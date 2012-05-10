@@ -17,23 +17,23 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-def consumer(msg):
-    # XXX This should resend message to some bus for data collection
-    pass
+import eventlet
+eventlet.monkey_patch()
 
+import sys
+
+from nova import flags
+from nova import log as logging
+from nova import service
+from nova import utils
 
 if __name__ == '__main__':
-    import sys
-    from nova import flags
-    # Import rabbit_notifier to register notification_topics flag
-    import nova.notifier.rabbit_notifier
-
+    utils.default_flagfile()
     flags.FLAGS(sys.argv)
-
-    from ceilometer.rpc import Connection
-
-    connection = Connection(flags.FLAGS)
-    connection.create_consumer("%s.info" % flags.FLAGS.notification_topics[0],
-                               consumer, fanout=False)
-    while True:
-        connection.consume()
+    logging.setup()
+    utils.monkey_patch()
+    server = service.Service.create(binary='ceilometer-nova-instance',
+                                    topic='ceilometer',
+                                    manager='ceilometer.nova.manager.InstanceManager')
+    service.serve(server)
+    service.wait()
