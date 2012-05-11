@@ -16,9 +16,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from lxml import etree
+
 from nova import log as logging
 from nova import manager
 from nova import flags
+import nova.virt.connection
 
 # Import rabbit_notifier to register notification_topics flag
 import nova.notifier.rabbit_notifier
@@ -40,3 +43,25 @@ class InstanceManager(manager.Manager):
     def _on_notification(self, body):
         event_type = body.get('event_type')
         LOG.info('NOTIFICATION: %s', event_type)
+
+
+class ComputeManager(manager.Manager):
+    def _get_disks(self, conn, instance):
+        """Get disks of an instance, only used to bypass bug#998089."""
+        domain = conn._conn.lookupByName(instance)
+        tree = etree.fromstring(domain.XMLDesc(0))
+        return filter(bool,
+                      [target.get('dev') \
+                           for target in tree.findall('devices/disk/target')])
+
+    @manager.periodic_task
+    def _fetch_diskio(self, context):
+        if FLAGS.connection_type == 'libvirt':
+            conn = nova.virt.connection.get_connection(read_only=True)
+            for instance in self.db.instance_get_all_by_host(context,
+                                                             self.host):
+                # TODO(jd) This does not work see bug#998089
+                # for disk in conn.get_disks(instance.name):
+                for disk in self._get_disks(conn, instance.name):
+                    stats = conn.block_stats(instance.name, disk)
+                    LOG.info("DISKIO USAGE: %s %s: read-requests=%d read-bytes=%d write-requests=%d write-bytes=%d errors=%d" % (instance, disk, stats[0], stats[1], stats[2], stats[3], stats[4]))
