@@ -75,3 +75,9 @@ class ComputeManager(manager.Manager):
                 for disk in disks:
                     stats = conn.block_stats(instance.name, disk)
                     LOG.info("DISKIO USAGE: %s %s: read-requests=%d read-bytes=%d write-requests=%d write-bytes=%d errors=%d" % (instance, disk, stats[0], stats[1], stats[2], stats[3], stats[4]))
+
+    @manager.periodic_task
+    def _fetch_cputime(self, context):
+        conn = nova.virt.connection.get_connection(read_only=True)
+        for instance in self.db.instance_get_all_by_host(context, self.host):
+            LOG.info("CPUTIME USAGE: %s %d" % (instance, conn.get_info(instance)['cpu_time']))
