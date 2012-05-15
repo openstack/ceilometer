@@ -1,1 +1,4 @@
 *.pyc
+*.dat
+TAGS
+*.egg-info
