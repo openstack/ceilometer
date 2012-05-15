@@ -32,8 +32,8 @@ if __name__ == '__main__':
     flags.FLAGS(sys.argv)
     logging.setup()
     utils.monkey_patch()
-    server = service.Service.create(binary='ceilometer-nova-compute',
+    server = service.Service.create(binary='ceilometer-agent',
                                     topic='ceilometer',
-                                    manager='ceilometer.nova.manager.ComputeManager')
+                                    manager='ceilometer.agent.manager.AgentManager')
     service.serve(server)
     service.wait()

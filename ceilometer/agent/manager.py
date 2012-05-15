@@ -30,8 +30,9 @@ FLAGS = flags.FLAGS
 LOG = logging.getLogger('nova.' + __name__)
 
 
-class ComputeManager(manager.Manager):
-    def _get_disks(self, conn, instance):
+class AgentManager(manager.Manager):
+    @staticmethod
+    def _get_disks(conn, instance):
         """Get disks of an instance, only used to bypass bug#998089."""
         domain = conn._conn.lookupByName(instance)
         tree = etree.fromstring(domain.XMLDesc(0))

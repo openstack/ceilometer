@@ -29,7 +29,7 @@ setuptools.setup(
     packages=setuptools.find_packages(exclude=['bin']),
     include_package_data=True,
     test_suite='nose.collector',
-    scripts=['bin/ceilometer-nova-compute'],
+    scripts=['bin/ceilometer-agent', 'bin/ceilometer-collector'],
     py_modules=[],
     entry_points={
         'ceilometer.collector.compute': [
