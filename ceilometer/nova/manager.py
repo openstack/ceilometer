@@ -29,7 +29,10 @@ import nova.notifier.rabbit_notifier
 from ceilometer import rpc
 
 FLAGS = flags.FLAGS
-LOG = logging.getLogger(__name__)
+# FIXME(dhellmann): We need to have the main program set up logging
+# correctly so messages from modules outside of the nova package
+# appear in the output.
+LOG = logging.getLogger('nova.' + __name__)
 
 
 class InstanceManager(manager.Manager):
@@ -51,8 +54,9 @@ class ComputeManager(manager.Manager):
         domain = conn._conn.lookupByName(instance)
         tree = etree.fromstring(domain.XMLDesc(0))
         return filter(bool,
-                      [target.get('dev') \
-                           for target in tree.findall('devices/disk/target')])
+                      [target.get('dev')
+                       for target in tree.findall('devices/disk/target')
+                       ])
 
     @manager.periodic_task
     def _fetch_diskio(self, context):
@@ -62,6 +66,12 @@ class ComputeManager(manager.Manager):
                                                              self.host):
                 # TODO(jd) This does not work see bug#998089
                 # for disk in conn.get_disks(instance.name):
-                for disk in self._get_disks(conn, instance.name):
+                try:
+                    disks = self._get_disks(conn, instance.name)
+                except Exception as err:
+                    LOG.warning('Ignoring instance %s: %s', instance.name, err)
+                    LOG.exception(err)
+                    continue
+                for disk in disks:
                     stats = conn.block_stats(instance.name, disk)
                     LOG.info("DISKIO USAGE: %s %s: read-requests=%d read-bytes=%d write-requests=%d write-bytes=%d errors=%d" % (instance, disk, stats[0], stats[1], stats[2], stats[3], stats[4]))
