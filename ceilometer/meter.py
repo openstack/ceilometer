@@ -20,6 +20,7 @@
 
 import hmac
 import hashlib
+import uuid
 
 
 # FIXME(dhellmann): Need to move this secret out of the code. Where?
@@ -38,3 +39,24 @@ def compute_signature(message):
         digest_maker.update(name)
         digest_maker.update(unicode(value).encode('utf-8'))
     return digest_maker.hexdigest()
+
+
+def meter_message_from_counter(notice, counter):
+    """Make a metering message ready to be published or stored.
+
+    Returns a dictionary containing a metering message
+    for a notification message and a Counter instance.
+    """
+    msg = {'source': counter.source,
+           'counter_type': counter.type,
+           'counter_volume': counter.volume,
+           'user_id': notice['payload']['user_id'],
+           'project_id': notice['payload']['tenant_id'],
+           'resource_id': counter.resource_id,
+           'counter_datetime': counter.datetime,
+           'counter_duration': counter.duration,
+           'resource_metadata': counter.resource_metadata,
+           'message_id': str(uuid.uuid1()),
+           }
+    msg['message_signature'] = compute_signature(msg)
+    return msg

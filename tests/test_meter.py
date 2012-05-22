@@ -15,14 +15,49 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Tests for converters for producing compute counter messages from
-notification events.
+"""Tests for ceilometer.meter
 """
 
-from ceilometer.compute import notifications
+from ceilometer import counter
+from ceilometer import meter
 
 
-INSTANCE_CREATE_END = {
+def test_compute_signature_change_key():
+    sig1 = meter.compute_signature({'a': 'A', 'b': 'B'})
+    sig2 = meter.compute_signature({'A': 'A', 'b': 'B'})
+    assert sig1 != sig2
+
+
+def test_compute_signature_change_value():
+    sig1 = meter.compute_signature({'a': 'A', 'b': 'B'})
+    sig2 = meter.compute_signature({'a': 'a', 'b': 'B'})
+    assert sig1 != sig2
+
+
+def test_compute_signature_same():
+    sig1 = meter.compute_signature({'a': 'A', 'b': 'B'})
+    sig2 = meter.compute_signature({'a': 'A', 'b': 'B'})
+    assert sig1 == sig2
+
+
+def test_compute_signature_signed():
+    data = {'a': 'A', 'b': 'B'}
+    sig1 = meter.compute_signature(data)
+    data['message_signature'] = sig1
+    sig2 = meter.compute_signature(data)
+    assert sig1 == sig2
+
+
+TEST_COUNTER = counter.Counter(source='src',
+                               type='typ',
+                               volume=1,
+                               resource_id=2,
+                               datetime='today',
+                               duration=3,
+                               resource_metadata={'key': 'value'},
+                               )
+
+TEST_NOTICE = {
     u'_context_auth_token': u'3d8b13de1b7d499587dfc69b77dc09c2',
     u'_context_is_admin': True,
     u'_context_project_id': u'7c150a59fe714e6f9263774af9688f0e',
@@ -60,32 +95,30 @@ INSTANCE_CREATE_END = {
     }
 
 
-def compare(name, actual, expected):
-    assert actual == expected, name
+def test_meter_message_from_counter_user_id():
+    msg = meter.meter_message_from_counter(TEST_NOTICE, TEST_COUNTER)
+    assert msg['user_id'] == TEST_NOTICE['payload']['user_id']
 
 
-def test_c1():
-    info = notifications.c1(INSTANCE_CREATE_END)
-
-    for name, actual, expected in [
-        ('counter_type', info.type, 'instance'),
-        ('counter_volume', info.volume, 1),
-        ('counter_datetime', info.datetime,
-         INSTANCE_CREATE_END['timestamp']),
-        ('resource_id', info.resource_id,
-         INSTANCE_CREATE_END['payload']['instance_id']),
-        ('display_name', info.resource_metadata['display_name'],
-         INSTANCE_CREATE_END['payload']['display_name']),
-        ('instance_type', info.resource_metadata['instance_type'],
-         INSTANCE_CREATE_END['payload']['instance_type_id']),
-        ('host', info.resource_metadata['host'],
-         INSTANCE_CREATE_END['publisher_id']),
-        ]:
-        yield compare, name, actual, expected
+def test_meter_message_from_counter_project_id():
+    msg = meter.meter_message_from_counter(TEST_NOTICE, TEST_COUNTER)
+    assert msg['project_id'] == TEST_NOTICE['payload']['tenant_id']
 
 
-def test_instance_create():
-    ic = notifications.InstanceCreate()
-    counters = ic.process_notification(INSTANCE_CREATE_END)
-    assert len(counters) == 1
-    assert counters[0].type == 'instance'
+def test_meter_message_from_counter_signed():
+    msg = meter.meter_message_from_counter(TEST_NOTICE, TEST_COUNTER)
+    assert 'message_signature' in msg
+
+
+def test_meter_message_from_counter_field():
+    def compare(f, c, msg_f, msg):
+        assert msg == c
+    msg = meter.meter_message_from_counter(TEST_NOTICE, TEST_COUNTER)
+    name_map = {'type': 'counter_type',
+                'volume': 'counter_volume',
+                'datetime': 'counter_datetime',
+                'duration': 'counter_duration',
+                }
+    for f in TEST_COUNTER._fields:
+        msg_f = name_map.get(f, f)
+        yield compare, f, getattr(TEST_COUNTER, f), msg_f, msg[msg_f]

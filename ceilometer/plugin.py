@@ -15,26 +15,24 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Tests for converters for producing compute counter messages from
-notification events.
+"""Base class for plugins.
 """
 
-from ceilometer import signature
+import abc
 
 
-def test_change_key():
-    sig1 = signature.compute_signature({'a': 'A', 'b': 'B'})
-    sig2 = signature.compute_signature({'A': 'A', 'b': 'B'})
-    assert sig1 != sig2
+class NotificationBase(object):
+    """Base class for plugins that support the notification API."""
 
+    __metaclass__ = abc.ABCMeta
 
-def test_change_value():
-    sig1 = signature.compute_signature({'a': 'A', 'b': 'B'})
-    sig2 = signature.compute_signature({'a': 'a', 'b': 'B'})
-    assert sig1 != sig2
+    @abc.abstractmethod
+    def get_event_types(self):
+        """Return a sequence of strings defining the event types to be
+        given to this plugin."""
+        return []
 
-
-def test_same():
-    sig1 = signature.compute_signature({'a': 'A', 'b': 'B'})
-    sig2 = signature.compute_signature({'a': 'A', 'b': 'B'})
-    assert sig1 == sig2
+    @abc.abstractmethod
+    def process_notification(self, message):
+        """Return a sequence of Counter instances for the given message."""
+        pass

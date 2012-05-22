@@ -31,7 +31,8 @@ def test_send_messages():
 
 def test_record_messages():
     conn = mox.MockObject(impl_kombu.Connection)
-    conn.declare_topic_consumer('notifications.info', mox.IsA(types.FunctionType))
+    conn.declare_topic_consumer('notifications.info',
+                                mox.IsA(types.FunctionType))
     conn.consume()
     mox.Replay(conn)
     notificationclient.record_messages(conn, StringIO())

@@ -18,26 +18,38 @@
 """Converters for producing compute counter messages from notification events.
 """
 
-from .. import signature
+from .. import counter
+from .. import plugin
 
 
 def c1(body):
     """Generate c1(instance) counters for a notice."""
-    c = {'source': '?',
-         'counter_type': 'instance',
-         'counter_volume': 1,
-         'user_id': body['payload']['user_id'],
-         'project_id': body['payload']['tenant_id'],
-         'resource_id': body['payload']['instance_id'],
-         'counter_datetime': body['timestamp'],
-         'counter_duration': 0,
-         # FIXME(dhellmann): Add region and other details to metadata
-         'resource_metadata': {'display_name':
-                                   body['payload']['display_name'],
-                               'instance_type':
-                                   body['payload']['instance_type_id'],
-                               'host': body['publisher_id'],
-                               },
-         }
-    c['message_signature'] = signature.compute_signature(c)
-    return [c]
+    return counter.Counter(
+        source='?',
+        type='instance',
+        volume=1,
+        resource_id=body['payload']['instance_id'],
+        datetime=body['timestamp'],
+        duration=0,
+        # FIXME(dhellmann): Add region and other
+        # details to metadata
+        resource_metadata={
+            'display_name':
+                body['payload']['display_name'],
+            'instance_type':
+                body['payload']['instance_type_id'],
+            'host': body['publisher_id'],
+            },
+        )
+
+
+class InstanceCreate(plugin.NotificationBase):
+    """Convert compute.instance.create.end notifications into Counters
+    """
+
+    def get_event_types(self):
+        return ['compute.instance.create.end']
+
+    def process_notification(self, message):
+        return [c1(message),
+                ]

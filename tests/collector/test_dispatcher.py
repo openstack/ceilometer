@@ -15,14 +15,19 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Tests for converters for producing compute counter messages from
-notification events.
+"""Tests for ceilometer/nova/dispatcher.py
 """
 
 from ceilometer.compute import notifications
+from ceilometer.collector import dispatcher
 
 
-INSTANCE_CREATE_END = {
+class StubDispatcher(dispatcher.NotificationDispatcher):
+    def _load_plugins(self):
+        self.handlers['compute.instance.create.end'] = [notifications.InstanceCreate()]
+
+
+TEST_NOTICE = {
     u'_context_auth_token': u'3d8b13de1b7d499587dfc69b77dc09c2',
     u'_context_is_admin': True,
     u'_context_project_id': u'7c150a59fe714e6f9263774af9688f0e',
@@ -60,32 +65,40 @@ INSTANCE_CREATE_END = {
     }
 
 
-def compare(name, actual, expected):
-    assert actual == expected, name
+def test_notify():
+    results = []
+    d = StubDispatcher(None, lambda x, y: results.append((x, y)))
+    d.notify(TEST_NOTICE)
+    assert len(results) == 1
+    counter = results[0][1]
+    assert counter.type == 'instance'
 
 
-def test_c1():
-    info = notifications.c1(INSTANCE_CREATE_END)
-
-    for name, actual, expected in [
-        ('counter_type', info.type, 'instance'),
-        ('counter_volume', info.volume, 1),
-        ('counter_datetime', info.datetime,
-         INSTANCE_CREATE_END['timestamp']),
-        ('resource_id', info.resource_id,
-         INSTANCE_CREATE_END['payload']['instance_id']),
-        ('display_name', info.resource_metadata['display_name'],
-         INSTANCE_CREATE_END['payload']['display_name']),
-        ('instance_type', info.resource_metadata['instance_type'],
-         INSTANCE_CREATE_END['payload']['instance_type_id']),
-        ('host', info.resource_metadata['host'],
-         INSTANCE_CREATE_END['publisher_id']),
-        ]:
-        yield compare, name, actual, expected
+def test_load_compute_plugins():
+    results = []
+    d = dispatcher.NotificationDispatcher(
+        'ceilometer.collector.compute',
+        lambda x, y: results.append((x, y))
+        )
+    assert d.handlers, 'No handlers were loaded'
 
 
-def test_instance_create():
-    ic = notifications.InstanceCreate()
-    counters = ic.process_notification(INSTANCE_CREATE_END)
-    assert len(counters) == 1
-    assert counters[0].type == 'instance'
+def test_load_no_plugins():
+    results = []
+    d = dispatcher.NotificationDispatcher(
+        'ceilometer.collector.none',
+        lambda x, y: results.append((x, y))
+        )
+    assert not d.handlers, 'Handlers were loaded'
+
+
+def test_notify_through_plugin():
+    results = []
+    d = dispatcher.NotificationDispatcher(
+        'ceilometer.collector.compute',
+        lambda x, y: results.append((x, y))
+        )
+    d.notify(TEST_NOTICE)
+    assert len(results) == 1
+    counter = results[0][1]
+    assert counter.type == 'instance'

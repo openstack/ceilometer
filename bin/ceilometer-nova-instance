@@ -28,12 +28,12 @@ from nova import service
 from nova import utils
 
 if __name__ == '__main__':
-    utils.default_flagfile()
+    utils.default_cfgfile()
     flags.FLAGS(sys.argv)
     logging.setup()
     utils.monkey_patch()
     server = service.Service.create(binary='ceilometer-nova-instance',
                                     topic='ceilometer',
-                                    manager='ceilometer.nova.manager.InstanceManager')
+                                    manager='ceilometer.collector.manager.CollectorManager')
     service.serve(server)
     service.wait()

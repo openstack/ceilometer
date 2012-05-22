@@ -23,29 +23,11 @@ from nova import manager
 from nova import flags
 import nova.virt.connection
 
-# Import rabbit_notifier to register notification_topics flag
-import nova.notifier.rabbit_notifier
-
-from ceilometer import rpc
-
 FLAGS = flags.FLAGS
 # FIXME(dhellmann): We need to have the main program set up logging
 # correctly so messages from modules outside of the nova package
 # appear in the output.
 LOG = logging.getLogger('nova.' + __name__)
-
-
-class InstanceManager(manager.Manager):
-    def init_host(self):
-        self.connection = rpc.Connection(flags.FLAGS)
-        self.connection.declare_topic_consumer(
-            topic='%s.info' % flags.FLAGS.notification_topics[0],
-            callback=self._on_notification)
-        self.connection.consume_in_thread()
-
-    def _on_notification(self, body):
-        event_type = body.get('event_type')
-        LOG.info('NOTIFICATION: %s', event_type)
 
 
 class ComputeManager(manager.Manager):

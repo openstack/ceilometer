@@ -19,14 +19,21 @@
 
 import setuptools
 
-setuptools.setup(name='ceilometer',
-                 version='0',
-                 description='cloud computing metering',
-                 author='OpenStack',
-                 author_email='ceilometer@lists.launchpad.net',
-                 url='https://launchpad.net/ceilometer',
-                 packages=setuptools.find_packages(exclude=['bin']),
-                 include_package_data=True,
-                 test_suite='nose.collector',
-                 scripts=['bin/ceilometer-nova-compute'],
-                 py_modules=[])
+setuptools.setup(
+    name='ceilometer',
+    version='0',
+    description='cloud computing metering',
+    author='OpenStack',
+    author_email='ceilometer@lists.launchpad.net',
+    url='https://launchpad.net/ceilometer',
+    packages=setuptools.find_packages(exclude=['bin']),
+    include_package_data=True,
+    test_suite='nose.collector',
+    scripts=['bin/ceilometer-nova-compute'],
+    py_modules=[],
+    entry_points={
+        'ceilometer.collector.compute': [
+            'instance_create = ceilometer.compute.notifications:InstanceCreate',
+            ],
+        },
+    )

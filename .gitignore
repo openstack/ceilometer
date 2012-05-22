@@ -2,3 +2,5 @@
 *.dat
 TAGS
 *.egg-info
+build
+.coverage
