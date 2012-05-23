@@ -16,12 +16,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from lxml import etree
+import pkg_resources
 
 from nova import log as logging
 from nova import manager
 from nova import flags
-import nova.virt.connection
 
 FLAGS = flags.FLAGS
 # FIXME(dhellmann): We need to have the main program set up logging
@@ -29,38 +28,47 @@ FLAGS = flags.FLAGS
 # appear in the output.
 LOG = logging.getLogger('nova.' + __name__)
 
+COMPUTE_PLUGIN_NAMESPACE = 'ceilometer.poll.compute'
+
 
 class AgentManager(manager.Manager):
-    @staticmethod
-    def _get_disks(conn, instance):
-        """Get disks of an instance, only used to bypass bug#998089."""
-        domain = conn._conn.lookupByName(instance)
-        tree = etree.fromstring(domain.XMLDesc(0))
-        return filter(bool,
-                      [target.get('dev')
-                       for target in tree.findall('devices/disk/target')
-                       ])
 
-    @manager.periodic_task
-    def _fetch_diskio(self, context):
-        if FLAGS.connection_type == 'libvirt':
-            conn = nova.virt.connection.get_connection(read_only=True)
-            for instance in self.db.instance_get_all_by_host(context,
-                                                             self.host):
-                # TODO(jd) This does not work see bug#998089
-                # for disk in conn.get_disks(instance.name):
-                try:
-                    disks = self._get_disks(conn, instance.name)
-                except Exception as err:
-                    LOG.warning('Ignoring instance %s: %s', instance.name, err)
-                    LOG.exception(err)
-                    continue
-                for disk in disks:
-                    stats = conn.block_stats(instance.name, disk)
-                    LOG.info("DISKIO USAGE: %s %s: read-requests=%d read-bytes=%d write-requests=%d write-bytes=%d errors=%d" % (instance, disk, stats[0], stats[1], stats[2], stats[3], stats[4]))
+    def init_host(self):
+        self._load_plugins()
+        return
 
-    @manager.periodic_task
-    def _fetch_cputime(self, context):
-        conn = nova.virt.connection.get_connection(read_only=True)
-        for instance in self.db.instance_get_all_by_host(context, self.host):
-            LOG.info("CPUTIME USAGE: %s %d" % (instance, conn.get_info(instance)['cpu_time']))
+    def _load_plugins(self):
+        self.pollsters = []
+        for ep in pkg_resources.iter_entry_points(COMPUTE_PLUGIN_NAMESPACE):
+            LOG.info('attempting to load pollster %s:%s',
+                     COMPUTE_PLUGIN_NAMESPACE, ep.name)
+            try:
+                plugin_class = ep.load()
+                plugin = plugin_class()
+                # FIXME(dhellmann): Currently assumes all plugins are
+                # enabled when they are discovered and
+                # importable. Need to add check against global
+                # configuration flag and check that asks the plugin if
+                # it should be enabled.
+                self.pollsters.append((ep.name, plugin))
+            except Exception as err:
+                LOG.warning('Failed to load pollster %s:%s',
+                            ep.name, err)
+                LOG.exception(err)
+        if not self.pollsters:
+            LOG.warning('Failed to load any pollsters for %s',
+                        COMPUTE_PLUGIN_NAMESPACE)
+        return
+
+    def periodic_tasks(self, context, raise_on_error=False):
+        """Tasks to be run at a periodic interval."""
+        for name, pollster in self.pollsters:
+            try:
+                LOG.info('polling %s', name)
+                for c in pollster.get_counters(self, context):
+                    LOG.info('COUNTER: %s', c)
+                    # FIXME(dhellmann): Convert to meter data and
+                    # publish.
+            except Exception as err:
+                LOG.warning('Continuing after error from %s: %s', name, err)
+                LOG.exception(err)

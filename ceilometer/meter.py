@@ -41,7 +41,7 @@ def compute_signature(message):
     return digest_maker.hexdigest()
 
 
-def meter_message_from_counter(notice, counter):
+def meter_message_from_counter(counter):
     """Make a metering message ready to be published or stored.
 
     Returns a dictionary containing a metering message
@@ -50,8 +50,8 @@ def meter_message_from_counter(notice, counter):
     msg = {'source': counter.source,
            'counter_type': counter.type,
            'counter_volume': counter.volume,
-           'user_id': notice['payload']['user_id'],
-           'project_id': notice['payload']['tenant_id'],
+           'user_id': counter.user_id,
+           'project_id': counter.project_id,
            'resource_id': counter.resource_id,
            'counter_datetime': counter.datetime,
            'counter_duration': counter.duration,

@@ -50,9 +50,9 @@ class CollectorManager(manager.Manager):
             callback=self.compute_handler.notify)
         self.connection.consume_in_thread()
 
-    def _publish_counter(self, notice, c):
+    def _publish_counter(self, counter):
         """Create a metering message for the counter and publish it."""
-        msg = meter.meter_message_from_counter(notice, c)
+        msg = meter.meter_message_from_counter(counter)
         LOG.info('PUBLISH: %s', str(msg))
         # FIXME(dhellmann): Need to publish the message on the
         # metering queue.

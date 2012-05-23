@@ -28,6 +28,8 @@ def c1(body):
         source='?',
         type='instance',
         volume=1,
+        user_id=body['payload']['user_id'],
+        project_id=body['payload']['tenant_id'],
         resource_id=body['payload']['instance_id'],
         datetime=body['timestamp'],
         duration=0,

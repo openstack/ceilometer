@@ -1,9 +1,8 @@
-#!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 #
-# Copyright © 2012 eNovance <licensing@enovance.com>
+# Copyright © 2012 New Dream Network, LLC (DreamHost)
 #
-# Author: Julien Danjou <julien@danjou.info>
+# Author: Doug Hellmann <doug.hellmann@dreamhost.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -16,40 +15,28 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Tests for manager.
+"""Tests for ceilometer/agent/manager.py
 """
-
-# import unittest
-# import mox
-# import stubout
-
-# import nova.tests.fakelibvirt as libvirt
-from nova import context
-from nova import flags
-from nova import test
-from nova import db
-from nova import test
 
 from ceilometer.agent import manager
 
-class TestAgentManager(test.TestCase):
 
-    def setUp(self):
-        self.context = context.RequestContext('admin', 'admin', is_admin=True)
-        self.manager = manager.AgentManager()
-        super(TestAgentManager, self).setUp()
+def test_load_plugins():
+    mgr = manager.AgentManager()
+    mgr.init_host()
+    assert mgr.pollsters, 'Failed to load any plugins'
+    return
 
-    def test_fetch_diskio(self):
-        self.manager._fetch_diskio(self.context)
 
-    def test_fetch_diskio_with_libvirt_non_existent_instance(self):
-        flags.FLAGS.connection_type = 'libvirt'
+def test_run_tasks():
+    class Pollster:
+        counters = []
 
-        instance = db.instance_create(self.context, {})
+        def get_counters(self, manager, context):
+            self.counters.append((manager, context))
+            return ['test data']
 
-        self.mox.StubOutWithMock(self.manager.db, 'instance_get_all_by_host')
-        self.manager.db.instance_get_all_by_host(self.context, self.manager.host).AndReturn([instance])
-
-        self.mox.ReplayAll()
-
-        self.manager._fetch_diskio(self.context)
+    mgr = manager.AgentManager()
+    mgr.pollsters = [('test', Pollster())]
+    mgr.periodic_tasks('context')
+    assert Pollster.counters[0] == (mgr, 'context')

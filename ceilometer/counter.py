@@ -29,8 +29,11 @@ Counter = collections.namedtuple('Counter',
                                  ' '.join(['source',
                                            'type',
                                            'volume',
+                                           'user_id',
+                                           'project_id',
                                            'resource_id',
                                            'datetime',
                                            'duration',
-                                           'resource_metadata'])
+                                           'resource_metadata',
+                                           ])
                                  )

@@ -67,10 +67,10 @@ TEST_NOTICE = {
 
 def test_notify():
     results = []
-    d = StubDispatcher(None, lambda x, y: results.append((x, y)))
+    d = StubDispatcher(None, lambda x: results.append(x))
     d.notify(TEST_NOTICE)
     assert len(results) == 1
-    counter = results[0][1]
+    counter = results[0]
     assert counter.type == 'instance'
 
 
@@ -78,7 +78,7 @@ def test_load_compute_plugins():
     results = []
     d = dispatcher.NotificationDispatcher(
         'ceilometer.collector.compute',
-        lambda x, y: results.append((x, y))
+        lambda x: results.append(x)
         )
     assert d.handlers, 'No handlers were loaded'
 
@@ -87,7 +87,7 @@ def test_load_no_plugins():
     results = []
     d = dispatcher.NotificationDispatcher(
         'ceilometer.collector.none',
-        lambda x, y: results.append((x, y))
+        lambda x: results.append(x)
         )
     assert not d.handlers, 'Handlers were loaded'
 
@@ -96,9 +96,9 @@ def test_notify_through_plugin():
     results = []
     d = dispatcher.NotificationDispatcher(
         'ceilometer.collector.compute',
-        lambda x, y: results.append((x, y))
+        lambda x: results.append(x)
         )
     d.notify(TEST_NOTICE)
     assert len(results) == 1
-    counter = results[0][1]
+    counter = results[0]
     assert counter.type == 'instance'

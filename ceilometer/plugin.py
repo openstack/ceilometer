@@ -30,9 +30,17 @@ class NotificationBase(object):
     def get_event_types(self):
         """Return a sequence of strings defining the event types to be
         given to this plugin."""
-        return []
 
     @abc.abstractmethod
     def process_notification(self, message):
         """Return a sequence of Counter instances for the given message."""
-        pass
+
+
+class PollsterBase(object):
+    """Base class for plugins that support the polling API."""
+
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def get_counters(self, manager, context):
+        """Return a sequence of Counter instances from polling the resources."""

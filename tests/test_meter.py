@@ -51,6 +51,8 @@ def test_compute_signature_signed():
 TEST_COUNTER = counter.Counter(source='src',
                                type='typ',
                                volume=1,
+                               user_id='user',
+                               project_id='project',
                                resource_id=2,
                                datetime='today',
                                duration=3,
@@ -95,25 +97,15 @@ TEST_NOTICE = {
     }
 
 
-def test_meter_message_from_counter_user_id():
-    msg = meter.meter_message_from_counter(TEST_NOTICE, TEST_COUNTER)
-    assert msg['user_id'] == TEST_NOTICE['payload']['user_id']
-
-
-def test_meter_message_from_counter_project_id():
-    msg = meter.meter_message_from_counter(TEST_NOTICE, TEST_COUNTER)
-    assert msg['project_id'] == TEST_NOTICE['payload']['tenant_id']
-
-
 def test_meter_message_from_counter_signed():
-    msg = meter.meter_message_from_counter(TEST_NOTICE, TEST_COUNTER)
+    msg = meter.meter_message_from_counter(TEST_COUNTER)
     assert 'message_signature' in msg
 
 
 def test_meter_message_from_counter_field():
     def compare(f, c, msg_f, msg):
         assert msg == c
-    msg = meter.meter_message_from_counter(TEST_NOTICE, TEST_COUNTER)
+    msg = meter.meter_message_from_counter(TEST_COUNTER)
     name_map = {'type': 'counter_type',
                 'volume': 'counter_volume',
                 'datetime': 'counter_datetime',

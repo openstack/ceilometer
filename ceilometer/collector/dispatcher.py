@@ -74,5 +74,5 @@ class NotificationDispatcher(object):
             for c in handler.process_notification(body):
                 LOG.info('COUNTER: %s', c)
                 # FIXME(dhellmann): Spawn green thread?
-                self.publish_func(body, c)
+                self.publish_func(c)
         return

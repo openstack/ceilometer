@@ -35,5 +35,9 @@ setuptools.setup(
         'ceilometer.collector.compute': [
             'instance_create = ceilometer.compute.notifications:InstanceCreate',
             ],
+        'ceilometer.poll.compute': [
+            'libvirt_diskio = ceilometer.compute.libvirt:DiskIOPollster',
+            'libvirt_cpu = ceilometer.compute.libvirt:CPUPollster',
+            ],
         },
     )
