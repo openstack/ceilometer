@@ -38,6 +38,7 @@ setuptools.setup(
         'ceilometer.poll.compute': [
             'libvirt_diskio = ceilometer.compute.libvirt:DiskIOPollster',
             'libvirt_cpu = ceilometer.compute.libvirt:CPUPollster',
+            'network_floatingip = ceilometer.compute.network:FloatingIPPollster',
             ],
         },
     )
