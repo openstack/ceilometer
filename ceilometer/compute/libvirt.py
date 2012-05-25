@@ -16,6 +16,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import datetime
+
 from lxml import etree
 
 from nova import log as logging
@@ -43,7 +45,7 @@ def make_counter_from_instance(instance, type, volume):
         user_id=instance.user_id,
         project_id=instance.project_id,
         resource_id=instance.uuid,
-        datetime=None,
+        timestamp=datetime.datetime.utcnow().isoformat(),
         duration=None,
         resource_metadata={
             'display_name': instance.display_name,

@@ -16,9 +16,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from nova import context
 from nova import flags
 from nova import log as logging
 from nova import manager
+from nova import rpc as nova_rpc
+from nova.rpc import dispatcher as rpc_dispatcher
 
 from ceilometer import rpc
 from ceilometer import meter
@@ -39,15 +42,30 @@ COMPUTE_COLLECTOR_NAMESPACE = 'ceilometer.collector.compute'
 
 
 class CollectorManager(manager.Manager):
+
     def init_host(self):
         self.connection = rpc.Connection(flags.FLAGS)
+
         self.compute_handler = dispatcher.NotificationDispatcher(
             COMPUTE_COLLECTOR_NAMESPACE,
             self._publish_counter,
             )
+        # FIXME(dhellmann): Should be using create_worker(), except
+        # that notification messages do not conform to the RPC
+        # invocation protocol (they do not include a "method"
+        # parameter).
         self.connection.declare_topic_consumer(
             topic='%s.info' % flags.FLAGS.notification_topics[0],
             callback=self.compute_handler.notify)
+
+        # Set ourselves up as a separate worker for the metering data,
+        # since the default for manager is to use create_consumer().
+        self.connection.create_worker(
+            flags.FLAGS.metering_topic,
+            rpc_dispatcher.RpcDispatcher([self]),
+            'ceilometer.collector.' + flags.FLAGS.metering_topic,
+            )
+
         self.connection.consume_in_thread()
 
     def _publish_counter(self, counter):
@@ -56,3 +74,24 @@ class CollectorManager(manager.Manager):
         LOG.info('PUBLISH: %s', str(msg))
         # FIXME(dhellmann): Need to publish the message on the
         # metering queue.
+        msg = {
+            'method': 'record_metering_data',
+            'version': '1.0',
+            'args': {'data': msg,
+                     },
+            }
+        ctxt = context.get_admin_context()
+        nova_rpc.cast(ctxt, FLAGS.metering_topic, msg)
+        nova_rpc.cast(ctxt,
+                 FLAGS.metering_topic + '.' + counter.type,
+                 msg)
+
+    def record_metering_data(self, context, data):
+        """This method is triggered when metering data is
+        cast from an agent.
+        """
+        #LOG.info('metering data: %r', data)
+        LOG.info('metering data %s for %s: %s',
+                 data['event_type'],
+                 data['resource_id'],
+                 data['counter_volume'])

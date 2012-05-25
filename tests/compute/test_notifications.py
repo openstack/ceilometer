@@ -70,7 +70,7 @@ def test_c1():
     for name, actual, expected in [
         ('counter_type', info.type, 'instance'),
         ('counter_volume', info.volume, 1),
-        ('counter_datetime', info.datetime,
+        ('timestamp', info.timestamp,
          INSTANCE_CREATE_END['timestamp']),
         ('resource_id', info.resource_id,
          INSTANCE_CREATE_END['payload']['instance_id']),

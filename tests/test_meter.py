@@ -21,6 +21,8 @@
 from ceilometer import counter
 from ceilometer import meter
 
+from nova import flags
+
 
 def test_compute_signature_change_key():
     sig1 = meter.compute_signature({'a': 'A', 'b': 'B'})
@@ -48,13 +50,25 @@ def test_compute_signature_signed():
     assert sig1 == sig2
 
 
+def test_compute_signature_use_configured_secret():
+    data = {'a': 'A', 'b': 'B'}
+    sig1 = meter.compute_signature(data)
+    old_secret = flags.FLAGS.metering_secret
+    try:
+        flags.FLAGS.metering_secret = 'not the default value'
+        sig2 = meter.compute_signature(data)
+    finally:
+        flags.FLAGS.metering_secret = old_secret
+    assert sig1 != sig2
+
+
 TEST_COUNTER = counter.Counter(source='src',
                                type='typ',
                                volume=1,
                                user_id='user',
                                project_id='project',
                                resource_id=2,
-                               datetime='today',
+                               timestamp='today',
                                duration=3,
                                resource_metadata={'key': 'value'},
                                )
@@ -102,13 +116,17 @@ def test_meter_message_from_counter_signed():
     assert 'message_signature' in msg
 
 
+def test_meter_message_from_counter_event_type():
+    msg = meter.meter_message_from_counter(TEST_COUNTER)
+    assert msg['event_type'] == 'metering.' + TEST_COUNTER.type
+
+
 def test_meter_message_from_counter_field():
     def compare(f, c, msg_f, msg):
         assert msg == c
     msg = meter.meter_message_from_counter(TEST_COUNTER)
     name_map = {'type': 'counter_type',
                 'volume': 'counter_volume',
-                'datetime': 'counter_datetime',
                 'duration': 'counter_duration',
                 }
     for f in TEST_COUNTER._fields:

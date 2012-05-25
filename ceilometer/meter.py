@@ -18,19 +18,31 @@
 """Compute the signature of a metering message.
 """
 
-import hmac
 import hashlib
+import hmac
 import uuid
 
+from nova import flags
+from nova.openstack.common import cfg
 
-# FIXME(dhellmann): Need to move this secret out of the code. Where?
-SECRET = 'secrete'
+METER_OPTS = [
+    cfg.StrOpt('metering_secret',
+               default='change this or be hacked',
+               help='Secret value for signing metering messages',
+               ),
+    cfg.StrOpt('metering_topic',
+               default='metering',
+               help='the topic ceilometer uses for metering messages',
+               ),
+    ]
+
+flags.FLAGS.register_opts(METER_OPTS)
 
 
 def compute_signature(message):
     """Return the signature for a message dictionary.
     """
-    digest_maker = hmac.new(SECRET, '', hashlib.sha256)
+    digest_maker = hmac.new(flags.FLAGS.metering_secret, '', hashlib.sha256)
     for name, value in sorted(message.iteritems()):
         if name == 'message_signature':
             # Skip any existing signature value, which would not have
@@ -53,10 +65,12 @@ def meter_message_from_counter(counter):
            'user_id': counter.user_id,
            'project_id': counter.project_id,
            'resource_id': counter.resource_id,
-           'counter_datetime': counter.datetime,
+           'timestamp': counter.timestamp,
            'counter_duration': counter.duration,
            'resource_metadata': counter.resource_metadata,
            'message_id': str(uuid.uuid1()),
+           # This field is used by the notification system.
+           'event_type': '%s.%s' % (flags.FLAGS.metering_topic, counter.type),
            }
     msg['message_signature'] = compute_signature(msg)
     return msg

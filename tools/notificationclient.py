@@ -34,10 +34,8 @@ from nova.openstack.common import cfg
 FLAGS = flags.FLAGS
 LOG = logging.getLogger(__name__)
 
-NOTIFICATION_TOPIC = 'notifications.info'
 
-
-def record_messages(connection, output):
+def record_messages(connection, topic, output):
     """Listen to notification.info messages and pickle them to output."""
     def process_event(body):
         print ('%s: %s' %
@@ -46,16 +44,38 @@ def record_messages(connection, output):
                 ))
         pickle.dump(body, output)
 
-    connection.declare_topic_consumer(NOTIFICATION_TOPIC, process_event)
+    connection.declare_topic_consumer(topic, process_event)
     try:
         connection.consume()
-        # for i in connection.iterconsume(5):
-        #     print 'iteration', i
     except KeyboardInterrupt:
         pass
 
 
-def send_messages(connection, input):
+def monitor_messages(connection, topic):
+    """Listen to notification.info messages and print them."""
+    def process_event(msg):
+        body = msg['args']['data']
+        if 'resource_id' in body:
+            print ('%s: %s/%-15s: %s' %
+                   (body.get('timestamp'),
+                    body.get('resource_id'),
+                    body.get('event_type'),
+                    body.get('counter_volume'),
+                    ))
+        else:
+            print ('%s: %s' %
+                   (body.get('timestamp'),
+                    body.get('event_type'),
+                    ))
+
+    connection.declare_topic_consumer(topic, process_event)
+    try:
+        connection.consume()
+    except KeyboardInterrupt:
+        pass
+
+
+def send_messages(connection, topic, input):
     """Read messages from the input and send them to the AMQP queue."""
     while True:
         try:
@@ -66,7 +86,7 @@ def send_messages(connection, input):
               (body.get('timestamp'),
                body.get('event_type', 'unknown event'),
                ))
-        connection.topic_send(NOTIFICATION_TOPIC, body)
+        connection.topic_send(topic, body)
 
 
 def main():
@@ -91,11 +111,17 @@ def main():
         description='record or play back notification events',
         )
     parser.add_argument('mode',
-                        choices=('record', 'replay'),
+                        choices=('record', 'replay', 'monitor'),
                         help='operating mode',
                         )
     parser.add_argument('data_file',
+                        default='msgs.dat',
+                        nargs='?',
                         help='the data file to read or write',
+                        )
+    parser.add_argument('--topic',
+                        default='notifications.info',
+                        help='the exchange topic to listen for',
                         )
     args = parser.parse_args(remaining_args[1:])
 
@@ -111,10 +137,12 @@ def main():
     try:
         if args.mode == 'replay':
             with open(args.data_file, 'rb') as input:
-                send_messages(connection, input)
+                send_messages(connection, args.topic, input)
         elif args.mode == 'record':
             with open(args.data_file, 'wb') as output:
-                record_messages(connection, output)
+                record_messages(connection, args.topic, output)
+        elif args.mode == 'monitor':
+            monitor_messages(connection, args.topic)
     finally:
         connection.close()
 

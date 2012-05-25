@@ -18,11 +18,15 @@
 
 import pkg_resources
 
+from nova import flags
 from nova import log as logging
 from nova import manager
-from nova import flags
+from nova import rpc
+
+from ceilometer import meter
 
 FLAGS = flags.FLAGS
+
 # FIXME(dhellmann): We need to have the main program set up logging
 # correctly so messages from modules outside of the nova package
 # appear in the output.
@@ -40,8 +44,6 @@ class AgentManager(manager.Manager):
     def _load_plugins(self):
         self.pollsters = []
         for ep in pkg_resources.iter_entry_points(COMPUTE_PLUGIN_NAMESPACE):
-            LOG.info('attempting to load pollster %s:%s',
-                     COMPUTE_PLUGIN_NAMESPACE, ep.name)
             try:
                 plugin_class = ep.load()
                 plugin = plugin_class()
@@ -51,6 +53,8 @@ class AgentManager(manager.Manager):
                 # configuration flag and check that asks the plugin if
                 # it should be enabled.
                 self.pollsters.append((ep.name, plugin))
+                LOG.info('loaded pollster %s:%s',
+                         COMPUTE_PLUGIN_NAMESPACE, ep.name)
             except Exception as err:
                 LOG.warning('Failed to load pollster %s:%s',
                             ep.name, err)
@@ -67,8 +71,16 @@ class AgentManager(manager.Manager):
                 LOG.info('polling %s', name)
                 for c in pollster.get_counters(self, context):
                     LOG.info('COUNTER: %s', c)
-                    # FIXME(dhellmann): Convert to meter data and
-                    # publish.
+                    msg = {
+                        'method': 'record_metering_data',
+                        'version': '1.0',
+                        'args': {'data': meter.meter_message_from_counter(c),
+                                 },
+                        }
+                    rpc.cast(context, FLAGS.metering_topic, msg)
+                    rpc.cast(context,
+                             FLAGS.metering_topic + '.' + c.type,
+                             msg)
             except Exception as err:
                 LOG.warning('Continuing after error from %s: %s', name, err)
                 LOG.exception(err)

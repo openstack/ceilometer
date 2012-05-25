@@ -32,7 +32,7 @@ Counter = collections.namedtuple('Counter',
                                            'user_id',
                                            'project_id',
                                            'resource_id',
-                                           'datetime',
+                                           'timestamp',
                                            'duration',
                                            'resource_metadata',
                                            ])

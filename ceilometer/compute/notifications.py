@@ -31,7 +31,7 @@ def c1(body):
         user_id=body['payload']['user_id'],
         project_id=body['payload']['tenant_id'],
         resource_id=body['payload']['instance_id'],
-        datetime=body['timestamp'],
+        timestamp=body['timestamp'],
         duration=0,
         # FIXME(dhellmann): Add region and other
         # details to metadata

@@ -18,7 +18,14 @@
 """Tests for ceilometer/agent/manager.py
 """
 
+import datetime
+
+from nova import context
+from nova import rpc
+from nova import test
+
 from ceilometer.agent import manager
+from ceilometer import counter
 
 
 def test_load_plugins():
@@ -28,15 +35,45 @@ def test_load_plugins():
     return
 
 
-def test_run_tasks():
+class TestRunTasks(test.TestCase):
+
     class Pollster:
         counters = []
+        test_data = counter.Counter(
+            source='test',
+            type='test',
+            volume=1,
+            user_id='test',
+            project_id='test',
+            resource_id='test_run_tasks',
+            timestamp=datetime.datetime.utcnow().isoformat(),
+            duration=0,
+            resource_metadata={'name': 'Pollster',
+                               },
+            )
 
         def get_counters(self, manager, context):
             self.counters.append((manager, context))
-            return ['test data']
+            return [self.test_data]
 
-    mgr = manager.AgentManager()
-    mgr.pollsters = [('test', Pollster())]
-    mgr.periodic_tasks('context')
-    assert Pollster.counters[0] == (mgr, 'context')
+    def faux_notify(self, context, topic, msg):
+        self.notifications.append((topic, msg))
+
+    def setUp(self):
+        super(TestRunTasks, self).setUp()
+        self.notifications = []
+        self.stubs.Set(rpc, 'cast', self.faux_notify)
+        self.mgr = manager.AgentManager()
+        self.mgr.pollsters = [('test', self.Pollster())]
+        self.ctx = context.RequestContext("user", "project")
+        self.mgr.periodic_tasks(self.ctx)
+
+    def test_message(self):
+        assert self.Pollster.counters[0][1] is self.ctx
+
+    def test_notify(self):
+        assert len(self.notifications) == 2
+
+    def test_notify_topics(self):
+        topics = [n[0] for n in self.notifications]
+        assert topics == ['metering', 'metering.test']
