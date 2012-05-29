@@ -20,8 +20,7 @@
 
 from ceilometer import counter
 from ceilometer import meter
-
-from nova import flags
+from ceilometer import cfg
 
 
 def test_compute_signature_change_key():
@@ -53,12 +52,12 @@ def test_compute_signature_signed():
 def test_compute_signature_use_configured_secret():
     data = {'a': 'A', 'b': 'B'}
     sig1 = meter.compute_signature(data)
-    old_secret = flags.FLAGS.metering_secret
+    old_secret = cfg.CONF.metering_secret
     try:
-        flags.FLAGS.metering_secret = 'not the default value'
+        cfg.CONF.metering_secret = 'not the default value'
         sig2 = meter.compute_signature(data)
     finally:
-        flags.FLAGS.metering_secret = old_secret
+        cfg.CONF.metering_secret = old_secret
     assert sig1 != sig2
 
 

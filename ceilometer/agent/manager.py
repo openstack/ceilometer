@@ -18,14 +18,13 @@
 
 import pkg_resources
 
-from nova import flags
 from nova import log as logging
 from nova import manager
 from nova import rpc
 
 from ceilometer import meter
+from ceilometer import cfg
 
-FLAGS = flags.FLAGS
 
 # FIXME(dhellmann): We need to have the main program set up logging
 # correctly so messages from modules outside of the nova package
@@ -77,9 +76,9 @@ class AgentManager(manager.Manager):
                         'args': {'data': meter.meter_message_from_counter(c),
                                  },
                         }
-                    rpc.cast(context, FLAGS.metering_topic, msg)
+                    rpc.cast(context, cfg.CONF.metering_topic, msg)
                     rpc.cast(context,
-                             FLAGS.metering_topic + '.' + c.type,
+                             cfg.CONF.metering_topic + '.' + c.type,
                              msg)
             except Exception as err:
                 LOG.warning('Continuing after error from %s: %s', name, err)

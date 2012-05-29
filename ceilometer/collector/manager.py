@@ -25,6 +25,7 @@ from nova.rpc import dispatcher as rpc_dispatcher
 
 from ceilometer import rpc
 from ceilometer import meter
+from ceilometer import cfg
 from ceilometer.collector import dispatcher
 
 # FIXME(dhellmann): There must be another way to do this.
@@ -61,9 +62,9 @@ class CollectorManager(manager.Manager):
         # Set ourselves up as a separate worker for the metering data,
         # since the default for manager is to use create_consumer().
         self.connection.create_worker(
-            flags.FLAGS.metering_topic,
+            cfg.CONF.metering_topic,
             rpc_dispatcher.RpcDispatcher([self]),
-            'ceilometer.collector.' + flags.FLAGS.metering_topic,
+            'ceilometer.collector.' + cfg.CONF.metering_topic,
             )
 
         self.connection.consume_in_thread()
@@ -81,10 +82,10 @@ class CollectorManager(manager.Manager):
                      },
             }
         ctxt = context.get_admin_context()
-        nova_rpc.cast(ctxt, FLAGS.metering_topic, msg)
+        nova_rpc.cast(ctxt, cfg.CONF.metering_topic, msg)
         nova_rpc.cast(ctxt,
-                 FLAGS.metering_topic + '.' + counter.type,
-                 msg)
+                      cfg.CONF.metering_topic + '.' + counter.type,
+                      msg)
 
     def record_metering_data(self, context, data):
         """This method is triggered when metering data is
