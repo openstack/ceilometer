@@ -41,7 +41,7 @@ class FloatingIPPollster(plugin.PollsterBase):
                                       user_id=None,
                                       project_id=ip.project_id,
                                       resource_id=ip.id,
-                                      datetime=None,
+                                      timestamp=None,
                                       duration=None,
                                       resource_metadata={
                         'address': ip.address,
