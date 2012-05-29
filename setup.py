@@ -33,12 +33,14 @@ setuptools.setup(
     py_modules=[],
     entry_points={
         'ceilometer.collector.compute': [
-            'instance_create = ceilometer.compute.notifications:InstanceCreate',
+            'instance_create'
+            '= ceilometer.compute.notifications:InstanceCreate',
             ],
         'ceilometer.poll.compute': [
             'libvirt_diskio = ceilometer.compute.libvirt:DiskIOPollster',
             'libvirt_cpu = ceilometer.compute.libvirt:CPUPollster',
-            'network_floatingip = ceilometer.compute.network:FloatingIPPollster',
+            'network_floatingip'
+            '= ceilometer.compute.network:FloatingIPPollster',
             ],
         },
     )

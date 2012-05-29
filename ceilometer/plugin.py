@@ -43,4 +43,5 @@ class PollsterBase(object):
 
     @abc.abstractmethod
     def get_counters(self, manager, context):
-        """Return a sequence of Counter instances from polling the resources."""
+        """Return a sequence of Counter instances from polling the
+        resources."""

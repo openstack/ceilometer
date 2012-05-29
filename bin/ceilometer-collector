@@ -32,8 +32,10 @@ if __name__ == '__main__':
     flags.FLAGS(sys.argv)
     logging.setup()
     utils.monkey_patch()
-    server = service.Service.create(binary='ceilometer-collector',
-                                    topic='ceilometer.collector',
-                                    manager='ceilometer.collector.manager.CollectorManager')
+    server = \
+        service.Service.create(binary='ceilometer-collector',
+                               topic='ceilometer.collector',
+                               manager='ceilometer.collector.'
+                               'manager.CollectorManager')
     service.serve(server)
     service.wait()

@@ -4,3 +4,4 @@ TAGS
 *.egg-info
 build
 .coverage
+.tox

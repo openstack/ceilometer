@@ -32,17 +32,18 @@ if __name__ == '__main__':
     flags.FLAGS(sys.argv)
     logging.setup()
     utils.monkey_patch()
-    server = service.Service.create(binary='ceilometer-agent',
-                                    topic='ceilometer.agent',
-                                    manager='ceilometer.agent.manager.AgentManager',
-                                    # FIXME(dhellmann): The
-                                    # periodic_interval is set very
-                                    # short for development. After we
-                                    # fix the configuration loading we
-                                    # can use the config file to
-                                    # adjust it and remove this
-                                    # hard-coded value.
-                                    periodic_interval=10,
-                                    )
+    server = \
+        service.Service.create(binary='ceilometer-agent',
+                               topic='ceilometer.agent',
+                               manager='ceilometer.agent.manager.AgentManager',
+                               # FIXME(dhellmann): The
+                               # periodic_interval is set very
+                               # short for development. After we
+                               # fix the configuration loading we
+                               # can use the config file to
+                               # adjust it and remove this
+                               # hard-coded value.
+                               periodic_interval=10,
+                               )
     service.serve(server)
     service.wait()

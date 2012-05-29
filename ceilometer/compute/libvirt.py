@@ -78,14 +78,17 @@ class DiskIOPollster(plugin.PollsterBase):
                 try:
                     disks = self._get_disks(conn, instance.name)
                 except Exception as err:
-                    self.LOG.warning('Ignoring instance %s: %s', instance.name, err)
+                    self.LOG.warning('Ignoring instance %s: %s', \
+                                         instance.name, err)
                     self.LOG.exception(err)
                     continue
                 bytes = 0
                 for disk in disks:
                     stats = conn.block_stats(instance.name, disk)
-                    self.LOG.info("DISKIO USAGE: %s %s: read-requests=%d read-bytes=%d write-requests=%d write-bytes=%d errors=%d",
-                             instance, disk, stats[0], stats[1], stats[2], stats[3], stats[4])
+                    self.LOG.info("DISKIO USAGE: %s %s:"
+"read-requests=%d read-bytes=%d write-requests=%d write-bytes=%d errors=%d",
+                                  instance, disk, stats[0], stats[1],
+                                  stats[2], stats[3], stats[4])
                     bytes += stats[1] + stats[3]  # combine read and write
                 yield make_counter_from_instance(instance,
                                                  type='disk',
@@ -101,11 +104,13 @@ class CPUPollster(plugin.PollsterBase):
         conn = nova.virt.connection.get_connection(read_only=True)
         # FIXME(dhellmann): How do we get a list of instances without
         # talking directly to the database?
-        for instance in manager.db.instance_get_all_by_host(context, manager.host):
+        for instance in manager.db.instance_get_all_by_host(context,
+                                                            manager.host):
             self.LOG.info('checking instance %s', instance.uuid)
             try:
                 cpu_info = conn.get_info(instance)
-                self.LOG.info("CPUTIME USAGE: %s %d", instance, cpu_info['cpu_time'])
+                self.LOG.info("CPUTIME USAGE: %s %d",
+                              instance, cpu_info['cpu_time'])
                 yield make_counter_from_instance(instance,
                                                  type='cpu',
                                                  volume=cpu_info['cpu_time'],

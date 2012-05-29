@@ -43,8 +43,10 @@ class FloatingIPPollster(plugin.PollsterBase):
                                       resource_id=ip.id,
                                       datetime=None,
                                       duration=None,
-                                      resource_metadata={'address': ip.address,
-                                                         'fixed_ip_id': ip.fixed_ip_id,
-                                                         'host': ip.host,
-                                                         'pool': ip.pool,
-                                                         'auto_assigned': ip.auto_assigned})
+                                      resource_metadata={
+                        'address': ip.address,
+                        'fixed_ip_id': ip.fixed_ip_id,
+                        'host': ip.host,
+                        'pool': ip.pool,
+                        'auto_assigned': ip.auto_assigned
+                        })

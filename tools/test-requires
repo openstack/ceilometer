@@ -1,0 +1,6 @@
+nose
+openstack.nose_plugin
+coverage
+pep8>=1.0
+eventlet
+mox
