@@ -41,16 +41,20 @@ def c1(body):
             'instance_type':
                 body['payload']['instance_type_id'],
             'host': body['publisher_id'],
+            'event_type': body['event_type'],
             },
         )
 
 
-class InstanceCreate(plugin.NotificationBase):
-    """Convert compute.instance.create.end notifications into Counters
+class InstanceNotifications(plugin.NotificationBase):
+    """Convert compute.instance.* notifications into Counters
     """
 
     def get_event_types(self):
-        return ['compute.instance.create.end']
+        return ['compute.instance.create.end',
+                'compute.instance.exists',
+                'compute.instance.delete.start',
+                ]
 
     def process_notification(self, message):
         return [c1(message),

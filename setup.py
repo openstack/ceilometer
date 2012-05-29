@@ -33,8 +33,7 @@ setuptools.setup(
     py_modules=[],
     entry_points={
         'ceilometer.collector.compute': [
-            'instance_create'
-            '= ceilometer.compute.notifications:InstanceCreate',
+          'instance = ceilometer.compute.notifications:InstanceNotifications',
             ],
         'ceilometer.poll.compute': [
             'libvirt_diskio = ceilometer.compute.libvirt:DiskIOPollster',

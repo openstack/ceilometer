@@ -24,7 +24,9 @@ from ceilometer.collector import dispatcher
 
 class StubDispatcher(dispatcher.NotificationDispatcher):
     def _load_plugins(self):
-        self.handlers['compute.instance.create.end'] = [notifications.InstanceCreate()]
+        self.handlers['compute.instance.create.end'] = [
+            notifications.InstanceNotifications(),
+            ]
 
 
 TEST_NOTICE = {
