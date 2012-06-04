@@ -78,8 +78,8 @@ class DiskIOPollster(plugin.PollsterBase):
                 try:
                     disks = self._get_disks(conn, instance.name)
                 except Exception as err:
-                    self.LOG.warning('Ignoring instance %s: %s', \
-                                         instance.name, err)
+                    self.LOG.warning('Ignoring instance %s: %s',
+                                     instance.name, err)
                     self.LOG.exception(err)
                     continue
                 bytes = 0
