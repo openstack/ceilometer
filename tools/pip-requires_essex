@@ -1,0 +1,10 @@
+https://github.com/openstack/openstack-common/zipball/master#egg=openstack.common
+https://github.com/openstack/nova/zipball/2012.1#egg=nova
+webob
+kombu
+iso8601
+lockfile
+netaddr
+argparse
+sqlalchemy
+anyjson==0.3.1
