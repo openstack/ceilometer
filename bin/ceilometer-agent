@@ -23,13 +23,13 @@ eventlet.monkey_patch()
 import sys
 
 from nova import flags
-from nova import log as logging
 from nova import service
 from nova import utils
+from ceilometer import log
 
 if __name__ == '__main__':
     flags.parse_args(sys.argv)
-    logging.setup()
+    log.setup()
     utils.monkey_patch()
     server = \
         service.Service.create(binary='ceilometer-agent',

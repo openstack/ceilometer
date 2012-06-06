@@ -18,18 +18,15 @@
 
 import pkg_resources
 
-from nova import log as logging
 from nova import manager
 from nova import rpc
 
 from ceilometer import meter
 from ceilometer import cfg
+from ceilometer import log
 
 
-# FIXME(dhellmann): We need to have the main program set up logging
-# correctly so messages from modules outside of the nova package
-# appear in the output.
-LOG = logging.getLogger('nova.' + __name__)
+LOG = log.getLogger(__name__)
 
 COMPUTE_PLUGIN_NAMESPACE = 'ceilometer.poll.compute'
 

@@ -16,8 +16,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from nova import log as logging
 from nova import exception
+
+from ceilometer import log
 
 from .. import counter
 from .. import plugin
@@ -25,7 +26,7 @@ from .. import plugin
 
 class FloatingIPPollster(plugin.PollsterBase):
 
-    LOG = logging.getLogger('nova.' + __name__ + '.floatingip')
+    LOG = log.getLogger(__name__ + '.floatingip')
 
     def get_counters(self, manager, context):
         try:

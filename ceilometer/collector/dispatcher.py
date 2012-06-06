@@ -21,12 +21,9 @@ and publish the results.
 
 import pkg_resources
 
-from nova import log as logging
+from ceilometer import log
 
-# FIXME(dhellmann): We need to have the main program set up logging
-# correctly so messages from modules outside of the nova package
-# appear in the output.
-LOG = logging.getLogger('nova.' + __name__)
+LOG = log.getLogger(__name__)
 
 
 class NotificationDispatcher(object):
