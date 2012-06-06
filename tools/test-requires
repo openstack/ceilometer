@@ -3,3 +3,4 @@ openstack.nose_plugin
 coverage
 pep8>=1.0
 mox
+glance>=2011.3.1

@@ -19,13 +19,12 @@
 from nova import context
 from nova import flags
 from nova import manager
-from nova import rpc as nova_rpc
 from nova.rpc import dispatcher as rpc_dispatcher
 
-from ceilometer import rpc
-from ceilometer import log
-from ceilometer import meter
 from ceilometer import cfg
+from ceilometer import log
+from ceilometer import publish
+from ceilometer import rpc
 from ceilometer.collector import dispatcher
 
 # FIXME(dhellmann): There must be another way to do this.
@@ -68,21 +67,8 @@ class CollectorManager(manager.Manager):
 
     def _publish_counter(self, counter):
         """Create a metering message for the counter and publish it."""
-        msg = meter.meter_message_from_counter(counter)
-        LOG.info('PUBLISH: %s', str(msg))
-        # FIXME(dhellmann): Need to publish the message on the
-        # metering queue.
-        msg = {
-            'method': 'record_metering_data',
-            'version': '1.0',
-            'args': {'data': msg,
-                     },
-            }
         ctxt = context.get_admin_context()
-        nova_rpc.cast(ctxt, cfg.CONF.metering_topic, msg)
-        nova_rpc.cast(ctxt,
-                      cfg.CONF.metering_topic + '.' + counter.name,
-                      msg)
+        publish.publish_counter(ctxt, counter)
 
     def record_metering_data(self, context, data):
         """This method is triggered when metering data is

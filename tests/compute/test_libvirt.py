@@ -19,11 +19,13 @@
 """Tests for manager.
 """
 
-# import unittest
-# import mox
-# import stubout
+try:
+    import libvirt
+except ImportError:
+    libvirt_missing = True
+else:
+    libvirt_missing = False
 
-# import nova.tests.fakelibvirt as libvirt
 from nova import context
 from nova import flags
 from nova import test
@@ -41,9 +43,11 @@ class TestDiskIOPollster(test.TestCase):
         self.pollster = libvirt.DiskIOPollster()
         super(TestDiskIOPollster, self).setUp()
 
+    @test.skip_if(libvirt_missing, 'Test requires libvirt')
     def test_fetch_diskio(self):
         list(self.pollster.get_counters(self.manager, self.context))
 
+    @test.skip_if(libvirt_missing, 'Test requires libvirt')
     def test_fetch_diskio_with_libvirt_non_existent_instance(self):
         flags.FLAGS.connection_type = 'libvirt'
 

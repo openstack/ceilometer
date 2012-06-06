@@ -1,6 +1,12 @@
 #!/bin/sh
-# Simple test runner, should be replaced with tox
+# Wrap tox to force it to enable global site-packages until
+# https://bitbucket.org/hpk42/tox/issue/32 is released.
+
+set -x
 
 rm -rf cover
-nosetests -P -d -v --cover-erase --with-coverage --cover-package=ceilometer --cover-inclusive tests
-tox -e pep8
+if [ ! -z "$VIRTUAL_ENV" ]
+then
+	rm -f $VIRTUAL_ENV/lib/python*/no-global-site-packages.txt
+fi
+nosetests "$@"

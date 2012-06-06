@@ -19,11 +19,9 @@
 import pkg_resources
 
 from nova import manager
-from nova import rpc
 
-from ceilometer import meter
-from ceilometer import cfg
 from ceilometer import log
+from ceilometer import publish
 
 
 LOG = log.getLogger(__name__)
@@ -67,16 +65,7 @@ class AgentManager(manager.Manager):
                 LOG.info('polling %s', name)
                 for c in pollster.get_counters(self, context):
                     LOG.info('COUNTER: %s', c)
-                    msg = {
-                        'method': 'record_metering_data',
-                        'version': '1.0',
-                        'args': {'data': meter.meter_message_from_counter(c),
-                                 },
-                        }
-                    rpc.cast(context, cfg.CONF.metering_topic, msg)
-                    rpc.cast(context,
-                             cfg.CONF.metering_topic + '.' + c.name,
-                             msg)
+                    publish.publish_counter(context, c)
             except Exception as err:
                 LOG.warning('Continuing after error from %s: %s', name, err)
                 LOG.exception(err)

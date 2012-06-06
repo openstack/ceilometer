@@ -26,6 +26,7 @@ from nova import test
 
 from ceilometer.agent import manager
 from ceilometer import counter
+from ceilometer import publish
 
 
 def test_load_plugins():
@@ -57,13 +58,13 @@ class TestRunTasks(test.TestCase):
             self.counters.append((manager, context))
             return [self.test_data]
 
-    def faux_notify(self, context, topic, msg):
-        self.notifications.append((topic, msg))
+    def faux_notify(self, context, msg):
+        self.notifications.append(msg)
 
     def setUp(self):
         super(TestRunTasks, self).setUp()
         self.notifications = []
-        self.stubs.Set(rpc, 'cast', self.faux_notify)
+        self.stubs.Set(publish, 'publish_counter', self.faux_notify)
         self.mgr = manager.AgentManager()
         self.mgr.pollsters = [('test', self.Pollster())]
         self.ctx = context.RequestContext("user", "project")
@@ -71,10 +72,3 @@ class TestRunTasks(test.TestCase):
 
     def test_message(self):
         assert self.Pollster.counters[0][1] is self.ctx
-
-    def test_notify(self):
-        assert len(self.notifications) == 2
-
-    def test_notify_topics(self):
-        topics = [n[0] for n in self.notifications]
-        assert topics == ['metering', 'metering.test']
