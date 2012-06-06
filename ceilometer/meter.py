@@ -59,6 +59,7 @@ def meter_message_from_counter(counter):
     for a notification message and a Counter instance.
     """
     msg = {'source': counter.source,
+           'counter_name': counter.name,
            'counter_type': counter.type,
            'counter_volume': counter.volume,
            'user_id': counter.user_id,

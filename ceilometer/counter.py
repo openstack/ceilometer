@@ -27,6 +27,7 @@ import collections
 
 Counter = collections.namedtuple('Counter',
                                  ' '.join(['source',
+                                           'name',
                                            'type',
                                            'volume',
                                            'user_id',

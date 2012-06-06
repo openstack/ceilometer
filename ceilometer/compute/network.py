@@ -36,12 +36,13 @@ class FloatingIPPollster(plugin.PollsterBase):
             for ip in ips:
                 self.LOG.info("FLOATING IP USAGE: %s" % ip.address)
                 yield counter.Counter(source='?',
-                                      type='floating_ip',
+                                      name='floating_ip',
+                                      type='delta',
                                       volume=1,
                                       user_id=None,
                                       project_id=ip.project_id,
                                       resource_id=ip.id,
-                                      datetime=None,
+                                      timestamp=None,
                                       duration=None,
                                       resource_metadata={
                         'address': ip.address,

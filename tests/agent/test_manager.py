@@ -41,7 +41,8 @@ class TestRunTasks(test.TestCase):
         counters = []
         test_data = counter.Counter(
             source='test',
-            type='test',
+            name='test',
+            type='cumulative',
             volume=1,
             user_id='test',
             project_id='test',

@@ -62,6 +62,7 @@ def test_compute_signature_use_configured_secret():
 
 
 TEST_COUNTER = counter.Counter(source='src',
+                               name='name',
                                type='typ',
                                volume=1,
                                user_id='user',
@@ -124,7 +125,8 @@ def test_meter_message_from_counter_field():
     def compare(f, c, msg_f, msg):
         assert msg == c
     msg = meter.meter_message_from_counter(TEST_COUNTER)
-    name_map = {'type': 'counter_type',
+    name_map = {'name': 'counter_name',
+                'type': 'counter_type',
                 'volume': 'counter_volume',
                 'duration': 'counter_duration',
                 }

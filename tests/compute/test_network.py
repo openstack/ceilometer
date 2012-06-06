@@ -34,19 +34,23 @@ class TestFloatingIPPollster(test.TestCase):
         super(TestFloatingIPPollster, self).setUp()
 
     def test_get_counters(self):
-        self.assertEqual(list(self.pollster.get_counters(self.manager, self.context)), [])
+        self.assertEqual(list(self.pollster.get_counters(self.manager,
+                                                         self.context)),
+                         [])
 
     def test_get_counters_not_empty(self):
         db.floating_ip_create(self.context,
                               {'address': '1.1.1.1',
-                               'host': self.manager.host })
+                               'host': self.manager.host,
+                               })
         db.floating_ip_create(self.context,
                               {'address': '1.1.1.2',
-                               'host': self.manager.host + "randomstring" })
+                               'host': self.manager.host + "randomstring",
+                               })
         db.floating_ip_create(self.context,
                               {'address': '1.1.1.3',
-                               'host': self.manager.host + "randomstring" })
+                               'host': self.manager.host + "randomstring",
+                               })
         counters = list(self.pollster.get_counters(self.manager, self.context))
         self.assertEqual(len(counters), 1)
         self.assertEqual(counters[0].resource_metadata['address'], '1.1.1.1')
-
