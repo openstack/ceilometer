@@ -26,6 +26,7 @@ from ceilometer import log
 from ceilometer import publish
 from ceilometer import rpc
 from ceilometer.collector import dispatcher
+from ceilometer import storage
 
 # FIXME(dhellmann): There must be another way to do this.
 # Import rabbit_notifier to register notification_topics flag
@@ -42,6 +43,10 @@ class CollectorManager(manager.Manager):
 
     def init_host(self):
         self.connection = rpc.Connection(flags.FLAGS)
+
+        storage.register_opts(cfg.CONF)
+        self.storage_engine = storage.get_engine(cfg.CONF)
+        self.storage_conn = self.storage_engine.get_connection(cfg.CONF)
 
         self.compute_handler = dispatcher.NotificationDispatcher(
             COMPUTE_COLLECTOR_NAMESPACE,
@@ -79,3 +84,8 @@ class CollectorManager(manager.Manager):
                  data['event_type'],
                  data['resource_id'],
                  data['counter_volume'])
+        try:
+            self.storage_conn.record_metering_data(data)
+        except Exception as err:
+            LOG.error('Failed to record metering data: %s', err)
+            LOG.exception(err)

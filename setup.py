@@ -41,5 +41,8 @@ setuptools.setup(
             'network_floatingip'
             '= ceilometer.compute.network:FloatingIPPollster',
             ],
+        'ceilometer.storage': [
+            'log = ceilometer.storage.impl_log:LogStorage',
+            ],
         },
     )
