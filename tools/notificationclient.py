@@ -29,7 +29,7 @@ import sys
 from nova import flags
 from nova import rpc
 from nova import utils
-from nova.openstack.common import cfg
+from ceilometer.openstack.common import cfg
 
 FLAGS = flags.FLAGS
 LOG = logging.getLogger(__name__)

@@ -1,4 +1,3 @@
-https://github.com/openstack/openstack-common/zipball/master#egg=openstack.common
 https://github.com/openstack/nova/zipball/master#egg=nova
 webob
 kombu
@@ -7,4 +6,5 @@ lockfile
 netaddr
 argparse
 sqlalchemy
+eventlet
 anyjson==0.3.1
