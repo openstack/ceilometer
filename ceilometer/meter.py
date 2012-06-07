@@ -52,6 +52,15 @@ def compute_signature(message):
     return digest_maker.hexdigest()
 
 
+def verify_signature(message):
+    """Check the signature in the message against the value computed
+    from the rest of the contents.
+    """
+    old_sig = message.get('message_signature')
+    new_sig = compute_signature(message)
+    return new_sig == old_sig
+
+
 def meter_message_from_counter(counter):
     """Make a metering message ready to be published or stored.
 

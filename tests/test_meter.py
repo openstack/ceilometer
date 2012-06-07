@@ -61,6 +61,24 @@ def test_compute_signature_use_configured_secret():
     assert sig1 != sig2
 
 
+def test_verify_signature_signed():
+    data = {'a': 'A', 'b': 'B'}
+    sig1 = meter.compute_signature(data)
+    data['message_signature'] = sig1
+    assert meter.verify_signature(data)
+
+
+def test_verify_signature_unsigned():
+    data = {'a': 'A', 'b': 'B'}
+    assert not meter.verify_signature(data)
+
+
+def test_verify_signature_incorrect():
+    data = {'a': 'A', 'b': 'B',
+            'message_signature': 'Not the same'}
+    assert not meter.verify_signature(data)
+
+
 TEST_COUNTER = counter.Counter(source='src',
                                name='name',
                                type='typ',

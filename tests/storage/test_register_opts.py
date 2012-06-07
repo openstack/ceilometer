@@ -44,3 +44,4 @@ class RegisterOpts(test.TestCase):
         self._faux_engine.register_opts(flags.FLAGS)
         self.mox.ReplayAll()
         storage.register_opts(flags.FLAGS)
+        self.mox.VerifyAll()
