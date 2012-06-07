@@ -73,7 +73,7 @@ def test_notify():
     d.notify(TEST_NOTICE)
     assert len(results) == 1
     counter = results[0]
-    assert counter.type == 'instance'
+    assert counter.name == 'instance'
 
 
 def test_load_compute_plugins():
@@ -103,4 +103,4 @@ def test_notify_through_plugin():
     d.notify(TEST_NOTICE)
     assert len(results) == 1
     counter = results[0]
-    assert counter.type == 'instance'
+    assert counter.name == 'instance'

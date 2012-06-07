@@ -81,7 +81,7 @@ class CollectorManager(manager.Manager):
         ctxt = context.get_admin_context()
         nova_rpc.cast(ctxt, cfg.CONF.metering_topic, msg)
         nova_rpc.cast(ctxt,
-                      cfg.CONF.metering_topic + '.' + counter.type,
+                      cfg.CONF.metering_topic + '.' + counter.name,
                       msg)
 
     def record_metering_data(self, context, data):

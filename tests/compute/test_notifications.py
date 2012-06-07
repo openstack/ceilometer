@@ -135,7 +135,8 @@ def test_c1():
     info = notifications.c1(INSTANCE_CREATE_END)
 
     for name, actual, expected in [
-        ('counter_type', info.type, 'instance'),
+        ('counter_name', info.name, 'instance'),
+        ('counter_type', info.type, 'delta'),
         ('counter_volume', info.volume, 1),
         ('timestamp', info.timestamp,
          INSTANCE_CREATE_END['timestamp']),
@@ -155,18 +156,18 @@ def test_instance_create():
     ic = notifications.InstanceNotifications()
     counters = ic.process_notification(INSTANCE_CREATE_END)
     assert len(counters) == 1
-    assert counters[0].type == 'instance'
+    assert counters[0].name == 'instance'
 
 
 def test_instance_exists():
     ic = notifications.InstanceNotifications()
     counters = ic.process_notification(INSTANCE_EXISTS)
     assert len(counters) == 1
-    assert counters[0].type == 'instance'
+    assert counters[0].name == 'instance'
 
 
 def test_instance_delete():
     ic = notifications.InstanceNotifications()
     counters = ic.process_notification(INSTANCE_DELETE_START)
     assert len(counters) == 1
-    assert counters[0].type == 'instance'
+    assert counters[0].name == 'instance'

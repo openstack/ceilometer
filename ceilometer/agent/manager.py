@@ -75,7 +75,7 @@ class AgentManager(manager.Manager):
                         }
                     rpc.cast(context, cfg.CONF.metering_topic, msg)
                     rpc.cast(context,
-                             cfg.CONF.metering_topic + '.' + c.type,
+                             cfg.CONF.metering_topic + '.' + c.name,
                              msg)
             except Exception as err:
                 LOG.warning('Continuing after error from %s: %s', name, err)

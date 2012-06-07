@@ -33,9 +33,10 @@ FLAGS = flags.FLAGS
 MIB = 2 ** 20  # mebibytes
 
 
-def make_counter_from_instance(instance, type, volume):
+def make_counter_from_instance(instance, name, type, volume):
     return counter.Counter(
         source='?',
+        name=name,
         type=type,
         volume=volume,
         user_id=instance.user_id,
@@ -87,7 +88,8 @@ class DiskIOPollster(plugin.PollsterBase):
                                   stats[2], stats[3], stats[4])
                     bytes += stats[1] + stats[3]  # combine read and write
                 yield make_counter_from_instance(instance,
-                                                 type='disk',
+                                                 name='disk',
+                                                 type='cumulative',
                                                  volume=bytes / MIB,
                                                  )
 
@@ -108,7 +110,8 @@ class CPUPollster(plugin.PollsterBase):
                 self.LOG.info("CPUTIME USAGE: %s %d",
                               instance, cpu_info['cpu_time'])
                 yield make_counter_from_instance(instance,
-                                                 type='cpu',
+                                                 name='cpu',
+                                                 type='cumulative',
                                                  volume=cpu_info['cpu_time'],
                                                  )
             except Exception as err:

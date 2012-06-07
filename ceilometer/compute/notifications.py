@@ -26,7 +26,8 @@ def c1(body):
     """Generate c1(instance) counters for a notice."""
     return counter.Counter(
         source='?',
-        type='instance',
+        name='instance',
+        type='delta',
         volume=1,
         user_id=body['payload']['user_id'],
         project_id=body['payload']['tenant_id'],
