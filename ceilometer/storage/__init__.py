@@ -35,10 +35,12 @@ STORAGE_OPTS = [
     ]
 
 
+cfg.CONF.register_opts(STORAGE_OPTS)
+
+
 def register_opts(conf):
     """Register any options for the storage system.
     """
-    conf.register_opts(STORAGE_OPTS)
     p = get_engine(conf)
     p.register_opts(conf)
 
