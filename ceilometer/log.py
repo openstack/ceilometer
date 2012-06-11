@@ -66,6 +66,32 @@ def getLogger(name='ceilometer'):
     return logging.getLogger(name)
 
 
+def _setup_default_logger(logger_name):
+    """Configure a single logger."""
+    root = getLogger(logger_name)
+    for handler in root.handlers:
+        root.removeHandler(handler)
+    logpath = _get_log_file_path()
+    if logpath:
+        filelog = logging.handlers.WatchedFileHandler(logpath)
+        filelog.setFormatter(
+            logging.Formatter(cfg.CONF.logging_default_format_string))
+        root.addHandler(filelog)
+
+        mode = int(FLAGS.logfile_mode, 8)
+        st = os.stat(logpath)
+        if st.st_mode != (stat.S_IFREG | mode):
+            os.chmod(logpath, mode)
+    else:
+        streamlog = logging.StreamHandler(sys.stdout)
+        streamlog.setFormatter(
+            logging.Formatter(cfg.CONF.logging_default_format_string))
+        root.addHandler(streamlog)
+
+    if cfg.CONF.log_level:
+        root.setLevel(logging.getLevelName(cfg.CONF.log_level.upper()))
+
+
 def setup():
     if cfg.CONF.log_config:
         try:
@@ -74,25 +100,10 @@ def setup():
             traceback.print_exc()
             raise
     else:
-        root = getLogger()
+        # Strip any existing log handlers to avoid seeing duplicate
+        # messages on the console.
+        root = getLogger(None)
         for handler in root.handlers:
             root.removeHandler(handler)
-        logpath = _get_log_file_path()
-        if logpath:
-            filelog = logging.handlers.WatchedFileHandler(logpath)
-            filelog.setFormatter(
-                logging.Formatter(cfg.CONF.logging_default_format_string))
-            root.addHandler(filelog)
-
-            mode = int(FLAGS.logfile_mode, 8)
-            st = os.stat(logpath)
-            if st.st_mode != (stat.S_IFREG | mode):
-                os.chmod(logpath, mode)
-        else:
-            streamlog = logging.StreamHandler(sys.stdout)
-            streamlog.setFormatter(
-                logging.Formatter(cfg.CONF.logging_default_format_string))
-            root.addHandler(streamlog)
-
-        if cfg.CONF.log_level:
-            root.setLevel(logging.getLevelName(cfg.CONF.log_level.upper()))
+        _setup_default_logger('ceilometer')
+        _setup_default_logger('nova')
