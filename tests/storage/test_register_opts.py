@@ -18,7 +18,6 @@
 """Tests for ceilometer/storage/
 """
 
-from nova import flags
 from nova import test
 
 from nova import rpc
@@ -39,9 +38,9 @@ class RegisterOpts(test.TestCase):
 
     def test_register_opts(self):
         self.stubs.Set(storage, 'get_engine', self.faux_get_engine)
-        flags.FLAGS.metering_storage_engine = 'log'
+        cfg.CONF.metering_storage_engine = 'log'
         self._faux_engine = self.mox.CreateMock(base.StorageEngine)
-        self._faux_engine.register_opts(flags.FLAGS)
+        self._faux_engine.register_opts(cfg.CONF)
         self.mox.ReplayAll()
-        storage.register_opts(flags.FLAGS)
+        storage.register_opts(cfg.CONF)
         self.mox.VerifyAll()
