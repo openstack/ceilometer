@@ -79,6 +79,32 @@ def test_verify_signature_incorrect():
     assert not meter.verify_signature(data)
 
 
+def test_recursive_keypairs():
+    data = {'a': 'A',
+            'b': 'B',
+            'nested': {'a': 'A',
+                       'b': 'B',
+                       },
+            }
+    pairs = list(meter.recursive_keypairs(data))
+    assert pairs == [('a', 'A'),
+                     ('b', 'B'),
+                     ('nested:a', 'A'),
+                     ('nested:b', 'B'),
+                     ]
+
+
+def test_verify_signature_nested():
+    data = {'a': 'A',
+            'b': 'B',
+            'nested': {'a': 'A',
+                       'b': 'B',
+                       },
+            }
+    data['message_signature'] = meter.compute_signature(data)
+    assert meter.verify_signature(data)
+
+
 TEST_COUNTER = counter.Counter(source='src',
                                name='name',
                                type='typ',
