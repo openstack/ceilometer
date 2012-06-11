@@ -134,11 +134,6 @@ def test_meter_message_from_counter_signed():
     assert 'message_signature' in msg
 
 
-def test_meter_message_from_counter_event_type():
-    msg = meter.meter_message_from_counter(TEST_COUNTER)
-    assert msg['event_type'] == 'metering.' + TEST_COUNTER.type
-
-
 def test_meter_message_from_counter_field():
     def compare(f, c, msg_f, msg):
         assert msg == c
