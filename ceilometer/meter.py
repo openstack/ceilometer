@@ -38,11 +38,22 @@ METER_OPTS = [
 cfg.CONF.register_opts(METER_OPTS)
 
 
+def recursive_keypairs(d):
+    """Generator that produces sequence of keypairs for nested dictionaries.
+    """
+    for name, value in sorted(d.iteritems()):
+        if isinstance(value, dict):
+            for subname, subvalue in recursive_keypairs(value):
+                yield ('%s:%s' % (name, subname), subvalue)
+        else:
+            yield name, value
+
+
 def compute_signature(message):
     """Return the signature for a message dictionary.
     """
     digest_maker = hmac.new(cfg.CONF.metering_secret, '', hashlib.sha256)
-    for name, value in sorted(message.iteritems()):
+    for name, value in recursive_keypairs(message):
         if name == 'message_signature':
             # Skip any existing signature value, which would not have
             # been part of the original message.
