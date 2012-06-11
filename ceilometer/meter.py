@@ -78,8 +78,6 @@ def meter_message_from_counter(counter):
            'counter_duration': counter.duration,
            'resource_metadata': counter.resource_metadata,
            'message_id': str(uuid.uuid1()),
-           # This field is used by the notification system.
-           'event_type': '%s.%s' % (cfg.CONF.metering_topic, counter.type),
            }
     msg['message_signature'] = compute_signature(msg)
     return msg

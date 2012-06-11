@@ -36,7 +36,7 @@ class TestCollectorManager(test.TestCase):
         self.ctx = context.RequestContext("user", "project")
 
     def test_valid_message(self):
-        msg = {'event_type': 'test',
+        msg = {'counter_name': 'test',
                'resource_id': self.id(),
                'counter_volume': 1,
                }
@@ -50,7 +50,7 @@ class TestCollectorManager(test.TestCase):
         self.mox.VerifyAll()
 
     def test_invalid_message(self):
-        msg = {'event_type': 'test',
+        msg = {'counter_name': 'test',
                'resource_id': self.id(),
                'counter_volume': 1,
                }

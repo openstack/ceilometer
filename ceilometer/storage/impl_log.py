@@ -52,6 +52,6 @@ class Connection(base.Connection):
                      ceilometer.meter.meter_message_from_counter
         """
         LOG.info('metering data %s for %s: %s',
-                 data['event_type'],
+                 data['counter_name'],
                  data['resource_id'],
                  data['counter_volume'])

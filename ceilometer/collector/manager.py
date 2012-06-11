@@ -82,11 +82,12 @@ class CollectorManager(manager.Manager):
         """
         #LOG.info('metering data: %r', data)
         LOG.info('metering data %s for %s: %s',
-                 data['event_type'],
+                 data['counter_name'],
                  data['resource_id'],
                  data['counter_volume'])
         if not meter.verify_signature(data):
-            LOG.warning('message signature invalid, discarding message')
+            LOG.warning('message signature invalid, discarding message: %r',
+                        data)
         else:
             try:
                 self.storage_conn.record_metering_data(data)
