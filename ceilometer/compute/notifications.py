@@ -34,13 +34,14 @@ def c1(body):
         resource_id=body['payload']['instance_id'],
         timestamp=body['timestamp'],
         duration=0,
-        # FIXME(dhellmann): Add region and other
-        # details to metadata
         resource_metadata={
             'display_name':
                 body['payload']['display_name'],
             'instance_type':
                 body['payload']['instance_type_id'],
+            'image_ref_url': body['payload']['image_ref_url'],
+            'disk_gb': body['payload']['disk_gb'],
+            'memory_mb': body['payload']['memory_mb'],
             'host': body['publisher_id'],
             'event_type': body['event_type'],
             },
