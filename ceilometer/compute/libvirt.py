@@ -56,6 +56,15 @@ class DiskIOPollster(plugin.PollsterBase):
 
     LOG = log.getLogger(__name__ + '.diskio')
 
+    DISKIO_USAGE_MESSAGE = ' '.join(["DISKIO USAGE:",
+                                     "%s %s:",
+                                     "read-requests=%d",
+                                     "read-bytes=%d",
+                                     "write-requests=%d",
+                                     "write-bytes=%d",
+                                     "errors=%d",
+                                     ])
+
     def _get_disks(self, conn, instance):
         """Get disks of an instance, only used to bypass bug#998089."""
         domain = conn._conn.lookupByName(instance)
@@ -82,8 +91,7 @@ class DiskIOPollster(plugin.PollsterBase):
                 bytes = 0
                 for disk in disks:
                     stats = conn.block_stats(instance.name, disk)
-                    self.LOG.info("DISKIO USAGE: %s %s:"
-"read-requests=%d read-bytes=%d write-requests=%d write-bytes=%d errors=%d",
+                    self.LOG.info(self.DISKIO_USAGE_MESSAGE,
                                   instance, disk, stats[0], stats[1],
                                   stats[2], stats[3], stats[4])
                     bytes += stats[1] + stats[3]  # combine read and write

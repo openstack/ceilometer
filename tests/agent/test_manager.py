@@ -21,7 +21,6 @@
 import datetime
 
 from nova import context
-from nova import rpc
 from nova import test
 
 from ceilometer.agent import manager

@@ -21,7 +21,7 @@
 import datetime
 
 from nova import context
-from nova import rpc
+from ceilometer.openstack.common import rpc
 from nova import test
 
 from ceilometer import counter

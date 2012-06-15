@@ -23,18 +23,10 @@ import logging.config
 import traceback
 import sys
 
-from ceilometer import cfg
+from ceilometer.openstack.common import cfg
 
-cfg.CONF.register_opts([
-        cfg.StrOpt('log_config',
-                   help='Log configuration file',
-                   ),
-        cfg.StrOpt('log_file',
-                   help='Log file',
-                   ),
-        cfg.StrOpt('log_dir',
-                   help='Log file directory',
-                   ),
+cfg.CONF.register_opts(
+    [
         cfg.StrOpt('log_level',
                    default="debug",
                    help='Log level',
@@ -42,7 +34,8 @@ cfg.CONF.register_opts([
         cfg.StrOpt('logging_default_format_string',
                    default='%(asctime)s %(levelname)s %(name)s: %(message)s',
                    help='format string to use for log messages'),
-        ])
+        ]
+    )
 
 
 def _get_binary_name():

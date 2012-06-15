@@ -22,7 +22,7 @@ import hashlib
 import hmac
 import uuid
 
-from ceilometer import cfg
+from ceilometer.openstack.common import cfg
 
 METER_OPTS = [
     cfg.StrOpt('metering_secret',

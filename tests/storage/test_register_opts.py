@@ -20,15 +20,9 @@
 
 from nova import test
 
-from nova import rpc
-
-from ceilometer import cfg
 from ceilometer import storage
 from ceilometer.storage import base
-
-# (dhellmann): This is needed to get the fake_rabbit config value set
-# up for the test base class.
-cfg.CONF.register_opts(rpc.rpc_opts)
+from ceilometer.openstack.common import cfg
 
 
 class RegisterOpts(test.TestCase):

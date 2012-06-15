@@ -31,18 +31,16 @@ setuptools.setup(
     test_suite='nose.collector',
     scripts=['bin/ceilometer-agent', 'bin/ceilometer-collector'],
     py_modules=[],
-    entry_points={
-        'ceilometer.collector.compute': [
-          'instance = ceilometer.compute.notifications:InstanceNotifications',
-            ],
-        'ceilometer.poll.compute': [
-            'libvirt_diskio = ceilometer.compute.libvirt:DiskIOPollster',
-            'libvirt_cpu = ceilometer.compute.libvirt:CPUPollster',
-            'network_floatingip'
-            '= ceilometer.compute.network:FloatingIPPollster',
-            ],
-        'ceilometer.storage': [
-            'log = ceilometer.storage.impl_log:LogStorage',
-            ],
-        },
+    entry_points="""
+    [ceilometer.collector.compute]
+    instance = ceilometer.compute.notifications:InstanceNotifications
+
+    [ceilometer.poll.compute]
+    libvirt_diskio = ceilometer.compute.libvirt:DiskIOPollster
+    libvirt_cpu = ceilometer.compute.libvirt:CPUPollster
+    network_floatingip = ceilometer.compute.network:FloatingIPPollster
+
+    [ceilometer.storage]
+    log = ceilometer.storage.impl_log:LogStorage
+    """,
     )

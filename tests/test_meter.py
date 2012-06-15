@@ -20,7 +20,7 @@
 
 from ceilometer import counter
 from ceilometer import meter
-from ceilometer import cfg
+from ceilometer.openstack.common import cfg
 
 
 def test_compute_signature_change_key():

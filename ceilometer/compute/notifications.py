@@ -35,10 +35,8 @@ def c1(body):
         timestamp=body['timestamp'],
         duration=0,
         resource_metadata={
-            'display_name':
-                body['payload']['display_name'],
-            'instance_type':
-                body['payload']['instance_type_id'],
+            'display_name': body['payload']['display_name'],
+            'instance_type': body['payload']['instance_type_id'],
             'image_ref_url': body['payload']['image_ref_url'],
             'disk_gb': body['payload']['disk_gb'],
             'memory_mb': body['payload']['memory_mb'],

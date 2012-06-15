@@ -19,21 +19,21 @@
 from nova import context
 from nova import flags
 from nova import manager
-from nova.rpc import dispatcher as rpc_dispatcher
 
-from ceilometer import cfg
 from ceilometer import log
 from ceilometer import meter
 from ceilometer import publish
 from ceilometer import rpc
 from ceilometer.collector import dispatcher
 from ceilometer import storage
+from ceilometer.openstack.common import cfg
+from ceilometer.openstack.common.rpc import dispatcher as rpc_dispatcher
 
 # FIXME(dhellmann): There must be another way to do this.
 # Import rabbit_notifier to register notification_topics flag
 import nova.notifier.rabbit_notifier
+import nova.openstack.common.rpc as nova_rpc
 
-FLAGS = flags.FLAGS
 LOG = log.getLogger(__name__)
 
 
@@ -43,7 +43,10 @@ COMPUTE_COLLECTOR_NAMESPACE = 'ceilometer.collector.compute'
 class CollectorManager(manager.Manager):
 
     def init_host(self):
-        self.connection = rpc.Connection(flags.FLAGS)
+        # Use the nova configuration flags to get
+        # a connection to the RPC mechanism nova
+        # is using.
+        self.connection = nova_rpc.create_connection()
 
         storage.register_opts(cfg.CONF)
         self.storage_engine = storage.get_engine(cfg.CONF)

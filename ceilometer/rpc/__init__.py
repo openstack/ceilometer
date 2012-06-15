@@ -16,7 +16,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from nova.rpc import impl_kombu
+from ceilometer.openstack.common.rpc import impl_kombu
 
 
 class Connection(impl_kombu.Connection):

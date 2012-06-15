@@ -21,7 +21,8 @@ import unittest
 import logging
 
 from ceilometer import log
-from ceilometer import cfg
+from ceilometer.openstack.common import cfg
+
 
 class LoggerTestCase(unittest.TestCase):
     def setUp(self):
@@ -61,4 +62,3 @@ class LogfilePathTestCase(unittest.TestCase):
         cfg.CONF.log_file = '/some/path/foo-bar.log'
         self.assertEquals(log._get_log_file_path(binary='foo-bar'),
                           '/some/path/foo-bar.log')
-

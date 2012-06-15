@@ -19,9 +19,9 @@
 """
 
 from nova import log as logging
-from nova import rpc
+from ceilometer.openstack.common import rpc
 
-from ceilometer import cfg
+from ceilometer.openstack.common import cfg
 from ceilometer import meter
 
 # FIXME(dhellmann): We need to have the main program set up logging

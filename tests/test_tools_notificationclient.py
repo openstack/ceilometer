@@ -6,7 +6,7 @@ import types
 
 import mox
 
-from nova.rpc import impl_kombu
+from ceilometer.openstack.common.rpc import impl_kombu
 
 # The module being tested is part of the tools directory,
 # so make sure it is in our import path.
