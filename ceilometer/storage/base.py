@@ -60,5 +60,116 @@ class Connection(object):
                      ceilometer.meter.meter_message_from_counter
         """
 
-    # FIXME(dhellmann): We will eventually need to add query methods
-    # for the API server to use, too.
+    @abc.abstractmethod
+    def get_users(self, source=None):
+        """Return an iterable of user id strings.
+
+        :param source: Optional source filter.
+        """
+
+    @abc.abstractmethod
+    def get_resources_by_user(self, user=None, source=None):
+        """Return an iterable of tuples containing resource ids and
+        the most recent version of the metadata for the resource.
+
+        :param user: The event owner.
+        :param source: Optional source filter.
+        """
+
+    @abc.abstractmethod
+    def get_raw_events_by_user(self, user, start=None, end=None,
+                               resource=None, meter=None, source=None):
+        """Return an iterable of event data.
+
+        :param user: The event owner.
+        :param start: Earliest timestamp to include.
+        :param end: Only include events with timestamp less than this.
+        :param resource: Optional filter for resource id.
+        :param meter: Optional filter for meter type using the meter name.
+        :param source: Optional source filter.
+        """
+
+    @abc.abstractmethod
+    def get_volume_sum_by_user(self, user, meter, start=None, end=None,
+                               resource=None, source=None):
+        """Return the sum of the volume field for the events
+        described by the query parameters.
+
+        :param user: The event owner.
+        :param meter: Filter for meter type using the meter name.
+        :param start: Earliest timestamp to include.
+        :param end: Only include events with timestamp less than this.
+        :param resource: Optional filter for resource id.
+        :param source: Optional source filter.
+        """
+
+    @abc.abstractmethod
+    def get_duration_sum_by_user(self, user, meter, start=None, end=None,
+                                 resource=None, source=None):
+        """Return the sum of time for the events described by the
+        query parameters.
+
+        :param user: The event owner.
+        :param meter: Filter for meter type using the meter name.
+        :param start: Earliest timestamp to include.
+        :param end: Only include events with timestamp less than this.
+        :param resource: Optional filter for resource id.
+        :param source: Optional source filter.
+        """
+
+    @abc.abstractmethod
+    def get_projects(self, source=None):
+        """Return an iterable of project id strings.
+
+        :param source: Optional source filter.
+        """
+
+    @abc.abstractmethod
+    def get_resources_by_project(self, project=None, source=None):
+        """Return an iterable of tuples containing resource ids and
+        the most recent version of the metadata for the resource.
+
+        :param project: The event owner.
+        :param source: Optional source filter.
+        """
+
+    @abc.abstractmethod
+    def get_raw_events_by_project(self, project, start=None, end=None,
+                               resource=None, meter=None, source=None):
+        """Return an iterable of event data.
+
+        :param project: The event owner.
+        :param start: Earliest timestamp to include.
+        :param end: Only include events with timestamp less than this.
+        :param resource: Optional filter for resource id.
+        :param meter: Optional filter for meter type using the meter name.
+        :param source: Optional source filter.
+        """
+
+    @abc.abstractmethod
+    def get_volume_sum_by_project(self, project, meter, start=None, end=None,
+                               resource=None, source=None):
+        """Return the sum of the volume field for the events
+        described by the query parameters.
+
+        :param project: The event owner.
+        :param meter: Optional filter for meter type using the meter name.
+        :param start: Earliest timestamp to include.
+        :param end: Only include events with timestamp less than this.
+        :param resource: Optional filter for resource id.
+        :param source: Optional source filter.
+        """
+
+    @abc.abstractmethod
+    def get_duration_sum_by_project(self, project, meter, start=None, end=None,
+                                 resource=None, source=None):
+        """Return the sum of time for the events described by the
+        query parameters.
+
+        :param project: The event owner.
+        :param meter: Optional filter for meter type using the meter name.
+        :param start: Earliest timestamp to include.
+        :param end: Only include events with timestamp less than this.
+        :param resource: Optional filter for resource id.
+        :param source: Optional source filter.
+        """
