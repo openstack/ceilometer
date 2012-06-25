@@ -122,6 +122,11 @@ class CPUPollster(plugin.PollsterBase):
                                                  type='cumulative',
                                                  volume=cpu_info['cpu_time'],
                                                  )
+                yield make_counter_from_instance(instance,
+                                                 name='instance',
+                                                 type='delta',
+                                                 volume=1,
+                                                 )
             except Exception as err:
                 self.LOG.error('could not get CPU time for %s: %s',
                                instance.uuid, err)
