@@ -17,6 +17,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from nova import flags
+
 from ceilometer import log
 from ceilometer.openstack.common import cfg
 
@@ -29,4 +31,9 @@ cfg.CONF.register_opts([
 
 def prepare_service(argv=[]):
     cfg.CONF(argv[1:])
+    # FIXME(dhellmann): We must set up the nova.flags module in order
+    # to have the RPC and DB access work correctly because we are
+    # still using the Service object out of nova directly. We need to
+    # move that into openstack.common.
+    flags.FLAGS(argv[1:])
     log.setup()
