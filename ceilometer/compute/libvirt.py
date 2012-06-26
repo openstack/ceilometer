@@ -26,7 +26,7 @@ import nova.virt.connection
 from ceilometer import log
 from ceilometer import counter
 from ceilometer import plugin
-
+from ceilometer.compute import instance as compute_instance
 
 FLAGS = flags.FLAGS
 
@@ -44,11 +44,8 @@ def make_counter_from_instance(instance, name, type, volume):
         resource_id=instance.uuid,
         timestamp=datetime.datetime.utcnow().isoformat(),
         duration=None,
-        resource_metadata={
-            'display_name': instance.display_name,
-            'instance_type': instance.instance_type.flavorid,
-            'host': instance.host,
-            },
+        resource_metadata=compute_instance.get_metadata_from_dbobject(
+            instance),
         )
 
 

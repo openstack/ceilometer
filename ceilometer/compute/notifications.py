@@ -20,43 +20,7 @@
 
 from ceilometer import counter
 from ceilometer import plugin
-
-INSTANCE_PROPERTIES = [
-    # Identity properties
-    'display_name',
-    'reservation_id',
-    # Type properties
-    'architecture'
-    # Location properties
-    'availability_zone',
-    # Image properties
-    'image_ref',
-    'image_ref_url',
-    'kernel_id',
-    'os_type',
-    'ramdisk_id',
-    # Capacity properties
-    'disk_gb',
-    'ephemeral_gb',
-    'memory_mb',
-    'root_gb',
-    'vcpus',
-    ]
-
-
-def get_instance_metadata_from_event(body):
-    """Return a metadata dictionary for the instance mentioned in the
-    notification event.
-    """
-    instance = body['payload']
-    metadata = {
-        'event_type': body['event_type'],
-        'instance_type': instance['instance_type_id'],
-        'host': body['publisher_id'],
-        }
-    for name in INSTANCE_PROPERTIES:
-        metadata[name] = instance.get(name, u'')
-    return metadata
+from ceilometer.compute import instance
 
 
 def c1(body):
@@ -71,7 +35,7 @@ def c1(body):
         resource_id=body['payload']['instance_id'],
         timestamp=body['timestamp'],
         duration=0,
-        resource_metadata=get_instance_metadata_from_event(body),
+        resource_metadata=instance.get_metadata_from_event(body),
         )
 
 
