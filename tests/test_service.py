@@ -17,21 +17,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import eventlet
-eventlet.monkey_patch()
-import sys
+import unittest
 
-from ceilometer.service import prepare_service
-from ceilometer.openstack.common import cfg
-from nova import service
+from ceilometer import service
 
 
-if __name__ == '__main__':
-    prepare_service(sys.argv)
-    server = \
-        service.Service.create(binary='ceilometer-collector',
-                               topic='ceilometer.collector',
-                               manager='ceilometer.collector.'
-                               'manager.CollectorManager')
-    service.serve(server)
-    service.wait()
+class ServiceTestCase(unittest.TestCase):
+    def test_prepare_service(self):
+        service.prepare_service()

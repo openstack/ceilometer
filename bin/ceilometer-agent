@@ -19,30 +19,19 @@
 
 import eventlet
 eventlet.monkey_patch()
-
 import sys
 
-from nova import flags
+from ceilometer.service import prepare_service
+from ceilometer.openstack.common import cfg
 from nova import service
-from nova import utils
-from ceilometer import log
+
 
 if __name__ == '__main__':
-    flags.parse_args(sys.argv)
-    log.setup()
-    utils.monkey_patch()
+    prepare_service(sys.argv)
     server = \
         service.Service.create(binary='ceilometer-agent',
                                topic='ceilometer.agent',
                                manager='ceilometer.agent.manager.AgentManager',
-                               # FIXME(dhellmann): The
-                               # periodic_interval is set very
-                               # short for development. After we
-                               # fix the configuration loading we
-                               # can use the config file to
-                               # adjust it and remove this
-                               # hard-coded value.
-                               periodic_interval=10,
-                               )
+                               periodic_interval=cfg.CONF.periodic_interval)
     service.serve(server)
     service.wait()

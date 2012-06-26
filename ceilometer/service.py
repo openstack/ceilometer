@@ -17,21 +17,16 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import eventlet
-eventlet.monkey_patch()
-import sys
-
-from ceilometer.service import prepare_service
+from ceilometer import log
 from ceilometer.openstack.common import cfg
-from nova import service
+
+cfg.CONF.register_opts([
+    cfg.IntOpt('periodic_interval',
+               default=60,
+               help='seconds between running periodic tasks')
+])
 
 
-if __name__ == '__main__':
-    prepare_service(sys.argv)
-    server = \
-        service.Service.create(binary='ceilometer-collector',
-                               topic='ceilometer.collector',
-                               manager='ceilometer.collector.'
-                               'manager.CollectorManager')
-    service.serve(server)
-    service.wait()
+def prepare_service(argv=[]):
+    cfg.CONF(argv[1:])
+    log.setup()
