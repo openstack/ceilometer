@@ -32,7 +32,11 @@ from ceilometer.openstack.common.rpc import dispatcher as rpc_dispatcher
 # FIXME(dhellmann): There must be another way to do this.
 # Import rabbit_notifier to register notification_topics flag
 import nova.notifier.rabbit_notifier
-import nova.openstack.common.rpc as nova_rpc
+try:
+    import nova.openstack.common.rpc as nova_rpc
+except ImportError:
+    # For Essex
+    import nova.rpc as nova_rpc
 
 LOG = log.getLogger(__name__)
 
