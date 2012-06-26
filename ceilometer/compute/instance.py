@@ -23,7 +23,7 @@ INSTANCE_PROPERTIES = [
     'display_name',
     'reservation_id',
     # Type properties
-    'architecture'
+    'architecture',
     # Location properties
     'availability_zone',
     # Image properties

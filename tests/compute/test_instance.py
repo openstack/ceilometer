@@ -29,13 +29,29 @@ from ceilometer.agent import manager
 
 class TestLocationMetadata(test.TestCase):
 
+    INSTANCE_PROPERTIES = {'display_name': 'display name',
+                           'reservation_id': 'reservation id',
+                           'architecture': 'x86_64',
+                           'availability_zone': 'zone1',
+                           'image_ref': 'image ref',
+                           'image_ref_url': 'image ref url',
+                           'kernel_id': 'kernel id',
+                           'os_type': 'linux',
+                           'ramdisk_id': 'ramdisk id',
+                           'disk_gb': 10,
+                           'ephemeral_gb': 7,
+                           'memory_mb': 2048,
+                           'root_gb': 3,
+                           'vcpus': 1,
+                           }
+
     def setUp(self):
         self.context = context.RequestContext('admin', 'admin', is_admin=True)
         self.manager = manager.AgentManager()
         super(TestLocationMetadata, self).setUp()
-        self.instance = db.instance_create(self.context, {})
+        self.instance = db.instance_create(self.context, self.INSTANCE_PROPERTIES)
 
     def test_metadata(self):
         md = instance.get_metadata_from_dbobject(self.instance)
-        for name in instance.INSTANCE_PROPERTIES:
-            assert name in md
+        for name in self.INSTANCE_PROPERTIES.keys():
+            assert md[name] == self.INSTANCE_PROPERTIES[name]
