@@ -38,7 +38,7 @@ Table of content
    :maxdepth: 1
 
    initial_setup
-   agent/writing_plugin_agent
+   agent/writing_agent_plugin
 
 Indices and tables
 ==================
