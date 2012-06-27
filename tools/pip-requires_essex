@@ -1,5 +1,6 @@
 https://github.com/openstack/openstack-common/zipball/master#egg=openstack.common
-https://github.com/openstack/nova/zipball/2012.1#egg=nova
+https://github.com/openstack/nova/zipball/2012.1.1#egg=nova
+https://github.com/openstack/python-novaclient/zipball/2012.1#egg=novaclient
 webob
 kombu
 iso8601
