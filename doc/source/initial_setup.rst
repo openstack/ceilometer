@@ -16,11 +16,13 @@
 Initial reading
 ===============
 
-If you are not yet familiar with ceilometer's architecture, it would be
-advisable that you start by reading the blueprint:
-  http://wiki.openstack.org/EfficientMetering
-and more specifically the architecture which has been agreed on:
-  http://wiki.openstack.org/EfficientMetering/ArchitectureProposalV1
+If you are not yet familiar with ceilometer's architecture, it would
+be advisable that you start by reading the blueprint_ and more
+specifically the architecture_ which has been agreed on.
+
+.. _architecture: http://wiki.openstack.org/EfficientMetering/ArchitectureProposalV1
+
+.. _blueprint: http://wiki.openstack.org/EfficientMetering
 
 In order to contribute to the ceilometer project, you will also need to:
 
