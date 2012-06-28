@@ -17,7 +17,16 @@
 Welcome to the Ceilometer developer documentation!
 ==================================================
 
-The ceilometer project aims to deliver a unique point of contact for billing  systems to aquire all meters they need to establish customer billing,  accross all current and future OpenStack core components.
+The ceilometer project aims to deliver a unique point of contact for billing
+systems to acquire all meters they need to establish customer billing, across
+all current OpenStack core components with work underway to support future
+OpenStack components through plugin agents.
+
+A list of the current usage data that ceilometer will (eventually) listen for
+can be found at http://wiki.openstack.org/SystemUsageData. For a list of the
+planned meters, refer to http://wiki.openstack.org/EfficientMetering#Meters.
+
+A list of the additional usage data is tracked in the bug tracker at https://bugs.launchpad.net/ceilometer.
 
 What is the purpose of the project and vision for it?
 =====================================================
@@ -27,12 +36,12 @@ What is the purpose of the project and vision for it?
 * Data may be collected by monitoring notifications sent from existing services or by polling the infrastructure.
 * Allow deployers to configure the type of data collected to meet their operating requirements.
 * The data collected by the metering system is made visible to some users through a REST API.
-* The metering messages are signed and non repudiable (http://en.wikipedia.org/wiki/Non-repudiation)
+* The metering messages are signed and non-repudiable. (http://en.wikipedia.org/wiki/Non-repudiation)
 
-This documentation has for objective to give you some clues on how to contribute code to ceilometer.
+This documentation offers information on how to contribute code to ceilometer.
 
-Table of content
-================
+Table of contents
+=================
 
 .. toctree::
    :maxdepth: 1

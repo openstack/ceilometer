@@ -13,15 +13,20 @@
       License for the specific language governing permissions and limitations
       under the License.
 
-This documentation has for objective to give you some clues on how to write a
+This documentation gives you some clues on how to write a
 new agent or plugin for Ceilometer a to use if you wish to instrument a
 functionality which has not yet been covered by an existing one.
+
+An agent runs on each compute node to poll for resource usage. Each metric 
+collected is tagged with the resource ID (such as an instance) and the owner,
+including tenant and user IDs.The metrics are then reported to the collector
+via the message bus. More detailed information follows. 
 
 Agent
 =====
 There is currently only one agent defined for Ceilometer which can be found at: ``ceilometer/agent/``
 As you will see in the ``manager.py`` file, this agent will automatically load any
-plugin defined in the namesace ``ceilometer.poll.compute``.
+plugin defined in the namespace ``ceilometer.poll.compute``.
 
 Agents are added by implementing a new nova.manager.Manager class, in the same
 way it was done for the AgentManager for the compute agent in the file
@@ -63,9 +68,9 @@ value of 1.
 Note that the ``LOG`` method is only used as a debugging tool and does not
 participate in the actual metering activity.
 
-Notification
-------------
-Notifiications are defined as subclass of the ``ceilometer.plugin.NotificationBase``
+Notifications
+-------------
+Notifications are defined as subclass of the ``ceilometer.plugin.NotificationBase``
 meta class as defined in the ``ceilometer/plugin.py`` file.  Notifications must
 implement two methods:
 
@@ -95,5 +100,3 @@ the project, thus ensuring as best as possible that a given patch has no side
 effect to the rest of the project.
 
 ### FIXME: could not find a unit test for CPUPollster
-
-

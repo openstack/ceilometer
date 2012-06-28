@@ -13,34 +13,35 @@
       License for the specific language governing permissions and limitations
       under the License.
 
-Initial reading
-===============
+Initial setup
+=============
 
-If you are not yet familiar with ceilometer's architecture, it would
-be advisable that you start by reading the blueprint_ and more
-specifically the architecture_ which has been agreed on.
-
-.. _architecture: http://wiki.openstack.org/EfficientMetering/ArchitectureProposalV1
-
-.. _blueprint: http://wiki.openstack.org/EfficientMetering
+If you are not yet familiar with ceilometer's architecture, it would be
+advisable that you start by reading the blueprint at http://wiki.openstack.org/EfficientMetering, and more specifically the architecture which has been agreed on
+at: http://wiki.openstack.org/EfficientMetering/ArchitectureProposalV1.
 
 In order to contribute to the ceilometer project, you will also need to:
 
-1. Have signed openstack's contributor's agreement
-    http://wiki.openstack.org/CLA
+1. Have signed OpenStack's contributor's agreement. Refer to http://wiki.openstack.org/CLA for more information.
 
-2. Be familiar with git and the OpenStack gerrit review process
-    http://wiki.openstack.org/GerritWorkflow
+2. Be familiar with git and the OpenStack Gerrit review process, see http://wiki.openstack.org/GerritWorkflow. 
+
+.. note:: 
+
+	Currently the ceilometer project is using StackForge, a
+	system for code reviews identical to the OpenStack contribution infrastructure. 
 
 Setting up the project
 ======================
 
-1. The first thing you will need to do is to clone the ceilometer project on your local machine:
+1. The first thing you will need to do is to clone the ceilometer project on your local machine::
+
     git clone https://github.com/stackforge/ceilometer.git
 
-2. Once this is done, you need to setup the review process:
+2. Once this is done, you need to setup the review process::
+
     git remote add gerrit ssh://<username>@review.stackforge.org:29418/stackforge/ceilometer.git
 
-3. Create a topic branch and switch to it
-    git checkout -b TOPIC-BRANCH
+3. Create a topic branch and switch to it::
 
+    git checkout -b TOPIC-BRANCH
