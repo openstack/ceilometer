@@ -9,4 +9,5 @@ if [ ! -z "$VIRTUAL_ENV" ]
 then
 	rm -f $VIRTUAL_ENV/lib/python*/no-global-site-packages.txt
 fi
+
 nosetests "$@"
