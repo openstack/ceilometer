@@ -16,8 +16,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import datetime
-
 from lxml import etree
 
 from nova import flags
@@ -27,6 +25,7 @@ from ceilometer import log
 from ceilometer import counter
 from ceilometer import plugin
 from ceilometer.compute import instance as compute_instance
+from ceilometer.openstack.common import timeutils
 
 FLAGS = flags.FLAGS
 
@@ -42,7 +41,7 @@ def make_counter_from_instance(instance, name, type, volume):
         user_id=instance.user_id,
         project_id=instance.project_id,
         resource_id=instance.uuid,
-        timestamp=datetime.datetime.utcnow().isoformat(),
+        timestamp=timeutils.isotime(),
         duration=None,
         resource_metadata=compute_instance.get_metadata_from_dbobject(
             instance),

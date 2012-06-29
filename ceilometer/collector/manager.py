@@ -24,9 +24,10 @@ from ceilometer import log
 from ceilometer import meter
 from ceilometer import publish
 from ceilometer import rpc
-from ceilometer.collector import dispatcher
 from ceilometer import storage
+from ceilometer.collector import dispatcher
 from ceilometer.openstack.common import cfg
+from ceilometer.openstack.common import timeutils
 from ceilometer.openstack.common.rpc import dispatcher as rpc_dispatcher
 
 # FIXME(dhellmann): There must be another way to do this.
@@ -88,15 +89,23 @@ class CollectorManager(manager.Manager):
         cast from an agent.
         """
         #LOG.info('metering data: %r', data)
-        LOG.info('metering data %s for %s: %s',
+        LOG.info('metering data %s for %s @ %s: %s',
                  data['counter_name'],
                  data['resource_id'],
+                 data.get('timestamp', 'NO TIMESTAMP'),
                  data['counter_volume'])
         if not meter.verify_signature(data):
             LOG.warning('message signature invalid, discarding message: %r',
                         data)
         else:
             try:
+                # Convert the timestamp to a datetime instance.
+                # Storage engines are responsible for converting
+                # that value to something they can store.
+                if 'timestamp' in data:
+                    data['timestamp'] = timeutils.parse_isotime(
+                        data['timestamp'],
+                        )
                 self.storage_conn.record_metering_data(data)
             except Exception as err:
                 LOG.error('Failed to record metering data: %s', err)

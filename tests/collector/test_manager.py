@@ -69,3 +69,23 @@ class TestCollectorManager(test.TestCase):
 
         assert not self.mgr.storage_conn.called, \
             'Should not have called the storage connection'
+
+    def test_timestamp_conversion(self):
+        msg = {'counter_name': 'test',
+               'resource_id': self.id(),
+               'counter_volume': 1,
+               'timestamp': '2012-07-02T13:53:40Z',
+               }
+        msg['message_signature'] = meter.compute_signature(msg)
+
+        expected = {}
+        expected.update(msg)
+        expected['timestamp'] = datetime.datetime(2012, 7, 2, 13, 53, 40)
+
+        self.mgr.storage_conn = self.mox.CreateMock(base.Connection)
+        self.mgr.storage_conn.record_metering_data(expected)
+        self.mox.ReplayAll()
+
+        self.mgr.record_metering_data(self.ctx, msg)
+        self.mox.VerifyAll()
+
