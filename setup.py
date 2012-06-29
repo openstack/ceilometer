@@ -17,6 +17,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import textwrap
+
 import setuptools
 
 setuptools.setup(
@@ -31,7 +33,7 @@ setuptools.setup(
     test_suite='nose.collector',
     scripts=['bin/ceilometer-agent', 'bin/ceilometer-collector'],
     py_modules=[],
-    entry_points="""
+    entry_points=textwrap.dedent("""
     [ceilometer.collector.compute]
     instance = ceilometer.compute.notifications:InstanceNotifications
 
@@ -42,5 +44,6 @@ setuptools.setup(
 
     [ceilometer.storage]
     log = ceilometer.storage.impl_log:LogStorage
-    """,
+    mongodb = ceilometer.storage.impl_mongodb:MongoDBStorage
+    """),
     )

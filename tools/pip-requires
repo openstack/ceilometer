@@ -1,5 +1,5 @@
 #https://github.com/openstack/nova/zipball/master#egg=nova
-# Work-around for packaging issue in nova:
+# Work-around for packaging issue in nova (https://bugs.launchpad.net/openstack-ci/+bug/1019423)
 http://nova.openstack.org/tarballs/nova-2012.2~f2~20120629.14648.tar.gz
 webob
 kombu

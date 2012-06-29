@@ -3,3 +3,11 @@ coverage
 pep8>=1.0
 mox
 glance>=2011.3.1
+# NOTE(dhellmann): Ming is necessary to provide the Mongo-in-memory
+# implementation for of MongoDB. The original source for Ming is at
+# http://sourceforge.net/project/merciless but there does not seem to
+# be a way to point to a "zipball" of the latest HEAD there, and we
+# need features present only in that version. I forked the project to
+# github to make it easier to install, then ended up making some
+# changes to it so it would be compatible with PyMongo's API.
+https://github.com/dreamhost/Ming/zipball/master#egg=Ming

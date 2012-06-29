@@ -29,7 +29,7 @@ STORAGE_ENGINE_NAMESPACE = 'ceilometer.storage'
 
 STORAGE_OPTS = [
     cfg.StrOpt('metering_storage_engine',
-               default='log',
+               default='mongodb',
                help='The name of the storage engine to use',
                ),
     ]
