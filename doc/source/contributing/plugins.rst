@@ -13,6 +13,10 @@
       License for the specific language governing permissions and limitations
       under the License.
 
+=======================
+ Writing Agent Plugins
+=======================
+
 This documentation gives you some clues on how to write a
 new agent or plugin for Ceilometer a to use if you wish to instrument a
 functionality which has not yet been covered by an existing one.
@@ -99,4 +103,4 @@ Unit tests are run in a continuous integration process for each commit made to
 the project, thus ensuring as best as possible that a given patch has no side
 effect to the rest of the project.
 
-### FIXME: could not find a unit test for CPUPollster
+.. todo:: FIXME: could not find a unit test for CPUPollster
