@@ -163,6 +163,26 @@ class Connection(base.Connection):
                  conf.mongodb_host, conf.mongodb_port)
         self.conn = self._get_connection(conf)
         self.db = getattr(self.conn, conf.mongodb_dbname)
+
+        # Establish indexes
+        #
+        # We need variations for user_id vs. project_id because of the
+        # way the indexes are stored in b-trees. The user_id and
+        # project_id values are usually mutually exclusive in the
+        # queries, so the database won't take advantage of an index
+        # including both.
+        for primary in ['user_id', 'project_id']:
+            self.db.resource.ensure_index([
+                    (primary, pymongo.ASCENDING),
+                    ('source', pymongo.ASCENDING),
+                    ])
+            self.db.meter.ensure_index([
+                    ('resource_id', pymongo.ASCENDING),
+                    (primary, pymongo.ASCENDING),
+                    ('counter_name', pymongo.ASCENDING),
+                    ('timestamp', pymongo.ASCENDING),
+                    ('source', pymongo.ASCENDING),
+                    ])
         return
 
     def _get_connection(self, conf):
