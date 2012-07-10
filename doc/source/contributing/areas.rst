@@ -17,6 +17,10 @@
  Areas to Contribute
 =====================
 
+The Ceilometer project maintains a list of things that need to be worked on at:
+http://wiki.openstack.org/EfficientMetering/RoadMap but feel free to work on
+something else.
+
 Plugins
 =======
 
