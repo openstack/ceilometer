@@ -49,7 +49,7 @@ class TestDiskIOPollster(test.TestCase):
 
     @test.skip_if(libvirt_missing, 'Test requires libvirt')
     def test_fetch_diskio_with_libvirt_non_existent_instance(self):
-        flags.FLAGS.connection_type = 'libvirt'
+        flags.FLAGS.compute_driver = 'libvirt.LibvirtDriver'
 
         instance = db.instance_create(self.context, {})
 

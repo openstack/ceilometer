@@ -71,7 +71,7 @@ class DiskIOPollster(plugin.PollsterBase):
                        ])
 
     def get_counters(self, manager, context):
-        if FLAGS.connection_type == 'libvirt':
+        if FLAGS.compute_driver == 'libvirt.LibvirtDriver':
             conn = nova.virt.connection.get_connection(read_only=True)
             for instance in manager.db.instance_get_all_by_host(context,
                                                                 manager.host):
