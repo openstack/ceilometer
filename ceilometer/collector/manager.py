@@ -20,19 +20,19 @@ from nova import context
 from nova import flags
 from nova import manager
 
-from ceilometer import log
 from ceilometer import meter
 from ceilometer import publish
 from ceilometer import rpc
 from ceilometer import storage
 from ceilometer.collector import dispatcher
 from ceilometer.openstack.common import cfg
+from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer.openstack.common.rpc import dispatcher as rpc_dispatcher
 
 # FIXME(dhellmann): There must be another way to do this.
 # Import rabbit_notifier to register notification_topics flag
-import nova.notifier.rabbit_notifier
+import ceilometer.openstack.common.notifier.rabbit_notifier
 try:
     import nova.openstack.common.rpc as nova_rpc
 except ImportError:

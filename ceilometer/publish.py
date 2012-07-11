@@ -18,9 +18,8 @@
 """Publish a counter using the preferred RPC mechanism.
 """
 
-from ceilometer import log
+from ceilometer.openstack.common import log
 from ceilometer.openstack.common import rpc
-
 from ceilometer.openstack.common import cfg
 from ceilometer import meter
 

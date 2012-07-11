@@ -21,7 +21,7 @@ and publish the results.
 
 import pkg_resources
 
-from ceilometer import log
+from ceilometer.openstack.common import log
 
 LOG = log.getLogger(__name__)
 

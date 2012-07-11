@@ -20,7 +20,7 @@ import pkg_resources
 
 from nova import manager
 
-from ceilometer import log
+from ceilometer.openstack.common import log
 from ceilometer import publish
 
 

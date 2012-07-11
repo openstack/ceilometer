@@ -18,7 +18,7 @@
 
 from nova import exception
 
-from ceilometer import log
+from ceilometer.openstack.common import log
 
 from .. import counter
 from .. import plugin

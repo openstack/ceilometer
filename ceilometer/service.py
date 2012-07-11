@@ -19,7 +19,7 @@
 
 from nova import flags
 
-from ceilometer import log
+from ceilometer.openstack.common import log
 from ceilometer.openstack.common import cfg
 
 cfg.CONF.register_opts([
@@ -36,4 +36,4 @@ def prepare_service(argv=[]):
     # still using the Service object out of nova directly. We need to
     # move that into openstack.common.
     flags.FLAGS(argv[1:])
-    log.setup()
+    log.setup('ceilometer')

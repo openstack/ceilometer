@@ -21,10 +21,10 @@ from lxml import etree
 from nova import flags
 import nova.virt.connection
 
-from ceilometer import log
 from ceilometer import counter
 from ceilometer import plugin
 from ceilometer.compute import instance as compute_instance
+from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 
 FLAGS = flags.FLAGS

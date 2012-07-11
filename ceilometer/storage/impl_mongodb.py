@@ -20,7 +20,7 @@
 
 import datetime
 
-from ceilometer import log
+from ceilometer.openstack.common import log
 from ceilometer.openstack.common import cfg
 from ceilometer.storage import base
 

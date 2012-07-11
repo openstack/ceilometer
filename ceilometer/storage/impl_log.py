@@ -18,7 +18,7 @@
 """Simple logging storage backend.
 """
 
-from ceilometer import log
+from ceilometer.openstack.common import log
 from ceilometer.storage import base
 
 LOG = log.getLogger(__name__)
