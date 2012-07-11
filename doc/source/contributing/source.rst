@@ -31,11 +31,11 @@ Setting up a Development Sandbox
     $ git clone https://github.com/stackforge/ceilometer.git
     $ cd ./ceilometer
 
-2. Once this is done, you need to setup the review process::
+3. Once this is done, you need to setup the review process::
 
-    $ git remote add gerrit ssh://<username>@review.stackforge.org:29418/stackforge/ceilometer.git
+    $ git remote add gerrit ssh://<username>@review.openstack.org:29418/stackforge/ceilometer.git
 
-3. If you are preparing a patch, create a topic branch and switch to
+4. If you are preparing a patch, create a topic branch and switch to
    it before making any changes::
 
     $ git checkout -b TOPIC-BRANCH
