@@ -167,8 +167,8 @@ def compare(name, actual, expected):
     assert actual == expected, name
 
 
-def test_c1():
-    info = notifications.c1(INSTANCE_CREATE_END)
+def test_process_notification():
+    info = notifications.InstanceNotifications.process_notification(INSTANCE_CREATE_END)[0]
 
     for name, actual, expected in [
         ('counter_name', info.name, 'instance'),

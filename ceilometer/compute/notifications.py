@@ -23,32 +23,28 @@ from ceilometer import plugin
 from ceilometer.compute import instance
 
 
-def c1(body):
-    """Generate c1(instance) counters for a notice."""
-    return counter.Counter(
-        source='?',
-        name='instance',
-        type='delta',
-        volume=1,
-        user_id=body['payload']['user_id'],
-        project_id=body['payload']['tenant_id'],
-        resource_id=body['payload']['instance_id'],
-        timestamp=body['timestamp'],
-        duration=0,
-        resource_metadata=instance.get_metadata_from_event(body),
-        )
-
-
 class InstanceNotifications(plugin.NotificationBase):
     """Convert compute.instance.* notifications into Counters
     """
 
-    def get_event_types(self):
+    @staticmethod
+    def get_event_types():
         return ['compute.instance.create.end',
                 'compute.instance.exists',
                 'compute.instance.delete.start',
                 ]
 
-    def process_notification(self, message):
-        return [c1(message),
-                ]
+    @staticmethod
+    def process_notification(message):
+        return [counter.Counter(
+            source='?',
+            name='instance',
+            type='delta',
+            volume=1,
+            user_id=message['payload']['user_id'],
+            project_id=message['payload']['tenant_id'],
+            resource_id=message['payload']['instance_id'],
+            timestamp=message['timestamp'],
+            duration=0,
+            resource_metadata=instance.get_metadata_from_event(message),
+        )]
