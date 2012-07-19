@@ -32,19 +32,30 @@ class InstanceNotifications(plugin.NotificationBase):
         return ['compute.instance.create.end',
                 'compute.instance.exists',
                 'compute.instance.delete.start',
-                ]
+        ]
 
     @staticmethod
     def process_notification(message):
-        return [counter.Counter(
-            source='?',
-            name='instance',
-            type='cumulative',
-            volume=1,
-            user_id=message['payload']['user_id'],
-            project_id=message['payload']['tenant_id'],
-            resource_id=message['payload']['instance_id'],
-            timestamp=message['timestamp'],
-            duration=0,
-            resource_metadata=instance.get_metadata_from_event(message),
-        )]
+        return [
+            counter.Counter(source='?',
+                            name='instance',
+                            type='cumulative',
+                            volume=1,
+                            user_id=message['payload']['user_id'],
+                            project_id=message['payload']['tenant_id'],
+                            resource_id=message['payload']['instance_id'],
+                            timestamp=message['timestamp'],
+                            duration=0,
+                            resource_metadata=instance.get_metadata_from_event(
+                                message)),
+            counter.Counter(source='?',
+                            name='memory',
+                            type='absolute',
+                            volume=message['payload']['memory_mb'],
+                            user_id=message['payload']['user_id'],
+                            project_id=message['payload']['tenant_id'],
+                        resource_id=message['payload']['instance_id'],
+                            timestamp=message['timestamp'],
+                            duration=0,
+                            resource_metadata={}),
+        ]

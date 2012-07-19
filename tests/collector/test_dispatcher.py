@@ -83,7 +83,7 @@ def test_notify():
     results = []
     d = StubDispatcher(None, lambda x: results.append(x))
     d.notify(TEST_NOTICE)
-    assert len(results) == 1
+    assert len(results) >= 1
     counter = results[0]
     assert counter.name == 'instance'
 
@@ -113,6 +113,7 @@ def test_notify_through_plugin():
         lambda x: results.append(x)
         )
     d.notify(TEST_NOTICE)
-    assert len(results) == 1
-    counter = results[0]
-    assert counter.name == 'instance'
+    assert len(results) >= 1
+    results_name = [ result.name for result in results ]
+    assert 'instance' in results_name
+    assert 'memory' in results_name
