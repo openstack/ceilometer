@@ -120,7 +120,7 @@ class CPUPollster(plugin.PollsterBase):
                                                  )
                 yield make_counter_from_instance(instance,
                                                  name='instance',
-                                                 type='delta',
+                                                 type='cumulative',
                                                  volume=1,
                                                  )
             except Exception as err:

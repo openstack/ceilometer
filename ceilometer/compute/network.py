@@ -39,7 +39,7 @@ class FloatingIPPollster(plugin.PollsterBase):
                 yield counter.Counter(
                     source='?',
                     name='floating_ip',
-                    type='delta',
+                    type='cumulative',
                     volume=1,
                     user_id=None,
                     project_id=ip.project_id,

@@ -24,7 +24,22 @@ in by the plugins that create them.
 
 import collections
 
-
+# Fields explanation:
+#
+# Source:
+# Name: the name of the counter, must be unique
+# Type: the type of the counter, must be either:
+#       - cumulative: the value is incremented and never reset to 0
+#       - delta: the value is reset to 0 each time it is sent
+#       - absolute: the value is an absolute value and is not a counter
+# Volume: the counter value
+# User ID: the user ID
+# Project ID: the project ID
+# Resource ID: the resource ID
+# Timestamp: when the counter has been read
+# Duration: duration in seconds determining how long the value is valid.
+#           adding this to timestamp give the end time of the counter
+# Resource metadata: various metadata
 Counter = collections.namedtuple('Counter',
                                  ' '.join(['source',
                                            'name',
