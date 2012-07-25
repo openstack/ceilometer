@@ -30,8 +30,8 @@ from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer.openstack.common.rpc import dispatcher as rpc_dispatcher
 
-# FIXME(dhellmann): There must be another way to do this.
-# Import rabbit_notifier to register notification_topics flag
+# FIXME(dhellmann): There must be another way to do this.  Import
+# rabbit_notifier to register notification_topics flag
 import ceilometer.openstack.common.notifier.rabbit_notifier
 try:
     import nova.openstack.common.rpc as nova_rpc
@@ -66,7 +66,7 @@ class CollectorManager(manager.Manager):
         # invocation protocol (they do not include a "method"
         # parameter).
         self.connection.declare_topic_consumer(
-            topic='%s.info' % flags.FLAGS.notification_topics[0],
+            topic='%s.info' % cfg.CONF.notification_topics[0],
             callback=self.compute_handler.notify)
 
         # Set ourselves up as a separate worker for the metering data,

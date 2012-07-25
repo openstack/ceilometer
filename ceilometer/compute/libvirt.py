@@ -19,17 +19,30 @@
 from lxml import etree
 
 from nova import flags
-import nova.virt.connection
 
 from ceilometer import counter
 from ceilometer import plugin
 from ceilometer.compute import instance as compute_instance
+from ceilometer.openstack.common import importutils
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 
 FLAGS = flags.FLAGS
 
 MIB = 2 ** 20  # mebibytes
+
+
+def get_libvirt_connection():
+    """Return an open connection for talking to libvirt."""
+    # The direct-import implementation only works with Folsom because
+    # the configuration setting changed.
+    try:
+        return importutils.import_object_ns('nova.virt',
+                                            FLAGS.compute_driver)
+    except ImportError:
+        # Fall back to the way it was done in Essex.
+        import nova.virt.connection
+        return nova.virt.connection.get_connection(read_only=True)
 
 
 def make_counter_from_instance(instance, name, type, volume):
@@ -72,7 +85,7 @@ class DiskIOPollster(plugin.PollsterBase):
 
     def get_counters(self, manager, context):
         if FLAGS.compute_driver == 'libvirt.LibvirtDriver':
-            conn = nova.virt.connection.get_connection(read_only=True)
+            conn = get_libvirt_connection()
             for instance in manager.db.instance_get_all_by_host(context,
                                                                 manager.host):
                 # TODO(jd) This does not work see bug#998089
@@ -103,7 +116,7 @@ class CPUPollster(plugin.PollsterBase):
     LOG = log.getLogger(__name__ + '.cpu')
 
     def get_counters(self, manager, context):
-        conn = nova.virt.connection.get_connection(read_only=True)
+        conn = get_libvirt_connection()
         # FIXME(dhellmann): How do we get a list of instances without
         # talking directly to the database?
         for instance in manager.db.instance_get_all_by_host(context,
