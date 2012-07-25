@@ -19,12 +19,12 @@
  Installing and Running the Development Version
 ================================================
 
-Ceilometer has two daemons. The :term:`agent` runs on the Nova compute
-node(s) and the :term:`collector` runs on the cloud's management
-node(s). In a development environment created by devstack_, these two
-are typically the same server. They do not have to be, though, so some
-of the instructions below are duplicated. Skip the steps you have
-already done.
+Ceilometer has three daemons. The :term:`agent` runs on the Nova
+compute node(s). The :term:`collector` and API server run on the
+cloud's management node(s). In a development environment created by
+devstack_, these two are typically the same server. They do not have
+to be, though, so some of the instructions below are duplicated. Skip
+the steps you have already done.
 
 .. _devstack: http://www.devstack.org/
 
@@ -145,3 +145,33 @@ Installing the Compute Agent
       stderr, so you may want to run this step using a screen session
       or other tool for maintaining a long-running program in the
       background.
+
+
+Installing the API Server
+=========================
+
+.. index::
+   double: installing; API
+
+1. Clone the ceilometer git repository to the server::
+
+   $ cd /opt/stack
+   $ git clone https://github.com/stackforge/ceilometer.git
+
+2. As a user with ``root`` permissions or ``sudo`` privileges, run the
+   ceilometer installer::
+
+   $ cd ceilometer
+   $ sudo python setup.py install
+
+3. Start the API server.
+
+   ::
+
+     $ python -m ceilometer.api
+
+   .. note::
+
+      The development version of the API server logs to stderr, so you
+      may want to run this step using a screen session or other tool
+      for maintaining a long-running program in the background.

@@ -20,8 +20,8 @@ from nova import exception
 
 from ceilometer.openstack.common import log
 
-from .. import counter
-from .. import plugin
+from ceilometer import counter
+from ceilometer import plugin
 
 
 class FloatingIPPollster(plugin.PollsterBase):
