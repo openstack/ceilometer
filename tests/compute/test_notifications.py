@@ -186,36 +186,38 @@ class TestNotifications(unittest.TestCase):
             ]:
             yield compare, name, actual, expected
 
+    def _check_counters(self, counters):
+        counter_names = [ counter.name for counter in counters ]
+        self.assertEqual(len(counters), 5)
+        self.assert_('instance' in counter_names)
+        self.assert_('memory' in counter_names)
+        self.assert_('vcpus' in counter_names)
+        self.assert_('root_disk_size' in counter_names)
+        self.assert_('ephemeral_disk_size' in counter_names)
+
+    @staticmethod
+    def _find_counter(counters, name):
+        return filter(lambda counter: counter.name == name, counters)[0]
 
     def test_instance_create(self):
         ic = notifications.InstanceNotifications()
         counters = ic.process_notification(INSTANCE_CREATE_END)
+        self._check_counters(counters)
 
-        self.assertEqual(len(counters), 3)
-
-        self.assertEqual(counters[0].name, 'instance')
-        self.assertEqual(counters[0].volume, 1)
-
-        self.assertEqual(counters[1].name, 'memory')
-        self.assertEqual(counters[1].volume, INSTANCE_CREATE_END['payload']['memory_mb'])
-
-        self.assertEqual(counters[2].name, 'vcpus')
-        self.assertEqual(counters[2].volume, INSTANCE_CREATE_END['payload']['vcpus'])
-
+        self.assertEqual(self._find_counter(counters, 'instance').volume, 1)
+        self.assertEqual(self._find_counter(counters, 'memory').volume,
+                         INSTANCE_CREATE_END['payload']['memory_mb'])
+        self.assertEqual(self._find_counter(counters, 'vcpus').volume,
+                         INSTANCE_CREATE_END['payload']['vcpus'])
+        self.assertEqual(self._find_counter(counters, 'root_disk_size').volume,
+                         INSTANCE_CREATE_END['payload']['root_gb'])
+        self.assertEqual(self._find_counter(counters, 'ephemeral_disk_size').volume,
+                         INSTANCE_CREATE_END['payload']['ephemeral_gb'])
 
     def test_instance_exists(self):
         ic = notifications.InstanceNotifications()
-        counters = ic.process_notification(INSTANCE_EXISTS)
-        self.assertEqual(len(counters), 3)
-        self.assertEqual(counters[0].name, 'instance')
-        self.assertEqual(counters[1].name, 'memory')
-        self.assertEqual(counters[2].name, 'vcpus')
-
+        self._check_counters(ic.process_notification(INSTANCE_EXISTS))
 
     def test_instance_delete(self):
         ic = notifications.InstanceNotifications()
-        counters = ic.process_notification(INSTANCE_DELETE_START)
-        self.assertEqual(len(counters), 3)
-        self.assertEqual(counters[0].name, 'instance')
-        self.assertEqual(counters[1].name, 'memory')
-        self.assertEqual(counters[2].name, 'vcpus')
+        self._check_counters(ic.process_notification(INSTANCE_DELETE_START))
