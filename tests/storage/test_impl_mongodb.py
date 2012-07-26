@@ -97,7 +97,7 @@ class MongoDBEngineTestBase(unittest.TestCase):
         self.conn.db = self.db
 
         self.counter = counter.Counter(
-            'test',
+            'test-1',
             'instance',
             'cumulative',
             1,
@@ -114,7 +114,7 @@ class MongoDBEngineTestBase(unittest.TestCase):
         self.conn.record_metering_data(self.msg)
 
         self.counter2 = counter.Counter(
-            'test',
+            'test-2',
             'instance',
             'cumulative',
             1,
@@ -129,6 +129,23 @@ class MongoDBEngineTestBase(unittest.TestCase):
             )
         self.msg2 = meter.meter_message_from_counter(self.counter2)
         self.conn.record_metering_data(self.msg2)
+
+        self.counter3 = counter.Counter(
+            'test-3',
+            'instance',
+            'cumulative',
+            1,
+            'user-id-alternate',
+            'project-id',
+            'resource-id-alternate',
+            timestamp=datetime.datetime(2012, 7, 2, 10, 41),
+            duration=0,
+            resource_metadata={'display_name': 'test-server',
+                               'tag': 'self.counter3',
+                               }
+            )
+        self.msg3 = meter.meter_message_from_counter(self.counter3)
+        self.conn.record_metering_data(self.msg3)
 
         for i in range(2, 4):
             c = counter.Counter(
@@ -158,11 +175,16 @@ class UserTest(MongoDBEngineTestBase):
     def test_new_user_source(self):
         user = self.db.user.find_one({'_id': 'user-id'})
         assert 'source' in user
-        assert user['source'] == ['test']
+        assert user['source'] == ['test-1', 'test-2']
 
     def test_get_users(self):
         users = self.conn.get_users()
-        assert set(users) == set(['user-id', 'user-id-2', 'user-id-3'])
+        assert set(users) == set(['user-id', 'user-id-alternate', 'user-id-2', 'user-id-3'])
+
+    def test_get_users_by_source(self):
+        users = list(self.conn.get_users(source='test-1'))
+        assert len(users) == 1
+        assert users == ['user-id']
 
 
 class ProjectTest(MongoDBEngineTestBase):
@@ -174,12 +196,17 @@ class ProjectTest(MongoDBEngineTestBase):
     def test_new_project_source(self):
         project = self.db.project.find_one({'_id': 'project-id'})
         assert 'source' in project
-        assert project['source'] == ['test']
+        assert project['source'] == ['test-1', 'test-2', 'test-3']
 
     def test_get_projects(self):
         projects = self.conn.get_projects()
         expected = set(['project-id', 'project-id-2', 'project-id-3'])
         assert set(projects) == expected
+
+    def test_get_projects_by_source(self):
+        projects = self.conn.get_projects(source='test-1')
+        expected = ['project-id']
+        assert projects == expected
 
 
 class ResourceTest(MongoDBEngineTestBase):
@@ -226,11 +253,18 @@ class ResourceTest(MongoDBEngineTestBase):
         else:
             assert False, 'Never found resource-id'
 
+    def test_get_resources_by_source(self):
+        resources = list(self.conn.get_resources(source='test-1'))
+        assert len(resources) == 1
+        ids = set(r['resource_id'] for r in resources)
+        assert ids == set(['resource-id'])
+
     def test_get_resources_by_user(self):
         resources = list(self.conn.get_resources(user='user-id'))
-        assert len(resources) == 2
+        num_resources = len(resources)
+        assert num_resources == 1
         ids = set(r['resource_id'] for r in resources)
-        assert ids == set(['resource-id', 'resource-id-alternate'])
+        assert ids == set(['resource-id'])
 
     def test_get_resources_by_project(self):
         resources = list(self.conn.get_resources(project='project-id'))
@@ -257,7 +291,7 @@ class MeterTest(MongoDBEngineTestBase):
         results = list(self.conn.get_raw_events(f))
         assert results
         for meter in results:
-            assert meter in [self.msg, self.msg2]
+            assert meter in [self.msg, self.msg2, self.msg3]
 
     def test_get_raw_events_by_resource(self):
         f = storage.EventFilter(user='user-id', resource='resource-id')
@@ -341,7 +375,7 @@ class SumTest(MongoDBEngineTestBase):
         counts = dict((r['resource_id'], r['value'])
                       for r in results)
         assert counts['resource-id'] == 1
-        assert counts['resource-id-alternate'] == 1
+        assert counts['resource-id-alternate'] == 2
         assert set(counts.keys()) == set(['resource-id',
                                           'resource-id-alternate'])
 

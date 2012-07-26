@@ -230,6 +230,7 @@ class Connection(base.Connection):
                       # last updated.
                       'timestamp': timestamp,
                       'metadata': data['resource_metadata'],
+                      'source': data['source'],
                       },
              '$addToSet': {'meter': {'counter_name': data['counter_name'],
                                      'counter_type': data['counter_type'],
@@ -248,20 +249,24 @@ class Connection(base.Connection):
 
         :param source: Optional source filter.
         """
-        q = {}
         if source is not None:
-            q['source'] = source
-        return self.db.user.distinct('_id')
+            q = {'source': source,
+                 }
+            return self.db.user.find(q).distinct('_id')
+        else:
+            return self.db.user.distinct('_id')
 
     def get_projects(self, source=None):
         """Return an iterable of project id strings.
 
         :param source: Optional source filter.
         """
-        q = {}
         if source is not None:
-            q['source'] = source
-        return self.db.project.distinct('_id')
+            q = {'source': source,
+                 }
+            return self.db.project.find(q).distinct('_id')
+        else:
+            return self.db.project.distinct('_id')
 
     def get_resources(self, user=None, project=None, source=None):
         """Return an iterable of dictionaries containing resource information.
