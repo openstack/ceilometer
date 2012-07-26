@@ -191,7 +191,7 @@ class TestNotifications(unittest.TestCase):
         ic = notifications.InstanceNotifications()
         counters = ic.process_notification(INSTANCE_CREATE_END)
 
-        self.assertEqual(len(counters), 2)
+        self.assertEqual(len(counters), 3)
 
         self.assertEqual(counters[0].name, 'instance')
         self.assertEqual(counters[0].volume, 1)
@@ -199,18 +199,23 @@ class TestNotifications(unittest.TestCase):
         self.assertEqual(counters[1].name, 'memory')
         self.assertEqual(counters[1].volume, INSTANCE_CREATE_END['payload']['memory_mb'])
 
+        self.assertEqual(counters[2].name, 'vcpus')
+        self.assertEqual(counters[2].volume, INSTANCE_CREATE_END['payload']['vcpus'])
+
 
     def test_instance_exists(self):
         ic = notifications.InstanceNotifications()
         counters = ic.process_notification(INSTANCE_EXISTS)
-        self.assertEqual(len(counters), 2)
+        self.assertEqual(len(counters), 3)
         self.assertEqual(counters[0].name, 'instance')
         self.assertEqual(counters[1].name, 'memory')
+        self.assertEqual(counters[2].name, 'vcpus')
 
 
     def test_instance_delete(self):
         ic = notifications.InstanceNotifications()
         counters = ic.process_notification(INSTANCE_DELETE_START)
-        self.assertEqual(len(counters), 2)
+        self.assertEqual(len(counters), 3)
         self.assertEqual(counters[0].name, 'instance')
         self.assertEqual(counters[1].name, 'memory')
+        self.assertEqual(counters[2].name, 'vcpus')
