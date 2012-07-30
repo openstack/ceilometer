@@ -53,8 +53,8 @@ class TestRunTasks(test.TestCase):
                                },
             )
 
-        def get_counters(self, manager, context):
-            self.counters.append((manager, context))
+        def get_counters(self, manager, instance):
+            self.counters.append((manager, instance))
             return [self.test_data]
 
     def faux_notify(self, context, msg):
@@ -67,7 +67,23 @@ class TestRunTasks(test.TestCase):
         self.mgr = manager.AgentManager()
         self.mgr.pollsters = [('test', self.Pollster())]
         self.ctx = context.RequestContext("user", "project")
+        # Set up a fake instance value to be returned by
+        # instance_get_all_by_host() so when the manager gets the list
+        # of instances to poll we can control the results.
+        self.instance = 'faux instance'
+        self.mox.StubOutWithMock(self.mgr.db, 'instance_get_all_by_host')
+        self.mgr.db.instance_get_all_by_host(
+            self.ctx,
+            self.mgr.host,
+            ).AndReturn([self.instance])
+
+        self.mox.ReplayAll()
+        # Invoke the periodic tasks to call the pollsters.
         self.mgr.periodic_tasks(self.ctx)
 
     def test_message(self):
-        assert self.Pollster.counters[0][1] is self.ctx
+        assert self.Pollster.counters[0][1] is self.instance
+
+    def test_notifications(self):
+        assert self.notifications[0] is self.Pollster.test_data
+        assert len(self.notifications) == 1

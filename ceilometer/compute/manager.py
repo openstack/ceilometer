@@ -26,7 +26,7 @@ from ceilometer import publish
 
 LOG = log.getLogger(__name__)
 
-COMPUTE_PLUGIN_NAMESPACE = 'ceilometer.poll.compute'
+PLUGIN_NAMESPACE = 'ceilometer.poll.compute'
 
 
 class AgentManager(manager.Manager):
@@ -37,7 +37,7 @@ class AgentManager(manager.Manager):
 
     def _load_plugins(self):
         self.pollsters = []
-        for ep in pkg_resources.iter_entry_points(COMPUTE_PLUGIN_NAMESPACE):
+        for ep in pkg_resources.iter_entry_points(PLUGIN_NAMESPACE):
             try:
                 plugin_class = ep.load()
                 plugin = plugin_class()
@@ -48,24 +48,28 @@ class AgentManager(manager.Manager):
                 # it should be enabled.
                 self.pollsters.append((ep.name, plugin))
                 LOG.info('loaded pollster %s:%s',
-                         COMPUTE_PLUGIN_NAMESPACE, ep.name)
+                         PLUGIN_NAMESPACE, ep.name)
             except Exception as err:
                 LOG.warning('Failed to load pollster %s:%s',
                             ep.name, err)
                 LOG.exception(err)
         if not self.pollsters:
             LOG.warning('Failed to load any pollsters for %s',
-                        COMPUTE_PLUGIN_NAMESPACE)
+                        PLUGIN_NAMESPACE)
         return
 
     def periodic_tasks(self, context, raise_on_error=False):
         """Tasks to be run at a periodic interval."""
-        for name, pollster in self.pollsters:
-            try:
-                LOG.info('polling %s', name)
-                for c in pollster.get_counters(self, context):
-                    LOG.info('COUNTER: %s', c)
-                    publish.publish_counter(context, c)
-            except Exception as err:
-                LOG.warning('Continuing after error from %s: %s', name, err)
-                LOG.exception(err)
+        # FIXME(dhellmann): How do we get a list of instances without
+        # talking directly to the database?
+        for instance in self.db.instance_get_all_by_host(context, self.host):
+            for name, pollster in self.pollsters:
+                try:
+                    LOG.info('polling %s', name)
+                    for c in pollster.get_counters(self, instance):
+                        LOG.info('COUNTER: %s', c)
+                        publish.publish_counter(context, c)
+                except Exception as err:
+                    LOG.warning('Continuing after error from %s: %s',
+                                name, err)
+                    LOG.exception(err)

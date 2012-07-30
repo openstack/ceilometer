@@ -83,20 +83,18 @@ class DiskIOPollster(plugin.ComputePollster):
                        for target in tree.findall('devices/disk/target')
                        ])
 
-    def get_counters(self, manager, context):
+    def get_counters(self, manager, instance):
         if FLAGS.compute_driver == 'libvirt.LibvirtDriver':
             conn = get_libvirt_connection()
-            for instance in manager.db.instance_get_all_by_host(context,
-                                                                manager.host):
-                # TODO(jd) This does not work see bug#998089
-                # for disk in conn.get_disks(instance.name):
-                try:
-                    disks = self._get_disks(conn, instance.name)
-                except Exception as err:
-                    self.LOG.warning('Ignoring instance %s: %s',
-                                     instance.name, err)
-                    self.LOG.exception(err)
-                    continue
+            # TODO(jd) This does not work see bug#998089
+            # for disk in conn.get_disks(instance.name):
+            try:
+                disks = self._get_disks(conn, instance.name)
+            except Exception as err:
+                self.LOG.warning('Ignoring instance %s: %s',
+                                 instance.name, err)
+                self.LOG.exception(err)
+            else:
                 bytes = 0
                 for disk in disks:
                     stats = conn.block_stats(instance.name, disk)
@@ -115,28 +113,24 @@ class CPUPollster(plugin.ComputePollster):
 
     LOG = log.getLogger(__name__ + '.cpu')
 
-    def get_counters(self, manager, context):
+    def get_counters(self, manager, instance):
         conn = get_libvirt_connection()
-        # FIXME(dhellmann): How do we get a list of instances without
-        # talking directly to the database?
-        for instance in manager.db.instance_get_all_by_host(context,
-                                                            manager.host):
-            self.LOG.info('checking instance %s', instance.uuid)
-            try:
-                cpu_info = conn.get_info(instance)
-                self.LOG.info("CPUTIME USAGE: %s %d",
-                              instance, cpu_info['cpu_time'])
-                yield make_counter_from_instance(instance,
-                                                 name='cpu',
-                                                 type='cumulative',
-                                                 volume=cpu_info['cpu_time'],
-                                                 )
-                yield make_counter_from_instance(instance,
-                                                 name='instance',
-                                                 type='cumulative',
-                                                 volume=1,
-                                                 )
-            except Exception as err:
-                self.LOG.error('could not get CPU time for %s: %s',
-                               instance.uuid, err)
-                self.LOG.exception(err)
+        self.LOG.info('checking instance %s', instance.uuid)
+        try:
+            cpu_info = conn.get_info(instance)
+            self.LOG.info("CPUTIME USAGE: %s %d",
+                          instance, cpu_info['cpu_time'])
+            yield make_counter_from_instance(instance,
+                                             name='cpu',
+                                             type='cumulative',
+                                             volume=cpu_info['cpu_time'],
+                                             )
+            yield make_counter_from_instance(instance,
+                                             name='instance',
+                                             type='cumulative',
+                                             volume=1,
+                                             )
+        except Exception as err:
+            self.LOG.error('could not get CPU time for %s: %s',
+                           instance.uuid, err)
+            self.LOG.exception(err)
