@@ -52,6 +52,8 @@ class Connection(impl_mongodb.Connection):
 
 class TestBase(unittest.TestCase):
 
+    DBNAME = 'testdb'
+
     def setUp(self):
         super(TestBase, self).setUp()
         self.app = flask.Flask('test')
@@ -61,17 +63,24 @@ class TestBase(unittest.TestCase):
         self.conf.metering_storage_engine = 'mongodb'
         self.conf.mongodb_host = 'localhost'
         self.conf.mongodb_port = 27017
-        self.conf.mongodb_dbname = 'testdb'
+        self.conf.mongodb_dbname = self.DBNAME
         self.conn = Connection(self.conf)
-        self.conn.conn.drop_database('testdb')
-        self.conn.conn['testdb']
+        self.conn.conn.drop_database(self.DBNAME)
+        self.conn.conn[self.DBNAME]
 
         @self.app.before_request
         def attach_storage_connection():
             flask.request.storage_conn = self.conn
         return
 
+    def tearDown(self):
+        self.conn.conn.drop_database(self.DBNAME)
+
     def get(self, path):
         rv = self.test_app.get(path)
-        data = json.loads(rv.data)
+        try:
+            data = json.loads(rv.data)
+        except ValueError:
+            print 'RAW DATA:', rv
+            raise
         return data
