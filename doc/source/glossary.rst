@@ -32,11 +32,21 @@
        A ceilometer is a device that uses a laser or other light
        source to determine the height of a cloud base.
 
+   central agent
+     Software service running on a central management node within the
+     OpenStack infrastructure measuring usage and sending the results
+     to the :term:`collector`.
+
    collector
      Software service running on the OpenStack infrastructure
      monitoring notifications from other OpenStack components and
      meter events from the ceilometer agent and recording the results
      in the database.
+
+   compute agent
+     Software service running on a compute node within the OpenStack
+     infrastructure measuring usage and sending the results to the
+     :term:`collector`.
 
    data store
      Storage system for recording data collected by ceilometer.

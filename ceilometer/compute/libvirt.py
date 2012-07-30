@@ -21,7 +21,7 @@ from lxml import etree
 from nova import flags
 
 from ceilometer import counter
-from ceilometer import plugin
+from ceilometer.compute import plugin
 from ceilometer.compute import instance as compute_instance
 from ceilometer.openstack.common import importutils
 from ceilometer.openstack.common import log
@@ -61,7 +61,7 @@ def make_counter_from_instance(instance, name, type, volume):
         )
 
 
-class DiskIOPollster(plugin.PollsterBase):
+class DiskIOPollster(plugin.ComputePollster):
 
     LOG = log.getLogger(__name__ + '.diskio')
 
@@ -111,7 +111,7 @@ class DiskIOPollster(plugin.PollsterBase):
                                                  )
 
 
-class CPUPollster(plugin.PollsterBase):
+class CPUPollster(plugin.ComputePollster):
 
     LOG = log.getLogger(__name__ + '.cpu')
 

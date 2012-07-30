@@ -19,12 +19,11 @@
 """
 
 from nova import context
-from nova import flags
 from nova import test
 from nova import db
 
 from ceilometer.compute import instance
-from ceilometer.agent import manager
+from ceilometer.compute import manager
 
 
 class TestLocationMetadata(test.TestCase):
@@ -49,7 +48,8 @@ class TestLocationMetadata(test.TestCase):
         self.context = context.RequestContext('admin', 'admin', is_admin=True)
         self.manager = manager.AgentManager()
         super(TestLocationMetadata, self).setUp()
-        self.instance = db.instance_create(self.context, self.INSTANCE_PROPERTIES)
+        self.instance = db.instance_create(self.context,
+                                           self.INSTANCE_PROPERTIES)
 
     def test_metadata(self):
         md = instance.get_metadata_from_dbobject(self.instance)

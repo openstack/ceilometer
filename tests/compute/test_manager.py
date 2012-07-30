@@ -23,7 +23,7 @@ import datetime
 from nova import context
 from nova import test
 
-from ceilometer.agent import manager
+from ceilometer.compute import manager
 from ceilometer import counter
 from ceilometer import publish
 

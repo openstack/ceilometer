@@ -19,12 +19,13 @@
  Installing and Running the Development Version
 ================================================
 
-Ceilometer has three daemons. The :term:`agent` runs on the Nova
-compute node(s). The :term:`collector` and API server run on the
-cloud's management node(s). In a development environment created by
-devstack_, these two are typically the same server. They do not have
-to be, though, so some of the instructions below are duplicated. Skip
-the steps you have already done.
+Ceilometer has three daemons. The :term:`compute agent` runs on the
+Nova compute node(s) while the :term:`central agent` and
+:term:`collector` run on the cloud's management node(s). In a
+development environment created by devstack_, these two are typically
+the same server. They do not have to be, though, so some of the
+instructions below are duplicated. Skip the steps you have already
+done.
 
 .. _devstack: http://www.devstack.org/
 
@@ -90,17 +91,15 @@ Installing the Collector
 .. _MongoDB: http://www.mongodb.org/
 
 
-Installing the Compute Agent
+Installing the Central Agent
 ============================
 
 .. index::
-   double: installing; compute agent
-
-.. note:: The compute agent must be installed on each nova compute node.
+   double: installing; central agent
 
 1. Install and configure nova.
 
-   The collector daemon imports code from ``nova``, so it needs to be
+   The agent daemon imports code from ``nova``, so it needs to be
    run on a server where nova has already been installed.
 
    .. note::
@@ -124,11 +123,11 @@ Installing the Compute Agent
 
    Ceilometer needs to know about some of the nova configuration
    options, so the simplest way to start is copying
-   ``/etc/nova/nova.conf`` to ``/etc/ceilometer-agent.conf``. Some
+   ``/etc/nova/nova.conf`` to ``/etc/ceilometer-agent-central.conf``. Some
    of the logging settings used in nova break ceilometer, so they need
    to be removed. For example, as a user with ``root`` permissions::
 
-     $ grep -v format_string /etc/nova/nova.conf > /etc/ceilometer-agent.conf
+     $ grep -v format_string /etc/nova/nova.conf > /etc/ceilometer-agent-central.conf
 
    Refer to :doc:`configuration` for details about any other options
    you might want to modify before starting the service.
@@ -137,9 +136,66 @@ Installing the Compute Agent
 
    ::
 
-     $ ./bin/ceilometer-agent
+     $ ./bin/ceilometer-agent-central
 
    .. note:: 
+
+      The default development configuration of the agent logs to
+      stderr, so you may want to run this step using a screen session
+      or other tool for maintaining a long-running program in the
+      background.
+
+
+Installing the Compute Agent
+============================
+
+.. index::
+   double: installing; compute agent
+
+.. note:: The compute agent must be installed on each nova compute node.
+
+1. Install and configure nova.
+
+   The agent daemon imports code from ``nova``, so it needs to be
+   run on a server where nova has already been installed.
+
+   .. note::
+
+      Ceilometer makes extensive use of the messaging bus, but has not
+      yet been tested with ZeroMQ. We recommend using Rabbit or qpid
+      for now.
+
+2. Clone the ceilometer git repository to the server::
+
+   $ cd /opt/stack
+   $ git clone https://github.com/stackforge/ceilometer.git
+
+4. As a user with ``root`` permissions or ``sudo`` privileges, run the
+   ceilometer installer::
+
+   $ cd ceilometer
+   $ sudo python setup.py install
+
+5. Configure ceilometer.
+
+   Ceilometer needs to know about some of the nova configuration
+   options, so the simplest way to start is copying
+   ``/etc/nova/nova.conf`` to ``/etc/ceilometer-agent-compute.conf``. Some
+   of the logging settings used in nova break ceilometer, so they need
+   to be removed. For example, as a user with ``root`` permissions::
+
+     $ grep -v format_string /etc/nova/nova.conf > /etc/ceilometer-agent-compute.conf
+
+   Refer to :doc:`configuration` for details about any other options
+   you might want to modify before starting the service.
+
+6. Start the agent.
+
+   ::
+
+     $ ./bin/ceilometer-agent-compute
+
+   .. note::
 
       The default development configuration of the agent logs to
       stderr, so you may want to run this step using a screen session

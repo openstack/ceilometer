@@ -15,24 +15,29 @@ High Level Description
    double: database; architecture
    double: API; architecture
 
-There are 4 basic components to the system:
+There are 5 basic components to the system:
 
-1. An :term:`agent` runs on each compute node and polls for resource
-   utilization statistics. There may be other types of agents in the
-   future, but for now we will focus on creating the compute agent.
+1. An :term:`compute agent` runs on each compute node and polls for
+   resource utilization statistics. There may be other types of agents
+   in the future, but for now we will focus on creating the compute
+   agent.
 
-2. The :term:`collector` runs on one or more central management
+2. An :term:`central agent` runs on a central management server to
+   poll for resource utilization statistics for resources not tied
+   to instances or compute nodes.
+
+3. The :term:`collector` runs on one or more central management
    servers to monitor the message queues (for notifications and for
    metering data coming from the agent). Notification messages are
    processed and turned into metering messages and sent back out onto
    the message bus using the appropriate topic. Metering messages are
    written to the data store without modification.
 
-3. The :term:`data store` is a database capable of handling concurrent
+4. The :term:`data store` is a database capable of handling concurrent
    writes (from one or more collector instances) and reads (from the
    API server).
 
-4. The :term:`API server` runs on one or more central management
+5. The :term:`API server` runs on one or more central management
    servers to provide access to the data from the data store. See
    EfficientMetering#API for details.
 
@@ -116,20 +121,17 @@ Metering data comes from two sources: through notifications built into
 the existing OpenStack components and by polling the infrastructure
 (such as via libvirt). Polling for compute resources is handled by an
 agent running on the compute node (where communication with the
-hypervisor is more efficient).
+hypervisor is more efficient).  The compute agent daemon is configured
+to run one or more *pollster* plugins using the
+``ceilometer.poll.compute`` namespace.  Polling for resources not tied
+to the compute node is handled by the central agent.  The central
+agent daemon is configured to run one or more *pollster* plugins using
+the ``ceilometer.poll.central`` namespace.
 
-.. note:: 
-
-   We only poll compute resources for now, but when other types of
-   polling are implemented the pollsters are likely to run somewhere
-   other than the compute node.
-
-The agent daemon is configured to run one or more *pollster*
-plugins using the ``ceilometer.poll.compute`` namespace. The agent
-periodically asks each pollster for instances of ``Counter``
-objects. The agent framework converts the Counters to metering
-messages, which it then signs and transmits on the metering message
-bus.
+The agents periodically asks each pollster for instances of
+``Counter`` objects. The agent framework converts the Counters to
+metering messages, which it then signs and transmits on the metering
+message bus.
 
 The pollster plugins do not communicate with the message bus directly,
 unless it is necessary to do so in order to collect the information

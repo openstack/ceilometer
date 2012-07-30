@@ -18,11 +18,12 @@
 # under the License.
 
 from nova import context
-from nova import test
 from nova import db
+from nova import exception
+from nova import test
 
-from ceilometer.compute import network
-from ceilometer.agent import manager
+from ceilometer.network import floatingip
+from ceilometer.central import manager
 
 
 class TestFloatingIPPollster(test.TestCase):
@@ -30,13 +31,18 @@ class TestFloatingIPPollster(test.TestCase):
     def setUp(self):
         self.context = context.RequestContext('admin', 'admin', is_admin=True)
         self.manager = manager.AgentManager()
-        self.pollster = network.FloatingIPPollster()
+        self.pollster = floatingip.FloatingIPPollster()
         super(TestFloatingIPPollster, self).setUp()
 
     def test_get_counters(self):
-        self.assertEqual(list(self.pollster.get_counters(self.manager,
-                                                         self.context)),
-                         [])
+        try:
+            list(self.pollster.get_counters(self.manager,
+                                            self.context)
+                 )
+        except exception.NoFloatingIpsDefined:
+            pass
+        else:
+            assert False, 'Should have seen an error'
 
     def test_get_counters_not_empty(self):
         db.floating_ip_create(self.context,
@@ -52,5 +58,11 @@ class TestFloatingIPPollster(test.TestCase):
                                'host': self.manager.host + "randomstring",
                                })
         counters = list(self.pollster.get_counters(self.manager, self.context))
-        self.assertEqual(len(counters), 1)
-        self.assertEqual(counters[0].resource_metadata['address'], '1.1.1.1')
+        self.assertEqual(len(counters), 3)
+        addresses = [c.resource_metadata['address']
+                     for c in counters
+                     ]
+        self.assertEqual(addresses, ['1.1.1.1',
+                                     '1.1.1.2',
+                                     '1.1.1.3',
+                                     ])

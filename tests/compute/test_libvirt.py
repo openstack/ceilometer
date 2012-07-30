@@ -20,7 +20,7 @@
 """
 
 try:
-    import libvirt
+    import libvirt as ignored_libvirt
 except ImportError:
     libvirt_missing = True
 else:
@@ -32,7 +32,7 @@ from nova import test
 from nova import db
 
 from ceilometer.compute import libvirt
-from ceilometer.agent import manager
+from ceilometer.compute import manager
 
 
 class TestDiskIOPollster(test.TestCase):

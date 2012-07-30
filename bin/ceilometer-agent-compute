@@ -36,9 +36,10 @@ if __name__ == '__main__':
 
     prepare_service(sys.argv)
     server = \
-        service.Service.create(binary='ceilometer-agent',
-                               topic='ceilometer.agent',
-                               manager='ceilometer.agent.manager.AgentManager',
-                               periodic_interval=cfg.CONF.periodic_interval)
+        service.Service.create(
+        binary='ceilometer-agent-compute',
+        topic='ceilometer.agent.compute',
+        manager='ceilometer.compute.manager.AgentManager',
+        periodic_interval=cfg.CONF.periodic_interval)
     service.serve(server)
     service.wait()

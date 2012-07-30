@@ -21,16 +21,16 @@ from nova import exception
 from ceilometer.openstack.common import log
 
 from ceilometer import counter
-from ceilometer import plugin
+from ceilometer.central import plugin
 
 
-class FloatingIPPollster(plugin.PollsterBase):
+class FloatingIPPollster(plugin.CentralPollster):
 
     LOG = log.getLogger(__name__ + '.floatingip')
 
     def get_counters(self, manager, context):
         try:
-            ips = manager.db.floating_ip_get_all_by_host(context, manager.host)
+            ips = manager.db.floating_ip_get_all(context)
         except exception.FloatingIpNotFoundForHost:
             pass
         else:
@@ -44,7 +44,7 @@ class FloatingIPPollster(plugin.PollsterBase):
                     user_id=None,
                     project_id=ip.project_id,
                     resource_id=ip.id,
-                    timestamp=None,
+                    timestamp=None,  # FIXME(dhellmann): This needs to be now()
                     duration=None,
                     resource_metadata={
                         'address': ip.address,

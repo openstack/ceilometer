@@ -17,33 +17,43 @@
  Writing Agent Plugins
 =======================
 
-This documentation gives you some clues on how to write a
-new agent or plugin for Ceilometer a to use if you wish to instrument a
-functionality which has not yet been covered by an existing one.
+This documentation gives you some clues on how to write a new agent or
+plugin for Ceilometer if you wish to instrument a measurement which
+has not yet been covered by an existing plugin.
 
-An agent runs on each compute node to poll for resource usage. Each metric 
-collected is tagged with the resource ID (such as an instance) and the owner,
-including tenant and user IDs.The metrics are then reported to the collector
-via the message bus. More detailed information follows. 
+Agents
+======
 
-Agent
-=====
-There is currently only one agent defined for Ceilometer which can be found at: ``ceilometer/agent/``
-As you will see in the ``manager.py`` file, this agent will automatically load any
-plugin defined in the namespace ``ceilometer.poll.compute``.
+The compute agent runs on each compute node to poll for resource
+usage. Each metric collected is tagged with the resource ID (such as
+an instance) and the owner, including tenant and user IDs. The metrics
+are then reported to the collector via the message bus. More detailed
+information follows.
 
-Agents are added by implementing a new nova.manager.Manager class, in the same
-way it was done for the AgentManager for the compute agent in the file
-``ceilometer/agent/manager.py``.
+The compute agent is implemented in ``bin/ceilometer-agent-compute``
+and ``ceilometer/compute/manager.py``. As you will see in the manager,
+the computeagent loads all plugins defined in the namespace
+``ceilometer.poll.compute``, then periodically calls their
+:func:`get_counters` method.
+
+The central agent polls other types of resources from a management
+server.  The central agent is defined in
+``bin/ceilometer-agent-central`` and
+``ceilometer/central/manager.py``. It loads plugins from the
+``ceilometer.poll.central`` namespace and polls them by calling their
+:func:`get_counters` method.
 
 Plugins
 =======
-An agent can support multiple plugins to retrieve different information and
-send them to the collector. As stated above, an agent will automatically
-activate all plugins of a given class. For example, the compute agent will
-load all plugins of class ``ceilometer.poll.compute``.  This will load, among
-others, the ceilometer.compute.libvirt.CPUPollster, which is defined in the
-file ``ceilometer/compute/libvirt.py`` as well as the ceilometer.compute.notifications.InstanceNotifications plugin
+
+An agent can support multiple plugins to retrieve different
+information and send them to the collector. As stated above, an agent
+will automatically activate all plugins of a given class. For example,
+the compute agent will load all plugins of class
+``ceilometer.poll.compute``.  This will load, among others, the
+:class:`ceilometer.compute.libvirt.CPUPollster`, which is defined in
+the file ``ceilometer/compute/libvirt.py`` as well as the
+:class:`ceilometer.compute.notifications.InstanceNotifications` plugin
 which is defined in the file ``ceilometer/compute/notifications.py``
 
 We are using these two existing plugins as examples as the first one provides
@@ -53,10 +63,13 @@ an existing event notification on the standard OpenStack queue to ceilometer.
 
 Pollster
 --------
-Pollsters are defined as subclasses of the ``ceilometer.plugin.PollsterBase`` meta
-class as defined in the ``ceilometer/plugin.py`` file. Pollsters must implement
-one method: ``get_counters(self, manager, context)``, which returns a
-a sequence of ``Counter`` objects as defined in the ``ceilometer/counter.py`` file.
+
+Compute plugins are defined as subclasses of the
+:class:`ceilometer.compute.plugin.ComputePollster` class as defined in
+the ``ceilometer/compute/plugin.py`` file. Pollsters must implement one
+method: ``get_counters(self, manager, context)``, which returns a
+sequence of ``Counter`` objects as defined in the
+``ceilometer/counter.py`` file.
 
 In the ``CPUPollster`` plugin, the ``get_counters`` method is implemented as a loop
 which, for each instances running on the local host, retrieves the cpu_time
@@ -74,9 +87,11 @@ participate in the actual metering activity.
 
 Notifications
 -------------
-Notifications are defined as subclass of the ``ceilometer.plugin.NotificationBase``
-meta class as defined in the ``ceilometer/plugin.py`` file.  Notifications must
-implement two methods:
+
+Notifications are defined as subclass of the
+:class:`ceilometer.plugin.NotificationBase` meta class as defined in
+the ``ceilometer/plugin.py`` file.  Notifications must implement two
+methods:
 
    ``get_event_types(self)`` which should return a sequence of strings defining the event types to be given to the plugin and
 
