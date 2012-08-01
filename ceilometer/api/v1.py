@@ -20,8 +20,15 @@
 
 import flask
 
+from ceilometer.openstack.common import log
+from ceilometer import storage
+
+
+LOG = log.getLogger(__name__)
+
 
 blueprint = flask.Blueprint('v1', __name__)
+
 
 ## APIs for working with resources.
 
@@ -29,8 +36,9 @@ blueprint = flask.Blueprint('v1', __name__)
 @blueprint.route('/resources', defaults={'source': None})
 @blueprint.route('/sources/<source>/resources')
 def list_resources(source):
-    resources = list(flask.request.storage_conn.get_resources(source=source))
-    return flask.jsonify(resources=resources)
+    resources = flask.request.storage_conn.get_resources(source=source)
+    return flask.jsonify(resources=list(resources))
+
 
 ## APIs for working with users.
 
@@ -38,5 +46,28 @@ def list_resources(source):
 @blueprint.route('/users', defaults={'source': None})
 @blueprint.route('/sources/<source>/users')
 def list_users(source):
-    users = list(flask.request.storage_conn.get_users(source=source))
-    return flask.jsonify(users=users)
+    users = flask.request.storage_conn.get_users(source=source)
+    return flask.jsonify(users=list(users))
+
+
+## APIs for working with events.
+
+
+@blueprint.route('/users/<user>')
+@blueprint.route('/users/<user>/meters/<meter>')
+@blueprint.route('/users/<user>/resources/<resource>')
+@blueprint.route('/users/<user>/resources/<resource>/meter/<meter>')
+@blueprint.route('/sources/<source>/users/<user>')
+@blueprint.route('/sources/<source>/users/<user>/meters/<meter>')
+@blueprint.route('/sources/<source>/users/<user>/resources/<resource>')
+@blueprint.route(
+    '/sources/<source>/users/<user>/resources/<resource>/meter/<meter>'
+    )
+def list_events(user, meter=None, resource=None, source=None):
+    f = storage.EventFilter(user=user,
+                            source=source,
+                            meter=meter,
+                            resource=resource,
+                            )
+    events = flask.request.storage_conn.get_raw_events(f)
+    return flask.jsonify(events=list(events))
