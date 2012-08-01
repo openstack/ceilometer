@@ -17,24 +17,18 @@
 
 import functools
 import itertools
-import json
 import logging
 import time
 import uuid
 
 import eventlet
 import greenlet
-try:
-    import qpid.messaging
-    import qpid.messaging.exceptions
-except ImportError:
-    # FIXME(dhellmann): Trying to prevent errors
-    # running the tests on stackforge, where qpid
-    # is not installed.
-    pass
+import qpid.messaging
+import qpid.messaging.exceptions
 
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common import jsonutils
 from ceilometer.openstack.common.rpc import amqp as rpc_amqp
 from ceilometer.openstack.common.rpc import common as rpc_common
 
@@ -131,7 +125,7 @@ class ConsumerBase(object):
         addr_opts["node"]["x-declare"].update(node_opts)
         addr_opts["link"]["x-declare"].update(link_opts)
 
-        self.address = "%s ; %s" % (node_name, json.dumps(addr_opts))
+        self.address = "%s ; %s" % (node_name, jsonutils.dumps(addr_opts))
 
         self.reconnect(session)
 
@@ -147,7 +141,7 @@ class ConsumerBase(object):
         try:
             self.callback(message.content)
         except Exception:
-            logging.exception(_("Failed to process message... skipping it."))
+            LOG.exception(_("Failed to process message... skipping it."))
         finally:
             self.session.acknowledge(message)
 
@@ -236,7 +230,7 @@ class Publisher(object):
         if node_opts:
             addr_opts["node"]["x-declare"].update(node_opts)
 
-        self.address = "%s ; %s" % (node_name, json.dumps(addr_opts))
+        self.address = "%s ; %s" % (node_name, jsonutils.dumps(addr_opts))
 
         self.reconnect(session)
 
@@ -335,7 +329,7 @@ class Connection(object):
         if self.conf.qpid_reconnect_interval:
             self.connection.reconnect_interval = (
                 self.conf.qpid_reconnect_interval)
-        self.connection.hearbeat = self.conf.qpid_heartbeat
+        self.connection.heartbeat = self.conf.qpid_heartbeat
         self.connection.protocol = self.conf.qpid_protocol
         self.connection.tcp_nodelay = self.conf.qpid_tcp_nodelay
 

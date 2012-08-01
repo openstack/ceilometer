@@ -41,6 +41,7 @@ import sys
 import traceback
 
 from ceilometer.openstack.common import cfg
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import jsonutils
 from ceilometer.openstack.common import local
 from ceilometer.openstack.common import notifier
@@ -65,13 +66,13 @@ log_opts = [
                help='prefix each line of exception output with this format'),
     cfg.ListOpt('default_log_levels',
                 default=[
-                  'amqplib=WARN',
-                  'sqlalchemy=WARN',
-                  'boto=WARN',
-                  'suds=INFO',
-                  'keystone=INFO',
-                  'eventlet.wsgi.server=WARN'
-                  ],
+                    'amqplib=WARN',
+                    'sqlalchemy=WARN',
+                    'boto=WARN',
+                    'suds=INFO',
+                    'keystone=INFO',
+                    'eventlet.wsgi.server=WARN'
+                ],
                 help='list of logger=LEVEL pairs'),
     cfg.BoolOpt('publish_errors',
                 default=False,
@@ -88,7 +89,7 @@ log_opts = [
                default='[instance: %(uuid)s] ',
                help='If an instance UUID is passed with the log message, '
                     'format it like this'),
-    ]
+]
 
 
 generic_log_opts = [
@@ -104,7 +105,7 @@ generic_log_opts = [
     cfg.StrOpt('logfile_mode',
                default='0644',
                help='Default file mode used when creating log files'),
-    ]
+]
 
 
 CONF = cfg.CONF
@@ -207,9 +208,9 @@ class JSONFormatter(logging.Formatter):
     def formatException(self, ei, strip_newlines=True):
         lines = traceback.format_exception(*ei)
         if strip_newlines:
-            lines = [itertools.ifilter(lambda x: x,
-                                      line.rstrip().splitlines())
-                    for line in lines]
+            lines = [itertools.ifilter(
+                lambda x: x,
+                line.rstrip().splitlines()) for line in lines]
             lines = list(itertools.chain(*lines))
         return lines
 
@@ -246,26 +247,27 @@ class JSONFormatter(logging.Formatter):
 
 class PublishErrorsHandler(logging.Handler):
     def emit(self, record):
-        if 'list_notifier_drivers' in CONF:
-            if ('ceilometer.openstack.common.notifier.log_notifier' in
-                CONF.list_notifier_drivers):
-                return
+        if ('ceilometer.openstack.common.notifier.log_notifier' in
+            CONF.notification_driver):
+            return
         notifier.api.notify(None, 'error.publisher',
-                                 'error_notification',
-                                 notifier.api.ERROR,
-                                 dict(error=record.msg))
+                            'error_notification',
+                            notifier.api.ERROR,
+                            dict(error=record.msg))
 
 
-def handle_exception(type, value, tb):
-    extra = {}
-    if CONF.verbose:
-        extra['exc_info'] = (type, value, tb)
-    getLogger().critical(str(value), **extra)
+def _create_logging_excepthook(product_name):
+    def logging_excepthook(type, value, tb):
+        extra = {}
+        if CONF.verbose:
+            extra['exc_info'] = (type, value, tb)
+        getLogger(product_name).critical(str(value), **extra)
+    return logging_excepthook
 
 
 def setup(product_name):
     """Setup logging."""
-    sys.excepthook = handle_exception
+    sys.excepthook = _create_logging_excepthook(product_name)
 
     if CONF.log_config:
         try:
@@ -356,17 +358,6 @@ def _setup_logging_from_conf(product_name):
         for handler in log_root.handlers:
             logger.addHandler(handler)
 
-    # NOTE(jkoelker) Clear the handlers for the root logger that was setup
-    #                by basicConfig in nova/__init__.py and install the
-    #                NullHandler.
-    root = logging.getLogger()
-    for handler in root.handlers:
-        root.removeHandler(handler)
-    handler = NullHandler()
-    handler.setFormatter(logging.Formatter())
-    root.addHandler(handler)
-
-
 _loggers = {}
 
 
@@ -404,8 +395,12 @@ class LegacyFormatter(logging.Formatter):
 
     def format(self, record):
         """Uses contextstring if request_id is set, otherwise default."""
-        if 'instance' not in record.__dict__:
-            record.__dict__['instance'] = ''
+        # NOTE(sdague): default the fancier formating params
+        # to an empty string so we don't throw an exception if
+        # they get used
+        for key in ('instance', 'color'):
+            if key not in record.__dict__:
+                record.__dict__[key] = ''
 
         if record.__dict__.get('request_id', None):
             self._fmt = CONF.logging_context_format_string

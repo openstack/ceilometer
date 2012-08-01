@@ -39,6 +39,8 @@ import itertools
 import json
 import xmlrpclib
 
+from ceilometer.openstack.common import timeutils
+
 
 def to_primitive(value, convert_instances=False, level=0):
     """Convert a complex object into primitives.
@@ -101,13 +103,15 @@ def to_primitive(value, convert_instances=False, level=0):
                                     level=level)
             return o
         elif isinstance(value, datetime.datetime):
-            return str(value)
+            return timeutils.strtime(value)
         elif hasattr(value, 'iteritems'):
             return to_primitive(dict(value.iteritems()),
                                 convert_instances=convert_instances,
-                                level=level)
+                                level=level + 1)
         elif hasattr(value, '__iter__'):
-            return to_primitive(list(value), level)
+            return to_primitive(list(value),
+                                convert_instances=convert_instances,
+                                level=level)
         elif convert_instances and hasattr(value, '__dict__'):
             # Likely an instance of something. Watch for cycles.
             # Ignore class member vars.
@@ -130,11 +134,15 @@ def loads(s):
     return json.loads(s)
 
 
+def load(s):
+    return json.load(s)
+
+
 try:
     import anyjson
 except ImportError:
     pass
 else:
     anyjson._modules.append((__name__, 'dumps', TypeError,
-                                       'loads', ValueError))
+                                       'loads', ValueError, 'load'))
     anyjson.force_implementation(__name__)

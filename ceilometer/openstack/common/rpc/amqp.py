@@ -35,6 +35,7 @@ from eventlet import pools
 from eventlet import semaphore
 
 from ceilometer.openstack.common import excutils
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import local
 from ceilometer.openstack.common.rpc import common as rpc_common
 

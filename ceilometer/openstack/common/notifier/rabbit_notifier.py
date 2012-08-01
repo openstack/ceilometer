@@ -16,14 +16,15 @@
 
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import context as req_context
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log as logging
 from ceilometer.openstack.common import rpc
 
 LOG = logging.getLogger(__name__)
 
-notification_topic_opt = cfg.ListOpt('notification_topics',
-        default=['notifications', ],
-        help='AMQP topic used for openstack notifications')
+notification_topic_opt = cfg.ListOpt(
+    'notification_topics', default=['notifications', ],
+    help='AMQP topic used for openstack notifications')
 
 CONF = cfg.CONF
 CONF.register_opt(notification_topic_opt)
