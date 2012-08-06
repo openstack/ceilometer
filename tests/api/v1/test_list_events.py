@@ -75,6 +75,14 @@ class TestListEvents(tests_api.TestBase):
         data = self.get('/users/user-id')
         self.assertEquals(2, len(data['events']))
 
+    def test_with_user_and_meters(self):
+        data = self.get('/users/user-id/meters/instance')
+        self.assertEquals(2, len(data['events']))
+
+    def test_with_user_and_meters_invalid(self):
+        data = self.get('/users/user-id/meters/no-such-meter')
+        self.assertEquals(0, len(data['events']))
+
     def test_with_source_and_user(self):
         data = self.get('/sources/source1/users/user-id')
         ids = [r['resource_id'] for r in data['events']]
