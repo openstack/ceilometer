@@ -35,8 +35,16 @@ blueprint = flask.Blueprint('v1', __name__)
 
 @blueprint.route('/resources', defaults={'source': None})
 @blueprint.route('/sources/<source>/resources')
-def list_resources(source):
-    resources = flask.request.storage_conn.get_resources(source=source)
+@blueprint.route('/users/<user>/resources')
+@blueprint.route('/projects/<project>/resources')
+@blueprint.route('/sources/<source>/users/<user>/resources')
+@blueprint.route('/sources/<source>/projects/<project>/resources')
+def list_resources(source=None, user=None, project=None):
+    resources = flask.request.storage_conn.get_resources(
+        source=source,
+        user=user,
+        project=project,
+        )
     return flask.jsonify(resources=list(resources))
 
 
@@ -53,6 +61,16 @@ def list_users(source):
 ## APIs for working with events.
 
 
+@blueprint.route('/projects/<project>')
+@blueprint.route('/projects/<project>/meters/<meter>')
+@blueprint.route('/projects/<project>/resources/<resource>')
+@blueprint.route('/projects/<project>/resources/<resource>/meters/<meter>')
+@blueprint.route('/sources/<source>/projects/<project>')
+@blueprint.route('/sources/<source>/projects/<project>/meters/<meter>')
+@blueprint.route('/sources/<source>/projects/<project>/resources/<resource>')
+@blueprint.route(
+    '/sources/<source>/projects/<project>/resources/<resource>/meters/<meter>'
+    )
 @blueprint.route('/users/<user>')
 @blueprint.route('/users/<user>/meters/<meter>')
 @blueprint.route('/users/<user>/resources/<resource>')
@@ -63,8 +81,14 @@ def list_users(source):
 @blueprint.route(
     '/sources/<source>/users/<user>/resources/<resource>/meters/<meter>'
     )
-def list_events(user, meter=None, resource=None, source=None):
+def list_events(user=None,
+                meter=None,
+                resource=None,
+                source=None,
+                project=None,
+                ):
     f = storage.EventFilter(user=user,
+                            project=project,
                             source=source,
                             meter=meter,
                             resource=resource,

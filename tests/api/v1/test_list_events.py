@@ -39,7 +39,7 @@ class TestListEvents(tests_api.TestBase):
             'cumulative',
             1,
             'user-id',
-            'project-id',
+            'project1',
             'resource-id',
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
             duration=0,
@@ -56,7 +56,7 @@ class TestListEvents(tests_api.TestBase):
             'cumulative',
             1,
             'user-id',
-            'project-id',
+            'project2',
             'resource-id-alternate',
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
             duration=0,
@@ -92,3 +92,27 @@ class TestListEvents(tests_api.TestBase):
         data = self.get('/users/user-id/resources/resource-id')
         ids = [r['resource_id'] for r in data['events']]
         self.assertEquals(['resource-id'], ids)
+
+
+    def test_with_project(self):
+        data = self.get('/projects/project1')
+        self.assertEquals(1, len(data['events']))
+
+    def test_with_project_and_meters(self):
+        data = self.get('/projects/project1/meters/instance')
+        self.assertEquals(1, len(data['events']))
+
+    def test_with_project_and_meters_invalid(self):
+        data = self.get('/projects/project2/meters/no-such-meter')
+        self.assertEquals(0, len(data['events']))
+
+    def test_with_source_and_project(self):
+        data = self.get('/sources/source1/projects/project1')
+        ids = [r['resource_id'] for r in data['events']]
+        self.assertEquals(['resource-id'], ids)
+
+    def test_with_resource(self):
+        data = self.get('/projects/project1/resources/resource-id')
+        ids = [r['resource_id'] for r in data['events']]
+        self.assertEquals(['resource-id'], ids)
+
