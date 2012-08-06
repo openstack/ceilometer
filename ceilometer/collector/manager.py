@@ -102,7 +102,7 @@ class CollectorManager(manager.Manager):
                 # Convert the timestamp to a datetime instance.
                 # Storage engines are responsible for converting
                 # that value to something they can store.
-                if 'timestamp' in data:
+                if data.get('timestamp'):
                     data['timestamp'] = timeutils.parse_isotime(
                         data['timestamp'],
                         )
