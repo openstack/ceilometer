@@ -56,12 +56,12 @@ def list_users(source):
 @blueprint.route('/users/<user>')
 @blueprint.route('/users/<user>/meters/<meter>')
 @blueprint.route('/users/<user>/resources/<resource>')
-@blueprint.route('/users/<user>/resources/<resource>/meter/<meter>')
+@blueprint.route('/users/<user>/resources/<resource>/meters/<meter>')
 @blueprint.route('/sources/<source>/users/<user>')
 @blueprint.route('/sources/<source>/users/<user>/meters/<meter>')
 @blueprint.route('/sources/<source>/users/<user>/resources/<resource>')
 @blueprint.route(
-    '/sources/<source>/users/<user>/resources/<resource>/meter/<meter>'
+    '/sources/<source>/users/<user>/resources/<resource>/meters/<meter>'
     )
 def list_events(user, meter=None, resource=None, source=None):
     f = storage.EventFilter(user=user,
