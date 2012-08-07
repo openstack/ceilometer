@@ -58,6 +58,16 @@ def list_users(source):
     return flask.jsonify(users=list(users))
 
 
+## APIs for working with projects.
+
+
+@blueprint.route('/projects', defaults={'source': None})
+@blueprint.route('/sources/<source>/projects')
+def list_projects(source):
+    projects = flask.request.storage_conn.get_projects(source=source)
+    return flask.jsonify(projects=list(projects))
+
+
 ## APIs for working with events.
 
 
