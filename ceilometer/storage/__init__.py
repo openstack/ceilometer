@@ -96,5 +96,3 @@ class EventFilter(object):
         self.resource = resource
         self.meter = meter
         self.source = source
-        if not (self.user or self.project):
-            raise RuntimeError('Must provide one of "user" or "project".')

@@ -391,13 +391,3 @@ class SumTest(MongoDBEngineTestBase):
                       for r in results)
         assert counts['resource-id'] == 1
         assert set(counts.keys()) == set(['resource-id'])
-
-
-def test_make_query_without_user_or_project():
-    f = storage.EventFilter(user='set')
-    f.user = None  # to bypass the check in the filter class
-    try:
-        impl_mongodb.make_query_from_filter(f)
-    except RuntimeError as err:
-        assert '"user"' in str(err)
-        assert '"project"' in str(err)
