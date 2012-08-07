@@ -14,13 +14,15 @@
 #    under the License.
 
 from ceilometer.openstack.common import cfg
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import importutils
 from ceilometer.openstack.common import log as logging
 
 
-list_notifier_drivers_opt = cfg.MultiStrOpt('list_notifier_drivers',
-        default=['ceilometer.openstack.common.notifier.no_op_notifier'],
-        help='List of drivers to send notifications')
+list_notifier_drivers_opt = cfg.MultiStrOpt(
+    'list_notifier_drivers',
+    default=['ceilometer.openstack.common.notifier.no_op_notifier'],
+    help='List of drivers to send notifications')
 
 CONF = cfg.CONF
 CONF.register_opt(list_notifier_drivers_opt)
