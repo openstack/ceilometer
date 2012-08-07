@@ -36,8 +36,3 @@ def attach_config():
     storage_engine = storage.get_engine(cfg.CONF)
     flask.request.storage_engine = storage_engine
     flask.request.storage_conn = storage_engine.get_connection(cfg.CONF)
-
-
-@app.route('/')
-def hello():
-    return 'Hello World!'

@@ -50,6 +50,7 @@ Table of contents
    measurements
    install
    configuration
+   api
    contributing/index
    glossary
 

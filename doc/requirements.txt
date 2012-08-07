@@ -1,0 +1,12 @@
+http://tarballs.openstack.org/nova/nova-master.tar.gz
+webob
+kombu
+iso8601
+lockfile
+netaddr
+argparse
+sqlalchemy
+eventlet
+anyjson==0.3.1
+Flask==0.9
+sphinxcontrib-httpdomain

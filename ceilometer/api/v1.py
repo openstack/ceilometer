@@ -40,6 +40,8 @@ blueprint = flask.Blueprint('v1', __name__)
 @blueprint.route('/sources/<source>/users/<user>/resources')
 @blueprint.route('/sources/<source>/projects/<project>/resources')
 def list_resources(source=None, user=None, project=None):
+    """Return a list of resource names.
+    """
     resources = flask.request.storage_conn.get_resources(
         source=source,
         user=user,
@@ -54,6 +56,8 @@ def list_resources(source=None, user=None, project=None):
 @blueprint.route('/users', defaults={'source': None})
 @blueprint.route('/sources/<source>/users')
 def list_users(source):
+    """Return a list of user names.
+    """
     users = flask.request.storage_conn.get_users(source=source)
     return flask.jsonify(users=list(users))
 
@@ -64,6 +68,8 @@ def list_users(source):
 @blueprint.route('/projects', defaults={'source': None})
 @blueprint.route('/sources/<source>/projects')
 def list_projects(source):
+    """Return a list of project names.
+    """
     projects = flask.request.storage_conn.get_projects(source=source)
     return flask.jsonify(projects=list(projects))
 
@@ -97,6 +103,8 @@ def list_events(user=None,
                 source=None,
                 project=None,
                 ):
+    """Return a list of raw metering events.
+    """
     f = storage.EventFilter(user=user,
                             project=project,
                             source=source,
