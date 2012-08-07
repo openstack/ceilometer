@@ -18,6 +18,55 @@
 """Blueprint for version 1 of API.
 """
 
+# [ ] / -- information about this version of the API
+#
+# [ ] /extensions -- list of available extensions
+# [ ] /extensions/<extension> -- details about a specific extension
+#
+# [ ] /sources -- list of known sources (where do we get this?)
+# [ ] /sources/components -- list of components which provide metering
+#                            data (where do we get this)?
+#
+# [x] /projects/<project>/resources -- list of resource ids
+# [x] /resources -- list of resource ids
+# [x] /sources/<source>/resources -- list of resource ids
+# [x] /users/<user>/resources -- list of resource ids
+#
+# [x] /users -- list of user ids
+# [x] /sources/<source>/users -- list of user ids
+#
+# [x] /projects -- list of project ids
+# [x] /sources/<source>/projects -- list of project ids
+#
+# [ ] /resources/<resource> -- metadata
+#
+# [ ] /projects/<project>/meters -- list of meters reporting for parent obj
+# [ ] /resources/<resource>/meters -- list of meters reporting for parent obj
+# [ ] /sources/<source>/meters -- list of meters reporting for parent obj
+# [ ] /users/<user>/meters -- list of meters reporting for parent obj
+#
+# [x] /projects/<project>/meters/<meter> -- events
+# [x] /resources/<resource>/meters/<meter> -- events
+# [x] /sources/<source>/meters/<meter> -- events
+# [x] /users/<user>/meters/<meter> -- events
+#
+# [ ] /projects/<project>/meters/<meter>/duration -- total time for selected
+#                                                    meter
+# [ ] /resources/<resource>/meters/<meter>/duration -- total time for selected
+#                                                      meter
+# [ ] /sources/<source>/meters/<meter>/duration -- total time for selected
+#                                                  meter
+# [ ] /users/<user>/meters/<meter>/duration -- total time for selected meter
+#
+# [ ] /projects/<project>/meters/<meter>/volume -- total or max volume for
+#                                                  selected meter
+# [ ] /resources/<resource>/meters/<meter>/volume -- total or max volume for
+#                                                    selected meter
+# [ ] /sources/<source>/meters/<meter>/volume -- total or max volume for
+#                                                selected meter
+# [ ] /users/<user>/meters/<meter>/volume -- total or max volume for selected
+#                                            meter
+
 import flask
 
 from ceilometer.openstack.common import log
@@ -33,14 +82,8 @@ blueprint = flask.Blueprint('v1', __name__)
 ## APIs for working with resources.
 
 
-@blueprint.route('/resources', defaults={'source': None})
-@blueprint.route('/sources/<source>/resources')
-@blueprint.route('/users/<user>/resources')
-@blueprint.route('/projects/<project>/resources')
-@blueprint.route('/sources/<source>/users/<user>/resources')
-@blueprint.route('/sources/<source>/projects/<project>/resources')
-def list_resources(source=None, user=None, project=None):
-    """Return a list of resource names.
+def _list_resources(source=None, user=None, project=None):
+    """Return a list of resource identifiers.
     """
     resources = flask.request.storage_conn.get_resources(
         source=source,
@@ -50,58 +93,103 @@ def list_resources(source=None, user=None, project=None):
     return flask.jsonify(resources=list(resources))
 
 
+@blueprint.route('/projects/<project>/resources')
+def list_resources_by_project(project):
+    """Return a list of resources owned by the project.
+
+    :param project: The ID of the owning project.
+    """
+    return _list_resources(project=project)
+
+
+@blueprint.route('/resources')
+def list_all_resources():
+    """Return a list of all known resources.
+    """
+    return _list_resources()
+
+
+@blueprint.route('/sources/<source>/resources')
+def list_resources_by_source(source):
+    """Return a list of resources for which a source is reporting
+    data.
+
+    :param source: The ID of the reporting source.
+    """
+    return _list_resources(source=source)
+
+
+@blueprint.route('/users/<user>/resources')
+def list_resources_by_user(user):
+    """Return a list of resources owned by the user.
+
+    :param user: The ID of the owning user.
+    """
+    return _list_resources(user=user)
+
+
 ## APIs for working with users.
 
 
-@blueprint.route('/users', defaults={'source': None})
-@blueprint.route('/sources/<source>/users')
-def list_users(source):
+def _list_users(source=None):
     """Return a list of user names.
     """
     users = flask.request.storage_conn.get_users(source=source)
     return flask.jsonify(users=list(users))
 
 
+@blueprint.route('/users')
+def list_all_users():
+    """Return a list of all known user names.
+    """
+    return _list_users()
+
+
+@blueprint.route('/sources/<source>/users')
+def list_users_by_source(source):
+    """Return a list of the users for which the source is reporting
+    data.
+
+    :param source: The ID of the source.
+    """
+    return _list_users(source=source)
+
+
 ## APIs for working with projects.
 
 
-@blueprint.route('/projects', defaults={'source': None})
-@blueprint.route('/sources/<source>/projects')
-def list_projects(source):
+def _list_projects(source=None):
     """Return a list of project names.
     """
     projects = flask.request.storage_conn.get_projects(source=source)
     return flask.jsonify(projects=list(projects))
 
 
+@blueprint.route('/projects')
+def list_all_projects():
+    """Return a list of all known project names.
+    """
+    return _list_projects()
+
+
+@blueprint.route('/sources/<source>/projects')
+def list_projects_by_source(source):
+    """Return a list project names for which the source is reporting
+    data.
+
+    :param source: The ID of the source.
+    """
+    return _list_projects(source=source)
+
+
 ## APIs for working with events.
 
 
-@blueprint.route('/projects/<project>')
-@blueprint.route('/projects/<project>/meters/<meter>')
-@blueprint.route('/projects/<project>/resources/<resource>')
-@blueprint.route('/projects/<project>/resources/<resource>/meters/<meter>')
-@blueprint.route('/sources/<source>/projects/<project>')
-@blueprint.route('/sources/<source>/projects/<project>/meters/<meter>')
-@blueprint.route('/sources/<source>/projects/<project>/resources/<resource>')
-@blueprint.route(
-    '/sources/<source>/projects/<project>/resources/<resource>/meters/<meter>'
-    )
-@blueprint.route('/users/<user>')
-@blueprint.route('/users/<user>/meters/<meter>')
-@blueprint.route('/users/<user>/resources/<resource>')
-@blueprint.route('/users/<user>/resources/<resource>/meters/<meter>')
-@blueprint.route('/sources/<source>/users/<user>')
-@blueprint.route('/sources/<source>/users/<user>/meters/<meter>')
-@blueprint.route('/sources/<source>/users/<user>/resources/<resource>')
-@blueprint.route(
-    '/sources/<source>/users/<user>/resources/<resource>/meters/<meter>'
-    )
-def list_events(user=None,
-                meter=None,
+def _list_events(project=None,
                 resource=None,
                 source=None,
-                project=None,
+                user=None,
+                meter=None,
                 ):
     """Return a list of raw metering events.
     """
@@ -113,3 +201,51 @@ def list_events(user=None,
                             )
     events = flask.request.storage_conn.get_raw_events(f)
     return flask.jsonify(events=list(events))
+
+
+@blueprint.route('/projects/<project>/meters/<meter>')
+def list_events_by_project(project, meter):
+    """Return a list of raw metering events for the project.
+
+    :param project: The ID of the project.
+    :param meter: The name of the meter.
+    """
+    return _list_events(project=project,
+                        meter=meter,
+                        )
+
+
+@blueprint.route('/resources/<resource>/meters/<meter>')
+def list_events_by_resource(resource, meter):
+    """Return a list of raw metering events for the resource.
+
+    :param resource: The ID of the resource.
+    :param meter: The name of the meter.
+    """
+    return _list_events(resource=resource,
+                        meter=meter,
+                        )
+
+
+@blueprint.route('/sources/<source>/meters/<meter>')
+def list_events_by_source(source, meter):
+    """Return a list of raw metering events for the source.
+
+    :param source: The ID of the reporting source.
+    :param meter: The name of the meter.
+    """
+    return _list_events(source=source,
+                        meter=meter,
+                        )
+
+
+@blueprint.route('/users/<user>/meters/<meter>')
+def list_events_by_user(user, meter):
+    """Return a list of raw metering events for the user.
+
+    :param user: The ID of the user.
+    :param meter: The name of the meter.
+    """
+    return _list_events(user=user,
+                        meter=meter,
+                        )
