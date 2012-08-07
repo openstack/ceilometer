@@ -111,3 +111,82 @@ class TestListResources(tests_api.TestBase):
         data = self.get('/sources/test_list_resources/resources')
         ids = [r['resource_id'] for r in data['resources']]
         self.assertEquals(['resource-id'], ids)
+
+    def test_with_user(self):
+        counter1 = counter.Counter(
+            'test_list_resources',
+            'instance',
+            'cumulative',
+            1,
+            'user-id',
+            'project-id',
+            'resource-id',
+            timestamp=datetime.datetime(2012, 7, 2, 10, 40),
+            duration=0,
+            resource_metadata={'display_name': 'test-server',
+                               'tag': 'self.counter',
+                               }
+            )
+        msg = meter.meter_message_from_counter(counter1)
+        self.conn.record_metering_data(msg)
+
+        counter2 = counter.Counter(
+            'not-test',
+            'instance',
+            'cumulative',
+            1,
+            'user-id2',
+            'project-id',
+            'resource-id-alternate',
+            timestamp=datetime.datetime(2012, 7, 2, 10, 41),
+            duration=0,
+            resource_metadata={'display_name': 'test-server',
+                               'tag': 'self.counter2',
+                               }
+            )
+        msg2 = meter.meter_message_from_counter(counter2)
+        self.conn.record_metering_data(msg2)
+
+        data = self.get('/users/user-id/resources')
+        ids = [r['resource_id'] for r in data['resources']]
+        self.assertEquals(['resource-id'], ids)
+
+    def test_with_project(self):
+        counter1 = counter.Counter(
+            'test_list_resources',
+            'instance',
+            'cumulative',
+            1,
+            'user-id',
+            'project-id',
+            'resource-id',
+            timestamp=datetime.datetime(2012, 7, 2, 10, 40),
+            duration=0,
+            resource_metadata={'display_name': 'test-server',
+                               'tag': 'self.counter',
+                               }
+            )
+        msg = meter.meter_message_from_counter(counter1)
+        self.conn.record_metering_data(msg)
+
+        counter2 = counter.Counter(
+            'not-test',
+            'instance',
+            'cumulative',
+            1,
+            'user-id2',
+            'project-id2',
+            'resource-id-alternate',
+            timestamp=datetime.datetime(2012, 7, 2, 10, 41),
+            duration=0,
+            resource_metadata={'display_name': 'test-server',
+                               'tag': 'self.counter2',
+                               }
+            )
+        msg2 = meter.meter_message_from_counter(counter2)
+        self.conn.record_metering_data(msg2)
+
+        data = self.get('/projects/project-id/resources')
+        ids = [r['resource_id'] for r in data['resources']]
+        self.assertEquals(['resource-id'], ids)
+
