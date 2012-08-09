@@ -96,11 +96,6 @@ def make_query_from_filter(event_filter, require_meter=True):
         q['user_id'] = event_filter.user
     elif event_filter.project:
         q['project_id'] = event_filter.project
-    else:
-        # NOTE(dhellmann): The EventFilter class should have detected
-        # this case already, but just in case someone passes something
-        # that isn't actually an EventFilter instance...
-        raise RuntimeError('One of "user" or "project" is required')
 
     if event_filter.meter:
         q['counter_name'] = event_filter.meter
