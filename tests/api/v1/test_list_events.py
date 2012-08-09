@@ -55,7 +55,7 @@ class TestListEvents(tests_api.TestBase):
             'instance',
             'cumulative',
             1,
-            'user-id',
+            'user-id2',
             'project2',
             'resource-id-alternate',
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
@@ -67,52 +67,38 @@ class TestListEvents(tests_api.TestBase):
         msg2 = meter.meter_message_from_counter(self.counter2)
         self.conn.record_metering_data(msg2)
 
-    def test_empty(self):
-        data = self.get('/users/no-such-user')
+    def test_all(self):
+        data = self.get('/resources')
+        self.assertEquals(2, len(data['resources']))
+
+    def test_empty_project(self):
+        data = self.get('/projects/no-such-project/meters/instance')
         self.assertEquals({'events': []}, data)
 
-    def test_with_user(self):
-        data = self.get('/users/user-id')
-        self.assertEquals(2, len(data['events']))
-
-    def test_with_user_and_meters(self):
-        data = self.get('/users/user-id/meters/instance')
-        self.assertEquals(2, len(data['events']))
-
-    def test_with_user_and_meters_invalid(self):
-        data = self.get('/users/user-id/meters/no-such-meter')
-        self.assertEquals(0, len(data['events']))
-
-    def test_with_source_and_user(self):
-        data = self.get('/sources/source1/users/user-id')
-        ids = [r['resource_id'] for r in data['events']]
-        self.assertEquals(['resource-id'], ids)
-
-    def test_with_resource(self):
-        data = self.get('/users/user-id/resources/resource-id')
-        ids = [r['resource_id'] for r in data['events']]
-        self.assertEquals(['resource-id'], ids)
-
-
-    def test_with_project(self):
-        data = self.get('/projects/project1')
-        self.assertEquals(1, len(data['events']))
-
-    def test_with_project_and_meters(self):
+    def test_by_project(self):
         data = self.get('/projects/project1/meters/instance')
         self.assertEquals(1, len(data['events']))
 
-    def test_with_project_and_meters_invalid(self):
-        data = self.get('/projects/project2/meters/no-such-meter')
-        self.assertEquals(0, len(data['events']))
+    def test_empty_resource(self):
+        data = self.get('/resources/no-such-resource/meters/instance')
+        self.assertEquals({'events': []}, data)
 
-    def test_with_source_and_project(self):
-        data = self.get('/sources/source1/projects/project1')
-        ids = [r['resource_id'] for r in data['events']]
-        self.assertEquals(['resource-id'], ids)
+    def test_by_resource(self):
+        data = self.get('/resources/resource-id/meters/instance')
+        self.assertEquals(1, len(data['events']))
 
-    def test_with_resource(self):
-        data = self.get('/projects/project1/resources/resource-id')
-        ids = [r['resource_id'] for r in data['events']]
-        self.assertEquals(['resource-id'], ids)
+    def test_empty_source(self):
+        data = self.get('/sources/no-such-source/meters/instance')
+        self.assertEquals({'events': []}, data)
 
+    def test_by_source(self):
+        data = self.get('/sources/source1/meters/instance')
+        self.assertEquals(1, len(data['events']))
+
+    def test_empty_user(self):
+        data = self.get('/users/no-such-user/meters/instance')
+        self.assertEquals({'events': []}, data)
+
+    def test_by_user(self):
+        data = self.get('/users/user-id/meters/instance')
+        self.assertEquals(1, len(data['events']))
