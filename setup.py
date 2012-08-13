@@ -38,6 +38,7 @@ setuptools.setup(
     entry_points=textwrap.dedent("""
     [ceilometer.collector.compute]
     instance = ceilometer.compute.notifications:Instance
+    instance_flavor = ceilometer.compute.notifications:InstanceFlavor
     memory = ceilometer.compute.notifications:Memory
     vcpus = ceilometer.compute.notifications:VCpus
     root_disk_size = ceilometer.compute.notifications:RootDiskSize

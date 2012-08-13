@@ -197,6 +197,13 @@ class TestNotifications(unittest.TestCase):
         c = counters[0]
         self.assertEqual(c.volume, 1)
 
+    def test_instance_create_flavor(self):
+        ic = notifications.InstanceFlavor()
+        counters = ic.process_notification(INSTANCE_CREATE_END)
+        self.assertEqual(len(counters), 1)
+        c = counters[0]
+        self.assertEqual(c.volume, 1)
+
     def test_instance_create_memory(self):
         ic = notifications.Memory()
         counters = ic.process_notification(INSTANCE_CREATE_END)
@@ -231,8 +238,17 @@ class TestNotifications(unittest.TestCase):
         counters = ic.process_notification(INSTANCE_EXISTS)
         self.assertEqual(len(counters), 1)
 
+    def test_instance_exists_flavor(self):
+        ic = notifications.Instance()
+        counters = ic.process_notification(INSTANCE_EXISTS)
+        self.assertEqual(len(counters), 1)
+
     def test_instance_delete_instance(self):
         ic = notifications.Instance()
         counters = ic.process_notification(INSTANCE_DELETE_START)
         self.assertEqual(len(counters), 1)
 
+    def test_instance_delete_flavor(self):
+        ic = notifications.Instance()
+        counters = ic.process_notification(INSTANCE_DELETE_START)
+        self.assertEqual(len(counters), 1)

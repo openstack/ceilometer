@@ -124,4 +124,29 @@ class EphemeralDiskSize(_Base):
                             timestamp=message['timestamp'],
                             duration=0,
                             resource_metadata={}),
-        ]
+            ]
+
+
+class InstanceFlavor(_Base):
+
+    @staticmethod
+    def process_notification(message):
+        counters = []
+        metadata = instance.get_metadata_from_event(message)
+        instance_type = message.get('payload', {}).get('instance_type')
+        if instance_type:
+            counters.append(
+                counter.Counter(
+                    source='?',
+                    name='instance:%s' % instance_type,
+                    type='absolute',
+                    volume=1,
+                    user_id=message['payload']['user_id'],
+                    project_id=message['payload']['tenant_id'],
+                    resource_id=message['payload']['instance_id'],
+                    timestamp=message['timestamp'],
+                    duration=0,
+                    resource_metadata=metadata,
+                    )
+                )
+        return counters
