@@ -37,7 +37,11 @@ setuptools.setup(
     py_modules=[],
     entry_points=textwrap.dedent("""
     [ceilometer.collector.compute]
-    instance = ceilometer.compute.notifications:InstanceNotifications
+    instance = ceilometer.compute.notifications:Instance
+    memory = ceilometer.compute.notifications:Memory
+    vcpus = ceilometer.compute.notifications:VCpus
+    root_disk_size = ceilometer.compute.notifications:RootDiskSize
+    ephemeral_disk_size = ceilometer.compute.notifications:EphemeralDiskSize
 
     [ceilometer.poll.compute]
     libvirt_diskio = ceilometer.compute.libvirt:DiskIOPollster

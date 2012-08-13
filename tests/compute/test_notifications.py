@@ -167,7 +167,7 @@ INSTANCE_EXISTS = {
 
 class TestNotifications(unittest.TestCase):
     def test_process_notification(self):
-        info = notifications.InstanceNotifications.process_notification(INSTANCE_CREATE_END)[0]
+        info = notifications.Instance.process_notification(INSTANCE_CREATE_END)[0]
 
         for name, actual, expected in [
             ('counter_name', info.name, 'instance'),
@@ -186,38 +186,53 @@ class TestNotifications(unittest.TestCase):
             ]:
             yield compare, name, actual, expected
 
-    def _check_counters(self, counters):
-        counter_names = [ counter.name for counter in counters ]
-        self.assertEqual(len(counters), 5)
-        self.assert_('instance' in counter_names)
-        self.assert_('memory' in counter_names)
-        self.assert_('vcpus' in counter_names)
-        self.assert_('root_disk_size' in counter_names)
-        self.assert_('ephemeral_disk_size' in counter_names)
-
     @staticmethod
     def _find_counter(counters, name):
         return filter(lambda counter: counter.name == name, counters)[0]
 
-    def test_instance_create(self):
-        ic = notifications.InstanceNotifications()
+    def test_instance_create_instance(self):
+        ic = notifications.Instance()
         counters = ic.process_notification(INSTANCE_CREATE_END)
-        self._check_counters(counters)
+        self.assertEqual(len(counters), 1)
+        c = counters[0]
+        self.assertEqual(c.volume, 1)
 
-        self.assertEqual(self._find_counter(counters, 'instance').volume, 1)
-        self.assertEqual(self._find_counter(counters, 'memory').volume,
-                         INSTANCE_CREATE_END['payload']['memory_mb'])
-        self.assertEqual(self._find_counter(counters, 'vcpus').volume,
-                         INSTANCE_CREATE_END['payload']['vcpus'])
-        self.assertEqual(self._find_counter(counters, 'root_disk_size').volume,
-                         INSTANCE_CREATE_END['payload']['root_gb'])
-        self.assertEqual(self._find_counter(counters, 'ephemeral_disk_size').volume,
+    def test_instance_create_memory(self):
+        ic = notifications.Memory()
+        counters = ic.process_notification(INSTANCE_CREATE_END)
+        self.assertEqual(len(counters), 1)
+        c = counters[0]
+        self.assertEqual(c.volume, INSTANCE_CREATE_END['payload']['memory_mb'])
+
+    def test_instance_create_vcpus(self):
+        ic = notifications.VCpus()
+        counters = ic.process_notification(INSTANCE_CREATE_END)
+        self.assertEqual(len(counters), 1)
+        c = counters[0]
+        self.assertEqual(c.volume, INSTANCE_CREATE_END['payload']['vcpus'])
+
+    def test_instance_create_root_disk_size(self):
+        ic = notifications.RootDiskSize()
+        counters = ic.process_notification(INSTANCE_CREATE_END)
+        self.assertEqual(len(counters), 1)
+        c = counters[0]
+        self.assertEqual(c.volume, INSTANCE_CREATE_END['payload']['root_gb'])
+
+    def test_instance_create_ephemiral_disk_size(self):
+        ic = notifications.EphemeralDiskSize()
+        counters = ic.process_notification(INSTANCE_CREATE_END)
+        self.assertEqual(len(counters), 1)
+        c = counters[0]
+        self.assertEqual(c.volume,
                          INSTANCE_CREATE_END['payload']['ephemeral_gb'])
 
-    def test_instance_exists(self):
-        ic = notifications.InstanceNotifications()
-        self._check_counters(ic.process_notification(INSTANCE_EXISTS))
+    def test_instance_exists_instance(self):
+        ic = notifications.Instance()
+        counters = ic.process_notification(INSTANCE_EXISTS)
+        self.assertEqual(len(counters), 1)
 
-    def test_instance_delete(self):
-        ic = notifications.InstanceNotifications()
-        self._check_counters(ic.process_notification(INSTANCE_DELETE_START))
+    def test_instance_delete_instance(self):
+        ic = notifications.Instance()
+        counters = ic.process_notification(INSTANCE_DELETE_START)
+        self.assertEqual(len(counters), 1)
+
