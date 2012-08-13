@@ -43,7 +43,7 @@ class Instance(_Base):
         return [
             counter.Counter(source='?',
                             name='instance',
-                            type='cumulative',
+                            type='absolute',
                             volume=1,
                             user_id=message['payload']['user_id'],
                             project_id=message['payload']['tenant_id'],
