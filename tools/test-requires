@@ -12,3 +12,4 @@ python-glanceclient
 # github to make it easier to install, then ended up making some
 # changes to it so it would be compatible with PyMongo's API.
 https://github.com/dreamhost/Ming/zipball/master#egg=Ming
+setuptools-git>=0.4
