@@ -68,16 +68,21 @@ class Connection(base.Connection):
         :param source: Optional source filter.
         """
 
-    def get_resources(self, user=None, project=None, source=None):
+    def get_resources(self, user=None, project=None, source=None,
+                      start_timestamp=None, end_timestamp=None):
         """Return an iterable of tuples containing resource ids and
         the most recent version of the metadata for the resource.
 
-        :param user: The event owner.
+        :param user: Optional ID for user that owns the resource.
+        :param project: Optional ID for project that owns the resource.
         :param source: Optional source filter.
+        :param start_timestamp: Optional modified timestamp start range.
+        :param end_timestamp: Optional modified timestamp end range.
         """
 
     def get_raw_events(self, event_filter):
-        """Return an iterable of event data.
+        """Return an iterable of raw event data as created by
+        :func:`ceilometer.meter.meter_message_from_counter`.
         """
 
     def get_volume_sum(self, event_filter):

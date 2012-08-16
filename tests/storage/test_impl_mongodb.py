@@ -55,6 +55,8 @@ from ming import mim
 import mox
 from nose.plugins import skip
 
+from nova import test
+
 from ceilometer import counter
 from ceilometer import meter
 from ceilometer import storage
@@ -63,14 +65,15 @@ from ceilometer.storage import impl_mongodb
 
 LOG = logging.getLogger(__name__)
 
+FORCING_MONGO = bool(int(os.environ.get('CEILOMETER_TEST_LIVE', 0)))
+
 
 class Connection(impl_mongodb.Connection):
 
     def _get_connection(self, conf):
         # Use a real MongoDB server if we can connect, but fall back
         # to a Mongo-in-memory connection if we cannot.
-        self.force_mongo = bool(int(os.environ.get('CEILOMETER_TEST_LIVE', 0)))
-        if self.force_mongo:
+        if FORCING_MONGO:
             try:
                 return super(Connection, self)._get_connection(conf)
             except:
@@ -253,6 +256,31 @@ class ResourceTest(MongoDBEngineTestBase):
         else:
             assert False, 'Never found resource-id'
 
+    def test_get_resources_start_timestamp(self):
+        timestamp = datetime.datetime(2012, 7, 2, 10, 42)
+        resources = list(self.conn.get_resources(start_timestamp=timestamp))
+        resource_ids = [r['resource_id'] for r in resources]
+        expected = set(['resource-id-2', 'resource-id-3'])
+        assert set(resource_ids) == expected
+
+    def test_get_resources_end_timestamp(self):
+        timestamp = datetime.datetime(2012, 7, 2, 10, 42)
+        resources = list(self.conn.get_resources(end_timestamp=timestamp))
+        resource_ids = [r['resource_id'] for r in resources]
+        expected = set(['resource-id', 'resource-id-alternate'])
+        assert set(resource_ids) == expected
+
+    @test.skip_if(not FORCING_MONGO, 'Requires real MongoDB test database')
+    def test_get_resources_both_timestamps(self):
+        start_ts = datetime.datetime(2012, 7, 2, 10, 42)
+        end_ts = datetime.datetime(2012, 7, 2, 10, 43)
+        resources = list(self.conn.get_resources(start_timestamp=start_ts,
+                                                 end_timestamp=end_ts)
+                        )
+        resource_ids = [r['resource_id'] for r in resources]
+        expected = set(['resource-id-2'])
+        assert set(resource_ids) == expected
+
     def test_get_resources_by_source(self):
         resources = list(self.conn.get_resources(source='test-1'))
         assert len(resources) == 1
@@ -320,6 +348,17 @@ class MeterTest(MongoDBEngineTestBase):
         length = len(results)
         assert length == 1
         assert results[0]['timestamp'] == datetime.datetime(2012, 7, 2, 10, 40)
+
+    @test.skip_if(not FORCING_MONGO, 'Requires real MongoDB test database')
+    def test_get_raw_events_by_both_times(self):
+        f = storage.EventFilter(
+            start=datetime.datetime(2012, 7, 2, 10, 42),
+            end=datetime.datetime(2012, 7, 2, 10, 43),
+            )
+        results = list(self.conn.get_raw_events(f))
+        length = len(results)
+        assert length == 1
+        assert results[0]['timestamp'] == datetime.datetime(2012, 7, 2, 10, 42)
 
     def test_get_raw_events_by_meter(self):
         f = storage.EventFilter(

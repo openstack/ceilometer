@@ -75,7 +75,8 @@ class Connection(object):
         """
 
     @abc.abstractmethod
-    def get_resources(self, user=None, project=None, source=None):
+    def get_resources(self, user=None, project=None, source=None,
+                      start_timestamp=None, end_timestamp=None):
         """Return an iterable of dictionaries containing resource information.
 
         { 'resource_id': UUID of the resource,
@@ -86,14 +87,17 @@ class Connection(object):
           'meter': list of the meters reporting data for the resource,
           }
 
-        :param user: Optional resource owner.
-        :param project: Optional resource owner.
+        :param user: Optional ID for user that owns the resource.
+        :param project: Optional ID for project that owns the resource.
         :param source: Optional source filter.
+        :param start_timestamp: Optional modified timestamp start range.
+        :param end_timestamp: Optional modified timestamp end range.
         """
 
     @abc.abstractmethod
     def get_raw_events(self, event_filter):
-        """Return an iterable of raw event data.
+        """Return an iterable of raw event data as created by
+        :func:`ceilometer.meter.meter_message_from_counter`.
         """
 
     @abc.abstractmethod

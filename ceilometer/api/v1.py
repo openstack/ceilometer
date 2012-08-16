@@ -70,6 +70,8 @@
 import flask
 
 from ceilometer.openstack.common import log
+from ceilometer.openstack.common import timeutils
+
 from ceilometer import storage
 
 
@@ -82,13 +84,20 @@ blueprint = flask.Blueprint('v1', __name__)
 ## APIs for working with resources.
 
 
-def _list_resources(source=None, user=None, project=None):
+def _list_resources(source=None, user=None, project=None,
+                    start_timestamp=None, end_timestamp=None):
     """Return a list of resource identifiers.
     """
+    if start_timestamp:
+        start_timestamp = timeutils.parse_isotime(start_timestamp)
+    if end_timestamp:
+        end_timestamp = timeutils.parse_isotime(end_timestamp)
     resources = flask.request.storage_conn.get_resources(
         source=source,
         user=user,
         project=project,
+        start_timestamp=start_timestamp,
+        end_timestamp=end_timestamp,
         )
     return flask.jsonify(resources=list(resources))
 
@@ -99,7 +108,11 @@ def list_resources_by_project(project):
 
     :param project: The ID of the owning project.
     """
-    return _list_resources(project=project)
+    return _list_resources(
+        project=project,
+        start_timestamp=flask.request.args.get('start_timestamp'),
+        end_timestamp=flask.request.args.get('end_timestamp'),
+        )
 
 
 @blueprint.route('/resources')
