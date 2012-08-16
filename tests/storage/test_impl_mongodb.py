@@ -53,9 +53,8 @@ import unittest
 
 from ming import mim
 import mox
-from nose.plugins import skip
 
-from nova import test
+from nose.plugins import skip
 
 from ceilometer import counter
 from ceilometer import meter
@@ -182,7 +181,11 @@ class UserTest(MongoDBEngineTestBase):
 
     def test_get_users(self):
         users = self.conn.get_users()
-        assert set(users) == set(['user-id', 'user-id-alternate', 'user-id-2', 'user-id-3'])
+        assert set(users) == set(['user-id',
+                                  'user-id-alternate',
+                                  'user-id-2',
+                                  'user-id-3',
+                                  ])
 
     def test_get_users_by_source(self):
         users = list(self.conn.get_users(source='test-1'))
@@ -270,7 +273,6 @@ class ResourceTest(MongoDBEngineTestBase):
         expected = set(['resource-id', 'resource-id-alternate'])
         assert set(resource_ids) == expected
 
-    @test.skip_if(not FORCING_MONGO, 'Requires real MongoDB test database')
     def test_get_resources_both_timestamps(self):
         start_ts = datetime.datetime(2012, 7, 2, 10, 42)
         end_ts = datetime.datetime(2012, 7, 2, 10, 43)
@@ -349,7 +351,6 @@ class MeterTest(MongoDBEngineTestBase):
         assert length == 1
         assert results[0]['timestamp'] == datetime.datetime(2012, 7, 2, 10, 40)
 
-    @test.skip_if(not FORCING_MONGO, 'Requires real MongoDB test database')
     def test_get_raw_events_by_both_times(self):
         f = storage.EventFilter(
             start=datetime.datetime(2012, 7, 2, 10, 42),
