@@ -31,6 +31,7 @@ setuptools.setup(
     packages=setuptools.find_packages(exclude=['bin']),
     include_package_data=True,
     test_suite='nose.collector',
+    setup_requires=['setuptools-git>=0.4'],
     scripts=['bin/ceilometer-agent-compute',
              'bin/ceilometer-agent-central',
              'bin/ceilometer-collector'],
