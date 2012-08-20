@@ -19,7 +19,7 @@
  Installing and Running the Development Version
 ================================================
 
-Ceilometer has three daemons. The :term:`compute agent` runs on the
+Ceilometer has four daemons. The :term:`compute agent` runs on the
 Nova compute node(s) while the :term:`central agent` and
 :term:`collector` run on the cloud's management node(s). In a
 development environment created by devstack_, these two are typically
@@ -29,205 +29,50 @@ done.
 
 .. _devstack: http://www.devstack.org/
 
-Installing the Collector
-========================
+Configuring Devstack
+====================
 
 .. index::
-   double: installing; collector
+   double: installing; devstack
 
-1. Install and configure nova.
+1. Create a ``localrc`` file as input to devstack.
 
-   The collector daemon imports code from ``nova``, so it needs to be
-   run on a server where nova has already been installed.
+2. Ceilometer makes extensive use of the messaging bus, but has not
+   yet been tested with ZeroMQ. We recommend using Rabbit or qpid for
+   now.
 
-   .. note::
+3. Nova does not generate the periodic notifications for all known
+   instances by default. To enable these auditing events, set
+   ``instance_usage_audit`` to true in the nova configuration file.
 
-      Ceilometer makes extensive use of the messaging bus, but has not
-      yet been tested with ZeroMQ. We recommend using Rabbit or qpid
-      for now.
+4. The ceilometer services are not enabled by default, so they must be
+   enabled in ``localrc`` before running ``stack.sh``.
 
-2. Install MongoDB.
+This example ``localrc`` file shows all of the settings required for
+ceilometer::
 
-   Follow the instructions to install the MongoDB_ package for your
-   operating system, then start the service.
+   # Configure the notifier to talk to the message queue
+   # and turn on usage audit events
+   EXTRA_OPTS=(notification_driver=nova.openstack.common.notifier.rabbit_notifier)
 
-3. Clone the ceilometer git repository to the management server::
+   # Enable the ceilometer services
+   enable_service ceilometer-acompute,ceilometer-acentral,ceilometer-collector
 
-   $ cd /opt/stack
-   $ git clone https://github.com/stackforge/ceilometer.git
+Running the API Server
+======================
 
-4. As a user with ``root`` permissions or ``sudo`` privileges, run the
-   ceilometer installer::
-
-   $ cd ceilometer
-   $ sudo python setup.py install
-
-5. Configure ceilometer.
-
-   Ceilometer needs to know about some of the nova configuration
-   options, so the simplest way to start is copying
-   ``/etc/nova/nova.conf`` to ``/etc/ceilometer-collector.conf``. Some
-   of the logging settings used in nova break ceilometer, so they need
-   to be removed. For example, as a user with ``root`` permissions::
-
-     $ grep -v format_string /etc/nova/nova.conf > /etc/ceilometer-collector.conf
-
-   Refer to :doc:`configuration` for details about any other options
-   you might want to modify before starting the service.
-
-6. Start the collector.
-
-   ::
-
-     $ ./bin/ceilometer-collector
-
-   .. note:: 
-
-      The default development configuration of the collector logs to
-      stderr, so you may want to run this step using a screen session
-      or other tool for maintaining a long-running program in the
-      background.
-
-.. _MongoDB: http://www.mongodb.org/
-
-
-Installing the Central Agent
-============================
-
-.. index::
-   double: installing; central agent
-
-1. Install and configure nova.
-
-   The agent daemon imports code from ``nova``, so it needs to be
-   run on a server where nova has already been installed.
-
-   .. note::
-
-      Ceilometer makes extensive use of the messaging bus, but has not
-      yet been tested with ZeroMQ. We recommend using Rabbit or qpid
-      for now.
-
-2. Clone the ceilometer git repository to the server::
-
-   $ cd /opt/stack
-   $ git clone https://github.com/stackforge/ceilometer.git
-
-4. As a user with ``root`` permissions or ``sudo`` privileges, run the
-   ceilometer installer::
-
-   $ cd ceilometer
-   $ sudo python setup.py install
-
-5. Configure ceilometer.
-
-   Ceilometer needs to know about some of the nova configuration
-   options, so the simplest way to start is copying
-   ``/etc/nova/nova.conf`` to ``/etc/ceilometer-agent-central.conf``. Some
-   of the logging settings used in nova break ceilometer, so they need
-   to be removed. For example, as a user with ``root`` permissions::
-
-     $ grep -v format_string /etc/nova/nova.conf > /etc/ceilometer-agent-central.conf
-
-   Refer to :doc:`configuration` for details about any other options
-   you might want to modify before starting the service.
-
-6. Start the agent.
-
-   ::
-
-     $ ./bin/ceilometer-agent-central
-
-   .. note:: 
-
-      The default development configuration of the agent logs to
-      stderr, so you may want to run this step using a screen session
-      or other tool for maintaining a long-running program in the
-      background.
-
-
-Installing the Compute Agent
-============================
-
-.. index::
-   double: installing; compute agent
-
-.. note:: The compute agent must be installed on each nova compute node.
-
-1. Install and configure nova.
-
-   The agent daemon imports code from ``nova``, so it needs to be
-   run on a server where nova has already been installed.
-
-   .. note::
-
-      Ceilometer makes extensive use of the messaging bus, but has not
-      yet been tested with ZeroMQ. We recommend using Rabbit or qpid
-      for now.
-
-2. Clone the ceilometer git repository to the server::
-
-   $ cd /opt/stack
-   $ git clone https://github.com/stackforge/ceilometer.git
-
-4. As a user with ``root`` permissions or ``sudo`` privileges, run the
-   ceilometer installer::
-
-   $ cd ceilometer
-   $ sudo python setup.py install
-
-5. Configure ceilometer.
-
-   Ceilometer needs to know about some of the nova configuration
-   options, so the simplest way to start is copying
-   ``/etc/nova/nova.conf`` to ``/etc/ceilometer-agent-compute.conf``. Some
-   of the logging settings used in nova break ceilometer, so they need
-   to be removed. For example, as a user with ``root`` permissions::
-
-     $ grep -v format_string /etc/nova/nova.conf > /etc/ceilometer-agent-compute.conf
-
-   Refer to :doc:`configuration` for details about any other options
-   you might want to modify before starting the service.
-
-6. Start the agent.
-
-   ::
-
-     $ ./bin/ceilometer-agent-compute
-
-   .. note::
-
-      The default development configuration of the agent logs to
-      stderr, so you may want to run this step using a screen session
-      or other tool for maintaining a long-running program in the
-      background.
-
-
-Installing the API Server
-=========================
+There is not currently a wrapper script for the ceilometer API server,
+so it must be started manually.
 
 .. index::
    double: installing; API
 
-1. Clone the ceilometer git repository to the server::
+::
 
-   $ cd /opt/stack
-   $ git clone https://github.com/stackforge/ceilometer.git
+  $ python -m ceilometer.api
 
-2. As a user with ``root`` permissions or ``sudo`` privileges, run the
-   ceilometer installer::
+.. note::
 
-   $ cd ceilometer
-   $ sudo python setup.py install
-
-3. Start the API server.
-
-   ::
-
-     $ python -m ceilometer.api
-
-   .. note::
-
-      The development version of the API server logs to stderr, so you
-      may want to run this step using a screen session or other tool
-      for maintaining a long-running program in the background.
+   The development version of the API server logs to stderr, so you
+   may want to run this step using a screen session or other tool for
+   maintaining a long-running program in the background.
