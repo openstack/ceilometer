@@ -1,1 +1,0 @@
-from nova.tests import *

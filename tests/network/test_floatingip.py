@@ -17,46 +17,48 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import mock
+
 from nova import context
 from nova import db
-from nova import exception
-from nova import test
 
 from ceilometer.network import floatingip
 from ceilometer.central import manager
+from ceilometer.tests import base
 
 
-class TestFloatingIPPollster(test.TestCase):
+class TestFloatingIPPollster(base.TestCase):
 
     def setUp(self):
+        super(TestFloatingIPPollster, self).setUp()
         self.context = context.RequestContext('admin', 'admin', is_admin=True)
         self.manager = manager.AgentManager()
         self.pollster = floatingip.FloatingIPPollster()
-        super(TestFloatingIPPollster, self).setUp()
+        self.stubs.Set(db, 'floating_ip_get_all', self.faux_get_ips)
 
-    def test_get_counters(self):
-        try:
-            list(self.pollster.get_counters(self.manager,
-                                            self.context)
-                 )
-        except exception.NoFloatingIpsDefined:
-            pass
-        else:
-            assert False, 'Should have seen an error'
+    def faux_get_ips(self, context):
+        ips = []
+        for i in range(1, 4):
+            ip = mock.MagicMock()
+            ip.address = '1.1.1.%d' % i
+            ip.host = self.manager.host
+            ips.append(ip)
+        return ips
+
+    # FIXME(dhellmann): Is there a useful way to define this
+    # test without a database?
+    #
+    # def test_get_counters_none_defined(self):
+    #     try:
+    #         list(self.pollster.get_counters(self.manager,
+    #                                         self.context)
+    #              )
+    #     except exception.NoFloatingIpsDefined:
+    #         pass
+    #     else:
+    #         assert False, 'Should have seen an error'
 
     def test_get_counters_not_empty(self):
-        db.floating_ip_create(self.context,
-                              {'address': '1.1.1.1',
-                               'host': self.manager.host,
-                               })
-        db.floating_ip_create(self.context,
-                              {'address': '1.1.1.2',
-                               'host': self.manager.host + "randomstring",
-                               })
-        db.floating_ip_create(self.context,
-                              {'address': '1.1.1.3',
-                               'host': self.manager.host + "randomstring",
-                               })
         counters = list(self.pollster.get_counters(self.manager, self.context))
         self.assertEqual(len(counters), 3)
         addresses = [c.resource_metadata['address']

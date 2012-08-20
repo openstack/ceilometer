@@ -20,20 +20,18 @@
 
 import datetime
 
-from nova import context
-from nova import test
-
 from ceilometer import meter
 from ceilometer.collector import manager
 from ceilometer.storage import base
+from ceilometer.tests import base as tests_base
 
 
-class TestCollectorManager(test.TestCase):
+class TestCollectorManager(tests_base.TestCase):
 
     def setUp(self):
         super(TestCollectorManager, self).setUp()
         self.mgr = manager.CollectorManager()
-        self.ctx = context.RequestContext("user", "project")
+        self.ctx = None
 
     def test_valid_message(self):
         msg = {'counter_name': 'test',
@@ -88,4 +86,3 @@ class TestCollectorManager(test.TestCase):
 
         self.mgr.record_metering_data(self.ctx, msg)
         self.mox.VerifyAll()
-

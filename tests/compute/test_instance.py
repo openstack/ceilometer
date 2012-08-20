@@ -18,15 +18,31 @@
 """Tests for ceilometer.compute.instance
 """
 
-from nova import context
-from nova import test
-from nova import db
+import unittest
+
+import mock
 
 from ceilometer.compute import instance
 from ceilometer.compute import manager
 
 
-class TestLocationMetadata(test.TestCase):
+class FauxInstance(object):
+
+    def __init__(self, **kwds):
+        for name, value in kwds.items():
+            setattr(self, name, value)
+
+    def __getitem__(self, key):
+        return getattr(self, key)
+
+    def get(self, key, default):
+        try:
+            return getattr(self, key)
+        except AttributeError:
+            return default
+
+
+class TestLocationMetadata(unittest.TestCase):
 
     INSTANCE_PROPERTIES = {'display_name': 'display name',
                            'reservation_id': 'reservation id',
@@ -45,13 +61,18 @@ class TestLocationMetadata(test.TestCase):
                            }
 
     def setUp(self):
-        self.context = context.RequestContext('admin', 'admin', is_admin=True)
         self.manager = manager.AgentManager()
         super(TestLocationMetadata, self).setUp()
-        self.instance = db.instance_create(self.context,
-                                           self.INSTANCE_PROPERTIES)
+        self.instance = FauxInstance(**self.INSTANCE_PROPERTIES)
+        self.instance.host = 'made-up-hostname'
+        m = mock.MagicMock()
+        m.flavorid = 1
+        self.instance.instance_type = m
 
     def test_metadata(self):
         md = instance.get_metadata_from_dbobject(self.instance)
         for name in self.INSTANCE_PROPERTIES.keys():
-            assert md[name] == self.INSTANCE_PROPERTIES[name]
+            actual = md[name]
+            print 'checking', name, actual
+            expected = self.INSTANCE_PROPERTIES[name]
+            assert actual == expected

@@ -19,16 +19,16 @@
 """
 
 import datetime
+import unittest
 
-from nova import context
 from ceilometer.openstack.common import rpc
-from nova import test
+from ceilometer.tests import base
 
 from ceilometer import counter
 from ceilometer import publish
 
 
-class TestPublish(test.TestCase):
+class TestPublish(base.TestCase):
 
     test_data = counter.Counter(
         source='test',
@@ -51,8 +51,7 @@ class TestPublish(test.TestCase):
         super(TestPublish, self).setUp()
         self.notifications = []
         self.stubs.Set(rpc, 'cast', self.faux_notify)
-        self.ctx = context.RequestContext("user", "project")
-        publish.publish_counter(self.ctx, self.test_data)
+        publish.publish_counter(None, self.test_data)
 
     def test_notify(self):
         assert len(self.notifications) == 2

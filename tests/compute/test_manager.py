@@ -20,12 +20,10 @@
 
 import datetime
 
-from nova import context
-from nova import test
-
 from ceilometer.compute import manager
 from ceilometer import counter
 from ceilometer import publish
+from ceilometer.tests import base
 
 
 def test_load_plugins():
@@ -35,7 +33,7 @@ def test_load_plugins():
     return
 
 
-class TestRunTasks(test.TestCase):
+class TestRunTasks(base.TestCase):
 
     class Pollster:
         counters = []
@@ -66,20 +64,19 @@ class TestRunTasks(test.TestCase):
         self.stubs.Set(publish, 'publish_counter', self.faux_notify)
         self.mgr = manager.AgentManager()
         self.mgr.pollsters = [('test', self.Pollster())]
-        self.ctx = context.RequestContext("user", "project")
         # Set up a fake instance value to be returned by
         # instance_get_all_by_host() so when the manager gets the list
         # of instances to poll we can control the results.
         self.instance = 'faux instance'
         self.mox.StubOutWithMock(self.mgr.db, 'instance_get_all_by_host')
         self.mgr.db.instance_get_all_by_host(
-            self.ctx,
+            None,
             self.mgr.host,
             ).AndReturn([self.instance])
 
         self.mox.ReplayAll()
         # Invoke the periodic tasks to call the pollsters.
-        self.mgr.periodic_tasks(self.ctx)
+        self.mgr.periodic_tasks(None)
 
     def test_message(self):
         assert self.Pollster.counters[0][1] is self.instance

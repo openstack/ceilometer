@@ -18,14 +18,13 @@
 """Tests for ceilometer/storage/
 """
 
-from nova import test
-
 from ceilometer import storage
 from ceilometer.storage import base
 from ceilometer.openstack.common import cfg
+from ceilometer.tests import base as test_base
 
 
-class RegisterOpts(test.TestCase):
+class RegisterOpts(test_base.TestCase):
 
     def faux_get_engine(self, conf):
         return self._faux_engine
