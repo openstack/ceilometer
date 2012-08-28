@@ -61,9 +61,7 @@ class TestBase(unittest.TestCase):
         self.test_app = self.app.test_client()
         self.conf = mock.Mock()
         self.conf.metering_storage_engine = 'mongodb'
-        self.conf.mongodb_host = 'localhost'
-        self.conf.mongodb_port = 27017
-        self.conf.mongodb_dbname = self.DBNAME
+        self.conf.database_connection = 'mongodb://localhost/%s' % self.DBNAME
         self.conn = Connection(self.conf)
         self.conn.conn.drop_database(self.DBNAME)
         self.conn.conn[self.DBNAME]

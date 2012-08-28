@@ -89,13 +89,10 @@ class MongoDBEngineTestBase(unittest.TestCase):
         super(MongoDBEngineTestBase, self).setUp()
 
         self.conf = mox.Mox().CreateMockAnything()
-        self.conf.metering_storage_engine = 'mongodb'
-        self.conf.mongodb_host = 'localhost'
-        self.conf.mongodb_port = 27017
-        self.conf.mongodb_dbname = 'testdb'
+        self.conf.database_connection = 'mongodb://localhost/testdb'
         self.conn = Connection(self.conf)
-        self.conn.conn.drop_database(self.conf.mongodb_dbname)
-        self.db = self.conn.conn[self.conf.mongodb_dbname]
+        self.conn.conn.drop_database('testdb')
+        self.db = self.conn.conn['testdb']
         self.conn.db = self.db
 
         self.counter = counter.Counter(

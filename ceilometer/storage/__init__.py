@@ -23,14 +23,16 @@ import pkg_resources
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import cfg
 
+from urlparse import urlparse
+
 LOG = log.getLogger(__name__)
 
 STORAGE_ENGINE_NAMESPACE = 'ceilometer.storage'
 
 STORAGE_OPTS = [
-    cfg.StrOpt('metering_storage_engine',
-               default='mongodb',
-               help='The name of the storage engine to use',
+    cfg.StrOpt('database_connection',
+               default='mongodb://localhost:27017/ceilometer',
+               help='Database connection string',
                ),
     ]
 
@@ -48,7 +50,7 @@ def register_opts(conf):
 def get_engine(conf):
     """Load the configured engine and return an instance.
     """
-    engine_name = conf.metering_storage_engine
+    engine_name = urlparse(conf.database_connection).scheme
     LOG.debug('looking for %r driver in %r',
               engine_name, STORAGE_ENGINE_NAMESPACE)
     for ep in pkg_resources.iter_entry_points(STORAGE_ENGINE_NAMESPACE,

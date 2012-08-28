@@ -27,6 +27,9 @@ from ceilometer.storage import base
 
 import bson.code
 import pymongo
+import re
+
+from urlparse import urlparse
 
 LOG = log.getLogger(__name__)
 
@@ -57,20 +60,7 @@ class MongoDBStorage(base.StorageEngine):
         }
     """
 
-    OPTIONS = [
-        cfg.StrOpt('mongodb_dbname',
-                   default='ceilometer',
-                   help='Database name',
-                   ),
-        cfg.StrOpt('mongodb_host',
-                   default='localhost',
-                   help='hostname or IP of server running MongoDB',
-                   ),
-        cfg.IntOpt('mongodb_port',
-                   default=27017,
-                   help='port number where MongoDB is running',
-                   ),
-        ]
+    OPTIONS = []
 
     def register_opts(self, conf):
         """Register any configuration options used by this engine.
@@ -169,10 +159,12 @@ class Connection(base.Connection):
         """)
 
     def __init__(self, conf):
-        LOG.info('connecting to MongoDB on %s:%s',
-                 conf.mongodb_host, conf.mongodb_port)
-        self.conn = self._get_connection(conf)
-        self.db = getattr(self.conn, conf.mongodb_dbname)
+        opts = self._parse_connection_url(conf.database_connection)
+        LOG.info('connecting to MongoDB on %s:%s', opts['host'], opts['port'])
+        self.conn = self._get_connection(opts)
+        self.db = getattr(self.conn, opts['dbname'])
+        if 'username' in opts:
+            self.db.authenticate(opts['username'], opts['password'])
 
         # Establish indexes
         #
@@ -195,7 +187,7 @@ class Connection(base.Connection):
                     ])
         return
 
-    def _get_connection(self, conf):
+    def _get_connection(self, opts):
         """Return a connection to the database.
 
         .. note::
@@ -203,10 +195,25 @@ class Connection(base.Connection):
           The tests use a subclass to override this and return an
           in-memory connection.
         """
-        return pymongo.Connection(conf.mongodb_host,
-                                  conf.mongodb_port,
-                                  safe=True,
-                                  )
+        return pymongo.Connection(opts['host'], opts['port'], safe=True)
+
+    def _parse_connection_url(self, url):
+        opts = {}
+        result = urlparse(url)
+        opts['dbtype'] = result.scheme
+        opts['dbname'] = result.path.replace('/', '')
+        netloc_match = re.match(r'(?:(\w+:\w+)@)?(.*)', result.netloc)
+        auth = netloc_match.group(1)
+        netloc = netloc_match.group(2)
+        if auth:
+            opts['username'], opts['password'] = auth.split(':')
+        if ':' in netloc:
+            opts['host'], port = netloc.split(':')
+        else:
+            opts['host'] = netloc
+            port = 27017
+        opts['port'] = port and int(port) or 27017
+        return opts
 
     def record_metering_data(self, data):
         """Write the data to the backend storage system.

@@ -26,14 +26,14 @@ from ceilometer.storage import impl_log
 
 def test_get_engine():
     conf = mox.Mox().CreateMockAnything()
-    conf.metering_storage_engine = 'log'
+    conf.database_connection = 'log://localhost'
     engine = storage.get_engine(conf)
     assert isinstance(engine, impl_log.LogStorage)
 
 
 def test_get_engine_no_such_engine():
     conf = mox.Mox().CreateMockAnything()
-    conf.metering_storage_engine = 'no-such-engine'
+    conf.database_connection = 'no-such-engine://localhost'
     try:
         storage.get_engine(conf)
     except RuntimeError as err:
