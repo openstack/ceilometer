@@ -231,14 +231,15 @@ class Connection(base.Connection):
             )
 
         # Record the updated resource metadata
-        timestamp = datetime.datetime.utcnow()
+        received_timestamp = datetime.datetime.utcnow()
         self.db.resource.update(
             {'_id': data['resource_id']},
             {'$set': {'project_id': data['project_id'],
                       'user_id': data['user_id'],
                       # Current metadata being used and when it was
                       # last updated.
-                      'timestamp': timestamp,
+                      'timestamp': data['timestamp'],
+                      'received_timestamp': received_timestamp,
                       'metadata': data['resource_metadata'],
                       'source': data['source'],
                       },
