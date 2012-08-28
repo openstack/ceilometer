@@ -70,6 +70,6 @@ class AgentManager(manager.Manager):
                         LOG.info('COUNTER: %s', c)
                         publish.publish_counter(context, c)
                 except Exception as err:
-                    LOG.warning('Continuing after error from %s: %s',
-                                name, err)
+                    LOG.warning('Continuing after error from %s for %s: %s',
+                                name, instance.name, err)
                     LOG.exception(err)
