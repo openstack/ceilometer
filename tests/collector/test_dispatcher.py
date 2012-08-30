@@ -114,6 +114,6 @@ def test_notify_through_plugin():
         )
     d.notify(TEST_NOTICE)
     assert len(results) >= 1
-    results_name = [ result.name for result in results ]
+    results_name = [result.name for result in results]
     assert 'instance' in results_name
     assert 'memory' in results_name
