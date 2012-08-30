@@ -15,31 +15,37 @@ High Level Description
    double: database; architecture
    double: API; architecture
 
-There are 5 basic components to the system:
+The following diagram summarizes ceilometer logical architecture:
 
-1. An :term:`compute agent` runs on each compute node and polls for
+.. image:: https://docs.google.com/drawings/pub?id=1_cIFir6HS6jSkPw7chrmyu8DGE2ZgXk79Kbj8nw-Hqo&w=800
+
+As shown in the above diagram, there are 5 basic components to the system:
+
+1. A :term:`compute agent` runs on each compute node and polls for
    resource utilization statistics. There may be other types of agents
    in the future, but for now we will focus on creating the compute
    agent.
 
-2. An :term:`central agent` runs on a central management server to
+2. A :term:`central agent` runs on a central management server to
    poll for resource utilization statistics for resources not tied
    to instances or compute nodes.
 
-3. The :term:`collector` runs on one or more central management
+3. A :term:`collector` runs on one or more central management
    servers to monitor the message queues (for notifications and for
    metering data coming from the agent). Notification messages are
    processed and turned into metering messages and sent back out onto
    the message bus using the appropriate topic. Metering messages are
    written to the data store without modification.
 
-4. The :term:`data store` is a database capable of handling concurrent
+4. A :term:`data store` is a database capable of handling concurrent
    writes (from one or more collector instances) and reads (from the
    API server).
 
-5. The :term:`API server` runs on one or more central management
+5. An :term:`API server` runs on one or more central management
    servers to provide access to the data from the data store. See
-   EfficientMetering#API for details.
+   `API Description`_ for details.
+
+.. _API Description: api.html
 
 These services communicate using the standard OpenStack messaging
 bus. Only the collector and API server have access to the data store.
