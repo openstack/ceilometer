@@ -41,10 +41,14 @@ help:
 clean:
 	-rm -rf $(BUILDDIR)/*
 
-html:
+html: check-dependencies
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
+
+.PHONY: check-dependencies
+check-dependencies:
+	@python -c 'import sphinxcontrib.autohttp.flask' >/dev/null 2>&1 || (echo "ERROR: Missing Sphinx dependencies. Run: pip install sphinxcontrib-httpdomain" && exit 1)
 
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
