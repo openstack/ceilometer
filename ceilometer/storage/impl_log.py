@@ -95,7 +95,7 @@ class Connection(base.Connection):
         described by the query parameters.
         """
 
-    def get_duration_sum(self, event_filter):
-        """Return the sum of time for the events described by the
-        query parameters.
+    def get_event_interval(self, event_filter):
+        """Return the min and max timestamp for events
+        matching the event_filter.
         """
