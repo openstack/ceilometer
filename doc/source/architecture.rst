@@ -17,7 +17,9 @@ High Level Description
 
 The following diagram summarizes ceilometer logical architecture:
 
-.. image:: https://docs.google.com/drawings/pub?id=1_cIFir6HS6jSkPw7chrmyu8DGE2ZgXk79Kbj8nw-Hqo&w=800
+.. The image source can be found at https://docs.google.com/drawings/d/1_cIFir6HS6jSkPw7chrmyu8DGE2ZgXk79Kbj8nw-Hqo/edit
+
+.. image:: ./Ceilometer_Architecture.png
 
 As shown in the above diagram, there are 5 basic components to the system:
 
