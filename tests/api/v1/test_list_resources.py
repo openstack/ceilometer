@@ -189,4 +189,3 @@ class TestListResources(tests_api.TestBase):
         data = self.get('/projects/project-id/resources')
         ids = [r['resource_id'] for r in data['resources']]
         self.assertEquals(['resource-id'], ids)
-

@@ -167,7 +167,8 @@ INSTANCE_EXISTS = {
 
 class TestNotifications(unittest.TestCase):
     def test_process_notification(self):
-        info = notifications.Instance.process_notification(INSTANCE_CREATE_END)[0]
+        info = notifications.Instance.process_notification(
+                INSTANCE_CREATE_END)[0]
 
         for name, actual, expected in [
             ('counter_name', info.name, 'instance'),
