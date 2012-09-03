@@ -34,6 +34,7 @@ setuptools.setup(
     setup_requires=['setuptools-git>=0.4'],
     scripts=['bin/ceilometer-agent-compute',
              'bin/ceilometer-agent-central',
+             'bin/ceilometer-api',
              'bin/ceilometer-collector'],
     py_modules=[],
     entry_points=textwrap.dedent("""

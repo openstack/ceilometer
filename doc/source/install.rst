@@ -61,15 +61,12 @@ ceilometer::
 Running the API Server
 ======================
 
-There is not currently a wrapper script for the ceilometer API server,
-so it must be started manually.
-
 .. index::
    double: installing; API
 
 ::
 
-  $ python -m ceilometer.api
+  $ ceilometer-api
 
 .. note::
 
