@@ -107,6 +107,12 @@ def list_resources_by_project(project):
     """Return a list of resources owned by the project.
 
     :param project: The ID of the owning project.
+    :param start_timestamp: Limits resources by last update time >= this value.
+        (optional)
+    :type start_timestamp: ISO date in UTC
+    :param end_timestamp: Limits resources by last update time < this value.
+        (optional)
+    :type end_timestamp: ISO date in UTC
     """
     return _list_resources(
         project=project,
@@ -118,6 +124,13 @@ def list_resources_by_project(project):
 @blueprint.route('/resources')
 def list_all_resources():
     """Return a list of all known resources.
+
+    :param start_timestamp: Limits resources by last update time >= this value.
+        (optional)
+    :type start_timestamp: ISO date in UTC
+    :param end_timestamp: Limits resources by last update time < this value.
+        (optional)
+    :type end_timestamp: ISO date in UTC
     """
     return _list_resources()
 
@@ -128,6 +141,12 @@ def list_resources_by_source(source):
     data.
 
     :param source: The ID of the reporting source.
+    :param start_timestamp: Limits resources by last update time >= this value.
+        (optional)
+    :type start_timestamp: ISO date in UTC
+    :param end_timestamp: Limits resources by last update time < this value.
+        (optional)
+    :type end_timestamp: ISO date in UTC
     """
     return _list_resources(source=source)
 
@@ -137,6 +156,12 @@ def list_resources_by_user(user):
     """Return a list of resources owned by the user.
 
     :param user: The ID of the owning user.
+    :param start_timestamp: Limits resources by last update time >= this value.
+        (optional)
+    :type start_timestamp: ISO date in UTC
+    :param end_timestamp: Limits resources by last update time < this value.
+        (optional)
+    :type end_timestamp: ISO date in UTC
     """
     return _list_resources(user=user)
 
@@ -222,6 +247,12 @@ def list_events_by_project(project, meter):
 
     :param project: The ID of the project.
     :param meter: The name of the meter.
+    :param start_timestamp: Limits events by timestamp >= this value.
+        (optional)
+    :type start_timestamp: ISO date in UTC
+    :param end_timestamp: Limits events by timestamp < this value.
+        (optional)
+    :type end_timestamp: ISO date in UTC
     """
     return _list_events(project=project,
                         meter=meter,
@@ -234,6 +265,12 @@ def list_events_by_resource(resource, meter):
 
     :param resource: The ID of the resource.
     :param meter: The name of the meter.
+    :param start_timestamp: Limits events by timestamp >= this value.
+        (optional)
+    :type start_timestamp: ISO date in UTC
+    :param end_timestamp: Limits events by timestamp < this value.
+        (optional)
+    :type end_timestamp: ISO date in UTC
     """
     return _list_events(resource=resource,
                         meter=meter,
@@ -246,6 +283,12 @@ def list_events_by_source(source, meter):
 
     :param source: The ID of the reporting source.
     :param meter: The name of the meter.
+    :param start_timestamp: Limits events by timestamp >= this value.
+        (optional)
+    :type start_timestamp: ISO date in UTC
+    :param end_timestamp: Limits events by timestamp < this value.
+        (optional)
+    :type end_timestamp: ISO date in UTC
     """
     return _list_events(source=source,
                         meter=meter,
@@ -258,6 +301,12 @@ def list_events_by_user(user, meter):
 
     :param user: The ID of the user.
     :param meter: The name of the meter.
+    :param start_timestamp: Limits events by timestamp >= this value.
+        (optional)
+    :type start_timestamp: ISO date in UTC
+    :param end_timestamp: Limits events by timestamp < this value.
+        (optional)
+    :type end_timestamp: ISO date in UTC
     """
     return _list_events(user=user,
                         meter=meter,
