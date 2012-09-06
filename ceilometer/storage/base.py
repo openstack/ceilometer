@@ -125,9 +125,9 @@ class Connection(object):
         """
 
     @abc.abstractmethod
-    def get_duration_sum(self, event_filter):
-        """Return the sum of time for the events described by the
-        query parameters.
+    def get_event_interval(self, event_filter):
+        """Return the min and max timestamps from events,
+        using the event_filter to limit the events seen.
 
-        The filter must have a meter value set.
+        ( datetime.datetime(), datetime.datetime() )
         """

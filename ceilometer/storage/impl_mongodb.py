@@ -130,14 +130,6 @@ class Connection(base.Connection):
         }
         """)
 
-    # JavaScript function for doing map-reduce to get a counter
-    # duration total.
-    MAP_COUNTER_DURATION = bson.code.Code("""
-        function() {
-            emit(this.resource_id, this.counter_duration);
-        }
-        """)
-
     # JavaScript function for doing map-reduce to get a maximum value
     # from a range.  (from
     # http://cookbook.mongodb.org/patterns/finding_max_and_min/)
@@ -157,6 +149,28 @@ class Connection(base.Connection):
             return total;
         }
         """)
+
+    # MAP_TIMESTAMP and REDUCE_MIN_MAX are based on the recipe
+    # http://cookbook.mongodb.org/patterns/finding_max_and_min_values_for_a_key
+    MAP_TIMESTAMP = bson.code.Code("""
+    function () {
+        emit('timestamp', { min : this.timestamp,
+                            max : this.timestamp } )
+    }
+    """)
+
+    REDUCE_MIN_MAX = bson.code.Code("""
+    function (key, values) {
+        var res = values[0];
+        for ( var i=1; i<values.length; i++ ) {
+            if ( values[i].min < res.min )
+               res.min = values[i].min;
+            if ( values[i].max > res.max )
+               res.max = values[i].max;
+        }
+        return res;
+    }
+    """)
 
     def __init__(self, conf):
         opts = self._parse_connection_url(conf.database_connection)
@@ -373,15 +387,46 @@ class Connection(base.Connection):
         return ({'resource_id': r['_id'], 'value': r['value']}
                 for r in results['results'])
 
-    def get_duration_sum(self, event_filter):
-        """Return the sum of time for the events described by the
-        query parameters.
+    def get_event_interval(self, event_filter):
+        """Return the min and max timestamps from events,
+        using the event_filter to limit the events seen.
+
+        ( datetime.datetime(), datetime.datetime() )
         """
         q = make_query_from_filter(event_filter)
-        results = self.db.meter.map_reduce(self.MAP_COUNTER_DURATION,
-                                           self.REDUCE_MAX,
+        results = self.db.meter.map_reduce(self.MAP_TIMESTAMP,
+                                           self.REDUCE_MIN_MAX,
                                            {'inline': 1},
                                            query=q,
                                            )
-        return ({'resource_id': r['_id'], 'value': r['value']}
-                for r in results['results'])
+        if results['results']:
+            answer = results['results'][0]['value']
+            a_min = answer['min']
+            a_max = answer['max']
+            if hasattr(a_min, 'valueOf') and a_min.valueOf is not None:
+                # NOTE (dhellmann): HACK ALERT
+                #
+                # The real MongoDB server can handle Date objects and
+                # the driver converts them to datetime instances
+                # correctly but the in-memory implementation in MIM
+                # (used by the tests) returns a spidermonkey.Object
+                # representing the "value" dictionary and there
+                # doesn't seem to be a way to recursively introspect
+                # that object safely to convert the min and max values
+                # back to datetime objects. In this method, we know
+                # what type the min and max values are expected to be,
+                # so it is safe to do the conversion
+                # here. JavaScript's time representation uses
+                # different units than Python's, so we divide to
+                # convert to the right units and then create the
+                # datetime instances to return.
+                #
+                # The issue with MIM is documented at
+                # https://sourceforge.net/p/merciless/bugs/3/
+                #
+                a_min = datetime.datetime.fromtimestamp(
+                    a_min.valueOf() // 1000)
+                a_max = datetime.datetime.fromtimestamp(
+                    a_max.valueOf() // 1000)
+            return (a_min, a_max)
+        return (None, None)

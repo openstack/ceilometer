@@ -85,12 +85,18 @@ class Connection(impl_mongodb.Connection):
 
 class MongoDBEngineTestBase(unittest.TestCase):
 
+    # Only instantiate the database config
+    # and connection once, since spidermonkey
+    # causes issues if we allocate too many
+    # Runtime objects in the same process.
+    # http://davisp.lighthouseapp.com/projects/26898/tickets/22
+    conf = mox.Mox().CreateMockAnything()
+    conf.database_connection = 'mongodb://localhost/testdb'
+    conn = Connection(conf)
+
     def setUp(self):
         super(MongoDBEngineTestBase, self).setUp()
 
-        self.conf = mox.Mox().CreateMockAnything()
-        self.conf.database_connection = 'mongodb://localhost/testdb'
-        self.conn = Connection(self.conf)
         self.conn.conn.drop_database('testdb')
         self.db = self.conn.conn['testdb']
         self.conn.db = self.db
@@ -428,3 +434,109 @@ class SumTest(MongoDBEngineTestBase):
                       for r in results)
         assert counts['resource-id'] == 1
         assert set(counts.keys()) == set(['resource-id'])
+
+
+class TestGetEventInterval(MongoDBEngineTestBase):
+
+    def setUp(self):
+        super(TestGetEventInterval, self).setUp()
+
+        # NOTE(dhellmann): mim requires spidermonkey to implement the
+        # map-reduce functions, so if we can't import it then just
+        # skip these tests unless we aren't using mim.
+        try:
+            import spidermonkey
+        except:
+            if isinstance(self.conn.conn, mim.Connection):
+                raise skip.SkipTest('requires spidermonkey')
+
+        # Create events relative to the range and pretend
+        # that the intervening events exist.
+
+        self.start = datetime.datetime(2012, 8, 28, 0, 0)
+        self.end = datetime.datetime(2012, 8, 29, 0, 0)
+
+        self.early1 = self.start - datetime.timedelta(minutes=20)
+        self.early2 = self.start - datetime.timedelta(minutes=10)
+
+
+        self.middle1 = self.start + datetime.timedelta(minutes=10)
+        self.middle2 = self.end - datetime.timedelta(minutes=10)
+
+
+        self.late1 = self.end + datetime.timedelta(minutes=10)
+        self.late2 = self.end + datetime.timedelta(minutes=20)
+
+        self._filter = storage.EventFilter(
+            resource='resource-id',
+            meter='instance',
+            start=self.start,
+            end=self.end,
+            )
+
+    def _make_events(self, *timestamps):
+        for t in timestamps:
+            c = counter.Counter(
+                'test',
+                'instance',
+                'cumulative',
+                1,
+                'user-id',
+                'project-id',
+                'resource-id',
+                timestamp=t,
+                duration=0,
+                resource_metadata={'display_name': 'test-server',
+                                   }
+                )
+            msg = meter.meter_message_from_counter(c)
+            self.conn.record_metering_data(msg)
+
+    def test_before_range(self):
+        self._make_events(self.early1, self.early2)
+        s, e = self.conn.get_event_interval(self._filter)
+        assert s is None
+        assert e is None
+
+    def test_overlap_range_start(self):
+        self._make_events(self.early1, self.start, self.middle1)
+        s, e = self.conn.get_event_interval(self._filter)
+        assert s == self.start
+        assert e == self.middle1
+
+    def test_within_range(self):
+        self._make_events(self.middle1, self.middle2)
+        s, e = self.conn.get_event_interval(self._filter)
+        assert s == self.middle1
+        assert e == self.middle2
+
+    def test_within_range_zero_duration(self):
+        self._make_events(self.middle1)
+        s, e = self.conn.get_event_interval(self._filter)
+        assert s == self.middle1
+        assert e == self.middle1
+
+    def test_within_range_zero_duration_two_events(self):
+        self._make_events(self.middle1, self.middle1)
+        s, e = self.conn.get_event_interval(self._filter)
+        assert s == self.middle1
+        assert e == self.middle1
+
+    def test_overlap_range_end(self):
+        self._make_events(self.middle2, self.end, self.late1)
+        s, e = self.conn.get_event_interval(self._filter)
+        assert s == self.middle2
+        assert e == self.middle2
+
+    def test_overlap_range_end_with_offset(self):
+        self._make_events(self.middle2, self.end, self.late1)
+        self._filter.end = self.late1
+        s, e = self.conn.get_event_interval(self._filter)
+        assert s == self.middle2
+        assert e == self.end
+
+    def test_after_range(self):
+        self._make_events(self.late1, self.late2)
+        s, e = self.conn.get_event_interval(self._filter)
+        assert s is None
+        assert e is None

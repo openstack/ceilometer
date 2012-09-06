@@ -22,11 +22,13 @@ import json
 import logging
 import os
 import unittest
+import urllib
 
 import flask
 from ming import mim
 import mock
 
+from ceilometer.tests import base as test_base
 from ceilometer.api import v1
 from ceilometer.storage import impl_mongodb
 
@@ -50,7 +52,7 @@ class Connection(impl_mongodb.Connection):
             return mim.Connection()
 
 
-class TestBase(unittest.TestCase):
+class TestBase(test_base.TestCase):
 
     DBNAME = 'testdb'
 
@@ -74,8 +76,12 @@ class TestBase(unittest.TestCase):
     def tearDown(self):
         self.conn.conn.drop_database(self.DBNAME)
 
-    def get(self, path):
-        rv = self.test_app.get(path)
+    def get(self, path, **kwds):
+        if kwds:
+            query = path + '?' + urllib.urlencode(kwds)
+        else:
+            query = path
+        rv = self.test_app.get(query)
         try:
             data = json.loads(rv.data)
         except ValueError:
