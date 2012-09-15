@@ -18,7 +18,7 @@
 """Storage backend management
 """
 
-import pkg_resources
+from stevedore import driver
 
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import cfg
@@ -53,20 +53,10 @@ def get_engine(conf):
     engine_name = urlparse(conf.database_connection).scheme
     LOG.debug('looking for %r driver in %r',
               engine_name, STORAGE_ENGINE_NAMESPACE)
-    for ep in pkg_resources.iter_entry_points(STORAGE_ENGINE_NAMESPACE,
-                                              engine_name):
-        try:
-            engine_class = ep.load()
-            engine = engine_class()
-        except Exception as err:
-            LOG.error('Failed to load storage engine %s: %s',
-                      engine_name, err)
-            LOG.exception(err)
-            raise
-        LOG.info('Loaded %s storage engine %r', engine_name, ep)
-        return engine
-    else:
-        raise RuntimeError('No %r storage engine found' % engine_name)
+    mgr = driver.DriverManager(STORAGE_ENGINE_NAMESPACE,
+                               engine_name,
+                               invoke_on_load=True)
+    return mgr.driver
 
 
 def get_connection(conf):
