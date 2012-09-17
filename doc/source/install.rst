@@ -53,7 +53,7 @@ ceilometer::
 
    # Configure the notifier to talk to the message queue
    # and turn on usage audit events
-   EXTRA_OPTS=(notification_driver=nova.openstack.common.notifier.rabbit_notifier)
+   EXTRA_OPTS=(notification_driver=nova.openstack.common.notifier.rabbit_notifier,ceilometer.compute.nova_notifier)
 
    # Enable the ceilometer services
    enable_service ceilometer-acompute,ceilometer-acentral,ceilometer-collector
