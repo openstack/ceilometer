@@ -58,12 +58,9 @@ class AgentManager(manager.Manager):
                         PLUGIN_NAMESPACE)
         return
 
-    def periodic_tasks(self, context, raise_on_error=False):
-        """Tasks to be run at a periodic interval."""
-        # FIXME(dhellmann): How do we get a list of instances without
-        # talking directly to the database?
-        for instance in self.db.instance_get_all_by_host(context, self.host):
-            for name, pollster in self.pollsters:
+    def poll_instance(self, context, instance):
+        """Poll one instance."""
+        for name, pollster in self.pollsters:
                 try:
                     LOG.info('polling %s', name)
                     for c in pollster.get_counters(self, instance):
@@ -73,3 +70,10 @@ class AgentManager(manager.Manager):
                     LOG.warning('Continuing after error from %s for %s: %s',
                                 name, instance.name, err)
                     LOG.exception(err)
+
+    def periodic_tasks(self, context, raise_on_error=False):
+        """Tasks to be run at a periodic interval."""
+        # FIXME(dhellmann): How do we get a list of instances without
+        # talking directly to the database?
+        for instance in self.db.instance_get_all_by_host(context, self.host):
+            self.poll_instance(context, instance)
