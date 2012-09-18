@@ -53,6 +53,8 @@ setuptools.setup(
 
     [ceilometer.poll.central]
     network_floatingip = ceilometer.network.floatingip:FloatingIPPollster
+    image = ceilometer.image.glance:ImagePollster
+    image_size = ceilometer.image.glance:ImageSizePollster
 
     [ceilometer.storage]
     log = ceilometer.storage.impl_log:LogStorage

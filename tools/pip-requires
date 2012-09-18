@@ -1,4 +1,5 @@
 http://tarballs.openstack.org/nova/nova-master.tar.gz
+http://tarballs.openstack.org/glance/glance-master.tar.gz
 webob
 kombu
 iso8601
