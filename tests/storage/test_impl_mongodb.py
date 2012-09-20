@@ -459,10 +459,8 @@ class TestGetEventInterval(MongoDBEngineTestBase):
         self.early1 = self.start - datetime.timedelta(minutes=20)
         self.early2 = self.start - datetime.timedelta(minutes=10)
 
-
         self.middle1 = self.start + datetime.timedelta(minutes=10)
         self.middle2 = self.end - datetime.timedelta(minutes=10)
-
 
         self.late1 = self.end + datetime.timedelta(minutes=10)
         self.late2 = self.end + datetime.timedelta(minutes=20)

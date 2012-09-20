@@ -90,7 +90,8 @@ class TestImagePollster(base.TestCase):
         super(TestImagePollster, self).setUp()
         self.context = context.RequestContext('admin', 'admin', is_admin=True)
         self.manager = manager.AgentManager()
-        self.stubs.Set(glance._Base, 'iter_images', self.fake_glance_iter_images)
+        self.stubs.Set(glance._Base, 'iter_images',
+                       self.fake_glance_iter_images)
 
     def test_glance_image_counter(self):
         counters = list(glance.ImagePollster().get_counters(self.manager,
@@ -104,5 +105,6 @@ class TestImagePollster(base.TestCase):
                                                                 self.context))
         self.assertEqual(len(counters), 3)
         for image in IMAGE_LIST:
-            self.assert_(any(map(lambda counter: counter.volume == image['size'],
+            self.assert_(
+                any(map(lambda counter: counter.volume == image['size'],
                                  counters)))

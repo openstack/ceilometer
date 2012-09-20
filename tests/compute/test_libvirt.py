@@ -132,7 +132,7 @@ class TestNetPollster(test_base.TestCase):
         domain.XMLDesc(0).AndReturn(dom_xml)
         self.mox.ReplayAll()
         interfaces = self.pollster._get_vnics(conn, self.instance)
-        self.assertTrue('vnet1' in  [x['name'] for x in interfaces])
+        self.assertTrue('vnet1' in [x['name'] for x in interfaces])
         self.assertTrue('fa:16:3e:71:ec:6d', [x['mac'] for x in interfaces])
         self.assertTrue([x['dhcpserver'] for x in interfaces])
 
