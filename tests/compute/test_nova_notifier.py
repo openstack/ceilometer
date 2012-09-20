@@ -118,7 +118,6 @@ class TestNovaNotifier(base.TestCase):
                        lambda context, instance: {})
         self.stubs.Set(db, 'instance_update_and_get_original',
                        lambda context, uuid, kwargs: (self.instance, self.instance))
-        self.stubs.Set(self.compute.resource_tracker, 'free_resources', self.do_nothing)
 
         self.stubs.Set(publish, 'publish_counter', self.do_nothing)
         nova_notifier.notify.manager.pollsters = [('test', self.Pollster())]
