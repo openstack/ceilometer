@@ -35,5 +35,5 @@ def prepare_service(argv=[]):
     # to have the RPC and DB access work correctly because we are
     # still using the Service object out of nova directly. We need to
     # move that into openstack.common.
-    flags.FLAGS(argv[1:])
+    flags.parse_args(argv)
     log.setup('ceilometer')
