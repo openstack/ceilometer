@@ -21,6 +21,11 @@ import textwrap
 
 import setuptools
 
+from ceilometer.openstack.common import setup
+
+requires = setup.parse_requirements()
+depend_links = setup.parse_dependency_links()
+
 setuptools.setup(
     name='ceilometer',
     version='0',
@@ -37,6 +42,8 @@ setuptools.setup(
              'bin/ceilometer-api',
              'bin/ceilometer-collector'],
     py_modules=[],
+    install_requires=requires,
+    dependency_links=depend_links,
     entry_points=textwrap.dedent("""
     [ceilometer.collector]
     instance = ceilometer.compute.notifications:Instance

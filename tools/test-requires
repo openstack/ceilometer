@@ -3,7 +3,6 @@ coverage
 pep8>=1.0
 mock
 mox
-glance>=2011.3.1
 python-glanceclient
 # NOTE(dhellmann): Ming is necessary to provide the Mongo-in-memory
 # implementation of MongoDB. The original source for Ming is at
@@ -13,4 +12,6 @@ python-glanceclient
 # github to make it easier to install, then ended up making some
 # changes to it so it would be compatible with PyMongo's API.
 https://github.com/dreamhost/Ming/zipball/master#egg=Ming
+http://tarballs.openstack.org/nova/nova-master.tar.gz
+http://tarballs.openstack.org/glance/glance-master.tar.gz
 setuptools-git>=0.4
