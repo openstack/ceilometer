@@ -26,6 +26,12 @@ from ceilometer.compute import instance
 class _Base(plugin.NotificationBase):
     """Convert compute.instance.* notifications into Counters
     """
+    metadata_keys = instance.INSTANCE_PROPERTIES
+
+    def notification_to_metadata(self, event):
+        metadata = super(_Base, self).notification_to_metadata(event)
+        metadata['instance_type'] = event['payload']['instance_type_id']
+        return metadata
 
     @staticmethod
     def get_event_types():
@@ -37,9 +43,7 @@ class _Base(plugin.NotificationBase):
 
 class Instance(_Base):
 
-    @staticmethod
-    def process_notification(message):
-        metadata = instance.get_metadata_from_event(message)
+    def process_notification(self, message):
         return [
             counter.Counter(source='?',
                             name='instance',
@@ -50,15 +54,15 @@ class Instance(_Base):
                             resource_id=message['payload']['instance_id'],
                             timestamp=message['timestamp'],
                             duration=0,
-                            resource_metadata=metadata,
+                            resource_metadata=self.notification_to_metadata(
+                                message),
                             ),
             ]
 
 
 class Memory(_Base):
 
-    @staticmethod
-    def process_notification(message):
+    def process_notification(self, message):
         return [
             counter.Counter(source='?',
                             name='memory',
@@ -69,14 +73,15 @@ class Memory(_Base):
                             resource_id=message['payload']['instance_id'],
                             timestamp=message['timestamp'],
                             duration=0,
-                            resource_metadata={}),
+                            resource_metadata=self.notification_to_metadata(
+                                message),
+                        ),
             ]
 
 
 class VCpus(_Base):
 
-    @staticmethod
-    def process_notification(message):
+    def process_notification(self, message):
         return [
             counter.Counter(source='?',
                             name='vcpus',
@@ -87,14 +92,15 @@ class VCpus(_Base):
                             resource_id=message['payload']['instance_id'],
                             timestamp=message['timestamp'],
                             duration=0,
-                            resource_metadata={}),
+                            resource_metadata=self.notification_to_metadata(
+                                message),
+                        ),
             ]
 
 
 class RootDiskSize(_Base):
 
-    @staticmethod
-    def process_notification(message):
+    def process_notification(self, message):
         return [
             counter.Counter(source='?',
                             name='root_disk_size',
@@ -105,14 +111,15 @@ class RootDiskSize(_Base):
                             resource_id=message['payload']['instance_id'],
                             timestamp=message['timestamp'],
                             duration=0,
-                            resource_metadata={}),
+                            resource_metadata=self.notification_to_metadata(
+                                message),
+                        ),
             ]
 
 
 class EphemeralDiskSize(_Base):
 
-    @staticmethod
-    def process_notification(message):
+    def process_notification(self, message):
         return [
             counter.Counter(source='?',
                             name='ephemeral_disk_size',
@@ -123,16 +130,16 @@ class EphemeralDiskSize(_Base):
                             resource_id=message['payload']['instance_id'],
                             timestamp=message['timestamp'],
                             duration=0,
-                            resource_metadata={}),
+                            resource_metadata=self.notification_to_metadata(
+                                message),
+                        ),
             ]
 
 
 class InstanceFlavor(_Base):
 
-    @staticmethod
-    def process_notification(message):
+    def process_notification(self, message):
         counters = []
-        metadata = instance.get_metadata_from_event(message)
         instance_type = message.get('payload', {}).get('instance_type')
         if instance_type:
             counters.append(
@@ -146,7 +153,8 @@ class InstanceFlavor(_Base):
                     resource_id=message['payload']['instance_id'],
                     timestamp=message['timestamp'],
                     duration=0,
-                    resource_metadata=metadata,
-                    )
+                    resource_metadata=self.notification_to_metadata(
+                        message),
                 )
+            )
         return counters
