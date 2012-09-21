@@ -43,6 +43,7 @@ LOG = log.getLogger(__name__)
 
 
 COMPUTE_COLLECTOR_NAMESPACE = 'ceilometer.collector.compute'
+VOLUME_COLLECTOR_NAMESPACE = 'ceilometer.collector.volume'
 
 
 class CollectorManager(manager.Manager):
@@ -61,6 +62,10 @@ class CollectorManager(manager.Manager):
             COMPUTE_COLLECTOR_NAMESPACE,
             self._publish_counter,
             )
+        self.volume_handler = dispatcher.NotificationDispatcher(
+            VOLUME_COLLECTOR_NAMESPACE,
+            self._publish_counter,
+            )
         # FIXME(dhellmann): Should be using create_worker(), except
         # that notification messages do not conform to the RPC
         # invocation protocol (they do not include a "method"
@@ -68,6 +73,9 @@ class CollectorManager(manager.Manager):
         self.connection.declare_topic_consumer(
             topic='%s.info' % cfg.CONF.notification_topics[0],
             callback=self.compute_handler.notify)
+        self.connection.declare_topic_consumer(
+            topic='%s.info' % cfg.CONF.notification_topics[0],
+            callback=self.volume_handler.notify)
 
         # Set ourselves up as a separate worker for the metering data,
         # since the default for manager is to use create_consumer().

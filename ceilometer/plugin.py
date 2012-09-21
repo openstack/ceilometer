@@ -35,6 +35,14 @@ class NotificationBase(object):
     def process_notification(self, message):
         """Return a sequence of Counter instances for the given message."""
 
+    def notification_to_metadata(self, event):
+        """Transform a payload dict to a metadata dict."""
+        metadata = dict([(k, event['payload'].get(k))
+                         for k in self.metadata_keys])
+        metadata['event_type'] = event['event_type']
+        metadata['host'] = event['publisher_id']
+        return metadata
+
 
 class PollsterBase(object):
     """Base class for plugins that support the polling API."""

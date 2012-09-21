@@ -46,6 +46,10 @@ setuptools.setup(
     root_disk_size = ceilometer.compute.notifications:RootDiskSize
     ephemeral_disk_size = ceilometer.compute.notifications:EphemeralDiskSize
 
+    [ceilometer.collector.volume]
+    volume = ceilometer.volume.notifications:Volume
+    volume_size = ceilometer.volume.notifications:VolumeSize
+
     [ceilometer.poll.compute]
     libvirt_diskio = ceilometer.compute.libvirt:DiskIOPollster
     libvirt_cpu = ceilometer.compute.libvirt:CPUPollster
