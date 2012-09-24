@@ -38,15 +38,13 @@ setuptools.setup(
              'bin/ceilometer-collector'],
     py_modules=[],
     entry_points=textwrap.dedent("""
-    [ceilometer.collector.compute]
+    [ceilometer.collector]
     instance = ceilometer.compute.notifications:Instance
     instance_flavor = ceilometer.compute.notifications:InstanceFlavor
     memory = ceilometer.compute.notifications:Memory
     vcpus = ceilometer.compute.notifications:VCpus
     root_disk_size = ceilometer.compute.notifications:RootDiskSize
     ephemeral_disk_size = ceilometer.compute.notifications:EphemeralDiskSize
-
-    [ceilometer.collector.volume]
     volume = ceilometer.volume.notifications:Volume
     volume_size = ceilometer.volume.notifications:VolumeSize
 

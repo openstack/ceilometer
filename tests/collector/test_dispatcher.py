@@ -82,16 +82,16 @@ TEST_NOTICE = {
 def test_notify():
     results = []
     d = StubDispatcher(None, lambda x: results.append(x))
-    d.notify(TEST_NOTICE)
+    d.notify("notifications.info", TEST_NOTICE)
     assert len(results) >= 1
     counter = results[0]
     assert counter.name == 'instance'
 
 
-def test_load_compute_plugins():
+def test_load_plugins():
     results = []
     d = dispatcher.NotificationDispatcher(
-        'ceilometer.collector.compute',
+        'ceilometer.collector',
         lambda x: results.append(x)
         )
     assert d.handlers, 'No handlers were loaded'
@@ -109,11 +109,21 @@ def test_load_no_plugins():
 def test_notify_through_plugin():
     results = []
     d = dispatcher.NotificationDispatcher(
-        'ceilometer.collector.compute',
+        'ceilometer.collector',
         lambda x: results.append(x)
         )
-    d.notify(TEST_NOTICE)
+    d.notify("notifications.info", TEST_NOTICE)
     assert len(results) >= 1
     results_name = [result.name for result in results]
     assert 'instance' in results_name
     assert 'memory' in results_name
+
+
+def test_notify_topics():
+    results = []
+    d = dispatcher.NotificationDispatcher(
+        'ceilometer.collector',
+        lambda x: results.append(x)
+        )
+    d.notify("dont.care", TEST_NOTICE)
+    assert len(results) == 0

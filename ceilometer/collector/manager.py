@@ -16,6 +16,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import functools
+
 from nova import context
 from nova import manager
 
@@ -28,8 +30,7 @@ from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer.openstack.common.rpc import dispatcher as rpc_dispatcher
 
-# FIXME(dhellmann): There must be another way to do this.  Import
-# rabbit_notifier to register notification_topics flag
+# Import rabbit_notifier to register notification_topics flag
 import ceilometer.openstack.common.notifier.rabbit_notifier
 try:
     import ceilometer.openstack.common.rpc as rpc
@@ -40,8 +41,7 @@ except ImportError:
 LOG = log.getLogger(__name__)
 
 
-COMPUTE_COLLECTOR_NAMESPACE = 'ceilometer.collector.compute'
-VOLUME_COLLECTOR_NAMESPACE = 'ceilometer.collector.volume'
+COLLECTOR_NAMESPACE = 'ceilometer.collector'
 
 
 class CollectorManager(manager.Manager):
@@ -56,24 +56,18 @@ class CollectorManager(manager.Manager):
         self.storage_engine = storage.get_engine(cfg.CONF)
         self.storage_conn = self.storage_engine.get_connection(cfg.CONF)
 
-        self.compute_handler = dispatcher.NotificationDispatcher(
-            COMPUTE_COLLECTOR_NAMESPACE,
-            self._publish_counter,
-            )
-        self.volume_handler = dispatcher.NotificationDispatcher(
-            VOLUME_COLLECTOR_NAMESPACE,
+        self.handler = dispatcher.NotificationDispatcher(
+            COLLECTOR_NAMESPACE,
             self._publish_counter,
             )
         # FIXME(dhellmann): Should be using create_worker(), except
         # that notification messages do not conform to the RPC
         # invocation protocol (they do not include a "method"
         # parameter).
-        self.connection.declare_topic_consumer(
-            topic='%s.info' % cfg.CONF.notification_topics[0],
-            callback=self.compute_handler.notify)
-        self.connection.declare_topic_consumer(
-            topic='%s.info' % cfg.CONF.notification_topics[0],
-            callback=self.volume_handler.notify)
+        for topic in self.handler.topics:
+            self.connection.declare_topic_consumer(
+                topic=topic,
+                callback=functools.partial(self.handler.notify, topic))
 
         # Set ourselves up as a separate worker for the metering data,
         # since the default for manager is to use create_consumer().

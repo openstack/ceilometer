@@ -34,6 +34,7 @@ class NotificationDispatcher(object):
         self.plugin_namespace = plugin_namespace
         self.publish_func = publish_func
         self.handlers = {}
+        self.topics = set()
         self._load_plugins()
 
     def _load_plugins(self):
@@ -42,13 +43,14 @@ class NotificationDispatcher(object):
             LOG.info('attempting to load notification handler for %s:%s',
                      self.plugin_namespace, ep.name)
             try:
-                plugin_class = ep.load()
-                plugin = plugin_class()
                 # FIXME(dhellmann): Currently assumes all plugins are
                 # enabled when they are discovered and
                 # importable. Need to add check against global
                 # configuration flag and check that asks the plugin if
                 # it should be enabled.
+                plugin_class = ep.load()
+                plugin = plugin_class()
+                self.topics.update(plugin.topics)
                 for event_type in plugin.get_event_types():
                     LOG.info('subscribing %s handler to %s events',
                              ep.name, event_type)
@@ -61,15 +63,16 @@ class NotificationDispatcher(object):
             LOG.warning('Failed to load any notification handlers for %s',
                         self.plugin_namespace)
 
-    def notify(self, body):
+    def notify(self, topic, body):
         """Dispatch the notification to the appropriate handler
         and publish the counters returned.
         """
         event_type = body.get('event_type')
         LOG.info('NOTIFICATION: %s', event_type)
         for handler in self.handlers.get(event_type, []):
-            for c in handler.process_notification(body):
-                LOG.info('COUNTER: %s', c)
-                # FIXME(dhellmann): Spawn green thread?
-                self.publish_func(c)
+            if topic in handler.topics:
+                for c in handler.process_notification(body):
+                    LOG.info('COUNTER: %s', c)
+                    # FIXME(dhellmann): Spawn green thread?
+                    self.publish_func(c)
         return

@@ -159,12 +159,9 @@ bus for data being provided by the pollsters via the agent as well as
 notification messages from other OpenStack components such as nova,
 glance, quantum, and swift.
 
-The collector loads one or more *listener* plugins, using a namespace
-under ``ceilometer.collector``. The namespace controls the exchange
-and topic where the listener is subscribed. For example,
-``ceilometer.collector.compute`` listens on the ``nova`` exchange to
-the ``notifications.info`` topic while ``ceilometer.collector.image``
-listens on the ``glance`` exchange for ``notifications.info``.
+The collector loads one or more *listener* plugins, using the namespace
+``ceilometer.collector``. Each plugin can listen to any topics, but by
+default it will listen to ``notifications.info``.
 
 The plugin provides a method to list the event types it wants and a
 callback for processing incoming messages. The registered name of the
