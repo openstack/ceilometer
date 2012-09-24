@@ -17,12 +17,10 @@
 # under the License.
 
 from nova import context
-from nova import flags
 from nova import manager
 
 from ceilometer import meter
 from ceilometer import publish
-from ceilometer import rpc
 from ceilometer import storage
 from ceilometer.collector import dispatcher
 from ceilometer.openstack.common import cfg
@@ -34,10 +32,10 @@ from ceilometer.openstack.common.rpc import dispatcher as rpc_dispatcher
 # rabbit_notifier to register notification_topics flag
 import ceilometer.openstack.common.notifier.rabbit_notifier
 try:
-    import nova.openstack.common.rpc as nova_rpc
+    import ceilometer.openstack.common.rpc as rpc
 except ImportError:
     # For Essex
-    import nova.rpc as nova_rpc
+    import nova.rpc as rpc
 
 LOG = log.getLogger(__name__)
 
@@ -52,7 +50,7 @@ class CollectorManager(manager.Manager):
         # Use the nova configuration flags to get
         # a connection to the RPC mechanism nova
         # is using.
-        self.connection = nova_rpc.create_connection()
+        self.connection = rpc.create_connection()
 
         storage.register_opts(cfg.CONF)
         self.storage_engine = storage.get_engine(cfg.CONF)
