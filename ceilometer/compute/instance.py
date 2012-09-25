@@ -41,21 +41,6 @@ INSTANCE_PROPERTIES = [
     ]
 
 
-def get_metadata_from_event(body):
-    """Return a metadata dictionary for the instance mentioned in the
-    notification event.
-    """
-    instance = body['payload']
-    metadata = {
-        'event_type': body['event_type'],
-        'instance_type': instance['instance_type_id'],
-        'host': body['publisher_id'],
-        }
-    for name in INSTANCE_PROPERTIES:
-        metadata[name] = instance.get(name, u'')
-    return metadata
-
-
 def get_metadata_from_dbobject(instance):
     """Return a metadata dictionary for the instance.
     """
