@@ -38,21 +38,6 @@ cfg.CONF.register_opts(
         cfg.IntOpt('glance_registry_port',
                    default=9191,
                    help="URL of Glance API server"),
-        cfg.StrOpt('glance_username',
-                   default="glance",
-                   help="Username to use for Glance access"),
-        cfg.StrOpt('glance_password',
-                   default="admin",
-                   help="Password to use for Glance access"),
-        cfg.StrOpt('glance_tenant_id',
-                   default="",
-                   help="Tenant ID to use for Glance access"),
-        cfg.StrOpt('glance_tenant_name',
-                   default="admin",
-                   help="Tenant name to use for Glance access"),
-        cfg.StrOpt('glance_auth_url',
-                   default="http://localhost:5000/v2.0",
-                   help="Auth URL to use for Glance access"),
     ])
 
 
@@ -60,11 +45,11 @@ class _Base(plugin.PollsterBase):
 
     @staticmethod
     def get_registry_client():
-        k = ksclient.Client(username=cfg.CONF.glance_username,
-                            password=cfg.CONF.glance_password,
-                            tenant_id=cfg.CONF.glance_tenant_id,
-                            tenant_name=cfg.CONF.glance_tenant_name,
-                            auth_url=cfg.CONF.glance_auth_url)
+        k = ksclient.Client(username=cfg.CONF.os_username,
+                            password=cfg.CONF.os_password,
+                            tenant_id=cfg.CONF.os_tenant_id,
+                            tenant_name=cfg.CONF.os_tenant_name,
+                            auth_url=cfg.CONF.os_auth_url)
         return client.RegistryClient(cfg.CONF.glance_registry_host,
                                      cfg.CONF.glance_registry_port,
                                      auth_tok=k.auth_token)
