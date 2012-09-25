@@ -99,7 +99,8 @@ class TestNovaNotifier(base.TestCase):
                          "ephemeral_gb": "0",
                          "vcpus": 1,
                          "host": "fakehost",
-                         "availability_zone": "1e3ce043029547f1a61c1996d1a531a4",
+                         "availability_zone":
+                             "1e3ce043029547f1a61c1996d1a531a4",
                          "created_at": '2012-05-08 20:23:41',
                          "os_type": "linux",
                          "kernel_id": "kernelid",
@@ -113,11 +114,13 @@ class TestNovaNotifier(base.TestCase):
         self.stubs.Set(db, 'instance_get', self.fake_db_instance_get)
         self.stubs.Set(db, 'instance_info_cache_delete', self.do_nothing)
         self.stubs.Set(db, 'instance_destroy', self.do_nothing)
-        self.stubs.Set(db, 'instance_system_metadata_get', self.fake_db_instance_system_metadata_get)
+        self.stubs.Set(db, 'instance_system_metadata_get',
+                       self.fake_db_instance_system_metadata_get)
         self.stubs.Set(db, 'block_device_mapping_get_all_by_instance',
                        lambda context, instance: {})
         self.stubs.Set(db, 'instance_update_and_get_original',
-                       lambda context, uuid, kwargs: (self.instance, self.instance))
+                       lambda context, uuid, kwargs: (self.instance,
+                                                      self.instance))
 
         self.stubs.Set(publish, 'publish_counter', self.do_nothing)
         nova_notifier.notify.manager.pollsters = [('test', self.Pollster())]
@@ -128,6 +131,8 @@ class TestNovaNotifier(base.TestCase):
 
     def test_notifications(self):
         self.compute.terminate_instance(self.context, instance=self.instance)
-        self.assertEqual(self.Pollster.counters[0][0], nova_notifier.notify.manager)
-        self.assertEqual(self.Pollster.counters[0][1].id, self.instance['uuid'])
+        self.assertEqual(self.Pollster.counters[0][0],
+                         nova_notifier.notify.manager)
+        self.assertEqual(self.Pollster.counters[0][1].id,
+                         self.instance['uuid'])
         self.assertEqual(len(self.Pollster.counters), 1)

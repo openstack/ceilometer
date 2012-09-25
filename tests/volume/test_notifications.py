@@ -74,7 +74,8 @@ class TestNotifications(unittest.TestCase):
         counters = v.process_notification(NOTIFICATION_VOLUME_EXISTS)
         self.assertEqual(len(counters), 1)
         c = counters[0]
-        self.assertEqual(c.volume, NOTIFICATION_VOLUME_EXISTS['payload']['size'])
+        self.assertEqual(c.volume,
+                         NOTIFICATION_VOLUME_EXISTS['payload']['size'])
 
     def test_volume_delete(self):
         v = notifications.Volume()
@@ -88,4 +89,5 @@ class TestNotifications(unittest.TestCase):
         counters = v.process_notification(NOTIFICATION_VOLUME_EXISTS)
         self.assertEqual(len(counters), 1)
         c = counters[0]
-        self.assertEqual(c.volume, NOTIFICATION_VOLUME_EXISTS['payload']['size'])
+        self.assertEqual(c.volume,
+                         NOTIFICATION_VOLUME_EXISTS['payload']['size'])
