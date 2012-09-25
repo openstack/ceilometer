@@ -67,6 +67,7 @@ class CollectorManager(manager.Manager):
         for topic in self.handler.topics:
             self.connection.declare_topic_consumer(
                 topic=topic,
+                queue_name="ceilometer.notifications",
                 callback=functools.partial(self.handler.notify, topic))
 
         # Set ourselves up as a separate worker for the metering data,
