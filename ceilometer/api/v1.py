@@ -62,6 +62,8 @@
 #                                                  selected meter
 # [ ] /resources/<resource>/meters/<meter>/volume -- total or max volume for
 #                                                    selected meter
+# [x] /resources/<resource>/meters/<meter>/volume/max -- max volume for
+#                                                        selected meter
 # [ ] /sources/<source>/meters/<meter>/volume -- total or max volume for
 #                                                selected meter
 # [ ] /users/<user>/meters/<meter>/volume -- total or max volume for selected
@@ -314,7 +316,40 @@ def list_events_by_user(user, meter):
                         meter=meter,
                         )
 
+
 ## APIs for working with meter calculations.
+
+
+def _get_query_timestamps(args={}):
+    # Determine the desired range, if any, from the
+    # GET arguments. Set up the query range using
+    # the specified offset.
+    # [query_start ... start_timestamp ... end_timestamp ... query_end]
+    search_offset = int(args.get('search_offset', 0))
+
+    start_timestamp = args.get('start_timestamp')
+    if start_timestamp:
+        start_timestamp = timeutils.parse_isotime(start_timestamp)
+        start_timestamp = start_timestamp.replace(tzinfo=None)
+        query_start = (start_timestamp -
+                       datetime.timedelta(minutes=search_offset))
+    else:
+        query_start = None
+
+    end_timestamp = args.get('end_timestamp')
+    if end_timestamp:
+        end_timestamp = timeutils.parse_isotime(end_timestamp)
+        end_timestamp = end_timestamp.replace(tzinfo=None)
+        query_end = end_timestamp + datetime.timedelta(minutes=search_offset)
+    else:
+        query_end = None
+
+    return dict(query_start=query_start,
+                query_end=query_end,
+                start_timestamp=start_timestamp,
+                end_timestamp=end_timestamp,
+                search_offset=search_offset,
+                )
 
 
 @blueprint.route('/resources/<resource>/meters/<meter>/duration')
@@ -331,35 +366,16 @@ def compute_duration_by_resource(resource, meter):
     :param search_offset: Number of minutes before
         and after start and end timestamps to query.
     """
-    # Determine the desired range, if any, from the
-    # GET arguments. Set up the query range using
-    # the specified offset.
-    # [query_start ... start_timestamp ... end_timestamp ... query_end]
-    search_offset = int(flask.request.args.get('search_offset', 0))
-
-    start_timestamp = flask.request.args.get('start_timestamp')
-    if start_timestamp:
-        start_timestamp = timeutils.parse_isotime(start_timestamp)
-        start_timestamp = start_timestamp.replace(tzinfo=None)
-        query_start = (start_timestamp -
-                       datetime.timedelta(minutes=search_offset))
-    else:
-        query_start = None
-
-    end_timestamp = flask.request.args.get('end_timestamp')
-    if end_timestamp:
-        end_timestamp = timeutils.parse_isotime(end_timestamp)
-        end_timestamp = end_timestamp.replace(tzinfo=None)
-        query_end = end_timestamp + datetime.timedelta(minutes=search_offset)
-    else:
-        query_end = None
+    q_ts = _get_query_timestamps(flask.request.args)
+    start_timestamp = q_ts['start_timestamp']
+    end_timestamp = q_ts['end_timestamp']
 
     # Query the database for the interval of timestamps
     # within the desired range.
     f = storage.EventFilter(meter=meter,
                             resource=resource,
-                            start=query_start,
-                            end=query_end,
+                            start=q_ts['query_start'],
+                            end=q_ts['query_end'],
                             )
     min_ts, max_ts = flask.request.storage_conn.get_event_interval(f)
 
@@ -396,3 +412,34 @@ def compute_duration_by_resource(resource, meter):
                          end_timestamp=max_ts,
                          duration=duration,
                          )
+
+
+@blueprint.route('/resources/<resource>/meters/<meter>/volume/max')
+def compute_max_resource_volume(resource, meter):
+    """Return the max volume for a meter.
+
+    :param resource: The ID of the resource.
+    :param meter: The name of the meter.
+    :param start_timestamp: ISO-formatted string of the
+        earliest time to include in the calculation.
+    :param end_timestamp: ISO-formatted string of the
+        latest time to include in the calculation.
+    :param search_offset: Number of minutes before and
+        after start and end timestamps to query.
+    """
+    q_ts = _get_query_timestamps(flask.request.args)
+
+    # Query the database for the max volume
+    f = storage.EventFilter(meter=meter,
+                            resource=resource,
+                            start=q_ts['query_start'],
+                            end=q_ts['query_end'],
+                            )
+    # TODO(sberler): do we want to return an error if the resource
+    # does not exist?
+    results = list(flask.request.storage_conn.get_volume_max(f))
+    value = None
+    if results:
+        value = results[0].get('value')  # there should only be one!
+
+    return flask.jsonify(volume=value)
