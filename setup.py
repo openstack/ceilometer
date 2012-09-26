@@ -54,6 +54,8 @@ setuptools.setup(
     ephemeral_disk_size = ceilometer.compute.notifications:EphemeralDiskSize
     volume = ceilometer.volume.notifications:Volume
     volume_size = ceilometer.volume.notifications:VolumeSize
+    image_download = ceilometer.image.notifications:ImageDownload
+    image_serve = ceilometer.image.notifications:ImageServe
 
     [ceilometer.poll.compute]
     libvirt_diskio = ceilometer.compute.libvirt:DiskIOPollster
