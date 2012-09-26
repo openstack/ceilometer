@@ -18,15 +18,31 @@
 """Publish a counter using the preferred RPC mechanism.
 """
 
+from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import rpc
-from ceilometer.openstack.common import cfg
 from ceilometer import meter
 
 LOG = log.getLogger(__name__)
 
+PUBLISH_OPTS = [
+    cfg.StrOpt('metering_topic',
+               default='metering',
+               help='the topic ceilometer uses for metering messages',
+               ),
+    ]
 
-def publish_counter(context, counter):
+
+def register_opts(config):
+    """Register the options for publishing metering messages.
+    """
+    config.register_opts(PUBLISH_OPTS)
+
+
+register_opts(cfg.CONF)
+
+
+def publish_counter(context, counter, topic, secret):
     """Send a metering message for the data represented by the counter.
 
     :param context: Execution context from the service or RPC call
@@ -35,11 +51,9 @@ def publish_counter(context, counter):
     msg = {
         'method': 'record_metering_data',
         'version': '1.0',
-        'args': {'data': meter.meter_message_from_counter(counter),
+        'args': {'data': meter.meter_message_from_counter(counter, secret),
                  },
         }
     LOG.debug('PUBLISH: %s', str(msg))
-    rpc.cast(context, cfg.CONF.metering_topic, msg)
-    rpc.cast(context,
-             cfg.CONF.metering_topic + '.' + counter.name,
-             msg)
+    rpc.cast(context, topic, msg)
+    rpc.cast(context, topic + '.' + counter.name, msg)

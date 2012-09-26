@@ -19,7 +19,6 @@
 """
 
 import datetime
-import logging
 
 from ming import mim
 from nose.plugins import skip
@@ -27,6 +26,7 @@ from nose.plugins import skip
 from ceilometer import counter
 from ceilometer import meter
 
+from ceilometer.openstack.common import cfg
 from ceilometer.tests import api as tests_api
 
 
@@ -61,7 +61,7 @@ class TestSumResourceVolume(tests_api.TestBase):
                                    }
                 )
             self.counters.append(c)
-            msg = meter.meter_message_from_counter(c)
+            msg = meter.meter_message_from_counter(c, cfg.CONF.metering_secret)
             self.conn.record_metering_data(msg)
 
     def test_no_time_bounds(self):

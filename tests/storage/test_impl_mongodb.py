@@ -115,7 +115,8 @@ class MongoDBEngineTestBase(unittest.TestCase):
                                'tag': 'self.counter',
                                }
             )
-        self.msg = meter.meter_message_from_counter(self.counter)
+        self.msg = meter.meter_message_from_counter(self.counter,
+                                                    'not-so-secret')
         self.conn.record_metering_data(self.msg)
 
         self.counter2 = counter.Counter(
@@ -132,7 +133,8 @@ class MongoDBEngineTestBase(unittest.TestCase):
                                'tag': 'self.counter2',
                                }
             )
-        self.msg2 = meter.meter_message_from_counter(self.counter2)
+        self.msg2 = meter.meter_message_from_counter(self.counter2,
+                                                     'not-so-secret')
         self.conn.record_metering_data(self.msg2)
 
         self.counter3 = counter.Counter(
@@ -149,7 +151,8 @@ class MongoDBEngineTestBase(unittest.TestCase):
                                'tag': 'self.counter3',
                                }
             )
-        self.msg3 = meter.meter_message_from_counter(self.counter3)
+        self.msg3 = meter.meter_message_from_counter(self.counter3,
+                                                     'not-so-secret')
         self.conn.record_metering_data(self.msg3)
 
         for i in range(2, 4):
@@ -167,7 +170,7 @@ class MongoDBEngineTestBase(unittest.TestCase):
                                    'tag': 'counter-%s' % i,
                                    }
                 )
-            msg = meter.meter_message_from_counter(c)
+            msg = meter.meter_message_from_counter(c, 'not-so-secret')
             self.conn.record_metering_data(msg)
 
 
@@ -487,7 +490,7 @@ class TestGetEventInterval(MongoDBEngineTestBase):
                 resource_metadata={'display_name': 'test-server',
                                    }
                 )
-            msg = meter.meter_message_from_counter(c)
+            msg = meter.meter_message_from_counter(c, 'not-so-secret')
             self.conn.record_metering_data(msg)
 
     def test_before_range(self):

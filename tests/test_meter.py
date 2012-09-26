@@ -20,63 +20,57 @@
 
 from ceilometer import counter
 from ceilometer import meter
-from ceilometer.openstack.common import cfg
 
 
 def test_compute_signature_change_key():
-    sig1 = meter.compute_signature({'a': 'A', 'b': 'B'})
-    sig2 = meter.compute_signature({'A': 'A', 'b': 'B'})
+    sig1 = meter.compute_signature({'a': 'A', 'b': 'B'}, 'not-so-secret')
+    sig2 = meter.compute_signature({'A': 'A', 'b': 'B'}, 'not-so-secret')
     assert sig1 != sig2
 
 
 def test_compute_signature_change_value():
-    sig1 = meter.compute_signature({'a': 'A', 'b': 'B'})
-    sig2 = meter.compute_signature({'a': 'a', 'b': 'B'})
+    sig1 = meter.compute_signature({'a': 'A', 'b': 'B'}, 'not-so-secret')
+    sig2 = meter.compute_signature({'a': 'a', 'b': 'B'}, 'not-so-secret')
     assert sig1 != sig2
 
 
 def test_compute_signature_same():
-    sig1 = meter.compute_signature({'a': 'A', 'b': 'B'})
-    sig2 = meter.compute_signature({'a': 'A', 'b': 'B'})
+    sig1 = meter.compute_signature({'a': 'A', 'b': 'B'}, 'not-so-secret')
+    sig2 = meter.compute_signature({'a': 'A', 'b': 'B'}, 'not-so-secret')
     assert sig1 == sig2
 
 
 def test_compute_signature_signed():
     data = {'a': 'A', 'b': 'B'}
-    sig1 = meter.compute_signature(data)
+    sig1 = meter.compute_signature(data, 'not-so-secret')
     data['message_signature'] = sig1
-    sig2 = meter.compute_signature(data)
+    sig2 = meter.compute_signature(data, 'not-so-secret')
     assert sig1 == sig2
 
 
 def test_compute_signature_use_configured_secret():
     data = {'a': 'A', 'b': 'B'}
-    sig1 = meter.compute_signature(data)
-    old_secret = cfg.CONF.metering_secret
-    try:
-        cfg.CONF.metering_secret = 'not the default value'
-        sig2 = meter.compute_signature(data)
-    finally:
-        cfg.CONF.metering_secret = old_secret
+    sig1 = meter.compute_signature(data, 'not-so-secret')
+    sig2 = meter.compute_signature(data, 'different-value')
     assert sig1 != sig2
 
 
 def test_verify_signature_signed():
     data = {'a': 'A', 'b': 'B'}
-    sig1 = meter.compute_signature(data)
+    sig1 = meter.compute_signature(data, 'not-so-secret')
     data['message_signature'] = sig1
-    assert meter.verify_signature(data)
+    assert meter.verify_signature(data, 'not-so-secret')
 
 
 def test_verify_signature_unsigned():
     data = {'a': 'A', 'b': 'B'}
-    assert not meter.verify_signature(data)
+    assert not meter.verify_signature(data, 'not-so-secret')
 
 
 def test_verify_signature_incorrect():
     data = {'a': 'A', 'b': 'B',
             'message_signature': 'Not the same'}
-    assert not meter.verify_signature(data)
+    assert not meter.verify_signature(data, 'not-so-secret')
 
 
 def test_recursive_keypairs():
@@ -101,8 +95,8 @@ def test_verify_signature_nested():
                        'b': 'B',
                        },
             }
-    data['message_signature'] = meter.compute_signature(data)
-    assert meter.verify_signature(data)
+    data['message_signature'] = meter.compute_signature(data, 'not-so-secret')
+    assert meter.verify_signature(data, 'not-so-secret')
 
 
 TEST_COUNTER = counter.Counter(source='src',
@@ -156,14 +150,14 @@ TEST_NOTICE = {
 
 
 def test_meter_message_from_counter_signed():
-    msg = meter.meter_message_from_counter(TEST_COUNTER)
+    msg = meter.meter_message_from_counter(TEST_COUNTER, 'not-so-secret')
     assert 'message_signature' in msg
 
 
 def test_meter_message_from_counter_field():
     def compare(f, c, msg_f, msg):
         assert msg == c
-    msg = meter.meter_message_from_counter(TEST_COUNTER)
+    msg = meter.meter_message_from_counter(TEST_COUNTER, 'not-so-secret')
     name_map = {'name': 'counter_name',
                 'type': 'counter_type',
                 'volume': 'counter_volume',

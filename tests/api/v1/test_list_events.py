@@ -23,6 +23,7 @@ import logging
 
 from ceilometer import counter
 from ceilometer import meter
+from ceilometer.openstack.common import cfg
 
 from ceilometer.tests import api as tests_api
 
@@ -47,7 +48,9 @@ class TestListEvents(tests_api.TestBase):
                                'tag': 'self.counter',
                                }
             )
-        msg = meter.meter_message_from_counter(self.counter1)
+        msg = meter.meter_message_from_counter(self.counter1,
+                                               cfg.CONF.metering_secret,
+                                               )
         self.conn.record_metering_data(msg)
 
         self.counter2 = counter.Counter(
@@ -64,7 +67,9 @@ class TestListEvents(tests_api.TestBase):
                                'tag': 'self.counter2',
                                }
             )
-        msg2 = meter.meter_message_from_counter(self.counter2)
+        msg2 = meter.meter_message_from_counter(self.counter2,
+                                                cfg.CONF.metering_secret,
+                                                )
         self.conn.record_metering_data(msg2)
 
     def test_all(self):

@@ -22,19 +22,14 @@ import os
 import re
 import unittest
 
-import mox
-
-from nose.plugins import skip
-from sqlalchemy import MetaData, text
-
 from ceilometer import counter
 from ceilometer import meter
 from ceilometer import storage
 from ceilometer.storage import migration
-import ceilometer.openstack.common.cfg as cfg
+from ceilometer.openstack.common import cfg
 from ceilometer.storage import impl_sqlalchemy
 from ceilometer.storage.sqlalchemy.models import Meter, Project, Resource
-from ceilometer.storage.sqlalchemy.models import Source, User
+from ceilometer.storage.sqlalchemy.models import User
 
 
 LOG = logging.getLogger(__name__)
@@ -60,8 +55,8 @@ class SQLAlchemyEngineTestBase(unittest.TestCase):
         super(SQLAlchemyEngineTestBase, self).tearDown()
         engine_conn = self.session.bind.connect()
         if CEILOMETER_TEST_LIVE:
-            engine_conn.execute(text('drop database %s' % MYSQL_DBNAME))
-            engine_conn.execute(text('create database %s' % MYSQL_DBNAME))
+            engine_conn.execute('drop database %s' % MYSQL_DBNAME)
+            engine_conn.execute('create database %s' % MYSQL_DBNAME)
         # needed for sqlite in-memory db to destroy
         self.session.close_all()
         self.session.bind.dispose()
@@ -97,7 +92,9 @@ class SQLAlchemyEngineTestBase(unittest.TestCase):
                                'tag': 'self.counter',
                                }
             )
-        self.msg1 = meter.meter_message_from_counter(self.counter)
+        self.msg1 = meter.meter_message_from_counter(self.counter,
+                                                     cfg.CONF.metering_secret,
+                                                     )
         self.conn.record_metering_data(self.msg1)
 
         self.counter2 = counter.Counter(
@@ -114,7 +111,9 @@ class SQLAlchemyEngineTestBase(unittest.TestCase):
                                'tag': 'self.counter2',
                                }
             )
-        self.msg2 = meter.meter_message_from_counter(self.counter2)
+        self.msg2 = meter.meter_message_from_counter(self.counter2,
+                                                     cfg.CONF.metering_secret,
+                                                     )
         self.conn.record_metering_data(self.msg2)
 
         self.counter3 = counter.Counter(
@@ -131,7 +130,9 @@ class SQLAlchemyEngineTestBase(unittest.TestCase):
                                'tag': 'self.counter3',
                                }
             )
-        self.msg3 = meter.meter_message_from_counter(self.counter3)
+        self.msg3 = meter.meter_message_from_counter(self.counter3,
+                                                     cfg.CONF.metering_secret,
+                                                     )
         self.conn.record_metering_data(self.msg3)
 
         for i in range(2, 4):
@@ -149,7 +150,7 @@ class SQLAlchemyEngineTestBase(unittest.TestCase):
                                    'tag': 'counter-%s' % i,
                                   }
                 )
-            msg = meter.meter_message_from_counter(c)
+            msg = meter.meter_message_from_counter(c, cfg.CONF.metering_secret)
             self.conn.record_metering_data(msg)
 
 
@@ -162,11 +163,9 @@ class UserTest(SQLAlchemyEngineTestBase):
     def test_new_user_source(self):
         user = self.session.query(User).get('user-id')
         assert hasattr(user, 'sources')
-        sources = user.sources
         assert map(lambda x: x.id, user.sources) == ['test-1', 'test-2']
 
     def test_get_users(self):
-        users = self.conn.get_users()
         xpct = set(['user-id', 'user-id-alternate', 'user-id-2', 'user-id-3'])
         assert set(self.conn.get_users()) == xpct
 
@@ -413,7 +412,7 @@ class TestGetEventInterval(SQLAlchemyEngineTestBase):
                 resource_metadata={'display_name': 'test-server',
                                    }
                 )
-            msg = meter.meter_message_from_counter(c)
+            msg = meter.meter_message_from_counter(c, cfg.CONF.metering_secret)
             self.conn.record_metering_data(msg)
 
     def test_before_range(self):

@@ -22,6 +22,7 @@ import datetime
 
 from ceilometer import meter
 from ceilometer.collector import manager
+from ceilometer.openstack.common import cfg
 from ceilometer.storage import base
 from ceilometer.openstack.common import rpc
 from ceilometer.openstack.common import cfg
@@ -96,6 +97,7 @@ class TestCollectorManager(tests_base.TestCase):
         super(TestCollectorManager, self).setUp()
         self.mgr = manager.CollectorManager()
         self.ctx = None
+        #cfg.CONF.metering_secret = 'not-so-secret'
 
     def test_init_host(self):
         self.stubs.Set(rpc, 'create_connection', lambda: StubConnection())
@@ -107,7 +109,10 @@ class TestCollectorManager(tests_base.TestCase):
                'resource_id': self.id(),
                'counter_volume': 1,
                }
-        msg['message_signature'] = meter.compute_signature(msg)
+        msg['message_signature'] = meter.compute_signature(
+            msg,
+            cfg.CONF.metering_secret,
+            )
 
         self.mgr.storage_conn = self.mox.CreateMock(base.Connection)
         self.mgr.storage_conn.record_metering_data(msg)
@@ -143,7 +148,10 @@ class TestCollectorManager(tests_base.TestCase):
                'counter_volume': 1,
                'timestamp': '2012-07-02T13:53:40Z',
                }
-        msg['message_signature'] = meter.compute_signature(msg)
+        msg['message_signature'] = meter.compute_signature(
+            msg,
+            cfg.CONF.metering_secret,
+            )
 
         expected = {}
         expected.update(msg)

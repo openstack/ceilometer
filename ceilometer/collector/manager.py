@@ -132,7 +132,7 @@ class CollectorManager(manager.Manager):
                  data['resource_id'],
                  data.get('timestamp', 'NO TIMESTAMP'),
                  data['counter_volume'])
-        if not meter.verify_signature(data):
+        if not meter.verify_signature(data, cfg.CONF.metering_secret):
             LOG.warning('message signature invalid, discarding message: %r',
                         data)
         else:

@@ -29,13 +29,16 @@ METER_OPTS = [
                default='change this or be hacked',
                help='Secret value for signing metering messages',
                ),
-    cfg.StrOpt('metering_topic',
-               default='metering',
-               help='the topic ceilometer uses for metering messages',
-               ),
     ]
 
-cfg.CONF.register_opts(METER_OPTS)
+
+def register_opts(config):
+    """Register the options for signing metering messages.
+    """
+    config.register_opts(METER_OPTS)
+
+
+register_opts(cfg.CONF)
 
 
 def recursive_keypairs(d):
@@ -49,10 +52,10 @@ def recursive_keypairs(d):
             yield name, value
 
 
-def compute_signature(message):
+def compute_signature(message, secret):
     """Return the signature for a message dictionary.
     """
-    digest_maker = hmac.new(cfg.CONF.metering_secret, '', hashlib.sha256)
+    digest_maker = hmac.new(secret, '', hashlib.sha256)
     for name, value in recursive_keypairs(message):
         if name == 'message_signature':
             # Skip any existing signature value, which would not have
@@ -63,16 +66,16 @@ def compute_signature(message):
     return digest_maker.hexdigest()
 
 
-def verify_signature(message):
+def verify_signature(message, secret):
     """Check the signature in the message against the value computed
     from the rest of the contents.
     """
     old_sig = message.get('message_signature')
-    new_sig = compute_signature(message)
+    new_sig = compute_signature(message, secret)
     return new_sig == old_sig
 
 
-def meter_message_from_counter(counter):
+def meter_message_from_counter(counter, secret):
     """Make a metering message ready to be published or stored.
 
     Returns a dictionary containing a metering message
@@ -90,5 +93,5 @@ def meter_message_from_counter(counter):
            'resource_metadata': counter.resource_metadata,
            'message_id': str(uuid.uuid1()),
            }
-    msg['message_signature'] = compute_signature(msg)
+    msg['message_signature'] = compute_signature(msg, secret)
     return msg

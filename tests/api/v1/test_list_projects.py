@@ -24,6 +24,7 @@ import logging
 from ceilometer import counter
 from ceilometer import meter
 
+from ceilometer.openstack.common import cfg
 from ceilometer.tests import api as tests_api
 
 LOG = logging.getLogger(__name__)
@@ -50,7 +51,9 @@ class TestListProjects(tests_api.TestBase):
                                'tag': 'self.counter',
                                }
             )
-        msg = meter.meter_message_from_counter(counter1)
+        msg = meter.meter_message_from_counter(counter1,
+                                               cfg.CONF.metering_secret,
+                                               )
         self.conn.record_metering_data(msg)
 
         counter2 = counter.Counter(
@@ -67,7 +70,9 @@ class TestListProjects(tests_api.TestBase):
                                'tag': 'self.counter2',
                                }
             )
-        msg2 = meter.meter_message_from_counter(counter2)
+        msg2 = meter.meter_message_from_counter(counter2,
+                                                cfg.CONF.metering_secret,
+                                                )
         self.conn.record_metering_data(msg2)
 
         data = self.get('/projects')
@@ -88,7 +93,9 @@ class TestListProjects(tests_api.TestBase):
                                'tag': 'self.counter',
                                }
             )
-        msg = meter.meter_message_from_counter(counter1)
+        msg = meter.meter_message_from_counter(counter1,
+                                               cfg.CONF.metering_secret,
+                                               )
         self.conn.record_metering_data(msg)
 
         counter2 = counter.Counter(
@@ -105,7 +112,9 @@ class TestListProjects(tests_api.TestBase):
                                'tag': 'self.counter2',
                                }
             )
-        msg2 = meter.meter_message_from_counter(counter2)
+        msg2 = meter.meter_message_from_counter(counter2,
+                                                cfg.CONF.metering_secret,
+                                                )
         self.conn.record_metering_data(msg2)
 
         data = self.get('/sources/test_list_users/projects')
