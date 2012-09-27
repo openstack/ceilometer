@@ -57,6 +57,9 @@ setuptools.setup(
     volume_size = ceilometer.volume.notifications:VolumeSize
     image_download = ceilometer.image.notifications:ImageDownload
     image_serve = ceilometer.image.notifications:ImageServe
+    network = ceilometer.network.notifications:Network
+    subnet = ceilometer.network.notifications:Subnet
+    port = ceilometer.network.notifications:Port
 
     [ceilometer.poll.compute]
     libvirt_diskio = ceilometer.compute.libvirt:DiskIOPollster
