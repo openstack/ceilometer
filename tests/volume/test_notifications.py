@@ -37,7 +37,7 @@ NOTIFICATION_VOLUME_DELETE = {
     u'_context_roles': [u'Member', u'admin'],
     u'_context_request_id': u'req-6ba8ccb4-1093-4a39-b029-adfaa3fc7ceb',
     u'_context_quota_class': None,
-    u'event_type': u'volume.delete.end',
+    u'event_type': u'volume.delete.start',
     u'timestamp': u'2012-09-21 10:24:13.168630',
     u'message_id': u'f6e6bc1f-fcd5-41e1-9a86-da7d024f03d9',
     u'_context_auth_token': u'277c6899de8a4b3d999f3e2e4c0915ff',
