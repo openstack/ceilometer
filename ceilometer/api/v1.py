@@ -443,3 +443,34 @@ def compute_max_resource_volume(resource, meter):
         value = results[0].get('value')  # there should only be one!
 
     return flask.jsonify(volume=value)
+
+
+@blueprint.route('/resources/<resource>/meters/<meter>/volume/sum')
+def compute_resource_volume_sum(resource, meter):
+    """Return the total volume for a meter.
+
+    :param resource: The ID of the resource.
+    :param meter: The name of the meter.
+    :param start_timestamp: ISO-formatted string of the
+        earliest time to include in the calculation.
+    :param end_timestamp: ISO-formatted string of the
+        latest time to include in the calculation.
+    :param search_offset: Number of minutes before and
+        after start and end timestamps to query.
+    """
+    q_ts = _get_query_timestamps(flask.request.args)
+
+    # Query the database for the max volume
+    f = storage.EventFilter(meter=meter,
+                            resource=resource,
+                            start=q_ts['query_start'],
+                            end=q_ts['query_end'],
+                            )
+    # TODO(sberler): do we want to return an error if the resource
+    # does not exist?
+    results = list(flask.request.storage_conn.get_volume_sum(f))
+    value = None
+    if results:
+        value = results[0].get('value')  # there should only be one!
+
+    return flask.jsonify(volume=value)
