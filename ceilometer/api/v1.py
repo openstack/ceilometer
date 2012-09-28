@@ -64,6 +64,8 @@
 #                                                    selected meter
 # [x] /resources/<resource>/meters/<meter>/volume/max -- max volume for
 #                                                        selected meter
+# [x] /resources/<resource>/meters/<meter>/volume/sum -- total volume for
+#                                                        selected meter
 # [ ] /sources/<source>/meters/<meter>/volume -- total or max volume for
 #                                                selected meter
 # [ ] /users/<user>/meters/<meter>/volume -- total or max volume for selected
