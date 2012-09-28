@@ -6,3 +6,8 @@ build
 .coverage
 .tox
 cover
+AUTHORS
+ChangeLog
+*.deb
+dist
+*.egg

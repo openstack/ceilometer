@@ -21,10 +21,10 @@ import textwrap
 
 import setuptools
 
-from ceilometer.openstack.common import setup
+from ceilometer.openstack.common import setup as common_setup
 
-requires = setup.parse_requirements()
-depend_links = setup.parse_dependency_links(['tools/pip-requires.txt'])
+requires = common_setup.parse_requirements(['tools/pip-requires.txt'])
+depend_links = common_setup.parse_dependency_links(['tools/pip-requires.txt'])
 
 setuptools.setup(
     name='ceilometer',
@@ -34,6 +34,7 @@ setuptools.setup(
     author_email='ceilometer@lists.launchpad.net',
     url='https://launchpad.net/ceilometer',
     packages=setuptools.find_packages(exclude=['bin']),
+    cmdclass=common_setup.get_cmdclass(),
     include_package_data=True,
     test_suite='nose.collector',
     setup_requires=['setuptools-git>=0.4'],
