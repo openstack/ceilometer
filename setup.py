@@ -24,7 +24,7 @@ import setuptools
 from ceilometer.openstack.common import setup
 
 requires = setup.parse_requirements()
-depend_links = setup.parse_dependency_links()
+depend_links = setup.parse_dependency_links(['tools/pip-requires.txt'])
 
 setuptools.setup(
     name='ceilometer',
