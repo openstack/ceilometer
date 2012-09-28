@@ -22,6 +22,18 @@ events.
 from ceilometer import counter
 from ceilometer import plugin
 
+from ceilometer.openstack.common import cfg
+
+
+OPTS = [
+    cfg.StrOpt('cinder_control_exchange',
+               default='cinder',
+               help="Exchange name for Cinder notifications"),
+]
+
+
+cfg.CONF.register_opts(OPTS)
+
 
 class _Base(plugin.NotificationBase):
     """Convert compute.instance.* notifications into Counters
@@ -33,6 +45,17 @@ class _Base(plugin.NotificationBase):
         "volume_type",
         "size",
     ]
+
+    @staticmethod
+    def get_exchange_topics(conf):
+        """Return a sequence of ExchangeTopics defining the exchange and
+        topics to be connected for this plugin."""
+        return [
+            plugin.ExchangeTopics(
+                exchange=conf.cinder_control_exchange,
+                topics=set(topic + ".info"
+                           for topic in conf.notification_topics)),
+        ]
 
     @staticmethod
     def get_event_types():

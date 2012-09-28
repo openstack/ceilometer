@@ -21,6 +21,17 @@
 from ceilometer import counter
 from ceilometer import plugin
 from ceilometer.compute import instance
+from ceilometer.openstack.common import cfg
+
+
+OPTS = [
+    cfg.StrOpt('nova_control_exchange',
+               default='nova',
+               help="Exchange name for Cinder notifications"),
+]
+
+
+cfg.CONF.register_opts(OPTS)
 
 
 class _Base(plugin.NotificationBase):
@@ -38,6 +49,17 @@ class _Base(plugin.NotificationBase):
         return ['compute.instance.create.end',
                 'compute.instance.exists',
                 'compute.instance.delete.start',
+        ]
+
+    @staticmethod
+    def get_exchange_topics(conf):
+        """Return a sequence of ExchangeTopics defining the exchange and
+        topics to be connected for this plugin."""
+        return [
+            plugin.ExchangeTopics(
+                exchange=conf.nova_control_exchange,
+                topics=set(topic + ".info"
+                           for topic in conf.notification_topics)),
         ]
 
 

@@ -19,8 +19,15 @@
 """
 
 import abc
+from collections import namedtuple
 
 from ceilometer.openstack.common import cfg
+# Import rabbit_notifier to register notification_topics flag so that
+# plugins can use it
+import ceilometer.openstack.common.notifier.rabbit_notifier
+
+
+ExchangeTopics = namedtuple('ExchangeTopics', ['exchange', 'topics'])
 
 
 class NotificationBase(object):
@@ -28,14 +35,15 @@ class NotificationBase(object):
 
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self):
-        self.topics = set(topic + ".info"
-                          for topic in cfg.CONF.notification_topics)
-
     @abc.abstractmethod
     def get_event_types(self):
         """Return a sequence of strings defining the event types to be
         given to this plugin."""
+
+    @abc.abstractmethod
+    def get_exchange_topics(self, conf):
+        """Return a sequence of ExchangeTopics defining the exchange and
+        topics to be connected for this plugin."""
 
     @abc.abstractmethod
     def process_notification(self, message):

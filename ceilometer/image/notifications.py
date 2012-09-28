@@ -22,6 +22,18 @@
 from ceilometer import counter
 from ceilometer import plugin
 
+from ceilometer.openstack.common import cfg
+
+
+OPTS = [
+    cfg.StrOpt('glance_control_exchange',
+               default='glance_notifications',
+               help="Exchange name for Cinder notifications"),
+]
+
+
+cfg.CONF.register_opts(OPTS)
+
 
 class ImageBase(plugin.NotificationBase):
     """
@@ -32,6 +44,17 @@ class ImageBase(plugin.NotificationBase):
     @staticmethod
     def get_event_types():
         return ['image.send']
+
+    @staticmethod
+    def get_exchange_topics(conf):
+        """Return a sequence of ExchangeTopics defining the exchange and
+        topics to be connected for this plugin."""
+        return [
+            plugin.ExchangeTopics(
+                exchange=conf.glance_control_exchange,
+                topics=set(topic + ".info"
+                           for topic in conf.notification_topics)),
+        ]
 
     def _counter(self, message, name, user_id, project_id):
         metadata = self.notification_to_metadata(message)
