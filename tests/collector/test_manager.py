@@ -176,5 +176,6 @@ class TestCollectorManager(tests_base.TestCase):
         results = []
         self.stubs.Set(self.mgr, 'publish_counter',
                        lambda counter: results.append(counter))
-        self.mgr.process_notification(notifications.Instance(), TEST_NOTICE)
+        self.mgr.handlers = [notifications.Instance()]
+        self.mgr.process_notification(TEST_NOTICE)
         self.assert_(len(results) >= 1)
