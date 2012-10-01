@@ -71,7 +71,7 @@ class Volume(_Base):
         return [
             counter.Counter(source='?',
                             name='volume',
-                            type='absolute',
+                            type='gauge',
                             volume=1,
                             user_id=message['payload']['user_id'],
                             project_id=message['payload']['tenant_id'],
@@ -90,7 +90,7 @@ class VolumeSize(_Base):
         return [
             counter.Counter(source='?',
                             name='volume_size',
-                            type='absolute',
+                            type='gauge',
                             volume=message['payload']['size'],
                             user_id=message['payload']['user_id'],
                             project_id=message['payload']['tenant_id'],

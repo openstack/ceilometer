@@ -31,7 +31,7 @@ import collections
 # Type: the type of the counter, must be either:
 #       - cumulative: the value is incremented and never reset to 0
 #       - delta: the value is reset to 0 each time it is sent
-#       - absolute: the value is an absolute value and is not a counter
+#       - gauge: the value is an absolute value and is not a counter
 # Volume: the counter value
 # User ID: the user ID
 # Project ID: the project ID

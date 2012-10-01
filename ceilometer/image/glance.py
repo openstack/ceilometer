@@ -93,7 +93,7 @@ class ImagePollster(_Base):
             yield Counter(
                 source='?',
                 name='image',
-                type='absolute',
+                type='gauge',
                 volume=1,
                 user_id=None,
                 project_id=image['owner'],
@@ -111,7 +111,7 @@ class ImageSizePollster(_Base):
             yield Counter(
                 source='?',
                 name='image_size',
-                type='absolute',
+                type='gauge',
                 volume=image['size'],
                 user_id=None,
                 project_id=image['owner'],
