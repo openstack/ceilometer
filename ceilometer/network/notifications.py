@@ -23,6 +23,7 @@
 from ceilometer import counter
 from ceilometer import plugin
 from ceilometer.openstack.common import cfg
+from ceilometer.openstack.common import log as logging
 
 
 OPTS = [
@@ -34,14 +35,24 @@ OPTS = [
 
 cfg.CONF.register_opts(OPTS)
 
+LOG = logging.getLogger(__name__)
+
 
 class NetworkNotificationBase(plugin.NotificationBase):
 
+    resource_name = None
+
     def get_event_types(self):
         return [
-            '%s.create.end' % (self.resource_name, event),
-            '%s.update.end' % (self.resource_name, event),
-            '%s.delete.start' % (self.resource_name, event),
+            '%s.create.end' % (self.resource_name),
+            '%s.update.end' % (self.resource_name),
+            # FIXME(dhellmann): Quantum delete notifications do
+            # not include the same metadata as the other messages,
+            # so we ignore them for now. This isn't ideal, since
+            # it may mean we miss charging for some amount of time,
+            # but it is better than throwing away the existing
+            # metadata for a resource when it is deleted.
+            ##'%s.delete.start' % (self.resource_name),
         ]
 
     @staticmethod
@@ -56,6 +67,7 @@ class NetworkNotificationBase(plugin.NotificationBase):
         ]
 
     def process_notification(self, message):
+        LOG.info('network notification %r', message)
         message['payload'] = message['payload'][self.resource_name]
         return [
             counter.Counter(source='?',

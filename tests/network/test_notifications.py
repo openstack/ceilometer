@@ -153,3 +153,21 @@ class TestNotifications(unittest.TestCase):
         v = notifications.Port()
         counters = v.process_notification(NOTIFICATION_PORT_UPDATE)
         self.assertEqual(len(counters), 2)
+
+
+class TestEventTypes(unittest.TestCase):
+
+    def test_network(self):
+        v = notifications.Network()
+        events = v.get_event_types()
+        assert events
+
+    def test_subnet(self):
+        v = notifications.Subnet()
+        events = v.get_event_types()
+        assert events
+
+    def test_port(self):
+        v = notifications.Port()
+        events = v.get_event_types()
+        assert events
