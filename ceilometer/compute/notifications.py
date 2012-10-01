@@ -27,7 +27,7 @@ from ceilometer.openstack.common import cfg
 OPTS = [
     cfg.StrOpt('nova_control_exchange',
                default='nova',
-               help="Exchange name for Cinder notifications"),
+               help="Exchange name for Nova notifications"),
 ]
 
 
