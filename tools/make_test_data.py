@@ -56,8 +56,8 @@ def main():
         )
     parser.add_argument(
         '--type',
-        choices=('absolute', 'cumulative'),
-        default='absolute',
+        choices=('gauge', 'cumulative'),
+        default='gauge',
         help='counter type',
         )
     parser.add_argument(

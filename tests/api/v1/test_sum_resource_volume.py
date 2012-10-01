@@ -49,7 +49,7 @@ class TestSumResourceVolume(tests_api.TestBase):
             c = counter.Counter(
                 'source1',
                 'volume_size',
-                'absolute',
+                'gauge',
                 5 + i,
                 'user-id',
                 'project1',

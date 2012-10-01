@@ -44,7 +44,7 @@ class TestNotification(unittest.TestCase):
     def _verify_common_counter(self, counter, name):
         self.assertFalse(counter is None)
         self.assertEqual(counter.name, name)
-        self.assertEqual(counter.type, 'absolute')
+        self.assertEqual(counter.type, 'gauge')
         self.assertEqual(counter.volume, 42)
         self.assertEqual(counter.resource_id, utils.fake_uuid('c'))
         self.assertEqual(counter.timestamp, NOW)
