@@ -46,6 +46,7 @@ class NetworkNotificationBase(plugin.NotificationBase):
         return [
             '%s.create.end' % (self.resource_name),
             '%s.update.end' % (self.resource_name),
+            '%s.exists' % (self.resource_name),
             # FIXME(dhellmann): Quantum delete notifications do
             # not include the same metadata as the other messages,
             # so we ignore them for now. This isn't ideal, since
