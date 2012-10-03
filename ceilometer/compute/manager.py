@@ -20,6 +20,7 @@ import pkg_resources
 
 from nova import manager
 
+from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import log
 from ceilometer import publish
 
@@ -65,7 +66,10 @@ class AgentManager(manager.Manager):
                     LOG.info('polling %s', name)
                     for c in pollster.get_counters(self, instance):
                         LOG.info('COUNTER: %s', c)
-                        publish.publish_counter(context, c)
+                        publish.publish_counter(context, c,
+                                                cfg.CONF.metering_topic,
+                                                cfg.CONF.metering_secret,
+                                                )
                 except Exception as err:
                     LOG.warning('Continuing after error from %s for %s: %s',
                                 name, instance.name, err)

@@ -25,6 +25,8 @@ from ceilometer import counter
 from ceilometer import publish
 from ceilometer.tests import base
 
+from ceilometer.openstack.common import cfg
+
 
 def test_load_plugins():
     mgr = manager.AgentManager()
@@ -55,8 +57,8 @@ class TestRunTasks(base.TestCase):
             self.counters.append((manager, instance))
             return [self.test_data]
 
-    def faux_notify(self, context, msg):
-        self.notifications.append(msg)
+    def faux_notify(self, context, msg, topic, secret):
+        self.notifications.append((msg, topic, secret))
 
     def setUp(self):
         super(TestRunTasks, self).setUp()
@@ -82,5 +84,8 @@ class TestRunTasks(base.TestCase):
         assert self.Pollster.counters[0][1] is self.instance
 
     def test_notifications(self):
-        assert self.notifications[0] is self.Pollster.test_data
-        assert len(self.notifications) == 1
+        actual = self.notifications
+        assert actual == [(self.Pollster.test_data,
+                           cfg.CONF.metering_topic,
+                           cfg.CONF.metering_secret,
+                           )]

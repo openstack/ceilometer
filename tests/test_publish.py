@@ -53,7 +53,8 @@ class TestPublish(base.TestCase):
         publish.publish_counter(None,
                                 self.test_data,
                                 'metering',
-                                'not-so-secret')
+                                'not-so-secret',
+                                )
 
     def test_notify(self):
         assert len(self.notifications) == 2
