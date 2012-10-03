@@ -14,4 +14,5 @@ python-glanceclient
 https://github.com/dreamhost/Ming/zipball/master#egg=Ming
 http://tarballs.openstack.org/nova/nova-master.tar.gz
 http://tarballs.openstack.org/glance/glance-master.tar.gz
+http://tarballs.openstack.org/keystone/keystone-master.tar.gz
 setuptools-git>=0.4
