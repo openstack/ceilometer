@@ -26,7 +26,7 @@ from ceilometer.openstack.common import cfg
 
 cfg.CONF.register_opts([
     cfg.IntOpt('periodic_interval',
-               default=60,
+               default=600,
                help='seconds between running periodic tasks')
 ])
 
