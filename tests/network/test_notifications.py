@@ -133,6 +133,30 @@ NOTIFICATION_PORT_UPDATE = {
     u'message_id': u'07b0a3a1-c0b5-40ab-a09c-28dee6bf48f4'}
 
 
+NOTIFICATION_NETWORK_EXISTS = {
+    u'_context_roles': [u'anotherrole',
+                        u'Member'],
+    u'_context_read_deleted': u'no',
+    u'event_type': u'network.exists',
+    u'timestamp': u'2012-09-27 14:11:27.086575',
+    u'_context_tenant_id': u'82ed0c40ebe64d0bb3310027039c8ed2',
+    u'payload': {u'network':
+                 {u'status': u'ACTIVE',
+                  u'subnets': [],
+                  u'name': u'abcedf',
+                  u'router:external': False,
+                  u'tenant_id': u'82ed0c40ebe64d0bb3310027039c8ed2',
+                  u'admin_state_up': True,
+                  u'shared': False,
+                  u'id': u'7fd4eb2f-a38e-4c25-8490-71ca8800c9be'}},
+    u'priority': u'INFO',
+    u'_context_is_admin': False,
+    u'_context_timestamp': u'2012-09-27 14:11:26.924779',
+    u'_context_user_id': u'b44b7ce67fc84414a5c1660a92a1b862',
+    u'publisher_id': u'network.ubuntu-VirtualBox',
+    u'message_id': u'9e839576-cc47-4c60-a7d8-5743681213b1'}
+
+
 class TestNotifications(unittest.TestCase):
     def test_network_create(self):
         v = notifications.Network()
@@ -152,6 +176,11 @@ class TestNotifications(unittest.TestCase):
     def test_port_update(self):
         v = notifications.Port()
         counters = v.process_notification(NOTIFICATION_PORT_UPDATE)
+        self.assertEqual(len(counters), 2)
+
+    def test_network_exists(self):
+        v = notifications.Network()
+        counters = v.process_notification(NOTIFICATION_NETWORK_EXISTS)
         self.assertEqual(len(counters), 2)
 
 
