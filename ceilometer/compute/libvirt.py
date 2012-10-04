@@ -194,13 +194,13 @@ class NetPollster(plugin.ComputePollster):
                 self.LOG.info(self.NET_USAGE_MESSAGE, instance.name,
                               vnic['name'], rx, tx)
                 yield make_vnic_counter(instance,
-                                        name='net_in_int',
+                                        name='network.incoming.bytes',
                                         type=counter.TYPE_CUMULATIVE,
                                         volume=rx,
                                         vnic_data=vnic
                                        )
                 yield make_vnic_counter(instance,
-                                        name='net_out_int',
+                                        name='network.outgoing.bytes',
                                         type=counter.TYPE_CUMULATIVE,
                                         volume=tx,
                                         vnic_data=vnic
