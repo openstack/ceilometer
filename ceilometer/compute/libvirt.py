@@ -31,8 +31,6 @@ from ceilometer.openstack.common import timeutils
 
 FLAGS = flags.FLAGS
 
-MIB = 2 ** 20  # mebibytes
-
 
 def get_libvirt_connection():
     """Return an open connection for talking to libvirt."""
@@ -123,9 +121,9 @@ class DiskIOPollster(plugin.ComputePollster):
                                   stats[2], stats[3], stats[4])
                     bytes += stats[1] + stats[3]  # combine read and write
                 yield make_counter_from_instance(instance,
-                                                 name='disk',
+                                                 name='disk.io.bytes',
                                                  type=counter.TYPE_CUMULATIVE,
-                                                 volume=bytes / MIB,
+                                                 volume=bytes,
                                                  )
 
 
