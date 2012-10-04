@@ -200,18 +200,32 @@ class NetPollster(plugin.ComputePollster):
         else:
             domain = conn._conn.lookupByName(instance.name)
             for vnic in vnics:
-                rx, _, _, _, tx, _, _, _ = domain.interfaceStats(vnic['name'])
+                rx_bytes, rx_packets, _, _, \
+                    tx_bytes, tx_packets, _, _ = \
+                    domain.interfaceStats(vnic['name'])
                 self.LOG.info(self.NET_USAGE_MESSAGE, instance.name,
-                              vnic['name'], rx, tx)
+                              vnic['name'], rx_bytes, tx_bytes)
                 yield make_vnic_counter(instance,
                                         name='network.incoming.bytes',
                                         type=counter.TYPE_CUMULATIVE,
-                                        volume=rx,
+                                        volume=rx_bytes,
                                         vnic_data=vnic
                                        )
                 yield make_vnic_counter(instance,
                                         name='network.outgoing.bytes',
                                         type=counter.TYPE_CUMULATIVE,
-                                        volume=tx,
+                                        volume=tx_bytes,
+                                        vnic_data=vnic
+                                       )
+                yield make_vnic_counter(instance,
+                                        name='network.incoming.packets',
+                                        type=counter.TYPE_CUMULATIVE,
+                                        volume=rx_packets,
+                                        vnic_data=vnic
+                                       )
+                yield make_vnic_counter(instance,
+                                        name='network.outgoing.packets',
+                                        type=counter.TYPE_CUMULATIVE,
+                                        volume=tx_packets,
                                         vnic_data=vnic
                                        )
