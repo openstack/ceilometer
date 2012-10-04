@@ -114,12 +114,19 @@ class DiskIOPollster(plugin.ComputePollster):
                 self.LOG.exception(err)
             else:
                 bytes = 0
+                requests = 0
                 for disk in disks:
                     stats = conn.block_stats(instance.name, disk)
                     self.LOG.info(self.DISKIO_USAGE_MESSAGE,
                                   instance, disk, stats[0], stats[1],
                                   stats[2], stats[3], stats[4])
                     bytes += stats[1] + stats[3]  # combine read and write
+                    requests += stats[0] + stats[2]
+                yield make_counter_from_instance(instance,
+                                                 name='disk.io.requests',
+                                                 type=counter.TYPE_CUMULATIVE,
+                                                 volume=requests,
+                                                 )
                 yield make_counter_from_instance(instance,
                                                  name='disk.io.bytes',
                                                  type=counter.TYPE_CUMULATIVE,
