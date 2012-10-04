@@ -107,7 +107,6 @@ TEST_COUNTER = counter.Counter(source='src',
                                project_id='project',
                                resource_id=2,
                                timestamp='today',
-                               duration=3,
                                resource_metadata={'key': 'value'},
                                )
 
@@ -161,7 +160,6 @@ def test_meter_message_from_counter_field():
     name_map = {'name': 'counter_name',
                 'type': 'counter_type',
                 'volume': 'counter_volume',
-                'duration': 'counter_duration',
                 }
     for f in TEST_COUNTER._fields:
         msg_f = name_map.get(f, f)

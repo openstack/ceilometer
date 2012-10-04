@@ -110,7 +110,6 @@ class MongoDBEngineTestBase(unittest.TestCase):
             'project-id',
             'resource-id',
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
-            duration=0,
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter',
                                }
@@ -128,7 +127,6 @@ class MongoDBEngineTestBase(unittest.TestCase):
             'project-id',
             'resource-id-alternate',
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
-            duration=0,
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter2',
                                }
@@ -146,7 +144,6 @@ class MongoDBEngineTestBase(unittest.TestCase):
             'project-id',
             'resource-id-alternate',
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
-            duration=0,
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter3',
                                }
@@ -165,7 +162,6 @@ class MongoDBEngineTestBase(unittest.TestCase):
                 'project-id-%s' % i,
                 'resource-id-%s' % i,
                 timestamp=datetime.datetime(2012, 7, 2, 10, 40 + i),
-                duration=0,
                 resource_metadata={'display_name': 'test-server',
                                    'tag': 'counter-%s' % i,
                                    }
@@ -486,7 +482,6 @@ class TestGetEventInterval(MongoDBEngineTestBase):
                 'project-id',
                 'resource-id',
                 timestamp=t,
-                duration=0,
                 resource_metadata={'display_name': 'test-server',
                                    }
                 )

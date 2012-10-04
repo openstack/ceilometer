@@ -99,7 +99,6 @@ class ImagePollster(_Base):
                 project_id=image['owner'],
                 resource_id=image['id'],
                 timestamp=timeutils.isotime(),
-                duration=None,
                 resource_metadata=self.extract_image_metadata(image),
             )
 
@@ -117,6 +116,5 @@ class ImageSizePollster(_Base):
                 project_id=image['owner'],
                 resource_id=image['id'],
                 timestamp=timeutils.isotime(),
-                duration=None,
                 resource_metadata=self.extract_image_metadata(image),
             )

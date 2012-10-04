@@ -104,7 +104,6 @@ class Meter(Base):
     resource_metadata = Column(JSONEncodedDict)
     counter_type = Column(String(255))
     counter_volume = Column(Integer)
-    counter_duration = Column(Integer)
     timestamp = Column(DateTime, default=timeutils.utcnow)
     message_signature = Column(String)
     message_id = Column(String)

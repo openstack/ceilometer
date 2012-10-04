@@ -38,7 +38,6 @@ class TestPublish(base.TestCase):
         project_id='test',
         resource_id='test_run_tasks',
         timestamp=datetime.datetime.utcnow().isoformat(),
-        duration=0,
         resource_metadata={'name': 'TestPublish',
                            },
         )

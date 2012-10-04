@@ -166,7 +166,6 @@ class Connection(base.Connection):
         meter.user = user
         meter.timestamp = data['timestamp']
         meter.resource_metadata = rmetadata
-        meter.counter_duration = data['counter_duration']
         meter.counter_volume = data['counter_volume']
         meter.message_signature = data['message_signature']
         meter.message_id = data['message_id']

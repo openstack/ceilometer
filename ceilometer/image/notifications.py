@@ -67,7 +67,6 @@ class ImageBase(plugin.NotificationBase):
                 user_id=user_id,
                 project_id=project_id,
                 timestamp=message['timestamp'],
-                duration=0,
                 resource_metadata=metadata,
                 )
 

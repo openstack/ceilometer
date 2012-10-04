@@ -79,7 +79,6 @@ class NetworkNotificationBase(plugin.NotificationBase):
                             project_id=message['payload']['tenant_id'],
                             resource_id=message['payload']['id'],
                             timestamp=message['timestamp'],
-                            duration=None,
                             resource_metadata=self.notification_to_metadata(
                                 message),
                         ),
@@ -91,7 +90,6 @@ class NetworkNotificationBase(plugin.NotificationBase):
                             project_id=message['payload']['tenant_id'],
                             resource_id='network',
                             timestamp=message['timestamp'],
-                            duration=None,
                             resource_metadata=self.notification_to_metadata(
                                 message),
                         ),

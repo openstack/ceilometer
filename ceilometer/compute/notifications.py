@@ -75,7 +75,6 @@ class Instance(_Base):
                             project_id=message['payload']['tenant_id'],
                             resource_id=message['payload']['instance_id'],
                             timestamp=message['timestamp'],
-                            duration=0,
                             resource_metadata=self.notification_to_metadata(
                                 message),
                             ),
@@ -94,7 +93,6 @@ class Memory(_Base):
                             project_id=message['payload']['tenant_id'],
                             resource_id=message['payload']['instance_id'],
                             timestamp=message['timestamp'],
-                            duration=0,
                             resource_metadata=self.notification_to_metadata(
                                 message),
                         ),
@@ -113,7 +111,6 @@ class VCpus(_Base):
                             project_id=message['payload']['tenant_id'],
                             resource_id=message['payload']['instance_id'],
                             timestamp=message['timestamp'],
-                            duration=0,
                             resource_metadata=self.notification_to_metadata(
                                 message),
                         ),
@@ -132,7 +129,6 @@ class RootDiskSize(_Base):
                             project_id=message['payload']['tenant_id'],
                             resource_id=message['payload']['instance_id'],
                             timestamp=message['timestamp'],
-                            duration=0,
                             resource_metadata=self.notification_to_metadata(
                                 message),
                         ),
@@ -151,7 +147,6 @@ class EphemeralDiskSize(_Base):
                             project_id=message['payload']['tenant_id'],
                             resource_id=message['payload']['instance_id'],
                             timestamp=message['timestamp'],
-                            duration=0,
                             resource_metadata=self.notification_to_metadata(
                                 message),
                         ),
@@ -174,7 +169,6 @@ class InstanceFlavor(_Base):
                     project_id=message['payload']['tenant_id'],
                     resource_id=message['payload']['instance_id'],
                     timestamp=message['timestamp'],
-                    duration=0,
                     resource_metadata=self.notification_to_metadata(
                         message),
                 )

@@ -87,7 +87,6 @@ class SQLAlchemyEngineTestBase(unittest.TestCase):
             project_id='project-id',
             resource_id='resource-id',
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
-            duration=0,
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter',
                                }
@@ -106,7 +105,6 @@ class SQLAlchemyEngineTestBase(unittest.TestCase):
             project_id='project-id',
             resource_id='resource-id-alternate',
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
-            duration=0,
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter2',
                                }
@@ -125,7 +123,6 @@ class SQLAlchemyEngineTestBase(unittest.TestCase):
             project_id='project-id',
             resource_id='resource-id-alternate',
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
-            duration=0,
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter3',
                                }
@@ -145,7 +142,6 @@ class SQLAlchemyEngineTestBase(unittest.TestCase):
                 'project-id-%s' % i,
                 'resource-id-%s' % i,
                 timestamp=datetime.datetime(2012, 7, 2, 10, 40 + i),
-                duration=0,
                 resource_metadata={'display_name': 'test-server',
                                    'tag': 'counter-%s' % i,
                                   }
@@ -408,7 +404,6 @@ class TestGetEventInterval(SQLAlchemyEngineTestBase):
                 '1',
                 '111',
                 timestamp=t,
-                duration=0,
                 resource_metadata={'display_name': 'test-server',
                                    }
                 )

@@ -46,7 +46,6 @@ class TestListResources(tests_api.TestBase):
             'project-id',
             'resource-id',
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
-            duration=0,
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter',
                                }
@@ -65,7 +64,6 @@ class TestListResources(tests_api.TestBase):
             'project-id',
             'resource-id-alternate',
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
-            duration=0,
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter2',
                                }
@@ -88,7 +86,6 @@ class TestListResources(tests_api.TestBase):
             'project-id',
             'resource-id',
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
-            duration=0,
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter',
                                }
@@ -107,7 +104,6 @@ class TestListResources(tests_api.TestBase):
             'project-id',
             'resource-id-alternate',
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
-            duration=0,
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter2',
                                }
@@ -131,7 +127,6 @@ class TestListResources(tests_api.TestBase):
             'project-id',
             'resource-id',
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
-            duration=0,
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter',
                                }
@@ -150,7 +145,6 @@ class TestListResources(tests_api.TestBase):
             'project-id',
             'resource-id-alternate',
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
-            duration=0,
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter2',
                                }
@@ -174,7 +168,6 @@ class TestListResources(tests_api.TestBase):
             'project-id',
             'resource-id',
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
-            duration=0,
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter',
                                }
@@ -193,7 +186,6 @@ class TestListResources(tests_api.TestBase):
             'project-id2',
             'resource-id-alternate',
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
-            duration=0,
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter2',
                                }

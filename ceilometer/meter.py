@@ -89,7 +89,6 @@ def meter_message_from_counter(counter, secret):
            'project_id': counter.project_id,
            'resource_id': counter.resource_id,
            'timestamp': counter.timestamp,
-           'counter_duration': counter.duration,
            'resource_metadata': counter.resource_metadata,
            'message_id': str(uuid.uuid1()),
            }

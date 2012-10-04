@@ -37,8 +37,6 @@ import collections
 # Project ID: the project ID
 # Resource ID: the resource ID
 # Timestamp: when the counter has been read
-# Duration: duration in seconds determining how long the value is valid.
-#           adding this to timestamp give the end time of the counter
 # Resource metadata: various metadata
 Counter = collections.namedtuple('Counter',
                                  ' '.join(['source',
@@ -49,7 +47,6 @@ Counter = collections.namedtuple('Counter',
                                            'project_id',
                                            'resource_id',
                                            'timestamp',
-                                           'duration',
                                            'resource_metadata',
                                            ])
                                  )

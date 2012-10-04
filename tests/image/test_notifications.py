@@ -49,7 +49,6 @@ class TestNotification(unittest.TestCase):
         self.assertEqual(c.volume, 42)
         self.assertEqual(c.resource_id, utils.fake_uuid('c'))
         self.assertEqual(c.timestamp, NOW)
-        self.assertEqual(c.duration, 0)
         metadata = c.resource_metadata
         self.assertEquals(metadata.get('event_type'), u'image.send')
         self.assertEquals(metadata.get('host'), u'images.example.com')

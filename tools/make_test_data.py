@@ -121,7 +121,6 @@ def main():
                             project_id=args.project,
                             resource_id=args.resource,
                             timestamp=timestamp,
-                            duration=0,
                             resource_metadata={},
                             )
         data = meter.meter_message_from_counter(c)

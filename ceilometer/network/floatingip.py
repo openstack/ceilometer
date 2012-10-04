@@ -45,7 +45,6 @@ class FloatingIPPollster(plugin.CentralPollster):
                     project_id=ip.project_id,
                     resource_id=ip.id,
                     timestamp=None,  # FIXME(dhellmann): This needs to be now()
-                    duration=None,
                     resource_metadata={
                         'address': ip.address,
                         'fixed_ip_id': ip.fixed_ip_id,

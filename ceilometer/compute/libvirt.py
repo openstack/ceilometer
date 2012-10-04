@@ -55,7 +55,6 @@ def make_counter_from_instance(instance, name, type, volume):
         project_id=instance.project_id,
         resource_id=instance.uuid,
         timestamp=timeutils.isotime(),
-        duration=None,
         resource_metadata=compute_instance.get_metadata_from_dbobject(
             instance),
         )
@@ -74,7 +73,6 @@ def make_vnic_counter(instance, name, type, volume, vnic_data):
         project_id=instance.project_id,
         resource_id=vnic_data['fref'],
         timestamp=timeutils.isotime(),
-        duration=None,
         resource_metadata=resource_metadata
         )
 

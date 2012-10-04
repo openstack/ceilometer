@@ -77,7 +77,6 @@ class Volume(_Base):
                             project_id=message['payload']['tenant_id'],
                             resource_id=message['payload']['volume_id'],
                             timestamp=message['timestamp'],
-                            duration=None,
                             resource_metadata=self.notification_to_metadata(
                                 message),
                             ),
@@ -96,7 +95,6 @@ class VolumeSize(_Base):
                             project_id=message['payload']['tenant_id'],
                             resource_id=message['payload']['volume_id'],
                             timestamp=message['timestamp'],
-                            duration=None,
                             resource_metadata=self.notification_to_metadata(
                                 message),
                             ),
