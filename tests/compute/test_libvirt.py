@@ -41,6 +41,23 @@ import mox
 import re
 
 
+class TestInstancePollster(unittest.TestCase):
+
+    @skip.skip_if(libvirt_missing, 'Test requires libvirt')
+    def setUp(self):
+        self.manager = manager.AgentManager()
+        self.pollster = libvirt.InstancePollster()
+        super(TestInstancePollster, self).setUp()
+        self.instance = mock.MagicMock()
+        self.instance.name = 'instance-00000001'
+        self.instance.id = 1
+        flags.FLAGS.compute_driver = 'libvirt.LibvirtDriver'
+        flags.FLAGS.connection_type = 'libvirt'
+
+    def test_get_counter(self):
+        list(self.pollster.get_counters(self.manager, self.instance))
+
+
 class TestDiskIOPollster(unittest.TestCase):
 
     def setUp(self):

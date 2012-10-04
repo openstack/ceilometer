@@ -79,6 +79,16 @@ def make_vnic_counter(instance, name, type, volume, vnic_data):
         )
 
 
+class InstancePollster(plugin.ComputePollster):
+
+    def get_counters(self, manager, instance):
+        yield make_counter_from_instance(instance,
+                                         name='instance',
+                                         type=counter.TYPE_CUMULATIVE,
+                                         volume=1,
+        )
+
+
 class DiskIOPollster(plugin.ComputePollster):
 
     LOG = log.getLogger(__name__ + '.diskio')
@@ -149,11 +159,6 @@ class CPUPollster(plugin.ComputePollster):
                                              name='cpu',
                                              type=counter.TYPE_CUMULATIVE,
                                              volume=cpu_info['cpu_time'],
-                                             )
-            yield make_counter_from_instance(instance,
-                                             name='instance',
-                                             type=counter.TYPE_CUMULATIVE,
-                                             volume=1,
                                              )
         except Exception as err:
             self.LOG.error('could not get CPU time for %s: %s',
