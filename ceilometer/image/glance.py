@@ -26,7 +26,7 @@ from keystoneclient.v2_0 import client as ksclient
 from glance.registry import client
 
 from ceilometer import plugin
-from ceilometer.counter import Counter
+from ceilometer import counter
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import timeutils
 
@@ -90,10 +90,10 @@ class ImagePollster(_Base):
 
     def get_counters(self, manager, context):
         for image in self.iter_images():
-            yield Counter(
+            yield counter.Counter(
                 source='?',
                 name='image',
-                type='gauge',
+                type=counter.TYPE_GAUGE,
                 volume=1,
                 user_id=None,
                 project_id=image['owner'],
@@ -108,10 +108,10 @@ class ImageSizePollster(_Base):
 
     def get_counters(self, manager, context):
         for image in self.iter_images():
-            yield Counter(
+            yield counter.Counter(
                 source='?',
                 name='image_size',
-                type='gauge',
+                type=counter.TYPE_GAUGE,
                 volume=image['size'],
                 user_id=None,
                 project_id=image['owner'],

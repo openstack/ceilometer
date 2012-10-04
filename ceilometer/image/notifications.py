@@ -61,7 +61,7 @@ class ImageBase(plugin.NotificationBase):
         return counter.Counter(
                 source='?',
                 name=name,
-                type='gauge',
+                type=counter.TYPE_GAUGE,
                 volume=message['payload']['bytes_sent'],
                 resource_id=message['payload']['image_id'],
                 user_id=user_id,

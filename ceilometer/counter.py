@@ -53,3 +53,7 @@ Counter = collections.namedtuple('Counter',
                                            'resource_metadata',
                                            ])
                                  )
+
+TYPE_GAUGE = 'gauge'
+TYPE_DELTA = 'delta'
+TYPE_CUMULATIVE = 'cumulative'

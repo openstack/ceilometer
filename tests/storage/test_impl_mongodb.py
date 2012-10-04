@@ -104,7 +104,7 @@ class MongoDBEngineTestBase(unittest.TestCase):
         self.counter = counter.Counter(
             'test-1',
             'instance',
-            'cumulative',
+            counter.TYPE_CUMULATIVE,
             1,
             'user-id',
             'project-id',
@@ -122,7 +122,7 @@ class MongoDBEngineTestBase(unittest.TestCase):
         self.counter2 = counter.Counter(
             'test-2',
             'instance',
-            'cumulative',
+            counter.TYPE_CUMULATIVE,
             1,
             'user-id',
             'project-id',
@@ -140,7 +140,7 @@ class MongoDBEngineTestBase(unittest.TestCase):
         self.counter3 = counter.Counter(
             'test-3',
             'instance',
-            'cumulative',
+            counter.TYPE_CUMULATIVE,
             1,
             'user-id-alternate',
             'project-id',
@@ -159,7 +159,7 @@ class MongoDBEngineTestBase(unittest.TestCase):
             c = counter.Counter(
                 'test',
                 'instance',
-                'cumulative',
+                counter.TYPE_CUMULATIVE,
                 1,
                 'user-id-%s' % i,
                 'project-id-%s' % i,
@@ -480,7 +480,7 @@ class TestGetEventInterval(MongoDBEngineTestBase):
             c = counter.Counter(
                 'test',
                 'instance',
-                'cumulative',
+                counter.TYPE_CUMULATIVE,
                 1,
                 'user-id',
                 'project-id',

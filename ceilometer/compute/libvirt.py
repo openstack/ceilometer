@@ -124,7 +124,7 @@ class DiskIOPollster(plugin.ComputePollster):
                     bytes += stats[1] + stats[3]  # combine read and write
                 yield make_counter_from_instance(instance,
                                                  name='disk',
-                                                 type='cumulative',
+                                                 type=counter.TYPE_CUMULATIVE,
                                                  volume=bytes / MIB,
                                                  )
 
@@ -142,12 +142,12 @@ class CPUPollster(plugin.ComputePollster):
                           instance, cpu_info['cpu_time'])
             yield make_counter_from_instance(instance,
                                              name='cpu',
-                                             type='cumulative',
+                                             type=counter.TYPE_CUMULATIVE,
                                              volume=cpu_info['cpu_time'],
                                              )
             yield make_counter_from_instance(instance,
                                              name='instance',
-                                             type='cumulative',
+                                             type=counter.TYPE_CUMULATIVE,
                                              volume=1,
                                              )
         except Exception as err:
@@ -195,13 +195,13 @@ class NetPollster(plugin.ComputePollster):
                               vnic['name'], rx, tx)
                 yield make_vnic_counter(instance,
                                         name='net_in_int',
-                                        type='cumulative',
+                                        type=counter.TYPE_CUMULATIVE,
                                         volume=rx,
                                         vnic_data=vnic
                                        )
                 yield make_vnic_counter(instance,
                                         name='net_out_int',
-                                        type='cumulative',
+                                        type=counter.TYPE_CUMULATIVE,
                                         volume=tx,
                                         vnic_data=vnic
                                        )

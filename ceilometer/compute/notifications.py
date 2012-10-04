@@ -69,7 +69,7 @@ class Instance(_Base):
         return [
             counter.Counter(source='?',
                             name='instance',
-                            type='gauge',
+                            type=counter.TYPE_GAUGE,
                             volume=1,
                             user_id=message['payload']['user_id'],
                             project_id=message['payload']['tenant_id'],
@@ -88,7 +88,7 @@ class Memory(_Base):
         return [
             counter.Counter(source='?',
                             name='memory',
-                            type='gauge',
+                            type=counter.TYPE_GAUGE,
                             volume=message['payload']['memory_mb'],
                             user_id=message['payload']['user_id'],
                             project_id=message['payload']['tenant_id'],
@@ -107,7 +107,7 @@ class VCpus(_Base):
         return [
             counter.Counter(source='?',
                             name='vcpus',
-                            type='gauge',
+                            type=counter.TYPE_GAUGE,
                             volume=message['payload']['vcpus'],
                             user_id=message['payload']['user_id'],
                             project_id=message['payload']['tenant_id'],
@@ -126,7 +126,7 @@ class RootDiskSize(_Base):
         return [
             counter.Counter(source='?',
                             name='root_disk_size',
-                            type='gauge',
+                            type=counter.TYPE_GAUGE,
                             volume=message['payload']['root_gb'],
                             user_id=message['payload']['user_id'],
                             project_id=message['payload']['tenant_id'],
@@ -145,7 +145,7 @@ class EphemeralDiskSize(_Base):
         return [
             counter.Counter(source='?',
                             name='ephemeral_disk_size',
-                            type='gauge',
+                            type=counter.TYPE_GAUGE,
                             volume=message['payload']['ephemeral_gb'],
                             user_id=message['payload']['user_id'],
                             project_id=message['payload']['tenant_id'],
@@ -168,7 +168,7 @@ class InstanceFlavor(_Base):
                 counter.Counter(
                     source='?',
                     name='instance:%s' % instance_type,
-                    type='gauge',
+                    type=counter.TYPE_GAUGE,
                     volume=1,
                     user_id=message['payload']['user_id'],
                     project_id=message['payload']['tenant_id'],

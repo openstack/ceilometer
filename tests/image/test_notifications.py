@@ -20,6 +20,7 @@ from datetime import datetime
 import unittest
 
 from ceilometer.image import notifications
+from ceilometer import counter
 from tests import utils
 
 NOW = datetime.isoformat(datetime.utcnow())
@@ -41,15 +42,15 @@ NOTIFICATION_IMAGE_SEND = {
 
 class TestNotification(unittest.TestCase):
 
-    def _verify_common_counter(self, counter, name):
-        self.assertFalse(counter is None)
-        self.assertEqual(counter.name, name)
-        self.assertEqual(counter.type, 'gauge')
-        self.assertEqual(counter.volume, 42)
-        self.assertEqual(counter.resource_id, utils.fake_uuid('c'))
-        self.assertEqual(counter.timestamp, NOW)
-        self.assertEqual(counter.duration, 0)
-        metadata = counter.resource_metadata
+    def _verify_common_counter(self, c, name):
+        self.assertFalse(c is None)
+        self.assertEqual(c.name, name)
+        self.assertEqual(c.type, counter.TYPE_GAUGE)
+        self.assertEqual(c.volume, 42)
+        self.assertEqual(c.resource_id, utils.fake_uuid('c'))
+        self.assertEqual(c.timestamp, NOW)
+        self.assertEqual(c.duration, 0)
+        metadata = c.resource_metadata
         self.assertEquals(metadata.get('event_type'), u'image.send')
         self.assertEquals(metadata.get('host'), u'images.example.com')
         self.assertEquals(metadata.get('destination_ip'), u'1.2.3.4')

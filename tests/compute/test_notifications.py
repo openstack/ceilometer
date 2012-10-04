@@ -172,7 +172,7 @@ class TestNotifications(unittest.TestCase):
 
         for name, actual, expected in [
             ('counter_name', info.name, 'instance'),
-            ('counter_type', info.type, 'cumulative'),
+            ('counter_type', info.type, counter.TYPE_CUMULATIVE),
             ('counter_volume', info.volume, 1),
             ('timestamp', info.timestamp,
              INSTANCE_CREATE_END['timestamp']),

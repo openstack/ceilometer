@@ -32,7 +32,7 @@ class TestPublish(base.TestCase):
     test_data = counter.Counter(
         source='test',
         name='test',
-        type='cumulative',
+        type=counter.TYPE_CUMULATIVE,
         volume=1,
         user_id='test',
         project_id='test',

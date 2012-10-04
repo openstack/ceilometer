@@ -81,7 +81,7 @@ class SQLAlchemyEngineTestBase(unittest.TestCase):
         self.counter = counter.Counter(
             'test-1',
             'instance',
-            'cumulative',
+            counter.TYPE_CUMULATIVE,
             volume=1,
             user_id='user-id',
             project_id='project-id',
@@ -100,7 +100,7 @@ class SQLAlchemyEngineTestBase(unittest.TestCase):
         self.counter2 = counter.Counter(
             'test-2',
             'instance',
-            'cumulative',
+            counter.TYPE_CUMULATIVE,
             volume=1,
             user_id='user-id',
             project_id='project-id',
@@ -119,7 +119,7 @@ class SQLAlchemyEngineTestBase(unittest.TestCase):
         self.counter3 = counter.Counter(
             'test-3',
             'instance',
-            'cumulative',
+            counter.TYPE_CUMULATIVE,
             volume=1,
             user_id='user-id-alternate',
             project_id='project-id',
@@ -139,7 +139,7 @@ class SQLAlchemyEngineTestBase(unittest.TestCase):
             c = counter.Counter(
                 'test',
                 'instance',
-                'cumulative',
+                counter.TYPE_CUMULATIVE,
                 1,
                 'user-id-%s' % i,
                 'project-id-%s' % i,
@@ -402,7 +402,7 @@ class TestGetEventInterval(SQLAlchemyEngineTestBase):
             c = counter.Counter(
                 'test',
                 'instance',
-                'cumulative',
+                counter.TYPE_CUMULATIVE,
                 1,
                 '11',
                 '1',
