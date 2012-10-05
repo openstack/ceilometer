@@ -20,29 +20,19 @@
 
 import datetime
 
-from ming import mim
-from nose.plugins import skip
-
 from ceilometer import counter
 from ceilometer import meter
 
 from ceilometer.openstack.common import cfg
 from ceilometer.tests import api as tests_api
+from ceilometer.tests.db import require_map_reduce
 
 
 class TestMaxResourceVolume(tests_api.TestBase):
 
     def setUp(self):
         super(TestMaxResourceVolume, self).setUp()
-
-        # NOTE(dhellmann): mim requires spidermonkey to implement the
-        # map-reduce functions, so if we can't import it then just
-        # skip these tests unless we arn't using mim.
-        try:
-            import spidermonkey
-        except:
-            if isinstance(self.conn.conn, mim.Connection):
-                raise skip.SkipTest('requires spidermonkey')
+        require_map_reduce(self.conn)
 
         self.counters = []
         for i in range(3):

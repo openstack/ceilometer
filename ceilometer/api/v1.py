@@ -60,6 +60,10 @@
 #
 # [ ] /projects/<project>/meters/<meter>/volume -- total or max volume for
 #                                                  selected meter
+# [x] /projects/<project>/meters/<meter>/volume/max -- max volume for
+#                                                      selected meter
+# [x] /projects/<project>/meters/<meter>/volume/sum -- total volume for
+#                                                      selected meter
 # [ ] /resources/<resource>/meters/<meter>/volume -- total or max volume for
 #                                                    selected meter
 # [x] /resources/<resource>/meters/<meter>/volume/max -- max volume for
@@ -474,5 +478,69 @@ def compute_resource_volume_sum(resource, meter):
     value = None
     if results:
         value = results[0].get('value')  # there should only be one!
+
+    return flask.jsonify(volume=value)
+
+
+@blueprint.route('/projects/<project>/meters/<meter>/volume/max')
+def compute_project_volume_max(project, meter):
+    """Return the max volume for a meter.
+
+    :param project: The ID of the project.
+    :param meter: The name of the meter.
+    :param start_timestamp: ISO-formatted string of the
+        earliest time to include in the calculation.
+    :param end_timestamp: ISO-formatted string of the
+        latest time to include in the calculation.
+    :param search_offset: Number of minutes before and
+        after start and end timestamps to query.
+    """
+    q_ts = _get_query_timestamps(flask.request.args)
+
+    f = storage.EventFilter(meter=meter,
+                            project=project,
+                            start=q_ts['query_start'],
+                            end=q_ts['query_end'],
+                            )
+    # FIXME(sberler): Currently get_volume_max is really always grouping
+    # by resource_id.  We should add a new function in the storage driver
+    # that does not do this grouping (and potentially rename the existing
+    # one to get_volume_max_by_resource())
+    results = list(flask.request.storage_conn.get_volume_max(f))
+    value = None
+    if results:
+        value = max(result.get('value') for result in results)
+
+    return flask.jsonify(volume=value)
+
+
+@blueprint.route('/projects/<project>/meters/<meter>/volume/sum')
+def compute_project_volume_sum(project, meter):
+    """Return the total volume for a meter.
+
+    :param project: The ID of the project.
+    :param meter: The name of the meter.
+    :param start_timestamp: ISO-formatted string of the
+        earliest time to include in the calculation.
+    :param end_timestamp: ISO-formatted string of the
+        latest time to include in the calculation.
+    :param search_offset: Number of minutes before and
+        after start and end timestamps to query.
+    """
+    q_ts = _get_query_timestamps(flask.request.args)
+
+    f = storage.EventFilter(meter=meter,
+                            project=project,
+                            start=q_ts['query_start'],
+                            end=q_ts['query_end'],
+                            )
+    # FIXME(sberler): Currently get_volume_max is really always grouping
+    # by resource_id.  We should add a new function in the storage driver
+    # that does not do this grouping (and potentially rename the existing
+    # one to get_volume_max_by_resource())
+    results = list(flask.request.storage_conn.get_volume_sum(f))
+    value = None
+    if results:
+        value = sum(result.get('value') for result in results)
 
     return flask.jsonify(volume=value)

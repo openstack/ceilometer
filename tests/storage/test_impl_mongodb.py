@@ -47,59 +47,28 @@
 """
 
 import datetime
-import logging
-import os
 import unittest
 
-from ming import mim
 import mox
-
-from nose.plugins import skip
 
 from ceilometer import counter
 from ceilometer import meter
 from ceilometer import storage
-from ceilometer.storage import impl_mongodb
-
-
-LOG = logging.getLogger(__name__)
-
-FORCING_MONGO = bool(int(os.environ.get('CEILOMETER_TEST_LIVE', 0)))
-
-
-class Connection(impl_mongodb.Connection):
-
-    def _get_connection(self, conf):
-        # Use a real MongoDB server if we can connect, but fall back
-        # to a Mongo-in-memory connection if we cannot.
-        if FORCING_MONGO:
-            try:
-                return super(Connection, self)._get_connection(conf)
-            except:
-                LOG.debug('Unable to connect to mongod')
-                raise
-        else:
-            LOG.debug('Unable to connect to mongod, falling back to MIM')
-            return mim.Connection()
+from ceilometer.tests.db import TestConnection, require_map_reduce
 
 
 class MongoDBEngineTestBase(unittest.TestCase):
 
-    # Only instantiate the database config
-    # and connection once, since spidermonkey
-    # causes issues if we allocate too many
-    # Runtime objects in the same process.
-    # http://davisp.lighthouseapp.com/projects/26898/tickets/22
-    conf = mox.Mox().CreateMockAnything()
-    conf.database_connection = 'mongodb://localhost/testdb'
-    conn = Connection(conf)
+    DBNAME = 'testdb'
 
     def setUp(self):
         super(MongoDBEngineTestBase, self).setUp()
 
-        self.conn.conn.drop_database('testdb')
-        self.db = self.conn.conn['testdb']
-        self.conn.db = self.db
+        conf = mox.Mox().CreateMockAnything()
+        conf.database_connection = 'mongodb://localhost/%s' % self.DBNAME
+        self.conn = TestConnection(conf)
+        self.conn.drop_database(self.DBNAME)
+        self.db = self.conn.conn[self.DBNAME]
 
         self.counter = counter.Counter(
             'test-1',
@@ -168,6 +137,9 @@ class MongoDBEngineTestBase(unittest.TestCase):
                 )
             msg = meter.meter_message_from_counter(c, 'not-so-secret')
             self.conn.record_metering_data(msg)
+
+    def tearDown(self):
+        self.conn.drop_database(self.DBNAME)
 
 
 class UserTest(MongoDBEngineTestBase):
@@ -384,14 +356,7 @@ class SumTest(MongoDBEngineTestBase):
 
     def setUp(self):
         super(SumTest, self).setUp()
-        # NOTE(dhellmann): mim requires spidermonkey to implement the
-        # map-reduce functions, so if we can't import it then just
-        # skip these tests unless we aren't using mim.
-        try:
-            import spidermonkey
-        except:
-            if isinstance(self.conn.conn, mim.Connection):
-                raise skip.SkipTest('requires spidermonkey')
+        require_map_reduce(self.conn)
 
     def test_by_user(self):
         f = storage.EventFilter(
@@ -439,15 +404,7 @@ class TestGetEventInterval(MongoDBEngineTestBase):
 
     def setUp(self):
         super(TestGetEventInterval, self).setUp()
-
-        # NOTE(dhellmann): mim requires spidermonkey to implement the
-        # map-reduce functions, so if we can't import it then just
-        # skip these tests unless we aren't using mim.
-        try:
-            import spidermonkey
-        except:
-            if isinstance(self.conn.conn, mim.Connection):
-                raise skip.SkipTest('requires spidermonkey')
+        require_map_reduce(self.conn)
 
         # Create events relative to the range and pretend
         # that the intervening events exist.
