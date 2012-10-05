@@ -1,4 +1,6 @@
 ceilometer
 ==========
 
-See blueprint at http://wiki.openstack.org/EfficientMetering
+See the ReleaseNotes document and the project home for more info.
+
+  http://launchpad.net/ceilometer
