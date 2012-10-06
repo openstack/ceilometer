@@ -52,6 +52,7 @@ Table of contents
    configuration
    api
    contributing/index
+   releasenotes/index
    glossary
 
 .. - installation
