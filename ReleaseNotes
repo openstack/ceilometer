@@ -15,6 +15,11 @@ to support nova-volume in favor of Cinder. A detailed list of meters covered
 per component can be found at:
   xxxx
 
+Quantum delete notifications do not include the same metadata as the other
+messages, so we ignore them for now. This isn't ideal, since it may mean we
+miss charging for some amount of time, but it is better than throwing away the
+existing metadata for a resource when it is deleted.
+
 The only tested and complete database backend is currently MongoDB, the 
 SQLAlchemy one is still work in progress.
 
