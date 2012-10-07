@@ -28,7 +28,7 @@ depend_links = common_setup.parse_dependency_links(['tools/pip-requires'])
 
 setuptools.setup(
     name='ceilometer',
-    version='0',
+    version='0.1',
     description='cloud computing metering',
     author='OpenStack',
     author_email='ceilometer@lists.launchpad.net',
