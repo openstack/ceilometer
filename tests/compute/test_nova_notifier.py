@@ -38,6 +38,7 @@ from ceilometer import counter
 from ceilometer.tests import base
 from ceilometer.tests import skip
 from ceilometer.compute import nova_notifier
+from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import importutils
 
 
@@ -110,7 +111,7 @@ class TestNovaNotifier(base.TestCase):
                          "metadata": {},
                          "uuid": "144e08f4-00cb-11e2-888e-5453ed1bbb5f"}
 
-        self.stubs.Set(db, 'instance_get', self.fake_db_instance_get)
+        self.stubs.Set(db, 'instance_get_by_uuid', self.fake_db_instance_get)
         self.stubs.Set(db, 'instance_info_cache_delete', self.do_nothing)
         self.stubs.Set(db, 'instance_destroy', self.do_nothing)
         self.stubs.Set(db, 'instance_system_metadata_get',
@@ -122,16 +123,20 @@ class TestNovaNotifier(base.TestCase):
                                                       self.instance))
 
         self.stubs.Set(publish, 'publish_counter', self.do_nothing)
-        nova_notifier.notify.manager.pollsters = [('test', self.Pollster())]
+        nova_notifier._initialize_config_options = False
+        nova_notifier.initialize_manager()
+        nova_notifier._agent_manager.pollsters = [('test', self.Pollster())]
 
     def tearDown(self):
-        super(TestNovaNotifier, self).tearDown()
         self.Pollster.counters = []
+        super(TestNovaNotifier, self).tearDown()
 
     def test_notifications(self):
         self.compute.terminate_instance(self.context, instance=self.instance)
+        self.assertTrue(self.Pollster.counters)
+        self.assertTrue(self.Pollster.counters[0])
         self.assertEqual(self.Pollster.counters[0][0],
-                         nova_notifier.notify.manager)
+                         nova_notifier._agent_manager)
         self.assertEqual(self.Pollster.counters[0][1].id,
                          self.instance['uuid'])
         self.assertEqual(len(self.Pollster.counters), 1)
