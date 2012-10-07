@@ -82,7 +82,7 @@ class InstancePollster(plugin.ComputePollster):
     def get_counters(self, manager, instance):
         yield make_counter_from_instance(instance,
                                          name='instance',
-                                         type=counter.TYPE_CUMULATIVE,
+                                         type=counter.TYPE_GAUGE,
                                          volume=1,
         )
 
