@@ -30,6 +30,9 @@ PUBLISH_OPTS = [
                default='metering',
                help='the topic ceilometer uses for metering messages',
                ),
+    cfg.StrOpt('control_exchange',
+               default='ceilometer',
+               help='AMQP exchange to connect to if using RabbitMQ or Qpid'),
     ]
 
 
