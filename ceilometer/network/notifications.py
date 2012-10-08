@@ -70,30 +70,30 @@ class NetworkNotificationBase(plugin.NotificationBase):
     def process_notification(self, message):
         LOG.info('network notification %r', message)
         message['payload'] = message['payload'][self.resource_name]
-        return [
-            counter.Counter(source='?',
-                            name=self.resource_name,
-                            type=counter.TYPE_GAUGE,
-                            volume=1,
-                            user_id=message['_context_user_id'],
-                            project_id=message['payload']['tenant_id'],
-                            resource_id=message['payload']['id'],
-                            timestamp=message['timestamp'],
-                            resource_metadata=self.notification_to_metadata(
-                                message),
-                        ),
-            counter.Counter(source='?',
-                            name=message['event_type'].rpartition('.')[0],
-                            type=counter.TYPE_GAUGE,
-                            volume=1,
-                            user_id=message['_context_user_id'],
-                            project_id=message['payload']['tenant_id'],
-                            resource_id='network',
-                            timestamp=message['timestamp'],
-                            resource_metadata=self.notification_to_metadata(
-                                message),
-                        ),
-        ]
+        metadata = self.notification_to_metadata(message)
+        yield counter.Counter(source='?',
+                              name=self.resource_name,
+                              type=counter.TYPE_GAUGE,
+                              volume=1,
+                              user_id=message['_context_user_id'],
+                              project_id=message['payload']['tenant_id'],
+                              resource_id=message['payload']['id'],
+                              timestamp=message['timestamp'],
+                              resource_metadata=metadata,
+                              )
+
+        network_counter_name = message['event_type'].rpartition('.')[0]
+        if network_counter_name != self.resource_name:
+            yield counter.Counter(source='?',
+                                  name=network_counter_name,
+                                  type=counter.TYPE_GAUGE,
+                                  volume=1,
+                                  user_id=message['_context_user_id'],
+                                  project_id=message['payload']['tenant_id'],
+                                  resource_id=message['payload']['id'],
+                                  timestamp=message['timestamp'],
+                                  resource_metadata=metadata,
+                                  )
 
 
 class Network(NetworkNotificationBase):

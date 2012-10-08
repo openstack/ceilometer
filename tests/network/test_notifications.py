@@ -161,27 +161,27 @@ class TestNotifications(unittest.TestCase):
     def test_network_create(self):
         v = notifications.Network()
         counters = v.process_notification(NOTIFICATION_NETWORK_CREATE)
-        self.assertEqual(len(counters), 2)
+        self.assertEqual(len(list(counters)), 2)
 
     def test_subnet_create(self):
         v = notifications.Subnet()
         counters = v.process_notification(NOTIFICATION_SUBNET_CREATE)
-        self.assertEqual(len(counters), 2)
+        self.assertEqual(len(list(counters)), 2)
 
     def test_port_create(self):
         v = notifications.Port()
         counters = v.process_notification(NOTIFICATION_PORT_CREATE)
-        self.assertEqual(len(counters), 2)
+        self.assertEqual(len(list(counters)), 2)
 
     def test_port_update(self):
         v = notifications.Port()
         counters = v.process_notification(NOTIFICATION_PORT_UPDATE)
-        self.assertEqual(len(counters), 2)
+        self.assertEqual(len(list(counters)), 2)
 
     def test_network_exists(self):
         v = notifications.Network()
         counters = v.process_notification(NOTIFICATION_NETWORK_EXISTS)
-        self.assertEqual(len(counters), 2)
+        self.assertEqual(len(list(counters)), 1)
 
 
 class TestEventTypes(unittest.TestCase):
