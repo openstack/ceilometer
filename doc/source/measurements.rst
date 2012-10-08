@@ -64,17 +64,14 @@ Network (Quantum)
 Name                      Type        Volume   Resource  Note
 ========================  ==========  =======  ========  =======================================================
 network                   Gauge             1  netw ID   Duration of network
-network.create            Gauge             1  netw ID
-network.update            Gauge             1  netw ID
-network.exists            Gauge             1  netw ID
+network.create            Delta       request  netw ID   Creation requests for this network
+network.update            Delta       request  netw ID   Update requests for this network
 subnet                    Gauge             1  subnt ID  Duration of subnet
-subnet.create             Gauge             1  subnt ID
-subnet.update             Gauge             1  subnt ID
-subnet.exists             Gauge             1  subnt ID
+subnet.create             Delta       request  subnt ID  Creation requests for this subnet
+subnet.update             Delta       request  subnt ID  Update requests for this subnet
 port                      Gauge             1  port ID   Duration of port
-port.create               Gauge             1  port ID
-port.update               Gauge             1  port ID
-port.exists               Gauge             1  port ID
+port.create               Delta       request  port ID   Creation requests for this port
+port.update               Delta       request  port ID   Update requests for this port
 floating_ip               Gauge             1  ip ID     Duration of floating ip
 ========================  ==========  =======  ========  =======================================================
 

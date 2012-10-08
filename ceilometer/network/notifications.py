@@ -86,7 +86,7 @@ class NetworkNotificationBase(plugin.NotificationBase):
         if network_counter_name != self.resource_name:
             yield counter.Counter(source='?',
                                   name=network_counter_name,
-                                  type=counter.TYPE_GAUGE,
+                                  type=counter.TYPE_DELTA,
                                   volume=1,
                                   user_id=message['_context_user_id'],
                                   project_id=message['payload']['tenant_id'],
