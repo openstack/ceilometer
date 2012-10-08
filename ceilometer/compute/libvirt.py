@@ -60,23 +60,6 @@ def make_counter_from_instance(instance, name, type, volume):
         )
 
 
-def make_vnic_counter(instance, name, type, volume, vnic_data):
-    resource_metadata = copy.copy(vnic_data)
-    resource_metadata['instance_id'] = instance.id
-
-    return counter.Counter(
-        source='?',
-        name=name,
-        type=type,
-        volume=volume,
-        user_id=instance.user_id,
-        project_id=instance.project_id,
-        resource_id=vnic_data['fref'],
-        timestamp=timeutils.isotime(),
-        resource_metadata=resource_metadata
-        )
-
-
 class InstancePollster(plugin.ComputePollster):
 
     def get_counters(self, manager, instance):
@@ -186,6 +169,23 @@ class NetPollster(plugin.ComputePollster):
             vnics.append(vnic)
         return vnics
 
+    @staticmethod
+    def make_vnic_counter(instance, name, type, volume, vnic_data):
+        resource_metadata = copy.copy(vnic_data)
+        resource_metadata['instance_id'] = instance.uuid
+
+        return counter.Counter(
+            source='?',
+            name=name,
+            type=type,
+            volume=volume,
+            user_id=instance.user_id,
+            project_id=instance.project_id,
+            resource_id=vnic_data['fref'],
+            timestamp=timeutils.isotime(),
+            resource_metadata=resource_metadata
+        )
+
     def get_counters(self, manager, instance):
         conn = get_libvirt_connection()
         self.LOG.info('checking instance %s', instance.uuid)
@@ -203,27 +203,27 @@ class NetPollster(plugin.ComputePollster):
                     domain.interfaceStats(vnic['name'])
                 self.LOG.info(self.NET_USAGE_MESSAGE, instance.name,
                               vnic['name'], rx_bytes, tx_bytes)
-                yield make_vnic_counter(instance,
-                                        name='network.incoming.bytes',
-                                        type=counter.TYPE_CUMULATIVE,
-                                        volume=rx_bytes,
-                                        vnic_data=vnic
-                                       )
-                yield make_vnic_counter(instance,
-                                        name='network.outgoing.bytes',
-                                        type=counter.TYPE_CUMULATIVE,
-                                        volume=tx_bytes,
-                                        vnic_data=vnic
-                                       )
-                yield make_vnic_counter(instance,
-                                        name='network.incoming.packets',
-                                        type=counter.TYPE_CUMULATIVE,
-                                        volume=rx_packets,
-                                        vnic_data=vnic
-                                       )
-                yield make_vnic_counter(instance,
-                                        name='network.outgoing.packets',
-                                        type=counter.TYPE_CUMULATIVE,
-                                        volume=tx_packets,
-                                        vnic_data=vnic
-                                       )
+                yield self.make_vnic_counter(instance,
+                                             name='network.incoming.bytes',
+                                             type=counter.TYPE_CUMULATIVE,
+                                             volume=rx_bytes,
+                                             vnic_data=vnic,
+                                             )
+                yield self.make_vnic_counter(instance,
+                                             name='network.outgoing.bytes',
+                                             type=counter.TYPE_CUMULATIVE,
+                                             volume=tx_bytes,
+                                             vnic_data=vnic,
+                                             )
+                yield self.make_vnic_counter(instance,
+                                             name='network.incoming.packets',
+                                             type=counter.TYPE_CUMULATIVE,
+                                             volume=rx_packets,
+                                             vnic_data=vnic,
+                                             )
+                yield self.make_vnic_counter(instance,
+                                             name='network.outgoing.packets',
+                                             type=counter.TYPE_CUMULATIVE,
+                                             volume=tx_packets,
+                                             vnic_data=vnic,
+                                             )
