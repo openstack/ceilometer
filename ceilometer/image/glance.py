@@ -22,49 +22,45 @@ from __future__ import absolute_import
 
 import itertools
 
+import glanceclient
 from keystoneclient.v2_0 import client as ksclient
-from glance.registry import client
 
 from ceilometer import plugin
 from ceilometer import counter
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import timeutils
 
-cfg.CONF.register_opts(
-    [
-        cfg.StrOpt('glance_registry_host',
-                   default='localhost',
-                   help="URL of Glance API server"),
-        cfg.IntOpt('glance_registry_port',
-                   default=9191,
-                   help="URL of Glance API server"),
-    ])
-
 
 class _Base(plugin.PollsterBase):
 
     @staticmethod
-    def get_registry_client():
+    def get_glance_client():
         k = ksclient.Client(username=cfg.CONF.os_username,
                             password=cfg.CONF.os_password,
                             tenant_id=cfg.CONF.os_tenant_id,
                             tenant_name=cfg.CONF.os_tenant_name,
                             auth_url=cfg.CONF.os_auth_url)
-        return client.RegistryClient(cfg.CONF.glance_registry_host,
-                                     cfg.CONF.glance_registry_port,
-                                     auth_tok=k.auth_token)
+
+        endpoint = k.service_catalog.url_for(service_type='image',
+                                             endpoint_type='internalURL')
+
+        # hard-code v1 glance API version selection while v2 API matures
+        return glanceclient.Client('1', endpoint, token=k.auth_token)
 
     def iter_images(self):
         """Iterate over all images."""
-        # We need to ask for both public and non public to get all images.
-        client = self.get_registry_client()
+        client = self.get_glance_client()
+        #TODO(eglynn): use pagination to protect against unbounded
+        #              memory usage
         return itertools.chain(
-            client.get_images_detailed(filters={"is_public": True}),
-            client.get_images_detailed(filters={"is_public": False}))
+            client.images.list(filters={"is_public": True}),
+            #TODO(eglynn): extend glance API with all_tenants logic to
+            #              avoid second call to retrieve private images
+            client.images.list(filters={"is_public": False}))
 
     @staticmethod
     def extract_image_metadata(image):
-        return dict([(k, image[k])
+        return dict((k, getattr(image, k))
                      for k in [
                              "status",
                              "is_public",
@@ -77,13 +73,12 @@ class _Base(plugin.PollsterBase):
                              "properties",
                              "min_disk",
                              "protected",
-                             "location",
                              "checksum",
                              "deleted_at",
                              "min_ram",
                              "size",
                      ]
-                 ])
+                 )
 
 
 class ImagePollster(_Base):
@@ -96,8 +91,8 @@ class ImagePollster(_Base):
                 type=counter.TYPE_GAUGE,
                 volume=1,
                 user_id=None,
-                project_id=image['owner'],
-                resource_id=image['id'],
+                project_id=image.owner,
+                resource_id=image.id,
                 timestamp=timeutils.isotime(),
                 resource_metadata=self.extract_image_metadata(image),
             )
@@ -111,10 +106,10 @@ class ImageSizePollster(_Base):
                 source='?',
                 name='image.size',
                 type=counter.TYPE_GAUGE,
-                volume=image['size'],
+                volume=image.size,
                 user_id=None,
-                project_id=image['owner'],
-                resource_id=image['id'],
+                project_id=image.owner,
+                resource_id=image.id,
                 timestamp=timeutils.isotime(),
                 resource_metadata=self.extract_image_metadata(image),
             )

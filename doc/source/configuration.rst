@@ -32,8 +32,6 @@ Parameter                   Default                               Note
 ==========================  ====================================  ==============================================================
 nova_control_exchange       nova                                  Exchange name for Nova notifications
 glance_control_exchange     glance_notifications                  Exchange name for Glance notifications
-glance_registry_host        localhost                             URL of Glance API server
-glance_registry_port        9191                                  port of Glance API server
 cinder_control_exchange     cinder                                Exchange name for Cinder notifications
 quantum_control_exchange    quantum                               Exchange name for Quantum notifications
 metering_secret             change this or be hacked              Secret value for signing metering messages
