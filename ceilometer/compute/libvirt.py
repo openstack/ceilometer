@@ -104,24 +104,38 @@ class DiskIOPollster(plugin.ComputePollster):
                                  instance.name, err)
                 self.LOG.exception(err)
             else:
-                bytes = 0
-                requests = 0
+                r_bytes = 0
+                r_requests = 0
+                w_bytes = 0
+                w_requests = 0
                 for disk in disks:
                     stats = conn.block_stats(instance.name, disk)
                     self.LOG.info(self.DISKIO_USAGE_MESSAGE,
                                   instance, disk, stats[0], stats[1],
                                   stats[2], stats[3], stats[4])
-                    bytes += stats[1] + stats[3]  # combine read and write
-                    requests += stats[0] + stats[2]
+                    r_bytes += stats[0]
+                    r_requests += stats[1]
+                    w_bytes += stats[3]
+                    w_requests += stats[2]
                 yield make_counter_from_instance(instance,
-                                                 name='disk.io.requests',
+                                                 name='disk.read.requests',
                                                  type=counter.TYPE_CUMULATIVE,
-                                                 volume=requests,
+                                                 volume=r_requests,
                                                  )
                 yield make_counter_from_instance(instance,
-                                                 name='disk.io.bytes',
+                                                 name='disk.read.bytes',
                                                  type=counter.TYPE_CUMULATIVE,
-                                                 volume=bytes,
+                                                 volume=r_bytes,
+                                                 )
+                yield make_counter_from_instance(instance,
+                                                 name='disk.write.requests',
+                                                 type=counter.TYPE_CUMULATIVE,
+                                                 volume=w_requests,
+                                                 )
+                yield make_counter_from_instance(instance,
+                                                 name='disk.write.bytes',
+                                                 type=counter.TYPE_CUMULATIVE,
+                                                 volume=w_bytes,
                                                  )
 
 
