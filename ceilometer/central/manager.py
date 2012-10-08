@@ -17,7 +17,6 @@
 # under the License.
 
 from ceilometer import extension_manager
-from ceilometer.compute import resources
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import log
 from ceilometer import publish
@@ -40,7 +39,6 @@ class AgentManager(object):
     def __init__(self, host=None):
         super(AgentManager, self).__init__()
         self.host = host
-        self.resources = resources.Resources()
         self.ext_manager = extension_manager.ActivatedExtensionManager(
             namespace=PLUGIN_NAMESPACE,
             disabled_names=cfg.CONF.disabled_central_pollsters,

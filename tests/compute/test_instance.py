@@ -44,7 +44,9 @@ class FauxInstance(object):
 
 class TestLocationMetadata(unittest.TestCase):
 
-    INSTANCE_PROPERTIES = {'display_name': 'display name',
+    # Mimics an instance returned from nova api call
+    INSTANCE_PROPERTIES = {'name': 'display name',
+                           'OS-EXT-SRV-ATTR:instance_name': 'instance-000001',
                            'reservation_id': 'reservation id',
                            'architecture': 'x86_64',
                            'availability_zone': 'zone1',
@@ -58,6 +60,8 @@ class TestLocationMetadata(unittest.TestCase):
                            'memory_mb': 2048,
                            'root_gb': 3,
                            'vcpus': 1,
+                           'flavor': {'id': 1},
+                           'hostId': '1234-5678'
                            }
 
     def setUp(self):
@@ -70,9 +74,18 @@ class TestLocationMetadata(unittest.TestCase):
         self.instance.instance_type = m
 
     def test_metadata(self):
-        md = instance.get_metadata_from_dbobject(self.instance)
-        for name in self.INSTANCE_PROPERTIES.keys():
+        md = instance.get_metadata_from_object(self.instance)
+        iprops = self.INSTANCE_PROPERTIES
+        for name in md.keys():
             actual = md[name]
             print 'checking', name, actual
-            expected = self.INSTANCE_PROPERTIES[name]
-            assert actual == expected
+            if name == 'name':
+                assert actual == iprops['OS-EXT-SRV-ATTR:instance_name']
+            elif name == 'host':
+                assert actual == iprops['hostId']
+            elif name == 'display_name':
+                assert actual == iprops['name']
+            elif name == 'instance_type':
+                assert actual == iprops['flavor']['id']
+            else:
+                assert actual == iprops[name]

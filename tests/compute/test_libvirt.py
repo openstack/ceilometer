@@ -56,6 +56,8 @@ class TestLibvirtBase(test_base.TestCase):
         self.manager = manager.AgentManager()
         self.instance = mock.MagicMock()
         self.instance.name = 'instance-00000001'
+        setattr(self.instance, 'OS-EXT-SRV-ATTR:instance_name',
+                self.instance.name)
         self.instance.id = 1
         self.instance.instance_type = mock.MagicMock()
         self.instance.instance_type.name = 'm1.small'
@@ -217,10 +219,13 @@ class TestCPUPollster(TestLibvirtBase):
         self.instance.vcpus = 1
         conn = fake_libvirt_conn(self.mox, 3)
         self.mox.StubOutWithMock(conn, 'get_info')
-        conn.get_info(self.instance).AndReturn({'cpu_time': 1 * (10 ** 6)})
-        conn.get_info(self.instance).AndReturn({'cpu_time': 3 * (10 ** 6)})
+        conn.get_info({'name': self.instance.name}).AndReturn(
+            {'cpu_time': 1 * (10 ** 6)})
+        conn.get_info({'name': self.instance.name}).AndReturn(
+            {'cpu_time': 3 * (10 ** 6)})
         # cpu_time resets on instance restart
-        conn.get_info(self.instance).AndReturn({'cpu_time': 2 * (10 ** 6)})
+        conn.get_info({'name': self.instance.name}).AndReturn(
+            {'cpu_time': 2 * (10 ** 6)})
         self.mox.ReplayAll()
 
         def _verify_cpu_metering(zero, expected_time):

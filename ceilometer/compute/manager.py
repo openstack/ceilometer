@@ -17,9 +17,10 @@
 # under the License.
 
 from ceilometer import extension_manager
+
+from ceilometer import nova_client
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import log
-from ceilometer.compute import resources
 from ceilometer import publish
 
 OPTS = [
@@ -40,8 +41,6 @@ PLUGIN_NAMESPACE = 'ceilometer.poll.compute'
 class AgentManager(object):
 
     def __init__(self):
-        self.resources = resources.Resources()
-
         self.ext_manager = extension_manager.ActivatedExtensionManager(
             namespace=PLUGIN_NAMESPACE,
             disabled_names=cfg.CONF.disabled_compute_pollsters,
@@ -76,6 +75,7 @@ class AgentManager(object):
 
     def periodic_tasks(self, context, raise_on_error=False):
         """Tasks to be run at a periodic interval."""
-        for instance in self.resources.instance_get_all_by_host(context):
-            if instance['vm_state'] != 'error':
+        nv = nova_client.Client()
+        for instance in nv.instance_get_all_by_host(cfg.CONF.host):
+            if getattr(instance, 'OS-EXT-STS:vm_state', None) != 'error':
                 self.poll_instance(context, instance)

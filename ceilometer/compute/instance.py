@@ -20,7 +20,6 @@
 
 INSTANCE_PROPERTIES = [
     # Identity properties
-    'display_name',
     'reservation_id',
     # Type properties
     'architecture',
@@ -41,16 +40,16 @@ INSTANCE_PROPERTIES = [
     ]
 
 
-def get_metadata_from_dbobject(instance):
+def get_metadata_from_object(instance):
     """Return a metadata dictionary for the instance.
     """
     metadata = {
-        'display_name': instance.display_name,
-        'instance_type': (instance.instance_type.flavorid
-                          if instance.instance_type
-                          else None),
-        'host': instance.host,
+        'display_name': instance.name,
+        'name': getattr(instance, 'OS-EXT-SRV-ATTR:instance_name', u''),
+        'instance_type': (instance.flavor['id'] if instance.flavor else None),
+        'host': instance.hostId,
         }
+
     for name in INSTANCE_PROPERTIES:
-        metadata[name] = instance.get(name, u'')
+        metadata[name] = getattr(instance, name, u'')
     return metadata
