@@ -82,9 +82,10 @@ Image (Glance)
 Name                      Type        Volume   Resource  Note
 ========================  ==========  =======  ========  =======================================================
 image                     Gauge             1  image ID  Image polling -> it (still) exists
-image_size                Gauge         bytes  image ID  Uploaded image size
-image_download            Gauge         bytes  image ID  Image is downloaded
-image_serve               Gauge         bytes  image ID  Image is served out
+image.size                Gauge         bytes  image ID  Uploaded image size
+image.update              Delta          reqs  image ID  Number of update on the image
+image.download            Delta         bytes  image ID  Image is downloaded
+image.serve               Delta         bytes  image ID  Image is served out
 ========================  ==========  =======  ========  =======================================================
 
 Volume (Cinder)

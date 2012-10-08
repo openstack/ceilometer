@@ -42,10 +42,6 @@ class ImageBase(plugin.NotificationBase):
     """
 
     @staticmethod
-    def get_event_types():
-        return ['image.send']
-
-    @staticmethod
     def get_exchange_topics(conf):
         """Return a sequence of ExchangeTopics defining the exchange and
         topics to be connected for this plugin."""
@@ -56,19 +52,89 @@ class ImageBase(plugin.NotificationBase):
                            for topic in conf.notification_topics)),
         ]
 
-    def _counter(self, message, name, user_id, project_id):
+
+class ImageCRUDBase(ImageBase):
+
+    metadata_keys = [
+        'name',
+        'size',
+        'status',
+        'disk_format',
+        'container_format',
+        'location',
+        'deleted',
+        'created_at',
+        'updated_at',
+        'properties',
+        'protected',
+        'checksum',
+        'is_public',
+        'deleted_at',
+        'min_ram',
+    ]
+
+    @staticmethod
+    def get_event_types():
+        return [
+            'image.update',
+        ]
+
+
+class ImageCRUD(ImageCRUDBase):
+
+    def process_notification(self, message):
         metadata = self.notification_to_metadata(message)
-        return counter.Counter(
+        return [
+            counter.Counter(
                 source='?',
-                name=name,
-                type=counter.TYPE_GAUGE,
-                volume=message['payload']['bytes_sent'],
-                resource_id=message['payload']['image_id'],
-                user_id=user_id,
-                project_id=project_id,
+                name=message['event_type'],
+                type=counter.TYPE_DELTA,
+                volume=1,
+                resource_id=message['payload']['id'],
+                user_id=None,
+                project_id=message['payload']['owner'],
                 timestamp=message['timestamp'],
                 resource_metadata=metadata,
-                )
+            ),
+        ]
+
+
+class Image(ImageCRUDBase):
+
+    def process_notification(self, message):
+        metadata = self.notification_to_metadata(message)
+        return [
+            counter.Counter(
+                source='?',
+                name='image',
+                type=counter.TYPE_GAUGE,
+                volume=1,
+                resource_id=message['payload']['id'],
+                user_id=None,
+                project_id=message['payload']['owner'],
+                timestamp=message['timestamp'],
+                resource_metadata=metadata,
+            ),
+        ]
+
+
+class ImageSize(ImageCRUDBase):
+
+    def process_notification(self, message):
+        metadata = self.notification_to_metadata(message)
+        return [
+            counter.Counter(
+                source='?',
+                name='image.size',
+                type=counter.TYPE_GAUGE,
+                volume=message['payload']['size'],
+                resource_id=message['payload']['id'],
+                user_id=None,
+                project_id=message['payload']['owner'],
+                timestamp=message['timestamp'],
+                resource_metadata=metadata,
+            ),
+        ]
 
 
 class ImageDownload(ImageBase):
@@ -76,13 +142,27 @@ class ImageDownload(ImageBase):
 
     metadata_keys = ['destination_ip', 'owner_id']
 
-    def process_notification(self, message):
+    @staticmethod
+    def get_event_types():
         return [
-            self._counter(message,
-                          'image_download',
-                          message['payload']['receiver_user_id'],
-                          message['payload']['receiver_tenant_id']),
-            ]
+            'image.send',
+        ]
+
+    def process_notification(self, message):
+        metadata = self.notification_to_metadata(message)
+        return [
+            counter.Counter(
+                source='?',
+                name='image.download',
+                type=counter.TYPE_DELTA,
+                volume=message['payload']['bytes_sent'],
+                resource_id=message['payload']['image_id'],
+                user_id=message['payload']['receiver_user_id'],
+                project_id=message['payload']['receiver_tenant_id'],
+                timestamp=message['timestamp'],
+                resource_metadata=metadata,
+            ),
+        ]
 
 
 class ImageServe(ImageBase):
@@ -91,10 +171,24 @@ class ImageServe(ImageBase):
     metadata_keys = ['destination_ip', 'receiver_user_id',
                      'receiver_tenant_id']
 
-    def process_notification(self, message):
+    @staticmethod
+    def get_event_types():
         return [
-            self._counter(message,
-                          'image_serve',
-                          message['payload']['owner_id'],
-                          None),
-            ]
+            'image.send',
+        ]
+
+    def process_notification(self, message):
+        metadata = self.notification_to_metadata(message)
+        return [
+            counter.Counter(
+                source='?',
+                name='image.serve',
+                type=counter.TYPE_DELTA,
+                volume=message['payload']['bytes_sent'],
+                resource_id=message['payload']['image_id'],
+                user_id=None,
+                project_id=message['payload']['owner_id'],
+                timestamp=message['timestamp'],
+                resource_metadata=metadata,
+            ),
+        ]

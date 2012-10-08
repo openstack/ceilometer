@@ -109,7 +109,7 @@ class ImageSizePollster(_Base):
         for image in self.iter_images():
             yield counter.Counter(
                 source='?',
-                name='image_size',
+                name='image.size',
                 type=counter.TYPE_GAUGE,
                 volume=image['size'],
                 user_id=None,
