@@ -117,5 +117,3 @@ plugins in the directory ``tests/compute`` and for the agent itself in ``test/ag
 Unit tests are run in a continuous integration process for each commit made to
 the project, thus ensuring as best as possible that a given patch has no side
 effect to the rest of the project.
-
-.. todo:: FIXME: could not find a unit test for CPUPollster
