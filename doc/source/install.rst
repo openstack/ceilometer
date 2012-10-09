@@ -16,8 +16,11 @@
 .. _install:
 
 ================================================
- Installing and Running the Development Version
+Install
 ================================================
+
+Installing and Running the Development Version
+++++++++++++++++++++++++++++++++++++++++++++++=
 
 Ceilometer has four daemons. The :term:`compute agent` runs on the
 Nova compute node(s) while the :term:`central agent` and
@@ -58,9 +61,8 @@ ceilometer::
    # Enable the ceilometer services
    enable_service ceilometer-acompute,ceilometer-acentral,ceilometer-collector,ceilometer-api
 
-===================
 Installing Manually
-===================
++++++++++++++++++++
 
 Installing the Collector
 ========================

@@ -93,7 +93,7 @@ state_path                   currentdir                            Top-level dir
 sqlite_db                    nova.sqlite                           file name for sqlite
 sql_connection               sqlite:///$state_path/$sqlite_db      connection string for sql database
 matchmaker_ringfile          /etc/nova/matchmaker_ring.json        Matchmaker ring file (JSON)
-rpc_zmq_bind_address         *                                     ZeroMQ bind address
+rpc_zmq_bind_address         '*'                                   ZeroMQ bind address
 rpc_zmq_matchmaker           ceilometer.openstack.common.rpc.      MatchMaker drivers
                              matchmaker.MatchMakerLocalhost
 rpc_zmq_port                 9501                                  ZeroMQ receiver listening port
@@ -110,7 +110,7 @@ rabbit_retry_interval        1                                     how frequentl
 rabbit_retry_backoff         2                                     how long to backoff for between retries when connecting
 rabbit_max_retries           0                                     maximum retries with trying to connect to RabbitMQ
                                                                    (the default of 0 implies an infinite retry count)
-rabbit_durable_queues
+rabbit_durable_queues        False                                 use durable queues in RabbitMQ
 rabbit_use_ssl               False                                 connect over SSL for RabbitMQ
 rabbit_durable_queues        False                                 use durable queues in RabbitMQ
 rabbit_ha_queues             False                                 use H/A queues in RabbitMQ (x-ha-policy: all).
