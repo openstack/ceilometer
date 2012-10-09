@@ -84,6 +84,7 @@ Name                      Type        Volume   Resource  Note
 image                     Gauge             1  image ID  Image polling -> it (still) exists
 image.size                Gauge         bytes  image ID  Uploaded image size
 image.update              Delta          reqs  image ID  Number of update on the image
+image.upload              Delta          reqs  image ID  Number of upload of the image
 image.download            Delta         bytes  image ID  Image is downloaded
 image.serve               Delta         bytes  image ID  Image is served out
 ========================  ==========  =======  ========  =======================================================

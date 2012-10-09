@@ -77,6 +77,7 @@ class ImageCRUDBase(ImageBase):
     def get_event_types():
         return [
             'image.update',
+            'image.upload',
         ]
 
 
