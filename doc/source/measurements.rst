@@ -51,10 +51,10 @@ instance:type             Gauge             1  inst ID   Duration of instance ty
 disk.io.requests          Cumulative  request  inst ID   Number of disk io requests
 disk.io.bytes             Cumulative    bytes  inst ID   Volume of disk io in bytes
 cpu                       Cumulative  seconds  inst ID   CPU time used
-network.incoming.bytes    Cumulative    bytes  inst ID   number of incoming bytes on the network
-network.outgoing.bytes    Cumulative    bytes  inst ID   number of outgoing bytes on the network
-network.incoming.packets  Cumulative  packets  inst ID   number of incoming packets
-network.outgoing.packets  Cumulative  packets  inst ID   number of outgoing packets
+network.incoming.bytes    Cumulative    bytes  iface ID  number of incoming bytes on the network
+network.outgoing.bytes    Cumulative    bytes  iface ID  number of outgoing bytes on the network
+network.incoming.packets  Cumulative  packets  iface ID  number of incoming packets
+network.outgoing.packets  Cumulative  packets  iface ID  number of outgoing packets
 ========================  ==========  =======  ========  =======================================================
 
 Network (Quantum)
