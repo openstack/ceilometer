@@ -55,6 +55,9 @@ setuptools.setup(
     ephemeral_disk_size = ceilometer.compute.notifications:EphemeralDiskSize
     volume = ceilometer.volume.notifications:Volume
     volume_size = ceilometer.volume.notifications:VolumeSize
+    image_crud = ceilometer.image.notifications:ImageCRUD
+    image = ceilometer.image.notifications:Image
+    image_size = ceilometer.image.notifications:ImageSize
     image_download = ceilometer.image.notifications:ImageDownload
     image_serve = ceilometer.image.notifications:ImageServe
     network = ceilometer.network.notifications:Network

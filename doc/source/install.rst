@@ -61,6 +61,10 @@ ceilometer::
    # Enable the ceilometer services
    enable_service ceilometer-acompute,ceilometer-acentral,ceilometer-collector,ceilometer-api
 
+5. If you want to be able to retrieve image counters, you need to instruct
+   Glance to send notifications to the bus by changing ``notifier_strategy``
+   to ``rabbit`` in ``glance-api.conf``.
+
 Installing Manually
 +++++++++++++++++++
 
