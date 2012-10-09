@@ -68,18 +68,20 @@ class TestRunTasks(base.TestCase):
         # Set up a fake instance value to be returned by
         # instance_get_all_by_host() so when the manager gets the list
         # of instances to poll we can control the results.
-        self.instance = 'faux instance'
+        self.instance = {'name': 'faux', 'vm_state': 'active'}
+        stillborn_instance = {'name': 'stillborn', 'vm_state': 'error'}
         self.mox.StubOutWithMock(self.mgr.db, 'instance_get_all_by_host')
         self.mgr.db.instance_get_all_by_host(
             None,
             self.mgr.host,
-            ).AndReturn([self.instance])
+            ).AndReturn([self.instance, stillborn_instance])
 
         self.mox.ReplayAll()
         # Invoke the periodic tasks to call the pollsters.
         self.mgr.periodic_tasks(None)
 
     def test_message(self):
+        assert len(self.Pollster.counters) == 1
         assert self.Pollster.counters[0][1] is self.instance
 
     def test_notifications(self):
