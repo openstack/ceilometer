@@ -69,6 +69,14 @@ NOTIFICATION_UPDATE = {"message_id": "0c65cb9c-018c-11e2-bc91-5453ed1bbb5f",
                        "timestamp": NOW}
 
 
+NOTIFICATION_UPLOAD = {"message_id": "0c65cb9c-018c-11e2-bc91-5453ed1bbb5f",
+                       "publisher_id": "images.example.com",
+                       "event_type": "image.upload",
+                       "priority": "info",
+                       "payload": IMAGE_META,
+                       "timestamp": NOW}
+
+
 class TestNotification(unittest.TestCase):
 
     def _verify_common_counter(self, c, name, volume):
@@ -127,3 +135,28 @@ class TestNotification(unittest.TestCase):
         self._verify_common_counter(update, 'image.size',
                                     IMAGE_META['size'])
         self.assertEqual(update.type, counter.TYPE_GAUGE)
+
+    def test_image_crud_on_upload(self):
+        handler = notifications.ImageCRUD()
+        counters = handler.process_notification(NOTIFICATION_UPLOAD)
+        self.assertEqual(len(counters), 1)
+        upload = counters[0]
+        self._verify_common_counter(upload, 'image.upload', 1)
+        self.assertEqual(upload.type, counter.TYPE_DELTA)
+
+    def test_image_on_upload(self):
+        handler = notifications.Image()
+        counters = handler.process_notification(NOTIFICATION_UPLOAD)
+        self.assertEqual(len(counters), 1)
+        upload = counters[0]
+        self._verify_common_counter(upload, 'image', 1)
+        self.assertEqual(upload.type, counter.TYPE_GAUGE)
+
+    def test_image_size_on_upload(self):
+        handler = notifications.ImageSize()
+        counters = handler.process_notification(NOTIFICATION_UPLOAD)
+        self.assertEqual(len(counters), 1)
+        upload = counters[0]
+        self._verify_common_counter(upload, 'image.size',
+                                    IMAGE_META['size'])
+        self.assertEqual(upload.type, counter.TYPE_GAUGE)
