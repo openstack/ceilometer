@@ -80,4 +80,5 @@ class AgentManager(manager.Manager):
         # FIXME(dhellmann): How do we get a list of instances without
         # talking directly to the database?
         for instance in self.db.instance_get_all_by_host(context, self.host):
-            self.poll_instance(context, instance)
+            if instance['vm_state'] != 'error':
+                self.poll_instance(context, instance)
