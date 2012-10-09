@@ -77,6 +77,14 @@ NOTIFICATION_UPLOAD = {"message_id": "0c65cb9c-018c-11e2-bc91-5453ed1bbb5f",
                        "timestamp": NOW}
 
 
+NOTIFICATION_DELETE = {"message_id": "0c65cb9c-018c-11e2-bc91-5453ed1bbb5f",
+                       "publisher_id": "images.example.com",
+                       "event_type": "image.delete",
+                       "priority": "info",
+                       "payload": IMAGE_META,
+                       "timestamp": NOW}
+
+
 class TestNotification(unittest.TestCase):
 
     def _verify_common_counter(self, c, name, volume):
@@ -160,3 +168,28 @@ class TestNotification(unittest.TestCase):
         self._verify_common_counter(upload, 'image.size',
                                     IMAGE_META['size'])
         self.assertEqual(upload.type, counter.TYPE_GAUGE)
+
+    def test_image_crud_on_delete(self):
+        handler = notifications.ImageCRUD()
+        counters = handler.process_notification(NOTIFICATION_DELETE)
+        self.assertEqual(len(counters), 1)
+        delete = counters[0]
+        self._verify_common_counter(delete, 'image.delete', 1)
+        self.assertEqual(delete.type, counter.TYPE_DELTA)
+
+    def test_image_on_delete(self):
+        handler = notifications.Image()
+        counters = handler.process_notification(NOTIFICATION_DELETE)
+        self.assertEqual(len(counters), 1)
+        delete = counters[0]
+        self._verify_common_counter(delete, 'image', 1)
+        self.assertEqual(delete.type, counter.TYPE_GAUGE)
+
+    def test_image_size_on_delete(self):
+        handler = notifications.ImageSize()
+        counters = handler.process_notification(NOTIFICATION_DELETE)
+        self.assertEqual(len(counters), 1)
+        delete = counters[0]
+        self._verify_common_counter(delete, 'image.size',
+                                    IMAGE_META['size'])
+        self.assertEqual(delete.type, counter.TYPE_GAUGE)
