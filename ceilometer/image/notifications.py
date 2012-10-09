@@ -78,6 +78,7 @@ class ImageCRUDBase(ImageBase):
         return [
             'image.update',
             'image.upload',
+            'image.delete',
         ]
 
 

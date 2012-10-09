@@ -85,6 +85,7 @@ image                     Gauge             1  image ID  Image polling -> it (st
 image.size                Gauge         bytes  image ID  Uploaded image size
 image.update              Delta          reqs  image ID  Number of update on the image
 image.upload              Delta          reqs  image ID  Number of upload of the image
+image.delete              Delta          reqs  image ID  Number of delete on the image
 image.download            Delta         bytes  image ID  Image is downloaded
 image.serve               Delta         bytes  image ID  Image is served out
 ========================  ==========  =======  ========  =======================================================
