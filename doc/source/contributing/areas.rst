@@ -50,7 +50,7 @@ the service and manager base classes still need to move.
 Testing
 =======
 
-The pre-release version of ceilometer has extensive unit tests, but
+The first version of ceilometer has extensive unit tests, but
 has not seen much run-time in real environments. Setting up a copy of
 ceilometer to monitor a real OpenStack installation or to perform some
 load testing would be especially helpful.
