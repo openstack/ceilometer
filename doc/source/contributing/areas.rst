@@ -44,7 +44,7 @@ the service and manager base classes still need to move.
 
 .. seealso::
 
-   * https://launchpad.net/openstack-nova
+   * https://launchpad.net/nova
    * https://launchpad.net/openstack-common
 
 Testing
