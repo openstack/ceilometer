@@ -51,8 +51,8 @@ setuptools.setup(
     instance_flavor = ceilometer.compute.notifications:InstanceFlavor
     memory = ceilometer.compute.notifications:Memory
     vcpus = ceilometer.compute.notifications:VCpus
-    root_disk_size = ceilometer.compute.notifications:RootDiskSize
-    ephemeral_disk_size = ceilometer.compute.notifications:EphemeralDiskSize
+    disk_root_size = ceilometer.compute.notifications:RootDiskSize
+    disk_ephemeral_size = ceilometer.compute.notifications:EphemeralDiskSize
     volume = ceilometer.volume.notifications:Volume
     volume_size = ceilometer.volume.notifications:VolumeSize
     image_crud = ceilometer.image.notifications:ImageCRUD

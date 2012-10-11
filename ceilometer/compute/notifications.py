@@ -122,7 +122,7 @@ class RootDiskSize(_Base):
     def process_notification(self, message):
         return [
             counter.Counter(source='?',
-                            name='root_disk_size',
+                            name='disk.root.size',
                             type=counter.TYPE_GAUGE,
                             volume=message['payload']['root_gb'],
                             user_id=message['payload']['user_id'],
@@ -140,7 +140,7 @@ class EphemeralDiskSize(_Base):
     def process_notification(self, message):
         return [
             counter.Counter(source='?',
-                            name='ephemeral_disk_size',
+                            name='disk.ephemeral.size',
                             type=counter.TYPE_GAUGE,
                             volume=message['payload']['ephemeral_gb'],
                             user_id=message['payload']['user_id'],

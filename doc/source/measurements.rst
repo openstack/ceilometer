@@ -34,7 +34,8 @@ Gauge       Discrete items (floating IPs, image uploads) and fluctuating values 
 Delta       Changing over time (bandwidth)
 ==========  ==============================================================================
 
-Here are the counter types by components that are currently implemented:
+
+Here are the meter types by components that are currently implemented:
 
 Compute (Nova)
 ==============
@@ -43,14 +44,14 @@ Compute (Nova)
 Name                      Type        Volume   Resource  Note
 ========================  ==========  =======  ========  =======================================================
 instance                  Gauge             1  inst ID   Duration of instance
+instance:<type>           Gauge             1  inst ID   Duration of instance <type> (openstack types)
 memory                    Gauge            MB  inst ID   Volume of RAM in MB
+cpu                       Cumulative  seconds  inst ID   CPU time used
 vcpus                     Gauge          vcpu  inst ID   Number of VCPUs
-root_disk_size            Gauge            GB  inst ID   Size of root disk in GB
-ephemeral_disk_size       Gauge            GB  inst ID   Size of ephemeral disk in GB
-instance:type             Gauge             1  inst ID   Duration of instance type
+disk.root.size            Gauge            GB  inst ID   Size of root disk in GB
+disk.ephemeral.size       Gauge            GB  inst ID   Size of ephemeral disk in GB
 disk.io.requests          Cumulative  request  inst ID   Number of disk io requests
 disk.io.bytes             Cumulative    bytes  inst ID   Volume of disk io in bytes
-cpu                       Cumulative  seconds  inst ID   CPU time used
 network.incoming.bytes    Cumulative    bytes  iface ID  number of incoming bytes on the network
 network.outgoing.bytes    Cumulative    bytes  iface ID  number of outgoing bytes on the network
 network.incoming.packets  Cumulative  packets  iface ID  number of incoming packets
@@ -72,7 +73,7 @@ subnet.update             Delta       request  subnt ID  Update requests for thi
 port                      Gauge             1  port ID   Duration of port
 port.create               Delta       request  port ID   Creation requests for this port
 port.update               Delta       request  port ID   Update requests for this port
-floating_ip               Gauge             1  ip ID     Duration of floating ip
+ip.floating               Gauge             1  ip ID     Duration of floating ip
 ========================  ==========  =======  ========  =======================================================
 
 Image (Glance)
@@ -97,7 +98,17 @@ Volume (Cinder)
 Name                      Type        Volume   Resource  Note
 ========================  ==========  =======  ========  =======================================================
 volume                    Gauge             1  vol ID    Duration of volune
-volume_size               Gauge            GB  vol ID    Size of volume
+volume.size               Gauge            GB  vol ID    Size of volume
 ========================  ==========  =======  ========  =======================================================
 
+Naming convention
+=================
+If you plan on adding meters, please follow the convention bellow:
 
+1. Always use '.' as separator and go from least to most discriminent word.
+   For example, do not use ephemeral_disk_size but disk.ephemeral.size
+
+2. When a part of the name is a variable, it should always be at the end and starts with a ':'.
+   For example do not use <type>.image but image:<type> where type is your variable name.
+
+3. If you have any hesitation, come and ask in #openstack-metering
