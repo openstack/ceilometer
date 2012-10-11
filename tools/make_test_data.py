@@ -123,7 +123,7 @@ def main():
                             timestamp=timestamp,
                             resource_metadata={},
                             )
-        data = meter.meter_message_from_counter(c)
+        data = meter.meter_message_from_counter(c, cfg.CONF.metering_secret)
         conn.record_metering_data(data)
         n += 1
         timestamp = timestamp + increment
