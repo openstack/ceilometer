@@ -91,6 +91,14 @@ LOG = log.getLogger(__name__)
 blueprint = flask.Blueprint('v1', __name__)
 
 
+def request_wants_html():
+    best = flask.request.accept_mimetypes \
+        .best_match(['application/json', 'text/html'])
+    return best == 'text/html' and \
+        flask.request.accept_mimetypes[best] > \
+        flask.request.accept_mimetypes['application/json']
+
+
 ## APIs for working with resources.
 
 
@@ -242,12 +250,11 @@ def list_projects_by_source(source):
 ## APIs for working with events.
 
 
-def _list_events(project=None,
-                resource=None,
-                source=None,
-                user=None,
-                meter=None,
-                ):
+def _list_events(meter,
+                 project=None,
+                 resource=None,
+                 source=None,
+                 user=None):
     """Return a list of raw metering events.
     """
     f = storage.EventFilter(user=user,
@@ -256,8 +263,17 @@ def _list_events(project=None,
                             meter=meter,
                             resource=resource,
                             )
-    events = flask.request.storage_conn.get_raw_events(f)
-    return flask.jsonify(events=list(events))
+    events = list(flask.request.storage_conn.get_raw_events(f))
+    jsonified = flask.jsonify(events=events)
+    if request_wants_html():
+        return flask.templating.render_template('list_event.html',
+                                                user=user,
+                                                project=project,
+                                                source=source,
+                                                meter=meter,
+                                                resource=resource,
+                                                events=jsonified)
+    return jsonified
 
 
 @blueprint.route('/projects/<project>/meters/<meter>')

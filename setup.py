@@ -18,7 +18,7 @@
 # under the License.
 
 import textwrap
-
+import os
 import setuptools
 
 from ceilometer.openstack.common import setup as common_setup
@@ -28,6 +28,12 @@ depend_links = common_setup.parse_dependency_links(['tools/pip-requires'])
 
 version = '0.2'
 url_base = 'http://tarballs.openstack.org/ceilometer/ceilometer-%s.tar.gz'
+
+
+def directories(target_dir):
+    return [dirpath
+            for dirpath, dirnames, filenames in os.walk(target_dir)]
+
 
 setuptools.setup(
 
@@ -58,6 +64,11 @@ setuptools.setup(
 
     packages=setuptools.find_packages(exclude=['bin']),
     cmdclass=common_setup.get_cmdclass(),
+    package_data={
+        "ceilometer":
+        directories("ceilomter/api/static")
+        + directories("ceilometer/api/templates"),
+    },
     include_package_data=True,
 
     test_suite='nose.collector',
