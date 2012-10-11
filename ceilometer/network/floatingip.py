@@ -19,6 +19,7 @@
 from nova import exception
 
 from ceilometer.openstack.common import log
+from ceilometer.openstack.common import timeutils
 
 from ceilometer import counter
 from ceilometer.central import plugin
@@ -44,7 +45,7 @@ class FloatingIPPollster(plugin.CentralPollster):
                     user_id=None,
                     project_id=ip.project_id,
                     resource_id=ip.id,
-                    timestamp=None,  # FIXME(dhellmann): This needs to be now()
+                    timestamp=timeutils.utcnow().isoformat(),
                     resource_metadata={
                         'address': ip.address,
                         'fixed_ip_id': ip.fixed_ip_id,
