@@ -26,25 +26,53 @@ from ceilometer.openstack.common import setup as common_setup
 requires = common_setup.parse_requirements(['tools/pip-requires'])
 depend_links = common_setup.parse_dependency_links(['tools/pip-requires'])
 
+version = '0.1'
+url_base = 'http://tarballs.openstack.org/ceilometer/ceilometer-%s.tar.gz'
+
 setuptools.setup(
+
     name='ceilometer',
-    version='0.1',
+    version=version,
+
     description='cloud computing metering',
+
     author='OpenStack',
     author_email='ceilometer@lists.launchpad.net',
+
     url='https://launchpad.net/ceilometer',
+    download_url=url_base % version,
+
+    classifiers=[
+        'Development Status :: 3 - Alpha',
+        'Framework :: Setuptools Plugin',
+        'Intended Audience :: Information Technology',
+        'Intended Audience :: System Administrators',
+        'License :: OSI Approved :: Apache Software License',
+        'Operating System :: POSIX :: Linux',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Topic :: System :: Monitoring',
+    ],
+
     packages=setuptools.find_packages(exclude=['bin']),
     cmdclass=common_setup.get_cmdclass(),
     include_package_data=True,
+
     test_suite='nose.collector',
+
     setup_requires=['setuptools-git>=0.4'],
+
     scripts=['bin/ceilometer-agent-compute',
              'bin/ceilometer-agent-central',
              'bin/ceilometer-api',
              'bin/ceilometer-collector'],
+
     py_modules=[],
+
     install_requires=requires,
     dependency_links=depend_links,
+
     entry_points=textwrap.dedent("""
     [ceilometer.collector]
     instance = ceilometer.compute.notifications:Instance
