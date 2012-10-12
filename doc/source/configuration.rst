@@ -20,7 +20,7 @@
 Ceilometer specific
 ===================
 
-The following table lists the ceilometer specific option in the global configuration file.
+The following table lists the ceilometer specific options in the global configuration file.
 Please note that ceilometer uses openstack-common extensively, which requires that
 the other parameters are set appropriately. For information we are listing the configuration
 elements that we use after the ceilometer specific elements. 
