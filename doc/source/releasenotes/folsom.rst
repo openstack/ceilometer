@@ -32,6 +32,11 @@ Components
    to support nova-volume in favor of Cinder. A detailed list of meters covered
    per component can be found at in :doc:`../measurements`.
 
+Nova with libvirt only
+   Most of the Nova meters will only work with libvirt fronted hypervisors at the
+   moment, and our test coverage was mostly done on KVM. Contributors are welcome
+   to implement other virtualization backends' meters.
+
 Quantum delete events
    Quantum delete notifications do not include the same metadata as the other
    messages, so we ignore them for now. This isn't ideal, since it may mean we
