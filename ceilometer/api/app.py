@@ -23,6 +23,8 @@ import flask
 from ceilometer.openstack.common import cfg
 from ceilometer import storage
 from ceilometer.api import v1
+from ceilometer.api import acl
+
 
 app = flask.Flask('ceilometer.api')
 app.register_blueprint(v1.blueprint, url_prefix='/v1')
@@ -36,3 +38,5 @@ def attach_config():
     storage_engine = storage.get_engine(cfg.CONF)
     flask.request.storage_engine = storage_engine
     flask.request.storage_conn = storage_engine.get_connection(cfg.CONF)
+
+acl.install(app)
