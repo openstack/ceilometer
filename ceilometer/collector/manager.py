@@ -147,9 +147,8 @@ class CollectorManager(manager.Manager):
                 # Storage engines are responsible for converting
                 # that value to something they can store.
                 if data.get('timestamp'):
-                    data['timestamp'] = timeutils.parse_isotime(
-                        data['timestamp'],
-                        )
+                    ts = timeutils.parse_isotime(data['timestamp'])
+                    data['timestamp'] = timeutils.normalize_time(ts)
                 self.storage_conn.record_metering_data(data)
             except Exception as err:
                 LOG.error('Failed to record metering data: %s', err)

@@ -18,7 +18,7 @@
 """Tests for ceilometer/agent/manager.py
 """
 
-import datetime
+from datetime import datetime
 
 from ceilometer import meter
 from ceilometer.collector import manager
@@ -155,7 +155,29 @@ class TestCollectorManager(tests_base.TestCase):
 
         expected = {}
         expected.update(msg)
-        expected['timestamp'] = datetime.datetime(2012, 7, 2, 13, 53, 40)
+        expected['timestamp'] = datetime(2012, 7, 2, 13, 53, 40)
+
+        self.mgr.storage_conn = self.mox.CreateMock(base.Connection)
+        self.mgr.storage_conn.record_metering_data(expected)
+        self.mox.ReplayAll()
+
+        self.mgr.record_metering_data(self.ctx, msg)
+        self.mox.VerifyAll()
+
+    def test_timestamp_tzinfo_conversion(self):
+        msg = {'counter_name': 'test',
+               'resource_id': self.id(),
+               'counter_volume': 1,
+               'timestamp': '2012-09-30T15:31:50.262-08:00',
+               }
+        msg['message_signature'] = meter.compute_signature(
+            msg,
+            cfg.CONF.metering_secret,
+            )
+
+        expected = {}
+        expected.update(msg)
+        expected['timestamp'] = datetime(2012, 9, 30, 23, 31, 50, 262000)
 
         self.mgr.storage_conn = self.mox.CreateMock(base.Connection)
         self.mgr.storage_conn.record_metering_data(expected)
