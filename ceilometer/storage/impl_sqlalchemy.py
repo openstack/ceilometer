@@ -127,14 +127,14 @@ class Connection(base.Connection):
 
         # create/update user && project, add/update their sources list
         if data['user_id']:
-            user = self.session.merge(User(id=data['user_id']))
+            user = self.session.merge(User(id=str(data['user_id'])))
             if not filter(lambda x: x.id == source.id, user.sources):
                 user.sources.append(source)
         else:
             user = None
 
         if data['project_id']:
-            project = self.session.merge(Project(id=data['project_id']))
+            project = self.session.merge(Project(id=str(data['project_id'])))
             if not filter(lambda x: x.id == source.id, project.sources):
                 project.sources.append(source)
         else:
@@ -144,7 +144,7 @@ class Connection(base.Connection):
         rtimestamp = datetime.datetime.utcnow()
         rmetadata = data['resource_metadata']
 
-        resource = self.session.merge(Resource(id=data['resource_id']))
+        resource = self.session.merge(Resource(id=str(data['resource_id'])))
         if not filter(lambda x: x.id == source.id, resource.sources):
             resource.sources.append(source)
         resource.project = project
