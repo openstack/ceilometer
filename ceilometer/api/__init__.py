@@ -29,7 +29,7 @@ flask.helpers.json = jsonutils
 # Register options for the service
 API_SERVICE_OPTS = [
     cfg.IntOpt('metering_api_port',
-               default=9000,
+               default=8777,
                help='The port for the ceilometer API server',
                ),
     ]
