@@ -157,6 +157,29 @@ NOTIFICATION_NETWORK_EXISTS = {
     u'message_id': u'9e839576-cc47-4c60-a7d8-5743681213b1'}
 
 
+NOTIFICATION_ROUTER_EXISTS = {
+    u'_context_roles': [u'anotherrole',
+                        u'Member'],
+    u'_context_read_deleted': u'no',
+    u'event_type': u'router.exists',
+    u'timestamp': u'2012-09-27 14:11:27.086575',
+    u'_context_tenant_id': u'82ed0c40ebe64d0bb3310027039c8ed2',
+    u'payload': {u'router':
+                 {'status': u'ACTIVE',
+                  'external_gateway_info':
+                  {'network_id': u'89d55642-4dec-43a4-a617-6cec051393b5'},
+                  'name': u'router1',
+                  'admin_state_up': True,
+                  'tenant_id': u'bb04a2b769c94917b57ba49df7783cfd',
+                  'id': u'ab8bb3ed-df23-4ca0-8f03-b887abcd5c23'}},
+    u'priority': u'INFO',
+    u'_context_is_admin': False,
+    u'_context_timestamp': u'2012-09-27 14:11:26.924779',
+    u'_context_user_id': u'b44b7ce67fc84414a5c1660a92a1b862',
+    u'publisher_id': u'network.ubuntu-VirtualBox',
+    u'message_id': u'9e839576-cc47-4c60-a7d8-5743681213b1'}
+
+
 class TestNotifications(unittest.TestCase):
     def test_network_create(self):
         v = notifications.Network()
@@ -183,6 +206,11 @@ class TestNotifications(unittest.TestCase):
         counters = v.process_notification(NOTIFICATION_NETWORK_EXISTS)
         self.assertEqual(len(list(counters)), 1)
 
+    def test_router_exists(self):
+        v = notifications.Router()
+        counters = v.process_notification(NOTIFICATION_ROUTER_EXISTS)
+        self.assertEqual(len(list(counters)), 1)
+
 
 class TestEventTypes(unittest.TestCase):
 
@@ -200,3 +228,6 @@ class TestEventTypes(unittest.TestCase):
         v = notifications.Port()
         events = v.get_event_types()
         assert events
+
+    def test_router(self):
+        assert notifications.Router().get_event_types()

@@ -153,3 +153,19 @@ class Port(NetworkNotificationBase):
     ]
 
     resource_name = 'port'
+
+
+class Router(NetworkNotificationBase):
+    """Listen for Quantum notifications in order to mediate with the
+    metering framework.
+
+    """
+
+    metadata_keys = [
+        "status",
+        "external_gateway_info",
+        "admin_state_up",
+        "name",
+    ]
+
+    resource_name = 'router'

@@ -94,6 +94,7 @@ setuptools.setup(
     network = ceilometer.network.notifications:Network
     subnet = ceilometer.network.notifications:Subnet
     port = ceilometer.network.notifications:Port
+    router = ceilometer.network.notifications:Router
 
     [ceilometer.poll.compute]
     libvirt_diskio = ceilometer.compute.libvirt:DiskIOPollster
