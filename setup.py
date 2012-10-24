@@ -45,6 +45,7 @@ setuptools.setup(
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Framework :: Setuptools Plugin',
+        'Environment :: OpenStack',
         'Intended Audience :: Information Technology',
         'Intended Audience :: System Administrators',
         'License :: OSI Approved :: Apache Software License',
@@ -72,6 +73,8 @@ setuptools.setup(
 
     install_requires=requires,
     dependency_links=depend_links,
+
+    zip_safe=False,
 
     entry_points=textwrap.dedent("""
     [ceilometer.collector]
