@@ -51,11 +51,17 @@ class TestInstancePollster(unittest.TestCase):
         self.instance = mock.MagicMock()
         self.instance.name = 'instance-00000001'
         self.instance.id = 1
+        self.instance.instance_type = mock.MagicMock()
+        self.instance.instance_type.name = 'm1.small'
         flags.FLAGS.compute_driver = 'libvirt.LibvirtDriver'
         flags.FLAGS.connection_type = 'libvirt'
 
     def test_get_counter(self):
-        list(self.pollster.get_counters(self.manager, self.instance))
+        counters = list(self.pollster.get_counters(self.manager,
+                                                   self.instance))
+        self.assertEquals(len(counters), 2)
+        self.assertEqual(counters[0].name, 'instance')
+        self.assertEqual(counters[1].name, 'instance:m1.small')
 
 
 class TestDiskIOPollster(unittest.TestCase):
