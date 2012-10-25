@@ -35,7 +35,6 @@ class TestListEvents(tests_api.TestBase):
     def setUp(self):
         super(TestListEvents, self).setUp()
         self.counter1 = counter.Counter(
-            'source1',
             'instance',
             'cumulative',
             1,
@@ -49,11 +48,11 @@ class TestListEvents(tests_api.TestBase):
             )
         msg = meter.meter_message_from_counter(self.counter1,
                                                cfg.CONF.metering_secret,
+                                               'source1',
                                                )
         self.conn.record_metering_data(msg)
 
         self.counter2 = counter.Counter(
-            'source2',
             'instance',
             'cumulative',
             1,
@@ -67,6 +66,7 @@ class TestListEvents(tests_api.TestBase):
             )
         msg2 = meter.meter_message_from_counter(self.counter2,
                                                 cfg.CONF.metering_secret,
+                                                'source2',
                                                 )
         self.conn.record_metering_data(msg2)
 

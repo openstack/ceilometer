@@ -79,7 +79,6 @@ class SQLAlchemyEngineTestBase(unittest.TestCase):
         migration.db_sync()
 
         self.counter = counter.Counter(
-            'test-1',
             'instance',
             counter.TYPE_CUMULATIVE,
             volume=1,
@@ -93,11 +92,11 @@ class SQLAlchemyEngineTestBase(unittest.TestCase):
             )
         self.msg1 = meter.meter_message_from_counter(self.counter,
                                                      cfg.CONF.metering_secret,
+                                                     'test-1',
                                                      )
         self.conn.record_metering_data(self.msg1)
 
         self.counter2 = counter.Counter(
-            'test-2',
             'instance',
             counter.TYPE_CUMULATIVE,
             volume=1,
@@ -111,11 +110,11 @@ class SQLAlchemyEngineTestBase(unittest.TestCase):
             )
         self.msg2 = meter.meter_message_from_counter(self.counter2,
                                                      cfg.CONF.metering_secret,
+                                                     'test-2',
                                                      )
         self.conn.record_metering_data(self.msg2)
 
         self.counter3 = counter.Counter(
-            'test-3',
             'instance',
             counter.TYPE_CUMULATIVE,
             volume=1,
@@ -129,12 +128,12 @@ class SQLAlchemyEngineTestBase(unittest.TestCase):
             )
         self.msg3 = meter.meter_message_from_counter(self.counter3,
                                                      cfg.CONF.metering_secret,
+                                                     'test-3',
                                                      )
         self.conn.record_metering_data(self.msg3)
 
         for i in range(2, 4):
             c = counter.Counter(
-                'test',
                 'instance',
                 counter.TYPE_CUMULATIVE,
                 1,
@@ -146,7 +145,8 @@ class SQLAlchemyEngineTestBase(unittest.TestCase):
                                    'tag': 'counter-%s' % i,
                                   }
                 )
-            msg = meter.meter_message_from_counter(c, cfg.CONF.metering_secret)
+            msg = meter.meter_message_from_counter(c, cfg.CONF.metering_secret,
+                                                   'test')
             self.conn.record_metering_data(msg)
 
 
@@ -396,7 +396,6 @@ class TestGetEventInterval(SQLAlchemyEngineTestBase):
     def _make_events(self, *timestamps):
         for t in timestamps:
             c = counter.Counter(
-                'test',
                 'instance',
                 counter.TYPE_CUMULATIVE,
                 1,
@@ -407,7 +406,8 @@ class TestGetEventInterval(SQLAlchemyEngineTestBase):
                 resource_metadata={'display_name': 'test-server',
                                    }
                 )
-            msg = meter.meter_message_from_counter(c, cfg.CONF.metering_secret)
+            msg = meter.meter_message_from_counter(c, cfg.CONF.metering_secret,
+                                                   'test')
             self.conn.record_metering_data(msg)
 
     def test_before_range(self):

@@ -69,8 +69,7 @@ class Volume(_Base):
 
     def process_notification(self, message):
         return [
-            counter.Counter(source='?',
-                            name='volume',
+            counter.Counter(name='volume',
                             type=counter.TYPE_GAUGE,
                             volume=1,
                             user_id=message['payload']['user_id'],
@@ -87,8 +86,7 @@ class VolumeSize(_Base):
 
     def process_notification(self, message):
         return [
-            counter.Counter(source='?',
-                            name='volume.size',
+            counter.Counter(name='volume.size',
                             type=counter.TYPE_GAUGE,
                             volume=message['payload']['size'],
                             user_id=message['payload']['user_id'],

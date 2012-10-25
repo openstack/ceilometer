@@ -71,8 +71,7 @@ class NetworkNotificationBase(plugin.NotificationBase):
         LOG.info('network notification %r', message)
         message['payload'] = message['payload'][self.resource_name]
         metadata = self.notification_to_metadata(message)
-        yield counter.Counter(source='?',
-                              name=self.resource_name,
+        yield counter.Counter(name=self.resource_name,
                               type=counter.TYPE_GAUGE,
                               volume=1,
                               user_id=message['_context_user_id'],
@@ -84,8 +83,7 @@ class NetworkNotificationBase(plugin.NotificationBase):
 
         network_counter_name = message['event_type'].rpartition('.')[0]
         if network_counter_name != self.resource_name:
-            yield counter.Counter(source='?',
-                                  name=network_counter_name,
+            yield counter.Counter(name=network_counter_name,
                                   type=counter.TYPE_DELTA,
                                   volume=1,
                                   user_id=message['_context_user_id'],

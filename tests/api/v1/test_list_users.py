@@ -38,7 +38,6 @@ class TestListUsers(tests_api.TestBase):
 
     def test_users(self):
         counter1 = counter.Counter(
-            'test_list_users',
             'instance',
             'cumulative',
             1,
@@ -52,11 +51,11 @@ class TestListUsers(tests_api.TestBase):
             )
         msg = meter.meter_message_from_counter(counter1,
                                                cfg.CONF.metering_secret,
+                                               'test_list_users',
                                                )
         self.conn.record_metering_data(msg)
 
         counter2 = counter.Counter(
-            'test_list_users',
             'instance',
             'cumulative',
             1,
@@ -70,6 +69,7 @@ class TestListUsers(tests_api.TestBase):
             )
         msg2 = meter.meter_message_from_counter(counter2,
                                                 cfg.CONF.metering_secret,
+                                                'test_list_users',
                                                 )
         self.conn.record_metering_data(msg2)
 
@@ -78,7 +78,6 @@ class TestListUsers(tests_api.TestBase):
 
     def test_with_source(self):
         counter1 = counter.Counter(
-            'test_list_users',
             'instance',
             'cumulative',
             1,
@@ -92,11 +91,11 @@ class TestListUsers(tests_api.TestBase):
             )
         msg = meter.meter_message_from_counter(counter1,
                                                cfg.CONF.metering_secret,
+                                               'test_list_users',
                                                )
         self.conn.record_metering_data(msg)
 
         counter2 = counter.Counter(
-            'not-test',
             'instance',
             'cumulative',
             1,
@@ -110,6 +109,7 @@ class TestListUsers(tests_api.TestBase):
             )
         msg2 = meter.meter_message_from_counter(counter2,
                                                 cfg.CONF.metering_secret,
+                                                'not-test',
                                                 )
         self.conn.record_metering_data(msg2)
 

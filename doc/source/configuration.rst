@@ -36,6 +36,7 @@ cinder_control_exchange     cinder                                Exchange name 
 quantum_control_exchange    quantum                               Exchange name for Quantum notifications
 metering_secret             change this or be hacked              Secret value for signing metering messages
 metering_topic              metering                              the topic ceilometer uses for metering messages
+counter_source              openstack                             The source name of emited counters
 control_exchange            ceilometer                            AMQP exchange to connect to if using RabbitMQ or Qpid
 periodic_interval           600                                   seconds between running periodic tasks
 os-username                 glance                                Username to use for openstack service access

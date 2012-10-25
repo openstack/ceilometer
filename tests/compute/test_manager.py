@@ -40,7 +40,6 @@ class TestRunTasks(base.TestCase):
     class Pollster:
         counters = []
         test_data = counter.Counter(
-            source='test',
             name='test',
             type=counter.TYPE_CUMULATIVE,
             volume=1,

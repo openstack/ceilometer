@@ -45,16 +45,19 @@ def register_opts(config):
 register_opts(cfg.CONF)
 
 
-def publish_counter(context, counter, topic, secret):
+def publish_counter(context, counter, topic, secret, source):
     """Send a metering message for the data represented by the counter.
 
     :param context: Execution context from the service or RPC call
     :param counter: ceilometer.counter.Counter instance
+    :param source: counter source
     """
     msg = {
         'method': 'record_metering_data',
         'version': '1.0',
-        'args': {'data': meter.meter_message_from_counter(counter, secret),
+        'args': {'data': meter.meter_message_from_counter(counter,
+                                                          secret,
+                                                          source),
                  },
         }
     LOG.debug('PUBLISH: %s', str(msg))

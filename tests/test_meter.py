@@ -99,8 +99,7 @@ def test_verify_signature_nested():
     assert meter.verify_signature(data, 'not-so-secret')
 
 
-TEST_COUNTER = counter.Counter(source='src',
-                               name='name',
+TEST_COUNTER = counter.Counter(name='name',
                                type='typ',
                                volume=1,
                                user_id='user',
@@ -149,14 +148,16 @@ TEST_NOTICE = {
 
 
 def test_meter_message_from_counter_signed():
-    msg = meter.meter_message_from_counter(TEST_COUNTER, 'not-so-secret')
+    msg = meter.meter_message_from_counter(TEST_COUNTER, 'not-so-secret',
+                                           'src')
     assert 'message_signature' in msg
 
 
 def test_meter_message_from_counter_field():
     def compare(f, c, msg_f, msg):
         assert msg == c
-    msg = meter.meter_message_from_counter(TEST_COUNTER, 'not-so-secret')
+    msg = meter.meter_message_from_counter(TEST_COUNTER, 'not-so-secret',
+                                           'src')
     name_map = {'name': 'counter_name',
                 'type': 'counter_type',
                 'volume': 'counter_volume',

@@ -86,7 +86,6 @@ class ImagePollster(_Base):
     def get_counters(self, manager, context):
         for image in self.iter_images():
             yield counter.Counter(
-                source='?',
                 name='image',
                 type=counter.TYPE_GAUGE,
                 volume=1,
@@ -103,7 +102,6 @@ class ImageSizePollster(_Base):
     def get_counters(self, manager, context):
         for image in self.iter_images():
             yield counter.Counter(
-                source='?',
                 name='image.size',
                 type=counter.TYPE_GAUGE,
                 volume=image.size,

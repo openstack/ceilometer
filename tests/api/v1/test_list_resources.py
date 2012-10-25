@@ -38,7 +38,6 @@ class TestListResources(tests_api.TestBase):
 
     def test_instances(self):
         counter1 = counter.Counter(
-            'test',
             'instance',
             'cumulative',
             1,
@@ -52,11 +51,11 @@ class TestListResources(tests_api.TestBase):
             )
         msg = meter.meter_message_from_counter(counter1,
                                                cfg.CONF.metering_secret,
+                                               'test',
                                                )
         self.conn.record_metering_data(msg)
 
         counter2 = counter.Counter(
-            'test',
             'instance',
             'cumulative',
             1,
@@ -70,6 +69,7 @@ class TestListResources(tests_api.TestBase):
             )
         msg2 = meter.meter_message_from_counter(counter2,
                                                 cfg.CONF.metering_secret,
+                                                'test',
                                                 )
         self.conn.record_metering_data(msg2)
 
@@ -78,7 +78,6 @@ class TestListResources(tests_api.TestBase):
 
     def test_with_source(self):
         counter1 = counter.Counter(
-            'test_list_resources',
             'instance',
             'cumulative',
             1,
@@ -92,11 +91,11 @@ class TestListResources(tests_api.TestBase):
             )
         msg = meter.meter_message_from_counter(counter1,
                                                cfg.CONF.metering_secret,
+                                               'test_list_resources',
                                                )
         self.conn.record_metering_data(msg)
 
         counter2 = counter.Counter(
-            'not-test',
             'instance',
             'cumulative',
             1,
@@ -110,6 +109,7 @@ class TestListResources(tests_api.TestBase):
             )
         msg2 = meter.meter_message_from_counter(counter2,
                                                 cfg.CONF.metering_secret,
+                                                'not-test',
                                                 )
         self.conn.record_metering_data(msg2)
 
@@ -119,7 +119,6 @@ class TestListResources(tests_api.TestBase):
 
     def test_with_user(self):
         counter1 = counter.Counter(
-            'test_list_resources',
             'instance',
             'cumulative',
             1,
@@ -133,11 +132,11 @@ class TestListResources(tests_api.TestBase):
             )
         msg = meter.meter_message_from_counter(counter1,
                                                cfg.CONF.metering_secret,
+                                               'test_list_resources',
                                                )
         self.conn.record_metering_data(msg)
 
         counter2 = counter.Counter(
-            'not-test',
             'instance',
             'cumulative',
             1,
@@ -151,6 +150,7 @@ class TestListResources(tests_api.TestBase):
             )
         msg2 = meter.meter_message_from_counter(counter2,
                                                 cfg.CONF.metering_secret,
+                                                'not-test',
                                                 )
         self.conn.record_metering_data(msg2)
 
@@ -160,7 +160,6 @@ class TestListResources(tests_api.TestBase):
 
     def test_with_project(self):
         counter1 = counter.Counter(
-            'test_list_resources',
             'instance',
             'cumulative',
             1,
@@ -174,11 +173,11 @@ class TestListResources(tests_api.TestBase):
             )
         msg = meter.meter_message_from_counter(counter1,
                                                cfg.CONF.metering_secret,
+                                               'test_list_resources',
                                                )
         self.conn.record_metering_data(msg)
 
         counter2 = counter.Counter(
-            'not-test',
             'instance',
             'cumulative',
             1,
@@ -192,6 +191,7 @@ class TestListResources(tests_api.TestBase):
             )
         msg2 = meter.meter_message_from_counter(counter2,
                                                 cfg.CONF.metering_secret,
+                                                'not-test',
                                                 )
         self.conn.record_metering_data(msg2)
 

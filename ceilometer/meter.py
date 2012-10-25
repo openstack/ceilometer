@@ -29,6 +29,10 @@ METER_OPTS = [
                default='change this or be hacked',
                help='Secret value for signing metering messages',
                ),
+    cfg.StrOpt('counter_source',
+               default='openstack',
+               help='Source for counters emited on this instance',
+               ),
     ]
 
 
@@ -75,13 +79,13 @@ def verify_signature(message, secret):
     return new_sig == old_sig
 
 
-def meter_message_from_counter(counter, secret):
+def meter_message_from_counter(counter, secret, source):
     """Make a metering message ready to be published or stored.
 
     Returns a dictionary containing a metering message
     for a notification message and a Counter instance.
     """
-    msg = {'source': counter.source,
+    msg = {'source': source,
            'counter_name': counter.name,
            'counter_type': counter.type,
            'counter_volume': counter.volume,

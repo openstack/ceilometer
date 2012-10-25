@@ -125,8 +125,9 @@ class CollectorManager(manager.Manager):
         """Create a metering message for the counter and publish it."""
         ctxt = context.get_admin_context()
         publish.publish_counter(ctxt, counter,
-            cfg.CONF.metering_topic, cfg.CONF.metering_secret,
-            )
+                                cfg.CONF.metering_topic,
+                                cfg.CONF.metering_secret,
+                                cfg.CONF.counter_source)
 
     def record_metering_data(self, context, data):
         """This method is triggered when metering data is

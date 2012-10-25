@@ -26,7 +26,6 @@ import collections
 
 # Fields explanation:
 #
-# Source:
 # Name: the name of the counter, must be unique
 # Type: the type of the counter, must be either:
 #       - cumulative: the value is incremented and never reset to 0
@@ -39,17 +38,17 @@ import collections
 # Timestamp: when the counter has been read
 # Resource metadata: various metadata
 Counter = collections.namedtuple('Counter',
-                                 ' '.join(['source',
-                                           'name',
-                                           'type',
-                                           'volume',
-                                           'user_id',
-                                           'project_id',
-                                           'resource_id',
-                                           'timestamp',
-                                           'resource_metadata',
-                                           ])
-                                 )
+                                 ' '.join([
+                                     'name',
+                                     'type',
+                                     'volume',
+                                     'user_id',
+                                     'project_id',
+                                     'resource_id',
+                                     'timestamp',
+                                     'resource_metadata',
+                                 ]))
+
 
 TYPE_GAUGE = 'gauge'
 TYPE_DELTA = 'delta'

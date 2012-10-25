@@ -88,7 +88,6 @@ class ImageCRUD(ImageCRUDBase):
         metadata = self.notification_to_metadata(message)
         return [
             counter.Counter(
-                source='?',
                 name=message['event_type'],
                 type=counter.TYPE_DELTA,
                 volume=1,
@@ -107,7 +106,6 @@ class Image(ImageCRUDBase):
         metadata = self.notification_to_metadata(message)
         return [
             counter.Counter(
-                source='?',
                 name='image',
                 type=counter.TYPE_GAUGE,
                 volume=1,
@@ -126,7 +124,6 @@ class ImageSize(ImageCRUDBase):
         metadata = self.notification_to_metadata(message)
         return [
             counter.Counter(
-                source='?',
                 name='image.size',
                 type=counter.TYPE_GAUGE,
                 volume=message['payload']['size'],
@@ -154,7 +151,6 @@ class ImageDownload(ImageBase):
         metadata = self.notification_to_metadata(message)
         return [
             counter.Counter(
-                source='?',
                 name='image.download',
                 type=counter.TYPE_DELTA,
                 volume=message['payload']['bytes_sent'],
@@ -183,7 +179,6 @@ class ImageServe(ImageBase):
         metadata = self.notification_to_metadata(message)
         return [
             counter.Counter(
-                source='?',
                 name='image.serve',
                 type=counter.TYPE_DELTA,
                 volume=message['payload']['bytes_sent'],

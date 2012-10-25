@@ -67,8 +67,7 @@ class Instance(_Base):
 
     def process_notification(self, message):
         return [
-            counter.Counter(source='?',
-                            name='instance',
+            counter.Counter(name='instance',
                             type=counter.TYPE_GAUGE,
                             volume=1,
                             user_id=message['payload']['user_id'],
@@ -85,8 +84,7 @@ class Memory(_Base):
 
     def process_notification(self, message):
         return [
-            counter.Counter(source='?',
-                            name='memory',
+            counter.Counter(name='memory',
                             type=counter.TYPE_GAUGE,
                             volume=message['payload']['memory_mb'],
                             user_id=message['payload']['user_id'],
@@ -103,8 +101,7 @@ class VCpus(_Base):
 
     def process_notification(self, message):
         return [
-            counter.Counter(source='?',
-                            name='vcpus',
+            counter.Counter(name='vcpus',
                             type=counter.TYPE_GAUGE,
                             volume=message['payload']['vcpus'],
                             user_id=message['payload']['user_id'],
@@ -121,8 +118,7 @@ class RootDiskSize(_Base):
 
     def process_notification(self, message):
         return [
-            counter.Counter(source='?',
-                            name='disk.root.size',
+            counter.Counter(name='disk.root.size',
                             type=counter.TYPE_GAUGE,
                             volume=message['payload']['root_gb'],
                             user_id=message['payload']['user_id'],
@@ -139,8 +135,7 @@ class EphemeralDiskSize(_Base):
 
     def process_notification(self, message):
         return [
-            counter.Counter(source='?',
-                            name='disk.ephemeral.size',
+            counter.Counter(name='disk.ephemeral.size',
                             type=counter.TYPE_GAUGE,
                             volume=message['payload']['ephemeral_gb'],
                             user_id=message['payload']['user_id'],
@@ -161,7 +156,6 @@ class InstanceFlavor(_Base):
         if instance_type:
             counters.append(
                 counter.Counter(
-                    source='?',
                     name='instance:%s' % instance_type,
                     type=counter.TYPE_GAUGE,
                     volume=1,

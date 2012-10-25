@@ -47,7 +47,6 @@ class TestNovaNotifier(base.TestCase):
     class Pollster(object):
         counters = []
         test_data = counter.Counter(
-            source='test',
             name='test',
             type=counter.TYPE_CUMULATIVE,
             volume=1,

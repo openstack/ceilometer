@@ -30,7 +30,6 @@ from ceilometer import publish
 class TestPublish(base.TestCase):
 
     test_data = counter.Counter(
-        source='test',
         name='test',
         type=counter.TYPE_CUMULATIVE,
         volume=1,
@@ -53,6 +52,7 @@ class TestPublish(base.TestCase):
                                 self.test_data,
                                 'metering',
                                 'not-so-secret',
+                                'test',
                                 )
 
     def test_notify(self):

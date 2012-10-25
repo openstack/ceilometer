@@ -113,8 +113,7 @@ def main():
     # Generate events
     n = 0
     while timestamp <= end:
-        c = counter.Counter(source='artificial',
-                            name=args.counter,
+        c = counter.Counter(name=args.counter,
                             type=args.type,
                             volume=args.volume,
                             user_id=args.user,
@@ -123,7 +122,9 @@ def main():
                             timestamp=timestamp,
                             resource_metadata={},
                             )
-        data = meter.meter_message_from_counter(c, cfg.CONF.metering_secret)
+        data = meter.meter_message_from_counter(c,
+                                                cfg.CONF.metering_secret,
+                                                'artificial')
         conn.record_metering_data(data)
         n += 1
         timestamp = timestamp + increment

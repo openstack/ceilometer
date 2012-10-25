@@ -38,7 +38,6 @@ class FloatingIPPollster(plugin.CentralPollster):
             for ip in ips:
                 self.LOG.info("FLOATING IP USAGE: %s" % ip.address)
                 yield counter.Counter(
-                    source='?',
                     name='ip.floating',
                     type=counter.TYPE_GAUGE,
                     volume=1,

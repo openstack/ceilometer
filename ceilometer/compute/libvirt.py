@@ -47,7 +47,6 @@ def get_libvirt_connection():
 
 def make_counter_from_instance(instance, name, type, volume):
     return counter.Counter(
-        source='?',
         name=name,
         type=type,
         volume=volume,
@@ -195,7 +194,6 @@ class NetPollster(plugin.ComputePollster):
         resource_metadata['instance_id'] = instance.uuid
 
         return counter.Counter(
-            source='?',
             name=name,
             type=type,
             volume=volume,
