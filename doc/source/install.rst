@@ -54,16 +54,9 @@ Configuring Devstack
 This example ``localrc`` file shows all of the settings required for
 ceilometer::
 
-   # Configure the notifier to talk to the message queue
-   # and turn on usage audit events
-   EXTRA_OPTS=(notification_driver=nova.openstack.common.notifier.rabbit_notifier,ceilometer.compute.nova_notifier)
-
    # Enable the ceilometer services
    enable_service ceilometer-acompute,ceilometer-acentral,ceilometer-collector,ceilometer-api
 
-5. If you want to be able to retrieve image counters, you need to instruct
-   Glance to send notifications to the bus by changing ``notifier_strategy``
-   to ``rabbit`` in ``glance-api.conf``.
 
 Installing Manually
 +++++++++++++++++++
@@ -85,23 +78,28 @@ Installing the Collector
       yet been tested with ZeroMQ. We recommend using Rabbit or qpid
       for now.
 
-2. Install MongoDB.
+2. If you want to be able to retrieve image counters, you need to instruct
+   Glance to send notifications to the bus by changing ``notifier_strategy``
+   to ``rabbit`` or ``qpid`` in ``glance-api.conf`` and restarting the
+   service.
+
+3. Install MongoDB.
 
    Follow the instructions to install the MongoDB_ package for your
    operating system, then start the service.
 
-3. Clone the ceilometer git repository to the management server::
+4. Clone the ceilometer git repository to the management server::
 
    $ cd /opt/stack
    $ git clone https://github.com/stackforge/ceilometer.git
 
-4. As a user with ``root`` permissions or ``sudo`` privileges, run the
+5. As a user with ``root`` permissions or ``sudo`` privileges, run the
    ceilometer installer::
 
    $ cd ceilometer
    $ sudo python setup.py install
 
-5. Configure ceilometer.
+6. Configure ceilometer.
 
    Ceilometer needs to know about some of the nova configuration
    options, so the simplest way to start is copying
@@ -114,7 +112,7 @@ Installing the Collector
    Refer to :doc:`configuration` for details about any other options
    you might want to modify before starting the service.
 
-6. Start the collector.
+7. Start the collector.
 
    ::
 
@@ -148,6 +146,15 @@ Installing the Compute Agent
       Ceilometer makes extensive use of the messaging bus, but has not
       yet been tested with ZeroMQ. We recommend using Rabbit or qpid
       for now.
+
+   The ``nova`` compute service needs the following configuration to
+   be set in ``nova.conf``::
+
+   # nova-compute configuration for ceilometer
+   instance_usage_audit=True
+   instance_usage_audit_period=hour
+   notification_driver=nova.openstack.common.notifier.rabbit_notifier
+   notification_driver=ceilometer.compute.nova_notifier
 
 2. Clone the ceilometer git repository to the server::
 
