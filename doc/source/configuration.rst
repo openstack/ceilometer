@@ -44,7 +44,7 @@ os-tenant-id                                                      Tenant ID to u
 os-tenant-name              admin                                 Tenant name to use for openstack service access
 os-auth-url                 http://localhost:5000/v2.0            Auth URL to use for openstack service access
 database_connection         mongodb://localhost:27017/ceilometer  Database connection string
-metering_api_port           9000                                  The port for the ceilometer API server
+metering_api_port           8777                                  The port for the ceilometer API server
 ==========================  ====================================  ==============================================================
 
 SQL Alchemy
