@@ -20,6 +20,7 @@ import datetime
 import logging
 import os
 import re
+import sqlalchemy
 import unittest
 
 from ceilometer import counter
@@ -36,7 +37,8 @@ LOG = logging.getLogger(__name__)
 CEILOMETER_TEST_LIVE = bool(int(os.environ.get('CEILOMETER_TEST_LIVE', 0)))
 if CEILOMETER_TEST_LIVE:
     MYSQL_DBNAME = 'ceilometer_test'
-    MYSQL_URL = 'mysql://ceilometer:somepass@localhost/%s' % MYSQL_DBNAME
+    MYSQL_BASE_URL = 'mysql://ceilometer:somepass@localhost/'
+    MYSQL_URL = MYSQL_BASE_URL + MYSQL_DBNAME
 
 
 class Connection(impl_sqlalchemy.Connection):
@@ -49,10 +51,10 @@ class Connection(impl_sqlalchemy.Connection):
             raise
 
 
-class SQLAlchemyEngineTestBase(unittest.TestCase):
+class SQLAlchemyEngineSubBase(unittest.TestCase):
 
     def tearDown(self):
-        super(SQLAlchemyEngineTestBase, self).tearDown()
+        super(SQLAlchemyEngineSubBase, self).tearDown()
         engine_conn = self.session.bind.connect()
         if CEILOMETER_TEST_LIVE:
             engine_conn.execute('drop database %s' % MYSQL_DBNAME)
@@ -62,7 +64,7 @@ class SQLAlchemyEngineTestBase(unittest.TestCase):
         self.session.bind.dispose()
 
     def setUp(self):
-        super(SQLAlchemyEngineTestBase, self).setUp()
+        super(SQLAlchemyEngineSubBase, self).setUp()
 
         self.conf = cfg.CONF
         self.conf.database_connection = 'sqlite://'
@@ -72,11 +74,27 @@ class SQLAlchemyEngineTestBase(unittest.TestCase):
             # should pull from conf file but for now manually specified
             # just make sure ceilometer_test db exists in mysql
             self.conf.database_connection = MYSQL_URL
+            engine = sqlalchemy.create_engine(MYSQL_BASE_URL)
+            engine_conn = engine.connect()
+            try:
+                engine_conn.execute('drop database %s' % MYSQL_DBNAME)
+            except sqlalchemy.exc.OperationalError:
+                pass
+            engine_conn.execute('create database %s' % MYSQL_DBNAME)
 
         self.conn = Connection(self.conf)
         self.session = self.conn.session
 
         migration.db_sync()
+
+
+class SQLAlchemyEngineTestBase(SQLAlchemyEngineSubBase):
+
+    def tearDown(self):
+        super(SQLAlchemyEngineTestBase, self).tearDown()
+
+    def setUp(self):
+        super(SQLAlchemyEngineTestBase, self).setUp()
 
         self.counter = counter.Counter(
             'instance',
@@ -458,3 +476,204 @@ class TestGetEventInterval(SQLAlchemyEngineTestBase):
         s, e = self.conn.get_event_interval(self._filter)
         assert s is None
         assert e is None
+
+
+class SumTest(SQLAlchemyEngineTestBase):
+
+    def setUp(self):
+        super(SumTest, self).setUp()
+
+    def test_by_user(self):
+        f = storage.EventFilter(
+            user='user-id',
+            meter='instance',
+            )
+        results = list(self.conn.get_volume_sum(f))
+        counts = dict((r['resource_id'], r['value'])
+                      for r in results)
+        assert counts['resource-id'] == 1
+        assert counts['resource-id-alternate'] == 1
+        assert set(counts.keys()) == set(['resource-id',
+                                          'resource-id-alternate'])
+
+    def test_by_project(self):
+        f = storage.EventFilter(
+            project='project-id',
+            meter='instance',
+            )
+        results = list(self.conn.get_volume_sum(f))
+        assert results
+        counts = dict((r['resource_id'], r['value'])
+                      for r in results)
+        assert counts['resource-id'] == 1
+        assert counts['resource-id-alternate'] == 2
+        assert set(counts.keys()) == set(['resource-id',
+                                          'resource-id-alternate'])
+
+    def test_one_resource(self):
+        f = storage.EventFilter(
+            user='user-id',
+            meter='instance',
+            resource='resource-id',
+            )
+        results = list(self.conn.get_volume_sum(f))
+        assert results
+        counts = dict((r['resource_id'], r['value'])
+                      for r in results)
+        assert counts['resource-id'] == 1
+        assert set(counts.keys()) == set(['resource-id'])
+
+
+class MaxProjectTest(SQLAlchemyEngineSubBase):
+
+    def setUp(self):
+        super(MaxProjectTest, self).setUp()
+
+        self.counters = []
+        for i in range(3):
+            c = counter.Counter(
+                'volume.size',
+                'gauge',
+                5 + i,
+                'user-id',
+                'project1',
+                'resource-id-%s' % i,
+                timestamp=datetime.datetime(2012, 9, 25, 10 + i, 30 + i),
+                resource_metadata={'display_name': 'test-volume',
+                                   'tag': 'self.counter',
+                                   }
+                )
+            self.counters.append(c)
+            msg = meter.meter_message_from_counter(c,
+                                                   cfg.CONF.metering_secret,
+                                                   'source1',
+                                                   )
+            self.conn.record_metering_data(msg)
+
+    def test_no_bounds(self):
+        expected = [{'value': 5.0, 'resource_id': u'resource-id-0'},
+                    {'value': 6.0, 'resource_id': u'resource-id-1'},
+                    {'value': 7.0, 'resource_id': u'resource-id-2'}]
+
+        f = storage.EventFilter(project='project1')
+
+        results = list(self.conn.get_volume_max(f))
+        assert results == expected
+
+    def test_start_timestamp(self):
+        expected = [{'value': 6L, 'resource_id': u'resource-id-1'},
+                    {'value': 7L, 'resource_id': u'resource-id-2'}]
+
+        f = storage.EventFilter(project='project1',
+                                start='2012-09-25T11:30:00')
+
+        results = list(self.conn.get_volume_max(f))
+        assert results == expected
+
+    def test_start_timestamp_after(self):
+        f = storage.EventFilter(project='project1',
+                                start='2012-09-25T12:34:00')
+
+        results = list(self.conn.get_volume_max(f))
+        assert results == []
+
+    def test_end_timestamp(self):
+        expected = [{'value': 5L, 'resource_id': u'resource-id-0'}]
+
+        f = storage.EventFilter(project='project1', end='2012-09-25T11:30:00')
+
+        results = list(self.conn.get_volume_max(f))
+        assert results == expected
+
+    def test_end_timestamp_before(self):
+        f = storage.EventFilter(project='project1', end='2012-09-25T09:54:00')
+
+        results = list(self.conn.get_volume_max(f))
+        assert results == []
+
+    def test_start_end_timestamp(self):
+        expected = [{'value': 6L, 'resource_id': u'resource-id-1'}]
+
+        f = storage.EventFilter(project='project1',
+                                start='2012-09-25T11:30:00',
+                                end='2012-09-25T11:32:00')
+
+        results = list(self.conn.get_volume_max(f))
+        assert results == expected
+
+
+class MaxResourceTest(SQLAlchemyEngineSubBase):
+
+    def setUp(self):
+        super(MaxResourceTest, self).setUp()
+
+        self.counters = []
+        for i in range(3):
+            c = counter.Counter(
+                'volume.size',
+                'gauge',
+                5 + i,
+                'user-id',
+                'project1',
+                'resource-id',
+                timestamp=datetime.datetime(2012, 9, 25, 10 + i, 30 + i),
+                resource_metadata={'display_name': 'test-volume',
+                                   'tag': 'self.counter',
+                                   }
+                )
+            self.counters.append(c)
+            msg = meter.meter_message_from_counter(c,
+                                                   cfg.CONF.metering_secret,
+                                                   'source1',
+                                                   )
+            self.conn.record_metering_data(msg)
+
+    def test_no_bounds(self):
+        expected = [{'value': 7L, 'resource_id': u'resource-id'}]
+
+        f = storage.EventFilter(resource='resource-id')
+
+        results = list(self.conn.get_volume_max(f))
+        assert results == expected
+
+    def test_start_timestamp(self):
+        expected = [{'value': 7L, 'resource_id': u'resource-id'}]
+
+        f = storage.EventFilter(resource='resource-id',
+                                start='2012-09-25T11:30:00')
+
+        results = list(self.conn.get_volume_max(f))
+        assert results == expected
+
+    def test_start_timestamp_after(self):
+        f = storage.EventFilter(resource='resource-id',
+                                start='2012-09-25T12:34:00')
+
+        results = list(self.conn.get_volume_max(f))
+        assert results == []
+
+    def test_end_timestamp(self):
+        expected = [{'value': 5L, 'resource_id': u'resource-id'}]
+
+        f = storage.EventFilter(resource='resource-id',
+                                end='2012-09-25T11:30:00')
+
+        results = list(self.conn.get_volume_max(f))
+        assert results == expected
+
+    def test_end_timestamp_before(self):
+        f = storage.EventFilter(resource='resource-id',
+                                end='2012-09-25T09:54:00')
+
+        results = list(self.conn.get_volume_max(f))
+        assert results == []
+
+    def test_start_end_timestamp(self):
+        expected = [{'value': 6L, 'resource_id': u'resource-id'}]
+
+        f = storage.EventFilter(resource='resource-id',
+                                start='2012-09-25T11:30:00',
+                                end='2012-09-25T11:32:00')
+
+        results = list(self.conn.get_volume_max(f))
+        assert results == expected

@@ -19,9 +19,11 @@
 """
 
 from stevedore import driver
+from datetime import datetime
 
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import cfg
+from ceilometer.openstack.common import timeutils
 
 from urlparse import urlparse
 
@@ -83,8 +85,16 @@ class EventFilter(object):
                  resource=None, meter=None, source=None):
         self.user = user
         self.project = project
-        self.start = start
-        self.end = end
+        self.start = self._sanitize_timestamp(start)
+        self.end = self._sanitize_timestamp(end)
         self.resource = resource
         self.meter = meter
         self.source = source
+
+    def _sanitize_timestamp(self, timestamp):
+        """Return a naive utc datetime object"""
+        if not timestamp:
+            return timestamp
+        if not isinstance(timestamp, datetime):
+            timestamp = timeutils.parse_isotime(timestamp)
+        return timeutils.normalize_time(timestamp)
