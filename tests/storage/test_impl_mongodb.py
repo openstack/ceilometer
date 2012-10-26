@@ -430,18 +430,20 @@ class TestGetEventInterval(MongoDBEngineTestBase):
     def _make_events(self, *timestamps):
         for t in timestamps:
             c = counter.Counter(
-                'test',
-                'instance',
-                counter.TYPE_CUMULATIVE,
-                1,
-                'user-id',
-                'project-id',
-                'resource-id',
+                name='instance',
+                type=counter.TYPE_CUMULATIVE,
+                volume=1,
+                user_id='user-id',
+                project_id='project-id',
+                resource_id='resource-id',
                 timestamp=t,
                 resource_metadata={'display_name': 'test-server',
                                    }
                 )
-            msg = meter.meter_message_from_counter(c, 'not-so-secret')
+            msg = meter.meter_message_from_counter(counter=c,
+                                                   secret='not-so-secret',
+                                                   source='test',
+                                                   )
             self.conn.record_metering_data(msg)
 
     def test_before_range(self):

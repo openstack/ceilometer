@@ -37,7 +37,6 @@ class TestMaxResourceVolume(tests_api.TestBase):
         self.counters = []
         for i in range(3):
             c = counter.Counter(
-                'source1',
                 'volume.size',
                 'gauge',
                 5 + i,
@@ -50,7 +49,10 @@ class TestMaxResourceVolume(tests_api.TestBase):
                                    }
                 )
             self.counters.append(c)
-            msg = meter.meter_message_from_counter(c, cfg.CONF.metering_secret)
+            msg = meter.meter_message_from_counter(c,
+                                                   cfg.CONF.metering_secret,
+                                                   'source1',
+                                                   )
             self.conn.record_metering_data(msg)
 
     def test_no_time_bounds(self):
