@@ -17,6 +17,8 @@
 # under the License.
 
 import copy
+import datetime
+import multiprocessing
 
 from lxml import etree
 
@@ -148,13 +150,46 @@ class CPUPollster(plugin.ComputePollster):
 
     LOG = log.getLogger(__name__ + '.cpu')
 
+    utilization_map = {}
+
+    def get_cpu_util(self, instance, cpu_info):
+        prev_times = self.utilization_map.get(instance.uuid)
+        self.utilization_map[instance.uuid] = (cpu_info['cpu_time'],
+                                               datetime.datetime.now())
+        cpu_util = 0.0
+        if prev_times:
+            prev_cpu = prev_times[0]
+            prev_timestamp = prev_times[1]
+            delta = self.utilization_map[instance.uuid][1] - prev_timestamp
+            elapsed = (delta.seconds * (10 ** 6) + delta.microseconds) * 1000
+            cores_fraction = instance.vcpus * 1.0 / multiprocessing.cpu_count()
+            # account for cpu_time being reset when the instance is restarted
+            time_used = (cpu_info['cpu_time'] - prev_cpu
+                         if prev_cpu <= cpu_info['cpu_time'] else
+                         cpu_info['cpu_time'])
+            cpu_util = 100 * cores_fraction * time_used / elapsed
+        return cpu_util
+
     def get_counters(self, manager, instance):
         conn = get_libvirt_connection()
         self.LOG.info('checking instance %s', instance.uuid)
         try:
             cpu_info = conn.get_info(instance)
             self.LOG.info("CPUTIME USAGE: %s %d",
-                          instance, cpu_info['cpu_time'])
+                          dict(instance), cpu_info['cpu_time'])
+            cpu_util = self.get_cpu_util(instance, cpu_info)
+            self.LOG.info("CPU UTILIZATION %%: %s %0.2f",
+                          dict(instance), cpu_util)
+            # FIXME(eglynn): once we have a way of configuring which measures
+            #                are published to each sink, we should by default
+            #                disable publishing this derived measure to the
+            #                metering store, only publishing to those sinks
+            #                that specifically need it
+            yield make_counter_from_instance(instance,
+                                             name='cpu_util',
+                                             type=counter.TYPE_GAUGE,
+                                             volume=cpu_util,
+                                             )
             yield make_counter_from_instance(instance,
                                              name='cpu',
                                              type=counter.TYPE_CUMULATIVE,
