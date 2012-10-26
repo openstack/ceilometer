@@ -145,6 +145,15 @@ def list_all_resources():
     return _list_resources()
 
 
+@blueprint.route('/sources/<source>')
+def get_source(source):
+    """Return a source details.
+
+    :param source: The ID of the reporting source.
+    """
+    return flask.jsonify(flask.request.sources.get(source, {}))
+
+
 @blueprint.route('/sources/<source>/resources')
 def list_resources_by_source(source):
     """Return a list of resources for which a source is reporting

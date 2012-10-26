@@ -25,6 +25,7 @@ import flask
 
 from ceilometer.tests import db as db_test_base
 from ceilometer.api import v1
+from ceilometer.api import app
 
 
 class TestBase(db_test_base.TestBase):
@@ -38,7 +39,8 @@ class TestBase(db_test_base.TestBase):
         @self.app.before_request
         def attach_storage_connection():
             flask.request.storage_conn = self.conn
-        return
+
+        self.app.before_request(app.attach_sources)
 
     def get(self, path, **kwds):
         if kwds:

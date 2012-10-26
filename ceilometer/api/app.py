@@ -21,6 +21,7 @@
 import flask
 
 from ceilometer.openstack.common import cfg
+from ceilometer.openstack.common import jsonutils
 from ceilometer import storage
 from ceilometer.api import v1
 from ceilometer.api import acl
@@ -38,5 +39,12 @@ def attach_config():
     storage_engine = storage.get_engine(cfg.CONF)
     flask.request.storage_engine = storage_engine
     flask.request.storage_conn = storage_engine.get_connection(cfg.CONF)
+
+
+@app.before_request
+def attach_sources():
+    with open("sources.json", "r") as f:
+        flask.request.sources = jsonutils.load(f)
+
 
 acl.install(app)
