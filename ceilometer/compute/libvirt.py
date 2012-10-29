@@ -59,7 +59,14 @@ def make_counter_from_instance(instance, name, type, volume):
         )
 
 
-class InstancePollster(plugin.ComputePollster):
+class LibVirtPollster(plugin.ComputePollster):
+
+    def is_enabled(self):
+        # Use a fairly liberal substring check.
+        return 'libvirt' in FLAGS.compute_driver.lower()
+
+
+class InstancePollster(LibVirtPollster):
 
     def get_counters(self, manager, instance):
         yield make_counter_from_instance(instance,
@@ -75,7 +82,7 @@ class InstancePollster(plugin.ComputePollster):
         )
 
 
-class DiskIOPollster(plugin.ComputePollster):
+class DiskIOPollster(LibVirtPollster):
 
     LOG = log.getLogger(__name__ + '.diskio')
 
@@ -98,53 +105,52 @@ class DiskIOPollster(plugin.ComputePollster):
                        ])
 
     def get_counters(self, manager, instance):
-        if FLAGS.compute_driver == 'libvirt.LibvirtDriver':
-            conn = get_libvirt_connection()
-            # TODO(jd) This does not work see bug#998089
-            # for disk in conn.get_disks(instance.name):
-            try:
-                disks = self._get_disks(conn, instance.name)
-            except Exception as err:
-                self.LOG.warning('Ignoring instance %s: %s',
-                                 instance.name, err)
-                self.LOG.exception(err)
-            else:
-                r_bytes = 0
-                r_requests = 0
-                w_bytes = 0
-                w_requests = 0
-                for disk in disks:
-                    stats = conn.block_stats(instance.name, disk)
-                    self.LOG.info(self.DISKIO_USAGE_MESSAGE,
-                                  instance, disk, stats[0], stats[1],
-                                  stats[2], stats[3], stats[4])
-                    r_bytes += stats[0]
-                    r_requests += stats[1]
-                    w_bytes += stats[3]
-                    w_requests += stats[2]
-                yield make_counter_from_instance(instance,
-                                                 name='disk.read.requests',
-                                                 type=counter.TYPE_CUMULATIVE,
-                                                 volume=r_requests,
-                                                 )
-                yield make_counter_from_instance(instance,
-                                                 name='disk.read.bytes',
-                                                 type=counter.TYPE_CUMULATIVE,
-                                                 volume=r_bytes,
-                                                 )
-                yield make_counter_from_instance(instance,
-                                                 name='disk.write.requests',
-                                                 type=counter.TYPE_CUMULATIVE,
-                                                 volume=w_requests,
-                                                 )
-                yield make_counter_from_instance(instance,
-                                                 name='disk.write.bytes',
-                                                 type=counter.TYPE_CUMULATIVE,
-                                                 volume=w_bytes,
-                                                 )
+        conn = get_libvirt_connection()
+        # TODO(jd) This does not work see bug#998089
+        # for disk in conn.get_disks(instance.name):
+        try:
+            disks = self._get_disks(conn, instance.name)
+        except Exception as err:
+            self.LOG.warning('Ignoring instance %s: %s',
+                             instance.name, err)
+            self.LOG.exception(err)
+        else:
+            r_bytes = 0
+            r_requests = 0
+            w_bytes = 0
+            w_requests = 0
+            for disk in disks:
+                stats = conn.block_stats(instance.name, disk)
+                self.LOG.info(self.DISKIO_USAGE_MESSAGE,
+                              instance, disk, stats[0], stats[1],
+                              stats[2], stats[3], stats[4])
+                r_bytes += stats[0]
+                r_requests += stats[1]
+                w_bytes += stats[3]
+                w_requests += stats[2]
+            yield make_counter_from_instance(instance,
+                                             name='disk.read.requests',
+                                             type=counter.TYPE_CUMULATIVE,
+                                             volume=r_requests,
+                                             )
+            yield make_counter_from_instance(instance,
+                                             name='disk.read.bytes',
+                                             type=counter.TYPE_CUMULATIVE,
+                                             volume=r_bytes,
+                                             )
+            yield make_counter_from_instance(instance,
+                                             name='disk.write.requests',
+                                             type=counter.TYPE_CUMULATIVE,
+                                             volume=w_requests,
+                                             )
+            yield make_counter_from_instance(instance,
+                                             name='disk.write.bytes',
+                                             type=counter.TYPE_CUMULATIVE,
+                                             volume=w_bytes,
+                                             )
 
 
-class CPUPollster(plugin.ComputePollster):
+class CPUPollster(LibVirtPollster):
 
     LOG = log.getLogger(__name__ + '.cpu')
 
@@ -166,7 +172,7 @@ class CPUPollster(plugin.ComputePollster):
             self.LOG.exception(err)
 
 
-class NetPollster(plugin.ComputePollster):
+class NetPollster(LibVirtPollster):
 
     LOG = log.getLogger(__name__ + '.net')
 

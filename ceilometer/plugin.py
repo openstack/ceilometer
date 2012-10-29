@@ -30,10 +30,24 @@ import ceilometer.openstack.common.notifier.rabbit_notifier
 ExchangeTopics = namedtuple('ExchangeTopics', ['exchange', 'topics'])
 
 
-class NotificationBase(object):
+class PluginBase(object):
+    """Base class for all plugins.
+    """
+
+    def is_enabled(self):
+        """Return boolean indicating whether this plugin should
+        be enabled and used by the caller.
+        """
+        return True
+
+
+class NotificationBase(PluginBase):
     """Base class for plugins that support the notification API."""
 
     __metaclass__ = abc.ABCMeta
+
+    def is_enabled(self):
+        return True
 
     @abc.abstractmethod
     def get_event_types(self):
@@ -58,7 +72,7 @@ class NotificationBase(object):
         return metadata
 
 
-class PollsterBase(object):
+class PollsterBase(PluginBase):
     """Base class for plugins that support the polling API."""
 
     __metaclass__ = abc.ABCMeta
