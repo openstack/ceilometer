@@ -20,12 +20,12 @@ import functools
 import itertools
 import pkg_resources
 
-from nova import context
 from nova import manager
 
 from ceilometer import meter
 from ceilometer import publish
 from ceilometer import storage
+from ceilometer.openstack.common import context
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
