@@ -16,9 +16,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import functools
-import itertools
-import pkg_resources
+from stevedore import extension
 
 from nova import manager
 
@@ -45,60 +43,24 @@ class CollectorManager(manager.Manager):
 
     COLLECTOR_NAMESPACE = 'ceilometer.collector'
 
-    @staticmethod
-    def _load_plugins(plugin_namespace):
-        handlers = []
-        # Listen for notifications from nova
-        for ep in pkg_resources.iter_entry_points(plugin_namespace):
-            LOG.info('attempting to load notification handler for %s:%s',
-                     plugin_namespace, ep.name)
-            try:
-                # FIXME(dhellmann): Currently assumes all plugins are
-                # enabled when they are discovered and
-                # importable. Need to add check against global
-                # configuration flag and check that asks the plugin if
-                # it should be enabled.
-                plugin_class = ep.load()
-                plugin = plugin_class()
-                handlers.append(plugin)
-            except Exception as err:
-                LOG.warning('Failed to load notification handler %s: %s',
-                            ep.name, err)
-                LOG.exception(err)
-        return handlers
-
     def init_host(self):
-        # Use the nova configuration flags to get
-        # a connection to the RPC mechanism nova
-        # is using.
+        # FIXME(dhellmann): Update Manager API to get Service instance
+        # with existing rpc handle.
         self.connection = rpc.create_connection()
 
         storage.register_opts(cfg.CONF)
         self.storage_engine = storage.get_engine(cfg.CONF)
         self.storage_conn = self.storage_engine.get_connection(cfg.CONF)
 
-        self.handlers = self._load_plugins(self.COLLECTOR_NAMESPACE)
+        self.ext_manager = extension.ExtensionManager(self.COLLECTOR_NAMESPACE,
+                                                      invoke_on_load=True,
+                                                      )
 
-        if not self.handlers:
+        if not list(self.ext_manager):
             LOG.warning('Failed to load any notification handlers for %s',
-                        self.plugin_namespace)
+                        self.COLLECTOR_NAMESPACE)
 
-        # FIXME(dhellmann): Should be using create_worker(), except
-        # that notification messages do not conform to the RPC
-        # invocation protocol (they do not include a "method"
-        # parameter).
-        # FIXME(dhellmann): Break this out into its own method
-        # so we can test the subscription logic.
-        for handler in self.handlers:
-            LOG.debug('Event types: %r', handler.get_event_types())
-            for exchange_topic in handler.get_exchange_topics(cfg.CONF):
-                for topic in exchange_topic.topics:
-                    self.connection.declare_topic_consumer(
-                        queue_name="ceilometer.notifications",
-                        topic=topic,
-                        exchange_name=exchange_topic.exchange,
-                        callback=self.process_notification,
-                        )
+        self.ext_manager.map(self._setup_subscription)
 
         # Set ourselves up as a separate worker for the metering data,
         # since the default for manager is to use create_consumer().
@@ -110,15 +72,36 @@ class CollectorManager(manager.Manager):
 
         self.connection.consume_in_thread()
 
+    def _setup_subscription(self, ext, *args, **kwds):
+        handler = ext.obj
+        LOG.debug('Event types: %r', handler.get_event_types())
+        for exchange_topic in handler.get_exchange_topics(cfg.CONF):
+            for topic in exchange_topic.topics:
+                # FIXME(dhellmann): Should be using create_worker(), except
+                # that notification messages do not conform to the RPC
+                # invocation protocol (they do not include a "method"
+                # parameter).
+                self.connection.declare_topic_consumer(
+                    queue_name="ceilometer.notifications",
+                    topic=topic,
+                    exchange_name=exchange_topic.exchange,
+                    callback=self.process_notification,
+                    )
+
     def process_notification(self, notification):
         """Make a notification processed by an handler."""
         LOG.debug('notification %r', notification.get('event_type'))
-        for handler in self.handlers:
-            if notification['event_type'] in handler.get_event_types():
-                for c in handler.process_notification(notification):
-                    LOG.info('COUNTER: %s', c)
-                    # FIXME(dhellmann): Spawn green thread?
-                    self.publish_counter(c)
+        self.ext_manager.map(self._process_notification_for_ext,
+                             notification=notification,
+                             )
+
+    def _process_notification_for_ext(self, ext, notification):
+        handler = ext.obj
+        if notification['event_type'] in handler.get_event_types():
+            for c in handler.process_notification(notification):
+                LOG.info('COUNTER: %s', c)
+                # FIXME(dhellmann): Spawn green thread?
+                self.publish_counter(c)
 
     @staticmethod
     def publish_counter(counter):
