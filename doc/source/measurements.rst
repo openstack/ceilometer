@@ -77,6 +77,8 @@ router                    Gauge             1  rtr ID    Duration of router
 router.create             Delta       request  rtr ID    Creation requests for this router
 router.update             Delta       request  rtr ID    Update requests for this router
 ip.floating               Gauge             1  ip ID     Duration of floating ip
+ip.floating.create        Delta             1  ip ID     Creation requests for this floating ip
+ip.floating.update        Delta             1  ip ID     Update requests for this floating ip
 ========================  ==========  =======  ========  =======================================================
 
 Image (Glance)

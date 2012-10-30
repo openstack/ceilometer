@@ -71,7 +71,9 @@ class NetworkNotificationBase(plugin.NotificationBase):
         LOG.info('network notification %r', message)
         message['payload'] = message['payload'][self.resource_name]
         metadata = self.notification_to_metadata(message)
-        yield counter.Counter(name=self.resource_name,
+        counter_name = getattr(self, "counter_name", self.resource_name)
+
+        yield counter.Counter(name=counter_name,
                               type=counter.TYPE_GAUGE,
                               volume=1,
                               user_id=message['_context_user_id'],
@@ -81,9 +83,10 @@ class NetworkNotificationBase(plugin.NotificationBase):
                               resource_metadata=metadata,
                               )
 
-        network_counter_name = message['event_type'].rpartition('.')[0]
-        if network_counter_name != self.resource_name:
-            yield counter.Counter(name=network_counter_name,
+        event_type_split = message['event_type'].split('.')
+        if len(event_type_split) > 2:
+            yield counter.Counter(name=counter_name
+                                  + "." + event_type_split[1],
                                   type=counter.TYPE_DELTA,
                                   volume=1,
                                   user_id=message['_context_user_id'],
@@ -167,3 +170,21 @@ class Router(NetworkNotificationBase):
     ]
 
     resource_name = 'router'
+
+
+class FloatingIP(NetworkNotificationBase):
+    """Listen for Quantum notifications in order to mediate with the
+    metering framework.
+
+    """
+
+    metadata_keys = [
+        "router_id",
+        "floating_network_id",
+        "fixed_ip_address",
+        "floating_ip_address",
+        "port_id",
+    ]
+
+    resource_name = 'floatingip'
+    counter_name = 'ip.floating'
