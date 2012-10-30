@@ -19,8 +19,6 @@
 """Tests for manager.
 """
 
-import unittest
-
 try:
     import libvirt as ignored_libvirt
 except ImportError:
@@ -41,13 +39,19 @@ import mox
 import re
 
 
-class TestInstancePollster(unittest.TestCase):
+def fake_libvirt_conn(moxobj):
+    conn = moxobj.CreateMockAnything()
+    conn._conn = moxobj.CreateMockAnything()
+    moxobj.StubOutWithMock(libvirt, 'get_libvirt_connection')
+    libvirt.get_libvirt_connection().AndReturn(conn)
+    return conn
 
-    @skip.skip_if(libvirt_missing, 'Test requires libvirt')
+
+class TestLibvirtBase(test_base.TestCase):
+
     def setUp(self):
+        super(TestLibvirtBase, self).setUp()
         self.manager = manager.AgentManager()
-        self.pollster = libvirt.InstancePollster()
-        super(TestInstancePollster, self).setUp()
         self.instance = mock.MagicMock()
         self.instance.name = 'instance-00000001'
         self.instance.id = 1
@@ -55,6 +59,14 @@ class TestInstancePollster(unittest.TestCase):
         self.instance.instance_type.name = 'm1.small'
         flags.FLAGS.compute_driver = 'libvirt.LibvirtDriver'
         flags.FLAGS.connection_type = 'libvirt'
+
+
+class TestInstancePollster(TestLibvirtBase):
+
+    @skip.skip_if(libvirt_missing, 'Test requires libvirt')
+    def setUp(self):
+        super(TestInstancePollster, self).setUp()
+        self.pollster = libvirt.InstancePollster()
 
     def test_get_counter(self):
         counters = list(self.pollster.get_counters(self.manager,
@@ -64,17 +76,11 @@ class TestInstancePollster(unittest.TestCase):
         self.assertEqual(counters[1].name, 'instance:m1.small')
 
 
-class TestDiskIOPollster(unittest.TestCase):
+class TestDiskIOPollster(TestLibvirtBase):
 
     def setUp(self):
-        self.manager = manager.AgentManager()
-        self.pollster = libvirt.DiskIOPollster()
         super(TestDiskIOPollster, self).setUp()
-        self.instance = mock.MagicMock()
-        self.instance.name = 'instance-00000001'
-        self.instance.id = 1
-        flags.FLAGS.compute_driver = 'libvirt.LibvirtDriver'
-        flags.FLAGS.connection_type = 'libvirt'
+        self.pollster = libvirt.DiskIOPollster()
 
     @skip.skip_if(libvirt_missing, 'Test requires libvirt')
     def test_fetch_diskio(self):
@@ -101,15 +107,11 @@ class TestDiskIOPollster(unittest.TestCase):
         assert not counters
 
 
-class TestNetPollster(test_base.TestCase):
+class TestNetPollster(TestLibvirtBase):
 
     def setUp(self):
-        self.manager = manager.AgentManager()
-        self.pollster = libvirt.NetPollster()
         super(TestNetPollster, self).setUp()
-        self.instance = mock.MagicMock()
-        self.instance.name = 'instance-00000001'
-        self.instance.id = 1
+        self.pollster = libvirt.NetPollster()
 
     def test_get_vnics(self):
         dom_xml = """
@@ -184,12 +186,9 @@ class TestNetPollster(test_base.TestCase):
                   'mac': 'fa:16:3e:71:ec:6e'}
                 ]
 
+        conn = fake_libvirt_conn(self.mox)
         ignore = mox.IgnoreArg()
-        conn = self.mox.CreateMockAnything()
-        conn._conn = self.mox.CreateMockAnything()
         domain = self.mox.CreateMockAnything()
-        self.mox.StubOutWithMock(libvirt, 'get_libvirt_connection')
-        libvirt.get_libvirt_connection().AndReturn(conn)
         self.mox.StubOutWithMock(self.pollster, '_get_vnics')
         self.pollster._get_vnics(ignore, ignore).AndReturn(vnics)
         self.mox.StubOutWithMock(conn._conn, 'lookupByName')
@@ -202,3 +201,22 @@ class TestNetPollster(test_base.TestCase):
         results = list(self.pollster.get_counters(self.manager, self.instance))
         self.assertTrue([countr.resource_metadata['ip'] for countr in results])
         self.assertTrue([countr.resource_id for countr in results])
+
+
+class TestCPUPollster(TestLibvirtBase):
+
+    def setUp(self):
+        super(TestCPUPollster, self).setUp()
+        self.pollster = libvirt.CPUPollster()
+
+    def test_get_counter(self):
+        expected_cpu_time = 12345
+
+        conn = fake_libvirt_conn(self.mox)
+        self.mox.StubOutWithMock(conn, 'get_info')
+        conn.get_info(self.instance).AndReturn({'cpu_time': expected_cpu_time})
+        self.mox.ReplayAll()
+        counters = list(self.pollster.get_counters(self.manager,
+                                                   self.instance))
+        self.assertEquals(len(counters), 1)
+        assert counters[0].volume == expected_cpu_time
