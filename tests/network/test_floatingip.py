@@ -19,11 +19,11 @@
 
 import mock
 
-from nova import context
 from nova import db
 
 from ceilometer.network import floatingip
 from ceilometer.central import manager
+from ceilometer.openstack.common import context
 from ceilometer.tests import base
 
 
@@ -31,7 +31,7 @@ class TestFloatingIPPollster(base.TestCase):
 
     def setUp(self):
         super(TestFloatingIPPollster, self).setUp()
-        self.context = context.RequestContext('admin', 'admin', is_admin=True)
+        self.context = context.get_admin_context()
         self.manager = manager.AgentManager()
         self.pollster = floatingip.FloatingIPPollster()
         self.stubs.Set(db, 'floating_ip_get_all', self.faux_get_ips)

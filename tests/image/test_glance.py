@@ -91,7 +91,7 @@ class TestImagePollster(base.TestCase):
 
     def setUp(self):
         super(TestImagePollster, self).setUp()
-        self.context = context.RequestContext('admin', 'admin', is_admin=True)
+        self.context = context.get_admin_context()
         self.manager = manager.AgentManager()
         self.stubs.Set(glance._Base, 'iter_images',
                        self.fake_glance_iter_images)

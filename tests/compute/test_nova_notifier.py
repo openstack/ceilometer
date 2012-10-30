@@ -81,7 +81,7 @@ class TestNovaNotifier(base.TestCase):
         flags.FLAGS.compute_driver = 'nova.virt.fake.FakeDriver'
         flags.FLAGS.notification_driver = [nova_notifier.__name__]
         self.compute = importutils.import_object(flags.FLAGS.compute_manager)
-        self.context = context.RequestContext('admin', 'admin', is_admin=True)
+        self.context = context.get_admin_context()
         fake_network.set_stub_network_methods(self.stubs)
 
         self.instance = {"name": "instance-1",
