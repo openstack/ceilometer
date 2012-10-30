@@ -4,7 +4,8 @@ iso8601
 lockfile
 netaddr
 argparse
-sqlalchemy
+SQLAlchemy==0.7.8
+sqlalchemy-migrate>=0.7.2
 eventlet
 anyjson>=0.3.1
 Flask==0.9
