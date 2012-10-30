@@ -24,8 +24,7 @@ from ceilometer.openstack.common import cfg
 from ceilometer.storage import base
 from ceilometer.storage.sqlalchemy.models import Meter, Project, Resource
 from ceilometer.storage.sqlalchemy.models import Source, User
-from ceilometer.storage.sqlalchemy.session import get_session
-import ceilometer.storage.sqlalchemy.session as session
+import ceilometer.storage.sqlalchemy.session as sqlalchemy_session
 
 LOG = log.getLogger(__name__)
 
@@ -109,7 +108,7 @@ class Connection(base.Connection):
     def _get_connection(self, conf):
         """Return a connection to the database.
         """
-        return session.get_session()
+        return sqlalchemy_session.get_session()
 
     def record_metering_data(self, data):
         """Write the data to the backend storage system.
@@ -222,6 +221,8 @@ class Connection(base.Connection):
             query = query.filter(Resource.timestamp < end_timestamp)
         if project is not None:
             query = query.filter(Resource.project_id == project)
+        query = query.options(
+                    sqlalchemy_session.sqlalchemy.orm.joinedload('meters'))
 
         for resource in query.all():
             r = row2dict(resource)
@@ -262,7 +263,7 @@ class Connection(base.Connection):
 
         ( datetime.datetime(), datetime.datetime() )
         """
-        func = session.func()
+        func = sqlalchemy_session.sqlalchemy.func
         query = self.session.query(func.min(Meter.timestamp),
                                    func.max(Meter.timestamp))
         query = make_query_from_filter(query, event_filter)
@@ -279,7 +280,7 @@ def model_query(*args, **kwargs):
 
     :param session: if present, the session to use
     """
-    session = kwargs.get('session') or get_session()
+    session = kwargs.get('session') or sqlalchemy_session.get_session()
     query = session.query(*args)
     return query
 

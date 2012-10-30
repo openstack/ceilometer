@@ -96,8 +96,7 @@ class Meter(Base):
     __tablename__ = 'meter'
     id = Column(Integer, primary_key=True)
     counter_name = Column(String(255))
-    sources = relationship("Source", secondary=lambda: sourceassoc,
-                           lazy='joined')
+    sources = relationship("Source", secondary=lambda: sourceassoc)
     user_id = Column(String(255), ForeignKey('user.id'))
     project_id = Column(String(255), ForeignKey('project.id'))
     resource_id = Column(String(255), ForeignKey('resource.id'))
@@ -112,29 +111,26 @@ class Meter(Base):
 class User(Base):
     __tablename__ = 'user'
     id = Column(String(255), primary_key=True)
-    sources = relationship("Source", secondary=lambda: sourceassoc,
-                           lazy='joined')
-    resources = relationship("Resource", backref='user', lazy='joined')
-    meters = relationship("Meter", backref='user', lazy='joined')
+    sources = relationship("Source", secondary=lambda: sourceassoc)
+    resources = relationship("Resource", backref='user')
+    meters = relationship("Meter", backref='user')
 
 
 class Project(Base):
     __tablename__ = 'project'
     id = Column(String(255), primary_key=True)
-    sources = relationship("Source", secondary=lambda: sourceassoc,
-                           lazy='joined')
-    resources = relationship("Resource", backref='project', lazy='joined')
-    meters = relationship("Meter", backref='project', lazy='joined')
+    sources = relationship("Source", secondary=lambda: sourceassoc)
+    resources = relationship("Resource", backref='project')
+    meters = relationship("Meter", backref='project')
 
 
 class Resource(Base):
     __tablename__ = 'resource'
     id = Column(String(255), primary_key=True)
-    sources = relationship("Source", secondary=lambda: sourceassoc,
-                           lazy='joined')
+    sources = relationship("Source", secondary=lambda: sourceassoc)
     timestamp = Column(DateTime)
     resource_metadata = Column(JSONEncodedDict)
     received_timestamp = Column(DateTime, default=timeutils.utcnow)
     user_id = Column(String(255), ForeignKey('user.id'))
     project_id = Column(String(255), ForeignKey('project.id'))
-    meters = relationship("Meter", backref='resource', lazy='joined')
+    meters = relationship("Meter", backref='resource')
