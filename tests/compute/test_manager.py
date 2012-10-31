@@ -20,6 +20,8 @@
 
 import datetime
 
+from stevedore import extension
+
 from ceilometer.compute import manager
 from ceilometer import counter
 from ceilometer import publish
@@ -31,7 +33,7 @@ from ceilometer.openstack.common import cfg
 def test_load_plugins():
     mgr = manager.AgentManager()
     mgr.init_host()
-    assert mgr.pollsters, 'Failed to load any plugins'
+    assert list(mgr.ext_manager), 'Failed to load any plugins'
     return
 
 
@@ -63,7 +65,15 @@ class TestRunTasks(base.TestCase):
         self.notifications = []
         self.stubs.Set(publish, 'publish_counter', self.faux_notify)
         self.mgr = manager.AgentManager()
-        self.mgr.pollsters = [('test', self.Pollster())]
+        self.mgr.ext_manager = extension.ExtensionManager('fake',
+                                                          invoke_on_load=False,
+                                                          )
+        self.mgr.ext_manager.extensions = [extension.Extension('test',
+                                                               None,
+                                                               None,
+                                                               self.Pollster(),
+                                                               ),
+                                           ]
         # Set up a fake instance value to be returned by
         # instance_get_all_by_host() so when the manager gets the list
         # of instances to poll we can control the results.

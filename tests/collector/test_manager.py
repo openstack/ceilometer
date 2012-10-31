@@ -20,12 +20,15 @@
 
 from datetime import datetime
 
+from mock import patch
+
+from stevedore import extension
+from stevedore.tests import manager as test_manager
+
 from ceilometer import meter
 from ceilometer.collector import manager
 from ceilometer.openstack.common import cfg
 from ceilometer.storage import base
-from ceilometer.openstack.common import rpc
-from ceilometer.openstack.common import cfg
 from ceilometer.tests import base as tests_base
 from ceilometer.compute import notifications
 
@@ -80,17 +83,6 @@ TEST_NOTICE = {
     }
 
 
-class StubConnection(object):
-    def declare_topic_consumer(*args, **kwargs):
-        pass
-
-    def create_worker(*args, **kwargs):
-        pass
-
-    def consume_in_thread(self):
-        pass
-
-
 class TestCollectorManager(tests_base.TestCase):
 
     def setUp(self):
@@ -100,9 +92,12 @@ class TestCollectorManager(tests_base.TestCase):
         #cfg.CONF.metering_secret = 'not-so-secret'
 
     def test_init_host(self):
-        self.stubs.Set(rpc, 'create_connection', lambda: StubConnection())
         cfg.CONF.database_connection = 'log://localhost'
-        self.mgr.init_host()
+        # If we try to create a real RPC connection, init_host() never
+        # returns. Mock it out so we can establish the manager
+        # configuration.
+        with patch('ceilometer.openstack.common.rpc.create_connection'):
+            self.mgr.init_host()
 
     def test_valid_message(self):
         msg = {'counter_name': 'test',
@@ -186,18 +181,20 @@ class TestCollectorManager(tests_base.TestCase):
         self.mgr.record_metering_data(self.ctx, msg)
         self.mox.VerifyAll()
 
-    def test_load_plugins(self):
-        results = self.mgr._load_plugins(self.mgr.COLLECTOR_NAMESPACE)
-        self.assert_(len(results) > 0)
-
-    def test_load_no_plugins(self):
-        results = self.mgr._load_plugins("foobar.namespace")
-        self.assertEqual(results, [])
-
     def test_process_notification(self):
+        # If we try to create a real RPC connection, init_host() never
+        # returns. Mock it out so we can establish the manager
+        # configuration.
+        with patch('ceilometer.openstack.common.rpc.create_connection'):
+            self.mgr.init_host()
         results = []
-        self.stubs.Set(self.mgr, 'publish_counter',
-                       lambda counter: results.append(counter))
-        self.mgr.handlers = [notifications.Instance()]
+        self.stubs.Set(self.mgr, 'publish_counter', results.append)
+        self.mgr.ext_manager = test_manager.TestExtensionManager(
+            [extension.Extension('test',
+                                 None,
+                                 None,
+                                 notifications.Instance(),
+                                 ),
+             ])
         self.mgr.process_notification(TEST_NOTICE)
         self.assert_(len(results) >= 1)

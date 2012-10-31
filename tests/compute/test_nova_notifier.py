@@ -21,6 +21,9 @@
 import mock
 import datetime
 
+from stevedore import extension
+from stevedore.tests import manager as test_manager
+
 from nova import flags
 from nova import db
 from nova import context
@@ -124,7 +127,14 @@ class TestNovaNotifier(base.TestCase):
         self.stubs.Set(publish, 'publish_counter', self.do_nothing)
         nova_notifier._initialize_config_options = False
         nova_notifier.initialize_manager()
-        nova_notifier._agent_manager.pollsters = [('test', self.Pollster())]
+        nova_notifier._agent_manager.ext_manager = \
+            test_manager.TestExtensionManager([
+                extension.Extension('test',
+                                    None,
+                                    None,
+                                    self.Pollster(),
+                                    ),
+                ])
 
     def tearDown(self):
         self.Pollster.counters = []
