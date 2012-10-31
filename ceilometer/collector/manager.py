@@ -20,6 +20,7 @@ from stevedore import extension
 
 from nova import manager
 
+from ceilometer import extension_manager
 from ceilometer import meter
 from ceilometer import publish
 from ceilometer import storage
@@ -34,6 +35,16 @@ try:
 except ImportError:
     # For Essex
     import nova.rpc as rpc
+
+
+OPTS = [
+    cfg.ListOpt('disabled_notification_listeners',
+                default=[],
+                help='list of listener plugins to disable',
+                ),
+    ]
+
+cfg.CONF.register_opts(OPTS)
 
 
 LOG = log.getLogger(__name__)
@@ -52,9 +63,10 @@ class CollectorManager(manager.Manager):
         self.storage_engine = storage.get_engine(cfg.CONF)
         self.storage_conn = self.storage_engine.get_connection(cfg.CONF)
 
-        self.ext_manager = extension.ExtensionManager(self.COLLECTOR_NAMESPACE,
-                                                      invoke_on_load=True,
-                                                      )
+        self.ext_manager = extension_manager.ActivatedExtensionManager(
+            namespace=self.COLLECTOR_NAMESPACE,
+            disabled_names=cfg.CONF.disabled_notification_listeners,
+            )
 
         if not list(self.ext_manager):
             LOG.warning('Failed to load any notification handlers for %s',
@@ -74,7 +86,8 @@ class CollectorManager(manager.Manager):
 
     def _setup_subscription(self, ext, *args, **kwds):
         handler = ext.obj
-        LOG.debug('Event types: %r', handler.get_event_types())
+        LOG.debug('Event types from %s: %s',
+                  ext.name, ', '.join(handler.get_event_types()))
         for exchange_topic in handler.get_exchange_topics(cfg.CONF):
             for topic in exchange_topic.topics:
                 # FIXME(dhellmann): Should be using create_worker(), except

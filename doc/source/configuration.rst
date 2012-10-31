@@ -23,30 +23,34 @@ Ceilometer specific
 The following table lists the ceilometer specific options in the global configuration file.
 Please note that ceilometer uses openstack-common extensively, which requires that
 the other parameters are set appropriately. For information we are listing the configuration
-elements that we use after the ceilometer specific elements. 
+elements that we use after the ceilometer specific elements.
+
 If you use sql alchemy, its specific paramaters will need to be set.
 
 
-==========================  ====================================  ==============================================================
-Parameter                   Default                               Note
-==========================  ====================================  ==============================================================
-nova_control_exchange       nova                                  Exchange name for Nova notifications
-glance_control_exchange     glance_notifications                  Exchange name for Glance notifications
-cinder_control_exchange     cinder                                Exchange name for Cinder notifications
-quantum_control_exchange    quantum                               Exchange name for Quantum notifications
-metering_secret             change this or be hacked              Secret value for signing metering messages
-metering_topic              metering                              the topic ceilometer uses for metering messages
-counter_source              openstack                             The source name of emited counters
-control_exchange            ceilometer                            AMQP exchange to connect to if using RabbitMQ or Qpid
-periodic_interval           600                                   seconds between running periodic tasks
-os-username                 glance                                Username to use for openstack service access
-os-password                 admin                                 Password to use for openstack service access
-os-tenant-id                                                      Tenant ID to use for openstack service access
-os-tenant-name              admin                                 Tenant name to use for openstack service access
-os-auth-url                 http://localhost:5000/v2.0            Auth URL to use for openstack service access
-database_connection         mongodb://localhost:27017/ceilometer  Database connection string
-metering_api_port           8777                                  The port for the ceilometer API server
-==========================  ====================================  ==============================================================
+===============================  ====================================  ==============================================================
+Parameter                        Default                               Note
+===============================  ====================================  ==============================================================
+nova_control_exchange            nova                                  Exchange name for Nova notifications
+glance_control_exchange          glance_notifications                  Exchange name for Glance notifications
+cinder_control_exchange          cinder                                Exchange name for Cinder notifications
+quantum_control_exchange         quantum                               Exchange name for Quantum notifications
+metering_secret                  change this or be hacked              Secret value for signing metering messages
+metering_topic                   metering                              the topic ceilometer uses for metering messages
+counter_source                   openstack                             The source name of emited counters
+control_exchange                 ceilometer                            AMQP exchange to connect to if using RabbitMQ or Qpid
+periodic_interval                600                                   seconds between running periodic tasks
+os-username                      glance                                Username to use for openstack service access
+os-password                      admin                                 Password to use for openstack service access
+os-tenant-id                                                           Tenant ID to use for openstack service access
+os-tenant-name                   admin                                 Tenant name to use for openstack service access
+os-auth-url                      http://localhost:5000/v2.0            Auth URL to use for openstack service access
+database_connection              mongodb://localhost:27017/ceilometer  Database connection string
+metering_api_port                8777                                  The port for the ceilometer API server
+disabled_central_pollsters                                             List of central pollsters to skip loading
+disabled_compute_pollsters                                             List of compute pollsters to skip loading
+disabled_notification_listeners                                        List of notification listeners to skip loading
+===============================  ====================================  ==============================================================
 
 SQL Alchemy
 ===========

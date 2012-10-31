@@ -16,14 +16,21 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from stevedore import extension
-
 from nova import manager
 
+from ceilometer import extension_manager
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import log
 from ceilometer import publish
 
+OPTS = [
+    cfg.ListOpt('disabled_central_pollsters',
+                default=[],
+                help='list of central pollsters to disable',
+                ),
+    ]
+
+cfg.CONF.register_opts(OPTS)
 
 LOG = log.getLogger(__name__)
 
@@ -38,9 +45,9 @@ class AgentManager(manager.Manager):
         # importable. Need to add check against global
         # configuration flag and check that asks the plugin if
         # it should be enabled.
-        self.ext_manager = extension.ExtensionManager(
+        self.ext_manager = extension_manager.ActivatedExtensionManager(
             namespace=PLUGIN_NAMESPACE,
-            invoke_on_load=True,
+            disabled_names=cfg.CONF.disabled_central_pollsters,
             )
         return
 

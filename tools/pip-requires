@@ -9,6 +9,6 @@ sqlalchemy-migrate>=0.7.2
 eventlet
 anyjson>=0.3.1
 Flask==0.9
-stevedore>=0.5
+stevedore>=0.6
 python-glanceclient
 python-cinderclient
