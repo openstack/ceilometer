@@ -141,6 +141,14 @@ class MongoDBEngineTestBase(unittest.TestCase):
         self.conn.drop_database(self.DBNAME)
 
 
+class IndexTest(MongoDBEngineTestBase):
+
+    def test_indexes_exist(self):
+        # ensure_index returns none if index already exists
+        assert not self.db.resource.ensure_index('foo', name='resource_idx')
+        assert not self.db.meter.ensure_index('foo', name='meter_idx')
+
+
 class UserTest(MongoDBEngineTestBase):
 
     def test_new_user(self):
