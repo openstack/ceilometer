@@ -19,6 +19,7 @@
 """
 
 import datetime
+import mock
 
 from stevedore import extension
 
@@ -57,8 +58,8 @@ class TestRunTasks(base.TestCase):
             self.counters.append((manager, instance))
             return [self.test_data]
 
-    def faux_notify(self, context, msg, topic, secret):
-        self.notifications.append((msg, topic, secret))
+    def faux_notify(self, context, msg, topic, secret, source):
+        self.notifications.append((msg, topic, secret, source))
 
     def setUp(self):
         super(TestRunTasks, self).setUp()
@@ -77,8 +78,12 @@ class TestRunTasks(base.TestCase):
         # Set up a fake instance value to be returned by
         # instance_get_all_by_host() so when the manager gets the list
         # of instances to poll we can control the results.
-        self.instance = {'name': 'faux', 'vm_state': 'active'}
-        stillborn_instance = {'name': 'stillborn', 'vm_state': 'error'}
+        self.instance = mock.MagicMock()
+        self.instance.name = 'faux'
+        self.instance.vm_state = 'active'
+        stillborn_instance = mock.MagicMock()
+        stillborn_instance.name = 'stillborn'
+        stillborn_instance.vm_state = 'error'
         self.mox.StubOutWithMock(self.mgr.db, 'instance_get_all_by_host')
         self.mgr.db.instance_get_all_by_host(
             None,
@@ -90,12 +95,13 @@ class TestRunTasks(base.TestCase):
         self.mgr.periodic_tasks(None)
 
     def test_message(self):
-        assert len(self.Pollster.counters) == 1
+        assert len(self.Pollster.counters) == 2
         assert self.Pollster.counters[0][1] is self.instance
 
     def test_notifications(self):
         actual = self.notifications
-        assert actual == [(self.Pollster.test_data,
-                           cfg.CONF.metering_topic,
-                           cfg.CONF.metering_secret,
-                           )]
+        assert list(actual[0]) == [self.Pollster.test_data,
+                                   cfg.CONF.metering_topic,
+                                   cfg.CONF.metering_secret,
+                                   cfg.CONF.counter_source,
+                                  ]

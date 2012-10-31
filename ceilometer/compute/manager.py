@@ -63,6 +63,7 @@ class AgentManager(manager.Manager):
                 publish.publish_counter(context, c,
                                         cfg.CONF.metering_topic,
                                         cfg.CONF.metering_secret,
+                                        cfg.CONF.counter_source,
                                         )
         except Exception as err:
             LOG.warning('Continuing after error from %s for %s: %s',
