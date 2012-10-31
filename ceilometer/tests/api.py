@@ -26,21 +26,20 @@ import flask
 from ceilometer.tests import db as db_test_base
 from ceilometer.api import v1
 from ceilometer.api import app
+from ceilometer.openstack.common import cfg
 
 
 class TestBase(db_test_base.TestBase):
 
     def setUp(self):
         super(TestBase, self).setUp()
-        self.app = flask.Flask('test')
+        self.app = app.make_app(enable_acl=False, attach_storage=False)
         self.app.register_blueprint(v1.blueprint)
         self.test_app = self.app.test_client()
 
         @self.app.before_request
         def attach_storage_connection():
             flask.request.storage_conn = self.conn
-
-        self.app.before_request(app.attach_sources)
 
     def get(self, path, **kwds):
         if kwds:

@@ -24,23 +24,36 @@ from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import jsonutils
 from ceilometer import storage
 from ceilometer.api import v1
+from ceilometer.api import acl
 
-
-app = flask.Flask('ceilometer.api')
-app.register_blueprint(v1.blueprint, url_prefix='/v1')
 
 storage.register_opts(cfg.CONF)
 
 
-@app.before_request
-def attach_config():
-    flask.request.cfg = cfg.CONF
-    storage_engine = storage.get_engine(cfg.CONF)
-    flask.request.storage_engine = storage_engine
-    flask.request.storage_conn = storage_engine.get_connection(cfg.CONF)
+def make_app(enable_acl=True, attach_storage=True):
+    app = flask.Flask('ceilometer.api')
+    app.register_blueprint(v1.blueprint, url_prefix='/v1')
 
+    try:
+        with open("sources.json", "r") as f:
+            sources = jsonutils.load(f)
+    except IOError:
+        sources = {}
 
-@app.before_request
-def attach_sources():
-    with open("sources.json", "r") as f:
-        flask.request.sources = jsonutils.load(f)
+    @app.before_request
+    def attach_config():
+        flask.request.cfg = cfg.CONF
+        flask.request.sources = sources
+
+    if attach_storage:
+        @app.before_request
+        def attach_storage():
+            storage_engine = storage.get_engine(cfg.CONF)
+            flask.request.storage_engine = storage_engine
+            flask.request.storage_conn = \
+                storage_engine.get_connection(cfg.CONF)
+
+    # Install the middleware wrapper
+    if enable_acl:
+        return acl.install(app, cfg.CONF)
+    return app
