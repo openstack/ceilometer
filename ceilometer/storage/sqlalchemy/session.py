@@ -22,6 +22,7 @@ import re
 import time
 
 import sqlalchemy
+from sqlalchemy import func
 from sqlalchemy.exc import DisconnectionError, OperationalError
 import sqlalchemy.orm
 from sqlalchemy.pool import NullPool, StaticPool
