@@ -18,22 +18,27 @@
 """Set up the ACL to acces the API server."""
 
 import flask
-from ceilometer.openstack.common import cfg
 from ceilometer import policy
 
 import keystone.middleware.auth_token
 
-# Register keystone middleware option
-cfg.CONF.register_opts(keystone.middleware.auth_token.opts,
-                       group='keystone_authtoken')
-keystone.middleware.auth_token.CONF = cfg.CONF
+
+def register_opts(conf):
+    """Register keystone middleware options
+    """
+    conf.register_opts(keystone.middleware.auth_token.opts,
+                       group='keystone_authtoken',
+                       )
+    keystone.middleware.auth_token.CONF = conf
 
 
-def install(app):
+def install(app, conf):
     """Install ACL check on application."""
     app.wsgi_app = keystone.middleware.auth_token.AuthProtocol(app.wsgi_app,
-                                                               {})
+                                                               conf=conf,
+                                                               )
     app.before_request(check)
+    return app
 
 
 def check():

@@ -26,7 +26,7 @@ class TestAPIACL(tests_api.TestBase):
 
     def setUp(self):
         super(TestAPIACL, self).setUp()
-        acl.install(self.app)
+        acl.install(self.app, {})
 
     def test_non_authenticated(self):
         with self.app.test_request_context('/'):
