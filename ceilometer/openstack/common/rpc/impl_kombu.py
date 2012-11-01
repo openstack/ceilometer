@@ -31,9 +31,9 @@ import kombu.messaging
 
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common import network_utils
 from ceilometer.openstack.common.rpc import amqp as rpc_amqp
 from ceilometer.openstack.common.rpc import common as rpc_common
-from ceilometer.openstack.common import network_utils
 
 kombu_opts = [
     cfg.StrOpt('kombu_ssl_version',
@@ -267,6 +267,7 @@ class FanoutConsumer(ConsumerBase):
 
         # Default options
         options = {'durable': False,
+                   'queue_arguments': _get_queue_arguments(conf),
                    'auto_delete': True,
                    'exclusive': True}
         options.update(kwargs)
