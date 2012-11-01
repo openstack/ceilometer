@@ -40,11 +40,6 @@ PLUGIN_NAMESPACE = 'ceilometer.poll.central'
 class AgentManager(manager.Manager):
 
     def init_host(self):
-        # FIXME(dhellmann): Currently assumes all plugins are
-        # enabled when they are discovered and
-        # importable. Need to add check against global
-        # configuration flag and check that asks the plugin if
-        # it should be enabled.
         self.ext_manager = extension_manager.ActivatedExtensionManager(
             namespace=PLUGIN_NAMESPACE,
             disabled_names=cfg.CONF.disabled_central_pollsters,
