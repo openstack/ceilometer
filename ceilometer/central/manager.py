@@ -19,6 +19,7 @@
 from nova import manager
 
 from ceilometer import extension_manager
+from ceilometer.compute import resources
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import log
 from ceilometer import publish
@@ -38,6 +39,9 @@ PLUGIN_NAMESPACE = 'ceilometer.poll.central'
 
 
 class AgentManager(manager.Manager):
+    def __init__(self, host=None):
+        super(AgentManager, self).__init__(host=host)
+        self.resources = resources.Resources()
 
     def init_host(self):
         self.ext_manager = extension_manager.ActivatedExtensionManager(
