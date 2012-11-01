@@ -191,14 +191,14 @@ class Connection(base.Connection):
             self.db.resource.ensure_index([
                     (primary, pymongo.ASCENDING),
                     ('source', pymongo.ASCENDING),
-                    ])
+                    ], name='resource_idx')
             self.db.meter.ensure_index([
                     ('resource_id', pymongo.ASCENDING),
                     (primary, pymongo.ASCENDING),
                     ('counter_name', pymongo.ASCENDING),
                     ('timestamp', pymongo.ASCENDING),
                     ('source', pymongo.ASCENDING),
-                    ])
+                    ], name='meter_idx')
         return
 
     def _get_connection(self, opts):
