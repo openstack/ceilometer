@@ -86,6 +86,7 @@ class TestDiskIOPollster(TestLibvirtBase):
 
     @skip.skip_if(libvirt_missing, 'Test requires libvirt')
     def test_fetch_diskio(self):
+        flags.FLAGS.compute_driver = 'fake.FakeVirtAPI'
         list(self.pollster.get_counters(self.manager, self.instance))
         #assert counters
         # FIXME(dhellmann): The CI environment doesn't produce
@@ -94,7 +95,7 @@ class TestDiskIOPollster(TestLibvirtBase):
 
     @skip.skip_if(libvirt_missing, 'Test requires libvirt')
     def test_fetch_diskio_not_libvirt(self):
-        flags.FLAGS.compute_driver = 'fake.FakeDriver'
+        flags.FLAGS.compute_driver = 'fake.FakeVirtAPI'
         flags.FLAGS.connection_type = 'fake'
         counters = list(self.pollster.get_counters(self.manager,
                                                    self.instance))
@@ -102,6 +103,7 @@ class TestDiskIOPollster(TestLibvirtBase):
 
     @skip.skip_if(libvirt_missing, 'Test requires libvirt')
     def test_fetch_diskio_with_libvirt_non_existent_instance(self):
+        flags.FLAGS.compute_driver = 'fake.FakeVirtAPI'
         instance = mock.MagicMock()
         instance.name = 'instance-00000999'
         instance.id = 999
