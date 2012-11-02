@@ -27,6 +27,7 @@ else:
     libvirt_missing = False
 
 import mock
+import time
 
 from nova import flags
 
@@ -39,11 +40,12 @@ import mox
 import re
 
 
-def fake_libvirt_conn(moxobj):
+def fake_libvirt_conn(moxobj, count=1):
     conn = moxobj.CreateMockAnything()
     conn._conn = moxobj.CreateMockAnything()
     moxobj.StubOutWithMock(libvirt, 'get_libvirt_connection')
-    libvirt.get_libvirt_connection().AndReturn(conn)
+    for _ in xrange(count):
+        libvirt.get_libvirt_connection().AndReturn(conn)
     return conn
 
 
@@ -210,13 +212,27 @@ class TestCPUPollster(TestLibvirtBase):
         self.pollster = libvirt.CPUPollster()
 
     def test_get_counter(self):
-        expected_cpu_time = 12345
-
-        conn = fake_libvirt_conn(self.mox)
+        self.instance.vcpus = 1
+        conn = fake_libvirt_conn(self.mox, 3)
         self.mox.StubOutWithMock(conn, 'get_info')
-        conn.get_info(self.instance).AndReturn({'cpu_time': expected_cpu_time})
+        conn.get_info(self.instance).AndReturn({'cpu_time': 1 * (10 ** 6)})
+        conn.get_info(self.instance).AndReturn({'cpu_time': 3 * (10 ** 6)})
+        # cpu_time resets on instance restart
+        conn.get_info(self.instance).AndReturn({'cpu_time': 2 * (10 ** 6)})
         self.mox.ReplayAll()
-        counters = list(self.pollster.get_counters(self.manager,
-                                                   self.instance))
-        self.assertEquals(len(counters), 1)
-        assert counters[0].volume == expected_cpu_time
+
+        def _verify_cpu_metering(zero, expected_time):
+            counters = list(self.pollster.get_counters(self.manager,
+                                                       self.instance))
+            self.assertEquals(len(counters), 2)
+            assert counters[0].name == 'cpu_util'
+            assert (counters[0].volume == 0.0 if zero else
+                    counters[0].volume > 0.0)
+            assert counters[1].name == 'cpu'
+            assert counters[1].volume == expected_time
+            # ensure elapsed time between polling cycles is non-zero
+            time.sleep(0.001)
+
+        _verify_cpu_metering(True, 1 * (10 ** 6))
+        _verify_cpu_metering(False, 3 * (10 ** 6))
+        _verify_cpu_metering(False, 2 * (10 ** 6))
