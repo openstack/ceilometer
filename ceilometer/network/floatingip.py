@@ -31,7 +31,7 @@ class FloatingIPPollster(plugin.CentralPollster):
 
     def get_counters(self, manager, context):
         try:
-            ips = manager.db.floating_ip_get_all(context)
+            ips = manager.resources.floating_ip_get_all(context)
         except exception.FloatingIpNotFoundForHost:
             pass
         else:

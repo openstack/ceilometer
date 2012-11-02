@@ -21,6 +21,7 @@ from nova import manager
 from ceilometer import extension_manager
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import log
+from ceilometer.compute import resources
 from ceilometer import publish
 
 OPTS = [
@@ -39,6 +40,10 @@ PLUGIN_NAMESPACE = 'ceilometer.poll.compute'
 
 
 class AgentManager(manager.Manager):
+
+    def __init__(self, host=None):
+        super(AgentManager, self).__init__(host=host)
+        self.resources = resources.Resources()
 
     def init_host(self):
         self.ext_manager = extension_manager.ActivatedExtensionManager(
@@ -75,8 +80,6 @@ class AgentManager(manager.Manager):
 
     def periodic_tasks(self, context, raise_on_error=False):
         """Tasks to be run at a periodic interval."""
-        # FIXME(dhellmann): How do we get a list of instances without
-        # talking directly to the database?
-        for instance in self.db.instance_get_all_by_host(context, self.host):
+        for instance in self.resources.instance_get_all_by_host(context):
             if instance['vm_state'] != 'error':
                 self.poll_instance(context, instance)

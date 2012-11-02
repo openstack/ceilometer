@@ -84,10 +84,10 @@ class TestRunTasks(base.TestCase):
         stillborn_instance = mock.MagicMock()
         stillborn_instance.name = 'stillborn'
         stillborn_instance.vm_state = 'error'
-        self.mox.StubOutWithMock(self.mgr.db, 'instance_get_all_by_host')
-        self.mgr.db.instance_get_all_by_host(
-            None,
-            self.mgr.host,
+        self.mox.StubOutWithMock(self.mgr.resources,
+                                 'instance_get_all_by_host')
+        self.mgr.resources.instance_get_all_by_host(
+            None
             ).AndReturn([self.instance, stillborn_instance])
 
         self.mox.ReplayAll()
