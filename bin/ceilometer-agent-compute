@@ -21,9 +21,13 @@ import eventlet
 eventlet.monkey_patch()
 import sys
 
+from ceilometer import service as ceilo_service
+from ceilometer.compute import manager
 from ceilometer.service import prepare_service
 from ceilometer.openstack.common import cfg
-from nova import service
+from ceilometer.openstack.common import service
+
+from nova import flags
 from nova.compute import manager as compute_manager
 
 
@@ -35,11 +39,9 @@ if __name__ == '__main__':
     cfg.CONF.register_opts(compute_manager.compute_opts)
 
     prepare_service(sys.argv)
-    server = \
-        service.Service.create(
-        binary='ceilometer-agent-compute',
-        topic='ceilometer.agent.compute',
-        manager='ceilometer.compute.manager.AgentManager',
-        periodic_interval=cfg.CONF.periodic_interval)
-    service.serve(server)
-    service.wait()
+    mgr = manager.AgentManager()
+    topic = 'ceilometer.agent.compute'
+    ceilo = ceilo_service.PeriodicService(cfg.CONF.host,
+                                          topic, mgr)
+    launcher = service.launch(ceilo)
+    launcher.wait()

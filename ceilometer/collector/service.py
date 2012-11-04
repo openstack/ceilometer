@@ -18,11 +18,10 @@
 
 from stevedore import extension
 
-from nova import manager
-
 from ceilometer import extension_manager
 from ceilometer import meter
 from ceilometer import publish
+from ceilometer import service
 from ceilometer import storage
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import cfg
@@ -50,14 +49,12 @@ cfg.CONF.register_opts(OPTS)
 LOG = log.getLogger(__name__)
 
 
-class CollectorManager(manager.Manager):
+class CollectorService(service.PeriodicService):
 
     COLLECTOR_NAMESPACE = 'ceilometer.collector'
 
-    def init_host(self):
-        # FIXME(dhellmann): Update Manager API to get Service instance
-        # with existing rpc handle.
-        self.connection = rpc.create_connection()
+    def start(self):
+        super(CollectorService, self).start()
 
         storage.register_opts(cfg.CONF)
         self.storage_engine = storage.get_engine(cfg.CONF)
@@ -75,14 +72,12 @@ class CollectorManager(manager.Manager):
         self.ext_manager.map(self._setup_subscription)
 
         # Set ourselves up as a separate worker for the metering data,
-        # since the default for manager is to use create_consumer().
-        self.connection.create_worker(
+        # since the default for service is to use create_consumer().
+        self.conn.create_worker(
             cfg.CONF.metering_topic,
             rpc_dispatcher.RpcDispatcher([self]),
             'ceilometer.collector.' + cfg.CONF.metering_topic,
             )
-
-        self.connection.consume_in_thread()
 
     def _setup_subscription(self, ext, *args, **kwds):
         handler = ext.obj
@@ -94,7 +89,7 @@ class CollectorManager(manager.Manager):
                 # that notification messages do not conform to the RPC
                 # invocation protocol (they do not include a "method"
                 # parameter).
-                self.connection.declare_topic_consumer(
+                self.conn.declare_topic_consumer(
                     queue_name="ceilometer.notifications",
                     topic=topic,
                     exchange_name=exchange_topic.exchange,
@@ -150,3 +145,6 @@ class CollectorManager(manager.Manager):
             except Exception as err:
                 LOG.error('Failed to record metering data: %s', err)
                 LOG.exception(err)
+
+    def periodic_tasks(self, context):
+        pass

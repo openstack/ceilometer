@@ -16,8 +16,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from nova import manager
-
 from ceilometer import extension_manager
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import log
@@ -39,13 +37,11 @@ LOG = log.getLogger(__name__)
 PLUGIN_NAMESPACE = 'ceilometer.poll.compute'
 
 
-class AgentManager(manager.Manager):
+class AgentManager(object):
 
-    def __init__(self, host=None):
-        super(AgentManager, self).__init__(host=host)
+    def __init__(self):
         self.resources = resources.Resources()
 
-    def init_host(self):
         self.ext_manager = extension_manager.ActivatedExtensionManager(
             namespace=PLUGIN_NAMESPACE,
             disabled_names=cfg.CONF.disabled_compute_pollsters,

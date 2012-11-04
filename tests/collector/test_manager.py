@@ -26,7 +26,7 @@ from stevedore import extension
 from stevedore.tests import manager as test_manager
 
 from ceilometer import meter
-from ceilometer.collector import manager
+from ceilometer.collector import service
 from ceilometer.openstack.common import cfg
 from ceilometer.storage import base
 from ceilometer.tests import base as tests_base
@@ -83,11 +83,11 @@ TEST_NOTICE = {
     }
 
 
-class TestCollectorManager(tests_base.TestCase):
+class TestCollectorService(tests_base.TestCase):
 
     def setUp(self):
-        super(TestCollectorManager, self).setUp()
-        self.mgr = manager.CollectorManager()
+        super(TestCollectorService, self).setUp()
+        self.srv = service.CollectorService('the-host', 'the-topic')
         self.ctx = None
         #cfg.CONF.metering_secret = 'not-so-secret'
 
@@ -97,7 +97,7 @@ class TestCollectorManager(tests_base.TestCase):
         # returns. Mock it out so we can establish the manager
         # configuration.
         with patch('ceilometer.openstack.common.rpc.create_connection'):
-            self.mgr.init_host()
+            self.srv.start()
 
     def test_valid_message(self):
         msg = {'counter_name': 'test',
@@ -109,11 +109,11 @@ class TestCollectorManager(tests_base.TestCase):
             cfg.CONF.metering_secret,
             )
 
-        self.mgr.storage_conn = self.mox.CreateMock(base.Connection)
-        self.mgr.storage_conn.record_metering_data(msg)
+        self.srv.storage_conn = self.mox.CreateMock(base.Connection)
+        self.srv.storage_conn.record_metering_data(msg)
         self.mox.ReplayAll()
 
-        self.mgr.record_metering_data(self.ctx, msg)
+        self.srv.record_metering_data(self.ctx, msg)
         self.mox.VerifyAll()
 
     def test_invalid_message(self):
@@ -130,11 +130,11 @@ class TestCollectorManager(tests_base.TestCase):
             def record_metering_data(self, data):
                 self.called = True
 
-        self.mgr.storage_conn = ErrorConnection()
+        self.srv.storage_conn = ErrorConnection()
 
-        self.mgr.record_metering_data(self.ctx, msg)
+        self.srv.record_metering_data(self.ctx, msg)
 
-        assert not self.mgr.storage_conn.called, \
+        assert not self.srv.storage_conn.called, \
             'Should not have called the storage connection'
 
     def test_timestamp_conversion(self):
@@ -152,11 +152,11 @@ class TestCollectorManager(tests_base.TestCase):
         expected.update(msg)
         expected['timestamp'] = datetime(2012, 7, 2, 13, 53, 40)
 
-        self.mgr.storage_conn = self.mox.CreateMock(base.Connection)
-        self.mgr.storage_conn.record_metering_data(expected)
+        self.srv.storage_conn = self.mox.CreateMock(base.Connection)
+        self.srv.storage_conn.record_metering_data(expected)
         self.mox.ReplayAll()
 
-        self.mgr.record_metering_data(self.ctx, msg)
+        self.srv.record_metering_data(self.ctx, msg)
         self.mox.VerifyAll()
 
     def test_timestamp_tzinfo_conversion(self):
@@ -174,11 +174,11 @@ class TestCollectorManager(tests_base.TestCase):
         expected.update(msg)
         expected['timestamp'] = datetime(2012, 9, 30, 23, 31, 50, 262000)
 
-        self.mgr.storage_conn = self.mox.CreateMock(base.Connection)
-        self.mgr.storage_conn.record_metering_data(expected)
+        self.srv.storage_conn = self.mox.CreateMock(base.Connection)
+        self.srv.storage_conn.record_metering_data(expected)
         self.mox.ReplayAll()
 
-        self.mgr.record_metering_data(self.ctx, msg)
+        self.srv.record_metering_data(self.ctx, msg)
         self.mox.VerifyAll()
 
     def test_process_notification(self):
@@ -186,15 +186,15 @@ class TestCollectorManager(tests_base.TestCase):
         # returns. Mock it out so we can establish the manager
         # configuration.
         with patch('ceilometer.openstack.common.rpc.create_connection'):
-            self.mgr.init_host()
+            self.srv.start()
         results = []
-        self.stubs.Set(self.mgr, 'publish_counter', results.append)
-        self.mgr.ext_manager = test_manager.TestExtensionManager(
+        self.stubs.Set(self.srv, 'publish_counter', results.append)
+        self.srv.ext_manager = test_manager.TestExtensionManager(
             [extension.Extension('test',
                                  None,
                                  None,
                                  notifications.Instance(),
                                  ),
              ])
-        self.mgr.process_notification(TEST_NOTICE)
+        self.srv.process_notification(TEST_NOTICE)
         self.assert_(len(results) >= 1)

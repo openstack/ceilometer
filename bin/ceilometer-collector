@@ -21,17 +21,17 @@ import eventlet
 eventlet.monkey_patch()
 import sys
 
+
+from ceilometer.collector import service as coll_service
 from ceilometer.service import prepare_service
 from ceilometer.openstack.common import cfg
-from nova import service
+from ceilometer.openstack.common import service
 
 
 if __name__ == '__main__':
     prepare_service(sys.argv)
-    server = \
-        service.Service.create(binary='ceilometer-collector',
-                               topic='ceilometer.collector',
-                               manager='ceilometer.collector.'
-                               'manager.CollectorManager')
-    service.serve(server)
-    service.wait()
+    topic = 'ceilometer.collector'
+    ceilo = coll_service.CollectorService(cfg.CONF.host,
+                                          topic)
+    launcher = service.launch(ceilo)
+    launcher.wait()
