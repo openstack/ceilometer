@@ -21,8 +21,11 @@ import os
 
 from nova import flags
 
-from ceilometer.openstack.common import log
 from ceilometer.openstack.common import cfg
+from ceilometer.openstack.common import context
+from ceilometer.openstack.common import log
+from ceilometer.openstack.common.rpc import service as rpc_service
+
 
 cfg.CONF.register_opts([
     cfg.IntOpt('periodic_interval',
@@ -49,6 +52,18 @@ CLI_OPTIONS = [
                help='Auth URL to use for openstack service access'),
 ]
 cfg.CONF.register_cli_opts(CLI_OPTIONS)
+cfg.CONF.register_cli_opts(flags.core_opts)
+cfg.CONF.register_cli_opts(flags.global_opts)
+
+
+class PeriodicService(rpc_service.Service):
+
+    def start(self):
+        super(PeriodicService, self).start()
+        admin_context = context.RequestContext('admin', 'admin', is_admin=True)
+        self.tg.add_timer(cfg.CONF.periodic_interval,
+                    self.manager.periodic_tasks,
+                    context=admin_context)
 
 
 def _sanitize_cmd_line(argv):

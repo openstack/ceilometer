@@ -46,7 +46,6 @@ def initialize_manager():
         cfg.CONF(args=[], project='ceilometer', prog='ceilometer-agent')
     # Instantiate a manager
     _agent_manager = AgentManager()
-    _agent_manager.init_host()
 
 
 def notify(context, message):

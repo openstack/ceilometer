@@ -33,7 +33,6 @@ from ceilometer.openstack.common import cfg
 
 def test_load_plugins():
     mgr = manager.AgentManager()
-    mgr.init_host()
     assert list(mgr.ext_manager), 'Failed to load any plugins'
     return
 
