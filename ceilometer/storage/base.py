@@ -58,6 +58,8 @@ class Connection(object):
 
         :param data: a dictionary such as returned by
                      ceilometer.meter.meter_message_from_counter
+
+        All timestamps must be naive utc datetime object.
         """
 
     @abc.abstractmethod
