@@ -150,11 +150,11 @@ Installing the Compute Agent
    The ``nova`` compute service needs the following configuration to
    be set in ``nova.conf``::
 
-   # nova-compute configuration for ceilometer
-   instance_usage_audit=True
-   instance_usage_audit_period=hour
-   notification_driver=nova.openstack.common.notifier.rabbit_notifier
-   notification_driver=ceilometer.compute.nova_notifier
+      # nova-compute configuration for ceilometer
+      instance_usage_audit=True
+      instance_usage_audit_period=hour
+      notification_driver=nova.openstack.common.notifier.rabbit_notifier
+      notification_driver=ceilometer.compute.nova_notifier
 
 2. Clone the ceilometer git repository to the server::
 
