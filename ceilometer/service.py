@@ -20,7 +20,11 @@
 import os
 
 from nova import flags
-from nova import config
+try:
+    from nova import config as nova_config
+except ImportError:
+    nova_config = False
+    from nova import flags
 
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import context
@@ -73,11 +77,18 @@ def _sanitize_cmd_line(argv):
     return [a for a in argv if a in cli_opt_names]
 
 
+def _init_nova_config(argv):
+    if nova_config:
+        nova_config.parse_args(argv)
+    else:
+        flags.FLAGS(argv)
+
+
 def prepare_service(argv=[]):
     cfg.CONF(argv[1:])
     # FIXME(dhellmann): We must set up the nova.flags module in order
     # to have the RPC and DB access work correctly because we are
     # still using the Service object out of nova directly. We need to
     # move that into openstack.common.
-    config.parse_args(_sanitize_cmd_line(argv))
+    _init_nova_config(_sanitize_cmd_line(argv))
     log.setup('ceilometer')
