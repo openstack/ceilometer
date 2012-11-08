@@ -23,6 +23,7 @@ import mock
 
 from stevedore import extension
 
+from ceilometer import nova_client
 from ceilometer.compute import manager
 from ceilometer import counter
 from ceilometer import publish
@@ -77,24 +78,18 @@ class TestRunTasks(base.TestCase):
         # Set up a fake instance value to be returned by
         # instance_get_all_by_host() so when the manager gets the list
         # of instances to poll we can control the results.
-        self.instance = mock.MagicMock()
-        self.instance.name = 'faux'
-        self.instance.vm_state = 'active'
-        stillborn_instance = mock.MagicMock()
-        stillborn_instance.name = 'stillborn'
-        stillborn_instance.vm_state = 'error'
-        self.mox.StubOutWithMock(self.mgr.resources,
-                                 'instance_get_all_by_host')
-        self.mgr.resources.instance_get_all_by_host(
-            None
-            ).AndReturn([self.instance, stillborn_instance])
-
+        self.instance = {'name': 'faux',
+                         'OS-EXT-STS:vm_state': 'active'}
+        stillborn_instance = {'name': 'stillborn',
+                              'OS-EXT-STS:vm_state': 'error'}
+        self.stubs.Set(nova_client.Client, 'instance_get_all_by_host',
+                       lambda *x: [self.instance, stillborn_instance])
         self.mox.ReplayAll()
         # Invoke the periodic tasks to call the pollsters.
         self.mgr.periodic_tasks(None)
 
     def test_message(self):
-        assert len(self.Pollster.counters) == 2
+        self.assertEqual(len(self.Pollster.counters), 2)
         assert self.Pollster.counters[0][1] is self.instance
 
     def test_notifications(self):
