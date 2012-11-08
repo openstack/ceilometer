@@ -22,12 +22,13 @@ import os
 import setuptools
 
 from ceilometer.openstack.common import setup as common_setup
+from ceilometer.version import version_info
 
 requires = common_setup.parse_requirements(['tools/pip-requires'])
 depend_links = common_setup.parse_dependency_links(['tools/pip-requires'])
 
-version = '0.2'
 url_base = 'http://tarballs.openstack.org/ceilometer/ceilometer-%s.tar.gz'
+version_string = version_info.canonical_version_string(always=True)
 
 
 def directories(target_dir):
@@ -38,7 +39,7 @@ def directories(target_dir):
 setuptools.setup(
 
     name='ceilometer',
-    version=version,
+    version=version_string,
 
     description='cloud computing metering',
 
@@ -46,7 +47,7 @@ setuptools.setup(
     author_email='ceilometer@lists.launchpad.net',
 
     url='https://launchpad.net/ceilometer',
-    download_url=url_base % version,
+    download_url=url_base % version_string,
 
     classifiers=[
         'Development Status :: 3 - Alpha',

@@ -11,3 +11,4 @@ ChangeLog
 *.deb
 dist
 *.egg
+ceilometer/versioninfo
