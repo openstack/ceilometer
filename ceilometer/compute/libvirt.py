@@ -101,22 +101,11 @@ class DiskIOPollster(LibVirtPollster):
                                      "errors=%d",
                                      ])
 
-    def _get_disks(self, conn, instance):
-        """Get disks of an instance, only used to bypass bug#998089."""
-        domain = conn._conn.lookupByName(instance)
-        tree = etree.fromstring(domain.XMLDesc(0))
-        return filter(bool,
-                      [target.get('dev')
-                       for target in tree.findall('devices/disk/target')
-                       ])
-
     def get_counters(self, manager, instance):
         conn = get_libvirt_connection()
-        # TODO(jd) This does not work see bug#998089
-        # for disk in conn.get_disks(instance.name):
         instance_name = _instance_name(instance)
         try:
-            disks = self._get_disks(conn, instance_name)
+            disks = conn.get_disks(instance_name)
         except Exception as err:
             self.LOG.warning('Ignoring instance %s: %s',
                              instance_name, err)
