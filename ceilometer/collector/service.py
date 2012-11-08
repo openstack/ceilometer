@@ -60,6 +60,8 @@ class CollectorService(service.PeriodicService):
         self.storage_engine = storage.get_engine(cfg.CONF)
         self.storage_conn = self.storage_engine.get_connection(cfg.CONF)
 
+    def initialize_service_hook(self, service):
+        '''Consumers must be declared before consume_thread start.'''
         self.ext_manager = extension_manager.ActivatedExtensionManager(
             namespace=self.COLLECTOR_NAMESPACE,
             disabled_names=cfg.CONF.disabled_notification_listeners,
