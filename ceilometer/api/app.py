@@ -57,3 +57,6 @@ def make_app(enable_acl=True, attach_storage=True):
     if enable_acl:
         return acl.install(app, cfg.CONF)
     return app
+
+# For documentation
+app = make_app(enable_acl=False, attach_storage=False)
