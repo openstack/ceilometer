@@ -59,8 +59,7 @@ class TestLibvirtBase(test_base.TestCase):
         setattr(self.instance, 'OS-EXT-SRV-ATTR:instance_name',
                 self.instance.name)
         self.instance.id = 1
-        self.instance.instance_type = mock.MagicMock()
-        self.instance.instance_type.name = 'm1.small'
+        self.instance.flavor = {'name': 'm1.small', 'id': 2}
         flags.FLAGS.compute_driver = 'libvirt.LibvirtDriver'
         flags.FLAGS.connection_type = 'libvirt'
 

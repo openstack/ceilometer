@@ -82,7 +82,7 @@ class InstancePollster(LibVirtPollster):
         )
         yield make_counter_from_instance(instance,
                                          name='instance:%s' %
-                                         instance.instance_type.name,
+                                         instance.flavor['name'],
                                          type=counter.TYPE_GAUGE,
                                          volume=1,
         )

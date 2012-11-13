@@ -49,12 +49,20 @@ class Client(object):
                                               auth_url=cfg.CONF.os_auth_url,
                                               no_cache=True)
 
+    def _with_flavor(self, instances):
+        flavors = dict((f.id, f) for f in self.nova_client.flavors.list())
+        for instance in instances:
+            fid = instance.flavor['id']
+            instance.flavor['name'] = flavors[fid].name
+        return instances
+
     @logged
     def instance_get_all_by_host(self, hostname):
         """Returns list of instances on particular host"""
         search_opts = {'host': hostname, 'all_tenants': True}
-        return self.nova_client.servers.list(detailed=True,
-                                             search_opts=search_opts)
+        return self._with_flavor(self.nova_client.servers.list(
+                                                  detailed=True,
+                                                  search_opts=search_opts))
 
     @logged
     def floating_ip_get_all(self):
