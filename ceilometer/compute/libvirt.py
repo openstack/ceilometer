@@ -163,6 +163,8 @@ class CPUPollster(LibVirtPollster):
             delta = self.utilization_map[instance.id][1] - prev_timestamp
             elapsed = (delta.seconds * (10 ** 6) + delta.microseconds) * 1000
             cores_fraction = instance.vcpus * 1.0 / multiprocessing.cpu_count()
+            cores_fraction = (instance.flavor['vcpus'] * 1.0 /
+                              multiprocessing.cpu_count())
             # account for cpu_time being reset when the instance is restarted
             time_used = (cpu_info['cpu_time'] - prev_cpu
                          if prev_cpu <= cpu_info['cpu_time'] else
@@ -176,10 +178,10 @@ class CPUPollster(LibVirtPollster):
         try:
             cpu_info = conn.get_info({'name': _instance_name(instance)})
             self.LOG.info("CPUTIME USAGE: %s %d",
-                          dict(instance), cpu_info['cpu_time'])
+                          instance.__dict__, cpu_info['cpu_time'])
             cpu_util = self.get_cpu_util(instance, cpu_info)
             self.LOG.info("CPU UTILIZATION %%: %s %0.2f",
-                          dict(instance), cpu_util)
+                          instance.__dict__, cpu_util)
             # FIXME(eglynn): once we have a way of configuring which measures
             #                are published to each sink, we should by default
             #                disable publishing this derived measure to the

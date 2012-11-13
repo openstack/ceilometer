@@ -54,6 +54,7 @@ class Client(object):
         for instance in instances:
             fid = instance.flavor['id']
             instance.flavor['name'] = flavors[fid].name
+            instance.flavor['vcpus'] = flavors[fid].vcpus
         return instances
 
     @logged
