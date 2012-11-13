@@ -28,12 +28,12 @@ Setting up a Development Sandbox
 2. Clone the ceilometer project to the machine::
 
     $ cd /opt/stack
-    $ git clone https://github.com/stackforge/ceilometer.git
+    $ git clone https://github.com/openstack/ceilometer.git
     $ cd ./ceilometer
 
 3. Once this is done, you need to setup the review process::
 
-    $ git remote add gerrit ssh://<username>@review.openstack.org:29418/stackforge/ceilometer.git
+    $ git remote add gerrit ssh://<username>@review.openstack.org:29418/openstack/ceilometer.git
 
 4. If you are preparing a patch, create a topic branch and switch to
    it before making any changes::
@@ -77,4 +77,4 @@ through gerrit.
    * http://wiki.openstack.org/GerritWorkflow
    * `OpenStack Gerrit instance`_.
 
-.. _OpenStack Gerrit instance: https://review.openstack.org/#/q/status:open+project:stackforge/ceilometer,n,z
+.. _OpenStack Gerrit instance: https://review.openstack.org/#/q/status:open+project:openstack/ceilometer,n,z
