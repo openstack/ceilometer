@@ -59,7 +59,7 @@ class TestLibvirtBase(test_base.TestCase):
         setattr(self.instance, 'OS-EXT-SRV-ATTR:instance_name',
                 self.instance.name)
         self.instance.id = 1
-        self.instance.flavor = {'name': 'm1.small', 'id': 2}
+        self.instance.flavor = {'name': 'm1.small', 'id': 2, 'vcpus': 1}
         flags.FLAGS.compute_driver = 'libvirt.LibvirtDriver'
         flags.FLAGS.connection_type = 'libvirt'
 
