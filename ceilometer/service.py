@@ -23,6 +23,10 @@ from nova import flags
 try:
     from nova import config as nova_config
 except ImportError:
+    # NOTE(dhellmann): We want to try to maintain compatibility
+    # with folsom for the time being, so set the name nova_config
+    # to a sentinal we can use to trigger different behavior
+    # when we try to set up the configuration object.
     nova_config = False
 
 from ceilometer.openstack.common import cfg
@@ -77,6 +81,10 @@ def _sanitize_cmd_line(argv):
 
 
 def _init_nova_config(argv):
+    # NOTE(dhellmann): We want to try to maintain compatibility
+    # with folsom for the time being, so this function is
+    # just here to isolate the rest of the module from having
+    # to know how to configure different versions of nova.
     if nova_config:
         nova_config.parse_args(argv)
     else:
