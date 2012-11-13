@@ -22,8 +22,8 @@
 :Bug tracker: http://launchpad.net/ceilometer
 :Mailing list: http://lists.openstack.org/cgi-bin/mailman/listinfo/openstack-dev (prefix subjects with ``[metering]`` for faster responses)
 :Wiki: http://wiki.openstack.org/EfficientMetering
-:Code Hosting: https://github.com/stackforge/ceilometer
-:Code Review: https://review.openstack.org/#/q/status:open+project:stackforge/ceilometer,n,z
+:Code Hosting: https://github.com/openstack/ceilometer
+:Code Review: https://review.openstack.org/#/q/status:open+project:openstack/ceilometer,n,z
 
 .. seealso::
 
