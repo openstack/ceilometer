@@ -24,7 +24,6 @@ try:
     from nova import config as nova_config
 except ImportError:
     nova_config = False
-    from nova import flags
 
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import context
@@ -81,7 +80,7 @@ def _init_nova_config(argv):
     if nova_config:
         nova_config.parse_args(argv)
     else:
-        flags.FLAGS(argv)
+        flags.parse_args(argv)
 
 
 def prepare_service(argv=[]):
