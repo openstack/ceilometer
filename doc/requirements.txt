@@ -1,4 +1,6 @@
 http://tarballs.openstack.org/nova/nova-master.tar.gz
+# we need the keystone middleware for the API service
+http://tarballs.openstack.org/keystone/keystone-master.tar.gz
 webob
 kombu
 iso8601
