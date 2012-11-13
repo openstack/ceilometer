@@ -44,8 +44,13 @@ def get_libvirt_connection():
     # The direct-import implementation only works with Folsom because
     # the configuration setting changed.
     try:
-        return importutils.import_object_ns('nova.virt',
-                                            FLAGS.compute_driver)
+        try:
+            return importutils.import_object_ns('nova.virt',
+                                                FLAGS.compute_driver,
+                                                None)
+        except TypeError:
+            return importutils.import_object_ns('nova.virt',
+                                                FLAGS.compute_driver)
     except ImportError:
         # Fall back to the way it was done in Essex.
         import nova.virt.connection
