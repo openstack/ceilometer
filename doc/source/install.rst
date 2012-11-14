@@ -103,11 +103,11 @@ Installing the Collector
 
    Ceilometer needs to know about some of the nova configuration
    options, so the simplest way to start is copying
-   ``/etc/nova/nova.conf`` to ``/etc/ceilometer-collector.conf``. Some
+   ``/etc/nova/nova.conf`` to ``/etc/ceilometer/ceilometer.conf``. Some
    of the logging settings used in nova break ceilometer, so they need
    to be removed. For example, as a user with ``root`` permissions::
 
-     $ grep -v format_string /etc/nova/nova.conf > /etc/ceilometer-collector.conf
+     $ grep -v format_string /etc/nova/nova.conf > /etc/ceilometer/ceilometer.conf
 
    Refer to :doc:`configuration` for details about any other options
    you might want to modify before starting the service.
@@ -171,11 +171,11 @@ Installing the Compute Agent
 
    Ceilometer needs to know about some of the nova configuration
    options, so the simplest way to start is copying
-   ``/etc/nova/nova.conf`` to ``/etc/ceilometer-agent.conf``. Some
+   ``/etc/nova/nova.conf`` to ``/etc/ceilometer/ceilometer.conf``. Some
    of the logging settings used in nova break ceilometer, so they need
    to be removed. For example, as a user with ``root`` permissions::
 
-     $ grep -v format_string /etc/nova/nova.conf > /etc/ceilometer-agent.conf
+     $ grep -v format_string /etc/nova/nova.conf > /etc/ceilometer/ceilometer.conf
 
    Refer to :doc:`configuration` for details about any other options
    you might want to modify before starting the service.
@@ -223,11 +223,11 @@ Installing the API Server
 
    Ceilometer needs to know about some of the nova configuration
    options, so the simplest way to start is copying
-   ``/etc/nova/nova.conf`` to ``/etc/ceilometer-agent.conf``. Some
+   ``/etc/nova/nova.conf`` to ``/etc/ceilometer/ceilometer.conf``. Some
    of the logging settings used in nova break ceilometer, so they need
    to be removed. For example, as a user with ``root`` permissions::
 
-     $ grep -v format_string /etc/nova/nova.conf > /etc/ceilometer-agent.conf
+     $ grep -v format_string /etc/nova/nova.conf > /etc/ceilometer/ceilometer.conf
 
    Refer to :doc:`configuration` for details about any other options
    you might want to modify before starting the service.
