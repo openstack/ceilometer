@@ -59,7 +59,7 @@ class TestLibvirtBase(test_base.TestCase):
         setattr(self.instance, 'OS-EXT-SRV-ATTR:instance_name',
                 self.instance.name)
         self.instance.id = 1
-        self.instance.flavor = {'name': 'm1.small', 'id': 2, 'vcpus': 1}
+        self.instance.flavor = {'name': 'm1.small', 'id': 2}
         flags.FLAGS.compute_driver = 'libvirt.LibvirtDriver'
         flags.FLAGS.connection_type = 'libvirt'
 
@@ -215,16 +215,15 @@ class TestCPUPollster(TestLibvirtBase):
         self.pollster = libvirt.CPUPollster()
 
     def test_get_counter(self):
-        self.instance.vcpus = 1
         conn = fake_libvirt_conn(self.mox, 3)
         self.mox.StubOutWithMock(conn, 'get_info')
         conn.get_info({'name': self.instance.name}).AndReturn(
-            {'cpu_time': 1 * (10 ** 6)})
+            {'cpu_time': 1 * (10 ** 6), 'num_cpu': 2})
         conn.get_info({'name': self.instance.name}).AndReturn(
-            {'cpu_time': 3 * (10 ** 6)})
+            {'cpu_time': 3 * (10 ** 6), 'num_cpu': 2})
         # cpu_time resets on instance restart
         conn.get_info({'name': self.instance.name}).AndReturn(
-            {'cpu_time': 2 * (10 ** 6)})
+            {'cpu_time': 2 * (10 ** 6), 'num_cpu': 2})
         self.mox.ReplayAll()
 
         def _verify_cpu_metering(zero, expected_time):

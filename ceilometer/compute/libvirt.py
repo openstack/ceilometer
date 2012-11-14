@@ -18,7 +18,6 @@
 
 import copy
 import datetime
-import multiprocessing
 
 from lxml import etree
 
@@ -167,8 +166,7 @@ class CPUPollster(LibVirtPollster):
             prev_timestamp = prev_times[1]
             delta = self.utilization_map[instance.id][1] - prev_timestamp
             elapsed = (delta.seconds * (10 ** 6) + delta.microseconds) * 1000
-            cores_fraction = (instance.flavor['vcpus'] * 1.0 /
-                              multiprocessing.cpu_count())
+            cores_fraction = 1.0 / cpu_info['num_cpu']
             # account for cpu_time being reset when the instance is restarted
             time_used = (cpu_info['cpu_time'] - prev_cpu
                          if prev_cpu <= cpu_info['cpu_time'] else
