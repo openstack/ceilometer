@@ -92,7 +92,7 @@ def _init_nova_config(argv):
 
 
 def prepare_service(argv=[]):
-    cfg.CONF(argv[1:])
+    cfg.CONF(argv[1:], project='ceilometer')
     # FIXME(dhellmann): We must set up the nova.flags module in order
     # to have the RPC and DB access work correctly because we are
     # still using the Service object out of nova directly. We need to

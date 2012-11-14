@@ -120,7 +120,7 @@ def main(argv):
         sys.argv[1:],
         # NOTE(dhellmann): Read the configuration file(s) for the
         #ceilometer collector by default.
-        default_config_files=['/etc/ceilometer-collector.conf'],
+        default_config_files=['/etc/ceilometer/ceilometer.conf'],
         )
     storage.register_opts(cfg.CONF)
     db = storage.get_connection(cfg.CONF)
