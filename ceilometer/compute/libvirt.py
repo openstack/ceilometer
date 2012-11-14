@@ -167,7 +167,6 @@ class CPUPollster(LibVirtPollster):
             prev_timestamp = prev_times[1]
             delta = self.utilization_map[instance.id][1] - prev_timestamp
             elapsed = (delta.seconds * (10 ** 6) + delta.microseconds) * 1000
-            cores_fraction = instance.vcpus * 1.0 / multiprocessing.cpu_count()
             cores_fraction = (instance.flavor['vcpus'] * 1.0 /
                               multiprocessing.cpu_count())
             # account for cpu_time being reset when the instance is restarted
