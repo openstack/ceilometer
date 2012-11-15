@@ -27,7 +27,11 @@ LOG = logging.getLogger(__name__)
 
 
 def _thread_done(gt, *args, **kwargs):
-    args[0].thread_done(args[1])
+    '''
+    Callback function to be passed to GreenThread.link() when we spawn()
+    Calls the ThreadGroup to notify if.
+    '''
+    kwargs['group'].thread_done(kwargs['thread'])
 
 
 class Thread(object):
@@ -40,16 +44,16 @@ class Thread(object):
     def __init__(self, name, thread, group):
         self.name = name
         self.thread = thread
-        self.thread.link(_thread_done, group, self)
+        self.thread.link(_thread_done, group=group, thread=self)
 
     def stop(self):
-        self.thread.cancel()
+        self.thread.kill()
 
     def wait(self):
         return self.thread.wait()
 
 
-class ThreadGroup():
+class ThreadGroup(object):
     """
     The point of this class is to:
     - keep track of timers and greenthreads (making it easier to stop them
@@ -75,12 +79,7 @@ class ThreadGroup():
         self.threads.append(th)
 
     def thread_done(self, thread):
-        try:
-            thread.wait()
-        except Exception as ex:
-            LOG.exception(ex)
-        finally:
-            self.threads.remove(thread)
+        self.threads.remove(thread)
 
     def stop(self):
         current = greenthread.getcurrent()

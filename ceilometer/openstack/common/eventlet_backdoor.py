@@ -61,7 +61,7 @@ def initialize_if_enabled():
     }
 
     if CONF.backdoor_port is None:
-        return
+        return None
 
     # NOTE(johannes): The standard sys.displayhook will print the value of
     # the last expression and set it to __builtin__._, which overwrites
@@ -73,6 +73,8 @@ def initialize_if_enabled():
             pprint.pprint(val)
     sys.displayhook = displayhook
 
-    eventlet.spawn(eventlet.backdoor.backdoor_server,
-                   eventlet.listen(('localhost', CONF.backdoor_port)),
-                   locals=backdoor_locals)
+    sock = eventlet.listen(('localhost', CONF.backdoor_port))
+    port = sock.getsockname()[1]
+    eventlet.spawn_n(eventlet.backdoor.backdoor_server, sock,
+                     locals=backdoor_locals)
+    return port
