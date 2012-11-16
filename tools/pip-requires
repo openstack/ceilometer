@@ -12,5 +12,5 @@ anyjson>=0.3.1
 Flask==0.9
 stevedore>=0.6
 python-glanceclient
-python-novaclient
+python-novaclient>=2.6.10
 python-keystoneclient>=0.2,<0.3
