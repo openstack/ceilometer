@@ -26,13 +26,11 @@ import logging
 import cPickle as pickle
 import sys
 
-from nova import flags
 from nova import utils
 
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import rpc
 
-FLAGS = flags.FLAGS
 LOG = logging.getLogger(__name__)
 
 
@@ -91,8 +89,8 @@ def send_messages(connection, topic, input):
 
 
 def main():
-    rpc.register_opts(FLAGS)
-    FLAGS.register_opts([
+    rpc.register_opts(cfg.CONF)
+    cfg.CONF.register_opts([
             cfg.StrOpt('datafile',
                        default=None,
                        help='Data file to read or write',
@@ -105,7 +103,7 @@ def main():
                         ),
             ])
 
-    remaining_args = FLAGS(sys.argv)
+    remaining_args = cfg.CONF(sys.argv)
     utils.monkey_patch()
 
     parser = argparse.ArgumentParser(

@@ -22,7 +22,15 @@ import datetime
 from lxml import etree
 
 from nova import flags
-
+try:
+    from nova import config as nova_config
+except ImportError:
+    # NOTE(dhellmann): We want to try to maintain compatibility
+    # with folsom for the time being, so set the name nova_config
+    # to a sentinal we can use to trigger different behavior
+    # when we try to set up the configuration object.
+    from nova import flags
+    nova_config = False
 from ceilometer import counter
 from ceilometer.compute import plugin
 from ceilometer.compute import instance as compute_instance
@@ -30,12 +38,21 @@ from ceilometer.openstack.common import importutils
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 
-FLAGS = flags.FLAGS
-
 
 def _instance_name(instance):
     """Shortcut to get instance name"""
     return getattr(instance, 'OS-EXT-SRV-ATTR:instance_name', None)
+
+
+def get_compute_driver():
+    # FIXME(jd) This function is made to be destroyed by an abstraction
+    # layer in Nova providing an hypervisor agnostic API.
+    # XXX(jd) Folsom compat
+    if not nova_config:
+        flags.parse_args([])
+        return flags.FLAGS.compute_driver
+    nova_config.parse_args([])
+    return nova_config.CONF.compute_driver
 
 
 def get_libvirt_connection():
@@ -45,11 +62,11 @@ def get_libvirt_connection():
     try:
         try:
             return importutils.import_object_ns('nova.virt',
-                                                FLAGS.compute_driver,
+                                                get_compute_driver(),
                                                 None)
         except TypeError:
             return importutils.import_object_ns('nova.virt',
-                                                FLAGS.compute_driver)
+                                                get_compute_driver())
     except ImportError:
         # Fall back to the way it was done in Essex.
         import nova.virt.connection
@@ -73,7 +90,7 @@ class LibVirtPollster(plugin.ComputePollster):
 
     def is_enabled(self):
         # Use a fairly liberal substring check.
-        return 'libvirt' in FLAGS.compute_driver.lower()
+        return 'libvirt' in get_compute_driver().lower()
 
 
 class InstancePollster(LibVirtPollster):

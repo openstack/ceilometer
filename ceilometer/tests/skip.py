@@ -73,14 +73,3 @@ class skip_unless(object):
                 raise nose.SkipTest(self.message)
             func(*args, **kw)
         return _skipper
-
-
-def skip_if_fake(func):
-    """Decorator that skips a test if running in fake mode."""
-    def _skipper(*args, **kw):
-        """Wrapped skipper function."""
-        if FLAGS.fake_tests:
-            raise unittest.SkipTest('Test cannot be run in fake mode')
-        else:
-            return func(*args, **kw)
-    return _skipper

@@ -18,16 +18,7 @@
 # under the License.
 
 import os
-
-from nova import flags
-try:
-    from nova import config as nova_config
-except ImportError:
-    # NOTE(dhellmann): We want to try to maintain compatibility
-    # with folsom for the time being, so set the name nova_config
-    # to a sentinal we can use to trigger different behavior
-    # when we try to set up the configuration object.
-    nova_config = False
+import socket
 
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import context
@@ -38,7 +29,14 @@ from ceilometer.openstack.common.rpc import service as rpc_service
 cfg.CONF.register_opts([
     cfg.IntOpt('periodic_interval',
                default=600,
-               help='seconds between running periodic tasks')
+               help='seconds between running periodic tasks'),
+    cfg.StrOpt('host',
+               default=socket.getfqdn(),
+               help='Name of this node.  This can be an opaque identifier.  '
+               'It is not necessarily a hostname, FQDN, or IP address. '
+               'However, the node name must be valid within '
+               'an AMQP key, and if using ZeroMQ, a valid '
+               'hostname, FQDN, or IP address'),
 ])
 
 CLI_OPTIONS = [
@@ -60,8 +58,6 @@ CLI_OPTIONS = [
                help='Auth URL to use for openstack service access'),
 ]
 cfg.CONF.register_cli_opts(CLI_OPTIONS)
-cfg.CONF.register_cli_opts(flags.core_opts)
-cfg.CONF.register_cli_opts(flags.global_opts)
 
 
 class PeriodicService(rpc_service.Service):
@@ -80,22 +76,6 @@ def _sanitize_cmd_line(argv):
     return [a for a in argv if a in cli_opt_names]
 
 
-def _init_nova_config(argv):
-    # NOTE(dhellmann): We want to try to maintain compatibility
-    # with folsom for the time being, so this function is
-    # just here to isolate the rest of the module from having
-    # to know how to configure different versions of nova.
-    if nova_config:
-        nova_config.parse_args(argv)
-    else:
-        flags.parse_args(argv)
-
-
 def prepare_service(argv=[]):
     cfg.CONF(argv[1:], project='ceilometer')
-    # FIXME(dhellmann): We must set up the nova.flags module in order
-    # to have the RPC and DB access work correctly because we are
-    # still using the Service object out of nova directly. We need to
-    # move that into openstack.common.
-    _init_nova_config(_sanitize_cmd_line(argv))
     log.setup('ceilometer')
