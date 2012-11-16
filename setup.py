@@ -127,5 +127,6 @@ setuptools.setup(
     mysql = ceilometer.storage.impl_sqlalchemy:SQLAlchemyStorage
     postgresql = ceilometer.storage.impl_sqlalchemy:SQLAlchemyStorage
     sqlite = ceilometer.storage.impl_sqlalchemy:SQLAlchemyStorage
+    test = ceilometer.storage.impl_test:TestDBStorage
     """),
     )
