@@ -24,7 +24,13 @@ import datetime
 from stevedore import extension
 from stevedore.tests import manager as test_manager
 
-from nova import flags
+try:
+    from nova import config
+    nova_CONF = config.CONF
+except ImportError:
+    # XXX Folsom compat
+    from nova import flags
+    nova_CONF = flags.FLAGS
 from nova import db
 from nova import context
 from nova.tests import fake_network
@@ -81,9 +87,9 @@ class TestNovaNotifier(base.TestCase):
     @skip.skip_unless(notifier_api, "Notifier API not found")
     def setUp(self):
         super(TestNovaNotifier, self).setUp()
-        flags.FLAGS.compute_driver = 'nova.virt.fake.FakeDriver'
-        flags.FLAGS.notification_driver = [nova_notifier.__name__]
-        self.compute = importutils.import_object(flags.FLAGS.compute_manager)
+        nova_CONF.compute_driver = 'nova.virt.fake.FakeDriver'
+        nova_CONF.notification_driver = [nova_notifier.__name__]
+        self.compute = importutils.import_object(nova_CONF.compute_manager)
         self.context = context.get_admin_context()
         fake_network.set_stub_network_methods(self.stubs)
 

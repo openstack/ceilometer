@@ -29,7 +29,13 @@ else:
 import mock
 import time
 
-from nova import flags
+try:
+    from nova import config
+    nova_CONF = config.CONF
+except ImportError:
+    # XXX Folsom compat
+    from nova import flags
+    nova_CONF = flags.FLAGS
 
 from ceilometer.compute import libvirt
 from ceilometer.compute import manager
@@ -60,8 +66,8 @@ class TestLibvirtBase(test_base.TestCase):
                 self.instance.name)
         self.instance.id = 1
         self.instance.flavor = {'name': 'm1.small', 'id': 2}
-        flags.FLAGS.compute_driver = 'libvirt.LibvirtDriver'
-        flags.FLAGS.connection_type = 'libvirt'
+        nova_CONF.compute_driver = 'libvirt.LibvirtDriver'
+        nova_CONF.connection_type = 'libvirt'
 
 
 class TestInstancePollster(TestLibvirtBase):
@@ -87,7 +93,7 @@ class TestDiskIOPollster(TestLibvirtBase):
 
     @skip.skip_if(libvirt_missing, 'Test requires libvirt')
     def test_fetch_diskio(self):
-        flags.FLAGS.compute_driver = 'fake.FakeVirtAPI'
+        nova_CONF.compute_driver = 'fake.FakeVirtAPI'
         list(self.pollster.get_counters(self.manager, self.instance))
         #assert counters
         # FIXME(dhellmann): The CI environment doesn't produce
@@ -96,15 +102,15 @@ class TestDiskIOPollster(TestLibvirtBase):
 
     @skip.skip_if(libvirt_missing, 'Test requires libvirt')
     def test_fetch_diskio_not_libvirt(self):
-        flags.FLAGS.compute_driver = 'fake.FakeVirtAPI'
-        flags.FLAGS.connection_type = 'fake'
+        nova_CONF.compute_driver = 'fake.FakeVirtAPI'
+        nova_CONF.connection_type = 'fake'
         counters = list(self.pollster.get_counters(self.manager,
                                                    self.instance))
         assert not counters
 
     @skip.skip_if(libvirt_missing, 'Test requires libvirt')
     def test_fetch_diskio_with_libvirt_non_existent_instance(self):
-        flags.FLAGS.compute_driver = 'fake.FakeVirtAPI'
+        nova_CONF.compute_driver = 'fake.FakeVirtAPI'
         instance = mock.MagicMock()
         instance.name = 'instance-00000999'
         instance.id = 999

@@ -21,7 +21,6 @@ import datetime
 
 from lxml import etree
 
-from nova import flags
 try:
     from nova import config as nova_config
 except ImportError:
@@ -52,7 +51,7 @@ def get_compute_driver():
         flags.parse_args([])
         return flags.FLAGS.compute_driver
     nova_config.parse_args([])
-    return nova_config.CONF.compute_driver
+    return nova_config.CONF.compute_driver or ""
 
 
 def get_libvirt_connection():
