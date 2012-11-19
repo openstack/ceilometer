@@ -30,7 +30,7 @@ import ceilometer.openstack.common.cfg as cfg
 from ceilometer.openstack.common import timeutils
 
 sql_opts = [
-    cfg.IntOpt('mysql_engine',
+    cfg.StrOpt('mysql_engine',
                default='InnoDB',
                help='MySQL engine')
            ]
