@@ -20,23 +20,23 @@
 import flask
 from ceilometer import policy
 
-import keystone.middleware.auth_token
+import keystoneclient.middleware.auth_token as auth_token
 
 
 def register_opts(conf):
-    """Register keystone middleware options
+    """Register keystoneclient middleware options
     """
-    conf.register_opts(keystone.middleware.auth_token.opts,
+    conf.register_opts(auth_token.opts,
                        group='keystone_authtoken',
                        )
-    keystone.middleware.auth_token.CONF = conf
+    auth_token.CONF = conf
 
 
 def install(app, conf):
     """Install ACL check on application."""
-    app.wsgi_app = keystone.middleware.auth_token.AuthProtocol(app.wsgi_app,
-                                                               conf=conf,
-                                                               )
+    app.wsgi_app = auth_token.AuthProtocol(app.wsgi_app,
+                                           conf=conf,
+                                          )
     app.before_request(check)
     return app
 
