@@ -248,11 +248,14 @@ def _list_events(meter,
                  user=None):
     """Return a list of raw metering events.
     """
+    q_ts = _get_query_timestamps(flask.request.args)
     f = storage.EventFilter(user=user,
                             project=project,
                             source=source,
                             meter=meter,
                             resource=resource,
+                            start=q_ts['start_timestamp'],
+                            end=q_ts['end_timestamp'],
                             )
     events = list(flask.request.storage_conn.get_raw_events(f))
     jsonified = flask.jsonify(events=events)
