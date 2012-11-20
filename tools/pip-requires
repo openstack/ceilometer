@@ -12,5 +12,4 @@ anyjson>=0.3.1
 Flask==0.9
 stevedore>=0.6
 python-glanceclient
-python-cinderclient
 python-novaclient
