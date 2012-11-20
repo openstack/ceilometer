@@ -26,7 +26,7 @@ from stevedore.tests import manager as test_manager
 
 try:
     from nova import config
-    nova_CONF = config.CONF
+    nova_CONF = config.cfg.CONF
 except ImportError:
     # XXX Folsom compat
     from nova import flags
@@ -99,6 +99,7 @@ class TestNovaNotifier(base.TestCase):
                          "user_id": "FAKE",
                          "project_id": "FAKE",
                          "display_name": "FAKE NAME",
+                         "hostname": "abcdef",
                          "reservation_id": "FAKE RID",
                          "instance_type_id": 1,
                          "architecture": "x86",

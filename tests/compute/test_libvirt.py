@@ -31,7 +31,7 @@ import time
 
 try:
     from nova import config
-    nova_CONF = config.CONF
+    nova_CONF = config.cfg.CONF
 except ImportError:
     # XXX Folsom compat
     from nova import flags

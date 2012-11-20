@@ -51,7 +51,7 @@ def get_compute_driver():
         flags.parse_args([])
         return flags.FLAGS.compute_driver
     nova_config.parse_args([])
-    return nova_config.CONF.compute_driver or ""
+    return nova_config.cfg.CONF.compute_driver or ""
 
 
 def get_libvirt_connection():
