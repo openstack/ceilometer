@@ -46,7 +46,7 @@ Name                      Type        Volume   Resource  Note
 instance                  Gauge             1  inst ID   Duration of instance
 instance:<type>           Gauge             1  inst ID   Duration of instance <type> (openstack types)
 memory                    Gauge            MB  inst ID   Volume of RAM in MB
-cpu                       Cumulative  seconds  inst ID   CPU time used
+cpu                       Cumulative       ns  inst ID   CPU time used
 vcpus                     Gauge          vcpu  inst ID   Number of VCPUs
 disk.root.size            Gauge            GB  inst ID   Size of root disk in GB
 disk.ephemeral.size       Gauge            GB  inst ID   Size of ephemeral disk in GB
