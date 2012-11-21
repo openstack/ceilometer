@@ -1,4 +1,4 @@
-https://github.com/openstack/nova/zipball/2012.2#egg=nova
+http://tarballs.openstack.org/nova/nova-stable-folsom.tar.gz
 nose
 coverage
 pep8>=1.0
@@ -12,5 +12,5 @@ mox
 # github to make it easier to install, then ended up making some
 # changes to it so it would be compatible with PyMongo's API.
 https://github.com/dreamhost/Ming/zipball/master#egg=Ming
-https://github.com/openstack/glance/zipball/2012.2#egg=glance
+http://tarballs.openstack.org/glance/glance-stable-folsom.tar.gz
 setuptools-git>=0.4
