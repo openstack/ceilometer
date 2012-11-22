@@ -30,6 +30,7 @@ except ImportError:
     # when we try to set up the configuration object.
     from nova import flags
     nova_config = False
+from nova.virt import driver
 from ceilometer import counter
 from ceilometer.compute import plugin
 from ceilometer.compute import instance as compute_instance
@@ -60,10 +61,8 @@ def get_libvirt_connection():
     # the configuration setting changed.
     try:
         try:
-            return importutils.import_object_ns('nova.virt',
-                                                get_compute_driver(),
-                                                None)
-        except TypeError:
+            return driver.load_compute_driver(None)
+        except AttributeError:
             return importutils.import_object_ns('nova.virt',
                                                 get_compute_driver())
     except ImportError:
@@ -88,8 +87,12 @@ def make_counter_from_instance(instance, name, type, volume):
 class LibVirtPollster(plugin.ComputePollster):
 
     def is_enabled(self):
-        # Use a fairly liberal substring check.
-        return 'libvirt' in get_compute_driver().lower()
+        # XXX(llu): Keeps Folsom compatibility
+        try:
+            return driver.compute_driver_matches("LibvirtDriver")
+        except AttributeError:
+            # Use a fairly liberal substring check.
+            return 'libvirt' in get_compute_driver().lower()
 
 
 class InstancePollster(LibVirtPollster):
