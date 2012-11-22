@@ -29,12 +29,6 @@ from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer.openstack.common.rpc import dispatcher as rpc_dispatcher
 
-try:
-    import ceilometer.openstack.common.rpc as rpc
-except ImportError:
-    # For Essex
-    import nova.rpc as rpc
-
 
 OPTS = [
     cfg.ListOpt('disabled_notification_listeners',
