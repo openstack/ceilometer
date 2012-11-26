@@ -6,7 +6,7 @@ netaddr
 argparse
 SQLAlchemy>=0.7.3,<=0.7.9
 sqlalchemy-migrate>=0.7.2
-pymongo>=2.2.1
+pymongo>=2.2
 eventlet
 anyjson>=0.3.1
 Flask==0.9
