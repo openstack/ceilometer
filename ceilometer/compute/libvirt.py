@@ -30,6 +30,8 @@ except ImportError:
     # when we try to set up the configuration object.
     from nova import flags
     nova_config = False
+    # Import this to register compute_driver flag in Folsom
+    import nova.compute.manager
 from nova.virt import driver
 from ceilometer import counter
 from ceilometer.compute import plugin
