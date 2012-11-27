@@ -106,6 +106,17 @@ volume                    Gauge             1  vol ID    Duration of volune
 volume.size               Gauge            GB  vol ID    Size of volume
 ========================  ==========  =======  ========  =======================================================
 
+Object Storage (Swift)
+======================
+
+==========================  ==========  ==========  ========  ==================================================
+Name                        Type        Volume      Resource  Note
+==========================  ==========  ==========  ========  ==================================================
+storage.objects             Gauge          objects  store ID  Number of objects
+storage.objects.size        Gauge            bytes  store ID  Total size of stored objects
+storage.objects.containers  Gauge       containers  store ID  Number of containers
+==========================  ==========  ==========  ========  ==================================================
+
 Naming convention
 =================
 If you plan on adding meters, please follow the convention bellow:
