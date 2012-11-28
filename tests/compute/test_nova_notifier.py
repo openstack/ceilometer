@@ -148,7 +148,26 @@ class TestNovaNotifier(base.TestCase):
         super(TestNovaNotifier, self).tearDown()
 
     def test_notifications(self):
-        self.compute.terminate_instance(self.context, instance=self.instance)
+        # Folsom compatibility check
+        try:
+            import nova.conductor.api
+        except ImportError:
+            # Folsom does not have nova.conductor, and it is safe to
+            # call this method directly, but not safe to mock it
+            # because mock.patch() fails to find the original.
+            self.compute.terminate_instance(self.context,
+                                        instance=self.instance)
+        else:
+            # Under Grizzly, Nova has moved to no-db access on the
+            # compute node. The compute manager uses RPC to talk to
+            # the conductor. We need to disable communication between
+            # the nova manager and the remote system since we can't
+            # expect the message bus to be available, or the remote
+            # controller to be there if the message bus is online.
+            with mock.patch('nova.conductor.api.API.instance_update'):
+                self.compute.terminate_instance(self.context,
+                                                instance=self.instance)
+
         self.assertTrue(self.Pollster.counters)
         self.assertTrue(self.Pollster.counters[0])
         self.assertEqual(self.Pollster.counters[0][0],
