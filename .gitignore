@@ -12,3 +12,4 @@ ChangeLog
 dist
 *.egg
 ceilometer/versioninfo
+doc/source/api/*.rst
