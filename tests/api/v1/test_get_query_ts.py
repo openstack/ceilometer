@@ -20,11 +20,11 @@
 
 import datetime
 
-from ceilometer.api import v1
+from ceilometer.api.v1 import blueprint
 
 
 def test_get_query_timestamps_none_specified():
-    result = v1._get_query_timestamps()
+    result = blueprint._get_query_timestamps()
     expected = {'start_timestamp': None,
                 'end_timestamp': None,
                 'query_start': None,
@@ -37,7 +37,7 @@ def test_get_query_timestamps_none_specified():
 
 def test_get_query_timestamps_start():
     args = {'start_timestamp': '2012-09-20T12:13:14'}
-    result = v1._get_query_timestamps(args)
+    result = blueprint._get_query_timestamps(args)
     expected = {'start_timestamp': datetime.datetime(2012, 9, 20, 12, 13, 14),
                 'end_timestamp': None,
                 'query_start': datetime.datetime(2012, 9, 20, 12, 13, 14),
@@ -50,7 +50,7 @@ def test_get_query_timestamps_start():
 
 def test_get_query_timestamps_end():
     args = {'end_timestamp': '2012-09-20T12:13:14'}
-    result = v1._get_query_timestamps(args)
+    result = blueprint._get_query_timestamps(args)
     expected = {'end_timestamp': datetime.datetime(2012, 9, 20, 12, 13, 14),
                 'start_timestamp': None,
                 'query_end': datetime.datetime(2012, 9, 20, 12, 13, 14),
@@ -66,7 +66,7 @@ def test_get_query_timestamps_with_offset():
             'end_timestamp': '2012-09-20T13:24:25',
             'search_offset': '20',
             }
-    result = v1._get_query_timestamps(args)
+    result = blueprint._get_query_timestamps(args)
     expected = {'query_end': datetime.datetime(2012, 9, 20, 13, 44, 25),
                 'query_start': datetime.datetime(2012, 9, 20, 11, 53, 14),
                 'end_timestamp': datetime.datetime(2012, 9, 20, 13, 24, 25),

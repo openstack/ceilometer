@@ -24,17 +24,16 @@ import urllib
 import flask
 
 from ceilometer.tests import db as db_test_base
-from ceilometer.api import v1
-from ceilometer.api import app
-from ceilometer.openstack.common import cfg
+from ceilometer.api.v1 import blueprint as v1_blueprint
+from ceilometer.api.v1 import app as v1_app
 
 
 class TestBase(db_test_base.TestBase):
 
     def setUp(self):
         super(TestBase, self).setUp()
-        self.app = app.make_app(enable_acl=False, attach_storage=False)
-        self.app.register_blueprint(v1.blueprint)
+        self.app = v1_app.make_app(enable_acl=False, attach_storage=False)
+        self.app.register_blueprint(v1_blueprint.blueprint)
         self.test_app = self.app.test_client()
 
         @self.app.before_request

@@ -23,7 +23,7 @@ import flask
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import jsonutils
 from ceilometer import storage
-from ceilometer.api import v1
+from ceilometer.api.v1 import blueprint as v1_blueprint
 from ceilometer.api import acl
 
 
@@ -32,7 +32,7 @@ storage.register_opts(cfg.CONF)
 
 def make_app(enable_acl=True, attach_storage=True):
     app = flask.Flask('ceilometer.api')
-    app.register_blueprint(v1.blueprint, url_prefix='/v1')
+    app.register_blueprint(v1_blueprint.blueprint, url_prefix='/v1')
 
     try:
         with open("sources.json", "r") as f:

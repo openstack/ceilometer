@@ -21,7 +21,7 @@
 import sys
 
 from ceilometer.api import acl
-from ceilometer.api import app
+from ceilometer.api.v1 import app
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import log as logging
 
