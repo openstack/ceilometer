@@ -194,8 +194,7 @@ class Connection(base.Connection):
         return (x[0] for x in query.all())
 
     def get_resources(self, user=None, project=None, source=None,
-                      start_timestamp=None, end_timestamp=None,
-                      session=None):
+                      start_timestamp=None, end_timestamp=None):
         """Return an iterable of dictionaries containing resource information.
 
         { 'resource_id': UUID of the resource,
@@ -212,7 +211,7 @@ class Connection(base.Connection):
         :param start_timestamp: Optional modified timestamp start range.
         :param end_timestamp: Optional modified timestamp end range.
         """
-        query = model_query(Resource, session=session)
+        query = model_query(Resource, session=self.session)
         if user is not None:
             query = query.filter(Resource.user_id == user)
         if source is not None:
