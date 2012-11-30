@@ -236,7 +236,7 @@ class ResourceTest(SQLAlchemyEngineTestBase):
 
     def test_new_resource_metadata(self):
         resource = self.session.query(Resource).get('resource-id')
-        assert hasattr(resource, 'metadata')
+        assert hasattr(resource, 'resource_metadata')
         metadata = resource.resource_metadata
         assert metadata['display_name'] == 'test-server'
 
@@ -249,10 +249,10 @@ class ResourceTest(SQLAlchemyEngineTestBase):
             assert resource['resource_id'] == 'resource-id'
             assert resource['project_id'] == 'project-id'
             assert resource['user_id'] == 'user-id'
-            assert 'resource_metadata' in resource
-            assert 'meters' in resource
+            assert 'metadata' in resource
+            assert 'meter' in resource
             foo = map(lambda x: [x['counter_name'], x['counter_type']],
-                      resource['meters'])
+                      resource['meter'])
             assert ['instance', 'cumulative'] in foo
             break
         else:
