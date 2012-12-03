@@ -50,9 +50,10 @@ Table of contents
    measurements
    install
    configuration
-   api
+   webapi/index
    contributing/index
    releasenotes/index
+   api/index
    glossary
 
 .. - installation

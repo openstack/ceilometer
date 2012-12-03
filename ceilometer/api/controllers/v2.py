@@ -486,6 +486,11 @@ class Source(Base):
     name = text
     data = {text: text}
 
+    @staticmethod
+    def sample():
+        return Source(name='openstack',
+                      data={'key': 'value'})
+
 
 class SourceController(RestController):
     """Works on resources."""

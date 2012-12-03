@@ -1,0 +1,6 @@
+============
+ V1 Web API
+============
+
+.. autoflask:: ceilometer.api.v1.app:app
+   :undoc-static:

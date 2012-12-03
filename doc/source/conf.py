@@ -31,7 +31,10 @@ import sys
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.todo',
               'sphinxcontrib.autohttp.flask',
+              'wsme.sphinxext',
               ]
+
+wsme_protocols = ['restjson', 'restxml']
 
 todo_include_todos = True
 
