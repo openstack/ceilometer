@@ -19,7 +19,7 @@
 import copy
 import datetime
 
-from ceilometer.openstack.common import cfg, log, timeutils
+from ceilometer.openstack.common import log
 from ceilometer.storage import base
 from ceilometer.storage.sqlalchemy.models import Meter, Project, Resource
 from ceilometer.storage.sqlalchemy.models import Source, User
@@ -256,6 +256,48 @@ class Connection(base.Connection):
             r['meter'] = r['meters']
             del r['meters']
             yield r
+
+    def get_meters(self, user=None, project=None, source=None,
+                   resource=None):
+        """Return an iterable of dictionaries containing meter information.
+
+        { 'name': name of the meter,
+          'type': type of the meter (guage, counter),
+          'resource_id': UUID of the resource,
+          'project_id': UUID of project owning the resource,
+          'user_id': UUID of user owning the resource,
+          }
+
+        :param user: Optional ID for user that owns the resource.
+        :param project: Optional ID for project that owns the resource.
+        :param resource: Optional ID of the resource.
+        :param source: Optional source filter.
+        """
+        query = model_query(Resource, session=self.session)
+        if user is not None:
+            query = query.filter(Resource.user_id == user)
+        if source is not None:
+            query = query.filter(Resource.sources.any(id=source))
+        if resource:
+            query = query.filter(Resource.id == resource)
+        if project is not None:
+            query = query.filter(Resource.project_id == project)
+        query = query.options(
+                    sqlalchemy_session.sqlalchemy.orm.joinedload('meters'))
+
+        for resource in query.all():
+            meter_names = set()
+            for meter in resource.meters:
+                if meter.counter_name in meter_names:
+                    continue
+                meter_names.add(meter.counter_name)
+                m = {}
+                m['resource_id'] = resource.id
+                m['project_id'] = resource.project_id
+                m['user_id'] = resource.user_id
+                m['name'] = meter.counter_name
+                m['type'] = meter.counter_type
+                yield m
 
     def get_raw_events(self, event_filter):
         """Return an iterable of raw event data as created by

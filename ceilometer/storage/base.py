@@ -133,3 +133,14 @@ class Connection(object):
 
         ( datetime.datetime(), datetime.datetime() )
         """
+
+    @abc.abstractmethod
+    def get_meters(self, user=None, project=None, resource=None, source=None):
+        """Return a list of meters.
+        {'resource_id': UUID string for the resource,
+         'project_id': UUID of project owning the resource,
+         'user_id': UUID of user owning the resource,
+         'name': The name of the meter,
+         'type': The meter type (gauge, counter, diff),
+        }
+        """

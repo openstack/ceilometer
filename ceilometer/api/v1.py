@@ -40,10 +40,11 @@
 #
 # [ ] /resources/<resource> -- metadata
 #
-# [ ] /projects/<project>/meters -- list of meters reporting for parent obj
-# [ ] /resources/<resource>/meters -- list of meters reporting for parent obj
-# [ ] /sources/<source>/meters -- list of meters reporting for parent obj
-# [ ] /users/<user>/meters -- list of meters reporting for parent obj
+# [x] /meters -- list of meters
+# [x] /projects/<project>/meters -- list of meters reporting for parent obj
+# [x] /resources/<resource>/meters -- list of meters reporting for parent obj
+# [x] /sources/<source>/meters -- list of meters reporting for parent obj
+# [x] /users/<user>/meters -- list of meters reporting for parent obj
 #
 # [x] /projects/<project>/meters/<meter> -- events
 # [x] /resources/<resource>/meters/<meter> -- events
@@ -97,6 +98,57 @@ def request_wants_html():
     return best == 'text/html' and \
         flask.request.accept_mimetypes[best] > \
         flask.request.accept_mimetypes['application/json']
+
+
+## APIs for working with meters.
+
+
+@blueprint.route('/meters')
+def list_meters_all():
+    """Return a list of meters.
+    """
+    meters = flask.request.storage_conn.get_meters()
+    return flask.jsonify(meters=list(meters))
+
+
+@blueprint.route('/resources/<resource>/meters')
+def list_meters_by_resource(resource):
+    """Return a list of meters by resource.
+
+    :param resource: The ID of the resource.
+    """
+    meters = flask.request.storage_conn.get_meters(resource=resource)
+    return flask.jsonify(meters=list(meters))
+
+
+@blueprint.route('/users/<user>/meters')
+def list_meters_by_user(user):
+    """Return a list of meters by user.
+
+    :param user: The ID of the owning user.
+    """
+    meters = flask.request.storage_conn.get_meters(user=user)
+    return flask.jsonify(meters=list(meters))
+
+
+@blueprint.route('/projects/<project>/meters')
+def list_meters_by_project(project):
+    """Return a list of meters by project.
+
+    :param project: The ID of the owning project.
+    """
+    meters = flask.request.storage_conn.get_meters(project=project)
+    return flask.jsonify(meters=list(meters))
+
+
+@blueprint.route('/sources/<source>/meters')
+def list_meters_by_source(source):
+    """Return a list of meters by source.
+
+    :param source: The ID of the owning source.
+    """
+    meters = flask.request.storage_conn.get_meters(source=source)
+    return flask.jsonify(meters=list(meters))
 
 
 ## APIs for working with resources.

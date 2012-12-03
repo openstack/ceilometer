@@ -80,6 +80,22 @@ class Connection(base.Connection):
         :param end_timestamp: Optional modified timestamp end range.
         """
 
+    def get_meters(self, user=None, project=None, resource=None, source=None):
+        """Return an iterable of dictionaries containing meter information.
+
+        { 'name': name of the meter,
+          'type': type of the meter (guage, counter),
+          'resource_id': UUID of the resource,
+          'project_id': UUID of project owning the resource,
+          'user_id': UUID of user owning the resource,
+          }
+
+        :param user: Optional ID for user that owns the resource.
+        :param project: Optional ID for project that owns the resource.
+        :param resource: Optional ID of the resource.
+        :param source: Optional source filter.
+        """
+
     def get_raw_events(self, event_filter):
         """Return an iterable of raw event data as created by
         :func:`ceilometer.meter.meter_message_from_counter`.

@@ -117,6 +117,18 @@ storage.objects.size        Gauge            bytes  store ID  Total size of stor
 storage.objects.containers  Gauge       containers  store ID  Number of containers
 ==========================  ==========  ==========  ========  ==================================================
 
+Dynamically retrieving the Meters via ceilometer client
+=======================================================
+    ceilometer meter-list -s openstack
+    +------------+-------+--------------------------------------+---------+----------------------------------+
+    | Name       | Type  | Resource ID                          | User ID | Project ID                       |
+    +------------+-------+--------------------------------------+---------+----------------------------------+
+    | image      | gauge | 09e84d97-8712-4dd2-bcce-45970b2430f7 |         | 57cf6d93688e4d39bf2fe3d3c03eb326 |
+
+The above command will retrieve the available meters that can be queried on
+given the actual resource instances available.
+
+
 Naming convention
 =================
 If you plan on adding meters, please follow the convention bellow:

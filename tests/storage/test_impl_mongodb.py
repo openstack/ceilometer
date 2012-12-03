@@ -290,6 +290,18 @@ class MeterTest(MongoDBEngineTestBase):
         meter = self.db.meter.find_one()
         assert meter is not None
 
+    def test_get_meters(self):
+        results = list(self.conn.get_meters())
+        assert len(results) == 4
+
+    def test_get_meters_by_user(self):
+        results = list(self.conn.get_meters(user='user-id'))
+        assert len(results) == 1
+
+    def test_get_meters_by_project(self):
+        results = list(self.conn.get_meters(project='project-id'))
+        assert len(results) == 2
+
     def test_get_raw_events_by_user(self):
         f = storage.EventFilter(user='user-id')
         results = list(self.conn.get_raw_events(f))
