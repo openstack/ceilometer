@@ -18,7 +18,6 @@
 """Base classes for API tests.
 """
 
-import logging
 import os
 
 from ming import mim
@@ -27,6 +26,7 @@ import mock
 
 from nose.plugins import skip
 
+from ceilometer.openstack.common import log as logging
 from ceilometer.storage import impl_mongodb
 from ceilometer.tests import base as test_base
 

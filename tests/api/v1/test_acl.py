@@ -18,8 +18,7 @@
 """Test ACL."""
 
 from ceilometer.tests import api as tests_api
-from ceilometer.api import acl
-from ceilometer.openstack.common import cfg
+from ceilometer.api.v1 import acl
 
 
 class TestAPIACL(tests_api.TestBase):
@@ -42,14 +41,18 @@ class TestAPIACL(tests_api.TestBase):
             self.app.preprocess_request()
             self.assertEqual(self.test_app.get().status_code, 401)
 
-    def test_authenticated_wrong_tenant(self):
-        with self.app.test_request_context('/', headers={
-                "X-Roles": "admin",
-                "X-Tenant-Name": "foobar",
-                "X-Tenant-Id": "bc23a9d531064583ace8f67dad60f6bb",
-        }):
-            self.app.preprocess_request()
-            self.assertEqual(self.test_app.get().status_code, 401)
+    # FIXME(dhellmann): This test is not properly looking at the tenant
+    # info. The status code returned is the expected value, but it
+    # is not clear why.
+    #
+    # def test_authenticated_wrong_tenant(self):
+    #     with self.app.test_request_context('/', headers={
+    #             "X-Roles": "admin",
+    #             "X-Tenant-Name": "foobar",
+    #             "X-Tenant-Id": "bc23a9d531064583ace8f67dad60f6bb",
+    #     }):
+    #         self.app.preprocess_request()
+    #         self.assertEqual(self.test_app.get().status_code, 401)
 
     def test_authenticated(self):
         with self.app.test_request_context('/', headers={

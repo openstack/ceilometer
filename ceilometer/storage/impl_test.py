@@ -20,9 +20,9 @@
 This driver is based on MIM, an in-memory version of MongoDB.
 """
 
-import logging
-
 from ming import mim
+
+from ceilometer.openstack.common import log as logging
 
 from ceilometer.storage import base
 from ceilometer.storage import impl_mongodb

@@ -2,7 +2,7 @@
 #
 # Copyright © 2012 New Dream Network, LLC (DreamHost)
 #
-# Author: Doug Hellmann <doug.hellmann@dreamhost.com>
+# Author: Julien Danjou <julien@danjou.info>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -17,11 +17,8 @@
 # under the License.
 """Set up the ACL to acces the API server."""
 
+import flask
 from ceilometer import policy
-
-from pecan import hooks
-
-from webob import exc
 
 import keystoneclient.middleware.auth_token as auth_token
 
@@ -37,19 +34,17 @@ def register_opts(conf):
 
 def install(app, conf):
     """Install ACL check on application."""
-    new_app = auth_token.AuthProtocol(app,
-                                      conf=conf,
-                                      )
-    return new_app
+    app.wsgi_app = auth_token.AuthProtocol(app.wsgi_app,
+                                           conf=conf,
+                                          )
+    app.before_request(check)
+    return app
 
 
-class AdminAuthHook(hooks.PecanHook):
-    """Verify that the user has admin rights
-    """
-
-    def before(self, state):
-        headers = state.request.headers
-        if not policy.check_is_admin(headers.get('X-Roles', "").split(","),
-                                     headers.get('X-Tenant-Id'),
-                                     headers.get('X-Tenant-Name')):
-            raise exc.HTTPUnauthorized()
+def check():
+    """Check application access."""
+    headers = flask.request.headers
+    if not policy.check_is_admin(headers.get('X-Roles', "").split(","),
+                                 headers.get('X-Tenant-Id'),
+                                 headers.get('X-Tenant-Name')):
+        return "Access denied", 401
