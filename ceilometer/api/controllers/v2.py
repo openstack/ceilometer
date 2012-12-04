@@ -503,7 +503,6 @@ class SourceController(RestController):
     @wsme.pecan.wsexpose(Source)
     def get(self):
         response = Source(name=self._id, data=self._data)
-        print 'RETURNING:', response
         return response
 
     meters = MetersController()
