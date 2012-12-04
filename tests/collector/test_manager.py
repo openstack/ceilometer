@@ -25,7 +25,7 @@ from mock import patch
 from stevedore import extension
 from stevedore.tests import manager as test_manager
 
-from ceilometer import meter
+from ceilometer.collector import meter
 from ceilometer.collector import service
 from ceilometer.openstack.common import cfg
 from ceilometer.storage import base

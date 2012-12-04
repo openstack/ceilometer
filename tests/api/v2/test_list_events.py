@@ -21,8 +21,8 @@
 import datetime
 import logging
 
+from ceilometer.collector import meter
 from ceilometer import counter
-from ceilometer import meter
 from ceilometer.openstack.common import cfg
 
 from .base import FunctionalTest

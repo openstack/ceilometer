@@ -18,8 +18,8 @@
 
 from stevedore import extension
 
+from ceilometer.collector import meter
 from ceilometer import extension_manager
-from ceilometer import meter
 from ceilometer import publish
 from ceilometer import service
 from ceilometer import storage

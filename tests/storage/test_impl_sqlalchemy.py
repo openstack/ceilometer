@@ -23,8 +23,8 @@ import re
 import sqlalchemy
 import unittest
 
+from ceilometer.collector import meter
 from ceilometer import counter
-from ceilometer import meter
 from ceilometer import storage
 from ceilometer.storage import migration
 from ceilometer.openstack.common import cfg
