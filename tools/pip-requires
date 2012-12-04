@@ -16,3 +16,4 @@ python-novaclient>=2.6.10
 python-keystoneclient>=0.2,<0.3
 python-swiftclient
 pecan
+lxml

@@ -111,10 +111,10 @@ setuptools.setup(
     floatingip = ceilometer.network.notifications:FloatingIP
 
     [ceilometer.poll.compute]
-    libvirt_diskio = ceilometer.compute.libvirt:DiskIOPollster
-    libvirt_cpu = ceilometer.compute.libvirt:CPUPollster
-    libvirt_net = ceilometer.compute.libvirt:NetPollster
-    libvirt_instance = ceilometer.compute.libvirt:InstancePollster
+    diskio = ceilometer.compute.pollsters:DiskIOPollster
+    cpu = ceilometer.compute.pollsters:CPUPollster
+    net = ceilometer.compute.pollsters:NetPollster
+    instance = ceilometer.compute.pollsters:InstancePollster
 
     [ceilometer.poll.central]
     network_floatingip = ceilometer.network.floatingip:FloatingIPPollster
@@ -129,5 +129,8 @@ setuptools.setup(
     postgresql = ceilometer.storage.impl_sqlalchemy:SQLAlchemyStorage
     sqlite = ceilometer.storage.impl_sqlalchemy:SQLAlchemyStorage
     test = ceilometer.storage.impl_test:TestDBStorage
+
+    [ceilometer.compute.virt]
+    libvirt = ceilometer.compute.virt.libvirt.inspector:LibvirtInspector
     """),
     )

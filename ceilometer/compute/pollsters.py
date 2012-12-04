@@ -1,8 +1,10 @@
 # -*- encoding: utf-8 -*-
 #
 # Copyright © 2012 eNovance <licensing@enovance.com>
+# Copyright © 2012 Red Hat, Inc
 #
 # Author: Julien Danjou <julien@danjou.info>
+# Author: Eoghan Glynn <eglynn@redhat.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -19,26 +21,27 @@
 import copy
 import datetime
 
-from lxml import etree
+from stevedore import driver
 
-try:
-    from nova import config as nova_config
-except ImportError:
-    # NOTE(dhellmann): We want to try to maintain compatibility
-    # with folsom for the time being, so set the name nova_config
-    # to a sentinal we can use to trigger different behavior
-    # when we try to set up the configuration object.
-    from nova import flags
-    nova_config = False
-    # Import this to register compute_driver flag in Folsom
-    import nova.compute.manager
-from nova.virt import driver
 from ceilometer import counter
 from ceilometer.compute import plugin
 from ceilometer.compute import instance as compute_instance
+from ceilometer.compute.virt import inspector as virt_inspector
+from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import importutils
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
+
+OPTS = [
+    cfg.StrOpt('hypervisor_inspector',
+               help='Inspector to use for inspecting the hypervisor layer',
+               default='libvirt')
+]
+
+CONF = cfg.CONF
+CONF.register_opts(OPTS)
+
+LOG = log.getLogger(__name__)
 
 
 def _instance_name(instance):
@@ -46,31 +49,16 @@ def _instance_name(instance):
     return getattr(instance, 'OS-EXT-SRV-ATTR:instance_name', None)
 
 
-def get_compute_driver():
-    # FIXME(jd) This function is made to be destroyed by an abstraction
-    # layer in Nova providing an hypervisor agnostic API.
-    # XXX(jd) Folsom compat
-    if not nova_config:
-        flags.parse_args([])
-        return flags.FLAGS.compute_driver
-    nova_config.parse_args([])
-    return nova_config.cfg.CONF.compute_driver or ""
-
-
-def get_libvirt_connection():
-    """Return an open connection for talking to libvirt."""
-    # The direct-import implementation only works with Folsom because
-    # the configuration setting changed.
+def get_hypervisor_inspector():
     try:
-        try:
-            return driver.load_compute_driver(None)
-        except AttributeError:
-            return importutils.import_object_ns('nova.virt',
-                                                get_compute_driver())
-    except ImportError:
-        # Fall back to the way it was done in Essex.
-        import nova.virt.connection
-        return nova.virt.connection.get_connection(read_only=True)
+        namespace = 'ceilometer.compute.virt'
+        mgr = driver.DriverManager(namespace,
+                                   CONF.hypervisor_inspector,
+                                   invoke_on_load=True)
+        return mgr.driver
+    except ImportError as e:
+        LOG.error("Unable to load the hypervisor inspector: %s" % (e))
+        return virt_inspector.Inspector()
 
 
 def make_counter_from_instance(instance, name, type, volume):
@@ -86,18 +74,16 @@ def make_counter_from_instance(instance, name, type, volume):
         )
 
 
-class LibVirtPollster(plugin.ComputePollster):
+class HypervisorPollster(plugin.ComputePollster):
 
-    def is_enabled(self):
-        # XXX(llu): Keeps Folsom compatibility
-        try:
-            return driver.compute_driver_matches("LibvirtDriver")
-        except AttributeError:
-            # Use a fairly liberal substring check.
-            return 'libvirt' in get_compute_driver().lower()
+    inspector = None
+
+    def __init__(self):
+        if not HypervisorPollster.inspector:
+            HypervisorPollster.inspector = get_hypervisor_inspector()
 
 
-class InstancePollster(LibVirtPollster):
+class InstancePollster(HypervisorPollster):
 
     def get_counters(self, manager, instance):
         yield make_counter_from_instance(instance,
@@ -113,7 +99,7 @@ class InstancePollster(LibVirtPollster):
         )
 
 
-class DiskIOPollster(LibVirtPollster):
+class DiskIOPollster(HypervisorPollster):
 
     LOG = log.getLogger(__name__ + '.diskio')
 
@@ -127,28 +113,21 @@ class DiskIOPollster(LibVirtPollster):
                                      ])
 
     def get_counters(self, manager, instance):
-        conn = get_libvirt_connection()
         instance_name = _instance_name(instance)
         try:
-            disks = conn.get_disks(instance_name)
-        except Exception as err:
-            self.LOG.warning('Ignoring instance %s: %s',
-                             instance_name, err)
-            self.LOG.exception(err)
-        else:
             r_bytes = 0
             r_requests = 0
             w_bytes = 0
             w_requests = 0
-            for disk in disks:
-                stats = conn.block_stats(instance_name, disk)
+            for disk, info in self.inspector.inspect_disks(instance_name):
                 self.LOG.info(self.DISKIO_USAGE_MESSAGE,
-                              instance, disk, stats[0], stats[1],
-                              stats[2], stats[3], stats[4])
-                r_bytes += stats[0]
-                r_requests += stats[1]
-                w_bytes += stats[3]
-                w_requests += stats[2]
+                              instance, disk.device, info.read_requests,
+                              info.read_bytes, info.write_requests,
+                              info.write_bytes, info.errors)
+                r_bytes += info.read_bytes
+                r_requests += info.read_requests
+                w_bytes += info.write_bytes
+                w_requests += info.write_requests
             yield make_counter_from_instance(instance,
                                              name='disk.read.requests',
                                              type=counter.TYPE_CUMULATIVE,
@@ -169,9 +148,13 @@ class DiskIOPollster(LibVirtPollster):
                                              type=counter.TYPE_CUMULATIVE,
                                              volume=w_bytes,
                                              )
+        except Exception as err:
+            self.LOG.warning('Ignoring instance %s: %s',
+                             instance_name, err)
+            self.LOG.exception(err)
 
 
-class CPUPollster(LibVirtPollster):
+class CPUPollster(HypervisorPollster):
 
     LOG = log.getLogger(__name__ + '.cpu')
 
@@ -179,7 +162,7 @@ class CPUPollster(LibVirtPollster):
 
     def get_cpu_util(self, instance, cpu_info):
         prev_times = self.utilization_map.get(instance.id)
-        self.utilization_map[instance.id] = (cpu_info['cpu_time'],
+        self.utilization_map[instance.id] = (cpu_info.time,
                                              datetime.datetime.now())
         cpu_util = 0.0
         if prev_times:
@@ -187,21 +170,20 @@ class CPUPollster(LibVirtPollster):
             prev_timestamp = prev_times[1]
             delta = self.utilization_map[instance.id][1] - prev_timestamp
             elapsed = (delta.seconds * (10 ** 6) + delta.microseconds) * 1000
-            cores_fraction = 1.0 / cpu_info['num_cpu']
+            cores_fraction = 1.0 / cpu_info.number
             # account for cpu_time being reset when the instance is restarted
-            time_used = (cpu_info['cpu_time'] - prev_cpu
-                         if prev_cpu <= cpu_info['cpu_time'] else
-                         cpu_info['cpu_time'])
+            time_used = (cpu_info.time - prev_cpu
+                         if prev_cpu <= cpu_info.time else cpu_info.time)
             cpu_util = 100 * cores_fraction * time_used / elapsed
         return cpu_util
 
     def get_counters(self, manager, instance):
-        conn = get_libvirt_connection()
         self.LOG.info('checking instance %s', instance.id)
+        instance_name = _instance_name(instance)
         try:
-            cpu_info = conn.get_info({'name': _instance_name(instance)})
+            cpu_info = self.inspector.inspect_cpus(instance_name)
             self.LOG.info("CPUTIME USAGE: %s %d",
-                          instance.__dict__, cpu_info['cpu_time'])
+                          instance.__dict__, cpu_info.time)
             cpu_util = self.get_cpu_util(instance, cpu_info)
             self.LOG.info("CPU UTILIZATION %%: %s %0.2f",
                           instance.__dict__, cpu_util)
@@ -218,7 +200,7 @@ class CPUPollster(LibVirtPollster):
             yield make_counter_from_instance(instance,
                                              name='cpu',
                                              type=counter.TYPE_CUMULATIVE,
-                                             volume=cpu_info['cpu_time'],
+                                             volume=cpu_info.time,
                                              )
         except Exception as err:
             self.LOG.error('could not get CPU time for %s: %s',
@@ -226,31 +208,17 @@ class CPUPollster(LibVirtPollster):
             self.LOG.exception(err)
 
 
-class NetPollster(LibVirtPollster):
+class NetPollster(HypervisorPollster):
 
     LOG = log.getLogger(__name__ + '.net')
 
     NET_USAGE_MESSAGE = ' '.join(["NETWORK USAGE:", "%s %s:", "read-bytes=%d",
                                   "write-bytes=%d"])
 
-    def _get_vnics(self, conn, instance):
-        """Get disks of an instance, only used to bypass bug#998089."""
-        domain = conn._conn.lookupByName(_instance_name(instance))
-        tree = etree.fromstring(domain.XMLDesc(0))
-        vnics = []
-        for interface in tree.findall('devices/interface'):
-            vnic = {}
-            vnic['name'] = interface.find('target').get('dev')
-            vnic['mac'] = interface.find('mac').get('address')
-            vnic['fref'] = interface.find('filterref').get('filter')
-            for param in interface.findall('filterref/parameter'):
-                vnic[param.get('name').lower()] = param.get('value')
-            vnics.append(vnic)
-        return vnics
-
     @staticmethod
     def make_vnic_counter(instance, name, type, volume, vnic_data):
-        resource_metadata = copy.copy(vnic_data)
+        metadata = copy.copy(vnic_data)
+        resource_metadata = dict(zip(metadata._fields, metadata))
         resource_metadata['instance_id'] = instance.id
 
         return counter.Counter(
@@ -259,50 +227,43 @@ class NetPollster(LibVirtPollster):
             volume=volume,
             user_id=instance.user_id,
             project_id=instance.tenant_id,
-            resource_id=vnic_data['fref'],
+            resource_id=vnic_data.fref,
             timestamp=timeutils.isotime(),
             resource_metadata=resource_metadata
         )
 
     def get_counters(self, manager, instance):
-        conn = get_libvirt_connection()
         instance_name = _instance_name(instance)
         self.LOG.info('checking instance %s', instance.id)
         try:
-            vnics = self._get_vnics(conn, instance)
-        except Exception as err:
-            self.LOG.warning('Ignoring instance %s: %s',
-                             instance_name, err)
-            self.LOG.exception(err)
-        else:
-            domain = conn._conn.lookupByName(instance_name)
-            for vnic in vnics:
-                rx_bytes, rx_packets, _, _, \
-                    tx_bytes, tx_packets, _, _ = \
-                    domain.interfaceStats(vnic['name'])
+            for vnic, info in self.inspector.inspect_vnics(instance_name):
                 self.LOG.info(self.NET_USAGE_MESSAGE, instance_name,
-                              vnic['name'], rx_bytes, tx_bytes)
+                              vnic.name, info.rx_bytes, info.tx_bytes)
                 yield self.make_vnic_counter(instance,
                                              name='network.incoming.bytes',
                                              type=counter.TYPE_CUMULATIVE,
-                                             volume=rx_bytes,
+                                             volume=info.rx_bytes,
                                              vnic_data=vnic,
                                              )
                 yield self.make_vnic_counter(instance,
                                              name='network.outgoing.bytes',
                                              type=counter.TYPE_CUMULATIVE,
-                                             volume=tx_bytes,
+                                             volume=info.tx_bytes,
                                              vnic_data=vnic,
                                              )
                 yield self.make_vnic_counter(instance,
                                              name='network.incoming.packets',
                                              type=counter.TYPE_CUMULATIVE,
-                                             volume=rx_packets,
+                                             volume=info.rx_packets,
                                              vnic_data=vnic,
                                              )
                 yield self.make_vnic_counter(instance,
                                              name='network.outgoing.packets',
                                              type=counter.TYPE_CUMULATIVE,
-                                             volume=tx_packets,
+                                             volume=info.tx_packets,
                                              vnic_data=vnic,
                                              )
+        except Exception as err:
+            self.LOG.warning('Ignoring instance %s: %s',
+                             instance_name, err)
+            self.LOG.exception(err)

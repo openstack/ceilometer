@@ -51,8 +51,8 @@ information and send them to the collector. As stated above, an agent
 will automatically activate all plugins of a given class. For example,
 the compute agent will load all plugins of class
 ``ceilometer.poll.compute``.  This will load, among others, the
-:class:`ceilometer.compute.libvirt.CPUPollster`, which is defined in
-the file ``ceilometer/compute/libvirt.py`` as well as the
+:class:`ceilometer.compute.pollsters.CPUPollster`, which is defined in
+the file ``ceilometer/compute/pollsters.py`` as well as the
 :class:`ceilometer.compute.notifications.InstanceNotifications` plugin
 which is defined in the file ``ceilometer/compute/notifications.py``
 
@@ -73,7 +73,7 @@ sequence of ``Counter`` objects as defined in the
 
 In the ``CPUPollster`` plugin, the ``get_counters`` method is implemented as a loop
 which, for each instances running on the local host, retrieves the cpu_time
-from libvirt and send back two ``Counter`` objects.  The first one, named
+from the hypervisor and sends back two ``Counter`` objects.  The first one, named
 "cpu", is of type "cumulative", meaning that between two polls, its value is
 not reset, or in other word that the cpu value is always provided as a duration
 that continuously increases since the creation of the instance. The second one,
