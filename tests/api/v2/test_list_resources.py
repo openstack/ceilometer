@@ -200,3 +200,32 @@ class TestListResources(FunctionalTest):
         data = self.get_json('/projects/project-id/resources')
         ids = [r['resource_id'] for r in data]
         self.assertEquals(['resource-id'], ids)
+
+    def test_metadata(self):
+        counter1 = counter.Counter(
+            'instance',
+            'cumulative',
+            1,
+            'user-id',
+            'project-id',
+            'resource-id',
+            timestamp=datetime.datetime(2012, 7, 2, 10, 40),
+            resource_metadata={'display_name': 'test-server',
+                               'tag': 'self.counter',
+                               'ignored_dict': {'key': 'value'},
+                               'ignored_list': ['not-returned'],
+                               }
+            )
+        msg = meter.meter_message_from_counter(counter1,
+                                               cfg.CONF.metering_secret,
+                                               'test',
+                                               )
+        self.conn.record_metering_data(msg)
+
+        data = self.get_json('/resources')
+        metadata = data[0]['metadata']
+        self.assertEqual(
+            list(sorted(metadata.iteritems())),
+            [('display_name', 'test-server'),
+             ('tag', 'self.counter'),
+             ])
