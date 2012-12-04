@@ -79,7 +79,8 @@ setuptools.setup(
     scripts=['bin/ceilometer-agent-compute',
              'bin/ceilometer-agent-central',
              'bin/ceilometer-api',
-             'bin/ceilometer-collector'],
+             'bin/ceilometer-collector',
+             'bin/ceilometer-dbsync'],
 
     py_modules=[],
 
