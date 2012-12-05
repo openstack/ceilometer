@@ -41,7 +41,7 @@ cfg.CONF.register_opts([
 
 CLI_OPTIONS = [
     cfg.StrOpt('os-username',
-               default=os.environ.get('OS_USERNAME', 'glance'),
+               default=os.environ.get('OS_USERNAME', 'ceilometer'),
                help='Username to use for openstack service access'),
     cfg.StrOpt('os-password',
                default=os.environ.get('OS_PASSWORD', 'admin'),

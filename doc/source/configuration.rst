@@ -40,7 +40,7 @@ metering_topic                   metering                              the topic
 counter_source                   openstack                             The source name of emited counters
 control_exchange                 ceilometer                            AMQP exchange to connect to if using RabbitMQ or Qpid
 periodic_interval                600                                   seconds between running periodic tasks
-os-username                      glance                                Username to use for openstack service access
+os-username                      ceilometer                            Username to use for openstack service access
 os-password                      admin                                 Password to use for openstack service access
 os-tenant-id                                                           Tenant ID to use for openstack service access
 os-tenant-name                   admin                                 Tenant name to use for openstack service access

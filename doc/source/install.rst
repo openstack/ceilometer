@@ -83,7 +83,7 @@ Installing the Collector
    to ``rabbit`` or ``qpid`` in ``glance-api.conf`` and restarting the
    service.
 
-3. In order to retrieve object store statistics, ceilometer needs an
+3. In order to retrieve object store statistics, ceilometer needs
    access to swift with ``ResellerAdmin`` role. You should give this
    role to your ``os_username`` user for tenant ``os_tenant_name``::
 
