@@ -18,8 +18,8 @@
 """Tests for ceilometer.meter
 """
 
+from ceilometer.collector import meter
 from ceilometer import counter
-from ceilometer import meter
 
 
 def test_compute_signature_change_key():

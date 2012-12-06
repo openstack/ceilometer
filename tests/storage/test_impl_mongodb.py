@@ -51,8 +51,8 @@ import unittest
 
 import mox
 
+from ceilometer.collector import meter
 from ceilometer import counter
-from ceilometer import meter
 from ceilometer import storage
 from ceilometer.tests.db import TestConnection, require_map_reduce
 

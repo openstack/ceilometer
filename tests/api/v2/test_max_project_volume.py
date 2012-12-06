@@ -20,8 +20,8 @@
 
 import datetime
 
+from ceilometer.collector import meter
 from ceilometer import counter
-from ceilometer import meter
 
 from ceilometer.openstack.common import cfg
 from ceilometer.tests.db import require_map_reduce

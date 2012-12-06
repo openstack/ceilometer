@@ -25,8 +25,8 @@ import datetime
 import logging
 import sys
 
+from ceilometer.collector import meter
 from ceilometer import counter
-from ceilometer import meter
 from ceilometer import storage
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import timeutils
