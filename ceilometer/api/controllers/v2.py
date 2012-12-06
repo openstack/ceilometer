@@ -235,6 +235,15 @@ class MeterVolumeController(object):
         return MeterVolume(volume=value)
 
 
+def _flatten_metadata(metadata):
+    """Return flattened resource metadata without nested structures
+    and with all values converted to unicode strings.
+    """
+    return dict((k, unicode(v))
+                for k, v in metadata.iteritems()
+                if type(v) not in set([list, dict, set]))
+
+
 class Event(Base):
     source = text
     counter_name = text
@@ -244,15 +253,15 @@ class Event(Base):
     project_id = text
     resource_id = text
     timestamp = datetime.datetime
-    # FIXME(dhellmann): Need to add the metadata back as
-    # a flat {text: text} mapping.
-    #resource_metadata = ?
+    resource_metadata = {text: text}
     message_id = text
 
-    def __init__(self, counter_volume=None, **kwds):
+    def __init__(self, counter_volume=None, resource_metadata={}, **kwds):
         if counter_volume is not None:
             counter_volume = float(counter_volume)
+        resource_metadata = _flatten_metadata(resource_metadata)
         super(Event, self).__init__(counter_volume=counter_volume,
+                                    resource_metadata=resource_metadata,
                                     **kwds)
 
 
@@ -398,12 +407,15 @@ class Resource(Base):
     project_id = text
     user_id = text
     timestamp = datetime.datetime
-    #metadata = ?
+    metadata = {text: text}
     meter = wsattr([MeterDescription])
 
-    def __init__(self, meter=[], **kwds):
+    def __init__(self, meter=[], metadata={}, **kwds):
         meter = [MeterDescription(**m) for m in meter]
-        super(Resource, self).__init__(meter=meter, **kwds)
+        metadata = _flatten_metadata(metadata)
+        super(Resource, self).__init__(meter=meter,
+                                       metadata=metadata,
+                                       **kwds)
 
 
 class ResourcesController(RestController):

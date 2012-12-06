@@ -44,6 +44,8 @@ class TestListEvents(FunctionalTest):
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter',
+                               'ignored_dict': {'key': 'value'},
+                               'ignored_list': ['not-returned'],
                                }
             )
         msg = meter.meter_message_from_counter(self.counter1,
@@ -106,3 +108,14 @@ class TestListEvents(FunctionalTest):
     def test_by_user(self):
         data = self.get_json('/users/user-id/meters/instance')
         self.assertEquals(1, len(data))
+
+    def test_metadata(self):
+        data = self.get_json('/resources/resource-id/meters/instance')
+        self.assertEquals(1, len(data))
+        sample = data[0]
+        self.assert_('resource_metadata' in sample)
+        self.assertEqual(
+            list(sorted(sample['resource_metadata'].iteritems())),
+            [('display_name', 'test-server'),
+             ('tag', 'self.counter'),
+             ])
