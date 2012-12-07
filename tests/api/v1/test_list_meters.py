@@ -74,7 +74,7 @@ class TestListMeters(tests_api.TestBase):
                     'resource-id2',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 41),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter2',
+                                       'tag': 'two.counter',
                                    }),
                 counter.Counter(
                     'meter.test',
@@ -85,7 +85,7 @@ class TestListMeters(tests_api.TestBase):
                     'resource-id3',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 42),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter3',
+                                       'tag': 'three.counter',
                                    }),
                 counter.Counter(
                     'meter.mine',
@@ -96,7 +96,7 @@ class TestListMeters(tests_api.TestBase):
                     'resource-id4',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 43),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter4',
+                                       'tag': 'four.counter',
                                    })]:
             msg = meter.meter_message_from_counter(cnt,
                                                    cfg.CONF.metering_secret,
@@ -153,3 +153,11 @@ class TestListMeters(tests_api.TestBase):
     def test_with_project_non_existent(self):
         data = self.get('/projects/jd-was-here/meters')
         self.assertEquals(data['meters'], [])
+
+    def test_metaquery1(self):
+        data = self.get('/meters?metadata.tag=self.counter')
+        self.assertEquals(1, len(data['meters']))
+
+    def test_metaquery2(self):
+        data = self.get('/meters?metadata.tag=four.counter')
+        self.assertEquals(1, len(data['meters']))

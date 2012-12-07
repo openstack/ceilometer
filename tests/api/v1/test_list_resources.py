@@ -166,3 +166,13 @@ class TestListResources(tests_api.TestBase):
     def test_with_project_non_existent(self):
         data = self.get('/projects/jd-was-here/resources')
         self.assertEquals(data['resources'], [])
+
+    def test_metaquery1(self):
+        q = '/sources/test_list_resources/resources'
+        data = self.get('%s?metadata.display_name=test-server' % q)
+        self.assertEquals(3, len(data['resources']))
+
+    def test_metaquery2(self):
+        q = '/sources/test_list_resources/resources'
+        data = self.get('%s?metadata.tag=self.counter4' % q)
+        self.assertEquals(1, len(data['resources']))

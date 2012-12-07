@@ -113,6 +113,9 @@ def make_query_from_filter(query, event_filter, require_meter=True):
     if event_filter.resource:
         query = query.filter_by(resource_id=event_filter.resource)
 
+    if event_filter.metaquery is not None and len(event_filter.metaquery) > 0:
+        raise NotImplementedError('metaquery not implemented')
+
     return query
 
 
@@ -212,7 +215,8 @@ class Connection(base.Connection):
         return (x[0] for x in query.all())
 
     def get_resources(self, user=None, project=None, source=None,
-                      start_timestamp=None, end_timestamp=None):
+                      start_timestamp=None, end_timestamp=None,
+                      metaquery=None):
         """Return an iterable of dictionaries containing resource information.
 
         { 'resource_id': UUID of the resource,
@@ -228,6 +232,7 @@ class Connection(base.Connection):
         :param source: Optional source filter.
         :param start_timestamp: Optional modified timestamp start range.
         :param end_timestamp: Optional modified timestamp end range.
+        :param metaquery: Optional dict with metadata to match on.
         """
         query = model_query(Resource, session=self.session)
         if user is not None:
@@ -242,6 +247,8 @@ class Connection(base.Connection):
             query = query.filter(Resource.project_id == project)
         query = query.options(
                     sqlalchemy_session.sqlalchemy.orm.joinedload('meters'))
+        if metaquery is not None:
+            raise NotImplementedError('metaquery not implemented')
 
         for resource in query.all():
             r = row2dict(resource)
@@ -257,8 +264,8 @@ class Connection(base.Connection):
             del r['meters']
             yield r
 
-    def get_meters(self, user=None, project=None, source=None,
-                   resource=None):
+    def get_meters(self, user=None, project=None, resource=None, source=None,
+                   metaquery={}):
         """Return an iterable of dictionaries containing meter information.
 
         { 'name': name of the meter,
@@ -272,6 +279,7 @@ class Connection(base.Connection):
         :param project: Optional ID for project that owns the resource.
         :param resource: Optional ID of the resource.
         :param source: Optional source filter.
+        :param metaquery: Optional dict with metadata to match on.
         """
         query = model_query(Resource, session=self.session)
         if user is not None:
@@ -284,6 +292,8 @@ class Connection(base.Connection):
             query = query.filter(Resource.project_id == project)
         query = query.options(
                     sqlalchemy_session.sqlalchemy.orm.joinedload('meters'))
+        if len(metaquery) > 0:
+            raise NotImplementedError('metaquery not implemented')
 
         for resource in query.all():
             meter_names = set()
