@@ -80,9 +80,10 @@ class EventFilter(object):
     :param resource: Optional filter for resource id.
     :param meter: Optional filter for meter type using the meter name.
     :param source: Optional source filter.
+    :param metaquery: Optional filter on the metadata
     """
     def __init__(self, user=None, project=None, start=None, end=None,
-                 resource=None, meter=None, source=None):
+                 resource=None, meter=None, source=None, metaquery={}):
         self.user = user
         self.project = project
         self.start = self._sanitize_timestamp(start)
@@ -90,6 +91,7 @@ class EventFilter(object):
         self.resource = resource
         self.meter = meter
         self.source = source
+        self.metaquery = metaquery
 
     def _sanitize_timestamp(self, timestamp):
         """Return a naive utc datetime object"""

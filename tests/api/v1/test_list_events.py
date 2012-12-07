@@ -124,3 +124,18 @@ class TestListEvents(tests_api.TestBase):
                         start_timestamp=datetime.datetime(2012, 7, 2, 10, 41),
                           end_timestamp=datetime.datetime(2012, 7, 2, 10, 42))
         self.assertEquals(1, len(data['events']))
+
+    def test_metaquery1(self):
+        q = '/sources/source1/meters/instance'
+        data = self.get('%s?metadata.tag=self.counter2' % q)
+        self.assertEquals(1, len(data['events']))
+
+    def test_metaquery2(self):
+        q = '/sources/source1/meters/instance'
+        data = self.get('%s?metadata.tag=self.counter' % q)
+        self.assertEquals(2, len(data['events']))
+
+    def test_metaquery3(self):
+        q = '/sources/source1/meters/instance'
+        data = self.get('%s?metadata.display_name=test-server' % q)
+        self.assertEquals(3, len(data['events']))
