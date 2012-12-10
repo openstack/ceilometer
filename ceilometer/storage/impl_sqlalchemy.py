@@ -25,6 +25,7 @@ from ceilometer.storage.sqlalchemy.models import Meter, Project, Resource
 from ceilometer.storage.sqlalchemy.models import Source, User
 from ceilometer.storage.sqlalchemy.session import func
 import ceilometer.storage.sqlalchemy.session as sqlalchemy_session
+from ceilometer.storage.sqlalchemy import migration
 
 LOG = log.getLogger(__name__)
 
@@ -127,6 +128,9 @@ class Connection(base.Connection):
         LOG.info('connecting to %s', conf.database_connection)
         self.session = self._get_connection(conf)
         return
+
+    def upgrade(self, version=None):
+        migration.db_sync(self.session.get_bind(), version=version)
 
     def _get_connection(self, conf):
         """Return a connection to the database.

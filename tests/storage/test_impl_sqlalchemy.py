@@ -26,7 +26,6 @@ import unittest
 from ceilometer.collector import meter
 from ceilometer import counter
 from ceilometer import storage
-from ceilometer.storage import migration
 from ceilometer.openstack.common import cfg
 from ceilometer.storage import impl_sqlalchemy
 from ceilometer.storage.sqlalchemy.models import Meter, Project, Resource
@@ -84,8 +83,7 @@ class SQLAlchemyEngineSubBase(unittest.TestCase):
 
         self.conn = Connection(self.conf)
         self.session = self.conn.session
-
-        migration.db_sync()
+        self.conn.upgrade()
 
 
 class SQLAlchemyEngineTestBase(SQLAlchemyEngineSubBase):

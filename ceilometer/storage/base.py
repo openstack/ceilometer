@@ -53,6 +53,10 @@ class Connection(object):
         """Constructor"""
 
     @abc.abstractmethod
+    def upgrade(self, version=None):
+        """Migrate the database to `version` or the most recent version."""
+
+    @abc.abstractmethod
     def record_metering_data(self, data):
         """Write the data to the backend storage system.
 

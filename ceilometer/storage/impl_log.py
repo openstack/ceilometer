@@ -45,6 +45,9 @@ class Connection(base.Connection):
     def __init__(self, conf):
         return
 
+    def upgrade(self, version=None):
+        pass
+
     def record_metering_data(self, data):
         """Write the data to the backend storage system.
 

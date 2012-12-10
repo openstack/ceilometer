@@ -204,6 +204,9 @@ class Connection(base.Connection):
                     ], name='meter_idx')
         return
 
+    def upgrade(self, version=None):
+        pass
+
     def _get_connection(self, opts):
         """Return a connection to the database.
 

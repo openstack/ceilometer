@@ -59,7 +59,7 @@ from migrate.versioning.repository import Repository
 _REPOSITORY = None
 
 
-def db_sync(version=None):
+def db_sync(engine, version=None):
     if version is not None:
         try:
             version = int(version)
@@ -69,9 +69,9 @@ def db_sync(version=None):
     current_version = db_version()
     repository = _find_migrate_repo()
     if version is None or version > current_version:
-        return versioning_api.upgrade(get_engine(), repository, version)
+        return versioning_api.upgrade(engine, repository, version)
     else:
-        return versioning_api.downgrade(get_engine(), repository,
+        return versioning_api.downgrade(engine, repository,
                                         version)
 
 
