@@ -24,7 +24,7 @@ from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import jsonutils
 from ceilometer import storage
 from ceilometer.api.v1 import blueprint as v1_blueprint
-from ceilometer.api import acl
+from ceilometer.api.v1 import acl
 
 
 storage.register_opts(cfg.CONF)
