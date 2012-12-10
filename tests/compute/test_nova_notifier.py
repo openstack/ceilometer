@@ -119,8 +119,6 @@ class TestNovaNotifier(base.TestCase):
                          "access_ip_v6": "someip",
                          "metadata": {},
                          "uuid": "144e08f4-00cb-11e2-888e-5453ed1bbb5f"}
-
-        self.stubs.Set(db, 'instance_get_by_uuid', self.fake_db_instance_get)
         self.stubs.Set(db, 'instance_info_cache_delete', self.do_nothing)
         self.stubs.Set(db, 'instance_destroy', self.do_nothing)
         self.stubs.Set(db, 'instance_system_metadata_get',
@@ -155,6 +153,8 @@ class TestNovaNotifier(base.TestCase):
             # Folsom does not have nova.conductor, and it is safe to
             # call this method directly, but not safe to mock it
             # because mock.patch() fails to find the original.
+            self.stubs.Set(db, 'instance_get_by_uuid',
+            self.fake_db_instance_get)
             self.compute.terminate_instance(self.context,
                                         instance=self.instance)
         else:
@@ -164,6 +164,8 @@ class TestNovaNotifier(base.TestCase):
             # the nova manager and the remote system since we can't
             # expect the message bus to be available, or the remote
             # controller to be there if the message bus is online.
+            self.stubs.Set(nova.conductor.api.API, 'instance_get_by_uuid',
+            self.fake_db_instance_get)
             with mock.patch('nova.conductor.api.API.instance_update'):
                 self.compute.terminate_instance(self.context,
                                                 instance=self.instance)

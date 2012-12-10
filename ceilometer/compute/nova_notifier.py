@@ -59,7 +59,14 @@ def notify(context, message):
     if message['event_type'] == 'compute.instance.delete.start':
         instance_id = message['payload']['instance_id']
         LOG.debug('polling final stats for %r', instance_id)
-        _agent_manager.poll_instance(
-            context,
-            db.instance_get_by_uuid(context, instance_id))
+        try:
+            from nova.conductor import api
+        except ImportError:
+            # Keep compatibility with folsom.
+            _agent_manager.poll_instance(context,
+                db.instance_get_by_uuid(context, instance_id))
+        else:
+            conductor_api = api.API()
+            _agent_manager.poll_instance(context,
+                conductor_api.instance_get_by_uuid(context, instance_id))
     return
