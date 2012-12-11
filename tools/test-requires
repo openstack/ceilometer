@@ -22,3 +22,7 @@ setuptools-git>=0.4
 # very soon.
 hg+https://bitbucket.org/cdevienne/wsme
 pecan
+# We should use swift>1.7.5, but it's not yet available
+swift
+# Swift dep that is not necessary if we depend on swift>1.7.5
+netifaces

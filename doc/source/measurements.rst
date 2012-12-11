@@ -109,13 +109,15 @@ volume.size               Gauge            GB  vol ID    Size of volume
 Object Storage (Swift)
 ======================
 
-==========================  ==========  ==========  ========  ==================================================
-Name                        Type        Volume      Resource  Note
-==========================  ==========  ==========  ========  ==================================================
-storage.objects             Gauge          objects  store ID  Number of objects
-storage.objects.size        Gauge            bytes  store ID  Total size of stored objects
-storage.objects.containers  Gauge       containers  store ID  Number of containers
-==========================  ==========  ==========  ========  ==================================================
+==========================      ==========  ==========  ========  ==================================================
+Name                            Type        Volume      Resource  Note
+==========================      ==========  ==========  ========  ==================================================
+storage.objects                 Gauge          objects  store ID  Number of objects
+storage.objects.size            Gauge            bytes  store ID  Total size of stored objects
+storage.objects.containers      Gauge       containers  store ID  Number of containers
+storage.objects.incoming.bytes  Delta            bytes  store ID  Number of incoming bytes
+storage.objects.outgoing.bytes  Delta            bytes  store ID  Number of outgoing bytes
+==============================  ==========  ==========  ========  ==================================================
 
 Dynamically retrieving the Meters via ceilometer client
 =======================================================
