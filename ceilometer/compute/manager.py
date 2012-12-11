@@ -16,9 +16,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from stevedore import driver
+
 from ceilometer import extension_manager
 
 from ceilometer import nova_client
+from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import log
 from ceilometer import publish
@@ -28,6 +31,10 @@ OPTS = [
                 default=[],
                 help='list of compute agent pollsters to disable',
                 ),
+    cfg.StrOpt('hypervisor_inspector',
+               default='libvirt',
+               help='Inspector to use for inspecting the hypervisor layer',
+              ),
     ]
 
 cfg.CONF.register_opts(OPTS)
@@ -38,6 +45,18 @@ LOG = log.getLogger(__name__)
 PLUGIN_NAMESPACE = 'ceilometer.poll.compute'
 
 
+def get_hypervisor_inspector():
+    try:
+        namespace = 'ceilometer.compute.virt'
+        mgr = driver.DriverManager(namespace,
+                                   cfg.CONF.hypervisor_inspector,
+                                   invoke_on_load=True)
+        return mgr.driver
+    except ImportError as e:
+        LOG.error("Unable to load the hypervisor inspector: %s" % (e))
+        return virt_inspector.Inspector()
+
+
 class AgentManager(object):
 
     def __init__(self):
@@ -45,6 +64,7 @@ class AgentManager(object):
             namespace=PLUGIN_NAMESPACE,
             disabled_names=cfg.CONF.disabled_compute_pollsters,
             )
+        self._inspector = get_hypervisor_inspector()
         return
 
     @staticmethod
@@ -79,3 +99,7 @@ class AgentManager(object):
         for instance in nv.instance_get_all_by_host(cfg.CONF.host):
             if getattr(instance, 'OS-EXT-STS:vm_state', None) != 'error':
                 self.poll_instance(context, instance)
+
+    @property
+    def inspector(self):
+        return self._inspector

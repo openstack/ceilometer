@@ -35,17 +35,15 @@ class TestPollsterBase(test_base.TestCase):
 
     def setUp(self):
         super(TestPollsterBase, self).setUp()
-        self.manager = manager.AgentManager()
+        self.mox.StubOutWithMock(manager, 'get_hypervisor_inspector')
+        self.inspector = self.mox.CreateMock(virt_inspector.Inspector)
+        manager.get_hypervisor_inspector().AndReturn(self.inspector)
         self.instance = mock.MagicMock()
         self.instance.name = 'instance-00000001'
         setattr(self.instance, 'OS-EXT-SRV-ATTR:instance_name',
                 self.instance.name)
         self.instance.id = 1
         self.instance.flavor = {'name': 'm1.small', 'id': 2}
-        self.mox.StubOutWithMock(pollsters, 'get_hypervisor_inspector')
-        self.inspector = self.mox.CreateMock(virt_inspector.Inspector)
-        pollsters.get_hypervisor_inspector().AndReturn(self.inspector)
-        pollsters.HypervisorPollster.inspector = None
 
 
 class TestInstancePollster(TestPollsterBase):
@@ -56,9 +54,9 @@ class TestInstancePollster(TestPollsterBase):
     def test_get_counters(self):
         self.mox.ReplayAll()
 
+        mgr = manager.AgentManager()
         pollster = pollsters.InstancePollster()
-        counters = list(pollster.get_counters(self.manager,
-                                              self.instance))
+        counters = list(pollster.get_counters(mgr, self.instance))
         self.assertEquals(len(counters), 2)
         self.assertEqual(counters[0].name, 'instance')
         self.assertEqual(counters[1].name, 'instance:m1.small')
@@ -79,8 +77,9 @@ class TestDiskIOPollster(TestPollsterBase):
         self.inspector.inspect_disks(self.instance.name).AndReturn(disks)
         self.mox.ReplayAll()
 
+        mgr = manager.AgentManager()
         pollster = pollsters.DiskIOPollster()
-        counters = list(pollster.get_counters(self.manager, self.instance))
+        counters = list(pollster.get_counters(mgr, self.instance))
         assert counters
 
         def _verify_disk_metering(name, expected_volume):
@@ -124,8 +123,9 @@ class TestNetPollster(TestPollsterBase):
         self.inspector.inspect_vnics(self.instance.name).AndReturn(vnics)
         self.mox.ReplayAll()
 
+        mgr = manager.AgentManager()
         pollster = pollsters.NetPollster()
-        counters = list(pollster.get_counters(self.manager, self.instance))
+        counters = list(pollster.get_counters(mgr, self.instance))
         assert counters
 
         def _verify_vnic_metering(name, ip, expected_volume):
@@ -160,11 +160,11 @@ class TestCPUPollster(TestPollsterBase):
             virt_inspector.CPUStats(time=2 * (10 ** 6), number=2))
         self.mox.ReplayAll()
 
+        mgr = manager.AgentManager()
         pollster = pollsters.CPUPollster()
 
         def _verify_cpu_metering(zero, expected_time):
-            counters = list(pollster.get_counters(self.manager,
-                                                  self.instance))
+            counters = list(pollster.get_counters(mgr, self.instance))
             self.assertEquals(len(counters), 2)
             assert counters[0].name == 'cpu_util'
             assert (counters[0].volume == 0.0 if zero else
