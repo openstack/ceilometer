@@ -130,6 +130,11 @@ setuptools.setup(
     [ceilometer.compute.virt]
     libvirt = ceilometer.compute.virt.libvirt.inspector:LibvirtInspector
 
+    [ceilometer.transformer]
+
+    [ceilometer.publisher]
+    meter_publisher = ceilometer.publisher.meter_publish:MeterPublisher
+
     [paste.filter_factory]
     swift=ceilometer.objectstore.swift_middleware:filter_factory
     """),

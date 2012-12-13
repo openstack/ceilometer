@@ -44,6 +44,7 @@ class FauxInstance(object):
 
 class TestLocationMetadata(unittest.TestCase):
 
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         self.manager = manager.AgentManager()
         super(TestLocationMetadata, self).setUp()

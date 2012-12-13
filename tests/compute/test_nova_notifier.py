@@ -44,7 +44,6 @@ except ImportError:
     notifier_api = None
 
 
-from ceilometer import publish
 from ceilometer import counter
 from ceilometer.tests import base
 from ceilometer.tests import skip
@@ -86,6 +85,7 @@ class TestNovaNotifier(base.TestCase):
     def fake_db_instance_system_metadata_get(context, uuid):
         return dict(meta_a=123, meta_b="foobar")
 
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     @skip.skip_unless(notifier_api, "Notifier API not found")
     def setUp(self):
         super(TestNovaNotifier, self).setUp()
@@ -133,9 +133,8 @@ class TestNovaNotifier(base.TestCase):
                        lambda context, uuid, kwargs: (self.instance,
                                                       self.instance))
 
-        self.stubs.Set(publish, 'publish_counter', self.do_nothing)
         agent_manager = manager.AgentManager()
-        agent_manager.ext_manager = \
+        agent_manager.pollster_manager = \
             test_manager.TestExtensionManager([
                 extension.Extension('test',
                                     None,

@@ -66,10 +66,10 @@ class AgentManager(agent.AgentManager):
 
     def poll_instance(self, context, instance):
         """Poll one instance."""
-        self.ext_manager.map(self.publish_counters_from_one_pollster,
-                             manager=self,
-                             context=context,
-                             instance=instance)
+        self.pollster_manager.map(self.publish_counters_from_one_pollster,
+                                  manager=self,
+                                  context=context,
+                                  instance=instance)
 
     def periodic_tasks(self, context, raise_on_error=False):
         """Tasks to be run at a periodic interval."""

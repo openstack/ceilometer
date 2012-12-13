@@ -19,21 +19,22 @@
 """
 
 import datetime
-
+import mock
 from stevedore import extension
 
 from ceilometer import nova_client
 from ceilometer.compute import manager
 from ceilometer import counter
-from ceilometer import publish
+from ceilometer import pipeline
 from ceilometer.tests import base
 
 from ceilometer.openstack.common import cfg
 
 
+@mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
 def test_load_plugins():
     mgr = manager.AgentManager()
-    assert list(mgr.ext_manager), 'Failed to load any plugins'
+    assert list(mgr.pollster_manager), 'Failed to load any plugins'
     return
 
 
@@ -57,23 +58,21 @@ class TestRunTasks(base.TestCase):
             self.counters.append((manager, instance))
             return [self.test_data]
 
-    def faux_notify(self, context, msg, topic, secret, source):
-        self.notifications.append((msg, topic, secret, source))
-
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestRunTasks, self).setUp()
-        self.notifications = []
-        self.stubs.Set(publish, 'publish_counter', self.faux_notify)
         self.mgr = manager.AgentManager()
-        self.mgr.ext_manager = extension.ExtensionManager('fake',
-                                                          invoke_on_load=False,
-                                                          )
-        self.mgr.ext_manager.extensions = [extension.Extension('test',
-                                                               None,
-                                                               None,
-                                                               self.Pollster(),
-                                                               ),
-                                           ]
+        self.mgr.pollster_manager = extension.ExtensionManager(
+            'fake',
+            invoke_on_load=False,
+        )
+        self.mgr.pollster_manager.extensions = [
+            extension.Extension('test',
+                                None,
+                                None,
+                                self.Pollster(), ),
+        ]
+
         # Set up a fake instance value to be returned by
         # instance_get_all_by_host() so when the manager gets the list
         # of instances to poll we can control the results.
@@ -96,8 +95,7 @@ class TestRunTasks(base.TestCase):
         self.assertTrue(self.Pollster.counters[0][1] is self.instance)
 
     def test_notifications(self):
-        actual = self.notifications
-        self.assertEqual(list(actual[0]), [self.Pollster.test_data,
-                                           cfg.CONF.metering_topic,
-                                           cfg.CONF.metering_secret,
-                                           cfg.CONF.counter_source])
+        self.assertTrue(self.mgr.pipeline_manager.publish_counter.called)
+        args, _ = self.mgr.pipeline_manager.publish_counter.call_args
+        self.assertEqual(args[1], self.Pollster.test_data)
+        self.assertEqual(args[2], cfg.CONF.counter_source)

@@ -23,6 +23,7 @@ from webob import Request
 from ceilometer.tests import base
 from ceilometer.objectstore import swift_middleware
 from ceilometer.openstack.common import rpc
+from ceilometer import pipeline
 
 
 class FakeApp(object):
@@ -41,17 +42,24 @@ class FakeApp(object):
 
 class TestSwiftMiddleware(base.TestCase):
 
+    class _faux_pipeline_manager():
+        def __init__(self):
+            self.counters = []
+
+        def publish_counter(self, context, counter, source):
+            self.counters.append(counter)
+
+    def _faux_setup_pipeline(self, publisher_manager):
+        return self.pipeline_manager
+
     def setUp(self):
         super(TestSwiftMiddleware, self).setUp()
-        self.notifications = []
-        self.stubs.Set(rpc, 'cast', self._faux_notify)
+        self.pipeline_manager = self._faux_pipeline_manager()
+        self.stubs.Set(pipeline, 'setup_pipeline', self._faux_setup_pipeline)
 
     @staticmethod
     def start_response(*args):
             pass
-
-    def _faux_notify(self, context, topic, msg):
-        self.notifications.append((topic, msg))
 
     def test_get(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(), {})
@@ -59,12 +67,12 @@ class TestSwiftMiddleware(base.TestCase):
                             environ={'REQUEST_METHOD': 'GET'})
         resp = app(req.environ, self.start_response)
         self.assertEqual(list(resp), ["This string is 28 bytes long"])
-        self.assertEqual(len(self.notifications), 2)
-        data = self.notifications[0][1]['args']['data']
-        self.assertEqual(data['counter_volume'], 28)
-        self.assertEqual(data['resource_metadata']['version'], '1.0')
-        self.assertEqual(data['resource_metadata']['container'], 'container')
-        self.assertEqual(data['resource_metadata']['object'], 'obj')
+        self.assertEqual(len(self.pipeline_manager.counters), 1)
+        data = self.pipeline_manager.counters[0]
+        self.assertEqual(data.volume, 28)
+        self.assertEqual(data.resource_metadata['version'], '1.0')
+        self.assertEqual(data.resource_metadata['container'], 'container')
+        self.assertEqual(data.resource_metadata['object'], 'obj')
 
     def test_put(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(body=['']), {})
@@ -73,12 +81,12 @@ class TestSwiftMiddleware(base.TestCase):
                                      'wsgi.input':
                                      StringIO.StringIO('some stuff')})
         resp = list(app(req.environ, self.start_response))
-        self.assertEqual(len(self.notifications), 2)
-        data = self.notifications[0][1]['args']['data']
-        self.assertEqual(data['counter_volume'], 10)
-        self.assertEqual(data['resource_metadata']['version'], '1.0')
-        self.assertEqual(data['resource_metadata']['container'], 'container')
-        self.assertEqual(data['resource_metadata']['object'], 'obj')
+        self.assertEqual(len(self.pipeline_manager.counters), 1)
+        data = self.pipeline_manager.counters[0]
+        self.assertEqual(data.volume, 10)
+        self.assertEqual(data.resource_metadata['version'], '1.0')
+        self.assertEqual(data.resource_metadata['container'], 'container')
+        self.assertEqual(data.resource_metadata['object'], 'obj')
 
     def test_post(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(body=['']), {})
@@ -87,21 +95,21 @@ class TestSwiftMiddleware(base.TestCase):
                                      'wsgi.input':
                                      StringIO.StringIO('some other stuff')})
         resp = list(app(req.environ, self.start_response))
-        self.assertEqual(len(self.notifications), 2)
-        data = self.notifications[0][1]['args']['data']
-        self.assertEqual(data['counter_volume'], 16)
-        self.assertEqual(data['resource_metadata']['version'], '1.0')
-        self.assertEqual(data['resource_metadata']['container'], 'container')
-        self.assertEqual(data['resource_metadata']['object'], 'obj')
+        self.assertEqual(len(self.pipeline_manager.counters), 1)
+        data = self.pipeline_manager.counters[0]
+        self.assertEqual(data.volume, 16)
+        self.assertEqual(data.resource_metadata['version'], '1.0')
+        self.assertEqual(data.resource_metadata['container'], 'container')
+        self.assertEqual(data.resource_metadata['object'], 'obj')
 
     def test_get_container(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(), {})
         req = Request.blank('/1.0/account/container',
                             environ={'REQUEST_METHOD': 'GET'})
         resp = list(app(req.environ, self.start_response))
-        self.assertEqual(len(self.notifications), 2)
-        data = self.notifications[0][1]['args']['data']
-        self.assertEqual(data['counter_volume'], 28)
-        self.assertEqual(data['resource_metadata']['version'], '1.0')
-        self.assertEqual(data['resource_metadata']['container'], 'container')
-        self.assertEqual(data['resource_metadata']['object'], None)
+        self.assertEqual(len(self.pipeline_manager.counters), 1)
+        data = self.pipeline_manager.counters[0]
+        self.assertEqual(data.volume, 28)
+        self.assertEqual(data.resource_metadata['version'], '1.0')
+        self.assertEqual(data.resource_metadata['container'], 'container')
+        self.assertEqual(data.resource_metadata['object'], None)

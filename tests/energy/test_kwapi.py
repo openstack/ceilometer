@@ -15,6 +15,7 @@
 # under the License.
 
 import datetime
+import mock
 
 from ceilometer.tests import base
 from ceilometer.energy import kwapi
@@ -60,6 +61,7 @@ class TestKwapiPollster(base.TestCase):
             probe_dict['id'] = key
             yield probe_dict
 
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestKwapiPollster, self).setUp()
         self.context = context.get_admin_context()

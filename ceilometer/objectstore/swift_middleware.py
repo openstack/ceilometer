@@ -20,11 +20,13 @@
 
 from __future__ import absolute_import
 
-from ceilometer import publish
+from stevedore import dispatch
+
 from ceilometer import counter
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import timeutils
+from ceilometer import pipeline
 
 from swift.common.utils import split_path
 
@@ -50,6 +52,13 @@ class CeilometerMiddleware(object):
     def __init__(self, app, conf):
         self.app = app
         cfg.CONF([], project='ceilometer')
+        publisher_manager = dispatch.NameDispatchExtensionManager(
+            namespace=pipeline.PUBLISHER_NAMESPACE,
+            check_func=lambda x: True,
+            invoke_on_load=True,
+        )
+
+        self.pipeline_manager = pipeline.setup_pipeline(publisher_manager)
 
     def __call__(self, env, start_response):
         start_response_args = [None]
@@ -81,56 +90,50 @@ class CeilometerMiddleware(object):
         else:
             return iter_response(iterable)
 
-    @staticmethod
-    def publish_counter(env, bytes_received, bytes_sent):
+    def publish_counter(self, env, bytes_received, bytes_sent):
         req = Request(env)
         version, account, container, obj = split_path(req.path, 1, 4, True)
         now = timeutils.utcnow().isoformat()
 
         if bytes_received:
-            publish.publish_counter(context.get_admin_context(),
-                                    counter.Counter(
-                                        name='storage.objects.incoming.bytes',
-                                        type='delta',
-                                        unit='B',
-                                        volume=bytes_received,
-                                        user_id=env.get('HTTP_X_USER_ID'),
-                                        project_id=env.get('HTTP_X_TENANT_ID'),
-                                        resource_id=account.partition(
-                                            'AUTH_')[2],
-                                        timestamp=now,
-                                        resource_metadata={
-                                            "path": req.path,
-                                            "version": version,
-                                            "container": container,
-                                            "object": obj,
-                                        },
-                                    ),
-                                    cfg.CONF.metering_topic,
-                                    cfg.CONF.metering_secret,
-                                    cfg.CONF.counter_source)
+            self.pipeline_manager.publish_counter(
+                context.get_admin_context(),
+                counter.Counter(
+                    name='storage.objects.incoming.bytes',
+                    type='delta',
+                    unit='B',
+                    volume=bytes_received,
+                    user_id=env.get('HTTP_X_USER_ID'),
+                    project_id=env.get('HTTP_X_TENANT_ID'),
+                    resource_id=account.partition('AUTH_')[2],
+                    timestamp=now,
+                    resource_metadata={
+                        "path": req.path,
+                        "version": version,
+                        "container": container,
+                        "object": obj,
+                    }, ),
+                cfg.CONF.counter_source)
 
         if bytes_sent:
-            publish.publish_counter(context.get_admin_context(),
-                                    counter.Counter(
-                                        name='storage.objects.outgoing.bytes',
-                                        type='delta',
-                                        unit='B',
-                                        volume=bytes_sent,
-                                        user_id=env.get('HTTP_X_USER_ID'),
-                                        project_id=env.get('HTTP_X_TENANT_ID'),
-                                        resource_id=account.partition(
-                                            'AUTH_')[2],
-                                        timestamp=now,
-                                        resource_metadata={
-                                            "path": req.path,
-                                            "version": version,
-                                            "container": container,
-                                            "object": obj,
-                                        }),
-                                    cfg.CONF.metering_topic,
-                                    cfg.CONF.metering_secret,
-                                    cfg.CONF.counter_source)
+            self.pipeline_manager.publish_counter(
+                context.get_admin_context(),
+                counter.Counter(
+                    name='storage.objects.outgoing.bytes',
+                    type='delta',
+                    unit='B',
+                    volume=bytes_sent,
+                    user_id=env.get('HTTP_X_USER_ID'),
+                    project_id=env.get('HTTP_X_TENANT_ID'),
+                    resource_id=account.partition('AUTH_')[2],
+                    timestamp=now,
+                    resource_metadata={
+                        "path": req.path,
+                        "version": version,
+                        "container": container,
+                        "object": obj,
+                    }),
+                cfg.CONF.counter_source)
 
 
 def filter_factory(global_conf, **local_conf):

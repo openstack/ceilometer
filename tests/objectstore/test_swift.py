@@ -17,6 +17,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import mock
 from ceilometer.central import manager
 from ceilometer.objectstore import swift
 from ceilometer.tests import base
@@ -45,6 +46,7 @@ class TestSwiftPollster(base.TestCase):
         for i in ACCOUNTS:
             yield i
 
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestSwiftPollster, self).setUp()
         self.pollster = swift.SwiftPollster()

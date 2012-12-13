@@ -24,7 +24,7 @@ from ceilometer.openstack.common import rpc
 from ceilometer.tests import base
 
 from ceilometer import counter
-from ceilometer import publish
+from ceilometer.publisher import meter_publish
 
 
 class TestPublish(base.TestCase):
@@ -48,12 +48,11 @@ class TestPublish(base.TestCase):
         super(TestPublish, self).setUp()
         self.notifications = []
         self.stubs.Set(rpc, 'cast', self.faux_notify)
-        publish.publish_counter(None,
-                                self.test_data,
-                                'metering',
-                                'not-so-secret',
-                                'test',
-                                )
+        publisher = meter_publish.MeterPublisher()
+        publisher.publish_counter(None,
+                                  self.test_data,
+                                  'test',
+                                  )
 
     def test_notify(self):
         assert len(self.notifications) == 2

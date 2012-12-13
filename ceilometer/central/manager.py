@@ -50,7 +50,7 @@ class AgentManager(agent.AgentManager):
                                         tenant_name=cfg.CONF.os_tenant_name,
                                         auth_url=cfg.CONF.os_auth_url)
 
-        self.ext_manager.map(self.publish_counters_from_one_pollster,
-                             manager=self,
-                             context=context,
-                             )
+        self.pollster_manager.map(self.publish_counters_from_one_pollster,
+                                  manager=self,
+                                  context=context,
+                                  )

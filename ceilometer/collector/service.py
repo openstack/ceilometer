@@ -16,11 +16,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from stevedore import extension
+from stevedore import dispatch
 
 from ceilometer.collector import meter
 from ceilometer import extension_manager
-from ceilometer import publish
+from ceilometer import pipeline
 from ceilometer import service
 from ceilometer import storage
 from ceilometer.openstack.common import context
@@ -56,16 +56,23 @@ class CollectorService(service.PeriodicService):
 
     def initialize_service_hook(self, service):
         '''Consumers must be declared before consume_thread start.'''
-        self.ext_manager = extension_manager.ActivatedExtensionManager(
-            namespace=self.COLLECTOR_NAMESPACE,
-            disabled_names=cfg.CONF.disabled_notification_listeners,
+        publisher_manager = dispatch.NameDispatchExtensionManager(
+            namespace=pipeline.PUBLISHER_NAMESPACE,
+            check_func=lambda x: True,
+            invoke_on_load=True,
         )
+        self.pipeline_manager = pipeline.setup_pipeline(publisher_manager)
 
-        if not list(self.ext_manager):
+        self.notification_manager = \
+            extension_manager.ActivatedExtensionManager(
+                namespace=self.COLLECTOR_NAMESPACE,
+                disabled_names=cfg.CONF.disabled_notification_listeners,
+            )
+
+        if not list(self.notification_manager):
             LOG.warning('Failed to load any notification handlers for %s',
                         self.COLLECTOR_NAMESPACE)
-
-        self.ext_manager.map(self._setup_subscription)
+        self.notification_manager.map(self._setup_subscription)
 
         # Set ourselves up as a separate worker for the metering data,
         # since the default for service is to use create_consumer().
@@ -95,9 +102,9 @@ class CollectorService(service.PeriodicService):
     def process_notification(self, notification):
         """Make a notification processed by an handler."""
         LOG.debug('notification %r', notification.get('event_type'))
-        self.ext_manager.map(self._process_notification_for_ext,
-                             notification=notification,
-                             )
+        self.notification_manager.map(self._process_notification_for_ext,
+                                      notification=notification,
+                                      )
 
     def _process_notification_for_ext(self, ext, notification):
         handler = ext.obj
@@ -107,14 +114,11 @@ class CollectorService(service.PeriodicService):
                 # FIXME(dhellmann): Spawn green thread?
                 self.publish_counter(c)
 
-    @staticmethod
-    def publish_counter(counter):
+    def publish_counter(self, counter):
         """Create a metering message for the counter and publish it."""
         ctxt = context.get_admin_context()
-        publish.publish_counter(ctxt, counter,
-                                cfg.CONF.metering_topic,
-                                cfg.CONF.metering_secret,
-                                cfg.CONF.counter_source)
+        self.pipeline_manager.publish_counter(ctxt, counter,
+                                              cfg.CONF.counter_source)
 
     def record_metering_data(self, context, data):
         """This method is triggered when metering data is

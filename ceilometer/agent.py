@@ -16,9 +16,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from ceilometer import publish
+from stevedore import dispatch
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import log
+from ceilometer import pipeline
 
 LOG = log.getLogger(__name__)
 
@@ -26,7 +27,15 @@ LOG = log.getLogger(__name__)
 class AgentManager(object):
 
     def __init__(self, extension_manager):
-        self.ext_manager = extension_manager
+        publisher_manager = dispatch.NameDispatchExtensionManager(
+            namespace=pipeline.PUBLISHER_NAMESPACE,
+            check_func=lambda x: True,
+            invoke_on_load=True,
+        )
+
+        self.pipeline_manager = pipeline.setup_pipeline(publisher_manager)
+
+        self.pollster_manager = extension_manager
 
     def publish_counters_from_one_pollster(self, ext, manager, context,
                                            *args, **kwargs):
@@ -36,11 +45,10 @@ class AgentManager(object):
             LOG.info('Polling %s', ext.name)
             for c in ext.obj.get_counters(manager, *args, **kwargs):
                 LOG.debug('Publishing counter: %s', c)
-                publish.publish_counter(context, c,
-                                        cfg.CONF.metering_topic,
-                                        cfg.CONF.metering_secret,
-                                        cfg.CONF.counter_source,
-                                        )
+                manager.pipeline_manager.publish_counter(
+                    context, c,
+                    cfg.CONF.counter_source)
+
         except Exception as err:
             LOG.warning('Continuing after error from %s: %s',
                         ext.name, err)

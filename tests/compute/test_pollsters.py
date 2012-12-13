@@ -51,6 +51,7 @@ class TestInstancePollster(TestPollsterBase):
     def setUp(self):
         super(TestInstancePollster, self).setUp()
 
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_counters(self):
         self.mox.ReplayAll()
 
@@ -67,6 +68,7 @@ class TestDiskIOPollster(TestPollsterBase):
     def setUp(self):
         super(TestDiskIOPollster, self).setUp()
 
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_counters(self):
         disks = [
             (virt_inspector.Disk(device='vda'),
@@ -102,6 +104,7 @@ class TestNetPollster(TestPollsterBase):
     def setUp(self):
         super(TestNetPollster, self).setUp()
 
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_counters(self):
         vnic0 = virt_inspector.Interface(
             name='vnet0',
@@ -157,6 +160,7 @@ class TestCPUPollster(TestPollsterBase):
     def setUp(self):
         super(TestCPUPollster, self).setUp()
 
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_counters(self):
         self.inspector.inspect_cpus(self.instance.name).AndReturn(
             virt_inspector.CPUStats(time=1 * (10 ** 6), number=2))

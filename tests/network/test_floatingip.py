@@ -28,6 +28,7 @@ from ceilometer.tests import base
 
 class TestFloatingIPPollster(base.TestCase):
 
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestFloatingIPPollster, self).setUp()
         self.context = context.get_admin_context()

@@ -16,6 +16,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import mock
+
 from ceilometer.tests import base
 from ceilometer.image import glance
 from ceilometer.central import manager
@@ -96,6 +98,7 @@ class TestImagePollster(base.TestCase):
     def fake_glance_iter_images(self, ksclient):
         return iter(IMAGE_LIST)
 
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestImagePollster, self).setUp()
         self.context = context.get_admin_context()
