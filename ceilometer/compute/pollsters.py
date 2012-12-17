@@ -21,25 +21,11 @@
 import copy
 import datetime
 
-from stevedore import driver
-
 from ceilometer import counter
 from ceilometer.compute import plugin
 from ceilometer.compute import instance as compute_instance
-from ceilometer.compute.virt import inspector as virt_inspector
-from ceilometer.openstack.common import cfg
-from ceilometer.openstack.common import importutils
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
-
-OPTS = [
-    cfg.StrOpt('hypervisor_inspector',
-               help='Inspector to use for inspecting the hypervisor layer',
-               default='libvirt')
-]
-
-CONF = cfg.CONF
-CONF.register_opts(OPTS)
 
 LOG = log.getLogger(__name__)
 
@@ -47,18 +33,6 @@ LOG = log.getLogger(__name__)
 def _instance_name(instance):
     """Shortcut to get instance name"""
     return getattr(instance, 'OS-EXT-SRV-ATTR:instance_name', None)
-
-
-def get_hypervisor_inspector():
-    try:
-        namespace = 'ceilometer.compute.virt'
-        mgr = driver.DriverManager(namespace,
-                                   CONF.hypervisor_inspector,
-                                   invoke_on_load=True)
-        return mgr.driver
-    except ImportError as e:
-        LOG.error("Unable to load the hypervisor inspector: %s" % (e))
-        return virt_inspector.Inspector()
 
 
 def make_counter_from_instance(instance, name, type, volume):
@@ -74,16 +48,7 @@ def make_counter_from_instance(instance, name, type, volume):
         )
 
 
-class HypervisorPollster(plugin.ComputePollster):
-
-    inspector = None
-
-    def __init__(self):
-        if not HypervisorPollster.inspector:
-            HypervisorPollster.inspector = get_hypervisor_inspector()
-
-
-class InstancePollster(HypervisorPollster):
+class InstancePollster(plugin.ComputePollster):
 
     def get_counters(self, manager, instance):
         yield make_counter_from_instance(instance,
@@ -99,7 +64,7 @@ class InstancePollster(HypervisorPollster):
         )
 
 
-class DiskIOPollster(HypervisorPollster):
+class DiskIOPollster(plugin.ComputePollster):
 
     LOG = log.getLogger(__name__ + '.diskio')
 
@@ -119,7 +84,7 @@ class DiskIOPollster(HypervisorPollster):
             r_requests = 0
             w_bytes = 0
             w_requests = 0
-            for disk, info in self.inspector.inspect_disks(instance_name):
+            for disk, info in manager.inspector.inspect_disks(instance_name):
                 self.LOG.info(self.DISKIO_USAGE_MESSAGE,
                               instance, disk.device, info.read_requests,
                               info.read_bytes, info.write_requests,
@@ -154,7 +119,7 @@ class DiskIOPollster(HypervisorPollster):
             self.LOG.exception(err)
 
 
-class CPUPollster(HypervisorPollster):
+class CPUPollster(plugin.ComputePollster):
 
     LOG = log.getLogger(__name__ + '.cpu')
 
@@ -181,7 +146,7 @@ class CPUPollster(HypervisorPollster):
         self.LOG.info('checking instance %s', instance.id)
         instance_name = _instance_name(instance)
         try:
-            cpu_info = self.inspector.inspect_cpus(instance_name)
+            cpu_info = manager.inspector.inspect_cpus(instance_name)
             self.LOG.info("CPUTIME USAGE: %s %d",
                           instance.__dict__, cpu_info.time)
             cpu_util = self.get_cpu_util(instance, cpu_info)
@@ -208,7 +173,7 @@ class CPUPollster(HypervisorPollster):
             self.LOG.exception(err)
 
 
-class NetPollster(HypervisorPollster):
+class NetPollster(plugin.ComputePollster):
 
     LOG = log.getLogger(__name__ + '.net')
 
@@ -236,7 +201,7 @@ class NetPollster(HypervisorPollster):
         instance_name = _instance_name(instance)
         self.LOG.info('checking instance %s', instance.id)
         try:
-            for vnic, info in self.inspector.inspect_vnics(instance_name):
+            for vnic, info in manager.inspector.inspect_vnics(instance_name):
                 self.LOG.info(self.NET_USAGE_MESSAGE, instance_name,
                               vnic.name, info.rx_bytes, info.tx_bytes)
                 yield self.make_vnic_counter(instance,
