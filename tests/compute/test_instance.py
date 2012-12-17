@@ -44,14 +44,16 @@ class FauxInstance(object):
 
 class TestLocationMetadata(unittest.TestCase):
 
-    # Mimics an instance returned from nova api call
-    INSTANCE_PROPERTIES = {'name': 'display name',
+    def setUp(self):
+        self.manager = manager.AgentManager()
+        super(TestLocationMetadata, self).setUp()
+
+        # Mimics an instance returned from nova api call
+        self.INSTANCE_PROPERTIES = {'name': 'display name',
                            'OS-EXT-SRV-ATTR:instance_name': 'instance-000001',
                            'reservation_id': 'reservation id',
                            'architecture': 'x86_64',
                            'availability_zone': 'zone1',
-                           'image_ref': 'image ref',
-                           'image_ref_url': 'image ref url',
                            'kernel_id': 'kernel id',
                            'os_type': 'linux',
                            'ramdisk_id': 'ramdisk id',
@@ -60,13 +62,14 @@ class TestLocationMetadata(unittest.TestCase):
                            'memory_mb': 2048,
                            'root_gb': 3,
                            'vcpus': 1,
+                           'image': {'id': 1,
+                                     'links': [{"rel": "bookmark",
+                                                'href': 2}],
+                                    },
                            'flavor': {'id': 1},
-                           'hostId': '1234-5678'
+                           'hostId': '1234-5678',
                            }
 
-    def setUp(self):
-        self.manager = manager.AgentManager()
-        super(TestLocationMetadata, self).setUp()
         self.instance = FauxInstance(**self.INSTANCE_PROPERTIES)
         self.instance.host = 'made-up-hostname'
         m = mock.MagicMock()
@@ -87,5 +90,16 @@ class TestLocationMetadata(unittest.TestCase):
                 assert actual == iprops['name']
             elif name == 'instance_type':
                 assert actual == iprops['flavor']['id']
+            elif name == 'image_ref':
+                assert actual == iprops['image']['id']
+            elif name == 'image_ref_url':
+                assert actual == iprops['image']['links'][0]['href']
             else:
                 assert actual == iprops[name]
+
+    def test_metadata_empty_image(self):
+        self.INSTANCE_PROPERTIES['image'] = ''
+        self.instance = FauxInstance(**self.INSTANCE_PROPERTIES)
+        md = instance.get_metadata_from_object(self.instance)
+        assert md['image_ref'] == None
+        assert md['image_ref_url'] == None

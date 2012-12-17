@@ -25,9 +25,6 @@ INSTANCE_PROPERTIES = [
     'architecture',
     # Location properties
     'availability_zone',
-    # Image properties
-    'image_ref',
-    'image_ref_url',
     'kernel_id',
     'os_type',
     'ramdisk_id',
@@ -48,6 +45,10 @@ def get_metadata_from_object(instance):
         'name': getattr(instance, 'OS-EXT-SRV-ATTR:instance_name', u''),
         'instance_type': (instance.flavor['id'] if instance.flavor else None),
         'host': instance.hostId,
+        # Image properties
+        'image_ref': (instance.image['id'] if instance.image else None),
+        'image_ref_url': (instance.image['links'][0]['href']
+                            if instance.image else None),
         }
 
     for name in INSTANCE_PROPERTIES:
