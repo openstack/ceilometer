@@ -49,7 +49,7 @@ if __name__ == '__main__':
     # Build the WSGI app
     root = app.setup_app(pecan_config,
                          extra_hooks=[acl.AdminAuthHook()])
-    root = acl.install(root, cfg.CONF)
+    root = acl.install(root, dict(cfg.CONF))
 
     # Create the WSGI server and start it
     host, port = '0.0.0.0', int(cfg.CONF.metering_api_port)
