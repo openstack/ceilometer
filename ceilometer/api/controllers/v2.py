@@ -252,6 +252,7 @@ class Event(Base):
     source = text
     counter_name = text
     counter_type = text
+    counter_unit = text
     counter_volume = float
     user_id = text
     project_id = text

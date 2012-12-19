@@ -101,6 +101,7 @@ def test_verify_signature_nested():
 
 TEST_COUNTER = counter.Counter(name='name',
                                type='typ',
+                               unit='',
                                volume=1,
                                user_id='user',
                                project_id='project',
@@ -160,6 +161,7 @@ def test_meter_message_from_counter_field():
                                            'src')
     name_map = {'name': 'counter_name',
                 'type': 'counter_type',
+                'unit': 'counter_unit',
                 'volume': 'counter_volume',
                 }
     for f in TEST_COUNTER._fields:

@@ -109,6 +109,7 @@ class Connection(object):
 
         { 'name': name of the meter,
           'type': type of the meter (guage, counter),
+          'unit': unit of the meter,
           'resource_id': UUID of the resource,
           'project_id': UUID of project owning the resource,
           'user_id': UUID of user owning the resource,

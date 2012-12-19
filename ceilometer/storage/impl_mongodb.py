@@ -55,7 +55,8 @@ class MongoDBStorage(base.StorageEngine):
               timestamp: datetime of last update
               user_id: uuid
               project_id: uuid
-              meter: [ array of {counter_name: string, counter_type: string} ]
+              meter: [ array of {counter_name: string, counter_type: string,
+                                 counter_unit: string} ]
             }
     """
 
@@ -272,6 +273,7 @@ class Connection(base.Connection):
                       },
              '$addToSet': {'meter': {'counter_name': data['counter_name'],
                                      'counter_type': data['counter_type'],
+                                     'counter_unit': data['counter_unit'],
                                      },
                            },
              },
@@ -364,6 +366,7 @@ class Connection(base.Connection):
 
         { 'name': name of the meter,
           'type': type of the meter (guage, counter),
+          'unit': unit of the meter,
           'resource_id': UUID of the resource,
           'project_id': UUID of project owning the resource,
           'user_id': UUID of user owning the resource,
@@ -391,6 +394,7 @@ class Connection(base.Connection):
                 m = {}
                 m['name'] = r_meter['counter_name']
                 m['type'] = r_meter['counter_type']
+                m['unit'] = r_meter['counter_unit']
                 m['resource_id'] = r['_id']
                 m['project_id'] = r['project_id']
                 m['user_id'] = r['user_id']

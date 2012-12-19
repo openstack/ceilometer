@@ -46,6 +46,7 @@ class TestListMeters(FunctionalTest):
                 counter.Counter(
                     'meter.test',
                     'cumulative',
+                    '',
                     1,
                     'user-id',
                     'project-id',
@@ -57,6 +58,7 @@ class TestListMeters(FunctionalTest):
                 counter.Counter(
                     'meter.test',
                     'cumulative',
+                    '',
                     3,
                     'user-id',
                     'project-id',
@@ -68,6 +70,7 @@ class TestListMeters(FunctionalTest):
                 counter.Counter(
                     'meter.mine',
                     'gauge',
+                    '',
                     1,
                     'user-id',
                     'project-id',
@@ -79,6 +82,7 @@ class TestListMeters(FunctionalTest):
                 counter.Counter(
                     'meter.test',
                     'cumulative',
+                    '',
                     1,
                     'user-id2',
                     'project-id2',
@@ -90,6 +94,7 @@ class TestListMeters(FunctionalTest):
                 counter.Counter(
                     'meter.mine',
                     'gauge',
+                    '',
                     1,
                     'user-id4',
                     'project-id2',

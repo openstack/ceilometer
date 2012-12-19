@@ -39,6 +39,7 @@ class TestListEvents(tests_api.TestBase):
                 counter.Counter(
                     'instance',
                     'cumulative',
+                    '',
                     1,
                     'user-id',
                     'project1',
@@ -51,6 +52,7 @@ class TestListEvents(tests_api.TestBase):
                 counter.Counter(
                     'instance',
                     'cumulative',
+                    '',
                     2,
                     'user-id',
                     'project1',
@@ -63,6 +65,7 @@ class TestListEvents(tests_api.TestBase):
                 counter.Counter(
                     'instance',
                     'cumulative',
+                    '',
                     1,
                     'user-id2',
                     'project2',

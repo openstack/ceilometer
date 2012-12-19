@@ -43,6 +43,7 @@ class TestListUsers(FunctionalTest):
         counter1 = counter.Counter(
             'instance',
             'cumulative',
+            '',
             1,
             'user-id',
             'project-id',
@@ -61,6 +62,7 @@ class TestListUsers(FunctionalTest):
         counter2 = counter.Counter(
             'instance',
             'cumulative',
+            '',
             1,
             'user-id2',
             'project-id',
@@ -83,6 +85,7 @@ class TestListUsers(FunctionalTest):
         counter1 = counter.Counter(
             'instance',
             'cumulative',
+            '',
             1,
             'user-id',
             'project-id',
@@ -101,6 +104,7 @@ class TestListUsers(FunctionalTest):
         counter2 = counter.Counter(
             'instance',
             'cumulative',
+            '',
             1,
             'user-id2',
             'project-id',

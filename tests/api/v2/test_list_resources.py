@@ -42,6 +42,7 @@ class TestListResources(FunctionalTest):
         counter1 = counter.Counter(
             'instance',
             'cumulative',
+            '',
             1,
             'user-id',
             'project-id',
@@ -60,6 +61,7 @@ class TestListResources(FunctionalTest):
         counter2 = counter.Counter(
             'instance',
             'cumulative',
+            '',
             1,
             'user-id',
             'project-id',
@@ -82,6 +84,7 @@ class TestListResources(FunctionalTest):
         counter1 = counter.Counter(
             'instance',
             'cumulative',
+            '',
             1,
             'user-id',
             'project-id',
@@ -100,6 +103,7 @@ class TestListResources(FunctionalTest):
         counter2 = counter.Counter(
             'instance',
             'cumulative',
+            '',
             1,
             'user-id2',
             'project-id',
@@ -123,6 +127,7 @@ class TestListResources(FunctionalTest):
         counter1 = counter.Counter(
             'instance',
             'cumulative',
+            '',
             1,
             'user-id',
             'project-id',
@@ -141,6 +146,7 @@ class TestListResources(FunctionalTest):
         counter2 = counter.Counter(
             'instance',
             'cumulative',
+            '',
             1,
             'user-id2',
             'project-id',
@@ -164,6 +170,7 @@ class TestListResources(FunctionalTest):
         counter1 = counter.Counter(
             'instance',
             'cumulative',
+            '',
             1,
             'user-id',
             'project-id',
@@ -182,6 +189,7 @@ class TestListResources(FunctionalTest):
         counter2 = counter.Counter(
             'instance',
             'cumulative',
+            '',
             1,
             'user-id2',
             'project-id2',
@@ -205,6 +213,7 @@ class TestListResources(FunctionalTest):
         counter1 = counter.Counter(
             'instance',
             'cumulative',
+            '',
             1,
             'user-id',
             'project-id',

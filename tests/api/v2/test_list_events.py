@@ -37,6 +37,7 @@ class TestListEvents(FunctionalTest):
         self.counter1 = counter.Counter(
             'instance',
             'cumulative',
+            '',
             1,
             'user-id',
             'project1',
@@ -57,6 +58,7 @@ class TestListEvents(FunctionalTest):
         self.counter2 = counter.Counter(
             'instance',
             'cumulative',
+            '',
             1,
             'user-id2',
             'project2',

@@ -35,6 +35,7 @@ class FloatingIPPollster(plugin.CentralPollster):
             yield counter.Counter(
                 name='ip.floating',
                 type=counter.TYPE_GAUGE,
+                unit='ip',
                 volume=1,
                 user_id=None,
                 project_id=ip.project_id,

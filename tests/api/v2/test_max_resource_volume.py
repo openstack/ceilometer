@@ -41,6 +41,7 @@ class TestMaxResourceVolume(FunctionalTest):
             c = counter.Counter(
                 'volume.size',
                 'gauge',
+                'GiB',
                 5 + i,
                 'user-id',
                 'project1',

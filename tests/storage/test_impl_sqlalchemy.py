@@ -97,6 +97,7 @@ class SQLAlchemyEngineTestBase(SQLAlchemyEngineSubBase):
         self.counter = counter.Counter(
             'instance',
             counter.TYPE_CUMULATIVE,
+            unit='',
             volume=1,
             user_id='user-id',
             project_id='project-id',
@@ -115,6 +116,7 @@ class SQLAlchemyEngineTestBase(SQLAlchemyEngineSubBase):
         self.counter2 = counter.Counter(
             'instance',
             counter.TYPE_CUMULATIVE,
+            unit='',
             volume=1,
             user_id='user-id',
             project_id='project-id',
@@ -133,6 +135,7 @@ class SQLAlchemyEngineTestBase(SQLAlchemyEngineSubBase):
         self.counter3 = counter.Counter(
             'instance',
             counter.TYPE_CUMULATIVE,
+            unit='',
             volume=1,
             user_id='user-id-alternate',
             project_id='project-id',
@@ -152,10 +155,11 @@ class SQLAlchemyEngineTestBase(SQLAlchemyEngineSubBase):
             c = counter.Counter(
                 'instance',
                 counter.TYPE_CUMULATIVE,
-                1,
-                'user-id-%s' % i,
-                'project-id-%s' % i,
-                'resource-id-%s' % i,
+                unit='',
+                volume=1,
+                user_id='user-id-%s' % i,
+                project_id='project-id-%s' % i,
+                resource_id='resource-id-%s' % i,
                 timestamp=datetime.datetime(2012, 7, 2, 10, 40 + i),
                 resource_metadata={'display_name': 'test-server',
                                    'tag': 'counter-%s' % i,
@@ -466,6 +470,7 @@ class TestGetEventInterval(SQLAlchemyEngineTestBase):
             c = counter.Counter(
                 'instance',
                 counter.TYPE_CUMULATIVE,
+                '',
                 1,
                 '11',
                 '1',
@@ -584,6 +589,7 @@ class MaxProjectTest(SQLAlchemyEngineSubBase):
             c = counter.Counter(
                 'volume.size',
                 'gauge',
+                'GiB',
                 5 + i,
                 'user-id',
                 'project1',
@@ -662,6 +668,7 @@ class MaxResourceTest(SQLAlchemyEngineSubBase):
             c = counter.Counter(
                 'volume.size',
                 'gauge',
+                'GiB',
                 5 + i,
                 'user-id',
                 'project1',

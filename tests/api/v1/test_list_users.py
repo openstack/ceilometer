@@ -46,6 +46,7 @@ class TestListUsers(tests_api.TestBase):
         counter1 = counter.Counter(
             'instance',
             'cumulative',
+            'instance',
             1,
             'user-id',
             'project-id',
@@ -64,6 +65,7 @@ class TestListUsers(tests_api.TestBase):
         counter2 = counter.Counter(
             'instance',
             'cumulative',
+            '',
             1,
             'user-id2',
             'project-id',
