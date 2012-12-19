@@ -303,11 +303,15 @@ class MeterController(RestController):
                 for e in request.storage_conn.get_raw_events(f)
                 ]
 
-    @wsme.pecan.wsexpose(Duration)
-    def duration(self):
+    # TODO(jd) replace str for timestamp by datetime?
+    @wsme.pecan.wsexpose(Duration, str, str, int)
+    def duration(self, start_timestamp=None, end_timestamp=None,
+                 search_offset=0):
         """Computes the duration of the meter events in the time range given.
         """
-        q_ts = _get_query_timestamps(request.params)
+        q_ts = _get_query_timestamps(dict(start_timestamp=start_timestamp,
+                                          end_timestamp=end_timestamp,
+                                          search_offset=search_offset))
         start_timestamp = q_ts['start_timestamp']
         end_timestamp = q_ts['end_timestamp']
 
