@@ -20,3 +20,4 @@ setuptools-git>=0.4
 # checkout on bitbucket. I hope to have that resolved
 # very soon.
 hg+https://bitbucket.org/cdevienne/wsme
+pecan

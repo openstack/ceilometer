@@ -18,15 +18,10 @@
 # under the License.
 """Set up the development API server.
 """
-import os
 import sys
-from wsgiref import simple_server
 
-from pecan import configuration
-
-from ceilometer.api import acl
-from ceilometer.api import app
-from ceilometer.api import config as api_config
+from ceilometer.api.v1 import acl
+from ceilometer.api.v1 import app
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import log as logging
 
@@ -37,34 +32,15 @@ if __name__ == '__main__':
     # inputs.
     acl.register_opts(cfg.CONF)
 
-    # Parse OpenStack config file and command line options, then
-    # configure logging.
+    # Parse config file and command line options,
+    # then configure logging.
     cfg.CONF(sys.argv[1:])
     logging.setup('ceilometer.api')
 
-    # Set up the pecan configuration
-    filename = api_config.__file__.replace('.pyc', '.py')
-    pecan_config = configuration.conf_from_file(filename)
+    root = app.make_app()
 
-    # Build the WSGI app
-    root = app.setup_app(pecan_config,
-                         extra_hooks=[acl.AdminAuthHook()])
-    root = acl.install(root, cfg.CONF)
+    # Enable debug mode
+    if cfg.CONF.verbose or cfg.CONF.debug:
+        root.debug = True
 
-    # Create the WSGI server and start it
-    host, port = '0.0.0.0', int(cfg.CONF.metering_api_port)
-    srv = simple_server.make_server(host, port, root)
-
-    print 'Starting server in PID %s' % os.getpid()
-
-    if host == '0.0.0.0':
-        print 'serving on 0.0.0.0:%s, view at http://127.0.0.1:%s' % \
-            (port, port)
-    else:
-        print "serving on http://%s:%s" % (host, port)
-
-    try:
-        srv.serve_forever()
-    except KeyboardInterrupt:
-        # allow CTRL+C to shutdown without an error
-        pass
+    root.run(host='0.0.0.0', port=cfg.CONF.metering_api_port)
