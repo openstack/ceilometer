@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 #
-# Author: John Tran <jhtran@att.com>
+# Copyright © 2012 eNovance <licensing@enovance.com>
+#
 # Author: Julien Danjou <julien@danjou.info>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -15,14 +16,13 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Run storage database migration.
-"""
 
-import sys
-from ceilometer import service
-from ceilometer import storage
-from ceilometer.openstack.common import cfg
+import subprocess
+import unittest
 
-if __name__ == '__main__':
-    service.prepare_service(sys.argv)
-    storage.get_connection(cfg.CONF).upgrade()
+
+class BinDbsyncTestCase(unittest.TestCase):
+    def test_dbsync_run(self):
+        subp = subprocess.Popen(["../bin/ceilometer-dbsync",
+                                "--database_connection=log://localhost"])
+        self.assertEqual(subp.wait(), 0)
