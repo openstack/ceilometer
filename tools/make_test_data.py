@@ -33,7 +33,7 @@ from ceilometer.openstack.common import timeutils
 
 
 def main():
-    cfg.CONF([])
+    cfg.CONF([], project='ceilometer')
 
     parser = argparse.ArgumentParser(
         description='generate metering data',
