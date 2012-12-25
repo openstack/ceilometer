@@ -28,8 +28,8 @@ from ceilometer import counter
 from ceilometer import storage
 from ceilometer.openstack.common import cfg
 from ceilometer.storage import impl_sqlalchemy
-from ceilometer.storage.sqlalchemy.models import Meter, Project, Resource
-from ceilometer.storage.sqlalchemy.models import User
+from ceilometer.storage.sqlalchemy.models import Meter, Project, Resource, User
+from ceilometer.storage.sqlalchemy.models import table_args
 
 
 LOG = logging.getLogger(__name__)
@@ -721,3 +721,8 @@ class MaxResourceTest(SQLAlchemyEngineSubBase):
 
         results = list(self.conn.get_volume_max(f))
         assert results == expected
+
+
+def test_model_table_args():
+    cfg.CONF.database_connection = 'mysql://localhost'
+    assert table_args()
