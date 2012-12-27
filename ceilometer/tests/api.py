@@ -52,18 +52,20 @@ class TestBase(db_test_base.TestBase):
         def attach_storage_connection():
             flask.request.storage_conn = self.conn
 
-    def get(self, path, **kwds):
+    def get(self, path, headers=None, **kwds):
         if kwds:
             query = path + '?' + urllib.urlencode(kwds)
         else:
             query = path
-        rv = self.test_app.get(query)
-        try:
-            data = json.loads(rv.data)
-        except ValueError:
-            print 'RAW DATA:', rv
-            raise
-        return data
+        rv = self.test_app.get(query, headers=headers)
+        if rv.status_code == 200 and rv.content_type == 'application/json':
+            try:
+                data = json.loads(rv.data)
+            except ValueError:
+                print 'RAW DATA:', rv
+                raise
+            return data
+        return rv
 
 
 class FunctionalTest(unittest.TestCase):

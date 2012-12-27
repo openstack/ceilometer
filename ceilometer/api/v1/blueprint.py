@@ -85,6 +85,8 @@ from ceilometer.openstack.common import timeutils
 
 from ceilometer import storage
 
+from ceilometer.api.v1 import acl
+
 
 LOG = log.getLogger(__name__)
 
@@ -105,6 +107,13 @@ def _get_metaquery(args):
                 for (k, v) in args.iteritems()
                     if k.startswith('metadata.'))
 
+
+def check_authorized_project(project):
+    authorized_project = acl.get_limited_to_project(flask.request.headers)
+    if authorized_project and authorized_project != project:
+        flask.abort(404)
+
+
 ## APIs for working with meters.
 
 
@@ -114,7 +123,9 @@ def list_meters_all():
     :param metadata.<key> match on the metadata within the resource. (optional)
     """
     rq = flask.request
-    meters = rq.storage_conn.get_meters(metaquery=_get_metaquery(rq.args))
+    meters = rq.storage_conn.get_meters(
+        project=acl.get_limited_to_project(rq.headers),
+        metaquery=_get_metaquery(rq.args))
     return flask.jsonify(meters=list(meters))
 
 
@@ -126,8 +137,10 @@ def list_meters_by_resource(resource):
     :param metadata.<key> match on the metadata within the resource. (optional)
     """
     rq = flask.request
-    meters = rq.storage_conn.get_meters(resource=resource,
-                                        metaquery=_get_metaquery(rq.args))
+    meters = rq.storage_conn.get_meters(
+        resource=resource,
+        project=acl.get_limited_to_project(rq.headers),
+        metaquery=_get_metaquery(rq.args))
     return flask.jsonify(meters=list(meters))
 
 
@@ -139,8 +152,10 @@ def list_meters_by_user(user):
     :param metadata.<key> match on the metadata within the resource. (optional)
     """
     rq = flask.request
-    meters = rq.storage_conn.get_meters(user=user,
-                                        metaquery=_get_metaquery(rq.args))
+    meters = rq.storage_conn.get_meters(
+        user=user,
+        project=acl.get_limited_to_project(rq.headers),
+        metaquery=_get_metaquery(rq.args))
     return flask.jsonify(meters=list(meters))
 
 
@@ -151,9 +166,12 @@ def list_meters_by_project(project):
     :param project: The ID of the owning project.
     :param metadata.<key> match on the metadata within the resource. (optional)
     """
+    check_authorized_project(project)
+
     rq = flask.request
-    meters = rq.storage_conn.get_meters(project=project,
-                                        metaquery=_get_metaquery(rq.args))
+    meters = rq.storage_conn.get_meters(
+        project=project,
+        metaquery=_get_metaquery(rq.args))
     return flask.jsonify(meters=list(meters))
 
 
@@ -165,8 +183,10 @@ def list_meters_by_source(source):
     :param metadata.<key> match on the metadata within the resource. (optional)
     """
     rq = flask.request
-    meters = rq.storage_conn.get_meters(source=source,
-                                        metaquery=_get_metaquery(rq.args))
+    meters = rq.storage_conn.get_meters(
+        source=source,
+        project=acl.get_limited_to_project(rq.headers),
+        metaquery=_get_metaquery(rq.args))
     return flask.jsonify(meters=list(meters))
 
 
@@ -201,6 +221,7 @@ def list_resources_by_project(project):
     :type end_timestamp: ISO date in UTC
     :param metadata.<key> match on the metadata within the resource. (optional)
     """
+    check_authorized_project(project)
     return _list_resources(project=project)
 
 
@@ -216,7 +237,8 @@ def list_all_resources():
     :type end_timestamp: ISO date in UTC
     :param metadata.<key> match on the metadata within the resource. (optional)
     """
-    return _list_resources()
+    return _list_resources(
+        project=acl.get_limited_to_project(flask.request.headers))
 
 
 @blueprint.route('/sources/<source>')
@@ -242,7 +264,10 @@ def list_resources_by_source(source):
     :type end_timestamp: ISO date in UTC
     :param metadata.<key> match on the metadata within the resource. (optional)
     """
-    return _list_resources(source=source)
+    return _list_resources(
+        source=source,
+        project=acl.get_limited_to_project(flask.request.headers),
+    )
 
 
 @blueprint.route('/users/<user>/resources')
@@ -258,7 +283,10 @@ def list_resources_by_user(user):
     :type end_timestamp: ISO date in UTC
     :param metadata.<key> match on the metadata within the resource. (optional)
     """
-    return _list_resources(user=user)
+    return _list_resources(
+        user=user,
+        project=acl.get_limited_to_project(flask.request.headers),
+    )
 
 
 ## APIs for working with users.
@@ -267,7 +295,13 @@ def list_resources_by_user(user):
 def _list_users(source=None):
     """Return a list of user names.
     """
-    users = flask.request.storage_conn.get_users(source=source)
+    # TODO(jd) it might be better to return the real list of users that are
+    # belonging to the project, but that's not provided by the storage
+    # drivers for now
+    if acl.get_limited_to_project(flask.request.headers):
+        users = [flask.request.headers.get('X-User-id')]
+    else:
+        users = flask.request.storage_conn.get_users(source=source)
     return flask.jsonify(users=list(users))
 
 
@@ -294,7 +328,18 @@ def list_users_by_source(source):
 def _list_projects(source=None):
     """Return a list of project names.
     """
-    projects = flask.request.storage_conn.get_projects(source=source)
+    project = acl.get_limited_to_project(flask.request.headers)
+    if project:
+        if source:
+            if project in flask.request.storage_conn.get_projects(
+                    source=source):
+                projects = [project]
+            else:
+                projects = []
+        else:
+            projects = [project]
+    else:
+        projects = flask.request.storage_conn.get_projects(source=source)
     return flask.jsonify(projects=list(projects))
 
 
@@ -334,7 +379,7 @@ def _list_events(meter,
                             start=q_ts['start_timestamp'],
                             end=q_ts['end_timestamp'],
                             metaquery=_get_metaquery(flask.request.args),
-                            )
+    )
     events = list(flask.request.storage_conn.get_raw_events(f))
     jsonified = flask.jsonify(events=events)
     if request_wants_html():
@@ -361,6 +406,7 @@ def list_events_by_project(project, meter):
         (optional)
     :type end_timestamp: ISO date in UTC
     """
+    check_authorized_project(project)
     return _list_events(project=project,
                         meter=meter,
                         )
@@ -379,9 +425,11 @@ def list_events_by_resource(resource, meter):
         (optional)
     :type end_timestamp: ISO date in UTC
     """
-    return _list_events(resource=resource,
-                        meter=meter,
-                        )
+    return _list_events(
+        resource=resource,
+        meter=meter,
+        project=acl.get_limited_to_project(flask.request.headers),
+    )
 
 
 @blueprint.route('/sources/<source>/meters/<meter>')
@@ -397,9 +445,11 @@ def list_events_by_source(source, meter):
         (optional)
     :type end_timestamp: ISO date in UTC
     """
-    return _list_events(source=source,
-                        meter=meter,
-                        )
+    return _list_events(
+        source=source,
+        meter=meter,
+        project=acl.get_limited_to_project(flask.request.headers),
+    )
 
 
 @blueprint.route('/users/<user>/meters/<meter>')
@@ -415,9 +465,11 @@ def list_events_by_user(user, meter):
         (optional)
     :type end_timestamp: ISO date in UTC
     """
-    return _list_events(user=user,
-                        meter=meter,
-                        )
+    return _list_events(
+        user=user,
+        meter=meter,
+        project=acl.get_limited_to_project(flask.request.headers),
+    )
 
 
 ## APIs for working with meter calculations.
@@ -475,11 +527,13 @@ def compute_duration_by_resource(resource, meter):
 
     # Query the database for the interval of timestamps
     # within the desired range.
-    f = storage.EventFilter(meter=meter,
-                            resource=resource,
-                            start=q_ts['query_start'],
-                            end=q_ts['query_end'],
-                            )
+    f = storage.EventFilter(
+        meter=meter,
+        project=acl.get_limited_to_project(flask.request.headers),
+        resource=resource,
+        start=q_ts['query_start'],
+        end=q_ts['query_end'],
+    )
     min_ts, max_ts = flask.request.storage_conn.get_event_interval(f)
 
     # "Clamp" the timestamps we return to the original time
@@ -533,11 +587,13 @@ def compute_max_resource_volume(resource, meter):
     q_ts = _get_query_timestamps(flask.request.args)
 
     # Query the database for the max volume
-    f = storage.EventFilter(meter=meter,
-                            resource=resource,
-                            start=q_ts['query_start'],
-                            end=q_ts['query_end'],
-                            )
+    f = storage.EventFilter(
+        meter=meter,
+        project=acl.get_limited_to_project(flask.request.headers),
+        resource=resource,
+        start=q_ts['query_start'],
+        end=q_ts['query_end'],
+    )
     # TODO(sberler): do we want to return an error if the resource
     # does not exist?
     results = list(flask.request.storage_conn.get_volume_max(f))
@@ -564,11 +620,13 @@ def compute_resource_volume_sum(resource, meter):
     q_ts = _get_query_timestamps(flask.request.args)
 
     # Query the database for the max volume
-    f = storage.EventFilter(meter=meter,
-                            resource=resource,
-                            start=q_ts['query_start'],
-                            end=q_ts['query_end'],
-                            )
+    f = storage.EventFilter(
+        meter=meter,
+        project=acl.get_limited_to_project(flask.request.headers),
+        resource=resource,
+        start=q_ts['query_start'],
+        end=q_ts['query_end'],
+    )
     # TODO(sberler): do we want to return an error if the resource
     # does not exist?
     results = list(flask.request.storage_conn.get_volume_sum(f))
@@ -592,6 +650,8 @@ def compute_project_volume_max(project, meter):
     :param search_offset: Number of minutes before and
         after start and end timestamps to query.
     """
+    check_authorized_project(project)
+
     q_ts = _get_query_timestamps(flask.request.args)
 
     f = storage.EventFilter(meter=meter,
@@ -624,6 +684,8 @@ def compute_project_volume_sum(project, meter):
     :param search_offset: Number of minutes before and
         after start and end timestamps to query.
     """
+    check_authorized_project(project)
+
     q_ts = _get_query_timestamps(flask.request.args)
 
     f = storage.EventFilter(meter=meter,
