@@ -3,6 +3,7 @@ coverage
 pep8>=1.0
 mock
 mox
+Babel>=0.9.6
 # NOTE(dhellmann): Ming is necessary to provide the Mongo-in-memory
 # implementation of MongoDB. The original source for Ming is at
 # http://sourceforge.net/project/merciless but there does not seem to
