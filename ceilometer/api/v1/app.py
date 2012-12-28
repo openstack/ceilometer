@@ -55,7 +55,7 @@ def make_app(enable_acl=True, attach_storage=True):
 
     # Install the middleware wrapper
     if enable_acl:
-        return acl.install(app, cfg.CONF)
+        return acl.install(app, dict(cfg.CONF))
     return app
 
 # For documentation
