@@ -1,6 +1,6 @@
 # Server Specific Configurations
 server = {
-    'port': '8080',
+    'port': '8777',
     'host': '0.0.0.0'
 }
 
@@ -16,7 +16,8 @@ app = {
 logging = {
     'loggers': {
         'root': {'level': 'INFO', 'handlers': ['console']},
-        'ceilometer': {'level': 'DEBUG', 'handlers': ['console']}
+        'ceilometer': {'level': 'DEBUG', 'handlers': ['console']},
+        'wsme': {'level': 'DEBUG', 'handlers': ['console']}
     },
     'handlers': {
         'console': {
