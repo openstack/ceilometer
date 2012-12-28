@@ -64,10 +64,12 @@ class TestComputeDurationByResource(FunctionalTest):
     def _invoke_api(self):
         return self.get_json(
             '/resources/resource-id/meters/instance:m1.tiny/duration',
-            start_timestamp=self.start.isoformat(),
-            end_timestamp=self.end.isoformat(),
-            search_offset=10,  # this value doesn't matter, db call is mocked
-            )
+            extra_params={
+            'daterange.start': self.start.isoformat(),
+            'daterange.end': self.end.isoformat(),
+            # this value doesn't matter, db call is mocked
+            'daterange.search_offset': 10,
+            })
 
     def test_before_range(self):
         self._set_interval(self.early1, self.early2)
@@ -124,9 +126,11 @@ class TestComputeDurationByResource(FunctionalTest):
         self._stub_interval_func(get_interval)
         data = self.get_json(
             '/resources/resource-id/meters/instance:m1.tiny/duration',
-            start_timestamp=self.late1.isoformat(),
-            search_offset=10,  # this value doesn't matter, db call is mocked
-            )
+            extra_params={
+                'daterange.start': self.late1.isoformat(),
+                # this value doesn't matter, db call is mocked
+                'daterange.search_offset': 10,
+            })
         self._assert_times_match(data['start_timestamp'], self.late1)
         self._assert_times_match(data['end_timestamp'], self.late2)
 
@@ -136,8 +140,10 @@ class TestComputeDurationByResource(FunctionalTest):
         self._stub_interval_func(get_interval)
         data = self.get_json(
             '/resources/resource-id/meters/instance:m1.tiny/duration',
-            end_timestamp=self.early2.isoformat(),
-            search_offset=10,  # this value doesn't matter, db call is mocked
-            )
+            extra_params={
+                'daterange.end': self.early2.isoformat(),
+                # this value doesn't matter, db call is mocked
+                'daterange.search_offset': 10,
+            })
         self._assert_times_match(data['start_timestamp'], self.early1)
         self._assert_times_match(data['end_timestamp'], self.early2)
