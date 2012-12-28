@@ -185,6 +185,8 @@ class NetPollster(plugin.ComputePollster):
         metadata = copy.copy(vnic_data)
         resource_metadata = dict(zip(metadata._fields, metadata))
         resource_metadata['instance_id'] = instance.id
+        resource_metadata['instance_type'] = instance.flavor['id'] if   \
+                        instance.flavor else None,
 
         return counter.Counter(
             name=name,
