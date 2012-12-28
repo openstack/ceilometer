@@ -27,7 +27,7 @@ from ceilometer.openstack.common import cfg
 
 OPTS = [
     cfg.StrOpt('glance_control_exchange',
-               default='glance_notifications',
+               default='glance',
                help="Exchange name for Glance notifications"),
 ]
 
