@@ -3,6 +3,7 @@
 # Copyright © 2012 New Dream Network, LLC (DreamHost)
 #
 # Author: Doug Hellmann <doug.hellmann@dreamhost.com>
+#         Julien Danjou <julien@danjou.info>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -59,6 +60,18 @@ class TestSumResourceVolume(tests_api.TestBase):
         data = self.get('/resources/resource-id/meters/volume.size/volume/sum')
         expected = {'volume': 5 + 6 + 7}
         assert data == expected
+
+    def test_no_time_bounds_non_admin(self):
+        data = self.get('/resources/resource-id/meters/volume.size/volume/sum',
+                        headers={"X-Roles": "Member",
+                                 "X-Tenant-Id": "project1"})
+        self.assertEqual(data, {'volume': 5 + 6 + 7})
+
+    def test_no_time_bounds_wrong_tenant(self):
+        data = self.get('/resources/resource-id/meters/volume.size/volume/sum',
+                        headers={"X-Roles": "Member",
+                                 "X-Tenant-Id": "?"})
+        self.assertEqual(data, {'volume': None})
 
     def test_start_timestamp(self):
         data = self.get('/resources/resource-id/meters/volume.size/volume/sum',

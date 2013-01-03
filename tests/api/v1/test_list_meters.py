@@ -3,6 +3,7 @@
 # Copyright 2012 Red Hat, Inc.
 #
 # Author: Angus Salkeld <asalkeld@redhat.com>
+#         Julien Danjou <julien@danjou.info>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -115,6 +116,18 @@ class TestListMeters(tests_api.TestBase):
                           set(['meter.test',
                                'meter.mine']))
 
+    def test_list_meters_non_admin(self):
+        data = self.get('/meters',
+                        headers={"X-Roles": "Member",
+                                 "X-Tenant-Id": "project-id"})
+        self.assertEquals(2, len(data['meters']))
+        self.assertEquals(set(r['resource_id'] for r in data['meters']),
+                          set(['resource-id',
+                               'resource-id2']))
+        self.assertEquals(set(r['name'] for r in data['meters']),
+                          set(['meter.test',
+                               'meter.mine']))
+
     def test_with_resource(self):
         data = self.get('/resources/resource-id/meters')
         ids = set(r['name'] for r in data['meters'])
@@ -126,6 +139,14 @@ class TestListMeters(tests_api.TestBase):
         self.assertEquals(set(['resource-id',
                                'resource-id2',
                                'resource-id3',
+                               'resource-id4']), ids)
+
+    def test_with_source_non_admin(self):
+        data = self.get('/sources/test_list_resources/meters',
+                        headers={"X-Roles": "Member",
+                                 "X-Tenant-Id": "project-id2"})
+        ids = set(r['resource_id'] for r in data['meters'])
+        self.assertEquals(set(['resource-id3',
                                'resource-id4']), ids)
 
     def test_with_source_non_existent(self):
@@ -141,6 +162,23 @@ class TestListMeters(tests_api.TestBase):
         rids = set(r['resource_id'] for r in data['meters'])
         self.assertEquals(set(['resource-id', 'resource-id2']), rids)
 
+    def test_with_user_non_admin(self):
+        data = self.get('/users/user-id/meters',
+                        headers={"X-Roles": "Member",
+                                 "X-Tenant-Id": "project-id"})
+        nids = set(r['name'] for r in data['meters'])
+        self.assertEquals(set(['meter.mine', 'meter.test']), nids)
+
+        rids = set(r['resource_id'] for r in data['meters'])
+        self.assertEquals(set(['resource-id', 'resource-id2']), rids)
+
+    def test_with_user_wrong_tenant(self):
+        data = self.get('/users/user-id/meters',
+                        headers={"X-Roles": "Member",
+                                 "X-Tenant-Id": "project666"})
+
+        self.assertEquals(data['meters'], [])
+
     def test_with_user_non_existent(self):
         data = self.get('/users/user-id-foobar123/meters')
         self.assertEquals(data['meters'], [])
@@ -150,6 +188,19 @@ class TestListMeters(tests_api.TestBase):
         ids = set(r['resource_id'] for r in data['meters'])
         self.assertEquals(set(['resource-id3', 'resource-id4']), ids)
 
+    def test_with_project_non_admin(self):
+        data = self.get('/projects/project-id2/meters',
+                        headers={"X-Roles": "Member",
+                                 "X-Tenant-Id": "project-id2"})
+        ids = set(r['resource_id'] for r in data['meters'])
+        self.assertEquals(set(['resource-id3', 'resource-id4']), ids)
+
+    def test_with_project_wrong_tenant(self):
+        data = self.get('/projects/project-id2/meters',
+                        headers={"X-Roles": "Member",
+                                 "X-Tenant-Id": "project-id"})
+        self.assertEqual(data.status_code, 404)
+
     def test_with_project_non_existent(self):
         data = self.get('/projects/jd-was-here/meters')
         self.assertEquals(data['meters'], [])
@@ -158,6 +209,30 @@ class TestListMeters(tests_api.TestBase):
         data = self.get('/meters?metadata.tag=self.counter')
         self.assertEquals(1, len(data['meters']))
 
+    def test_metaquery1_non_admin(self):
+        data = self.get('/meters?metadata.tag=self.counter',
+                        headers={"X-Roles": "Member",
+                                 "X-Tenant-Id": "project-id"})
+        self.assertEquals(1, len(data['meters']))
+
+    def test_metaquery1_wrong_tenant(self):
+        data = self.get('/meters?metadata.tag=self.counter',
+                        headers={"X-Roles": "Member",
+                                 "X-Tenant-Id": "project-666"})
+        self.assertEquals(0, len(data['meters']))
+
     def test_metaquery2(self):
         data = self.get('/meters?metadata.tag=four.counter')
         self.assertEquals(1, len(data['meters']))
+
+    def test_metaquery2_non_admin(self):
+        data = self.get('/meters?metadata.tag=four.counter',
+                        headers={"X-Roles": "Member",
+                                 "X-Tenant-Id": "project-id2"})
+        self.assertEquals(1, len(data['meters']))
+
+    def test_metaquery2_non_admin(self):
+        data = self.get('/meters?metadata.tag=four.counter',
+                        headers={"X-Roles": "Member",
+                                 "X-Tenant-Id": "project-666"})
+        self.assertEquals(0, len(data['meters']))

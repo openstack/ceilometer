@@ -17,7 +17,6 @@
 # under the License.
 """Set up the ACL to acces the API server."""
 
-import flask
 from ceilometer import policy
 
 import keystoneclient.middleware.auth_token as auth_token
@@ -37,14 +36,12 @@ def install(app, conf):
     app.wsgi_app = auth_token.AuthProtocol(app.wsgi_app,
                                            conf=conf,
                                           )
-    app.before_request(check)
     return app
 
 
-def check():
-    """Check application access."""
-    headers = flask.request.headers
+def get_limited_to_project(headers):
+    """Return the tenant the request should be limited to."""
     if not policy.check_is_admin(headers.get('X-Roles', "").split(","),
                                  headers.get('X-Tenant-Id'),
                                  headers.get('X-Tenant-Name')):
-        return "Access denied", 401
+        return headers.get('X-Tenant-Id')

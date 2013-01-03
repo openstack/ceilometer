@@ -60,6 +60,18 @@ class TestMaxResourceVolume(tests_api.TestBase):
         expected = {'volume': 7}
         assert data == expected
 
+    def test_no_time_bounds_non_admin(self):
+        data = self.get('/resources/resource-id/meters/volume.size/volume/max',
+                        headers={"X-Roles": "Member",
+                                 "X-Tenant-Id": "project1"})
+        self.assertEqual(data, {'volume': 7})
+
+    def test_no_time_bounds_wrong_tenant(self):
+        data = self.get('/resources/resource-id/meters/volume.size/volume/max',
+                        headers={"X-Roles": "Member",
+                                 "X-Tenant-Id": "??"})
+        self.assertEqual(data, {'volume': None})
+
     def test_start_timestamp(self):
         data = self.get('/resources/resource-id/meters/volume.size/volume/max',
                         start_timestamp='2012-09-25T11:30:00')

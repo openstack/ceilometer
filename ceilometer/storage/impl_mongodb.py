@@ -97,7 +97,7 @@ def make_query_from_filter(event_filter, require_meter=True):
 
     if event_filter.user:
         q['user_id'] = event_filter.user
-    elif event_filter.project:
+    if event_filter.project:
         q['project_id'] = event_filter.project
 
     if event_filter.meter:

@@ -3,6 +3,7 @@
 # Copyright © 2012 New Dream Network, LLC (DreamHost)
 #
 # Author: Doug Hellmann <doug.hellmann@dreamhost.com>
+#         Julien Danjou <julien@danjou.info>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -85,6 +86,18 @@ class TestListEvents(tests_api.TestBase):
         data = self.get('/projects/project1/meters/instance')
         self.assertEquals(2, len(data['events']))
 
+    def test_by_project_non_admin(self):
+        data = self.get('/projects/project1/meters/instance',
+                        headers={"X-Roles": "Member",
+                                 "X-Tenant-Id": "project1"})
+        self.assertEquals(2, len(data['events']))
+
+    def test_by_project_wrong_tenant(self):
+        resp = self.get('/projects/project1/meters/instance',
+                        headers={"X-Roles": "Member",
+                                 "X-Tenant-Id": "this-is-my-project"})
+        self.assertEquals(404, resp.status_code)
+
     def test_by_project_with_timestamps(self):
         data = self.get('/projects/project1/meters/instance',
                         start_timestamp=datetime.datetime(2012, 7, 2, 10, 42))
@@ -98,6 +111,18 @@ class TestListEvents(tests_api.TestBase):
         data = self.get('/resources/resource-id/meters/instance')
         self.assertEquals(2, len(data['events']))
 
+    def test_by_resource_non_admin(self):
+        data = self.get('/resources/resource-id-alternate/meters/instance',
+                                headers={"X-Roles": "Member",
+                                         "X-Tenant-Id": "project2"})
+        self.assertEquals(1, len(data['events']))
+
+    def test_by_resource_some_tenant(self):
+        data = self.get('/resources/resource-id/meters/instance',
+                                headers={"X-Roles": "Member",
+                                         "X-Tenant-Id": "project2"})
+        self.assertEquals(0, len(data['events']))
+
     def test_empty_source(self):
         data = self.get('/sources/no-such-source/meters/instance')
         self.assertEquals({'events': []}, data)
@@ -105,6 +130,12 @@ class TestListEvents(tests_api.TestBase):
     def test_by_source(self):
         data = self.get('/sources/source1/meters/instance')
         self.assertEquals(3, len(data['events']))
+
+    def test_by_source_non_admin(self):
+        data = self.get('/sources/source1/meters/instance',
+                        headers={"X-Roles": "Member",
+                                 "X-Tenant-Id": "project2"})
+        self.assertEquals(1, len(data['events']))
 
     def test_by_source_with_timestamps(self):
         data = self.get('/sources/source1/meters/instance',
@@ -119,6 +150,18 @@ class TestListEvents(tests_api.TestBase):
         data = self.get('/users/user-id/meters/instance')
         self.assertEquals(2, len(data['events']))
 
+    def test_by_user_non_admin(self):
+        data = self.get('/users/user-id/meters/instance',
+                        headers={"X-Roles": "Member",
+                                 "X-Tenant-Id": "project1"})
+        self.assertEquals(2, len(data['events']))
+
+    def test_by_user_wrong_tenant(self):
+        data = self.get('/users/user-id/meters/instance',
+                        headers={"X-Roles": "Member",
+                                 "X-Tenant-Id": "project2"})
+        self.assertEquals(0, len(data['events']))
+
     def test_by_user_with_timestamps(self):
         data = self.get('/users/user-id/meters/instance',
                         start_timestamp=datetime.datetime(2012, 7, 2, 10, 41),
@@ -130,12 +173,33 @@ class TestListEvents(tests_api.TestBase):
         data = self.get('%s?metadata.tag=self.counter2' % q)
         self.assertEquals(1, len(data['events']))
 
+    def test_metaquery1_wrong_tenant(self):
+        q = '/sources/source1/meters/instance'
+        data = self.get('%s?metadata.tag=self.counter2' % q,
+                        headers={"X-Roles": "Member",
+                                 "X-Tenant-Id": "project1"})
+        self.assertEquals(0, len(data['events']))
+
     def test_metaquery2(self):
         q = '/sources/source1/meters/instance'
         data = self.get('%s?metadata.tag=self.counter' % q)
+        self.assertEquals(2, len(data['events']))
+
+    def test_metaquery2_non_admin(self):
+        q = '/sources/source1/meters/instance'
+        data = self.get('%s?metadata.tag=self.counter' % q,
+                        headers={"X-Roles": "Member",
+                                 "X-Tenant-Id": "project1"})
         self.assertEquals(2, len(data['events']))
 
     def test_metaquery3(self):
         q = '/sources/source1/meters/instance'
         data = self.get('%s?metadata.display_name=test-server' % q)
         self.assertEquals(3, len(data['events']))
+
+    def test_metaquery3_with_project(self):
+        q = '/sources/source1/meters/instance'
+        data = self.get('%s?metadata.display_name=test-server' % q,
+                    headers={"X-Roles": "Member",
+                             "X-Tenant-Id": "project2"})
+        self.assertEquals(1, len(data['events']))
