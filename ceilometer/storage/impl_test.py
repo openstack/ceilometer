@@ -36,27 +36,27 @@ class TestDBStorage(base.StorageEngine):
 
     This driver is based on MIM, an in-memory version of MongoDB.
 
-    Collections:
+    Collections::
 
-    - user
-      - { _id: user id
-          source: [ array of source ids reporting for the user ]
-          }
-    - project
-      - { _id: project id
-          source: [ array of source ids reporting for the project ]
-          }
-    - meter
-      - the raw incoming data
-    - resource
-      - the metadata for resources
-      - { _id: uuid of resource,
-          metadata: metadata dictionaries
-          timestamp: datetime of last update
-          user_id: uuid
-          project_id: uuid
-          meter: [ array of {counter_name: string, counter_type: string} ]
-        }
+        - user
+          - { _id: user id
+              source: [ array of source ids reporting for the user ]
+              }
+        - project
+          - { _id: project id
+              source: [ array of source ids reporting for the project ]
+              }
+        - meter
+          - the raw incoming data
+        - resource
+          - the metadata for resources
+          - { _id: uuid of resource,
+              metadata: metadata dictionaries
+              timestamp: datetime of last update
+              user_id: uuid
+              project_id: uuid
+              meter: [ array of {counter_name: string, counter_type: string} ]
+            }
     """
 
     OPTIONS = []

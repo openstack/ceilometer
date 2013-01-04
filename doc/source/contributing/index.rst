@@ -24,3 +24,4 @@
    areas
    source
    plugins
+   ../api/index
