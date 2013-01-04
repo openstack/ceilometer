@@ -26,8 +26,14 @@ from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import timeutils
 
-from swift.common.swob import Request
 from swift.common.utils import split_path
+
+try:
+    # Swift >= 1.7.5
+    from swift.common.swob import Request
+except ImportError:
+    from webob import Request
+
 try:
     # Swift > 1.7.5
     from swift.common.utils import InputProxy
