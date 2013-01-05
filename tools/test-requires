@@ -26,3 +26,7 @@ pecan
 swift
 # Swift dep that is not necessary if we depend on swift>1.7.5
 netifaces
+
+# Docs Requirements
+sphinx
+docutils==0.9.1 # for bug 1091333, remove after sphinx >1.1.3 is released.

@@ -164,11 +164,21 @@ class TestNovaNotifier(base.TestCase):
             # the nova manager and the remote system since we can't
             # expect the message bus to be available, or the remote
             # controller to be there if the message bus is online.
-            self.stubs.Set(nova.conductor.api.API, 'instance_get_by_uuid',
-            self.fake_db_instance_get)
-            with mock.patch('nova.conductor.api.API.instance_update'):
+            @mock.patch.object(nova.conductor.api.API,
+                               'block_device_mapping_get_all_by_instance',
+                               lambda obj, context, instance: {})
+            @mock.patch.object(nova.conductor.api.API,
+                               'instance_get_by_uuid',
+                               self.fake_db_instance_get)
+            @mock.patch('nova.conductor.api.API.instance_info_cache_delete')
+            @mock.patch('nova.conductor.api.API.instance_destroy')
+            @mock.patch('nova.conductor.api.API.block_device_mapping_destroy')
+            @mock.patch('nova.conductor.api.API.instance_update')
+            def run_test(*omit_args):
                 self.compute.terminate_instance(self.context,
                                                 instance=self.instance)
+
+            run_test()
 
         self.assertTrue(self.Pollster.counters)
         self.assertTrue(self.Pollster.counters[0])
