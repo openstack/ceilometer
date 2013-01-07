@@ -49,6 +49,8 @@ class _Base(plugin.NotificationBase):
         return ['compute.instance.create.end',
                 'compute.instance.exists',
                 'compute.instance.delete.start',
+                'compute.instance.finish_resize.end',
+                'compute.instance.resize.revert.end',
         ]
 
     @staticmethod
