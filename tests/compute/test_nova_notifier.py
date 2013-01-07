@@ -23,6 +23,7 @@ import datetime
 
 from stevedore import extension
 from stevedore.tests import manager as test_manager
+from ceilometer.compute import manager
 
 try:
     from nova import config
@@ -130,9 +131,8 @@ class TestNovaNotifier(base.TestCase):
                                                       self.instance))
 
         self.stubs.Set(publish, 'publish_counter', self.do_nothing)
-        nova_notifier._initialize_config_options = False
-        nova_notifier.initialize_manager()
-        nova_notifier._agent_manager.ext_manager = \
+        agent_manager = manager.AgentManager()
+        agent_manager.ext_manager = \
             test_manager.TestExtensionManager([
                 extension.Extension('test',
                                     None,
@@ -140,10 +140,12 @@ class TestNovaNotifier(base.TestCase):
                                     self.Pollster(),
                                     ),
                 ])
+        nova_notifier.initialize_manager(agent_manager)
 
     def tearDown(self):
         self.Pollster.counters = []
         super(TestNovaNotifier, self).tearDown()
+        nova_notifier._agent_manager = None
 
     def test_notifications(self):
         # Folsom compatibility check
