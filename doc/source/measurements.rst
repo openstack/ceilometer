@@ -129,6 +129,16 @@ storage.objects.incoming.bytes  Delta                B  store ID  Number of inco
 storage.objects.outgoing.bytes  Delta                B  store ID  Number of outgoing bytes
 ==============================  ==========  ==========  ========  ==============================================
 
+Energy (Kwapi)
+======================
+
+==========================      ==========  ==========  ========  ==============================================
+Name                            Type        Volume      Resource  Note
+==========================      ==========  ==========  ========  ==============================================
+energy                          Cumulative         kWh  probe ID  Amount of energy
+power                           Gauge                W  probe ID  Power consumption
+==============================  ==========  ==========  ========  ==============================================
+
 Dynamically retrieving the Meters via ceilometer client
 =======================================================
     ceilometer meter-list -s openstack
