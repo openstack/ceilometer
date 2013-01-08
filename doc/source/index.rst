@@ -53,7 +53,6 @@ Table of contents
    webapi/index
    contributing/index
    releasenotes/index
-   api/index
    glossary
 
 .. - installation

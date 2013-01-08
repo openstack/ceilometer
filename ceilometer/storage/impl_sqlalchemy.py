@@ -33,45 +33,45 @@ LOG = log.getLogger(__name__)
 class SQLAlchemyStorage(base.StorageEngine):
     """Put the data into a SQLAlchemy database
 
-    Tables:
+    Tables::
 
-    - user
-      - { id: user uuid }
-    - source
-      - { id: source id }
-    - project
-      - { id: project uuid }
-    - meter
-      - the raw incoming data
-      - { id: meter id
-          counter_name: counter name
-          user_id: user uuid            (->user.id)
-          project_id: project uuid      (->project.id)
-          resource_id: resource uuid    (->resource.id)
-          resource_metadata: metadata dictionaries
-          counter_type: counter type
-          counter_volume: counter volume
-          timestamp: datetime
-          message_signature: message signature
-          message_id: message uuid
-          }
-    - resource
-      - the metadata for resources
-      - { id: resource uuid
-          resource_metadata: metadata dictionaries
-          received_timestamp: received datetime
-          timestamp: datetime
-          project_id: project uuid      (->project.id)
-          user_id: user uuid            (->user.id)
-          }
-    - sourceassoc
-      - the relationships
-      - { meter_id: meter id            (->meter.id)
-          project_id: project uuid      (->project.id)
-          resource_id: resource uuid    (->resource.id)
-          user_id: user uuid            (->user.id)
-          source_id: source id          (->source.id)
-          }
+        - user
+          - { id: user uuid }
+        - source
+          - { id: source id }
+        - project
+          - { id: project uuid }
+        - meter
+          - the raw incoming data
+          - { id: meter id
+              counter_name: counter name
+              user_id: user uuid            (->user.id)
+              project_id: project uuid      (->project.id)
+              resource_id: resource uuid    (->resource.id)
+              resource_metadata: metadata dictionaries
+              counter_type: counter type
+              counter_volume: counter volume
+              timestamp: datetime
+              message_signature: message signature
+              message_id: message uuid
+              }
+        - resource
+          - the metadata for resources
+          - { id: resource uuid
+              resource_metadata: metadata dictionaries
+              received_timestamp: received datetime
+              timestamp: datetime
+              project_id: project uuid      (->project.id)
+              user_id: user uuid            (->user.id)
+              }
+        - sourceassoc
+          - the relationships
+          - { meter_id: meter id            (->meter.id)
+              project_id: project uuid      (->project.id)
+              resource_id: resource uuid    (->resource.id)
+              user_id: user uuid            (->user.id)
+              source_id: source id          (->source.id)
+              }
     """
 
     OPTIONS = []
