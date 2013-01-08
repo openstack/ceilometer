@@ -49,7 +49,5 @@ class AdminAuthHook(hooks.PecanHook):
 
     def before(self, state):
         headers = state.request.headers
-        if not policy.check_is_admin(headers.get('X-Roles', "").split(","),
-                                     headers.get('X-Tenant-Id'),
-                                     headers.get('X-Tenant-Name')):
+        if not policy.check_is_admin(headers.get('X-Roles', "").split(",")):
             raise exc.HTTPUnauthorized()

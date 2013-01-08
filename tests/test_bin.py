@@ -19,10 +19,21 @@
 
 import subprocess
 import unittest
+import tempfile
+import os
 
 
 class BinDbsyncTestCase(unittest.TestCase):
+    def setUp(self):
+        self.tempfile = tempfile.mktemp()
+        with open(self.tempfile, 'w') as tmp:
+            tmp.write("[DEFAULT]\n")
+            tmp.write("database_connection=log://localhost\n")
+
     def test_dbsync_run(self):
         subp = subprocess.Popen(["../bin/ceilometer-dbsync",
-                                "--database_connection=log://localhost"])
+                                 "--config-file=%s" % self.tempfile])
         self.assertEqual(subp.wait(), 0)
+
+    def tearDown(self):
+        os.unlink(self.tempfile)

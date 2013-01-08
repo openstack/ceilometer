@@ -22,7 +22,5 @@ from ceilometer import policy
 
 def get_limited_to_project(headers):
     """Return the tenant the request should be limited to."""
-    if not policy.check_is_admin(headers.get('X-Roles', "").split(","),
-                                 headers.get('X-Tenant-Id'),
-                                 headers.get('X-Tenant-Name')):
+    if not policy.check_is_admin(headers.get('X-Roles', "").split(",")):
         return headers.get('X-Tenant-Id')
