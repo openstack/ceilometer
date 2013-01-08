@@ -60,4 +60,6 @@ def notify(context, message):
         instance_id = message['payload']['instance_id']
         LOG.debug('polling final stats for %r', instance_id)
         _agent_manager.poll_instance(context,
-            instance_info_source.instance_get_by_uuid(context, instance_id))
+                                     instance_info_source.instance_get_by_uuid(
+                                         context,
+                                         instance_id))

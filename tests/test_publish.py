@@ -38,9 +38,8 @@ class TestPublish(base.TestCase):
         project_id='test',
         resource_id='test_run_tasks',
         timestamp=datetime.datetime.utcnow().isoformat(),
-        resource_metadata={'name': 'TestPublish',
-                           },
-        )
+        resource_metadata={'name': 'TestPublish'},
+    )
 
     def faux_notify(self, context, topic, msg):
         self.notifications.append((topic, msg))

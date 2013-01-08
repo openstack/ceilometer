@@ -46,7 +46,7 @@ class DateRangeTest(unittest.TestCase):
             'query_start': datetime.datetime(2012, 9, 20, 12, 13, 14),
             'query_end': None,
             'search_offset': 0,
-            }
+        }
 
         assert result == expected
 
@@ -59,7 +59,7 @@ class DateRangeTest(unittest.TestCase):
             'query_end': datetime.datetime(2012, 9, 20, 12, 13, 14),
             'query_start': None,
             'search_offset': 0,
-            }
+        }
 
         assert result == expected
 
@@ -68,13 +68,13 @@ class DateRangeTest(unittest.TestCase):
             end=datetime.datetime(2012, 9, 20, 13, 24, 25),
             start=datetime.datetime(2012, 9, 20, 12, 13, 14),
             search_offset=20,
-            ).to_dict()
+        ).to_dict()
         expected = {
             'query_end': datetime.datetime(2012, 9, 20, 13, 44, 25),
             'query_start': datetime.datetime(2012, 9, 20, 11, 53, 14),
             'end_timestamp': datetime.datetime(2012, 9, 20, 13, 24, 25),
             'start_timestamp': datetime.datetime(2012, 9, 20, 12, 13, 14),
             'search_offset': 20,
-            }
+        }
 
         assert result == expected

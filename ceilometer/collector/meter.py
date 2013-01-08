@@ -33,7 +33,7 @@ METER_OPTS = [
                default='openstack',
                help='Source for counters emited on this instance',
                ),
-    ]
+]
 
 
 def register_opts(config):

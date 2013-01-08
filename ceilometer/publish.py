@@ -33,7 +33,7 @@ PUBLISH_OPTS = [
     cfg.StrOpt('control_exchange',
                default='ceilometer',
                help='AMQP exchange to connect to if using RabbitMQ or Qpid'),
-    ]
+]
 
 
 def register_opts(config):
@@ -59,7 +59,7 @@ def publish_counter(context, counter, topic, secret, source):
                                                           secret,
                                                           source),
                  },
-        }
+    }
     LOG.debug('PUBLISH: %s', str(msg))
     rpc.cast(context, topic, msg)
     rpc.cast(context, topic + '.' + counter.name, msg)

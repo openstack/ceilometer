@@ -33,8 +33,7 @@ INSTANCE_PROPERTIES = [
     'ephemeral_gb',
     'memory_mb',
     'root_gb',
-    'vcpus',
-    ]
+    'vcpus']
 
 
 def get_metadata_from_object(instance):
@@ -48,8 +47,8 @@ def get_metadata_from_object(instance):
         # Image properties
         'image_ref': (instance.image['id'] if instance.image else None),
         'image_ref_url': (instance.image['links'][0]['href']
-                            if instance.image else None),
-        }
+                          if instance.image else None),
+    }
 
     for name in INSTANCE_PROPERTIES:
         metadata[name] = getattr(instance, name, u'')

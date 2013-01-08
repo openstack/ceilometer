@@ -105,7 +105,7 @@ def request_wants_html():
 def _get_metaquery(args):
     return dict((k, v)
                 for (k, v) in args.iteritems()
-                    if k.startswith('metadata.'))
+                if k.startswith('metadata.'))
 
 
 def check_authorized_project(project):
@@ -204,7 +204,7 @@ def _list_resources(source=None, user=None, project=None):
         start_timestamp=q_ts['start_timestamp'],
         end_timestamp=q_ts['end_timestamp'],
         metaquery=_get_metaquery(rq.args),
-        )
+    )
     return flask.jsonify(resources=list(resources))
 
 
@@ -371,14 +371,15 @@ def _list_events(meter,
     """Return a list of raw metering events.
     """
     q_ts = _get_query_timestamps(flask.request.args)
-    f = storage.EventFilter(user=user,
-                            project=project,
-                            source=source,
-                            meter=meter,
-                            resource=resource,
-                            start=q_ts['start_timestamp'],
-                            end=q_ts['end_timestamp'],
-                            metaquery=_get_metaquery(flask.request.args),
+    f = storage.EventFilter(
+        user=user,
+        project=project,
+        source=source,
+        meter=meter,
+        resource=resource,
+        start=q_ts['start_timestamp'],
+        end=q_ts['end_timestamp'],
+        metaquery=_get_metaquery(flask.request.args),
     )
     events = list(flask.request.storage_conn.get_raw_events(f))
     jsonified = flask.jsonify(events=events)

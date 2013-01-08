@@ -46,7 +46,7 @@ def make_counter_from_instance(instance, name, type, unit, volume):
         resource_id=instance.id,
         timestamp=timeutils.isotime(),
         resource_metadata=compute_instance.get_metadata_from_object(instance),
-        )
+    )
 
 
 class InstancePollster(plugin.ComputePollster):
@@ -56,15 +56,13 @@ class InstancePollster(plugin.ComputePollster):
                                          name='instance',
                                          type=counter.TYPE_GAUGE,
                                          unit='instance',
-                                         volume=1,
-        )
+                                         volume=1)
         yield make_counter_from_instance(instance,
                                          name='instance:%s' %
                                          instance.flavor['name'],
                                          type=counter.TYPE_GAUGE,
                                          unit='instance',
-                                         volume=1,
-        )
+                                         volume=1)
 
 
 class DiskIOPollster(plugin.ComputePollster):
@@ -194,8 +192,8 @@ class NetPollster(plugin.ComputePollster):
         metadata = copy.copy(vnic_data)
         resource_metadata = dict(zip(metadata._fields, metadata))
         resource_metadata['instance_id'] = instance.id
-        resource_metadata['instance_type'] = instance.flavor['id'] if   \
-                        instance.flavor else None,
+        resource_metadata['instance_type'] = \
+            instance.flavor['id'] if instance.flavor else None,
 
         return counter.Counter(
             name=name,

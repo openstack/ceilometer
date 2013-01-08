@@ -106,7 +106,7 @@ class SQLAlchemyEngineTestBase(SQLAlchemyEngineSubBase):
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter',
                                }
-            )
+        )
         self.msg1 = meter.meter_message_from_counter(self.counter,
                                                      cfg.CONF.metering_secret,
                                                      'test-1',
@@ -125,7 +125,7 @@ class SQLAlchemyEngineTestBase(SQLAlchemyEngineSubBase):
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter2',
                                }
-            )
+        )
         self.msg2 = meter.meter_message_from_counter(self.counter2,
                                                      cfg.CONF.metering_secret,
                                                      'test-2',
@@ -144,7 +144,7 @@ class SQLAlchemyEngineTestBase(SQLAlchemyEngineSubBase):
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter3',
                                }
-            )
+        )
         self.msg3 = meter.meter_message_from_counter(self.counter3,
                                                      cfg.CONF.metering_secret,
                                                      'test-3',
@@ -162,9 +162,8 @@ class SQLAlchemyEngineTestBase(SQLAlchemyEngineSubBase):
                 resource_id='resource-id-%s' % i,
                 timestamp=datetime.datetime(2012, 7, 2, 10, 40 + i),
                 resource_metadata={'display_name': 'test-server',
-                                   'tag': 'counter-%s' % i,
-                                  }
-                )
+                                   'tag': 'counter-%s' % i},
+            )
             msg = meter.meter_message_from_counter(c, cfg.CONF.metering_secret,
                                                    'test')
             self.conn.record_metering_data(msg)
@@ -230,8 +229,8 @@ class ResourceTest(SQLAlchemyEngineTestBase):
 
     def test_new_resource_meter(self):
         resource = self.session.query(Resource).filter_by(id='resource-id').\
-                       filter(Meter.counter_name == 'instance').\
-                       filter(Meter.counter_type == 'cumulative').first()
+            filter(Meter.counter_name == 'instance').\
+            filter(Meter.counter_type == 'cumulative').first()
         assert len(set(resource.meters)) == 1
         foo = map(lambda x: [x.counter_name, x.counter_type], resource.meters)
         assert ['instance', 'cumulative'] in foo
@@ -278,8 +277,7 @@ class ResourceTest(SQLAlchemyEngineTestBase):
         start_ts = datetime.datetime(2012, 7, 2, 10, 42)
         end_ts = datetime.datetime(2012, 7, 2, 10, 43)
         resources = list(self.conn.get_resources(start_timestamp=start_ts,
-                                                 end_timestamp=end_ts)
-                        )
+                                                 end_timestamp=end_ts))
         resource_ids = [r['resource_id'] for r in resources]
         assert set(resource_ids) == set(['resource-id-2'])
 
@@ -396,7 +394,7 @@ class MeterTest(SQLAlchemyEngineTestBase):
         f = storage.EventFilter(
             user='user-id',
             start=datetime.datetime(2012, 7, 2, 10, 41),
-            )
+        )
         results = list(self.conn.get_raw_events(f))
         assert len(results) == 1
         assert results[0]['timestamp'] == datetime.datetime(2012, 7, 2, 10, 41)
@@ -405,7 +403,7 @@ class MeterTest(SQLAlchemyEngineTestBase):
         f = storage.EventFilter(
             user='user-id',
             end=datetime.datetime(2012, 7, 2, 10, 41),
-            )
+        )
         results = list(self.conn.get_raw_events(f))
         length = len(results)
         assert length == 1
@@ -415,7 +413,7 @@ class MeterTest(SQLAlchemyEngineTestBase):
         f = storage.EventFilter(
             start=datetime.datetime(2012, 7, 2, 10, 42),
             end=datetime.datetime(2012, 7, 2, 10, 43),
-            )
+        )
         results = list(self.conn.get_raw_events(f))
         length = len(results)
         assert length == 1
@@ -463,7 +461,7 @@ class TestGetEventInterval(SQLAlchemyEngineTestBase):
             meter='instance',
             start=self.start,
             end=self.end,
-            )
+        )
 
     def _make_events(self, *timestamps):
         for t in timestamps:
@@ -478,7 +476,7 @@ class TestGetEventInterval(SQLAlchemyEngineTestBase):
                 timestamp=t,
                 resource_metadata={'display_name': 'test-server',
                                    }
-                )
+            )
             msg = meter.meter_message_from_counter(c, cfg.CONF.metering_secret,
                                                    'test')
             self.conn.record_metering_data(msg)
@@ -542,7 +540,7 @@ class SumTest(SQLAlchemyEngineTestBase):
         f = storage.EventFilter(
             user='user-id',
             meter='instance',
-            )
+        )
         results = list(self.conn.get_volume_sum(f))
         counts = dict((r['resource_id'], r['value'])
                       for r in results)
@@ -555,7 +553,7 @@ class SumTest(SQLAlchemyEngineTestBase):
         f = storage.EventFilter(
             project='project-id',
             meter='instance',
-            )
+        )
         results = list(self.conn.get_volume_sum(f))
         assert results
         counts = dict((r['resource_id'], r['value'])
@@ -570,7 +568,7 @@ class SumTest(SQLAlchemyEngineTestBase):
             user='user-id',
             meter='instance',
             resource='resource-id',
-            )
+        )
         results = list(self.conn.get_volume_sum(f))
         assert results
         counts = dict((r['resource_id'], r['value'])
@@ -598,7 +596,7 @@ class MaxProjectTest(SQLAlchemyEngineSubBase):
                 resource_metadata={'display_name': 'test-volume',
                                    'tag': 'self.counter',
                                    }
-                )
+            )
             self.counters.append(c)
             msg = meter.meter_message_from_counter(c,
                                                    cfg.CONF.metering_secret,
@@ -677,7 +675,7 @@ class MaxResourceTest(SQLAlchemyEngineSubBase):
                 resource_metadata={'display_name': 'test-volume',
                                    'tag': 'self.counter',
                                    }
-                )
+            )
             self.counters.append(c)
             msg = meter.meter_message_from_counter(c,
                                                    cfg.CONF.metering_secret,

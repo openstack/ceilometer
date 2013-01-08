@@ -136,4 +136,4 @@ setuptools.setup(
     [paste.filter_factory]
     swift=ceilometer.objectstore.swift_middleware:filter_factory
     """),
-    )
+)

@@ -145,7 +145,7 @@ TEST_NOTICE = {
     u'priority': u'INFO',
     u'publisher_id': u'compute.vagrant-precise',
     u'timestamp': u'2012-05-08 20:23:48.028195',
-    }
+}
 
 
 def test_meter_message_from_counter_signed():

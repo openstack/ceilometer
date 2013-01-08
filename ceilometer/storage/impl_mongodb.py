@@ -193,17 +193,16 @@ class Connection(base.Connection):
         # including both.
         for primary in ['user_id', 'project_id']:
             self.db.resource.ensure_index([
-                    (primary, pymongo.ASCENDING),
-                    ('source', pymongo.ASCENDING),
-                    ], name='resource_idx')
+                (primary, pymongo.ASCENDING),
+                ('source', pymongo.ASCENDING),
+            ], name='resource_idx')
             self.db.meter.ensure_index([
-                    ('resource_id', pymongo.ASCENDING),
-                    (primary, pymongo.ASCENDING),
-                    ('counter_name', pymongo.ASCENDING),
-                    ('timestamp', pymongo.ASCENDING),
-                    ('source', pymongo.ASCENDING),
-                    ], name='meter_idx')
-        return
+                ('resource_id', pymongo.ASCENDING),
+                (primary, pymongo.ASCENDING),
+                ('counter_name', pymongo.ASCENDING),
+                ('timestamp', pymongo.ASCENDING),
+                ('source', pymongo.ASCENDING),
+            ], name='meter_idx')
 
     def upgrade(self, version=None):
         pass
@@ -249,14 +248,14 @@ class Connection(base.Connection):
                            },
              },
             upsert=True,
-            )
+        )
         self.db.project.update(
             {'_id': data['project_id']},
             {'$addToSet': {'source': data['source'],
                            },
              },
             upsert=True,
-            )
+        )
 
         # Record the updated resource metadata
         received_timestamp = datetime.datetime.utcnow()
@@ -278,7 +277,7 @@ class Connection(base.Connection):
                            },
              },
             upsert=True,
-            )
+        )
 
         # Record the raw data for the event. Use a copy so we do not
         # modify a data structure owned by our caller (the driver adds

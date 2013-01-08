@@ -50,25 +50,24 @@ class TestLocationMetadata(unittest.TestCase):
 
         # Mimics an instance returned from nova api call
         self.INSTANCE_PROPERTIES = {'name': 'display name',
-                           'OS-EXT-SRV-ATTR:instance_name': 'instance-000001',
-                           'reservation_id': 'reservation id',
-                           'architecture': 'x86_64',
-                           'availability_zone': 'zone1',
-                           'kernel_id': 'kernel id',
-                           'os_type': 'linux',
-                           'ramdisk_id': 'ramdisk id',
-                           'disk_gb': 10,
-                           'ephemeral_gb': 7,
-                           'memory_mb': 2048,
-                           'root_gb': 3,
-                           'vcpus': 1,
-                           'image': {'id': 1,
-                                     'links': [{"rel": "bookmark",
-                                                'href': 2}],
-                                    },
-                           'flavor': {'id': 1},
-                           'hostId': '1234-5678',
-                           }
+                                    'OS-EXT-SRV-ATTR:instance_name':
+                                    'instance-000001',
+                                    'reservation_id': 'reservation id',
+                                    'architecture': 'x86_64',
+                                    'availability_zone': 'zone1',
+                                    'kernel_id': 'kernel id',
+                                    'os_type': 'linux',
+                                    'ramdisk_id': 'ramdisk id',
+                                    'disk_gb': 10,
+                                    'ephemeral_gb': 7,
+                                    'memory_mb': 2048,
+                                    'root_gb': 3,
+                                    'vcpus': 1,
+                                    'image': {'id': 1,
+                                              'links': [{"rel": "bookmark",
+                                                         'href': 2}]},
+                                    'flavor': {'id': 1},
+                                    'hostId': '1234-5678'}
 
         self.instance = FauxInstance(**self.INSTANCE_PROPERTIES)
         self.instance.host = 'made-up-hostname'
@@ -101,5 +100,5 @@ class TestLocationMetadata(unittest.TestCase):
         self.INSTANCE_PROPERTIES['image'] = ''
         self.instance = FauxInstance(**self.INSTANCE_PROPERTIES)
         md = instance.get_metadata_from_object(self.instance)
-        assert md['image_ref'] == None
-        assert md['image_ref_url'] == None
+        self.assertEqual(md['image_ref'], None)
+        self.assertEqual(md['image_ref_url'], None)

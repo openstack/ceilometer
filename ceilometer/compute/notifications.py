@@ -50,8 +50,7 @@ class _Base(plugin.NotificationBase):
                 'compute.instance.exists',
                 'compute.instance.delete.start',
                 'compute.instance.finish_resize.end',
-                'compute.instance.resize.revert.end',
-        ]
+                'compute.instance.resize.revert.end']
 
     @staticmethod
     def get_exchange_topics(conf):
@@ -80,7 +79,7 @@ class Instance(_Base):
                             resource_metadata=self.notification_to_metadata(
                                 message),
                             ),
-            ]
+        ]
 
 
 class Memory(_Base):
@@ -96,9 +95,8 @@ class Memory(_Base):
                             resource_id=message['payload']['instance_id'],
                             timestamp=message['timestamp'],
                             resource_metadata=self.notification_to_metadata(
-                                message),
-                        ),
-            ]
+                                message)),
+        ]
 
 
 class VCpus(_Base):
@@ -114,9 +112,8 @@ class VCpus(_Base):
                             resource_id=message['payload']['instance_id'],
                             timestamp=message['timestamp'],
                             resource_metadata=self.notification_to_metadata(
-                                message),
-                        ),
-            ]
+                                message)),
+        ]
 
 
 class RootDiskSize(_Base):
@@ -132,9 +129,8 @@ class RootDiskSize(_Base):
                             resource_id=message['payload']['instance_id'],
                             timestamp=message['timestamp'],
                             resource_metadata=self.notification_to_metadata(
-                                message),
-                        ),
-            ]
+                                message)),
+        ]
 
 
 class EphemeralDiskSize(_Base):
@@ -150,9 +146,8 @@ class EphemeralDiskSize(_Base):
                             resource_id=message['payload']['instance_id'],
                             timestamp=message['timestamp'],
                             resource_metadata=self.notification_to_metadata(
-                                message),
-                        ),
-            ]
+                                message)),
+        ]
 
 
 class InstanceFlavor(_Base):

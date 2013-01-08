@@ -69,11 +69,11 @@ class TestDiskIOPollster(TestPollsterBase):
 
     def test_get_counters(self):
         disks = [
-                 (virt_inspector.Disk(device='vda'),
-                  virt_inspector.DiskStats(read_bytes=1L, read_requests=2L,
-                                           write_bytes=3L, write_requests=4L,
-                                           errors=-1L))
-                ]
+            (virt_inspector.Disk(device='vda'),
+             virt_inspector.DiskStats(read_bytes=1L, read_requests=2L,
+                                      write_bytes=3L, write_requests=4L,
+                                      errors=-1L))
+        ]
         self.inspector.inspect_disks(self.instance.name).AndReturn(disks)
         self.mox.ReplayAll()
 
@@ -100,22 +100,24 @@ class TestNetPollster(TestPollsterBase):
         super(TestNetPollster, self).setUp()
 
     def test_get_counters(self):
-        vnic0 = virt_inspector.Interface(name='vnet0',
-                                         fref='fa163e71ec6e',
-                                         mac='fa:16:3e:71:ec:6d',
-                                         parameters=dict(ip='10.0.0.2',
-                                                     projmask='255.255.255.0',
-                                                     projnet='proj1',
-                                                     dhcp_server='10.0.0.1'))
+        vnic0 = virt_inspector.Interface(
+            name='vnet0',
+            fref='fa163e71ec6e',
+            mac='fa:16:3e:71:ec:6d',
+            parameters=dict(ip='10.0.0.2',
+                            projmask='255.255.255.0',
+                            projnet='proj1',
+                            dhcp_server='10.0.0.1'))
         stats0 = virt_inspector.InterfaceStats(rx_bytes=1L, rx_packets=2L,
                                                tx_bytes=3L, tx_packets=4L)
-        vnic1 = virt_inspector.Interface(name='vnet1',
-                                         fref='fa163e71ec6f',
-                                         mac='fa:16:3e:71:ec:6e',
-                                         parameters=dict(ip='192.168.0.3',
-                                                     projmask='255.255.255.0',
-                                                     projnet='proj2',
-                                                     dhcp_server='10.0.0.2'))
+        vnic1 = virt_inspector.Interface(
+            name='vnet1',
+            fref='fa163e71ec6f',
+            mac='fa:16:3e:71:ec:6e',
+            parameters=dict(ip='192.168.0.3',
+                            projmask='255.255.255.0',
+                            projnet='proj2',
+                            dhcp_server='10.0.0.2'))
         stats1 = virt_inspector.InterfaceStats(rx_bytes=5L, rx_packets=6L,
                                                tx_bytes=7L, tx_packets=8L)
         vnics = [(vnic0, stats0), (vnic1, stats1)]

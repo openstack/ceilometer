@@ -36,17 +36,17 @@ class TestComputeDurationByResource(FunctionalTest):
         # Create events relative to the range and pretend
         # that the intervening events exist.
 
-        self.early1 = datetime.datetime(2012, 8, 27,  7, 0)
+        self.early1 = datetime.datetime(2012, 8, 27, 7, 0)
         self.early2 = datetime.datetime(2012, 8, 27, 17, 0)
 
         self.start = datetime.datetime(2012, 8, 28, 0, 0)
 
-        self.middle1 = datetime.datetime(2012, 8, 28,  8, 0)
+        self.middle1 = datetime.datetime(2012, 8, 28, 8, 0)
         self.middle2 = datetime.datetime(2012, 8, 28, 18, 0)
 
         self.end = datetime.datetime(2012, 8, 28, 23, 59)
 
-        self.late1 = datetime.datetime(2012, 8, 29,  9, 0)
+        self.late1 = datetime.datetime(2012, 8, 29, 9, 0)
         self.late2 = datetime.datetime(2012, 8, 29, 19, 0)
 
     def _stub_interval_func(self, func):

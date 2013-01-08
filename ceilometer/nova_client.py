@@ -61,8 +61,8 @@ class Client(object):
         """Returns list of instances on particular host"""
         search_opts = {'host': hostname, 'all_tenants': True}
         return self._with_flavor(self.nova_client.servers.list(
-                                                  detailed=True,
-                                                  search_opts=search_opts))
+            detailed=True,
+            search_opts=search_opts))
 
     @logged
     def floating_ip_get_all(self):

@@ -1,6 +1,5 @@
 nose
 coverage
-pep8>=1.0
 mock
 mox
 Babel>=0.9.6

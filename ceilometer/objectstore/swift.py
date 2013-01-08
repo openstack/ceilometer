@@ -36,8 +36,8 @@ LOG = log.getLogger(__name__)
 OPTS = [
     cfg.StrOpt('reseller_prefix',
                default='AUTH_',
-               help="Swift reseller prefix. Must be on par with "\
-                   "reseller_prefix in proxy-server.conf."),
+               help="Swift reseller prefix. Must be on par with "
+               "reseller_prefix in proxy-server.conf."),
 ]
 
 cfg.CONF.register_opts(OPTS)

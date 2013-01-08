@@ -32,5 +32,5 @@ API_SERVICE_OPTS = [
                default=8777,
                help='The port for the ceilometer API server',
                ),
-    ]
+]
 cfg.CONF.register_opts(API_SERVICE_OPTS)

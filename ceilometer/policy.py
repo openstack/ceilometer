@@ -31,7 +31,7 @@ OPTS = [
     cfg.StrOpt('policy_default_rule',
                default='default',
                help='Rule checked when requested rule is not found'),
-    ]
+]
 
 cfg.CONF.register_opts(OPTS)
 

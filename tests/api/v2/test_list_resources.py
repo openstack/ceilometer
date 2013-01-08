@@ -51,7 +51,7 @@ class TestListResources(FunctionalTest):
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter',
                                }
-            )
+        )
         msg = meter.meter_message_from_counter(counter1,
                                                cfg.CONF.metering_secret,
                                                'test',
@@ -70,7 +70,7 @@ class TestListResources(FunctionalTest):
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter2',
                                }
-            )
+        )
         msg2 = meter.meter_message_from_counter(counter2,
                                                 cfg.CONF.metering_secret,
                                                 'test',
@@ -93,7 +93,7 @@ class TestListResources(FunctionalTest):
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter',
                                }
-            )
+        )
         msg = meter.meter_message_from_counter(counter1,
                                                cfg.CONF.metering_secret,
                                                'test_list_resources',
@@ -112,7 +112,7 @@ class TestListResources(FunctionalTest):
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter2',
                                }
-            )
+        )
         msg2 = meter.meter_message_from_counter(counter2,
                                                 cfg.CONF.metering_secret,
                                                 'not-test',
@@ -136,7 +136,7 @@ class TestListResources(FunctionalTest):
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter',
                                }
-            )
+        )
         msg = meter.meter_message_from_counter(counter1,
                                                cfg.CONF.metering_secret,
                                                'test_list_resources',
@@ -155,7 +155,7 @@ class TestListResources(FunctionalTest):
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter2',
                                }
-            )
+        )
         msg2 = meter.meter_message_from_counter(counter2,
                                                 cfg.CONF.metering_secret,
                                                 'not-test',
@@ -179,7 +179,7 @@ class TestListResources(FunctionalTest):
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter',
                                }
-            )
+        )
         msg = meter.meter_message_from_counter(counter1,
                                                cfg.CONF.metering_secret,
                                                'test_list_resources',
@@ -198,7 +198,7 @@ class TestListResources(FunctionalTest):
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter2',
                                }
-            )
+        )
         msg2 = meter.meter_message_from_counter(counter2,
                                                 cfg.CONF.metering_secret,
                                                 'not-test',
@@ -224,7 +224,7 @@ class TestListResources(FunctionalTest):
                                'ignored_dict': {'key': 'value'},
                                'ignored_list': ['not-returned'],
                                }
-            )
+        )
         msg = meter.meter_message_from_counter(counter1,
                                                cfg.CONF.metering_secret,
                                                'test',

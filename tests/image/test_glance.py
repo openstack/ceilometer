@@ -110,4 +110,4 @@ class TestImagePollster(base.TestCase):
         for image in IMAGE_LIST:
             self.assert_(
                 any(map(lambda counter: counter.volume == image.size,
-                                 counters)))
+                        counters)))

@@ -51,7 +51,7 @@ class TestMaxProjectVolume(FunctionalTest):
                 resource_metadata={'display_name': 'test-volume',
                                    'tag': 'self.counter',
                                    }
-                )
+            )
             self.counters.append(c)
             msg = meter.meter_message_from_counter(c,
                                                    cfg.CONF.metering_secret,

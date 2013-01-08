@@ -37,7 +37,7 @@ class TestLibvirtInspection(test_base.TestCase):
         self.inspector.connection.getCapabilities()
         self.domain = self.mox.CreateMockAnything()
         self.inspector.connection.lookupByName(self.instance_name).AndReturn(
-                                                                 self.domain)
+            self.domain)
 
     def test_inspect_cpus(self):
         self.domain.info().AndReturn((0L, 0L, 0L, 2L, 999999L))

@@ -51,10 +51,11 @@ class TestAPIACL(FunctionalTest):
         response = self.get_json('/sources',
                                  expect_errors=True,
                                  headers={
-                "X-Roles": "Member",
-                "X-Tenant-Name": "admin",
-                "X-Tenant-Id": "bc23a9d531064583ace8f67dad60f6bb",
-                })
+                                     "X-Roles": "Member",
+                                     "X-Tenant-Name": "admin",
+                                     "X-Tenant-Id":
+                                     "bc23a9d531064583ace8f67dad60f6bb",
+                                 })
         self.assertEqual(response.status_int, 401)
 
     # FIXME(dhellmann): This test is not properly looking at the tenant
@@ -76,8 +77,9 @@ class TestAPIACL(FunctionalTest):
         response = self.get_json('/sources',
                                  expect_errors=True,
                                  headers={
-                "X-Roles": "admin",
-                "X-Tenant-Name": "admin",
-                "X-Tenant-Id": "bc23a9d531064583ace8f67dad60f6bb",
-                })
+                                     "X-Roles": "admin",
+                                     "X-Tenant-Name": "admin",
+                                     "X-Tenant-Id":
+                                     "bc23a9d531064583ace8f67dad60f6bb",
+                                 })
         self.assertEqual(response.status_int, 200)

@@ -36,7 +36,7 @@ libvirt_opts = [
                default='',
                help='Override the default libvirt URI '
                     '(which is dependent on libvirt_type)'),
-    ]
+]
 
 CONF = cfg.CONF
 CONF.register_opts(libvirt_opts)
@@ -126,9 +126,10 @@ class LibvirtInspector(virt_inspector.Inspector):
     def inspect_disks(self, instance_name):
         domain = self._lookup_by_name(instance_name)
         tree = etree.fromstring(domain.XMLDesc(0))
-        for device in filter(bool,
-                      [target.get("dev")
-                       for target in tree.findall('devices/disk/target')]):
+        for device in filter(
+                bool,
+                [target.get("dev")
+                 for target in tree.findall('devices/disk/target')]):
             disk = virt_inspector.Disk(device=device)
             block_stats = domain.blockStats(device)
             stats = virt_inspector.DiskStats(read_requests=block_stats[0],

@@ -104,7 +104,8 @@ class CeilometerMiddleware(object):
                                             "version": version,
                                             "container": container,
                                             "object": obj,
-                                    }),
+                                        },
+                                    ),
                                     cfg.CONF.metering_topic,
                                     cfg.CONF.metering_secret,
                                     cfg.CONF.counter_source)
@@ -126,7 +127,7 @@ class CeilometerMiddleware(object):
                                             "version": version,
                                             "container": container,
                                             "object": obj,
-                                    }),
+                                        }),
                                     cfg.CONF.metering_topic,
                                     cfg.CONF.metering_secret,
                                     cfg.CONF.counter_source)

@@ -284,7 +284,7 @@ class MeterController(RestController):
 
     _custom_actions = {
         'duration': ['GET'],
-        }
+    }
 
     def __init__(self, meter_id):
         request.context['meter_id'] = meter_id
@@ -304,7 +304,7 @@ class MeterController(RestController):
             resource=request.context.get('resource_id'),
             meter=self._id,
             source=request.context.get('source_id'),
-            )
+        )
         return [Event(**e)
                 for e in request.storage_conn.get_raw_events(f)
                 ]
@@ -445,7 +445,8 @@ class ResourcesController(RestController):
                 project=request.context.get('project_id'),
                 start_timestamp=start_timestamp,
                 end_timestamp=end_timestamp,
-                )]
+            )
+        ]
         return resources
 
 

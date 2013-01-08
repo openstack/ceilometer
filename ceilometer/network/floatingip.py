@@ -47,4 +47,4 @@ class FloatingIPPollster(plugin.CentralPollster):
                     'host': ip.host,
                     'pool': ip.pool,
                     'auto_assigned': ip.auto_assigned
-                    })
+                })

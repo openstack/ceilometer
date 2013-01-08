@@ -54,8 +54,7 @@ class TestListMeters(tests_api.TestBase):
                     'resource-id',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 40),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter',
-                                   }),
+                                       'tag': 'self.counter'}),
                 counter.Counter(
                     'meter.test',
                     'cumulative',
@@ -66,8 +65,7 @@ class TestListMeters(tests_api.TestBase):
                     'resource-id',
                     timestamp=datetime.datetime(2012, 7, 2, 11, 40),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter',
-                                   }),
+                                       'tag': 'self.counter'}),
                 counter.Counter(
                     'meter.mine',
                     'gauge',
@@ -78,8 +76,7 @@ class TestListMeters(tests_api.TestBase):
                     'resource-id2',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 41),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'two.counter',
-                                   }),
+                                       'tag': 'two.counter'}),
                 counter.Counter(
                     'meter.test',
                     'cumulative',
@@ -90,8 +87,7 @@ class TestListMeters(tests_api.TestBase):
                     'resource-id3',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 42),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'three.counter',
-                                   }),
+                                       'tag': 'three.counter'}),
                 counter.Counter(
                     'meter.mine',
                     'gauge',
@@ -102,8 +98,7 @@ class TestListMeters(tests_api.TestBase):
                     'resource-id4',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 43),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'four.counter',
-                                   })]:
+                                       'tag': 'four.counter'})]:
             msg = meter.meter_message_from_counter(cnt,
                                                    cfg.CONF.metering_secret,
                                                    'test_list_resources')

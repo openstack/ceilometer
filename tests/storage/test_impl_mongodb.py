@@ -82,7 +82,7 @@ class MongoDBEngineTestBase(unittest.TestCase):
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter',
                                }
-            )
+        )
         self.msg = meter.meter_message_from_counter(self.counter,
                                                     'not-so-secret',
                                                     'test-1')
@@ -100,7 +100,7 @@ class MongoDBEngineTestBase(unittest.TestCase):
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter2',
                                }
-            )
+        )
         self.msg2 = meter.meter_message_from_counter(self.counter2,
                                                      'not-so-secret',
                                                      'test-2')
@@ -118,7 +118,7 @@ class MongoDBEngineTestBase(unittest.TestCase):
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter3',
                                }
-            )
+        )
         self.msg3 = meter.meter_message_from_counter(self.counter3,
                                                      'not-so-secret',
                                                      'test-3')
@@ -137,7 +137,7 @@ class MongoDBEngineTestBase(unittest.TestCase):
                 resource_metadata={'display_name': 'test-server',
                                    'tag': 'counter-%s' % i,
                                    }
-                )
+            )
             msg = meter.meter_message_from_counter(c, 'not-so-secret', 'test')
             self.conn.record_metering_data(msg)
 
@@ -264,8 +264,7 @@ class ResourceTest(MongoDBEngineTestBase):
         start_ts = datetime.datetime(2012, 7, 2, 10, 42)
         end_ts = datetime.datetime(2012, 7, 2, 10, 43)
         resources = list(self.conn.get_resources(start_timestamp=start_ts,
-                                                 end_timestamp=end_ts)
-                        )
+                                                 end_timestamp=end_ts))
         resource_ids = [r['resource_id'] for r in resources]
         expected = set(['resource-id-2'])
         assert set(resource_ids) == expected
@@ -334,7 +333,7 @@ class MeterTest(MongoDBEngineTestBase):
         f = storage.EventFilter(
             user='user-id',
             start=datetime.datetime(2012, 7, 2, 10, 41),
-            )
+        )
         results = list(self.conn.get_raw_events(f))
         length = len(results)
         assert length == 1
@@ -344,7 +343,7 @@ class MeterTest(MongoDBEngineTestBase):
         f = storage.EventFilter(
             user='user-id',
             end=datetime.datetime(2012, 7, 2, 10, 41),
-            )
+        )
         results = list(self.conn.get_raw_events(f))
         length = len(results)
         assert length == 1
@@ -354,7 +353,7 @@ class MeterTest(MongoDBEngineTestBase):
         f = storage.EventFilter(
             start=datetime.datetime(2012, 7, 2, 10, 42),
             end=datetime.datetime(2012, 7, 2, 10, 43),
-            )
+        )
         results = list(self.conn.get_raw_events(f))
         length = len(results)
         assert length == 1
@@ -364,7 +363,7 @@ class MeterTest(MongoDBEngineTestBase):
         f = storage.EventFilter(
             user='user-id',
             meter='no-such-meter',
-            )
+        )
         results = list(self.conn.get_raw_events(f))
         assert not results
 
@@ -372,7 +371,7 @@ class MeterTest(MongoDBEngineTestBase):
         f = storage.EventFilter(
             user='user-id',
             meter='instance',
-            )
+        )
         results = list(self.conn.get_raw_events(f))
         assert results
 
@@ -393,7 +392,7 @@ class SumTest(MongoDBEngineTestBase):
         f = storage.EventFilter(
             user='user-id',
             meter='instance',
-            )
+        )
         results = list(self.conn.get_volume_sum(f))
         assert results
         counts = dict((r['resource_id'], r['value'])
@@ -407,7 +406,7 @@ class SumTest(MongoDBEngineTestBase):
         f = storage.EventFilter(
             project='project-id',
             meter='instance',
-            )
+        )
         results = list(self.conn.get_volume_sum(f))
         assert results
         counts = dict((r['resource_id'], r['value'])
@@ -422,7 +421,7 @@ class SumTest(MongoDBEngineTestBase):
             user='user-id',
             meter='instance',
             resource='resource-id',
-            )
+        )
         results = list(self.conn.get_volume_sum(f))
         assert results
         counts = dict((r['resource_id'], r['value'])
@@ -457,7 +456,7 @@ class TestGetEventInterval(MongoDBEngineTestBase):
             meter='instance',
             start=self.start,
             end=self.end,
-            )
+        )
 
     def _make_events(self, *timestamps):
         for t in timestamps:
@@ -472,7 +471,7 @@ class TestGetEventInterval(MongoDBEngineTestBase):
                 timestamp=t,
                 resource_metadata={'display_name': 'test-server',
                                    }
-                )
+            )
             msg = meter.meter_message_from_counter(counter=c,
                                                    secret='not-so-secret',
                                                    source='test',

@@ -51,9 +51,8 @@ class TestRunTasks(base.TestCase):
             project_id='test',
             resource_id='test_run_tasks',
             timestamp=datetime.datetime.utcnow().isoformat(),
-            resource_metadata={'name': 'Pollster',
-                               },
-            )
+            resource_metadata={'name': 'Pollster'},
+        )
 
         def get_counters(self, manager, instance):
             self.counters.append((manager, instance))
@@ -98,5 +97,4 @@ class TestRunTasks(base.TestCase):
         assert list(actual[0]) == [self.Pollster.test_data,
                                    cfg.CONF.metering_topic,
                                    cfg.CONF.metering_secret,
-                                   cfg.CONF.counter_source,
-                                  ]
+                                   cfg.CONF.counter_source]

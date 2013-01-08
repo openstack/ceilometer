@@ -61,8 +61,7 @@ class _Base(plugin.NotificationBase):
     def get_event_types():
         return ['volume.exists',
                 'volume.create.end',
-                'volume.delete.start',
-        ]
+                'volume.delete.start']
 
 
 class Volume(_Base):

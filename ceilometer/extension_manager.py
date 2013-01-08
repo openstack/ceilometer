@@ -38,14 +38,14 @@ def should_use_extension(namespace, ext, disabled_names):
         LOG.debug(
             '%s extension %r disabled through configuration setting',
             namespace, ext.name,
-            )
+        )
         return False
     if not ext.obj.is_enabled():
         LOG.debug(
             '%s extension %r reported that it is disabled',
             namespace,
             ext.name,
-            )
+        )
         return False
     LOG.debug('using %s extension %r', namespace, ext.name)
     return True
@@ -68,4 +68,4 @@ class ActivatedExtensionManager(enabled.EnabledExtensionManager):
             invoke_on_load=invoke_on_load,
             invoke_args=invoke_args,
             invoke_kwds=invoke_kwds,
-            )
+        )

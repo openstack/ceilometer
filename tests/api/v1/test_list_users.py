@@ -55,7 +55,7 @@ class TestListUsers(tests_api.TestBase):
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter',
                                }
-            )
+        )
         msg = meter.meter_message_from_counter(counter1,
                                                cfg.CONF.metering_secret,
                                                'test_list_users',
@@ -74,7 +74,7 @@ class TestListUsers(tests_api.TestBase):
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter2',
                                }
-            )
+        )
         msg2 = meter.meter_message_from_counter(counter2,
                                                 cfg.CONF.metering_secret,
                                                 'not-test',

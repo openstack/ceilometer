@@ -252,7 +252,7 @@ class Connection(base.Connection):
         if project is not None:
             query = query.filter(Resource.project_id == project)
         query = query.options(
-                    sqlalchemy_session.sqlalchemy.orm.joinedload('meters'))
+            sqlalchemy_session.sqlalchemy.orm.joinedload('meters'))
         if metaquery is not None:
             raise NotImplementedError('metaquery not implemented')
 
@@ -298,7 +298,7 @@ class Connection(base.Connection):
         if project is not None:
             query = query.filter(Resource.project_id == project)
         query = query.options(
-                    sqlalchemy_session.sqlalchemy.orm.joinedload('meters'))
+            sqlalchemy_session.sqlalchemy.orm.joinedload('meters'))
         if len(metaquery) > 0:
             raise NotImplementedError('metaquery not implemented')
 

@@ -71,7 +71,7 @@ INSTANCE_CREATE_END = {
     u'priority': u'INFO',
     u'publisher_id': u'compute.vagrant-precise',
     u'timestamp': u'2012-05-08 20:23:48.028195',
-    }
+}
 
 INSTANCE_DELETE_START = {
     u'_context_auth_token': u'3d8b13de1b7d499587dfc69b77dc09c2',
@@ -115,7 +115,7 @@ INSTANCE_DELETE_START = {
     u'priority': u'INFO',
     u'publisher_id': u'compute.vagrant-precise',
     u'timestamp': u'2012-05-08 20:24:14.824743',
-    }
+}
 
 INSTANCE_EXISTS = {
     u'_context_auth_token': None,
@@ -162,7 +162,7 @@ INSTANCE_EXISTS = {
     u'priority': u'INFO',
     u'publisher_id': u'compute.vagrant-precise',
     u'timestamp': u'2012-05-08 16:03:44.122481',
-    }
+}
 
 INSTANCE_FINISH_RESIZE_END = {
     u'_context_roles': [u'admin'],
@@ -208,7 +208,7 @@ INSTANCE_FINISH_RESIZE_END = {
                  u'host': u'ip-10-147-132-184.ec2.internal',
                  u'display_name': u's1',
                  u'image_ref_url': u'http://10.147.132.184:9292/images/'
-                                    'a130b9d9-e00e-436e-9782-836ccef06e8a',
+                 'a130b9d9-e00e-436e-9782-836ccef06e8a',
                  u'root_gb': 20,
                  u'tenant_id': u'cea4b25edb484e5392727181b7721d29',
                  u'created_at': u'2013-01-04T11:21:48.000000',
@@ -216,17 +216,16 @@ INSTANCE_FINISH_RESIZE_END = {
                  u'instance_type': u'm1.small',
                  u'vcpus': 1,
                  u'image_meta': {u'kernel_id':
-                                     u'571478e0-d5e7-4c2e-95a5-2bc79443c28a',
+                                 u'571478e0-d5e7-4c2e-95a5-2bc79443c28a',
                                  u'ramdisk_id':
-                                     u'5f23128e-5525-46d8-bc66-9c30cd87141a',
+                                 u'5f23128e-5525-46d8-bc66-9c30cd87141a',
                                  u'base_image_ref':
-                                     u'a130b9d9-e00e-436e-9782-836ccef06e8a'
-                                 },
+                                 u'a130b9d9-e00e-436e-9782-836ccef06e8a'},
                  u'architecture': None,
                  u'os_type': None
                  },
     u'priority': u'INFO'
-    }
+}
 
 INSTANCE_RESIZE_REVERT_END = {
     u'_context_roles': [u'admin'],
@@ -266,7 +265,7 @@ INSTANCE_RESIZE_REVERT_END = {
                  u'host': u'ip-10-147-132-184.ec2.internal',
                  u'display_name': u's1',
                  u'image_ref_url': u'http://10.147.132.184:9292/images/'
-                                    'a130b9d9-e00e-436e-9782-836ccef06e8a',
+                 'a130b9d9-e00e-436e-9782-836ccef06e8a',
                  u'root_gb': 0,
                  u'tenant_id': u'cea4b25edb484e5392727181b7721d29',
                  u'created_at': u'2013-01-04T11:21:48.000000',
@@ -274,23 +273,23 @@ INSTANCE_RESIZE_REVERT_END = {
                  u'instance_type': u'm1.tiny',
                  u'vcpus': 1,
                  u'image_meta': {u'kernel_id':
-                                     u'571478e0-d5e7-4c2e-95a5-2bc79443c28a',
+                                 u'571478e0-d5e7-4c2e-95a5-2bc79443c28a',
                                  u'ramdisk_id':
-                                     u'5f23128e-5525-46d8-bc66-9c30cd87141a',
+                                 u'5f23128e-5525-46d8-bc66-9c30cd87141a',
                                  u'base_image_ref':
-                                     u'a130b9d9-e00e-436e-9782-836ccef06e8a'
-                                 },
+                                 u'a130b9d9-e00e-436e-9782-836ccef06e8a'},
                  u'architecture': None,
                  u'os_type': None
                  },
     u'priority': u'INFO'
-    }
+}
 
 
 class TestNotifications(unittest.TestCase):
     def test_process_notification(self):
         info = notifications.Instance.process_notification(
-                INSTANCE_CREATE_END)[0]
+            INSTANCE_CREATE_END
+        )[0]
 
         for name, actual, expected in [
             ('counter_name', info.name, 'instance'),
@@ -306,7 +305,7 @@ class TestNotifications(unittest.TestCase):
              INSTANCE_CREATE_END['payload']['instance_type_id']),
             ('host', info.resource_metadata['host'],
              INSTANCE_CREATE_END['publisher_id']),
-            ]:
+        ]:
             yield compare, name, actual, expected
 
     @staticmethod

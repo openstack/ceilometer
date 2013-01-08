@@ -1,7 +1,6 @@
 http://tarballs.openstack.org/nova/nova-stable-folsom.tar.gz
 nose
 coverage
-pep8>=1.0
 mock
 mox
 # NOTE(dhellmann): Ming is necessary to provide the Mongo-in-memory

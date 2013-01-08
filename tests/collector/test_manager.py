@@ -80,7 +80,7 @@ TEST_NOTICE = {
     u'priority': u'INFO',
     u'publisher_id': u'compute.vagrant-precise',
     u'timestamp': u'2012-05-08 20:23:48.028195',
-    }
+}
 
 
 class TestCollectorService(tests_base.TestCase):
@@ -107,7 +107,7 @@ class TestCollectorService(tests_base.TestCase):
         msg['message_signature'] = meter.compute_signature(
             msg,
             cfg.CONF.metering_secret,
-            )
+        )
 
         self.srv.storage_conn = self.mox.CreateMock(base.Connection)
         self.srv.storage_conn.record_metering_data(msg)
@@ -146,7 +146,7 @@ class TestCollectorService(tests_base.TestCase):
         msg['message_signature'] = meter.compute_signature(
             msg,
             cfg.CONF.metering_secret,
-            )
+        )
 
         expected = {}
         expected.update(msg)
@@ -168,7 +168,7 @@ class TestCollectorService(tests_base.TestCase):
         msg['message_signature'] = meter.compute_signature(
             msg,
             cfg.CONF.metering_secret,
-            )
+        )
 
         expected = {}
         expected.update(msg)

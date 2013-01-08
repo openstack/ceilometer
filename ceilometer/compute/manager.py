@@ -33,9 +33,8 @@ OPTS = [
                 ),
     cfg.StrOpt('hypervisor_inspector',
                default='libvirt',
-               help='Inspector to use for inspecting the hypervisor layer',
-              ),
-    ]
+               help='Inspector to use for inspecting the hypervisor layer'),
+]
 
 cfg.CONF.register_opts(OPTS)
 
@@ -63,7 +62,7 @@ class AgentManager(object):
         self.ext_manager = extension_manager.ActivatedExtensionManager(
             namespace=PLUGIN_NAMESPACE,
             disabled_names=cfg.CONF.disabled_compute_pollsters,
-            )
+        )
         self._inspector = get_hypervisor_inspector()
         return
 

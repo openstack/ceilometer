@@ -48,7 +48,7 @@ class TestListEvents(FunctionalTest):
                                'ignored_dict': {'key': 'value'},
                                'ignored_list': ['not-returned'],
                                }
-            )
+        )
         msg = meter.meter_message_from_counter(self.counter1,
                                                cfg.CONF.metering_secret,
                                                'test_source',
@@ -67,7 +67,7 @@ class TestListEvents(FunctionalTest):
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter2',
                                }
-            )
+        )
         msg2 = meter.meter_message_from_counter(self.counter2,
                                                 cfg.CONF.metering_secret,
                                                 'source2',

@@ -61,24 +61,24 @@ class _Base(plugin.PollsterBase):
     @staticmethod
     def extract_image_metadata(image):
         return dict((k, getattr(image, k))
-                     for k in [
-                             "status",
-                             "is_public",
-                             "name",
-                             "deleted",
-                             "container_format",
-                             "created_at",
-                             "disk_format",
-                             "updated_at",
-                             "properties",
-                             "min_disk",
-                             "protected",
-                             "checksum",
-                             "deleted_at",
-                             "min_ram",
-                             "size",
-                     ]
-                 )
+                    for k in
+                    [
+                        "status",
+                        "is_public",
+                        "name",
+                        "deleted",
+                        "container_format",
+                        "created_at",
+                        "disk_format",
+                        "updated_at",
+                        "properties",
+                        "min_disk",
+                        "protected",
+                        "checksum",
+                        "deleted_at",
+                        "min_ram",
+                        "size",
+                    ])
 
 
 class ImagePollster(_Base):

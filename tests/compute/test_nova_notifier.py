@@ -67,7 +67,7 @@ class TestNovaNotifier(base.TestCase):
             timestamp=datetime.datetime.utcnow().isoformat(),
             resource_metadata={'name': 'Pollster',
                                },
-            )
+        )
 
         def get_counters(self, manager, instance):
             self.counters.append((manager, instance))
@@ -111,7 +111,7 @@ class TestNovaNotifier(base.TestCase):
                          "vcpus": 1,
                          "host": "fakehost",
                          "availability_zone":
-                             "1e3ce043029547f1a61c1996d1a531a4",
+                         "1e3ce043029547f1a61c1996d1a531a4",
                          "created_at": '2012-05-08 20:23:41',
                          "os_type": "linux",
                          "kernel_id": "kernelid",
@@ -140,7 +140,7 @@ class TestNovaNotifier(base.TestCase):
                                     None,
                                     self.Pollster(),
                                     ),
-                ])
+            ])
         nova_notifier.initialize_manager(agent_manager)
 
     def tearDown(self):
@@ -157,9 +157,9 @@ class TestNovaNotifier(base.TestCase):
             # call this method directly, but not safe to mock it
             # because mock.patch() fails to find the original.
             self.stubs.Set(db, 'instance_get_by_uuid',
-            self.fake_db_instance_get)
+                           self.fake_db_instance_get)
             self.compute.terminate_instance(self.context,
-                                        instance=self.instance)
+                                            instance=self.instance)
         else:
             # Under Grizzly, Nova has moved to no-db access on the
             # compute node. The compute manager uses RPC to talk to

@@ -54,8 +54,8 @@ class TestListResources(tests_api.TestBase):
                     'resource-id',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 40),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter',
-                                   }),
+                                       'tag': 'self.counter'},
+                ),
                 counter.Counter(
                     'instance',
                     'cumulative',
@@ -66,8 +66,8 @@ class TestListResources(tests_api.TestBase):
                     'resource-id-alternate',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 41),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter2',
-                                   }),
+                                       'tag': 'self.counter2'},
+                ),
                 counter.Counter(
                     'instance',
                     'cumulative',
@@ -78,8 +78,8 @@ class TestListResources(tests_api.TestBase):
                     'resource-id2',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 42),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter3',
-                                   }),
+                                       'tag': 'self.counter3'},
+                ),
                 counter.Counter(
                     'instance',
                     'cumulative',
@@ -90,8 +90,8 @@ class TestListResources(tests_api.TestBase):
                     'resource-id',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 43),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter4',
-                                   })]:
+                                       'tag': 'self.counter4'}
+                )]:
             msg = meter.meter_message_from_counter(cnt,
                                                    cfg.CONF.metering_secret,
                                                    'test_list_resources')

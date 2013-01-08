@@ -35,7 +35,7 @@ OPTS = [
                 default=[],
                 help='list of listener plugins to disable',
                 ),
-    ]
+]
 
 cfg.CONF.register_opts(OPTS)
 
@@ -59,7 +59,7 @@ class CollectorService(service.PeriodicService):
         self.ext_manager = extension_manager.ActivatedExtensionManager(
             namespace=self.COLLECTOR_NAMESPACE,
             disabled_names=cfg.CONF.disabled_notification_listeners,
-            )
+        )
 
         if not list(self.ext_manager):
             LOG.warning('Failed to load any notification handlers for %s',
@@ -73,7 +73,7 @@ class CollectorService(service.PeriodicService):
             cfg.CONF.metering_topic,
             rpc_dispatcher.RpcDispatcher([self]),
             'ceilometer.collector.' + cfg.CONF.metering_topic,
-            )
+        )
 
     def _setup_subscription(self, ext, *args, **kwds):
         handler = ext.obj
@@ -90,7 +90,7 @@ class CollectorService(service.PeriodicService):
                     topic=topic,
                     exchange_name=exchange_topic.exchange,
                     callback=self.process_notification,
-                    )
+                )
 
     def process_notification(self, notification):
         """Make a notification processed by an handler."""

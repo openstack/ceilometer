@@ -36,7 +36,7 @@ STORAGE_OPTS = [
                default='mongodb://localhost:27017/ceilometer',
                help='Database connection string',
                ),
-    ]
+]
 
 
 cfg.CONF.register_opts(STORAGE_OPTS)

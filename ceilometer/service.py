@@ -66,8 +66,8 @@ class PeriodicService(rpc_service.Service):
         super(PeriodicService, self).start()
         admin_context = context.RequestContext('admin', 'admin', is_admin=True)
         self.tg.add_timer(cfg.CONF.periodic_interval,
-                    self.manager.periodic_tasks,
-                    context=admin_context)
+                          self.manager.periodic_tasks,
+                          context=admin_context)
 
 
 def _sanitize_cmd_line(argv):
