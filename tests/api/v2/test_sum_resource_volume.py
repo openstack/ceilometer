@@ -63,32 +63,37 @@ class TestSumResourceVolume(FunctionalTest):
         assert data == expected
 
     def test_start_timestamp(self):
-        data = self.get_json(self.PATH,
-                             start_timestamp='2012-09-25T11:30:00')
+        data = self.get_json(
+            self.PATH,
+            extra_params={'daterange.start': '2012-09-25T11:30:00'})
         expected = {'volume': 6 + 7}
         assert data == expected
 
     def test_start_timestamp_after(self):
-        data = self.get_json(self.PATH,
-                             start_timestamp='2012-09-25T12:34:00')
+        data = self.get_json(
+            self.PATH,
+            extra_params={'daterange.start': '2012-09-25T12:34:00'})
         expected = {'volume': None}
         assert data == expected
 
     def test_end_timestamp(self):
-        data = self.get_json(self.PATH,
-                             end_timestamp='2012-09-25T11:30:00')
+        data = self.get_json(
+            self.PATH,
+            extra_params={'daterange.end': '2012-09-25T11:30:00'})
         expected = {'volume': 5}
         assert data == expected
 
     def test_end_timestamp_before(self):
-        data = self.get_json(self.PATH,
-                             end_timestamp='2012-09-25T09:54:00')
+        data = self.get_json(
+            self.PATH,
+            extra_params={'daterange.end': '2012-09-25T09:54:00'})
         expected = {'volume': None}
         assert data == expected
 
     def test_start_end_timestamp(self):
-        data = self.get_json(self.PATH,
-                             start_timestamp='2012-09-25T11:30:00',
-                             end_timestamp='2012-09-25T11:32:00')
+        data = self.get_json(
+            self.PATH,
+            extra_params={'daterange.start': '2012-09-25T11:30:00',
+                          'daterange.end': '2012-09-25T11:32:00'})
         expected = {'volume': 6}
         assert data == expected

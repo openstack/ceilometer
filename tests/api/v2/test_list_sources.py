@@ -40,7 +40,7 @@ class TestListSource(FunctionalTest):
             '/sources/test_source_that_does_not_exist',
             expect_errors=True)
         print 'GOT:', ydata
-        self.assertEqual(ydata.status_code, 404)
+        self.assertEqual(ydata.status_int, 404)
         self.assert_(
             "No source test_source_that_does_not_exist" in
             ydata.json['error_message']

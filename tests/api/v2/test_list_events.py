@@ -95,7 +95,7 @@ class TestListEvents(FunctionalTest):
     def test_empty_source(self):
         data = self.get_json('/sources/no-such-source/meters/instance',
                              expect_errors=True)
-        self.assertEquals(data.status_code, 404)
+        self.assertEquals(data.status_int, 404)
 
     def test_by_source(self):
         data = self.get_json('/sources/test_source/meters/instance')

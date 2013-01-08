@@ -95,50 +95,6 @@ from ceilometer import storage
 LOG = logging.getLogger(__name__)
 
 
-def _get_query_timestamps(args={}):
-    """Return any optional timestamp information in the request.
-
-    Determine the desired range, if any, from the GET arguments. Set
-    up the query range using the specified offset.
-
-    [query_start ... start_timestamp ... end_timestamp ... query_end]
-
-    Returns a dictionary containing:
-
-    query_start: First timestamp to use for query
-    start_timestamp: start_timestamp parameter from request
-    query_end: Final timestamp to use for query
-    end_timestamp: end_timestamp parameter from request
-    search_offset: search_offset parameter from request
-
-    """
-    search_offset = int(args.get('search_offset', 0))
-
-    start_timestamp = args.get('start_timestamp')
-    if start_timestamp:
-        start_timestamp = timeutils.parse_isotime(start_timestamp)
-        start_timestamp = start_timestamp.replace(tzinfo=None)
-        query_start = (start_timestamp -
-                       datetime.timedelta(minutes=search_offset))
-    else:
-        query_start = None
-
-    end_timestamp = args.get('end_timestamp')
-    if end_timestamp:
-        end_timestamp = timeutils.parse_isotime(end_timestamp)
-        end_timestamp = end_timestamp.replace(tzinfo=None)
-        query_end = end_timestamp + datetime.timedelta(minutes=search_offset)
-    else:
-        query_end = None
-
-    return {'query_start': query_start,
-            'query_end': query_end,
-            'start_timestamp': start_timestamp,
-            'end_timestamp': end_timestamp,
-            'search_offset': search_offset,
-            }
-
-
 # FIXME(dhellmann): Change APIs that use this to return float?
 class MeterVolume(Base):
     volume = wsattr(float, mandatory=False)
@@ -149,13 +105,59 @@ class MeterVolume(Base):
         super(MeterVolume, self).__init__(volume=volume, **kw)
 
 
+class DateRange(Base):
+    start = datetime.datetime
+    end = datetime.datetime
+    search_offset = int
+
+    def __init__(self, start=None, end=None, search_offset=0):
+        if start is not None:
+            start = start.replace(tzinfo=None)
+        if end is not None:
+            end = end.replace(tzinfo=None)
+        super(DateRange, self).__init__(start=start,
+                                        end=end,
+                                        search_offset=search_offset,
+                                        )
+
+    @property
+    def query_start(self):
+        """The timestamp the query should use to start, including
+        the search offset.
+        """
+        if self.start is None:
+            return None
+        return (self.start -
+                datetime.timedelta(minutes=self.search_offset))
+
+    @property
+    def query_end(self):
+        """The timestamp the query should use to end, including
+        the search offset.
+        """
+        if self.end is None:
+            return None
+        return (self.end +
+                datetime.timedelta(minutes=self.search_offset))
+
+    def to_dict(self):
+        return {'query_start': self.query_start,
+                'query_end': self.query_end,
+                'start_timestamp': self.start,
+                'end_timestamp': self.end,
+                'search_offset': self.search_offset,
+                }
+
+
 class MeterVolumeController(object):
 
-    @wsme.pecan.wsexpose(MeterVolume)
-    def max(self):
+    @wsme.pecan.wsexpose(MeterVolume, DateRange)
+    def max(self, daterange=None):
         """Find the maximum volume for the matching meter events.
         """
-        q_ts = _get_query_timestamps(request.params)
+        if daterange is None:
+            daterange = DateRange()
+        q_ts = daterange.to_dict()
 
         try:
             meter = request.context['meter_id']
@@ -193,11 +195,13 @@ class MeterVolumeController(object):
 
         return MeterVolume(volume=value)
 
-    @wsme.pecan.wsexpose(MeterVolume)
-    def sum(self):
+    @wsme.pecan.wsexpose(MeterVolume, DateRange)
+    def sum(self, daterange=None):
         """Compute the total volume for the matching meter events.
         """
-        q_ts = _get_query_timestamps(request.params)
+        if daterange is None:
+            daterange = DateRange()
+        q_ts = daterange.to_dict()
 
         try:
             meter = request.context['meter_id']
@@ -285,16 +289,17 @@ class MeterController(RestController):
         request.context['meter_id'] = meter_id
         self._id = meter_id
 
-    @wsme.pecan.wsexpose([Event])
-    def get_all(self):
+    @wsme.pecan.wsexpose([Event], DateRange)
+    def get_all(self, daterange=None):
         """Return all events for the meter.
         """
-        q_ts = _get_query_timestamps(request.params)
+        if daterange is None:
+            daterange = DateRange()
         f = storage.EventFilter(
             user=request.context.get('user_id'),
             project=request.context.get('project_id'),
-            start=q_ts['query_start'],
-            end=q_ts['query_end'],
+            start=daterange.query_start,
+            end=daterange.query_end,
             resource=request.context.get('resource_id'),
             meter=self._id,
             source=request.context.get('source_id'),
@@ -303,24 +308,19 @@ class MeterController(RestController):
                 for e in request.storage_conn.get_raw_events(f)
                 ]
 
-    # TODO(jd) replace str for timestamp by datetime?
-    @wsme.pecan.wsexpose(Duration, str, str, int)
-    def duration(self, start_timestamp=None, end_timestamp=None,
-                 search_offset=0):
+    @wsme.pecan.wsexpose(Duration, DateRange)
+    def duration(self, daterange=None):
         """Computes the duration of the meter events in the time range given.
         """
-        q_ts = _get_query_timestamps(dict(start_timestamp=start_timestamp,
-                                          end_timestamp=end_timestamp,
-                                          search_offset=search_offset))
-        start_timestamp = q_ts['start_timestamp']
-        end_timestamp = q_ts['end_timestamp']
+        if daterange is None:
+            daterange = DateRange()
 
         # Query the database for the interval of timestamps
         # within the desired range.
         f = storage.EventFilter(user=request.context.get('user_id'),
                                 project=request.context.get('project_id'),
-                                start=q_ts['query_start'],
-                                end=q_ts['query_end'],
+                                start=daterange.query_start,
+                                end=daterange.query_end,
                                 resource=request.context.get('resource_id'),
                                 meter=self._id,
                                 source=request.context.get('source_id'),
@@ -330,12 +330,12 @@ class MeterController(RestController):
         # "Clamp" the timestamps we return to the original time
         # range, excluding the offset.
         LOG.debug('start_timestamp %s, end_timestamp %s, min_ts %s, max_ts %s',
-                  start_timestamp, end_timestamp, min_ts, max_ts)
-        if start_timestamp and min_ts and min_ts < start_timestamp:
-            min_ts = start_timestamp
+                  daterange.start, daterange.end, min_ts, max_ts)
+        if daterange.start and min_ts and min_ts < daterange.start:
+            min_ts = daterange.start
             LOG.debug('clamping min timestamp to range')
-        if end_timestamp and max_ts and max_ts > end_timestamp:
-            max_ts = end_timestamp
+        if daterange.end and max_ts and max_ts > daterange.end:
+            max_ts = daterange.end
             LOG.debug('clamping max timestamp to range')
 
         # If we got valid timestamps back, compute a duration in minutes.

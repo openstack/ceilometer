@@ -44,7 +44,7 @@ class TestAPIACL(FunctionalTest):
 
     def test_non_authenticated(self):
         response = self.get_json('/sources', expect_errors=True)
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_int, 401)
 
     def test_authenticated_wrong_role(self):
         response = self.get_json('/sources',
@@ -54,7 +54,7 @@ class TestAPIACL(FunctionalTest):
                 "X-Tenant-Name": "admin",
                 "X-Tenant-Id": "bc23a9d531064583ace8f67dad60f6bb",
                 })
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_int, 401)
 
     # FIXME(dhellmann): This test is not properly looking at the tenant
     # info. We do not correctly detect the improper tenant. That's
@@ -69,7 +69,7 @@ class TestAPIACL(FunctionalTest):
     #             "X-Tenant-Name": "achoo",
     #             "X-Tenant-Id": "bc23a9d531064583ace8f67dad60f6bb",
     #             })
-    #     self.assertEqual(response.status_code, 401)
+    #     self.assertEqual(response.status_int, 401)
 
     def test_authenticated(self):
         response = self.get_json('/sources',
@@ -79,4 +79,4 @@ class TestAPIACL(FunctionalTest):
                 "X-Tenant-Name": "admin",
                 "X-Tenant-Id": "bc23a9d531064583ace8f67dad60f6bb",
                 })
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_int, 200)

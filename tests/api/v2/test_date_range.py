@@ -24,10 +24,10 @@ import datetime
 from ceilometer.api.controllers import v2 as api
 
 
-class TimestampTest(unittest.TestCase):
+class DateRangeTest(unittest.TestCase):
 
     def test_get_query_timestamps_none_specified(self):
-        result = api._get_query_timestamps()
+        result = api.DateRange().to_dict()
         expected = {'start_timestamp': None,
                     'end_timestamp': None,
                     'query_start': None,
@@ -38,8 +38,8 @@ class TimestampTest(unittest.TestCase):
         assert result == expected
 
     def test_get_query_timestamps_start(self):
-        args = {'start_timestamp': '2012-09-20T12:13:14'}
-        result = api._get_query_timestamps(args)
+        d = datetime.datetime(2012, 9, 20, 12, 13, 14)
+        result = api.DateRange(start=d).to_dict()
         expected = {
             'start_timestamp': datetime.datetime(2012, 9, 20, 12, 13, 14),
             'end_timestamp': None,
@@ -51,8 +51,8 @@ class TimestampTest(unittest.TestCase):
         assert result == expected
 
     def test_get_query_timestamps_end(self):
-        args = {'end_timestamp': '2012-09-20T12:13:14'}
-        result = api._get_query_timestamps(args)
+        d = datetime.datetime(2012, 9, 20, 12, 13, 14)
+        result = api.DateRange(end=d).to_dict()
         expected = {
             'end_timestamp': datetime.datetime(2012, 9, 20, 12, 13, 14),
             'start_timestamp': None,
@@ -64,11 +64,11 @@ class TimestampTest(unittest.TestCase):
         assert result == expected
 
     def test_get_query_timestamps_with_offset(self):
-        args = {'start_timestamp': '2012-09-20T12:13:14',
-                'end_timestamp': '2012-09-20T13:24:25',
-                'search_offset': '20',
-                }
-        result = api._get_query_timestamps(args)
+        result = api.DateRange(
+            end=datetime.datetime(2012, 9, 20, 13, 24, 25),
+            start=datetime.datetime(2012, 9, 20, 12, 13, 14),
+            search_offset=20,
+            ).to_dict()
         expected = {
             'query_end': datetime.datetime(2012, 9, 20, 13, 44, 25),
             'query_start': datetime.datetime(2012, 9, 20, 11, 53, 14),
