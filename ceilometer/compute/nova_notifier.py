@@ -35,23 +35,17 @@ except ImportError:
 # in the log file.
 LOG = logging.getLogger('nova.ceilometer.notifier')
 
-# NOTE(dhellmann): The _initialize_config_options is set by the tests
-# to disable the cfg.CONF() call in notify(), since initializing the
-# object in one tests breaks other tests unpredictably when new
-# modules are imported and new options registered.
-#
-# GLOBAL STATE IS A BAD IDEA BUT IMPORT SIDE-EFFECTS ARE WORSE!
-_initialize_config_options = True
 _agent_manager = None
 
 
-def initialize_manager():
+def initialize_manager(agent_manager=None):
     global _agent_manager
-    # NOTE(dhellmann): See note above.
-    if _initialize_config_options:
+    if not agent_manager:
         cfg.CONF(args=[], project='ceilometer', prog='ceilometer-agent')
-    # Instantiate a manager
-    _agent_manager = AgentManager()
+        # Instantiate a manager
+        _agent_manager = AgentManager()
+    else:
+        _agent_manager = agent_manager
 
 
 def notify(context, message):
