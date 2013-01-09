@@ -427,6 +427,12 @@ class MeterTest(SQLAlchemyEngineTestBase):
         results = list(self.conn.get_raw_events(f))
         assert results
 
+    def test_get_raw_events_by_source(self):
+        f = storage.EventFilter(source='test-1')
+        results = list(self.conn.get_raw_events(f))
+        assert results
+        assert len(results) == 1
+
 
 class TestGetEventInterval(SQLAlchemyEngineTestBase):
 

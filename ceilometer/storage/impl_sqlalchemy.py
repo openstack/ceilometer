@@ -100,7 +100,7 @@ def make_query_from_filter(query, event_filter, require_meter=True):
     elif require_meter:
         raise RuntimeError('Missing required meter specifier')
     if event_filter.source:
-        query = query.filter_by(source=event_filter.source)
+        query = query.filter(Meter.sources.any(id=event_filter.source))
     if event_filter.start:
         ts_start = event_filter.start
         query = query.filter(Meter.timestamp >= ts_start)
