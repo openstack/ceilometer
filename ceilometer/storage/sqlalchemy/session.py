@@ -169,7 +169,7 @@ def get_engine():
             if remaining == -1:
                 remaining = 'infinite'
             while True:
-                msg = _('SQL connection failed. %s attempts left.')
+                msg = 'SQL connection failed. %s attempts left.'
                 LOG.warn(msg % remaining)
                 if remaining != 'infinite':
                     remaining -= 1
