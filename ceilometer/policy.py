@@ -17,6 +17,8 @@
 
 """Policy Engine For Ceilometer"""
 
+import os
+
 from ceilometer import utils
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import policy
@@ -42,6 +44,10 @@ def init():
     global _POLICY_CACHE
     if not _POLICY_PATH:
         _POLICY_PATH = cfg.CONF.policy_file
+        if not os.path.exists(_POLICY_PATH):
+            _POLICY_PATH = cfg.CONF.find_file(_POLICY_PATH)
+        if not _POLICY_PATH:
+            raise cfg.ConfigFilesNotFoundError([cfg.CONF.policy_file])
     utils.read_cached_file(_POLICY_PATH, _POLICY_CACHE,
                            reload_func=_set_brain)
 
