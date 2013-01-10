@@ -19,6 +19,7 @@
 
 from ceilometer.api import acl
 from ceilometer.api import app
+from ceilometer.openstack.common import cfg
 from .base import FunctionalTest
 
 
@@ -39,7 +40,7 @@ class TestAPIACL(FunctionalTest):
 
         self.stubs.Set(app, 'setup_app', setup_app)
         result = super(TestAPIACL, self)._make_app()
-        acl.install(result, {})
+        acl.install(result, cfg.CONF)
         return result
 
     def test_non_authenticated(self):

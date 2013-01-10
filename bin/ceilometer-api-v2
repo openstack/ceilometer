@@ -26,6 +26,7 @@ from pecan import configuration
 
 from ceilometer.api import acl
 from ceilometer.api import app
+from ceilometer import service
 from ceilometer.api import config as api_config
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import log as logging
@@ -39,8 +40,7 @@ if __name__ == '__main__':
 
     # Parse OpenStack config file and command line options, then
     # configure logging.
-    cfg.CONF(sys.argv[1:])
-    logging.setup('ceilometer.api')
+    service.prepare_service()
 
     # Set up the pecan configuration
     filename = api_config.__file__.replace('.pyc', '.py')
@@ -49,7 +49,7 @@ if __name__ == '__main__':
     # Build the WSGI app
     root = app.setup_app(pecan_config,
                          extra_hooks=[acl.AdminAuthHook()])
-    root = acl.install(root, dict(cfg.CONF))
+    root = acl.install(root, cfg.CONF)
 
     # Create the WSGI server and start it
     host, port = '0.0.0.0', int(cfg.CONF.metering_api_port)

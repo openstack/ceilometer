@@ -24,7 +24,7 @@ from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import jsonutils
 from ceilometer import storage
 from ceilometer.api.v1 import blueprint as v1_blueprint
-from ceilometer.api.v1 import acl
+from ceilometer.api import acl
 
 
 storage.register_opts(cfg.CONF)
@@ -55,7 +55,7 @@ def make_app(enable_acl=True, attach_storage=True):
 
     # Install the middleware wrapper
     if enable_acl:
-        return acl.install(app, dict(cfg.CONF))
+        app.wsgi_app = acl.install(app.wsgi_app, cfg.CONF)
     return app
 
 # For documentation

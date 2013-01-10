@@ -15,28 +15,10 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Set up the ACL to acces the API server."""
+"""Handle the ACL to acces the API server."""
 
 from ceilometer import policy
-
-import keystoneclient.middleware.auth_token as auth_token
-
-
-def register_opts(conf):
-    """Register keystoneclient middleware options
-    """
-    conf.register_opts(auth_token.opts,
-                       group='keystone_authtoken',
-                       )
-    auth_token.CONF = conf
-
-
-def install(app, conf):
-    """Install ACL check on application."""
-    app.wsgi_app = auth_token.AuthProtocol(app.wsgi_app,
-                                           conf=conf,
-                                          )
-    return app
+from ceilometer.api import acl
 
 
 def get_limited_to_project(headers):

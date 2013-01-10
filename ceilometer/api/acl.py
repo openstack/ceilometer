@@ -25,22 +25,22 @@ from webob import exc
 
 import keystoneclient.middleware.auth_token as auth_token
 
+OPT_GROUP_NAME = 'keystone_authtoken'
+
 
 def register_opts(conf):
     """Register keystoneclient middleware options
     """
     conf.register_opts(auth_token.opts,
-                       group='keystone_authtoken',
-                       )
+                       group=OPT_GROUP_NAME)
     auth_token.CONF = conf
 
 
 def install(app, conf):
     """Install ACL check on application."""
-    new_app = auth_token.AuthProtocol(app,
-                                      conf=conf,
-                                      )
-    return new_app
+    register_opts(conf)
+    return auth_token.AuthProtocol(app,
+                                   conf=dict(conf.get(OPT_GROUP_NAME)))
 
 
 class AdminAuthHook(hooks.PecanHook):

@@ -20,8 +20,9 @@
 """
 import sys
 
-from ceilometer.api.v1 import acl
+from ceilometer.api import acl
 from ceilometer.api.v1 import app
+from ceilometer import service
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import log as logging
 
@@ -34,8 +35,7 @@ if __name__ == '__main__':
 
     # Parse config file and command line options,
     # then configure logging.
-    cfg.CONF(sys.argv[1:])
-    logging.setup('ceilometer.api')
+    service.prepare_service()
 
     root = app.make_app()
 
