@@ -50,6 +50,7 @@ class SQLAlchemyStorage(base.StorageEngine):
               resource_id: resource uuid    (->resource.id)
               resource_metadata: metadata dictionaries
               counter_type: counter type
+              counter_unit: counter unit
               counter_volume: counter volume
               timestamp: datetime
               message_signature: message signature
@@ -184,6 +185,7 @@ class Connection(base.Connection):
 
         # Record the raw data for the event.
         meter = Meter(counter_type=data['counter_type'],
+                      counter_unit=data['counter_unit'],
                       counter_name=data['counter_name'], resource=resource)
         self.session.add(meter)
         if not filter(lambda x: x.id == source.id, meter.sources):
@@ -274,6 +276,7 @@ class Connection(base.Connection):
 
         { 'name': name of the meter,
           'type': type of the meter (guage, counter),
+          'unit': unit of the meter,
           'resource_id': UUID of the resource,
           'project_id': UUID of project owning the resource,
           'user_id': UUID of user owning the resource,
@@ -311,6 +314,7 @@ class Connection(base.Connection):
                 m['user_id'] = resource.user_id
                 m['name'] = meter.counter_name
                 m['type'] = meter.counter_type
+                m['unit'] = meter.counter_unit
                 yield m
 
     def get_raw_events(self, event_filter):

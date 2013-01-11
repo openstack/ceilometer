@@ -73,6 +73,7 @@ class MongoDBEngineTestBase(unittest.TestCase):
         self.counter = counter.Counter(
             'instance',
             counter.TYPE_CUMULATIVE,
+            '',
             1,
             'user-id',
             'project-id',
@@ -90,6 +91,7 @@ class MongoDBEngineTestBase(unittest.TestCase):
         self.counter2 = counter.Counter(
             'instance',
             counter.TYPE_CUMULATIVE,
+            '',
             1,
             'user-id',
             'project-id',
@@ -107,6 +109,7 @@ class MongoDBEngineTestBase(unittest.TestCase):
         self.counter3 = counter.Counter(
             'instance',
             counter.TYPE_CUMULATIVE,
+            '',
             1,
             'user-id-alternate',
             'project-id',
@@ -125,6 +128,7 @@ class MongoDBEngineTestBase(unittest.TestCase):
             c = counter.Counter(
                 'instance',
                 counter.TYPE_CUMULATIVE,
+                '',
                 1,
                 'user-id-%s' % i,
                 'project-id-%s' % i,
@@ -217,6 +221,7 @@ class ResourceTest(MongoDBEngineTestBase):
         assert 'meter' in resource
         assert resource['meter'] == [{'counter_name': 'instance',
                                       'counter_type': 'cumulative',
+                                      'counter_unit': '',
                                       }]
 
     def test_new_resource_metadata(self):
@@ -235,6 +240,7 @@ class ResourceTest(MongoDBEngineTestBase):
             assert 'metadata' in resource
             assert resource['meter'] == [{'counter_name': 'instance',
                                           'counter_type': 'cumulative',
+                                          'counter_unit': '',
                                           }]
             break
         else:
@@ -458,6 +464,7 @@ class TestGetEventInterval(MongoDBEngineTestBase):
             c = counter.Counter(
                 name='instance',
                 type=counter.TYPE_CUMULATIVE,
+                unit='',
                 volume=1,
                 user_id='user-id',
                 project_id='project-id',

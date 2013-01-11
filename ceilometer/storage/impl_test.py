@@ -55,7 +55,8 @@ class TestDBStorage(base.StorageEngine):
               timestamp: datetime of last update
               user_id: uuid
               project_id: uuid
-              meter: [ array of {counter_name: string, counter_type: string} ]
+              meter: [ array of {counter_name: string, counter_type: string,
+                                 counter_unit: string} ]
             }
     """
 

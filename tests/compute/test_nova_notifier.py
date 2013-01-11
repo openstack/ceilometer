@@ -59,6 +59,7 @@ class TestNovaNotifier(base.TestCase):
         test_data = counter.Counter(
             name='test',
             type=counter.TYPE_CUMULATIVE,
+            unit='',
             volume=1,
             user_id='test',
             project_id='test',

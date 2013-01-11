@@ -88,6 +88,7 @@ class ImagePollster(_Base):
             yield counter.Counter(
                 name='image',
                 type=counter.TYPE_GAUGE,
+                unit='image',
                 volume=1,
                 user_id=None,
                 project_id=image.owner,
@@ -104,6 +105,7 @@ class ImageSizePollster(_Base):
             yield counter.Counter(
                 name='image.size',
                 type=counter.TYPE_GAUGE,
+                unit='B',
                 volume=image.size,
                 user_id=None,
                 project_id=image.owner,

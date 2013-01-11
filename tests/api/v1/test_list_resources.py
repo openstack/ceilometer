@@ -47,6 +47,7 @@ class TestListResources(tests_api.TestBase):
                 counter.Counter(
                     'instance',
                     'cumulative',
+                    '',
                     1,
                     'user-id',
                     'project-id',
@@ -58,6 +59,7 @@ class TestListResources(tests_api.TestBase):
                 counter.Counter(
                     'instance',
                     'cumulative',
+                    '',
                     1,
                     'user-id',
                     'project-id',
@@ -69,6 +71,7 @@ class TestListResources(tests_api.TestBase):
                 counter.Counter(
                     'instance',
                     'cumulative',
+                    '',
                     1,
                     'user-id2',
                     'project-id2',
@@ -80,6 +83,7 @@ class TestListResources(tests_api.TestBase):
                 counter.Counter(
                     'instance',
                     'cumulative',
+                    '',
                     1,
                     'user-id',
                     'project-id',

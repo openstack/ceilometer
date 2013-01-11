@@ -92,6 +92,7 @@ class CeilometerMiddleware(object):
                                     counter.Counter(
                                         name='storage.objects.incoming.bytes',
                                         type='delta',
+                                        unit='B',
                                         volume=bytes_received,
                                         user_id=env.get('HTTP_X_USER_ID'),
                                         project_id=env.get('HTTP_X_TENANT_ID'),
@@ -113,6 +114,7 @@ class CeilometerMiddleware(object):
                                     counter.Counter(
                                         name='storage.objects.outgoing.bytes',
                                         type='delta',
+                                        unit='B',
                                         volume=bytes_sent,
                                         user_id=env.get('HTTP_X_USER_ID'),
                                         project_id=env.get('HTTP_X_TENANT_ID'),

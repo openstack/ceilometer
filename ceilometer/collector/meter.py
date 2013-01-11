@@ -88,6 +88,7 @@ def meter_message_from_counter(counter, secret, source):
     msg = {'source': source,
            'counter_name': counter.name,
            'counter_type': counter.type,
+           'counter_unit': counter.unit,
            'counter_volume': counter.volume,
            'user_id': counter.user_id,
            'project_id': counter.project_id,

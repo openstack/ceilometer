@@ -61,6 +61,11 @@ def main():
         help='counter type',
         )
     parser.add_argument(
+        '--unit',
+        default=None,
+        help='counter unit',
+        )
+    parser.add_argument(
         '--project',
         help='project id of owner',
         )
@@ -115,6 +120,7 @@ def main():
     while timestamp <= end:
         c = counter.Counter(name=args.counter,
                             type=args.type,
+                            unit=args.unit,
                             volume=args.volume,
                             user_id=args.user,
                             project_id=args.project,
