@@ -39,11 +39,13 @@ class TestPolicy(base.TestCase):
             pass
 
     def test_init(self):
+        json_data = "{\"is_fun\": [[\"role:clown\"]]}"
         cfg.CONF([])
         cfg.CONF.policy_file = tempfile.mktemp()
         with open(cfg.CONF.policy_file, "w") as f:
-            f.write("{}")
+            f.write(json_data)
         policy.init()
+        self.assertEqual(policy._POLICY_CACHE['data'], json_data)
 
     def test_init_file_not_found(self):
         cfg.CONF([])
