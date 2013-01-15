@@ -5,13 +5,8 @@ pep8>=1.0
 mock
 mox
 # NOTE(dhellmann): Ming is necessary to provide the Mongo-in-memory
-# implementation of MongoDB. The original source for Ming is at
-# http://sourceforge.net/project/merciless but there does not seem to
-# be a way to point to a "zipball" of the latest HEAD there, and we
-# need features present only in that version. I forked the project to
-# github to make it easier to install, then ended up making some
-# changes to it so it would be compatible with PyMongo's API.
-https://github.com/dreamhost/Ming/zipball/master#egg=Ming
+# implementation of MongoDB.
+Ming>=0.3.2
 http://tarballs.openstack.org/glance/glance-stable-folsom.tar.gz
 setuptools-git>=0.4
 # FIXME(dhellmann): We need a version of WSME more current
