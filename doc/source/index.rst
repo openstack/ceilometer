@@ -37,7 +37,7 @@ What is the purpose of the project and vision for it?
   users through a REST API.
 * The metering messages are signed and :term:`non-repudiable`.
 
-This documentation offers information on ceilometer works and how to
+This documentation offers information on how ceilometer works and how to
 contribute to the project.
 
 Table of contents
