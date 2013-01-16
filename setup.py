@@ -119,7 +119,6 @@ setuptools.setup(
     [ceilometer.poll.central]
     network_floatingip = ceilometer.network.floatingip:FloatingIPPollster
     image = ceilometer.image.glance:ImagePollster
-    image_size = ceilometer.image.glance:ImageSizePollster
     objectstore = ceilometer.objectstore.swift:SwiftPollster
 
     [ceilometer.storage]

@@ -96,12 +96,6 @@ class ImagePollster(_Base):
                 timestamp=timeutils.isotime(),
                 resource_metadata=self.extract_image_metadata(image),
             )
-
-
-class ImageSizePollster(_Base):
-
-    def get_counters(self, manager, context):
-        for image in self.iter_images():
             yield counter.Counter(
                 name='image.size',
                 type=counter.TYPE_GAUGE,
