@@ -73,7 +73,7 @@ class Connection(base.Connection):
 
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, end_timestamp=None,
-                      metaquery={}):
+                      metaquery={}, resource=None):
         """Return an iterable of dictionaries containing resource information.
 
         { 'resource_id': UUID of the resource,
@@ -90,6 +90,7 @@ class Connection(base.Connection):
         :param start_timestamp: Optional modified timestamp start range.
         :param end_timestamp: Optional modified timestamp end range.
         :param metaquery: Optional dict with metadata to match on.
+        :param resource: Optional resource filter.
         """
 
     def get_meters(self, user=None, project=None, resource=None, source=None,
@@ -128,4 +129,22 @@ class Connection(base.Connection):
     def get_event_interval(self, event_filter):
         """Return the min and max timestamp for events
         matching the event_filter.
+        """
+
+    def get_meter_statistics(self, event_filter):
+        """Return a dictionary containing meter statistics.
+        described by the query parameters.
+
+        The filter must have a meter value set.
+
+        { 'min':
+          'max':
+          'avg':
+          'sum':
+          'count':
+          'duration':
+          'duration_start':
+          'duration_end':
+          }
+
         """

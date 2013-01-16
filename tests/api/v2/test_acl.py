@@ -44,11 +44,11 @@ class TestAPIACL(FunctionalTest):
         return result
 
     def test_non_authenticated(self):
-        response = self.get_json('/sources', expect_errors=True)
+        response = self.get_json('/meters', expect_errors=True)
         self.assertEqual(response.status_int, 401)
 
     def test_authenticated_wrong_role(self):
-        response = self.get_json('/sources',
+        response = self.get_json('/meters',
                                  expect_errors=True,
                                  headers={
                                      "X-Roles": "Member",
@@ -74,7 +74,7 @@ class TestAPIACL(FunctionalTest):
     #     self.assertEqual(response.status_int, 401)
 
     def test_authenticated(self):
-        response = self.get_json('/sources',
+        response = self.get_json('/meters',
                                  expect_errors=True,
                                  headers={
                                      "X-Roles": "admin",

@@ -116,12 +116,16 @@ class TestListMeters(FunctionalTest):
                                'meter.mine']))
 
     def test_with_resource(self):
-        data = self.get_json('/resources/resource-id/meters')
+        data = self.get_json('/meters', q=[{'field': 'resource_id',
+                                            'value': 'resource-id',
+                                            }])
         ids = set(r['name'] for r in data)
         self.assertEquals(set(['meter.test']), ids)
 
     def test_with_source(self):
-        data = self.get_json('/sources/test_source/meters')
+        data = self.get_json('/meters', q=[{'field': 'source',
+                                            'value': 'test_source',
+                                            }])
         ids = set(r['resource_id'] for r in data)
         self.assertEquals(set(['resource-id',
                                'resource-id2',
@@ -129,13 +133,22 @@ class TestListMeters(FunctionalTest):
                                'resource-id4']), ids)
 
     def test_with_source_non_existent(self):
-        data = self.get_json('/sources/test_source_doesnt_exist/meters',
-                             expect_errors=True)
-        self.assert_('No source test_source_doesnt_exist' in
-                     data.json['error_message'])
+        data = self.get_json('/meters',
+                             q=[{'field': 'source',
+                                 'value': 'test_source_doesnt_exist',
+                                 }],
+                             )
+        assert not data
 
     def test_with_user(self):
-        data = self.get_json('/users/user-id/meters')
+        data = self.get_json('/meters',
+                             q=[{'field': 'user_id',
+                                 'value': 'user-id',
+                                 }],
+                             )
+
+        uids = set(r['user_id'] for r in data)
+        self.assertEquals(set(['user-id']), uids)
 
         nids = set(r['name'] for r in data)
         self.assertEquals(set(['meter.mine', 'meter.test']), nids)
@@ -144,14 +157,26 @@ class TestListMeters(FunctionalTest):
         self.assertEquals(set(['resource-id', 'resource-id2']), rids)
 
     def test_with_user_non_existent(self):
-        data = self.get_json('/users/user-id-foobar123/meters')
+        data = self.get_json('/meters',
+                             q=[{'field': 'user_id',
+                                 'value': 'user-id-foobar123',
+                                 }],
+                             )
         self.assertEquals(data, [])
 
     def test_with_project(self):
-        data = self.get_json('/projects/project-id2/meters')
+        data = self.get_json('/meters',
+                             q=[{'field': 'project_id',
+                                 'value': 'project-id2',
+                                 }],
+                             )
         ids = set(r['resource_id'] for r in data)
         self.assertEquals(set(['resource-id3', 'resource-id4']), ids)
 
     def test_with_project_non_existent(self):
-        data = self.get_json('/projects/jd-was-here/meters')
+        data = self.get_json('/meters',
+                             q=[{'field': 'project_id',
+                                 'value': 'jd-was-here',
+                                 }],
+                             )
         self.assertEquals(data, [])

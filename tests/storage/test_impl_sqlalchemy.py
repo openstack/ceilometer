@@ -734,6 +734,91 @@ class MaxResourceTest(SQLAlchemyEngineSubBase):
         assert results == expected
 
 
+class StatisticsTest(SQLAlchemyEngineSubBase):
+
+    def setUp(self):
+        super(StatisticsTest, self).setUp()
+        self.counters = []
+        for i in range(3):
+            c = counter.Counter(
+                'volume.size',
+                'gauge',
+                'GiB',
+                5 + i,
+                'user-id',
+                'project1',
+                'resource-id',
+                timestamp=datetime.datetime(2012, 9, 25, 10 + i, 30 + i),
+                resource_metadata={'display_name': 'test-volume',
+                                   'tag': 'self.counter',
+                                   }
+            )
+            self.counters.append(c)
+            msg = meter.meter_message_from_counter(c,
+                                                   cfg.CONF.metering_secret,
+                                                   'source1',
+                                                   )
+            self.conn.record_metering_data(msg)
+        for i in range(3):
+            c = counter.Counter(
+                'volume.size',
+                'gauge',
+                'GiB',
+                8 + i,
+                'user-5',
+                'project2',
+                'resource-6',
+                timestamp=datetime.datetime(2012, 9, 25, 10 + i, 30 + i),
+                resource_metadata={'display_name': 'test-volume',
+                                   'tag': 'self.counter',
+                                   }
+            )
+            self.counters.append(c)
+            msg = meter.meter_message_from_counter(c,
+                                                   cfg.CONF.metering_secret,
+                                                   'source1',
+                                                   )
+            self.conn.record_metering_data(msg)
+
+    def test_by_user(self):
+        f = storage.EventFilter(
+            user='user-5',
+            meter='volume.size',
+        )
+        results = self.conn.get_meter_statistics(f)
+        assert results['count'] == 3
+        assert results['min'] == 8
+        assert results['max'] == 10
+        assert results['sum'] == 27
+        assert results['avg'] == 9
+
+    def test_by_project(self):
+        f = storage.EventFilter(
+            meter='volume.size',
+            resource='resource-id',
+            start='2012-09-25T11:30:00',
+            end='2012-09-25T11:32:00',
+        )
+        results = self.conn.get_meter_statistics(f)
+        assert results['count'] == 1
+        assert results['min'] == 6
+        assert results['max'] == 6
+        assert results['sum'] == 6
+        assert results['avg'] == 6
+
+    def test_one_resource(self):
+        f = storage.EventFilter(
+            user='user-id',
+            meter='volume.size',
+        )
+        results = self.conn.get_meter_statistics(f)
+        assert results['count'] == 3
+        assert results['min'] == 5
+        assert results['max'] == 7
+        assert results['sum'] == 18
+        assert results['avg'] == 6
+
+
 def test_model_table_args():
     cfg.CONF.database_connection = 'mysql://localhost'
     assert table_args()

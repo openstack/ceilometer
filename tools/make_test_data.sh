@@ -8,6 +8,13 @@ then
     project_name=demo
 fi
 
+if [ -z "$OS_USERNAME" ]
+then
+    user=demo
+else
+    user=$OS_USERNAME
+fi
+
 # Convert a possible project name to an id, if we have
 # keystone installed.
 if which keystone >/dev/null
@@ -41,7 +48,7 @@ late2="2012-08-31T20:00:00"
 
 mkdata() {
   ${bindir}/make_test_data.py --project "$project" \
-    --start "$2" --end "$3" \
+    --user "$user" --start "$2" --end "$3" \
     "$1" instance:m1.tiny 1
 }
 

@@ -133,20 +133,9 @@ class FunctionalTest(unittest.TestCase):
         self.stubs = stubout.StubOutForTesting()
 
         self.app = self._make_app()
-        self._stubout_sources()
 
     def _make_app(self):
         return load_test_app(self.config)
-
-    def _stubout_sources(self):
-        """Source data is usually read from a file, but
-        we want to let tests define their own. The class
-        attribute SOURCE_DATA is injected into the controller
-        as though it was read from the usual configuration
-        file.
-        """
-        self.stubs.SmartSet(v2.SourcesController, 'sources',
-                            self.SOURCE_DATA)
 
     def tearDown(self):
         self.mox.UnsetStubs()
@@ -156,11 +145,19 @@ class FunctionalTest(unittest.TestCase):
         set_config({}, overwrite=True)
 
     def get_json(self, path, expect_errors=False, headers=None,
-                 extra_params={}, **params):
+                 q=[], **params):
         full_path = self.PATH_PREFIX + path
+        query_params = {'q.field': [],
+                        'q.value': [],
+                        'q.op': [],
+                        }
+        for query in q:
+            for name in ['field', 'op', 'value']:
+                query_params['q.%s' % name].append(query.get(name, ''))
         all_params = {}
         all_params.update(params)
-        all_params.update(extra_params)
+        if q:
+            all_params.update(query_params)
         print 'GET: %s %r' % (full_path, all_params)
         response = self.app.get(full_path,
                                 params=all_params,

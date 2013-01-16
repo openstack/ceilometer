@@ -75,45 +75,70 @@ class TestListEvents(FunctionalTest):
         self.conn.record_metering_data(msg2)
 
     def test_all(self):
-        data = self.get_json('/resources')
+        data = self.get_json('/meters/instance')
         self.assertEquals(2, len(data))
 
     def test_empty_project(self):
-        data = self.get_json('/projects/no-such-project/meters/instance')
+        data = self.get_json('/meters/instance',
+                             q=[{'field': 'project_id',
+                                 'value': 'no-such-project',
+                                 }])
         self.assertEquals([], data)
 
     def test_by_project(self):
-        data = self.get_json('/projects/project1/meters/instance')
+        data = self.get_json('/meters/instance',
+                             q=[{'field': 'project_id',
+                                 'value': 'project1',
+                                 }])
         self.assertEquals(1, len(data))
 
     def test_empty_resource(self):
-        data = self.get_json('/resources/no-such-resource/meters/instance')
+        data = self.get_json('/meters/instance',
+                             q=[{'field': 'resource_id',
+                                 'value': 'no-such-resource',
+                                 }])
         self.assertEquals([], data)
 
     def test_by_resource(self):
-        data = self.get_json('/resources/resource-id/meters/instance')
+        data = self.get_json('/meters/instance',
+                             q=[{'field': 'resource_id',
+                                 'value': 'resource-id',
+                                 }])
         self.assertEquals(1, len(data))
 
     def test_empty_source(self):
-        data = self.get_json('/sources/no-such-source/meters/instance',
-                             expect_errors=True)
-        self.assertEquals(data.status_int, 404)
+        data = self.get_json('/meters/instance',
+                             q=[{'field': 'source',
+                                 'value': 'no-such-source',
+                                 }])
+        self.assertEquals(0, len(data))
 
     def test_by_source(self):
-        data = self.get_json('/sources/test_source/meters/instance')
+        data = self.get_json('/meters/instance',
+                             q=[{'field': 'source',
+                                 'value': 'test_source',
+                                 }])
         self.assertEquals(1, len(data))
 
     def test_empty_user(self):
-        data = self.get_json('/users/no-such-user/meters/instance')
+        data = self.get_json('/meters/instance',
+                             q=[{'field': 'user_id',
+                                 'value': 'no-such-user',
+                                 }])
         self.assertEquals([], data)
 
     def test_by_user(self):
-        data = self.get_json('/users/user-id/meters/instance')
+        data = self.get_json('/meters/instance',
+                             q=[{'field': 'user_id',
+                                 'value': 'user-id',
+                                 }])
         self.assertEquals(1, len(data))
 
     def test_metadata(self):
-        data = self.get_json('/resources/resource-id/meters/instance')
-        self.assertEquals(1, len(data))
+        data = self.get_json('/meters/instance',
+                             q=[{'field': 'resource_id',
+                                 'value': 'resource-id',
+                                 }])
         sample = data[0]
         self.assert_('resource_metadata' in sample)
         self.assertEqual(
