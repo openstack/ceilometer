@@ -121,6 +121,7 @@ setuptools.setup(
     image = ceilometer.image.glance:ImagePollster
     image_size = ceilometer.image.glance:ImageSizePollster
     objectstore = ceilometer.objectstore.swift:SwiftPollster
+    kwapi = ceilometer.energy.kwapi:KwapiPollster
 
     [ceilometer.storage]
     log = ceilometer.storage.impl_log:LogStorage
