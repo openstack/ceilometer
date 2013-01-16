@@ -17,28 +17,48 @@
 # under the License.
 
 from pecan import make_app
+from pecan import configuration
+
+from ceilometer.api import config as api_config
+from ceilometer.api import acl
 from ceilometer.api import hooks
 from ceilometer.api import middleware
-from ceilometer.service import prepare_service
+from ceilometer.openstack.common import cfg
 
 
-def setup_app(config, extra_hooks=[]):
+def get_pecan_config():
+    # Set up the pecan configuration
+    filename = api_config.__file__.replace('.pyc', '.py')
+    return configuration.conf_from_file(filename)
 
-    # Initialize the cfg.CONF object
-    prepare_service([])
 
+def setup_app(pecan_config=None, extra_hooks=None):
     # FIXME: Replace DBHook with a hooks.TransactionHook
     app_hooks = [hooks.ConfigHook(),
                  hooks.DBHook()]
-    app_hooks.extend(extra_hooks)
+    if extra_hooks:
+        app_hooks.extend(extra_hooks)
 
-    return make_app(
-        config.app.root,
-        static_root=config.app.static_root,
-        template_path=config.app.template_path,
-        logging=getattr(config, 'logging', {}),
-        debug=getattr(config.app, 'debug', False),
-        force_canonical=getattr(config.app, 'force_canonical', True),
+    if not pecan_config:
+        pecan_config = get_pecan_config()
+
+    if pecan_config.app.enable_acl:
+        app_hooks.append(acl.AdminAuthHook())
+
+    configuration.set_config(dict(pecan_config), overwrite=True)
+
+    app = make_app(
+        pecan_config.app.root,
+        static_root=pecan_config.app.static_root,
+        template_path=pecan_config.app.template_path,
+        logging=getattr(pecan_config, 'logging', {}),
+        debug=getattr(pecan_config.app, 'debug', False),
+        force_canonical=getattr(pecan_config.app, 'force_canonical', True),
         hooks=app_hooks,
         wrap_app=middleware.ParsableErrorMiddleware,
     )
+
+    if pecan_config.app.enable_acl:
+        return acl.install(app, cfg.CONF)
+
+    return app

@@ -20,27 +20,14 @@
 """
 import sys
 
-from ceilometer.api import acl
 from ceilometer.api.v1 import app
 from ceilometer import service
 from ceilometer.openstack.common import cfg
-from ceilometer.openstack.common import log as logging
 
 
 if __name__ == '__main__':
-    # Register keystone middleware option before
-    # parsing the config file and command line
-    # inputs.
-    acl.register_opts(cfg.CONF)
-
     # Parse config file and command line options,
     # then configure logging.
-    service.prepare_service()
-
-    root = app.make_app()
-
-    # Enable debug mode
-    if cfg.CONF.verbose or cfg.CONF.debug:
-        root.debug = True
-
+    service.prepare_service(sys.argv)
+    root = app.make_app(cfg.CONF)
     root.run(host='0.0.0.0', port=cfg.CONF.metering_api_port)

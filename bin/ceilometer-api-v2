@@ -22,34 +22,19 @@ import os
 import sys
 from wsgiref import simple_server
 
-from pecan import configuration
-
-from ceilometer.api import acl
 from ceilometer.api import app
 from ceilometer import service
-from ceilometer.api import config as api_config
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import log as logging
 
 
 if __name__ == '__main__':
-    # Register keystone middleware option before
-    # parsing the config file and command line
-    # inputs.
-    acl.register_opts(cfg.CONF)
-
     # Parse OpenStack config file and command line options, then
     # configure logging.
-    service.prepare_service()
-
-    # Set up the pecan configuration
-    filename = api_config.__file__.replace('.pyc', '.py')
-    pecan_config = configuration.conf_from_file(filename)
+    service.prepare_service(sys.argv)
 
     # Build the WSGI app
-    root = app.setup_app(pecan_config,
-                         extra_hooks=[acl.AdminAuthHook()])
-    root = acl.install(root, cfg.CONF)
+    root = app.setup_app()
 
     # Create the WSGI server and start it
     host, port = '0.0.0.0', int(cfg.CONF.metering_api_port)
