@@ -142,8 +142,8 @@ write_autodoc_index()
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.intersphinx',
               'sphinx.ext.todo',
-	      'sphinxcontrib.autohttp.flask',
-	      'wsme.sphinxext',	      
+              'sphinxcontrib.autohttp.flask',
+              'wsmeext.sphinxext',
               'sphinx.ext.coverage',
               'sphinx.ext.pngmath',
               'sphinx.ext.viewcode']

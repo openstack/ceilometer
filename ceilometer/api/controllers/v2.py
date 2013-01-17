@@ -83,7 +83,7 @@ from pecan import request
 from pecan.rest import RestController
 
 import wsme
-import wsme.pecan
+import wsmeext.pecan as wsme_pecan
 from wsme.types import Base, text, wsattr
 
 from ceilometer.openstack.common import jsonutils
@@ -151,7 +151,7 @@ class DateRange(Base):
 
 class MeterVolumeController(object):
 
-    @wsme.pecan.wsexpose(MeterVolume, DateRange)
+    @wsme_pecan.wsexpose(MeterVolume, DateRange)
     def max(self, daterange=None):
         """Find the maximum volume for the matching meter events.
         """
@@ -195,7 +195,7 @@ class MeterVolumeController(object):
 
         return MeterVolume(volume=value)
 
-    @wsme.pecan.wsexpose(MeterVolume, DateRange)
+    @wsme_pecan.wsexpose(MeterVolume, DateRange)
     def sum(self, daterange=None):
         """Compute the total volume for the matching meter events.
         """
@@ -290,7 +290,7 @@ class MeterController(RestController):
         request.context['meter_id'] = meter_id
         self._id = meter_id
 
-    @wsme.pecan.wsexpose([Event], DateRange)
+    @wsme_pecan.wsexpose([Event], DateRange)
     def get_all(self, daterange=None):
         """Return all events for the meter.
         """
@@ -309,7 +309,7 @@ class MeterController(RestController):
                 for e in request.storage_conn.get_raw_events(f)
                 ]
 
-    @wsme.pecan.wsexpose(Duration, DateRange)
+    @wsme_pecan.wsexpose(Duration, DateRange)
     def duration(self, daterange=None):
         """Computes the duration of the meter events in the time range given.
         """
@@ -378,7 +378,7 @@ class MetersController(RestController):
     def _lookup(self, meter_id, *remainder):
         return MeterController(meter_id), remainder
 
-    @wsme.pecan.wsexpose([Meter])
+    @wsme_pecan.wsexpose([Meter])
     def get_all(self):
         user_id = request.context.get('user_id')
         project_id = request.context.get('project_id')
@@ -430,7 +430,7 @@ class ResourcesController(RestController):
     def _lookup(self, resource_id, *remainder):
         return ResourceController(resource_id), remainder
 
-    @wsme.pecan.wsexpose([Resource])
+    @wsme_pecan.wsexpose([Resource])
     def get_all(self, start_timestamp=None, end_timestamp=None):
         if start_timestamp:
             start_timestamp = timeutils.parse_isotime(start_timestamp)
@@ -467,7 +467,7 @@ class ProjectsController(RestController):
     def _lookup(self, project_id, *remainder):
         return ProjectController(project_id), remainder
 
-    @wsme.pecan.wsexpose([text])
+    @wsme_pecan.wsexpose([text])
     def get_all(self):
         source_id = request.context.get('source_id')
         projects = list(request.storage_conn.get_projects(source=source_id))
@@ -493,7 +493,7 @@ class UsersController(RestController):
     def _lookup(self, user_id, *remainder):
         return UserController(user_id), remainder
 
-    @wsme.pecan.wsexpose([text])
+    @wsme_pecan.wsexpose([text])
     def get_all(self):
         source_id = request.context.get('source_id')
         users = list(request.storage_conn.get_users(source=source_id))
@@ -518,7 +518,7 @@ class SourceController(RestController):
         self._id = source_id
         self._data = data
 
-    @wsme.pecan.wsexpose(Source)
+    @wsme_pecan.wsexpose(Source)
     def get(self):
         response = Source(name=self._id, data=self._data)
         return response
@@ -566,7 +566,7 @@ class SourcesController(RestController):
             pecan.abort(404, detail='No source %s' % source_id)
         return SourceController(source_id, data), remainder
 
-    @wsme.pecan.wsexpose([Source])
+    @wsme_pecan.wsexpose([Source])
     def get_all(self):
         return [Source(name=key, data=value)
                 for key, value in self.sources.iteritems()]
