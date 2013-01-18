@@ -1,4 +1,4 @@
-webob
+WebOb>=1.2
 kombu
 iso8601
 lockfile
