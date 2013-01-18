@@ -18,7 +18,6 @@
 """Handle the ACL to acces the API server."""
 
 from ceilometer import policy
-from ceilometer.api import acl
 
 
 def get_limited_to_project(headers):
