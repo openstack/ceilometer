@@ -48,7 +48,6 @@ from ceilometer import counter
 from ceilometer.tests import base
 from ceilometer.tests import skip
 from ceilometer.compute import nova_notifier
-from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import importutils
 
 

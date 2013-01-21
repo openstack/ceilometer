@@ -19,7 +19,6 @@
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import log as logging
 
-from nova import db
 from ceilometer.compute.manager import AgentManager
 
 try:

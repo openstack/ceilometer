@@ -14,11 +14,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import os
 from functools import wraps
 from novaclient.v1_1 import client as nova_client
 
-import ceilometer.service
 from ceilometer.openstack.common import cfg, log
 
 LOG = log.getLogger(__name__)
