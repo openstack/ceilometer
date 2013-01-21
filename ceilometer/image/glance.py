@@ -23,33 +23,27 @@ from __future__ import absolute_import
 import itertools
 
 import glanceclient
-from keystoneclient.v2_0 import client as ksclient
 
 from ceilometer import plugin
 from ceilometer import counter
-from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import timeutils
 
 
 class _Base(plugin.PollsterBase):
 
     @staticmethod
-    def get_glance_client():
-        k = ksclient.Client(username=cfg.CONF.os_username,
-                            password=cfg.CONF.os_password,
-                            tenant_id=cfg.CONF.os_tenant_id,
-                            tenant_name=cfg.CONF.os_tenant_name,
-                            auth_url=cfg.CONF.os_auth_url)
-
-        endpoint = k.service_catalog.url_for(service_type='image',
-                                             endpoint_type='internalURL')
+    def get_glance_client(ksclient):
+        endpoint = ksclient.service_catalog.url_for(
+            service_type='image',
+            endpoint_type='internalURL')
 
         # hard-code v1 glance API version selection while v2 API matures
-        return glanceclient.Client('1', endpoint, token=k.auth_token)
+        return glanceclient.Client('1', endpoint,
+                                   token=ksclient.auth_token)
 
-    def iter_images(self):
+    def iter_images(self, ksclient):
         """Iterate over all images."""
-        client = self.get_glance_client()
+        client = self.get_glance_client(ksclient)
         #TODO(eglynn): use pagination to protect against unbounded
         #              memory usage
         return itertools.chain(
@@ -88,7 +82,7 @@ class ImagePollster(_Base):
         return ['image', 'image.size']
 
     def get_counters(self, manager):
-        for image in self.iter_images():
+        for image in self.iter_images(manager.keystone):
             yield counter.Counter(
                 name='image',
                 type=counter.TYPE_GAUGE,

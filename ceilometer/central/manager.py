@@ -16,6 +16,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from keystoneclient.v2_0 import client as ksclient
+
 from ceilometer import agent
 from ceilometer import extension_manager
 from ceilometer.openstack.common import cfg
@@ -42,6 +44,12 @@ class AgentManager(agent.AgentManager):
 
     def periodic_tasks(self, context, raise_on_error=False):
         """Tasks to be run at a periodic interval."""
+        self.keystone = ksclient.Client(username=cfg.CONF.os_username,
+                                        password=cfg.CONF.os_password,
+                                        tenant_id=cfg.CONF.os_tenant_id,
+                                        tenant_name=cfg.CONF.os_tenant_name,
+                                        auth_url=cfg.CONF.os_auth_url)
+
         self.ext_manager.map(self.publish_counters_from_one_pollster,
                              manager=self,
                              context=context,

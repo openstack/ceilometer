@@ -83,16 +83,23 @@ IMAGE_LIST = [
 ]
 
 
+class TestManager(manager.AgentManager):
+
+    def __init__(self):
+        super(TestManager, self).__init__()
+        self.keystone = None
+
+
 class TestImagePollster(base.TestCase):
 
     @staticmethod
-    def fake_glance_iter_images(foobar):
+    def fake_glance_iter_images(self, ksclient):
         return iter(IMAGE_LIST)
 
     def setUp(self):
         super(TestImagePollster, self).setUp()
         self.context = context.get_admin_context()
-        self.manager = manager.AgentManager()
+        self.manager = TestManager()
         self.stubs.Set(glance._Base, 'iter_images',
                        self.fake_glance_iter_images)
 

@@ -36,6 +36,7 @@ class TestFloatingIPPollster(base.TestCase):
         self.stubs.Set(nova_client.Client, 'floating_ip_get_all',
                        self.faux_get_ips)
 
+    @staticmethod
     def faux_get_ips(self):
         ips = []
         for i in range(1, 4):

@@ -31,17 +31,24 @@ ACCOUNTS = [('tenant-000', {'x-account-object-count': 12,
                             })]
 
 
+class TestManager(manager.AgentManager):
+
+    def __init__(self):
+        super(TestManager, self).__init__()
+        self.keystone = None
+
+
 class TestSwiftPollster(base.TestCase):
 
     @staticmethod
-    def fake_iter_accounts(_dummy):
+    def fake_iter_accounts(self, ksclient):
         for i in ACCOUNTS:
             yield i
 
     def setUp(self):
         super(TestSwiftPollster, self).setUp()
         self.pollster = swift.SwiftPollster()
-        self.manager = manager.AgentManager()
+        self.manager = TestManager()
         self.stubs.Set(swift.SwiftPollster, 'iter_accounts',
                        self.fake_iter_accounts)
 
@@ -50,6 +57,6 @@ class TestSwiftPollster(base.TestCase):
         self.assertEqual(len(counters), 6)
 
     def test_objectstore_get_counter_names(self):
-        counters = list(self.pollster.get_counters(None))
+        counters = list(self.pollster.get_counters(self.manager))
         self.assertEqual(set([c.name for c in counters]),
                          set(self.pollster.get_counter_names()))

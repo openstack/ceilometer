@@ -16,7 +16,6 @@
 
 import datetime
 
-from keystoneclient.v2_0 import client as ksclient
 import requests
 
 from ceilometer import counter
@@ -51,21 +50,16 @@ class _Base(plugin.CentralPollster):
     """Base class for the Kwapi pollster, derived from CentralPollster."""
 
     @staticmethod
-    def get_kwapi_client():
+    def get_kwapi_client(ksclient):
         """Returns a KwapiClient configured with the proper url and token."""
-        keystone = ksclient.Client(username=cfg.CONF.os_username,
-                                   password=cfg.CONF.os_password,
-                                   tenant_id=cfg.CONF.os_tenant_id,
-                                   tenant_name=cfg.CONF.os_tenant_name,
-                                   auth_url=cfg.CONF.os_auth_url)
-        endpoint = keystone.service_catalog.url_for(service_type='energy',
+        endpoint = ksclient.service_catalog.url_for(service_type='energy',
                                                     endpoint_type='internalURL'
                                                     )
-        return KwapiClient(endpoint, keystone.auth_token)
+        return KwapiClient(endpoint, ksclient.auth_token)
 
-    def iter_probes(self):
+    def iter_probes(self, ksclient):
         """Iterate over all probes."""
-        client = self.get_kwapi_client()
+        client = self.get_kwapi_client(ksclient)
         return client.iter_probes()
 
 
@@ -78,7 +72,7 @@ class KwapiPollster(_Base):
 
     def get_counters(self, manager):
         """Returns all counters."""
-        for probe in self.iter_probes():
+        for probe in self.iter_probes(manager.keystone):
             yield counter.Counter(
                 name='energy',
                 type=counter.TYPE_CUMULATIVE,

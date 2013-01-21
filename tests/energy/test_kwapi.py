@@ -43,10 +43,17 @@ PROBE_DICT = {
 }
 
 
+class TestManager(manager.AgentManager):
+
+    def __init__(self):
+        super(TestManager, self).__init__()
+        self.keystone = None
+
+
 class TestKwapiPollster(base.TestCase):
 
     @staticmethod
-    def fake_kwapi_iter_probes(foobar):
+    def fake_kwapi_iter_probes(self, ksclient):
         probes = PROBE_DICT['probes']
         for key, value in probes.iteritems():
             probe_dict = value
@@ -56,7 +63,7 @@ class TestKwapiPollster(base.TestCase):
     def setUp(self):
         super(TestKwapiPollster, self).setUp()
         self.context = context.get_admin_context()
-        self.manager = manager.AgentManager()
+        self.manager = TestManager()
         self.stubs.Set(kwapi._Base, 'iter_probes', self.fake_kwapi_iter_probes)
 
     def test_kwapi_counter(self):

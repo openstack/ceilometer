@@ -27,6 +27,7 @@ from ceilometer import publish
 from ceilometer.tests import base
 
 from ceilometer.openstack.common import cfg
+from keystoneclient.v2_0 import client as ksclient
 
 
 def test_load_plugins():
@@ -62,6 +63,7 @@ class TestRunTasks(base.TestCase):
         super(TestRunTasks, self).setUp()
         self.notifications = []
         self.stubs.Set(publish, 'publish_counter', self.faux_notify)
+        self.stubs.Set(ksclient, 'Client', lambda *args, **kwargs: None)
         self.mgr = manager.AgentManager()
         self.mgr.ext_manager = extension.ExtensionManager('fake',
                                                           invoke_on_load=False,
