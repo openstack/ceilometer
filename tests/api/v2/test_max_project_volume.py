@@ -31,7 +31,7 @@ from .base import FunctionalTest
 
 class TestMaxProjectVolume(FunctionalTest):
 
-    PATH = '/projects/project1/meters/volume.size/volume/max'
+    PATH = '/meters/volume.size/statistics'
 
     def setUp(self):
         super(TestMaxProjectVolume, self).setUp()
@@ -60,42 +60,72 @@ class TestMaxProjectVolume(FunctionalTest):
             self.conn.record_metering_data(msg)
 
     def test_no_time_bounds(self):
-        data = self.get_json(self.PATH)
-        expected = {'volume': 7}
-        self.assertEqual(data, expected)
+        data = self.get_json(self.PATH, q=[{'field': 'project_id',
+                                            'value': 'project1',
+                                            }])
+        self.assertEqual(data['max'], 7)
+        self.assertEqual(data['count'], 3)
 
     def test_start_timestamp(self):
-        data = self.get_json(
-            self.PATH,
-            extra_params={'daterange.start': '2012-09-25T11:30:00'})
-        expected = {'volume': 7}
-        self.assertEqual(data, expected)
+        data = self.get_json(self.PATH, q=[{'field': 'project_id',
+                                            'value': 'project1',
+                                            },
+                                           {'field': 'timestamp',
+                                            'op': 'ge',
+                                            'value': '2012-09-25T11:30:00',
+                                            },
+                                           ])
+        self.assertEqual(data['max'], 7)
+        self.assertEqual(data['count'], 2)
 
     def test_start_timestamp_after(self):
-        data = self.get_json(
-            self.PATH,
-            extra_params={'daterange.start': '2012-09-25T12:34:00'})
-        expected = {'volume': None}
-        self.assertEqual(data, expected)
+        data = self.get_json(self.PATH, q=[{'field': 'project_id',
+                                            'value': 'project1',
+                                            },
+                                           {'field': 'timestamp',
+                                            'op': 'ge',
+                                            'value': '2012-09-25T12:34:00',
+                                            },
+                                           ])
+        self.assertEqual(data['max'], None)
+        self.assertEqual(data['count'], 0)
 
     def test_end_timestamp(self):
-        data = self.get_json(
-            self.PATH,
-            extra_params={'daterange.end': '2012-09-25T11:30:00'})
-        expected = {'volume': 5}
-        self.assertEqual(data, expected)
+        data = self.get_json(self.PATH, q=[{'field': 'project_id',
+                                            'value': 'project1',
+                                            },
+                                           {'field': 'timestamp',
+                                            'op': 'le',
+                                            'value': '2012-09-25T11:30:00',
+                                            },
+                                           ])
+        self.assertEqual(data['max'], 5)
+        self.assertEqual(data['count'], 1)
 
     def test_end_timestamp_before(self):
-        data = self.get_json(
-            self.PATH,
-            extra_params={'daterange.end': '2012-09-25T09:54:00'})
-        expected = {'volume': None}
-        self.assertEqual(data, expected)
+        data = self.get_json(self.PATH, q=[{'field': 'project_id',
+                                            'value': 'project1',
+                                            },
+                                           {'field': 'timestamp',
+                                            'op': 'le',
+                                            'value': '2012-09-25T09:54:00',
+                                            },
+                                           ])
+        self.assertEqual(data['max'], None)
+        self.assertEqual(data['count'], 0)
 
     def test_start_end_timestamp(self):
-        data = self.get_json(
-            self.PATH,
-            extra_params={'daterange.start': '2012-09-25T11:30:00',
-                          'daterange.end': '2012-09-25T11:32:00'})
-        expected = {'volume': 6}
-        self.assertEqual(data, expected)
+        data = self.get_json(self.PATH, q=[{'field': 'project_id',
+                                            'value': 'project1',
+                                            },
+                                           {'field': 'timestamp',
+                                            'op': 'ge',
+                                            'value': '2012-09-25T11:30:00',
+                                            },
+                                           {'field': 'timestamp',
+                                            'op': 'le',
+                                            'value': '2012-09-25T11:32:00',
+                                            },
+                                           ])
+        self.assertEqual(data['max'], 6)
+        self.assertEqual(data['count'], 1)

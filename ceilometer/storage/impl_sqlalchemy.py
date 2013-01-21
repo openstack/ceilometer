@@ -222,7 +222,7 @@ class Connection(base.Connection):
 
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, end_timestamp=None,
-                      metaquery=None):
+                      metaquery=None, resource=None):
         """Return an iterable of dictionaries containing resource information.
 
         { 'resource_id': UUID of the resource,
@@ -239,6 +239,7 @@ class Connection(base.Connection):
         :param start_timestamp: Optional modified timestamp start range.
         :param end_timestamp: Optional modified timestamp end range.
         :param metaquery: Optional dict with metadata to match on.
+        :param resource: Optional resource filter.
         """
         query = model_query(Resource, session=self.session)
         if user is not None:
@@ -251,6 +252,8 @@ class Connection(base.Connection):
             query = query.filter(Resource.timestamp < end_timestamp)
         if project is not None:
             query = query.filter(Resource.project_id == project)
+        if resource is not None:
+            query = query.filter(Resource.id == resource)
         query = query.options(
             sqlalchemy_session.sqlalchemy.orm.joinedload('meters'))
         if metaquery is not None:
@@ -368,6 +371,41 @@ class Connection(base.Connection):
         a_min, a_max = results[0]
         return (a_min, a_max)
 
+    def get_meter_statistics(self, event_filter):
+        """Return a dictionary containing meter statistics.
+        described by the query parameters.
+
+        The filter must have a meter value set.
+
+        { 'min':
+          'max':
+          'avg':
+          'sum':
+          'count':
+          'duration':
+          'duration_start':
+          'duration_end':
+          }
+        """
+        query = self.session.query(func.min(Meter.timestamp),
+                                   func.max(Meter.timestamp),
+                                   func.sum(Meter.counter_volume),
+                                   func.min(Meter.counter_volume),
+                                   func.max(Meter.counter_volume),
+                                   func.count(Meter.counter_volume))
+        query = make_query_from_filter(query, event_filter)
+        results = query.all()
+        res = results[0]
+        count = int(res[5])
+        return {'count': count,
+                'min': res[3],
+                'max': res[4],
+                'avg': (res[2] / count) if count > 0 else None,
+                'sum': res[2],
+                'duration': None,
+                'duration_start': res[0],
+                'duration_end': res[1],
+                }
 
 ############################
 

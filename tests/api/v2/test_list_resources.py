@@ -119,7 +119,9 @@ class TestListResources(FunctionalTest):
                                                 )
         self.conn.record_metering_data(msg2)
 
-        data = self.get_json('/sources/test_list_resources/resources')
+        data = self.get_json('/resources', q=[{'field': 'source',
+                                               'value': 'test_list_resources',
+                                               }])
         ids = [r['resource_id'] for r in data]
         self.assertEquals(['resource-id'], ids)
 
@@ -162,7 +164,9 @@ class TestListResources(FunctionalTest):
                                                 )
         self.conn.record_metering_data(msg2)
 
-        data = self.get_json('/users/user-id/resources')
+        data = self.get_json('/resources', q=[{'field': 'user_id',
+                                               'value': 'user-id',
+                                               }])
         ids = [r['resource_id'] for r in data]
         self.assertEquals(['resource-id'], ids)
 
@@ -205,7 +209,9 @@ class TestListResources(FunctionalTest):
                                                 )
         self.conn.record_metering_data(msg2)
 
-        data = self.get_json('/projects/project-id/resources')
+        data = self.get_json('/resources', q=[{'field': 'project_id',
+                                               'value': 'project-id',
+                                               }])
         ids = [r['resource_id'] for r in data]
         self.assertEquals(['resource-id'], ids)
 
