@@ -41,7 +41,6 @@ class TestFloatingIPPollster(base.TestCase):
         for i in range(1, 4):
             ip = mock.MagicMock()
             ip.address = '1.1.1.%d' % i
-            ip.host = self.manager.host
             ips.append(ip)
         return ips
 

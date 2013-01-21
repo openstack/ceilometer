@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 #
-# Copyright © 2012 eNovance <licensing@enovance.com>
+# Copyright © 2012-2013 eNovance <licensing@enovance.com>
 #
 # Author: Julien Danjou <julien@danjou.info>
 #
@@ -18,13 +18,12 @@
 
 from stevedore import driver
 
+from ceilometer import agent
 from ceilometer import extension_manager
-
 from ceilometer import nova_client
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import log
-from ceilometer import publish
 
 OPTS = [
     cfg.ListOpt('disabled_compute_pollsters',
@@ -41,8 +40,6 @@ cfg.CONF.register_opts(OPTS)
 
 LOG = log.getLogger(__name__)
 
-PLUGIN_NAMESPACE = 'ceilometer.poll.compute'
-
 
 def get_hypervisor_inspector():
     try:
@@ -56,41 +53,23 @@ def get_hypervisor_inspector():
         return virt_inspector.Inspector()
 
 
-class AgentManager(object):
+class AgentManager(agent.AgentManager):
 
     def __init__(self):
-        self.ext_manager = extension_manager.ActivatedExtensionManager(
-            namespace=PLUGIN_NAMESPACE,
-            disabled_names=cfg.CONF.disabled_compute_pollsters,
+        super(AgentManager, self).__init__(
+            extension_manager.ActivatedExtensionManager(
+                namespace='ceilometer.poll.compute',
+                disabled_names=cfg.CONF.disabled_compute_pollsters,
+            ),
         )
         self._inspector = get_hypervisor_inspector()
-        return
-
-    @staticmethod
-    def publish_counters_from_one_pollster(ext, manager, context, instance):
-        """Used to invoke the plugins loaded by the ExtensionManager.
-        """
-        try:
-            LOG.info('polling %s', ext.name)
-            for c in ext.obj.get_counters(manager, instance):
-                LOG.info('COUNTER: %s', c)
-                publish.publish_counter(context, c,
-                                        cfg.CONF.metering_topic,
-                                        cfg.CONF.metering_secret,
-                                        cfg.CONF.counter_source,
-                                        )
-        except Exception as err:
-            LOG.warning('Continuing after error from %s for %s: %s',
-                        ext.name, instance.id, err)
-            LOG.exception(err)
 
     def poll_instance(self, context, instance):
         """Poll one instance."""
         self.ext_manager.map(self.publish_counters_from_one_pollster,
                              manager=self,
                              context=context,
-                             instance=instance,
-                             )
+                             instance=instance)
 
     def periodic_tasks(self, context, raise_on_error=False):
         """Tasks to be run at a periodic interval."""
