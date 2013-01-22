@@ -335,6 +335,11 @@ class Connection(base.Connection):
             # detail that should not leak outside of the driver.
             e = row2dict(e)
             del e['id']
+            # Replace 'sources' with 'source' to meet the caller's
+            # expectation, Meter.sources contains one and only one
+            # source in the current implementation.
+            e['source'] = e['sources'][0]['id']
+            del e['sources']
             yield e
 
     def _make_volume_query(self, event_filter, counter_volume_func):

@@ -112,44 +112,7 @@ class MeterTest(base.MeterTest, SQLAlchemyEngineTestBase):
 
 
 class RawEventTest(base.RawEventTest, SQLAlchemyEngineTestBase):
-
-    def _compare_raw(self, msg_dict, result_dict):
-        for k, v in msg_dict.items():
-            if k in ['timestamp', 'source']:
-                continue
-            if k == 'resource_metadata':
-                key = result_dict[k]
-                value = v
-            else:
-                key = str(result_dict[k])
-                value = str(v)
-            assert key == value
-
-    def _iterate_msgs(self, results):
-        for meter in results:
-            labels = map(lambda x: x['id'], meter['sources'])
-            # should only have one source
-            assert len(labels) == 1
-            count = re.match('test-(\d+)', labels[0]).group(1)
-            self._compare_raw(getattr(self, 'msg' + count), meter)
-
-    def test_get_raw_events_by_user(self):
-        f = storage.EventFilter(user='user-id')
-        results = list(self.conn.get_raw_events(f))
-        assert len(results) == 2
-        self._iterate_msgs(results)
-
-    def test_get_raw_events_by_project(self):
-        f = storage.EventFilter(project='project-id')
-        results = list(self.conn.get_raw_events(f))
-        assert len(results) == 3
-        self._iterate_msgs(results)
-
-    def test_get_raw_events_by_resource(self):
-        f = storage.EventFilter(user='user-id', resource='resource-id')
-        results = list(self.conn.get_raw_events(f))
-        assert len(results) == 1
-        self._compare_raw(self.msg1, results[0])
+    pass
 
 
 class TestGetEventInterval(base.TestGetEventInterval,

@@ -112,28 +112,7 @@ class MeterTest(base.MeterTest, MongoDBEngineTestBase):
 
 
 class RawEventTest(base.RawEventTest, MongoDBEngineTestBase):
-
-    def test_get_raw_events_by_user(self):
-        f = storage.EventFilter(user='user-id')
-        results = list(self.conn.get_raw_events(f))
-        assert len(results) == 2
-        for meter in results:
-            assert meter in [self.msg1, self.msg2]
-
-    def test_get_raw_events_by_project(self):
-        f = storage.EventFilter(project='project-id')
-        results = list(self.conn.get_raw_events(f))
-        assert results
-        for meter in results:
-            assert meter in [self.msg1, self.msg2, self.msg3]
-
-    def test_get_raw_events_by_resource(self):
-        f = storage.EventFilter(user='user-id', resource='resource-id')
-        results = list(self.conn.get_raw_events(f))
-        assert results
-        meter = results[0]
-        assert meter is not None
-        assert meter == self.msg1
+    pass
 
 
 class SumTest(base.SumTest, MongoDBEngineTestBase):
