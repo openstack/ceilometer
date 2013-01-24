@@ -34,6 +34,7 @@ except ImportError:
     nova_CONF = flags.FLAGS
 from nova import db
 from nova import context
+from nova import service  # For nova_CONF.compute_manager
 from nova.tests import fake_network
 from nova.compute import vm_states
 # Needed for flags option, but Essex does not have it
