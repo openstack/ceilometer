@@ -88,6 +88,10 @@ class TestRunTasks(base.TestCase):
         # Invoke the periodic tasks to call the pollsters.
         self.mgr.periodic_tasks(None)
 
+    def tearDown(self):
+        self.Pollster.counters = []
+        super(TestRunTasks, self).tearDown()
+
     def test_message(self):
         self.assertEqual(len(self.Pollster.counters), 2)
         assert self.Pollster.counters[0][1] is self.instance
