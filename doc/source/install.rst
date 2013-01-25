@@ -15,9 +15,9 @@
 
 .. _install:
 
-================================================
+=======
 Install
-================================================
+=======
 
 Installing and Running the Development Version
 ++++++++++++++++++++++++++++++++++++++++++++++
@@ -85,18 +85,21 @@ Installing the Collector
 
 3. In order to retrieve object store statistics, ceilometer needs
    access to swift with ``ResellerAdmin`` role. You should give this
-   role to your ``os_username`` user for tenant ``os_tenant_name``::
+   role to your ``os_username`` user for tenant ``os_tenant_name``:
 
-   $ keystone role-create --name=ResellerAdmin
-   +----------+----------------------------------+
-   | Property |              Value               |
-   +----------+----------------------------------+
-   |    id    | 462fa46c13fd4798a95a3bfbe27b5e54 |
-   |   name   |          ResellerAdmin           |
-   +----------+----------------------------------+
-   $ keystone user-role-add --tenant_id $SERVICE_TENANT \
-                            --user_id $CEILOMETER_USER \
-                            --role_id 462fa46c13fd4798a95a3bfbe27b5e54
+   ::
+
+     $ keystone role-create --name=ResellerAdmin
+     +----------+----------------------------------+
+     | Property |              Value               |
+     +----------+----------------------------------+
+     |    id    | 462fa46c13fd4798a95a3bfbe27b5e54 |
+     |   name   |          ResellerAdmin           |
+     +----------+----------------------------------+
+
+     $ keystone user-role-add --tenant_id $SERVICE_TENANT \
+                              --user_id $CEILOMETER_USER \
+                              --role_id 462fa46c13fd4798a95a3bfbe27b5e54
 
    You'll also need to add the Ceilometer middleware to Swift to account for
    incoming and outgoing traffic, adding this lines to

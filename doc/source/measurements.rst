@@ -37,11 +37,12 @@ Delta       Changing over time (bandwidth)
 Units should use common abbreviatons:
 
 ============  ========  ==============  =====
-Dimension     Unit      Abbreviations      Note
+Dimension     Unit      Abbreviations   Note
 ============  ========  ==============  =====
 None          N/A                       Dimension-less variable
 Volume        byte                   B
 Time          seconds                s
+============  ========  ==============  =====
 
 Information units should be expressed in bits ('b') or bytes ('B').
 
@@ -51,7 +52,7 @@ Compute (Nova)
 ==============
 
 ========================  ==========  ========  ========  =======================================================
-Name                      Type        Unit     Resource  Note
+Name                      Type        Unit      Resource  Note
 ========================  ==========  ========  ========  =======================================================
 instance                  Gauge                 inst ID   Duration of instance
 instance:<type>           Gauge                 inst ID   Duration of instance <type> (openstack types)
@@ -119,9 +120,9 @@ volume.size               Gauge           GiB  vol ID    Size of volume
 Object Storage (Swift)
 ======================
 
-==========================      ==========  ==========  ========  ==============================================
+==============================  ==========  ==========  ========  ==============================================
 Name                            Type        Volume      Resource  Note
-==========================      ==========  ==========  ========  ==============================================
+==============================  ==========  ==========  ========  ==============================================
 storage.objects                 Gauge          objects  store ID  Number of objects
 storage.objects.size            Gauge                B  store ID  Total size of stored objects
 storage.objects.containers      Gauge       containers  store ID  Number of containers
@@ -130,25 +131,28 @@ storage.objects.outgoing.bytes  Delta                B  store ID  Number of outg
 ==============================  ==========  ==========  ========  ==============================================
 
 Energy (Kwapi)
-======================
+==============
 
-==========================      ==========  ==========  ========  ==============================================
-Name                            Type        Volume      Resource  Note
-==========================      ==========  ==========  ========  ==============================================
-energy                          Cumulative         kWh  probe ID  Amount of energy
-power                           Gauge                W  probe ID  Power consumption
-==============================  ==========  ==========  ========  ==============================================
+==========================  ==========  ==========  ========  ==============================================
+Name                        Type        Volume      Resource  Note
+==========================  ==========  ==========  ========  ==============================================
+energy                      Cumulative         kWh  probe ID  Amount of energy
+power                       Gauge                W  probe ID  Power consumption
+==========================  ==========  ==========  ========  ==============================================
 
 Dynamically retrieving the Meters via ceilometer client
 =======================================================
-    ceilometer meter-list -s openstack
+
+To retrieve the available meters that can be queried given the actual
+resource instances available, use the ``meter-list`` command:
+
+::
+
+    $ ceilometer meter-list -s openstack
     +------------+-------+--------------------------------------+---------+----------------------------------+
     | Name       | Type  | Resource ID                          | User ID | Project ID                       |
     +------------+-------+--------------------------------------+---------+----------------------------------+
     | image      | gauge | 09e84d97-8712-4dd2-bcce-45970b2430f7 |         | 57cf6d93688e4d39bf2fe3d3c03eb326 |
-
-The above command will retrieve the available meters that can be queried on
-given the actual resource instances available.
 
 
 Naming convention
