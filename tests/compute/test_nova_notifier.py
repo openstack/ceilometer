@@ -120,7 +120,8 @@ class TestNovaNotifier(base.TestCase):
                          "access_ip_v4": "someip",
                          "access_ip_v6": "someip",
                          "metadata": {},
-                         "uuid": "144e08f4-00cb-11e2-888e-5453ed1bbb5f"}
+                         "uuid": "144e08f4-00cb-11e2-888e-5453ed1bbb5f",
+                         "system_metadata": {}}
         self.stubs.Set(db, 'instance_info_cache_delete', self.do_nothing)
         self.stubs.Set(db, 'instance_destroy', self.do_nothing)
         self.stubs.Set(db, 'instance_system_metadata_get',
@@ -177,6 +178,7 @@ class TestNovaNotifier(base.TestCase):
             @mock.patch('nova.conductor.api.API.instance_destroy')
             @mock.patch('nova.conductor.api.API.block_device_mapping_destroy')
             @mock.patch('nova.conductor.api.API.instance_update')
+            @mock.patch('nova.compute.utils.add_instance_fault_from_exc')
             def run_test(*omit_args):
                 self.compute.terminate_instance(self.context,
                                                 instance=self.instance)
