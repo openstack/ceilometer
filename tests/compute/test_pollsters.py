@@ -82,6 +82,9 @@ class TestDiskIOPollster(TestPollsterBase):
         counters = list(pollster.get_counters(mgr, self.instance))
         assert counters
 
+        self.assertEqual(set([c.name for c in counters]),
+                         set(pollster.get_counter_names()))
+
         def _verify_disk_metering(name, expected_volume):
             match = [c for c in counters if c.name == name]
             self.assertEquals(len(match), 1, 'missing counter %s' % name)
@@ -129,6 +132,8 @@ class TestNetPollster(TestPollsterBase):
         pollster = pollsters.NetPollster()
         counters = list(pollster.get_counters(mgr, self.instance))
         assert counters
+        self.assertEqual(set([c.name for c in counters]),
+                         set(pollster.get_counter_names()))
 
         def _verify_vnic_metering(name, ip, expected_volume):
             match = [c for c in counters if c.name == name and
@@ -168,6 +173,8 @@ class TestCPUPollster(TestPollsterBase):
         def _verify_cpu_metering(zero, expected_time):
             counters = list(pollster.get_counters(mgr, self.instance))
             self.assertEquals(len(counters), 2)
+            self.assertEqual(set([c.name for c in counters]),
+                             set(pollster.get_counter_names()))
             assert counters[0].name == 'cpu_util'
             assert (counters[0].volume == 0.0 if zero else
                     counters[0].volume > 0.0)

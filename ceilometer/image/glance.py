@@ -83,6 +83,10 @@ class _Base(plugin.PollsterBase):
 
 class ImagePollster(_Base):
 
+    @staticmethod
+    def get_counter_names():
+        return ['image', 'image.size']
+
     def get_counters(self, manager):
         for image in self.iter_images():
             yield counter.Counter(
