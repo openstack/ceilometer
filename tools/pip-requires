@@ -17,3 +17,4 @@ python-keystoneclient>=0.2,<0.3
 python-swiftclient
 lxml
 requests<1.0
+extras

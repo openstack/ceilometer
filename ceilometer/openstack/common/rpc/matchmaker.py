@@ -21,10 +21,10 @@ return keys for direct exchanges, per (approximate) AMQP parlance.
 import contextlib
 import itertools
 import json
-import logging
 
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common import log as logging
 
 
 matchmaker_opts = [
