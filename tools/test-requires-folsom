@@ -8,12 +8,6 @@ mox
 Ming>=0.3.2
 http://tarballs.openstack.org/glance/glance-stable-folsom.tar.gz
 setuptools-git>=0.4
-# FIXME(dhellmann): We need a version of WSME more current
-# than what is released right now. We can't include it in
-# pip-requires because we have to point to the Mercurial
-# checkout on bitbucket. I hope to have that resolved
-# very soon.
-hg+https://bitbucket.org/cdevienne/wsme
 # 1.7.4 is the Folsom release
 http://tarballs.openstack.org/swift/swift-stable-folsom.tar.gz
 # Swift dep that is not necessary if we depend on swift>1.7.5

@@ -19,3 +19,4 @@ python-swiftclient
 lxml
 requests<1.0
 extras
+wsme>=0.5b1
