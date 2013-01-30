@@ -10,6 +10,7 @@ pymongo>=2.2
 eventlet
 anyjson>=0.2.4
 Flask==0.9
+pecan>=0.2.0
 stevedore>=0.6
 python-glanceclient
 python-novaclient>=2.6.10

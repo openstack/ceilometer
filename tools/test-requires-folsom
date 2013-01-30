@@ -14,7 +14,6 @@ setuptools-git>=0.4
 # checkout on bitbucket. I hope to have that resolved
 # very soon.
 hg+https://bitbucket.org/cdevienne/wsme
-pecan
 # 1.7.4 is the Folsom release
 http://tarballs.openstack.org/swift/swift-stable-folsom.tar.gz
 # Swift dep that is not necessary if we depend on swift>1.7.5
