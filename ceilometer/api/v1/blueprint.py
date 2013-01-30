@@ -91,7 +91,9 @@ from ceilometer.api.v1 import acl
 LOG = log.getLogger(__name__)
 
 
-blueprint = flask.Blueprint('v1', __name__)
+blueprint = flask.Blueprint('v1', __name__,
+                            template_folder='templates',
+                            static_folder='static')
 
 
 def request_wants_html():

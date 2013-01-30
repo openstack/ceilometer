@@ -203,3 +203,9 @@ class TestListEvents(tests_api.TestBase):
                         headers={"X-Roles": "Member",
                                  "X-Tenant-Id": "project2"})
         self.assertEquals(1, len(data['events']))
+
+    def test_template_list_event(self):
+        rv = self.get('/resources/resource-id/meters/instance',
+                      headers={"Accept": "text/html"})
+        self.assertEqual(200, rv.status_code)
+        self.assertTrue("text/html" in rv.content_type)
