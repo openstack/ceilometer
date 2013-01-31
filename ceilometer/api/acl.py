@@ -18,6 +18,7 @@
 """Set up the ACL to acces the API server."""
 
 from ceilometer import policy
+from ceilometer.openstack.common import cfg
 
 from pecan import hooks
 
@@ -36,9 +37,11 @@ def register_opts(conf):
     auth_token.CONF = conf
 
 
+register_opts(cfg.CONF)
+
+
 def install(app, conf):
     """Install ACL check on application."""
-    register_opts(conf)
     return auth_token.AuthProtocol(app,
                                    conf=dict(conf.get(OPT_GROUP_NAME)))
 

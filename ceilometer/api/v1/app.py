@@ -30,7 +30,7 @@ from ceilometer.api import acl
 storage.register_opts(cfg.CONF)
 
 
-def make_app(enable_acl=True, attach_storage=True):
+def make_app(conf, enable_acl=True, attach_storage=True):
     app = flask.Flask('ceilometer.api')
     app.register_blueprint(v1_blueprint.blueprint, url_prefix='/v1')
 
@@ -42,21 +42,22 @@ def make_app(enable_acl=True, attach_storage=True):
 
     @app.before_request
     def attach_config():
-        flask.request.cfg = cfg.CONF
+        flask.request.cfg = conf
         flask.request.sources = sources
 
     if attach_storage:
         @app.before_request
         def attach_storage():
-            storage_engine = storage.get_engine(cfg.CONF)
+            storage_engine = storage.get_engine(conf)
             flask.request.storage_engine = storage_engine
             flask.request.storage_conn = \
-                storage_engine.get_connection(cfg.CONF)
+                storage_engine.get_connection(conf)
 
     # Install the middleware wrapper
     if enable_acl:
-        app.wsgi_app = acl.install(app.wsgi_app, cfg.CONF)
+        app.wsgi_app = acl.install(app.wsgi_app, conf)
+
     return app
 
 # For documentation
-app = make_app(enable_acl=False, attach_storage=False)
+app = make_app(cfg.CONF, enable_acl=False, attach_storage=False)

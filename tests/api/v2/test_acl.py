@@ -17,31 +17,47 @@
 # under the License.
 """Test ACL."""
 
-from ceilometer.api import acl
-from ceilometer.api import app
-from ceilometer.openstack.common import cfg
+import datetime
+
 from .base import FunctionalTest
+
+VALID_TOKEN = '4562138218392831'
+
+
+class FakeMemcache(object):
+    def __init__(self):
+        self.set_key = None
+        self.set_value = None
+        self.token_expiration = None
+
+    def get(self, key):
+        if key == "tokens/%s" % VALID_TOKEN:
+            dt = datetime.datetime.now() + datetime.timedelta(minutes=5)
+            return ({'access': {
+                'token': {'id': VALID_TOKEN},
+                'user': {
+                    'id': 'user_id1',
+                    'name': 'user_name1',
+                    'tenantId': '123i2910',
+                    'tenantName': 'mytenant',
+                    'roles': [
+                        {'name': 'admin'},
+                    ]},
+            }}, dt.strftime("%s"))
+
+    def set(self, key, value, time=None):
+        self.set_value = value
+        self.set_key = key
 
 
 class TestAPIACL(FunctionalTest):
 
+    def setUp(self):
+        super(TestAPIACL, self).setUp()
+        self.app.app._cache = FakeMemcache()
+
     def _make_app(self):
-        # Save the original app constructor so
-        # we can use it in our wrapper
-        original_setup_app = app.setup_app
-
-        # Wrap application construction with
-        # a function that ensures the AdminAuthHook
-        # is provided.
-        def setup_app(config, extra_hooks=[]):
-            extra_hooks = extra_hooks[:]
-            extra_hooks.append(acl.AdminAuthHook())
-            return original_setup_app(config, extra_hooks)
-
-        self.stubs.Set(app, 'setup_app', setup_app)
-        result = super(TestAPIACL, self)._make_app()
-        acl.install(result, cfg.CONF)
-        return result
+        return super(TestAPIACL, self)._make_app(enable_acl=True)
 
     def test_non_authenticated(self):
         response = self.get_json('/meters', expect_errors=True)
@@ -77,6 +93,7 @@ class TestAPIACL(FunctionalTest):
         response = self.get_json('/meters',
                                  expect_errors=True,
                                  headers={
+                                     "X-Auth-Token": VALID_TOKEN,
                                      "X-Roles": "admin",
                                      "X-Tenant-Name": "admin",
                                      "X-Tenant-Id":

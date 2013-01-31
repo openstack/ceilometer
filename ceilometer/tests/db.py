@@ -49,6 +49,7 @@ class TestBase(test_base.TestCase):
 
     def tearDown(self):
         self.conn.drop_database(self.DBNAME)
+        super(TestBase, self).tearDown()
 
 
 class TestConnection(impl_mongodb.Connection):
