@@ -97,8 +97,7 @@ class TestImagePollster(base.TestCase):
                        self.fake_glance_iter_images)
 
     def test_glance_image_counter(self):
-        counters = list(glance.ImagePollster().get_counters(self.manager,
-                                                            self.context))
+        counters = list(glance.ImagePollster().get_counters(self.manager))
         self.assertEqual(len(counters), 6)
         for counter in [c for c in counters if c.name == 'image']:
             self.assertEqual(counter.volume, 1)

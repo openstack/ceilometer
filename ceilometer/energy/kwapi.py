@@ -72,7 +72,7 @@ class _Base(plugin.CentralPollster):
 class KwapiPollster(_Base):
     """Kwapi pollster derived from the base class."""
 
-    def get_counters(self, manager, context):
+    def get_counters(self, manager):
         """Returns all counters."""
         for probe in self.iter_probes():
             yield counter.Counter(

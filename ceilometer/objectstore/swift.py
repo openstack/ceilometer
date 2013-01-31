@@ -52,7 +52,7 @@ class _Base(plugin.PollsterBase):
     def iter_accounts():
         """Iterate over all accounts, yielding (tenant_id, stats) tuples."""
 
-    def get_counters(self, manager, context):
+    def get_counters(self, manager):
         for tenant, account in self.iter_accounts():
             yield counter.Counter(
                 name='storage.objects',

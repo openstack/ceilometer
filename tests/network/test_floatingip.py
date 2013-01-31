@@ -58,7 +58,7 @@ class TestFloatingIPPollster(base.TestCase):
     #         assert False, 'Should have seen an error'
 
     def test_get_counters_not_empty(self):
-        counters = list(self.pollster.get_counters(self.manager, self.context))
+        counters = list(self.pollster.get_counters(self.manager))
         self.assertEqual(len(counters), 3)
         addresses = [c.resource_metadata['address']
                      for c in counters
