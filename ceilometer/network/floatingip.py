@@ -28,7 +28,7 @@ class FloatingIPPollster(plugin.CentralPollster):
 
     LOG = log.getLogger(__name__ + '.floatingip')
 
-    def get_counters(self, manager, context):
+    def get_counters(self, manager):
         nv = nova_client.Client()
         for ip in nv.floating_ip_get_all():
             self.LOG.info("FLOATING IP USAGE: %s" % ip.address)

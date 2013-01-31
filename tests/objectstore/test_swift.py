@@ -17,6 +17,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from ceilometer.central import manager
 from ceilometer.objectstore import swift
 from ceilometer.tests import base
 
@@ -40,9 +41,10 @@ class TestSwiftPollster(base.TestCase):
     def setUp(self):
         super(TestSwiftPollster, self).setUp()
         self.pollster = swift.SwiftPollster()
+        self.manager = manager.AgentManager()
         self.stubs.Set(swift.SwiftPollster, 'iter_accounts',
                        self.fake_iter_accounts)
 
     def test_objectstore_metering(self):
-        counters = list(self.pollster.get_counters(None, None))
+        counters = list(self.pollster.get_counters(self.manager))
         self.assertEqual(len(counters), 6)
