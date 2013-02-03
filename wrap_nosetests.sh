@@ -1,5 +1,5 @@
 #!/bin/sh
-# Wrap tox to force it to enable global site-packages until
+# Wrap nosetests to force it to enable global site-packages until
 # https://bitbucket.org/hpk42/tox/issue/32 is released.
 
 set -x
