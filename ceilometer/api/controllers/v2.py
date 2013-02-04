@@ -51,6 +51,11 @@ operation_kind = Enum(str, 'lt', 'le', 'eq', 'ne', 'ge', 'gt')
 
 
 class Query(Base):
+    """Query filter.
+    """
+
+    _op = None  # provide a default
+
     def get_op(self):
         return self._op or 'eq'
 
@@ -58,14 +63,26 @@ class Query(Base):
         self._op = value
 
     field = text
+    "The name of the field to test"
+
     #op = wsme.wsattr(operation_kind, default='eq')
     # this ^ doesn't seem to work.
     op = wsme.wsproperty(operation_kind, get_op, set_op)
+    "The comparison operator. Defaults to 'eq'."
+
     value = text
+    "The value to compare against the stored data"
 
     def __repr__(self):
         # for logging calls
         return '<Query %r %s %r>' % (self.field, self.op, self.value)
+
+    @classmethod
+    def sample(cls):
+        return cls(field='resource_id',
+                   op='eq',
+                   value='bd9431c1-8d69-4ad3-803a-8d4a6b89fd36',
+                   )
 
 
 def _query_to_kwargs(query, db_func):
@@ -184,17 +201,44 @@ def _flatten_metadata(metadata):
 
 
 class Sample(Base):
+    """A single measurement for a given meter and resource.
+    """
+
     source = text
+    "An identity source ID"
+
     counter_name = text
+    "The name of the meter"
+    # FIXME(dhellmann): Make this meter_name?
+
     counter_type = text
+    "The type of the meter (see :ref:`measurements`)"
+    # FIXME(dhellmann): Make this meter_type?
+
     counter_unit = text
+    "The unit of measure for the value in counter_volume"
+    # FIXME(dhellmann): Make this meter_unit?
+
     counter_volume = float
+    "The actual measured value"
+
     user_id = text
+    "The ID of the user who last triggered an update to the resource"
+
     project_id = text
+    "The ID of the project or tenant that owns the resource"
+
     resource_id = text
+    "The ID of the :class:`Resource` for which the measurements are taken"
+
     timestamp = datetime.datetime
+    "UTC date and time when the measurement was made"
+
     resource_metadata = {text: text}
+    "Arbitrary metadata associated with the resource"
+
     message_id = text
+    "A unique identifier for the sample"
 
     def __init__(self, counter_volume=None, resource_metadata={}, **kwds):
         if counter_volume is not None:
@@ -204,16 +248,50 @@ class Sample(Base):
                                      resource_metadata=resource_metadata,
                                      **kwds)
 
+    @classmethod
+    def sample(cls):
+        return cls(source='openstack',
+                   counter_name='instance',
+                   counter_type='gauge',
+                   counter_unit='instance',
+                   counter_volume=1,
+                   resource_id='bd9431c1-8d69-4ad3-803a-8d4a6b89fd36',
+                   project_id='35b17138-b364-4e6a-a131-8f3099c5be68',
+                   user_id='efd87807-12d2-4b38-9c70-5f5c2ac427ff',
+                   timestamp=datetime.datetime.utcnow(),
+                   metadata={'name1': 'value1',
+                             'name2': 'value2'},
+                   message_id='5460acce-4fd6-480d-ab18-9735ec7b1996',
+                   )
+
 
 class Statistics(Base):
+    """Computed statistics for a query.
+    """
+
     min = float
+    "The minimum volume seen in the data"
+
     max = float
+    "The maximum volume seen in the data"
+
     avg = float
+    "The average of all of the volume values seen in the data"
+
     sum = float
+    "The total of all of the volume values seen in the data"
+
     count = int
+    "The number of samples seen"
+
     duration = float
+    "The difference, in minutes, between the oldest and newest timestamp"
+
     duration_start = datetime.datetime
+    "UTC date and time of the earliest timestamp, or the query start time"
+
     duration_end = datetime.datetime
+    "UTC date and time of the oldest timestamp, or the query end time"
 
     def __init__(self, start_timestamp=None, end_timestamp=None, **kwds):
         super(Statistics, self).__init__(**kwds)
@@ -250,8 +328,21 @@ class Statistics(Base):
             # it is not available in Python 2.6.
             diff = self.duration_end - self.duration_start
             self.duration = (diff.seconds + (diff.days * 24 * 60 ** 2)) / 60
+            # FIXME(dhellmann): Shouldn't this value be returned in
+            # seconds, or something even smaller?
         else:
             self.duration_start = self.duration_end = self.duration = None
+
+    @classmethod
+    def sample(cls):
+        return cls(min=1,
+                   max=9,
+                   avg=4.5,
+                   sum=45,
+                   count=10,
+                   duration_start=datetime.datetime(2013, 1, 4, 16, 42),
+                   duration_end=datetime.datetime(2013, 1, 4, 16, 47),
+                   )
 
 
 class MeterController(RestController):
@@ -267,7 +358,9 @@ class MeterController(RestController):
 
     @wsme_pecan.wsexpose([Sample], [Query])
     def get_all(self, q=[]):
-        """Return all events for the meter.
+        """Return sample data for the meter.
+
+        :param q: Filter rules for the data to be returned.
         """
         kwargs = _query_to_kwargs(q, storage.EventFilter.__init__)
         kwargs['meter'] = self._id
@@ -299,12 +392,37 @@ class MeterController(RestController):
 
 
 class Meter(Base):
+    """One category of measurements.
+    """
+
     name = text
+    "The unique name for the meter"
+
+    # FIXME(dhellmann): Make this an enum?
     type = text
+    "The meter type (see :ref:`measurements`)"
+
     unit = text
+    "The unit of measure"
+
     resource_id = text
+    "The ID of the :class:`Resource` for which the measurements are taken"
+
     project_id = text
+    "The ID of the project or tenant that owns the resource"
+
     user_id = text
+    "The ID of the user who last triggered an update to the resource"
+
+    @classmethod
+    def sample(cls):
+        return cls(name='instance',
+                   type='gauge',
+                   unit='instance',
+                   resource_id='bd9431c1-8d69-4ad3-803a-8d4a6b89fd36',
+                   project_id='35b17138-b364-4e6a-a131-8f3099c5be68',
+                   user_id='efd87807-12d2-4b38-9c70-5f5c2ac427ff',
+                   )
 
 
 class MetersController(RestController):
@@ -316,46 +434,67 @@ class MetersController(RestController):
 
     @wsme_pecan.wsexpose([Meter], [Query])
     def get_all(self, q=[]):
+        """Return all known meters, based on the data recorded so far.
+
+        :param q: Filter rules for the meters to be returned.
+        """
         kwargs = _query_to_kwargs(q, request.storage_conn.get_meters)
         return [Meter(**m)
                 for m in request.storage_conn.get_meters(**kwargs)]
 
 
 class Resource(Base):
+    """An externally defined object for which samples have been received.
+    """
+
     resource_id = text
+    "The unique identifier for the resource"
+
     project_id = text
+    "The ID of the owning project or tenant"
+
     user_id = text
+    "The ID of the user who created the resource or updated it last"
+
     timestamp = datetime.datetime
+    "UTC date and time of the last update to any meter for the resource"
+
     metadata = {text: text}
+    "Arbitrary metadata associated with the resource"
 
     def __init__(self, metadata={}, **kwds):
         metadata = _flatten_metadata(metadata)
         super(Resource, self).__init__(metadata=metadata, **kwds)
 
-
-class ResourceController(RestController):
-    """Manages operations on a single resource.
-    """
-
-    def __init__(self, resource_id):
-        request.context['resource_id'] = resource_id
-
-    @wsme_pecan.wsexpose([Resource])
-    def get_all(self):
-            r = request.storage_conn.get_resources(
-                resource=request.context.get('resource_id'))[0]
-            return Resource(**r)
+    @classmethod
+    def sample(cls):
+        return cls(resource_id='bd9431c1-8d69-4ad3-803a-8d4a6b89fd36',
+                   project_id='35b17138-b364-4e6a-a131-8f3099c5be68',
+                   user_id='efd87807-12d2-4b38-9c70-5f5c2ac427ff',
+                   timestamp=datetime.datetime.utcnow(),
+                   metadata={'name1': 'value1',
+                             'name2': 'value2'},
+                   )
 
 
 class ResourcesController(RestController):
     """Works on resources."""
 
-    @pecan.expose()
-    def _lookup(self, resource_id, *remainder):
-        return ResourceController(resource_id), remainder
+    @wsme_pecan.wsexpose(Resource, unicode)
+    def get_one(self, resource_id):
+        """Retrieve details about one resource.
+
+        :param resource_id: The UUID of the resource.
+        """
+        r = request.storage_conn.get_resources(resource=resource_id)[0]
+        return Resource(**r)
 
     @wsme_pecan.wsexpose([Resource], [Query])
     def get_all(self, q=[]):
+        """Retrieve definitions of all of the resources.
+
+        :param q: Filter rules for the resources to be returned.
+        """
         kwargs = _query_to_kwargs(q, request.storage_conn.get_resources)
         resources = [
             Resource(**r)

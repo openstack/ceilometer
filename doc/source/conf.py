@@ -19,6 +19,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(BASE_DIR, "..", ".."))
 
 sys.path.insert(0, ROOT)
+sys.path.insert(0, BASE_DIR)
 
 # This is required for ReadTheDocs.org, but isn't a bad idea anyway.
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openstack_dashboard.settings'
@@ -146,7 +147,8 @@ extensions = ['sphinx.ext.autodoc',
               'wsmeext.sphinxext',
               'sphinx.ext.coverage',
               'sphinx.ext.pngmath',
-              'sphinx.ext.viewcode']
+              'sphinx.ext.viewcode',
+              'ceilext.api']
 
 wsme_protocols = ['restjson', 'restxml']
 
