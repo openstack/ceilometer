@@ -66,7 +66,7 @@ setuptools.setup(
     cmdclass=common_setup.get_cmdclass(),
     package_data={
         "ceilometer":
-        directories("ceilomter/api/static")
+        directories("ceilometer/api/static")
         + directories("ceilometer/api/templates"),
     },
     include_package_data=True,
