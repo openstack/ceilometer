@@ -20,6 +20,7 @@
 
 import datetime
 
+from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import rpc
 from ceilometer.tests import base
 
@@ -29,34 +30,90 @@ from ceilometer.publisher import meter_publish
 
 class TestPublish(base.TestCase):
 
-    test_data = counter.Counter(
-        name='test',
-        type=counter.TYPE_CUMULATIVE,
-        unit='',
-        volume=1,
-        user_id='test',
-        project_id='test',
-        resource_id='test_run_tasks',
-        timestamp=datetime.datetime.utcnow().isoformat(),
-        resource_metadata={'name': 'TestPublish'},
-    )
+    test_data = [
+        counter.Counter(
+            name='test',
+            type=counter.TYPE_CUMULATIVE,
+            unit='',
+            volume=1,
+            user_id='test',
+            project_id='test',
+            resource_id='test_run_tasks',
+            timestamp=datetime.datetime.utcnow().isoformat(),
+            resource_metadata={'name': 'TestPublish'},
+        ),
+        counter.Counter(
+            name='test',
+            type=counter.TYPE_CUMULATIVE,
+            unit='',
+            volume=1,
+            user_id='test',
+            project_id='test',
+            resource_id='test_run_tasks',
+            timestamp=datetime.datetime.utcnow().isoformat(),
+            resource_metadata={'name': 'TestPublish'},
+        ),
+        counter.Counter(
+            name='test2',
+            type=counter.TYPE_CUMULATIVE,
+            unit='',
+            volume=1,
+            user_id='test',
+            project_id='test',
+            resource_id='test_run_tasks',
+            timestamp=datetime.datetime.utcnow().isoformat(),
+            resource_metadata={'name': 'TestPublish'},
+        ),
+        counter.Counter(
+            name='test2',
+            type=counter.TYPE_CUMULATIVE,
+            unit='',
+            volume=1,
+            user_id='test',
+            project_id='test',
+            resource_id='test_run_tasks',
+            timestamp=datetime.datetime.utcnow().isoformat(),
+            resource_metadata={'name': 'TestPublish'},
+        ),
+        counter.Counter(
+            name='test3',
+            type=counter.TYPE_CUMULATIVE,
+            unit='',
+            volume=1,
+            user_id='test',
+            project_id='test',
+            resource_id='test_run_tasks',
+            timestamp=datetime.datetime.utcnow().isoformat(),
+            resource_metadata={'name': 'TestPublish'},
+        ),
+    ]
 
-    def faux_notify(self, context, topic, msg):
-        self.notifications.append((topic, msg))
+    def faux_cast(self, context, topic, msg):
+        self.published.append((topic, msg))
 
     def setUp(self):
         super(TestPublish, self).setUp()
-        self.notifications = []
-        self.stubs.Set(rpc, 'cast', self.faux_notify)
+        self.published = []
+        self.stubs.Set(rpc, 'cast', self.faux_cast)
         publisher = meter_publish.MeterPublisher()
-        publisher.publish_counter(None,
-                                  self.test_data,
-                                  'test',
-                                  )
+        publisher.publish_counters(None,
+                                   self.test_data,
+                                   'test')
 
-    def test_notify(self):
-        assert len(self.notifications) == 2
+    def test_published(self):
+        self.assertEqual(len(self.published), 4)
+        for topic, rpc_call in self.published:
+            meters = rpc_call['args']['data']
+            self.assertIsInstance(meters, list)
+            if topic != cfg.CONF.metering_topic:
+                self.assertEqual(len(set(meter['counter_name']
+                                         for meter in meters)),
+                                 1,
+                                 "Meter are published grouped by name")
 
-    def test_notify_topics(self):
-        topics = [n[0] for n in self.notifications]
-        assert topics == ['metering', 'metering.test']
+    def test_published_topics(self):
+        topics = [topic for topic, meter in self.published]
+        self.assertIn(cfg.CONF.metering_topic, topics)
+        self.assertIn(cfg.CONF.metering_topic + '.' + 'test', topics)
+        self.assertIn(cfg.CONF.metering_topic + '.' + 'test2', topics)
+        self.assertIn(cfg.CONF.metering_topic + '.' + 'test3', topics)

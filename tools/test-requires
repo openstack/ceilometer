@@ -1,4 +1,5 @@
 nose
+unittest2
 coverage
 mock
 mox

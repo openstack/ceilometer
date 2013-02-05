@@ -18,7 +18,7 @@
 
 from stevedore import dispatch
 
-from ceilometer.collector import meter
+from ceilometer.collector import meter as meter_api
 from ceilometer import extension_manager
 from ceilometer import pipeline
 from ceilometer import service
@@ -124,27 +124,32 @@ class CollectorService(service.PeriodicService):
         """This method is triggered when metering data is
         cast from an agent.
         """
-        #LOG.info('metering data: %r', data)
-        LOG.info('metering data %s for %s @ %s: %s',
-                 data['counter_name'],
-                 data['resource_id'],
-                 data.get('timestamp', 'NO TIMESTAMP'),
-                 data['counter_volume'])
-        if not meter.verify_signature(data, cfg.CONF.metering_secret):
-            LOG.warning('message signature invalid, discarding message: %r',
-                        data)
-        else:
-            try:
-                # Convert the timestamp to a datetime instance.
-                # Storage engines are responsible for converting
-                # that value to something they can store.
-                if data.get('timestamp'):
-                    ts = timeutils.parse_isotime(data['timestamp'])
-                    data['timestamp'] = timeutils.normalize_time(ts)
-                self.storage_conn.record_metering_data(data)
-            except Exception as err:
-                LOG.error('Failed to record metering data: %s', err)
-                LOG.exception(err)
+        # We may have receive only one counter on the wire
+        if not isinstance(data, list):
+            data = [data]
+
+        for meter in data:
+            LOG.info('metering data %s for %s @ %s: %s',
+                     meter['counter_name'],
+                     meter['resource_id'],
+                     meter.get('timestamp', 'NO TIMESTAMP'),
+                     meter['counter_volume'])
+            if meter_api.verify_signature(meter, cfg.CONF.metering_secret):
+                try:
+                    # Convert the timestamp to a datetime instance.
+                    # Storage engines are responsible for converting
+                    # that value to something they can store.
+                    if meter.get('timestamp'):
+                        ts = timeutils.parse_isotime(meter['timestamp'])
+                        meter['timestamp'] = timeutils.normalize_time(ts)
+                    self.storage_conn.record_metering_data(meter)
+                except Exception as err:
+                    LOG.error('Failed to record metering data: %s', err)
+                    LOG.exception(err)
+            else:
+                LOG.warning(
+                    'message signature invalid, discarding message: %r',
+                    meter)
 
     def periodic_tasks(self, context):
         pass

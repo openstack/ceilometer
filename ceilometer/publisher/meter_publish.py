@@ -18,7 +18,9 @@
 """Publish a counter using the preferred RPC mechanism.
 """
 
-from ceilometer.collector import meter
+import itertools
+
+from ceilometer.collector import meter as meter_api
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import rpc
@@ -44,23 +46,36 @@ register_opts(cfg.CONF)
 
 
 class MeterPublisher(plugin.PublisherBase):
-    def publish_counter(self, context, counter, source):
+    def publish_counters(self, context, counters, source):
         """Send a metering message for publishing
 
         :param context: Execution context from the service or RPC call
         :param counter: Counter from pipeline after transformation
         :param source: counter source
         """
+
+        meters = [
+            meter_api.meter_message_from_counter(counter,
+                                                 cfg.CONF.metering_secret,
+                                                 source)
+            for counter in counters
+        ]
+
         topic = cfg.CONF.metering_topic
         msg = {
             'method': 'record_metering_data',
             'version': '1.0',
-            'args': {'data': meter.meter_message_from_counter(
-                counter,
-                cfg.CONF.metering_secret,
-                source),
-            },
+            'args': {'data': meters},
         }
         LOG.debug('PUBLISH: %s', str(msg))
         rpc.cast(context, topic, msg)
-        rpc.cast(context, topic + '.' + counter.name, msg)
+
+        for meter_name, meter_list in itertools.groupby(
+                sorted(meters, key=lambda m: m['counter_name']),
+                lambda m: m['counter_name']):
+            msg = {
+                'method': 'record_metering_data',
+                'version': '1.0',
+                'args': {'data': list(meter_list)},
+            }
+            rpc.cast(context, topic + '.' + meter_name, msg)

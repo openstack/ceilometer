@@ -1,5 +1,6 @@
 http://tarballs.openstack.org/nova/nova-stable-folsom.tar.gz
 nose
+unittest2
 coverage
 mock
 mox

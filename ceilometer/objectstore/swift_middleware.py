@@ -96,9 +96,9 @@ class CeilometerMiddleware(object):
         now = timeutils.utcnow().isoformat()
 
         if bytes_received:
-            self.pipeline_manager.publish_counter(
+            self.pipeline_manager.publish_counters(
                 context.get_admin_context(),
-                counter.Counter(
+                [counter.Counter(
                     name='storage.objects.incoming.bytes',
                     type='delta',
                     unit='B',
@@ -112,13 +112,13 @@ class CeilometerMiddleware(object):
                         "version": version,
                         "container": container,
                         "object": obj,
-                    }, ),
+                    }, )],
                 cfg.CONF.counter_source)
 
         if bytes_sent:
-            self.pipeline_manager.publish_counter(
+            self.pipeline_manager.publish_counters(
                 context.get_admin_context(),
-                counter.Counter(
+                [counter.Counter(
                     name='storage.objects.outgoing.bytes',
                     type='delta',
                     unit='B',
@@ -132,7 +132,7 @@ class CeilometerMiddleware(object):
                         "version": version,
                         "container": container,
                         "object": obj,
-                    }),
+                    })],
                 cfg.CONF.counter_source)
 
 

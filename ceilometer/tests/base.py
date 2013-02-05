@@ -19,13 +19,13 @@
 """Test base classes.
 """
 
-import unittest
+import unittest2
 
 import mox
 import stubout
 
 
-class TestCase(unittest.TestCase):
+class TestCase(unittest2.TestCase):
 
     def setUp(self):
         super(TestCase, self).setUp()

@@ -46,8 +46,8 @@ class TestSwiftMiddleware(base.TestCase):
         def __init__(self):
             self.counters = []
 
-        def publish_counter(self, context, counter, source):
-            self.counters.append(counter)
+        def publish_counters(self, context, counters, source):
+            self.counters.extend(counters)
 
     def _faux_setup_pipeline(self, publisher_manager):
         return self.pipeline_manager

@@ -57,11 +57,11 @@ class TestPipeline(base.TestCase):
         def __init__(self):
             self.counters = []
 
-        def publish_counter(self, ctxt, counter, source):
-            self.counters.append(counter)
+        def publish_counters(self, ctxt, counters, source):
+            self.counters.extend(counters)
 
     class PublisherClassException():
-        def publish_counter(self, ctxt, counter, source):
+        def publish_counters(self, ctxt, counters, source):
             raise Exception()
 
     class TransformerClass(object):
