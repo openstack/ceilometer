@@ -182,8 +182,30 @@ class Connection(base.Connection):
                              max : this.counter_volume,
                              sum : this.counter_volume,
                              count : 1,
-                             timestamp_min : this.timestamp,
-                             timestamp_max : this.timestamp } )
+                             duration_start : this.timestamp,
+                             duration_end : this.timestamp,
+                             period_start : this.timestamp,
+                             period_end : this.timestamp} )
+    }
+    """)
+
+    MAP_STATS_PERIOD = bson.code.Code("""
+    function () {
+        var period = %d * 1000;
+        var period_first = %d * 1000;
+        var period_start = period_first
+                           + (Math.floor(new Date(this.timestamp.getTime()
+                                         - period_first) / period)
+                              * period);
+        emit(period_start,
+             { min : this.counter_volume,
+               max : this.counter_volume,
+               sum : this.counter_volume,
+               count : 1,
+               duration_start : this.timestamp,
+               duration_end : this.timestamp,
+               period_start : new Date(period_start),
+               period_end : new Date(period_start + period) } )
     }
     """)
 
@@ -197,10 +219,10 @@ class Connection(base.Connection):
                res.max = values[i].max;
             res.count += values[i].count;
             res.sum += values[i].sum;
-            if ( values[i].timestamp_min < res.timestamp_min )
-               res.timestamp_min = values[i].timestamp_min;
-            if ( values[i].timestamp_max > res.timestamp_max )
-               res.timestamp_max = values[i].timestamp_max;
+            if ( values[i].duration_start < res.duration_start )
+               res.duration_start = values[i].duration_start;
+            if ( values[i].duration_end > res.duration_end )
+               res.duration_end = values[i].duration_end;
         }
         return res;
     }
@@ -209,7 +231,8 @@ class Connection(base.Connection):
     FINALIZE_STATS = bson.code.Code("""
     function (key, value) {
         value.avg = value.sum / value.count;
-        value.duration = (value.timestamp_max - value.timestamp_min) / 1000;
+        value.duration = (value.duration_end - value.duration_start) / 1000;
+        value.period = (value.period_end - value.period_start) / 1000;
         return value;
     }""")
 
@@ -452,7 +475,7 @@ class Connection(base.Connection):
             del e['_id']
             yield e
 
-    def get_meter_statistics(self, event_filter):
+    def get_meter_statistics(self, event_filter, period=None):
         """Return a dictionary containing meter statistics.
         described by the query parameters.
 
@@ -463,6 +486,9 @@ class Connection(base.Connection):
           'avg':
           'sum':
           'count':
+          'period':
+          'period_start':
+          'period_end':
           'duration':
           'duration_start':
           'duration_end':
@@ -470,23 +496,24 @@ class Connection(base.Connection):
 
         """
         q = make_query_from_filter(event_filter)
-        results = self.db.meter.map_reduce(self.MAP_STATS,
-                                           self.REDUCE_STATS,
-                                           {'inline': 1},
-                                           finalize=self.FINALIZE_STATS,
-                                           query=q,
-                                           )
-        if results['results']:
-            return results['results'][0]['value']
 
-        return {'count': 0,
-                'min': None,
-                'max': None,
-                'avg': None,
-                'sum': None,
-                'duration': None,
-                'duration_start': None,
-                'duration_end': None}
+        if period:
+            map_stats = self.MAP_STATS_PERIOD % \
+                (period,
+                 int(event_filter.start.strftime('%s'))
+                 if event_filter.start else 0)
+        else:
+            map_stats = self.MAP_STATS
+
+        results = self.db.meter.map_reduce(
+            map_stats,
+            self.REDUCE_STATS,
+            {'inline': 1},
+            finalize=self.FINALIZE_STATS,
+            query=q,
+        )
+
+        return [r['value'] for r in results['results']]
 
     def get_volume_sum(self, event_filter):
         """Return the sum of the volume field for the events

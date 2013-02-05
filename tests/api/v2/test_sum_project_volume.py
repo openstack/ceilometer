@@ -63,8 +63,8 @@ class TestSumProjectVolume(FunctionalTest):
                                             'value': 'project1',
                                             }])
         expected = 5 + 6 + 7
-        assert data['sum'] == expected
-        assert data['count'] == 3
+        self.assertEqual(data[0]['sum'], expected)
+        self.assertEqual(data[0]['count'], 3)
 
     def test_start_timestamp(self):
         data = self.get_json(self.PATH, q=[{'field': 'project_id',
@@ -76,8 +76,8 @@ class TestSumProjectVolume(FunctionalTest):
                                             },
                                            ])
         expected = 6 + 7
-        assert data['sum'] == expected
-        assert data['count'] == 2
+        self.assertEqual(data[0]['sum'], expected)
+        self.assertEqual(data[0]['count'], 2)
 
     def test_start_timestamp_after(self):
         data = self.get_json(self.PATH, q=[{'field': 'project_id',
@@ -88,8 +88,7 @@ class TestSumProjectVolume(FunctionalTest):
                                             'value': '2012-09-25T12:34:00',
                                             },
                                            ])
-        assert data['sum'] is None
-        assert data['count'] == 0
+        self.assertEqual(data, [])
 
     def test_end_timestamp(self):
         data = self.get_json(self.PATH, q=[{'field': 'project_id',
@@ -100,8 +99,8 @@ class TestSumProjectVolume(FunctionalTest):
                                             'value': '2012-09-25T11:30:00',
                                             },
                                            ])
-        assert data['sum'] == 5
-        assert data['count'] == 1
+        self.assertEqual(data[0]['sum'], 5)
+        self.assertEqual(data[0]['count'], 1)
 
     def test_end_timestamp_before(self):
         data = self.get_json(self.PATH, q=[{'field': 'project_id',
@@ -112,8 +111,7 @@ class TestSumProjectVolume(FunctionalTest):
                                             'value': '2012-09-25T09:54:00',
                                             },
                                            ])
-        assert data['sum'] is None
-        assert data['count'] == 0
+        self.assertEqual(data, [])
 
     def test_start_end_timestamp(self):
         data = self.get_json(self.PATH, q=[{'field': 'project_id',
@@ -128,5 +126,5 @@ class TestSumProjectVolume(FunctionalTest):
                                             'value': '2012-09-25T11:32:00',
                                             },
                                            ])
-        assert data['sum'] == 6
-        assert data['count'] == 1
+        self.assertEqual(data[0]['sum'], 6)
+        self.assertEqual(data[0]['count'], 1)

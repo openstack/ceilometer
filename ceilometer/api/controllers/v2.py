@@ -293,6 +293,15 @@ class Statistics(Base):
     duration_end = datetime.datetime
     "UTC date and time of the oldest timestamp, or the query end time"
 
+    period = int
+    "The difference, in seconds, between the period start and end"
+
+    period_start = datetime.datetime
+    "UTC date and time of the period start"
+
+    period_end = datetime.datetime
+    "UTC date and time of the period end"
+
     def __init__(self, start_timestamp=None, end_timestamp=None, **kwds):
         super(Statistics, self).__init__(**kwds)
         self._update_duration(start_timestamp, end_timestamp)
@@ -338,6 +347,9 @@ class Statistics(Base):
                    count=10,
                    duration_start=datetime.datetime(2013, 1, 4, 16, 42),
                    duration_end=datetime.datetime(2013, 1, 4, 16, 47),
+                   period=7200,
+                   period_start=datetime.datetime(2013, 1, 4, 16, 00),
+                   period_end=datetime.datetime(2013, 1, 4, 18, 00),
                    )
 
 
@@ -365,14 +377,19 @@ class MeterController(RestController):
                 for e in request.storage_conn.get_raw_events(f)
                 ]
 
-    @wsme_pecan.wsexpose(Statistics, [Query])
-    def statistics(self, q=[]):
+    @wsme_pecan.wsexpose([Statistics], [Query], int)
+    def statistics(self, q=[], period=None):
         """Computes the statistics of the meter events in the time range given.
+
+        :param q: Filter rules for the data to be returned.
+        :param period: Returned result will be an array of statistics for a
+                       period long of that number of seconds.
+
         """
         kwargs = _query_to_kwargs(q, storage.EventFilter.__init__)
         kwargs['meter'] = self._id
         f = storage.EventFilter(**kwargs)
-        computed = request.storage_conn.get_meter_statistics(f)
+        computed = request.storage_conn.get_meter_statistics(f, period)
         # Find the original timestamp in the query to use for clamping
         # the duration returned in the statistics.
         start = end = None
@@ -381,10 +398,11 @@ class MeterController(RestController):
                 end = timeutils.parse_isotime(i.value).replace(tzinfo=None)
             elif i.field == 'timestamp' and i.op in ('gt', 'ge'):
                 start = timeutils.parse_isotime(i.value).replace(tzinfo=None)
-        stat = Statistics(start_timestamp=start,
-                          end_timestamp=end,
-                          **computed)
-        return stat
+
+        return [Statistics(start_timestamp=start,
+                           end_timestamp=end,
+                           **c)
+                for c in computed]
 
 
 class Meter(Base):

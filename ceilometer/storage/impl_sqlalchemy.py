@@ -20,9 +20,11 @@ from __future__ import absolute_import
 
 import copy
 import datetime
+import math
 from sqlalchemy import func
 
 from ceilometer.openstack.common import log
+from ceilometer.openstack.common import timeutils
 from ceilometer.storage import base
 from ceilometer.storage.sqlalchemy.models import Meter, Project, Resource
 from ceilometer.storage.sqlalchemy.models import Source, User
@@ -378,7 +380,34 @@ class Connection(base.Connection):
         a_min, a_max = results[0]
         return (a_min, a_max)
 
-    def get_meter_statistics(self, event_filter):
+    def _make_stats_query(self, event_filter):
+        query = self.session.query(
+            func.min(Meter.timestamp).label('tsmin'),
+            func.max(Meter.timestamp).label('tsmax'),
+            func.avg(Meter.counter_volume).label('avg'),
+            func.sum(Meter.counter_volume).label('sum'),
+            func.min(Meter.counter_volume).label('min'),
+            func.max(Meter.counter_volume).label('max'),
+            func.count(Meter.counter_volume).label('count'))
+
+        return make_query_from_filter(query, event_filter)
+
+    @staticmethod
+    def _stats_result_to_dict(result, period_start, period_end):
+        return {'count': result.count,
+                'min': result.min,
+                'max': result.max,
+                'avg': result.avg,
+                'sum': result.sum,
+                'duration_start': result.tsmin,
+                'duration_end': result.tsmax,
+                'duration': timeutils.delta_seconds(result.tsmin,
+                                                    result.tsmax),
+                'period': timeutils.delta_seconds(period_start, period_end),
+                'period_start': period_start,
+                'period_end': period_end}
+
+    def get_meter_statistics(self, event_filter, period=None):
         """Return a dictionary containing meter statistics.
         described by the query parameters.
 
@@ -389,32 +418,40 @@ class Connection(base.Connection):
           'avg':
           'sum':
           'count':
+          'period':
+          'period_start':
+          'period_end':
           'duration':
           'duration_start':
           'duration_end':
           }
         """
-        query = self.session.query(func.min(Meter.timestamp),
-                                   func.max(Meter.timestamp),
-                                   func.sum(Meter.counter_volume),
-                                   func.min(Meter.counter_volume),
-                                   func.max(Meter.counter_volume),
-                                   func.count(Meter.counter_volume))
-        query = make_query_from_filter(query, event_filter)
-        results = query.all()
-        res = results[0]
-        count = int(res[5])
-        return {'count': count,
-                'min': res[3],
-                'max': res[4],
-                'avg': (res[2] / count) if count > 0 else None,
-                'sum': res[2],
-                'duration': (res[1] - res[0]).seconds,
-                'duration_start': res[0],
-                'duration_end': res[1],
-                }
 
-############################
+        res = self._make_stats_query(event_filter).all()[0]
+
+        if not period:
+            return [self._stats_result_to_dict(res, res.tsmin, res.tsmax)]
+
+        query = self._make_stats_query(event_filter)
+        # HACK(jd) This is an awful method to compute stats by period, but
+        # since we're trying to be SQL agnostic we have to write portable
+        # code, so here it is, admire! We're going to do one request to get
+        # stats by period. We would like to use GROUP BY, but there's no
+        # portable way to manipulate timestamp in SQL, so we can't.
+        results = []
+        for i in range(int(math.ceil(
+                timeutils.delta_seconds(event_filter.start or res.tsmin,
+                                        event_filter.end or res.tsmax)
+                / float(period)))):
+            period_start = (event_filter.start
+                            + datetime.timedelta(seconds=i * period))
+            period_end = period_start + datetime.timedelta(seconds=period)
+            q = query.filter(Meter.timestamp >= period_start)
+            q = q.filter(Meter.timestamp < period_end)
+            results.append(self._stats_result_to_dict(q.all()[0],
+                                                      period_start,
+                                                      period_end))
+        return results
 
 
 def model_query(*args, **kwargs):
