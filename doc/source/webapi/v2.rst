@@ -2,11 +2,41 @@
  V2 Web API
 ============
 
-.. default-domain:: wsme
+Resources
+=========
 
-.. root:: ceilometer.api.controllers.root.RootController
-   :webpath:
+.. rest-controller:: ceilometer.api.controllers.v2:ResourcesController
+   :webprefix: /v2/resources
 
-.. autotype:: ceilometer.api.controllers.v2.Source
+.. autotype:: ceilometer.api.controllers.v2.Resource
+   :members:
 
-.. service:: /v2/sources
+Meters
+======
+
+.. rest-controller:: ceilometer.api.controllers.v2:MetersController
+   :webprefix: /v2/meters
+
+.. rest-controller:: ceilometer.api.controllers.v2:MeterController
+   :webprefix: /v2/meters
+
+Samples and Statistics
+======================
+
+.. autotype:: ceilometer.api.controllers.v2.Meter
+   :members:
+
+.. autotype:: ceilometer.api.controllers.v2.Sample
+   :members:
+
+.. autotype:: ceilometer.api.controllers.v2.Statistics
+   :members:
+
+Filtering Queries
+=================
+
+Many of the endpoints above accecpt a query filter argument, which
+should be a list of Query data structures:
+
+.. autotype:: ceilometer.api.controllers.v2.Query
+   :members:
