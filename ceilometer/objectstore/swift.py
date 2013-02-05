@@ -94,6 +94,12 @@ class SwiftPollster(_Base):
     """
 
     @staticmethod
+    def get_counter_names():
+        return ['storage.objects',
+                'storage.objects.size',
+                'storage.objects.containers']
+
+    @staticmethod
     def iter_accounts():
         ks = ksclient.Client(username=cfg.CONF.os_username,
                              password=cfg.CONF.os_password,

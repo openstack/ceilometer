@@ -78,3 +78,8 @@ class TestKwapiPollster(base.TestCase):
             self.assert_(
                 any(map(lambda counter: counter.volume == probe['w'],
                         power_counters)))
+
+    def test_kwapi_counter_list(self):
+        counters = list(kwapi.KwapiPollster().get_counters(self.manager))
+        self.assertEqual(set([c.name for c in counters]),
+                         set(kwapi.KwapiPollster().get_counter_names()))

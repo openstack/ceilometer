@@ -48,3 +48,8 @@ class TestSwiftPollster(base.TestCase):
     def test_objectstore_metering(self):
         counters = list(self.pollster.get_counters(self.manager))
         self.assertEqual(len(counters), 6)
+
+    def test_objectstore_get_counter_names(self):
+        counters = list(self.pollster.get_counters(None))
+        self.assertEqual(set([c.name for c in counters]),
+                         set(self.pollster.get_counter_names()))

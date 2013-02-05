@@ -72,6 +72,10 @@ class _Base(plugin.CentralPollster):
 class KwapiPollster(_Base):
     """Kwapi pollster derived from the base class."""
 
+    @staticmethod
+    def get_counter_names():
+        return ['energy', 'power']
+
     def get_counters(self, manager):
         """Returns all counters."""
         for probe in self.iter_probes():

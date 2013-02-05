@@ -105,3 +105,8 @@ class TestImagePollster(base.TestCase):
             self.assert_(
                 any(map(lambda counter: counter.volume == image.size,
                         counters)))
+
+    def test_get_counter_names(self):
+        counters = list(glance.ImagePollster().get_counters(self.manager))
+        self.assertEqual(set([c.name for c in counters]),
+                         set(glance.ImagePollster().get_counter_names()))
