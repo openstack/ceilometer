@@ -178,6 +178,8 @@ class TestNovaNotifier(base.TestCase):
             @mock.patch('nova.conductor.api.API.instance_destroy')
             @mock.patch('nova.conductor.api.API.block_device_mapping_destroy')
             @mock.patch('nova.conductor.api.API.instance_update')
+            @mock.patch('nova.conductor.api.API.action_event_start')
+            @mock.patch('nova.conductor.api.API.action_event_finish')
             @mock.patch('nova.compute.utils.add_instance_fault_from_exc')
             def run_test(*omit_args):
                 self.compute.terminate_instance(self.context,
