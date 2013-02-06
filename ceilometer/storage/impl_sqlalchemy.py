@@ -407,7 +407,7 @@ class Connection(base.Connection):
                 'max': res[4],
                 'avg': (res[2] / count) if count > 0 else None,
                 'sum': res[2],
-                'duration': None,
+                'duration': (res[1] - res[0]).seconds,
                 'duration_start': res[0],
                 'duration_end': res[1],
                 }
