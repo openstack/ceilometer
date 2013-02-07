@@ -150,8 +150,7 @@ class Pipeline(object):
                 set(self.publishers).difference(
                     set(self.publisher_manager.names())), cfg)
 
-    @staticmethod
-    def _setup_transformers(cfg, transformer_manager):
+    def _setup_transformers(self, cfg, transformer_manager):
         transformer_cfg = cfg['transformers'] or []
         transformers = []
         for transformer in transformer_cfg:
@@ -165,13 +164,13 @@ class Pipeline(object):
             transformers.append(ext.plugin(**parameter))
             LOG.info("Pipeline %s: Setup transformer instance %s "
                      "with parameter %s",
+                     self,
                      transformer['name'],
                      parameter)
 
         return transformers
 
-    @staticmethod
-    def _publish_counter_to_one_publisher(ext, ctxt, counter, source):
+    def _publish_counter_to_one_publisher(self, ext, ctxt, counter, source):
         try:
             ext.obj.publish_counter(ctxt, counter, source)
         except Exception as err:
