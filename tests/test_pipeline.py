@@ -22,6 +22,7 @@ from stevedore import extension
 
 from ceilometer import counter
 from ceilometer import plugin
+from ceilometer.transformer import accumulator
 from ceilometer.openstack.common import timeutils
 from ceilometer import pipeline
 from ceilometer.tests import base
@@ -42,7 +43,7 @@ class TestPipeline(base.TestCase):
             'update': self.TransformerClass,
             'except': self.TransformerClassException,
             'drop': self.TransformerClassDrop,
-            'cache': self.TransformerClassCache}
+            'cache': accumulator.TransformerAccumulator}
 
         if name in class_name_ext:
             return extension.Extension(name, None,
@@ -90,21 +91,6 @@ class TestPipeline(base.TestCase):
     class TransformerClassException(object):
         def handle_sample(self, ctxt, counter, source):
             raise Exception()
-
-    class TransformerClassCache(object):
-        samples = []
-        caches = []
-
-        def __init__(self, drop=True):
-            self.__class__.caches = []
-
-        def handle_sample(self, ctxt, counter, source):
-            self.__class__.caches.append(counter)
-
-        def flush(self, ctxt, source):
-            x = self.__class__.caches
-            self.__class__.caches = []
-            return x
 
     def _create_publisher_manager(self, ext_name='test'):
         self.publisher_manager = dispatch.NameDispatchExtensionManager(
@@ -563,10 +549,13 @@ class TestPipeline(base.TestCase):
                         == 'b_update')
 
     def test_flush_pipeline_cache(self):
+        CACHE_SIZE = 10
         self.pipeline_cfg[0]['transformers'].extend([
             {
                 'name': 'cache',
-                'parameters': {}
+                'parameters': {
+                    'size': CACHE_SIZE,
+                }
             },
             {
                 'name': 'update',
@@ -581,20 +570,27 @@ class TestPipeline(base.TestCase):
         pipe = pipeline_manager.pipelines_for_counter('a')[0]
 
         pipe.publish_counter(None, self.test_counter, None)
-        self.assertTrue(len(self.TransformerClassCache.caches) == 1)
-        self.assertTrue(len(self.TransformerClass.samples) == 1)
         self.assertTrue(len(self.publisher.counters) == 0)
         pipe.flush(None, None)
-        self.assertTrue(len(self.publisher.counters) == 1)
-        self.assertTrue(len(self.TransformerClass.samples) == 2)
+        self.assertEqual(len(self.publisher.counters), 0)
+        pipe.publish_counter(None, self.test_counter, None)
+        pipe.flush(None, None)
+        self.assertEqual(len(self.publisher.counters), 0)
+        for i in range(CACHE_SIZE - 2):
+            pipe.publish_counter(None, self.test_counter, None)
+        pipe.flush(None, None)
+        self.assertEqual(len(self.publisher.counters), CACHE_SIZE)
         self.assertTrue(getattr(self.publisher.counters[0], 'name')
                         == 'a_update_new')
 
     def test_flush_pipeline_cache_multiple_counter(self):
+        CACHE_SIZE = 3
         self.pipeline_cfg[0]['transformers'].extend([
             {
                 'name': 'cache',
-                'parameters': {}
+                'parameters': {
+                    'size': CACHE_SIZE
+                }
             },
             {
                 'name': 'update',
@@ -611,12 +607,12 @@ class TestPipeline(base.TestCase):
         pipe.publish_counter(None, self.test_counter, None)
         self.test_counter = self.test_counter._replace(name='b')
         pipe.publish_counter(None, self.test_counter, None)
-        self.assertTrue(len(self.TransformerClassCache.caches) == 2)
-        self.assertTrue(len(self.TransformerClass.samples) == 2)
         self.assertTrue(len(self.publisher.counters) == 0)
         pipe.flush(None, None)
-        self.assertTrue(len(self.publisher.counters) == 2)
-        self.assertTrue(len(self.TransformerClass.samples) == 4)
+        self.assertEqual(len(self.publisher.counters), 0)
+        pipe.publish_counter(None, self.test_counter, None)
+        pipe.flush(None, None)
+        self.assertEqual(len(self.publisher.counters), CACHE_SIZE)
         self.assertTrue(getattr(self.publisher.counters[0], 'name')
                         == 'a_update_new')
         self.assertTrue(getattr(self.publisher.counters[1], 'name')
@@ -632,7 +628,6 @@ class TestPipeline(base.TestCase):
         pipe = pipeline_manager.pipelines_for_counter('a')[0]
 
         pipe.publish_counter(None, self.test_counter, None)
-        self.assertTrue(len(self.TransformerClassCache.caches) == 1)
         self.assertTrue(len(self.publisher.counters) == 0)
         pipe.flush(None, None)
         self.assertTrue(len(self.publisher.counters) == 1)
