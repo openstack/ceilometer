@@ -231,7 +231,7 @@ class TestListMeters(tests_api.TestBase):
                                  "X-Tenant-Id": "project-id2"})
         self.assertEquals(1, len(data['meters']))
 
-    def test_metaquery2_non_admin(self):
+    def test_metaquery2_non_admin_wrong_project(self):
         data = self.get('/meters?metadata.tag=four.counter',
                         headers={"X-Roles": "Member",
                                  "X-Tenant-Id": "project-666"})
