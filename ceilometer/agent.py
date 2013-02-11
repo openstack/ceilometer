@@ -42,12 +42,15 @@ class AgentManager(object):
         """Used to invoke the plugins loaded by the ExtensionManager.
         """
         try:
-            LOG.info('Polling %s', ext.name)
-            for c in ext.obj.get_counters(manager, *args, **kwargs):
-                LOG.debug('Publishing counter: %s', c)
-                manager.pipeline_manager.publish_counter(
-                    context, c,
-                    cfg.CONF.counter_source)
+            publisher = manager.pipeline_manager.publisher(
+                context,
+                cfg.CONF.counter_source,
+            )
+            with publisher:
+                LOG.info('Polling %s', ext.name)
+                for c in ext.obj.get_counters(manager, *args, **kwargs):
+                    LOG.debug('Publishing counter: %s', c)
+                    publisher(c)
 
         except Exception as err:
             LOG.warning('Continuing after error from %s: %s',

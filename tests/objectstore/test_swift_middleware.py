@@ -48,6 +48,12 @@ class TestSwiftMiddleware(base.TestCase):
         def publish_counters(self, context, counters, source):
             self.counters.extend(counters)
 
+        def publisher(self, context, source):
+            return pipeline.Publisher(self, context, source)
+
+        def flush(self, context, source):
+            pass
+
     def _faux_setup_pipeline(self, publisher_manager):
         return self.pipeline_manager
 
