@@ -23,8 +23,6 @@ Based on pecan.middleware.errordocument
 
 import json
 
-from webob import exc
-
 
 class ParsableErrorMiddleware(object):
     """Replace error body with something the client can parse.

@@ -22,22 +22,26 @@ import unittest
 
 from ceilometer.image import notifications
 from ceilometer import counter
-from tests import utils
+
+
+def fake_uuid(x):
+    return '%s-%s-%s-%s' % (x * 8, x * 4, x * 4, x * 12)
+
 
 NOW = datetime.isoformat(datetime.utcnow())
 
 NOTIFICATION_SEND = {
     u'event_type': u'image.send',
     u'timestamp': NOW,
-    u'message_id': utils.fake_uuid('a'),
+    u'message_id': fake_uuid('a'),
     u'priority': u'INFO',
     u'publisher_id': u'images.example.com',
-    u'payload': {u'receiver_tenant_id': utils.fake_uuid('b'),
+    u'payload': {u'receiver_tenant_id': fake_uuid('b'),
                  u'destination_ip': u'1.2.3.4',
                  u'bytes_sent': 42,
-                 u'image_id': utils.fake_uuid('c'),
-                 u'receiver_user_id': utils.fake_uuid('d'),
-                 u'owner_id': utils.fake_uuid('e')}
+                 u'image_id': fake_uuid('c'),
+                 u'receiver_user_id': fake_uuid('d'),
+                 u'owner_id': fake_uuid('e')}
 }
 
 IMAGE_META = {u'status': u'saving',
@@ -51,7 +55,7 @@ IMAGE_META = {u'status': u'saving',
                               u'key1': u'value1'},
               u'min_disk': 0,
               u'protected': False,
-              u'id': utils.fake_uuid('c'),
+              u'id': fake_uuid('c'),
               u'location': None,
               u'checksum': u'd990432ef91afef3ad9dbf4a975d3365',
               u'owner': "fake",
@@ -90,7 +94,7 @@ class TestNotification(unittest.TestCase):
     def _verify_common_counter(self, c, name, volume):
         self.assertFalse(c is None)
         self.assertEqual(c.name, name)
-        self.assertEqual(c.resource_id, utils.fake_uuid('c'))
+        self.assertEqual(c.resource_id, fake_uuid('c'))
         self.assertEqual(c.timestamp, NOW)
         self.assertEqual(c.volume, volume)
         metadata = c.resource_metadata
@@ -102,8 +106,8 @@ class TestNotification(unittest.TestCase):
         self.assertEqual(len(counters), 1)
         download = counters[0]
         self._verify_common_counter(download, 'image.download', 42)
-        self.assertEqual(download.user_id, utils.fake_uuid('d'))
-        self.assertEqual(download.project_id, utils.fake_uuid('b'))
+        self.assertEqual(download.user_id, fake_uuid('d'))
+        self.assertEqual(download.project_id, fake_uuid('b'))
         self.assertEqual(download.type, counter.TYPE_DELTA)
 
     def test_image_serve(self):
@@ -112,11 +116,11 @@ class TestNotification(unittest.TestCase):
         self.assertEqual(len(counters), 1)
         serve = counters[0]
         self._verify_common_counter(serve, 'image.serve', 42)
-        self.assertEqual(serve.project_id, utils.fake_uuid('e'))
+        self.assertEqual(serve.project_id, fake_uuid('e'))
         self.assertEquals(serve.resource_metadata.get('receiver_user_id'),
-                          utils.fake_uuid('d'))
+                          fake_uuid('d'))
         self.assertEquals(serve.resource_metadata.get('receiver_tenant_id'),
-                          utils.fake_uuid('b'))
+                          fake_uuid('b'))
         self.assertEqual(serve.type, counter.TYPE_DELTA)
 
     def test_image_crud_on_update(self):

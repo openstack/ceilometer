@@ -24,7 +24,6 @@ inline callbacks.
 """
 
 import functools
-import unittest
 
 import nose.plugins.skip
 

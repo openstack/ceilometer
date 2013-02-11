@@ -16,14 +16,16 @@
 """SQLAlchemy storage backend
 """
 
+from __future__ import absolute_import
+
 import copy
 import datetime
+from sqlalchemy import func
 
 from ceilometer.openstack.common import log
 from ceilometer.storage import base
 from ceilometer.storage.sqlalchemy.models import Meter, Project, Resource
 from ceilometer.storage.sqlalchemy.models import Source, User
-from ceilometer.storage.sqlalchemy.session import func
 import ceilometer.storage.sqlalchemy.session as sqlalchemy_session
 from ceilometer.storage.sqlalchemy import migration
 

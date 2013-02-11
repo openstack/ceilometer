@@ -21,7 +21,6 @@ import os
 from stevedore import extension
 import yaml
 
-from ceilometer import extension_manager
 from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import log
 

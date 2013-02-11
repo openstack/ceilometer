@@ -16,13 +16,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import copy
-
 from stevedore import dispatch
 from stevedore import extension
 
 from ceilometer import counter
-from ceilometer import extension_manager as act_extension
 from ceilometer.openstack.common import timeutils
 from ceilometer import pipeline
 from ceilometer.tests import base

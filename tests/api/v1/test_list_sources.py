@@ -18,12 +18,6 @@
 """Test listing users.
 """
 
-import datetime
-import logging
-
-from ceilometer.collector import meter
-from ceilometer import counter
-
 from ceilometer.tests import api as tests_api
 
 

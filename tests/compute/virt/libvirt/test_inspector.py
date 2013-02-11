@@ -19,12 +19,8 @@
 """Tests for libvirt inspector.
 """
 
-import time
-
 from ceilometer.compute.virt.libvirt import inspector as libvirt_inspector
 from ceilometer.tests import base as test_base
-
-import mox
 
 
 class TestLibvirtInspection(test_base.TestCase):

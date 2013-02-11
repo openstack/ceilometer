@@ -20,7 +20,6 @@ import requests
 
 from ceilometer import counter
 from ceilometer.central import plugin
-from ceilometer.openstack.common import cfg
 
 
 class KwapiClient(object):
