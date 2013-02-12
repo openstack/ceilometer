@@ -22,6 +22,7 @@ notification events.
 import unittest
 
 from ceilometer.compute import notifications
+from ceilometer import counter
 
 
 INSTANCE_CREATE_END = {
@@ -287,26 +288,24 @@ INSTANCE_RESIZE_REVERT_END = {
 
 class TestNotifications(unittest.TestCase):
     def test_process_notification(self):
-        info = notifications.Instance.process_notification(
+        info = notifications.Instance().process_notification(
             INSTANCE_CREATE_END
         )[0]
 
         for name, actual, expected in [
-            ('counter_name', info.name, 'instance'),
-            ('counter_type', info.type, counter.TYPE_CUMULATIVE),
-            ('counter_volume', info.volume, 1),
-            ('timestamp', info.timestamp,
-             INSTANCE_CREATE_END['timestamp']),
-            ('resource_id', info.resource_id,
-             INSTANCE_CREATE_END['payload']['instance_id']),
-            ('display_name', info.resource_metadata['display_name'],
-             INSTANCE_CREATE_END['payload']['display_name']),
-            ('instance_type', info.resource_metadata['instance_type'],
-             INSTANCE_CREATE_END['payload']['instance_type_id']),
-            ('host', info.resource_metadata['host'],
-             INSTANCE_CREATE_END['publisher_id']),
+                ('counter_name', info.name, 'instance'),
+                ('counter_type', info.type, counter.TYPE_GAUGE),
+                ('counter_volume', info.volume, 1),
+                ('timestamp', info.timestamp,
+                 INSTANCE_CREATE_END['timestamp']),
+                ('resource_id', info.resource_id,
+                 INSTANCE_CREATE_END['payload']['instance_id']),
+                ('instance_type', info.resource_metadata['instance_type'],
+                 INSTANCE_CREATE_END['payload']['instance_type_id']),
+                ('host', info.resource_metadata['host'],
+                 INSTANCE_CREATE_END['publisher_id']),
         ]:
-            yield compare, name, actual, expected
+            self.assertEqual(actual, expected, name)
 
     @staticmethod
     def _find_counter(counters, name):
