@@ -769,6 +769,9 @@ class StatisticsTest(DBTestBase):
             meter='volume.size',
         )
         results = self.conn.get_meter_statistics(f)
+        self.assertEqual(results['duration'],
+                         (datetime.datetime(2012, 9, 25, 12, 32)
+                          - datetime.datetime(2012, 9, 25, 10, 30)).seconds)
         assert results['count'] == 3
         assert results['min'] == 8
         assert results['max'] == 10
@@ -783,6 +786,7 @@ class StatisticsTest(DBTestBase):
             end='2012-09-25T11:32:00',
         )
         results = self.conn.get_meter_statistics(f)
+        self.assertEqual(results['duration'], 0)
         assert results['count'] == 1
         assert results['min'] == 6
         assert results['max'] == 6
@@ -795,6 +799,9 @@ class StatisticsTest(DBTestBase):
             meter='volume.size',
         )
         results = self.conn.get_meter_statistics(f)
+        self.assertEqual(results['duration'],
+                         (datetime.datetime(2012, 9, 25, 12, 32)
+                          - datetime.datetime(2012, 9, 25, 10, 30)).seconds)
         assert results['count'] == 3
         assert results['min'] == 5
         assert results['max'] == 7

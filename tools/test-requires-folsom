@@ -6,7 +6,8 @@ mock
 mox
 # NOTE(dhellmann): Ming is necessary to provide the Mongo-in-memory
 # implementation of MongoDB.
-Ming>=0.3.2
+# NOTE(jd): the support for finalize in map reduce in MIM is not yet merged
+git+http://git.naquadah.org/git/~jd/merciless.git#egg=Ming
 http://tarballs.openstack.org/glance/glance-stable-folsom.tar.gz
 setuptools-git>=0.4
 # 1.7.4 is the Folsom release

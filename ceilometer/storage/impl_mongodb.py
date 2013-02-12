@@ -180,7 +180,7 @@ class Connection(base.Connection):
     function () {
         emit('statistics', { min : this.counter_volume,
                              max : this.counter_volume,
-                             qty : this.counter_volume,
+                             sum : this.counter_volume,
                              count : 1,
                              timestamp_min : this.timestamp,
                              timestamp_max : this.timestamp } )
@@ -196,7 +196,7 @@ class Connection(base.Connection):
             if ( values[i].max > res.max )
                res.max = values[i].max;
             res.count += values[i].count;
-            res.qty += values[i].qty;
+            res.sum += values[i].sum;
             if ( values[i].timestamp_min < res.timestamp_min )
                res.timestamp_min = values[i].timestamp_min;
             if ( values[i].timestamp_max > res.timestamp_max )
@@ -205,6 +205,13 @@ class Connection(base.Connection):
         return res;
     }
     """)
+
+    FINALIZE_STATS = bson.code.Code("""
+    function (key, value) {
+        value.avg = value.sum / value.count;
+        value.duration = (value.timestamp_max - value.timestamp_min) / 1000;
+        return value;
+    }""")
 
     def __init__(self, conf):
         opts = self._parse_connection_url(conf.database_connection)
@@ -466,34 +473,20 @@ class Connection(base.Connection):
         results = self.db.meter.map_reduce(self.MAP_STATS,
                                            self.REDUCE_STATS,
                                            {'inline': 1},
+                                           finalize=self.FINALIZE_STATS,
                                            query=q,
                                            )
         if results['results']:
-            r = results['results'][0]['value']
-            (start, end) = self._fix_interval_min_max(r['timestamp_min'],
-                                                      r['timestamp_max'])
-        else:
-            start = None
-            end = None
-            r = {'count': 0,
-                 'min': None,
-                 'max': None,
-                 'avg': None,
-                 'qty': None,
-                 'duration': None,
-                 'duration_start': None,
-                 'duration_end': None,
-                 }
-        count = int(r['count'])
-        return {'min': r['min'],
-                'sum': r['qty'],
-                'count': count,
-                'avg': (r['qty'] / count) if count > 0 else None,
-                'max': r['max'],
-                'duration': 0,
-                'duration_start': start,
-                'duration_end': end,
-                }
+            return results['results'][0]['value']
+
+        return {'count': 0,
+                'min': None,
+                'max': None,
+                'avg': None,
+                'sum': None,
+                'duration': None,
+                'duration_start': None,
+                'duration_end': None}
 
     def get_volume_sum(self, event_filter):
         """Return the sum of the volume field for the events
