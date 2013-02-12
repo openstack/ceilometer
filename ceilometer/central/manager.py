@@ -21,6 +21,7 @@ from keystoneclient.v2_0 import client as ksclient
 from ceilometer import agent
 from ceilometer import extension_manager
 from ceilometer.openstack.common import cfg
+from ceilometer import service  # For cfg.CONF.os_*
 
 OPTS = [
     cfg.ListOpt('disabled_central_pollsters',
