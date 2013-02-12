@@ -486,7 +486,7 @@ class ResourcesController(RestController):
 
         :param resource_id: The UUID of the resource.
         """
-        r = request.storage_conn.get_resources(resource=resource_id)[0]
+        r = list(request.storage_conn.get_resources(resource=resource_id))[0]
         return Resource(**r)
 
     @wsme_pecan.wsexpose([Resource], [Query])

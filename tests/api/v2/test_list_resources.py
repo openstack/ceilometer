@@ -80,6 +80,48 @@ class TestListResources(FunctionalTest):
         data = self.get_json('/resources')
         self.assertEquals(2, len(data))
 
+    def test_instances_one(self):
+        counter1 = counter.Counter(
+            'instance',
+            'cumulative',
+            '',
+            1,
+            'user-id',
+            'project-id',
+            'resource-id',
+            timestamp=datetime.datetime(2012, 7, 2, 10, 40),
+            resource_metadata={'display_name': 'test-server',
+                               'tag': 'self.counter',
+                               }
+        )
+        msg = meter.meter_message_from_counter(counter1,
+                                               cfg.CONF.metering_secret,
+                                               'test',
+                                               )
+        self.conn.record_metering_data(msg)
+
+        counter2 = counter.Counter(
+            'instance',
+            'cumulative',
+            '',
+            1,
+            'user-id',
+            'project-id',
+            'resource-id-alternate',
+            timestamp=datetime.datetime(2012, 7, 2, 10, 41),
+            resource_metadata={'display_name': 'test-server',
+                               'tag': 'self.counter2',
+                               }
+        )
+        msg2 = meter.meter_message_from_counter(counter2,
+                                                cfg.CONF.metering_secret,
+                                                'test',
+                                                )
+        self.conn.record_metering_data(msg2)
+
+        data = self.get_json('/resources/resource-id')
+        self.assertEquals('resource-id', data['resource_id'])
+
     def test_with_source(self):
         counter1 = counter.Counter(
             'instance',
