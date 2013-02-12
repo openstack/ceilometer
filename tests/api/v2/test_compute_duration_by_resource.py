@@ -99,14 +99,14 @@ class TestComputeDurationByResource(FunctionalTest):
         data = self._invoke_api()
         self._assert_times_match(data['duration_start'], self.start)
         self._assert_times_match(data['duration_end'], self.middle1)
-        assert data['duration'] == 8 * 60
+        self.assertEqual(data['duration'], 8 * 60 * 60)
 
     def test_within_range(self):
         self._set_interval(self.middle1, self.middle2)
         data = self._invoke_api()
         self._assert_times_match(data['duration_start'], self.middle1)
         self._assert_times_match(data['duration_end'], self.middle2)
-        assert data['duration'] == 10 * 60
+        self.assertEqual(data['duration'], 10 * 60 * 60)
 
     def test_within_range_zero_duration(self):
         self._set_interval(self.middle1, self.middle1)
@@ -120,7 +120,7 @@ class TestComputeDurationByResource(FunctionalTest):
         data = self._invoke_api()
         self._assert_times_match(data['duration_start'], self.middle2)
         self._assert_times_match(data['duration_end'], self.end)
-        assert data['duration'] == (6 * 60) - 1
+        self.assertEqual(data['duration'], ((6 * 60) - 1) * 60)
 
     def test_after_range(self):
         self._set_interval(self.late1, self.late2)

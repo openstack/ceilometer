@@ -324,12 +324,8 @@ class Statistics(Base):
         if (self.duration_start and
                 self.duration_end and
                 self.duration_start <= self.duration_end):
-            # Can't use timedelta.total_seconds() because
-            # it is not available in Python 2.6.
-            diff = self.duration_end - self.duration_start
-            self.duration = (diff.seconds + (diff.days * 24 * 60 ** 2)) / 60
-            # FIXME(dhellmann): Shouldn't this value be returned in
-            # seconds, or something even smaller?
+            self.duration = timeutils.delta_seconds(self.duration_start,
+                                                    self.duration_end)
         else:
             self.duration_start = self.duration_end = self.duration = None
 

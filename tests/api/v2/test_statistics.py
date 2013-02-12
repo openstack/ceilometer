@@ -66,7 +66,7 @@ class TestStatisticsDuration(unittest.TestCase):
                           )
         assert s.duration_start == self.start
         assert s.duration_end == self.middle1
-        assert s.duration == 8 * 60
+        self.assertEqual(s.duration, 8 * 60 * 60)
 
     def test_within_range(self):
         s = v2.Statistics(duration_start=self.middle1,
@@ -76,7 +76,7 @@ class TestStatisticsDuration(unittest.TestCase):
                           )
         assert s.duration_start == self.middle1
         assert s.duration_end == self.middle2
-        assert s.duration == 10 * 60
+        self.assertEqual(s.duration, 10 * 60 * 60)
 
     def test_within_range_zero_duration(self):
         s = v2.Statistics(duration_start=self.middle1,
@@ -96,7 +96,7 @@ class TestStatisticsDuration(unittest.TestCase):
                           )
         assert s.duration_start == self.middle2
         assert s.duration_end == self.end
-        assert s.duration == (6 * 60) - 1
+        self.assertEqual(s.duration, ((6 * 60) - 1) * 60)
 
     def test_after_range(self):
         s = v2.Statistics(duration_start=self.late1,
