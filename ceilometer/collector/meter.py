@@ -29,10 +29,6 @@ METER_OPTS = [
                default='change this or be hacked',
                help='Secret value for signing metering messages',
                ),
-    cfg.StrOpt('counter_source',
-               default='openstack',
-               help='Source for counters emited on this instance',
-               ),
 ]
 
 

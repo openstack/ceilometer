@@ -23,6 +23,16 @@ in by the plugins that create them.
 """
 
 import collections
+from ceilometer.openstack.common import cfg
+
+OPTS = [
+    cfg.StrOpt('counter_source',
+               default='openstack',
+               help='Source for counters emited on this instance'),
+]
+
+cfg.CONF.register_opts(OPTS)
+
 
 # Fields explanation:
 #
