@@ -15,7 +15,6 @@
 # under the License.
 
 from sqlalchemy import *
-from ceilometer.openstack.common import timeutils
 
 meta = MetaData()
 

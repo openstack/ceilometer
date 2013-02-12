@@ -25,7 +25,6 @@ from stevedore import extension
 from ceilometer import nova_client
 from ceilometer.compute import manager
 from ceilometer import counter
-from ceilometer import pipeline
 from ceilometer.tests import base
 
 from ceilometer.openstack.common import cfg

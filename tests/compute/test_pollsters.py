@@ -28,8 +28,6 @@ from ceilometer.compute import manager
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.tests import base as test_base
 
-import mox
-
 
 class TestPollsterBase(test_base.TestCase):
 

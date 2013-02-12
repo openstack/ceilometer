@@ -24,7 +24,6 @@ from stevedore import extension
 
 from ceilometer.central import manager
 from ceilometer import counter
-from ceilometer import pipeline
 from ceilometer.tests import base
 
 from ceilometer.openstack.common import cfg

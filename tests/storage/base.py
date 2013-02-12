@@ -33,9 +33,6 @@ from ceilometer.tests import base as test_base
 class DBEngineBase(object):
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self):
-        super(DBEngineBase, self).__init__()
-
     @abc.abstractmethod
     def get_connection(self):
         """Return an open connection to the DB
@@ -75,7 +72,6 @@ class DBTestBase(test_base.TestCase):
         '''Return an instance of the class which implements
            the DBEngineTestBase abstract class
         '''
-        return None
 
     def __setup_engine(self):
         if self.engine is None:

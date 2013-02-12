@@ -46,11 +46,9 @@
 
 """
 
-
 import mox
 
 from tests.storage import base
-from ceilometer import storage
 from ceilometer.tests.db import TestConnection, require_map_reduce
 
 
