@@ -27,6 +27,7 @@ from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import timeutils
 from ceilometer import pipeline
+from ceilometer import service
 
 from swift.common.utils import split_path
 
@@ -51,7 +52,7 @@ class CeilometerMiddleware(object):
 
     def __init__(self, app, conf):
         self.app = app
-        cfg.CONF([], project='ceilometer')
+        service.prepare_service()
         publisher_manager = dispatch.NameDispatchExtensionManager(
             namespace=pipeline.PUBLISHER_NAMESPACE,
             check_func=lambda x: True,
