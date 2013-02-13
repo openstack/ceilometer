@@ -66,20 +66,22 @@ class TransformerExtensionManager(extension.ExtensionManager):
 
 class Publisher(object):
 
-    def __init__(self, pipeline, context, source):
-        self.pipeline = pipeline
+    def __init__(self, pipelines, context, source):
+        self.pipelines = pipelines
         self.context = context
         self.source = source
 
     def __enter__(self):
         def p(counters):
-            return self.pipeline.publish_counters(self.context,
-                                                  counters,
-                                                  self.source)
+            for p in self.pipelines:
+                p.publish_counters(self.context,
+                                   counters,
+                                   self.source)
         return p
 
     def __exit__(self, exc_type, exc_value, traceback):
-        self.pipeline.flush(self.context, self.source)
+        for p in self.pipelines:
+            p.flush(self.context, self.source)
 
 
 class Pipeline(object):
@@ -241,14 +243,6 @@ class Pipeline(object):
 
         LOG.audit("Pipeline %s: Published counters", self)
 
-    def publisher(self, context, source):
-        """Build a new Publisher for this pipeline.
-
-        :param context: The context.
-        :param source: Counter source.
-        """
-        return Publisher(self, context, source)
-
     def publish_counter(self, ctxt, counter, source):
         self.publish_counters(ctxt, [counter], source)
 
@@ -285,9 +279,16 @@ class Pipeline(object):
 
         LOG.audit("Flush pipeline %s", self)
         for (i, transformer) in enumerate(self.transformers):
-            self._publish_counters(i + 1, ctxt,
-                                   list(transformer.flush(ctxt, source)),
-                                   source)
+            try:
+                self._publish_counters(i + 1, ctxt,
+                                       list(transformer.flush(ctxt, source)),
+                                       source)
+            except Exception as err:
+                LOG.warning(
+                    "Pipeline %s: Error flushing "
+                    "transformer %s",
+                    self, transformer)
+                LOG.exception(err)
 
     def get_interval(self):
         return self.interval
@@ -353,24 +354,13 @@ class PipelineManager(object):
                                    transformer_manager)
                           for pipedef in cfg]
 
-    def pipelines_for_counter(self, counter_name):
-        """Get all pipelines that support counter"""
-        return [p for p in self.pipelines if p.support_counter(counter_name)]
+    def publisher(self, context, source):
+        """Build a new Publisher for these manager pipelines.
 
-    def publish_counter(self, ctxt, counter, source):
-        """Publish counter through pipelines
-
-        This is helpful to notification mechanism, so that they don't need
-        to maintain the private mapping cache from counter to pipelines.
-
-        For polling based data collector, they may need keep private
-        mapping cache for different interval support.
-
+        :param context: The context.
+        :param source: Counter source.
         """
-        # TODO(yjiang5) Utilize a cache
-        for p in self.pipelines:
-            if p.support_counter(counter.name):
-                p.publish_counter(ctxt, counter, source)
+        return Publisher(self.pipelines, context, source)
 
 
 def setup_pipeline(publisher_manager):

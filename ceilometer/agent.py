@@ -47,12 +47,9 @@ class AgentManager(object):
                 context,
                 cfg.CONF.counter_source,
             )
-            with publisher:
-                LOG.info('Polling %s', ext.name)
-                for c in ext.obj.get_counters(manager, *args, **kwargs):
-                    LOG.debug('Publishing counter: %s', c)
-                    publisher(c)
-
+            with publisher as p:
+                LOG.debug('Polling and publishing %s', ext.name)
+                p(ext.obj.get_counters(manager, *args, **kwargs))
         except Exception as err:
             LOG.warning('Continuing after error from %s: %s',
                         ext.name, err)
