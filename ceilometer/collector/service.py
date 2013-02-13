@@ -88,16 +88,16 @@ class CollectorService(service.PeriodicService):
                   ext.name, ', '.join(handler.get_event_types()))
         for exchange_topic in handler.get_exchange_topics(cfg.CONF):
             for topic in exchange_topic.topics:
-                # FIXME(dhellmann): Should be using create_worker(), except
-                # that notification messages do not conform to the RPC
-                # invocation protocol (they do not include a "method"
-                # parameter).
-                self.conn.declare_topic_consumer(
-                    queue_name="ceilometer.notifications",
-                    topic=topic,
-                    exchange_name=exchange_topic.exchange,
-                    callback=self.process_notification,
-                )
+                try:
+                    self.conn.join_consumer_pool(
+                        callback=self.process_notification,
+                        pool_name='ceilometer.notifications',
+                        topic=topic,
+                        exchange_name=exchange_topic.exchange,
+                    )
+                except Exception:
+                    LOG.exception('Could not join consumer pool %s/%s' %
+                                  (topic, exchange_topic.exchange))
 
     def process_notification(self, notification):
         """Make a notification processed by an handler."""
