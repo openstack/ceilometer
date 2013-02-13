@@ -61,22 +61,12 @@ class DBEngineBase(object):
 class DBTestBase(test_base.TestCase):
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, *args):
-        super(DBTestBase, self).__init__(*args)
-        self.engine = None
-        self.conn = None
-
     @classmethod
     @abc.abstractmethod
     def get_engine(cls):
         '''Return an instance of the class which implements
            the DBEngineTestBase abstract class
         '''
-
-    def __setup_engine(self):
-        if self.engine is None:
-            self.engine = self.get_engine()
-            self.conn = self.engine.get_connection()
 
     def tearDown(self):
         self.engine.clean_up()
@@ -86,11 +76,11 @@ class DBTestBase(test_base.TestCase):
 
     def setUp(self):
         super(DBTestBase, self).setUp()
-        self.__setup_engine()
+        self.engine = self.get_engine()
+        self.conn = self.engine.get_connection()
         self.prepare_data()
 
     def prepare_data(self):
-        #prepare the test data
         self.msgs = []
         self.counter = counter.Counter(
             'instance',

@@ -56,11 +56,14 @@ class MongoDBEngine(base.DBEngineBase):
 
     DBNAME = 'testdb'
 
+    def tearDown(self):
+        self.conn.drop_database(self.DBNAME)
+        super(MongoDBEngine, self).tearDown()
+
     def get_connection(self):
         conf = mox.Mox().CreateMockAnything()
         conf.database_connection = 'mongodb://localhost/%s' % self.DBNAME
         self.conn = TestConnection(conf)
-        self.conn.drop_database(self.DBNAME)
         self.db = self.conn.conn[self.DBNAME]
         return self.conn
 
