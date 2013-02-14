@@ -56,11 +56,16 @@ class NotificationBase(PluginBase):
     @abc.abstractmethod
     def get_exchange_topics(self, conf):
         """Return a sequence of ExchangeTopics defining the exchange and
-        topics to be connected for this plugin."""
+        topics to be connected for this plugin.
+
+        :param conf: Configuration.
+        """
 
     @abc.abstractmethod
     def process_notification(self, message):
-        """Return a sequence of Counter instances for the given message."""
+        """Return a sequence of Counter instances for the given message.
+
+        :param message: Message to process."""
 
     def notification_to_metadata(self, event):
         """Transform a payload dict to a metadata dict."""
@@ -94,7 +99,7 @@ class PublisherBase(PluginBase):
 
     @abc.abstractmethod
     def publish_counters(self, context, counters, source):
-        "Publish counters into final conduit"
+        "Publish counters into final conduit."
 
 
 class TransformerBase(PluginBase):
@@ -104,29 +109,28 @@ class TransformerBase(PluginBase):
 
     @abc.abstractmethod
     def handle_sample(self, context, counter, source):
-        """Transform a counter
+        """Transform a counter.
 
-        parameter:
-            context: Passed from the data collector
-            counters: An interator of counters.
-            source: Passed from data collector.
-
+        :param context: Passed from the data collector.
+        :param counter: A counter.
+        :param source: Passed from data collector.
         """
 
     def flush(self, context, source):
-        """Flush counters cached previously"""
+        """Flush counters cached previously.
+
+        :param context: Passed from the data collector.
+        :param source: Source of counters that are being published."""
         return []
 
-    def __init__(self, **parameter):
-        """Setup transformer
+    def __init__(self, **kwargs):
+        """Setup transformer.
 
         Each time a transformed is involved in a pipeline, a new transformer
         instance is created and chained into the pipeline. i.e. transformer
         instance is per pipeline. This helps if transformer need keep some
         cache and per-pipeline information.
 
-        parameter:
-            kwds: the parameter that is defined in pipeline config file
-
+        :param kwargs: The parameters that are defined in pipeline config file.
         """
         super(TransformerBase, self).__init__()
