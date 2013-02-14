@@ -23,6 +23,7 @@ from webob import Request
 from ceilometer.tests import base
 from ceilometer.objectstore import swift_middleware
 from ceilometer import pipeline
+from ceilometer.openstack.common import cfg
 
 
 class FakeApp(object):
@@ -59,6 +60,10 @@ class TestSwiftMiddleware(base.TestCase):
     @staticmethod
     def start_response(*args):
             pass
+
+    def test_rpc_setup(self):
+        app = swift_middleware.CeilometerMiddleware(FakeApp(), {})
+        self.assertEqual(cfg.CONF.control_exchange, 'ceilometer')
 
     def test_get(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(), {})
