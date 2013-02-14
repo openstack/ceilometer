@@ -570,10 +570,7 @@ def compute_duration_by_resource(resource, meter):
     # sentinal indicating that there is something "funny"
     # about the range.
     if min_ts and max_ts and (min_ts <= max_ts):
-        # Can't use timedelta.total_seconds() because
-        # it is not available in Python 2.6.
-        diff = max_ts - min_ts
-        duration = (diff.seconds + (diff.days * 24 * 60 ** 2)) / 60
+        duration = timeutils.delta_seconds(min_ts, max_ts)
     else:
         min_ts = max_ts = duration = None
 
