@@ -64,6 +64,24 @@ class TransformerExtensionManager(extension.ExtensionManager):
         return self.by_name[name]
 
 
+class Publisher(object):
+
+    def __init__(self, pipeline, context, source):
+        self.pipeline = pipeline
+        self.context = context
+        self.source = source
+
+    def __enter__(self):
+        def p(counters):
+            return self.pipeline.publish_counters(self.context,
+                                                  counters,
+                                                  self.source)
+        return p
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.pipeline.flush(self.context, self.source)
+
+
 class Pipeline(object):
     """Sample handling pipeline
 
@@ -222,6 +240,14 @@ class Pipeline(object):
                                    )
 
         LOG.audit("Pipeline %s: Published counters", self)
+
+    def publisher(self, context, source):
+        """Build a new Publisher for this pipeline.
+
+        :param context: The context.
+        :param source: Counter source.
+        """
+        return Publisher(self, context, source)
 
     def publish_counter(self, ctxt, counter, source):
         self.publish_counters(ctxt, [counter], source)

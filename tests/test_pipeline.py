@@ -2,7 +2,8 @@
 #
 # Copyright © 2013 Intel Corp.
 #
-# Author: Yunhong Jiang <yunhong.jiang@intel.com>
+# Authors: Yunhong Jiang <yunhong.jiang@intel.com>
+#          Julien Danjou <julien@danjou.info>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -20,6 +21,7 @@ from stevedore import dispatch
 from stevedore import extension
 
 from ceilometer import counter
+from ceilometer import plugin
 from ceilometer.openstack.common import timeutils
 from ceilometer import pipeline
 from ceilometer.tests import base
@@ -61,7 +63,7 @@ class TestPipeline(base.TestCase):
         def publish_counters(self, ctxt, counters, source):
             raise Exception()
 
-    class TransformerClass(object):
+    class TransformerClass(plugin.TransformerBase):
         samples = []
 
         def __init__(self, append_name='_update'):
@@ -76,7 +78,7 @@ class TestPipeline(base.TestCase):
             newname = getattr(counter, 'name') + self.append_name
             return counter._replace(name=newname)
 
-    class TransformerClassDrop(object):
+    class TransformerClassDrop(plugin.TransformerBase):
         samples = []
 
         def __init__(self):
@@ -94,15 +96,15 @@ class TestPipeline(base.TestCase):
         caches = []
 
         def __init__(self, drop=True):
-            self.__class__.samples = []
             self.__class__.caches = []
 
         def handle_sample(self, ctxt, counter, source):
-            self.__class__.samples.append(counter)
             self.__class__.caches.append(counter)
 
         def flush(self, ctxt, source):
-            return self.__class__.caches
+            x = self.__class__.caches
+            self.__class__.caches = []
+            return x
 
     def _create_publisher_manager(self, ext_name='test'):
         self.publisher_manager = dispatch.NameDispatchExtensionManager(
@@ -585,7 +587,6 @@ class TestPipeline(base.TestCase):
         pipe.flush(None, None)
         self.assertTrue(len(self.publisher.counters) == 1)
         self.assertTrue(len(self.TransformerClass.samples) == 2)
-        self.assertTrue(len(self.TransformerClassCache.caches) == 1)
         self.assertTrue(getattr(self.publisher.counters[0], 'name')
                         == 'a_update_new')
 
@@ -615,7 +616,6 @@ class TestPipeline(base.TestCase):
         self.assertTrue(len(self.publisher.counters) == 0)
         pipe.flush(None, None)
         self.assertTrue(len(self.publisher.counters) == 2)
-        self.assertTrue(len(self.TransformerClassCache.caches) == 2)
         self.assertTrue(len(self.TransformerClass.samples) == 4)
         self.assertTrue(getattr(self.publisher.counters[0], 'name')
                         == 'a_update_new')

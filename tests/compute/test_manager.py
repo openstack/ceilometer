@@ -94,7 +94,6 @@ class TestRunTasks(base.TestCase):
         self.assertTrue(self.Pollster.counters[0][1] is self.instance)
 
     def test_notifications(self):
-        self.assertTrue(self.mgr.pipeline_manager.publish_counter.called)
-        args, _ = self.mgr.pipeline_manager.publish_counter.call_args
-        self.assertEqual(args[1], self.Pollster.test_data)
-        self.assertEqual(args[2], cfg.CONF.counter_source)
+        self.assertTrue(self.mgr.pipeline_manager.publisher.called)
+        args, _ = self.mgr.pipeline_manager.publisher.call_args
+        self.assertEqual(args[1], cfg.CONF.counter_source)
