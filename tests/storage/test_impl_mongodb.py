@@ -49,7 +49,8 @@
 import mox
 
 from tests.storage import base
-from ceilometer.tests.db import TestConnection, require_map_reduce
+from ceilometer.storage.impl_test import TestConnection
+from ceilometer.tests.db import require_map_reduce
 
 
 class MongoDBEngine(base.DBEngineBase):
