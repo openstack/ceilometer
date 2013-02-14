@@ -181,7 +181,7 @@ class Connection(base.Connection):
         emit('statistics', { min : this.counter_volume,
                              max : this.counter_volume,
                              sum : this.counter_volume,
-                             count : 1,
+                             count : NumberInt(1),
                              duration_start : this.timestamp,
                              duration_end : this.timestamp,
                              period_start : this.timestamp,
