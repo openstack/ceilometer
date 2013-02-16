@@ -137,6 +137,12 @@ class ConnectionContext(rpc_common.Connection):
     def create_worker(self, topic, proxy, pool_name):
         self.connection.create_worker(topic, proxy, pool_name)
 
+    def join_consumer_pool(self, callback, pool_name, topic, exchange_name):
+        self.connection.join_consumer_pool(callback,
+                                           pool_name,
+                                           topic,
+                                           exchange_name)
+
     def consume_in_thread(self):
         self.connection.consume_in_thread()
 
@@ -224,14 +230,53 @@ def pack_context(msg, context):
     msg.update(context_d)
 
 
-class ProxyCallback(object):
-    """Calls methods on a proxy object based on method and args."""
+class _ThreadPoolWithWait(object):
+    """Base class for a delayed invocation manager used by
+    the Connection class to start up green threads
+    to handle incoming messages.
+    """
 
-    def __init__(self, conf, proxy, connection_pool):
-        self.proxy = proxy
+    def __init__(self, conf, connection_pool):
         self.pool = greenpool.GreenPool(conf.rpc_thread_pool_size)
         self.connection_pool = connection_pool
         self.conf = conf
+
+    def wait(self):
+        """Wait for all callback threads to exit."""
+        self.pool.waitall()
+
+
+class CallbackWrapper(_ThreadPoolWithWait):
+    """Wraps a straight callback to allow it to be invoked in a green
+    thread.
+    """
+
+    def __init__(self, conf, callback, connection_pool):
+        """
+        :param conf: cfg.CONF instance
+        :param callback: a callable (probably a function)
+        :param connection_pool: connection pool as returned by
+                                get_connection_pool()
+        """
+        super(CallbackWrapper, self).__init__(
+            conf=conf,
+            connection_pool=connection_pool,
+        )
+        self.callback = callback
+
+    def __call__(self, message_data):
+        self.pool.spawn_n(self.callback, message_data)
+
+
+class ProxyCallback(_ThreadPoolWithWait):
+    """Calls methods on a proxy object based on method and args."""
+
+    def __init__(self, conf, proxy, connection_pool):
+        super(ProxyCallback, self).__init__(
+            conf=conf,
+            connection_pool=connection_pool,
+        )
+        self.proxy = proxy
 
     def __call__(self, message_data):
         """Consumer callback to call a method on a proxy object.
@@ -292,10 +337,6 @@ class ProxyCallback(object):
             LOG.exception(_('Exception during message handling'))
             ctxt.reply(None, sys.exc_info(),
                        connection_pool=self.connection_pool)
-
-    def wait(self):
-        """Wait for all callback threads to exit."""
-        self.pool.waitall()
 
 
 class MulticallWaiter(object):
