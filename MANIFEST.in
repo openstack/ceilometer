@@ -7,3 +7,4 @@ exclude .gitreview
 global-exclude *.pyc
 recursive-include public *
 recursive-include ceilometer/locale *
+recursive-include ceilometer *.html
