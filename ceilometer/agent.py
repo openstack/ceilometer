@@ -16,13 +16,36 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import abc
+import itertools
+
 from oslo.config import cfg
 from stevedore import dispatch
-
+from ceilometer.openstack.common import context
 from ceilometer.openstack.common import log
 from ceilometer import pipeline
 
 LOG = log.getLogger(__name__)
+
+
+class PollingTask(object):
+    """Polling task for polling counters and inject into pipeline
+    A polling task can be invoked periodically or only once"""
+
+    def __init__(self, agent_manager):
+        self.manager = agent_manager
+        self.pollsters = set()
+        self.publish_context = pipeline.PublishContext(
+            agent_manager.context,
+            cfg.CONF.counter_source)
+
+    def add(self, pollster, pipelines):
+        self.publish_context.add_pipelines(pipelines)
+        self.pollsters.update([pollster])
+
+    @abc.abstractmethod
+    def poll_and_publish(self):
+        """Polling counter and publish into pipeline."""
 
 
 class AgentManager(object):
@@ -38,19 +61,34 @@ class AgentManager(object):
 
         self.pollster_manager = extension_manager
 
-    def publish_counters_from_one_pollster(self, ext, manager, context,
-                                           *args, **kwargs):
-        """Used to invoke the plugins loaded by the ExtensionManager.
-        """
-        try:
-            publisher = manager.pipeline_manager.publisher(
-                context,
-                cfg.CONF.counter_source,
-            )
-            with publisher as p:
-                LOG.debug('Polling and publishing %s', ext.name)
-                p(ext.obj.get_counters(manager, *args, **kwargs))
-        except Exception as err:
-            LOG.warning('Continuing after error from %s: %s',
-                        ext.name, err)
-            LOG.exception(err)
+        self.context = context.RequestContext('admin', 'admin', is_admin=True)
+
+    @abc.abstractmethod
+    def create_polling_task(self):
+        """Create an empty polling task"""
+
+    def setup_polling_tasks(self):
+        polling_tasks = {}
+        for pipeline, pollster in itertools.product(
+                self.pipeline_manager.pipelines,
+                self.pollster_manager.extensions):
+            for counter in pollster.obj.get_counter_names():
+                if pipeline.support_counter(counter):
+                    polling_task = polling_tasks.get(pipeline.interval, None)
+                    if not polling_task:
+                        polling_task = self.create_polling_task()
+                        polling_tasks[pipeline.interval] = polling_task
+                    polling_task.add(pollster, [pipeline])
+                    break
+
+        return polling_tasks
+
+    def initialize_service_hook(self, service):
+        self.service = service
+        for interval, task in self.setup_polling_tasks().iteritems():
+            self.service.tg.add_timer(interval,
+                                      self.interval_task,
+                                      task=task)
+
+    def interval_task(self, task):
+        task.poll_and_publish()

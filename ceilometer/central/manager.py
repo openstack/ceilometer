@@ -21,6 +21,7 @@ from oslo.config import cfg
 
 from ceilometer import agent
 from ceilometer import extension_manager
+from ceilometer.openstack.common import log
 from ceilometer import service  # For cfg.CONF.os_*
 
 OPTS = [
@@ -33,6 +34,26 @@ OPTS = [
 cfg.CONF.register_opts(OPTS)
 
 
+LOG = log.getLogger(__name__)
+
+
+class PollingTask(agent.PollingTask):
+    def poll_and_publish(self):
+        """Tasks to be run at a periodic interval."""
+        with self.publish_context as publisher:
+            # TODO(yjiang5) passing counters into get_counters to avoid
+            # polling all counters one by one
+            for pollster in self.pollsters:
+                try:
+                    LOG.info("Polling pollster %s", pollster.name)
+                    publisher(list(pollster.obj.get_counters(
+                        self.manager)))
+                except Exception as err:
+                    LOG.warning('Continue after error from %s: %s',
+                                pollster.name, err)
+                    LOG.exception(err)
+
+
 class AgentManager(agent.AgentManager):
 
     def __init__(self):
@@ -43,15 +64,15 @@ class AgentManager(agent.AgentManager):
             ),
         )
 
-    def periodic_tasks(self, context, raise_on_error=False):
-        """Tasks to be run at a periodic interval."""
-        self.keystone = ksclient.Client(username=cfg.CONF.os_username,
-                                        password=cfg.CONF.os_password,
-                                        tenant_id=cfg.CONF.os_tenant_id,
-                                        tenant_name=cfg.CONF.os_tenant_name,
-                                        auth_url=cfg.CONF.os_auth_url)
+    def create_polling_task(self):
+        return PollingTask(self)
 
-        self.pollster_manager.map(self.publish_counters_from_one_pollster,
-                                  manager=self,
-                                  context=context,
-                                  )
+    def interval_task(self, task):
+        self.keystone = ksclient.Client(
+            username=cfg.CONF.os_username,
+            password=cfg.CONF.os_password,
+            tenant_id=cfg.CONF.os_tenant_id,
+            tenant_name=cfg.CONF.os_tenant_name,
+            auth_url=cfg.CONF.os_auth_url)
+
+        super(AgentManager, self).interval_task(task)

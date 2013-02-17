@@ -46,6 +46,7 @@ def initialize_manager(agent_manager=None):
         _agent_manager = AgentManager()
     else:
         _agent_manager = agent_manager
+    _agent_manager.setup_notifier_task()
 
 
 def notify(context, message):

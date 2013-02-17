@@ -41,6 +41,29 @@ cfg.CONF.register_opts(OPTS)
 LOG = log.getLogger(__name__)
 
 
+class PollingTask(agent.PollingTask):
+    def poll_and_publish_instances(self, instances):
+        with self.publish_context as publisher:
+            for instance in instances:
+                if getattr(instance, 'OS-EXT-STS:vm_state', None) != 'error':
+                    # TODO(yjiang5) passing counters to get_counters to avoid
+                    # polling all counters one by one
+                    for pollster in self.pollsters:
+                        try:
+                            LOG.info("Polling pollster %s", pollster.name)
+                            publisher(list(pollster.obj.get_counters(
+                                self.manager,
+                                instance)))
+                        except Exception as err:
+                            LOG.warning('Continue after error from %s: %s',
+                                        pollster.name, err)
+                            LOG.exception(err)
+
+    def poll_and_publish(self):
+        self.poll_and_publish_instances(
+            self.manager.nv.instance_get_all_by_host(cfg.CONF.host))
+
+
 def get_hypervisor_inspector():
     try:
         namespace = 'ceilometer.compute.virt'
@@ -63,20 +86,23 @@ class AgentManager(agent.AgentManager):
             ),
         )
         self._inspector = get_hypervisor_inspector()
+        self.nv = nova_client.Client()
+
+    def create_polling_task(self):
+        return PollingTask(self)
+
+    def setup_notifier_task(self):
+        """For nova notifier usage"""
+        task = PollingTask(self)
+        for pollster in self.pollster_manager.extensions:
+            task.add(
+                pollster,
+                self.pipeline_manager.pipelines)
+        self.notifier_task = task
 
     def poll_instance(self, context, instance):
         """Poll one instance."""
-        self.pollster_manager.map(self.publish_counters_from_one_pollster,
-                                  manager=self,
-                                  context=context,
-                                  instance=instance)
-
-    def periodic_tasks(self, context, raise_on_error=False):
-        """Tasks to be run at a periodic interval."""
-        nv = nova_client.Client()
-        for instance in nv.instance_get_all_by_host(cfg.CONF.host):
-            if getattr(instance, 'OS-EXT-STS:vm_state', None) != 'error':
-                self.poll_instance(context, instance)
+        self.notifier_task.poll_and_publish_instances([instance])
 
     @property
     def inspector(self):

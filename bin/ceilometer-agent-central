@@ -22,18 +22,17 @@ eventlet.monkey_patch()
 import sys
 
 from oslo.config import cfg
-
-from ceilometer import service as ceilo_service
 from ceilometer.central import manager
 from ceilometer.service import prepare_service
 from ceilometer.openstack.common import service
+from ceilometer.openstack.common.rpc import service as rpc_service
 
 if __name__ == '__main__':
 
     prepare_service(sys.argv)
     mgr = manager.AgentManager()
     topic = 'ceilometer.agent.central'
-    ceilo = ceilo_service.PeriodicService(cfg.CONF.host,
-                                          topic, mgr)
+    ceilo = rpc_service.Service(cfg.CONF.host,
+                                topic, mgr)
     launcher = service.launch(ceilo)
     launcher.wait()

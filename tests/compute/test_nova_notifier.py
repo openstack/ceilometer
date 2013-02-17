@@ -78,6 +78,9 @@ class TestNovaNotifier(base.TestCase):
             self.counters.append((manager, instance))
             return [self.test_data]
 
+        def get_counter_names(self):
+            return ['test']
+
     def fake_db_instance_get(self, context, id_):
         if self.instance['uuid'] == id_:
             return mock.MagicMock(name=self.instance['name'],

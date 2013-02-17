@@ -23,11 +23,16 @@ import datetime
 import mock
 from oslo.config import cfg
 from stevedore import extension
+from stevedore.tests import manager as extension_tests
+from stevedore import dispatch
 
 from ceilometer import nova_client
 from ceilometer.compute import manager
 from ceilometer import counter
+from ceilometer import pipeline
 from ceilometer.tests import base
+
+from tests import agentbase
 
 
 @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
@@ -37,25 +42,7 @@ def test_load_plugins():
     return
 
 
-class TestRunTasks(base.TestCase):
-
-    class Pollster:
-        counters = []
-        test_data = counter.Counter(
-            name='test',
-            type=counter.TYPE_CUMULATIVE,
-            unit='',
-            volume=1,
-            user_id='test',
-            project_id='test',
-            resource_id='test_run_tasks',
-            timestamp=datetime.datetime.utcnow().isoformat(),
-            resource_metadata={'name': 'Pollster'},
-        )
-
-        def get_counters(self, manager, instance):
-            self.counters.append((manager, instance))
-            return [self.test_data]
+class TestRunTasks(agentbase.BaseAgentManagerTestCase):
 
     def _fake_instance(self, name, state):
         instance = mock.MagicMock()
@@ -63,20 +50,12 @@ class TestRunTasks(base.TestCase):
         setattr(instance, 'OS-EXT-STS:vm_state', state)
         return instance
 
+    def setup_manager(self):
+        self.mgr = manager.AgentManager()
+
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestRunTasks, self).setUp()
-        self.mgr = manager.AgentManager()
-        self.mgr.pollster_manager = extension.ExtensionManager(
-            'fake',
-            invoke_on_load=False,
-        )
-        self.mgr.pollster_manager.extensions = [
-            extension.Extension('test',
-                                None,
-                                None,
-                                self.Pollster(), ),
-        ]
 
         # Set up a fake instance value to be returned by
         # instance_get_all_by_host() so when the manager gets the list
@@ -85,19 +64,18 @@ class TestRunTasks(base.TestCase):
         stillborn_instance = self._fake_instance('stillborn', 'error')
         self.stubs.Set(nova_client.Client, 'instance_get_all_by_host',
                        lambda *x: [self.instance, stillborn_instance])
-        self.mox.ReplayAll()
-        # Invoke the periodic tasks to call the pollsters.
-        self.mgr.periodic_tasks(None)
 
-    def tearDown(self):
-        self.Pollster.counters = []
-        super(TestRunTasks, self).tearDown()
-
-    def test_message(self):
+    def test_notifier_task(self):
+        self.mgr.setup_notifier_task()
+        self.mgr.poll_instance(None, self.instance)
         self.assertEqual(len(self.Pollster.counters), 1)
+        assert self.publisher.counters[0] == self.Pollster.test_data
+
+    def test_setup_polling_tasks(self):
+        super(TestRunTasks, self).test_setup_polling_tasks()
         self.assertTrue(self.Pollster.counters[0][1] is self.instance)
 
-    def test_notifications(self):
-        self.assertTrue(self.mgr.pipeline_manager.publisher.called)
-        args, _ = self.mgr.pipeline_manager.publisher.call_args
-        self.assertEqual(args[1], cfg.CONF.counter_source)
+    def test_interval_exception_isolation(self):
+        super(TestRunTasks, self).test_interval_exception_isolation()
+        self.assertEqual(len(self.PollsterException.counters), 1)
+        self.assertEqual(len(self.PollsterExceptionAnother.counters), 1)

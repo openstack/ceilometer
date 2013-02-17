@@ -95,10 +95,10 @@ class CeilometerMiddleware(object):
         req = Request(env)
         version, account, container, obj = split_path(req.path, 1, 4, True)
         now = timeutils.utcnow().isoformat()
-
-        with self.pipeline_manager.publisher(
+        with pipeline.PublishContext(
                 context.get_admin_context(),
-                cfg.CONF.counter_source
+                cfg.CONF.counter_source,
+                self.pipeline_manager.pipelines,
         ) as publisher:
             if bytes_received:
                 publisher([counter.Counter(
