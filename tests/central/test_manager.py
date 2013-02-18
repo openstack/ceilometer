@@ -19,15 +19,15 @@
 """
 
 import datetime
+
 import mock
+from oslo.config import cfg
+from keystoneclient.v2_0 import client as ksclient
 from stevedore import extension
 
 from ceilometer.central import manager
 from ceilometer import counter
 from ceilometer.tests import base
-
-from ceilometer.openstack.common import cfg
-from keystoneclient.v2_0 import client as ksclient
 
 
 @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())

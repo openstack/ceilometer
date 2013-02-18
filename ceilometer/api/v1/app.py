@@ -19,8 +19,8 @@
 """
 
 import flask
+from oslo.config import cfg
 
-from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import jsonutils
 from ceilometer import storage
 from ceilometer.api.v1 import blueprint as v1_blueprint

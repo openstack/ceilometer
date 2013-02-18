@@ -28,8 +28,8 @@ import kombu
 import kombu.connection
 import kombu.entity
 import kombu.messaging
+from oslo.config import cfg
 
-from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import network_utils
 from ceilometer.openstack.common.rpc import amqp as rpc_amqp

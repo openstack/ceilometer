@@ -23,7 +23,8 @@ in by the plugins that create them.
 """
 
 import collections
-from ceilometer.openstack.common import cfg
+
+from oslo.config import cfg
 
 OPTS = [
     cfg.StrOpt('counter_source',

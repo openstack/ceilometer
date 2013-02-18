@@ -18,14 +18,14 @@
 """Storage backend management
 """
 
-from stevedore import driver
 from datetime import datetime
+from urlparse import urlparse
+
+from oslo.config import cfg
+from stevedore import driver
 
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import timeutils
-
-from urlparse import urlparse
 
 LOG = log.getLogger(__name__)
 

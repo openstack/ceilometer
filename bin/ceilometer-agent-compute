@@ -21,10 +21,11 @@ import eventlet
 eventlet.monkey_patch()
 import sys
 
+from oslo.config import cfg
+
 from ceilometer import service as ceilo_service
 from ceilometer.compute import manager
 from ceilometer.service import prepare_service
-from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import service
 
 

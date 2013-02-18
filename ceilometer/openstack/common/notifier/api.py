@@ -15,7 +15,8 @@
 
 import uuid
 
-from ceilometer.openstack.common import cfg
+from oslo.config import cfg
+
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import importutils

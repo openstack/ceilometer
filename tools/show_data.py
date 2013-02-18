@@ -19,8 +19,9 @@
 
 import sys
 
+from oslo.config import cfg
+
 from ceilometer import storage
-from ceilometer.openstack.common import cfg
 
 
 def show_users(db, args):

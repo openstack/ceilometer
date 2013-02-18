@@ -22,9 +22,10 @@
 import datetime
 import logging
 
+from oslo.config import cfg
+
 from ceilometer.collector import meter
 from ceilometer import counter
-from ceilometer.openstack.common import cfg
 
 from ceilometer.tests import api as tests_api
 

@@ -16,6 +16,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from oslo.config import cfg
 from stevedore import dispatch
 
 from ceilometer.collector import meter as meter_api
@@ -24,7 +25,6 @@ from ceilometer import pipeline
 from ceilometer import service
 from ceilometer import storage
 from ceilometer.openstack.common import context
-from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer.openstack.common.rpc import dispatcher as rpc_dispatcher

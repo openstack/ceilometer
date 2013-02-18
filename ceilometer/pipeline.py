@@ -19,10 +19,10 @@
 import itertools
 import os
 
+from oslo.config import cfg
 from stevedore import extension
 import yaml
 
-from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import log
 
 OPTS = [

@@ -20,9 +20,10 @@
 
 """
 
+from oslo.config import cfg
+
 from ceilometer import counter
 from ceilometer import plugin
-from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import log as logging
 
 

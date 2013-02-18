@@ -27,8 +27,8 @@ import cPickle as pickle
 import sys
 
 from nova import utils
+from oslo.config import cfg
 
-from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import rpc
 
 LOG = logging.getLogger(__name__)

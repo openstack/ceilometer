@@ -20,9 +20,10 @@
 """
 import sys
 
+from oslo.config import cfg
+
 from ceilometer.api.v1 import app
 from ceilometer import service
-from ceilometer.openstack.common import cfg
 
 
 if __name__ == '__main__':
