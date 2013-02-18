@@ -132,6 +132,7 @@ setuptools.setup(
     libvirt = ceilometer.compute.virt.libvirt.inspector:LibvirtInspector
 
     [ceilometer.transformer]
+    accumulator = ceilometer.transformer.accumulator:TransformerAccumulator
 
     [ceilometer.publisher]
     meter_publisher = ceilometer.publisher.meter_publish:MeterPublisher
