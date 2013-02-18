@@ -20,6 +20,7 @@
 This driver is based on MIM, an in-memory version of MongoDB.
 """
 
+import os
 from ming import mim
 
 from ceilometer.openstack.common import log as logging
@@ -76,11 +77,32 @@ class TestDBStorage(base.StorageEngine):
 class TestConnection(impl_mongodb.Connection):
 
     _mim_instance = None
+    FORCE_MONGO = bool(int(os.environ.get('CEILOMETER_TEST_LIVE', 0)))
+
+    def drop_database(self, database):
+        if TestConnection._mim_instance is not None:
+            # Don't want to use drop_database() because we
+            # may end up running out of spidermonkey instances.
+            # http://davisp.lighthouseapp.com/projects/26898/tickets/22
+            self.conn[database].clear()
+        else:
+            self.conn.drop_database(database)
 
     def _get_connection(self, conf):
-        # MIM will die if we have too many connections, so use a
-        # Singleton
-        if TestConnection._mim_instance is None:
-            LOG.debug('Creating a new MIM Connection object')
-            TestConnection._mim_instance = mim.Connection()
-        return TestConnection._mim_instance
+        # Use a real MongoDB server if we can connect, but fall back
+        # to a Mongo-in-memory connection if we cannot.
+        if self.FORCE_MONGO:
+            try:
+                return super(TestConnection, self)._get_connection(conf)
+            except:
+                LOG.debug('Unable to connect to mongodb')
+                raise
+        else:
+            LOG.debug('Using MIM for test connection')
+
+            # MIM will die if we have too many connections, so use a
+            # Singleton
+            if TestConnection._mim_instance is None:
+                LOG.debug('Creating a new MIM Connection object')
+                TestConnection._mim_instance = mim.Connection()
+            return TestConnection._mim_instance

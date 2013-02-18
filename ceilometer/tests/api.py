@@ -84,11 +84,7 @@ class FunctionalTest(base.TestCase):
 
         cfg.CONF.database_connection = 'test://localhost/%s' % self.DBNAME
         self.conn = storage.get_connection(cfg.CONF)
-        # Don't want to use drop_database() because we
-        # may end up running out of spidermonkey instances.
-        # http://davisp.lighthouseapp.com/projects/26898/tickets/22
-        self.conn.conn[self.DBNAME].clear()
-
+        self.conn.drop_database(self.DBNAME)
         self.app = self._make_app()
 
     def _make_app(self, enable_acl=False):
