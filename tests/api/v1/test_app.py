@@ -21,9 +21,10 @@ import os
 import tempfile
 import unittest
 
+from oslo.config import cfg
+
 from ceilometer.api.v1 import app
 from ceilometer.api import acl
-from ceilometer.openstack.common import cfg
 from ceilometer import service
 
 

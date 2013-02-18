@@ -16,8 +16,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from oslo.config import cfg
 from stevedore import dispatch
-from ceilometer.openstack.common import cfg
+
 from ceilometer.openstack.common import log
 from ceilometer import pipeline
 

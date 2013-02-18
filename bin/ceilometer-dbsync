@@ -19,9 +19,11 @@
 """
 
 import sys
+
+from oslo.config import cfg
+
 from ceilometer import service
 from ceilometer import storage
-from ceilometer.openstack.common import cfg
 
 if __name__ == '__main__':
     service.prepare_service(sys.argv)

@@ -40,7 +40,8 @@ import stat
 import sys
 import traceback
 
-from ceilometer.openstack.common import cfg
+from oslo.config import cfg
+
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import jsonutils
 from ceilometer.openstack.common import local

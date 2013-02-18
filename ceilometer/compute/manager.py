@@ -16,13 +16,13 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from oslo.config import cfg
 from stevedore import driver
 
 from ceilometer import agent
 from ceilometer import extension_manager
 from ceilometer import nova_client
 from ceilometer.compute.virt import inspector as virt_inspector
-from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import log
 
 OPTS = [

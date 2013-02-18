@@ -22,11 +22,11 @@ from __future__ import absolute_import
 
 import abc
 
+from oslo.config import cfg
 from swiftclient import client as swift
 
 from ceilometer import plugin
 from ceilometer import counter
-from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import timeutils
 from ceilometer.openstack.common import log
 

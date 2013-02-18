@@ -23,9 +23,10 @@
 import logging
 import sys
 
+from oslo.config import cfg
+
 from ceilometer import counter
 from ceilometer import publish
-from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import timeutils
 from ceilometer.openstack.common import context
 

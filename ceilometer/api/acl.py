@@ -17,14 +17,12 @@
 # under the License.
 """Set up the ACL to acces the API server."""
 
-from ceilometer import policy
-from ceilometer.openstack.common import cfg
-
+import keystoneclient.middleware.auth_token as auth_token
+from oslo.config import cfg
 from pecan import hooks
-
 from webob import exc
 
-import keystoneclient.middleware.auth_token as auth_token
+from ceilometer import policy
 
 OPT_GROUP_NAME = 'keystone_authtoken'
 

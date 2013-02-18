@@ -20,7 +20,8 @@
 
 import datetime
 
-from ceilometer.openstack.common import cfg
+from oslo.config import cfg
+
 from ceilometer.openstack.common import rpc
 from ceilometer.tests import base
 

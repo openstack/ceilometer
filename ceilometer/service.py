@@ -20,7 +20,8 @@
 import os
 import socket
 
-from ceilometer.openstack.common import cfg
+from oslo.config import cfg
+
 from ceilometer.openstack.common import rpc
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import log

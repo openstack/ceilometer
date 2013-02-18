@@ -28,8 +28,8 @@ import time
 
 import eventlet
 import logging as std_logging
+from oslo.config import cfg
 
-from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import eventlet_backdoor
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import importutils

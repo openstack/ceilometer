@@ -20,8 +20,9 @@
 
 import itertools
 
+from oslo.config import cfg
+
 from ceilometer.collector import meter as meter_api
-from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import rpc
 from ceilometer import plugin

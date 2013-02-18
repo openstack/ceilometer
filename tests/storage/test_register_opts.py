@@ -18,9 +18,10 @@
 """Tests for ceilometer/storage/
 """
 
+from oslo.config import cfg
+
 from ceilometer import storage
 from ceilometer.storage import base
-from ceilometer.openstack.common import cfg
 from ceilometer.tests import base as test_base
 
 

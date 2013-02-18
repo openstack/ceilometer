@@ -15,9 +15,11 @@
 # under the License.
 
 from functools import wraps
-from novaclient.v1_1 import client as nova_client
 
-from ceilometer.openstack.common import cfg, log
+from novaclient.v1_1 import client as nova_client
+from oslo.config import cfg
+
+from ceilometer.openstack.common import log
 from ceilometer import service  # For cfg.CONF.os_*
 
 LOG = log.getLogger(__name__)

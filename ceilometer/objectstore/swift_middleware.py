@@ -20,10 +20,10 @@
 
 from __future__ import absolute_import
 
+from oslo.config import cfg
 from stevedore import dispatch
 
 from ceilometer import counter
-from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import timeutils
 from ceilometer import pipeline

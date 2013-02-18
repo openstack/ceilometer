@@ -22,13 +22,12 @@ from datetime import datetime
 
 from mock import patch
 from mock import MagicMock
-
+from oslo.config import cfg
 from stevedore import extension
 from stevedore.tests import manager as test_manager
 
 from ceilometer.collector import meter
 from ceilometer.collector import service
-from ceilometer.openstack.common import cfg
 from ceilometer.storage import base
 from ceilometer.tests import base as tests_base
 from ceilometer.compute import notifications

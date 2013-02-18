@@ -28,7 +28,8 @@ For some wrappers that add message versioning to rpc, see:
 import inspect
 import logging
 
-from ceilometer.openstack.common import cfg
+from oslo.config import cfg
+
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import importutils
 from ceilometer.openstack.common import local

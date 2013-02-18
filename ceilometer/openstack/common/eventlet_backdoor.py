@@ -24,8 +24,7 @@ import traceback
 import eventlet
 import eventlet.backdoor
 import greenlet
-
-from ceilometer.openstack.common import cfg
+from oslo.config import cfg
 
 eventlet_backdoor_opts = [
     cfg.IntOpt('backdoor_port',

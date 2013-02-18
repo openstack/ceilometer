@@ -17,8 +17,8 @@
 # under the License.
 
 import flask.helpers
+from oslo.config import cfg
 
-from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import jsonutils
 
 # Replace the json module used by flask with the one from

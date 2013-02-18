@@ -16,6 +16,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from oslo.config import cfg
 from pecan import make_app
 from pecan import configuration
 
@@ -23,7 +24,6 @@ from ceilometer.api import config as api_config
 from ceilometer.api import acl
 from ceilometer.api import hooks
 from ceilometer.api import middleware
-from ceilometer.openstack.common import cfg
 
 
 def get_pecan_config():

@@ -20,10 +20,11 @@
 
 import datetime
 
+from oslo.config import cfg
+
 from ceilometer.collector import meter
 from ceilometer import counter
 
-from ceilometer.openstack.common import cfg
 from .base import FunctionalTest
 from ceilometer.tests.db import require_map_reduce
 

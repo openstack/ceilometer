@@ -30,7 +30,8 @@ POSSIBLE_TOPDIR = os.path.normpath(os.path.join(os.path.abspath(sys.argv[0]),
 if os.path.exists(os.path.join(POSSIBLE_TOPDIR, 'ceilometer', '__init__.py')):
     sys.path.insert(0, POSSIBLE_TOPDIR)
 
-from ceilometer.openstack.common import cfg
+from oslo.config import cfg
+
 from ceilometer.openstack.common import log as logging
 from ceilometer.openstack.common import rpc
 from ceilometer.openstack.common.rpc import impl_zmq

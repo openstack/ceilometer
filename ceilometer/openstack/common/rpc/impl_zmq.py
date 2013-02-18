@@ -23,8 +23,8 @@ import uuid
 
 import eventlet
 import greenlet
+from oslo.config import cfg
 
-from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import importutils
 from ceilometer.openstack.common import jsonutils

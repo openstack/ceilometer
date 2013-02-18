@@ -19,8 +19,9 @@
 
 import os
 
+from oslo.config import cfg
+
 from ceilometer import utils
-from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import policy
 
 

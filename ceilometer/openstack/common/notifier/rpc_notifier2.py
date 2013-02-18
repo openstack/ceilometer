@@ -15,7 +15,8 @@
 
 '''messaging based notification driver, with message envelopes'''
 
-from ceilometer.openstack.common import cfg
+from oslo.config import cfg
+
 from ceilometer.openstack.common import context as req_context
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log as logging

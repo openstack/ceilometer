@@ -17,10 +17,10 @@
 # under the License.
 
 from keystoneclient.v2_0 import client as ksclient
+from oslo.config import cfg
 
 from ceilometer import agent
 from ceilometer import extension_manager
-from ceilometer.openstack.common import cfg
 from ceilometer import service  # For cfg.CONF.os_*
 
 OPTS = [

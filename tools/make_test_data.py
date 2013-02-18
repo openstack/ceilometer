@@ -25,10 +25,11 @@ import datetime
 import logging
 import sys
 
+from oslo.config import cfg
+
 from ceilometer.collector import meter
 from ceilometer import counter
 from ceilometer import storage
-from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import timeutils
 
 

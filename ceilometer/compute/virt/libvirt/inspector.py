@@ -18,9 +18,9 @@
 """Implementation of Inspector abstraction for libvirt"""
 
 from lxml import etree
+from oslo.config import cfg
 
 from ceilometer.compute.virt import inspector as virt_inspector
-from ceilometer.openstack.common import cfg
 from ceilometer.openstack.common import log as logging
 
 libvirt = None

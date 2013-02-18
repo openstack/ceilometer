@@ -18,12 +18,13 @@
 # under the License.
 
 import cStringIO as StringIO
+
+from oslo.config import cfg
 from webob import Request
 
 from ceilometer.tests import base
 from ceilometer.objectstore import swift_middleware
 from ceilometer import pipeline
-from ceilometer.openstack.common import cfg
 
 
 class FakeApp(object):

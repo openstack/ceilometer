@@ -19,15 +19,15 @@
 """
 
 import datetime
+
 import mock
+from oslo.config import cfg
 from stevedore import extension
 
 from ceilometer import nova_client
 from ceilometer.compute import manager
 from ceilometer import counter
 from ceilometer.tests import base
-
-from ceilometer.openstack.common import cfg
 
 
 @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())

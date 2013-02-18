@@ -20,9 +20,10 @@
 import os
 import tempfile
 
+from oslo.config import cfg
+
 from ceilometer.tests import base
 from ceilometer import policy
-from ceilometer.openstack.common import cfg
 
 
 class TestPolicy(base.TestCase):

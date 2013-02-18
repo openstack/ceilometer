@@ -25,7 +25,8 @@ import socket
 import sys
 import textwrap
 
-from ceilometer.openstack.common import cfg
+from oslo.config import cfg
+
 from ceilometer.openstack.common import importutils
 
 

@@ -23,13 +23,13 @@ import os
 import urllib
 
 import flask
+from oslo.config import cfg
 from pecan import set_config
 from pecan.testing import load_test_app
 
 from ceilometer import storage
 from ceilometer.api.v1 import app as v1_app
 from ceilometer.api.v1 import blueprint as v1_blueprint
-from ceilometer.openstack.common import cfg
 from ceilometer.tests import db as db_test_base
 from ceilometer.tests import base
 

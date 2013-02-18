@@ -18,10 +18,11 @@
 """Converters for producing compute counter messages from notification events.
 """
 
+from oslo.config import cfg
+
 from ceilometer import counter
 from ceilometer import plugin
 from ceilometer.compute import instance
-from ceilometer.openstack.common import cfg
 
 
 OPTS = [

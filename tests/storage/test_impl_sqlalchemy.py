@@ -20,8 +20,9 @@ import logging
 import os
 import sqlalchemy
 
+from oslo.config import cfg
+
 from tests.storage import base
-from ceilometer.openstack.common import cfg
 from ceilometer.storage import impl_sqlalchemy
 from ceilometer.storage.sqlalchemy.models import Project, User
 from ceilometer.storage.sqlalchemy.models import table_args

@@ -22,7 +22,8 @@ import contextlib
 import itertools
 import json
 
-from ceilometer.openstack.common import cfg
+from oslo.config import cfg
+
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log as logging
 
