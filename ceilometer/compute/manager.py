@@ -17,25 +17,12 @@
 # under the License.
 
 from oslo.config import cfg
-from stevedore import driver
 
 from ceilometer import agent
 from ceilometer import extension_manager
 from ceilometer import nova_client
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.openstack.common import log
-
-OPTS = [
-    cfg.ListOpt('disabled_compute_pollsters',
-                default=[],
-                help='list of compute agent pollsters to disable',
-                ),
-    cfg.StrOpt('hypervisor_inspector',
-               default='libvirt',
-               help='Inspector to use for inspecting the hypervisor layer'),
-]
-
-cfg.CONF.register_opts(OPTS)
 
 
 LOG = log.getLogger(__name__)
@@ -64,18 +51,6 @@ class PollingTask(agent.PollingTask):
             self.manager.nv.instance_get_all_by_host(cfg.CONF.host))
 
 
-def get_hypervisor_inspector():
-    try:
-        namespace = 'ceilometer.compute.virt'
-        mgr = driver.DriverManager(namespace,
-                                   cfg.CONF.hypervisor_inspector,
-                                   invoke_on_load=True)
-        return mgr.driver
-    except ImportError as e:
-        LOG.error("Unable to load the hypervisor inspector: %s" % (e))
-        return virt_inspector.Inspector()
-
-
 class AgentManager(agent.AgentManager):
 
     def __init__(self):
@@ -85,7 +60,7 @@ class AgentManager(agent.AgentManager):
                 disabled_names=cfg.CONF.disabled_compute_pollsters,
             ),
         )
-        self._inspector = get_hypervisor_inspector()
+        self._inspector = virt_inspector.get_hypervisor_inspector()
         self.nv = nova_client.Client()
 
     def create_polling_task(self):

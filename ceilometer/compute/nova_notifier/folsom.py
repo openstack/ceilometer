@@ -16,17 +16,18 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+__all__ = [
+    'notify',
+    'initialize_manager',
+]
+
 from oslo.config import cfg
 
 from ceilometer.openstack.common import log as logging
 
 from ceilometer.compute.manager import AgentManager
 
-try:
-    from nova.conductor import api
-    instance_info_source = api.API()
-except ImportError:
-    from nova import db as instance_info_source
+from nova import db as instance_info_source
 
 # This module runs inside the nova compute
 # agent, which only configures the "nova" logger.

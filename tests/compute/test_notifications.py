@@ -285,13 +285,79 @@ INSTANCE_RESIZE_REVERT_END = {
     u'priority': u'INFO'
 }
 
+INSTANCE_DELETE_SAMPLES = {
+    u'_context_roles': [u'admin'],
+    u'_context_request_id': u'req-9da1d714-dabe-42fd-8baa-583e57cd4f1a',
+    u'_context_quota_class': None,
+    u'event_type': u'compute.instance.delete.samples',
+    u'_context_user_name': u'admin',
+    u'_context_project_name': u'admin',
+    u'timestamp': u'2013-01-04 15:20:32.009532',
+    u'_context_is_admin': True,
+    u'message_id': u'c48deeba-d0c3-4154-b3db-47480b52267a',
+    u'_context_auth_token': None,
+    u'_context_instance_lock_checked': False,
+    u'_context_project_id': u'cea4b25edb484e5392727181b7721d29',
+    u'_context_timestamp': u'2013-01-04T15:19:51.018218',
+    u'_context_read_deleted': u'no',
+    u'_context_user_id': u'01b83a5e23f24a6fb6cd073c0aee6eed',
+    u'_context_remote_address': u'10.147.132.184',
+    u'publisher_id': u'compute.ip-10-147-132-184.ec2.internal',
+    u'payload': {u'state_description': u'resize_reverting',
+                 u'availability_zone': None,
+                 u'ephemeral_gb': 0,
+                 u'instance_type_id': 2,
+                 u'deleted_at': u'',
+                 u'reservation_id': u'r-u3fvim06',
+                 u'memory_mb': 512,
+                 u'user_id': u'01b83a5e23f24a6fb6cd073c0aee6eed',
+                 u'hostname': u's1',
+                 u'state': u'resized',
+                 u'launched_at': u'2013-01-04T15:10:14.000000',
+                 u'metadata': [],
+                 u'ramdisk_id': u'5f23128e-5525-46d8-bc66-9c30cd87141a',
+                 u'access_ip_v6': None,
+                 u'disk_gb': 0,
+                 u'access_ip_v4': None,
+                 u'kernel_id': u'571478e0-d5e7-4c2e-95a5-2bc79443c28a',
+                 u'host': u'ip-10-147-132-184.ec2.internal',
+                 u'display_name': u's1',
+                 u'image_ref_url': u'http://10.147.132.184:9292/images/'
+                 'a130b9d9-e00e-436e-9782-836ccef06e8a',
+                 u'root_gb': 0,
+                 u'tenant_id': u'cea4b25edb484e5392727181b7721d29',
+                 u'created_at': u'2013-01-04T11:21:48.000000',
+                 u'instance_id': u'648e8963-6886-4c3c-98f9-4511c292f86b',
+                 u'instance_type': u'm1.tiny',
+                 u'vcpus': 1,
+                 u'image_meta': {u'kernel_id':
+                                 u'571478e0-d5e7-4c2e-95a5-2bc79443c28a',
+                                 u'ramdisk_id':
+                                 u'5f23128e-5525-46d8-bc66-9c30cd87141a',
+                                 u'base_image_ref':
+                                 u'a130b9d9-e00e-436e-9782-836ccef06e8a'},
+                 u'architecture': None,
+                 u'os_type': None,
+                 u'samples': [{u'name': u'sample-name1',
+                               u'type': u'sample-type1',
+                               u'unit': u'sample-units1',
+                               u'volume': 1},
+                              {u'name': u'sample-name2',
+                               u'type': u'sample-type2',
+                               u'unit': u'sample-units2',
+                               u'volume': 2},
+                              ],
+                 },
+    u'priority': u'INFO'
+}
+
 
 class TestNotifications(unittest.TestCase):
+
     def test_process_notification(self):
         info = notifications.Instance().process_notification(
             INSTANCE_CREATE_END
         )[0]
-
         for name, actual, expected in [
                 ('counter_name', info.name, 'instance'),
                 ('counter_type', info.type, counter.TYPE_GAUGE),
@@ -435,3 +501,10 @@ class TestNotifications(unittest.TestCase):
         c = counters[0]
         self.assertEqual(c.volume,
                          INSTANCE_RESIZE_REVERT_END['payload']['vcpus'])
+
+    def test_instance_delete_samples(self):
+        ic = notifications.InstanceDelete()
+        counters = ic.process_notification(INSTANCE_DELETE_SAMPLES)
+        self.assertEqual(len(counters), 2)
+        names = [c.name for c in counters]
+        self.assertEqual(names, ['sample-name1', 'sample-name2'])

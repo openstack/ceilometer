@@ -172,3 +172,29 @@ class InstanceFlavor(_Base):
                 )
             )
         return counters
+
+
+class InstanceDelete(_Base):
+    """Handle the messages sent by the nova notifier plugin
+    when an instance is being deleted.
+    """
+
+    @staticmethod
+    def get_event_types():
+        return ['compute.instance.delete.samples']
+
+    def process_notification(self, message):
+        return [
+            counter.Counter(name=sample['name'],
+                            type=sample['type'],
+                            unit=sample['unit'],
+                            volume=sample['volume'],
+                            user_id=message['payload']['user_id'],
+                            project_id=message['payload']['tenant_id'],
+                            resource_id=message['payload']['instance_id'],
+                            timestamp=message['timestamp'],
+                            resource_metadata=self.notification_to_metadata(
+                                message),
+                            )
+            for sample in message['payload'].get('samples', [])
+        ]

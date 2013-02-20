@@ -29,6 +29,10 @@ from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer.openstack.common.rpc import dispatcher as rpc_dispatcher
 
+# Import rpc_notifier to register `notification_topics` flag so that
+# plugins can use it
+# FIXME(dhellmann): Use option importing feature of oslo.config instead.
+import ceilometer.openstack.common.notifier.rpc_notifier
 
 OPTS = [
     cfg.ListOpt('disabled_notification_listeners',
@@ -56,6 +60,7 @@ class CollectorService(service.PeriodicService):
 
     def initialize_service_hook(self, service):
         '''Consumers must be declared before consume_thread start.'''
+        LOG.debug('initialize_service_hooks')
         publisher_manager = dispatch.NameDispatchExtensionManager(
             namespace=pipeline.PUBLISHER_NAMESPACE,
             check_func=lambda x: True,
@@ -63,6 +68,8 @@ class CollectorService(service.PeriodicService):
         )
         self.pipeline_manager = pipeline.setup_pipeline(publisher_manager)
 
+        LOG.debug('loading notification handlers from %s',
+                  self.COLLECTOR_NAMESPACE)
         self.notification_manager = \
             extension_manager.ActivatedExtensionManager(
                 namespace=self.COLLECTOR_NAMESPACE,

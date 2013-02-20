@@ -18,6 +18,13 @@
 """Tests for ceilometer.compute.nova_notifier
 """
 
+try:
+    import nova.conductor
+    import nose.plugins.skip
+    raise nose.SkipTest('do not run folsom tests under grizzly')
+except ImportError:
+    pass
+
 # FIXME(dhellmann): Temporarily disable these tests so we can get a
 # fix to go through Jenkins.
 import nose.plugins.skip
@@ -31,13 +38,9 @@ from stevedore import extension
 from stevedore.tests import manager as test_manager
 from ceilometer.compute import manager
 
-try:
-    from nova import config
-    nova_CONF = config.cfg.CONF
-except ImportError:
-    # XXX Folsom compat
-    from nova import flags
-    nova_CONF = flags.FLAGS
+# XXX Folsom compat
+from nova import flags
+nova_CONF = flags.FLAGS
 from nova import db
 from nova import context
 from nova import service  # For nova_CONF.compute_manager

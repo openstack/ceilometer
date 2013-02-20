@@ -21,10 +21,6 @@
 import abc
 from collections import namedtuple
 
-# Import rpc_notifier to register notification_topics flag so that
-# plugins can use it
-import ceilometer.openstack.common.notifier.rpc_notifier
-
 
 ExchangeTopics = namedtuple('ExchangeTopics', ['exchange', 'topics'])
 
