@@ -26,7 +26,7 @@ import logging
 import cPickle as pickle
 import sys
 
-from nova import utils
+#from nova import utils
 from oslo.config import cfg
 
 from ceilometer.openstack.common import rpc
