@@ -57,6 +57,12 @@ class TestRunTasks(base.TestCase):
             self.counters.append((manager, instance))
             return [self.test_data]
 
+    def _fake_instance(self, name, state):
+        instance = mock.MagicMock()
+        instance.name = name
+        setattr(instance, 'OS-EXT-STS:vm_state', state)
+        return instance
+
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestRunTasks, self).setUp()
@@ -75,10 +81,8 @@ class TestRunTasks(base.TestCase):
         # Set up a fake instance value to be returned by
         # instance_get_all_by_host() so when the manager gets the list
         # of instances to poll we can control the results.
-        self.instance = {'name': 'faux',
-                         'OS-EXT-STS:vm_state': 'active'}
-        stillborn_instance = {'name': 'stillborn',
-                              'OS-EXT-STS:vm_state': 'error'}
+        self.instance = self._fake_instance('faux', 'active')
+        stillborn_instance = self._fake_instance('stillborn', 'error')
         self.stubs.Set(nova_client.Client, 'instance_get_all_by_host',
                        lambda *x: [self.instance, stillborn_instance])
         self.mox.ReplayAll()
@@ -90,7 +94,7 @@ class TestRunTasks(base.TestCase):
         super(TestRunTasks, self).tearDown()
 
     def test_message(self):
-        self.assertEqual(len(self.Pollster.counters), 2)
+        self.assertEqual(len(self.Pollster.counters), 1)
         self.assertTrue(self.Pollster.counters[0][1] is self.instance)
 
     def test_notifications(self):
