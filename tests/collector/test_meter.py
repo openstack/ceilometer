@@ -20,6 +20,7 @@
 
 from ceilometer.collector import meter
 from ceilometer import counter
+from ceilometer.openstack.common import jsonutils
 
 
 def test_compute_signature_change_key():
@@ -97,6 +98,20 @@ def test_verify_signature_nested():
             }
     data['message_signature'] = meter.compute_signature(data, 'not-so-secret')
     assert meter.verify_signature(data, 'not-so-secret')
+
+
+def test_verify_signature_nested_json():
+    data = {'a': 'A',
+            'b': 'B',
+            'nested': {'a': 'A',
+                       'b': 'B',
+                       'c': ('c',),
+                       'd': ['d']
+                       },
+            }
+    data['message_signature'] = meter.compute_signature(data, 'not-so-secret')
+    jsondata = jsonutils.loads(jsonutils.dumps(data))
+    assert meter.verify_signature(jsondata, 'not-so-secret')
 
 
 TEST_COUNTER = counter.Counter(name='name',
