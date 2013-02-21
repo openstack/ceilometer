@@ -48,6 +48,12 @@ def recursive_keypairs(d):
         if isinstance(value, dict):
             for subname, subvalue in recursive_keypairs(value):
                 yield ('%s:%s' % (name, subname), subvalue)
+        elif isinstance(value, (tuple, list)):
+            # When doing a pair of JSON encode/decode operations to the tuple,
+            # the tuple would become list. So we have to generate the value as
+            # list here.
+            yield name, list(map(lambda x: unicode(x).encode('utf-8'),
+                                 value))
         else:
             yield name, value
 
