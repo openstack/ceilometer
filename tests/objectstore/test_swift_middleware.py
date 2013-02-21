@@ -43,15 +43,22 @@ class FakeApp(object):
 
 class TestSwiftMiddleware(base.TestCase):
 
-    class _faux_pipeline_manager():
-        def __init__(self):
-            self.counters = []
+    class _faux_pipeline_manager(object):
+        class _faux_pipeline(object):
+            def __init__(self):
+                self.counters = []
 
-        def publish_counters(self, context, counters, source):
-            self.counters.extend(counters)
+            def publish_counters(self, ctxt, counters, source):
+                self.counters.extend(counters)
+
+            def flush(self, ctx, source):
+                pass
+
+        def __init__(self):
+            self.pipelines = [self._faux_pipeline()]
 
         def publisher(self, context, source):
-            return pipeline.Publisher(self, context, source)
+            return pipeline.Publisher(self.pipelines, context, source)
 
         def flush(self, context, source):
             pass
@@ -78,8 +85,9 @@ class TestSwiftMiddleware(base.TestCase):
                             environ={'REQUEST_METHOD': 'GET'})
         resp = app(req.environ, self.start_response)
         self.assertEqual(list(resp), ["This string is 28 bytes long"])
-        self.assertEqual(len(self.pipeline_manager.counters), 1)
-        data = self.pipeline_manager.counters[0]
+        counters = self.pipeline_manager.pipelines[0].counters
+        self.assertEqual(len(counters), 1)
+        data = counters[0]
         self.assertEqual(data.volume, 28)
         self.assertEqual(data.resource_metadata['version'], '1.0')
         self.assertEqual(data.resource_metadata['container'], 'container')
@@ -92,8 +100,9 @@ class TestSwiftMiddleware(base.TestCase):
                                      'wsgi.input':
                                      StringIO.StringIO('some stuff')})
         resp = list(app(req.environ, self.start_response))
-        self.assertEqual(len(self.pipeline_manager.counters), 1)
-        data = self.pipeline_manager.counters[0]
+        counters = self.pipeline_manager.pipelines[0].counters
+        self.assertEqual(len(counters), 1)
+        data = counters[0]
         self.assertEqual(data.volume, 10)
         self.assertEqual(data.resource_metadata['version'], '1.0')
         self.assertEqual(data.resource_metadata['container'], 'container')
@@ -106,8 +115,9 @@ class TestSwiftMiddleware(base.TestCase):
                                      'wsgi.input':
                                      StringIO.StringIO('some other stuff')})
         resp = list(app(req.environ, self.start_response))
-        self.assertEqual(len(self.pipeline_manager.counters), 1)
-        data = self.pipeline_manager.counters[0]
+        counters = self.pipeline_manager.pipelines[0].counters
+        self.assertEqual(len(counters), 1)
+        data = counters[0]
         self.assertEqual(data.volume, 16)
         self.assertEqual(data.resource_metadata['version'], '1.0')
         self.assertEqual(data.resource_metadata['container'], 'container')
@@ -118,8 +128,9 @@ class TestSwiftMiddleware(base.TestCase):
         req = Request.blank('/1.0/account/container',
                             environ={'REQUEST_METHOD': 'GET'})
         resp = list(app(req.environ, self.start_response))
-        self.assertEqual(len(self.pipeline_manager.counters), 1)
-        data = self.pipeline_manager.counters[0]
+        counters = self.pipeline_manager.pipelines[0].counters
+        self.assertEqual(len(counters), 1)
+        data = counters[0]
         self.assertEqual(data.volume, 28)
         self.assertEqual(data.resource_metadata['version'], '1.0')
         self.assertEqual(data.resource_metadata['container'], 'container')

@@ -109,16 +109,11 @@ class CollectorService(service.PeriodicService):
     def _process_notification_for_ext(self, ext, notification):
         handler = ext.obj
         if notification['event_type'] in handler.get_event_types():
-            for c in handler.process_notification(notification):
-                LOG.info('COUNTER: %s', c)
+            ctxt = context.get_admin_context()
+            with self.pipeline_manager.publisher(ctxt,
+                                                 cfg.CONF.counter_source) as p:
                 # FIXME(dhellmann): Spawn green thread?
-                self.publish_counter(c)
-
-    def publish_counter(self, counter):
-        """Create a metering message for the counter and publish it."""
-        ctxt = context.get_admin_context()
-        self.pipeline_manager.publish_counter(ctxt, counter,
-                                              cfg.CONF.counter_source)
+                p(list(handler.process_notification(notification)))
 
     def record_metering_data(self, context, data):
         """This method is triggered when metering data is
