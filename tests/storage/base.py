@@ -289,6 +289,10 @@ class ResourceTest(DBTestBase):
         #                  self.conn.get_resources,
         #                  metaquery=q)
 
+    def test_get_resources_by_empty_metaquery(self):
+        resources = list(self.conn.get_resources(metaquery={}))
+        self.assertTrue(len(resources) == 4)
+
 
 class MeterTest(DBTestBase):
 
@@ -314,6 +318,10 @@ class MeterTest(DBTestBase):
         except NotImplementedError:
             got_not_imp = True
             self.assertTrue(got_not_imp)
+
+    def test_get_meters_by_empty_metaquery(self):
+        results = list(self.conn.get_meters(metaquery={}))
+        self.assertTrue(len(results) == 4)
 
 
 class RawEventTest(DBTestBase):
