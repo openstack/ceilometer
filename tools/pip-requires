@@ -21,4 +21,4 @@ requests<1.0
 extras
 wsme>=0.5b1
 pyyaml
-http://tarballs.openstack.org/oslo-config/oslo-config-2013.1b3.tar.gz#egg=oslo-config
+http://tarballs.openstack.org/oslo-config/oslo-config-2013.1b4.tar.gz#egg=oslo-config

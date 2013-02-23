@@ -21,12 +21,12 @@
 import re
 import time
 
+from oslo.config import cfg
 import sqlalchemy
 from sqlalchemy.exc import DisconnectionError, OperationalError
 import sqlalchemy.orm
 from sqlalchemy.pool import NullPool, StaticPool
 
-import ceilometer.openstack.common.cfg as cfg
 import ceilometer.openstack.common.log as logging
 
 LOG = logging.getLogger(__name__)
