@@ -37,3 +37,24 @@ class BinDbsyncTestCase(unittest.TestCase):
 
     def tearDown(self):
         os.unlink(self.tempfile)
+
+
+class BinSendCounterTestCase(unittest.TestCase):
+    def setUp(self):
+        self.tempfile = tempfile.mktemp()
+        with open(self.tempfile, 'w') as tmp:
+            tmp.write("[DEFAULT]\n")
+            tmp.write(
+                "rpc_backend=ceilometer.openstack.common.rpc.impl_fake\n")
+            tmp.write(
+                "pipeline_cfg_file=../etc/ceilometer/pipeline.yaml\n")
+
+    def test_send_counter_run(self):
+        subp = subprocess.Popen(["../bin/ceilometer-send-counter",
+                                 "--config-file=%s" % self.tempfile,
+                                 "--counter-resource=someuuid",
+                                 "--counter-name=mycounter"])
+        self.assertEqual(subp.wait(), 0)
+
+    def tearDown(self):
+        os.unlink(self.tempfile)
