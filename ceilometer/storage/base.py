@@ -19,10 +19,30 @@
 """
 
 import abc
+import datetime
+import math
 
-from ceilometer.openstack.common import log
+from ceilometer.openstack.common import timeutils
 
-LOG = log.getLogger(__name__)
+
+def iter_period(start, end, period):
+    """Split a time from start to end in periods of a number of seconds. This
+    function yield the (start, end) time for each period composing the time
+    passed as argument.
+
+    :param start: When the period set start.
+    :param end: When the period end starts.
+    :param period: The duration of the period.
+
+    """
+    period_start = start
+    increment = datetime.timedelta(seconds=period)
+    for i in xrange(int(math.ceil(
+            timeutils.delta_seconds(start, end)
+            / float(period)))):
+        next_start = period_start + increment
+        yield (period_start, next_start)
+        period_start = next_start
 
 
 class StorageEngine(object):
