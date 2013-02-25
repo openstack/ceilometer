@@ -232,7 +232,8 @@ class Connection(base.Connection):
     function (key, value) {
         value.avg = value.sum / value.count;
         value.duration = (value.duration_end - value.duration_start) / 1000;
-        value.period = (value.period_end - value.period_start) / 1000;
+        value.period = NumberInt((value.period_end - value.period_start)
+                                  / 1000);
         return value;
     }""")
 

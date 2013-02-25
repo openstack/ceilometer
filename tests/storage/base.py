@@ -765,6 +765,14 @@ class StatisticsTest(DBTestBase):
         assert results['sum'] == 27
         assert results['avg'] == 9
 
+    def test_period_is_int(self):
+        f = storage.EventFilter(
+            meter='volume.size',
+        )
+        results = self.conn.get_meter_statistics(f)[0]
+        assert(isinstance(results['period'], int))
+        assert results['count'] == 6
+
     def test_by_user_period(self):
         f = storage.EventFilter(
             user='user-5',
@@ -787,6 +795,7 @@ class StatisticsTest(DBTestBase):
                 self.assertEqual(r['max'], 9)
                 self.assertEqual(r['sum'], 17)
                 self.assertEqual(r['period'], 7200)
+                self.assertEqual(isinstance(r['period'], int))
                 self.assertEqual(r['period_end'],
                                  r['period_start']
                                  + datetime.timedelta(seconds=7200))

@@ -403,7 +403,8 @@ class Connection(base.Connection):
                 'duration_end': result.tsmax,
                 'duration': timeutils.delta_seconds(result.tsmin,
                                                     result.tsmax),
-                'period': timeutils.delta_seconds(period_start, period_end),
+                'period': int(timeutils.delta_seconds(period_start,
+                                                      period_end)),
                 'period_start': period_start,
                 'period_end': period_end}
 
