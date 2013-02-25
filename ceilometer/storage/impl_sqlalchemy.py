@@ -119,7 +119,7 @@ def make_query_from_filter(query, event_filter, require_meter=True):
     if event_filter.resource:
         query = query.filter_by(resource_id=event_filter.resource)
 
-    if event_filter.metaquery is not None and len(event_filter.metaquery) > 0:
+    if event_filter.metaquery:
         raise NotImplementedError('metaquery not implemented')
 
     return query
@@ -226,7 +226,7 @@ class Connection(base.Connection):
 
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, end_timestamp=None,
-                      metaquery=None, resource=None):
+                      metaquery={}, resource=None):
         """Return an iterable of dictionaries containing resource information.
 
         { 'resource_id': UUID of the resource,
@@ -260,7 +260,7 @@ class Connection(base.Connection):
             query = query.filter(Resource.id == resource)
         query = query.options(
             sqlalchemy_session.sqlalchemy.orm.joinedload('meters'))
-        if metaquery is not None:
+        if metaquery:
             raise NotImplementedError('metaquery not implemented')
 
         for resource in query.all():
@@ -306,7 +306,7 @@ class Connection(base.Connection):
             query = query.filter(Resource.project_id == project)
         query = query.options(
             sqlalchemy_session.sqlalchemy.orm.joinedload('meters'))
-        if len(metaquery) > 0:
+        if metaquery:
             raise NotImplementedError('metaquery not implemented')
 
         for resource in query.all():
