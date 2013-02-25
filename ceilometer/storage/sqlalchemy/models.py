@@ -19,14 +19,15 @@ SQLAlchemy models for nova data.
 """
 
 import json
+from urlparse import urlparse
+
+from oslo.config import cfg
 from sqlalchemy import Column, Integer, String, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import TypeDecorator, VARCHAR
-from urlparse import urlparse
 
-import ceilometer.openstack.common.cfg as cfg
 from ceilometer.openstack.common import timeutils
 
 sql_opts = [
