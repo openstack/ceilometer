@@ -51,6 +51,16 @@
    data store
      Storage system for recording data collected by ceilometer.
 
+   meter
+     The measurements tracked for a resource. For example, an instance has
+     a number of meters, such as duration of instance, CPU time used,
+     number of disk io requests, etc.
+     Three types of meters are defined in ceilometer:
+      * Cumulative: Increasing over time (e.g. disk I/O)
+      * Gauge: Discrete items (e.g. floating IPs, image uploads) and fluctuating
+        values (e.g. number of Swift objects)
+      * Delta: Incremental change to a counter over time (e.g. bandwidth delta)
+
    non-repudiable
     From WikiPedia [#]_:
 
@@ -60,6 +70,23 @@
       seen in a legal setting wherein the authenticity of a signature
       is being challenged. In such an instance, the authenticity is
       being "repudiated".
+
+   project
+     The OpenStack tenant or project.
+
+   resource
+     The OpenStack entity being metered (e.g. instance, volume, image, etc.).
+
+   sample
+     Data sample for a particular meter.
+
+   source
+     The origin of metering data. This field is set to "openstack" by default.
+     It can be configured to a different value using the counter_source field
+     in the ceilometer.conf file.
+
+   user
+     An OpenStack user.
 
 .. [#] http://en.wikipedia.org/wiki/Ceilometer
 .. [#] http://en.wikipedia.org/wiki/Non-repudiation
