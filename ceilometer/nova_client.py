@@ -54,7 +54,10 @@ class Client(object):
         flavors = dict((f.id, f) for f in self.nova_client.flavors.list())
         for instance in instances:
             fid = instance.flavor['id']
-            instance.flavor['name'] = flavors[fid].name
+            try:
+                instance.flavor['name'] = flavors[fid].name
+            except KeyError:
+                instance.flavor['name'] = 'unknown-id-%s' % fid
         return instances
 
     @logged
