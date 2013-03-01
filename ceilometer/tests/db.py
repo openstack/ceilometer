@@ -38,7 +38,6 @@ class TestBase(test_base.TestCase):
     def setUp(self):
         super(TestBase, self).setUp()
         self.conf = mock.Mock()
-        self.conf.metering_storage_engine = 'mongodb'
         self.conf.database_connection = 'mongodb://localhost/%s' % self.DBNAME
         self.conn = TestConnection(self.conf)
         self.conn.drop_database(self.DBNAME)

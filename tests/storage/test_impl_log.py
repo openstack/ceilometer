@@ -25,7 +25,6 @@ from ceilometer.storage import impl_log
 
 def test_get_connection():
     conf = mox.Mox().CreateMockAnything()
-    conf.metering_storage_engine = 'log'
     log_stg = impl_log.LogStorage()
     conn = log_stg.get_connection(conf)
     conn.record_metering_data({'counter_name': 'test',
