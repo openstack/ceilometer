@@ -77,6 +77,7 @@ class DBTestBase(test_base.TestCase):
 
     def setUp(self):
         super(DBTestBase, self).setUp()
+        # TODO(jd) remove, use test_base.TestCase setUp to do that
         self.engine = self.get_engine()
         self.conn = self.engine.get_connection()
         self.prepare_data()

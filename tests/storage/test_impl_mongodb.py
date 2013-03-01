@@ -69,7 +69,7 @@ class MongoDBEngine(base.DBEngineBase):
         return self.conn
 
     def clean_up(self):
-        self.conn.drop_database(self.DBNAME)
+        self.conn.clear()
 
     def get_sources_by_project_id(self, id):
         project = self.db.project.find_one({'_id': id})

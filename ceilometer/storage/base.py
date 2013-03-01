@@ -182,3 +182,7 @@ class Connection(object):
           }
 
         """
+
+    @abc.abstractmethod
+    def clear(self):
+        """Clear database."""

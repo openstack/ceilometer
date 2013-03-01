@@ -20,7 +20,6 @@
 """
 
 import datetime
-import logging
 
 from oslo.config import cfg
 
@@ -28,8 +27,6 @@ from ceilometer.collector import meter
 from ceilometer import counter
 
 from ceilometer.tests import api as tests_api
-
-LOG = logging.getLogger(__name__)
 
 
 class TestListEvents(tests_api.TestBase):
@@ -169,6 +166,15 @@ class TestListEvents(tests_api.TestBase):
                         end_timestamp=datetime.datetime(2012, 7, 2, 10, 42))
         self.assertEquals(1, len(data['events']))
 
+    def test_template_list_event(self):
+        rv = self.get('/resources/resource-id/meters/instance',
+                      headers={"Accept": "text/html"})
+        self.assertEqual(200, rv.status_code)
+        self.assertTrue("text/html" in rv.content_type)
+
+
+class TestListEventsMetaquery(TestListEvents):
+
     def test_metaquery1(self):
         q = '/sources/source1/meters/instance'
         data = self.get('%s?metadata.tag=self.counter2' % q)
@@ -204,9 +210,3 @@ class TestListEvents(tests_api.TestBase):
                         headers={"X-Roles": "Member",
                                  "X-Tenant-Id": "project2"})
         self.assertEquals(1, len(data['events']))
-
-    def test_template_list_event(self):
-        rv = self.get('/resources/resource-id/meters/instance',
-                      headers={"Accept": "text/html"})
-        self.assertEqual(200, rv.status_code)
-        self.assertTrue("text/html" in rv.content_type)
