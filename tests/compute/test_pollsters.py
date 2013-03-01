@@ -33,9 +33,9 @@ class TestPollsterBase(test_base.TestCase):
 
     def setUp(self):
         super(TestPollsterBase, self).setUp()
-        self.mox.StubOutWithMock(manager, 'get_hypervisor_inspector')
+        self.mox.StubOutWithMock(virt_inspector, 'get_hypervisor_inspector')
         self.inspector = self.mox.CreateMock(virt_inspector.Inspector)
-        manager.get_hypervisor_inspector().AndReturn(self.inspector)
+        virt_inspector.get_hypervisor_inspector().AndReturn(self.inspector)
         self.instance = mock.MagicMock()
         self.instance.name = 'instance-00000001'
         setattr(self.instance, 'OS-EXT-SRV-ATTR:instance_name',

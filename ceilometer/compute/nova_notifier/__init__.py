@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 #
-# Copyright © 2013 New Dream Network, LLC
+# Copyright © 2013 New Dream Network, LLC (DreamHost)
 #
 # Author: Doug Hellmann <doug.hellmann@dreamhost.com>
 #
@@ -16,13 +16,13 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from oslo.config import cfg
-
-OPTS = [
-    cfg.ListOpt('disabled_compute_pollsters',
-                default=[],
-                help='list of compute agent pollsters to disable',
-                ),
-]
-
-cfg.CONF.register_opts(OPTS)
+# NOTE(dhellmann): The implementations of the notifier for folsom and
+# grizzly are completely different. Rather than have lots of checks
+# throughout the code, the two implementations are placed in separate
+# modules and the right version is imported here.
+try:
+    import nova.conductor
+except ImportError:
+    from .folsom import *
+else:
+    from .grizzly import *

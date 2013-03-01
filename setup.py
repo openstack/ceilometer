@@ -91,6 +91,7 @@ setuptools.setup(
     [ceilometer.collector]
     instance = ceilometer.compute.notifications:Instance
     instance_flavor = ceilometer.compute.notifications:InstanceFlavor
+    instance_delete = ceilometer.compute.notifications:InstanceDelete
     memory = ceilometer.compute.notifications:Memory
     vcpus = ceilometer.compute.notifications:VCpus
     disk_root_size = ceilometer.compute.notifications:RootDiskSize

@@ -3,6 +3,7 @@
 # Copyright © 2012 Red Hat, Inc
 #
 # Author: Eoghan Glynn <eglynn@redhat.com>
+#         Doug Hellmann <doug.hellmann@dreamhost.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -18,6 +19,23 @@
 """Inspector abstraction for read-only access to hypervisors"""
 
 import collections
+
+from oslo.config import cfg
+from stevedore import driver
+
+from ceilometer.openstack.common import log
+
+
+OPTS = [
+    cfg.StrOpt('hypervisor_inspector',
+               default='libvirt',
+               help='Inspector to use for inspecting the hypervisor layer'),
+]
+
+cfg.CONF.register_opts(OPTS)
+
+
+LOG = log.getLogger(__name__)
 
 # Named tuple representing instances.
 #
@@ -128,3 +146,15 @@ class Inspector(object):
                  read and written, and the error count
         """
         raise NotImplementedError()
+
+
+def get_hypervisor_inspector():
+    try:
+        namespace = 'ceilometer.compute.virt'
+        mgr = driver.DriverManager(namespace,
+                                   cfg.CONF.hypervisor_inspector,
+                                   invoke_on_load=True)
+        return mgr.driver
+    except ImportError as e:
+        LOG.error("Unable to load the hypervisor inspector: %s" % (e))
+        return Inspector()

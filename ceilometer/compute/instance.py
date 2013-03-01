@@ -46,9 +46,14 @@ def get_metadata_from_object(instance):
         'host': instance.hostId,
         # Image properties
         'image_ref': (instance.image['id'] if instance.image else None),
-        'image_ref_url': (instance.image['links'][0]['href']
-                          if instance.image else None),
     }
+
+    # Images that come through the conductor API in the nova notifier
+    # plugin will not have links.
+    if instance.image and instance.image.get('links'):
+        metadata['image_ref_url'] = instance.image['links'][0]['href']
+    else:
+        metadata['image_ref_url'] = None
 
     for name in INSTANCE_PROPERTIES:
         metadata[name] = getattr(instance, name, u'')
