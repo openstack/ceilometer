@@ -393,7 +393,7 @@ class Connection(base.Connection):
         return make_query_from_filter(query, event_filter)
 
     @staticmethod
-    def _stats_result_to_dict(result, period_start, period_end):
+    def _stats_result_to_dict(result, period, period_start, period_end):
         return {'count': result.count,
                 'min': result.min,
                 'max': result.max,
@@ -403,8 +403,7 @@ class Connection(base.Connection):
                 'duration_end': result.tsmax,
                 'duration': timeutils.delta_seconds(result.tsmin,
                                                     result.tsmax),
-                'period': int(timeutils.delta_seconds(period_start,
-                                                      period_end)),
+                'period': period,
                 'period_start': period_start,
                 'period_end': period_end}
 
@@ -431,7 +430,7 @@ class Connection(base.Connection):
         res = self._make_stats_query(event_filter).all()[0]
 
         if not period:
-            return [self._stats_result_to_dict(res, res.tsmin, res.tsmax)]
+            return [self._stats_result_to_dict(res, 0, res.tsmin, res.tsmax)]
 
         query = self._make_stats_query(event_filter)
         # HACK(jd) This is an awful method to compute stats by period, but
@@ -449,9 +448,12 @@ class Connection(base.Connection):
             period_end = period_start + datetime.timedelta(seconds=period)
             q = query.filter(Meter.timestamp >= period_start)
             q = q.filter(Meter.timestamp < period_end)
-            results.append(self._stats_result_to_dict(q.all()[0],
-                                                      period_start,
-                                                      period_end))
+            results.append(self._stats_result_to_dict(
+                result=q.all()[0],
+                period=int(timeutils.delta_seconds(period_start, period_end)),
+                period_start=period_start,
+                period_end=period_end,
+            ))
         return results
 
 

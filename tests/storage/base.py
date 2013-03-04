@@ -773,6 +773,14 @@ class StatisticsTest(DBTestBase):
         assert results['sum'] == 27
         assert results['avg'] == 9
 
+    def test_no_period_in_query(self):
+        f = storage.EventFilter(
+            user='user-5',
+            meter='volume.size',
+        )
+        results = self.conn.get_meter_statistics(f)[0]
+        assert results['period'] == 0
+
     def test_period_is_int(self):
         f = storage.EventFilter(
             meter='volume.size',
