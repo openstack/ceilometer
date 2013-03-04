@@ -15,9 +15,10 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Test listing raw events.
+"""Test API against MongoDB.
 """
 from . import list_events
+from . import list_meters
 
 
 class TestListEvents(list_events.TestListEvents):
@@ -25,4 +26,16 @@ class TestListEvents(list_events.TestListEvents):
 
 
 class TestListEventsMetaQuery(list_events.TestListEventsMetaquery):
+    database_connection = 'test://'
+
+
+class TestListEmptyMeters(list_meters.TestListEmptyMeters):
+    database_connection = 'test://'
+
+
+class TestListMeters(list_meters.TestListMeters):
+    database_connection = 'test://'
+
+
+class TestListMetersMetaquery(list_meters.TestListMetersMetaquery):
     database_connection = 'test://'

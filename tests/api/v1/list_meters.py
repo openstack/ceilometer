@@ -206,6 +206,9 @@ class TestListMeters(tests_api.TestBase):
         data = self.get('/projects/jd-was-here/meters')
         self.assertEquals(data['meters'], [])
 
+
+class TestListMetersMetaquery(TestListMeters):
+
     def test_metaquery1(self):
         data = self.get('/meters?metadata.tag=self.counter')
         self.assertEquals(1, len(data['meters']))
