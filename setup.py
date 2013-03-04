@@ -70,6 +70,7 @@ setuptools.setup(
         directories("ceilometer/api/static")
         + directories("ceilometer/api/templates"),
     },
+    exclude_package_data={'': ['tests/*']},
     include_package_data=True,
 
     test_suite='nose.collector',

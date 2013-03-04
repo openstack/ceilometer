@@ -3,7 +3,7 @@ include ChangeLog
 include ceilometer/storage/sqlalchemy/migrate_repo/migrate.cfg
 exclude .gitignore
 exclude .gitreview
-recursive-include tests *.py
+graft tests
 recursive-include nova_tests *.py
 global-exclude *.pyc
 recursive-include public *
