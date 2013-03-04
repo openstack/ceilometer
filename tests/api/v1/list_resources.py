@@ -39,10 +39,10 @@ class TestListEmptyResources(tests_api.TestBase):
         self.assertEquals({'resources': []}, data)
 
 
-class TestListResources(tests_api.TestBase):
+class TestListResourcesBase(tests_api.TestBase):
 
     def setUp(self):
-        super(TestListResources, self).setUp()
+        super(TestListResourcesBase, self).setUp()
 
         for cnt in [
                 counter.Counter(
@@ -97,6 +97,9 @@ class TestListResources(tests_api.TestBase):
                                                    cfg.CONF.metering_secret,
                                                    'test_list_resources')
             self.conn.record_metering_data(msg)
+
+
+class TestListResources(TestListResourcesBase):
 
     def test_list_resources(self):
         data = self.get('/resources')
@@ -254,6 +257,9 @@ class TestListResources(tests_api.TestBase):
     def test_with_project_non_existent(self):
         data = self.get('/projects/jd-was-here/resources')
         self.assertEquals(data['resources'], [])
+
+
+class TestListResourcesMetaquery(TestListResourcesBase):
 
     def test_metaquery1(self):
         q = '/sources/test_list_resources/resources'

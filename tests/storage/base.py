@@ -264,9 +264,9 @@ class ResourceTest(DBTestBase):
 
     def test_get_resources_by_user(self):
         resources = list(self.conn.get_resources(user='user-id'))
-        assert len(resources) == 1
+        assert len(resources) == 2
         ids = set(r['resource_id'] for r in resources)
-        assert ids == set(['resource-id'])
+        assert ids == set(['resource-id', 'resource-id-alternate'])
 
     def test_get_resources_by_project(self):
         resources = list(self.conn.get_resources(project='project-id'))

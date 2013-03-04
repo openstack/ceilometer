@@ -187,16 +187,19 @@ class MTable():
     def __init__(self, name, families):
         self.name = name
         self.families = families
-        self.rows = {}
+        self._rows = {}
 
     def row(self, key):
-        return self.rows[key] if key in self.rows else {}
+        return self._rows[key] if key in self._rows else {}
+
+    def rows(self, keys):
+        return ((k, v) for k, v in self._rows.iteritems() if k in keys)
 
     def put(self, key, data):
-        self.rows[key] = data
+        self._rows[key] = data
 
     def scan(self, filter=None, columns=[], row_start=None, row_stop=None):
-        sorted_keys = sorted(self.rows)
+        sorted_keys = sorted(self._rows)
         # copy data into a sorted dict
         rows = {}
         for row in sorted_keys:
@@ -206,7 +209,7 @@ class MTable():
             if row_stop:
                 if row > row_stop:
                     break
-            rows[row] = copy.copy(self.rows[row])
+            rows[row] = copy.copy(self._rows[row])
         if columns:
             ret = {}
             for row in rows.keys():

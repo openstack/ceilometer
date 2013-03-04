@@ -19,7 +19,6 @@
 from __future__ import absolute_import
 
 import copy
-import datetime
 from sqlalchemy import func
 
 from ceilometer.openstack.common import log
@@ -63,8 +62,6 @@ class SQLAlchemyStorage(base.StorageEngine):
           - the metadata for resources
           - { id: resource uuid
               resource_metadata: metadata dictionaries
-              received_timestamp: received datetime
-              timestamp: datetime
               project_id: project uuid      (->project.id)
               user_id: user uuid            (->user.id)
               }
@@ -174,7 +171,6 @@ class Connection(base.Connection):
             project = None
 
         # Record the updated resource metadata
-        rtimestamp = datetime.datetime.utcnow()
         rmetadata = data['resource_metadata']
 
         resource = self.session.merge(Resource(id=str(data['resource_id'])))
@@ -182,8 +178,6 @@ class Connection(base.Connection):
             resource.sources.append(source)
         resource.project = project
         resource.user = user
-        resource.timestamp = data['timestamp']
-        resource.received_timestamp = rtimestamp
         # Current metadata being used and when it was last updated.
         resource.resource_metadata = rmetadata
         # autoflush didn't catch this one, requires manual flush
@@ -247,36 +241,38 @@ class Connection(base.Connection):
         :param metaquery: Optional dict with metadata to match on.
         :param resource: Optional resource filter.
         """
-        query = model_query(Resource, session=self.session)
+        query = model_query(Meter,
+                            session=self.session).group_by(Meter.resource_id)
         if user is not None:
-            query = query.filter(Resource.user_id == user)
+            query = query.filter(Meter.user_id == user)
         if source is not None:
-            query = query.filter(Resource.sources.any(id=source))
-        if start_timestamp is not None:
-            query = query.filter(Resource.timestamp >= start_timestamp)
+            query = query.filter(Meter.sources.any(id=source))
+        if start_timestamp:
+            query = query.filter(Meter.timestamp >= start_timestamp)
         if end_timestamp:
-            query = query.filter(Resource.timestamp < end_timestamp)
+            query = query.filter(Meter.timestamp < end_timestamp)
         if project is not None:
-            query = query.filter(Resource.project_id == project)
+            query = query.filter(Meter.project_id == project)
         if resource is not None:
-            query = query.filter(Resource.id == resource)
-        query = query.options(
-            sqlalchemy_session.sqlalchemy.orm.joinedload('meters'))
+            query = query.filter(Meter.resource_id == resource)
         if metaquery:
             raise NotImplementedError('metaquery not implemented')
 
-        for resource in query.all():
-            r = row2dict(resource)
-            # Replace the '_id' key with 'resource_id' to meet the
-            # caller's expectations.
+        for meter in query.all():
+            r = row2dict(meter.resource)
             r['resource_id'] = r['id']
             del r['id']
             # Replace the 'resource_metadata' with 'metadata'
             r['metadata'] = r['resource_metadata']
             del r['resource_metadata']
-            # Replace the 'meters' with 'meter'
-            r['meter'] = r['meters']
-            del r['meters']
+            r['meter'] = [
+                {
+                    'counter_name': meter.counter_name,
+                    'counter_type': meter.counter_type,
+                    'counter_unit': meter.counter_unit,
+                }
+                for meter in meter.resource.meters
+            ]
             yield r
 
     def get_meters(self, user=None, project=None, resource=None, source=None,
@@ -472,7 +468,7 @@ def model_query(*args, **kwargs):
     return query
 
 
-def row2dict(row, srcflag=None):
+def row2dict(row, srcflag=False):
     """Convert User, Project, Meter, Resource instance to dictionary object
        with nested Source(s) and Meter(s)
     """

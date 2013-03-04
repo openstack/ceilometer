@@ -21,6 +21,7 @@ import compute_duration_by_resource as cdbr
 import list_events
 import list_meters
 import list_projects
+import list_resources
 import list_users
 
 
@@ -53,4 +54,12 @@ class TestListProjects(list_projects.TestListProjects):
 
 
 class TestComputeDurationByResource(cdbr.TestComputeDurationByResource):
+    database_connection = 'sqlite://'
+
+
+class TestListEmptyResources(list_resources.TestListEmptyResources):
+    database_connection = 'sqlite://'
+
+
+class TestListResources(list_resources.TestListResources):
     database_connection = 'sqlite://'

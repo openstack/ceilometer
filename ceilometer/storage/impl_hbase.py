@@ -194,9 +194,6 @@ class Connection(base.Connection):
         new_resource = {'f:resource_id': data['resource_id'],
                         'f:project_id': data['project_id'],
                         'f:user_id': data['user_id'],
-                        'f:timestamp': timeutils.strtime(data['timestamp']),
-                        'f:received_timestamp': timeutils.strtime(
-                            received_timestamp),
                         'f:metadata': json.dumps(data['resource_metadata']),
                         'f:source': data["source"],
                         'f:m_%s' % new_meter: "1",
@@ -299,38 +296,30 @@ class Connection(base.Connection):
             raise NotImplementedError('metaquery not implemented')
 
         resource_ids = {}
-        if start_timestamp or end_timestamp:
-            # Look for resources matching the above criteria and with
-            # samples in the time range we care about, then change the
-            # resource query to return just those resources by id.
-            g = self.meter.scan(filter=q, row_start=start_row,
-                                row_stop=end_row)
-            for ignored, data in g:
-                resource_ids[data['f:resource_id']] = data['f:resource_id']
+        g = self.meter.scan(filter=q, row_start=start_row,
+                            row_stop=end_row)
+        for ignored, data in g:
+            resource_ids[data['f:resource_id']] = data['f:resource_id']
 
         q = make_query(user=user, project=project, source=source,
                        query_only=True, require_meter=False)
         LOG.debug("q: %s" % q)
-        for resource_id, data in self.resource.scan(filter=q):
-            if not resource_ids or resource_id in resource_ids:
-                r = {'resource_id': resource_id,
-                     'metadata': json.loads(data['f:metadata']),
-                     'project_id': data['f:project_id'],
-                     'received_timestamp': data['f:received_timestamp'],
-                     'source': data['f:source'],
-                     'timestamp':
-                     timeutils.parse_strtime(data['f:timestamp']),
-                     'user_id': data['f:user_id'],
-                     'meter': []}
+        for resource_id, data in self.resource.rows(resource_ids):
+            r = {'resource_id': resource_id,
+                 'metadata': json.loads(data['f:metadata']),
+                 'project_id': data['f:project_id'],
+                 'source': data['f:source'],
+                 'user_id': data['f:user_id'],
+                 'meter': []}
 
-                for m in data:
-                    if m.startswith('f:m_'):
-                        name, type, unit = m[4:].split("!")
-                        r['meter'].append({"counter_name": name,
-                                           "counter_type": type,
-                                           "counter_unit": unit})
+            for m in data:
+                if m.startswith('f:m_'):
+                    name, type, unit = m[4:].split("!")
+                    r['meter'].append({"counter_name": name,
+                                       "counter_type": type,
+                                       "counter_unit": unit})
 
-                yield r
+            yield r
 
     def get_meters(self, user=None, project=None, resource=None, source=None,
                    metaquery={}):

@@ -53,7 +53,6 @@ class MongoDBStorage(base.StorageEngine):
           - the metadata for resources
           - { _id: uuid of resource,
               metadata: metadata dictionaries
-              timestamp: datetime of last update
               user_id: uuid
               project_id: uuid
               meter: [ array of {counter_name: string, counter_type: string,
@@ -323,15 +322,10 @@ class Connection(base.Connection):
         )
 
         # Record the updated resource metadata
-        received_timestamp = datetime.datetime.utcnow()
         self.db.resource.update(
             {'_id': data['resource_id']},
             {'$set': {'project_id': data['project_id'],
                       'user_id': data['user_id'],
-                      # Current metadata being used and when it was
-                      # last updated.
-                      'timestamp': data['timestamp'],
-                      'received_timestamp': received_timestamp,
                       'metadata': data['resource_metadata'],
                       'source': data['source'],
                       },
@@ -400,8 +394,10 @@ class Connection(base.Connection):
         if source is not None:
             q['source'] = source
         if resource is not None:
-            q['_id'] = resource
-        q.update(metaquery)
+            q['resource_id'] = resource
+        # Add resource_ prefix so it matches the field in the db
+        q.update(dict(('resource_' + k, v)
+                      for (k, v) in metaquery.iteritems()))
 
         # FIXME(dhellmann): This may not perform very well,
         # but doing any better will require changing the database
@@ -414,10 +410,13 @@ class Connection(base.Connection):
             ts_range = make_timestamp_range(start_timestamp, end_timestamp)
             if ts_range:
                 q['timestamp'] = ts_range
-            resource_ids = self.db.meter.find(q).distinct('resource_id')
-            # Overwrite the query to just filter on the ids
-            # we have discovered to be interesting.
-            q = {'_id': {'$in': resource_ids}}
+
+        # FIXME(jd): We should use self.db.meter.group() and not use the
+        # resource collection, but that's not supported by MIM, so it's not
+        # easily testable yet. Since it was bugged before anyway, it's still
+        # better for now.
+        resource_ids = self.db.meter.find(q).distinct('resource_id')
+        q = {'_id': {'$in': resource_ids}}
         for resource in self.db.resource.find(q):
             r = {}
             r.update(resource)
