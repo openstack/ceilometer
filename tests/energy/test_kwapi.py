@@ -22,6 +22,7 @@ from ceilometer.energy import kwapi
 from ceilometer.central import manager
 from ceilometer.openstack.common import context
 
+from keystoneclient import exceptions
 
 PROBE_DICT = {
     "probes": {
@@ -61,14 +62,26 @@ class TestKwapiPollster(base.TestCase):
             probe_dict['id'] = key
             yield probe_dict
 
+    @staticmethod
+    def fake_kwapi_get_kwapi_client(self, ksclient):
+        raise exceptions.EndpointNotFound("fake keystone exception")
+
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestKwapiPollster, self).setUp()
         self.context = context.get_admin_context()
         self.manager = TestManager()
-        self.stubs.Set(kwapi._Base, 'iter_probes', self.fake_kwapi_iter_probes)
+
+    def test_kwapi_endpoint_not_exist(self):
+        self.stubs.Set(kwapi._Base, 'get_kwapi_client',
+                       self.fake_kwapi_get_kwapi_client)
+
+        counters = list(kwapi.KwapiPollster().get_counters(self.manager))
+        self.assertEqual(len(counters), 0)
 
     def test_kwapi_counter(self):
+        self.stubs.Set(kwapi._Base, 'iter_probes', self.fake_kwapi_iter_probes)
+
         counters = list(kwapi.KwapiPollster().get_counters(self.manager))
         self.assertEqual(len(counters), 6)
         energy_counters = [counter for counter in counters
@@ -89,6 +102,8 @@ class TestKwapiPollster(base.TestCase):
                         power_counters)))
 
     def test_kwapi_counter_list(self):
+        self.stubs.Set(kwapi._Base, 'iter_probes', self.fake_kwapi_iter_probes)
+
         counters = list(kwapi.KwapiPollster().get_counters(self.manager))
         self.assertEqual(set([c.name for c in counters]),
                          set(kwapi.KwapiPollster().get_counter_names()))

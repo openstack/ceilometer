@@ -20,6 +20,11 @@ import requests
 
 from ceilometer import counter
 from ceilometer.central import plugin
+from ceilometer.openstack.common import log
+
+from keystoneclient import exceptions
+
+LOG = log.getLogger(__name__)
 
 
 class KwapiClient(object):
@@ -58,7 +63,11 @@ class _Base(plugin.CentralPollster):
 
     def iter_probes(self, ksclient):
         """Iterate over all probes."""
-        client = self.get_kwapi_client(ksclient)
+        try:
+            client = self.get_kwapi_client(ksclient)
+        except exceptions.EndpointNotFound:
+            LOG.debug(_("Kwapi endpoint not found"))
+            return []
         return client.iter_probes()
 
 
