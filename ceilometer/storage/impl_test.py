@@ -79,14 +79,14 @@ class TestConnection(impl_mongodb.Connection):
     _mim_instance = None
     FORCE_MONGO = bool(int(os.environ.get('CEILOMETER_TEST_LIVE', 0)))
 
-    def drop_database(self, database):
+    def clear(self):
         if TestConnection._mim_instance is not None:
-            # Don't want to use drop_database() because we
+            # Don't want to use drop_database() because
             # may end up running out of spidermonkey instances.
             # http://davisp.lighthouseapp.com/projects/26898/tickets/22
-            self.conn[database].clear()
+            self.db.clear()
         else:
-            self.conn.drop_database(database)
+            super(TestConnection, self).clear()
 
     def _get_connection(self, conf):
         # Use a real MongoDB server if we can connect, but fall back

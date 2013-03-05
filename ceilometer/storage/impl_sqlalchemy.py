@@ -27,7 +27,7 @@ from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer.storage import base
 from ceilometer.storage.sqlalchemy.models import Meter, Project, Resource
-from ceilometer.storage.sqlalchemy.models import Source, User
+from ceilometer.storage.sqlalchemy.models import Source, User, Base
 import ceilometer.storage.sqlalchemy.session as sqlalchemy_session
 from ceilometer.storage.sqlalchemy import migration
 
@@ -86,7 +86,8 @@ class SQLAlchemyStorage(base.StorageEngine):
         """
         conf.register_opts(self.OPTIONS)
 
-    def get_connection(self, conf):
+    @staticmethod
+    def get_connection(conf):
         """Return a Connection instance based on the configuration settings.
         """
         return Connection(conf)
@@ -114,7 +115,7 @@ def make_query_from_filter(query, event_filter, require_meter=True):
         query = query.filter(Meter.timestamp < ts_end)
     if event_filter.user:
         query = query.filter_by(user_id=event_filter.user)
-    elif event_filter.project:
+    if event_filter.project:
         query = query.filter_by(project_id=event_filter.project)
     if event_filter.resource:
         query = query.filter_by(resource_id=event_filter.resource)
@@ -136,6 +137,11 @@ class Connection(base.Connection):
 
     def upgrade(self, version=None):
         migration.db_sync(self.session.get_bind(), version=version)
+
+    def clear(self):
+        engine = self.session.get_bind()
+        for table in reversed(Base.metadata.sorted_tables):
+            engine.execute(table.delete())
 
     def _get_connection(self, conf):
         """Return a connection to the database.

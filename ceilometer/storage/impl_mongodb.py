@@ -268,6 +268,9 @@ class Connection(base.Connection):
     def upgrade(self, version=None):
         pass
 
+    def clear(self):
+        self.conn.drop_database(self.db)
+
     def _get_connection(self, opts):
         """Return a connection to the database.
 

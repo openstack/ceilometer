@@ -1,8 +1,10 @@
 # -*- encoding: utf-8 -*-
 #
 # Copyright © 2012 New Dream Network, LLC (DreamHost)
+# Copyright © 2013 eNovance
 #
 # Author: Doug Hellmann <doug.hellmann@dreamhost.com>
+#         Julien Danjou <julien@danjou.info>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -19,33 +21,24 @@
 """
 
 from ming import mim
-
-import mock
-
 from nose.plugins import skip
+from oslo.config import cfg
 
-from ceilometer.openstack.common import log as logging
-from ceilometer.storage.impl_test import TestConnection
+from ceilometer import storage
 from ceilometer.tests import base as test_base
-
-LOG = logging.getLogger(__name__)
 
 
 class TestBase(test_base.TestCase):
 
-    DBNAME = 'testdb'
+    # Default tests use test:// (MIM)
+    database_connection = 'test://'
 
     def setUp(self):
         super(TestBase, self).setUp()
-        self.conf = mock.Mock()
-        self.conf.database_connection = 'mongodb://localhost/%s' % self.DBNAME
-        self.conn = TestConnection(self.conf)
-        self.conn.drop_database(self.DBNAME)
-        self.conn.conn[self.DBNAME]
-
-    def tearDown(self):
-        self.conn.drop_database(self.DBNAME)
-        super(TestBase, self).tearDown()
+        cfg.CONF.database_connection = self.database_connection
+        self.conn = storage.get_connection(cfg.CONF)
+        self.conn.upgrade()
+        self.conn.clear()
 
 
 def require_map_reduce(conn):
