@@ -48,7 +48,7 @@ Table of contents
 
    architecture
    measurements
-   install
+   install/index
    configuration
    webapi/index
    contributing/index
