@@ -63,14 +63,16 @@ setuptools.setup(
         'Topic :: System :: Monitoring',
     ],
 
-    packages=setuptools.find_packages(exclude=['bin']),
+    packages=setuptools.find_packages(exclude=['bin',
+                                               'tests',
+                                               'tests.*',
+                                               '*.tests']),
     cmdclass=common_setup.get_cmdclass(),
     package_data={
         "ceilometer":
         directories("ceilometer/api/static")
         + directories("ceilometer/api/templates"),
     },
-    exclude_package_data={'': ['tests/*']},
     include_package_data=True,
 
     test_suite='nose.collector',
