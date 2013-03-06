@@ -15,10 +15,19 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Test listing raw events.
+"""Test API against SQLAlchemy.
 """
 from . import list_events
+from . import list_meters
 
 
 class TestListEvents(list_events.TestListEvents):
+    database_connection = 'sqlite://'
+
+
+class TestListEmptyMeters(list_meters.TestListEmptyMeters):
+    database_connection = 'sqlite://'
+
+
+class TestListMeters(list_meters.TestListMeters):
     database_connection = 'sqlite://'
