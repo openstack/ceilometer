@@ -17,6 +17,7 @@
 # under the License.
 """Test API against SQLAlchemy.
 """
+from . import compute_duration_by_resource as cdbr
 from . import list_events
 from . import list_meters
 from . import list_projects
@@ -48,4 +49,8 @@ class TestListEmptyProjects(list_projects.TestListEmptyProjects):
 
 
 class TestListProjects(list_projects.TestListProjects):
+    database_connection = 'sqlite://'
+
+
+class TestComputeDurationByResource(cdbr.TestComputeDurationByResource):
     database_connection = 'sqlite://'
