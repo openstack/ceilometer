@@ -804,23 +804,23 @@ class StatisticsTest(DBTestBase):
         self.assertEqual(set(r['period_end'] for r in results),
                          set([datetime.datetime(2012, 9, 25, 12, 28),
                               datetime.datetime(2012, 9, 25, 14, 28)]))
-        for r in results:
-            if r['period_start'] == datetime.datetime(2012, 9, 25, 10, 0):
-                self.assertEqual(r['count'], 2)
-                self.assertEqual(r['avg'], 8.5)
-                self.assertEqual(r['min'], 8)
-                self.assertEqual(r['max'], 9)
-                self.assertEqual(r['sum'], 17)
-                self.assertEqual(r['period'], 7200)
-                self.assertEqual(isinstance(r['period'], int))
-                self.assertEqual(r['period_end'],
-                                 r['period_start']
-                                 + datetime.timedelta(seconds=7200))
-                self.assertEqual(r['duration'], 3660)
-                self.assertEqual(r['duration_start'],
-                                 datetime.datetime(2012, 9, 25, 10, 30))
-                self.assertEqual(r['duration_end'],
-                                 datetime.datetime(2012, 9, 25, 11, 31))
+        r = results[0]
+        self.assertEqual(r['period_start'],
+                         datetime.datetime(2012, 9, 25, 10, 28))
+        self.assertEqual(r['count'], 2)
+        self.assertEqual(r['avg'], 8.5)
+        self.assertEqual(r['min'], 8)
+        self.assertEqual(r['max'], 9)
+        self.assertEqual(r['sum'], 17)
+        self.assertEqual(r['period'], 7200)
+        self.assertIsInstance(r['period'], int)
+        expected_end = r['period_start'] + datetime.timedelta(seconds=7200)
+        self.assertEqual(r['period_end'], expected_end)
+        self.assertEqual(r['duration'], 3660)
+        self.assertEqual(r['duration_start'],
+                         datetime.datetime(2012, 9, 25, 10, 30))
+        self.assertEqual(r['duration_end'],
+                         datetime.datetime(2012, 9, 25, 11, 31))
 
     def test_by_project(self):
         f = storage.EventFilter(
