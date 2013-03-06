@@ -21,6 +21,7 @@ import itertools
 
 from oslo.config import cfg
 from stevedore import dispatch
+
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import log
 from ceilometer import pipeline
@@ -65,7 +66,7 @@ class AgentManager(object):
 
     @abc.abstractmethod
     def create_polling_task(self):
-        """Create an empty polling task"""
+        """Create an empty polling task."""
 
     def setup_polling_tasks(self):
         polling_tasks = {}

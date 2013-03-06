@@ -20,15 +20,15 @@
 
 import copy
 import datetime
+import re
+import urlparse
+
+import bson.code
+import pymongo
 
 from ceilometer.openstack.common import log
 from ceilometer.storage import base
 
-import bson.code
-import pymongo
-import re
-
-from urlparse import urlparse
 
 LOG = log.getLogger(__name__)
 
@@ -283,7 +283,7 @@ class Connection(base.Connection):
 
     def _parse_connection_url(self, url):
         opts = {}
-        result = urlparse(url)
+        result = urlparse.urlparse(url)
         opts['dbtype'] = result.scheme
         opts['dbname'] = result.path.replace('/', '')
         netloc_match = re.match(r'(?:(\w+:\w+)@)?(.*)', result.netloc)

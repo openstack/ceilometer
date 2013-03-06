@@ -17,8 +17,8 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Base classes for API tests.
-"""
+
+"""Base classes for API tests."""
 
 from ming import mim
 from nose.plugins import skip
@@ -26,6 +26,10 @@ from oslo.config import cfg
 
 from ceilometer import storage
 from ceilometer.tests import base as test_base
+
+
+class BaseException(Exception):
+    """A base exception for avoiding false positives."""
 
 
 class TestBase(test_base.TestCase):
@@ -49,6 +53,6 @@ def require_map_reduce(conn):
     # skip these tests unless we aren't using mim.
     try:
         import spidermonkey
-    except:
+    except BaseException:
         if isinstance(conn.conn, mim.Connection):
             raise skip.SkipTest('requires spidermonkey')

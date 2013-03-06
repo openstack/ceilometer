@@ -22,27 +22,29 @@ from __future__ import absolute_import
 
 from oslo.config import cfg
 from stevedore import dispatch
+from swift.common.utils import split_path
+import webob
+
+REQUEST = webob
+try:
+    # Swift >= 1.7.5
+    import swift.common.swob
+    REQUEST = swift.common.swob
+except ImportError:
+    pass
+
+try:
+    # Swift > 1.7.5 ... module exists but doesn't contain class.
+    from  swift.common.utils import InputProxy
+except ImportError:
+    # Swift <= 1.7.5 ... module exists and has class.
+    from swift.common.middleware.proxy_logging import InputProxy
 
 from ceilometer import counter
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import timeutils
 from ceilometer import pipeline
 from ceilometer import service
-
-from swift.common.utils import split_path
-
-try:
-    # Swift >= 1.7.5
-    from swift.common.swob import Request
-except ImportError:
-    from webob import Request
-
-try:
-    # Swift > 1.7.5
-    from swift.common.utils import InputProxy
-except ImportError:
-    # Swift <= 1.7.5
-    from swift.common.middleware.proxy_logging import InputProxy
 
 
 class CeilometerMiddleware(object):
@@ -92,7 +94,7 @@ class CeilometerMiddleware(object):
             return iter_response(iterable)
 
     def publish_counter(self, env, bytes_received, bytes_sent):
-        req = Request(env)
+        req = REQUEST.Request(env)
         version, account, container, obj = split_path(req.path, 1, 4, True)
         now = timeutils.utcnow().isoformat()
         with pipeline.PublishContext(

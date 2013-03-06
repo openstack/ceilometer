@@ -26,31 +26,27 @@ LOG = log.getLogger(__name__)
 
 
 class StorageEngine(object):
-    """Base class for storage engines.
-    """
+    """Base class for storage engines."""
 
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def register_opts(self, conf):
-        """Register any configuration options used by this engine.
-        """
+        """Register any configuration options used by this engine."""
 
     @abc.abstractmethod
     def get_connection(self, conf):
-        """Return a Connection instance based on the configuration settings.
-        """
+        """Return a Connection instance based on the configuration settings."""
 
 
 class Connection(object):
-    """Base class for storage system connections.
-    """
+    """Base class for storage system connections."""
 
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def __init__(self, conf):
-        """Constructor"""
+        """Constructor."""
 
     @abc.abstractmethod
     def upgrade(self, version=None):

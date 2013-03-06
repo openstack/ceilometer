@@ -13,29 +13,30 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""SQLAlchemy storage backend
-"""
+
+"""SQLAlchemy storage backend."""
 
 from __future__ import absolute_import
 
 import copy
 import datetime
 import math
+
 from sqlalchemy import func
 
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer.storage import base
+from ceilometer.storage.sqlalchemy import migration
 from ceilometer.storage.sqlalchemy.models import Meter, Project, Resource
 from ceilometer.storage.sqlalchemy.models import Source, User, Base
 import ceilometer.storage.sqlalchemy.session as sqlalchemy_session
-from ceilometer.storage.sqlalchemy import migration
 
 LOG = log.getLogger(__name__)
 
 
 class SQLAlchemyStorage(base.StorageEngine):
-    """Put the data into a SQLAlchemy database
+    """Put the data into a SQLAlchemy database.
 
     Tables::
 
@@ -82,8 +83,7 @@ class SQLAlchemyStorage(base.StorageEngine):
     OPTIONS = []
 
     def register_opts(self, conf):
-        """Register any configuration options used by this engine.
-        """
+        """Register any configuration options used by this engine."""
         conf.register_opts(self.OPTIONS)
 
     @staticmethod
@@ -127,8 +127,7 @@ def make_query_from_filter(query, event_filter, require_meter=True):
 
 
 class Connection(base.Connection):
-    """SqlAlchemy connection.
-    """
+    """SqlAlchemy connection."""
 
     def __init__(self, conf):
         LOG.info('connecting to %s', conf.database_connection)
@@ -144,8 +143,7 @@ class Connection(base.Connection):
             engine.execute(table.delete())
 
     def _get_connection(self, conf):
-        """Return a connection to the database.
-        """
+        """Return a connection to the database."""
         return sqlalchemy_session.get_session()
 
     def record_metering_data(self, data):
@@ -353,7 +351,7 @@ class Connection(base.Connection):
             yield e
 
     def _make_volume_query(self, event_filter, counter_volume_func):
-        """Returns complex Meter counter_volume query for max and sum"""
+        """Returns complex Meter counter_volume query for max and sum."""
         subq = model_query(Meter.id, session=self.session)
         subq = make_query_from_filter(subq, event_filter, require_meter=False)
         subq = subq.subquery()
@@ -464,7 +462,7 @@ class Connection(base.Connection):
 
 
 def model_query(*args, **kwargs):
-    """Query helper
+    """Query helper.
 
     :param session: if present, the session to use
     """

@@ -18,14 +18,16 @@
 """Storage backend management
 """
 
-from datetime import datetime
-from urlparse import urlparse
+
+import datetime
+import urlparse
 
 from oslo.config import cfg
 from stevedore import driver
 
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
+
 
 LOG = log.getLogger(__name__)
 
@@ -43,16 +45,14 @@ cfg.CONF.register_opts(STORAGE_OPTS)
 
 
 def register_opts(conf):
-    """Register any options for the storage system.
-    """
+    """Register any options for the storage system."""
     p = get_engine(conf)
     p.register_opts(conf)
 
 
 def get_engine(conf):
-    """Load the configured engine and return an instance.
-    """
-    engine_name = urlparse(conf.database_connection).scheme
+    """Load the configured engine and return an instance."""
+    engine_name = urlparse.urlparse(conf.database_connection).scheme
     LOG.debug('looking for %r driver in %r',
               engine_name, STORAGE_ENGINE_NAMESPACE)
     mgr = driver.DriverManager(STORAGE_ENGINE_NAMESPACE,
@@ -62,8 +62,7 @@ def get_engine(conf):
 
 
 def get_connection(conf):
-    """Return an open connection to the database.
-    """
+    """Return an open connection to the database."""
     engine = get_engine(conf)
     engine.register_opts(conf)
     db = engine.get_connection(conf)
@@ -94,9 +93,9 @@ class EventFilter(object):
         self.metaquery = metaquery
 
     def _sanitize_timestamp(self, timestamp):
-        """Return a naive utc datetime object"""
+        """Return a naive utc datetime object."""
         if not timestamp:
             return timestamp
-        if not isinstance(timestamp, datetime):
+        if not isinstance(timestamp, datetime.datetime):
             timestamp = timeutils.parse_isotime(timestamp)
         return timeutils.normalize_time(timestamp)

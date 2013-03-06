@@ -16,16 +16,16 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from pecan import expose
+import pecan
 
-from . import v2
+from ceilometer.api.controllers import v2
 
 
 class RootController(object):
 
     v2 = v2.V2Controller()
 
-    @expose(generic=True, template='index.html')
+    @pecan.expose(generic=True, template='index.html')
     def index(self):
         # FIXME: Return version information
         return dict()

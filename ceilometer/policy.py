@@ -15,14 +15,14 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-"""Policy Engine For Ceilometer"""
+"""Policy Engine For Ceilometer."""
 
 import os
 
 from oslo.config import cfg
 
-from ceilometer import utils
 from ceilometer.openstack.common import policy
+from ceilometer import utils
 
 
 OPTS = [

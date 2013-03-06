@@ -19,10 +19,11 @@
 """
 
 import abc
-from collections import namedtuple
+import collections
 
 
-ExchangeTopics = namedtuple('ExchangeTopics', ['exchange', 'topics'])
+ExchangeTopics = collections.namedtuple('ExchangeTopics',
+                                        ['exchange', 'topics'])
 
 
 class PluginBase(object):

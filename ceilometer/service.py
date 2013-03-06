@@ -22,9 +22,9 @@ import socket
 
 from oslo.config import cfg
 
-from ceilometer.openstack.common import rpc
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import log
+from ceilometer.openstack.common import rpc
 from ceilometer.openstack.common.rpc import service as rpc_service
 
 

@@ -26,6 +26,7 @@ import collections
 
 from oslo.config import cfg
 
+
 OPTS = [
     cfg.StrOpt('counter_source',
                default='openstack',

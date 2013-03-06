@@ -21,9 +21,9 @@
 import copy
 import datetime
 
-from ceilometer import counter
-from ceilometer.compute import plugin
 from ceilometer.compute import instance as compute_instance
+from ceilometer.compute import plugin
+from ceilometer import counter
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 
@@ -31,7 +31,7 @@ LOG = log.getLogger(__name__)
 
 
 def _instance_name(instance):
-    """Shortcut to get instance name"""
+    """Shortcut to get instance name."""
     return getattr(instance, 'OS-EXT-SRV-ATTR:instance_name', None)
 
 

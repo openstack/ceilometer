@@ -14,7 +14,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from functools import wraps
+import functools
 
 from novaclient.v1_1 import client as nova_client
 from oslo.config import cfg
@@ -27,7 +27,7 @@ LOG = log.getLogger(__name__)
 
 def logged(func):
 
-    @wraps(func)
+    @functools.wraps(func)
     def with_logging(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -41,7 +41,7 @@ def logged(func):
 class Client(object):
 
     def __init__(self):
-        """Returns nova client"""
+        """Returns a nova Client object."""
         conf = cfg.CONF
         tenant = conf.os_tenant_id and conf.os_tenant_id or conf.os_tenant_name
         self.nova_client = nova_client.Client(username=cfg.CONF.os_username,
@@ -62,7 +62,7 @@ class Client(object):
 
     @logged
     def instance_get_all_by_host(self, hostname):
-        """Returns list of instances on particular host"""
+        """Returns list of instances on particular host."""
         search_opts = {'host': hostname, 'all_tenants': True}
         return self._with_flavor(self.nova_client.servers.list(
             detailed=True,
@@ -70,5 +70,5 @@ class Client(object):
 
     @logged
     def floating_ip_get_all(self):
-        """Returns all floating ips"""
+        """Returns all floating ips."""
         return self.nova_client.floating_ips.list()

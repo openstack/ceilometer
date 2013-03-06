@@ -17,9 +17,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import textwrap
 import os
 import setuptools
+import textwrap
 
 from ceilometer.openstack.common import setup as common_setup
 

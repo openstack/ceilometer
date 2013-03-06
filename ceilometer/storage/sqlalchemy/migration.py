@@ -17,16 +17,16 @@
 import distutils.version as dist_version
 import os
 
-from ceilometer.storage.sqlalchemy.session import get_engine
-from ceilometer.openstack.common import log as logging
-
-
 import migrate
 from migrate.versioning import util as migrate_util
 import sqlalchemy
 
+from ceilometer.openstack.common import log
+from ceilometer.storage.sqlalchemy import session
+
+
 INIT_VERSION = 1
-LOG = logging.getLogger(__name__)
+LOG = log.getLogger(__name__)
 
 
 @migrate_util.decorator
@@ -78,20 +78,20 @@ def db_sync(engine, version=None):
 def db_version():
     repository = _find_migrate_repo()
     try:
-        return versioning_api.db_version(get_engine(), repository)
+        return versioning_api.db_version(session.get_engine(), repository)
     except versioning_exceptions.DatabaseNotControlledError:
         meta = sqlalchemy.MetaData()
-        engine = get_engine()
+        engine = session.get_engine()
         meta.reflect(bind=engine)
         tables = meta.tables
         if len(tables) == 0:
             db_version_control(0)
-            return versioning_api.db_version(get_engine(), repository)
+            return versioning_api.db_version(session.get_engine(), repository)
 
 
 def db_version_control(version=None):
     repository = _find_migrate_repo()
-    versioning_api.version_control(get_engine(), repository, version)
+    versioning_api.version_control(session.get_engine(), repository, version)
     return version
 
 

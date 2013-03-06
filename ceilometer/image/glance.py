@@ -21,12 +21,11 @@
 from __future__ import absolute_import
 
 import itertools
-
 import glanceclient
 
-from ceilometer import plugin
 from ceilometer import counter
 from ceilometer.openstack.common import timeutils
+from ceilometer import plugin
 
 
 class _Base(plugin.PollsterBase):

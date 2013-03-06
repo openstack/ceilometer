@@ -15,7 +15,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Implementation of Inspector abstraction for libvirt"""
+"""Implementation of Inspector abstraction for libvirt."""
 
 from lxml import etree
 from oslo.config import cfg

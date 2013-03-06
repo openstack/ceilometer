@@ -19,9 +19,9 @@
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 
+from ceilometer.central import plugin
 from ceilometer import counter
 from ceilometer import nova_client
-from ceilometer.central import plugin
 
 
 class FloatingIPPollster(plugin.CentralPollster):

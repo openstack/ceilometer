@@ -15,14 +15,16 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Set up the ACL to acces the API server."""
 
-import keystoneclient.middleware.auth_token as auth_token
+"""Access Control Lists (ACL's) control access the API server."""
+
+from keystoneclient.middleware import auth_token
 from oslo.config import cfg
 from pecan import hooks
 from webob import exc
 
 from ceilometer import policy
+
 
 OPT_GROUP_NAME = 'keystone_authtoken'
 

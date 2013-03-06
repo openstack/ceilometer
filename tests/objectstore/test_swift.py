@@ -18,6 +18,7 @@
 # under the License.
 
 import mock
+
 from ceilometer.central import manager
 from ceilometer.objectstore import swift
 from ceilometer.tests import base

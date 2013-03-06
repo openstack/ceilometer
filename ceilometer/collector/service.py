@@ -21,18 +21,19 @@ from stevedore import dispatch
 
 from ceilometer.collector import meter as meter_api
 from ceilometer import extension_manager
-from ceilometer import pipeline
-from ceilometer import service
-from ceilometer import storage
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import timeutils
 from ceilometer.openstack.common.rpc import dispatcher as rpc_dispatcher
 
 # Import rpc_notifier to register `notification_topics` flag so that
 # plugins can use it
 # FIXME(dhellmann): Use option importing feature of oslo.config instead.
 import ceilometer.openstack.common.notifier.rpc_notifier
+
+from ceilometer.openstack.common import timeutils
+from ceilometer import pipeline
+from ceilometer import service
+from ceilometer import storage
 
 OPTS = [
     cfg.ListOpt('disabled_notification_listeners',
@@ -42,7 +43,6 @@ OPTS = [
 ]
 
 cfg.CONF.register_opts(OPTS)
-
 
 LOG = log.getLogger(__name__)
 

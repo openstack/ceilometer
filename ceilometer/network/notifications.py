@@ -23,9 +23,8 @@
 from oslo.config import cfg
 
 from ceilometer import counter
+from ceilometer.openstack.common import log
 from ceilometer import plugin
-from ceilometer.openstack.common import log as logging
-
 
 OPTS = [
     cfg.StrOpt('quantum_control_exchange',
@@ -33,10 +32,9 @@ OPTS = [
                help="Exchange name for Quantum notifications"),
 ]
 
-
 cfg.CONF.register_opts(OPTS)
 
-LOG = logging.getLogger(__name__)
+LOG = log.getLogger(__name__)
 
 
 class NetworkNotificationBase(plugin.NotificationBase):

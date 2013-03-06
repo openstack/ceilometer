@@ -139,7 +139,7 @@ class ImageSize(ImageCRUDBase):
 
 
 class ImageDownload(ImageBase):
-    """ Emit image_download counter when an image is downloaded. """
+    """Emit image_download counter when an image is downloaded."""
 
     metadata_keys = ['destination_ip', 'owner_id']
 
@@ -167,7 +167,7 @@ class ImageDownload(ImageBase):
 
 
 class ImageServe(ImageBase):
-    """ Emit image_serve counter when an image is served out. """
+    """Emit image_serve counter when an image is served out."""
 
     metadata_keys = ['destination_ip', 'receiver_user_id',
                      'receiver_tenant_id']

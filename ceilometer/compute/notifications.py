@@ -20,9 +20,9 @@
 
 from oslo.config import cfg
 
+from ceilometer.compute import instance
 from ceilometer import counter
 from ceilometer import plugin
-from ceilometer.compute import instance
 
 
 OPTS = [

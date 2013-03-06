@@ -15,16 +15,15 @@
 # under the License.
 
 """
-SQLAlchemy models for nova data.
+SQLAlchemy models for Ceilometer data.
 """
 
 import json
-from urlparse import urlparse
+import urlparse
 
 from oslo.config import cfg
-from sqlalchemy import Column, Integer, String, Table
+from sqlalchemy import Column, Integer, String, Table, ForeignKey, DateTime
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import TypeDecorator, VARCHAR
 
@@ -40,7 +39,7 @@ cfg.CONF.register_opts(sql_opts)
 
 
 def table_args():
-    engine_name = urlparse(cfg.CONF.database_connection).scheme
+    engine_name = urlparse.urlparse(cfg.CONF.database_connection).scheme
     if engine_name == 'mysql':
         return {'mysql_engine': cfg.CONF.mysql_engine,
                 'mysql_charset': "utf8"}
@@ -97,7 +96,7 @@ class Source(Base):
 
 
 class Meter(Base):
-    """Metering data"""
+    """Metering data."""
 
     __tablename__ = 'meter'
     id = Column(Integer, primary_key=True)

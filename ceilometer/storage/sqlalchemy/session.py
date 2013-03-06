@@ -23,13 +23,14 @@ import time
 
 from oslo.config import cfg
 import sqlalchemy
-from sqlalchemy.exc import DisconnectionError, OperationalError
+import sqlalchemy.exc as exc
 import sqlalchemy.orm
-from sqlalchemy.pool import NullPool, StaticPool
+import sqlalchemy.pool as pool
 
-import ceilometer.openstack.common.log as logging
+from ceilometer.openstack.common import log
 
-LOG = logging.getLogger(__name__)
+
+LOG = log.getLogger(__name__)
 
 _MAKER = None
 _ENGINE = None
@@ -73,7 +74,7 @@ def get_session(autocommit=True, expire_on_commit=False, autoflush=True):
 
 
 def synchronous_switch_listener(dbapi_conn, connection_rec):
-    """Switch sqlite connections to non-synchronous mode"""
+    """Switch sqlite connections to non-synchronous mode."""
     dbapi_conn.execute("PRAGMA synchronous = OFF")
 
 
@@ -99,7 +100,7 @@ def ping_listener(dbapi_conn, connection_rec, connection_proxy):
     except dbapi_conn.OperationalError, ex:
         if ex.args[0] in (2006, 2013, 2014, 2045, 2055):
             LOG.warn('Got mysql server has gone away: %s', ex)
-            raise DisconnectionError("Database server went away")
+            raise exc.DisconnectionError("Database server went away")
         else:
             raise
 
@@ -135,10 +136,10 @@ def get_engine():
             engine_args['echo'] = True
 
         if "sqlite" in connection_dict.drivername:
-            engine_args["poolclass"] = NullPool
+            engine_args["poolclass"] = pool.NullPool
 
             if cfg.CONF.database_connection == "sqlite://":
-                engine_args["poolclass"] = StaticPool
+                engine_args["poolclass"] = pool.StaticPool
                 engine_args["connect_args"] = {'check_same_thread': False}
 
         _ENGINE = sqlalchemy.create_engine(cfg.CONF.database_connection,
@@ -160,7 +161,7 @@ def get_engine():
 
         try:
             _ENGINE.connect()
-        except OperationalError, e:
+        except exc.OperationalError, e:
             if not is_db_connection_error(e.args[0]):
                 raise
 
@@ -176,7 +177,7 @@ def get_engine():
                 try:
                     _ENGINE.connect()
                     break
-                except OperationalError, e:
+                except exc.OperationalError, e:
                     if (remaining != 'infinite' and remaining == 0) \
                             or not is_db_connection_error(e.args[0]):
                         raise

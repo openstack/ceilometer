@@ -307,7 +307,7 @@ class PipelineManager(object):
     """
 
     def __init__(self, cfg, publisher_manager):
-        """Create the pipeline manager"""
+        """Create the pipeline manager."""
         self._setup_pipelines(cfg, publisher_manager)
 
     def _setup_pipelines(self, cfg, publisher_manager):

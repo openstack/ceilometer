@@ -19,9 +19,9 @@
 from oslo.config import cfg
 
 from ceilometer import agent
+from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer import extension_manager
 from ceilometer import nova_client
-from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.openstack.common import log
 
 
@@ -67,7 +67,7 @@ class AgentManager(agent.AgentManager):
         return PollingTask(self)
 
     def setup_notifier_task(self):
-        """For nova notifier usage"""
+        """For nova notifier usage."""
         task = PollingTask(self)
         for pollster in self.pollster_manager.extensions:
             task.add(

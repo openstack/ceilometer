@@ -17,11 +17,11 @@
 # under the License.
 """Test API against SQLAlchemy.
 """
-from . import compute_duration_by_resource as cdbr
-from . import list_events
-from . import list_meters
-from . import list_projects
-from . import list_users
+import compute_duration_by_resource as cdbr
+import list_events
+import list_meters
+import list_projects
+import list_users
 
 
 class TestListEvents(list_events.TestListEvents):

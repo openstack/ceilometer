@@ -16,11 +16,12 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-"""nova HACKING file compliance testing
+"""Ceilometer HACKING file compliance testing
 
 Built on top of pep8.py
 """
 
+import imp
 import inspect
 import logging
 import os
@@ -28,7 +29,7 @@ import re
 import subprocess
 import sys
 import tokenize
-import warnings
+import traceback
 
 import pep8
 
@@ -43,8 +44,12 @@ logging.disable('LOG')
 #N6xx calling methods
 #N7xx localization
 #N8xx git commit messages
+#N9xx other
 
-IMPORT_EXCEPTIONS = ['sqlalchemy', 'migrate', 'nova.db.sqlalchemy.session']
+IMPORT_EXCEPTIONS = ['sqlalchemy', 'migrate',
+                     'ceilometer.storage.sqlalchemy.session',
+                     'ceilometer.storage.sqlalchemy.models']
+# Paste is missing a __init__ in top level directory
 START_DOCSTRING_TRIPLE = ['u"""', 'r"""', '"""', "u'''", "r'''", "'''"]
 END_DOCSTRING_TRIPLE = ['"""', "'''"]
 VERBOSE_MISSING_IMPORT = os.getenv('HACKING_VERBOSE_MISSING_IMPORT', 'False')
@@ -149,111 +154,124 @@ def nova_except_format_assert(logical_line):
         yield 1, "N202: assertRaises Exception too broad"
 
 
-def nova_one_import_per_line(logical_line):
-    r"""Check for import format.
+modules_cache = dict((mod, True) for mod in tuple(sys.modules.keys())
+                     + sys.builtin_module_names)
+
+RE_RELATIVE_IMPORT = re.compile('^from\s*[.]')
+
+
+def nova_import_rules(logical_line):
+    r"""Check for imports.
 
     nova HACKING guide recommends one import per line:
     Do not import more than one module per line
 
     Examples:
-    Okay: from nova.rpc.common import RemoteError
-    N301: from nova.rpc.common import RemoteError, LOG
-    """
-    pos = logical_line.find(',')
-    parts = logical_line.split()
-    if (pos > -1 and (parts[0] == "import" or
-                      parts[0] == "from" and parts[2] == "import") and
-        not is_import_exception(parts[1])):
-        yield pos, "N301: one import per line"
+    Okay: from nova.compute import api
+    N301: from nova.compute import api, utils
 
 
-def nova_import_module_only(logical_line):
-    r"""Check for import module only.
+    Imports should usually be on separate lines.
 
     nova HACKING guide recommends importing only modules:
     Do not import objects, only modules
 
+    Examples:
     Okay: from os import path
+    Okay: from os import path as p
+    Okay: from os import (path as p)
     Okay: import os.path
+    Okay: from nova.compute import rpcapi
     N302: from os.path import dirname as dirname2
-    N303  from os.path import *
-    N304  import flakes
+    N302: from os.path import (dirname as dirname2)
+    N303: from os.path import *
+    N304: from .compute import rpcapi
     """
-    # N302 import only modules
-    # N303 Invalid Import
-    # N304 Relative Import
+    #NOTE(afazekas): An old style relative import example will not be able to
+    # pass the doctest, since the relativity depends on the file's locality
 
-    # TODO(sdague) actually get these tests working
-    # TODO(jogo) simplify this code
-    def import_module_check(mod, parent=None, added=False):
-        """Checks for relative, modules and invalid imports.
-
-        If can't find module on first try, recursively check for relative
-        imports.
-        When parsing 'from x import y,' x is the parent.
-        """
-        current_path = os.path.dirname(pep8.current_file)
+    def is_module_for_sure(mod, search_path=sys.path):
+        mod = mod.replace('(', '')  # Ignore parentheses
         try:
-            with warnings.catch_warnings():
-                warnings.simplefilter('ignore', DeprecationWarning)
-                valid = True
-                if parent:
-                    parent_mod = __import__(parent, globals(), locals(),
-                        [mod], -1)
-                    valid = inspect.ismodule(getattr(parent_mod, mod))
-                else:
-                    __import__(mod, globals(), locals(), [], -1)
-                    valid = inspect.ismodule(sys.modules[mod])
-                if not valid:
-                    if added:
-                        sys.path.pop()
-                        added = False
-                        return logical_line.find(mod), ("N304: No "
-                            "relative imports. '%s' is a relative import"
-                            % logical_line)
-                    return logical_line.find(mod), ("N302: import only "
-                        "modules. '%s' does not import a module"
-                        % logical_line)
+            mod_name = mod
+            while '.' in mod_name:
+                pack_name, _sep, mod_name = mod.partition('.')
+                f, p, d = imp.find_module(pack_name, search_path)
+                search_path = [p]
+            imp.find_module(mod_name, search_path)
+        except ImportError:
+            try:
+                # NOTE(vish): handle namespace modules
+                module = __import__(mod)
+            except ImportError, exc:
+                # NOTE(vish): the import error might be due
+                #             to a missing dependency
+                missing = str(exc).split()[-1]
+                if (missing != mod.split('.')[-1] or
+                        "cannot import" in str(exc)):
+                    _missingImport.add(missing)
+                    return True
+                return False
+            except Exception, exc:
+                # NOTE(jogo) don't stack trace if unexpected import error,
+                # log and continue.
+                traceback.print_exc()
+                return False
+        return True
 
-        except (ImportError, NameError) as exc:
-            if not added:
-                added = True
-                sys.path.append(current_path)
-                return import_module_check(mod, parent, added)
-            else:
-                name = logical_line.split()[1]
-                if name not in _missingImport:
-                    if VERBOSE_MISSING_IMPORT != 'False':
-                        print >> sys.stderr, ("ERROR: import '%s' in %s "
-                                              "failed: %s" %
-                            (name, pep8.current_file, exc))
-                    _missingImport.add(name)
-                added = False
-                sys.path.pop()
-                return
+    def is_module(mod):
+        """Checks for non module imports."""
+        if mod in modules_cache:
+            return modules_cache[mod]
+        res = is_module_for_sure(mod)
+        modules_cache[mod] = res
+        return res
 
-        except AttributeError:
-            # Invalid import
-            if "import *" in logical_line:
-                # TODO(jogo): handle "from x import *, by checking all
-                #           "objects in x"
-                return
-            return logical_line.find(mod), ("N303: Invalid import, "
-                "%s" % mod)
+    current_path = os.path.dirname(pep8.current_file)
+    current_mod = os.path.basename(pep8.current_file)
+    if current_mod[-3:] == ".py":
+        current_mod = current_mod[:-3]
 
     split_line = logical_line.split()
-    if (", " not in logical_line and
-            split_line[0] in ('import', 'from') and
-            (len(split_line) in (2, 4, 6)) and
-            split_line[1] != "__future__"):
-        if is_import_exception(split_line[1]):
+    split_line_len = len(split_line)
+    if (split_line[0] in ('import', 'from') and split_line_len > 1 and
+        not is_import_exception(split_line[1])):
+        pos = logical_line.find(',')
+        if pos != -1:
+            if split_line[0] == 'from':
+                yield pos, "N301: one import per line"
+            return  # ',' is not supported by the N302 checker yet
+        pos = logical_line.find('*')
+        if pos != -1:
+            yield pos, "N303: No wildcard (*) import."
             return
-        if "from" == split_line[0]:
-            rval = import_module_check(split_line[3], parent=split_line[1])
-        else:
-            rval = import_module_check(split_line[1])
-        if rval is not None:
-            yield rval
+
+        if split_line_len in (2, 4, 6) and split_line[1] != "__future__":
+            if 'from' == split_line[0] and split_line_len > 3:
+                mod = '.'.join((split_line[1], split_line[3]))
+                if is_import_exception(mod):
+                        return
+                if RE_RELATIVE_IMPORT.search(logical_line):
+                    yield logical_line.find('.'), ("N304: No "
+                        "relative imports. '%s' is a relative import"
+                        % logical_line)
+                    return
+
+                if not is_module(mod):
+                    yield 0, ("N302: import only modules."
+                              "'%s' does not import a module" % logical_line)
+                return
+
+        #NOTE(afazekas): import searches first in the package
+        # The import keyword just imports modules
+        # The guestfs module now imports guestfs
+        mod = split_line[1]
+        if (current_mod != mod and
+            not is_module(mod) and
+            is_module_for_sure(mod, [current_path])):
+                yield 0, ("N304: No relative imports."
+                          " '%s' is a relative import"
+                          % logical_line)
 
 
 #TODO(jogo): import template: N305
@@ -293,12 +311,26 @@ def nova_import_no_db_in_virt(logical_line, filename):
     """
     if "nova/virt" in filename and not filename.endswith("fake.py"):
         if logical_line.startswith("from nova import db"):
+
             yield (0, "N307: nova.db import not allowed in nova/virt/*")
 
 
-def in_docstring_position(previous_logical):
-    return (previous_logical.startswith("def ") or
-        previous_logical.startswith("class "))
+def is_docstring(physical_line, previous_logical):
+    """Return True if found docstring
+    'A docstring is a string literal that occurs as the first statement in a
+    module, function, class,'
+    http://www.python.org/dev/peps/pep-0257/#what-is-a-docstring
+    """
+    line = physical_line.lstrip()
+    start = max([line.find(i) for i in START_DOCSTRING_TRIPLE])
+    end = max([line[-4:-1] == i for i in END_DOCSTRING_TRIPLE])
+    if (previous_logical.startswith("def ") or
+            previous_logical.startswith("class ")):
+        if start is 0:
+            return True
+        else:
+            # Handle multi line comments
+            return end and start in (-1, len(line) - 4)
 
 
 def nova_docstring_start_space(physical_line, previous_logical):
@@ -308,6 +340,8 @@ def nova_docstring_start_space(physical_line, previous_logical):
     Docstring should not start with space
 
     Okay: def foo():\n    '''This is good.'''
+    Okay: def foo():\n    a = ''' This is not a docstring.'''
+    Okay: def foo():\n    pass\n    ''' This is not.'''
     N401: def foo():\n    ''' This is not.'''
     """
     # short circuit so that we don't fail on our own fail test
@@ -318,30 +352,32 @@ def nova_docstring_start_space(physical_line, previous_logical):
     # it's important that we determine this is actually a docstring,
     # and not a doc block used somewhere after the first line of a
     # function def
-    if in_docstring_position(previous_logical):
+    if is_docstring(physical_line, previous_logical):
         pos = max([physical_line.find(i) for i in START_DOCSTRING_TRIPLE])
-        if pos != -1 and len(physical_line) > pos + 4:
-            if physical_line[pos + 3] == ' ':
-                return (pos, "N401: docstring should not start with"
-                        " a space")
+        if physical_line[pos + 3] == ' ':
+            return (pos, "N401: docstring should not start with"
+                    " a space")
 
 
-def nova_docstring_one_line(physical_line):
+def nova_docstring_one_line(physical_line, previous_logical):
     r"""Check one line docstring end.
 
     nova HACKING guide recommendation for one line docstring:
     A one line docstring looks like this and ends in punctuation.
 
-    Okay: '''This is good.'''
-    Okay: '''This is good too!'''
-    Okay: '''How about this?'''
-    N402: '''This is not'''
-    N402: '''Bad punctuation,'''
+    Okay: def foo():\n    '''This is good.'''
+    Okay: def foo():\n    '''This is good too!'''
+    Okay: def foo():\n    '''How about this?'''
+    Okay: def foo():\n    a = '''This is not a docstring'''
+    Okay: def foo():\n    pass\n    '''This is not a docstring'''
+    Okay: class Foo:\n    pass\n    '''This is not a docstring'''
+    N402: def foo():\n    '''This is not'''
+    N402: def foo():\n    '''Bad punctuation,'''
+    N402: class Foo:\n    '''Bad punctuation,'''
     """
     #TODO(jogo) make this apply to multi line docstrings as well
     line = physical_line.lstrip()
-
-    if line.startswith('"') or line.startswith("'"):
+    if is_docstring(physical_line, previous_logical):
         pos = max([line.find(i) for i in START_DOCSTRING_TRIPLE])  # start
         end = max([line[-4:-1] == i for i in END_DOCSTRING_TRIPLE])  # end
 
@@ -350,20 +386,27 @@ def nova_docstring_one_line(physical_line):
                 return pos, "N402: one line docstring needs punctuation."
 
 
-def nova_docstring_multiline_end(physical_line, previous_logical):
+def nova_docstring_multiline_end(physical_line, previous_logical, tokens):
     r"""Check multi line docstring end.
 
     nova HACKING guide recommendation for docstring:
     Docstring should end on a new line
 
     Okay: '''foobar\nfoo\nbar\n'''
-    N403: def foo():\n'''foobar\nfoo\nbar\n   d'''\n\n
+    Okay: def foo():\n    '''foobar\nfoo\nbar\n'''
+    Okay: class Foo:\n    '''foobar\nfoo\nbar\n'''
+    Okay: def foo():\n    a = '''not\na\ndocstring'''
+    Okay: def foo():\n    pass\n'''foobar\nfoo\nbar\n   d'''
+    N403: def foo():\n    '''foobar\nfoo\nbar\ndocstring'''
+    N403: class Foo:\n    '''foobar\nfoo\nbar\ndocstring'''\n\n
     """
-    if in_docstring_position(previous_logical):
+    # if find OP tokens, not a docstring
+    ops = [t for t, _, _, _, _ in tokens if t == tokenize.OP]
+    if (is_docstring(physical_line, previous_logical) and len(tokens) > 0 and
+            len(ops) == 0):
         pos = max(physical_line.find(i) for i in END_DOCSTRING_TRIPLE)
-        if pos != -1 and len(physical_line) == pos + 4:
-            if physical_line.strip() not in START_DOCSTRING_TRIPLE:
-                return (pos, "N403: multi line docstring end on new line")
+        if physical_line.strip() not in START_DOCSTRING_TRIPLE:
+            return (pos, "N403: multi line docstring end on new line")
 
 
 def nova_docstring_multiline_start(physical_line, previous_logical, tokens):
@@ -373,9 +416,10 @@ def nova_docstring_multiline_start(physical_line, previous_logical, tokens):
     Docstring should start with A multi line docstring has a one-line summary
 
     Okay: '''foobar\nfoo\nbar\n'''
-    N404: def foo():\n'''\nfoo\nbar\n''' \n\n
+    Okay: def foo():\n    a = '''\nnot\na docstring\n'''
+    N404: def foo():\n'''\nfoo\nbar\n'''\n\n
     """
-    if in_docstring_position(previous_logical):
+    if is_docstring(physical_line, previous_logical):
         pos = max([physical_line.find(i) for i in START_DOCSTRING_TRIPLE])
         # start of docstring when len(tokens)==0
         if len(tokens) == 0 and pos != -1 and len(physical_line) == pos + 4:
@@ -385,7 +429,7 @@ def nova_docstring_multiline_start(physical_line, previous_logical, tokens):
 
 
 def nova_no_cr(physical_line):
-    r"""Check that we only use newlines not cariage returns.
+    r"""Check that we only use newlines not carriage returns.
 
     Okay: import os\nimport sys
     # pep8 doesn't yet replace \r in strings, will work on an
@@ -493,6 +537,37 @@ def nova_localization_strings(logical_line, tokens):
 
 #TODO(jogo) Dict and list objects
 
+
+def nova_is_not(logical_line):
+    r"""Check localization in line.
+
+    Okay: if x is not y
+    N901: if not X is Y
+    N901: if not X.B is Y
+    """
+    split_line = logical_line.split()
+    if (len(split_line) == 5 and split_line[0] == 'if' and
+            split_line[1] == 'not' and split_line[3] == 'is'):
+                yield (logical_line.find('not'), "N901: Use the 'is not' "
+                        "operator for when testing for unequal identities")
+
+
+def nova_not_in(logical_line):
+    r"""Check localization in line.
+
+    Okay: if x not in y
+    Okay: if not (X in Y or X is Z)
+    Okay: if not (X in Y)
+    N902: if not X in Y
+    N902: if not X.B in Y
+    """
+    split_line = logical_line.split()
+    if (len(split_line) == 5 and split_line[0] == 'if' and
+            split_line[1] == 'not' and split_line[3] == 'in' and not
+            split_line[2].startswith('(')):
+                yield (logical_line.find('not'), "N902: Use the 'not in' "
+                        "operator for collection membership evaluation")
+
 current_file = ""
 
 
@@ -513,7 +588,7 @@ def add_nova():
         if not inspect.isfunction(function):
             continue
         args = inspect.getargspec(function)[0]
-        if args and name.startswith("nova"):
+        if args and name.startswith("ceilometer"):
             exec("pep8.%s = %s" % (name, name))
 
 
@@ -523,7 +598,7 @@ def once_git_check_commit_title():
     nova HACKING recommends not referencing a bug or blueprint in first line,
     it should provide an accurate description of the change
     N801
-    N802 Title limited to 50 chars
+    N802 Title limited to 72 chars
     """
     #Get title of most recent commit
 
@@ -548,6 +623,8 @@ def once_git_check_commit_title():
                "description of the change, not just a reference to a bug "
                "or blueprint" % title.strip())
         error = True
+    # HACKING.rst recommends commit titles 50 chars or less, but enforces
+    # a 72 character limit
     if len(title.decode('utf-8')) > 72:
         print ("N802: git commit title ('%s') should be under 50 chars"
                 % title.strip())

@@ -15,16 +15,15 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Set up the API server application instance
-"""
+"""Set up the API server application instance."""
 
 import flask
 from oslo.config import cfg
 
+from ceilometer.api import acl
+from ceilometer.api.v1 import blueprint as v1_blueprint
 from ceilometer.openstack.common import jsonutils
 from ceilometer import storage
-from ceilometer.api.v1 import blueprint as v1_blueprint
-from ceilometer.api import acl
 
 
 storage.register_opts(cfg.CONF)

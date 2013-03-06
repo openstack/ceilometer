@@ -17,11 +17,10 @@
 # under the License.
 
 from oslo.config import cfg
-from pecan import make_app
-from pecan import configuration
+import pecan
 
-from ceilometer.api import config as api_config
 from ceilometer.api import acl
+from ceilometer.api import config as api_config
 from ceilometer.api import hooks
 from ceilometer.api import middleware
 
@@ -29,7 +28,7 @@ from ceilometer.api import middleware
 def get_pecan_config():
     # Set up the pecan configuration
     filename = api_config.__file__.replace('.pyc', '.py')
-    return configuration.conf_from_file(filename)
+    return pecan.configuration.conf_from_file(filename)
 
 
 def setup_app(pecan_config=None, extra_hooks=None):
@@ -45,9 +44,9 @@ def setup_app(pecan_config=None, extra_hooks=None):
     if pecan_config.app.enable_acl:
         app_hooks.append(acl.AdminAuthHook())
 
-    configuration.set_config(dict(pecan_config), overwrite=True)
+    pecan.configuration.set_config(dict(pecan_config), overwrite=True)
 
-    app = make_app(
+    app = pecan.make_app(
         pecan_config.app.root,
         static_root=pecan_config.app.static_root,
         template_path=pecan_config.app.template_path,

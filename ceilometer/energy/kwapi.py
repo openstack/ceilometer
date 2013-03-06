@@ -16,13 +16,12 @@
 
 import datetime
 
+from keystoneclient import exceptions
 import requests
 
-from ceilometer import counter
 from ceilometer.central import plugin
+from ceilometer import counter
 from ceilometer.openstack.common import log
-
-from keystoneclient import exceptions
 
 LOG = log.getLogger(__name__)
 

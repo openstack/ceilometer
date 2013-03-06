@@ -32,25 +32,24 @@
 import datetime
 import inspect
 import pecan
-from pecan import request
-from pecan.rest import RestController
+from pecan import rest
 
 import wsme
 import wsmeext.pecan as wsme_pecan
-from wsme.types import Base, text, Enum
+from wsme import types as wtypes
 
-from ceilometer.openstack.common import log as logging
+from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer import storage
 
 
-LOG = logging.getLogger(__name__)
+LOG = log.getLogger(__name__)
 
 
-operation_kind = Enum(str, 'lt', 'le', 'eq', 'ne', 'ge', 'gt')
+operation_kind = wtypes.Enum(str, 'lt', 'le', 'eq', 'ne', 'ge', 'gt')
 
 
-class Query(Base):
+class Query(wtypes.Base):
     """Query filter.
     """
 
@@ -62,7 +61,7 @@ class Query(Base):
     def set_op(self, value):
         self._op = value
 
-    field = text
+    field = wtypes.text
     "The name of the field to test"
 
     #op = wsme.wsattr(operation_kind, default='eq')
@@ -70,7 +69,7 @@ class Query(Base):
     op = wsme.wsproperty(operation_kind, get_op, set_op)
     "The comparison operator. Defaults to 'eq'."
 
-    value = text
+    value = wtypes.text
     "The value to compare against the stored data"
 
     def __repr__(self):
@@ -200,44 +199,44 @@ def _flatten_metadata(metadata):
                 if type(v) not in set([list, dict, set]))
 
 
-class Sample(Base):
+class Sample(wtypes.Base):
     """A single measurement for a given meter and resource.
     """
 
-    source = text
+    source = wtypes.text
     "An identity source ID"
 
-    counter_name = text
+    counter_name = wtypes.text
     "The name of the meter"
     # FIXME(dhellmann): Make this meter_name?
 
-    counter_type = text
+    counter_type = wtypes.text
     "The type of the meter (see :ref:`measurements`)"
     # FIXME(dhellmann): Make this meter_type?
 
-    counter_unit = text
+    counter_unit = wtypes.text
     "The unit of measure for the value in counter_volume"
     # FIXME(dhellmann): Make this meter_unit?
 
     counter_volume = float
     "The actual measured value"
 
-    user_id = text
+    user_id = wtypes.text
     "The ID of the user who last triggered an update to the resource"
 
-    project_id = text
+    project_id = wtypes.text
     "The ID of the project or tenant that owns the resource"
 
-    resource_id = text
+    resource_id = wtypes.text
     "The ID of the :class:`Resource` for which the measurements are taken"
 
     timestamp = datetime.datetime
     "UTC date and time when the measurement was made"
 
-    resource_metadata = {text: text}
+    resource_metadata = {wtypes.text: wtypes.text}
     "Arbitrary metadata associated with the resource"
 
-    message_id = text
+    message_id = wtypes.text
     "A unique identifier for the sample"
 
     def __init__(self, counter_volume=None, resource_metadata={}, **kwds):
@@ -265,7 +264,7 @@ class Sample(Base):
                    )
 
 
-class Statistics(Base):
+class Statistics(wtypes.Base):
     """Computed statistics for a query.
     """
 
@@ -353,7 +352,7 @@ class Statistics(Base):
                    )
 
 
-class MeterController(RestController):
+class MeterController(rest.RestController):
     """Manages operations on a single meter.
     """
     _custom_actions = {
@@ -361,7 +360,7 @@ class MeterController(RestController):
     }
 
     def __init__(self, meter_id):
-        request.context['meter_id'] = meter_id
+        pecan.request.context['meter_id'] = meter_id
         self._id = meter_id
 
     @wsme_pecan.wsexpose([Sample], [Query])
@@ -374,7 +373,7 @@ class MeterController(RestController):
         kwargs['meter'] = self._id
         f = storage.EventFilter(**kwargs)
         return [Sample(**e)
-                for e in request.storage_conn.get_raw_events(f)
+                for e in pecan.request.storage_conn.get_raw_events(f)
                 ]
 
     @wsme_pecan.wsexpose([Statistics], [Query], int)
@@ -389,7 +388,7 @@ class MeterController(RestController):
         kwargs = _query_to_kwargs(q, storage.EventFilter.__init__)
         kwargs['meter'] = self._id
         f = storage.EventFilter(**kwargs)
-        computed = request.storage_conn.get_meter_statistics(f, period)
+        computed = pecan.request.storage_conn.get_meter_statistics(f, period)
         # Find the original timestamp in the query to use for clamping
         # the duration returned in the statistics.
         start = end = None
@@ -405,27 +404,27 @@ class MeterController(RestController):
                 for c in computed]
 
 
-class Meter(Base):
+class Meter(wtypes.Base):
     """One category of measurements.
     """
 
-    name = text
+    name = wtypes.text
     "The unique name for the meter"
 
     # FIXME(dhellmann): Make this an enum?
-    type = text
+    type = wtypes.text
     "The meter type (see :ref:`measurements`)"
 
-    unit = text
+    unit = wtypes.text
     "The unit of measure"
 
-    resource_id = text
+    resource_id = wtypes.text
     "The ID of the :class:`Resource` for which the measurements are taken"
 
-    project_id = text
+    project_id = wtypes.text
     "The ID of the project or tenant that owns the resource"
 
-    user_id = text
+    user_id = wtypes.text
     "The ID of the user who last triggered an update to the resource"
 
     @classmethod
@@ -439,7 +438,7 @@ class Meter(Base):
                    )
 
 
-class MetersController(RestController):
+class MetersController(rest.RestController):
     """Works on meters."""
 
     @pecan.expose()
@@ -452,28 +451,28 @@ class MetersController(RestController):
 
         :param q: Filter rules for the meters to be returned.
         """
-        kwargs = _query_to_kwargs(q, request.storage_conn.get_meters)
+        kwargs = _query_to_kwargs(q, pecan.request.storage_conn.get_meters)
         return [Meter(**m)
-                for m in request.storage_conn.get_meters(**kwargs)]
+                for m in pecan.request.storage_conn.get_meters(**kwargs)]
 
 
-class Resource(Base):
+class Resource(wtypes.Base):
     """An externally defined object for which samples have been received.
     """
 
-    resource_id = text
+    resource_id = wtypes.text
     "The unique identifier for the resource"
 
-    project_id = text
+    project_id = wtypes.text
     "The ID of the owning project or tenant"
 
-    user_id = text
+    user_id = wtypes.text
     "The ID of the user who created the resource or updated it last"
 
     timestamp = datetime.datetime
     "UTC date and time of the last update to any meter for the resource"
 
-    metadata = {text: text}
+    metadata = {wtypes.text: wtypes.text}
     "Arbitrary metadata associated with the resource"
 
     def __init__(self, metadata={}, **kwds):
@@ -491,7 +490,7 @@ class Resource(Base):
                    )
 
 
-class ResourcesController(RestController):
+class ResourcesController(rest.RestController):
     """Works on resources."""
 
     @wsme_pecan.wsexpose(Resource, unicode)
@@ -500,7 +499,8 @@ class ResourcesController(RestController):
 
         :param resource_id: The UUID of the resource.
         """
-        r = list(request.storage_conn.get_resources(resource=resource_id))[0]
+        r = list(pecan.request.storage_conn.get_resources(
+                 resource=resource_id))[0]
         return Resource(**r)
 
     @wsme_pecan.wsexpose([Resource], [Query])
@@ -509,10 +509,10 @@ class ResourcesController(RestController):
 
         :param q: Filter rules for the resources to be returned.
         """
-        kwargs = _query_to_kwargs(q, request.storage_conn.get_resources)
+        kwargs = _query_to_kwargs(q, pecan.request.storage_conn.get_resources)
         resources = [
             Resource(**r)
-            for r in request.storage_conn.get_resources(**kwargs)]
+            for r in pecan.request.storage_conn.get_resources(**kwargs)]
         return resources
 
 
