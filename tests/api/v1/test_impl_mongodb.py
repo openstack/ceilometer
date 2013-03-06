@@ -19,6 +19,7 @@
 """
 from . import list_events
 from . import list_meters
+from . import list_projects
 from . import list_users
 
 
@@ -47,4 +48,12 @@ class TestListEmptyUsers(list_users.TestListEmptyUsers):
 
 
 class TestListUsers(list_users.TestListUsers):
+    database_connection = 'test://'
+
+
+class TestListEmptyProjects(list_projects.TestListEmptyProjects):
+    database_connection = 'test://'
+
+
+class TestListProjects(list_projects.TestListProjects):
     database_connection = 'test://'
