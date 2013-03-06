@@ -19,6 +19,7 @@
 """
 from . import list_events
 from . import list_meters
+from . import list_users
 
 
 class TestListEvents(list_events.TestListEvents):
@@ -30,4 +31,12 @@ class TestListEmptyMeters(list_meters.TestListEmptyMeters):
 
 
 class TestListMeters(list_meters.TestListMeters):
+    database_connection = 'sqlite://'
+
+
+class TestListEmptyUsers(list_users.TestListEmptyUsers):
+    database_connection = 'sqlite://'
+
+
+class TestListUsers(list_users.TestListUsers):
     database_connection = 'sqlite://'

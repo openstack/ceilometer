@@ -19,6 +19,7 @@
 """
 from . import list_events
 from . import list_meters
+from . import list_users
 
 
 class TestListEvents(list_events.TestListEvents):
@@ -38,4 +39,12 @@ class TestListMeters(list_meters.TestListMeters):
 
 
 class TestListMetersMetaquery(list_meters.TestListMetersMetaquery):
+    database_connection = 'test://'
+
+
+class TestListEmptyUsers(list_users.TestListEmptyUsers):
+    database_connection = 'test://'
+
+
+class TestListUsers(list_users.TestListUsers):
     database_connection = 'test://'
