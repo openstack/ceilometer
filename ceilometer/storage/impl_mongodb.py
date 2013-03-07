@@ -20,6 +20,7 @@
 
 import copy
 import datetime
+import operator
 import re
 import urlparse
 
@@ -519,7 +520,8 @@ class Connection(base.Connection):
             query=q,
         )
 
-        return [r['value'] for r in results['results']]
+        return sorted((r['value'] for r in results['results']),
+                      key=operator.itemgetter('period_start'))
 
     def get_volume_sum(self, event_filter):
         """Return the sum of the volume field for the events
