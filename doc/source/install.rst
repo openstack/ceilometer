@@ -57,7 +57,6 @@ ceilometer::
    # Enable the ceilometer services
    enable_service ceilometer-acompute,ceilometer-acentral,ceilometer-collector,ceilometer-api
 
-
 Installing Manually
 +++++++++++++++++++
 
@@ -67,23 +66,12 @@ Installing the Collector
 .. index::
    double: installing; collector
 
-1. Install and configure nova.
-
-   The collector daemon imports code from ``nova``, so it needs to be
-   run on a server where nova has already been installed.
-
-   .. note::
-
-      Ceilometer makes extensive use of the messaging bus, but has not
-      yet been tested with ZeroMQ. We recommend using Rabbit or qpid
-      for now.
-
-2. If you want to be able to retrieve image counters, you need to instruct
+1. If you want to be able to retrieve image counters, you need to instruct
    Glance to send notifications to the bus by changing ``notifier_strategy``
    to ``rabbit`` or ``qpid`` in ``glance-api.conf`` and restarting the
    service.
 
-3. In order to retrieve object store statistics, ceilometer needs
+2. In order to retrieve object store statistics, ceilometer needs
    access to swift with ``ResellerAdmin`` role. You should give this
    role to your ``os_username`` user for tenant ``os_tenant_name``:
 
@@ -110,31 +98,57 @@ Installing the Collector
 
    And adding ``ceilometer`` in the ``pipeline`` of that same file.
 
-4. Install MongoDB.
+3. Install MongoDB.
 
    Follow the instructions to install the MongoDB_ package for your
    operating system, then start the service.
 
-5. Clone the ceilometer git repository to the management server::
+4. Clone the ceilometer git repository to the management server::
 
    $ cd /opt/stack
    $ git clone https://github.com/openstack/ceilometer.git
 
-6. As a user with ``root`` permissions or ``sudo`` privileges, run the
+5. As a user with ``root`` permissions or ``sudo`` privileges, run the
    ceilometer installer::
 
    $ cd ceilometer
    $ sudo python setup.py install
 
-7. Configure ceilometer.
+6. Copy the sample configuration files from the source tree
+   to their final location.
 
-   Ceilometer needs to know about some of the nova configuration
-   options, so the simplest way to start is copying
-   ``/etc/nova/nova.conf`` to ``/etc/ceilometer/ceilometer.conf``. Some
-   of the logging settings used in nova break ceilometer, so they need
-   to be removed. For example, as a user with ``root`` permissions::
+   ::
 
-     $ grep -v format_string /etc/nova/nova.conf > /etc/ceilometer/ceilometer.conf
+      $ mkdir -p /etc/ceilometer
+      $ cp etc/ceilometer/*.json /etc/ceilometer
+      $ cp etc/ceilometer/*.yaml /etc/ceilometer
+      $ cp etc/ceilometer/ceilometer.conf.sample /etc/ceilometer/ceilometer.conf
+
+7. Edit ``/etc/ceilometer/ceilometer.conf``
+
+   1. Configure RPC
+
+      Set the RPC-related options correctly so ceilometer's daemons
+      can communicate with each other and receive notifications from
+      the other projects.
+
+      In particular, look for the ``*_control_exchange`` options and
+      make sure the names are correct. If you did not change the
+      ``control_exchange`` settings for the other components, the
+      defaults should be correct.
+
+      .. note::
+
+         Ceilometer makes extensive use of the messaging bus, but has
+         not yet been tested with ZeroMQ. We recommend using Rabbit or
+         qpid for now.
+
+   2. Set the ``metering_secret`` value.
+
+      Set the ``metering_secret`` value to a large, random, value. Use
+      the same value in all ceilometer configuration files, on all
+      nodes, so that messages passing between the nodes can be
+      validated.
 
    Refer to :doc:`configuration` for details about any other options
    you might want to modify before starting the service.
@@ -163,16 +177,7 @@ Installing the Compute Agent
 
 .. note:: The compute agent must be installed on each nova compute node.
 
-1. Install and configure nova.
-
-   The collector daemon imports code from ``nova``, so it needs to be
-   run on a server where nova has already been installed.
-
-   .. note::
-
-      Ceilometer makes extensive use of the messaging bus, but has not
-      yet been tested with ZeroMQ. We recommend using Rabbit or qpid
-      for now.
+1. Configure nova.
 
    The ``nova`` compute service needs the following configuration to
    be set in ``nova.conf``::
@@ -180,7 +185,7 @@ Installing the Compute Agent
       # nova-compute configuration for ceilometer
       instance_usage_audit=True
       instance_usage_audit_period=hour
-      notification_driver=nova.openstack.common.notifier.rabbit_notifier
+      notification_driver=nova.openstack.common.notifier.rpc_notifier
       notification_driver=ceilometer.compute.nova_notifier
 
 2. Clone the ceilometer git repository to the server::
@@ -194,72 +199,180 @@ Installing the Compute Agent
    $ cd ceilometer
    $ sudo python setup.py install
 
-5. Configure ceilometer.
+5. Copy the sample configuration files from the source tree
+   to their final location.
 
-   Ceilometer needs to know about some of the nova configuration
-   options, so the simplest way to start is copying
-   ``/etc/nova/nova.conf`` to ``/etc/ceilometer/ceilometer.conf``. Some
-   of the logging settings used in nova break ceilometer, so they need
-   to be removed. For example, as a user with ``root`` permissions::
+   ::
 
-     $ grep -v format_string /etc/nova/nova.conf > /etc/ceilometer/ceilometer.conf
+      $ mkdir -p /etc/ceilometer
+      $ cp etc/ceilometer/*.json /etc/ceilometer
+      $ cp etc/ceilometer/*.yaml /etc/ceilometer
+      $ cp etc/ceilometer/ceilometer.conf.sample /etc/ceilometer/ceilometer.conf
+
+6. Edit ``/etc/ceilometer/ceilometer.conf``
+
+   1. Configure RPC
+
+      Set the RPC-related options correctly so ceilometer's daemons
+      can communicate with each other and receive notifications from
+      the other projects.
+
+      In particular, look for the ``*_control_exchange`` options and
+      make sure the names are correct. If you did not change the
+      ``control_exchange`` settings for the other components, the
+      defaults should be correct.
+
+      .. note::
+
+         Ceilometer makes extensive use of the messaging bus, but has
+         not yet been tested with ZeroMQ. We recommend using Rabbit or
+         qpid for now.
+
+   2. Set the ``metering_secret`` value.
+
+      Set the ``metering_secret`` value to a large, random, value. Use
+      the same value in all ceilometer configuration files, on all
+      nodes, so that messages passing between the nodes can be
+      validated.
 
    Refer to :doc:`configuration` for details about any other options
    you might want to modify before starting the service.
 
-6. Start the agent.
+7. Start the agent.
 
    ::
 
-     $ ./bin/ceilometer-agent
+     $ ./bin/ceilometer-agent-compute
 
-   .. note:: 
+   .. note::
 
       The default development configuration of the agent logs to
       stderr, so you may want to run this step using a screen session
       or other tool for maintaining a long-running program in the
       background.
 
-Installing the API Server
-=========================
-    
+Installing the Central Agent
+============================
+
 .. index::
-   double: installing; API
-    
+   double: installing; agent
+
 .. note::
-   The API server needs to be able to talk to keystone and ceilometer's
-   database.
 
-1. Install and configure nova.
+   The central agent needs to be able to talk to keystone and any of
+   the services being polled for updates.
 
-   The the ceilometer api server imports code from ``nova``, so it needs to be
-   run on a server where nova has already been installed.
-
-2. Clone the ceilometer git repository to the server::
+1. Clone the ceilometer git repository to the server::
 
    $ cd /opt/stack
    $ git clone https://github.com/openstack/ceilometer.git
 
-4. As a user with ``root`` permissions or ``sudo`` privileges, run the
+2. As a user with ``root`` permissions or ``sudo`` privileges, run the
    ceilometer installer::
 
    $ cd ceilometer
    $ sudo python setup.py install
 
-5. Configure ceilometer.
+3. Copy the sample configuration files from the source tree
+   to their final location.
 
-   Ceilometer needs to know about some of the nova configuration
-   options, so the simplest way to start is copying
-   ``/etc/nova/nova.conf`` to ``/etc/ceilometer/ceilometer.conf``. Some
-   of the logging settings used in nova break ceilometer, so they need
-   to be removed. For example, as a user with ``root`` permissions::
+   ::
 
-     $ grep -v format_string /etc/nova/nova.conf > /etc/ceilometer/ceilometer.conf
+      $ mkdir -p /etc/ceilometer
+      $ cp etc/ceilometer/*.json /etc/ceilometer
+      $ cp etc/ceilometer/*.yaml /etc/ceilometer
+      $ cp etc/ceilometer/ceilometer.conf.sample /etc/ceilometer/ceilometer.conf
+
+4. Edit ``/etc/ceilometer/ceilometer.conf``
+
+   1. Configure RPC
+
+      Set the RPC-related options correctly so ceilometer's daemons
+      can communicate with each other and receive notifications from
+      the other projects.
+
+      In particular, look for the ``*_control_exchange`` options and
+      make sure the names are correct. If you did not change the
+      ``control_exchange`` settings for the other components, the
+      defaults should be correct.
+
+      .. note::
+
+         Ceilometer makes extensive use of the messaging bus, but has
+         not yet been tested with ZeroMQ. We recommend using Rabbit or
+         qpid for now.
+
+   2. Set the ``metering_secret`` value.
+
+      Set the ``metering_secret`` value to a large, random, value. Use
+      the same value in all ceilometer configuration files, on all
+      nodes, so that messages passing between the nodes can be
+      validated.
 
    Refer to :doc:`configuration` for details about any other options
    you might want to modify before starting the service.
 
-6. Start the agent.
+5. Start the agent
+
+   ::
+
+    $ ./bin/ceilometer-agent-central
+
+
+Installing the API Server
+=========================
+
+.. index::
+   double: installing; API
+
+.. note::
+   The API server needs to be able to talk to keystone and ceilometer's
+   database.
+
+1. Clone the ceilometer git repository to the server::
+
+   $ cd /opt/stack
+   $ git clone https://github.com/openstack/ceilometer.git
+
+2. As a user with ``root`` permissions or ``sudo`` privileges, run the
+   ceilometer installer::
+
+   $ cd ceilometer
+   $ sudo python setup.py install
+
+3. Copy the sample configuration files from the source tree
+   to their final location.
+
+   ::
+
+      $ mkdir -p /etc/ceilometer
+      $ cp etc/ceilometer/*.json /etc/ceilometer
+      $ cp etc/ceilometer/*.yaml /etc/ceilometer
+      $ cp etc/ceilometer/ceilometer.conf.sample /etc/ceilometer/ceilometer.conf
+
+4. Edit ``/etc/ceilometer/ceilometer.conf``
+
+   1. Configure RPC
+
+      Set the RPC-related options correctly so ceilometer's daemons
+      can communicate with each other and receive notifications from
+      the other projects.
+
+      In particular, look for the ``*_control_exchange`` options and
+      make sure the names are correct. If you did not change the
+      ``control_exchange`` settings for the other components, the
+      defaults should be correct.
+
+      .. note::
+
+         Ceilometer makes extensive use of the messaging bus, but has
+         not yet been tested with ZeroMQ. We recommend using Rabbit or
+         qpid for now.
+
+   Refer to :doc:`configuration` for details about any other options
+   you might want to modify before starting the service.
+
+5. Start the API server.
 
    ::
 
