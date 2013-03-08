@@ -74,6 +74,8 @@
 # metering_api_port=8777
 #### (IntOpt) The port for the ceilometer API server
 
+# auth_strategy=keystone
+### (StrOpt) one of keystone or noauth
 
 ######## defined in ceilometer.central.manager ########
 

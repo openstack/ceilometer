@@ -18,17 +18,38 @@
 # under the License.
 """Set up the development API server.
 """
+import os
 import sys
+from wsgiref import simple_server
 
 from oslo.config import cfg
 
-from ceilometer.api.v1 import app
+from ceilometer.api import app
 from ceilometer import service
 
 
 if __name__ == '__main__':
-    # Parse config file and command line options,
-    # then configure logging.
+    # Parse OpenStack config file and command line options, then
+    # configure logging.
     service.prepare_service(sys.argv)
-    root = app.make_app(cfg.CONF)
-    root.run(host='0.0.0.0', port=cfg.CONF.metering_api_port)
+
+    # Build the WSGI app
+    root = app.VersionSelectorApplication()
+
+    # Create the WSGI server and start it
+    host, port = '0.0.0.0', int(cfg.CONF.metering_api_port)
+    srv = simple_server.make_server(host, port, root)
+
+    print 'Starting server in PID %s' % os.getpid()
+
+    if host == '0.0.0.0':
+        print 'serving on 0.0.0.0:%s, view at http://127.0.0.1:%s' % \
+            (port, port)
+    else:
+        print "serving on http://%s:%s" % (host, port)
+
+    try:
+        srv.serve_forever()
+    except KeyboardInterrupt:
+        # allow CTRL+C to shutdown without an error
+        pass
