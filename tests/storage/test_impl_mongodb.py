@@ -46,9 +46,14 @@
 
 """
 
+import copy
+import datetime
 import mox
 
 from tests.storage import base
+
+from ceilometer.collector import meter
+from ceilometer import counter
 from ceilometer.storage.impl_test import TestConnection
 from ceilometer.tests.db import require_map_reduce
 
@@ -150,3 +155,74 @@ class StatisticsTest(base.StatisticsTest, MongoDBEngineTestBase):
     def setUp(self):
         super(StatisticsTest, self).setUp()
         require_map_reduce(self.conn)
+
+
+class CompatibilityTest(MongoDBEngineTestBase):
+
+    def prepare_data(self):
+        def old_record_metering_data(self, data):
+            self.db.user.update(
+                {'_id': data['user_id']},
+                {'$addToSet': {'source': data['source'],
+                               },
+                 },
+                upsert=True,
+            )
+            self.db.project.update(
+                {'_id': data['project_id']},
+                {'$addToSet': {'source': data['source'],
+                               },
+                 },
+                upsert=True,
+            )
+            received_timestamp = datetime.datetime.utcnow()
+            self.db.resource.update(
+                {'_id': data['resource_id']},
+                {'$set': {'project_id': data['project_id'],
+                          'user_id': data['user_id'],
+                          # Current metadata being used and when it was
+                          # last updated.
+                          'timestamp': data['timestamp'],
+                          'received_timestamp': received_timestamp,
+                          'metadata': data['resource_metadata'],
+                          'source': data['source'],
+                          },
+                 '$addToSet': {'meter': {'counter_name': data['counter_name'],
+                                         'counter_type': data['counter_type'],
+                                         },
+                               },
+                 },
+                upsert=True,
+            )
+
+            record = copy.copy(data)
+            self.db.meter.insert(record)
+            return
+
+        # Stubout with the old version DB schema, the one w/o 'counter_unit'
+        self.stubs.Set(self.conn,
+                       'record_metering_data',
+                       old_record_metering_data)
+        self.counters = []
+        c = counter.Counter(
+            'volume.size',
+            'gauge',
+            'GiB',
+            5,
+            'user-id',
+            'project1',
+            'resource-id',
+            timestamp=datetime.datetime(2012, 9, 25, 10, 30),
+            resource_metadata={'display_name': 'test-volume',
+                               'tag': 'self.counter',
+                               }
+        )
+        self.counters.append(c)
+        msg = meter.meter_message_from_counter(c,
+                                               secret='not-so-secret',
+                                               source='test')
+        self.conn.record_metering_data(self.conn, msg)
+
+    def test_counter_unit(self):
+        meters = list(self.conn.get_meters())
+        self.assertEqual(len(meters), 1)

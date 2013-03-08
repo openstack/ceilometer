@@ -460,7 +460,9 @@ class Connection(base.Connection):
                 m = {}
                 m['name'] = r_meter['counter_name']
                 m['type'] = r_meter['counter_type']
-                m['unit'] = r_meter['counter_unit']
+                # Return empty string if 'counter_unit' is not valid for
+                # backward compaitiblity.
+                m['unit'] = r_meter.get('counter_unit', '')
                 m['resource_id'] = r['_id']
                 m['project_id'] = r['project_id']
                 m['user_id'] = r['user_id']
