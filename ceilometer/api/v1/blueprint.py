@@ -18,6 +18,15 @@
 """Blueprint for version 1 of API.
 """
 
+#############################################################################
+#############################################################################
+#
+# NOTE(dhellmann): The V1 API is being deprecated during Havana, and
+# as such it is feature-frozen. Only make bug-fix changes in this file.
+#
+#############################################################################
+#############################################################################
+
 # [ ] / -- information about this version of the API
 #
 # [ ] /extensions -- list of available extensions
