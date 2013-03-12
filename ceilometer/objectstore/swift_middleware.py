@@ -35,7 +35,7 @@ except ImportError:
 
 try:
     # Swift > 1.7.5 ... module exists but doesn't contain class.
-    from  swift.common.utils import InputProxy
+    from swift.common.utils import InputProxy
 except ImportError:
     # Swift <= 1.7.5 ... module exists and has class.
     from swift.common.middleware.proxy_logging import InputProxy
