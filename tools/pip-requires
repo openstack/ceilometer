@@ -11,7 +11,7 @@ eventlet
 anyjson>=0.2.4
 Flask==0.9
 pecan>=0.2.0
-stevedore>=0.6
+stevedore>=0.7
 python-glanceclient
 python-novaclient>=2.6.10
 # FIXME(llu) Until the latest python-keystoneclient compatible with oslo.config
