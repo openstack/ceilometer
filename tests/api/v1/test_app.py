@@ -36,6 +36,7 @@ class TestApp(unittest.TestCase):
     def test_keystone_middleware_conf(self):
         cfg.CONF.set_override("auth_protocol", "foottp",
                               group=acl.OPT_GROUP_NAME)
+        cfg.CONF.set_override("auth_version", "v2.0", group=acl.OPT_GROUP_NAME)
         api_app = app.make_app(cfg.CONF, attach_storage=False)
         self.assertEqual(api_app.wsgi_app.auth_protocol, 'foottp')
 
@@ -43,6 +44,7 @@ class TestApp(unittest.TestCase):
         tmpfile = tempfile.mktemp()
         with open(tmpfile, "w") as f:
             f.write("[%s]\nauth_protocol = barttp" % acl.OPT_GROUP_NAME)
+            f.write("\nauth_version = v2.0")
         service.prepare_service(['ceilometer-api',
                                  '--config-file=%s' % tmpfile])
         api_app = app.make_app(cfg.CONF, attach_storage=False)

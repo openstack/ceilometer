@@ -27,6 +27,7 @@ from oslo.config import cfg
 import pecan
 import pecan.testing
 
+from ceilometer.api import acl
 from ceilometer.api.v1 import app as v1_app
 from ceilometer.api.v1 import blueprint as v1_blueprint
 from ceilometer import storage
@@ -40,6 +41,7 @@ class TestBase(db_test_base.TestBase):
 
     def setUp(self):
         super(TestBase, self).setUp()
+        cfg.CONF.set_override("auth_version", "v2.0", group=acl.OPT_GROUP_NAME)
         self.app = v1_app.make_app(cfg.CONF,
                                    enable_acl=False,
                                    attach_storage=False)
@@ -79,6 +81,7 @@ class FunctionalTest(db_test_base.TestBase):
 
     def setUp(self):
         super(FunctionalTest, self).setUp()
+        cfg.CONF.set_override("auth_version", "v2.0", group=acl.OPT_GROUP_NAME)
         self.app = self._make_app()
 
     def _make_app(self, enable_acl=False):
