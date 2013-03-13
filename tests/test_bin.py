@@ -20,6 +20,7 @@
 import httplib2
 import json
 import os
+import random
 import socket
 import subprocess
 import tempfile
@@ -67,11 +68,13 @@ class BinSendCounterTestCase(unittest.TestCase):
 class BinApiTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.api_port = 8777
+        self.api_port = random.randint(10000, 11000)
         self.http = httplib2.Http()
         self.tempfile = tempfile.mktemp()
         with open(self.tempfile, 'w') as tmp:
             tmp.write("[DEFAULT]\n")
+            tmp.write(
+                "metering_api_port=%s\n" % self.api_port)
             tmp.write(
                 "rpc_backend=ceilometer.openstack.common.rpc.impl_fake\n")
             tmp.write("database_connection=log://localhost\n")
