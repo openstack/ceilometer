@@ -1,8 +1,6 @@
 WebOb>=1.2
 kombu
 iso8601
-lockfile
-netaddr
 argparse
 SQLAlchemy>=0.7.3,<=0.7.9
 sqlalchemy-migrate>=0.7.2

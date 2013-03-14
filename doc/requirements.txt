@@ -4,8 +4,6 @@ http://tarballs.openstack.org/keystone/keystone-master.tar.gz
 webob
 kombu
 iso8601
-lockfile
-netaddr
 argparse
 sqlalchemy
 eventlet
