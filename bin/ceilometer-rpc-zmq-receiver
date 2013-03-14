@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
-#    Copyright 2011 OpenStack LLC
+#    Copyright 2011 OpenStack Foundation
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -39,10 +39,10 @@ from ceilometer.openstack.common.rpc import impl_zmq
 CONF = cfg.CONF
 CONF.register_opts(rpc.rpc_opts)
 CONF.register_opts(impl_zmq.zmq_opts)
-CONF(sys.argv[1:], project='ceilometer')
 
 
 def main():
+    CONF(sys.argv[1:], project='ceilometer')
     logging.setup("ceilometer")
 
     with contextlib.closing(impl_zmq.ZmqProxy(CONF)) as reactor:
