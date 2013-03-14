@@ -22,6 +22,12 @@ Based on pecan.middleware.errordocument
 """
 
 import json
+import webob
+from xml import etree as et
+
+from ceilometer.openstack.common import log
+
+LOG = log.getLogger(__name__)
 
 
 class ParsableErrorMiddleware(object):
@@ -61,12 +67,24 @@ class ParsableErrorMiddleware(object):
 
         app_iter = self.app(environ, replacement_start_response)
         if (state['status_code'] / 100) not in (2, 3):
-            # FIXME(dhellmann): Always returns errors as JSON,
-            # but should look at the environ to determine
-            # the desired type.
-            body = [json.dumps({'error_message': '\n'.join(app_iter)})]
+            req = webob.Request(environ)
+            if (req.accept.best_match(['application/json', 'application/xml'])
+                == 'application/xml'):
+                try:
+                    # simple check xml is valid
+                    body = [et.ElementTree.tostring(
+                            et.ElementTree.fromstring('<error_message>'
+                                                      + '\n'.join(app_iter)
+                                                      + '</error_message>'))]
+                except et.ElementTree.ParseError as err:
+                    LOG.error('Error parsing HTTP response: %s' % err)
+                    body = ['<error_message>%s' % state['status_code']
+                            + '</error_message>']
+                state['headers'].append(('Content-Type', 'application/xml'))
+            else:
+                body = [json.dumps({'error_message': '\n'.join(app_iter)})]
+                state['headers'].append(('Content-Type', 'application/json'))
             state['headers'].append(('Content-Length', len(body[0])))
-            state['headers'].append(('Content-Type', 'application/json'))
         else:
             body = app_iter
         return body
