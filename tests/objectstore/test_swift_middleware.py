@@ -133,3 +133,61 @@ class TestSwiftMiddleware(base.TestCase):
         self.assertEqual(data.resource_metadata['version'], '1.0')
         self.assertEqual(data.resource_metadata['container'], 'container')
         self.assertEqual(data.resource_metadata['object'], None)
+
+    def test_no_metadata_headers(self):
+        app = swift_middleware.CeilometerMiddleware(FakeApp(), {})
+        req = Request.blank('/1.0/account/container',
+                            environ={'REQUEST_METHOD': 'GET'})
+        resp = list(app(req.environ, self.start_response))
+        counters = self.pipeline_manager.pipelines[0].counters
+        self.assertEqual(len(counters), 1)
+        data = counters[0]
+        http_headers = [k for k in data.resource_metadata.keys()
+                        if k.startswith('http_header_')]
+        self.assertEqual(len(http_headers), 0)
+        self.assertEqual(data.resource_metadata['version'], '1.0')
+        self.assertEqual(data.resource_metadata['container'], 'container')
+        self.assertEqual(data.resource_metadata['object'], None)
+
+    def test_metadata_headers(self):
+        app = swift_middleware.CeilometerMiddleware(FakeApp(), {
+            'metadata_headers': 'X_VAR1, x-var2, x-var3'
+        })
+        req = Request.blank('/1.0/account/container',
+                            environ={'REQUEST_METHOD': 'GET'},
+                            headers={
+                                'X_VAR1': 'value1',
+                                'X_VAR2': 'value2'
+                            })
+        resp = list(app(req.environ, self.start_response))
+        counters = self.pipeline_manager.pipelines[0].counters
+        self.assertEqual(len(counters), 1)
+        data = counters[0]
+        http_headers = [k for k in data.resource_metadata.keys()
+                        if k.startswith('http_header_')]
+        self.assertEqual(len(http_headers), 2)
+        self.assertEqual(data.resource_metadata['version'], '1.0')
+        self.assertEqual(data.resource_metadata['container'], 'container')
+        self.assertEqual(data.resource_metadata['object'], None)
+        self.assertEqual(data.resource_metadata['http_header_x_var1'],
+                         'value1')
+        self.assertEqual(data.resource_metadata['http_header_x_var2'],
+                         'value2')
+        self.assertFalse('http_header_x_var3' in data.resource_metadata)
+
+    def test_metadata_headers_on_not_existing_header(self):
+        app = swift_middleware.CeilometerMiddleware(FakeApp(), {
+            'metadata_headers': 'x-var3'
+        })
+        req = Request.blank('/1.0/account/container',
+                            environ={'REQUEST_METHOD': 'GET'})
+        resp = list(app(req.environ, self.start_response))
+        counters = self.pipeline_manager.pipelines[0].counters
+        self.assertEqual(len(counters), 1)
+        data = counters[0]
+        http_headers = [k for k in data.resource_metadata.keys()
+                        if k.startswith('http_header_')]
+        self.assertEqual(len(http_headers), 0)
+        self.assertEqual(data.resource_metadata['version'], '1.0')
+        self.assertEqual(data.resource_metadata['container'], 'container')
+        self.assertEqual(data.resource_metadata['object'], None)

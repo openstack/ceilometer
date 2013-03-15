@@ -18,6 +18,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+"""
+Ceilometer Middleware for Swift Proxy
+
+Configuration:
+
+In /etc/swift/proxy-server.conf on the main pipeline add "ceilometer" just
+before "proxy-server" and add the following filter in the file:
+
+[filter:ceilometer]
+use = egg:ceilometer#swift
+
+# Some optional configuration
+# this allow to publish additional metadata
+metadata_headers = X-TEST
+"""
+
 from __future__ import absolute_import
 
 from oslo.config import cfg
@@ -54,6 +71,12 @@ class CeilometerMiddleware(object):
 
     def __init__(self, app, conf):
         self.app = app
+
+        self.metadata_headers = [h.strip().replace('-', '_').lower()
+                                 for h in conf.get(
+                                     "metadata_headers",
+                                     "").split(",") if h.strip()]
+
         service.prepare_service()
         publisher_manager = dispatch.NameDispatchExtensionManager(
             namespace=pipeline.PUBLISHER_NAMESPACE,
@@ -97,6 +120,19 @@ class CeilometerMiddleware(object):
         req = REQUEST.Request(env)
         version, account, container, obj = split_path(req.path, 1, 4, True)
         now = timeutils.utcnow().isoformat()
+
+        resource_metadata = {
+            "path": req.path,
+            "version": version,
+            "container": container,
+            "object": obj,
+        }
+
+        for header in self.metadata_headers:
+            if header.upper() in req.headers:
+                resource_metadata['http_header_%s' % header] = req.headers.get(
+                    header.upper())
+
         with pipeline.PublishContext(
                 context.get_admin_context(),
                 cfg.CONF.counter_source,
@@ -112,12 +148,7 @@ class CeilometerMiddleware(object):
                     project_id=env.get('HTTP_X_TENANT_ID'),
                     resource_id=account.partition('AUTH_')[2],
                     timestamp=now,
-                    resource_metadata={
-                        "path": req.path,
-                        "version": version,
-                        "container": container,
-                        "object": obj,
-                    })])
+                    resource_metadata=resource_metadata)])
 
             if bytes_sent:
                 publisher([counter.Counter(
@@ -129,12 +160,7 @@ class CeilometerMiddleware(object):
                     project_id=env.get('HTTP_X_TENANT_ID'),
                     resource_id=account.partition('AUTH_')[2],
                     timestamp=now,
-                    resource_metadata={
-                        "path": req.path,
-                        "version": version,
-                        "container": container,
-                        "object": obj,
-                    })])
+                    resource_metadata=resource_metadata)])
 
 
 def filter_factory(global_conf, **local_conf):
