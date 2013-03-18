@@ -342,3 +342,34 @@ Installing the API Server
    may want to run this step using a screen session or other tool for
    maintaining a long-running program in the background.
 
+
+Configuring keystone to work with API
+=====================================
+
+.. index::
+   double: installing; configure keystone
+
+.. note::
+   The API server needs to be able to talk to keystone to authenticate.
+
+1. Create a service for ceilometer in keystone::
+
+   $ keystone service-create --name=ceilometer \
+                             --type=metering \
+                             --description="Ceilometer Service"
+
+2. Create an endpoint in keystone for ceilometer::
+
+   $ keystone endpoint-create --region RegionOne \
+                              --service_id $CEILOMETER_SERVICE \
+                              --publicurl "http://$SERVICE_HOST:8777/" \
+                              --adminurl "http://$SERVICE_HOST:8777/" \
+                              --internalurl "http://$SERVICE_HOST:8777/"
+
+.. note::
+
+   CEILOMETER_SERVICE is the id of the service created by the first command
+   and SERVICE_HOST is the host where the Ceilometer API is running. The
+   default port value for ceilometer API is 8777. If the port value
+   has been customized, adjust accordingly.
+
