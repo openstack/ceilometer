@@ -18,6 +18,10 @@
 """Test ACL."""
 
 import datetime
+from oslo.config import cfg
+
+from ceilometer.api import acl
+from ceilometer import policy
 
 from .base import FunctionalTest
 
@@ -54,9 +58,19 @@ class TestAPIACL(FunctionalTest):
 
     def setUp(self):
         super(TestAPIACL, self).setUp()
-        self.app.app._cache = FakeMemcache()
+        self.environ = {'fake.cache': FakeMemcache()}
+
+    def get_json(self, path, expect_errors=False, headers=None,
+                 q=[], **params):
+        return super(TestAPIACL, self).get_json(path,
+                                                expect_errors=expect_errors,
+                                                headers=headers,
+                                                q=q,
+                                                extra_environ=self.environ,
+                                                **params)
 
     def _make_app(self):
+        cfg.CONF.set_override("cache", "fake.cache", group=acl.OPT_GROUP_NAME)
         return super(TestAPIACL, self)._make_app(enable_acl=True)
 
     def test_non_authenticated(self):

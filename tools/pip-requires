@@ -14,10 +14,7 @@ pecan>=0.2.0
 stevedore>=0.7
 python-glanceclient
 python-novaclient>=2.6.10
-# FIXME(llu) Until the latest python-keystoneclient compatible with oslo.config
-# is ready on Pypi, we use master for work-around. Bug #1151665.
-# python-keystoneclient>=0.2,<0.3
-http://tarballs.openstack.org/python-keystoneclient/python-keystoneclient-master.tar.gz#egg=python-keystoneclient
+python-keystoneclient>=0.2.3
 python-swiftclient
 lxml
 requests<1.0

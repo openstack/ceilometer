@@ -133,7 +133,7 @@ class FunctionalTest(db_test_base.TestBase):
         pecan.set_config({}, overwrite=True)
 
     def get_json(self, path, expect_errors=False, headers=None,
-                 q=[], **params):
+                 extra_environ=None, q=[], **params):
         full_path = self.PATH_PREFIX + path
         query_params = {'q.field': [],
                         'q.value': [],
@@ -150,6 +150,7 @@ class FunctionalTest(db_test_base.TestBase):
         response = self.app.get(full_path,
                                 params=all_params,
                                 headers=headers,
+                                extra_environ=extra_environ,
                                 expect_errors=expect_errors)
         if not expect_errors:
             response = response.json
