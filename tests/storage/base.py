@@ -327,34 +327,34 @@ class MeterTest(DBTestBase):
 
 class RawEventTest(DBTestBase):
 
-    def test_get_raw_events_by_user(self):
+    def test_get_samples_by_user(self):
         f = storage.EventFilter(user='user-id')
-        results = list(self.conn.get_raw_events(f))
+        results = list(self.conn.get_samples(f))
         assert len(results) == 2
         for meter in results:
             assert meter in [self.msg1, self.msg2]
 
-    def test_get_raw_events_by_project(self):
+    def test_get_samples_by_project(self):
         f = storage.EventFilter(project='project-id')
-        results = list(self.conn.get_raw_events(f))
+        results = list(self.conn.get_samples(f))
         assert results
         for meter in results:
             assert meter in [self.msg1, self.msg2, self.msg3]
 
-    def test_get_raw_events_by_resource(self):
+    def test_get_samples_by_resource(self):
         f = storage.EventFilter(user='user-id', resource='resource-id')
-        results = list(self.conn.get_raw_events(f))
+        results = list(self.conn.get_samples(f))
         assert results
         meter = results[0]
         assert meter is not None
         assert meter == self.msg1
 
-    def test_get_events_by_metaquery(self):
+    def test_get_samples_by_metaquery(self):
         q = {'metadata.display_name': 'test-server'}
         f = storage.EventFilter(metaquery=q)
         got_not_imp = False
         try:
-            results = list(self.conn.get_raw_events(f))
+            results = list(self.conn.get_samples(f))
             assert results
             for meter in results:
                 assert meter in self.msgs
@@ -362,48 +362,48 @@ class RawEventTest(DBTestBase):
             got_not_imp = True
             self.assertTrue(got_not_imp)
 
-    def test_get_raw_events_by_start_time(self):
+    def test_get_samples_by_start_time(self):
         f = storage.EventFilter(
             user='user-id',
             start=datetime.datetime(2012, 7, 2, 10, 41),
         )
-        results = list(self.conn.get_raw_events(f))
+        results = list(self.conn.get_samples(f))
         assert len(results) == 1
         assert results[0]['timestamp'] == datetime.datetime(2012, 7, 2, 10, 41)
 
-    def test_get_raw_events_by_end_time(self):
+    def test_get_samples_by_end_time(self):
         f = storage.EventFilter(
             user='user-id',
             end=datetime.datetime(2012, 7, 2, 10, 41),
         )
-        results = list(self.conn.get_raw_events(f))
+        results = list(self.conn.get_samples(f))
         length = len(results)
         assert length == 1
         assert results[0]['timestamp'] == datetime.datetime(2012, 7, 2, 10, 40)
 
-    def test_get_raw_events_by_both_times(self):
+    def test_get_samples_by_both_times(self):
         f = storage.EventFilter(
             start=datetime.datetime(2012, 7, 2, 10, 42),
             end=datetime.datetime(2012, 7, 2, 10, 43),
         )
-        results = list(self.conn.get_raw_events(f))
+        results = list(self.conn.get_samples(f))
         length = len(results)
         assert length == 1
         assert results[0]['timestamp'] == datetime.datetime(2012, 7, 2, 10, 42)
 
-    def test_get_raw_events_by_meter(self):
+    def test_get_samples_by_name(self):
         f = storage.EventFilter(user='user-id', meter='no-such-meter')
-        results = list(self.conn.get_raw_events(f))
+        results = list(self.conn.get_samples(f))
         assert not results
 
-    def test_get_raw_events_by_meter2(self):
+    def test_get_samples_by_name2(self):
         f = storage.EventFilter(user='user-id', meter='instance')
-        results = list(self.conn.get_raw_events(f))
+        results = list(self.conn.get_samples(f))
         assert results
 
-    def test_get_raw_events_by_source(self):
+    def test_get_samples_by_source(self):
         f = storage.EventFilter(source='test-1')
-        results = list(self.conn.get_raw_events(f))
+        results = list(self.conn.get_samples(f))
         assert results
         assert len(results) == 1
 

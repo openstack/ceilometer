@@ -55,10 +55,10 @@
 # [x] /sources/<source>/meters -- list of meters reporting for parent obj
 # [x] /users/<user>/meters -- list of meters reporting for parent obj
 #
-# [x] /projects/<project>/meters/<meter> -- events
-# [x] /resources/<resource>/meters/<meter> -- events
-# [x] /sources/<source>/meters/<meter> -- events
-# [x] /users/<user>/meters/<meter> -- events
+# [x] /projects/<project>/meters/<meter> -- samples
+# [x] /resources/<resource>/meters/<meter> -- samples
+# [x] /sources/<source>/meters/<meter> -- samples
+# [x] /users/<user>/meters/<meter> -- samples
 #
 # [ ] /projects/<project>/meters/<meter>/duration -- total time for selected
 #                                                    meter
@@ -380,15 +380,19 @@ def list_projects_by_source(source):
     return _list_projects(source=source)
 
 
-## APIs for working with events.
+## APIs for working with samples.
 
 
-def _list_events(meter,
-                 project=None,
-                 resource=None,
-                 source=None,
-                 user=None):
-    """Return a list of raw metering events.
+def _list_samples(meter,
+                  project=None,
+                  resource=None,
+                  source=None,
+                  user=None):
+    """Return a list of raw samples.
+
+    Note: the API talks about "events" these are equivelent to samples.
+    but we still need to return the samples within the "events" dict
+    to maintain API compatibilty.
     """
     q_ts = _get_query_timestamps(flask.request.args)
     f = storage.EventFilter(
@@ -401,7 +405,7 @@ def _list_events(meter,
         end=q_ts['end_timestamp'],
         metaquery=_get_metaquery(flask.request.args),
     )
-    events = list(flask.request.storage_conn.get_raw_events(f))
+    events = list(flask.request.storage_conn.get_samples(f))
     jsonified = flask.jsonify(events=events)
     if request_wants_html():
         return flask.templating.render_template('list_event.html',
@@ -415,38 +419,38 @@ def _list_events(meter,
 
 
 @blueprint.route('/projects/<project>/meters/<meter>')
-def list_events_by_project(project, meter):
-    """Return a list of raw metering events for the project.
+def list_samples_by_project(project, meter):
+    """Return a list of raw samples for the project.
 
     :param project: The ID of the project.
     :param meter: The name of the meter.
-    :param start_timestamp: Limits events by timestamp >= this value.
+    :param start_timestamp: Limits samples by timestamp >= this value.
         (optional)
     :type start_timestamp: ISO date in UTC
-    :param end_timestamp: Limits events by timestamp < this value.
+    :param end_timestamp: Limits samples by timestamp < this value.
         (optional)
     :type end_timestamp: ISO date in UTC
     """
     check_authorized_project(project)
-    return _list_events(project=project,
-                        meter=meter,
-                        )
+    return _list_samples(project=project,
+                         meter=meter,
+                         )
 
 
 @blueprint.route('/resources/<resource>/meters/<meter>')
-def list_events_by_resource(resource, meter):
-    """Return a list of raw metering events for the resource.
+def list_samples_by_resource(resource, meter):
+    """Return a list of raw samples for the resource.
 
     :param resource: The ID of the resource.
     :param meter: The name of the meter.
-    :param start_timestamp: Limits events by timestamp >= this value.
+    :param start_timestamp: Limits samples by timestamp >= this value.
         (optional)
     :type start_timestamp: ISO date in UTC
-    :param end_timestamp: Limits events by timestamp < this value.
+    :param end_timestamp: Limits samples by timestamp < this value.
         (optional)
     :type end_timestamp: ISO date in UTC
     """
-    return _list_events(
+    return _list_samples(
         resource=resource,
         meter=meter,
         project=acl.get_limited_to_project(flask.request.headers),
@@ -454,19 +458,19 @@ def list_events_by_resource(resource, meter):
 
 
 @blueprint.route('/sources/<source>/meters/<meter>')
-def list_events_by_source(source, meter):
-    """Return a list of raw metering events for the source.
+def list_samples_by_source(source, meter):
+    """Return a list of raw samples for the source.
 
     :param source: The ID of the reporting source.
     :param meter: The name of the meter.
-    :param start_timestamp: Limits events by timestamp >= this value.
+    :param start_timestamp: Limits samples by timestamp >= this value.
         (optional)
     :type start_timestamp: ISO date in UTC
-    :param end_timestamp: Limits events by timestamp < this value.
+    :param end_timestamp: Limits samples by timestamp < this value.
         (optional)
     :type end_timestamp: ISO date in UTC
     """
-    return _list_events(
+    return _list_samples(
         source=source,
         meter=meter,
         project=acl.get_limited_to_project(flask.request.headers),
@@ -474,19 +478,19 @@ def list_events_by_source(source, meter):
 
 
 @blueprint.route('/users/<user>/meters/<meter>')
-def list_events_by_user(user, meter):
-    """Return a list of raw metering events for the user.
+def list_samples_by_user(user, meter):
+    """Return a list of raw samples for the user.
 
     :param user: The ID of the user.
     :param meter: The name of the meter.
-    :param start_timestamp: Limits events by timestamp >= this value.
+    :param start_timestamp: Limits samples by timestamp >= this value.
         (optional)
     :type start_timestamp: ISO date in UTC
-    :param end_timestamp: Limits events by timestamp < this value.
+    :param end_timestamp: Limits samples by timestamp < this value.
         (optional)
     :type end_timestamp: ISO date in UTC
     """
-    return _list_events(
+    return _list_samples(
         user=user,
         meter=meter,
         project=acl.get_limited_to_project(flask.request.headers),
@@ -571,7 +575,7 @@ def compute_duration_by_resource(resource, meter):
     # If we got valid timestamps back, compute a duration in minutes.
     #
     # If the min > max after clamping then we know the
-    # timestamps on the events fell outside of the time
+    # timestamps on the samples fell outside of the time
     # range we care about for the query, so treat them as
     # "invalid."
     #
@@ -624,7 +628,7 @@ def compute_max_resource_volume(resource, meter):
 
 @blueprint.route('/resources/<resource>/meters/<meter>/volume/sum')
 def compute_resource_volume_sum(resource, meter):
-    """Return the total volume for a meter.
+    """Return the sum of samples for a meter.
 
     :param resource: The ID of the resource.
     :param meter: The name of the meter.

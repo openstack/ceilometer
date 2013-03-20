@@ -40,7 +40,7 @@
    collector
      Software service running on the OpenStack infrastructure
      monitoring notifications from other OpenStack components and
-     meter events from the ceilometer agent and recording the results
+     samples from the ceilometer agent and recording the results
      in the database.
 
    compute agent

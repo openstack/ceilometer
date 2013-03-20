@@ -118,24 +118,24 @@ class Connection(base.Connection):
         """
         return []
 
-    def get_raw_events(self, event_filter):
-        """Return an iterable of raw event data as created by
+    def get_samples(self, event_filter):
+        """Return an iterable of samples as created by
         :func:`ceilometer.meter.meter_message_from_counter`.
         """
         return []
 
     def get_volume_sum(self, event_filter):
-        """Return the sum of the volume field for the events
+        """Return the sum of the volume field for the samples
         described by the query parameters.
         """
 
     def get_volume_max(self, event_filter):
-        """Return the maximum of the volume field for the events
+        """Return the maximum of the volume field for the samples
         described by the query parameters.
         """
 
     def get_event_interval(self, event_filter):
-        """Return the min and max timestamp for events
+        """Return the min and max timestamp for samples
         matching the event_filter.
         """
 
