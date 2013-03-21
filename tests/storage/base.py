@@ -878,3 +878,82 @@ class StatisticsTest(DBTestBase):
         assert results['max'] == 7
         assert results['sum'] == 18
         assert results['avg'] == 6
+
+
+class CounterDataTypeTest(DBTestBase):
+
+    def prepare_data(self):
+        c = counter.Counter(
+            'dummyBigCounter',
+            counter.TYPE_CUMULATIVE,
+            unit='',
+            volume=3372036854775807,
+            user_id='user-id',
+            project_id='project-id',
+            resource_id='resource-id',
+            timestamp=datetime.datetime(2012, 7, 2, 10, 40),
+            resource_metadata={}
+        )
+        msg = meter.meter_message_from_counter(
+            c,
+            cfg.CONF.metering_secret,
+            'test-1',
+        )
+
+        self.conn.record_metering_data(msg)
+
+        c = counter.Counter(
+            'dummySmallCounter',
+            counter.TYPE_CUMULATIVE,
+            unit='',
+            volume=-3372036854775807,
+            user_id='user-id',
+            project_id='project-id',
+            resource_id='resource-id',
+            timestamp=datetime.datetime(2012, 7, 2, 10, 40),
+            resource_metadata={}
+        )
+        msg = meter.meter_message_from_counter(
+            c,
+            cfg.CONF.metering_secret,
+            'test-1',
+        )
+        self.conn.record_metering_data(msg)
+
+        c = counter.Counter(
+            'floatCounter',
+            counter.TYPE_CUMULATIVE,
+            unit='',
+            volume=1938495037.53697,
+            user_id='user-id',
+            project_id='project-id',
+            resource_id='resource-id',
+            timestamp=datetime.datetime(2012, 7, 2, 10, 40),
+            resource_metadata={}
+        )
+        msg = meter.meter_message_from_counter(
+            c,
+            cfg.CONF.metering_secret,
+            'test-1',
+        )
+        self.conn.record_metering_data(msg)
+
+    def test_storage_can_handle_large_values(self):
+        f = storage.EventFilter(
+            meter='dummyBigCounter',
+        )
+        results = list(self.conn.get_samples(f))
+        self.assertEqual(results[0]['counter_volume'], 3372036854775807)
+
+        f = storage.EventFilter(
+            meter='dummySmallCounter',
+        )
+        results = list(self.conn.get_samples(f))
+        self.assertEqual(results[0]['counter_volume'], -3372036854775807)
+
+    def test_storage_can_handle_float_values(self):
+        f = storage.EventFilter(
+            meter='floatCounter',
+        )
+        results = list(self.conn.get_samples(f))
+        self.assertEqual(results[0]['counter_volume'], 1938495037.53697)

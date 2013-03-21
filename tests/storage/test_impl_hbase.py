@@ -177,6 +177,10 @@ class StatisticsTest(base.StatisticsTest, HBaseEngineTestBase):
     pass
 
 
+class CounterDataTypeTest(base.CounterDataTypeTest, HBaseEngineTestBase):
+    pass
+
+
 ###############
 # This is a very crude version of "in-memory HBase", which implements just
 # enough functionality of HappyBase API to support testing of our driver.

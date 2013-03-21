@@ -135,6 +135,10 @@ class StatisticsTest(base.StatisticsTest, SQLAlchemyEngineTestBase):
     pass
 
 
+class CounterDataTypeTest(base.CounterDataTypeTest, SQLAlchemyEngineTestBase):
+    pass
+
+
 def test_model_table_args():
     cfg.CONF.database_connection = 'mysql://localhost'
     assert table_args()

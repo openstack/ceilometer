@@ -22,7 +22,8 @@ import json
 import urlparse
 
 from oslo.config import cfg
-from sqlalchemy import Column, Integer, String, Table, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, Table, ForeignKey, DateTime, \
+    Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import TypeDecorator, VARCHAR
@@ -108,7 +109,7 @@ class Meter(Base):
     resource_metadata = Column(JSONEncodedDict)
     counter_type = Column(String(255))
     counter_unit = Column(String(255))
-    counter_volume = Column(Integer)
+    counter_volume = Column(Float(53))
     timestamp = Column(DateTime, default=timeutils.utcnow)
     message_signature = Column(String)
     message_id = Column(String)

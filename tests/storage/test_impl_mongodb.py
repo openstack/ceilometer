@@ -226,3 +226,7 @@ class CompatibilityTest(MongoDBEngineTestBase):
     def test_counter_unit(self):
         meters = list(self.conn.get_meters())
         self.assertEqual(len(meters), 1)
+
+
+class CounterDataTypeTest(base.CounterDataTypeTest, MongoDBEngineTestBase):
+    pass
