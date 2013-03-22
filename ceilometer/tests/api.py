@@ -30,8 +30,6 @@ import pecan.testing
 from ceilometer.api import acl
 from ceilometer.api.v1 import app as v1_app
 from ceilometer.api.v1 import blueprint as v1_blueprint
-from ceilometer import storage
-from ceilometer.tests import base
 from ceilometer.tests import db as db_test_base
 
 

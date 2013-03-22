@@ -1,8 +1,10 @@
 # -*- encoding: utf-8 -*-
 #
 # Copyright © 2012 New Dream Network, LLC (DreamHost)
+# Copyright © 2013 eNovance
 #
 # Author: Doug Hellmann <doug.hellmann@dreamhost.com>
+#         Julien Danjou <julien@danjou.info>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -20,7 +22,9 @@
 
 import copy
 import datetime
+import nose
 import operator
+import os
 import re
 import urlparse
 
@@ -125,6 +129,8 @@ def make_query_from_filter(event_filter, require_meter=True):
 class Connection(base.Connection):
     """MongoDB connection.
     """
+
+    _mim_instance = None
 
     # JavaScript function for doing map-reduce to get a counter volume
     # total.
@@ -240,7 +246,36 @@ class Connection(base.Connection):
     def __init__(self, conf):
         opts = self._parse_connection_url(conf.database_connection)
         LOG.info('connecting to MongoDB on %s:%s', opts['host'], opts['port'])
-        self.conn = self._get_connection(opts)
+
+        if opts['host'] == '__test__':
+            live_tests = bool(int(os.environ.get('CEILOMETER_TEST_LIVE', 0)))
+            if live_tests:
+                url = os.environ.get('CEILOMETER_TEST_MONGO_URL')
+                if not url:
+                    raise RuntimeError("CEILOMETER_TEST_LIVE is on, but "
+                                       "CEILOMETER_TEST_MONGO_URL "
+                                       "is not defined")
+                opts = self._parse_connection_url(url)
+                self.conn = pymongo.Connection(opts['host'],
+                                               opts['port'],
+                                               safe=True)
+            else:
+                # MIM will die if we have too many connections, so use a
+                # Singleton
+                if Connection._mim_instance is None:
+                    try:
+                        from ming import mim
+                    except ImportError:
+                        raise nose.SkipTest("Ming not found")
+                    LOG.debug('Creating a new MIM Connection object')
+                    Connection._mim_instance = mim.Connection()
+                self.conn = Connection._mim_instance
+                LOG.debug('Using MIM for test connection')
+        else:
+            self.conn = pymongo.Connection(opts['host'],
+                                           opts['port'],
+                                           safe=True)
+
         self.db = getattr(self.conn, opts['dbname'])
         if 'username' in opts:
             self.db.authenticate(opts['username'], opts['password'])
@@ -269,17 +304,13 @@ class Connection(base.Connection):
         pass
 
     def clear(self):
-        self.conn.drop_database(self.db)
-
-    def _get_connection(self, opts):
-        """Return a connection to the database.
-
-        .. note::
-
-          The tests use a subclass to override this and return an
-          in-memory connection.
-        """
-        return pymongo.Connection(opts['host'], opts['port'], safe=True)
+        if self._mim_instance is not None:
+            # Don't want to use drop_database() because
+            # may end up running out of spidermonkey instances.
+            # http://davisp.lighthouseapp.com/projects/26898/tickets/22
+            self.db.clear()
+        else:
+            self.conn.drop_database(self.db)
 
     def _parse_connection_url(self, url):
         opts = {}
@@ -592,3 +623,16 @@ class Connection(base.Connection):
             answer = results['results'][0]['value']
             return self._fix_interval_min_max(answer['min'], answer['max'])
         return (None, None)
+
+
+def require_map_reduce(conn):
+    """Raises SkipTest if the connection is using mim.
+    """
+    # NOTE(dhellmann): mim requires spidermonkey to implement the
+    # map-reduce functions, so if we can't import it then just
+    # skip these tests unless we aren't using mim.
+    try:
+        import spidermonkey
+    except BaseException:
+        if isinstance(conn.conn, mim.Connection):
+            raise nose.SkipTest('requires spidermonkey')

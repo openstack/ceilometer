@@ -53,11 +53,11 @@ from tests.storage import base
 
 from ceilometer.collector import meter
 from ceilometer import counter
-from ceilometer.storage.impl_test import require_map_reduce
+from ceilometer.storage.impl_mongodb import require_map_reduce
 
 
 class MongoDBEngineTestBase(base.DBTestBase):
-    database_connection = 'test://'
+    database_connection = 'mongodb://__test__'
 
 
 class IndexTest(MongoDBEngineTestBase):

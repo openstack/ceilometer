@@ -22,7 +22,7 @@ import datetime
 import logging
 
 from ceilometer.openstack.common import timeutils
-from ceilometer.storage import impl_test
+from ceilometer.storage import impl_mongodb
 from .base import FunctionalTest
 
 LOG = logging.getLogger(__name__)
@@ -50,7 +50,7 @@ class TestComputeDurationByResource(FunctionalTest):
         self.late2 = datetime.datetime(2012, 8, 29, 19, 0)
 
     def _stub_interval_func(self, func):
-        self.stubs.Set(impl_test.TestConnection,
+        self.stubs.Set(impl_mongodb.Connection,
                        'get_meter_statistics',
                        func)
 

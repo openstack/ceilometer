@@ -26,7 +26,7 @@ from ceilometer.collector import meter
 from ceilometer import counter
 
 from .base import FunctionalTest
-from ceilometer.storage.impl_test import require_map_reduce
+from ceilometer.storage.impl_mongodb import require_map_reduce
 
 
 class TestSumProjectVolume(FunctionalTest):

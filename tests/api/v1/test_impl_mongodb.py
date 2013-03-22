@@ -29,64 +29,64 @@ from . import max_resource_volume
 
 
 class TestListEvents(list_events.TestListEvents):
-    database_connection = 'test://'
+    database_connection = 'mongodb://__test__'
 
 
 class TestListEventsMetaQuery(list_events.TestListEventsMetaquery):
-    database_connection = 'test://'
+    database_connection = 'mongodb://__test__'
 
 
 class TestListEmptyMeters(list_meters.TestListEmptyMeters):
-    database_connection = 'test://'
+    database_connection = 'mongodb://__test__'
 
 
 class TestListMeters(list_meters.TestListMeters):
-    database_connection = 'test://'
+    database_connection = 'mongodb://__test__'
 
 
 class TestListMetersMetaquery(list_meters.TestListMetersMetaquery):
-    database_connection = 'test://'
+    database_connection = 'mongodb://__test__'
 
 
 class TestListEmptyUsers(list_users.TestListEmptyUsers):
-    database_connection = 'test://'
+    database_connection = 'mongodb://__test__'
 
 
 class TestListUsers(list_users.TestListUsers):
-    database_connection = 'test://'
+    database_connection = 'mongodb://__test__'
 
 
 class TestListEmptyProjects(list_projects.TestListEmptyProjects):
-    database_connection = 'test://'
+    database_connection = 'mongodb://__test__'
 
 
 class TestListProjects(list_projects.TestListProjects):
-    database_connection = 'test://'
+    database_connection = 'mongodb://__test__'
 
 
 class TestComputeDurationByResource(cdbr.TestComputeDurationByResource):
-    database_connection = 'test://'
+    database_connection = 'mongodb://__test__'
 
 
 class TestListEmptyResources(list_resources.TestListEmptyResources):
-    database_connection = 'test://'
+    database_connection = 'mongodb://__test__'
 
 
 class TestListResources(list_resources.TestListResources):
-    database_connection = 'test://'
+    database_connection = 'mongodb://__test__'
 
 
 class TestListResourcesMetaquery(list_resources.TestListResourcesMetaquery):
-    database_connection = 'test://'
+    database_connection = 'mongodb://__test__'
 
 
 class TestListSource(list_sources.TestListSource):
-    database_connection = 'test://'
+    database_connection = 'mongodb://__test__'
 
 
 class TestMaxProjectVolume(max_project_volume.TestMaxProjectVolume):
-    database_connection = 'test://'
+    database_connection = 'mongodb://__test__'
 
 
 class TestMaxProjectVolume(max_resource_volume.TestMaxResourceVolume):
-    database_connection = 'test://'
+    database_connection = 'mongodb://__test__'
