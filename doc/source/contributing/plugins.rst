@@ -77,10 +77,8 @@ from the hypervisor and sends back two ``Counter`` objects.  The first one, name
 "cpu", is of type "cumulative", meaning that between two polls, its value is
 not reset, or in other word that the cpu value is always provided as a duration
 that continuously increases since the creation of the instance. The second one,
-named "instance", is of type "cumulative", meaning that it's value is just the
-volume since the last poll. Here, the instance counter is only used as a way
-to tell the system that the instance is still running, hence the hard coded
-value of 1.
+named "cpu_util", is of type "gauge", meaning that its value is the percentage
+of cpu utilization.
 
 Note that the ``LOG`` method is only used as a debugging tool and does not
 participate in the actual metering activity.
