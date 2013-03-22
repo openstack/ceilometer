@@ -22,6 +22,7 @@ from . import list_events
 from . import list_meters
 from . import list_projects
 from . import list_resources
+from . import list_sources
 from . import list_users
 
 
@@ -74,4 +75,8 @@ class TestListResources(list_resources.TestListResources):
 
 
 class TestListResourcesMetaquery(list_resources.TestListResourcesMetaquery):
+    database_connection = 'test://'
+
+
+class TestListSource(list_sources.TestListSource):
     database_connection = 'test://'
