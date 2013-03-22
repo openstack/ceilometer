@@ -52,6 +52,8 @@ import hashlib
 import copy
 import datetime
 import happybase
+import os
+import re
 from collections import defaultdict
 
 from oslo.config import cfg
@@ -117,18 +119,60 @@ class Connection(base.Connection):
         '''
         opts = self._parse_connection_url(conf.database_connection)
         opts['table_prefix'] = conf.table_prefix
+
+        # This is a in-memory usage for unit tests
+        if opts['host'] == '__test__':
+            live_tests = bool(int(os.environ.get('CEILOMETER_TEST_LIVE', 0)))
+            if not live_tests:
+                self.conn = MConnection()
+                self.project = self.conn.table(self.PROJECT_TABLE)
+                self.user = self.conn.table(self.USER_TABLE)
+                self.resource = self.conn.table(self.RESOURCE_TABLE)
+                self.meter = self.conn.table(self.METER_TABLE)
+                return
+
+            # Export this variable before running tests against real HBase
+            # e.g. CEILOMETER_TEST_HBASE_URL=hbase://192.168.1.100:9090
+            url = os.environ.get('CEILOMETER_TEST_HBASE_URL')
+            if not url:
+                raise RuntimeError("CEILOMETER_TEST_LIVE is on, but "
+                                   "CEILOMETER_TEST_HBASE_URL is not defined")
+
+            # Reparse URL, but from the env variable now
+            opts = self._parse_connection_url(url)
+
         self.conn = self._get_connection(opts)
         self.conn.open()
-        self.project = self.conn.table('project')
-        self.user = self.conn.table('user')
-        self.resource = self.conn.table('resource')
-        self.meter = self.conn.table('meter')
+        self.project = self.conn.table(self.PROJECT_TABLE)
+        self.user = self.conn.table(self.USER_TABLE)
+        self.resource = self.conn.table(self.RESOURCE_TABLE)
+        self.meter = self.conn.table(self.METER_TABLE)
+
+    PROJECT_TABLE = "project"
+    USER_TABLE = "user"
+    RESOURCE_TABLE = "resource"
+    METER_TABLE = "meter"
 
     def upgrade(self, version=None):
-        pass
+        self.conn.create_table(self.PROJECT_TABLE, {'f': dict()})
+        self.conn.create_table(self.USER_TABLE, {'f': dict()})
+        self.conn.create_table(self.RESOURCE_TABLE, {'f': dict()})
+        self.conn.create_table(self.METER_TABLE, {'f': dict()})
 
     def clear(self):
-        pass
+        LOG.debug('Dropping HBase schema...')
+        for table in [self.PROJECT_TABLE,
+                      self.USER_TABLE,
+                      self.RESOURCE_TABLE,
+                      self.METER_TABLE]:
+            try:
+                self.conn.disable_table(table)
+            except:
+                LOG.debug('Cannot disable table but ignoring error')
+            try:
+                self.conn.delete_table(table)
+            except:
+                LOG.debug('Cannot delete table but ignoring error')
 
     @staticmethod
     def _get_connection(conf):
@@ -538,6 +582,120 @@ class Connection(base.Connection):
                     a_max = timestamp
 
         return a_min, a_max
+
+
+###############
+# This is a very crude version of "in-memory HBase", which implements just
+# enough functionality of HappyBase API to support testing of our driver.
+#
+class MTable(object):
+    """HappyBase.Table mock
+    """
+    def __init__(self, name, families):
+        self.name = name
+        self.families = families
+        self._rows = {}
+
+    def row(self, key):
+        return self._rows.get(key, {})
+
+    def rows(self, keys):
+        return ((k, self.row(k)) for k in keys)
+
+    def put(self, key, data):
+        self._rows[key] = data
+
+    def scan(self, filter=None, columns=[], row_start=None, row_stop=None):
+        sorted_keys = sorted(self._rows)
+        # copy data between row_start and row_stop into a dict
+        rows = {}
+        for row in sorted_keys:
+            if row_start and row < row_start:
+                continue
+            if row_stop and row > row_stop:
+                break
+            rows[row] = copy.copy(self._rows[row])
+        if columns:
+            ret = {}
+            for row in rows.keys():
+                data = rows[row]
+                for key in data:
+                    if key in columns:
+                        ret[row] = data
+            rows = ret
+        elif filter:
+            # TODO: we should really parse this properly, but at the moment we
+            # are only going to support AND here
+            filters = filter.split('AND')
+            for f in filters:
+                # Extract filter name and its arguments
+                g = re.search("(.*)\((.*),?\)", f)
+                fname = g.group(1).strip()
+                fargs = [s.strip().replace('\'', '').replace('\"', '')
+                         for s in g.group(2).split(',')]
+                m = getattr(self, fname)
+                if callable(m):
+                    # overwrite rows for filtering to take effect
+                    # in case of multiple filters
+                    rows = m(fargs, rows)
+                else:
+                    raise NotImplementedError("%s filter is not implemented, "
+                                              "you may want to add it!")
+        for k in sorted(rows):
+            yield k, rows[k]
+
+    def SingleColumnValueFilter(self, args, rows):
+        """This method is called from scan() when 'SingleColumnValueFilter'
+        is found in the 'filter' argument
+        """
+        op = args[2]
+        column = "%s:%s" % (args[0], args[1])
+        value = args[3]
+        if value.startswith('binary:'):
+            value = value[7:]
+        r = {}
+        for row in rows:
+            data = rows[row]
+
+            if op == '=':
+                if column in data and data[column] == value:
+                    r[row] = data
+            elif op == '<=':
+                if column in data and data[column] <= value:
+                    r[row] = data
+            elif op == '>=':
+                if column in data and data[column] >= value:
+                    r[row] = data
+            else:
+                raise NotImplementedError("In-memory "
+                                          "SingleColumnValueFilter "
+                                          "doesn't support the %s operation "
+                                          "yet" % op)
+        return r
+
+
+class MConnection(object):
+    """HappyBase.Connection mock
+    """
+    def __init__(self):
+        self.tables = {}
+
+    def open(self):
+        LOG.debug("Opening in-memory HBase connection")
+        return
+
+    def create_table(self, n, families={}):
+        if n in self.tables:
+            return self.tables[n]
+        t = MTable(n, families)
+        self.tables[n] = t
+        return t
+
+    def delete_table(self, name, use_prefix=True):
+        self.tables.remove(self.tables[name])
+
+    def table(self, name):
+        return self.create_table(name)
 
 
 #################################################

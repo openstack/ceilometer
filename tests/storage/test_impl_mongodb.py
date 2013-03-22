@@ -48,57 +48,26 @@
 
 import copy
 import datetime
-import mox
 
 from tests.storage import base
 
 from ceilometer.collector import meter
 from ceilometer import counter
-from ceilometer.storage.impl_test import TestConnection, require_map_reduce
-
-
-class MongoDBEngine(base.DBEngineBase):
-
-    DBNAME = 'testdb'
-
-    def tearDown(self):
-        self.conn.drop_database(self.DBNAME)
-        super(MongoDBEngine, self).tearDown()
-
-    def get_connection(self):
-        conf = mox.Mox().CreateMockAnything()
-        conf.database_connection = 'mongodb://localhost/%s' % self.DBNAME
-        self.conn = TestConnection(conf)
-        self.db = self.conn.conn[self.DBNAME]
-        return self.conn
-
-    def clean_up(self):
-        self.conn.clear()
-
-    def get_sources_by_project_id(self, id):
-        project = self.db.project.find_one({'_id': id})
-        return list(project['source'])
-
-    def get_sources_by_user_id(self, id):
-        user = self.db.user.find_one({'_id': id})
-        return list(user['source'])
+from ceilometer.storage.impl_test import require_map_reduce
 
 
 class MongoDBEngineTestBase(base.DBTestBase):
-
-    def get_engine(cls):
-        return MongoDBEngine()
+    database_connection = 'test://'
 
 
 class IndexTest(MongoDBEngineTestBase):
 
     def test_indexes_exist(self):
         # ensure_index returns none if index already exists
-        assert self.engine is not None
-        assert not self.engine.db.resource.ensure_index('foo',
-                                                        name='resource_idx')
-        assert not self.engine.db.meter.ensure_index('foo',
-                                                     name='meter_idx')
+        assert not self.conn.db.resource.ensure_index('foo',
+                                                      name='resource_idx')
+        assert not self.conn.db.meter.ensure_index('foo',
+                                                   name='meter_idx')
 
 
 class UserTest(base.UserTest, MongoDBEngineTestBase):

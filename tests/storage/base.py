@@ -28,58 +28,14 @@ from oslo.config import cfg
 from ceilometer.collector import meter
 from ceilometer import counter
 from ceilometer import storage
-from ceilometer.tests import base as test_base
+from ceilometer.tests import db as test_db
 
 
-class DBEngineBase(object):
+class DBTestBase(test_db.TestBase):
     __metaclass__ = abc.ABCMeta
-
-    @abc.abstractmethod
-    def get_connection(self):
-        """Return an open connection to the DB
-        """
-
-    @abc.abstractmethod
-    def clean_up(self):
-        """Clean up all resources allocated in get_connection()
-        """
-
-    @abc.abstractmethod
-    def get_sources_by_project_id(self, id):
-        """Return a list of source strings of the matching project.
-
-        :param id: id string value of the matching project.
-        """
-
-    @abc.abstractmethod
-    def get_sources_by_user_id(self, id):
-        """Return a list of source strings of the matching user.
-
-        :param id: id string value of the matching user.
-        """
-
-
-class DBTestBase(test_base.TestCase):
-    __metaclass__ = abc.ABCMeta
-
-    @classmethod
-    @abc.abstractmethod
-    def get_engine(cls):
-        '''Return an instance of the class which implements
-           the DBEngineTestBase abstract class
-        '''
-
-    def tearDown(self):
-        self.engine.clean_up()
-        self.conn = None
-        self.engine = None
-        super(DBTestBase, self).tearDown()
 
     def setUp(self):
         super(DBTestBase, self).setUp()
-        # TODO(jd) remove, use test_base.TestCase setUp to do that
-        self.engine = self.get_engine()
-        self.conn = self.engine.get_connection()
         self.prepare_data()
 
     def prepare_data(self):
@@ -162,22 +118,8 @@ class DBTestBase(test_base.TestCase):
             self.conn.record_metering_data(msg)
             self.msgs.append(msg)
 
-    def get_sources_by_user_id(self, id):
-        return self.engine.get_sources_by_user_id(id)
-
-    def get_sources_by_project_id(self, id):
-        return self.engine.get_sources_by_project_id(id)
-
 
 class UserTest(DBTestBase):
-
-    def test_new_user(self):
-        user_sources = self.get_sources_by_user_id('user-id')
-        assert user_sources != []
-
-    def test_new_user_source(self):
-        user_sources = self.get_sources_by_user_id('user-id')
-        assert set(user_sources) == set(['test-1', 'test-2'])
 
     def test_get_users(self):
         users = self.conn.get_users()
@@ -193,14 +135,6 @@ class UserTest(DBTestBase):
 
 
 class ProjectTest(DBTestBase):
-
-    def test_new_project(self):
-        project_sources = self.get_sources_by_project_id('project-id')
-        assert list(project_sources) != []
-
-    def test_new_project_source(self):
-        project_sources = self.get_sources_by_project_id('project-id')
-        assert set(project_sources) == set(['test-1', 'test-2', 'test-3'])
 
     def test_get_projects(self):
         projects = self.conn.get_projects()
