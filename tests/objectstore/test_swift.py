@@ -23,6 +23,8 @@ from ceilometer.central import manager
 from ceilometer.objectstore import swift
 from ceilometer.tests import base
 
+from keystoneclient import exceptions
+
 ACCOUNTS = [('tenant-000', {'x-account-object-count': 12,
                             'x-account-bytes-used': 321321321,
                             'x-account-container-count': 7,
@@ -37,10 +39,14 @@ class TestManager(manager.AgentManager):
 
     def __init__(self):
         super(TestManager, self).__init__()
-        self.keystone = None
+        self.keystone = mock.MagicMock()
 
 
 class TestSwiftPollster(base.TestCase):
+
+    @staticmethod
+    def fake_ks_service_catalog_url_for(*args, **kwargs):
+        raise exceptions.EndpointNotFound("Fake keystone exception")
 
     @staticmethod
     def fake_iter_accounts(self, ksclient):
@@ -52,14 +58,22 @@ class TestSwiftPollster(base.TestCase):
         super(TestSwiftPollster, self).setUp()
         self.pollster = swift.SwiftPollster()
         self.manager = TestManager()
-        self.stubs.Set(swift.SwiftPollster, 'iter_accounts',
-                       self.fake_iter_accounts)
 
     def test_objectstore_metering(self):
+        self.stubs.Set(swift.SwiftPollster, 'iter_accounts',
+                       self.fake_iter_accounts)
         counters = list(self.pollster.get_counters(self.manager))
         self.assertEqual(len(counters), 6)
 
     def test_objectstore_get_counter_names(self):
+        self.stubs.Set(swift.SwiftPollster, 'iter_accounts',
+                       self.fake_iter_accounts)
         counters = list(self.pollster.get_counters(self.manager))
         self.assertEqual(set([c.name for c in counters]),
                          set(self.pollster.get_counter_names()))
+
+    def test_objectstore_endpoint_notfound(self):
+        self.stubs.Set(self.manager.keystone.service_catalog, 'url_for',
+                       self.fake_ks_service_catalog_url_for)
+        counters = list(self.pollster.get_counters(self.manager))
+        self.assertEqual(len(counters), 0)

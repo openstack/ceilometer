@@ -24,6 +24,7 @@ import abc
 
 from oslo.config import cfg
 from swiftclient import client as swift
+from keystoneclient import exceptions
 
 from ceilometer import counter
 from ceilometer.openstack.common import log
@@ -101,9 +102,14 @@ class SwiftPollster(_Base):
 
     @staticmethod
     def iter_accounts(ksclient):
-        endpoint = ksclient.service_catalog.url_for(
-            service_type='object-store',
-            endpoint_type='adminURL')
+        try:
+            endpoint = ksclient.service_catalog.url_for(
+                service_type='object-store',
+                endpoint_type='adminURL')
+        except exceptions.EndpointNotFound:
+            LOG.debug(_("Swift endpoint not found"))
+            return
+
         base_url = '%s/v1/%s' % (endpoint, cfg.CONF.reseller_prefix)
         for t in ksclient.tenants.list():
             yield (t.id, swift.head_account('%s%s' % (base_url, t.id),
