@@ -88,7 +88,7 @@ def show_raw(db, args):
         print u
         for resource in db.get_resources(user=u):
             print '  ', resource['resource_id']
-            for event in db.get_raw_events(storage.EventFilter(
+            for event in db.get_samples(storage.EventFilter(
                     user=u,
                     resource=resource['resource_id'],
                     )):

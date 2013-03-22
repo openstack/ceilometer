@@ -120,14 +120,14 @@ class Connection(object):
         """
 
     @abc.abstractmethod
-    def get_raw_events(self, event_filter):
-        """Return an iterable of raw event data as created by
+    def get_samples(self, event_filter):
+        """Return an iterable of samples as created by
         :func:`ceilometer.meter.meter_message_from_counter`.
         """
 
     @abc.abstractmethod
     def get_volume_sum(self, event_filter):
-        """Return the sum of the volume field for the events
+        """Return the sum of the volume field for the samples
         described by the query parameters.
 
         The filter must have a meter value set.
@@ -139,7 +139,7 @@ class Connection(object):
 
     @abc.abstractmethod
     def get_volume_max(self, event_filter):
-        """Return the maximum of the volume field for the events
+        """Return the maximum of the volume field for the samples
         described by the query parameters.
 
         The filter must have a meter value set.
@@ -151,8 +151,8 @@ class Connection(object):
 
     @abc.abstractmethod
     def get_event_interval(self, event_filter):
-        """Return the min and max timestamps from events,
-        using the event_filter to limit the events seen.
+        """Return the min and max timestamps from samples,
+        using the event_filter to limit the samples seen.
 
         ( datetime.datetime(), datetime.datetime() )
         """

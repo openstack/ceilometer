@@ -301,7 +301,7 @@ class Connection(base.Connection):
         resource_ids = {}
         if start_timestamp or end_timestamp:
             # Look for resources matching the above criteria and with
-            # events in the time range we care about, then change the
+            # samples in the time range we care about, then change the
             # resource query to return just those resources by id.
             g = self.meter.scan(filter=q, row_start=start_row,
                                 row_stop=end_row)
@@ -381,8 +381,8 @@ class Connection(base.Connection):
                  }
             yield m
 
-    def get_raw_events(self, event_filter):
-        """Return an iterable of raw event data as created by
+    def get_samples(self, event_filter):
+        """Return an iterable of samples as created by
         :func:`ceilometer.meter.meter_message_from_counter`.
         """
         q, start, stop = make_query_from_filter(event_filter,
@@ -494,7 +494,7 @@ class Connection(base.Connection):
         return list(results)
 
     def get_volume_sum(self, event_filter):
-        """Return the sum of the volume field for the events
+        """Return the sum of the volume field for the samples
         described by the query parameters.
         """
         q, start, stop = make_query_from_filter(event_filter)
@@ -509,7 +509,7 @@ class Connection(base.Connection):
                 for (k, v) in results.iteritems())
 
     def get_volume_max(self, event_filter):
-        """Return the maximum of the volume field for the events
+        """Return the maximum of the volume field for the samples
         described by the query parameters.
         """
 
@@ -525,8 +525,8 @@ class Connection(base.Connection):
                 for (k, v) in results.iteritems())
 
     def get_event_interval(self, event_filter):
-        """Return the min and max timestamps from events,
-        using the event_filter to limit the events seen.
+        """Return the min and max timestamps from samples,
+        using the event_filter to limit the samples seen.
 
         ( datetime.datetime(), datetime.datetime() )
         """

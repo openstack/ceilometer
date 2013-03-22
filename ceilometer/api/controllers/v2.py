@@ -322,7 +322,7 @@ class Statistics(wtypes.Base):
         # If we got valid timestamps back, compute a duration in minutes.
         #
         # If the min > max after clamping then we know the
-        # timestamps on the events fell outside of the time
+        # timestamps on the samples fell outside of the time
         # range we care about for the query, so treat them as
         # "invalid."
         #
@@ -365,7 +365,7 @@ class MeterController(rest.RestController):
 
     @wsme_pecan.wsexpose([Sample], [Query])
     def get_all(self, q=[]):
-        """Return sample data for the meter.
+        """Return samples for the meter.
 
         :param q: Filter rules for the data to be returned.
         """
@@ -373,12 +373,12 @@ class MeterController(rest.RestController):
         kwargs['meter'] = self._id
         f = storage.EventFilter(**kwargs)
         return [Sample(**e)
-                for e in pecan.request.storage_conn.get_raw_events(f)
+                for e in pecan.request.storage_conn.get_samples(f)
                 ]
 
     @wsme_pecan.wsexpose([Statistics], [Query], int)
     def statistics(self, q=[], period=None):
-        """Computes the statistics of the meter events in the time range given.
+        """Computes the statistics of the samples in the time range given.
 
         :param q: Filter rules for the data to be returned.
         :param period: Returned result will be an array of statistics for a
