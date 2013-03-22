@@ -21,7 +21,12 @@ This driver is based on MIM, an in-memory version of MongoDB.
 """
 
 import os
-from ming import mim
+import nose
+
+try:
+    from ming import mim
+except ImportError:
+    mim = None
 
 from ceilometer.openstack.common import log as logging
 
@@ -103,6 +108,22 @@ class TestConnection(impl_mongodb.Connection):
             # MIM will die if we have too many connections, so use a
             # Singleton
             if TestConnection._mim_instance is None:
-                LOG.debug('Creating a new MIM Connection object')
-                TestConnection._mim_instance = mim.Connection()
+                if mim:
+                    LOG.debug('Creating a new MIM Connection object')
+                    TestConnection._mim_instance = mim.Connection()
+                else:
+                    raise nose.SkipTest("Ming not found")
             return TestConnection._mim_instance
+
+
+def require_map_reduce(conn):
+    """Raises SkipTest if the connection is using mim.
+    """
+    # NOTE(dhellmann): mim requires spidermonkey to implement the
+    # map-reduce functions, so if we can't import it then just
+    # skip these tests unless we aren't using mim.
+    try:
+        import spidermonkey
+    except BaseException:
+        if isinstance(conn.conn, mim.Connection):
+            raise skip.SkipTest('requires spidermonkey')

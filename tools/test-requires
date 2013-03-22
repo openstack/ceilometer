@@ -7,7 +7,7 @@ Babel>=0.9.6
 # NOTE(dhellmann): Ming is necessary to provide the Mongo-in-memory
 # implementation of MongoDB.
 # NOTE(jd): the support for finalize in map reduce in MIM is not yet merged
-git+http://git.naquadah.org/git/~jd/merciless.git#egg=Ming
+# git+http://git.naquadah.org/git/~jd/merciless.git#egg=Ming
 http://tarballs.openstack.org/nova/nova-master.tar.gz
 http://tarballs.openstack.org/glance/glance-master.tar.gz
 setuptools-git>=0.4
