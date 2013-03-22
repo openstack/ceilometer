@@ -25,6 +25,7 @@ import list_resources
 import list_sources
 import list_users
 import max_project_volume
+import max_resource_volume
 
 
 class TestListEvents(list_events.TestListEvents):
@@ -72,4 +73,8 @@ class TestListSource(list_sources.TestListSource):
 
 
 class TestMaxProjectVolume(max_project_volume.TestMaxProjectVolume):
+    database_connection = 'sqlite://'
+
+
+class TestMaxResourceVolume(max_resource_volume.TestMaxResourceVolume):
     database_connection = 'sqlite://'

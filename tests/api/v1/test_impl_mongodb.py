@@ -25,6 +25,7 @@ from . import list_resources
 from . import list_sources
 from . import list_users
 from . import max_project_volume
+from . import max_resource_volume
 
 
 class TestListEvents(list_events.TestListEvents):
@@ -84,4 +85,8 @@ class TestListSource(list_sources.TestListSource):
 
 
 class TestMaxProjectVolume(max_project_volume.TestMaxProjectVolume):
+    database_connection = 'test://'
+
+
+class TestMaxProjectVolume(max_resource_volume.TestMaxResourceVolume):
     database_connection = 'test://'
