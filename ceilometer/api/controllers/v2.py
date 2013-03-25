@@ -194,9 +194,11 @@ def _flatten_metadata(metadata):
     """Return flattened resource metadata without nested structures
     and with all values converted to unicode strings.
     """
-    return dict((k, unicode(v))
-                for k, v in metadata.iteritems()
-                if type(v) not in set([list, dict, set]))
+    if metadata:
+        return dict((k, unicode(v))
+                    for k, v in metadata.iteritems()
+                    if type(v) not in set([list, dict, set]))
+    return {}
 
 
 class Sample(wtypes.Base):
