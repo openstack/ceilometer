@@ -20,8 +20,6 @@ from __future__ import absolute_import
 
 import copy
 import datetime
-import math
-
 from sqlalchemy import func
 
 from ceilometer.openstack.common import log
@@ -398,7 +396,7 @@ class Connection(base.Connection):
 
     @staticmethod
     def _stats_result_to_dict(result, period, period_start, period_end):
-        return {'count': result.count,
+        return {'count': int(result.count),
                 'min': result.min,
                 'max': result.max,
                 'avg': result.avg,
@@ -431,7 +429,8 @@ class Connection(base.Connection):
           }
         """
 
-        res = self._make_stats_query(event_filter).all()[0]
+        if not period or not event_filter.start or not event_filter.end:
+            res = self._make_stats_query(event_filter).all()[0]
 
         if not period:
             return [self._stats_result_to_dict(res, 0, res.tsmin, res.tsmax)]
@@ -443,21 +442,23 @@ class Connection(base.Connection):
         # stats by period. We would like to use GROUP BY, but there's no
         # portable way to manipulate timestamp in SQL, so we can't.
         results = []
-        for i in range(int(math.ceil(
-                timeutils.delta_seconds(event_filter.start or res.tsmin,
-                                        event_filter.end or res.tsmax)
-                / float(period)))):
-            period_start = (event_filter.start
-                            + datetime.timedelta(seconds=i * period))
-            period_end = period_start + datetime.timedelta(seconds=period)
+        for period_start, period_end in base.iter_period(
+                event_filter.start or res.tsmin,
+                event_filter.end or res.tsmax,
+                period):
             q = query.filter(Meter.timestamp >= period_start)
             q = q.filter(Meter.timestamp < period_end)
-            results.append(self._stats_result_to_dict(
-                result=q.all()[0],
-                period=int(timeutils.delta_seconds(period_start, period_end)),
-                period_start=period_start,
-                period_end=period_end,
-            ))
+            r = q.all()[0]
+            # Don't add results that didn't have any event
+            if r.count:
+                results.append(self._stats_result_to_dict(
+                    result=r,
+                    period=int(timeutils.delta_seconds(period_start,
+                                                       period_end)),
+                    period_start=period_start,
+                    period_end=period_end,
+                ))
+
         return results
 
 

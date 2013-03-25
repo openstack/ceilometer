@@ -822,6 +822,33 @@ class StatisticsTest(DBTestBase):
         self.assertEqual(r['duration_end'],
                          datetime.datetime(2012, 9, 25, 11, 31))
 
+    def test_by_user_period_start_end(self):
+        f = storage.EventFilter(
+            user='user-5',
+            meter='volume.size',
+            start='2012-09-25T10:28:00',
+            end='2012-09-25T11:28:00',
+        )
+        results = self.conn.get_meter_statistics(f, period=1800)
+        self.assertEqual(len(results), 1)
+        r = results[0]
+        self.assertEqual(r['period_start'],
+                         datetime.datetime(2012, 9, 25, 10, 28))
+        self.assertEqual(r['count'], 1)
+        self.assertEqual(r['avg'], 8)
+        self.assertEqual(r['min'], 8)
+        self.assertEqual(r['max'], 8)
+        self.assertEqual(r['sum'], 8)
+        self.assertEqual(r['period'], 1800)
+        self.assertEqual(r['period_end'],
+                         r['period_start']
+                         + datetime.timedelta(seconds=1800))
+        self.assertEqual(r['duration'], 0)
+        self.assertEqual(r['duration_start'],
+                         datetime.datetime(2012, 9, 25, 10, 30))
+        self.assertEqual(r['duration_end'],
+                         datetime.datetime(2012, 9, 25, 10, 30))
+
     def test_by_project(self):
         f = storage.EventFilter(
             meter='volume.size',
