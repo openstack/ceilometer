@@ -28,7 +28,7 @@ NOTIFICATION_VOLUME_EXISTS = {
                  u'audit_period_ending': u'2012-09-21 00:00:00',
                  u'user_id': u'4d2fa4b76a4a4ecab8c468c8dea42f89',
                  u'launched_at': u'2012-09-20 15:05:23',
-                 u'size': 1},
+                 u'size': 2},
     u'priority': u'INFO'
 }
 
@@ -57,16 +57,26 @@ NOTIFICATION_VOLUME_DELETE = {
                  u'volume_id': u'3b761164-84b4-4eb3-8fcb-1974c641d6ef',
                  u'user_id': u'4d2fa4b76a4a4ecab8c468c8dea42f89',
                  u'launched_at': u'2012-09-21 10:10:50',
-                 u'size': 1},
+                 u'size': 3},
     u'priority': u'INFO'}
 
 
 class TestNotifications(unittest.TestCase):
+
+    def _verify_common_counter(self, c, name, notification):
+        self.assertFalse(c is None)
+        self.assertEqual(c.name, name)
+        self.assertEqual(c.resource_id, notification['payload']['volume_id'])
+        self.assertEqual(c.timestamp, notification['timestamp'])
+        metadata = c.resource_metadata
+        self.assertEquals(metadata.get('host'), notification['publisher_id'])
+
     def test_volume_exists(self):
         v = notifications.Volume()
         counters = v.process_notification(NOTIFICATION_VOLUME_EXISTS)
         self.assertEqual(len(counters), 1)
         c = counters[0]
+        self._verify_common_counter(c, 'volume', NOTIFICATION_VOLUME_EXISTS)
         self.assertEqual(c.volume, 1)
 
     def test_volume_size_exists(self):
@@ -74,20 +84,25 @@ class TestNotifications(unittest.TestCase):
         counters = v.process_notification(NOTIFICATION_VOLUME_EXISTS)
         self.assertEqual(len(counters), 1)
         c = counters[0]
+        self._verify_common_counter(c, 'volume.size',
+                                    NOTIFICATION_VOLUME_EXISTS)
         self.assertEqual(c.volume,
                          NOTIFICATION_VOLUME_EXISTS['payload']['size'])
 
     def test_volume_delete(self):
         v = notifications.Volume()
-        counters = v.process_notification(NOTIFICATION_VOLUME_EXISTS)
+        counters = v.process_notification(NOTIFICATION_VOLUME_DELETE)
         self.assertEqual(len(counters), 1)
         c = counters[0]
+        self._verify_common_counter(c, 'volume', NOTIFICATION_VOLUME_DELETE)
         self.assertEqual(c.volume, 1)
 
     def test_volume_size_delete(self):
         v = notifications.VolumeSize()
-        counters = v.process_notification(NOTIFICATION_VOLUME_EXISTS)
+        counters = v.process_notification(NOTIFICATION_VOLUME_DELETE)
         self.assertEqual(len(counters), 1)
         c = counters[0]
+        self._verify_common_counter(c, 'volume.size',
+                                    NOTIFICATION_VOLUME_DELETE)
         self.assertEqual(c.volume,
-                         NOTIFICATION_VOLUME_EXISTS['payload']['size'])
+                         NOTIFICATION_VOLUME_DELETE['payload']['size'])
