@@ -27,7 +27,7 @@ from ceilometer.collector import meter
 from ceilometer import counter
 
 from ceilometer.tests import api as tests_api
-from ceilometer.tests.db import require_map_reduce
+from ceilometer.storage.impl_test import require_map_reduce
 
 
 class TestSumProjectVolume(tests_api.TestBase):

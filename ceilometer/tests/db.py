@@ -20,7 +20,6 @@
 
 """Base classes for API tests."""
 
-from ming import mim
 from nose.plugins import skip
 from oslo.config import cfg
 
@@ -43,16 +42,3 @@ class TestBase(test_base.TestCase):
         self.conn = storage.get_connection(cfg.CONF)
         self.conn.upgrade()
         self.conn.clear()
-
-
-def require_map_reduce(conn):
-    """Raises SkipTest if the connection is using mim.
-    """
-    # NOTE(dhellmann): mim requires spidermonkey to implement the
-    # map-reduce functions, so if we can't import it then just
-    # skip these tests unless we aren't using mim.
-    try:
-        import spidermonkey
-    except BaseException:
-        if isinstance(conn.conn, mim.Connection):
-            raise skip.SkipTest('requires spidermonkey')
