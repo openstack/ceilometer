@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 #
 # Author: John Tran <jhtran@att.com>
+#         Julien Danjou <julien@danjou.info>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -19,6 +20,7 @@
 from __future__ import absolute_import
 
 import copy
+import os
 from sqlalchemy import func
 
 from ceilometer.openstack.common import log
@@ -125,9 +127,11 @@ class Connection(base.Connection):
     """SqlAlchemy connection."""
 
     def __init__(self, conf):
-        LOG.info('connecting to %s', conf.database_connection)
-        self.session = self._get_connection(conf)
-        return
+        url = conf.database_connection
+        if url == 'sqlite://':
+            url = os.environ.get('CEILOMETER_TEST_SQL_URL', url)
+        LOG.info('connecting to %s', url)
+        self.session = sqlalchemy_session.get_session(url, conf)
 
     def upgrade(self, version=None):
         migration.db_sync(self.session.get_bind(), version=version)
@@ -136,10 +140,6 @@ class Connection(base.Connection):
         engine = self.session.get_bind()
         for table in reversed(Base.metadata.sorted_tables):
             engine.execute(table.delete())
-
-    def _get_connection(self, conf):
-        """Return a connection to the database."""
-        return sqlalchemy_session.get_session()
 
     def record_metering_data(self, data):
         """Write the data to the backend storage system.
@@ -205,7 +205,7 @@ class Connection(base.Connection):
 
         :param source: Optional source filter.
         """
-        query = model_query(User.id, session=self.session)
+        query = self.session.query(User.id)
         if source is not None:
             query = query.filter(User.sources.any(id=source))
         return (x[0] for x in query.all())
@@ -215,7 +215,7 @@ class Connection(base.Connection):
 
         :param source: Optional source filter.
         """
-        query = model_query(Project.id, session=self.session)
+        query = self.session.query(Project.id)
         if source:
             query = query.filter(Project.sources.any(id=source))
         return (x[0] for x in query.all())
@@ -241,8 +241,7 @@ class Connection(base.Connection):
         :param metaquery: Optional dict with metadata to match on.
         :param resource: Optional resource filter.
         """
-        query = model_query(Meter,
-                            session=self.session).group_by(Meter.resource_id)
+        query = self.session.query(Meter,).group_by(Meter.resource_id)
         if user is not None:
             query = query.filter(Meter.user_id == user)
         if source is not None:
@@ -293,7 +292,7 @@ class Connection(base.Connection):
         :param source: Optional source filter.
         :param metaquery: Optional dict with metadata to match on.
         """
-        query = model_query(Resource, session=self.session)
+        query = self.session.query(Resource)
         if user is not None:
             query = query.filter(Resource.user_id == user)
         if source is not None:
@@ -326,7 +325,7 @@ class Connection(base.Connection):
         """Return an iterable of samples as created by
         :func:`ceilometer.meter.meter_message_from_counter`.
         """
-        query = model_query(Meter, session=self.session)
+        query = self.session.query(Meter)
         query = make_query_from_filter(query, event_filter,
                                        require_meter=False)
         samples = query.all()
@@ -346,7 +345,7 @@ class Connection(base.Connection):
 
     def _make_volume_query(self, event_filter, counter_volume_func):
         """Returns complex Meter counter_volume query for max and sum."""
-        subq = model_query(Meter.id, session=self.session)
+        subq = self.session.query(Meter.id)
         subq = make_query_from_filter(subq, event_filter, require_meter=False)
         subq = subq.subquery()
         mainq = self.session.query(Resource.id, counter_volume_func)
@@ -456,16 +455,6 @@ class Connection(base.Connection):
                 ))
 
         return results
-
-
-def model_query(*args, **kwargs):
-    """Query helper.
-
-    :param session: if present, the session to use
-    """
-    session = kwargs.get('session') or sqlalchemy_session.get_session()
-    query = session.query(*args)
-    return query
 
 
 def row2dict(row, srcflag=False):

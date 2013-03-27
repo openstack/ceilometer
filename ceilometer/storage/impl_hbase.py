@@ -120,26 +120,19 @@ class Connection(base.Connection):
         opts = self._parse_connection_url(conf.database_connection)
         opts['table_prefix'] = conf.table_prefix
 
-        # This is a in-memory usage for unit tests
         if opts['host'] == '__test__':
-            live_tests = bool(int(os.environ.get('CEILOMETER_TEST_LIVE', 0)))
-            if not live_tests:
+            url = os.environ.get('CEILOMETER_TEST_HBASE_URL')
+            if url:
+                # Reparse URL, but from the env variable now
+                opts = self._parse_connection_url(url)
+            else:
+                # This is a in-memory usage for unit tests
                 self.conn = MConnection()
                 self.project = self.conn.table(self.PROJECT_TABLE)
                 self.user = self.conn.table(self.USER_TABLE)
                 self.resource = self.conn.table(self.RESOURCE_TABLE)
                 self.meter = self.conn.table(self.METER_TABLE)
                 return
-
-            # Export this variable before running tests against real HBase
-            # e.g. CEILOMETER_TEST_HBASE_URL=hbase://192.168.1.100:9090
-            url = os.environ.get('CEILOMETER_TEST_HBASE_URL')
-            if not url:
-                raise RuntimeError("CEILOMETER_TEST_LIVE is on, but "
-                                   "CEILOMETER_TEST_HBASE_URL is not defined")
-
-            # Reparse URL, but from the env variable now
-            opts = self._parse_connection_url(url)
 
         self.conn = self._get_connection(opts)
         self.conn.open()

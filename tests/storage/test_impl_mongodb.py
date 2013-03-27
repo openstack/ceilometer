@@ -42,7 +42,7 @@
     pip install python-spidermonkey
 
   To run the tests *without* mim, set the environment variable
-  CEILOMETER_TEST_LIVE=1 before running tox.
+  CEILOMETER_TEST_MONGODB_URL to a MongoDB URL before running tox.
 
 """
 
