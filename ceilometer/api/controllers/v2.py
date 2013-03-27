@@ -49,7 +49,14 @@ LOG = log.getLogger(__name__)
 operation_kind = wtypes.Enum(str, 'lt', 'le', 'eq', 'ne', 'ge', 'gt')
 
 
-class Query(wtypes.Base):
+class _Base(wtypes.Base):
+
+    @classmethod
+    def from_db_model(cls, m):
+        return cls(**(m.as_dict()))
+
+
+class Query(_Base):
     """Query filter.
     """
 
@@ -201,7 +208,7 @@ def _flatten_metadata(metadata):
     return {}
 
 
-class Sample(wtypes.Base):
+class Sample(_Base):
     """A single measurement for a given meter and resource.
     """
 
@@ -266,7 +273,7 @@ class Sample(wtypes.Base):
                    )
 
 
-class Statistics(wtypes.Base):
+class Statistics(_Base):
     """Computed statistics for a query.
     """
 
@@ -374,7 +381,7 @@ class MeterController(rest.RestController):
         kwargs = _query_to_kwargs(q, storage.EventFilter.__init__)
         kwargs['meter'] = self._id
         f = storage.EventFilter(**kwargs)
-        return [Sample(**e)
+        return [Sample.from_db_model(e)
                 for e in pecan.request.storage_conn.get_samples(f)
                 ]
 
@@ -391,6 +398,7 @@ class MeterController(rest.RestController):
         kwargs['meter'] = self._id
         f = storage.EventFilter(**kwargs)
         computed = pecan.request.storage_conn.get_meter_statistics(f, period)
+        LOG.debug('computed value coming from %r', pecan.request.storage_conn)
         # Find the original timestamp in the query to use for clamping
         # the duration returned in the statistics.
         start = end = None
@@ -402,11 +410,11 @@ class MeterController(rest.RestController):
 
         return [Statistics(start_timestamp=start,
                            end_timestamp=end,
-                           **c)
+                           **c.as_dict())
                 for c in computed]
 
 
-class Meter(wtypes.Base):
+class Meter(_Base):
     """One category of measurements.
     """
 
@@ -454,11 +462,11 @@ class MetersController(rest.RestController):
         :param q: Filter rules for the meters to be returned.
         """
         kwargs = _query_to_kwargs(q, pecan.request.storage_conn.get_meters)
-        return [Meter(**m)
+        return [Meter.from_db_model(m)
                 for m in pecan.request.storage_conn.get_meters(**kwargs)]
 
 
-class Resource(wtypes.Base):
+class Resource(_Base):
     """An externally defined object for which samples have been received.
     """
 
@@ -503,7 +511,7 @@ class ResourcesController(rest.RestController):
         """
         r = list(pecan.request.storage_conn.get_resources(
                  resource=resource_id))[0]
-        return Resource(**r)
+        return Resource.from_db_model(r)
 
     @wsme_pecan.wsexpose([Resource], [Query])
     def get_all(self, q=[]):
@@ -513,7 +521,7 @@ class ResourcesController(rest.RestController):
         """
         kwargs = _query_to_kwargs(q, pecan.request.storage_conn.get_resources)
         resources = [
-            Resource(**r)
+            Resource.from_db_model(r)
             for r in pecan.request.storage_conn.get_resources(**kwargs)]
         return resources
 

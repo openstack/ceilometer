@@ -23,6 +23,7 @@ import logging
 
 from ceilometer.openstack.common import timeutils
 from ceilometer.storage import impl_mongodb
+from ceilometer.storage import models
 from .base import FunctionalTest
 
 LOG = logging.getLogger(__name__)
@@ -58,13 +59,26 @@ class TestComputeDurationByResource(FunctionalTest):
         def get_interval(ignore_self, event_filter, period):
             assert event_filter.start
             assert event_filter.end
-            if (event_filter.start > end
-                or event_filter.end < start):
+            if (event_filter.start > end or event_filter.end < start):
                 return []
-            return [{'count': 0,
-                     # ...
-                     'duration_start': max(event_filter.start, start),
-                     'duration_end': min(event_filter.end, end)}]
+            duration_start = max(event_filter.start, start)
+            duration_end = min(event_filter.end, end)
+            duration = timeutils.delta_seconds(duration_start, duration_end)
+            return [
+                models.Statistics(
+                    min=0,
+                    max=0,
+                    avg=0,
+                    sum=0,
+                    count=0,
+                    period=None,
+                    period_start=None,
+                    period_end=None,
+                    duration=duration,
+                    duration_start=duration_start,
+                    duration_end=duration_end,
+                )
+            ]
         self._stub_interval_func(get_interval)
 
     def _invoke_api(self):
@@ -124,14 +138,21 @@ class TestComputeDurationByResource(FunctionalTest):
 
     def test_without_end_timestamp(self):
         def get_interval(ignore_self, event_filter, period):
-            return [{'count': 0,
-                     'min': None,
-                     'max': None,
-                     'avg': None,
-                     'qty': None,
-                     'duration': None,
-                     'duration_start': self.late1,
-                     'duration_end': self.late2}]
+            return [
+                models.Statistics(
+                    count=0,
+                    min=None,
+                    max=None,
+                    avg=None,
+                    duration=None,
+                    duration_start=self.late1,
+                    duration_end=self.late2,
+                    sum=0,
+                    period=None,
+                    period_start=None,
+                    period_end=None,
+                )
+            ]
         self._stub_interval_func(get_interval)
         data = self.get_json('/meters/instance:m1.tiny/statistics',
                              q=[{'field': 'timestamp',
@@ -146,14 +167,22 @@ class TestComputeDurationByResource(FunctionalTest):
 
     def test_without_start_timestamp(self):
         def get_interval(ignore_self, event_filter, period):
-            return [{'count': 0,
-                     'min': None,
-                     'max': None,
-                     'avg': None,
-                     'qty': None,
-                     'duration': None,
-                     'duration_start': self.early1,
-                     'duration_end': self.early2}]
+            return [
+                models.Statistics(
+                    count=0,
+                    min=None,
+                    max=None,
+                    avg=None,
+                    duration=None,
+                    duration_start=self.early1,
+                    duration_end=self.early2,
+                    #
+                    sum=0,
+                    period=None,
+                    period_start=None,
+                    period_end=None,
+                )
+            ]
             return (self.early1, self.early2)
         self._stub_interval_func(get_interval)
         data = self.get_json('/meters/instance:m1.tiny/statistics',

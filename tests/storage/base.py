@@ -29,6 +29,7 @@ from ceilometer.collector import meter
 from ceilometer import counter
 from ceilometer import storage
 from ceilometer.tests import db as test_db
+from ceilometer.storage import models
 
 
 class DBTestBase(test_db.TestBase):
@@ -153,17 +154,14 @@ class ResourceTest(DBTestBase):
         resources = list(self.conn.get_resources())
         assert len(resources) == 4
         for resource in resources:
-            if resource['resource_id'] != 'resource-id':
+            if resource.resource_id != 'resource-id':
                 continue
-            assert resource['resource_id'] == 'resource-id'
-            assert resource['project_id'] == 'project-id'
-            assert resource['user_id'] == 'user-id'
-            assert resource['metadata']['display_name'] == 'test-server'
-            foo = map(lambda x: [x['counter_name'],
-                                 x['counter_type'],
-                                 x['counter_unit']],
-                      resource['meter'])
-            assert ['instance', 'cumulative', ''] in foo
+            assert resource.resource_id == 'resource-id'
+            assert resource.project_id == 'project-id'
+            assert resource.user_id == 'user-id'
+            assert resource.metadata['display_name'] == 'test-server'
+            self.assertIn(models.ResourceMeter('instance', 'cumulative', ''),
+                          resource.meter)
             break
         else:
             assert False, 'Never found resource-id'
@@ -171,14 +169,14 @@ class ResourceTest(DBTestBase):
     def test_get_resources_start_timestamp(self):
         timestamp = datetime.datetime(2012, 7, 2, 10, 42)
         resources = list(self.conn.get_resources(start_timestamp=timestamp))
-        resource_ids = [r['resource_id'] for r in resources]
+        resource_ids = [r.resource_id for r in resources]
         expected = set(['resource-id-2', 'resource-id-3'])
         assert set(resource_ids) == expected
 
     def test_get_resources_end_timestamp(self):
         timestamp = datetime.datetime(2012, 7, 2, 10, 42)
         resources = list(self.conn.get_resources(end_timestamp=timestamp))
-        resource_ids = [r['resource_id'] for r in resources]
+        resource_ids = [r.resource_id for r in resources]
         expected = set(['resource-id', 'resource-id-alternate'])
         assert set(resource_ids) == expected
 
@@ -187,25 +185,25 @@ class ResourceTest(DBTestBase):
         end_ts = datetime.datetime(2012, 7, 2, 10, 43)
         resources = list(self.conn.get_resources(start_timestamp=start_ts,
                                                  end_timestamp=end_ts))
-        resource_ids = [r['resource_id'] for r in resources]
+        resource_ids = [r.resource_id for r in resources]
         assert set(resource_ids) == set(['resource-id-2'])
 
     def test_get_resources_by_source(self):
         resources = list(self.conn.get_resources(source='test-1'))
         assert len(resources) == 1
-        ids = set(r['resource_id'] for r in resources)
+        ids = set(r.resource_id for r in resources)
         assert ids == set(['resource-id'])
 
     def test_get_resources_by_user(self):
         resources = list(self.conn.get_resources(user='user-id'))
         assert len(resources) == 2
-        ids = set(r['resource_id'] for r in resources)
+        ids = set(r.resource_id for r in resources)
         assert ids == set(['resource-id', 'resource-id-alternate'])
 
     def test_get_resources_by_project(self):
         resources = list(self.conn.get_resources(project='project-id'))
         assert len(resources) == 2
-        ids = set(r['resource_id'] for r in resources)
+        ids = set(r.resource_id for r in resources)
         assert ids == set(['resource-id', 'resource-id-alternate'])
 
     def test_get_resources_by_metaquery(self):
@@ -266,14 +264,14 @@ class RawEventTest(DBTestBase):
         results = list(self.conn.get_samples(f))
         assert len(results) == 2
         for meter in results:
-            assert meter in [self.msg1, self.msg2]
+            assert meter.as_dict() in [self.msg1, self.msg2]
 
     def test_get_samples_by_project(self):
         f = storage.EventFilter(project='project-id')
         results = list(self.conn.get_samples(f))
         assert results
         for meter in results:
-            assert meter in [self.msg1, self.msg2, self.msg3]
+            assert meter.as_dict() in [self.msg1, self.msg2, self.msg3]
 
     def test_get_samples_by_resource(self):
         f = storage.EventFilter(user='user-id', resource='resource-id')
@@ -281,7 +279,7 @@ class RawEventTest(DBTestBase):
         assert results
         meter = results[0]
         assert meter is not None
-        assert meter == self.msg1
+        assert meter.as_dict() == self.msg1
 
     def test_get_samples_by_metaquery(self):
         q = {'metadata.display_name': 'test-server'}
@@ -291,7 +289,7 @@ class RawEventTest(DBTestBase):
             results = list(self.conn.get_samples(f))
             assert results
             for meter in results:
-                assert meter in self.msgs
+                assert meter.as_dict() in self.msgs
         except NotImplementedError:
             got_not_imp = True
             self.assertTrue(got_not_imp)
@@ -303,7 +301,7 @@ class RawEventTest(DBTestBase):
         )
         results = list(self.conn.get_samples(f))
         assert len(results) == 1
-        assert results[0]['timestamp'] == datetime.datetime(2012, 7, 2, 10, 41)
+        assert results[0].timestamp == datetime.datetime(2012, 7, 2, 10, 41)
 
     def test_get_samples_by_end_time(self):
         f = storage.EventFilter(
@@ -313,7 +311,7 @@ class RawEventTest(DBTestBase):
         results = list(self.conn.get_samples(f))
         length = len(results)
         assert length == 1
-        assert results[0]['timestamp'] == datetime.datetime(2012, 7, 2, 10, 40)
+        assert results[0].timestamp == datetime.datetime(2012, 7, 2, 10, 40)
 
     def test_get_samples_by_both_times(self):
         f = storage.EventFilter(
@@ -323,7 +321,7 @@ class RawEventTest(DBTestBase):
         results = list(self.conn.get_samples(f))
         length = len(results)
         assert length == 1
-        assert results[0]['timestamp'] == datetime.datetime(2012, 7, 2, 10, 42)
+        assert results[0].timestamp == datetime.datetime(2012, 7, 2, 10, 42)
 
     def test_get_samples_by_name(self):
         f = storage.EventFilter(user='user-id', meter='no-such-meter')
@@ -487,31 +485,31 @@ class StatisticsTest(DBTestBase):
             user='user-5',
             meter='volume.size',
         )
-        results = self.conn.get_meter_statistics(f)[0]
-        self.assertEqual(results['duration'],
+        results = list(self.conn.get_meter_statistics(f))[0]
+        self.assertEqual(results.duration,
                          (datetime.datetime(2012, 9, 25, 12, 32)
                           - datetime.datetime(2012, 9, 25, 10, 30)).seconds)
-        assert results['count'] == 3
-        assert results['min'] == 8
-        assert results['max'] == 10
-        assert results['sum'] == 27
-        assert results['avg'] == 9
+        assert results.count == 3
+        assert results.min == 8
+        assert results.max == 10
+        assert results.sum == 27
+        assert results.avg == 9
 
     def test_no_period_in_query(self):
         f = storage.EventFilter(
             user='user-5',
             meter='volume.size',
         )
-        results = self.conn.get_meter_statistics(f)[0]
-        assert results['period'] == 0
+        results = list(self.conn.get_meter_statistics(f))[0]
+        assert results.period == 0
 
     def test_period_is_int(self):
         f = storage.EventFilter(
             meter='volume.size',
         )
-        results = self.conn.get_meter_statistics(f)[0]
-        assert(isinstance(results['period'], int))
-        assert results['count'] == 6
+        results = list(self.conn.get_meter_statistics(f))[0]
+        assert(isinstance(results.period, int))
+        assert results.count == 6
 
     def test_by_user_period(self):
         f = storage.EventFilter(
@@ -519,30 +517,30 @@ class StatisticsTest(DBTestBase):
             meter='volume.size',
             start='2012-09-25T10:28:00',
         )
-        results = self.conn.get_meter_statistics(f, period=7200)
+        results = list(self.conn.get_meter_statistics(f, period=7200))
         self.assertEqual(len(results), 2)
-        self.assertEqual(set(r['period_start'] for r in results),
+        self.assertEqual(set(r.period_start for r in results),
                          set([datetime.datetime(2012, 9, 25, 10, 28),
                               datetime.datetime(2012, 9, 25, 12, 28)]))
-        self.assertEqual(set(r['period_end'] for r in results),
+        self.assertEqual(set(r.period_end for r in results),
                          set([datetime.datetime(2012, 9, 25, 12, 28),
                               datetime.datetime(2012, 9, 25, 14, 28)]))
         r = results[0]
-        self.assertEqual(r['period_start'],
+        self.assertEqual(r.period_start,
                          datetime.datetime(2012, 9, 25, 10, 28))
-        self.assertEqual(r['count'], 2)
-        self.assertEqual(r['avg'], 8.5)
-        self.assertEqual(r['min'], 8)
-        self.assertEqual(r['max'], 9)
-        self.assertEqual(r['sum'], 17)
-        self.assertEqual(r['period'], 7200)
-        self.assertIsInstance(r['period'], int)
-        expected_end = r['period_start'] + datetime.timedelta(seconds=7200)
-        self.assertEqual(r['period_end'], expected_end)
-        self.assertEqual(r['duration'], 3660)
-        self.assertEqual(r['duration_start'],
+        self.assertEqual(r.count, 2)
+        self.assertEqual(r.avg, 8.5)
+        self.assertEqual(r.min, 8)
+        self.assertEqual(r.max, 9)
+        self.assertEqual(r.sum, 17)
+        self.assertEqual(r.period, 7200)
+        self.assertIsInstance(r.period, int)
+        expected_end = r.period_start + datetime.timedelta(seconds=7200)
+        self.assertEqual(r.period_end, expected_end)
+        self.assertEqual(r.duration, 3660)
+        self.assertEqual(r.duration_start,
                          datetime.datetime(2012, 9, 25, 10, 30))
-        self.assertEqual(r['duration_end'],
+        self.assertEqual(r.duration_end,
                          datetime.datetime(2012, 9, 25, 11, 31))
 
     def test_by_user_period_start_end(self):
@@ -552,24 +550,24 @@ class StatisticsTest(DBTestBase):
             start='2012-09-25T10:28:00',
             end='2012-09-25T11:28:00',
         )
-        results = self.conn.get_meter_statistics(f, period=1800)
+        results = list(self.conn.get_meter_statistics(f, period=1800))
         self.assertEqual(len(results), 1)
         r = results[0]
-        self.assertEqual(r['period_start'],
+        self.assertEqual(r.period_start,
                          datetime.datetime(2012, 9, 25, 10, 28))
-        self.assertEqual(r['count'], 1)
-        self.assertEqual(r['avg'], 8)
-        self.assertEqual(r['min'], 8)
-        self.assertEqual(r['max'], 8)
-        self.assertEqual(r['sum'], 8)
-        self.assertEqual(r['period'], 1800)
-        self.assertEqual(r['period_end'],
-                         r['period_start']
+        self.assertEqual(r.count, 1)
+        self.assertEqual(r.avg, 8)
+        self.assertEqual(r.min, 8)
+        self.assertEqual(r.max, 8)
+        self.assertEqual(r.sum, 8)
+        self.assertEqual(r.period, 1800)
+        self.assertEqual(r.period_end,
+                         r.period_start
                          + datetime.timedelta(seconds=1800))
-        self.assertEqual(r['duration'], 0)
-        self.assertEqual(r['duration_start'],
+        self.assertEqual(r.duration, 0)
+        self.assertEqual(r.duration_start,
                          datetime.datetime(2012, 9, 25, 10, 30))
-        self.assertEqual(r['duration_end'],
+        self.assertEqual(r.duration_end,
                          datetime.datetime(2012, 9, 25, 10, 30))
 
     def test_by_project(self):
@@ -579,28 +577,28 @@ class StatisticsTest(DBTestBase):
             start='2012-09-25T11:30:00',
             end='2012-09-25T11:32:00',
         )
-        results = self.conn.get_meter_statistics(f)[0]
-        self.assertEqual(results['duration'], 0)
-        assert results['count'] == 1
-        assert results['min'] == 6
-        assert results['max'] == 6
-        assert results['sum'] == 6
-        assert results['avg'] == 6
+        results = list(self.conn.get_meter_statistics(f))[0]
+        self.assertEqual(results.duration, 0)
+        assert results.count == 1
+        assert results.min == 6
+        assert results.max == 6
+        assert results.sum == 6
+        assert results.avg == 6
 
     def test_one_resource(self):
         f = storage.EventFilter(
             user='user-id',
             meter='volume.size',
         )
-        results = self.conn.get_meter_statistics(f)[0]
-        self.assertEqual(results['duration'],
+        results = list(self.conn.get_meter_statistics(f))[0]
+        self.assertEqual(results.duration,
                          (datetime.datetime(2012, 9, 25, 12, 32)
                           - datetime.datetime(2012, 9, 25, 10, 30)).seconds)
-        assert results['count'] == 3
-        assert results['min'] == 5
-        assert results['max'] == 7
-        assert results['sum'] == 18
-        assert results['avg'] == 6
+        assert results.count == 3
+        assert results.min == 5
+        assert results.max == 7
+        assert results.sum == 18
+        assert results.avg == 6
 
 
 class CounterDataTypeTest(DBTestBase):
@@ -666,17 +664,17 @@ class CounterDataTypeTest(DBTestBase):
             meter='dummyBigCounter',
         )
         results = list(self.conn.get_samples(f))
-        self.assertEqual(results[0]['counter_volume'], 3372036854775807)
+        self.assertEqual(results[0].counter_volume, 3372036854775807)
 
         f = storage.EventFilter(
             meter='dummySmallCounter',
         )
         results = list(self.conn.get_samples(f))
-        self.assertEqual(results[0]['counter_volume'], -3372036854775807)
+        self.assertEqual(results[0].counter_volume, -3372036854775807)
 
     def test_storage_can_handle_float_values(self):
         f = storage.EventFilter(
             meter='floatCounter',
         )
         results = list(self.conn.get_samples(f))
-        self.assertEqual(results[0]['counter_volume'], 1938495037.53697)
+        self.assertEqual(results[0].counter_volume, 1938495037.53697)

@@ -138,7 +138,7 @@ def list_meters_all():
     meters = rq.storage_conn.get_meters(
         project=acl.get_limited_to_project(rq.headers),
         metaquery=_get_metaquery(rq.args))
-    return flask.jsonify(meters=list(meters))
+    return flask.jsonify(meters=[m.as_dict() for m in meters])
 
 
 @blueprint.route('/resources/<resource>/meters')
@@ -154,7 +154,7 @@ def list_meters_by_resource(resource):
         resource=resource,
         project=acl.get_limited_to_project(rq.headers),
         metaquery=_get_metaquery(rq.args))
-    return flask.jsonify(meters=list(meters))
+    return flask.jsonify(meters=[m.as_dict() for m in meters])
 
 
 @blueprint.route('/users/<user>/meters')
@@ -170,7 +170,7 @@ def list_meters_by_user(user):
         user=user,
         project=acl.get_limited_to_project(rq.headers),
         metaquery=_get_metaquery(rq.args))
-    return flask.jsonify(meters=list(meters))
+    return flask.jsonify(meters=[m.as_dict() for m in meters])
 
 
 @blueprint.route('/projects/<project>/meters')
@@ -187,7 +187,7 @@ def list_meters_by_project(project):
     meters = rq.storage_conn.get_meters(
         project=project,
         metaquery=_get_metaquery(rq.args))
-    return flask.jsonify(meters=list(meters))
+    return flask.jsonify(meters=[m.as_dict() for m in meters])
 
 
 @blueprint.route('/sources/<source>/meters')
@@ -203,7 +203,7 @@ def list_meters_by_source(source):
         source=source,
         project=acl.get_limited_to_project(rq.headers),
         metaquery=_get_metaquery(rq.args))
-    return flask.jsonify(meters=list(meters))
+    return flask.jsonify(meters=[m.as_dict() for m in meters])
 
 
 ## APIs for working with resources.
@@ -221,7 +221,7 @@ def _list_resources(source=None, user=None, project=None):
         end_timestamp=q_ts['end_timestamp'],
         metaquery=_get_metaquery(rq.args),
     )
-    return flask.jsonify(resources=list(resources))
+    return flask.jsonify(resources=[r.as_dict() for r in resources])
 
 
 @blueprint.route('/projects/<project>/resources')
@@ -405,8 +405,8 @@ def _list_samples(meter,
         end=q_ts['end_timestamp'],
         metaquery=_get_metaquery(flask.request.args),
     )
-    events = list(flask.request.storage_conn.get_samples(f))
-    jsonified = flask.jsonify(events=events)
+    events = flask.request.storage_conn.get_samples(f)
+    jsonified = flask.jsonify(events=[e.as_dict() for e in events])
     if request_wants_html():
         return flask.templating.render_template('list_event.html',
                                                 user=user,
@@ -608,7 +608,7 @@ def _get_statistics(stats_type, meter=None, resource=None, project=None):
     results = list(flask.request.storage_conn.get_meter_statistics(f))
     value = None
     if results:
-        value = results[0][stats_type]  # there should only be one!
+        value = getattr(results[0], stats_type)  # there should only be one!
 
     return flask.jsonify(volume=value)
 
