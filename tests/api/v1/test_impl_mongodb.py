@@ -26,6 +26,8 @@ from . import list_sources
 from . import list_users
 from . import max_project_volume
 from . import max_resource_volume
+from . import sum_project_volume
+from . import sum_resource_volume
 
 
 class TestListEvents(list_events.TestListEvents):
@@ -88,5 +90,13 @@ class TestMaxProjectVolume(max_project_volume.TestMaxProjectVolume):
     database_connection = 'mongodb://__test__'
 
 
-class TestMaxProjectVolume(max_resource_volume.TestMaxResourceVolume):
+class TestMaxResourceVolume(max_resource_volume.TestMaxResourceVolume):
+    database_connection = 'mongodb://__test__'
+
+
+class TestSumProjectVolume(sum_project_volume.TestSumProjectVolume):
+    database_connection = 'mongodb://__test__'
+
+
+class TestSumResourceVolume(sum_resource_volume.TestSumResourceVolume):
     database_connection = 'mongodb://__test__'
