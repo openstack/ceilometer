@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 #
 # Author: John Tran <jhtran@att.com>
+#         Julien Danjou <julien@danjou.info>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -22,7 +23,6 @@ from migrate.versioning import util as migrate_util
 import sqlalchemy
 
 from ceilometer.openstack.common import log
-from ceilometer.storage.sqlalchemy import session
 
 
 INIT_VERSION = 1
@@ -66,7 +66,7 @@ def db_sync(engine, version=None):
         except ValueError:
             raise Exception(_("version should be an integer"))
 
-    current_version = db_version()
+    current_version = db_version(engine)
     repository = _find_migrate_repo()
     if version is None or version > current_version:
         return versioning_api.upgrade(engine, repository, version)
@@ -75,23 +75,23 @@ def db_sync(engine, version=None):
                                         version)
 
 
-def db_version():
+def db_version(engine):
     repository = _find_migrate_repo()
     try:
-        return versioning_api.db_version(session.get_engine(), repository)
+        return versioning_api.db_version(engine,
+                                         repository)
     except versioning_exceptions.DatabaseNotControlledError:
         meta = sqlalchemy.MetaData()
-        engine = session.get_engine()
         meta.reflect(bind=engine)
         tables = meta.tables
         if len(tables) == 0:
-            db_version_control(0)
-            return versioning_api.db_version(session.get_engine(), repository)
+            db_version_control(engine, 0)
+            return versioning_api.db_version(engine, repository)
 
 
-def db_version_control(version=None):
+def db_version_control(engine, version=None):
     repository = _find_migrate_repo()
-    versioning_api.version_control(session.get_engine(), repository, version)
+    versioning_api.version_control(engine, repository, version)
     return version
 
 

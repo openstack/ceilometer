@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 #
 # Author: John Tran <jhtran@att.com>
+#         Julien Danjou <julien@danjou.info>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -14,6 +15,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 """Tests for ceilometer/storage/impl_sqlalchemy.py
+
+.. note::
+  In order to run the tests against real SQL server set the environment
+  variable CEILOMETER_TEST_SQL_URL to point to a SQL server before running
+  the tests.
+
 """
 
 from oslo.config import cfg

@@ -19,14 +19,9 @@
 """Tests for ceilometer/storage/impl_hbase.py
 
 .. note::
-  To run the tests using in-memory mocked HappyBase API,
-  set the environment variable CEILOMETER_TEST_LIVE=0 (this is the default
-  value)
-
   In order to run the tests against real HBase server set the environment
-  variable CEILOMETER_TEST_LIVE=1 and set HBASE_URL below to
-  point to that HBase instance before running the tests. Make sure the Thrift
-  server is running on that server.
+  variable CEILOMETER_TEST_HBASE_URL to point to that HBase instance before
+  running the tests. Make sure the Thrift server is running on that server.
 
 """
 from tests.storage import base

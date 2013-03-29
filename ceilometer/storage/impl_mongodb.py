@@ -248,13 +248,8 @@ class Connection(base.Connection):
         LOG.info('connecting to MongoDB on %s:%s', opts['host'], opts['port'])
 
         if opts['host'] == '__test__':
-            live_tests = bool(int(os.environ.get('CEILOMETER_TEST_LIVE', 0)))
-            if live_tests:
-                url = os.environ.get('CEILOMETER_TEST_MONGO_URL')
-                if not url:
-                    raise RuntimeError("CEILOMETER_TEST_LIVE is on, but "
-                                       "CEILOMETER_TEST_MONGO_URL "
-                                       "is not defined")
+            url = os.environ.get('CEILOMETER_TEST_MONGODB_URL')
+            if url:
                 opts = self._parse_connection_url(url)
                 self.conn = pymongo.Connection(opts['host'],
                                                opts['port'],
