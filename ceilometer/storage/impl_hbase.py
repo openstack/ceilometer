@@ -478,10 +478,19 @@ class Connection(base.Connection):
                                       row_stop=stop)
                       )
 
-        start_time = event_filter.start \
-            or timeutils.parse_strtime(meters[-1]['f:timestamp'])
-        end_time = event_filter.end \
-            or timeutils.parse_strtime(meters[0]['f:timestamp'])
+        if event_filter.start:
+            start_time = event_filter.start
+        elif meters:
+            start_time = timeutils.parse_strtime(meters[-1]['f:timestamp'])
+        else:
+            start_time = None
+
+        if event_filter.end:
+            end_time = event_filter.end
+        elif meters:
+            end_time = timeutils.parse_strtime(meters[0]['f:timestamp'])
+        else:
+            end_time = None
 
         results = []
 
@@ -518,37 +527,6 @@ class Connection(base.Connection):
                                 })
             self._update_meter_stats(results[-1], meter)
         return list(results)
-
-    def get_volume_sum(self, event_filter):
-        """Return the sum of the volume field for the samples
-        described by the query parameters.
-        """
-        q, start, stop = make_query_from_filter(event_filter)
-        LOG.debug("q: %s" % q)
-        gen = self.meter.scan(filter=q, row_start=start, row_stop=stop)
-        results = defaultdict(int)
-        for ignored, meter in gen:
-            results[meter['f:resource_id']] \
-                += int(meter['f:counter_volume'])
-
-        return ({'resource_id': k, 'value': v}
-                for (k, v) in results.iteritems())
-
-    def get_volume_max(self, event_filter):
-        """Return the maximum of the volume field for the samples
-        described by the query parameters.
-        """
-
-        q, start, stop = make_query_from_filter(event_filter)
-        LOG.debug("q: %s" % q)
-        gen = self.meter.scan(filter=q, row_start=start, row_stop=stop)
-        results = defaultdict(int)
-        for ignored, meter in gen:
-            results[meter['f:resource_id']] = \
-                max(results[meter['f:resource_id']],
-                    int(meter['f:counter_volume']))
-        return ({'resource_id': k, 'value': v}
-                for (k, v) in results.iteritems())
 
     def get_event_interval(self, event_filter):
         """Return the min and max timestamps from samples,

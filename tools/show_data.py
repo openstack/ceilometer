@@ -41,23 +41,20 @@ def show_resources(db, args):
             for k, v in sorted(resource['metadata'].iteritems()):
                 print '      %-10s : %s' % (k, v)
             for meter in resource['meter']:
+                totals = db.get_statistics(storage.EventFilter(
+                    user=u,
+                    meter=meter['counter_name'],
+                    resource=resource['resource_id'],
+                ))
                 # FIXME(dhellmann): Need a way to tell whether to use
                 # max() or sum() by meter name without hard-coding.
                 if meter['counter_name'] in ['cpu', 'disk']:
-                    totals = db.get_volume_max(storage.EventFilter(
-                            user=u,
-                            meter=meter['counter_name'],
-                            resource=resource['resource_id'],
-                            ))
+                    value = totals[0]['max']
                 else:
-                    totals = db.get_volume_sum(storage.EventFilter(
-                            user=u,
-                            meter=meter['counter_name'],
-                            resource=resource['resource_id'],
-                            ))
+                    value = totals[0]['sum']
                 print '    %s (%s): %s' % \
                     (meter['counter_name'], meter['counter_type'],
-                     totals.next()['value'])
+                     value)
 
 
 def show_total_resources(db, args):
@@ -68,18 +65,15 @@ def show_total_resources(db, args):
     for u in users:
         print u
         for meter in ['disk', 'cpu', 'instance']:
+            stats = db.get_statistics(storage.EventFilter(
+                    user=u,
+                    meter=meter,
+                ))
             if meter in ['cpu', 'disk']:
-                total = db.get_volume_max(storage.EventFilter(
-                        user=u,
-                        meter=meter,
-                        ))
+                total = stats['max']
             else:
-                total = db.get_volume_sum(storage.EventFilter(
-                        user=u,
-                        meter=meter,
-                        ))
-            for t in total:
-                print '  ', meter, t['resource_id'], t['value']
+                total = stats['sum']
+            print '  ', meter, total
 
 
 def show_raw(db, args):

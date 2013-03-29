@@ -146,30 +146,6 @@ class Connection(object):
         """
 
     @abc.abstractmethod
-    def get_volume_sum(self, event_filter):
-        """Return the sum of the volume field for the samples
-        described by the query parameters.
-
-        The filter must have a meter value set.
-
-        { 'resource_id': UUID string for the resource,
-          'value': The sum for the volume.
-          }
-        """
-
-    @abc.abstractmethod
-    def get_volume_max(self, event_filter):
-        """Return the maximum of the volume field for the samples
-        described by the query parameters.
-
-        The filter must have a meter value set.
-
-        { 'resource_id': UUID string for the resource,
-          'value': The max for the volume.
-          }
-        """
-
-    @abc.abstractmethod
     def get_event_interval(self, event_filter):
         """Return the min and max timestamps from samples,
         using the event_filter to limit the samples seen.

@@ -593,6 +593,26 @@ def compute_duration_by_resource(resource, meter):
                          )
 
 
+def _get_statistics(stats_type, meter=None, resource=None, project=None):
+    q_ts = _get_query_timestamps(flask.request.args)
+
+    f = storage.EventFilter(
+        meter=meter,
+        project=project,
+        resource=resource,
+        start=q_ts['query_start'],
+        end=q_ts['query_end'],
+    )
+    # TODO(sberler): do we want to return an error if the resource
+    # does not exist?
+    results = list(flask.request.storage_conn.get_meter_statistics(f))
+    value = None
+    if results:
+        value = results[0][stats_type]  # there should only be one!
+
+    return flask.jsonify(volume=value)
+
+
 @blueprint.route('/resources/<resource>/meters/<meter>/volume/max')
 def compute_max_resource_volume(resource, meter):
     """Return the max volume for a meter.
@@ -606,24 +626,12 @@ def compute_max_resource_volume(resource, meter):
     :param search_offset: Number of minutes before and
         after start and end timestamps to query.
     """
-    q_ts = _get_query_timestamps(flask.request.args)
-
-    # Query the database for the max volume
-    f = storage.EventFilter(
+    return _get_statistics(
+        'max',
         meter=meter,
-        project=acl.get_limited_to_project(flask.request.headers),
         resource=resource,
-        start=q_ts['query_start'],
-        end=q_ts['query_end'],
+        project=acl.get_limited_to_project(flask.request.headers),
     )
-    # TODO(sberler): do we want to return an error if the resource
-    # does not exist?
-    results = list(flask.request.storage_conn.get_volume_max(f))
-    value = None
-    if results:
-        value = results[0].get('value')  # there should only be one!
-
-    return flask.jsonify(volume=value)
 
 
 @blueprint.route('/resources/<resource>/meters/<meter>/volume/sum')
@@ -639,24 +647,12 @@ def compute_resource_volume_sum(resource, meter):
     :param search_offset: Number of minutes before and
         after start and end timestamps to query.
     """
-    q_ts = _get_query_timestamps(flask.request.args)
-
-    # Query the database for the max volume
-    f = storage.EventFilter(
+    return _get_statistics(
+        'sum',
         meter=meter,
-        project=acl.get_limited_to_project(flask.request.headers),
         resource=resource,
-        start=q_ts['query_start'],
-        end=q_ts['query_end'],
+        project=acl.get_limited_to_project(flask.request.headers),
     )
-    # TODO(sberler): do we want to return an error if the resource
-    # does not exist?
-    results = list(flask.request.storage_conn.get_volume_sum(f))
-    value = None
-    if results:
-        value = results[0].get('value')  # there should only be one!
-
-    return flask.jsonify(volume=value)
 
 
 @blueprint.route('/projects/<project>/meters/<meter>/volume/max')
@@ -673,24 +669,7 @@ def compute_project_volume_max(project, meter):
         after start and end timestamps to query.
     """
     check_authorized_project(project)
-
-    q_ts = _get_query_timestamps(flask.request.args)
-
-    f = storage.EventFilter(meter=meter,
-                            project=project,
-                            start=q_ts['query_start'],
-                            end=q_ts['query_end'],
-                            )
-    # FIXME(sberler): Currently get_volume_max is really always grouping
-    # by resource_id.  We should add a new function in the storage driver
-    # that does not do this grouping (and potentially rename the existing
-    # one to get_volume_max_by_resource())
-    results = list(flask.request.storage_conn.get_volume_max(f))
-    value = None
-    if results:
-        value = max(result.get('value') for result in results)
-
-    return flask.jsonify(volume=value)
+    return _get_statistics('max', project=project, meter=meter)
 
 
 @blueprint.route('/projects/<project>/meters/<meter>/volume/sum')
@@ -708,20 +687,8 @@ def compute_project_volume_sum(project, meter):
     """
     check_authorized_project(project)
 
-    q_ts = _get_query_timestamps(flask.request.args)
-
-    f = storage.EventFilter(meter=meter,
-                            project=project,
-                            start=q_ts['query_start'],
-                            end=q_ts['query_end'],
-                            )
-    # FIXME(sberler): Currently get_volume_max is really always grouping
-    # by resource_id.  We should add a new function in the storage driver
-    # that does not do this grouping (and potentially rename the existing
-    # one to get_volume_max_by_resource())
-    results = list(flask.request.storage_conn.get_volume_sum(f))
-    value = None
-    if results:
-        value = sum(result.get('value') for result in results)
-
-    return flask.jsonify(volume=value)
+    return _get_statistics(
+        'sum',
+        meter=meter,
+        project=project,
+    )

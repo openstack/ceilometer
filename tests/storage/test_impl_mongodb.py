@@ -90,31 +90,10 @@ class RawEventTest(base.RawEventTest, MongoDBEngineTestBase):
     pass
 
 
-class SumTest(base.SumTest, MongoDBEngineTestBase):
-
-    def setUp(self):
-        super(SumTest, self).setUp()
-        require_map_reduce(self.conn)
-
-
 class TestGetEventInterval(base.TestGetEventInterval, MongoDBEngineTestBase):
 
     def setUp(self):
         super(TestGetEventInterval, self).setUp()
-        require_map_reduce(self.conn)
-
-
-class MaxProjectTest(base.MaxProjectTest, MongoDBEngineTestBase):
-
-    def setUp(self):
-        super(MaxProjectTest, self).setUp()
-        require_map_reduce(self.conn)
-
-
-class MaxResourceTest(base.MaxResourceTest, MongoDBEngineTestBase):
-
-    def setUp(self):
-        super(MaxResourceTest, self).setUp()
         require_map_reduce(self.conn)
 
 

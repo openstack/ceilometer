@@ -56,18 +56,6 @@ class TestGetEventInterval(base.TestGetEventInterval,
     pass
 
 
-class SumTest(base.SumTest, HBaseEngineTestBase):
-    pass
-
-
-class MaxProjectTest(base.MaxProjectTest, HBaseEngineTestBase):
-    pass
-
-
-class MaxResourceTest(base.MaxResourceTest, HBaseEngineTestBase):
-    pass
-
-
 class StatisticsTest(base.StatisticsTest, HBaseEngineTestBase):
     pass
 

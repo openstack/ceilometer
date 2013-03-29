@@ -132,34 +132,6 @@ class Connection(base.Connection):
 
     _mim_instance = None
 
-    # JavaScript function for doing map-reduce to get a counter volume
-    # total.
-    MAP_COUNTER_VOLUME = bson.code.Code("""
-        function() {
-            emit(this.resource_id, this.counter_volume);
-        }
-        """)
-
-    # JavaScript function for doing map-reduce to get a maximum value
-    # from a range.  (from
-    # http://cookbook.mongodb.org/patterns/finding_max_and_min/)
-    REDUCE_MAX = bson.code.Code("""
-        function (key, values) {
-            return Math.max.apply(Math, values);
-        }
-        """)
-
-    # JavaScript function for doing map-reduce to get a sum.
-    REDUCE_SUM = bson.code.Code("""
-        function (key, values) {
-            var total = 0;
-            for (var i = 0; i < values.length; i++) {
-                total += values[i];
-            }
-            return total;
-        }
-        """)
-
     # MAP_TIMESTAMP and REDUCE_MIN_MAX are based on the recipe
     # http://cookbook.mongodb.org/patterns/finding_max_and_min_values_for_a_key
     MAP_TIMESTAMP = bson.code.Code("""
@@ -547,32 +519,6 @@ class Connection(base.Connection):
 
         return sorted((r['value'] for r in results['results']),
                       key=operator.itemgetter('period_start'))
-
-    def get_volume_sum(self, event_filter):
-        """Return the sum of the volume field for the samples
-        described by the query parameters.
-        """
-        q = make_query_from_filter(event_filter)
-        results = self.db.meter.map_reduce(self.MAP_COUNTER_VOLUME,
-                                           self.REDUCE_SUM,
-                                           {'inline': 1},
-                                           query=q,
-                                           )
-        return ({'resource_id': r['_id'], 'value': r['value']}
-                for r in results['results'])
-
-    def get_volume_max(self, event_filter):
-        """Return the maximum of the volume field for the samples
-        described by the query parameters.
-        """
-        q = make_query_from_filter(event_filter)
-        results = self.db.meter.map_reduce(self.MAP_COUNTER_VOLUME,
-                                           self.REDUCE_MAX,
-                                           {'inline': 1},
-                                           query=q,
-                                           )
-        return ({'resource_id': r['_id'], 'value': r['value']}
-                for r in results['results'])
 
     def _fix_interval_min_max(self, a_min, a_max):
         if hasattr(a_min, 'valueOf') and a_min.valueOf is not None:

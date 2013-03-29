@@ -58,18 +58,6 @@ class TestGetEventInterval(base.TestGetEventInterval,
     pass
 
 
-class SumTest(base.SumTest, SQLAlchemyEngineTestBase):
-    pass
-
-
-class MaxProjectTest(base.MaxProjectTest, SQLAlchemyEngineTestBase):
-    pass
-
-
-class MaxResourceTest(base.MaxResourceTest, SQLAlchemyEngineTestBase):
-    pass
-
-
 class StatisticsTest(base.StatisticsTest, SQLAlchemyEngineTestBase):
     pass
 

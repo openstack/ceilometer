@@ -352,18 +352,6 @@ class Connection(base.Connection):
         mainq = mainq.join(Meter).group_by(Resource.id)
         return mainq.filter(Meter.id.in_(subq))
 
-    def get_volume_sum(self, event_filter):
-        counter_volume_func = func.sum(Meter.counter_volume)
-        query = self._make_volume_query(event_filter, counter_volume_func)
-        results = query.all()
-        return ({'resource_id': x, 'value': y} for x, y in results)
-
-    def get_volume_max(self, event_filter):
-        counter_volume_func = func.max(Meter.counter_volume)
-        query = self._make_volume_query(event_filter, counter_volume_func)
-        results = query.all()
-        return ({'resource_id': x, 'value': y} for x, y in results)
-
     def get_event_interval(self, event_filter):
         """Return the min and max timestamps from samples,
         using the event_filter to limit the samples seen.
@@ -398,8 +386,10 @@ class Connection(base.Connection):
                 'sum': result.sum,
                 'duration_start': result.tsmin,
                 'duration_end': result.tsmax,
-                'duration': timeutils.delta_seconds(result.tsmin,
-                                                    result.tsmax),
+                'duration': (timeutils.delta_seconds(result.tsmin,
+                                                     result.tsmax)
+                             if result.tsmin and result.tsmax
+                             else None),
                 'period': period,
                 'period_start': period_start,
                 'period_end': period_end}
