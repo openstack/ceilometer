@@ -65,9 +65,9 @@ run through tox_.
 .. _nose options documentation: http://readthedocs.org/docs/nose/en/latest/usage.html#options
 
    Use a double hyphen to pass options to nose. For example, to set verbose
-   flag and to run only tests under tests/api/v2:
+   flag and to run only tests under tests/api/v2::
 
-   $ tox -e py27 -- -v api/v2
+      $ tox -e py27 -- -v api/v2
 
 .. seealso::
 
