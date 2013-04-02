@@ -66,7 +66,8 @@ setuptools.setup(
     packages=setuptools.find_packages(exclude=['bin',
                                                'tests',
                                                'tests.*',
-                                               '*.tests']),
+                                               '*.tests',
+                                               'nova_tests']),
     cmdclass=common_setup.get_cmdclass(),
     package_data={
         "ceilometer":
