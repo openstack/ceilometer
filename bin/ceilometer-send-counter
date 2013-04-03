@@ -26,6 +26,9 @@ import sys
 from oslo.config import cfg
 from stevedore import dispatch
 
+from ceilometer.openstack.common import gettextutils
+gettextutils.install('ceilometer')
+
 from ceilometer import counter
 from ceilometer import pipeline
 from ceilometer import service
