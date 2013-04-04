@@ -60,6 +60,7 @@ from oslo.config import cfg
 
 from ceilometer.openstack.common import log, timeutils
 from ceilometer.storage import base
+from ceilometer.storage import models
 
 LOG = log.getLogger(__name__)
 
@@ -304,16 +305,7 @@ class Connection(base.Connection):
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, end_timestamp=None,
                       metaquery={}):
-        """Return an iterable of dictionaries containing resource information.
-
-        :type end_timestamp: object
-        { 'resource_id': UUID of the resource,
-          'project_id': UUID of project owning the resource,
-          'user_id': UUID of user owning the resource,
-          'timestamp': UTC datetime of last update to the resource,
-          'metadata': most current metadata for the resource,
-          'meter': list of the meters reporting data for the resource,
-          }
+        """Return an iterable of models.Resource instances
 
         :param user: Optional ID for user that owns the resource.
         :param project: Optional ID for project that owns the resource.
@@ -342,33 +334,21 @@ class Connection(base.Connection):
                        query_only=True, require_meter=False)
         LOG.debug("q: %s" % q)
         for resource_id, data in self.resource.rows(resource_ids):
-            r = {'resource_id': resource_id,
-                 'metadata': json.loads(data['f:metadata']),
-                 'project_id': data['f:project_id'],
-                 'source': data['f:source'],
-                 'user_id': data['f:user_id'],
-                 'meter': []}
-
-            for m in data:
-                if m.startswith('f:m_'):
-                    name, type, unit = m[4:].split("!")
-                    r['meter'].append({"counter_name": name,
-                                       "counter_type": type,
-                                       "counter_unit": unit})
-
-            yield r
+            yield models.Resource(
+                resource_id=resource_id,
+                project_id=data['f:project_id'],
+                user_id=data['f:user_id'],
+                metadata=json.loads(data['f:metadata']),
+                meter=[
+                    models.ResourceMeter(*(m[4:].split("!")))
+                    for m in data
+                    if m.startswith('f:m_')
+                ],
+            )
 
     def get_meters(self, user=None, project=None, resource=None, source=None,
                    metaquery={}):
-        """Return an iterable of dictionaries containing meter information.
-
-        { 'name': name of the meter,
-          'type': type of the meter (guage, counter),
-          'unit': unit of the meter,
-          'resource_id': UUID of the resource,
-          'project_id': UUID of project owning the resource,
-          'user_id': UUID of user owning the resource,
-          }
+        """Return an iterable of models.Meter instances
 
         :param user: Optional ID for user that owns the resource.
         :param project: Optional ID for project that owns the resource.
@@ -398,30 +378,27 @@ class Connection(base.Connection):
             if meter is None:
                 continue
             name, type, unit = meter[4:].split("!")
-            m = {'name': name,
-                 'type': type,
-                 'unit': unit,
-                 'resource_id': data['f:resource_id'],
-                 'project_id': data['f:project_id'],
-                 'user_id': data['f:user_id'],
-                 }
-            yield m
+            yield models.Meter(
+                name=name,
+                type=type,
+                unit=unit,
+                resource_id=data['f:resource_id'],
+                project_id=data['f:project_id'],
+                user_id=data['f:user_id'],
+            )
 
     def get_samples(self, event_filter):
-        """Return an iterable of samples as created by
-        :func:`ceilometer.meter.meter_message_from_counter`.
+        """Return an iterable of models.Sample instances
         """
         q, start, stop = make_query_from_filter(event_filter,
                                                 require_meter=False)
         LOG.debug("q: %s" % q)
 
         gen = self.meter.scan(filter=q, row_start=start, row_stop=stop)
-        meters = []
         for ignored, meter in gen:
             meter = json.loads(meter['f:message'])
             meter['timestamp'] = timeutils.parse_strtime(meter['timestamp'])
-            meters.append(meter)
-        return meters
+            yield models.Sample(**meter)
 
     def _update_meter_stats(self, stat, meter):
         """Do the stats calculation on a requested time bucket in stats dict
@@ -434,41 +411,29 @@ class Connection(base.Connection):
         """
         vol = int(meter['f:counter_volume'])
         ts = timeutils.parse_strtime(meter['f:timestamp'])
-        stat['min'] = min(vol, stat['min'] or vol)
-        stat['max'] = max(vol, stat['max'])
-        stat['sum'] = vol + (stat['sum'] or 0)
-        stat['count'] += 1
-        stat['avg'] = (stat['sum'] / float(stat['count']))
-        stat['duration_start'] = min(ts, stat['duration_start'] or ts)
-        stat['duration_end'] = max(ts, stat['duration_end'] or ts)
-        stat['duration'] = \
-            timeutils.delta_seconds(stat['duration_start'],
-                                    stat['duration_end'])
+        stat.min = min(vol, stat.min or vol)
+        stat.max = max(vol, stat.max)
+        stat.sum = vol + (stat.sum or 0)
+        stat.count += 1
+        stat.avg = (stat.sum / float(stat.count))
+        stat.duration_start = min(ts, stat.duration_start or ts)
+        stat.duration_end = max(ts, stat.duration_end or ts)
+        stat.duration = \
+            timeutils.delta_seconds(stat.duration_start,
+                                    stat.duration_end)
 
     def get_meter_statistics(self, event_filter, period=None):
-        """Return a dictionary containing meter statistics.
-        described by the query parameters.
+        """Return an iterable of models.Statistics instances containing meter
+        statistics described by the query parameters.
 
         The filter must have a meter value set.
 
-        { 'min':
-          'max':
-          'avg':
-          'sum':
-          'count':
-          'period':
-          'period_start':
-          'period_end':
-          'duration':
-          'duration_start':
-          'duration_end':
-          }
-
         .. note::
 
-        Due to HBase limitations the aggregations are implemented
-        in the driver itself, therefore this method will be quite slow
-        because of all the Thrift traffic it is going to create.
+           Due to HBase limitations the aggregations are implemented
+           in the driver itself, therefore this method will be quite slow
+           because of all the Thrift traffic it is going to create.
+
         """
         q, start, stop = make_query_from_filter(event_filter)
 
@@ -508,25 +473,26 @@ class Connection(base.Connection):
                     start_time, ts) / period) * period
                 period_start = start_time + datetime.timedelta(0, offset)
 
-            if not len(results) or not results[-1]['period_start'] == \
+            if not len(results) or not results[-1].period_start == \
                     period_start:
                 if period:
                     period_end = period_start + datetime.timedelta(
                         0, period)
-                results.append({'count': 0,
-                                'min': 0,
-                                'max': 0,
-                                'avg': 0,
-                                'sum': 0,
-                                'period': period,
-                                'period_start': period_start,
-                                'period_end': period_end,
-                                'duration': None,
-                                'duration_start': None,
-                                'duration_end': None,
-                                })
+                results.append(
+                    models.Statistics(count=0,
+                                      min=0,
+                                      max=0,
+                                      avg=0,
+                                      sum=0,
+                                      period=period,
+                                      period_start=period_start,
+                                      period_end=period_end,
+                                      duration=None,
+                                      duration_start=None,
+                                      duration_end=None)
+                )
             self._update_meter_stats(results[-1], meter)
-        return list(results)
+        return results
 
     def get_event_interval(self, event_filter):
         """Return the min and max timestamps from samples,

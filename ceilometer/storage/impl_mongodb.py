@@ -33,6 +33,7 @@ import pymongo
 
 from ceilometer.openstack.common import log
 from ceilometer.storage import base
+from ceilometer.storage import models
 
 
 LOG = log.getLogger(__name__)
@@ -366,15 +367,7 @@ class Connection(base.Connection):
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, end_timestamp=None,
                       metaquery={}, resource=None):
-        """Return an iterable of dictionaries containing resource information.
-
-        { 'resource_id': UUID of the resource,
-          'project_id': UUID of project owning the resource,
-          'user_id': UUID of user owning the resource,
-          'timestamp': UTC datetime of last update to the resource,
-          'metadata': most current metadata for the resource,
-          'meter': list of the meters reporting data for the resource,
-          }
+        """Return an iterable of models.Resource instances
 
         :param user: Optional ID for user that owns the resource.
         :param project: Optional ID for project that owns the resource.
@@ -416,25 +409,24 @@ class Connection(base.Connection):
         resource_ids = self.db.meter.find(q).distinct('resource_id')
         q = {'_id': {'$in': resource_ids}}
         for resource in self.db.resource.find(q):
-            r = {}
-            r.update(resource)
-            # Replace the '_id' key with 'resource_id' to meet the
-            # caller's expectations.
-            r['resource_id'] = r['_id']
-            del r['_id']
-            yield r
+            yield models.Resource(
+                resource_id=resource['_id'],
+                project_id=resource['project_id'],
+                user_id=resource['user_id'],
+                metadata=resource['metadata'],
+                meter=[
+                    models.ResourceMeter(
+                        counter_name=meter['counter_name'],
+                        counter_type=meter['counter_type'],
+                        counter_unit=meter['counter_unit'],
+                    )
+                    for meter in resource['meter']
+                ],
+            )
 
     def get_meters(self, user=None, project=None, resource=None, source=None,
                    metaquery={}):
-        """Return an iterable of dictionaries containing meter information.
-
-        { 'name': name of the meter,
-          'type': type of the meter (guage, counter),
-          'unit': unit of the meter,
-          'resource_id': UUID of the resource,
-          'project_id': UUID of project owning the resource,
-          'user_id': UUID of user owning the resource,
-          }
+        """Return an iterable of models.Meter instances
 
         :param user: Optional ID for user that owns the resource.
         :param project: Optional ID for project that owns the resource.
@@ -455,16 +447,16 @@ class Connection(base.Connection):
 
         for r in self.db.resource.find(q):
             for r_meter in r['meter']:
-                m = {}
-                m['name'] = r_meter['counter_name']
-                m['type'] = r_meter['counter_type']
-                # Return empty string if 'counter_unit' is not valid for
-                # backward compaitiblity.
-                m['unit'] = r_meter.get('counter_unit', '')
-                m['resource_id'] = r['_id']
-                m['project_id'] = r['project_id']
-                m['user_id'] = r['user_id']
-                yield m
+                yield models.Meter(
+                    name=r_meter['counter_name'],
+                    type=r_meter['counter_type'],
+                    # Return empty string if 'counter_unit' is not valid for
+                    # backward compaitiblity.
+                    unit=r_meter.get('counter_unit', ''),
+                    resource_id=r['_id'],
+                    project_id=r['project_id'],
+                    user_id=r['user_id'],
+                )
 
     def get_samples(self, event_filter):
         """Return an iterable of samples as created by
@@ -477,26 +469,13 @@ class Connection(base.Connection):
             # the event was inserted. It is an implementation
             # detail that should not leak outside of the driver.
             del s['_id']
-            yield s
+            yield models.Sample(**s)
 
     def get_meter_statistics(self, event_filter, period=None):
-        """Return a dictionary containing meter statistics.
-        described by the query parameters.
+        """Return an iterable of models.Statistics instance containing meter
+        statistics described by the query parameters.
 
         The filter must have a meter value set.
-
-        { 'min':
-          'max':
-          'avg':
-          'sum':
-          'count':
-          'period':
-          'period_start':
-          'period_end':
-          'duration':
-          'duration_start':
-          'duration_end':
-          }
 
         """
         q = make_query_from_filter(event_filter)
@@ -517,8 +496,9 @@ class Connection(base.Connection):
             query=q,
         )
 
-        return sorted((r['value'] for r in results['results']),
-                      key=operator.itemgetter('period_start'))
+        return sorted((models.Statistics(**(r['value']))
+                       for r in results['results']),
+                      key=operator.attrgetter('period_start'))
 
     def _fix_interval_min_max(self, a_min, a_max):
         if hasattr(a_min, 'valueOf') and a_min.valueOf is not None:
