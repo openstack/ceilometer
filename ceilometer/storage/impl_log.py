@@ -124,11 +124,6 @@ class Connection(base.Connection):
         """
         return []
 
-    def get_event_interval(self, event_filter):
-        """Return the min and max timestamp for samples
-        matching the event_filter.
-        """
-
     def get_meter_statistics(self, event_filter, period=None):
         """Return a dictionary containing meter statistics.
         described by the query parameters.

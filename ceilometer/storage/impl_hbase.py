@@ -494,32 +494,6 @@ class Connection(base.Connection):
             self._update_meter_stats(results[-1], meter)
         return results
 
-    def get_event_interval(self, event_filter):
-        """Return the min and max timestamps from samples,
-        using the event_filter to limit the samples seen.
-
-        ( datetime.datetime(), datetime.datetime() )
-        """
-        q, start, stop = make_query_from_filter(event_filter)
-        LOG.debug("q: %s" % q)
-        gen = self.meter.scan(filter=q, row_start=start, row_stop=stop)
-        a_min = None
-        a_max = None
-        for ignored, meter in gen:
-            timestamp = timeutils.parse_strtime(meter['f:timestamp'])
-            if a_min is None:
-                a_min = timestamp
-            else:
-                if timestamp < a_min:
-                    a_min = timestamp
-            if a_max is None:
-                a_max = timestamp
-            else:
-                if timestamp > a_max:
-                    a_max = timestamp
-
-        return a_min, a_max
-
 
 ###############
 # This is a very crude version of "in-memory HBase", which implements just

@@ -22,7 +22,7 @@ import datetime
 import logging
 
 from ceilometer.openstack.common import timeutils
-
+from ceilometer.storage import models
 from ceilometer.tests import api as tests_api
 
 LOG = logging.getLogger(__name__)
@@ -49,12 +49,18 @@ class TestComputeDurationByResource(tests_api.TestBase):
         self.late1 = datetime.datetime(2012, 8, 29, 9, 0)
         self.late2 = datetime.datetime(2012, 8, 29, 19, 0)
 
-    def _set_interval(self, start, end):
-        def get_interval(event_filter):
-            assert event_filter.start
-            assert event_filter.end
-            return (start, end)
-        self.stubs.Set(self.conn, 'get_event_interval', get_interval)
+    def _set_stats(self, start, end):
+        def get_meter_statistics(event_filter):
+            return models.Statistics(
+                min=0, max=0, avg=0, sum=0, count=0,
+                period=None,
+                period_start=None,
+                period_end=None,
+                duration=end - start,
+                duration_start=start,
+                duration_end=end)
+        self.stubs.Set(self.conn, 'get_meter_statistics',
+                       get_meter_statistics)
 
     def _invoke_api(self):
         return self.get(
@@ -65,7 +71,7 @@ class TestComputeDurationByResource(tests_api.TestBase):
         )
 
     def test_before_range(self):
-        self._set_interval(self.early1, self.early2)
+        self._set_stats(self.early1, self.early2)
         data = self._invoke_api()
         assert data['start_timestamp'] is None
         assert data['end_timestamp'] is None
@@ -76,44 +82,42 @@ class TestComputeDurationByResource(tests_api.TestBase):
         assert actual == expected
 
     def test_overlap_range_start(self):
-        self._set_interval(self.early1, self.middle1)
+        self._set_stats(self.early1, self.middle1)
         data = self._invoke_api()
         self._assert_times_match(data['start_timestamp'], self.start)
         self._assert_times_match(data['end_timestamp'], self.middle1)
         self.assertEqual(data['duration'], 8 * 60 * 60)
 
     def test_within_range(self):
-        self._set_interval(self.middle1, self.middle2)
+        self._set_stats(self.middle1, self.middle2)
         data = self._invoke_api()
         self._assert_times_match(data['start_timestamp'], self.middle1)
         self._assert_times_match(data['end_timestamp'], self.middle2)
         self.assertEqual(data['duration'], 10 * 60 * 60)
 
     def test_within_range_zero_duration(self):
-        self._set_interval(self.middle1, self.middle1)
+        self._set_stats(self.middle1, self.middle1)
         data = self._invoke_api()
         self._assert_times_match(data['start_timestamp'], self.middle1)
         self._assert_times_match(data['end_timestamp'], self.middle1)
         assert data['duration'] == 0
 
     def test_overlap_range_end(self):
-        self._set_interval(self.middle2, self.late1)
+        self._set_stats(self.middle2, self.late1)
         data = self._invoke_api()
         self._assert_times_match(data['start_timestamp'], self.middle2)
         self._assert_times_match(data['end_timestamp'], self.end)
         self.assertEqual(data['duration'], ((6 * 60) - 1) * 60)
 
     def test_after_range(self):
-        self._set_interval(self.late1, self.late2)
+        self._set_stats(self.late1, self.late2)
         data = self._invoke_api()
         assert data['start_timestamp'] is None
         assert data['end_timestamp'] is None
         assert data['duration'] is None
 
     def test_without_end_timestamp(self):
-        def get_interval(event_filter):
-            return (self.late1, self.late2)
-        self.stubs.Set(self.conn, 'get_event_interval', get_interval)
+        self._set_stats(self.late1, self.late2)
         data = self.get(
             '/resources/resource-id/meters/instance:m1.tiny/duration',
             start_timestamp=self.late1.isoformat(),
@@ -123,9 +127,7 @@ class TestComputeDurationByResource(tests_api.TestBase):
         self._assert_times_match(data['end_timestamp'], self.late2)
 
     def test_without_start_timestamp(self):
-        def get_interval(event_filter):
-            return (self.early1, self.early2)
-        self.stubs.Set(self.conn, 'get_event_interval', get_interval)
+        self._set_stats(self.early1, self.early2)
         data = self.get(
             '/resources/resource-id/meters/instance:m1.tiny/duration',
             end_timestamp=self.early2.isoformat(),

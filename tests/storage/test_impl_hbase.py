@@ -51,11 +51,6 @@ class RawEventTest(base.RawEventTest, HBaseEngineTestBase):
     pass
 
 
-class TestGetEventInterval(base.TestGetEventInterval,
-                           HBaseEngineTestBase):
-    pass
-
-
 class StatisticsTest(base.StatisticsTest, HBaseEngineTestBase):
     pass
 

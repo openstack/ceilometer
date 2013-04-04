@@ -133,28 +133,6 @@ class Connection(base.Connection):
 
     _mim_instance = None
 
-    # MAP_TIMESTAMP and REDUCE_MIN_MAX are based on the recipe
-    # http://cookbook.mongodb.org/patterns/finding_max_and_min_values_for_a_key
-    MAP_TIMESTAMP = bson.code.Code("""
-    function () {
-        emit('timestamp', { min : this.timestamp,
-                            max : this.timestamp } )
-    }
-    """)
-
-    REDUCE_MIN_MAX = bson.code.Code("""
-    function (key, values) {
-        var res = values[0];
-        for ( var i=1; i<values.length; i++ ) {
-            if ( values[i].min < res.min )
-               res.min = values[i].min;
-            if ( values[i].max > res.max )
-               res.max = values[i].max;
-        }
-        return res;
-    }
-    """)
-
     MAP_STATS = bson.code.Code("""
     function () {
         emit('statistics', { min : this.counter_volume,
@@ -527,23 +505,6 @@ class Connection(base.Connection):
             a_max = datetime.datetime.fromtimestamp(
                 a_max.valueOf() // 1000)
         return (a_min, a_max)
-
-    def get_event_interval(self, event_filter):
-        """Return the min and max timestamps from samples,
-        using the event_filter to limit the samples seen.
-
-        ( datetime.datetime(), datetime.datetime() )
-        """
-        q = make_query_from_filter(event_filter)
-        results = self.db.meter.map_reduce(self.MAP_TIMESTAMP,
-                                           self.REDUCE_MIN_MAX,
-                                           {'inline': 1},
-                                           query=q,
-                                           )
-        if results['results']:
-            answer = results['results'][0]['value']
-            return self._fix_interval_min_max(answer['min'], answer['max'])
-        return (None, None)
 
 
 def require_map_reduce(conn):
