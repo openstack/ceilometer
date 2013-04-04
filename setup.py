@@ -26,7 +26,7 @@ from ceilometer.openstack.common import setup as common_setup
 requires = common_setup.parse_requirements(['tools/pip-requires'])
 depend_links = common_setup.parse_dependency_links(['tools/pip-requires'])
 project = 'ceilometer'
-version = common_setup.get_version(project, '2013.1')
+version = common_setup.get_version(project, '2013.1.1')
 
 url_base = 'http://tarballs.openstack.org/ceilometer/ceilometer-%s.tar.gz'
 
