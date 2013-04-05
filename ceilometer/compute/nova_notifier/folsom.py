@@ -25,6 +25,7 @@ from nova import db as instance_info_source
 from oslo.config import cfg
 
 from ceilometer.compute import manager as compute_manager
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log as logging
 
 # This module runs inside the nova compute
@@ -58,7 +59,7 @@ def notify(context, message):
 
     if message['event_type'] == 'compute.instance.delete.start':
         instance_id = message['payload']['instance_id']
-        LOG.debug('polling final stats for %r', instance_id)
+        LOG.debug(_('polling final stats for %r'), instance_id)
         _agent_manager.poll_instance(context,
                                      instance_info_source.instance_get_by_uuid(
                                          context,
