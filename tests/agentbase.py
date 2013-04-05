@@ -2,8 +2,10 @@
 #
 # Copyright © 2012 New Dream Network, LLC (DreamHost)
 # Copyright © 2013 Intel corp.
+# Copyright © 2013 eNovance
 #
 # Author: Yunhong Jiang <yunhong.jiang@intel.com>
+#         Julien Danjou <julien@danjou.info>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -22,12 +24,13 @@ import datetime
 import mock
 
 from stevedore import extension
-from stevedore import dispatch
 from stevedore.tests import manager as extension_tests
 
 from ceilometer import counter
 from ceilometer import pipeline
+from ceilometer import publisher
 from ceilometer.tests import base
+from ceilometer import transformer
 
 
 default_test_data = counter.Counter(
@@ -92,10 +95,11 @@ class BaseAgentManagerTestCase(base.TestCase):
 
     def setup_pipeline(self):
         self.publisher = self.PublisherClass()
-        self.publisher_manager = dispatch.NameDispatchExtensionManager(
+        self.transformer_manager = transformer.TransformerExtensionManager(
+            'ceilometer.transformer',
+        )
+        self.publisher_manager = publisher.PublisherExtensionManager(
             'fake',
-            check_func=lambda x: True,
-            invoke_on_load=False,
         )
         self.publisher_manager.extensions = [
             extension.Extension(
@@ -111,6 +115,7 @@ class BaseAgentManagerTestCase(base.TestCase):
 
         self.mgr.pipeline_manager = pipeline.PipelineManager(
             self.pipeline_cfg,
+            self.transformer_manager,
             self.publisher_manager)
 
     def create_extension_manager(self):
@@ -233,6 +238,7 @@ class BaseAgentManagerTestCase(base.TestCase):
         ]
         self.mgr.pipeline_manager = pipeline.PipelineManager(
             self.pipeline_cfg,
+            self.transformer_manager,
             self.publisher_manager)
 
         polling_tasks = self.mgr.setup_polling_tasks()

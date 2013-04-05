@@ -17,7 +17,6 @@
 # under the License.
 
 from oslo.config import cfg
-from stevedore import dispatch
 
 from ceilometer.collector import meter as meter_api
 from ceilometer import extension_manager
@@ -32,8 +31,10 @@ import ceilometer.openstack.common.notifier.rpc_notifier
 
 from ceilometer.openstack.common import timeutils
 from ceilometer import pipeline
+from ceilometer import publisher
 from ceilometer import service
 from ceilometer import storage
+from ceilometer import transformer
 
 OPTS = [
     cfg.ListOpt('disabled_notification_listeners',
@@ -61,12 +62,14 @@ class CollectorService(service.PeriodicService):
     def initialize_service_hook(self, service):
         '''Consumers must be declared before consume_thread start.'''
         LOG.debug('initialize_service_hooks')
-        publisher_manager = dispatch.NameDispatchExtensionManager(
-            namespace=pipeline.PUBLISHER_NAMESPACE,
-            check_func=lambda x: True,
-            invoke_on_load=True,
+        self.pipeline_manager = pipeline.setup_pipeline(
+            transformer.TransformerExtensionManager(
+                'ceilometer.transformer',
+            ),
+            publisher.PublisherExtensionManager(
+                'ceilometer.publisher',
+            ),
         )
-        self.pipeline_manager = pipeline.setup_pipeline(publisher_manager)
 
         LOG.debug('loading notification handlers from %s',
                   self.COLLECTOR_NAMESPACE)

@@ -61,7 +61,7 @@ class TestSwiftMiddleware(base.TestCase):
             def flush(self, ctx, source):
                 pass
 
-    def _faux_setup_pipeline(self, publisher_manager):
+    def _faux_setup_pipeline(self, transformer_manager, publisher_manager):
         return self.pipeline_manager
 
     def setUp(self):

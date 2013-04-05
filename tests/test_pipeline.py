@@ -17,11 +17,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from stevedore import dispatch
 from stevedore import extension
 
 from ceilometer import counter
 from ceilometer import plugin
+from ceilometer import publisher
+from ceilometer import transformer
 from ceilometer.transformer import accumulator
 from ceilometer.openstack.common import timeutils
 from ceilometer import pipeline
@@ -92,12 +93,34 @@ class TestPipeline(base.TestCase):
         def handle_sample(self, ctxt, counter, source):
             raise Exception()
 
-    def _create_publisher_manager(self, ext_name='test'):
-        self.publisher_manager = dispatch.NameDispatchExtensionManager(
-            'fake',
-            [],
-            invoke_on_load=False,
+    def setUp(self):
+        super(TestPipeline, self).setUp()
+
+        self.test_counter = counter.Counter(
+            name='a',
+            type='test_type',
+            volume=1,
+            unit='B',
+            user_id="test_user",
+            project_id="test_proj",
+            resource_id="test_resource",
+            timestamp=timeutils.utcnow().isoformat(),
+            resource_metadata={}
         )
+
+        self.stubs.Set(transformer.TransformerExtensionManager,
+                       "__init__",
+                       self.fake_tem_init)
+
+        self.stubs.Set(transformer.TransformerExtensionManager,
+                       "get_ext",
+                       self.fake_tem_get_ext)
+
+        self.publisher_manager = publisher.PublisherExtensionManager(
+            'fake',
+        )
+
+        self.transformer_manager = transformer.TransformerExtensionManager()
 
         self.publisher = self.PublisherClass()
         self.new_publisher = self.PublisherClass()
@@ -127,30 +150,6 @@ class TestPipeline(base.TestCase):
             for e
             in self.publisher_manager.extensions)
 
-    def setUp(self):
-        super(TestPipeline, self).setUp()
-
-        self.test_counter = counter.Counter(
-            name='a',
-            type='test_type',
-            volume=1,
-            unit='B',
-            user_id="test_user",
-            project_id="test_proj",
-            resource_id="test_resource",
-            timestamp=timeutils.utcnow().isoformat(),
-            resource_metadata={}
-        )
-
-        self.stubs.Set(pipeline.TransformerExtensionManager,
-                       "__init__",
-                       self.fake_tem_init)
-
-        self.stubs.Set(pipeline.TransformerExtensionManager,
-                       "get_ext",
-                       self.fake_tem_get_ext)
-
-        self._create_publisher_manager()
         self.pipeline_cfg = [{
             'name': "test_pipeline",
             'interval': 5,
@@ -166,6 +165,7 @@ class TestPipeline(base.TestCase):
         self.assertRaises(pipeline.PipelineException,
                           pipeline.PipelineManager,
                           self.pipeline_cfg,
+                          self.transformer_manager,
                           self.publisher_manager)
 
     def test_no_counters(self):
@@ -222,6 +222,7 @@ class TestPipeline(base.TestCase):
 
     def test_get_interval(self):
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager,
                                                     self.publisher_manager)
 
         pipe = pipeline_manager.pipelines[0]
@@ -229,6 +230,7 @@ class TestPipeline(base.TestCase):
 
     def test_publisher_transformer_invoked(self):
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager,
                                                     self.publisher_manager)
 
         with pipeline_manager.publisher(None, None) as p:
@@ -245,6 +247,7 @@ class TestPipeline(base.TestCase):
         counter_cfg = ['a', 'b']
         self.pipeline_cfg[0]['counters'] = counter_cfg
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager,
                                                     self.publisher_manager)
 
         with pipeline_manager.publisher(None, None) as p:
@@ -267,6 +270,7 @@ class TestPipeline(base.TestCase):
         counter_cfg = ['*']
         self.pipeline_cfg[0]['counters'] = counter_cfg
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager,
                                                     self.publisher_manager)
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter])
@@ -280,6 +284,7 @@ class TestPipeline(base.TestCase):
         counter_cfg = ['*', '!a']
         self.pipeline_cfg[0]['counters'] = counter_cfg
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager,
                                                     self.publisher_manager)
         self.assertFalse(pipeline_manager.pipelines[0].support_counter('a'))
 
@@ -287,6 +292,7 @@ class TestPipeline(base.TestCase):
         counter_cfg = ['*', '!b']
         self.pipeline_cfg[0]['counters'] = counter_cfg
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager,
                                                     self.publisher_manager)
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter])
@@ -299,6 +305,7 @@ class TestPipeline(base.TestCase):
         counter_cfg = ['!b', '!c']
         self.pipeline_cfg[0]['counters'] = counter_cfg
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager,
                                                     self.publisher_manager)
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter])
@@ -314,6 +321,7 @@ class TestPipeline(base.TestCase):
         counter_cfg = ['!a', '!c']
         self.pipeline_cfg[0]['counters'] = counter_cfg
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager,
                                                     self.publisher_manager)
         self.assertFalse(pipeline_manager.pipelines[0].support_counter('a'))
         self.assertTrue(pipeline_manager.pipelines[0].support_counter('b'))
@@ -335,6 +343,7 @@ class TestPipeline(base.TestCase):
         })
 
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager,
                                                     self.publisher_manager)
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter])
@@ -359,7 +368,7 @@ class TestPipeline(base.TestCase):
         self.assertTrue(getattr(self.TransformerClass.samples[1], "name")
                         == 'b')
 
-    def test_multple_pipeline_exception(self):
+    def test_multiple_pipeline_exception(self):
         self.pipeline_cfg.append({
             'name': "second_pipeline",
             "interval": 5,
@@ -374,6 +383,7 @@ class TestPipeline(base.TestCase):
             'publishers': ['except'],
         })
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager,
                                                     self.publisher_manager)
 
         with pipeline_manager.publisher(None, None) as p:
@@ -397,6 +407,7 @@ class TestPipeline(base.TestCase):
     def test_none_transformer_pipeline(self):
         self.pipeline_cfg[0]['transformers'] = None
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager,
                                                     self.publisher_manager)
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter])
@@ -406,6 +417,7 @@ class TestPipeline(base.TestCase):
     def test_empty_transformer_pipeline(self):
         self.pipeline_cfg[0]['transformers'] = []
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager,
                                                     self.publisher_manager)
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter])
@@ -424,6 +436,7 @@ class TestPipeline(base.TestCase):
             },
         ]
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager,
                                                     self.publisher_manager)
 
         with pipeline_manager.publisher(None, None) as p:
@@ -456,6 +469,7 @@ class TestPipeline(base.TestCase):
             },
         ]
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager,
                                                     self.publisher_manager)
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter])
@@ -491,6 +505,7 @@ class TestPipeline(base.TestCase):
             },
         ]
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager,
                                                     self.publisher_manager)
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter])
@@ -506,6 +521,7 @@ class TestPipeline(base.TestCase):
     def test_multiple_publisher(self):
         self.pipeline_cfg[0]['publishers'] = ['test', 'new']
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager,
                                                     self.publisher_manager)
 
         with pipeline_manager.publisher(None, None) as p:
@@ -521,6 +537,7 @@ class TestPipeline(base.TestCase):
     def test_multiple_publisher_isolation(self):
         self.pipeline_cfg[0]['publishers'] = ['except', 'new']
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager,
                                                     self.publisher_manager)
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter])
@@ -532,6 +549,7 @@ class TestPipeline(base.TestCase):
     def test_multiple_counter_pipeline(self):
         self.pipeline_cfg[0]['counters'] = ['a', 'b']
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager,
                                                     self.publisher_manager)
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter,
@@ -561,6 +579,7 @@ class TestPipeline(base.TestCase):
             }, ]
         )
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager,
                                                     self.publisher_manager)
         pipe = pipeline_manager.pipelines[0]
 
@@ -597,6 +616,7 @@ class TestPipeline(base.TestCase):
         )
         self.pipeline_cfg[0]['counters'] = ['a', 'b']
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager,
                                                     self.publisher_manager)
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter,
@@ -620,6 +640,7 @@ class TestPipeline(base.TestCase):
             'parameters': {}
         })
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager,
                                                     self.publisher_manager)
         pipe = pipeline_manager.pipelines[0]
 
@@ -642,6 +663,7 @@ class TestPipeline(base.TestCase):
             'publishers': ["test"],
         }, ]
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager,
                                                     self.publisher_manager)
 
         self.test_counter = self.test_counter._replace(name='a:b')

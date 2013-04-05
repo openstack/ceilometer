@@ -20,11 +20,12 @@ import abc
 import itertools
 
 from oslo.config import cfg
-from stevedore import dispatch
 
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import log
 from ceilometer import pipeline
+from ceilometer import publisher
+from ceilometer import transformer
 
 LOG = log.getLogger(__name__)
 
@@ -52,13 +53,14 @@ class PollingTask(object):
 class AgentManager(object):
 
     def __init__(self, extension_manager):
-        publisher_manager = dispatch.NameDispatchExtensionManager(
-            namespace=pipeline.PUBLISHER_NAMESPACE,
-            check_func=lambda x: True,
-            invoke_on_load=True,
+        self.pipeline_manager = pipeline.setup_pipeline(
+            transformer.TransformerExtensionManager(
+                'ceilometer.transformer',
+            ),
+            publisher.PublisherExtensionManager(
+                'ceilometer.publisher',
+            ),
         )
-
-        self.pipeline_manager = pipeline.setup_pipeline(publisher_manager)
 
         self.pollster_manager = extension_manager
 

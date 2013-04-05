@@ -20,7 +20,6 @@ import itertools
 import os
 
 from oslo.config import cfg
-from stevedore import extension
 import yaml
 
 from ceilometer.openstack.common import log
@@ -36,9 +35,6 @@ cfg.CONF.register_opts(OPTS)
 
 LOG = log.getLogger(__name__)
 
-PUBLISHER_NAMESPACE = 'ceilometer.publisher'
-TRANSFORMER_NAMESPACE = 'ceilometer.transformer'
-
 
 class PipelineException(Exception):
     def __init__(self, message, pipeline_cfg):
@@ -47,21 +43,6 @@ class PipelineException(Exception):
 
     def __str__(self):
         return 'Pipeline %s: %s' % (self.pipeline_cfg, self.msg)
-
-
-class TransformerExtensionManager(extension.ExtensionManager):
-
-    def __init__(self):
-        super(TransformerExtensionManager, self).__init__(
-            namespace=TRANSFORMER_NAMESPACE,
-            invoke_on_load=False,
-            invoke_args=(),
-            invoke_kwds={}
-        )
-        self.by_name = dict((e.name, e) for e in self.extensions)
-
-    def get_ext(self, name):
-        return self.by_name[name]
 
 
 class PublishContext(object):
@@ -306,11 +287,9 @@ class PipelineManager(object):
 
     """
 
-    def __init__(self, cfg, publisher_manager):
-        """Create the pipeline manager."""
-        self._setup_pipelines(cfg, publisher_manager)
-
-    def _setup_pipelines(self, cfg, publisher_manager):
+    def __init__(self, cfg,
+                 transformer_manager,
+                 publisher_manager):
         """Setup the pipelines according to config.
 
         The top of the cfg is a list of pipeline definitions.
@@ -352,7 +331,6 @@ class PipelineManager(object):
         Publisher's name is plugin name in setup.py
 
         """
-        transformer_manager = TransformerExtensionManager()
         self.pipelines = [Pipeline(pipedef, publisher_manager,
                                    transformer_manager)
                           for pipedef in cfg]
@@ -366,7 +344,7 @@ class PipelineManager(object):
         return PublishContext(context, source, self.pipelines)
 
 
-def setup_pipeline(publisher_manager):
+def setup_pipeline(transformer_manager, publisher_manager):
     """Setup pipeline manager according to yaml config file."""
     cfg_file = cfg.CONF.pipeline_cfg_file
     if not os.path.exists(cfg_file):
@@ -381,4 +359,5 @@ def setup_pipeline(publisher_manager):
     LOG.info("Pipeline config: %s", pipeline_cfg)
 
     return PipelineManager(pipeline_cfg,
+                           transformer_manager,
                            publisher_manager)

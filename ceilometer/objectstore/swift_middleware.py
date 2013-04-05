@@ -38,7 +38,6 @@ metadata_headers = X-TEST
 from __future__ import absolute_import
 
 from oslo.config import cfg
-from stevedore import dispatch
 from swift.common.utils import split_path
 import webob
 
@@ -61,7 +60,9 @@ from ceilometer import counter
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import timeutils
 from ceilometer import pipeline
+from ceilometer import publisher
 from ceilometer import service
+from ceilometer import transformer
 
 
 class CeilometerMiddleware(object):
@@ -78,13 +79,15 @@ class CeilometerMiddleware(object):
                                      "").split(",") if h.strip()]
 
         service.prepare_service()
-        publisher_manager = dispatch.NameDispatchExtensionManager(
-            namespace=pipeline.PUBLISHER_NAMESPACE,
-            check_func=lambda x: True,
-            invoke_on_load=True,
-        )
 
-        self.pipeline_manager = pipeline.setup_pipeline(publisher_manager)
+        self.pipeline_manager = pipeline.setup_pipeline(
+            transformer.TransformerExtensionManager(
+                'ceilometer.transformer',
+            ),
+            publisher.PublisherExtensionManager(
+                'ceilometer.publisher',
+            ),
+        )
 
     def __call__(self, env, start_response):
         start_response_args = [None]
