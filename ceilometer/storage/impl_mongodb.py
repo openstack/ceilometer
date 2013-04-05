@@ -22,7 +22,6 @@
 
 import copy
 import datetime
-import nose
 import operator
 import os
 import re
@@ -234,6 +233,7 @@ class Connection(base.Connection):
                     try:
                         from ming import mim
                     except ImportError:
+                        import nose
                         raise nose.SkipTest("Ming not found")
                     LOG.debug('Creating a new MIM Connection object')
                     Connection._mim_instance = mim.Connection()
@@ -556,4 +556,5 @@ def require_map_reduce(conn):
         import spidermonkey
     except BaseException:
         if isinstance(conn.conn, mim.Connection):
+            import nose
             raise nose.SkipTest('requires spidermonkey')
