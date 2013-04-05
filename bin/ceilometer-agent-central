@@ -22,6 +22,10 @@ eventlet.monkey_patch()
 import sys
 
 from oslo.config import cfg
+
+from ceilometer.openstack.common import gettextutils
+gettextutils.install('ceilometer')
+
 from ceilometer.central import manager
 from ceilometer.service import prepare_service
 from ceilometer.openstack.common import service

@@ -24,6 +24,9 @@ from wsgiref import simple_server
 
 from oslo.config import cfg
 
+from ceilometer.openstack.common import gettextutils
+gettextutils.install('ceilometer')
+
 from ceilometer.api import app
 from ceilometer import service
 

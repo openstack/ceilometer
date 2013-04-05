@@ -22,6 +22,9 @@ import sys
 
 from oslo.config import cfg
 
+from ceilometer.openstack.common import gettextutils
+gettextutils.install('ceilometer')
+
 from ceilometer import service
 from ceilometer import storage
 
