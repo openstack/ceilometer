@@ -53,11 +53,6 @@ class RawEventTest(base.RawEventTest, SQLAlchemyEngineTestBase):
     pass
 
 
-class TestGetEventInterval(base.TestGetEventInterval,
-                           SQLAlchemyEngineTestBase):
-    pass
-
-
 class StatisticsTest(base.StatisticsTest, SQLAlchemyEngineTestBase):
     pass
 

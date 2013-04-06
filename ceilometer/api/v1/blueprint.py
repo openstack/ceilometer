@@ -559,7 +559,8 @@ def compute_duration_by_resource(resource, meter):
         start=q_ts['query_start'],
         end=q_ts['query_end'],
     )
-    min_ts, max_ts = flask.request.storage_conn.get_event_interval(f)
+    stats = flask.request.storage_conn.get_meter_statistics(f)
+    min_ts, max_ts = stats.duration_start, stats.duration_end
 
     # "Clamp" the timestamps we return to the original time
     # range, excluding the offset.

@@ -90,13 +90,6 @@ class RawEventTest(base.RawEventTest, MongoDBEngineTestBase):
     pass
 
 
-class TestGetEventInterval(base.TestGetEventInterval, MongoDBEngineTestBase):
-
-    def setUp(self):
-        super(TestGetEventInterval, self).setUp()
-        require_map_reduce(self.conn)
-
-
 class StatisticsTest(base.StatisticsTest, MongoDBEngineTestBase):
 
     def setUp(self):

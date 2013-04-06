@@ -344,19 +344,6 @@ class Connection(base.Connection):
         mainq = mainq.join(Meter).group_by(Resource.id)
         return mainq.filter(Meter.id.in_(subq))
 
-    def get_event_interval(self, event_filter):
-        """Return the min and max timestamps from samples,
-        using the event_filter to limit the samples seen.
-
-        ( datetime.datetime(), datetime.datetime() )
-        """
-        query = self.session.query(func.min(Meter.timestamp),
-                                   func.max(Meter.timestamp))
-        query = make_query_from_filter(query, event_filter)
-        results = query.all()
-        a_min, a_max = results[0]
-        return (a_min, a_max)
-
     def _make_stats_query(self, event_filter):
         query = self.session.query(
             func.min(Meter.timestamp).label('tsmin'),

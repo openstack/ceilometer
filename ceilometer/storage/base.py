@@ -131,14 +131,6 @@ class Connection(object):
         """
 
     @abc.abstractmethod
-    def get_event_interval(self, event_filter):
-        """Return the min and max timestamps from samples,
-        using the event_filter to limit the samples seen.
-
-        ( datetime.datetime(), datetime.datetime() )
-        """
-
-    @abc.abstractmethod
     def get_meter_statistics(self, event_filter, period=None):
         """Return an iterable of model.Statistics instances
 
