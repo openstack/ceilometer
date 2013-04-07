@@ -46,5 +46,5 @@ def install(domain):
     NOVA_LOCALEDIR).
     """
     gettext.install(domain,
-                    os.environ.get(domain.upper() + '_LOCALEDIR'),
+                    localedir=os.environ.get(domain.upper() + '_LOCALEDIR'),
                     unicode=True)
