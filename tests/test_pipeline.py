@@ -20,7 +20,6 @@
 from stevedore import extension
 
 from ceilometer import counter
-from ceilometer import plugin
 from ceilometer import publisher
 from ceilometer import transformer
 from ceilometer.transformer import accumulator
@@ -65,7 +64,7 @@ class TestPipeline(base.TestCase):
         def publish_counters(self, ctxt, counters, source):
             raise Exception()
 
-    class TransformerClass(plugin.TransformerBase):
+    class TransformerClass(transformer.TransformerBase):
         samples = []
 
         def __init__(self, append_name='_update'):
@@ -80,7 +79,7 @@ class TestPipeline(base.TestCase):
             newname = getattr(counter, 'name') + self.append_name
             return counter._replace(name=newname)
 
-    class TransformerClassDrop(plugin.TransformerBase):
+    class TransformerClassDrop(transformer.TransformerBase):
         samples = []
 
         def __init__(self):

@@ -18,6 +18,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import abc
 from stevedore import dispatch
 
 
@@ -29,3 +30,13 @@ class PublisherExtensionManager(dispatch.NameDispatchExtensionManager):
             check_func=lambda x: True,
             invoke_on_load=True,
         )
+
+
+class PublisherBase(object):
+    """Base class for plugins that publish the sampler."""
+
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def publish_counters(self, context, counters, source):
+        "Publish counters into final conduit."

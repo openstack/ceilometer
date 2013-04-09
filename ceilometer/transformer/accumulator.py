@@ -16,10 +16,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from ceilometer import plugin
+from ceilometer import transformer
 
 
-class TransformerAccumulator(plugin.TransformerBase):
+class TransformerAccumulator(transformer.TransformerBase):
     """Transformer that accumulates counter until a threshold, and then flush
     them out in the wild. """
 

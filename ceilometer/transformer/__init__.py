@@ -16,6 +16,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import abc
 from stevedore import extension
 
 
@@ -32,3 +33,37 @@ class TransformerExtensionManager(extension.ExtensionManager):
 
     def get_ext(self, name):
         return self.by_name[name]
+
+
+class TransformerBase(object):
+    """Base class for plugins that transform the counter."""
+
+    __metaclass__ = abc.ABCMeta
+
+    def __init__(self, **kwargs):
+        """Setup transformer.
+
+        Each time a transformed is involved in a pipeline, a new transformer
+        instance is created and chained into the pipeline. i.e. transformer
+        instance is per pipeline. This helps if transformer need keep some
+        cache and per-pipeline information.
+
+        :param kwargs: The parameters that are defined in pipeline config file.
+        """
+        super(TransformerBase, self).__init__()
+
+    @abc.abstractmethod
+    def handle_sample(self, context, counter, source):
+        """Transform a counter.
+
+        :param context: Passed from the data collector.
+        :param counter: A counter.
+        :param source: Passed from data collector.
+        """
+
+    def flush(self, context, source):
+        """Flush counters cached previously.
+
+        :param context: Passed from the data collector.
+        :param source: Source of counters that are being published."""
+        return []
