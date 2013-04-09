@@ -36,7 +36,7 @@ cfg.CONF.register_opts(OPTS)
 
 
 class _Base(plugin.NotificationBase):
-    """Convert compute.instance.* notifications into Counters
+    """Convert volume notifications into Counters
     """
 
     metadata_keys = [

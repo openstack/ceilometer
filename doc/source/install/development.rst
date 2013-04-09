@@ -44,7 +44,12 @@ Configuring Devstack
    instances by default. To enable these auditing events, set
    ``instance_usage_audit`` to true in the nova configuration file.
 
-4. The ceilometer services are not enabled by default, so they must be
+4. Cinder does not generate notifications by default. To enable
+   these auditing events, set the following in the cinder configuration file::
+
+      notification_driver=cinder.openstack.common.notifier.rpc_notifier
+
+5. The ceilometer services are not enabled by default, so they must be
    enabled in ``localrc`` before running ``stack.sh``.
 
 This example ``localrc`` file shows all of the settings required for
