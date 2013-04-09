@@ -7,9 +7,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ceilometer "
-"jenkins.ceilometer.propose.translation.update.70\n"
+"jenkins.ceilometer.propose.translation.update.84\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-03-26 00:01+0000\n"
+"POT-Creation-Date: 2013-04-09 00:01+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,36 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
+
+#: ceilometer/compute/nova_notifier/folsom.py:62
+#: ceilometer/compute/nova_notifier/grizzly.py:144
+#, python-format
+msgid "polling final stats for %r"
+msgstr ""
+
+#: ceilometer/compute/nova_notifier/grizzly.py:91
+#, python-format
+msgid "using provided stats gatherer %r"
+msgstr ""
+
+#: ceilometer/compute/nova_notifier/grizzly.py:94
+msgid "making a new stats gatherer"
+msgstr ""
+
+#: ceilometer/compute/nova_notifier/grizzly.py:114
+#, python-format
+msgid "INFO %r"
+msgstr ""
+
+#: ceilometer/compute/nova_notifier/grizzly.py:138
+#, python-format
+msgid "ignoring %s"
+msgstr ""
+
+#: ceilometer/compute/nova_notifier/grizzly.py:140
+#, python-format
+msgid "processing %s"
+msgstr ""
 
 #: ceilometer/energy/kwapi.py:68
 msgid "Kwapi endpoint not found"
@@ -31,17 +61,22 @@ msgstr ""
 msgid "Original exception being dropped: %s"
 msgstr ""
 
-#: ceilometer/openstack/common/log.py:225
+#: ceilometer/openstack/common/log.py:226
 #, python-format
 msgid "Deprecated: %s"
 msgstr ""
 
-#: ceilometer/openstack/common/log.py:358
+#: ceilometer/openstack/common/log.py:329
+#, python-format
+msgid "Error loading logging config %(log_config)s: %(err_msg)s"
+msgstr ""
+
+#: ceilometer/openstack/common/log.py:379
 #, python-format
 msgid "syslog facility must be one of: %s"
 msgstr ""
 
-#: ceilometer/openstack/common/log.py:519
+#: ceilometer/openstack/common/log.py:540
 #, python-format
 msgid "Fatal call to deprecated config: %(msg)s"
 msgstr ""
