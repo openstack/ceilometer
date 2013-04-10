@@ -308,3 +308,34 @@ class TestListResources(FunctionalTest):
             [('display_name', 'test-server'),
              ('tag', 'self.counter'),
              ])
+
+    def test_resource_meter_links(self):
+        counter1 = counter.Counter(
+            'instance',
+            'cumulative',
+            '',
+            1,
+            'user-id',
+            'project-id',
+            'resource-id',
+            timestamp=datetime.datetime(2012, 7, 2, 10, 40),
+            resource_metadata={'display_name': 'test-server',
+                               'tag': 'self.counter',
+                               }
+        )
+        msg = meter.meter_message_from_counter(counter1,
+                                               cfg.CONF.metering_secret,
+                                               'test_list_resources',
+                                               )
+        self.conn.record_metering_data(msg)
+
+        data = self.get_json('/resources')
+        links = data[0]['links']
+        self.assertEqual(len(links), 2)
+        self.assertEqual(links[0]['rel'], 'self')
+        self.assertTrue((self.PATH_PREFIX + '/resources/resource-id')
+                        in links[0]['href'])
+        self.assertEqual(links[1]['rel'], 'instance')
+        self.assertTrue((self.PATH_PREFIX + '/meters/instance?'
+                         'q.field=resource_id&q.value=resource-id')
+                        in links[1]['href'])
