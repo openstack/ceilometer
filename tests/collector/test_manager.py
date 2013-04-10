@@ -26,7 +26,7 @@ from oslo.config import cfg
 from stevedore import extension
 from stevedore.tests import manager as test_manager
 
-from ceilometer.collector import meter
+from ceilometer.publisher import meter
 from ceilometer.collector import service
 from ceilometer.storage import base
 from ceilometer.tests import base as tests_base
@@ -89,7 +89,7 @@ class TestCollectorService(tests_base.TestCase):
         super(TestCollectorService, self).setUp()
         self.srv = service.CollectorService('the-host', 'the-topic')
         self.ctx = None
-        #cfg.CONF.metering_secret = 'not-so-secret'
+        #cfg.CONF.publisher_meter.metering_secret = 'not-so-secret'
 
     @patch('ceilometer.pipeline.setup_pipeline', MagicMock())
     def test_init_host(self):
@@ -107,7 +107,7 @@ class TestCollectorService(tests_base.TestCase):
                }
         msg['message_signature'] = meter.compute_signature(
             msg,
-            cfg.CONF.metering_secret,
+            cfg.CONF.publisher_meter.metering_secret,
         )
 
         self.srv.storage_conn = self.mox.CreateMock(base.Connection)
@@ -146,7 +146,7 @@ class TestCollectorService(tests_base.TestCase):
                }
         msg['message_signature'] = meter.compute_signature(
             msg,
-            cfg.CONF.metering_secret,
+            cfg.CONF.publisher_meter.metering_secret,
         )
 
         expected = {}
@@ -168,7 +168,7 @@ class TestCollectorService(tests_base.TestCase):
                }
         msg['message_signature'] = meter.compute_signature(
             msg,
-            cfg.CONF.metering_secret,
+            cfg.CONF.publisher_meter.metering_secret,
         )
 
         expected = {}

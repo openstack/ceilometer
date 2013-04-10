@@ -25,7 +25,7 @@ import datetime
 
 from oslo.config import cfg
 
-from ceilometer.collector import meter
+from ceilometer.publisher import meter
 from ceilometer import counter
 from ceilometer import storage
 from ceilometer.tests import db as test_db
@@ -54,10 +54,11 @@ class DBTestBase(test_db.TestBase):
                                'tag': 'self.counter',
                                }
         )
-        self.msg1 = meter.meter_message_from_counter(self.counter,
-                                                     cfg.CONF.metering_secret,
-                                                     'test-1',
-                                                     )
+        self.msg1 = meter.meter_message_from_counter(
+            self.counter,
+            cfg.CONF.publisher_meter.metering_secret,
+            'test-1',
+        )
         self.conn.record_metering_data(self.msg1)
         self.msgs.append(self.msg1)
 
@@ -74,10 +75,11 @@ class DBTestBase(test_db.TestBase):
                                'tag': 'self.counter2',
                                }
         )
-        self.msg2 = meter.meter_message_from_counter(self.counter2,
-                                                     cfg.CONF.metering_secret,
-                                                     'test-2',
-                                                     )
+        self.msg2 = meter.meter_message_from_counter(
+            self.counter2,
+            cfg.CONF.publisher_meter.metering_secret,
+            'test-2',
+        )
         self.conn.record_metering_data(self.msg2)
         self.msgs.append(self.msg2)
 
@@ -94,10 +96,11 @@ class DBTestBase(test_db.TestBase):
                                'tag': 'self.counter3',
                                }
         )
-        self.msg3 = meter.meter_message_from_counter(self.counter3,
-                                                     cfg.CONF.metering_secret,
-                                                     'test-3',
-                                                     )
+        self.msg3 = meter.meter_message_from_counter(
+            self.counter3,
+            cfg.CONF.publisher_meter.metering_secret,
+            'test-3',
+        )
         self.conn.record_metering_data(self.msg3)
         self.msgs.append(self.msg3)
 
@@ -114,8 +117,11 @@ class DBTestBase(test_db.TestBase):
                 resource_metadata={'display_name': 'test-server',
                                    'tag': 'counter-%s' % i},
             )
-            msg = meter.meter_message_from_counter(c, cfg.CONF.metering_secret,
-                                                   'test')
+            msg = meter.meter_message_from_counter(
+                c,
+                cfg.CONF.publisher_meter.metering_secret,
+                'test',
+            )
             self.conn.record_metering_data(msg)
             self.msgs.append(msg)
 
@@ -359,10 +365,11 @@ class StatisticsTest(DBTestBase):
                                    }
             )
             self.counters.append(c)
-            msg = meter.meter_message_from_counter(c,
-                                                   secret='not-so-secret',
-                                                   source='test',
-                                                   )
+            msg = meter.meter_message_from_counter(
+                c,
+                secret='not-so-secret',
+                source='test',
+            )
             self.conn.record_metering_data(msg)
         for i in range(3):
             c = counter.Counter(
@@ -379,10 +386,11 @@ class StatisticsTest(DBTestBase):
                                    }
             )
             self.counters.append(c)
-            msg = meter.meter_message_from_counter(c,
-                                                   secret='not-so-secret',
-                                                   source='test',
-                                                   )
+            msg = meter.meter_message_from_counter(
+                c,
+                secret='not-so-secret',
+                source='test',
+            )
             self.conn.record_metering_data(msg)
 
     def test_by_user(self):
@@ -522,7 +530,7 @@ class CounterDataTypeTest(DBTestBase):
         )
         msg = meter.meter_message_from_counter(
             c,
-            cfg.CONF.metering_secret,
+            cfg.CONF.publisher_meter.metering_secret,
             'test-1',
         )
 
@@ -541,7 +549,7 @@ class CounterDataTypeTest(DBTestBase):
         )
         msg = meter.meter_message_from_counter(
             c,
-            cfg.CONF.metering_secret,
+            cfg.CONF.publisher_meter.metering_secret,
             'test-1',
         )
         self.conn.record_metering_data(msg)
@@ -559,7 +567,7 @@ class CounterDataTypeTest(DBTestBase):
         )
         msg = meter.meter_message_from_counter(
             c,
-            cfg.CONF.metering_secret,
+            cfg.CONF.publisher_meter.metering_secret,
             'test-1',
         )
         self.conn.record_metering_data(msg)

@@ -15,27 +15,41 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Compute the signature of a metering message.
+"""Publish a counter using the preferred RPC mechanism.
 """
 
 import hashlib
 import hmac
+import itertools
 import uuid
 
 from oslo.config import cfg
 
-METER_OPTS = [
+from ceilometer.openstack.common import log
+from ceilometer.openstack.common import rpc
+from ceilometer import publisher
+
+
+LOG = log.getLogger(__name__)
+
+METER_PUBLISH_OPTS = [
+    cfg.StrOpt('metering_topic',
+               default='metering',
+               help='the topic ceilometer uses for metering messages',
+               deprecated_group="DEFAULT",
+               ),
     cfg.StrOpt('metering_secret',
                default='change this or be hacked',
                help='Secret value for signing metering messages',
+               deprecated_group="DEFAULT",
                ),
 ]
 
 
 def register_opts(config):
-    """Register the options for signing metering messages.
+    """Register the options for publishing metering messages.
     """
-    config.register_opts(METER_OPTS)
+    config.register_opts(METER_PUBLISH_OPTS, group="publisher_meter")
 
 
 register_opts(cfg.CONF)
@@ -101,3 +115,40 @@ def meter_message_from_counter(counter, secret, source):
            }
     msg['message_signature'] = compute_signature(msg, secret)
     return msg
+
+
+class MeterPublisher(publisher.PublisherBase):
+    def publish_counters(self, context, counters, source):
+        """Send a metering message for publishing
+
+        :param context: Execution context from the service or RPC call
+        :param counter: Counter from pipeline after transformation
+        :param source: counter source
+        """
+
+        meters = [
+            meter_message_from_counter(
+                counter,
+                cfg.CONF.publisher_meter.metering_secret,
+                source)
+            for counter in counters
+        ]
+
+        topic = cfg.CONF.publisher_meter.metering_topic
+        msg = {
+            'method': 'record_metering_data',
+            'version': '1.0',
+            'args': {'data': meters},
+        }
+        LOG.debug('PUBLISH: %s', str(msg))
+        rpc.cast(context, topic, msg)
+
+        for meter_name, meter_list in itertools.groupby(
+                sorted(meters, key=lambda m: m['counter_name']),
+                lambda m: m['counter_name']):
+            msg = {
+                'method': 'record_metering_data',
+                'version': '1.0',
+                'args': {'data': list(meter_list)},
+            }
+            rpc.cast(context, topic + '.' + meter_name, msg)

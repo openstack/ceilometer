@@ -404,7 +404,7 @@
 #matchmaker_heartbeat_ttl=600
 
 
-######## defined in ceilometer.publisher.meter_publish ########
+######## defined in ceilometer.publisher.meter ########
 
 # the topic ceilometer uses for metering messages (string
 # value)
