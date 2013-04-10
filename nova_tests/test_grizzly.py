@@ -19,18 +19,10 @@
 """Tests for ceilometer.compute.nova_notifier
 """
 
-try:
-    import nova.conductor
-except ImportError:
-    import nose.plugins.skip
-    raise nose.SkipTest('do not run grizzly tests under folsom')
-
 import contextlib
 import datetime
 
 import mock
-
-from oslo.config import cfg
 
 from stevedore import extension
 from stevedore.tests import manager as test_manager
@@ -38,7 +30,7 @@ from stevedore.tests import manager as test_manager
 ## NOTE(dhellmann): These imports are not in the generally approved
 ## alphabetical order, but they are in the order that actually
 ## works. Please don't change them.
-
+from nova.tests import fake_network
 from nova.compute import vm_states
 from nova.compute import instance_types
 from nova import config
@@ -47,7 +39,6 @@ from nova import db
 from nova.openstack.common import importutils
 from nova.openstack.common import log as logging
 from nova.openstack.common.notifier import api as notifier_api
-from nova.tests import fake_network
 
 # For nova_CONF.compute_manager, used in the nova_notifier module.
 from nova import service
