@@ -84,27 +84,39 @@ class TestSwiftMiddleware(base.TestCase):
         resp = app(req.environ, self.start_response)
         self.assertEqual(list(resp), ["This string is 28 bytes long"])
         counters = self.pipeline_manager.pipelines[0].counters
-        self.assertEqual(len(counters), 1)
+        self.assertEqual(len(counters), 2)
         data = counters[0]
         self.assertEqual(data.volume, 28)
         self.assertEqual(data.resource_metadata['version'], '1.0')
         self.assertEqual(data.resource_metadata['container'], 'container')
         self.assertEqual(data.resource_metadata['object'], 'obj')
 
+        # test the # of request and the request method
+        data = counters[1]
+        self.assertEqual(data.name, 'storage.api.request')
+        self.assertEqual(data.volume, 1)
+        self.assertEqual(data.resource_metadata['method'], 'get')
+
     def test_put(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(body=['']), {})
         req = Request.blank('/1.0/account/container/obj',
-                            environ={'REQUEST_METHOD': 'GET',
+                            environ={'REQUEST_METHOD': 'PUT',
                                      'wsgi.input':
                                      StringIO.StringIO('some stuff')})
         resp = list(app(req.environ, self.start_response))
         counters = self.pipeline_manager.pipelines[0].counters
-        self.assertEqual(len(counters), 1)
+        self.assertEqual(len(counters), 2)
         data = counters[0]
         self.assertEqual(data.volume, 10)
         self.assertEqual(data.resource_metadata['version'], '1.0')
         self.assertEqual(data.resource_metadata['container'], 'container')
         self.assertEqual(data.resource_metadata['object'], 'obj')
+
+        # test the # of request and the request method
+        data = counters[1]
+        self.assertEqual(data.name, 'storage.api.request')
+        self.assertEqual(data.volume, 1)
+        self.assertEqual(data.resource_metadata['method'], 'put')
 
     def test_post(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(body=['']), {})
@@ -114,12 +126,54 @@ class TestSwiftMiddleware(base.TestCase):
                                      StringIO.StringIO('some other stuff')})
         resp = list(app(req.environ, self.start_response))
         counters = self.pipeline_manager.pipelines[0].counters
-        self.assertEqual(len(counters), 1)
+        self.assertEqual(len(counters), 2)
         data = counters[0]
         self.assertEqual(data.volume, 16)
         self.assertEqual(data.resource_metadata['version'], '1.0')
         self.assertEqual(data.resource_metadata['container'], 'container')
         self.assertEqual(data.resource_metadata['object'], 'obj')
+
+        # test the # of request and the request method
+        data = counters[1]
+        self.assertEqual(data.name, 'storage.api.request')
+        self.assertEqual(data.volume, 1)
+        self.assertEqual(data.resource_metadata['method'], 'post')
+
+    def test_head(self):
+        app = swift_middleware.CeilometerMiddleware(FakeApp(body=['']), {})
+        req = Request.blank('/1.0/account/container/obj',
+                            environ={'REQUEST_METHOD': 'HEAD'})
+        resp = list(app(req.environ, self.start_response))
+        counters = self.pipeline_manager.pipelines[0].counters
+        self.assertEqual(len(counters), 1)
+        data = counters[0]
+        self.assertEqual(data.resource_metadata['version'], '1.0')
+        self.assertEqual(data.resource_metadata['container'], 'container')
+        self.assertEqual(data.resource_metadata['object'], 'obj')
+        self.assertEqual(data.resource_metadata['method'], 'head')
+
+        self.assertEqual(data.name, 'storage.api.request')
+        self.assertEqual(data.volume, 1)
+
+    def test_bogus_request(self):
+        """
+        test even for arbitrary request method, this will still work
+        """
+        app = swift_middleware.CeilometerMiddleware(FakeApp(body=['']), {})
+        req = Request.blank('/1.0/account/container/obj',
+                            environ={'REQUEST_METHOD': 'BOGUS'})
+        resp = list(app(req.environ, self.start_response))
+        counters = self.pipeline_manager.pipelines[0].counters
+
+        self.assertEqual(len(counters), 1)
+        data = counters[0]
+        self.assertEqual(data.resource_metadata['version'], '1.0')
+        self.assertEqual(data.resource_metadata['container'], 'container')
+        self.assertEqual(data.resource_metadata['object'], 'obj')
+        self.assertEqual(data.resource_metadata['method'], 'bogus')
+
+        self.assertEqual(data.name, 'storage.api.request')
+        self.assertEqual(data.volume, 1)
 
     def test_get_container(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(), {})
@@ -127,7 +181,7 @@ class TestSwiftMiddleware(base.TestCase):
                             environ={'REQUEST_METHOD': 'GET'})
         resp = list(app(req.environ, self.start_response))
         counters = self.pipeline_manager.pipelines[0].counters
-        self.assertEqual(len(counters), 1)
+        self.assertEqual(len(counters), 2)
         data = counters[0]
         self.assertEqual(data.volume, 28)
         self.assertEqual(data.resource_metadata['version'], '1.0')
@@ -140,7 +194,7 @@ class TestSwiftMiddleware(base.TestCase):
                             environ={'REQUEST_METHOD': 'GET'})
         resp = list(app(req.environ, self.start_response))
         counters = self.pipeline_manager.pipelines[0].counters
-        self.assertEqual(len(counters), 1)
+        self.assertEqual(len(counters), 2)
         data = counters[0]
         http_headers = [k for k in data.resource_metadata.keys()
                         if k.startswith('http_header_')]
@@ -161,7 +215,7 @@ class TestSwiftMiddleware(base.TestCase):
                             })
         resp = list(app(req.environ, self.start_response))
         counters = self.pipeline_manager.pipelines[0].counters
-        self.assertEqual(len(counters), 1)
+        self.assertEqual(len(counters), 2)
         data = counters[0]
         http_headers = [k for k in data.resource_metadata.keys()
                         if k.startswith('http_header_')]
@@ -183,7 +237,7 @@ class TestSwiftMiddleware(base.TestCase):
                             environ={'REQUEST_METHOD': 'GET'})
         resp = list(app(req.environ, self.start_response))
         counters = self.pipeline_manager.pipelines[0].counters
-        self.assertEqual(len(counters), 1)
+        self.assertEqual(len(counters), 2)
         data = counters[0]
         http_headers = [k for k in data.resource_metadata.keys()
                         if k.startswith('http_header_')]

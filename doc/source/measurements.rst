@@ -140,6 +140,7 @@ storage.objects.size            Gauge                B  store ID  Total size of 
 storage.objects.containers      Gauge       containers  store ID  Number of containers
 storage.objects.incoming.bytes  Delta                B  store ID  Number of incoming bytes
 storage.objects.outgoing.bytes  Delta                B  store ID  Number of outgoing bytes
+storage.api.request             Delta          request  store ID  Number of API requests against swift
 ==============================  ==========  ==========  ========  ==============================================
 
 Energy (Kwapi)

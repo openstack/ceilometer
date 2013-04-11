@@ -144,7 +144,7 @@ class CeilometerMiddleware(object):
             if bytes_received:
                 publisher([counter.Counter(
                     name='storage.objects.incoming.bytes',
-                    type='delta',
+                    type=counter.TYPE_DELTA,
                     unit='B',
                     volume=bytes_received,
                     user_id=env.get('HTTP_X_USER_ID'),
@@ -156,7 +156,7 @@ class CeilometerMiddleware(object):
             if bytes_sent:
                 publisher([counter.Counter(
                     name='storage.objects.outgoing.bytes',
-                    type='delta',
+                    type=counter.TYPE_DELTA,
                     unit='B',
                     volume=bytes_sent,
                     user_id=env.get('HTTP_X_USER_ID'),
@@ -164,6 +164,20 @@ class CeilometerMiddleware(object):
                     resource_id=account.partition('AUTH_')[2],
                     timestamp=now,
                     resource_metadata=resource_metadata)])
+
+            # publish the event for each request
+            # request method will be recorded in the metadata
+            resource_metadata['method'] = req.method.lower()
+            publisher([counter.Counter(
+                name='storage.api.request',
+                type=counter.TYPE_DELTA,
+                unit='request',
+                volume=1,
+                user_id=env.get('HTTP_X_USER_ID'),
+                project_id=env.get('HTTP_X_TENANT_ID'),
+                resource_id=account.partition('AUTH_')[2],
+                timestamp=now,
+                resource_metadata=resource_metadata)])
 
 
 def filter_factory(global_conf, **local_conf):
