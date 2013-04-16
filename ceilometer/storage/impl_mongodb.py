@@ -516,6 +516,11 @@ def require_map_reduce(conn):
     try:
         import spidermonkey
     except BaseException:
-        if isinstance(conn.conn, mim.Connection):
+        try:
+            from ming import mim
+            if hasattr(conn, "conn") and isinstance(conn.conn, mim.Connection):
+                import nose
+                raise nose.SkipTest('requires spidermonkey')
+        except ImportError:
             import nose
-            raise nose.SkipTest('requires spidermonkey')
+            raise nose.SkipTest('requires mim')
