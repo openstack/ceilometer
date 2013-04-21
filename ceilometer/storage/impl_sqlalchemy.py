@@ -26,12 +26,12 @@ from sqlalchemy.orm import exc
 
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
+import ceilometer.openstack.common.db.sqlalchemy.session as sqlalchemy_session
 from ceilometer.storage import base
 from ceilometer.storage import models as api_models
 from ceilometer.storage.sqlalchemy import migration
 from ceilometer.storage.sqlalchemy.models import Meter, Project, Resource
 from ceilometer.storage.sqlalchemy.models import Source, User, Base, Alarm
-import ceilometer.storage.sqlalchemy.session as sqlalchemy_session
 
 LOG = log.getLogger(__name__)
 

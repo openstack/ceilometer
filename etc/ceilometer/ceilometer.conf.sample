@@ -423,7 +423,7 @@
 #mysql_engine=InnoDB
 
 
-######## defined in ceilometer.storage.sqlalchemy.session ########
+######## defined in ceilometer.openstack.common.db.sqlalchemy.session ########
 
 # Verbosity of SQL debugging information. 0=None,
 # 100=Everything (integer value)
