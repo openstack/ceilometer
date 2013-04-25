@@ -86,8 +86,13 @@ fake_rabbit                  False                                 If passed, us
 publish_errors               False                                 publish error events
 use_stderr                   True                                  Log output to standard error
 logfile_mode                 0644                                  Default file mode used when creating log files
-logdir                                                             Log output to a per-service log file in named directory
-logfile                                                            Log output to a named file
+log_dir                                                            Log output to a per-service log file in named directory
+log_file                                                           Log output to a named file
+log_format                   date-time level name msg              Log format
+log_date_format              YYYY-MM-DD hh:mm:ss                   Log date format
+log_config                                                         Logging configuration file used. The options specified in that
+                                                                    config file will override any other logging options specified
+                                                                    in Ceilometer config file.
 default_log_levels           ['amqplib=WARN',sqlalchemy=WARN,...]  Default log level per components
 notification_topics          ['notifications', ]                   AMQP topic used for openstack notifications
 enabled_apis                 ['ec2', 'osapi_compute']              List of APIs to enable by default
@@ -143,3 +148,6 @@ rpc_response_timeout         60                                    Seconds to wa
 rpc_cast_timeout             30                                    Seconds to wait before a cast expires (TTL).
                                                                    Only supported by impl_zmq.
 ===========================  ====================================  ==============================================================
+
+A sample configuration file can be found in ceilometer.conf.sample_.
+.. _ceilometer.conf.sample: https://github.com/openstack/ceilometer/blob/master/etc/ceilometer/ceilometer.conf.sample
