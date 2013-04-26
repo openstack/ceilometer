@@ -89,7 +89,7 @@ class ImageCRUD(ImageCRUDBase):
             counter.Counter(
                 name=message['event_type'],
                 type=counter.TYPE_DELTA,
-                unit='event',
+                unit='image',
                 volume=1,
                 resource_id=message['payload']['id'],
                 user_id=None,
