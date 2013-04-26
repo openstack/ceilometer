@@ -1,9 +1,7 @@
-#!/usr/bin/env python
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 # Copyright 2012 SINA Corporation
 # All Rights Reserved.
-# Author: Zhongyue Luo <lzyeval@gmail.com>
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -16,9 +14,13 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+#
+# @author: Zhongyue Luo, SINA Corporation.
+#
 
 """Extracts OpenStack config option info from module(s)."""
 
+import imp
 import os
 import re
 import socket
@@ -37,11 +39,19 @@ FLOATOPT = "FloatOpt"
 LISTOPT = "ListOpt"
 MULTISTROPT = "MultiStrOpt"
 
+OPT_TYPES = {
+    STROPT: 'string value',
+    BOOLOPT: 'boolean value',
+    INTOPT: 'integer value',
+    FLOATOPT: 'floating point value',
+    LISTOPT: 'list value',
+    MULTISTROPT: 'multi valued',
+}
+
 OPTION_COUNT = 0
 OPTION_REGEX = re.compile(r"(%s)" % "|".join([STROPT, BOOLOPT, INTOPT,
                                               FLOATOPT, LISTOPT,
                                               MULTISTROPT]))
-OPTION_HELP_INDENT = "####"
 
 PY_EXT = ".py"
 BASEDIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
@@ -49,10 +59,7 @@ WORDWRAP_WIDTH = 60
 
 
 def main(srcfiles):
-    print '\n'.join(['#' * 20, '# ceilometer.conf sample #', '#' * 20,
-                     '', '[DEFAULT]', ''])
-    _list_opts(cfg.CommonConfigOpts,
-               cfg.__name__ + ':' + cfg.CommonConfigOpts.__name__)
+    print '\n'.join(['#' * 26, '# ceilometer.conf sample #', '#' * 26, ''])
     mods_by_pkg = dict()
     for filepath in srcfiles:
         pkg_name = filepath.split(os.sep)[1]
@@ -65,47 +72,124 @@ def main(srcfiles):
     ext_names = filter(lambda x: x not in pkg_names, mods_by_pkg.keys())
     ext_names.sort()
     pkg_names.extend(ext_names)
+
+    # opts_by_group is a mapping of group name to an options list
+    # The options list is a list of (module, options) tuples
+    opts_by_group = {'DEFAULT': []}
+
     for pkg_name in pkg_names:
         mods = mods_by_pkg.get(pkg_name)
         mods.sort()
         for mod_str in mods:
-            _print_module(mod_str)
+            if mod_str.endswith('.__init__'):
+                mod_str = mod_str[:mod_str.rfind(".")]
+
+            mod_obj = _import_module(mod_str)
+            if not mod_obj:
+                continue
+
+            for group, opts in _list_opts(mod_obj):
+                opts_by_group.setdefault(group, []).append((mod_str, opts))
+
+    print_group_opts('DEFAULT', opts_by_group.pop('DEFAULT', []))
+    for group, opts in opts_by_group.items():
+        print_group_opts(group, opts)
+
     print "# Total option count: %d" % OPTION_COUNT
 
 
-def _print_module(mod_str):
-    mod_obj = None
-    if mod_str.endswith('.__init__'):
-        mod_str = mod_str[:mod_str.rfind(".")]
+def _import_module(mod_str):
     try:
-        mod_obj = importutils.import_module(mod_str)
+        if mod_str.startswith('bin.'):
+            imp.load_source(mod_str[4:], os.path.join('bin', mod_str[4:]))
+            return sys.modules[mod_str[4:]]
+        else:
+            return importutils.import_module(mod_str)
     except (ValueError, AttributeError), err:
-        return
+        return None
     except ImportError, ie:
         sys.stderr.write("%s\n" % str(ie))
-        return
+        return None
     except Exception, e:
-        return
-    _list_opts(mod_obj, mod_str)
+        return None
 
 
-def _list_opts(obj, name):
+def _guess_groups(opt, mod_obj):
+    groups = []
+
+    # is it in the DEFAULT group?
+    if (opt.dest in cfg.CONF and
+        not isinstance(cfg.CONF[opt.dest], cfg.CONF.GroupAttr)):
+        groups.append('DEFAULT')
+
+    # what other groups is it in?
+    for key, value in cfg.CONF.items():
+        if not isinstance(value, cfg.CONF.GroupAttr):
+            continue
+        if opt.dest not in value:
+            continue
+        groups.append(key)
+
+    if len(groups) == 1:
+        return groups[0]
+
+    group = None
+    for g in groups:
+        if g in mod_obj.__name__:
+            group = g
+            break
+
+    if group is None and 'DEFAULT' in groups:
+        sys.stderr.write("Guessing that " + opt.dest +
+                         " in " + mod_obj.__name__ +
+                         " is in DEFAULT group out of " +
+                         ','.join(groups) + "\n")
+        return 'DEFAULT'
+
+    if group is None:
+        sys.stderr.write("Unable to guess what group " + opt.dest +
+                         " in " + mod_obj.__name__ +
+                         " is in out of " + ','.join(groups) + "\n")
+        sys.exit(1)
+
+    sys.stderr.write("Guessing that " + opt.dest +
+                     " in " + mod_obj.__name__ +
+                     " is in the " + group +
+                     " group out of " + ','.join(groups) + "\n")
+    return group
+
+
+def _list_opts(obj):
+    def is_opt(o):
+        return (isinstance(o, cfg.Opt) and
+                not isinstance(o, cfg.SubCommandOpt))
+
     opts = list()
     for attr_str in dir(obj):
         attr_obj = getattr(obj, attr_str)
-        if isinstance(attr_obj, cfg.Opt):
+        if is_opt(attr_obj):
             opts.append(attr_obj)
         elif (isinstance(attr_obj, list) and
-              all(map(lambda x: isinstance(x, cfg.Opt), attr_obj))):
+              all(map(lambda x: is_opt(x), attr_obj))):
             opts.extend(attr_obj)
-    if not opts:
-        return
-    global OPTION_COUNT
-    OPTION_COUNT += len(opts)
-    print '######## defined in %s ########\n' % name
+
+    ret = {}
     for opt in opts:
-        _print_opt(opt)
+        ret.setdefault(_guess_groups(opt, obj), []).append(opt)
+    return ret.items()
+
+
+def print_group_opts(group, opts_by_module):
+    print "[%s]" % group
     print
+    global OPTION_COUNT
+    for mod, opts in opts_by_module:
+        OPTION_COUNT += len(opts)
+        print '######## defined in %s ########' % mod
+        print
+        for opt in opts:
+            _print_opt(opt)
+        print
 
 
 def _get_my_ip():
@@ -119,27 +203,19 @@ def _get_my_ip():
         return None
 
 
-MY_IP = _get_my_ip()
-HOST = socket.gethostname()
-
-
 def _sanitize_default(s):
     """Set up a reasonably sensible default for pybasedir, my_ip and host."""
     if s.startswith(BASEDIR):
         return s.replace(BASEDIR, '/usr/lib/python/site-packages')
-    elif s == MY_IP:
+    elif BASEDIR in s:
+        return s.replace(BASEDIR, '')
+    elif s == _get_my_ip():
         return '10.0.0.1'
-    elif s == HOST:
-        return 'ceilometer'
+    elif s == socket.getfqdn():
+        return 'nova'
     elif s.strip() != s:
         return '"%s"' % s
     return s
-
-
-def _wrap(msg, indent):
-    padding = ' ' * indent
-    prefix = "\n%s %s " % (OPTION_HELP_INDENT, padding)
-    return prefix.join(textwrap.wrap(msg, WORDWRAP_WIDTH))
 
 
 def _print_opt(opt):
@@ -152,35 +228,37 @@ def _print_opt(opt):
     except (ValueError, AttributeError), err:
         sys.stderr.write("%s\n" % str(err))
         sys.exit(1)
+    opt_help += ' (' + OPT_TYPES[opt_type] + ')'
+    print '#', "\n# ".join(textwrap.wrap(opt_help, WORDWRAP_WIDTH))
     try:
         if opt_default is None:
-            print '# %s=<None>' % opt_name
+            print '#%s=<None>' % opt_name
         elif opt_type == STROPT:
             assert(isinstance(opt_default, basestring))
-            print '# %s=%s' % (opt_name, _sanitize_default(opt_default))
+            print '#%s=%s' % (opt_name, _sanitize_default(opt_default))
         elif opt_type == BOOLOPT:
             assert(isinstance(opt_default, bool))
-            print '# %s=%s' % (opt_name, str(opt_default).lower())
+            print '#%s=%s' % (opt_name, str(opt_default).lower())
         elif opt_type == INTOPT:
             assert(isinstance(opt_default, int) and
                    not isinstance(opt_default, bool))
-            print '# %s=%s' % (opt_name, opt_default)
+            print '#%s=%s' % (opt_name, opt_default)
         elif opt_type == FLOATOPT:
             assert(isinstance(opt_default, float))
-            print '# %s=%s' % (opt_name, opt_default)
+            print '#%s=%s' % (opt_name, opt_default)
         elif opt_type == LISTOPT:
             assert(isinstance(opt_default, list))
-            print '# %s=%s' % (opt_name, ','.join(opt_default))
+            print '#%s=%s' % (opt_name, ','.join(opt_default))
         elif opt_type == MULTISTROPT:
             assert(isinstance(opt_default, list))
+            if not opt_default:
+                opt_default = ['']
             for default in opt_default:
-                print '# %s=%s' % (opt_name, default)
+                print '#%s=%s' % (opt_name, default)
+        print
     except Exception:
         sys.stderr.write('Error in option "%s"\n' % opt_name)
         sys.exit(1)
-    opt_type_tag = "(%s)" % opt_type
-    print OPTION_HELP_INDENT, opt_type_tag, _wrap(opt_help, len(opt_type_tag))
-    print
 
 
 if __name__ == '__main__':

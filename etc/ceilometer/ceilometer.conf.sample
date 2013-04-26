@@ -1,304 +1,480 @@
-####################
+##########################
 # ceilometer.conf sample #
-####################
+##########################
 
 [DEFAULT]
 
-######## defined in ceilometer.openstack.common.cfg:CommonConfigOpts ########
+######## defined in ceilometer.counter ########
 
-# debug=false
-#### (BoolOpt) Print debugging output
-
-# verbose=false
-#### (BoolOpt) Print more verbose output
-
-# log_config=<None>
-#### (StrOpt) If this option is specified, the logging configuration file
-####          specified is used and overrides any other logging options
-####          specified. Please see the Python logging module
-####          documentation for details on logging configuration files.
-
-# log_format=%(asctime)s %(levelname)8s [%(name)s] %(message)s
-#### (StrOpt) A logging.Formatter log message format string which may use
-####          any of the available logging.LogRecord attributes. Default:
-####          %default
-
-# log_date_format=%Y-%m-%d %H:%M:%S
-#### (StrOpt) Format string for %(asctime)s in log records. Default:
-####          %default
-
-# log_file=<None>
-#### (StrOpt) (Optional) Name of log file to output to. If not set,
-####          logging will go to stdout.
-
-# log_dir=<None>
-#### (StrOpt) (Optional) The directory to keep log files in (will be
-####          prepended to --logfile)
-
-# use_syslog=false
-#### (BoolOpt) Use syslog for logging.
-
-# syslog_log_facility=LOG_USER
-#### (StrOpt) syslog facility to receive log lines
+# Source for counters emited on this instance (string value)
+#counter_source=openstack
 
 
-######## defined in ceilometer.meter ########
+######## defined in ceilometer.pipeline ########
 
-# metering_secret=change this or be hacked
-#### (StrOpt) Secret value for signing metering messages
-
-# counter_source=openstack
-#### (StrOpt) Source for counters emited on this instance
+# Configuration file for pipeline definition (string value)
+#pipeline_cfg_file=pipeline.yaml
 
 
 ######## defined in ceilometer.policy ########
 
-# policy_file=policy.json
-#### (StrOpt) JSON file representing policy
+# JSON file representing policy (string value)
+#policy_file=policy.json
 
-# policy_default_rule=default
-#### (StrOpt) Rule checked when requested rule is not found
+# Rule checked when requested rule is not found (string value)
+#policy_default_rule=default
 
 
-######## defined in ceilometer.publish ########
+######## defined in ceilometer.service ########
 
-# metering_topic=metering
-#### (StrOpt) the topic ceilometer uses for metering messages
+# Username to use for openstack service access (string value)
+#os_username=
 
-# control_exchange=ceilometer
-#### (StrOpt) AMQP exchange to connect to if using RabbitMQ or Qpid
+# Password to use for openstack service access (string value)
+#os_password=
+
+# Tenant ID to use for openstack service access (string value)
+#os_tenant_id=
+
+# Tenant name to use for openstack service access (string
+# value)
+#os_tenant_name=
+
+# Auth URL to use for openstack service access (string value)
+#os_auth_url=
 
 
 ######## defined in ceilometer.api ########
 
-# metering_api_port=8777
-#### (IntOpt) The port for the ceilometer API server
+# The port for the ceilometer API server (integer value)
+#metering_api_port=8777
 
-# auth_strategy=keystone
-### (StrOpt) one of keystone or noauth
 
 ######## defined in ceilometer.central.manager ########
 
-# disabled_central_pollsters=
-#### (ListOpt) list of central pollsters to disable
+# list of central pollsters to disable (list value)
+#disabled_central_pollsters=
+
+
+######## defined in ceilometer.collector.meter ########
+
+# Secret value for signing metering messages (string value)
+#metering_secret=change this or be hacked
+
+
+######## defined in ceilometer.collector.service ########
+
+# list of listener plugins to disable (list value)
+#disabled_notification_listeners=
+
+
+######## defined in ceilometer.compute ########
+
+# list of compute agent pollsters to disable (list value)
+#disabled_compute_pollsters=
 
 
 ######## defined in ceilometer.compute.notifications ########
 
-# nova_control_exchange=nova
-#### (StrOpt) Exchange name for Nova notifications
+# Exchange name for Nova notifications (string value)
+#nova_control_exchange=nova
+
+
+######## defined in ceilometer.compute.virt.inspector ########
+
+# Inspector to use for inspecting the hypervisor layer (string
+# value)
+#hypervisor_inspector=libvirt
+
+
+######## defined in ceilometer.compute.virt.libvirt.inspector ########
+
+# Libvirt domain type (valid options are: kvm, lxc, qemu, uml,
+# xen) (string value)
+#libvirt_type=kvm
+
+# Override the default libvirt URI (which is dependent on
+# libvirt_type) (string value)
+#libvirt_uri=
 
 
 ######## defined in ceilometer.image.notifications ########
 
-# glance_control_exchange=glance_notifications
-#### (StrOpt) Exchange name for Glance notifications
+# Exchange name for Glance notifications (string value)
+#glance_control_exchange=glance
 
 
 ######## defined in ceilometer.network.notifications ########
 
-# quantum_control_exchange=quantum
-#### (StrOpt) Exchange name for Quantum notifications
+# Exchange name for Quantum notifications (string value)
+#quantum_control_exchange=quantum
+
+
+######## defined in ceilometer.objectstore.swift ########
+
+# Swift reseller prefix. Must be on par with reseller_prefix
+# in proxy-server.conf. (string value)
+#reseller_prefix=AUTH_
 
 
 ######## defined in ceilometer.openstack.common.eventlet_backdoor ########
 
-# backdoor_port=<None>
-#### (IntOpt) port for eventlet backdoor to listen
+# port for eventlet backdoor to listen (integer value)
+#backdoor_port=<None>
 
 
 ######## defined in ceilometer.openstack.common.log ########
 
-# logdir=<None>
-#### (StrOpt) Log output to a per-service log file in named directory
+# Print debugging output (set logging level to DEBUG instead
+# of default WARNING level). (boolean value)
+#debug=false
 
-# logfile=<None>
-#### (StrOpt) Log output to a named file
+# Print more verbose output (set logging level to INFO instead
+# of default WARNING level). (boolean value)
+#verbose=false
 
-# use_stderr=true
-#### (BoolOpt) Log output to standard error
+# Log output to standard error (boolean value)
+#use_stderr=true
 
-# logfile_mode=0644
-#### (StrOpt) Default file mode used when creating log files
+# Default file mode used when creating log files (string
+# value)
+#logfile_mode=0644
 
-# logging_context_format_string=%(asctime)s %(levelname)s %(name)s [%(request_id)s %(user)s %(tenant)s] %(instance)s%(message)s
-#### (StrOpt) format string to use for log messages with context
+# format string to use for log messages with context (string
+# value)
+#logging_context_format_string=%(asctime)s.%(msecs)03d %(process)d %(levelname)s %(name)s [%(request_id)s %(user)s %(tenant)s] %(instance)s%(message)s
 
-# logging_default_format_string=%(asctime)s %(process)d %(levelname)s %(name)s [-] %(instance)s%(message)s
-#### (StrOpt) format string to use for log messages without context
+# format string to use for log messages without context
+# (string value)
+#logging_default_format_string=%(asctime)s.%(msecs)03d %(process)d %(levelname)s %(name)s [-] %(instance)s%(message)s
 
-# logging_debug_format_suffix=%(funcName)s %(pathname)s:%(lineno)d
-#### (StrOpt) data to append to log format when level is DEBUG
+# data to append to log format when level is DEBUG (string
+# value)
+#logging_debug_format_suffix=%(funcName)s %(pathname)s:%(lineno)d
 
-# logging_exception_prefix=%(asctime)s %(process)d TRACE %(name)s %(instance)s
-#### (StrOpt) prefix each line of exception output with this format
+# prefix each line of exception output with this format
+# (string value)
+#logging_exception_prefix=%(asctime)s.%(msecs)03d %(process)d TRACE %(name)s %(instance)s
 
-# default_log_levels=amqplib=WARN,sqlalchemy=WARN,boto=WARN,suds=INFO,keystone=INFO,eventlet.wsgi.server=WARN
-#### (ListOpt) list of logger=LEVEL pairs
+# list of logger=LEVEL pairs (list value)
+#default_log_levels=amqplib=WARN,sqlalchemy=WARN,boto=WARN,suds=INFO,keystone=INFO,eventlet.wsgi.server=WARN
 
-# publish_errors=false
-#### (BoolOpt) publish error events
+# publish error events (boolean value)
+#publish_errors=false
 
-# fatal_deprecations=false
-#### (BoolOpt) make deprecations fatal
+# make deprecations fatal (boolean value)
+#fatal_deprecations=false
 
-# instance_format="[instance: %(uuid)s] "
-#### (StrOpt) If an instance is passed with the log message, format it
-####          like this
+# If an instance is passed with the log message, format it
+# like this (string value)
+#instance_format="[instance: %(uuid)s] "
 
-# instance_uuid_format="[instance: %(uuid)s] "
-#### (StrOpt) If an instance UUID is passed with the log message, format
-####          it like this
+# If an instance UUID is passed with the log message, format
+# it like this (string value)
+#instance_uuid_format="[instance: %(uuid)s] "
+
+# If this option is specified, the logging configuration file
+# specified is used and overrides any other logging options
+# specified. Please see the Python logging module
+# documentation for details on logging configuration files.
+# (string value)
+#log_config=<None>
+
+# A logging.Formatter log message format string which may use
+# any of the available logging.LogRecord attributes. Default:
+# %(default)s (string value)
+#log_format=%(asctime)s %(levelname)8s [%(name)s] %(message)s
+
+# Format string for %%(asctime)s in log records. Default:
+# %(default)s (string value)
+#log_date_format=%Y-%m-%d %H:%M:%S
+
+# (Optional) Name of log file to output to. If no default is
+# set, logging will go to stdout. (string value)
+#log_file=<None>
+
+# (Optional) The base directory used for relative --log-file
+# paths (string value)
+#log_dir=<None>
+
+# Use syslog for logging. (boolean value)
+#use_syslog=false
+
+# syslog facility to receive log lines (string value)
+#syslog_log_facility=LOG_USER
 
 
 ######## defined in ceilometer.openstack.common.notifier.api ########
 
-#### (MultiStrOpt) Driver or drivers to handle sending notifications
+# Driver or drivers to handle sending notifications (multi
+# valued)
+#notification_driver=
 
-# default_notification_level=INFO
-#### (StrOpt) Default notification level for outgoing notifications
+# Default notification level for outgoing notifications
+# (string value)
+#default_notification_level=INFO
 
-# default_publisher_id=$host
-#### (StrOpt) Default publisher_id for outgoing notifications
+# Default publisher_id for outgoing notifications (string
+# value)
+#default_publisher_id=$host
 
 
 ######## defined in ceilometer.openstack.common.notifier.list_notifier ########
 
-# list_notifier_drivers=ceilometer.openstack.common.notifier.no_op_notifier
-#### (MultiStrOpt) List of drivers to send notifications
+# List of drivers to send notifications (multi valued)
+#list_notifier_drivers=ceilometer.openstack.common.notifier.no_op_notifier
 
 
 ######## defined in ceilometer.openstack.common.notifier.rpc_notifier ########
 
-# notification_topics=notifications
-#### (ListOpt) AMQP topic used for openstack notifications
+# AMQP topic used for openstack notifications (list value)
+#notification_topics=notifications
 
 
 ######## defined in ceilometer.openstack.common.rpc ########
 
-# rpc_backend=ceilometer.openstack.common.rpc.impl_kombu
-#### (StrOpt) The messaging module to use, defaults to kombu.
+# The messaging module to use, defaults to kombu. (string
+# value)
+#rpc_backend=ceilometer.openstack.common.rpc.impl_kombu
 
-# rpc_thread_pool_size=64
-#### (IntOpt) Size of RPC thread pool
+# Size of RPC thread pool (integer value)
+#rpc_thread_pool_size=64
 
-# rpc_conn_pool_size=30
-#### (IntOpt) Size of RPC connection pool
+# Size of RPC connection pool (integer value)
+#rpc_conn_pool_size=30
 
-# rpc_response_timeout=60
-#### (IntOpt) Seconds to wait for a response from call or multicall
+# Seconds to wait for a response from call or multicall
+# (integer value)
+#rpc_response_timeout=60
 
-# rpc_cast_timeout=30
-#### (IntOpt) Seconds to wait before a cast expires (TTL). Only supported
-####          by impl_zmq.
+# Seconds to wait before a cast expires (TTL). Only supported
+# by impl_zmq. (integer value)
+#rpc_cast_timeout=30
 
-# allowed_rpc_exception_modules=ceilometer.openstack.common.exception,nova.exception,cinder.exception
-#### (ListOpt) Modules of exceptions that are permitted to be recreatedupon
-####           receiving exception data from an rpc call.
+# Modules of exceptions that are permitted to be recreatedupon
+# receiving exception data from an rpc call. (list value)
+#allowed_rpc_exception_modules=ceilometer.openstack.common.exception,nova.exception,cinder.exception,exceptions
 
-# fake_rabbit=false
-#### (BoolOpt) If passed, use a fake RabbitMQ provider
+# If passed, use a fake RabbitMQ provider (boolean value)
+#fake_rabbit=false
+
+# AMQP exchange to connect to if using RabbitMQ or Qpid
+# (string value)
+#control_exchange=openstack
+
+
+######## defined in ceilometer.openstack.common.rpc.amqp ########
+
+# Enable a fast single reply queue if using AMQP based RPC
+# like RabbitMQ or Qpid. (boolean value)
+#amqp_rpc_single_reply_queue=false
 
 
 ######## defined in ceilometer.openstack.common.rpc.impl_kombu ########
 
-# kombu_ssl_version=
-#### (StrOpt) SSL version to use (valid only if SSL enabled)
+# SSL version to use (valid only if SSL enabled) (string
+# value)
+#kombu_ssl_version=
 
-# kombu_ssl_keyfile=
-#### (StrOpt) SSL key file (valid only if SSL enabled)
+# SSL key file (valid only if SSL enabled) (string value)
+#kombu_ssl_keyfile=
 
-# kombu_ssl_certfile=
-#### (StrOpt) SSL cert file (valid only if SSL enabled)
+# SSL cert file (valid only if SSL enabled) (string value)
+#kombu_ssl_certfile=
 
-# kombu_ssl_ca_certs=
-#### (StrOpt) SSL certification authority file (valid only if SSL enabled)
+# SSL certification authority file (valid only if SSL enabled)
+# (string value)
+#kombu_ssl_ca_certs=
 
-# rabbit_host=localhost
-#### (StrOpt) The RabbitMQ broker address where a single node is used
+# The RabbitMQ broker address where a single node is used
+# (string value)
+#rabbit_host=localhost
 
-# rabbit_port=5672
-#### (IntOpt) The RabbitMQ broker port where a single node is used
+# The RabbitMQ broker port where a single node is used
+# (integer value)
+#rabbit_port=5672
 
-# rabbit_hosts=$rabbit_host:$rabbit_port
-#### (ListOpt) RabbitMQ HA cluster host:port pairs
+# RabbitMQ HA cluster host:port pairs (list value)
+#rabbit_hosts=$rabbit_host:$rabbit_port
 
-# rabbit_use_ssl=false
-#### (BoolOpt) connect over SSL for RabbitMQ
+# connect over SSL for RabbitMQ (boolean value)
+#rabbit_use_ssl=false
 
-# rabbit_userid=guest
-#### (StrOpt) the RabbitMQ userid
+# the RabbitMQ userid (string value)
+#rabbit_userid=guest
 
-# rabbit_password=guest
-#### (StrOpt) the RabbitMQ password
+# the RabbitMQ password (string value)
+#rabbit_password=guest
 
-# rabbit_virtual_host=/
-#### (StrOpt) the RabbitMQ virtual host
+# the RabbitMQ virtual host (string value)
+#rabbit_virtual_host=/
 
-# rabbit_retry_interval=1
-#### (IntOpt) how frequently to retry connecting with RabbitMQ
+# how frequently to retry connecting with RabbitMQ (integer
+# value)
+#rabbit_retry_interval=1
 
-# rabbit_retry_backoff=2
-#### (IntOpt) how long to backoff for between retries when connecting to
-####          RabbitMQ
+# how long to backoff for between retries when connecting to
+# RabbitMQ (integer value)
+#rabbit_retry_backoff=2
 
-# rabbit_max_retries=0
-#### (IntOpt) maximum retries with trying to connect to RabbitMQ (the
-####          default of 0 implies an infinite retry count)
+# maximum retries with trying to connect to RabbitMQ (the
+# default of 0 implies an infinite retry count) (integer
+# value)
+#rabbit_max_retries=0
 
-# rabbit_durable_queues=false
-#### (BoolOpt) use durable queues in RabbitMQ
+# use durable queues in RabbitMQ (boolean value)
+#rabbit_durable_queues=false
 
-# rabbit_ha_queues=false
-#### (BoolOpt) use H/A queues in RabbitMQ (x-ha-policy: all).You need to
-####           wipe RabbitMQ database when changing this option.
+# use H/A queues in RabbitMQ (x-ha-policy: all).You need to
+# wipe RabbitMQ database when changing this option. (boolean
+# value)
+#rabbit_ha_queues=false
+
+
+######## defined in ceilometer.openstack.common.rpc.impl_qpid ########
+
+# Qpid broker hostname (string value)
+#qpid_hostname=localhost
+
+# Qpid broker port (integer value)
+#qpid_port=5672
+
+# Qpid HA cluster host:port pairs (list value)
+#qpid_hosts=$qpid_hostname:$qpid_port
+
+# Username for qpid connection (string value)
+#qpid_username=
+
+# Password for qpid connection (string value)
+#qpid_password=
+
+# Space separated list of SASL mechanisms to use for auth
+# (string value)
+#qpid_sasl_mechanisms=
+
+# Seconds between connection keepalive heartbeats (integer
+# value)
+#qpid_heartbeat=60
+
+# Transport to use, either 'tcp' or 'ssl' (string value)
+#qpid_protocol=tcp
+
+# Disable Nagle algorithm (boolean value)
+#qpid_tcp_nodelay=true
+
+
+######## defined in ceilometer.openstack.common.rpc.impl_zmq ########
+
+# ZeroMQ bind address. Should be a wildcard (*), an ethernet
+# interface, or IP. The "host" option should point or resolve
+# to this address. (string value)
+#rpc_zmq_bind_address=*
+
+# MatchMaker driver (string value)
+#rpc_zmq_matchmaker=ceilometer.openstack.common.rpc.matchmaker.MatchMakerLocalhost
+
+# ZeroMQ receiver listening port (integer value)
+#rpc_zmq_port=9501
+
+# Number of ZeroMQ contexts, defaults to 1 (integer value)
+#rpc_zmq_contexts=1
+
+# Maximum number of ingress messages to locally buffer per
+# topic. Default is unlimited. (integer value)
+#rpc_zmq_topic_backlog=<None>
+
+# Directory for holding IPC sockets (string value)
+#rpc_zmq_ipc_dir=/var/run/openstack
+
+# Name of this node. Must be a valid hostname, FQDN, or IP
+# address. Must match "host" option, if running Nova. (string
+# value)
+#rpc_zmq_host=nova
 
 
 ######## defined in ceilometer.openstack.common.rpc.matchmaker ########
 
-# matchmaker_ringfile=/etc/nova/matchmaker_ring.json
-#### (StrOpt) Matchmaker ring file (JSON)
+# Matchmaker ring file (JSON) (string value)
+#matchmaker_ringfile=/etc/nova/matchmaker_ring.json
+
+# Heartbeat frequency (integer value)
+#matchmaker_heartbeat_freq=300
+
+# Heartbeat time-to-live. (integer value)
+#matchmaker_heartbeat_ttl=600
+
+
+######## defined in ceilometer.publisher.meter_publish ########
+
+# the topic ceilometer uses for metering messages (string
+# value)
+#metering_topic=metering
 
 
 ######## defined in ceilometer.storage ########
 
-# database_connection=mongodb://localhost:27017/ceilometer
-#### (StrOpt) Database connection string
+# Database connection string (string value)
+#database_connection=mongodb://localhost:27017/ceilometer
 
 
 ######## defined in ceilometer.storage.sqlalchemy.models ########
 
-# mysql_engine=InnoDB
-#### (StrOpt) MySQL engine
+# MySQL engine (string value)
+#mysql_engine=InnoDB
 
 
 ######## defined in ceilometer.storage.sqlalchemy.session ########
 
-# sql_connection_debug=0
-#### (IntOpt) Verbosity of SQL debugging information. 0=None,
-####          100=Everything
+# Verbosity of SQL debugging information. 0=None,
+# 100=Everything (integer value)
+#sql_connection_debug=0
 
-# sql_connection_trace=false
-#### (BoolOpt) Add python stack traces to SQL as comment strings
+# Add python stack traces to SQL as comment strings (boolean
+# value)
+#sql_connection_trace=false
 
-# sqlite_synchronous=true
-#### (BoolOpt) If passed, use synchronous mode for sqlite
+# If passed, use synchronous mode for sqlite (boolean value)
+#sqlite_synchronous=true
 
-# sql_idle_timeout=3600
-#### (IntOpt) timeout before idle sql connections are reaped
+# timeout before idle sql connections are reaped (integer
+# value)
+#sql_idle_timeout=3600
 
-# sql_max_retries=10
-#### (IntOpt) maximum db connection retries during startup. (setting -1
-####          implies an infinite retry count)
+# maximum db connection retries during startup. (setting -1
+# implies an infinite retry count) (integer value)
+#sql_max_retries=10
 
-# sql_retry_interval=10
-#### (IntOpt) interval between retries of opening a sql connection
+# interval between retries of opening a sql connection
+# (integer value)
+#sql_retry_interval=10
 
 
 ######## defined in ceilometer.volume.notifications ########
 
-# cinder_control_exchange=cinder
-#### (StrOpt) Exchange name for Cinder notifications
+# Exchange name for Cinder notifications (string value)
+#cinder_control_exchange=cinder
 
 
-# Total option count: 72
+[rpc_notifier2]
+
+######## defined in ceilometer.openstack.common.notifier.rpc_notifier2 ########
+
+# AMQP topic(s) used for openstack notifications (list value)
+#topics=notifications
+
+
+[matchmaker_redis]
+
+######## defined in ceilometer.openstack.common.rpc.matchmaker_redis ########
+
+# Host to locate redis (string value)
+#host=127.0.0.1
+
+# Use this port to connect to redis host. (integer value)
+#port=6379
+
+# Password for Redis server. (optional) (string value)
+#password=<None>
+
+
+# Total option count: 105
