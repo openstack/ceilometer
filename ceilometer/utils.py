@@ -1,9 +1,9 @@
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 # Copyright 2010 United States Government as represented by the
 # Administrator of the National Aeronautics and Space Administration.
 # Copyright 2011 Justin Santa Barbara
+
 # All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -20,8 +20,12 @@
 
 """Utilities and helper functions."""
 
-
+import calendar
+import datetime
+import decimal
 import os
+
+from ceilometer.openstack.common import timeutils
 
 
 def read_cached_file(filename, cache_info, reload_func=None):
@@ -59,3 +63,35 @@ def recursive_keypairs(d):
                                  value))
         else:
             yield name, value
+
+
+def dt_to_decimal(utc):
+    """Datetime to Decimal.
+
+    Some databases don't store microseconds in datetime
+    so we always store as Decimal unixtime.
+    """
+    decimal.getcontext().prec = 30
+    return decimal.Decimal(str(calendar.timegm(utc.utctimetuple()))) + \
+        (decimal.Decimal(str(utc.microsecond)) /
+         decimal.Decimal("1000000.0"))
+
+
+def decimal_to_dt(dec):
+    """Return a datetime from Decimal unixtime format.
+    """
+    if dec is None:
+        return None
+    integer = int(dec)
+    micro = (dec - decimal.Decimal(integer)) * decimal.Decimal(1000000)
+    daittyme = datetime.datetime.utcfromtimestamp(integer)
+    return daittyme.replace(microsecond=int(round(micro)))
+
+
+def sanitize_timestamp(timestamp):
+    """Return a naive utc datetime object."""
+    if not timestamp:
+        return timestamp
+    if not isinstance(timestamp, datetime.datetime):
+        timestamp = timeutils.parse_isotime(timestamp)
+    return timeutils.normalize_time(timestamp)

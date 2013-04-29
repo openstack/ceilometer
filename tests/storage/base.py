@@ -30,6 +30,7 @@ from ceilometer import counter
 from ceilometer import storage
 from ceilometer.tests import db as test_db
 from ceilometer.storage import models
+from ceilometer import utils
 
 
 class DBTestBase(test_db.TestBase):
@@ -666,3 +667,144 @@ class AlarmTest(DBTestBase):
         self.assertEquals(len(survivors), 2)
         for s in survivors:
             self.assertNotEquals(victim.name, s.name)
+
+
+class EventTestBase(test_db.TestBase):
+    """Separate test base class because we don't want to
+    inherit all the Meter stuff.
+    """
+    __metaclass__ = abc.ABCMeta
+
+    def setUp(self):
+        super(EventTestBase, self).setUp()
+        self.prepare_data()
+
+    def prepare_data(self):
+        # Add some data ...
+        pass
+
+
+class EventTest(EventTestBase):
+    def test_save_events_no_traits(self):
+        now = datetime.datetime.utcnow()
+        m = [models.Event("Foo", now, None), models.Event("Zoo", now, [])]
+        self.conn.record_events(m)
+        for model in m:
+            self.assertTrue(model.id >= 0)
+        self.assertNotEqual(m[0].id, m[1].id)
+
+    def test_string_traits(self):
+        model = models.Trait("Foo", models.Trait.TEXT_TYPE, "my_text")
+        trait = self.conn._make_trait(model, None)
+        self.assertEquals(trait.t_type, models.Trait.TEXT_TYPE)
+        self.assertIsNone(trait.t_float)
+        self.assertIsNone(trait.t_int)
+        self.assertIsNone(trait.t_datetime)
+        self.assertEquals(trait.t_string, "my_text")
+        self.assertIsNotNone(trait.name)
+
+    def test_int_traits(self):
+        model = models.Trait("Foo", models.Trait.INT_TYPE, 100)
+        trait = self.conn._make_trait(model, None)
+        self.assertEquals(trait.t_type, models.Trait.INT_TYPE)
+        self.assertIsNone(trait.t_float)
+        self.assertIsNone(trait.t_string)
+        self.assertIsNone(trait.t_datetime)
+        self.assertEquals(trait.t_int, 100)
+        self.assertIsNotNone(trait.name)
+
+    def test_float_traits(self):
+        model = models.Trait("Foo", models.Trait.FLOAT_TYPE, 123.456)
+        trait = self.conn._make_trait(model, None)
+        self.assertEquals(trait.t_type, models.Trait.FLOAT_TYPE)
+        self.assertIsNone(trait.t_int)
+        self.assertIsNone(trait.t_string)
+        self.assertIsNone(trait.t_datetime)
+        self.assertEquals(trait.t_float, 123.456)
+        self.assertIsNotNone(trait.name)
+
+    def test_datetime_traits(self):
+        now = datetime.datetime.utcnow()
+        model = models.Trait("Foo", models.Trait.DATETIME_TYPE, now)
+        trait = self.conn._make_trait(model, None)
+        self.assertEquals(trait.t_type, models.Trait.DATETIME_TYPE)
+        self.assertIsNone(trait.t_int)
+        self.assertIsNone(trait.t_string)
+        self.assertIsNone(trait.t_float)
+        self.assertEquals(trait.t_datetime, utils.dt_to_decimal(now))
+        self.assertIsNotNone(trait.name)
+
+    def test_save_events_traits(self):
+        event_models = []
+        for event_name in ['Foo', 'Bar', 'Zoo']:
+            now = datetime.datetime.utcnow()
+            trait_models = \
+                [models.Trait(name, dtype, value)
+                    for name, dtype, value in [
+                        ('trait_A', models.Trait.TEXT_TYPE, "my_text"),
+                        ('trait_B', models.Trait.INT_TYPE, 199),
+                        ('trait_C', models.Trait.FLOAT_TYPE, 1.23456),
+                        ('trait_D', models.Trait.DATETIME_TYPE, now)]]
+            event_models.append(
+                models.Event(event_name, now, trait_models))
+
+        self.conn.record_events(event_models)
+        for model in event_models:
+            for trait in model.traits:
+                self.assertTrue(trait.id >= 0)
+
+
+class GetEventTest(EventTestBase):
+    def prepare_data(self):
+        event_models = []
+        base = 0
+        self.start = datetime.datetime(2013, 12, 31, 5, 0)
+        now = self.start
+        for event_name in ['Foo', 'Bar', 'Zoo']:
+            trait_models = \
+                [models.Trait(name, dtype, value)
+                    for name, dtype, value in [
+                        ('trait_A', models.Trait.TEXT_TYPE,
+                            "my_%s_text" % event_name),
+                        ('trait_B', models.Trait.INT_TYPE,
+                            base + 1),
+                        ('trait_C', models.Trait.FLOAT_TYPE,
+                            float(base) + 0.123456),
+                        ('trait_D', models.Trait.DATETIME_TYPE, now)]]
+            event_models.append(
+                models.Event(event_name, now, trait_models))
+            base += 100
+            now = now + datetime.timedelta(hours=1)
+        self.end = now
+
+        self.conn.record_events(event_models)
+
+    def test_simple_get(self):
+        event_filter = storage.EventFilter(self.start, self.end)
+        events = self.conn.get_events(event_filter)
+        self.assertEquals(3, len(events))
+        start_time = None
+        for i, name in enumerate(["Foo", "Bar", "Zoo"]):
+            self.assertEquals(events[i].event_name, name)
+            self.assertEquals(4, len(events[i].traits))
+            # Ensure sorted results ...
+            if start_time is not None:
+                # Python 2.6 has no assertLess :(
+                self.assertTrue(start_time < events[i].generated)
+            start_time = events[i].generated
+
+    def test_simple_get_event_name(self):
+        event_filter = storage.EventFilter(self.start, self.end, "Bar")
+        events = self.conn.get_events(event_filter)
+        self.assertEquals(1, len(events))
+        self.assertEquals(events[0].event_name, "Bar")
+        self.assertEquals(4, len(events[0].traits))
+
+    def test_get_event_trait_filter(self):
+        trait_filters = {'key': 'trait_B', 't_int': 101}
+        event_filter = storage.EventFilter(self.start, self.end,
+                                           traits=trait_filters)
+        events = self.conn.get_events(event_filter)
+        self.assertEquals(1, len(events))
+        self.assertEquals(events[0].event_name, "Bar")
+        self.assertEquals(4, len(events[0].traits))

@@ -160,3 +160,17 @@ class Connection(base.Connection):
     def delete_alarm(self, alarm_id):
         """Delete a alarm
         """
+
+    def record_events(self, events):
+        """Write the events.
+
+        :param events: a list of model.Event objects.
+        """
+        raise NotImplementedError('Events not implemented.')
+
+    def get_events(self, event_filter):
+        """Return an iterable of model.Event objects.
+
+        :param event_filter: EventFilter instance
+        """
+        raise NotImplementedError('Events not implemented.')

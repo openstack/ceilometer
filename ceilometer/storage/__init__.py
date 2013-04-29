@@ -19,14 +19,13 @@
 """
 
 
-import datetime
 import urlparse
 
 from oslo.config import cfg
 from stevedore import driver
 
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import timeutils
+from ceilometer import utils
 
 
 LOG = log.getLogger(__name__)
@@ -85,17 +84,31 @@ class SampleFilter(object):
                  resource=None, meter=None, source=None, metaquery={}):
         self.user = user
         self.project = project
-        self.start = self._sanitize_timestamp(start)
-        self.end = self._sanitize_timestamp(end)
+        self.start = utils.sanitize_timestamp(start)
+        self.end = utils.sanitize_timestamp(end)
         self.resource = resource
         self.meter = meter
         self.source = source
         self.metaquery = metaquery
 
-    def _sanitize_timestamp(self, timestamp):
-        """Return a naive utc datetime object."""
-        if not timestamp:
-            return timestamp
-        if not isinstance(timestamp, datetime.datetime):
-            timestamp = timeutils.parse_isotime(timestamp)
-        return timeutils.normalize_time(timestamp)
+
+class EventFilter(object):
+    """Properties for building an Event query.
+
+    :param start: UTC start datetime (mandatory)
+    :param end: UTC end datetime (mandatory)
+    :param event_name: the name of the event. None for all.
+    :param traits: the trait filter dict, all of which are optional
+                    {'key': <key>,
+                    't_string': <value>,
+                    't_int': <value>,
+                    't_datetime': <value>
+                    't_float': <value>}
+                   currently, only one trait dict is supported.
+    """
+
+    def __init__(self, start, end, event_name=None, traits={}):
+        self.start = utils.sanitize_timestamp(start)
+        self.end = utils.sanitize_timestamp(end)
+        self.event_name = event_name
+        self.traits = traits

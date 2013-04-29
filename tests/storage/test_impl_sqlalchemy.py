@@ -25,8 +25,9 @@
 
 from oslo.config import cfg
 
-from tests.storage import base
 from ceilometer.storage.sqlalchemy.models import table_args
+
+from tests.storage import base
 
 
 class SQLAlchemyEngineTestBase(base.DBTestBase):
@@ -62,6 +63,37 @@ class CounterDataTypeTest(base.CounterDataTypeTest, SQLAlchemyEngineTestBase):
 
 
 class AlarmTest(base.AlarmTest, SQLAlchemyEngineTestBase):
+    pass
+
+
+class EventTestBase(base.EventTestBase):
+    # Note: Do not derive from SQLAlchemyEngineTestBase, since we
+    # don't want to automatically inherit all the Meter setup.
+    database_connection = 'sqlite://'
+
+
+class UniqueNameTest(base.EventTest, EventTestBase):
+    # UniqueName is a construct specific to sqlalchemy.
+    # Not applicable to other drivers.
+
+    def test_unique_exists(self):
+        u1 = self.conn._get_or_create_unique_name("foo")
+        self.assertTrue(u1.id >= 0)
+        u2 = self.conn._get_or_create_unique_name("foo")
+        self.assertEqual(u1, u2)
+
+    def test_new_unique(self):
+        u1 = self.conn._get_or_create_unique_name("foo")
+        self.assertTrue(u1.id >= 0)
+        u2 = self.conn._get_or_create_unique_name("blah")
+        self.assertNotEqual(u1, u2)
+
+
+class EventTest(base.EventTest, EventTestBase):
+    pass
+
+
+class GetEventTest(base.GetEventTest, EventTestBase):
     pass
 
 

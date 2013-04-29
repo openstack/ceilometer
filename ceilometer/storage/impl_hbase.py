@@ -508,6 +508,20 @@ class Connection(base.Connection):
         """
         raise NotImplementedError('Alarms not implemented')
 
+    def record_events(self, events):
+        """Write the events.
+
+        :param events: a list of model.Event objects.
+        """
+        raise NotImplementedError('Events not implemented.')
+
+    def get_events(self, event_filter):
+        """Return an iterable of model.Event objects.
+
+        :param event_filter: EventFilter instance
+        """
+        raise NotImplementedError('Events not implemented.')
+
 
 ###############
 # This is a very crude version of "in-memory HBase", which implements just

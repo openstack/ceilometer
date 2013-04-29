@@ -19,10 +19,10 @@
 
 from __future__ import absolute_import
 
+import operator
 import os
 import uuid
 from sqlalchemy import func
-from sqlalchemy.orm import exc
 
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
@@ -32,6 +32,9 @@ from ceilometer.storage import models as api_models
 from ceilometer.storage.sqlalchemy import migration
 from ceilometer.storage.sqlalchemy.models import Meter, Project, Resource
 from ceilometer.storage.sqlalchemy.models import Source, User, Base, Alarm
+from ceilometer.storage.sqlalchemy.models import UniqueName, Event, Trait
+from ceilometer import utils
+
 
 LOG = log.getLogger(__name__)
 
@@ -95,7 +98,7 @@ class SQLAlchemyStorage(base.StorageEngine):
 def make_query_from_filter(query, sample_filter, require_meter=True):
     """Return a query dictionary based on the settings in the filter.
 
-    :param filter: QueryFilter instance
+    :param filter: SampleFilter instance
     :param require_meter: If true and the filter does not have a meter,
                           raise an error.
     """
@@ -488,3 +491,128 @@ class Connection(base.Connection):
         """
         self.session.query(Alarm).filter(Alarm.id == alarm_id).delete()
         self.session.flush()
+
+    def _get_unique(self, key):
+        return self.session.query(UniqueName)\
+                   .filter(UniqueName.key == key).first()
+
+    def _get_or_create_unique_name(self, key):
+        """Find the UniqueName entry for a given key, creating
+           one if necessary.
+
+           This may result in a flush.
+        """
+        unique = self._get_unique(key)
+        if not unique:
+            unique = UniqueName(key=key)
+            self.session.add(unique)
+            self.session.flush()
+        return unique
+
+    def _make_trait(self, trait_model, event):
+        """Make a new Trait from a Trait model.
+
+        Doesn't flush or add to session.
+        """
+        name = self._get_or_create_unique_name(trait_model.name)
+        value_map = Trait._value_map
+        values = {'t_string': None, 't_float': None,
+                  't_int': None, 't_datetime': None}
+        value = trait_model.value
+        if trait_model.dtype == api_models.Trait.DATETIME_TYPE:
+            value = utils.dt_to_decimal(value)
+        values[value_map[trait_model.dtype]] = value
+        return Trait(name, event, trait_model.dtype, **values)
+
+    def _record_event(self, event_model):
+        """Store a single Event, including related Traits.
+        """
+        unique = self._get_or_create_unique_name(event_model.event_name)
+
+        generated = utils.dt_to_decimal(event_model.generated)
+        event = Event(unique, generated)
+        self.session.add(event)
+
+        new_traits = []
+        if event_model.traits:
+            for trait in event_model.traits:
+                t = self._make_trait(trait, event)
+                self.session.add(t)
+                new_traits.append(t)
+
+        # Note: we don't flush here, explicitly (unless a new uniquename
+        # does it). Otherwise, just wait until all the Events are staged.
+        return (event, new_traits)
+
+    def record_events(self, event_models):
+        """Write the events to SQL database via sqlalchemy.
+
+        :param event_models: a list of model.Event objects.
+
+        Flush when they're all added, unless new UniqueNames are
+        added along the way.
+        """
+        events = [self._record_event(event_model)
+                  for event_model in event_models]
+
+        self.session.flush()
+
+        # Update the models with the underlying DB ID.
+        for model, actual in zip(event_models, events):
+            actual_event, actual_traits = actual
+            model.id = actual_event.id
+            if model.traits and actual_traits:
+                for trait, actual_trait in zip(model.traits, actual_traits):
+                    trait.id = actual_trait.id
+
+    def get_events(self, event_filter):
+        """Return an iterable of model.Event objects.
+
+        :param event_filter: EventFilter instance
+        """
+
+        start = utils.dt_to_decimal(event_filter.start)
+        end = utils.dt_to_decimal(event_filter.end)
+        sub_query = self.session.query(Event.id)\
+            .join(Trait, Trait.event_id == Event.id)\
+            .filter(Event.generated >= start, Event.generated <= end)
+
+        if event_filter.event_name:
+            event_name = self._get_unique(event_filter.event_name)
+            sub_query = sub_query.filter(Event.unique_name == event_name)
+
+        if event_filter.traits:
+            for key, value in event_filter.traits.iteritems():
+                if key == 'key':
+                    key = self._get_unique(value)
+                    sub_query = sub_query.filter(Trait.name == key)
+                elif key == 't_string':
+                    sub_query = sub_query.filter(Trait.t_string == value)
+                elif key == 't_int':
+                    sub_query = sub_query.filter(Trait.t_int == value)
+                elif key == 't_datetime':
+                    dt = utils.dt_to_decimal(value)
+                    sub_query = sub_query.filter(Trait.t_datetime == dt)
+                elif key == 't_float':
+                    sub_query = sub_query.filter(Trait.t_datetime == value)
+
+        sub_query = sub_query.subquery()
+
+        all_data = self.session.query(Trait)\
+            .join(sub_query, Trait.event_id == sub_query.c.id)
+
+        # Now convert the sqlalchemy objects back into Models ...
+        event_models_dict = {}
+        for trait in all_data.all():
+            event = event_models_dict.get(trait.event_id)
+            if not event:
+                generated = utils.decimal_to_dt(trait.event.generated)
+                event = api_models.Event(trait.event.unique_name.key,
+                                         generated, [])
+                event_models_dict[trait.event_id] = event
+            value = trait.get_value()
+            trait_model = api_models.Trait(trait.name.key, trait.t_type, value)
+            event.append_trait(trait_model)
+
+        event_models = event_models_dict.values()
+        return sorted(event_models, key=operator.attrgetter('generated'))

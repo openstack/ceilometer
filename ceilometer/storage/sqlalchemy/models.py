@@ -25,10 +25,13 @@ from oslo.config import cfg
 from sqlalchemy import Column, Integer, String, Table, ForeignKey, DateTime
 from sqlalchemy import Float, Boolean, Text
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import TypeDecorator, VARCHAR
 
 from ceilometer.openstack.common import timeutils
+from ceilometer.storage import models as api_models
+from ceilometer import utils
 
 sql_opts = [
     cfg.StrOpt('mysql_engine',
@@ -174,3 +177,84 @@ class Alarm(Base):
     insufficient_data_actions = Column(JSONEncodedDict)
 
     matching_metadata = Column(JSONEncodedDict)
+
+
+class UniqueName(Base):
+    """Key names should only be stored once.
+    """
+    __tablename__ = 'unique_name'
+    id = Column(Integer, primary_key=True)
+    key = Column(String(32), index=True, unique=True)
+
+    def __init__(self, key):
+        self.key = key
+
+    def __repr__(self):
+        return "<UniqueName: %s>" % self.key
+
+
+class Event(Base):
+    __tablename__ = 'event'
+    id = Column(Integer, primary_key=True)
+    generated = Column(Float(asdecimal=True), index=True)
+
+    unique_name_id = Column(Integer, ForeignKey('unique_name.id'))
+    unique_name = relationship("UniqueName", backref=backref('unique_name',
+                               order_by=id))
+
+    def __init__(self, event, generated):
+        self.unique_name = event
+        self.generated = generated
+
+    def __repr__(self):
+        return "<Event %d('Event: %s, Generated: %s')>" % \
+               (self.id, self.unique_name, self.generated)
+
+
+class Trait(Base):
+    __tablename__ = 'trait'
+    id = Column(Integer, primary_key=True)
+
+    name_id = Column(Integer, ForeignKey('unique_name.id'))
+    name = relationship("UniqueName", backref=backref('name', order_by=id))
+
+    t_type = Column(Integer, index=True)
+    t_string = Column(String(32), nullable=True, default=None, index=True)
+    t_float = Column(Float, nullable=True, default=None, index=True)
+    t_int = Column(Integer, nullable=True, default=None, index=True)
+    t_datetime = Column(Float(asdecimal=True), nullable=True, default=None,
+                        index=True)
+
+    event_id = Column(Integer, ForeignKey('event.id'))
+    event = relationship("Event", backref=backref('event', order_by=id))
+
+    _value_map = {api_models.Trait.TEXT_TYPE: 't_string',
+                  api_models.Trait.FLOAT_TYPE: 't_float',
+                  api_models.Trait.INT_TYPE: 't_int',
+                  api_models.Trait.DATETIME_TYPE: 't_datetime'}
+
+    def __init__(self, name, event, t_type, t_string=None, t_float=None,
+                 t_int=None, t_datetime=None):
+        self.name = name
+        self.t_type = t_type
+        self.t_string = t_string
+        self.t_float = t_float
+        self.t_int = t_int
+        self.t_datetime = t_datetime
+        self.event = event
+
+    def get_value(self):
+        if self.t_type == api_models.Trait.INT_TYPE:
+            return self.t_int
+        if self.t_type == api_models.Trait.FLOAT_TYPE:
+            return self.t_float
+        if self.t_type == api_models.Trait.DATETIME_TYPE:
+            return utils.decimal_to_dt(self.t_datetime)
+        if self.t_type == api_models.Trait.TEXT_TYPE:
+            return self.t_string
+        return None
+
+    def __repr__(self):
+        return "<Trait(%s) %d=%s/%s/%s/%s on %s>" % (self.name, self.t_type,
+               self.t_string, self.t_float, self.t_int, self.t_datetime,
+               self.event)

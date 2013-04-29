@@ -43,6 +43,46 @@ class Model(object):
         return self.as_dict() == other.as_dict()
 
 
+class Event(Model):
+    """A raw event from the source system. Events have Traits.
+
+       Metrics will be derived from one or more Events.
+    """
+    def __init__(self, event_name, generated, traits):
+        """
+        :param event_name:  Name of the event.
+        :param generated:   UTC time for when the event occured.
+        :param traits:      list of Traits on this Event.
+        """
+        Model.__init__(self, event_name=event_name, generated=generated,
+                       traits=traits)
+
+    def append_trait(self, trait_model):
+        self.traits.append(trait_model)
+
+    def __repr__(self):
+        trait_list = [str(trait) for trait in self.traits]
+        return "<Event: %s, %s %s>" % \
+            (self.event_name, self.generated, " ".join(trait_list))
+
+
+class Trait(Model):
+    """A Trait is a key/value pair of data on an Event. The value is variant
+    record of basic data types (int, date, float, etc).
+    """
+
+    TEXT_TYPE = 1
+    INT_TYPE = 2
+    FLOAT_TYPE = 3
+    DATETIME_TYPE = 4
+
+    def __init__(self, name, dtype, value):
+        Model.__init__(self, name=name, dtype=dtype, value=value)
+
+    def __repr__(self):
+        return "<Trait: %s %d %s>" % (self.name, self.dtype, self.value)
+
+
 class Resource(Model):
     """Something for which sample data has been collected.
     """
