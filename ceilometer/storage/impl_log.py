@@ -118,13 +118,13 @@ class Connection(base.Connection):
         """
         return []
 
-    def get_samples(self, event_filter):
+    def get_samples(self, sample_filter):
         """Return an iterable of samples as created by
         :func:`ceilometer.meter.meter_message_from_counter`.
         """
         return []
 
-    def get_meter_statistics(self, event_filter, period=None):
+    def get_meter_statistics(self, sample_filter, period=None):
         """Return a dictionary containing meter statistics.
         described by the query parameters.
 
@@ -144,3 +144,4 @@ class Connection(base.Connection):
           }
 
         """
+        return []

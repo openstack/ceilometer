@@ -257,24 +257,24 @@ class MeterTest(DBTestBase):
         self.assertTrue(len(results) == 4)
 
 
-class RawEventTest(DBTestBase):
+class RawSampleTest(DBTestBase):
 
     def test_get_samples_by_user(self):
-        f = storage.EventFilter(user='user-id')
+        f = storage.SampleFilter(user='user-id')
         results = list(self.conn.get_samples(f))
         assert len(results) == 2
         for meter in results:
             assert meter.as_dict() in [self.msg1, self.msg2]
 
     def test_get_samples_by_project(self):
-        f = storage.EventFilter(project='project-id')
+        f = storage.SampleFilter(project='project-id')
         results = list(self.conn.get_samples(f))
         assert results
         for meter in results:
             assert meter.as_dict() in [self.msg1, self.msg2, self.msg3]
 
     def test_get_samples_by_resource(self):
-        f = storage.EventFilter(user='user-id', resource='resource-id')
+        f = storage.SampleFilter(user='user-id', resource='resource-id')
         results = list(self.conn.get_samples(f))
         assert results
         meter = results[0]
@@ -283,7 +283,7 @@ class RawEventTest(DBTestBase):
 
     def test_get_samples_by_metaquery(self):
         q = {'metadata.display_name': 'test-server'}
-        f = storage.EventFilter(metaquery=q)
+        f = storage.SampleFilter(metaquery=q)
         got_not_imp = False
         try:
             results = list(self.conn.get_samples(f))
@@ -295,7 +295,7 @@ class RawEventTest(DBTestBase):
             self.assertTrue(got_not_imp)
 
     def test_get_samples_by_start_time(self):
-        f = storage.EventFilter(
+        f = storage.SampleFilter(
             user='user-id',
             start=datetime.datetime(2012, 7, 2, 10, 41),
         )
@@ -304,7 +304,7 @@ class RawEventTest(DBTestBase):
         assert results[0].timestamp == datetime.datetime(2012, 7, 2, 10, 41)
 
     def test_get_samples_by_end_time(self):
-        f = storage.EventFilter(
+        f = storage.SampleFilter(
             user='user-id',
             end=datetime.datetime(2012, 7, 2, 10, 41),
         )
@@ -314,7 +314,7 @@ class RawEventTest(DBTestBase):
         assert results[0].timestamp == datetime.datetime(2012, 7, 2, 10, 40)
 
     def test_get_samples_by_both_times(self):
-        f = storage.EventFilter(
+        f = storage.SampleFilter(
             start=datetime.datetime(2012, 7, 2, 10, 42),
             end=datetime.datetime(2012, 7, 2, 10, 43),
         )
@@ -324,17 +324,17 @@ class RawEventTest(DBTestBase):
         assert results[0].timestamp == datetime.datetime(2012, 7, 2, 10, 42)
 
     def test_get_samples_by_name(self):
-        f = storage.EventFilter(user='user-id', meter='no-such-meter')
+        f = storage.SampleFilter(user='user-id', meter='no-such-meter')
         results = list(self.conn.get_samples(f))
         assert not results
 
     def test_get_samples_by_name2(self):
-        f = storage.EventFilter(user='user-id', meter='instance')
+        f = storage.SampleFilter(user='user-id', meter='instance')
         results = list(self.conn.get_samples(f))
         assert results
 
     def test_get_samples_by_source(self):
-        f = storage.EventFilter(source='test-1')
+        f = storage.SampleFilter(source='test-1')
         results = list(self.conn.get_samples(f))
         assert results
         assert len(results) == 1
@@ -386,7 +386,7 @@ class StatisticsTest(DBTestBase):
             self.conn.record_metering_data(msg)
 
     def test_by_user(self):
-        f = storage.EventFilter(
+        f = storage.SampleFilter(
             user='user-5',
             meter='volume.size',
         )
@@ -401,7 +401,7 @@ class StatisticsTest(DBTestBase):
         assert results.avg == 9
 
     def test_no_period_in_query(self):
-        f = storage.EventFilter(
+        f = storage.SampleFilter(
             user='user-5',
             meter='volume.size',
         )
@@ -409,7 +409,7 @@ class StatisticsTest(DBTestBase):
         assert results.period == 0
 
     def test_period_is_int(self):
-        f = storage.EventFilter(
+        f = storage.SampleFilter(
             meter='volume.size',
         )
         results = list(self.conn.get_meter_statistics(f))[0]
@@ -417,7 +417,7 @@ class StatisticsTest(DBTestBase):
         assert results.count == 6
 
     def test_by_user_period(self):
-        f = storage.EventFilter(
+        f = storage.SampleFilter(
             user='user-5',
             meter='volume.size',
             start='2012-09-25T10:28:00',
@@ -449,7 +449,7 @@ class StatisticsTest(DBTestBase):
                          datetime.datetime(2012, 9, 25, 11, 31))
 
     def test_by_user_period_start_end(self):
-        f = storage.EventFilter(
+        f = storage.SampleFilter(
             user='user-5',
             meter='volume.size',
             start='2012-09-25T10:28:00',
@@ -476,7 +476,7 @@ class StatisticsTest(DBTestBase):
                          datetime.datetime(2012, 9, 25, 10, 30))
 
     def test_by_project(self):
-        f = storage.EventFilter(
+        f = storage.SampleFilter(
             meter='volume.size',
             resource='resource-id',
             start='2012-09-25T11:30:00',
@@ -491,7 +491,7 @@ class StatisticsTest(DBTestBase):
         assert results.avg == 6
 
     def test_one_resource(self):
-        f = storage.EventFilter(
+        f = storage.SampleFilter(
             user='user-id',
             meter='volume.size',
         )
@@ -565,20 +565,20 @@ class CounterDataTypeTest(DBTestBase):
         self.conn.record_metering_data(msg)
 
     def test_storage_can_handle_large_values(self):
-        f = storage.EventFilter(
+        f = storage.SampleFilter(
             meter='dummyBigCounter',
         )
         results = list(self.conn.get_samples(f))
         self.assertEqual(results[0].counter_volume, 3372036854775807)
 
-        f = storage.EventFilter(
+        f = storage.SampleFilter(
             meter='dummySmallCounter',
         )
         results = list(self.conn.get_samples(f))
         self.assertEqual(results[0].counter_volume, -3372036854775807)
 
     def test_storage_can_handle_float_values(self):
-        f = storage.EventFilter(
+        f = storage.SampleFilter(
             meter='floatCounter',
         )
         results = list(self.conn.get_samples(f))

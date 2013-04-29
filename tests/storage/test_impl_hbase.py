@@ -47,7 +47,7 @@ class MeterTest(base.MeterTest, HBaseEngineTestBase):
     pass
 
 
-class RawEventTest(base.RawEventTest, HBaseEngineTestBase):
+class RawSampleTest(base.RawSampleTest, HBaseEngineTestBase):
     pass
 
 

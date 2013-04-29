@@ -57,7 +57,7 @@ class _Base(wtypes.Base):
 
 
 class Query(_Base):
-    """Query filter.
+    """Sample query filter.
     """
 
     _op = None  # provide a default
@@ -378,9 +378,9 @@ class MeterController(rest.RestController):
 
         :param q: Filter rules for the data to be returned.
         """
-        kwargs = _query_to_kwargs(q, storage.EventFilter.__init__)
+        kwargs = _query_to_kwargs(q, storage.SampleFilter.__init__)
         kwargs['meter'] = self._id
-        f = storage.EventFilter(**kwargs)
+        f = storage.SampleFilter(**kwargs)
         return [Sample.from_db_model(e)
                 for e in pecan.request.storage_conn.get_samples(f)
                 ]
@@ -394,9 +394,9 @@ class MeterController(rest.RestController):
                        period long of that number of seconds.
 
         """
-        kwargs = _query_to_kwargs(q, storage.EventFilter.__init__)
+        kwargs = _query_to_kwargs(q, storage.SampleFilter.__init__)
         kwargs['meter'] = self._id
-        f = storage.EventFilter(**kwargs)
+        f = storage.SampleFilter(**kwargs)
         computed = pecan.request.storage_conn.get_meter_statistics(f, period)
         LOG.debug('computed value coming from %r', pecan.request.storage_conn)
         # Find the original timestamp in the query to use for clamping

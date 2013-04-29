@@ -395,7 +395,7 @@ def _list_samples(meter,
     to maintain API compatibilty.
     """
     q_ts = _get_query_timestamps(flask.request.args)
-    f = storage.EventFilter(
+    f = storage.SampleFilter(
         user=user,
         project=project,
         source=source,
@@ -405,8 +405,9 @@ def _list_samples(meter,
         end=q_ts['end_timestamp'],
         metaquery=_get_metaquery(flask.request.args),
     )
-    events = flask.request.storage_conn.get_samples(f)
-    jsonified = flask.jsonify(events=[e.as_dict() for e in events])
+    samples = flask.request.storage_conn.get_samples(f)
+
+    jsonified = flask.jsonify(events=[s.as_dict() for s in samples])
     if request_wants_html():
         return flask.templating.render_template('list_event.html',
                                                 user=user,
@@ -552,7 +553,7 @@ def compute_duration_by_resource(resource, meter):
 
     # Query the database for the interval of timestamps
     # within the desired range.
-    f = storage.EventFilter(
+    f = storage.SampleFilter(
         meter=meter,
         project=acl.get_limited_to_project(flask.request.headers),
         resource=resource,
@@ -597,7 +598,7 @@ def compute_duration_by_resource(resource, meter):
 def _get_statistics(stats_type, meter=None, resource=None, project=None):
     q_ts = _get_query_timestamps(flask.request.args)
 
-    f = storage.EventFilter(
+    f = storage.SampleFilter(
         meter=meter,
         project=project,
         resource=resource,

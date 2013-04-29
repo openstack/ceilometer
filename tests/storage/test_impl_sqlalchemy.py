@@ -49,7 +49,7 @@ class MeterTest(base.MeterTest, SQLAlchemyEngineTestBase):
     pass
 
 
-class RawEventTest(base.RawEventTest, SQLAlchemyEngineTestBase):
+class RawSampleTest(base.RawSampleTest, SQLAlchemyEngineTestBase):
     pass
 
 
