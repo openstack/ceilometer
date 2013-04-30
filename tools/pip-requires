@@ -16,7 +16,6 @@ python-keystoneclient>=0.2.3
 python-swiftclient
 lxml
 requests<1.0
-extras
 wsme>=0.5b1
 pyyaml
 oslo.config>=1.1.0
