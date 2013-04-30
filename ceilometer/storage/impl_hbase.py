@@ -334,6 +334,7 @@ class Connection(base.Connection):
             yield models.Resource(
                 resource_id=resource_id,
                 project_id=data['f:project_id'],
+                source=data['f:source'],
                 user_id=data['f:user_id'],
                 metadata=json.loads(data['f:metadata']),
                 meter=[
@@ -381,6 +382,7 @@ class Connection(base.Connection):
                 unit=unit,
                 resource_id=data['f:resource_id'],
                 project_id=data['f:project_id'],
+                source=data['f:source'],
                 user_id=data['f:user_id'],
             )
 

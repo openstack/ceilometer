@@ -157,6 +157,7 @@ class ProjectTest(DBTestBase):
 class ResourceTest(DBTestBase):
 
     def test_get_resources(self):
+        msgs_sources = [msg['source'] for msg in self.msgs]
         resources = list(self.conn.get_resources())
         assert len(resources) == 4
         for resource in resources:
@@ -164,6 +165,7 @@ class ResourceTest(DBTestBase):
                 continue
             assert resource.resource_id == 'resource-id'
             assert resource.project_id == 'project-id'
+            self.assertIn(resource.source, msgs_sources)
             assert resource.user_id == 'user-id'
             assert resource.metadata['display_name'] == 'test-server'
             self.assertIn(models.ResourceMeter('instance', 'cumulative', ''),
@@ -236,8 +238,11 @@ class ResourceTest(DBTestBase):
 class MeterTest(DBTestBase):
 
     def test_get_meters(self):
+        msgs_sources = [msg['source'] for msg in self.msgs]
         results = list(self.conn.get_meters())
         assert len(results) == 4
+        for meter in results:
+            self.assertIn(meter.source, msgs_sources)
 
     def test_get_meters_by_user(self):
         results = list(self.conn.get_meters(user='user-id'))

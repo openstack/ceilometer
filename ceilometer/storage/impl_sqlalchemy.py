@@ -255,6 +255,7 @@ class Connection(base.Connection):
             yield api_models.Resource(
                 resource_id=meter.resource_id,
                 project_id=meter.project_id,
+                source=meter.sources[0].id,
                 user_id=meter.user_id,
                 metadata=meter.resource_metadata,
                 meter=[
@@ -303,6 +304,7 @@ class Connection(base.Connection):
                     unit=meter.counter_unit,
                     resource_id=resource.id,
                     project_id=resource.project_id,
+                    source=resource.sources[0].id,
                     user_id=resource.user_id,
                 )
 

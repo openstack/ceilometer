@@ -392,6 +392,7 @@ class Connection(base.Connection):
             yield models.Resource(
                 resource_id=resource['_id'],
                 project_id=resource['project_id'],
+                source=resource['source'],
                 user_id=resource['user_id'],
                 metadata=resource['metadata'],
                 meter=[
@@ -435,6 +436,7 @@ class Connection(base.Connection):
                     unit=r_meter.get('counter_unit', ''),
                     resource_id=r['_id'],
                     project_id=r['project_id'],
+                    source=r['source'],
                     user_id=r['user_id'],
                 )
 
