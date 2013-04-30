@@ -22,6 +22,7 @@
 .. toctree::
    :maxdepth: 2
 
+   dbreco
    development
    manual
    mod_wsgi
