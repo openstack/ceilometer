@@ -3,6 +3,9 @@
 #
 # Copyright © 2012 eNovance <licensing@enovance.com>
 #
+# Copyright 2013 IBM Corp
+# All Rights Reserved.
+#
 # Author: Julien Danjou <julien@danjou.info>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -42,7 +45,9 @@ class TestFloatingIPPollster(base.TestCase):
         ips = []
         for i in range(1, 4):
             ip = mock.MagicMock()
-            ip.address = '1.1.1.%d' % i
+            ip.id = i
+            ip.ip = '1.1.1.%d' % i
+            ip.pool = 'public'
             ips.append(ip)
         return ips
 
@@ -62,13 +67,19 @@ class TestFloatingIPPollster(base.TestCase):
     def test_get_counters_not_empty(self):
         counters = list(self.pollster.get_counters(self.manager))
         self.assertEqual(len(counters), 3)
-        addresses = [c.resource_metadata['address']
-                     for c in counters
-                     ]
-        self.assertEqual(addresses, ['1.1.1.1',
-                                     '1.1.1.2',
-                                     '1.1.1.3',
-                                     ])
+        # It's necessary to verify all the attributes extracted by Nova
+        # API /os-floating-ips to make sure they're available and correct.
+        self.assertEqual(counters[0].resource_id, 1)
+        self.assertEqual(counters[0].resource_metadata["address"], "1.1.1.1")
+        self.assertEqual(counters[0].resource_metadata["pool"], "public")
+
+        self.assertEqual(counters[1].resource_id, 2)
+        self.assertEqual(counters[1].resource_metadata["address"], "1.1.1.2")
+        self.assertEqual(counters[1].resource_metadata["pool"], "public")
+
+        self.assertEqual(counters[2].resource_id, 3)
+        self.assertEqual(counters[2].resource_metadata["address"], "1.1.1.3")
+        self.assertEqual(counters[2].resource_metadata["pool"], "public")
 
     def test_get_counter_names(self):
         counters = list(self.pollster.get_counters(self.manager))
