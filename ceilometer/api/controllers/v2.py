@@ -40,8 +40,8 @@ from wsme import types as wtypes
 
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
+from ceilometer import counter
 from ceilometer import storage
-
 
 LOG = log.getLogger(__name__)
 
@@ -421,8 +421,9 @@ class Meter(_Base):
     name = wtypes.text
     "The unique name for the meter"
 
-    # FIXME(dhellmann): Make this an enum?
-    type = wtypes.text
+    type = wtypes.Enum(str, counter.TYPE_GAUGE,
+                       counter.TYPE_CUMULATIVE,
+                       counter.TYPE_DELTA)
     "The meter type (see :ref:`measurements`)"
 
     unit = wtypes.text

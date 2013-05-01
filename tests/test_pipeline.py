@@ -97,7 +97,7 @@ class TestPipeline(base.TestCase):
 
         self.test_counter = counter.Counter(
             name='a',
-            type='test_type',
+            type=counter.TYPE_GAUGE,
             volume=1,
             unit='B',
             user_id="test_user",
