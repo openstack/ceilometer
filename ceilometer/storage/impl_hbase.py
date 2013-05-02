@@ -273,10 +273,10 @@ class Connection(base.Connection):
                   # add in reversed_ts here for time range scan
                   'f:rts': str(rts)
                   }
-        # Don't want to be changing the original data object
+        # Don't want to be changing the original data object.
         data = copy.copy(data)
         data['timestamp'] = ts
-        # Save original event
+        # Save original meter.
         record['f:message'] = json.dumps(data)
         self.meter.put(row, record)
 
@@ -387,10 +387,10 @@ class Connection(base.Connection):
                 user_id=data['f:user_id'],
             )
 
-    def get_samples(self, event_filter):
+    def get_samples(self, sample_filter):
         """Return an iterable of models.Sample instances
         """
-        q, start, stop = make_query_from_filter(event_filter,
+        q, start, stop = make_query_from_filter(sample_filter,
                                                 require_meter=False)
         LOG.debug("q: %s" % q)
 
@@ -422,7 +422,7 @@ class Connection(base.Connection):
             timeutils.delta_seconds(stat.duration_start,
                                     stat.duration_end)
 
-    def get_meter_statistics(self, event_filter, period=None):
+    def get_meter_statistics(self, sample_filter, period=None):
         """Return an iterable of models.Statistics instances containing meter
         statistics described by the query parameters.
 
@@ -435,7 +435,7 @@ class Connection(base.Connection):
            because of all the Thrift traffic it is going to create.
 
         """
-        q, start, stop = make_query_from_filter(event_filter)
+        q, start, stop = make_query_from_filter(sample_filter)
 
         meters = list(meter for (ignored, meter) in
                       self.meter.scan(filter=q,
@@ -443,15 +443,15 @@ class Connection(base.Connection):
                                       row_stop=stop)
                       )
 
-        if event_filter.start:
-            start_time = event_filter.start
+        if sample_filter.start:
+            start_time = sample_filter.start
         elif meters:
             start_time = timeutils.parse_strtime(meters[-1]['f:timestamp'])
         else:
             start_time = None
 
-        if event_filter.end:
-            end_time = event_filter.end
+        if sample_filter.end:
+            end_time = sample_filter.end
         elif meters:
             end_time = timeutils.parse_strtime(meters[0]['f:timestamp'])
         else:
@@ -684,29 +684,30 @@ def make_query(user=None, project=None, meter=None,
             q.append("SingleColumnValueFilter ('f', 'rts', >=, 'binary:%s')" %
                      rts_end)
 
-    query_filter = None
+    sample_filter = None
     if len(q):
-        query_filter = " AND ".join(q)
+        sample_filter = " AND ".join(q)
     if query_only:
-        return query_filter
+        return sample_filter
     else:
-        return query_filter, startRow, stopRow
+        return sample_filter, startRow, stopRow
 
 
-def make_query_from_filter(event_filter, require_meter=True):
+def make_query_from_filter(sample_filter, require_meter=True):
     """Return a query dictionary based on the settings in the filter.
 
-    :param filter: EventFilter instance
+    :param sample_filter: SampleFilter instance
     :param require_meter: If true and the filter does not have a meter,
                           raise an error.
     """
-    if event_filter.metaquery is not None and len(event_filter.metaquery) > 0:
+    if sample_filter.metaquery is not None and \
+        len(sample_filter.metaquery) > 0:
         raise NotImplementedError('metaquery not implemented')
 
-    return make_query(event_filter.user, event_filter.project,
-                      event_filter.meter, event_filter.resource,
-                      event_filter.source, event_filter.start,
-                      event_filter.end, require_meter)
+    return make_query(sample_filter.user, sample_filter.project,
+                      sample_filter.meter, sample_filter.resource,
+                      sample_filter.source, sample_filter.start,
+                      sample_filter.end, require_meter)
 
 
 def _load_hbase_list(d, prefix):

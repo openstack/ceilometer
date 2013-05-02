@@ -126,13 +126,13 @@ class Connection(object):
         """
 
     @abc.abstractmethod
-    def get_samples(self, event_filter):
+    def get_samples(self, sample_filter):
         """Return an iterable of model.Sample instances
         """
 
     @abc.abstractmethod
-    def get_meter_statistics(self, event_filter, period=None):
-        """Return an iterable of model.Statistics instances
+    def get_meter_statistics(self, sample_filter, period=None):
+        """Return an iterable of model.Statistics instances.
 
         The filter must have a meter value set.
         """

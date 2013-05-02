@@ -86,7 +86,7 @@ class MeterTest(base.MeterTest, MongoDBEngineTestBase):
     pass
 
 
-class RawEventTest(base.RawEventTest, MongoDBEngineTestBase):
+class RawSampleTest(base.RawSampleTest, MongoDBEngineTestBase):
     pass
 
 

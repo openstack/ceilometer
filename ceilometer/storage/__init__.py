@@ -69,13 +69,13 @@ def get_connection(conf):
     return db
 
 
-class EventFilter(object):
-    """Holds the properties for building a query to filter events.
+class SampleFilter(object):
+    """Holds the properties for building a query from a meter/sample filter.
 
-    :param user: The event owner.
-    :param project: The event owner.
+    :param user: The sample owner.
+    :param project: The sample project.
     :param start: Earliest timestamp to include.
-    :param end: Only include events with timestamp less than this.
+    :param end: Only include samples with timestamp less than this.
     :param resource: Optional filter for resource id.
     :param meter: Optional filter for meter type using the meter name.
     :param source: Optional source filter.

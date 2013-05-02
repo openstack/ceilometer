@@ -124,7 +124,7 @@ class Sample(Model):
         :param counter_type: the type of the measurement
         :param counter_unit: the units for the measurement
         :param counter_volume: the measured value
-        :param user_id: the user that triggered the event and measurement
+        :param user_id: the user that triggered the measurement
         :param project_id: the project that owns the resource
         :param resource_id: the thing on which the measurement was taken
         :param timestamp: the time of the measurement

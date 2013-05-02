@@ -41,7 +41,7 @@ def show_resources(db, args):
             for k, v in sorted(resource['metadata'].iteritems()):
                 print '      %-10s : %s' % (k, v)
             for meter in resource['meter']:
-                totals = db.get_statistics(storage.EventFilter(
+                totals = db.get_statistics(storage.SampleFilter(
                     user=u,
                     meter=meter['counter_name'],
                     resource=resource['resource_id'],
@@ -65,7 +65,7 @@ def show_total_resources(db, args):
     for u in users:
         print u
         for meter in ['disk', 'cpu', 'instance']:
-            stats = db.get_statistics(storage.EventFilter(
+            stats = db.get_statistics(storage.SampleFilter(
                     user=u,
                     meter=meter,
                 ))
@@ -82,11 +82,11 @@ def show_raw(db, args):
         print u
         for resource in db.get_resources(user=u):
             print '  ', resource['resource_id']
-            for event in db.get_samples(storage.EventFilter(
+            for sample in db.get_samples(storage.SampleFilter(
                     user=u,
                     resource=resource['resource_id'],
                     )):
-                print fmt % event
+                print fmt % sample
 
 
 def show_help(db, args):
