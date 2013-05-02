@@ -55,6 +55,16 @@ class _Base(wtypes.Base):
     def from_db_model(cls, m):
         return cls(**(m.as_dict()))
 
+    def as_dict(self, db_model):
+        valid_keys = inspect.getargspec(db_model.__init__)[0]
+        if 'self' in valid_keys:
+            valid_keys.remove('self')
+
+        return dict((k, getattr(self, k))
+                    for k in valid_keys
+                    if hasattr(self, k) and
+                    getattr(self, k) != wsme.Unset)
+
 
 class Query(_Base):
     """Query filter.
@@ -527,8 +537,130 @@ class ResourcesController(rest.RestController):
         return resources
 
 
+class Alarm(_Base):
+    """One category of measurements.
+    """
+
+    alarm_id = wtypes.text
+    "The UUID of the alarm"
+
+    name = wtypes.text
+    "The name for the alarm"
+
+    description = wtypes.text
+    "The description of the alarm"
+
+    counter_name = wtypes.text
+    "The name of counter"
+
+    project_id = wtypes.text
+    "The ID of the project or tenant that owns the alarm"
+
+    user_id = wtypes.text
+    "The ID of the user who created the alarm"
+
+    comparison_operator = wtypes.Enum(str, 'lt', 'le', 'eq', 'ne', 'ge', 'gt')
+    "The comparison against the alarm threshold"
+
+    threshold = float
+    "The threshold of the alarm"
+
+    statistic = wtypes.Enum(str, 'max', 'min', 'avg', 'sum', 'count')
+    "The statistic to compare to the threshold"
+
+    enabled = bool
+    "This alarm is enabled?"
+
+    evaluation_periods = int
+    "The number of periods to evaluate the threshold"
+
+    period = float
+    "The time range in seconds over which to evaluate the threshold"
+
+    timestamp = datetime.datetime
+    "The date of the last alarm definition update"
+
+    state = wtypes.Enum(str, 'ok', 'alarm', 'insufficient data')
+    "The state offset the alarm"
+
+    state_timestamp = datetime.datetime
+    "The date of the last alarm state changed"
+
+    ok_actions = [wtypes.text]
+    "The actions to do when alarm state change to ok"
+
+    alarm_actions = [wtypes.text]
+    "The actions to do when alarm state change to alarm"
+
+    insufficient_data_actions = [wtypes.text]
+    "The actions to do when alarm state change to insufficient data"
+
+    matching_metadata = {wtypes.text: wtypes.text}
+    "The matching_metadata of the alarm"
+
+    def __init__(self, **kwargs):
+        super(Alarm, self).__init__(**kwargs)
+
+    @classmethod
+    def sample(cls):
+        return cls(alarm_id=None,
+                   name="SwiftObjectAlarm",
+                   description="An alarm",
+                   counter_name="storage.objects",
+                   comparison_operator="gt",
+                   threshold=200,
+                   statistic="avg",
+                   user_id="c96c887c216949acbdfbd8b494863567",
+                   project_id="c96c887c216949acbdfbd8b494863567",
+                   evaluation_periods=2,
+                   period=240,
+                   enabled=True,
+                   timestamp=datetime.datetime.utcnow(),
+                   state="ok",
+                   state_timestamp=datetime.datetime.utcnow(),
+                   ok_actions=["http://site:8000/ok"],
+                   alarm_actions=["http://site:8000/alarm"],
+                   insufficient_data_actions=["http://site:8000/nodata"],
+                   matching_metadata={"key_name":
+                                      "key_value"}
+                   )
+
+
+class AlarmsController(rest.RestController):
+    """Works on alarms."""
+
+    @wsme_pecan.wsexpose(Alarm, body=Alarm, status_code=201)
+    def post(self, data):
+        """Create a new alarm"""
+        raise wsme.exc.ClientSideError("Not implemented")
+
+    @wsme_pecan.wsexpose(Alarm, wtypes.text, body=Alarm, status_code=201)
+    def put(self, alarm_id, data):
+        """Modify an alarm"""
+        raise wsme.exc.ClientSideError("Not implemented")
+
+    @wsme_pecan.wsexpose(None, wtypes.text, status_code=204)
+    def delete(self, alarm_id):
+        """Delete an alarm"""
+        raise wsme.exc.ClientSideError("Not implemented")
+
+    @wsme_pecan.wsexpose(Alarm, wtypes.text)
+    def get_one(self, alarm_id):
+        """Return one alarm"""
+        raise wsme.exc.ClientSideError("Not implemented")
+
+    @wsme_pecan.wsexpose([Alarm], [Query])
+    def get_all(self, q=[]):
+        """Return all alarms, based on the query provided.
+
+        :param q: Filter rules for the alarms to be returned.
+        """
+        return []
+
+
 class V2Controller(object):
     """Version 2 API controller root."""
 
     resources = ResourcesController()
     meters = MetersController()
+    alarms = AlarmsController()
