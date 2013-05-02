@@ -638,6 +638,18 @@ class AlarmTest(DBTestBase):
         self.assertEquals(updated.enabled, False)
         self.assertEquals(updated.state, models.Alarm.ALARM_INSUFFICIENT_DATA)
 
+    def test_update_llu(self):
+        llu = models.Alarm('llu',
+                           'counter_name', 'lt', 34, 'max',
+                           'bla', 'ffo')
+        updated = self.conn.update_alarm(llu)
+        updated.state = models.Alarm.ALARM_OK
+        updated.description = ':)'
+        self.conn.update_alarm(updated)
+
+        all = list(self.conn.get_alarms())
+        self.assertEquals(len(all), 1)
+
     def test_delete(self):
         self.add_some_alarms()
         victim = list(self.conn.get_alarms(name='orange-alert'))[0]
