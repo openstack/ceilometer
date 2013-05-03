@@ -1,18 +1,18 @@
-# Translations template for ceilometer.
+# Korean (South Korea) translations for ceilometer.
 # Copyright (C) 2013 ORGANIZATION
 # This file is distributed under the same license as the ceilometer project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
-#, fuzzy
+# Translators:
+# ujuc Gang <potopro@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer "
-"jenkins.ceilometer.propose.translation.update.108\n"
+"Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2013-05-03 09:40+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2013-04-17 00:01+0000\n"
+"Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
+"Language-Team: ko_KR <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -30,7 +30,7 @@ msgstr ""
 #: ceilometer/compute/nova_notifier.py:105
 #, python-format
 msgid "INFO %r"
-msgstr ""
+msgstr "INFO %r"
 
 #: ceilometer/compute/nova_notifier.py:129
 #, python-format
@@ -53,7 +53,7 @@ msgstr ""
 
 #: ceilometer/objectstore/swift.py:110
 msgid "Swift endpoint not found"
-msgstr ""
+msgstr "Swift endpoint를 찾지 못하였습니다."
 
 #: ceilometer/openstack/common/excutils.py:48
 #, python-format
@@ -235,12 +235,12 @@ msgstr ""
 #: ceilometer/openstack/common/rpc/amqp.py:337
 #, python-format
 msgid "UNIQUE_ID is %s."
-msgstr ""
+msgstr "UNIQUE_ID는 %s입니다."
 
 #: ceilometer/openstack/common/rpc/amqp.py:406
 #, python-format
 msgid "received %s"
-msgstr ""
+msgstr "%s을 얻음"
 
 #: ceilometer/openstack/common/rpc/amqp.py:413
 #, python-format
@@ -473,7 +473,7 @@ msgstr ""
 
 #: ceilometer/openstack/common/rpc/impl_zmq.py:379
 msgid "Registering reactor"
-msgstr ""
+msgstr "등록 리액터"
 
 #: ceilometer/openstack/common/rpc/impl_zmq.py:391
 msgid "In reactor registered"
@@ -554,7 +554,7 @@ msgstr ""
 
 #: ceilometer/openstack/common/rpc/impl_zmq.py:686
 msgid "Creating payload"
-msgstr ""
+msgstr "Payload 생성"
 
 #: ceilometer/openstack/common/rpc/impl_zmq.py:699
 msgid "Creating queue socket for reply waiter"
@@ -588,7 +588,7 @@ msgstr ""
 #: ceilometer/openstack/common/rpc/impl_zmq.py:759
 #, python-format
 msgid "%(msg)s"
-msgstr ""
+msgstr "%(msg)s"
 
 #: ceilometer/openstack/common/rpc/impl_zmq.py:762
 #, python-format
