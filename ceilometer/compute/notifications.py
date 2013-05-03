@@ -89,7 +89,7 @@ class Memory(_Base):
         return [
             counter.Counter(name='memory',
                             type=counter.TYPE_GAUGE,
-                            unit='B',
+                            unit='MB',
                             volume=message['payload']['memory_mb'],
                             user_id=message['payload']['user_id'],
                             project_id=message['payload']['tenant_id'],
@@ -123,7 +123,7 @@ class RootDiskSize(_Base):
         return [
             counter.Counter(name='disk.root.size',
                             type=counter.TYPE_GAUGE,
-                            unit='B',
+                            unit='GB',
                             volume=message['payload']['root_gb'],
                             user_id=message['payload']['user_id'],
                             project_id=message['payload']['tenant_id'],
@@ -140,7 +140,7 @@ class EphemeralDiskSize(_Base):
         return [
             counter.Counter(name='disk.ephemeral.size',
                             type=counter.TYPE_GAUGE,
-                            unit='B',
+                            unit='GB',
                             volume=message['payload']['ephemeral_gb'],
                             user_id=message['payload']['user_id'],
                             project_id=message['payload']['tenant_id'],
