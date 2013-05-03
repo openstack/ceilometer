@@ -55,6 +55,10 @@ class _Base(wtypes.Base):
     def from_db_model(cls, m):
         return cls(**(m.as_dict()))
 
+    @classmethod
+    def from_db_and_links(cls, m, links):
+        return cls(links=links, **(m.as_dict()))
+
     def as_dict(self, db_model):
         valid_keys = inspect.getargspec(db_model.__init__)[0]
         if 'self' in valid_keys:
@@ -64,6 +68,25 @@ class _Base(wtypes.Base):
                     for k in valid_keys
                     if hasattr(self, k) and
                     getattr(self, k) != wsme.Unset)
+
+
+class Link(_Base):
+    """A link representation
+    """
+
+    href = wtypes.text
+    "The url of a link"
+
+    rel = wtypes.text
+    "The name of a link"
+
+    @classmethod
+    def sample(cls):
+        return cls(href=('http://localhost:8777/v2/meters/volume?'
+                         'q.field=resource_id&'
+                         'q.value=bd9431c1-8d69-4ad3-803a-8d4a6b89fd36'),
+                   rel='volume'
+                   )
 
 
 class Query(_Base):
@@ -216,6 +239,15 @@ def _flatten_metadata(metadata):
                     for k, v in metadata.iteritems()
                     if type(v) not in set([list, dict, set]))
     return {}
+
+
+def _make_link(rel_name, url, type, type_arg, query=None):
+    query_str = ''
+    if query:
+        query_str = '?q.field=%s&q.value=%s' % (query['field'],
+                                                query['value'])
+    return Link(href=('%s/v2/%s/%s%s') % (url, type, type_arg, query_str),
+                rel=rel_name)
 
 
 class Sample(_Base):
@@ -496,6 +528,9 @@ class Resource(_Base):
     metadata = {wtypes.text: wtypes.text}
     "Arbitrary metadata associated with the resource"
 
+    links = [Link]
+    "A list containing a self link and associated meter links"
+
     def __init__(self, metadata={}, **kwds):
         metadata = _flatten_metadata(metadata)
         super(Resource, self).__init__(metadata=metadata, **kwds)
@@ -508,11 +543,29 @@ class Resource(_Base):
                    timestamp=datetime.datetime.utcnow(),
                    metadata={'name1': 'value1',
                              'name2': 'value2'},
+                   links=[Link(href=('http://localhost:8777/v2/resources/'
+                                     'bd9431c1-8d69-4ad3-803a-8d4a6b89fd36'),
+                               rel='self'),
+                          Link(href=('http://localhost:8777/v2/meters/volume?'
+                                     'q.field=resource_id&'
+                                     'q.value=bd9431c1-8d69-4ad3-803a-'
+                                     '8d4a6b89fd36'),
+                               rel='volume')],
                    )
 
 
 class ResourcesController(rest.RestController):
     """Works on resources."""
+
+    def _resource_links(self, resource_id):
+        links = [_make_link('self', pecan.request.host_url, 'resources',
+                            resource_id)]
+        for meter in pecan.request.storage_conn.get_meters(resource=
+                                                           resource_id):
+            query = {'field': 'resource_id', 'value': resource_id}
+            links.append(_make_link(meter.name, pecan.request.host_url,
+                                    'meters', meter.name, query=query))
+        return links
 
     @wsme_pecan.wsexpose(Resource, unicode)
     def get_one(self, resource_id):
@@ -522,7 +575,8 @@ class ResourcesController(rest.RestController):
         """
         r = list(pecan.request.storage_conn.get_resources(
                  resource=resource_id))[0]
-        return Resource.from_db_model(r)
+        return Resource.from_db_and_links(r,
+                                          self._resource_links(resource_id))
 
     @wsme_pecan.wsexpose([Resource], [Query])
     def get_all(self, q=[]):
@@ -532,7 +586,8 @@ class ResourcesController(rest.RestController):
         """
         kwargs = _query_to_kwargs(q, pecan.request.storage_conn.get_resources)
         resources = [
-            Resource.from_db_model(r)
+            Resource.from_db_and_links(r,
+                                       self._resource_links(r.resource_id))
             for r in pecan.request.storage_conn.get_resources(**kwargs)]
         return resources
 
