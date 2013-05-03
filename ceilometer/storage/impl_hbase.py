@@ -90,7 +90,7 @@ class HBaseStorage(base.StorageEngine):
 
     OPTIONS = [
         cfg.StrOpt('table_prefix',
-                   default='',
+                   default=None,
                    help='Database table prefix',
                    ),
     ]
