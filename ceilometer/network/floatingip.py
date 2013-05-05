@@ -2,6 +2,9 @@
 #
 # Copyright © 2012 eNovance <licensing@enovance.com>
 #
+# Copyright 2013 IBM Corp
+# All Rights Reserved.
+#
 # Author: Julien Danjou <julien@danjou.info>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -35,20 +38,21 @@ class FloatingIPPollster(plugin.CentralPollster):
     def get_counters(self, manager):
         nv = nova_client.Client()
         for ip in nv.floating_ip_get_all():
-            self.LOG.info("FLOATING IP USAGE: %s" % ip.address)
+            self.LOG.info("FLOATING IP USAGE: %s" % ip.ip)
+            # FIXME (flwang) Now Nova API /os-floating-ips can't provide those
+            # attributes were used by Ceilometer, such as project id, host.
+            # In this fix, those attributes usage will be removed temporarily.
+            # And they will be back after fix the Nova bug 1174802.
             yield counter.Counter(
                 name='ip.floating',
                 type=counter.TYPE_GAUGE,
                 unit='ip',
                 volume=1,
                 user_id=None,
-                project_id=ip.project_id,
+                project_id=None,
                 resource_id=ip.id,
                 timestamp=timeutils.utcnow().isoformat(),
                 resource_metadata={
-                    'address': ip.address,
-                    'fixed_ip_id': ip.fixed_ip_id,
-                    'host': ip.host,
-                    'pool': ip.pool,
-                    'auto_assigned': ip.auto_assigned
+                    'address': ip.ip,
+                    'pool': ip.pool
                 })
