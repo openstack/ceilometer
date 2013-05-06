@@ -138,5 +138,21 @@ class Connection(object):
         """
 
     @abc.abstractmethod
+    def get_alarms(self, name=None, user=None,
+                   project=None, enabled=True, alarm_id=None):
+        """Yields a lists of alarms that match filters
+        """
+
+    @abc.abstractmethod
+    def update_alarm(self, alarm):
+        """update alarm
+        """
+
+    @abc.abstractmethod
+    def delete_alarm(self, alarm_id):
+        """Delete a alarm
+        """
+
+    @abc.abstractmethod
     def clear(self):
         """Clear database."""

@@ -145,3 +145,18 @@ class Connection(base.Connection):
 
         """
         return []
+
+    def get_alarms(self, name=None, user=None,
+                   project=None, enabled=True, alarm_id=None):
+        """Yields a lists of alarms that match filters
+        """
+        return []
+
+    def update_alarm(self, alarm):
+        """update alarm
+        """
+        return alarm
+
+    def delete_alarm(self, alarm_id):
+        """Delete a alarm
+        """

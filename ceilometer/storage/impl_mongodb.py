@@ -506,6 +506,22 @@ class Connection(base.Connection):
                 a_max.valueOf() // 1000)
         return (a_min, a_max)
 
+    def get_alarms(self, name=None, user=None,
+                   project=None, enabled=True, alarm_id=None):
+        """Yields a lists of alarms that match filters
+        """
+        raise NotImplementedError('Alarms not implemented')
+
+    def update_alarm(self, alarm):
+        """update alarm
+        """
+        raise NotImplementedError('Alarms not implemented')
+
+    def delete_alarm(self, alarm_id):
+        """Delete a alarm
+        """
+        raise NotImplementedError('Alarms not implemented')
+
 
 def require_map_reduce(conn):
     """Raises SkipTest if the connection is using mim.

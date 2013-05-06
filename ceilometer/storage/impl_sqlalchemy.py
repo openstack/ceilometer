@@ -411,3 +411,19 @@ class Connection(base.Connection):
                     period_start=period_start,
                     period_end=period_end,
                 )
+
+    def get_alarms(self, name=None, user=None,
+                   project=None, enabled=True, alarm_id=None):
+        """Yields a lists of alarms that match filters
+        """
+        raise NotImplementedError('Alarms not implemented')
+
+    def update_alarm(self, alarm):
+        """update alarm
+        """
+        raise NotImplementedError('Alarms not implemented')
+
+    def delete_alarm(self, alarm_id):
+        """Delete a alarm
+        """
+        raise NotImplementedError('Alarms not implemented')
