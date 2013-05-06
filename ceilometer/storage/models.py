@@ -174,3 +174,78 @@ class Statistics(Model):
                        period_end=period_end, duration=duration,
                        duration_start=duration_start,
                        duration_end=duration_end)
+
+
+class Alarm(Model):
+    ALARM_INSUFFICIENT_DATA = 'insufficient data'
+    ALARM_OK = 'ok'
+    ALARM_ALARM = 'alarm'
+    """
+    An alarm to monitor.
+
+    :param alarm_id: UUID of the alarm
+    :param name: The Alarm name
+    :param description: User friendly description of the alarm
+    :param enabled: Is the alarm enabled
+    :param state: Alarm state (alarm/nodata/ok)
+    :param counter_name: The counter that the alarm is based on
+    :param comparison_operator: How to compare the samples and the threshold
+    :param threshold: the value to compare to the samples
+    :param statistic: the function from Statistic (min/max/avg/count)
+    :param user_id: the owner/creator of the alarm
+    :param project_id: the project_id of the creator
+    :param evaluation_periods: the number of periods
+    :param period: the time period in seconds
+    :param timestamp: the timestamp when the alarm was last updated
+    :param state_timestamp: the timestamp of the last state change
+    :param ok_actions: the list of webhooks to call when entering the ok state
+    :param alarm_actions: the list of webhooks to call when entering the
+                          alarm state
+    :param insufficient_data_actions: the list of webhooks to call when
+                                      entering the insufficient data state
+    :param matching_metadata: the key/values of metadata to match on.
+    """
+    def __init__(self, name, counter_name,
+                 comparison_operator, threshold, statistic,
+                 user_id, project_id,
+                 evaluation_periods=1,
+                 period=60,
+                 alarm_id=None,
+                 enabled=True,
+                 description='',
+                 timestamp=None,
+                 state=ALARM_INSUFFICIENT_DATA,
+                 state_timestamp=None,
+                 ok_actions=[],
+                 alarm_actions=[],
+                 insufficient_data_actions=[],
+                 matching_metadata={}
+                 ):
+        if not description:
+            # make a nice user friendly description by default
+            description = 'Alarm when %s is %s a %s of %s over %s seconds' % (
+                counter_name, comparison_operator,
+                statistic, threshold, period)
+
+        Model.__init__(
+            self,
+            alarm_id=alarm_id,
+            enabled=enabled,
+            name=name,
+            description=description,
+            timestamp=timestamp,
+            counter_name=counter_name,
+            user_id=user_id,
+            project_id=project_id,
+            comparison_operator=comparison_operator,
+            threshold=threshold,
+            statistic=statistic,
+            evaluation_periods=evaluation_periods,
+            period=period,
+            state=state,
+            state_timestamp=state_timestamp,
+            ok_actions=ok_actions,
+            alarm_actions=alarm_actions,
+            insufficient_data_actions=
+            insufficient_data_actions,
+            matching_metadata=matching_metadata)

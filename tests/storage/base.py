@@ -583,3 +583,66 @@ class CounterDataTypeTest(DBTestBase):
         )
         results = list(self.conn.get_samples(f))
         self.assertEqual(results[0].counter_volume, 1938495037.53697)
+
+
+class AlarmTest(DBTestBase):
+
+    def test_empty(self):
+        alarms = list(self.conn.get_alarms())
+        self.assertEquals([], alarms)
+
+    def add_some_alarms(self):
+        alarms = [models.Alarm('red-alert',
+                               'test.one', 'eq', 36, 'count',
+                               'me', 'and-da-boys',
+                               evaluation_periods=1,
+                               period=60,
+                               alarm_actions=['http://nowhere/alarms']),
+                  models.Alarm('orange-alert',
+                               'test.fourty', 'gt', 75, 'avg',
+                               'me', 'and-da-boys',
+                               period=60,
+                               alarm_actions=['http://nowhere/alarms']),
+                  models.Alarm('yellow-alert',
+                               'test.five', 'lt', 10, 'min',
+                               'me', 'and-da-boys',
+                               alarm_actions=['http://nowhere/alarms'])]
+        for a in alarms:
+            self.conn.update_alarm(a)
+
+    def test_add(self):
+        self.add_some_alarms()
+        alarms = list(self.conn.get_alarms())
+        self.assertEquals(len(alarms), 3)
+
+    def test_defaults(self):
+        self.add_some_alarms()
+        yellow = list(self.conn.get_alarms(name='yellow-alert'))[0]
+
+        self.assertEquals(yellow.evaluation_periods, 1)
+        self.assertEquals(yellow.period, 60)
+        self.assertEquals(yellow.enabled, True)
+        self.assertEquals(yellow.description,
+                          'Alarm when test.five is lt %s' %
+                          'a min of 10 over 60 seconds')
+        self.assertEquals(yellow.state, models.Alarm.ALARM_INSUFFICIENT_DATA)
+        self.assertEquals(yellow.ok_actions, [])
+        self.assertEquals(yellow.insufficient_data_actions, [])
+
+    def test_update(self):
+        self.add_some_alarms()
+        orange = list(self.conn.get_alarms(name='orange-alert'))[0]
+        orange.enabled = False
+        orange.state = models.Alarm.ALARM_INSUFFICIENT_DATA
+        updated = self.conn.update_alarm(orange)
+        self.assertEquals(updated.enabled, False)
+        self.assertEquals(updated.state, models.Alarm.ALARM_INSUFFICIENT_DATA)
+
+    def test_delete(self):
+        self.add_some_alarms()
+        victim = list(self.conn.get_alarms(name='orange-alert'))[0]
+        self.conn.delete_alarm(victim.alarm_id)
+        survivors = list(self.conn.get_alarms())
+        self.assertEquals(len(survivors), 2)
+        for s in survivors:
+            self.assertNotEquals(victim.name, s.name)

@@ -494,6 +494,23 @@ class Connection(base.Connection):
             self._update_meter_stats(results[-1], meter)
         return results
 
+    def get_alarms(self, name=None, user=None,
+                   project=None, enabled=True, alarm_id=None):
+        """Yields a lists of alarms that match filters
+            raise NotImplementedError('metaquery not implemented')
+        """
+        raise NotImplementedError('Alarms not implemented')
+
+    def update_alarm(self, alarm):
+        """update alarm
+        """
+        raise NotImplementedError('Alarms not implemented')
+
+    def delete_alarm(self, alarm_id):
+        """Delete a alarm
+        """
+        raise NotImplementedError('Alarms not implemented')
+
 
 ###############
 # This is a very crude version of "in-memory HBase", which implements just
