@@ -684,25 +684,81 @@ class Alarm(_Base):
 class AlarmsController(rest.RestController):
     """Works on alarms."""
 
+    @wsme.validate(Alarm)
     @wsme_pecan.wsexpose(Alarm, body=Alarm, status_code=201)
     def post(self, data):
         """Create a new alarm"""
-        raise wsme.exc.ClientSideError("Not implemented")
+        conn = pecan.request.storage_conn
 
-    @wsme_pecan.wsexpose(Alarm, wtypes.text, body=Alarm, status_code=201)
+        data.user_id = pecan.request.headers.get('X-User-Id')
+        data.project_id = pecan.request.headers.get('X-Project-Id')
+        data.alarm_id = wsme.Unset
+        data.state_timestamp = wsme.Unset
+        data.timestamp = timeutils.utcnow()
+
+        # make sure alarms are unique by name per project.
+        alarms = list(conn.get_alarms(name=data.name,
+                                      project=data.project_id))
+        if len(alarms) > 0:
+            raise wsme.exc.ClientSideError(_("Alarm with that name exists"))
+
+        try:
+            kwargs = data.as_dict(storage.models.Alarm)
+            alarm_in = storage.models.Alarm(**kwargs)
+        except Exception as ex:
+            LOG.exception(ex)
+            raise wsme.exc.ClientSideError(_("Alarm incorrect"))
+
+        alarm = conn.update_alarm(alarm_in)
+        return Alarm.from_db_model(alarm)
+
+    @wsme.validate(Alarm)
+    @wsme_pecan.wsexpose(Alarm, wtypes.text, body=Alarm)
     def put(self, alarm_id, data):
         """Modify an alarm"""
-        raise wsme.exc.ClientSideError("Not implemented")
+        conn = pecan.request.storage_conn
+        data.state_timestamp = wsme.Unset
+        data.alarm_id = alarm_id
+        data.user_id = pecan.request.headers.get('X-User-Id')
+        data.project_id = pecan.request.headers.get('X-Project-Id')
+
+        alarms = list(conn.get_alarms(alarm_id=alarm_id,
+                                      project=data.project_id))
+        if len(alarms) < 1:
+            raise wsme.exc.ClientSideError(_("Unknown alarm"))
+
+        # merge the new values from kwargs into the current
+        # alarm "alarm_in".
+        alarm_in = alarms[0]
+        kwargs = data.as_dict(storage.models.Alarm)
+        for k, v in kwargs.iteritems():
+            setattr(alarm_in, k, v)
+            if k == 'state':
+                alarm_in.state_timestamp = timeutils.utcnow()
+
+        alarm = conn.update_alarm(alarm_in)
+        return Alarm.from_db_model(alarm)
 
     @wsme_pecan.wsexpose(None, wtypes.text, status_code=204)
     def delete(self, alarm_id):
         """Delete an alarm"""
-        raise wsme.exc.ClientSideError("Not implemented")
+        conn = pecan.request.storage_conn
+        project_id = pecan.request.headers.get('X-Project-Id')
+        alarms = list(conn.get_alarms(alarm_id=alarm_id,
+                                      project=project_id))
+        if len(alarms) < 1:
+            raise wsme.exc.ClientSideError(_("Unknown alarm"))
+
+        conn.delete_alarm(alarm_id)
 
     @wsme_pecan.wsexpose(Alarm, wtypes.text)
     def get_one(self, alarm_id):
         """Return one alarm"""
-        raise wsme.exc.ClientSideError("Not implemented")
+        alarms = list(pecan.request.storage_conn.get_alarms(alarm_id=alarm_id))
+        if len(alarms) < 1:
+            raise wsme.exc.ClientSideError(_("Unknown alarm"))
+
+        return Alarm.from_db_model(alarms[0])
 
     @wsme_pecan.wsexpose([Alarm], [Query])
     def get_all(self, q=[]):
@@ -710,7 +766,10 @@ class AlarmsController(rest.RestController):
 
         :param q: Filter rules for the alarms to be returned.
         """
-        return []
+        kwargs = _query_to_kwargs(q,
+                                  pecan.request.storage_conn.get_alarms)
+        return [Alarm.from_db_model(m)
+                for m in pecan.request.storage_conn.get_alarms(**kwargs)]
 
 
 class V2Controller(object):
