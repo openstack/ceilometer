@@ -18,7 +18,6 @@
 """Base classes for API tests.
 """
 
-import json
 import os
 import urllib
 
@@ -59,9 +58,9 @@ class TestBase(db_test_base.TestBase):
         rv = self.test_app.get(query, headers=headers)
         if rv.status_code == 200 and rv.content_type == 'application/json':
             try:
-                data = json.loads(rv.data)
+                data = jsonutils.loads(rv.data)
             except ValueError:
-                print 'RAW DATA:', rv
+                print('RAW DATA:%s' % rv)
                 raise
             return data
         return rv
