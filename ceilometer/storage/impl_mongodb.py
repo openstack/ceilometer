@@ -26,6 +26,7 @@ import operator
 import os
 import re
 import urlparse
+import uuid
 
 import bson.code
 import bson.objectid
@@ -521,35 +522,34 @@ class Connection(base.Connection):
         if enabled is not None:
             q['enabled'] = enabled
         if alarm_id is not None:
-            q['_id'] = alarm_id
+            q['alarm_id'] = alarm_id
 
         for alarm in self.db.alarm.find(q):
             a = {}
             a.update(alarm)
-            a['alarm_id'] = str(a['_id'])
             del a['_id']
             yield models.Alarm(**a)
 
     def update_alarm(self, alarm):
         """update alarm
         """
-        aid = bson.objectid.ObjectId(oid=alarm.alarm_id)
+        if alarm.alarm_id is None:
+            # This is an insert, generate an id
+            alarm.alarm_id = str(uuid.uuid1())
         data = alarm.as_dict()
         self.db.alarm.update(
-            {'_id': aid},
+            {'alarm_id': alarm.alarm_id},
             {'$set': data},
             upsert=True)
 
-        stored_alarm = self.db.alarm.find({'_id': aid})[0]
-        stored_alarm['alarm_id'] = str(stored_alarm['_id'])
+        stored_alarm = self.db.alarm.find({'alarm_id': alarm.alarm_id})[0]
         del stored_alarm['_id']
         return models.Alarm(**stored_alarm)
 
     def delete_alarm(self, alarm_id):
         """Delete a alarm
         """
-        aid = bson.objectid.ObjectId(oid=alarm_id)
-        self.db.alarm.remove({'_id': aid})
+        self.db.alarm.remove({'alarm_id': alarm_id})
 
 
 def require_map_reduce(conn):
