@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-05-03 09:40+0000\n"
+"POT-Creation-Date: 2013-05-06 09:40+0000\n"
 "PO-Revision-Date: 2013-02-13 21:01+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Japanese "
@@ -635,13 +635,4 @@ msgstr ""
 #: ceilometer/storage/sqlalchemy/migration.py:67
 msgid "version should be an integer"
 msgstr "バージョンは整数である必要があります"
-
-#~ msgid "in looping call"
-#~ msgstr ""
-
-#~ msgid "Timed out waiting for RPC response."
-#~ msgstr ""
-
-#~ msgid "Timeout while waiting on RPC response."
-#~ msgstr ""
 
