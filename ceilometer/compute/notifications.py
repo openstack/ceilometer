@@ -1,8 +1,10 @@
 # -*- encoding: utf-8 -*-
 #
 # Copyright © 2012 New Dream Network, LLC (DreamHost)
+# Copyright © 2013 eNovance
 #
 # Author: Doug Hellmann <doug.hellmann@dreamhost.com>
+#         Julien Danjou <julien@danjou.info>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -23,6 +25,7 @@ from oslo.config import cfg
 from ceilometer.compute import instance
 from ceilometer import counter
 from ceilometer import plugin
+from ceilometer import utils
 
 
 OPTS = [
@@ -35,23 +38,7 @@ OPTS = [
 cfg.CONF.register_opts(OPTS)
 
 
-class _Base(plugin.NotificationBase):
-    """Convert compute.instance.* notifications into Counters
-    """
-    metadata_keys = instance.INSTANCE_PROPERTIES
-
-    def notification_to_metadata(self, event):
-        metadata = super(_Base, self).notification_to_metadata(event)
-        metadata['instance_type'] = event['payload']['instance_type_id']
-        return metadata
-
-    @staticmethod
-    def get_event_types():
-        return ['compute.instance.create.end',
-                'compute.instance.exists',
-                'compute.instance.delete.start',
-                'compute.instance.finish_resize.end',
-                'compute.instance.resize.revert.end']
+class ComputeNotificationBase(plugin.NotificationBase):
 
     @staticmethod
     def get_exchange_topics(conf):
@@ -65,7 +52,61 @@ class _Base(plugin.NotificationBase):
         ]
 
 
-class Instance(_Base):
+class InstanceScheduled(ComputeNotificationBase):
+
+    metadata_keys = ['request_spec']
+
+    @staticmethod
+    def get_event_types():
+        return ['scheduler.run_instance.scheduled']
+
+    def notification_to_metadata(self, event):
+        metadata = super(InstanceScheduled,
+                         self).notification_to_metadata(event)
+        metadata['weighted_host'] = event['payload']['weighted_host']['host']
+        metadata['weight'] = event['payload']['weighted_host']['weight']
+        return metadata
+
+    def process_notification(self, message):
+        return [
+            counter.Counter(
+                name='instance.scheduled',
+                type=counter.TYPE_DELTA,
+                volume=1,
+                unit='instance',
+                user_id=None,
+                project_id=
+                message['payload']['request_spec']
+                ['instance_properties']['project_id'],
+                resource_id=message['payload']['instance_id'],
+                timestamp=message['timestamp'],
+                resource_metadata=dict(
+                    utils.recursive_keypairs(message['payload'])),
+            )
+        ]
+
+
+class ComputeInstanceNotificationBase(ComputeNotificationBase):
+    """Convert compute.instance.* notifications into Counters
+    """
+    metadata_keys = instance.INSTANCE_PROPERTIES
+
+    def notification_to_metadata(self, event):
+        metadata = super(ComputeInstanceNotificationBase,
+                         self).notification_to_metadata(event)
+        metadata['instance_type'] = event['payload']['instance_type_id']
+        return metadata
+
+    @staticmethod
+    def get_event_types():
+        return ['compute.instance.create.end',
+                'compute.instance.exists',
+                'compute.instance.delete.start',
+                'compute.instance.finish_resize.end',
+                'compute.instance.resize.revert.end']
+
+
+class Instance(ComputeInstanceNotificationBase):
 
     def process_notification(self, message):
         return [
@@ -83,7 +124,7 @@ class Instance(_Base):
         ]
 
 
-class Memory(_Base):
+class Memory(ComputeInstanceNotificationBase):
 
     def process_notification(self, message):
         return [
@@ -100,7 +141,7 @@ class Memory(_Base):
         ]
 
 
-class VCpus(_Base):
+class VCpus(ComputeInstanceNotificationBase):
 
     def process_notification(self, message):
         return [
@@ -117,7 +158,7 @@ class VCpus(_Base):
         ]
 
 
-class RootDiskSize(_Base):
+class RootDiskSize(ComputeInstanceNotificationBase):
 
     def process_notification(self, message):
         return [
@@ -134,7 +175,7 @@ class RootDiskSize(_Base):
         ]
 
 
-class EphemeralDiskSize(_Base):
+class EphemeralDiskSize(ComputeInstanceNotificationBase):
 
     def process_notification(self, message):
         return [
@@ -151,7 +192,7 @@ class EphemeralDiskSize(_Base):
         ]
 
 
-class InstanceFlavor(_Base):
+class InstanceFlavor(ComputeInstanceNotificationBase):
 
     def process_notification(self, message):
         counters = []
@@ -174,7 +215,7 @@ class InstanceFlavor(_Base):
         return counters
 
 
-class InstanceDelete(_Base):
+class InstanceDelete(ComputeInstanceNotificationBase):
     """Handle the messages sent by the nova notifier plugin
     when an instance is being deleted.
     """

@@ -1,8 +1,10 @@
 # -*- encoding: utf-8 -*-
 #
 # Copyright © 2012 New Dream Network, LLC (DreamHost)
+# Copyright © 2013 eNovance
 #
 # Author: Doug Hellmann <doug.hellmann@dreamhost.com>
+#         Julien Danjou <julien@danjou.info>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -351,6 +353,51 @@ INSTANCE_DELETE_SAMPLES = {
 }
 
 
+INSTANCE_SCHEDULED = {
+    u'_context_roles': [u'admin'],
+    u'_context_request_id': u'req-9da1d714-dabe-42fd-8baa-583e57cd4f1a',
+    u'_context_quota_class': None,
+    u'event_type': u'scheduler.run_instance.scheduled',
+    u'_context_user_name': u'admin',
+    u'_context_project_name': u'admin',
+    u'timestamp': u'2013-01-04 15:20:32.009532',
+    u'_context_is_admin': True,
+    u'message_id': u'c48deeba-d0c3-4154-b3db-47480b52267a',
+    u'_context_auth_token': None,
+    u'_context_instance_lock_checked': False,
+    u'_context_project_id': u'cea4b25edb484e5392727181b7721d29',
+    u'_context_timestamp': u'2013-01-04T15:19:51.018218',
+    u'_context_read_deleted': u'no',
+    u'_context_user_id': u'01b83a5e23f24a6fb6cd073c0aee6eed',
+    u'_context_remote_address': u'10.147.132.184',
+    u'publisher_id': u'compute.ip-10-147-132-184.ec2.internal',
+    u'payload': {
+        'instance_id': 'fake-uuid1-1',
+        'weighted_host': {
+            'host': 'host3',
+            'weight': 3.0,
+        },
+        'request_spec': {
+            'instance_properties': {
+                'root_gb': 512,
+                'ephemeral_gb': 0,
+                'launch_index': 0,
+                'memory_mb': 512,
+                'vcpus': 1,
+                'os_type': 'Linux',
+                'project_id': 1,
+                'system_metadata': {'system': 'metadata'}},
+            'instance_type': {'memory_mb': 512,
+                              'vcpus': 1,
+                              'root_gb': 512,
+                              'ephemeral_gb': 0},
+            'instance_uuids': ['fake-uuid1-1'],
+        },
+    },
+    u'priority': u'INFO'
+}
+
+
 class TestNotifications(base.TestCase):
 
     def test_process_notification(self):
@@ -507,3 +554,16 @@ class TestNotifications(base.TestCase):
         self.assertEqual(len(counters), 2)
         names = [c.name for c in counters]
         self.assertEqual(names, ['sample-name1', 'sample-name2'])
+
+    def test_instance_scheduled(self):
+        ic = notifications.InstanceScheduled()
+
+        self.assertIn(INSTANCE_SCHEDULED['event_type'],
+                      ic.get_event_types())
+
+        counters = ic.process_notification(INSTANCE_SCHEDULED)
+        self.assertEqual(len(counters), 1)
+        names = [c.name for c in counters]
+        self.assertEqual(names, ['instance.scheduled'])
+        rid = [c.resource_id for c in counters]
+        self.assertEqual(rid, ['fake-uuid1-1'])
