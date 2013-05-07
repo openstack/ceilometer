@@ -28,6 +28,7 @@ import re
 import urlparse
 
 import bson.code
+import bson.objectid
 import pymongo
 
 from ceilometer.openstack.common import log
@@ -510,17 +511,45 @@ class Connection(base.Connection):
                    project=None, enabled=True, alarm_id=None):
         """Yields a lists of alarms that match filters
         """
-        raise NotImplementedError('Alarms not implemented')
+        q = {}
+        if user is not None:
+            q['user_id'] = user
+        if project is not None:
+            q['project_id'] = project
+        if name is not None:
+            q['name'] = name
+        if enabled is not None:
+            q['enabled'] = enabled
+        if alarm_id is not None:
+            q['_id'] = alarm_id
+
+        for alarm in self.db.alarm.find(q):
+            a = {}
+            a.update(alarm)
+            a['alarm_id'] = str(a['_id'])
+            del a['_id']
+            yield models.Alarm(**a)
 
     def update_alarm(self, alarm):
         """update alarm
         """
-        raise NotImplementedError('Alarms not implemented')
+        aid = bson.objectid.ObjectId(oid=alarm.alarm_id)
+        data = alarm.as_dict()
+        self.db.alarm.update(
+            {'_id': aid},
+            {'$set': data},
+            upsert=True)
+
+        stored_alarm = self.db.alarm.find({'_id': aid})[0]
+        stored_alarm['alarm_id'] = str(stored_alarm['_id'])
+        del stored_alarm['_id']
+        return models.Alarm(**stored_alarm)
 
     def delete_alarm(self, alarm_id):
         """Delete a alarm
         """
-        raise NotImplementedError('Alarms not implemented')
+        aid = bson.objectid.ObjectId(oid=alarm_id)
+        self.db.alarm.remove({'_id': aid})
 
 
 def require_map_reduce(conn):

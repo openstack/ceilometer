@@ -97,6 +97,10 @@ class StatisticsTest(base.StatisticsTest, MongoDBEngineTestBase):
         require_map_reduce(self.conn)
 
 
+class AlarmTest(base.AlarmTest, MongoDBEngineTestBase):
+    pass
+
+
 class CompatibilityTest(MongoDBEngineTestBase):
 
     def prepare_data(self):
