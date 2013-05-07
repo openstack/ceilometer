@@ -16,7 +16,7 @@ python-keystoneclient>=0.2.3
 python-swiftclient
 lxml
 requests>=1.1
-wsme>=0.5b1
+wsme>=0.5b2
 pyyaml
 oslo.config>=1.1.0
 happybase>=0.4
