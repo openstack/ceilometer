@@ -61,6 +61,10 @@ class CounterDataTypeTest(base.CounterDataTypeTest, SQLAlchemyEngineTestBase):
     pass
 
 
+class AlarmTest(base.AlarmTest, SQLAlchemyEngineTestBase):
+    pass
+
+
 def test_model_table_args():
     cfg.CONF.database_connection = 'mysql://localhost'
     assert table_args()

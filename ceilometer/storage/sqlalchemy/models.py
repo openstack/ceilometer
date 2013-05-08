@@ -22,8 +22,8 @@ import json
 import urlparse
 
 from oslo.config import cfg
-from sqlalchemy import Column, Integer, String, Table, ForeignKey, DateTime, \
-    Float
+from sqlalchemy import Column, Integer, String, Table, ForeignKey, DateTime
+from sqlalchemy import Float, Boolean, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import TypeDecorator, VARCHAR
@@ -73,6 +73,12 @@ class CeilometerBase(object):
 
     def __getitem__(self, key):
         return getattr(self, key)
+
+    def update(self, values):
+        """ Make the model object behave like a dict
+        """
+        for k, v in values.iteritems():
+            setattr(self, k, v)
 
 
 Base = declarative_base(cls=CeilometerBase)
@@ -139,3 +145,32 @@ class Resource(Base):
     user_id = Column(String(255), ForeignKey('user.id'))
     project_id = Column(String(255), ForeignKey('project.id'))
     meters = relationship("Meter", backref='resource')
+
+
+class Alarm(Base):
+    """Alarm data"""
+    __tablename__ = 'alarm'
+    id = Column(String(255), primary_key=True)
+    enabled = Column(Boolean)
+    name = Column(Text)
+    description = Column(Text)
+    timestamp = Column(DateTime, default=timeutils.utcnow)
+    counter_name = Column(Text)
+
+    user_id = Column(String(255), ForeignKey('user.id'))
+    project_id = Column(String(255), ForeignKey('project.id'))
+
+    comparison_operator = Column(String(2))
+    threshold = Column(Float)
+    statistic = Column(String(255))
+    evaluation_periods = Column(Integer)
+    period = Column(Integer)
+
+    state = Column(String(255))
+    state_timestamp = Column(DateTime, default=timeutils.utcnow)
+
+    ok_actions = Column(JSONEncodedDict)
+    alarm_actions = Column(JSONEncodedDict)
+    insufficient_data_actions = Column(JSONEncodedDict)
+
+    matching_metadata = Column(JSONEncodedDict)

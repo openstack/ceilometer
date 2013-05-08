@@ -19,9 +19,10 @@
 
 from __future__ import absolute_import
 
-import copy
 import os
+import uuid
 from sqlalchemy import func
+from sqlalchemy.orm import exc
 
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
@@ -29,7 +30,7 @@ from ceilometer.storage import base
 from ceilometer.storage import models as api_models
 from ceilometer.storage.sqlalchemy import migration
 from ceilometer.storage.sqlalchemy.models import Meter, Project, Resource
-from ceilometer.storage.sqlalchemy.models import Source, User, Base
+from ceilometer.storage.sqlalchemy.models import Source, User, Base, Alarm
 import ceilometer.storage.sqlalchemy.session as sqlalchemy_session
 
 LOG = log.getLogger(__name__)
@@ -412,18 +413,78 @@ class Connection(base.Connection):
                     period_end=period_end,
                 )
 
+    def _row_to_alarm_model(self, row):
+        return api_models.Alarm(alarm_id=row.id,
+                                enabled=row.enabled,
+                                name=row.name,
+                                description=row.description,
+                                timestamp=row.timestamp,
+                                counter_name=row.counter_name,
+                                user_id=row.user_id,
+                                project_id=row.project_id,
+                                comparison_operator=row.comparison_operator,
+                                threshold=row.threshold,
+                                statistic=row.statistic,
+                                evaluation_periods=row.evaluation_periods,
+                                period=row.period,
+                                state=row.state,
+                                state_timestamp=row.state_timestamp,
+                                ok_actions=row.ok_actions,
+                                alarm_actions=row.alarm_actions,
+                                insufficient_data_actions=
+                                row.insufficient_data_actions,
+                                matching_metadata=row.matching_metadata)
+
+    def _alarm_model_to_row(self, alarm, row=None):
+        if row is None:
+            row = Alarm(id=str(uuid.uuid1()))
+        row.update(alarm.as_dict())
+        return row
+
     def get_alarms(self, name=None, user=None,
                    project=None, enabled=True, alarm_id=None):
         """Yields a lists of alarms that match filters
+        :param user: Optional ID for user that owns the resource.
+        :param project: Optional ID for project that owns the resource.
+        :param enabled: Optional boolean to list disable alarm.
+        :param alarm_id: Optional alarm_id to return one alarm.
         """
-        raise NotImplementedError('Alarms not implemented')
+        query = self.session.query(Alarm)
+        if name is not None:
+            query = query.filter(Alarm.name == name)
+        if enabled is not None:
+            query = query.filter(Alarm.enabled == enabled)
+        if user is not None:
+            query = query.filter(Alarm.user_id == user)
+        if project is not None:
+            query = query.filter(Alarm.project_id == project)
+        if alarm_id is not None:
+            query = query.filter(Alarm.id == alarm_id)
+
+        return (self._row_to_alarm_model(x) for x in query.all())
 
     def update_alarm(self, alarm):
         """update alarm
+
+        :param alarm: the new Alarm to update
         """
-        raise NotImplementedError('Alarms not implemented')
+        if alarm.alarm_id:
+            alarm_row = self.session.merge(Alarm(id=alarm.alarm_id))
+            self._alarm_model_to_row(alarm, alarm_row)
+        else:
+            self.session.merge(User(id=alarm.user_id))
+            self.session.merge(Project(id=alarm.project_id))
+
+            alarm_row = self._alarm_model_to_row(alarm)
+            self.session.add(alarm_row)
+
+        self.session.flush()
+        return self._row_to_alarm_model(alarm_row)
 
     def delete_alarm(self, alarm_id):
         """Delete a alarm
+
+        :param alarm_id: ID of the alarm to delete
         """
-        raise NotImplementedError('Alarms not implemented')
+        self.session.query(Alarm).filter(Alarm.id == alarm_id).delete()
+        self.session.flush()
