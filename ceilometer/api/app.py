@@ -45,7 +45,8 @@ def get_pecan_config():
 def setup_app(pecan_config=None, extra_hooks=None):
     # FIXME: Replace DBHook with a hooks.TransactionHook
     app_hooks = [hooks.ConfigHook(),
-                 hooks.DBHook()]
+                 hooks.DBHook(),
+                 hooks.PipelineHook()]
     if extra_hooks:
         app_hooks.extend(extra_hooks)
 

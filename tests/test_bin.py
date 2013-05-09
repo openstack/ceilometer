@@ -82,6 +82,8 @@ class BinApiTestCase(unittest.TestCase):
                 "auth_strategy=noauth\n")
             tmp.write(
                 "debug=true\n")
+            tmp.write(
+                "pipeline_cfg_file=../etc/ceilometer/pipeline.yaml\n")
         self.subp = subprocess.Popen(["../bin/ceilometer-api",
                                       "--config-file=%s" % self.tempfile])
 

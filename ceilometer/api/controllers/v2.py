@@ -38,9 +38,11 @@ import wsme
 import wsmeext.pecan as wsme_pecan
 from wsme import types as wtypes
 
+from ceilometer.openstack.common import context
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer import counter
+from ceilometer import pipeline
 from ceilometer import storage
 
 LOG = log.getLogger(__name__)
@@ -290,13 +292,26 @@ class Sample(_Base):
     message_id = wtypes.text
     "A unique identifier for the sample"
 
-    def __init__(self, counter_volume=None, resource_metadata={}, **kwds):
+    def __init__(self, counter_volume=None, resource_metadata={},
+                 timestamp=None, **kwds):
         if counter_volume is not None:
             counter_volume = float(counter_volume)
         resource_metadata = _flatten_metadata(resource_metadata)
+        # this is to make it easier for clients to pass a timestamp in
+        if timestamp and isinstance(timestamp, basestring):
+            timestamp = timeutils.parse_isotime(timestamp)
+
         super(Sample, self).__init__(counter_volume=counter_volume,
                                      resource_metadata=resource_metadata,
-                                     **kwds)
+                                     timestamp=timestamp, **kwds)
+        # Seems the mandatory option doesn't work so do it manually
+        for m in ('counter_volume', 'counter_unit',
+                  'counter_name', 'counter_type', 'resource_id'):
+            if getattr(self, m) in (wsme.Unset, None):
+                raise wsme.exc.MissingArgument(m)
+
+        if self.resource_metadata in (wtypes.Unset, None):
+            self.resource_metadata = {}
 
     @classmethod
     def sample(cls):
@@ -426,6 +441,68 @@ class MeterController(rest.RestController):
         return [Sample.from_db_model(e)
                 for e in pecan.request.storage_conn.get_samples(f)
                 ]
+
+    @wsme.validate([Sample])
+    @wsme_pecan.wsexpose([Sample], body=[Sample])
+    def post(self, body):
+        """Post a list of new Samples to Ceilometer.
+
+        :param body: a list of samples within the request body.
+        """
+        # Note:
+        #  1) the above validate decorator seems to do nothing.
+        #  2) the mandatory options seems to also do nothing.
+        #  3) the body should already be in a list of Sample's
+
+        def get_consistent_source():
+            '''Find a source that can be applied across the sample group
+            or raise InvalidInput if the sources are inconsistent.
+            If all are None - use the configured counter_source
+            If any sample has source set then the others must be the same
+            or None.
+            '''
+            source = None
+            for s in samples:
+                if source and s.source:
+                    if source != s.source:
+                        raise wsme.exc.InvalidInput('source', s.source,
+                                                    'can not post Samples %s' %
+                                                    'with different sources')
+                if s.source and not source:
+                    source = s.source
+            return source or pecan.request.cfg.counter_source
+
+        samples = [Sample(**b) for b in body]
+        now = timeutils.utcnow()
+        source = get_consistent_source()
+        for s in samples:
+            if self._id != s.counter_name:
+                raise wsme.exc.InvalidInput('counter_name', s.counter_name,
+                                            'should be %s' % self._id)
+            if s.timestamp is None or s.timestamp is wsme.Unset:
+                s.timestamp = now
+            s.source = '%s:%s' % (s.project_id, source)
+
+        with pipeline.PublishContext(
+                context.get_admin_context(),
+                source,
+                pecan.request.pipeline_manager.pipelines,
+        ) as publisher:
+            publisher([counter.Counter(
+                name=s.counter_name,
+                type=s.counter_type,
+                unit=s.counter_unit,
+                volume=s.counter_volume,
+                user_id=s.user_id,
+                project_id=s.project_id,
+                resource_id=s.resource_id,
+                timestamp=s.timestamp.isoformat(),
+                resource_metadata=s.resource_metadata) for s in samples])
+
+        # TODO(asalkeld) this is not ideal, it would be nice if the publisher
+        # returned the created sample message with message id (or at least the
+        # a list of message_ids).
+        return samples
 
     @wsme_pecan.wsexpose([Statistics], [Query], int)
     def statistics(self, q=[], period=None):
