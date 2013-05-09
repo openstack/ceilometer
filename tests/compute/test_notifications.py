@@ -19,8 +19,7 @@
 notification events.
 """
 
-import unittest
-
+from ceilometer.tests import base
 from ceilometer.compute import notifications
 from ceilometer import counter
 
@@ -352,7 +351,7 @@ INSTANCE_DELETE_SAMPLES = {
 }
 
 
-class TestNotifications(unittest.TestCase):
+class TestNotifications(base.TestCase):
 
     def test_process_notification(self):
         info = notifications.Instance().process_notification(

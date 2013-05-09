@@ -17,11 +17,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import unittest
-
 from ceilometer import service
+from ceilometer.tests import base
 
 
-class ServiceTestCase(unittest.TestCase):
+class ServiceTestCase(base.TestCase):
     def test_prepare_service(self):
         service.prepare_service()

@@ -18,12 +18,11 @@
 """Tests for ceilometer.compute.instance
 """
 
-import unittest
-
 import mock
 
 from ceilometer.compute import instance
 from ceilometer.compute import manager
+from ceilometer.tests import base
 
 
 class FauxInstance(object):
@@ -42,7 +41,7 @@ class FauxInstance(object):
             return default
 
 
-class TestLocationMetadata(unittest.TestCase):
+class TestLocationMetadata(base.TestCase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):

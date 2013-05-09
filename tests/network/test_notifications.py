@@ -18,9 +18,8 @@
 """Tests for ceilometer.network.notifications
 """
 
-import unittest
-
 from ceilometer.network import notifications
+from ceilometer.tests import base
 
 NOTIFICATION_NETWORK_CREATE = {
     u'_context_roles': [u'anotherrole',
@@ -204,7 +203,7 @@ NOTIFICATION_FLOATINGIP_EXISTS = {
     u'message_id': u'9e839576-cc47-4c60-a7d8-5743681213b1'}
 
 
-class TestNotifications(unittest.TestCase):
+class TestNotifications(base.TestCase):
     def test_network_create(self):
         v = notifications.Network()
         counters = list(v.process_notification(NOTIFICATION_NETWORK_CREATE))
@@ -246,7 +245,7 @@ class TestNotifications(unittest.TestCase):
         self.assertEqual(counters[0].name, "ip.floating")
 
 
-class TestEventTypes(unittest.TestCase):
+class TestEventTypes(base.TestCase):
 
     def test_network(self):
         v = notifications.Network()

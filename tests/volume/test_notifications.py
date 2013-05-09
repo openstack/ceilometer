@@ -1,6 +1,5 @@
-import unittest
-
 from ceilometer.volume import notifications
+from ceilometer.tests import base
 
 NOTIFICATION_VOLUME_EXISTS = {
     u'_context_roles': [u'admin'],
@@ -61,7 +60,7 @@ NOTIFICATION_VOLUME_DELETE = {
     u'priority': u'INFO'}
 
 
-class TestNotifications(unittest.TestCase):
+class TestNotifications(base.TestCase):
 
     def _verify_common_counter(self, c, name, notification):
         self.assertFalse(c is None)

@@ -34,6 +34,7 @@ class TestPolicy(base.TestCase):
         policy._POLICY_CACHE = {}
 
     def tearDown(self):
+        super(TestPolicy, self).tearDown()
         try:
             os.unlink(cfg.CONF.policy_file)
         except OSError:

@@ -16,9 +16,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import unittest
-
 from ceilometer.storage import models
+from ceilometer.tests import base
 
 
 class FakeModel(models.Model):
@@ -26,7 +25,7 @@ class FakeModel(models.Model):
         models.Model.__init__(self, arg1=arg1, arg2=arg2)
 
 
-class ModelTest(unittest.TestCase):
+class ModelTest(base.TestCase):
 
     def test_create_attributes(self):
         m = FakeModel(1, 2)

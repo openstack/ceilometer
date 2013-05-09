@@ -18,10 +18,10 @@
 # under the License.
 
 from datetime import datetime
-import unittest
 
 from ceilometer.image import notifications
 from ceilometer import counter
+from ceilometer.tests import base
 
 
 def fake_uuid(x):
@@ -89,7 +89,7 @@ NOTIFICATION_DELETE = {"message_id": "0c65cb9c-018c-11e2-bc91-5453ed1bbb5f",
                        "timestamp": NOW}
 
 
-class TestNotification(unittest.TestCase):
+class TestNotification(base.TestCase):
 
     def _verify_common_counter(self, c, name, volume):
         self.assertFalse(c is None)

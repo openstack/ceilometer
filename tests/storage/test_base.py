@@ -17,12 +17,12 @@
 # under the License.
 import datetime
 import math
-import unittest
 
 from ceilometer.storage import base
+from ceilometer.tests import base as test_base
 
 
-class BaseTest(unittest.TestCase):
+class BaseTest(test_base.TestCase):
 
     def test_iter_period(self):
         times = list(base.iter_period(

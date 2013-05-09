@@ -20,14 +20,15 @@
 
 import datetime
 import logging
-import unittest
 
 from ceilometer.api.controllers import v2
+from ceilometer.tests import base
+
 
 LOG = logging.getLogger(__name__)
 
 
-class TestStatisticsDuration(unittest.TestCase):
+class TestStatisticsDuration(base.TestCase):
 
     def setUp(self):
         super(TestStatisticsDuration, self).setUp()

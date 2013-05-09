@@ -19,18 +19,19 @@
 """
 import os
 import tempfile
-import unittest
 
 from oslo.config import cfg
 
 from ceilometer.api.v1 import app
 from ceilometer.api import acl
 from ceilometer import service
+from ceilometer.tests import base
 
 
-class TestApp(unittest.TestCase):
+class TestApp(base.TestCase):
 
     def tearDown(self):
+        super(TestApp, self).tearDown()
         cfg.CONF.reset()
 
     def test_keystone_middleware_conf(self):

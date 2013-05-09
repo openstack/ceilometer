@@ -25,11 +25,13 @@ import socket
 import subprocess
 import tempfile
 import time
-import unittest
+
+from ceilometer.tests import base
 
 
-class BinDbsyncTestCase(unittest.TestCase):
+class BinDbsyncTestCase(base.TestCase):
     def setUp(self):
+        super(BinDbsyncTestCase, self).setUp()
         self.tempfile = tempfile.mktemp()
         with open(self.tempfile, 'w') as tmp:
             tmp.write("[DEFAULT]\n")
@@ -41,11 +43,13 @@ class BinDbsyncTestCase(unittest.TestCase):
         self.assertEqual(subp.wait(), 0)
 
     def tearDown(self):
+        super(BinDbsyncTestCase, self).tearDown()
         os.unlink(self.tempfile)
 
 
-class BinSendCounterTestCase(unittest.TestCase):
+class BinSendCounterTestCase(base.TestCase):
     def setUp(self):
+        super(BinSendCounterTestCase, self).setUp()
         self.tempfile = tempfile.mktemp()
         with open(self.tempfile, 'w') as tmp:
             tmp.write("[DEFAULT]\n")
@@ -62,12 +66,14 @@ class BinSendCounterTestCase(unittest.TestCase):
         self.assertEqual(subp.wait(), 0)
 
     def tearDown(self):
+        super(BinSendCounterTestCase, self).tearDown()
         os.unlink(self.tempfile)
 
 
-class BinApiTestCase(unittest.TestCase):
+class BinApiTestCase(base.TestCase):
 
     def setUp(self):
+        super(BinApiTestCase, self).setUp()
         self.api_port = random.randint(10000, 11000)
         self.http = httplib2.Http()
         self.tempfile = tempfile.mktemp()
@@ -88,6 +94,7 @@ class BinApiTestCase(unittest.TestCase):
                                       "--config-file=%s" % self.tempfile])
 
     def tearDown(self):
+        super(BinApiTestCase, self).tearDown()
         os.unlink(self.tempfile)
         self.subp.kill()
         self.subp.wait()
