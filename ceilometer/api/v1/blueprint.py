@@ -94,7 +94,7 @@ from ceilometer.openstack.common import timeutils
 
 from ceilometer import storage
 
-from ceilometer.api.v1 import acl
+from ceilometer.api import acl
 
 
 LOG = log.getLogger(__name__)
