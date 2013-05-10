@@ -214,5 +214,6 @@ rpc_cast_timeout             30                                    Seconds to wa
                                                                    Only supported by impl_zmq.
 ===========================  ====================================  ==============================================================
 
-A sample configuration file can be found in ceilometer.conf.sample_.
+A sample configuration file can be found in `ceilometer.conf.sample`_.
+
 .. _ceilometer.conf.sample: https://github.com/openstack/ceilometer/blob/master/etc/ceilometer/ceilometer.conf.sample
