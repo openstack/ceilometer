@@ -43,26 +43,24 @@ class TestAlarms(FunctionalTest):
 
         self.auth_headers = {'X-User-Id': str(uuid.uuid1()),
                              'X-Project-Id': str(uuid.uuid1())}
-
-        for alarm in [Alarm(alarm_id='1', name='name1',
+        for alarm in [Alarm(name='name1',
                             counter_name='meter.test',
                             comparison_operator='gt', threshold=2.0,
                             statistic='avg',
                             user_id=self.auth_headers['X-User-Id'],
                             project_id=self.auth_headers['X-Project-Id']),
-                      Alarm(alarm_id='2', name='name2',
+                      Alarm(name='name2',
                             counter_name='meter.mine',
                             comparison_operator='gt', threshold=2.0,
                             statistic='avg',
                             user_id=self.auth_headers['X-User-Id'],
                             project_id=self.auth_headers['X-Project-Id']),
-                      Alarm(alarm_id='3', name='name3',
+                      Alarm(name='name3',
                             counter_name='meter.test',
                             comparison_operator='gt', threshold=2.0,
                             statistic='avg',
                             user_id=self.auth_headers['X-User-Id'],
-                            project_id=self.auth_headers['X-Project-Id']),
-                      ]:
+                            project_id=self.auth_headers['X-Project-Id'])]:
             self.conn.update_alarm(alarm)
 
     def test_list_alarms(self):
@@ -77,9 +75,19 @@ class TestAlarms(FunctionalTest):
                                'meter.mine']))
 
     def test_get_alarm(self):
-        data = self.get_json('/alarms/1')
-        self.assertEquals(data['name'], 'name1')
-        self.assertEquals(data['counter_name'], 'meter.test')
+        alarms = self.get_json('/alarms',
+                               q=[{'field': 'name',
+                                   'value': 'name1',
+                                   }])
+        for a in alarms:
+            print '%s: %s' % (a['name'], a['alarm_id'])
+        self.assertEquals(alarms[0]['name'], 'name1')
+        self.assertEquals(alarms[0]['counter_name'], 'meter.test')
+
+        one = self.get_json('/alarms/%s' % alarms[0]['alarm_id'])
+        self.assertEquals(one['name'], 'name1')
+        self.assertEquals(one['counter_name'], 'meter.test')
+        self.assertEquals(one['alarm_id'], alarms[0]['alarm_id'])
 
     def test_post_invalid_alarm(self):
         json = {
@@ -111,9 +119,17 @@ class TestAlarms(FunctionalTest):
         json = {
             'name': 'renamed_alarm',
         }
-        self.put_json('/alarms/1', params=json,
+        data = self.get_json('/alarms',
+                             q=[{'field': 'name',
+                                 'value': 'name1',
+                                 }])
+        self.assertEquals(1, len(data))
+        alarm_id = data[0]['alarm_id']
+
+        self.put_json('/alarms/%s' % alarm_id,
+                      params=json,
                       headers=self.auth_headers)
-        alarm = list(self.conn.get_alarms(alarm_id='1'))[0]
+        alarm = list(self.conn.get_alarms(alarm_id=alarm_id))[0]
         self.assertEquals(alarm.name, json['name'])
 
     def test_put_alarm_wrong_field(self):
@@ -125,7 +141,15 @@ class TestAlarms(FunctionalTest):
             'name': 'renamed_alarm',
             'this_can_not_be_correct': 'ha',
         }
-        resp = self.put_json('/alarms/1', params=json,
+        data = self.get_json('/alarms',
+                             q=[{'field': 'name',
+                                 'value': 'name1',
+                                 }],
+                             headers=self.auth_headers)
+        self.assertEquals(1, len(data))
+
+        resp = self.put_json('/alarms/%s' % data[0]['alarm_id'],
+                             params=json,
                              expect_errors=True,
                              headers=self.auth_headers)
         self.assertEquals(resp.status_code, 200)
@@ -134,6 +158,7 @@ class TestAlarms(FunctionalTest):
         data = self.get_json('/alarms')
         self.assertEquals(3, len(data))
 
-        self.delete('/alarms/1', status=200)
+        self.delete('/alarms/%s' % data[0]['alarm_id'],
+                    status=200)
         alarms = list(self.conn.get_alarms())
         self.assertEquals(2, len(alarms))
