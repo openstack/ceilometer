@@ -28,20 +28,20 @@
 ######## defined in ceilometer.service ########
 
 # Username to use for openstack service access (string value)
-#os_username=
+#os_username=ceilometer
 
 # Password to use for openstack service access (string value)
-#os_password=
+#os_password=admin
 
 # Tenant ID to use for openstack service access (string value)
 #os_tenant_id=
 
 # Tenant name to use for openstack service access (string
 # value)
-#os_tenant_name=
+#os_tenant_name=admin
 
 # Auth URL to use for openstack service access (string value)
-#os_auth_url=
+#os_auth_url=http://localhost:5000/v2.0
 
 
 ######## defined in ceilometer.api ########
@@ -50,16 +50,17 @@
 #metering_api_port=8777
 
 
+######## defined in ceilometer.api.app ########
+
+# The strategy to use for auth: noauth or keystone. (string
+# value)
+#auth_strategy=keystone
+
+
 ######## defined in ceilometer.central.manager ########
 
 # list of central pollsters to disable (list value)
 #disabled_central_pollsters=
-
-
-######## defined in ceilometer.collector.meter ########
-
-# Secret value for signing metering messages (string value)
-#metering_secret=change this or be hacked
 
 
 ######## defined in ceilometer.collector.service ########
@@ -135,10 +136,6 @@
 
 # Log output to standard error (boolean value)
 #use_stderr=true
-
-# Default file mode used when creating log files (string
-# value)
-#logfile_mode=0644
 
 # format string to use for log messages with context (string
 # value)
@@ -404,13 +401,6 @@
 #matchmaker_heartbeat_ttl=600
 
 
-######## defined in ceilometer.publisher.meter ########
-
-# the topic ceilometer uses for metering messages (string
-# value)
-#metering_topic=metering
-
-
 ######## defined in ceilometer.storage ########
 
 # Database connection string (string value)
@@ -475,6 +465,18 @@
 
 # Password for Redis server. (optional) (string value)
 #password=<None>
+
+
+[publisher_meter]
+
+######## defined in ceilometer.publisher.meter ########
+
+# the topic ceilometer uses for metering messages (string
+# value)
+#metering_topic=metering
+
+# Secret value for signing metering messages (string value)
+#metering_secret=change this or be hacked
 
 
 # Total option count: 105
