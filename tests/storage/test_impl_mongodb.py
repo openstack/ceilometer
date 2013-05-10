@@ -51,7 +51,7 @@ import datetime
 
 from tests.storage import base
 
-from ceilometer.collector import meter
+from ceilometer.publisher import meter
 from ceilometer import counter
 from ceilometer.storage.impl_mongodb import require_map_reduce
 
@@ -162,9 +162,10 @@ class CompatibilityTest(MongoDBEngineTestBase):
                                }
         )
         self.counters.append(c)
-        msg = meter.meter_message_from_counter(c,
-                                               secret='not-so-secret',
-                                               source='test')
+        msg = meter.meter_message_from_counter(
+            c,
+            secret='not-so-secret',
+            source='test')
         self.conn.record_metering_data(self.conn, msg)
 
     def test_counter_unit(self):

@@ -27,7 +27,7 @@ import sys
 
 from oslo.config import cfg
 
-from ceilometer.collector import meter
+from ceilometer.publisher import meter
 from ceilometer import counter
 from ceilometer import storage
 from ceilometer.openstack.common import timeutils
@@ -129,9 +129,10 @@ def main():
                             timestamp=timestamp,
                             resource_metadata={},
                             )
-        data = meter.meter_message_from_counter(c,
-                                                cfg.CONF.metering_secret,
-                                                'artificial')
+        data = meter.meter_message_from_counter(
+            c,
+            cfg.CONF.publisher_meter.metering_secret,
+            'artificial')
         conn.record_metering_data(data)
         n += 1
         timestamp = timestamp + increment

@@ -23,7 +23,7 @@ import datetime
 
 from oslo.config import cfg
 
-from ceilometer.collector import meter
+from ceilometer.publisher import meter
 from ceilometer import counter
 
 from ceilometer.tests import api as tests_api
@@ -71,9 +71,10 @@ class TestListEvents(tests_api.TestBase):
                                        'tag': 'self.counter2'}
                 ),
         ]:
-            msg = meter.meter_message_from_counter(cnt,
-                                                   cfg.CONF.metering_secret,
-                                                   'source1')
+            msg = meter.meter_message_from_counter(
+                cnt,
+                cfg.CONF.publisher_meter.metering_secret,
+                'source1')
             self.conn.record_metering_data(msg)
 
     def test_empty_project(self):

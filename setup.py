@@ -140,7 +140,8 @@ setuptools.setup(
     accumulator = ceilometer.transformer.accumulator:TransformerAccumulator
 
     [ceilometer.publisher]
-    meter_publisher = ceilometer.publisher.meter_publish:MeterPublisher
+    meter_publisher = ceilometer.publisher.meter:MeterPublisher
+    meter = ceilometer.publisher.meter:MeterPublisher
 
     [paste.filter_factory]
     swift=ceilometer.objectstore.swift_middleware:filter_factory

@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 #
-# Copyright © 2012 eNovance <licensing@enovance.com>
+# Copyright © 2012-2013 eNovance <licensing@enovance.com>
 #
 # Author: Julien Danjou <julien@danjou.info>
 #
@@ -18,7 +18,7 @@
 
 from oslo.config import cfg
 
-from ceilometer.collector import meter as meter_api
+from ceilometer.publisher import meter as publisher_meter
 from ceilometer import extension_manager
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import log
@@ -87,9 +87,9 @@ class CollectorService(service.PeriodicService):
         # Set ourselves up as a separate worker for the metering data,
         # since the default for service is to use create_consumer().
         self.conn.create_worker(
-            cfg.CONF.metering_topic,
+            cfg.CONF.publisher_meter.metering_topic,
             rpc_dispatcher.RpcDispatcher([self]),
-            'ceilometer.collector.' + cfg.CONF.metering_topic,
+            'ceilometer.collector.' + cfg.CONF.publisher_meter.metering_topic,
         )
 
     def _setup_subscription(self, ext, *args, **kwds):
@@ -139,7 +139,9 @@ class CollectorService(service.PeriodicService):
                      meter['resource_id'],
                      meter.get('timestamp', 'NO TIMESTAMP'),
                      meter['counter_volume'])
-            if meter_api.verify_signature(meter, cfg.CONF.metering_secret):
+            if publisher_meter.verify_signature(
+                    meter,
+                    cfg.CONF.publisher_meter.metering_secret):
                 try:
                     # Convert the timestamp to a datetime instance.
                     # Storage engines are responsible for converting
