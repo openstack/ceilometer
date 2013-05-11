@@ -74,7 +74,7 @@ class TestSwiftMiddleware(base.TestCase):
             pass
 
     def test_rpc_setup(self):
-        app = swift_middleware.CeilometerMiddleware(FakeApp(), {})
+        swift_middleware.CeilometerMiddleware(FakeApp(), {})
         self.assertEqual(cfg.CONF.control_exchange, 'ceilometer')
 
     def test_get(self):
@@ -103,7 +103,7 @@ class TestSwiftMiddleware(base.TestCase):
                             environ={'REQUEST_METHOD': 'PUT',
                                      'wsgi.input':
                                      StringIO.StringIO('some stuff')})
-        resp = list(app(req.environ, self.start_response))
+        list(app(req.environ, self.start_response))
         counters = self.pipeline_manager.pipelines[0].counters
         self.assertEqual(len(counters), 2)
         data = counters[0]
@@ -124,7 +124,7 @@ class TestSwiftMiddleware(base.TestCase):
                             environ={'REQUEST_METHOD': 'POST',
                                      'wsgi.input':
                                      StringIO.StringIO('some other stuff')})
-        resp = list(app(req.environ, self.start_response))
+        list(app(req.environ, self.start_response))
         counters = self.pipeline_manager.pipelines[0].counters
         self.assertEqual(len(counters), 2)
         data = counters[0]
@@ -143,7 +143,7 @@ class TestSwiftMiddleware(base.TestCase):
         app = swift_middleware.CeilometerMiddleware(FakeApp(body=['']), {})
         req = Request.blank('/1.0/account/container/obj',
                             environ={'REQUEST_METHOD': 'HEAD'})
-        resp = list(app(req.environ, self.start_response))
+        list(app(req.environ, self.start_response))
         counters = self.pipeline_manager.pipelines[0].counters
         self.assertEqual(len(counters), 1)
         data = counters[0]
@@ -162,7 +162,7 @@ class TestSwiftMiddleware(base.TestCase):
         app = swift_middleware.CeilometerMiddleware(FakeApp(body=['']), {})
         req = Request.blank('/1.0/account/container/obj',
                             environ={'REQUEST_METHOD': 'BOGUS'})
-        resp = list(app(req.environ, self.start_response))
+        list(app(req.environ, self.start_response))
         counters = self.pipeline_manager.pipelines[0].counters
 
         self.assertEqual(len(counters), 1)
@@ -179,7 +179,7 @@ class TestSwiftMiddleware(base.TestCase):
         app = swift_middleware.CeilometerMiddleware(FakeApp(), {})
         req = Request.blank('/1.0/account/container',
                             environ={'REQUEST_METHOD': 'GET'})
-        resp = list(app(req.environ, self.start_response))
+        list(app(req.environ, self.start_response))
         counters = self.pipeline_manager.pipelines[0].counters
         self.assertEqual(len(counters), 2)
         data = counters[0]
@@ -192,7 +192,7 @@ class TestSwiftMiddleware(base.TestCase):
         app = swift_middleware.CeilometerMiddleware(FakeApp(), {})
         req = Request.blank('/1.0/account/container',
                             environ={'REQUEST_METHOD': 'GET'})
-        resp = list(app(req.environ, self.start_response))
+        list(app(req.environ, self.start_response))
         counters = self.pipeline_manager.pipelines[0].counters
         self.assertEqual(len(counters), 2)
         data = counters[0]
@@ -213,7 +213,7 @@ class TestSwiftMiddleware(base.TestCase):
                                 'X_VAR1': 'value1',
                                 'X_VAR2': 'value2'
                             })
-        resp = list(app(req.environ, self.start_response))
+        list(app(req.environ, self.start_response))
         counters = self.pipeline_manager.pipelines[0].counters
         self.assertEqual(len(counters), 2)
         data = counters[0]
@@ -235,7 +235,7 @@ class TestSwiftMiddleware(base.TestCase):
         })
         req = Request.blank('/1.0/account/container',
                             environ={'REQUEST_METHOD': 'GET'})
-        resp = list(app(req.environ, self.start_response))
+        list(app(req.environ, self.start_response))
         counters = self.pipeline_manager.pipelines[0].counters
         self.assertEqual(len(counters), 2)
         data = counters[0]
