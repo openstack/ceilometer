@@ -77,14 +77,6 @@
 
 
 #
-# Options defined in ceilometer.collector.service
-#
-
-# list of listener plugins to disable (list value)
-#disabled_notification_listeners=
-
-
-#
 # Options defined in ceilometer.compute
 #
 
@@ -523,6 +515,34 @@
 #cinder_control_exchange=cinder
 
 
+[publisher_udp]
+
+#
+# Options defined in ceilometer.publisher.udp
+#
+
+# The host target to publish metering records to. (string
+# value)
+#host=localhost
+
+# The port to send UDP meters to. (integer value)
+#port=4952
+
+
+[publisher_meter]
+
+#
+# Options defined in ceilometer.publisher.meter
+#
+
+# the topic ceilometer uses for metering messages (string
+# value)
+#metering_topic=metering
+
+# Secret value for signing metering messages (string value)
+#metering_secret=change this or be hacked
+
+
 [rpc_notifier2]
 
 #
@@ -549,18 +569,21 @@
 #password=<None>
 
 
-[publisher_meter]
+[collector]
 
 #
-# Options defined in ceilometer.publisher.meter
+# Options defined in ceilometer.collector.service
 #
 
-# the topic ceilometer uses for metering messages (string
-# value)
-#metering_topic=metering
+# list of listener plugins to disable (list value)
+#disabled_notification_listeners=
 
-# Secret value for signing metering messages (string value)
-#metering_secret=change this or be hacked
+# address to bind the UDP socket todisabled if set to an empty
+# string (string value)
+#udp_address=0.0.0.0
+
+# port to bind the UDP socket to (integer value)
+#udp_port=4952
 
 
-# Total option count: 111
+# Total option count: 115

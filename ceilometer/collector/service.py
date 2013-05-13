@@ -16,12 +16,19 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import eventlet
 from oslo.config import cfg
+import msgpack
+import socket
+import sys
 
 from ceilometer.publisher import meter as publisher_meter
 from ceilometer import extension_manager
+from ceilometer.service import prepare_service
 from ceilometer.openstack.common import context
+from ceilometer.openstack.common import gettextutils
 from ceilometer.openstack.common import log
+from ceilometer.openstack.common import service as os_service
 from ceilometer.openstack.common.rpc import dispatcher as rpc_dispatcher
 
 # Import rpc_notifier to register `notification_topics` flag so that
@@ -40,24 +47,84 @@ OPTS = [
     cfg.ListOpt('disabled_notification_listeners',
                 default=[],
                 help='list of listener plugins to disable',
-                ),
+                deprecated_group="DEFAULT"),
+    cfg.StrOpt('udp_address',
+               default='0.0.0.0',
+               help='address to bind the UDP socket to'
+               'disabled if set to an empty string'),
+    cfg.IntOpt('udp_port',
+               default=4952,
+               help='port to bind the UDP socket to'),
 ]
 
-cfg.CONF.register_opts(OPTS)
+cfg.CONF.register_opts(OPTS, group="collector")
 
 LOG = log.getLogger(__name__)
+
+
+def get_storage_connection(conf):
+    storage.register_opts(conf)
+    storage_engine = storage.get_engine(conf)
+    return storage_engine.get_connection(conf)
+
+
+class UDPCollectorService(os_service.Service):
+    """UDP listener for the collector service."""
+
+    def __init__(self):
+        super(UDPCollectorService, self).__init__()
+        self.storage_conn = get_storage_connection(cfg.CONF)
+
+    def start(self):
+        """Bind the UDP socket and handle incoming data."""
+        super(UDPCollectorService, self).start()
+
+        udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        udp.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        udp.bind((cfg.CONF.collector.udp_address,
+                  cfg.CONF.collector.udp_port))
+
+        self.running = True
+        while self.running:
+            # NOTE(jd) Arbitrary limit of 64K because that ought to be
+            # enough for anybody.
+            data, source = udp.recvfrom(64 * 1024)
+            try:
+                counter = msgpack.loads(data)
+            except:
+                LOG.warn(_("UDP: Cannot decode data sent by %s"), str(source))
+            else:
+                try:
+                    counter['counter_name'] = counter['name']
+                    counter['counter_volume'] = counter['volume']
+                    counter['counter_unit'] = counter['unit']
+                    counter['counter_type'] = counter['type']
+                    LOG.debug("UDP: Storing %s", str(counter))
+                    self.storage_conn.record_metering_data(counter)
+                except Exception as err:
+                    LOG.debug(_("UDP: Unable to store meter"))
+                    LOG.exception(err)
+
+    def stop(self):
+        self.running = False
+        super(UDPCollectorService, self).stop()
+
+
+def udp_collector():
+    # TODO(jd) move into prepare_service gettextutils and eventlet?
+    eventlet.monkey_patch()
+    gettextutils.install('ceilometer')
+    prepare_service(sys.argv)
+    os_service.launch(UDPCollectorService()).wait()
 
 
 class CollectorService(service.PeriodicService):
 
     COLLECTOR_NAMESPACE = 'ceilometer.collector'
 
-    def start(self):
-        super(CollectorService, self).start()
-
-        storage.register_opts(cfg.CONF)
-        self.storage_engine = storage.get_engine(cfg.CONF)
-        self.storage_conn = self.storage_engine.get_connection(cfg.CONF)
+    def __init__(self, host, topic, manager=None):
+        super(CollectorService, self).__init__(host, topic, manager)
+        self.storage_conn = get_storage_connection(cfg.CONF)
 
     def initialize_service_hook(self, service):
         '''Consumers must be declared before consume_thread start.'''
@@ -76,7 +143,8 @@ class CollectorService(service.PeriodicService):
         self.notification_manager = \
             extension_manager.ActivatedExtensionManager(
                 namespace=self.COLLECTOR_NAMESPACE,
-                disabled_names=cfg.CONF.disabled_notification_listeners,
+                disabled_names=
+                cfg.CONF.collector.disabled_notification_listeners,
             )
 
         if not list(self.notification_manager):

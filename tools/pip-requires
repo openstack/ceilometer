@@ -12,6 +12,7 @@ anyjson>=0.2.4
 Flask==0.9
 pecan>=0.2.0
 stevedore>=0.7
+msgpack-python
 python-glanceclient
 python-novaclient>=2.6.10
 python-keystoneclient>=0.2.3

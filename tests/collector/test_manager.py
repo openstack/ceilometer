@@ -19,6 +19,8 @@
 """
 
 from datetime import datetime
+import msgpack
+import socket
 
 from mock import patch
 from mock import MagicMock
@@ -26,6 +28,7 @@ from oslo.config import cfg
 from stevedore import extension
 from stevedore.tests import manager as test_manager
 
+from ceilometer import counter
 from ceilometer.publisher import meter
 from ceilometer.collector import service
 from ceilometer.storage import base
@@ -83,17 +86,93 @@ TEST_NOTICE = {
 }
 
 
-class TestCollectorService(tests_base.TestCase):
+class TestCollector(tests_base.TestCase):
+    def setUp(self):
+        super(TestCollector, self).setUp()
+        cfg.CONF.set_override("database_connection", "log://")
+
+
+class TestUDPCollectorService(TestCollector):
+    def _make_fake_socket(self, family, type):
+        udp_socket = self.mox.CreateMockAnything()
+        udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        udp_socket.bind((cfg.CONF.collector.udp_address,
+                         cfg.CONF.collector.udp_port))
+
+        def stop_udp(anything):
+            # Make the loop stop
+            self.srv.stop()
+
+        udp_socket.recvfrom(64 * 1024).WithSideEffects(
+            stop_udp).AndReturn(
+                (msgpack.dumps(self.counter),
+                 ('127.0.0.1', 12345)))
+
+        self.mox.ReplayAll()
+
+        return udp_socket
+
+    def setUp(self):
+        super(TestUDPCollectorService, self).setUp()
+        self.srv = service.UDPCollectorService()
+        self.counter = dict(counter.Counter(
+            name='foobar',
+            type='bad',
+            unit='F',
+            volume=1,
+            user_id='jd',
+            project_id='ceilometer',
+            resource_id='cat',
+            timestamp='NOW!',
+            resource_metadata={},
+        )._asdict())
+
+    def test_udp_receive(self):
+        self.srv.storage_conn = self.mox.CreateMock(base.Connection)
+        self.counter['source'] = 'mysource'
+        self.counter['counter_name'] = self.counter['name']
+        self.counter['counter_volume'] = self.counter['volume']
+        self.counter['counter_type'] = self.counter['type']
+        self.counter['counter_unit'] = self.counter['unit']
+        self.srv.storage_conn.record_metering_data(self.counter)
+        self.mox.ReplayAll()
+
+        with patch('socket.socket', self._make_fake_socket):
+            self.srv.start()
+
+    @staticmethod
+    def _raise_error():
+        raise Exception
+
+    def test_udp_receive_bad_decoding(self):
+        with patch('socket.socket', self._make_fake_socket):
+            with patch('msgpack.loads', self._raise_error):
+                self.srv.start()
+
+    def test_udp_receive_storage_error(self):
+        self.srv.storage_conn = self.mox.CreateMock(base.Connection)
+        self.counter['source'] = 'mysource'
+        self.counter['counter_name'] = self.counter['name']
+        self.counter['counter_volume'] = self.counter['volume']
+        self.counter['counter_type'] = self.counter['type']
+        self.counter['counter_unit'] = self.counter['unit']
+        self.srv.storage_conn.record_metering_data(
+            self.counter).AndRaise(IOError)
+        self.mox.ReplayAll()
+
+        with patch('socket.socket', self._make_fake_socket):
+            self.srv.start()
+
+
+class TestCollectorService(TestCollector):
 
     def setUp(self):
         super(TestCollectorService, self).setUp()
         self.srv = service.CollectorService('the-host', 'the-topic')
         self.ctx = None
-        #cfg.CONF.publisher_meter.metering_secret = 'not-so-secret'
 
     @patch('ceilometer.pipeline.setup_pipeline', MagicMock())
     def test_init_host(self):
-        cfg.CONF.database_connection = 'log://localhost'
         # If we try to create a real RPC connection, init_host() never
         # returns. Mock it out so we can establish the manager
         # configuration.
@@ -158,7 +237,6 @@ class TestCollectorService(tests_base.TestCase):
         self.mox.ReplayAll()
 
         self.srv.record_metering_data(self.ctx, msg)
-        self.mox.VerifyAll()
 
     def test_timestamp_tzinfo_conversion(self):
         msg = {'counter_name': 'test',
@@ -180,7 +258,6 @@ class TestCollectorService(tests_base.TestCase):
         self.mox.ReplayAll()
 
         self.srv.record_metering_data(self.ctx, msg)
-        self.mox.VerifyAll()
 
     @patch('ceilometer.pipeline.setup_pipeline', MagicMock())
     def test_process_notification(self):
