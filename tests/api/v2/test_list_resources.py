@@ -290,6 +290,58 @@ class TestListResources(FunctionalTest):
         ids = [r['resource_id'] for r in data]
         self.assertEquals(['resource-id'], ids)
 
+    def test_with_user_non_admin(self):
+        counter1 = counter.Counter(
+            'instance',
+            'cumulative',
+            '',
+            1,
+            'user-id2',
+            'project-id2',
+            'resource-id-alternate',
+            timestamp=datetime.datetime(2012, 7, 2, 10, 41),
+            resource_metadata={'display_name': 'test-server',
+                               'tag': 'self.counter1',
+                               }
+        )
+        msg2 = meter.meter_message_from_counter(counter1,
+                                                cfg.CONF.metering_secret,
+                                                'not-test',
+                                                )
+        self.conn.record_metering_data(msg2)
+
+        data = self.get_json('/resources',
+                             headers={"X-Roles": "Member",
+                                      "X-Tenant-Id": "project-id2"})
+        ids = set(r['resource_id'] for r in data)
+        self.assertEquals(set(['resource-id-alternate']), ids)
+
+    def test_with_user_wrong_tenant(self):
+        counter1 = counter.Counter(
+            'instance',
+            'cumulative',
+            '',
+            1,
+            'user-id2',
+            'project-id2',
+            'resource-id-alternate',
+            timestamp=datetime.datetime(2012, 7, 2, 10, 41),
+            resource_metadata={'display_name': 'test-server',
+                               'tag': 'self.counter1',
+                               }
+        )
+        msg2 = meter.meter_message_from_counter(counter1,
+                                                cfg.CONF.metering_secret,
+                                                'not-test',
+                                                )
+        self.conn.record_metering_data(msg2)
+
+        data = self.get_json('/resources',
+                             headers={"X-Roles": "Member",
+                                      "X-Tenant-Id": "project-wrong"})
+        ids = set(r['resource_id'] for r in data)
+        self.assertEquals(set(), ids)
+
     def test_metadata(self):
         counter1 = counter.Counter(
             'instance',

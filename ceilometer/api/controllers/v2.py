@@ -44,6 +44,8 @@ from ceilometer.openstack.common import timeutils
 from ceilometer import counter
 from ceilometer import pipeline
 from ceilometer import storage
+from ceilometer.api import acl
+
 
 LOG = log.getLogger(__name__)
 
@@ -126,8 +128,39 @@ class Query(_Base):
                    )
 
 
+def _sanitize_query(q):
+    '''
+    Check the query to see if:
+    1) the request is comming from admin - then allow full visibility
+    2) non-admin - make sure that the query includes the requester's
+    project.
+    '''
+    auth_project = acl.get_limited_to_project(pecan.request.headers)
+    if auth_project:
+        proj_q = [i for i in q if i.field == 'project_id']
+        for i in proj_q:
+            if auth_project != i.value or i.op != 'eq':
+                # TODO(asalkeld) in the next version of wsme (0.5b3+)
+                # activate this code to be able to return the correct
+                # status code (also update api/v2/test_acl.py).
+                #return wsme.api.Response([return_type()],
+                #                         status_code=401)
+                errstr = 'Not Authorized to access project %s %s' % (i.op,
+                                                                     i.value)
+                raise wsme.exc.ClientSideError(errstr)
+
+        if not proj_q:
+            # The user is restricted, but they didn't specify a project
+            # so add it for them.
+            q.append(Query(field='project_id',
+                           op='eq',
+                           value=auth_project))
+    return q
+
+
 def _query_to_kwargs(query, db_func):
     # TODO(dhellmann): This function needs tests of its own.
+    query = _sanitize_query(query)
     valid_keys = inspect.getargspec(db_func)[0]
     if 'self' in valid_keys:
         valid_keys.remove('self')
@@ -474,11 +507,18 @@ class MeterController(rest.RestController):
 
         samples = [Sample(**b) for b in body]
         now = timeutils.utcnow()
+        auth_project = acl.get_limited_to_project(pecan.request.headers)
         source = get_consistent_source()
         for s in samples:
             if self._id != s.counter_name:
                 raise wsme.exc.InvalidInput('counter_name', s.counter_name,
                                             'should be %s' % self._id)
+            if auth_project and auth_project != s.project_id:
+                # non admin user trying to cross post to another project_id
+                auth_msg = 'can not post samples to other projects'
+                raise wsme.exc.InvalidInput('project_id', s.project_id,
+                                            auth_msg)
+
             if s.timestamp is None or s.timestamp is wsme.Unset:
                 s.timestamp = now
             s.source = '%s:%s' % (s.project_id, source)
@@ -511,7 +551,6 @@ class MeterController(rest.RestController):
         :param q: Filter rules for the data to be returned.
         :param period: Returned result will be an array of statistics for a
                        period long of that number of seconds.
-
         """
         kwargs = _query_to_kwargs(q, storage.SampleFilter.__init__)
         kwargs['meter'] = self._id
@@ -650,8 +689,9 @@ class ResourcesController(rest.RestController):
 
         :param resource_id: The UUID of the resource.
         """
+        authorized_project = acl.get_limited_to_project(pecan.request.headers)
         r = list(pecan.request.storage_conn.get_resources(
-                 resource=resource_id))[0]
+                 resource=resource_id, project=authorized_project))[0]
         return Resource.from_db_and_links(r,
                                           self._resource_links(resource_id))
 
@@ -820,9 +860,9 @@ class AlarmsController(rest.RestController):
     def delete(self, alarm_id):
         """Delete an alarm"""
         conn = pecan.request.storage_conn
-        project_id = pecan.request.headers.get('X-Project-Id')
+        auth_project = acl.get_limited_to_project(pecan.request.headers)
         alarms = list(conn.get_alarms(alarm_id=alarm_id,
-                                      project=project_id))
+                                      project=auth_project))
         if len(alarms) < 1:
             raise wsme.exc.ClientSideError(_("Unknown alarm"))
 
@@ -831,7 +871,10 @@ class AlarmsController(rest.RestController):
     @wsme_pecan.wsexpose(Alarm, wtypes.text)
     def get_one(self, alarm_id):
         """Return one alarm"""
-        alarms = list(pecan.request.storage_conn.get_alarms(alarm_id=alarm_id))
+        conn = pecan.request.storage_conn
+        auth_project = acl.get_limited_to_project(pecan.request.headers)
+        alarms = list(conn.get_alarms(alarm_id=alarm_id,
+                                      project=auth_project))
         if len(alarms) < 1:
             raise wsme.exc.ClientSideError(_("Unknown alarm"))
 
