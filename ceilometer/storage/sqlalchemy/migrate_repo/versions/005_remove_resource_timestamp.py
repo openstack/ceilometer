@@ -18,6 +18,8 @@
 
 from sqlalchemy import MetaData, Table, Column, DateTime
 
+from ceilometer.openstack.common import timeutils
+
 meta = MetaData()
 
 

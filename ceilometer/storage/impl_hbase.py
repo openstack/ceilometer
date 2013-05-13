@@ -223,9 +223,6 @@ class Connection(base.Connection):
             project['f:s_%s' % data['source']] = "1"
             self.project.put(data['project_id'], project)
 
-        # Record the updated resource metadata.
-        received_timestamp = timeutils.utcnow()
-
         resource = self.resource.row(data['resource_id'])
         new_meter = "%s!%s!%s" % (
             data['counter_name'], data['counter_type'], data['counter_unit'])

@@ -243,6 +243,6 @@ class BaseAgentManagerTestCase(base.TestCase):
 
         polling_tasks = self.mgr.setup_polling_tasks()
         self.assertEqual(len(polling_tasks.keys()), 1)
-        task = polling_tasks.get(10)
+        polling_tasks.get(10)
         self.mgr.interval_task(polling_tasks.get(10))
         self.assertEqual(len(self.publisher.counters), 0)

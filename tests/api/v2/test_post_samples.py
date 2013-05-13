@@ -60,26 +60,6 @@ class TestPostSamples(FunctionalTest):
 
         self.assertEquals(s1, data.json)
 
-    def test_one(self):
-        s1 = [{'counter_name': 'apples',
-               'counter_type': 'gauge',
-               'counter_unit': 'instance',
-               'counter_volume': 1,
-               'resource_id': 'bd9431c1-8d69-4ad3-803a-8d4a6b89fd36',
-               'project_id': '35b17138-b364-4e6a-a131-8f3099c5be68',
-               'user_id': 'efd87807-12d2-4b38-9c70-5f5c2ac427ff',
-               'resource_metadata': {'name1': 'value1',
-                                     'name2': 'value2'}}]
-
-        data = self.post_json('/meters/apples/', s1)
-
-        # timestamp not given so it is generated.
-        s1[0]['timestamp'] = data.json[0]['timestamp']
-        # source is generated if not provided.
-        s1[0]['source'] = '%s:openstack' % s1[0]['project_id']
-
-        self.assertEquals(s1, data.json)
-
     def test_wrong_project_id(self):
         '''
         do not accept cross posting samples to different projects

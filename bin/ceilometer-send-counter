@@ -97,13 +97,14 @@ pipeline_manager = pipeline.setup_pipeline(
 
 with pipeline_manager.publisher(context.get_admin_context(),
                                 cfg.CONF.counter_source) as p:
-    p([counter.Counter(name=cfg.CONF.counter_name,
-                                    type=cfg.CONF.counter_type,
-                                    unit=cfg.CONF.counter_unit,
-                                    volume=cfg.CONF.counter_volume,
-                                    user_id=cfg.CONF.counter_user,
-                                    project_id=cfg.CONF.counter_project,
-                                    resource_id=cfg.CONF.counter_resource,
-                                    timestamp=cfg.CONF.counter_timestamp,
-                                    resource_metadata=cfg.CONF.counter_metadata
-                                    and eval(cfg.CONF.counter_metadata))])
+    p([counter.Counter(
+        name=cfg.CONF.counter_name,
+        type=cfg.CONF.counter_type,
+        unit=cfg.CONF.counter_unit,
+        volume=cfg.CONF.counter_volume,
+        user_id=cfg.CONF.counter_user,
+        project_id=cfg.CONF.counter_project,
+        resource_id=cfg.CONF.counter_resource,
+        timestamp=cfg.CONF.counter_timestamp,
+        resource_metadata=cfg.CONF.counter_metadata and eval(
+            cfg.CONF.counter_metadata))])
