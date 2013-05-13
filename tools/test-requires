@@ -8,8 +8,8 @@ Babel>=0.9.6
 # implementation of MongoDB.
 # NOTE(jd): the support for finalize in map reduce in MIM is not yet merged
 # git+http://git.naquadah.org/git/~jd/merciless.git#egg=Ming
-http://tarballs.openstack.org/nova/nova-master.tar.gz
-http://tarballs.openstack.org/glance/glance-master.tar.gz
+http://tarballs.openstack.org/nova/nova-master.tar.gz#egg=nova
+http://tarballs.openstack.org/glance/glance-master.tar.gz#egg=glance
 setuptools-git>=0.4
 # We should use swift>1.7.5, but it's not yet available
 swift

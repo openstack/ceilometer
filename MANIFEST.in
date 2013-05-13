@@ -1,8 +1,10 @@
 include AUTHORS
 include ChangeLog
+include CONTRIBUTING.txt
 include ceilometer/storage/sqlalchemy/migrate_repo/migrate.cfg
 exclude .gitignore
 exclude .gitreview
+include ReleaseNotes
 graft tests
 graft etc
 recursive-include nova_tests *.py
