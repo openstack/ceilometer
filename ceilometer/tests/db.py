@@ -20,7 +20,6 @@
 
 """Base classes for API tests."""
 
-from nose.plugins import skip
 from oslo.config import cfg
 
 from ceilometer import storage
