@@ -98,9 +98,10 @@ class TestAPIACL(FunctionalTest):
                     timestamp=datetime.datetime(2012, 7, 2, 10, 43),
                     resource_metadata={'display_name': 'test-server',
                                        'tag': 'self.counter4'})]:
-            msg = meter.meter_message_from_counter(cnt,
-                                                   cfg.CONF.metering_secret,
-                                                   'test_source')
+            msg = meter.meter_message_from_counter(
+                cnt,
+                cfg.CONF.publisher_meter.metering_secret,
+                'test_source')
             self.conn.record_metering_data(msg)
 
     def get_json(self, path, expect_errors=False, headers=None,

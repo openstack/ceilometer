@@ -304,10 +304,11 @@ class TestListResources(FunctionalTest):
                                'tag': 'self.counter1',
                                }
         )
-        msg2 = meter.meter_message_from_counter(counter1,
-                                                cfg.CONF.metering_secret,
-                                                'not-test',
-                                                )
+        msg2 = meter.meter_message_from_counter(
+            counter1,
+            cfg.CONF.publisher_meter.metering_secret,
+            'not-test',
+        )
         self.conn.record_metering_data(msg2)
 
         data = self.get_json('/resources',
@@ -330,10 +331,11 @@ class TestListResources(FunctionalTest):
                                'tag': 'self.counter1',
                                }
         )
-        msg2 = meter.meter_message_from_counter(counter1,
-                                                cfg.CONF.metering_secret,
-                                                'not-test',
-                                                )
+        msg2 = meter.meter_message_from_counter(
+            counter1,
+            cfg.CONF.publisher_meter.metering_secret,
+            'not-test',
+        )
         self.conn.record_metering_data(msg2)
 
         data = self.get_json('/resources',
