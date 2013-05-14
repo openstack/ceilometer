@@ -99,10 +99,11 @@ class BinApiTestCase(unittest.TestCase):
             try:
                 r, c = self.http.request(url, 'GET')
             except socket.error:
-                time.sleep(.3)
+                time.sleep(.5)
                 self.assertEqual(self.subp.poll(), None)
             else:
                 return r, c
+        return (None, None)
 
     def test_v1(self):
         response, content = self.get_response('v1/meters')
