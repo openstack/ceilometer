@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-05-13 09:40+0000\n"
+"POT-Creation-Date: 2013-05-15 09:40+0000\n"
 "PO-Revision-Date: 2013-02-13 21:01+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Japanese "
@@ -19,16 +19,16 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: ceilometer/api/controllers/v2.py:780
+#: ceilometer/api/controllers/v2.py:820
 msgid "Alarm with that name exists"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:787
+#: ceilometer/api/controllers/v2.py:827
 msgid "Alarm incorrect"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:805 ceilometer/api/controllers/v2.py:827
-#: ceilometer/api/controllers/v2.py:836
+#: ceilometer/api/controllers/v2.py:845 ceilometer/api/controllers/v2.py:867
+#: ceilometer/api/controllers/v2.py:879
 msgid "Unknown alarm"
 msgstr ""
 
@@ -203,6 +203,36 @@ msgstr ""
 #: ceilometer/openstack/common/service.py:304
 #, python-format
 msgid "Waiting on %d children to exit"
+msgstr ""
+
+#: ceilometer/openstack/common/db/exception.py:44
+msgid "Invalid Parameter: Unicode is not supported by the current database."
+msgstr ""
+
+#: ceilometer/openstack/common/db/sqlalchemy/session.py:437
+msgid "DB exception wrapped."
+msgstr ""
+
+#: ceilometer/openstack/common/db/sqlalchemy/session.py:487
+#, python-format
+msgid "Got mysql server has gone away: %s"
+msgstr ""
+
+#: ceilometer/openstack/common/db/sqlalchemy/session.py:557
+#, python-format
+msgid "SQL connection failed. %s attempts left."
+msgstr ""
+
+#: ceilometer/openstack/common/db/sqlalchemy/utils.py:33
+msgid "Sort key supplied was not valid."
+msgstr ""
+
+#: ceilometer/openstack/common/db/sqlalchemy/utils.py:72
+msgid "Id not in sort_keys; is sort_keys unique?"
+msgstr ""
+
+#: ceilometer/openstack/common/db/sqlalchemy/utils.py:120
+msgid "Unknown sort direction, must be 'desc' or 'asc'"
 msgstr ""
 
 #: ceilometer/openstack/common/notifier/api.py:125
