@@ -22,7 +22,10 @@
 import unittest2
 
 import mox
+from oslo.config import cfg
 import stubout
+
+cfg.CONF.import_opt('pipeline_cfg_file', 'ceilometer.pipeline')
 
 
 class TestCase(unittest2.TestCase):
@@ -31,6 +34,13 @@ class TestCase(unittest2.TestCase):
         super(TestCase, self).setUp()
         self.mox = mox.Mox()
         self.stubs = stubout.StubOutForTesting()
+        # Set a default location for the pipeline config file so the
+        # tests work even if ceilometer is not installed globally on
+        # the system.
+        cfg.CONF.set_override(
+            'pipeline_cfg_file',
+            '../etc/ceilometer/pipeline.yaml',
+        )
 
     def tearDown(self):
         self.mox.UnsetStubs()
