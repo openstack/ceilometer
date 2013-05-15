@@ -108,7 +108,7 @@ Installing the Collector
       nodes, so that messages passing between the nodes can be
       validated.
 
-   Refer to :doc:`configuration` for details about any other options
+   Refer to :doc:`/configuration` for details about any other options
    you might want to modify before starting the service.
 
 8. Start the collector.
@@ -193,7 +193,7 @@ Installing the Compute Agent
       nodes, so that messages passing between the nodes can be
       validated.
 
-   Refer to :doc:`configuration` for details about any other options
+   Refer to :doc:`/configuration` for details about any other options
    you might want to modify before starting the service.
 
 7. Start the agent.
@@ -267,7 +267,7 @@ Installing the Central Agent
       nodes, so that messages passing between the nodes can be
       validated.
 
-   Refer to :doc:`configuration` for details about any other options
+   Refer to :doc:`/configuration` for details about any other options
    you might want to modify before starting the service.
 
 5. Start the agent
@@ -327,7 +327,7 @@ Installing the API Server
          not yet been tested with ZeroMQ. We recommend using Rabbit or
          qpid for now.
 
-   Refer to :doc:`configuration` for details about any other options
+   Refer to :doc:`/configuration` for details about any other options
    you might want to modify before starting the service.
 
 5. Start the API server.
