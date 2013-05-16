@@ -445,6 +445,12 @@
 #cinder_control_exchange=cinder
 
 
+######## defined in ceilometer.api.app ########
+
+# Deploy the deprecated v1 API. (boolean value)
+#enable_v1_api=true
+
+
 [rpc_notifier2]
 
 ######## defined in ceilometer.openstack.common.notifier.rpc_notifier2 ########
@@ -479,4 +485,4 @@
 #metering_secret=change this or be hacked
 
 
-# Total option count: 105
+# Total option count: 106

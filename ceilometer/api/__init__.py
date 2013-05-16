@@ -16,15 +16,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import flask.helpers
 from oslo.config import cfg
-
-from ceilometer.openstack.common import jsonutils
-
-# Replace the json module used by flask with the one from
-# openstack.common so we can take advantage of the fact that it knows
-# how to serialize more complex objects.
-flask.helpers.json = jsonutils
 
 # Register options for the service
 API_SERVICE_OPTS = [

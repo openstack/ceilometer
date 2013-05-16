@@ -23,13 +23,15 @@ from ceilometer.api import acl
 from ceilometer.api import config as api_config
 from ceilometer.api import hooks
 from ceilometer.api import middleware
-from ceilometer.api.v1 import app as v1app
 
 
 auth_opts = [
     cfg.StrOpt('auth_strategy',
                default='keystone',
                help='The strategy to use for auth: noauth or keystone.'),
+    cfg.BoolOpt('enable_v1_api',
+                default=True,
+                help='Deploy the deprecated v1 API.'),
 ]
 
 CONF = cfg.CONF
@@ -77,7 +79,14 @@ class VersionSelectorApplication(object):
         pc = get_pecan_config()
         pc.app.debug = CONF.debug
         pc.app.enable_acl = (CONF.auth_strategy == 'keystone')
-        self.v1 = v1app.make_app(cfg.CONF, enable_acl=pc.app.enable_acl)
+        if cfg.CONF.enable_v1_api:
+            from ceilometer.api.v1 import app as v1app
+            self.v1 = v1app.make_app(cfg.CONF, enable_acl=pc.app.enable_acl)
+        else:
+            def not_found(environ, start_response):
+                start_response('404 Not Found', [])
+                return []
+            self.v1 = not_found
         self.v2 = setup_app(pecan_config=pc)
 
     def __call__(self, environ, start_response):

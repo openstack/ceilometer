@@ -18,6 +18,7 @@
 """Set up the API server application instance."""
 
 import flask
+import flask.helpers
 from oslo.config import cfg
 
 from ceilometer.api import acl
@@ -25,6 +26,10 @@ from ceilometer.api.v1 import blueprint as v1_blueprint
 from ceilometer.openstack.common import jsonutils
 from ceilometer import storage
 
+# Replace the json module used by flask with the one from
+# openstack.common so we can take advantage of the fact that it knows
+# how to serialize more complex objects.
+flask.helpers.json = jsonutils
 
 storage.register_opts(cfg.CONF)
 
