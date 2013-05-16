@@ -12,8 +12,7 @@ mox
 Babel>=0.9.6
 # NOTE(dhellmann): Ming is necessary to provide the Mongo-in-memory
 # implementation of MongoDB.
-# NOTE(jd): the support for finalize in map reduce in MIM is not yet merged
-# git+http://git.naquadah.org/git/~jd/merciless.git#egg=Ming
+Ming>=0.3.4
 http://tarballs.openstack.org/nova/nova-master.tar.gz#egg=nova
 http://tarballs.openstack.org/glance/glance-master.tar.gz#egg=glance
 # We should use swift>1.7.5, but it's not yet available
