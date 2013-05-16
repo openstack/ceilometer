@@ -212,6 +212,12 @@ class NetPollster(plugin.ComputePollster):
         resource_metadata['instance_type'] = \
             instance.flavor['id'] if instance.flavor else None
 
+        if vnic_data.fref is not None:
+            rid = vnic_data.fref
+        else:
+            instance_name = _instance_name(instance)
+            rid = "%s-%s-%s" % (instance_name, instance.id, vnic_data.name)
+
         return counter.Counter(
             name=name,
             type=type,
@@ -219,7 +225,7 @@ class NetPollster(plugin.ComputePollster):
             volume=volume,
             user_id=instance.user_id,
             project_id=instance.tenant_id,
-            resource_id=vnic_data.fref,
+            resource_id=rid,
             timestamp=timeutils.isotime(),
             resource_metadata=resource_metadata
         )
