@@ -110,7 +110,10 @@ class LibvirtInspector(virt_inspector.Inspector):
         for iface in tree.findall('devices/interface'):
             name = iface.find('target').get('dev')
             mac = iface.find('mac').get('address')
-            fref = iface.find('filterref').get('filter')
+            fref = iface.find('filterref')
+            if fref is not None:
+                fref = fref.get('filter')
+
             params = dict((p.get('name').lower(), p.get('value'))
                           for p in iface.findall('filterref/parameter'))
             interface = virt_inspector.Interface(name=name, mac=mac,
