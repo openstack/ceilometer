@@ -108,6 +108,6 @@ class TestNotifier(tests_base.TestCase):
 
         self.assertEqual(len(pub.counters), 0)
         notifier.notify(None, MESSAGE)
-        self.assertGreater(len(pub.counters), 0)
+        self.assertTrue(len(pub.counters) > 0)
         self.assertIn('disk.ephemeral.size',
                       [c.name for c in pub.counters])

@@ -18,17 +18,15 @@
 # under the License.
 """Test base classes.
 """
-
-import unittest2
-
 import mox
 from oslo.config import cfg
 import stubout
+import testtools
 
 cfg.CONF.import_opt('pipeline_cfg_file', 'ceilometer.pipeline')
 
 
-class TestCase(unittest2.TestCase):
+class TestCase(testtools.TestCase):
 
     def setUp(self):
         super(TestCase, self).setUp()
