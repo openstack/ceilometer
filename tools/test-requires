@@ -1,5 +1,4 @@
 nose
-unittest2
 coverage
 mock
 mox
@@ -17,3 +16,4 @@ netifaces
 sphinx
 docutils==0.9.1 # for bug 1091333, remove after sphinx >1.1.3 is released.
 python-spidermonkey
+testtools>=0.9.29

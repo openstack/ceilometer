@@ -213,8 +213,8 @@ class Connection(base.Connection):
                     try:
                         from ming import mim
                     except ImportError:
-                        import nose
-                        raise nose.SkipTest("Ming not found")
+                        import testtools
+                        raise testtools.testcase.TestSkipped('requires mim')
                     LOG.debug('Creating a new MIM Connection object')
                     Connection._mim_instance = mim.Connection()
                 self.conn = Connection._mim_instance
@@ -564,8 +564,8 @@ def require_map_reduce(conn):
         try:
             from ming import mim
             if hasattr(conn, "conn") and isinstance(conn.conn, mim.Connection):
-                import nose
-                raise nose.SkipTest('requires spidermonkey')
+                import testtools
+                raise testtools.testcase.TestSkipped('requires spidermonkey')
         except ImportError:
-            import nose
-            raise nose.SkipTest('requires mim')
+            import testtools
+            raise testtools.testcase.TestSkipped('requires mim')
