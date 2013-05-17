@@ -68,7 +68,7 @@ Name                      Type        Unit      Resource  Origin        Note
 ========================  ==========  ========  ========  ============  =======================================================
 instance                  Gauge       instance  inst ID   both          Duration of instance
 instance:<type>           Gauge       instance  inst ID   both          Duration of instance <type> (openstack types)
-memory                    Gauge              B  inst ID   notification  Volume of RAM in B
+memory                    Gauge             MB  inst ID   notification  Volume of RAM in MB
 cpu                       Cumulative        ns  inst ID   pollster      CPU time used
 cpu_util                  Gauge              %  inst ID   pollster      CPU utilisation
 vcpus                     Gauge           vcpu  inst ID   notification  Number of VCPUs
@@ -76,8 +76,8 @@ disk.read.request         Cumulative   request  inst ID   pollster      Number o
 disk.write.request        Cumulative   request  inst ID   pollster      Number of write requests
 disk.read.bytes           Cumulative         B  inst ID   pollster      Volume of read in B
 disk.write.bytes          Cumulative         B  inst ID   pollster      Volume of write in B
-disk.root.size            Gauge              B  inst ID   notification  Size of root disk in GB
-disk.ephemeral.size       Gauge              B  inst ID   notification  Size of ephemeral disk in GB
+disk.root.size            Gauge             GB  inst ID   notification  Size of root disk in GB
+disk.ephemeral.size       Gauge             GB  inst ID   notification  Size of ephemeral disk in GB
 network.incoming.bytes    Cumulative         B  iface ID  pollster      number of incoming bytes on the network
 network.outgoing.bytes    Cumulative         B  iface ID  pollster      number of outgoing bytes on the network
 network.incoming.packets  Cumulative   packets  iface ID  pollster      number of incoming packets
