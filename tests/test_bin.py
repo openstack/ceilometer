@@ -19,11 +19,9 @@
 
 import httplib2
 import json
-import os
 import random
 import socket
 import subprocess
-import tempfile
 import time
 
 from ceilometer.tests import base
@@ -32,7 +30,7 @@ from ceilometer.tests import base
 class BinDbsyncTestCase(base.TestCase):
     def setUp(self):
         super(BinDbsyncTestCase, self).setUp()
-        self.tempfile = tempfile.mktemp()
+        self.tempfile = self.temp_config_file_path()
         with open(self.tempfile, 'w') as tmp:
             tmp.write("[DEFAULT]\n")
             tmp.write("database_connection=log://localhost\n")
@@ -42,15 +40,11 @@ class BinDbsyncTestCase(base.TestCase):
                                  "--config-file=%s" % self.tempfile])
         self.assertEqual(subp.wait(), 0)
 
-    def tearDown(self):
-        super(BinDbsyncTestCase, self).tearDown()
-        os.unlink(self.tempfile)
-
 
 class BinSendCounterTestCase(base.TestCase):
     def setUp(self):
         super(BinSendCounterTestCase, self).setUp()
-        self.tempfile = tempfile.mktemp()
+        self.tempfile = self.temp_config_file_path()
         with open(self.tempfile, 'w') as tmp:
             tmp.write("[DEFAULT]\n")
             tmp.write(
@@ -65,10 +59,6 @@ class BinSendCounterTestCase(base.TestCase):
                                  "--counter-name=mycounter"])
         self.assertEqual(subp.wait(), 0)
 
-    def tearDown(self):
-        super(BinSendCounterTestCase, self).tearDown()
-        os.unlink(self.tempfile)
-
 
 class BinApiTestCase(base.TestCase):
 
@@ -76,7 +66,7 @@ class BinApiTestCase(base.TestCase):
         super(BinApiTestCase, self).setUp()
         self.api_port = random.randint(10000, 11000)
         self.http = httplib2.Http()
-        self.tempfile = tempfile.mktemp()
+        self.tempfile = self.temp_config_file_path()
         with open(self.tempfile, 'w') as tmp:
             tmp.write("[DEFAULT]\n")
             tmp.write(
@@ -95,7 +85,6 @@ class BinApiTestCase(base.TestCase):
 
     def tearDown(self):
         super(BinApiTestCase, self).tearDown()
-        os.unlink(self.tempfile)
         self.subp.kill()
         self.subp.wait()
 
