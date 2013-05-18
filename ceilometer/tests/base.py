@@ -42,8 +42,19 @@ class TestCase(testtools.TestCase):
         # the system.
         cfg.CONF.set_override(
             'pipeline_cfg_file',
-            '../etc/ceilometer/pipeline.yaml',
+            self.path_get('etc/ceilometer/pipeline.yaml'),
         )
+
+    def path_get(self, project_file=None):
+        root = os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                            '..',
+                                            '..',
+                                            )
+                               )
+        if project_file:
+            return os.path.join(root, project_file)
+        else:
+            return root
 
     def temp_config_file_path(self, name='ceilometer.conf'):
         return os.path.join(self.tempdir.path, name)

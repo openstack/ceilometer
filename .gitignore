@@ -6,6 +6,8 @@ build
 .coverage
 .tox
 cover
+.testrepository
+subunit.log
 AUTHORS
 ChangeLog
 *.deb

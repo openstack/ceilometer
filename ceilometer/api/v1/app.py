@@ -29,12 +29,13 @@ from ceilometer import storage
 storage.register_opts(cfg.CONF)
 
 
-def make_app(conf, enable_acl=True, attach_storage=True):
+def make_app(conf, enable_acl=True, attach_storage=True,
+             sources_file='sources.json'):
     app = flask.Flask('ceilometer.api')
     app.register_blueprint(v1_blueprint.blueprint, url_prefix='/v1')
 
     try:
-        with open("sources.json", "r") as f:
+        with open(sources_file, "r") as f:
             sources = jsonutils.load(f)
     except IOError:
         sources = {}
