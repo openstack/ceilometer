@@ -45,11 +45,30 @@ class _Base(plugin.PollsterBase):
         client = self.get_glance_client(ksclient)
         #TODO(eglynn): use pagination to protect against unbounded
         #              memory usage
-        return itertools.chain(
+        rawImageList = list(itertools.chain(
             client.images.list(filters={"is_public": True}),
             #TODO(eglynn): extend glance API with all_tenants logic to
             #              avoid second call to retrieve private images
-            client.images.list(filters={"is_public": False}))
+            client.images.list(filters={"is_public": False})))
+
+        # When retrieving images from glance, glance will check
+        # whether the user is of 'admin_role' which is
+        # configured in glance-api.conf. If the user is of
+        # admin_role, and is querying public images(which means
+        # that the 'is_public' param is set to be True),
+        # glance will ignore 'is_public' parameter and returns
+        # all the public images together with private images.
+        # As a result, if the user/tenant has an admin role
+        # for ceilometer to collect image list,
+        # the _Base.iter_images method will return a image list
+        # which contains duplicate images. Add the following
+        # code to avoid recording down duplicate image events.
+        imageIdSet = set(image.id for image in rawImageList)
+
+        for image in rawImageList:
+            if image.id in imageIdSet:
+                imageIdSet -= set([image.id])
+                yield image
 
     @staticmethod
     def extract_image_metadata(image):
