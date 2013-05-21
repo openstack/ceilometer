@@ -86,21 +86,6 @@ def test_verify_signature_incorrect():
     assert not meter.verify_signature(data, 'not-so-secret')
 
 
-def test_recursive_keypairs():
-    data = {'a': 'A',
-            'b': 'B',
-            'nested': {'a': 'A',
-                       'b': 'B',
-                       },
-            }
-    pairs = list(meter.recursive_keypairs(data))
-    assert pairs == [('a', 'A'),
-                     ('b', 'B'),
-                     ('nested:a', 'A'),
-                     ('nested:b', 'B'),
-                     ]
-
-
 def test_verify_signature_nested():
     data = {'a': 'A',
             'b': 'B',

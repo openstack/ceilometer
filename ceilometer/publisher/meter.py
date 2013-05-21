@@ -28,6 +28,7 @@ from oslo.config import cfg
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import rpc
 from ceilometer import publisher
+from ceilometer import utils
 
 
 LOG = log.getLogger(__name__)
@@ -55,28 +56,11 @@ def register_opts(config):
 register_opts(cfg.CONF)
 
 
-def recursive_keypairs(d):
-    """Generator that produces sequence of keypairs for nested dictionaries.
-    """
-    for name, value in sorted(d.iteritems()):
-        if isinstance(value, dict):
-            for subname, subvalue in recursive_keypairs(value):
-                yield ('%s:%s' % (name, subname), subvalue)
-        elif isinstance(value, (tuple, list)):
-            # When doing a pair of JSON encode/decode operations to the tuple,
-            # the tuple would become list. So we have to generate the value as
-            # list here.
-            yield name, list(map(lambda x: unicode(x).encode('utf-8'),
-                                 value))
-        else:
-            yield name, value
-
-
 def compute_signature(message, secret):
     """Return the signature for a message dictionary.
     """
     digest_maker = hmac.new(secret, '', hashlib.sha256)
-    for name, value in recursive_keypairs(message):
+    for name, value in utils.recursive_keypairs(message):
         if name == 'message_signature':
             # Skip any existing signature value, which would not have
             # been part of the original message.
