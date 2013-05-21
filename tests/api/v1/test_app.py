@@ -18,7 +18,6 @@
 """Test basic ceilometer-api app
 """
 import os
-import tempfile
 
 from oslo.config import cfg
 
@@ -42,7 +41,7 @@ class TestApp(base.TestCase):
         self.assertEqual(api_app.wsgi_app.auth_protocol, 'foottp')
 
     def test_keystone_middleware_parse_conffile(self):
-        tmpfile = tempfile.mktemp()
+        tmpfile = self.temp_config_file_path()
         with open(tmpfile, "w") as f:
             f.write("[%s]\nauth_protocol = barttp" % acl.OPT_GROUP_NAME)
             f.write("\nauth_version = v2.0")

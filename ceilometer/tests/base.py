@@ -18,8 +18,10 @@
 # under the License.
 """Test base classes.
 """
+import fixtures
 import mox
 from oslo.config import cfg
+import os.path
 import stubout
 import testtools
 
@@ -32,6 +34,9 @@ class TestCase(testtools.TestCase):
         super(TestCase, self).setUp()
         self.mox = mox.Mox()
         self.stubs = stubout.StubOutForTesting()
+        self.tempdir = self.useFixture(fixtures.TempDir())
+        self.useFixture(fixtures.FakeLogger())
+
         # Set a default location for the pipeline config file so the
         # tests work even if ceilometer is not installed globally on
         # the system.
@@ -39,6 +44,9 @@ class TestCase(testtools.TestCase):
             'pipeline_cfg_file',
             '../etc/ceilometer/pipeline.yaml',
         )
+
+    def temp_config_file_path(self, name='ceilometer.conf'):
+        return os.path.join(self.tempdir.path, name)
 
     def tearDown(self):
         self.mox.UnsetStubs()
