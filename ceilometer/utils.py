@@ -42,3 +42,20 @@ def read_cached_file(filename, cache_info, reload_func=None):
         if reload_func:
             reload_func(cache_info['data'])
     return cache_info['data']
+
+
+def recursive_keypairs(d):
+    """Generator that produces sequence of keypairs for nested dictionaries.
+    """
+    for name, value in sorted(d.iteritems()):
+        if isinstance(value, dict):
+            for subname, subvalue in recursive_keypairs(value):
+                yield ('%s:%s' % (name, subname), subvalue)
+        elif isinstance(value, (tuple, list)):
+            # When doing a pair of JSON encode/decode operations to the tuple,
+            # the tuple would become list. So we have to generate the value as
+            # list here.
+            yield name, list(map(lambda x: unicode(x).encode('utf-8'),
+                                 value))
+        else:
+            yield name, value
