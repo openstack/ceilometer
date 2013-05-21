@@ -40,7 +40,7 @@ class TestApp(base.TestCase):
                               group=acl.OPT_GROUP_NAME)
         cfg.CONF.set_override("auth_version", "v2.0", group=acl.OPT_GROUP_NAME)
         cfg.CONF.set_override("pipeline_cfg_file",
-                              "../etc/ceilometer/pipeline.yaml")
+                              self.path_get("etc/ceilometer/pipeline.yaml"))
         api_app = app.setup_app()
         self.assertEqual(api_app.auth_protocol, 'foottp')
 
@@ -48,7 +48,8 @@ class TestApp(base.TestCase):
         tmpfile = self.temp_config_file_path()
         with open(tmpfile, "w") as f:
             f.write("[DEFAULT]\n")
-            f.write("pipeline_cfg_file = ../etc/ceilometer/pipeline.yaml\n")
+            f.write("pipeline_cfg_file = %s\n" %
+                    self.path_get("etc/ceilometer/pipeline.yaml"))
             f.write("[%s]\n" % acl.OPT_GROUP_NAME)
             f.write("auth_protocol = barttp\n")
             f.write("auth_version = v2.0\n")

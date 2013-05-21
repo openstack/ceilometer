@@ -41,9 +41,13 @@ class TestBase(db_test_base.TestBase):
     def setUp(self):
         super(TestBase, self).setUp()
         cfg.CONF.set_override("auth_version", "v2.0", group=acl.OPT_GROUP_NAME)
+        cfg.CONF.set_override("policy_file",
+                              self.path_get('tests/policy.json'))
+        sources_file = self.path_get('tests/sources.json')
         self.app = v1_app.make_app(cfg.CONF,
                                    enable_acl=False,
-                                   attach_storage=False)
+                                   attach_storage=False,
+                                   sources_file=sources_file)
         self.app.register_blueprint(v1_blueprint.blueprint)
         self.test_app = self.app.test_client()
 
@@ -86,11 +90,7 @@ class FunctionalTest(db_test_base.TestBase):
 
     def _make_app(self, enable_acl=False):
         # Determine where we are so we can set up paths in the config
-        root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                                '..',
-                                                '..',
-                                                )
-                                   )
+        root_dir = self.path_get()
 
         self.config = {
 

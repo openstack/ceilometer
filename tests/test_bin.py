@@ -36,7 +36,7 @@ class BinDbsyncTestCase(base.TestCase):
             tmp.write("database_connection=log://localhost\n")
 
     def test_dbsync_run(self):
-        subp = subprocess.Popen(["../bin/ceilometer-dbsync",
+        subp = subprocess.Popen([self.path_get('bin/ceilometer-dbsync'),
                                  "--config-file=%s" % self.tempfile])
         self.assertEqual(subp.wait(), 0)
 
@@ -45,15 +45,16 @@ class BinSendCounterTestCase(base.TestCase):
     def setUp(self):
         super(BinSendCounterTestCase, self).setUp()
         self.tempfile = self.temp_config_file_path()
+        pipeline_cfg_file = self.path_get('etc/ceilometer/pipeline.yaml')
         with open(self.tempfile, 'w') as tmp:
             tmp.write("[DEFAULT]\n")
             tmp.write(
                 "rpc_backend=ceilometer.openstack.common.rpc.impl_fake\n")
             tmp.write(
-                "pipeline_cfg_file=../etc/ceilometer/pipeline.yaml\n")
+                "pipeline_cfg_file=%s\n" % pipeline_cfg_file)
 
     def test_send_counter_run(self):
-        subp = subprocess.Popen(["../bin/ceilometer-send-counter",
+        subp = subprocess.Popen([self.path_get('bin/ceilometer-send-counter'),
                                  "--config-file=%s" % self.tempfile,
                                  "--counter-resource=someuuid",
                                  "--counter-name=mycounter"])
@@ -67,6 +68,8 @@ class BinApiTestCase(base.TestCase):
         self.api_port = random.randint(10000, 11000)
         self.http = httplib2.Http()
         self.tempfile = self.temp_config_file_path()
+        pipeline_cfg_file = self.path_get('etc/ceilometer/pipeline.yaml')
+        policy_file = self.path_get('tests/policy.json')
         with open(self.tempfile, 'w') as tmp:
             tmp.write("[DEFAULT]\n")
             tmp.write(
@@ -79,8 +82,10 @@ class BinApiTestCase(base.TestCase):
             tmp.write(
                 "debug=true\n")
             tmp.write(
-                "pipeline_cfg_file=../etc/ceilometer/pipeline.yaml\n")
-        self.subp = subprocess.Popen(["../bin/ceilometer-api",
+                "pipeline_cfg_file=%s\n" % pipeline_cfg_file)
+            tmp.write(
+                "policy_file=%s\n" % policy_file)
+        self.subp = subprocess.Popen([self.path_get('bin/ceilometer-api'),
                                       "--config-file=%s" % self.tempfile])
 
     def tearDown(self):

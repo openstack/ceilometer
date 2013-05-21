@@ -1,5 +1,6 @@
-nose
+distribute>=0.6.24
 coverage
+discover
 mock
 mox
 fixtures>=0.3.12
@@ -17,4 +18,6 @@ netifaces
 sphinx
 docutils==0.9.1 # for bug 1091333, remove after sphinx >1.1.3 is released.
 python-spidermonkey
+python-subunit
+testrepository>=0.0.13
 testtools>=0.9.29
