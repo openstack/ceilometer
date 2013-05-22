@@ -146,7 +146,7 @@ class FunctionalTest(db_test_base.TestBase):
         full_path = self.PATH_PREFIX + path
         print('%s: %s %s' % (method.upper(), full_path, params))
         response = getattr(self.app, "%s_json" % method)(
-            full_path,
+            str(full_path),
             params=params,
             headers=headers,
             status=status,
@@ -160,7 +160,7 @@ class FunctionalTest(db_test_base.TestBase):
                extra_environ=None, status=None):
         full_path = self.PATH_PREFIX + path
         print('DELETE: %s' % (full_path))
-        response = self.app.delete(full_path,
+        response = self.app.delete(str(full_path),
                                    headers=headers,
                                    status=status,
                                    extra_environ=extra_environ,
