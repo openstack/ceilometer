@@ -124,7 +124,18 @@ class TestNetPollster(TestPollsterBase):
                             dhcp_server='10.0.0.2'))
         stats1 = virt_inspector.InterfaceStats(rx_bytes=5L, rx_packets=6L,
                                                tx_bytes=7L, tx_packets=8L)
-        vnics = [(vnic0, stats0), (vnic1, stats1)]
+        vnic2 = virt_inspector.Interface(
+            name='vnet2',
+            fref=None,
+            mac='fa:18:4e:72:fc:7e',
+            parameters=dict(ip='192.168.0.4',
+                            projmask='255.255.255.0',
+                            projnet='proj3',
+                            dhcp_server='10.0.0.3'))
+        stats2 = virt_inspector.InterfaceStats(rx_bytes=9L, rx_packets=10L,
+                                               tx_bytes=11L, tx_packets=12L)
+
+        vnics = [(vnic0, stats0), (vnic1, stats1), (vnic2, stats2)]
 
         self.inspector.inspect_vnics(self.instance.name).AndReturn(vnics)
         self.mox.ReplayAll()
@@ -136,21 +147,39 @@ class TestNetPollster(TestPollsterBase):
         self.assertEqual(set([c.name for c in counters]),
                          set(pollster.get_counter_names()))
 
-        def _verify_vnic_metering(name, ip, expected_volume):
+        def _verify_vnic_metering(name, ip, expected_volume, expected_rid):
             match = [c for c in counters if c.name == name and
                      c.resource_metadata['parameters']['ip'] == ip]
             self.assertEquals(len(match), 1, 'missing counter %s' % name)
             self.assertEquals(match[0].volume, expected_volume)
             self.assertEquals(match[0].type, 'cumulative')
+            self.assertEquals(match[0].resource_id, expected_rid)
 
-        _verify_vnic_metering('network.incoming.bytes', '10.0.0.2', 1L)
-        _verify_vnic_metering('network.incoming.bytes', '192.168.0.3', 5L)
-        _verify_vnic_metering('network.outgoing.bytes', '10.0.0.2', 3L)
-        _verify_vnic_metering('network.outgoing.bytes', '192.168.0.3', 7L)
-        _verify_vnic_metering('network.incoming.packets', '10.0.0.2', 2L)
-        _verify_vnic_metering('network.incoming.packets', '192.168.0.3', 6L)
-        _verify_vnic_metering('network.outgoing.packets', '10.0.0.2', 4L)
-        _verify_vnic_metering('network.outgoing.packets', '192.168.0.3', 8L)
+        instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
+        _verify_vnic_metering('network.incoming.bytes', '10.0.0.2', 1L,
+                              vnic0.fref)
+        _verify_vnic_metering('network.incoming.bytes', '192.168.0.3', 5L,
+                              vnic1.fref)
+        _verify_vnic_metering('network.incoming.bytes', '192.168.0.4', 9L,
+                              "%s-%s" % (instance_name_id, vnic2.name))
+        _verify_vnic_metering('network.outgoing.bytes', '10.0.0.2', 3L,
+                              vnic0.fref)
+        _verify_vnic_metering('network.outgoing.bytes', '192.168.0.3', 7L,
+                              vnic1.fref)
+        _verify_vnic_metering('network.outgoing.bytes', '192.168.0.4', 11L,
+                              "%s-%s" % (instance_name_id, vnic2.name))
+        _verify_vnic_metering('network.incoming.packets', '10.0.0.2', 2L,
+                              vnic0.fref)
+        _verify_vnic_metering('network.incoming.packets', '192.168.0.3', 6L,
+                              vnic1.fref)
+        _verify_vnic_metering('network.incoming.packets', '192.168.0.4', 10L,
+                              "%s-%s" % (instance_name_id, vnic2.name))
+        _verify_vnic_metering('network.outgoing.packets', '10.0.0.2', 4L,
+                              vnic0.fref)
+        _verify_vnic_metering('network.outgoing.packets', '192.168.0.3', 8L,
+                              vnic1.fref)
+        _verify_vnic_metering('network.outgoing.packets', '192.168.0.4', 12L,
+                              "%s-%s" % (instance_name_id, vnic2.name))
 
 
 class TestCPUPollster(TestPollsterBase):
