@@ -86,6 +86,8 @@ class FunctionalTest(db_test_base.TestBase):
         super(FunctionalTest, self).setUp()
         service.prepare_service()
         cfg.CONF.set_override("auth_version", "v2.0", group=acl.OPT_GROUP_NAME)
+        cfg.CONF.set_override("policy_file",
+                              self.path_get('tests/policy.json'))
         self.app = self._make_app()
 
     def _make_app(self, enable_acl=False):
