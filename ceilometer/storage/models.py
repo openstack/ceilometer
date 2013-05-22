@@ -47,10 +47,12 @@ class Resource(Model):
     """Something for which sample data has been collected.
     """
 
-    def __init__(self, resource_id, project_id, user_id, metadata, meter):
+    def __init__(self, resource_id, project_id, source, user_id, metadata,
+                 meter):
         """
         :param resource_id: UUID of the resource
         :param project_id:  UUID of project owning the resource
+        :param source:      the identifier for the user/project id definition
         :param user_id:     UUID of user owning the resource
         :param metadata:    most current metadata for the resource (a dict)
         :param meter:       list of the meters reporting data for the resource,
@@ -58,6 +60,7 @@ class Resource(Model):
         Model.__init__(self,
                        resource_id=resource_id,
                        project_id=project_id,
+                       source=source,
                        user_id=user_id,
                        metadata=metadata,
                        meter=meter,
@@ -88,13 +91,15 @@ class Meter(Model):
     """Definition of a meter for which sample data has been collected.
     """
 
-    def __init__(self, name, type, unit, resource_id, project_id, user_id):
+    def __init__(self, name, type, unit, resource_id, project_id, source,
+                 user_id):
         """
         :param name: name of the meter
         :param type: type of the meter (guage, counter)
         :param unit: unit of the meter
         :param resource_id: UUID of the resource
         :param project_id: UUID of project owning the resource
+        :param source: the identifier for the user/project id definition
         :param user_id: UUID of user owning the resource
         """
         Model.__init__(self,
@@ -103,6 +108,7 @@ class Meter(Model):
                        unit=unit,
                        resource_id=resource_id,
                        project_id=project_id,
+                       source=source,
                        user_id=user_id,
                        )
 
