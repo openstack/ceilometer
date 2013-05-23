@@ -553,6 +553,20 @@ class Connection(base.Connection):
         """
         self.db.alarm.remove({'alarm_id': alarm_id})
 
+    def record_events(self, events):
+        """Write the events.
+
+        :param events: a list of model.Event objects.
+        """
+        raise NotImplementedError('Events not implemented.')
+
+    def get_events(self, event_filter):
+        """Return an iterable of model.Event objects.
+
+        :param event_filter: EventFilter instance
+        """
+        raise NotImplementedError('Events not implemented.')
+
 
 def require_map_reduce(conn):
     """Raises SkipTest if the connection is using mim.

@@ -156,3 +156,15 @@ class Connection(object):
     @abc.abstractmethod
     def clear(self):
         """Clear database."""
+
+    @abc.abstractmethod
+    def record_events(self, events):
+        """Write the events to the backend storage system.
+
+        :param events: a list of model.Event objects.
+        """
+
+    @abc.abstractmethod
+    def get_events(self, event_filter):
+        """Return an iterable of model.Event objects.
+        """
