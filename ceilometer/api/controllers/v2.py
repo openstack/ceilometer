@@ -357,8 +357,8 @@ class Sample(_Base):
                    project_id='35b17138-b364-4e6a-a131-8f3099c5be68',
                    user_id='efd87807-12d2-4b38-9c70-5f5c2ac427ff',
                    timestamp=datetime.datetime.utcnow(),
-                   metadata={'name1': 'value1',
-                             'name2': 'value2'},
+                   resource_metadata={'name1': 'value1',
+                                      'name2': 'value2'},
                    message_id='5460acce-4fd6-480d-ab18-9735ec7b1996',
                    )
 
