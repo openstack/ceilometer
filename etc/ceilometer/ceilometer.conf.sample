@@ -1,22 +1,24 @@
-##########################
-# ceilometer.conf sample #
-##########################
-
 [DEFAULT]
 
-######## defined in ceilometer.counter ########
+#
+# Options defined in ceilometer.counter
+#
 
 # Source for counters emited on this instance (string value)
 #counter_source=openstack
 
 
-######## defined in ceilometer.pipeline ########
+#
+# Options defined in ceilometer.pipeline
+#
 
 # Configuration file for pipeline definition (string value)
 #pipeline_cfg_file=pipeline.yaml
 
 
-######## defined in ceilometer.policy ########
+#
+# Options defined in ceilometer.policy
+#
 
 # JSON file representing policy (string value)
 #policy_file=policy.json
@@ -25,7 +27,9 @@
 #policy_default_rule=default
 
 
-######## defined in ceilometer.service ########
+#
+# Options defined in ceilometer.service
+#
 
 # Username to use for openstack service access (string value)
 #os_username=ceilometer
@@ -44,51 +48,70 @@
 #os_auth_url=http://localhost:5000/v2.0
 
 
-######## defined in ceilometer.api ########
+#
+# Options defined in ceilometer.api
+#
 
 # The port for the ceilometer API server (integer value)
 #metering_api_port=8777
 
 
-######## defined in ceilometer.api.app ########
+#
+# Options defined in ceilometer.api.app
+#
 
 # The strategy to use for auth: noauth or keystone. (string
 # value)
 #auth_strategy=keystone
 
+# Deploy the deprecated v1 API. (boolean value)
+#enable_v1_api=true
 
-######## defined in ceilometer.central.manager ########
+
+#
+# Options defined in ceilometer.central.manager
+#
 
 # list of central pollsters to disable (list value)
 #disabled_central_pollsters=
 
 
-######## defined in ceilometer.collector.service ########
+#
+# Options defined in ceilometer.collector.service
+#
 
 # list of listener plugins to disable (list value)
 #disabled_notification_listeners=
 
 
-######## defined in ceilometer.compute ########
+#
+# Options defined in ceilometer.compute
+#
 
 # list of compute agent pollsters to disable (list value)
 #disabled_compute_pollsters=
 
 
-######## defined in ceilometer.compute.notifications ########
+#
+# Options defined in ceilometer.compute.notifications
+#
 
 # Exchange name for Nova notifications (string value)
 #nova_control_exchange=nova
 
 
-######## defined in ceilometer.compute.virt.inspector ########
+#
+# Options defined in ceilometer.compute.virt.inspector
+#
 
 # Inspector to use for inspecting the hypervisor layer (string
 # value)
 #hypervisor_inspector=libvirt
 
 
-######## defined in ceilometer.compute.virt.libvirt.inspector ########
+#
+# Options defined in ceilometer.compute.virt.libvirt.inspector
+#
 
 # Libvirt domain type (valid options are: kvm, lxc, qemu, uml,
 # xen) (string value)
@@ -99,32 +122,89 @@
 #libvirt_uri=
 
 
-######## defined in ceilometer.image.notifications ########
+#
+# Options defined in ceilometer.image.notifications
+#
 
 # Exchange name for Glance notifications (string value)
 #glance_control_exchange=glance
 
 
-######## defined in ceilometer.network.notifications ########
+#
+# Options defined in ceilometer.network.notifications
+#
 
 # Exchange name for Quantum notifications (string value)
 #quantum_control_exchange=quantum
 
 
-######## defined in ceilometer.objectstore.swift ########
+#
+# Options defined in ceilometer.objectstore.swift
+#
 
 # Swift reseller prefix. Must be on par with reseller_prefix
 # in proxy-server.conf. (string value)
 #reseller_prefix=AUTH_
 
 
-######## defined in ceilometer.openstack.common.eventlet_backdoor ########
+#
+# Options defined in ceilometer.openstack.common.db.sqlalchemy.session
+#
+
+# The SQLAlchemy connection string used to connect to the
+# database (string value)
+#sql_connection=sqlite:////ceilometer/openstack/common/db/$sqlite_db
+
+# the filename to use with sqlite (string value)
+#sqlite_db=ceilometer.sqlite
+
+# timeout before idle sql connections are reaped (integer
+# value)
+#sql_idle_timeout=3600
+
+# If passed, use synchronous mode for sqlite (boolean value)
+#sqlite_synchronous=true
+
+# Minimum number of SQL connections to keep open in a pool
+# (integer value)
+#sql_min_pool_size=1
+
+# Maximum number of SQL connections to keep open in a pool
+# (integer value)
+#sql_max_pool_size=5
+
+# maximum db connection retries during startup. (setting -1
+# implies an infinite retry count) (integer value)
+#sql_max_retries=10
+
+# interval between retries of opening a sql connection
+# (integer value)
+#sql_retry_interval=10
+
+# If set, use this value for max_overflow with sqlalchemy
+# (integer value)
+#sql_max_overflow=<None>
+
+# Verbosity of SQL debugging information. 0=None,
+# 100=Everything (integer value)
+#sql_connection_debug=0
+
+# Add python stack traces to SQL as comment strings (boolean
+# value)
+#sql_connection_trace=false
+
+
+#
+# Options defined in ceilometer.openstack.common.eventlet_backdoor
+#
 
 # port for eventlet backdoor to listen (integer value)
 #backdoor_port=<None>
 
 
-######## defined in ceilometer.openstack.common.log ########
+#
+# Options defined in ceilometer.openstack.common.log
+#
 
 # Print debugging output (set logging level to DEBUG instead
 # of default WARNING level). (boolean value)
@@ -201,7 +281,9 @@
 #syslog_log_facility=LOG_USER
 
 
-######## defined in ceilometer.openstack.common.notifier.api ########
+#
+# Options defined in ceilometer.openstack.common.notifier.api
+#
 
 # Driver or drivers to handle sending notifications (multi
 # valued)
@@ -216,19 +298,25 @@
 #default_publisher_id=$host
 
 
-######## defined in ceilometer.openstack.common.notifier.list_notifier ########
+#
+# Options defined in ceilometer.openstack.common.notifier.list_notifier
+#
 
 # List of drivers to send notifications (multi valued)
 #list_notifier_drivers=ceilometer.openstack.common.notifier.no_op_notifier
 
 
-######## defined in ceilometer.openstack.common.notifier.rpc_notifier ########
+#
+# Options defined in ceilometer.openstack.common.notifier.rpc_notifier
+#
 
 # AMQP topic used for openstack notifications (list value)
 #notification_topics=notifications
 
 
-######## defined in ceilometer.openstack.common.rpc ########
+#
+# Options defined in ceilometer.openstack.common.rpc
+#
 
 # The messaging module to use, defaults to kombu. (string
 # value)
@@ -260,14 +348,18 @@
 #control_exchange=openstack
 
 
-######## defined in ceilometer.openstack.common.rpc.amqp ########
+#
+# Options defined in ceilometer.openstack.common.rpc.amqp
+#
 
 # Enable a fast single reply queue if using AMQP based RPC
 # like RabbitMQ or Qpid. (boolean value)
 #amqp_rpc_single_reply_queue=false
 
 
-######## defined in ceilometer.openstack.common.rpc.impl_kombu ########
+#
+# Options defined in ceilometer.openstack.common.rpc.impl_kombu
+#
 
 # SSL version to use (valid only if SSL enabled) (string
 # value)
@@ -328,7 +420,9 @@
 #rabbit_ha_queues=false
 
 
-######## defined in ceilometer.openstack.common.rpc.impl_qpid ########
+#
+# Options defined in ceilometer.openstack.common.rpc.impl_qpid
+#
 
 # Qpid broker hostname (string value)
 #qpid_hostname=localhost
@@ -360,7 +454,9 @@
 #qpid_tcp_nodelay=true
 
 
-######## defined in ceilometer.openstack.common.rpc.impl_zmq ########
+#
+# Options defined in ceilometer.openstack.common.rpc.impl_zmq
+#
 
 # ZeroMQ bind address. Should be a wildcard (*), an ethernet
 # interface, or IP. The "host" option should point or resolve
@@ -389,7 +485,9 @@
 #rpc_zmq_host=nova
 
 
-######## defined in ceilometer.openstack.common.rpc.matchmaker ########
+#
+# Options defined in ceilometer.openstack.common.rpc.matchmaker
+#
 
 # Matchmaker ring file (JSON) (string value)
 #matchmaker_ringfile=/etc/nova/matchmaker_ring.json
@@ -401,59 +499,35 @@
 #matchmaker_heartbeat_ttl=600
 
 
-######## defined in ceilometer.storage ########
+#
+# Options defined in ceilometer.storage
+#
 
 # Database connection string (string value)
 #database_connection=mongodb://localhost:27017/ceilometer
 
 
-######## defined in ceilometer.storage.sqlalchemy.models ########
+#
+# Options defined in ceilometer.storage.sqlalchemy.models
+#
 
 # MySQL engine (string value)
 #mysql_engine=InnoDB
 
 
-######## defined in ceilometer.openstack.common.db.sqlalchemy.session ########
-
-# Verbosity of SQL debugging information. 0=None,
-# 100=Everything (integer value)
-#sql_connection_debug=0
-
-# Add python stack traces to SQL as comment strings (boolean
-# value)
-#sql_connection_trace=false
-
-# If passed, use synchronous mode for sqlite (boolean value)
-#sqlite_synchronous=true
-
-# timeout before idle sql connections are reaped (integer
-# value)
-#sql_idle_timeout=3600
-
-# maximum db connection retries during startup. (setting -1
-# implies an infinite retry count) (integer value)
-#sql_max_retries=10
-
-# interval between retries of opening a sql connection
-# (integer value)
-#sql_retry_interval=10
-
-
-######## defined in ceilometer.volume.notifications ########
+#
+# Options defined in ceilometer.volume.notifications
+#
 
 # Exchange name for Cinder notifications (string value)
 #cinder_control_exchange=cinder
 
 
-######## defined in ceilometer.api.app ########
-
-# Deploy the deprecated v1 API. (boolean value)
-#enable_v1_api=true
-
-
 [rpc_notifier2]
 
-######## defined in ceilometer.openstack.common.notifier.rpc_notifier2 ########
+#
+# Options defined in ceilometer.openstack.common.notifier.rpc_notifier2
+#
 
 # AMQP topic(s) used for openstack notifications (list value)
 #topics=notifications
@@ -461,7 +535,9 @@
 
 [matchmaker_redis]
 
-######## defined in ceilometer.openstack.common.rpc.matchmaker_redis ########
+#
+# Options defined in ceilometer.openstack.common.rpc.matchmaker_redis
+#
 
 # Host to locate redis (string value)
 #host=127.0.0.1
@@ -475,7 +551,9 @@
 
 [publisher_meter]
 
-######## defined in ceilometer.publisher.meter ########
+#
+# Options defined in ceilometer.publisher.meter
+#
 
 # the topic ceilometer uses for metering messages (string
 # value)
@@ -485,4 +563,4 @@
 #metering_secret=change this or be hacked
 
 
-# Total option count: 106
+# Total option count: 111
