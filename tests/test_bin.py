@@ -27,9 +27,9 @@ import time
 from ceilometer.tests import base
 
 
-class BinDbsyncTestCase(base.TestCase):
+class BinTestCase(base.TestCase):
     def setUp(self):
-        super(BinDbsyncTestCase, self).setUp()
+        super(BinTestCase, self).setUp()
         self.tempfile = self.temp_config_file_path()
         with open(self.tempfile, 'w') as tmp:
             tmp.write("[database]\n")
@@ -37,6 +37,11 @@ class BinDbsyncTestCase(base.TestCase):
 
     def test_dbsync_run(self):
         subp = subprocess.Popen(['ceilometer-dbsync',
+                                 "--config-file=%s" % self.tempfile])
+        self.assertEqual(subp.wait(), 0)
+
+    def test_run_expirer(self):
+        subp = subprocess.Popen(['ceilometer-expirer',
                                  "--config-file=%s" % self.tempfile])
         self.assertEqual(subp.wait(), 0)
 

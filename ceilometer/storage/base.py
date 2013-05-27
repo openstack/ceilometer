@@ -83,6 +83,15 @@ class Connection(object):
         """
 
     @abc.abstractmethod
+    def clear_expired_metering_data(self, ttl):
+        """Clear expired data from the backend storage system according to the
+        time-to-live.
+
+        :param ttl: Number of seconds to keep records for.
+
+        """
+
+    @abc.abstractmethod
     def get_users(self, source=None):
         """Return an iterable of user id strings.
 
