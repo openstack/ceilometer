@@ -43,7 +43,7 @@ cfg.CONF.register_opts(sql_opts)
 
 
 def table_args():
-    engine_name = urlparse.urlparse(cfg.CONF.database_connection).scheme
+    engine_name = urlparse.urlparse(cfg.CONF.database.connection).scheme
     if engine_name == 'mysql':
         return {'mysql_engine': cfg.CONF.mysql_engine,
                 'mysql_charset': "utf8"}

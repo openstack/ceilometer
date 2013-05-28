@@ -39,7 +39,8 @@ class TestBase(test_base.TestCase):
 
     def setUp(self):
         super(TestBase, self).setUp()
-        cfg.CONF.database_connection = self.database_connection
+        cfg.CONF.set_override('connection', self.database_connection,
+                              group='database')
         self.conn = storage.get_connection(cfg.CONF)
         self.conn.upgrade()
         self.conn.clear()

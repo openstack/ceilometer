@@ -32,8 +32,8 @@ class BinDbsyncTestCase(base.TestCase):
         super(BinDbsyncTestCase, self).setUp()
         self.tempfile = self.temp_config_file_path()
         with open(self.tempfile, 'w') as tmp:
-            tmp.write("[DEFAULT]\n")
-            tmp.write("database_connection=log://localhost\n")
+            tmp.write("[database]\n")
+            tmp.write("connection=log://localhost\n")
 
     def test_dbsync_run(self):
         subp = subprocess.Popen([self.path_get('bin/ceilometer-dbsync'),
@@ -74,7 +74,6 @@ class BinApiTestCase(base.TestCase):
             tmp.write("[DEFAULT]\n")
             tmp.write(
                 "rpc_backend=ceilometer.openstack.common.rpc.impl_fake\n")
-            tmp.write("database_connection=log://localhost\n")
             tmp.write(
                 "auth_strategy=noauth\n")
             tmp.write(
@@ -86,6 +85,8 @@ class BinApiTestCase(base.TestCase):
             tmp.write("[api]\n")
             tmp.write(
                 "port=%s\n" % self.api_port)
+            tmp.write("[database]\n")
+            tmp.write("connection=log://localhost\n")
         self.subp = subprocess.Popen([self.path_get('bin/ceilometer-api'),
                                       "--config-file=%s" % self.tempfile])
 

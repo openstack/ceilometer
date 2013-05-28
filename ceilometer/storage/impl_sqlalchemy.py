@@ -132,11 +132,11 @@ class Connection(base.Connection):
     """SqlAlchemy connection."""
 
     def __init__(self, conf):
-        url = conf.database_connection
+        url = conf.database.connection
         if url == 'sqlite://':
             url = os.environ.get('CEILOMETER_TEST_SQL_URL', url)
         LOG.info('connecting to %s', url)
-        self.session = sqlalchemy_session.get_session(url, conf)
+        self.session = sqlalchemy_session.get_session()
 
     def upgrade(self, version=None):
         migration.db_sync(self.session.get_bind(), version=version)

@@ -91,7 +91,7 @@ class Connection(base.Connection):
         '''
         Hbase Connection Initialization
         '''
-        opts = self._parse_connection_url(conf.database_connection)
+        opts = self._parse_connection_url(conf.database.connection)
         opts['table_prefix'] = conf.table_prefix
 
         if opts['host'] == '__test__':

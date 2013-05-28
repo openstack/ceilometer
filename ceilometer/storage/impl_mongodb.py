@@ -196,7 +196,7 @@ class Connection(base.Connection):
     }""")
 
     def __init__(self, conf):
-        opts = self._parse_connection_url(conf.database_connection)
+        opts = self._parse_connection_url(conf.database.connection)
         LOG.info('connecting to MongoDB on %s:%s', opts['host'], opts['port'])
 
         if opts['host'] == '__test__':

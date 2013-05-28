@@ -89,7 +89,7 @@ TEST_NOTICE = {
 class TestCollector(tests_base.TestCase):
     def setUp(self):
         super(TestCollector, self).setUp()
-        cfg.CONF.set_override("database_connection", "log://")
+        cfg.CONF.set_override("connection", "log://", group='database')
 
 
 class TestUDPCollectorService(TestCollector):

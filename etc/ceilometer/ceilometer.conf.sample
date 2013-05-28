@@ -444,7 +444,7 @@
 # Name of this node. Must be a valid hostname, FQDN, or IP
 # address. Must match "host" option, if running Nova. (string
 # value)
-#rpc_zmq_host=dex
+#rpc_zmq_host=ceilometer
 
 
 #
@@ -462,8 +462,8 @@
 # Options defined in ceilometer.storage
 #
 
-# Database connection string (string value)
-#database_connection=mongodb://localhost:27017/ceilometer
+# DEPRECATED - Database connection string (string value)
+#database_connection=<None>
 
 
 #
@@ -480,19 +480,6 @@
 
 # Exchange name for Cinder notifications (string value)
 #cinder_control_exchange=cinder
-
-
-[api]
-
-#
-# Options defined in ceilometer.api
-#
-
-# The port for the ceilometer API server (integer value)
-#port=8777
-
-# The listen IP for the ceilometer API server (string value)
-#host=0.0.0.0
 
 
 [publisher_udp]
@@ -588,6 +575,19 @@
 #topics=notifications
 
 
+[api]
+
+#
+# Options defined in ceilometer.api
+#
+
+# The port for the ceilometer API server (integer value)
+#port=8777
+
+# The listen IP for the ceilometer API server (string value)
+#host=0.0.0.0
+
+
 [matchmaker_redis]
 
 #
@@ -631,4 +631,4 @@
 #ringfile=/etc/oslo/matchmaker_ring.json
 
 
-# Total option count: 119
+# Total option count: 120

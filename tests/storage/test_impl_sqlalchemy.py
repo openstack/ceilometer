@@ -98,5 +98,5 @@ class GetEventTest(base.GetEventTest, EventTestBase):
 
 
 def test_model_table_args():
-    cfg.CONF.database_connection = 'mysql://localhost'
+    cfg.CONF.database.connection = 'mysql://localhost'
     assert table_args()

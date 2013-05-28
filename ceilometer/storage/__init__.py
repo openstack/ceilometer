@@ -35,13 +35,16 @@ STORAGE_ENGINE_NAMESPACE = 'ceilometer.storage'
 STORAGE_OPTS = [
     cfg.StrOpt('database_connection',
                secret=True,
-               default='mongodb://localhost:27017/ceilometer',
-               help='Database connection string',
+               default=None,
+               help='DEPRECATED - Database connection string',
                ),
 ]
 
 
 cfg.CONF.register_opts(STORAGE_OPTS)
+cfg.CONF.import_opt('connection',
+                    'ceilometer.openstack.common.db.sqlalchemy.session',
+                    group='database')
 
 
 def register_opts(conf):
@@ -52,7 +55,9 @@ def register_opts(conf):
 
 def get_engine(conf):
     """Load the configured engine and return an instance."""
-    engine_name = urlparse.urlparse(conf.database_connection).scheme
+    if conf.database_connection:
+        conf.database.connection = conf.database_connection
+    engine_name = urlparse.urlparse(conf.database.connection).scheme
     LOG.debug('looking for %r driver in %r',
               engine_name, STORAGE_ENGINE_NAMESPACE)
     mgr = driver.DriverManager(STORAGE_ENGINE_NAMESPACE,
