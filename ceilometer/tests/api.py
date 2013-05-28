@@ -95,36 +95,12 @@ class FunctionalTest(db_test_base.TestBase):
         root_dir = self.path_get()
 
         self.config = {
-
             'app': {
                 'root': 'ceilometer.api.controllers.root.RootController',
                 'modules': ['ceilometer.api'],
                 'static_root': '%s/public' % root_dir,
                 'template_path': '%s/ceilometer/api/templates' % root_dir,
                 'enable_acl': enable_acl,
-            },
-
-            'logging': {
-                'loggers': {
-                    'root': {'level': 'DEBUG', 'handlers': ['console']},
-                    'wsme': {'level': 'DEBUG', 'handlers': ['console']},
-                    'ceilometer': {'level': 'DEBUG',
-                                   'handlers': ['console'],
-                                   },
-                },
-                'handlers': {
-                    'console': {
-                        'level': 'DEBUG',
-                        'class': 'logging.StreamHandler',
-                        'formatter': 'simple'
-                    }
-                },
-                'formatters': {
-                    'simple': {
-                        'format': ('%(asctime)s %(levelname)-5.5s [%(name)s]'
-                                   '[%(threadName)s] %(message)s')
-                    }
-                },
             },
         }
 
