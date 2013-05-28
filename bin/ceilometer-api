@@ -18,6 +18,7 @@
 # under the License.
 """Set up the development API server.
 """
+import logging
 import os
 import sys
 from wsgiref import simple_server
@@ -28,6 +29,7 @@ from ceilometer.openstack.common import gettextutils
 gettextutils.install('ceilometer')
 
 from ceilometer.api import app
+from ceilometer.openstack.common import log
 from ceilometer import service
 
 
@@ -43,13 +45,16 @@ if __name__ == '__main__':
     host, port = '0.0.0.0', int(cfg.CONF.metering_api_port)
     srv = simple_server.make_server(host, port, root)
 
-    print 'Starting server in PID %s' % os.getpid()
+    LOG = log.getLogger(__name__)
+    LOG.info('Starting server in PID %s' % os.getpid())
+    LOG.info("Configuration:")
+    cfg.CONF.log_opt_values(LOG, logging.INFO)
 
     if host == '0.0.0.0':
-        print 'serving on 0.0.0.0:%s, view at http://127.0.0.1:%s' % \
-            (port, port)
+        LOG.info('serving on 0.0.0.0:%s, view at http://127.0.0.1:%s' %
+                 (port, port))
     else:
-        print "serving on http://%s:%s" % (host, port)
+        LOG.info("serving on http://%s:%s" % (host, port))
 
     try:
         srv.serve_forever()
