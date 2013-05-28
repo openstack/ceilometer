@@ -1,9 +1,7 @@
-#!/usr/bin/env bash
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
-# Copyright 2012 SINA Corporation
+# Copyright 2011 OpenStack Foundation.
 # All Rights Reserved.
-# Author: Zhongyue Luo <lzyeval@gmail.com>
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -17,9 +15,21 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-FILES=$(find ceilometer -type f -name "*.py" ! -path "ceilometer/tests/*" -exec \
-    grep -l "Opt(" {} \; | sort -u)
 
-PYTHONPATH=./:${PYTHONPATH} \
-    python $(dirname "$0")/../../ceilometer/openstack/common/config/generator.py ${FILES} > \
-    etc/ceilometer/ceilometer.conf.sample
+import errno
+import os
+
+
+def ensure_tree(path):
+    """Create a directory (and any ancestor directories required)
+
+    :param path: Directory to create
+    """
+    try:
+        os.makedirs(path)
+    except OSError as exc:
+        if exc.errno == errno.EEXIST:
+            if not os.path.isdir(path):
+                raise
+        else:
+            raise

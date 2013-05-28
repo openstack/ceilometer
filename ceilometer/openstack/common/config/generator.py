@@ -18,10 +18,8 @@
 #
 # @author: Zhongyue Luo, SINA Corporation.
 #
-
 """Extracts OpenStack config option info from module(s)."""
 
-import gettext
 import imp
 import os
 import re
@@ -31,9 +29,10 @@ import textwrap
 
 from oslo.config import cfg
 
+from ceilometer.openstack.common import gettextutils
 from ceilometer.openstack.common import importutils
 
-gettext.install('ceilometer', unicode=1)
+gettextutils.install('ceilometer')
 
 STROPT = "StrOpt"
 BOOLOPT = "BoolOpt"
@@ -61,7 +60,7 @@ BASEDIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 WORDWRAP_WIDTH = 60
 
 
-def main(srcfiles):
+def generate(srcfiles):
     mods_by_pkg = dict()
     for filepath in srcfiles:
         pkg_name = filepath.split(os.sep)[1]
@@ -107,16 +106,14 @@ def _import_module(mod_str):
             return sys.modules[mod_str[4:]]
         else:
             return importutils.import_module(mod_str)
-    except (ValueError, AttributeError), err:
-        return None
-    except ImportError, ie:
+    except ImportError as ie:
         sys.stderr.write("%s\n" % str(ie))
         return None
-    except Exception, e:
+    except Exception:
         return None
 
 
-def _is_in_group (opt, group):
+def _is_in_group(opt, group):
     "Check if opt is in group."
     for key, value in group._opts.items():
         if value['opt'] == opt:
@@ -135,7 +132,11 @@ def _guess_groups(opt, mod_obj):
             if _is_in_group(opt, value._group):
                 return value._group.name
 
-    raise RuntimeError("Unable to find group for option %s" % opt.name)
+    raise RuntimeError(
+        "Unable to find group for option %s, "
+        "maybe it's defined twice in the same group?"
+        % opt.name
+    )
 
 
 def _list_opts(obj):
@@ -193,7 +194,7 @@ def _sanitize_default(s):
     elif s == _get_my_ip():
         return '10.0.0.1'
     elif s == socket.getfqdn():
-        return 'nova'
+        return 'ceilometer'
     elif s.strip() != s:
         return '"%s"' % s
     return s
@@ -242,8 +243,11 @@ def _print_opt(opt):
         sys.exit(1)
 
 
-if __name__ == '__main__':
+def main():
     if len(sys.argv) < 2:
-        print "usage: python %s [srcfile]...\n" % sys.argv[0]
+        print "usage: %s [srcfile]...\n" % sys.argv[0]
         sys.exit(0)
-    main(sys.argv[1:])
+    generate(sys.argv[1:])
+
+if __name__ == '__main__':
+    main()

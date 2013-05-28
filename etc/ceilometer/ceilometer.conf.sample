@@ -143,47 +143,11 @@
 # Options defined in ceilometer.openstack.common.db.sqlalchemy.session
 #
 
-# The SQLAlchemy connection string used to connect to the
-# database (string value)
-#sql_connection=sqlite:////ceilometer/openstack/common/db/$sqlite_db
-
 # the filename to use with sqlite (string value)
 #sqlite_db=ceilometer.sqlite
 
-# timeout before idle sql connections are reaped (integer
-# value)
-#sql_idle_timeout=3600
-
-# If passed, use synchronous mode for sqlite (boolean value)
+# If true, use synchronous mode for sqlite (boolean value)
 #sqlite_synchronous=true
-
-# Minimum number of SQL connections to keep open in a pool
-# (integer value)
-#sql_min_pool_size=1
-
-# Maximum number of SQL connections to keep open in a pool
-# (integer value)
-#sql_max_pool_size=5
-
-# maximum db connection retries during startup. (setting -1
-# implies an infinite retry count) (integer value)
-#sql_max_retries=10
-
-# interval between retries of opening a sql connection
-# (integer value)
-#sql_retry_interval=10
-
-# If set, use this value for max_overflow with sqlalchemy
-# (integer value)
-#sql_max_overflow=<None>
-
-# Verbosity of SQL debugging information. 0=None,
-# 100=Everything (integer value)
-#sql_connection_debug=0
-
-# Add python stack traces to SQL as comment strings (boolean
-# value)
-#sql_connection_trace=false
 
 
 #
@@ -192,6 +156,18 @@
 
 # port for eventlet backdoor to listen (integer value)
 #backdoor_port=<None>
+
+
+#
+# Options defined in ceilometer.openstack.common.lockutils
+#
+
+# Whether to disable inter-process locks (boolean value)
+#disable_process_locking=false
+
+# Directory to use for lock files. Default to a temp directory
+# (string value)
+#lock_path=<None>
 
 
 #
@@ -250,9 +226,11 @@
 #log_config=<None>
 
 # A logging.Formatter log message format string which may use
-# any of the available logging.LogRecord attributes. Default:
-# %(default)s (string value)
-#log_format=%(asctime)s %(levelname)8s [%(name)s] %(message)s
+# any of the available logging.LogRecord attributes. This
+# option is deprecated.  Please use
+# logging_context_format_string and
+# logging_default_format_string instead. (string value)
+#log_format=<None>
 
 # Format string for %%(asctime)s in log records. Default:
 # %(default)s (string value)
@@ -474,15 +452,12 @@
 # Name of this node. Must be a valid hostname, FQDN, or IP
 # address. Must match "host" option, if running Nova. (string
 # value)
-#rpc_zmq_host=nova
+#rpc_zmq_host=dex
 
 
 #
 # Options defined in ceilometer.openstack.common.rpc.matchmaker
 #
-
-# Matchmaker ring file (JSON) (string value)
-#matchmaker_ringfile=/etc/nova/matchmaker_ring.json
 
 # Heartbeat frequency (integer value)
 #matchmaker_heartbeat_freq=300
@@ -527,6 +502,61 @@
 
 # The port to send UDP meters to. (integer value)
 #port=4952
+
+
+[database]
+
+#
+# Options defined in ceilometer.openstack.common.db.api
+#
+
+# The backend to use for db (string value)
+#backend=sqlalchemy
+
+# Enable the experimental use of thread pooling for all DB API
+# calls (boolean value)
+#use_tpool=false
+
+
+#
+# Options defined in ceilometer.openstack.common.db.sqlalchemy.session
+#
+
+# The SQLAlchemy connection string used to connect to the
+# database (string value)
+#connection=sqlite:////common/db/$sqlite_db
+
+# timeout before idle sql connections are reaped (integer
+# value)
+#idle_timeout=3600
+
+# Minimum number of SQL connections to keep open in a pool
+# (integer value)
+#min_pool_size=1
+
+# Maximum number of SQL connections to keep open in a pool
+# (integer value)
+#max_pool_size=5
+
+# maximum db connection retries during startup. (setting -1
+# implies an infinite retry count) (integer value)
+#max_retries=10
+
+# interval between retries of opening a sql connection
+# (integer value)
+#retry_interval=10
+
+# If set, use this value for max_overflow with sqlalchemy
+# (integer value)
+#max_overflow=<None>
+
+# Verbosity of SQL debugging information. 0=None,
+# 100=Everything (integer value)
+#connection_debug=0
+
+# Add python stack traces to SQL as comment strings (boolean
+# value)
+#connection_trace=false
 
 
 [publisher_meter]
@@ -586,4 +616,14 @@
 #udp_port=4952
 
 
-# Total option count: 115
+[matchmaker_ring]
+
+#
+# Options defined in ceilometer.openstack.common.rpc.matchmaker_ring
+#
+
+# Matchmaker ring file (JSON) (string value)
+#ringfile=/etc/oslo/matchmaker_ring.json
+
+
+# Total option count: 119

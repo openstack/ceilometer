@@ -43,12 +43,11 @@ import traceback
 from oslo.config import cfg
 
 from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common import importutils
 from ceilometer.openstack.common import jsonutils
 from ceilometer.openstack.common import local
-from ceilometer.openstack.common import notifier
 
 
-_DEFAULT_LOG_FORMAT = "%(asctime)s %(levelname)8s [%(name)s] %(message)s"
 _DEFAULT_LOG_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 common_cli_opts = [
@@ -73,11 +72,13 @@ logging_cli_opts = [
                     'documentation for details on logging configuration '
                     'files.'),
     cfg.StrOpt('log-format',
-               default=_DEFAULT_LOG_FORMAT,
+               default=None,
                metavar='FORMAT',
                help='A logging.Formatter log message format string which may '
                     'use any of the available logging.LogRecord attributes. '
-                    'Default: %(default)s'),
+                    'This option is deprecated.  Please use '
+                    'logging_context_format_string and '
+                    'logging_default_format_string instead.'),
     cfg.StrOpt('log-date-format',
                default=_DEFAULT_LOG_DATE_FORMAT,
                metavar='DATE_FORMAT',
@@ -321,17 +322,6 @@ class JSONFormatter(logging.Formatter):
         return jsonutils.dumps(message)
 
 
-class PublishErrorsHandler(logging.Handler):
-    def emit(self, record):
-        if ('ceilometer.openstack.common.notifier.log_notifier' in
-                CONF.notification_driver):
-            return
-        notifier.api.notify(None, 'error.publisher',
-                            'error_notification',
-                            notifier.api.ERROR,
-                            dict(error=record.msg))
-
-
 def _create_logging_excepthook(product_name):
     def logging_excepthook(type, value, tb):
         extra = {}
@@ -427,15 +417,22 @@ def _setup_logging_from_conf():
         log_root.addHandler(streamlog)
 
     if CONF.publish_errors:
-        log_root.addHandler(PublishErrorsHandler(logging.ERROR))
+        handler = importutils.import_object(
+            "ceilometer.openstack.common.log_handler.PublishErrorsHandler",
+            logging.ERROR)
+        log_root.addHandler(handler)
 
+    datefmt = CONF.log_date_format
     for handler in log_root.handlers:
-        datefmt = CONF.log_date_format
+        # NOTE(alaski): CONF.log_format overrides everything currently.  This
+        # should be deprecated in favor of context aware formatting.
         if CONF.log_format:
             handler.setFormatter(logging.Formatter(fmt=CONF.log_format,
                                                    datefmt=datefmt))
+            log_root.info('Deprecated: log_format is now deprecated and will '
+                          'be removed in the next release')
         else:
-            handler.setFormatter(LegacyFormatter(datefmt=datefmt))
+            handler.setFormatter(ContextFormatter(datefmt=datefmt))
 
     if CONF.debug:
         log_root.setLevel(logging.DEBUG)
@@ -481,7 +478,7 @@ class WritableLogger(object):
         self.logger.log(self.level, msg)
 
 
-class LegacyFormatter(logging.Formatter):
+class ContextFormatter(logging.Formatter):
     """A context.RequestContext aware formatter configured through flags.
 
     The flags used to set format strings are: logging_context_format_string
