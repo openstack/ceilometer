@@ -231,3 +231,12 @@ class CollectorService(rpc_service.Service):
                 LOG.warning(
                     'message signature invalid, discarding message: %r',
                     meter)
+
+
+def collector():
+    # TODO(jd) move into prepare_service gettextutils and eventlet?
+    eventlet.monkey_patch()
+    gettextutils.install('ceilometer')
+    prepare_service(sys.argv)
+    os_service.launch(CollectorService(cfg.CONF.host,
+                                       'ceilometer.collector')).wait()

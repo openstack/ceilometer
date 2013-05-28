@@ -115,7 +115,7 @@ Installing the Collector
 
    ::
 
-     $ ./bin/ceilometer-collector
+     $ ceilometer-collector
 
    .. note:: 
 
