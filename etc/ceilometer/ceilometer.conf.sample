@@ -49,14 +49,6 @@
 
 
 #
-# Options defined in ceilometer.api
-#
-
-# The port for the ceilometer API server (integer value)
-#metering_api_port=8777
-
-
-#
 # Options defined in ceilometer.api.app
 #
 
@@ -513,6 +505,19 @@
 
 # Exchange name for Cinder notifications (string value)
 #cinder_control_exchange=cinder
+
+
+[api]
+
+#
+# Options defined in ceilometer.api
+#
+
+# The port for the ceilometer API server (integer value)
+#port=8777
+
+# The listen IP for the ceilometer API server (string value)
+#host=0.0.0.0
 
 
 [publisher_udp]

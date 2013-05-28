@@ -42,7 +42,7 @@ if __name__ == '__main__':
     root = app.VersionSelectorApplication()
 
     # Create the WSGI server and start it
-    host, port = '0.0.0.0', int(cfg.CONF.metering_api_port)
+    host, port = cfg.CONF.api.host, cfg.CONF.api.port
     srv = simple_server.make_server(host, port, root)
 
     LOG = log.getLogger(__name__)

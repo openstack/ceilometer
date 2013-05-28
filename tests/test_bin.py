@@ -73,8 +73,6 @@ class BinApiTestCase(base.TestCase):
         with open(self.tempfile, 'w') as tmp:
             tmp.write("[DEFAULT]\n")
             tmp.write(
-                "metering_api_port=%s\n" % self.api_port)
-            tmp.write(
                 "rpc_backend=ceilometer.openstack.common.rpc.impl_fake\n")
             tmp.write("database_connection=log://localhost\n")
             tmp.write(
@@ -85,6 +83,9 @@ class BinApiTestCase(base.TestCase):
                 "pipeline_cfg_file=%s\n" % pipeline_cfg_file)
             tmp.write(
                 "policy_file=%s\n" % policy_file)
+            tmp.write("[api]\n")
+            tmp.write(
+                "port=%s\n" % self.api_port)
         self.subp = subprocess.Popen([self.path_get('bin/ceilometer-api'),
                                       "--config-file=%s" % self.tempfile])
 
