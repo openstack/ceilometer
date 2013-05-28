@@ -34,6 +34,7 @@ STORAGE_ENGINE_NAMESPACE = 'ceilometer.storage'
 
 STORAGE_OPTS = [
     cfg.StrOpt('database_connection',
+               secret=True,
                default='mongodb://localhost:27017/ceilometer',
                help='Database connection string',
                ),

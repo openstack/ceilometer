@@ -46,6 +46,7 @@ CLI_OPTIONS = [
                default=os.environ.get('OS_USERNAME', 'ceilometer'),
                help='Username to use for openstack service access'),
     cfg.StrOpt('os-password',
+               secret=True,
                default=os.environ.get('OS_PASSWORD', 'admin'),
                help='Password to use for openstack service access'),
     cfg.StrOpt('os-tenant-id',

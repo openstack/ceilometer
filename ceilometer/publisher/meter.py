@@ -40,6 +40,7 @@ METER_PUBLISH_OPTS = [
                deprecated_group="DEFAULT",
                ),
     cfg.StrOpt('metering_secret',
+               secret=True,
                default='change this or be hacked',
                help='Secret value for signing metering messages',
                deprecated_group="DEFAULT",
