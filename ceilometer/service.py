@@ -41,24 +41,29 @@ cfg.CONF.register_opts([
 
 CLI_OPTIONS = [
     cfg.StrOpt('os-username',
+               deprecated_group="DEFAULT",
                default=os.environ.get('OS_USERNAME', 'ceilometer'),
                help='Username to use for openstack service access'),
     cfg.StrOpt('os-password',
+               deprecated_group="DEFAULT",
                secret=True,
                default=os.environ.get('OS_PASSWORD', 'admin'),
                help='Password to use for openstack service access'),
     cfg.StrOpt('os-tenant-id',
+               deprecated_group="DEFAULT",
                default=os.environ.get('OS_TENANT_ID', ''),
                help='Tenant ID to use for openstack service access'),
     cfg.StrOpt('os-tenant-name',
+               deprecated_group="DEFAULT",
                default=os.environ.get('OS_TENANT_NAME', 'admin'),
                help='Tenant name to use for openstack service access'),
     cfg.StrOpt('os-auth-url',
+               deprecated_group="DEFAULT",
                default=os.environ.get('OS_AUTH_URL',
                                       'http://localhost:5000/v2.0'),
                help='Auth URL to use for openstack service access'),
 ]
-cfg.CONF.register_cli_opts(CLI_OPTIONS)
+cfg.CONF.register_cli_opts(CLI_OPTIONS, group="service_credentials")
 
 
 def _sanitize_cmd_line(argv):

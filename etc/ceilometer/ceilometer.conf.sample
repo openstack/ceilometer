@@ -28,27 +28,6 @@
 
 
 #
-# Options defined in ceilometer.service
-#
-
-# Username to use for openstack service access (string value)
-#os_username=ceilometer
-
-# Password to use for openstack service access (string value)
-#os_password=admin
-
-# Tenant ID to use for openstack service access (string value)
-#os_tenant_id=
-
-# Tenant name to use for openstack service access (string
-# value)
-#os_tenant_name=admin
-
-# Auth URL to use for openstack service access (string value)
-#os_auth_url=http://localhost:5000/v2.0
-
-
-#
 # Options defined in ceilometer.api.app
 #
 
@@ -444,7 +423,7 @@
 # Name of this node. Must be a valid hostname, FQDN, or IP
 # address. Must match "host" option, if running Nova. (string
 # value)
-#rpc_zmq_host=ceilometer
+#rpc_zmq_host=dex
 
 
 #
@@ -588,20 +567,27 @@
 #host=0.0.0.0
 
 
-[matchmaker_redis]
+[service_credentials]
 
 #
-# Options defined in ceilometer.openstack.common.rpc.matchmaker_redis
+# Options defined in ceilometer.service
 #
 
-# Host to locate redis (string value)
-#host=127.0.0.1
+# Username to use for openstack service access (string value)
+#os_username=ceilometer
 
-# Use this port to connect to redis host. (integer value)
-#port=6379
+# Password to use for openstack service access (string value)
+#os_password=admin
 
-# Password for Redis server. (optional) (string value)
-#password=<None>
+# Tenant ID to use for openstack service access (string value)
+#os_tenant_id=
+
+# Tenant name to use for openstack service access (string
+# value)
+#os_tenant_name=admin
+
+# Auth URL to use for openstack service access (string value)
+#os_auth_url=http://localhost:5000/v2.0
 
 
 [collector]
@@ -629,6 +615,22 @@
 
 # Matchmaker ring file (JSON) (string value)
 #ringfile=/etc/oslo/matchmaker_ring.json
+
+
+[matchmaker_redis]
+
+#
+# Options defined in ceilometer.openstack.common.rpc.matchmaker_redis
+#
+
+# Host to locate redis (string value)
+#host=127.0.0.1
+
+# Use this port to connect to redis host. (integer value)
+#port=6379
+
+# Password for Redis server. (optional) (string value)
+#password=<None>
 
 
 # Total option count: 120

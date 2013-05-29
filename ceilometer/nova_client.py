@@ -42,13 +42,14 @@ class Client(object):
 
     def __init__(self):
         """Returns a nova Client object."""
-        conf = cfg.CONF
+        conf = cfg.CONF.service_credentials
         tenant = conf.os_tenant_id and conf.os_tenant_id or conf.os_tenant_name
-        self.nova_client = nova_client.Client(username=cfg.CONF.os_username,
-                                              api_key=cfg.CONF.os_password,
-                                              project_id=tenant,
-                                              auth_url=cfg.CONF.os_auth_url,
-                                              no_cache=True)
+        self.nova_client = nova_client.Client(
+            username=cfg.CONF.service_credentials.os_username,
+            api_key=cfg.CONF.service_credentials.os_password,
+            project_id=tenant,
+            auth_url=cfg.CONF.service_credentials.os_auth_url,
+            no_cache=True)
 
     def _with_flavor(self, instances):
         flavors = dict((f.id, f) for f in self.nova_client.flavors.list())

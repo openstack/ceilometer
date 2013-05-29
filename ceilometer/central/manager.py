@@ -69,10 +69,10 @@ class AgentManager(agent.AgentManager):
 
     def interval_task(self, task):
         self.keystone = ksclient.Client(
-            username=cfg.CONF.os_username,
-            password=cfg.CONF.os_password,
-            tenant_id=cfg.CONF.os_tenant_id,
-            tenant_name=cfg.CONF.os_tenant_name,
-            auth_url=cfg.CONF.os_auth_url)
+            username=cfg.CONF.service_credentials.os_username,
+            password=cfg.CONF.service_credentials.os_password,
+            tenant_id=cfg.CONF.service_credentials.os_tenant_id,
+            tenant_name=cfg.CONF.service_credentials.os_tenant_name,
+            auth_url=cfg.CONF.service_credentials.os_auth_url)
 
         super(AgentManager, self).interval_task(task)

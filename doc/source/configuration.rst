@@ -40,17 +40,29 @@ metering_topic                   metering                              the topic
 counter_source                   openstack                             The source name of emited counters
 control_exchange                 ceilometer                            AMQP exchange to connect to if using RabbitMQ or Qpid
 periodic_interval                600                                   seconds between running periodic tasks
-os_username                      ceilometer                            Username to use for openstack service access
-os_password                      admin                                 Password to use for openstack service access
-os_tenant_id                                                           Tenant ID to use for openstack service access
-os_tenant_name                   admin                                 Tenant name to use for openstack service access
-os_auth_url                      http://localhost:5000/v2.0            Auth URL to use for openstack service access
 database_connection              mongodb://localhost:27017/ceilometer  Database connection string
 metering_api_port                8777                                  The port for the ceilometer API server
 disabled_central_pollsters                                             List of central pollsters to skip loading
 disabled_compute_pollsters                                             List of compute pollsters to skip loading
 disabled_notification_listeners                                        List of notification listeners to skip loading
 reseller_prefix                  AUTH\_                                Prefix used by swift for reseller token
+===============================  ====================================  ==============================================================
+
+Service polling authentication
+==============================
+
+The following options must be placed into a [service_credentials] sections
+and will be used by Ceilometer to retrieve information from OpenStack
+components.
+
+===============================  ====================================  ==============================================================
+Parameter                        Default                               Note
+===============================  ====================================  ==============================================================
+os_username                      ceilometer                            Username to use for openstack service access
+os_password                      admin                                 Password to use for openstack service access
+os_tenant_id                                                           Tenant ID to use for openstack service access
+os_tenant_name                   admin                                 Tenant name to use for openstack service access
+os_auth_url                      http://localhost:5000/v2.0            Auth URL to use for openstack service access
 ===============================  ====================================  ==============================================================
 
 Keystone Middleware Authentication
