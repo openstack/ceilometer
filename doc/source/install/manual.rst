@@ -274,7 +274,7 @@ Installing the Central Agent
 
    ::
 
-    $ ./bin/ceilometer-agent-central
+    $ ceilometer-agent-central
 
 
 Installing the API Server

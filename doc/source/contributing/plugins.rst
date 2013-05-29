@@ -36,12 +36,10 @@ the computeagent loads all plugins defined in the namespace
 ``ceilometer.poll.compute``, then periodically calls their
 :func:`get_counters` method.
 
-The central agent polls other types of resources from a management
-server.  The central agent is defined in
-``bin/ceilometer-agent-central`` and
-``ceilometer/central/manager.py``. It loads plugins from the
-``ceilometer.poll.central`` namespace and polls them by calling their
-:func:`get_counters` method.
+The central agent polls other types of resources from a management server.
+The central agent is defined in ``ceilometer/central/manager.py``. It loads
+plugins from the ``ceilometer.poll.central`` namespace and polls them by
+calling their :func:`get_counters` method.
 
 Plugins
 =======
