@@ -200,7 +200,7 @@ Installing the Compute Agent
 
    ::
 
-     $ ./bin/ceilometer-agent-compute
+     $ ceilometer-agent-compute
 
    .. note::
 
