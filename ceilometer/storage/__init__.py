@@ -23,9 +23,12 @@ import urlparse
 
 from oslo.config import cfg
 from stevedore import driver
+import sys
 
+from ceilometer.openstack.common import gettextutils
 from ceilometer.openstack.common import log
 from ceilometer import utils
+from ceilometer import service
 
 
 LOG = log.getLogger(__name__)
@@ -118,3 +121,9 @@ class EventFilter(object):
         self.end = utils.sanitize_timestamp(end)
         self.event_name = event_name
         self.traits = traits
+
+
+def dbsync():
+    gettextutils.install('ceilometer')
+    service.prepare_service(sys.argv)
+    get_connection(cfg.CONF).upgrade()

@@ -36,7 +36,7 @@ class BinDbsyncTestCase(base.TestCase):
             tmp.write("connection=log://localhost\n")
 
     def test_dbsync_run(self):
-        subp = subprocess.Popen([self.path_get('bin/ceilometer-dbsync'),
+        subp = subprocess.Popen(['ceilometer-dbsync',
                                  "--config-file=%s" % self.tempfile])
         self.assertEqual(subp.wait(), 0)
 
