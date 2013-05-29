@@ -22,7 +22,6 @@ from oslo.config import cfg
 from ceilometer import agent
 from ceilometer import extension_manager
 from ceilometer.openstack.common import log
-from ceilometer import service  # For cfg.CONF.os_*
 
 OPTS = [
     cfg.ListOpt('disabled_central_pollsters',
@@ -32,7 +31,7 @@ OPTS = [
 ]
 
 cfg.CONF.register_opts(OPTS)
-
+cfg.CONF.import_group('service_credentials', 'ceilometer.service')
 
 LOG = log.getLogger(__name__)
 
