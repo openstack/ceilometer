@@ -34,11 +34,19 @@ class TestListEvents(list_events.TestListEvents):
     database_connection = 'hbase://__test__'
 
 
+class TestListEventsMetaQuery(list_events.TestListEventsMetaquery):
+    database_connection = 'hbase://__test__'
+
+
 class TestListEmptyMeters(list_meters.TestListEmptyMeters):
     database_connection = 'hbase://__test__'
 
 
 class TestListMeters(list_meters.TestListMeters):
+    database_connection = 'hbase://__test__'
+
+
+class TestListMetersMetaquery(list_meters.TestListMetersMetaquery):
     database_connection = 'hbase://__test__'
 
 
@@ -67,6 +75,10 @@ class TestListEmptyResources(list_resources.TestListEmptyResources):
 
 
 class TestListResources(list_resources.TestListResources):
+    database_connection = 'hbase://__test__'
+
+
+class TestListResourcesMetaquery(list_resources.TestListResourcesMetaquery):
     database_connection = 'hbase://__test__'
 
 
