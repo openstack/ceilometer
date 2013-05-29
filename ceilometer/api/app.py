@@ -16,14 +16,22 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import logging
+import os
 from oslo.config import cfg
 import pecan
+import sys
 
 from ceilometer.api import acl
 from ceilometer.api import config as api_config
 from ceilometer.api import hooks
 from ceilometer.api import middleware
+from ceilometer import service
+from ceilometer.openstack.common import log
+from wsgiref import simple_server
+from ceilometer.openstack.common import gettextutils
 
+LOG = log.getLogger(__name__)
 
 auth_opts = [
     cfg.StrOpt('auth_strategy',
@@ -91,3 +99,27 @@ class VersionSelectorApplication(object):
         if environ['PATH_INFO'].startswith('/v1/'):
             return self.v1(environ, start_response)
         return self.v2(environ, start_response)
+
+
+def start():
+    gettextutils.install('ceilometer')
+    service.prepare_service(sys.argv)
+
+    # Build the WSGI app
+    root = VersionSelectorApplication()
+
+    # Create the WSGI server and start it
+    host, port = cfg.CONF.api.host, cfg.CONF.api.port
+    srv = simple_server.make_server(host, port, root)
+
+    LOG.info('Starting server in PID %s' % os.getpid())
+    LOG.info("Configuration:")
+    cfg.CONF.log_opt_values(LOG, logging.INFO)
+
+    if host == '0.0.0.0':
+        LOG.info('serving on 0.0.0.0:%s, view at http://127.0.0.1:%s' %
+                 (port, port))
+    else:
+        LOG.info("serving on http://%s:%s" % (host, port))
+
+    srv.serve_forever()

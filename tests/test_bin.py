@@ -87,7 +87,7 @@ class BinApiTestCase(base.TestCase):
                 "port=%s\n" % self.api_port)
             tmp.write("[database]\n")
             tmp.write("connection=log://localhost\n")
-        self.subp = subprocess.Popen([self.path_get('bin/ceilometer-api'),
+        self.subp = subprocess.Popen(['ceilometer-api',
                                       "--config-file=%s" % self.tempfile])
 
     def tearDown(self):
