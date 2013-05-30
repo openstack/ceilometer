@@ -110,6 +110,7 @@ class TestNovaNotifier(base.TestCase):
                          "root_gb": "20",
                          "ephemeral_gb": "0",
                          "vcpus": 1,
+                         'node': "fakenode",
                          "host": "fakehost",
                          "availability_zone":
                          "1e3ce043029547f1a61c1996d1a531a4",
