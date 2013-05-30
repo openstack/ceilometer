@@ -42,3 +42,4 @@ def downgrade(migrate_engine):
         sql += "SET foreign_key_checks = 1;"
         sql += "ALTER DATABASE %s DEFAULT CHARACTER SET latin1;" \
             % migrate_engine.url.database
+        migrate_engine.execute(sql)
