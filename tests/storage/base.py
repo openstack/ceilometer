@@ -41,6 +41,17 @@ class DBTestBase(test_db.TestBase):
         self.prepare_data()
 
     def prepare_data(self):
+        original_timestamps = [(2012, 7, 2, 10, 40), (2012, 7, 2, 10, 41),
+                               (2012, 7, 2, 10, 41), (2012, 7, 2, 10, 42),
+                               (2012, 7, 2, 10, 43)]
+        timestamps_for_test_samples_default_order = [(2012, 7, 2, 10, 44),
+                                                     (2011, 5, 30, 18, 3),
+                                                     (2012, 12, 1, 1, 25),
+                                                     (2012, 2, 29, 6, 59),
+                                                     (2013, 5, 31, 23, 7)]
+        timestamp_list = (original_timestamps +
+                          timestamps_for_test_samples_default_order)
+
         self.msgs = []
         self.counter = counter.Counter(
             'instance',
@@ -50,7 +61,7 @@ class DBTestBase(test_db.TestBase):
             user_id='user-id',
             project_id='project-id',
             resource_id='resource-id',
-            timestamp=datetime.datetime(2012, 7, 2, 10, 40),
+            timestamp=datetime.datetime(*timestamp_list[0]),
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter',
                                }
@@ -71,7 +82,7 @@ class DBTestBase(test_db.TestBase):
             user_id='user-id',
             project_id='project-id',
             resource_id='resource-id-alternate',
-            timestamp=datetime.datetime(2012, 7, 2, 10, 41),
+            timestamp=datetime.datetime(*timestamp_list[1]),
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter2',
                                }
@@ -92,7 +103,7 @@ class DBTestBase(test_db.TestBase):
             user_id='user-id-alternate',
             project_id='project-id',
             resource_id='resource-id-alternate',
-            timestamp=datetime.datetime(2012, 7, 2, 10, 41),
+            timestamp=datetime.datetime(*timestamp_list[2]),
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter3',
                                }
@@ -105,7 +116,11 @@ class DBTestBase(test_db.TestBase):
         self.conn.record_metering_data(self.msg3)
         self.msgs.append(self.msg3)
 
-        for i in range(2, 4):
+        start_idx = 3
+        end_idx = len(timestamp_list)
+
+        for i, ts in zip(range(start_idx - 1, end_idx - 1),
+                         timestamp_list[start_idx:end_idx]):
             c = counter.Counter(
                 'instance',
                 counter.TYPE_CUMULATIVE,
@@ -114,7 +129,7 @@ class DBTestBase(test_db.TestBase):
                 user_id='user-id-%s' % i,
                 project_id='project-id-%s' % i,
                 resource_id='resource-id-%s' % i,
-                timestamp=datetime.datetime(2012, 7, 2, 10, 40 + i),
+                timestamp=datetime.datetime(*ts),
                 resource_metadata={'display_name': 'test-server',
                                    'tag': 'counter-%s' % i},
             )
@@ -131,11 +146,10 @@ class UserTest(DBTestBase):
 
     def test_get_users(self):
         users = self.conn.get_users()
-        assert set(users) == set(['user-id',
-                                  'user-id-alternate',
-                                  'user-id-2',
-                                  'user-id-3',
-                                  ])
+        expected = set(['user-id', 'user-id-alternate', 'user-id-2',
+                        'user-id-3', 'user-id-4', 'user-id-5', 'user-id-6',
+                        'user-id-7', 'user-id-8'])
+        self.assertEqual(set(users), expected)
 
     def test_get_users_by_source(self):
         users = self.conn.get_users(source='test-1')
@@ -146,8 +160,10 @@ class ProjectTest(DBTestBase):
 
     def test_get_projects(self):
         projects = self.conn.get_projects()
-        expected = set(['project-id', 'project-id-2', 'project-id-3'])
-        assert set(projects) == expected
+        expected = set(['project-id', 'project-id-2', 'project-id-3',
+                        'project-id-4', 'project-id-5', 'project-id-6',
+                        'project-id-7', 'project-id-8'])
+        self.assertEqual(set(projects), expected)
 
     def test_get_projects_by_source(self):
         projects = self.conn.get_projects(source='test-1')
@@ -160,7 +176,7 @@ class ResourceTest(DBTestBase):
     def test_get_resources(self):
         msgs_sources = [msg['source'] for msg in self.msgs]
         resources = list(self.conn.get_resources())
-        assert len(resources) == 4
+        self.assertEqual(len(resources), 9)
         for resource in resources:
             if resource.resource_id != 'resource-id':
                 continue
@@ -179,15 +195,17 @@ class ResourceTest(DBTestBase):
         timestamp = datetime.datetime(2012, 7, 2, 10, 42)
         resources = list(self.conn.get_resources(start_timestamp=timestamp))
         resource_ids = [r.resource_id for r in resources]
-        expected = set(['resource-id-2', 'resource-id-3'])
-        assert set(resource_ids) == expected
+        expected = set(['resource-id-2', 'resource-id-3', 'resource-id-4',
+                        'resource-id-6', 'resource-id-8'])
+        self.assertEqual(set(resource_ids), expected)
 
     def test_get_resources_end_timestamp(self):
         timestamp = datetime.datetime(2012, 7, 2, 10, 42)
         resources = list(self.conn.get_resources(end_timestamp=timestamp))
         resource_ids = [r.resource_id for r in resources]
-        expected = set(['resource-id', 'resource-id-alternate'])
-        assert set(resource_ids) == expected
+        expected = set(['resource-id', 'resource-id-alternate',
+                        'resource-id-5', 'resource-id-7'])
+        self.assertEqual(set(resource_ids), expected)
 
     def test_get_resources_both_timestamps(self):
         start_ts = datetime.datetime(2012, 7, 2, 10, 42)
@@ -220,7 +238,7 @@ class ResourceTest(DBTestBase):
         got_not_imp = False
         try:
             resources = list(self.conn.get_resources(metaquery=q))
-            assert len(resources) == 4
+            self.assertEqual(len(resources), 9)
         except NotImplementedError:
             got_not_imp = True
             self.assertTrue(got_not_imp)
@@ -233,7 +251,7 @@ class ResourceTest(DBTestBase):
 
     def test_get_resources_by_empty_metaquery(self):
         resources = list(self.conn.get_resources(metaquery={}))
-        self.assertTrue(len(resources) == 4)
+        self.assertEqual(len(resources), 9)
 
 
 class MeterTest(DBTestBase):
@@ -241,7 +259,7 @@ class MeterTest(DBTestBase):
     def test_get_meters(self):
         msgs_sources = [msg['source'] for msg in self.msgs]
         results = list(self.conn.get_meters())
-        assert len(results) == 4
+        self.assertEqual(len(results), 9)
         for meter in results:
             self.assertIn(meter.source, msgs_sources)
 
@@ -259,14 +277,14 @@ class MeterTest(DBTestBase):
         try:
             results = list(self.conn.get_meters(metaquery=q))
             assert results
-            assert len(results) == 4
+            self.assertEqual(len(results), 9)
         except NotImplementedError:
             got_not_imp = True
             self.assertTrue(got_not_imp)
 
     def test_get_meters_by_empty_metaquery(self):
         results = list(self.conn.get_meters(metaquery={}))
-        self.assertTrue(len(results) == 4)
+        self.assertEqual(len(results), 9)
 
 
 class RawSampleTest(DBTestBase):
@@ -280,6 +298,14 @@ class RawSampleTest(DBTestBase):
         f = storage.SampleFilter()
         results = list(self.conn.get_samples(f, limit=3))
         self.assertEqual(len(results), 3)
+
+    def test_get_samples_in_default_order(self):
+        f = storage.SampleFilter()
+        prev_timestamp = None
+        for sample in self.conn.get_samples(f):
+            if prev_timestamp is not None:
+                self.assertTrue(prev_timestamp >= sample.timestamp)
+            prev_timestamp = sample.timestamp
 
     def test_get_samples_by_user(self):
         f = storage.SampleFilter(user='user-id')
