@@ -20,7 +20,8 @@ from novaclient.v1_1 import client as nova_client
 from oslo.config import cfg
 
 from ceilometer.openstack.common import log
-from ceilometer import service  # For cfg.CONF.os_*
+
+cfg.CONF.import_group('service_credentials', 'ceilometer.service')
 
 LOG = log.getLogger(__name__)
 

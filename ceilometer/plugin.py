@@ -20,6 +20,11 @@
 
 import abc
 import collections
+from oslo.config import cfg
+
+# Import this option so every Notification plugin can use it freely.
+cfg.CONF.import_opt('notification_topics',
+                    'ceilometer.openstack.common.notifier.rpc_notifier')
 
 
 ExchangeTopics = collections.namedtuple('ExchangeTopics',

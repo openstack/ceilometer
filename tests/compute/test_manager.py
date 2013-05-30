@@ -17,20 +17,10 @@
 # under the License.
 """Tests for ceilometer/agent/manager.py
 """
-
-import datetime
-
 import mock
-from oslo.config import cfg
-from stevedore import extension
-from stevedore.tests import manager as extension_tests
-from stevedore import dispatch
 
 from ceilometer import nova_client
 from ceilometer.compute import manager
-from ceilometer import counter
-from ceilometer import pipeline
-from ceilometer.tests import base
 
 from tests import agentbase
 

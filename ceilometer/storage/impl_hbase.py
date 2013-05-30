@@ -27,7 +27,6 @@ import datetime
 import happybase
 import os
 import re
-from collections import defaultdict
 
 from oslo.config import cfg
 

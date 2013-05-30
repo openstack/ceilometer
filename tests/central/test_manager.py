@@ -18,15 +18,9 @@
 """Tests for ceilometer/central/manager.py
 """
 
-import datetime
-
 import mock
-from oslo.config import cfg
-from stevedore import extension
 
 from ceilometer.central import manager
-from ceilometer import counter
-from ceilometer.tests import base
 from keystoneclient.v2_0 import client as ksclient
 
 from tests import agentbase
