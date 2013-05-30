@@ -23,4 +23,4 @@ from ceilometer.tests import base
 
 class ServiceTestCase(base.TestCase):
     def test_prepare_service(self):
-        service.prepare_service()
+        service.prepare_service([])

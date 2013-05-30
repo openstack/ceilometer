@@ -26,9 +26,6 @@ import sys
 from oslo.config import cfg
 from stevedore import dispatch
 
-from ceilometer.openstack.common import gettextutils
-gettextutils.install('ceilometer')
-
 from ceilometer import counter
 from ceilometer import pipeline
 from ceilometer import publisher
@@ -75,7 +72,7 @@ cfg.CONF.register_cli_opts([
                help='counter metadata'),
 ])
 
-service.prepare_service(sys.argv)
+service.prepare_service()
 
 # Set up logging to use the console
 console = logging.StreamHandler(sys.stderr)

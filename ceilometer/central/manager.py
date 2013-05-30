@@ -16,14 +16,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import eventlet
 from keystoneclient.v2_0 import client as ksclient
 from oslo.config import cfg
-import sys
 
 from ceilometer import agent
 from ceilometer import extension_manager
-from ceilometer.openstack.common import gettextutils
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import service as os_service
 from ceilometer.openstack.common.rpc import service as rpc_service
@@ -84,10 +81,7 @@ class AgentManager(agent.AgentManager):
 
 
 def agent_central():
-    # TODO(jd) move into prepare_service gettextutils and eventlet?
-    eventlet.monkey_patch()
-    gettextutils.install('ceilometer')
-    service.prepare_service(sys.argv)
+    service.prepare_service()
     os_service.launch(rpc_service.Service(cfg.CONF.host,
                                           'ceilometer.agent.central',
                                           AgentManager())).wait()

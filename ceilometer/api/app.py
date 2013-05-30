@@ -20,7 +20,6 @@ import logging
 import os
 from oslo.config import cfg
 import pecan
-import sys
 
 from ceilometer.api import acl
 from ceilometer.api import config as api_config
@@ -29,7 +28,6 @@ from ceilometer.api import middleware
 from ceilometer import service
 from ceilometer.openstack.common import log
 from wsgiref import simple_server
-from ceilometer.openstack.common import gettextutils
 
 LOG = log.getLogger(__name__)
 
@@ -102,8 +100,7 @@ class VersionSelectorApplication(object):
 
 
 def start():
-    gettextutils.install('ceilometer')
-    service.prepare_service(sys.argv)
+    service.prepare_service()
 
     # Build the WSGI app
     root = VersionSelectorApplication()

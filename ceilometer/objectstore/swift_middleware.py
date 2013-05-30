@@ -78,7 +78,7 @@ class CeilometerMiddleware(object):
                                      "metadata_headers",
                                      "").split(",") if h.strip()]
 
-        service.prepare_service()
+        service.prepare_service([])
 
         self.pipeline_manager = pipeline.setup_pipeline(
             transformer.TransformerExtensionManager(

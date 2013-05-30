@@ -26,7 +26,6 @@ from oslo.config import cfg
 import pecan
 import pecan.testing
 
-from ceilometer import service
 from ceilometer.openstack.common import jsonutils
 from ceilometer.api import acl
 from ceilometer.api.v1 import app as v1_app
@@ -84,7 +83,6 @@ class FunctionalTest(db_test_base.TestBase):
 
     def setUp(self):
         super(FunctionalTest, self).setUp()
-        service.prepare_service()
         cfg.CONF.set_override("auth_version", "v2.0", group=acl.OPT_GROUP_NAME)
         cfg.CONF.set_override("policy_file",
                               self.path_get('tests/policy.json'))
