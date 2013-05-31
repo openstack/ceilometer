@@ -59,6 +59,21 @@ class TestSwiftPollster(base.TestCase):
         self.pollster = swift.SwiftPollster()
         self.manager = TestManager()
 
+    def test_objectstore_neaten_url(self):
+        test_endpoint = 'http://127.0.0.1:8080'
+        test_tenant_id = 'a7fd1695fa154486a647e44aa99a1b9b'
+        standard_url = test_endpoint + '/v1/' + 'AUTH_' + test_tenant_id
+
+        self.assertEqual(standard_url,
+                         self.pollster._neaten_url(test_endpoint,
+                                                   test_tenant_id))
+        self.assertEqual(standard_url,
+                         self.pollster._neaten_url(test_endpoint + '/',
+                                                   test_tenant_id))
+        self.assertEqual(standard_url,
+                         self.pollster._neaten_url(test_endpoint + '/v1',
+                                                   test_tenant_id))
+
     def test_objectstore_metering(self):
         self.stubs.Set(swift.SwiftPollster, 'iter_accounts',
                        self.fake_iter_accounts)
