@@ -95,6 +95,71 @@ mysql_engine                InnoDB                                MySQL engine t
 sqlite_synchronous          True                                  If passed, use synchronous mode for sqlite
 ==========================  ====================================  ==============================================================
 
+HBase
+===================
+
+To configure HBase as your database backend:
+
+1. To install an HBase server, for pure development purpose, you can just
+download the HBase image from Cloudera and get it up and running. Then the
+quickest way to check it is to run the ``HBase shell`` and try a ``list``
+command which would return the list of the tables in your HBase server:
+
+ ::
+
+    $ ${HBASE_HOME}/bin/hbase shell
+
+    hbase> list
+
+.. note::
+    This driver has been tested against HBase 0.92.1/CDH 4.1.1,
+    HBase 0.94.2/CDH 4.2.0, HBase 0.94.4/HDP 1.2 and HBase 0.94.5/Apache.
+    Versions earlier than 0.92.1 are not supported due to feature incompatibility.
+
+2. A few HBase tables are expected by Ceilometer.
+To create them, run the following:
+
+ ::
+
+    $ ${HBASE_HOME}/bin/hbase shell
+
+    hbase> create 'project', {NAME=>'f'}
+    hbase> create 'user', {NAME=>'f'}
+    hbase> create 'resource', {NAME=>'f'}
+    hbase> create 'meter', {NAME=>'f'}
+
+3. This driver is implemented to use HBase Thrift interface so it's necessary
+to have the HBase Thrift server installed and started. When you have HBase
+installed, normally, HBase thrift server is turned on by default. If it's not,
+turn it on by running command ``hbase thrift start``. The implementation uses
+`HappyBase`_ which is a wrapper library used to interact with HBase via Thrift
+protocol, you can verify the thrift connection by running a quick test from a
+client:
+
+ .. _HappyBase: http://happybase.readthedocs.org/en/latest/index.html#
+
+::
+
+    import happybase
+
+    conn = happybase.Connection(host=$hbase-thrift-server, port=9090, table_prefix=None)
+    print conn.tables() # this returns a list of HBase tables in your HBase server
+
+4. The parameter "database_connection" needs to be configured to point to
+the Hbase Thrift server.
+
+===========================  ====================================  ==============================================================
+Parameter                    Value                                 Note
+===========================  ====================================  ==============================================================
+database_connection          hbase://$hbase-thrift-server:9090     Database connection string
+===========================  ====================================  ==============================================================
+
+.. note::
+
+    If you are changing the configuration on the fly, you will need to restart
+    the Ceilometer services that use the database to allow the changes to take
+    affect, i.e. the collector and API services.
+
 General options
 ===============
 
