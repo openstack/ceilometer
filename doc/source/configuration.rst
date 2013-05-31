@@ -53,6 +53,32 @@ disabled_notification_listeners                                        List of n
 reseller_prefix                  AUTH\_                                Prefix used by swift for reseller token
 ===============================  ====================================  ==============================================================
 
+Keystone Middleware Authentication
+==================================
+
+The following table lists the Keystone middleware authentication options which are used to get admin token.
+Please note that these options need to be under [keystone_authtoken] section.
+
+===============================  ====================================  ==============================================================
+Parameter                        Default                               Note
+===============================  ====================================  ==============================================================
+auth_host                                                              The host providing the Keystone service API endpoint for
+                                                                       validating and requesting tokens
+auth_port                        35357                                 The port used to validate tokens
+auth_protocol                    https                                 The protocol used to validate tokens
+auth_uri                         auth_protocol://auth_host:auth_port   The full URI used to validate tokens
+admin_token                                                            Either this or the following three options are required. If
+                                                                       set, this is a single shared secret with the Keystone
+                                                                       configuration used to validate tokens.
+admin_user                                                             User name for retrieving admin token
+admin_password                                                         Password for retrieving admin token
+admin_tenant_name                                                      Tenant name for retrieving admin token
+signing_dir                                                            The cache directory for signing certificate
+certfile                                                               Required if Keystone server requires client cert
+keyfile                                                                Required if Keystone server requires client cert. This can be
+                                                                       the same as certfile if the certfile includes the private key.
+===============================  ====================================  ==============================================================
+
 SQL Alchemy
 ===========
 
