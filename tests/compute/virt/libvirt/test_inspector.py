@@ -73,6 +73,14 @@ class TestLibvirtInspection(test_base.TestCase):
                        </filterref>
                        <alias name='net1'/>
                      </interface>
+                     <interface type='bridge'>
+                       <mac address='fa:16:3e:96:33:f0'/>
+                       <source bridge='qbr420008b3-7c'/>
+                       <target dev='vnet2'/>
+                       <model type='virtio'/>
+                       <address type='pci' domain='0x0000' bus='0x00' \
+                       slot='0x03' function='0x0'/>
+                    </interface>
                  </devices>
              </domain>
         """
@@ -82,11 +90,13 @@ class TestLibvirtInspection(test_base.TestCase):
                                                        3L, 4L, 0L, 0L))
         self.domain.interfaceStats('vnet1').AndReturn((5L, 6L, 0L, 0L,
                                                        7L, 8L, 0L, 0L))
+        self.domain.interfaceStats('vnet2').AndReturn((9L, 10L, 0L, 0L,
+                                                       11L, 12L, 0L, 0L))
         self.mox.ReplayAll()
 
         interfaces = list(self.inspector.inspect_vnics(self.instance_name))
 
-        self.assertEquals(len(interfaces), 2)
+        self.assertEquals(len(interfaces), 3)
         vnic0, info0 = interfaces[0]
         self.assertEqual(vnic0.name, 'vnet0')
         self.assertEqual(vnic0.mac, 'fa:16:3e:71:ec:6d')
@@ -114,6 +124,16 @@ class TestLibvirtInspection(test_base.TestCase):
         self.assertEqual(info1.rx_packets, 6L)
         self.assertEqual(info1.tx_bytes, 7L)
         self.assertEqual(info1.tx_packets, 8L)
+
+        vnic2, info2 = interfaces[2]
+        self.assertEqual(vnic2.name, 'vnet2')
+        self.assertEqual(vnic2.mac, 'fa:16:3e:96:33:f0')
+        self.assertEqual(vnic2.fref, None)
+        self.assertEqual(vnic2.parameters, dict())
+        self.assertEqual(info2.rx_bytes, 9L)
+        self.assertEqual(info2.rx_packets, 10L)
+        self.assertEqual(info2.tx_bytes, 11L)
+        self.assertEqual(info2.tx_packets, 12L)
 
     def test_inspect_disks(self):
         dom_xml = """
