@@ -80,13 +80,15 @@ class UniqueNameTest(base.EventTest, EventTestBase):
         u1 = self.conn._get_or_create_unique_name("foo")
         self.assertTrue(u1.id >= 0)
         u2 = self.conn._get_or_create_unique_name("foo")
-        self.assertEqual(u1, u2)
+        self.assertEqual(u1.id, u2.id)
+        self.assertEqual(u1.key, u2.key)
 
     def test_new_unique(self):
         u1 = self.conn._get_or_create_unique_name("foo")
         self.assertTrue(u1.id >= 0)
         u2 = self.conn._get_or_create_unique_name("blah")
-        self.assertNotEqual(u1, u2)
+        self.assertNotEqual(u1.id, u2.id)
+        self.assertNotEqual(u1.key, u2.key)
 
 
 class EventTest(base.EventTest, EventTestBase):
