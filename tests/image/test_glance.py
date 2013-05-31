@@ -82,7 +82,31 @@ IMAGE_LIST = [
           u'deleted_at': None,
           u'min_ram': 0,
           u'size': 1024}),
+    # Make one duplicate private image to test the iter_images method.
+    type('Image', (object,),
+         {u'status': u'queued',
+          u'name': "some name",
+          u'deleted': False,
+          u'container_format': None,
+          u'created_at': u'2012-09-18T16:29:46',
+          u'disk_format': None,
+          u'updated_at': u'2012-09-18T16:29:46',
+          u'properties': {},
+          u'min_disk': 0,
+          u'protected': False,
+          u'id': u'1d21a8d0-25f4-4e0a-b4ec-85f40237676b',
+          u'location': None,
+          u'checksum': None,
+          u'owner': u'4c8364fc20184ed7971b76602aa96184',
+          u'is_public': True,
+          u'deleted_at': None,
+          u'min_ram': 0,
+          u'size': 2048}),
 ]
+
+
+class _BaseObject(object):
+    pass
 
 
 class TestManager(manager.AgentManager):
@@ -94,17 +118,26 @@ class TestManager(manager.AgentManager):
 
 class TestImagePollster(base.TestCase):
 
-    @staticmethod
-    def fake_glance_iter_images(self, ksclient):
-        return iter(IMAGE_LIST)
+    def fake_get_glance_client(self, ksclient):
+        glanceclient = _BaseObject()
+        setattr(glanceclient, "images", _BaseObject())
+        setattr(glanceclient.images,
+                "list", lambda *args, **kwargs: iter(IMAGE_LIST))
+        return glanceclient
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestImagePollster, self).setUp()
         self.context = context.get_admin_context()
         self.manager = TestManager()
-        self.stubs.Set(glance._Base, 'iter_images',
-                       self.fake_glance_iter_images)
+        self.stubs.Set(glance._Base, 'get_glance_client',
+                       self.fake_get_glance_client)
+
+    # Tests whether the iter_images method returns an unique image list.
+    def test_iter_images(self):
+        images = list(glance.ImagePollster().
+                      iter_images(self.manager.keystone))
+        self.assertEqual(len(images), len(set(image.id for image in images)))
 
     def test_glance_image_counter(self):
         counters = list(glance.ImagePollster().get_counters(self.manager))
