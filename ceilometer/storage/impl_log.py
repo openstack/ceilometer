@@ -100,7 +100,7 @@ class Connection(base.Connection):
         return []
 
     def get_meters(self, user=None, project=None, resource=None, source=None,
-                   metaquery={}):
+                   limit=None, metaquery={}):
         """Return an iterable of dictionaries containing meter information.
 
         { 'name': name of the meter,
@@ -114,6 +114,7 @@ class Connection(base.Connection):
         :param project: Optional ID for project that owns the resource.
         :param resource: Optional resource filter.
         :param source: Optional source filter.
+        :param limit: Maximum number of results to return.
         :param metaquery: Optional dict with metadata to match on.
         """
         return []

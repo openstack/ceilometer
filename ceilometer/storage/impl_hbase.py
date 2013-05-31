@@ -393,8 +393,11 @@ class Connection(base.Connection):
                 user_id=data['f:user_id'],
             )
 
-    def get_samples(self, sample_filter):
-        """Return an iterable of models.Sample instances
+    def get_samples(self, sample_filter, limit=None):
+        """Return an iterable of models.Sample instances.
+
+        :param sample_filter: Filter.
+        :param limit: Maximum number of results to return.
         """
         def make_sample(data):
             """ transform HBase fields to Sample model
@@ -415,6 +418,9 @@ class Connection(base.Connection):
             # properly.
             # handle metaquery
             metaquery = sample_filter.metaquery
+            # TODO(jd) implements using HBase capabilities
+            if limit == 0:
+                break
             if len(metaquery) > 0:
                 # metaquery checks resource table
                 resource = self.resource.row(meter['f:resource_id'])
@@ -423,8 +429,12 @@ class Connection(base.Connection):
                     if resource['f:r_' + k.split('.', 1)[1]] != v:
                         break   # if one metaquery doesn't match, break
                 else:
+                    if limit:
+                        limit -= 1
                     yield make_sample(meter)
             else:
+                if limit:
+                    limit -= 1
                 yield make_sample(meter)
 
     def _update_meter_stats(self, stat, meter):
