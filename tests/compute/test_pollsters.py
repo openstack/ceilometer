@@ -23,8 +23,8 @@
 import mock
 import time
 
-from ceilometer.compute import pollsters
 from ceilometer.compute import manager
+from ceilometer.compute import pollsters
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.tests import base as test_base
 

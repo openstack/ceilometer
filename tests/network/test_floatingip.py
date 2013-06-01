@@ -22,9 +22,9 @@
 
 import mock
 
-from ceilometer import nova_client
-from ceilometer.network import floatingip
 from ceilometer.central import manager
+from ceilometer.network import floatingip
+from ceilometer import nova_client
 from ceilometer.openstack.common import context
 from ceilometer.tests import base
 

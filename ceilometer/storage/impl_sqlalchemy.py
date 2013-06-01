@@ -30,9 +30,16 @@ import ceilometer.openstack.common.db.sqlalchemy.session as sqlalchemy_session
 from ceilometer.storage import base
 from ceilometer.storage import models as api_models
 from ceilometer.storage.sqlalchemy import migration
-from ceilometer.storage.sqlalchemy.models import Meter, Project, Resource
-from ceilometer.storage.sqlalchemy.models import Source, User, Base, Alarm
-from ceilometer.storage.sqlalchemy.models import UniqueName, Event, Trait
+from ceilometer.storage.sqlalchemy.models import Alarm
+from ceilometer.storage.sqlalchemy.models import Base
+from ceilometer.storage.sqlalchemy.models import Event
+from ceilometer.storage.sqlalchemy.models import Meter
+from ceilometer.storage.sqlalchemy.models import Project
+from ceilometer.storage.sqlalchemy.models import Resource
+from ceilometer.storage.sqlalchemy.models import Source
+from ceilometer.storage.sqlalchemy.models import Trait
+from ceilometer.storage.sqlalchemy.models import UniqueName
+from ceilometer.storage.sqlalchemy.models import User
 from ceilometer import utils
 
 

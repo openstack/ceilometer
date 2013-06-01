@@ -78,8 +78,7 @@ class CeilometerBase(object):
         return getattr(self, key)
 
     def update(self, values):
-        """ Make the model object behave like a dict
-        """
+        """Make the model object behave like a dict."""
         for k, v in values.iteritems():
             setattr(self, k, v)
 
@@ -151,7 +150,7 @@ class Resource(Base):
 
 
 class Alarm(Base):
-    """Alarm data"""
+    """Define Alarm data."""
     __tablename__ = 'alarm'
     id = Column(String(255), primary_key=True)
     enabled = Column(Boolean)

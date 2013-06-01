@@ -804,7 +804,7 @@ class AlarmsController(rest.RestController):
     @wsme.validate(Alarm)
     @wsme_pecan.wsexpose(Alarm, body=Alarm, status_code=201)
     def post(self, data):
-        """Create a new alarm"""
+        """Create a new alarm."""
         conn = pecan.request.storage_conn
 
         data.user_id = pecan.request.headers.get('X-User-Id')
@@ -832,7 +832,7 @@ class AlarmsController(rest.RestController):
     @wsme.validate(Alarm)
     @wsme_pecan.wsexpose(Alarm, wtypes.text, body=Alarm)
     def put(self, alarm_id, data):
-        """Modify an alarm"""
+        """Modify an alarm."""
         conn = pecan.request.storage_conn
         data.state_timestamp = wsme.Unset
         data.alarm_id = alarm_id
@@ -858,7 +858,7 @@ class AlarmsController(rest.RestController):
 
     @wsme_pecan.wsexpose(None, wtypes.text, status_code=204)
     def delete(self, alarm_id):
-        """Delete an alarm"""
+        """Delete an alarm."""
         conn = pecan.request.storage_conn
         auth_project = acl.get_limited_to_project(pecan.request.headers)
         alarms = list(conn.get_alarms(alarm_id=alarm_id,
@@ -870,7 +870,7 @@ class AlarmsController(rest.RestController):
 
     @wsme_pecan.wsexpose(Alarm, wtypes.text)
     def get_one(self, alarm_id):
-        """Return one alarm"""
+        """Return one alarm."""
         conn = pecan.request.storage_conn
         auth_project = acl.get_limited_to_project(pecan.request.headers)
         alarms = list(conn.get_alarms(alarm_id=alarm_id,
