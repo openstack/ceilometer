@@ -271,12 +271,32 @@ class MeterTest(DBTestBase):
 
 class RawSampleTest(DBTestBase):
 
+    def test_get_samples_limit_zero(self):
+        f = storage.SampleFilter()
+        results = list(self.conn.get_samples(f, limit=0))
+        self.assertEqual(len(results), 0)
+
+    def test_get_samples_limit(self):
+        f = storage.SampleFilter()
+        results = list(self.conn.get_samples(f, limit=3))
+        self.assertEqual(len(results), 3)
+
     def test_get_samples_by_user(self):
         f = storage.SampleFilter(user='user-id')
         results = list(self.conn.get_samples(f))
         assert len(results) == 2
         for meter in results:
             assert meter.as_dict() in [self.msg1, self.msg2]
+
+    def test_get_samples_by_user_limit(self):
+        f = storage.SampleFilter(user='user-id')
+        results = list(self.conn.get_samples(f, limit=1))
+        self.assertEqual(len(results), 1)
+
+    def test_get_samples_by_user_limit_bigger(self):
+        f = storage.SampleFilter(user='user-id')
+        results = list(self.conn.get_samples(f, limit=42))
+        self.assertEqual(len(results), 2)
 
     def test_get_samples_by_project(self):
         f = storage.SampleFilter(project='project-id')

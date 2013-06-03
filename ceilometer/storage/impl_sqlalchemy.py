@@ -318,12 +318,20 @@ class Connection(base.Connection):
                     user_id=resource.user_id,
                 )
 
-    def get_samples(self, sample_filter):
-        """Return an iterable of api_models.Samples
+    def get_samples(self, sample_filter, limit=None):
+        """Return an iterable of api_models.Samples.
+
+        :param sample_filter: Filter.
+        :param limit: Maximum number of results to return.
         """
+        if limit == 0:
+            return
+
         query = self.session.query(Meter)
         query = make_query_from_filter(query, sample_filter,
                                        require_meter=False)
+        if limit:
+            query = query.limit(limit)
         samples = query.all()
 
         for s in samples:

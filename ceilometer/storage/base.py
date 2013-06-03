@@ -126,8 +126,11 @@ class Connection(object):
         """
 
     @abc.abstractmethod
-    def get_samples(self, sample_filter):
-        """Return an iterable of model.Sample instances
+    def get_samples(self, sample_filter, limit=None):
+        """Return an iterable of model.Sample instances.
+
+        :param sample_filter: Filter.
+        :param limit: Maximum number of results to return.
         """
 
     @abc.abstractmethod
