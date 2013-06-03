@@ -51,11 +51,11 @@ tables = [unique_name, event, trait]
 
 def upgrade(migrate_engine):
     meta.bind = migrate_engine
-    for i in sorted(tables):
+    for i in tables:
         i.create()
 
 
 def downgrade(migrate_engine):
     meta.bind = migrate_engine
-    for i in sorted(tables, reverse=True):
+    for i in reversed(tables):
         i.drop()
