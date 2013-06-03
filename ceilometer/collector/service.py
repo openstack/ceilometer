@@ -30,6 +30,7 @@ from ceilometer.openstack.common import gettextutils
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import service as os_service
 from ceilometer.openstack.common.rpc import dispatcher as rpc_dispatcher
+from ceilometer.openstack.common.rpc import service as rpc_service
 
 # Import rpc_notifier to register `notification_topics` flag so that
 # plugins can use it
@@ -118,13 +119,18 @@ def udp_collector():
     os_service.launch(UDPCollectorService()).wait()
 
 
-class CollectorService(service.PeriodicService):
+class CollectorService(rpc_service.Service):
 
     COLLECTOR_NAMESPACE = 'ceilometer.collector'
 
     def __init__(self, host, topic, manager=None):
         super(CollectorService, self).__init__(host, topic, manager)
         self.storage_conn = get_storage_connection(cfg.CONF)
+
+    def start(self):
+        super(CollectorService, self).start()
+        # Add a dummy thread to have wait() working
+        self.tg.add_timer(604800, lambda: None)
 
     def initialize_service_hook(self, service):
         '''Consumers must be declared before consume_thread start.'''
@@ -225,6 +231,3 @@ class CollectorService(service.PeriodicService):
                 LOG.warning(
                     'message signature invalid, discarding message: %r',
                     meter)
-
-    def periodic_tasks(self, context):
-        pass

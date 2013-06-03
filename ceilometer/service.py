@@ -22,10 +22,8 @@ import socket
 
 from oslo.config import cfg
 
-from ceilometer.openstack.common import context
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import rpc
-from ceilometer.openstack.common.rpc import service as rpc_service
 
 
 cfg.CONF.register_opts([
@@ -61,16 +59,6 @@ CLI_OPTIONS = [
                help='Auth URL to use for openstack service access'),
 ]
 cfg.CONF.register_cli_opts(CLI_OPTIONS)
-
-
-class PeriodicService(rpc_service.Service):
-
-    def start(self):
-        super(PeriodicService, self).start()
-        admin_context = context.RequestContext('admin', 'admin', is_admin=True)
-        self.tg.add_timer(cfg.CONF.periodic_interval,
-                          self.manager.periodic_tasks,
-                          context=admin_context)
 
 
 def _sanitize_cmd_line(argv):
