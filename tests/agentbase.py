@@ -148,7 +148,7 @@ class BaseAgentManagerTestCase(base.TestCase):
 
     @abc.abstractmethod
     def setup_manager(self):
-        """Setup subclass specific managers"""
+        """Setup subclass specific managers."""
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):

@@ -31,7 +31,8 @@ from collections import defaultdict
 
 from oslo.config import cfg
 
-from ceilometer.openstack.common import log, timeutils
+from ceilometer.openstack.common import log
+from ceilometer.openstack.common import timeutils
 from ceilometer.storage import base
 from ceilometer.storage import models
 
@@ -134,11 +135,11 @@ class Connection(base.Connection):
                       self.METER_TABLE]:
             try:
                 self.conn.disable_table(table)
-            except:
+            except Exception:
                 LOG.debug('Cannot disable table but ignoring error')
             try:
                 self.conn.delete_table(table)
-            except:
+            except Exception:
                 LOG.debug('Cannot delete table but ignoring error')
 
     @staticmethod
@@ -292,8 +293,7 @@ class Connection(base.Connection):
         :param metaquery: Optional dict with metadata to match on.
         """
         def make_resource(data):
-            """ transform HBase fields to Resource model
-            """
+            """Transform HBase fields to Resource model."""
             # convert HBase metadata e.g. f:r_display_name to display_name
             data['f:metadata'] = dict((k[4:], v)
                                       for k, v in data.iteritems()
@@ -397,8 +397,7 @@ class Connection(base.Connection):
         """Return an iterable of models.Sample instances
         """
         def make_sample(data):
-            """ transform HBase fields to Sample model
-            """
+            """Transform HBase fields to Sample model."""
             data = json.loads(data['f:message'])
             data['timestamp'] = timeutils.parse_strtime(data['timestamp'])
             return models.Sample(**data)
@@ -410,7 +409,7 @@ class Connection(base.Connection):
         gen = self.meter.scan(filter=q, row_start=start, row_stop=stop)
 
         for ignored, meter in gen:
-            # TODO (shengjie) put this implementation here because it's failing
+            # TODO(shengjie) put this implementation here because it's failing
             # the test. bp hbase-meter-table-enhancement will address this
             # properly.
             # handle metaquery
@@ -593,8 +592,8 @@ class MTable(object):
                         ret[row] = data
             rows = ret
         elif filter:
-            # TODO: we should really parse this properly, but at the moment we
-            # are only going to support AND here
+            # TODO(jdanjou): we should really parse this properly,
+            # but at the moment we are only going to support AND here
             filters = filter.split('AND')
             for f in filters:
                 # Extract filter name and its arguments
@@ -763,7 +762,7 @@ def make_query_from_filter(sample_filter, require_meter=True):
 
 
 def _make_rowkey_scan(meter, rts_start=None, rts_end=None):
-    """ if it's meter filter without start and end,
+    """If it's meter filter without start and end,
         start_row = meter while end_row = meter + MAX_BYTE
     """
     if not rts_start:

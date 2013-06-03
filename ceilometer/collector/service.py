@@ -91,7 +91,7 @@ class UDPCollectorService(os_service.Service):
             data, source = udp.recvfrom(64 * 1024)
             try:
                 counter = msgpack.loads(data)
-            except:
+            except Exception:
                 LOG.warn(_("UDP: Cannot decode data sent by %s"), str(source))
             else:
                 try:
