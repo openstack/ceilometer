@@ -20,6 +20,7 @@
 
 import datetime
 import logging
+import webtest.app
 
 from oslo.config import cfg
 
@@ -79,6 +80,19 @@ class TestListEvents(FunctionalTest):
 
     def test_all(self):
         data = self.get_json('/meters/instance')
+        self.assertEquals(2, len(data))
+
+    def test_all_limit(self):
+        data = self.get_json('/meters/instance?limit=1')
+        self.assertEquals(1, len(data))
+
+    def test_all_limit_negative(self):
+        self.assertRaises(webtest.app.AppError,
+                          self.get_json,
+                          '/meters/instance?limit=-2')
+
+    def test_all_limit_bigger(self):
+        data = self.get_json('/meters/instance?limit=42')
         self.assertEquals(2, len(data))
 
     def test_empty_project(self):
