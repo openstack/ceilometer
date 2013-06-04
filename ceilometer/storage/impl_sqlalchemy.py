@@ -24,6 +24,7 @@ import os
 import uuid
 from sqlalchemy import func
 from sqlalchemy import desc
+from sqlalchemy.orm import aliased
 
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
@@ -298,7 +299,31 @@ class Connection(base.Connection):
         :param metaquery: Optional dict with metadata to match on.
         """
         session = sqlalchemy_session.get_session()
-        query = session.query(Resource)
+
+        # Meter table will store large records and join with resource
+        # will be very slow.
+        # subquery_meter is used to reduce meter records
+        # by selecting a record for each (resource_id, counter_name).
+        # max() is used to choice a meter record, so the latest record
+        # is selected for each (resource_id, counter_name).
+        #
+        subquery_meter = session.query(func.max(Meter.id).label('id')).\
+            group_by(Meter.resource_id, Meter.counter_name).subquery()
+
+        # The SQL of query_meter is essentially:
+        #
+        # SELECT meter.* FROM meter INNER JOIN
+        #  (SELECT max(meter.id) AS id FROM meter
+        #   GROUP BY meter.resource_id, meter.counter_name) AS anon_2
+        # ON meter.id = anon_2.id
+        #
+        query_meter = session.query(Meter).\
+            join(subquery_meter, Meter.id == subquery_meter.c.id)
+
+        alias_meter = aliased(Meter, query_meter.subquery())
+        query = session.query(Resource, alias_meter).join(
+            alias_meter, Resource.id == alias_meter.resource_id)
+
         if user is not None:
             query = query.filter(Resource.user_id == user)
         if source is not None:
@@ -307,26 +332,18 @@ class Connection(base.Connection):
             query = query.filter(Resource.id == resource)
         if project is not None:
             query = query.filter(Resource.project_id == project)
-        query = query.options(
-            sqlalchemy_session.sqlalchemy.orm.joinedload('meters'))
         if metaquery:
             raise NotImplementedError('metaquery not implemented')
 
-        for resource in query.all():
-            meter_names = set()
-            for meter in resource.meters:
-                if meter.counter_name in meter_names:
-                    continue
-                meter_names.add(meter.counter_name)
-                yield api_models.Meter(
-                    name=meter.counter_name,
-                    type=meter.counter_type,
-                    unit=meter.counter_unit,
-                    resource_id=resource.id,
-                    project_id=resource.project_id,
-                    source=resource.sources[0].id,
-                    user_id=resource.user_id,
-                )
+        for resource, meter in query.all():
+            yield api_models.Meter(
+                name=meter.counter_name,
+                type=meter.counter_type,
+                unit=meter.counter_unit,
+                resource_id=resource.id,
+                project_id=resource.project_id,
+                source=resource.sources[0].id,
+                user_id=resource.user_id)
 
     @staticmethod
     def get_samples(sample_filter, limit=None):
