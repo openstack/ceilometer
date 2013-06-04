@@ -17,7 +17,6 @@
 # under the License.
 
 from ceilometer import pipeline
-from ceilometer import publisher
 from ceilometer import transformer
 from ceilometer.openstack.common import context as req_context
 from ceilometer.openstack.common import log as logging
@@ -56,9 +55,6 @@ def _load_pipeline_manager():
     _pipeline_manager = pipeline.setup_pipeline(
         transformer.TransformerExtensionManager(
             'ceilometer.transformer',
-        ),
-        publisher.PublisherExtensionManager(
-            'ceilometer.publisher',
         ),
     )
 

@@ -23,6 +23,8 @@ from oslo.config import cfg
 import yaml
 
 from ceilometer.openstack.common import log
+from ceilometer import publisher
+
 
 OPTS = [
     cfg.StrOpt('pipeline_cfg_file',
@@ -90,7 +92,7 @@ class Pipeline(object):
 
     """
 
-    def __init__(self, cfg, publisher_manager, transformer_manager):
+    def __init__(self, cfg, transformer_manager):
         self.cfg = cfg
 
         try:
@@ -100,10 +102,8 @@ class Pipeline(object):
             except ValueError:
                 raise PipelineException("Invalid interval value", cfg)
             self.counters = cfg['counters']
-            self.publishers = cfg['publishers']
             # It's legal to have no transformer specified
             self.transformer_cfg = cfg['transformers'] or []
-            self.publisher_manager = publisher_manager
         except KeyError as err:
             raise PipelineException(
                 "Required field %s not specified" % err.args[0], cfg)
@@ -113,7 +113,15 @@ class Pipeline(object):
 
         self._check_counters()
 
-        self._check_publishers(cfg, publisher_manager)
+        if not cfg.get('publishers'):
+            raise PipelineException("No publisher specified", cfg)
+
+        self.publishers = []
+        for p in cfg['publishers']:
+            try:
+                self.publishers.append(publisher.get_publisher(p))
+            except Exception:
+                LOG.exception("Unable to load publisher %s", p)
 
         self.transformers = self._setup_transformers(cfg, transformer_manager)
 
@@ -144,16 +152,6 @@ class Pipeline(object):
                 "Included counters specified with wildcard",
                 self.cfg)
 
-    def _check_publishers(self, cfg, publisher_manager):
-        if not self.publishers:
-            raise PipelineException(
-                "No publisher specified", cfg)
-        if not set(self.publishers).issubset(set(publisher_manager.names())):
-            raise PipelineException(
-                "Publishers %s invalid" %
-                set(self.publishers).difference(
-                    set(self.publisher_manager.names())), cfg)
-
     def _setup_transformers(self, cfg, transformer_manager):
         transformer_cfg = cfg['transformers'] or []
         transformers = []
@@ -173,14 +171,6 @@ class Pipeline(object):
                      parameter)
 
         return transformers
-
-    def _publish_counters_to_one_publisher(self, ext, ctxt, counters, source):
-        try:
-            ext.obj.publish_counters(ctxt, counters, source)
-        except Exception as err:
-            LOG.warning("Pipeline %s: Continue after error "
-                        "from publisher %s", self, ext.name)
-            LOG.exception(err)
 
     def _transform_counter(self, start, ctxt, counter, source):
         try:
@@ -218,12 +208,13 @@ class Pipeline(object):
                 transformed_counters.append(counter)
 
         LOG.audit("Pipeline %s: Publishing counters", self)
-        self.publisher_manager.map(self.publishers,
-                                   self._publish_counters_to_one_publisher,
-                                   ctxt=ctxt,
-                                   counters=transformed_counters,
-                                   source=source,
-                                   )
+
+        for p in self.publishers:
+            try:
+                p.publish_counters(ctxt, transformed_counters, source)
+            except Exception:
+                LOG.exception("Pipeline %s: Continue after error "
+                              "from publisher %s", self, p)
 
         LOG.audit("Pipeline %s: Published counters", self)
 
@@ -288,8 +279,7 @@ class PipelineManager(object):
     """
 
     def __init__(self, cfg,
-                 transformer_manager,
-                 publisher_manager):
+                 transformer_manager):
         """Setup the pipelines according to config.
 
         The top of the cfg is a list of pipeline definitions.
@@ -331,8 +321,7 @@ class PipelineManager(object):
         Publisher's name is plugin name in setup.py
 
         """
-        self.pipelines = [Pipeline(pipedef, publisher_manager,
-                                   transformer_manager)
+        self.pipelines = [Pipeline(pipedef, transformer_manager)
                           for pipedef in cfg]
 
     def publisher(self, context, source):
@@ -344,7 +333,7 @@ class PipelineManager(object):
         return PublishContext(context, source, self.pipelines)
 
 
-def setup_pipeline(transformer_manager, publisher_manager):
+def setup_pipeline(transformer_manager):
     """Setup pipeline manager according to yaml config file."""
     cfg_file = cfg.CONF.pipeline_cfg_file
     if not os.path.exists(cfg_file):
@@ -359,5 +348,4 @@ def setup_pipeline(transformer_manager, publisher_manager):
     LOG.info("Pipeline config: %s", pipeline_cfg)
 
     return PipelineManager(pipeline_cfg,
-                           transformer_manager,
-                           publisher_manager)
+                           transformer_manager)

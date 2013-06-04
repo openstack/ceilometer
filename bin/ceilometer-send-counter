@@ -28,7 +28,6 @@ from stevedore import dispatch
 
 from ceilometer import counter
 from ceilometer import pipeline
-from ceilometer import publisher
 from ceilometer import service
 from ceilometer import transformer
 from ceilometer.openstack.common import timeutils
@@ -86,9 +85,6 @@ root_logger.setLevel(logging.DEBUG)
 pipeline_manager = pipeline.setup_pipeline(
     transformer.TransformerExtensionManager(
         'ceilometer.transformer',
-    ),
-    publisher.PublisherExtensionManager(
-        'ceilometer.publisher',
     ),
 )
 

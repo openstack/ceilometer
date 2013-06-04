@@ -28,7 +28,6 @@ from stevedore.tests import manager as extension_tests
 
 from ceilometer import counter
 from ceilometer import pipeline
-from ceilometer import publisher
 from ceilometer.tests import base
 from ceilometer import transformer
 
@@ -70,13 +69,6 @@ class TestPollsterException(TestPollster):
 
 class BaseAgentManagerTestCase(base.TestCase):
 
-    class PublisherClass():
-        def __init__(self):
-            self.counters = []
-
-        def publish_counters(self, ctxt, counter, source):
-            self.counters.extend(counter)
-
     class Pollster(TestPollster):
         counters = []
         test_data = default_test_data
@@ -94,29 +86,12 @@ class BaseAgentManagerTestCase(base.TestCase):
         test_data = default_test_data._replace(name='testexceptionanother')
 
     def setup_pipeline(self):
-        self.publisher = self.PublisherClass()
         self.transformer_manager = transformer.TransformerExtensionManager(
             'ceilometer.transformer',
         )
-        self.publisher_manager = publisher.PublisherExtensionManager(
-            'fake',
-        )
-        self.publisher_manager.extensions = [
-            extension.Extension(
-                'test_pub',
-                None,
-                None,
-                self.publisher,
-            ), ]
-        self.publisher_manager.by_name = dict(
-            (e.name, e)
-            for e
-            in self.publisher_manager.extensions)
-
         self.mgr.pipeline_manager = pipeline.PipelineManager(
             self.pipeline_cfg,
-            self.transformer_manager,
-            self.publisher_manager)
+            self.transformer_manager)
 
     def create_extension_manager(self):
         return extension_tests.TestExtensionManager(
@@ -160,7 +135,7 @@ class BaseAgentManagerTestCase(base.TestCase):
             'interval': 60,
             'counters': ['test'],
             'transformers': [],
-            'publishers': ["test_pub"],
+            'publishers': ["test"],
         }, ]
         self.setup_pipeline()
 
@@ -176,7 +151,8 @@ class BaseAgentManagerTestCase(base.TestCase):
         self.assertEqual(len(polling_tasks), 1)
         self.assertTrue(60 in polling_tasks.keys())
         self.mgr.interval_task(polling_tasks.values()[0])
-        self.assertEqual(self.publisher.counters[0], self.Pollster.test_data)
+        pub = self.mgr.pipeline_manager.pipelines[0].publishers[0]
+        self.assertEqual(pub.counters[0], self.Pollster.test_data)
 
     def test_setup_polling_tasks_multiple_interval(self):
         self.pipeline_cfg.append({
@@ -184,7 +160,7 @@ class BaseAgentManagerTestCase(base.TestCase):
             'interval': 10,
             'counters': ['test'],
             'transformers': [],
-            'publishers': ["test_pub"],
+            'publishers': ["test"],
         })
         self.setup_pipeline()
         polling_tasks = self.mgr.setup_polling_tasks()
@@ -199,7 +175,7 @@ class BaseAgentManagerTestCase(base.TestCase):
                 'interval': 10,
                 'counters': ['test_invalid'],
                 'transformers': [],
-                'publishers': ["test_pub"],
+                'publishers': ["test"],
             })
         polling_tasks = self.mgr.setup_polling_tasks()
         self.assertEqual(len(polling_tasks), 1)
@@ -211,7 +187,7 @@ class BaseAgentManagerTestCase(base.TestCase):
             'interval': 60,
             'counters': ['testanother'],
             'transformers': [],
-            'publishers': ["test_pub"],
+            'publishers': ["test"],
         })
         self.setup_pipeline()
         polling_tasks = self.mgr.setup_polling_tasks()
@@ -226,23 +202,23 @@ class BaseAgentManagerTestCase(base.TestCase):
                 'interval': 10,
                 'counters': ['testexceptionanother'],
                 'transformers': [],
-                'publishers': ["test_pub"],
+                'publishers': ["test"],
             },
             {
                 'name': "test_pipeline_2",
                 'interval': 10,
                 'counters': ['testexception'],
                 'transformers': [],
-                'publishers': ["test_pub"],
+                'publishers': ["test"],
             },
         ]
         self.mgr.pipeline_manager = pipeline.PipelineManager(
             self.pipeline_cfg,
-            self.transformer_manager,
-            self.publisher_manager)
+            self.transformer_manager)
 
         polling_tasks = self.mgr.setup_polling_tasks()
         self.assertEqual(len(polling_tasks.keys()), 1)
         polling_tasks.get(10)
         self.mgr.interval_task(polling_tasks.get(10))
-        self.assertEqual(len(self.publisher.counters), 0)
+        pub = self.mgr.pipeline_manager.pipelines[0].publishers[0]
+        self.assertEqual(len(pub.counters), 0)

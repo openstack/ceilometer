@@ -21,7 +21,6 @@ from oslo.config import cfg
 from pecan import hooks
 
 from ceilometer import pipeline
-from ceilometer import publisher
 from ceilometer import storage
 from ceilometer import transformer
 
@@ -61,9 +60,7 @@ class PipelineHook(hooks.PecanHook):
             # when the file is imported.
             self.__class__.pipeline_manager = pipeline.setup_pipeline(
                 transformer.TransformerExtensionManager(
-                    'ceilometer.transformer'),
-                publisher.PublisherExtensionManager(
-                    'ceilometer.publisher'))
+                    'ceilometer.transformer'))
 
     def before(self, state):
         state.request.pipeline_manager = self.pipeline_manager

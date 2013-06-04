@@ -59,7 +59,8 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         self.mgr.setup_notifier_task()
         self.mgr.poll_instance(None, self.instance)
         self.assertEqual(len(self.Pollster.counters), 1)
-        assert self.publisher.counters[0] == self.Pollster.test_data
+        pub = self.mgr.pipeline_manager.pipelines[0].publishers[0]
+        self.assertEqual(pub.counters[0], self.Pollster.test_data)
 
     def test_setup_polling_tasks(self):
         super(TestRunTasks, self).test_setup_polling_tasks()
