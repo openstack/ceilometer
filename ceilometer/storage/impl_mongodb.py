@@ -322,7 +322,6 @@ class Connection(base.Connection):
         # a new key '_id').
         record = copy.copy(data)
         self.db.meter.insert(record)
-        return
 
     def get_users(self, source=None):
         """Return an iterable of user id strings.
