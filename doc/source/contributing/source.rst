@@ -52,7 +52,7 @@ run through tox_.
 
 2. Install the test dependencies::
 
-   $ sudo pip install -r /opt/stack/ceilometer/tools/test-requires
+   $ sudo pip install -r /opt/stack/ceilometer/test-requirements.txt
 
 3. Run the unit and code-style tests::
 
