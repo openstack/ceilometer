@@ -70,10 +70,10 @@ class UDPPublisher(publisher.PublisherBase):
         for counter in counters:
             msg = counter._asdict()
             msg['source'] = source
-            LOG.debug(_("Publishing counter %s over UDP to %s:%d"),
-                      msg,
-                      cfg.CONF.publisher_udp.host,
-                      cfg.CONF.publisher_udp.port)
+            host = cfg.CONF.publisher_udp.host
+            port = cfg.CONF.publisher_udp.port
+            LOG.debug(_("Publishing counter %(msg)s over "
+                        "UDP to %(host)s:%(port)d") % locals())
             try:
                 self.socket.sendto(msgpack.dumps(msg),
                                    (cfg.CONF.publisher_udp.host,
