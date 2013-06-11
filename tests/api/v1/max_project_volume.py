@@ -23,7 +23,7 @@ import datetime
 
 from oslo.config import cfg
 
-from ceilometer.publisher import meter
+from ceilometer.publisher import rpc
 from ceilometer import counter
 
 from ceilometer.tests import api as tests_api
@@ -52,9 +52,9 @@ class TestMaxProjectVolume(tests_api.TestBase):
                                    }
             )
             self.counters.append(c)
-            msg = meter.meter_message_from_counter(
+            msg = rpc.meter_message_from_counter(
                 c,
-                cfg.CONF.publisher_meter.metering_secret,
+                cfg.CONF.publisher_rpc.metering_secret,
                 'source1',
             )
             self.conn.record_metering_data(msg)

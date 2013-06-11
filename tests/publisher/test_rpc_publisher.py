@@ -24,66 +24,66 @@ from oslo.config import cfg
 
 from ceilometer import counter
 from ceilometer.openstack.common import jsonutils
-from ceilometer.openstack.common import rpc
-from ceilometer.publisher import meter
+from ceilometer.openstack.common import rpc as oslo_rpc
+from ceilometer.publisher import rpc
 from ceilometer.tests import base
 
 
 def test_compute_signature_change_key():
-    sig1 = meter.compute_signature({'a': 'A', 'b': 'B'},
-                                   'not-so-secret')
-    sig2 = meter.compute_signature({'A': 'A', 'b': 'B'},
-                                   'not-so-secret')
+    sig1 = rpc.compute_signature({'a': 'A', 'b': 'B'},
+                                 'not-so-secret')
+    sig2 = rpc.compute_signature({'A': 'A', 'b': 'B'},
+                                 'not-so-secret')
     assert sig1 != sig2
 
 
 def test_compute_signature_change_value():
-    sig1 = meter.compute_signature({'a': 'A', 'b': 'B'},
-                                   'not-so-secret')
-    sig2 = meter.compute_signature({'a': 'a', 'b': 'B'},
-                                   'not-so-secret')
+    sig1 = rpc.compute_signature({'a': 'A', 'b': 'B'},
+                                 'not-so-secret')
+    sig2 = rpc.compute_signature({'a': 'a', 'b': 'B'},
+                                 'not-so-secret')
     assert sig1 != sig2
 
 
 def test_compute_signature_same():
-    sig1 = meter.compute_signature({'a': 'A', 'b': 'B'},
-                                   'not-so-secret')
-    sig2 = meter.compute_signature({'a': 'A', 'b': 'B'},
-                                   'not-so-secret')
+    sig1 = rpc.compute_signature({'a': 'A', 'b': 'B'},
+                                 'not-so-secret')
+    sig2 = rpc.compute_signature({'a': 'A', 'b': 'B'},
+                                 'not-so-secret')
     assert sig1 == sig2
 
 
 def test_compute_signature_signed():
     data = {'a': 'A', 'b': 'B'}
-    sig1 = meter.compute_signature(data, 'not-so-secret')
+    sig1 = rpc.compute_signature(data, 'not-so-secret')
     data['message_signature'] = sig1
-    sig2 = meter.compute_signature(data, 'not-so-secret')
+    sig2 = rpc.compute_signature(data, 'not-so-secret')
     assert sig1 == sig2
 
 
 def test_compute_signature_use_configured_secret():
     data = {'a': 'A', 'b': 'B'}
-    sig1 = meter.compute_signature(data, 'not-so-secret')
-    sig2 = meter.compute_signature(data, 'different-value')
+    sig1 = rpc.compute_signature(data, 'not-so-secret')
+    sig2 = rpc.compute_signature(data, 'different-value')
     assert sig1 != sig2
 
 
 def test_verify_signature_signed():
     data = {'a': 'A', 'b': 'B'}
-    sig1 = meter.compute_signature(data, 'not-so-secret')
+    sig1 = rpc.compute_signature(data, 'not-so-secret')
     data['message_signature'] = sig1
-    assert meter.verify_signature(data, 'not-so-secret')
+    assert rpc.verify_signature(data, 'not-so-secret')
 
 
 def test_verify_signature_unsigned():
     data = {'a': 'A', 'b': 'B'}
-    assert not meter.verify_signature(data, 'not-so-secret')
+    assert not rpc.verify_signature(data, 'not-so-secret')
 
 
 def test_verify_signature_incorrect():
     data = {'a': 'A', 'b': 'B',
             'message_signature': 'Not the same'}
-    assert not meter.verify_signature(data, 'not-so-secret')
+    assert not rpc.verify_signature(data, 'not-so-secret')
 
 
 def test_verify_signature_nested():
@@ -93,10 +93,10 @@ def test_verify_signature_nested():
                        'b': 'B',
                        },
             }
-    data['message_signature'] = meter.compute_signature(
+    data['message_signature'] = rpc.compute_signature(
         data,
         'not-so-secret')
-    assert meter.verify_signature(data, 'not-so-secret')
+    assert rpc.verify_signature(data, 'not-so-secret')
 
 
 def test_verify_signature_nested_json():
@@ -108,11 +108,11 @@ def test_verify_signature_nested_json():
                        'd': ['d']
                        },
             }
-    data['message_signature'] = meter.compute_signature(
+    data['message_signature'] = rpc.compute_signature(
         data,
         'not-so-secret')
     jsondata = jsonutils.loads(jsonutils.dumps(data))
-    assert meter.verify_signature(jsondata, 'not-so-secret')
+    assert rpc.verify_signature(jsondata, 'not-so-secret')
 
 
 TEST_COUNTER = counter.Counter(name='name',
@@ -165,7 +165,7 @@ TEST_NOTICE = {
 
 
 def test_meter_message_from_counter_signed():
-    msg = meter.meter_message_from_counter(
+    msg = rpc.meter_message_from_counter(
         TEST_COUNTER,
         'not-so-secret',
         'src')
@@ -175,7 +175,7 @@ def test_meter_message_from_counter_signed():
 def test_meter_message_from_counter_field():
     def compare(f, c, msg_f, msg):
         assert msg == c
-    msg = meter.meter_message_from_counter(
+    msg = rpc.meter_message_from_counter(
         TEST_COUNTER, 'not-so-secret',
         'src')
     name_map = {'name': 'counter_name',
@@ -254,8 +254,8 @@ class TestPublish(base.TestCase):
     def setUp(self):
         super(TestPublish, self).setUp()
         self.published = []
-        self.stubs.Set(rpc, 'cast', self.faux_cast)
-        publisher = meter.MeterPublisher(None)
+        self.stubs.Set(oslo_rpc, 'cast', self.faux_cast)
+        publisher = rpc.RPCPublisher(None)
         publisher.publish_counters(None,
                                    self.test_data,
                                    'test')
@@ -265,7 +265,7 @@ class TestPublish(base.TestCase):
         for topic, rpc_call in self.published:
             meters = rpc_call['args']['data']
             self.assertIsInstance(meters, list)
-            if topic != cfg.CONF.publisher_meter.metering_topic:
+            if topic != cfg.CONF.publisher_rpc.metering_topic:
                 self.assertEqual(len(set(meter['counter_name']
                                          for meter in meters)),
                                  1,
@@ -273,10 +273,10 @@ class TestPublish(base.TestCase):
 
     def test_published_topics(self):
         topics = [topic for topic, meter in self.published]
-        self.assertIn(cfg.CONF.publisher_meter.metering_topic, topics)
+        self.assertIn(cfg.CONF.publisher_rpc.metering_topic, topics)
         self.assertIn(
-            cfg.CONF.publisher_meter.metering_topic + '.' + 'test', topics)
+            cfg.CONF.publisher_rpc.metering_topic + '.' + 'test', topics)
         self.assertIn(
-            cfg.CONF.publisher_meter.metering_topic + '.' + 'test2', topics)
+            cfg.CONF.publisher_rpc.metering_topic + '.' + 'test2', topics)
         self.assertIn(
-            cfg.CONF.publisher_meter.metering_topic + '.' + 'test3', topics)
+            cfg.CONF.publisher_rpc.metering_topic + '.' + 'test3', topics)

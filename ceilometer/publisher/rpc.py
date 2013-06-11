@@ -51,7 +51,7 @@ METER_PUBLISH_OPTS = [
 def register_opts(config):
     """Register the options for publishing metering messages.
     """
-    config.register_opts(METER_PUBLISH_OPTS, group="publisher_meter")
+    config.register_opts(METER_PUBLISH_OPTS, group="publisher_rpc")
 
 
 register_opts(cfg.CONF)
@@ -102,7 +102,7 @@ def meter_message_from_counter(counter, secret, source):
     return msg
 
 
-class MeterPublisher(publisher.PublisherBase):
+class RPCPublisher(publisher.PublisherBase):
     def publish_counters(self, context, counters, source):
         """Send a metering message for publishing
 
@@ -114,12 +114,12 @@ class MeterPublisher(publisher.PublisherBase):
         meters = [
             meter_message_from_counter(
                 counter,
-                cfg.CONF.publisher_meter.metering_secret,
+                cfg.CONF.publisher_rpc.metering_secret,
                 source)
             for counter in counters
         ]
 
-        topic = cfg.CONF.publisher_meter.metering_topic
+        topic = cfg.CONF.publisher_rpc.metering_topic
         msg = {
             'method': 'record_metering_data',
             'version': '1.0',

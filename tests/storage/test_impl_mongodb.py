@@ -51,7 +51,7 @@ import datetime
 
 from tests.storage import base
 
-from ceilometer.publisher import meter
+from ceilometer.publisher import rpc
 from ceilometer import counter
 from ceilometer.storage.impl_mongodb import require_map_reduce
 
@@ -162,7 +162,7 @@ class CompatibilityTest(MongoDBEngineTestBase):
                                }
         )
         self.counters.append(c)
-        msg = meter.meter_message_from_counter(
+        msg = rpc.meter_message_from_counter(
             c,
             secret='not-so-secret',
             source='test')

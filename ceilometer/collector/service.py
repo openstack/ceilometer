@@ -21,7 +21,7 @@ import msgpack
 import socket
 from stevedore import extension
 
-from ceilometer.publisher import meter as publisher_meter
+from ceilometer.publisher import rpc as publisher_rpc
 from ceilometer.service import prepare_service
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import log
@@ -134,9 +134,9 @@ class CollectorService(rpc_service.Service):
         # Set ourselves up as a separate worker for the metering data,
         # since the default for service is to use create_consumer().
         self.conn.create_worker(
-            cfg.CONF.publisher_meter.metering_topic,
+            cfg.CONF.publisher_rpc.metering_topic,
             rpc_dispatcher.RpcDispatcher([self]),
-            'ceilometer.collector.' + cfg.CONF.publisher_meter.metering_topic,
+            'ceilometer.collector.' + cfg.CONF.publisher_rpc.metering_topic,
         )
 
     def _setup_subscription(self, ext, *args, **kwds):
@@ -186,9 +186,9 @@ class CollectorService(rpc_service.Service):
                      meter['resource_id'],
                      meter.get('timestamp', 'NO TIMESTAMP'),
                      meter['counter_volume'])
-            if publisher_meter.verify_signature(
+            if publisher_rpc.verify_signature(
                     meter,
-                    cfg.CONF.publisher_meter.metering_secret):
+                    cfg.CONF.publisher_rpc.metering_secret):
                 try:
                     # Convert the timestamp to a datetime instance.
                     # Storage engines are responsible for converting
