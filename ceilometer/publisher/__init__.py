@@ -20,22 +20,27 @@
 
 import abc
 from stevedore import driver
+import urlparse
 
 
-def get_publisher(name, namespace='ceilometer.publisher'):
+def get_publisher(url, namespace='ceilometer.publisher'):
     """Get publisher driver and load it.
 
-    :param name: Name of the publisher driver.
+    :param URL: URL for the publisher
     :param namespace: Namespace to use to look for drivers.
     """
-    loaded_driver = driver.DriverManager(namespace, name)
-    return loaded_driver.driver()
+    parse_result = urlparse.urlparse(url)
+    loaded_driver = driver.DriverManager(namespace, parse_result.scheme)
+    return loaded_driver.driver(parse_result)
 
 
 class PublisherBase(object):
     """Base class for plugins that publish the sampler."""
 
     __metaclass__ = abc.ABCMeta
+
+    def __init__(self, parsed_url):
+        pass
 
     @abc.abstractmethod
     def publish_counters(self, context, counters, source):

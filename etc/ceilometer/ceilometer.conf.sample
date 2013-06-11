@@ -17,17 +17,6 @@
 
 
 #
-# Options defined in ceilometer.policy
-#
-
-# JSON file representing policy (string value)
-#policy_file=policy.json
-
-# Rule checked when requested rule is not found (string value)
-#policy_default_rule=default
-
-
-#
 # Options defined in ceilometer.api.app
 #
 
@@ -240,6 +229,18 @@
 
 
 #
+# Options defined in ceilometer.openstack.common.policy
+#
+
+# JSON file containing policy (string value)
+#policy_file=policy.json
+
+# Rule enforced when requested rule is not found (string
+# value)
+#policy_default_rule=default
+
+
+#
 # Options defined in ceilometer.openstack.common.rpc
 #
 
@@ -271,15 +272,6 @@
 # AMQP exchange to connect to if using RabbitMQ or Qpid
 # (string value)
 #control_exchange=openstack
-
-
-#
-# Options defined in ceilometer.openstack.common.rpc.amqp
-#
-
-# Enable a fast single reply queue if using AMQP based RPC
-# like RabbitMQ or Qpid. (boolean value)
-#amqp_rpc_single_reply_queue=false
 
 
 #
@@ -407,7 +399,7 @@
 # Name of this node. Must be a valid hostname, FQDN, or IP
 # address. Must match "host" option, if running Nova. (string
 # value)
-#rpc_zmq_host=dex
+#rpc_zmq_host=ceilometer
 
 
 #
@@ -445,20 +437,6 @@
 #cinder_control_exchange=cinder
 
 
-[publisher_udp]
-
-#
-# Options defined in ceilometer.publisher.udp
-#
-
-# The host target to publish metering records to. (string
-# value)
-#host=localhost
-
-# The port to send UDP meters to. (integer value)
-#port=4952
-
-
 [database]
 
 #
@@ -479,7 +457,11 @@
 
 # The SQLAlchemy connection string used to connect to the
 # database (string value)
-#connection=sqlite:////common/db/$sqlite_db
+#connection=sqlite:////ceilometer/openstack/common/db/$sqlite_db
+
+# The SQLAlchemy connection string used to connect to the
+# slave database (string value)
+#slave_connection=
 
 # timeout before idle sql connections are reaped (integer
 # value)
@@ -491,7 +473,7 @@
 
 # Maximum number of SQL connections to keep open in a pool
 # (integer value)
-#max_pool_size=5
+#max_pool_size=<None>
 
 # maximum db connection retries during startup. (setting -1
 # implies an infinite retry count) (integer value)
@@ -512,6 +494,10 @@
 # Add python stack traces to SQL as comment strings (boolean
 # value)
 #connection_trace=false
+
+# If set, use this value for pool_timeout with sqlalchemy
+# (integer value)
+#pool_timeout=<None>
 
 
 [publisher_meter]
@@ -614,4 +600,4 @@
 #password=<None>
 
 
-# Total option count: 117
+# Total option count: 116

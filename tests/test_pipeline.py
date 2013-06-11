@@ -54,13 +54,13 @@ class TestPipeline(base.TestCase):
 
         raise KeyError(name)
 
-    def get_publisher(self, name, namespace=''):
-        fake_drivers = {'test': test_publisher.TestPublisher,
-                        'new': test_publisher.TestPublisher,
-                        'except': self.PublisherClassException}
-        return fake_drivers[name]()
+    def get_publisher(self, url, namespace=''):
+        fake_drivers = {'test://': test_publisher.TestPublisher,
+                        'new://': test_publisher.TestPublisher,
+                        'except://': self.PublisherClassException}
+        return fake_drivers[url](url)
 
-    class PublisherClassException():
+    class PublisherClassException(publisher.PublisherBase):
         def publish_counters(self, ctxt, counters, source):
             raise Exception()
 
@@ -127,7 +127,7 @@ class TestPipeline(base.TestCase):
                 {'name': "update",
                  'parameters': {}}
             ],
-            'publishers': ["test"],
+            'publishers': ["test://"],
         }, ]
 
     def _exception_create_pipelinemanager(self):
@@ -475,7 +475,7 @@ class TestPipeline(base.TestCase):
                         == 'a_update')
 
     def test_multiple_publisher(self):
-        self.pipeline_cfg[0]['publishers'] = ['test', 'new']
+        self.pipeline_cfg[0]['publishers'] = ['test://', 'new://']
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
                                                     self.transformer_manager)
 
@@ -492,7 +492,7 @@ class TestPipeline(base.TestCase):
                          'a_update')
 
     def test_multiple_publisher_isolation(self):
-        self.pipeline_cfg[0]['publishers'] = ['except', 'new']
+        self.pipeline_cfg[0]['publishers'] = ['except://', 'new://']
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
                                                     self.transformer_manager)
         with pipeline_manager.publisher(None, None) as p:
@@ -614,7 +614,7 @@ class TestPipeline(base.TestCase):
                 {'name': "update",
                  'parameters': {}}
             ],
-            'publishers': ["test"],
+            'publishers': ["test://"],
         }, ]
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
                                                     self.transformer_manager)

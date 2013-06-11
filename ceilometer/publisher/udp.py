@@ -20,42 +20,24 @@
 
 from ceilometer import publisher
 from ceilometer.openstack.common import log
+from ceilometer.openstack.common import network_utils
 from ceilometer.openstack.common.gettextutils import _
-from oslo.config import cfg
 import msgpack
 import socket
+from oslo.config import cfg
+
+cfg.CONF.import_opt('udp_port', 'ceilometer.collector.service',
+                    group='collector')
 
 LOG = log.getLogger(__name__)
-
-UDP_PUBLISH_GROUP = cfg.OptGroup(name='publisher_udp',
-                                 title='Options for UDP publisher')
-
-UDP_PUBLISH_OPTS = [
-    cfg.StrOpt('host',
-               default="localhost",
-               help='The host target to publish metering records to.',
-               ),
-    cfg.IntOpt('port',
-               default=4952,
-               help='The port to send UDP meters to.',
-               ),
-]
-
-
-def register_opts(config):
-    """Register the options for publishing UDP messages.
-    """
-    config.register_group(UDP_PUBLISH_GROUP)
-    config.register_opts(UDP_PUBLISH_OPTS,
-                         group=UDP_PUBLISH_GROUP)
-
-
-register_opts(cfg.CONF)
 
 
 class UDPPublisher(publisher.PublisherBase):
 
-    def __init__(self):
+    def __init__(self, parsed_url):
+        self.host, self.port = network_utils.parse_host_port(
+            parsed_url.netloc,
+            default_port=cfg.CONF.collector.udp_port)
         self.socket = socket.socket(socket.AF_INET,
                                     socket.SOCK_DGRAM)
 
@@ -70,14 +52,13 @@ class UDPPublisher(publisher.PublisherBase):
         for counter in counters:
             msg = counter._asdict()
             msg['source'] = source
-            host = cfg.CONF.publisher_udp.host
-            port = cfg.CONF.publisher_udp.port
+            host = self.host
+            port = self.port
             LOG.debug(_("Publishing counter %(msg)s over "
                         "UDP to %(host)s:%(port)d") % locals())
             try:
                 self.socket.sendto(msgpack.dumps(msg),
-                                   (cfg.CONF.publisher_udp.host,
-                                    cfg.CONF.publisher_udp.port))
+                                   (self.host, self.port))
             except Exception as e:
                 LOG.warn(_("Unable to send counter over UDP"))
                 LOG.exception(e)
