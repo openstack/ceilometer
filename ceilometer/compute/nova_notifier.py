@@ -25,7 +25,8 @@ from nova.openstack.common import log as logging
 # HACK(dhellmann): Insert the nova version of openstack.common into
 # sys.modules as though it was the copy from ceilometer, so that when
 # we use modules from ceilometer below they do not re-define options.
-import ceilometer  # use the real ceilometer base package
+# use the real ceilometer base package
+import ceilometer  # noqa
 for name in ['openstack', 'openstack.common', 'openstack.common.log']:
     sys.modules['ceilometer.' + name] = sys.modules['nova.' + name]
 

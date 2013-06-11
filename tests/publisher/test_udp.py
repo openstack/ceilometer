@@ -19,11 +19,9 @@
 """
 
 import datetime
-import functools
 import mock
 import msgpack
 from oslo.config import cfg
-import socket
 
 from ceilometer import counter
 from ceilometer.publisher import udp

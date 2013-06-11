@@ -29,15 +29,9 @@ from ceilometer.openstack.common import service as os_service
 from ceilometer.openstack.common.rpc import dispatcher as rpc_dispatcher
 from ceilometer.openstack.common.rpc import service as rpc_service
 
-# Import rpc_notifier to register `notification_topics` flag so that
-# plugins can use it
-# FIXME(dhellmann): Use option importing feature of oslo.config instead.
-import ceilometer.openstack.common.notifier.rpc_notifier
-
 from ceilometer.openstack.common import timeutils
 from ceilometer import pipeline
 from ceilometer import publisher
-from ceilometer import service
 from ceilometer import storage
 from ceilometer import transformer
 

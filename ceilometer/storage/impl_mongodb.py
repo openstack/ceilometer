@@ -579,7 +579,7 @@ def require_map_reduce(conn):
     # map-reduce functions, so if we can't import it then just
     # skip these tests unless we aren't using mim.
     try:
-        import spidermonkey
+        import spidermonkey  # noqa
     except BaseException:
         try:
             from ming import mim

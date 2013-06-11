@@ -18,7 +18,6 @@
 """Base classes for API tests.
 """
 
-import os
 import urllib
 
 import flask

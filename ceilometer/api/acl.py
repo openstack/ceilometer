@@ -20,8 +20,6 @@
 
 from keystoneclient.middleware import auth_token
 from oslo.config import cfg
-from pecan import hooks
-from webob import exc
 
 from ceilometer import policy
 
