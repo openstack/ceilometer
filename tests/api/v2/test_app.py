@@ -35,7 +35,6 @@ class TestApp(base.TestCase):
         cfg.CONF.reset()
 
     def test_keystone_middleware_conf(self):
-        service.prepare_service()
         cfg.CONF.set_override("auth_protocol", "foottp",
                               group=acl.OPT_GROUP_NAME)
         cfg.CONF.set_override("auth_version", "v2.0", group=acl.OPT_GROUP_NAME)

@@ -16,17 +16,14 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import eventlet
 from oslo.config import cfg
 import msgpack
 import socket
-import sys
 
 from ceilometer.publisher import meter as publisher_meter
 from ceilometer import extension_manager
 from ceilometer.service import prepare_service
 from ceilometer.openstack.common import context
-from ceilometer.openstack.common import gettextutils
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import service as os_service
 from ceilometer.openstack.common.rpc import dispatcher as rpc_dispatcher
@@ -112,10 +109,7 @@ class UDPCollectorService(os_service.Service):
 
 
 def udp_collector():
-    # TODO(jd) move into prepare_service gettextutils and eventlet?
-    eventlet.monkey_patch()
-    gettextutils.install('ceilometer')
-    prepare_service(sys.argv)
+    prepare_service()
     os_service.launch(UDPCollectorService()).wait()
 
 
@@ -234,9 +228,6 @@ class CollectorService(rpc_service.Service):
 
 
 def collector():
-    # TODO(jd) move into prepare_service gettextutils and eventlet?
-    eventlet.monkey_patch()
-    gettextutils.install('ceilometer')
-    prepare_service(sys.argv)
+    prepare_service()
     os_service.launch(CollectorService(cfg.CONF.host,
                                        'ceilometer.collector')).wait()
