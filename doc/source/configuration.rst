@@ -51,7 +51,7 @@ reseller_prefix                  AUTH\_                                Prefix us
 Service polling authentication
 ==============================
 
-The following options must be placed into a [service_credentials] sections
+The following options must be placed under a [service_credentials] section
 and will be used by Ceilometer to retrieve information from OpenStack
 components.
 
