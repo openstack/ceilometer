@@ -212,8 +212,6 @@ class Connection(base.Connection):
             meter.message_id = data['message_id']
             session.flush()
 
-        return
-
     def get_users(self, source=None):
         """Return an iterable of user id strings.
 

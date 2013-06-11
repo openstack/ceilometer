@@ -57,7 +57,8 @@ def register_opts(conf):
 def get_engine(conf):
     """Load the configured engine and return an instance."""
     if conf.database_connection:
-        conf.database.connection = conf.database_connection
+        conf.set_override('connection', conf.database_connection,
+                          group='database')
     engine_name = urlparse.urlparse(conf.database.connection).scheme
     LOG.debug('looking for %r driver in %r',
               engine_name, STORAGE_ENGINE_NAMESPACE)
