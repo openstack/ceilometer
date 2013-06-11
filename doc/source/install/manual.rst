@@ -334,7 +334,7 @@ Installing the API Server
 
    ::
 
-    $ ./bin/ceilometer-api
+    $ ceilometer-api
 
 .. note::
 
