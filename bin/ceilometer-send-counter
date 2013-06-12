@@ -24,7 +24,6 @@ import logging
 import sys
 
 from oslo.config import cfg
-from stevedore import dispatch
 
 from ceilometer import counter
 from ceilometer import pipeline
