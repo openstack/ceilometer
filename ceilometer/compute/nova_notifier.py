@@ -32,9 +32,8 @@ for name in ['openstack', 'openstack.common', 'openstack.common.log']:
 
 from nova.conductor import api
 
-from oslo.config import cfg
+from stevedore import extension
 
-from ceilometer import extension_manager
 from ceilometer.compute.virt import inspector
 from ceilometer.openstack.common.gettextutils import _
 
@@ -84,9 +83,9 @@ def initialize_gatherer(gatherer=None):
         _gatherer = gatherer
     if _gatherer is None:
         LOG.debug(_('making a new stats gatherer'))
-        mgr = extension_manager.ActivatedExtensionManager(
+        mgr = extension.ExtensionManager(
             namespace='ceilometer.poll.compute',
-            disabled_names=cfg.CONF.disabled_compute_pollsters,
+            invoke_on_load=True,
         )
         _gatherer = DeletedInstanceStatsGatherer(mgr)
     return _gatherer
