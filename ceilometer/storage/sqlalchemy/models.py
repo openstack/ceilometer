@@ -183,7 +183,7 @@ class UniqueName(Base):
     """
     __tablename__ = 'unique_name'
     id = Column(Integer, primary_key=True)
-    key = Column(String(32), index=True, unique=True)
+    key = Column(String(255), index=True, unique=True)
 
     def __init__(self, key):
         self.key = key
@@ -218,7 +218,7 @@ class Trait(Base):
     name = relationship("UniqueName", backref=backref('name', order_by=id))
 
     t_type = Column(Integer, index=True)
-    t_string = Column(String(32), nullable=True, default=None, index=True)
+    t_string = Column(String(255), nullable=True, default=None, index=True)
     t_float = Column(Float, nullable=True, default=None, index=True)
     t_int = Column(Integer, nullable=True, default=None, index=True)
     t_datetime = Column(Float(asdecimal=True), nullable=True, default=None,
