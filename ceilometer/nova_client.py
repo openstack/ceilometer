@@ -32,7 +32,7 @@ def logged(func):
     def with_logging(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except Exception, e:
+        except Exception as e:
             LOG.exception(e)
             raise
 
