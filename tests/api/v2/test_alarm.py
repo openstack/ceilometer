@@ -133,10 +133,8 @@ class TestAlarms(FunctionalTest):
         self.assertEquals(alarm.name, json['name'])
 
     def test_put_alarm_wrong_field(self):
-        '''
-        Note: wsme will ignore unknown fields so will
-        just not appear in the Alarm.
-        '''
+        # Note: wsme will ignore unknown fields so will just not appear in
+        # the Alarm.
         json = {
             'name': 'renamed_alarm',
             'this_can_not_be_correct': 'ha',

@@ -88,9 +88,7 @@ class Connection(base.Connection):
     """
 
     def __init__(self, conf):
-        '''
-        Hbase Connection Initialization
-        '''
+        """Hbase Connection Initialization"""
         opts = self._parse_connection_url(conf.database.connection)
         opts['table_prefix'] = conf.table_prefix
 

@@ -129,8 +129,7 @@ class Query(_Base):
 
 
 def _sanitize_query(q):
-    '''
-    Check the query to see if:
+    '''Check the query to see if:
     1) the request is comming from admin - then allow full visibility
     2) non-admin - make sure that the query includes the requester's
     project.

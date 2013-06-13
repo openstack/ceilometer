@@ -156,9 +156,7 @@ class TestSwiftMiddleware(base.TestCase):
         self.assertEqual(data.volume, 1)
 
     def test_bogus_request(self):
-        """
-        test even for arbitrary request method, this will still work
-        """
+        """Test even for arbitrary request method, this will still work."""
         app = swift_middleware.CeilometerMiddleware(FakeApp(body=['']), {})
         req = Request.blank('/1.0/account/container/obj',
                             environ={'REQUEST_METHOD': 'BOGUS'})

@@ -66,9 +66,7 @@ from ceilometer import transformer
 
 
 class CeilometerMiddleware(object):
-    """
-    Ceilometer middleware used for counting requests.
-    """
+    """Ceilometer middleware used for counting requests."""
 
     def __init__(self, app, conf):
         self.app = app

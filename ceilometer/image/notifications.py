@@ -35,10 +35,7 @@ cfg.CONF.register_opts(OPTS)
 
 
 class ImageBase(plugin.NotificationBase):
-    """
-    Listen for image.send notifications in order to mediate with
-    the metering framework.
-    """
+    """Base class for image counting. """
 
     @staticmethod
     def get_exchange_topics(conf):

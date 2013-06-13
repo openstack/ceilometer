@@ -61,9 +61,7 @@ class TestPostSamples(FunctionalTest):
         self.assertEquals(s1, data.json)
 
     def test_wrong_project_id(self):
-        '''
-        do not accept cross posting samples to different projects
-        '''
+        """Do not accept cross posting samples to different projects."""
         s1 = [{'counter_name': 'my_counter_name',
                'counter_type': 'gauge',
                'counter_unit': 'instance',
@@ -87,11 +85,10 @@ class TestPostSamples(FunctionalTest):
         self.assertEquals(data.status_int, 400)
 
     def test_multiple_samples(self):
-        '''
-        send multiple samples.
+        """Send multiple samples.
         The usecase here is to reduce the chatter and send the counters
         at a slower cadence.
-        '''
+        """
         samples = []
         stamps = []
         for x in range(6):
@@ -127,9 +124,7 @@ class TestPostSamples(FunctionalTest):
                     self.assertEquals(v, data.json[x][k])
 
     def test_missing_mandatory_fields(self):
-        '''
-        do not accept posting samples with missing mandatory fields
-        '''
+        """Do not accept posting samples with missing mandatory fields."""
         s1 = [{'counter_name': 'my_counter_name',
                'counter_type': 'gauge',
                'counter_unit': 'instance',
@@ -152,9 +147,7 @@ class TestPostSamples(FunctionalTest):
             self.assertEquals(data.status_int, 400)
 
     def test_multiple_sources(self):
-        '''
-        do not accept a single post of mixed sources
-        '''
+        """Do not accept a single post of mixed sources."""
         s1 = [{'counter_name': 'my_counter_name',
                'counter_type': 'gauge',
                'counter_unit': 'instance',
@@ -179,11 +172,9 @@ class TestPostSamples(FunctionalTest):
         self.assertEquals(data.status_int, 400)
 
     def test_multiple_samples_some_null_sources(self):
-        '''
-        do accept a single post with some null sources
+        """Do accept a single post with some null sources
         this is a convience feature so you only have to set
-        one of the sample's source field.
-        '''
+        one of the sample's source field."""
         s1 = [{'counter_name': 'my_counter_name',
                'counter_type': 'gauge',
                'counter_unit': 'instance',

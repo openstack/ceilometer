@@ -72,8 +72,7 @@ class TestBase(db_test_base.TestBase):
 
 
 class FunctionalTest(db_test_base.TestBase):
-    """
-    Used for functional tests of Pecan controllers where you need to
+    """Used for functional tests of Pecan controllers where you need to
     test your literal application and its integration with the
     framework.
     """

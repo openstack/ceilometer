@@ -49,7 +49,8 @@ class Event(Model):
        Metrics will be derived from one or more Events.
     """
     def __init__(self, event_name, generated, traits):
-        """
+        """Create a new event.
+
         :param event_name:  Name of the event.
         :param generated:   UTC time for when the event occured.
         :param traits:      list of Traits on this Event.
@@ -89,7 +90,8 @@ class Resource(Model):
 
     def __init__(self, resource_id, project_id, source, user_id, metadata,
                  meter):
-        """
+        """Create a new resource.
+
         :param resource_id: UUID of the resource
         :param project_id:  UUID of project owning the resource
         :param source:      the identifier for the user/project id definition
@@ -115,7 +117,8 @@ class ResourceMeter(Model):
     """
 
     def __init__(self, counter_name, counter_type, counter_unit):
-        """
+        """Create a new resource meter.
+
         :param counter_name: the name of the counter updating the resource
         :param counter_type: one of gauge, delta, cumulative
         :param counter_unit: official units name for the sample data
@@ -133,7 +136,8 @@ class Meter(Model):
 
     def __init__(self, name, type, unit, resource_id, project_id, source,
                  user_id):
-        """
+        """Create a new meter.
+
         :param name: name of the meter
         :param type: type of the meter (guage, counter)
         :param unit: unit of the meter
@@ -164,7 +168,8 @@ class Sample(Model):
                  message_id,
                  message_signature,
                  ):
-        """
+        """Create a new sample.
+
         :param source: the identifier for the user/project id definition
         :param counter_name: the name of the measurement being taken
         :param counter_type: the type of the measurement
@@ -201,7 +206,8 @@ class Statistics(Model):
                  min, max, avg, sum, count,
                  period, period_start, period_end,
                  duration, duration_start, duration_end):
-        """
+        """Create a new statistics object.
+
         :param min: The smallest volume found
         :param max: The largest volume found
         :param avg: The average of all volumes found

@@ -113,14 +113,11 @@ class InstanceNotFoundException(InspectorException):
 class Inspector(object):
 
     def inspect_instances(self):
-        """
-        List the instances on the current host.
-        """
+        """List the instances on the current host. """
         raise NotImplementedError()
 
     def inspect_cpus(self, instance_name):
-        """
-        Inspect the CPU statistics for an instance.
+        """Inspect the CPU statistics for an instance.
 
         :param instance_name: the name of the target instance
         :return: the number of CPUs and cumulative CPU time
@@ -128,8 +125,7 @@ class Inspector(object):
         raise NotImplementedError()
 
     def inspect_vnics(self, instance_name):
-        """
-        Inspect the vNIC statistics for an instance.
+        """Inspect the vNIC statistics for an instance.
 
         :param instance_name: the name of the target instance
         :return: for each vNIC, the number of bytes & packets
@@ -138,8 +134,7 @@ class Inspector(object):
         raise NotImplementedError()
 
     def inspect_disks(self, instance_name):
-        """
-        Inspect the disk statistics for an instance.
+        """Inspect the disk statistics for an instance.
 
         :param instance_name: the name of the target instance
         :return: for each disk, the number of bytes & operations
