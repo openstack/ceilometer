@@ -42,7 +42,6 @@ control_exchange                 ceilometer                            AMQP exch
 periodic_interval                600                                   seconds between running periodic tasks
 database_connection              mongodb://localhost:27017/ceilometer  Database connection string
 metering_api_port                8777                                  The port for the ceilometer API server
-disabled_central_pollsters                                             List of central pollsters to skip loading
 disabled_compute_pollsters                                             List of compute pollsters to skip loading
 disabled_notification_listeners                                        List of notification listeners to skip loading
 reseller_prefix                  AUTH\_                                Prefix used by swift for reseller token

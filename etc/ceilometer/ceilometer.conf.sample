@@ -40,14 +40,6 @@
 
 
 #
-# Options defined in ceilometer.central.manager
-#
-
-# list of central pollsters to disable (list value)
-#disabled_central_pollsters=
-
-
-#
 # Options defined in ceilometer.compute
 #
 
@@ -633,4 +625,4 @@
 #password=<None>
 
 
-# Total option count: 120
+# Total option count: 119
