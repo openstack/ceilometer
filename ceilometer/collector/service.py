@@ -19,9 +19,9 @@
 from oslo.config import cfg
 import msgpack
 import socket
+from stevedore import extension
 
 from ceilometer.publisher import meter as publisher_meter
-from ceilometer import extension_manager
 from ceilometer.service import prepare_service
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import log
@@ -36,10 +36,6 @@ from ceilometer import storage
 from ceilometer import transformer
 
 OPTS = [
-    cfg.ListOpt('disabled_notification_listeners',
-                default=[],
-                help='list of listener plugins to disable',
-                deprecated_group="DEFAULT"),
     cfg.StrOpt('udp_address',
                default='0.0.0.0',
                help='address to bind the UDP socket to'
@@ -135,10 +131,9 @@ class CollectorService(rpc_service.Service):
         LOG.debug('loading notification handlers from %s',
                   self.COLLECTOR_NAMESPACE)
         self.notification_manager = \
-            extension_manager.ActivatedExtensionManager(
+            extension.ExtensionManager(
                 namespace=self.COLLECTOR_NAMESPACE,
-                disabled_names=
-                cfg.CONF.collector.disabled_notification_listeners,
+                invoke_on_load=True,
             )
 
         if not list(self.notification_manager):
