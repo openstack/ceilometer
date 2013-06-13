@@ -26,26 +26,26 @@ class BaseTest(test_base.TestCase):
 
     def test_iter_period(self):
         times = list(base.iter_period(
-            datetime.datetime(2013, 01, 01, 12, 00),
-            datetime.datetime(2013, 01, 01, 13, 00),
+            datetime.datetime(2013, 1, 1, 12, 0),
+            datetime.datetime(2013, 1, 1, 13, 0),
             60))
         self.assertEqual(len(times), 60)
         self.assertEqual(times[10],
-                         (datetime.datetime(2013, 01, 01, 12, 10),
-                          datetime.datetime(2013, 01, 01, 12, 11)))
+                         (datetime.datetime(2013, 1, 1, 12, 10),
+                          datetime.datetime(2013, 1, 1, 12, 11)))
         self.assertEqual(times[21],
-                         (datetime.datetime(2013, 01, 01, 12, 21),
-                          datetime.datetime(2013, 01, 01, 12, 22)))
+                         (datetime.datetime(2013, 1, 1, 12, 21),
+                          datetime.datetime(2013, 1, 1, 12, 22)))
 
     def test_iter_period_bis(self):
         times = list(base.iter_period(
-            datetime.datetime(2013, 01, 02, 13, 00),
-            datetime.datetime(2013, 01, 02, 14, 00),
+            datetime.datetime(2013, 1, 2, 13, 0),
+            datetime.datetime(2013, 1, 2, 14, 0),
             55))
         self.assertEqual(len(times), math.ceil(3600 / 55.0))
         self.assertEqual(times[10],
-                         (datetime.datetime(2013, 01, 02, 13, 9, 10),
-                          datetime.datetime(2013, 01, 02, 13, 10, 5)))
+                         (datetime.datetime(2013, 1, 2, 13, 9, 10),
+                          datetime.datetime(2013, 1, 2, 13, 10, 5)))
         self.assertEqual(times[21],
-                         (datetime.datetime(2013, 01, 02, 13, 19, 15),
-                          datetime.datetime(2013, 01, 02, 13, 20, 10)))
+                         (datetime.datetime(2013, 1, 2, 13, 19, 15),
+                          datetime.datetime(2013, 1, 2, 13, 20, 10)))
