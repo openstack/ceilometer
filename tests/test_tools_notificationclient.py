@@ -26,7 +26,6 @@ def test_send_messages():
     mox.Replay(conn)
     notificationclient.send_messages(conn, 'notifications.info', input)
     mox.Verify(conn)
-    return
 
 
 def test_record_messages():
@@ -37,4 +36,3 @@ def test_record_messages():
     mox.Replay(conn)
     notificationclient.record_messages(conn, 'notifications.info', StringIO())
     mox.Verify(conn)
-    return

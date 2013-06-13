@@ -29,7 +29,6 @@ from tests import agentbase
 def test_load_plugins():
     mgr = manager.AgentManager()
     assert list(mgr.pollster_manager), 'Failed to load any plugins'
-    return
 
 
 class TestRunTasks(agentbase.BaseAgentManagerTestCase):
