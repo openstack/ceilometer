@@ -40,14 +40,6 @@
 
 
 #
-# Options defined in ceilometer.compute
-#
-
-# list of compute agent pollsters to disable (list value)
-#disabled_compute_pollsters=
-
-
-#
 # Options defined in ceilometer.compute.notifications
 #
 
@@ -625,4 +617,4 @@
 #password=<None>
 
 
-# Total option count: 119
+# Total option count: 118

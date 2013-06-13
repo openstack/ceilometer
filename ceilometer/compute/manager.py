@@ -17,10 +17,10 @@
 # under the License.
 
 from oslo.config import cfg
+from stevedore import extension
 
 from ceilometer import agent
 from ceilometer.compute.virt import inspector as virt_inspector
-from ceilometer import extension_manager
 from ceilometer import nova_client
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import service as os_service
@@ -57,9 +57,9 @@ class AgentManager(agent.AgentManager):
 
     def __init__(self):
         super(AgentManager, self).__init__(
-            extension_manager.ActivatedExtensionManager(
+            extension.ExtensionManager(
                 namespace='ceilometer.poll.compute',
-                disabled_names=cfg.CONF.disabled_compute_pollsters,
+                invoke_on_load=True,
             ),
         )
         self._inspector = virt_inspector.get_hypervisor_inspector()
