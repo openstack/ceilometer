@@ -174,7 +174,8 @@ class TestPostSamples(FunctionalTest):
     def test_multiple_samples_some_null_sources(self):
         """Do accept a single post with some null sources
         this is a convience feature so you only have to set
-        one of the sample's source field."""
+        one of the sample's source field.
+        """
         s1 = [{'counter_name': 'my_counter_name',
                'counter_type': 'gauge',
                'counter_unit': 'instance',

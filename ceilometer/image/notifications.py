@@ -40,7 +40,8 @@ class ImageBase(plugin.NotificationBase):
     @staticmethod
     def get_exchange_topics(conf):
         """Return a sequence of ExchangeTopics defining the exchange and
-        topics to be connected for this plugin."""
+        topics to be connected for this plugin.
+        """
         return [
             plugin.ExchangeTopics(
                 exchange=conf.glance_control_exchange,

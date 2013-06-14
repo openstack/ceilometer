@@ -31,8 +31,10 @@ LOG = log.getLogger(__name__)
 
 
 class PollingTask(object):
-    """Polling task for polling counters and inject into pipeline
-    A polling task can be invoked periodically or only once"""
+    """Polling task for polling counters and inject into pipeline.
+    A polling task can be invoked periodically or only once.
+
+    """
 
     def __init__(self, agent_manager):
         self.manager = agent_manager

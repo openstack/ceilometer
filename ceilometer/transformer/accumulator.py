@@ -21,7 +21,9 @@ from ceilometer import transformer
 
 class TransformerAccumulator(transformer.TransformerBase):
     """Transformer that accumulates counter until a threshold, and then flush
-    them out in the wild. """
+    them out in the wild.
+
+    """
 
     def __init__(self, size=1, **kwargs):
         if size >= 1:
