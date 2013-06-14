@@ -36,15 +36,7 @@ cfg.CONF.register_opts(OPTS)
 
 
 class _Base(plugin.NotificationBase):
-    """Convert volume notifications into Counters
-    """
-
-    metadata_keys = [
-        "status",
-        "display_name",
-        "volume_type",
-        "size",
-    ]
+    """Convert volume notifications into Counters."""
 
     @staticmethod
     def get_exchange_topics(conf):
@@ -66,36 +58,26 @@ class _Base(plugin.NotificationBase):
 
 
 class Volume(_Base):
-
     def process_notification(self, message):
-        return [
-            counter.Counter(name='volume',
-                            type=counter.TYPE_GAUGE,
-                            unit='volume',
-                            volume=1,
-                            user_id=message['payload']['user_id'],
-                            project_id=message['payload']['tenant_id'],
-                            resource_id=message['payload']['volume_id'],
-                            timestamp=message['timestamp'],
-                            resource_metadata=self.notification_to_metadata(
-                                message),
-                            ),
-        ]
+        yield counter.Counter.from_notification(
+            name='volume',
+            type=counter.TYPE_GAUGE,
+            unit='volume',
+            volume=1,
+            user_id=message['payload']['user_id'],
+            project_id=message['payload']['tenant_id'],
+            resource_id=message['payload']['volume_id'],
+            message=message)
 
 
 class VolumeSize(_Base):
-
     def process_notification(self, message):
-        return [
-            counter.Counter(name='volume.size',
-                            type=counter.TYPE_GAUGE,
-                            unit='GB',
-                            volume=message['payload']['size'],
-                            user_id=message['payload']['user_id'],
-                            project_id=message['payload']['tenant_id'],
-                            resource_id=message['payload']['volume_id'],
-                            timestamp=message['timestamp'],
-                            resource_metadata=self.notification_to_metadata(
-                                message),
-                            ),
-        ]
+        yield counter.Counter.from_notification(
+            name='volume.size',
+            type=counter.TYPE_GAUGE,
+            unit='GB',
+            volume=message['payload']['size'],
+            user_id=message['payload']['user_id'],
+            project_id=message['payload']['tenant_id'],
+            resource_id=message['payload']['volume_id'],
+            message=message)

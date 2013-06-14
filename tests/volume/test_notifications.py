@@ -72,7 +72,7 @@ class TestNotifications(base.TestCase):
 
     def test_volume_exists(self):
         v = notifications.Volume()
-        counters = v.process_notification(NOTIFICATION_VOLUME_EXISTS)
+        counters = list(v.process_notification(NOTIFICATION_VOLUME_EXISTS))
         self.assertEqual(len(counters), 1)
         c = counters[0]
         self._verify_common_counter(c, 'volume', NOTIFICATION_VOLUME_EXISTS)
@@ -80,7 +80,7 @@ class TestNotifications(base.TestCase):
 
     def test_volume_size_exists(self):
         v = notifications.VolumeSize()
-        counters = v.process_notification(NOTIFICATION_VOLUME_EXISTS)
+        counters = list(v.process_notification(NOTIFICATION_VOLUME_EXISTS))
         self.assertEqual(len(counters), 1)
         c = counters[0]
         self._verify_common_counter(c, 'volume.size',
@@ -90,7 +90,7 @@ class TestNotifications(base.TestCase):
 
     def test_volume_delete(self):
         v = notifications.Volume()
-        counters = v.process_notification(NOTIFICATION_VOLUME_DELETE)
+        counters = list(v.process_notification(NOTIFICATION_VOLUME_DELETE))
         self.assertEqual(len(counters), 1)
         c = counters[0]
         self._verify_common_counter(c, 'volume', NOTIFICATION_VOLUME_DELETE)
@@ -98,7 +98,7 @@ class TestNotifications(base.TestCase):
 
     def test_volume_size_delete(self):
         v = notifications.VolumeSize()
-        counters = v.process_notification(NOTIFICATION_VOLUME_DELETE)
+        counters = list(v.process_notification(NOTIFICATION_VOLUME_DELETE))
         self.assertEqual(len(counters), 1)
         c = counters[0]
         self._verify_common_counter(c, 'volume.size',

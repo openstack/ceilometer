@@ -102,7 +102,7 @@ class TestNotification(base.TestCase):
 
     def test_image_download(self):
         handler = notifications.ImageDownload()
-        counters = handler.process_notification(NOTIFICATION_SEND)
+        counters = list(handler.process_notification(NOTIFICATION_SEND))
         self.assertEqual(len(counters), 1)
         download = counters[0]
         self._verify_common_counter(download, 'image.download', 42)
@@ -112,7 +112,7 @@ class TestNotification(base.TestCase):
 
     def test_image_serve(self):
         handler = notifications.ImageServe()
-        counters = handler.process_notification(NOTIFICATION_SEND)
+        counters = list(handler.process_notification(NOTIFICATION_SEND))
         self.assertEqual(len(counters), 1)
         serve = counters[0]
         self._verify_common_counter(serve, 'image.serve', 42)
@@ -125,7 +125,7 @@ class TestNotification(base.TestCase):
 
     def test_image_crud_on_update(self):
         handler = notifications.ImageCRUD()
-        counters = handler.process_notification(NOTIFICATION_UPDATE)
+        counters = list(handler.process_notification(NOTIFICATION_UPDATE))
         self.assertEqual(len(counters), 1)
         update = counters[0]
         self._verify_common_counter(update, 'image.update', 1)
@@ -133,7 +133,7 @@ class TestNotification(base.TestCase):
 
     def test_image_on_update(self):
         handler = notifications.Image()
-        counters = handler.process_notification(NOTIFICATION_UPDATE)
+        counters = list(handler.process_notification(NOTIFICATION_UPDATE))
         self.assertEqual(len(counters), 1)
         update = counters[0]
         self._verify_common_counter(update, 'image', 1)
@@ -141,7 +141,7 @@ class TestNotification(base.TestCase):
 
     def test_image_size_on_update(self):
         handler = notifications.ImageSize()
-        counters = handler.process_notification(NOTIFICATION_UPDATE)
+        counters = list(handler.process_notification(NOTIFICATION_UPDATE))
         self.assertEqual(len(counters), 1)
         update = counters[0]
         self._verify_common_counter(update, 'image.size',
@@ -150,7 +150,7 @@ class TestNotification(base.TestCase):
 
     def test_image_crud_on_upload(self):
         handler = notifications.ImageCRUD()
-        counters = handler.process_notification(NOTIFICATION_UPLOAD)
+        counters = list(handler.process_notification(NOTIFICATION_UPLOAD))
         self.assertEqual(len(counters), 1)
         upload = counters[0]
         self._verify_common_counter(upload, 'image.upload', 1)
@@ -158,7 +158,7 @@ class TestNotification(base.TestCase):
 
     def test_image_on_upload(self):
         handler = notifications.Image()
-        counters = handler.process_notification(NOTIFICATION_UPLOAD)
+        counters = list(handler.process_notification(NOTIFICATION_UPLOAD))
         self.assertEqual(len(counters), 1)
         upload = counters[0]
         self._verify_common_counter(upload, 'image', 1)
@@ -166,7 +166,7 @@ class TestNotification(base.TestCase):
 
     def test_image_size_on_upload(self):
         handler = notifications.ImageSize()
-        counters = handler.process_notification(NOTIFICATION_UPLOAD)
+        counters = list(handler.process_notification(NOTIFICATION_UPLOAD))
         self.assertEqual(len(counters), 1)
         upload = counters[0]
         self._verify_common_counter(upload, 'image.size',
@@ -175,7 +175,7 @@ class TestNotification(base.TestCase):
 
     def test_image_crud_on_delete(self):
         handler = notifications.ImageCRUD()
-        counters = handler.process_notification(NOTIFICATION_DELETE)
+        counters = list(handler.process_notification(NOTIFICATION_DELETE))
         self.assertEqual(len(counters), 1)
         delete = counters[0]
         self._verify_common_counter(delete, 'image.delete', 1)
@@ -183,7 +183,7 @@ class TestNotification(base.TestCase):
 
     def test_image_on_delete(self):
         handler = notifications.Image()
-        counters = handler.process_notification(NOTIFICATION_DELETE)
+        counters = list(handler.process_notification(NOTIFICATION_DELETE))
         self.assertEqual(len(counters), 1)
         delete = counters[0]
         self._verify_common_counter(delete, 'image', 1)
@@ -191,7 +191,7 @@ class TestNotification(base.TestCase):
 
     def test_image_size_on_delete(self):
         handler = notifications.ImageSize()
-        counters = handler.process_notification(NOTIFICATION_DELETE)
+        counters = list(handler.process_notification(NOTIFICATION_DELETE))
         self.assertEqual(len(counters), 1)
         delete = counters[0]
         self._verify_common_counter(delete, 'image.size',

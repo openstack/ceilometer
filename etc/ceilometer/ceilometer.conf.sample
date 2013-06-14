@@ -29,23 +29,23 @@
 
 
 #
-# Options defined in ceilometer.compute.instance
-#
-
-# list of metadata prefixes resevred for metering use (list
-# value)
-#reserved_metadata_namespace=metering.
-
-# limit on length of reserved metadata values (integer value)
-#reserved_metadata_length=256
-
-
-#
 # Options defined in ceilometer.compute.notifications
 #
 
 # Exchange name for Nova notifications (string value)
 #nova_control_exchange=nova
+
+
+#
+# Options defined in ceilometer.compute.pollsters
+#
+
+# list of metadata prefixes reserved for metering use (list
+# value)
+#reserved_metadata_namespace=metering.
+
+# limit on length of reserved metadata values (integer value)
+#reserved_metadata_length=256
 
 
 #
