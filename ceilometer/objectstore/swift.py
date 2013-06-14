@@ -31,6 +31,8 @@ from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer import plugin
 
+from urlparse import urljoin
+
 
 LOG = log.getLogger(__name__)
 
@@ -110,7 +112,19 @@ class SwiftPollster(_Base):
             LOG.debug(_("Swift endpoint not found"))
             return
 
-        base_url = '%s/v1/%s' % (endpoint, cfg.CONF.reseller_prefix)
         for t in ksclient.tenants.list():
-            yield (t.id, swift.head_account('%s%s' % (base_url, t.id),
+            yield (t.id, swift.head_account(SwiftPollster.
+                                            _neaten_url(endpoint, t.id),
                                             ksclient.auth_token))
+
+    # Transform the registered url to standard and valid format.
+    @staticmethod
+    def _neaten_url(endpoint, tenant_id):
+
+        path = 'v1/' + cfg.CONF.reseller_prefix + tenant_id
+
+        # remove the tail '/' of the endpoint.
+        if endpoint.endswith('/'):
+            endpoint = endpoint[:-1]
+
+        return urljoin(endpoint, path)
