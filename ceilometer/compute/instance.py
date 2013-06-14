@@ -17,6 +17,19 @@
 # under the License.
 """Common code for working with instances
 """
+from oslo.config import cfg
+
+OPTS = [
+    cfg.ListOpt('reserved_metadata_namespace',
+                default=['metering.'],
+                help='list of metadata prefixes resevred for metering use',
+                ),
+    cfg.IntOpt('reserved_metadata_length',
+               default=256,
+               help='limit on length of reserved metadata values'),
+]
+
+cfg.CONF.register_opts(OPTS)
 
 INSTANCE_PROPERTIES = [
     # Identity properties
@@ -34,6 +47,24 @@ INSTANCE_PROPERTIES = [
     'memory_mb',
     'root_gb',
     'vcpus']
+
+
+def add_reserved_user_metadata(instance, metadata):
+    limit = cfg.CONF.reserved_metadata_length
+    user_metadata = {}
+    for prefix in cfg.CONF.reserved_metadata_namespace:
+        md = dict(
+            (k[len(prefix):].replace('.', '_'),
+             v[:limit] if isinstance(v, basestring) else v)
+            for k, v in instance.metadata.items()
+            if (k.startswith(prefix) and
+                k[len(prefix):].replace('.', '_') not in metadata)
+        )
+        user_metadata.update(md)
+    if user_metadata:
+        metadata['user_metadata'] = user_metadata
+
+    return metadata
 
 
 def get_metadata_from_object(instance):
@@ -57,4 +88,5 @@ def get_metadata_from_object(instance):
 
     for name in INSTANCE_PROPERTIES:
         metadata[name] = getattr(instance, name, u'')
-    return metadata
+
+    return add_reserved_user_metadata(instance, metadata)
