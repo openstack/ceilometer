@@ -21,6 +21,7 @@ from stevedore import extension
 
 from ceilometer import counter
 from ceilometer import publisher
+from ceilometer.publisher import test as test_publisher
 from ceilometer import transformer
 from ceilometer.transformer import accumulator
 from ceilometer.openstack.common import timeutils
@@ -53,12 +54,11 @@ class TestPipeline(base.TestCase):
 
         raise KeyError(name)
 
-    class PublisherClass():
-        def __init__(self):
-            self.counters = []
-
-        def publish_counters(self, ctxt, counters, source):
-            self.counters.extend(counters)
+    def get_publisher(self, name, namespace=''):
+        fake_drivers = {'test': test_publisher.TestPublisher,
+                        'new': test_publisher.TestPublisher,
+                        'except': self.PublisherClassException}
+        return fake_drivers[name]()
 
     class PublisherClassException():
         def publish_counters(self, ctxt, counters, source):
@@ -115,39 +115,9 @@ class TestPipeline(base.TestCase):
                        "get_ext",
                        self.fake_tem_get_ext)
 
-        self.publisher_manager = publisher.PublisherExtensionManager(
-            'fake',
-        )
+        self.stubs.Set(publisher, 'get_publisher', self.get_publisher)
 
         self.transformer_manager = transformer.TransformerExtensionManager()
-
-        self.publisher = self.PublisherClass()
-        self.new_publisher = self.PublisherClass()
-        self.publisher_exception = self.PublisherClassException()
-        self.publisher_manager.extensions = [
-            extension.Extension(
-                'test',
-                None,
-                None,
-                self.publisher,
-            ),
-            extension.Extension(
-                'new',
-                None,
-                None,
-                self.new_publisher,
-            ),
-            extension.Extension(
-                'except',
-                None,
-                None,
-                self.publisher_exception,
-            ),
-        ]
-        self.publisher_manager.by_name = dict(
-            (e.name, e)
-            for e
-            in self.publisher_manager.extensions)
 
         self.pipeline_cfg = [{
             'name': "test_pipeline",
@@ -164,8 +134,7 @@ class TestPipeline(base.TestCase):
         self.assertRaises(pipeline.PipelineException,
                           pipeline.PipelineManager,
                           self.pipeline_cfg,
-                          self.transformer_manager,
-                          self.publisher_manager)
+                          self.transformer_manager)
 
     def test_no_counters(self):
         del self.pipeline_cfg[0]['counters']
@@ -205,7 +174,6 @@ class TestPipeline(base.TestCase):
     def test_check_publishers_invalid_publisher(self):
         publisher_cfg = ['test_invalid']
         self.pipeline_cfg[0]['publishers'] = publisher_cfg
-        self._exception_create_pipelinemanager()
 
     def test_invalid_string_interval(self):
         self.pipeline_cfg[0]['interval'] = 'string'
@@ -221,24 +189,22 @@ class TestPipeline(base.TestCase):
 
     def test_get_interval(self):
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
-                                                    self.transformer_manager,
-                                                    self.publisher_manager)
+                                                    self.transformer_manager)
 
         pipe = pipeline_manager.pipelines[0]
         self.assertTrue(pipe.get_interval() == 5)
 
     def test_publisher_transformer_invoked(self):
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
-                                                    self.transformer_manager,
-                                                    self.publisher_manager)
+                                                    self.transformer_manager)
 
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter])
 
-        self.assertTrue(len(self.publisher.counters) == 1)
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+        self.assertEqual(len(publisher.counters), 1)
         self.assertTrue(len(self.TransformerClass.samples) == 1)
-        self.assertTrue(getattr(self.publisher.counters[0], "name")
-                        == 'a_update')
+        self.assertEqual(getattr(publisher.counters[0], "name"), 'a_update')
         self.assertTrue(getattr(self.TransformerClass.samples[0], "name")
                         == 'a')
 
@@ -246,73 +212,68 @@ class TestPipeline(base.TestCase):
         counter_cfg = ['a', 'b']
         self.pipeline_cfg[0]['counters'] = counter_cfg
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
-                                                    self.transformer_manager,
-                                                    self.publisher_manager)
+                                                    self.transformer_manager)
 
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter])
 
-        self.assertTrue(len(self.publisher.counters) == 1)
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+        self.assertEqual(len(publisher.counters), 1)
 
         self.test_counter = self.test_counter._replace(name='b')
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter])
 
-        self.assertTrue(len(self.publisher.counters) == 2)
+        self.assertEqual(len(publisher.counters), 2)
         self.assertTrue(len(self.TransformerClass.samples) == 2)
-        self.assertTrue(getattr(self.publisher.counters[0], "name")
-                        == 'a_update')
-        self.assertTrue(getattr(self.publisher.counters[1], "name")
-                        == 'b_update')
+        self.assertEqual(getattr(publisher.counters[0], "name"), 'a_update')
+        self.assertEqual(getattr(publisher.counters[1], "name"), 'b_update')
 
     def test_wildcard_counter(self):
         counter_cfg = ['*']
         self.pipeline_cfg[0]['counters'] = counter_cfg
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
-                                                    self.transformer_manager,
-                                                    self.publisher_manager)
+                                                    self.transformer_manager)
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter])
 
-        self.assertTrue(len(self.publisher.counters) == 1)
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+        self.assertEqual(len(publisher.counters), 1)
         self.assertTrue(len(self.TransformerClass.samples) == 1)
-        self.assertTrue(getattr(self.publisher.counters[0], "name")
-                        == 'a_update')
+        self.assertEqual(getattr(publisher.counters[0], "name"), 'a_update')
 
     def test_wildcard_excluded_counters(self):
         counter_cfg = ['*', '!a']
         self.pipeline_cfg[0]['counters'] = counter_cfg
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
-                                                    self.transformer_manager,
-                                                    self.publisher_manager)
+                                                    self.transformer_manager)
         self.assertFalse(pipeline_manager.pipelines[0].support_counter('a'))
 
     def test_wildcard_excluded_counters_not_excluded(self):
         counter_cfg = ['*', '!b']
         self.pipeline_cfg[0]['counters'] = counter_cfg
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
-                                                    self.transformer_manager,
-                                                    self.publisher_manager)
+                                                    self.transformer_manager)
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter])
-        self.assertTrue(len(self.publisher.counters) == 1)
-        self.assertTrue(len(self.TransformerClass.samples) == 1)
-        self.assertTrue(getattr(self.publisher.counters[0], "name")
-                        == 'a_update')
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+        self.assertEqual(len(publisher.counters), 1)
+        self.assertEqual(len(self.TransformerClass.samples), 1)
+        self.assertEqual(getattr(publisher.counters[0], "name"),
+                         'a_update')
 
     def test_all_excluded_counters_not_excluded(self):
         counter_cfg = ['!b', '!c']
         self.pipeline_cfg[0]['counters'] = counter_cfg
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
-                                                    self.transformer_manager,
-                                                    self.publisher_manager)
+                                                    self.transformer_manager)
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter])
 
-        self.assertTrue(len(self.publisher.counters) == 1)
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+        self.assertEqual(len(publisher.counters), 1)
         self.assertTrue(len(self.TransformerClass.samples) == 1)
-        self.assertTrue(getattr(self.publisher.counters[0], "name")
-                        == 'a_update')
+        self.assertEqual(getattr(publisher.counters[0], "name"), 'a_update')
         self.assertTrue(getattr(self.TransformerClass.samples[0], "name")
                         == 'a')
 
@@ -320,8 +281,7 @@ class TestPipeline(base.TestCase):
         counter_cfg = ['!a', '!c']
         self.pipeline_cfg[0]['counters'] = counter_cfg
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
-                                                    self.transformer_manager,
-                                                    self.publisher_manager)
+                                                    self.transformer_manager)
         self.assertFalse(pipeline_manager.pipelines[0].support_counter('a'))
         self.assertTrue(pipeline_manager.pipelines[0].support_counter('b'))
         self.assertFalse(pipeline_manager.pipelines[0].support_counter('c'))
@@ -342,8 +302,7 @@ class TestPipeline(base.TestCase):
         })
 
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
-                                                    self.transformer_manager,
-                                                    self.publisher_manager)
+                                                    self.transformer_manager)
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter])
 
@@ -352,12 +311,12 @@ class TestPipeline(base.TestCase):
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter])
 
-        self.assertTrue(len(self.publisher.counters) == 1)
-        self.assertTrue(getattr(self.publisher.counters[0], "name")
-                        == 'a_update')
-        self.assertTrue(len(self.new_publisher.counters) == 1)
-        self.assertTrue(getattr(self.new_publisher.counters[0], "name")
-                        == 'b_new')
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+        self.assertEqual(len(publisher.counters), 1)
+        self.assertEqual(getattr(publisher.counters[0], "name"), 'a_update')
+        new_publisher = pipeline_manager.pipelines[1].publishers[0]
+        self.assertEqual(len(new_publisher.counters), 1)
+        self.assertEqual(getattr(new_publisher.counters[0], "name"), 'b_new')
         self.assertTrue(getattr(self.TransformerClass.samples[0], "name")
                         == 'a')
 
@@ -382,8 +341,7 @@ class TestPipeline(base.TestCase):
             'publishers': ['except'],
         })
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
-                                                    self.transformer_manager,
-                                                    self.publisher_manager)
+                                                    self.transformer_manager)
 
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter])
@@ -393,10 +351,9 @@ class TestPipeline(base.TestCase):
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter])
 
-        self.assertTrue(len(self.publisher.counters) == 1)
-        self.assertTrue(getattr(self.publisher.counters[0], "name")
-                        == 'a_update')
-        self.assertTrue(len(self.new_publisher.counters) == 0)
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+        self.assertEqual(len(publisher.counters), 1)
+        self.assertEqual(getattr(publisher.counters[0], "name"), 'a_update')
         self.assertTrue(len(self.TransformerClass.samples) == 2)
         self.assertTrue(getattr(self.TransformerClass.samples[0], "name")
                         == 'a')
@@ -406,22 +363,22 @@ class TestPipeline(base.TestCase):
     def test_none_transformer_pipeline(self):
         self.pipeline_cfg[0]['transformers'] = None
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
-                                                    self.transformer_manager,
-                                                    self.publisher_manager)
+                                                    self.transformer_manager)
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter])
-        self.assertTrue(len(self.publisher.counters) == 1)
-        self.assertTrue(getattr(self.publisher.counters[0], 'name') == 'a')
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+        self.assertEqual(len(publisher.counters), 1)
+        self.assertEqual(getattr(publisher.counters[0], 'name'), 'a')
 
     def test_empty_transformer_pipeline(self):
         self.pipeline_cfg[0]['transformers'] = []
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
-                                                    self.transformer_manager,
-                                                    self.publisher_manager)
+                                                    self.transformer_manager)
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter])
-        self.assertTrue(len(self.publisher.counters) == 1)
-        self.assertTrue(getattr(self.publisher.counters[0], 'name') == 'a')
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+        self.assertEqual(len(publisher.counters), 1)
+        self.assertEqual(getattr(publisher.counters[0], 'name'), 'a')
 
     def test_multiple_transformer_same_class(self):
         self.pipeline_cfg[0]['transformers'] = [
@@ -435,15 +392,15 @@ class TestPipeline(base.TestCase):
             },
         ]
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
-                                                    self.transformer_manager,
-                                                    self.publisher_manager)
+                                                    self.transformer_manager)
 
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter])
 
-        self.assertTrue(len(self.publisher.counters) == 1)
-        self.assertTrue(getattr(self.publisher.counters[0], 'name')
-                        == 'a_update_update')
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+        self.assertEqual(len(publisher.counters), 1)
+        self.assertEqual(getattr(publisher.counters[0], 'name'),
+                         'a_update_update')
         self.assertTrue(len(self.TransformerClass.samples) == 2)
         self.assertTrue(getattr(self.TransformerClass.samples[0], 'name')
                         == 'a')
@@ -468,8 +425,7 @@ class TestPipeline(base.TestCase):
             },
         ]
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
-                                                    self.transformer_manager,
-                                                    self.publisher_manager)
+                                                    self.transformer_manager)
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter])
 
@@ -478,9 +434,10 @@ class TestPipeline(base.TestCase):
                         == 'a')
         self.assertTrue(getattr(self.TransformerClass.samples[1], 'name')
                         == 'a_update')
-        self.assertTrue(len(self.publisher.counters) == 1)
-        self.assertTrue(getattr(self.publisher.counters[0], 'name')
-                        == 'a_update_new')
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+        self.assertEqual(len(publisher.counters), 1)
+        self.assertEqual(getattr(publisher.counters[0], 'name'),
+                         'a_update_new')
 
     def test_multiple_transformer_drop_transformer(self):
         self.pipeline_cfg[0]['transformers'] = [
@@ -504,12 +461,12 @@ class TestPipeline(base.TestCase):
             },
         ]
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
-                                                    self.transformer_manager,
-                                                    self.publisher_manager)
+                                                    self.transformer_manager)
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter])
 
-        self.assertTrue(len(self.publisher.counters) == 0)
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+        self.assertEqual(len(publisher.counters), 0)
         self.assertTrue(len(self.TransformerClass.samples) == 1)
         self.assertTrue(getattr(self.TransformerClass.samples[0], 'name')
                         == 'a')
@@ -520,45 +477,44 @@ class TestPipeline(base.TestCase):
     def test_multiple_publisher(self):
         self.pipeline_cfg[0]['publishers'] = ['test', 'new']
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
-                                                    self.transformer_manager,
-                                                    self.publisher_manager)
+                                                    self.transformer_manager)
 
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter])
 
-        self.assertTrue(len(self.publisher.counters) == 1)
-        self.assertTrue(len(self.new_publisher.counters) == 1)
-        self.assertTrue(getattr(self.new_publisher.counters[0], 'name')
-                        == 'a_update')
-        self.assertTrue(getattr(self.publisher.counters[0], 'name')
-                        == 'a_update')
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+        new_publisher = pipeline_manager.pipelines[0].publishers[1]
+        self.assertEqual(len(publisher.counters), 1)
+        self.assertEqual(len(new_publisher.counters), 1)
+        self.assertEqual(getattr(new_publisher.counters[0], 'name'),
+                         'a_update')
+        self.assertEqual(getattr(publisher.counters[0], 'name'),
+                         'a_update')
 
     def test_multiple_publisher_isolation(self):
         self.pipeline_cfg[0]['publishers'] = ['except', 'new']
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
-                                                    self.transformer_manager,
-                                                    self.publisher_manager)
+                                                    self.transformer_manager)
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter])
 
-        self.assertTrue(len(self.new_publisher.counters) == 1)
-        self.assertTrue(getattr(self.new_publisher.counters[0], 'name')
-                        == 'a_update')
+        new_publisher = pipeline_manager.pipelines[0].publishers[1]
+        self.assertEqual(len(new_publisher.counters), 1)
+        self.assertEqual(getattr(new_publisher.counters[0], 'name'),
+                         'a_update')
 
     def test_multiple_counter_pipeline(self):
         self.pipeline_cfg[0]['counters'] = ['a', 'b']
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
-                                                    self.transformer_manager,
-                                                    self.publisher_manager)
+                                                    self.transformer_manager)
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter,
                self.test_counter._replace(name='b')])
 
-        self.assertTrue(len(self.publisher.counters) == 2)
-        self.assertTrue(getattr(self.publisher.counters[0], 'name')
-                        == 'a_update')
-        self.assertTrue(getattr(self.publisher.counters[1], 'name')
-                        == 'b_update')
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+        self.assertEqual(len(publisher.counters), 2)
+        self.assertEqual(getattr(publisher.counters[0], 'name'), 'a_update')
+        self.assertEqual(getattr(publisher.counters[1], 'name'), 'b_update')
 
     def test_flush_pipeline_cache(self):
         CACHE_SIZE = 10
@@ -578,22 +534,22 @@ class TestPipeline(base.TestCase):
             }, ]
         )
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
-                                                    self.transformer_manager,
-                                                    self.publisher_manager)
+                                                    self.transformer_manager)
         pipe = pipeline_manager.pipelines[0]
 
         pipe.publish_counter(None, self.test_counter, None)
-        self.assertTrue(len(self.publisher.counters) == 0)
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+        self.assertEqual(len(publisher.counters), 0)
         pipe.flush(None, None)
-        self.assertEqual(len(self.publisher.counters), 0)
+        self.assertEqual(len(publisher.counters), 0)
         pipe.publish_counter(None, self.test_counter, None)
         pipe.flush(None, None)
-        self.assertEqual(len(self.publisher.counters), 0)
+        self.assertEqual(len(publisher.counters), 0)
         for i in range(CACHE_SIZE - 2):
             pipe.publish_counter(None, self.test_counter, None)
         pipe.flush(None, None)
-        self.assertEqual(len(self.publisher.counters), CACHE_SIZE)
-        self.assertTrue(getattr(self.publisher.counters[0], 'name')
+        self.assertEqual(len(publisher.counters), CACHE_SIZE)
+        self.assertTrue(getattr(publisher.counters[0], 'name')
                         == 'a_update_new')
 
     def test_flush_pipeline_cache_multiple_counter(self):
@@ -615,23 +571,22 @@ class TestPipeline(base.TestCase):
         )
         self.pipeline_cfg[0]['counters'] = ['a', 'b']
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
-                                                    self.transformer_manager,
-                                                    self.publisher_manager)
+                                                    self.transformer_manager)
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter,
                self.test_counter._replace(name='b')])
 
-        self.assertTrue(len(self.publisher.counters) == 0)
-        self.assertEqual(len(self.publisher.counters), 0)
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+        self.assertEqual(len(publisher.counters), 0)
 
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter])
 
-        self.assertEqual(len(self.publisher.counters), CACHE_SIZE)
-        self.assertTrue(getattr(self.publisher.counters[0], 'name')
-                        == 'a_update_new')
-        self.assertTrue(getattr(self.publisher.counters[1], 'name')
-                        == 'b_update_new')
+        self.assertEqual(len(publisher.counters), CACHE_SIZE)
+        self.assertEqual(getattr(publisher.counters[0], 'name'),
+                         'a_update_new')
+        self.assertEqual(getattr(publisher.counters[1], 'name'),
+                         'b_update_new')
 
     def test_flush_pipeline_cache_before_publisher(self):
         self.pipeline_cfg[0]['transformers'].append({
@@ -639,16 +594,16 @@ class TestPipeline(base.TestCase):
             'parameters': {}
         })
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
-                                                    self.transformer_manager,
-                                                    self.publisher_manager)
+                                                    self.transformer_manager)
         pipe = pipeline_manager.pipelines[0]
 
+        publisher = pipe.publishers[0]
         pipe.publish_counter(None, self.test_counter, None)
-        self.assertTrue(len(self.publisher.counters) == 0)
+        self.assertEqual(len(publisher.counters), 0)
         pipe.flush(None, None)
-        self.assertTrue(len(self.publisher.counters) == 1)
-        self.assertTrue(getattr(self.publisher.counters[0], 'name')
-                        == 'a_update')
+        self.assertEqual(len(publisher.counters), 1)
+        self.assertEqual(getattr(publisher.counters[0], 'name'),
+                         'a_update')
 
     def test_variable_counter(self):
         self.pipeline_cfg = [{
@@ -662,17 +617,17 @@ class TestPipeline(base.TestCase):
             'publishers': ["test"],
         }, ]
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
-                                                    self.transformer_manager,
-                                                    self.publisher_manager)
+                                                    self.transformer_manager)
 
         self.test_counter = self.test_counter._replace(name='a:b')
 
         with pipeline_manager.publisher(None, None) as p:
             p([self.test_counter])
 
-        self.assertTrue(len(self.publisher.counters) == 1)
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+        self.assertEqual(len(publisher.counters), 1)
         self.assertTrue(len(self.TransformerClass.samples) == 1)
-        self.assertTrue(getattr(self.publisher.counters[0], "name")
-                        == 'a:b_update')
+        self.assertEqual(getattr(publisher.counters[0], "name"),
+                         'a:b_update')
         self.assertTrue(getattr(self.TransformerClass.samples[0], "name")
                         == 'a:b')

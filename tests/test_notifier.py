@@ -20,10 +20,8 @@
 
 from ceilometer import notifier
 from ceilometer import pipeline
-from ceilometer import publisher
 from ceilometer import transformer
 from ceilometer.tests import base as tests_base
-from stevedore import extension
 
 
 MESSAGE = {
@@ -68,44 +66,21 @@ MESSAGE = {
 
 class TestNotifier(tests_base.TestCase):
 
-    class PublisherClass():
-        def __init__(self):
-            self.counters = []
-
-        def publish_counters(self, ctxt, counter, source):
-            self.counters.extend(counter)
-
     def test_process_notification(self):
-        pub = self.PublisherClass()
         transformer_manager = transformer.TransformerExtensionManager(
             'ceilometer.transformer',
         )
-        publisher_manager = publisher.PublisherExtensionManager(
-            'fake',
-        )
-        publisher_manager.extensions = [
-            extension.Extension(
-                'test_pub',
-                None,
-                None,
-                pub,
-            ), ]
-        publisher_manager.by_name = dict(
-            (e.name, e)
-            for e
-            in publisher_manager.extensions)
-
         notifier._pipeline_manager = pipeline.PipelineManager(
             [{
                 'name': "test_pipeline",
                 'interval': 60,
                 'counters': ['*'],
                 'transformers': [],
-                'publishers': ["test_pub"],
+                'publishers': ["test"],
             }],
-            transformer_manager,
-            publisher_manager)
+            transformer_manager)
 
+        pub = notifier._pipeline_manager.pipelines[0].publishers[0]
         self.assertEqual(len(pub.counters), 0)
         notifier.notify(None, MESSAGE)
         self.assertTrue(len(pub.counters) > 0)

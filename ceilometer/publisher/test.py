@@ -1,10 +1,8 @@
 # -*- encoding: utf-8 -*-
 #
-# Copyright © 2013 Intel Corp.
 # Copyright © 2013 eNovance
 #
-# Author: Yunhong Jiang <yunhong.jiang@intel.com>
-#         Julien Danjou <julien@danjou.info>
+# Author: Julien Danjou <julien@danjou.info>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -17,26 +15,23 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+"""Publish a counter in memory, useful for testing
+"""
 
-import abc
-from stevedore import driver
-
-
-def get_publisher(name, namespace='ceilometer.publisher'):
-    """Get publisher driver and load it.
-
-    :param name: Name of the publisher driver.
-    :param namespace: Namespace to use to look for drivers.
-    """
-    loaded_driver = driver.DriverManager(namespace, name)
-    return loaded_driver.driver()
+from ceilometer import publisher
 
 
-class PublisherBase(object):
-    """Base class for plugins that publish the sampler."""
+class TestPublisher(publisher.PublisherBase):
+    """Publisher used in unit testing."""
 
-    __metaclass__ = abc.ABCMeta
+    def __init__(self):
+        self.counters = []
 
-    @abc.abstractmethod
     def publish_counters(self, context, counters, source):
-        "Publish counters into final conduit."
+        """Send a metering message for publishing
+
+        :param context: Execution context from the service or RPC call
+        :param counter: Counter from pipeline after transformation
+        :param source: counter source
+        """
+        self.counters.extend(counters)

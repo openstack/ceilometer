@@ -60,7 +60,6 @@ from ceilometer import counter
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import timeutils
 from ceilometer import pipeline
-from ceilometer import publisher
 from ceilometer import service
 from ceilometer import transformer
 
@@ -81,9 +80,6 @@ class CeilometerMiddleware(object):
         self.pipeline_manager = pipeline.setup_pipeline(
             transformer.TransformerExtensionManager(
                 'ceilometer.transformer',
-            ),
-            publisher.PublisherExtensionManager(
-                'ceilometer.publisher',
             ),
         )
 

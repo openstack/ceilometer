@@ -24,7 +24,6 @@ from oslo.config import cfg
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import log
 from ceilometer import pipeline
-from ceilometer import publisher
 from ceilometer import transformer
 
 LOG = log.getLogger(__name__)
@@ -56,9 +55,6 @@ class AgentManager(object):
         self.pipeline_manager = pipeline.setup_pipeline(
             transformer.TransformerExtensionManager(
                 'ceilometer.transformer',
-            ),
-            publisher.PublisherExtensionManager(
-                'ceilometer.publisher',
             ),
         )
 

@@ -31,7 +31,6 @@ from ceilometer.openstack.common.rpc import service as rpc_service
 
 from ceilometer.openstack.common import timeutils
 from ceilometer import pipeline
-from ceilometer import publisher
 from ceilometer import storage
 from ceilometer import transformer
 
@@ -116,9 +115,6 @@ class CollectorService(rpc_service.Service):
         self.pipeline_manager = pipeline.setup_pipeline(
             transformer.TransformerExtensionManager(
                 'ceilometer.transformer',
-            ),
-            publisher.PublisherExtensionManager(
-                'ceilometer.publisher',
             ),
         )
 
