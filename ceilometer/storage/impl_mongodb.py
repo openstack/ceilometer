@@ -248,7 +248,8 @@ class Connection(base.Connection):
                 ('source', pymongo.ASCENDING),
             ], name='meter_idx')
 
-    def upgrade(self, version=None):
+    @staticmethod
+    def upgrade(version=None):
         pass
 
     def clear(self):
@@ -260,7 +261,8 @@ class Connection(base.Connection):
         else:
             self.conn.drop_database(self.db)
 
-    def _parse_connection_url(self, url):
+    @staticmethod
+    def _parse_connection_url(url):
         opts = {}
         result = urlparse.urlparse(url)
         opts['dbtype'] = result.scheme
@@ -556,14 +558,16 @@ class Connection(base.Connection):
         """
         self.db.alarm.remove({'alarm_id': alarm_id})
 
-    def record_events(self, events):
+    @staticmethod
+    def record_events(events):
         """Write the events.
 
         :param events: a list of model.Event objects.
         """
         raise NotImplementedError('Events not implemented.')
 
-    def get_events(self, event_filter):
+    @staticmethod
+    def get_events(event_filter):
         """Return an iterable of model.Event objects.
 
         :param event_filter: EventFilter instance

@@ -93,5 +93,6 @@ class AgentManager(object):
                                       self.interval_task,
                                       task=task)
 
-    def interval_task(self, task):
+    @staticmethod
+    def interval_task(task):
         task.poll_and_publish()

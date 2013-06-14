@@ -154,7 +154,8 @@ class Connection(base.Connection):
         for table in reversed(Base.metadata.sorted_tables):
             engine.execute(table.delete())
 
-    def record_metering_data(self, data):
+    @staticmethod
+    def record_metering_data(data):
         """Write the data to the backend storage system.
 
         :param data: a dictionary such as returned by
@@ -212,7 +213,8 @@ class Connection(base.Connection):
             meter.message_id = data['message_id']
             session.flush()
 
-    def get_users(self, source=None):
+    @staticmethod
+    def get_users(source=None):
         """Return an iterable of user id strings.
 
         :param source: Optional source filter.
@@ -223,7 +225,8 @@ class Connection(base.Connection):
             query = query.filter(User.sources.any(id=source))
         return (x[0] for x in query.all())
 
-    def get_projects(self, source=None):
+    @staticmethod
+    def get_projects(source=None):
         """Return an iterable of project id strings.
 
         :param source: Optional source filter.
@@ -234,7 +237,8 @@ class Connection(base.Connection):
             query = query.filter(Project.sources.any(id=source))
         return (x[0] for x in query.all())
 
-    def get_resources(self, user=None, project=None, source=None,
+    @staticmethod
+    def get_resources(user=None, project=None, source=None,
                       start_timestamp=None, end_timestamp=None,
                       metaquery={}, resource=None):
         """Return an iterable of api_models.Resource instances
@@ -281,7 +285,8 @@ class Connection(base.Connection):
                 ],
             )
 
-    def get_meters(self, user=None, project=None, resource=None, source=None,
+    @staticmethod
+    def get_meters(user=None, project=None, resource=None, source=None,
                    metaquery={}):
         """Return an iterable of api_models.Meter instances
 
@@ -322,7 +327,8 @@ class Connection(base.Connection):
                     user_id=resource.user_id,
                 )
 
-    def get_samples(self, sample_filter, limit=None):
+    @staticmethod
+    def get_samples(sample_filter, limit=None):
         """Return an iterable of api_models.Samples.
 
         :param sample_filter: Filter.
@@ -361,7 +367,8 @@ class Connection(base.Connection):
                 message_signature=s.message_signature,
             )
 
-    def _make_volume_query(self, sample_filter, counter_volume_func):
+    @staticmethod
+    def _make_volume_query(sample_filter, counter_volume_func):
         """Returns complex Meter counter_volume query for max and sum."""
         session = sqlalchemy_session.get_session()
         subq = session.query(Meter.id)
@@ -371,7 +378,8 @@ class Connection(base.Connection):
         mainq = mainq.join(Meter).group_by(Resource.id)
         return mainq.filter(Meter.id.in_(subq))
 
-    def _make_stats_query(self, sample_filter):
+    @staticmethod
+    def _make_stats_query(sample_filter):
         session = sqlalchemy_session.get_session()
         query = session.query(
             func.min(Meter.timestamp).label('tsmin'),
@@ -440,7 +448,8 @@ class Connection(base.Connection):
                     period_end=period_end,
                 )
 
-    def _row_to_alarm_model(self, row):
+    @staticmethod
+    def _row_to_alarm_model(row):
         return api_models.Alarm(alarm_id=row.id,
                                 enabled=row.enabled,
                                 name=row.name,
@@ -462,7 +471,8 @@ class Connection(base.Connection):
                                 row.insufficient_data_actions,
                                 matching_metadata=row.matching_metadata)
 
-    def _alarm_model_to_row(self, alarm, row=None):
+    @staticmethod
+    def _alarm_model_to_row(alarm, row=None):
         if row is None:
             row = Alarm(id=str(uuid.uuid1()))
         row.update(alarm.as_dict())
@@ -511,7 +521,8 @@ class Connection(base.Connection):
             session.flush()
         return self._row_to_alarm_model(alarm_row)
 
-    def delete_alarm(self, alarm_id):
+    @staticmethod
+    def delete_alarm(alarm_id):
         """Delete a alarm
 
         :param alarm_id: ID of the alarm to delete
@@ -521,7 +532,8 @@ class Connection(base.Connection):
             session.query(Alarm).filter(Alarm.id == alarm_id).delete()
             session.flush()
 
-    def _get_unique(self, session, key):
+    @staticmethod
+    def _get_unique(session, key):
         return session.query(UniqueName).filter(UniqueName.key == key).first()
 
     def _get_or_create_unique_name(self, key, session=None):

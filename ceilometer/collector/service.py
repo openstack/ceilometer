@@ -50,18 +50,12 @@ cfg.CONF.register_opts(OPTS, group="collector")
 LOG = log.getLogger(__name__)
 
 
-def get_storage_connection(conf):
-    storage.register_opts(conf)
-    storage_engine = storage.get_engine(conf)
-    return storage_engine.get_connection(conf)
-
-
 class UDPCollectorService(os_service.Service):
     """UDP listener for the collector service."""
 
     def __init__(self):
         super(UDPCollectorService, self).__init__()
-        self.storage_conn = get_storage_connection(cfg.CONF)
+        self.storage_conn = storage.get_connection(cfg.CONF)
 
     def start(self):
         """Bind the UDP socket and handle incoming data."""
@@ -109,7 +103,7 @@ class CollectorService(rpc_service.Service):
 
     def __init__(self, host, topic, manager=None):
         super(CollectorService, self).__init__(host, topic, manager)
-        self.storage_conn = get_storage_connection(cfg.CONF)
+        self.storage_conn = storage.get_connection(cfg.CONF)
 
     def start(self):
         super(CollectorService, self).start()

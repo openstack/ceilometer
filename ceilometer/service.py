@@ -69,12 +69,6 @@ CLI_OPTIONS = [
 cfg.CONF.register_cli_opts(CLI_OPTIONS, group="service_credentials")
 
 
-def _sanitize_cmd_line(argv):
-    """Remove non-nova CLI options from argv."""
-    cli_opt_names = ['--%s' % o.name for o in CLI_OPTIONS]
-    return [a for a in argv if a in cli_opt_names]
-
-
 def prepare_service(argv=None):
     eventlet.monkey_patch()
     gettextutils.install('ceilometer')

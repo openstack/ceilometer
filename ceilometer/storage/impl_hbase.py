@@ -621,7 +621,8 @@ class MTable(object):
         for k in sorted(rows):
             yield k, rows[k]
 
-    def SingleColumnValueFilter(self, args, rows):
+    @staticmethod
+    def SingleColumnValueFilter(args, rows):
         """This method is called from scan() when 'SingleColumnValueFilter'
         is found in the 'filter' argument
         """
@@ -659,7 +660,6 @@ class MConnection(object):
 
     def open(self):
         LOG.debug("Opening in-memory HBase connection")
-        return
 
     def create_table(self, n, families={}):
         if n in self.tables:

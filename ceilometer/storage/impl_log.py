@@ -43,7 +43,7 @@ class Connection(base.Connection):
     """
 
     def __init__(self, conf):
-        return
+        pass
 
     def upgrade(self, version=None):
         pass

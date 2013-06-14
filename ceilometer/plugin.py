@@ -35,7 +35,8 @@ class PluginBase(object):
     """Base class for all plugins.
     """
 
-    def is_enabled(self):
+    @staticmethod
+    def is_enabled():
         """Return boolean indicating whether this plugin should
         be enabled and used by the caller.
         """
@@ -46,9 +47,6 @@ class NotificationBase(PluginBase):
     """Base class for plugins that support the notification API."""
 
     __metaclass__ = abc.ABCMeta
-
-    def is_enabled(self):
-        return True
 
     @abc.abstractmethod
     def get_event_types(self):
