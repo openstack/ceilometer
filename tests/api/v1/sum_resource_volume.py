@@ -27,14 +27,12 @@ from ceilometer.publisher import rpc
 from ceilometer import counter
 
 from ceilometer.tests import api as tests_api
-from ceilometer.storage.impl_mongodb import require_map_reduce
 
 
 class TestSumResourceVolume(tests_api.TestBase):
 
     def setUp(self):
         super(TestSumResourceVolume, self).setUp()
-        require_map_reduce(self.conn)
 
         self.counters = []
         for i in range(3):

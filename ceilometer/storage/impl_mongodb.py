@@ -21,7 +21,6 @@
 """
 
 import copy
-import datetime
 import operator
 import os
 import re
@@ -155,11 +154,32 @@ def make_query_from_filter(sample_filter, require_meter=True):
     return q
 
 
+class ConnectionPool(object):
+
+    def __init__(self):
+        self._pool = {}
+
+    def connect(self, opts):
+        # opts is a dict, dict are unhashable, convert to tuple
+        connection_pool_key = tuple(sorted(opts.items()))
+
+        if connection_pool_key not in self._pool:
+            LOG.info('connecting to MongoDB replicaset "%s" on %s',
+                     opts['replica_set'],
+                     opts['netloc'])
+            self._pool[connection_pool_key] = pymongo.Connection(
+                opts['netloc'],
+                replicaSet=opts['replica_set'],
+                safe=True)
+
+        return self._pool.get(connection_pool_key)
+
+
 class Connection(base.Connection):
     """MongoDB connection.
     """
 
-    _mim_instance = None
+    CONNECTION_POOL = ConnectionPool()
 
     MAP_STATS = bson.code.Code("""
     function () {
@@ -196,13 +216,20 @@ class Connection(base.Connection):
 
     REDUCE_STATS = bson.code.Code("""
     function (key, values) {
-        var res = values[0];
+        var res = { min: values[0].min,
+                    max: values[0].max,
+                    count: values[0].count,
+                    sum: values[0].sum,
+                    period_start: values[0].period_start,
+                    period_end: values[0].period_end,
+                    duration_start: values[0].duration_start,
+                    duration_end: values[0].duration_end };
         for ( var i=1; i<values.length; i++ ) {
             if ( values[i].min < res.min )
                res.min = values[i].min;
             if ( values[i].max > res.max )
                res.max = values[i].max;
-            res.count += values[i].count;
+            res.count = NumberInt(res.count + values[i].count);
             res.sum += values[i].sum;
             if ( values[i].duration_start < res.duration_start )
                res.duration_start = values[i].duration_start;
@@ -224,33 +251,23 @@ class Connection(base.Connection):
 
     def __init__(self, conf):
         opts = self._parse_connection_url(conf.database.connection)
-        LOG.info('connecting to MongoDB replicaset "%s" on %s',
-                 conf.storage_mongodb.replica_set_name,
-                 opts['netloc'])
 
         if opts['netloc'] == '__test__':
             url = os.environ.get('CEILOMETER_TEST_MONGODB_URL')
-            if url:
-                opts = self._parse_connection_url(url)
-                self.conn = pymongo.Connection(opts['netloc'], safe=True)
-            else:
-                # MIM will die if we have too many connections, so use a
-                # Singleton
-                if Connection._mim_instance is None:
-                    try:
-                        from ming import mim
-                    except ImportError:
-                        import testtools
-                        raise testtools.testcase.TestSkipped('requires mim')
-                    LOG.debug('Creating a new MIM Connection object')
-                    Connection._mim_instance = mim.Connection()
-                self.conn = Connection._mim_instance
-                LOG.debug('Using MIM for test connection')
-        else:
-            self.conn = pymongo.Connection(
-                opts['netloc'],
-                replicaSet=conf.storage_mongodb.replica_set_name,
-                safe=True)
+            if not url:
+                raise RuntimeError(
+                    "No MongoDB test URL set,"
+                    "export CEILOMETER_TEST_MONGODB_URL environment variable")
+            opts = self._parse_connection_url(url)
+
+        # FIXME(jd) This should be a parameter in the database URL, not global
+        opts['replica_set'] = conf.storage_mongodb.replica_set_name
+
+        # NOTE(jd) Use our own connection pooling on top of the Pymongo one.
+        # We need that otherwise we overflow the MongoDB instance with new
+        # connection since we instanciate a Pymongo client each time someone
+        # requires a new storage connection.
+        self.conn = self.CONNECTION_POOL.connect(opts)
 
         self.db = getattr(self.conn, opts['dbname'])
         if 'username' in opts:
@@ -281,13 +298,7 @@ class Connection(base.Connection):
         pass
 
     def clear(self):
-        if self._mim_instance is not None:
-            # Don't want to use drop_database() because
-            # may end up running out of spidermonkey instances.
-            # http://davisp.lighthouseapp.com/projects/26898/tickets/22
-            self.db.clear()
-        else:
-            self.conn.drop_database(self.db)
+        self.conn.drop_database(self.db)
 
     @staticmethod
     def _parse_connection_url(url):
@@ -526,34 +537,6 @@ class Connection(base.Connection):
                        for r in results['results']),
                       key=operator.attrgetter('period_start'))
 
-    def _fix_interval_min_max(self, a_min, a_max):
-        if hasattr(a_min, 'valueOf') and a_min.valueOf is not None:
-            # NOTE (dhellmann): HACK ALERT
-            #
-            # The real MongoDB server can handle Date objects and
-            # the driver converts them to datetime instances
-            # correctly but the in-memory implementation in MIM
-            # (used by the tests) returns a spidermonkey.Object
-            # representing the "value" dictionary and there
-            # doesn't seem to be a way to recursively introspect
-            # that object safely to convert the min and max values
-            # back to datetime objects. In this method, we know
-            # what type the min and max values are expected to be,
-            # so it is safe to do the conversion
-            # here. JavaScript's time representation uses
-            # different units than Python's, so we divide to
-            # convert to the right units and then create the
-            # datetime instances to return.
-            #
-            # The issue with MIM is documented at
-            # https://sourceforge.net/p/merciless/bugs/3/
-            #
-            a_min = datetime.datetime.fromtimestamp(
-                a_min.valueOf() // 1000)
-            a_max = datetime.datetime.fromtimestamp(
-                a_max.valueOf() // 1000)
-        return (a_min, a_max)
-
     def get_alarms(self, name=None, user=None,
                    project=None, enabled=True, alarm_id=None):
         """Yields a lists of alarms that match filters
@@ -612,22 +595,3 @@ class Connection(base.Connection):
         :param event_filter: EventFilter instance
         """
         raise NotImplementedError('Events not implemented.')
-
-
-def require_map_reduce(conn):
-    """Raises SkipTest if the connection is using mim.
-    """
-    # NOTE(dhellmann): mim requires spidermonkey to implement the
-    # map-reduce functions, so if we can't import it then just
-    # skip these tests unless we aren't using mim.
-    try:
-        import spidermonkey  # noqa
-    except BaseException:
-        try:
-            from ming import mim
-            if hasattr(conn, "conn") and isinstance(conn.conn, mim.Connection):
-                import testtools
-                raise testtools.testcase.TestSkipped('requires spidermonkey')
-        except ImportError:
-            import testtools
-            raise testtools.testcase.TestSkipped('requires mim')

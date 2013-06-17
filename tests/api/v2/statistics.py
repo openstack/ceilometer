@@ -23,8 +23,6 @@ from oslo.config import cfg
 
 from . import base
 from ceilometer import counter
-from ceilometer.storage.impl_mongodb import Connection as mongo_conn
-from ceilometer.storage.impl_mongodb import require_map_reduce
 from ceilometer.publisher import rpc
 
 
@@ -34,9 +32,6 @@ class TestMaxProjectVolume(base.FunctionalTest):
 
     def setUp(self):
         super(TestMaxProjectVolume, self).setUp()
-        # TODO(gordc): remove when we drop mim
-        if isinstance(self.conn, mongo_conn):
-            require_map_reduce(self.conn)
 
         self.counters = []
         for i in range(3):
@@ -137,9 +132,6 @@ class TestMaxResourceVolume(base.FunctionalTest):
 
     def setUp(self):
         super(TestMaxResourceVolume, self).setUp()
-        # TODO(gordc): remove when we drop mim
-        if isinstance(self.conn, mongo_conn):
-            require_map_reduce(self.conn)
 
         self.counters = []
         for i in range(3):
@@ -256,9 +248,6 @@ class TestSumProjectVolume(base.FunctionalTest):
 
     def setUp(self):
         super(TestSumProjectVolume, self).setUp()
-        # TODO(gordc): remove when we drop mim
-        if isinstance(self.conn, mongo_conn):
-            require_map_reduce(self.conn)
 
         self.counters = []
         for i in range(3):
@@ -361,9 +350,6 @@ class TestSumResourceVolume(base.FunctionalTest):
 
     def setUp(self):
         super(TestSumResourceVolume, self).setUp()
-        # TODO(gordc): remove when we drop mim
-        if isinstance(self.conn, mongo_conn):
-            require_map_reduce(self.conn)
 
         self.counters = []
         for i in range(3):

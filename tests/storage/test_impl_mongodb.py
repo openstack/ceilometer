@@ -18,56 +18,31 @@
 """Tests for ceilometer/storage/impl_mongodb.py
 
 .. note::
-
-  (dhellmann) These tests have some dependencies which cannot be
-  installed in the CI environment right now.
-
-  Ming is necessary to provide the Mongo-in-memory implementation for
-  of MongoDB. The original source for Ming is at
-  http://sourceforge.net/project/merciless but there does not seem to
-  be a way to point to a "zipball" of the latest HEAD there, and we
-  need features present only in that version. I forked the project to
-  github to make it easier to install, and put the URL into the
-  test-requires file. Then I ended up making some changes to it so it
-  would be compatible with PyMongo's API.
-
-    https://github.com/dreamhost/Ming/zipball/master#egg=Ming
-
-  In order to run the tests that use map-reduce with MIM, some
-  additional system-level packages are required::
-
-    apt-get install nspr-config
-    apt-get install libnspr4-dev
-    apt-get install pkg-config
-    pip install python-spidermonkey
-
-  To run the tests *without* mim, set the environment variable
-  CEILOMETER_TEST_MONGODB_URL to a MongoDB URL before running tox.
+  In order to run the tests against another MongoDB server set the
+  environment variable CEILOMETER_TEST_MONGODB_URL to point to a MongoDB
+  server before running the tests.
 
 """
 
 import copy
 import datetime
+from oslo.config import cfg
 
 from tests.storage import base
 
 from ceilometer.publisher import rpc
 from ceilometer import counter
-from ceilometer.storage.impl_mongodb import require_map_reduce
+from ceilometer.storage import impl_mongodb
 
 
 class MongoDBEngineTestBase(base.DBTestBase):
     database_connection = 'mongodb://__test__'
 
 
-class IndexTest(MongoDBEngineTestBase):
-
-    def test_indexes_exist(self):
-        # ensure_index returns none if index already exists
-        assert not self.conn.db.resource.ensure_index('foo',
-                                                      name='resource_idx')
-        assert not self.conn.db.meter.ensure_index('foo',
-                                                   name='meter_idx')
+class MongoDBConnection(MongoDBEngineTestBase):
+    def test_connection_pooling(self):
+        self.assertEqual(self.conn.conn,
+                         impl_mongodb.Connection(cfg.CONF).conn)
 
 
 class UserTest(base.UserTest, MongoDBEngineTestBase):
@@ -91,10 +66,7 @@ class RawSampleTest(base.RawSampleTest, MongoDBEngineTestBase):
 
 
 class StatisticsTest(base.StatisticsTest, MongoDBEngineTestBase):
-
-    def setUp(self):
-        super(StatisticsTest, self).setUp()
-        require_map_reduce(self.conn)
+    pass
 
 
 class AlarmTest(base.AlarmTest, MongoDBEngineTestBase):
