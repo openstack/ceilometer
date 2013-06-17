@@ -24,7 +24,7 @@ import logging
 
 from oslo.config import cfg
 
-from ceilometer.publisher import meter
+from ceilometer.publisher import rpc
 from ceilometer import counter
 
 from ceilometer.tests import api as tests_api
@@ -57,9 +57,9 @@ class TestListUsers(tests_api.TestBase):
                                'tag': 'self.counter',
                                }
         )
-        msg = meter.meter_message_from_counter(
+        msg = rpc.meter_message_from_counter(
             counter1,
-            cfg.CONF.publisher_meter.metering_secret,
+            cfg.CONF.publisher_rpc.metering_secret,
             'test_list_users',
         )
         self.conn.record_metering_data(msg)
@@ -77,9 +77,9 @@ class TestListUsers(tests_api.TestBase):
                                'tag': 'self.counter2',
                                }
         )
-        msg2 = meter.meter_message_from_counter(
+        msg2 = rpc.meter_message_from_counter(
             counter2,
-            cfg.CONF.publisher_meter.metering_secret,
+            cfg.CONF.publisher_rpc.metering_secret,
             'not-test',
         )
         self.conn.record_metering_data(msg2)

@@ -24,7 +24,7 @@ import webtest.app
 
 from oslo.config import cfg
 
-from ceilometer.publisher import meter
+from ceilometer.publisher import rpc
 from ceilometer import counter
 
 from .base import FunctionalTest
@@ -51,9 +51,9 @@ class TestListEvents(FunctionalTest):
                                'ignored_list': ['not-returned'],
                                }
         )
-        msg = meter.meter_message_from_counter(
+        msg = rpc.meter_message_from_counter(
             self.counter1,
-            cfg.CONF.publisher_meter.metering_secret,
+            cfg.CONF.publisher_rpc.metering_secret,
             'test_source',
         )
         self.conn.record_metering_data(msg)
@@ -71,9 +71,9 @@ class TestListEvents(FunctionalTest):
                                'tag': 'self.counter2',
                                }
         )
-        msg2 = meter.meter_message_from_counter(
+        msg2 = rpc.meter_message_from_counter(
             self.counter2,
-            cfg.CONF.publisher_meter.metering_secret,
+            cfg.CONF.publisher_rpc.metering_secret,
             'source2',
         )
         self.conn.record_metering_data(msg2)

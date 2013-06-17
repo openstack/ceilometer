@@ -29,7 +29,7 @@ from stevedore import extension
 from stevedore.tests import manager as test_manager
 
 from ceilometer import counter
-from ceilometer.publisher import meter
+from ceilometer.publisher import rpc
 from ceilometer.collector import service
 from ceilometer.storage import base
 from ceilometer.tests import base as tests_base
@@ -184,9 +184,9 @@ class TestCollectorService(TestCollector):
                'resource_id': self.id(),
                'counter_volume': 1,
                }
-        msg['message_signature'] = meter.compute_signature(
+        msg['message_signature'] = rpc.compute_signature(
             msg,
-            cfg.CONF.publisher_meter.metering_secret,
+            cfg.CONF.publisher_rpc.metering_secret,
         )
 
         self.srv.storage_conn = self.mox.CreateMock(base.Connection)
@@ -223,9 +223,9 @@ class TestCollectorService(TestCollector):
                'counter_volume': 1,
                'timestamp': '2012-07-02T13:53:40Z',
                }
-        msg['message_signature'] = meter.compute_signature(
+        msg['message_signature'] = rpc.compute_signature(
             msg,
-            cfg.CONF.publisher_meter.metering_secret,
+            cfg.CONF.publisher_rpc.metering_secret,
         )
 
         expected = {}
@@ -244,9 +244,9 @@ class TestCollectorService(TestCollector):
                'counter_volume': 1,
                'timestamp': '2012-09-30T15:31:50.262-08:00',
                }
-        msg['message_signature'] = meter.compute_signature(
+        msg['message_signature'] = rpc.compute_signature(
             msg,
-            cfg.CONF.publisher_meter.metering_secret,
+            cfg.CONF.publisher_rpc.metering_secret,
         )
 
         expected = {}

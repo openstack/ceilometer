@@ -437,6 +437,20 @@
 #cinder_control_exchange=cinder
 
 
+[publisher_rpc]
+
+#
+# Options defined in ceilometer.publisher.rpc
+#
+
+# the topic ceilometer uses for metering messages (string
+# value)
+#metering_topic=metering
+
+# Secret value for signing metering messages (string value)
+#metering_secret=change this or be hacked
+
+
 [database]
 
 #
@@ -498,20 +512,6 @@
 # If set, use this value for pool_timeout with sqlalchemy
 # (integer value)
 #pool_timeout=<None>
-
-
-[publisher_meter]
-
-#
-# Options defined in ceilometer.publisher.meter
-#
-
-# the topic ceilometer uses for metering messages (string
-# value)
-#metering_topic=metering
-
-# Secret value for signing metering messages (string value)
-#metering_secret=change this or be hacked
 
 
 [rpc_notifier2]

@@ -25,7 +25,7 @@ import datetime
 
 from oslo.config import cfg
 
-from ceilometer.publisher import meter
+from ceilometer.publisher import rpc
 from ceilometer import counter
 from ceilometer import storage
 from ceilometer.tests import db as test_db
@@ -55,9 +55,9 @@ class DBTestBase(test_db.TestBase):
                                'tag': 'self.counter',
                                }
         )
-        self.msg1 = meter.meter_message_from_counter(
+        self.msg1 = rpc.meter_message_from_counter(
             self.counter,
-            cfg.CONF.publisher_meter.metering_secret,
+            cfg.CONF.publisher_rpc.metering_secret,
             'test-1',
         )
         self.conn.record_metering_data(self.msg1)
@@ -76,9 +76,9 @@ class DBTestBase(test_db.TestBase):
                                'tag': 'self.counter2',
                                }
         )
-        self.msg2 = meter.meter_message_from_counter(
+        self.msg2 = rpc.meter_message_from_counter(
             self.counter2,
-            cfg.CONF.publisher_meter.metering_secret,
+            cfg.CONF.publisher_rpc.metering_secret,
             'test-2',
         )
         self.conn.record_metering_data(self.msg2)
@@ -97,9 +97,9 @@ class DBTestBase(test_db.TestBase):
                                'tag': 'self.counter3',
                                }
         )
-        self.msg3 = meter.meter_message_from_counter(
+        self.msg3 = rpc.meter_message_from_counter(
             self.counter3,
-            cfg.CONF.publisher_meter.metering_secret,
+            cfg.CONF.publisher_rpc.metering_secret,
             'test-3',
         )
         self.conn.record_metering_data(self.msg3)
@@ -118,9 +118,9 @@ class DBTestBase(test_db.TestBase):
                 resource_metadata={'display_name': 'test-server',
                                    'tag': 'counter-%s' % i},
             )
-            msg = meter.meter_message_from_counter(
+            msg = rpc.meter_message_from_counter(
                 c,
-                cfg.CONF.publisher_meter.metering_secret,
+                cfg.CONF.publisher_rpc.metering_secret,
                 'test',
             )
             self.conn.record_metering_data(msg)
@@ -391,7 +391,7 @@ class StatisticsTest(DBTestBase):
                                    }
             )
             self.counters.append(c)
-            msg = meter.meter_message_from_counter(
+            msg = rpc.meter_message_from_counter(
                 c,
                 secret='not-so-secret',
                 source='test',
@@ -412,7 +412,7 @@ class StatisticsTest(DBTestBase):
                                    }
             )
             self.counters.append(c)
-            msg = meter.meter_message_from_counter(
+            msg = rpc.meter_message_from_counter(
                 c,
                 secret='not-so-secret',
                 source='test',
@@ -554,9 +554,9 @@ class CounterDataTypeTest(DBTestBase):
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
             resource_metadata={}
         )
-        msg = meter.meter_message_from_counter(
+        msg = rpc.meter_message_from_counter(
             c,
-            cfg.CONF.publisher_meter.metering_secret,
+            cfg.CONF.publisher_rpc.metering_secret,
             'test-1',
         )
 
@@ -573,9 +573,9 @@ class CounterDataTypeTest(DBTestBase):
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
             resource_metadata={}
         )
-        msg = meter.meter_message_from_counter(
+        msg = rpc.meter_message_from_counter(
             c,
-            cfg.CONF.publisher_meter.metering_secret,
+            cfg.CONF.publisher_rpc.metering_secret,
             'test-1',
         )
         self.conn.record_metering_data(msg)
@@ -591,9 +591,9 @@ class CounterDataTypeTest(DBTestBase):
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
             resource_metadata={}
         )
-        msg = meter.meter_message_from_counter(
+        msg = rpc.meter_message_from_counter(
             c,
-            cfg.CONF.publisher_meter.metering_secret,
+            cfg.CONF.publisher_rpc.metering_secret,
             'test-1',
         )
         self.conn.record_metering_data(msg)
