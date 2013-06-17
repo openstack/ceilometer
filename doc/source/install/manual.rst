@@ -143,6 +143,8 @@ Installing the Compute Agent
       # nova-compute configuration for ceilometer
       instance_usage_audit=True
       instance_usage_audit_period=hour
+      notify_on_state_change=vm_and_task_state
+      notify_on_any_change=True
       notification_driver=nova.openstack.common.notifier.rpc_notifier
       notification_driver=ceilometer.compute.nova_notifier
 

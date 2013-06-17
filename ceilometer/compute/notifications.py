@@ -74,9 +74,12 @@ class ComputeInstanceNotificationBase(ComputeNotificationBase):
     """
     @staticmethod
     def get_event_types():
-        return ['compute.instance.create.end',
+        return ['compute.instance.create.start',
+                'compute.instance.create.end',
                 'compute.instance.exists',
+                'compute.instance.update',
                 'compute.instance.delete.start',
+                'compute.instance.delete.end',
                 'compute.instance.finish_resize.end',
                 'compute.instance.resize.revert.end']
 
