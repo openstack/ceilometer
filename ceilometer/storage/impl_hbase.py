@@ -18,9 +18,9 @@
 # under the License.
 """HBase storage backend
 """
-from sets import Set
 import json
 import hashlib
+import itertools
 import copy
 import datetime
 import happybase
@@ -296,7 +296,7 @@ class Connection(base.Connection):
         :param resource: Optional resource filter.
         """
 
-        def make_resource(data):
+        def make_resource(data, first_ts, last_ts):
             """Transform HBase fields to Resource model."""
             # convert HBase metadata e.g. f:r_display_name to display_name
             data['f:metadata'] = dict((k[4:], v)
@@ -305,6 +305,8 @@ class Connection(base.Connection):
 
             return models.Resource(
                 resource_id=data['f:resource_id'],
+                first_sample_timestamp=first_ts,
+                last_sample_timestamp=last_ts,
                 project_id=data['f:project_id'],
                 source=data['f:source'],
                 user_id=data['f:user_id'],
@@ -330,27 +332,35 @@ class Connection(base.Connection):
                                             require_meter=False,
                                             query_only=False)
         LOG.debug("Query Meter table: %s" % q)
-        gen = meter_table.scan(filter=q, row_start=start_row,
-                               row_stop=stop_row)
+        meters = meter_table.scan(filter=q, row_start=start_row,
+                                  row_stop=stop_row)
 
-        # put all the resource_ids in a Set
-        resource_ids = Set()
-        for ignored, data in gen:
-            resource_ids.add(data['f:resource_id'])
+        resources = {}
+        for resource_id, r_meters in itertools.groupby(
+                meters, key=lambda x: x[1]['f:resource_id']):
+            timestamps = tuple(timeutils.parse_strtime(m[1]['f:timestamp'])
+                               for m in r_meters)
+            resources[resource_id] = (min(timestamps), max(timestamps))
 
         # handle metaquery
         if len(metaquery) > 0:
-            for ignored, data in resource_table.rows(resource_ids):
+            for ignored, data in resource_table.rows(resources.iterkeys()):
                 for k, v in metaquery.iteritems():
                     # if metaquery matches, yield the resource model
                     # e.g. metaquery: metadata.display_name
                     #      equals
                     #      HBase: f:r_display_name
                     if data['f:r_' + k.split('.', 1)[1]] == v:
-                        yield make_resource(data)
+                        yield make_resource(
+                            data,
+                            resources[data['f:resource_id']][0],
+                            resources[data['f:resource_id']][1])
         else:
-            for ignored, data in resource_table.rows(resource_ids):
-                yield make_resource(data)
+            for ignored, data in resource_table.rows(resources.iterkeys()):
+                yield make_resource(
+                    data,
+                    resources[data['f:resource_id']][0],
+                    resources[data['f:resource_id']][1])
 
     def get_meters(self, user=None, project=None, resource=None, source=None,
                    metaquery={}):

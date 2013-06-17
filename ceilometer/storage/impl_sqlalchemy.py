@@ -287,7 +287,11 @@ class Connection(base.Connection):
         :param resource: Optional resource filter.
         """
         session = sqlalchemy_session.get_session()
-        query = session.query(Meter,).group_by(Meter.resource_id)
+        query = session.query(
+            Meter,
+            func.min(Meter.timestamp),
+            func.max(Meter.timestamp),
+        ).group_by(Meter.resource_id)
         if user is not None:
             query = query.filter(Meter.user_id == user)
         if source is not None:
@@ -309,10 +313,12 @@ class Connection(base.Connection):
         if metaquery:
             raise NotImplementedError('metaquery not implemented')
 
-        for meter in query.all():
+        for meter, first_ts, last_ts in query.all():
             yield api_models.Resource(
                 resource_id=meter.resource_id,
                 project_id=meter.project_id,
+                first_sample_timestamp=first_ts,
+                last_sample_timestamp=last_ts,
                 source=meter.sources[0].id,
                 user_id=meter.user_id,
                 metadata=meter.resource_metadata,

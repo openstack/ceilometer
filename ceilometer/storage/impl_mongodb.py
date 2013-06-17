@@ -594,6 +594,8 @@ class Connection(base.Connection):
                 "user_id": {"$first": "$user_id"},
                 "project_id": {"$first": "$project_id"},
                 "source": {"$first": "$source"},
+                "first_sample_timestamp": {"$min": "$timestamp"},
+                "last_sample_timestamp": {"$max": "$timestamp"},
                 "metadata": {"$first": "$resource_metadata"},
                 "meters_name": {"$push": "$counter_name"},
                 "meters_type": {"$push": "$counter_type"},
@@ -610,6 +612,8 @@ class Connection(base.Connection):
                 resource_id=result['_id'],
                 user_id=result['user_id'],
                 project_id=result['project_id'],
+                first_sample_timestamp=result['first_sample_timestamp'],
+                last_sample_timestamp=result['last_sample_timestamp'],
                 source=result['source'],
                 metadata=result['metadata'],
                 meter=[

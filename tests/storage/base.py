@@ -58,6 +58,27 @@ class DBTestBase(test_db.TestBase):
                           timestamps_for_test_samples_default_order)
 
         self.msgs = []
+        c = sample.Sample(
+            'instance',
+            sample.TYPE_CUMULATIVE,
+            unit='',
+            volume=1,
+            user_id='user-id',
+            project_id='project-id',
+            resource_id='resource-id',
+            timestamp=datetime.datetime(2012, 7, 2, 10, 39),
+            resource_metadata={'display_name': 'test-server',
+                               'tag': 'self.counter',
+                               },
+            source='test-1',
+        )
+        self.msg0 = rpc.meter_message_from_counter(
+            c,
+            cfg.CONF.publisher_rpc.metering_secret,
+        )
+        self.conn.record_metering_data(self.msg0)
+        self.msgs.append(self.msg0)
+
         self.counter = sample.Sample(
             'instance',
             sample.TYPE_CUMULATIVE,
@@ -185,6 +206,10 @@ class ResourceTest(DBTestBase):
         for resource in resources:
             if resource.resource_id != 'resource-id':
                 continue
+            self.assertEqual(resource.first_sample_timestamp,
+                             datetime.datetime(2012, 7, 2, 10, 39))
+            self.assertEqual(resource.last_sample_timestamp,
+                             datetime.datetime(2012, 7, 2, 10, 40))
             assert resource.resource_id == 'resource-id'
             assert resource.project_id == 'project-id'
             self.assertIn(resource.source, msgs_sources)
@@ -455,9 +480,9 @@ class RawSampleTest(DBTestBase):
     def test_get_samples_by_user(self):
         f = storage.SampleFilter(user='user-id')
         results = list(self.conn.get_samples(f))
-        assert len(results) == 2
+        self.assertEqual(len(results), 3)
         for meter in results:
-            assert meter.as_dict() in [self.msg1, self.msg2]
+            assert meter.as_dict() in [self.msg0, self.msg1, self.msg2]
 
     def test_get_samples_by_user_limit(self):
         f = storage.SampleFilter(user='user-id')
@@ -467,22 +492,23 @@ class RawSampleTest(DBTestBase):
     def test_get_samples_by_user_limit_bigger(self):
         f = storage.SampleFilter(user='user-id')
         results = list(self.conn.get_samples(f, limit=42))
-        self.assertEqual(len(results), 2)
+        self.assertEqual(len(results), 3)
 
     def test_get_samples_by_project(self):
         f = storage.SampleFilter(project='project-id')
         results = list(self.conn.get_samples(f))
         assert results
         for meter in results:
-            assert meter.as_dict() in [self.msg1, self.msg2, self.msg3]
+            assert meter.as_dict() in [self.msg0, self.msg1,
+                                       self.msg2, self.msg3]
 
     def test_get_samples_by_resource(self):
         f = storage.SampleFilter(user='user-id', resource='resource-id')
         results = list(self.conn.get_samples(f))
         assert results
-        meter = results[0]
+        meter = results[1]
         assert meter is not None
-        assert meter.as_dict() == self.msg1
+        self.assertEqual(meter.as_dict(), self.msg0)
 
     def test_get_samples_by_metaquery(self):
         q = {'metadata.display_name': 'test-server'}
@@ -525,16 +551,17 @@ class RawSampleTest(DBTestBase):
         )
 
         results = list(self.conn.get_samples(f))
-        assert len(results) == 0
+        self.assertEqual(len(results), 1)
 
         f.end_timestamp_op = 'lt'
         results = list(self.conn.get_samples(f))
-        assert len(results) == 0
+        self.assertEqual(len(results), 1)
 
         f.end_timestamp_op = 'le'
         results = list(self.conn.get_samples(f))
-        assert len(results) == 1
-        assert results[0].timestamp == timestamp
+        self.assertEqual(len(results), 2)
+        self.assertEqual(results[1].timestamp,
+                         datetime.datetime(2012, 7, 2, 10, 39))
 
     def test_get_samples_by_both_times(self):
         start_ts = datetime.datetime(2012, 7, 2, 10, 42)
@@ -585,8 +612,7 @@ class RawSampleTest(DBTestBase):
     def test_get_samples_by_source(self):
         f = storage.SampleFilter(source='test-1')
         results = list(self.conn.get_samples(f))
-        assert results
-        assert len(results) == 1
+        self.assertEqual(len(results), 2)
 
     def test_clear_metering_data(self):
         timeutils.utcnow.override_time = datetime.datetime(2012, 7, 2, 10, 45)
@@ -620,7 +646,7 @@ class RawSampleTest(DBTestBase):
 
         f = storage.SampleFilter(meter='instance')
         results = list(self.conn.get_samples(f))
-        self.assertEqual(len(results), 10)
+        self.assertEqual(len(results), 11)
         results = list(self.conn.get_users())
         self.assertEqual(len(results), 9)
         results = list(self.conn.get_projects())

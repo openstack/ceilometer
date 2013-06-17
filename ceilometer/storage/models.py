@@ -88,12 +88,17 @@ class Resource(Model):
     """Something for which sample data has been collected.
     """
 
-    def __init__(self, resource_id, project_id, source, user_id, metadata,
+    def __init__(self, resource_id, project_id,
+                 first_sample_timestamp,
+                 last_sample_timestamp,
+                 source, user_id, metadata,
                  meter):
         """Create a new resource.
 
         :param resource_id: UUID of the resource
         :param project_id:  UUID of project owning the resource
+        :param first_sample_timestamp: first sample timestamp captured
+        :param last_sample_timestamp: last sample timestamp captured
         :param source:      the identifier for the user/project id definition
         :param user_id:     UUID of user owning the resource
         :param metadata:    most current metadata for the resource (a dict)
@@ -101,6 +106,8 @@ class Resource(Model):
         """
         Model.__init__(self,
                        resource_id=resource_id,
+                       first_sample_timestamp=first_sample_timestamp,
+                       last_sample_timestamp=last_sample_timestamp,
                        project_id=project_id,
                        source=source,
                        user_id=user_id,
