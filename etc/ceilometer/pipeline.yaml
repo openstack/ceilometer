@@ -6,4 +6,4 @@
         - "*"
     transformers:
     publishers:
-        - meter
+        - meter://

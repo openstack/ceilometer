@@ -24,7 +24,7 @@ from ceilometer import publisher
 class TestPublisher(publisher.PublisherBase):
     """Publisher used in unit testing."""
 
-    def __init__(self):
+    def __init__(self, parsed_url):
         self.counters = []
 
     def publish_counters(self, context, counters, source):

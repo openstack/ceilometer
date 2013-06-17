@@ -118,6 +118,9 @@ class Pipeline(object):
 
         self.publishers = []
         for p in cfg['publishers']:
+            if '://' not in p:
+                # Support old format without URL
+                p = p + "://"
             try:
                 self.publishers.append(publisher.get_publisher(p))
             except Exception:

@@ -255,7 +255,7 @@ class TestPublish(base.TestCase):
         super(TestPublish, self).setUp()
         self.published = []
         self.stubs.Set(rpc, 'cast', self.faux_cast)
-        publisher = meter.MeterPublisher()
+        publisher = meter.MeterPublisher(None)
         publisher.publish_counters(None,
                                    self.test_data,
                                    'test')
