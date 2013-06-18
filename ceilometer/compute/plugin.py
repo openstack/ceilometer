@@ -24,12 +24,12 @@ from ceilometer import plugin
 
 
 class ComputePollster(plugin.PollsterBase):
-    """Base class for plugins that support the polling API on the
-    compute node."""
+    """Base class for plugins that support the polling API on the compute node.
+    """
 
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def get_counters(self, manager, context):
-        """Return a sequence of Counter instances from polling the
-        resources."""
+        """Return a sequence of Counter instances from polling the resources.
+        """

@@ -51,7 +51,8 @@ class NotificationBase(PluginBase):
     @abc.abstractmethod
     def get_event_types(self):
         """Return a sequence of strings defining the event types to be
-        given to this plugin."""
+        given to this plugin.
+        """
 
     @abc.abstractmethod
     def get_exchange_topics(self, conf):
@@ -65,7 +66,8 @@ class NotificationBase(PluginBase):
     def process_notification(self, message):
         """Return a sequence of Counter instances for the given message.
 
-        :param message: Message to process."""
+        :param message: Message to process.
+        """
 
     def notification_to_metadata(self, event):
         """Transform a payload dict to a metadata dict."""
@@ -87,5 +89,6 @@ class PollsterBase(PluginBase):
 
     @abc.abstractmethod
     def get_counters(self, manager, instance):
-        """Return a sequence of Counter instances from polling the
-        resources."""
+        """Return a sequence of Counter instances from polling the resources.
+
+        """

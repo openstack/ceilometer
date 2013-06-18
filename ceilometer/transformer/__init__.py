@@ -65,5 +65,6 @@ class TransformerBase(object):
         """Flush counters cached previously.
 
         :param context: Passed from the data collector.
-        :param source: Source of counters that are being published."""
+        :param source: Source of counters that are being published.
+        """
         return []
