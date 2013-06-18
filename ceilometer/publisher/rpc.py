@@ -21,7 +21,9 @@
 import hashlib
 import hmac
 import itertools
+import operator
 import uuid
+import urlparse
 
 from oslo.config import cfg
 
@@ -103,12 +105,19 @@ def meter_message_from_counter(counter, secret, source):
 
 
 class RPCPublisher(publisher.PublisherBase):
-    def publish_counters(self, context, counters, source):
-        """Send a metering message for publishing
 
-        :param context: Execution context from the service or RPC call
-        :param counter: Counter from pipeline after transformation
-        :param source: counter source
+    def __init__(self, parsed_url):
+        options = urlparse.parse_qs(parsed_url.query)
+        self.per_meter_topic = bool(int(
+            options.get('per_meter_topic', [0])[-1]))
+
+    def publish_counters(self, context, counters, source):
+        """Publish counters on RPC.
+
+        :param context: Execution context from the service or RPC call.
+        :param counters: Counters from pipeline after transformation.
+        :param source: Counter source.
+
         """
 
         meters = [
@@ -125,15 +134,20 @@ class RPCPublisher(publisher.PublisherBase):
             'version': '1.0',
             'args': {'data': meters},
         }
-        LOG.debug('PUBLISH: %s', str(msg))
+        LOG.audit('Publishing %d counters on %s',
+                  len(msg['args']['data']), topic)
         rpc.cast(context, topic, msg)
 
-        for meter_name, meter_list in itertools.groupby(
-                sorted(meters, key=lambda m: m['counter_name']),
-                lambda m: m['counter_name']):
-            msg = {
-                'method': 'record_metering_data',
-                'version': '1.0',
-                'args': {'data': list(meter_list)},
-            }
-            rpc.cast(context, topic + '.' + meter_name, msg)
+        if self.per_meter_topic:
+            for meter_name, meter_list in itertools.groupby(
+                    sorted(meters, key=operator.itemgetter('counter_name')),
+                    operator.itemgetter('counter_name')):
+                msg = {
+                    'method': 'record_metering_data',
+                    'version': '1.0',
+                    'args': {'data': list(meter_list)},
+                }
+                topic_name = topic + '.' + meter_name
+                LOG.audit('Publishing %d counters on %s',
+                          len(msg['args']['data']), topic_name)
+                rpc.cast(context, topic_name, msg)
