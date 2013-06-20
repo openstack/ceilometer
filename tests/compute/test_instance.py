@@ -67,7 +67,10 @@ class TestLocationMetadata(base.TestCase):
                                               'links': [{"rel": "bookmark",
                                                          'href': 2}]},
                                     'flavor': {'id': 1},
-                                    'hostId': '1234-5678'}
+                                    'hostId': '1234-5678',
+                                    'metadata': {'metering.autoscale.group':
+                                                 'X' * 512,
+                                                 'metering.ephemeral_gb': 42}}
 
         self.instance = FauxInstance(**self.INSTANCE_PROPERTIES)
         self.instance.host = 'made-up-hostname'
@@ -93,6 +96,10 @@ class TestLocationMetadata(base.TestCase):
                 assert actual == iprops['image']['id']
             elif name == 'image_ref_url':
                 assert actual == iprops['image']['links'][0]['href']
+            elif name == 'user_metadata':
+                expected = iprops['metadata']['metering.autoscale.group'][:256]
+                self.assertEqual(actual['autoscale_group'], expected)
+                self.assertEqual(len(actual), 1)
             else:
                 assert actual == iprops[name]
 
