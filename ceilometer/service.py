@@ -30,9 +30,6 @@ from ceilometer.openstack.common import rpc
 
 
 cfg.CONF.register_opts([
-    cfg.IntOpt('periodic_interval',
-               default=600,
-               help='seconds between running periodic tasks'),
     cfg.StrOpt('host',
                default=socket.getfqdn(),
                help='Name of this node.  This can be an opaque identifier.  '
