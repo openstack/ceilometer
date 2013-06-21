@@ -113,7 +113,7 @@ class InstanceNotFoundException(InspectorException):
 class Inspector(object):
 
     def inspect_instances(self):
-        """List the instances on the current host. """
+        """List the instances on the current host."""
         raise NotImplementedError()
 
     def inspect_cpus(self, instance_name):

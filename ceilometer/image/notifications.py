@@ -35,7 +35,7 @@ cfg.CONF.register_opts(OPTS)
 
 
 class ImageBase(plugin.NotificationBase):
-    """Base class for image counting. """
+    """Base class for image counting."""
 
     @staticmethod
     def get_exchange_topics(conf):
