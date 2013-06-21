@@ -1,8 +1,10 @@
 # -*- encoding: utf-8 -*-
 #
 # Copyright © 2013 Red Hat, Inc
+# Copyright © 2013 eNovance <licensing@enovance.com>
 #
-# Author: Eoghan Glynn <eglynn@redhat.com>
+# Authors: Eoghan Glynn <eglynn@redhat.com>
+#          Julien Danjou <julien@danjou.info>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -21,8 +23,12 @@ from stevedore import extension
 
 from ceilometer.service import prepare_service
 from ceilometer.openstack.common import log
+from ceilometer.openstack.common import network_utils
 from ceilometer.openstack.common import service as os_service
+from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common.rpc import service as rpc_service
 from ceilometerclient import client as ceiloclient
+
 
 OPTS = [
     cfg.IntOpt('threshold_evaluation_interval',
@@ -88,3 +94,78 @@ class SingletonAlarmService(os_service.Service):
 def singleton_alarm():
     prepare_service()
     os_service.launch(SingletonAlarmService()).wait()
+
+
+cfg.CONF.import_opt('host', 'ceilometer.service')
+
+
+class AlarmNotifierService(rpc_service.Service):
+
+    EXTENSIONS_NAMESPACE = "ceilometer.alarm.notifier"
+
+    def __init__(self, host, topic):
+        super(AlarmNotifierService, self).__init__(host, topic, self)
+        self.notifiers = extension.ExtensionManager(self.EXTENSIONS_NAMESPACE,
+                                                    invoke_on_load=True)
+
+    def start(self):
+        super(AlarmNotifierService, self).start()
+        # Add a dummy thread to have wait() working
+        self.tg.add_timer(604800, lambda: None)
+
+    def _handle_action(self, action, alarm, state, reason):
+        try:
+            action = network_utils.urlsplit(action)
+        except Exception:
+            LOG.error(
+                _("Unable to parse action %(action)s for alarm %(alarm)s"),
+                locals())
+            return
+
+        try:
+            notifier = self.notifiers[action.scheme].obj
+        except KeyError:
+            scheme = action.scheme
+            LOG.error(
+                _("Action %(scheme)s for alarm %(alarm)s is unknown, "
+                  "cannot notify"),
+                locals())
+            return
+
+        try:
+            LOG.debug("Notifying alarm %s with action %s",
+                      alarm, action)
+            notifier.notify(action, alarm, state, reason)
+        except Exception:
+            LOG.exception(_("Unable to notify alarm %s"), alarm)
+            return
+
+    def notify_alarm(self, context, data):
+        """Notify that alarm has been triggered.
+
+        data should be a dict with the following keys:
+        - actions, the URL of the action to run;
+          this is a mapped to extensions automatically
+        - alarm, the alarm that has been triggered
+        - state, the new state the alarm transitionned to
+        - reason, the reason the alarm changed its state
+
+        :param context: Request context.
+        :param data: A dict as described above.
+        """
+        actions = data.get('actions')
+        if not actions:
+            LOG.error(_("Unable to notify for an alarm with no action"))
+            return
+
+        for action in actions:
+            self._handle_action(action,
+                                data.get('alarm'),
+                                data.get('state'),
+                                data.get('reason'))
+
+
+def alarm_notifier():
+    prepare_service()
+    os_service.launch(AlarmNotifierService(
+        cfg.CONF.host, 'ceilometer.alarm')).wait()
