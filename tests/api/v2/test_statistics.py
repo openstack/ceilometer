@@ -15,17 +15,12 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Test listing raw events.
-"""
+"""Test statistics objects."""
 
 import datetime
-import logging
 
 from ceilometer.api.controllers import v2
 from ceilometer.tests import base
-
-
-LOG = logging.getLogger(__name__)
 
 
 class TestStatisticsDuration(base.TestCase):

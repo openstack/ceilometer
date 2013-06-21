@@ -61,6 +61,9 @@ class TestApp(base.TestCase):
 
 class TestApiMiddleware(FunctionalTest):
 
+    # This doesn't really matter
+    database_connection = 'mongodb://__test__'
+
     def test_json_parsable_error_middleware_404(self):
         response = self.get_json('/invalid_path',
                                  expect_errors=True,

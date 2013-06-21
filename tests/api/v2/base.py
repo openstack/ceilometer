@@ -20,7 +20,4 @@ from ceilometer.tests import api
 
 
 class FunctionalTest(api.FunctionalTest):
-
-    database_connection = 'mongodb://__test__'
-
     PATH_PREFIX = '/v2'
