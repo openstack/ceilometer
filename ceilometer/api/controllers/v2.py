@@ -748,7 +748,7 @@ class Alarm(_Base):
     evaluation_periods = int
     "The number of periods to evaluate the threshold"
 
-    period = float
+    period = int
     "The time range in seconds over which to evaluate the threshold"
 
     timestamp = datetime.datetime
