@@ -29,6 +29,18 @@
 
 
 #
+# Options defined in ceilometer.compute.instance
+#
+
+# list of metadata prefixes resevred for metering use (list
+# value)
+#reserved_metadata_namespace=metering.
+
+# limit on length of reserved metadata values (integer value)
+#reserved_metadata_length=256
+
+
+#
 # Options defined in ceilometer.compute.notifications
 #
 
@@ -600,4 +612,4 @@
 #password=<None>
 
 
-# Total option count: 116
+# Total option count: 118
