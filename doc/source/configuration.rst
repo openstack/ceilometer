@@ -39,7 +39,6 @@ metering_secret                  change this or be hacked              Secret va
 metering_topic                   metering                              the topic ceilometer uses for metering messages
 counter_source                   openstack                             The source name of emited counters
 control_exchange                 ceilometer                            AMQP exchange to connect to if using RabbitMQ or Qpid
-periodic_interval                600                                   seconds between running periodic tasks
 database_connection              mongodb://localhost:27017/ceilometer  Database connection string
 metering_api_port                8777                                  The port for the ceilometer API server
 reseller_prefix                  AUTH\_                                Prefix used by swift for reseller token
