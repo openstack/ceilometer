@@ -64,7 +64,7 @@ class FakeMemcache(object):
                     ]},
             }}, dt.strftime("%s"))
 
-    def set(self, key, value, time=None):
+    def set(self, key, value, **kwargs):
         self.set_value = value
         self.set_key = key
 
