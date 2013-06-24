@@ -838,11 +838,10 @@ class AlarmsController(rest.RestController):
         conn = pecan.request.storage_conn
         data.state_timestamp = wsme.Unset
         data.alarm_id = alarm_id
-        data.user_id = pecan.request.headers.get('X-User-Id')
-        data.project_id = pecan.request.headers.get('X-Project-Id')
+        auth_project = acl.get_limited_to_project(pecan.request.headers)
 
         alarms = list(conn.get_alarms(alarm_id=alarm_id,
-                                      project=data.project_id))
+                                      project=auth_project))
         if len(alarms) < 1:
             raise wsme.exc.ClientSideError(_("Unknown alarm"))
 
