@@ -16,6 +16,7 @@ msgpack-python
 python-glanceclient
 python-novaclient>=2.6.10
 python-keystoneclient>=0.2,<0.3
+python-ceilometerclient>=1.0.1
 python-swiftclient
 lxml
 requests>=1.1,<1.2.1
