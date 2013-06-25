@@ -30,6 +30,35 @@ class TestNovaClient(base.TestCase):
         self.nv = nova_client.Client()
 
     @staticmethod
+    def fake_flavors_get(*args, **kwargs):
+        a = mock.MagicMock()
+        a.id = args[0]
+        if a.id == 1:
+            a.name = 'm1.tiny'
+        elif a.id == 2:
+            a.name = 'm1.large'
+        else:
+            return None
+        return a
+
+    @staticmethod
+    def fake_images_get(*args, **kwargs):
+        a = mock.MagicMock()
+        a.id = args[0]
+        if a.id == 1:
+            a.name = 'ubuntu-12.04-x86'
+            a.metadata = {'kernel_id': 11,
+                          'ramdisk_id': 21}
+        elif a.id == 2:
+            a.name = 'centos-5.4-x64'
+            a.metadata = {'kernel_id': 12,
+                          'ramdisk_id': 22}
+        else:
+            return None
+
+        return a
+
+    @staticmethod
     def fake_flavors_list():
         a = mock.MagicMock()
         a.id = 1
@@ -44,31 +73,60 @@ class TestNovaClient(base.TestCase):
         a = mock.MagicMock()
         a.id = 42
         a.flavor = {'id': 1}
+        a.image = {'id': 1}
         return [a]
 
     def test_instance_get_all_by_host(self):
-        self.stubs.Set(self.nv.nova_client.flavors, 'list',
-                       self.fake_flavors_list)
+        self.stubs.Set(self.nv.nova_client.flavors, 'get',
+                       self.fake_flavors_get)
         self.stubs.Set(self.nv.nova_client.servers, 'list',
                        self.fake_servers_list)
+        self.stubs.Set(self.nv.nova_client.images, 'get',
+                       self.fake_images_get)
 
         instances = self.nv.instance_get_all_by_host('foobar')
         self.assertEqual(len(instances), 1)
         self.assertEqual(instances[0].flavor['name'], 'm1.tiny')
+        self.assertEqual(instances[0].image['name'], 'ubuntu-12.04-x86')
+        self.assertEqual(instances[0].kernel_id, 11)
+        self.assertEqual(instances[0].ramdisk_id, 21)
 
     @staticmethod
     def fake_servers_list_unknown_flavor(*args, **kwargs):
         a = mock.MagicMock()
         a.id = 42
         a.flavor = {'id': 666}
+        a.image = {'id': 1}
         return [a]
 
     def test_instance_get_all_by_host_unknown_flavor(self):
-        self.stubs.Set(self.nv.nova_client.flavors, 'list',
-                       self.fake_flavors_list)
+        self.stubs.Set(self.nv.nova_client.flavors, 'get',
+                       self.fake_flavors_get)
         self.stubs.Set(self.nv.nova_client.servers, 'list',
                        self.fake_servers_list_unknown_flavor)
+        self.stubs.Set(self.nv.nova_client.images, 'get',
+                       self.fake_images_get)
 
         instances = self.nv.instance_get_all_by_host('foobar')
         self.assertEqual(len(instances), 1)
         self.assertEqual(instances[0].flavor['name'], 'unknown-id-666')
+
+    @staticmethod
+    def fake_servers_list_unknown_image(*args, **kwargs):
+        a = mock.MagicMock()
+        a.id = 42
+        a.flavor = {'id': 1}
+        a.image = {'id': 666}
+        return [a]
+
+    def test_instance_get_all_by_host_unknown_image(self):
+        self.stubs.Set(self.nv.nova_client.flavors, 'get',
+                       self.fake_flavors_get)
+        self.stubs.Set(self.nv.nova_client.servers, 'list',
+                       self.fake_servers_list_unknown_image)
+        self.stubs.Set(self.nv.nova_client.images, 'get',
+                       self.fake_images_get)
+
+        instances = self.nv.instance_get_all_by_host('foobar')
+        self.assertEqual(len(instances), 1)
+        self.assertEqual(instances[0].image['name'], 'unknown-id-666')

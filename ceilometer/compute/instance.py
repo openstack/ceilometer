@@ -37,16 +37,12 @@ INSTANCE_PROPERTIES = [
     # Type properties
     'architecture',
     # Location properties
-    'availability_zone',
     'kernel_id',
     'os_type',
     'ramdisk_id',
     # Capacity properties
-    'disk_gb',
     'ephemeral_gb',
-    'memory_mb',
-    'root_gb',
-    'vcpus']
+    'root_gb']
 
 
 def add_reserved_user_metadata(instance, metadata):
@@ -71,9 +67,14 @@ def get_metadata_from_object(instance):
     """Return a metadata dictionary for the instance.
     """
     metadata = {
+        'availability_zone': getattr(instance,
+                                     'OS-EXT-AZ:availability_zone', u''),
         'display_name': instance.name,
         'name': getattr(instance, 'OS-EXT-SRV-ATTR:instance_name', u''),
         'instance_type': (instance.flavor['id'] if instance.flavor else None),
+        'disk_gb': (instance.flavor['disk'] if instance.flavor else None),
+        'memory_mb': (instance.flavor['ram'] if instance.flavor else None),
+        'vcpus': (instance.flavor['vcpus'] if instance.flavor else None),
         'host': instance.hostId,
         # Image properties
         'image_ref': (instance.image['id'] if instance.image else None),
