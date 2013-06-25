@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-06-20 09:40+0000\n"
+"POT-Creation-Date: 2013-06-24 09:40+0000\n"
 "PO-Revision-Date: 2013-04-17 22:06+0000\n"
 "Last-Translator: Stefano Maffulli <smaffulli@gmail.com>\n"
 "Language-Team: it <LL@li.org>\n"
@@ -796,25 +796,4 @@ msgstr ""
 #: ceilometer/storage/sqlalchemy/migration.py:67
 msgid "version should be an integer"
 msgstr ""
-
-#~ msgid "Failed to understand rule %(rule)s"
-#~ msgstr ""
-
-#~ msgid "no calling threads waiting for msg_id : %(msg_id)s, message : %(data)s"
-#~ msgstr ""
-
-#~ msgid "CONSUMER GOT %s"
-#~ msgstr ""
-
-#~ msgid "ROUTER RELAY-OUT SUCCEEDED %(data)s"
-#~ msgstr ""
-
-#~ msgid "ROUTER RELAY-OUT QUEUED %(data)s"
-#~ msgstr ""
-
-#~ msgid "Could not create IPC directory %s"
-#~ msgstr ""
-
-#~ msgid "Publishing counter %s over UDP to %s:%d"
-#~ msgstr ""
 
