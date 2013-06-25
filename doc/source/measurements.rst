@@ -78,11 +78,10 @@ disk.read.bytes           Cumulative         B  inst ID   pollster      Volume o
 disk.write.bytes          Cumulative         B  inst ID   pollster      Volume of write in B
 disk.root.size            Gauge             GB  inst ID   notification  Size of root disk in GB
 disk.ephemeral.size       Gauge             GB  inst ID   notification  Size of ephemeral disk in GB
-network.incoming.bytes    Cumulative         B  iface ID  pollster      number of incoming bytes on the network
-network.outgoing.bytes    Cumulative         B  iface ID  pollster      number of outgoing bytes on the network
-network.incoming.packets  Cumulative   packets  iface ID  pollster      number of incoming packets
-network.outgoing.packets  Cumulative   packets  iface ID  pollster      number of outgoing packets
-
+network.incoming.bytes    Cumulative         B  iface ID  pollster      number of incoming bytes on the network for a VM interface
+network.outgoing.bytes    Cumulative         B  iface ID  pollster      number of outgoing bytes on the network for a VM interface
+network.incoming.packets  Cumulative   packets  iface ID  pollster      number of incoming packets for a VM interface
+network.outgoing.packets  Cumulative   packets  iface ID  pollster      number of outgoing packets for a VM interface
 ========================  ==========  ========  ========  ============  =======================================================
 
 At present, most of the Nova meters will only work with libvirt front-end
