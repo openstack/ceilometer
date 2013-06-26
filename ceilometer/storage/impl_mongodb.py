@@ -483,10 +483,14 @@ class Connection(base.Connection):
         q = make_query_from_filter(sample_filter)
 
         if period:
-            map_stats = self.MAP_STATS_PERIOD % \
-                (period,
-                 int(sample_filter.start.strftime('%s'))
-                 if sample_filter.start else 0)
+            if sample_filter.start:
+                period_start = sample_filter.start
+            else:
+                period_start = self.db.meter.find(
+                    limit=1, sort=[('timestamp',
+                                    pymongo.ASCENDING)])[0]['timestamp']
+            period_start = int(period_start.strftime('%s'))
+            map_stats = self.MAP_STATS_PERIOD % (period, period_start)
         else:
             map_stats = self.MAP_STATS
 
