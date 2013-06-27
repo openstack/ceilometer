@@ -11,65 +11,67 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+import testtools
 
-# from . import acl
-# from . import alarm
-# from . import compute_duration_by_resource
-# from . import list_events
+from . import acl
+from . import alarm
+from . import compute_duration_by_resource
+from . import list_events
 from . import list_meters
-# from . import list_resources
+from . import list_resources
 from . import post_samples
-# from . import statistics
+from . import statistics
 
 
-# TODO(jd) Fix the HBase driver to pass these tests!
-# class TestAPIAcl(acl.TestAPIACL):
-#     database_connection = 'hbase://__test__'
+class TestAPIAcl(acl.TestAPIACL):
+    database_connection = 'hbase://__test__'
 
-# TODO(jd) Fix the HBase driver to pass these tests!
-# class TestListEvents(list_events.TestListEvents):
-#     database_connection = 'hbase://__test__'
 
-# TODO(jd) Fix the HBase driver to pass these tests!
-# class TestListEmptyAlarms(alarm.TestListEmptyAlarms):
-#     database_connection = 'hbase://__test__'
+class TestListEvents(list_events.TestListEvents):
+    database_connection = 'hbase://__test__'
 
-# TODO(jd) Fix the HBase driver to pass these tests!
-# class TestAlarms(alarm.TestAlarms):
-#     database_connection = 'hbase://__test__'
 
-# TODO(jd) Fix the HBase driver to pass these tests!
-# class TestComputeDurationByResource(
-#         compute_duration_by_resource.TestComputeDurationByResource):
-#     database_connection = 'hbase://__test__'
+@testtools.skip('HBase alarms not implemented')
+class TestListEmptyAlarms(alarm.TestListEmptyAlarms):
+    database_connection = 'hbase://__test__'
+
+
+@testtools.skip('HBase alarms not implemented')
+class TestAlarms(alarm.TestAlarms):
+    database_connection = 'hbase://__test__'
+
+
+class TestComputeDurationByResource(
+        compute_duration_by_resource.TestComputeDurationByResource):
+    database_connection = 'hbase://__test__'
 
 
 class TestListEmptyMeters(list_meters.TestListEmptyMeters):
     database_connection = 'hbase://__test__'
 
-# TODO(jd) Fix the HBase driver to pass these tests!
-# class TestListMeters(list_meters.TestListMeters):
-#     database_connection = 'hbase://__test__'
 
-# TODO(jd) Fix the HBase driver to pass these tests!
-# class TestListResources(list_resources.TestListResources):
-#     database_connection = 'hbase://__test__'
+class TestListMeters(list_meters.TestListMeters):
+    database_connection = 'hbase://__test__'
 
-# TODO(jd) Fix the HBase driver to pass these tests!
-# class TestMaxProjectVolume(statistics.TestMaxProjectVolume):
-#     database_connection = 'hbase://__test__'
 
-# TODO(jd) Fix the HBase driver to pass these tests!
-# class TestMaxResourceVolume(statistics.TestMaxResourceVolume):
-#     database_connection = 'hbase://__test__'
+class TestListResources(list_resources.TestListResources):
+    database_connection = 'hbase://__test__'
 
-# TODO(jd) Fix the HBase driver to pass these tests!
-# class TestSumProjectVolume(statistics.TestSumProjectVolume):
-#     database_connection = 'hbase://__test__'
 
-# TODO(jd) Fix the HBase driver to pass these tests!
-# class TestSumResourceVolume(statistics.TestSumProjectVolume):
-#     database_connection = 'hbase://__test__'
+class TestMaxProjectVolume(statistics.TestMaxProjectVolume):
+    database_connection = 'hbase://__test__'
+
+
+class TestMaxResourceVolume(statistics.TestMaxResourceVolume):
+    database_connection = 'hbase://__test__'
+
+
+class TestSumProjectVolume(statistics.TestSumProjectVolume):
+    database_connection = 'hbase://__test__'
+
+
+class TestSumResourceVolume(statistics.TestSumProjectVolume):
+    database_connection = 'hbase://__test__'
 
 
 class TestPostSamples(post_samples.TestPostSamples):
