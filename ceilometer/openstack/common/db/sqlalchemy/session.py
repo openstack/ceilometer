@@ -260,8 +260,6 @@ from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log as logging
 from ceilometer.openstack.common import timeutils
 
-DEFAULT = 'DEFAULT'
-
 sqlite_db_opts = [
     cfg.StrOpt('sqlite_db',
                default='ceilometer.sqlite',
@@ -278,8 +276,10 @@ database_opts = [
                        '../', '$sqlite_db')),
                help='The SQLAlchemy connection string used to connect to the '
                     'database',
-               deprecated_name='sql_connection',
-               deprecated_group=DEFAULT,
+               deprecated_opts=[cfg.DeprecatedOpt('sql_connection',
+                                                  group='DEFAULT'),
+                                cfg.DeprecatedOpt('sql_connection',
+                                                  group='DATABASE')],
                secret=True),
     cfg.StrOpt('slave_connection',
                default='',
@@ -288,56 +288,71 @@ database_opts = [
                secret=True),
     cfg.IntOpt('idle_timeout',
                default=3600,
-               deprecated_name='sql_idle_timeout',
-               deprecated_group=DEFAULT,
+               deprecated_opts=[cfg.DeprecatedOpt('sql_idle_timeout',
+                                                  group='DEFAULT'),
+                                cfg.DeprecatedOpt('sql_idle_timeout',
+                                                  group='DATABASE')],
                help='timeout before idle sql connections are reaped'),
     cfg.IntOpt('min_pool_size',
                default=1,
-               deprecated_name='sql_min_pool_size',
-               deprecated_group=DEFAULT,
+               deprecated_opts=[cfg.DeprecatedOpt('sql_min_pool_size',
+                                                  group='DEFAULT'),
+                                cfg.DeprecatedOpt('sql_min_pool_size',
+                                                  group='DATABASE')],
                help='Minimum number of SQL connections to keep open in a '
                     'pool'),
     cfg.IntOpt('max_pool_size',
                default=None,
-               deprecated_name='sql_max_pool_size',
-               deprecated_group=DEFAULT,
+               deprecated_opts=[cfg.DeprecatedOpt('sql_max_pool_size',
+                                                  group='DEFAULT'),
+                                cfg.DeprecatedOpt('sql_max_pool_size',
+                                                  group='DATABASE')],
                help='Maximum number of SQL connections to keep open in a '
                     'pool'),
     cfg.IntOpt('max_retries',
                default=10,
-               deprecated_name='sql_max_retries',
-               deprecated_group=DEFAULT,
+               deprecated_opts=[cfg.DeprecatedOpt('sql_max_retries',
+                                                  group='DEFAULT'),
+                                cfg.DeprecatedOpt('sql_max_retries',
+                                                  group='DATABASE')],
                help='maximum db connection retries during startup. '
                     '(setting -1 implies an infinite retry count)'),
     cfg.IntOpt('retry_interval',
                default=10,
-               deprecated_name='sql_retry_interval',
-               deprecated_group=DEFAULT,
+               deprecated_opts=[cfg.DeprecatedOpt('sql_retry_interval',
+                                                  group='DEFAULT'),
+                                cfg.DeprecatedOpt('reconnect_interval',
+                                                  group='DATABASE')],
                help='interval between retries of opening a sql connection'),
     cfg.IntOpt('max_overflow',
                default=None,
-               deprecated_name='sql_max_overflow',
-               deprecated_group=DEFAULT,
+               deprecated_opts=[cfg.DeprecatedOpt('sql_max_overflow',
+                                                  group='DEFAULT'),
+                                cfg.DeprecatedOpt('sqlalchemy_max_overflow',
+                                                  group='DATABASE')],
                help='If set, use this value for max_overflow with sqlalchemy'),
     cfg.IntOpt('connection_debug',
                default=0,
-               deprecated_name='sql_connection_debug',
-               deprecated_group=DEFAULT,
+               deprecated_opts=[cfg.DeprecatedOpt('sql_connection_debug',
+                                                  group='DEFAULT')],
                help='Verbosity of SQL debugging information. 0=None, '
                     '100=Everything'),
     cfg.BoolOpt('connection_trace',
                 default=False,
-                deprecated_name='sql_connection_trace',
-                deprecated_group=DEFAULT,
+                deprecated_opts=[cfg.DeprecatedOpt('sql_connection_trace',
+                                                   group='DEFAULT')],
                 help='Add python stack traces to SQL as comment strings'),
     cfg.IntOpt('pool_timeout',
                default=None,
+               deprecated_opts=[cfg.DeprecatedOpt('sqlalchemy_pool_timeout',
+                                                  group='DATABASE')],
                help='If set, use this value for pool_timeout with sqlalchemy'),
 ]
 
 CONF = cfg.CONF
 CONF.register_opts(sqlite_db_opts)
 CONF.register_opts(database_opts, 'database')
+
 LOG = logging.getLogger(__name__)
 
 _ENGINE = None
