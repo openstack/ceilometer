@@ -81,19 +81,26 @@ class SampleFilter(object):
 
     :param user: The sample owner.
     :param project: The sample project.
-    :param start: Earliest timestamp to include.
-    :param end: Only include samples with timestamp less than this.
+    :param start: Earliest time point in the request.
+    :param start_timestamp_op: Earliest timestamp operation in the request.
+    :param end: Latest time point in the request.
+    :param end_timestamp_op: Latest timestamp operation in the request.
     :param resource: Optional filter for resource id.
     :param meter: Optional filter for meter type using the meter name.
     :param source: Optional source filter.
     :param metaquery: Optional filter on the metadata
     """
-    def __init__(self, user=None, project=None, start=None, end=None,
-                 resource=None, meter=None, source=None, metaquery={}):
+    def __init__(self, user=None, project=None,
+                 start=None, start_timestamp_op=None,
+                 end=None, end_timestamp_op=None,
+                 resource=None, meter=None,
+                 source=None, metaquery={}):
         self.user = user
         self.project = project
         self.start = utils.sanitize_timestamp(start)
+        self.start_timestamp_op = start_timestamp_op
         self.end = utils.sanitize_timestamp(end)
+        self.end_timestamp_op = end_timestamp_op
         self.resource = resource
         self.meter = meter
         self.source = source

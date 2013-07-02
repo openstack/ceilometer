@@ -98,7 +98,8 @@ class Connection(object):
 
     @abc.abstractmethod
     def get_resources(self, user=None, project=None, source=None,
-                      start_timestamp=None, end_timestamp=None,
+                      start_timestamp=None, start_timestamp_op=None,
+                      end_timestamp=None, end_timestamp_op=None,
                       metaquery={}, resource=None):
         """Return an iterable of models.Resource instances containing
         resource information.
@@ -107,7 +108,9 @@ class Connection(object):
         :param project: Optional ID for project that owns the resource.
         :param source: Optional source filter.
         :param start_timestamp: Optional modified timestamp start range.
+        :param start_timestamp_op: Optional timestamp start range operation.
         :param end_timestamp: Optional modified timestamp end range.
+        :param end_timestamp_op: Optional timestamp end range operation.
         :param metaquery: Optional dict with metadata to match on.
         :param resource: Optional resource filter.
         """

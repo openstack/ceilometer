@@ -93,17 +93,28 @@ class MongoDBStorage(base.StorageEngine):
         return Connection(conf)
 
 
-def make_timestamp_range(start, end):
-    """Given two possible datetimes, create the query
-    document to find timestamps within that range
-    using $gte for the lower bound and $lt for the
+def make_timestamp_range(start, end,
+                         start_timestamp_op=None, end_timestamp_op=None):
+    """Given two possible datetimes and their operations, create the query
+    document to find timestamps within that range.
+    By default, using $gte for the lower bound and $lt for the
     upper bound.
     """
     ts_range = {}
+
     if start:
-        ts_range['$gte'] = start
+        if start_timestamp_op == 'gt':
+            start_timestamp_op = '$gt'
+        else:
+            start_timestamp_op = '$gte'
+        ts_range[start_timestamp_op] = start
+
     if end:
-        ts_range['$lt'] = end
+        if end_timestamp_op == 'le':
+            end_timestamp_op = '$lte'
+        else:
+            end_timestamp_op = '$lt'
+        ts_range[end_timestamp_op] = end
     return ts_range
 
 
@@ -126,7 +137,9 @@ def make_query_from_filter(sample_filter, require_meter=True):
     elif require_meter:
         raise RuntimeError('Missing required meter specifier')
 
-    ts_range = make_timestamp_range(sample_filter.start, sample_filter.end)
+    ts_range = make_timestamp_range(sample_filter.start, sample_filter.end,
+                                    sample_filter.start_timestamp_op,
+                                    sample_filter.end_timestamp_op)
     if ts_range:
         q['timestamp'] = ts_range
 
@@ -355,7 +368,8 @@ class Connection(base.Connection):
         return sorted(self.db.project.find(q).distinct('_id'))
 
     def get_resources(self, user=None, project=None, source=None,
-                      start_timestamp=None, end_timestamp=None,
+                      start_timestamp=None, start_timestamp_op=None,
+                      end_timestamp=None, end_timestamp_op=None,
                       metaquery={}, resource=None):
         """Return an iterable of models.Resource instances
 
@@ -363,7 +377,9 @@ class Connection(base.Connection):
         :param project: Optional ID for project that owns the resource.
         :param source: Optional source filter.
         :param start_timestamp: Optional modified timestamp start range.
+        :param start_timestamp_op: Optional start time operator, like gt, ge.
         :param end_timestamp: Optional modified timestamp end range.
+        :param end_timestamp_op: Optional end time operator, like lt, le.
         :param metaquery: Optional dict with metadata to match on.
         :param resource: Optional resource filter.
         """
@@ -388,7 +404,9 @@ class Connection(base.Connection):
             # Look for resources matching the above criteria and with
             # samples in the time range we care about, then change the
             # resource query to return just those resources by id.
-            ts_range = make_timestamp_range(start_timestamp, end_timestamp)
+            ts_range = make_timestamp_range(start_timestamp, end_timestamp,
+                                            start_timestamp_op,
+                                            end_timestamp_op)
             if ts_range:
                 q['timestamp'] = ts_range
 

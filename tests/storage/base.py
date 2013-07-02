@@ -193,27 +193,80 @@ class ResourceTest(DBTestBase):
 
     def test_get_resources_start_timestamp(self):
         timestamp = datetime.datetime(2012, 7, 2, 10, 42)
-        resources = list(self.conn.get_resources(start_timestamp=timestamp))
-        resource_ids = [r.resource_id for r in resources]
         expected = set(['resource-id-2', 'resource-id-3', 'resource-id-4',
                         'resource-id-6', 'resource-id-8'])
+
+        resources = list(self.conn.get_resources(start_timestamp=timestamp))
+        resource_ids = [r.resource_id for r in resources]
+        self.assertEqual(set(resource_ids), expected)
+
+        resources = list(self.conn.get_resources(start_timestamp=timestamp,
+                                                 start_timestamp_op='ge'))
+        resource_ids = [r.resource_id for r in resources]
+        self.assertEqual(set(resource_ids), expected)
+
+        resources = list(self.conn.get_resources(start_timestamp=timestamp,
+                                                 start_timestamp_op='gt'))
+        resource_ids = [r.resource_id for r in resources]
+        expected.remove('resource-id-2')
         self.assertEqual(set(resource_ids), expected)
 
     def test_get_resources_end_timestamp(self):
         timestamp = datetime.datetime(2012, 7, 2, 10, 42)
-        resources = list(self.conn.get_resources(end_timestamp=timestamp))
-        resource_ids = [r.resource_id for r in resources]
         expected = set(['resource-id', 'resource-id-alternate',
                         'resource-id-5', 'resource-id-7'])
+
+        resources = list(self.conn.get_resources(end_timestamp=timestamp))
+        resource_ids = [r.resource_id for r in resources]
+        self.assertEqual(set(resource_ids), expected)
+
+        resources = list(self.conn.get_resources(end_timestamp=timestamp,
+                                                 end_timestamp_op='lt'))
+        resource_ids = [r.resource_id for r in resources]
+        self.assertEqual(set(resource_ids), expected)
+
+        resources = list(self.conn.get_resources(end_timestamp=timestamp,
+                                                 end_timestamp_op='le'))
+        resource_ids = [r.resource_id for r in resources]
+        expected.add('resource-id-2')
         self.assertEqual(set(resource_ids), expected)
 
     def test_get_resources_both_timestamps(self):
         start_ts = datetime.datetime(2012, 7, 2, 10, 42)
         end_ts = datetime.datetime(2012, 7, 2, 10, 43)
+
         resources = list(self.conn.get_resources(start_timestamp=start_ts,
                                                  end_timestamp=end_ts))
         resource_ids = [r.resource_id for r in resources]
         assert set(resource_ids) == set(['resource-id-2'])
+
+        resources = list(self.conn.get_resources(start_timestamp=start_ts,
+                                                 end_timestamp=end_ts,
+                                                 start_timestamp_op='ge',
+                                                 end_timestamp_op='lt'))
+        resource_ids = [r.resource_id for r in resources]
+        assert set(resource_ids) == set(['resource-id-2'])
+
+        resources = list(self.conn.get_resources(start_timestamp=start_ts,
+                                                 end_timestamp=end_ts,
+                                                 start_timestamp_op='gt',
+                                                 end_timestamp_op='lt'))
+        resource_ids = [r.resource_id for r in resources]
+        assert len(resource_ids) == 0
+
+        resources = list(self.conn.get_resources(start_timestamp=start_ts,
+                                                 end_timestamp=end_ts,
+                                                 start_timestamp_op='gt',
+                                                 end_timestamp_op='le'))
+        resource_ids = [r.resource_id for r in resources]
+        assert set(resource_ids) == set(['resource-id-3'])
+
+        resources = list(self.conn.get_resources(start_timestamp=start_ts,
+                                                 end_timestamp=end_ts,
+                                                 start_timestamp_op='ge',
+                                                 end_timestamp_op='le'))
+        resource_ids = [r.resource_id for r in resources]
+        assert set(resource_ids) == set(['resource-id-2', 'resource-id-3'])
 
     def test_get_resources_by_source(self):
         resources = list(self.conn.get_resources(source='test-1'))
@@ -353,33 +406,79 @@ class RawSampleTest(DBTestBase):
             self.assertTrue(got_not_imp)
 
     def test_get_samples_by_start_time(self):
+        timestamp = datetime.datetime(2012, 7, 2, 10, 41)
         f = storage.SampleFilter(
             user='user-id',
-            start=datetime.datetime(2012, 7, 2, 10, 41),
+            start=timestamp,
         )
+
         results = list(self.conn.get_samples(f))
         assert len(results) == 1
-        assert results[0].timestamp == datetime.datetime(2012, 7, 2, 10, 41)
+        assert results[0].timestamp == timestamp
+
+        f.start_timestamp_op = 'ge'
+        results = list(self.conn.get_samples(f))
+        assert len(results) == 1
+        assert results[0].timestamp == timestamp
+
+        f.start_timestamp_op = 'gt'
+        results = list(self.conn.get_samples(f))
+        assert len(results) == 0
 
     def test_get_samples_by_end_time(self):
+        timestamp = datetime.datetime(2012, 7, 2, 10, 40)
         f = storage.SampleFilter(
             user='user-id',
-            end=datetime.datetime(2012, 7, 2, 10, 41),
+            end=timestamp,
         )
+
         results = list(self.conn.get_samples(f))
-        length = len(results)
-        assert length == 1
-        assert results[0].timestamp == datetime.datetime(2012, 7, 2, 10, 40)
+        assert len(results) == 0
+
+        f.end_timestamp_op = 'lt'
+        results = list(self.conn.get_samples(f))
+        assert len(results) == 0
+
+        f.end_timestamp_op = 'le'
+        results = list(self.conn.get_samples(f))
+        assert len(results) == 1
+        assert results[0].timestamp == timestamp
 
     def test_get_samples_by_both_times(self):
+        start_ts = datetime.datetime(2012, 7, 2, 10, 42)
+        end_ts = datetime.datetime(2012, 7, 2, 10, 43)
         f = storage.SampleFilter(
-            start=datetime.datetime(2012, 7, 2, 10, 42),
-            end=datetime.datetime(2012, 7, 2, 10, 43),
+            start=start_ts,
+            end=end_ts,
         )
+
         results = list(self.conn.get_samples(f))
-        length = len(results)
-        assert length == 1
-        assert results[0].timestamp == datetime.datetime(2012, 7, 2, 10, 42)
+        assert len(results) == 1
+        assert results[0].timestamp == start_ts
+
+        f.start_timestamp_op = 'gt'
+        f.end_timestamp_op = 'lt'
+        results = list(self.conn.get_samples(f))
+        assert len(results) == 0
+
+        f.start_timestamp_op = 'ge'
+        f.end_timestamp_op = 'lt'
+        results = list(self.conn.get_samples(f))
+        assert len(results) == 1
+        assert results[0].timestamp == start_ts
+
+        f.start_timestamp_op = 'gt'
+        f.end_timestamp_op = 'le'
+        results = list(self.conn.get_samples(f))
+        assert len(results) == 1
+        assert results[0].timestamp == end_ts
+
+        f.start_timestamp_op = 'ge'
+        f.end_timestamp_op = 'le'
+        results = list(self.conn.get_samples(f))
+        assert len(results) == 2
+        assert results[0].timestamp == end_ts
+        assert results[1].timestamp == start_ts
 
     def test_get_samples_by_name(self):
         f = storage.SampleFilter(user='user-id', meter='no-such-meter')
