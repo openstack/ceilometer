@@ -28,7 +28,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'openstack_dashboard.settings'
 def write_autodoc_index():
 
     def find_autodoc_modules(module_name, sourcedir):
-        """returns a list of modules in the SOURCE directory"""
+        """Return a list of modules in the SOURCE directory."""
         modlist = []
         os.chdir(os.path.join(sourcedir, module_name))
         print "SEARCHING %s" % sourcedir
@@ -77,8 +77,9 @@ def write_autodoc_index():
         if not(os.path.exists(MOD_DIR)):
             os.mkdir(MOD_DIR)
         for module in find_autodoc_modules(modulename, path):
-            if any([module.startswith(exclude) for exclude \
-                                                in EXCLUDED_MODULES]):
+            if any([module.startswith(exclude)
+                    for exclude
+                    in EXCLUDED_MODULES]):
                 print "Excluded module %s." % module
                 continue
             mod_path = os.path.join(path, *module.split("."))
@@ -300,14 +301,14 @@ htmlhelp_basename = 'Ceilometerdoc'
 # -- Options for LaTeX output -------------------------------------------------
 
 latex_elements = {
-# The paper size ('letterpaper' or 'a4paper').
-#'papersize': 'letterpaper',
+    # The paper size ('letterpaper' or 'a4paper').
+    #'papersize': 'letterpaper',
 
-# The font size ('10pt', '11pt' or '12pt').
-#'pointsize': '10pt',
+    # The font size ('10pt', '11pt' or '12pt').
+    #'pointsize': '10pt',
 
-# Additional stuff for the LaTeX preamble.
-#'preamble': '',
+    # Additional stuff for the LaTeX preamble.
+    #'preamble': '',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples

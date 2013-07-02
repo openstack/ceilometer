@@ -38,56 +38,56 @@ def main():
 
     parser = argparse.ArgumentParser(
         description='generate metering data',
-        )
+    )
     parser.add_argument(
         '--interval',
         default=10,
         type=int,
         help='the period between events, in minutes',
-        )
+    )
     parser.add_argument(
         '--start',
         default=31,
         help='the number of days in the past to start timestamps',
-        )
+    )
     parser.add_argument(
         '--end',
         default=2,
         help='the number of days into the future to continue timestamps',
-        )
+    )
     parser.add_argument(
         '--type',
         choices=('gauge', 'cumulative'),
         default='gauge',
         help='counter type',
-        )
+    )
     parser.add_argument(
         '--unit',
         default=None,
         help='counter unit',
-        )
+    )
     parser.add_argument(
         '--project',
         help='project id of owner',
-        )
+    )
     parser.add_argument(
         '--user',
         help='user id of owner',
-        )
+    )
     parser.add_argument(
         'resource',
         help='the resource id for the meter data',
-        )
+    )
     parser.add_argument(
         'counter',
         help='the counter name for the meter data',
-        )
+    )
     parser.add_argument(
         'volume',
         help='the amount to attach to the meter',
         type=int,
         default=1,
-        )
+    )
     args = parser.parse_args()
 
     # Set up logging to use the console

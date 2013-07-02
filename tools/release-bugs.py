@@ -36,7 +36,7 @@ PRE_RELEASE_STATUS = "Fix Released"
 RELEASE_PROMPT = (
     "Found {bug_count} '{pre_release_status}' bugs for milestone "
     "{milestone_title}. Mark them 'Fix Released'? [y/n]: "
-    )
+)
 
 
 def main():
