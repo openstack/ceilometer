@@ -692,9 +692,15 @@ class ResourcesController(rest.RestController):
         :param resource_id: The UUID of the resource.
         """
         authorized_project = acl.get_limited_to_project(pecan.request.headers)
-        r = list(pecan.request.storage_conn.get_resources(
-                 resource=resource_id, project=authorized_project))[0]
-        return Resource.from_db_and_links(r,
+        resources = list(pecan.request.storage_conn.get_resources(
+            resource=resource_id, project=authorized_project))
+        # FIXME (flwang): Need to change this to return a 404 error code when
+        # we get a release of WSME that supports it.
+        if not resources:
+            raise wsme.exc.InvalidInput("resource_id",
+                                        resource_id,
+                                        _("Unknown resource"))
+        return Resource.from_db_and_links(resources[0],
                                           self._resource_links(resource_id))
 
     @wsme_pecan.wsexpose([Resource], [Query])
@@ -876,6 +882,8 @@ class AlarmsController(rest.RestController):
         auth_project = acl.get_limited_to_project(pecan.request.headers)
         alarms = list(conn.get_alarms(alarm_id=alarm_id,
                                       project=auth_project))
+        # FIXME (flwang): Need to change this to return a 404 error code when
+        # we get a release of WSME that supports it.
         if len(alarms) < 1:
             raise wsme.exc.ClientSideError(_("Unknown alarm"))
 

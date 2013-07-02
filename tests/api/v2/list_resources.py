@@ -196,6 +196,56 @@ class TestListResources(FunctionalTest):
         ids = [r['resource_id'] for r in data]
         self.assertEquals(['resource-id'], ids)
 
+    def test_with_invalid_resource_id(self):
+        counter1 = counter.Counter(
+            'instance',
+            'cumulative',
+            '',
+            1,
+            'user-id',
+            'project-id',
+            'resource-id-1',
+            timestamp=datetime.datetime(2012, 7, 2, 10, 40),
+            resource_metadata={'display_name': 'test-server',
+                               'tag': 'self.counter',
+                               }
+        )
+        msg = rpc.meter_message_from_counter(
+            counter1,
+            cfg.CONF.publisher_rpc.metering_secret,
+            'test_list_resources',
+        )
+        self.conn.record_metering_data(msg)
+
+        counter2 = counter.Counter(
+            'instance',
+            'cumulative',
+            '',
+            1,
+            'user-id2',
+            'project-id',
+            'resource-id-2',
+            timestamp=datetime.datetime(2012, 7, 2, 10, 41),
+            resource_metadata={'display_name': 'test-server',
+                               'tag': 'self.counter2',
+                               }
+        )
+        msg2 = rpc.meter_message_from_counter(
+            counter2,
+            cfg.CONF.publisher_rpc.metering_secret,
+            'test_list_resources',
+        )
+        self.conn.record_metering_data(msg2)
+
+        resp1 = self.get_json('/resources/resource-id-1')
+        self.assertEquals(resp1["resource_id"], "resource-id-1")
+
+        resp2 = self.get_json('/resources/resource-id-2')
+        self.assertEquals(resp2["resource_id"], "resource-id-2")
+
+        resp3 = self.get_json('/resources/resource-id-3', expect_errors=True)
+        self.assertEquals(resp3.status_code, 400)
+
     def test_with_user(self):
         counter1 = counter.Counter(
             'instance',
