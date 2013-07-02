@@ -76,13 +76,13 @@ class TestKwapiPollster(base.TestCase):
         self.stubs.Set(kwapi._Base, 'get_kwapi_client',
                        self.fake_kwapi_get_kwapi_client)
 
-        counters = list(kwapi.KwapiPollster().get_counters(self.manager))
+        counters = list(kwapi.KwapiPollster().get_counters(self.manager, {}))
         self.assertEqual(len(counters), 0)
 
     def test_kwapi_counter(self):
         self.stubs.Set(kwapi._Base, 'iter_probes', self.fake_kwapi_iter_probes)
 
-        counters = list(kwapi.KwapiPollster().get_counters(self.manager))
+        counters = list(kwapi.KwapiPollster().get_counters(self.manager, {}))
         self.assertEqual(len(counters), 6)
         energy_counters = [counter for counter in counters
                            if counter.name == "energy"]
@@ -104,6 +104,6 @@ class TestKwapiPollster(base.TestCase):
     def test_kwapi_counter_list(self):
         self.stubs.Set(kwapi._Base, 'iter_probes', self.fake_kwapi_iter_probes)
 
-        counters = list(kwapi.KwapiPollster().get_counters(self.manager))
+        counters = list(kwapi.KwapiPollster().get_counters(self.manager, {}))
         self.assertEqual(set([c.name for c in counters]),
                          set(kwapi.KwapiPollster().get_counter_names()))

@@ -65,7 +65,7 @@ class TestFloatingIPPollster(base.TestCase):
     #         assert False, 'Should have seen an error'
 
     def test_get_counters_not_empty(self):
-        counters = list(self.pollster.get_counters(self.manager))
+        counters = list(self.pollster.get_counters(self.manager, {}))
         self.assertEqual(len(counters), 3)
         # It's necessary to verify all the attributes extracted by Nova
         # API /os-floating-ips to make sure they're available and correct.
@@ -82,6 +82,6 @@ class TestFloatingIPPollster(base.TestCase):
         self.assertEqual(counters[2].resource_metadata["pool"], "public")
 
     def test_get_counter_names(self):
-        counters = list(self.pollster.get_counters(self.manager))
+        counters = list(self.pollster.get_counters(self.manager, {}))
         self.assertEqual(set([c.name for c in counters]),
                          set(self.pollster.get_counter_names()))

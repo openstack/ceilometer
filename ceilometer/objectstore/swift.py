@@ -55,7 +55,7 @@ class _Base(plugin.PollsterBase):
     def iter_accounts(ksclient):
         """Iterate over all accounts, yielding (tenant_id, stats) tuples."""
 
-    def get_counters(self, manager):
+    def get_counters(self, manager, cache):
         for tenant, account in self.iter_accounts(manager.keystone):
             yield counter.Counter(
                 name='storage.objects',

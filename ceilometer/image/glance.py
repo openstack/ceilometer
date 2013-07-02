@@ -99,7 +99,7 @@ class ImagePollster(_Base):
     def get_counter_names():
         return ['image', 'image.size']
 
-    def get_counters(self, manager):
+    def get_counters(self, manager, cache):
         for image in self.iter_images(manager.keystone):
             yield counter.Counter(
                 name='image',

@@ -37,12 +37,15 @@ class PollingTask(agent.PollingTask):
                 if getattr(instance, 'OS-EXT-STS:vm_state', None) != 'error':
                     # TODO(yjiang5) passing counters to get_counters to avoid
                     # polling all counters one by one
+                    cache = {}
                     for pollster in self.pollsters:
                         try:
                             LOG.info("Polling pollster %s", pollster.name)
                             publisher(list(pollster.obj.get_counters(
                                 self.manager,
-                                instance)))
+                                cache,
+                                instance,
+                            )))
                         except Exception as err:
                             LOG.warning('Continue after error from %s: %s',
                                         pollster.name, err)

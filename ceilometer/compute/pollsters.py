@@ -57,7 +57,7 @@ class InstancePollster(plugin.ComputePollster):
         # variable. We don't need such format in future
         return ['instance', 'instance:*']
 
-    def get_counters(self, manager, instance):
+    def get_counters(self, manager, cache, instance):
         yield make_counter_from_instance(instance,
                                          name='instance',
                                          type=counter.TYPE_GAUGE,
@@ -91,7 +91,7 @@ class DiskIOPollster(plugin.ComputePollster):
                 'disk.write.requests',
                 'disk.write.bytes']
 
-    def get_counters(self, manager, instance):
+    def get_counters(self, manager, cache, instance):
         instance_name = _instance_name(instance)
         try:
             r_bytes = 0
@@ -164,7 +164,7 @@ class CPUPollster(plugin.ComputePollster):
     def get_counter_names():
         return ['cpu', 'cpu_util']
 
-    def get_counters(self, manager, instance):
+    def get_counters(self, manager, cache, instance):
         self.LOG.info('checking instance %s', instance.id)
         instance_name = _instance_name(instance)
         try:
@@ -237,7 +237,7 @@ class NetPollster(plugin.ComputePollster):
                 'network.outgoing.bytes',
                 'network.outgoing.packets']
 
-    def get_counters(self, manager, instance):
+    def get_counters(self, manager, cache, instance):
         instance_name = _instance_name(instance)
         self.LOG.info('checking instance %s', instance.id)
         try:
