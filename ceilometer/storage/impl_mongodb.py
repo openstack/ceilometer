@@ -32,10 +32,11 @@ import bson.code
 import bson.objectid
 import pymongo
 
+from oslo.config import cfg
+
 from ceilometer.openstack.common import log
 from ceilometer.storage import base
 from ceilometer.storage import models
-
 
 LOG = log.getLogger(__name__)
 
@@ -66,13 +67,26 @@ class MongoDBStorage(base.StorageEngine):
             }
     """
 
-    OPTIONS = []
+    OPTIONS = [
+        cfg.StrOpt('replica_set_name',
+                   default='',
+                   help='Used to identify the replication set name',
+                   ),
+    ]
+
+    OPTION_GROUP = cfg.OptGroup(name='storage_mongodb',
+                                title='Options for the mongodb storage')
 
     def register_opts(self, conf):
         """Register any configuration options used by this engine.
         """
-        conf.register_opts(self.OPTIONS)
+        conf.register_group(self.OPTION_GROUP)
+        conf.register_opts(self.OPTIONS, self.OPTION_GROUP)
 
+    # FIXME(xingzhou): ceilometer-api will create a Connection object for
+    # each request. As pymongo.Connection has already maintained a db
+    # connection pool for client, it is better to use a cached Connection
+    # object to connect to mongodb.
     def get_connection(self, conf):
         """Return a Connection instance based on the configuration settings.
         """
@@ -197,15 +211,15 @@ class Connection(base.Connection):
 
     def __init__(self, conf):
         opts = self._parse_connection_url(conf.database.connection)
-        LOG.info('connecting to MongoDB on %s:%s', opts['host'], opts['port'])
+        LOG.info('connecting to MongoDB replicaset "%s" on %s',
+                 conf.storage_mongodb.replica_set_name,
+                 opts['netloc'])
 
-        if opts['host'] == '__test__':
+        if opts['netloc'] == '__test__':
             url = os.environ.get('CEILOMETER_TEST_MONGODB_URL')
             if url:
                 opts = self._parse_connection_url(url)
-                self.conn = pymongo.Connection(opts['host'],
-                                               opts['port'],
-                                               safe=True)
+                self.conn = pymongo.Connection(opts['netloc'], safe=True)
             else:
                 # MIM will die if we have too many connections, so use a
                 # Singleton
@@ -220,9 +234,10 @@ class Connection(base.Connection):
                 self.conn = Connection._mim_instance
                 LOG.debug('Using MIM for test connection')
         else:
-            self.conn = pymongo.Connection(opts['host'],
-                                           opts['port'],
-                                           safe=True)
+            self.conn = pymongo.Connection(
+                opts['netloc'],
+                replicaSet=conf.storage_mongodb.replica_set_name,
+                safe=True)
 
         self.db = getattr(self.conn, opts['dbname'])
         if 'username' in opts:
@@ -269,15 +284,9 @@ class Connection(base.Connection):
         opts['dbname'] = result.path.replace('/', '')
         netloc_match = re.match(r'(?:(\w+:\w+)@)?(.*)', result.netloc)
         auth = netloc_match.group(1)
-        netloc = netloc_match.group(2)
+        opts['netloc'] = netloc_match.group(2)
         if auth:
             opts['username'], opts['password'] = auth.split(':')
-        if ':' in netloc:
-            opts['host'], port = netloc.split(':')
-        else:
-            opts['host'] = netloc
-            port = 27017
-        opts['port'] = port and int(port) or 27017
         return opts
 
     def record_metering_data(self, data):
