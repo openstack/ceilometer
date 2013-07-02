@@ -27,6 +27,7 @@ from swiftclient import client as swift
 from keystoneclient import exceptions
 
 from ceilometer import counter
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer import plugin
@@ -50,13 +51,12 @@ class _Base(plugin.PollsterBase):
 
     __metaclass__ = abc.ABCMeta
 
-    @staticmethod
     @abc.abstractmethod
-    def iter_accounts(ksclient):
+    def _iter_accounts(ksclient, cache):
         """Iterate over all accounts, yielding (tenant_id, stats) tuples."""
 
     def get_counters(self, manager, cache):
-        for tenant, account in self.iter_accounts(manager.keystone):
+        for tenant, account in self._iter_accounts(manager.keystone, cache):
             yield counter.Counter(
                 name='storage.objects',
                 type=counter.TYPE_GAUGE,
@@ -102,17 +102,27 @@ class SwiftPollster(_Base):
                 'storage.objects.size',
                 'storage.objects.containers']
 
-    @staticmethod
-    def iter_accounts(ksclient):
+    CACHE_KEY_TENANT = 'tenants'
+    CACHE_KEY_HEAD = 'swift.head_account'
+
+    def _iter_accounts(self, ksclient, cache):
+        if self.CACHE_KEY_TENANT not in cache:
+            cache[self.CACHE_KEY_TENANT] = ksclient.tenants.list()
+        if self.CACHE_KEY_HEAD not in cache:
+            cache[self.CACHE_KEY_HEAD] = list(self._get_account_info(ksclient,
+                                                                     cache))
+        return iter(cache['swift.head_account'])
+
+    def _get_account_info(self, ksclient, cache):
         try:
             endpoint = ksclient.service_catalog.url_for(
                 service_type='object-store',
                 endpoint_type='adminURL')
         except exceptions.EndpointNotFound:
             LOG.debug(_("Swift endpoint not found"))
-            return
+            raise StopIteration()
 
-        for t in ksclient.tenants.list():
+        for t in cache['tenants']:
             yield (t.id, swift.head_account(SwiftPollster.
                                             _neaten_url(endpoint, t.id),
                                             ksclient.auth_token))
