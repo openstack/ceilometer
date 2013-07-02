@@ -133,11 +133,20 @@ class TestImagePollster(base.TestCase):
         self.stubs.Set(glance._Base, 'get_glance_client',
                        self.fake_get_glance_client)
 
-    # Tests whether the iter_images method returns an unique image list.
     def test_iter_images(self):
+        # Tests whether the iter_images method returns an unique image
+        # list when there is nothing in the cache
         images = list(glance.ImagePollster().
-                      iter_images(self.manager.keystone))
+                      _iter_images(self.manager.keystone, {}))
         self.assertEqual(len(images), len(set(image.id for image in images)))
+
+    def test_iter_images_cached(self):
+        # Tests whether the iter_images method returns the values from
+        # the cache
+        cache = {'images': []}
+        images = list(glance.ImagePollster().
+                      _iter_images(self.manager.keystone, cache))
+        self.assertEqual(images, [])
 
     def test_glance_image_counter(self):
         counters = list(glance.ImagePollster().get_counters(self.manager, {}))

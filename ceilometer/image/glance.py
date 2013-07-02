@@ -40,8 +40,7 @@ class _Base(plugin.PollsterBase):
         return glanceclient.Client('1', endpoint,
                                    token=ksclient.auth_token)
 
-    def iter_images(self, ksclient):
-        """Iterate over all images."""
+    def _get_images(self, ksclient):
         client = self.get_glance_client(ksclient)
         #TODO(eglynn): use pagination to protect against unbounded
         #              memory usage
@@ -69,6 +68,12 @@ class _Base(plugin.PollsterBase):
             if image.id in imageIdSet:
                 imageIdSet -= set([image.id])
                 yield image
+
+    def _iter_images(self, ksclient, cache):
+        """Iterate over all images."""
+        if 'images' not in cache:
+            cache['images'] = list(self._get_images(ksclient))
+        return iter(cache['images'])
 
     @staticmethod
     def extract_image_metadata(image):
@@ -100,7 +105,7 @@ class ImagePollster(_Base):
         return ['image', 'image.size']
 
     def get_counters(self, manager, cache):
-        for image in self.iter_images(manager.keystone):
+        for image in self._iter_images(manager.keystone, cache):
             yield counter.Counter(
                 name='image',
                 type=counter.TYPE_GAUGE,
