@@ -526,6 +526,18 @@
 #pool_timeout=<None>
 
 
+[alarm]
+
+#
+# Options defined in ceilometer.alarm.service
+#
+
+# Period of threshold evaluation cycle, should be >= than
+# configured pipeline interval for collection of underlying
+# metrics. (integer value)
+#threshold_evaluation_interval=60
+
+
 [rpc_notifier2]
 
 #
@@ -612,4 +624,4 @@
 #password=<None>
 
 
-# Total option count: 118
+# Total option count: 119

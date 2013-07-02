@@ -53,7 +53,7 @@ class Evaluator(object):
     # avoid unknown state
     quorum = 1
 
-    def __init__(self, notifier):
+    def __init__(self, notifier=None):
         self.alarms = []
         self.notifier = notifier
         self.api_client = None
