@@ -55,7 +55,7 @@ class TestManager(manager.AgentManager):
 class TestKwapiPollster(base.TestCase):
 
     @staticmethod
-    def fake_kwapi_iter_probes(self, ksclient):
+    def fake_iter_probes(self, ksclient, cache):
         probes = PROBE_DICT['probes']
         for key, value in probes.iteritems():
             probe_dict = value
@@ -63,7 +63,7 @@ class TestKwapiPollster(base.TestCase):
             yield probe_dict
 
     @staticmethod
-    def fake_kwapi_get_kwapi_client(self, ksclient):
+    def fake_get_kwapi_client(self, ksclient):
         raise exceptions.EndpointNotFound("fake keystone exception")
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
@@ -72,15 +72,16 @@ class TestKwapiPollster(base.TestCase):
         self.context = context.get_admin_context()
         self.manager = TestManager()
 
-    def test_kwapi_endpoint_not_exist(self):
+    def test_endpoint_not_exist(self):
         self.stubs.Set(kwapi._Base, 'get_kwapi_client',
-                       self.fake_kwapi_get_kwapi_client)
+                       self.fake_get_kwapi_client)
 
         counters = list(kwapi.KwapiPollster().get_counters(self.manager, {}))
         self.assertEqual(len(counters), 0)
 
-    def test_kwapi_counter(self):
-        self.stubs.Set(kwapi._Base, 'iter_probes', self.fake_kwapi_iter_probes)
+    def test_counter(self):
+        self.stubs.Set(kwapi._Base, '_iter_probes',
+                       self.fake_iter_probes)
 
         counters = list(kwapi.KwapiPollster().get_counters(self.manager, {}))
         self.assertEqual(len(counters), 6)
@@ -101,9 +102,21 @@ class TestKwapiPollster(base.TestCase):
                 any(map(lambda counter: counter.volume == probe['w'],
                         power_counters)))
 
-    def test_kwapi_counter_list(self):
-        self.stubs.Set(kwapi._Base, 'iter_probes', self.fake_kwapi_iter_probes)
+    def test_get_counters_cached(self):
+        probe = {'id': 'A'}
+        probe.update(PROBE_DICT['probes']['A'])
+        cache = {
+            kwapi.KwapiPollster.CACHE_KEY_PROBE: [probe],
+        }
+        self.manager.keystone = mock.Mock()
+        pollster = kwapi.KwapiPollster()
+        counters = list(pollster.get_counters(self.manager, cache))
+        self.assertEqual(len(counters), 2)
 
-        counters = list(kwapi.KwapiPollster().get_counters(self.manager, {}))
+    def test_counter_list(self):
+        self.stubs.Set(kwapi._Base, '_iter_probes',
+                       self.fake_iter_probes)
+        pollster = kwapi.KwapiPollster()
+        counters = list(pollster.get_counters(self.manager, {}))
         self.assertEqual(set([c.name for c in counters]),
-                         set(kwapi.KwapiPollster().get_counter_names()))
+                         set(pollster.get_counter_names()))

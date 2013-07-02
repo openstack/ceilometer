@@ -21,6 +21,7 @@ import requests
 
 from ceilometer.central import plugin
 from ceilometer import counter
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 
 LOG = log.getLogger(__name__)
@@ -60,14 +61,21 @@ class _Base(plugin.CentralPollster):
                                                     )
         return KwapiClient(endpoint, ksclient.auth_token)
 
-    def iter_probes(self, ksclient):
+    CACHE_KEY_PROBE = 'kwapi.probes'
+
+    def _iter_probes(self, ksclient, cache):
         """Iterate over all probes."""
+        if self.CACHE_KEY_PROBE not in cache:
+            cache[self.CACHE_KEY_PROBE] = self._get_probes(ksclient)
+        return iter(cache[self.CACHE_KEY_PROBE])
+
+    def _get_probes(self, ksclient):
         try:
             client = self.get_kwapi_client(ksclient)
         except exceptions.EndpointNotFound:
             LOG.debug(_("Kwapi endpoint not found"))
             return []
-        return client.iter_probes()
+        return list(client.iter_probes())
 
 
 class KwapiPollster(_Base):
@@ -79,7 +87,7 @@ class KwapiPollster(_Base):
 
     def get_counters(self, manager, cache):
         """Returns all counters."""
-        for probe in self.iter_probes(manager.keystone):
+        for probe in self._iter_probes(manager.keystone, cache):
             yield counter.Counter(
                 name='energy',
                 type=counter.TYPE_CUMULATIVE,
