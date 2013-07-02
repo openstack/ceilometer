@@ -164,11 +164,6 @@ class ResourceTest(base.ResourceTest, MongoDBEngineTestBase):
     pass
 
 
-class ResourceTestPagination(base.ResourceTestPagination,
-                             MongoDBEngineTestBase):
-    pass
-
-
 class MeterTest(base.MeterTest, MongoDBEngineTestBase):
     pass
 

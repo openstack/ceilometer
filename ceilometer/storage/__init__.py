@@ -58,6 +58,10 @@ cfg.CONF.import_opt('connection',
                     group='database')
 
 
+class StorageBadVersion(Exception):
+    """Error raised when the storage backend version is not good enough."""
+
+
 def get_engine(conf):
     """Load the configured engine and return an instance."""
     if conf.database_connection:

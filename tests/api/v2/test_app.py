@@ -41,6 +41,7 @@ class TestApp(base.TestCase):
         cfg.CONF.set_override("auth_version", "v2.0", group=acl.OPT_GROUP_NAME)
         cfg.CONF.set_override("pipeline_cfg_file",
                               self.path_get("etc/ceilometer/pipeline.yaml"))
+        cfg.CONF.set_override('connection', "log://", group="database")
         api_app = app.setup_app()
         self.assertEqual(api_app.auth_protocol, 'foottp')
 
@@ -55,6 +56,7 @@ class TestApp(base.TestCase):
             f.write("auth_version = v2.0\n")
         service.prepare_service(['ceilometer-api',
                                  '--config-file=%s' % tmpfile])
+        cfg.CONF.set_override('connection', "log://", group="database")
         api_app = app.setup_app()
         self.assertEqual(api_app.auth_protocol, 'barttp')
         os.unlink(tmpfile)

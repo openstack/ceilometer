@@ -33,7 +33,10 @@ class TestBase(test_base.TestCase):
         super(TestBase, self).setUp()
         cfg.CONF.set_override('connection', str(self.database_connection),
                               group='database')
-        self.conn = storage.get_connection(cfg.CONF)
+        try:
+            self.conn = storage.get_connection(cfg.CONF)
+        except storage.StorageBadVersion as e:
+            self.skipTest(str(e))
         self.conn.upgrade()
 
     def tearDown(self):
