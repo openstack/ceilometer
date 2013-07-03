@@ -45,6 +45,7 @@ os_password                      admin                                 Password 
 os_tenant_id                                                           Tenant ID to use for openstack service access
 os_tenant_name                   admin                                 Tenant name to use for openstack service access
 os_auth_url                      http://localhost:5000/v2.0            Auth URL to use for openstack service access
+os_endpoint_type                 publicURL                             Endpoint type in the catalog to use to access services
 database_connection              mongodb://localhost:27017/ceilometer  Database connection string
 metering_api_port                8777                                  The port for the ceilometer API server
 disabled_central_pollsters                                             List of central pollsters to skip loading

@@ -44,10 +44,12 @@ class Client(object):
         """Returns a nova Client object."""
         conf = cfg.CONF
         tenant = conf.os_tenant_id and conf.os_tenant_id or conf.os_tenant_name
+        endpoint_type = cfg.CONF.os_endpoint_type
         self.nova_client = nova_client.Client(username=cfg.CONF.os_username,
                                               api_key=cfg.CONF.os_password,
                                               project_id=tenant,
                                               auth_url=cfg.CONF.os_auth_url,
+                                              endpoint_type=endpoint_type,
                                               no_cache=True)
 
     def _with_flavor(self, instances):
