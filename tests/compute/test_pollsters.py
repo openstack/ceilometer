@@ -219,6 +219,34 @@ class TestNetPollster(TestPollsterBase):
         _verify_vnic_metering('network.outgoing.packets', '192.168.0.4', 12L,
                               "%s-%s" % (instance_name_id, vnic2.name))
 
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def test_get_counters_cache(self):
+        vnic0 = virt_inspector.Interface(
+            name='vnet0',
+            fref='fa163e71ec6e',
+            mac='fa:16:3e:71:ec:6d',
+            parameters=dict(ip='10.0.0.2',
+                            projmask='255.255.255.0',
+                            projnet='proj1',
+                            dhcp_server='10.0.0.1'))
+        stats0 = virt_inspector.InterfaceStats(rx_bytes=1L, rx_packets=2L,
+                                               tx_bytes=3L, tx_packets=4L)
+        vnics = [(vnic0, stats0)]
+
+        self.mox.ReplayAll()
+
+        mgr = manager.AgentManager()
+        pollster = pollsters.NetPollster()
+        cache = {
+            pollster.CACHE_KEY_VNIC: {
+                self.instance.name: vnics,
+            },
+        }
+        counters = list(pollster.get_counters(mgr, cache, self.instance))
+        assert counters
+        # We should have one of each counter for one vnic
+        self.assertEqual(len(counters), 4)
+
 
 class TestCPUPollster(TestPollsterBase):
 
