@@ -395,6 +395,87 @@ class Connection(base.Connection):
         self.db.project.remove({'_id': {'$nin': results['projects']}})
         self.db.resource.remove({'_id': {'$nin': results['resources']}})
 
+    @staticmethod
+    def _get_marker(db_collection, marker_pairs):
+        """Return the mark document according to the attribute-value pairs.
+
+        :param db_collection: Database collection that be query.
+        :param maker_pairs: Attribute-value pairs filter.
+        """
+        if db_collection is None:
+            return
+        if not marker_pairs:
+            return
+        ret = db_collection.find(marker_pairs, limit=2)
+
+        if ret.count() == 0:
+            raise base.NoResultFound
+        elif ret.count() > 1:
+            raise base.MultipleResultsFound
+        else:
+            _ret = ret.__getitem__(0)
+            return _ret
+
+    @classmethod
+    def _recurse_sort_keys(cls, sort_keys, marker, flag):
+        _first = sort_keys[0]
+        value = marker[_first]
+        if len(sort_keys) == 1:
+            return {_first: {flag: value}}
+        else:
+            criteria_equ = {_first: {'eq': value}}
+            criteria_cmp = cls._recurse_sort_keys(sort_keys[1:], marker, flag)
+        return dict(criteria_equ, ** criteria_cmp)
+
+    @classmethod
+    def paginate_query(cls, q, db_collection, limit=None, marker=None,
+                       sort_keys=[], sort_dir='desc'):
+        """Returns a query result with sorting / pagination.
+
+        Pagination works by requiring sort_key and sort_dir.
+        We use the last item in previous page as the 'marker' for pagination.
+        So we return values that follow the passed marker in the order.
+        :param q: the query dict passed in.
+        :param db_collection: Database collection that be query.
+        :param limit: maximum number of items to return.
+        :param marker: the last item of the previous page; we return the next
+                       results after this item.
+        :param sort_keys: array of attributes by which results be sorted.
+        :param sort_dir: direction in which results be sorted (asc, desc).
+        return: The query with sorting/pagination added.
+        """
+
+        if db_collection is None:
+            return
+        all_sort = []
+        sort_mapping = {'desc': (pymongo.DESCENDING, '$lt'),
+                        'asc': (pymongo.ASCENDING, '$gt')
+                        }
+        _sort_dir, _sort_flag = sort_mapping.get(sort_dir,
+                                                 sort_mapping['desc'])
+
+        for _sort_key in sort_keys:
+            _all_sort = (_sort_key, _sort_dir)
+            all_sort.append(_all_sort)
+
+        if marker is not None:
+            sort_criteria_list = []
+
+            for i in range(0, len(sort_keys)):
+                sort_criteria_list.append(cls._recurse_sort_keys(
+                                          sort_keys[:(len(sort_keys) - i)],
+                                          marker, _sort_flag))
+
+            metaquery = {"$or": sort_criteria_list}
+            q.update(metaquery)
+
+        #NOTE(Fengqian):MongoDB collection.find can not handle limit
+        #when it equals None, it will raise TypeError, so we treate
+        #None as 0 for the value of limit.
+        if limit is None:
+            limit = 0
+        return db_collection.find(q, limit=limit, sort=all_sort)
+
     def get_users(self, source=None):
         """Return an iterable of user id strings.
 
@@ -424,7 +505,8 @@ class Connection(base.Connection):
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
                       end_timestamp=None, end_timestamp_op=None,
-                      metaquery={}, resource=None):
+                      metaquery={}, resource=None, limit=None,
+                      marker_pairs=None, sort_key=None, sort_dir=None):
         """Return an iterable of models.Resource instances
 
         :param user: Optional ID for user that owns the resource.
@@ -436,6 +518,11 @@ class Connection(base.Connection):
         :param end_timestamp_op: Optional end time operator, like lt, le.
         :param metaquery: Optional dict with metadata to match on.
         :param resource: Optional resource filter.
+        :param limit: Number of documents should be returned.
+        :param marker_pairs: Attribute-value pairs to identify the last item of
+                            the previous page.
+        :param sort_key: Attribute by which results be sorted.
+        :param sort_dir: Direction with which results be sorted(asc, desc).
         """
         q = {}
         if user is not None:
@@ -464,13 +551,18 @@ class Connection(base.Connection):
             if ts_range:
                 q['timestamp'] = ts_range
 
+        marker = self._get_marker(self.db.resource, marker_pairs=marker_pairs)
+        sort_keys = base._handle_sort_key('resource', sort_key)
+
         # FIXME(jd): We should use self.db.meter.group() and not use the
         # resource collection, but that's not supported by MIM, so it's not
         # easily testable yet. Since it was bugged before anyway, it's still
         # better for now.
         resource_ids = self.db.meter.find(q).distinct('resource_id')
         q = {'_id': {'$in': resource_ids}}
-        for resource in self.db.resource.find(q):
+        for resource in self.paginate_query(q, self.db.resource, limit=limit,
+                                            marker=marker, sort_keys=sort_keys,
+                                            sort_dir=sort_dir):
             yield models.Resource(
                 resource_id=resource['_id'],
                 project_id=resource['project_id'],
@@ -488,7 +580,8 @@ class Connection(base.Connection):
             )
 
     def get_meters(self, user=None, project=None, resource=None, source=None,
-                   metaquery={}):
+                   metaquery={}, limit=None, marker_pairs=None, sort_key=None,
+                   sort_dir=None):
         """Return an iterable of models.Meter instances
 
         :param user: Optional ID for user that owns the resource.
@@ -496,6 +589,11 @@ class Connection(base.Connection):
         :param resource: Optional resource filter.
         :param source: Optional source filter.
         :param metaquery: Optional dict with metadata to match on.
+        :param limit: Number of documents should be returned.
+        :param marker_pairs: Attribute-value pairs to identify the last item of
+                             the previous page.
+        :param sort_key: Attribute by which results be sorted.
+        :param sort_dir: Direction with which results be sorted(asc, desc).
         """
         q = {}
         if user is not None:
@@ -508,7 +606,12 @@ class Connection(base.Connection):
             q['source'] = source
         q.update(metaquery)
 
-        for r in self.db.resource.find(q):
+        marker = self._get_marker(self.db.resource, marker_pairs=marker_pairs)
+        sort_keys = base._handle_sort_key('meter', sort_key)
+
+        for r in self.paginate_query(q, self.db.resource, limit=limit,
+                                     marker=marker,
+                                     sort_keys=sort_keys, sort_dir=sort_dir):
             for r_meter in r['meter']:
                 yield models.Meter(
                     name=r_meter['counter_name'],
@@ -601,8 +704,19 @@ class Connection(base.Connection):
         return matching_metadata
 
     def get_alarms(self, name=None, user=None,
-                   project=None, enabled=True, alarm_id=None):
+                   project=None, enabled=True, alarm_id=None, limit=None,
+                   marker_pairs=None, sort_key=None, sort_dir=None):
         """Yields a lists of alarms that match filters
+        :param name: The Alarm name.
+        :param user: Optional ID for user that owns the resource.
+        :param project: Optional ID for project that owns the resource.
+        :param enabled: Optional boolean to list disable alarm.
+        :param alarm_id: Optional alarm_id to return one alarm.
+        :param limit: Number of rows should be returned.
+        :param marker_pairs: Attribute-value pairs to identify the last item of
+                            the previous page.
+        :param sort_key: Attribute by which results be sorted.
+        :param sort_dir: Direction with which results be sorted(asc, desc).
         """
         q = {}
         if user is not None:
@@ -616,7 +730,12 @@ class Connection(base.Connection):
         if alarm_id is not None:
             q['alarm_id'] = alarm_id
 
-        for alarm in self.db.alarm.find(q):
+        marker = self._get_marker(self.db.alarm, marker_pairs=marker_pairs)
+        sort_keys = base._handle_sort_key('alarm', sort_key)
+
+        for alarm in self.paginate_query(q, self.db.alarm, limit=limit,
+                                         marker=marker, sort_keys=sort_keys,
+                                         sort_dir=sort_dir):
             a = {}
             a.update(alarm)
             del a['_id']

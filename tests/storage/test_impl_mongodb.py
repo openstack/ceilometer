@@ -37,6 +37,8 @@ from ceilometer import sample
 from ceilometer.storage import impl_mongodb
 from ceilometer.storage import models
 from ceilometer.tests import db as tests_db
+from ceilometer.storage.base import NoResultFound
+from ceilometer.storage.base import MultipleResultsFound
 
 
 class MongoDBEngineTestBase(base.DBTestBase):
@@ -55,6 +57,44 @@ class MongoDBConnection(MongoDBEngineTestBase):
             group='database')
         conn = impl_mongodb.Connection(cfg.CONF)
         self.assertTrue(conn.conn)
+
+    def test_recurse_sort_keys(self):
+        sort_keys = ['k1', 'k2', 'k3']
+        marker = {'k1': 'v1', 'k2': 'v2', 'k3': 'v3'}
+        flag = '$lt'
+        ret = impl_mongodb.Connection._recurse_sort_keys(sort_keys=sort_keys,
+                                                         marker=marker,
+                                                         flag=flag)
+        expect = {'k3': {'$lt': 'v3'}, 'k2': {'eq': 'v2'}, 'k1': {'eq': 'v1'}}
+        self.assertEquals(ret, expect)
+
+
+class MongoDBTestMarkerBase(MongoDBEngineTestBase):
+    #NOTE(Fengqian): All these three test case are the same for resource
+    #and meter collection. As to alarm, we will set up in AlarmTestPagination.
+    def test_get_marker(self):
+        marker_pairs = {'user_id': 'user-id-4'}
+        ret = impl_mongodb.Connection._get_marker(self.conn.db.resource,
+                                                  marker_pairs)
+        self.assertEqual(ret['project_id'], 'project-id-4')
+
+    def test_get_marker_None(self):
+        try:
+            marker_pairs = {'user_id': 'user-id-foo'}
+            ret = impl_mongodb.Connection._get_marker(self.conn.db.resource,
+                                                      marker_pairs)
+            self.assertEqual(ret['project_id'], 'project-id-foo')
+        except NoResultFound:
+            self.assertTrue(True)
+
+    def test_get_marker_multiple(self):
+        try:
+            marker_pairs = {'project_id': 'project-id'}
+            ret = impl_mongodb.Connection._get_marker(self.conn.db.resource,
+                                                      marker_pairs)
+            self.assertEqual(ret['project_id'], 'project-id-foo')
+        except MultipleResultsFound:
+            self.assertTrue(True)
 
 
 class IndexTest(MongoDBEngineTestBase):
@@ -124,7 +164,16 @@ class ResourceTest(base.ResourceTest, MongoDBEngineTestBase):
     pass
 
 
+class ResourceTestPagination(base.ResourceTestPagination,
+                             MongoDBEngineTestBase):
+    pass
+
+
 class MeterTest(base.MeterTest, MongoDBEngineTestBase):
+    pass
+
+
+class MeterTestPagination(base.MeterTestPagination, MongoDBEngineTestBase):
     pass
 
 
@@ -246,6 +295,36 @@ class CompatibilityTest(MongoDBEngineTestBase):
     def test_counter_unit(self):
         meters = list(self.conn.get_meters())
         self.assertEqual(len(meters), 1)
+
+
+class AlarmTestPagination(base.AlarmTestPagination, MongoDBEngineTestBase):
+
+    def test_alarm_get_marker(self):
+        self.add_some_alarms()
+        marker_pairs = {'name': 'red-alert'}
+        ret = impl_mongodb.Connection._get_marker(self.conn.db.alarm,
+                                                  marker_pairs=marker_pairs)
+        self.assertEqual(ret['counter_name'], 'test.one')
+
+    def test_alarm_get_marker_None(self):
+        self.add_some_alarms()
+        try:
+            marker_pairs = {'name': 'user-id-foo'}
+            ret = impl_mongodb.Connection._get_marker(self.conn.db.alarm,
+                                                      marker_pairs)
+            self.assertEqual(ret['counter_name'], 'counter_name-foo')
+        except NoResultFound:
+            self.assertTrue(True)
+
+    def test_alarm_get_marker_multiple(self):
+        self.add_some_alarms()
+        try:
+            marker_pairs = {'user_id': 'me'}
+            ret = impl_mongodb.Connection._get_marker(self.conn.db.alarm,
+                                                      marker_pairs)
+            self.assertEqual(ret['counter_name'], 'counter-name-foo')
+        except MultipleResultsFound:
+            self.assertTrue(True)
 
 
 class CounterDataTypeTest(base.CounterDataTypeTest, MongoDBEngineTestBase):

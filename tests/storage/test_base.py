@@ -49,3 +49,13 @@ class BaseTest(test_base.TestCase):
         self.assertEqual(times[21],
                          (datetime.datetime(2013, 1, 2, 13, 19, 15),
                           datetime.datetime(2013, 1, 2, 13, 20, 10)))
+
+    def test_handle_sort_key(self):
+        sort_keys_alarm = base._handle_sort_key('alarm')
+        self.assertEquals(sort_keys_alarm, ['name', 'user_id', 'project_id'])
+
+        sort_keys_meter = base._handle_sort_key('meter', 'foo')
+        self.assertEquals(sort_keys_meter, ['foo', 'user_id', 'project_id'])
+
+        sort_keys_resource = base._handle_sort_key('resource', 'project_id')
+        self.assertEquals(sort_keys_resource, ['project_id', 'user_id'])
