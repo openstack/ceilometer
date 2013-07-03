@@ -240,7 +240,8 @@ class TestCPUPollster(TestPollsterBase):
         pollster = pollsters.CPUPollster()
 
         def _verify_cpu_metering(zero, expected_time):
-            counters = list(pollster.get_counters(mgr, {}, self.instance))
+            cache = {}
+            counters = list(pollster.get_counters(mgr, cache, self.instance))
             self.assertEquals(len(counters), 2)
             self.assertEqual(set([c.name for c in counters]),
                              set(pollster.get_counter_names()))
@@ -249,9 +250,37 @@ class TestCPUPollster(TestPollsterBase):
                     counters[0].volume > 0.0)
             assert counters[1].name == 'cpu'
             assert counters[1].volume == expected_time
+            assert pollster.CACHE_KEY_CPU in cache
+            assert self.instance.name in cache[pollster.CACHE_KEY_CPU]
             # ensure elapsed time between polling cycles is non-zero
             time.sleep(0.001)
 
         _verify_cpu_metering(True, 1 * (10 ** 6))
         _verify_cpu_metering(False, 3 * (10 ** 6))
         _verify_cpu_metering(False, 2 * (10 ** 6))
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def test_get_counters_cache(self):
+        # self.inspector.inspect_cpus(self.instance.name).AndReturn(
+        #     virt_inspector.CPUStats(time=1 * (10 ** 6), number=2))
+        # self.inspector.inspect_cpus(self.instance.name).AndReturn(
+        #     virt_inspector.CPUStats(time=3 * (10 ** 6), number=2))
+        # # cpu_time resets on instance restart
+        # self.inspector.inspect_cpus(self.instance.name).AndReturn(
+        #     virt_inspector.CPUStats(time=2 * (10 ** 6), number=2))
+        self.mox.ReplayAll()
+
+        mgr = manager.AgentManager()
+        pollster = pollsters.CPUPollster()
+
+        cache = {
+            pollster.CACHE_KEY_CPU: {
+                self.instance.name: virt_inspector.CPUStats(
+                    time=10 ** 6,
+                    number=2,
+                ),
+            },
+        }
+        counters = list(pollster.get_counters(mgr, cache, self.instance))
+        self.assertEquals(len(counters), 2)
+        self.assertEquals(counters[1].volume, 10 ** 6)
