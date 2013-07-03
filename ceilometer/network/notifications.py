@@ -15,7 +15,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Handler for producing network counter messages from Quantum notification
+"""Handler for producing network counter messages from Neutron notification
    events.
 
 """
@@ -27,9 +27,10 @@ from ceilometer.openstack.common import log
 from ceilometer import plugin
 
 OPTS = [
-    cfg.StrOpt('quantum_control_exchange',
-               default='quantum',
-               help="Exchange name for Quantum notifications"),
+    cfg.StrOpt('neutron_control_exchange',
+               default='neutron',
+               help="Exchange name for Neutron notifications",
+               deprecated_name='quantum_control_exchange'),
 ]
 
 cfg.CONF.register_opts(OPTS)
@@ -46,7 +47,7 @@ class NetworkNotificationBase(plugin.NotificationBase):
             '%s.create.end' % (self.resource_name),
             '%s.update.end' % (self.resource_name),
             '%s.exists' % (self.resource_name),
-            # FIXME(dhellmann): Quantum delete notifications do
+            # FIXME(dhellmann): Neutron delete notifications do
             # not include the same metadata as the other messages,
             # so we ignore them for now. This isn't ideal, since
             # it may mean we miss charging for some amount of time,
@@ -63,7 +64,7 @@ class NetworkNotificationBase(plugin.NotificationBase):
         """
         return [
             plugin.ExchangeTopics(
-                exchange=conf.quantum_control_exchange,
+                exchange=conf.neutron_control_exchange,
                 topics=set(topic + ".info"
                            for topic in conf.notification_topics)),
         ]
@@ -102,7 +103,7 @@ class NetworkNotificationBase(plugin.NotificationBase):
 
 
 class Network(NetworkNotificationBase):
-    """Listen for Quantum network notifications in order to mediate with the
+    """Listen for Neutron network notifications in order to mediate with the
     metering framework.
 
     """
@@ -120,7 +121,7 @@ class Network(NetworkNotificationBase):
 
 
 class Subnet(NetworkNotificationBase):
-    """Listen for Quantum notifications in order to mediate with the
+    """Listen for Neutron notifications in order to mediate with the
     metering framework.
 
     """
@@ -141,7 +142,7 @@ class Subnet(NetworkNotificationBase):
 
 
 class Port(NetworkNotificationBase):
-    """Listen for Quantum notifications in order to mediate with the
+    """Listen for Neutron notifications in order to mediate with the
     metering framework.
 
     """
@@ -161,7 +162,7 @@ class Port(NetworkNotificationBase):
 
 
 class Router(NetworkNotificationBase):
-    """Listen for Quantum notifications in order to mediate with the
+    """Listen for Neutron notifications in order to mediate with the
     metering framework.
 
     """
@@ -177,7 +178,7 @@ class Router(NetworkNotificationBase):
 
 
 class FloatingIP(NetworkNotificationBase):
-    """Listen for Quantum notifications in order to mediate with the
+    """Listen for Neutron notifications in order to mediate with the
     metering framework.
 
     """

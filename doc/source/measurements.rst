@@ -89,7 +89,7 @@ hypervisors while test coverage was mostly done based on KVM. Contributors
 are welcome to implement other virtualization backends’ meters or complete
 the existing ones.
 
-Network (Quantum)
+Network (Neutron)
 =================
 
 ========================  ==========  ========  ========  ============  ======================================================

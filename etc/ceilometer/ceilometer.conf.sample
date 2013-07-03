@@ -82,8 +82,8 @@
 # Options defined in ceilometer.network.notifications
 #
 
-# Exchange name for Quantum notifications (string value)
-#quantum_control_exchange=quantum
+# Exchange name for Neutron notifications (string value)
+#neutron_control_exchange=neutron
 
 
 #

@@ -34,7 +34,7 @@ Parameter                        Default                               Note
 nova_control_exchange            nova                                  Exchange name for Nova notifications
 glance_control_exchange          glance                                Exchange name for Glance notifications
 cinder_control_exchange          cinder                                Exchange name for Cinder notifications
-quantum_control_exchange         quantum                               Exchange name for Quantum notifications
+neutron_control_exchange         neutron                               Exchange name for Neutron notifications
 metering_secret                  change this or be hacked              Secret value for signing metering messages
 metering_topic                   metering                              the topic ceilometer uses for metering messages
 counter_source                   openstack                             The source name of emited counters

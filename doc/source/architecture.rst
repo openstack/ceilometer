@@ -157,7 +157,7 @@ Handling Notifications
 The heart of the system is the collector, which monitors the message
 bus for data being provided by the pollsters via the agent as well as
 notification messages from other OpenStack components such as nova,
-glance, quantum, and swift.
+glance, neutron, and swift.
 
 The collector loads one or more *listener* plugins, using the namespace
 ``ceilometer.collector``. Each plugin can listen to any topics, but by

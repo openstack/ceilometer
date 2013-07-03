@@ -21,10 +21,18 @@ then
     echo "notification_driver=cinder.openstack.common.notifier.rabbit_notifier" >> $CINDER_CONF
 fi
 
+# For compatibility with Grizzly
 QUANTUM_CONF=/etc/quantum/quantum.conf
 if ! grep -q "notification_driver=quantum.openstack.common.notifier.rabbit_notifier" $QUANTUM_CONF
 then
     echo "notification_driver=quantum.openstack.common.notifier.rabbit_notifier" >> $QUANTUM_CONF
+fi
+
+# Havana release onward
+NEUTRON_CONF=/etc/neutron/neutron.conf
+if ! grep -q "notification_driver=neutron.openstack.common.notifier.rabbit_notifier" $NEUTRON_CONF
+then
+    echo "notification_driver=neutron.openstack.common.notifier.rabbit_notifier" >> $NEUTRON_CONF
 fi
 
 # For nova we set both the rabbit notifier and the special ceilometer
