@@ -41,6 +41,11 @@ should be a list of Query data structures:
 .. autotype:: ceilometer.api.controllers.v2.Query
    :members:
 
+Links
+=====
+
+.. autotype:: ceilometer.api.controllers.v2.Link
+   :members:
 
 API and CLI query examples
 ==========================
@@ -68,35 +73,51 @@ Ceilometer API calls:
 
 A simple query to return a list of available meters::
 
-     $ curl -X GET -H 'X-Auth-Token:<inserttokenhere>' "http://localhost:8777/v2/meters"
+     curl -H 'X-Auth-Token: <inserttokenhere>' \
+       "http://localhost:8777/v2/meters"
 
 A query to return the list of resources::
 
-     $ curl -X GET -H 'X-Auth-Token:<inserttokenhere>' "http://localhost:8777/v2/resources"
+     curl -H 'X-Auth-Token: <inserttokenhere>' \
+       "http://localhost:8777/v2/resources"
 
 A query to return the list of meters, limited to a specific meter type::
 
-     $ curl -X GET -H 'X-Auth-Token:<inserttokenhere>' "http://localhost:8777/v2/meters/disk.root.size"
+     curl -H 'X-Auth-Token: <inserttokenhere>' \
+       "http://localhost:8777/v2/meters/disk.root.size"
 
 A query using filters (see: `query filter section <http://docs.openstack.org/developer/ceilometer/webapi/v2.html#filtering-queries>`_)::
 
-     $ curl -X GET -H 'X-Auth-Token:<inserttokenhere>' "http://localhost:8777/v2/meters/instance?q.field=metadata.event_type&q.value=compute.instance.delete.start"
+     curl -H 'X-Auth-Token: <inserttokenhere>' \
+       "http://localhost:8777/v2/meters/instance?q.field=metadata.event_type&q.value=compute.instance.delete.start"
 
 Additional examples::
 
-     $ curl -X GET -H 'X-Auth-Token:<inserttokenhere>' "http://localhost:8777/v2/meters/disk.root.size?q.field=resource_id&q.op=eq&q.value=<resource_id_here>"
+     curl -H 'X-Auth-Token: <inserttokenhere>' \
+       "http://localhost:8777/v2/meters/disk.root.size?q.field=resource_id&q.op=eq&q.value=<resource_id_here>"
 
 or::
 
-     $ curl -X GET -H 'X-Auth-Token:<inserttokenhere>' "http://localhost:8777/v2/meters/instance?q.field=metadata.event_type&q.value=compute.instance.exists"
+     curl -H 'X-Auth-Token: <inserttokenhere>' \
+       "http://localhost:8777/v2/meters/instance?q.field=metadata.event_type&q.value=compute.instance.exists"
 
-and finally, a JSON-based example::
+You can specify multiple filters by using an array of queries (order matters)::
 
-     $ curl -X GET -H 'X-Auth-Token:<inserttokenhere>' -H 'Content-Type:application/json' -d '{"q":[{"field": "timestamp","op": "ge","value":"2013-04-01T13:34:17"}]}' http://localhost:8777/v2/meters
+     curl -H 'X-Auth-Token: <inserttokenhere>' \
+       "http://localhost:8777/v2/meters/instance"\
+       "?q.field=metadata.event_type&q.value=compute.instance.exists"\
+       "&q.field=timestamp&q.op=gt&q.value=2013-07-03T13:34:17"
 
 
-Links
-=====
+JSON based example::
 
-.. autotype:: ceilometer.api.controllers.v2.Link
-   :members:
+     curl -H 'X-Auth-Token: <inserttokenhere>' -H 'Content-Type: application/json' \
+       -d '{"q":[{"field": "timestamp","op": "ge","value":"2013-04-01T13:34:17"}]}' \
+       http://localhost:8777/v2/meters
+
+JSON based example with multiple filters::
+
+     curl -H 'X-Auth-Token: <inserttokenhere>' -H 'Content-Type: application/json' \
+       -d '{"q":[{"field": "timestamp","op": "ge","value":"2013-04-01T13:34:17"},'\
+       "'{"field": "project_id","op": "eq","value":"8d6057bc-5b90-4296-afe0-84acaa2ef909"}]}' \
+       http://localhost:8777/v2/meters/instance
