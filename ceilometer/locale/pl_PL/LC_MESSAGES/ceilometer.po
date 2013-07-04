@@ -1,19 +1,20 @@
-# Russian translations for ceilometer.
+# Polish (Poland) translations for ceilometer.
 # Copyright (C) 2013 ORGANIZATION
 # This file is distributed under the same license as the ceilometer project.
 #
 # Translators:
+# Cyryl Sochacki <cyrylsochacki@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2013-07-04 09:40+0000\n"
-"PO-Revision-Date: 2012-12-11 06:53+0000\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: Russian "
-"(http://www.transifex.com/projects/p/openstack/language/ru/)\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"PO-Revision-Date: 2013-07-04 07:30+0000\n"
+"Last-Translator: Cyryl Sochacki <cyrylsochacki@gmail.com>\n"
+"Language-Team: Polish (Poland) "
+"(http://www.transifex.com/projects/p/openstack/language/pl_PL/)\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && "
+"(n%100<10 || n%100>=20) ? 1 : 2)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -98,12 +99,12 @@ msgstr ""
 
 #: ceilometer/api/controllers/v2.py:835
 msgid "Alarm incorrect"
-msgstr ""
+msgstr "Nieprawidłowy alarm"
 
 #: ceilometer/api/controllers/v2.py:852 ceilometer/api/controllers/v2.py:874
 #: ceilometer/api/controllers/v2.py:888
 msgid "Unknown alarm"
-msgstr ""
+msgstr "Nieznany alarm"
 
 #: ceilometer/collector/service.py:76
 #, python-format
@@ -126,17 +127,17 @@ msgstr ""
 #: ceilometer/compute/nova_notifier.py:105
 #, python-format
 msgid "INFO %r"
-msgstr ""
+msgstr "INFO %r"
 
 #: ceilometer/compute/nova_notifier.py:129
 #, python-format
 msgid "ignoring %s"
-msgstr ""
+msgstr "ignorowanie %s"
 
 #: ceilometer/compute/nova_notifier.py:131
 #, python-format
 msgid "processing %s"
-msgstr ""
+msgstr "przetwarzanie %s"
 
 #: ceilometer/compute/nova_notifier.py:135
 #, python-format
@@ -290,7 +291,7 @@ msgstr ""
 #: ceilometer/openstack/common/processutils.py:240
 #, python-format
 msgid "Result was %s"
-msgstr ""
+msgstr "Wynik był %s"
 
 #: ceilometer/openstack/common/processutils.py:179
 #, python-format
@@ -545,7 +546,7 @@ msgstr ""
 #: ceilometer/openstack/common/rpc/common.py:142
 #: ceilometer/openstack/common/rpc/common.py:143
 msgid "<unknown>"
-msgstr ""
+msgstr "<nieznany>"
 
 #: ceilometer/openstack/common/rpc/common.py:147
 #, python-format
@@ -687,12 +688,12 @@ msgstr ""
 
 #: ceilometer/openstack/common/rpc/impl_zmq.py:146
 msgid "Could not open socket."
-msgstr ""
+msgstr "Nie można otworzyć gniazda."
 
 #: ceilometer/openstack/common/rpc/impl_zmq.py:158
 #, python-format
 msgid "Subscribing to %s"
-msgstr ""
+msgstr "Subskrybowanie do  %s"
 
 #: ceilometer/openstack/common/rpc/impl_zmq.py:200
 msgid "You cannot recv on this socket."
@@ -700,7 +701,7 @@ msgstr ""
 
 #: ceilometer/openstack/common/rpc/impl_zmq.py:205
 msgid "You cannot send on this socket."
-msgstr ""
+msgstr "Nie możesz wysłać na te gniazdo."
 
 #: ceilometer/openstack/common/rpc/impl_zmq.py:267
 #, python-format
@@ -813,12 +814,12 @@ msgstr ""
 #: ceilometer/openstack/common/rpc/impl_zmq.py:721
 #, python-format
 msgid "%(msg)s"
-msgstr ""
+msgstr "%(msg)s"
 
 #: ceilometer/openstack/common/rpc/impl_zmq.py:724
 #, python-format
 msgid "Sending message(s) to: %s"
-msgstr ""
+msgstr "Wysyłanie wiadomości do: %s"
 
 #: ceilometer/openstack/common/rpc/impl_zmq.py:728
 msgid "No matchmaker results. Not casting."
@@ -873,10 +874,4 @@ msgstr ""
 #: ceilometer/storage/sqlalchemy/migration.py:67
 msgid "version should be an integer"
 msgstr ""
-
-#~ msgid "Out reactor registered"
-#~ msgstr ""
-
-#~ msgid "ROUTER RELAY-OUT %(data)s"
-#~ msgstr ""
 
