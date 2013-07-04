@@ -20,8 +20,6 @@
 
 from __future__ import absolute_import
 
-import abc
-
 from oslo.config import cfg
 from swiftclient import client as swift
 from keystoneclient import exceptions
@@ -49,59 +47,6 @@ cfg.CONF.register_opts(OPTS)
 
 class _Base(plugin.PollsterBase):
 
-    __metaclass__ = abc.ABCMeta
-
-    @abc.abstractmethod
-    def _iter_accounts(ksclient, cache):
-        """Iterate over all accounts, yielding (tenant_id, stats) tuples."""
-
-    def get_counters(self, manager, cache):
-        for tenant, account in self._iter_accounts(manager.keystone, cache):
-            yield counter.Counter(
-                name='storage.objects',
-                type=counter.TYPE_GAUGE,
-                volume=int(account['x-account-object-count']),
-                unit='object',
-                user_id=None,
-                project_id=tenant,
-                resource_id=tenant,
-                timestamp=timeutils.isotime(),
-                resource_metadata=None,
-            )
-            yield counter.Counter(
-                name='storage.objects.size',
-                type=counter.TYPE_GAUGE,
-                volume=int(account['x-account-bytes-used']),
-                unit='B',
-                user_id=None,
-                project_id=tenant,
-                resource_id=tenant,
-                timestamp=timeutils.isotime(),
-                resource_metadata=None,
-            )
-            yield counter.Counter(
-                name='storage.objects.containers',
-                type=counter.TYPE_GAUGE,
-                volume=int(account['x-account-container-count']),
-                unit='container',
-                user_id=None,
-                project_id=tenant,
-                resource_id=tenant,
-                timestamp=timeutils.isotime(),
-                resource_metadata=None,
-            )
-
-
-class SwiftPollster(_Base):
-    """Iterate over all accounts, using keystone.
-    """
-
-    @staticmethod
-    def get_counter_names():
-        return ['storage.objects',
-                'storage.objects.size',
-                'storage.objects.containers']
-
     CACHE_KEY_TENANT = 'tenants'
     CACHE_KEY_HEAD = 'swift.head_account'
 
@@ -123,13 +68,13 @@ class SwiftPollster(_Base):
             raise StopIteration()
 
         for t in cache['tenants']:
-            yield (t.id, swift.head_account(SwiftPollster.
-                                            _neaten_url(endpoint, t.id),
+            yield (t.id, swift.head_account(self._neaten_url(endpoint, t.id),
                                             ksclient.auth_token))
 
-    # Transform the registered url to standard and valid format.
     @staticmethod
     def _neaten_url(endpoint, tenant_id):
+        """Transform the registered url to standard and valid format.
+        """
 
         path = 'v1/' + cfg.CONF.reseller_prefix + tenant_id
 
@@ -138,3 +83,72 @@ class SwiftPollster(_Base):
             endpoint = endpoint[:-1]
 
         return urljoin(endpoint, path)
+
+
+class ObjectsPollster(_Base):
+    """Iterate over all accounts, using keystone.
+    """
+
+    @staticmethod
+    def get_counter_names():
+        return ['storage.objects']
+
+    def get_counters(self, manager, cache):
+        for tenant, account in self._iter_accounts(manager.keystone, cache):
+            yield counter.Counter(
+                name='storage.objects',
+                type=counter.TYPE_GAUGE,
+                volume=int(account['x-account-object-count']),
+                unit='object',
+                user_id=None,
+                project_id=tenant,
+                resource_id=tenant,
+                timestamp=timeutils.isotime(),
+                resource_metadata=None,
+            )
+
+
+class ObjectsSizePollster(_Base):
+    """Iterate over all accounts, using keystone.
+    """
+
+    @staticmethod
+    def get_counter_names():
+        return ['storage.objects.size']
+
+    def get_counters(self, manager, cache):
+        for tenant, account in self._iter_accounts(manager.keystone, cache):
+            yield counter.Counter(
+                name='storage.objects.size',
+                type=counter.TYPE_GAUGE,
+                volume=int(account['x-account-bytes-used']),
+                unit='B',
+                user_id=None,
+                project_id=tenant,
+                resource_id=tenant,
+                timestamp=timeutils.isotime(),
+                resource_metadata=None,
+            )
+
+
+class ObjectsContainersPollster(_Base):
+    """Iterate over all accounts, using keystone.
+    """
+
+    @staticmethod
+    def get_counter_names():
+        return ['storage.objects.containers']
+
+    def get_counters(self, manager, cache):
+        for tenant, account in self._iter_accounts(manager.keystone, cache):
+            yield counter.Counter(
+                name='storage.objects.containers',
+                type=counter.TYPE_GAUGE,
+                volume=int(account['x-account-container-count']),
+                unit='container',
+                user_id=None,
+                project_id=tenant,
+                resource_id=tenant,
+                timestamp=timeutils.isotime(),
+                resource_metadata=None,
+            )
