@@ -41,11 +41,12 @@ class PollingTask(agent.PollingTask):
                     for pollster in self.pollsters:
                         try:
                             LOG.info("Polling pollster %s", pollster.name)
-                            publisher(list(pollster.obj.get_counters(
+                            counters = list(pollster.obj.get_counters(
                                 self.manager,
                                 cache,
                                 instance,
-                            )))
+                            ))
+                            publisher(counters)
                         except Exception as err:
                             LOG.warning('Continue after error from %s: %s',
                                         pollster.name, err)
