@@ -121,3 +121,157 @@ JSON based example with multiple filters::
        -d '{"q":[{"field": "timestamp","op": "ge","value":"2013-04-01T13:34:17"},'\
        "'{"field": "project_id","op": "eq","value":"8d6057bc-5b90-4296-afe0-84acaa2ef909"}]}' \
        http://localhost:8777/v2/meters/instance
+
+
+Functional examples
++++++++++++++++++++
+
+The examples below are meant to help you understand how to query the
+Ceilometer API to build custom metrics report. The query parameters should
+be encoded using one of the above methods, e.g. as the URL parameters or
+as JSON encoded data passed to the GET request.
+
+Get the list of samples about instances running for June 2013::
+
+     GET /v2/meters/instance
+     q: [{"field": "timestamp",
+          "op": "ge",
+          "value": "2013-06-01T00:00:00"},
+         {"field": "timestamp",
+          "op": "lt",
+           "value": "2013-07-01T00:00:00"}]
+
+
+Get the list of samples about instances running for June 2013 for a particular project::
+
+    GET /v2/meters/instance
+    q: [{"field": "timestamp",
+         "op": "ge",
+         "value": "2013-06-01T00:00:00"},
+        {"field": "timestamp",
+         "op": "lt",
+         "value": "2013-07-01T00:00:00"},
+        {"field": "project_id",
+         "op": "eq",
+         "value": "8d6057bc-5b90-4296-afe0-84acaa2ef909"}]
+
+Get the list of samples about instances with m1.tiny flavor running for June 2013 for a particular project::
+
+    GET /v2/meters/instance:m1.tiny
+    q: [{"field": "timestamp",
+         "op": "ge",
+         "value": "2013-06-01T00:00:00"},
+        {"field": "timestamp",
+         "op": "lt",
+         "value": "2013-07-01T00:00:00"},
+        {"field": "project_id",
+         "op": "eq",
+         "value": "8d6057bc-5b90-4296-afe0-84acaa2ef909"}]
+
+Now you may want to have statistics on the meters you are targeting.
+Consider the following example where you are getting the list of samples
+about CPU utilisation of a given instance (identified by its "resource_id")
+running for June 2013::
+
+    GET /v2/meters/cpu_util
+    q: [{"field": "timestamp",
+         "op": "ge",
+         "value": "2013-06-01T00:00:00"},
+        {"field": "timestamp",
+         "op": "lt",
+         "value": "2013-07-01T00:00:00"},
+        {"field": "resource_id",
+         "op": "eq",
+         "value": "64da755c-9120-4236-bee1-54acafe24980"}]
+
+You can have statistics on the list of samples requested (avg, sum, max,
+min, count) computed on the full duration)::
+
+    GET /v2/meters/cpu_util/statistics
+    q: [{"field": "timestamp",
+         "op": "ge",
+         "value": "2013-06-01T00:00:00"},
+        {"field": "timestamp",
+         "op": "lt",
+         "value": "2013-07-01T00:00:00"},
+        {"field": "resource_id",
+         "op": "eq",
+         "value": "64da755c-9120-4236-bee1-54acafe24980"}]
+
+You may want to aggregate samples over a given period (10 minutes for
+example) in order to get an array of the statistics computed on smaller
+durations::
+
+    GET /v2/meters/cpu_util/statistics
+    q: [{"field": "timestamp",
+         "op": "ge",
+         "value": "2013-06-01T00:00:00"},
+        {"field": "timestamp",
+         "op": "lt",
+         "value": "2013-07-01T00:00:00"},
+        {"field": "resource_id",
+         "op": "eq",
+         "value": "64da755c-9120-4236-bee1-54acafe24980"}]
+    period: 600
+
+If you want to retrieve all the instances (not the list of samples, but the
+resource itself) that have been run during this month for a given project,
+you should ask the resource endpoint for the list of resources (all types:
+including storage, images, networking, ...)::
+
+    GET /v2/resources
+    q: [{"field": "timestamp",
+         "op": "ge",
+         "value": "2013-06-01T00:00:00"},
+        {"field": "timestamp",
+         "op": "lt",
+         "value": "2013-07-01T00:00:00"},
+        {"field": "project_id",
+         "op": "eq",
+         "value": "8d6057bc-5b90-4296-afe0-84acaa2ef909"}]
+
+Then look for resources that have an *instance* meter linked to them. That
+will indicate resources that have been measured as being instance. You can
+then request their samples to have more detailed information, like their
+state or their flavor::
+
+    GET /v2/meter/instance
+    q: [{"field": "timestamp",
+         "op": "ge",
+         "value": "2013-06-01T00:00:00"},
+        {"field": "timestamp",
+         "op": "lt",
+         "value": "2013-07-01T00:00:00"},
+        {"field": "resource_id",
+         "op": "eq",
+         "value": "64da755c-9120-4236-bee1-54acafe24980"},
+        {"field": "project_id",
+         "op": "eq",
+         "value": "8d6057bc-5b90-4296-afe0-84acaa2ef909"}]
+
+This will return a list of samples that have been recorded on this
+particular resource. You can inspect them to retrieve information, such as
+the instance state (check the *metadata.vm_state* field) or the instance
+flavor (check the *metadata.flavor* field).
+You can request nested metadata fields by using a dot to delimit the fields
+(e.g. *metadata.weighted_host.host* for *instance.scheduled* meter)
+
+To retrieve only the 3 last samples of a meters, you can pass the *limit*
+parameter to the query::
+
+    GET /v2/meter/instance
+    q: [{"field": "timestamp",
+         "op": "ge",
+         "value": "2013-06-01T00:00:00"},
+        {"field": "timestamp",
+         "op": "lt",
+         "value": "2013-07-01T00:00:00"},
+        {"field": "resource_id",
+         "op": "eq",
+         "value": "64da755c-9120-4236-bee1-54acafe24980"},
+        {"field": "project_id",
+         "op": "eq",
+         "value": "8d6057bc-5b90-4296-afe0-84acaa2ef909"}]
+    limit: 3
+
+This query would only return the last 3 samples.
