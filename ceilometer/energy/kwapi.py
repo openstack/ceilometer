@@ -78,12 +78,12 @@ class _Base(plugin.CentralPollster):
         return list(client.iter_probes())
 
 
-class KwapiPollster(_Base):
-    """Kwapi pollster derived from the base class."""
+class EnergyPollster(_Base):
+    """Measures energy consumption."""
 
     @staticmethod
     def get_counter_names():
-        return ['energy', 'power']
+        return ['energy']
 
     def get_counters(self, manager, cache):
         """Returns all counters."""
@@ -100,6 +100,18 @@ class KwapiPollster(_Base):
                     probe['timestamp']).isoformat(),
                 resource_metadata={}
             )
+
+
+class PowerPollster(_Base):
+    """Measures power consumption."""
+
+    @staticmethod
+    def get_counter_names():
+        return ['power']
+
+    def get_counters(self, manager, cache):
+        """Returns all counters."""
+        for probe in self._iter_probes(manager.keystone, cache):
             yield counter.Counter(
                 name='power',
                 type=counter.TYPE_GAUGE,
