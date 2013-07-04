@@ -148,17 +148,28 @@ class TestImagePollster(base.TestCase):
                       _iter_images(self.manager.keystone, cache))
         self.assertEqual(images, [])
 
-    def test_glance_image_counter(self):
+    def test_image(self):
         counters = list(glance.ImagePollster().get_counters(self.manager, {}))
-        self.assertEqual(len(counters), 6)
-        for counter in [c for c in counters if c.name == 'image']:
+        self.assertEqual(len(counters), 3)
+        for counter in counters:
             self.assertEqual(counter.volume, 1)
+
+    def test_image_size(self):
+        counters = list(glance.ImageSizePollster().get_counters(self.manager,
+                                                                {}))
+        self.assertEqual(len(counters), 3)
         for image in IMAGE_LIST:
             self.assert_(
                 any(map(lambda counter: counter.volume == image.size,
                         counters)))
 
-    def test_get_counter_names(self):
+    def test_image_get_counter_names(self):
         counters = list(glance.ImagePollster().get_counters(self.manager, {}))
         self.assertEqual(set([c.name for c in counters]),
                          set(glance.ImagePollster().get_counter_names()))
+
+    def test_image_size_get_counter_names(self):
+        counters = list(glance.ImageSizePollster().get_counters(self.manager,
+                                                                {}))
+        self.assertEqual(set([c.name for c in counters]),
+                         set(glance.ImageSizePollster().get_counter_names()))
