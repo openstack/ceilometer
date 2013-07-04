@@ -88,7 +88,13 @@ class PollsterBase(PluginBase):
         """Return a sequence of Counter names supported by the pollster."""
 
     @abc.abstractmethod
-    def get_counters(self, manager, instance):
+    def get_counters(self, manager, cache):
         """Return a sequence of Counter instances from polling the resources.
+
+        :param manager: The service manager class invoking the plugin.
+        :param cache: A dictionary to allow pollsters to pass data
+                      between themselves when recomputing it would be
+                      expensive (e.g., asking another service for a
+                      list of objects).
 
         """

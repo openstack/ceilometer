@@ -77,7 +77,7 @@ class KwapiPollster(_Base):
     def get_counter_names():
         return ['energy', 'power']
 
-    def get_counters(self, manager):
+    def get_counters(self, manager, cache):
         """Returns all counters."""
         for probe in self.iter_probes(manager.keystone):
             yield counter.Counter(

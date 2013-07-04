@@ -37,11 +37,15 @@ class PollingTask(agent.PollingTask):
         with self.publish_context as publisher:
             # TODO(yjiang5) passing counters into get_counters to avoid
             # polling all counters one by one
+            cache = {}
             for pollster in self.pollsters:
                 try:
                     LOG.info("Polling pollster %s", pollster.name)
-                    publisher(list(pollster.obj.get_counters(
-                        self.manager)))
+                    counters = list(pollster.obj.get_counters(
+                        self.manager,
+                        cache,
+                    ))
+                    publisher(counters)
                 except Exception as err:
                     LOG.warning('Continue after error from %s: %s',
                                 pollster.name, err)

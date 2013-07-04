@@ -56,7 +56,7 @@ class TestInstancePollster(TestPollsterBase):
 
         mgr = manager.AgentManager()
         pollster = pollsters.InstancePollster()
-        counters = list(pollster.get_counters(mgr, self.instance))
+        counters = list(pollster.get_counters(mgr, {}, self.instance))
         self.assertEquals(len(counters), 2)
         self.assertEqual(counters[0].name, 'instance')
         self.assertEqual(counters[1].name, 'instance:m1.small')
@@ -80,7 +80,7 @@ class TestDiskIOPollster(TestPollsterBase):
 
         mgr = manager.AgentManager()
         pollster = pollsters.DiskIOPollster()
-        counters = list(pollster.get_counters(mgr, self.instance))
+        counters = list(pollster.get_counters(mgr, {}, self.instance))
         assert counters
 
         self.assertEqual(set([c.name for c in counters]),
@@ -143,7 +143,7 @@ class TestNetPollster(TestPollsterBase):
 
         mgr = manager.AgentManager()
         pollster = pollsters.NetPollster()
-        counters = list(pollster.get_counters(mgr, self.instance))
+        counters = list(pollster.get_counters(mgr, {}, self.instance))
         assert counters
         self.assertEqual(set([c.name for c in counters]),
                          set(pollster.get_counter_names()))
@@ -203,7 +203,7 @@ class TestCPUPollster(TestPollsterBase):
         pollster = pollsters.CPUPollster()
 
         def _verify_cpu_metering(zero, expected_time):
-            counters = list(pollster.get_counters(mgr, self.instance))
+            counters = list(pollster.get_counters(mgr, {}, self.instance))
             self.assertEquals(len(counters), 2)
             self.assertEqual(set([c.name for c in counters]),
                              set(pollster.get_counter_names()))

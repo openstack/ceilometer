@@ -30,6 +30,10 @@ class ComputePollster(plugin.PollsterBase):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def get_counters(self, manager, context):
+    def get_counters(self, manager, cache, instance):
         """Return a sequence of Counter instances from polling the resources.
+
+        :param manager: The service manager invoking the plugin
+        :param cache: A dictionary for passing data between plugins
+        :param instance: The instance to examine
         """
