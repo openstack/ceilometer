@@ -66,9 +66,9 @@ def show_total_resources(db, args):
         print u
         for meter in ['disk', 'cpu', 'instance']:
             stats = db.get_statistics(storage.SampleFilter(
-                    user=u,
-                    meter=meter,
-                ))
+                user=u,
+                meter=meter,
+            ))
             if meter in ['cpu', 'disk']:
                 total = stats['max']
             else:
@@ -85,7 +85,7 @@ def show_raw(db, args):
             for sample in db.get_samples(storage.SampleFilter(
                     user=u,
                     resource=resource['resource_id'],
-                    )):
+            )):
                 print fmt % sample
 
 
@@ -107,7 +107,7 @@ COMMANDS = {
     'resources': show_resources,
     'total_resources': show_total_resources,
     'raw': show_raw,
-    }
+}
 
 
 def main(argv):
@@ -116,7 +116,7 @@ def main(argv):
         # NOTE(dhellmann): Read the configuration file(s) for the
         #ceilometer collector by default.
         default_config_files=['/etc/ceilometer/ceilometer.conf'],
-        )
+    )
     storage.register_opts(cfg.CONF)
     db = storage.get_connection(cfg.CONF)
     command = extra_args[0] if extra_args else 'help'

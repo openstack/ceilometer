@@ -91,24 +91,24 @@ def send_messages(connection, topic, input):
 def main():
     rpc.register_opts(cfg.CONF)
     cfg.CONF.register_opts([
-            cfg.StrOpt('datafile',
-                       default=None,
-                       help='Data file to read or write',
-                       ),
-            cfg.BoolOpt('record',
-                        help='Record events',
-                        ),
-            cfg.BoolOpt('replay',
-                        help='Replay events',
-                        ),
-            ])
+        cfg.StrOpt('datafile',
+                   default=None,
+                   help='Data file to read or write',
+                   ),
+        cfg.BoolOpt('record',
+                    help='Record events',
+                    ),
+        cfg.BoolOpt('replay',
+                    help='Replay events',
+                    ),
+    ])
 
     remaining_args = cfg.CONF(sys.argv)
-    utils.monkey_patch()
+    #utils.monkey_patch()
 
     parser = argparse.ArgumentParser(
         description='record or play back notification events',
-        )
+    )
     parser.add_argument('mode',
                         choices=('record', 'replay', 'monitor'),
                         help='operating mode',

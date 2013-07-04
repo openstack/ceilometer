@@ -44,8 +44,9 @@ from nova.openstack.common import importutils
 from nova.openstack.common import log as logging
 from nova.openstack.common.notifier import api as notifier_api
 
-# For nova_CONF.compute_manager, used in the nova_notifier module.
-from nova import service
+# This option is used in the nova_notifier module, so make
+# sure it is defined.
+config.cfg.CONF.import_opt('compute_manager', 'nova.service')
 
 # HACK(dhellmann): Import this before any other ceilometer code
 # because the notifier module messes with the import path to force
@@ -156,20 +157,20 @@ class TestNovaNotifier(base.TestCase):
 
         # Terminate the instance to trigger the notification.
         with contextlib.nested(
-                # Under Grizzly, Nova has moved to no-db access on the
-                # compute node. The compute manager uses RPC to talk to
-                # the conductor. We need to disable communication between
-                # the nova manager and the remote system since we can't
-                # expect the message bus to be available, or the remote
-                # controller to be there if the message bus is online.
-                mock.patch.object(self.compute, 'conductor_api'),
-                # The code that looks up the instance uses a global
-                # reference to the API, so we also have to patch that to
-                # return our fake data.
-                mock.patch.object(nova_notifier.instance_info_source,
-                                  'instance_get_by_uuid',
-                                  self.fake_instance_ref_get),
-                ):
+            # Under Grizzly, Nova has moved to no-db access on the
+            # compute node. The compute manager uses RPC to talk to
+            # the conductor. We need to disable communication between
+            # the nova manager and the remote system since we can't
+            # expect the message bus to be available, or the remote
+            # controller to be there if the message bus is online.
+            mock.patch.object(self.compute, 'conductor_api'),
+            # The code that looks up the instance uses a global
+            # reference to the API, so we also have to patch that to
+            # return our fake data.
+            mock.patch.object(nova_notifier.instance_info_source,
+                              'instance_get_by_uuid',
+                              self.fake_instance_ref_get),
+        ):
             self.compute.terminate_instance(self.context,
                                             instance=self.instance)
 
