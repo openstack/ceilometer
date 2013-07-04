@@ -58,6 +58,9 @@ def register_opts(config):
 
 register_opts(cfg.CONF)
 
+cfg.CONF.import_opt('rabbit_max_retries',
+                    'ceilometer.openstack.common.rpc.impl_kombu')
+
 
 def compute_signature(message, secret):
     """Return the signature for a message dictionary.
@@ -108,9 +111,31 @@ class RPCPublisher(publisher.PublisherBase):
 
     def __init__(self, parsed_url):
         options = urlparse.parse_qs(parsed_url.query)
+        # the values of the option is a list of url params values
+        # only take care of the latest one if the option
+        # is provided more than once
         self.per_meter_topic = bool(int(
             options.get('per_meter_topic', [0])[-1]))
+
         self.target = options.get('target', ['record_metering_data'])[0]
+
+        self.policy = options.get('policy', ['wait'])[-1]
+        self.max_queue_length = int(options.get(
+            'max_queue_length', [1024])[-1])
+
+        self.local_queue = []
+
+        if self.policy in ['queue', 'drop']:
+            LOG.info('Publishing policy set to %s, \
+                     override rabbit_max_retries to 1' % self.policy)
+            cfg.CONF.set_override("rabbit_max_retries", 1)
+
+        elif self.policy == 'default':
+            LOG.info('Publishing policy set to %s' % self.policy)
+        else:
+            LOG.warn('Publishing policy is unknown (%s) force to default'
+                     % self.policy)
+            self.policy = 'default'
 
     def publish_counters(self, context, counters, source):
         """Publish counters on RPC.
@@ -137,7 +162,7 @@ class RPCPublisher(publisher.PublisherBase):
         }
         LOG.audit('Publishing %d counters on %s',
                   len(msg['args']['data']), topic)
-        rpc.cast(context, topic, msg)
+        self.local_queue.append((context, topic, msg))
 
         if self.per_meter_topic:
             for meter_name, meter_list in itertools.groupby(
@@ -151,4 +176,52 @@ class RPCPublisher(publisher.PublisherBase):
                 topic_name = topic + '.' + meter_name
                 LOG.audit('Publishing %d counters on %s',
                           len(msg['args']['data']), topic_name)
-                rpc.cast(context, topic_name, msg)
+                self.local_queue.append((context, topic_name, msg))
+
+        self.flush()
+
+    def flush(self):
+        #note(sileht):
+        # the behavior of rpc.cast call depends of rabbit_max_retries
+        # if rabbit_max_retries <= 0:
+        #   it returns only if the msg has been sent on the amqp queue
+        # if rabbit_max_retries > 0:
+        #   it raises a exception if rabbitmq is unreachable
+        #
+        # Ugly, but actually the oslo.rpc do a sys.exit(1) instead of a
+        # RPCException, so we catch both until a correct behavior is
+        # implemented in oslo
+        #
+        # the default policy just respect the rabbitmq configuration
+        # nothing special is done if rabbit_max_retries <= 0
+        # and exception is reraised if rabbit_max_retries > 0
+        while self.local_queue:
+            context, topic, msg = self.local_queue[0]
+            try:
+                rpc.cast(context, topic, msg)
+            except (SystemExit, rpc.common.RPCException):
+                if self.policy == 'queue':
+                    LOG.warn("Failed to publish counters, queue them")
+                    queue_length = len(self.local_queue)
+                    if queue_length > self.max_queue_length > 0:
+                        count = queue_length - self.max_queue_length
+                        self.local_queue = self.local_queue[count:]
+                        LOG.warn("Publisher max queue length is exceeded, "
+                                 "dropping %d oldest counters",
+                                 count)
+                    break
+
+                elif self.policy == 'drop':
+                    counters = sum([len(m['args']['data'])
+                                    for _, _, m in self.local_queue])
+                    LOG.warn(
+                        "Failed to publish %d counters, dropping them",
+                        counters)
+                    self.local_queue = []
+                    break
+                else:
+                    # default, occur only if rabbit_max_retries > 0
+                    self.local_queue = []
+                    raise
+            else:
+                self.local_queue.pop(0)

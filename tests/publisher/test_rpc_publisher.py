@@ -204,11 +204,19 @@ class TestPublish(base.TestCase):
     ]
 
     def faux_cast(self, context, topic, msg):
-        self.published.append((topic, msg))
+        if self.rpc_unreachable:
+            #note(sileht): Ugly, but when rabbitmq is unreachable
+            # and rabbitmq_max_retries is not 0
+            # oslo.rpc do a sys.exit(1), so we do the same
+            # things here until this is fixed in oslo
+            raise SystemExit(1)
+        else:
+            self.published.append((topic, msg))
 
     def setUp(self):
         super(TestPublish, self).setUp()
         self.published = []
+        self.rpc_unreachable = False
         self.stubs.Set(oslo_rpc, 'cast', self.faux_cast)
 
     def test_published(self):
@@ -261,3 +269,118 @@ class TestPublish(base.TestCase):
             cfg.CONF.publisher_rpc.metering_topic + '.' + 'test2', topics)
         self.assertIn(
             cfg.CONF.publisher_rpc.metering_topic + '.' + 'test3', topics)
+
+    def test_published_with_no_policy(self):
+        self.rpc_unreachable = True
+        publisher = rpc.RPCPublisher(
+            network_utils.urlsplit('rpc://'))
+        self.assertRaises(
+            SystemExit,
+            publisher.publish_counters,
+            None, self.test_data, 'test')
+        self.assertEqual(publisher.policy, 'default')
+        self.assertEqual(len(self.published), 0)
+        self.assertEqual(len(publisher.local_queue), 0)
+
+    def test_published_with_policy_block(self):
+        self.rpc_unreachable = True
+        publisher = rpc.RPCPublisher(
+            network_utils.urlsplit('rpc://?policy=default'))
+        self.assertRaises(
+            SystemExit,
+            publisher.publish_counters,
+            None, self.test_data, 'test')
+        self.assertEqual(len(self.published), 0)
+        self.assertEqual(len(publisher.local_queue), 0)
+
+    def test_published_with_policy_incorrect(self):
+        self.rpc_unreachable = True
+        publisher = rpc.RPCPublisher(
+            network_utils.urlsplit('rpc://?policy=notexist'))
+        self.assertRaises(
+            SystemExit,
+            publisher.publish_counters,
+            None, self.test_data, 'test')
+        self.assertEqual(publisher.policy, 'default')
+        self.assertEqual(len(self.published), 0)
+        self.assertEqual(len(publisher.local_queue), 0)
+
+    def test_published_with_policy_drop_and_rpc_down(self):
+        self.rpc_unreachable = True
+        publisher = rpc.RPCPublisher(
+            network_utils.urlsplit('rpc://?policy=drop'))
+        publisher.publish_counters(None,
+                                   self.test_data,
+                                   'test')
+        self.assertEqual(len(self.published), 0)
+        self.assertEqual(len(publisher.local_queue), 0)
+
+    def test_published_with_policy_queue_and_rpc_down(self):
+        self.rpc_unreachable = True
+        publisher = rpc.RPCPublisher(
+            network_utils.urlsplit('rpc://?policy=queue'))
+        publisher.publish_counters(None,
+                                   self.test_data,
+                                   'test')
+        self.assertEqual(len(self.published), 0)
+        self.assertEqual(len(publisher.local_queue), 1)
+
+    def test_published_with_policy_queue_and_rpc_down_up(self):
+        self.rpc_unreachable = True
+        publisher = rpc.RPCPublisher(
+            network_utils.urlsplit('rpc://?policy=queue'))
+        publisher.publish_counters(None,
+                                   self.test_data,
+                                   'test')
+        self.assertEqual(len(self.published), 0)
+        self.assertEqual(len(publisher.local_queue), 1)
+
+        self.rpc_unreachable = False
+        publisher.publish_counters(None,
+                                   self.test_data,
+                                   'test')
+
+        self.assertEqual(len(self.published), 2)
+        self.assertEqual(len(publisher.local_queue), 0)
+
+    def test_published_with_policy_sized_queue_and_rpc_down(self):
+        self.rpc_unreachable = True
+        publisher = rpc.RPCPublisher(
+            network_utils.urlsplit('rpc://?policy=queue&max_queue_length=3'))
+        for i in range(0, 5):
+            publisher.publish_counters(None,
+                                       self.test_data,
+                                       'test-%d' % i)
+        self.assertEqual(len(self.published), 0)
+        self.assertEqual(len(publisher.local_queue), 3)
+        self.assertEqual(
+            publisher.local_queue[0][2]['args']['data'][0]['source'],
+            'test-2'
+        )
+        self.assertEqual(
+            publisher.local_queue[1][2]['args']['data'][0]['source'],
+            'test-3'
+        )
+        self.assertEqual(
+            publisher.local_queue[2][2]['args']['data'][0]['source'],
+            'test-4'
+        )
+
+    def test_published_with_policy_default_sized_queue_and_rpc_down(self):
+        self.rpc_unreachable = True
+        publisher = rpc.RPCPublisher(
+            network_utils.urlsplit('rpc://?policy=queue'))
+        for i in range(0, 2000):
+            publisher.publish_counters(None,
+                                       self.test_data,
+                                       'test-%d' % i)
+        self.assertEqual(len(self.published), 0)
+        self.assertEqual(len(publisher.local_queue), 1024)
+        self.assertEqual(
+            publisher.local_queue[0][2]['args']['data'][0]['source'],
+            'test-976'
+        )
+        self.assertEqual(
+            publisher.local_queue[1023][2]['args']['data'][0]['source'],
+            'test-1999'
+        )
