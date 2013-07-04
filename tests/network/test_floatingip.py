@@ -85,3 +85,9 @@ class TestFloatingIPPollster(base.TestCase):
         counters = list(self.pollster.get_counters(self.manager, {}))
         self.assertEqual(set([c.name for c in counters]),
                          set(self.pollster.get_counter_names()))
+
+    def test_get_counters_cached(self):
+        cache = {}
+        cache['floating_ips'] = self.faux_get_ips(None)[:2]
+        counters = list(self.pollster.get_counters(self.manager, cache))
+        self.assertEqual(len(counters), 2)
