@@ -31,10 +31,6 @@ class FloatingIPPollster(plugin.CentralPollster):
 
     LOG = log.getLogger(__name__ + '.floatingip')
 
-    @staticmethod
-    def get_counter_names():
-        return ['ip.floating']
-
     def _get_floating_ips(self):
         nv = nova_client.Client()
         return nv.floating_ip_get_all()

@@ -53,7 +53,7 @@ class TestDiskPollsters(base.TestPollsterBase):
         assert self.instance.name in cache[pollster.CACHE_KEY_DISK]
 
         self.assertEqual(set([c.name for c in counters]),
-                         set(pollster.get_counter_names()))
+                         set([name]))
 
         match = [c for c in counters if c.name == name]
         self.assertEquals(len(match), 1, 'missing counter %s' % name)

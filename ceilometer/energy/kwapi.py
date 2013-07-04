@@ -81,10 +81,6 @@ class _Base(plugin.CentralPollster):
 class EnergyPollster(_Base):
     """Measures energy consumption."""
 
-    @staticmethod
-    def get_counter_names():
-        return ['energy']
-
     def get_counters(self, manager, cache):
         """Returns all counters."""
         for probe in self._iter_probes(manager.keystone, cache):
@@ -104,10 +100,6 @@ class EnergyPollster(_Base):
 
 class PowerPollster(_Base):
     """Measures power consumption."""
-
-    @staticmethod
-    def get_counter_names():
-        return ['power']
 
     def get_counters(self, manager, cache):
         """Returns all counters."""

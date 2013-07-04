@@ -34,23 +34,22 @@ class PollingTask(agent.PollingTask):
     def poll_and_publish_instances(self, instances):
         with self.publish_context as publisher:
             for instance in instances:
-                if getattr(instance, 'OS-EXT-STS:vm_state', None) != 'error':
-                    # TODO(yjiang5) passing counters to get_counters to avoid
-                    # polling all counters one by one
-                    cache = {}
-                    for pollster in self.pollsters:
-                        try:
-                            LOG.info("Polling pollster %s", pollster.name)
-                            counters = list(pollster.obj.get_counters(
-                                self.manager,
-                                cache,
-                                instance,
-                            ))
-                            publisher(counters)
-                        except Exception as err:
-                            LOG.warning('Continue after error from %s: %s',
-                                        pollster.name, err)
-                            LOG.exception(err)
+                if getattr(instance, 'OS-EXT-STS:vm_state', None) == 'error':
+                    continue
+                cache = {}
+                for pollster in self.pollsters:
+                    try:
+                        LOG.info("Polling pollster %s", pollster.name)
+                        counters = list(pollster.obj.get_counters(
+                            self.manager,
+                            cache,
+                            instance,
+                        ))
+                        publisher(counters)
+                    except Exception as err:
+                        LOG.warning('Continue after error from %s: %s',
+                                    pollster.name, err)
+                        LOG.exception(err)
 
     def poll_and_publish(self):
         self.poll_and_publish_instances(

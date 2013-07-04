@@ -77,7 +77,7 @@ class TestNetPollster(base.TestPollsterBase):
         counters = list(pollster.get_counters(mgr, {}, self.instance))
         self.assertEqual(len(counters), 3)  # one for each nic
         self.assertEqual(set([c.name for c in counters]),
-                         set(pollster.get_counter_names()))
+                         set([counters[0].name]))
 
         def _verify_vnic_metering(ip, expected_volume, expected_rid):
             match = [c for c in counters

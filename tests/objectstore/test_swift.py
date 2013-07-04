@@ -132,7 +132,7 @@ class TestSwiftPollster(base.TestCase):
                        self.fake_iter_accounts)
         counters = list(self.pollster.get_counters(self.manager, {}))
         self.assertEqual(set([c.name for c in counters]),
-                         set(self.pollster.get_counter_names()))
+                         set([counters[0].name]))
 
     def test_endpoint_notfound(self):
         self.stubs.Set(self.manager.keystone.service_catalog, 'url_for',

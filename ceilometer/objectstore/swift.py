@@ -89,10 +89,6 @@ class ObjectsPollster(_Base):
     """Iterate over all accounts, using keystone.
     """
 
-    @staticmethod
-    def get_counter_names():
-        return ['storage.objects']
-
     def get_counters(self, manager, cache):
         for tenant, account in self._iter_accounts(manager.keystone, cache):
             yield counter.Counter(
@@ -112,10 +108,6 @@ class ObjectsSizePollster(_Base):
     """Iterate over all accounts, using keystone.
     """
 
-    @staticmethod
-    def get_counter_names():
-        return ['storage.objects.size']
-
     def get_counters(self, manager, cache):
         for tenant, account in self._iter_accounts(manager.keystone, cache):
             yield counter.Counter(
@@ -134,10 +126,6 @@ class ObjectsSizePollster(_Base):
 class ObjectsContainersPollster(_Base):
     """Iterate over all accounts, using keystone.
     """
-
-    @staticmethod
-    def get_counter_names():
-        return ['storage.objects.containers']
 
     def get_counters(self, manager, cache):
         for tenant, account in self._iter_accounts(manager.keystone, cache):

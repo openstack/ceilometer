@@ -73,14 +73,12 @@ class AgentManager(object):
         for pipeline, pollster in itertools.product(
                 self.pipeline_manager.pipelines,
                 self.pollster_manager.extensions):
-            for counter in pollster.obj.get_counter_names():
-                if pipeline.support_counter(counter):
-                    polling_task = polling_tasks.get(pipeline.interval, None)
-                    if not polling_task:
-                        polling_task = self.create_polling_task()
-                        polling_tasks[pipeline.interval] = polling_task
-                    polling_task.add(pollster, [pipeline])
-                    break
+            if pipeline.support_counter(pollster.name):
+                polling_task = polling_tasks.get(pipeline.interval, None)
+                if not polling_task:
+                    polling_task = self.create_polling_task()
+                    polling_tasks[pipeline.interval] = polling_task
+                polling_task.add(pollster, [pipeline])
 
         return polling_tasks
 
