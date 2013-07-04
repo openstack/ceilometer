@@ -1,5 +1,6 @@
 ..
       Copyright 2012 New Dream Network (DreamHost)
+      Copyright 2013 eNovance
 
       Licensed under the Apache License, Version 2.0 (the "License"); you may
       not use this file except in compliance with the License. You may obtain
@@ -23,11 +24,14 @@
      Software service running on the OpenStack infrastructure
      measuring usage and sending the results to the :term:`collector`.
 
+   alarm
+     An action triggered whenever a meter reaches a certain threshold.
+
    API server
      HTTP REST API service for ceilometer.
 
    ceilometer
-     From WikiPedia [#]_:
+     From Wikipedia [#]_:
 
        A ceilometer is a device that uses a laser or other light
        source to determine the height of a cloud base.
@@ -61,8 +65,14 @@
         values (e.g. number of Swift objects)
       * Delta: Incremental change to a counter over time (e.g. bandwidth delta)
 
+   notification
+      A message sent via an external OpenStack system (e.g Nova, Glance,
+      etc) using the Oslo notification mechanism [#]_. These notifications
+      are usually sent to and received by Ceilometer through the notifier
+      RPC driver.
+
    non-repudiable
-    From WikiPedia [#]_:
+    From Wikipedia [#]_:
 
       Non-repudiation refers to a state of affairs where the purported
       maker of a statement will not be able to successfully challenge
@@ -75,7 +85,7 @@
      The OpenStack tenant or project.
 
    resource
-     The OpenStack entity being metered (e.g. instance, volume, image, etc.).
+     The OpenStack entity being metered (e.g. instance, volume, image, etc).
 
    sample
      Data sample for a particular meter.
@@ -89,4 +99,5 @@
      An OpenStack user.
 
 .. [#] http://en.wikipedia.org/wiki/Ceilometer
+.. [#] https://github.com/openstack/oslo-incubator/tree/master/openstack/common/notifier
 .. [#] http://en.wikipedia.org/wiki/Non-repudiation
