@@ -26,22 +26,8 @@ from ceilometer.tests import base as tests_base
 from ceilometer import utils
 
 
-def test_recursive_keypairs():
-    data = {'a': 'A',
-            'b': 'B',
-            'nested': {'a': 'A',
-                       'b': 'B',
-                       },
-            }
-    pairs = list(utils.recursive_keypairs(data))
-    assert pairs == [('a', 'A'),
-                     ('b', 'B'),
-                     ('nested:a', 'A'),
-                     ('nested:b', 'B'),
-                     ]
-
-
 class TestUtils(tests_base.TestCase):
+
     def test_datetime_to_decimal(self):
         expected = 1356093296.12
         utc_datetime = datetime.datetime.utcfromtimestamp(expected)
@@ -54,3 +40,16 @@ class TestUtils(tests_base.TestCase):
         expected_datetime = datetime.datetime.utcfromtimestamp(expected)
         actual_datetime = utils.decimal_to_dt(dexpected)
         self.assertEqual(actual_datetime, expected_datetime)
+
+    def test_recursive_keypairs(self):
+        data = {'a': 'A',
+                'b': 'B',
+                'nested': {'a': 'A',
+                           'b': 'B',
+                           },
+                }
+        pairs = list(utils.recursive_keypairs(data))
+        self.assertEqual(pairs, [('a', 'A'),
+                                 ('b', 'B'),
+                                 ('nested:a', 'A'),
+                                 ('nested:b', 'B')])
