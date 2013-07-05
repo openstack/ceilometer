@@ -278,7 +278,8 @@ class Connection(base.Connection):
         return (key for key, ignored in self.project.scan(**scan_args))
 
     def get_resources(self, user=None, project=None, source=None,
-                      start_timestamp=None, end_timestamp=None,
+                      start_timestamp=None, start_timestamp_op=None,
+                      end_timestamp=None, end_timestamp_op=None,
                       metaquery={}):
         """Return an iterable of models.Resource instances
 
@@ -286,7 +287,9 @@ class Connection(base.Connection):
         :param project: Optional ID for project that owns the resource.
         :param source: Optional source filter.
         :param start_timestamp: Optional modified timestamp start range.
+        :param start_timestamp_op: Optional start time operator, like ge, gt.
         :param end_timestamp: Optional modified timestamp end range.
+        :param end_timestamp_op: Optional end time operator, like lt, le.
         :param metaquery: Optional dict with metadata to match on.
         """
         def make_resource(data):
@@ -313,7 +316,9 @@ class Connection(base.Connection):
                                             project=project,
                                             source=source,
                                             start=start_timestamp,
+                                            start_op=start_timestamp_op,
                                             end=end_timestamp,
+                                            end_op=end_timestamp_op,
                                             require_meter=False,
                                             query_only=False)
         LOG.debug("Query Meter table: %s" % q)
@@ -692,8 +697,8 @@ def reverse_timestamp(dt):
 
 
 def make_query(user=None, project=None, meter=None,
-               resource=None, source=None, start=None, end=None,
-               require_meter=True, query_only=False):
+               resource=None, source=None, start=None, start_op=None,
+               end=None, end_op=None, require_meter=True, query_only=False):
     """Return a filter query string based on the selected parameters.
 
     :param user: Optional user-id
@@ -702,7 +707,9 @@ def make_query(user=None, project=None, meter=None,
     :param resource: Optional resource-id
     :param source: Optional source-id
     :param start: Optional start timestamp
+    :param start_op: Optional start timestamp operator, like gt, ge
     :param end: Optional end timestamp
+    :param end_op: Optional end timestamp operator, like lt, le
     :param require_meter: If true and the filter does not have a meter,
             raise an error.
     :param query_only: If true only returns the filter query,
@@ -726,6 +733,12 @@ def make_query(user=None, project=None, meter=None,
     start_row, end_row = "", ""
     rts_start = str(reverse_timestamp(start) + 1) if start else ""
     rts_end = str(reverse_timestamp(end) + 1) if end else ""
+
+    #By default, we are using ge for lower bound and lt for upper bound
+    if start_op == 'gt':
+        rts_start = str(long(rts_start) - 2)
+    if end_op == 'le':
+        rts_end = str(long(rts_end) - 1)
 
     # when start_time and end_time is provided,
     #    if it's filtered by meter,
@@ -765,7 +778,10 @@ def make_query_from_filter(sample_filter, require_meter=True):
     return make_query(sample_filter.user, sample_filter.project,
                       sample_filter.meter, sample_filter.resource,
                       sample_filter.source, sample_filter.start,
-                      sample_filter.end, require_meter)
+                      sample_filter.start_timestamp_op,
+                      sample_filter.end,
+                      sample_filter.end_timestamp_op,
+                      require_meter)
 
 
 def _make_rowkey_scan(meter, rts_start=None, rts_end=None):

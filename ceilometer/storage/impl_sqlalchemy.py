@@ -119,10 +119,16 @@ def make_query_from_filter(query, sample_filter, require_meter=True):
         query = query.filter(Meter.sources.any(id=sample_filter.source))
     if sample_filter.start:
         ts_start = sample_filter.start
-        query = query.filter(Meter.timestamp >= ts_start)
+        if sample_filter.start_timestamp_op == 'gt':
+            query = query.filter(Meter.timestamp > ts_start)
+        else:
+            query = query.filter(Meter.timestamp >= ts_start)
     if sample_filter.end:
         ts_end = sample_filter.end
-        query = query.filter(Meter.timestamp < ts_end)
+        if sample_filter.end_timestamp_op == 'le':
+            query = query.filter(Meter.timestamp <= ts_end)
+        else:
+            query = query.filter(Meter.timestamp < ts_end)
     if sample_filter.user:
         query = query.filter_by(user_id=sample_filter.user)
     if sample_filter.project:
@@ -240,7 +246,8 @@ class Connection(base.Connection):
 
     @staticmethod
     def get_resources(user=None, project=None, source=None,
-                      start_timestamp=None, end_timestamp=None,
+                      start_timestamp=None, start_timestamp_op=None,
+                      end_timestamp=None, end_timestamp_op=None,
                       metaquery={}, resource=None):
         """Return an iterable of api_models.Resource instances
 
@@ -248,7 +255,9 @@ class Connection(base.Connection):
         :param project: Optional ID for project that owns the resource.
         :param source: Optional source filter.
         :param start_timestamp: Optional modified timestamp start range.
+        :param start_timestamp_op: Optonal start time operator, like gt, ge.
         :param end_timestamp: Optional modified timestamp end range.
+        :param end_timestamp_op: Optional end time operator, like lt, le.
         :param metaquery: Optional dict with metadata to match on.
         :param resource: Optional resource filter.
         """
@@ -259,9 +268,15 @@ class Connection(base.Connection):
         if source is not None:
             query = query.filter(Meter.sources.any(id=source))
         if start_timestamp:
-            query = query.filter(Meter.timestamp >= start_timestamp)
+            if start_timestamp_op == 'gt':
+                query = query.filter(Meter.timestamp > start_timestamp)
+            else:
+                query = query.filter(Meter.timestamp >= start_timestamp)
         if end_timestamp:
-            query = query.filter(Meter.timestamp < end_timestamp)
+            if end_timestamp_op == 'le':
+                query = query.filter(Meter.timestamp <= end_timestamp)
+            else:
+                query = query.filter(Meter.timestamp < end_timestamp)
         if project is not None:
             query = query.filter(Meter.project_id == project)
         if resource is not None:

@@ -171,16 +171,12 @@ def _query_to_kwargs(query, db_func):
     metaquery = {}
     for i in query:
         if i.field == 'timestamp':
-            # FIXME(dhellmann): This logic is not consistent with the
-            # way the timestamps are treated inside the mongo driver
-            # (the end timestamp is always tested using $lt). We
-            # should just pass a single timestamp through to the
-            # storage layer with the operator and let the storage
-            # layer use that operator.
             if i.op in ('lt', 'le'):
                 stamp['end_timestamp'] = i.value
+                stamp['end_timestamp_op'] = i.op
             elif i.op in ('gt', 'ge'):
                 stamp['start_timestamp'] = i.value
+                stamp['start_timestamp_op'] = i.op
             else:
                 LOG.warn('_query_to_kwargs ignoring %r unexpected op %r"' %
                          (i.field, i.op))
@@ -209,6 +205,10 @@ def _query_to_kwargs(query, db_func):
         else:
             raise wsme.exc.UnknownArgument('timestamp',
                                            "not valid for this resource")
+        if 'start_timestamp_op' in stamp:
+            kwargs['start_timestamp_op'] = stamp['start_timestamp_op']
+        if 'end_timestamp_op' in stamp:
+            kwargs['end_timestamp_op'] = stamp['end_timestamp_op']
 
     if trans:
         for k in trans:
