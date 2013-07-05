@@ -14,12 +14,12 @@
 
 from . import acl
 from . import alarm
-# from . import compute_duration_by_resource
+from . import compute_duration_by_resource
 from . import list_events
 from . import list_meters
 from . import list_resources
 from . import post_samples
-# from . import statistics
+from . import statistics
 
 
 class TestAPIAcl(acl.TestAPIACL):
@@ -37,10 +37,10 @@ class TestListEmptyAlarms(alarm.TestListEmptyAlarms):
 class TestAlarms(alarm.TestAlarms):
     database_connection = 'sqlite://'
 
-# TODO(jd) fix SQL driver to pass this test!
-# class TestComputeDurationByResource(
-#         compute_duration_by_resource.TestComputeDurationByResource):
-#     database_connection = 'sqlite://'
+
+class TestComputeDurationByResource(
+        compute_duration_by_resource.TestComputeDurationByResource):
+    database_connection = 'sqlite://'
 
 
 class TestListEmptyMeters(list_meters.TestListEmptyMeters):
@@ -54,21 +54,21 @@ class TestListMeters(list_meters.TestListMeters):
 class TestListResources(list_resources.TestListResources):
     database_connection = 'sqlite://'
 
-# TODO(jd) fix SQL driver to pass this test!
-# class TestMaxProjectVolume(statistics.TestMaxProjectVolume):
-#     database_connection = 'sqlite://'
 
-# TODO(jd) fix SQL driver to pass this test!
-# class TestMaxResourceVolume(statistics.TestMaxResourceVolume):
-#     database_connection = 'sqlite://'
+class TestMaxProjectVolume(statistics.TestMaxProjectVolume):
+    database_connection = 'sqlite://'
 
-# TODO(jd) fix SQL driver to pass this test!
-# class TestSumProjectVolume(statistics.TestSumProjectVolume):
-#     database_connection = 'sqlite:// '
 
-# TODO(jd) fix SQL driver to pass this test!
-# class TestSumResourceVolume(statistics.TestSumProjectVolume):
-#     database_connection = 'sqlite:// '
+class TestMaxResourceVolume(statistics.TestMaxResourceVolume):
+    database_connection = 'sqlite://'
+
+
+class TestSumProjectVolume(statistics.TestSumProjectVolume):
+    database_connection = 'sqlite:// '
+
+
+class TestSumResourceVolume(statistics.TestSumProjectVolume):
+    database_connection = 'sqlite:// '
 
 
 class TestPostSamples(post_samples.TestPostSamples):

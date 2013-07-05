@@ -401,17 +401,6 @@ class Connection(base.Connection):
             )
 
     @staticmethod
-    def _make_volume_query(sample_filter, counter_volume_func):
-        """Returns complex Meter counter_volume query for max and sum."""
-        session = sqlalchemy_session.get_session()
-        subq = session.query(Meter.id)
-        subq = make_query_from_filter(subq, sample_filter, require_meter=False)
-        subq = subq.subquery()
-        mainq = session.query(Resource.id, counter_volume_func)
-        mainq = mainq.join(Meter).group_by(Resource.id)
-        return mainq.filter(Meter.id.in_(subq))
-
-    @staticmethod
     def _make_stats_query(sample_filter):
         session = sqlalchemy_session.get_session()
         query = session.query(
@@ -455,7 +444,8 @@ class Connection(base.Connection):
             res = self._make_stats_query(sample_filter).all()[0]
 
         if not period:
-            yield self._stats_result_to_model(res, 0, res.tsmin, res.tsmax)
+            if res.count:
+                yield self._stats_result_to_model(res, 0, res.tsmin, res.tsmax)
             return
 
         query = self._make_stats_query(sample_filter)

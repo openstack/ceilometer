@@ -23,6 +23,7 @@ from oslo.config import cfg
 
 from . import base
 from ceilometer import counter
+from ceilometer.storage.impl_mongodb import Connection as mongo_conn
 from ceilometer.storage.impl_mongodb import require_map_reduce
 from ceilometer.publisher import rpc
 
@@ -33,7 +34,9 @@ class TestMaxProjectVolume(base.FunctionalTest):
 
     def setUp(self):
         super(TestMaxProjectVolume, self).setUp()
-        require_map_reduce(self.conn)
+        # TODO(gordc): remove when we drop mim
+        if isinstance(self.conn, mongo_conn):
+            require_map_reduce(self.conn)
 
         self.counters = []
         for i in range(3):
@@ -134,7 +137,9 @@ class TestMaxResourceVolume(base.FunctionalTest):
 
     def setUp(self):
         super(TestMaxResourceVolume, self).setUp()
-        require_map_reduce(self.conn)
+        # TODO(gordc): remove when we drop mim
+        if isinstance(self.conn, mongo_conn):
+            require_map_reduce(self.conn)
 
         self.counters = []
         for i in range(3):
@@ -178,9 +183,9 @@ class TestMaxResourceVolume(base.FunctionalTest):
                               u'2012-09-25T11:31:00']))
         self.assertEqual(data[0]['period'], 3600)
         self.assertEqual(set(x['period_start'] for x in data),
-                         set([u'2012-09-25T10:00:00',
-                              u'2012-09-25T11:00:00',
-                              u'2012-09-25T12:00:00']))
+                         set([u'2012-09-25T10:30:00',
+                              u'2012-09-25T11:30:00',
+                              u'2012-09-25T12:30:00']))
 
     def test_start_timestamp(self):
         data = self.get_json(self.PATH, q=[{'field': 'resource_id',
@@ -251,7 +256,9 @@ class TestSumProjectVolume(base.FunctionalTest):
 
     def setUp(self):
         super(TestSumProjectVolume, self).setUp()
-        require_map_reduce(self.conn)
+        # TODO(gordc): remove when we drop mim
+        if isinstance(self.conn, mongo_conn):
+            require_map_reduce(self.conn)
 
         self.counters = []
         for i in range(3):
@@ -354,7 +361,9 @@ class TestSumResourceVolume(base.FunctionalTest):
 
     def setUp(self):
         super(TestSumResourceVolume, self).setUp()
-        require_map_reduce(self.conn)
+        # TODO(gordc): remove when we drop mim
+        if isinstance(self.conn, mongo_conn):
+            require_map_reduce(self.conn)
 
         self.counters = []
         for i in range(3):
