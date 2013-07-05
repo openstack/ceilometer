@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-04 09:40+0000\n"
+"POT-Creation-Date: 2013-07-05 09:40+0000\n"
 "PO-Revision-Date: 2012-12-11 06:53+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Portuguese (Brazil) "
@@ -113,36 +113,36 @@ msgstr ""
 msgid "UDP: Unable to store meter"
 msgstr ""
 
-#: ceilometer/compute/nova_notifier.py:82
+#: ceilometer/compute/nova_notifier.py:84
 #, python-format
 msgid "using provided stats gatherer %r"
 msgstr ""
 
-#: ceilometer/compute/nova_notifier.py:85
+#: ceilometer/compute/nova_notifier.py:87
 msgid "making a new stats gatherer"
 msgstr ""
 
-#: ceilometer/compute/nova_notifier.py:105
+#: ceilometer/compute/nova_notifier.py:107
 #, python-format
 msgid "INFO %r"
 msgstr ""
 
-#: ceilometer/compute/nova_notifier.py:129
+#: ceilometer/compute/nova_notifier.py:131
 #, python-format
 msgid "ignoring %s"
 msgstr ""
 
-#: ceilometer/compute/nova_notifier.py:131
+#: ceilometer/compute/nova_notifier.py:133
 #, python-format
 msgid "processing %s"
 msgstr ""
 
-#: ceilometer/compute/nova_notifier.py:135
+#: ceilometer/compute/nova_notifier.py:137
 #, python-format
 msgid "polling final stats for %r"
 msgstr ""
 
-#: ceilometer/energy/kwapi.py:68
+#: ceilometer/energy/kwapi.py:76
 msgid "Kwapi endpoint not found"
 msgstr ""
 
@@ -872,10 +872,4 @@ msgstr ""
 #: ceilometer/storage/sqlalchemy/migration.py:67
 msgid "version should be an integer"
 msgstr ""
-
-#~ msgid "Out reactor registered"
-#~ msgstr ""
-
-#~ msgid "ROUTER RELAY-OUT %(data)s"
-#~ msgstr ""
 
