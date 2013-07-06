@@ -77,7 +77,7 @@ installation. A plugin system based on `setuptools entry points`_
 makes it easy to add new monitors in the collector or subagents for
 polling.
 
-.. _setuptools entry points: http://packages.python.org/distribute/setuptools.html#dynamic-discovery-of-services-and-plugins
+.. _setuptools entry points: http://pythonhosted.org/setuptools/setuptools.html#dynamic-discovery-of-services-and-plugins
 
 Each daemon provides basic essential services in a framework to be
 shared by the plugins, and the plugins do the specialized work.  As a
