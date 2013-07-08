@@ -23,6 +23,7 @@ in by the plugins that create them.
 """
 
 import collections
+import copy
 
 from oslo.config import cfg
 
@@ -67,3 +68,23 @@ Counter = collections.namedtuple('Counter',
 TYPE_GAUGE = 'gauge'
 TYPE_DELTA = 'delta'
 TYPE_CUMULATIVE = 'cumulative'
+
+
+def from_notification(cls, name, type, volume, unit,
+                      user_id, project_id, resource_id,
+                      message):
+    metadata = copy.copy(message['payload'])
+    metadata['event_type'] = message['event_type']
+    metadata['host'] = message['publisher_id']
+    return cls(name=name,
+               type=type,
+               volume=volume,
+               unit=unit,
+               user_id=user_id,
+               project_id=project_id,
+               resource_id=resource_id,
+               timestamp=message['timestamp'],
+               resource_metadata=metadata)
+
+
+Counter.from_notification = classmethod(from_notification)

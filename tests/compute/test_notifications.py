@@ -401,9 +401,9 @@ INSTANCE_SCHEDULED = {
 class TestNotifications(base.TestCase):
 
     def test_process_notification(self):
-        info = notifications.Instance().process_notification(
+        info = list(notifications.Instance().process_notification(
             INSTANCE_CREATE_END
-        )[0]
+        ))[0]
         for name, actual, expected in [
                 ('counter_name', info.name, 'instance'),
                 ('counter_type', info.type, counter.TYPE_GAUGE),
@@ -412,7 +412,8 @@ class TestNotifications(base.TestCase):
                  INSTANCE_CREATE_END['timestamp']),
                 ('resource_id', info.resource_id,
                  INSTANCE_CREATE_END['payload']['instance_id']),
-                ('instance_type', info.resource_metadata['instance_type'],
+                ('instance_type_id',
+                 info.resource_metadata['instance_type_id'],
                  INSTANCE_CREATE_END['payload']['instance_type_id']),
                 ('host', info.resource_metadata['host'],
                  INSTANCE_CREATE_END['publisher_id']),
@@ -425,42 +426,42 @@ class TestNotifications(base.TestCase):
 
     def test_instance_create_instance(self):
         ic = notifications.Instance()
-        counters = ic.process_notification(INSTANCE_CREATE_END)
+        counters = list(ic.process_notification(INSTANCE_CREATE_END))
         self.assertEqual(len(counters), 1)
         c = counters[0]
         self.assertEqual(c.volume, 1)
 
     def test_instance_create_flavor(self):
         ic = notifications.InstanceFlavor()
-        counters = ic.process_notification(INSTANCE_CREATE_END)
+        counters = list(ic.process_notification(INSTANCE_CREATE_END))
         self.assertEqual(len(counters), 1)
         c = counters[0]
         self.assertEqual(c.volume, 1)
 
     def test_instance_create_memory(self):
         ic = notifications.Memory()
-        counters = ic.process_notification(INSTANCE_CREATE_END)
+        counters = list(ic.process_notification(INSTANCE_CREATE_END))
         self.assertEqual(len(counters), 1)
         c = counters[0]
         self.assertEqual(c.volume, INSTANCE_CREATE_END['payload']['memory_mb'])
 
     def test_instance_create_vcpus(self):
         ic = notifications.VCpus()
-        counters = ic.process_notification(INSTANCE_CREATE_END)
+        counters = list(ic.process_notification(INSTANCE_CREATE_END))
         self.assertEqual(len(counters), 1)
         c = counters[0]
         self.assertEqual(c.volume, INSTANCE_CREATE_END['payload']['vcpus'])
 
     def test_instance_create_root_disk_size(self):
         ic = notifications.RootDiskSize()
-        counters = ic.process_notification(INSTANCE_CREATE_END)
+        counters = list(ic.process_notification(INSTANCE_CREATE_END))
         self.assertEqual(len(counters), 1)
         c = counters[0]
         self.assertEqual(c.volume, INSTANCE_CREATE_END['payload']['root_gb'])
 
     def test_instance_create_ephemeral_disk_size(self):
         ic = notifications.EphemeralDiskSize()
-        counters = ic.process_notification(INSTANCE_CREATE_END)
+        counters = list(ic.process_notification(INSTANCE_CREATE_END))
         self.assertEqual(len(counters), 1)
         c = counters[0]
         self.assertEqual(c.volume,
@@ -468,34 +469,34 @@ class TestNotifications(base.TestCase):
 
     def test_instance_exists_instance(self):
         ic = notifications.Instance()
-        counters = ic.process_notification(INSTANCE_EXISTS)
+        counters = list(ic.process_notification(INSTANCE_EXISTS))
         self.assertEqual(len(counters), 1)
 
     def test_instance_exists_flavor(self):
         ic = notifications.Instance()
-        counters = ic.process_notification(INSTANCE_EXISTS)
+        counters = list(ic.process_notification(INSTANCE_EXISTS))
         self.assertEqual(len(counters), 1)
 
     def test_instance_delete_instance(self):
         ic = notifications.Instance()
-        counters = ic.process_notification(INSTANCE_DELETE_START)
+        counters = list(ic.process_notification(INSTANCE_DELETE_START))
         self.assertEqual(len(counters), 1)
 
     def test_instance_delete_flavor(self):
         ic = notifications.Instance()
-        counters = ic.process_notification(INSTANCE_DELETE_START)
+        counters = list(ic.process_notification(INSTANCE_DELETE_START))
         self.assertEqual(len(counters), 1)
 
     def test_instance_finish_resize_instance(self):
         ic = notifications.Instance()
-        counters = ic.process_notification(INSTANCE_FINISH_RESIZE_END)
+        counters = list(ic.process_notification(INSTANCE_FINISH_RESIZE_END))
         self.assertEqual(len(counters), 1)
         c = counters[0]
         self.assertEqual(c.volume, 1)
 
     def test_instance_finish_resize_flavor(self):
         ic = notifications.InstanceFlavor()
-        counters = ic.process_notification(INSTANCE_FINISH_RESIZE_END)
+        counters = list(ic.process_notification(INSTANCE_FINISH_RESIZE_END))
         self.assertEqual(len(counters), 1)
         c = counters[0]
         self.assertEqual(c.volume, 1)
@@ -503,7 +504,7 @@ class TestNotifications(base.TestCase):
 
     def test_instance_finish_resize_memory(self):
         ic = notifications.Memory()
-        counters = ic.process_notification(INSTANCE_FINISH_RESIZE_END)
+        counters = list(ic.process_notification(INSTANCE_FINISH_RESIZE_END))
         self.assertEqual(len(counters), 1)
         c = counters[0]
         self.assertEqual(c.volume,
@@ -511,7 +512,7 @@ class TestNotifications(base.TestCase):
 
     def test_instance_finish_resize_vcpus(self):
         ic = notifications.VCpus()
-        counters = ic.process_notification(INSTANCE_FINISH_RESIZE_END)
+        counters = list(ic.process_notification(INSTANCE_FINISH_RESIZE_END))
         self.assertEqual(len(counters), 1)
         c = counters[0]
         self.assertEqual(c.volume,
@@ -519,14 +520,14 @@ class TestNotifications(base.TestCase):
 
     def test_instance_resize_finish_instance(self):
         ic = notifications.Instance()
-        counters = ic.process_notification(INSTANCE_FINISH_RESIZE_END)
+        counters = list(ic.process_notification(INSTANCE_FINISH_RESIZE_END))
         self.assertEqual(len(counters), 1)
         c = counters[0]
         self.assertEqual(c.volume, 1)
 
     def test_instance_resize_finish_flavor(self):
         ic = notifications.InstanceFlavor()
-        counters = ic.process_notification(INSTANCE_RESIZE_REVERT_END)
+        counters = list(ic.process_notification(INSTANCE_RESIZE_REVERT_END))
         self.assertEqual(len(counters), 1)
         c = counters[0]
         self.assertEqual(c.volume, 1)
@@ -534,7 +535,7 @@ class TestNotifications(base.TestCase):
 
     def test_instance_resize_finish_memory(self):
         ic = notifications.Memory()
-        counters = ic.process_notification(INSTANCE_RESIZE_REVERT_END)
+        counters = list(ic.process_notification(INSTANCE_RESIZE_REVERT_END))
         self.assertEqual(len(counters), 1)
         c = counters[0]
         self.assertEqual(c.volume,
@@ -542,7 +543,7 @@ class TestNotifications(base.TestCase):
 
     def test_instance_resize_finish_vcpus(self):
         ic = notifications.VCpus()
-        counters = ic.process_notification(INSTANCE_RESIZE_REVERT_END)
+        counters = list(ic.process_notification(INSTANCE_RESIZE_REVERT_END))
         self.assertEqual(len(counters), 1)
         c = counters[0]
         self.assertEqual(c.volume,
@@ -550,7 +551,7 @@ class TestNotifications(base.TestCase):
 
     def test_instance_delete_samples(self):
         ic = notifications.InstanceDelete()
-        counters = ic.process_notification(INSTANCE_DELETE_SAMPLES)
+        counters = list(ic.process_notification(INSTANCE_DELETE_SAMPLES))
         self.assertEqual(len(counters), 2)
         names = [c.name for c in counters]
         self.assertEqual(names, ['sample-name1', 'sample-name2'])
@@ -561,7 +562,7 @@ class TestNotifications(base.TestCase):
         self.assertIn(INSTANCE_SCHEDULED['event_type'],
                       ic.get_event_types())
 
-        counters = ic.process_notification(INSTANCE_SCHEDULED)
+        counters = list(ic.process_notification(INSTANCE_SCHEDULED))
         self.assertEqual(len(counters), 1)
         names = [c.name for c in counters]
         self.assertEqual(names, ['instance.scheduled'])

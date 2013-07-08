@@ -22,10 +22,8 @@
 
 from oslo.config import cfg
 
-from ceilometer.compute import instance
 from ceilometer import counter
 from ceilometer import plugin
-from ceilometer import utils
 
 
 OPTS = [
@@ -39,7 +37,6 @@ cfg.CONF.register_opts(OPTS)
 
 
 class ComputeNotificationBase(plugin.NotificationBase):
-
     @staticmethod
     def get_exchange_topics(conf):
         """Return a sequence of ExchangeTopics defining the exchange and
@@ -54,50 +51,27 @@ class ComputeNotificationBase(plugin.NotificationBase):
 
 
 class InstanceScheduled(ComputeNotificationBase):
-
-    metadata_keys = ['request_spec']
-
     @staticmethod
     def get_event_types():
         return ['scheduler.run_instance.scheduled']
 
-    def notification_to_metadata(self, event):
-        metadata = super(InstanceScheduled,
-                         self).notification_to_metadata(event)
-        metadata['weighted_host'] = event['payload']['weighted_host']['host']
-        metadata['weight'] = event['payload']['weighted_host']['weight']
-        return metadata
-
     def process_notification(self, message):
-        return [
-            counter.Counter(
-                name='instance.scheduled',
-                type=counter.TYPE_DELTA,
-                volume=1,
-                unit='instance',
-                user_id=None,
-                project_id=
-                message['payload']['request_spec']
-                ['instance_properties']['project_id'],
-                resource_id=message['payload']['instance_id'],
-                timestamp=message['timestamp'],
-                resource_metadata=dict(
-                    utils.recursive_keypairs(message['payload'])),
-            )
-        ]
+        yield counter.Counter.from_notification(
+            name='instance.scheduled',
+            type=counter.TYPE_DELTA,
+            volume=1,
+            unit='instance',
+            user_id=None,
+            project_id=
+            message['payload']['request_spec']
+            ['instance_properties']['project_id'],
+            resource_id=message['payload']['instance_id'],
+            message=message)
 
 
 class ComputeInstanceNotificationBase(ComputeNotificationBase):
     """Convert compute.instance.* notifications into Counters
     """
-    metadata_keys = instance.INSTANCE_PROPERTIES
-
-    def notification_to_metadata(self, event):
-        metadata = super(ComputeInstanceNotificationBase,
-                         self).notification_to_metadata(event)
-        metadata['instance_type'] = event['payload']['instance_type_id']
-        return metadata
-
     @staticmethod
     def get_event_types():
         return ['compute.instance.create.end',
@@ -108,112 +82,83 @@ class ComputeInstanceNotificationBase(ComputeNotificationBase):
 
 
 class Instance(ComputeInstanceNotificationBase):
-
     def process_notification(self, message):
-        return [
-            counter.Counter(name='instance',
-                            type=counter.TYPE_GAUGE,
-                            unit='instance',
-                            volume=1,
-                            user_id=message['payload']['user_id'],
-                            project_id=message['payload']['tenant_id'],
-                            resource_id=message['payload']['instance_id'],
-                            timestamp=message['timestamp'],
-                            resource_metadata=self.notification_to_metadata(
-                                message),
-                            ),
-        ]
+        yield counter.Counter.from_notification(
+            name='instance',
+            type=counter.TYPE_GAUGE,
+            unit='instance',
+            volume=1,
+            user_id=message['payload']['user_id'],
+            project_id=message['payload']['tenant_id'],
+            resource_id=message['payload']['instance_id'],
+            message=message)
 
 
 class Memory(ComputeInstanceNotificationBase):
-
     def process_notification(self, message):
-        return [
-            counter.Counter(name='memory',
-                            type=counter.TYPE_GAUGE,
-                            unit='MB',
-                            volume=message['payload']['memory_mb'],
-                            user_id=message['payload']['user_id'],
-                            project_id=message['payload']['tenant_id'],
-                            resource_id=message['payload']['instance_id'],
-                            timestamp=message['timestamp'],
-                            resource_metadata=self.notification_to_metadata(
-                                message)),
-        ]
+        yield counter.Counter.from_notification(
+            name='memory',
+            type=counter.TYPE_GAUGE,
+            unit='MB',
+            volume=message['payload']['memory_mb'],
+            user_id=message['payload']['user_id'],
+            project_id=message['payload']['tenant_id'],
+            resource_id=message['payload']['instance_id'],
+            message=message)
 
 
 class VCpus(ComputeInstanceNotificationBase):
-
     def process_notification(self, message):
-        return [
-            counter.Counter(name='vcpus',
-                            type=counter.TYPE_GAUGE,
-                            unit='vcpu',
-                            volume=message['payload']['vcpus'],
-                            user_id=message['payload']['user_id'],
-                            project_id=message['payload']['tenant_id'],
-                            resource_id=message['payload']['instance_id'],
-                            timestamp=message['timestamp'],
-                            resource_metadata=self.notification_to_metadata(
-                                message)),
-        ]
+        yield counter.Counter.from_notification(
+            name='vcpus',
+            type=counter.TYPE_GAUGE,
+            unit='vcpu',
+            volume=message['payload']['vcpus'],
+            user_id=message['payload']['user_id'],
+            project_id=message['payload']['tenant_id'],
+            resource_id=message['payload']['instance_id'],
+            message=message)
 
 
 class RootDiskSize(ComputeInstanceNotificationBase):
-
     def process_notification(self, message):
-        return [
-            counter.Counter(name='disk.root.size',
-                            type=counter.TYPE_GAUGE,
-                            unit='GB',
-                            volume=message['payload']['root_gb'],
-                            user_id=message['payload']['user_id'],
-                            project_id=message['payload']['tenant_id'],
-                            resource_id=message['payload']['instance_id'],
-                            timestamp=message['timestamp'],
-                            resource_metadata=self.notification_to_metadata(
-                                message)),
-        ]
+        yield counter.Counter.from_notification(
+            name='disk.root.size',
+            type=counter.TYPE_GAUGE,
+            unit='GB',
+            volume=message['payload']['root_gb'],
+            user_id=message['payload']['user_id'],
+            project_id=message['payload']['tenant_id'],
+            resource_id=message['payload']['instance_id'],
+            message=message)
 
 
 class EphemeralDiskSize(ComputeInstanceNotificationBase):
-
     def process_notification(self, message):
-        return [
-            counter.Counter(name='disk.ephemeral.size',
-                            type=counter.TYPE_GAUGE,
-                            unit='GB',
-                            volume=message['payload']['ephemeral_gb'],
-                            user_id=message['payload']['user_id'],
-                            project_id=message['payload']['tenant_id'],
-                            resource_id=message['payload']['instance_id'],
-                            timestamp=message['timestamp'],
-                            resource_metadata=self.notification_to_metadata(
-                                message)),
-        ]
+        yield counter.Counter.from_notification(
+            name='disk.ephemeral.size',
+            type=counter.TYPE_GAUGE,
+            unit='GB',
+            volume=message['payload']['ephemeral_gb'],
+            user_id=message['payload']['user_id'],
+            project_id=message['payload']['tenant_id'],
+            resource_id=message['payload']['instance_id'],
+            message=message)
 
 
 class InstanceFlavor(ComputeInstanceNotificationBase):
-
     def process_notification(self, message):
-        counters = []
         instance_type = message.get('payload', {}).get('instance_type')
         if instance_type:
-            counters.append(
-                counter.Counter(
-                    name='instance:%s' % instance_type,
-                    type=counter.TYPE_GAUGE,
-                    unit='instance',
-                    volume=1,
-                    user_id=message['payload']['user_id'],
-                    project_id=message['payload']['tenant_id'],
-                    resource_id=message['payload']['instance_id'],
-                    timestamp=message['timestamp'],
-                    resource_metadata=self.notification_to_metadata(
-                        message),
-                )
-            )
-        return counters
+            yield counter.Counter.from_notification(
+                name='instance:%s' % instance_type,
+                type=counter.TYPE_GAUGE,
+                unit='instance',
+                volume=1,
+                user_id=message['payload']['user_id'],
+                project_id=message['payload']['tenant_id'],
+                resource_id=message['payload']['instance_id'],
+                message=message)
 
 
 class InstanceDelete(ComputeInstanceNotificationBase):
@@ -226,17 +171,13 @@ class InstanceDelete(ComputeInstanceNotificationBase):
         return ['compute.instance.delete.samples']
 
     def process_notification(self, message):
-        return [
-            counter.Counter(name=sample['name'],
-                            type=sample['type'],
-                            unit=sample['unit'],
-                            volume=sample['volume'],
-                            user_id=message['payload']['user_id'],
-                            project_id=message['payload']['tenant_id'],
-                            resource_id=message['payload']['instance_id'],
-                            timestamp=message['timestamp'],
-                            resource_metadata=self.notification_to_metadata(
-                                message),
-                            )
-            for sample in message['payload'].get('samples', [])
-        ]
+        for sample in message['payload'].get('samples', []):
+            yield counter.Counter.from_notification(
+                name=sample['name'],
+                type=sample['type'],
+                unit=sample['unit'],
+                volume=sample['volume'],
+                user_id=message['payload']['user_id'],
+                project_id=message['payload']['tenant_id'],
+                resource_id=message['payload']['instance_id'],
+                message=message)

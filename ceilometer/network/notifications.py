@@ -72,34 +72,31 @@ class NetworkNotificationBase(plugin.NotificationBase):
     def process_notification(self, message):
         LOG.info('network notification %r', message)
         message['payload'] = message['payload'][self.resource_name]
-        metadata = self.notification_to_metadata(message)
         counter_name = getattr(self, 'counter_name', self.resource_name)
         unit_value = getattr(self, 'unit', self.resource_name)
 
-        yield counter.Counter(name=counter_name,
-                              type=counter.TYPE_GAUGE,
-                              unit=unit_value,
-                              volume=1,
-                              user_id=message['_context_user_id'],
-                              project_id=message['payload']['tenant_id'],
-                              resource_id=message['payload']['id'],
-                              timestamp=message['timestamp'],
-                              resource_metadata=metadata,
-                              )
+        yield counter.Counter.from_notification(
+            name=counter_name,
+            type=counter.TYPE_GAUGE,
+            unit=unit_value,
+            volume=1,
+            user_id=message['_context_user_id'],
+            project_id=message['payload']['tenant_id'],
+            resource_id=message['payload']['id'],
+            message=message)
 
         event_type_split = message['event_type'].split('.')
         if len(event_type_split) > 2:
-            yield counter.Counter(name=counter_name
-                                  + "." + event_type_split[1],
-                                  type=counter.TYPE_DELTA,
-                                  unit=unit_value,
-                                  volume=1,
-                                  user_id=message['_context_user_id'],
-                                  project_id=message['payload']['tenant_id'],
-                                  resource_id=message['payload']['id'],
-                                  timestamp=message['timestamp'],
-                                  resource_metadata=metadata,
-                                  )
+            yield counter.Counter.from_notification(
+                name=counter_name
+                + "." + event_type_split[1],
+                type=counter.TYPE_DELTA,
+                unit=unit_value,
+                volume=1,
+                user_id=message['_context_user_id'],
+                project_id=message['payload']['tenant_id'],
+                resource_id=message['payload']['id'],
+                message=message)
 
 
 class Network(NetworkNotificationBase):
@@ -107,16 +104,6 @@ class Network(NetworkNotificationBase):
     metering framework.
 
     """
-
-    metadata_keys = [
-        "status",
-        "subnets",
-        "name",
-        "router:external",
-        "admin_state_up",
-        "shared",
-    ]
-
     resource_name = 'network'
 
 
@@ -125,19 +112,6 @@ class Subnet(NetworkNotificationBase):
     metering framework.
 
     """
-
-    metadata_keys = [
-        "name",
-        "enable_dhcp",
-        "network_id",
-        "dns_nameservers",
-        "allocation_pools",
-        "host_routes",
-        "ip_version",
-        "gateway_ip",
-        "cidr",
-    ]
-
     resource_name = 'subnet'
 
 
@@ -146,18 +120,6 @@ class Port(NetworkNotificationBase):
     metering framework.
 
     """
-
-    metadata_keys = [
-        "status",
-        "name",
-        "admin_state_up",
-        "network_id",
-        "device_owner",
-        "mac_address",
-        "fixed_ips",
-        "device_id",
-    ]
-
     resource_name = 'port'
 
 
@@ -166,14 +128,6 @@ class Router(NetworkNotificationBase):
     metering framework.
 
     """
-
-    metadata_keys = [
-        "status",
-        "external_gateway_info",
-        "admin_state_up",
-        "name",
-    ]
-
     resource_name = 'router'
 
 
@@ -182,15 +136,6 @@ class FloatingIP(NetworkNotificationBase):
     metering framework.
 
     """
-
-    metadata_keys = [
-        "router_id",
-        "floating_network_id",
-        "fixed_ip_address",
-        "floating_ip_address",
-        "port_id",
-    ]
-
     resource_name = 'floatingip'
     counter_name = 'ip.floating'
     unit = 'ip'
