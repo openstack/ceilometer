@@ -264,6 +264,8 @@ class Connection(base.Connection):
                 ('timestamp', pymongo.ASCENDING),
                 ('source', pymongo.ASCENDING),
             ], name='meter_idx')
+        self.db.meter.ensure_index([('timestamp', pymongo.DESCENDING)],
+                                   name='timestamp_idx')
 
     def upgrade(self, version=None):
         pass
