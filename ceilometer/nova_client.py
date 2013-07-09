@@ -52,37 +52,43 @@ class Client(object):
                                               no_cache=True)
 
     def _with_flavor_and_image(self, instances):
-        flavor_attrs = ['name', 'vcpus', 'ram', 'disk']
         for instance in instances:
-            fid = instance.flavor['id']
-            try:
-                flavor = self.nova_client.flavors.get(fid)
-            except novaclient.exceptions.NotFound:
-                flavor = None
-
-            for attr in flavor_attrs:
-                try:
-                    instance.flavor[attr] = getattr(flavor, attr)
-                except (KeyError, AttributeError):
-                    if attr == 'name':
-                        instance.flavor['name'] = 'unknown-id-%s' % fid
-
-            iid = instance.image['id']
-            try:
-                image = self.nova_client.images.get(iid)
-            except novaclient.exceptions.NotFound:
-                image = None
-
-            try:
-                image_meta = getattr(image, 'metadata')
-            except (KeyError, AttributeError):
-                instance.image['name'] = 'unknown-id-%s' % iid
-            else:
-                instance.image['name'] = getattr(image, 'name')
-                instance.kernel_id = image_meta['kernel_id']
-                instance.ramdisk_id = image_meta['ramdisk_id']
+            self._with_flavor(instance)
+            self._with_image(instance)
 
         return instances
+
+    def _with_flavor(self, instance):
+        fid = instance.flavor['id']
+        try:
+            flavor = self.nova_client.flavors.get(fid)
+        except novaclient.exceptions.NotFound:
+            flavor = None
+
+        attr_defaults = [('name', 'unknown-id-%s' % fid),
+                         ('vcpus', 0), ('ram', 0), ('disk', 0)]
+        for attr, default in attr_defaults:
+            if not flavor:
+                instance.flavor[attr] = default
+                continue
+            instance.flavor[attr] = getattr(flavor, attr, default)
+
+    def _with_image(self, instance):
+        iid = instance.image['id']
+        try:
+            image = self.nova_client.images.get(iid)
+        except novaclient.exceptions.NotFound:
+            instance.image['name'] = 'unknown-id-%s' % iid
+            instance.kernel_id = None
+            instance.ramdisk_id = None
+            return
+
+        instance.image['name'] = getattr(image, 'name')
+        image_metadata = getattr(image, 'metadata', None)
+
+        for attr in ['kernel_id', 'ramdisk_id']:
+            ameta = image_metadata.get(attr, None) if image_metadata else None
+            setattr(instance, attr, ameta)
 
     @logged
     def instance_get_all_by_host(self, hostname):
