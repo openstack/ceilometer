@@ -22,5 +22,6 @@ lxml
 requests>=1.1,<1.2.1
 wsme>=0.5b2
 pyyaml
-http://tarballs.openstack.org/oslo.config/oslo.config-1.2.0a2.tar.gz#egg=oslo.config-1.2.0a2
+-f http://tarballs.openstack.org/oslo.config/oslo.config-1.2.0a3.tar.gz#egg=oslo.config-1.2.0a3
+oslo.config>=1.2.0a3
 happybase>=0.4
