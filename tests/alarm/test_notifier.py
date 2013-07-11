@@ -15,11 +15,14 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+import eventlet
 import urlparse
 import mock
+import requests
 
 from ceilometer.alarm import service
 from ceilometer.openstack.common import context
+from ceilometer.openstack.common import network_utils
 from ceilometer.tests import base
 
 
@@ -55,6 +58,25 @@ class TestAlarmNotifier(base.TestCase):
                                       'alarm': {'name': 'foobar'},
                                       'condition': {'threshold': 42},
                                   })
+
+    def test_notify_alarm_rest_action(self):
+        action = 'http://host/action'
+        data_json = '{"state": "ALARM", "reason": "what ?"}'
+
+        self.mox.StubOutWithMock(requests, "post")
+        requests.post(network_utils.urlsplit(action), data=data_json)
+        self.mox.ReplayAll()
+        self.service.notify_alarm(context.get_admin_context(),
+                                  {
+                                      'actions': [action],
+                                      'alarm': {'name': 'foobar'},
+                                      'condition': {'threshold': 42},
+                                      'reason': 'what ?',
+                                      'state': 'ALARM',
+                                  })
+        eventlet.sleep(1)
+        self.mox.UnsetStubs()
+        self.mox.VerifyAll()
 
     @staticmethod
     def _fake_urlsplit(*args, **kwargs):
