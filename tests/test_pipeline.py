@@ -24,6 +24,7 @@ from ceilometer import publisher
 from ceilometer.publisher import test as test_publisher
 from ceilometer import transformer
 from ceilometer.transformer import accumulator
+from ceilometer.transformer import conversions
 from ceilometer.openstack.common import timeutils
 from ceilometer import pipeline
 from ceilometer.tests import base
@@ -44,7 +45,9 @@ class TestPipeline(base.TestCase):
             'update': self.TransformerClass,
             'except': self.TransformerClassException,
             'drop': self.TransformerClassDrop,
-            'cache': accumulator.TransformerAccumulator}
+            'cache': accumulator.TransformerAccumulator,
+            'unit_conversion': conversions.ScalingTransformer,
+        }
 
         if name in class_name_ext:
             return extension.Extension(name, None,
@@ -631,3 +634,111 @@ class TestPipeline(base.TestCase):
                          'a:b_update')
         self.assertTrue(getattr(self.TransformerClass.samples[0], "name")
                         == 'a:b')
+
+    def _do_test_global_unit_conversion(self, replace, scale):
+        self.pipeline_cfg[0]['transformers'] = [
+            {
+                'name': 'unit_conversion',
+                'parameters': {
+                    'source': {},
+                    'target': {'name': 'cpu_mins',
+                               'unit': 'min',
+                               'scale': scale},
+                    'replace': replace
+                }
+            },
+        ]
+        self.pipeline_cfg[0]['counters'] = ['cpu']
+        counters = [
+            counter.Counter(
+                name='cpu',
+                type=counter.TYPE_CUMULATIVE,
+                volume=1200000000,
+                unit='ns',
+                user_id='test_user',
+                project_id='test_proj',
+                resource_id='test_resource',
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata={}
+            ),
+        ]
+
+        pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager)
+        pipe = pipeline_manager.pipelines[0]
+
+        pipe.publish_counters(None, counters, None)
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+        self.assertEqual(len(publisher.counters), 1)
+        pipe.flush(None, None)
+        self.assertEqual(len(publisher.counters), 1 if replace else 2)
+        cpu_mins = publisher.counters[-1]
+        self.assertEquals(getattr(cpu_mins, 'name'), 'cpu_mins')
+        self.assertEquals(getattr(cpu_mins, 'unit'), 'min')
+        self.assertEquals(getattr(cpu_mins, 'type'), counter.TYPE_CUMULATIVE)
+        self.assertEquals(getattr(cpu_mins, 'volume'), 20)
+        if not replace:
+            self.assertEquals(publisher.counters[0], counters[0])
+
+    def test_global_unit_conversion_replacing(self):
+        scale = 'volume / ((10**6) * 60)'
+        self._do_test_global_unit_conversion(True, scale)
+
+    def test_global_unit_conversion_additive(self):
+        scale = 1 / ((10 ** 6) * 60.0)
+        self._do_test_global_unit_conversion(False, scale)
+
+    def test_unit_identified_source_unit_conversion(self):
+        self.pipeline_cfg[0]['transformers'] = [
+            {
+                'name': 'unit_conversion',
+                'parameters': {
+                    'source': {'unit': '°C'},
+                    'target': {'unit': '°F',
+                               'scale': '(volume * 1.8) + 32'},
+                    'replace': True
+                }
+            },
+        ]
+        self.pipeline_cfg[0]['counters'] = ['core_temperature',
+                                            'ambient_temperature']
+        counters = [
+            counter.Counter(
+                name='core_temperature',
+                type=counter.TYPE_GAUGE,
+                volume=36.0,
+                unit='°C',
+                user_id='test_user',
+                project_id='test_proj',
+                resource_id='test_resource',
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata={}
+            ),
+            counter.Counter(
+                name='ambient_temperature',
+                type=counter.TYPE_GAUGE,
+                volume=88.8,
+                unit='°F',
+                user_id='test_user',
+                project_id='test_proj',
+                resource_id='test_resource',
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata={}
+            ),
+        ]
+
+        pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager)
+        pipe = pipeline_manager.pipelines[0]
+
+        pipe.publish_counters(None, counters, None)
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+        self.assertEqual(len(publisher.counters), 2)
+        core_temp = publisher.counters[1]
+        self.assertEquals(getattr(core_temp, 'name'), 'core_temperature')
+        self.assertEquals(getattr(core_temp, 'unit'), '°F')
+        self.assertEquals(getattr(core_temp, 'volume'), 96.8)
+        amb_temp = publisher.counters[0]
+        self.assertEquals(getattr(amb_temp, 'name'), 'ambient_temperature')
+        self.assertEquals(getattr(amb_temp, 'unit'), '°F')
+        self.assertEquals(getattr(amb_temp, 'volume'), 88.8)
