@@ -18,6 +18,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import collections
 import copy
 import datetime
 
@@ -144,6 +145,12 @@ class InstancePollster(plugin.ComputePollster):
                                          volume=1)
 
 
+DiskIOData = collections.namedtuple(
+    'DiskIOData',
+    'r_bytes r_requests w_bytes w_requests',
+)
+
+
 class DiskIOPollster(plugin.ComputePollster):
 
     LOG = log.getLogger(__name__ + '.diskio')
@@ -164,14 +171,16 @@ class DiskIOPollster(plugin.ComputePollster):
                 'disk.write.requests',
                 'disk.write.bytes']
 
-    def get_counters(self, manager, cache, instance):
-        instance_name = _instance_name(instance)
-        try:
+    CACHE_KEY_DISK = 'diskio'
+
+    def _populate_cache(self, inspector, cache, instance, instance_name):
+        i_cache = cache.setdefault(self.CACHE_KEY_DISK, {})
+        if instance_name not in i_cache:
             r_bytes = 0
             r_requests = 0
             w_bytes = 0
             w_requests = 0
-            for disk, info in manager.inspector.inspect_disks(instance_name):
+            for disk, info in inspector.inspect_disks(instance_name):
                 self.LOG.info(self.DISKIO_USAGE_MESSAGE,
                               instance, disk.device, info.read_requests,
                               info.read_bytes, info.write_requests,
@@ -180,29 +189,46 @@ class DiskIOPollster(plugin.ComputePollster):
                 r_requests += info.read_requests
                 w_bytes += info.write_bytes
                 w_requests += info.write_requests
+            i_cache[instance_name] = DiskIOData(
+                r_bytes=r_bytes,
+                r_requests=r_requests,
+                w_bytes=w_bytes,
+                w_requests=w_requests,
+            )
+        return i_cache[instance_name]
+
+    def get_counters(self, manager, cache, instance):
+        instance_name = _instance_name(instance)
+        c_data = self._populate_cache(
+            manager.inspector,
+            cache,
+            instance,
+            instance_name,
+        )
+        try:
             yield make_counter_from_instance(instance,
                                              name='disk.read.requests',
                                              type=counter.TYPE_CUMULATIVE,
                                              unit='request',
-                                             volume=r_requests,
+                                             volume=c_data.r_requests,
                                              )
             yield make_counter_from_instance(instance,
                                              name='disk.read.bytes',
                                              type=counter.TYPE_CUMULATIVE,
                                              unit='B',
-                                             volume=r_bytes,
+                                             volume=c_data.r_bytes,
                                              )
             yield make_counter_from_instance(instance,
                                              name='disk.write.requests',
                                              type=counter.TYPE_CUMULATIVE,
                                              unit='request',
-                                             volume=w_requests,
+                                             volume=c_data.w_requests,
                                              )
             yield make_counter_from_instance(instance,
                                              name='disk.write.bytes',
                                              type=counter.TYPE_CUMULATIVE,
                                              unit='B',
-                                             volume=w_bytes,
+                                             volume=c_data.w_bytes,
                                              )
         except Exception as err:
             self.LOG.warning('Ignoring instance %s: %s',

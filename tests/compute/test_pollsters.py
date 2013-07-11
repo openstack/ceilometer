@@ -156,8 +156,11 @@ class TestDiskIOPollster(TestPollsterBase):
 
         mgr = manager.AgentManager()
         pollster = pollsters.DiskIOPollster()
-        counters = list(pollster.get_counters(mgr, {}, self.instance))
+        cache = {}
+        counters = list(pollster.get_counters(mgr, cache, self.instance))
         assert counters
+        assert pollster.CACHE_KEY_DISK in cache
+        assert self.instance.name in cache[pollster.CACHE_KEY_DISK]
 
         self.assertEqual(set([c.name for c in counters]),
                          set(pollster.get_counter_names()))
@@ -172,6 +175,40 @@ class TestDiskIOPollster(TestPollsterBase):
         _verify_disk_metering('disk.read.bytes', 1L)
         _verify_disk_metering('disk.write.requests', 4L)
         _verify_disk_metering('disk.write.bytes', 3L)
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def test_get_counters_cache(self):
+        self.mox.ReplayAll()
+
+        mgr = manager.AgentManager()
+        pollster = pollsters.DiskIOPollster()
+        cache = {
+            pollster.CACHE_KEY_DISK: {
+                self.instance.name: pollsters.DiskIOData(
+                    r_bytes=-1,
+                    r_requests=-2,
+                    w_bytes=-3,
+                    w_requests=-4,
+                ),
+            },
+        }
+
+        counters = list(pollster.get_counters(mgr, cache, self.instance))
+        assert counters
+
+        self.assertEqual(set([c.name for c in counters]),
+                         set(pollster.get_counter_names()))
+
+        def _verify_disk_metering(name, expected_volume):
+            match = [c for c in counters if c.name == name]
+            self.assertEquals(len(match), 1, 'missing counter %s' % name)
+            self.assertEquals(match[0].volume, expected_volume)
+            self.assertEquals(match[0].type, 'cumulative')
+
+        _verify_disk_metering('disk.read.requests', -2L)
+        _verify_disk_metering('disk.read.bytes', -1L)
+        _verify_disk_metering('disk.write.requests', -4L)
+        _verify_disk_metering('disk.write.bytes', -3L)
 
 
 class TestNetPollster(TestPollsterBase):
