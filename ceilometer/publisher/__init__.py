@@ -20,7 +20,7 @@
 
 import abc
 from stevedore import driver
-import urlparse
+from ceilometer.openstack.common import network_utils
 
 
 def get_publisher(url, namespace='ceilometer.publisher'):
@@ -29,7 +29,7 @@ def get_publisher(url, namespace='ceilometer.publisher'):
     :param URL: URL for the publisher
     :param namespace: Namespace to use to look for drivers.
     """
-    parse_result = urlparse.urlparse(url)
+    parse_result = network_utils.urlsplit(url)
     loaded_driver = driver.DriverManager(namespace, parse_result.scheme)
     return loaded_driver.driver(parse_result)
 

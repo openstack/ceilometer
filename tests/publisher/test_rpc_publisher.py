@@ -3,6 +3,7 @@
 # Copyright © 2012 New Dream Network, LLC (DreamHost)
 #
 # Author: Doug Hellmann <doug.hellmann@dreamhost.com>
+#         Julien Danjou <julien@danjou.info>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -24,6 +25,7 @@ from oslo.config import cfg
 
 from ceilometer import counter
 from ceilometer.openstack.common import jsonutils
+from ceilometer.openstack.common import network_utils
 from ceilometer.openstack.common import rpc as oslo_rpc
 from ceilometer.publisher import rpc
 from ceilometer.tests import base
@@ -255,12 +257,24 @@ class TestPublish(base.TestCase):
         super(TestPublish, self).setUp()
         self.published = []
         self.stubs.Set(oslo_rpc, 'cast', self.faux_cast)
-        publisher = rpc.RPCPublisher(None)
+
+    def test_published(self):
+        publisher = rpc.RPCPublisher(
+            network_utils.urlsplit('rpc://'))
         publisher.publish_counters(None,
                                    self.test_data,
                                    'test')
+        self.assertEqual(len(self.published), 1)
+        self.assertEqual(self.published[0][0],
+                         cfg.CONF.publisher_rpc.metering_topic)
+        self.assertIsInstance(self.published[0][1]['args']['data'], list)
 
-    def test_published(self):
+    def test_published_with_per_meter_topic(self):
+        publisher = rpc.RPCPublisher(
+            network_utils.urlsplit('rpc://?per_meter_topic=1'))
+        publisher.publish_counters(None,
+                                   self.test_data,
+                                   'test')
         self.assertEqual(len(self.published), 4)
         for topic, rpc_call in self.published:
             meters = rpc_call['args']['data']
@@ -271,7 +285,6 @@ class TestPublish(base.TestCase):
                                  1,
                                  "Meter are published grouped by name")
 
-    def test_published_topics(self):
         topics = [topic for topic, meter in self.published]
         self.assertIn(cfg.CONF.publisher_rpc.metering_topic, topics)
         self.assertIn(

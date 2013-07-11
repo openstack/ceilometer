@@ -22,11 +22,11 @@ import datetime
 import mock
 import msgpack
 from oslo.config import cfg
-import urlparse
 
 from ceilometer import counter
 from ceilometer.publisher import udp
 from ceilometer.tests import base
+from ceilometer.openstack.common import network_utils
 
 
 class TestUDPPublisher(base.TestCase):
@@ -105,7 +105,8 @@ class TestUDPPublisher(base.TestCase):
         self.data_sent = []
         with mock.patch('socket.socket',
                         self._make_fake_socket(self.data_sent)):
-            publisher = udp.UDPPublisher(urlparse.urlparse('udp://somehost'))
+            publisher = udp.UDPPublisher(
+                network_utils.urlsplit('udp://somehost'))
         publisher.publish_counters(None,
                                    self.test_data,
                                    self.COUNTER_SOURCE)
@@ -142,7 +143,8 @@ class TestUDPPublisher(base.TestCase):
     def test_publish_error(self):
         with mock.patch('socket.socket',
                         self._make_broken_socket):
-            publisher = udp.UDPPublisher(urlparse.urlparse('udp://localhost'))
+            publisher = udp.UDPPublisher(
+                network_utils.urlsplit('udp://localhost'))
         publisher.publish_counters(None,
                                    self.test_data,
                                    self.COUNTER_SOURCE)
