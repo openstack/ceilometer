@@ -24,11 +24,36 @@
   running the tests. Make sure the Thrift server is running on that server.
 
 """
+from oslo.config import cfg
+
+from ceilometer.storage.impl_hbase import Connection
+from ceilometer.storage.impl_hbase import MConnection
 from tests.storage import base
 
 
 class HBaseEngineTestBase(base.DBTestBase):
     database_connection = 'hbase://__test__'
+
+
+class ConnectionTest(HBaseEngineTestBase):
+
+    def test_hbase_connection(self):
+        cfg.CONF.database.connection = self.database_connection
+        conn = Connection(cfg.CONF)
+        self.assertIsInstance(conn.conn, MConnection)
+
+        class TestConn(object):
+            def __init__(self, host, port):
+                self.netloc = '%(host)s:%(port)s' % locals()
+
+            def open(self):
+                pass
+
+        cfg.CONF.database.connection = 'hbase://test_hbase:9090'
+        self.stubs.Set(Connection, '_get_connection',
+                       lambda self, x: TestConn(x['host'], x['port']))
+        conn = Connection(cfg.CONF)
+        self.assertIsInstance(conn.conn, TestConn)
 
 
 class UserTest(base.UserTest, HBaseEngineTestBase):
