@@ -348,11 +348,26 @@ class NetPollster(plugin.ComputePollster):
                 'network.outgoing.bytes',
                 'network.outgoing.packets']
 
+    CACHE_KEY_VNIC = 'vnics'
+
+    def _get_vnics_for_instance(self, cache, inspector, instance_name):
+        i_cache = cache.setdefault(self.CACHE_KEY_VNIC, {})
+        if instance_name not in i_cache:
+            i_cache[instance_name] = list(
+                inspector.inspect_vnics(instance_name)
+            )
+        return i_cache[instance_name]
+
     def get_counters(self, manager, cache, instance):
         instance_name = _instance_name(instance)
         self.LOG.info('checking instance %s', instance.id)
         try:
-            for vnic, info in manager.inspector.inspect_vnics(instance_name):
+            vnics = self._get_vnics_for_instance(
+                cache,
+                manager.inspector,
+                instance_name,
+            )
+            for vnic, info in vnics:
                 self.LOG.info(self.NET_USAGE_MESSAGE, instance_name,
                               vnic.name, info.rx_bytes, info.tx_bytes)
                 yield self.make_vnic_counter(instance,
