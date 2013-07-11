@@ -22,7 +22,8 @@ import json
 import urlparse
 
 from oslo.config import cfg
-from sqlalchemy import Column, Integer, String, Table, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, Table, ForeignKey, DateTime, \
+    Index
 from sqlalchemy import Float, Boolean, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref
@@ -108,6 +109,12 @@ class Meter(Base):
     """Metering data."""
 
     __tablename__ = 'meter'
+    __table_args__ = (
+        Index('ix_meter_timestamp', 'timestamp'),
+        Index('ix_meter_user_id', 'user_id'),
+        Index('ix_meter_project_id', 'project_id'),
+        Index('idx_meter_rid_cname', 'resource_id', 'counter_name'),
+    )
     id = Column(Integer, primary_key=True)
     counter_name = Column(String(255))
     sources = relationship("Source", secondary=lambda: sourceassoc)
@@ -119,8 +126,8 @@ class Meter(Base):
     counter_unit = Column(String(255))
     counter_volume = Column(Float(53))
     timestamp = Column(DateTime, default=timeutils.utcnow)
-    message_signature = Column(String)
-    message_id = Column(String)
+    message_signature = Column(String(1000))
+    message_id = Column(String(1000))
 
 
 class User(Base):
@@ -141,6 +148,10 @@ class Project(Base):
 
 class Resource(Base):
     __tablename__ = 'resource'
+    __table_ards__ = (
+        Index('ix_resource_project_id', 'project_id'),
+        Index('ix_resource_user_id', 'user_id'),
+    )
     id = Column(String(255), primary_key=True)
     sources = relationship("Source", secondary=lambda: sourceassoc)
     resource_metadata = Column(JSONEncodedDict)
@@ -152,12 +163,17 @@ class Resource(Base):
 class Alarm(Base):
     """Define Alarm data."""
     __tablename__ = 'alarm'
+    __table_ards__ = (
+        Index('ix_alarm_user_id', 'user_id'),
+        Index('ix_alarm_project_id', 'project_id'),
+        Index('ix_alarm_counter_name', 'counter_name'),
+    )
     id = Column(String(255), primary_key=True)
     enabled = Column(Boolean)
     name = Column(Text)
     description = Column(Text)
     timestamp = Column(DateTime, default=timeutils.utcnow)
-    counter_name = Column(Text)
+    counter_name = Column(String(255))
 
     user_id = Column(String(255), ForeignKey('user.id'))
     project_id = Column(String(255), ForeignKey('project.id'))
@@ -194,8 +210,12 @@ class UniqueName(Base):
 
 class Event(Base):
     __tablename__ = 'event'
+    __table_args__ = (
+        Index('unique_name_id', 'unique_name_id'),
+        Index('ix_event_generated', 'generated'),
+    )
     id = Column(Integer, primary_key=True)
-    generated = Column(Float(asdecimal=True), index=True)
+    generated = Column(Float(asdecimal=True))
 
     unique_name_id = Column(Integer, ForeignKey('unique_name.id'))
     unique_name = relationship("UniqueName", backref=backref('unique_name',
