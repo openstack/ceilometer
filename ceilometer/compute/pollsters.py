@@ -242,7 +242,7 @@ class CPUPollster(plugin.ComputePollster):
 
     utilization_map = {}
 
-    def get_cpu_util(self, instance, cpu_info):
+    def _get_cpu_util(self, instance, cpu_info):
         prev_times = self.utilization_map.get(instance.id)
         self.utilization_map[instance.id] = (cpu_info.time,
                                              datetime.datetime.now())
@@ -259,6 +259,14 @@ class CPUPollster(plugin.ComputePollster):
             cpu_util = 100 * cores_fraction * time_used / elapsed
         return cpu_util
 
+    CACHE_KEY_CPU = 'cpu'
+
+    def _get_cpu_info(self, inspector, instance_name, cache):
+        i_cache = cache.setdefault(self.CACHE_KEY_CPU, {})
+        if instance_name not in i_cache:
+            i_cache[instance_name] = inspector.inspect_cpus(instance_name)
+        return i_cache[instance_name]
+
     @staticmethod
     def get_counter_names():
         return ['cpu', 'cpu_util']
@@ -267,10 +275,14 @@ class CPUPollster(plugin.ComputePollster):
         self.LOG.info('checking instance %s', instance.id)
         instance_name = _instance_name(instance)
         try:
-            cpu_info = manager.inspector.inspect_cpus(instance_name)
+            cpu_info = self._get_cpu_info(
+                manager.inspector,
+                instance_name,
+                cache,
+            )
             self.LOG.info("CPUTIME USAGE: %s %d",
                           instance.__dict__, cpu_info.time)
-            cpu_util = self.get_cpu_util(instance, cpu_info)
+            cpu_util = self._get_cpu_util(instance, cpu_info)
             self.LOG.info("CPU UTILIZATION %%: %s %0.2f",
                           instance.__dict__, cpu_util)
             # FIXME(eglynn): once we have a way of configuring which measures
