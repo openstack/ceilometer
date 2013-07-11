@@ -31,7 +31,7 @@ from ceilometer.openstack.common import rpc
 
 cfg.CONF.register_opts([
     cfg.StrOpt('host',
-               default=socket.getfqdn(),
+               default=socket.gethostname(),
                help='Name of this node.  This can be an opaque identifier.  '
                'It is not necessarily a hostname, FQDN, or IP address. '
                'However, the node name must be valid within '
