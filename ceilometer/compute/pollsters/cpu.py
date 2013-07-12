@@ -69,12 +69,14 @@ class CPUPollster(_Base):
     def _get_counter(instance, instance_name, cpu_info):
         LOG.info("CPUTIME USAGE: %s %d",
                  instance.__dict__, cpu_info.time)
+        cpu_num = {'cpu_number': cpu_info.number}
         return util.make_counter_from_instance(
             instance,
             name='cpu',
             type=counter.TYPE_CUMULATIVE,
             unit='ns',
             volume=cpu_info.time,
+            additional_metadata=cpu_num,
         )
 
 
