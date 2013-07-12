@@ -66,10 +66,6 @@ class _Base(plugin.ComputePollster):
 class CPUPollster(_Base):
 
     @staticmethod
-    def get_counter_names():
-        return ['cpu']
-
-    @staticmethod
     def _get_counter(instance, instance_name, cpu_info):
         LOG.info("CPUTIME USAGE: %s %d",
                  instance.__dict__, cpu_info.time)
@@ -90,10 +86,6 @@ class CPUUtilPollster(_Base):
     #                that specifically need it
 
     utilization_map = {}
-
-    @staticmethod
-    def get_counter_names():
-        return ['cpu_util']
 
     def _get_cpu_util(self, instance, cpu_info):
         prev_times = self.utilization_map.get(instance.id)

@@ -76,10 +76,6 @@ class PollsterBase(PluginBase):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def get_counter_names(self):
-        """Return a sequence of Counter names supported by the pollster."""
-
-    @abc.abstractmethod
     def get_counters(self, manager, cache):
         """Return a sequence of Counter instances from polling the resources.
 

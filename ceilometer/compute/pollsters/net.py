@@ -91,10 +91,6 @@ class _Base(plugin.ComputePollster):
 
 class IncomingBytesPollster(_Base):
 
-    @staticmethod
-    def get_counter_names():
-        return ['network.incoming.bytes']
-
     def _get_counter(self, instance, vnic, info):
         return self.make_vnic_counter(
             instance,
@@ -107,10 +103,6 @@ class IncomingBytesPollster(_Base):
 
 
 class IncomingPacketsPollster(_Base):
-
-    @staticmethod
-    def get_counter_names():
-        return ['network.incoming.packets']
 
     def _get_counter(self, instance, vnic, info):
         return self.make_vnic_counter(
@@ -125,10 +117,6 @@ class IncomingPacketsPollster(_Base):
 
 class OutgoingBytesPollster(_Base):
 
-    @staticmethod
-    def get_counter_names():
-        return ['network.outgoing.bytes']
-
     def _get_counter(self, instance, vnic, info):
         return self.make_vnic_counter(
             instance,
@@ -141,10 +129,6 @@ class OutgoingBytesPollster(_Base):
 
 
 class OutgoingPacketsPollster(_Base):
-
-    @staticmethod
-    def get_counter_names():
-        return ['network.outgoing.packets']
 
     def _get_counter(self, instance, vnic, info):
         return self.make_vnic_counter(

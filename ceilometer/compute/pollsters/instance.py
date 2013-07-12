@@ -26,10 +26,6 @@ from ceilometer.compute.pollsters import util
 class InstancePollster(plugin.ComputePollster):
 
     @staticmethod
-    def get_counter_names():
-        return ['instance']
-
-    @staticmethod
     def get_counters(manager, cache, instance):
         yield util.make_counter_from_instance(
             instance,
@@ -43,15 +39,10 @@ class InstancePollster(plugin.ComputePollster):
 class InstanceFlavorPollster(plugin.ComputePollster):
 
     @staticmethod
-    def get_counter_names():
-        # Instance type counter is specific because it includes
-        # variable. We don't need such format in future
-        return ['instance:*']
-
-    @staticmethod
     def get_counters(manager, cache, instance):
         yield util.make_counter_from_instance(
             instance,
+            # Use the "meter name + variable" syntax
             name='instance:%s' %
             instance.flavor['name'],
             type=counter.TYPE_GAUGE,

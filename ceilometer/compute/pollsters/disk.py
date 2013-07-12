@@ -95,10 +95,6 @@ class _Base(plugin.ComputePollster):
 class ReadRequestsPollster(_Base):
 
     @staticmethod
-    def get_counter_names():
-        return ['disk.read.requests']
-
-    @staticmethod
     def _get_counter(instance, c_data):
         return util.make_counter_from_instance(
             instance,
@@ -110,10 +106,6 @@ class ReadRequestsPollster(_Base):
 
 
 class ReadBytesPollster(_Base):
-
-    @staticmethod
-    def get_counter_names():
-        return ['disk.read.bytes']
 
     @staticmethod
     def _get_counter(instance, c_data):
@@ -129,10 +121,6 @@ class ReadBytesPollster(_Base):
 class WriteRequestsPollster(_Base):
 
     @staticmethod
-    def get_counter_names():
-        return ['disk.write.requests']
-
-    @staticmethod
     def _get_counter(instance, c_data):
         return util.make_counter_from_instance(
             instance,
@@ -144,10 +132,6 @@ class WriteRequestsPollster(_Base):
 
 
 class WriteBytesPollster(_Base):
-
-    @staticmethod
-    def get_counter_names():
-        return ['disk.write.bytes']
 
     @staticmethod
     def _get_counter(instance, c_data):

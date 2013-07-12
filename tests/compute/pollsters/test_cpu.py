@@ -53,8 +53,7 @@ class TestCPUPollster(base.TestPollsterBase):
             counters = list(pollster.get_counters(mgr, cache, self.instance))
             self.assertEquals(len(counters), 1)
             self.assertEqual(set([c.name for c in counters]),
-                             set(pollster.get_counter_names()))
-            assert counters[0].name == 'cpu'
+                             set(['cpu']))
             assert counters[0].volume == expected_time
             assert pollster.CACHE_KEY_CPU in cache
             assert self.instance.name in cache[pollster.CACHE_KEY_CPU]
@@ -110,8 +109,7 @@ class TestCPUUtilPollster(base.TestPollsterBase):
             counters = list(pollster.get_counters(mgr, cache, self.instance))
             self.assertEquals(len(counters), 1)
             self.assertEqual(set([c.name for c in counters]),
-                             set(pollster.get_counter_names()))
-            assert counters[0].name == 'cpu_util'
+                             set(['cpu_util']))
             assert (counters[0].volume == 0.0 if zero else
                     counters[0].volume > 0.0)
             assert pollster.CACHE_KEY_CPU in cache

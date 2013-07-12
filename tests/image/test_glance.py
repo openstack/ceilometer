@@ -166,10 +166,10 @@ class TestImagePollster(base.TestCase):
     def test_image_get_counter_names(self):
         counters = list(glance.ImagePollster().get_counters(self.manager, {}))
         self.assertEqual(set([c.name for c in counters]),
-                         set(glance.ImagePollster().get_counter_names()))
+                         set(['image']))
 
     def test_image_size_get_counter_names(self):
         counters = list(glance.ImageSizePollster().get_counters(self.manager,
                                                                 {}))
         self.assertEqual(set([c.name for c in counters]),
-                         set(glance.ImageSizePollster().get_counter_names()))
+                         set(['image.size']))

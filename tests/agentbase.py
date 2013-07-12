@@ -48,10 +48,6 @@ default_test_data = counter.Counter(
 class TestPollster:
     test_data = default_test_data
 
-    @classmethod
-    def get_counter_names(self):
-        return [self.test_data.name]
-
     def get_counters(self, manager, cache, instance=None):
         self.counters.append((manager, instance))
         return [self.test_data]
