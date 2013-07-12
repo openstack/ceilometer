@@ -102,7 +102,7 @@ class ImagePollster(_Base):
 
     @staticmethod
     def get_counter_names():
-        return ['image', 'image.size']
+        return ['image']
 
     def get_counters(self, manager, cache):
         for image in self._iter_images(manager.keystone, cache):
@@ -117,6 +117,16 @@ class ImagePollster(_Base):
                 timestamp=timeutils.isotime(),
                 resource_metadata=self.extract_image_metadata(image),
             )
+
+
+class ImageSizePollster(_Base):
+
+    @staticmethod
+    def get_counter_names():
+        return ['image.size']
+
+    def get_counters(self, manager, cache):
+        for image in self._iter_images(manager.keystone, cache):
             yield counter.Counter(
                 name='image.size',
                 type=counter.TYPE_GAUGE,
