@@ -1,0 +1,103 @@
+# -*- encoding: utf-8 -*-
+#
+# Copyright © 2012 eNovance <licensing@enovance.com>
+# Copyright © 2012 Red Hat, Inc
+#
+# Author: Julien Danjou <julien@danjou.info>
+# Author: Eoghan Glynn <eglynn@redhat.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+"""Tests for the compute pollsters.
+"""
+
+import mock
+
+from ceilometer.compute import manager
+from ceilometer.compute.pollsters import util
+from ceilometer.tests import base as test_base
+
+
+class FauxInstance(object):
+
+    def __init__(self, **kwds):
+        for name, value in kwds.items():
+            setattr(self, name, value)
+
+    def __getitem__(self, key):
+        return getattr(self, key)
+
+    def get(self, key, default):
+        try:
+            return getattr(self, key)
+        except AttributeError:
+            return default
+
+
+class TestLocationMetadata(test_base.TestCase):
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def setUp(self):
+        self.manager = manager.AgentManager()
+        super(TestLocationMetadata, self).setUp()
+
+        # Mimics an instance returned from nova api call
+        self.INSTANCE_PROPERTIES = {'name': 'display name',
+                                    'OS-EXT-SRV-ATTR:instance_name':
+                                    'instance-000001',
+                                    'OS-EXT-AZ:availability_zone':
+                                    'foo-zone',
+                                    'reservation_id': 'reservation id',
+                                    'architecture': 'x86_64',
+                                    'kernel_id': 'kernel id',
+                                    'os_type': 'linux',
+                                    'ramdisk_id': 'ramdisk id',
+                                    'ephemeral_gb': 7,
+                                    'root_gb': 3,
+                                    'image': {'id': 1,
+                                              'links': [{"rel": "bookmark",
+                                                         'href': 2}]},
+                                    'hostId': '1234-5678',
+                                    'flavor': {'id': 1,
+                                               'disk': 0,
+                                               'ram': 512,
+                                               'vcpus': 2},
+                                    'metadata': {'metering.autoscale.group':
+                                                 'X' * 512,
+                                                 'metering.ephemeral_gb': 42}}
+
+        self.instance = FauxInstance(**self.INSTANCE_PROPERTIES)
+
+    def test_metadata(self):
+        md = util._get_metadata_from_object(self.instance)
+        for prop, value in self.INSTANCE_PROPERTIES.iteritems():
+            if prop not in ("metadata"):
+                # Special cases
+                if prop == 'name':
+                    prop = 'display_name'
+                elif prop == 'hostId':
+                    prop = "host"
+                elif prop == 'OS-EXT-SRV-ATTR:instance_name':
+                    prop = 'name'
+                self.assertEqual(md[prop], value)
+        user_metadata = md['user_metadata']
+        expected = self.INSTANCE_PROPERTIES[
+            'metadata']['metering.autoscale.group'][:256]
+        self.assertEqual(user_metadata['autoscale_group'], expected)
+        self.assertEqual(len(user_metadata), 1)
+
+    def test_metadata_empty_image(self):
+        self.INSTANCE_PROPERTIES['image'] = ''
+        self.instance = FauxInstance(**self.INSTANCE_PROPERTIES)
+        md = util._get_metadata_from_object(self.instance)
+        self.assertEqual(md['image_ref'], None)
+        self.assertEqual(md['image_ref_url'], None)
