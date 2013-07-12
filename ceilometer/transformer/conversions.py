@@ -20,6 +20,7 @@ import copy
 
 from ceilometer import counter as ceilocounter
 from ceilometer.openstack.common import log
+from ceilometer.openstack.common import timeutils
 from ceilometer import transformer
 
 LOG = log.getLogger(__name__)
@@ -57,7 +58,7 @@ class ScalingTransformer(transformer.TransformerBase):
         return ((eval(scale, {}, ns) if isinstance(scale, basestring)
                  else counter.volume * scale) if scale else counter.volume)
 
-    def _convert(self, counter):
+    def _convert(self, counter, growth=1):
         """Transform the appropriate counter fields.
         """
         scale = self.target.get('scale')
@@ -65,7 +66,7 @@ class ScalingTransformer(transformer.TransformerBase):
             name=self.target.get('name', counter.name),
             unit=self.target.get('unit', counter.unit),
             type=self.target.get('type', counter.type),
-            volume=self._scale(counter, scale),
+            volume=self._scale(counter, scale) * growth,
             user_id=counter.user_id,
             project_id=counter.project_id,
             resource_id=counter.resource_id,
@@ -102,3 +103,47 @@ class ScalingTransformer(transformer.TransformerBase):
             counters.append(self.preserved)
             self.preserved = None
         return counters
+
+
+class RateOfChangeTransformer(ScalingTransformer):
+    """Transformer based on the rate of change of a counter volume,
+       for example taking the current and previous volumes of a
+       cumulative counter and producing a gauge value based on the
+       proportion of some maximum used.
+    """
+
+    def __init__(self, **kwargs):
+        """Initialize transformer with configured parameters.
+        """
+        self.cache = {}
+        super(RateOfChangeTransformer, self).__init__(**kwargs)
+
+    def handle_sample(self, context, counter, source):
+        """Handle a sample, converting if necessary."""
+        LOG.debug('handling counter %s', (counter,))
+        key = counter.name + counter.resource_id
+        prev = self.cache.get(key)
+        timestamp = timeutils.parse_isotime(counter.timestamp)
+        self.cache[key] = (counter.volume, timestamp)
+
+        if prev:
+            prev_volume = prev[0]
+            prev_timestamp = prev[1]
+            time_delta = timeutils.delta_seconds(prev_timestamp, timestamp)
+            # we only allow negative deltas for noncumulative counters, whereas
+            # for cumulative we assume that a reset has occurred in the interim
+            # so that the current volume gives a lower bound on growth
+            volume_delta = (counter.volume - prev_volume
+                            if (prev_volume <= counter.volume or
+                                counter.type != ceilocounter.TYPE_CUMULATIVE)
+                            else counter.volume)
+            rate_of_change = ((1.0 * volume_delta / time_delta)
+                              if time_delta else 0.0)
+
+            transformed = self._convert(counter, rate_of_change)
+            LOG.debug(_('converted to: %s') % (transformed,))
+            counter = self._keep(counter, transformed)
+        elif self.replace:
+            LOG.warn(_('dropping counter with no predecessor: %s') % counter)
+            counter = None
+        return counter
