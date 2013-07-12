@@ -21,57 +21,61 @@
 import datetime
 
 from ceilometer.api.v1 import blueprint
+from ceilometer.tests import base
 
 
-def test_get_query_timestamps_none_specified():
-    result = blueprint._get_query_timestamps()
-    expected = {'start_timestamp': None,
-                'end_timestamp': None,
-                'query_start': None,
-                'query_end': None,
-                'search_offset': 0,
+class TestQueryTimestamps(base.TestCase):
+
+    def test_get_query_timestamps_none_specified(self):
+        result = blueprint._get_query_timestamps()
+        expected = {'start_timestamp': None,
+                    'end_timestamp': None,
+                    'query_start': None,
+                    'query_end': None,
+                    'search_offset': 0,
+                    }
+        self.assertEqual(result, expected)
+
+    def test_get_query_timestamps_start(self):
+        args = {'start_timestamp': '2012-09-20T12:13:14'}
+        result = blueprint._get_query_timestamps(args)
+        expected = {'start_timestamp': datetime.datetime(2012, 9, 20,
+                                                         12, 13, 14),
+                    'end_timestamp': None,
+                    'query_start': datetime.datetime(2012, 9, 20,
+                                                     12, 13, 14),
+                    'query_end': None,
+                    'search_offset': 0,
+                    }
+        self.assertEqual(result, expected)
+
+    def test_get_query_timestamps_end(self):
+        args = {'end_timestamp': '2012-09-20T12:13:14'}
+        result = blueprint._get_query_timestamps(args)
+        expected = {'end_timestamp': datetime.datetime(2012, 9, 20,
+                                                       12, 13, 14),
+                    'start_timestamp': None,
+                    'query_end': datetime.datetime(2012, 9, 20,
+                                                   12, 13, 14),
+                    'query_start': None,
+                    'search_offset': 0,
+                    }
+        self.assertEqual(result, expected)
+
+    def test_get_query_timestamps_with_offset(self):
+        args = {'start_timestamp': '2012-09-20T12:13:14',
+                'end_timestamp': '2012-09-20T13:24:25',
+                'search_offset': '20',
                 }
-
-    assert result == expected
-
-
-def test_get_query_timestamps_start():
-    args = {'start_timestamp': '2012-09-20T12:13:14'}
-    result = blueprint._get_query_timestamps(args)
-    expected = {'start_timestamp': datetime.datetime(2012, 9, 20, 12, 13, 14),
-                'end_timestamp': None,
-                'query_start': datetime.datetime(2012, 9, 20, 12, 13, 14),
-                'query_end': None,
-                'search_offset': 0,
-                }
-
-    assert result == expected
-
-
-def test_get_query_timestamps_end():
-    args = {'end_timestamp': '2012-09-20T12:13:14'}
-    result = blueprint._get_query_timestamps(args)
-    expected = {'end_timestamp': datetime.datetime(2012, 9, 20, 12, 13, 14),
-                'start_timestamp': None,
-                'query_end': datetime.datetime(2012, 9, 20, 12, 13, 14),
-                'query_start': None,
-                'search_offset': 0,
-                }
-
-    assert result == expected
-
-
-def test_get_query_timestamps_with_offset():
-    args = {'start_timestamp': '2012-09-20T12:13:14',
-            'end_timestamp': '2012-09-20T13:24:25',
-            'search_offset': '20',
-            }
-    result = blueprint._get_query_timestamps(args)
-    expected = {'query_end': datetime.datetime(2012, 9, 20, 13, 44, 25),
-                'query_start': datetime.datetime(2012, 9, 20, 11, 53, 14),
-                'end_timestamp': datetime.datetime(2012, 9, 20, 13, 24, 25),
-                'start_timestamp': datetime.datetime(2012, 9, 20, 12, 13, 14),
-                'search_offset': 20,
-                }
-
-    assert result == expected
+        result = blueprint._get_query_timestamps(args)
+        expected = {'query_end': datetime.datetime(2012, 9, 20,
+                                                   13, 44, 25),
+                    'query_start': datetime.datetime(2012, 9, 20,
+                                                     11, 53, 14),
+                    'end_timestamp': datetime.datetime(2012, 9, 20,
+                                                       13, 24, 25),
+                    'start_timestamp': datetime.datetime(2012, 9, 20,
+                                                         12, 13, 14),
+                    'search_offset': 20,
+                    }
+        self.assertEqual(result, expected)

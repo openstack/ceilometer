@@ -19,22 +19,26 @@
 """
 
 import mox
+import testtools
 
 from ceilometer import storage
 from ceilometer.storage import impl_log
 
 
-def test_get_engine():
-    conf = mox.Mox().CreateMockAnything()
-    conf.database.connection = 'log://localhost'
-    engine = storage.get_engine(conf)
-    assert isinstance(engine, impl_log.LogStorage)
+class EngineTest(testtools.TestCase):
 
+    def test_get_engine(self):
+        conf = mox.Mox().CreateMockAnything()
+        conf.database = mox.Mox().CreateMockAnything()
+        conf.database.connection = 'log://localhost'
+        engine = storage.get_engine(conf)
+        self.assertIsInstance(engine, impl_log.LogStorage)
 
-def test_get_engine_no_such_engine():
-    conf = mox.Mox().CreateMockAnything()
-    conf.database.connection = 'no-such-engine://localhost'
-    try:
-        storage.get_engine(conf)
-    except RuntimeError as err:
-        assert 'no-such-engine' in unicode(err)
+    def test_get_engine_no_such_engine(self):
+        conf = mox.Mox().CreateMockAnything()
+        conf.database = mox.Mox().CreateMockAnything()
+        conf.database.connection = 'no-such-engine://localhost'
+        try:
+            storage.get_engine(conf)
+        except RuntimeError as err:
+            self.assertIn('no-such-engine', unicode(err))

@@ -19,17 +19,19 @@
 """
 
 import mock
-
-from ceilometer.central import manager
 from keystoneclient.v2_0 import client as ksclient
 
+from ceilometer.central import manager
+from ceilometer.tests import base
 from tests import agentbase
 
 
-@mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
-def test_load_plugins():
-    mgr = manager.AgentManager()
-    assert list(mgr.pollster_manager), 'Failed to load any plugins'
+class TestManager(base.TestCase):
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def test_load_plugins(self):
+        mgr = manager.AgentManager()
+        self.assertIsNotNone(list(mgr.pollster_manager))
 
 
 class TestRunTasks(agentbase.BaseAgentManagerTestCase):

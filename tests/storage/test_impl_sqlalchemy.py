@@ -22,11 +22,7 @@
   the tests.
 
 """
-
-from oslo.config import cfg
-
 from ceilometer.storage.sqlalchemy.models import table_args
-
 from tests.storage import base
 
 
@@ -99,6 +95,8 @@ class GetEventTest(base.GetEventTest, EventTestBase):
     pass
 
 
-def test_model_table_args():
-    cfg.CONF.database.connection = 'mysql://localhost'
-    assert table_args()
+class ModelTest(SQLAlchemyEngineTestBase):
+    database_connection = 'mysql://localhost'
+
+    def test_model_table_args(self):
+        self.assertIsNotNone(table_args())

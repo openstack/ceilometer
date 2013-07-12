@@ -17,17 +17,17 @@
 # under the License.
 """Tests for ceilometer/storage/impl_log.py
 """
-
-import mox
-
+from ceilometer.tests import base
 from ceilometer.storage import impl_log
 
 
-def test_get_connection():
-    conf = mox.Mox().CreateMockAnything()
-    log_stg = impl_log.LogStorage()
-    conn = log_stg.get_connection(conf)
-    conn.record_metering_data({'counter_name': 'test',
-                               'resource_id': __name__,
-                               'counter_volume': 1,
-                               })
+class ConnectionTest(base.TestCase):
+
+    def test_get_connection(self):
+        conf = self.mox.CreateMockAnything()
+        log_stg = impl_log.LogStorage()
+        conn = log_stg.get_connection(conf)
+        conn.record_metering_data({'counter_name': 'test',
+                                   'resource_id': __name__,
+                                   'counter_volume': 1,
+                                   })
