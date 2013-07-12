@@ -286,6 +286,12 @@ class Connection(base.Connection):
         if 'username' in opts:
             self.db.authenticate(opts['username'], opts['password'])
 
+        # NOTE(jd) Upgrading is just about creating index, so let's do this
+        # on connection to be sure at least the TTL is correcly updated if
+        # needed.
+        self.upgrade()
+
+    def upgrade(self, version=None):
         # Establish indexes
         #
         # We need variations for user_id vs. project_id because of the
@@ -340,10 +346,6 @@ class Connection(base.Connection):
     def _is_natively_ttl_supported(self):
         # Assume is not supported if we can get the version
         return self.conn.server_info().get('versionArray', []) >= [2, 2]
-
-    @staticmethod
-    def upgrade(version=None):
-        pass
 
     def clear(self):
         self.conn.drop_database(self.db)

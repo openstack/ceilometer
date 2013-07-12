@@ -34,3 +34,4 @@ class TestBase(test_base.TestCase):
         self.conn = storage.get_connection(cfg.CONF)
         self.conn.upgrade()
         self.conn.clear()
+        self.conn.upgrade()
