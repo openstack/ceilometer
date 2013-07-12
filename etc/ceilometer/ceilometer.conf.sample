@@ -597,6 +597,13 @@
 # port to bind the UDP socket to (integer value)
 #udp_port=4952
 
+# Acknowledge message when event persistence fails (boolean
+# value)
+#ack_on_event_error=true
+
+# Save event details (boolean value)
+#store_events=false
+
 
 [matchmaker_ring]
 
@@ -624,4 +631,4 @@
 #password=<None>
 
 
-# Total option count: 119
+# Total option count: 121

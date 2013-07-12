@@ -16,22 +16,25 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from oslo.config import cfg
 import msgpack
+from oslo.config import cfg
 import socket
 from stevedore import extension
 
 from ceilometer.publisher import rpc as publisher_rpc
 from ceilometer.service import prepare_service
 from ceilometer.openstack.common import context
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import service as os_service
 from ceilometer.openstack.common.rpc import dispatcher as rpc_dispatcher
 from ceilometer.openstack.common.rpc import service as rpc_service
 
+
 from ceilometer.openstack.common import timeutils
 from ceilometer import pipeline
 from ceilometer import storage
+from ceilometer.storage import models
 from ceilometer import transformer
 
 OPTS = [
@@ -42,6 +45,12 @@ OPTS = [
     cfg.IntOpt('udp_port',
                default=4952,
                help='port to bind the UDP socket to'),
+    cfg.BoolOpt('ack_on_event_error',
+                default=True,
+                help='Acknowledge message when event persistence fails'),
+    cfg.BoolOpt('store_events',
+                default=False,
+                help='Save event details'),
 ]
 
 cfg.CONF.register_opts(OPTS, group="collector")
@@ -141,8 +150,11 @@ class CollectorService(rpc_service.Service):
 
     def _setup_subscription(self, ext, *args, **kwds):
         handler = ext.obj
-        LOG.debug('Event types from %s: %s',
-                  ext.name, ', '.join(handler.get_event_types()))
+        ack_on_error = cfg.CONF.collector.ack_on_event_error
+        LOG.debug('Event types from %s: %s (ack_on_error=%s)',
+                  ext.name, ', '.join(handler.get_event_types()),
+                  ack_on_error)
+
         for exchange_topic in handler.get_exchange_topics(cfg.CONF):
             for topic in exchange_topic.topics:
                 try:
@@ -151,7 +163,7 @@ class CollectorService(rpc_service.Service):
                         pool_name='ceilometer.notifications',
                         topic=topic,
                         exchange_name=exchange_topic.exchange,
-                    )
+                        ack_on_error=ack_on_error)
                 except Exception:
                     LOG.exception('Could not join consumer pool %s/%s' %
                                   (topic, exchange_topic.exchange))
@@ -160,8 +172,60 @@ class CollectorService(rpc_service.Service):
         """Make a notification processed by an handler."""
         LOG.debug('notification %r', notification.get('event_type'))
         self.notification_manager.map(self._process_notification_for_ext,
-                                      notification=notification,
-                                      )
+                                      notification=notification)
+
+        if cfg.CONF.collector.store_events:
+            self._message_to_event(notification)
+
+    @staticmethod
+    def _extract_when(body):
+        """Extract the generated datetime from the notification.
+        """
+        when = body.get('timestamp', body.get('_context_timestamp'))
+        if when:
+            return timeutils.normalize_time(timeutils.parse_isotime(when))
+
+        return timeutils.utcnow()
+
+    def _message_to_event(self, body):
+        """Convert message to Ceilometer Event.
+
+        NOTE: this is currently based on the Nova notification format.
+        We will need to make this driver-based to support other formats.
+
+        NOTE: the rpc layer currently rips out the notification
+        delivery_info, which is critical to determining the
+        source of the notification. This will have to get added back later.
+        """
+        event_name = body['event_type']
+        when = self._extract_when(body)
+
+        LOG.debug('Saving event "%s"', event_name)
+
+        message_id = body.get('message_id')
+
+        # TODO(sandy) - check we have not already saved this notification.
+        #               (possible on retries) Use message_id to spot dups.
+        publisher = body.get('publisher_id')
+        request_id = body.get('_context_request_id')
+        tenant_id = body.get('_context_tenant')
+
+        text = models.Trait.TEXT_TYPE
+        all_traits = [models.Trait('message_id', text, message_id),
+                      models.Trait('service', text, publisher),
+                      models.Trait('request_id', text, request_id),
+                      models.Trait('tenant_id', text, tenant_id),
+                      ]
+        # Only store non-None value traits ...
+        traits = [trait for trait in all_traits if trait.value is not None]
+
+        event = models.Event(event_name, when, traits)
+        try:
+            self.storage_conn.record_events([event, ])
+        except Exception as err:
+            LOG.exception(_("Unable to store events: %s"), err)
+            # By re-raising we avoid ack()'ing the message.
+            raise
 
     def _process_notification_for_ext(self, ext, notification):
         handler = ext.obj
