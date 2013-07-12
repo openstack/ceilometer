@@ -427,7 +427,7 @@ class Connection(base.Connection):
                     models.ResourceMeter(
                         counter_name=meter['counter_name'],
                         counter_type=meter['counter_type'],
-                        counter_unit=meter['counter_unit'],
+                        counter_unit=meter.get('counter_unit', ''),
                     )
                     for meter in resource['meter']
                 ],
@@ -460,7 +460,7 @@ class Connection(base.Connection):
                     name=r_meter['counter_name'],
                     type=r_meter['counter_type'],
                     # Return empty string if 'counter_unit' is not valid for
-                    # backward compaitiblity.
+                    # backward compatibility.
                     unit=r_meter.get('counter_unit', ''),
                     resource_id=r['_id'],
                     project_id=r['project_id'],
@@ -489,6 +489,8 @@ class Connection(base.Connection):
             # the sample was inserted. It is an implementation
             # detail that should not leak outside of the driver.
             del s['_id']
+            # Backward compatibility for samples without units
+            s['counter_unit'] = s.get('counter_unit', '')
             yield models.Sample(**s)
 
     def get_meter_statistics(self, sample_filter, period=None):
