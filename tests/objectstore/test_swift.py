@@ -20,6 +20,7 @@
 import collections
 
 import mock
+import testscenarios
 
 from ceilometer.central import manager
 from ceilometer.objectstore import swift
@@ -28,6 +29,7 @@ from ceilometer.tests import base
 from keystoneclient import exceptions
 from swiftclient import client as swift_client
 
+load_tests = testscenarios.load_tests_apply_scenarios
 
 ACCOUNTS = [('tenant-000', {'x-account-object-count': 12,
                             'x-account-bytes-used': 321321321,
@@ -48,6 +50,17 @@ class TestManager(manager.AgentManager):
 
 class TestSwiftPollster(base.TestCase):
 
+    # Define scenarios to run all of the tests against all of the
+    # pollsters.
+    scenarios = [
+        ('storage.objects',
+         {'factory': swift.ObjectsPollster}),
+        ('storage.objects.size',
+         {'factory': swift.ObjectsSizePollster}),
+        ('storage.objects.containers',
+         {'factory': swift.ObjectsContainersPollster}),
+    ]
+
     @staticmethod
     def fake_ks_service_catalog_url_for(*args, **kwargs):
         raise exceptions.EndpointNotFound("Fake keystone exception")
@@ -59,13 +72,13 @@ class TestSwiftPollster(base.TestCase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestSwiftPollster, self).setUp()
-        self.pollster = swift.SwiftPollster()
+        self.pollster = self.factory()
         self.manager = TestManager()
 
     def test_iter_accounts_no_cache(self):
         def empty_account_info(obj, ksclient, cache):
             return []
-        self.stubs.Set(swift.SwiftPollster, '_get_account_info',
+        self.stubs.Set(self.factory, '_get_account_info',
                        empty_account_info)
         cache = {}
         data = list(self.pollster._iter_accounts(mock.Mock(), cache))
@@ -83,7 +96,7 @@ class TestSwiftPollster(base.TestCase):
         )
         self.stubs.Set(swift_client, 'head_account',
                        ksclient)
-        self.stubs.Set(swift.SwiftPollster, '_neaten_url',
+        self.stubs.Set(self.factory, '_neaten_url',
                        mock.Mock())
         Tenant = collections.namedtuple('Tenant', 'id')
         cache = {
@@ -99,23 +112,23 @@ class TestSwiftPollster(base.TestCase):
         standard_url = test_endpoint + '/v1/' + 'AUTH_' + test_tenant_id
 
         self.assertEqual(standard_url,
-                         self.pollster._neaten_url(test_endpoint,
-                                                   test_tenant_id))
+                         swift._Base._neaten_url(test_endpoint,
+                                                 test_tenant_id))
         self.assertEqual(standard_url,
-                         self.pollster._neaten_url(test_endpoint + '/',
-                                                   test_tenant_id))
+                         swift._Base._neaten_url(test_endpoint + '/',
+                                                 test_tenant_id))
         self.assertEqual(standard_url,
-                         self.pollster._neaten_url(test_endpoint + '/v1',
-                                                   test_tenant_id))
+                         swift._Base._neaten_url(test_endpoint + '/v1',
+                                                 test_tenant_id))
 
     def test_metering(self):
-        self.stubs.Set(swift.SwiftPollster, '_iter_accounts',
+        self.stubs.Set(self.factory, '_iter_accounts',
                        self.fake_iter_accounts)
         counters = list(self.pollster.get_counters(self.manager, {}))
-        self.assertEqual(len(counters), 6)
+        self.assertEqual(len(counters), 2)
 
     def test_get_counter_names(self):
-        self.stubs.Set(swift.SwiftPollster, '_iter_accounts',
+        self.stubs.Set(self.factory, '_iter_accounts',
                        self.fake_iter_accounts)
         counters = list(self.pollster.get_counters(self.manager, {}))
         self.assertEqual(set([c.name for c in counters]),

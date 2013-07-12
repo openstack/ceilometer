@@ -22,3 +22,4 @@ python-spidermonkey
 python-subunit
 testrepository>=0.0.13
 testtools>=0.9.29
+testscenarios<0.5
