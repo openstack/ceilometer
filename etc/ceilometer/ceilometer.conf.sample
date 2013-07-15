@@ -583,6 +583,10 @@
 # Auth URL to use for openstack service access (string value)
 #os_auth_url=http://localhost:5000/v2.0
 
+# Type of endpoint in Identity service catalog to use for
+# communication with OpenStack services. (string value)
+#os_endpoint_type=publicURL
+
 
 [collector]
 
@@ -631,4 +635,4 @@
 #password=<None>
 
 
-# Total option count: 121
+# Total option count: 122

@@ -59,6 +59,7 @@ os_password                      admin                                 Password 
 os_tenant_id                                                           Tenant ID to use for openstack service access
 os_tenant_name                   admin                                 Tenant name to use for openstack service access
 os_auth_url                      http://localhost:5000/v2.0            Auth URL to use for openstack service access
+os_endpoint_type                 publicURL                             Endpoint type in the catalog to use to access services
 ===============================  ====================================  ==============================================================
 
 Keystone Middleware Authentication
