@@ -96,7 +96,10 @@ def _get_metadata_from_object(instance):
     return _add_reserved_user_metadata(instance, metadata)
 
 
-def make_counter_from_instance(instance, name, type, unit, volume):
+def make_counter_from_instance(instance, name, type, unit, volume,
+                               additional_metadata={}):
+    resource_metadata = _get_metadata_from_object(instance)
+    resource_metadata.update(additional_metadata)
     return counter.Counter(
         name=name,
         type=type,
@@ -106,7 +109,7 @@ def make_counter_from_instance(instance, name, type, unit, volume):
         project_id=instance.tenant_id,
         resource_id=instance.id,
         timestamp=timeutils.isotime(),
-        resource_metadata=_get_metadata_from_object(instance),
+        resource_metadata=resource_metadata,
     )
 
 

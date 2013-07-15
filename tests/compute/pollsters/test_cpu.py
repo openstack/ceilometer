@@ -57,6 +57,8 @@ class TestCPUPollster(base.TestPollsterBase):
             assert counters[0].volume == expected_time
             assert pollster.CACHE_KEY_CPU in cache
             assert self.instance.name in cache[pollster.CACHE_KEY_CPU]
+            self.assertEquals(counters[0].resource_metadata.get('cpu_number'),
+                              2)
             # ensure elapsed time between polling cycles is non-zero
             time.sleep(0.001)
 
