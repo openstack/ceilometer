@@ -747,9 +747,11 @@ class TestPipeline(base.TestCase):
         self.assertEquals(getattr(amb_temp, 'volume'), 88.8)
         self.assertEquals(getattr(core_temp, 'volume'), 96.8)
 
-    def _do_test_rate_of_change_conversion(self, prev, curr, offset,
-                                           type, expected):
-        s = "100.0 / (10**9 * resource_metadata.get('cpu_number', 1))"
+    def _do_test_rate_of_change_conversion(self, prev, curr, type, expected,
+                                           offset=1, weight=None):
+        s = "(resource_metadata.user_metadata.autoscaling_weight or 1.0)" \
+            "* (resource_metadata.non.existent or 1.0)" \
+            "* (100.0 / (10**9 * (resource_metadata.cpu_number or 1)))"
         self.pipeline_cfg[0]['transformers'] = [
             {
                 'name': 'rate_of_change',
@@ -766,6 +768,7 @@ class TestPipeline(base.TestCase):
         self.pipeline_cfg[0]['counters'] = ['cpu']
         now = timeutils.utcnow()
         later = now + datetime.timedelta(minutes=offset)
+        um = {'autoscaling_weight': weight} if weight else {}
         counters = [
             counter.Counter(
                 name='cpu',
@@ -776,7 +779,8 @@ class TestPipeline(base.TestCase):
                 project_id='test_proj',
                 resource_id='test_resource',
                 timestamp=now.isoformat(),
-                resource_metadata={'cpu_number': 4}
+                resource_metadata={'cpu_number': 4,
+                                   'user_metadata': um},
             ),
             counter.Counter(
                 name='cpu',
@@ -787,7 +791,8 @@ class TestPipeline(base.TestCase):
                 project_id='test_proj',
                 resource_id='test_resource',
                 timestamp=later.isoformat(),
-                resource_metadata={'cpu_number': 4}
+                resource_metadata={'cpu_number': 4,
+                                   'user_metadata': um},
             ),
         ]
 
@@ -812,30 +817,34 @@ class TestPipeline(base.TestCase):
     def test_rate_of_change_conversion(self):
         self._do_test_rate_of_change_conversion(120000000000,
                                                 180000000000,
-                                                1,
                                                 counter.TYPE_CUMULATIVE,
                                                 25.0)
+
+    def test_rate_of_change_conversion_weight(self):
+        self._do_test_rate_of_change_conversion(120000000000,
+                                                180000000000,
+                                                counter.TYPE_CUMULATIVE,
+                                                27.5,
+                                                weight=1.1)
 
     def test_rate_of_change_conversion_negative_cumulative_delta(self):
         self._do_test_rate_of_change_conversion(180000000000,
                                                 120000000000,
-                                                1,
                                                 counter.TYPE_CUMULATIVE,
                                                 50.0)
 
     def test_rate_of_change_conversion_negative_gauge_delta(self):
         self._do_test_rate_of_change_conversion(180000000000,
                                                 120000000000,
-                                                1,
                                                 counter.TYPE_GAUGE,
                                                 -25.0)
 
     def test_rate_of_change_conversion_zero_delay(self):
         self._do_test_rate_of_change_conversion(120000000000,
                                                 120000000000,
-                                                0,
                                                 counter.TYPE_CUMULATIVE,
-                                                0.0)
+                                                0.0,
+                                                offset=0)
 
     def _do_test_rate_of_change_no_predecessor(self, replace):
         s = "100.0 / (10**9 * resource_metadata.get('cpu_number', 1))"

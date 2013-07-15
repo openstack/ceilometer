@@ -16,7 +16,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import copy
+from collections import defaultdict
 
 from ceilometer import counter as ceilocounter
 from ceilometer.openstack.common import log
@@ -24,6 +24,29 @@ from ceilometer.openstack.common import timeutils
 from ceilometer import transformer
 
 LOG = log.getLogger(__name__)
+
+
+class Namespace(object):
+    """Encapsulates the namespace wrapping the evaluation of the
+       configured scale factor. This allows nested dicts to be
+       accessed in the attribute style, and missing attributes
+       to yield false when used in a boolean expression.
+    """
+    def __init__(self, seed):
+        self.__dict__ = defaultdict(lambda: Namespace({}))
+        self.__dict__.update(seed)
+        for k, v in self.__dict__.iteritems():
+            if isinstance(v, dict):
+                self.__dict__[k] = Namespace(v)
+
+    def __getattr__(self, attr):
+        return self.__dict__[attr]
+
+    def __getitem__(self, key):
+        return self.__dict__[key]
+
+    def __nonzero__(self):
+        return len(self.__dict__) > 0
 
 
 class ScalingTransformer(transformer.TransformerBase):
@@ -54,7 +77,8 @@ class ScalingTransformer(transformer.TransformerBase):
         """Apply the scaling factor (either a straight multiplicative
            factor or else a string to be eval'd).
         """
-        ns = copy.deepcopy(counter._asdict())
+        ns = Namespace(counter._asdict())
+
         return ((eval(scale, {}, ns) if isinstance(scale, basestring)
                  else counter.volume * scale) if scale else counter.volume)
 
