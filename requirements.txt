@@ -6,6 +6,7 @@ iso8601
 argparse
 SQLAlchemy>=0.7,<=0.7.99
 sqlalchemy-migrate>=0.7.2
+alembic>=0.4.1
 pymongo>=2.2
 eventlet
 anyjson>=0.3.3
