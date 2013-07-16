@@ -21,6 +21,7 @@
 """
 
 import copy
+import datetime
 import operator
 import os
 import re
@@ -34,8 +35,13 @@ import pymongo
 from oslo.config import cfg
 
 from ceilometer.openstack.common import log
+from ceilometer.openstack.common import timeutils
+from ceilometer import storage
 from ceilometer.storage import base
 from ceilometer.storage import models
+
+cfg.CONF.import_opt('time_to_live', 'ceilometer.storage',
+                    group="database")
 
 LOG = log.getLogger(__name__)
 
@@ -181,6 +187,17 @@ class Connection(base.Connection):
 
     CONNECTION_POOL = ConnectionPool()
 
+    REDUCE_GROUP_CLEAN = bson.code.Code("""
+    function ( curr, result ) {
+        if (result.resources.indexOf(curr.resource_id) < 0)
+            result.resources.push(curr.resource_id);
+        if (result.users.indexOf(curr.user_id) < 0)
+            result.users.push(curr.user_id);
+        if (result.projects.indexOf(curr.project_id) < 0)
+            result.projects.push(curr.project_id);
+    }
+    """)
+
     MAP_STATS = bson.code.Code("""
     function () {
         emit('statistics', { min : this.counter_volume,
@@ -293,6 +310,39 @@ class Connection(base.Connection):
                 ('source', pymongo.ASCENDING),
             ], name='meter_idx')
 
+        # Since mongodb 2.2 support db-ttl natively
+        if self._is_natively_ttl_supported():
+            self._ensure_meter_ttl_index()
+
+    def _ensure_meter_ttl_index(self):
+        indexes = self.db.meter.index_information()
+
+        ttl = cfg.CONF.database.time_to_live
+
+        if ttl <= 0:
+            if 'meter_ttl' in indexes:
+                self.db.meter.drop_index('meter_ttl')
+            return
+
+        if 'meter_ttl' in indexes:
+            # NOTE(sileht): manually check expireAfterSeconds because
+            # ensure_index doesn't update index options if the index already
+            # exists
+            if ttl == indexes['meter_ttl'].get('expireAfterSeconds', -1):
+                return
+
+            self.db.meter.drop_index('meter_ttl')
+
+        self.db.meter.create_index(
+            [('timestamp', pymongo.ASCENDING)],
+            expireAfterSeconds=ttl,
+            name='meter_ttl'
+        )
+
+    def _is_natively_ttl_supported(self):
+        # Assume is not supported if we can get the version
+        return self.conn.server_info().get('versionArray', []) >= [2, 2]
+
     @staticmethod
     def upgrade(version=None):
         pass
@@ -357,6 +407,35 @@ class Connection(base.Connection):
         # a new key '_id').
         record = copy.copy(data)
         self.db.meter.insert(record)
+
+    def clear_expired_metering_data(self, ttl):
+        """Clear expired data from the backend storage system according to the
+        time-to-live.
+
+        :param ttl: Number of seconds to keep records for.
+
+        """
+        # Before mongodb 2.2 we need to clear expired data manually
+        if not self._is_natively_ttl_supported():
+            end = timeutils.utcnow() - datetime.timedelta(seconds=ttl)
+            f = storage.SampleFilter(end=end)
+            q = make_query_from_filter(f, require_meter=False)
+            self.db.meter.remove(q)
+
+        results = self.db.meter.group(
+            key={},
+            condition={},
+            reduce=self.REDUCE_GROUP_CLEAN,
+            initial={
+                'resources': [],
+                'users': [],
+                'projects': [],
+            }
+        )[0]
+
+        self.db.user.remove({'_id': {'$nin': results['users']}})
+        self.db.project.remove({'_id': {'$nin': results['projects']}})
+        self.db.resource.remove({'_id': {'$nin': results['resources']}})
 
     def get_users(self, source=None):
         """Return an iterable of user id strings.

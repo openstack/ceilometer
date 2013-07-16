@@ -33,7 +33,7 @@ LOG = log.getLogger(__name__)
 
 STORAGE_ENGINE_NAMESPACE = 'ceilometer.storage'
 
-STORAGE_OPTS = [
+OLD_STORAGE_OPTS = [
     cfg.StrOpt('database_connection',
                secret=True,
                default=None,
@@ -41,8 +41,18 @@ STORAGE_OPTS = [
                ),
 ]
 
+cfg.CONF.register_opts(OLD_STORAGE_OPTS)
 
-cfg.CONF.register_opts(STORAGE_OPTS)
+
+STORAGE_OPTS = [
+    cfg.IntOpt('time_to_live',
+               default=-1,
+               help="""number of seconds that samples are kept
+in the database for (<= 0 means forever)"""),
+]
+
+cfg.CONF.register_opts(STORAGE_OPTS, group='database')
+
 cfg.CONF.import_opt('connection',
                     'ceilometer.openstack.common.db.sqlalchemy.session',
                     group='database')
@@ -132,3 +142,11 @@ class EventFilter(object):
 def dbsync():
     service.prepare_service()
     get_connection(cfg.CONF).upgrade()
+
+
+def expirer():
+    service.prepare_service()
+    LOG.debug("Clearing expired metering data")
+    storage_conn = get_connection(cfg.CONF)
+    storage_conn.clear_expired_metering_data(
+        cfg.CONF.database.time_to_live)

@@ -257,6 +257,15 @@ class Connection(base.Connection):
         record['f:message'] = json.dumps(data)
         meter_table.put(row, record)
 
+    def clear_expired_metering_data(self, ttl):
+        """Clear expired data from the backend storage system according to the
+        time-to-live.
+
+        :param ttl: Number of seconds to keep records for.
+
+        """
+        raise NotImplementedError
+
     def get_users(self, source=None):
         """Return an iterable of user id strings.
 

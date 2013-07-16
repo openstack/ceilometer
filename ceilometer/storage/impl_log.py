@@ -62,6 +62,15 @@ class Connection(base.Connection):
                  data['resource_id'],
                  data['counter_volume'])
 
+    def clear_expired_metering_data(self, ttl):
+        """Clear expired data from the backend storage system according to the
+        time-to-live.
+
+        :param ttl: Number of seconds to keep records for.
+
+        """
+        LOG.info("Dropping data with TTL %d", ttl)
+
     def get_users(self, source=None):
         """Return an iterable of user id strings.
 

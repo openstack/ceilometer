@@ -26,6 +26,7 @@ import datetime
 from oslo.config import cfg
 
 from ceilometer.publisher import rpc
+from ceilometer.openstack.common import timeutils
 from ceilometer import counter
 from ceilometer import storage
 from ceilometer.tests import db as test_db
@@ -39,6 +40,10 @@ class DBTestBase(test_db.TestBase):
     def setUp(self):
         super(DBTestBase, self).setUp()
         self.prepare_data()
+
+    def tearDown(self):
+        timeutils.utcnow.override_time = None
+        super(DBTestBase, self).tearDown()
 
     def prepare_data(self):
         original_timestamps = [(2012, 7, 2, 10, 40), (2012, 7, 2, 10, 41),
@@ -495,6 +500,46 @@ class RawSampleTest(DBTestBase):
         results = list(self.conn.get_samples(f))
         assert results
         assert len(results) == 1
+
+    def test_clear_metering_data(self):
+        timeutils.utcnow.override_time = datetime.datetime(2012, 7, 2, 10, 45)
+
+        try:
+            self.conn.clear_expired_metering_data(3 * 60)
+        except NotImplementedError:
+            got_not_imp = True
+            self.assertTrue(got_not_imp)
+            return
+
+        f = storage.SampleFilter(meter='instance')
+        results = list(self.conn.get_samples(f))
+        self.assertEqual(len(results), 5)
+        results = list(self.conn.get_users())
+        self.assertEqual(len(results), 5)
+        results = list(self.conn.get_projects())
+        self.assertEqual(len(results), 5)
+        results = list(self.conn.get_resources())
+        self.assertEqual(len(results), 5)
+
+    def test_clear_metering_data_no_data_to_remove(self):
+        timeutils.utcnow.override_time = datetime.datetime(2010, 7, 2, 10, 45)
+
+        try:
+            self.conn.clear_expired_metering_data(3 * 60)
+        except NotImplementedError:
+            got_not_imp = True
+            self.assertTrue(got_not_imp)
+            return
+
+        f = storage.SampleFilter(meter='instance')
+        results = list(self.conn.get_samples(f))
+        self.assertEqual(len(results), 10)
+        results = list(self.conn.get_users())
+        self.assertEqual(len(results), 9)
+        results = list(self.conn.get_projects())
+        self.assertEqual(len(results), 8)
+        results = list(self.conn.get_resources())
+        self.assertEqual(len(results), 9)
 
 
 class StatisticsTest(DBTestBase):

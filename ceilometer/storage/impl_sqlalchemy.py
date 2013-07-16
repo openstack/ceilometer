@@ -19,6 +19,7 @@
 
 from __future__ import absolute_import
 
+import datetime
 import operator
 import os
 import uuid
@@ -220,6 +221,35 @@ class Connection(base.Connection):
             meter.message_signature = data['message_signature']
             meter.message_id = data['message_id']
             session.flush()
+
+    @staticmethod
+    def clear_expired_metering_data(ttl):
+        """Clear expired data from the backend storage system according to the
+        time-to-live.
+
+        :param ttl: Number of seconds to keep records for.
+
+        """
+        session = sqlalchemy_session.get_session()
+        query = session.query(Meter.id)
+        end = timeutils.utcnow() - datetime.timedelta(seconds=ttl)
+        query = query.filter(Meter.timestamp < end)
+        query.delete()
+
+        query = session.query(User.id).filter(~User.id.in_(
+            session.query(Meter.user_id).group_by(Meter.user_id)
+        ))
+        query.delete(synchronize_session='fetch')
+
+        query = session.query(Project.id).filter(~Project.id.in_(
+            session.query(Meter.project_id).group_by(Meter.project_id)
+        ))
+        query.delete(synchronize_session='fetch')
+
+        query = session.query(Resource.id).filter(~Resource.id.in_(
+            session.query(Meter.resource_id).group_by(Meter.resource_id)
+        ))
+        query.delete(synchronize_session='fetch')
 
     @staticmethod
     def get_users(source=None):
