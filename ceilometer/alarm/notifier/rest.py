@@ -19,6 +19,7 @@
 
 import eventlet
 import requests
+import urlparse
 
 from oslo.config import cfg
 
@@ -58,7 +59,11 @@ class RestAlarmNotifier(notifier.AlarmNotifier):
         kwargs = {'data': jsonutils.dumps(body)}
 
         if action.scheme == 'https':
-            kwargs['verify'] = cfg.CONF.alarm.rest_notifier_ssl_verify
+            default_verify = int(cfg.CONF.alarm.rest_notifier_ssl_verify)
+            options = urlparse.parse_qs(action.query)
+            verify = bool(int(options.get('ceilometer-alarm-ssl-verify',
+                                          [default_verify])[-1]))
+            kwargs['verify'] = verify
 
             cert = cfg.CONF.alarm.rest_notifier_certificate_file
             key = cfg.CONF.alarm.rest_notifier_certificate_key
