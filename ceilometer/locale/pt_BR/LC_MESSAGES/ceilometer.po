@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-05 09:40+0000\n"
+"POT-Creation-Date: 2013-07-16 09:39+0000\n"
 "PO-Revision-Date: 2012-12-11 06:53+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Portuguese (Brazil) "
@@ -18,71 +18,90 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: ceilometer/alarm/service.py:85
+#: ceilometer/alarm/service.py:92
 msgid "threshold evaluation cycle failed"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:94
+#: ceilometer/alarm/service.py:122
+#, python-format
+msgid "Unable to parse action %(action)s for alarm %(alarm)s"
+msgstr ""
+
+#: ceilometer/alarm/service.py:131
+#, python-format
+msgid "Action %(scheme)s for alarm %(alarm)s is unknown, cannot notify"
+msgstr ""
+
+#: ceilometer/alarm/service.py:141
+#, python-format
+msgid "Unable to notify alarm %s"
+msgstr ""
+
+#: ceilometer/alarm/service.py:159
+msgid "Unable to notify for an alarm with no action"
+msgstr ""
+
+#: ceilometer/alarm/threshold_evaluation.py:95
 #, python-format
 msgid "query stats from %(start)s to %(now)s"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:106
+#: ceilometer/alarm/threshold_evaluation.py:107
 #, python-format
 msgid "sanitize stats %s"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:110
+#: ceilometer/alarm/threshold_evaluation.py:111
 #, python-format
 msgid "pruned statistics to %d"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:115
+#: ceilometer/alarm/threshold_evaluation.py:116
 #, python-format
 msgid "stats query %s"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:121
+#: ceilometer/alarm/threshold_evaluation.py:122
 msgid "alarm stats retrieval failed"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:127
+#: ceilometer/alarm/threshold_evaluation.py:128
 #, python-format
 msgid "alarm %(id)s transitioning to %(state)s because %(reason)s"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:137
+#: ceilometer/alarm/threshold_evaluation.py:138
 msgid "alarm state update failed"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:145
+#: ceilometer/alarm/threshold_evaluation.py:146
 #, python-format
 msgid "%d datapoints are unknown"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:155
+#: ceilometer/alarm/threshold_evaluation.py:156
 #, python-format
 msgid ""
 "Transition to %(state)s due to %(count)d samples %(disposition)s "
 "threshold, most recent: %(last)s"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:187
+#: ceilometer/alarm/threshold_evaluation.py:188
 #, python-format
 msgid "initiating evaluation cycle on %d alarms"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:193
+#: ceilometer/alarm/threshold_evaluation.py:194
 #, python-format
 msgid "skipping alarm %s"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:195
+#: ceilometer/alarm/threshold_evaluation.py:196
 #, python-format
 msgid "evaluating alarm %s"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:213
+#: ceilometer/alarm/threshold_evaluation.py:214
 #, python-format
 msgid "comparing value %(value)s against threshold %(limit)s"
 msgstr ""
@@ -104,13 +123,18 @@ msgstr ""
 msgid "Unknown alarm"
 msgstr ""
 
-#: ceilometer/collector/service.py:76
+#: ceilometer/collector/service.py:85
 #, python-format
 msgid "UDP: Cannot decode data sent by %s"
 msgstr ""
 
-#: ceilometer/collector/service.py:86
+#: ceilometer/collector/service.py:95
 msgid "UDP: Unable to store meter"
+msgstr ""
+
+#: ceilometer/collector/service.py:226
+#, python-format
+msgid "Unable to store events: %s"
 msgstr ""
 
 #: ceilometer/compute/nova_notifier.py:84
@@ -146,7 +170,7 @@ msgstr ""
 msgid "Kwapi endpoint not found"
 msgstr ""
 
-#: ceilometer/objectstore/swift.py:112
+#: ceilometer/objectstore/swift.py:67
 msgid "Swift endpoint not found"
 msgstr ""
 
@@ -871,5 +895,23 @@ msgstr ""
 
 #: ceilometer/storage/sqlalchemy/migration.py:67
 msgid "version should be an integer"
+msgstr ""
+
+#: ceilometer/transformer/conversions.py:47
+#, python-format
+msgid ""
+"scaling conversion transformer with source: %(source)s target: %(target)s"
+" replace: %(replace)s"
+msgstr ""
+
+#: ceilometer/transformer/conversions.py:93
+#: ceilometer/transformer/conversions.py:144
+#, python-format
+msgid "converted to: %s"
+msgstr ""
+
+#: ceilometer/transformer/conversions.py:147
+#, python-format
+msgid "dropping counter with no predecessor: %s"
 msgstr ""
 
