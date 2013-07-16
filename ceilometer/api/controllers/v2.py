@@ -213,8 +213,7 @@ def _query_to_kwargs(query, db_func):
     if trans:
         for k in trans:
             if k not in valid_keys:
-                raise wsme.exc.UnknownArgument(i.field,
-                                               "unrecognized query field")
+                raise wsme.exc.UnknownArgument(k, "unrecognized query field")
             kwargs[k] = trans[k]
 
     return kwargs
