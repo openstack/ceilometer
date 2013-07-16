@@ -55,8 +55,6 @@ class TestCPUPollster(base.TestPollsterBase):
             self.assertEqual(set([c.name for c in counters]),
                              set(['cpu']))
             assert counters[0].volume == expected_time
-            assert pollster.CACHE_KEY_CPU in cache
-            assert self.instance.name in cache[pollster.CACHE_KEY_CPU]
             self.assertEquals(counters[0].resource_metadata.get('cpu_number'),
                               2)
             # ensure elapsed time between polling cycles is non-zero
@@ -67,78 +65,16 @@ class TestCPUPollster(base.TestPollsterBase):
         _verify_cpu_metering(2 * (10 ** 6))
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
-    def test_get_counters_cache(self):
+    def test_get_counters_no_caching(self):
+        self.inspector.inspect_cpus(self.instance.name).AndReturn(
+            virt_inspector.CPUStats(time=1 * (10 ** 6), number=2))
         self.mox.ReplayAll()
 
         mgr = manager.AgentManager()
         pollster = cpu.CPUPollster()
 
-        cache = {
-            pollster.CACHE_KEY_CPU: {
-                self.instance.name: virt_inspector.CPUStats(
-                    time=10 ** 6,
-                    number=2,
-                ),
-            },
-        }
+        cache = {}
         counters = list(pollster.get_counters(mgr, cache, self.instance))
         self.assertEquals(len(counters), 1)
         self.assertEquals(counters[0].volume, 10 ** 6)
-
-
-class TestCPUUtilPollster(base.TestPollsterBase):
-
-    def setUp(self):
-        super(TestCPUUtilPollster, self).setUp()
-
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
-    def test_get_counters(self):
-        self.inspector.inspect_cpus(self.instance.name).AndReturn(
-            virt_inspector.CPUStats(time=1 * (10 ** 6), number=2))
-        self.inspector.inspect_cpus(self.instance.name).AndReturn(
-            virt_inspector.CPUStats(time=3 * (10 ** 6), number=2))
-        # cpu_time resets on instance restart
-        self.inspector.inspect_cpus(self.instance.name).AndReturn(
-            virt_inspector.CPUStats(time=2 * (10 ** 6), number=2))
-        self.mox.ReplayAll()
-
-        mgr = manager.AgentManager()
-        pollster = cpu.CPUUtilPollster()
-        pollster.utilization_map = {}  # clear the internal cache
-
-        def _verify_cpu_metering(zero):
-            cache = {}
-            counters = list(pollster.get_counters(mgr, cache, self.instance))
-            self.assertEquals(len(counters), 1)
-            self.assertEqual(set([c.name for c in counters]),
-                             set(['cpu_util']))
-            assert (counters[0].volume == 0.0 if zero else
-                    counters[0].volume > 0.0)
-            assert pollster.CACHE_KEY_CPU in cache
-            assert self.instance.name in cache[pollster.CACHE_KEY_CPU]
-            # ensure elapsed time between polling cycles is non-zero
-            time.sleep(0.001)
-
-        _verify_cpu_metering(True)
-        _verify_cpu_metering(False)
-        _verify_cpu_metering(False)
-
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
-    def test_get_counters_cache(self):
-        self.mox.ReplayAll()
-
-        mgr = manager.AgentManager()
-        pollster = cpu.CPUUtilPollster()
-        pollster.utilization_map = {}  # clear the internal cache
-
-        cache = {
-            pollster.CACHE_KEY_CPU: {
-                self.instance.name: virt_inspector.CPUStats(
-                    time=10 ** 6,
-                    number=2,
-                ),
-            },
-        }
-        counters = list(pollster.get_counters(mgr, cache, self.instance))
-        self.assertEquals(len(counters), 1)
-        self.assertEquals(counters[0].volume, 0)
+        self.assertEquals(len(cache), 0)
