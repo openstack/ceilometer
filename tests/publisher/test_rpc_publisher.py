@@ -221,6 +221,21 @@ class TestPublish(base.TestCase):
         self.assertEqual(self.published[0][0],
                          cfg.CONF.publisher_rpc.metering_topic)
         self.assertIsInstance(self.published[0][1]['args']['data'], list)
+        self.assertEqual(self.published[0][1]['method'],
+                         'record_metering_data')
+
+    def test_publish_target(self):
+        publisher = rpc.RPCPublisher(
+            network_utils.urlsplit('rpc://?target=custom_procedure_call'))
+        publisher.publish_counters(None,
+                                   self.test_data,
+                                   'test')
+        self.assertEqual(len(self.published), 1)
+        self.assertEqual(self.published[0][0],
+                         cfg.CONF.publisher_rpc.metering_topic)
+        self.assertIsInstance(self.published[0][1]['args']['data'], list)
+        self.assertEqual(self.published[0][1]['method'],
+                         'custom_procedure_call')
 
     def test_published_with_per_meter_topic(self):
         publisher = rpc.RPCPublisher(

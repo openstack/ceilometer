@@ -110,6 +110,7 @@ class RPCPublisher(publisher.PublisherBase):
         options = urlparse.parse_qs(parsed_url.query)
         self.per_meter_topic = bool(int(
             options.get('per_meter_topic', [0])[-1]))
+        self.target = options.get('target', ['record_metering_data'])[0]
 
     def publish_counters(self, context, counters, source):
         """Publish counters on RPC.
@@ -130,7 +131,7 @@ class RPCPublisher(publisher.PublisherBase):
 
         topic = cfg.CONF.publisher_rpc.metering_topic
         msg = {
-            'method': 'record_metering_data',
+            'method': self.target,
             'version': '1.0',
             'args': {'data': meters},
         }
@@ -143,7 +144,7 @@ class RPCPublisher(publisher.PublisherBase):
                     sorted(meters, key=operator.itemgetter('counter_name')),
                     operator.itemgetter('counter_name')):
                 msg = {
-                    'method': 'record_metering_data',
+                    'method': self.target,
                     'version': '1.0',
                     'args': {'data': list(meter_list)},
                 }
