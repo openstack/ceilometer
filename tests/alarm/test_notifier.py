@@ -98,7 +98,7 @@ class TestAlarmNotifier(base.TestCase):
                               group='alarm')
         self.mox.StubOutWithMock(requests, "post")
         requests.post(action, data=data_json,
-                      cert=certificate)
+                      cert=certificate, verify=True)
         self.mox.ReplayAll()
 
         with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
@@ -123,7 +123,28 @@ class TestAlarmNotifier(base.TestCase):
                               group='alarm')
         self.mox.StubOutWithMock(requests, "post")
         requests.post(action, data=data_json,
-                      cert=(certificate, key))
+                      cert=(certificate, key), verify=True)
+        self.mox.ReplayAll()
+
+        with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
+            self.service.notify_alarm(context.get_admin_context(),
+                                      {
+                                          'actions': [action],
+                                          'alarm': {'name': 'foobar'},
+                                          'condition': {'threshold': 42},
+                                          'reason': 'what ?',
+                                          'state': 'ALARM',
+                                      })
+
+    def test_notify_alarm_rest_action_with_ssl_verify_disable_by_cfg(self):
+        action = 'https://host/action'
+        data_json = '{"state": "ALARM", "reason": "what ?"}'
+
+        cfg.CONF.set_override("rest_notifier_ssl_verify", False,
+                              group='alarm')
+        self.mox.StubOutWithMock(requests, "post")
+        requests.post(action, data=data_json,
+                      verify=False)
         self.mox.ReplayAll()
 
         with mock.patch('eventlet.spawn_n', self._fake_spawn_n):

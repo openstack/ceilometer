@@ -572,6 +572,10 @@
 # SSL Client private key for REST notifier (string value)
 #rest_notifier_certificate_key=
 
+# Verify the SSL Server certificate when
+# calling alarm action (boolean value)
+#rest_notifier_ssl_verify=true
+
 
 #
 # Options defined in ceilometer.alarm.rpc
@@ -709,4 +713,4 @@
 #password=<None>
 
 
-# Total option count: 133
+# Total option count: 134

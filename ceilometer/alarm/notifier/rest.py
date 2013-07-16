@@ -37,6 +37,12 @@ REST_NOTIFIER_OPTS = [
                default='',
                help='SSL Client private key for REST notifier'
                ),
+    cfg.BoolOpt('rest_notifier_ssl_verify',
+                default=True,
+                help='Verify the SSL Server certificate when \
+                calling alarm action'
+                ),
+
 ]
 
 cfg.CONF.register_opts(REST_NOTIFIER_OPTS, group="alarm")
@@ -51,9 +57,12 @@ class RestAlarmNotifier(notifier.AlarmNotifier):
         body = {'state': state, 'reason': reason}
         kwargs = {'data': jsonutils.dumps(body)}
 
-        cert = cfg.CONF.alarm.rest_notifier_certificate_file
-        key = cfg.CONF.alarm.rest_notifier_certificate_key
-        if action.scheme == 'https' and cert:
-            kwargs['cert'] = (cert, key) if key else cert
+        if action.scheme == 'https':
+            kwargs['verify'] = cfg.CONF.alarm.rest_notifier_ssl_verify
+
+            cert = cfg.CONF.alarm.rest_notifier_certificate_file
+            key = cfg.CONF.alarm.rest_notifier_certificate_key
+            if cert:
+                kwargs['cert'] = (cert, key) if key else cert
 
         eventlet.spawn_n(requests.post, action.geturl(), **kwargs)
