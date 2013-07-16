@@ -20,11 +20,26 @@
 import eventlet
 import requests
 
+from oslo.config import cfg
+
 from ceilometer.alarm import notifier
 from ceilometer.openstack.common import jsonutils
 from ceilometer.openstack.common import log
 
 LOG = log.getLogger(__name__)
+
+REST_NOTIFIER_OPTS = [
+    cfg.StrOpt('rest_notifier_certificate_file',
+               default='',
+               help='SSL Client certificate for REST notifier'
+               ),
+    cfg.StrOpt('rest_notifier_certificate_key',
+               default='',
+               help='SSL Client private key for REST notifier'
+               ),
+]
+
+cfg.CONF.register_opts(REST_NOTIFIER_OPTS, group="alarm")
 
 
 class RestAlarmNotifier(notifier.AlarmNotifier):
@@ -33,9 +48,13 @@ class RestAlarmNotifier(notifier.AlarmNotifier):
     def notify(self, action, alarm, state, reason):
         LOG.info("Notifying alarm %s in state %s with action %s because %s",
                  alarm, state, action, reason)
-        data = {
-            'state': state,
-            'reason': reason,
-        }
-        eventlet.spawn_n(requests.post, action,
-                         data=jsonutils.dumps(data))
+
+        body = {'state': state, 'reason': reason}
+        kwargs = {'data': jsonutils.dumps(body)}
+
+        cert = cfg.CONF.alarm.rest_notifier_certificate_file
+        key = cfg.CONF.alarm.rest_notifier_certificate_key
+        if action.scheme == 'https' and cert:
+            kwargs['cert'] = (cert, key) if key else cert
+
+        eventlet.spawn_n(requests.post, action, **kwargs)

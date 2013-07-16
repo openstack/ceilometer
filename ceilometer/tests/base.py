@@ -64,4 +64,5 @@ class TestCase(testtools.TestCase):
         self.stubs.UnsetAll()
         self.stubs.SmartUnsetAll()
         self.mox.VerifyAll()
+        cfg.CONF.reset()
         super(TestCase, self).tearDown()

@@ -563,6 +563,17 @@
 [alarm]
 
 #
+# Options defined in ceilometer.alarm.notifier.rest
+#
+
+# SSL Client certificate for REST notifier (string value)
+#rest_notifier_certificate_file=
+
+# SSL Client private key for REST notifier (string value)
+#rest_notifier_certificate_key=
+
+
+#
 # Options defined in ceilometer.alarm.service
 #
 
@@ -689,4 +700,4 @@
 #password=<None>
 
 
-# Total option count: 130
+# Total option count: 132

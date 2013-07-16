@@ -15,10 +15,11 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-import eventlet
 import urlparse
 import mock
 import requests
+
+from oslo.config import cfg
 
 from ceilometer.alarm import service
 from ceilometer.openstack.common import context
@@ -59,6 +60,10 @@ class TestAlarmNotifier(base.TestCase):
                                       'condition': {'threshold': 42},
                                   })
 
+    @staticmethod
+    def _fake_spawn_n(func, *args, **kwargs):
+        func(*args, **kwargs)
+
     def test_notify_alarm_rest_action(self):
         action = 'http://host/action'
         data_json = '{"state": "ALARM", "reason": "what ?"}'
@@ -66,17 +71,63 @@ class TestAlarmNotifier(base.TestCase):
         self.mox.StubOutWithMock(requests, "post")
         requests.post(network_utils.urlsplit(action), data=data_json)
         self.mox.ReplayAll()
-        self.service.notify_alarm(context.get_admin_context(),
-                                  {
-                                      'actions': [action],
-                                      'alarm': {'name': 'foobar'},
-                                      'condition': {'threshold': 42},
-                                      'reason': 'what ?',
-                                      'state': 'ALARM',
-                                  })
-        eventlet.sleep(1)
-        self.mox.UnsetStubs()
-        self.mox.VerifyAll()
+
+        with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
+            self.service.notify_alarm(context.get_admin_context(),
+                                      {
+                                          'actions': [action],
+                                          'alarm': {'name': 'foobar'},
+                                          'condition': {'threshold': 42},
+                                          'reason': 'what ?',
+                                          'state': 'ALARM',
+                                      })
+
+    def test_notify_alarm_rest_action_with_ssl_client_cert(self):
+        action = 'https://host/action'
+        certificate = "/etc/ssl/cert/whatever.pem"
+        data_json = '{"state": "ALARM", "reason": "what ?"}'
+
+        cfg.CONF.set_override("rest_notifier_certificate_file", certificate,
+                              group='alarm')
+        self.mox.StubOutWithMock(requests, "post")
+        requests.post(network_utils.urlsplit(action), data=data_json,
+                      cert=certificate)
+        self.mox.ReplayAll()
+
+        with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
+            self.service.notify_alarm(context.get_admin_context(),
+                                      {
+                                          'actions': [action],
+                                          'alarm': {'name': 'foobar'},
+                                          'condition': {'threshold': 42},
+                                          'reason': 'what ?',
+                                          'state': 'ALARM',
+                                      })
+
+    def test_notify_alarm_rest_action_with_ssl_client_cert_and_key(self):
+        action = 'https://host/action'
+        certificate = "/etc/ssl/cert/whatever.pem"
+        key = "/etc/ssl/cert/whatever.key"
+        data_json = '{"state": "ALARM", "reason": "what ?"}'
+
+        cfg.CONF.set_override("rest_notifier_certificate_file", certificate,
+                              group='alarm')
+        cfg.CONF.set_override("rest_notifier_certificate_key", key,
+                              group='alarm')
+        self.mox.StubOutWithMock(requests, "post")
+        requests.post(network_utils.urlsplit(action), data=data_json,
+                      cert=(certificate, key))
+        self.mox.ReplayAll()
+
+        with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
+            self.service.notify_alarm(context.get_admin_context(),
+                                      {
+                                          'actions': [action],
+                                          'alarm': {'name': 'foobar'},
+                                          'condition': {'threshold': 42},
+                                          'reason': 'what ?',
+                                          'state': 'ALARM',
+                                      })
 
     @staticmethod
     def _fake_urlsplit(*args, **kwargs):
