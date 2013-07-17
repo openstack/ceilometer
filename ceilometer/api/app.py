@@ -26,6 +26,7 @@ from ceilometer.api import config as api_config
 from ceilometer.api import hooks
 from ceilometer.api import middleware
 from ceilometer import service
+from ceilometer import storage
 from ceilometer.openstack.common import log
 from wsgiref import simple_server
 
@@ -51,9 +52,13 @@ def get_pecan_config():
 
 
 def setup_app(pecan_config=None, extra_hooks=None):
+    storage_engine = storage.get_engine(cfg.CONF)
     # FIXME: Replace DBHook with a hooks.TransactionHook
     app_hooks = [hooks.ConfigHook(),
-                 hooks.DBHook(),
+                 hooks.DBHook(
+                     storage_engine,
+                     storage_engine.get_connection(cfg.CONF),
+                 ),
                  hooks.PipelineHook()]
     if extra_hooks:
         app_hooks.extend(extra_hooks)

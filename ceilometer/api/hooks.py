@@ -21,7 +21,6 @@ from oslo.config import cfg
 from pecan import hooks
 
 from ceilometer import pipeline
-from ceilometer import storage
 from ceilometer import transformer
 
 
@@ -36,15 +35,13 @@ class ConfigHook(hooks.PecanHook):
 
 class DBHook(hooks.PecanHook):
 
-    def before(self, state):
-        storage_engine = storage.get_engine(state.request.cfg)
-        state.request.storage_engine = storage_engine
-        state.request.storage_conn = storage_engine.get_connection(
-            state.request.cfg)
+    def __init__(self, storage_engine, storage_connection):
+        self.storage_engine = storage_engine
+        self.storage_connection = storage_connection
 
-    # def after(self, state):
-    #     print 'method:', state.request.method
-    #     print 'response:', state.response.status
+    def before(self, state):
+        state.request.storage_engine = self.storage_engine
+        state.request.storage_conn = self.storage_connection
 
 
 class PipelineHook(hooks.PecanHook):
