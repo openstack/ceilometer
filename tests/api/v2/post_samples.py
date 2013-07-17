@@ -78,7 +78,7 @@ class TestPostSamples(FunctionalTest):
                               headers={
                                   "X-Roles": "Member",
                                   "X-Tenant-Name": "lu-tenant",
-                                  "X-Tenant-Id":
+                                  "X-Project-Id":
                                   "bc23a9d531064583ace8f67dad60f6bb",
                               })
 

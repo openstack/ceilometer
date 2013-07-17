@@ -363,7 +363,7 @@ class TestListResources(FunctionalTest):
 
         data = self.get_json('/resources',
                              headers={"X-Roles": "Member",
-                                      "X-Tenant-Id": "project-id2"})
+                                      "X-Project-Id": "project-id2"})
         ids = set(r['resource_id'] for r in data)
         self.assertEquals(set(['resource-id-alternate']), ids)
 
@@ -390,7 +390,7 @@ class TestListResources(FunctionalTest):
 
         data = self.get_json('/resources',
                              headers={"X-Roles": "Member",
-                                      "X-Tenant-Id": "project-wrong"})
+                                      "X-Project-Id": "project-wrong"})
         ids = set(r['resource_id'] for r in data)
         self.assertEquals(set(), ids)
 

@@ -52,4 +52,4 @@ def get_limited_to_project(headers):
     if not _ENFORCER.enforce('context_is_admin',
                              {},
                              {'roles': headers.get('X-Roles', "").split(",")}):
-        return headers.get('X-Tenant-Id')
+        return headers.get('X-Project-Id')

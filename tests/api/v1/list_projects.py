@@ -88,7 +88,7 @@ class TestListProjects(tests_api.TestBase):
     def test_projects_non_admin(self):
         data = self.get('/projects',
                         headers={"X-Roles": "Member",
-                                 "X-Tenant-Id": "project-id"})
+                                 "X-Project-Id": "project-id"})
         self.assertEquals(['project-id'], data['projects'])
 
     def test_with_source(self):
@@ -98,5 +98,5 @@ class TestListProjects(tests_api.TestBase):
     def test_with_source_non_admin(self):
         data = self.get('/sources/test_list_users/projects',
                         headers={"X-Roles": "Member",
-                                 "X-Tenant-Id": "project-id2"})
+                                 "X-Project-Id": "project-id2"})
         self.assertEquals(['project-id2'], data['projects'])
