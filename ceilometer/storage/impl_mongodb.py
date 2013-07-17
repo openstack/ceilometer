@@ -88,10 +88,6 @@ class MongoDBStorage(base.StorageEngine):
         conf.register_group(self.OPTION_GROUP)
         conf.register_opts(self.OPTIONS, self.OPTION_GROUP)
 
-    # FIXME(xingzhou): ceilometer-api will create a Connection object for
-    # each request. As pymongo.Connection has already maintained a db
-    # connection pool for client, it is better to use a cached Connection
-    # object to connect to mongodb.
     def get_connection(self, conf):
         """Return a Connection instance based on the configuration settings.
         """
