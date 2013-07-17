@@ -53,7 +53,7 @@ config.cfg.CONF.import_opt('compute_manager', 'nova.service')
 # nova's version of oslo to be used instead of ceilometer's.
 from ceilometer.compute import nova_notifier
 
-from ceilometer import counter
+from ceilometer import sample
 from ceilometer.tests import base
 
 LOG = logging.getLogger(__name__)
@@ -64,9 +64,9 @@ class TestNovaNotifier(base.TestCase):
 
     class Pollster(object):
         instances = []
-        test_data = counter.Counter(
+        test_data = sample.Sample(
             name='test',
-            type=counter.TYPE_CUMULATIVE,
+            type=sample.TYPE_CUMULATIVE,
             unit='units-go-here',
             volume=1,
             user_id='test',
@@ -220,7 +220,7 @@ class TestNovaNotifier(base.TestCase):
             self.assertEqual(len(samples), 1)
             s = payload['samples'][0]
             self.assertEqual(s, {'name': 'test',
-                                 'type': counter.TYPE_CUMULATIVE,
+                                 'type': sample.TYPE_CUMULATIVE,
                                  'unit': 'units-go-here',
                                  'volume': 1,
                                  })

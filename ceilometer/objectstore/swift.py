@@ -24,7 +24,7 @@ from oslo.config import cfg
 from swiftclient import client as swift
 from keystoneclient import exceptions
 
-from ceilometer import counter
+from ceilometer import sample
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
@@ -91,9 +91,9 @@ class ObjectsPollster(_Base):
 
     def get_counters(self, manager, cache):
         for tenant, account in self._iter_accounts(manager.keystone, cache):
-            yield counter.Counter(
+            yield sample.Sample(
                 name='storage.objects',
-                type=counter.TYPE_GAUGE,
+                type=sample.TYPE_GAUGE,
                 volume=int(account['x-account-object-count']),
                 unit='object',
                 user_id=None,
@@ -110,9 +110,9 @@ class ObjectsSizePollster(_Base):
 
     def get_counters(self, manager, cache):
         for tenant, account in self._iter_accounts(manager.keystone, cache):
-            yield counter.Counter(
+            yield sample.Sample(
                 name='storage.objects.size',
-                type=counter.TYPE_GAUGE,
+                type=sample.TYPE_GAUGE,
                 volume=int(account['x-account-bytes-used']),
                 unit='B',
                 user_id=None,
@@ -129,9 +129,9 @@ class ObjectsContainersPollster(_Base):
 
     def get_counters(self, manager, cache):
         for tenant, account in self._iter_accounts(manager.keystone, cache):
-            yield counter.Counter(
+            yield sample.Sample(
                 name='storage.objects.containers',
-                type=counter.TYPE_GAUGE,
+                type=sample.TYPE_GAUGE,
                 volume=int(account['x-account-container-count']),
                 unit='container',
                 user_id=None,

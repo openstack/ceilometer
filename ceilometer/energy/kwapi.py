@@ -20,7 +20,7 @@ from keystoneclient import exceptions
 import requests
 
 from ceilometer.central import plugin
-from ceilometer import counter
+from ceilometer import sample
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 
@@ -84,9 +84,9 @@ class EnergyPollster(_Base):
     def get_counters(self, manager, cache):
         """Returns all counters."""
         for probe in self._iter_probes(manager.keystone, cache):
-            yield counter.Counter(
+            yield sample.Sample(
                 name='energy',
-                type=counter.TYPE_CUMULATIVE,
+                type=sample.TYPE_CUMULATIVE,
                 unit='kWh',
                 volume=probe['kwh'],
                 user_id=None,
@@ -104,9 +104,9 @@ class PowerPollster(_Base):
     def get_counters(self, manager, cache):
         """Returns all counters."""
         for probe in self._iter_probes(manager.keystone, cache):
-            yield counter.Counter(
+            yield sample.Sample(
                 name='power',
-                type=counter.TYPE_GAUGE,
+                type=sample.TYPE_GAUGE,
                 unit='W',
                 volume=probe['w'],
                 user_id=None,

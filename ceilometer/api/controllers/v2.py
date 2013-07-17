@@ -41,7 +41,7 @@ from wsme import types as wtypes
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
-from ceilometer import counter
+from ceilometer import sample
 from ceilometer import pipeline
 from ceilometer import storage
 from ceilometer.api import acl
@@ -491,7 +491,7 @@ class MeterController(rest.RestController):
         def get_consistent_source():
             '''Find a source that can be applied across the sample group
             or raise InvalidInput if the sources are inconsistent.
-            If all are None - use the configured counter_source
+            If all are None - use the configured sample_source
             If any sample has source set then the others must be the same
             or None.
             '''
@@ -504,7 +504,7 @@ class MeterController(rest.RestController):
                                                     'with different sources')
                 if s.source and not source:
                     source = s.source
-            return source or pecan.request.cfg.counter_source
+            return source or pecan.request.cfg.sample_source
 
         samples = [Sample(**b) for b in body]
         now = timeutils.utcnow()
@@ -534,7 +534,7 @@ class MeterController(rest.RestController):
                 source,
                 pecan.request.pipeline_manager.pipelines,
         ) as publisher:
-            publisher([counter.Counter(
+            publisher([sample.Sample(
                 name=s.counter_name,
                 type=s.counter_type,
                 unit=s.counter_unit,
@@ -585,9 +585,9 @@ class Meter(_Base):
     name = wtypes.text
     "The unique name for the meter"
 
-    type = wtypes.Enum(str, counter.TYPE_GAUGE,
-                       counter.TYPE_CUMULATIVE,
-                       counter.TYPE_DELTA)
+    type = wtypes.Enum(str, sample.TYPE_GAUGE,
+                       sample.TYPE_CUMULATIVE,
+                       sample.TYPE_DELTA)
     "The meter type (see :ref:`measurements`)"
 
     unit = wtypes.text

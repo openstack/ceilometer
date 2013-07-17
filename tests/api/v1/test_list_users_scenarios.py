@@ -26,7 +26,7 @@ import testscenarios
 from oslo.config import cfg
 
 from ceilometer.publisher import rpc
-from ceilometer import counter
+from ceilometer import sample
 
 from ceilometer.tests import api as tests_api
 from ceilometer.tests import db as tests_db
@@ -50,7 +50,7 @@ class TestListUsers(tests_api.TestBase,
     def setUp(self):
         super(TestListUsers, self).setUp()
 
-        counter1 = counter.Counter(
+        counter1 = sample.Sample(
             'instance',
             'cumulative',
             'instance',
@@ -70,7 +70,7 @@ class TestListUsers(tests_api.TestBase,
         )
         self.conn.record_metering_data(msg)
 
-        counter2 = counter.Counter(
+        counter2 = sample.Sample(
             'instance',
             'cumulative',
             '',

@@ -27,7 +27,7 @@ from oslo.config import cfg
 
 from ceilometer.publisher import rpc
 from ceilometer.openstack.common import timeutils
-from ceilometer import counter
+from ceilometer import sample
 from ceilometer import storage
 from ceilometer.tests import db as test_db
 from ceilometer.storage import models
@@ -58,9 +58,9 @@ class DBTestBase(test_db.TestBase):
                           timestamps_for_test_samples_default_order)
 
         self.msgs = []
-        self.counter = counter.Counter(
+        self.counter = sample.Sample(
             'instance',
-            counter.TYPE_CUMULATIVE,
+            sample.TYPE_CUMULATIVE,
             unit='',
             volume=1,
             user_id='user-id',
@@ -79,9 +79,9 @@ class DBTestBase(test_db.TestBase):
         self.conn.record_metering_data(self.msg1)
         self.msgs.append(self.msg1)
 
-        self.counter2 = counter.Counter(
+        self.counter2 = sample.Sample(
             'instance',
-            counter.TYPE_CUMULATIVE,
+            sample.TYPE_CUMULATIVE,
             unit='',
             volume=1,
             user_id='user-id',
@@ -100,9 +100,9 @@ class DBTestBase(test_db.TestBase):
         self.conn.record_metering_data(self.msg2)
         self.msgs.append(self.msg2)
 
-        self.counter3 = counter.Counter(
+        self.counter3 = sample.Sample(
             'instance',
-            counter.TYPE_CUMULATIVE,
+            sample.TYPE_CUMULATIVE,
             unit='',
             volume=1,
             user_id='user-id-alternate',
@@ -126,9 +126,9 @@ class DBTestBase(test_db.TestBase):
 
         for i, ts in zip(range(start_idx - 1, end_idx - 1),
                          timestamp_list[start_idx:end_idx]):
-            c = counter.Counter(
+            c = sample.Sample(
                 'instance',
-                counter.TYPE_CUMULATIVE,
+                sample.TYPE_CUMULATIVE,
                 unit='',
                 volume=1,
                 user_id='user-id-%s' % i,
@@ -547,7 +547,7 @@ class StatisticsTest(DBTestBase):
     def prepare_data(self):
         self.counters = []
         for i in range(3):
-            c = counter.Counter(
+            c = sample.Sample(
                 'volume.size',
                 'gauge',
                 'GiB',
@@ -568,7 +568,7 @@ class StatisticsTest(DBTestBase):
             )
             self.conn.record_metering_data(msg)
         for i in range(3):
-            c = counter.Counter(
+            c = sample.Sample(
                 'volume.size',
                 'gauge',
                 'GiB',
@@ -754,9 +754,9 @@ class StatisticsTest(DBTestBase):
 class CounterDataTypeTest(DBTestBase):
 
     def prepare_data(self):
-        c = counter.Counter(
+        c = sample.Sample(
             'dummyBigCounter',
-            counter.TYPE_CUMULATIVE,
+            sample.TYPE_CUMULATIVE,
             unit='',
             volume=3372036854775807,
             user_id='user-id',
@@ -773,9 +773,9 @@ class CounterDataTypeTest(DBTestBase):
 
         self.conn.record_metering_data(msg)
 
-        c = counter.Counter(
+        c = sample.Sample(
             'dummySmallCounter',
-            counter.TYPE_CUMULATIVE,
+            sample.TYPE_CUMULATIVE,
             unit='',
             volume=-3372036854775807,
             user_id='user-id',
@@ -791,9 +791,9 @@ class CounterDataTypeTest(DBTestBase):
         )
         self.conn.record_metering_data(msg)
 
-        c = counter.Counter(
+        c = sample.Sample(
             'floatCounter',
-            counter.TYPE_CUMULATIVE,
+            sample.TYPE_CUMULATIVE,
             unit='',
             volume=1938495037.53697,
             user_id='user-id',

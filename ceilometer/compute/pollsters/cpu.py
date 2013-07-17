@@ -18,7 +18,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from ceilometer import counter
+from ceilometer import sample
 from ceilometer.compute import plugin
 from ceilometer.compute.pollsters import util
 from ceilometer.openstack.common import log
@@ -39,7 +39,7 @@ class CPUPollster(plugin.ComputePollster):
             yield util.make_counter_from_instance(
                 instance,
                 name='cpu',
-                type=counter.TYPE_CUMULATIVE,
+                type=sample.TYPE_CUMULATIVE,
                 unit='ns',
                 volume=cpu_info.time,
                 additional_metadata=cpu_num,

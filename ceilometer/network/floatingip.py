@@ -23,7 +23,7 @@ from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 
 from ceilometer.central import plugin
-from ceilometer import counter
+from ceilometer import sample
 from ceilometer import nova_client
 
 
@@ -47,9 +47,9 @@ class FloatingIPPollster(plugin.CentralPollster):
             # attributes were used by Ceilometer, such as project id, host.
             # In this fix, those attributes usage will be removed temporarily.
             # And they will be back after fix the Nova bug 1174802.
-            yield counter.Counter(
+            yield sample.Sample(
                 name='ip.floating',
-                type=counter.TYPE_GAUGE,
+                type=sample.TYPE_GAUGE,
                 unit='ip',
                 volume=1,
                 user_id=None,

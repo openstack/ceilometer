@@ -25,7 +25,7 @@ import sys
 
 from oslo.config import cfg
 
-from ceilometer import counter
+from ceilometer import sample
 from ceilometer import pipeline
 from ceilometer import service
 from ceilometer import transformer
@@ -88,8 +88,8 @@ pipeline_manager = pipeline.setup_pipeline(
 )
 
 with pipeline_manager.publisher(context.get_admin_context(),
-                                cfg.CONF.counter_source) as p:
-    p([counter.Counter(
+                                cfg.CONF.sample_source) as p:
+    p([sample.Sample(
         name=cfg.CONF.counter_name,
         type=cfg.CONF.counter_type,
         unit=cfg.CONF.counter_unit,

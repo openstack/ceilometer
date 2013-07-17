@@ -40,7 +40,7 @@ class PollingTask(object):
         self.pollsters = set()
         self.publish_context = pipeline.PublishContext(
             agent_manager.context,
-            cfg.CONF.counter_source)
+            cfg.CONF.sample_source)
 
     def add(self, pollster, pipelines):
         self.publish_context.add_pipelines(pipelines)

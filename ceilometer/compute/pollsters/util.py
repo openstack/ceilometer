@@ -20,7 +20,7 @@
 
 from oslo.config import cfg
 
-from ceilometer import counter
+from ceilometer import sample
 from ceilometer.openstack.common import timeutils
 
 
@@ -100,7 +100,7 @@ def make_counter_from_instance(instance, name, type, unit, volume,
                                additional_metadata={}):
     resource_metadata = _get_metadata_from_object(instance)
     resource_metadata.update(additional_metadata)
-    return counter.Counter(
+    return sample.Sample(
         name=name,
         type=type,
         unit=unit,

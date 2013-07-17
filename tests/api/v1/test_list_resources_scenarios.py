@@ -26,7 +26,7 @@ import testscenarios
 from oslo.config import cfg
 
 from ceilometer.publisher import rpc
-from ceilometer import counter
+from ceilometer import sample
 
 from ceilometer.tests import api as tests_api
 from ceilometer.tests import db as tests_db
@@ -51,7 +51,7 @@ class TestListResourcesBase(tests_api.TestBase,
         super(TestListResourcesBase, self).setUp()
 
         for cnt in [
-                counter.Counter(
+                sample.Sample(
                     'instance',
                     'cumulative',
                     '',
@@ -63,7 +63,7 @@ class TestListResourcesBase(tests_api.TestBase,
                     resource_metadata={'display_name': 'test-server',
                                        'tag': 'self.counter'},
                 ),
-                counter.Counter(
+                sample.Sample(
                     'instance',
                     'cumulative',
                     '',
@@ -75,7 +75,7 @@ class TestListResourcesBase(tests_api.TestBase,
                     resource_metadata={'display_name': 'test-server',
                                        'tag': 'self.counter2'},
                 ),
-                counter.Counter(
+                sample.Sample(
                     'instance',
                     'cumulative',
                     '',
@@ -87,7 +87,7 @@ class TestListResourcesBase(tests_api.TestBase,
                     resource_metadata={'display_name': 'test-server',
                                        'tag': 'self.counter3'},
                 ),
-                counter.Counter(
+                sample.Sample(
                     'instance',
                     'cumulative',
                     '',

@@ -26,7 +26,7 @@ import testscenarios
 from oslo.config import cfg
 
 from ceilometer.publisher import rpc
-from ceilometer import counter
+from ceilometer import sample
 
 from ceilometer.tests import api as tests_api
 from ceilometer.tests import db as tests_db
@@ -51,7 +51,7 @@ class TestListMeters(tests_api.TestBase,
         super(TestListMeters, self).setUp()
 
         for cnt in [
-                counter.Counter(
+                sample.Sample(
                     'meter.test',
                     'cumulative',
                     '',
@@ -62,7 +62,7 @@ class TestListMeters(tests_api.TestBase,
                     timestamp=datetime.datetime(2012, 7, 2, 10, 40),
                     resource_metadata={'display_name': 'test-server',
                                        'tag': 'self.counter'}),
-                counter.Counter(
+                sample.Sample(
                     'meter.test',
                     'cumulative',
                     '',
@@ -73,7 +73,7 @@ class TestListMeters(tests_api.TestBase,
                     timestamp=datetime.datetime(2012, 7, 2, 11, 40),
                     resource_metadata={'display_name': 'test-server',
                                        'tag': 'self.counter'}),
-                counter.Counter(
+                sample.Sample(
                     'meter.mine',
                     'gauge',
                     '',
@@ -84,7 +84,7 @@ class TestListMeters(tests_api.TestBase,
                     timestamp=datetime.datetime(2012, 7, 2, 10, 41),
                     resource_metadata={'display_name': 'test-server',
                                        'tag': 'two.counter'}),
-                counter.Counter(
+                sample.Sample(
                     'meter.test',
                     'cumulative',
                     '',
@@ -95,7 +95,7 @@ class TestListMeters(tests_api.TestBase,
                     timestamp=datetime.datetime(2012, 7, 2, 10, 42),
                     resource_metadata={'display_name': 'test-server',
                                        'tag': 'three.counter'}),
-                counter.Counter(
+                sample.Sample(
                     'meter.mine',
                     'gauge',
                     '',

@@ -22,7 +22,7 @@
 import datetime
 from oslo.config import cfg
 
-from ceilometer import counter
+from ceilometer import sample
 from ceilometer.openstack.common import jsonutils
 from ceilometer.openstack.common import network_utils
 from ceilometer.openstack.common import rpc as oslo_rpc
@@ -111,16 +111,15 @@ class TestSignature(base.TestCase):
 
 class TestCounter(base.TestCase):
 
-    TEST_COUNTER = counter.Counter(name='name',
-                                   type='typ',
-                                   unit='',
-                                   volume=1,
-                                   user_id='user',
-                                   project_id='project',
-                                   resource_id=2,
-                                   timestamp='today',
-                                   resource_metadata={'key': 'value'},
-                                   )
+    TEST_COUNTER = sample.Sample(name='name',
+                                 type='typ',
+                                 unit='',
+                                 volume=1,
+                                 user_id='user',
+                                 project_id='project',
+                                 resource_id=2,
+                                 timestamp='today',
+                                 resource_metadata={'key': 'value'})
 
     def test_meter_message_from_counter_signed(self):
         msg = rpc.meter_message_from_counter(self.TEST_COUNTER,
@@ -146,9 +145,9 @@ class TestCounter(base.TestCase):
 class TestPublish(base.TestCase):
 
     test_data = [
-        counter.Counter(
+        sample.Sample(
             name='test',
-            type=counter.TYPE_CUMULATIVE,
+            type=sample.TYPE_CUMULATIVE,
             unit='',
             volume=1,
             user_id='test',
@@ -157,9 +156,9 @@ class TestPublish(base.TestCase):
             timestamp=datetime.datetime.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
         ),
-        counter.Counter(
+        sample.Sample(
             name='test',
-            type=counter.TYPE_CUMULATIVE,
+            type=sample.TYPE_CUMULATIVE,
             unit='',
             volume=1,
             user_id='test',
@@ -168,9 +167,9 @@ class TestPublish(base.TestCase):
             timestamp=datetime.datetime.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
         ),
-        counter.Counter(
+        sample.Sample(
             name='test2',
-            type=counter.TYPE_CUMULATIVE,
+            type=sample.TYPE_CUMULATIVE,
             unit='',
             volume=1,
             user_id='test',
@@ -179,9 +178,9 @@ class TestPublish(base.TestCase):
             timestamp=datetime.datetime.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
         ),
-        counter.Counter(
+        sample.Sample(
             name='test2',
-            type=counter.TYPE_CUMULATIVE,
+            type=sample.TYPE_CUMULATIVE,
             unit='',
             volume=1,
             user_id='test',
@@ -190,9 +189,9 @@ class TestPublish(base.TestCase):
             timestamp=datetime.datetime.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
         ),
-        counter.Counter(
+        sample.Sample(
             name='test3',
-            type=counter.TYPE_CUMULATIVE,
+            type=sample.TYPE_CUMULATIVE,
             unit='',
             volume=1,
             user_id='test',

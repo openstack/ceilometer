@@ -28,7 +28,7 @@ import sys
 from oslo.config import cfg
 
 from ceilometer.publisher import rpc
-from ceilometer import counter
+from ceilometer import sample
 from ceilometer import storage
 from ceilometer.openstack.common import timeutils
 
@@ -119,7 +119,7 @@ def main():
     # Generate events
     n = 0
     while timestamp <= end:
-        c = counter.Counter(name=args.counter,
+        c = sample.Sample(name=args.counter,
                             type=args.type,
                             unit=args.unit,
                             volume=args.volume,

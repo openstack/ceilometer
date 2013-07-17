@@ -15,9 +15,9 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Counter class for holding data about a metering event.
+"""Sample class for holding data about a metering event.
 
-A Counter doesn't really do anything, but we need a way to
+A Sample doesn't really do anything, but we need a way to
 ensure that all of the appropriate fields have been filled
 in by the plugins that create them.
 """
@@ -29,9 +29,10 @@ from oslo.config import cfg
 
 
 OPTS = [
-    cfg.StrOpt('counter_source',
+    cfg.StrOpt('sample_source',
                default='openstack',
-               help='Source for counters emited on this instance'),
+               deprecated_name='counter_source',
+               help='Source for samples emited on this instance'),
 ]
 
 cfg.CONF.register_opts(OPTS)
@@ -39,30 +40,30 @@ cfg.CONF.register_opts(OPTS)
 
 # Fields explanation:
 #
-# Name: the name of the counter, must be unique
-# Type: the type of the counter, must be either:
+# Name: the name of the meter, must be unique
+# Type: the type of the meter, must be either:
 #       - cumulative: the value is incremented and never reset to 0
 #       - delta: the value is reset to 0 each time it is sent
 #       - gauge: the value is an absolute value and is not a counter
-# Unit: the unit of the counter
-# Volume: the counter value
+# Unit: the unit of the meter
+# Volume: the sample value
 # User ID: the user ID
 # Project ID: the project ID
 # Resource ID: the resource ID
-# Timestamp: when the counter has been read
+# Timestamp: when the sample has been read
 # Resource metadata: various metadata
-Counter = collections.namedtuple('Counter',
-                                 ' '.join([
-                                     'name',
-                                     'type',
-                                     'unit',
-                                     'volume',
-                                     'user_id',
-                                     'project_id',
-                                     'resource_id',
-                                     'timestamp',
-                                     'resource_metadata',
-                                 ]))
+Sample = collections.namedtuple('Sample',
+                                ' '.join([
+                                    'name',
+                                    'type',
+                                    'unit',
+                                    'volume',
+                                    'user_id',
+                                    'project_id',
+                                    'resource_id',
+                                    'timestamp',
+                                    'resource_metadata',
+                                ]))
 
 
 TYPE_GAUGE = 'gauge'
@@ -87,4 +88,4 @@ def from_notification(cls, name, type, volume, unit,
                resource_metadata=metadata)
 
 
-Counter.from_notification = classmethod(from_notification)
+Sample.from_notification = classmethod(from_notification)

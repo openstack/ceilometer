@@ -21,7 +21,7 @@
 import abc
 import collections
 
-from ceilometer import counter
+from ceilometer import sample
 from ceilometer.compute import plugin
 from ceilometer.compute.pollsters import util
 from ceilometer.openstack.common import log
@@ -99,7 +99,7 @@ class ReadRequestsPollster(_Base):
         return util.make_counter_from_instance(
             instance,
             name='disk.read.requests',
-            type=counter.TYPE_CUMULATIVE,
+            type=sample.TYPE_CUMULATIVE,
             unit='request',
             volume=c_data.r_requests,
         )
@@ -112,7 +112,7 @@ class ReadBytesPollster(_Base):
         return util.make_counter_from_instance(
             instance,
             name='disk.read.bytes',
-            type=counter.TYPE_CUMULATIVE,
+            type=sample.TYPE_CUMULATIVE,
             unit='B',
             volume=c_data.r_bytes,
         )
@@ -125,7 +125,7 @@ class WriteRequestsPollster(_Base):
         return util.make_counter_from_instance(
             instance,
             name='disk.write.requests',
-            type=counter.TYPE_CUMULATIVE,
+            type=sample.TYPE_CUMULATIVE,
             unit='request',
             volume=c_data.w_requests,
         )
@@ -138,7 +138,7 @@ class WriteBytesPollster(_Base):
         return util.make_counter_from_instance(
             instance,
             name='disk.write.bytes',
-            type=counter.TYPE_CUMULATIVE,
+            type=sample.TYPE_CUMULATIVE,
             unit='B',
             volume=c_data.w_bytes,
         )

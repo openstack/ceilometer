@@ -21,7 +21,7 @@ events.
 
 from oslo.config import cfg
 
-from ceilometer import counter
+from ceilometer import sample
 from ceilometer import plugin
 
 
@@ -59,9 +59,9 @@ class _Base(plugin.NotificationBase):
 
 class Volume(_Base):
     def process_notification(self, message):
-        yield counter.Counter.from_notification(
+        yield sample.Sample.from_notification(
             name='volume',
-            type=counter.TYPE_GAUGE,
+            type=sample.TYPE_GAUGE,
             unit='volume',
             volume=1,
             user_id=message['payload']['user_id'],
@@ -72,9 +72,9 @@ class Volume(_Base):
 
 class VolumeSize(_Base):
     def process_notification(self, message):
-        yield counter.Counter.from_notification(
+        yield sample.Sample.from_notification(
             name='volume.size',
-            type=counter.TYPE_GAUGE,
+            type=sample.TYPE_GAUGE,
             unit='GB',
             volume=message['payload']['size'],
             user_id=message['payload']['user_id'],

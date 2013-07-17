@@ -18,7 +18,7 @@
 
 from collections import defaultdict
 
-from ceilometer import counter as ceilocounter
+from ceilometer import sample
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer import transformer
@@ -81,7 +81,7 @@ class ScalingTransformer(transformer.TransformerBase):
         """Transform the appropriate counter fields.
         """
         scale = self.target.get('scale')
-        return ceilocounter.Counter(
+        return sample.Sample(
             name=self.target.get('name', counter.name),
             unit=self.target.get('unit', counter.unit),
             type=self.target.get('type', counter.type),
@@ -132,7 +132,7 @@ class RateOfChangeTransformer(ScalingTransformer):
             # so that the current volume gives a lower bound on growth
             volume_delta = (counter.volume - prev_volume
                             if (prev_volume <= counter.volume or
-                                counter.type != ceilocounter.TYPE_CUMULATIVE)
+                                counter.type != sample.TYPE_CUMULATIVE)
                             else counter.volume)
             rate_of_change = ((1.0 * volume_delta / time_delta)
                               if time_delta else 0.0)

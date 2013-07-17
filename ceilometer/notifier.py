@@ -26,7 +26,7 @@ from stevedore import extension
 
 LOG = logging.getLogger(__name__)
 
-cfg.CONF.import_opt('counter_source', 'ceilometer.counter')
+cfg.CONF.import_opt('sample_source', 'ceilometer.sample')
 
 
 _notification_manager = None
@@ -64,7 +64,7 @@ def _process_notification_for_ext(ext, context, notification):
     if notification['event_type'] in handler.get_event_types():
 
         with _pipeline_manager.publisher(context,
-                                         cfg.CONF.counter_source) as p:
+                                         cfg.CONF.sample_source) as p:
             # FIXME(dhellmann): Spawn green thread?
             p(list(handler.process_notification(notification)))
 

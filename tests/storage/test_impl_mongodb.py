@@ -33,7 +33,7 @@ from oslo.config import cfg
 from tests.storage import base
 
 from ceilometer.publisher import rpc
-from ceilometer import counter
+from ceilometer import sample
 from ceilometer.storage import impl_mongodb
 from ceilometer.storage import models
 
@@ -223,7 +223,7 @@ class CompatibilityTest(MongoDBEngineTestBase):
                        'record_metering_data',
                        old_record_metering_data)
         self.counters = []
-        c = counter.Counter(
+        c = sample.Sample(
             'volume.size',
             'gauge',
             'GiB',

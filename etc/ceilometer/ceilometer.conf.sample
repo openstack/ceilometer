@@ -1,19 +1,19 @@
 [DEFAULT]
 
 #
-# Options defined in ceilometer.counter
-#
-
-# Source for counters emited on this instance (string value)
-#counter_source=openstack
-
-
-#
 # Options defined in ceilometer.pipeline
 #
 
 # Configuration file for pipeline definition (string value)
 #pipeline_cfg_file=pipeline.yaml
+
+
+#
+# Options defined in ceilometer.sample
+#
+
+# Source for samples emited on this instance (string value)
+#sample_source=openstack
 
 
 #

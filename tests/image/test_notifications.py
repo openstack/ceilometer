@@ -20,7 +20,7 @@
 from datetime import datetime
 
 from ceilometer.image import notifications
-from ceilometer import counter
+from ceilometer import sample
 from ceilometer.tests import base
 
 
@@ -108,7 +108,7 @@ class TestNotification(base.TestCase):
         self._verify_common_counter(download, 'image.download', 42)
         self.assertEqual(download.user_id, fake_uuid('d'))
         self.assertEqual(download.project_id, fake_uuid('b'))
-        self.assertEqual(download.type, counter.TYPE_DELTA)
+        self.assertEqual(download.type, sample.TYPE_DELTA)
 
     def test_image_serve(self):
         handler = notifications.ImageServe()
@@ -121,7 +121,7 @@ class TestNotification(base.TestCase):
                           fake_uuid('d'))
         self.assertEquals(serve.resource_metadata.get('receiver_tenant_id'),
                           fake_uuid('b'))
-        self.assertEqual(serve.type, counter.TYPE_DELTA)
+        self.assertEqual(serve.type, sample.TYPE_DELTA)
 
     def test_image_crud_on_update(self):
         handler = notifications.ImageCRUD()
@@ -129,7 +129,7 @@ class TestNotification(base.TestCase):
         self.assertEqual(len(counters), 1)
         update = counters[0]
         self._verify_common_counter(update, 'image.update', 1)
-        self.assertEqual(update.type, counter.TYPE_DELTA)
+        self.assertEqual(update.type, sample.TYPE_DELTA)
 
     def test_image_on_update(self):
         handler = notifications.Image()
@@ -137,7 +137,7 @@ class TestNotification(base.TestCase):
         self.assertEqual(len(counters), 1)
         update = counters[0]
         self._verify_common_counter(update, 'image', 1)
-        self.assertEqual(update.type, counter.TYPE_GAUGE)
+        self.assertEqual(update.type, sample.TYPE_GAUGE)
 
     def test_image_size_on_update(self):
         handler = notifications.ImageSize()
@@ -146,7 +146,7 @@ class TestNotification(base.TestCase):
         update = counters[0]
         self._verify_common_counter(update, 'image.size',
                                     IMAGE_META['size'])
-        self.assertEqual(update.type, counter.TYPE_GAUGE)
+        self.assertEqual(update.type, sample.TYPE_GAUGE)
 
     def test_image_crud_on_upload(self):
         handler = notifications.ImageCRUD()
@@ -154,7 +154,7 @@ class TestNotification(base.TestCase):
         self.assertEqual(len(counters), 1)
         upload = counters[0]
         self._verify_common_counter(upload, 'image.upload', 1)
-        self.assertEqual(upload.type, counter.TYPE_DELTA)
+        self.assertEqual(upload.type, sample.TYPE_DELTA)
 
     def test_image_on_upload(self):
         handler = notifications.Image()
@@ -162,7 +162,7 @@ class TestNotification(base.TestCase):
         self.assertEqual(len(counters), 1)
         upload = counters[0]
         self._verify_common_counter(upload, 'image', 1)
-        self.assertEqual(upload.type, counter.TYPE_GAUGE)
+        self.assertEqual(upload.type, sample.TYPE_GAUGE)
 
     def test_image_size_on_upload(self):
         handler = notifications.ImageSize()
@@ -171,7 +171,7 @@ class TestNotification(base.TestCase):
         upload = counters[0]
         self._verify_common_counter(upload, 'image.size',
                                     IMAGE_META['size'])
-        self.assertEqual(upload.type, counter.TYPE_GAUGE)
+        self.assertEqual(upload.type, sample.TYPE_GAUGE)
 
     def test_image_crud_on_delete(self):
         handler = notifications.ImageCRUD()
@@ -179,7 +179,7 @@ class TestNotification(base.TestCase):
         self.assertEqual(len(counters), 1)
         delete = counters[0]
         self._verify_common_counter(delete, 'image.delete', 1)
-        self.assertEqual(delete.type, counter.TYPE_DELTA)
+        self.assertEqual(delete.type, sample.TYPE_DELTA)
 
     def test_image_on_delete(self):
         handler = notifications.Image()
@@ -187,7 +187,7 @@ class TestNotification(base.TestCase):
         self.assertEqual(len(counters), 1)
         delete = counters[0]
         self._verify_common_counter(delete, 'image', 1)
-        self.assertEqual(delete.type, counter.TYPE_GAUGE)
+        self.assertEqual(delete.type, sample.TYPE_GAUGE)
 
     def test_image_size_on_delete(self):
         handler = notifications.ImageSize()
@@ -196,4 +196,4 @@ class TestNotification(base.TestCase):
         delete = counters[0]
         self._verify_common_counter(delete, 'image.size',
                                     IMAGE_META['size'])
-        self.assertEqual(delete.type, counter.TYPE_GAUGE)
+        self.assertEqual(delete.type, sample.TYPE_GAUGE)

@@ -251,7 +251,7 @@ class CollectorService(rpc_service.Service):
         if notification['event_type'] in handler.get_event_types():
             ctxt = context.get_admin_context()
             with self.pipeline_manager.publisher(ctxt,
-                                                 cfg.CONF.counter_source) as p:
+                                                 cfg.CONF.sample_source) as p:
                 # FIXME(dhellmann): Spawn green thread?
                 p(list(handler.process_notification(notification)))
 

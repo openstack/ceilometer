@@ -25,7 +25,7 @@ import testscenarios
 from oslo.config import cfg
 
 from ceilometer.publisher import rpc
-from ceilometer import counter
+from ceilometer import sample
 from ceilometer.tests import db as tests_db
 
 from .base import FunctionalTest
@@ -45,7 +45,7 @@ class TestListResources(FunctionalTest,
         self.assertEquals([], data)
 
     def test_instance_no_metadata(self):
-        counter1 = counter.Counter(
+        counter1 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -67,7 +67,7 @@ class TestListResources(FunctionalTest,
         self.assertEquals(1, len(data))
 
     def test_instances(self):
-        counter1 = counter.Counter(
+        counter1 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -87,7 +87,7 @@ class TestListResources(FunctionalTest,
         )
         self.conn.record_metering_data(msg)
 
-        counter2 = counter.Counter(
+        counter2 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -111,7 +111,7 @@ class TestListResources(FunctionalTest,
         self.assertEquals(2, len(data))
 
     def test_instances_one(self):
-        counter1 = counter.Counter(
+        counter1 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -131,7 +131,7 @@ class TestListResources(FunctionalTest,
         )
         self.conn.record_metering_data(msg)
 
-        counter2 = counter.Counter(
+        counter2 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -155,7 +155,7 @@ class TestListResources(FunctionalTest,
         self.assertEquals('resource-id', data['resource_id'])
 
     def test_with_source(self):
-        counter1 = counter.Counter(
+        counter1 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -175,7 +175,7 @@ class TestListResources(FunctionalTest,
         )
         self.conn.record_metering_data(msg)
 
-        counter2 = counter.Counter(
+        counter2 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -202,7 +202,7 @@ class TestListResources(FunctionalTest,
         self.assertEquals(['resource-id'], ids)
 
     def test_with_invalid_resource_id(self):
-        counter1 = counter.Counter(
+        counter1 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -222,7 +222,7 @@ class TestListResources(FunctionalTest,
         )
         self.conn.record_metering_data(msg)
 
-        counter2 = counter.Counter(
+        counter2 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -252,7 +252,7 @@ class TestListResources(FunctionalTest,
         self.assertEquals(resp3.status_code, 400)
 
     def test_with_user(self):
-        counter1 = counter.Counter(
+        counter1 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -272,7 +272,7 @@ class TestListResources(FunctionalTest,
         )
         self.conn.record_metering_data(msg)
 
-        counter2 = counter.Counter(
+        counter2 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -299,7 +299,7 @@ class TestListResources(FunctionalTest,
         self.assertEquals(['resource-id'], ids)
 
     def test_with_project(self):
-        counter1 = counter.Counter(
+        counter1 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -319,7 +319,7 @@ class TestListResources(FunctionalTest,
         )
         self.conn.record_metering_data(msg)
 
-        counter2 = counter.Counter(
+        counter2 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -346,7 +346,7 @@ class TestListResources(FunctionalTest,
         self.assertEquals(['resource-id'], ids)
 
     def test_with_user_non_admin(self):
-        counter1 = counter.Counter(
+        counter1 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -373,7 +373,7 @@ class TestListResources(FunctionalTest,
         self.assertEquals(set(['resource-id-alternate']), ids)
 
     def test_with_user_wrong_tenant(self):
-        counter1 = counter.Counter(
+        counter1 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -400,7 +400,7 @@ class TestListResources(FunctionalTest,
         self.assertEquals(set(), ids)
 
     def test_metadata(self):
-        counter1 = counter.Counter(
+        counter1 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -431,7 +431,7 @@ class TestListResources(FunctionalTest,
              ])
 
     def test_resource_meter_links(self):
-        counter1 = counter.Counter(
+        counter1 = sample.Sample(
             'instance',
             'cumulative',
             '',

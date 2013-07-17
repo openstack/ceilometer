@@ -26,7 +26,7 @@ import testscenarios
 from oslo.config import cfg
 
 from ceilometer.publisher import rpc
-from ceilometer import counter
+from ceilometer import sample
 from ceilometer.tests import db as tests_db
 
 from .base import FunctionalTest
@@ -41,7 +41,7 @@ class TestListEvents(FunctionalTest,
 
     def setUp(self):
         super(TestListEvents, self).setUp()
-        self.counter1 = counter.Counter(
+        self.counter1 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -63,7 +63,7 @@ class TestListEvents(FunctionalTest,
         )
         self.conn.record_metering_data(msg)
 
-        self.counter2 = counter.Counter(
+        self.counter2 = sample.Sample(
             'instance',
             'cumulative',
             '',

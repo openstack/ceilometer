@@ -22,7 +22,7 @@ import datetime
 import os
 import logging
 import logging.handlers
-from ceilometer import counter
+from ceilometer import sample
 from ceilometer.publisher import file
 from ceilometer.tests import base
 from ceilometer.openstack.common.network_utils import urlsplit
@@ -31,9 +31,9 @@ from ceilometer.openstack.common.network_utils import urlsplit
 class TestFilePublisher(base.TestCase):
 
     test_data = [
-        counter.Counter(
+        sample.Sample(
             name='test',
-            type=counter.TYPE_CUMULATIVE,
+            type=sample.TYPE_CUMULATIVE,
             unit='',
             volume=1,
             user_id='test',
@@ -42,9 +42,9 @@ class TestFilePublisher(base.TestCase):
             timestamp=datetime.datetime.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
         ),
-        counter.Counter(
+        sample.Sample(
             name='test2',
-            type=counter.TYPE_CUMULATIVE,
+            type=sample.TYPE_CUMULATIVE,
             unit='',
             volume=1,
             user_id='test',
@@ -53,9 +53,9 @@ class TestFilePublisher(base.TestCase):
             timestamp=datetime.datetime.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
         ),
-        counter.Counter(
+        sample.Sample(
             name='test2',
-            type=counter.TYPE_CUMULATIVE,
+            type=sample.TYPE_CUMULATIVE,
             unit='',
             volume=1,
             user_id='test',

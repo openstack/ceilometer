@@ -23,7 +23,7 @@ import testscenarios
 
 from oslo.config import cfg
 
-from ceilometer import counter
+from ceilometer import sample
 from ceilometer.api import acl
 from ceilometer.publisher import rpc
 from ceilometer.tests import db as tests_db
@@ -83,7 +83,7 @@ class TestAPIACL(FunctionalTest,
         self.environ = {'fake.cache': FakeMemcache()}
 
         for cnt in [
-                counter.Counter(
+                sample.Sample(
                     'meter.test',
                     'cumulative',
                     '',
@@ -94,7 +94,7 @@ class TestAPIACL(FunctionalTest,
                     timestamp=datetime.datetime(2012, 7, 2, 10, 40),
                     resource_metadata={'display_name': 'test-server',
                                        'tag': 'self.counter'}),
-                counter.Counter(
+                sample.Sample(
                     'meter.mine',
                     'gauge',
                     '',

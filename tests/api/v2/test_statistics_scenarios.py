@@ -23,7 +23,7 @@ import testscenarios
 from oslo.config import cfg
 
 from . import base
-from ceilometer import counter
+from ceilometer import sample
 from ceilometer.publisher import rpc
 from ceilometer.tests import db as tests_db
 
@@ -40,7 +40,7 @@ class TestMaxProjectVolume(base.FunctionalTest,
 
         self.counters = []
         for i in range(3):
-            c = counter.Counter(
+            c = sample.Sample(
                 'volume.size',
                 'gauge',
                 'GiB',
@@ -141,7 +141,7 @@ class TestMaxResourceVolume(base.FunctionalTest,
 
         self.counters = []
         for i in range(3):
-            c = counter.Counter(
+            c = sample.Sample(
                 'volume.size',
                 'gauge',
                 'GiB',
@@ -258,7 +258,7 @@ class TestSumProjectVolume(base.FunctionalTest,
 
         self.counters = []
         for i in range(3):
-            c = counter.Counter(
+            c = sample.Sample(
                 'volume.size',
                 'gauge',
                 'GiB',
@@ -361,7 +361,7 @@ class TestSumResourceVolume(base.FunctionalTest,
 
         self.counters = []
         for i in range(3):
-            c = counter.Counter(
+            c = sample.Sample(
                 'volume.size',
                 'gauge',
                 'GiB',

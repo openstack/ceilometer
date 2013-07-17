@@ -28,7 +28,7 @@ from oslo.config import cfg
 from stevedore import extension
 from stevedore.tests import manager as test_manager
 
-from ceilometer import counter
+from ceilometer import sample
 from ceilometer.openstack.common import timeutils
 from ceilometer.collector import service
 from ceilometer.storage import base
@@ -115,7 +115,7 @@ class TestUDPCollectorService(TestCollector):
     def setUp(self):
         super(TestUDPCollectorService, self).setUp()
         self.srv = service.UDPCollectorService()
-        self.counter = dict(counter.Counter(
+        self.counter = dict(sample.Sample(
             name='foobar',
             type='bad',
             unit='F',

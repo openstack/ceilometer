@@ -23,7 +23,7 @@ import mock
 import msgpack
 from oslo.config import cfg
 
-from ceilometer import counter
+from ceilometer import sample
 from ceilometer.publisher import udp
 from ceilometer.tests import base
 from ceilometer.openstack.common import network_utils
@@ -32,9 +32,9 @@ from ceilometer.openstack.common import network_utils
 class TestUDPPublisher(base.TestCase):
 
     test_data = [
-        counter.Counter(
+        sample.Sample(
             name='test',
-            type=counter.TYPE_CUMULATIVE,
+            type=sample.TYPE_CUMULATIVE,
             unit='',
             volume=1,
             user_id='test',
@@ -43,9 +43,9 @@ class TestUDPPublisher(base.TestCase):
             timestamp=datetime.datetime.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
         ),
-        counter.Counter(
+        sample.Sample(
             name='test',
-            type=counter.TYPE_CUMULATIVE,
+            type=sample.TYPE_CUMULATIVE,
             unit='',
             volume=1,
             user_id='test',
@@ -54,9 +54,9 @@ class TestUDPPublisher(base.TestCase):
             timestamp=datetime.datetime.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
         ),
-        counter.Counter(
+        sample.Sample(
             name='test2',
-            type=counter.TYPE_CUMULATIVE,
+            type=sample.TYPE_CUMULATIVE,
             unit='',
             volume=1,
             user_id='test',
@@ -65,9 +65,9 @@ class TestUDPPublisher(base.TestCase):
             timestamp=datetime.datetime.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
         ),
-        counter.Counter(
+        sample.Sample(
             name='test2',
-            type=counter.TYPE_CUMULATIVE,
+            type=sample.TYPE_CUMULATIVE,
             unit='',
             volume=1,
             user_id='test',
@@ -76,9 +76,9 @@ class TestUDPPublisher(base.TestCase):
             timestamp=datetime.datetime.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
         ),
-        counter.Counter(
+        sample.Sample(
             name='test3',
-            type=counter.TYPE_CUMULATIVE,
+            type=sample.TYPE_CUMULATIVE,
             unit='',
             volume=1,
             user_id='test',

@@ -22,7 +22,7 @@
 
 from oslo.config import cfg
 
-from ceilometer import counter
+from ceilometer import sample
 from ceilometer.openstack.common import log
 from ceilometer import plugin
 
@@ -75,9 +75,9 @@ class NetworkNotificationBase(plugin.NotificationBase):
         counter_name = getattr(self, 'counter_name', self.resource_name)
         unit_value = getattr(self, 'unit', self.resource_name)
 
-        yield counter.Counter.from_notification(
+        yield sample.Sample.from_notification(
             name=counter_name,
-            type=counter.TYPE_GAUGE,
+            type=sample.TYPE_GAUGE,
             unit=unit_value,
             volume=1,
             user_id=message['_context_user_id'],
@@ -87,10 +87,10 @@ class NetworkNotificationBase(plugin.NotificationBase):
 
         event_type_split = message['event_type'].split('.')
         if len(event_type_split) > 2:
-            yield counter.Counter.from_notification(
+            yield sample.Sample.from_notification(
                 name=counter_name
                 + "." + event_type_split[1],
-                type=counter.TYPE_DELTA,
+                type=sample.TYPE_DELTA,
                 unit=unit_value,
                 volume=1,
                 user_id=message['_context_user_id'],

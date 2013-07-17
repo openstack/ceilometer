@@ -21,7 +21,7 @@
 
 from oslo.config import cfg
 
-from ceilometer import counter
+from ceilometer import sample
 from ceilometer import plugin
 
 OPTS = [
@@ -62,9 +62,9 @@ class ImageCRUDBase(ImageBase):
 
 class ImageCRUD(ImageCRUDBase):
     def process_notification(self, message):
-        yield counter.Counter.from_notification(
+        yield sample.Sample.from_notification(
             name=message['event_type'],
-            type=counter.TYPE_DELTA,
+            type=sample.TYPE_DELTA,
             unit='image',
             volume=1,
             resource_id=message['payload']['id'],
@@ -75,9 +75,9 @@ class ImageCRUD(ImageCRUDBase):
 
 class Image(ImageCRUDBase):
     def process_notification(self, message):
-        yield counter.Counter.from_notification(
+        yield sample.Sample.from_notification(
             name='image',
-            type=counter.TYPE_GAUGE,
+            type=sample.TYPE_GAUGE,
             unit='image',
             volume=1,
             resource_id=message['payload']['id'],
@@ -88,9 +88,9 @@ class Image(ImageCRUDBase):
 
 class ImageSize(ImageCRUDBase):
     def process_notification(self, message):
-        yield counter.Counter.from_notification(
+        yield sample.Sample.from_notification(
             name='image.size',
-            type=counter.TYPE_GAUGE,
+            type=sample.TYPE_GAUGE,
             unit='B',
             volume=message['payload']['size'],
             resource_id=message['payload']['id'],
@@ -108,9 +108,9 @@ class ImageDownload(ImageBase):
         ]
 
     def process_notification(self, message):
-        yield counter.Counter.from_notification(
+        yield sample.Sample.from_notification(
             name='image.download',
-            type=counter.TYPE_DELTA,
+            type=sample.TYPE_DELTA,
             unit='B',
             volume=message['payload']['bytes_sent'],
             resource_id=message['payload']['image_id'],
@@ -128,9 +128,9 @@ class ImageServe(ImageBase):
         ]
 
     def process_notification(self, message):
-        yield counter.Counter.from_notification(
+        yield sample.Sample.from_notification(
             name='image.serve',
-            type=counter.TYPE_DELTA,
+            type=sample.TYPE_DELTA,
             unit='B',
             volume=message['payload']['bytes_sent'],
             resource_id=message['payload']['image_id'],

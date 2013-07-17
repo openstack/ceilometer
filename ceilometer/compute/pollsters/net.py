@@ -20,7 +20,7 @@
 
 import copy
 
-from ceilometer import counter
+from ceilometer import sample
 from ceilometer.compute import plugin
 from ceilometer.compute.pollsters import util
 from ceilometer.openstack.common import log
@@ -48,7 +48,7 @@ class _Base(plugin.ComputePollster):
             instance_name = util.instance_name(instance)
             rid = "%s-%s-%s" % (instance_name, instance.id, vnic_data.name)
 
-        return counter.Counter(
+        return sample.Sample(
             name=name,
             type=type,
             unit=unit,
@@ -95,7 +95,7 @@ class IncomingBytesPollster(_Base):
         return self.make_vnic_counter(
             instance,
             name='network.incoming.bytes',
-            type=counter.TYPE_CUMULATIVE,
+            type=sample.TYPE_CUMULATIVE,
             unit='B',
             volume=info.rx_bytes,
             vnic_data=vnic,
@@ -108,7 +108,7 @@ class IncomingPacketsPollster(_Base):
         return self.make_vnic_counter(
             instance,
             name='network.incoming.packets',
-            type=counter.TYPE_CUMULATIVE,
+            type=sample.TYPE_CUMULATIVE,
             unit='packet',
             volume=info.rx_packets,
             vnic_data=vnic,
@@ -121,7 +121,7 @@ class OutgoingBytesPollster(_Base):
         return self.make_vnic_counter(
             instance,
             name='network.outgoing.bytes',
-            type=counter.TYPE_CUMULATIVE,
+            type=sample.TYPE_CUMULATIVE,
             unit='B',
             volume=info.tx_bytes,
             vnic_data=vnic,
@@ -134,7 +134,7 @@ class OutgoingPacketsPollster(_Base):
         return self.make_vnic_counter(
             instance,
             name='network.outgoing.packets',
-            type=counter.TYPE_CUMULATIVE,
+            type=sample.TYPE_CUMULATIVE,
             unit='packet',
             volume=info.tx_packets,
             vnic_data=vnic,

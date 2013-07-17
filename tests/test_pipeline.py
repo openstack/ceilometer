@@ -21,7 +21,7 @@ import datetime
 
 from stevedore import extension
 
-from ceilometer import counter
+from ceilometer import sample
 from ceilometer import publisher
 from ceilometer.publisher import test as test_publisher
 from ceilometer import transformer
@@ -101,9 +101,9 @@ class TestPipeline(base.TestCase):
     def setUp(self):
         super(TestPipeline, self).setUp()
 
-        self.test_counter = counter.Counter(
+        self.test_counter = sample.Sample(
             name='a',
-            type=counter.TYPE_GAUGE,
+            type=sample.TYPE_GAUGE,
             volume=1,
             unit='B',
             user_id="test_user",
@@ -653,9 +653,9 @@ class TestPipeline(base.TestCase):
         ]
         self.pipeline_cfg[0]['counters'] = ['cpu']
         counters = [
-            counter.Counter(
+            sample.Sample(
                 name='cpu',
-                type=counter.TYPE_CUMULATIVE,
+                type=sample.TYPE_CUMULATIVE,
                 volume=1200000000,
                 unit='ns',
                 user_id='test_user',
@@ -678,7 +678,7 @@ class TestPipeline(base.TestCase):
         cpu_mins = publisher.counters[-1]
         self.assertEquals(getattr(cpu_mins, 'name'), 'cpu_mins')
         self.assertEquals(getattr(cpu_mins, 'unit'), 'min')
-        self.assertEquals(getattr(cpu_mins, 'type'), counter.TYPE_CUMULATIVE)
+        self.assertEquals(getattr(cpu_mins, 'type'), sample.TYPE_CUMULATIVE)
         self.assertEquals(getattr(cpu_mins, 'volume'), 20)
 
     def test_unit_identified_source_unit_conversion(self):
@@ -695,9 +695,9 @@ class TestPipeline(base.TestCase):
         self.pipeline_cfg[0]['counters'] = ['core_temperature',
                                             'ambient_temperature']
         counters = [
-            counter.Counter(
+            sample.Sample(
                 name='core_temperature',
-                type=counter.TYPE_GAUGE,
+                type=sample.TYPE_GAUGE,
                 volume=36.0,
                 unit='°C',
                 user_id='test_user',
@@ -706,9 +706,9 @@ class TestPipeline(base.TestCase):
                 timestamp=timeutils.utcnow().isoformat(),
                 resource_metadata={}
             ),
-            counter.Counter(
+            sample.Sample(
                 name='ambient_temperature',
-                type=counter.TYPE_GAUGE,
+                type=sample.TYPE_GAUGE,
                 volume=88.8,
                 unit='°F',
                 user_id='test_user',
@@ -748,7 +748,7 @@ class TestPipeline(base.TestCase):
                     'source': {},
                     'target': {'name': 'cpu_util',
                                'unit': '%',
-                               'type': counter.TYPE_GAUGE,
+                               'type': sample.TYPE_GAUGE,
                                'scale': s},
                 }
             },
@@ -758,7 +758,7 @@ class TestPipeline(base.TestCase):
         later = now + datetime.timedelta(minutes=offset)
         um = {'autoscaling_weight': weight} if weight else {}
         counters = [
-            counter.Counter(
+            sample.Sample(
                 name='cpu',
                 type=type,
                 volume=prev,
@@ -770,7 +770,7 @@ class TestPipeline(base.TestCase):
                 resource_metadata={'cpu_number': 4,
                                    'user_metadata': um},
             ),
-            counter.Counter(
+            sample.Sample(
                 name='cpu',
                 type=type,
                 volume=prev,
@@ -782,7 +782,7 @@ class TestPipeline(base.TestCase):
                 resource_metadata={'cpu_number': 2,
                                    'user_metadata': um},
             ),
-            counter.Counter(
+            sample.Sample(
                 name='cpu',
                 type=type,
                 volume=curr,
@@ -794,7 +794,7 @@ class TestPipeline(base.TestCase):
                 resource_metadata={'cpu_number': 4,
                                    'user_metadata': um},
             ),
-            counter.Counter(
+            sample.Sample(
                 name='cpu',
                 type=type,
                 volume=curr,
@@ -821,44 +821,44 @@ class TestPipeline(base.TestCase):
         self.assertEquals(getattr(cpu_util, 'name'), 'cpu_util')
         self.assertEquals(getattr(cpu_util, 'resource_id'), 'test_resource')
         self.assertEquals(getattr(cpu_util, 'unit'), '%')
-        self.assertEquals(getattr(cpu_util, 'type'), counter.TYPE_GAUGE)
+        self.assertEquals(getattr(cpu_util, 'type'), sample.TYPE_GAUGE)
         self.assertEquals(getattr(cpu_util, 'volume'), expected)
         cpu_util = publisher.counters[1]
         self.assertEquals(getattr(cpu_util, 'name'), 'cpu_util')
         self.assertEquals(getattr(cpu_util, 'resource_id'), 'test_resource2')
         self.assertEquals(getattr(cpu_util, 'unit'), '%')
-        self.assertEquals(getattr(cpu_util, 'type'), counter.TYPE_GAUGE)
+        self.assertEquals(getattr(cpu_util, 'type'), sample.TYPE_GAUGE)
         self.assertEquals(getattr(cpu_util, 'volume'), expected * 2)
 
     def test_rate_of_change_conversion(self):
         self._do_test_rate_of_change_conversion(120000000000,
                                                 180000000000,
-                                                counter.TYPE_CUMULATIVE,
+                                                sample.TYPE_CUMULATIVE,
                                                 25.0)
 
     def test_rate_of_change_conversion_weight(self):
         self._do_test_rate_of_change_conversion(120000000000,
                                                 180000000000,
-                                                counter.TYPE_CUMULATIVE,
+                                                sample.TYPE_CUMULATIVE,
                                                 27.5,
                                                 weight=1.1)
 
     def test_rate_of_change_conversion_negative_cumulative_delta(self):
         self._do_test_rate_of_change_conversion(180000000000,
                                                 120000000000,
-                                                counter.TYPE_CUMULATIVE,
+                                                sample.TYPE_CUMULATIVE,
                                                 50.0)
 
     def test_rate_of_change_conversion_negative_gauge_delta(self):
         self._do_test_rate_of_change_conversion(180000000000,
                                                 120000000000,
-                                                counter.TYPE_GAUGE,
+                                                sample.TYPE_GAUGE,
                                                 -25.0)
 
     def test_rate_of_change_conversion_zero_delay(self):
         self._do_test_rate_of_change_conversion(120000000000,
                                                 120000000000,
-                                                counter.TYPE_CUMULATIVE,
+                                                sample.TYPE_CUMULATIVE,
                                                 0.0,
                                                 offset=0)
 
@@ -871,7 +871,7 @@ class TestPipeline(base.TestCase):
                     'source': {},
                     'target': {'name': 'cpu_util',
                                'unit': '%',
-                               'type': counter.TYPE_GAUGE,
+                               'type': sample.TYPE_GAUGE,
                                'scale': s}
                 }
             },
@@ -879,9 +879,9 @@ class TestPipeline(base.TestCase):
         self.pipeline_cfg[0]['counters'] = ['cpu']
         now = timeutils.utcnow()
         counters = [
-            counter.Counter(
+            sample.Sample(
                 name='cpu',
-                type=counter.TYPE_CUMULATIVE,
+                type=sample.TYPE_CUMULATIVE,
                 volume=120000000000,
                 unit='ns',
                 user_id='test_user',

@@ -26,15 +26,15 @@ import mock
 from stevedore import extension
 from stevedore.tests import manager as extension_tests
 
-from ceilometer import counter
+from ceilometer import sample
 from ceilometer import pipeline
 from ceilometer.tests import base
 from ceilometer import transformer
 
 
-default_test_data = counter.Counter(
+default_test_data = sample.Sample(
     name='test',
-    type=counter.TYPE_CUMULATIVE,
+    type=sample.TYPE_CUMULATIVE,
     unit='',
     volume=1,
     user_id='test',

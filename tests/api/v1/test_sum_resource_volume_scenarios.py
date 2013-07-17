@@ -25,7 +25,7 @@ import testscenarios
 from oslo.config import cfg
 
 from ceilometer.publisher import rpc
-from ceilometer import counter
+from ceilometer import sample
 
 from ceilometer.tests import api as tests_api
 from ceilometer.tests import db as tests_db
@@ -41,7 +41,7 @@ class TestSumResourceVolume(tests_api.TestBase,
 
         self.counters = []
         for i in range(3):
-            c = counter.Counter(
+            c = sample.Sample(
                 'volume.size',
                 'gauge',
                 'GiB',

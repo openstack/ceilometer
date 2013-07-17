@@ -23,7 +23,7 @@ from __future__ import absolute_import
 import itertools
 import glanceclient
 
-from ceilometer import counter
+from ceilometer import sample
 from ceilometer.openstack.common import timeutils
 from ceilometer import plugin
 
@@ -102,9 +102,9 @@ class ImagePollster(_Base):
 
     def get_counters(self, manager, cache):
         for image in self._iter_images(manager.keystone, cache):
-            yield counter.Counter(
+            yield sample.Sample(
                 name='image',
-                type=counter.TYPE_GAUGE,
+                type=sample.TYPE_GAUGE,
                 unit='image',
                 volume=1,
                 user_id=None,
@@ -119,9 +119,9 @@ class ImageSizePollster(_Base):
 
     def get_counters(self, manager, cache):
         for image in self._iter_images(manager.keystone, cache):
-            yield counter.Counter(
+            yield sample.Sample(
                 name='image.size',
-                type=counter.TYPE_GAUGE,
+                type=sample.TYPE_GAUGE,
                 unit='B',
                 volume=image.size,
                 user_id=None,
