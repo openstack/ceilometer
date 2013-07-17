@@ -51,10 +51,6 @@ class StorageEngine(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def register_opts(self, conf):
-        """Register any configuration options used by this engine."""
-
-    @abc.abstractmethod
     def get_connection(self, conf):
         """Return a Connection instance based on the configuration settings."""
 

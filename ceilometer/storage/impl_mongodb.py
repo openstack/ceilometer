@@ -73,10 +73,6 @@ class MongoDBStorage(base.StorageEngine):
             }
     """
 
-    def register_opts(self, conf):
-        """Register any configuration options used by this engine.
-        """
-
     def get_connection(self, conf):
         """Return a Connection instance based on the configuration settings.
         """

@@ -28,10 +28,6 @@ class LogStorage(base.StorageEngine):
     """Log the data
     """
 
-    def register_opts(self, conf):
-        """Register any configuration options used by this engine.
-        """
-
     def get_connection(self, conf):
         """Return a Connection instance based on the configuration settings.
         """

@@ -92,12 +92,6 @@ class SQLAlchemyStorage(base.StorageEngine):
               }
     """
 
-    OPTIONS = []
-
-    def register_opts(self, conf):
-        """Register any configuration options used by this engine."""
-        conf.register_opts(self.OPTIONS)
-
     @staticmethod
     def get_connection(conf):
         """Return a Connection instance based on the configuration settings.
