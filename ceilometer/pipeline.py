@@ -204,7 +204,7 @@ class Pipeline(object):
 
         transformed_counters = []
         for counter in counters:
-            LOG.audit("Pipeline %s: Transform counter %s from %s transformer",
+            LOG.debug("Pipeline %s: Transform counter %s from %s transformer",
                       self, counter, start)
             counter = self._transform_counter(start, ctxt, counter, source)
             if counter:
