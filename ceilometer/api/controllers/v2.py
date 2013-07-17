@@ -382,7 +382,7 @@ class Statistics(_Base):
     "The number of samples seen"
 
     duration = float
-    "The difference, in minutes, between the oldest and newest timestamp"
+    "The difference, in seconds, between the oldest and newest timestamp"
 
     duration_start = datetime.datetime
     "UTC date and time of the earliest timestamp, or the query start time"
@@ -417,7 +417,7 @@ class Statistics(_Base):
             self.duration_end = end_timestamp
             LOG.debug('clamping max timestamp to range')
 
-        # If we got valid timestamps back, compute a duration in minutes.
+        # If we got valid timestamps back, compute a duration in seconds.
         #
         # If the min > max after clamping then we know the
         # timestamps on the samples fell outside of the time
