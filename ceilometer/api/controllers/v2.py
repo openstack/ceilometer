@@ -514,6 +514,11 @@ class MeterController(rest.RestController):
             if self._id != s.counter_name:
                 raise wsme.exc.InvalidInput('counter_name', s.counter_name,
                                             'should be %s' % self._id)
+
+            s.user_id = (s.user_id or
+                         pecan.request.headers.get('X-User-Id'))
+            s.project_id = (s.project_id or
+                            pecan.request.headers.get('X-Project-Id'))
             if auth_project and auth_project != s.project_id:
                 # non admin user trying to cross post to another project_id
                 auth_msg = 'can not post samples to other projects'

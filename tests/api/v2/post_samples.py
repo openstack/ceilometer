@@ -203,3 +203,29 @@ class TestPostSamples(FunctionalTest):
                     self.assertEquals(data.json[x][k],
                                       '%s:%s' % (s1[x]['project_id'],
                                                  'paperstack'))
+
+    def test_missing_project_user_id(self):
+        """Ensure missing project & user IDs are defaulted appropriately.
+        """
+        s1 = [{'counter_name': 'my_counter_name',
+               'counter_type': 'gauge',
+               'counter_unit': 'instance',
+               'counter_volume': 1,
+               'source': 'closedstack',
+               'resource_id': 'bd9431c1-8d69-4ad3-803a-8d4a6b89fd36',
+               'resource_metadata': {'name1': 'value1',
+                                     'name2': 'value2'}}]
+
+        project_id = 'bc23a9d531064583ace8f67dad60f6bb'
+        user_id = 'fd87807-12d2-4b38-9c70-5f5c2ac427ff'
+        data = self.post_json('/meters/my_counter_name/', s1,
+                              expect_errors=True,
+                              headers={
+                                  'X-Roles': 'chief-bottle-washer',
+                                  'X-Project-Id': project_id,
+                                  'X-User-Id': user_id,
+                              })
+
+        self.assertEquals(data.status_int, 200)
+        self.assertEquals(data.json[0]['project_id'], project_id)
+        self.assertEquals(data.json[0]['user_id'], user_id)
