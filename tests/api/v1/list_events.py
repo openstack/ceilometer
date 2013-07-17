@@ -88,13 +88,13 @@ class TestListEvents(tests_api.TestBase):
     def test_by_project_non_admin(self):
         data = self.get('/projects/project1/meters/instance',
                         headers={"X-Roles": "Member",
-                                 "X-Tenant-Id": "project1"})
+                                 "X-Project-Id": "project1"})
         self.assertEquals(2, len(data['events']))
 
     def test_by_project_wrong_tenant(self):
         resp = self.get('/projects/project1/meters/instance',
                         headers={"X-Roles": "Member",
-                                 "X-Tenant-Id": "this-is-my-project"})
+                                 "X-Project-Id": "this-is-my-project"})
         self.assertEquals(404, resp.status_code)
 
     def test_by_project_with_timestamps(self):
@@ -113,13 +113,13 @@ class TestListEvents(tests_api.TestBase):
     def test_by_resource_non_admin(self):
         data = self.get('/resources/resource-id-alternate/meters/instance',
                         headers={"X-Roles": "Member",
-                                 "X-Tenant-Id": "project2"})
+                                 "X-Project-Id": "project2"})
         self.assertEquals(1, len(data['events']))
 
     def test_by_resource_some_tenant(self):
         data = self.get('/resources/resource-id/meters/instance',
                         headers={"X-Roles": "Member",
-                                 "X-Tenant-Id": "project2"})
+                                 "X-Project-Id": "project2"})
         self.assertEquals(0, len(data['events']))
 
     def test_empty_source(self):
@@ -133,7 +133,7 @@ class TestListEvents(tests_api.TestBase):
     def test_by_source_non_admin(self):
         data = self.get('/sources/source1/meters/instance',
                         headers={"X-Roles": "Member",
-                                 "X-Tenant-Id": "project2"})
+                                 "X-Project-Id": "project2"})
         self.assertEquals(1, len(data['events']))
 
     def test_by_source_with_timestamps(self):
@@ -152,13 +152,13 @@ class TestListEvents(tests_api.TestBase):
     def test_by_user_non_admin(self):
         data = self.get('/users/user-id/meters/instance',
                         headers={"X-Roles": "Member",
-                                 "X-Tenant-Id": "project1"})
+                                 "X-Project-Id": "project1"})
         self.assertEquals(2, len(data['events']))
 
     def test_by_user_wrong_tenant(self):
         data = self.get('/users/user-id/meters/instance',
                         headers={"X-Roles": "Member",
-                                 "X-Tenant-Id": "project2"})
+                                 "X-Project-Id": "project2"})
         self.assertEquals(0, len(data['events']))
 
     def test_by_user_with_timestamps(self):
@@ -185,7 +185,7 @@ class TestListEventsMetaquery(TestListEvents):
         q = '/sources/source1/meters/instance'
         data = self.get('%s?metadata.tag=self.counter2' % q,
                         headers={"X-Roles": "Member",
-                                 "X-Tenant-Id": "project1"})
+                                 "X-Project-Id": "project1"})
         self.assertEquals(0, len(data['events']))
 
     def test_metaquery2(self):
@@ -197,7 +197,7 @@ class TestListEventsMetaquery(TestListEvents):
         q = '/sources/source1/meters/instance'
         data = self.get('%s?metadata.tag=self.counter' % q,
                         headers={"X-Roles": "Member",
-                                 "X-Tenant-Id": "project1"})
+                                 "X-Project-Id": "project1"})
         self.assertEquals(2, len(data['events']))
 
     def test_metaquery3(self):
@@ -209,5 +209,5 @@ class TestListEventsMetaquery(TestListEvents):
         q = '/sources/source1/meters/instance'
         data = self.get('%s?metadata.display_name=test-server' % q,
                         headers={"X-Roles": "Member",
-                                 "X-Tenant-Id": "project2"})
+                                 "X-Project-Id": "project2"})
         self.assertEquals(1, len(data['events']))

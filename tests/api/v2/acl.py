@@ -127,7 +127,7 @@ class TestAPIACL(FunctionalTest):
                                  headers={
                                      "X-Roles": "Member",
                                      "X-Tenant-Name": "admin",
-                                     "X-Tenant-Id":
+                                     "X-Project-Id":
                                      "bc23a9d531064583ace8f67dad60f6bb",
                                  })
         self.assertEqual(response.status_int, 401)
@@ -143,7 +143,7 @@ class TestAPIACL(FunctionalTest):
     #                              headers={
     #             "X-Roles": "admin",
     #             "X-Tenant-Name": "achoo",
-    #             "X-Tenant-Id": "bc23a9d531064583ace8f67dad60f6bb",
+    #             "X-Project-Id": "bc23a9d531064583ace8f67dad60f6bb",
     #             })
     #     self.assertEqual(response.status_int, 401)
 
@@ -152,7 +152,7 @@ class TestAPIACL(FunctionalTest):
                              headers={"X-Auth-Token": VALID_TOKEN,
                                       "X-Roles": "admin",
                                       "X-Tenant-Name": "admin",
-                                      "X-Tenant-Id":
+                                      "X-Project-Id":
                                       "bc23a9d531064583ace8f67dad60f6bb",
                                       })
         ids = set(r['resource_id'] for r in data)
@@ -162,7 +162,7 @@ class TestAPIACL(FunctionalTest):
         data = self.get_json('/meters',
                              headers={"X-Roles": "Member",
                                       "X-Auth-Token": VALID_TOKEN2,
-                                      "X-Tenant-Id": "project-good"})
+                                      "X-Project-Id": "project-good"})
         ids = set(r['resource_id'] for r in data)
         self.assertEquals(set(['resource-good', 'resource-56']), ids)
 
@@ -170,7 +170,7 @@ class TestAPIACL(FunctionalTest):
         data = self.get_json('/meters',
                              headers={"X-Roles": "Member",
                                       "X-Auth-Token": VALID_TOKEN2,
-                                      "X-Tenant-Id": "project-good"},
+                                      "X-Project-Id": "project-good"},
                              q=[{'field': 'project_id',
                                  'value': 'project-good',
                                  }])
@@ -182,7 +182,7 @@ class TestAPIACL(FunctionalTest):
                              expect_errors=True,
                              headers={"X-Roles": "Member",
                                       "X-Auth-Token": VALID_TOKEN2,
-                                      "X-Tenant-Id": "project-good"},
+                                      "X-Project-Id": "project-good"},
                              q=[{'field': 'project_id',
                                  'value': 'project-wrong',
                                  }])
@@ -195,7 +195,7 @@ class TestAPIACL(FunctionalTest):
                              expect_errors=True,
                              headers={"X-Roles": "Member",
                                       "X-Auth-Token": VALID_TOKEN2,
-                                      "X-Tenant-Id": "project-good"},
+                                      "X-Project-Id": "project-good"},
                              q=[{'field': 'project_id',
                                  'value': 'project-good',
                                  },

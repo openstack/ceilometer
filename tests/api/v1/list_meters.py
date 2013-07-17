@@ -121,7 +121,7 @@ class TestListMeters(tests_api.TestBase):
     def test_list_meters_non_admin(self):
         data = self.get('/meters',
                         headers={"X-Roles": "Member",
-                                 "X-Tenant-Id": "project-id"})
+                                 "X-Project-Id": "project-id"})
         self.assertEquals(2, len(data['meters']))
         self.assertEquals(set(r['resource_id'] for r in data['meters']),
                           set(['resource-id',
@@ -146,7 +146,7 @@ class TestListMeters(tests_api.TestBase):
     def test_with_source_non_admin(self):
         data = self.get('/sources/test_list_resources/meters',
                         headers={"X-Roles": "Member",
-                                 "X-Tenant-Id": "project-id2"})
+                                 "X-Project-Id": "project-id2"})
         ids = set(r['resource_id'] for r in data['meters'])
         self.assertEquals(set(['resource-id3',
                                'resource-id4']), ids)
@@ -167,7 +167,7 @@ class TestListMeters(tests_api.TestBase):
     def test_with_user_non_admin(self):
         data = self.get('/users/user-id/meters',
                         headers={"X-Roles": "Member",
-                                 "X-Tenant-Id": "project-id"})
+                                 "X-Project-Id": "project-id"})
         nids = set(r['name'] for r in data['meters'])
         self.assertEquals(set(['meter.mine', 'meter.test']), nids)
 
@@ -177,7 +177,7 @@ class TestListMeters(tests_api.TestBase):
     def test_with_user_wrong_tenant(self):
         data = self.get('/users/user-id/meters',
                         headers={"X-Roles": "Member",
-                                 "X-Tenant-Id": "project666"})
+                                 "X-Project-Id": "project666"})
 
         self.assertEquals(data['meters'], [])
 
@@ -193,14 +193,14 @@ class TestListMeters(tests_api.TestBase):
     def test_with_project_non_admin(self):
         data = self.get('/projects/project-id2/meters',
                         headers={"X-Roles": "Member",
-                                 "X-Tenant-Id": "project-id2"})
+                                 "X-Project-Id": "project-id2"})
         ids = set(r['resource_id'] for r in data['meters'])
         self.assertEquals(set(['resource-id3', 'resource-id4']), ids)
 
     def test_with_project_wrong_tenant(self):
         data = self.get('/projects/project-id2/meters',
                         headers={"X-Roles": "Member",
-                                 "X-Tenant-Id": "project-id"})
+                                 "X-Project-Id": "project-id"})
         self.assertEqual(data.status_code, 404)
 
     def test_with_project_non_existent(self):
@@ -217,13 +217,13 @@ class TestListMetersMetaquery(TestListMeters):
     def test_metaquery1_non_admin(self):
         data = self.get('/meters?metadata.tag=self.counter',
                         headers={"X-Roles": "Member",
-                                 "X-Tenant-Id": "project-id"})
+                                 "X-Project-Id": "project-id"})
         self.assertEquals(1, len(data['meters']))
 
     def test_metaquery1_wrong_tenant(self):
         data = self.get('/meters?metadata.tag=self.counter',
                         headers={"X-Roles": "Member",
-                                 "X-Tenant-Id": "project-666"})
+                                 "X-Project-Id": "project-666"})
         self.assertEquals(0, len(data['meters']))
 
     def test_metaquery2(self):
@@ -233,11 +233,11 @@ class TestListMetersMetaquery(TestListMeters):
     def test_metaquery2_non_admin(self):
         data = self.get('/meters?metadata.tag=four.counter',
                         headers={"X-Roles": "Member",
-                                 "X-Tenant-Id": "project-id2"})
+                                 "X-Project-Id": "project-id2"})
         self.assertEquals(1, len(data['meters']))
 
     def test_metaquery2_non_admin_wrong_project(self):
         data = self.get('/meters?metadata.tag=four.counter',
                         headers={"X-Roles": "Member",
-                                 "X-Tenant-Id": "project-666"})
+                                 "X-Project-Id": "project-666"})
         self.assertEquals(0, len(data['meters']))

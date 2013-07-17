@@ -92,7 +92,7 @@ class TestListUsers(tests_api.TestBase):
         data = self.get('/users',
                         headers={"X-Roles": "Member",
                                  "X-User-Id": "user-id",
-                                 "X-Tenant-Id": "project-id"})
+                                 "X-Project-Id": "project-id"})
         self.assertEquals(['user-id'], data['users'])
 
     def test_with_source(self):
@@ -103,5 +103,5 @@ class TestListUsers(tests_api.TestBase):
         data = self.get('/sources/test_list_users/users',
                         headers={"X-Roles": "Member",
                                  "X-User-Id": "user-id",
-                                 "X-Tenant-Id": "project-id"})
+                                 "X-Project-Id": "project-id"})
         self.assertEquals(['user-id'], data['users'])
