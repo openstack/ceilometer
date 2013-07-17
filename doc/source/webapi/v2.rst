@@ -36,7 +36,11 @@ Filtering Queries
 =================
 
 Many of the endpoints above accept a query filter argument, which
-should be a list of Query data structures:
+should be a list of Query data structures. Whatever the endpoint you
+want to apply a filter on, you always filter on the fields of the *Sample*
+type (for example, if you apply a filter on a query for statistics,
+you won't target *duration_start* field of *Statistics*, but *timestamp*
+field of *Sample*):
 
 .. autotype:: ceilometer.api.controllers.v2.Query
    :members:
@@ -155,7 +159,7 @@ Get the list of samples about instances running for June 2013 for a particular p
          "op": "eq",
          "value": "8d6057bc-5b90-4296-afe0-84acaa2ef909"}]
 
-Get the list of samples about instances with m1.tiny flavor running for June 2013 for a particular project::
+Get the list of samples about instances with *m1.tiny* flavor running for June 2013 for a particular project::
 
     GET /v2/meters/instance:m1.tiny
     q: [{"field": "timestamp",
@@ -170,7 +174,7 @@ Get the list of samples about instances with m1.tiny flavor running for June 201
 
 Now you may want to have statistics on the meters you are targeting.
 Consider the following example where you are getting the list of samples
-about CPU utilisation of a given instance (identified by its "resource_id")
+about CPU utilisation of a given instance (identified by its *resource_id*)
 running for June 2013::
 
     GET /v2/meters/cpu_util
@@ -184,8 +188,8 @@ running for June 2013::
          "op": "eq",
          "value": "64da755c-9120-4236-bee1-54acafe24980"}]
 
-You can have statistics on the list of samples requested (avg, sum, max,
-min, count) computed on the full duration)::
+You can have statistics on the list of samples requested (*avg*, *sum*, *max*,
+*min*, *count*) computed on the full duration::
 
     GET /v2/meters/cpu_util/statistics
     q: [{"field": "timestamp",
