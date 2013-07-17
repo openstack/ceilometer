@@ -245,11 +245,11 @@ class CollectorService(rpc_service.Service):
             data = [data]
 
         for meter in data:
-            LOG.info('metering data %s for %s @ %s: %s',
-                     meter['counter_name'],
-                     meter['resource_id'],
-                     meter.get('timestamp', 'NO TIMESTAMP'),
-                     meter['counter_volume'])
+            LOG.debug('metering data %s for %s @ %s: %s',
+                      meter['counter_name'],
+                      meter['resource_id'],
+                      meter.get('timestamp', 'NO TIMESTAMP'),
+                      meter['counter_volume'])
             if publisher_rpc.verify_signature(
                     meter,
                     cfg.CONF.publisher_rpc.metering_secret):
