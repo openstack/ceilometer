@@ -247,6 +247,7 @@ rpc_conn_pool_size           30                                    Size of RPC c
 rpc_response_timeout         60                                    Seconds to wait for a response from call or multicall
 rpc_cast_timeout             30                                    Seconds to wait before a cast expires (TTL).
                                                                    Only supported by impl_zmq.
+dispatchers                  database                              The list of dispatchers to process metering data.
 ===========================  ====================================  ==============================================================
 
 A sample configuration file can be found in `ceilometer.conf.sample`_.

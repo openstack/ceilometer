@@ -375,3 +375,46 @@ Configuring keystone to work with API
    default port value for ceilometer API is 8777. If the port value
    has been customized, adjust accordingly.
 
+
+Use multiple dispatchers
+========================
+
+.. index::
+   double: installing; multiple dispatchers
+
+.. note::
+   The Ceilometer collector allows multiple dispatchers to be configured so that
+   metering data can be easily sent to multiple internal and external systems.
+
+   Ceilometer by default only saves metering data in a database, to allow
+   Ceilometer to send metering data to other systems in addition to the
+   database, multiple dispatchers can be developed and enabled by modifying
+   Ceilometer configuration file.
+
+   Ceilometer ships two dispatchers currently. One is called database
+   dispatcher, and the other is called file dispatcher. As the names imply,
+   database dispatcher basically sends metering data to a database driver,
+   eventually metering data will be saved in database. File dispatcher sends
+   metering data into a file. The location, name, size of the file can be
+   configured in ceilometer configuration file. These two dispatchers are
+   shipped in the Ceilometer egg and defined in the entry_points as follows:
+
+        [ceilometer.dispatcher]
+        file = ceilometer.collector.dispatcher.file:FileDispatcher
+        database = ceilometer.collector.dispatcher.database:DatabaseDispatcher
+
+   To use both dispatchers on a Ceilometer collector service, add the following
+   line in file ceilometer.conf
+
+        [collector]
+        dispatcher=database
+        dispatcher=file
+
+   If there is no dispatcher present, database dispatcher is used as the
+   default. If in some cases such as traffic tests, no dispatcher is needed,
+   one can configure the line like the following:
+
+        dispatcher=
+
+   With above configuration, no dispatcher is used by the Ceilometer collector
+   service, all metering data received by Ceilometer collector will be dropped.

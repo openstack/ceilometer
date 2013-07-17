@@ -597,6 +597,23 @@
 #os_endpoint_type=publicURL
 
 
+[dispatcher_file]
+
+#
+# Options defined in ceilometer.collector.dispatcher.file
+#
+
+# Name and the location of the file to record meters. (string
+# value)
+#file_path=<None>
+
+# The max size of the file (integer value)
+#max_bytes=0
+
+# The max number of the files to keep (integer value)
+#backup_count=0
+
+
 [collector]
 
 #
@@ -616,6 +633,9 @@
 
 # Save event details (boolean value)
 #store_events=false
+
+# dispatcher to process metering data (multi valued)
+#dispatcher=database
 
 
 [matchmaker_ring]
@@ -644,4 +664,4 @@
 #password=<None>
 
 
-# Total option count: 123
+# Total option count: 127

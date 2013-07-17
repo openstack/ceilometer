@@ -20,8 +20,8 @@ import msgpack
 from oslo.config import cfg
 import socket
 from stevedore import extension
+from stevedore import named
 
-from ceilometer.publisher import rpc as publisher_rpc
 from ceilometer.service import prepare_service
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common.gettextutils import _
@@ -29,7 +29,6 @@ from ceilometer.openstack.common import log
 from ceilometer.openstack.common import service as os_service
 from ceilometer.openstack.common.rpc import dispatcher as rpc_dispatcher
 from ceilometer.openstack.common.rpc import service as rpc_service
-
 
 from ceilometer.openstack.common import timeutils
 from ceilometer import pipeline
@@ -51,6 +50,9 @@ OPTS = [
     cfg.BoolOpt('store_events',
                 default=False,
                 help='Save event details'),
+    cfg.MultiStrOpt('dispatcher',
+                    default=['database'],
+                    help='dispatcher to process metering data'),
 ]
 
 cfg.CONF.register_opts(OPTS, group="collector")
@@ -108,10 +110,10 @@ def udp_collector():
 class CollectorService(rpc_service.Service):
 
     COLLECTOR_NAMESPACE = 'ceilometer.collector'
+    DISPATCHER_NAMESPACE = 'ceilometer.dispatcher'
 
     def __init__(self, host, topic, manager=None):
         super(CollectorService, self).__init__(host, topic, manager)
-        self.storage_conn = storage.get_connection(cfg.CONF)
 
     def start(self):
         super(CollectorService, self).start()
@@ -140,6 +142,18 @@ class CollectorService(rpc_service.Service):
                         self.COLLECTOR_NAMESPACE)
         self.notification_manager.map(self._setup_subscription)
 
+        # Load all configured dispatchers
+        self.dispatchers = []
+        for dispatcher in named.NamedExtensionManager(
+                namespace=self.DISPATCHER_NAMESPACE,
+                names=cfg.CONF.collector.dispatcher,
+                invoke_on_load=True,
+                invoke_args=[cfg.CONF]):
+            if dispatcher.obj:
+                self.dispatchers.append(dispatcher.obj)
+
+        LOG.info('dispatchers loaded %s' % str(self.dispatchers))
+
         # Set ourselves up as a separate worker for the metering data,
         # since the default for service is to use create_consumer().
         self.conn.create_worker(
@@ -167,6 +181,10 @@ class CollectorService(rpc_service.Service):
                 except Exception:
                     LOG.exception('Could not join consumer pool %s/%s' %
                                   (topic, exchange_topic.exchange))
+
+    def record_metering_data(self, context, data):
+        for dispatcher in self.dispatchers:
+            dispatcher.record_metering_data(context, data)
 
     def process_notification(self, notification):
         """Make a notification processed by an handler."""
@@ -235,39 +253,6 @@ class CollectorService(rpc_service.Service):
                                                  cfg.CONF.counter_source) as p:
                 # FIXME(dhellmann): Spawn green thread?
                 p(list(handler.process_notification(notification)))
-
-    def record_metering_data(self, context, data):
-        """This method is triggered when metering data is
-        cast from an agent.
-        """
-        # We may have receive only one counter on the wire
-        if not isinstance(data, list):
-            data = [data]
-
-        for meter in data:
-            LOG.debug('metering data %s for %s @ %s: %s',
-                      meter['counter_name'],
-                      meter['resource_id'],
-                      meter.get('timestamp', 'NO TIMESTAMP'),
-                      meter['counter_volume'])
-            if publisher_rpc.verify_signature(
-                    meter,
-                    cfg.CONF.publisher_rpc.metering_secret):
-                try:
-                    # Convert the timestamp to a datetime instance.
-                    # Storage engines are responsible for converting
-                    # that value to something they can store.
-                    if meter.get('timestamp'):
-                        ts = timeutils.parse_isotime(meter['timestamp'])
-                        meter['timestamp'] = timeutils.normalize_time(ts)
-                    self.storage_conn.record_metering_data(meter)
-                except Exception as err:
-                    LOG.error('Failed to record metering data: %s', err)
-                    LOG.exception(err)
-            else:
-                LOG.warning(
-                    'message signature invalid, discarding message: %r',
-                    meter)
 
 
 def collector():

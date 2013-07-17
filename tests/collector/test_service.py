@@ -30,7 +30,6 @@ from stevedore.tests import manager as test_manager
 
 from ceilometer import counter
 from ceilometer.openstack.common import timeutils
-from ceilometer.publisher import rpc
 from ceilometer.collector import service
 from ceilometer.storage import base
 from ceilometer.tests import base as tests_base
@@ -183,87 +182,6 @@ class TestCollectorService(TestCollector):
         # configuration.
         with patch('ceilometer.openstack.common.rpc.create_connection'):
             self.srv.start()
-
-    def test_valid_message(self):
-        msg = {'counter_name': 'test',
-               'resource_id': self.id(),
-               'counter_volume': 1,
-               }
-        msg['message_signature'] = rpc.compute_signature(
-            msg,
-            cfg.CONF.publisher_rpc.metering_secret,
-        )
-
-        self.srv.storage_conn = self.mox.CreateMock(base.Connection)
-        self.srv.storage_conn.record_metering_data(msg)
-        self.mox.ReplayAll()
-
-        self.srv.record_metering_data(self.ctx, msg)
-        self.mox.VerifyAll()
-
-    def test_invalid_message(self):
-        msg = {'counter_name': 'test',
-               'resource_id': self.id(),
-               'counter_volume': 1,
-               }
-        msg['message_signature'] = 'invalid-signature'
-
-        class ErrorConnection:
-
-            called = False
-
-            def record_metering_data(self, data):
-                self.called = True
-
-        self.srv.storage_conn = ErrorConnection()
-
-        self.srv.record_metering_data(self.ctx, msg)
-
-        assert not self.srv.storage_conn.called, \
-            'Should not have called the storage connection'
-
-    def test_timestamp_conversion(self):
-        msg = {'counter_name': 'test',
-               'resource_id': self.id(),
-               'counter_volume': 1,
-               'timestamp': '2012-07-02T13:53:40Z',
-               }
-        msg['message_signature'] = rpc.compute_signature(
-            msg,
-            cfg.CONF.publisher_rpc.metering_secret,
-        )
-
-        expected = {}
-        expected.update(msg)
-        expected['timestamp'] = datetime.datetime(2012, 7, 2, 13, 53, 40)
-
-        self.srv.storage_conn = self.mox.CreateMock(base.Connection)
-        self.srv.storage_conn.record_metering_data(expected)
-        self.mox.ReplayAll()
-
-        self.srv.record_metering_data(self.ctx, msg)
-
-    def test_timestamp_tzinfo_conversion(self):
-        msg = {'counter_name': 'test',
-               'resource_id': self.id(),
-               'counter_volume': 1,
-               'timestamp': '2012-09-30T15:31:50.262-08:00',
-               }
-        msg['message_signature'] = rpc.compute_signature(
-            msg,
-            cfg.CONF.publisher_rpc.metering_secret,
-        )
-
-        expected = {}
-        expected.update(msg)
-        expected['timestamp'] = datetime.datetime(2012, 9, 30,
-                                                  23, 31, 50, 262000)
-
-        self.srv.storage_conn = self.mox.CreateMock(base.Connection)
-        self.srv.storage_conn.record_metering_data(expected)
-        self.mox.ReplayAll()
-
-        self.srv.record_metering_data(self.ctx, msg)
 
     @patch('ceilometer.pipeline.setup_pipeline', MagicMock())
     def test_process_notification(self):
