@@ -19,7 +19,6 @@
 """HBase storage backend
 """
 from sets import Set
-from urlparse import urlparse
 import json
 import hashlib
 import copy
@@ -27,10 +26,11 @@ import datetime
 import happybase
 import os
 import re
-from oslo.config import cfg
+import urlparse
 
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
+from ceilometer.openstack.common import network_utils
 from ceilometer.storage import base
 from ceilometer.storage import models
 
@@ -63,17 +63,10 @@ class HBaseStorage(base.StorageEngine):
         }
     """
 
-    OPTIONS = [
-        cfg.StrOpt('table_prefix',
-                   default=None,
-                   help='Database table prefix',
-                   ),
-    ]
-
     def register_opts(self, conf):
         """Register any configuration options used by this engine.
         """
-        conf.register_opts(self.OPTIONS)
+        pass
 
     @staticmethod
     def get_connection(conf):
@@ -96,7 +89,6 @@ class Connection(base.Connection):
     def __init__(self, conf):
         """Hbase Connection Initialization."""
         opts = self._parse_connection_url(conf.database.connection)
-        opts['table_prefix'] = conf.table_prefix
 
         if opts['host'] == '__test__':
             url = os.environ.get('CEILOMETER_TEST_HBASE_URL')
@@ -159,7 +151,9 @@ class Connection(base.Connection):
         database name, so we are not looking for these in the url.
         """
         opts = {}
-        result = urlparse(url)
+        result = network_utils.urlsplit(url)
+        opts['table_prefix'] = urlparse.parse_qs(
+            result.query).get('table_prefix', [None])[0]
         opts['dbtype'] = result.scheme
         if ':' in result.netloc:
             opts['host'], port = result.netloc.split(':')
