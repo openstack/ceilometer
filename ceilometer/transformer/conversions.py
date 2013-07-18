@@ -66,7 +66,7 @@ class ScalingTransformer(transformer.TransformerBase):
         self.source = source
         self.target = target
         self.replace = replace
-        self.preserved = None
+        self.preserved = []
         LOG.debug(_('scaling conversion transformer with source:'
                     ' %(source)s target: %(target)s replace:'
                     ' %(replace)s') % locals())
@@ -106,7 +106,7 @@ class ScalingTransformer(transformer.TransformerBase):
         if self.replace:
             counter = transformed
         else:
-            self.preserved = transformed
+            self.preserved.append(transformed)
         return counter
 
     def handle_sample(self, context, counter, source):
@@ -124,8 +124,8 @@ class ScalingTransformer(transformer.TransformerBase):
         """
         counters = []
         if self.preserved:
-            counters.append(self.preserved)
-            self.preserved = None
+            counters.extend(self.preserved)
+            self.preserved = []
         return counters
 
 

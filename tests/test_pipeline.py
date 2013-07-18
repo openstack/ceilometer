@@ -785,6 +785,18 @@ class TestPipeline(base.TestCase):
             counter.Counter(
                 name='cpu',
                 type=type,
+                volume=prev,
+                unit='ns',
+                user_id='test_user',
+                project_id='test_proj',
+                resource_id='test_resource2',
+                timestamp=now.isoformat(),
+                resource_metadata={'cpu_number': 2,
+                                   'user_metadata': um},
+            ),
+            counter.Counter(
+                name='cpu',
+                type=type,
                 volume=curr,
                 unit='ns',
                 user_id='test_user',
@@ -792,6 +804,18 @@ class TestPipeline(base.TestCase):
                 resource_id='test_resource',
                 timestamp=later.isoformat(),
                 resource_metadata={'cpu_number': 4,
+                                   'user_metadata': um},
+            ),
+            counter.Counter(
+                name='cpu',
+                type=type,
+                volume=curr,
+                unit='ns',
+                user_id='test_user',
+                project_id='test_proj',
+                resource_id='test_resource2',
+                timestamp=later.isoformat(),
+                resource_metadata={'cpu_number': 2,
                                    'user_metadata': um},
             ),
         ]
@@ -802,17 +826,24 @@ class TestPipeline(base.TestCase):
 
         pipe.publish_counters(None, counters, None)
         publisher = pipeline_manager.pipelines[0].publishers[0]
-        self.assertEqual(len(publisher.counters), 2)
+        self.assertEqual(len(publisher.counters), 4)
         # original counters are passed thru' unmolested
-        self.assertEquals(publisher.counters[0], counters[0])
-        self.assertEquals(publisher.counters[1], counters[1])
+        for i in xrange(4):
+            self.assertEquals(publisher.counters[i], counters[i])
         pipe.flush(None, None)
-        self.assertEqual(len(publisher.counters), 3)
-        cpu_util = publisher.counters[-1]
+        self.assertEqual(len(publisher.counters), 6)
+        cpu_util = publisher.counters[4]
         self.assertEquals(getattr(cpu_util, 'name'), 'cpu_util')
+        self.assertEquals(getattr(cpu_util, 'resource_id'), 'test_resource')
         self.assertEquals(getattr(cpu_util, 'unit'), '%')
         self.assertEquals(getattr(cpu_util, 'type'), counter.TYPE_GAUGE)
         self.assertEquals(getattr(cpu_util, 'volume'), expected)
+        cpu_util = publisher.counters[5]
+        self.assertEquals(getattr(cpu_util, 'name'), 'cpu_util')
+        self.assertEquals(getattr(cpu_util, 'resource_id'), 'test_resource2')
+        self.assertEquals(getattr(cpu_util, 'unit'), '%')
+        self.assertEquals(getattr(cpu_util, 'type'), counter.TYPE_GAUGE)
+        self.assertEquals(getattr(cpu_util, 'volume'), expected * 2)
 
     def test_rate_of_change_conversion(self):
         self._do_test_rate_of_change_conversion(120000000000,
