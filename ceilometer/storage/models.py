@@ -232,6 +232,13 @@ class Alarm(Model):
     ALARM_INSUFFICIENT_DATA = 'insufficient data'
     ALARM_OK = 'ok'
     ALARM_ALARM = 'alarm'
+
+    ALARM_ACTIONS_MAP = {
+        ALARM_INSUFFICIENT_DATA: 'insufficient_data_actions',
+        ALARM_OK: 'ok_actions',
+        ALARM_ALARM: 'alarm_actions',
+    }
+
     """
     An alarm to monitor.
 

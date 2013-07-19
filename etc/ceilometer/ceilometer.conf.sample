@@ -574,6 +574,15 @@
 
 
 #
+# Options defined in ceilometer.alarm.rpc
+#
+
+# the topic ceilometer uses for alarm notifier messages
+# (string value)
+#notifier_rpc_topic=alarm_notifier
+
+
+#
 # Options defined in ceilometer.alarm.service
 #
 
@@ -700,4 +709,4 @@
 #password=<None>
 
 
-# Total option count: 132
+# Total option count: 133

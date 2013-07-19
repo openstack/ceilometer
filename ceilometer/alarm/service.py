@@ -21,12 +21,14 @@
 from oslo.config import cfg
 from stevedore import extension
 
+from ceilometer.alarm import rpc as rpc_alarm
 from ceilometer.service import prepare_service
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import network_utils
 from ceilometer.openstack.common import service as os_service
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common.rpc import service as rpc_service
+from ceilometer.openstack.common.rpc import dispatcher as rpc_dispatcher
 from ceilometerclient import client as ceiloclient
 
 
@@ -39,6 +41,8 @@ OPTS = [
 ]
 
 cfg.CONF.register_opts(OPTS, group='alarm')
+cfg.CONF.import_opt('notifier_rpc_topic', 'ceilometer.alarm.rpc',
+                    group='alarm')
 
 LOG = log.getLogger(__name__)
 
@@ -52,6 +56,7 @@ class SingletonAlarmService(os_service.Service):
         self.extension_manager = extension.ExtensionManager(
             namespace=self.ALARM_NAMESPACE,
             invoke_on_load=True,
+            invoke_args=(rpc_alarm.RPCAlarmNotifier(),)
         )
 
     def start(self):
@@ -113,6 +118,14 @@ class AlarmNotifierService(rpc_service.Service):
         super(AlarmNotifierService, self).start()
         # Add a dummy thread to have wait() working
         self.tg.add_timer(604800, lambda: None)
+
+    def initialize_service_hook(self, service):
+        LOG.debug('initialize_service_hooks')
+        self.conn.create_worker(
+            cfg.CONF.alarm.notifier_rpc_topic,
+            rpc_dispatcher.RpcDispatcher([self]),
+            'ceilometer.alarm.' + cfg.CONF.alarm.notifier_rpc_topic,
+        )
 
     def _handle_action(self, action, alarm, state, reason):
         try:
