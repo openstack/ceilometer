@@ -82,6 +82,10 @@ class TestListEvents(FunctionalTest):
         data = self.get_json('/meters/instance')
         self.assertEquals(2, len(data))
 
+    def test_all_trailing_slash(self):
+        data = self.get_json('/meters/instance/')
+        self.assertEquals(2, len(data))
+
     def test_all_limit(self):
         data = self.get_json('/meters/instance?limit=1')
         self.assertEquals(1, len(data))
