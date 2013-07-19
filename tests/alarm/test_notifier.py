@@ -23,7 +23,6 @@ from oslo.config import cfg
 
 from ceilometer.alarm import service
 from ceilometer.openstack.common import context
-from ceilometer.openstack.common import network_utils
 from ceilometer.tests import base
 
 
@@ -69,7 +68,7 @@ class TestAlarmNotifier(base.TestCase):
         data_json = '{"state": "ALARM", "reason": "what ?"}'
 
         self.mox.StubOutWithMock(requests, "post")
-        requests.post(network_utils.urlsplit(action), data=data_json)
+        requests.post(action, data=data_json)
         self.mox.ReplayAll()
 
         with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
@@ -90,7 +89,7 @@ class TestAlarmNotifier(base.TestCase):
         cfg.CONF.set_override("rest_notifier_certificate_file", certificate,
                               group='alarm')
         self.mox.StubOutWithMock(requests, "post")
-        requests.post(network_utils.urlsplit(action), data=data_json,
+        requests.post(action, data=data_json,
                       cert=certificate)
         self.mox.ReplayAll()
 
@@ -115,7 +114,7 @@ class TestAlarmNotifier(base.TestCase):
         cfg.CONF.set_override("rest_notifier_certificate_key", key,
                               group='alarm')
         self.mox.StubOutWithMock(requests, "post")
-        requests.post(network_utils.urlsplit(action), data=data_json,
+        requests.post(action, data=data_json,
                       cert=(certificate, key))
         self.mox.ReplayAll()
 

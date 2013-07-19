@@ -48,7 +48,6 @@ class RestAlarmNotifier(notifier.AlarmNotifier):
     def notify(self, action, alarm, state, reason):
         LOG.info("Notifying alarm %s in state %s with action %s because %s",
                  alarm, state, action, reason)
-
         body = {'state': state, 'reason': reason}
         kwargs = {'data': jsonutils.dumps(body)}
 
@@ -57,4 +56,4 @@ class RestAlarmNotifier(notifier.AlarmNotifier):
         if action.scheme == 'https' and cert:
             kwargs['cert'] = (cert, key) if key else cert
 
-        eventlet.spawn_n(requests.post, action, **kwargs)
+        eventlet.spawn_n(requests.post, action.geturl(), **kwargs)
