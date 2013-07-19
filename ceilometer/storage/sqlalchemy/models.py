@@ -28,7 +28,7 @@ from sqlalchemy import Float, Boolean, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
-from sqlalchemy.types import TypeDecorator, VARCHAR
+from sqlalchemy.types import TypeDecorator
 
 from ceilometer.openstack.common import timeutils
 from ceilometer.storage import models as api_models
@@ -54,7 +54,7 @@ def table_args():
 class JSONEncodedDict(TypeDecorator):
     "Represents an immutable structure as a json-encoded string."
 
-    impl = VARCHAR
+    impl = String
 
     def process_bind_param(self, value, dialect):
         if value is not None:
@@ -99,6 +99,12 @@ sourceassoc = Table('sourceassoc', Base.metadata,
                     Column('source_id', String(255),
                            ForeignKey("source.id")))
 
+Index('idx_su', sourceassoc.c['source_id'], sourceassoc.c['user_id']),
+Index('idx_sp', sourceassoc.c['source_id'], sourceassoc.c['project_id']),
+Index('idx_sr', sourceassoc.c['source_id'], sourceassoc.c['resource_id']),
+Index('idx_sm', sourceassoc.c['source_id'], sourceassoc.c['meter_id']),
+Index('ix_sourceassoc_source_id', sourceassoc.c['source_id'])
+
 
 class Source(Base):
     __tablename__ = 'source'
@@ -121,7 +127,7 @@ class Meter(Base):
     user_id = Column(String(255), ForeignKey('user.id'))
     project_id = Column(String(255), ForeignKey('project.id'))
     resource_id = Column(String(255), ForeignKey('resource.id'))
-    resource_metadata = Column(JSONEncodedDict)
+    resource_metadata = Column(JSONEncodedDict(5000))
     counter_type = Column(String(255))
     counter_unit = Column(String(255))
     counter_volume = Column(Float(53))
@@ -148,13 +154,13 @@ class Project(Base):
 
 class Resource(Base):
     __tablename__ = 'resource'
-    __table_ards__ = (
+    __table_args__ = (
         Index('ix_resource_project_id', 'project_id'),
         Index('ix_resource_user_id', 'user_id'),
     )
     id = Column(String(255), primary_key=True)
     sources = relationship("Source", secondary=lambda: sourceassoc)
-    resource_metadata = Column(JSONEncodedDict)
+    resource_metadata = Column(JSONEncodedDict(5000))
     user_id = Column(String(255), ForeignKey('user.id'))
     project_id = Column(String(255), ForeignKey('project.id'))
     meters = relationship("Meter", backref='resource')
@@ -163,7 +169,7 @@ class Resource(Base):
 class Alarm(Base):
     """Define Alarm data."""
     __tablename__ = 'alarm'
-    __table_ards__ = (
+    __table_args__ = (
         Index('ix_alarm_user_id', 'user_id'),
         Index('ix_alarm_project_id', 'project_id'),
         Index('ix_alarm_counter_name', 'counter_name'),
@@ -198,8 +204,12 @@ class UniqueName(Base):
     """Key names should only be stored once.
     """
     __tablename__ = 'unique_name'
+    __table_args__ = (
+        Index('ix_unique_name_key', 'key'),
+    )
+
     id = Column(Integer, primary_key=True)
-    key = Column(String(255), index=True, unique=True)
+    key = Column(String(255))
 
     def __init__(self, key):
         self.key = key
@@ -232,17 +242,23 @@ class Event(Base):
 
 class Trait(Base):
     __tablename__ = 'trait'
+    __table_args__ = (
+        Index('ix_trait_t_int', 't_int'),
+        Index('ix_trait_t_string', 't_string'),
+        Index('ix_trait_t_datetime', 't_datetime'),
+        Index('ix_trait_t_type', 't_type'),
+        Index('ix_trait_t_float', 't_float'),
+    )
     id = Column(Integer, primary_key=True)
 
     name_id = Column(Integer, ForeignKey('unique_name.id'))
     name = relationship("UniqueName", backref=backref('name', order_by=id))
 
-    t_type = Column(Integer, index=True)
-    t_string = Column(String(255), nullable=True, default=None, index=True)
-    t_float = Column(Float, nullable=True, default=None, index=True)
-    t_int = Column(Integer, nullable=True, default=None, index=True)
-    t_datetime = Column(Float(asdecimal=True), nullable=True, default=None,
-                        index=True)
+    t_type = Column(Integer)
+    t_string = Column(String(255), nullable=True, default=None)
+    t_float = Column(Float, nullable=True, default=None)
+    t_int = Column(Integer, nullable=True, default=None)
+    t_datetime = Column(Float(asdecimal=True), nullable=True, default=None)
 
     event_id = Column(Integer, ForeignKey('event.id'))
     event = relationship("Event", backref=backref('event', order_by=id))
