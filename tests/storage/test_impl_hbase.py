@@ -44,7 +44,7 @@ class ConnectionTest(HBaseEngineTestBase):
 
         class TestConn(object):
             def __init__(self, host, port):
-                self.netloc = '%(host)s:%(port)s' % locals()
+                self.netloc = '%s:%s' % (host, port)
 
             def open(self):
                 pass

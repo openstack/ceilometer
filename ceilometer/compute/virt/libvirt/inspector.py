@@ -83,7 +83,10 @@ class LibvirtInspector(virt_inspector.Inspector):
         except Exception as ex:
             error_code = ex.get_error_code() if libvirt else 'unknown'
             msg = ("Error from libvirt while looking up %(instance_name)s: "
-                   "[Error Code %(error_code)s] %(ex)s" % locals())
+                   "[Error Code %(error_code)s] "
+                   "%(ex)s" % {'instance_name': instance_name,
+                               'error_code': error_code,
+                               'ex': ex})
             raise virt_inspector.InstanceNotFoundException(msg)
 
     def inspect_instances(self):

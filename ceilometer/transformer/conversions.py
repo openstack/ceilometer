@@ -64,7 +64,9 @@ class ScalingTransformer(transformer.TransformerBase):
         self.source = source
         self.target = target
         LOG.debug(_('scaling conversion transformer with source:'
-                    ' %(source)s target: %(target)s:') % locals())
+                    ' %(source)s target: %(target)s:')
+                  % {'source': source,
+                     'target': target})
         super(ScalingTransformer, self).__init__(**kwargs)
 
     @staticmethod

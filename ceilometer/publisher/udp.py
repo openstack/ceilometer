@@ -54,8 +54,9 @@ class UDPPublisher(publisher.PublisherBase):
             msg['source'] = source
             host = self.host
             port = self.port
-            LOG.debug(_("Publishing counter %(msg)s over "
-                        "UDP to %(host)s:%(port)d") % locals())
+            LOG.debug(_("Publishing counter %(msg)s over UDP to "
+                        "%(host)s:%(port)d") % {'msg': msg, 'host': host,
+                                                'port': port})
             try:
                 self.socket.sendto(msgpack.dumps(msg),
                                    (self.host, self.port))
