@@ -27,11 +27,12 @@ import sys
 import time
 
 import eventlet
+from eventlet import event
 import logging as std_logging
 from oslo.config import cfg
 
 from ceilometer.openstack.common import eventlet_backdoor
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import importutils
 from ceilometer.openstack.common import log as logging
 from ceilometer.openstack.common import threadgroup
@@ -51,19 +52,8 @@ class Launcher(object):
         :returns: None
 
         """
-        self._services = threadgroup.ThreadGroup()
+        self.services = Services()
         self.backdoor_port = eventlet_backdoor.initialize_if_enabled()
-
-    @staticmethod
-    def run_service(service):
-        """Start and wait for a service to finish.
-
-        :param service: service to run and wait for.
-        :returns: None
-
-        """
-        service.start()
-        service.wait()
 
     def launch_service(self, service):
         """Load and start the given service.
@@ -73,7 +63,7 @@ class Launcher(object):
 
         """
         service.backdoor_port = self.backdoor_port
-        self._services.add_thread(self.run_service, service)
+        self.services.add(service)
 
     def stop(self):
         """Stop all services which are currently running.
@@ -81,7 +71,7 @@ class Launcher(object):
         :returns: None
 
         """
-        self._services.stop()
+        self.services.stop()
 
     def wait(self):
         """Waits until all services have been stopped, and then returns.
@@ -89,7 +79,7 @@ class Launcher(object):
         :returns: None
 
         """
-        self._services.wait()
+        self.services.wait()
 
 
 class SignalExit(SystemExit):
@@ -124,9 +114,13 @@ class ServiceLauncher(Launcher):
         except SystemExit as exc:
             status = exc.code
         finally:
-            if rpc:
-                rpc.cleanup()
             self.stop()
+            if rpc:
+                try:
+                    rpc.cleanup()
+                except Exception:
+                    # We're shutting down, so it doesn't matter at this point.
+                    LOG.exception(_('Exception during rpc cleanup.'))
         return status
 
 
@@ -189,7 +183,8 @@ class ProcessLauncher(object):
         random.seed()
 
         launcher = Launcher()
-        launcher.run_service(service)
+        launcher.launch_service(service)
+        launcher.wait()
 
     def _start_child(self, wrap):
         if len(wrap.forktimes) > wrap.workers:
@@ -313,14 +308,62 @@ class Service(object):
     def __init__(self, threads=1000):
         self.tg = threadgroup.ThreadGroup(threads)
 
+        # signal that the service is done shutting itself down:
+        self._done = event.Event()
+
     def start(self):
         pass
 
     def stop(self):
         self.tg.stop()
+        self.tg.wait()
+        # Signal that service cleanup is done:
+        if not self._done.ready():
+            self._done.send()
+
+    def wait(self):
+        self._done.wait()
+
+
+class Services(object):
+
+    def __init__(self):
+        self.services = []
+        self.tg = threadgroup.ThreadGroup()
+        self.done = event.Event()
+
+    def add(self, service):
+        self.services.append(service)
+        self.tg.add_thread(self.run_service, service, self.done)
+
+    def stop(self):
+        # wait for graceful shutdown of services:
+        for service in self.services:
+            service.stop()
+            service.wait()
+
+        # Each service has performed cleanup, now signal that the run_service
+        # wrapper threads can now die:
+        if not self.done.ready():
+            self.done.send()
+
+        # reap threads:
+        self.tg.stop()
 
     def wait(self):
         self.tg.wait()
+
+    @staticmethod
+    def run_service(service, done):
+        """Service start wrapper.
+
+        :param service: service to run
+        :param done: event to wait on until a shutdown is triggered
+        :returns: None
+
+        """
+        service.start()
+        done.wait()
 
 
 def launch(service, workers=None):
