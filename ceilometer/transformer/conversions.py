@@ -53,23 +53,18 @@ class ScalingTransformer(transformer.TransformerBase):
     """Transformer to apply a scaling conversion.
     """
 
-    def __init__(self, source={}, target={}, replace=False, **kwargs):
+    def __init__(self, source={}, target={}, **kwargs):
         """Initialize transformer with configured parameters.
 
         :param source: dict containing source counter unit
         :param target: dict containing target counter name, type,
                        unit and scaling factor (a missing value
                        connotes no change)
-        :param replace: true if source counter is to be replaced
-                        (as opposed to an additive conversion)
         """
         self.source = source
         self.target = target
-        self.replace = replace
-        self.preserved = []
         LOG.debug(_('scaling conversion transformer with source:'
-                    ' %(source)s target: %(target)s replace:'
-                    ' %(replace)s') % locals())
+                    ' %(source)s target: %(target)s:') % locals())
         super(ScalingTransformer, self).__init__(**kwargs)
 
     @staticmethod
@@ -98,35 +93,13 @@ class ScalingTransformer(transformer.TransformerBase):
             resource_metadata=counter.resource_metadata
         )
 
-    def _keep(self, counter, transformed):
-        """Either replace counter with the transformed version
-           or preserve for flush() call to emit as an additional
-           sample.
-        """
-        if self.replace:
-            counter = transformed
-        else:
-            self.preserved.append(transformed)
-        return counter
-
     def handle_sample(self, context, counter, source):
         """Handle a sample, converting if necessary."""
         LOG.debug('handling counter %s', (counter,))
         if (self.source.get('unit', counter.unit) == counter.unit):
-            transformed = self._convert(counter)
-            LOG.debug(_('converted to: %s') % (transformed,))
-            counter = self._keep(counter, transformed)
+            counter = self._convert(counter)
+            LOG.debug(_('converted to: %s') % (counter,))
         return counter
-
-    def flush(self, context, source):
-        """Emit the additional transformed counter in the non-replace
-           case.
-        """
-        counters = []
-        if self.preserved:
-            counters.extend(self.preserved)
-            self.preserved = []
-        return counters
 
 
 class RateOfChangeTransformer(ScalingTransformer):
@@ -164,10 +137,9 @@ class RateOfChangeTransformer(ScalingTransformer):
             rate_of_change = ((1.0 * volume_delta / time_delta)
                               if time_delta else 0.0)
 
-            transformed = self._convert(counter, rate_of_change)
-            LOG.debug(_('converted to: %s') % (transformed,))
-            counter = self._keep(counter, transformed)
-        elif self.replace:
+            counter = self._convert(counter, rate_of_change)
+            LOG.debug(_('converted to: %s') % (counter,))
+        else:
             LOG.warn(_('dropping counter with no predecessor: %s') % counter)
             counter = None
         return counter

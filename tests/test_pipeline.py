@@ -638,7 +638,8 @@ class TestPipeline(base.TestCase):
         self.assertTrue(getattr(self.TransformerClass.samples[0], "name")
                         == 'a:b')
 
-    def _do_test_global_unit_conversion(self, replace, scale):
+    def test_global_unit_conversion(self):
+        scale = 'volume / ((10**6) * 60)'
         self.pipeline_cfg[0]['transformers'] = [
             {
                 'name': 'unit_conversion',
@@ -647,7 +648,6 @@ class TestPipeline(base.TestCase):
                     'target': {'name': 'cpu_mins',
                                'unit': 'min',
                                'scale': scale},
-                    'replace': replace
                 }
             },
         ]
@@ -674,22 +674,12 @@ class TestPipeline(base.TestCase):
         publisher = pipeline_manager.pipelines[0].publishers[0]
         self.assertEqual(len(publisher.counters), 1)
         pipe.flush(None, None)
-        self.assertEqual(len(publisher.counters), 1 if replace else 2)
+        self.assertEqual(len(publisher.counters), 1)
         cpu_mins = publisher.counters[-1]
         self.assertEquals(getattr(cpu_mins, 'name'), 'cpu_mins')
         self.assertEquals(getattr(cpu_mins, 'unit'), 'min')
         self.assertEquals(getattr(cpu_mins, 'type'), counter.TYPE_CUMULATIVE)
         self.assertEquals(getattr(cpu_mins, 'volume'), 20)
-        if not replace:
-            self.assertEquals(publisher.counters[0], counters[0])
-
-    def test_global_unit_conversion_replacing(self):
-        scale = 'volume / ((10**6) * 60)'
-        self._do_test_global_unit_conversion(True, scale)
-
-    def test_global_unit_conversion_additive(self):
-        scale = 1 / ((10 ** 6) * 60.0)
-        self._do_test_global_unit_conversion(False, scale)
 
     def test_unit_identified_source_unit_conversion(self):
         self.pipeline_cfg[0]['transformers'] = [
@@ -699,7 +689,6 @@ class TestPipeline(base.TestCase):
                     'source': {'unit': '°C'},
                     'target': {'unit': '°F',
                                'scale': '(volume * 1.8) + 32'},
-                    'replace': True
                 }
             },
         ]
@@ -761,7 +750,6 @@ class TestPipeline(base.TestCase):
                                'unit': '%',
                                'type': counter.TYPE_GAUGE,
                                'scale': s},
-                    'replace': False
                 }
             },
         ]
@@ -826,19 +814,16 @@ class TestPipeline(base.TestCase):
 
         pipe.publish_counters(None, counters, None)
         publisher = pipeline_manager.pipelines[0].publishers[0]
-        self.assertEqual(len(publisher.counters), 4)
-        # original counters are passed thru' unmolested
-        for i in xrange(4):
-            self.assertEquals(publisher.counters[i], counters[i])
+        self.assertEqual(len(publisher.counters), 2)
         pipe.flush(None, None)
-        self.assertEqual(len(publisher.counters), 6)
-        cpu_util = publisher.counters[4]
+        self.assertEqual(len(publisher.counters), 2)
+        cpu_util = publisher.counters[0]
         self.assertEquals(getattr(cpu_util, 'name'), 'cpu_util')
         self.assertEquals(getattr(cpu_util, 'resource_id'), 'test_resource')
         self.assertEquals(getattr(cpu_util, 'unit'), '%')
         self.assertEquals(getattr(cpu_util, 'type'), counter.TYPE_GAUGE)
         self.assertEquals(getattr(cpu_util, 'volume'), expected)
-        cpu_util = publisher.counters[5]
+        cpu_util = publisher.counters[1]
         self.assertEquals(getattr(cpu_util, 'name'), 'cpu_util')
         self.assertEquals(getattr(cpu_util, 'resource_id'), 'test_resource2')
         self.assertEquals(getattr(cpu_util, 'unit'), '%')
@@ -877,7 +862,7 @@ class TestPipeline(base.TestCase):
                                                 0.0,
                                                 offset=0)
 
-    def _do_test_rate_of_change_no_predecessor(self, replace):
+    def test_rate_of_change_no_predecessor(self):
         s = "100.0 / (10**9 * resource_metadata.get('cpu_number', 1))"
         self.pipeline_cfg[0]['transformers'] = [
             {
@@ -887,8 +872,7 @@ class TestPipeline(base.TestCase):
                     'target': {'name': 'cpu_util',
                                'unit': '%',
                                'type': counter.TYPE_GAUGE,
-                               'scale': s},
-                    'replace': replace
+                               'scale': s}
                 }
             },
         ]
@@ -914,14 +898,6 @@ class TestPipeline(base.TestCase):
 
         pipe.publish_counters(None, counters, None)
         publisher = pipeline_manager.pipelines[0].publishers[0]
-        self.assertEqual(len(publisher.counters), 0 if replace else 1)
+        self.assertEqual(len(publisher.counters), 0)
         pipe.flush(None, None)
-        self.assertEqual(len(publisher.counters), 0 if replace else 1)
-        if not replace:
-            self.assertEquals(publisher.counters[0], counters[0])
-
-    def _do_test_rate_of_change_no_predecessor_discard(self):
-        self._do_test_rate_of_change_no_predecessor(True)
-
-    def _do_test_rate_of_change_no_predecessor_preserve(self):
-        self._do_test_rate_of_change_no_predecessor(False)
+        self.assertEqual(len(publisher.counters), 0)
