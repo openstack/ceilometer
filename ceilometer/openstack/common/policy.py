@@ -65,7 +65,7 @@ from oslo.config import cfg
 import six
 
 from ceilometer.openstack.common import fileutils
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import jsonutils
 from ceilometer.openstack.common import log as logging
 
@@ -285,7 +285,7 @@ class BaseCheck(object):
         pass
 
     @abc.abstractmethod
-    def __call__(self, target, cred):
+    def __call__(self, target, cred, enforcer):
         """Triggers if instance of the class is called.
 
         Performs the check. Returns False to reject the access or a
@@ -303,7 +303,7 @@ class FalseCheck(BaseCheck):
 
         return "!"
 
-    def __call__(self, target, cred):
+    def __call__(self, target, cred, enforcer):
         """Check the policy."""
 
         return False
@@ -317,7 +317,7 @@ class TrueCheck(BaseCheck):
 
         return "@"
 
-    def __call__(self, target, cred):
+    def __call__(self, target, cred, enforcer):
         """Check the policy."""
 
         return True
@@ -363,13 +363,13 @@ class NotCheck(BaseCheck):
 
         return "not %s" % self.rule
 
-    def __call__(self, target, cred):
+    def __call__(self, target, cred, enforcer):
         """Check the policy.
 
         Returns the logical inverse of the wrapped check.
         """
 
-        return not self.rule(target, cred)
+        return not self.rule(target, cred, enforcer)
 
 
 class AndCheck(BaseCheck):
@@ -391,7 +391,7 @@ class AndCheck(BaseCheck):
 
         return "(%s)" % ' and '.join(str(r) for r in self.rules)
 
-    def __call__(self, target, cred):
+    def __call__(self, target, cred, enforcer):
         """Check the policy.
 
         Requires that all rules accept in order to return True.
@@ -434,7 +434,7 @@ class OrCheck(BaseCheck):
 
         return "(%s)" % ' or '.join(str(r) for r in self.rules)
 
-    def __call__(self, target, cred):
+    def __call__(self, target, cred, enforcer):
         """Check the policy.
 
         Requires that at least one rule accept in order to return True.

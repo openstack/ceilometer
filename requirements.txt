@@ -7,6 +7,7 @@ argparse
 SQLAlchemy>=0.7,<=0.7.99
 sqlalchemy-migrate>=0.7.2
 alembic>=0.4.1
+netaddr
 pymongo>=2.2
 eventlet
 anyjson>=0.3.3
@@ -21,6 +22,7 @@ python-ceilometerclient>=1.0.1
 python-swiftclient
 lxml
 requests>=1.1,<1.2.1
+six
 wsme>=0.5b2
 pyyaml
 -f http://tarballs.openstack.org/oslo.config/oslo.config-1.2.0a3.tar.gz#egg=oslo.config-1.2.0a3

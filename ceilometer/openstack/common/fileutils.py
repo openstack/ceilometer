@@ -21,7 +21,7 @@ import errno
 import os
 
 from ceilometer.openstack.common import excutils
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log as logging
 
 LOG = logging.getLogger(__name__)

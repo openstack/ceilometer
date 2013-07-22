@@ -19,17 +19,15 @@
 Exception related utilities.
 """
 
-import contextlib
 import logging
 import sys
 import time
 import traceback
 
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common.gettextutils import _  # noqa
 
 
-@contextlib.contextmanager
-def save_and_reraise_exception():
+class save_and_reraise_exception(object):
     """Save current exception, run some code and then re-raise.
 
     In some cases the exception context can be cleared, resulting in None
@@ -41,15 +39,33 @@ def save_and_reraise_exception():
     To work around this, we save the exception state, run handler code, and
     then re-raise the original exception. If another exception occurs, the
     saved exception is logged and the new exception is re-raised.
-    """
-    type_, value, tb = sys.exc_info()
-    try:
-        yield
+
+    In some cases the caller may not want to re-raise the exception, and
+    for those circumstances this context provides a reraise flag that
+    can be used to suppress the exception.  For example:
+
     except Exception:
-        logging.error(_('Original exception being dropped: %s'),
-                      traceback.format_exception(type_, value, tb))
-        raise
-    raise type_, value, tb
+        with save_and_reraise_exception() as ctxt:
+            decide_if_need_reraise()
+            if not should_be_reraised:
+                ctxt.reraise = False
+    """
+    def __init__(self):
+        self.reraise = True
+
+    def __enter__(self):
+        self.type_, self.value, self.tb, = sys.exc_info()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type is not None:
+            logging.error(_('Original exception being dropped: %s'),
+                          traceback.format_exception(self.type_,
+                                                     self.value,
+                                                     self.tb))
+            return False
+        if self.reraise:
+            raise self.type_, self.value, self.tb
 
 
 def forever_retry_uncaught_exceptions(infunc):

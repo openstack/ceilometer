@@ -18,7 +18,10 @@
 #
 # @author: Zhongyue Luo, SINA Corporation.
 #
+
 """Extracts OpenStack config option info from module(s)."""
+
+from __future__ import print_function
 
 import imp
 import os
@@ -97,7 +100,7 @@ def generate(srcfiles):
     for group, opts in opts_by_group.items():
         print_group_opts(group, opts)
 
-    print "# Total option count: %d" % OPTION_COUNT
+    print("# Total option count: %d" % OPTION_COUNT)
 
 
 def _import_module(mod_str):
@@ -161,18 +164,18 @@ def _list_opts(obj):
 
 
 def print_group_opts(group, opts_by_module):
-    print "[%s]" % group
-    print
+    print("[%s]" % group)
+    print('')
     global OPTION_COUNT
     for mod, opts in opts_by_module:
         OPTION_COUNT += len(opts)
-        print '#'
-        print '# Options defined in %s' % mod
-        print '#'
-        print
+        print('#')
+        print('# Options defined in %s' % mod)
+        print('#')
+        print('')
         for opt in opts:
             _print_opt(opt)
-        print
+        print('')
 
 
 def _get_my_ip():
@@ -188,7 +191,12 @@ def _get_my_ip():
 
 def _sanitize_default(s):
     """Set up a reasonably sensible default for pybasedir, my_ip and host."""
-    if s.startswith(BASEDIR):
+    if s.startswith(sys.prefix):
+        # NOTE(jd) Don't use os.path.join, because it is likely to think the
+        # second part is an absolute pathname and therefore drop the first
+        # part.
+        s = os.path.normpath("/usr/" + s[len(sys.prefix):])
+    elif s.startswith(BASEDIR):
         return s.replace(BASEDIR, '/usr/lib/python/site-packages')
     elif BASEDIR in s:
         return s.replace(BASEDIR, '')
@@ -213,33 +221,33 @@ def _print_opt(opt):
         sys.stderr.write("%s\n" % str(err))
         sys.exit(1)
     opt_help += ' (' + OPT_TYPES[opt_type] + ')'
-    print '#', "\n# ".join(textwrap.wrap(opt_help, WORDWRAP_WIDTH))
+    print('#', "\n# ".join(textwrap.wrap(opt_help, WORDWRAP_WIDTH)))
     try:
         if opt_default is None:
-            print '#%s=<None>' % opt_name
+            print('#%s=<None>' % opt_name)
         elif opt_type == STROPT:
             assert(isinstance(opt_default, basestring))
-            print '#%s=%s' % (opt_name, _sanitize_default(opt_default))
+            print('#%s=%s' % (opt_name, _sanitize_default(opt_default)))
         elif opt_type == BOOLOPT:
             assert(isinstance(opt_default, bool))
-            print '#%s=%s' % (opt_name, str(opt_default).lower())
+            print('#%s=%s' % (opt_name, str(opt_default).lower()))
         elif opt_type == INTOPT:
             assert(isinstance(opt_default, int) and
                    not isinstance(opt_default, bool))
-            print '#%s=%s' % (opt_name, opt_default)
+            print('#%s=%s' % (opt_name, opt_default))
         elif opt_type == FLOATOPT:
             assert(isinstance(opt_default, float))
-            print '#%s=%s' % (opt_name, opt_default)
+            print('#%s=%s' % (opt_name, opt_default))
         elif opt_type == LISTOPT:
             assert(isinstance(opt_default, list))
-            print '#%s=%s' % (opt_name, ','.join(opt_default))
+            print('#%s=%s' % (opt_name, ','.join(opt_default)))
         elif opt_type == MULTISTROPT:
             assert(isinstance(opt_default, list))
             if not opt_default:
                 opt_default = ['']
             for default in opt_default:
-                print '#%s=%s' % (opt_name, default)
-        print
+                print('#%s=%s' % (opt_name, default))
+        print('')
     except Exception:
         sys.stderr.write('Error in option "%s"\n' % opt_name)
         sys.exit(1)
@@ -247,7 +255,7 @@ def _print_opt(opt):
 
 def main():
     if len(sys.argv) < 2:
-        print "usage: %s [srcfile]...\n" % sys.argv[0]
+        print("usage: %s [srcfile]...\n" % sys.argv[0])
         sys.exit(0)
     generate(sys.argv[1:])
 
