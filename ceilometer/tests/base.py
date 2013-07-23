@@ -36,6 +36,7 @@ class TestCase(testtools.TestCase):
         self.stubs = stubout.StubOutForTesting()
         self.tempdir = self.useFixture(fixtures.TempDir())
         self.useFixture(fixtures.FakeLogger())
+        cfg.CONF([], project='ceilometer')
 
         # Set a default location for the pipeline config file so the
         # tests work even if ceilometer is not installed globally on
