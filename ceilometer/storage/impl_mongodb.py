@@ -24,9 +24,7 @@ import copy
 import datetime
 import operator
 import os
-import re
 import time
-import urlparse
 import uuid
 
 import bson.code
@@ -36,7 +34,6 @@ import pymongo
 from oslo.config import cfg
 
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import network_utils
 from ceilometer.openstack.common import timeutils
 from ceilometer import storage
 from ceilometer.storage import base
@@ -147,20 +144,15 @@ class ConnectionPool(object):
     def __init__(self):
         self._pool = {}
 
-    def connect(self, opts):
-        # opts is a dict, dict are unhashable, convert to tuple
-        connection_pool_key = tuple(sorted(opts.items()))
-
-        if connection_pool_key not in self._pool:
-            LOG.info('connecting to MongoDB replicaset "%s" on %s',
-                     opts['replica_set'],
-                     opts['netloc'])
-            self._pool[connection_pool_key] = pymongo.Connection(
-                opts['netloc'],
-                replicaSet=opts['replica_set'],
+    def connect(self, url):
+        if url not in self._pool:
+            LOG.info('connecting to MongoDB on %s', url)
+            self._pool[url] = pymongo.MongoClient(
+                url,
+                use_greenlets=True,
                 safe=True)
 
-        return self._pool.get(connection_pool_key)
+        return self._pool.get(url)
 
 
 class Connection(base.Connection):
@@ -249,25 +241,23 @@ class Connection(base.Connection):
     }""")
 
     def __init__(self, conf):
-        opts = self._parse_connection_url(conf.database.connection)
+        url = conf.database.connection
 
-        if opts['netloc'] == '__test__':
+        if url == 'mongodb://__test__':
             url = os.environ.get('CEILOMETER_TEST_MONGODB_URL')
             if not url:
                 raise RuntimeError(
                     "No MongoDB test URL set,"
                     "export CEILOMETER_TEST_MONGODB_URL environment variable")
-            opts = self._parse_connection_url(url)
 
         # NOTE(jd) Use our own connection pooling on top of the Pymongo one.
         # We need that otherwise we overflow the MongoDB instance with new
         # connection since we instanciate a Pymongo client each time someone
         # requires a new storage connection.
-        self.conn = self.CONNECTION_POOL.connect(opts)
+        self.conn = self.CONNECTION_POOL.connect(url)
 
-        self.db = getattr(self.conn, opts['dbname'])
-        if 'username' in opts:
-            self.db.authenticate(opts['username'], opts['password'])
+        connection_options = pymongo.uri_parser.parse_uri(url)
+        self.db = getattr(self.conn, connection_options['database'])
 
         # NOTE(jd) Upgrading is just about creating index, so let's do this
         # on connection to be sure at least the TTL is correcly updated if
@@ -332,21 +322,6 @@ class Connection(base.Connection):
 
     def clear(self):
         self.conn.drop_database(self.db)
-
-    @staticmethod
-    def _parse_connection_url(url):
-        opts = {}
-        result = network_utils.urlsplit(url)
-        opts['replica_set'] = urlparse.parse_qs(
-            result.query).get('replica_set', [""])[0]
-        opts['dbtype'] = result.scheme
-        opts['dbname'] = result.path.replace('/', '')
-        netloc_match = re.match(r'(?:(\w+:\w+)@)?(.*)', result.netloc)
-        auth = netloc_match.group(1)
-        opts['netloc'] = netloc_match.group(2)
-        if auth:
-            opts['username'], opts['password'] = auth.split(':')
-        return opts
 
     def record_metering_data(self, data):
         """Write the data to the backend storage system.
