@@ -21,16 +21,25 @@
 import copy
 import datetime
 import logging
+import testscenarios
 
 from ceilometer.openstack.common import rpc
 from ceilometer.openstack.common import timeutils
 
 from .base import FunctionalTest
 
+load_tests = testscenarios.load_tests_apply_scenarios
+
 LOG = logging.getLogger(__name__)
 
 
 class TestPostSamples(FunctionalTest):
+
+    scenarios = [
+        ('sqlalchemy', dict(database_connection='sqlite://')),
+        ('mongodb', dict(database_connection='mongodb://__test__')),
+        ('hbase', dict(database_connection='hbase://__test__')),
+    ]
 
     def faux_cast(self, context, topic, msg):
         self.published.append((topic, msg))
