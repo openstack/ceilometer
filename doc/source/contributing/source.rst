@@ -59,15 +59,14 @@ run through tox_.
    $ cd /opt/stack/ceilometer
    $ tox -e py27,pep8
 
-   As tox is a wrapper around nose, it also accepts the same flags as nosetests.
-   See the `nose options documentation`_ for details about these additional flags.
+   As tox is a wrapper around testr, it also accepts the same flags as testr.
+   See the `testr documentation`_ for details about these additional flags.
 
-.. _nose options documentation: http://readthedocs.org/docs/nose/en/latest/usage.html#options
+.. _testr documentation: https://testrepository.readthedocs.org/en/latest/MANUAL.html
 
-   Use a double hyphen to pass options to nose. For example, to set verbose
-   flag and to run only tests under tests/api/v2::
+   Use a double hyphen to pass options to testr. For example, to run only tests under tests/api/v2::
 
-      $ tox -e py27 -- -v api/v2
+      $ tox -e py27 -- api.v2
 
 .. seealso::
 
