@@ -26,6 +26,8 @@
 
 import copy
 import datetime
+import uuid
+
 from oslo.config import cfg
 
 from tests.storage import base
@@ -33,6 +35,7 @@ from tests.storage import base
 from ceilometer.publisher import rpc
 from ceilometer import counter
 from ceilometer.storage import impl_mongodb
+from ceilometer.storage import models
 
 
 class MongoDBEngineTestBase(base.DBTestBase):
@@ -143,7 +146,25 @@ class StatisticsTest(base.StatisticsTest, MongoDBEngineTestBase):
 
 
 class AlarmTest(base.AlarmTest, MongoDBEngineTestBase):
-    pass
+    def prepare_old_matching_metadata_alarm(self):
+        alarm = models.Alarm('old-alert',
+                             'test.one', 'eq', 36, 'count',
+                             'me', 'and-da-boys',
+                             evaluation_periods=1,
+                             period=60,
+                             alarm_actions=['http://nowhere/alarms'],
+                             matching_metadata={'key': 'value'})
+        alarm.alarm_id = str(uuid.uuid1())
+        data = alarm.as_dict()
+        self.conn.db.alarm.update(
+            {'alarm_id': alarm.alarm_id},
+            {'$set': data},
+            upsert=True)
+
+    def test_alarm_get_old_matching_metadata_format(self):
+        self.prepare_old_matching_metadata_alarm()
+        old = list(self.conn.get_alarms(name='old-alert'))[0]
+        self.assertEquals(old.matching_metadata, {'key': 'value'})
 
 
 class CompatibilityTest(MongoDBEngineTestBase):

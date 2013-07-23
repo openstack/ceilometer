@@ -616,6 +616,26 @@ class Connection(base.Connection):
                        for r in results['results']),
                       key=operator.attrgetter('period_start'))
 
+    @staticmethod
+    def _decode_matching_metadata(matching_metadata):
+        if isinstance(matching_metadata, dict):
+            #note(sileht): keep compatibility with old db format
+            return matching_metadata
+        else:
+            new_matching_metadata = {}
+            for elem in matching_metadata:
+                new_matching_metadata[elem['key']] = elem['value']
+            return new_matching_metadata
+
+    @staticmethod
+    def _encode_matching_metadata(matching_metadata):
+        if matching_metadata:
+            new_matching_metadata = []
+            for k, v in matching_metadata.iteritems():
+                new_matching_metadata.append({'key': k, 'value': v})
+            return new_matching_metadata
+        return matching_metadata
+
     def get_alarms(self, name=None, user=None,
                    project=None, enabled=True, alarm_id=None):
         """Yields a lists of alarms that match filters
@@ -636,6 +656,8 @@ class Connection(base.Connection):
             a = {}
             a.update(alarm)
             del a['_id']
+            a['matching_metadata'] = \
+                self._decode_matching_metadata(a['matching_metadata'])
             yield models.Alarm(**a)
 
     def update_alarm(self, alarm):
@@ -645,6 +667,9 @@ class Connection(base.Connection):
             # This is an insert, generate an id
             alarm.alarm_id = str(uuid.uuid1())
         data = alarm.as_dict()
+        data['matching_metadata'] = \
+            self._encode_matching_metadata(data['matching_metadata'])
+
         self.db.alarm.update(
             {'alarm_id': alarm.alarm_id},
             {'$set': data},
@@ -652,6 +677,8 @@ class Connection(base.Connection):
 
         stored_alarm = self.db.alarm.find({'alarm_id': alarm.alarm_id})[0]
         del stored_alarm['_id']
+        stored_alarm['matching_metadata'] = \
+            self._decode_matching_metadata(stored_alarm['matching_metadata'])
         return models.Alarm(**stored_alarm)
 
     def delete_alarm(self, alarm_id):

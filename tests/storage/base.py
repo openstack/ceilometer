@@ -801,16 +801,21 @@ class AlarmTest(DBTestBase):
                                'me', 'and-da-boys',
                                evaluation_periods=1,
                                period=60,
-                               alarm_actions=['http://nowhere/alarms']),
+                               alarm_actions=['http://nowhere/alarms'],
+                               matching_metadata={'key': 'value'}),
                   models.Alarm('orange-alert',
                                'test.fourty', 'gt', 75, 'avg',
                                'me', 'and-da-boys',
                                period=60,
-                               alarm_actions=['http://nowhere/alarms']),
+                               alarm_actions=['http://nowhere/alarms'],
+                               matching_metadata={'key2': 'value2'}),
                   models.Alarm('yellow-alert',
                                'test.five', 'lt', 10, 'min',
                                'me', 'and-da-boys',
-                               alarm_actions=['http://nowhere/alarms'])]
+                               alarm_actions=['http://nowhere/alarms'],
+                               matching_metadata=
+                               {'key2': 'value2',
+                                'user_metadata.key3': 'value3'})]
         for a in alarms:
             self.conn.update_alarm(a)
 
@@ -832,15 +837,23 @@ class AlarmTest(DBTestBase):
         self.assertEquals(yellow.state, models.Alarm.ALARM_INSUFFICIENT_DATA)
         self.assertEquals(yellow.ok_actions, [])
         self.assertEquals(yellow.insufficient_data_actions, [])
+        self.assertEquals(yellow.matching_metadata,
+                          {'key2': 'value2',
+                           'user_metadata.key3': 'value3'})
 
     def test_update(self):
         self.add_some_alarms()
         orange = list(self.conn.get_alarms(name='orange-alert'))[0]
         orange.enabled = False
         orange.state = models.Alarm.ALARM_INSUFFICIENT_DATA
+        orange.matching_metadata = {'new': 'value',
+                                    'user_metadata.new2': 'value4'}
         updated = self.conn.update_alarm(orange)
         self.assertEquals(updated.enabled, False)
         self.assertEquals(updated.state, models.Alarm.ALARM_INSUFFICIENT_DATA)
+        self.assertEquals(updated.matching_metadata,
+                          {'new': 'value',
+                           'user_metadata.new2': 'value4'})
 
     def test_update_llu(self):
         llu = models.Alarm('llu',
