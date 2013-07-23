@@ -21,6 +21,7 @@
 
 import datetime
 import logging
+import testscenarios
 
 from oslo.config import cfg
 
@@ -29,10 +30,18 @@ from ceilometer import counter
 
 from ceilometer.tests import api as tests_api
 
+load_tests = testscenarios.load_tests_apply_scenarios
+
 LOG = logging.getLogger(__name__)
 
 
 class TestListEmptyResources(tests_api.TestBase):
+
+    scenarios = [
+        ('sqlalchemy', dict(database_connection='sqlite://')),
+        ('mongodb', dict(database_connection='mongodb://__test__')),
+        ('hbase', dict(database_connection='hbase://__test__')),
+    ]
 
     def test_empty(self):
         data = self.get('/resources')
@@ -40,6 +49,12 @@ class TestListEmptyResources(tests_api.TestBase):
 
 
 class TestListResourcesBase(tests_api.TestBase):
+
+    scenarios = [
+        ('sqlalchemy', dict(database_connection='sqlite://')),
+        ('mongodb', dict(database_connection='mongodb://__test__')),
+        ('hbase', dict(database_connection='hbase://__test__')),
+    ]
 
     def setUp(self):
         super(TestListResourcesBase, self).setUp()
@@ -261,6 +276,12 @@ class TestListResources(TestListResourcesBase):
 
 
 class TestListResourcesMetaquery(TestListResourcesBase):
+
+    scenarios = [
+        #('sqlalchemy', dict(database_connection='sqlite://')),
+        ('mongodb', dict(database_connection='mongodb://__test__')),
+        ('hbase', dict(database_connection='hbase://__test__')),
+    ]
 
     def test_metaquery1(self):
         q = '/sources/test_list_resources/resources'

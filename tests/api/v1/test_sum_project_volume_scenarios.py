@@ -16,10 +16,11 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Test getting the max resource volume.
+"""Test getting the sum project volume.
 """
 
 import datetime
+import testscenarios
 
 from oslo.config import cfg
 
@@ -28,11 +29,19 @@ from ceilometer import counter
 
 from ceilometer.tests import api as tests_api
 
+load_tests = testscenarios.load_tests_apply_scenarios
 
-class TestMaxProjectVolume(tests_api.TestBase):
+
+class TestSumProjectVolume(tests_api.TestBase):
+
+    scenarios = [
+        ('sqlalchemy', dict(database_connection='sqlite://')),
+        ('mongodb', dict(database_connection='mongodb://__test__')),
+        ('hbase', dict(database_connection='hbase://__test__')),
+    ]
 
     def setUp(self):
-        super(TestMaxProjectVolume, self).setUp()
+        super(TestSumProjectVolume, self).setUp()
 
         self.counters = []
         for i in range(3):
@@ -58,48 +67,48 @@ class TestMaxProjectVolume(tests_api.TestBase):
             self.conn.record_metering_data(msg)
 
     def test_no_time_bounds(self):
-        data = self.get('/projects/project1/meters/volume.size/volume/max')
-        expected = {'volume': 7}
+        data = self.get('/projects/project1/meters/volume.size/volume/sum')
+        expected = {'volume': 5 + 6 + 7}
         assert data == expected
 
     def test_no_time_bounds_non_admin(self):
-        data = self.get('/projects/project1/meters/volume.size/volume/max',
+        data = self.get('/projects/project1/meters/volume.size/volume/sum',
                         headers={"X-Roles": "Member",
                                  "X-Project-Id": "project1"})
-        self.assertEqual(data, {'volume': 7})
+        self.assertEqual(data, {'volume': 5 + 6 + 7})
 
     def test_no_time_bounds_wrong_tenant(self):
-        resp = self.get('/projects/project1/meters/volume.size/volume/max',
+        resp = self.get('/projects/project1/meters/volume.size/volume/sum',
                         headers={"X-Roles": "Member",
-                                 "X-Project-Id": "?"})
+                                 "X-Project-Id": "???"})
         self.assertEqual(resp.status_code, 404)
 
     def test_start_timestamp(self):
-        data = self.get('/projects/project1/meters/volume.size/volume/max',
+        data = self.get('/projects/project1/meters/volume.size/volume/sum',
                         start_timestamp='2012-09-25T11:30:00')
-        expected = {'volume': 7}
+        expected = {'volume': 6 + 7}
         assert data == expected
 
     def test_start_timestamp_after(self):
-        data = self.get('/projects/project1/meters/volume.size/volume/max',
+        data = self.get('/projects/project1/meters/volume.size/volume/sum',
                         start_timestamp='2012-09-25T12:34:00')
         expected = {'volume': None}
         assert data == expected
 
     def test_end_timestamp(self):
-        data = self.get('/projects/project1/meters/volume.size/volume/max',
+        data = self.get('/projects/project1/meters/volume.size/volume/sum',
                         end_timestamp='2012-09-25T11:30:00')
         expected = {'volume': 5}
         assert data == expected
 
     def test_end_timestamp_before(self):
-        data = self.get('/projects/project1/meters/volume.size/volume/max',
+        data = self.get('/projects/project1/meters/volume.size/volume/sum',
                         end_timestamp='2012-09-25T09:54:00')
         expected = {'volume': None}
         assert data == expected
 
     def test_start_end_timestamp(self):
-        data = self.get('/projects/project1/meters/volume.size/volume/max',
+        data = self.get('/projects/project1/meters/volume.size/volume/sum',
                         start_timestamp='2012-09-25T11:30:00',
                         end_timestamp='2012-09-25T11:32:00')
         expected = {'volume': 6}

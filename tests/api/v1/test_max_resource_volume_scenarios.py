@@ -19,6 +19,7 @@
 """
 
 import datetime
+import testscenarios
 
 from oslo.config import cfg
 
@@ -27,8 +28,16 @@ from ceilometer import counter
 
 from ceilometer.tests import api as tests_api
 
+load_tests = testscenarios.load_tests_apply_scenarios
+
 
 class TestMaxResourceVolume(tests_api.TestBase):
+
+    scenarios = [
+        ('sqlalchemy', dict(database_connection='sqlite://')),
+        ('mongodb', dict(database_connection='mongodb://__test__')),
+        ('hbase', dict(database_connection='hbase://__test__')),
+    ]
 
     def setUp(self):
         super(TestMaxResourceVolume, self).setUp()

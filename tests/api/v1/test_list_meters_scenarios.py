@@ -21,6 +21,7 @@
 
 import datetime
 import logging
+import testscenarios
 
 from oslo.config import cfg
 
@@ -29,10 +30,18 @@ from ceilometer import counter
 
 from ceilometer.tests import api as tests_api
 
+load_tests = testscenarios.load_tests_apply_scenarios
+
 LOG = logging.getLogger(__name__)
 
 
 class TestListEmptyMeters(tests_api.TestBase):
+
+    scenarios = [
+        ('sqlalchemy', dict(database_connection='sqlite://')),
+        ('mongodb', dict(database_connection='mongodb://__test__')),
+        ('hbase', dict(database_connection='hbase://__test__')),
+    ]
 
     def test_empty(self):
         data = self.get('/meters')
@@ -40,6 +49,12 @@ class TestListEmptyMeters(tests_api.TestBase):
 
 
 class TestListMeters(tests_api.TestBase):
+
+    scenarios = [
+        ('sqlalchemy', dict(database_connection='sqlite://')),
+        ('mongodb', dict(database_connection='mongodb://__test__')),
+        ('hbase', dict(database_connection='hbase://__test__')),
+    ]
 
     def setUp(self):
         super(TestListMeters, self).setUp()
@@ -209,6 +224,12 @@ class TestListMeters(tests_api.TestBase):
 
 
 class TestListMetersMetaquery(TestListMeters):
+
+    scenarios = [
+        #('sqlalchemy', dict(database_connection='sqlite://')),
+        ('mongodb', dict(database_connection='mongodb://__test__')),
+        ('hbase', dict(database_connection='hbase://__test__')),
+    ]
 
     def test_metaquery1(self):
         data = self.get('/meters?metadata.tag=self.counter')
