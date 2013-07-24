@@ -114,6 +114,7 @@ class CollectorService(rpc_service.Service):
 
     def __init__(self, host, topic, manager=None):
         super(CollectorService, self).__init__(host, topic, manager)
+        self.storage_conn = storage.get_connection(cfg.CONF)
 
     def start(self):
         super(CollectorService, self).start()

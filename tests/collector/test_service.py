@@ -127,6 +127,10 @@ class TestUDPCollectorService(TestCollector):
             resource_metadata={},
         )._asdict())
 
+    def test_service_has_storage_conn(self):
+        srv = service.UDPCollectorService()
+        self.assertIsNotNone(srv.storage_conn)
+
     def test_udp_receive(self):
         self.srv.storage_conn = self.mox.CreateMock(base.Connection)
         self.counter['source'] = 'mysource'
@@ -174,6 +178,11 @@ class TestCollectorService(TestCollector):
         super(TestCollectorService, self).setUp()
         self.srv = service.CollectorService('the-host', 'the-topic')
         self.ctx = None
+
+    def test_service_has_storage_conn(self):
+        # Test an unmocked default CollectorService
+        srv = service.CollectorService('the-host', 'the-topic')
+        self.assertIsNotNone(srv.storage_conn)
 
     @patch('ceilometer.pipeline.setup_pipeline', MagicMock())
     def test_init_host(self):
