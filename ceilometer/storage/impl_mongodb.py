@@ -25,6 +25,7 @@ import datetime
 import operator
 import os
 import re
+import time
 import urlparse
 import uuid
 
@@ -599,7 +600,7 @@ class Connection(base.Connection):
                 period_start = self.db.meter.find(
                     limit=1, sort=[('timestamp',
                                     pymongo.ASCENDING)])[0]['timestamp']
-            period_start = int(period_start.strftime('%s'))
+            period_start = int(time.mktime(period_start.utctimetuple()))
             map_stats = self.MAP_STATS_PERIOD % (period, period_start)
         else:
             map_stats = self.MAP_STATS
