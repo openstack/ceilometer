@@ -639,6 +639,9 @@
 # value)
 #os_tenant_name=admin
 
+# Certificate chain for SSL validation (string value)
+#os_cacert=<None>
+
 # Auth URL to use for openstack service access (string value)
 #os_auth_url=http://localhost:5000/v2.0
 

@@ -83,6 +83,7 @@ class SingletonAlarmService(os_service.Service):
             os_tenant_name=auth_config.os_tenant_name,
             os_password=auth_config.os_password,
             os_username=auth_config.os_username,
+            cacert=auth_config.os_cacert,
             endpoint_type=auth_config.os_endpoint_type,
         )
         return ceiloclient.get_client(2, **creds)

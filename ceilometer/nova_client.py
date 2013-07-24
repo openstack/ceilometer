@@ -52,6 +52,7 @@ class Client(object):
             project_id=tenant,
             auth_url=cfg.CONF.service_credentials.os_auth_url,
             endpoint_type=cfg.CONF.service_credentials.os_endpoint_type,
+            cacert=cfg.CONF.service_credentials.os_cacert,
             no_cache=True)
 
     def _with_flavor_and_image(self, instances):
