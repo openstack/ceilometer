@@ -58,12 +58,6 @@ cfg.CONF.import_opt('connection',
                     group='database')
 
 
-def register_opts(conf):
-    """Register any options for the storage system."""
-    p = get_engine(conf)
-    p.register_opts(conf)
-
-
 def get_engine(conf):
     """Load the configured engine and return an instance."""
     if conf.database_connection:
@@ -80,10 +74,7 @@ def get_engine(conf):
 
 def get_connection(conf):
     """Return an open connection to the database."""
-    engine = get_engine(conf)
-    engine.register_opts(conf)
-    db = engine.get_connection(conf)
-    return db
+    return get_engine(conf).get_connection(conf)
 
 
 class SampleFilter(object):

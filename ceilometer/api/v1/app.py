@@ -31,8 +31,6 @@ from ceilometer import storage
 # how to serialize more complex objects.
 flask.helpers.json = jsonutils
 
-storage.register_opts(cfg.CONF)
-
 
 def make_app(conf, enable_acl=True, attach_storage=True,
              sources_file='sources.json'):

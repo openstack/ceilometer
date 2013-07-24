@@ -63,11 +63,6 @@ class HBaseStorage(base.StorageEngine):
         }
     """
 
-    def register_opts(self, conf):
-        """Register any configuration options used by this engine.
-        """
-        pass
-
     @staticmethod
     def get_connection(conf):
         """Return a Connection instance based on the configuration settings.
