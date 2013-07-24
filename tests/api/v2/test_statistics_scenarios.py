@@ -25,17 +25,13 @@ from oslo.config import cfg
 from . import base
 from ceilometer import counter
 from ceilometer.publisher import rpc
+from ceilometer.tests import db as tests_db
 
 load_tests = testscenarios.load_tests_apply_scenarios
 
 
-class TestMaxProjectVolume(base.FunctionalTest):
-
-    scenarios = [
-        ('sqlalchemy', dict(database_connection='sqlite://')),
-        ('mongodb', dict(database_connection='mongodb://__test__')),
-        ('hbase', dict(database_connection='hbase://__test__')),
-    ]
+class TestMaxProjectVolume(base.FunctionalTest,
+                           tests_db.MixinTestsWithBackendScenarios):
 
     PATH = '/meters/volume.size/statistics'
 
@@ -135,13 +131,8 @@ class TestMaxProjectVolume(base.FunctionalTest):
         self.assertEqual(data[0]['count'], 1)
 
 
-class TestMaxResourceVolume(base.FunctionalTest):
-
-    scenarios = [
-        ('sqlalchemy', dict(database_connection='sqlite://')),
-        ('mongodb', dict(database_connection='mongodb://__test__')),
-        ('hbase', dict(database_connection='hbase://__test__')),
-    ]
+class TestMaxResourceVolume(base.FunctionalTest,
+                            tests_db.MixinTestsWithBackendScenarios):
 
     PATH = '/meters/volume.size/statistics'
 
@@ -257,13 +248,8 @@ class TestMaxResourceVolume(base.FunctionalTest):
         self.assertEqual(data[0]['count'], 1)
 
 
-class TestSumProjectVolume(base.FunctionalTest):
-
-    scenarios = [
-        ('sqlalchemy', dict(database_connection='sqlite://')),
-        ('mongodb', dict(database_connection='mongodb://__test__')),
-        ('hbase', dict(database_connection='hbase://__test__')),
-    ]
+class TestSumProjectVolume(base.FunctionalTest,
+                           tests_db.MixinTestsWithBackendScenarios):
 
     PATH = '/meters/volume.size/statistics'
 
@@ -365,13 +351,8 @@ class TestSumProjectVolume(base.FunctionalTest):
         self.assertEqual(data[0]['count'], 1)
 
 
-class TestSumResourceVolume(base.FunctionalTest):
-
-    scenarios = [
-        ('sqlalchemy', dict(database_connection='sqlite://')),
-        ('mongodb', dict(database_connection='mongodb://__test__')),
-        ('hbase', dict(database_connection='hbase://__test__')),
-    ]
+class TestSumResourceVolume(base.FunctionalTest,
+                            tests_db.MixinTestsWithBackendScenarios):
 
     PATH = '/meters/volume.size/statistics'
 

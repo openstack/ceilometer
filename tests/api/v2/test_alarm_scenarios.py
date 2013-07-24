@@ -26,32 +26,23 @@ import testscenarios
 from .base import FunctionalTest
 
 from ceilometer.storage.models import Alarm
+from ceilometer.tests import db as tests_db
 
 load_tests = testscenarios.load_tests_apply_scenarios
 
 LOG = logging.getLogger(__name__)
 
 
-class TestListEmptyAlarms(FunctionalTest):
-
-    scenarios = [
-        ('sqlalchemy', dict(database_connection='sqlite://')),
-        ('mongodb', dict(database_connection='mongodb://__test__')),
-        #('hbase', dict(database_connection='hbase://__test__')),
-    ]
+class TestListEmptyAlarms(FunctionalTest,
+                          tests_db.MixinTestsWithBackendScenarios):
 
     def test_empty(self):
         data = self.get_json('/alarms')
         self.assertEquals([], data)
 
 
-class TestAlarms(FunctionalTest):
-
-    scenarios = [
-        ('sqlalchemy', dict(database_connection='sqlite://')),
-        ('mongodb', dict(database_connection='mongodb://__test__')),
-        #('hbase', dict(database_connection='hbase://__test__')),
-    ]
+class TestAlarms(FunctionalTest,
+                 tests_db.MixinTestsWithBackendScenarios):
 
     def setUp(self):
         super(TestAlarms, self).setUp()

@@ -48,6 +48,10 @@ class TestBase(db_test_base.TestBase):
                                    enable_acl=False,
                                    attach_storage=False,
                                    sources_file=sources_file)
+
+        # this is needed to pass over unhandled exceptions
+        self.app.debug = True
+
         self.app.register_blueprint(v1_blueprint.blueprint)
         self.test_app = self.app.test_client()
 

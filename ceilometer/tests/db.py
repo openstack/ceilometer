@@ -35,3 +35,13 @@ class TestBase(test_base.TestCase):
         self.conn.upgrade()
         self.conn.clear()
         self.conn.upgrade()
+
+
+class MixinTestsWithBackendScenarios(object):
+    __metaclass__ = test_base.SkipNotImplementedMeta
+
+    scenarios = [
+        ('sqlalchemy', dict(database_connection='sqlite://')),
+        ('mongodb', dict(database_connection='mongodb://__test__')),
+        ('hbase', dict(database_connection='hbase://__test__')),
+    ]

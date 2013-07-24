@@ -26,6 +26,7 @@ from oslo.config import cfg
 
 from ceilometer.publisher import rpc
 from ceilometer import counter
+from ceilometer.tests import db as tests_db
 
 from .base import FunctionalTest
 
@@ -34,26 +35,16 @@ load_tests = testscenarios.load_tests_apply_scenarios
 LOG = logging.getLogger(__name__)
 
 
-class TestListEmptyMeters(FunctionalTest):
-
-    scenarios = [
-        ('sqlalchemy', dict(database_connection='sqlite://')),
-        ('mongodb', dict(database_connection='mongodb://__test__')),
-        ('hbase', dict(database_connection='hbase://__test__')),
-    ]
+class TestListEmptyMeters(FunctionalTest,
+                          tests_db.MixinTestsWithBackendScenarios):
 
     def test_empty(self):
         data = self.get_json('/meters')
         self.assertEquals([], data)
 
 
-class TestListMeters(FunctionalTest):
-
-    scenarios = [
-        ('sqlalchemy', dict(database_connection='sqlite://')),
-        ('mongodb', dict(database_connection='mongodb://__test__')),
-        ('hbase', dict(database_connection='hbase://__test__')),
-    ]
+class TestListMeters(FunctionalTest,
+                     tests_db.MixinTestsWithBackendScenarios):
 
     def setUp(self):
         super(TestListMeters, self).setUp()

@@ -25,19 +25,15 @@ import testscenarios
 from ceilometer.openstack.common import timeutils
 from ceilometer.storage import models
 from ceilometer.tests import api as tests_api
+from ceilometer.tests import db as tests_db
 
 load_tests = testscenarios.load_tests_apply_scenarios
 
 LOG = logging.getLogger(__name__)
 
 
-class TestComputeDurationByResource(tests_api.TestBase):
-
-    scenarios = [
-        ('sqlalchemy', dict(database_connection='sqlite://')),
-        ('mongodb', dict(database_connection='mongodb://__test__')),
-        ('hbase', dict(database_connection='hbase://__test__')),
-    ]
+class TestComputeDurationByResource(tests_api.TestBase,
+                                    tests_db.MixinTestsWithBackendScenarios):
 
     def setUp(self):
         super(TestComputeDurationByResource, self).setUp()

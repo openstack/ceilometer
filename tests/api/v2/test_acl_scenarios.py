@@ -25,6 +25,7 @@ from oslo.config import cfg
 from ceilometer import counter
 from ceilometer.api import acl
 from ceilometer.publisher import rpc
+from ceilometer.tests import db as tests_db
 
 from .base import FunctionalTest
 
@@ -73,13 +74,8 @@ class FakeMemcache(object):
         self.set_key = key
 
 
-class TestAPIACL(FunctionalTest):
-
-    scenarios = [
-        ('sqlalchemy', dict(database_connection='sqlite://')),
-        ('mongodb', dict(database_connection='mongodb://__test__')),
-        ('hbase', dict(database_connection='hbase://__test__')),
-    ]
+class TestAPIACL(FunctionalTest,
+                 tests_db.MixinTestsWithBackendScenarios):
 
     def setUp(self):
         super(TestAPIACL, self).setUp()

@@ -29,32 +29,23 @@ from ceilometer.publisher import rpc
 from ceilometer import counter
 
 from ceilometer.tests import api as tests_api
+from ceilometer.tests import db as tests_db
 
 load_tests = testscenarios.load_tests_apply_scenarios
 
 LOG = logging.getLogger(__name__)
 
 
-class TestListEmptyResources(tests_api.TestBase):
-
-    scenarios = [
-        ('sqlalchemy', dict(database_connection='sqlite://')),
-        ('mongodb', dict(database_connection='mongodb://__test__')),
-        ('hbase', dict(database_connection='hbase://__test__')),
-    ]
+class TestListEmptyResources(tests_api.TestBase,
+                             tests_db.MixinTestsWithBackendScenarios):
 
     def test_empty(self):
         data = self.get('/resources')
         self.assertEquals({'resources': []}, data)
 
 
-class TestListResourcesBase(tests_api.TestBase):
-
-    scenarios = [
-        ('sqlalchemy', dict(database_connection='sqlite://')),
-        ('mongodb', dict(database_connection='mongodb://__test__')),
-        ('hbase', dict(database_connection='hbase://__test__')),
-    ]
+class TestListResourcesBase(tests_api.TestBase,
+                            tests_db.MixinTestsWithBackendScenarios):
 
     def setUp(self):
         super(TestListResourcesBase, self).setUp()
@@ -275,13 +266,8 @@ class TestListResources(TestListResourcesBase):
         self.assertEquals(data['resources'], [])
 
 
-class TestListResourcesMetaquery(TestListResourcesBase):
-
-    scenarios = [
-        #('sqlalchemy', dict(database_connection='sqlite://')),
-        ('mongodb', dict(database_connection='mongodb://__test__')),
-        ('hbase', dict(database_connection='hbase://__test__')),
-    ]
+class TestListResourcesMetaquery(TestListResourcesBase,
+                                 tests_db.MixinTestsWithBackendScenarios):
 
     def test_metaquery1(self):
         q = '/sources/test_list_resources/resources'

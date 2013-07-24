@@ -25,6 +25,7 @@ import testscenarios
 
 from ceilometer.openstack.common import rpc
 from ceilometer.openstack.common import timeutils
+from ceilometer.tests import db as tests_db
 
 from .base import FunctionalTest
 
@@ -33,13 +34,8 @@ load_tests = testscenarios.load_tests_apply_scenarios
 LOG = logging.getLogger(__name__)
 
 
-class TestPostSamples(FunctionalTest):
-
-    scenarios = [
-        ('sqlalchemy', dict(database_connection='sqlite://')),
-        ('mongodb', dict(database_connection='mongodb://__test__')),
-        ('hbase', dict(database_connection='hbase://__test__')),
-    ]
+class TestPostSamples(FunctionalTest,
+                      tests_db.MixinTestsWithBackendScenarios):
 
     def faux_cast(self, context, topic, msg):
         self.published.append((topic, msg))

@@ -19,11 +19,13 @@
 """Test base classes.
 """
 import fixtures
+import functools
 import mox
 from oslo.config import cfg
 import os.path
 import stubout
 import testtools
+from testtools import testcase
 
 cfg.CONF.import_opt('pipeline_cfg_file', 'ceilometer.pipeline')
 
@@ -67,3 +69,27 @@ class TestCase(testtools.TestCase):
         self.mox.VerifyAll()
         cfg.CONF.reset()
         super(TestCase, self).tearDown()
+
+
+def _skip_decorator(func):
+    @functools.wraps(func)
+    def skip_if_not_implemented(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except NotImplementedError as e:
+            raise testcase.TestSkipped(str(e))
+        except Exception as e:
+            if 'not implemented' in str(e):
+                raise testcase.TestSkipped(str(e))
+            raise
+    return skip_if_not_implemented
+
+
+class SkipNotImplementedMeta(type):
+    def __new__(cls, name, bases, local):
+        for attr in local:
+            value = local[attr]
+            if callable(value) and (
+                    attr.startswith('test_') or attr == 'setUp'):
+                local[attr] = _skip_decorator(value)
+        return type.__new__(cls, name, bases, local)
