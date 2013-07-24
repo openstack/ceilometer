@@ -38,6 +38,12 @@ cfg.CONF.register_opts(OPTS)
 class _Base(plugin.NotificationBase):
     """Convert volume notifications into Counters."""
 
+    event_types = [
+        'volume.exists',
+        'volume.create.*',
+        'volume.delete.*',
+    ]
+
     @staticmethod
     def get_exchange_topics(conf):
         """Return a sequence of ExchangeTopics defining the exchange and
@@ -49,12 +55,6 @@ class _Base(plugin.NotificationBase):
                 topics=set(topic + ".info"
                            for topic in conf.notification_topics)),
         ]
-
-    @staticmethod
-    def get_event_types():
-        return ['volume.exists',
-                'volume.create.end',
-                'volume.delete.start']
 
 
 class Volume(_Base):

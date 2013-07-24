@@ -560,7 +560,7 @@ class TestNotifications(base.TestCase):
         ic = notifications.InstanceScheduled()
 
         self.assertIn(INSTANCE_SCHEDULED['event_type'],
-                      ic.get_event_types())
+                      ic.event_types)
 
         counters = list(ic.process_notification(INSTANCE_SCHEDULED))
         self.assertEqual(len(counters), 1)
