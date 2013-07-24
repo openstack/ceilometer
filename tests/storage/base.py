@@ -652,6 +652,47 @@ class StatisticsTest(DBTestBase):
         self.assertEqual(r.duration_end,
                          datetime.datetime(2012, 9, 25, 11, 31))
 
+    def test_by_user_period_with_timezone(self):
+        dates = [
+            '2012-09-25T00:28:00-10:00',
+            '2012-09-25T01:28:00-09:00',
+            '2012-09-25T02:28:00-08:00',
+            '2012-09-25T03:28:00-07:00',
+            '2012-09-25T04:28:00-06:00',
+            '2012-09-25T05:28:00-05:00',
+            '2012-09-25T06:28:00-04:00',
+            '2012-09-25T07:28:00-03:00',
+            '2012-09-25T08:28:00-02:00',
+            '2012-09-25T09:28:00-01:00',
+            '2012-09-25T10:28:00Z',
+            '2012-09-25T11:28:00+01:00',
+            '2012-09-25T12:28:00+02:00',
+            '2012-09-25T13:28:00+03:00',
+            '2012-09-25T14:28:00+04:00',
+            '2012-09-25T15:28:00+05:00',
+            '2012-09-25T16:28:00+06:00',
+            '2012-09-25T17:28:00+07:00',
+            '2012-09-25T18:28:00+08:00',
+            '2012-09-25T19:28:00+09:00',
+            '2012-09-25T20:28:00+10:00',
+            '2012-09-25T21:28:00+11:00',
+            '2012-09-25T22:28:00+12:00',
+        ]
+        for date in dates:
+            f = storage.SampleFilter(
+                user='user-5',
+                meter='volume.size',
+                start=date
+            )
+            results = list(self.conn.get_meter_statistics(f, period=7200))
+            self.assertEqual(len(results), 2)
+            self.assertEqual(set(r.period_start for r in results),
+                             set([datetime.datetime(2012, 9, 25, 10, 28),
+                                  datetime.datetime(2012, 9, 25, 12, 28)]))
+            self.assertEqual(set(r.period_end for r in results),
+                             set([datetime.datetime(2012, 9, 25, 12, 28),
+                                  datetime.datetime(2012, 9, 25, 14, 28)]))
+
     def test_by_user_period_start_end(self):
         f = storage.SampleFilter(
             user='user-5',

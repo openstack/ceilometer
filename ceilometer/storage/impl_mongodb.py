@@ -20,11 +20,11 @@
 """MongoDB storage backend
 """
 
+import calendar
 import copy
 import datetime
 import operator
 import os
-import time
 import uuid
 
 import bson.code
@@ -565,7 +565,7 @@ class Connection(base.Connection):
                 period_start = self.db.meter.find(
                     limit=1, sort=[('timestamp',
                                     pymongo.ASCENDING)])[0]['timestamp']
-            period_start = int(time.mktime(period_start.utctimetuple()))
+            period_start = int(calendar.timegm(period_start.utctimetuple()))
             map_stats = self.MAP_STATS_PERIOD % (period, period_start)
         else:
             map_stats = self.MAP_STATS
