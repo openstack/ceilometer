@@ -157,6 +157,44 @@ class TestAlarmNotifier(base.TestCase):
                                           'state': 'ALARM',
                                       })
 
+    def test_notify_alarm_rest_action_with_ssl_verify_disable(self):
+        action = 'https://host/action?ceilometer-alarm-ssl-verify=0'
+        data_json = '{"state": "ALARM", "reason": "what ?"}'
+
+        self.mox.StubOutWithMock(requests, "post")
+        requests.post(action, data=data_json, verify=False)
+        self.mox.ReplayAll()
+
+        with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
+            self.service.notify_alarm(context.get_admin_context(),
+                                      {
+                                          'actions': [action],
+                                          'alarm': {'name': 'foobar'},
+                                          'condition': {'threshold': 42},
+                                          'reason': 'what ?',
+                                          'state': 'ALARM',
+                                      })
+
+    def test_notify_alarm_rest_action_with_ssl_verify_enable_by_user(self):
+        action = 'https://host/action?ceilometer-alarm-ssl-verify=1'
+        data_json = '{"state": "ALARM", "reason": "what ?"}'
+
+        cfg.CONF.set_override("rest_notifier_ssl_verify", False,
+                              group='alarm')
+        self.mox.StubOutWithMock(requests, "post")
+        requests.post(action, data=data_json, verify=True)
+        self.mox.ReplayAll()
+
+        with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
+            self.service.notify_alarm(context.get_admin_context(),
+                                      {
+                                          'actions': [action],
+                                          'alarm': {'name': 'foobar'},
+                                          'condition': {'threshold': 42},
+                                          'reason': 'what ?',
+                                          'state': 'ALARM',
+                                      })
+
     @staticmethod
     def _fake_urlsplit(*args, **kwargs):
         raise Exception("Evil urlsplit!")
