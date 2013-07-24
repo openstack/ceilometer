@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-16 09:39+0000\n"
+"POT-Creation-Date: 2013-07-24 09:39+0000\n"
 "PO-Revision-Date: 2013-06-08 07:51+0000\n"
 "Last-Translator: daisy.ycguo <daisy.ycguo@gmail.com>\n"
 "Language-Team: Romanian "
@@ -19,26 +19,26 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: ceilometer/alarm/service.py:92
+#: ceilometer/alarm/service.py:97
 msgid "threshold evaluation cycle failed"
 msgstr ""
 
-#: ceilometer/alarm/service.py:122
+#: ceilometer/alarm/service.py:135
 #, python-format
 msgid "Unable to parse action %(action)s for alarm %(alarm)s"
 msgstr ""
 
-#: ceilometer/alarm/service.py:131
+#: ceilometer/alarm/service.py:144
 #, python-format
 msgid "Action %(scheme)s for alarm %(alarm)s is unknown, cannot notify"
 msgstr ""
 
-#: ceilometer/alarm/service.py:141
+#: ceilometer/alarm/service.py:154
 #, python-format
 msgid "Unable to notify alarm %s"
 msgstr ""
 
-#: ceilometer/alarm/service.py:159
+#: ceilometer/alarm/service.py:172
 msgid "Unable to notify for an alarm with no action"
 msgstr ""
 
@@ -107,33 +107,33 @@ msgstr ""
 msgid "comparing value %(value)s against threshold %(limit)s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:702
+#: ceilometer/api/controllers/v2.py:709
 msgid "Unknown resource"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:828
+#: ceilometer/api/controllers/v2.py:835
 msgid "Alarm with that name exists"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:835
+#: ceilometer/api/controllers/v2.py:842
 msgid "Alarm incorrect"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:852 ceilometer/api/controllers/v2.py:874
-#: ceilometer/api/controllers/v2.py:888
+#: ceilometer/api/controllers/v2.py:859 ceilometer/api/controllers/v2.py:881
+#: ceilometer/api/controllers/v2.py:895
 msgid "Unknown alarm"
 msgstr ""
 
-#: ceilometer/collector/service.py:85
+#: ceilometer/collector/service.py:87
 #, python-format
 msgid "UDP: Cannot decode data sent by %s"
 msgstr ""
 
-#: ceilometer/collector/service.py:95
+#: ceilometer/collector/service.py:97
 msgid "UDP: Unable to store meter"
 msgstr ""
 
-#: ceilometer/collector/service.py:226
+#: ceilometer/collector/service.py:244
 #, python-format
 msgid "Unable to store events: %s"
 msgstr ""
@@ -175,12 +175,21 @@ msgstr ""
 msgid "Swift endpoint not found"
 msgstr ""
 
-#: ceilometer/openstack/common/excutils.py:49
+#: ceilometer/openstack/common/eventlet_backdoor.py:142
+#, python-format
+msgid "Eventlet backdoor listening on %(port)s for process %(pid)d"
+msgstr ""
+
+#: ceilometer/openstack/common/exception.py:104
+msgid "Uncaught exception"
+msgstr ""
+
+#: ceilometer/openstack/common/excutils.py:62
 #, python-format
 msgid "Original exception being dropped: %s"
 msgstr ""
 
-#: ceilometer/openstack/common/excutils.py:74
+#: ceilometer/openstack/common/excutils.py:90
 #, python-format
 msgid "Unexpected exception occurred %d time(s)... retrying."
 msgstr ""
@@ -190,47 +199,62 @@ msgstr ""
 msgid "Reloading cached file %s"
 msgstr ""
 
-#: ceilometer/openstack/common/lockutils.py:102
+#: ceilometer/openstack/common/lockutils.py:100
 #, python-format
 msgid "Could not release the acquired lock `%s`"
 msgstr ""
 
-#: ceilometer/openstack/common/lockutils.py:189
+#: ceilometer/openstack/common/lockutils.py:166
 #, python-format
-msgid "Got semaphore \"%(lock)s\" for method \"%(method)s\"..."
+msgid "Got semaphore \"%(lock)s\""
 msgstr ""
 
-#: ceilometer/openstack/common/lockutils.py:200
+#: ceilometer/openstack/common/lockutils.py:175
 #, python-format
-msgid "Attempting to grab file lock \"%(lock)s\" for method \"%(method)s\"..."
+msgid "Attempting to grab file lock \"%(lock)s\""
 msgstr ""
 
-#: ceilometer/openstack/common/lockutils.py:227
+#: ceilometer/openstack/common/lockutils.py:185
 #, python-format
-msgid "Got file lock \"%(lock)s\" at %(path)s for method \"%(method)s\"..."
+msgid "Created lock path: %s"
 msgstr ""
 
-#: ceilometer/openstack/common/lockutils.py:235
+#: ceilometer/openstack/common/lockutils.py:203
 #, python-format
-msgid "Released file lock \"%(lock)s\" at %(path)s for method \"%(method)s\"..."
+msgid "Got file lock \"%(lock)s\" at %(path)s"
 msgstr ""
 
-#: ceilometer/openstack/common/log.py:244
+#: ceilometer/openstack/common/lockutils.py:207
+#, python-format
+msgid "Released file lock \"%(lock)s\" at %(path)s"
+msgstr ""
+
+#: ceilometer/openstack/common/lockutils.py:244
+#, python-format
+msgid "Got semaphore / lock \"%(function)s\""
+msgstr ""
+
+#: ceilometer/openstack/common/lockutils.py:248
+#, python-format
+msgid "Semaphore / lock released \"%(function)s\""
+msgstr ""
+
+#: ceilometer/openstack/common/log.py:245
 #, python-format
 msgid "Deprecated: %s"
 msgstr ""
 
-#: ceilometer/openstack/common/log.py:336
+#: ceilometer/openstack/common/log.py:337
 #, python-format
 msgid "Error loading logging config %(log_config)s: %(err_msg)s"
 msgstr ""
 
-#: ceilometer/openstack/common/log.py:386
+#: ceilometer/openstack/common/log.py:387
 #, python-format
 msgid "syslog facility must be one of: %s"
 msgstr ""
 
-#: ceilometer/openstack/common/log.py:556
+#: ceilometer/openstack/common/log.py:557
 #, python-format
 msgid "Fatal call to deprecated config: %(msg)s"
 msgstr ""
@@ -334,62 +358,92 @@ msgstr ""
 msgid "process_input not supported over SSH"
 msgstr ""
 
-#: ceilometer/openstack/common/service.py:113
-#: ceilometer/openstack/common/service.py:276
+#: ceilometer/openstack/common/service.py:103
+#: ceilometer/openstack/common/service.py:271
 msgid "Full set of CONF:"
 msgstr ""
 
-#: ceilometer/openstack/common/service.py:122
-#: ceilometer/openstack/common/service.py:219
+#: ceilometer/openstack/common/service.py:112
+#: ceilometer/openstack/common/service.py:214
 #, python-format
 msgid "Caught %s, exiting"
 msgstr ""
 
-#: ceilometer/openstack/common/service.py:165
+#: ceilometer/openstack/common/service.py:123
+msgid "Exception during rpc cleanup."
+msgstr ""
+
+#: ceilometer/openstack/common/service.py:159
 msgid "Parent process has died unexpectedly, exiting"
 msgstr ""
 
-#: ceilometer/openstack/common/service.py:201
+#: ceilometer/openstack/common/service.py:196
 msgid "Forking too fast, sleeping"
 msgstr ""
 
-#: ceilometer/openstack/common/service.py:224
+#: ceilometer/openstack/common/service.py:219
 msgid "Unhandled exception"
 msgstr ""
 
-#: ceilometer/openstack/common/service.py:231
+#: ceilometer/openstack/common/service.py:226
 #, python-format
 msgid "Started child %d"
 msgstr ""
 
-#: ceilometer/openstack/common/service.py:241
+#: ceilometer/openstack/common/service.py:236
 #, python-format
 msgid "Starting %d workers"
 msgstr ""
 
-#: ceilometer/openstack/common/service.py:258
+#: ceilometer/openstack/common/service.py:253
 #, python-format
 msgid "Child %(pid)d killed by signal %(sig)d"
 msgstr ""
 
-#: ceilometer/openstack/common/service.py:262
+#: ceilometer/openstack/common/service.py:257
 #, python-format
 msgid "Child %(pid)s exited with status %(code)d"
 msgstr ""
 
-#: ceilometer/openstack/common/service.py:266
+#: ceilometer/openstack/common/service.py:261
 #, python-format
 msgid "pid %d not in child list"
 msgstr ""
 
-#: ceilometer/openstack/common/service.py:294
+#: ceilometer/openstack/common/service.py:289
 #, python-format
 msgid "Caught %s, stopping children"
 msgstr ""
 
-#: ceilometer/openstack/common/service.py:305
+#: ceilometer/openstack/common/service.py:300
 #, python-format
 msgid "Waiting on %d children to exit"
+msgstr ""
+
+#: ceilometer/openstack/common/sslutils.py:52
+#, python-format
+msgid "Unable to find cert_file : %s"
+msgstr ""
+
+#: ceilometer/openstack/common/sslutils.py:55
+#, python-format
+msgid "Unable to find ca_file : %s"
+msgstr ""
+
+#: ceilometer/openstack/common/sslutils.py:58
+#, python-format
+msgid "Unable to find key_file : %s"
+msgstr ""
+
+#: ceilometer/openstack/common/sslutils.py:61
+msgid ""
+"When running server in SSL mode, you must specify both a cert_file and "
+"key_file option value in your configuration file"
+msgstr ""
+
+#: ceilometer/openstack/common/sslutils.py:100
+#, python-format
+msgid "Invalid SSL version : %s"
 msgstr ""
 
 #: ceilometer/openstack/common/db/exception.py:44
@@ -898,21 +952,35 @@ msgstr ""
 msgid "version should be an integer"
 msgstr ""
 
-#: ceilometer/transformer/conversions.py:47
+#: ceilometer/transformer/conversions.py:70
 #, python-format
 msgid ""
 "scaling conversion transformer with source: %(source)s target: %(target)s"
 " replace: %(replace)s"
 msgstr ""
 
-#: ceilometer/transformer/conversions.py:93
-#: ceilometer/transformer/conversions.py:144
+#: ceilometer/transformer/conversions.py:117
+#: ceilometer/transformer/conversions.py:168
 #, python-format
 msgid "converted to: %s"
 msgstr ""
 
-#: ceilometer/transformer/conversions.py:147
+#: ceilometer/transformer/conversions.py:171
 #, python-format
 msgid "dropping counter with no predecessor: %s"
 msgstr ""
+
+#~ msgid "Got semaphore \"%(lock)s\" for method \"%(method)s\"..."
+#~ msgstr ""
+
+#~ msgid "Attempting to grab file lock \"%(lock)s\" for method \"%(method)s\"..."
+#~ msgstr ""
+
+#~ msgid "Got file lock \"%(lock)s\" at %(path)s for method \"%(method)s\"..."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Released file lock \"%(lock)s\" at "
+#~ "%(path)s for method \"%(method)s\"..."
+#~ msgstr ""
 
