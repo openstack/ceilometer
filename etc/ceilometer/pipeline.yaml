@@ -20,6 +20,5 @@
                   unit: "%"
                   type: "gauge"
                   scale: "100.0 / (10**9 * (resource_metadata.cpu_number or 1))"
-              replace: False
     publishers:
         - rpc://
