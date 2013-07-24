@@ -15,6 +15,7 @@
 # under the License.
 
 import datetime
+from oslo.config import cfg
 
 from keystoneclient import exceptions
 import requests
@@ -56,9 +57,9 @@ class _Base(plugin.CentralPollster):
     @staticmethod
     def get_kwapi_client(ksclient):
         """Returns a KwapiClient configured with the proper url and token."""
-        endpoint = ksclient.service_catalog.url_for(service_type='energy',
-                                                    endpoint_type='internalURL'
-                                                    )
+        endpoint = ksclient.service_catalog.url_for(
+            service_type='energy',
+            endpoint_type=cfg.CONF.service_credentials.os_endpoint_type)
         return KwapiClient(endpoint, ksclient.auth_token)
 
     CACHE_KEY_PROBE = 'kwapi.probes'
