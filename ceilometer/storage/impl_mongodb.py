@@ -36,6 +36,7 @@ import pymongo
 from oslo.config import cfg
 
 from ceilometer.openstack.common import log
+from ceilometer.openstack.common import network_utils
 from ceilometer.openstack.common import timeutils
 from ceilometer import storage
 from ceilometer.storage import base
@@ -73,21 +74,9 @@ class MongoDBStorage(base.StorageEngine):
             }
     """
 
-    OPTIONS = [
-        cfg.StrOpt('replica_set_name',
-                   default='',
-                   help='Used to identify the replication set name',
-                   ),
-    ]
-
-    OPTION_GROUP = cfg.OptGroup(name='storage_mongodb',
-                                title='Options for the mongodb storage')
-
     def register_opts(self, conf):
         """Register any configuration options used by this engine.
         """
-        conf.register_group(self.OPTION_GROUP)
-        conf.register_opts(self.OPTIONS, self.OPTION_GROUP)
 
     def get_connection(self, conf):
         """Return a Connection instance based on the configuration settings.
@@ -274,9 +263,6 @@ class Connection(base.Connection):
                     "export CEILOMETER_TEST_MONGODB_URL environment variable")
             opts = self._parse_connection_url(url)
 
-        # FIXME(jd) This should be a parameter in the database URL, not global
-        opts['replica_set'] = conf.storage_mongodb.replica_set_name
-
         # NOTE(jd) Use our own connection pooling on top of the Pymongo one.
         # We need that otherwise we overflow the MongoDB instance with new
         # connection since we instanciate a Pymongo client each time someone
@@ -354,7 +340,9 @@ class Connection(base.Connection):
     @staticmethod
     def _parse_connection_url(url):
         opts = {}
-        result = urlparse.urlparse(url)
+        result = network_utils.urlsplit(url)
+        opts['replica_set'] = urlparse.parse_qs(
+            result.query).get('replica_set', [""])[0]
         opts['dbtype'] = result.scheme
         opts['dbname'] = result.path.replace('/', '')
         netloc_match = re.match(r'(?:(\w+:\w+)@)?(.*)', result.netloc)

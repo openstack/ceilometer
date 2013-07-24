@@ -47,6 +47,14 @@ class MongoDBConnection(MongoDBEngineTestBase):
         self.assertEqual(self.conn.conn,
                          impl_mongodb.Connection(cfg.CONF).conn)
 
+    def test_replica_set(self):
+        cfg.CONF.set_override(
+            'connection',
+            'mongodb://__test__?replica_set=foobar',
+            group='database')
+        conn = impl_mongodb.Connection(cfg.CONF)
+        self.assertTrue(conn.conn)
+
 
 class IndexTest(MongoDBEngineTestBase):
     def test_meter_ttl_index_absent(self):
