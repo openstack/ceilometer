@@ -143,10 +143,8 @@ class TestListMeters(FunctionalTest,
         self.assertEquals('resource-id4', data[0]['resource_id'])
         metadata = data[0]['resource_metadata']
         self.assertIsNotNone(metadata)
-        # FIXME (flwang): Based on current implement, the metadata of
-        # dictionary type can't be shown in the output. See bug 1203699.
-        # Will add more asserts in the fix of 1203699.
         self.assertEqual('self.counter4', metadata['tag'])
+        self.assertEqual('prop_value', metadata['properties.prop_1'])
 
     def test_list_meters_metadata_query(self):
         data = self.get_json('/meters/meter.test',

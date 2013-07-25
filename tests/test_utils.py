@@ -53,3 +53,17 @@ class TestUtils(tests_base.TestCase):
                                  ('b', 'B'),
                                  ('nested:a', 'A'),
                                  ('nested:b', 'B')])
+
+    def test_recursive_keypairs_with_separator(self):
+        data = {'a': 'A',
+                'b': 'B',
+                'nested': {'a': 'A',
+                           'b': 'B',
+                           },
+                }
+        separator = '.'
+        pairs = list(utils.recursive_keypairs(data, separator))
+        self.assertEqual(pairs, [('a', 'A'),
+                                 ('b', 'B'),
+                                 ('nested.a', 'A'),
+                                 ('nested.b', 'B')])

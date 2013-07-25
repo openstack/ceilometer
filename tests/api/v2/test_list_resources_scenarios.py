@@ -411,7 +411,7 @@ class TestListResources(FunctionalTest,
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter',
-                               'ignored_dict': {'key': 'value'},
+                               'dict_properties': {'key': 'value'},
                                'ignored_list': ['not-returned'],
                                },
             source='test',
@@ -425,10 +425,11 @@ class TestListResources(FunctionalTest,
         data = self.get_json('/resources')
         metadata = data[0]['metadata']
         self.assertEqual(
-            list(sorted(metadata.iteritems())),
-            [('display_name', 'test-server'),
-             ('tag', 'self.counter'),
-             ])
+            [(u'dict_properties.key', u'value'),
+             (u'display_name', u'test-server'),
+             (u'tag', u'self.counter')
+             ],
+            list(sorted(metadata.iteritems())))
 
     def test_resource_meter_links(self):
         counter1 = sample.Sample(
