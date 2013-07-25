@@ -38,7 +38,7 @@ import ceilometer  # use the real ceilometer base package
 for name in ['openstack', 'openstack.common', 'openstack.common.log']:
     sys.modules['ceilometer.' + name] = sys.modules['nova.' + name]
 
-from nova.conductor import api
+from nova import conductor
 
 from oslo.config import cfg
 
@@ -53,7 +53,7 @@ from ceilometer.compute.virt import inspector
 LOG = logging.getLogger('nova.ceilometer.notifier')
 
 _gatherer = None
-instance_info_source = api.API()
+instance_info_source = conductor.API()
 
 
 class DeletedInstanceStatsGatherer(object):
