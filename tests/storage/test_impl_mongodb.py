@@ -48,9 +48,10 @@ class MongoDBConnection(MongoDBEngineTestBase):
                          impl_mongodb.Connection(cfg.CONF).conn)
 
     def test_replica_set(self):
+        # FIXME(Alexei_987) should not hardcode URL here
         cfg.CONF.set_override(
             'connection',
-            'mongodb://__test__?replica_set=foobar',
+            'mongodb://localhost:29000/ceilometer?replicaSet=foobar',
             group='database')
         conn = impl_mongodb.Connection(cfg.CONF)
         self.assertTrue(conn.conn)
