@@ -102,54 +102,26 @@ class IndexTest(MongoDBEngineTestBase):
         # create a fake index and check it is deleted
         self.conn.db.meter.ensure_index('foo', name='meter_ttl')
         cfg.CONF.set_override('time_to_live', -1, group='database')
-
-        self.conn._ensure_meter_ttl_index()
+        self.conn.upgrade()
         self.assertTrue(self.conn.db.meter.ensure_index('foo',
                                                         name='meter_ttl'))
         cfg.CONF.set_override('time_to_live', 456789, group='database')
-        self.conn._ensure_meter_ttl_index()
+        self.conn.upgrade()
         self.assertFalse(self.conn.db.meter.ensure_index('foo',
                                                          name='meter_ttl'))
 
     def test_meter_ttl_index_present(self):
         cfg.CONF.set_override('time_to_live', 456789, group='database')
-        self.conn._ensure_meter_ttl_index()
+        self.conn.upgrade()
         self.assertFalse(self.conn.db.meter.ensure_index('foo',
                                                          name='meter_ttl'))
         self.assertEqual(self.conn.db.meter.index_information()[
             'meter_ttl']['expireAfterSeconds'], 456789)
 
         cfg.CONF.set_override('time_to_live', -1, group='database')
-        self.conn._ensure_meter_ttl_index()
+        self.conn.upgrade()
         self.assertTrue(self.conn.db.meter.ensure_index('foo',
                                                         name='meter_ttl'))
-
-    def test_ttl_index_is_supported(self):
-        self.mox.StubOutWithMock(self.conn.conn, "server_info")
-        self.conn.conn.server_info().AndReturn({'versionArray': [2, 4, 5, 0]})
-
-        self.mox.ReplayAll()
-        self.assertTrue(self.conn._is_natively_ttl_supported())
-        self.mox.UnsetStubs()
-        self.mox.VerifyAll()
-
-    def test_ttl_index_is_not_supported(self):
-        self.mox.StubOutWithMock(self.conn.conn, "server_info")
-        self.conn.conn.server_info().AndReturn({'versionArray': [2, 0, 1, 0]})
-
-        self.mox.ReplayAll()
-        self.assertFalse(self.conn._is_natively_ttl_supported())
-        self.mox.UnsetStubs()
-        self.mox.VerifyAll()
-
-    def test_ttl_index_is_unkown(self):
-        self.mox.StubOutWithMock(self.conn.conn, "server_info")
-        self.conn.conn.server_info().AndReturn({})
-
-        self.mox.ReplayAll()
-        self.assertFalse(self.conn._is_natively_ttl_supported())
-        self.mox.UnsetStubs()
-        self.mox.VerifyAll()
 
 
 class UserTest(base.UserTest, MongoDBEngineTestBase):
@@ -173,25 +145,10 @@ class MeterTestPagination(base.MeterTestPagination, MongoDBEngineTestBase):
 
 
 class RawSampleTest(base.RawSampleTest, MongoDBEngineTestBase):
+    # NOTE(jd) Override this test in MongoDB because our code doesn't clear
+    # the collections, this is handled by MongoDB TTL feature.
     def test_clear_metering_data(self):
-        # NOTE(sileht): ensure this tests is played for any version of mongo
-        self.mox.StubOutWithMock(self.conn, "_is_natively_ttl_supported")
-        self.conn._is_natively_ttl_supported().AndReturn(False)
-
-        self.mox.ReplayAll()
-        super(RawSampleTest, self).test_clear_metering_data()
-        self.mox.UnsetStubs()
-        self.mox.VerifyAll()
-
-    def test_clear_metering_data_no_data_to_remove(self):
-        # NOTE(sileht): ensure this tests is played for any version of mongo
-        self.mox.StubOutWithMock(self.conn, "_is_natively_ttl_supported")
-        self.conn._is_natively_ttl_supported().AndReturn(False)
-
-        self.mox.ReplayAll()
-        super(RawSampleTest, self).test_clear_metering_data_no_data_to_remove()
-        self.mox.UnsetStubs()
-        self.mox.VerifyAll()
+        pass
 
 
 class StatisticsTest(base.StatisticsTest, MongoDBEngineTestBase):

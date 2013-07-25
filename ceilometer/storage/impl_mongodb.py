@@ -22,7 +22,6 @@
 
 import calendar
 import copy
-import datetime
 import operator
 import uuid
 import weakref
@@ -34,7 +33,6 @@ import pymongo
 from oslo.config import cfg
 
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import timeutils
 from ceilometer import storage
 from ceilometer.storage import base
 from ceilometer.storage import models
@@ -287,11 +285,6 @@ class Connection(base.Connection):
         self.db.meter.ensure_index([('timestamp', pymongo.DESCENDING)],
                                    name='timestamp_idx')
 
-        # Since mongodb 2.2 support db-ttl natively
-        if self._is_natively_ttl_supported():
-            self._ensure_meter_ttl_index()
-
-    def _ensure_meter_ttl_index(self):
         indexes = self.db.meter.index_information()
 
         ttl = cfg.CONF.database.time_to_live
@@ -315,10 +308,6 @@ class Connection(base.Connection):
             expireAfterSeconds=ttl,
             name='meter_ttl'
         )
-
-    def _is_natively_ttl_supported(self):
-        # Assume is not supported if we can get the version
-        return self.conn.server_info().get('versionArray', []) >= [2, 2]
 
     def clear(self):
         self.conn.drop_database(self.db)
@@ -377,13 +366,6 @@ class Connection(base.Connection):
         :param ttl: Number of seconds to keep records for.
 
         """
-        # Before mongodb 2.2 we need to clear expired data manually
-        if not self._is_natively_ttl_supported():
-            end = timeutils.utcnow() - datetime.timedelta(seconds=ttl)
-            f = storage.SampleFilter(end=end)
-            q = make_query_from_filter(f, require_meter=False)
-            self.db.meter.remove(q)
-
         results = self.db.meter.group(
             key={},
             condition={},
