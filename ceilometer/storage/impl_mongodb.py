@@ -430,7 +430,10 @@ class Connection(base.Connection):
         q = {}
         if source is not None:
             q['source'] = source
-        return sorted(self.db.user.find(q).distinct('_id'))
+
+        return (doc['_id'] for doc in
+                self.db.user.find(q, fields=['_id'],
+                                  sort=[('_id', pymongo.ASCENDING)]))
 
     def get_projects(self, source=None):
         """Return an iterable of project id strings.
@@ -440,7 +443,10 @@ class Connection(base.Connection):
         q = {}
         if source is not None:
             q['source'] = source
-        return sorted(self.db.project.find(q).distinct('_id'))
+
+        return (doc['_id'] for doc in
+                self.db.project.find(q, fields=['_id'],
+                                     sort=[('_id', pymongo.ASCENDING)]))
 
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
