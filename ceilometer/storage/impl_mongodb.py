@@ -24,7 +24,6 @@ import calendar
 import copy
 import datetime
 import operator
-import os
 import uuid
 import weakref
 
@@ -247,13 +246,6 @@ class Connection(base.Connection):
     def __init__(self, conf):
         url = conf.database.connection
 
-        if url == 'mongodb://__test__':
-            url = os.environ.get('CEILOMETER_TEST_MONGODB_URL')
-            if not url:
-                raise RuntimeError(
-                    "No MongoDB test URL set,"
-                    "export CEILOMETER_TEST_MONGODB_URL environment variable")
-
         # NOTE(jd) Use our own connection pooling on top of the Pymongo one.
         # We need that otherwise we overflow the MongoDB instance with new
         # connection since we instanciate a Pymongo client each time someone
@@ -326,6 +318,8 @@ class Connection(base.Connection):
 
     def clear(self):
         self.conn.drop_database(self.db)
+        # Connection will be reopened automatically if needed
+        self.conn.close()
 
     def record_metering_data(self, data):
         """Write the data to the backend storage system.

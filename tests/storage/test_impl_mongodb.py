@@ -36,10 +36,11 @@ from ceilometer.publisher import rpc
 from ceilometer import counter
 from ceilometer.storage import impl_mongodb
 from ceilometer.storage import models
+from ceilometer.tests import db as tests_db
 
 
 class MongoDBEngineTestBase(base.DBTestBase):
-    database_connection = 'mongodb://__test__'
+    database_connection = tests_db.MongoDBFakeConnectionUrl()
 
 
 class MongoDBConnection(MongoDBEngineTestBase):
@@ -48,10 +49,9 @@ class MongoDBConnection(MongoDBEngineTestBase):
                          impl_mongodb.Connection(cfg.CONF).conn)
 
     def test_replica_set(self):
-        # FIXME(Alexei_987) should not hardcode URL here
         cfg.CONF.set_override(
             'connection',
-            'mongodb://localhost:29000/ceilometer?replicaSet=foobar',
+            str(tests_db.MongoDBFakeConnectionUrl()) + '?replicaSet=foobar',
             group='database')
         conn = impl_mongodb.Connection(cfg.CONF)
         self.assertTrue(conn.conn)
