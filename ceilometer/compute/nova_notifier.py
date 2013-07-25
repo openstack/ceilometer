@@ -30,7 +30,7 @@ import ceilometer  # noqa
 for name in ['openstack', 'openstack.common', 'openstack.common.log']:
     sys.modules['ceilometer.' + name] = sys.modules['nova.' + name]
 
-from nova.conductor import api
+from nova import conductor
 
 from stevedore import extension
 
@@ -46,7 +46,7 @@ from ceilometer.openstack.common.gettextutils import _
 LOG = logging.getLogger('nova.ceilometer.notifier')
 
 _gatherer = None
-instance_info_source = api.API()
+instance_info_source = conductor.API()
 
 
 class DeletedInstanceStatsGatherer(object):
