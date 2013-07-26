@@ -72,6 +72,26 @@ class TestPostSamples(FunctionalTest,
         self.assertEqual(s1, data.json)
         self.assertEqual(s1[0], self.published[0][1]['args']['data'][0])
 
+    def test_messsage_id_provided(self):
+        """Do not accept sample with message_id."""
+        s1 = [{'counter_name': 'my_counter_name',
+               'counter_type': 'gauge',
+               'counter_unit': 'instance',
+               'counter_volume': 1,
+               'message_id': 'evil',
+               'source': 'closedstack',
+               'resource_id': 'bd9431c1-8d69-4ad3-803a-8d4a6b89fd36',
+               'project_id': '35b17138-b364-4e6a-a131-8f3099c5be68',
+               'user_id': 'efd87807-12d2-4b38-9c70-5f5c2ac427ff',
+               'resource_metadata': {'name1': 'value1',
+                                     'name2': 'value2'}}]
+
+        data = self.post_json('/meters/my_counter_name/', s1,
+                              expect_errors=True)
+
+        self.assertEqual(data.status_int, 400)
+        self.assertEqual(len(self.published), 0)
+
     def test_wrong_project_id(self):
         """Do not accept cross posting samples to different projects."""
         s1 = [{'counter_name': 'my_counter_name',
