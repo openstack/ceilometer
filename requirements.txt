@@ -17,7 +17,7 @@ stevedore>=0.9
 msgpack-python
 python-glanceclient
 python-novaclient>=2.6.10
-python-keystoneclient>=0.2,<0.3
+python-keystoneclient>=0.3.0
 python-ceilometerclient>=1.0.1
 python-swiftclient
 lxml

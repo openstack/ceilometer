@@ -18,6 +18,7 @@
 """Test ACL."""
 
 import datetime
+import json
 import testscenarios
 
 from oslo.config import cfg
@@ -44,7 +45,7 @@ class FakeMemcache(object):
     def get(self, key):
         if key == "tokens/%s" % VALID_TOKEN:
             dt = datetime.datetime.now() + datetime.timedelta(minutes=5)
-            return ({'access': {
+            return json.dumps(({'access': {
                 'token': {'id': VALID_TOKEN},
                 'user': {
                     'id': 'user_id1',
@@ -54,10 +55,10 @@ class FakeMemcache(object):
                     'roles': [
                         {'name': 'admin'},
                     ]},
-            }}, dt.strftime("%s"))
+            }}, dt.strftime("%s")))
         if key == "tokens/%s" % VALID_TOKEN2:
             dt = datetime.datetime.now() + datetime.timedelta(minutes=5)
-            return ({'access': {
+            return json.dumps(({'access': {
                 'token': {'id': VALID_TOKEN2},
                 'user': {
                     'id': 'user_id2',
@@ -67,7 +68,7 @@ class FakeMemcache(object):
                     'roles': [
                         {'name': 'Member'},
                     ]},
-            }}, dt.strftime("%s"))
+            }}, dt.strftime("%s")))
 
     def set(self, key, value, **kwargs):
         self.set_value = value
