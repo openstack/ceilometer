@@ -493,49 +493,31 @@ class MeterController(rest.RestController):
         #  2) the mandatory options seems to also do nothing.
         #  3) the body should already be in a list of Sample's
 
-        def get_consistent_source():
-            '''Find a source that can be applied across the sample group
-            or raise InvalidInput if the sources are inconsistent.
-            If all are None - use the configured sample_source
-            If any sample has source set then the others must be the same
-            or None.
-            '''
-            source = None
-            for s in samples:
-                if source and s.source:
-                    if source != s.source:
-                        raise wsme.exc.InvalidInput('source', s.source,
-                                                    'can not post Samples %s' %
-                                                    'with different sources')
-                if s.source and not source:
-                    source = s.source
-            return source or pecan.request.cfg.sample_source
-
         samples = [Sample(**b) for b in body]
+
         now = timeutils.utcnow()
         auth_project = acl.get_limited_to_project(pecan.request.headers)
-        source = get_consistent_source()
+        def_source = pecan.request.cfg.sample_source
+        def_project_id = pecan.request.headers.get('X-Project-Id')
+        def_user_id = pecan.request.headers.get('X-User-Id')
+
+        published_samples = []
         for s in samples:
             if self._id != s.counter_name:
                 raise wsme.exc.InvalidInput('counter_name', s.counter_name,
                                             'should be %s' % self._id)
 
-            s.user_id = (s.user_id or
-                         pecan.request.headers.get('X-User-Id'))
-            s.project_id = (s.project_id or
-                            pecan.request.headers.get('X-Project-Id'))
+            s.user_id = (s.user_id or def_user_id)
+            s.project_id = (s.project_id or def_project_id)
+            s.source = '%s:%s' % (s.project_id, (s.source or def_source))
+            s.timestamp = (s.timestamp or now)
+
             if auth_project and auth_project != s.project_id:
                 # non admin user trying to cross post to another project_id
                 auth_msg = 'can not post samples to other projects'
                 raise wsme.exc.InvalidInput('project_id', s.project_id,
                                             auth_msg)
 
-            if s.timestamp is None or s.timestamp is wsme.Unset:
-                s.timestamp = now
-            s.source = '%s:%s' % (s.project_id, source)
-
-        published_samples = []
-        for s in samples:
             published_sample = sample.Sample(
                 name=s.counter_name,
                 type=s.counter_type,
@@ -546,9 +528,10 @@ class MeterController(rest.RestController):
                 resource_id=s.resource_id,
                 timestamp=s.timestamp.isoformat(),
                 resource_metadata=s.resource_metadata,
-                source=source)
-            s.message_id = published_sample.id
+                source=s.source)
             published_samples.append(published_sample)
+
+            s.message_id = published_sample.id
 
         with pecan.request.pipeline_manager.publisher(
                 context.get_admin_context()) as publisher:

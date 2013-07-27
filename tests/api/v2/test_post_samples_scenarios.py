@@ -23,6 +23,8 @@ import datetime
 import logging
 import testscenarios
 
+from oslo.config import cfg
+
 from ceilometer.openstack.common import rpc
 from ceilometer.openstack.common import timeutils
 from ceilometer.tests import db as tests_db
@@ -38,6 +40,8 @@ class TestPostSamples(FunctionalTest,
                       tests_db.MixinTestsWithBackendScenarios):
 
     def faux_cast(self, context, topic, msg):
+        for s in msg['args']['data']:
+            del s['message_signature']
         self.published.append((topic, msg))
 
     def setUp(self):
@@ -66,6 +70,7 @@ class TestPostSamples(FunctionalTest,
         s1[0]['source'] = '%s:openstack' % s1[0]['project_id']
 
         self.assertEqual(s1, data.json)
+        self.assertEqual(s1[0], self.published[0][1]['args']['data'][0])
 
     def test_wrong_project_id(self):
         """Do not accept cross posting samples to different projects."""
@@ -90,6 +95,7 @@ class TestPostSamples(FunctionalTest,
                               })
 
         self.assertEqual(data.status_int, 400)
+        self.assertEqual(len(self.published), 0)
 
     def test_multiple_samples(self):
         """Send multiple samples.
@@ -97,10 +103,8 @@ class TestPostSamples(FunctionalTest,
         at a slower cadence.
         """
         samples = []
-        stamps = []
         for x in range(6):
             dt = datetime.datetime(2012, 8, 27, x, 0, tzinfo=None)
-            stamps.append(dt)
             s = {'counter_name': 'apples',
                  'counter_type': 'gauge',
                  'counter_unit': 'instance',
@@ -116,19 +120,26 @@ class TestPostSamples(FunctionalTest,
 
         data = self.post_json('/meters/apples/', samples)
 
-        # source is modified to include the project_id.
-        for x in range(6):
-            for (k, v) in samples[x].iteritems():
-                if k == 'timestamp':
-                    timestamp = timeutils.parse_isotime(data.json[x][k])
-                    self.assertEqual(stamps[x].replace(tzinfo=None),
-                                     timestamp.replace(tzinfo=None))
-                elif k == 'source':
-                    self.assertEqual(data.json[x][k],
-                                     '%s:%s' % (samples[x]['project_id'],
-                                                samples[x]['source']))
-                else:
-                    self.assertEqual(v, data.json[x][k])
+        for x, s in enumerate(samples):
+            # source is modified to include the project_id.
+            s['source'] = '%s:%s' % (s['project_id'],
+                                     s['source'])
+            # Ignore message id that is randomly generated
+            s['message_id'] = data.json[x]['message_id']
+
+            # remove tzinfo to compare generated timestamp
+            # with the provided one
+            c = data.json[x]
+            timestamp = timeutils.parse_isotime(c['timestamp'])
+            c['timestamp'] = timestamp.replace(tzinfo=None).isoformat()
+
+            # do the same on the pipeline
+            msg = self.published[0][1]['args']['data'][x]
+            timestamp = timeutils.parse_isotime(msg['timestamp'])
+            msg['timestamp'] = timestamp.replace(tzinfo=None).isoformat()
+
+            self.assertEqual(s, c)
+            self.assertEqual(s, self.published[0][1]['args']['data'][x])
 
     def test_missing_mandatory_fields(self):
         """Do not accept posting samples with missing mandatory fields."""
@@ -153,8 +164,8 @@ class TestPostSamples(FunctionalTest,
                                   expect_errors=True)
             self.assertEqual(data.status_int, 400)
 
-    def test_multiple_sources(self):
-        """Do not accept a single post of mixed sources."""
+    def test_multiple_project_id_and_admin(self):
+        """Allow admin is allowed to set multiple project_id."""
         s1 = [{'counter_name': 'my_counter_name',
                'counter_type': 'gauge',
                'counter_unit': 'instance',
@@ -168,26 +179,46 @@ class TestPostSamples(FunctionalTest,
                'counter_type': 'gauge',
                'counter_unit': 'instance',
                'counter_volume': 2,
-               'source': 'not this',
-               'project_id': '35b17138-b364-4e6a-a131-8f3099c5be68',
+               'source': 'closedstack',
+               'project_id': '4af38dca-f6fc-11e2-94f5-14dae9283f29',
                'user_id': 'efd87807-12d2-4b38-9c70-5f5c2ac427ff',
                'resource_id': 'bd9431c1-8d69-4ad3-803a-8d4a6b89fd36',
                'resource_metadata': {'name1': 'value1',
                                      'name2': 'value2'}}]
         data = self.post_json('/meters/my_counter_name/', s1,
-                              expect_errors=True)
-        self.assertEqual(data.status_int, 400)
+                              headers={"X-Roles": "admin"})
 
-    def test_multiple_samples_some_null_sources(self):
-        """Do accept a single post with some null sources
-        this is a convience feature so you only have to set
-        one of the sample's source field.
+        self.assertEqual(data.status_int, 200)
+        for x, s in enumerate(s1):
+            # source is modified to include the project_id.
+            s['source'] = '%s:%s' % (s['project_id'],
+                                     'closedstack')
+            # Ignore message id that is randomly generated
+            s['message_id'] = data.json[x]['message_id']
+            # timestamp not given so it is generated.
+            s['timestamp'] = data.json[x]['timestamp']
+            s.setdefault('resource_metadata', dict())
+            self.assertEqual(s, data.json[x])
+            self.assertEqual(s, self.published[0][1]['args']['data'][x])
+
+    def test_multiple_samples_multiple_sources(self):
+        """Do accept a single post with some multiples sources
+        with some of them null
         """
         s1 = [{'counter_name': 'my_counter_name',
                'counter_type': 'gauge',
                'counter_unit': 'instance',
                'counter_volume': 1,
                'source': 'paperstack',
+               'project_id': '35b17138-b364-4e6a-a131-8f3099c5be68',
+               'user_id': 'efd87807-12d2-4b38-9c70-5f5c2ac427ff',
+               'resource_id': 'bd9431c1-8d69-4ad3-803a-8d4a6b89fd36',
+               },
+              {'counter_name': 'my_counter_name',
+               'counter_type': 'gauge',
+               'counter_unit': 'instance',
+               'counter_volume': 5,
+               'source': 'waterstack',
                'project_id': '35b17138-b364-4e6a-a131-8f3099c5be68',
                'user_id': 'efd87807-12d2-4b38-9c70-5f5c2ac427ff',
                'resource_id': 'bd9431c1-8d69-4ad3-803a-8d4a6b89fd36',
@@ -204,12 +235,19 @@ class TestPostSamples(FunctionalTest,
         data = self.post_json('/meters/my_counter_name/', s1,
                               expect_errors=True)
         self.assertEqual(data.status_int, 200)
-        for x in range(2):
-            for (k, v) in s1[x].iteritems():
-                if k == 'source':
-                    self.assertEqual(data.json[x][k],
-                                     '%s:%s' % (s1[x]['project_id'],
-                                                'paperstack'))
+        for x, s in enumerate(s1):
+            # source is modified to include the project_id.
+            s['source'] = '%s:%s' % (
+                s['project_id'],
+                s.get('source', cfg.CONF.sample_source)
+            )
+            # Ignore message id that is randomly generated
+            s['message_id'] = data.json[x]['message_id']
+            # timestamp not given so it is generated.
+            s['timestamp'] = data.json[x]['timestamp']
+            s.setdefault('resource_metadata', dict())
+            self.assertEqual(s, data.json[x])
+            self.assertEqual(s, self.published[0][1]['args']['data'][x])
 
     def test_missing_project_user_id(self):
         """Ensure missing project & user IDs are defaulted appropriately.
@@ -234,5 +272,16 @@ class TestPostSamples(FunctionalTest,
                               })
 
         self.assertEqual(data.status_int, 200)
-        self.assertEqual(data.json[0]['project_id'], project_id)
-        self.assertEqual(data.json[0]['user_id'], user_id)
+        for x, s in enumerate(s1):
+            # source is modified to include the project_id.
+            s['source'] = '%s:%s' % (project_id,
+                                     s['source'])
+            # Ignore message id that is randomly generated
+            s['message_id'] = data.json[x]['message_id']
+            # timestamp not given so it is generated.
+            s['timestamp'] = data.json[x]['timestamp']
+            s['user_id'] = user_id
+            s['project_id'] = project_id
+
+            self.assertEqual(s, data.json[x])
+            self.assertEqual(s, self.published[0][1]['args']['data'][x])
