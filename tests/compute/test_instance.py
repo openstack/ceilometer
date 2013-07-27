@@ -53,49 +53,53 @@ class TestLocationMetadata(unittest.TestCase):
         self.INSTANCE_PROPERTIES = {'name': 'display name',
                                     'OS-EXT-SRV-ATTR:instance_name':
                                     'instance-000001',
+                                    'availability_zone': None,
+                                    'OS-EXT-AZ:availability_zone':
+                                    'foo-zone',
                                     'reservation_id': 'reservation id',
                                     'architecture': 'x86_64',
-                                    'availability_zone': 'zone1',
                                     'kernel_id': 'kernel id',
                                     'os_type': 'linux',
                                     'ramdisk_id': 'ramdisk id',
-                                    'disk_gb': 10,
                                     'ephemeral_gb': 7,
-                                    'memory_mb': 2048,
                                     'root_gb': 3,
-                                    'vcpus': 1,
                                     'image': {'id': 1,
                                               'links': [{"rel": "bookmark",
                                                          'href': 2}]},
-                                    'flavor': {'id': 1},
-                                    'hostId': '1234-5678'}
+                                    'hostId': '1234-5678',
+                                    'flavor': {'id': 1,
+                                               'disk': 0,
+                                               'ram': 512,
+                                               'vcpus': 2},
+                                    'metadata': {'metering.autoscale.group':
+                                                 'X' * 512,
+                                                 'metering.ephemeral_gb': 42}}
 
         self.instance = FauxInstance(**self.INSTANCE_PROPERTIES)
-        self.instance.host = 'made-up-hostname'
-        m = mock.MagicMock()
-        m.flavorid = 1
-        self.instance.instance_type = m
 
     def test_metadata(self):
         md = instance.get_metadata_from_object(self.instance)
         iprops = self.INSTANCE_PROPERTIES
-        for name in md.keys():
-            actual = md[name]
-            print 'checking', name, actual
-            if name == 'name':
-                assert actual == iprops['OS-EXT-SRV-ATTR:instance_name']
-            elif name == 'host':
-                assert actual == iprops['hostId']
-            elif name == 'display_name':
-                assert actual == iprops['name']
-            elif name == 'instance_type':
-                assert actual == iprops['flavor']['id']
-            elif name == 'image_ref':
-                assert actual == iprops['image']['id']
-            elif name == 'image_ref_url':
-                assert actual == iprops['image']['links'][0]['href']
-            else:
-                assert actual == iprops[name]
+        self.assertEqual(md['availability_zone'],
+                         iprops['OS-EXT-AZ:availability_zone'])
+        self.assertEqual(md['name'], iprops['OS-EXT-SRV-ATTR:instance_name'])
+        self.assertEqual(md['disk_gb'], iprops['flavor']['disk'])
+        self.assertEqual(md['display_name'], iprops['name'])
+        self.assertEqual(md['instance_type'], iprops['flavor']['id'])
+        self.assertEqual(md['image_ref'], iprops['image']['id'])
+        self.assertEqual(md['image_ref_url'],
+                         iprops['image']['links'][0]['href'])
+        self.assertEqual(md['memory_mb'], iprops['flavor']['ram'])
+        self.assertEqual(md['vcpus'], iprops['flavor']['vcpus'])
+        self.assertEqual(md['host'], iprops['hostId'])
+
+        self.assertEqual(md['reservation_id'], iprops['reservation_id'])
+        self.assertEqual(md['kernel_id'], iprops['kernel_id'])
+        self.assertEqual(md['ramdisk_id'], iprops['ramdisk_id'])
+        self.assertEqual(md['architecture'], iprops['architecture'])
+        self.assertEqual(md['os_type'], iprops['os_type'])
+        self.assertEqual(md['ephemeral_gb'], iprops['ephemeral_gb'])
+        self.assertEqual(md['root_gb'], iprops['root_gb'])
 
     def test_metadata_empty_image(self):
         self.INSTANCE_PROPERTIES['image'] = ''
