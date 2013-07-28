@@ -418,7 +418,6 @@ class Connection(base.Connection):
             data['timestamp'] = timeutils.parse_strtime(data['timestamp'])
             return models.Sample(**data)
 
-        resource_table = self.conn.table(self.RESOURCE_TABLE)
         meter_table = self.conn.table(self.METER_TABLE)
 
         q, start, stop = make_query_from_filter(sample_filter,
@@ -437,11 +436,10 @@ class Connection(base.Connection):
             if limit == 0:
                 break
             if len(metaquery) > 0:
-                # metaquery checks resource table
-                resource = resource_table.row(meter['f:resource_id'])
-
                 for k, v in metaquery.iteritems():
-                    if resource['f:r_' + k.split('.', 1)[1]] != v:
+                    message = json.loads(meter['f:message'])
+                    metadata = message['resource_metadata']
+                    if metadata[k.split('.', 1)[1]] != v:
                         break   # if one metaquery doesn't match, break
                 else:
                     if limit:
@@ -764,6 +762,8 @@ def make_query(user=None, project=None, meter=None,
     #    query other tables should have no start and end passed in
     if meter:
         start_row, end_row = _make_rowkey_scan(meter, rts_start, rts_end)
+        q.append("SingleColumnValueFilter "
+                 "('f', 'counter_name', =, 'binary:%s')" % meter)
     elif require_meter:
         raise RuntimeError('Missing required meter specifier')
     else:

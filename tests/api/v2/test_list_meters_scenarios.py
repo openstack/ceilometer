@@ -71,7 +71,7 @@ class TestListMeters(FunctionalTest,
                     'resource-id',
                     timestamp=datetime.datetime(2012, 7, 2, 11, 40),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter'}),
+                                       'tag': 'self.counter1'}),
                 sample.Sample(
                     'meter.mine',
                     'gauge',
@@ -123,12 +123,56 @@ class TestListMeters(FunctionalTest,
                           set(['meter.test',
                                'meter.mine']))
 
+    def test_list_meters_metadata_query(self):
+        data = self.get_json('/meters/meter.test',
+                             q=[{'field': 'metadata.tag',
+                                 'op': 'eq',
+                                 'value': 'self.counter1',
+                                 }],)
+        self.assertEquals(1, len(data))
+        self.assertEquals(set(r['resource_id'] for r in data),
+                          set(['resource-id']))
+        self.assertEquals(set(r['counter_name'] for r in data),
+                          set(['meter.test']))
+
+    def test_list_meters_multi_metadata_query(self):
+        data = self.get_json('/meters/meter.test',
+                             q=[{'field': 'metadata.tag',
+                                 'op': 'eq',
+                                 'value': 'self.counter1',
+                                 },
+                                {'field': 'metadata.display_name',
+                                 'op': 'eq',
+                                 'value': 'test-server',
+                                 }],)
+        self.assertEquals(1, len(data))
+        self.assertEquals(set(r['resource_id'] for r in data),
+                          set(['resource-id']))
+        self.assertEquals(set(r['counter_name'] for r in data),
+                          set(['meter.test']))
+
     def test_with_resource(self):
         data = self.get_json('/meters', q=[{'field': 'resource_id',
                                             'value': 'resource-id',
                                             }])
         ids = set(r['name'] for r in data)
         self.assertEquals(set(['meter.test']), ids)
+
+    def test_with_resource_and_metadata_query(self):
+        data = self.get_json('/meters/meter.mine',
+                             q=[{'field': 'resource_id',
+                                 'op': 'eq',
+                                 'value': 'resource-id2',
+                                 },
+                                {'field': 'metadata.tag',
+                                 'op': 'eq',
+                                 'value': 'self.counter2',
+                                 }])
+        self.assertEquals(1, len(data))
+        self.assertEquals(set(r['resource_id'] for r in data),
+                          set(['resource-id2']))
+        self.assertEquals(set(r['counter_name'] for r in data),
+                          set(['meter.mine']))
 
     def test_with_source(self):
         data = self.get_json('/meters', q=[{'field': 'source',
@@ -139,6 +183,22 @@ class TestListMeters(FunctionalTest,
                                'resource-id2',
                                'resource-id3',
                                'resource-id4']), ids)
+
+    def test_with_source_and_metadata_query(self):
+        data = self.get_json('/meters/meter.mine',
+                             q=[{'field': 'source',
+                                 'op': 'eq',
+                                 'value': 'test_source',
+                                 },
+                                {'field': 'metadata.tag',
+                                 'op': 'eq',
+                                 'value': 'self.counter2',
+                                 }])
+        self.assertEquals(1, len(data))
+        self.assertEquals(set(r['source'] for r in data),
+                          set(['test_source']))
+        self.assertEquals(set(r['counter_name'] for r in data),
+                          set(['meter.mine']))
 
     def test_with_source_non_existent(self):
         data = self.get_json('/meters',
@@ -164,6 +224,22 @@ class TestListMeters(FunctionalTest,
         rids = set(r['resource_id'] for r in data)
         self.assertEquals(set(['resource-id', 'resource-id2']), rids)
 
+    def test_with_user_and_metadata_query(self):
+        data = self.get_json('/meters/meter.test',
+                             q=[{'field': 'user_id',
+                                 'op': 'eq',
+                                 'value': 'user-id',
+                                 },
+                                {'field': 'metadata.tag',
+                                 'op': 'eq',
+                                 'value': 'self.counter1',
+                                 }])
+        self.assertEquals(1, len(data))
+        self.assertEquals(set(r['user_id'] for r in data),
+                          set(['user-id']))
+        self.assertEquals(set(r['counter_name'] for r in data),
+                          set(['meter.test']))
+
     def test_with_user_non_existent(self):
         data = self.get_json('/meters',
                              q=[{'field': 'user_id',
@@ -180,6 +256,22 @@ class TestListMeters(FunctionalTest,
                              )
         ids = set(r['resource_id'] for r in data)
         self.assertEquals(set(['resource-id3', 'resource-id4']), ids)
+
+    def test_with_project_and_metadata_query(self):
+        data = self.get_json('/meters/meter.test',
+                             q=[{'field': 'project_id',
+                                 'op': 'eq',
+                                 'value': 'project-id',
+                                 },
+                                {'field': 'metadata.tag',
+                                 'op': 'eq',
+                                 'value': 'self.counter1',
+                                 }])
+        self.assertEquals(1, len(data))
+        self.assertEquals(set(r['project_id'] for r in data),
+                          set(['project-id']))
+        self.assertEquals(set(r['counter_name'] for r in data),
+                          set(['meter.test']))
 
     def test_with_project_non_existent(self):
         data = self.get_json('/meters',
