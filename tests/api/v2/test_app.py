@@ -25,6 +25,7 @@ from ceilometer.api import app
 from ceilometer.api import acl
 from ceilometer import service
 from ceilometer.tests import base
+from ceilometer.tests import db as tests_db
 from .base import FunctionalTest
 
 
@@ -62,7 +63,7 @@ class TestApp(base.TestCase):
 class TestApiMiddleware(FunctionalTest):
 
     # This doesn't really matter
-    database_connection = 'mongodb://__test__'
+    database_connection = tests_db.MongoDBFakeConnectionUrl()
 
     def test_json_parsable_error_middleware_404(self):
         response = self.get_json('/invalid_path',
