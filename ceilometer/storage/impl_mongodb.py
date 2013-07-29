@@ -26,6 +26,7 @@ import datetime
 import operator
 import os
 import uuid
+import weakref
 
 import bson.code
 import bson.objectid
@@ -145,14 +146,17 @@ class ConnectionPool(object):
         self._pool = {}
 
     def connect(self, url):
-        if url not in self._pool:
-            LOG.info('connecting to MongoDB on %s', url)
-            self._pool[url] = pymongo.MongoClient(
-                url,
-                use_greenlets=True,
-                safe=True)
-
-        return self._pool.get(url)
+        if url in self._pool:
+            client = self._pool.get(url)()
+            if client:
+                return client
+        LOG.info('connecting to MongoDB on %s', url)
+        client = pymongo.MongoClient(
+            url,
+            use_greenlets=True,
+            safe=True)
+        self._pool[url] = weakref.ref(client)
+        return client
 
 
 class Connection(base.Connection):
