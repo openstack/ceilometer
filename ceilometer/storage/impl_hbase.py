@@ -102,7 +102,7 @@ class Connection(base.Connection):
             self.conn = self._get_connection(opts)
         self.conn.open()
 
-    def upgrade(self, version=None):
+    def upgrade(self):
         self.conn.create_table(self.PROJECT_TABLE, {'f': dict()})
         self.conn.create_table(self.USER_TABLE, {'f': dict()})
         self.conn.create_table(self.RESOURCE_TABLE, {'f': dict()})

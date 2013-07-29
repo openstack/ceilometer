@@ -260,7 +260,7 @@ class Connection(base.Connection):
         # needed.
         self.upgrade()
 
-    def upgrade(self, version=None):
+    def upgrade(self):
         # Establish indexes
         #
         # We need variations for user_id vs. project_id because of the

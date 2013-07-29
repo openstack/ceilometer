@@ -35,8 +35,6 @@ class TestBase(test_base.TestCase):
                               group='database')
         self.conn = storage.get_connection(cfg.CONF)
         self.conn.upgrade()
-        self.conn.clear()
-        self.conn.upgrade()
 
     def tearDown(self):
         self.conn.clear()
