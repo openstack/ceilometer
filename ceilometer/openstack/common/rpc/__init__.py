@@ -29,7 +29,7 @@ import inspect
 
 from oslo.config import cfg
 
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import importutils
 from ceilometer.openstack.common import local
 from ceilometer.openstack.common import log as logging

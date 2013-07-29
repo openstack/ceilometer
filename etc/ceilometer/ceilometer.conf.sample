@@ -227,15 +227,7 @@
 
 # Default publisher_id for outgoing notifications (string
 # value)
-#default_publisher_id=$host
-
-
-#
-# Options defined in ceilometer.openstack.common.notifier.list_notifier
-#
-
-# List of drivers to send notifications (multi valued)
-#list_notifier_drivers=ceilometer.openstack.common.notifier.no_op_notifier
+#default_publisher_id=<None>
 
 
 #
@@ -293,11 +285,23 @@
 
 
 #
+# Options defined in ceilometer.openstack.common.rpc.amqp
+#
+
+# Use durable queues in amqp. (boolean value)
+#amqp_durable_queues=false
+
+# Auto-delete queues in amqp. (boolean value)
+#amqp_auto_delete=false
+
+
+#
 # Options defined in ceilometer.openstack.common.rpc.impl_kombu
 #
 
-# SSL version to use (valid only if SSL enabled) (string
-# value)
+# SSL version to use (valid only if SSL enabled). valid values
+# are TLSv1, SSLv23 and SSLv3. SSLv2 may be available on some
+# distributions (string value)
 #kombu_ssl_version=
 
 # SSL key file (valid only if SSL enabled) (string value)
@@ -345,9 +349,6 @@
 # default of 0 implies an infinite retry count) (integer
 # value)
 #rabbit_max_retries=0
-
-# use durable queues in RabbitMQ (boolean value)
-#rabbit_durable_queues=false
 
 # use H/A queues in RabbitMQ (x-ha-policy: all).You need to
 # wipe RabbitMQ database when changing this option. (boolean
@@ -713,4 +714,3 @@
 #password=<None>
 
 
-# Total option count: 134

@@ -27,7 +27,7 @@ import greenlet
 from oslo.config import cfg
 
 from ceilometer.openstack.common import excutils
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import importutils
 from ceilometer.openstack.common import jsonutils
 from ceilometer.openstack.common.rpc import common as rpc_common
