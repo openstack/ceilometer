@@ -62,7 +62,7 @@ class _Base(plugin.PollsterBase):
         try:
             endpoint = ksclient.service_catalog.url_for(
                 service_type='object-store',
-                endpoint_type='adminURL')
+                endpoint_type=cfg.CONF.service_credentials.os_endpoint_type)
         except exceptions.EndpointNotFound:
             LOG.debug(_("Swift endpoint not found"))
             raise StopIteration()
@@ -75,14 +75,7 @@ class _Base(plugin.PollsterBase):
     def _neaten_url(endpoint, tenant_id):
         """Transform the registered url to standard and valid format.
         """
-
-        path = 'v1/' + cfg.CONF.reseller_prefix + tenant_id
-
-        # remove the tail '/' of the endpoint.
-        if endpoint.endswith('/'):
-            endpoint = endpoint[:-1]
-
-        return urljoin(endpoint, path)
+        return urljoin(endpoint, '/v1/' + cfg.CONF.reseller_prefix + tenant_id)
 
 
 class ObjectsPollster(_Base):

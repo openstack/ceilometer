@@ -120,6 +120,9 @@ class TestSwiftPollster(base.TestCase):
         self.assertEqual(standard_url,
                          swift._Base._neaten_url(test_endpoint + '/v1',
                                                  test_tenant_id))
+        self.assertEqual(standard_url,
+                         swift._Base._neaten_url(standard_url,
+                                                 test_tenant_id))
 
     def test_metering(self):
         self.stubs.Set(self.factory, '_iter_accounts',

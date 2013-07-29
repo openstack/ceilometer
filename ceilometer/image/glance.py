@@ -22,6 +22,7 @@ from __future__ import absolute_import
 
 import itertools
 import glanceclient
+from oslo.config import cfg
 
 from ceilometer import sample
 from ceilometer.openstack.common import timeutils
@@ -34,7 +35,7 @@ class _Base(plugin.PollsterBase):
     def get_glance_client(ksclient):
         endpoint = ksclient.service_catalog.url_for(
             service_type='image',
-            endpoint_type='internalURL')
+            endpoint_type=cfg.CONF.service_credentials.os_endpoint_type)
 
         # hard-code v1 glance API version selection while v2 API matures
         return glanceclient.Client('1', endpoint,
