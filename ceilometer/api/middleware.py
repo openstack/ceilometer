@@ -24,6 +24,10 @@ Based on pecan.middleware.errordocument
 import json
 import webob
 from xml import etree as et
+try:
+    from xml.etree.ElementTree import ParseError
+except ImportError:
+    from xml.parsers.expat import ExpatError as ParseError
 
 from ceilometer.openstack.common import log
 
@@ -76,7 +80,7 @@ class ParsableErrorMiddleware(object):
                             et.ElementTree.fromstring('<error_message>'
                                                       + '\n'.join(app_iter)
                                                       + '</error_message>'))]
-                except et.ElementTree.ParseError as err:
+                except ParseError as err:
                     LOG.error('Error parsing HTTP response: %s' % err)
                     body = ['<error_message>%s' % state['status_code']
                             + '</error_message>']
