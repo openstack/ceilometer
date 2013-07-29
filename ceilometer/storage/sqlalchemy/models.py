@@ -190,6 +190,7 @@ class Alarm(Base):
     ok_actions = Column(JSONEncodedDict)
     alarm_actions = Column(JSONEncodedDict)
     insufficient_data_actions = Column(JSONEncodedDict)
+    repeat_actions = Column(Boolean)
 
     matching_metadata = Column(JSONEncodedDict)
 

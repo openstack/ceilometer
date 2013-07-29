@@ -188,6 +188,69 @@ class TestEvaluate(base.TestCase):
                              [])
             self.assertEqual(self.notifier.notify.call_args_list, [])
 
+    def test_equivocal_from_known_state_and_repeat_actions(self):
+        self._set_all_alarms('ok')
+        self.alarms[1].repeat_actions = True
+        with mock.patch('ceilometerclient.client.get_client',
+                        return_value=self.api_client):
+            avgs = [self._get_stat('avg', self.alarms[0].threshold + v)
+                    for v in xrange(5)]
+            maxs = [self._get_stat('max', self.alarms[1].threshold - v)
+                    for v in xrange(-1, 3)]
+            self.api_client.statistics.list.side_effect = [avgs, maxs]
+            self.evaluator.evaluate()
+            self._assert_all_alarms('ok')
+            self.assertEqual(self.api_client.alarms.update.call_args_list,
+                             [])
+            reason = 'Remaining as ok due to 4 samples inside' \
+                     ' threshold, most recent: 8.0'
+            expected = [mock.call(self.alarms[1], 'ok', reason)]
+            self.assertEqual(self.notifier.notify.call_args_list, expected)
+
+    def test_unequivocal_from_known_state_and_repeat_actions(self):
+        self._set_all_alarms('alarm')
+        self.alarms[1].repeat_actions = True
+        with mock.patch('ceilometerclient.client.get_client',
+                        return_value=self.api_client):
+            avgs = [self._get_stat('avg', self.alarms[0].threshold + v)
+                    for v in xrange(1, 6)]
+            maxs = [self._get_stat('max', self.alarms[1].threshold - v)
+                    for v in xrange(4)]
+            self.api_client.statistics.list.side_effect = [avgs, maxs]
+            self.evaluator.evaluate()
+            self._assert_all_alarms('alarm')
+            self.assertEqual(self.api_client.alarms.update.call_args_list,
+                             [])
+            reason = 'Remaining as alarm due to 4 samples outside' \
+                     ' threshold, most recent: 7.0'
+            expected = [mock.call(self.alarms[1], 'alarm', reason)]
+            self.assertEqual(self.notifier.notify.call_args_list, expected)
+
+    def test_state_change_and_repeat_actions(self):
+        self._set_all_alarms('ok')
+        self.alarms[0].repeat_actions = True
+        self.alarms[1].repeat_actions = True
+        with mock.patch('ceilometerclient.client.get_client',
+                        return_value=self.api_client):
+            avgs = [self._get_stat('avg', self.alarms[0].threshold + v)
+                    for v in xrange(1, 6)]
+            maxs = [self._get_stat('max', self.alarms[1].threshold - v)
+                    for v in xrange(4)]
+            self.api_client.statistics.list.side_effect = [avgs, maxs]
+            self.evaluator.evaluate()
+            self._assert_all_alarms('alarm')
+            expected = [mock.call(alarm.alarm_id, state='alarm')
+                        for alarm in self.alarms]
+            update_calls = self.api_client.alarms.update.call_args_list
+            self.assertEqual(update_calls, expected)
+            reasons = ['Transition to alarm due to 5 samples outside'
+                       ' threshold, most recent: 85.0',
+                       'Transition to alarm due to 4 samples outside'
+                       ' threshold, most recent: 7.0']
+            expected = [mock.call(alarm, 'alarm', reason)
+                        for alarm, reason in zip(self.alarms, reasons)]
+            self.assertEqual(self.notifier.notify.call_args_list, expected)
+
     def test_equivocal_from_unknown(self):
         self._set_all_alarms('insufficient data')
         with mock.patch('ceilometerclient.client.get_client',
