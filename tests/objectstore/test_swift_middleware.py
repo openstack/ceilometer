@@ -43,23 +43,20 @@ class FakeApp(object):
 
 class TestSwiftMiddleware(base.TestCase):
 
-    class _faux_pipeline_manager(object):
+    class _faux_pipeline_manager(pipeline.PipelineManager):
         class _faux_pipeline(object):
             def __init__(self, pipeline_manager):
                 self.pipeline_manager = pipeline_manager
                 self.counters = []
 
-            def publish_counters(self, ctxt, counters, source):
+            def publish_counters(self, ctxt, counters):
                 self.counters.extend(counters)
 
-            def flush(self, context, source):
+            def flush(self, context):
                 pass
 
         def __init__(self):
             self.pipelines = [self._faux_pipeline(self)]
-
-            def flush(self, ctx, source):
-                pass
 
     def _faux_setup_pipeline(self, transformer_manager):
         return self.pipeline_manager

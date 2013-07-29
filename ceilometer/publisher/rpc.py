@@ -137,12 +137,11 @@ class RPCPublisher(publisher.PublisherBase):
                      % self.policy)
             self.policy = 'default'
 
-    def publish_counters(self, context, counters, source):
+    def publish_counters(self, context, counters):
         """Publish counters on RPC.
 
         :param context: Execution context from the service or RPC call.
         :param counters: Counters from pipeline after transformation.
-        :param source: Counter source.
 
         """
 
@@ -150,7 +149,7 @@ class RPCPublisher(publisher.PublisherBase):
             meter_message_from_counter(
                 counter,
                 cfg.CONF.publisher_rpc.metering_secret,
-                source)
+                counter.source)
             for counter in counters
         ]
 

@@ -49,10 +49,9 @@ class PipelineException(Exception):
 
 class PublishContext(object):
 
-    def __init__(self, context, source, pipelines=[]):
+    def __init__(self, context, pipelines=[]):
         self.pipelines = set(pipelines)
         self.context = context
-        self.source = source
 
     def add_pipelines(self, pipelines):
         self.pipelines.update(pipelines)
@@ -61,13 +60,12 @@ class PublishContext(object):
         def p(counters):
             for p in self.pipelines:
                 p.publish_counters(self.context,
-                                   counters,
-                                   self.source)
+                                   counters)
         return p
 
     def __exit__(self, exc_type, exc_value, traceback):
         for p in self.pipelines:
-            p.flush(self.context, self.source)
+            p.flush(self.context)
 
 
 class Pipeline(object):
@@ -175,10 +173,10 @@ class Pipeline(object):
 
         return transformers
 
-    def _transform_counter(self, start, ctxt, counter, source):
+    def _transform_counter(self, start, ctxt, counter):
         try:
             for transformer in self.transformers[start:]:
-                counter = transformer.handle_sample(ctxt, counter, source)
+                counter = transformer.handle_sample(ctxt, counter)
                 if not counter:
                     LOG.debug("Pipeline %s: Counter dropped by transformer %s",
                               self, transformer)
@@ -190,7 +188,7 @@ class Pipeline(object):
                         self, transformer, counter)
             LOG.exception(err)
 
-    def _publish_counters(self, start, ctxt, counters, source):
+    def _publish_counters(self, start, ctxt, counters):
         """Push counter into pipeline for publishing.
 
         param start: the first transformer that the counter will be injected.
@@ -198,7 +196,6 @@ class Pipeline(object):
                      may emit counters
         param ctxt: execution context from the manager or service
         param counters: counter list
-        param source: counter source
 
         """
 
@@ -206,7 +203,7 @@ class Pipeline(object):
         for counter in counters:
             LOG.debug("Pipeline %s: Transform counter %s from %s transformer",
                       self, counter, start)
-            counter = self._transform_counter(start, ctxt, counter, source)
+            counter = self._transform_counter(start, ctxt, counter)
             if counter:
                 transformed_counters.append(counter)
 
@@ -214,22 +211,22 @@ class Pipeline(object):
 
         for p in self.publishers:
             try:
-                p.publish_counters(ctxt, transformed_counters, source)
+                p.publish_counters(ctxt, transformed_counters)
             except Exception:
                 LOG.exception("Pipeline %s: Continue after error "
                               "from publisher %s", self, p)
 
         LOG.audit("Pipeline %s: Published counters", self)
 
-    def publish_counter(self, ctxt, counter, source):
-        self.publish_counters(ctxt, [counter], source)
+    def publish_counter(self, ctxt, counter):
+        self.publish_counters(ctxt, [counter])
 
-    def publish_counters(self, ctxt, counters, source):
+    def publish_counters(self, ctxt, counters):
         for counter_name, counters in itertools.groupby(
                 sorted(counters, key=lambda c: c.name),
                 lambda c: c.name):
             if self.support_counter(counter_name):
-                self._publish_counters(0, ctxt, counters, source)
+                self._publish_counters(0, ctxt, counters)
 
     # (yjiang5) To support counters like instance:m1.tiny,
     # which include variable part at the end starting with ':'.
@@ -252,15 +249,14 @@ class Pipeline(object):
         else:
             return counter_name in self.counters
 
-    def flush(self, ctxt, source):
+    def flush(self, ctxt):
         """Flush data after all counter have been injected to pipeline."""
 
         LOG.audit("Flush pipeline %s", self)
         for (i, transformer) in enumerate(self.transformers):
             try:
                 self._publish_counters(i + 1, ctxt,
-                                       list(transformer.flush(ctxt, source)),
-                                       source)
+                                       list(transformer.flush(ctxt)))
             except Exception as err:
                 LOG.warning(
                     "Pipeline %s: Error flushing "
@@ -327,13 +323,13 @@ class PipelineManager(object):
         self.pipelines = [Pipeline(pipedef, transformer_manager)
                           for pipedef in cfg]
 
-    def publisher(self, context, source):
+    def publisher(self, context):
         """Build a new Publisher for these manager pipelines.
 
         :param context: The context.
         :param source: Counter source.
         """
-        return PublishContext(context, source, self.pipelines)
+        return PublishContext(context, self.pipelines)
 
 
 def setup_pipeline(transformer_manager):

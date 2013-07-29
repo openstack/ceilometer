@@ -19,8 +19,6 @@
 import abc
 import itertools
 
-from oslo.config import cfg
-
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import log
 from ceilometer import pipeline
@@ -39,8 +37,7 @@ class PollingTask(object):
         self.manager = agent_manager
         self.pollsters = set()
         self.publish_context = pipeline.PublishContext(
-            agent_manager.context,
-            cfg.CONF.sample_source)
+            agent_manager.context)
 
     def add(self, pollster, pipelines):
         self.publish_context.add_pipelines(pipelines)

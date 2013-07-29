@@ -222,8 +222,7 @@ class TestPublish(base.TestCase):
         publisher = rpc.RPCPublisher(
             network_utils.urlsplit('rpc://'))
         publisher.publish_counters(None,
-                                   self.test_data,
-                                   'test')
+                                   self.test_data)
         self.assertEqual(len(self.published), 1)
         self.assertEqual(self.published[0][0],
                          cfg.CONF.publisher_rpc.metering_topic)
@@ -235,8 +234,7 @@ class TestPublish(base.TestCase):
         publisher = rpc.RPCPublisher(
             network_utils.urlsplit('rpc://?target=custom_procedure_call'))
         publisher.publish_counters(None,
-                                   self.test_data,
-                                   'test')
+                                   self.test_data)
         self.assertEqual(len(self.published), 1)
         self.assertEqual(self.published[0][0],
                          cfg.CONF.publisher_rpc.metering_topic)
@@ -248,8 +246,7 @@ class TestPublish(base.TestCase):
         publisher = rpc.RPCPublisher(
             network_utils.urlsplit('rpc://?per_meter_topic=1'))
         publisher.publish_counters(None,
-                                   self.test_data,
-                                   'test')
+                                   self.test_data)
         self.assertEqual(len(self.published), 4)
         for topic, rpc_call in self.published:
             meters = rpc_call['args']['data']
@@ -276,7 +273,7 @@ class TestPublish(base.TestCase):
         self.assertRaises(
             SystemExit,
             publisher.publish_counters,
-            None, self.test_data, 'test')
+            None, self.test_data)
         self.assertEqual(publisher.policy, 'default')
         self.assertEqual(len(self.published), 0)
         self.assertEqual(len(publisher.local_queue), 0)
@@ -288,7 +285,7 @@ class TestPublish(base.TestCase):
         self.assertRaises(
             SystemExit,
             publisher.publish_counters,
-            None, self.test_data, 'test')
+            None, self.test_data)
         self.assertEqual(len(self.published), 0)
         self.assertEqual(len(publisher.local_queue), 0)
 
@@ -299,7 +296,7 @@ class TestPublish(base.TestCase):
         self.assertRaises(
             SystemExit,
             publisher.publish_counters,
-            None, self.test_data, 'test')
+            None, self.test_data)
         self.assertEqual(publisher.policy, 'default')
         self.assertEqual(len(self.published), 0)
         self.assertEqual(len(publisher.local_queue), 0)
@@ -309,8 +306,7 @@ class TestPublish(base.TestCase):
         publisher = rpc.RPCPublisher(
             network_utils.urlsplit('rpc://?policy=drop'))
         publisher.publish_counters(None,
-                                   self.test_data,
-                                   'test')
+                                   self.test_data)
         self.assertEqual(len(self.published), 0)
         self.assertEqual(len(publisher.local_queue), 0)
 
@@ -319,8 +315,7 @@ class TestPublish(base.TestCase):
         publisher = rpc.RPCPublisher(
             network_utils.urlsplit('rpc://?policy=queue'))
         publisher.publish_counters(None,
-                                   self.test_data,
-                                   'test')
+                                   self.test_data)
         self.assertEqual(len(self.published), 0)
         self.assertEqual(len(publisher.local_queue), 1)
 
@@ -329,15 +324,13 @@ class TestPublish(base.TestCase):
         publisher = rpc.RPCPublisher(
             network_utils.urlsplit('rpc://?policy=queue'))
         publisher.publish_counters(None,
-                                   self.test_data,
-                                   'test')
+                                   self.test_data)
         self.assertEqual(len(self.published), 0)
         self.assertEqual(len(publisher.local_queue), 1)
 
         self.rpc_unreachable = False
         publisher.publish_counters(None,
-                                   self.test_data,
-                                   'test')
+                                   self.test_data)
 
         self.assertEqual(len(self.published), 2)
         self.assertEqual(len(publisher.local_queue), 0)
@@ -347,9 +340,10 @@ class TestPublish(base.TestCase):
         publisher = rpc.RPCPublisher(
             network_utils.urlsplit('rpc://?policy=queue&max_queue_length=3'))
         for i in range(0, 5):
+            for s in self.test_data:
+                s.source = 'test-%d' % i
             publisher.publish_counters(None,
-                                       self.test_data,
-                                       'test-%d' % i)
+                                       self.test_data)
         self.assertEqual(len(self.published), 0)
         self.assertEqual(len(publisher.local_queue), 3)
         self.assertEqual(
@@ -370,9 +364,10 @@ class TestPublish(base.TestCase):
         publisher = rpc.RPCPublisher(
             network_utils.urlsplit('rpc://?policy=queue'))
         for i in range(0, 2000):
+            for s in self.test_data:
+                s.source = 'test-%d' % i
             publisher.publish_counters(None,
-                                       self.test_data,
-                                       'test-%d' % i)
+                                       self.test_data)
         self.assertEqual(len(self.published), 0)
         self.assertEqual(len(publisher.local_queue), 1024)
         self.assertEqual(

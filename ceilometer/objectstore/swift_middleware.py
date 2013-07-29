@@ -37,7 +37,6 @@ metadata_headers = X-TEST
 
 from __future__ import absolute_import
 
-from oslo.config import cfg
 from swift.common.utils import split_path
 import webob
 
@@ -130,11 +129,8 @@ class CeilometerMiddleware(object):
                 resource_metadata['http_header_%s' % header] = req.headers.get(
                     header.upper())
 
-        with pipeline.PublishContext(
-                context.get_admin_context(),
-                cfg.CONF.sample_source,
-                self.pipeline_manager.pipelines,
-        ) as publisher:
+        with self.pipeline_manager.publisher(
+                context.get_admin_context()) as publisher:
             if bytes_received:
                 publisher([sample.Sample(
                     name='storage.objects.incoming.bytes',

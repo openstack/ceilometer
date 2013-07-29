@@ -1,8 +1,10 @@
 # -*- encoding: utf-8 -*-
 #
 # Copyright © 2012 New Dream Network, LLC (DreamHost)
+# Copyright © 2013 eNovance
 #
-# Author: Doug Hellmann <doug.hellmann@dreamhost.com>
+# Authors: Doug Hellmann <doug.hellmann@dreamhost.com>
+#          Julien Danjou <julien@danjou.info>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -22,7 +24,6 @@ ensure that all of the appropriate fields have been filled
 in by the plugins that create them.
 """
 
-import collections
 import copy
 
 from oslo.config import cfg
@@ -40,6 +41,7 @@ cfg.CONF.register_opts(OPTS)
 
 # Fields explanation:
 #
+# Source: the source of this sample
 # Name: the name of the meter, must be unique
 # Type: the type of the meter, must be either:
 #       - cumulative: the value is incremented and never reset to 0
@@ -52,40 +54,41 @@ cfg.CONF.register_opts(OPTS)
 # Resource ID: the resource ID
 # Timestamp: when the sample has been read
 # Resource metadata: various metadata
-Sample = collections.namedtuple('Sample',
-                                ' '.join([
-                                    'name',
-                                    'type',
-                                    'unit',
-                                    'volume',
-                                    'user_id',
-                                    'project_id',
-                                    'resource_id',
-                                    'timestamp',
-                                    'resource_metadata',
-                                ]))
+class Sample(object):
 
+    def __init__(self, name, type, unit, volume, user_id, project_id,
+                 resource_id, timestamp, resource_metadata, source=None):
+        self.name = name
+        self.type = type
+        self.unit = unit
+        self.volume = volume
+        self.user_id = user_id
+        self.project_id = project_id
+        self.resource_id = resource_id
+        self.timestamp = timestamp
+        self.resource_metadata = resource_metadata
+        self.source = source or cfg.CONF.sample_source
+
+    def as_dict(self):
+        return copy.copy(self.__dict__)
+
+    @classmethod
+    def from_notification(cls, name, type, volume, unit,
+                          user_id, project_id, resource_id,
+                          message):
+        metadata = copy.copy(message['payload'])
+        metadata['event_type'] = message['event_type']
+        metadata['host'] = message['publisher_id']
+        return cls(name=name,
+                   type=type,
+                   volume=volume,
+                   unit=unit,
+                   user_id=user_id,
+                   project_id=project_id,
+                   resource_id=resource_id,
+                   timestamp=message['timestamp'],
+                   resource_metadata=metadata)
 
 TYPE_GAUGE = 'gauge'
 TYPE_DELTA = 'delta'
 TYPE_CUMULATIVE = 'cumulative'
-
-
-def from_notification(cls, name, type, volume, unit,
-                      user_id, project_id, resource_id,
-                      message):
-    metadata = copy.copy(message['payload'])
-    metadata['event_type'] = message['event_type']
-    metadata['host'] = message['publisher_id']
-    return cls(name=name,
-               type=type,
-               volume=volume,
-               unit=unit,
-               user_id=user_id,
-               project_id=project_id,
-               resource_id=resource_id,
-               timestamp=message['timestamp'],
-               resource_metadata=metadata)
-
-
-Sample.from_notification = classmethod(from_notification)

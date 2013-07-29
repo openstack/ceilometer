@@ -27,11 +27,10 @@ class TestPublisher(publisher.PublisherBase):
     def __init__(self, parsed_url):
         self.counters = []
 
-    def publish_counters(self, context, counters, source):
+    def publish_counters(self, context, counters):
         """Send a metering message for publishing
 
         :param context: Execution context from the service or RPC call
         :param counter: Counter from pipeline after transformation
-        :param source: counter source
         """
         self.counters.extend(counters)

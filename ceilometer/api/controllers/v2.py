@@ -42,7 +42,6 @@ from ceilometer.openstack.common import context
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer import sample
-from ceilometer import pipeline
 from ceilometer import storage
 from ceilometer.api import acl
 
@@ -529,11 +528,8 @@ class MeterController(rest.RestController):
                 s.timestamp = now
             s.source = '%s:%s' % (s.project_id, source)
 
-        with pipeline.PublishContext(
-                context.get_admin_context(),
-                source,
-                pecan.request.pipeline_manager.pipelines,
-        ) as publisher:
+        with pecan.request.pipeline_manager.publisher(
+                context.get_admin_context()) as publisher:
             publisher([sample.Sample(
                 name=s.counter_name,
                 type=s.counter_type,
@@ -543,7 +539,8 @@ class MeterController(rest.RestController):
                 project_id=s.project_id,
                 resource_id=s.resource_id,
                 timestamp=s.timestamp.isoformat(),
-                resource_metadata=s.resource_metadata) for s in samples])
+                resource_metadata=s.resource_metadata,
+                source=source) for s in samples])
 
         # TODO(asalkeld) this is not ideal, it would be nice if the publisher
         # returned the created sample message with message id (or at least the
