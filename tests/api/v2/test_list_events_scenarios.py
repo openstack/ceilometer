@@ -54,12 +54,12 @@ class TestListEvents(FunctionalTest,
                                'tag': 'self.counter',
                                'ignored_dict': {'key': 'value'},
                                'ignored_list': ['not-returned'],
-                               }
+                               },
+            source='test_source',
         )
         msg = rpc.meter_message_from_counter(
             self.counter1,
             cfg.CONF.publisher_rpc.metering_secret,
-            'test_source',
         )
         self.conn.record_metering_data(msg)
 
@@ -74,12 +74,12 @@ class TestListEvents(FunctionalTest,
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter2',
-                               }
+                               },
+            source='source2',
         )
         msg2 = rpc.meter_message_from_counter(
             self.counter2,
             cfg.CONF.publisher_rpc.metering_secret,
-            'source2',
         )
         self.conn.record_metering_data(msg2)
 

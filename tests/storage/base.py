@@ -69,12 +69,12 @@ class DBTestBase(test_db.TestBase):
             timestamp=datetime.datetime(*timestamp_list[0]),
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter',
-                               }
+                               },
+            source='test-1',
         )
         self.msg1 = rpc.meter_message_from_counter(
             self.counter,
             cfg.CONF.publisher_rpc.metering_secret,
-            'test-1',
         )
         self.conn.record_metering_data(self.msg1)
         self.msgs.append(self.msg1)
@@ -90,12 +90,12 @@ class DBTestBase(test_db.TestBase):
             timestamp=datetime.datetime(*timestamp_list[1]),
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter2',
-                               }
+                               },
+            source='test-2',
         )
         self.msg2 = rpc.meter_message_from_counter(
             self.counter2,
             cfg.CONF.publisher_rpc.metering_secret,
-            'test-2',
         )
         self.conn.record_metering_data(self.msg2)
         self.msgs.append(self.msg2)
@@ -111,12 +111,12 @@ class DBTestBase(test_db.TestBase):
             timestamp=datetime.datetime(*timestamp_list[2]),
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter3',
-                               }
+                               },
+            source='test-3',
         )
         self.msg3 = rpc.meter_message_from_counter(
             self.counter3,
             cfg.CONF.publisher_rpc.metering_secret,
-            'test-3',
         )
         self.conn.record_metering_data(self.msg3)
         self.msgs.append(self.msg3)
@@ -137,11 +137,11 @@ class DBTestBase(test_db.TestBase):
                 timestamp=datetime.datetime(*ts),
                 resource_metadata={'display_name': 'test-server',
                                    'tag': 'counter-%s' % i},
+                source='test',
             )
             msg = rpc.meter_message_from_counter(
                 c,
                 cfg.CONF.publisher_rpc.metering_secret,
-                'test',
             )
             self.conn.record_metering_data(msg)
             self.msgs.append(msg)
@@ -558,13 +558,13 @@ class StatisticsTest(DBTestBase):
                 timestamp=datetime.datetime(2012, 9, 25, 10 + i, 30 + i),
                 resource_metadata={'display_name': 'test-volume',
                                    'tag': 'self.counter',
-                                   }
+                                   },
+                source='test',
             )
             self.counters.append(c)
             msg = rpc.meter_message_from_counter(
                 c,
                 secret='not-so-secret',
-                source='test',
             )
             self.conn.record_metering_data(msg)
         for i in range(3):
@@ -579,13 +579,13 @@ class StatisticsTest(DBTestBase):
                 timestamp=datetime.datetime(2012, 9, 25, 10 + i, 30 + i),
                 resource_metadata={'display_name': 'test-volume',
                                    'tag': 'self.counter',
-                                   }
+                                   },
+                source='test',
             )
             self.counters.append(c)
             msg = rpc.meter_message_from_counter(
                 c,
                 secret='not-so-secret',
-                source='test',
             )
             self.conn.record_metering_data(msg)
 
@@ -763,12 +763,12 @@ class CounterDataTypeTest(DBTestBase):
             project_id='project-id',
             resource_id='resource-id',
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
-            resource_metadata={}
+            resource_metadata={},
+            source='test-1',
         )
         msg = rpc.meter_message_from_counter(
             c,
             cfg.CONF.publisher_rpc.metering_secret,
-            'test-1',
         )
 
         self.conn.record_metering_data(msg)
@@ -782,12 +782,12 @@ class CounterDataTypeTest(DBTestBase):
             project_id='project-id',
             resource_id='resource-id',
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
-            resource_metadata={}
+            resource_metadata={},
+            source='test-1',
         )
         msg = rpc.meter_message_from_counter(
             c,
             cfg.CONF.publisher_rpc.metering_secret,
-            'test-1',
         )
         self.conn.record_metering_data(msg)
 
@@ -800,12 +800,12 @@ class CounterDataTypeTest(DBTestBase):
             project_id='project-id',
             resource_id='resource-id',
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
-            resource_metadata={}
+            resource_metadata={},
+            source='test-1',
         )
         msg = rpc.meter_message_from_counter(
             c,
             cfg.CONF.publisher_rpc.metering_secret,
-            'test-1',
         )
         self.conn.record_metering_data(msg)
 

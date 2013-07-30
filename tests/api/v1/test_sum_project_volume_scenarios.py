@@ -52,13 +52,13 @@ class TestSumProjectVolume(tests_api.TestBase,
                 timestamp=datetime.datetime(2012, 9, 25, 10 + i, 30 + i),
                 resource_metadata={'display_name': 'test-volume',
                                    'tag': 'self.counter',
-                                   }
+                                   },
+                source='source1',
             )
             self.counters.append(c)
             msg = rpc.meter_message_from_counter(
                 c,
                 cfg.CONF.publisher_rpc.metering_secret,
-                'source1',
             )
             self.conn.record_metering_data(msg)
 

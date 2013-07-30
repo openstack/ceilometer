@@ -85,13 +85,13 @@ def verify_signature(message, secret):
     return new_sig == old_sig
 
 
-def meter_message_from_counter(counter, secret, source):
+def meter_message_from_counter(counter, secret):
     """Make a metering message ready to be published or stored.
 
     Returns a dictionary containing a metering message
     for a notification message and a Counter instance.
     """
-    msg = {'source': source,
+    msg = {'source': counter.source,
            'counter_name': counter.name,
            'counter_type': counter.type,
            'counter_unit': counter.unit,
@@ -148,8 +148,7 @@ class RPCPublisher(publisher.PublisherBase):
         meters = [
             meter_message_from_counter(
                 counter,
-                cfg.CONF.publisher_rpc.metering_secret,
-                counter.source)
+                cfg.CONF.publisher_rpc.metering_secret)
             for counter in counters
         ]
 
