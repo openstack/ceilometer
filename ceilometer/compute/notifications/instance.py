@@ -20,37 +20,11 @@
 """Converters for producing compute sample messages from notification events.
 """
 
-from oslo.config import cfg
-
-from ceilometer import plugin
+from ceilometer.compute import notifications
 from ceilometer import sample
 
 
-OPTS = [
-    cfg.StrOpt('nova_control_exchange',
-               default='nova',
-               help="Exchange name for Nova notifications"),
-]
-
-
-cfg.CONF.register_opts(OPTS)
-
-
-class ComputeNotificationBase(plugin.NotificationBase):
-    @staticmethod
-    def get_exchange_topics(conf):
-        """Return a sequence of ExchangeTopics defining the exchange and
-        topics to be connected for this plugin.
-        """
-        return [
-            plugin.ExchangeTopics(
-                exchange=conf.nova_control_exchange,
-                topics=set(topic + ".info"
-                           for topic in conf.notification_topics)),
-        ]
-
-
-class InstanceScheduled(ComputeNotificationBase):
+class InstanceScheduled(notifications.ComputeNotificationBase):
     event_types = ['scheduler.run_instance.scheduled']
 
     def process_notification(self, message):
@@ -67,7 +41,7 @@ class InstanceScheduled(ComputeNotificationBase):
             message=message)
 
 
-class ComputeInstanceNotificationBase(ComputeNotificationBase):
+class ComputeInstanceNotificationBase(notifications.ComputeNotificationBase):
     """Convert compute.instance.* notifications into Samples
     """
     event_types = ['compute.instance.*']

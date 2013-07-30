@@ -23,7 +23,7 @@ import mock
 from stevedore import extension
 from stevedore.tests import manager as test_manager
 
-from ceilometer.compute import notifications
+from ceilometer.compute.notifications import instance
 from ceilometer import notification
 from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import timeutils
@@ -101,7 +101,7 @@ class TestNotification(tests_base.BaseTestCase):
             [extension.Extension('test',
                                  None,
                                  None,
-                                 notifications.Instance(),
+                                 instance.Instance(),
                                  ),
              ])
         self.srv.process_notification(TEST_NOTICE)
