@@ -209,16 +209,15 @@ class Pipeline(object):
             if sample:
                 transformed_samples.append(sample)
 
-        LOG.audit("Pipeline %s: Publishing samples", self)
-
-        for p in self.publishers:
-            try:
-                p.publish_samples(ctxt, transformed_samples)
-            except Exception:
-                LOG.exception("Pipeline %s: Continue after error "
-                              "from publisher %s", self, p)
-
-        LOG.audit("Pipeline %s: Published samples", self)
+        if transformed_samples:
+            LOG.audit("Pipeline %s: Publishing samples", self)
+            for p in self.publishers:
+                try:
+                    p.publish_samples(ctxt, transformed_samples)
+                except Exception:
+                    LOG.exception("Pipeline %s: Continue after error "
+                                  "from publisher %s", self, p)
+            LOG.audit("Pipeline %s: Published samples", self)
 
     def publish_sample(self, ctxt, sample):
         self.publish_samples(ctxt, [sample])
