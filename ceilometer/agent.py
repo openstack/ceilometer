@@ -51,11 +51,6 @@ class PollingTask(object):
 class AgentManager(object):
 
     def __init__(self, extension_manager):
-        self.pipeline_manager = pipeline.setup_pipeline(
-            transformer.TransformerExtensionManager(
-                'ceilometer.transformer',
-            ),
-        )
 
         self.pollster_manager = extension_manager
 
@@ -80,6 +75,12 @@ class AgentManager(object):
         return polling_tasks
 
     def initialize_service_hook(self, service):
+        self.pipeline_manager = pipeline.setup_pipeline(
+            transformer.TransformerExtensionManager(
+                'ceilometer.transformer',
+            ),
+        )
+
         self.service = service
         for interval, task in self.setup_polling_tasks().iteritems():
             self.service.tg.add_timer(interval,
