@@ -25,7 +25,7 @@ import greenlet
 from oslo.config import cfg
 
 from ceilometer.openstack.common import excutils
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import importutils
 from ceilometer.openstack.common import jsonutils
 from ceilometer.openstack.common import log as logging
@@ -181,11 +181,16 @@ class DirectConsumer(ConsumerBase):
         'callback' is the callback to call when messages are received
         """
 
-        super(DirectConsumer, self).__init__(session, callback,
-                                             "%s/%s" % (msg_id, msg_id),
-                                             {"type": "direct"},
-                                             msg_id,
-                                             {"exclusive": True})
+        super(DirectConsumer, self).__init__(
+            session, callback,
+            "%s/%s" % (msg_id, msg_id),
+            {"type": "direct"},
+            msg_id,
+            {
+                "auto-delete": conf.amqp_auto_delete,
+                "exclusive": True,
+                "durable": conf.amqp_durable_queues,
+            })
 
 
 class TopicConsumer(ConsumerBase):
@@ -203,9 +208,14 @@ class TopicConsumer(ConsumerBase):
         """
 
         exchange_name = exchange_name or rpc_amqp.get_control_exchange(conf)
-        super(TopicConsumer, self).__init__(session, callback,
-                                            "%s/%s" % (exchange_name, topic),
-                                            {}, name or topic, {})
+        super(TopicConsumer, self).__init__(
+            session, callback,
+            "%s/%s" % (exchange_name, topic),
+            {}, name or topic,
+            {
+                "auto-delete": conf.amqp_auto_delete,
+                "durable": conf.amqp_durable_queues,
+            })
 
 
 class FanoutConsumer(ConsumerBase):
@@ -228,7 +238,7 @@ class FanoutConsumer(ConsumerBase):
             {"exclusive": True})
 
     def reconnect(self, session):
-        topic = self.get_node_name()
+        topic = self.get_node_name().rpartition('_fanout')[0]
         params = {
             'session': session,
             'topic': topic,
