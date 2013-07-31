@@ -56,7 +56,7 @@ class _Base(plugin.PollsterBase):
         if self.CACHE_KEY_HEAD not in cache:
             cache[self.CACHE_KEY_HEAD] = list(self._get_account_info(ksclient,
                                                                      cache))
-        return iter(cache['swift.head_account'])
+        return iter(cache[self.CACHE_KEY_HEAD])
 
     def _get_account_info(self, ksclient, cache):
         try:
