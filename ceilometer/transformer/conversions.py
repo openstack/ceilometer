@@ -140,6 +140,7 @@ class RateOfChangeTransformer(ScalingTransformer):
             counter = self._convert(counter, rate_of_change)
             LOG.debug(_('converted to: %s') % (counter,))
         else:
-            LOG.warn(_('dropping counter with no predecessor: %s') % counter)
+            LOG.warn(_('dropping counter with no predecessor: %s') %
+                     (counter,))
             counter = None
         return counter
