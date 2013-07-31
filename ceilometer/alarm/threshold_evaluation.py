@@ -92,7 +92,8 @@ class Evaluator(object):
         window = (alarm.period *
                   (alarm.evaluation_periods + cls.look_back))
         start = now - datetime.timedelta(seconds=window)
-        LOG.debug(_('query stats from %(start)s to %(now)s') % locals())
+        LOG.debug(_('query stats from %(start)s to '
+                    '%(now)s') % {'start': start, 'now': now})
         after = dict(field='timestamp', op='ge', value=start.isoformat())
         before = dict(field='timestamp', op='le', value=now.isoformat())
         constraints.extend([before, after])
@@ -124,11 +125,11 @@ class Evaluator(object):
 
     def _update(self, alarm, state, reason):
         """Refresh alarm state."""
-        id = alarm.alarm_id
-        LOG.info(_('alarm %(id)s transitioning to %(state)s'
-                   ' because %(reason)s') % locals())
+        LOG.info(_('alarm %(id)s transitioning to %(state)s because '
+                   '%(reason)s') % {'id': alarm.alarm_id, 'state': state,
+                                    'reason': reason})
         try:
-            self._client.alarms.update(id, **dict(state=state))
+            self._client.alarms.update(alarm.alarm_id, **dict(state=state))
             alarm.state = state
             if self.notifier:
                 self.notifier.notify(alarm, state, reason)
@@ -155,7 +156,8 @@ class Evaluator(object):
         last = getattr(statistics[-1], alarm.statistic)
         return (_('Transition to %(state)s due to %(count)d samples'
                   ' %(disposition)s threshold, most recent: %(last)s') %
-                locals())
+                {'state': state, 'count': count, 'disposition': disposition,
+                 'last': last})
 
     def _transition(self, alarm, statistics, compared):
         """Transition alarm state if necessary.
@@ -212,7 +214,8 @@ class Evaluator(object):
                     value = getattr(stat, alarm.statistic)
                     limit = alarm.threshold
                     LOG.debug(_('comparing value %(value)s against threshold'
-                                ' %(limit)s') % locals())
+                                ' %(limit)s') %
+                              {'value': value, 'limit': limit})
                     return op(value, limit)
 
                 self._transition(alarm,
