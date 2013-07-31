@@ -131,11 +131,11 @@ class CollectorService(service.PeriodicService):
             data = [data]
 
         for meter in data:
-            LOG.info('metering data %s for %s @ %s: %s',
-                     meter['counter_name'],
-                     meter['resource_id'],
-                     meter.get('timestamp', 'NO TIMESTAMP'),
-                     meter['counter_volume'])
+            LOG.debug('metering data %s for %s @ %s: %s',
+                      meter['counter_name'],
+                      meter['resource_id'],
+                      meter.get('timestamp', 'NO TIMESTAMP'),
+                      meter['counter_volume'])
             if meter_api.verify_signature(meter, cfg.CONF.metering_secret):
                 try:
                     # Convert the timestamp to a datetime instance.
