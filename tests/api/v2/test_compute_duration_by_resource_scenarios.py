@@ -68,6 +68,7 @@ class TestComputeDurationByResource(FunctionalTest,
             duration = timeutils.delta_seconds(duration_start, duration_end)
             return [
                 models.Statistics(
+                    unit='',
                     min=0,
                     max=0,
                     avg=0,
@@ -142,6 +143,7 @@ class TestComputeDurationByResource(FunctionalTest,
         def get_interval(ignore_self, event_filter, period):
             return [
                 models.Statistics(
+                    unit=None,
                     count=0,
                     min=None,
                     max=None,
@@ -171,6 +173,7 @@ class TestComputeDurationByResource(FunctionalTest,
         def get_interval(ignore_self, event_filter, period):
             return [
                 models.Statistics(
+                    unit=None,
                     count=0,
                     min=None,
                     max=None,

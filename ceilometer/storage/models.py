@@ -202,12 +202,13 @@ class Sample(Model):
 class Statistics(Model):
     """Computed statistics based on a set of sample data.
     """
-    def __init__(self,
+    def __init__(self, unit,
                  min, max, avg, sum, count,
                  period, period_start, period_end,
                  duration, duration_start, duration_end):
         """Create a new statistics object.
 
+        :param unit: The unit type of the data set
         :param min: The smallest volume found
         :param max: The largest volume found
         :param avg: The average of all volumes found
@@ -220,7 +221,7 @@ class Statistics(Model):
         :param duration_start: The earliest time for the matching samples
         :param duration_end: The latest time for the matching samples
         """
-        Model.__init__(self,
+        Model.__init__(self, unit=unit,
                        min=min, max=max, avg=avg, sum=sum, count=count,
                        period=period, period_start=period_start,
                        period_end=period_end, duration=duration,

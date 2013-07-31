@@ -365,6 +365,9 @@ class Statistics(_Base):
     """Computed statistics for a query.
     """
 
+    unit = wtypes.text
+    "The unit type of the data set"
+
     min = float
     "The minimum volume seen in the data"
 
@@ -436,7 +439,8 @@ class Statistics(_Base):
 
     @classmethod
     def sample(cls):
-        return cls(min=1,
+        return cls(unit='GiB',
+                   min=1,
                    max=9,
                    avg=4.5,
                    sum=45,
