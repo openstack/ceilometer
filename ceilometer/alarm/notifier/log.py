@@ -26,6 +26,7 @@ LOG = log.getLogger(__name__)
 class LogAlarmNotifier(notifier.AlarmNotifier):
     "Log alarm notifier."""
 
+    @staticmethod
     def notify(action, alarm, state, reason):
         LOG.info("Notifying alarm %s in state %s with action %s because %s",
                  alarm, state, action, reason)

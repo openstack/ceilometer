@@ -52,7 +52,8 @@ cfg.CONF.register_opts(REST_NOTIFIER_OPTS, group="alarm")
 class RestAlarmNotifier(notifier.AlarmNotifier):
     """Rest alarm notifier."""
 
-    def notify(self, action, alarm, state, reason):
+    @staticmethod
+    def notify(action, alarm, state, reason):
         LOG.info("Notifying alarm %s in state %s with action %s because %s",
                  alarm, state, action, reason)
         body = {'state': state, 'reason': reason}
