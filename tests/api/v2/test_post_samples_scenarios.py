@@ -60,6 +60,8 @@ class TestPostSamples(FunctionalTest,
 
         # timestamp not given so it is generated.
         s1[0]['timestamp'] = data.json[0]['timestamp']
+        # Ignore message id that is randomly generated
+        s1[0]['message_id'] = data.json[0]['message_id']
         # source is generated if not provided.
         s1[0]['source'] = '%s:openstack' % s1[0]['project_id']
 

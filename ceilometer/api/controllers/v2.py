@@ -528,9 +528,9 @@ class MeterController(rest.RestController):
                 s.timestamp = now
             s.source = '%s:%s' % (s.project_id, source)
 
-        with pecan.request.pipeline_manager.publisher(
-                context.get_admin_context()) as publisher:
-            publisher([sample.Sample(
+        published_samples = []
+        for s in samples:
+            published_sample = sample.Sample(
                 name=s.counter_name,
                 type=s.counter_type,
                 unit=s.counter_unit,
@@ -540,7 +540,13 @@ class MeterController(rest.RestController):
                 resource_id=s.resource_id,
                 timestamp=s.timestamp.isoformat(),
                 resource_metadata=s.resource_metadata,
-                source=source) for s in samples])
+                source=source)
+            s.message_id = published_sample.id
+            published_samples.append(published_sample)
+
+        with pecan.request.pipeline_manager.publisher(
+                context.get_admin_context()) as publisher:
+            publisher(published_samples)
 
         # TODO(asalkeld) this is not ideal, it would be nice if the publisher
         # returned the created sample message with message id (or at least the

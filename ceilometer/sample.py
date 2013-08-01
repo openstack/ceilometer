@@ -25,6 +25,7 @@ in by the plugins that create them.
 """
 
 import copy
+import uuid
 
 from oslo.config import cfg
 
@@ -68,6 +69,7 @@ class Sample(object):
         self.timestamp = timestamp
         self.resource_metadata = resource_metadata
         self.source = source or cfg.CONF.sample_source
+        self.id = str(uuid.uuid1())
 
     def as_dict(self):
         return copy.copy(self.__dict__)
