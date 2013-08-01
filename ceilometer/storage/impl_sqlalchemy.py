@@ -147,9 +147,9 @@ class Connection(base.Connection):
             conf.database.connection = \
                 os.environ.get('CEILOMETER_TEST_SQL_URL', url)
 
-    def upgrade(self, version=None):
+    def upgrade(self):
         session = sqlalchemy_session.get_session()
-        migration.db_sync(session.get_bind(), version=version)
+        migration.db_sync(session.get_bind())
 
     def clear(self):
         session = sqlalchemy_session.get_session()

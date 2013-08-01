@@ -18,6 +18,9 @@
 import distutils.version as dist_version
 import os
 
+import alembic
+from alembic import config as alembic_config
+
 import migrate
 from migrate.versioning import util as migrate_util
 import sqlalchemy
@@ -59,20 +62,17 @@ from migrate.versioning.repository import Repository
 _REPOSITORY = None
 
 
-def db_sync(engine, version=None):
-    if version is not None:
-        try:
-            version = int(version)
-        except ValueError:
-            raise Exception(_("version should be an integer"))
-
-    current_version = db_version(engine)
+def db_sync(engine):
+    db_version(engine)  # This is needed to create a version stamp in empty DB
     repository = _find_migrate_repo()
-    if version is None or version > current_version:
-        return versioning_api.upgrade(engine, repository, version)
-    else:
-        return versioning_api.downgrade(engine, repository,
-                                        version)
+    versioning_api.upgrade(engine, repository)
+    alembic.command.upgrade(_alembic_config(), "head")
+
+
+def _alembic_config():
+    path = os.path.join(os.path.dirname(__file__), 'alembic/alembic.ini')
+    config = alembic_config.Config(path)
+    return config
 
 
 def db_version(engine):

@@ -65,7 +65,7 @@ class Connection(object):
         """Constructor."""
 
     @abc.abstractmethod
-    def upgrade(self, version=None):
+    def upgrade(self):
         """Migrate the database to `version` or the most recent version."""
 
     @abc.abstractmethod

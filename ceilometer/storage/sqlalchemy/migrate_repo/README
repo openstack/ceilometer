@@ -1,4 +1,4 @@
-This is a database migration repository.
+sqlalchemy-migrate is DEPRECATED.
 
-More information at
-http://code.google.com/p/sqlalchemy-migrate/
+All new migrations should be written using alembic.
+Please see ceilometer/storage/sqlalchemy/alembic/README

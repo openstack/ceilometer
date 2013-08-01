@@ -41,7 +41,7 @@ class Connection(base.Connection):
     def __init__(self, conf):
         pass
 
-    def upgrade(self, version=None):
+    def upgrade(self):
         pass
 
     def clear(self):
