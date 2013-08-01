@@ -17,6 +17,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import threading
 from oslo.config import cfg
 from pecan import hooks
 
@@ -61,3 +62,18 @@ class PipelineHook(hooks.PecanHook):
 
     def before(self, state):
         state.request.pipeline_manager = self.pipeline_manager
+
+
+class TranslationHook(hooks.PecanHook):
+
+    def __init__(self):
+        # Use thread local storage to make this thread safe in situations
+        # where one pecan instance is being used to serve multiple request
+        # threads.
+        self.local_error = threading.local()
+        self.local_error.translatable_error = None
+
+    def after(self, state):
+        if hasattr(state.response, 'translatable_error'):
+            self.local_error.translatable_error = (
+                state.response.translatable_error)

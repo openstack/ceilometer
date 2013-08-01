@@ -704,9 +704,11 @@ class ResourcesController(rest.RestController):
         # FIXME (flwang): Need to change this to return a 404 error code when
         # we get a release of WSME that supports it.
         if not resources:
+            error = _("Unknown resource")
+            pecan.response.translatable_error = error
             raise wsme.exc.InvalidInput("resource_id",
                                         resource_id,
-                                        _("Unknown resource"))
+                                        error)
         return Resource.from_db_and_links(resources[0],
                                           self._resource_links(resource_id))
 
@@ -836,14 +838,18 @@ class AlarmsController(rest.RestController):
         alarms = list(conn.get_alarms(name=data.name,
                                       project=data.project_id))
         if len(alarms) > 0:
-            raise wsme.exc.ClientSideError(_("Alarm with that name exists"))
+            error = _("Alarm with that name exists")
+            pecan.response.translatable_error = error
+            raise wsme.exc.ClientSideError(error)
 
         try:
             kwargs = data.as_dict(storage.models.Alarm)
             alarm_in = storage.models.Alarm(**kwargs)
         except Exception as ex:
             LOG.exception(ex)
-            raise wsme.exc.ClientSideError(_("Alarm incorrect"))
+            error = _("Alarm incorrect")
+            pecan.response.translatable_error = error
+            raise wsme.exc.ClientSideError(error)
 
         alarm = conn.update_alarm(alarm_in)
         return Alarm.from_db_model(alarm)
@@ -860,7 +866,9 @@ class AlarmsController(rest.RestController):
         alarms = list(conn.get_alarms(alarm_id=alarm_id,
                                       project=auth_project))
         if len(alarms) < 1:
-            raise wsme.exc.ClientSideError(_("Unknown alarm"))
+            error = _("Unknown alarm")
+            pecan.response.translatable_error = error
+            raise wsme.exc.ClientSideError(error)
 
         # merge the new values from kwargs into the current
         # alarm "alarm_in".
@@ -882,7 +890,9 @@ class AlarmsController(rest.RestController):
         alarms = list(conn.get_alarms(alarm_id=alarm_id,
                                       project=auth_project))
         if len(alarms) < 1:
-            raise wsme.exc.ClientSideError(_("Unknown alarm"))
+            error = _("Unknown alarm")
+            pecan.response.translatable_error = error
+            raise wsme.exc.ClientSideError(error)
 
         conn.delete_alarm(alarm_id)
 
@@ -896,7 +906,9 @@ class AlarmsController(rest.RestController):
         # FIXME (flwang): Need to change this to return a 404 error code when
         # we get a release of WSME that supports it.
         if len(alarms) < 1:
-            raise wsme.exc.ClientSideError(_("Unknown alarm"))
+            error = _("Unknown alarm")
+            pecan.response.translatable_error = error
+            raise wsme.exc.ClientSideError(error)
 
         return Alarm.from_db_model(alarms[0])
 

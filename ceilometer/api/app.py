@@ -59,7 +59,8 @@ def setup_app(pecan_config=None, extra_hooks=None):
                      storage_engine,
                      storage_engine.get_connection(cfg.CONF),
                  ),
-                 hooks.PipelineHook()]
+                 hooks.PipelineHook(),
+                 hooks.TranslationHook()]
     if extra_hooks:
         app_hooks.extend(extra_hooks)
 
