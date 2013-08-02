@@ -33,12 +33,12 @@ information follows.
 The compute agent is implemented in ``ceilometer/compute/manager.py``. As
 you will see in the manager, the computeagent loads all plugins defined in
 the namespace ``ceilometer.poll.compute``, then periodically calls their
-:func:`get_counters` method.
+:func:`get_samples` method.
 
 The central agent polls other types of resources from a management server.
 The central agent is defined in ``ceilometer/central/manager.py``. It loads
 plugins from the ``ceilometer.poll.central`` namespace and polls them by
-calling their :func:`get_counters` method.
+calling their :func:`get_samples` method.
 
 Plugins
 =======
@@ -64,11 +64,11 @@ Pollster
 Compute plugins are defined as subclasses of the
 :class:`ceilometer.compute.plugin.ComputePollster` class as defined in
 the ``ceilometer/compute/plugin.py`` file. Pollsters must implement one
-method: ``get_counters(self, manager, context)``, which returns a
+method: ``get_samples(self, manager, context)``, which returns a
 sequence of ``Counter`` objects as defined in the
 ``ceilometer/counter.py`` file.
 
-In the ``CPUPollster`` plugin, the ``get_counters`` method is implemented as a loop
+In the ``CPUPollster`` plugin, the ``get_samples`` method is implemented as a loop
 which, for each instances running on the local host, retrieves the cpu_time
 from the hypervisor and sends back two ``Counter`` objects.  The first one, named
 "cpu", is of type "cumulative", meaning that between two polls, its value is

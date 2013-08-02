@@ -76,7 +76,7 @@ class _Base(plugin.ComputePollster):
     def _get_counter(instance, c_data):
         """Return one Counter."""
 
-    def get_counters(self, manager, cache, instance):
+    def get_samples(self, manager, cache, instance):
         instance_name = util.instance_name(instance)
         c_data = self._populate_cache(
             manager.inspector,

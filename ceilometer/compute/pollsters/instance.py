@@ -26,7 +26,7 @@ from ceilometer.compute.pollsters import util
 class InstancePollster(plugin.ComputePollster):
 
     @staticmethod
-    def get_counters(manager, cache, instance):
+    def get_samples(manager, cache, instance):
         yield util.make_counter_from_instance(
             instance,
             name='instance',
@@ -39,7 +39,7 @@ class InstancePollster(plugin.ComputePollster):
 class InstanceFlavorPollster(plugin.ComputePollster):
 
     @staticmethod
-    def get_counters(manager, cache, instance):
+    def get_samples(manager, cache, instance):
         yield util.make_counter_from_instance(
             instance,
             # Use the "meter name + variable" syntax

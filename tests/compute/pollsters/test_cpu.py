@@ -35,7 +35,7 @@ class TestCPUPollster(base.TestPollsterBase):
         super(TestCPUPollster, self).setUp()
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
-    def test_get_counters(self):
+    def test_get_samples(self):
         self.inspector.inspect_cpus(self.instance.name).AndReturn(
             virt_inspector.CPUStats(time=1 * (10 ** 6), number=2))
         self.inspector.inspect_cpus(self.instance.name).AndReturn(
@@ -50,12 +50,12 @@ class TestCPUPollster(base.TestPollsterBase):
 
         def _verify_cpu_metering(expected_time):
             cache = {}
-            counters = list(pollster.get_counters(mgr, cache, self.instance))
-            self.assertEquals(len(counters), 1)
-            self.assertEqual(set([c.name for c in counters]),
+            samples = list(pollster.get_samples(mgr, cache, self.instance))
+            self.assertEquals(len(samples), 1)
+            self.assertEqual(set([s.name for s in samples]),
                              set(['cpu']))
-            assert counters[0].volume == expected_time
-            self.assertEquals(counters[0].resource_metadata.get('cpu_number'),
+            assert samples[0].volume == expected_time
+            self.assertEquals(samples[0].resource_metadata.get('cpu_number'),
                               2)
             # ensure elapsed time between polling cycles is non-zero
             time.sleep(0.001)
@@ -65,7 +65,7 @@ class TestCPUPollster(base.TestPollsterBase):
         _verify_cpu_metering(2 * (10 ** 6))
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
-    def test_get_counters_no_caching(self):
+    def test_get_samples_no_caching(self):
         self.inspector.inspect_cpus(self.instance.name).AndReturn(
             virt_inspector.CPUStats(time=1 * (10 ** 6), number=2))
         self.mox.ReplayAll()
@@ -74,7 +74,7 @@ class TestCPUPollster(base.TestPollsterBase):
         pollster = cpu.CPUPollster()
 
         cache = {}
-        counters = list(pollster.get_counters(mgr, cache, self.instance))
-        self.assertEquals(len(counters), 1)
-        self.assertEquals(counters[0].volume, 10 ** 6)
+        samples = list(pollster.get_samples(mgr, cache, self.instance))
+        self.assertEquals(len(samples), 1)
+        self.assertEquals(samples[0].volume, 10 ** 6)
         self.assertEquals(len(cache), 0)

@@ -127,18 +127,18 @@ class TestSwiftPollster(base.TestCase):
     def test_metering(self):
         self.stubs.Set(self.factory, '_iter_accounts',
                        self.fake_iter_accounts)
-        counters = list(self.pollster.get_counters(self.manager, {}))
-        self.assertEqual(len(counters), 2)
+        samples = list(self.pollster.get_samples(self.manager, {}))
+        self.assertEqual(len(samples), 2)
 
     def test_get_counter_names(self):
         self.stubs.Set(self.factory, '_iter_accounts',
                        self.fake_iter_accounts)
-        counters = list(self.pollster.get_counters(self.manager, {}))
-        self.assertEqual(set([c.name for c in counters]),
-                         set([counters[0].name]))
+        samples = list(self.pollster.get_samples(self.manager, {}))
+        self.assertEqual(set([s.name for s in samples]),
+                         set([samples[0].name]))
 
     def test_endpoint_notfound(self):
         self.stubs.Set(self.manager.keystone.service_catalog, 'url_for',
                        self.fake_ks_service_catalog_url_for)
-        counters = list(self.pollster.get_counters(self.manager, {}))
-        self.assertEqual(len(counters), 0)
+        samples = list(self.pollster.get_samples(self.manager, {}))
+        self.assertEqual(len(samples), 0)

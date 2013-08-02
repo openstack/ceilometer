@@ -76,7 +76,7 @@ class PollsterBase(PluginBase):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def get_counters(self, manager, cache):
+    def get_samples(self, manager, cache):
         """Return a sequence of Counter instances from polling the resources.
 
         :param manager: The service manager class invoking the plugin.

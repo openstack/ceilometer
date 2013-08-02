@@ -71,17 +71,17 @@ class TestNetPollster(base.TestPollsterBase):
         self.mox.ReplayAll()
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
-    def _check_get_counters(self, factory, expected):
+    def _check_get_samples(self, factory, expected):
         mgr = manager.AgentManager()
         pollster = factory()
-        counters = list(pollster.get_counters(mgr, {}, self.instance))
-        self.assertEqual(len(counters), 3)  # one for each nic
-        self.assertEqual(set([c.name for c in counters]),
-                         set([counters[0].name]))
+        samples = list(pollster.get_samples(mgr, {}, self.instance))
+        self.assertEqual(len(samples), 3)  # one for each nic
+        self.assertEqual(set([s.name for s in samples]),
+                         set([samples[0].name]))
 
         def _verify_vnic_metering(ip, expected_volume, expected_rid):
-            match = [c for c in counters
-                     if c.resource_metadata['parameters']['ip'] == ip
+            match = [s for s in samples
+                     if s.resource_metadata['parameters']['ip'] == ip
                      ]
             self.assertEquals(len(match), 1, 'missing ip %s' % ip)
             self.assertEquals(match[0].volume, expected_volume)
@@ -93,7 +93,7 @@ class TestNetPollster(base.TestPollsterBase):
 
     def test_incoming_bytes(self):
         instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
-        self._check_get_counters(
+        self._check_get_samples(
             net.IncomingBytesPollster,
             [('10.0.0.2', 1L, self.vnic0.fref),
              ('192.168.0.3', 5L, self.vnic1.fref),
@@ -104,7 +104,7 @@ class TestNetPollster(base.TestPollsterBase):
 
     def test_outgoing_bytes(self):
         instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
-        self._check_get_counters(
+        self._check_get_samples(
             net.OutgoingBytesPollster,
             [('10.0.0.2', 3L, self.vnic0.fref),
              ('192.168.0.3', 7L, self.vnic1.fref),
@@ -115,7 +115,7 @@ class TestNetPollster(base.TestPollsterBase):
 
     def test_incoming_packets(self):
         instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
-        self._check_get_counters(
+        self._check_get_samples(
             net.IncomingPacketsPollster,
             [('10.0.0.2', 2L, self.vnic0.fref),
              ('192.168.0.3', 6L, self.vnic1.fref),
@@ -126,7 +126,7 @@ class TestNetPollster(base.TestPollsterBase):
 
     def test_outgoing_packets(self):
         instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
-        self._check_get_counters(
+        self._check_get_samples(
             net.OutgoingPacketsPollster,
             [('10.0.0.2', 4L, self.vnic0.fref),
              ('192.168.0.3', 8L, self.vnic1.fref),
@@ -143,7 +143,7 @@ class TestNetPollsterCache(base.TestPollsterBase):
         self.mox.ReplayAll()
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
-    def _check_get_counters_cache(self, factory):
+    def _check_get_samples_cache(self, factory):
         vnic0 = virt_inspector.Interface(
             name='vnet0',
             fref='fa163e71ec6e',
@@ -163,17 +163,17 @@ class TestNetPollsterCache(base.TestPollsterBase):
                 self.instance.name: vnics,
             },
         }
-        counters = list(pollster.get_counters(mgr, cache, self.instance))
-        self.assertEqual(len(counters), 1)
+        samples = list(pollster.get_samples(mgr, cache, self.instance))
+        self.assertEqual(len(samples), 1)
 
     def test_incoming_bytes(self):
-        self._check_get_counters_cache(net.IncomingBytesPollster)
+        self._check_get_samples_cache(net.IncomingBytesPollster)
 
     def test_outgoing_bytes(self):
-        self._check_get_counters_cache(net.OutgoingBytesPollster)
+        self._check_get_samples_cache(net.OutgoingBytesPollster)
 
     def test_incoming_packets(self):
-        self._check_get_counters_cache(net.IncomingPacketsPollster)
+        self._check_get_samples_cache(net.IncomingPacketsPollster)
 
     def test_outgoing_packets(self):
-        self._check_get_counters_cache(net.OutgoingPacketsPollster)
+        self._check_get_samples_cache(net.OutgoingPacketsPollster)
