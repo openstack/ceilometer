@@ -53,6 +53,7 @@ class TestAlarms(FunctionalTest,
                             counter_name='meter.test',
                             comparison_operator='gt', threshold=2.0,
                             statistic='avg',
+                            repeat_actions=True,
                             user_id=self.auth_headers['X-User-Id'],
                             project_id=self.auth_headers['X-Project-Id']),
                       Alarm(name='name2',
@@ -94,6 +95,7 @@ class TestAlarms(FunctionalTest,
         self.assertEquals(one['name'], 'name1')
         self.assertEquals(one['counter_name'], 'meter.test')
         self.assertEquals(one['alarm_id'], alarms[0]['alarm_id'])
+        self.assertEquals(one['repeat_actions'], alarms[0]['repeat_actions'])
 
     def test_post_invalid_alarm(self):
         json = {
@@ -115,15 +117,18 @@ class TestAlarms(FunctionalTest,
             'comparison_operator': 'gt',
             'threshold': 2.0,
             'statistic': 'avg',
+            'repeat_actions': True,
         }
         self.post_json('/alarms', params=json, status=200,
                        headers=self.auth_headers)
         alarms = list(self.conn.get_alarms())
         self.assertEquals(4, len(alarms))
+        self.assertEquals(alarms[3].repeat_actions, True)
 
     def test_put_alarm(self):
         json = {
             'name': 'renamed_alarm',
+            'repeat_actions': True,
         }
         data = self.get_json('/alarms',
                              q=[{'field': 'name',
@@ -137,6 +142,7 @@ class TestAlarms(FunctionalTest,
                       headers=self.auth_headers)
         alarm = list(self.conn.get_alarms(alarm_id=alarm_id))[0]
         self.assertEquals(alarm.name, json['name'])
+        self.assertEquals(alarm.repeat_actions, json['repeat_actions'])
 
     def test_put_alarm_wrong_field(self):
         # Note: wsme will ignore unknown fields so will just not appear in

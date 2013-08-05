@@ -782,6 +782,9 @@ class Alarm(_Base):
     insufficient_data_actions = [wtypes.text]
     "The actions to do when alarm state change to insufficient data"
 
+    repeat_actions = bool
+    "The actions should be re-triggered on each evaluation cycle"
+
     matching_metadata = {wtypes.text: wtypes.text}
     "The matching_metadata of the alarm"
 
@@ -809,7 +812,8 @@ class Alarm(_Base):
                    alarm_actions=["http://site:8000/alarm"],
                    insufficient_data_actions=["http://site:8000/nodata"],
                    matching_metadata={"key_name":
-                                      "key_value"}
+                                      "key_value"},
+                   repeat_actions=False,
                    )
 
 

@@ -516,7 +516,8 @@ class Connection(base.Connection):
                                 alarm_actions=row.alarm_actions,
                                 insufficient_data_actions=
                                 row.insufficient_data_actions,
-                                matching_metadata=row.matching_metadata)
+                                matching_metadata=row.matching_metadata,
+                                repeat_actions=row.repeat_actions)
 
     @staticmethod
     def _alarm_model_to_row(alarm, row=None):

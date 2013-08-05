@@ -263,6 +263,8 @@ class Alarm(Model):
     :param insufficient_data_actions: the list of webhooks to call when
                                       entering the insufficient data state
     :param matching_metadata: the key/values of metadata to match on.
+    :param repeat_actions: Is the actions should be triggered on each
+                           alarm evaluation.
     """
     def __init__(self, name, counter_name,
                  comparison_operator, threshold, statistic,
@@ -278,7 +280,8 @@ class Alarm(Model):
                  ok_actions=[],
                  alarm_actions=[],
                  insufficient_data_actions=[],
-                 matching_metadata={}
+                 matching_metadata={},
+                 repeat_actions=False
                  ):
         if not description:
             # make a nice user friendly description by default
@@ -307,4 +310,5 @@ class Alarm(Model):
             alarm_actions=alarm_actions,
             insufficient_data_actions=
             insufficient_data_actions,
+            repeat_actions=repeat_actions,
             matching_metadata=matching_metadata)
