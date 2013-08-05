@@ -70,7 +70,7 @@ class _Base(plugin.ComputePollster):
             )
         return i_cache[instance_name]
 
-    def get_counters(self, manager, cache, instance):
+    def get_samples(self, manager, cache, instance):
         instance_name = util.instance_name(instance)
         LOG.info('checking instance %s', instance.id)
         try:

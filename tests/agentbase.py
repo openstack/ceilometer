@@ -48,17 +48,17 @@ default_test_data = sample.Sample(
 class TestPollster:
     test_data = default_test_data
 
-    def get_counters(self, manager, cache, instance=None):
+    def get_samples(self, manager, cache, instance=None):
         self.counters.append((manager, instance))
         return [self.test_data]
 
 
 class TestPollsterException(TestPollster):
-    def get_counters(self, manager, cache, instance=None):
+    def get_samples(self, manager, cache, instance=None):
         # Put an instance parameter here so that it can be used
         # by both central manager and compute manager
         # In future, we possibly don't need such hack if we
-        # combine the get_counters() function again
+        # combine the get_samples() function again
         self.counters.append((manager, instance))
         raise Exception()
 

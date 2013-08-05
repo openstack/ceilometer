@@ -28,7 +28,7 @@ LOG = log.getLogger(__name__)
 
 class CPUPollster(plugin.ComputePollster):
 
-    def get_counters(self, manager, cache, instance):
+    def get_samples(self, manager, cache, instance):
         LOG.info('checking instance %s', instance.id)
         instance_name = util.instance_name(instance)
         try:

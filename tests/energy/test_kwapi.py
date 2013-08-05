@@ -68,8 +68,8 @@ class TestKwapi(base.TestCase):
         self.stubs.Set(kwapi._Base, 'get_kwapi_client',
                        self.fake_get_kwapi_client)
 
-        counters = list(kwapi.EnergyPollster().get_counters(self.manager, {}))
-        self.assertEqual(len(counters), 0)
+        samples = list(kwapi.EnergyPollster().get_samples(self.manager, {}))
+        self.assertEqual(len(samples), 0)
 
 
 class TestEnergyPollster(base.TestCase):
@@ -90,24 +90,24 @@ class TestEnergyPollster(base.TestCase):
             probe_dict['id'] = key
             yield probe_dict
 
-    def test_counter(self):
+    def test_sample(self):
         cache = {}
-        counters = list(kwapi.EnergyPollster().get_counters(
+        samples = list(kwapi.EnergyPollster().get_samples(
             self.manager,
             cache,
         ))
-        self.assertEqual(len(counters), 3)
-        counters_by_name = dict((c.resource_id, c) for c in counters)
+        self.assertEqual(len(samples), 3)
+        samples_by_name = dict((s.resource_id, s) for s in samples)
         for name, probe in PROBE_DICT['probes'].items():
-            counter = counters_by_name[name]
+            sample = samples_by_name[name]
             expected = datetime.datetime.fromtimestamp(
                 probe['timestamp']
             ).isoformat()
-            self.assertEqual(counter.timestamp, expected)
-            self.assertEqual(counter.volume, probe['kwh'])
+            self.assertEqual(sample.timestamp, expected)
+            self.assertEqual(sample.volume, probe['kwh'])
             # self.assert_(
-            #     any(map(lambda counter: counter.volume == probe['w'],
-            #             power_counters)))
+            #     any(map(lambda sample: sample.volume == probe['w'],
+            #             power_samples)))
 
 
 class TestEnergyPollsterCache(base.TestCase):
@@ -118,7 +118,7 @@ class TestEnergyPollsterCache(base.TestCase):
         self.context = context.get_admin_context()
         self.manager = TestManager()
 
-    def test_get_counters_cached(self):
+    def test_get_samples_cached(self):
         probe = {'id': 'A'}
         probe.update(PROBE_DICT['probes']['A'])
         cache = {
@@ -128,8 +128,8 @@ class TestEnergyPollsterCache(base.TestCase):
         pollster = kwapi.EnergyPollster()
         with mock.patch.object(pollster, '_get_probes') as do_not_call:
             do_not_call.side_effect = AssertionError('should not be called')
-            counters = list(pollster.get_counters(self.manager, cache))
-        self.assertEqual(len(counters), 1)
+            samples = list(pollster.get_samples(self.manager, cache))
+        self.assertEqual(len(samples), 1)
 
 
 class TestPowerPollster(base.TestCase):
@@ -150,21 +150,21 @@ class TestPowerPollster(base.TestCase):
             probe_dict['id'] = key
             yield probe_dict
 
-    def test_counter(self):
+    def test_sample(self):
         cache = {}
-        counters = list(kwapi.PowerPollster().get_counters(
+        samples = list(kwapi.PowerPollster().get_samples(
             self.manager,
             cache,
         ))
-        self.assertEqual(len(counters), 3)
-        counters_by_name = dict((c.resource_id, c) for c in counters)
+        self.assertEqual(len(samples), 3)
+        samples_by_name = dict((s.resource_id, s) for s in samples)
         for name, probe in PROBE_DICT['probes'].items():
-            counter = counters_by_name[name]
+            sample = samples_by_name[name]
             expected = datetime.datetime.fromtimestamp(
                 probe['timestamp']
             ).isoformat()
-            self.assertEqual(counter.timestamp, expected)
-            self.assertEqual(counter.volume, probe['w'])
+            self.assertEqual(sample.timestamp, expected)
+            self.assertEqual(sample.volume, probe['w'])
 
 
 class TestPowerPollsterCache(base.TestCase):
@@ -175,7 +175,7 @@ class TestPowerPollsterCache(base.TestCase):
         self.context = context.get_admin_context()
         self.manager = TestManager()
 
-    def test_get_counters_cached(self):
+    def test_get_samples_cached(self):
         probe = {'id': 'A'}
         probe.update(PROBE_DICT['probes']['A'])
         cache = {
@@ -185,5 +185,5 @@ class TestPowerPollsterCache(base.TestCase):
         pollster = kwapi.PowerPollster()
         with mock.patch.object(pollster, '_get_probes') as do_not_call:
             do_not_call.side_effect = AssertionError('should not be called')
-            counters = list(pollster.get_counters(self.manager, cache))
-        self.assertEqual(len(counters), 1)
+            samples = list(pollster.get_samples(self.manager, cache))
+        self.assertEqual(len(samples), 1)

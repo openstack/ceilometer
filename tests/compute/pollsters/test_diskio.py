@@ -42,36 +42,36 @@ class TestDiskPollsters(base.TestPollsterBase):
         self.mox.ReplayAll()
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
-    def _check_get_counters(self, factory, name, expected_volume):
+    def _check_get_samples(self, factory, name, expected_volume):
         pollster = factory()
 
         mgr = manager.AgentManager()
         cache = {}
-        counters = list(pollster.get_counters(mgr, cache, self.instance))
-        assert counters
+        samples = list(pollster.get_samples(mgr, cache, self.instance))
+        assert samples
         assert pollster.CACHE_KEY_DISK in cache
         assert self.instance.name in cache[pollster.CACHE_KEY_DISK]
 
-        self.assertEqual(set([c.name for c in counters]),
+        self.assertEqual(set([s.name for s in samples]),
                          set([name]))
 
-        match = [c for c in counters if c.name == name]
+        match = [s for s in samples if s.name == name]
         self.assertEquals(len(match), 1, 'missing counter %s' % name)
         self.assertEquals(match[0].volume, expected_volume)
         self.assertEquals(match[0].type, 'cumulative')
 
     def test_disk_read_requests(self):
-        self._check_get_counters(disk.ReadRequestsPollster,
-                                 'disk.read.requests', 2L)
+        self._check_get_samples(disk.ReadRequestsPollster,
+                                'disk.read.requests', 2L)
 
     def test_disk_read_bytes(self):
-        self._check_get_counters(disk.ReadBytesPollster,
-                                 'disk.read.bytes', 1L)
+        self._check_get_samples(disk.ReadBytesPollster,
+                                'disk.read.bytes', 1L)
 
     def test_disk_write_requests(self):
-        self._check_get_counters(disk.WriteRequestsPollster,
-                                 'disk.write.requests', 4L)
+        self._check_get_samples(disk.WriteRequestsPollster,
+                                'disk.write.requests', 4L)
 
     def test_disk_write_bytes(self):
-        self._check_get_counters(disk.WriteBytesPollster,
-                                 'disk.write.bytes', 3L)
+        self._check_get_samples(disk.WriteBytesPollster,
+                                'disk.write.bytes', 3L)

@@ -78,7 +78,7 @@ class TestNovaNotifier(base.TestCase):
                                },
         )
 
-        def get_counters(self, manager, cache, instance):
+        def get_samples(self, manager, cache, instance):
             self.instances.append((manager, instance))
             return [self.test_data]
 
