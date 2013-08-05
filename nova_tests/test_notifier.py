@@ -37,6 +37,7 @@ try:
 except ImportError:
     from nova.compute import instance_types as flavors
 
+from nova.objects import instance as nova_instance
 from nova import config
 from nova import context
 from nova import db
@@ -96,7 +97,7 @@ class TestNovaNotifier(base.TestCase):
         self.context = context.get_admin_context()
         fake_network.set_stub_network_methods(self.stubs)
 
-        self.instance = {"name": "instance-1",
+        instance_data = {"display_name": "instance-1",
                          'OS-EXT-SRV-ATTR:instance_name': 'instance-1',
                          "id": 1,
                          "image_ref": "FAKE",
@@ -116,15 +117,23 @@ class TestNovaNotifier(base.TestCase):
                          "availability_zone":
                          "1e3ce043029547f1a61c1996d1a531a4",
                          "created_at": '2012-05-08 20:23:41',
+                         "launched_at": '2012-05-08 20:25:45',
+                         "terminated_at": '2012-05-09 20:23:41',
                          "os_type": "linux",
                          "kernel_id": "kernelid",
                          "ramdisk_id": "ramdiskid",
                          "vm_state": vm_states.ACTIVE,
-                         "access_ip_v4": "someip",
-                         "access_ip_v6": "someip",
+                         "task_state": None,
+                         "access_ip_v4": "192.168.5.4",
+                         "access_ip_v6": "2001:DB8::0",
                          "metadata": {},
                          "uuid": "144e08f4-00cb-11e2-888e-5453ed1bbb5f",
                          "system_metadata": {}}
+
+        self.instance = nova_instance.Instance()
+        for key, value in instance_data.iteritems():
+            setattr(self.instance, key, value)
+
         self.stubs.Set(db, 'instance_info_cache_delete', self.do_nothing)
         self.stubs.Set(db, 'instance_destroy', self.do_nothing)
         self.stubs.Set(db, 'instance_system_metadata_get',
@@ -181,7 +190,7 @@ class TestNovaNotifier(base.TestCase):
         nova_notifier._gatherer = None
 
     def fake_instance_ref_get(self, context, id_):
-        if self.instance['uuid'] == id_:
+        if self.instance.uuid == id_:
             return self.instance
         return {}
 
@@ -203,7 +212,7 @@ class TestNovaNotifier(base.TestCase):
 
     def test_correct_instance(self):
         for i, (gatherer, inst) in enumerate(self.Pollster.instances):
-            self.assertEqual((i, inst.uuid), (i, self.instance['uuid']))
+            self.assertEqual((i, inst.uuid), (i, self.instance.uuid))
 
     def test_correct_gatherer(self):
         for i, (gatherer, inst) in enumerate(self.Pollster.instances):
