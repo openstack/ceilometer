@@ -22,7 +22,7 @@ if [ ! "$COVERAGE_ARGS" ]; then
 fi
 
 # Main unit tests
-MONGO_DATA=`mktemp -d`
+MONGO_DATA=`mktemp -d /tmp/CEILO-MONGODB-XXXXX`
 trap "clean_exit" EXIT
 mkfifo ${MONGO_DATA}/out
 mongod --maxConns 32 --nojournal --noprealloc --smallfiles --quiet --noauth --port 29000 --dbpath "${MONGO_DATA}" --bind_ip localhost &>${MONGO_DATA}/out &
