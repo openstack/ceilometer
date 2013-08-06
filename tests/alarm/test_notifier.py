@@ -71,23 +71,21 @@ class TestAlarmNotifier(base.TestCase):
     def _fake_spawn_n(func, *args, **kwargs):
         func(*args, **kwargs)
 
-    def test_notify_alarm_rest_action(self):
+    def test_notify_alarm_rest_action_ok(self):
         action = 'http://host/action'
         data_json = '{"state": "ALARM", "reason": "what ?"}'
 
-        self.mox.StubOutWithMock(requests, "post")
-        requests.post(action, data=data_json)
-        self.mox.ReplayAll()
-
         with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
-            self.service.notify_alarm(context.get_admin_context(),
-                                      {
-                                          'actions': [action],
-                                          'alarm': {'name': 'foobar'},
-                                          'condition': {'threshold': 42},
-                                          'reason': 'what ?',
-                                          'state': 'ALARM',
-                                      })
+            with mock.patch.object(requests, 'post') as poster:
+                self.service.notify_alarm(context.get_admin_context(),
+                                          {
+                                              'actions': [action],
+                                              'alarm': {'name': 'foobar'},
+                                              'condition': {'threshold': 42},
+                                              'reason': 'what ?',
+                                              'state': 'ALARM',
+                                          })
+                poster.assert_called_with(action, data=data_json)
 
     def test_notify_alarm_rest_action_with_ssl_client_cert(self):
         action = 'https://host/action'
@@ -96,20 +94,19 @@ class TestAlarmNotifier(base.TestCase):
 
         cfg.CONF.set_override("rest_notifier_certificate_file", certificate,
                               group='alarm')
-        self.mox.StubOutWithMock(requests, "post")
-        requests.post(action, data=data_json,
-                      cert=certificate, verify=True)
-        self.mox.ReplayAll()
 
         with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
-            self.service.notify_alarm(context.get_admin_context(),
-                                      {
-                                          'actions': [action],
-                                          'alarm': {'name': 'foobar'},
-                                          'condition': {'threshold': 42},
-                                          'reason': 'what ?',
-                                          'state': 'ALARM',
-                                      })
+            with mock.patch.object(requests, 'post') as poster:
+                self.service.notify_alarm(context.get_admin_context(),
+                                          {
+                                              'actions': [action],
+                                              'alarm': {'name': 'foobar'},
+                                              'condition': {'threshold': 42},
+                                              'reason': 'what ?',
+                                              'state': 'ALARM',
+                                          })
+                poster.assert_called_with(action, data=data_json,
+                                          cert=certificate, verify=True)
 
     def test_notify_alarm_rest_action_with_ssl_client_cert_and_key(self):
         action = 'https://host/action'
@@ -121,20 +118,19 @@ class TestAlarmNotifier(base.TestCase):
                               group='alarm')
         cfg.CONF.set_override("rest_notifier_certificate_key", key,
                               group='alarm')
-        self.mox.StubOutWithMock(requests, "post")
-        requests.post(action, data=data_json,
-                      cert=(certificate, key), verify=True)
-        self.mox.ReplayAll()
 
         with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
-            self.service.notify_alarm(context.get_admin_context(),
-                                      {
-                                          'actions': [action],
-                                          'alarm': {'name': 'foobar'},
-                                          'condition': {'threshold': 42},
-                                          'reason': 'what ?',
-                                          'state': 'ALARM',
-                                      })
+            with mock.patch.object(requests, 'post') as poster:
+                self.service.notify_alarm(context.get_admin_context(),
+                                          {
+                                              'actions': [action],
+                                              'alarm': {'name': 'foobar'},
+                                              'condition': {'threshold': 42},
+                                              'reason': 'what ?',
+                                              'state': 'ALARM',
+                                          })
+                poster.assert_called_with(action, data=data_json,
+                                          cert=(certificate, key), verify=True)
 
     def test_notify_alarm_rest_action_with_ssl_verify_disable_by_cfg(self):
         action = 'https://host/action'
@@ -142,38 +138,36 @@ class TestAlarmNotifier(base.TestCase):
 
         cfg.CONF.set_override("rest_notifier_ssl_verify", False,
                               group='alarm')
-        self.mox.StubOutWithMock(requests, "post")
-        requests.post(action, data=data_json,
-                      verify=False)
-        self.mox.ReplayAll()
 
         with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
-            self.service.notify_alarm(context.get_admin_context(),
-                                      {
-                                          'actions': [action],
-                                          'alarm': {'name': 'foobar'},
-                                          'condition': {'threshold': 42},
-                                          'reason': 'what ?',
-                                          'state': 'ALARM',
-                                      })
+            with mock.patch.object(requests, 'post') as poster:
+                self.service.notify_alarm(context.get_admin_context(),
+                                          {
+                                              'actions': [action],
+                                              'alarm': {'name': 'foobar'},
+                                              'condition': {'threshold': 42},
+                                              'reason': 'what ?',
+                                              'state': 'ALARM',
+                                          })
+                poster.assert_called_with(action, data=data_json,
+                                          verify=False)
 
     def test_notify_alarm_rest_action_with_ssl_verify_disable(self):
         action = 'https://host/action?ceilometer-alarm-ssl-verify=0'
         data_json = '{"state": "ALARM", "reason": "what ?"}'
 
-        self.mox.StubOutWithMock(requests, "post")
-        requests.post(action, data=data_json, verify=False)
-        self.mox.ReplayAll()
-
         with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
-            self.service.notify_alarm(context.get_admin_context(),
-                                      {
-                                          'actions': [action],
-                                          'alarm': {'name': 'foobar'},
-                                          'condition': {'threshold': 42},
-                                          'reason': 'what ?',
-                                          'state': 'ALARM',
-                                      })
+            with mock.patch.object(requests, 'post') as poster:
+                self.service.notify_alarm(context.get_admin_context(),
+                                          {
+                                              'actions': [action],
+                                              'alarm': {'name': 'foobar'},
+                                              'condition': {'threshold': 42},
+                                              'reason': 'what ?',
+                                              'state': 'ALARM',
+                                          })
+                poster.assert_called_with(action, data=data_json,
+                                          verify=False)
 
     def test_notify_alarm_rest_action_with_ssl_verify_enable_by_user(self):
         action = 'https://host/action?ceilometer-alarm-ssl-verify=1'
@@ -181,19 +175,19 @@ class TestAlarmNotifier(base.TestCase):
 
         cfg.CONF.set_override("rest_notifier_ssl_verify", False,
                               group='alarm')
-        self.mox.StubOutWithMock(requests, "post")
-        requests.post(action, data=data_json, verify=True)
-        self.mox.ReplayAll()
 
         with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
-            self.service.notify_alarm(context.get_admin_context(),
-                                      {
-                                          'actions': [action],
-                                          'alarm': {'name': 'foobar'},
-                                          'condition': {'threshold': 42},
-                                          'reason': 'what ?',
-                                          'state': 'ALARM',
-                                      })
+            with mock.patch.object(requests, 'post') as poster:
+                self.service.notify_alarm(context.get_admin_context(),
+                                          {
+                                              'actions': [action],
+                                              'alarm': {'name': 'foobar'},
+                                              'condition': {'threshold': 42},
+                                              'reason': 'what ?',
+                                              'state': 'ALARM',
+                                          })
+                poster.assert_called_with(action, data=data_json,
+                                          verify=True)
 
     @staticmethod
     def _fake_urlsplit(*args, **kwargs):
