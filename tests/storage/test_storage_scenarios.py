@@ -28,9 +28,9 @@ from ceilometer.publisher import rpc
 from ceilometer.openstack.common import timeutils
 from ceilometer import sample
 from ceilometer import storage
-from ceilometer.tests import db as tests_db
 from ceilometer.storage import models
 from ceilometer.storage.base import Pagination
+from ceilometer.tests import db as tests_db
 
 load_tests = testscenarios.load_tests_apply_scenarios
 
@@ -1673,9 +1673,19 @@ class EventTestBase(tests_db.TestBase,
 
 
 class EventTest(EventTestBase):
+    def test_duplicate_message_id(self):
+        now = datetime.datetime.utcnow()
+        m = [models.Event("1", "Foo", now, None),
+             models.Event("1", "Zoo", now, [])]
+        problem_events = self.conn.record_events(m)
+        self.assertEquals(1, len(problem_events))
+        bad = problem_events[0]
+        self.assertEquals(models.Event.DUPLICATE, bad[0])
+
     def test_save_events_no_traits(self):
         now = datetime.datetime.utcnow()
-        m = [models.Event("Foo", now, None), models.Event("Zoo", now, [])]
+        m = [models.Event("1", "Foo", now, None),
+             models.Event("2", "Zoo", now, [])]
         self.conn.record_events(m)
         for model in m:
             self.assertTrue(model.id >= 0)
@@ -1693,7 +1703,8 @@ class EventTest(EventTestBase):
                         ('trait_C', models.Trait.FLOAT_TYPE, 1.23456),
                         ('trait_D', models.Trait.DATETIME_TYPE, now)]]
             event_models.append(
-                models.Event(event_name, now, trait_models))
+                models.Event("id_%s" % event_name,
+                             event_name, now, trait_models))
 
         self.conn.record_events(event_models)
         for model in event_models:
@@ -1719,7 +1730,8 @@ class GetEventTest(EventTestBase):
                             float(base) + 0.123456),
                         ('trait_D', models.Trait.DATETIME_TYPE, now)]]
             event_models.append(
-                models.Event(event_name, now, trait_models))
+                models.Event("id_%s" % event_name,
+                             event_name, now, trait_models))
             base += 100
             now = now + datetime.timedelta(hours=1)
         self.end = now

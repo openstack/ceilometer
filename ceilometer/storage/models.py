@@ -48,23 +48,34 @@ class Event(Model):
 
        Metrics will be derived from one or more Events.
     """
-    def __init__(self, event_name, generated, traits):
+
+    DUPLICATE = 1
+    UNKNOWN_PROBLEM = 2
+
+    def __init__(self, message_id, event_name, generated, traits):
         """Create a new event.
 
+        :param message_id:  Unique ID for the message this event
+                            stemmed from. This is different than
+                            the Event ID, which comes from the
+                            underlying storage system.
         :param event_name:  Name of the event.
         :param generated:   UTC time for when the event occured.
         :param traits:      list of Traits on this Event.
         """
-        Model.__init__(self, event_name=event_name, generated=generated,
-                       traits=traits)
+        Model.__init__(self, message_id=message_id, event_name=event_name,
+                       generated=generated, traits=traits)
 
     def append_trait(self, trait_model):
         self.traits.append(trait_model)
 
     def __repr__(self):
-        trait_list = [str(trait) for trait in self.traits]
-        return "<Event: %s, %s %s>" % \
-            (self.event_name, self.generated, " ".join(trait_list))
+        trait_list = []
+        if self.traits:
+            trait_list = [str(trait) for trait in self.traits]
+        return "<Event: %s, %s, %s, %s>" % \
+            (self.message_id, self.event_name, self.generated,
+             " ".join(trait_list))
 
 
 class Trait(Model):

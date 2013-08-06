@@ -64,8 +64,7 @@ class DatabaseDispatcher(dispatcher.Base):
                         meter['timestamp'] = timeutils.normalize_time(ts)
                     self.storage_conn.record_metering_data(meter)
                 except Exception as err:
-                    LOG.error('Failed to record metering data: %s', err)
-                    LOG.exception(err)
+                    LOG.exception('Failed to record metering data: %s', err)
             else:
                 LOG.warning(
                     'message signature invalid, discarding message: %r',
@@ -74,4 +73,5 @@ class DatabaseDispatcher(dispatcher.Base):
     def record_events(self, events):
         if not isinstance(events, list):
             events = [events]
-        self.storage_conn.record_events(events)
+
+        return self.storage_conn.record_events(events)

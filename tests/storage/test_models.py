@@ -50,3 +50,7 @@ class ModelTest(base.TestCase):
         self.assertEqual(d, {'arg1': 1,
                              'arg2': [{'arg1': 'a',
                                        'arg2': 'b'}]})
+
+    def test_event_repr_no_traits(self):
+        x = models.Event("1", "name", "now", None)
+        self.assertEquals("<Event: 1, name, now, >", repr(x))

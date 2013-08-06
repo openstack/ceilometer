@@ -28,12 +28,13 @@ from oslo.config import cfg
 from stevedore import extension
 from stevedore.tests import manager as test_manager
 
-from ceilometer import sample
-from ceilometer.openstack.common import timeutils
 from ceilometer.collector import service
-from ceilometer.storage import base
-from ceilometer.tests import base as tests_base
 from ceilometer.compute import notifications
+from ceilometer.openstack.common import timeutils
+from ceilometer import sample
+from ceilometer.storage import base
+from ceilometer.storage import models
+from ceilometer.tests import base as tests_base
 
 
 TEST_NOTICE = {
@@ -224,7 +225,9 @@ class TestCollectorService(TestCollector):
     def test_message_to_event_missing_keys(self):
         now = timeutils.utcnow()
         timeutils.set_time_override(now)
-        message = {'event_type': "foo", 'message_id': "abc"}
+        message = {'event_type': "foo",
+                   'message_id': "abc",
+                   'publisher_id': "1"}
 
         mock_dispatcher = MagicMock()
         self.srv.dispatcher_manager = test_manager.TestExtensionManager(
@@ -245,7 +248,7 @@ class TestCollectorService(TestCollector):
         self.assertEqual(now, event.generated)
         self.assertEqual(1, len(event.traits))
 
-    def test_message_to_event_bad_save(self):
+    def test_message_to_event_duplicate(self):
         cfg.CONF.set_override("store_events", True, group="collector")
         mock_dispatcher = MagicMock()
         self.srv.dispatcher_manager = test_manager.TestExtensionManager(
@@ -255,13 +258,26 @@ class TestCollectorService(TestCollector):
                                  mock_dispatcher
                                  ),
              ])
-        mock_dispatcher.record_events.side_effect = MyException("Boom")
+        mock_dispatcher.record_events.return_value = [
+            (models.Event.DUPLICATE, object())]
         message = {'event_type': "foo", 'message_id': "abc"}
-        try:
-            self.srv._message_to_event(message)
-            self.fail("failing save should raise")
-        except Exception:
-            pass
+        self.srv._message_to_event(message)  # Should return silently.
+
+    def test_message_to_event_bad_event(self):
+        cfg.CONF.set_override("store_events", True, group="collector")
+        mock_dispatcher = MagicMock()
+        self.srv.dispatcher_manager = test_manager.TestExtensionManager(
+            [extension.Extension('test',
+                                 None,
+                                 None,
+                                 mock_dispatcher
+                                 ),
+             ])
+        mock_dispatcher.record_events.return_value = [
+            (models.Event.UNKNOWN_PROBLEM, object())]
+        message = {'event_type': "foo", 'message_id': "abc"}
+        self.assertRaises(service.UnableToSaveEventException,
+                          self.srv._message_to_event, message)
 
     def test_extract_when(self):
         now = timeutils.utcnow()

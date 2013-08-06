@@ -17,13 +17,13 @@
 # under the License.
 """Tests for ceilometer/collector/dispatcher/database.py
 """
-from oslo.config import cfg
 from datetime import datetime
+from oslo.config import cfg
 
 from ceilometer.collector.dispatcher import database
 from ceilometer.publisher import rpc
-from ceilometer.tests import base as tests_base
 from ceilometer.storage import base
+from ceilometer.tests import base as tests_base
 
 
 class TestDispatcherDB(tests_base.TestCase):

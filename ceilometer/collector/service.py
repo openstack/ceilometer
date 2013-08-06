@@ -21,7 +21,6 @@ from oslo.config import cfg
 import socket
 from stevedore import extension
 from stevedore import named
-import sys
 
 from ceilometer.service import prepare_service
 from ceilometer.openstack.common import context
@@ -106,6 +105,15 @@ class UDPCollectorService(os_service.Service):
 def udp_collector():
     prepare_service()
     os_service.launch(UDPCollectorService()).wait()
+
+
+class UnableToSaveEventException(Exception):
+    """Thrown when we want to requeue an event.
+
+    Any exception is fine, but this one should make debugging
+    a little easier.
+    """
+    pass
 
 
 class CollectorService(rpc_service.Service):
@@ -213,41 +221,32 @@ class CollectorService(rpc_service.Service):
         delivery_info, which is critical to determining the
         source of the notification. This will have to get added back later.
         """
+        message_id = body.get('message_id')
         event_name = body['event_type']
         when = self._extract_when(body)
-
         LOG.debug('Saving event "%s"', event_name)
 
-        message_id = body.get('message_id')
-
-        # TODO(sandy) - check we have not already saved this notification.
-        #               (possible on retries) Use message_id to spot dups.
         publisher = body.get('publisher_id')
         request_id = body.get('_context_request_id')
         tenant_id = body.get('_context_tenant')
 
         text = models.Trait.TEXT_TYPE
-        all_traits = [models.Trait('message_id', text, message_id),
-                      models.Trait('service', text, publisher),
+        all_traits = [models.Trait('service', text, publisher),
                       models.Trait('request_id', text, request_id),
                       models.Trait('tenant_id', text, tenant_id),
                       ]
         # Only store non-None value traits ...
         traits = [trait for trait in all_traits if trait.value is not None]
 
-        event = models.Event(event_name, when, traits)
+        event = models.Event(message_id, event_name, when, traits)
 
-        exc_info = None
+        problem_events = []
         for dispatcher in self.dispatcher_manager:
-            try:
-                dispatcher.obj.record_events(event)
-            except Exception:
-                LOG.exception('Error while saving events with dispatcher %s',
-                              dispatcher)
-                exc_info = sys.exc_info()
-        # Don't ack the message if any of the dispatchers fail
-        if exc_info:
-            raise exc_info[1], None, exc_info[2]
+            problem_events.extend(dispatcher.obj.record_events(event))
+        if models.Event.UNKNOWN_PROBLEM in [x[0] for x in problem_events]:
+            # Don't ack the message, raise to requeue it
+            # if ack_on_error = False
+            raise UnableToSaveEventException()
 
     @staticmethod
     def _record_metering_data_for_ext(ext, context, data):

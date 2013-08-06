@@ -26,10 +26,11 @@ from sqlalchemy import func
 from sqlalchemy import desc
 from sqlalchemy.orm import aliased
 
+from ceilometer.openstack.common.db import exception as dbexc
+import ceilometer.openstack.common.db.sqlalchemy.session as sqlalchemy_session
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
-import ceilometer.openstack.common.db.sqlalchemy.session as sqlalchemy_session
 from ceilometer.storage import base
 from ceilometer.storage import models as api_models
 from ceilometer.storage.sqlalchemy import migration
@@ -685,7 +686,7 @@ class Connection(base.Connection):
                                                      session=session)
 
             generated = utils.dt_to_decimal(event_model.generated)
-            event = Event(unique, generated)
+            event = Event(event_model.message_id, unique, generated)
             session.add(event)
 
             new_traits = []
@@ -704,22 +705,39 @@ class Connection(base.Connection):
 
         :param event_models: a list of model.Event objects.
 
-        Flush when they're all added, unless new UniqueNames are
-        added along the way.
+        Returns a list of events that could not be saved in a
+        (reason, event) tuple. Reasons are enumerated in
+        storage.model.Event
         """
         session = sqlalchemy_session.get_session()
-        with session.begin():
-            events = [self._record_event(session, event_model)
-                      for event_model in event_models]
-            session.flush()
+        events = []
+        problem_events = []
+        for event_model in event_models:
+            event = None
+            try:
+                with session.begin():
+                    event = self._record_event(session, event_model)
+                    session.flush()
+            except dbexc.DBDuplicateEntry:
+                problem_events.append((api_models.Event.DUPLICATE,
+                                       event_model))
+            except Exception as e:
+                LOG.exception('Failed to record event: %s', e)
+                problem_events.append((api_models.Event.UNKNOWN_PROBLEM,
+                                       event_model))
+            events.append(event)
 
         # Update the models with the underlying DB ID.
         for model, actual in zip(event_models, events):
+            if not actual:
+                continue
             actual_event, actual_traits = actual
             model.id = actual_event.id
             if model.traits and actual_traits:
                 for trait, actual_trait in zip(model.traits, actual_traits):
                     trait.id = actual_trait.id
+
+        return problem_events
 
     def get_events(self, event_filter):
         """Return an iterable of model.Event objects.
@@ -765,7 +783,8 @@ class Connection(base.Connection):
                 event = event_models_dict.get(trait.event_id)
                 if not event:
                     generated = utils.decimal_to_dt(trait.event.generated)
-                    event = api_models.Event(trait.event.unique_name.key,
+                    event = api_models.Event(trait.event.message_id,
+                                             trait.event.unique_name.key,
                                              generated, [])
                     event_models_dict[trait.event_id] = event
                 value = trait.get_value()

@@ -83,3 +83,4 @@ class FileDispatcher(dispatcher.Base):
     def record_events(self, events):
         if self.log:
             self.log.info(events)
+        return []

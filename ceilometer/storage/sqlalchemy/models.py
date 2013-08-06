@@ -226,22 +226,25 @@ class Event(Base):
     __tablename__ = 'event'
     __table_args__ = (
         Index('unique_name_id', 'unique_name_id'),
+        Index('ix_event_message_id', 'message_id'),
         Index('ix_event_generated', 'generated'),
     )
     id = Column(Integer, primary_key=True)
+    message_id = Column(String(50), unique=True)
     generated = Column(Float(asdecimal=True))
 
     unique_name_id = Column(Integer, ForeignKey('unique_name.id'))
     unique_name = relationship("UniqueName", backref=backref('unique_name',
                                order_by=id))
 
-    def __init__(self, event, generated):
+    def __init__(self, message_id, event, generated):
+        self.message_id = message_id
         self.unique_name = event
         self.generated = generated
 
     def __repr__(self):
-        return "<Event %d('Event: %s, Generated: %s')>" % \
-               (self.id, self.unique_name, self.generated)
+        return "<Event %d('Event: %s %s, Generated: %s')>" % \
+               (self.id, self.message_id, self.unique_name, self.generated)
 
 
 class Trait(Base):

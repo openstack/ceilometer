@@ -24,6 +24,7 @@
 """
 
 import datetime
+from mock import patch
 
 from ceilometer.storage import models
 from ceilometer.storage.sqlalchemy.models import table_args
@@ -54,6 +55,10 @@ class UniqueNameTest(EventTestBase):
         u2 = self.conn._get_or_create_unique_name("blah")
         self.assertNotEqual(u1.id, u2.id)
         self.assertNotEqual(u1.key, u2.key)
+
+
+class MyException(Exception):
+    pass
 
 
 class EventTest(EventTestBase):
@@ -97,6 +102,18 @@ class EventTest(EventTestBase):
         self.assertIsNone(trait.t_float)
         self.assertEqual(trait.t_datetime, utils.dt_to_decimal(now))
         self.assertIsNotNone(trait.name)
+
+    def test_bad_event(self):
+        now = datetime.datetime.utcnow()
+        m = [models.Event("1", "Foo", now, []),
+             models.Event("2", "Zoo", now, [])]
+
+        with patch.object(self.conn, "_record_event") as mock_save:
+            mock_save.side_effect = MyException("Boom")
+            problem_events = self.conn.record_events(m)
+        self.assertEquals(2, len(problem_events))
+        for bad, event in problem_events:
+            self.assertEquals(models.Event.UNKNOWN_PROBLEM, bad)
 
 
 class ModelTest(tests_db.TestBase):
