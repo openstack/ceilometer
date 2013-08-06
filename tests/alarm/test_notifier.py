@@ -43,7 +43,7 @@ class TestAlarmNotifier(base.TestCase):
     def test_notify_alarm(self):
         data = {
             'actions': ['test://'],
-            'alarm': {'name': 'foobar'},
+            'alarm': 'foobar',
             'state': 'ALARM',
             'reason': 'Everything is on fire',
         }
@@ -63,7 +63,7 @@ class TestAlarmNotifier(base.TestCase):
         self.service.notify_alarm(context.get_admin_context(),
                                   {
                                       'actions': ['log://'],
-                                      'alarm': {'name': 'foobar'},
+                                      'alarm': 'foobar',
                                       'condition': {'threshold': 42},
                                   })
 
@@ -73,14 +73,14 @@ class TestAlarmNotifier(base.TestCase):
 
     def test_notify_alarm_rest_action_ok(self):
         action = 'http://host/action'
-        data_json = '{"state": "ALARM", "reason": "what ?"}'
+        data_json = '{"reason": "what ?", "alarm": "foobar", "state": "ALARM"}'
 
         with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
             with mock.patch.object(requests, 'post') as poster:
                 self.service.notify_alarm(context.get_admin_context(),
                                           {
                                               'actions': [action],
-                                              'alarm': {'name': 'foobar'},
+                                              'alarm': 'foobar',
                                               'condition': {'threshold': 42},
                                               'reason': 'what ?',
                                               'state': 'ALARM',
@@ -90,7 +90,7 @@ class TestAlarmNotifier(base.TestCase):
     def test_notify_alarm_rest_action_with_ssl_client_cert(self):
         action = 'https://host/action'
         certificate = "/etc/ssl/cert/whatever.pem"
-        data_json = '{"state": "ALARM", "reason": "what ?"}'
+        data_json = '{"reason": "what ?", "alarm": "foobar", "state": "ALARM"}'
 
         cfg.CONF.set_override("rest_notifier_certificate_file", certificate,
                               group='alarm')
@@ -100,7 +100,7 @@ class TestAlarmNotifier(base.TestCase):
                 self.service.notify_alarm(context.get_admin_context(),
                                           {
                                               'actions': [action],
-                                              'alarm': {'name': 'foobar'},
+                                              'alarm': 'foobar',
                                               'condition': {'threshold': 42},
                                               'reason': 'what ?',
                                               'state': 'ALARM',
@@ -112,7 +112,7 @@ class TestAlarmNotifier(base.TestCase):
         action = 'https://host/action'
         certificate = "/etc/ssl/cert/whatever.pem"
         key = "/etc/ssl/cert/whatever.key"
-        data_json = '{"state": "ALARM", "reason": "what ?"}'
+        data_json = '{"reason": "what ?", "alarm": "foobar", "state": "ALARM"}'
 
         cfg.CONF.set_override("rest_notifier_certificate_file", certificate,
                               group='alarm')
@@ -124,7 +124,7 @@ class TestAlarmNotifier(base.TestCase):
                 self.service.notify_alarm(context.get_admin_context(),
                                           {
                                               'actions': [action],
-                                              'alarm': {'name': 'foobar'},
+                                              'alarm': 'foobar',
                                               'condition': {'threshold': 42},
                                               'reason': 'what ?',
                                               'state': 'ALARM',
@@ -134,7 +134,7 @@ class TestAlarmNotifier(base.TestCase):
 
     def test_notify_alarm_rest_action_with_ssl_verify_disable_by_cfg(self):
         action = 'https://host/action'
-        data_json = '{"state": "ALARM", "reason": "what ?"}'
+        data_json = '{"reason": "what ?", "alarm": "foobar", "state": "ALARM"}'
 
         cfg.CONF.set_override("rest_notifier_ssl_verify", False,
                               group='alarm')
@@ -144,7 +144,7 @@ class TestAlarmNotifier(base.TestCase):
                 self.service.notify_alarm(context.get_admin_context(),
                                           {
                                               'actions': [action],
-                                              'alarm': {'name': 'foobar'},
+                                              'alarm': 'foobar',
                                               'condition': {'threshold': 42},
                                               'reason': 'what ?',
                                               'state': 'ALARM',
@@ -154,14 +154,14 @@ class TestAlarmNotifier(base.TestCase):
 
     def test_notify_alarm_rest_action_with_ssl_verify_disable(self):
         action = 'https://host/action?ceilometer-alarm-ssl-verify=0'
-        data_json = '{"state": "ALARM", "reason": "what ?"}'
+        data_json = '{"reason": "what ?", "alarm": "foobar", "state": "ALARM"}'
 
         with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
             with mock.patch.object(requests, 'post') as poster:
                 self.service.notify_alarm(context.get_admin_context(),
                                           {
                                               'actions': [action],
-                                              'alarm': {'name': 'foobar'},
+                                              'alarm': 'foobar',
                                               'condition': {'threshold': 42},
                                               'reason': 'what ?',
                                               'state': 'ALARM',
@@ -171,7 +171,7 @@ class TestAlarmNotifier(base.TestCase):
 
     def test_notify_alarm_rest_action_with_ssl_verify_enable_by_user(self):
         action = 'https://host/action?ceilometer-alarm-ssl-verify=1'
-        data_json = '{"state": "ALARM", "reason": "what ?"}'
+        data_json = '{"reason": "what ?", "alarm": "foobar", "state": "ALARM"}'
 
         cfg.CONF.set_override("rest_notifier_ssl_verify", False,
                               group='alarm')
@@ -181,7 +181,7 @@ class TestAlarmNotifier(base.TestCase):
                 self.service.notify_alarm(context.get_admin_context(),
                                           {
                                               'actions': [action],
-                                              'alarm': {'name': 'foobar'},
+                                              'alarm': 'foobar',
                                               'condition': {'threshold': 42},
                                               'reason': 'what ?',
                                               'state': 'ALARM',
@@ -202,7 +202,7 @@ class TestAlarmNotifier(base.TestCase):
                     context.get_admin_context(),
                     {
                         'actions': ['no-such-action-i-am-sure'],
-                        'alarm': {'name': 'foobar'},
+                        'alarm': 'foobar',
                         'condition': {'threshold': 42},
                     })
                 self.assertTrue(LOG.error.called)
@@ -214,7 +214,7 @@ class TestAlarmNotifier(base.TestCase):
                 context.get_admin_context(),
                 {
                     'actions': ['no-such-action-i-am-sure://'],
-                    'alarm': {'name': 'foobar'},
+                    'alarm': 'foobar',
                     'condition': {'threshold': 42},
                 })
             self.assertTrue(LOG.error.called)

@@ -56,7 +56,7 @@ class RestAlarmNotifier(notifier.AlarmNotifier):
     def notify(action, alarm, state, reason):
         LOG.info("Notifying alarm %s in state %s with action %s because %s",
                  alarm, state, action, reason)
-        body = {'state': state, 'reason': reason}
+        body = {'alarm': alarm, 'state': state, 'reason': reason}
         kwargs = {'data': jsonutils.dumps(body)}
 
         if action.scheme == 'https':
