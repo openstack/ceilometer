@@ -22,7 +22,6 @@ import hashlib
 import hmac
 import itertools
 import operator
-import uuid
 import urlparse
 
 from oslo.config import cfg
@@ -101,7 +100,7 @@ def meter_message_from_counter(counter, secret):
            'resource_id': counter.resource_id,
            'timestamp': counter.timestamp,
            'resource_metadata': counter.resource_metadata,
-           'message_id': str(uuid.uuid1()),
+           'message_id': counter.id,
            }
     msg['message_signature'] = compute_signature(msg, secret)
     return msg
