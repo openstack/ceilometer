@@ -734,7 +734,7 @@ class ResourcesController(rest.RestController):
 
 
 class Alarm(_Base):
-    """One category of measurements.
+    """Representation of an alarm.
     """
 
     alarm_id = wtypes.text
@@ -826,8 +826,66 @@ class Alarm(_Base):
                    )
 
 
+class AlarmController(rest.RestController):
+    """Manages operations on a single alarm.
+    """
+    def __init__(self, alarm_id):
+        pecan.request.context['alarm_id'] = alarm_id
+        self._id = alarm_id
+
+    def _alarm(self):
+        self.conn = pecan.request.storage_conn
+        auth_project = acl.get_limited_to_project(pecan.request.headers)
+        alarms = list(self.conn.get_alarms(alarm_id=self._id,
+                                           project=auth_project))
+        # FIXME (flwang): Need to change this to return a 404 error code when
+        # we get a release of WSME that supports it.
+        if len(alarms) < 1:
+            error = _("Unknown alarm")
+            pecan.response.translatable_error = error
+            raise wsme.exc.ClientSideError(error)
+        return alarms[0]
+
+    @wsme_pecan.wsexpose(Alarm, wtypes.text)
+    def get(self):
+        """Return this alarm."""
+        return Alarm.from_db_model(self._alarm())
+
+    @wsme.validate(Alarm)
+    @wsme_pecan.wsexpose(Alarm, wtypes.text, body=Alarm)
+    def put(self, data):
+        """Modify this alarm."""
+        # merge the new values from kwargs into the current
+        # alarm "alarm_in".
+        alarm_in = self._alarm()
+        data.state_timestamp = wsme.Unset
+        data.alarm_id = self._id
+        kwargs = data.as_dict(storage.models.Alarm)
+        for k, v in kwargs.iteritems():
+            setattr(alarm_in, k, v)
+            if k == 'state':
+                alarm_in.state_timestamp = timeutils.utcnow()
+
+        alarm = self.conn.update_alarm(alarm_in)
+        return Alarm.from_db_model(alarm)
+
+    @wsme_pecan.wsexpose(None, wtypes.text, status_code=204)
+    def delete(self):
+        """Delete this alarm."""
+        # ensure alarm exists before deleting
+        alarm_id = self._alarm().alarm_id
+        self.conn.delete_alarm(alarm_id)
+
+
 class AlarmsController(rest.RestController):
-    """Works on alarms."""
+    """Manages operations on the alarms collection.
+    """
+
+    @pecan.expose()
+    def _lookup(self, alarm_id, *remainder):
+        if remainder and not remainder[-1]:
+            remainder = remainder[:-1]
+        return AlarmController(alarm_id), remainder
 
     @wsme.validate(Alarm)
     @wsme_pecan.wsexpose(Alarm, body=Alarm, status_code=201)
@@ -860,64 +918,6 @@ class AlarmsController(rest.RestController):
 
         alarm = conn.update_alarm(alarm_in)
         return Alarm.from_db_model(alarm)
-
-    @wsme.validate(Alarm)
-    @wsme_pecan.wsexpose(Alarm, wtypes.text, body=Alarm)
-    def put(self, alarm_id, data):
-        """Modify an alarm."""
-        conn = pecan.request.storage_conn
-        data.state_timestamp = wsme.Unset
-        data.alarm_id = alarm_id
-        auth_project = acl.get_limited_to_project(pecan.request.headers)
-
-        alarms = list(conn.get_alarms(alarm_id=alarm_id,
-                                      project=auth_project))
-        if len(alarms) < 1:
-            error = _("Unknown alarm")
-            pecan.response.translatable_error = error
-            raise wsme.exc.ClientSideError(error)
-
-        # merge the new values from kwargs into the current
-        # alarm "alarm_in".
-        alarm_in = alarms[0]
-        kwargs = data.as_dict(storage.models.Alarm)
-        for k, v in kwargs.iteritems():
-            setattr(alarm_in, k, v)
-            if k == 'state':
-                alarm_in.state_timestamp = timeutils.utcnow()
-
-        alarm = conn.update_alarm(alarm_in)
-        return Alarm.from_db_model(alarm)
-
-    @wsme_pecan.wsexpose(None, wtypes.text, status_code=204)
-    def delete(self, alarm_id):
-        """Delete an alarm."""
-        conn = pecan.request.storage_conn
-        auth_project = acl.get_limited_to_project(pecan.request.headers)
-        alarms = list(conn.get_alarms(alarm_id=alarm_id,
-                                      project=auth_project))
-        if len(alarms) < 1:
-            error = _("Unknown alarm")
-            pecan.response.translatable_error = error
-            raise wsme.exc.ClientSideError(error)
-
-        conn.delete_alarm(alarm_id)
-
-    @wsme_pecan.wsexpose(Alarm, wtypes.text)
-    def get_one(self, alarm_id):
-        """Return one alarm."""
-        conn = pecan.request.storage_conn
-        auth_project = acl.get_limited_to_project(pecan.request.headers)
-        alarms = list(conn.get_alarms(alarm_id=alarm_id,
-                                      project=auth_project))
-        # FIXME (flwang): Need to change this to return a 404 error code when
-        # we get a release of WSME that supports it.
-        if len(alarms) < 1:
-            error = _("Unknown alarm")
-            pecan.response.translatable_error = error
-            raise wsme.exc.ClientSideError(error)
-
-        return Alarm.from_db_model(alarms[0])
 
     @wsme_pecan.wsexpose([Alarm], [Query])
     def get_all(self, q=[]):
