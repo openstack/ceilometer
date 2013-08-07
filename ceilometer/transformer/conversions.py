@@ -74,7 +74,7 @@ class ScalingTransformer(transformer.TransformerBase):
         """Apply the scaling factor (either a straight multiplicative
            factor or else a string to be eval'd).
         """
-        ns = Namespace(counter._asdict())
+        ns = Namespace(counter.as_dict())
 
         return ((eval(scale, {}, ns) if isinstance(scale, basestring)
                  else counter.volume * scale) if scale else counter.volume)
@@ -95,7 +95,7 @@ class ScalingTransformer(transformer.TransformerBase):
             resource_metadata=counter.resource_metadata
         )
 
-    def handle_sample(self, context, counter, source):
+    def handle_sample(self, context, counter):
         """Handle a sample, converting if necessary."""
         LOG.debug('handling counter %s', (counter,))
         if (self.source.get('unit', counter.unit) == counter.unit):
@@ -117,7 +117,7 @@ class RateOfChangeTransformer(ScalingTransformer):
         self.cache = {}
         super(RateOfChangeTransformer, self).__init__(**kwargs)
 
-    def handle_sample(self, context, counter, source):
+    def handle_sample(self, context, counter):
         """Handle a sample, converting if necessary."""
         LOG.debug('handling counter %s', (counter,))
         key = counter.name + counter.resource_id

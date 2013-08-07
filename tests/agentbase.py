@@ -71,15 +71,42 @@ class BaseAgentManagerTestCase(base.TestCase):
 
     class PollsterAnother(TestPollster):
         counters = []
-        test_data = default_test_data._replace(name='testanother')
+        test_data = sample.Sample(
+            name='testanother',
+            type=default_test_data.type,
+            unit=default_test_data.unit,
+            volume=default_test_data.volume,
+            user_id=default_test_data.user_id,
+            project_id=default_test_data.project_id,
+            resource_id=default_test_data.resource_id,
+            timestamp=default_test_data.timestamp,
+            resource_metadata=default_test_data.resource_metadata)
 
     class PollsterException(TestPollsterException):
         counters = []
-        test_data = default_test_data._replace(name='testexception')
+        test_data = sample.Sample(
+            name='testexception',
+            type=default_test_data.type,
+            unit=default_test_data.unit,
+            volume=default_test_data.volume,
+            user_id=default_test_data.user_id,
+            project_id=default_test_data.project_id,
+            resource_id=default_test_data.resource_id,
+            timestamp=default_test_data.timestamp,
+            resource_metadata=default_test_data.resource_metadata)
 
     class PollsterExceptionAnother(TestPollsterException):
         counters = []
-        test_data = default_test_data._replace(name='testexceptionanother')
+        test_data = sample.Sample(
+            name='testexceptionanother',
+            type=default_test_data.type,
+            unit=default_test_data.unit,
+            volume=default_test_data.volume,
+            user_id=default_test_data.user_id,
+            project_id=default_test_data.project_id,
+            resource_id=default_test_data.resource_id,
+            timestamp=default_test_data.timestamp,
+            resource_metadata=default_test_data.resource_metadata)
 
     def setup_pipeline(self):
         self.transformer_manager = transformer.TransformerExtensionManager(

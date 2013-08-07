@@ -87,8 +87,7 @@ pipeline_manager = pipeline.setup_pipeline(
     ),
 )
 
-with pipeline_manager.publisher(context.get_admin_context(),
-                                cfg.CONF.sample_source) as p:
+with pipeline_manager.publisher(context.get_admin_context()) as p:
     p([sample.Sample(
         name=cfg.CONF.counter_name,
         type=cfg.CONF.counter_type,

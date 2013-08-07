@@ -41,17 +41,15 @@ class UDPPublisher(publisher.PublisherBase):
         self.socket = socket.socket(socket.AF_INET,
                                     socket.SOCK_DGRAM)
 
-    def publish_counters(self, context, counters, source):
+    def publish_counters(self, context, counters):
         """Send a metering message for publishing
 
         :param context: Execution context from the service or RPC call
         :param counter: Counter from pipeline after transformation
-        :param source: counter source
         """
 
         for counter in counters:
-            msg = counter._asdict()
-            msg['source'] = source
+            msg = counter.as_dict()
             host = self.host
             port = self.port
             LOG.debug(_("Publishing counter %(msg)s over UDP to "

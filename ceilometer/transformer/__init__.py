@@ -53,18 +53,16 @@ class TransformerBase(object):
         super(TransformerBase, self).__init__()
 
     @abc.abstractmethod
-    def handle_sample(self, context, counter, source):
+    def handle_sample(self, context, counter):
         """Transform a counter.
 
         :param context: Passed from the data collector.
         :param counter: A counter.
-        :param source: Passed from data collector.
         """
 
-    def flush(self, context, source):
+    def flush(self, context):
         """Flush counters cached previously.
 
         :param context: Passed from the data collector.
-        :param source: Source of counters that are being published.
         """
         return []

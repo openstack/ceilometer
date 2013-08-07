@@ -115,7 +115,7 @@ class TestUDPCollectorService(TestCollector):
     def setUp(self):
         super(TestUDPCollectorService, self).setUp()
         self.srv = service.UDPCollectorService()
-        self.counter = dict(sample.Sample(
+        self.counter = sample.Sample(
             name='foobar',
             type='bad',
             unit='F',
@@ -125,7 +125,7 @@ class TestUDPCollectorService(TestCollector):
             resource_id='cat',
             timestamp='NOW!',
             resource_metadata={},
-        )._asdict())
+        ).as_dict()
 
     def test_service_has_storage_conn(self):
         srv = service.UDPCollectorService()
