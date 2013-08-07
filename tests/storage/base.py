@@ -331,9 +331,9 @@ class ResourceTestPagination(DBTestBase):
 
     def test_get_resources_paginate(self):
         marker_pairs = {'user_id': 'user-id-4'}
-        results = self.conn.get_meters(limit=3, marker_pairs=marker_pairs,
-                                       sort_key='user_id',
-                                       sort_dir='asc')
+        results = self.conn.get_resources(limit=3, marker_pairs=marker_pairs,
+                                          sort_key='user_id',
+                                          sort_dir='asc')
         self.assertEquals(['user-id-5', 'user-id-6', 'user-id-7'],
                           [i.user_id for i in results])
 
@@ -419,10 +419,10 @@ class MeterTestPagination(DBTestBase):
                           [i.user_id for i in results])
 
         marker_pairs = {'user_id': 'user-id-4'}
-        results = list(self.conn.get_resources(limit=2,
-                                               marker_pairs=marker_pairs,
-                                               sort_key='user_id',
-                                               sort_dir='desc'))
+        results = list(self.conn.get_meters(limit=2,
+                                            marker_pairs=marker_pairs,
+                                            sort_key='user_id',
+                                            sort_dir='desc'))
         self.assertEquals(['user-id-3', 'user-id-2'],
                           [i.user_id for i in results])
 
