@@ -45,6 +45,40 @@ def iter_period(start, end, period):
         period_start = next_start
 
 
+def _handle_sort_key(model_name, sort_key=None):
+    """Generate sort keys according to the passed in sort key from user.
+
+    :param model_name: Database model name be query.(alarm, meter, etc.)
+    :param sort_key: sort key passed from user.
+    return: sort keys list
+    """
+    sort_keys_extra = {'alarm': ['name', 'user_id', 'project_id'],
+                       'meter': ['user_id', 'project_id'],
+                       'resource': ['user_id', 'project_id'],
+                       }
+
+    sort_keys = sort_keys_extra[model_name]
+    if not sort_key:
+        return sort_keys
+    # NOTE(Fengqian): We need to put the sort key from user
+    #in the first place of sort keys list.
+    try:
+        sort_keys.remove(sort_key)
+    except ValueError:
+        pass
+    finally:
+        sort_keys.insert(0, sort_key)
+    return sort_keys
+
+
+class MultipleResultsFound(Exception):
+    pass
+
+
+class NoResultFound(Exception):
+    pass
+
+
 class StorageEngine(object):
     """Base class for storage engines."""
 
