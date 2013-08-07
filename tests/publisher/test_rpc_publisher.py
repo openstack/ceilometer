@@ -119,20 +119,19 @@ class TestCounter(base.TestCase):
                                  project_id='project',
                                  resource_id=2,
                                  timestamp='today',
-                                 resource_metadata={'key': 'value'})
+                                 resource_metadata={'key': 'value'},
+                                 source='rpc')
 
     def test_meter_message_from_counter_signed(self):
         msg = rpc.meter_message_from_counter(self.TEST_COUNTER,
-                                             'not-so-secret',
-                                             'src')
+                                             'not-so-secret')
         self.assertIn('message_signature', msg)
 
     def test_meter_message_from_counter_field(self):
         def compare(f, c, msg_f, msg):
             self.assertEqual(msg, c)
         msg = rpc.meter_message_from_counter(self.TEST_COUNTER,
-                                             'not-so-secret',
-                                             'src')
+                                             'not-so-secret')
         name_map = {'name': 'counter_name',
                     'type': 'counter_type',
                     'unit': 'counter_unit',

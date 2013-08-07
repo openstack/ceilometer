@@ -60,7 +60,8 @@ class TestListMeters(FunctionalTest,
                     'resource-id',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 40),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter'}),
+                                       'tag': 'self.counter'},
+                    source='test_source'),
                 sample.Sample(
                     'meter.test',
                     'cumulative',
@@ -71,7 +72,8 @@ class TestListMeters(FunctionalTest,
                     'resource-id',
                     timestamp=datetime.datetime(2012, 7, 2, 11, 40),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter1'}),
+                                       'tag': 'self.counter1'},
+                    source='test_source'),
                 sample.Sample(
                     'meter.mine',
                     'gauge',
@@ -82,7 +84,8 @@ class TestListMeters(FunctionalTest,
                     'resource-id2',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 41),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter2'}),
+                                       'tag': 'self.counter2'},
+                    source='test_source'),
                 sample.Sample(
                     'meter.test',
                     'cumulative',
@@ -93,7 +96,8 @@ class TestListMeters(FunctionalTest,
                     'resource-id3',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 42),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter3'}),
+                                       'tag': 'self.counter3'},
+                    source='test_source'),
                 sample.Sample(
                     'meter.mine',
                     'gauge',
@@ -104,11 +108,11 @@ class TestListMeters(FunctionalTest,
                     'resource-id4',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 43),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter4'})]:
+                                       'tag': 'self.counter4'},
+                    source='test_source')]:
             msg = rpc.meter_message_from_counter(
                 cnt,
-                cfg.CONF.publisher_rpc.metering_secret,
-                'test_source')
+                cfg.CONF.publisher_rpc.metering_secret)
             self.conn.record_metering_data(msg)
 
     def test_list_meters(self):

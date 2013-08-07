@@ -59,12 +59,12 @@ class TestListProjects(tests_api.TestBase,
             'resource-id',
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
             resource_metadata={'display_name': 'test-server',
-                               'tag': 'self.counter'}
+                               'tag': 'self.counter'},
+            source='test_list_projects',
         )
         msg = rpc.meter_message_from_counter(
             counter1,
             cfg.CONF.publisher_rpc.metering_secret,
-            'test_list_projects',
         )
         self.conn.record_metering_data(msg)
 
@@ -78,12 +78,12 @@ class TestListProjects(tests_api.TestBase,
             'resource-id-alternate',
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
             resource_metadata={'display_name': 'test-server',
-                               'tag': 'self.counter2'}
+                               'tag': 'self.counter2'},
+            source='test_list_users',
         )
         msg2 = rpc.meter_message_from_counter(
             counter2,
             cfg.CONF.publisher_rpc.metering_secret,
-            'test_list_users',
         )
         self.conn.record_metering_data(msg2)
 

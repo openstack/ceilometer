@@ -234,13 +234,13 @@ class CompatibilityTest(MongoDBEngineTestBase):
             timestamp=datetime.datetime(2012, 9, 25, 10, 30),
             resource_metadata={'display_name': 'test-volume',
                                'tag': 'self.counter',
-                               }
+                               },
+            source='test',
         )
         self.counters.append(c)
         msg = rpc.meter_message_from_counter(
             c,
-            secret='not-so-secret',
-            source='test')
+            secret='not-so-secret')
         self.conn.record_metering_data(self.conn, msg)
 
     def test_counter_unit(self):

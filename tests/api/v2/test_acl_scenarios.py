@@ -93,7 +93,8 @@ class TestAPIACL(FunctionalTest,
                     'resource-good',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 40),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter'}),
+                                       'tag': 'self.counter'},
+                    source='test_source'),
                 sample.Sample(
                     'meter.mine',
                     'gauge',
@@ -104,11 +105,11 @@ class TestAPIACL(FunctionalTest,
                     'resource-56',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 43),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter4'})]:
+                                       'tag': 'self.counter4'},
+                    source='test_source')]:
             msg = rpc.meter_message_from_counter(
                 cnt,
-                cfg.CONF.publisher_rpc.metering_secret,
-                'test_source')
+                cfg.CONF.publisher_rpc.metering_secret)
             self.conn.record_metering_data(msg)
 
     def get_json(self, path, expect_errors=False, headers=None,

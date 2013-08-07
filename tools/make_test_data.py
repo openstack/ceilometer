@@ -128,11 +128,11 @@ def main():
                             resource_id=args.resource,
                             timestamp=timestamp,
                             resource_metadata={},
+                            source='artificial',
                             )
         data = rpc.meter_message_from_counter(
             c,
-            cfg.CONF.publisher_rpc.metering_secret,
-            'artificial')
+            cfg.CONF.publisher_rpc.metering_secret)
         conn.record_metering_data(data)
         n += 1
         timestamp = timestamp + increment

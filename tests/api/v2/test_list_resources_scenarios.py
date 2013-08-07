@@ -54,12 +54,12 @@ class TestListResources(FunctionalTest,
             'project-id',
             'resource-id',
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
-            resource_metadata=None
+            resource_metadata=None,
+            source='test',
         )
         msg = rpc.meter_message_from_counter(
             counter1,
             cfg.CONF.publisher_rpc.metering_secret,
-            'test',
         )
         self.conn.record_metering_data(msg)
 
@@ -78,12 +78,12 @@ class TestListResources(FunctionalTest,
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter',
-                               }
+                               },
+            source='test',
         )
         msg = rpc.meter_message_from_counter(
             counter1,
             cfg.CONF.publisher_rpc.metering_secret,
-            'test',
         )
         self.conn.record_metering_data(msg)
 
@@ -98,12 +98,12 @@ class TestListResources(FunctionalTest,
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter2',
-                               }
+                               },
+            source='test',
         )
         msg2 = rpc.meter_message_from_counter(
             counter2,
             cfg.CONF.publisher_rpc.metering_secret,
-            'test',
         )
         self.conn.record_metering_data(msg2)
 
@@ -122,12 +122,12 @@ class TestListResources(FunctionalTest,
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter',
-                               }
+                               },
+            source='test',
         )
         msg = rpc.meter_message_from_counter(
             counter1,
             cfg.CONF.publisher_rpc.metering_secret,
-            'test',
         )
         self.conn.record_metering_data(msg)
 
@@ -142,12 +142,12 @@ class TestListResources(FunctionalTest,
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter2',
-                               }
+                               },
+            source='test',
         )
         msg2 = rpc.meter_message_from_counter(
             counter2,
             cfg.CONF.publisher_rpc.metering_secret,
-            'test',
         )
         self.conn.record_metering_data(msg2)
 
@@ -166,12 +166,12 @@ class TestListResources(FunctionalTest,
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter',
-                               }
+                               },
+            source='test_list_resources',
         )
         msg = rpc.meter_message_from_counter(
             counter1,
             cfg.CONF.publisher_rpc.metering_secret,
-            'test_list_resources',
         )
         self.conn.record_metering_data(msg)
 
@@ -186,12 +186,12 @@ class TestListResources(FunctionalTest,
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter2',
-                               }
+                               },
+            source='not-test',
         )
         msg2 = rpc.meter_message_from_counter(
             counter2,
             cfg.CONF.publisher_rpc.metering_secret,
-            'not-test',
         )
         self.conn.record_metering_data(msg2)
 
@@ -213,12 +213,12 @@ class TestListResources(FunctionalTest,
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter',
-                               }
+                               },
+            source='test_list_resources',
         )
         msg = rpc.meter_message_from_counter(
             counter1,
             cfg.CONF.publisher_rpc.metering_secret,
-            'test_list_resources',
         )
         self.conn.record_metering_data(msg)
 
@@ -233,12 +233,12 @@ class TestListResources(FunctionalTest,
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter2',
-                               }
+                               },
+            source='test_list_resources',
         )
         msg2 = rpc.meter_message_from_counter(
             counter2,
             cfg.CONF.publisher_rpc.metering_secret,
-            'test_list_resources',
         )
         self.conn.record_metering_data(msg2)
 
@@ -263,12 +263,12 @@ class TestListResources(FunctionalTest,
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter',
-                               }
+                               },
+            source='test_list_resources',
         )
         msg = rpc.meter_message_from_counter(
             counter1,
             cfg.CONF.publisher_rpc.metering_secret,
-            'test_list_resources',
         )
         self.conn.record_metering_data(msg)
 
@@ -283,12 +283,12 @@ class TestListResources(FunctionalTest,
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter2',
-                               }
+                               },
+            source='not-test',
         )
         msg2 = rpc.meter_message_from_counter(
             counter2,
             cfg.CONF.publisher_rpc.metering_secret,
-            'not-test',
         )
         self.conn.record_metering_data(msg2)
 
@@ -310,12 +310,12 @@ class TestListResources(FunctionalTest,
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter',
-                               }
+                               },
+            source='test_list_resources',
         )
         msg = rpc.meter_message_from_counter(
             counter1,
             cfg.CONF.publisher_rpc.metering_secret,
-            'test_list_resources',
         )
         self.conn.record_metering_data(msg)
 
@@ -330,12 +330,12 @@ class TestListResources(FunctionalTest,
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter2',
-                               }
+                               },
+            source='not-test',
         )
         msg2 = rpc.meter_message_from_counter(
             counter2,
             cfg.CONF.publisher_rpc.metering_secret,
-            'not-test',
         )
         self.conn.record_metering_data(msg2)
 
@@ -357,12 +357,12 @@ class TestListResources(FunctionalTest,
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter1',
-                               }
+                               },
+            source='not-test',
         )
         msg2 = rpc.meter_message_from_counter(
             counter1,
             cfg.CONF.publisher_rpc.metering_secret,
-            'not-test',
         )
         self.conn.record_metering_data(msg2)
 
@@ -384,12 +384,12 @@ class TestListResources(FunctionalTest,
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter1',
-                               }
+                               },
+            source='not-test',
         )
         msg2 = rpc.meter_message_from_counter(
             counter1,
             cfg.CONF.publisher_rpc.metering_secret,
-            'not-test',
         )
         self.conn.record_metering_data(msg2)
 
@@ -413,12 +413,12 @@ class TestListResources(FunctionalTest,
                                'tag': 'self.counter',
                                'ignored_dict': {'key': 'value'},
                                'ignored_list': ['not-returned'],
-                               }
+                               },
+            source='test',
         )
         msg = rpc.meter_message_from_counter(
             counter1,
             cfg.CONF.publisher_rpc.metering_secret,
-            'test',
         )
         self.conn.record_metering_data(msg)
 
@@ -442,12 +442,12 @@ class TestListResources(FunctionalTest,
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter',
-                               }
+                               },
+            source='test_list_resources',
         )
         msg = rpc.meter_message_from_counter(
             counter1,
             cfg.CONF.publisher_rpc.metering_secret,
-            'test_list_resources',
         )
         self.conn.record_metering_data(msg)
 
