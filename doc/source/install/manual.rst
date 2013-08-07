@@ -374,6 +374,19 @@ Configuring keystone to work with API
    default port value for ceilometer API is 8777. If the port value
    has been customized, adjust accordingly.
 
+Notifications queues
+========================
+
+.. index::
+   double: installing; notifications queues
+
+By default, Ceilometer consumes notifications on the RPC bus sent to
+**notification_topics** by using a queue/pool name that is identical to the
+topic name. You shouldn't have different applications consuming messages
+from this queue.
+If you want to also consume the topic notifications with a system other than
+Ceilometer, you should configure a separate queue that listens for the same
+messages.
 
 Use multiple dispatchers
 ========================
