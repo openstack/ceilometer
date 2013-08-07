@@ -31,6 +31,7 @@ for name in ['openstack', 'openstack.common', 'openstack.common.log']:
     sys.modules['ceilometer.' + name] = sys.modules['nova.' + name]
 
 from nova import conductor
+from nova import utils
 
 from stevedore import extension
 
@@ -46,7 +47,7 @@ from ceilometer.openstack.common.gettextutils import _
 LOG = logging.getLogger('nova.ceilometer.notifier')
 
 _gatherer = None
-instance_info_source = conductor.API()
+conductor_api = conductor.API()
 
 
 class DeletedInstanceStatsGatherer(object):
@@ -100,9 +101,16 @@ class Instance(object):
     dictionary. This class makes an object from the dictonary so we
     can pass it to the pollsters.
     """
-    def __init__(self, info):
+    def __init__(self, context, info):
         for k, v in info.iteritems():
-            setattr(self, k, v)
+            if k == 'name':
+                setattr(self, 'OS-EXT-SRV-ATTR:instance_name', v)
+            elif k == 'metadata':
+                setattr(self, k, utils.metadata_to_dict(v))
+            else:
+                setattr(self, k, v)
+        self.flavor_name = conductor_api.instance_type_get(
+            context, self.instance_type_id).get('name', 'UNKNOWN')
         LOG.debug(_('INFO %r'), info)
 
     @property
@@ -113,7 +121,7 @@ class Instance(object):
     def flavor(self):
         return {
             'id': self.instance_type_id,
-            'name': self.instance_type.get('name', 'UNKNOWN'),
+            'name': self.flavor_name,
         }
 
     @property
@@ -123,6 +131,10 @@ class Instance(object):
     @property
     def image(self):
         return {'id': self.image_ref}
+
+    @property
+    def name(self):
+        return self.display_name
 
 
 def notify(context, message):
@@ -136,7 +148,7 @@ def notify(context, message):
     LOG.debug(_('polling final stats for %r'), instance_id)
 
     # Ask for the instance details
-    instance_ref = instance_info_source.instance_get_by_uuid(
+    instance_ref = conductor_api.instance_get_by_uuid(
         context,
         instance_id,
     )
@@ -148,7 +160,7 @@ def notify(context, message):
     # Extend the payload with samples from our plugins.  We only need
     # to send some of the data from the counter objects, since a lot
     # of the fields are the same.
-    instance = Instance(instance_ref)
+    instance = Instance(context, instance_ref)
     counters = gatherer(instance)
     payload['samples'] = [{'name': c.name,
                            'type': c.type,
