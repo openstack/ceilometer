@@ -2,24 +2,21 @@ pep8==1.4.5
 pyflakes==0.7.2
 flake8==2.0
 hacking>=0.5.6,<0.7
-coverage
+coverage>=3.6
 discover
 httplib2
-mock
-mox
+mock>=1.0
+mox>=0.5.3
 fixtures>=0.3.12
 Babel>=0.9.6
 http://tarballs.openstack.org/nova/nova-master.tar.gz#egg=nova
-# We should use swift>1.7.5, but it's not yet available
 swift
-# Swift dep that is not necessary if we depend on swift>1.7.5
-netifaces
 # Docs Requirements
-sphinx
+sphinx>=1.1.2
 sphinxcontrib-pecanwsme>=0.2
-docutils==0.9.1 # for bug 1091333, remove after sphinx >1.1.3 is released.
+docutils==0.9.1
 oslo.sphinx
 python-subunit
-testrepository>=0.0.13
-testtools>=0.9.29
-testscenarios<0.5
+testrepository>=0.0.17
+testtools>=0.9.32
+testscenarios>=0.4,<0.5
