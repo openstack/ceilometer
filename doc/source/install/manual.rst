@@ -14,6 +14,8 @@
       License for the specific language governing permissions and limitations
       under the License.
 
+.. _installing_manually:
+
 =====================
  Installing Manually
 =====================
@@ -29,7 +31,12 @@ Installing the Collector
    to ``rabbit`` or ``qpid`` in ``glance-api.conf`` and restarting the
    service.
 
-2. In order to retrieve object store statistics, ceilometer needs
+2. If you want to be able to retrieve volume counters, you need to instruct
+   Cinder to send notifications to the bus by changing ``notification_driver``
+   to ``cinder.openstack.common.notifier.rabbit_notifier`` and
+   ``control_exchange`` to ``cinder``, before restarting the service.
+
+3. In order to retrieve object store statistics, ceilometer needs
    access to swift with ``ResellerAdmin`` role. You should give this
    role to your ``os_username`` user for tenant ``os_tenant_name``:
 
@@ -56,23 +63,23 @@ Installing the Collector
 
    And adding ``ceilometer`` in the ``pipeline`` of that same file.
 
-3. Install MongoDB.
+4. Install MongoDB.
 
    Follow the instructions to install the MongoDB_ package for your
    operating system, then start the service.
 
-4. Clone the ceilometer git repository to the management server::
+5. Clone the ceilometer git repository to the management server::
 
    $ cd /opt/stack
    $ git clone https://github.com/openstack/ceilometer.git
 
-5. As a user with ``root`` permissions or ``sudo`` privileges, run the
+6. As a user with ``root`` permissions or ``sudo`` privileges, run the
    ceilometer installer::
 
    $ cd ceilometer
    $ sudo python setup.py install
 
-6. Copy the sample configuration files from the source tree
+7. Copy the sample configuration files from the source tree
    to their final location.
 
    ::
@@ -82,7 +89,7 @@ Installing the Collector
       $ cp etc/ceilometer/*.yaml /etc/ceilometer
       $ cp etc/ceilometer/ceilometer.conf.sample /etc/ceilometer/ceilometer.conf
 
-7. Edit ``/etc/ceilometer/ceilometer.conf``
+8. Edit ``/etc/ceilometer/ceilometer.conf``
 
    1. Configure RPC
 
@@ -111,7 +118,7 @@ Installing the Collector
    Refer to :doc:`/configuration` for details about any other options
    you might want to modify before starting the service.
 
-8. Start the collector.
+9. Start the collector.
 
    ::
 

@@ -137,6 +137,8 @@ volume                    Gauge        volume  vol ID    notification  Duration 
 volume.size               Gauge            GB  vol ID    notification  Size of volume
 ========================  ==========  =======  ========  ============  =======================================================
 
+Make sure Cinder is properly configured first: see :ref:`installing_manually`.
+
 Object Storage (Swift)
 ======================
 
@@ -150,6 +152,11 @@ storage.objects.incoming.bytes  Delta                B  store ID  notification  
 storage.objects.outgoing.bytes  Delta                B  store ID  notification  Number of outgoing bytes
 storage.api.request             Delta          request  store ID  notification  Number of API requests against swift
 ==============================  ==========  ==========  ========  ============  ==============================================
+
+In order to use storage.objects.incoming.bytes and storage.outgoing.bytes, one must configure
+Swift as described in :ref:`installing_manually`. Note that they may not be
+updated right after an upload/download, since Swift takes some time to update
+the container properties.
 
 Energy (Kwapi)
 ==============
