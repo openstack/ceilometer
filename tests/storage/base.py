@@ -658,7 +658,6 @@ class RawSampleTest(DBTestBase):
 class StatisticsTest(DBTestBase):
 
     def prepare_data(self):
-        self.counters = []
         for i in range(3):
             c = sample.Sample(
                 'volume.size',
@@ -674,7 +673,6 @@ class StatisticsTest(DBTestBase):
                                    },
                 source='test',
             )
-            self.counters.append(c)
             msg = rpc.meter_message_from_counter(
                 c,
                 secret='not-so-secret',
@@ -695,7 +693,6 @@ class StatisticsTest(DBTestBase):
                                    },
                 source='test',
             )
-            self.counters.append(c)
             msg = rpc.meter_message_from_counter(
                 c,
                 secret='not-so-secret',
