@@ -32,6 +32,16 @@ Samples and Statistics
 .. autotype:: ceilometer.api.controllers.v2.Statistics
    :members:
 
+Alarms
+======
+
+.. rest-controller:: ceilometer.api.controllers.v2:AlarmsController
+   :webprefix: /v2/alarms
+
+.. autotype:: ceilometer.api.controllers.v2.Alarm
+   :members:
+
+
 Filtering Queries
 =================
 
