@@ -21,6 +21,7 @@ from oslo.config import cfg
 import socket
 from stevedore import extension
 from stevedore import named
+import sys
 
 from ceilometer.service import prepare_service
 from ceilometer.openstack.common import context
@@ -112,10 +113,6 @@ class CollectorService(rpc_service.Service):
     COLLECTOR_NAMESPACE = 'ceilometer.collector'
     DISPATCHER_NAMESPACE = 'ceilometer.dispatcher'
 
-    def __init__(self, host, topic, manager=None):
-        super(CollectorService, self).__init__(host, topic, manager)
-        self.storage_conn = storage.get_connection(cfg.CONF)
-
     def start(self):
         super(CollectorService, self).start()
         # Add a dummy thread to have wait() working
@@ -143,17 +140,16 @@ class CollectorService(rpc_service.Service):
                         self.COLLECTOR_NAMESPACE)
         self.notification_manager.map(self._setup_subscription)
 
-        # Load all configured dispatchers
-        self.dispatchers = []
-        for dispatcher in named.NamedExtensionManager(
-                namespace=self.DISPATCHER_NAMESPACE,
-                names=cfg.CONF.collector.dispatcher,
-                invoke_on_load=True,
-                invoke_args=[cfg.CONF]):
-            if dispatcher.obj:
-                self.dispatchers.append(dispatcher.obj)
-
-        LOG.info('dispatchers loaded %s' % str(self.dispatchers))
+        LOG.debug('loading dispatchers from %s',
+                  self.DISPATCHER_NAMESPACE)
+        self.dispatcher_manager = named.NamedExtensionManager(
+            namespace=self.DISPATCHER_NAMESPACE,
+            names=cfg.CONF.collector.dispatcher,
+            invoke_on_load=True,
+            invoke_args=[cfg.CONF])
+        if not list(self.dispatcher_manager):
+            LOG.warning('Failed to load any dispatchers for %s',
+                        self.DISPATCHER_NAMESPACE)
 
         # Set ourselves up as a separate worker for the metering data,
         # since the default for service is to use create_consumer().
@@ -184,8 +180,9 @@ class CollectorService(rpc_service.Service):
                                   (topic, exchange_topic.exchange))
 
     def record_metering_data(self, context, data):
-        for dispatcher in self.dispatchers:
-            dispatcher.record_metering_data(context, data)
+        self.dispatcher_manager.map(self._record_metering_data_for_ext,
+                                    context=context,
+                                    data=data)
 
     def process_notification(self, notification):
         """Make a notification processed by an handler."""
@@ -239,12 +236,22 @@ class CollectorService(rpc_service.Service):
         traits = [trait for trait in all_traits if trait.value is not None]
 
         event = models.Event(event_name, when, traits)
-        try:
-            self.storage_conn.record_events([event, ])
-        except Exception as err:
-            LOG.exception(_("Unable to store events: %s"), err)
-            # By re-raising we avoid ack()'ing the message.
-            raise
+
+        exc_info = None
+        for dispatcher in self.dispatcher_manager:
+            try:
+                dispatcher.obj.record_events(event)
+            except Exception:
+                LOG.exception('Error while saving events with dispatcher %s',
+                              dispatcher)
+                exc_info = sys.exc_info()
+        # Don't ack the message if any of the dispatchers fail
+        if exc_info:
+            raise exc_info[1], None, exc_info[2]
+
+    @staticmethod
+    def _record_metering_data_for_ext(ext, context, data):
+        ext.obj.record_metering_data(context, data)
 
     def _process_notification_for_ext(self, ext, notification):
         with self.pipeline_manager.publisher(context.get_admin_context()) as p:

@@ -179,11 +179,6 @@ class TestCollectorService(TestCollector):
         self.srv = service.CollectorService('the-host', 'the-topic')
         self.ctx = None
 
-    def test_service_has_storage_conn(self):
-        # Test an unmocked default CollectorService
-        srv = service.CollectorService('the-host', 'the-topic')
-        self.assertIsNotNone(srv.storage_conn)
-
     @patch('ceilometer.pipeline.setup_pipeline', MagicMock())
     def test_init_host(self):
         # If we try to create a real RPC connection, init_host() never
@@ -231,27 +226,41 @@ class TestCollectorService(TestCollector):
         timeutils.set_time_override(now)
         message = {'event_type': "foo", 'message_id': "abc"}
 
-        self.srv.storage_conn = MagicMock()
+        mock_dispatcher = MagicMock()
+        self.srv.dispatcher_manager = test_manager.TestExtensionManager(
+            [extension.Extension('test',
+                                 None,
+                                 None,
+                                 mock_dispatcher
+                                 ),
+             ])
 
         with patch('ceilometer.collector.service.LOG') as mylog:
             self.srv._message_to_event(message)
             self.assertFalse(mylog.exception.called)
-        events = self.srv.storage_conn.record_events.call_args[0]
+        events = mock_dispatcher.record_events.call_args[0]
         self.assertEqual(1, len(events))
-        event = events[0][0]
+        event = events[0]
         self.assertEqual("foo", event.event_name)
         self.assertEqual(now, event.generated)
         self.assertEqual(1, len(event.traits))
 
     def test_message_to_event_bad_save(self):
         cfg.CONF.set_override("store_events", True, group="collector")
-        self.srv.storage_conn = MagicMock()
-        self.srv.storage_conn.record_events.side_effect = MyException("Boom")
+        mock_dispatcher = MagicMock()
+        self.srv.dispatcher_manager = test_manager.TestExtensionManager(
+            [extension.Extension('test',
+                                 None,
+                                 None,
+                                 mock_dispatcher
+                                 ),
+             ])
+        mock_dispatcher.record_events.side_effect = MyException("Boom")
         message = {'event_type': "foo", 'message_id': "abc"}
         try:
             self.srv._message_to_event(message)
             self.fail("failing save should raise")
-        except MyException:
+        except Exception:
             pass
 
     def test_extract_when(self):
