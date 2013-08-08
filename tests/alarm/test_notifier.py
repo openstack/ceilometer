@@ -26,6 +26,15 @@ from ceilometer.openstack.common import context
 from ceilometer.tests import base
 
 
+DATA_JSON = ('{"current": "ALARM", "alarm": "foobar",'
+             ' "reason": "what ?", "previous": "OK"}')
+NOTIFICATION = dict(alarm='foobar',
+                    condition=dict(threshold=42),
+                    reason='what ?',
+                    previous='OK',
+                    current='ALARM')
+
+
 class TestAlarmNotifier(base.TestCase):
 
     def setUp(self):
@@ -44,7 +53,8 @@ class TestAlarmNotifier(base.TestCase):
         data = {
             'actions': ['test://'],
             'alarm': 'foobar',
-            'state': 'ALARM',
+            'previous': 'OK',
+            'current': 'ALARM',
             'reason': 'Everything is on fire',
         }
         self.service.notify_alarm(context.get_admin_context(), data)
@@ -53,7 +63,8 @@ class TestAlarmNotifier(base.TestCase):
         self.assertEqual(notifications[0], (
             urlparse.urlsplit(data['actions'][0]),
             data['alarm'],
-            data['state'],
+            data['previous'],
+            data['current'],
             data['reason']))
 
     def test_notify_alarm_no_action(self):
@@ -71,26 +82,25 @@ class TestAlarmNotifier(base.TestCase):
     def _fake_spawn_n(func, *args, **kwargs):
         func(*args, **kwargs)
 
+    @staticmethod
+    def _notification(action):
+        notification = {}
+        notification.update(NOTIFICATION)
+        notification['actions'] = [action]
+        return notification
+
     def test_notify_alarm_rest_action_ok(self):
         action = 'http://host/action'
-        data_json = '{"reason": "what ?", "alarm": "foobar", "state": "ALARM"}'
 
         with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
             with mock.patch.object(requests, 'post') as poster:
                 self.service.notify_alarm(context.get_admin_context(),
-                                          {
-                                              'actions': [action],
-                                              'alarm': 'foobar',
-                                              'condition': {'threshold': 42},
-                                              'reason': 'what ?',
-                                              'state': 'ALARM',
-                                          })
-                poster.assert_called_with(action, data=data_json)
+                                          self._notification(action))
+                poster.assert_called_with(action, data=DATA_JSON)
 
     def test_notify_alarm_rest_action_with_ssl_client_cert(self):
         action = 'https://host/action'
         certificate = "/etc/ssl/cert/whatever.pem"
-        data_json = '{"reason": "what ?", "alarm": "foobar", "state": "ALARM"}'
 
         cfg.CONF.set_override("rest_notifier_certificate_file", certificate,
                               group='alarm')
@@ -98,21 +108,14 @@ class TestAlarmNotifier(base.TestCase):
         with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
             with mock.patch.object(requests, 'post') as poster:
                 self.service.notify_alarm(context.get_admin_context(),
-                                          {
-                                              'actions': [action],
-                                              'alarm': 'foobar',
-                                              'condition': {'threshold': 42},
-                                              'reason': 'what ?',
-                                              'state': 'ALARM',
-                                          })
-                poster.assert_called_with(action, data=data_json,
+                                          self._notification(action))
+                poster.assert_called_with(action, data=DATA_JSON,
                                           cert=certificate, verify=True)
 
     def test_notify_alarm_rest_action_with_ssl_client_cert_and_key(self):
         action = 'https://host/action'
         certificate = "/etc/ssl/cert/whatever.pem"
         key = "/etc/ssl/cert/whatever.key"
-        data_json = '{"reason": "what ?", "alarm": "foobar", "state": "ALARM"}'
 
         cfg.CONF.set_override("rest_notifier_certificate_file", certificate,
                               group='alarm')
@@ -122,19 +125,12 @@ class TestAlarmNotifier(base.TestCase):
         with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
             with mock.patch.object(requests, 'post') as poster:
                 self.service.notify_alarm(context.get_admin_context(),
-                                          {
-                                              'actions': [action],
-                                              'alarm': 'foobar',
-                                              'condition': {'threshold': 42},
-                                              'reason': 'what ?',
-                                              'state': 'ALARM',
-                                          })
-                poster.assert_called_with(action, data=data_json,
+                                          self._notification(action))
+                poster.assert_called_with(action, data=DATA_JSON,
                                           cert=(certificate, key), verify=True)
 
     def test_notify_alarm_rest_action_with_ssl_verify_disable_by_cfg(self):
         action = 'https://host/action'
-        data_json = '{"reason": "what ?", "alarm": "foobar", "state": "ALARM"}'
 
         cfg.CONF.set_override("rest_notifier_ssl_verify", False,
                               group='alarm')
@@ -142,36 +138,22 @@ class TestAlarmNotifier(base.TestCase):
         with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
             with mock.patch.object(requests, 'post') as poster:
                 self.service.notify_alarm(context.get_admin_context(),
-                                          {
-                                              'actions': [action],
-                                              'alarm': 'foobar',
-                                              'condition': {'threshold': 42},
-                                              'reason': 'what ?',
-                                              'state': 'ALARM',
-                                          })
-                poster.assert_called_with(action, data=data_json,
+                                          self._notification(action))
+                poster.assert_called_with(action, data=DATA_JSON,
                                           verify=False)
 
     def test_notify_alarm_rest_action_with_ssl_verify_disable(self):
         action = 'https://host/action?ceilometer-alarm-ssl-verify=0'
-        data_json = '{"reason": "what ?", "alarm": "foobar", "state": "ALARM"}'
 
         with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
             with mock.patch.object(requests, 'post') as poster:
                 self.service.notify_alarm(context.get_admin_context(),
-                                          {
-                                              'actions': [action],
-                                              'alarm': 'foobar',
-                                              'condition': {'threshold': 42},
-                                              'reason': 'what ?',
-                                              'state': 'ALARM',
-                                          })
-                poster.assert_called_with(action, data=data_json,
+                                          self._notification(action))
+                poster.assert_called_with(action, data=DATA_JSON,
                                           verify=False)
 
     def test_notify_alarm_rest_action_with_ssl_verify_enable_by_user(self):
         action = 'https://host/action?ceilometer-alarm-ssl-verify=1'
-        data_json = '{"reason": "what ?", "alarm": "foobar", "state": "ALARM"}'
 
         cfg.CONF.set_override("rest_notifier_ssl_verify", False,
                               group='alarm')
@@ -179,14 +161,8 @@ class TestAlarmNotifier(base.TestCase):
         with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
             with mock.patch.object(requests, 'post') as poster:
                 self.service.notify_alarm(context.get_admin_context(),
-                                          {
-                                              'actions': [action],
-                                              'alarm': 'foobar',
-                                              'condition': {'threshold': 42},
-                                              'reason': 'what ?',
-                                              'state': 'ALARM',
-                                          })
-                poster.assert_called_with(action, data=data_json,
+                                          self._notification(action))
+                poster.assert_called_with(action, data=DATA_JSON,
                                           verify=True)
 
     @staticmethod

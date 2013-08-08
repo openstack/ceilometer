@@ -127,7 +127,8 @@ class Evaluator(object):
     def _refresh(self, alarm, state, reason):
         """Refresh alarm state."""
         try:
-            if alarm.state != state:
+            previous = alarm.state
+            if previous != state:
                 LOG.info(_('alarm %(id)s transitioning to %(state)s because '
                            '%(reason)s') % {'id': alarm.alarm_id,
                                             'state': state,
@@ -136,7 +137,7 @@ class Evaluator(object):
                 self._client.alarms.update(alarm.alarm_id, **dict(state=state))
             alarm.state = state
             if self.notifier:
-                self.notifier.notify(alarm, state, reason)
+                self.notifier.notify(alarm, previous, reason)
         except Exception:
             # retry will occur naturally on the next evaluation
             # cycle (unless alarm state reverts in the meantime)

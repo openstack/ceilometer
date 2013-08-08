@@ -37,11 +37,12 @@ class RPCAlarmNotifier(rpc_proxy.RpcProxy):
             default_version='1.0',
             topic=cfg.CONF.alarm.notifier_rpc_topic)
 
-    def notify(self, alarm, state, reason):
+    def notify(self, alarm, previous, reason):
         actions = getattr(alarm, Alarm.ALARM_ACTIONS_MAP[alarm.state])
         msg = self.make_msg('notify_alarm', data={
             'actions': actions,
             'alarm': alarm.alarm_id,
-            'state': state,
+            'previous': previous,
+            'current': alarm.state,
             'reason': reason})
         self.cast(context.get_admin_context(), msg)

@@ -26,5 +26,5 @@ class TestAlarmNotifier(notifier.AlarmNotifier):
     def __init__(self):
         self.notifications = []
 
-    def notify(self, action, alarm, state, reason):
-        self.notifications.append((action, alarm, state, reason))
+    def notify(self, action, alarm, previous, current, reason):
+        self.notifications.append((action, alarm, previous, current, reason))
