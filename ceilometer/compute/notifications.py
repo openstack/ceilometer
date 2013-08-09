@@ -51,9 +51,7 @@ class ComputeNotificationBase(plugin.NotificationBase):
 
 
 class InstanceScheduled(ComputeNotificationBase):
-    @staticmethod
-    def get_event_types():
-        return ['scheduler.run_instance.scheduled']
+    event_types = ['scheduler.run_instance.scheduled']
 
     def process_notification(self, message):
         yield sample.Sample.from_notification(
@@ -72,16 +70,7 @@ class InstanceScheduled(ComputeNotificationBase):
 class ComputeInstanceNotificationBase(ComputeNotificationBase):
     """Convert compute.instance.* notifications into Counters
     """
-    @staticmethod
-    def get_event_types():
-        return ['compute.instance.create.start',
-                'compute.instance.create.end',
-                'compute.instance.exists',
-                'compute.instance.update',
-                'compute.instance.delete.start',
-                'compute.instance.delete.end',
-                'compute.instance.finish_resize.end',
-                'compute.instance.resize.revert.end']
+    event_types = ['compute.instance.*']
 
 
 class Instance(ComputeInstanceNotificationBase):
@@ -169,9 +158,7 @@ class InstanceDelete(ComputeInstanceNotificationBase):
     when an instance is being deleted.
     """
 
-    @staticmethod
-    def get_event_types():
-        return ['compute.instance.delete.samples']
+    event_types = ['compute.instance.delete.samples']
 
     def process_notification(self, message):
         for s in message['payload'].get('samples', []):

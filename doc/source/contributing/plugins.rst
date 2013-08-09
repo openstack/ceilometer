@@ -85,12 +85,11 @@ Notifications
 
 Notifications are defined as subclass of the
 :class:`ceilometer.plugin.NotificationBase` meta class as defined in
-the ``ceilometer/plugin.py`` file.  Notifications must implement two
-methods:
+the ``ceilometer/plugin.py`` file.  Notifications must implement:
 
-   ``get_event_types(self)`` which should return a sequence of strings defining the event types to be given to the plugin and
+   ``event_types`` which should be a sequence of strings defining the event types to be given to the plugin and
 
-   ``process_notification(self, message)`` which receives an event message from the list provided to get_event_types and returns a sequence of Counter objects as defined in the ``ceilometer/counter.py`` file.
+   ``process_notification(self, message)`` which receives an event message from the list provided to event_types and returns a sequence of Counter objects as defined in the ``ceilometer/counter.py`` file.
 
 In the ``InstanceNotifications`` plugin, it listens to three events:
 

@@ -20,6 +20,7 @@
 
 import abc
 import collections
+import fnmatch
 from oslo.config import cfg
 
 # Import this option so every Notification plugin can use it freely.
@@ -48,8 +49,8 @@ class NotificationBase(PluginBase):
 
     __metaclass__ = abc.ABCMeta
 
-    @abc.abstractmethod
-    def get_event_types(self):
+    @abc.abstractproperty
+    def event_types(self):
         """Return a sequence of strings defining the event types to be
         given to this plugin.
         """
@@ -68,6 +69,27 @@ class NotificationBase(PluginBase):
 
         :param message: Message to process.
         """
+
+    @staticmethod
+    def _handle_event_type(event_type, event_type_to_handle):
+        """Check whether event_type should be handled according to
+        event_type_to_handle.
+
+        """
+        return any(map(lambda e: fnmatch.fnmatch(event_type, e),
+                       event_type_to_handle))
+
+    def to_samples(self, notification):
+        """Return samples produced by *process_notification* for the given
+        notification, if it's handled by this notification handler.
+
+        :param notification: The notification to process.
+
+        """
+        if self._handle_event_type(notification['event_type'],
+                                   self.event_types):
+            return self.process_notification(notification)
+        return []
 
 
 class PollsterBase(PluginBase):

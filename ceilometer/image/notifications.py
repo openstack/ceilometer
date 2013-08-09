@@ -51,13 +51,11 @@ class ImageBase(plugin.NotificationBase):
 
 
 class ImageCRUDBase(ImageBase):
-    @staticmethod
-    def get_event_types():
-        return [
-            'image.update',
-            'image.upload',
-            'image.delete',
-        ]
+    event_types = [
+        'image.update',
+        'image.upload',
+        'image.delete',
+    ]
 
 
 class ImageCRUD(ImageCRUDBase):
@@ -101,11 +99,7 @@ class ImageSize(ImageCRUDBase):
 
 class ImageDownload(ImageBase):
     """Emit image_download counter when an image is downloaded."""
-    @staticmethod
-    def get_event_types():
-        return [
-            'image.send',
-        ]
+    event_types = ['image.send']
 
     def process_notification(self, message):
         yield sample.Sample.from_notification(
@@ -121,11 +115,7 @@ class ImageDownload(ImageBase):
 
 class ImageServe(ImageBase):
     """Emit image_serve counter when an image is served out."""
-    @staticmethod
-    def get_event_types():
-        return [
-            'image.send',
-        ]
+    event_types = ['image.send']
 
     def process_notification(self, message):
         yield sample.Sample.from_notification(

@@ -167,7 +167,7 @@ class CollectorService(rpc_service.Service):
         handler = ext.obj
         ack_on_error = cfg.CONF.collector.ack_on_event_error
         LOG.debug('Event types from %s: %s (ack_on_error=%s)',
-                  ext.name, ', '.join(handler.get_event_types()),
+                  ext.name, ', '.join(handler.event_types),
                   ack_on_error)
 
         for exchange_topic in handler.get_exchange_topics(cfg.CONF):
@@ -247,12 +247,9 @@ class CollectorService(rpc_service.Service):
             raise
 
     def _process_notification_for_ext(self, ext, notification):
-        handler = ext.obj
-        if notification['event_type'] in handler.get_event_types():
-            ctxt = context.get_admin_context()
-            with self.pipeline_manager.publisher(ctxt) as p:
-                # FIXME(dhellmann): Spawn green thread?
-                p(list(handler.process_notification(notification)))
+        with self.pipeline_manager.publisher(context.get_admin_context()) as p:
+            # FIXME(dhellmann): Spawn green thread?
+            p(list(ext.obj.to_samples(notification)))
 
 
 def collector():

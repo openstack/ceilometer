@@ -249,21 +249,21 @@ class TestEventTypes(base.TestCase):
 
     def test_network(self):
         v = notifications.Network()
-        events = v.get_event_types()
+        events = v.event_types
         assert events
 
     def test_subnet(self):
         v = notifications.Subnet()
-        events = v.get_event_types()
+        events = v.event_types
         assert events
 
     def test_port(self):
         v = notifications.Port()
-        events = v.get_event_types()
+        events = v.event_types
         assert events
 
     def test_router(self):
-        assert notifications.Router().get_event_types()
+        self.assertTrue(notifications.Router().event_types)
 
     def test_floatingip(self):
-        assert notifications.FloatingIP().get_event_types()
+        self.assertTrue(notifications.FloatingIP().event_types)

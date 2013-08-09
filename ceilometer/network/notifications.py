@@ -42,10 +42,11 @@ class NetworkNotificationBase(plugin.NotificationBase):
 
     resource_name = None
 
-    def get_event_types(self):
+    @property
+    def event_types(self):
         return [
-            '%s.create.end' % (self.resource_name),
-            '%s.update.end' % (self.resource_name),
+            '%s.create.*' % (self.resource_name),
+            '%s.update.*' % (self.resource_name),
             '%s.exists' % (self.resource_name),
             # FIXME(dhellmann): Neutron delete notifications do
             # not include the same metadata as the other messages,
