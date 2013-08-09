@@ -53,10 +53,10 @@ class RestAlarmNotifier(notifier.AlarmNotifier):
     """Rest alarm notifier."""
 
     @staticmethod
-    def notify(action, alarm, previous, current, reason):
+    def notify(action, alarm_id, previous, current, reason):
         LOG.info("Notifying alarm %s from %s to %s with action %s because %s",
-                 alarm, previous, current, action, reason)
-        body = {'alarm': alarm, 'previous': previous,
+                 alarm_id, previous, current, action, reason)
+        body = {'alarm_id': alarm_id, 'previous': previous,
                 'current': current, 'reason': reason}
         kwargs = {'data': jsonutils.dumps(body)}
 
