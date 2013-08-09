@@ -20,7 +20,6 @@
 """ Base classes for DB backend implemtation test
 """
 
-import abc
 import datetime
 
 from oslo.config import cfg
@@ -35,7 +34,6 @@ from ceilometer import utils
 
 
 class DBTestBase(test_db.TestBase):
-    __metaclass__ = abc.ABCMeta
 
     def setUp(self):
         super(DBTestBase, self).setUp()
@@ -1103,7 +1101,6 @@ class EventTestBase(test_db.TestBase):
     """Separate test base class because we don't want to
     inherit all the Meter stuff.
     """
-    __metaclass__ = abc.ABCMeta
 
     def setUp(self):
         super(EventTestBase, self).setUp()
