@@ -127,7 +127,7 @@ class Meter(Base):
     user_id = Column(String(255), ForeignKey('user.id'))
     project_id = Column(String(255), ForeignKey('project.id'))
     resource_id = Column(String(255), ForeignKey('resource.id'))
-    resource_metadata = Column(JSONEncodedDict(5000))
+    resource_metadata = Column(JSONEncodedDict())
     counter_type = Column(String(255))
     counter_unit = Column(String(255))
     counter_volume = Column(Float(53))
