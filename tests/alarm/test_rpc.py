@@ -73,8 +73,9 @@ class TestRPCAlarmNotifier(base.TestCase):
         ]
 
     def test_notify_alarm(self):
+        previous = ['alarm', 'ok']
         for i, a in enumerate(self.alarms):
-            self.notifier.notify(a, "ok", "what? %d" % i)
+            self.notifier.notify(a, previous[i], "what? %d" % i)
         self.assertEqual(len(self.notified), 2)
         for i, a in enumerate(self.alarms):
             actions = getattr(a, AlarmModel.ALARM_ACTIONS_MAP[a.state])
@@ -84,7 +85,9 @@ class TestRPCAlarmNotifier(base.TestCase):
                              self.alarms[i].alarm_id)
             self.assertEqual(self.notified[i][1]["args"]["data"]["actions"],
                              actions)
-            self.assertEqual(self.notified[i][1]["args"]["data"]["state"],
-                             "ok")
+            self.assertEqual(self.notified[i][1]["args"]["data"]["previous"],
+                             previous[i])
+            self.assertEqual(self.notified[i][1]["args"]["data"]["current"],
+                             self.alarms[i].state)
             self.assertEqual(self.notified[i][1]["args"]["data"]["reason"],
                              "what? %d" % i)

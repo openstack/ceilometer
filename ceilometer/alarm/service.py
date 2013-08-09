@@ -128,7 +128,7 @@ class AlarmNotifierService(rpc_service.Service):
             'ceilometer.alarm.' + cfg.CONF.alarm.notifier_rpc_topic,
         )
 
-    def _handle_action(self, action, alarm, state, reason):
+    def _handle_action(self, action, alarm, previous, current, reason):
         try:
             action = network_utils.urlsplit(action)
         except Exception:
@@ -150,7 +150,7 @@ class AlarmNotifierService(rpc_service.Service):
         try:
             LOG.debug("Notifying alarm %s with action %s",
                       alarm, action)
-            notifier.notify(action, alarm, state, reason)
+            notifier.notify(action, alarm, previous, current, reason)
         except Exception:
             LOG.exception(_("Unable to notify alarm %s"), alarm)
             return
@@ -162,7 +162,8 @@ class AlarmNotifierService(rpc_service.Service):
         - actions, the URL of the action to run;
           this is a mapped to extensions automatically
         - alarm, the alarm that has been triggered
-        - state, the new state the alarm transitionned to
+        - previous, the previous state of the alarm
+        - current, the new state the alarm has transitioned to
         - reason, the reason the alarm changed its state
 
         :param context: Request context.
@@ -176,7 +177,8 @@ class AlarmNotifierService(rpc_service.Service):
         for action in actions:
             self._handle_action(action,
                                 data.get('alarm'),
-                                data.get('state'),
+                                data.get('previous'),
+                                data.get('current'),
                                 data.get('reason'))
 
 

@@ -102,7 +102,7 @@ class TestEvaluate(base.TestCase):
             update_calls = self.api_client.alarms.update.call_args_list
             self.assertEqual(update_calls, expected)
             expected = [mock.call(alarm,
-                                  'insufficient data',
+                                  'ok',
                                   ('%d datapoints are unknown' %
                                    alarm.evaluation_periods))
                         for alarm in self.alarms]
@@ -123,7 +123,7 @@ class TestEvaluate(base.TestCase):
             )
             self.notifier.notify.assert_called_once_with(
                 self.alarms[0],
-                'insufficient data',
+                'ok',
                 mock.ANY
             )
 
@@ -146,7 +146,7 @@ class TestEvaluate(base.TestCase):
                        ' threshold, most recent: 85.0',
                        'Transition to alarm due to 4 samples outside'
                        ' threshold, most recent: 7.0']
-            expected = [mock.call(alarm, 'alarm', reason)
+            expected = [mock.call(alarm, 'ok', reason)
                         for alarm, reason in zip(self.alarms, reasons)]
             self.assertEqual(self.notifier.notify.call_args_list, expected)
 
@@ -169,7 +169,7 @@ class TestEvaluate(base.TestCase):
                        ' threshold, most recent: 76.0',
                        'Transition to ok due to 4 samples inside'
                        ' threshold, most recent: 14.0']
-            expected = [mock.call(alarm, 'ok', reason)
+            expected = [mock.call(alarm, 'alarm', reason)
                         for alarm, reason in zip(self.alarms, reasons)]
             self.assertEqual(self.notifier.notify.call_args_list, expected)
 
@@ -247,7 +247,7 @@ class TestEvaluate(base.TestCase):
                        ' threshold, most recent: 85.0',
                        'Transition to alarm due to 4 samples outside'
                        ' threshold, most recent: 7.0']
-            expected = [mock.call(alarm, 'alarm', reason)
+            expected = [mock.call(alarm, 'ok', reason)
                         for alarm, reason in zip(self.alarms, reasons)]
             self.assertEqual(self.notifier.notify.call_args_list, expected)
 
@@ -270,6 +270,6 @@ class TestEvaluate(base.TestCase):
                        ' threshold, most recent: 85.0',
                        'Transition to alarm due to 4 samples outside'
                        ' threshold, most recent: 7.0']
-            expected = [mock.call(alarm, 'alarm', reason)
+            expected = [mock.call(alarm, 'insufficient data', reason)
                         for alarm, reason in zip(self.alarms, reasons)]
             self.assertEqual(self.notifier.notify.call_args_list, expected)
