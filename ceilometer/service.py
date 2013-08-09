@@ -75,7 +75,7 @@ cfg.CONF.register_cli_opts(CLI_OPTIONS, group="service_credentials")
 
 def prepare_service(argv=None):
     eventlet.monkey_patch()
-    gettextutils.install('ceilometer')
+    gettextutils.install('ceilometer', True)
     rpc.set_defaults(control_exchange='ceilometer')
     cfg.set_defaults(log.log_opts,
                      default_log_levels=['amqplib=WARN',

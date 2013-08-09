@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 #
+# Copyright 2013 IBM Corp.
 # Copyright © 2012 New Dream Network, LLC (DreamHost)
 #
 # Author: Doug Hellmann <doug.hellmann@dreamhost.com>
@@ -29,6 +30,8 @@ try:
 except ImportError:
     from xml.parsers.expat import ExpatError as ParseError
 
+from ceilometer.api import hooks
+from ceilometer.openstack.common import gettextutils
 from ceilometer.openstack.common import log
 
 LOG = log.getLogger(__name__)
@@ -72,21 +75,48 @@ class ParsableErrorMiddleware(object):
         app_iter = self.app(environ, replacement_start_response)
         if (state['status_code'] / 100) not in (2, 3):
             req = webob.Request(environ)
+            # Find the first TranslationHook in the array of hooks and use the
+            # translatable_error object from it
+            error = None
+            for hook in self.app.hooks:
+                if isinstance(hook, hooks.TranslationHook):
+                    error = hook.local_error.translatable_error
+                    break
+            user_locale = req.accept_language.best_match(
+                gettextutils.get_available_languages('ceilometer'),
+                default_match='en_US')
+
             if (req.accept.best_match(['application/json', 'application/xml'])
                == 'application/xml'):
                 try:
                     # simple check xml is valid
+                    fault = et.ElementTree.fromstring('\n'.join(app_iter))
+                    # Add the translated error to the xml data
+                    if error is not None:
+                        for fault_string in fault.findall('faultstring'):
+                            fault_string.text = (
+                                gettextutils.get_localized_message(
+                                    error, user_locale))
                     body = [et.ElementTree.tostring(
-                            et.ElementTree.fromstring('<error_message>'
-                                                      + '\n'.join(app_iter)
-                                                      + '</error_message>'))]
+                            et.ElementTree.fromstring(
+                                '<error_message>'
+                                + et.ElementTree.tostring(fault)
+                                + '</error_message>'))]
                 except ParseError as err:
                     LOG.error('Error parsing HTTP response: %s' % err)
                     body = ['<error_message>%s' % state['status_code']
                             + '</error_message>']
                 state['headers'].append(('Content-Type', 'application/xml'))
             else:
-                body = [json.dumps({'error_message': '\n'.join(app_iter)})]
+                try:
+                    fault = json.loads('\n'.join(app_iter))
+                    if error is not None and 'faultstring' in fault:
+                        fault['faultstring'] = (
+                            gettextutils.get_localized_message(
+                                error, user_locale))
+                    body = [json.dumps({'error_message': json.dumps(fault)})]
+                except ValueError as err:
+                    body = [json.dumps({'error_message': '\n'.join(app_iter)})]
                 state['headers'].append(('Content-Type', 'application/json'))
             state['headers'].append(('Content-Length', len(body[0])))
         else:
