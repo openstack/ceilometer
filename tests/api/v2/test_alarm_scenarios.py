@@ -123,7 +123,12 @@ class TestAlarms(FunctionalTest,
                        headers=self.auth_headers)
         alarms = list(self.conn.get_alarms())
         self.assertEquals(4, len(alarms))
-        self.assertEquals(alarms[3].repeat_actions, True)
+        for alarm in alarms:
+            if alarm.name == 'added_alarm':
+                self.assertEqual(alarm.repeat_actions, True)
+                break
+        else:
+            self.fail("Alarm not found")
 
     def test_put_alarm(self):
         json = {
