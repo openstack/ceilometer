@@ -26,9 +26,9 @@ from ceilometer.openstack.common import context
 from ceilometer.tests import base
 
 
-DATA_JSON = ('{"current": "ALARM", "alarm": "foobar",'
+DATA_JSON = ('{"current": "ALARM", "alarm_id": "foobar",'
              ' "reason": "what ?", "previous": "OK"}')
-NOTIFICATION = dict(alarm='foobar',
+NOTIFICATION = dict(alarm_id='foobar',
                     condition=dict(threshold=42),
                     reason='what ?',
                     previous='OK',
@@ -52,7 +52,7 @@ class TestAlarmNotifier(base.TestCase):
     def test_notify_alarm(self):
         data = {
             'actions': ['test://'],
-            'alarm': 'foobar',
+            'alarm_id': 'foobar',
             'previous': 'OK',
             'current': 'ALARM',
             'reason': 'Everything is on fire',
@@ -62,7 +62,7 @@ class TestAlarmNotifier(base.TestCase):
         self.assertEqual(len(notifications), 1)
         self.assertEqual(notifications[0], (
             urlparse.urlsplit(data['actions'][0]),
-            data['alarm'],
+            data['alarm_id'],
             data['previous'],
             data['current'],
             data['reason']))
@@ -74,7 +74,7 @@ class TestAlarmNotifier(base.TestCase):
         self.service.notify_alarm(context.get_admin_context(),
                                   {
                                       'actions': ['log://'],
-                                      'alarm': 'foobar',
+                                      'alarm_id': 'foobar',
                                       'condition': {'threshold': 42},
                                   })
 
@@ -178,7 +178,7 @@ class TestAlarmNotifier(base.TestCase):
                     context.get_admin_context(),
                     {
                         'actions': ['no-such-action-i-am-sure'],
-                        'alarm': 'foobar',
+                        'alarm_id': 'foobar',
                         'condition': {'threshold': 42},
                     })
                 self.assertTrue(LOG.error.called)
@@ -190,7 +190,7 @@ class TestAlarmNotifier(base.TestCase):
                 context.get_admin_context(),
                 {
                     'actions': ['no-such-action-i-am-sure://'],
-                    'alarm': 'foobar',
+                    'alarm_id': 'foobar',
                     'condition': {'threshold': 42},
                 })
             self.assertTrue(LOG.error.called)

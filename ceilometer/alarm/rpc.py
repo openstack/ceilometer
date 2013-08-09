@@ -41,7 +41,7 @@ class RPCAlarmNotifier(rpc_proxy.RpcProxy):
         actions = getattr(alarm, Alarm.ALARM_ACTIONS_MAP[alarm.state])
         msg = self.make_msg('notify_alarm', data={
             'actions': actions,
-            'alarm': alarm.alarm_id,
+            'alarm_id': alarm.alarm_id,
             'previous': previous,
             'current': alarm.state,
             'reason': reason})

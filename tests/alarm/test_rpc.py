@@ -81,7 +81,7 @@ class TestRPCAlarmNotifier(base.TestCase):
             actions = getattr(a, AlarmModel.ALARM_ACTIONS_MAP[a.state])
             self.assertEqual(self.notified[i][0],
                              cfg.CONF.alarm.notifier_rpc_topic)
-            self.assertEqual(self.notified[i][1]["args"]["data"]["alarm"],
+            self.assertEqual(self.notified[i][1]["args"]["data"]["alarm_id"],
                              self.alarms[i].alarm_id)
             self.assertEqual(self.notified[i][1]["args"]["data"]["actions"],
                              actions)

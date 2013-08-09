@@ -25,11 +25,11 @@ class AlarmNotifier(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def notify(self, action, alarm, previous, current, reason):
+    def notify(self, action, alarm_id, previous, current, reason):
         """Notify that an alarm has been triggered.
 
         :param action: The action that is being attended, as a parsed URL.
-        :param alarm: The triggered alarm.
+        :param alarm_id: The triggered alarm.
         :param previous: The previous state of the alarm.
         :param current: The current state of the alarm.
         :param reason: The reason the alarm changed its state.

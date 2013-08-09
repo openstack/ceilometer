@@ -128,12 +128,12 @@ class AlarmNotifierService(rpc_service.Service):
             'ceilometer.alarm.' + cfg.CONF.alarm.notifier_rpc_topic,
         )
 
-    def _handle_action(self, action, alarm, previous, current, reason):
+    def _handle_action(self, action, alarm_id, previous, current, reason):
         try:
             action = network_utils.urlsplit(action)
         except Exception:
             LOG.error(
-                _("Unable to parse action %(action)s for alarm %(alarm)s"),
+                _("Unable to parse action %(action)s for alarm %(alarm_id)s"),
                 locals())
             return
 
@@ -142,17 +142,17 @@ class AlarmNotifierService(rpc_service.Service):
         except KeyError:
             scheme = action.scheme
             LOG.error(
-                _("Action %(scheme)s for alarm %(alarm)s is unknown, "
+                _("Action %(scheme)s for alarm %(alarm_id)s is unknown, "
                   "cannot notify"),
                 locals())
             return
 
         try:
             LOG.debug("Notifying alarm %s with action %s",
-                      alarm, action)
-            notifier.notify(action, alarm, previous, current, reason)
+                      alarm_id, action)
+            notifier.notify(action, alarm_id, previous, current, reason)
         except Exception:
-            LOG.exception(_("Unable to notify alarm %s"), alarm)
+            LOG.exception(_("Unable to notify alarm %s"), alarm_id)
             return
 
     def notify_alarm(self, context, data):
@@ -161,7 +161,7 @@ class AlarmNotifierService(rpc_service.Service):
         data should be a dict with the following keys:
         - actions, the URL of the action to run;
           this is a mapped to extensions automatically
-        - alarm, the alarm that has been triggered
+        - alarm_id, the ID of the alarm that has been triggered
         - previous, the previous state of the alarm
         - current, the new state the alarm has transitioned to
         - reason, the reason the alarm changed its state
@@ -176,7 +176,7 @@ class AlarmNotifierService(rpc_service.Service):
 
         for action in actions:
             self._handle_action(action,
-                                data.get('alarm'),
+                                data.get('alarm_id'),
                                 data.get('previous'),
                                 data.get('current'),
                                 data.get('reason'))
