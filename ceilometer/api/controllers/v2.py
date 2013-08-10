@@ -4,6 +4,7 @@
 #
 # Author: Doug Hellmann <doug.hellmann@dreamhost.com>
 #         Angus Salkeld <asalkeld@redhat.com>
+#         Eoghan Glynn <eglynn@redhat.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -826,9 +827,55 @@ class Alarm(_Base):
                    )
 
 
+class AlarmChange(_Base):
+    """Representation of an event in an alarm's history
+    """
+
+    alarm_id = wtypes.text
+    "The UUID of the alarm"
+
+    type = wtypes.Enum(str,
+                       'creation',
+                       'rule change',
+                       'state transition',
+                       'deletion')
+    "The type of change"
+
+    detail = wtypes.text
+    "JSON fragment describing change"
+
+    project_id = wtypes.text
+    "The project ID of the initiating identity"
+
+    user_id = wtypes.text
+    "The user ID of the initiating identity"
+
+    on_behalf_of = wtypes.text
+    "The tenant on behalf of which the change is being made"
+
+    timestamp = datetime.datetime
+    "The time/date of the alarm change"
+
+    @classmethod
+    def sample(cls):
+        return cls(alarm_id='e8ff32f772a44a478182c3fe1f7cad6a',
+                   type='rule change',
+                   detail='{"threshold": 42.0, "evaluation_periods": 4}',
+                   user_id="3e5d11fda79448ac99ccefb20be187ca",
+                   project_id="b6f16144010811e387e4de429e99ee8c",
+                   on_behalf_of="92159030020611e3b26dde429e99ee8c",
+                   timestamp=datetime.datetime.utcnow(),
+                   )
+
+
 class AlarmController(rest.RestController):
     """Manages operations on a single alarm.
     """
+
+    _custom_actions = {
+        'history': ['GET'],
+    }
+
     def __init__(self, alarm_id):
         pecan.request.context['alarm_id'] = alarm_id
         self._id = alarm_id
@@ -875,6 +922,19 @@ class AlarmController(rest.RestController):
         # ensure alarm exists before deleting
         alarm_id = self._alarm().alarm_id
         self.conn.delete_alarm(alarm_id)
+
+    # TODO(eglynn): add pagination marker to signature once overall
+    #               API support for pagination is finalized
+    @wsme_pecan.wsexpose([AlarmChange], [Query])
+    def history(self, q=[]):
+        """Assembles the alarm history requested.
+
+        :param q: Filter rules for the changes to be described.
+        """
+        # ensure per-tenant segregation
+        self._alarm()
+        # TODO(eglynn): history not yet persisted
+        return []
 
 
 class AlarmsController(rest.RestController):

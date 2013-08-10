@@ -172,3 +172,13 @@ class TestAlarms(FunctionalTest,
                     status=200)
         alarms = list(self.conn.get_alarms())
         self.assertEquals(2, len(alarms))
+
+    def test_get_alarm_history(self):
+        data = self.get_json('/alarms')
+        history = self.get_json('/alarms/%s/history' % data[0]['alarm_id'])
+        self.assertEquals([], history)
+
+    def test_get_nonexistent_alarm_history(self):
+        response = self.get_json('/alarms/%s/history' % 'foobar',
+                                 expect_errors=True)
+        self.assertEqual(response.status_int, 400)
