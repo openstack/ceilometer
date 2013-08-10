@@ -865,6 +865,19 @@ class Connection(base.Connection):
         """
         self.db.alarm.remove({'alarm_id': alarm_id})
 
+    def get_alarm_changes(self, alarm_id, on_behalf_of):
+        """Yields list of AlarmChanges describing alarm history
+        :param alarm_id: ID of alarm to return changes for
+        :param on_behalf_of: ID of tenant to scope changes query (None for
+                             administrative user, indicating all projects)
+        """
+        raise NotImplementedError('Alarm history not implemented')
+
+    def record_alarm_change(self, alarm_change):
+        """Record alarm change event.
+        """
+        raise NotImplementedError('Alarm history not implemented')
+
     @staticmethod
     def record_events(events):
         """Write the events.
