@@ -108,7 +108,12 @@ class TestListMeters(FunctionalTest,
                     'resource-id4',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 43),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter4'},
+                                       'tag': 'self.counter4',
+                                       'properties': {
+                                       'prop_1': 'prop_value',
+                                       'prop_2': {'sub_prop_1':
+                                                  'sub_prop_value'}}
+                                       },
                     source='test_source')]:
             msg = rpc.meter_message_from_counter(
                 cnt,
@@ -126,6 +131,22 @@ class TestListMeters(FunctionalTest,
         self.assertEquals(set(r['name'] for r in data),
                           set(['meter.test',
                                'meter.mine']))
+
+    def test_list_meters_with_dict_metadata(self):
+        data = self.get_json('/meters/meter.mine',
+                             q=[{'field':
+                                 'metadata.properties.prop_2.sub_prop_1',
+                                 'op': 'eq',
+                                 'value': 'sub_prop_value',
+                                 }])
+        self.assertEquals(1, len(data))
+        self.assertEquals('resource-id4', data[0]['resource_id'])
+        metadata = data[0]['resource_metadata']
+        self.assertIsNotNone(metadata)
+        # FIXME (flwang): Based on current implement, the metadata of
+        # dictionary type can't be shown in the output. See bug 1203699.
+        # Will add more asserts in the fix of 1203699.
+        self.assertEqual('self.counter4', metadata['tag'])
 
     def test_list_meters_metadata_query(self):
         data = self.get_json('/meters/meter.test',

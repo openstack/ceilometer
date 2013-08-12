@@ -449,8 +449,18 @@ class Connection(base.Connection):
                 for k, v in metaquery.iteritems():
                     message = json.loads(meter['f:message'])
                     metadata = message['resource_metadata']
-                    if metadata[k.split('.', 1)[1]] != v:
-                        break   # if one metaquery doesn't match, break
+                    keys = k.split('.')
+                    # Support the dictionary type of metadata
+                    for key in keys[1:]:
+                        if key in metadata:
+                            metadata = metadata[key]
+                        else:
+                            break
+                    # NOTE (flwang) For multiple level searching, the matadata
+                    # object will be drilled down to check if it's matched
+                    # with the searched value.
+                    if metadata != v:
+                        break
                 else:
                     if limit:
                         limit -= 1
