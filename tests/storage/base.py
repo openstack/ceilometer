@@ -707,6 +707,7 @@ class StatisticsTest(DBTestBase):
                          (datetime.datetime(2012, 9, 25, 12, 32)
                           - datetime.datetime(2012, 9, 25, 10, 30)).seconds)
         assert results.count == 3
+        assert results.unit == 'GiB'
         assert results.min == 8
         assert results.max == 10
         assert results.sum == 27
@@ -746,6 +747,7 @@ class StatisticsTest(DBTestBase):
         self.assertEqual(r.period_start,
                          datetime.datetime(2012, 9, 25, 10, 28))
         self.assertEqual(r.count, 2)
+        self.assertEqual(r.unit, 'GiB')
         self.assertEqual(r.avg, 8.5)
         self.assertEqual(r.min, 8)
         self.assertEqual(r.max, 9)
@@ -814,6 +816,7 @@ class StatisticsTest(DBTestBase):
         self.assertEqual(r.period_start,
                          datetime.datetime(2012, 9, 25, 10, 28))
         self.assertEqual(r.count, 1)
+        self.assertEqual(r.unit, 'GiB')
         self.assertEqual(r.avg, 8)
         self.assertEqual(r.min, 8)
         self.assertEqual(r.max, 8)
@@ -838,6 +841,7 @@ class StatisticsTest(DBTestBase):
         results = list(self.conn.get_meter_statistics(f))[0]
         self.assertEqual(results.duration, 0)
         assert results.count == 1
+        assert results.unit == 'GiB'
         assert results.min == 6
         assert results.max == 6
         assert results.sum == 6
@@ -853,6 +857,7 @@ class StatisticsTest(DBTestBase):
                          (datetime.datetime(2012, 9, 25, 12, 32)
                           - datetime.datetime(2012, 9, 25, 10, 30)).seconds)
         assert results.count == 3
+        assert results.unit == 'GiB'
         assert results.min == 5
         assert results.max == 7
         assert results.sum == 18

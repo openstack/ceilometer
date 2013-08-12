@@ -434,6 +434,7 @@ class Connection(base.Connection):
     def _make_stats_query(sample_filter):
         session = sqlalchemy_session.get_session()
         query = session.query(
+            Meter.counter_unit.label('unit'),
             func.min(Meter.timestamp).label('tsmin'),
             func.max(Meter.timestamp).label('tsmax'),
             func.avg(Meter.counter_volume).label('avg'),
@@ -450,6 +451,7 @@ class Connection(base.Connection):
                     if result.tsmin is not None and result.tsmax is not None
                     else None)
         return api_models.Statistics(
+            unit=result.unit,
             count=int(result.count),
             min=result.min,
             max=result.max,

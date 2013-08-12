@@ -175,7 +175,8 @@ class Connection(base.Connection):
 
     MAP_STATS = bson.code.Code("""
     function () {
-        emit('statistics', { min : this.counter_volume,
+        emit('statistics', { unit: this.counter_unit,
+                             min : this.counter_volume,
                              max : this.counter_volume,
                              sum : this.counter_volume,
                              count : NumberInt(1),
@@ -195,7 +196,8 @@ class Connection(base.Connection):
                                          - period_first) / period)
                               * period);
         emit(period_start,
-             { min : this.counter_volume,
+             { unit: this.counter_unit,
+               min : this.counter_volume,
                max : this.counter_volume,
                sum : this.counter_volume,
                count : NumberInt(1),
@@ -208,7 +210,8 @@ class Connection(base.Connection):
 
     REDUCE_STATS = bson.code.Code("""
     function (key, values) {
-        var res = { min: values[0].min,
+        var res = { unit: values[0].unit,
+                    min: values[0].min,
                     max: values[0].max,
                     count: values[0].count,
                     sum: values[0].sum,

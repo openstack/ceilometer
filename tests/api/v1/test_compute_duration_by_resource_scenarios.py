@@ -57,6 +57,7 @@ class TestComputeDurationByResource(tests_api.TestBase,
     def _set_stats(self, start, end):
         def get_meter_statistics(event_filter):
             return models.Statistics(
+                unit='',
                 min=0, max=0, avg=0, sum=0, count=0,
                 period=None,
                 period_start=None,

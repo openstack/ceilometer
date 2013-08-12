@@ -472,6 +472,7 @@ class Connection(base.Connection):
         """
         vol = int(meter['f:counter_volume'])
         ts = timeutils.parse_strtime(meter['f:timestamp'])
+        stat.unit = meter['f:counter_unit']
         stat.min = min(vol, stat.min or vol)
         stat.max = max(vol, stat.max)
         stat.sum = vol + (stat.sum or 0)
@@ -541,7 +542,8 @@ class Connection(base.Connection):
                     period_end = period_start + datetime.timedelta(
                         0, period)
                 results.append(
-                    models.Statistics(count=0,
+                    models.Statistics(unit='',
+                                      count=0,
                                       min=0,
                                       max=0,
                                       avg=0,
