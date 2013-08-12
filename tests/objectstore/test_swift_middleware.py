@@ -49,7 +49,7 @@ class TestSwiftMiddleware(base.TestCase):
                 self.pipeline_manager = pipeline_manager
                 self.counters = []
 
-            def publish_counters(self, ctxt, counters):
+            def publish_samples(self, ctxt, counters):
                 self.counters.extend(counters)
 
             def flush(self, context):

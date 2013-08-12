@@ -41,7 +41,7 @@ class UDPPublisher(publisher.PublisherBase):
         self.socket = socket.socket(socket.AF_INET,
                                     socket.SOCK_DGRAM)
 
-    def publish_counters(self, context, counters):
+    def publish_samples(self, context, counters):
         """Send a metering message for publishing
 
         :param context: Execution context from the service or RPC call

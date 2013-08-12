@@ -100,19 +100,19 @@ class CeilometerMiddleware(object):
                         bytes_sent += len(chunk)
                     yield chunk
             finally:
-                self.publish_counter(env,
-                                     input_proxy.bytes_received,
-                                     bytes_sent)
+                self.publish_sample(env,
+                                    input_proxy.bytes_received,
+                                    bytes_sent)
 
         try:
             iterable = self.app(env, my_start_response)
         except Exception:
-            self.publish_counter(env, input_proxy.bytes_received, 0)
+            self.publish_sample(env, input_proxy.bytes_received, 0)
             raise
         else:
             return iter_response(iterable)
 
-    def publish_counter(self, env, bytes_received, bytes_sent):
+    def publish_sample(self, env, bytes_received, bytes_sent):
         req = REQUEST.Request(env)
         version, account, container, obj = split_path(req.path, 1, 4, True)
         now = timeutils.utcnow().isoformat()

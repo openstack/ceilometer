@@ -136,7 +136,7 @@ class RPCPublisher(publisher.PublisherBase):
                      % self.policy)
             self.policy = 'default'
 
-    def publish_counters(self, context, counters):
+    def publish_samples(self, context, counters):
         """Publish counters on RPC.
 
         :param context: Execution context from the service or RPC call.

@@ -86,7 +86,7 @@ class FilePublisher(publisher.PublisherBase):
         rfh.setLevel(logging.INFO)
         self.publisher_logger.addHandler(rfh)
 
-    def publish_counters(self, context, counters):
+    def publish_samples(self, context, counters):
         """Send a metering message for publishing
 
         :param context: Execution context from the service or RPC call

@@ -71,8 +71,8 @@ class TestFilePublisher(base.TestCase):
         parsed_url = urlsplit(
             'file:///tmp/log_file?max_bytes=50&backup_count=3')
         publisher = file.FilePublisher(parsed_url)
-        publisher.publish_counters(None,
-                                   self.test_data)
+        publisher.publish_samples(None,
+                                  self.test_data)
 
         handler = publisher.publisher_logger.handlers[0]
         self.assertTrue(isinstance(handler,
@@ -87,8 +87,8 @@ class TestFilePublisher(base.TestCase):
         parsed_url = urlsplit(
             'file:///tmp/log_file_plain')
         publisher = file.FilePublisher(parsed_url)
-        publisher.publish_counters(None,
-                                   self.test_data)
+        publisher.publish_samples(None,
+                                  self.test_data)
 
         handler = publisher.publisher_logger.handlers[0]
         self.assertTrue(isinstance(handler,
@@ -104,7 +104,7 @@ class TestFilePublisher(base.TestCase):
         parsed_url = urlsplit(
             'file:///tmp/log_file_bad?max_bytes=yus&backup_count=5y')
         publisher = file.FilePublisher(parsed_url)
-        publisher.publish_counters(None,
-                                   self.test_data)
+        publisher.publish_samples(None,
+                                  self.test_data)
 
         self.assertIsNone(publisher.publisher_logger)

@@ -28,7 +28,7 @@ LOG = log.getLogger(__name__)
 
 
 class PollingTask(object):
-    """Polling task for polling counters and inject into pipeline.
+    """Polling task for polling samples and inject into pipeline.
     A polling task can be invoked periodically or only once.
 
     """
@@ -45,7 +45,7 @@ class PollingTask(object):
 
     @abc.abstractmethod
     def poll_and_publish(self):
-        """Polling counter and publish into pipeline."""
+        """Polling sample and publish into pipeline."""
 
 
 class AgentManager(object):
@@ -70,7 +70,7 @@ class AgentManager(object):
         for pipeline, pollster in itertools.product(
                 self.pipeline_manager.pipelines,
                 self.pollster_manager.extensions):
-            if pipeline.support_counter(pollster.name):
+            if pipeline.support_meter(pollster.name):
                 polling_task = polling_tasks.get(pipeline.interval, None)
                 if not polling_task:
                     polling_task = self.create_polling_task()
