@@ -92,7 +92,7 @@
 
    source
      The origin of metering data. This field is set to "openstack" by default.
-     It can be configured to a different value using the counter_source field
+     It can be configured to a different value using the sample_source field
      in the ceilometer.conf file.
 
    user

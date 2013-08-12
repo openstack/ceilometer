@@ -46,9 +46,9 @@ Units
    disk, routers, floating IPs, etc.).
 4. When creating a new meter, if another meter exists measuring
    something similar, the same units and precision should be used.
-5. Samples (aka "meters" or "counters") should always document their
-   units in Ceilometer (API and Documentation) and new sampling code
-   should not be merged without the appropriate documentation.
+5. Meters and samples should always document their units in Ceilometer (API
+   and Documentation) and new sampling code should not be merged without the
+   appropriate documentation.
 
 ============  ========  ==============  =====
 Dimension     Unit      Abbreviations   Note
