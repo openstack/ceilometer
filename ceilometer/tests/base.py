@@ -20,24 +20,25 @@
 """
 import fixtures
 import functools
-import mox
 from oslo.config import cfg
 import os.path
-import stubout
 import testtools
 from testtools import testcase
 
-cfg.CONF.import_opt('pipeline_cfg_file', 'ceilometer.pipeline')
+from ceilometer.openstack.common.fixture import config
+from ceilometer.openstack.common.fixture import moxstubout
 
 
 class TestCase(testtools.TestCase):
-
     def setUp(self):
         super(TestCase, self).setUp()
-        self.mox = mox.Mox()
-        self.stubs = stubout.StubOutForTesting()
         self.tempdir = self.useFixture(fixtures.TempDir())
         self.useFixture(fixtures.FakeLogger())
+        self.useFixture(config.Config())
+        moxfixture = self.useFixture(moxstubout.MoxStubout())
+        self.mox = moxfixture.mox
+        self.stubs = moxfixture.stubs
+
         cfg.CONF([], project='ceilometer')
 
         # Set a default location for the pipeline config file so the
@@ -45,7 +46,7 @@ class TestCase(testtools.TestCase):
         # the system.
         cfg.CONF.set_override(
             'pipeline_cfg_file',
-            self.path_get('etc/ceilometer/pipeline.yaml'),
+            self.path_get('etc/ceilometer/pipeline.yaml')
         )
 
     def path_get(self, project_file=None):
@@ -61,14 +62,6 @@ class TestCase(testtools.TestCase):
 
     def temp_config_file_path(self, name='ceilometer.conf'):
         return os.path.join(self.tempdir.path, name)
-
-    def tearDown(self):
-        self.mox.UnsetStubs()
-        self.stubs.UnsetAll()
-        self.stubs.SmartUnsetAll()
-        self.mox.VerifyAll()
-        cfg.CONF.reset()
-        super(TestCase, self).tearDown()
 
 
 def _skip_decorator(func):

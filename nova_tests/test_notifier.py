@@ -48,6 +48,11 @@ from nova.openstack.common import log as logging
 # sure it is defined.
 config.cfg.CONF.import_opt('compute_manager', 'nova.service')
 
+# HACK(jd) Import this first because of the second HACK below, and because
+# of Nova not having these module yet as of this writing
+import ceilometer.openstack.common.fixture.config
+import ceilometer.openstack.common.fixture.moxstubout
+
 # HACK(dhellmann): Import this before any other ceilometer code
 # because the notifier module messes with the import path to force
 # nova's version of oslo to be used instead of ceilometer's.
