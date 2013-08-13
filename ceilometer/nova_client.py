@@ -70,7 +70,9 @@ class Client(object):
             flavor = None
 
         attr_defaults = [('name', 'unknown-id-%s' % fid),
-                         ('vcpus', 0), ('ram', 0), ('disk', 0)]
+                         ('vcpus', 0), ('ram', 0), ('disk', 0),
+                         ('ephemeral', 0)]
+
         for attr, default in attr_defaults:
             if not flavor:
                 instance.flavor[attr] = default

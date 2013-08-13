@@ -33,12 +33,7 @@ INSTANCE_PROPERTIES = [
     'kernel_id',
     'os_type',
     'ramdisk_id',
-    # Capacity properties
-    'disk_gb',
-    'ephemeral_gb',
-    'memory_mb',
-    'root_gb',
-    'vcpus']
+]
 
 OPTS = [
     cfg.ListOpt('reserved_metadata_namespace',
@@ -92,7 +87,16 @@ def _get_metadata_from_object(instance):
         metadata['image_ref_url'] = None
 
     for name in INSTANCE_PROPERTIES:
-        metadata[name] = getattr(instance, name, u'')
+        if hasattr(instance, name):
+            metadata[name] = getattr(instance, name)
+
+    metadata['vcpus'] = instance.flavor['vcpus']
+    metadata['memory_mb'] = instance.flavor['ram']
+    metadata['disk_gb'] = instance.flavor['disk']
+    metadata['ephemeral_gb'] = instance.flavor['ephemeral']
+    metadata['root_gb'] = int(metadata['disk_gb']) - \
+        int(metadata['ephemeral_gb'])
+
     return _add_reserved_user_metadata(instance, metadata)
 
 

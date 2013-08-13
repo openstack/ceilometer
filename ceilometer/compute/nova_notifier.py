@@ -122,6 +122,10 @@ class Instance(object):
         return {
             'id': self.instance_type_id,
             'name': self.flavor_name,
+            'vcpus': self.vcpus,
+            'ram': self.memory_mb,
+            'disk': self.root_gb + self.ephemeral_gb,
+            'ephemeral': self.ephemeral_gb
         }
 
     @property

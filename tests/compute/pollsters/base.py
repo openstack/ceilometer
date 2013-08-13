@@ -37,4 +37,4 @@ class TestPollsterBase(test_base.TestCase):
                 self.instance.name)
         self.instance.id = 1
         self.instance.flavor = {'name': 'm1.small', 'id': 2, 'vcpus': 1,
-                                'ram': 512, 'disk': 0}
+                                'ram': 512, 'disk': 20, 'ephemeral': 0}
