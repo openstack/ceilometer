@@ -176,7 +176,7 @@ class Connection(object):
         """
 
     @abc.abstractmethod
-    def get_meter_statistics(self, sample_filter, period=None):
+    def get_meter_statistics(self, sample_filter, period=None, groupby=None):
         """Return an iterable of model.Statistics instances.
 
         The filter must have a meter value set.

@@ -54,6 +54,13 @@ class StatisticsTest(base.StatisticsTest, SQLAlchemyEngineTestBase):
     pass
 
 
+class StatisticsGroupByTest(base.StatisticsGroupByTest,
+                            SQLAlchemyEngineTestBase):
+    # This is not implemented
+    def test_group_by_source(self):
+        pass
+
+
 class CounterDataTypeTest(base.CounterDataTypeTest, SQLAlchemyEngineTestBase):
     pass
 

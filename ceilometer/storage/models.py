@@ -212,7 +212,8 @@ class Statistics(Model):
     def __init__(self, unit,
                  min, max, avg, sum, count,
                  period, period_start, period_end,
-                 duration, duration_start, duration_end):
+                 duration, duration_start, duration_end,
+                 groupby):
         """Create a new statistics object.
 
         :param unit: The unit type of the data set
@@ -227,13 +228,15 @@ class Statistics(Model):
         :param duration: The total time for the matching samples
         :param duration_start: The earliest time for the matching samples
         :param duration_end: The latest time for the matching samples
+        :param groupby: The fields used to group the samples.
         """
         Model.__init__(self, unit=unit,
                        min=min, max=max, avg=avg, sum=sum, count=count,
                        period=period, period_start=period_start,
                        period_end=period_end, duration=duration,
                        duration_start=duration_start,
-                       duration_end=duration_end)
+                       duration_end=duration_end,
+                       groupby=groupby)
 
 
 class Alarm(Model):

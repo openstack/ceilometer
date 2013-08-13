@@ -684,13 +684,16 @@ class Connection(base.Connection):
             s['counter_unit'] = s.get('counter_unit', '')
             yield models.Sample(**s)
 
-    def get_meter_statistics(self, sample_filter, period=None):
+    def get_meter_statistics(self, sample_filter, period=None, groupby=None):
         """Return an iterable of models.Statistics instance containing meter
         statistics described by the query parameters.
 
         The filter must have a meter value set.
 
         """
+        if groupby:
+            raise NotImplementedError("Group by not implemented.")
+
         q = make_query_from_filter(sample_filter)
 
         if period:
@@ -712,6 +715,10 @@ class Connection(base.Connection):
             finalize=self.FINALIZE_STATS,
             query=q,
         )
+
+        # TODO(jd) implement groupby and remove this code
+        for r in results['results']:
+            r['value']['groupby'] = None
 
         return sorted((models.Statistics(**(r['value']))
                        for r in results['results']),

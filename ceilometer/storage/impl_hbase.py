@@ -494,7 +494,7 @@ class Connection(base.Connection):
             timeutils.delta_seconds(stat.duration_start,
                                     stat.duration_end)
 
-    def get_meter_statistics(self, sample_filter, period=None):
+    def get_meter_statistics(self, sample_filter, period=None, groupby=None):
         """Return an iterable of models.Statistics instances containing meter
         statistics described by the query parameters.
 
@@ -507,6 +507,9 @@ class Connection(base.Connection):
            because of all the Thrift traffic it is going to create.
 
         """
+        if groupby:
+            raise NotImplementedError("Group by not implemented.")
+
         meter_table = self.conn.table(self.METER_TABLE)
 
         q, start, stop = make_query_from_filter(sample_filter)
@@ -563,7 +566,8 @@ class Connection(base.Connection):
                                       period_end=period_end,
                                       duration=None,
                                       duration_start=None,
-                                      duration_end=None)
+                                      duration_end=None,
+                                      groupby=None)
                 )
             self._update_meter_stats(results[-1], meter)
         return results
