@@ -23,6 +23,7 @@ from oslo.config import cfg
 
 from ceilometer.openstack.common import log
 from ceilometerclient import client as ceiloclient
+from ceilometer.openstack.common.gettextutils import _
 
 LOG = log.getLogger(__name__)
 
