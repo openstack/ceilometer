@@ -19,6 +19,7 @@
 from collections import defaultdict
 
 from ceilometer import sample
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer import transformer
