@@ -185,6 +185,13 @@ class TestMaxResourceVolume(base.FunctionalTest,
                               u'2012-09-25T11:30:00',
                               u'2012-09-25T12:30:00']))
 
+    def test_period_with_negative_value(self):
+        resp = self.get_json(self.PATH, expect_errors=True,
+                             q=[{'field': 'resource_id',
+                                 'value': 'resource-id'}],
+                             period=-1)
+        self.assertEquals(400, resp.status_code)
+
     def test_start_timestamp(self):
         data = self.get_json(self.PATH, q=[{'field': 'resource_id',
                                             'value': 'resource-id',
