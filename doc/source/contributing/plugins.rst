@@ -65,12 +65,12 @@ Compute plugins are defined as subclasses of the
 :class:`ceilometer.compute.plugin.ComputePollster` class as defined in
 the ``ceilometer/compute/plugin.py`` file. Pollsters must implement one
 method: ``get_samples(self, manager, context)``, which returns a
-sequence of ``Counter`` objects as defined in the
-``ceilometer/counter.py`` file.
+sequence of ``Sample`` objects as defined in the
+``ceilometer/sample.py`` file.
 
 In the ``CPUPollster`` plugin, the ``get_samples`` method is implemented as a loop
 which, for each instances running on the local host, retrieves the cpu_time
-from the hypervisor and sends back two ``Counter`` objects.  The first one, named
+from the hypervisor and sends back two ``Sample`` objects.  The first one, named
 "cpu", is of type "cumulative", meaning that between two polls, its value is
 not reset, or in other word that the cpu value is always provided as a duration
 that continuously increases since the creation of the instance. The second one,
@@ -89,7 +89,7 @@ the ``ceilometer/plugin.py`` file.  Notifications must implement:
 
    ``event_types`` which should be a sequence of strings defining the event types to be given to the plugin and
 
-   ``process_notification(self, message)`` which receives an event message from the list provided to event_types and returns a sequence of Counter objects as defined in the ``ceilometer/counter.py`` file.
+   ``process_notification(self, message)`` which receives an event message from the list provided to event_types and returns a sequence of Sample objects as defined in the ``ceilometer/sample.py`` file.
 
 In the ``InstanceNotifications`` plugin, it listens to three events:
 
@@ -101,7 +101,7 @@ In the ``InstanceNotifications`` plugin, it listens to three events:
 
 using the ``get_event_type`` method and subsequently the method
 ``process_notification`` will be invoked each time such events are happening which
-generates the appropriate counter objects to be sent to the collector.
+generates the appropriate sample objects to be sent to the collector.
 
 Tests
 =====

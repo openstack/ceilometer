@@ -26,12 +26,12 @@ Installing the Collector
 .. index::
    double: installing; collector
 
-1. If you want to be able to retrieve image counters, you need to instruct
+1. If you want to be able to retrieve image samples, you need to instruct
    Glance to send notifications to the bus by changing ``notifier_strategy``
    to ``rabbit`` or ``qpid`` in ``glance-api.conf`` and restarting the
    service.
 
-2. If you want to be able to retrieve volume counters, you need to instruct
+2. If you want to be able to retrieve volume samples, you need to instruct
    Cinder to send notifications to the bus by changing ``notification_driver``
    to ``cinder.openstack.common.notifier.rabbit_notifier`` and
    ``control_exchange`` to ``cinder``, before restarting the service.
