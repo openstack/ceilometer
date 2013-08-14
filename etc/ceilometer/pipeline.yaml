@@ -2,7 +2,7 @@
 -
     name: meter_pipeline
     interval: 600
-    counters:
+    meters:
         - "*"
     transformers:
     publishers:
@@ -10,7 +10,7 @@
 -
     name: cpu_pipeline
     interval: 600
-    counters:
+    meters:
         - "cpu"
     transformers:
         - name: "rate_of_change"

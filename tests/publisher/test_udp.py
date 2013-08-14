@@ -113,8 +113,8 @@ class TestUDPPublisher(base.TestCase):
                         self._make_fake_socket(self.data_sent)):
             publisher = udp.UDPPublisher(
                 network_utils.urlsplit('udp://somehost'))
-        publisher.publish_counters(None,
-                                   self.test_data)
+        publisher.publish_samples(None,
+                                  self.test_data)
 
         self.assertEqual(len(self.data_sent), 5)
 
@@ -146,5 +146,5 @@ class TestUDPPublisher(base.TestCase):
                         self._make_broken_socket):
             publisher = udp.UDPPublisher(
                 network_utils.urlsplit('udp://localhost'))
-        publisher.publish_counters(None,
-                                   self.test_data)
+        publisher.publish_samples(None,
+                                  self.test_data)
