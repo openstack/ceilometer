@@ -534,9 +534,9 @@ class Connection(base.Connection):
         :param sort_dir: Direction with which results be sorted(asc, desc).
         """
 
-        if marker_pairs is not None:
+        if marker_pairs:
             raise NotImplementedError(
-                "Cannot use marker pairs in resource listing")
+                "Cannot use marker pairs in resource listing, not implemented")
 
         q = {}
         if user is not None:
