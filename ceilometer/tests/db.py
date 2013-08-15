@@ -21,6 +21,7 @@
 """Base classes for API tests."""
 import os
 import uuid
+import warnings
 
 from oslo.config import cfg
 
@@ -33,10 +34,15 @@ class TestBase(test_base.TestCase):
         super(TestBase, self).setUp()
         cfg.CONF.set_override('connection', str(self.database_connection),
                               group='database')
-        try:
-            self.conn = storage.get_connection(cfg.CONF)
-        except storage.StorageBadVersion as e:
-            self.skipTest(str(e))
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                action='ignore',
+                message='.*you must provide a username and password.*')
+            try:
+                self.conn = storage.get_connection(cfg.CONF)
+            except storage.StorageBadVersion as e:
+                self.skipTest(str(e))
         self.conn.upgrade()
 
     def tearDown(self):
