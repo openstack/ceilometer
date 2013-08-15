@@ -40,6 +40,7 @@ import wsmeext.pecan as wsme_pecan
 from wsme import types as wtypes
 
 from ceilometer.openstack.common import context
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer import sample
