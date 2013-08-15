@@ -169,6 +169,22 @@ database_connection          hbase://$hbase-thrift-server:9090     Database conn
     the Ceilometer services that use the database to allow the changes to take
     affect, i.e. the collector and API services.
 
+Event Conversion
+================
+
+The following options in the [event] configuration section affect the extraction of Event data from notifications.
+
+==================================  ======================================  ==============================================================
+Parameter                           Default                                 Note
+==================================  ======================================  ==============================================================
+drop_unmatched_notifications        False                                   If set to True, then notifications with no matching event
+                                                                            definition will be dropped.
+                                                                            (Notifications will *only* be dropped if this is True)
+definitions_cfg_file                event_definitions.yaml                  Name of event definitions config file (yaml format)
+==================================  ======================================  ==============================================================
+
+
+
 General options
 ===============
 
