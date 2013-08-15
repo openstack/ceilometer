@@ -1,6 +1,17 @@
 [DEFAULT]
 
 #
+# Options defined in ceilometer.middleware
+#
+
+# Exchanges name to listen for notifications (multi valued)
+#http_control_exchanges=nova
+#http_control_exchanges=glance
+#http_control_exchanges=neutron
+#http_control_exchanges=cinder
+
+
+#
 # Options defined in ceilometer.pipeline
 #
 
