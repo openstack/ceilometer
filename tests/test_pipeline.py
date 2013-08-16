@@ -747,10 +747,10 @@ class TestPipeline(base.TestCase):
         pipe.flush(None)
         self.assertEqual(len(publisher.counters), 1)
         cpu_mins = publisher.counters[-1]
-        self.assertEquals(getattr(cpu_mins, 'name'), 'cpu_mins')
-        self.assertEquals(getattr(cpu_mins, 'unit'), 'min')
-        self.assertEquals(getattr(cpu_mins, 'type'), sample.TYPE_CUMULATIVE)
-        self.assertEquals(getattr(cpu_mins, 'volume'), 20)
+        self.assertEqual(getattr(cpu_mins, 'name'), 'cpu_mins')
+        self.assertEqual(getattr(cpu_mins, 'unit'), 'min')
+        self.assertEqual(getattr(cpu_mins, 'type'), sample.TYPE_CUMULATIVE)
+        self.assertEqual(getattr(cpu_mins, 'volume'), 20)
 
     def test_unit_identified_source_unit_conversion(self):
         self.pipeline_cfg[0]['transformers'] = [
@@ -798,14 +798,14 @@ class TestPipeline(base.TestCase):
         publisher = pipeline_manager.pipelines[0].publishers[0]
         self.assertEqual(len(publisher.counters), 2)
         core_temp = publisher.counters[1]
-        self.assertEquals(getattr(core_temp, 'name'), 'core_temperature')
-        self.assertEquals(getattr(core_temp, 'unit'), '°F')
-        self.assertEquals(getattr(core_temp, 'volume'), 96.8)
+        self.assertEqual(getattr(core_temp, 'name'), 'core_temperature')
+        self.assertEqual(getattr(core_temp, 'unit'), '°F')
+        self.assertEqual(getattr(core_temp, 'volume'), 96.8)
         amb_temp = publisher.counters[0]
-        self.assertEquals(getattr(amb_temp, 'name'), 'ambient_temperature')
-        self.assertEquals(getattr(amb_temp, 'unit'), '°F')
-        self.assertEquals(getattr(amb_temp, 'volume'), 88.8)
-        self.assertEquals(getattr(core_temp, 'volume'), 96.8)
+        self.assertEqual(getattr(amb_temp, 'name'), 'ambient_temperature')
+        self.assertEqual(getattr(amb_temp, 'unit'), '°F')
+        self.assertEqual(getattr(amb_temp, 'volume'), 88.8)
+        self.assertEqual(getattr(core_temp, 'volume'), 96.8)
 
     def _do_test_rate_of_change_conversion(self, prev, curr, type, expected,
                                            offset=1, weight=None):
@@ -889,17 +889,17 @@ class TestPipeline(base.TestCase):
         pipe.flush(None)
         self.assertEqual(len(publisher.counters), 2)
         cpu_util = publisher.counters[0]
-        self.assertEquals(getattr(cpu_util, 'name'), 'cpu_util')
-        self.assertEquals(getattr(cpu_util, 'resource_id'), 'test_resource')
-        self.assertEquals(getattr(cpu_util, 'unit'), '%')
-        self.assertEquals(getattr(cpu_util, 'type'), sample.TYPE_GAUGE)
-        self.assertEquals(getattr(cpu_util, 'volume'), expected)
+        self.assertEqual(getattr(cpu_util, 'name'), 'cpu_util')
+        self.assertEqual(getattr(cpu_util, 'resource_id'), 'test_resource')
+        self.assertEqual(getattr(cpu_util, 'unit'), '%')
+        self.assertEqual(getattr(cpu_util, 'type'), sample.TYPE_GAUGE)
+        self.assertEqual(getattr(cpu_util, 'volume'), expected)
         cpu_util = publisher.counters[1]
-        self.assertEquals(getattr(cpu_util, 'name'), 'cpu_util')
-        self.assertEquals(getattr(cpu_util, 'resource_id'), 'test_resource2')
-        self.assertEquals(getattr(cpu_util, 'unit'), '%')
-        self.assertEquals(getattr(cpu_util, 'type'), sample.TYPE_GAUGE)
-        self.assertEquals(getattr(cpu_util, 'volume'), expected * 2)
+        self.assertEqual(getattr(cpu_util, 'name'), 'cpu_util')
+        self.assertEqual(getattr(cpu_util, 'resource_id'), 'test_resource2')
+        self.assertEqual(getattr(cpu_util, 'unit'), '%')
+        self.assertEqual(getattr(cpu_util, 'type'), sample.TYPE_GAUGE)
+        self.assertEqual(getattr(cpu_util, 'volume'), expected * 2)
 
     def test_rate_of_change_conversion(self):
         self._do_test_rate_of_change_conversion(120000000000,

@@ -38,7 +38,7 @@ class TestListEmptyAlarms(FunctionalTest,
 
     def test_empty(self):
         data = self.get_json('/alarms')
-        self.assertEquals([], data)
+        self.assertEqual([], data)
 
 
 class TestAlarms(FunctionalTest,
@@ -72,14 +72,11 @@ class TestAlarms(FunctionalTest,
 
     def test_list_alarms(self):
         data = self.get_json('/alarms')
-        self.assertEquals(3, len(data))
-        self.assertEquals(set(r['name'] for r in data),
-                          set(['name1',
-                               'name2',
-                               'name3']))
-        self.assertEquals(set(r['counter_name'] for r in data),
-                          set(['meter.test',
-                               'meter.mine']))
+        self.assertEqual(3, len(data))
+        self.assertEqual(set(r['name'] for r in data),
+                         set(['name1', 'name2', 'name3']))
+        self.assertEqual(set(r['counter_name'] for r in data),
+                         set(['meter.test', 'meter.mine']))
 
     def test_get_alarm(self):
         alarms = self.get_json('/alarms',
@@ -88,14 +85,14 @@ class TestAlarms(FunctionalTest,
                                    }])
         for a in alarms:
             print('%s: %s' % (a['name'], a['alarm_id']))
-        self.assertEquals(alarms[0]['name'], 'name1')
-        self.assertEquals(alarms[0]['counter_name'], 'meter.test')
+        self.assertEqual(alarms[0]['name'], 'name1')
+        self.assertEqual(alarms[0]['counter_name'], 'meter.test')
 
         one = self.get_json('/alarms/%s' % alarms[0]['alarm_id'])
-        self.assertEquals(one['name'], 'name1')
-        self.assertEquals(one['counter_name'], 'meter.test')
-        self.assertEquals(one['alarm_id'], alarms[0]['alarm_id'])
-        self.assertEquals(one['repeat_actions'], alarms[0]['repeat_actions'])
+        self.assertEqual(one['name'], 'name1')
+        self.assertEqual(one['counter_name'], 'meter.test')
+        self.assertEqual(one['alarm_id'], alarms[0]['alarm_id'])
+        self.assertEqual(one['repeat_actions'], alarms[0]['repeat_actions'])
 
     def test_post_invalid_alarm(self):
         json = {
@@ -108,7 +105,7 @@ class TestAlarms(FunctionalTest,
         self.post_json('/alarms', params=json, expect_errors=True, status=400,
                        headers=self.auth_headers)
         alarms = list(self.conn.get_alarms())
-        self.assertEquals(3, len(alarms))
+        self.assertEqual(3, len(alarms))
 
     def test_post_alarm(self):
         json = {
@@ -122,7 +119,7 @@ class TestAlarms(FunctionalTest,
         self.post_json('/alarms', params=json, status=200,
                        headers=self.auth_headers)
         alarms = list(self.conn.get_alarms())
-        self.assertEquals(4, len(alarms))
+        self.assertEqual(4, len(alarms))
         for alarm in alarms:
             if alarm.name == 'added_alarm':
                 self.assertEqual(alarm.repeat_actions, True)
@@ -139,15 +136,15 @@ class TestAlarms(FunctionalTest,
                              q=[{'field': 'name',
                                  'value': 'name1',
                                  }])
-        self.assertEquals(1, len(data))
+        self.assertEqual(1, len(data))
         alarm_id = data[0]['alarm_id']
 
         self.put_json('/alarms/%s' % alarm_id,
                       params=json,
                       headers=self.auth_headers)
         alarm = list(self.conn.get_alarms(alarm_id=alarm_id))[0]
-        self.assertEquals(alarm.name, json['name'])
-        self.assertEquals(alarm.repeat_actions, json['repeat_actions'])
+        self.assertEqual(alarm.name, json['name'])
+        self.assertEqual(alarm.repeat_actions, json['repeat_actions'])
 
     def test_put_alarm_wrong_field(self):
         # Note: wsme will ignore unknown fields so will just not appear in
@@ -161,27 +158,27 @@ class TestAlarms(FunctionalTest,
                                  'value': 'name1',
                                  }],
                              headers=self.auth_headers)
-        self.assertEquals(1, len(data))
+        self.assertEqual(1, len(data))
 
         resp = self.put_json('/alarms/%s' % data[0]['alarm_id'],
                              params=json,
                              expect_errors=True,
                              headers=self.auth_headers)
-        self.assertEquals(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
 
     def test_delete_alarm(self):
         data = self.get_json('/alarms')
-        self.assertEquals(3, len(data))
+        self.assertEqual(3, len(data))
 
         self.delete('/alarms/%s' % data[0]['alarm_id'],
                     status=200)
         alarms = list(self.conn.get_alarms())
-        self.assertEquals(2, len(alarms))
+        self.assertEqual(2, len(alarms))
 
     def test_get_alarm_history(self):
         data = self.get_json('/alarms')
         history = self.get_json('/alarms/%s/history' % data[0]['alarm_id'])
-        self.assertEquals([], history)
+        self.assertEqual([], history)
 
     def test_get_nonexistent_alarm_history(self):
         response = self.get_json('/alarms/%s/history' % 'foobar',

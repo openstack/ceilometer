@@ -38,7 +38,7 @@ class TestInstancePollster(base.TestPollsterBase):
         mgr = manager.AgentManager()
         pollster = pollsters_instance.InstancePollster()
         samples = list(pollster.get_samples(mgr, {}, self.instance))
-        self.assertEquals(len(samples), 1)
+        self.assertEqual(len(samples), 1)
         self.assertEqual(samples[0].name, 'instance')
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
@@ -48,5 +48,5 @@ class TestInstancePollster(base.TestPollsterBase):
         mgr = manager.AgentManager()
         pollster = pollsters_instance.InstanceFlavorPollster()
         samples = list(pollster.get_samples(mgr, {}, self.instance))
-        self.assertEquals(len(samples), 1)
+        self.assertEqual(len(samples), 1)
         self.assertEqual(samples[0].name, 'instance:m1.small')

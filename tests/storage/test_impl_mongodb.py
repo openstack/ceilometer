@@ -66,7 +66,7 @@ class MongoDBConnection(MongoDBEngineTestBase):
                                                          marker=marker,
                                                          flag=flag)
         expect = {'k3': {'$lt': 'v3'}, 'k2': {'eq': 'v2'}, 'k1': {'eq': 'v1'}}
-        self.assertEquals(ret, expect)
+        self.assertEqual(ret, expect)
 
 
 class MongoDBTestMarkerBase(MongoDBEngineTestBase):
@@ -174,7 +174,7 @@ class AlarmTest(base.AlarmTest, MongoDBEngineTestBase):
     def test_alarm_get_old_matching_metadata_format(self):
         self.prepare_old_matching_metadata_alarm()
         old = list(self.conn.get_alarms(name='old-alert'))[0]
-        self.assertEquals(old.matching_metadata, {'key': 'value'})
+        self.assertEqual(old.matching_metadata, {'key': 'value'})
 
 
 class CompatibilityTest(MongoDBEngineTestBase):

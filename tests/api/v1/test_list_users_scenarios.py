@@ -41,7 +41,7 @@ class TestListEmptyUsers(tests_api.TestBase,
 
     def test_empty(self):
         data = self.get('/users')
-        self.assertEquals({'users': []}, data)
+        self.assertEqual({'users': []}, data)
 
 
 class TestListUsers(tests_api.TestBase,
@@ -92,22 +92,22 @@ class TestListUsers(tests_api.TestBase,
 
     def test_users(self):
         data = self.get('/users')
-        self.assertEquals(['user-id', 'user-id2'], data['users'])
+        self.assertEqual(['user-id', 'user-id2'], data['users'])
 
     def test_users_non_admin(self):
         data = self.get('/users',
                         headers={"X-Roles": "Member",
                                  "X-User-Id": "user-id",
                                  "X-Project-Id": "project-id"})
-        self.assertEquals(['user-id'], data['users'])
+        self.assertEqual(['user-id'], data['users'])
 
     def test_with_source(self):
         data = self.get('/sources/test_list_users/users')
-        self.assertEquals(['user-id'], data['users'])
+        self.assertEqual(['user-id'], data['users'])
 
     def test_with_source_non_admin(self):
         data = self.get('/sources/test_list_users/users',
                         headers={"X-Roles": "Member",
                                  "X-User-Id": "user-id",
                                  "X-Project-Id": "project-id"})
-        self.assertEquals(['user-id'], data['users'])
+        self.assertEqual(['user-id'], data['users'])

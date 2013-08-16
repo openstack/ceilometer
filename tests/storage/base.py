@@ -357,25 +357,24 @@ class ResourceTestPagination(DBTestBase):
         results = self.conn.get_resources(limit=3, marker_pairs=marker_pairs,
                                           sort_key='user_id',
                                           sort_dir='asc')
-        self.assertEquals(['user-id-5', 'user-id-6', 'user-id-7'],
-                          [i.user_id for i in results])
+        self.assertEqual(['user-id-5', 'user-id-6', 'user-id-7'],
+                         [i.user_id for i in results])
 
         marker_pairs = {'user_id': 'user-id-4'}
         results = list(self.conn.get_resources(limit=2,
                                                marker_pairs=marker_pairs,
                                                sort_key='user_id',
                                                sort_dir='desc'))
-        self.assertEquals(['user-id-3', 'user-id-2'],
-                          [i.user_id for i in results])
+        self.assertEqual(['user-id-3', 'user-id-2'],
+                         [i.user_id for i in results])
 
         marker_pairs = {'project_id': 'project-id-5'}
         results = list(self.conn.get_resources(limit=3,
                                                marker_pairs=marker_pairs,
                                                sort_key='user_id',
                                                sort_dir='asc'))
-        self.assertEquals(['resource-id-6', 'resource-id-7',
-                           'resource-id-8'],
-                          [i.resource_id for i in results])
+        self.assertEqual(['resource-id-6', 'resource-id-7', 'resource-id-8'],
+                         [i.resource_id for i in results])
 
 
 class MeterTest(DBTestBase):
@@ -431,28 +430,28 @@ class MeterTestPagination(DBTestBase):
         marker_pairs = {'user_id': 'user-id-alternate'}
         results = self.conn.get_meters(limit=3, marker_pairs=marker_pairs,
                                        sort_key='user_id', sort_dir='desc')
-        self.assertEquals(['user-id-8', 'user-id-7', 'user-id-6'],
-                          [i.user_id for i in results])
+        self.assertEqual(['user-id-8', 'user-id-7', 'user-id-6'],
+                         [i.user_id for i in results])
 
         marker_pairs = {'user_id': 'user-id-4'}
         results = self.conn.get_meters(limit=3, marker_pairs=marker_pairs,
                                        sort_key='user_id',
                                        sort_dir='asc')
-        self.assertEquals(['user-id-5', 'user-id-6', 'user-id-7'],
-                          [i.user_id for i in results])
+        self.assertEqual(['user-id-5', 'user-id-6', 'user-id-7'],
+                         [i.user_id for i in results])
 
         marker_pairs = {'user_id': 'user-id-4'}
         results = list(self.conn.get_meters(limit=2,
                                             marker_pairs=marker_pairs,
                                             sort_key='user_id',
                                             sort_dir='desc'))
-        self.assertEquals(['user-id-3', 'user-id-2'],
-                          [i.user_id for i in results])
+        self.assertEqual(['user-id-3', 'user-id-2'],
+                         [i.user_id for i in results])
 
         marker_pairs = {'user_id': 'user-id'}
         results = self.conn.get_meters(limit=3, marker_pairs=marker_pairs,
                                        sort_key='user_id', sort_dir='desc')
-        self.assertEquals([], [i.user_id for i in results])
+        self.assertEqual([], [i.user_id for i in results])
 
 
 class RawSampleTest(DBTestBase):
@@ -823,8 +822,7 @@ class StatisticsTest(DBTestBase):
         self.assertEqual(r.sum, 8)
         self.assertEqual(r.period, 1800)
         self.assertEqual(r.period_end,
-                         r.period_start
-                         + datetime.timedelta(seconds=1800))
+                         r.period_start + datetime.timedelta(seconds=1800))
         self.assertEqual(r.duration, 0)
         self.assertEqual(r.duration_start,
                          datetime.datetime(2012, 9, 25, 10, 30))
@@ -974,29 +972,28 @@ class AlarmTest(AlarmTestBase):
 
     def test_empty(self):
         alarms = list(self.conn.get_alarms())
-        self.assertEquals([], alarms)
+        self.assertEqual([], alarms)
 
     def test_add(self):
         self.add_some_alarms()
         alarms = list(self.conn.get_alarms())
-        self.assertEquals(len(alarms), 3)
+        self.assertEqual(len(alarms), 3)
 
     def test_defaults(self):
         self.add_some_alarms()
         yellow = list(self.conn.get_alarms(name='yellow-alert'))[0]
 
-        self.assertEquals(yellow.evaluation_periods, 1)
-        self.assertEquals(yellow.period, 60)
-        self.assertEquals(yellow.enabled, True)
-        self.assertEquals(yellow.description,
-                          'Alarm when test.five is lt %s' %
-                          'a min of 10 over 60 seconds')
-        self.assertEquals(yellow.state, models.Alarm.ALARM_INSUFFICIENT_DATA)
-        self.assertEquals(yellow.ok_actions, [])
-        self.assertEquals(yellow.insufficient_data_actions, [])
-        self.assertEquals(yellow.matching_metadata,
-                          {'key2': 'value2',
-                           'user_metadata.key3': 'value3'})
+        self.assertEqual(yellow.evaluation_periods, 1)
+        self.assertEqual(yellow.period, 60)
+        self.assertEqual(yellow.enabled, True)
+        self.assertEqual(yellow.description,
+                         'Alarm when test.five is lt '
+                         'a min of 10 over 60 seconds')
+        self.assertEqual(yellow.state, models.Alarm.ALARM_INSUFFICIENT_DATA)
+        self.assertEqual(yellow.ok_actions, [])
+        self.assertEqual(yellow.insufficient_data_actions, [])
+        self.assertEqual(yellow.matching_metadata,
+                         {'key2': 'value2', 'user_metadata.key3': 'value3'})
 
     def test_update(self):
         self.add_some_alarms()
@@ -1006,11 +1003,10 @@ class AlarmTest(AlarmTestBase):
         orange.matching_metadata = {'new': 'value',
                                     'user_metadata.new2': 'value4'}
         updated = self.conn.update_alarm(orange)
-        self.assertEquals(updated.enabled, False)
-        self.assertEquals(updated.state, models.Alarm.ALARM_INSUFFICIENT_DATA)
-        self.assertEquals(updated.matching_metadata,
-                          {'new': 'value',
-                           'user_metadata.new2': 'value4'})
+        self.assertEqual(updated.enabled, False)
+        self.assertEqual(updated.state, models.Alarm.ALARM_INSUFFICIENT_DATA)
+        self.assertEqual(updated.matching_metadata,
+                         {'new': 'value', 'user_metadata.new2': 'value4'})
 
     def test_update_llu(self):
         llu = models.Alarm('llu',
@@ -1022,14 +1018,14 @@ class AlarmTest(AlarmTestBase):
         self.conn.update_alarm(updated)
 
         all = list(self.conn.get_alarms())
-        self.assertEquals(len(all), 1)
+        self.assertEqual(len(all), 1)
 
     def test_delete(self):
         self.add_some_alarms()
         victim = list(self.conn.get_alarms(name='orange-alert'))[0]
         self.conn.delete_alarm(victim.alarm_id)
         survivors = list(self.conn.get_alarms())
-        self.assertEquals(len(survivors), 2)
+        self.assertEqual(len(survivors), 2)
         for s in survivors:
             self.assertNotEquals(victim.name, s.name)
 
@@ -1088,15 +1084,14 @@ class AlarmTestPagination(AlarmTestBase):
         page = list(self.conn.get_alarms(limit=4,
                                          marker_pairs=marker_pairs,
                                          sort_key='name', sort_dir='desc'))
-        self.assertEquals(['red-alert', 'orange-alert'],
-                          [i.name for i in page])
+        self.assertEqual(['red-alert', 'orange-alert'], [i.name for i in page])
 
         marker_pairs = {'name': 'orange-alert'}
         page1 = list(self.conn.get_alarms(limit=2,
                                           sort_key='comparison_operator',
                                           sort_dir='desc',
                                           marker_pairs=marker_pairs))
-        self.assertEquals(['red-alert'], [i.name for i in page1])
+        self.assertEqual(['red-alert'], [i.name for i in page1])
 
 
 class EventTestBase(test_db.TestBase):
@@ -1125,42 +1120,42 @@ class EventTest(EventTestBase):
     def test_string_traits(self):
         model = models.Trait("Foo", models.Trait.TEXT_TYPE, "my_text")
         trait = self.conn._make_trait(model, None)
-        self.assertEquals(trait.t_type, models.Trait.TEXT_TYPE)
+        self.assertEqual(trait.t_type, models.Trait.TEXT_TYPE)
         self.assertIsNone(trait.t_float)
         self.assertIsNone(trait.t_int)
         self.assertIsNone(trait.t_datetime)
-        self.assertEquals(trait.t_string, "my_text")
+        self.assertEqual(trait.t_string, "my_text")
         self.assertIsNotNone(trait.name)
 
     def test_int_traits(self):
         model = models.Trait("Foo", models.Trait.INT_TYPE, 100)
         trait = self.conn._make_trait(model, None)
-        self.assertEquals(trait.t_type, models.Trait.INT_TYPE)
+        self.assertEqual(trait.t_type, models.Trait.INT_TYPE)
         self.assertIsNone(trait.t_float)
         self.assertIsNone(trait.t_string)
         self.assertIsNone(trait.t_datetime)
-        self.assertEquals(trait.t_int, 100)
+        self.assertEqual(trait.t_int, 100)
         self.assertIsNotNone(trait.name)
 
     def test_float_traits(self):
         model = models.Trait("Foo", models.Trait.FLOAT_TYPE, 123.456)
         trait = self.conn._make_trait(model, None)
-        self.assertEquals(trait.t_type, models.Trait.FLOAT_TYPE)
+        self.assertEqual(trait.t_type, models.Trait.FLOAT_TYPE)
         self.assertIsNone(trait.t_int)
         self.assertIsNone(trait.t_string)
         self.assertIsNone(trait.t_datetime)
-        self.assertEquals(trait.t_float, 123.456)
+        self.assertEqual(trait.t_float, 123.456)
         self.assertIsNotNone(trait.name)
 
     def test_datetime_traits(self):
         now = datetime.datetime.utcnow()
         model = models.Trait("Foo", models.Trait.DATETIME_TYPE, now)
         trait = self.conn._make_trait(model, None)
-        self.assertEquals(trait.t_type, models.Trait.DATETIME_TYPE)
+        self.assertEqual(trait.t_type, models.Trait.DATETIME_TYPE)
         self.assertIsNone(trait.t_int)
         self.assertIsNone(trait.t_string)
         self.assertIsNone(trait.t_float)
-        self.assertEquals(trait.t_datetime, utils.dt_to_decimal(now))
+        self.assertEqual(trait.t_datetime, utils.dt_to_decimal(now))
         self.assertIsNotNone(trait.name)
 
     def test_save_events_traits(self):
@@ -1211,11 +1206,11 @@ class GetEventTest(EventTestBase):
     def test_simple_get(self):
         event_filter = storage.EventFilter(self.start, self.end)
         events = self.conn.get_events(event_filter)
-        self.assertEquals(3, len(events))
+        self.assertEqual(3, len(events))
         start_time = None
         for i, name in enumerate(["Foo", "Bar", "Zoo"]):
-            self.assertEquals(events[i].event_name, name)
-            self.assertEquals(4, len(events[i].traits))
+            self.assertEqual(events[i].event_name, name)
+            self.assertEqual(4, len(events[i].traits))
             # Ensure sorted results ...
             if start_time is not None:
                 # Python 2.6 has no assertLess :(
@@ -1225,15 +1220,15 @@ class GetEventTest(EventTestBase):
     def test_simple_get_event_name(self):
         event_filter = storage.EventFilter(self.start, self.end, "Bar")
         events = self.conn.get_events(event_filter)
-        self.assertEquals(1, len(events))
-        self.assertEquals(events[0].event_name, "Bar")
-        self.assertEquals(4, len(events[0].traits))
+        self.assertEqual(1, len(events))
+        self.assertEqual(events[0].event_name, "Bar")
+        self.assertEqual(4, len(events[0].traits))
 
     def test_get_event_trait_filter(self):
         trait_filters = {'key': 'trait_B', 't_int': 101}
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits=trait_filters)
         events = self.conn.get_events(event_filter)
-        self.assertEquals(1, len(events))
-        self.assertEquals(events[0].event_name, "Bar")
-        self.assertEquals(4, len(events[0].traits))
+        self.assertEqual(1, len(events))
+        self.assertEqual(events[0].event_name, "Bar")
+        self.assertEqual(4, len(events[0].traits))

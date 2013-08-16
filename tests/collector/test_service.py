@@ -237,11 +237,11 @@ class TestCollectorService(TestCollector):
             self.srv._message_to_event(message)
             self.assertFalse(mylog.exception.called)
         events = self.srv.storage_conn.record_events.call_args[0]
-        self.assertEquals(1, len(events))
+        self.assertEqual(1, len(events))
         event = events[0][0]
-        self.assertEquals("foo", event.event_name)
-        self.assertEquals(now, event.generated)
-        self.assertEquals(1, len(event.traits))
+        self.assertEqual("foo", event.event_name)
+        self.assertEqual(now, event.generated)
+        self.assertEqual(1, len(event.traits))
 
     def test_message_to_event_bad_save(self):
         cfg.CONF.set_override("store_events", True, group="collector")
@@ -260,16 +260,16 @@ class TestCollectorService(TestCollector):
         timeutils.set_time_override(now)
 
         body = {"timestamp": str(modified)}
-        self.assertEquals(service.CollectorService._extract_when(body),
-                          modified)
+        self.assertEqual(service.CollectorService._extract_when(body),
+                         modified)
 
         body = {"_context_timestamp": str(modified)}
-        self.assertEquals(service.CollectorService._extract_when(body),
-                          modified)
+        self.assertEqual(service.CollectorService._extract_when(body),
+                         modified)
 
         then = now + datetime.timedelta(hours=1)
         body = {"timestamp": str(modified), "_context_timestamp": str(then)}
-        self.assertEquals(service.CollectorService._extract_when(body),
-                          modified)
+        self.assertEqual(service.CollectorService._extract_when(body),
+                         modified)
 
-        self.assertEquals(service.CollectorService._extract_when({}), now)
+        self.assertEqual(service.CollectorService._extract_when({}), now)

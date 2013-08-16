@@ -41,7 +41,7 @@ class TestListEmptyProjects(tests_api.TestBase,
 
     def test_empty(self):
         data = self.get('/projects')
-        self.assertEquals({'projects': []}, data)
+        self.assertEqual({'projects': []}, data)
 
 
 class TestListProjects(tests_api.TestBase,
@@ -89,20 +89,20 @@ class TestListProjects(tests_api.TestBase,
 
     def test_projects(self):
         data = self.get('/projects')
-        self.assertEquals(['project-id', 'project-id2'], data['projects'])
+        self.assertEqual(['project-id', 'project-id2'], data['projects'])
 
     def test_projects_non_admin(self):
         data = self.get('/projects',
                         headers={"X-Roles": "Member",
                                  "X-Project-Id": "project-id"})
-        self.assertEquals(['project-id'], data['projects'])
+        self.assertEqual(['project-id'], data['projects'])
 
     def test_with_source(self):
         data = self.get('/sources/test_list_users/projects')
-        self.assertEquals(['project-id2'], data['projects'])
+        self.assertEqual(['project-id2'], data['projects'])
 
     def test_with_source_non_admin(self):
         data = self.get('/sources/test_list_users/projects',
                         headers={"X-Roles": "Member",
                                  "X-Project-Id": "project-id2"})
-        self.assertEquals(['project-id2'], data['projects'])
+        self.assertEqual(['project-id2'], data['projects'])

@@ -83,10 +83,10 @@ class TestNetPollster(base.TestPollsterBase):
             match = [s for s in samples
                      if s.resource_metadata['parameters']['ip'] == ip
                      ]
-            self.assertEquals(len(match), 1, 'missing ip %s' % ip)
-            self.assertEquals(match[0].volume, expected_volume)
-            self.assertEquals(match[0].type, 'cumulative')
-            self.assertEquals(match[0].resource_id, expected_rid)
+            self.assertEqual(len(match), 1, 'missing ip %s' % ip)
+            self.assertEqual(match[0].volume, expected_volume)
+            self.assertEqual(match[0].type, 'cumulative')
+            self.assertEqual(match[0].resource_id, expected_rid)
 
         for ip, volume, rid in expected:
             _verify_vnic_metering(ip, volume, rid)

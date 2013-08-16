@@ -65,7 +65,7 @@ class TestPostSamples(FunctionalTest,
         # source is generated if not provided.
         s1[0]['source'] = '%s:openstack' % s1[0]['project_id']
 
-        self.assertEquals(s1, data.json)
+        self.assertEqual(s1, data.json)
 
     def test_wrong_project_id(self):
         """Do not accept cross posting samples to different projects."""
@@ -89,7 +89,7 @@ class TestPostSamples(FunctionalTest,
                                   "bc23a9d531064583ace8f67dad60f6bb",
                               })
 
-        self.assertEquals(data.status_int, 400)
+        self.assertEqual(data.status_int, 400)
 
     def test_multiple_samples(self):
         """Send multiple samples.
@@ -121,14 +121,14 @@ class TestPostSamples(FunctionalTest,
             for (k, v) in samples[x].iteritems():
                 if k == 'timestamp':
                     timestamp = timeutils.parse_isotime(data.json[x][k])
-                    self.assertEquals(stamps[x].replace(tzinfo=None),
-                                      timestamp.replace(tzinfo=None))
+                    self.assertEqual(stamps[x].replace(tzinfo=None),
+                                     timestamp.replace(tzinfo=None))
                 elif k == 'source':
-                    self.assertEquals(data.json[x][k],
-                                      '%s:%s' % (samples[x]['project_id'],
-                                                 samples[x]['source']))
+                    self.assertEqual(data.json[x][k],
+                                     '%s:%s' % (samples[x]['project_id'],
+                                                samples[x]['source']))
                 else:
-                    self.assertEquals(v, data.json[x][k])
+                    self.assertEqual(v, data.json[x][k])
 
     def test_missing_mandatory_fields(self):
         """Do not accept posting samples with missing mandatory fields."""
@@ -151,7 +151,7 @@ class TestPostSamples(FunctionalTest,
             print('posting without %s' % m)
             data = self.post_json('/meters/my_counter_name/', s_broke,
                                   expect_errors=True)
-            self.assertEquals(data.status_int, 400)
+            self.assertEqual(data.status_int, 400)
 
     def test_multiple_sources(self):
         """Do not accept a single post of mixed sources."""
@@ -176,7 +176,7 @@ class TestPostSamples(FunctionalTest,
                                      'name2': 'value2'}}]
         data = self.post_json('/meters/my_counter_name/', s1,
                               expect_errors=True)
-        self.assertEquals(data.status_int, 400)
+        self.assertEqual(data.status_int, 400)
 
     def test_multiple_samples_some_null_sources(self):
         """Do accept a single post with some null sources
@@ -203,13 +203,13 @@ class TestPostSamples(FunctionalTest,
                                      'name2': 'value2'}}]
         data = self.post_json('/meters/my_counter_name/', s1,
                               expect_errors=True)
-        self.assertEquals(data.status_int, 200)
+        self.assertEqual(data.status_int, 200)
         for x in range(2):
             for (k, v) in s1[x].iteritems():
                 if k == 'source':
-                    self.assertEquals(data.json[x][k],
-                                      '%s:%s' % (s1[x]['project_id'],
-                                                 'paperstack'))
+                    self.assertEqual(data.json[x][k],
+                                     '%s:%s' % (s1[x]['project_id'],
+                                                'paperstack'))
 
     def test_missing_project_user_id(self):
         """Ensure missing project & user IDs are defaulted appropriately.
@@ -233,6 +233,6 @@ class TestPostSamples(FunctionalTest,
                                   'X-User-Id': user_id,
                               })
 
-        self.assertEquals(data.status_int, 200)
-        self.assertEquals(data.json[0]['project_id'], project_id)
-        self.assertEquals(data.json[0]['user_id'], user_id)
+        self.assertEqual(data.status_int, 200)
+        self.assertEqual(data.json[0]['project_id'], project_id)
+        self.assertEqual(data.json[0]['user_id'], user_id)

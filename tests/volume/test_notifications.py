@@ -80,7 +80,7 @@ class TestNotifications(base.TestCase):
         self.assertEqual(c.resource_id, notification['payload']['volume_id'])
         self.assertEqual(c.timestamp, notification['timestamp'])
         metadata = c.resource_metadata
-        self.assertEquals(metadata.get('host'), notification['publisher_id'])
+        self.assertEqual(metadata.get('host'), notification['publisher_id'])
 
     def test_volume_exists(self):
         v = notifications.Volume()

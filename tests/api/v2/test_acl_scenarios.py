@@ -164,7 +164,7 @@ class TestAPIACL(FunctionalTest,
                                       "bc23a9d531064583ace8f67dad60f6bb",
                                       })
         ids = set(r['resource_id'] for r in data)
-        self.assertEquals(set(['resource-good', 'resource-56']), ids)
+        self.assertEqual(set(['resource-good', 'resource-56']), ids)
 
     def test_with_non_admin_missing_project_query(self):
         data = self.get_json('/meters',
@@ -172,7 +172,7 @@ class TestAPIACL(FunctionalTest,
                                       "X-Auth-Token": VALID_TOKEN2,
                                       "X-Project-Id": "project-good"})
         ids = set(r['resource_id'] for r in data)
-        self.assertEquals(set(['resource-good', 'resource-56']), ids)
+        self.assertEqual(set(['resource-good', 'resource-56']), ids)
 
     def test_with_non_admin(self):
         data = self.get_json('/meters',
@@ -183,7 +183,7 @@ class TestAPIACL(FunctionalTest,
                                  'value': 'project-good',
                                  }])
         ids = set(r['resource_id'] for r in data)
-        self.assertEquals(set(['resource-good', 'resource-56']), ids)
+        self.assertEqual(set(['resource-good', 'resource-56']), ids)
 
     def test_non_admin_wrong_project(self):
         data = self.get_json('/meters',

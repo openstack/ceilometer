@@ -98,7 +98,7 @@ class TestNotification(base.TestCase):
         self.assertEqual(c.timestamp, NOW)
         self.assertEqual(c.volume, volume)
         metadata = c.resource_metadata
-        self.assertEquals(metadata.get('host'), u'images.example.com')
+        self.assertEqual(metadata.get('host'), u'images.example.com')
 
     def test_image_download(self):
         handler = notifications.ImageDownload()
@@ -117,10 +117,10 @@ class TestNotification(base.TestCase):
         serve = counters[0]
         self._verify_common_counter(serve, 'image.serve', 42)
         self.assertEqual(serve.project_id, fake_uuid('e'))
-        self.assertEquals(serve.resource_metadata.get('receiver_user_id'),
-                          fake_uuid('d'))
-        self.assertEquals(serve.resource_metadata.get('receiver_tenant_id'),
-                          fake_uuid('b'))
+        self.assertEqual(serve.resource_metadata.get('receiver_user_id'),
+                         fake_uuid('d'))
+        self.assertEqual(serve.resource_metadata.get('receiver_tenant_id'),
+                         fake_uuid('b'))
         self.assertEqual(serve.type, sample.TYPE_DELTA)
 
     def test_image_crud_on_update(self):

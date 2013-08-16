@@ -41,7 +41,7 @@ class TestListEmptyMeters(tests_api.TestBase,
 
     def test_empty(self):
         data = self.get('/meters')
-        self.assertEquals({'meters': []}, data)
+        self.assertEqual({'meters': []}, data)
 
 
 class TestListMeters(tests_api.TestBase,
@@ -118,94 +118,90 @@ class TestListMeters(tests_api.TestBase,
 
     def test_list_meters(self):
         data = self.get('/meters')
-        self.assertEquals(4, len(data['meters']))
-        self.assertEquals(set(r['resource_id'] for r in data['meters']),
-                          set(['resource-id',
-                               'resource-id2',
-                               'resource-id3',
-                               'resource-id4']))
-        self.assertEquals(set(r['name'] for r in data['meters']),
-                          set(['meter.test',
-                               'meter.mine']))
+        self.assertEqual(4, len(data['meters']))
+        self.assertEqual(set(r['resource_id'] for r in data['meters']),
+                         set(['resource-id',
+                              'resource-id2',
+                              'resource-id3',
+                              'resource-id4']))
+        self.assertEqual(set(r['name'] for r in data['meters']),
+                         set(['meter.test', 'meter.mine']))
 
     def test_list_meters_non_admin(self):
         data = self.get('/meters',
                         headers={"X-Roles": "Member",
                                  "X-Project-Id": "project-id"})
-        self.assertEquals(2, len(data['meters']))
-        self.assertEquals(set(r['resource_id'] for r in data['meters']),
-                          set(['resource-id',
-                               'resource-id2']))
-        self.assertEquals(set(r['name'] for r in data['meters']),
-                          set(['meter.test',
-                               'meter.mine']))
+        self.assertEqual(2, len(data['meters']))
+        self.assertEqual(set(r['resource_id'] for r in data['meters']),
+                         set(['resource-id', 'resource-id2']))
+        self.assertEqual(set(r['name'] for r in data['meters']),
+                         set(['meter.test', 'meter.mine']))
 
     def test_with_resource(self):
         data = self.get('/resources/resource-id/meters')
         ids = set(r['name'] for r in data['meters'])
-        self.assertEquals(set(['meter.test']), ids)
+        self.assertEqual(set(['meter.test']), ids)
 
     def test_with_source(self):
         data = self.get('/sources/test_list_resources/meters')
         ids = set(r['resource_id'] for r in data['meters'])
-        self.assertEquals(set(['resource-id',
-                               'resource-id2',
-                               'resource-id3',
-                               'resource-id4']), ids)
+        self.assertEqual(set(['resource-id',
+                              'resource-id2',
+                              'resource-id3',
+                              'resource-id4']), ids)
 
     def test_with_source_non_admin(self):
         data = self.get('/sources/test_list_resources/meters',
                         headers={"X-Roles": "Member",
                                  "X-Project-Id": "project-id2"})
         ids = set(r['resource_id'] for r in data['meters'])
-        self.assertEquals(set(['resource-id3',
-                               'resource-id4']), ids)
+        self.assertEqual(set(['resource-id3', 'resource-id4']), ids)
 
     def test_with_source_non_existent(self):
         data = self.get('/sources/test_list_resources_dont_exist/meters')
-        self.assertEquals(data['meters'], [])
+        self.assertEqual(data['meters'], [])
 
     def test_with_user(self):
         data = self.get('/users/user-id/meters')
 
         nids = set(r['name'] for r in data['meters'])
-        self.assertEquals(set(['meter.mine', 'meter.test']), nids)
+        self.assertEqual(set(['meter.mine', 'meter.test']), nids)
 
         rids = set(r['resource_id'] for r in data['meters'])
-        self.assertEquals(set(['resource-id', 'resource-id2']), rids)
+        self.assertEqual(set(['resource-id', 'resource-id2']), rids)
 
     def test_with_user_non_admin(self):
         data = self.get('/users/user-id/meters',
                         headers={"X-Roles": "Member",
                                  "X-Project-Id": "project-id"})
         nids = set(r['name'] for r in data['meters'])
-        self.assertEquals(set(['meter.mine', 'meter.test']), nids)
+        self.assertEqual(set(['meter.mine', 'meter.test']), nids)
 
         rids = set(r['resource_id'] for r in data['meters'])
-        self.assertEquals(set(['resource-id', 'resource-id2']), rids)
+        self.assertEqual(set(['resource-id', 'resource-id2']), rids)
 
     def test_with_user_wrong_tenant(self):
         data = self.get('/users/user-id/meters',
                         headers={"X-Roles": "Member",
                                  "X-Project-Id": "project666"})
 
-        self.assertEquals(data['meters'], [])
+        self.assertEqual(data['meters'], [])
 
     def test_with_user_non_existent(self):
         data = self.get('/users/user-id-foobar123/meters')
-        self.assertEquals(data['meters'], [])
+        self.assertEqual(data['meters'], [])
 
     def test_with_project(self):
         data = self.get('/projects/project-id2/meters')
         ids = set(r['resource_id'] for r in data['meters'])
-        self.assertEquals(set(['resource-id3', 'resource-id4']), ids)
+        self.assertEqual(set(['resource-id3', 'resource-id4']), ids)
 
     def test_with_project_non_admin(self):
         data = self.get('/projects/project-id2/meters',
                         headers={"X-Roles": "Member",
                                  "X-Project-Id": "project-id2"})
         ids = set(r['resource_id'] for r in data['meters'])
-        self.assertEquals(set(['resource-id3', 'resource-id4']), ids)
+        self.assertEqual(set(['resource-id3', 'resource-id4']), ids)
 
     def test_with_project_wrong_tenant(self):
         data = self.get('/projects/project-id2/meters',
@@ -215,7 +211,7 @@ class TestListMeters(tests_api.TestBase,
 
     def test_with_project_non_existent(self):
         data = self.get('/projects/jd-was-here/meters')
-        self.assertEquals(data['meters'], [])
+        self.assertEqual(data['meters'], [])
 
 
 class TestListMetersMetaquery(TestListMeters,
@@ -223,32 +219,32 @@ class TestListMetersMetaquery(TestListMeters,
 
     def test_metaquery1(self):
         data = self.get('/meters?metadata.tag=self.counter')
-        self.assertEquals(1, len(data['meters']))
+        self.assertEqual(1, len(data['meters']))
 
     def test_metaquery1_non_admin(self):
         data = self.get('/meters?metadata.tag=self.counter',
                         headers={"X-Roles": "Member",
                                  "X-Project-Id": "project-id"})
-        self.assertEquals(1, len(data['meters']))
+        self.assertEqual(1, len(data['meters']))
 
     def test_metaquery1_wrong_tenant(self):
         data = self.get('/meters?metadata.tag=self.counter',
                         headers={"X-Roles": "Member",
                                  "X-Project-Id": "project-666"})
-        self.assertEquals(0, len(data['meters']))
+        self.assertEqual(0, len(data['meters']))
 
     def test_metaquery2(self):
         data = self.get('/meters?metadata.tag=four.counter')
-        self.assertEquals(1, len(data['meters']))
+        self.assertEqual(1, len(data['meters']))
 
     def test_metaquery2_non_admin(self):
         data = self.get('/meters?metadata.tag=four.counter',
                         headers={"X-Roles": "Member",
                                  "X-Project-Id": "project-id2"})
-        self.assertEquals(1, len(data['meters']))
+        self.assertEqual(1, len(data['meters']))
 
     def test_metaquery2_non_admin_wrong_project(self):
         data = self.get('/meters?metadata.tag=four.counter',
                         headers={"X-Roles": "Member",
                                  "X-Project-Id": "project-666"})
-        self.assertEquals(0, len(data['meters']))
+        self.assertEqual(0, len(data['meters']))

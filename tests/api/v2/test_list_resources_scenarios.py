@@ -42,7 +42,7 @@ class TestListResources(FunctionalTest,
 
     def test_empty(self):
         data = self.get_json('/resources')
-        self.assertEquals([], data)
+        self.assertEqual([], data)
 
     def test_instance_no_metadata(self):
         counter1 = sample.Sample(
@@ -64,7 +64,7 @@ class TestListResources(FunctionalTest,
         self.conn.record_metering_data(msg)
 
         data = self.get_json('/resources')
-        self.assertEquals(1, len(data))
+        self.assertEqual(1, len(data))
 
     def test_instances(self):
         counter1 = sample.Sample(
@@ -108,7 +108,7 @@ class TestListResources(FunctionalTest,
         self.conn.record_metering_data(msg2)
 
         data = self.get_json('/resources')
-        self.assertEquals(2, len(data))
+        self.assertEqual(2, len(data))
 
     def test_instances_one(self):
         counter1 = sample.Sample(
@@ -152,7 +152,7 @@ class TestListResources(FunctionalTest,
         self.conn.record_metering_data(msg2)
 
         data = self.get_json('/resources/resource-id')
-        self.assertEquals('resource-id', data['resource_id'])
+        self.assertEqual('resource-id', data['resource_id'])
 
     def test_with_source(self):
         counter1 = sample.Sample(
@@ -199,7 +199,7 @@ class TestListResources(FunctionalTest,
                                                'value': 'test_list_resources',
                                                }])
         ids = [r['resource_id'] for r in data]
-        self.assertEquals(['resource-id'], ids)
+        self.assertEqual(['resource-id'], ids)
 
     def test_with_invalid_resource_id(self):
         counter1 = sample.Sample(
@@ -243,13 +243,13 @@ class TestListResources(FunctionalTest,
         self.conn.record_metering_data(msg2)
 
         resp1 = self.get_json('/resources/resource-id-1')
-        self.assertEquals(resp1["resource_id"], "resource-id-1")
+        self.assertEqual(resp1["resource_id"], "resource-id-1")
 
         resp2 = self.get_json('/resources/resource-id-2')
-        self.assertEquals(resp2["resource_id"], "resource-id-2")
+        self.assertEqual(resp2["resource_id"], "resource-id-2")
 
         resp3 = self.get_json('/resources/resource-id-3', expect_errors=True)
-        self.assertEquals(resp3.status_code, 400)
+        self.assertEqual(resp3.status_code, 400)
 
     def test_with_user(self):
         counter1 = sample.Sample(
@@ -296,7 +296,7 @@ class TestListResources(FunctionalTest,
                                                'value': 'user-id',
                                                }])
         ids = [r['resource_id'] for r in data]
-        self.assertEquals(['resource-id'], ids)
+        self.assertEqual(['resource-id'], ids)
 
     def test_with_project(self):
         counter1 = sample.Sample(
@@ -343,7 +343,7 @@ class TestListResources(FunctionalTest,
                                                'value': 'project-id',
                                                }])
         ids = [r['resource_id'] for r in data]
-        self.assertEquals(['resource-id'], ids)
+        self.assertEqual(['resource-id'], ids)
 
     def test_with_user_non_admin(self):
         counter1 = sample.Sample(
@@ -370,7 +370,7 @@ class TestListResources(FunctionalTest,
                              headers={"X-Roles": "Member",
                                       "X-Project-Id": "project-id2"})
         ids = set(r['resource_id'] for r in data)
-        self.assertEquals(set(['resource-id-alternate']), ids)
+        self.assertEqual(set(['resource-id-alternate']), ids)
 
     def test_with_user_wrong_tenant(self):
         counter1 = sample.Sample(
@@ -397,7 +397,7 @@ class TestListResources(FunctionalTest,
                              headers={"X-Roles": "Member",
                                       "X-Project-Id": "project-wrong"})
         ids = set(r['resource_id'] for r in data)
-        self.assertEquals(set(), ids)
+        self.assertEqual(set(), ids)
 
     def test_metadata(self):
         counter1 = sample.Sample(

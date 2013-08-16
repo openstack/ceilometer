@@ -96,7 +96,7 @@ class TestLibvirtInspection(test_base.TestCase):
 
         interfaces = list(self.inspector.inspect_vnics(self.instance_name))
 
-        self.assertEquals(len(interfaces), 3)
+        self.assertEqual(len(interfaces), 3)
         vnic0, info0 = interfaces[0]
         self.assertEqual(vnic0.name, 'vnet0')
         self.assertEqual(vnic0.mac, 'fa:16:3e:71:ec:6d')
@@ -158,7 +158,7 @@ class TestLibvirtInspection(test_base.TestCase):
 
         disks = list(self.inspector.inspect_disks(self.instance_name))
 
-        self.assertEquals(len(disks), 1)
+        self.assertEqual(len(disks), 1)
         disk0, info0 = disks[0]
         self.assertEqual(disk0.device, 'vda')
         self.assertEqual(info0.read_requests, 1L)
