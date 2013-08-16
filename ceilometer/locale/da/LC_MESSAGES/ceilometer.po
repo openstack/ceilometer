@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-08-15 06:04+0000\n"
+"POT-Creation-Date: 2013-08-16 06:03+0000\n"
 "PO-Revision-Date: 2013-05-16 08:53+0000\n"
 "Last-Translator: Jens Hyllegaard <jens.hyllegaard@gmail.com>\n"
 "Language-Team: Danish "
@@ -114,19 +114,19 @@ msgstr ""
 msgid "comparing value %(value)s against threshold %(limit)s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:715
+#: ceilometer/api/controllers/v2.py:716
 msgid "Unknown resource"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:891
+#: ceilometer/api/controllers/v2.py:892
 msgid "Unknown alarm"
 msgstr "Ukendt alarm"
 
-#: ceilometer/api/controllers/v2.py:966
+#: ceilometer/api/controllers/v2.py:967
 msgid "Alarm with that name exists"
 msgstr "Alarm med dette navn findes"
 
-#: ceilometer/api/controllers/v2.py:975
+#: ceilometer/api/controllers/v2.py:976
 msgid "Alarm incorrect"
 msgstr "Alarm er forkert"
 
@@ -929,18 +929,18 @@ msgstr ""
 msgid "Unable to send counter over UDP"
 msgstr ""
 
-#: ceilometer/transformer/conversions.py:66
+#: ceilometer/transformer/conversions.py:67
 #, python-format
 msgid "scaling conversion transformer with source: %(source)s target: %(target)s:"
 msgstr ""
 
-#: ceilometer/transformer/conversions.py:103
-#: ceilometer/transformer/conversions.py:143
+#: ceilometer/transformer/conversions.py:104
+#: ceilometer/transformer/conversions.py:144
 #, python-format
 msgid "converted to: %s"
 msgstr ""
 
-#: ceilometer/transformer/conversions.py:145
+#: ceilometer/transformer/conversions.py:146
 #, python-format
 msgid "dropping counter with no predecessor: %s"
 msgstr ""
@@ -997,11 +997,5 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "version should be an integer"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "scaling conversion transformer with source:"
-#~ " %(source)s target: %(target)s replace: "
-#~ "%(replace)s"
 #~ msgstr ""
 
