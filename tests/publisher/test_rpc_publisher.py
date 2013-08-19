@@ -19,6 +19,7 @@
 """Tests for ceilometer/publish.py
 """
 
+import eventlet
 import datetime
 from oslo.config import cfg
 
@@ -264,6 +265,32 @@ class TestPublish(base.TestCase):
             cfg.CONF.publisher_rpc.metering_topic + '.' + 'test2', topics)
         self.assertIn(
             cfg.CONF.publisher_rpc.metering_topic + '.' + 'test3', topics)
+
+    def test_published_concurrency(self):
+        """This test the concurrent access to the local queue
+        of the rpc publisher
+        """
+
+        def faux_cast_go(context, topic, msg):
+            self.published.append((topic, msg))
+
+        def faux_cast_wait(context, topic, msg):
+            self.stubs.Set(oslo_rpc, 'cast', faux_cast_go)
+            eventlet.sleep(1)
+            self.published.append((topic, msg))
+
+        self.stubs.Set(oslo_rpc, 'cast', faux_cast_wait)
+
+        publisher = rpc.RPCPublisher(network_utils.urlsplit('rpc://'))
+        job1 = eventlet.spawn(publisher.publish_samples, None, self.test_data)
+        job2 = eventlet.spawn(publisher.publish_samples, None, self.test_data)
+
+        job1.wait()
+        job2.wait()
+
+        self.assertEqual(publisher.policy, 'default')
+        self.assertEqual(len(self.published), 2)
+        self.assertEqual(len(publisher.local_queue), 0)
 
     def test_published_with_no_policy(self):
         self.rpc_unreachable = True
