@@ -26,6 +26,7 @@ class TestPublisher(publisher.PublisherBase):
 
     def __init__(self, parsed_url):
         self.counters = []
+        self.calls = 0
 
     def publish_samples(self, context, counters):
         """Send a metering message for publishing
@@ -34,3 +35,4 @@ class TestPublisher(publisher.PublisherBase):
         :param counter: Counter from pipeline after transformation
         """
         self.counters.extend(counters)
+        self.calls += 1
