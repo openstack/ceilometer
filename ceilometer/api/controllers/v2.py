@@ -567,6 +567,11 @@ class MeterController(rest.RestController):
         :param period: Returned result will be an array of statistics for a
                        period long of that number of seconds.
         """
+        if period and period < 0:
+            error = _("Period must be positive.")
+            pecan.response.translatable_error = error
+            raise wsme.exc.ClientSideError(error)
+
         kwargs = _query_to_kwargs(q, storage.SampleFilter.__init__)
         kwargs['meter'] = self._id
         f = storage.SampleFilter(**kwargs)
