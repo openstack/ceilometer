@@ -47,4 +47,4 @@ def upgrade():
 
 
 def downgrade():
-    change_type(sa.Stryng(5000))
+    change_type(sa.String(5000))
