@@ -507,6 +507,10 @@ class MeterController(rest.RestController):
                 raise wsme.exc.InvalidInput('counter_name', s.counter_name,
                                             'should be %s' % self._id)
 
+            if s.message_id:
+                raise wsme.exc.InvalidInput('message_id', s.message_id,
+                                            'The message_id must not be set')
+
             s.user_id = (s.user_id or def_user_id)
             s.project_id = (s.project_id or def_project_id)
             s.source = '%s:%s' % (s.project_id, (s.source or def_source))
