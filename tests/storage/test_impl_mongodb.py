@@ -30,18 +30,18 @@ import uuid
 
 from oslo.config import cfg
 
-from tests.storage import base
-
 from ceilometer.publisher import rpc
 from ceilometer import sample
 from ceilometer.storage import impl_mongodb
 from ceilometer.storage import models
-from ceilometer.tests import db as tests_db
 from ceilometer.storage.base import NoResultFound
 from ceilometer.storage.base import MultipleResultsFound
+from ceilometer.tests import db as tests_db
+
+from tests.storage import test_storage_scenarios
 
 
-class MongoDBEngineTestBase(base.DBTestBase):
+class MongoDBEngineTestBase(tests_db.TestBase):
     database_connection = tests_db.MongoDBFakeConnectionUrl()
 
 
@@ -69,7 +69,8 @@ class MongoDBConnection(MongoDBEngineTestBase):
         self.assertEqual(ret, expect)
 
 
-class MongoDBTestMarkerBase(MongoDBEngineTestBase):
+class MongoDBTestMarkerBase(test_storage_scenarios.DBTestBase,
+                            MongoDBEngineTestBase):
     #NOTE(Fengqian): All these three test case are the same for resource
     #and meter collection. As to alarm, we will set up in AlarmTestPagination.
     def test_get_marker(self):
@@ -79,8 +80,8 @@ class MongoDBTestMarkerBase(MongoDBEngineTestBase):
         self.assertEqual(ret['project_id'], 'project-id-4')
 
     def test_get_marker_None(self):
+        marker_pairs = {'user_id': 'user-id-foo'}
         try:
-            marker_pairs = {'user_id': 'user-id-foo'}
             ret = impl_mongodb.Connection._get_marker(self.conn.db.resource,
                                                       marker_pairs)
             self.assertEqual(ret['project_id'], 'project-id-foo')
@@ -124,61 +125,8 @@ class IndexTest(MongoDBEngineTestBase):
                                                         name='meter_ttl'))
 
 
-class UserTest(base.UserTest, MongoDBEngineTestBase):
-    pass
-
-
-class ProjectTest(base.ProjectTest, MongoDBEngineTestBase):
-    pass
-
-
-class ResourceTest(base.ResourceTest, MongoDBEngineTestBase):
-    pass
-
-
-class MeterTest(base.MeterTest, MongoDBEngineTestBase):
-    pass
-
-
-class MeterTestPagination(base.MeterTestPagination, MongoDBEngineTestBase):
-    pass
-
-
-class RawSampleTest(base.RawSampleTest, MongoDBEngineTestBase):
-    # NOTE(jd) Override this test in MongoDB because our code doesn't clear
-    # the collections, this is handled by MongoDB TTL feature.
-    def test_clear_metering_data(self):
-        pass
-
-
-class StatisticsTest(base.StatisticsTest, MongoDBEngineTestBase):
-    pass
-
-
-class AlarmTest(base.AlarmTest, MongoDBEngineTestBase):
-    def prepare_old_matching_metadata_alarm(self):
-        alarm = models.Alarm('old-alert',
-                             'test.one', 'eq', 36, 'count',
-                             'me', 'and-da-boys',
-                             evaluation_periods=1,
-                             period=60,
-                             alarm_actions=['http://nowhere/alarms'],
-                             matching_metadata={'key': 'value'})
-        alarm.alarm_id = str(uuid.uuid1())
-        data = alarm.as_dict()
-        self.conn.db.alarm.update(
-            {'alarm_id': alarm.alarm_id},
-            {'$set': data},
-            upsert=True)
-
-    def test_alarm_get_old_matching_metadata_format(self):
-        self.prepare_old_matching_metadata_alarm()
-        old = list(self.conn.get_alarms(name='old-alert'))[0]
-        self.assertEqual(old.matching_metadata, {'key': 'value'})
-
-
-class CompatibilityTest(MongoDBEngineTestBase):
-
+class CompatibilityTest(test_storage_scenarios.DBTestBase,
+                        MongoDBEngineTestBase):
     def prepare_data(self):
         def old_record_metering_data(self, data):
             self.db.user.update(
@@ -244,13 +192,33 @@ class CompatibilityTest(MongoDBEngineTestBase):
             secret='not-so-secret')
         self.conn.record_metering_data(self.conn, msg)
 
+        # Create the old format alarm with a dict instead of a
+        # array for matching_metadata
+        alarm = models.Alarm('old-alert',
+                             'test.one', 'eq', 36, 'count',
+                             'me', 'and-da-boys',
+                             evaluation_periods=1,
+                             period=60,
+                             alarm_actions=['http://nowhere/alarms'],
+                             matching_metadata={'key': 'value'})
+        alarm.alarm_id = str(uuid.uuid1())
+        data = alarm.as_dict()
+        self.conn.db.alarm.update(
+            {'alarm_id': alarm.alarm_id},
+            {'$set': data},
+            upsert=True)
+
+    def test_alarm_get_old_matching_metadata_format(self):
+        old = list(self.conn.get_alarms(name='old-alert'))[0]
+        self.assertEqual(old.matching_metadata, {'key': 'value'})
+
     def test_counter_unit(self):
         meters = list(self.conn.get_meters())
         self.assertEqual(len(meters), 1)
 
 
-class AlarmTestPagination(base.AlarmTestPagination, MongoDBEngineTestBase):
-
+class AlarmTestPagination(test_storage_scenarios.AlarmTestBase,
+                          MongoDBEngineTestBase):
     def test_alarm_get_marker(self):
         self.add_some_alarms()
         marker_pairs = {'name': 'red-alert'}
@@ -277,7 +245,3 @@ class AlarmTestPagination(base.AlarmTestPagination, MongoDBEngineTestBase):
             self.assertEqual(ret['counter_name'], 'counter-name-foo')
         except MultipleResultsFound:
             self.assertTrue(True)
-
-
-class CounterDataTypeTest(base.CounterDataTypeTest, MongoDBEngineTestBase):
-    pass

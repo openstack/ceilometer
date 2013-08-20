@@ -28,59 +28,16 @@ import datetime
 from ceilometer.storage import models
 from ceilometer.storage.sqlalchemy.models import table_args
 from ceilometer import utils
-from tests.storage import base
+from ceilometer.tests import db as tests_db
 
 
-class SQLAlchemyEngineTestBase(base.DBTestBase):
-    database_connection = 'sqlite://'
-
-
-class UserTest(base.UserTest, SQLAlchemyEngineTestBase):
-    pass
-
-
-class ProjectTest(base.ProjectTest, SQLAlchemyEngineTestBase):
-    pass
-
-
-class ResourceTest(base.ResourceTest, SQLAlchemyEngineTestBase):
-    pass
-
-
-class MeterTest(base.MeterTest, SQLAlchemyEngineTestBase):
-    pass
-
-
-class RawSampleTest(base.RawSampleTest, SQLAlchemyEngineTestBase):
-    pass
-
-
-class StatisticsTest(base.StatisticsTest, SQLAlchemyEngineTestBase):
-    pass
-
-
-class StatisticsGroupByTest(base.StatisticsGroupByTest,
-                            SQLAlchemyEngineTestBase):
-    # This is not implemented
-    def test_group_by_source(self):
-        pass
-
-
-class CounterDataTypeTest(base.CounterDataTypeTest, SQLAlchemyEngineTestBase):
-    pass
-
-
-class AlarmTest(base.AlarmTest, SQLAlchemyEngineTestBase):
-    pass
-
-
-class EventTestBase(base.EventTestBase):
+class EventTestBase(tests_db.TestBase):
     # Note: Do not derive from SQLAlchemyEngineTestBase, since we
     # don't want to automatically inherit all the Meter setup.
     database_connection = 'sqlite://'
 
 
-class UniqueNameTest(base.EventTest, EventTestBase):
+class UniqueNameTest(EventTestBase):
     # UniqueName is a construct specific to sqlalchemy.
     # Not applicable to other drivers.
 
@@ -99,7 +56,7 @@ class UniqueNameTest(base.EventTest, EventTestBase):
         self.assertNotEqual(u1.key, u2.key)
 
 
-class EventTest(base.EventTest, EventTestBase):
+class EventTest(EventTestBase):
     def test_string_traits(self):
         model = models.Trait("Foo", models.Trait.TEXT_TYPE, "my_text")
         trait = self.conn._make_trait(model, None)
@@ -142,11 +99,7 @@ class EventTest(base.EventTest, EventTestBase):
         self.assertIsNotNone(trait.name)
 
 
-class GetEventTest(base.GetEventTest, EventTestBase):
-    pass
-
-
-class ModelTest(SQLAlchemyEngineTestBase):
+class ModelTest(tests_db.TestBase):
     database_connection = 'mysql://localhost'
 
     def test_model_table_args(self):

@@ -64,6 +64,20 @@ class MongoDBFakeConnectionUrl(object):
         return '%(url)s_%(db)s' % dict(url=self.url, db=uuid.uuid4().hex)
 
 
+class DB2FakeConnectionUrl(MongoDBFakeConnectionUrl):
+    def __init__(self):
+        self.url = (os.environ.get('CEILOMETER_TEST_DB2_URL') or
+                    os.environ.get('CEILOMETER_TEST_MONGODB_URL'))
+        if not self.url:
+            raise RuntimeError(
+                "No DB2 test URL set, "
+                "export CEILOMETER_TEST_DB2_URL environment variable")
+        else:
+            # This is to make sure that the db2 driver is used when
+            # CEILOMETER_TEST_DB2_URL was not set
+            self.url = self.url.replace('mongodb:', 'db2:', 1)
+
+
 class MixinTestsWithBackendScenarios(object):
     __metaclass__ = test_base.SkipNotImplementedMeta
 
@@ -71,4 +85,5 @@ class MixinTestsWithBackendScenarios(object):
         ('sqlalchemy', dict(database_connection='sqlite://')),
         ('mongodb', dict(database_connection=MongoDBFakeConnectionUrl())),
         ('hbase', dict(database_connection='hbase://__test__')),
+        ('db2', dict(database_connection=DB2FakeConnectionUrl())),
     ]

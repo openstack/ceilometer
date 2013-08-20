@@ -28,10 +28,10 @@ from oslo.config import cfg
 
 from ceilometer.storage.impl_hbase import Connection
 from ceilometer.storage.impl_hbase import MConnection
-from tests.storage import base
+from ceilometer.tests import db as tests_db
 
 
-class HBaseEngineTestBase(base.DBTestBase):
+class HBaseEngineTestBase(tests_db.TestBase):
     database_connection = 'hbase://__test__'
 
 
@@ -54,31 +54,3 @@ class ConnectionTest(HBaseEngineTestBase):
                        lambda self, x: TestConn(x['host'], x['port']))
         conn = Connection(cfg.CONF)
         self.assertIsInstance(conn.conn, TestConn)
-
-
-class UserTest(base.UserTest, HBaseEngineTestBase):
-    pass
-
-
-class ProjectTest(base.ProjectTest, HBaseEngineTestBase):
-    pass
-
-
-class ResourceTest(base.ResourceTest, HBaseEngineTestBase):
-    pass
-
-
-class MeterTest(base.MeterTest, HBaseEngineTestBase):
-    pass
-
-
-class RawSampleTest(base.RawSampleTest, HBaseEngineTestBase):
-    pass
-
-
-class StatisticsTest(base.StatisticsTest, HBaseEngineTestBase):
-    pass
-
-
-class CounterDataTypeTest(base.CounterDataTypeTest, HBaseEngineTestBase):
-    pass

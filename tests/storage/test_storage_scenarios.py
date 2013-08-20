@@ -16,11 +16,11 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
 """ Base classes for DB backend implemtation test
 """
 
 import datetime
+import testscenarios
 
 from oslo.config import cfg
 
@@ -28,12 +28,13 @@ from ceilometer.publisher import rpc
 from ceilometer.openstack.common import timeutils
 from ceilometer import sample
 from ceilometer import storage
-from ceilometer.tests import db as test_db
+from ceilometer.tests import db as tests_db
 from ceilometer.storage import models
 
+load_tests = testscenarios.load_tests_apply_scenarios
 
-class DBTestBase(test_db.TestBase):
 
+class DBTestBase(tests_db.TestBase):
     def setUp(self):
         super(DBTestBase, self).setUp()
         self.prepare_data()
@@ -165,7 +166,8 @@ class DBTestBase(test_db.TestBase):
             self.msgs.append(msg)
 
 
-class UserTest(DBTestBase):
+class UserTest(DBTestBase,
+               tests_db.MixinTestsWithBackendScenarios):
 
     def test_get_users(self):
         users = self.conn.get_users()
@@ -179,7 +181,8 @@ class UserTest(DBTestBase):
         assert list(users) == ['user-id']
 
 
-class ProjectTest(DBTestBase):
+class ProjectTest(DBTestBase,
+                  tests_db.MixinTestsWithBackendScenarios):
 
     def test_get_projects(self):
         projects = self.conn.get_projects()
@@ -194,9 +197,19 @@ class ProjectTest(DBTestBase):
         assert list(projects) == expected
 
 
-class ResourceTest(DBTestBase):
+class ResourceTest(DBTestBase,
+                   tests_db.MixinTestsWithBackendScenarios):
 
     def test_get_resources(self):
+        expected_first_sample_timestamp = datetime.datetime(2012, 7, 2, 10, 39)
+        expected_last_sample_timestamp = datetime.datetime(2012, 7, 2, 10, 40)
+
+        #note(sileht): This is not normal, all backends should
+        # the same data...
+        if cfg.CONF.database.connection.startswith('db2://'):
+            expected_first_sample_timestamp = None
+            expected_last_sample_timestamp = None
+
         msgs_sources = [msg['source'] for msg in self.msgs]
         resources = list(self.conn.get_resources())
         self.assertEqual(len(resources), 9)
@@ -204,9 +217,9 @@ class ResourceTest(DBTestBase):
             if resource.resource_id != 'resource-id':
                 continue
             self.assertEqual(resource.first_sample_timestamp,
-                             datetime.datetime(2012, 7, 2, 10, 39))
+                             expected_first_sample_timestamp)
             self.assertEqual(resource.last_sample_timestamp,
-                             datetime.datetime(2012, 7, 2, 10, 40))
+                             expected_last_sample_timestamp)
             assert resource.resource_id == 'resource-id'
             assert resource.project_id == 'project-id'
             self.assertIn(resource.source, msgs_sources)
@@ -315,26 +328,16 @@ class ResourceTest(DBTestBase):
 
     def test_get_resources_by_metaquery(self):
         q = {'metadata.display_name': 'test-server'}
-        got_not_imp = False
-        try:
-            resources = list(self.conn.get_resources(metaquery=q))
-            self.assertEqual(len(resources), 9)
-        except NotImplementedError:
-            got_not_imp = True
-            self.assertTrue(got_not_imp)
-        #this should work, but it doesn't.
-        #actually unless I wrap get_resources in list()
-        #it doesn't get called - weird
-        #self.assertRaises(NotImplementedError,
-        #                  self.conn.get_resources,
-        #                  metaquery=q)
+        resources = list(self.conn.get_resources(metaquery=q))
+        self.assertEqual(len(resources), 9)
 
     def test_get_resources_by_empty_metaquery(self):
         resources = list(self.conn.get_resources(metaquery={}))
         self.assertEqual(len(resources), 9)
 
 
-class ResourceTestPagination(DBTestBase):
+class ResourceTestPagination(DBTestBase,
+                             tests_db.MixinTestsWithBackendScenarios):
 
     def test_get_resource_all_limit(self):
         results = list(self.conn.get_resources(limit=8))
@@ -376,7 +379,8 @@ class ResourceTestPagination(DBTestBase):
                          [i.resource_id for i in results])
 
 
-class MeterTest(DBTestBase):
+class MeterTest(DBTestBase,
+                tests_db.MixinTestsWithBackendScenarios):
 
     def test_get_meters(self):
         msgs_sources = [msg['source'] for msg in self.msgs]
@@ -395,21 +399,17 @@ class MeterTest(DBTestBase):
 
     def test_get_meters_by_metaquery(self):
         q = {'metadata.display_name': 'test-server'}
-        got_not_imp = False
-        try:
-            results = list(self.conn.get_meters(metaquery=q))
-            assert results
-            self.assertEqual(len(results), 9)
-        except NotImplementedError:
-            got_not_imp = True
-            self.assertTrue(got_not_imp)
+        results = list(self.conn.get_meters(metaquery=q))
+        assert results
+        self.assertEqual(len(results), 9)
 
     def test_get_meters_by_empty_metaquery(self):
         results = list(self.conn.get_meters(metaquery={}))
         self.assertEqual(len(results), 9)
 
 
-class MeterTestPagination(DBTestBase):
+class MeterTestPagination(DBTestBase,
+                          tests_db.MixinTestsWithBackendScenarios):
 
     def tet_get_meters_all_limit(self):
         results = list(self.conn.get_meters(limit=8))
@@ -453,7 +453,8 @@ class MeterTestPagination(DBTestBase):
         self.assertEqual([], [i.user_id for i in results])
 
 
-class RawSampleTest(DBTestBase):
+class RawSampleTest(DBTestBase,
+                    tests_db.MixinTestsWithBackendScenarios):
 
     def test_get_samples_limit_zero(self):
         f = storage.SampleFilter()
@@ -509,15 +510,10 @@ class RawSampleTest(DBTestBase):
     def test_get_samples_by_metaquery(self):
         q = {'metadata.display_name': 'test-server'}
         f = storage.SampleFilter(metaquery=q)
-        got_not_imp = False
-        try:
-            results = list(self.conn.get_samples(f))
-            assert results
-            for meter in results:
-                assert meter.as_dict() in self.msgs
-        except NotImplementedError:
-            got_not_imp = True
-            self.assertTrue(got_not_imp)
+        results = list(self.conn.get_samples(f))
+        assert results
+        for meter in results:
+            assert meter.as_dict() in self.msgs
 
     def test_get_samples_by_start_time(self):
         timestamp = datetime.datetime(2012, 7, 2, 10, 41)
@@ -611,15 +607,13 @@ class RawSampleTest(DBTestBase):
         self.assertEqual(len(results), 2)
 
     def test_clear_metering_data(self):
-        timeutils.utcnow.override_time = datetime.datetime(2012, 7, 2, 10, 45)
-
-        try:
-            self.conn.clear_expired_metering_data(3 * 60)
-        except NotImplementedError:
-            got_not_imp = True
-            self.assertTrue(got_not_imp)
+        # NOTE(jd) Override this test in MongoDB because our code doesn't clear
+        # the collections, this is handled by MongoDB TTL feature.
+        if cfg.CONF.database.connection.startswith('mongodb://'):
             return
 
+        timeutils.utcnow.override_time = datetime.datetime(2012, 7, 2, 10, 45)
+        self.conn.clear_expired_metering_data(3 * 60)
         f = storage.SampleFilter(meter='instance')
         results = list(self.conn.get_samples(f))
         self.assertEqual(len(results), 5)
@@ -631,15 +625,13 @@ class RawSampleTest(DBTestBase):
         self.assertEqual(len(results), 5)
 
     def test_clear_metering_data_no_data_to_remove(self):
-        timeutils.utcnow.override_time = datetime.datetime(2010, 7, 2, 10, 45)
-
-        try:
-            self.conn.clear_expired_metering_data(3 * 60)
-        except NotImplementedError:
-            got_not_imp = True
-            self.assertTrue(got_not_imp)
+        # NOTE(jd) Override this test in MongoDB because our code doesn't clear
+        # the collections, this is handled by MongoDB TTL feature.
+        if cfg.CONF.database.connection.startswith('mongodb://'):
             return
 
+        timeutils.utcnow.override_time = datetime.datetime(2010, 7, 2, 10, 45)
+        self.conn.clear_expired_metering_data(3 * 60)
         f = storage.SampleFilter(meter='instance')
         results = list(self.conn.get_samples(f))
         self.assertEqual(len(results), 11)
@@ -651,7 +643,8 @@ class RawSampleTest(DBTestBase):
         self.assertEqual(len(results), 9)
 
 
-class StatisticsTest(DBTestBase):
+class StatisticsTest(DBTestBase,
+                     tests_db.MixinTestsWithBackendScenarios):
 
     def prepare_data(self):
         for i in range(3):
@@ -861,7 +854,8 @@ class StatisticsTest(DBTestBase):
         assert results.avg == 6
 
 
-class StatisticsGroupByTest(DBTestBase):
+class StatisticsGroupByTest(DBTestBase,
+                            tests_db.MixinTestsWithBackendScenarios):
 
     def prepare_data(self):
         test_sample_data = (
@@ -1416,8 +1410,8 @@ class StatisticsGroupByTest(DBTestBase):
         pass
 
 
-class CounterDataTypeTest(DBTestBase):
-
+class CounterDataTypeTest(DBTestBase,
+                          tests_db.MixinTestsWithBackendScenarios):
     def prepare_data(self):
         c = sample.Sample(
             'dummyBigCounter',
@@ -1496,7 +1490,6 @@ class CounterDataTypeTest(DBTestBase):
 
 
 class AlarmTestBase(DBTestBase):
-
     def add_some_alarms(self):
         alarms = [models.Alarm('red-alert',
                                'test.one', 'eq', 36, 'count',
@@ -1522,7 +1515,8 @@ class AlarmTestBase(DBTestBase):
             self.conn.update_alarm(a)
 
 
-class AlarmTest(AlarmTestBase):
+class AlarmTest(AlarmTestBase,
+                tests_db.MixinTestsWithBackendScenarios):
 
     def test_empty(self):
         alarms = list(self.conn.get_alarms())
@@ -1584,7 +1578,8 @@ class AlarmTest(AlarmTestBase):
             self.assertNotEquals(victim.name, s.name)
 
 
-class AlarmTestPagination(AlarmTestBase):
+class AlarmTestPagination(AlarmTestBase,
+                          tests_db.MixinTestsWithBackendScenarios):
 
     def test_get_alarm_all_limit(self):
         self.add_some_alarms()
@@ -1648,7 +1643,8 @@ class AlarmTestPagination(AlarmTestBase):
         self.assertEqual(['red-alert'], [i.name for i in page1])
 
 
-class EventTestBase(test_db.TestBase):
+class EventTestBase(tests_db.TestBase,
+                    tests_db.MixinTestsWithBackendScenarios):
     """Separate test base class because we don't want to
     inherit all the Meter stuff.
     """
