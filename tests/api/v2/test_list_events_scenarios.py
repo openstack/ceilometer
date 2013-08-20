@@ -52,7 +52,7 @@ class TestListEvents(FunctionalTest,
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.counter',
-                               'ignored_dict': {'key': 'value'},
+                               'dict_properties': {'key': 'value'},
                                'ignored_list': ['not-returned'],
                                },
             source='test_source',
@@ -169,6 +169,7 @@ class TestListEvents(FunctionalTest,
         self.assert_('resource_metadata' in sample)
         self.assertEqual(
             list(sorted(sample['resource_metadata'].iteritems())),
-            [('display_name', 'test-server'),
+            [('dict_properties.key', 'value'),
+             ('display_name', 'test-server'),
              ('tag', 'self.counter'),
              ])

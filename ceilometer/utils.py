@@ -27,13 +27,13 @@ import decimal
 from ceilometer.openstack.common import timeutils
 
 
-def recursive_keypairs(d):
+def recursive_keypairs(d, separator=':'):
     """Generator that produces sequence of keypairs for nested dictionaries.
     """
     for name, value in sorted(d.iteritems()):
         if isinstance(value, dict):
             for subname, subvalue in recursive_keypairs(value):
-                yield ('%s:%s' % (name, subname), subvalue)
+                yield ('%s%s%s' % (name, separator, subname), subvalue)
         elif isinstance(value, (tuple, list)):
             # When doing a pair of JSON encode/decode operations to the tuple,
             # the tuple would become list. So we have to generate the value as

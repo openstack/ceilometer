@@ -45,6 +45,7 @@ from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer import sample
 from ceilometer import storage
+from ceilometer import utils
 from ceilometer.api import acl
 
 
@@ -270,8 +271,9 @@ def _flatten_metadata(metadata):
     """
     if metadata:
         return dict((k, unicode(v))
-                    for k, v in metadata.iteritems()
-                    if type(v) not in set([list, dict, set]))
+                    for k, v in utils.recursive_keypairs(metadata,
+                                                         separator='.')
+                    if type(v) not in set([list, set]))
     return {}
 
 
