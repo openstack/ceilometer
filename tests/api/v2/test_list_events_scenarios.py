@@ -41,7 +41,7 @@ class TestListEvents(FunctionalTest,
 
     def setUp(self):
         super(TestListEvents, self).setUp()
-        self.counter1 = sample.Sample(
+        self.sample1 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -51,19 +51,19 @@ class TestListEvents(FunctionalTest,
             'resource-id',
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
             resource_metadata={'display_name': 'test-server',
-                               'tag': 'self.counter',
+                               'tag': 'self.sample',
                                'dict_properties': {'key': 'value'},
                                'ignored_list': ['not-returned'],
                                },
             source='test_source',
         )
         msg = rpc.meter_message_from_counter(
-            self.counter1,
+            self.sample1,
             cfg.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg)
 
-        self.counter2 = sample.Sample(
+        self.sample2 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -73,12 +73,12 @@ class TestListEvents(FunctionalTest,
             'resource-id-alternate',
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
             resource_metadata={'display_name': 'test-server',
-                               'tag': 'self.counter2',
+                               'tag': 'self.sample2',
                                },
             source='source2',
         )
         msg2 = rpc.meter_message_from_counter(
-            self.counter2,
+            self.sample2,
             cfg.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg2)
@@ -171,5 +171,5 @@ class TestListEvents(FunctionalTest,
             list(sorted(sample['resource_metadata'].iteritems())),
             [('dict_properties.key', 'value'),
              ('display_name', 'test-server'),
-             ('tag', 'self.counter'),
+             ('tag', 'self.sample'),
              ])

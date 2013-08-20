@@ -38,9 +38,8 @@ class TestMaxProjectVolume(base.FunctionalTest,
     def setUp(self):
         super(TestMaxProjectVolume, self).setUp()
 
-        self.counters = []
         for i in range(3):
-            c = sample.Sample(
+            s = sample.Sample(
                 'volume.size',
                 'gauge',
                 'GiB',
@@ -50,13 +49,12 @@ class TestMaxProjectVolume(base.FunctionalTest,
                 'resource-id-%s' % i,
                 timestamp=datetime.datetime(2012, 9, 25, 10 + i, 30 + i),
                 resource_metadata={'display_name': 'test-volume',
-                                   'tag': 'self.counter',
+                                   'tag': 'self.sample',
                                    },
                 source='source1',
             )
-            self.counters.append(c)
             msg = rpc.meter_message_from_counter(
-                c,
+                s,
                 cfg.CONF.publisher_rpc.metering_secret,
             )
             self.conn.record_metering_data(msg)
@@ -139,9 +137,8 @@ class TestMaxResourceVolume(base.FunctionalTest,
     def setUp(self):
         super(TestMaxResourceVolume, self).setUp()
 
-        self.counters = []
         for i in range(3):
-            c = sample.Sample(
+            s = sample.Sample(
                 'volume.size',
                 'gauge',
                 'GiB',
@@ -151,13 +148,12 @@ class TestMaxResourceVolume(base.FunctionalTest,
                 'resource-id',
                 timestamp=datetime.datetime(2012, 9, 25, 10 + i, 30 + i),
                 resource_metadata={'display_name': 'test-volume',
-                                   'tag': 'self.counter',
+                                   'tag': 'self.sample',
                                    },
                 source='source1',
             )
-            self.counters.append(c)
             msg = rpc.meter_message_from_counter(
-                c,
+                s,
                 cfg.CONF.publisher_rpc.metering_secret,
             )
             self.conn.record_metering_data(msg)
@@ -263,9 +259,8 @@ class TestSumProjectVolume(base.FunctionalTest,
     def setUp(self):
         super(TestSumProjectVolume, self).setUp()
 
-        self.counters = []
         for i in range(3):
-            c = sample.Sample(
+            s = sample.Sample(
                 'volume.size',
                 'gauge',
                 'GiB',
@@ -275,13 +270,12 @@ class TestSumProjectVolume(base.FunctionalTest,
                 'resource-id-%s' % i,
                 timestamp=datetime.datetime(2012, 9, 25, 10 + i, 30 + i),
                 resource_metadata={'display_name': 'test-volume',
-                                   'tag': 'self.counter',
+                                   'tag': 'self.sample',
                                    },
                 source='source1',
             )
-            self.counters.append(c)
             msg = rpc.meter_message_from_counter(
-                c,
+                s,
                 cfg.CONF.publisher_rpc.metering_secret,
             )
             self.conn.record_metering_data(msg)
@@ -366,9 +360,8 @@ class TestSumResourceVolume(base.FunctionalTest,
     def setUp(self):
         super(TestSumResourceVolume, self).setUp()
 
-        self.counters = []
         for i in range(3):
-            c = sample.Sample(
+            s = sample.Sample(
                 'volume.size',
                 'gauge',
                 'GiB',
@@ -378,13 +371,12 @@ class TestSumResourceVolume(base.FunctionalTest,
                 'resource-id',
                 timestamp=datetime.datetime(2012, 9, 25, 10 + i, 30 + i),
                 resource_metadata={'display_name': 'test-volume',
-                                   'tag': 'self.counter',
+                                   'tag': 'self.sample',
                                    },
                 source='source1',
             )
-            self.counters.append(c)
             msg = rpc.meter_message_from_counter(
-                c,
+                s,
                 cfg.CONF.publisher_rpc.metering_secret,
             )
             self.conn.record_metering_data(msg)

@@ -93,7 +93,7 @@ class TestAPIACL(FunctionalTest,
                     'resource-good',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 40),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter'},
+                                       'tag': 'self.sample'},
                     source='test_source'),
                 sample.Sample(
                     'meter.mine',
@@ -105,7 +105,7 @@ class TestAPIACL(FunctionalTest,
                     'resource-56',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 43),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter4'},
+                                       'tag': 'self.sample4'},
                     source='test_source')]:
             msg = rpc.meter_message_from_counter(
                 cnt,

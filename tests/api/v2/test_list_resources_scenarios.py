@@ -45,7 +45,7 @@ class TestListResources(FunctionalTest,
         self.assertEqual([], data)
 
     def test_instance_no_metadata(self):
-        counter1 = sample.Sample(
+        sample1 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -58,7 +58,7 @@ class TestListResources(FunctionalTest,
             source='test',
         )
         msg = rpc.meter_message_from_counter(
-            counter1,
+            sample1,
             cfg.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg)
@@ -67,7 +67,7 @@ class TestListResources(FunctionalTest,
         self.assertEqual(1, len(data))
 
     def test_instances(self):
-        counter1 = sample.Sample(
+        sample1 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -77,17 +77,17 @@ class TestListResources(FunctionalTest,
             'resource-id',
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
             resource_metadata={'display_name': 'test-server',
-                               'tag': 'self.counter',
+                               'tag': 'self.sample',
                                },
             source='test',
         )
         msg = rpc.meter_message_from_counter(
-            counter1,
+            sample1,
             cfg.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg)
 
-        counter2 = sample.Sample(
+        sample2 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -97,12 +97,12 @@ class TestListResources(FunctionalTest,
             'resource-id-alternate',
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
             resource_metadata={'display_name': 'test-server',
-                               'tag': 'self.counter2',
+                               'tag': 'self.sample2',
                                },
             source='test',
         )
         msg2 = rpc.meter_message_from_counter(
-            counter2,
+            sample2,
             cfg.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg2)
@@ -111,7 +111,7 @@ class TestListResources(FunctionalTest,
         self.assertEqual(2, len(data))
 
     def test_instances_one(self):
-        counter1 = sample.Sample(
+        sample1 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -121,17 +121,17 @@ class TestListResources(FunctionalTest,
             'resource-id',
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
             resource_metadata={'display_name': 'test-server',
-                               'tag': 'self.counter',
+                               'tag': 'self.sample',
                                },
             source='test',
         )
         msg = rpc.meter_message_from_counter(
-            counter1,
+            sample1,
             cfg.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg)
 
-        counter2 = sample.Sample(
+        sample2 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -141,12 +141,12 @@ class TestListResources(FunctionalTest,
             'resource-id-alternate',
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
             resource_metadata={'display_name': 'test-server',
-                               'tag': 'self.counter2',
+                               'tag': 'self.sample2',
                                },
             source='test',
         )
         msg2 = rpc.meter_message_from_counter(
-            counter2,
+            sample2,
             cfg.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg2)
@@ -155,7 +155,7 @@ class TestListResources(FunctionalTest,
         self.assertEqual('resource-id', data['resource_id'])
 
     def test_with_source(self):
-        counter1 = sample.Sample(
+        sample1 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -165,17 +165,17 @@ class TestListResources(FunctionalTest,
             'resource-id',
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
             resource_metadata={'display_name': 'test-server',
-                               'tag': 'self.counter',
+                               'tag': 'self.sample',
                                },
             source='test_list_resources',
         )
         msg = rpc.meter_message_from_counter(
-            counter1,
+            sample1,
             cfg.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg)
 
-        counter2 = sample.Sample(
+        sample2 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -185,12 +185,12 @@ class TestListResources(FunctionalTest,
             'resource-id-alternate',
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
             resource_metadata={'display_name': 'test-server',
-                               'tag': 'self.counter2',
+                               'tag': 'self.sample2',
                                },
             source='not-test',
         )
         msg2 = rpc.meter_message_from_counter(
-            counter2,
+            sample2,
             cfg.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg2)
@@ -202,7 +202,7 @@ class TestListResources(FunctionalTest,
         self.assertEqual(['resource-id'], ids)
 
     def test_with_invalid_resource_id(self):
-        counter1 = sample.Sample(
+        sample1 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -212,17 +212,17 @@ class TestListResources(FunctionalTest,
             'resource-id-1',
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
             resource_metadata={'display_name': 'test-server',
-                               'tag': 'self.counter',
+                               'tag': 'self.sample',
                                },
             source='test_list_resources',
         )
         msg = rpc.meter_message_from_counter(
-            counter1,
+            sample1,
             cfg.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg)
 
-        counter2 = sample.Sample(
+        sample2 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -232,12 +232,12 @@ class TestListResources(FunctionalTest,
             'resource-id-2',
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
             resource_metadata={'display_name': 'test-server',
-                               'tag': 'self.counter2',
+                               'tag': 'self.sample2',
                                },
             source='test_list_resources',
         )
         msg2 = rpc.meter_message_from_counter(
-            counter2,
+            sample2,
             cfg.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg2)
@@ -252,7 +252,7 @@ class TestListResources(FunctionalTest,
         self.assertEqual(resp3.status_code, 400)
 
     def test_with_user(self):
-        counter1 = sample.Sample(
+        sample1 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -262,17 +262,17 @@ class TestListResources(FunctionalTest,
             'resource-id',
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
             resource_metadata={'display_name': 'test-server',
-                               'tag': 'self.counter',
+                               'tag': 'self.sample',
                                },
             source='test_list_resources',
         )
         msg = rpc.meter_message_from_counter(
-            counter1,
+            sample1,
             cfg.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg)
 
-        counter2 = sample.Sample(
+        sample2 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -282,12 +282,12 @@ class TestListResources(FunctionalTest,
             'resource-id-alternate',
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
             resource_metadata={'display_name': 'test-server',
-                               'tag': 'self.counter2',
+                               'tag': 'self.sample2',
                                },
             source='not-test',
         )
         msg2 = rpc.meter_message_from_counter(
-            counter2,
+            sample2,
             cfg.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg2)
@@ -299,7 +299,7 @@ class TestListResources(FunctionalTest,
         self.assertEqual(['resource-id'], ids)
 
     def test_with_project(self):
-        counter1 = sample.Sample(
+        sample1 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -309,17 +309,17 @@ class TestListResources(FunctionalTest,
             'resource-id',
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
             resource_metadata={'display_name': 'test-server',
-                               'tag': 'self.counter',
+                               'tag': 'self.sample',
                                },
             source='test_list_resources',
         )
         msg = rpc.meter_message_from_counter(
-            counter1,
+            sample1,
             cfg.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg)
 
-        counter2 = sample.Sample(
+        sample2 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -329,12 +329,12 @@ class TestListResources(FunctionalTest,
             'resource-id-alternate',
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
             resource_metadata={'display_name': 'test-server',
-                               'tag': 'self.counter2',
+                               'tag': 'self.sample2',
                                },
             source='not-test',
         )
         msg2 = rpc.meter_message_from_counter(
-            counter2,
+            sample2,
             cfg.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg2)
@@ -346,7 +346,7 @@ class TestListResources(FunctionalTest,
         self.assertEqual(['resource-id'], ids)
 
     def test_with_user_non_admin(self):
-        counter1 = sample.Sample(
+        sample1 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -356,12 +356,12 @@ class TestListResources(FunctionalTest,
             'resource-id-alternate',
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
             resource_metadata={'display_name': 'test-server',
-                               'tag': 'self.counter1',
+                               'tag': 'self.sample1',
                                },
             source='not-test',
         )
         msg2 = rpc.meter_message_from_counter(
-            counter1,
+            sample1,
             cfg.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg2)
@@ -373,7 +373,7 @@ class TestListResources(FunctionalTest,
         self.assertEqual(set(['resource-id-alternate']), ids)
 
     def test_with_user_wrong_tenant(self):
-        counter1 = sample.Sample(
+        sample1 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -383,12 +383,12 @@ class TestListResources(FunctionalTest,
             'resource-id-alternate',
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
             resource_metadata={'display_name': 'test-server',
-                               'tag': 'self.counter1',
+                               'tag': 'self.sample1',
                                },
             source='not-test',
         )
         msg2 = rpc.meter_message_from_counter(
-            counter1,
+            sample1,
             cfg.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg2)
@@ -400,7 +400,7 @@ class TestListResources(FunctionalTest,
         self.assertEqual(set(), ids)
 
     def test_metadata(self):
-        counter1 = sample.Sample(
+        sample1 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -410,14 +410,14 @@ class TestListResources(FunctionalTest,
             'resource-id',
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
             resource_metadata={'display_name': 'test-server',
-                               'tag': 'self.counter',
+                               'tag': 'self.sample',
                                'dict_properties': {'key': 'value'},
                                'ignored_list': ['not-returned'],
                                },
             source='test',
         )
         msg = rpc.meter_message_from_counter(
-            counter1,
+            sample1,
             cfg.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg)
@@ -427,12 +427,12 @@ class TestListResources(FunctionalTest,
         self.assertEqual(
             [(u'dict_properties.key', u'value'),
              (u'display_name', u'test-server'),
-             (u'tag', u'self.counter')
+             (u'tag', u'self.sample')
              ],
             list(sorted(metadata.iteritems())))
 
     def test_resource_meter_links(self):
-        counter1 = sample.Sample(
+        sample1 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -442,12 +442,12 @@ class TestListResources(FunctionalTest,
             'resource-id',
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
             resource_metadata={'display_name': 'test-server',
-                               'tag': 'self.counter',
+                               'tag': 'self.sample',
                                },
             source='test_list_resources',
         )
         msg = rpc.meter_message_from_counter(
-            counter1,
+            sample1,
             cfg.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg)

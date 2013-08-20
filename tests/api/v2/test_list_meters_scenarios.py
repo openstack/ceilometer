@@ -60,7 +60,7 @@ class TestListMeters(FunctionalTest,
                     'resource-id',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 40),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter'},
+                                       'tag': 'self.sample'},
                     source='test_source'),
                 sample.Sample(
                     'meter.test',
@@ -72,7 +72,7 @@ class TestListMeters(FunctionalTest,
                     'resource-id',
                     timestamp=datetime.datetime(2012, 7, 2, 11, 40),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter1'},
+                                       'tag': 'self.sample1'},
                     source='test_source'),
                 sample.Sample(
                     'meter.mine',
@@ -84,7 +84,7 @@ class TestListMeters(FunctionalTest,
                     'resource-id2',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 41),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter2'},
+                                       'tag': 'self.sample2'},
                     source='test_source'),
                 sample.Sample(
                     'meter.test',
@@ -96,7 +96,7 @@ class TestListMeters(FunctionalTest,
                     'resource-id3',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 42),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter3'},
+                                       'tag': 'self.sample3'},
                     source='test_source'),
                 sample.Sample(
                     'meter.mine',
@@ -108,11 +108,11 @@ class TestListMeters(FunctionalTest,
                     'resource-id4',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 43),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter4',
+                                       'tag': 'self.sample4',
                                        'properties': {
-                                       'prop_1': 'prop_value',
-                                       'prop_2': {'sub_prop_1':
-                                                  'sub_prop_value'}}
+                                           'prop_1': 'prop_value',
+                                           'prop_2': {'sub_prop_1':
+                                                      'sub_prop_value'}}
                                        },
                     source='test_source')]:
             msg = rpc.meter_message_from_counter(
@@ -142,14 +142,14 @@ class TestListMeters(FunctionalTest,
         self.assertEqual('resource-id4', data[0]['resource_id'])
         metadata = data[0]['resource_metadata']
         self.assertIsNotNone(metadata)
-        self.assertEqual('self.counter4', metadata['tag'])
+        self.assertEqual('self.sample4', metadata['tag'])
         self.assertEqual('prop_value', metadata['properties.prop_1'])
 
     def test_list_meters_metadata_query(self):
         data = self.get_json('/meters/meter.test',
                              q=[{'field': 'metadata.tag',
                                  'op': 'eq',
-                                 'value': 'self.counter1',
+                                 'value': 'self.sample1',
                                  }],)
         self.assertEqual(1, len(data))
         self.assertEqual(set(r['resource_id'] for r in data),
@@ -161,7 +161,7 @@ class TestListMeters(FunctionalTest,
         data = self.get_json('/meters/meter.test',
                              q=[{'field': 'metadata.tag',
                                  'op': 'eq',
-                                 'value': 'self.counter1',
+                                 'value': 'self.sample1',
                                  },
                                 {'field': 'metadata.display_name',
                                  'op': 'eq',
@@ -188,7 +188,7 @@ class TestListMeters(FunctionalTest,
                                  },
                                 {'field': 'metadata.tag',
                                  'op': 'eq',
-                                 'value': 'self.counter2',
+                                 'value': 'self.sample2',
                                  }])
         self.assertEqual(1, len(data))
         self.assertEqual(set(r['resource_id'] for r in data),
@@ -214,7 +214,7 @@ class TestListMeters(FunctionalTest,
                                  },
                                 {'field': 'metadata.tag',
                                  'op': 'eq',
-                                 'value': 'self.counter2',
+                                 'value': 'self.sample2',
                                  }])
         self.assertEqual(1, len(data))
         self.assertEqual(set(r['source'] for r in data), set(['test_source']))
@@ -253,7 +253,7 @@ class TestListMeters(FunctionalTest,
                                  },
                                 {'field': 'metadata.tag',
                                  'op': 'eq',
-                                 'value': 'self.counter1',
+                                 'value': 'self.sample1',
                                  }])
         self.assertEqual(1, len(data))
         self.assertEqual(set(r['user_id'] for r in data), set(['user-id']))
@@ -285,7 +285,7 @@ class TestListMeters(FunctionalTest,
                                  },
                                 {'field': 'metadata.tag',
                                  'op': 'eq',
-                                 'value': 'self.counter1',
+                                 'value': 'self.sample1',
                                  }])
         self.assertEqual(1, len(data))
         self.assertEqual(set(r['project_id'] for r in data),

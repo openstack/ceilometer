@@ -61,7 +61,7 @@ class TestListMeters(tests_api.TestBase,
                     'resource-id',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 40),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter'},
+                                       'tag': 'self.sample'},
                     source='test_list_resources'),
                 sample.Sample(
                     'meter.test',
@@ -73,7 +73,7 @@ class TestListMeters(tests_api.TestBase,
                     'resource-id',
                     timestamp=datetime.datetime(2012, 7, 2, 11, 40),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter'},
+                                       'tag': 'self.sample'},
                     source='test_list_resources'),
                 sample.Sample(
                     'meter.mine',
@@ -85,7 +85,7 @@ class TestListMeters(tests_api.TestBase,
                     'resource-id2',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 41),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'two.counter'},
+                                       'tag': 'two.sample'},
                     source='test_list_resources'),
                 sample.Sample(
                     'meter.test',
@@ -97,7 +97,7 @@ class TestListMeters(tests_api.TestBase,
                     'resource-id3',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 42),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'three.counter'},
+                                       'tag': 'three.sample'},
                     source='test_list_resources'),
                 sample.Sample(
                     'meter.mine',
@@ -109,7 +109,7 @@ class TestListMeters(tests_api.TestBase,
                     'resource-id4',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 43),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'four.counter'},
+                                       'tag': 'four.sample'},
                     source='test_list_resources')]:
             msg = rpc.meter_message_from_counter(
                 cnt,
@@ -218,33 +218,33 @@ class TestListMetersMetaquery(TestListMeters,
                               tests_db.MixinTestsWithBackendScenarios):
 
     def test_metaquery1(self):
-        data = self.get('/meters?metadata.tag=self.counter')
+        data = self.get('/meters?metadata.tag=self.sample')
         self.assertEqual(1, len(data['meters']))
 
     def test_metaquery1_non_admin(self):
-        data = self.get('/meters?metadata.tag=self.counter',
+        data = self.get('/meters?metadata.tag=self.sample',
                         headers={"X-Roles": "Member",
                                  "X-Project-Id": "project-id"})
         self.assertEqual(1, len(data['meters']))
 
     def test_metaquery1_wrong_tenant(self):
-        data = self.get('/meters?metadata.tag=self.counter',
+        data = self.get('/meters?metadata.tag=self.sample',
                         headers={"X-Roles": "Member",
                                  "X-Project-Id": "project-666"})
         self.assertEqual(0, len(data['meters']))
 
     def test_metaquery2(self):
-        data = self.get('/meters?metadata.tag=four.counter')
+        data = self.get('/meters?metadata.tag=four.sample')
         self.assertEqual(1, len(data['meters']))
 
     def test_metaquery2_non_admin(self):
-        data = self.get('/meters?metadata.tag=four.counter',
+        data = self.get('/meters?metadata.tag=four.sample',
                         headers={"X-Roles": "Member",
                                  "X-Project-Id": "project-id2"})
         self.assertEqual(1, len(data['meters']))
 
     def test_metaquery2_non_admin_wrong_project(self):
-        data = self.get('/meters?metadata.tag=four.counter',
+        data = self.get('/meters?metadata.tag=four.sample',
                         headers={"X-Roles": "Member",
                                  "X-Project-Id": "project-666"})
         self.assertEqual(0, len(data['meters']))

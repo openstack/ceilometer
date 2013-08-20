@@ -39,9 +39,8 @@ class TestSumResourceVolume(tests_api.TestBase,
     def setUp(self):
         super(TestSumResourceVolume, self).setUp()
 
-        self.counters = []
         for i in range(3):
-            c = sample.Sample(
+            s = sample.Sample(
                 'volume.size',
                 'gauge',
                 'GiB',
@@ -51,13 +50,12 @@ class TestSumResourceVolume(tests_api.TestBase,
                 'resource-id',
                 timestamp=datetime.datetime(2012, 9, 25, 10 + i, 30 + i),
                 resource_metadata={'display_name': 'test-volume',
-                                   'tag': 'self.counter',
+                                   'tag': 'self.sample',
                                    },
                 source='source1',
             )
-            self.counters.append(c)
             msg = rpc.meter_message_from_counter(
-                c,
+                s,
                 cfg.CONF.publisher_rpc.metering_secret,
             )
             self.conn.record_metering_data(msg)

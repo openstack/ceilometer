@@ -61,7 +61,7 @@ class TestListResourcesBase(tests_api.TestBase,
                     'resource-id',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 40),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter'},
+                                       'tag': 'self.sample'},
                     source='test_list_resources',
                 ),
                 sample.Sample(
@@ -74,7 +74,7 @@ class TestListResourcesBase(tests_api.TestBase,
                     'resource-id-alternate',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 41),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter2'},
+                                       'tag': 'self.sample2'},
                     source='test_list_resources',
                 ),
                 sample.Sample(
@@ -87,7 +87,7 @@ class TestListResourcesBase(tests_api.TestBase,
                     'resource-id2',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 42),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter3'},
+                                       'tag': 'self.sample3'},
                     source='test_list_resources',
                 ),
                 sample.Sample(
@@ -100,7 +100,7 @@ class TestListResourcesBase(tests_api.TestBase,
                     'resource-id',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 43),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter4'},
+                                       'tag': 'self.sample4'},
                     source='test_list_resources',
                 )]:
             msg = rpc.meter_message_from_counter(
@@ -282,12 +282,12 @@ class TestListResourcesMetaquery(TestListResourcesBase,
 
     def test_metaquery2(self):
         q = '/sources/test_list_resources/resources'
-        data = self.get('%s?metadata.tag=self.counter4' % q)
+        data = self.get('%s?metadata.tag=self.sample4' % q)
         self.assertEqual(1, len(data['resources']))
 
     def test_metaquery2_non_admin(self):
         q = '/sources/test_list_resources/resources'
-        data = self.get('%s?metadata.tag=self.counter4' % q,
+        data = self.get('%s?metadata.tag=self.sample4' % q,
                         headers={"X-Roles": "Member",
                                  "X-Project-Id": "project-id"})
         self.assertEqual(1, len(data['resources']))

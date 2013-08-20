@@ -50,7 +50,7 @@ class TestListUsers(tests_api.TestBase,
     def setUp(self):
         super(TestListUsers, self).setUp()
 
-        counter1 = sample.Sample(
+        sample1 = sample.Sample(
             'instance',
             'cumulative',
             'instance',
@@ -60,17 +60,17 @@ class TestListUsers(tests_api.TestBase,
             'resource-id',
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
             resource_metadata={'display_name': 'test-server',
-                               'tag': 'self.counter',
+                               'tag': 'self.sample',
                                },
             source='test_list_users',
         )
         msg = rpc.meter_message_from_counter(
-            counter1,
+            sample1,
             cfg.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg)
 
-        counter2 = sample.Sample(
+        sample2 = sample.Sample(
             'instance',
             'cumulative',
             '',
@@ -80,12 +80,12 @@ class TestListUsers(tests_api.TestBase,
             'resource-id-alternate',
             timestamp=datetime.datetime(2012, 7, 2, 10, 41),
             resource_metadata={'display_name': 'test-server',
-                               'tag': 'self.counter2',
+                               'tag': 'self.sample2',
                                },
             source='not-test',
         )
         msg2 = rpc.meter_message_from_counter(
-            counter2,
+            sample2,
             cfg.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg2)

@@ -49,7 +49,7 @@ class TestListEvents(tests_api.TestBase,
                     'resource-id',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 40),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter'},
+                                       'tag': 'self.sample'},
                     source='source1',
                 ),
                 sample.Sample(
@@ -62,7 +62,7 @@ class TestListEvents(tests_api.TestBase,
                     'resource-id',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 41),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter'},
+                                       'tag': 'self.sample'},
                     source='source1',
                 ),
                 sample.Sample(
@@ -75,7 +75,7 @@ class TestListEvents(tests_api.TestBase,
                     'resource-id-alternate',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 42),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.counter2'},
+                                       'tag': 'self.sample2'},
                     source='source1',
                 ),
         ]:
@@ -186,24 +186,24 @@ class TestListEventsMetaquery(TestListEvents,
 
     def test_metaquery1(self):
         q = '/sources/source1/meters/instance'
-        data = self.get('%s?metadata.tag=self.counter2' % q)
+        data = self.get('%s?metadata.tag=self.sample2' % q)
         self.assertEqual(1, len(data['events']))
 
     def test_metaquery1_wrong_tenant(self):
         q = '/sources/source1/meters/instance'
-        data = self.get('%s?metadata.tag=self.counter2' % q,
+        data = self.get('%s?metadata.tag=self.sample2' % q,
                         headers={"X-Roles": "Member",
                                  "X-Project-Id": "project1"})
         self.assertEqual(0, len(data['events']))
 
     def test_metaquery2(self):
         q = '/sources/source1/meters/instance'
-        data = self.get('%s?metadata.tag=self.counter' % q)
+        data = self.get('%s?metadata.tag=self.sample' % q)
         self.assertEqual(2, len(data['events']))
 
     def test_metaquery2_non_admin(self):
         q = '/sources/source1/meters/instance'
-        data = self.get('%s?metadata.tag=self.counter' % q,
+        data = self.get('%s?metadata.tag=self.sample' % q,
                         headers={"X-Roles": "Member",
                                  "X-Project-Id": "project1"})
         self.assertEqual(2, len(data['events']))
