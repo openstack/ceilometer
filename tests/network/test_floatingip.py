@@ -81,7 +81,7 @@ class TestFloatingIPPollster(base.TestCase):
         self.assertEqual(samples[2].resource_metadata["address"], "1.1.1.3")
         self.assertEqual(samples[2].resource_metadata["pool"], "public")
 
-    def test_get_counter_names(self):
+    def test_get_meter_names(self):
         samples = list(self.pollster.get_samples(self.manager, {}))
         self.assertEqual(set([s.name for s in samples]),
                          set(['ip.floating']))
