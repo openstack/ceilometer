@@ -15,7 +15,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Publish a counter using the preferred RPC mechanism.
+"""Publish a sample using the preferred RPC mechanism.
 """
 
 import hashlib
@@ -84,23 +84,23 @@ def verify_signature(message, secret):
     return new_sig == old_sig
 
 
-def meter_message_from_counter(counter, secret):
+def meter_message_from_counter(sample, secret):
     """Make a metering message ready to be published or stored.
 
     Returns a dictionary containing a metering message
-    for a notification message and a Counter instance.
+    for a notification message and a Sample instance.
     """
-    msg = {'source': counter.source,
-           'counter_name': counter.name,
-           'counter_type': counter.type,
-           'counter_unit': counter.unit,
-           'counter_volume': counter.volume,
-           'user_id': counter.user_id,
-           'project_id': counter.project_id,
-           'resource_id': counter.resource_id,
-           'timestamp': counter.timestamp,
-           'resource_metadata': counter.resource_metadata,
-           'message_id': counter.id,
+    msg = {'source': sample.source,
+           'counter_name': sample.name,
+           'counter_type': sample.type,
+           'counter_unit': sample.unit,
+           'counter_volume': sample.volume,
+           'user_id': sample.user_id,
+           'project_id': sample.project_id,
+           'resource_id': sample.resource_id,
+           'timestamp': sample.timestamp,
+           'resource_metadata': sample.resource_metadata,
+           'message_id': sample.id,
            }
     msg['message_signature'] = compute_signature(msg, secret)
     return msg
@@ -136,19 +136,19 @@ class RPCPublisher(publisher.PublisherBase):
                      % self.policy)
             self.policy = 'default'
 
-    def publish_samples(self, context, counters):
-        """Publish counters on RPC.
+    def publish_samples(self, context, samples):
+        """Publish samples on RPC.
 
         :param context: Execution context from the service or RPC call.
-        :param counters: Counters from pipeline after transformation.
+        :param samples: Samples from pipeline after transformation.
 
         """
 
         meters = [
             meter_message_from_counter(
-                counter,
+                sample,
                 cfg.CONF.publisher_rpc.metering_secret)
-            for counter in counters
+            for sample in samples
         ]
 
         topic = cfg.CONF.publisher_rpc.metering_topic
@@ -157,7 +157,7 @@ class RPCPublisher(publisher.PublisherBase):
             'version': '1.0',
             'args': {'data': meters},
         }
-        LOG.audit('Publishing %d counters on %s',
+        LOG.audit('Publishing %d samples on %s',
                   len(msg['args']['data']), topic)
         self.local_queue.append((context, topic, msg))
 
@@ -171,7 +171,7 @@ class RPCPublisher(publisher.PublisherBase):
                     'args': {'data': list(meter_list)},
                 }
                 topic_name = topic + '.' + meter_name
-                LOG.audit('Publishing %d counters on %s',
+                LOG.audit('Publishing %d samples on %s',
                           len(msg['args']['data']), topic_name)
                 self.local_queue.append((context, topic_name, msg))
 
@@ -197,7 +197,7 @@ class RPCPublisher(publisher.PublisherBase):
             count = queue_length - self.max_queue_length
             self.local_queue = self.local_queue[count:]
             LOG.warn("Publisher max local_queue length is exceeded, "
-                     "dropping %d oldest counters", count)
+                     "dropping %d oldest samples", count)
 
     @staticmethod
     def _process_queue(queue, policy):
@@ -220,14 +220,14 @@ class RPCPublisher(publisher.PublisherBase):
             try:
                 rpc.cast(context, topic, msg)
             except (SystemExit, rpc.common.RPCException):
-                counters = sum([len(m['args']['data']) for _, _, m in queue])
+                samples = sum([len(m['args']['data']) for _, _, m in queue])
                 if policy == 'queue':
-                    LOG.warn("Failed to publish %s counters, queue them",
-                             counters)
+                    LOG.warn("Failed to publish %s samples, queue them",
+                             samples)
                     return queue
                 elif policy == 'drop':
-                    LOG.warn("Failed to publish %d counters, dropping them",
-                             counters)
+                    LOG.warn("Failed to publish %d samples, dropping them",
+                             samples)
                     return []
                 # default, occur only if rabbit_max_retries > 0
                 raise

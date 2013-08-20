@@ -15,7 +15,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Publish a counter using an UDP mechanism
+"""Publish a sample using an UDP mechanism
 """
 
 from ceilometer import publisher
@@ -41,23 +41,23 @@ class UDPPublisher(publisher.PublisherBase):
         self.socket = socket.socket(socket.AF_INET,
                                     socket.SOCK_DGRAM)
 
-    def publish_samples(self, context, counters):
+    def publish_samples(self, context, samples):
         """Send a metering message for publishing
 
         :param context: Execution context from the service or RPC call
-        :param counter: Counter from pipeline after transformation
+        :param samples: Samples from pipeline after transformation
         """
 
-        for counter in counters:
-            msg = counter.as_dict()
+        for sample in samples:
+            msg = sample.as_dict()
             host = self.host
             port = self.port
-            LOG.debug(_("Publishing counter %(msg)s over UDP to "
+            LOG.debug(_("Publishing sample %(msg)s over UDP to "
                         "%(host)s:%(port)d") % {'msg': msg, 'host': host,
                                                 'port': port})
             try:
                 self.socket.sendto(msgpack.dumps(msg),
                                    (self.host, self.port))
             except Exception as e:
-                LOG.warn(_("Unable to send counter over UDP"))
+                LOG.warn(_("Unable to send sample over UDP"))
                 LOG.exception(e)
