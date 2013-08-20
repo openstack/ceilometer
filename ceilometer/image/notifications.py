@@ -15,7 +15,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Handler for producing image counter messages from glance notification
+"""Handler for producing image metering messages from glance notification
    events.
 """
 
@@ -98,7 +98,7 @@ class ImageSize(ImageCRUDBase):
 
 
 class ImageDownload(ImageBase):
-    """Emit image_download counter when an image is downloaded."""
+    """Emit image_download sample when an image is downloaded."""
     event_types = ['image.send']
 
     def process_notification(self, message):
@@ -114,7 +114,7 @@ class ImageDownload(ImageBase):
 
 
 class ImageServe(ImageBase):
-    """Emit image_serve counter when an image is served out."""
+    """Emit image_serve sample when an image is served out."""
     event_types = ['image.send']
 
     def process_notification(self, message):
