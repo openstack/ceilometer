@@ -150,7 +150,6 @@ class ConnectionPool(object):
         LOG.info('connecting to MongoDB on %s', url)
         client = pymongo.MongoClient(
             url,
-            use_greenlets=True,
             safe=True)
         self._pool[url] = weakref.ref(client)
         return client
