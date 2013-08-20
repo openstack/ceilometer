@@ -83,7 +83,7 @@ class EnergyPollster(_Base):
     """Measures energy consumption."""
 
     def get_samples(self, manager, cache):
-        """Returns all counters."""
+        """Returns all samples."""
         for probe in self._iter_probes(manager.keystone, cache):
             yield sample.Sample(
                 name='energy',
@@ -103,7 +103,7 @@ class PowerPollster(_Base):
     """Measures power consumption."""
 
     def get_samples(self, manager, cache):
-        """Returns all counters."""
+        """Returns all samples."""
         for probe in self._iter_probes(manager.keystone, cache):
             yield sample.Sample(
                 name='power',
