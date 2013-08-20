@@ -57,8 +57,8 @@ class ScalingTransformer(transformer.TransformerBase):
     def __init__(self, source={}, target={}, **kwargs):
         """Initialize transformer with configured parameters.
 
-        :param source: dict containing source counter unit
-        :param target: dict containing target counter name, type,
+        :param source: dict containing source sample unit
+        :param target: dict containing target sample name, type,
                        unit and scaling factor (a missing value
                        connotes no change)
         """
@@ -71,44 +71,44 @@ class ScalingTransformer(transformer.TransformerBase):
         super(ScalingTransformer, self).__init__(**kwargs)
 
     @staticmethod
-    def _scale(counter, scale):
+    def _scale(s, scale):
         """Apply the scaling factor (either a straight multiplicative
            factor or else a string to be eval'd).
         """
-        ns = Namespace(counter.as_dict())
+        ns = Namespace(s.as_dict())
 
         return ((eval(scale, {}, ns) if isinstance(scale, basestring)
-                 else counter.volume * scale) if scale else counter.volume)
+                 else s.volume * scale) if scale else s.volume)
 
-    def _convert(self, counter, growth=1):
-        """Transform the appropriate counter fields.
+    def _convert(self, s, growth=1):
+        """Transform the appropriate sample fields.
         """
         scale = self.target.get('scale')
         return sample.Sample(
-            name=self.target.get('name', counter.name),
-            unit=self.target.get('unit', counter.unit),
-            type=self.target.get('type', counter.type),
-            volume=self._scale(counter, scale) * growth,
-            user_id=counter.user_id,
-            project_id=counter.project_id,
-            resource_id=counter.resource_id,
-            timestamp=counter.timestamp,
-            resource_metadata=counter.resource_metadata
+            name=self.target.get('name', s.name),
+            unit=self.target.get('unit', s.unit),
+            type=self.target.get('type', s.type),
+            volume=self._scale(s, scale) * growth,
+            user_id=s.user_id,
+            project_id=s.project_id,
+            resource_id=s.resource_id,
+            timestamp=s.timestamp,
+            resource_metadata=s.resource_metadata
         )
 
-    def handle_sample(self, context, counter):
+    def handle_sample(self, context, s):
         """Handle a sample, converting if necessary."""
-        LOG.debug('handling counter %s', (counter,))
-        if (self.source.get('unit', counter.unit) == counter.unit):
-            counter = self._convert(counter)
-            LOG.debug(_('converted to: %s') % (counter,))
-        return counter
+        LOG.debug('handling sample %s', (s,))
+        if (self.source.get('unit', s.unit) == s.unit):
+            s = self._convert(s)
+            LOG.debug(_('converted to: %s') % (s,))
+        return s
 
 
 class RateOfChangeTransformer(ScalingTransformer):
-    """Transformer based on the rate of change of a counter volume,
+    """Transformer based on the rate of change of a sample volume,
        for example taking the current and previous volumes of a
-       cumulative counter and producing a gauge value based on the
+       cumulative sample and producing a gauge value based on the
        proportion of some maximum used.
     """
 
@@ -118,32 +118,32 @@ class RateOfChangeTransformer(ScalingTransformer):
         self.cache = {}
         super(RateOfChangeTransformer, self).__init__(**kwargs)
 
-    def handle_sample(self, context, counter):
+    def handle_sample(self, context, s):
         """Handle a sample, converting if necessary."""
-        LOG.debug('handling counter %s', (counter,))
-        key = counter.name + counter.resource_id
+        LOG.debug('handling sample %s', (s,))
+        key = s.name + s.resource_id
         prev = self.cache.get(key)
-        timestamp = timeutils.parse_isotime(counter.timestamp)
-        self.cache[key] = (counter.volume, timestamp)
+        timestamp = timeutils.parse_isotime(s.timestamp)
+        self.cache[key] = (s.volume, timestamp)
 
         if prev:
             prev_volume = prev[0]
             prev_timestamp = prev[1]
             time_delta = timeutils.delta_seconds(prev_timestamp, timestamp)
-            # we only allow negative deltas for noncumulative counters, whereas
+            # we only allow negative deltas for noncumulative samples, whereas
             # for cumulative we assume that a reset has occurred in the interim
             # so that the current volume gives a lower bound on growth
-            volume_delta = (counter.volume - prev_volume
-                            if (prev_volume <= counter.volume or
-                                counter.type != sample.TYPE_CUMULATIVE)
-                            else counter.volume)
+            volume_delta = (s.volume - prev_volume
+                            if (prev_volume <= s.volume or
+                                s.type != sample.TYPE_CUMULATIVE)
+                            else s.volume)
             rate_of_change = ((1.0 * volume_delta / time_delta)
                               if time_delta else 0.0)
 
-            counter = self._convert(counter, rate_of_change)
-            LOG.debug(_('converted to: %s') % (counter,))
+            s = self._convert(s, rate_of_change)
+            LOG.debug(_('converted to: %s') % (s,))
         else:
-            LOG.warn(_('dropping counter with no predecessor: %s') %
-                     (counter,))
-            counter = None
-        return counter
+            LOG.warn(_('dropping sample with no predecessor: %s') %
+                     (s,))
+            s = None
+        return s

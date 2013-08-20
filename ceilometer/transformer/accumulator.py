@@ -20,26 +20,26 @@ from ceilometer import transformer
 
 
 class TransformerAccumulator(transformer.TransformerBase):
-    """Transformer that accumulates counter until a threshold, and then flush
+    """Transformer that accumulates sample until a threshold, and then flush
     them out in the wild.
 
     """
 
     def __init__(self, size=1, **kwargs):
         if size >= 1:
-            self.counters = []
+            self.samples = []
         self.size = size
         super(TransformerAccumulator, self).__init__(**kwargs)
 
-    def handle_sample(self, context, counter):
+    def handle_sample(self, context, sample):
         if self.size >= 1:
-            self.counters.append(counter)
+            self.samples.append(sample)
         else:
-            return counter
+            return sample
 
     def flush(self, context):
-        if len(self.counters) >= self.size:
-            x = self.counters
-            self.counters = []
+        if len(self.samples) >= self.size:
+            x = self.samples
+            self.samples = []
             return x
         return []

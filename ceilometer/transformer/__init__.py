@@ -36,7 +36,7 @@ class TransformerExtensionManager(extension.ExtensionManager):
 
 
 class TransformerBase(object):
-    """Base class for plugins that transform the counter."""
+    """Base class for plugins that transform the sample."""
 
     __metaclass__ = abc.ABCMeta
 
@@ -53,15 +53,15 @@ class TransformerBase(object):
         super(TransformerBase, self).__init__()
 
     @abc.abstractmethod
-    def handle_sample(self, context, counter):
-        """Transform a counter.
+    def handle_sample(self, context, sample):
+        """Transform a sample.
 
         :param context: Passed from the data collector.
-        :param counter: A counter.
+        :param sample: A sample.
         """
 
     def flush(self, context):
-        """Flush counters cached previously.
+        """Flush samples cached previously.
 
         :param context: Passed from the data collector.
         """
