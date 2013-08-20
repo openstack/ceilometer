@@ -96,8 +96,8 @@ def _get_metadata_from_object(instance):
     return _add_reserved_user_metadata(instance, metadata)
 
 
-def make_counter_from_instance(instance, name, type, unit, volume,
-                               additional_metadata={}):
+def make_sample_from_instance(instance, name, type, unit, volume,
+                              additional_metadata={}):
     resource_metadata = _get_metadata_from_object(instance)
     resource_metadata.update(additional_metadata)
     return sample.Sample(

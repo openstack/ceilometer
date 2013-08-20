@@ -27,7 +27,7 @@ class InstancePollster(plugin.ComputePollster):
 
     @staticmethod
     def get_samples(manager, cache, instance):
-        yield util.make_counter_from_instance(
+        yield util.make_sample_from_instance(
             instance,
             name='instance',
             type=sample.TYPE_GAUGE,
@@ -40,7 +40,7 @@ class InstanceFlavorPollster(plugin.ComputePollster):
 
     @staticmethod
     def get_samples(manager, cache, instance):
-        yield util.make_counter_from_instance(
+        yield util.make_sample_from_instance(
             instance,
             # Use the "meter name + variable" syntax
             name='instance:%s' %

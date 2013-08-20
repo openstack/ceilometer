@@ -17,7 +17,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Converters for producing compute counter messages from notification events.
+"""Converters for producing compute sample messages from notification events.
 """
 
 from oslo.config import cfg
@@ -68,7 +68,7 @@ class InstanceScheduled(ComputeNotificationBase):
 
 
 class ComputeInstanceNotificationBase(ComputeNotificationBase):
-    """Convert compute.instance.* notifications into Counters
+    """Convert compute.instance.* notifications into Samples
     """
     event_types = ['compute.instance.*']
 
