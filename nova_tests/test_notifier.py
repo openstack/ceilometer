@@ -94,9 +94,6 @@ class TestNovaNotifier(base.TestCase):
             )
             return [self.test_data_1, test_data_2]
 
-        def get_counter_names(self):
-            return ['test1', 'test2']
-
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestNovaNotifier, self).setUp()
