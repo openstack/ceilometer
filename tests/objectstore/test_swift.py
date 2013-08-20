@@ -130,7 +130,7 @@ class TestSwiftPollster(base.TestCase):
         samples = list(self.pollster.get_samples(self.manager, {}))
         self.assertEqual(len(samples), 2)
 
-    def test_get_counter_names(self):
+    def test_get_meter_names(self):
         self.stubs.Set(self.factory, '_iter_accounts',
                        self.fake_iter_accounts)
         samples = list(self.pollster.get_samples(self.manager, {}))
