@@ -54,7 +54,7 @@ def _handle_sort_key(model_name, sort_key=None):
     """
     sort_keys_extra = {'alarm': ['name', 'user_id', 'project_id'],
                        'meter': ['user_id', 'project_id'],
-                       'resource': ['user_id', 'project_id'],
+                       'resource': ['user_id', 'project_id', 'timestamp'],
                        }
 
     sort_keys = sort_keys_extra[model_name]

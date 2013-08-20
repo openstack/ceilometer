@@ -298,6 +298,9 @@ class Connection(base.Connection):
         return value;
     }""")
 
+    SORT_OPERATION_MAPPING = {'desc': (pymongo.DESCENDING, '$lt'),
+                              'asc': (pymongo.ASCENDING, '$gt')}
+
     def __init__(self, conf):
         url = conf.database.connection
 
@@ -488,15 +491,7 @@ class Connection(base.Connection):
         :return: sort parameters, query to use
         """
         all_sort = []
-        sort_mapping = {'desc': (pymongo.DESCENDING, '$lt'),
-                        'asc': (pymongo.ASCENDING, '$gt')
-                        }
-        _sort_dir, _sort_flag = sort_mapping.get(sort_dir,
-                                                 sort_mapping['desc'])
-
-        for _sort_key in sort_keys:
-            _all_sort = (_sort_key, _sort_dir)
-            all_sort.append(_all_sort)
+        all_sort, _op = cls._build_sort_instructions(sort_keys, sort_dir)
 
         if marker is not None:
             sort_criteria_list = []
@@ -504,13 +499,34 @@ class Connection(base.Connection):
             for i in range(0, len(sort_keys)):
                 sort_criteria_list.append(cls._recurse_sort_keys(
                                           sort_keys[:(len(sort_keys) - i)],
-                                          marker, _sort_flag))
+                                          marker, _op))
 
             metaquery = {"$or": sort_criteria_list}
         else:
             metaquery = {}
 
         return all_sort, metaquery
+
+    @classmethod
+    def _build_sort_instructions(cls, sort_keys=[], sort_dir='desc'):
+        """Returns a sort_instruction and paging operator.
+
+        Sort instructions are used in the query to determine what attributes
+        to sort on and what direction to use.
+        :param q: The query dict passed in.
+        :param sort_keys: array of attributes by which results be sorted.
+        :param sort_dir: direction in which results be sorted (asc, desc).
+        :return: sort instructions and paging operator
+        """
+        sort_instructions = []
+        _sort_dir, operation = cls.SORT_OPERATION_MAPPING.get(
+            sort_dir, cls.SORT_OPERATION_MAPPING['desc'])
+
+        for _sort_key in sort_keys:
+            _instruction = (_sort_key, _sort_dir)
+            sort_instructions.append(_instruction)
+
+        return sort_instructions, operation
 
     @classmethod
     def paginate_query(cls, q, db_collection, limit=None, marker=None,
@@ -615,8 +631,12 @@ class Connection(base.Connection):
             if ts_range:
                 q['timestamp'] = ts_range
 
+        sort_keys = base._handle_sort_key('resource')
+        sort_instructions = self._build_sort_instructions(sort_keys)[0]
+
         aggregate = self.db.meter.aggregate([
             {"$match": q},
+            {"$sort": dict(sort_instructions)},
             {"$group": {
                 "_id": "$resource_id",
                 "user_id": {"$first": "$user_id"},

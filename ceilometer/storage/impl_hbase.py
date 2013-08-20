@@ -169,6 +169,14 @@ class Connection(base.Connection):
         user_table = self.conn.table(self.USER_TABLE)
         resource_table = self.conn.table(self.RESOURCE_TABLE)
         meter_table = self.conn.table(self.METER_TABLE)
+
+        # store metadata fields with prefix "r_"
+        resource_metadata = {}
+        if data['resource_metadata']:
+            resource_metadata = dict(('f:r_%s' % k, v)
+                                     for (k, v)
+                                     in data['resource_metadata'].iteritems())
+
         # Make sure we know about the user and project
         if data['user_id']:
             user = user_table.row(data['user_id'])
@@ -188,7 +196,8 @@ class Connection(base.Connection):
         rts = reverse_timestamp(data['timestamp'])
 
         resource = resource_table.row(data['resource_id'])
-        new_meter = "%s!%s!%s" % (
+
+        new_meter = _format_meter_reference(
             data['counter_name'], data['counter_type'], data['counter_unit'])
         new_resource = {'f:resource_id': data['resource_id'],
                         'f:project_id': data['project_id'],
@@ -197,12 +206,7 @@ class Connection(base.Connection):
                         # store meters with prefix "m_"
                         'f:m_%s' % new_meter: "1"
                         }
-        # store metadata fields with prefix "r_"
-        if data['resource_metadata']:
-            resource_metadata = dict(('f:r_%s' % k, v)
-                                     for (k, v)
-                                     in data['resource_metadata'].iteritems())
-            new_resource.update(resource_metadata)
+        new_resource.update(resource_metadata)
 
         # Update if resource has new information
         if new_resource != resource:
@@ -240,6 +244,8 @@ class Connection(base.Connection):
                   # add in reversed_ts here for time range scan
                   'f:rts': str(rts)
                   }
+        # Need to record resource_metadata for more robust filtering.
+        record.update(resource_metadata)
         # Don't want to be changing the original data object.
         data = copy.copy(data)
         data['timestamp'] = ts
@@ -301,12 +307,10 @@ class Connection(base.Connection):
         if pagination:
             raise NotImplementedError(_('Pagination not implemented'))
 
-        def make_resource(data, first_ts, last_ts):
+        def make_resource(data, first_ts, last_ts, meter_refs):
             """Transform HBase fields to Resource model."""
             # convert HBase metadata e.g. f:r_display_name to display_name
-            data['f:metadata'] = dict((k[4:], v)
-                                      for k, v in data.iteritems()
-                                      if k.startswith('f:r_'))
+            data['f:metadata'] = _metadata_from_document(data)
 
             return models.Resource(
                 resource_id=data['f:resource_id'],
@@ -317,13 +321,10 @@ class Connection(base.Connection):
                 user_id=data['f:user_id'],
                 metadata=data['f:metadata'],
                 meter=[
-                    models.ResourceMeter(*(m[4:].split("!")))
-                    for m in data
-                    if m.startswith('f:m_')
+                    models.ResourceMeter(*(m.split("!")))
+                    for m in meter_refs
                 ],
             )
-
-        resource_table = self.conn.table(self.RESOURCE_TABLE)
         meter_table = self.conn.table(self.METER_TABLE)
 
         q, start_row, stop_row = make_query(user=user,
@@ -340,32 +341,40 @@ class Connection(base.Connection):
         meters = meter_table.scan(filter=q, row_start=start_row,
                                   row_stop=stop_row)
 
-        resources = {}
-        for resource_id, r_meters in itertools.groupby(
-                meters, key=lambda x: x[1]['f:resource_id']):
-            timestamps = tuple(timeutils.parse_strtime(m[1]['f:timestamp'])
-                               for m in r_meters)
-            resources[resource_id] = (min(timestamps), max(timestamps))
+        # We have to sort on resource_id before we can group by it. According
+        # to the itertools documentation a new group is generated when the
+        # value of the key function changes (it breaks there).
+        meters = sorted(meters, key=_resource_id_from_record_tuple)
 
-        # handle metaquery
-        if len(metaquery) > 0:
-            for ignored, data in resource_table.rows(resources.iterkeys()):
+        for resource_id, r_meters in itertools.groupby(
+                meters, key=_resource_id_from_record_tuple):
+            meter_rows = [data[1] for data in sorted(
+                r_meters, key=_timestamp_from_record_tuple)]
+            meter_references = [
+                _format_meter_reference(m['f:counter_name'],
+                                        m['f:counter_type'],
+                                        m['f:counter_unit'])
+                for m in meter_rows]
+
+            latest_data = meter_rows[-1]
+            min_ts = timeutils.parse_strtime(meter_rows[0]['f:timestamp'])
+            max_ts = timeutils.parse_strtime(latest_data['f:timestamp'])
+            if metaquery:
                 for k, v in metaquery.iteritems():
-                    # if metaquery matches, yield the resource model
-                    # e.g. metaquery: metadata.display_name
-                    #      equals
-                    #      HBase: f:r_display_name
-                    if data['f:r_' + k.split('.', 1)[1]] == v:
+                    if latest_data['f:r_' + k.split('.', 1)[1]] == v:
                         yield make_resource(
-                            data,
-                            resources[data['f:resource_id']][0],
-                            resources[data['f:resource_id']][1])
-        else:
-            for ignored, data in resource_table.rows(resources.iterkeys()):
+                            latest_data,
+                            min_ts,
+                            max_ts,
+                            meter_references
+                        )
+            else:
                 yield make_resource(
-                    data,
-                    resources[data['f:resource_id']][0],
-                    resources[data['f:resource_id']][1])
+                    latest_data,
+                    min_ts,
+                    max_ts,
+                    meter_references
+                )
 
     def get_meters(self, user=None, project=None, resource=None, source=None,
                    metaquery={}, pagination=None):
@@ -894,3 +903,29 @@ def _load_hbase_list(d, prefix):
     for key in (k for k in d if k.startswith(prefix)):
         ret.append(key[len(prefix):])
     return ret
+
+
+def _format_meter_reference(counter_name, counter_type, counter_unit):
+    """Format reference to meter data.
+    """
+    return "%s!%s!%s" % (counter_name, counter_type, counter_unit)
+
+
+def _metadata_from_document(doc):
+    """Extract resource metadata from HBase document using prefix specific
+    to HBase implementation.
+    """
+    return dict(
+        (k[4:], v) for k, v in doc.iteritems() if k.startswith('f:r_'))
+
+
+def _timestamp_from_record_tuple(record):
+    """Extract timestamp from HBase tuple record
+    """
+    return timeutils.parse_strtime(record[1]['f:timestamp'])
+
+
+def _resource_id_from_record_tuple(record):
+    """Extract resource_id from HBase tuple record
+    """
+    return record[1]['f:resource_id']

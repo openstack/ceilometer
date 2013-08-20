@@ -23,6 +23,7 @@
 
 import copy
 import weakref
+import itertools
 
 import bson.code
 import bson.objectid
@@ -179,6 +180,8 @@ class Connection(base.Connection):
                'duration_end': 1,
                }
 
+    SORT_OPERATION_MAP = {'desc': pymongo.DESCENDING, 'asc': pymongo.ASCENDING}
+
     def __init__(self, conf):
         url = conf.database.connection
 
@@ -210,6 +213,27 @@ class Connection(base.Connection):
                                  connection_options['password'])
 
         self.upgrade()
+
+    @classmethod
+    def _build_sort_instructions(cls, sort_keys=[], sort_dir='desc'):
+        """Returns a sort_instruction.
+
+        Sort instructions are used in the query to determine what attributes
+        to sort on and what direction to use.
+        :param q: The query dict passed in.
+        :param sort_keys: array of attributes by which results be sorted.
+        :param sort_dir: direction in which results be sorted (asc, desc).
+        :return: sort parameters
+        """
+        sort_instructions = []
+        _sort_dir = cls.SORT_OPERATION_MAP.get(
+            sort_dir, cls.SORT_OPERATION_MAP['desc'])
+
+        for _sort_key in sort_keys:
+            _instruction = (_sort_key, _sort_dir)
+            sort_instructions.append(_instruction)
+
+        return sort_instructions
 
     def upgrade(self, version=None):
         # Establish indexes
@@ -395,30 +419,36 @@ class Connection(base.Connection):
             if ts_range:
                 q['timestamp'] = ts_range
 
-        resource_ids = self.db.meter.find(q).distinct('resource_id')
-        if self._using_mongodb:
-            q = {'_id': {'$in': resource_ids}}
-        else:
-            q = {'_id': {'$in': [m['_id'] for m in resource_ids]}}
+        sort_keys = base._handle_sort_key('resource', 'timestamp')
+        sort_keys.insert(0, 'resource_id')
+        sort_instructions = self._build_sort_instructions(sort_keys=sort_keys,
+                                                          sort_dir='desc')
+        resource = lambda x: x['resource_id']
+        meters = self.db.meter.find(q, sort=sort_instructions)
+        for resource_id, r_meters in itertools.groupby(meters, key=resource):
+            resource_meters = []
+            # Because we have to know first/last timestamp, and we need a full
+            # list of references to the resource's meters, we need a tuple
+            # here.
+            r_meters = tuple(r_meters)
+            for meter in r_meters:
+                resource_meters.append(models.ResourceMeter(
+                    counter_name=meter['counter_name'],
+                    counter_type=meter['counter_type'],
+                    counter_unit=meter.get('counter_unit', ''))
+                )
+            latest_meter = r_meters[0]
+            last_ts = latest_meter['timestamp']
+            first_ts = r_meters[-1]['timestamp']
 
-        for resource in self.db.resource.find(q):
-            yield models.Resource(
-                resource_id=resource['_id'],
-                project_id=resource['project_id'],
-                first_sample_timestamp=None,
-                last_sample_timestamp=None,
-                source=resource['source'],
-                user_id=resource['user_id'],
-                metadata=resource['metadata'],
-                meter=[
-                    models.ResourceMeter(
-                        counter_name=meter['counter_name'],
-                        counter_type=meter['counter_type'],
-                        counter_unit=meter.get('counter_unit', ''),
-                    )
-                    for meter in resource['meter']
-                ],
-            )
+            yield models.Resource(resource_id=latest_meter['resource_id'],
+                                  project_id=latest_meter['project_id'],
+                                  first_sample_timestamp=first_ts,
+                                  last_sample_timestamp=last_ts,
+                                  source=latest_meter['source'],
+                                  user_id=latest_meter['user_id'],
+                                  metadata=latest_meter['resource_metadata'],
+                                  meter=resource_meters)
 
     def get_meters(self, user=None, project=None, resource=None, source=None,
                    metaquery={}, pagination=None):

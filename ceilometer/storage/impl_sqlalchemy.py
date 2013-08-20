@@ -46,7 +46,6 @@ from ceilometer.storage.sqlalchemy.models import UniqueName
 from ceilometer.storage.sqlalchemy.models import User
 from ceilometer import utils
 
-
 LOG = log.getLogger(__name__)
 
 
@@ -111,7 +110,7 @@ def make_query_from_filter(query, sample_filter, require_meter=True):
     if sample_filter.meter:
         query = query.filter(Meter.counter_name == sample_filter.meter)
     elif require_meter:
-        raise RuntimeError('Missing required meter specifier')
+        raise RuntimeError(_('Missing required meter specifier'))
     if sample_filter.source:
         query = query.filter(Meter.sources.any(id=sample_filter.source))
     if sample_filter.start:
@@ -134,7 +133,7 @@ def make_query_from_filter(query, sample_filter, require_meter=True):
         query = query.filter_by(resource_id=sample_filter.resource)
 
     if sample_filter.metaquery:
-        raise NotImplementedError('metaquery not implemented')
+        raise NotImplementedError(_('metaquery not implemented'))
 
     return query
 
@@ -289,35 +288,75 @@ class Connection(base.Connection):
         :param pagination: Optional pagination query.
         """
 
+        # We probably want to raise these early, since we don't know from here
+        # if they will be handled. We don't want extra wait or work for it to
+        # just fail.
         if pagination:
             raise NotImplementedError(_('Pagination not implemented'))
+        if metaquery:
+            raise NotImplementedError(_('metaquery not implemented'))
 
+        # (thomasm) We need to get the max timestamp first, since that's the
+        # most accurate. We also need to filter down in the subquery to
+        # constrain what we have to JOIN on later.
         session = sqlalchemy_session.get_session()
-        query = session.query(
-            Meter,
-            func.min(Meter.timestamp),
-            func.max(Meter.timestamp),
+
+        ts_subquery = session.query(
+            Meter.resource_id,
+            func.max(Meter.timestamp).label("max_ts"),
+            func.min(Meter.timestamp).label("min_ts")
         ).group_by(Meter.resource_id)
-        if user is not None:
-            query = query.filter(Meter.user_id == user)
-        if source is not None:
-            query = query.filter(Meter.sources.any(id=source))
+
+        # Here are the basic 'eq' operation filters for the sample data.
+        for column, value in [(Meter.resource_id, resource),
+                              (Meter.user_id, user),
+                              (Meter.project_id, project)]:
+            if value:
+                ts_subquery = ts_subquery.filter(column == value)
+
+        if source:
+            ts_subquery = ts_subquery.filter(
+                Meter.sources.any(id=source))
+
+        # Here we limit the samples being used to a specific time period,
+        # if requested.
         if start_timestamp:
             if start_timestamp_op == 'gt':
-                query = query.filter(Meter.timestamp > start_timestamp)
+                ts_subquery = ts_subquery.filter(
+                    Meter.timestamp > start_timestamp
+                )
             else:
-                query = query.filter(Meter.timestamp >= start_timestamp)
+                ts_subquery = ts_subquery.filter(
+                    Meter.timestamp >= start_timestamp
+                )
         if end_timestamp:
             if end_timestamp_op == 'le':
-                query = query.filter(Meter.timestamp <= end_timestamp)
+                ts_subquery = ts_subquery.filter(
+                    Meter.timestamp <= end_timestamp
+                )
             else:
-                query = query.filter(Meter.timestamp < end_timestamp)
-        if project is not None:
-            query = query.filter(Meter.project_id == project)
-        if resource is not None:
-            query = query.filter(Meter.resource_id == resource)
-        if metaquery:
-            raise NotImplementedError('metaquery not implemented')
+                ts_subquery = ts_subquery.filter(
+                    Meter.timestamp < end_timestamp
+                )
+        ts_subquery = ts_subquery.subquery()
+
+        # Now we need to get the max Meter.id out of the leftover results, to
+        # break any ties.
+        agg_subquery = session.query(
+            func.max(Meter.id).label("max_id"),
+            ts_subquery
+        ).filter(
+            Meter.resource_id == ts_subquery.c.resource_id,
+            Meter.timestamp == ts_subquery.c.max_ts
+        ).group_by(Meter.resource_id).subquery()
+
+        query = session.query(
+            Meter,
+            agg_subquery.c.min_ts,
+            agg_subquery.c.max_ts
+        ).filter(
+            Meter.id == agg_subquery.c.max_id
+        )
 
         for meter, first_ts, last_ts in query.all():
             yield api_models.Resource(
@@ -353,6 +392,8 @@ class Connection(base.Connection):
 
         if pagination:
             raise NotImplementedError(_('Pagination not implemented'))
+        if metaquery:
+            raise NotImplementedError(_('metaquery not implemented'))
 
         session = sqlalchemy_session.get_session()
 
@@ -388,8 +429,6 @@ class Connection(base.Connection):
             query = query.filter(Resource.id == resource)
         if project is not None:
             query = query.filter(Resource.project_id == project)
-        if metaquery:
-            raise NotImplementedError('metaquery not implemented')
 
         for resource, meter in query.all():
             yield api_models.Meter(
@@ -501,7 +540,7 @@ class Connection(base.Connection):
             for group in groupby:
                 if group not in ['user_id', 'project_id', 'resource_id']:
                     raise NotImplementedError(
-                        "Unable to group by these fields")
+                        _("Unable to group by these fields"))
 
         if not period:
             for res in self._make_stats_query(sample_filter, groupby):

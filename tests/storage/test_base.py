@@ -58,4 +58,5 @@ class BaseTest(test_base.TestCase):
         self.assertEqual(sort_keys_meter, ['foo', 'user_id', 'project_id'])
 
         sort_keys_resource = base._handle_sort_key('resource', 'project_id')
-        self.assertEqual(sort_keys_resource, ['project_id', 'user_id'])
+        self.assertEquals(sort_keys_resource,
+                          ['project_id', 'user_id', 'timestamp'])
