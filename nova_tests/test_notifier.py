@@ -85,7 +85,7 @@ class TestNovaNotifier(base.TestCase):
 
         def get_samples(self, manager, cache, instance):
             self.instances.append((manager, instance))
-            test_data_2 = util.make_counter_from_instance(
+            test_data_2 = util.make_sample_from_instance(
                 instance,
                 name='test2',
                 type=sample.TYPE_CUMULATIVE,

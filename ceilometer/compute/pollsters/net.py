@@ -35,7 +35,7 @@ class _Base(plugin.ComputePollster):
                                   "write-bytes=%d"])
 
     @staticmethod
-    def make_vnic_counter(instance, name, type, unit, volume, vnic_data):
+    def make_vnic_sample(instance, name, type, unit, volume, vnic_data):
         metadata = copy.copy(vnic_data)
         resource_metadata = dict(zip(metadata._fields, metadata))
         resource_metadata['instance_id'] = instance.id
@@ -82,7 +82,7 @@ class _Base(plugin.ComputePollster):
             for vnic, info in vnics:
                 LOG.info(self.NET_USAGE_MESSAGE, instance_name,
                          vnic.name, info.rx_bytes, info.tx_bytes)
-                yield self._get_counter(instance, vnic, info)
+                yield self._get_sample(instance, vnic, info)
         except Exception as err:
             LOG.warning('Ignoring instance %s: %s',
                         instance_name, err)
@@ -91,8 +91,8 @@ class _Base(plugin.ComputePollster):
 
 class IncomingBytesPollster(_Base):
 
-    def _get_counter(self, instance, vnic, info):
-        return self.make_vnic_counter(
+    def _get_sample(self, instance, vnic, info):
+        return self.make_vnic_sample(
             instance,
             name='network.incoming.bytes',
             type=sample.TYPE_CUMULATIVE,
@@ -104,8 +104,8 @@ class IncomingBytesPollster(_Base):
 
 class IncomingPacketsPollster(_Base):
 
-    def _get_counter(self, instance, vnic, info):
-        return self.make_vnic_counter(
+    def _get_sample(self, instance, vnic, info):
+        return self.make_vnic_sample(
             instance,
             name='network.incoming.packets',
             type=sample.TYPE_CUMULATIVE,
@@ -117,8 +117,8 @@ class IncomingPacketsPollster(_Base):
 
 class OutgoingBytesPollster(_Base):
 
-    def _get_counter(self, instance, vnic, info):
-        return self.make_vnic_counter(
+    def _get_sample(self, instance, vnic, info):
+        return self.make_vnic_sample(
             instance,
             name='network.outgoing.bytes',
             type=sample.TYPE_CUMULATIVE,
@@ -130,8 +130,8 @@ class OutgoingBytesPollster(_Base):
 
 class OutgoingPacketsPollster(_Base):
 
-    def _get_counter(self, instance, vnic, info):
-        return self.make_vnic_counter(
+    def _get_sample(self, instance, vnic, info):
+        return self.make_vnic_sample(
             instance,
             name='network.outgoing.packets',
             type=sample.TYPE_CUMULATIVE,

@@ -73,8 +73,8 @@ class _Base(plugin.ComputePollster):
         return i_cache[instance_name]
 
     @abc.abstractmethod
-    def _get_counter(instance, c_data):
-        """Return one Counter."""
+    def _get_sample(instance, c_data):
+        """Return one Sample."""
 
     def get_samples(self, manager, cache, instance):
         instance_name = util.instance_name(instance)
@@ -85,7 +85,7 @@ class _Base(plugin.ComputePollster):
             instance_name,
         )
         try:
-            yield self._get_counter(instance, c_data)
+            yield self._get_sample(instance, c_data)
         except Exception as err:
             LOG.warning('Ignoring instance %s: %s',
                         instance_name, err)
@@ -95,8 +95,8 @@ class _Base(plugin.ComputePollster):
 class ReadRequestsPollster(_Base):
 
     @staticmethod
-    def _get_counter(instance, c_data):
-        return util.make_counter_from_instance(
+    def _get_sample(instance, c_data):
+        return util.make_sample_from_instance(
             instance,
             name='disk.read.requests',
             type=sample.TYPE_CUMULATIVE,
@@ -108,8 +108,8 @@ class ReadRequestsPollster(_Base):
 class ReadBytesPollster(_Base):
 
     @staticmethod
-    def _get_counter(instance, c_data):
-        return util.make_counter_from_instance(
+    def _get_sample(instance, c_data):
+        return util.make_sample_from_instance(
             instance,
             name='disk.read.bytes',
             type=sample.TYPE_CUMULATIVE,
@@ -121,8 +121,8 @@ class ReadBytesPollster(_Base):
 class WriteRequestsPollster(_Base):
 
     @staticmethod
-    def _get_counter(instance, c_data):
-        return util.make_counter_from_instance(
+    def _get_sample(instance, c_data):
+        return util.make_sample_from_instance(
             instance,
             name='disk.write.requests',
             type=sample.TYPE_CUMULATIVE,
@@ -134,8 +134,8 @@ class WriteRequestsPollster(_Base):
 class WriteBytesPollster(_Base):
 
     @staticmethod
-    def _get_counter(instance, c_data):
-        return util.make_counter_from_instance(
+    def _get_sample(instance, c_data):
+        return util.make_sample_from_instance(
             instance,
             name='disk.write.bytes',
             type=sample.TYPE_CUMULATIVE,

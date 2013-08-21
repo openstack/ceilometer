@@ -65,7 +65,7 @@ class DeletedInstanceStatsGatherer(object):
         samples = self.mgr.map(self._get_samples_from_plugin,
                                cache=cache,
                                instance=instance)
-        # counters is a list of lists, so flatten it before returning
+        # samples is a list of lists, so flatten it before returning
         # the results
         results = []
         for slist in samples:
@@ -158,15 +158,15 @@ def notify(context, message):
         context, instance_ref, None, None)
 
     # Extend the payload with samples from our plugins.  We only need
-    # to send some of the data from the counter objects, since a lot
+    # to send some of the data from the sample objects, since a lot
     # of the fields are the same.
     instance = Instance(context, instance_ref)
-    counters = gatherer(instance)
-    payload['samples'] = [{'name': c.name,
-                           'type': c.type,
-                           'unit': c.unit,
-                           'volume': c.volume}
-                          for c in counters]
+    samples = gatherer(instance)
+    payload['samples'] = [{'name': s.name,
+                           'type': s.type,
+                           'unit': s.unit,
+                           'volume': s.volume}
+                          for s in samples]
 
     publisher_id = notifier_api.publisher_id('compute', None)
 

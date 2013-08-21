@@ -36,7 +36,7 @@ class CPUPollster(plugin.ComputePollster):
             LOG.info("CPUTIME USAGE: %s %d",
                      instance.__dict__, cpu_info.time)
             cpu_num = {'cpu_number': cpu_info.number}
-            yield util.make_counter_from_instance(
+            yield util.make_sample_from_instance(
                 instance,
                 name='cpu',
                 type=sample.TYPE_CUMULATIVE,
