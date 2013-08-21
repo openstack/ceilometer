@@ -18,7 +18,7 @@ fi
 if [ ! "$COVERAGE_ARGS" ]; then
 	# Nova notifier tests
 	bash tools/init_testr_if_needed.sh
-	python setup.py testr --slowest --testr-args="--concurrency=1 --here=nova_tests $*"
+	python setup.py testr --slowest --testr-args="--here=nova_tests $*"
 fi
 
 # Main unit tests
