@@ -77,7 +77,7 @@ class Sample(object):
     @classmethod
     def from_notification(cls, name, type, volume, unit,
                           user_id, project_id, resource_id,
-                          message):
+                          message, source=None):
         metadata = copy.copy(message['payload'])
         metadata['event_type'] = message['event_type']
         metadata['host'] = message['publisher_id']
@@ -89,7 +89,8 @@ class Sample(object):
                    project_id=project_id,
                    resource_id=resource_id,
                    timestamp=message['timestamp'],
-                   resource_metadata=metadata)
+                   resource_metadata=metadata,
+                   source=source)
 
 TYPE_GAUGE = 'gauge'
 TYPE_DELTA = 'delta'
