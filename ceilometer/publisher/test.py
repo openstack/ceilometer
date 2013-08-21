@@ -15,7 +15,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Publish a counter in memory, useful for testing
+"""Publish a sample in memory, useful for testing
 """
 
 from ceilometer import publisher
@@ -25,14 +25,14 @@ class TestPublisher(publisher.PublisherBase):
     """Publisher used in unit testing."""
 
     def __init__(self, parsed_url):
-        self.counters = []
+        self.samples = []
         self.calls = 0
 
-    def publish_samples(self, context, counters):
+    def publish_samples(self, context, samples):
         """Send a metering message for publishing
 
         :param context: Execution context from the service or RPC call
-        :param counter: Counter from pipeline after transformation
+        :param samples: Samples from pipeline after transformation
         """
-        self.counters.extend(counters)
+        self.samples.extend(samples)
         self.calls += 1

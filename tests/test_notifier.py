@@ -81,8 +81,8 @@ class TestNotifier(tests_base.TestCase):
             transformer_manager)
 
         pub = notifier._pipeline_manager.pipelines[0].publishers[0]
-        self.assertEqual(len(pub.counters), 0)
+        self.assertEqual(len(pub.samples), 0)
         notifier.notify(None, MESSAGE)
-        self.assertTrue(len(pub.counters) > 0)
+        self.assertTrue(len(pub.samples) > 0)
         self.assertIn('disk.ephemeral.size',
-                      [c.name for c in pub.counters])
+                      [c.name for c in pub.samples])

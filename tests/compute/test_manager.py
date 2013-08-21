@@ -59,15 +59,15 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
     def test_notifier_task(self):
         self.mgr.setup_notifier_task()
         self.mgr.poll_instance(None, self.instance)
-        self.assertEqual(len(self.Pollster.counters), 1)
+        self.assertEqual(len(self.Pollster.samples), 1)
         pub = self.mgr.pipeline_manager.pipelines[0].publishers[0]
-        self.assertEqual(pub.counters[0], self.Pollster.test_data)
+        self.assertEqual(pub.samples[0], self.Pollster.test_data)
 
     def test_setup_polling_tasks(self):
         super(TestRunTasks, self).test_setup_polling_tasks()
-        self.assertTrue(self.Pollster.counters[0][1] is self.instance)
+        self.assertTrue(self.Pollster.samples[0][1] is self.instance)
 
     def test_interval_exception_isolation(self):
         super(TestRunTasks, self).test_interval_exception_isolation()
-        self.assertEqual(len(self.PollsterException.counters), 1)
-        self.assertEqual(len(self.PollsterExceptionAnother.counters), 1)
+        self.assertEqual(len(self.PollsterException.samples), 1)
+        self.assertEqual(len(self.PollsterExceptionAnother.samples), 1)
