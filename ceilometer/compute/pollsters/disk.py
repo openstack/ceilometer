@@ -78,13 +78,13 @@ class _Base(plugin.ComputePollster):
 
     def get_samples(self, manager, cache, instance):
         instance_name = util.instance_name(instance)
-        c_data = self._populate_cache(
-            manager.inspector,
-            cache,
-            instance,
-            instance_name,
-        )
         try:
+            c_data = self._populate_cache(
+                manager.inspector,
+                cache,
+                instance,
+                instance_name,
+            )
             yield self._get_sample(instance, c_data)
         except Exception as err:
             LOG.warning('Ignoring instance %s: %s',
