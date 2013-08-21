@@ -179,6 +179,29 @@ class RPCPublisher(publisher.PublisherBase):
 
     def flush(self):
         #note(sileht):
+        # IO of the rpc stuff in handled by eventlet,
+        # this is why the self.local_queue, is emptied before processing the
+        # queue and the remaining messages in the queue are added to
+        # self.local_queue after in case of a other call have already added
+        # something in the self.local_queue
+        queue = self.local_queue
+        self.local_queue = []
+        self.local_queue = self._process_queue(queue, self.policy) + \
+            self.local_queue
+        if self.policy == 'queue':
+            self._check_queue_length()
+
+    def _check_queue_length(self):
+        queue_length = len(self.local_queue)
+        if queue_length > self.max_queue_length > 0:
+            count = queue_length - self.max_queue_length
+            self.local_queue = self.local_queue[count:]
+            LOG.warn("Publisher max local_queue length is exceeded, "
+                     "dropping %d oldest counters", count)
+
+    @staticmethod
+    def _process_queue(queue, policy):
+        #note(sileht):
         # the behavior of rpc.cast call depends of rabbit_max_retries
         # if rabbit_max_retries <= 0:
         #   it returns only if the msg has been sent on the amqp queue
@@ -192,33 +215,22 @@ class RPCPublisher(publisher.PublisherBase):
         # the default policy just respect the rabbitmq configuration
         # nothing special is done if rabbit_max_retries <= 0
         # and exception is reraised if rabbit_max_retries > 0
-        while self.local_queue:
-            context, topic, msg = self.local_queue[0]
+        while queue:
+            context, topic, msg = queue[0]
             try:
                 rpc.cast(context, topic, msg)
             except (SystemExit, rpc.common.RPCException):
-                if self.policy == 'queue':
-                    LOG.warn("Failed to publish counters, queue them")
-                    queue_length = len(self.local_queue)
-                    if queue_length > self.max_queue_length > 0:
-                        count = queue_length - self.max_queue_length
-                        self.local_queue = self.local_queue[count:]
-                        LOG.warn("Publisher max queue length is exceeded, "
-                                 "dropping %d oldest counters",
-                                 count)
-                    break
-
-                elif self.policy == 'drop':
-                    counters = sum([len(m['args']['data'])
-                                    for _, _, m in self.local_queue])
-                    LOG.warn(
-                        "Failed to publish %d counters, dropping them",
-                        counters)
-                    self.local_queue = []
-                    break
-                else:
-                    # default, occur only if rabbit_max_retries > 0
-                    self.local_queue = []
-                    raise
+                counters = sum([len(m['args']['data']) for _, _, m in queue])
+                if policy == 'queue':
+                    LOG.warn("Failed to publish %s counters, queue them",
+                             counters)
+                    return queue
+                elif policy == 'drop':
+                    LOG.warn("Failed to publish %d counters, dropping them",
+                             counters)
+                    return []
+                # default, occur only if rabbit_max_retries > 0
+                raise
             else:
-                self.local_queue.pop(0)
+                queue.pop(0)
+        return []
