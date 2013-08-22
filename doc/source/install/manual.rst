@@ -395,7 +395,7 @@ If you want to also consume the topic notifications with a system other than
 Ceilometer, you should configure a separate queue that listens for the same
 messages.
 
-Use multiple dispatchers
+Using multiple dispatchers
 ========================
 
 .. index::
@@ -437,3 +437,24 @@ Use multiple dispatchers
 
    With above configuration, no dispatcher is used by the Ceilometer collector
    service, all metering data received by Ceilometer collector will be dropped.
+
+
+Using other databases
+===================
+.. index::
+   double: installing; database, hbase, mysql, db2
+
+   Ceilometer by default uses mongodb as its backend data repository.
+   A deployment can choose to use other databases, currently the supported
+   databases are mongodb, hbase, mysql (or sqlalchemy-enabled databases) and
+   db2. To use a database other than MongoDB, edit the database section in
+   ceilometer.conf:
+
+   To use db2 as the data repository, make the section look like this::
+
+        [database]
+        connection = db2://username:password@host:27017/ceilometer
+
+   To use mongodb as the data reporitoy, make the section look like this::
+        [database]
+        connection = mongodb://username:password@host:27017/ceilometer
