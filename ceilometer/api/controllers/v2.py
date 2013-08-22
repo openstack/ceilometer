@@ -256,6 +256,8 @@ def _query_to_kwargs(query, db_func):
                 stamp['search_offset'] = i.value
             elif i.field.startswith('metadata.'):
                 metaquery[i.field] = i._get_value_as_type()
+            elif i.field.startswith('resource_metadata.'):
+                metaquery[i.field[9:]] = i._get_value_as_type()
             else:
                 trans[translation.get(i.field, i.field)] = i.value
 

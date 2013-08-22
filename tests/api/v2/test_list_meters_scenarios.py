@@ -173,6 +173,20 @@ class TestListMeters(FunctionalTest,
         self.assertEqual(set(r['counter_name'] for r in data),
                          set(['meter.test']))
 
+    def test_list_meters_resource_metadata_query(self):
+        # NOTE(jd) Same test as above, but with the alias resource_metadata
+        # as query field
+        data = self.get_json('/meters/meter.test',
+                             q=[{'field': 'resource_metadata.tag',
+                                 'op': 'eq',
+                                 'value': 'self.sample1',
+                                 }],)
+        self.assertEqual(1, len(data))
+        self.assertEqual(set(r['resource_id'] for r in data),
+                         set(['resource-id']))
+        self.assertEqual(set(r['counter_name'] for r in data),
+                         set(['meter.test']))
+
     def test_list_meters_multi_metadata_query(self):
         data = self.get_json('/meters/meter.test',
                              q=[{'field': 'metadata.tag',
