@@ -36,13 +36,6 @@ class PluginBase(object):
     """Base class for all plugins.
     """
 
-    @staticmethod
-    def is_enabled():
-        """Return boolean indicating whether this plugin should
-        be enabled and used by the caller.
-        """
-        return True
-
 
 class NotificationBase(PluginBase):
     """Base class for plugins that support the notification API."""
