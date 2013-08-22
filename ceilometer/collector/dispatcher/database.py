@@ -70,3 +70,8 @@ class DatabaseDispatcher(dispatcher.Base):
                 LOG.warning(
                     'message signature invalid, discarding message: %r',
                     meter)
+
+    def record_events(self, events):
+        if not isinstance(events, list):
+            events = [events]
+        self.storage_conn.record_events(events)

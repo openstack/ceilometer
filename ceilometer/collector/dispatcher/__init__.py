@@ -29,3 +29,7 @@ class Base(object):
     @abc.abstractmethod
     def record_metering_data(self, context, data):
         """Recording metering data interface."""
+
+    @abc.abstractmethod
+    def record_events(self, events):
+        """Recording events interface."""
