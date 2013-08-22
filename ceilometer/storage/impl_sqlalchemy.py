@@ -431,9 +431,8 @@ class Connection(base.Connection):
             )
 
     @staticmethod
-    def _make_stats_query(sample_filter):
-        session = sqlalchemy_session.get_session()
-        query = session.query(
+    def _make_stats_query(sample_filter, groupby):
+        select = [
             Meter.counter_unit.label('unit'),
             func.min(Meter.timestamp).label('tsmin'),
             func.max(Meter.timestamp).label('tsmax'),
@@ -441,12 +440,25 @@ class Connection(base.Connection):
             func.sum(Meter.counter_volume).label('sum'),
             func.min(Meter.counter_volume).label('min'),
             func.max(Meter.counter_volume).label('max'),
-            func.count(Meter.counter_volume).label('count'))
+            func.count(Meter.counter_volume).label('count'),
+        ]
+
+        session = sqlalchemy_session.get_session()
+
+        if groupby:
+            group_attributes = [getattr(Meter, g) for g in groupby]
+            select.extend(group_attributes)
+
+        query = session.query(*select)
+
+        if groupby:
+            query = query.group_by(*group_attributes)
 
         return make_query_from_filter(query, sample_filter)
 
     @staticmethod
-    def _stats_result_to_model(result, period, period_start, period_end):
+    def _stats_result_to_model(result, period, period_start,
+                               period_end, groupby):
         duration = (timeutils.delta_seconds(result.tsmin, result.tsmax)
                     if result.tsmin is not None and result.tsmax is not None
                     else None)
@@ -463,24 +475,35 @@ class Connection(base.Connection):
             period=period,
             period_start=period_start,
             period_end=period_end,
+            groupby=(dict((g, getattr(result, g)) for g in groupby)
+                     if groupby else None)
         )
 
-    def get_meter_statistics(self, sample_filter, period=None):
+    def get_meter_statistics(self, sample_filter, period=None, groupby=None):
         """Return an iterable of api_models.Statistics instances containing
         meter statistics described by the query parameters.
 
         The filter must have a meter value set.
 
         """
-        if not period or not sample_filter.start or not sample_filter.end:
-            res = self._make_stats_query(sample_filter).all()[0]
+        if groupby:
+            for group in groupby:
+                if group not in ['user_id', 'project_id', 'resource_id']:
+                    raise NotImplementedError(
+                        "Unable to group by these fields")
 
         if not period:
-            if res.count:
-                yield self._stats_result_to_model(res, 0, res.tsmin, res.tsmax)
+            for res in self._make_stats_query(sample_filter, groupby):
+                if res.count:
+                    yield self._stats_result_to_model(res, 0,
+                                                      res.tsmin, res.tsmax,
+                                                      groupby)
             return
 
-        query = self._make_stats_query(sample_filter)
+        if not sample_filter.start or not sample_filter.end:
+            res = self._make_stats_query(sample_filter, None).first()
+
+        query = self._make_stats_query(sample_filter, groupby)
         # HACK(jd) This is an awful method to compute stats by period, but
         # since we're trying to be SQL agnostic we have to write portable
         # code, so here it is, admire! We're going to do one request to get
@@ -492,16 +515,16 @@ class Connection(base.Connection):
                 period):
             q = query.filter(Meter.timestamp >= period_start)
             q = q.filter(Meter.timestamp < period_end)
-            r = q.all()[0]
-            # Don't return results that didn't have any data.
-            if r.count:
-                yield self._stats_result_to_model(
-                    result=r,
-                    period=int(timeutils.delta_seconds(period_start,
-                                                       period_end)),
-                    period_start=period_start,
-                    period_end=period_end,
-                )
+            for r in q.all():
+                if r.count:
+                    yield self._stats_result_to_model(
+                        result=r,
+                        period=int(timeutils.delta_seconds(period_start,
+                                                           period_end)),
+                        period_start=period_start,
+                        period_end=period_end,
+                        groupby=groupby
+                    )
 
     @staticmethod
     def _row_to_alarm_model(row):

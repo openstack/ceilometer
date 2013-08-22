@@ -862,6 +862,561 @@ class StatisticsTest(DBTestBase):
         assert results.avg == 6
 
 
+class StatisticsGroupByTest(DBTestBase):
+
+    def prepare_data(self):
+        test_sample_data = (
+            {'volume': 2, 'user': 'user-1', 'project': 'project-1',
+             'resource': 'resource-1', 'timestamp': (2013, 8, 1, 16, 10),
+             'metadata_flavor': 'm1.tiny', 'metadata_event': 'event-1',
+             'source': 'source-2'},
+            {'volume': 2, 'user': 'user-1', 'project': 'project-2',
+             'resource': 'resource-1', 'timestamp': (2013, 8, 1, 15, 37),
+             'metadata_flavor': 'm1.large', 'metadata_event': 'event-1',
+             'source': 'source-2'},
+            {'volume': 1, 'user': 'user-2', 'project': 'project-1',
+             'resource': 'resource-2', 'timestamp': (2013, 8, 1, 10, 11),
+             'metadata_flavor': 'm1.tiny', 'metadata_event': 'event-2',
+             'source': 'source-1'},
+            {'volume': 1, 'user': 'user-2', 'project': 'project-1',
+             'resource': 'resource-2', 'timestamp': (2013, 8, 1, 10, 40),
+             'metadata_flavor': 'm1.large', 'metadata_event': 'event-2',
+             'source': 'source-1'},
+            {'volume': 2, 'user': 'user-2', 'project': 'project-1',
+             'resource': 'resource-1', 'timestamp': (2013, 8, 1, 14, 59),
+             'metadata_flavor': 'm1.large', 'metadata_event': 'event-2',
+             'source': 'source-1'},
+            {'volume': 4, 'user': 'user-2', 'project': 'project-2',
+             'resource': 'resource-2', 'timestamp': (2013, 8, 1, 17, 28),
+             'metadata_flavor': 'm1.large', 'metadata_event': 'event-2',
+             'source': 'source-1'},
+            {'volume': 4, 'user': 'user-3', 'project': 'project-1',
+             'resource': 'resource-3', 'timestamp': (2013, 8, 1, 11, 22),
+             'metadata_flavor': 'm1.tiny', 'metadata_event': 'event-2',
+             'source': 'source-3'},
+        )
+
+        for test_sample in test_sample_data:
+            c = sample.Sample(
+                'instance',
+                sample.TYPE_CUMULATIVE,
+                unit='s',
+                volume=test_sample['volume'],
+                user_id=test_sample['user'],
+                project_id=test_sample['project'],
+                resource_id=test_sample['resource'],
+                timestamp=datetime.datetime(*test_sample['timestamp']),
+                resource_metadata={'flavor': test_sample['metadata_flavor'],
+                                   'event': test_sample['metadata_event'], },
+                source=test_sample['source'],
+            )
+            msg = rpc.meter_message_from_counter(
+                c,
+                cfg.CONF.publisher_rpc.metering_secret,
+            )
+            self.conn.record_metering_data(msg)
+
+    def test_group_by_user(self):
+        f = storage.SampleFilter(
+            meter='instance',
+        )
+        results = list(self.conn.get_meter_statistics(f, groupby=['user_id']))
+        self.assertEqual(len(results), 3)
+        groupby_list = [r.groupby for r in results]
+        groupby_keys_set = set(x for sub_dict in groupby_list
+                               for x in sub_dict.keys())
+        groupby_vals_set = set(x for sub_dict in groupby_list
+                               for x in sub_dict.values())
+        self.assertEqual(groupby_keys_set, set(['user_id']))
+        self.assertEqual(groupby_vals_set, set(['user-1', 'user-2', 'user-3']))
+
+        for r in results:
+            if r.groupby == {'user_id': 'user-1'}:
+                self.assertEqual(r.count, 2)
+                self.assertEqual(r.unit, 's')
+                self.assertEqual(r.min, 2)
+                self.assertEqual(r.max, 2)
+                self.assertEqual(r.sum, 4)
+                self.assertEqual(r.avg, 2)
+            elif r.groupby == {'user_id': 'user-2'}:
+                self.assertEqual(r.count, 4)
+                self.assertEqual(r.unit, 's')
+                self.assertEqual(r.min, 1)
+                self.assertEqual(r.max, 4)
+                self.assertEqual(r.sum, 8)
+                self.assertEqual(r.avg, 2)
+            elif r.groupby == {'user_id': 'user-3'}:
+                self.assertEqual(r.count, 1)
+                self.assertEqual(r.unit, 's')
+                self.assertEqual(r.min, 4)
+                self.assertEqual(r.max, 4)
+                self.assertEqual(r.sum, 4)
+                self.assertEqual(r.avg, 4)
+
+    def test_group_by_resource(self):
+        f = storage.SampleFilter(
+            meter='instance',
+        )
+        results = list(self.conn.get_meter_statistics(f,
+                                                      groupby=['resource_id']))
+        self.assertEqual(len(results), 3)
+        groupby_list = [r.groupby for r in results]
+        groupby_keys_set = set(x for sub_dict in groupby_list
+                               for x in sub_dict.keys())
+        groupby_vals_set = set(x for sub_dict in groupby_list
+                               for x in sub_dict.values())
+        self.assertEqual(groupby_keys_set, set(['resource_id']))
+        self.assertEqual(groupby_vals_set, set(['resource-1',
+                                                'resource-2',
+                                                'resource-3']))
+        for r in results:
+            if r.groupby == {'resource_id': 'resource-1'}:
+                self.assertEqual(r.count, 3)
+                self.assertEqual(r.unit, 's')
+                self.assertEqual(r.min, 2)
+                self.assertEqual(r.max, 2)
+                self.assertEqual(r.sum, 6)
+                self.assertEqual(r.avg, 2)
+            elif r.groupby == {'resource_id': 'resource-2'}:
+                self.assertEqual(r.count, 3)
+                self.assertEqual(r.unit, 's')
+                self.assertEqual(r.min, 1)
+                self.assertEqual(r.max, 4)
+                self.assertEqual(r.sum, 6)
+                self.assertEqual(r.avg, 2)
+            elif r.groupby == {'resource_id': 'resource-3'}:
+                self.assertEqual(r.count, 1)
+                self.assertEqual(r.unit, 's')
+                self.assertEqual(r.min, 4)
+                self.assertEqual(r.max, 4)
+                self.assertEqual(r.sum, 4)
+                self.assertEqual(r.avg, 4)
+
+    def test_group_by_project(self):
+        f = storage.SampleFilter(
+            meter='instance',
+        )
+        results = list(self.conn.get_meter_statistics(f,
+                                                      groupby=['project_id']))
+        self.assertEqual(len(results), 2)
+        groupby_list = [r.groupby for r in results]
+        groupby_keys_set = set(x for sub_dict in groupby_list
+                               for x in sub_dict.keys())
+        groupby_vals_set = set(x for sub_dict in groupby_list
+                               for x in sub_dict.values())
+        self.assertEqual(groupby_keys_set, set(['project_id']))
+        self.assertEqual(groupby_vals_set, set(['project-1', 'project-2']))
+
+        for r in results:
+            if r.groupby == {'project_id': 'project-1'}:
+                self.assertEqual(r.count, 5)
+                self.assertEqual(r.unit, 's')
+                self.assertEqual(r.min, 1)
+                self.assertEqual(r.max, 4)
+                self.assertEqual(r.sum, 10)
+                self.assertEqual(r.avg, 2)
+            elif r.groupby == {'project_id': 'project-2'}:
+                self.assertEqual(r.count, 2)
+                self.assertEqual(r.unit, 's')
+                self.assertEqual(r.min, 2)
+                self.assertEqual(r.max, 4)
+                self.assertEqual(r.sum, 6)
+                self.assertEqual(r.avg, 3)
+
+    def test_group_by_source(self):
+        f = storage.SampleFilter(
+            meter='instance',
+        )
+        results = list(self.conn.get_meter_statistics(f, groupby=['source']))
+        self.assertEqual(len(results), 3)
+        groupby_list = [r.groupby for r in results]
+        groupby_keys_set = set(x for sub_dict in groupby_list
+                               for x in sub_dict.keys())
+        groupby_vals_set = set(x for sub_dict in groupby_list
+                               for x in sub_dict.values())
+        self.assertEqual(groupby_keys_set, set(['source']))
+        self.assertEqual(groupby_vals_set, set(['source-1',
+                                                'source-2',
+                                                'source-3']))
+
+        for r in results:
+            if r.groupby == {'source': 'source-1'}:
+                self.assertEqual(r.count, 4)
+                self.assertEqual(r.unit, 's')
+                self.assertEqual(r.min, 1)
+                self.assertEqual(r.max, 4)
+                self.assertEqual(r.sum, 8)
+                self.assertEqual(r.avg, 2)
+            elif r.groupby == {'source': 'source-2'}:
+                self.assertEqual(r.count, 2)
+                self.assertEqual(r.unit, 's')
+                self.assertEqual(r.min, 2)
+                self.assertEqual(r.max, 2)
+                self.assertEqual(r.sum, 4)
+                self.assertEqual(r.avg, 2)
+            elif r.groupby == {'source': 'source-3'}:
+                self.assertEqual(r.count, 1)
+                self.assertEqual(r.unit, 's')
+                self.assertEqual(r.min, 4)
+                self.assertEqual(r.max, 4)
+                self.assertEqual(r.sum, 4)
+                self.assertEqual(r.avg, 4)
+
+    def test_group_by_unknown_field(self):
+        f = storage.SampleFilter(
+            meter='instance',
+        )
+        result = self.conn.get_meter_statistics(
+            f, groupby=['wtf'])
+        self.assertRaises(
+            NotImplementedError,
+            list,
+            result)
+
+    def test_group_by_metadata(self):
+        pass
+
+    def test_group_by_multiple_regular(self):
+        f = storage.SampleFilter(
+            meter='instance',
+        )
+        results = list(self.conn.get_meter_statistics(f,
+                                                      groupby=['user_id',
+                                                               'resource_id']))
+        self.assertEqual(len(results), 4)
+        groupby_list = [r.groupby for r in results]
+        groupby_keys_set = set(x for sub_dict in groupby_list
+                               for x in sub_dict.keys())
+        groupby_vals_set = set(x for sub_dict in groupby_list
+                               for x in sub_dict.values())
+        self.assertEqual(groupby_keys_set, set(['user_id', 'resource_id']))
+        self.assertEqual(groupby_vals_set, set(['user-1', 'user-2',
+                                                'user-3', 'resource-1',
+                                                'resource-2', 'resource-3']))
+
+        for r in results:
+            if r.groupby == {'user_id': 'user-1', 'resource_id': 'resource-1'}:
+                self.assertEqual(r.count, 2)
+                self.assertEqual(r.unit, 's')
+                self.assertEqual(r.min, 2)
+                self.assertEqual(r.max, 2)
+                self.assertEqual(r.sum, 4)
+                self.assertEqual(r.avg, 2)
+            elif r.groupby == {'user_id': 'user-2',
+                               'resource_id': 'resource-1'}:
+                self.assertEqual(r.count, 1)
+                self.assertEqual(r.unit, 's')
+                self.assertEqual(r.min, 2)
+                self.assertEqual(r.max, 2)
+                self.assertEqual(r.sum, 2)
+                self.assertEqual(r.avg, 2)
+            elif r.groupby == {'user_id': 'user-2',
+                               'resource_id': 'resource-2'}:
+                self.assertEqual(r.count, 3)
+                self.assertEqual(r.unit, 's')
+                self.assertEqual(r.min, 1)
+                self.assertEqual(r.max, 4)
+                self.assertEqual(r.sum, 6)
+                self.assertEqual(r.avg, 2)
+            elif r.groupby == {'user_id': 'user-3',
+                               'resource_id': 'resource-3'}:
+                self.assertEqual(r.count, 1)
+                self.assertEqual(r.unit, 's')
+                self.assertEqual(r.min, 4)
+                self.assertEqual(r.max, 4)
+                self.assertEqual(r.sum, 4)
+                self.assertEqual(r.avg, 4)
+            else:
+                self.assertNotEqual(r.groupby, {'user_id': 'user-1',
+                                                'resource_id': 'resource-2'})
+                self.assertNotEqual(r.groupby, {'user_id': 'user-1',
+                                                'resource_id': 'resource-3'})
+                self.assertNotEqual(r.groupby, {'user_id': 'user-2',
+                                                'resource_id': 'resource-3'})
+                self.assertNotEqual(r.groupby, {'user_id': 'user-3',
+                                                'resource_id': 'resource-1'})
+                self.assertNotEqual(r.groupby, {'user_id': 'user-3',
+                                                'resource_id': 'resource-2'})
+
+    def test_group_by_multiple_metadata(self):
+        pass
+
+    def test_group_by_multiple_regular_metadata(self):
+        pass
+
+    def test_group_by_with_query_filter(self):
+        f = storage.SampleFilter(
+            meter='instance',
+            project='project-1',
+        )
+        results = list(self.conn.get_meter_statistics(
+            f,
+            groupby=['resource_id']))
+        self.assertEqual(len(results), 3)
+        groupby_list = [r.groupby for r in results]
+        groupby_keys_set = set(x for sub_dict in groupby_list
+                               for x in sub_dict.keys())
+        groupby_vals_set = set(x for sub_dict in groupby_list
+                               for x in sub_dict.values())
+        self.assertEqual(groupby_keys_set, set(['resource_id']))
+        self.assertEqual(groupby_vals_set, set(['resource-1',
+                                                'resource-2',
+                                                'resource-3']))
+
+        for r in results:
+            if r.groupby == {'resource_id': 'resource-1'}:
+                self.assertEqual(r.count, 2)
+                self.assertEqual(r.unit, 's')
+                self.assertEqual(r.min, 2)
+                self.assertEqual(r.max, 2)
+                self.assertEqual(r.sum, 4)
+                self.assertEqual(r.avg, 2)
+            elif r.groupby == {'resource_id': 'resource-2'}:
+                self.assertEqual(r.count, 2)
+                self.assertEqual(r.unit, 's')
+                self.assertEqual(r.min, 1)
+                self.assertEqual(r.max, 1)
+                self.assertEqual(r.sum, 2)
+                self.assertEqual(r.avg, 1)
+            elif r.groupby == {'resource_id': 'resource-3'}:
+                self.assertEqual(r.count, 1)
+                self.assertEqual(r.unit, 's')
+                self.assertEqual(r.min, 4)
+                self.assertEqual(r.max, 4)
+                self.assertEqual(r.sum, 4)
+                self.assertEqual(r.avg, 4)
+
+    def test_group_by_metadata_with_query_filter(self):
+        pass
+
+    def test_group_by_with_query_filter_multiple(self):
+        f = storage.SampleFilter(
+            meter='instance',
+            user='user-2',
+            source='source-1',
+        )
+        results = list(self.conn.get_meter_statistics(
+            f,
+            groupby=['project_id', 'resource_id']))
+        self.assertEqual(len(results), 3)
+        groupby_list = [r.groupby for r in results]
+        groupby_keys_set = set(x for sub_dict in groupby_list
+                               for x in sub_dict.keys())
+        groupby_vals_set = set(x for sub_dict in groupby_list
+                               for x in sub_dict.values())
+        self.assertEqual(groupby_keys_set, set(['project_id', 'resource_id']))
+        self.assertEqual(groupby_vals_set, set(['project-1', 'project-2',
+                                                'resource-1', 'resource-2']))
+
+        for r in results:
+            if r.groupby == {'project_id': 'project-1',
+                             'resource_id': 'resource-1'}:
+                self.assertEqual(r.count, 1)
+                self.assertEqual(r.unit, 's')
+                self.assertEqual(r.min, 2)
+                self.assertEqual(r.max, 2)
+                self.assertEqual(r.sum, 2)
+                self.assertEqual(r.avg, 2)
+            elif r.groupby == {'project_id': 'project-1',
+                               'resource_id': 'resource-2'}:
+                self.assertEqual(r.count, 2)
+                self.assertEqual(r.unit, 's')
+                self.assertEqual(r.min, 1)
+                self.assertEqual(r.max, 1)
+                self.assertEqual(r.sum, 2)
+                self.assertEqual(r.avg, 1)
+            elif r.groupby == {'project_id': 'project-2',
+                               'resource_id': 'resource-2'}:
+                self.assertEqual(r.count, 1)
+                self.assertEqual(r.unit, 's')
+                self.assertEqual(r.min, 4)
+                self.assertEqual(r.max, 4)
+                self.assertEqual(r.sum, 4)
+                self.assertEqual(r.avg, 4)
+
+    def test_group_by_metadata_with_query_filter_multiple(self):
+        pass
+
+    def test_group_by_with_period(self):
+        f = storage.SampleFilter(
+            meter='instance',
+        )
+        results = list(self.conn.get_meter_statistics(f,
+                                                      period=7200,
+                                                      groupby=['project_id']))
+        self.assertEqual(len(results), 4)
+        groupby_list = [r.groupby for r in results]
+        groupby_keys_set = set(x for sub_dict in groupby_list
+                               for x in sub_dict.keys())
+        groupby_vals_set = set(x for sub_dict in groupby_list
+                               for x in sub_dict.values())
+        self.assertEqual(groupby_keys_set, set(['project_id']))
+        self.assertEqual(groupby_vals_set, set(['project-1', 'project-2']))
+        period_start_set = set([r.period_start for r in results])
+        period_start_valid = set([datetime.datetime(2013, 8, 1, 10, 11),
+                                  datetime.datetime(2013, 8, 1, 14, 11),
+                                  datetime.datetime(2013, 8, 1, 16, 11)])
+        self.assertEqual(period_start_set, period_start_valid)
+
+        for r in results:
+            if (r.groupby == {'project_id': 'project-1'} and
+                    r.period_start == datetime.datetime(2013, 8, 1, 10, 11)):
+                self.assertEqual(r.count, 3)
+                self.assertEqual(r.unit, 's')
+                self.assertEqual(r.min, 1)
+                self.assertEqual(r.max, 4)
+                self.assertEqual(r.sum, 6)
+                self.assertEqual(r.avg, 2)
+                self.assertEqual(r.duration, 4260)
+                self.assertEqual(r.duration_start,
+                                 datetime.datetime(2013, 8, 1, 10, 11))
+                self.assertEqual(r.duration_end,
+                                 datetime.datetime(2013, 8, 1, 11, 22))
+                self.assertEqual(r.period, 7200)
+                self.assertEqual(r.period_end,
+                                 datetime.datetime(2013, 8, 1, 12, 11))
+            elif (r.groupby == {'project_id': 'project-1'} and
+                    r.period_start == datetime.datetime(2013, 8, 1, 14, 11)):
+                self.assertEqual(r.count, 2)
+                self.assertEqual(r.unit, 's')
+                self.assertEqual(r.min, 2)
+                self.assertEqual(r.max, 2)
+                self.assertEqual(r.sum, 4)
+                self.assertEqual(r.avg, 2)
+                self.assertEqual(r.duration, 4260)
+                self.assertEqual(r.duration_start,
+                                 datetime.datetime(2013, 8, 1, 14, 59))
+                self.assertEqual(r.duration_end,
+                                 datetime.datetime(2013, 8, 1, 16, 10))
+                self.assertEqual(r.period, 7200)
+                self.assertEqual(r.period_end,
+                                 datetime.datetime(2013, 8, 1, 16, 11))
+            elif (r.groupby == {'project_id': 'project-2'} and
+                    r.period_start == datetime.datetime(2013, 8, 1, 14, 11)):
+                self.assertEqual(r.count, 1)
+                self.assertEqual(r.unit, 's')
+                self.assertEqual(r.min, 2)
+                self.assertEqual(r.max, 2)
+                self.assertEqual(r.sum, 2)
+                self.assertEqual(r.avg, 2)
+                self.assertEqual(r.duration, 0)
+                self.assertEqual(r.duration_start,
+                                 datetime.datetime(2013, 8, 1, 15, 37))
+                self.assertEqual(r.duration_end,
+                                 datetime.datetime(2013, 8, 1, 15, 37))
+                self.assertEqual(r.period, 7200)
+                self.assertEqual(r.period_end,
+                                 datetime.datetime(2013, 8, 1, 16, 11))
+            elif (r.groupby == {'project_id': 'project-2'} and
+                    r.period_start == datetime.datetime(2013, 8, 1, 16, 11)):
+                self.assertEqual(r.count, 1)
+                self.assertEqual(r.unit, 's')
+                self.assertEqual(r.min, 4)
+                self.assertEqual(r.max, 4)
+                self.assertEqual(r.sum, 4)
+                self.assertEqual(r.avg, 4)
+                self.assertEqual(r.duration, 0)
+                self.assertEqual(r.duration_start,
+                                 datetime.datetime(2013, 8, 1, 17, 28))
+                self.assertEqual(r.duration_end,
+                                 datetime.datetime(2013, 8, 1, 17, 28))
+                self.assertEqual(r.period, 7200)
+                self.assertEqual(r.period_end,
+                                 datetime.datetime(2013, 8, 1, 18, 11))
+            else:
+                self.assertNotEqual([r.groupby, r.period_start],
+                                    [{'project_id': 'project-1'},
+                                     datetime.datetime(2013, 8, 1, 16, 11)])
+                self.assertNotEqual([r.groupby, r.period_start],
+                                    [{'project_id': 'project-2'},
+                                     datetime.datetime(2013, 8, 1, 10, 11)])
+
+    def test_group_by_metadata_with_period(self):
+        pass
+
+    def test_group_by_with_query_filter_and_period(self):
+        f = storage.SampleFilter(
+            meter='instance',
+            source='source-1',
+        )
+        results = list(self.conn.get_meter_statistics(f,
+                                                      period=7200,
+                                                      groupby=['project_id']))
+        self.assertEqual(len(results), 3)
+        groupby_list = [r.groupby for r in results]
+        groupby_keys_set = set(x for sub_dict in groupby_list
+                               for x in sub_dict.keys())
+        groupby_vals_set = set(x for sub_dict in groupby_list
+                               for x in sub_dict.values())
+        self.assertEqual(groupby_keys_set, set(['project_id']))
+        self.assertEqual(groupby_vals_set, set(['project-1', 'project-2']))
+        period_start_set = set([r.period_start for r in results])
+        period_start_valid = set([datetime.datetime(2013, 8, 1, 10, 11),
+                                  datetime.datetime(2013, 8, 1, 14, 11),
+                                  datetime.datetime(2013, 8, 1, 16, 11)])
+        self.assertEqual(period_start_set, period_start_valid)
+
+        for r in results:
+            if (r.groupby == {'project_id': 'project-1'} and
+                    r.period_start == datetime.datetime(2013, 8, 1, 10, 11)):
+                self.assertEqual(r.count, 2)
+                self.assertEqual(r.unit, 's')
+                self.assertEqual(r.min, 1)
+                self.assertEqual(r.max, 1)
+                self.assertEqual(r.sum, 2)
+                self.assertEqual(r.avg, 1)
+                self.assertEqual(r.duration, 1740)
+                self.assertEqual(r.duration_start,
+                                 datetime.datetime(2013, 8, 1, 10, 11))
+                self.assertEqual(r.duration_end,
+                                 datetime.datetime(2013, 8, 1, 10, 40))
+                self.assertEqual(r.period, 7200)
+                self.assertEqual(r.period_end,
+                                 datetime.datetime(2013, 8, 1, 12, 11))
+            elif (r.groupby == {'project_id': 'project-1'} and
+                    r.period_start == datetime.datetime(2013, 8, 1, 14, 11)):
+                self.assertEqual(r.count, 1)
+                self.assertEqual(r.unit, 's')
+                self.assertEqual(r.min, 2)
+                self.assertEqual(r.max, 2)
+                self.assertEqual(r.sum, 2)
+                self.assertEqual(r.avg, 2)
+                self.assertEqual(r.duration, 0)
+                self.assertEqual(r.duration_start,
+                                 datetime.datetime(2013, 8, 1, 14, 59))
+                self.assertEqual(r.duration_end,
+                                 datetime.datetime(2013, 8, 1, 14, 59))
+                self.assertEqual(r.period, 7200)
+                self.assertEqual(r.period_end,
+                                 datetime.datetime(2013, 8, 1, 16, 11))
+            elif (r.groupby == {'project_id': 'project-2'} and
+                    r.period_start == datetime.datetime(2013, 8, 1, 16, 11)):
+                self.assertEqual(r.count, 1)
+                self.assertEqual(r.unit, 's')
+                self.assertEqual(r.min, 4)
+                self.assertEqual(r.max, 4)
+                self.assertEqual(r.sum, 4)
+                self.assertEqual(r.avg, 4)
+                self.assertEqual(r.duration, 0)
+                self.assertEqual(r.duration_start,
+                                 datetime.datetime(2013, 8, 1, 17, 28))
+                self.assertEqual(r.duration_end,
+                                 datetime.datetime(2013, 8, 1, 17, 28))
+                self.assertEqual(r.period, 7200)
+                self.assertEqual(r.period_end,
+                                 datetime.datetime(2013, 8, 1, 18, 11))
+            else:
+                self.assertNotEqual([r.groupby, r.period_start],
+                                    [{'project_id': 'project-1'},
+                                     datetime.datetime(2013, 8, 1, 16, 11)])
+                self.assertNotEqual([r.groupby, r.period_start],
+                                    [{'project_id': 'project-2'},
+                                     datetime.datetime(2013, 8, 1, 10, 11)])
+
+    def test_group_by_metadata_with_query_filter_and_period(self):
+        pass
+
+
 class CounterDataTypeTest(DBTestBase):
 
     def prepare_data(self):

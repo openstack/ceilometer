@@ -80,6 +80,7 @@ class TestComputeDurationByResource(FunctionalTest,
                     duration=duration,
                     duration_start=duration_start,
                     duration_end=duration_end,
+                    groupby=None,
                 )
             ]
         self._stub_interval_func(get_interval)
@@ -155,6 +156,7 @@ class TestComputeDurationByResource(FunctionalTest,
                     period=None,
                     period_start=None,
                     period_end=None,
+                    groupby=None,
                 )
             ]
         self._stub_interval_func(get_interval)
@@ -185,6 +187,7 @@ class TestComputeDurationByResource(FunctionalTest,
                     period=None,
                     period_start=None,
                     period_end=None,
+                    groupby=None,
                 )
             ]
             return (self.early1, self.early2)

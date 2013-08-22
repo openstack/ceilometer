@@ -64,7 +64,8 @@ class TestComputeDurationByResource(tests_api.TestBase,
                 period_end=None,
                 duration=end - start,
                 duration_start=start,
-                duration_end=end)
+                duration_end=end,
+                groupby=None)
         self.stubs.Set(self.conn, 'get_meter_statistics',
                        get_meter_statistics)
 
