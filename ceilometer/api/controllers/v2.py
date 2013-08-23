@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 #
 # Copyright © 2012 New Dream Network, LLC (DreamHost)
+# Copyright 2013 IBM Corp.
 #
 # Author: Doug Hellmann <doug.hellmann@dreamhost.com>
 #         Angus Salkeld <asalkeld@redhat.com>
@@ -30,6 +31,7 @@
 # [PUT   ] /meters/<meter> -- update the meter (not the samples)
 # [DELETE] /meters/<meter> -- delete the meter and samples
 #
+import ast
 import datetime
 import inspect
 import pecan
@@ -42,6 +44,7 @@ from wsme import types as wtypes
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
+from ceilometer.openstack.common import strutils
 from ceilometer.openstack.common import timeutils
 from ceilometer import sample
 from ceilometer import storage
@@ -118,16 +121,79 @@ class Query(_Base):
     value = wtypes.text
     "The value to compare against the stored data"
 
+    type = wtypes.text
+    "The data type of value to compare against the stored data"
+
     def __repr__(self):
         # for logging calls
-        return '<Query %r %s %r>' % (self.field, self.op, self.value)
+        return '<Query %r %s %r %s>' % (self.field,
+                                        self.op,
+                                        self.value,
+                                        self.type)
 
     @classmethod
     def sample(cls):
         return cls(field='resource_id',
                    op='eq',
                    value='bd9431c1-8d69-4ad3-803a-8d4a6b89fd36',
+                   type='string'
                    )
+
+    def _get_value_as_type(self):
+        """Convert metadata value to the specified data type.
+
+        This method is called during metadata query to help convert the
+        querying metadata to the data type specified by user. If there is no
+        data type given, the metadata will be parsed by ast.literal_eval to
+        try to do a smart converting.
+
+        NOTE (flwang) Using "_" as prefix to avoid an InvocationError raised
+        from wsmeext/sphinxext.py. It's OK to call it outside the Query class.
+        Because the "public" side of that class is actually the outside of the
+        API, and the "private" side is the API implementation. The method is
+        only used in the API implementation, so it's OK.
+
+        :returns: metadata value converted with the specified data type.
+        """
+        try:
+            converted_value = self.value
+            if not self.type:
+                try:
+                    converted_value = ast.literal_eval(self.value)
+                except ValueError:
+                    msg = _('Failed to convert the metadata value %s'
+                            ' automatically') % (self.value)
+                    LOG.debug(msg)
+            else:
+                if self.type == 'integer':
+                    converted_value = int(self.value)
+                elif self.type == 'float':
+                    converted_value = float(self.value)
+                elif self.type == 'boolean':
+                    converted_value = strutils.bool_from_string(self.value)
+                elif self.type == 'string':
+                    converted_value = self.value
+                else:
+                    # For now, this method only support integer, float,
+                    # boolean and and string as the metadata type. A TypeError
+                    # will be raised for any other type.
+                    raise TypeError()
+        except ValueError:
+            msg = _('Failed to convert the metadata value %(value)s'
+                    ' to the expected data type %(type)s.') % \
+                {'value': self.value, 'type': self.type}
+            raise wsme.exc.ClientSideError(msg)
+        except TypeError:
+            msg = _('The data type %s is not supported. The supported'
+                    ' data type list is: integer, float, boolean and'
+                    ' string.') % (self.type)
+            raise wsme.exc.ClientSideError(msg)
+        except Exception:
+            msg = _('Unexpected exception converting %(value)s to'
+                    ' the expected data type %(type)s.') % \
+                {'value': self.value, 'type': self.type}
+            raise wsme.exc.ClientSideError(msg)
+        return converted_value
 
 
 def _sanitize_query(q):
@@ -189,7 +255,7 @@ def _query_to_kwargs(query, db_func):
             elif i.field == 'search_offset':
                 stamp['search_offset'] = i.value
             elif i.field.startswith('metadata.'):
-                metaquery[i.field] = i.value
+                metaquery[i.field] = i._get_value_as_type()
             else:
                 trans[translation.get(i.field, i.field)] = i.value
 

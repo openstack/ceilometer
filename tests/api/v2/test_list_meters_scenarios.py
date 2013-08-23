@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 #
 # Copyright 2012 Red Hat, Inc.
+# Copyright 2013 IBM Corp.
 #
 # Author: Angus Salkeld <asalkeld@redhat.com>
 #
@@ -60,7 +61,10 @@ class TestListMeters(FunctionalTest,
                     'resource-id',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 40),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.sample'},
+                                       'tag': 'self.sample',
+                                       'size': 123,
+                                       'util': 0.75,
+                                       'is_public': True},
                     source='test_source'),
                 sample.Sample(
                     'meter.test',
@@ -72,7 +76,10 @@ class TestListMeters(FunctionalTest,
                     'resource-id',
                     timestamp=datetime.datetime(2012, 7, 2, 11, 40),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.sample1'},
+                                       'tag': 'self.sample1',
+                                       'size': 0,
+                                       'util': 0.47,
+                                       'is_public': False},
                     source='test_source'),
                 sample.Sample(
                     'meter.mine',
@@ -84,7 +91,10 @@ class TestListMeters(FunctionalTest,
                     'resource-id2',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 41),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.sample2'},
+                                       'tag': 'self.sample2',
+                                       'size': 456,
+                                       'util': 0.64,
+                                       'is_public': False},
                     source='test_source'),
                 sample.Sample(
                     'meter.test',
@@ -96,7 +106,10 @@ class TestListMeters(FunctionalTest,
                     'resource-id3',
                     timestamp=datetime.datetime(2012, 7, 2, 10, 42),
                     resource_metadata={'display_name': 'test-server',
-                                       'tag': 'self.sample3'},
+                                       'tag': 'self.sample3',
+                                       'size': 0,
+                                       'util': 0.75,
+                                       'is_public': False},
                     source='test_source'),
                 sample.Sample(
                     'meter.mine',
@@ -112,8 +125,11 @@ class TestListMeters(FunctionalTest,
                                        'properties': {
                                            'prop_1': 'prop_value',
                                            'prop_2': {'sub_prop_1':
-                                                      'sub_prop_value'}}
+                                                      'sub_prop_value'}
                                        },
+                                       'size': 0,
+                                       'util': 0.58,
+                                       'is_public': True},
                     source='test_source')]:
             msg = rpc.meter_message_from_counter(
                 cnt,
@@ -172,6 +188,86 @@ class TestListMeters(FunctionalTest,
                          set(['resource-id']))
         self.assertEqual(set(r['counter_name'] for r in data),
                          set(['meter.test']))
+
+    def test_list_meters_query_integer_metadata(self):
+        data = self.get_json('/meters/meter.test',
+                             q=[{'field': 'metadata.size',
+                             'op': 'eq',
+                             'value': '0',
+                             'type': 'integer'}]
+                             )
+        self.assertEquals(2, len(data))
+        self.assertEquals(set(r['resource_id'] for r in data),
+                          set(['resource-id',
+                               'resource-id3']))
+        self.assertEquals(set(r['counter_name'] for r in data),
+                          set(['meter.test']))
+        self.assertEquals(set(r['resource_metadata']['size'] for r in data),
+                          set(['0']))
+
+    def test_list_meters_query_float_metadata(self):
+        data = self.get_json('/meters/meter.test',
+                             q=[{'field': 'metadata.util',
+                             'op': 'eq',
+                             'value': '0.75',
+                             'type': 'float'}]
+                             )
+        self.assertEquals(2, len(data))
+        self.assertEquals(set(r['resource_id'] for r in data),
+                          set(['resource-id',
+                               'resource-id3']))
+        self.assertEquals(set(r['counter_name'] for r in data),
+                          set(['meter.test']))
+        self.assertEquals(set(r['resource_metadata']['util'] for r in data),
+                          set(['0.75']))
+
+    def test_list_meters_query_boolean_metadata(self):
+        data = self.get_json('/meters/meter.mine',
+                             q=[{'field': 'metadata.is_public',
+                             'op': 'eq',
+                             'value': 'False',
+                             'type': 'boolean'}]
+                             )
+        self.assertEquals(1, len(data))
+        self.assertEquals(set(r['resource_id'] for r in data),
+                          set(['resource-id2']))
+        self.assertEquals(set(r['counter_name'] for r in data),
+                          set(['meter.mine']))
+        self.assertEquals(set(r['resource_metadata']['is_public'] for r
+                              in data), set(['False']))
+
+    def test_list_meters_query_string_metadata(self):
+        data = self.get_json('/meters/meter.test',
+                             q=[{'field': 'metadata.tag',
+                             'op': 'eq',
+                             'value': 'self.sample'}]
+                             )
+        self.assertEquals(1, len(data))
+        self.assertEquals(set(r['resource_id'] for r in data),
+                          set(['resource-id']))
+        self.assertEquals(set(r['counter_name'] for r in data),
+                          set(['meter.test']))
+        self.assertEquals(set(r['resource_metadata']['tag'] for r in data),
+                          set(['self.sample']))
+
+    def test_list_meters_query_integer_float_metadata_without_type(self):
+        data = self.get_json('/meters/meter.test',
+                             q=[{'field': 'metadata.size',
+                                 'op': 'eq',
+                                 'value': '0'},
+                                {'field': 'metadata.util',
+                                 'op': 'eq',
+                                 'value': '0.75'}]
+                             )
+        self.assertEquals(1, len(data))
+        self.assertEquals(set(r['resource_id'] for r in data),
+                          set(['resource-id3']))
+        self.assertEquals(set(r['counter_name'] for r in data),
+                          set(['meter.test']))
+        self.assertEquals(set(r['resource_metadata']['size'] for r in data),
+                          set(['0']))
+        self.assertEquals(set(r['resource_metadata']['util'] for r in data),
+                          set(['0.75']))
 
     def test_with_resource(self):
         data = self.get_json('/meters', q=[{'field': 'resource_id',

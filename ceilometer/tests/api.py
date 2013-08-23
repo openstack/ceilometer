@@ -152,9 +152,10 @@ class FunctionalTest(db_test_base.TestBase):
         query_params = {'q.field': [],
                         'q.value': [],
                         'q.op': [],
+                        'q.type': [],
                         }
         for query in q:
-            for name in ['field', 'op', 'value']:
+            for name in ['field', 'op', 'value', 'type']:
                 query_params['q.%s' % name].append(query.get(name, ''))
         all_params = {}
         all_params.update(params)
