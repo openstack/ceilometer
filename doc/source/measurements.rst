@@ -63,6 +63,8 @@ Here are the meter types by components that are currently implemented:
 Compute (Nova)
 ==============
 
+All meters are related to the guest machine, not the host.
+
 ========================  ==========  ========  ========  ============  =======================================================
 Name                      Type        Unit      Resource  Origin        Note
 ========================  ==========  ========  ========  ============  =======================================================
@@ -70,7 +72,7 @@ instance                  Gauge       instance  inst ID   both          Duration
 instance:<type>           Gauge       instance  inst ID   both          Duration of instance <type> (openstack types)
 memory                    Gauge             MB  inst ID   notification  Volume of RAM in MB
 cpu                       Cumulative        ns  inst ID   pollster      CPU time used
-cpu_util                  Gauge              %  inst ID   pollster      CPU utilisation
+cpu_util                  Gauge              %  inst ID   pollster      Average CPU utilisation
 vcpus                     Gauge           vcpu  inst ID   notification  Number of VCPUs
 disk.read.request         Cumulative   request  inst ID   pollster      Number of read requests
 disk.write.request        Cumulative   request  inst ID   pollster      Number of write requests
