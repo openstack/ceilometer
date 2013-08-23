@@ -276,7 +276,8 @@ class TestPublish(base.TestCase):
 
         def faux_cast_wait(context, topic, msg):
             self.stubs.Set(oslo_rpc, 'cast', faux_cast_go)
-            eventlet.sleep(1)
+            # Sleep to simulate concurrency and allow other threads to work
+            eventlet.sleep(0)
             self.published.append((topic, msg))
 
         self.stubs.Set(oslo_rpc, 'cast', faux_cast_wait)
