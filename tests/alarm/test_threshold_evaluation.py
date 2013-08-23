@@ -17,10 +17,12 @@
 # under the License.
 """Tests for ceilometer/alarm/threshold_evaluation.py
 """
+import datetime
 import mock
 import uuid
 
 from ceilometer.alarm import threshold_evaluation
+from ceilometer.openstack.common import timeutils
 from ceilometer.storage import models
 from ceilometer.tests import base
 from ceilometerclient import exc
@@ -60,6 +62,10 @@ class TestEvaluate(base.TestCase):
         ]
         self.evaluator = threshold_evaluation.Evaluator(self.notifier)
         self.evaluator.assign_alarms(self.alarms)
+
+    def tearDown(self):
+        super(TestEvaluate, self).tearDown()
+        timeutils.utcnow.override_time = None
 
     @staticmethod
     def _get_stat(attr, value):
@@ -273,3 +279,15 @@ class TestEvaluate(base.TestCase):
             expected = [mock.call(alarm, 'insufficient data', reason)
                         for alarm, reason in zip(self.alarms, reasons)]
             self.assertEqual(self.notifier.notify.call_args_list, expected)
+
+    def test_bound_duration(self):
+        timeutils.utcnow.override_time = datetime.datetime(2012, 7, 2, 10, 45)
+        constraint = self.evaluator._bound_duration(self.alarms[0], [])
+        self.assertEqual(constraint, [
+            {'field': 'timestamp',
+             'op': 'le',
+             'value': timeutils.utcnow().isoformat()},
+            {'field': 'timestamp',
+             'op': 'ge',
+             'value': '2012-07-02T10:39:00'},
+        ])
