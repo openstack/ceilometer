@@ -10,7 +10,7 @@ netaddr
 pymongo>=2.4
 eventlet>=0.13.0
 anyjson>=0.3.3
-Flask==0.9
+Flask>=0.10,<1.0
 pecan>=0.2.0
 stevedore>=0.10
 msgpack-python
