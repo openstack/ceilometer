@@ -22,6 +22,7 @@ import operator
 from oslo.config import cfg
 
 from ceilometer.openstack.common import log
+from ceilometer.openstack.common import timeutils
 from ceilometerclient import client as ceiloclient
 from ceilometer.openstack.common.gettextutils import _
 
@@ -90,7 +91,7 @@ class Evaluator(object):
     @classmethod
     def _bound_duration(cls, alarm, constraints):
         """Bound the duration of the statistics query."""
-        now = datetime.datetime.utcnow()
+        now = timeutils.utcnow()
         window = (alarm.period *
                   (alarm.evaluation_periods + cls.look_back))
         start = now - datetime.timedelta(seconds=window)
