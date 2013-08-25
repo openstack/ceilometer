@@ -16,6 +16,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import fnmatch
 import itertools
 import os
 import operator
@@ -241,14 +242,27 @@ class Pipeline(object):
 
     def support_meter(self, meter_name):
         meter_name = self._variable_meter_name(meter_name)
-        if ('!' + meter_name) in self.meters:
-            return False
-        if '*' in self.meters:
-            return True
-        elif self.meters[0][0] == '!':
-            return not ('!' + meter_name) in self.meters
+
+        # Special case: if we only have negation, we suppose the default it
+        # allow
+        if all(meter.startswith('!') for meter in self.meters):
+            default = True
         else:
-            return meter_name in self.meters
+            default = False
+
+        # Support wildcard like storage.* and !disk.*
+        # Start with negation, we consider that the order is deny, allow
+        if any(fnmatch.fnmatch(meter_name, meter[1:])
+               for meter in self.meters
+               if meter[0] == '!'):
+            return False
+
+        if any(fnmatch.fnmatch(meter_name, meter)
+               for meter in self.meters
+               if meter[0] != '!'):
+            return True
+
+        return default
 
     def flush(self, ctxt):
         """Flush data after all samples have been injected to pipeline."""
