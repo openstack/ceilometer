@@ -22,7 +22,12 @@
   the tests.
 
 """
+
+import datetime
+
+from ceilometer.storage import models
 from ceilometer.storage.sqlalchemy.models import table_args
+from ceilometer import utils
 from tests.storage import base
 
 
@@ -95,7 +100,46 @@ class UniqueNameTest(base.EventTest, EventTestBase):
 
 
 class EventTest(base.EventTest, EventTestBase):
-    pass
+    def test_string_traits(self):
+        model = models.Trait("Foo", models.Trait.TEXT_TYPE, "my_text")
+        trait = self.conn._make_trait(model, None)
+        self.assertEqual(trait.t_type, models.Trait.TEXT_TYPE)
+        self.assertIsNone(trait.t_float)
+        self.assertIsNone(trait.t_int)
+        self.assertIsNone(trait.t_datetime)
+        self.assertEqual(trait.t_string, "my_text")
+        self.assertIsNotNone(trait.name)
+
+    def test_int_traits(self):
+        model = models.Trait("Foo", models.Trait.INT_TYPE, 100)
+        trait = self.conn._make_trait(model, None)
+        self.assertEqual(trait.t_type, models.Trait.INT_TYPE)
+        self.assertIsNone(trait.t_float)
+        self.assertIsNone(trait.t_string)
+        self.assertIsNone(trait.t_datetime)
+        self.assertEqual(trait.t_int, 100)
+        self.assertIsNotNone(trait.name)
+
+    def test_float_traits(self):
+        model = models.Trait("Foo", models.Trait.FLOAT_TYPE, 123.456)
+        trait = self.conn._make_trait(model, None)
+        self.assertEqual(trait.t_type, models.Trait.FLOAT_TYPE)
+        self.assertIsNone(trait.t_int)
+        self.assertIsNone(trait.t_string)
+        self.assertIsNone(trait.t_datetime)
+        self.assertEqual(trait.t_float, 123.456)
+        self.assertIsNotNone(trait.name)
+
+    def test_datetime_traits(self):
+        now = datetime.datetime.utcnow()
+        model = models.Trait("Foo", models.Trait.DATETIME_TYPE, now)
+        trait = self.conn._make_trait(model, None)
+        self.assertEqual(trait.t_type, models.Trait.DATETIME_TYPE)
+        self.assertIsNone(trait.t_int)
+        self.assertIsNone(trait.t_string)
+        self.assertIsNone(trait.t_float)
+        self.assertEqual(trait.t_datetime, utils.dt_to_decimal(now))
+        self.assertIsNotNone(trait.name)
 
 
 class GetEventTest(base.GetEventTest, EventTestBase):
