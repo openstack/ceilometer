@@ -29,6 +29,7 @@ import bson.code
 import bson.objectid
 import pymongo
 
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer import storage
 from ceilometer.storage import base
@@ -340,7 +341,8 @@ class Connection(base.Connection):
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
                       end_timestamp=None, end_timestamp_op=None,
-                      metaquery={}, resource=None):
+                      metaquery={}, resource=None, limit=None,
+                      marker_pairs=None, sort_key=None, sort_dir=None):
         """Return an iterable of models.Resource instances
 
         :param user: Optional ID for user that owns the resource.
@@ -352,7 +354,16 @@ class Connection(base.Connection):
         :param end_timestamp_op: Optional end time operator, like lt, le.
         :param metaquery: Optional dict with metadata to match on.
         :param resource: Optional resource filter.
+        :param limit: Number of documents should be returned.
+        :param marker_pairs: Attribute-value pairs to identify the last item of
+                            the previous page.
+        :param sort_key: Attribute by which results be sorted.
+        :param sort_dir: Direction with which results be sorted(asc, desc).
         """
+
+        if limit or marker_pairs or sort_key or sort_dir:
+            raise NotImplementedError(_('Pagination not implemented'))
+
         q = {}
         if user is not None:
             q['user_id'] = user
@@ -402,7 +413,8 @@ class Connection(base.Connection):
             )
 
     def get_meters(self, user=None, project=None, resource=None, source=None,
-                   metaquery={}):
+                   metaquery={}, limit=None, marker_pairs=None,
+                   sort_key=None, sort_dir=None):
         """Return an iterable of models.Meter instances
 
         :param user: Optional ID for user that owns the resource.
@@ -410,7 +422,16 @@ class Connection(base.Connection):
         :param resource: Optional resource filter.
         :param source: Optional source filter.
         :param metaquery: Optional dict with metadata to match on.
+        :param limit: Number of documents should be returned.
+        :param marker_pairs: Attribute-value pairs to identify the last item of
+                            the previous page.
+        :param sort_key: Attribute by which results be sorted.
+        :param sort_dir: Direction with which results be sorted(asc, desc).
         """
+
+        if limit or marker_pairs or sort_key or sort_dir:
+            raise NotImplementedError(_('Pagination not implemented'))
+
         q = {}
         if user is not None:
             q['user_id'] = user
@@ -462,13 +483,17 @@ class Connection(base.Connection):
             s['counter_unit'] = s.get('counter_unit', '')
             yield models.Sample(**s)
 
-    def get_meter_statistics(self, sample_filter, period=None):
+    def get_meter_statistics(self, sample_filter, period=None, groupby=None):
         """Return an iterable of models.Statistics instance containing meter
         statistics described by the query parameters.
 
         The filter must have a meter value set.
 
         """
+
+        if groupby:
+            raise NotImplementedError("Group by not implemented.")
+
         q = make_query_from_filter(sample_filter)
 
         if period:
@@ -519,9 +544,25 @@ class Connection(base.Connection):
         return matching_metadata
 
     def get_alarms(self, name=None, user=None,
-                   project=None, enabled=True, alarm_id=None):
-        """Yields a list of alarms that match filters
+                   project=None, enabled=True, alarm_id=None, limit=None,
+                   marker_pairs=None, sort_key=None, sort_dir=None):
+        """Yields a lists of alarms that match filters
+        :param user: Optional ID for user that owns the resource.
+        :param project: Optional ID for project that owns the resource.
+        :param enabled: Optional boolean to list disable alarm.
+        :param alarm_id: Optional alarm_id to return one alarm.
+        :param metaquery: Optional dict with metadata to match on.
+        :param resource: Optional resource filter.
+        :param limit: Number of documents should be returned.
+        :param marker_pairs: Attribute-value pairs to identify the last item of
+                            the previous page.
+        :param sort_key: Attribute by which results be sorted.
+        :param sort_dir: Direction with which results be sorted(asc, desc).
         """
+
+        if limit or marker_pairs or sort_key or sort_dir:
+            raise NotImplementedError(_('Pagination not implemented'))
+
         q = {}
         if user is not None:
             q['user_id'] = user
