@@ -28,6 +28,7 @@ import os
 import re
 import urlparse
 
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer.openstack.common import network_utils
@@ -282,7 +283,8 @@ class Connection(base.Connection):
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
                       end_timestamp=None, end_timestamp_op=None,
-                      metaquery={}, resource=None):
+                      metaquery={}, resource=None, limit=None,
+                      marker_pairs=None, sort_key=None, sort_dir=None):
         """Return an iterable of models.Resource instances
 
         :param user: Optional ID for user that owns the resource.
@@ -294,7 +296,15 @@ class Connection(base.Connection):
         :param end_timestamp_op: Optional end time operator, like lt, le.
         :param metaquery: Optional dict with metadata to match on.
         :param resource: Optional resource filter.
+        :param limit: Number of documents should be returned.
+        :param marker_pairs: Attribute-value pairs to identify the last item of
+                            the previous page.
+        :param sort_key: Attribute by which results be sorted.
+        :param sort_dir: Direction with which results be sorted(asc, desc).
         """
+
+        if limit or marker_pairs or sort_key or sort_dir:
+            raise NotImplementedError(_('Pagination not implemented'))
 
         def make_resource(data, first_ts, last_ts):
             """Transform HBase fields to Resource model."""
@@ -363,7 +373,8 @@ class Connection(base.Connection):
                     resources[data['f:resource_id']][1])
 
     def get_meters(self, user=None, project=None, resource=None, source=None,
-                   metaquery={}):
+                   metaquery={}, limit=None, marker_pairs=None,
+                   sort_key=None, sort_dir=None):
         """Return an iterable of models.Meter instances
 
         :param user: Optional ID for user that owns the resource.
@@ -371,7 +382,15 @@ class Connection(base.Connection):
         :param resource: Optional resource filter.
         :param source: Optional source filter.
         :param metaquery: Optional dict with metadata to match on.
+        :param limit: Number of documents should be returned.
+        :param marker_pairs: Attribute-value pairs to identify the last item of
+                            the previous page.
+        :param sort_key: Attribute by which results be sorted.
+        :param sort_dir: Direction with which results be sorted(asc, desc).
         """
+
+        if limit or marker_pairs or sort_key or sort_dir:
+            raise NotImplementedError(_('Pagination not implemented'))
 
         resource_table = self.conn.table(self.RESOURCE_TABLE)
         q = make_query(user=user, project=project, resource=resource,
@@ -573,7 +592,8 @@ class Connection(base.Connection):
         return results
 
     def get_alarms(self, name=None, user=None,
-                   project=None, enabled=True, alarm_id=None):
+                   project=None, enabled=True, alarm_id=None, limit=None,
+                   marker_pairs=None, sort_key=None, sort_dir=None):
         """Yields a lists of alarms that match filters
             raise NotImplementedError('metaquery not implemented')
         """

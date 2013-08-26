@@ -27,6 +27,7 @@ from sqlalchemy import func
 from sqlalchemy import desc
 from sqlalchemy.orm import aliased
 
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 import ceilometer.openstack.common.db.sqlalchemy.session as sqlalchemy_session
@@ -273,7 +274,8 @@ class Connection(base.Connection):
     def get_resources(user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
                       end_timestamp=None, end_timestamp_op=None,
-                      metaquery={}, resource=None):
+                      metaquery={}, resource=None, limit=None,
+                      marker_pairs=None, sort_key=None, sort_dir=None):
         """Return an iterable of api_models.Resource instances
 
         :param user: Optional ID for user that owns the resource.
@@ -285,7 +287,16 @@ class Connection(base.Connection):
         :param end_timestamp_op: Optional end time operator, like lt, le.
         :param metaquery: Optional dict with metadata to match on.
         :param resource: Optional resource filter.
+        :param limit: Number of documents should be returned.
+        :param marker_pairs: Attribute-value pairs to identify the last item of
+                            the previous page.
+        :param sort_key: Attribute by which results be sorted.
+        :param sort_dir: Direction with which results be sorted(asc, desc).
         """
+
+        if limit or marker_pairs or sort_key or sort_dir:
+            raise NotImplementedError(_('Pagination not implemented'))
+
         session = sqlalchemy_session.get_session()
         query = session.query(
             Meter,
@@ -334,7 +345,8 @@ class Connection(base.Connection):
 
     @staticmethod
     def get_meters(user=None, project=None, resource=None, source=None,
-                   metaquery={}):
+                   metaquery={}, limit=None, marker_pairs=None,
+                   sort_key=None, sort_dir=None):
         """Return an iterable of api_models.Meter instances
 
         :param user: Optional ID for user that owns the resource.
@@ -342,7 +354,16 @@ class Connection(base.Connection):
         :param resource: Optional ID of the resource.
         :param source: Optional source filter.
         :param metaquery: Optional dict with metadata to match on.
+        :param limit: Number of documents should be returned.
+        :param marker_pairs: Attribute-value pairs to identify the last item of
+                            the previous page.
+        :param sort_key: Attribute by which results be sorted.
+        :param sort_dir: Direction with which results be sorted(asc, desc).
         """
+
+        if limit or marker_pairs or sort_key or sort_dir:
+            raise NotImplementedError(_('Pagination not implemented'))
+
         session = sqlalchemy_session.get_session()
 
         # Meter table will store large records and join with resource
@@ -558,13 +579,26 @@ class Connection(base.Connection):
         return row
 
     def get_alarms(self, name=None, user=None,
-                   project=None, enabled=True, alarm_id=None):
+                   project=None, enabled=True, alarm_id=None,
+                   limit=None, marker_pairs=None,
+                   sort_key=None, sort_dir=None):
         """Yields a lists of alarms that match filters
         :param user: Optional ID for user that owns the resource.
         :param project: Optional ID for project that owns the resource.
         :param enabled: Optional boolean to list disable alarm.
         :param alarm_id: Optional alarm_id to return one alarm.
+        :param metaquery: Optional dict with metadata to match on.
+        :param resource: Optional resource filter.
+        :param limit: Number of documents should be returned.
+        :param marker_pairs: Attribute-value pairs to identify the last item of
+                            the previous page.
+        :param sort_key: Attribute by which results be sorted.
+        :param sort_dir: Direction with which results be sorted(asc, desc).
         """
+
+        if limit or marker_pairs or sort_key or sort_dir:
+            raise NotImplementedError(_('Pagination not implemented'))
+
         session = sqlalchemy_session.get_session()
         query = session.query(Alarm)
         if name is not None:
