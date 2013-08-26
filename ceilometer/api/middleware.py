@@ -40,6 +40,20 @@ LOG = log.getLogger(__name__)
 class ParsableErrorMiddleware(object):
     """Replace error body with something the client can parse.
     """
+
+    @staticmethod
+    def best_match_language(accept_language):
+        """Determines best available locale from the Accept-Language
+        header.
+
+        :returns: the best language match or None if the 'Accept-Language'
+                  header was not available in the request.
+        """
+        if not accept_language:
+            return None
+        all_languages = gettextutils.get_available_languages('ceilometer')
+        return accept_language.best_match(all_languages)
+
     def __init__(self, app):
         self.app = app
 
@@ -82,10 +96,7 @@ class ParsableErrorMiddleware(object):
                 if isinstance(hook, hooks.TranslationHook):
                     error = hook.local_error.translatable_error
                     break
-            user_locale = req.accept_language.best_match(
-                gettextutils.get_available_languages('ceilometer'),
-                default_match='en_US')
-
+            user_locale = self.best_match_language(req.accept_language)
             if (req.accept.best_match(['application/json', 'application/xml'])
                == 'application/xml'):
                 try:

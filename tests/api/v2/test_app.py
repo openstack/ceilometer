@@ -70,10 +70,14 @@ class TestApiMiddleware(FunctionalTest):
     # This doesn't really matter
     database_connection = tests_db.MongoDBFakeConnectionUrl()
 
-    translated_error = 'Translated error'
+    no_lang_translated_error = 'No lang translated error'
+    en_US_translated_error = 'en-US translated error'
 
     def _fake_get_localized_message(self, message, user_locale):
-        return self.translated_error
+        if user_locale is None:
+            return self.no_lang_translated_error
+        else:
+            return self.en_US_translated_error
 
     def test_json_parsable_error_middleware_404(self):
         response = self.get_json('/invalid_path',
@@ -129,7 +133,7 @@ class TestApiMiddleware(FunctionalTest):
         self.assertEqual(response.content_type, "application/json")
         self.assertTrue(response.json['error_message'])
         fault = json.loads(response.json['error_message'])
-        self.assertEqual(fault['faultstring'], self.translated_error)
+        self.assertEqual(fault['faultstring'], self.no_lang_translated_error)
 
     def test_xml_parsable_error_middleware_404(self):
         response = self.get_json('/invalid_path',
@@ -165,4 +169,23 @@ class TestApiMiddleware(FunctionalTest):
         self.assertEqual(response.xml.tag, 'error_message')
         fault = response.xml.findall('./error/faultstring')
         for fault_string in fault:
-            self.assertEqual(fault_string.text, self.translated_error)
+            self.assertEqual(fault_string.text, self.no_lang_translated_error)
+
+    def test_best_match_language(self):
+        # Ensure that we are actually invoking language negotiation
+        self.stubs.Set(gettextutils, 'get_localized_message',
+                       self._fake_get_localized_message)
+
+        response = self.get_json('/alarms/-',
+                                 expect_errors=True,
+                                 headers={"Accept":
+                                          "application/xml,*/*",
+                                          "Accept-Language":
+                                          "en-US"}
+                                 )
+        self.assertEqual(response.status_int, 400)
+        self.assertEqual(response.content_type, "application/xml")
+        self.assertEqual(response.xml.tag, 'error_message')
+        fault = response.xml.findall('./error/faultstring')
+        for fault_string in fault:
+            self.assertEqual(fault_string.text, self.en_US_translated_error)
