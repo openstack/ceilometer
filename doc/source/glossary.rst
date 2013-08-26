@@ -99,5 +99,5 @@
      An OpenStack user.
 
 .. [#] http://en.wikipedia.org/wiki/Ceilometer
-.. [#] https://github.com/openstack/oslo-incubator/tree/master/openstack/common/notifier
+.. [#] https://git.openstack.org/cgit/openstack/ceilometer/tree/ceilometer/openstack/common/notifier
 .. [#] http://en.wikipedia.org/wiki/Non-repudiation

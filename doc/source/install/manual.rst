@@ -71,7 +71,7 @@ Installing the Collector
 5. Clone the ceilometer git repository to the management server::
 
    $ cd /opt/stack
-   $ git clone https://github.com/openstack/ceilometer.git
+   $ git clone https://git.openstack.org/openstack/ceilometer.git
 
 6. As a user with ``root`` permissions or ``sudo`` privileges, run the
    ceilometer installer::
@@ -157,7 +157,7 @@ Installing the Compute Agent
 2. Clone the ceilometer git repository to the server::
 
    $ cd /opt/stack
-   $ git clone https://github.com/openstack/ceilometer.git
+   $ git clone https://git.openstack.org/openstack/ceilometer.git
 
 4. As a user with ``root`` permissions or ``sudo`` privileges, run the
    ceilometer installer::
@@ -231,7 +231,7 @@ Installing the Central Agent
 1. Clone the ceilometer git repository to the server::
 
    $ cd /opt/stack
-   $ git clone https://github.com/openstack/ceilometer.git
+   $ git clone https://git.openstack.org/openstack/ceilometer.git
 
 2. As a user with ``root`` permissions or ``sudo`` privileges, run the
    ceilometer installer::
@@ -298,7 +298,7 @@ Installing the API Server
 1. Clone the ceilometer git repository to the server::
 
    $ cd /opt/stack
-   $ git clone https://github.com/openstack/ceilometer.git
+   $ git clone https://git.openstack.org/openstack/ceilometer.git
 
 2. As a user with ``root`` permissions or ``sudo`` privileges, run the
    ceilometer installer::

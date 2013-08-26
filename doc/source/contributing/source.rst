@@ -28,7 +28,7 @@ Setting up a Development Sandbox
 2. Clone the ceilometer project to the machine::
 
     $ cd /opt/stack
-    $ git clone https://github.com/openstack/ceilometer.git
+    $ git clone https://git.openstack.org/openstack/ceilometer
     $ cd ./ceilometer
 
 3. Once this is done, you need to setup the review process::

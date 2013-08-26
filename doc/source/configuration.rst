@@ -252,4 +252,4 @@ dispatchers                  database                              The list of d
 
 A sample configuration file can be found in `ceilometer.conf.sample`_.
 
-.. _ceilometer.conf.sample: https://github.com/openstack/ceilometer/blob/master/etc/ceilometer/ceilometer.conf.sample
+.. _ceilometer.conf.sample: https://git.openstack.org/cgit/openstack/ceilometer/tree/etc/ceilometer/ceilometer.conf.sample
