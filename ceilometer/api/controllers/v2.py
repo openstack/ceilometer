@@ -250,8 +250,8 @@ def _query_to_kwargs(query, db_func, internal_keys=[], headers=None):
                    'project_id': 'project',
                    'resource_id': 'resource'}
     stamp = {}
-    trans = {}
     metaquery = {}
+    kwargs = {}
     for i in query:
         if i.field == 'timestamp':
             if i.op in ('lt', 'le'):
@@ -261,22 +261,29 @@ def _query_to_kwargs(query, db_func, internal_keys=[], headers=None):
                 stamp['start_timestamp'] = i.value
                 stamp['start_timestamp_op'] = i.op
             else:
-                LOG.warn('_query_to_kwargs ignoring %r unexpected op %r"' %
-                         (i.field, i.op))
+                raise wsme.exc.InvalidInput('op', i.op,
+                                            'unimplemented operator for %s' %
+                                            i.field)
         else:
-            if i.op != 'eq':
-                LOG.warn('_query_to_kwargs ignoring %r unimplemented op %r' %
-                         (i.field, i.op))
-            elif i.field == 'search_offset':
-                stamp['search_offset'] = i.value
-            elif i.field.startswith('metadata.'):
-                metaquery[i.field] = i._get_value_as_type()
-            elif i.field.startswith('resource_metadata.'):
-                metaquery[i.field[9:]] = i._get_value_as_type()
+            if i.op == 'eq':
+                if i.field == 'search_offset':
+                    stamp['search_offset'] = i.value
+                elif i.field.startswith('metadata.'):
+                    metaquery[i.field] = i._get_value_as_type()
+                elif i.field.startswith('resource_metadata.'):
+                    metaquery[i.field[9:]] = i._get_value_as_type()
+                else:
+                    key = translation.get(i.field, i.field)
+                    if key not in valid_keys:
+                        msg = ("unrecognized field in query: %s, "
+                               "valid keys: %s") % (query, valid_keys)
+                        raise wsme.exc.UnknownArgument(key, msg)
+                    kwargs[key] = i.value
             else:
-                trans[translation.get(i.field, i.field)] = i.value
+                raise wsme.exc.InvalidInput('op', i.op,
+                                            'unimplemented operator for %s' %
+                                            i.field)
 
-    kwargs = {}
     if metaquery and 'metaquery' in valid_keys:
         kwargs['metaquery'] = metaquery
     if stamp:
@@ -294,14 +301,6 @@ def _query_to_kwargs(query, db_func, internal_keys=[], headers=None):
             kwargs['start_timestamp_op'] = stamp['start_timestamp_op']
         if 'end_timestamp_op' in stamp:
             kwargs['end_timestamp_op'] = stamp['end_timestamp_op']
-
-    if trans:
-        for k in trans:
-            if k not in valid_keys:
-                msg = ("unrecognized field in query: %s, valid keys: %s" %
-                       (query, valid_keys))
-                raise wsme.exc.UnknownArgument(k, msg)
-            kwargs[k] = trans[k]
 
     return kwargs
 
