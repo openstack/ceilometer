@@ -18,7 +18,6 @@
 """Set up the API server application instance."""
 
 import flask
-import flask.helpers
 from oslo.config import cfg
 
 from ceilometer.api import acl
@@ -26,16 +25,19 @@ from ceilometer.api.v1 import blueprint as v1_blueprint
 from ceilometer.openstack.common import jsonutils
 from ceilometer import storage
 
-# Replace the json module used by flask with the one from
-# openstack.common so we can take advantage of the fact that it knows
-# how to serialize more complex objects.
-flask.helpers.json = jsonutils
+
+class JSONEncoder(flask.json.JSONEncoder):
+    @staticmethod
+    def default(o):
+        return jsonutils.to_primitive(o)
 
 
 def make_app(conf, enable_acl=True, attach_storage=True,
              sources_file='sources.json'):
     app = flask.Flask('ceilometer.api')
     app.register_blueprint(v1_blueprint.blueprint, url_prefix='/v1')
+
+    app.json_encoder = JSONEncoder
 
     try:
         with open(sources_file, "r") as f:
