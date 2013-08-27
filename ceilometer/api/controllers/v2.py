@@ -34,9 +34,12 @@
 import ast
 import datetime
 import inspect
+import json
 import uuid
 import pecan
 from pecan import rest
+
+from oslo.config import cfg
 
 import wsme
 import wsmeext.pecan as wsme_pecan
@@ -54,6 +57,16 @@ from ceilometer.api import acl
 
 
 LOG = log.getLogger(__name__)
+
+
+ALARM_API_OPTS = [
+    cfg.BoolOpt('record_history',
+                default=True,
+                help='Record alarm change events'
+                ),
+]
+
+cfg.CONF.register_opts(ALARM_API_OPTS, group='alarm')
 
 
 operation_kind = wtypes.Enum(str, 'lt', 'le', 'eq', 'ne', 'ge', 'gt')
@@ -895,6 +908,9 @@ class AlarmChange(_Base):
     """Representation of an event in an alarm's history
     """
 
+    event_id = wtypes.text
+    "The UUID of the change event"
+
     alarm_id = wtypes.text
     "The UUID of the alarm"
 
@@ -957,6 +973,28 @@ class AlarmController(rest.RestController):
             raise wsme.exc.ClientSideError(error)
         return alarms[0]
 
+    def _record_change(self, data, now, on_behalf_of=None, type=None):
+        if not cfg.CONF.alarm.record_history:
+            return
+        type = type or (storage.models.AlarmChange.STATE_TRANSITION
+                        if data.get('state')
+                        else storage.models.AlarmChange.RULE_CHANGE)
+        detail = json.dumps(utils.stringify_timestamps(data))
+        user_id = pecan.request.headers.get('X-User-Id')
+        project_id = pecan.request.headers.get('X-Project-Id')
+        on_behalf_of = on_behalf_of or project_id
+        try:
+            self.conn.record_alarm_change(dict(event_id=str(uuid.uuid4()),
+                                               alarm_id=self._id,
+                                               type=type,
+                                               detail=detail,
+                                               user_id=user_id,
+                                               project_id=project_id,
+                                               on_behalf_of=on_behalf_of,
+                                               timestamp=now))
+        except NotImplementedError:
+            pass
+
     @wsme_pecan.wsexpose(Alarm, wtypes.text)
     def get(self):
         """Return this alarm."""
@@ -969,23 +1007,30 @@ class AlarmController(rest.RestController):
         # merge the new values from kwargs into the current
         # alarm "alarm_in".
         alarm_in = self._alarm()
+        now = timeutils.utcnow()
+        change = data.as_dict(storage.models.Alarm)
         data.state_timestamp = wsme.Unset
         data.alarm_id = self._id
         kwargs = data.as_dict(storage.models.Alarm)
         for k, v in kwargs.iteritems():
             setattr(alarm_in, k, v)
             if k == 'state':
-                alarm_in.state_timestamp = timeutils.utcnow()
+                alarm_in.state_timestamp = now
 
         alarm = self.conn.update_alarm(alarm_in)
+        self._record_change(change, now, on_behalf_of=alarm.project_id)
         return Alarm.from_db_model(alarm)
 
     @wsme_pecan.wsexpose(None, wtypes.text, status_code=204)
     def delete(self):
         """Delete this alarm."""
         # ensure alarm exists before deleting
-        alarm_id = self._alarm().alarm_id
-        self.conn.delete_alarm(alarm_id)
+        alarm = self._alarm()
+        self.conn.delete_alarm(alarm.alarm_id)
+        change = Alarm.from_db_model(alarm).as_dict(storage.models.Alarm)
+        self._record_change(change,
+                            timeutils.utcnow(),
+                            type=storage.models.AlarmChange.DELETION)
 
     # TODO(eglynn): add pagination marker to signature once overall
     #               API support for pagination is finalized
@@ -995,10 +1040,13 @@ class AlarmController(rest.RestController):
 
         :param q: Filter rules for the changes to be described.
         """
-        # ensure per-tenant segregation
-        self._alarm()
-        # TODO(eglynn): history not yet persisted
-        return []
+        # allow history to be returned for deleted alarms, but scope changes
+        # returned to those carried out on behalf of the auth'd tenant, to
+        # avoid inappropriate cross-tenant visibility of alarm history
+        auth_project = acl.get_limited_to_project(pecan.request.headers)
+        conn = pecan.request.storage_conn
+        return [AlarmChange.from_db_model(ac)
+                for ac in conn.get_alarm_changes(self._id, auth_project)]
 
 
 class AlarmsController(rest.RestController):
@@ -1011,17 +1059,38 @@ class AlarmsController(rest.RestController):
             remainder = remainder[:-1]
         return AlarmController(alarm_id), remainder
 
+    def _record_creation(self, conn, data, alarm_id, now):
+        if not cfg.CONF.alarm.record_history:
+            return
+        type = storage.models.AlarmChange.CREATION
+        detail = json.dumps(utils.stringify_timestamps(data))
+        user_id = pecan.request.headers.get('X-User-Id')
+        project_id = pecan.request.headers.get('X-Project-Id')
+        try:
+            conn.record_alarm_change(dict(event_id=str(uuid.uuid4()),
+                                          alarm_id=alarm_id,
+                                          type=type,
+                                          detail=detail,
+                                          user_id=user_id,
+                                          project_id=project_id,
+                                          on_behalf_of=project_id,
+                                          timestamp=now))
+        except NotImplementedError:
+            pass
+
     @wsme.validate(Alarm)
     @wsme_pecan.wsexpose(Alarm, body=Alarm, status_code=201)
     def post(self, data):
         """Create a new alarm."""
         conn = pecan.request.storage_conn
 
+        now = timeutils.utcnow()
         data.alarm_id = str(uuid.uuid4())
         data.user_id = pecan.request.headers.get('X-User-Id')
         data.project_id = pecan.request.headers.get('X-Project-Id')
         data.state_timestamp = wsme.Unset
-        data.timestamp = timeutils.utcnow()
+        change = data.as_dict(storage.models.Alarm)
+        data.timestamp = now
 
         # make sure alarms are unique by name per project.
         alarms = list(conn.get_alarms(name=data.name,
@@ -1041,6 +1110,7 @@ class AlarmsController(rest.RestController):
             raise wsme.exc.ClientSideError(error)
 
         alarm = conn.create_alarm(alarm_in)
+        self._record_creation(conn, change, alarm.alarm_id, now)
         return Alarm.from_db_model(alarm)
 
     @wsme_pecan.wsexpose([Alarm], [Query])

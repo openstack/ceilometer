@@ -4,6 +4,7 @@
 #
 # Author: Mehdi Abaakouk <mehdi.abaakouk@enovance.com>
 #         Angus Salkeld <asalkeld@redhat.com>
+#         Eoghan Glynn <eglynn@redhat.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -19,9 +20,13 @@
 '''Tests alarm operation
 '''
 
+import datetime
+import json as jsonutils
 import logging
 import uuid
 import testscenarios
+
+from oslo.config import cfg
 
 from .base import FunctionalTest
 
@@ -47,8 +52,8 @@ class TestAlarms(FunctionalTest,
     def setUp(self):
         super(TestAlarms, self).setUp()
 
-        self.auth_headers = {'X-User-Id': str(uuid.uuid1()),
-                             'X-Project-Id': str(uuid.uuid1())}
+        self.auth_headers = {'X-User-Id': str(uuid.uuid4()),
+                             'X-Project-Id': str(uuid.uuid4())}
         for alarm in [Alarm(name='name1',
                             alarm_id='a',
                             counter_name='meter.test',
@@ -178,12 +183,140 @@ class TestAlarms(FunctionalTest,
         alarms = list(self.conn.get_alarms())
         self.assertEqual(2, len(alarms))
 
-    def test_get_alarm_history(self):
+    def _get_alarm(self, index):
         data = self.get_json('/alarms')
-        history = self.get_json('/alarms/%s/history' % data[0]['alarm_id'])
+        return data[index]
+
+    def _get_alarm_history(self, alarm, auth_headers=None):
+        return self.get_json('/alarms/%s/history' % alarm['alarm_id'],
+                             headers=auth_headers or self.auth_headers)
+
+    def _update_alarm(self, alarm, data, auth_headers=None):
+        self.put_json('/alarms/%s' % alarm['alarm_id'],
+                      params=data,
+                      headers=auth_headers or self.auth_headers)
+
+    def _assert_is_subset(self, expected, actual):
+        for k, v in expected.iteritems():
+            self.assertEqual(v, actual.get(k), 'mismatched field: %s' % k)
+        self.assertTrue(actual['event_id'] is not None)
+
+    def _assert_in_json(self, expected, actual):
+        for k, v in expected.iteritems():
+            fragment = jsonutils.dumps({k: v})[1:-1]
+            self.assertTrue(fragment in actual,
+                            '%s not in %s' % (fragment, actual))
+
+    def test_get_unrecorded_alarm_history(self):
+        cfg.CONF.set_override('record_history', False, group='alarm')
+        alarm = self._get_alarm(0)
+        history = self._get_alarm_history(alarm)
+        self.assertEqual([], history)
+        self._update_alarm(alarm, dict(name='renamed'))
+        history = self._get_alarm_history(alarm)
         self.assertEqual([], history)
 
+    def test_get_recorded_alarm_history_on_create(self):
+        new_alarm = dict(name='new_alarm',
+                         counter_name='other_meter',
+                         comparison_operator='le',
+                         threshold=42.0,
+                         statistic='max')
+        self.post_json('/alarms', params=new_alarm, status=200,
+                       headers=self.auth_headers)
+        alarm = self._get_alarm(3)
+        history = self._get_alarm_history(alarm)
+        self.assertEqual(1, len(history))
+        self._assert_is_subset(dict(alarm_id=alarm['alarm_id'],
+                                    on_behalf_of=alarm['project_id'],
+                                    project_id=alarm['project_id'],
+                                    type='creation',
+                                    user_id=alarm['user_id']),
+                               history[0])
+        self._assert_in_json(new_alarm, history[0]['detail'])
+
+    def _do_test_get_recorded_alarm_history_on_update(self,
+                                                      data,
+                                                      type,
+                                                      detail,
+                                                      auth=None):
+        alarm = self._get_alarm(0)
+        history = self._get_alarm_history(alarm)
+        self.assertEqual([], history)
+        self._update_alarm(alarm, data, auth)
+        history = self._get_alarm_history(alarm)
+        self.assertEqual(1, len(history))
+        project_id = auth['X-Project-Id'] if auth else alarm['project_id']
+        user_id = auth['X-User-Id'] if auth else alarm['user_id']
+        self._assert_is_subset(dict(alarm_id=alarm['alarm_id'],
+                                    detail=detail,
+                                    on_behalf_of=alarm['project_id'],
+                                    project_id=project_id,
+                                    type=type,
+                                    user_id=user_id),
+                               history[0])
+
+    def test_get_recorded_alarm_history_rule_change(self):
+        now = datetime.datetime.utcnow().isoformat()
+        data = dict(name='renamed', timestamp=now)
+        detail = '{"timestamp": "%s", "name": "renamed"}' % now
+        self._do_test_get_recorded_alarm_history_on_update(data,
+                                                           'rule change',
+                                                           detail)
+
+    def test_get_recorded_alarm_history_state_transition(self):
+        data = dict(state='alarm')
+        detail = '{"state": "alarm"}'
+        self._do_test_get_recorded_alarm_history_on_update(data,
+                                                           'state transition',
+                                                           detail)
+
+    def test_get_recorded_alarm_history_rule_change_on_behalf_of(self):
+        data = dict(name='renamed')
+        detail = '{"name": "renamed"}'
+        auth = {'X-Roles': 'admin',
+                'X-User-Id': str(uuid.uuid4()),
+                'X-Project-Id': str(uuid.uuid4())}
+        self._do_test_get_recorded_alarm_history_on_update(data,
+                                                           'rule change',
+                                                           detail,
+                                                           auth)
+
+    def test_get_recorded_alarm_history_segregation(self):
+        data = dict(name='renamed')
+        detail = '{"name": "renamed"}'
+        self._do_test_get_recorded_alarm_history_on_update(data,
+                                                           'rule change',
+                                                           detail)
+        auth = {'X-Roles': 'member',
+                'X-User-Id': str(uuid.uuid4()),
+                'X-Project-Id': str(uuid.uuid4())}
+        history = self._get_alarm_history(self._get_alarm(0), auth)
+        self.assertEqual([], history)
+
+    def test_get_recorded_alarm_history_preserved_after_deletion(self):
+        alarm = self._get_alarm(0)
+        history = self._get_alarm_history(alarm)
+        self.assertEqual([], history)
+        self._update_alarm(alarm, dict(name='renamed'))
+        alarm = self._get_alarm(0)
+        history = self._get_alarm_history(alarm)
+        self.assertEqual(1, len(history))
+        self.delete('/alarms/%s' % alarm['alarm_id'],
+                    headers=self.auth_headers,
+                    status=200)
+        history = self._get_alarm_history(alarm)
+        self.assertEqual(2, len(history))
+        self._assert_is_subset(dict(alarm_id=alarm['alarm_id'],
+                                    on_behalf_of=alarm['project_id'],
+                                    project_id=alarm['project_id'],
+                                    type='deletion',
+                                    user_id=alarm['user_id']),
+                               history[0])
+        self._assert_in_json(alarm, history[0]['detail'])
+
     def test_get_nonexistent_alarm_history(self):
-        response = self.get_json('/alarms/%s/history' % 'foobar',
-                                 expect_errors=True)
-        self.assertEqual(response.status_int, 400)
+        # the existence of alarm history is independent of the
+        # continued existence of the alarm itself
+        history = self._get_alarm_history(dict(alarm_id='foobar'))
+        self.assertEqual([], history)

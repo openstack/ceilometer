@@ -74,3 +74,10 @@ def sanitize_timestamp(timestamp):
     if not isinstance(timestamp, datetime.datetime):
         timestamp = timeutils.parse_isotime(timestamp)
     return timeutils.normalize_time(timestamp)
+
+
+def stringify_timestamps(data):
+    """Stringify any datetimes in given dict."""
+    isa_timestamp = lambda v: isinstance(v, datetime.datetime)
+    return dict((k, v.isoformat() if isa_timestamp(v) else v)
+                for (k, v) in data.iteritems())

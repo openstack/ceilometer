@@ -608,6 +608,14 @@
 #threshold_evaluation_interval=60
 
 
+#
+# Options defined in ceilometer.api.controllers.v2
+#
+
+# Record alarm change events (boolean value)
+#record_history=true
+
+
 [rpc_notifier2]
 
 #
