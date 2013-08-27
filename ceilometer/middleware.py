@@ -66,7 +66,8 @@ class HTTPRequest(plugin.NotificationBase):
             unit=message['event_type'].split('.')[1],
             user_id=message['payload']['request'].get('HTTP_X_USER_ID'),
             project_id=message['payload']['request'].get('HTTP_X_PROJECT_ID'),
-            resource_id=None,
+            resource_id=message['payload']['request'].get(
+                'HTTP_X_SERVICE_NAME'),
             message=message)
 
 

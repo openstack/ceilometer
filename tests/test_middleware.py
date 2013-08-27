@@ -35,7 +35,9 @@ HTTP_REQUEST = {
     u'event_type': u'http.request',
     u'message_id': u'dae6f69c-00e0-41c0-b371-41ec3b7f4451',
     u'payload': {u'request': {'HTTP_X_FOOBAR': 'foobaz',
-                              'HTTP_X_USER_ID': 'jd-x32'}},
+                              'HTTP_X_USER_ID': 'jd-x32',
+                              'HTTP_X_PROJECT_ID': 'project-id',
+                              'HTTP_X_SERVICE_NAME': 'nova'}},
     u'priority': u'INFO',
     u'publisher_id': u'compute.vagrant-precise',
     u'timestamp': u'2012-05-08 20:23:48.028195',
@@ -55,7 +57,10 @@ HTTP_RESPONSE = {
     u'event_type': u'http.response',
     u'message_id': u'dae6f69c-00e0-41c0-b371-41ec3b7f4451',
     u'payload': {u'request': {'HTTP_X_FOOBAR': 'foobaz',
-                              'HTTP_X_USER_ID': 'jd-x32'}},
+                              'HTTP_X_USER_ID': 'jd-x32',
+                              'HTTP_X_PROJECT_ID': 'project-id',
+                              'HTTP_X_SERVICE_NAME': 'nova'},
+                 u'response': {'status': '200 OK'}},
     u'priority': u'INFO',
     u'publisher_id': u'compute.vagrant-precise',
     u'timestamp': u'2012-05-08 20:23:48.028195',
@@ -69,8 +74,12 @@ class TestNotifications(base.TestCase):
         ))[0]
         self.assertEqual(sample.user_id,
                          HTTP_REQUEST['payload']['request']['HTTP_X_USER_ID'])
-        self.assertEqual(sample.project_id, None)
-        self.assertEqual(sample.resource_id, None)
+        self.assertEqual(sample.project_id,
+                         HTTP_REQUEST['payload']['request']
+                         ['HTTP_X_PROJECT_ID'])
+        self.assertEqual(sample.resource_id,
+                         HTTP_REQUEST['payload']['request']
+                         ['HTTP_X_SERVICE_NAME'])
         self.assertEqual(sample.volume, 1)
 
     def test_process_response_notification(self):
@@ -78,9 +87,13 @@ class TestNotifications(base.TestCase):
             HTTP_RESPONSE
         ))[0]
         self.assertEqual(sample.user_id,
-                         HTTP_REQUEST['payload']['request']['HTTP_X_USER_ID'])
-        self.assertEqual(sample.project_id, None)
-        self.assertEqual(sample.resource_id, None)
+                         HTTP_RESPONSE['payload']['request']['HTTP_X_USER_ID'])
+        self.assertEqual(sample.project_id,
+                         HTTP_RESPONSE['payload']['request']
+                         ['HTTP_X_PROJECT_ID'])
+        self.assertEqual(sample.resource_id,
+                         HTTP_RESPONSE['payload']['request']
+                         ['HTTP_X_SERVICE_NAME'])
         self.assertEqual(sample.volume, 1)
 
     def test_exchanges(self):
