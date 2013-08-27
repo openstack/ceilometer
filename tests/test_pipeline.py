@@ -325,6 +325,37 @@ class TestPipeline(base.TestCase):
         self.assertTrue(pipeline_manager.pipelines[0].support_meter('b'))
         self.assertFalse(pipeline_manager.pipelines[0].support_meter('c'))
 
+    def test_wildcard_and_excluded_wildcard_counters(self):
+        counter_cfg = ['*', '!disk.*']
+        self.pipeline_cfg[0]['counters'] = counter_cfg
+        pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager)
+        self.assertFalse(pipeline_manager.pipelines[0].
+                         support_meter('disk.read.bytes'))
+        self.assertTrue(pipeline_manager.pipelines[0].support_meter('cpu'))
+
+    def test_included_counter_and_wildcard_counters(self):
+        counter_cfg = ['cpu', 'disk.*']
+        self.pipeline_cfg[0]['counters'] = counter_cfg
+        pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager)
+        self.assertTrue(pipeline_manager.pipelines[0].
+                        support_meter('disk.read.bytes'))
+        self.assertTrue(pipeline_manager.pipelines[0].support_meter('cpu'))
+        self.assertFalse(pipeline_manager.pipelines[0].
+                         support_meter('instance'))
+
+    def test_excluded_counter_and_excluded_wildcard_counters(self):
+        counter_cfg = ['!cpu', '!disk.*']
+        self.pipeline_cfg[0]['counters'] = counter_cfg
+        pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager)
+        self.assertFalse(pipeline_manager.pipelines[0].
+                         support_meter('disk.read.bytes'))
+        self.assertFalse(pipeline_manager.pipelines[0].support_meter('cpu'))
+        self.assertTrue(pipeline_manager.pipelines[0].
+                        support_meter('instance'))
+
     def test_multiple_pipeline(self):
         self.pipeline_cfg.append({
             'name': 'second_pipeline',
