@@ -840,12 +840,21 @@ class Connection(base.Connection):
         :param on_behalf_of: ID of tenant to scope changes query (None for
                              administrative user, indicating all projects)
         """
-        raise NotImplementedError('Alarm history not implemented')
+        q = dict(alarm_id=alarm_id)
+        if on_behalf_of is not None:
+            q['on_behalf_of'] = on_behalf_of
+
+        sort = [("timestamp", pymongo.DESCENDING)]
+        for alarm_change in self.db.alarm_history.find(q, sort=sort):
+            ac = {}
+            ac.update(alarm_change)
+            del ac['_id']
+            yield models.AlarmChange(**ac)
 
     def record_alarm_change(self, alarm_change):
         """Record alarm change event.
         """
-        raise NotImplementedError('Alarm history not implemented')
+        self.db.alarm_history.insert(alarm_change)
 
     @staticmethod
     def record_events(events):

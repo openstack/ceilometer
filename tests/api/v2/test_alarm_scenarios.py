@@ -183,9 +183,11 @@ class TestAlarms(FunctionalTest,
         alarms = list(self.conn.get_alarms())
         self.assertEqual(2, len(alarms))
 
-    def _get_alarm(self, index):
+    def _get_alarm(self, id):
         data = self.get_json('/alarms')
-        return data[index]
+        match = [a for a in data if a['alarm_id'] == id]
+        self.assertEqual(1, len(match), 'alarm %s not found' % id)
+        return match[0]
 
     def _get_alarm_history(self, alarm, auth_headers=None):
         return self.get_json('/alarms/%s/history' % alarm['alarm_id'],
@@ -207,14 +209,18 @@ class TestAlarms(FunctionalTest,
             self.assertTrue(fragment in actual,
                             '%s not in %s' % (fragment, actual))
 
-    def test_get_unrecorded_alarm_history(self):
+    def test_record_alarm_history_config(self):
         cfg.CONF.set_override('record_history', False, group='alarm')
-        alarm = self._get_alarm(0)
+        alarm = self._get_alarm('a')
         history = self._get_alarm_history(alarm)
         self.assertEqual([], history)
         self._update_alarm(alarm, dict(name='renamed'))
         history = self._get_alarm_history(alarm)
         self.assertEqual([], history)
+        cfg.CONF.set_override('record_history', True, group='alarm')
+        self._update_alarm(alarm, dict(name='foobar'))
+        history = self._get_alarm_history(alarm)
+        self.assertEqual(1, len(history))
 
     def test_get_recorded_alarm_history_on_create(self):
         new_alarm = dict(name='new_alarm',
@@ -224,7 +230,7 @@ class TestAlarms(FunctionalTest,
                          statistic='max')
         self.post_json('/alarms', params=new_alarm, status=200,
                        headers=self.auth_headers)
-        alarm = self._get_alarm(3)
+        alarm = self.get_json('/alarms')[3]
         history = self._get_alarm_history(alarm)
         self.assertEqual(1, len(history))
         self._assert_is_subset(dict(alarm_id=alarm['alarm_id'],
@@ -240,7 +246,7 @@ class TestAlarms(FunctionalTest,
                                                       type,
                                                       detail,
                                                       auth=None):
-        alarm = self._get_alarm(0)
+        alarm = self._get_alarm('a')
         history = self._get_alarm_history(alarm)
         self.assertEqual([], history)
         self._update_alarm(alarm, data, auth)
@@ -291,17 +297,17 @@ class TestAlarms(FunctionalTest,
         auth = {'X-Roles': 'member',
                 'X-User-Id': str(uuid.uuid4()),
                 'X-Project-Id': str(uuid.uuid4())}
-        history = self._get_alarm_history(self._get_alarm(0), auth)
+        history = self._get_alarm_history(self._get_alarm('a'), auth)
         self.assertEqual([], history)
 
     def test_get_recorded_alarm_history_preserved_after_deletion(self):
-        alarm = self._get_alarm(0)
+        alarm = self._get_alarm('a')
         history = self._get_alarm_history(alarm)
         self.assertEqual([], history)
         self._update_alarm(alarm, dict(name='renamed'))
-        alarm = self._get_alarm(0)
         history = self._get_alarm_history(alarm)
         self.assertEqual(1, len(history))
+        alarm = self._get_alarm('a')
         self.delete('/alarms/%s' % alarm['alarm_id'],
                     headers=self.auth_headers,
                     status=200)
