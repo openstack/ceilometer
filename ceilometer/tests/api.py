@@ -114,6 +114,17 @@ class FunctionalTest(db_test_base.TestBase):
 
     def put_json(self, path, params, expect_errors=False, headers=None,
                  extra_environ=None, status=None):
+        """Sends simulated HTTP PUT request to Pecan test app.
+
+        :param path: url path of target service
+        :param params: content for wsgi.input of request
+        :param expect_errors: boolean value whether an error is expected based
+                              on request
+        :param headers: A dictionary of headers to send along with the request
+        :param extra_environ: A dictionary of environ variables to send along
+                              with the request
+        :param status: Expected status code of response
+        """
         return self.post_json(path=path, params=params,
                               expect_errors=expect_errors,
                               headers=headers, extra_environ=extra_environ,
@@ -121,6 +132,19 @@ class FunctionalTest(db_test_base.TestBase):
 
     def post_json(self, path, params, expect_errors=False, headers=None,
                   method="post", extra_environ=None, status=None):
+        """Sends simulated HTTP POST request to Pecan test app.
+
+        :param path: url path of target service
+        :param params: content for wsgi.input of request
+        :param expect_errors: boolean value whether an error is expected based
+                              on request
+        :param headers: A dictionary of headers to send along with the request
+        :param method: Request method type. Appropriate method function call
+                       should be used rather than passing attribute in.
+        :param extra_environ: A dictionary of environ variables to send along
+                              with the request
+        :param status: Expected status code of response
+        """
         full_path = self.PATH_PREFIX + path
         print('%s: %s %s' % (method.upper(), full_path, params))
         response = getattr(self.app, "%s_json" % method)(
@@ -136,6 +160,16 @@ class FunctionalTest(db_test_base.TestBase):
 
     def delete(self, path, expect_errors=False, headers=None,
                extra_environ=None, status=None):
+        """Sends simulated HTTP DELETE request to Pecan test app.
+
+        :param path: url path of target service
+        :param expect_errors: boolean value whether an error is expected based
+                              on request
+        :param headers: A dictionary of headers to send along with the request
+        :param extra_environ: A dictionary of environ variables to send along
+                              with the request
+        :param status: Expected status code of response
+        """
         full_path = self.PATH_PREFIX + path
         print('DELETE: %s' % (full_path))
         response = self.app.delete(str(full_path),
@@ -148,6 +182,18 @@ class FunctionalTest(db_test_base.TestBase):
 
     def get_json(self, path, expect_errors=False, headers=None,
                  extra_environ=None, q=[], **params):
+        """Sends simulated HTTP GET request to Pecan test app.
+
+        :param path: url path of target service
+        :param expect_errors: boolean value whether an error is expected based
+                              on request
+        :param headers: A dictionary of headers to send along with the request
+        :param extra_environ: A dictionary of environ variables to send along
+                              with the request
+        :param q: list of queries consisting of: field, value, op, and type
+                  keys
+        :param params: content for wsgi.input of request
+        """
         full_path = self.PATH_PREFIX + path
         query_params = {'q.field': [],
                         'q.value': [],
