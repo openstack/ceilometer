@@ -159,13 +159,13 @@ Installing the Compute Agent
    $ cd /opt/stack
    $ git clone https://git.openstack.org/openstack/ceilometer.git
 
-4. As a user with ``root`` permissions or ``sudo`` privileges, run the
+3. As a user with ``root`` permissions or ``sudo`` privileges, run the
    ceilometer installer::
 
    $ cd ceilometer
    $ sudo python setup.py install
 
-5. Copy the sample configuration files from the source tree
+4. Copy the sample configuration files from the source tree
    to their final location.
 
    ::
@@ -175,7 +175,7 @@ Installing the Compute Agent
       $ cp etc/ceilometer/*.yaml /etc/ceilometer
       $ cp etc/ceilometer/ceilometer.conf.sample /etc/ceilometer/ceilometer.conf
 
-6. Edit ``/etc/ceilometer/ceilometer.conf``
+5. Edit ``/etc/ceilometer/ceilometer.conf``
 
    1. Configure RPC
 
@@ -204,7 +204,7 @@ Installing the Compute Agent
    Refer to :doc:`/configuration` for details about any other options
    you might want to modify before starting the service.
 
-7. Start the agent.
+6. Start the agent.
 
    ::
 
@@ -360,19 +360,23 @@ Configuring keystone to work with API
 .. note::
    The API server needs to be able to talk to keystone to authenticate.
 
-1. Create a service for ceilometer in keystone::
+1. Create a service for ceilometer in keystone
 
-   $ keystone service-create --name=ceilometer \
-                             --type=metering \
-                             --description="Ceilometer Service"
+   ::
 
-2. Create an endpoint in keystone for ceilometer::
+      $ keystone service-create --name=ceilometer \
+                                --type=metering \
+                                --description="Ceilometer Service"
 
-   $ keystone endpoint-create --region RegionOne \
-                              --service_id $CEILOMETER_SERVICE \
-                              --publicurl "http://$SERVICE_HOST:8777/" \
-                              --adminurl "http://$SERVICE_HOST:8777/" \
-                              --internalurl "http://$SERVICE_HOST:8777/"
+2. Create an endpoint in keystone for ceilometer
+
+   ::
+
+      $ keystone endpoint-create --region RegionOne \
+                                 --service_id $CEILOMETER_SERVICE \
+                                 --publicurl "http://$SERVICE_HOST:8777/" \
+                                 --adminurl "http://$SERVICE_HOST:8777/" \
+                                 --internalurl "http://$SERVICE_HOST:8777/"
 
 .. note::
 
@@ -396,65 +400,65 @@ Ceilometer, you should configure a separate queue that listens for the same
 messages.
 
 Using multiple dispatchers
-========================
+================================
 
 .. index::
    double: installing; multiple dispatchers
 
-.. note::
-   The Ceilometer collector allows multiple dispatchers to be configured so that
-   metering data can be easily sent to multiple internal and external systems.
+The Ceilometer collector allows multiple dispatchers to be configured so that
+metering data can be easily sent to multiple internal and external systems.
 
-   Ceilometer by default only saves metering data in a database, to allow
-   Ceilometer to send metering data to other systems in addition to the
-   database, multiple dispatchers can be developed and enabled by modifying
-   Ceilometer configuration file.
+Ceilometer by default only saves metering data in a database, to allow
+Ceilometer to send metering data to other systems in addition to the
+database, multiple dispatchers can be developed and enabled by modifying
+Ceilometer configuration file.
 
-   Ceilometer ships two dispatchers currently. One is called database
-   dispatcher, and the other is called file dispatcher. As the names imply,
-   database dispatcher basically sends metering data to a database driver,
-   eventually metering data will be saved in database. File dispatcher sends
-   metering data into a file. The location, name, size of the file can be
-   configured in ceilometer configuration file. These two dispatchers are
-   shipped in the Ceilometer egg and defined in the entry_points as follows:
+Ceilometer ships two dispatchers currently. One is called database
+dispatcher, and the other is called file dispatcher. As the names imply,
+database dispatcher basically sends metering data to a database driver,
+eventually metering data will be saved in database. File dispatcher sends
+metering data into a file. The location, name, size of the file can be
+configured in ceilometer configuration file. These two dispatchers are
+shipped in the Ceilometer egg and defined in the entry_points as follows::
 
-        [ceilometer.dispatcher]
-        file = ceilometer.collector.dispatcher.file:FileDispatcher
-        database = ceilometer.collector.dispatcher.database:DatabaseDispatcher
+   [ceilometer.dispatcher]
+   file = ceilometer.collector.dispatcher.file:FileDispatcher
+   database = ceilometer.collector.dispatcher.database:DatabaseDispatcher
 
-   To use both dispatchers on a Ceilometer collector service, add the following
-   line in file ceilometer.conf
+To use both dispatchers on a Ceilometer collector service, add the following
+line in file ceilometer.conf::
 
-        [collector]
-        dispatcher=database
-        dispatcher=file
+   [collector]
+   dispatcher=database
+   dispatcher=file
 
-   If there is no dispatcher present, database dispatcher is used as the
-   default. If in some cases such as traffic tests, no dispatcher is needed,
-   one can configure the line like the following:
+If there is no dispatcher present, database dispatcher is used as the
+default. If in some cases such as traffic tests, no dispatcher is needed,
+one can configure the line like the following::
 
-        dispatcher=
+   dispatcher=
 
-   With above configuration, no dispatcher is used by the Ceilometer collector
-   service, all metering data received by Ceilometer collector will be dropped.
+With above configuration, no dispatcher is used by the Ceilometer collector
+service, all metering data received by Ceilometer collector will be dropped.
 
 
 Using other databases
-===================
+=========================
 .. index::
    double: installing; database, hbase, mysql, db2
 
-   Ceilometer by default uses mongodb as its backend data repository.
-   A deployment can choose to use other databases, currently the supported
-   databases are mongodb, hbase, mysql (or sqlalchemy-enabled databases) and
-   db2. To use a database other than MongoDB, edit the database section in
-   ceilometer.conf:
+Ceilometer by default uses mongodb as its backend data repository.
+A deployment can choose to use other databases, currently the supported
+databases are mongodb, hbase, mysql (or sqlalchemy-enabled databases) and
+db2. To use a database other than MongoDB, edit the database section in
+ceilometer.conf:
 
-   To use db2 as the data repository, make the section look like this::
+To use db2 as the data repository, make the section look like this::
 
-        [database]
-        connection = db2://username:password@host:27017/ceilometer
+   [database]
+   connection = db2://username:password@host:27017/ceilometer
 
-   To use mongodb as the data reporitoy, make the section look like this::
-        [database]
-        connection = mongodb://username:password@host:27017/ceilometer
+To use mongodb as the data repository, make the section look like this::
+
+   [database]
+   connection = mongodb://username:password@host:27017/ceilometer
