@@ -18,11 +18,15 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import abc
+
 from oslo.config import cfg
 from stevedore import extension
 
 from ceilometer.alarm import rpc as rpc_alarm
+from ceilometer.alarm.partition import coordination
 from ceilometer.service import prepare_service
+from ceilometer.openstack.common import importutils
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import network_utils
 from ceilometer.openstack.common import service as os_service
@@ -39,39 +43,35 @@ OPTS = [
                     ' be >= than configured pipeline interval for'
                     ' collection of underlying metrics.',
                deprecated_opts=[cfg.DeprecatedOpt(
-                   'threshold_evaluation_interval', group='alarm')])
+                   'threshold_evaluation_interval', group='alarm')]),
+    cfg.StrOpt('evaluation_service',
+               default='ceilometer.alarm.service.SingletonAlarmService',
+               help='Class to launch as alarm evaluation service'),
 ]
 
 cfg.CONF.register_opts(OPTS, group='alarm')
 cfg.CONF.import_opt('notifier_rpc_topic', 'ceilometer.alarm.rpc',
                     group='alarm')
+cfg.CONF.import_opt('partition_rpc_topic', 'ceilometer.alarm.rpc',
+                    group='alarm')
 
 LOG = log.getLogger(__name__)
 
 
-class SingletonAlarmService(os_service.Service):
+class AlarmService(object):
+
+    __metaclass__ = abc.ABCMeta
 
     EXTENSIONS_NAMESPACE = "ceilometer.alarm.evaluator"
 
-    def __init__(self):
-        super(SingletonAlarmService, self).__init__()
-        self.api_client = None
+    def _load_evaluators(self):
         self.evaluators = extension.ExtensionManager(
-            self.EXTENSIONS_NAMESPACE,
+            namespace=self.EXTENSIONS_NAMESPACE,
             invoke_on_load=True,
-            invoke_args=(rpc_alarm.RPCAlarmNotifier(),))
+            invoke_args=(rpc_alarm.RPCAlarmNotifier(),)
+        )
         self.supported_evaluators = [ext.name for ext in
                                      self.evaluators.extensions]
-
-    def start(self):
-        super(SingletonAlarmService, self).start()
-        interval = cfg.CONF.alarm.evaluation_interval
-        self.tg.add_timer(
-            interval,
-            self._evaluate_all_alarms,
-            0)
-        # Add a dummy thread to have wait() working
-        self.tg.add_timer(604800, lambda: None)
 
     @property
     def _client(self):
@@ -89,15 +89,15 @@ class SingletonAlarmService(os_service.Service):
             self.api_client = ceiloclient.get_client(2, **creds)
         return self.api_client
 
-    def _evaluate_all_alarms(self):
+    def _evaluate_assigned_alarms(self):
         try:
-            alarms = self._client.alarms.list()
+            alarms = self._assigned_alarms()
             LOG.info(_('initiating evaluation cycle on %d alarms') %
                      len(alarms))
             for alarm in alarms:
                 self._evaluate_alarm(alarm)
         except Exception:
-            LOG.exception(_('threshold evaluation cycle failed'))
+            LOG.exception(_('alarm evaluation cycle failed'))
 
     def _evaluate_alarm(self, alarm):
         """Evaluate the alarms assigned to this evaluator."""
@@ -113,13 +113,96 @@ class SingletonAlarmService(os_service.Service):
         LOG.debug(_('evaluating alarm %s') % alarm.alarm_id)
         self.evaluators[alarm.type].obj.evaluate(alarm)
 
+    @abc.abstractmethod
+    def _assigned_alarms(self):
+        pass
 
-def singleton_alarm():
+
+class SingletonAlarmService(AlarmService, os_service.Service):
+
+    def __init__(self):
+        super(SingletonAlarmService, self).__init__()
+        self._load_evaluators()
+        self.api_client = None
+
+    def start(self):
+        super(SingletonAlarmService, self).start()
+        if self.evaluators:
+            interval = cfg.CONF.alarm.evaluation_interval
+            self.tg.add_timer(
+                interval,
+                self._evaluate_assigned_alarms,
+                0)
+        # Add a dummy thread to have wait() working
+        self.tg.add_timer(604800, lambda: None)
+
+    def _assigned_alarms(self):
+        return self._client.alarms.list()
+
+
+def alarm_evaluator():
     prepare_service()
-    os_service.launch(SingletonAlarmService()).wait()
+    service = importutils.import_object(cfg.CONF.alarm.evaluation_service)
+    os_service.launch(service).wait()
 
 
 cfg.CONF.import_opt('host', 'ceilometer.service')
+
+
+class PartitionedAlarmService(AlarmService, rpc_service.Service):
+
+    def __init__(self):
+        super(PartitionedAlarmService, self).__init__(
+            cfg.CONF.host,
+            cfg.CONF.alarm.partition_rpc_topic,
+            self
+        )
+        self._load_evaluators()
+        self.api_client = None
+        self.partition_coordinator = coordination.PartitionCoordinator()
+
+    def initialize_service_hook(self, service):
+        LOG.debug('initialize_service_hooks')
+        self.conn.create_worker(
+            cfg.CONF.alarm.partition_rpc_topic,
+            rpc_dispatcher.RpcDispatcher([self]),
+            'ceilometer.alarm.' + cfg.CONF.alarm.partition_rpc_topic,
+        )
+
+    def start(self):
+        super(PartitionedAlarmService, self).start()
+        if self.evaluators:
+            eval_interval = cfg.CONF.alarm.evaluation_interval
+            self.tg.add_timer(
+                eval_interval / 4,
+                self.partition_coordinator.report_presence,
+                0)
+            self.tg.add_timer(
+                eval_interval / 2,
+                self.partition_coordinator.check_mastership,
+                eval_interval,
+                *[eval_interval, self._client])
+            self.tg.add_timer(
+                eval_interval,
+                self._evaluate_assigned_alarms,
+                eval_interval)
+        # Add a dummy thread to have wait() working
+        self.tg.add_timer(604800, lambda: None)
+
+    def _assigned_alarms(self):
+        return self.partition_coordinator.assigned_alarms(self._client)
+
+    def presence(self, context, data):
+        self.partition_coordinator.presence(data.get('uuid'),
+                                            data.get('priority'))
+
+    def assign(self, context, data):
+        self.partition_coordinator.assign(data.get('uuid'),
+                                          data.get('alarms'))
+
+    def allocate(self, context, data):
+        self.partition_coordinator.allocate(data.get('uuid'),
+                                            data.get('alarms'))
 
 
 class AlarmNotifierService(rpc_service.Service):
