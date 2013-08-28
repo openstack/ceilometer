@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-08-22 06:03+0000\n"
+"POT-Creation-Date: 2013-08-28 06:04+0000\n"
 "PO-Revision-Date: 2013-06-08 07:51+0000\n"
 "Last-Translator: daisy.ycguo <daisy.ycguo@gmail.com>\n"
 "Language-Team: Romanian "
@@ -42,110 +42,131 @@ msgstr ""
 msgid "Unable to notify for an alarm with no action"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:97
+#: ceilometer/alarm/threshold_evaluation.py:98
 #, python-format
 msgid "query stats from %(start)s to %(now)s"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:110
+#: ceilometer/alarm/threshold_evaluation.py:111
 #, python-format
 msgid "sanitize stats %s"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:114
+#: ceilometer/alarm/threshold_evaluation.py:115
 #, python-format
 msgid "pruned statistics to %d"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:119
+#: ceilometer/alarm/threshold_evaluation.py:120
 #, python-format
 msgid "stats query %s"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:125
+#: ceilometer/alarm/threshold_evaluation.py:126
 msgid "alarm stats retrieval failed"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:133
+#: ceilometer/alarm/threshold_evaluation.py:134
 #, python-format
 msgid "alarm %(id)s transitioning to %(state)s because %(reason)s"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:145
+#: ceilometer/alarm/threshold_evaluation.py:146
 msgid "alarm state update failed"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:153
+#: ceilometer/alarm/threshold_evaluation.py:154
 #, python-format
 msgid "%d datapoints are unknown"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:165
+#: ceilometer/alarm/threshold_evaluation.py:166
 #, python-format
 msgid ""
 "Transition to %(state)s due to %(count)d samples %(disposition)s "
 "threshold, most recent: %(last)s"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:169
+#: ceilometer/alarm/threshold_evaluation.py:170
 #, python-format
 msgid ""
 "Remaining as %(state)s due to %(count)d samples %(disposition)s "
 "threshold, most recent: %(last)s"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:206
+#: ceilometer/alarm/threshold_evaluation.py:207
 #, python-format
 msgid "initiating evaluation cycle on %d alarms"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:212
+#: ceilometer/alarm/threshold_evaluation.py:213
 #, python-format
 msgid "skipping alarm %s"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:214
+#: ceilometer/alarm/threshold_evaluation.py:215
 #, python-format
 msgid "evaluating alarm %s"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:232
+#: ceilometer/alarm/threshold_evaluation.py:233
 #, python-format
 msgid "comparing value %(value)s against threshold %(limit)s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:560
+#: ceilometer/api/controllers/v2.py:164
+#, python-format
+msgid "Failed to convert the metadata value %s automatically"
+msgstr ""
+
+#: ceilometer/api/controllers/v2.py:182
+#, python-format
+msgid ""
+"Failed to convert the metadata value %(value)s to the expected data type "
+"%(type)s."
+msgstr ""
+
+#: ceilometer/api/controllers/v2.py:187
+#, python-format
+msgid ""
+"The data type %s is not supported. The supported data type list is: "
+"integer, float, boolean and string."
+msgstr ""
+
+#: ceilometer/api/controllers/v2.py:192
+#, python-format
+msgid ""
+"Unexpected exception converting %(value)s to the expected data type "
+"%(type)s."
+msgstr ""
+
+#: ceilometer/api/controllers/v2.py:628
 msgid "Period must be positive."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:710
+#: ceilometer/api/controllers/v2.py:778
 msgid "Unknown resource"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:886
+#: ceilometer/api/controllers/v2.py:954
 msgid "Unknown alarm"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:961
+#: ceilometer/api/controllers/v2.py:1029
 msgid "Alarm with that name exists"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:970
+#: ceilometer/api/controllers/v2.py:1038
 msgid "Alarm incorrect"
 msgstr ""
 
-#: ceilometer/collector/service.py:87
+#: ceilometer/collector/service.py:88
 #, python-format
 msgid "UDP: Cannot decode data sent by %s"
 msgstr ""
 
-#: ceilometer/collector/service.py:97
+#: ceilometer/collector/service.py:98
 msgid "UDP: Unable to store meter"
-msgstr ""
-
-#: ceilometer/collector/service.py:245
-#, python-format
-msgid "Unable to store events: %s"
 msgstr ""
 
 #: ceilometer/compute/nova_notifier.py:84
@@ -420,6 +441,21 @@ msgstr ""
 #: ceilometer/openstack/common/sslutils.py:100
 #, python-format
 msgid "Invalid SSL version : %s"
+msgstr ""
+
+#: ceilometer/openstack/common/strutils.py:88
+#, python-format
+msgid "Unrecognized value '%(val)s', acceptable values are: %(acceptable)s"
+msgstr ""
+
+#: ceilometer/openstack/common/strutils.py:184
+#, python-format
+msgid "Invalid string format: %s"
+msgstr ""
+
+#: ceilometer/openstack/common/strutils.py:191
+#, python-format
+msgid "Unknown byte multiplier: %s"
 msgstr ""
 
 #: ceilometer/openstack/common/db/exception.py:44
@@ -933,6 +969,15 @@ msgstr ""
 msgid "Unable to send sample over UDP"
 msgstr ""
 
+#: ceilometer/storage/impl_db2.py:365 ceilometer/storage/impl_db2.py:433
+#: ceilometer/storage/impl_db2.py:573 ceilometer/storage/impl_hbase.py:307
+#: ceilometer/storage/impl_hbase.py:393
+#: ceilometer/storage/impl_sqlalchemy.py:298
+#: ceilometer/storage/impl_sqlalchemy.py:365
+#: ceilometer/storage/impl_sqlalchemy.py:600
+msgid "Pagination not implemented"
+msgstr ""
+
 #: ceilometer/transformer/conversions.py:67
 #, python-format
 msgid "scaling conversion transformer with source: %(source)s target: %(target)s:"
@@ -1010,5 +1055,8 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "dropping counter with no predecessor: %s"
+#~ msgstr ""
+
+#~ msgid "Unable to store events: %s"
 #~ msgstr ""
 
