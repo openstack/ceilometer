@@ -161,6 +161,11 @@ class Connection(base.Connection):
         """
         return []
 
+    def create_alarm(self, alarm):
+        """Create alarm.
+        """
+        return alarm
+
     def update_alarm(self, alarm):
         """update alarm
         """

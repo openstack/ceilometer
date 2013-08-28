@@ -23,7 +23,6 @@
 import calendar
 import copy
 import operator
-import uuid
 import weakref
 
 import bson.code
@@ -844,9 +843,6 @@ class Connection(base.Connection):
     def update_alarm(self, alarm):
         """update alarm
         """
-        if alarm.alarm_id is None:
-            # This is an insert, generate an id
-            alarm.alarm_id = str(uuid.uuid1())
         data = alarm.as_dict()
         data['matching_metadata'] = \
             self._encode_matching_metadata(data['matching_metadata'])
@@ -861,6 +857,8 @@ class Connection(base.Connection):
         stored_alarm['matching_metadata'] = \
             self._decode_matching_metadata(stored_alarm['matching_metadata'])
         return models.Alarm(**stored_alarm)
+
+    create_alarm = update_alarm
 
     def delete_alarm(self, alarm_id):
         """Delete a alarm

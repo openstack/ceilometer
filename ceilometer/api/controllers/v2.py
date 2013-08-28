@@ -34,6 +34,7 @@
 import ast
 import datetime
 import inspect
+import uuid
 import pecan
 from pecan import rest
 
@@ -1016,9 +1017,9 @@ class AlarmsController(rest.RestController):
         """Create a new alarm."""
         conn = pecan.request.storage_conn
 
+        data.alarm_id = str(uuid.uuid4())
         data.user_id = pecan.request.headers.get('X-User-Id')
         data.project_id = pecan.request.headers.get('X-Project-Id')
-        data.alarm_id = wsme.Unset
         data.state_timestamp = wsme.Unset
         data.timestamp = timeutils.utcnow()
 
@@ -1039,7 +1040,7 @@ class AlarmsController(rest.RestController):
             pecan.response.translatable_error = error
             raise wsme.exc.ClientSideError(error)
 
-        alarm = conn.update_alarm(alarm_in)
+        alarm = conn.create_alarm(alarm_in)
         return Alarm.from_db_model(alarm)
 
     @wsme_pecan.wsexpose([Alarm], [Query])

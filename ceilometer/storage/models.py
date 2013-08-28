@@ -277,12 +277,11 @@ class Alarm(Model):
     :param repeat_actions: Is the actions should be triggered on each
                            alarm evaluation.
     """
-    def __init__(self, name, counter_name,
+    def __init__(self, alarm_id, name, counter_name,
                  comparison_operator, threshold, statistic,
                  user_id, project_id,
                  evaluation_periods=1,
                  period=60,
-                 alarm_id=None,
                  enabled=True,
                  description='',
                  timestamp=None,

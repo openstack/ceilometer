@@ -194,7 +194,7 @@ class CompatibilityTest(test_storage_scenarios.DBTestBase,
 
         # Create the old format alarm with a dict instead of a
         # array for matching_metadata
-        alarm = models.Alarm('old-alert',
+        alarm = models.Alarm('0ld-4l3rt', 'old-alert',
                              'test.one', 'eq', 36, 'count',
                              'me', 'and-da-boys',
                              evaluation_periods=1,

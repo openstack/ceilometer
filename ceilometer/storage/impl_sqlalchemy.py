@@ -22,7 +22,6 @@ from __future__ import absolute_import
 import datetime
 import operator
 import os
-import uuid
 from sqlalchemy import func
 from sqlalchemy import desc
 from sqlalchemy.orm import aliased
@@ -571,13 +570,6 @@ class Connection(base.Connection):
                                 matching_metadata=row.matching_metadata,
                                 repeat_actions=row.repeat_actions)
 
-    @staticmethod
-    def _alarm_model_to_row(alarm, row=None):
-        if row is None:
-            row = Alarm(id=str(uuid.uuid1()))
-        row.update(alarm.as_dict())
-        return row
-
     def get_alarms(self, name=None, user=None,
                    project=None, enabled=True, alarm_id=None,
                    limit=None, marker_pairs=None,
@@ -614,24 +606,33 @@ class Connection(base.Connection):
 
         return (self._row_to_alarm_model(x) for x in query.all())
 
+    def create_alarm(self, alarm):
+        """Create an alarm.
+
+        :param alarm: The alarm to create.
+        """
+        session = sqlalchemy_session.get_session()
+        with session.begin():
+            session.merge(User(id=alarm.user_id))
+            session.merge(Project(id=alarm.project_id))
+            alarm_row = Alarm(id=alarm.alarm_id)
+            alarm_row.update(alarm.as_dict())
+            session.add(alarm_row)
+            session.flush()
+
+        return self._row_to_alarm_model(alarm_row)
+
     def update_alarm(self, alarm):
-        """update alarm
+        """Update an alarm.
 
         :param alarm: the new Alarm to update
         """
         session = sqlalchemy_session.get_session()
         with session.begin():
-            if alarm.alarm_id:
-                alarm_row = session.merge(Alarm(id=alarm.alarm_id))
-                self._alarm_model_to_row(alarm, alarm_row)
-            else:
-                session.merge(User(id=alarm.user_id))
-                session.merge(Project(id=alarm.project_id))
-
-                alarm_row = self._alarm_model_to_row(alarm)
-                session.add(alarm_row)
-
+            alarm_row = session.merge(Alarm(id=alarm.alarm_id))
+            alarm_row.update(alarm.as_dict())
             session.flush()
+
         return self._row_to_alarm_model(alarm_row)
 
     @staticmethod
