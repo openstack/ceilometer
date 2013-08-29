@@ -19,6 +19,7 @@
 """Test listing meters.
 """
 
+import base64
 import datetime
 import logging
 import testscenarios
@@ -410,3 +411,10 @@ class TestListMeters(FunctionalTest,
                                  }],
                              )
         self.assertEqual(data, [])
+
+    def test_list_meters_meter_id(self):
+        data = self.get_json('/meters')
+        for i in data:
+            expected = base64.encodestring('%s+%s' % (i['resource_id'],
+                                                      i['name']))
+            self.assertEqual(expected, i['meter_id'])

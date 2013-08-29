@@ -32,6 +32,7 @@
 # [DELETE] /meters/<meter> -- delete the meter and samples
 #
 import ast
+import base64
 import datetime
 import inspect
 import json
@@ -686,6 +687,15 @@ class Meter(_Base):
 
     user_id = wtypes.text
     "The ID of the user who last triggered an update to the resource"
+
+    meter_id = wtypes.text
+    "The unique identifier for the meter"
+
+    def __init__(self, **kwargs):
+        meter_id = base64.encodestring('%s+%s' % (kwargs['resource_id'],
+                                                  kwargs['name']))
+        kwargs['meter_id'] = meter_id
+        super(Meter, self).__init__(**kwargs)
 
     @classmethod
     def sample(cls):
