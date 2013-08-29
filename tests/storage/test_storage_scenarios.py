@@ -1059,12 +1059,16 @@ class StatisticsGroupByTest(DBTestBase,
         f = storage.SampleFilter(
             meter='instance',
         )
-        result = self.conn.get_meter_statistics(
-            f, groupby=['wtf'])
+        # NOTE(terriyu): The MongoDB get_meter_statistics() returns a list
+        # whereas the SQLAlchemy get_meter_statistics() returns a generator.
+        # You have to apply list() to the SQLAlchemy generator to get it to
+        # throw an error. The MongoDB get_meter_statistics() will throw an
+        # error before list() is called. By using lambda, we can cover both
+        # MongoDB and SQLAlchemy in a single test.
         self.assertRaises(
             NotImplementedError,
-            list,
-            result)
+            lambda: list(self.conn.get_meter_statistics(f, groupby=['wtf']))
+        )
 
     def test_group_by_metadata(self):
         pass
