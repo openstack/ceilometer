@@ -1071,6 +1071,8 @@ class StatisticsGroupByTest(DBTestBase,
         )
 
     def test_group_by_metadata(self):
+        # TODO(terriyu): test_group_by_metadata needs to be implemented.
+        # This test should check grouping by a single metadata field.
         pass
 
     def test_group_by_multiple_regular(self):
@@ -1136,9 +1138,16 @@ class StatisticsGroupByTest(DBTestBase,
                                                 'resource_id': 'resource-2'})
 
     def test_group_by_multiple_metadata(self):
+        # TODO(terriyu): test_group_by_multiple_metadata needs to be
+        # implemented.
+        # This test should check grouping by multiple metadata fields.
         pass
 
     def test_group_by_multiple_regular_metadata(self):
+        # TODO(terriyu): test_group_by_multiple_regular_metadata needs to be
+        # implemented.
+        # This test should check grouping by a combination of regular and
+        # metadata fields.
         pass
 
     def test_group_by_with_query_filter(self):
@@ -1184,6 +1193,10 @@ class StatisticsGroupByTest(DBTestBase,
                 self.assertEqual(r.avg, 4)
 
     def test_group_by_metadata_with_query_filter(self):
+        # TODO(terriyu): test_group_by_metadata_with_query_filter needs to be
+        # implemented.
+        # This test should check grouping by a metadata field in combination
+        # with a query filter.
         pass
 
     def test_group_by_with_query_filter_multiple(self):
@@ -1230,8 +1243,15 @@ class StatisticsGroupByTest(DBTestBase,
                 self.assertEqual(r.max, 4)
                 self.assertEqual(r.sum, 4)
                 self.assertEqual(r.avg, 4)
+            else:
+                self.assertNotEqual(r.groupby, {'project_id': 'project-2',
+                                                'resource_id': 'resource-1'})
 
     def test_group_by_metadata_with_query_filter_multiple(self):
+        # TODO(terriyu): test_group_by_metadata_with_query_filter_multiple
+        # needs to be implemented.
+        # This test should check grouping by multiple metadata fields in
+        # combination with a query filter.
         pass
 
     def test_group_by_with_period(self):
@@ -1329,6 +1349,10 @@ class StatisticsGroupByTest(DBTestBase,
                                      datetime.datetime(2013, 8, 1, 10, 11)])
 
     def test_group_by_metadata_with_period(self):
+        # TODO(terriyu): test_group_by_metadata_with_period needs to be
+        # implemented.
+        # This test should check grouping by metadata fields in combination
+        # with period grouping.
         pass
 
     def test_group_by_with_query_filter_and_period(self):
@@ -1411,6 +1435,10 @@ class StatisticsGroupByTest(DBTestBase,
                                      datetime.datetime(2013, 8, 1, 10, 11)])
 
     def test_group_by_metadata_with_query_filter_and_period(self):
+        # TODO(terriyu): test_group_by_metadata_with_query_filter_and_period
+        # needs to be implemented.
+        # This test should check grouping with metadata fields in combination
+        # with a query filter and period grouping.
         pass
 
 
