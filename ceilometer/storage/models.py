@@ -258,7 +258,7 @@ class Alarm(Model):
     :param description: User friendly description of the alarm
     :param enabled: Is the alarm enabled
     :param state: Alarm state (alarm/nodata/ok)
-    :param counter_name: The counter that the alarm is based on
+    :param meter_name: The counter that the alarm is based on
     :param comparison_operator: How to compare the samples and the threshold
     :param threshold: the value to compare to the samples
     :param statistic: the function from Statistic (min/max/avg/count)
@@ -277,7 +277,7 @@ class Alarm(Model):
     :param repeat_actions: Is the actions should be triggered on each
                            alarm evaluation.
     """
-    def __init__(self, alarm_id, name, counter_name,
+    def __init__(self, alarm_id, name, meter_name,
                  comparison_operator, threshold, statistic,
                  user_id, project_id,
                  evaluation_periods=1,
@@ -296,7 +296,7 @@ class Alarm(Model):
         if not description:
             # make a nice user friendly description by default
             description = 'Alarm when %s is %s a %s of %s over %s seconds' % (
-                counter_name, comparison_operator,
+                meter_name, comparison_operator,
                 statistic, threshold, period)
 
         Model.__init__(
@@ -306,7 +306,7 @@ class Alarm(Model):
             name=name,
             description=description,
             timestamp=timestamp,
-            counter_name=counter_name,
+            meter_name=meter_name,
             user_id=user_id,
             project_id=project_id,
             comparison_operator=comparison_operator,

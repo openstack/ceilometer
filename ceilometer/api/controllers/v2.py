@@ -834,8 +834,8 @@ class Alarm(_Base):
     description = wtypes.text
     "The description of the alarm"
 
-    counter_name = wtypes.text
-    "The name of counter"
+    meter_name = wtypes.text
+    "The name of meter"
 
     project_id = wtypes.text
     "The ID of the project or tenant that owns the alarm"
@@ -893,7 +893,7 @@ class Alarm(_Base):
         return cls(alarm_id=None,
                    name="SwiftObjectAlarm",
                    description="An alarm",
-                   counter_name="storage.objects",
+                   meter_name="storage.objects",
                    comparison_operator="gt",
                    threshold=200,
                    statistic="avg",

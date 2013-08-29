@@ -1594,7 +1594,7 @@ class AlarmTest(AlarmTestBase,
 
     def test_update_llu(self):
         llu = models.Alarm('llu', 'llu',
-                           'counter_name', 'lt', 34, 'max',
+                           'meter_name', 'lt', 34, 'max',
                            'bla', 'ffo')
         updated = self.conn.update_alarm(llu)
         updated.state = models.Alarm.ALARM_OK

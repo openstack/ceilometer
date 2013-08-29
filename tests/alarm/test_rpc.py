@@ -40,7 +40,7 @@ class TestRPCAlarmNotifier(base.TestCase):
         self.alarms = [
             AlarmClient(None, info={
                 'name': 'instance_running_hot',
-                'counter_name': 'cpu_util',
+                'meter_name': 'cpu_util',
                 'comparison_operator': 'gt',
                 'threshold': 80.0,
                 'evaluation_periods': 5,
@@ -56,7 +56,7 @@ class TestRPCAlarmNotifier(base.TestCase):
             }),
             AlarmClient(None, info={
                 'name': 'group_running_idle',
-                'counter_name': 'cpu_util',
+                'meter_name': 'cpu_util',
                 'comparison_operator': 'le',
                 'threshold': 10.0,
                 'statistic': 'max',

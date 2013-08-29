@@ -543,7 +543,7 @@ class Connection(base.Connection):
                                 name=row.name,
                                 description=row.description,
                                 timestamp=row.timestamp,
-                                counter_name=row.counter_name,
+                                meter_name=row.meter_name,
                                 user_id=row.user_id,
                                 project_id=row.project_id,
                                 comparison_operator=row.comparison_operator,

@@ -56,7 +56,7 @@ class TestAlarms(FunctionalTest,
                              'X-Project-Id': str(uuid.uuid4())}
         for alarm in [Alarm(name='name1',
                             alarm_id='a',
-                            counter_name='meter.test',
+                            meter_name='meter.test',
                             comparison_operator='gt', threshold=2.0,
                             statistic='avg',
                             repeat_actions=True,
@@ -64,14 +64,14 @@ class TestAlarms(FunctionalTest,
                             project_id=self.auth_headers['X-Project-Id']),
                       Alarm(name='name2',
                             alarm_id='b',
-                            counter_name='meter.mine',
+                            meter_name='meter.mine',
                             comparison_operator='gt', threshold=2.0,
                             statistic='avg',
                             user_id=self.auth_headers['X-User-Id'],
                             project_id=self.auth_headers['X-Project-Id']),
                       Alarm(name='name3',
                             alarm_id='c',
-                            counter_name='meter.test',
+                            meter_name='meter.test',
                             comparison_operator='gt', threshold=2.0,
                             statistic='avg',
                             user_id=self.auth_headers['X-User-Id'],
@@ -83,7 +83,7 @@ class TestAlarms(FunctionalTest,
         self.assertEqual(3, len(data))
         self.assertEqual(set(r['name'] for r in data),
                          set(['name1', 'name2', 'name3']))
-        self.assertEqual(set(r['counter_name'] for r in data),
+        self.assertEqual(set(r['meter_name'] for r in data),
                          set(['meter.test', 'meter.mine']))
 
     def test_get_alarm(self):
@@ -94,18 +94,18 @@ class TestAlarms(FunctionalTest,
         for a in alarms:
             print('%s: %s' % (a['name'], a['alarm_id']))
         self.assertEqual(alarms[0]['name'], 'name1')
-        self.assertEqual(alarms[0]['counter_name'], 'meter.test')
+        self.assertEqual(alarms[0]['meter_name'], 'meter.test')
 
         one = self.get_json('/alarms/%s' % alarms[0]['alarm_id'])
         self.assertEqual(one['name'], 'name1')
-        self.assertEqual(one['counter_name'], 'meter.test')
+        self.assertEqual(one['meter_name'], 'meter.test')
         self.assertEqual(one['alarm_id'], alarms[0]['alarm_id'])
         self.assertEqual(one['repeat_actions'], alarms[0]['repeat_actions'])
 
     def test_post_invalid_alarm(self):
         json = {
             'name': 'added_alarm',
-            'counter_name': 'ameter',
+            'meter_name': 'ameter',
             'comparison_operator': 'gt',
             'threshold': 2.0,
             'statistic': 'magic',
@@ -118,7 +118,7 @@ class TestAlarms(FunctionalTest,
     def test_post_alarm(self):
         json = {
             'name': 'added_alarm',
-            'counter_name': 'ameter',
+            'meter_name': 'ameter',
             'comparison_operator': 'gt',
             'threshold': 2.0,
             'statistic': 'avg',
@@ -218,7 +218,7 @@ class TestAlarms(FunctionalTest,
 
     def test_get_recorded_alarm_history_on_create(self):
         new_alarm = dict(name='new_alarm',
-                         counter_name='other_meter',
+                         meter_name='other_meter',
                          comparison_operator='le',
                          threshold=42.0,
                          statistic='max')

@@ -63,7 +63,7 @@ class TestSingletonAlarmService(base.TestCase):
     def test_evaluation_cycle(self):
         alarms = [
             models.Alarm(name='instance_running_hot',
-                         counter_name='cpu_util',
+                         meter_name='cpu_util',
                          comparison_operator='gt',
                          threshold=80.0,
                          evaluation_periods=5,
