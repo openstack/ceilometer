@@ -1523,20 +1523,20 @@ class CounterDataTypeTest(DBTestBase,
 
 class AlarmTestBase(DBTestBase):
     def add_some_alarms(self):
-        alarms = [models.Alarm('red-alert',
+        alarms = [models.Alarm('r3d', 'red-alert',
                                'test.one', 'eq', 36, 'count',
                                'me', 'and-da-boys',
                                evaluation_periods=1,
                                period=60,
                                alarm_actions=['http://nowhere/alarms'],
                                matching_metadata={'key': 'value'}),
-                  models.Alarm('orange-alert',
+                  models.Alarm('0r4ng3', 'orange-alert',
                                'test.fourty', 'gt', 75, 'avg',
                                'me', 'and-da-boys',
                                period=60,
                                alarm_actions=['http://nowhere/alarms'],
                                matching_metadata={'key2': 'value2'}),
-                  models.Alarm('yellow-alert',
+                  models.Alarm('y3ll0w', 'yellow-alert',
                                'test.five', 'lt', 10, 'min',
                                'me', 'and-da-boys',
                                alarm_actions=['http://nowhere/alarms'],
@@ -1544,7 +1544,7 @@ class AlarmTestBase(DBTestBase):
                                {'key2': 'value2',
                                 'user_metadata.key3': 'value3'})]
         for a in alarms:
-            self.conn.update_alarm(a)
+            self.conn.create_alarm(a)
 
 
 class AlarmTest(AlarmTestBase,
@@ -1589,7 +1589,7 @@ class AlarmTest(AlarmTestBase,
                          {'new': 'value', 'user_metadata.new2': 'value4'})
 
     def test_update_llu(self):
-        llu = models.Alarm('llu',
+        llu = models.Alarm('llu', 'llu',
                            'counter_name', 'lt', 34, 'max',
                            'bla', 'ffo')
         updated = self.conn.update_alarm(llu)

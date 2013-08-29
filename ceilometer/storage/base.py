@@ -189,6 +189,13 @@ class Connection(object):
         """
 
     @abc.abstractmethod
+    def create_alarm(self, alarm):
+        """Create an alarm. Returns the alarm as created.
+
+        :param alarm: The alarm to create.
+        """
+
+    @abc.abstractmethod
     def update_alarm(self, alarm):
         """update alarm
         """

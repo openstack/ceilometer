@@ -599,6 +599,11 @@ class Connection(base.Connection):
         """
         raise NotImplementedError('Alarms not implemented')
 
+    def create_alarm(self, alarm):
+        """update alarm
+        """
+        raise NotImplementedError('Alarms not implemented')
+
     def update_alarm(self, alarm):
         """update alarm
         """
