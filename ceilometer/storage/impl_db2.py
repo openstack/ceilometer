@@ -22,6 +22,7 @@
 """
 
 import copy
+import urlparse
 import weakref
 
 import bson.code
@@ -142,9 +143,15 @@ class ConnectionPool(object):
             if client:
                 return client
         LOG.info('connecting to DB2 on %s', url)
-        client = pymongo.MongoClient(
-            url,
-            safe=True)
+        url_parsed = urlparse.urlparse(url)
+        if url_parsed.path.startswith('/ceilometer_for_tox_testing_'):
+            #note(sileht): this is a workaround for running tests without reach
+            #the maximum allowed connection of mongod in gate
+            #this only work with pymongo >= 2.6, this is not in the
+            #requirements file because is not needed for normal use of mongo
+            client = pymongo.MongoClient(url, safe=True, max_pool_size=None)
+        else:
+            client = pymongo.MongoClient(url, safe=True)
         self._pool[url] = weakref.ref(client)
         return client
 

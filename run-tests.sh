@@ -26,7 +26,7 @@ MONGO_DATA=`mktemp -d /tmp/CEILO-MONGODB-XXXXX`
 trap "clean_exit" EXIT
 mkfifo ${MONGO_DATA}/out
 export PATH=${PATH:+$PATH:}/sbin:/usr/sbin
-mongod --maxConns 256 --nojournal --noprealloc --smallfiles --quiet --noauth --port 29000 --dbpath "${MONGO_DATA}" --bind_ip localhost &>${MONGO_DATA}/out &
+mongod --maxConns 32 --nojournal --noprealloc --smallfiles --quiet --noauth --port 29000 --dbpath "${MONGO_DATA}" --bind_ip localhost &>${MONGO_DATA}/out &
 MONGO_PID=$!
 # Wait for Mongo to start listening to connections
 while read line
@@ -36,5 +36,5 @@ done < ${MONGO_DATA}/out
 # Read the fifo for ever otherwise mongod would block
 # + that gives us the log on screen
 cat ${MONGO_DATA}/out > /dev/null &
-export CEILOMETER_TEST_MONGODB_URL="mongodb://localhost:29000/ceilometer"
+export CEILOMETER_TEST_MONGODB_URL="mongodb://localhost:29000/ceilometer_for_tox_testing"
 python setup.py testr --slowest --testr-args="$*" $COVERAGE_ARG
