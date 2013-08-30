@@ -23,7 +23,7 @@ import urlparse
 
 from oslo.config import cfg
 from sqlalchemy import Column, Integer, String, Table, ForeignKey, DateTime, \
-    Index
+    Index, UniqueConstraint
 from sqlalchemy import Float, Boolean, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref
@@ -104,6 +104,8 @@ Index('idx_sp', sourceassoc.c['source_id'], sourceassoc.c['project_id']),
 Index('idx_sr', sourceassoc.c['source_id'], sourceassoc.c['resource_id']),
 Index('idx_sm', sourceassoc.c['source_id'], sourceassoc.c['meter_id']),
 Index('ix_sourceassoc_source_id', sourceassoc.c['source_id'])
+UniqueConstraint(sourceassoc.c['meter_id'], sourceassoc.c['user_id'],
+                 name='uniq_sourceassoc0meter_id0user_id')
 
 
 class Source(Base):
