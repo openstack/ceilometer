@@ -30,6 +30,7 @@ from ceilometer import sample
 from ceilometer import storage
 from ceilometer.tests import db as tests_db
 from ceilometer.storage import models
+from ceilometer.storage.base import Pagination
 
 load_tests = testscenarios.load_tests_apply_scenarios
 
@@ -340,41 +341,40 @@ class ResourceTestPagination(DBTestBase,
                              tests_db.MixinTestsWithBackendScenarios):
 
     def test_get_resource_all_limit(self):
-        results = list(self.conn.get_resources(limit=8))
+        pagination = Pagination(limit=8)
+        results = list(self.conn.get_resources(pagination=pagination))
         self.assertEqual(len(results), 8)
 
-        results = list(self.conn.get_resources(limit=5))
+        pagination = Pagination(limit=5)
+        results = list(self.conn.get_resources(pagination=pagination))
         self.assertEqual(len(results), 5)
 
     def test_get_resources_all_marker(self):
-        marker_pairs = {'user_id': 'user-id-4',
-                        'project_id': 'project-id-4'}
-        results = list(self.conn.get_resources(marker_pairs=marker_pairs,
-                                               sort_key='user_id',
-                                               sort_dir='asc'))
+        pagination = Pagination(primary_sort_dir='asc', sort_keys=['user_id'],
+                                sort_dirs=['asc'],
+                                marker_value='resource-id-4')
+        results = list(self.conn.get_resources(pagination=pagination))
         self.assertEqual(len(results), 5)
 
     def test_get_resources_paginate(self):
-        marker_pairs = {'user_id': 'user-id-4'}
-        results = self.conn.get_resources(limit=3, marker_pairs=marker_pairs,
-                                          sort_key='user_id',
-                                          sort_dir='asc')
+        pagination = Pagination(limit=3, primary_sort_dir='asc',
+                                sort_keys=['user_id'], sort_dirs=['asc'],
+                                marker_value='resource-id-4')
+        results = self.conn.get_resources(pagination=pagination)
         self.assertEqual(['user-id-5', 'user-id-6', 'user-id-7'],
                          [i.user_id for i in results])
 
-        marker_pairs = {'user_id': 'user-id-4'}
-        results = list(self.conn.get_resources(limit=2,
-                                               marker_pairs=marker_pairs,
-                                               sort_key='user_id',
-                                               sort_dir='desc'))
+        pagination = Pagination(limit=2, primary_sort_dir='desc',
+                                sort_keys=['user_id'], sort_dirs=['asc'],
+                                marker_value='resource-id-4')
+        results = list(self.conn.get_resources(pagination=pagination))
         self.assertEqual(['user-id-3', 'user-id-2'],
                          [i.user_id for i in results])
 
-        marker_pairs = {'project_id': 'project-id-5'}
-        results = list(self.conn.get_resources(limit=3,
-                                               marker_pairs=marker_pairs,
-                                               sort_key='user_id',
-                                               sort_dir='asc'))
+        pagination = Pagination(limit=3, primary_sort_dir='asc',
+                                sort_keys=['user_id'], sort_dirs=['asc'],
+                                marker_value='resource-id-5')
+        results = list(self.conn.get_resources(pagination=pagination))
         self.assertEqual(['resource-id-6', 'resource-id-7', 'resource-id-8'],
                          [i.resource_id for i in results])
 
@@ -412,44 +412,48 @@ class MeterTestPagination(DBTestBase,
                           tests_db.MixinTestsWithBackendScenarios):
 
     def tet_get_meters_all_limit(self):
-        results = list(self.conn.get_meters(limit=8))
+        pagination = Pagination(limit=8)
+        results = list(self.conn.get_meters(pagination=pagination))
         self.assertEqual(len(results), 8)
 
-        results = list(self.conn.get_meters(limit=5))
+        pagination = Pagination(limit=5)
+        results = list(self.conn.get_meters(pagination=pagination))
         self.assertEqual(len(results), 5)
 
     def test_get_meters_all_marker(self):
-        marker_pairs = {'user_id': 'user-id-alternate'}
-        results = list(self.conn.get_meters(marker_pairs=marker_pairs,
-                                            sort_key='user_id',
-                                            sort_dir='desc'))
+        pagination = Pagination(limit=3, primary_sort_dir='desc',
+                                sort_keys=['user_id'], sort_dirs=['desc'],
+                                marker_value='resource-id-5')
+
+        results = list(self.conn.get_meters(pagination=pagination))
         self.assertEqual(len(results), 8)
 
     def test_get_meters_paginate(self):
-        marker_pairs = {'user_id': 'user-id-alternate'}
-        results = self.conn.get_meters(limit=3, marker_pairs=marker_pairs,
-                                       sort_key='user_id', sort_dir='desc')
+        pagination = Pagination(limit=3, primary_sort_dir='desc',
+                                sort_keys=['user_id'], sort_dirs=['desc'],
+                                marker_value='resource-id-5')
+        results = self.conn.get_meters(pagination=pagination)
         self.assertEqual(['user-id-8', 'user-id-7', 'user-id-6'],
                          [i.user_id for i in results])
 
-        marker_pairs = {'user_id': 'user-id-4'}
-        results = self.conn.get_meters(limit=3, marker_pairs=marker_pairs,
-                                       sort_key='user_id',
-                                       sort_dir='asc')
+        pagination = Pagination(limit=3, primary_sort_dir='asc',
+                                sort_keys=['user_id'], sort_dirs=['desc'],
+                                marker_value='resource-id-5')
+        results = self.conn.get_meters(pagination=pagination)
         self.assertEqual(['user-id-5', 'user-id-6', 'user-id-7'],
                          [i.user_id for i in results])
 
-        marker_pairs = {'user_id': 'user-id-4'}
-        results = list(self.conn.get_meters(limit=2,
-                                            marker_pairs=marker_pairs,
-                                            sort_key='user_id',
-                                            sort_dir='desc'))
+        pagination = Pagination(limit=2, primary_sort_dir='desc',
+                                sort_keys=['user_id'], sort_dirs=['desc'],
+                                marker_value='resource-id-5')
+        results = list(self.conn.get_meters(pagination=pagination))
         self.assertEqual(['user-id-3', 'user-id-2'],
                          [i.user_id for i in results])
 
-        marker_pairs = {'user_id': 'user-id'}
-        results = self.conn.get_meters(limit=3, marker_pairs=marker_pairs,
-                                       sort_key='user_id', sort_dir='desc')
+        pagination = Pagination(limit=3, primary_sort_dir='desc',
+                                sort_keys=['user_id'], sort_dirs=['desc'],
+                                marker_value='resource-id-5')
+        results = self.conn.get_meters(pagination=pagination)
         self.assertEqual([], [i.user_id for i in results])
 
 
@@ -1615,64 +1619,42 @@ class AlarmTestPagination(AlarmTestBase,
 
     def test_get_alarm_all_limit(self):
         self.add_some_alarms()
-        alarms = list(self.conn.get_alarms(limit=2))
+        pagination = Pagination(limit=2)
+        alarms = list(self.conn.get_alarms(pagination=pagination))
         self.assertEqual(len(alarms), 2)
 
-        alarms = list(self.conn.get_alarms(limit=1))
+        pagination = Pagination(limit=1)
+        alarms = list(self.conn.get_alarms(pagination=pagination))
         self.assertEqual(len(alarms), 1)
 
     def test_get_alarm_all_marker(self):
         self.add_some_alarms()
 
-        marker_pairs = {'name': 'orange-alert'}
-        alarms = list(self.conn.get_alarms(marker_pairs=marker_pairs,
-                                           sort_key='name',
-                                           sort_dir='desc'))
+        pagination = Pagination(marker_value='orange-alert')
+        alarms = list(self.conn.get_alarms(pagination=pagination))
         self.assertEqual(len(alarms), 0)
 
-        marker_pairs = {'name': 'red-alert'}
-        alarms = list(self.conn.get_alarms(marker_pairs=marker_pairs,
-                                           sort_key='name',
-                                           sort_dir='desc'))
+        pagination = Pagination(marker_value='red-alert')
+        alarms = list(self.conn.get_alarms(pagination=pagination))
         self.assertEqual(len(alarms), 1)
 
-        marker_pairs = {'name': 'yellow-alert'}
-        alarms = list(self.conn.get_alarms(marker_pairs=marker_pairs,
-                                           sort_key='name',
-                                           sort_dir='desc'))
-        self.assertEqual(len(alarms), 2)
-
-    def test_get_alarm_sort_marker(self):
-        self.add_some_alarms()
-
-        marker_pairs = {'name': 'orange-alert'}
-        alarms = list(self.conn.get_alarms(sort_key='counter_name',
-                                           sort_dir='desc',
-                                           marker_pairs=marker_pairs))
-        self.assertEqual(len(alarms), 1)
-
-        marker_pairs = {'name': 'yellow-alert'}
-        alarms = list(self.conn.get_alarms(sort_key='comparison_operator',
-                                           sort_dir='desc',
-                                           marker_pairs=marker_pairs))
+        pagination = Pagination(marker_value='yellow-alert')
+        alarms = list(self.conn.get_alarms(pagination=pagination))
         self.assertEqual(len(alarms), 2)
 
     def test_get_alarm_paginate(self):
 
         self.add_some_alarms()
 
-        marker_pairs = {'name': 'yellow-alert'}
-        page = list(self.conn.get_alarms(limit=4,
-                                         marker_pairs=marker_pairs,
-                                         sort_key='name', sort_dir='desc'))
+        pagination = Pagination(limit=4, marker_value='yellow-alert')
+        page = list(self.conn.get_alarms(pagination=pagination))
         self.assertEqual(['red-alert', 'orange-alert'], [i.name for i in page])
 
-        marker_pairs = {'name': 'orange-alert'}
-        page1 = list(self.conn.get_alarms(limit=2,
-                                          sort_key='comparison_operator',
-                                          sort_dir='desc',
-                                          marker_pairs=marker_pairs))
-        self.assertEqual(['red-alert'], [i.name for i in page1])
+        pagination = Pagination(limit=2, marker_value='orange-alert',
+                                primary_sort_dir='asc')
+        page1 = list(self.conn.get_alarms(pagination=pagination))
+        self.assertEqual(['red-alert', 'yellow-alert'],
+                         [i.name for i in page1])
 
 
 class EventTestBase(tests_db.TestBase,

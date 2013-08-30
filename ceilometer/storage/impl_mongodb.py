@@ -36,6 +36,7 @@ from ceilometer.openstack.common import log
 from ceilometer import storage
 from ceilometer.storage import base
 from ceilometer.storage import models
+from ceilometer.openstack.common.gettextutils import _
 
 cfg.CONF.import_opt('time_to_live', 'ceilometer.storage',
                     group="database")
@@ -560,8 +561,7 @@ class Connection(base.Connection):
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
                       end_timestamp=None, end_timestamp_op=None,
-                      metaquery={}, resource=None, limit=None,
-                      marker_pairs=None, sort_key=None, sort_dir=None):
+                      metaquery={}, resource=None, pagination=None):
         """Return an iterable of models.Resource instances
 
         :param user: Optional ID for user that owns the resource.
@@ -573,16 +573,10 @@ class Connection(base.Connection):
         :param end_timestamp_op: Optional end time operator, like lt, le.
         :param metaquery: Optional dict with metadata to match on.
         :param resource: Optional resource filter.
-        :param limit: Number of documents should be returned.
-        :param marker_pairs: Attribute-value pairs to identify the last item of
-                            the previous page.
-        :param sort_key: Attribute by which results be sorted.
-        :param sort_dir: Direction with which results be sorted(asc, desc).
+        :param pagination: Optional pagination query.
         """
-
-        if marker_pairs:
-            raise NotImplementedError(
-                "Cannot use marker pairs in resource listing, not implemented")
+        if pagination:
+            raise NotImplementedError(_('Pagination not implemented'))
 
         q = {}
         if user is not None:
@@ -611,15 +605,8 @@ class Connection(base.Connection):
             if ts_range:
                 q['timestamp'] = ts_range
 
-        sort_keys = base._handle_sort_key('resource', sort_key)
-        sort_instruction, query = self._build_paginate_query(None,
-                                                             sort_keys,
-                                                             sort_dir)
-        q.update(query)
-
         aggregate = self.db.meter.aggregate([
             {"$match": q},
-            {"$sort": dict(sort_instruction)},
             {"$group": {
                 "_id": "$resource_id",
                 "user_id": {"$first": "$user_id"},
@@ -635,10 +622,6 @@ class Connection(base.Connection):
         ])
 
         for result in aggregate['result']:
-            if limit is not None:
-                if limit == 0:
-                    break
-                limit -= 1
             yield models.Resource(
                 resource_id=result['_id'],
                 user_id=result['user_id'],
@@ -660,8 +643,7 @@ class Connection(base.Connection):
             )
 
     def get_meters(self, user=None, project=None, resource=None, source=None,
-                   metaquery={}, limit=None, marker_pairs=None, sort_key=None,
-                   sort_dir=None):
+                   metaquery={}, pagination=None):
         """Return an iterable of models.Meter instances
 
         :param user: Optional ID for user that owns the resource.
@@ -669,12 +651,11 @@ class Connection(base.Connection):
         :param resource: Optional resource filter.
         :param source: Optional source filter.
         :param metaquery: Optional dict with metadata to match on.
-        :param limit: Number of documents should be returned.
-        :param marker_pairs: Attribute-value pairs to identify the last item of
-                             the previous page.
-        :param sort_key: Attribute by which results be sorted.
-        :param sort_dir: Direction with which results be sorted(asc, desc).
+        :param pagination: Optional pagination query.
         """
+        if pagination:
+            raise NotImplementedError(_('Pagination not implemented'))
+
         q = {}
         if user is not None:
             q['user_id'] = user
@@ -686,12 +667,7 @@ class Connection(base.Connection):
             q['source'] = source
         q.update(metaquery)
 
-        marker = self._get_marker(self.db.resource, marker_pairs=marker_pairs)
-        sort_keys = base._handle_sort_key('meter', sort_key)
-
-        for r in self.paginate_query(q, self.db.resource, limit=limit,
-                                     marker=marker,
-                                     sort_keys=sort_keys, sort_dir=sort_dir):
+        for r in self.db.resource.find(q):
             for r_meter in r['meter']:
                 yield models.Meter(
                     name=r_meter['counter_name'],
@@ -801,20 +777,18 @@ class Connection(base.Connection):
         return matching_metadata
 
     def get_alarms(self, name=None, user=None,
-                   project=None, enabled=True, alarm_id=None, limit=None,
-                   marker_pairs=None, sort_key=None, sort_dir=None):
+                   project=None, enabled=True, alarm_id=None, pagination=None):
         """Yields a lists of alarms that match filters
         :param name: The Alarm name.
         :param user: Optional ID for user that owns the resource.
         :param project: Optional ID for project that owns the resource.
         :param enabled: Optional boolean to list disable alarm.
         :param alarm_id: Optional alarm_id to return one alarm.
-        :param limit: Number of rows should be returned.
-        :param marker_pairs: Attribute-value pairs to identify the last item of
-                            the previous page.
-        :param sort_key: Attribute by which results be sorted.
-        :param sort_dir: Direction with which results be sorted(asc, desc).
+        :param pagination: Optional pagination query.
         """
+        if pagination:
+            raise NotImplementedError(_('Pagination not implemented'))
+
         q = {}
         if user is not None:
             q['user_id'] = user
@@ -827,12 +801,7 @@ class Connection(base.Connection):
         if alarm_id is not None:
             q['alarm_id'] = alarm_id
 
-        marker = self._get_marker(self.db.alarm, marker_pairs=marker_pairs)
-        sort_keys = base._handle_sort_key('alarm', sort_key)
-
-        for alarm in self.paginate_query(q, self.db.alarm, limit=limit,
-                                         marker=marker, sort_keys=sort_keys,
-                                         sort_dir=sort_dir):
+        for alarm in self.db.alarm.find(q):
             a = {}
             a.update(alarm)
             del a['_id']
