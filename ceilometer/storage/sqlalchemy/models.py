@@ -157,6 +157,7 @@ class Resource(Base):
     __table_args__ = (
         Index('ix_resource_project_id', 'project_id'),
         Index('ix_resource_user_id', 'user_id'),
+        Index('resource_user_id_project_id_key', 'user_id', 'project_id')
     )
     id = Column(String(255), primary_key=True)
     sources = relationship("Source", secondary=lambda: sourceassoc)
