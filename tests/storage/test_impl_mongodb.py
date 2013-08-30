@@ -26,14 +26,12 @@
 
 import copy
 import datetime
-import uuid
 
 from oslo.config import cfg
 
 from ceilometer.publisher import rpc
 from ceilometer import sample
 from ceilometer.storage import impl_mongodb
-from ceilometer.storage import models
 from ceilometer.storage.base import NoResultFound
 from ceilometer.storage.base import MultipleResultsFound
 from ceilometer.tests import db as tests_db
@@ -194,23 +192,74 @@ class CompatibilityTest(test_storage_scenarios.DBTestBase,
 
         # Create the old format alarm with a dict instead of a
         # array for matching_metadata
-        alarm = models.Alarm('0ld-4l3rt', 'old-alert',
-                             'test.one', 'eq', 36, 'count',
-                             'me', 'and-da-boys',
-                             evaluation_periods=1,
-                             period=60,
-                             alarm_actions=['http://nowhere/alarms'],
-                             matching_metadata={'key': 'value'})
-        alarm.alarm_id = str(uuid.uuid1())
-        data = alarm.as_dict()
+        alarm = dict(alarm_id='0ld-4l3rt',
+                     enabled=True,
+                     name='old-alert',
+                     description='old-alert',
+                     timestamp=None,
+                     meter_name='cpu',
+                     user_id='me',
+                     project_id='and-da-boys',
+                     comparison_operator='lt',
+                     threshold=36,
+                     statistic='count',
+                     evaluation_periods=1,
+                     period=60,
+                     state="insufficient data",
+                     state_timestamp=None,
+                     ok_actions=[],
+                     alarm_actions=['http://nowhere/alarms'],
+                     insufficient_data_actions=[],
+                     repeat_actions=False,
+                     matching_metadata={'key': 'value'})
+
         self.conn.db.alarm.update(
-            {'alarm_id': alarm.alarm_id},
-            {'$set': data},
+            {'alarm_id': alarm['alarm_id']},
+            {'$set': alarm},
             upsert=True)
 
-    def test_alarm_get_old_matching_metadata_format(self):
+        alarm['alarm_id'] = 'other-kind-of-0ld-4l3rt'
+        alarm['name'] = 'other-old-alaert'
+        alarm['matching_metadata'] = [{'key': 'key1', 'value': 'value1'},
+                                      {'key': 'key2', 'value': 'value2'}]
+        self.conn.db.alarm.update(
+            {'alarm_id': alarm['alarm_id']},
+            {'$set': alarm},
+            upsert=True)
+
+    def test_alarm_get_old_format_matching_metadata_dict(self):
         old = list(self.conn.get_alarms(name='old-alert'))[0]
-        self.assertEqual(old.matching_metadata, {'key': 'value'})
+        self.assertEqual(old.type, 'threshold')
+        self.assertEqual(old.rule['query'],
+                         [{'field': 'key',
+                           'op': 'eq',
+                           'value': 'value',
+                           'type': 'string'}])
+        self.assertEqual(old.rule['period'], 60)
+        self.assertEqual(old.rule['meter_name'], 'cpu')
+        self.assertEqual(old.rule['evaluation_periods'], 1)
+        self.assertEqual(old.rule['statistic'], 'count')
+        self.assertEqual(old.rule['comparison_operator'], 'lt')
+        self.assertEqual(old.rule['threshold'], 36)
+
+    def test_alarm_get_old_format_matching_metadata_array(self):
+        old = list(self.conn.get_alarms(name='other-old-alaert'))[0]
+        self.assertEqual(old.type, 'threshold')
+        self.assertEqual(sorted(old.rule['query']),
+                         sorted([{'field': 'key1',
+                                  'op': 'eq',
+                                  'value': 'value1',
+                                  'type': 'string'},
+                                 {'field': 'key2',
+                                  'op': 'eq',
+                                  'value': 'value2',
+                                  'type': 'string'}]))
+        self.assertEqual(old.rule['meter_name'], 'cpu')
+        self.assertEqual(old.rule['period'], 60)
+        self.assertEqual(old.rule['evaluation_periods'], 1)
+        self.assertEqual(old.rule['statistic'], 'count')
+        self.assertEqual(old.rule['comparison_operator'], 'lt')
+        self.assertEqual(old.rule['threshold'], 36)
 
     def test_counter_unit(self):
         meters = list(self.conn.get_meters())
@@ -224,7 +273,7 @@ class AlarmTestPagination(test_storage_scenarios.AlarmTestBase,
         marker_pairs = {'name': 'red-alert'}
         ret = impl_mongodb.Connection._get_marker(self.conn.db.alarm,
                                                   marker_pairs=marker_pairs)
-        self.assertEqual(ret['meter_name'], 'test.one')
+        self.assertEqual(ret['rule']['meter_name'], 'test.one')
 
     def test_alarm_get_marker_None(self):
         self.add_some_alarms()
@@ -232,7 +281,8 @@ class AlarmTestPagination(test_storage_scenarios.AlarmTestBase,
             marker_pairs = {'name': 'user-id-foo'}
             ret = impl_mongodb.Connection._get_marker(self.conn.db.alarm,
                                                       marker_pairs)
-            self.assertEqual(ret['meter_name'], 'meter_name-foo')
+            self.assertEqual(ret['rule']['meter_name'],
+                             'meter_name-foo')
         except NoResultFound:
             self.assertTrue(True)
 
@@ -242,6 +292,7 @@ class AlarmTestPagination(test_storage_scenarios.AlarmTestBase,
             marker_pairs = {'user_id': 'me'}
             ret = impl_mongodb.Connection._get_marker(self.conn.db.alarm,
                                                       marker_pairs)
-            self.assertEqual(ret['meter_name'], 'counter-name-foo')
+            self.assertEqual(ret['rule']['meter_name'],
+                             'counter-name-foo')
         except MultipleResultsFound:
             self.assertTrue(True)

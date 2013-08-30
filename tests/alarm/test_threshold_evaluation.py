@@ -36,29 +36,61 @@ class TestEvaluate(base.TestCase):
         self.notifier = mock.MagicMock()
         self.alarms = [
             models.Alarm(name='instance_running_hot',
-                         meter_name='cpu_util',
-                         comparison_operator='gt',
-                         threshold=80.0,
-                         evaluation_periods=5,
-                         statistic='avg',
+                         description='instance_running_hot',
+                         type='threshold',
+                         enabled=True,
                          user_id='foobar',
                          project_id='snafu',
-                         period=60,
                          alarm_id=str(uuid.uuid4()),
-                         matching_metadata={'resource_id':
-                                            'my_instance'}),
+                         state='insufficient data',
+                         state_timestamp=None,
+                         timestamp=None,
+                         insufficient_data_actions=[],
+                         ok_actions=[],
+                         alarm_actions=[],
+                         repeat_actions=False,
+                         rule=dict(
+                             comparison_operator='gt',
+                             threshold=80.0,
+                             evaluation_periods=5,
+                             statistic='avg',
+                             period=60,
+                             meter_name='cpu_util',
+                             query=[{'field': 'meter',
+                                     'op': 'eq',
+                                     'value': 'cpu_util'},
+                                    {'field': 'resource_id',
+                                     'op': 'eq',
+                                     'value': 'my_instance'}])
+                         ),
             models.Alarm(name='group_running_idle',
-                         meter_name='cpu_util',
-                         comparison_operator='le',
-                         threshold=10.0,
-                         statistic='max',
-                         evaluation_periods=4,
+                         description='group_running_idle',
+                         type='threshold',
+                         enabled=True,
                          user_id='foobar',
                          project_id='snafu',
-                         period=300,
+                         state='insufficient data',
+                         state_timestamp=None,
+                         timestamp=None,
+                         insufficient_data_actions=[],
+                         ok_actions=[],
+                         alarm_actions=[],
+                         repeat_actions=False,
                          alarm_id=str(uuid.uuid4()),
-                         matching_metadata={'metadata.user_metadata.AS':
-                                            'my_group'}),
+                         rule=dict(
+                             comparison_operator='le',
+                             threshold=10.0,
+                             evaluation_periods=4,
+                             statistic='max',
+                             period=300,
+                             meter_name='cpu_util',
+                             query=[{'field': 'meter',
+                                     'op': 'eq',
+                                     'value': 'cpu_util'},
+                                    {'field': 'metadata.user_metadata.AS',
+                                     'op': 'eq',
+                                     'value': 'my_group'}])
+                         ),
         ]
         self.evaluator = threshold_evaluation.Evaluator(self.notifier)
         self.evaluator.assign_alarms(self.alarms)
@@ -83,9 +115,9 @@ class TestEvaluate(base.TestCase):
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
             broken = exc.CommunicationError(message='broken')
-            avgs = [self._get_stat('avg', self.alarms[0].threshold - v)
+            avgs = [self._get_stat('avg', self.alarms[0].rule['threshold'] - v)
                     for v in xrange(5)]
-            maxs = [self._get_stat('max', self.alarms[1].threshold + v)
+            maxs = [self._get_stat('max', self.alarms[1].rule['threshold'] + v)
                     for v in xrange(1, 4)]
             self.api_client.statistics.list.side_effect = [broken,
                                                            broken,
@@ -110,7 +142,7 @@ class TestEvaluate(base.TestCase):
             expected = [mock.call(alarm,
                                   'ok',
                                   ('%d datapoints are unknown' %
-                                   alarm.evaluation_periods))
+                                   alarm.rule['evaluation_periods']))
                         for alarm in self.alarms]
             self.assertEqual(self.notifier.notify.call_args_list, expected)
 
@@ -137,9 +169,9 @@ class TestEvaluate(base.TestCase):
         self._set_all_alarms('ok')
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
-            avgs = [self._get_stat('avg', self.alarms[0].threshold + v)
+            avgs = [self._get_stat('avg', self.alarms[0].rule['threshold'] + v)
                     for v in xrange(1, 6)]
-            maxs = [self._get_stat('max', self.alarms[1].threshold - v)
+            maxs = [self._get_stat('max', self.alarms[1].rule['threshold'] - v)
                     for v in xrange(4)]
             self.api_client.statistics.list.side_effect = [avgs, maxs]
             self.evaluator.evaluate()
@@ -160,9 +192,9 @@ class TestEvaluate(base.TestCase):
         self._set_all_alarms('alarm')
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
-            avgs = [self._get_stat('avg', self.alarms[0].threshold - v)
+            avgs = [self._get_stat('avg', self.alarms[0].rule['threshold'] - v)
                     for v in xrange(5)]
-            maxs = [self._get_stat('max', self.alarms[1].threshold + v)
+            maxs = [self._get_stat('max', self.alarms[1].rule['threshold'] + v)
                     for v in xrange(1, 5)]
             self.api_client.statistics.list.side_effect = [avgs, maxs]
             self.evaluator.evaluate()
@@ -183,9 +215,9 @@ class TestEvaluate(base.TestCase):
         self._set_all_alarms('ok')
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
-            avgs = [self._get_stat('avg', self.alarms[0].threshold + v)
+            avgs = [self._get_stat('avg', self.alarms[0].rule['threshold'] + v)
                     for v in xrange(5)]
-            maxs = [self._get_stat('max', self.alarms[1].threshold - v)
+            maxs = [self._get_stat('max', self.alarms[1].rule['threshold'] - v)
                     for v in xrange(-1, 3)]
             self.api_client.statistics.list.side_effect = [avgs, maxs]
             self.evaluator.evaluate()
@@ -199,9 +231,9 @@ class TestEvaluate(base.TestCase):
         self.alarms[1].repeat_actions = True
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
-            avgs = [self._get_stat('avg', self.alarms[0].threshold + v)
+            avgs = [self._get_stat('avg', self.alarms[0].rule['threshold'] + v)
                     for v in xrange(5)]
-            maxs = [self._get_stat('max', self.alarms[1].threshold - v)
+            maxs = [self._get_stat('max', self.alarms[1].rule['threshold'] - v)
                     for v in xrange(-1, 3)]
             self.api_client.statistics.list.side_effect = [avgs, maxs]
             self.evaluator.evaluate()
@@ -218,9 +250,9 @@ class TestEvaluate(base.TestCase):
         self.alarms[1].repeat_actions = True
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
-            avgs = [self._get_stat('avg', self.alarms[0].threshold + v)
+            avgs = [self._get_stat('avg', self.alarms[0].rule['threshold'] + v)
                     for v in xrange(1, 6)]
-            maxs = [self._get_stat('max', self.alarms[1].threshold - v)
+            maxs = [self._get_stat('max', self.alarms[1].rule['threshold'] - v)
                     for v in xrange(4)]
             self.api_client.statistics.list.side_effect = [avgs, maxs]
             self.evaluator.evaluate()
@@ -238,9 +270,9 @@ class TestEvaluate(base.TestCase):
         self.alarms[1].repeat_actions = True
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
-            avgs = [self._get_stat('avg', self.alarms[0].threshold + v)
+            avgs = [self._get_stat('avg', self.alarms[0].rule['threshold'] + v)
                     for v in xrange(1, 6)]
-            maxs = [self._get_stat('max', self.alarms[1].threshold - v)
+            maxs = [self._get_stat('max', self.alarms[1].rule['threshold'] - v)
                     for v in xrange(4)]
             self.api_client.statistics.list.side_effect = [avgs, maxs]
             self.evaluator.evaluate()
@@ -261,9 +293,9 @@ class TestEvaluate(base.TestCase):
         self._set_all_alarms('insufficient data')
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
-            avgs = [self._get_stat('avg', self.alarms[0].threshold + v)
+            avgs = [self._get_stat('avg', self.alarms[0].rule['threshold'] + v)
                     for v in xrange(1, 6)]
-            maxs = [self._get_stat('max', self.alarms[1].threshold - v)
+            maxs = [self._get_stat('max', self.alarms[1].rule['threshold'] - v)
                     for v in xrange(4)]
             self.api_client.statistics.list.side_effect = [avgs, maxs]
             self.evaluator.evaluate()

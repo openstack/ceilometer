@@ -1852,26 +1852,87 @@ class CounterDataTypeTest(DBTestBase,
 
 class AlarmTestBase(DBTestBase):
     def add_some_alarms(self):
-        alarms = [models.Alarm('r3d', 'red-alert',
-                               'test.one', 'eq', 36, 'count',
-                               'me', 'and-da-boys',
-                               evaluation_periods=1,
-                               period=60,
+        alarms = [models.Alarm(alarm_id='r3d',
+                               enabled=True,
+                               type='threshold',
+                               name='red-alert',
+                               description='my red-alert',
+                               timestamp=None,
+                               user_id='me',
+                               project_id='and-da-boys',
+                               state="insufficient data",
+                               state_timestamp=None,
+                               ok_actions=[],
                                alarm_actions=['http://nowhere/alarms'],
-                               matching_metadata={'key': 'value'}),
-                  models.Alarm('0r4ng3', 'orange-alert',
-                               'test.fourty', 'gt', 75, 'avg',
-                               'me', 'and-da-boys',
-                               period=60,
+                               insufficient_data_actions=[],
+                               repeat_actions=False,
+                               rule=dict(comparison_operator='eq',
+                                         threshold=36,
+                                         statistic='count',
+                                         evaluation_periods=1,
+                                         period=60,
+                                         meter_name='test.one',
+                                         query=[{'field': 'key',
+                                                 'op': 'eq',
+                                                 'value': 'value',
+                                                 'type': 'string'}]),
+                               ),
+                  models.Alarm(alarm_id='0r4ng3',
+                               enabled=True,
+                               type='threshold',
+                               name='orange-alert',
+                               description='a orange',
+                               timestamp=None,
+                               user_id='me',
+                               project_id='and-da-boys',
+                               state="insufficient data",
+                               state_timestamp=None,
+                               ok_actions=[],
                                alarm_actions=['http://nowhere/alarms'],
-                               matching_metadata={'key2': 'value2'}),
-                  models.Alarm('y3ll0w', 'yellow-alert',
-                               'test.five', 'lt', 10, 'min',
-                               'me', 'and-da-boys',
+                               insufficient_data_actions=[],
+                               repeat_actions=False,
+                               rule=dict(comparison_operator='gt',
+                                         threshold=75,
+                                         statistic='avg',
+                                         evaluation_periods=1,
+                                         period=60,
+                                         meter_name='test.fourty',
+                                         query=[{'field': 'key2',
+                                                 'op': 'eq',
+                                                 'value': 'value2',
+                                                 'type': 'string'}]),
+                               ),
+                  models.Alarm(alarm_id='y3ll0w',
+                               enabled=True,
+                               type='threshold',
+                               name='yellow-alert',
+                               description='yellow',
+                               timestamp=None,
+                               user_id='me',
+                               project_id='and-da-boys',
+                               state="insufficient data",
+                               state_timestamp=None,
+                               ok_actions=[],
                                alarm_actions=['http://nowhere/alarms'],
-                               matching_metadata=
-                               {'key2': 'value2',
-                                'user_metadata.key3': 'value3'})]
+                               insufficient_data_actions=[],
+                               repeat_actions=False,
+                               rule=dict(comparison_operator='lt',
+                                         threshold=10,
+                                         statistic='min',
+                                         evaluation_periods=1,
+                                         period=60,
+                                         meter_name='test.five',
+                                         query=[{'field': 'key2',
+                                                 'op': 'eq',
+                                                 'value': 'value2',
+                                                 'type': 'string'},
+                                                {'field':
+                                                 'user_metadata.key3',
+                                                 'op': 'eq',
+                                                 'value': 'value3',
+                                                 'type': 'string'}]),
+                               )]
+
         for a in alarms:
             self.conn.create_alarm(a)
 
@@ -1887,40 +1948,50 @@ class AlarmTest(AlarmTestBase,
         self.add_some_alarms()
         alarms = list(self.conn.get_alarms())
         self.assertEqual(len(alarms), 3)
-
-    def test_defaults(self):
-        self.add_some_alarms()
-        yellow = list(self.conn.get_alarms(name='yellow-alert'))[0]
-
-        self.assertEqual(yellow.evaluation_periods, 1)
-        self.assertEqual(yellow.period, 60)
-        self.assertEqual(yellow.enabled, True)
-        self.assertEqual(yellow.description,
-                         'Alarm when test.five is lt '
-                         'a min of 10 over 60 seconds')
-        self.assertEqual(yellow.state, models.Alarm.ALARM_INSUFFICIENT_DATA)
-        self.assertEqual(yellow.ok_actions, [])
-        self.assertEqual(yellow.insufficient_data_actions, [])
-        self.assertEqual(yellow.matching_metadata,
-                         {'key2': 'value2', 'user_metadata.key3': 'value3'})
+        self.assertEqual(alarms[0].rule['meter_name'], 'test.one')
+        self.assertEqual(alarms[1].rule['meter_name'], 'test.fourty')
+        self.assertEqual(alarms[2].rule['meter_name'], 'test.five')
 
     def test_update(self):
         self.add_some_alarms()
         orange = list(self.conn.get_alarms(name='orange-alert'))[0]
         orange.enabled = False
         orange.state = models.Alarm.ALARM_INSUFFICIENT_DATA
-        orange.matching_metadata = {'new': 'value',
-                                    'user_metadata.new2': 'value4'}
+        query = [{'field': 'metadata.group',
+                  'op': 'eq',
+                  'value': 'test.updated',
+                  'type': 'string'}]
+        orange.rule['query'] = query
+        orange.rule['meter_name'] = 'new_meter_name'
         updated = self.conn.update_alarm(orange)
         self.assertEqual(updated.enabled, False)
         self.assertEqual(updated.state, models.Alarm.ALARM_INSUFFICIENT_DATA)
-        self.assertEqual(updated.matching_metadata,
-                         {'new': 'value', 'user_metadata.new2': 'value4'})
+        self.assertEqual(updated.rule['query'], query)
+        self.assertEqual(updated.rule['meter_name'], 'new_meter_name')
 
     def test_update_llu(self):
-        llu = models.Alarm('llu', 'llu',
-                           'meter_name', 'lt', 34, 'max',
-                           'bla', 'ffo')
+        llu = models.Alarm(alarm_id='llu',
+                           enabled=True,
+                           type='threshold',
+                           name='llu',
+                           description='llu',
+                           timestamp=None,
+                           user_id='bla',
+                           project_id='ffo',
+                           state="insufficient data",
+                           state_timestamp=None,
+                           ok_actions=[],
+                           alarm_actions=[],
+                           insufficient_data_actions=[],
+                           repeat_actions=False,
+                           rule=dict(comparison_operator='lt',
+                                     threshold=34,
+                                     statistic='max',
+                                     evaluation_periods=1,
+                                     period=60,
+                                     meter_name='llt',
+                                     query=[])
+                           )
         updated = self.conn.update_alarm(llu)
         updated.state = models.Alarm.ALARM_OK
         updated.description = ':)'

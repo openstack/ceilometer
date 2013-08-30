@@ -175,23 +175,16 @@ class Alarm(Base):
     __table_args__ = (
         Index('ix_alarm_user_id', 'user_id'),
         Index('ix_alarm_project_id', 'project_id'),
-        Index('ix_alarm_meter_name', 'meter_name'),
     )
     id = Column(String(255), primary_key=True)
     enabled = Column(Boolean)
     name = Column(Text)
+    type = Column(String(50))
     description = Column(Text)
     timestamp = Column(DateTime, default=timeutils.utcnow)
-    meter_name = Column(String(255))
 
     user_id = Column(String(255), ForeignKey('user.id'))
     project_id = Column(String(255), ForeignKey('project.id'))
-
-    comparison_operator = Column(String(2))
-    threshold = Column(Float)
-    statistic = Column(String(255))
-    evaluation_periods = Column(Integer)
-    period = Column(Integer)
 
     state = Column(String(255))
     state_timestamp = Column(DateTime, default=timeutils.utcnow)
@@ -201,7 +194,7 @@ class Alarm(Base):
     insufficient_data_actions = Column(JSONEncodedDict)
     repeat_actions = Column(Boolean)
 
-    matching_metadata = Column(JSONEncodedDict)
+    rule = Column(JSONEncodedDict)
 
 
 class AlarmChange(Base):

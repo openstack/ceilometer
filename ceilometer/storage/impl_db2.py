@@ -615,14 +615,55 @@ class Connection(base.Connection):
                 new_matching_metadata[elem['key']] = elem['value']
             return new_matching_metadata
 
-    @staticmethod
-    def _encode_matching_metadata(matching_metadata):
-        if matching_metadata:
-            new_matching_metadata = []
-            for k, v in matching_metadata.iteritems():
-                new_matching_metadata.append({'key': k, 'value': v})
-            return new_matching_metadata
-        return matching_metadata
+    @classmethod
+    def _ensure_encapsulated_rule_format(cls, alarm):
+        """This ensure the alarm returned by the storage have the correct
+        format. The previous format looks like:
+        {
+            'alarm_id': '0ld-4l3rt',
+            'enabled': True,
+            'name': 'old-alert',
+            'description': 'old-alert',
+            'timestamp': None,
+            'meter_name': 'cpu',
+            'user_id': 'me',
+            'project_id': 'and-da-boys',
+            'comparison_operator': 'lt',
+            'threshold': 36,
+            'statistic': 'count',
+            'evaluation_periods': 1,
+            'period': 60,
+            'state': "insufficient data",
+            'state_timestamp': None,
+            'ok_actions': [],
+            'alarm_actions': ['http://nowhere/alarms'],
+            'insufficient_data_actions': [],
+            'repeat_actions': False,
+            'matching_metadata': {'key': 'value'}
+            # or 'matching_metadata': [{'key': 'key', 'value': 'value'}]
+        }
+        """
+
+        if isinstance(alarm.get('rule'), dict):
+            return
+
+        alarm['type'] = 'threshold'
+        alarm['rule'] = {}
+        alarm['matching_metadata'] = cls._decode_matching_metadata(
+            alarm['matching_metadata'])
+        for field in ['period', 'evaluation_period', 'threshold',
+                      'statistic', 'comparison_operator', 'meter_name']:
+            if field in alarm:
+                alarm['rule'][field] = alarm[field]
+                del alarm[field]
+
+        query = []
+        for key in alarm['matching_metadata']:
+            query.append({'field': key,
+                          'op': 'eq',
+                          'value': alarm['matching_metadata'][key]})
+        del alarm['matching_metadata']
+        alarm['rule']['query'] = query
 
     def get_alarms(self, name=None, user=None,
                    project=None, enabled=True, alarm_id=None, pagination=None):
@@ -655,17 +696,13 @@ class Connection(base.Connection):
             a = {}
             a.update(alarm)
             del a['_id']
-            a['matching_metadata'] = \
-                self._decode_matching_metadata(a['matching_metadata'])
+            self._ensure_encapsulated_rule_format(a)
             yield models.Alarm(**a)
 
     def update_alarm(self, alarm):
         """update alarm
         """
         data = alarm.as_dict()
-        data['matching_metadata'] = \
-            self._encode_matching_metadata(data['matching_metadata'])
-
         self.db.alarm.update(
             {'alarm_id': alarm.alarm_id},
             {'$set': data},
@@ -673,8 +710,7 @@ class Connection(base.Connection):
 
         stored_alarm = self.db.alarm.find({'alarm_id': alarm.alarm_id})[0]
         del stored_alarm['_id']
-        stored_alarm['matching_metadata'] = \
-            self._decode_matching_metadata(stored_alarm['matching_metadata'])
+        self._ensure_encapsulated_rule_format(stored_alarm)
         return models.Alarm(**stored_alarm)
 
     create_alarm = update_alarm

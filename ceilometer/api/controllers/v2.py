@@ -38,6 +38,7 @@ import inspect
 import json
 import uuid
 import pecan
+import six
 from pecan import rest
 
 from oslo.config import cfg
@@ -73,6 +74,51 @@ cfg.CONF.register_opts(ALARM_API_OPTS, group='alarm')
 operation_kind = wtypes.Enum(str, 'lt', 'le', 'eq', 'ne', 'ge', 'gt')
 
 
+class BoundedInt(wtypes.UserType):
+    basetype = int
+    name = 'bounded int'
+
+    def __init__(self, min=None, max=None):
+        self.min = min
+        self.max = max
+
+    def validate(self, value):
+        if self.min is not None and value < self.min:
+            error = _('Value %(value)s is invalid (should be greater or equal '
+                      'to %(min)s)') % dict(value=value, min=self.min)
+            pecan.response.translatable_error = error
+            raise wsme.exc.ClientSideError(unicode(error))
+
+        if self.max is not None and value > self.max:
+            error = _('Value %(value)s is invalid (should be lower or equal '
+                      'to %(max)s)') % dict(value=value, max=self.max)
+            pecan.response.translatable_error = error
+            raise wsme.exc.ClientSideError(unicode(error))
+        return value
+
+
+class AdvEnum(wtypes.wsproperty):
+    """Handle default and mandatory for wtypes.Enum
+    """
+    def __init__(self, name, *args, **kwargs):
+        self._name = '_advenum_%s' % name
+        self._default = kwargs.pop('default', None)
+        mandatory = kwargs.pop('mandatory', False)
+        enum = wtypes.Enum(*args, **kwargs)
+        super(AdvEnum, self).__init__(datatype=enum, fget=self._get,
+                                      fset=self._set, mandatory=mandatory)
+
+    def _get(self, parent):
+        if hasattr(parent, self._name):
+            value = getattr(parent, self._name)
+            return value or self._default
+        return self._default
+
+    def _set(self, parent, value):
+        if self.datatype.validate(value):
+            setattr(parent, self._name, value)
+
+
 class _Base(wtypes.Base):
 
     @classmethod
@@ -87,9 +133,11 @@ class _Base(wtypes.Base):
         valid_keys = inspect.getargspec(db_model.__init__)[0]
         if 'self' in valid_keys:
             valid_keys.remove('self')
+        return self.as_dict_from_keys(valid_keys)
 
+    def as_dict_from_keys(self, keys):
         return dict((k, getattr(self, k))
-                    for k in valid_keys
+                    for k in keys
                     if hasattr(self, k) and
                     getattr(self, k) != wsme.Unset)
 
@@ -153,6 +201,9 @@ class Query(_Base):
                    value='bd9431c1-8d69-4ad3-803a-8d4a6b89fd36',
                    type='string'
                    )
+
+    def as_dict(self):
+        return self.as_dict_from_keys(['field', 'op', 'type', 'value'])
 
     def _get_value_as_type(self):
         """Convert metadata value to the specified data type.
@@ -852,6 +903,83 @@ class ResourcesController(rest.RestController):
         return resources
 
 
+class AlarmThresholdRule(_Base):
+    meter_name = wsme.wsattr(wtypes.text, mandatory=True)
+    "The name of the meter"
+
+    #FIXME(sileht): default doesn't work
+    #workaround: default is set in validate method
+    query = wsme.wsattr([Query], default=[])
+    """The query to find the data for computing statistics.
+    Ownership settings are automatically included based on the Alarm owner.
+    """
+
+    period = wsme.wsattr(BoundedInt(min=1), default=60)
+    "The time range in seconds over which query"
+
+    comparison_operator = AdvEnum('comparison_operator', str,
+                                  'lt', 'le', 'eq', 'ne', 'ge', 'gt',
+                                  default='eq')
+    "The comparison against the alarm threshold"
+
+    threshold = wsme.wsattr(float, mandatory=True)
+    "The threshold of the alarm"
+
+    statistic = AdvEnum('statistic', str, 'max', 'min', 'avg', 'sum',
+                        'count', default='avg')
+    "The statistic to compare to the threshold"
+
+    evaluation_periods = wsme.wsattr(BoundedInt(min=1), default=1)
+    "The number of historical periods to evaluate the threshold"
+
+    def __init__(self, query=None, **kwargs):
+        if query:
+            query = [Query(**q) for q in query]
+        super(AlarmThresholdRule, self).__init__(query=query, **kwargs)
+
+    @staticmethod
+    def validate(threshold_rule):
+        if not threshold_rule.query:
+            threshold_rule.query = []
+        #note(sileht): _query_to_kwargs implicitly call _sanitize_query
+        #that add project_id in query
+        _query_to_kwargs(threshold_rule.query, storage.SampleFilter.__init__,
+                         internal_keys=['timestamp', 'start', 'start_timestamp'
+                                        'end', 'end_timestamp'])
+        return threshold_rule
+
+    @property
+    def default_description(self):
+        return _(
+            'Alarm when %(meter_name)s is %(comparison_operator)s a '
+            '%(statistic)s of %(threshold)s over %(period)s seconds') % \
+            dict(comparison_operator=self.comparison_operator,
+                 statistic=self.statistic,
+                 threshold=self.threshold,
+                 meter_name=self.meter_name,
+                 period=self.period)
+
+    def as_dict(self):
+        rule = self.as_dict_from_keys(['period', 'comparison_operator',
+                                       'threshold', 'statistic',
+                                       'evaluation_periods', 'meter_name'])
+        rule['query'] = [q.as_dict() for q in self.query]
+        return rule
+
+    @classmethod
+    def sample(cls):
+        return cls(meter_name='cpu_util',
+                   period=60,
+                   evaluation_periods=1,
+                   threshold=300.0,
+                   statistic='avg',
+                   comparison_operator='gt',
+                   query=[{'field': 'resource_id',
+                           'value': '2a4d689b-f0b8-49c1-9eef-87cae58d80db',
+                           'op': 'eq',
+                           'type': 'string'}])
+
+
 class Alarm(_Base):
     """Representation of an alarm.
     """
@@ -859,79 +987,81 @@ class Alarm(_Base):
     alarm_id = wtypes.text
     "The UUID of the alarm"
 
-    name = wtypes.text
+    name = wsme.wsattr(wtypes.text, mandatory=True)
     "The name for the alarm"
 
-    description = wtypes.text
+    _description = None  # provide a default
+
+    def get_description(self):
+        rule = getattr(self, '%s_rule' % self.type, None)
+        if not self._description and rule:
+            return six.text_type(rule.default_description)
+        return self._description
+
+    def set_description(self, value):
+        self._description = value
+
+    description = wsme.wsproperty(wtypes.text, get_description,
+                                  set_description)
     "The description of the alarm"
 
-    meter_name = wtypes.text
-    "The name of meter"
+    enabled = wsme.wsattr(bool, default=True)
+    "This alarm is enabled?"
 
+    ok_actions = wsme.wsattr([wtypes.text], default=[])
+    "The actions to do when alarm state change to ok"
+
+    alarm_actions = wsme.wsattr([wtypes.text], default=[])
+    "The actions to do when alarm state change to alarm"
+
+    insufficient_data_actions = wsme.wsattr([wtypes.text], default=[])
+    "The actions to do when alarm state change to insufficient data"
+
+    repeat_actions = wsme.wsattr(bool, default=False)
+    "The actions should be re-triggered on each evaluation cycle"
+
+    type = AdvEnum('type', str, 'threshold', mandatory=True)
+    "Explicit type specifier to select which rule to follow below."
+
+    threshold_rule = AlarmThresholdRule
+    "Describe when to trigger the alarm based on computed statistics"
+
+    # These settings are ignored in the PUT or POST operations, but are
+    # filled in for GET
     project_id = wtypes.text
     "The ID of the project or tenant that owns the alarm"
 
     user_id = wtypes.text
     "The ID of the user who created the alarm"
 
-    comparison_operator = wtypes.Enum(str, 'lt', 'le', 'eq', 'ne', 'ge', 'gt')
-    "The comparison against the alarm threshold"
-
-    threshold = float
-    "The threshold of the alarm"
-
-    statistic = wtypes.Enum(str, 'max', 'min', 'avg', 'sum', 'count')
-    "The statistic to compare to the threshold"
-
-    enabled = bool
-    "This alarm is enabled?"
-
-    evaluation_periods = int
-    "The number of periods to evaluate the threshold"
-
-    period = int
-    "The time range in seconds over which to evaluate the threshold"
-
     timestamp = datetime.datetime
     "The date of the last alarm definition update"
 
-    state = wtypes.Enum(str, 'ok', 'alarm', 'insufficient data')
+    #TODO(sileht): Add an explicit "set_state" operation instead of
+    #forcing the caller to PUT the entire definition of the alarm to test it.
+    #(example: POST/PUT? alarms/<alarm_id>/state)
+    state = AdvEnum('state', str, 'ok', 'alarm', 'insufficient data',
+                    default='insufficient data')
     "The state offset the alarm"
 
     state_timestamp = datetime.datetime
     "The date of the last alarm state changed"
 
-    ok_actions = [wtypes.text]
-    "The actions to do when alarm state change to ok"
-
-    alarm_actions = [wtypes.text]
-    "The actions to do when alarm state change to alarm"
-
-    insufficient_data_actions = [wtypes.text]
-    "The actions to do when alarm state change to insufficient data"
-
-    repeat_actions = bool
-    "The actions should be re-triggered on each evaluation cycle"
-
-    matching_metadata = {wtypes.text: wtypes.text}
-    "The matching_metadata of the alarm"
-
-    def __init__(self, **kwargs):
+    def __init__(self, rule=None, **kwargs):
         super(Alarm, self).__init__(**kwargs)
+
+        if rule and self.type == 'threshold':
+            self.threshold_rule = AlarmThresholdRule(**rule)
 
     @classmethod
     def sample(cls):
         return cls(alarm_id=None,
                    name="SwiftObjectAlarm",
                    description="An alarm",
-                   meter_name="storage.objects",
-                   comparison_operator="gt",
-                   threshold=200,
-                   statistic="avg",
+                   type='threshold',
+                   threshold_rule=None,
                    user_id="c96c887c216949acbdfbd8b494863567",
                    project_id="c96c887c216949acbdfbd8b494863567",
-                   evaluation_periods=2,
-                   period=240,
                    enabled=True,
                    timestamp=datetime.datetime.utcnow(),
                    state="ok",
@@ -939,10 +1069,16 @@ class Alarm(_Base):
                    ok_actions=["http://site:8000/ok"],
                    alarm_actions=["http://site:8000/alarm"],
                    insufficient_data_actions=["http://site:8000/nodata"],
-                   matching_metadata={"key_name":
-                                      "key_value"},
                    repeat_actions=False,
                    )
+
+    def as_dict(self, db_model):
+        d = super(Alarm, self).as_dict(db_model)
+        for k in d:
+            if k.endswith('_rule'):
+                del d[k]
+        d['rule'] = getattr(self, "%s_rule" % self.type).as_dict()
+        return d
 
 
 class AlarmChange(_Base):
@@ -1017,9 +1153,7 @@ class AlarmController(rest.RestController):
     def _record_change(self, data, now, on_behalf_of=None, type=None):
         if not cfg.CONF.alarm.record_history:
             return
-        type = type or (storage.models.AlarmChange.STATE_TRANSITION
-                        if data.get('state')
-                        else storage.models.AlarmChange.RULE_CHANGE)
+        type = type or storage.models.AlarmChange.RULE_CHANGE
         detail = json.dumps(utils.stringify_timestamps(data))
         user_id = pecan.request.headers.get('X-User-Id')
         project_id = pecan.request.headers.get('X-Project-Id')
@@ -1045,20 +1179,35 @@ class AlarmController(rest.RestController):
     @wsme_pecan.wsexpose(Alarm, wtypes.text, body=Alarm)
     def put(self, data):
         """Modify this alarm."""
-        # merge the new values from kwargs into the current
-        # alarm "alarm_in".
+        # Ensure alarm exists
         alarm_in = self._alarm()
+
         now = timeutils.utcnow()
-        change = data.as_dict(storage.models.Alarm)
-        data.state_timestamp = wsme.Unset
+
         data.alarm_id = self._id
-        kwargs = data.as_dict(storage.models.Alarm)
-        for k, v in kwargs.iteritems():
-            setattr(alarm_in, k, v)
-            if k == 'state':
-                alarm_in.state_timestamp = now
+        data.user_id = alarm_in.user_id
+        data.project_id = alarm_in.project_id
+        data.timestamp = now
+        if alarm_in.state != data.state:
+            data.state_timestamp = now
+        else:
+            data.state_timestamp = alarm_in.state_timestamp
+
+        old_alarm = Alarm.from_db_model(alarm_in).as_dict(storage.models.Alarm)
+        updated_alarm = data.as_dict(storage.models.Alarm)
+        try:
+            alarm_in = storage.models.Alarm(**updated_alarm)
+        except Exception:
+            LOG.exception("Error while putting alarm: %s" % updated_alarm)
+            error = _("Alarm incorrect")
+            pecan.response.translatable_error = error
+            raise wsme.exc.ClientSideError(unicode(error))
 
         alarm = self.conn.update_alarm(alarm_in)
+
+        change = dict((k, v) for k, v in updated_alarm.items()
+                      if v != old_alarm[k] and k not in
+                      ['timestamp', 'state_timestamp'])
         self._record_change(change, now, on_behalf_of=alarm.project_id)
         return Alarm.from_db_model(alarm)
 
@@ -1126,14 +1275,15 @@ class AlarmsController(rest.RestController):
     def post(self, data):
         """Create a new alarm."""
         conn = pecan.request.storage_conn
-
         now = timeutils.utcnow()
+
         data.alarm_id = str(uuid.uuid4())
         data.user_id = pecan.request.headers.get('X-User-Id')
         data.project_id = pecan.request.headers.get('X-Project-Id')
-        data.state_timestamp = wsme.Unset
-        change = data.as_dict(storage.models.Alarm)
         data.timestamp = now
+        data.state_timestamp = now
+
+        change = data.as_dict(storage.models.Alarm)
 
         # make sure alarms are unique by name per project.
         alarms = list(conn.get_alarms(name=data.name,
@@ -1144,10 +1294,9 @@ class AlarmsController(rest.RestController):
             raise wsme.exc.ClientSideError(unicode(error))
 
         try:
-            kwargs = data.as_dict(storage.models.Alarm)
-            alarm_in = storage.models.Alarm(**kwargs)
-        except Exception as ex:
-            LOG.exception(ex)
+            alarm_in = storage.models.Alarm(**change)
+        except Exception:
+            LOG.exception("Error while posting alarm: %s" % change)
             error = _("Alarm incorrect")
             pecan.response.translatable_error = error
             raise wsme.exc.ClientSideError(unicode(error))

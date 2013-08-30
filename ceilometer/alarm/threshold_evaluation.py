@@ -80,20 +80,12 @@ class Evaluator(object):
             self.api_client = ceiloclient.get_client(2, **creds)
         return self.api_client
 
-    @staticmethod
-    def _constraints(alarm):
-        """Assert the constraints on the statistics query."""
-        constraints = []
-        for (field, value) in alarm.matching_metadata.iteritems():
-            constraints.append(dict(field=field, op='eq', value=value))
-        return constraints
-
     @classmethod
     def _bound_duration(cls, alarm, constraints):
         """Bound the duration of the statistics query."""
         now = timeutils.utcnow()
-        window = (alarm.period *
-                  (alarm.evaluation_periods + cls.look_back))
+        window = (alarm.rule['period'] *
+                  (alarm.rule['evaluation_periods'] + cls.look_back))
         start = now - datetime.timedelta(seconds=window)
         LOG.debug(_('query stats from %(start)s to '
                     '%(now)s') % {'start': start, 'now': now})
@@ -111,7 +103,7 @@ class Evaluator(object):
         LOG.debug(_('sanitize stats %s') % statistics)
         # in practice statistics are always sorted by period start, not
         # strictly required by the API though
-        statistics = statistics[:alarm.evaluation_periods]
+        statistics = statistics[:alarm.rule['evaluation_periods']]
         LOG.debug(_('pruned statistics to %d') % len(statistics))
         return statistics
 
@@ -119,9 +111,9 @@ class Evaluator(object):
         """Retrieve statistics over the current window."""
         LOG.debug(_('stats query %s') % query)
         try:
-            return self._client.statistics.list(alarm.meter_name,
-                                                q=query,
-                                                period=alarm.period)
+            return self._client.statistics.list(
+                meter_name=alarm.rule['meter_name'], q=query,
+                period=alarm.rule['period'])
         except Exception:
             LOG.exception(_('alarm stats retrieval failed'))
             return []
@@ -151,7 +143,8 @@ class Evaluator(object):
         """
         sufficient = len(statistics) >= self.quorum
         if not sufficient and alarm.state != UNKNOWN:
-            reason = _('%d datapoints are unknown') % alarm.evaluation_periods
+            reason = _('%d datapoints are unknown') % alarm.rule[
+                'evaluation_periods']
             self._refresh(alarm, UNKNOWN, reason)
         return sufficient
 
@@ -160,7 +153,7 @@ class Evaluator(object):
         """Fabricate reason string."""
         count = len(statistics)
         disposition = 'inside' if state == OK else 'outside'
-        last = getattr(statistics[-1], alarm.statistic)
+        last = getattr(statistics[-1], alarm.rule['statistic'])
         transition = alarm.state != state
         if transition:
             return (_('Transition to %(state)s due to %(count)d samples'
@@ -216,7 +209,7 @@ class Evaluator(object):
 
             query = self._bound_duration(
                 alarm,
-                self._constraints(alarm)
+                alarm.rule['query']
             )
 
             statistics = self._sanitize(
@@ -227,9 +220,9 @@ class Evaluator(object):
             if self._sufficient(alarm, statistics):
 
                 def _compare(stat):
-                    op = COMPARATORS[alarm.comparison_operator]
-                    value = getattr(stat, alarm.statistic)
-                    limit = alarm.threshold
+                    op = COMPARATORS[alarm.rule['comparison_operator']]
+                    value = getattr(stat, alarm.rule['statistic'])
+                    limit = alarm.rule['threshold']
                     LOG.debug(_('comparing value %(value)s against threshold'
                                 ' %(limit)s') %
                               {'value': value, 'limit': limit})
