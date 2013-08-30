@@ -322,3 +322,44 @@ class Alarm(Model):
             insufficient_data_actions,
             repeat_actions=repeat_actions,
             matching_metadata=matching_metadata)
+
+
+class AlarmChange(Model):
+    """Record of an alarm change.
+
+    :param event_id: UUID of the change event
+    :param alarm_id: UUID of the alarm
+    :param type: The type of change
+    :param detail: JSON fragment describing change
+    :param user_id: the user ID of the initiating identity
+    :param project_id: the project ID of the initiating identity
+    :param on_behalf_of: the tenant on behalf of which the change
+                         is being made
+    :param timestamp: the timestamp of the change
+    """
+
+    CREATION = 'creation'
+    RULE_CHANGE = 'rule change'
+    STATE_TRANSITION = 'state transition'
+    DELETION = 'deletion'
+
+    def __init__(self,
+                 event_id,
+                 alarm_id,
+                 type,
+                 detail,
+                 user_id,
+                 project_id,
+                 on_behalf_of,
+                 timestamp=None
+                 ):
+        Model.__init__(
+            self,
+            event_id=event_id,
+            alarm_id=alarm_id,
+            type=type,
+            detail=detail,
+            user_id=user_id,
+            project_id=project_id,
+            on_behalf_of=on_behalf_of,
+            timestamp=timestamp)
