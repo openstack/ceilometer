@@ -39,10 +39,12 @@ numerous reasons:
 
 The following is a table indicating the status of each database drivers:
 
-================== ============= ================= ==============
-Driver             API Complete  Storage Complete  Production Use
-================== ============= ================= ==============
-MongoDB            Yes           Yes               Multiple
-mysql, postgresql  No            Yes               None known
-HBASE              No            Yes               None known
-================== ============= ================= ==============
+================== ============================= =================== ======
+Driver             API querying                  API statistics      Alarms
+================== ============================= =================== ======
+MongoDB            Yes                           Yes                 Yes
+MySQL              Yes, except metadata querying Yes                 Yes
+PostgreSQL         Yes, except metadata querying Yes                 Yes
+HBase              Yes                           Yes, except groupby No
+DB2                Yes                           No                  No
+================== ============================= =================== ======
