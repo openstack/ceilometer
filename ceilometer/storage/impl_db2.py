@@ -187,8 +187,13 @@ class Connection(base.Connection):
         # that the test wont try aggregate on older mongodb during the test.
         # For db2, the versionArray won't be part of the server_info, so there
         # will not be exception when real db2 gets used as backend.
-        version_array = self.conn.server_info().get('versionArray')
-        if version_array and version_array < [2, 2]:
+        server_info = self.conn.server_info()
+        if server_info.get('sysInfo'):
+            self._using_mongodb = True
+        else:
+            self._using_mongodb = False
+
+        if self._using_mongodb and server_info.get('versionArray') < [2, 2]:
             raise storage.StorageBadVersion("Need at least MongoDB 2.2")
 
         connection_options = pymongo.uri_parser.parse_uri(url)
@@ -354,7 +359,6 @@ class Connection(base.Connection):
         :param resource: Optional resource filter.
         :param pagination: Optional pagination query.
         """
-
         if pagination:
             raise NotImplementedError(_('Pagination not implemented'))
 
@@ -381,12 +385,12 @@ class Connection(base.Connection):
             if ts_range:
                 q['timestamp'] = ts_range
 
-        # FIXME(jd): We should use self.db.meter.group() and not use the
-        # resource collection, but that's not supported by MIM, so it's not
-        # easily testable yet. Since it was bugged before anyway, it's still
-        # better for now.
         resource_ids = self.db.meter.find(q).distinct('resource_id')
-        q = {'_id': {'$in': resource_ids}}
+        if self._using_mongodb:
+            q = {'_id': {'$in': resource_ids}}
+        else:
+            q = {'_id': {'$in': [m['_id'] for m in resource_ids]}}
+
         for resource in self.db.resource.find(q):
             yield models.Resource(
                 resource_id=resource['_id'],
@@ -479,15 +483,8 @@ class Connection(base.Connection):
         The filter must have a meter value set.
 
         """
-        #FIXME(sileht): since testscenarios is used
-        # all API functionnal and DB tests have been enabled
-        # get_meter_statistics will not return the expected data in some tests
-        # Some other tests return "IndexError: list index out of range"
-        # on the line: rslt = results['result'][0]
-        # complete trace: http://paste.openstack.org/show/45016/
-        # And because I have no db2 installation to test,
-        # I have disable this method until it is fixed
-        raise NotImplementedError("Statistics not implemented")
+        if self._using_mongodb:
+            raise NotImplementedError("Statistics not implemented.")
 
         if groupby:
             raise NotImplementedError("Group by not implemented.")
