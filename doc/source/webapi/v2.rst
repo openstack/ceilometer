@@ -32,6 +32,7 @@ Samples and Statistics
 .. autotype:: ceilometer.api.controllers.v2.Statistics
    :members:
 
+.. _alarms-api:
 Alarms
 ======
 
@@ -292,6 +293,7 @@ parameter to the query::
 
 This query would only return the last 3 samples.
 
+.. _user-defined-data:
 User-defined data
 +++++++++++++++++
 
