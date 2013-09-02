@@ -203,9 +203,9 @@ class TestListResources(FunctionalTest):
                                'tag': 'self.counter',
                                }
         )
-        msg = rpc.meter_message_from_counter(
+        msg = meter.meter_message_from_counter(
             counter1,
-            cfg.CONF.publisher_rpc.metering_secret,
+            cfg.CONF.metering_secret,
             'test_list_resources',
         )
         self.conn.record_metering_data(msg)
@@ -223,9 +223,9 @@ class TestListResources(FunctionalTest):
                                'tag': 'self.counter2',
                                }
         )
-        msg2 = rpc.meter_message_from_counter(
+        msg2 = meter.meter_message_from_counter(
             counter2,
-            cfg.CONF.publisher_rpc.metering_secret,
+            cfg.CONF.metering_secret,
             'test_list_resources',
         )
         self.conn.record_metering_data(msg2)
