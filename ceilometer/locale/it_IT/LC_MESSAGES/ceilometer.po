@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-08-29 06:04+0000\n"
+"POT-Creation-Date: 2013-08-30 06:04+0000\n"
 "PO-Revision-Date: 2012-12-11 06:53+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Italian (Italy) "
@@ -113,49 +113,49 @@ msgstr ""
 msgid "comparing value %(value)s against threshold %(limit)s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:164
+#: ceilometer/api/controllers/v2.py:165
 #, python-format
 msgid "Failed to convert the metadata value %s automatically"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:182
+#: ceilometer/api/controllers/v2.py:183
 #, python-format
 msgid ""
 "Failed to convert the metadata value %(value)s to the expected data type "
 "%(type)s."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:187
+#: ceilometer/api/controllers/v2.py:188
 #, python-format
 msgid ""
 "The data type %s is not supported. The supported data type list is: "
 "integer, float, boolean and string."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:192
+#: ceilometer/api/controllers/v2.py:193
 #, python-format
 msgid ""
 "Unexpected exception converting %(value)s to the expected data type "
 "%(type)s."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:628
+#: ceilometer/api/controllers/v2.py:629
 msgid "Period must be positive."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:778
+#: ceilometer/api/controllers/v2.py:779
 msgid "Unknown resource"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:954
+#: ceilometer/api/controllers/v2.py:955
 msgid "Unknown alarm"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1029
+#: ceilometer/api/controllers/v2.py:1030
 msgid "Alarm with that name exists"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1038
+#: ceilometer/api/controllers/v2.py:1039
 msgid "Alarm incorrect"
 msgstr ""
 
@@ -195,6 +195,16 @@ msgstr ""
 #: ceilometer/compute/nova_notifier.py:148
 #, python-format
 msgid "polling final stats for %r"
+msgstr ""
+
+#: ceilometer/compute/virt/hyperv/utilsv2.py:164
+#, python-format
+msgid "VM %s not found on Hyper-V"
+msgstr ""
+
+#: ceilometer/compute/virt/hyperv/utilsv2.py:166
+#, python-format
+msgid "Duplicate VM name found: %s"
 msgstr ""
 
 #: ceilometer/energy/kwapi.py:77
@@ -508,6 +518,17 @@ msgstr ""
 
 #: ceilometer/openstack/common/db/sqlalchemy/utils.py:290
 msgid "Unsupported id columns type"
+msgstr ""
+
+#: ceilometer/openstack/common/middleware/notifier.py:40
+#, python-format
+msgid "An exception occurred processing the API call: %s "
+msgstr ""
+
+#: ceilometer/openstack/common/middleware/sizelimit.py:57
+#: ceilometer/openstack/common/middleware/sizelimit.py:66
+#: ceilometer/openstack/common/middleware/sizelimit.py:77
+msgid "Request is too large."
 msgstr ""
 
 #: ceilometer/openstack/common/notifier/api.py:129
@@ -968,12 +989,12 @@ msgstr ""
 msgid "Unable to send sample over UDP"
 msgstr ""
 
-#: ceilometer/storage/impl_db2.py:365 ceilometer/storage/impl_db2.py:433
-#: ceilometer/storage/impl_db2.py:573 ceilometer/storage/impl_hbase.py:307
+#: ceilometer/storage/impl_db2.py:364 ceilometer/storage/impl_db2.py:432
+#: ceilometer/storage/impl_db2.py:572 ceilometer/storage/impl_hbase.py:307
 #: ceilometer/storage/impl_hbase.py:393
-#: ceilometer/storage/impl_sqlalchemy.py:298
-#: ceilometer/storage/impl_sqlalchemy.py:365
-#: ceilometer/storage/impl_sqlalchemy.py:600
+#: ceilometer/storage/impl_sqlalchemy.py:297
+#: ceilometer/storage/impl_sqlalchemy.py:364
+#: ceilometer/storage/impl_sqlalchemy.py:592
 msgid "Pagination not implemented"
 msgstr ""
 
