@@ -72,6 +72,34 @@ NOTIFICATION_VOLUME_DELETE = {
     u'priority': u'INFO'}
 
 
+NOTIFICATION_VOLUME_RESIZE = {
+    u'_context_roles': [u'Member', u'admin'],
+    u'_context_request_id': u'req-6ba8ccb4-1093-4a39-b029-adfaa3fc7ceb',
+    u'_context_quota_class': None,
+    u'event_type': u'volume.resize.end',
+    u'timestamp': u'2012-09-21 10:24:13.168630',
+    u'message_id': u'b5814258-3425-4eb7-b6b7-bf4811203e58',
+    u'_context_auth_token': u'277c6899de8a4b3d999f3e2e4c0915ff',
+    u'_context_is_admin': True,
+    u'_context_project_id': u'6c97f1ecf17047eab696786d56a0bff5',
+    u'_context_timestamp': u'2012-09-21T10:02:27.134211',
+    u'_context_read_deleted': u'no',
+    u'_context_user_id': u'4d2fa4b76a4a4ecab8c468c8dea42f89',
+    u'_context_remote_address': u'192.168.22.101',
+    u'publisher_id': u'volume.ubuntu-VirtualBox',
+    u'payload': {u'status': u'extending',
+                 u'volume_type_id': None,
+                 u'display_name': u'abc',
+                 u'tenant_id': u'6c97f1ecf17047eab696786d56a0bff5',
+                 u'created_at': u'2012-09-21 10:10:47',
+                 u'snapshot_id': None,
+                 u'volume_id': u'3b761164-84b4-4eb3-8fcb-1974c641d6ef',
+                 u'user_id': u'4d2fa4b76a4a4ecab8c468c8dea42f89',
+                 u'launched_at': u'2012-09-21 10:10:50',
+                 u'size': 3},
+    u'priority': u'INFO'}
+
+
 class TestNotifications(base.TestCase):
 
     def _verify_common_sample(self, s, name, notification):
@@ -117,3 +145,21 @@ class TestNotifications(base.TestCase):
                                    NOTIFICATION_VOLUME_DELETE)
         self.assertEqual(s.volume,
                          NOTIFICATION_VOLUME_DELETE['payload']['size'])
+
+    def test_volume_resize(self):
+        v = notifications.Volume()
+        samples = list(v.process_notification(NOTIFICATION_VOLUME_RESIZE))
+        self.assertEqual(len(samples), 1)
+        s = samples[0]
+        self._verify_common_sample(s, 'volume', NOTIFICATION_VOLUME_RESIZE)
+        self.assertEqual(s.volume, 1)
+
+    def test_volume_size_resize(self):
+        v = notifications.VolumeSize()
+        samples = list(v.process_notification(NOTIFICATION_VOLUME_RESIZE))
+        self.assertEqual(len(samples), 1)
+        s = samples[0]
+        self._verify_common_sample(s, 'volume.size',
+                                   NOTIFICATION_VOLUME_RESIZE)
+        self.assertEqual(s.volume,
+                         NOTIFICATION_VOLUME_RESIZE['payload']['size'])
