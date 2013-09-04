@@ -211,7 +211,7 @@ class Query(_Base):
         return converted_value
 
 
-def _sanitize_query(q):
+def _sanitize_query(q, valid_keys):
     '''Check the query to see if:
     1) the request is comming from admin - then allow full visibility
     2) non-admin - make sure that the query includes the requester's
@@ -231,7 +231,7 @@ def _sanitize_query(q):
                                                                      i.value)
                 raise wsme.exc.ClientSideError(errstr)
 
-        if not proj_q:
+        if not proj_q and 'on_behalf_of' not in valid_keys:
             # The user is restricted, but they didn't specify a project
             # so add it for them.
             q.append(Query(field='project_id',
@@ -240,12 +240,19 @@ def _sanitize_query(q):
     return q
 
 
-def _query_to_kwargs(query, db_func):
+def _exclude_from(keys, excluded):
+    if keys and excluded:
+        for key in excluded:
+            if key in keys:
+                keys.remove(key)
+
+
+def _query_to_kwargs(query, db_func, internal_keys=[]):
     # TODO(dhellmann): This function needs tests of its own.
-    query = _sanitize_query(query)
     valid_keys = inspect.getargspec(db_func)[0]
-    if 'self' in valid_keys:
-        valid_keys.remove('self')
+    query = _sanitize_query(query, valid_keys)
+    internal_keys.append('self')
+    _exclude_from(valid_keys, internal_keys)
     translation = {'user_id': 'user',
                    'project_id': 'project',
                    'resource_id': 'resource'}
@@ -298,7 +305,9 @@ def _query_to_kwargs(query, db_func):
     if trans:
         for k in trans:
             if k not in valid_keys:
-                raise wsme.exc.UnknownArgument(k, "unrecognized query field")
+                msg = ("unrecognized field in query: %s, valid keys: %s" %
+                       (query, valid_keys))
+                raise wsme.exc.UnknownArgument(k, msg)
             kwargs[k] = trans[k]
 
     return kwargs
@@ -1055,8 +1064,10 @@ class AlarmController(rest.RestController):
         # avoid inappropriate cross-tenant visibility of alarm history
         auth_project = acl.get_limited_to_project(pecan.request.headers)
         conn = pecan.request.storage_conn
+        kwargs = _query_to_kwargs(q, conn.get_alarm_changes, ['on_behalf_of'])
         return [AlarmChange.from_db_model(ac)
-                for ac in conn.get_alarm_changes(self._id, auth_project)]
+                for ac in conn.get_alarm_changes(self._id, auth_project,
+                                                 **kwargs)]
 
 
 class AlarmsController(rest.RestController):

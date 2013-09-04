@@ -189,9 +189,17 @@ class TestAlarms(FunctionalTest,
         self.assertEqual(1, len(match), 'alarm %s not found' % id)
         return match[0]
 
-    def _get_alarm_history(self, alarm, auth_headers=None):
-        return self.get_json('/alarms/%s/history' % alarm['alarm_id'],
-                             headers=auth_headers or self.auth_headers)
+    def _get_alarm_history(self, alarm, auth_headers=None, query=None,
+                           expect_errors=False, status=200):
+        url = '/alarms/%s/history' % alarm['alarm_id']
+        if query:
+            url += '?q.op=%(op)s&q.value=%(value)s&q.field=%(field)s' % query
+        resp = self.get_json(url,
+                             headers=auth_headers or self.auth_headers,
+                             expect_errors=expect_errors)
+        if expect_errors:
+            self.assertEqual(resp.status_code, status)
+        return resp
 
     def _update_alarm(self, alarm, data, auth_headers=None):
         self.put_json('/alarms/%s' % alarm['alarm_id'],
@@ -277,16 +285,58 @@ class TestAlarms(FunctionalTest,
                                                            'state transition',
                                                            detail)
 
-    def test_get_recorded_alarm_history_rule_change_on_behalf_of(self):
-        data = dict(name='renamed')
-        detail = '{"name": "renamed"}'
-        auth = {'X-Roles': 'admin',
-                'X-User-Id': str(uuid.uuid4()),
-                'X-Project-Id': str(uuid.uuid4())}
-        self._do_test_get_recorded_alarm_history_on_update(data,
-                                                           'rule change',
-                                                           detail,
-                                                           auth)
+    def test_get_recorded_alarm_history_state_transition_on_behalf_of(self):
+        # credentials for new non-admin user, on who's behalf the alarm
+        # is created
+        member_user = str(uuid.uuid4())
+        member_project = str(uuid.uuid4())
+        member_auth = {'X-Roles': 'member',
+                       'X-User-Id': member_user,
+                       'X-Project-Id': member_project}
+        new_alarm = dict(name='new_alarm',
+                         meter_name='other_meter',
+                         comparison_operator='le',
+                         threshold=42.0,
+                         statistic='max')
+        self.post_json('/alarms', params=new_alarm, status=200,
+                       headers=member_auth)
+        alarm = self.get_json('/alarms', headers=member_auth)[0]
+
+        # effect a state transition as a new administrative user
+        admin_user = str(uuid.uuid4())
+        admin_project = str(uuid.uuid4())
+        admin_auth = {'X-Roles': 'admin',
+                      'X-User-Id': admin_user,
+                      'X-Project-Id': admin_project}
+        data = dict(state='alarm')
+        self._update_alarm(alarm, data, auth_headers=admin_auth)
+
+        # ensure that both the creation event and state transition
+        # are visible to the non-admin alarm owner and admin user alike
+        for auth in [member_auth, admin_auth]:
+            history = self._get_alarm_history(alarm, auth_headers=auth)
+            self.assertEqual(2, len(history))
+            self._assert_is_subset(dict(alarm_id=alarm['alarm_id'],
+                                        detail='{"state": "alarm"}',
+                                        on_behalf_of=alarm['project_id'],
+                                        project_id=admin_project,
+                                        type='state transition',
+                                        user_id=admin_user),
+                                   history[0])
+            self._assert_is_subset(dict(alarm_id=alarm['alarm_id'],
+                                        on_behalf_of=alarm['project_id'],
+                                        project_id=member_project,
+                                        type='creation',
+                                        user_id=member_user),
+                                   history[1])
+            self._assert_in_json(new_alarm, history[1]['detail'])
+
+            # ensure on_behalf_of cannot be constrained in an API call
+            query = dict(field='on_behalf_of',
+                         op='eq',
+                         value=alarm['project_id'])
+            self._get_alarm_history(alarm, auth_headers=auth, query=query,
+                                    expect_errors=True, status=400)
 
     def test_get_recorded_alarm_history_segregation(self):
         data = dict(name='renamed')
@@ -313,6 +363,39 @@ class TestAlarms(FunctionalTest,
                     status=200)
         history = self._get_alarm_history(alarm)
         self.assertEqual(2, len(history))
+        self._assert_is_subset(dict(alarm_id=alarm['alarm_id'],
+                                    on_behalf_of=alarm['project_id'],
+                                    project_id=alarm['project_id'],
+                                    type='deletion',
+                                    user_id=alarm['user_id']),
+                               history[0])
+        self._assert_in_json(alarm, history[0]['detail'])
+
+    def test_get_constrained_alarm_history(self):
+        alarm = self._get_alarm('a')
+        self._update_alarm(alarm, dict(name='renamed'))
+        now = datetime.datetime.utcnow().isoformat()
+        query = dict(field='timestamp', op='gt', value=now)
+        history = self._get_alarm_history(alarm, query=query)
+        self.assertEqual(0, len(history))
+        query['op'] = 'le'
+        history = self._get_alarm_history(alarm, query=query)
+        self.assertEqual(1, len(history))
+        detail = '{"name": "renamed"}'
+        self._assert_is_subset(dict(alarm_id=alarm['alarm_id'],
+                                    detail=detail,
+                                    on_behalf_of=alarm['project_id'],
+                                    project_id=alarm['project_id'],
+                                    type='rule change',
+                                    user_id=alarm['user_id']),
+                               history[0])
+        alarm = self._get_alarm('a')
+        self.delete('/alarms/%s' % alarm['alarm_id'],
+                    headers=self.auth_headers,
+                    status=200)
+        query = dict(field='type', op='eq', value='deletion')
+        history = self._get_alarm_history(alarm, query=query)
+        self.assertEqual(1, len(history))
         self._assert_is_subset(dict(alarm_id=alarm['alarm_id'],
                                     on_behalf_of=alarm['project_id'],
                                     project_id=alarm['project_id'],
