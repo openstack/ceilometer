@@ -43,7 +43,7 @@ class KwapiClient(object):
         if self.token is not None:
             headers = {'X-Auth-Token': self.token}
         request = requests.get(probes_url, headers=headers)
-        message = request.json
+        message = request.json()
         probes = message['probes']
         for key, value in probes.iteritems():
             probe_dict = value
