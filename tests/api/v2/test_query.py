@@ -15,10 +15,13 @@
 #    under the License.
 """Test the methods related to query."""
 
+import datetime
+
 import wsme
 
 from ceilometer.api.controllers import v2 as api
 from ceilometer.api.controllers.v2 import Query
+from ceilometer.api.controllers.v2 import _query_to_kwargs
 from ceilometer.tests import base as tests_base
 
 
@@ -97,6 +100,108 @@ class TestQuery(tests_base.TestCase):
                       value='fake',
                       type='integer')
         self.assertRaises(wsme.exc.ClientSideError, query._get_value_as_type)
+
+    def _fake_db_func(self, resource, on_behalf_of, x, y,
+                      metaquery={}, user=None, project=None,
+                      start_timestamp=None, start_timestamp_op=None,
+                      end_timestamp=None, end_timestamp_op=None, **kwargs):
+        pass
+
+    def test_query_to_kwargs_exclude_internal(self):
+        queries = [Query(field=f,
+                         op='eq',
+                         value='fake',
+                         type='string') for f in ['y', 'on_behalf_of', 'x']]
+        self.assertRaises(wsme.exc.ClientSideError,
+                          _query_to_kwargs,
+                          queries,
+                          self._fake_db_func,
+                          headers={'X-ProjectId': 'foobar'},
+                          internal_keys=['on_behalf_of'])
+
+    def test_query_to_kwargs_self_always_excluded(self):
+        queries = [Query(field=f,
+                         op='eq',
+                         value='fake',
+                         type='string') for f in ['x', 'y']]
+        kwargs = _query_to_kwargs(queries,
+                                  self._fake_db_func,
+                                  headers={'X-ProjectId': 'foobar'})
+        self.assertFalse('self' in kwargs)
+
+    def test_query_to_kwargs_timestamp_mapping(self):
+        start = datetime.datetime.utcnow()
+        end = datetime.datetime.utcnow()
+        queries = [Query(field='timestamp',
+                         op='gt',
+                         value=start.isoformat(),
+                         type='string'),
+                   Query(field='timestamp',
+                         op='le',
+                         value=end.isoformat(),
+                         type='string')]
+        kwargs = _query_to_kwargs(queries,
+                                  self._fake_db_func,
+                                  headers={'X-ProjectId': 'foobar'})
+        self.assertEqual(kwargs.get('start_timestamp'), start)
+        self.assertEqual(kwargs.get('start_timestamp_op'), 'gt')
+        self.assertEqual(kwargs.get('end_timestamp'), end)
+        self.assertEqual(kwargs.get('end_timestamp_op'), 'le')
+
+    def test_query_to_kwargs_non_equality_on_metadata(self):
+        queries = [Query(field='resource_metadata.image_id',
+                         op='gt',
+                         value='image',
+                         type='string'),
+                   Query(field='metadata.ramdisk_id',
+                         op='le',
+                         value='ramdisk',
+                         type='string')]
+        kwargs = _query_to_kwargs(queries,
+                                  self._fake_db_func,
+                                  headers={'X-ProjectId': 'foobar'})
+        self.assertFalse('metaquery' in kwargs)
+
+    def test_query_to_kwargs_equality_on_metadata(self):
+        queries = [Query(field='resource_metadata.image_id',
+                         op='eq',
+                         value='image',
+                         type='string'),
+                   Query(field='metadata.ramdisk_id',
+                         op='eq',
+                         value='ramdisk',
+                         type='string')]
+        kwargs = _query_to_kwargs(queries,
+                                  self._fake_db_func,
+                                  headers={'X-ProjectId': 'foobar'})
+        self.assertTrue('metaquery' in kwargs)
+        metaquery = kwargs['metaquery']
+        self.assertEqual(metaquery.get('metadata.image_id'), 'image')
+        self.assertEqual(metaquery.get('metadata.ramdisk_id'), 'ramdisk')
+
+    def test_query_to_kwargs_translation(self):
+        queries = [Query(field=f,
+                         op='eq',
+                         value='fake_%s' % f,
+                         type='string') for f in ['user_id',
+                                                  'project_id',
+                                                  'resource_id']]
+        kwargs = _query_to_kwargs(queries,
+                                  self._fake_db_func,
+                                  headers={'X-ProjectId': 'foobar'})
+        for o in ['user', 'project', 'resource']:
+            self.assertEqual(kwargs.get(o), 'fake_%s_id' % o)
+
+    def test_query_to_kwargs_unrecognized(self):
+        queries = [Query(field=f,
+                         op='eq',
+                         value='fake',
+                         type='string') for f in ['y', 'z', 'x']]
+        self.assertRaises(wsme.exc.ClientSideError,
+                          _query_to_kwargs,
+                          queries,
+                          self._fake_db_func,
+                          headers={'X-ProjectId': 'foobar'})
 
 
 class TestValidateGroupByFields(tests_base.TestCase):
