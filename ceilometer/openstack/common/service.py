@@ -43,6 +43,29 @@ CONF = cfg.CONF
 LOG = logging.getLogger(__name__)
 
 
+def _sighup_supported():
+    return hasattr(signal, 'SIGHUP')
+
+
+def _is_sighup(signo):
+    return _sighup_supported() and signo == signal.SIGHUP
+
+
+def _signo_to_signame(signo):
+    signals = {signal.SIGTERM: 'SIGTERM',
+               signal.SIGINT: 'SIGINT'}
+    if _sighup_supported():
+        signals[signal.SIGHUP] = 'SIGHUP'
+    return signals[signo]
+
+
+def _set_signals_handler(handler):
+    signal.signal(signal.SIGTERM, handler)
+    signal.signal(signal.SIGINT, handler)
+    if _sighup_supported():
+        signal.signal(signal.SIGHUP, handler)
+
+
 class Launcher(object):
     """Launch one or more services and wait for them to complete."""
 
@@ -100,16 +123,11 @@ class SignalExit(SystemExit):
 class ServiceLauncher(Launcher):
     def _handle_signal(self, signo, frame):
         # Allow the process to be killed again and die from natural causes
-        signal.signal(signal.SIGTERM, signal.SIG_DFL)
-        signal.signal(signal.SIGINT, signal.SIG_DFL)
-        signal.signal(signal.SIGHUP, signal.SIG_DFL)
-
+        _set_signals_handler(signal.SIG_DFL)
         raise SignalExit(signo)
 
     def handle_signal(self):
-        signal.signal(signal.SIGTERM, self._handle_signal)
-        signal.signal(signal.SIGINT, self._handle_signal)
-        signal.signal(signal.SIGHUP, self._handle_signal)
+        _set_signals_handler(self._handle_signal)
 
     def _wait_for_exit_or_signal(self):
         status = None
@@ -121,9 +139,7 @@ class ServiceLauncher(Launcher):
         try:
             super(ServiceLauncher, self).wait()
         except SignalExit as exc:
-            signame = {signal.SIGTERM: 'SIGTERM',
-                       signal.SIGINT: 'SIGINT',
-                       signal.SIGHUP: 'SIGHUP'}[exc.signo]
+            signame = _signo_to_signame(exc.signo)
             LOG.info(_('Caught %s, exiting'), signame)
             status = exc.code
             signo = exc.signo
@@ -144,7 +160,7 @@ class ServiceLauncher(Launcher):
         while True:
             self.handle_signal()
             status, signo = self._wait_for_exit_or_signal()
-            if signo != signal.SIGHUP:
+            if not _is_sighup(signo):
                 return status
             self.restart()
 
@@ -167,18 +183,14 @@ class ProcessLauncher(object):
         self.handle_signal()
 
     def handle_signal(self):
-        signal.signal(signal.SIGTERM, self._handle_signal)
-        signal.signal(signal.SIGINT, self._handle_signal)
-        signal.signal(signal.SIGHUP, self._handle_signal)
+        _set_signals_handler(self._handle_signal)
 
     def _handle_signal(self, signo, frame):
         self.sigcaught = signo
         self.running = False
 
         # Allow the process to be killed again and die from natural causes
-        signal.signal(signal.SIGTERM, signal.SIG_DFL)
-        signal.signal(signal.SIGINT, signal.SIG_DFL)
-        signal.signal(signal.SIGHUP, signal.SIG_DFL)
+        _set_signals_handler(signal.SIG_DFL)
 
     def _pipe_watcher(self):
         # This will block until the write end is closed when the parent
@@ -200,7 +212,8 @@ class ProcessLauncher(object):
             raise SignalExit(signal.SIGHUP)
 
         signal.signal(signal.SIGTERM, _sigterm)
-        signal.signal(signal.SIGHUP, _sighup)
+        if _sighup_supported():
+            signal.signal(signal.SIGHUP, _sighup)
         # Block SIGINT and let the parent send us a SIGTERM
         signal.signal(signal.SIGINT, signal.SIG_IGN)
 
@@ -211,9 +224,7 @@ class ProcessLauncher(object):
         try:
             launcher.wait()
         except SignalExit as exc:
-            signame = {signal.SIGTERM: 'SIGTERM',
-                       signal.SIGINT: 'SIGINT',
-                       signal.SIGHUP: 'SIGHUP'}[exc.signo]
+            signame = _signo_to_signame(exc.signo)
             LOG.info(_('Caught %s, exiting'), signame)
             status = exc.code
             signo = exc.signo
@@ -269,7 +280,7 @@ class ProcessLauncher(object):
             while True:
                 self._child_process_handle_signal()
                 status, signo = self._child_wait_for_exit_or_signal(launcher)
-                if signo != signal.SIGHUP:
+                if not _is_sighup(signo):
                     break
                 launcher.restart()
 
@@ -339,11 +350,9 @@ class ProcessLauncher(object):
             self.handle_signal()
             self._respawn_children()
             if self.sigcaught:
-                signame = {signal.SIGTERM: 'SIGTERM',
-                           signal.SIGINT: 'SIGINT',
-                           signal.SIGHUP: 'SIGHUP'}[self.sigcaught]
+                signame = _signo_to_signame(self.sigcaught)
                 LOG.info(_('Caught %s, stopping children'), signame)
-            if self.sigcaught != signal.SIGHUP:
+            if not _is_sighup(self.sigcaught):
                 break
 
             for pid in self.children:
