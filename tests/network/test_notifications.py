@@ -202,6 +202,29 @@ NOTIFICATION_FLOATINGIP_EXISTS = {
     u'publisher_id': u'network.ubuntu-VirtualBox',
     u'message_id': u'9e839576-cc47-4c60-a7d8-5743681213b1'}
 
+NOTIFICATION_L3_METER = {
+    u'_context_roles': [u'admin'],
+    u'_context_read_deleted': u'no',
+    u'event_type': u'l3.meter',
+    u'timestamp': u'2013-08-22 13:14:06.880304',
+    u'_context_tenant_id': None,
+    u'payload': {u'first_update': 1377176476,
+                 u'bytes': 0,
+                 u'label_id': u'383244a7-e99b-433a-b4a1-d37cf5b17d15',
+                 u'last_update': 1377177246,
+                 u'host': u'precise64',
+                 u'tenant_id': u'admin',
+                 u'time': 30,
+                 u'pkts': 0},
+    u'priority': u'INFO',
+    u'_context_is_admin': True,
+    u'_context_timestamp': u'2013-08-22 13:01:06.614635',
+    u'_context_user_id': None,
+    u'publisher_id': u'metering.precise64',
+    u'message_id': u'd7aee6e8-c7eb-4d47-9338-f60920d708e4',
+    u'_unique_id': u'd5a3bdacdcc24644b84e67a4c10e886a',
+    u'_context_project_id': None}
+
 
 class TestNotifications(base.TestCase):
     def test_network_create(self):
@@ -244,6 +267,12 @@ class TestNotifications(base.TestCase):
         self.assertEqual(len(samples), 1)
         self.assertEqual(samples[0].name, "ip.floating")
 
+    def test_metering_report(self):
+        v = notifications.Bandwidth()
+        samples = list(v.process_notification(NOTIFICATION_L3_METER))
+        self.assertEqual(len(samples), 1)
+        self.assertEqual(samples[0].name, "bandwidth")
+
 
 class TestEventTypes(base.TestCase):
 
@@ -267,3 +296,6 @@ class TestEventTypes(base.TestCase):
 
     def test_floatingip(self):
         self.assertTrue(notifications.FloatingIP().event_types)
+
+    def test_bandwidth(self):
+        self.assertTrue(notifications.Bandwidth().event_types)

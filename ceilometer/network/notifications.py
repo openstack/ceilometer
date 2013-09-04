@@ -140,3 +140,22 @@ class FloatingIP(NetworkNotificationBase):
     resource_name = 'floatingip'
     counter_name = 'ip.floating'
     unit = 'ip'
+
+
+class Bandwidth(NetworkNotificationBase):
+    """Listen for Neutron notifications in order to mediate with the
+    metering framework.
+
+    """
+    event_types = ['l3.meter']
+
+    def process_notification(self, message):
+        yield sample.Sample.from_notification(
+            name='bandwidth',
+            type=sample.TYPE_DELTA,
+            unit='B',
+            volume=message['payload']['bytes'],
+            user_id=None,
+            project_id=message['payload']['tenant_id'],
+            resource_id=message['payload']['label_id'],
+            message=message)
