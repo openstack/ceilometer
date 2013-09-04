@@ -119,7 +119,7 @@ class Evaluator(object):
         """Retrieve statistics over the current window."""
         LOG.debug(_('stats query %s') % query)
         try:
-            return self._client.statistics.list(alarm.counter_name,
+            return self._client.statistics.list(alarm.meter_name,
                                                 q=query,
                                                 period=alarm.period)
         except Exception:

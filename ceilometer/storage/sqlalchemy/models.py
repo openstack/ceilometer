@@ -175,14 +175,14 @@ class Alarm(Base):
     __table_args__ = (
         Index('ix_alarm_user_id', 'user_id'),
         Index('ix_alarm_project_id', 'project_id'),
-        Index('ix_alarm_counter_name', 'counter_name'),
+        Index('ix_alarm_meter_name', 'meter_name'),
     )
     id = Column(String(255), primary_key=True)
     enabled = Column(Boolean)
     name = Column(Text)
     description = Column(Text)
     timestamp = Column(DateTime, default=timeutils.utcnow)
-    counter_name = Column(String(255))
+    meter_name = Column(String(255))
 
     user_id = Column(String(255), ForeignKey('user.id'))
     project_id = Column(String(255), ForeignKey('project.id'))
