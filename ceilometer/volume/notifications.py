@@ -42,6 +42,7 @@ class _Base(plugin.NotificationBase):
         'volume.exists',
         'volume.create.*',
         'volume.delete.*',
+        'volume.resize.*',
     ]
 
     @staticmethod
