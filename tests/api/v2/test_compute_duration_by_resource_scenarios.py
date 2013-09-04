@@ -58,7 +58,7 @@ class TestComputeDurationByResource(FunctionalTest,
         self.stubs.Set(type(self.conn), 'get_meter_statistics', func)
 
     def _set_interval(self, start, end):
-        def get_interval(ignore_self, event_filter, period):
+        def get_interval(ignore_self, event_filter, period, groupby):
             assert event_filter.start
             assert event_filter.end
             if (event_filter.start > end or event_filter.end < start):
@@ -141,7 +141,7 @@ class TestComputeDurationByResource(FunctionalTest,
         self.assertEqual(data, [])
 
     def test_without_end_timestamp(self):
-        def get_interval(ignore_self, event_filter, period):
+        def get_interval(ignore_self, event_filter, period, groupby):
             return [
                 models.Statistics(
                     unit=None,
@@ -172,7 +172,7 @@ class TestComputeDurationByResource(FunctionalTest,
         self._assert_times_match(data[0]['duration_end'], self.late2)
 
     def test_without_start_timestamp(self):
-        def get_interval(ignore_self, event_filter, period):
+        def get_interval(ignore_self, event_filter, period, groupby):
             return [
                 models.Statistics(
                     unit=None,

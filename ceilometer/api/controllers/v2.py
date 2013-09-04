@@ -313,6 +313,26 @@ def _query_to_kwargs(query, db_func, internal_keys=[]):
     return kwargs
 
 
+def _validate_groupby_fields(groupby_fields):
+    """Checks that the list of groupby fields from request is valid and
+    if all fields are valid, returns fields with duplicates removed
+
+    """
+    # NOTE(terriyu): Currently, metadata fields are not supported in our
+    # group by statistics implementation
+    valid_fields = set(['user_id', 'resource_id', 'project_id', 'source'])
+
+    invalid_fields = set(groupby_fields) - valid_fields
+    if invalid_fields:
+        raise wsme.exc.UnknownArgument(invalid_fields,
+                                       "Invalid groupby fields")
+
+    # Remove duplicate fields
+    # NOTE(terriyu): This assumes that we don't care about the order of the
+    # group by fields.
+    return list(set(groupby_fields))
+
+
 def _get_query_timestamps(args={}):
     """Return any optional timestamp information in the request.
 
@@ -459,6 +479,9 @@ class Sample(_Base):
 class Statistics(_Base):
     """Computed statistics for a query.
     """
+
+    groupby = {wtypes.text: wtypes.text}
+    "Dictionary of field names for group, if groupby statistics are requested"
 
     unit = wtypes.text
     "The unit type of the data set"
@@ -640,11 +663,12 @@ class MeterController(rest.RestController):
         # a list of message_ids).
         return samples
 
-    @wsme_pecan.wsexpose([Statistics], [Query], int)
-    def statistics(self, q=[], period=None):
+    @wsme_pecan.wsexpose([Statistics], [Query], [unicode], int)
+    def statistics(self, q=[], groupby=[], period=None):
         """Computes the statistics of the samples in the time range given.
 
         :param q: Filter rules for the data to be returned.
+        :param groupby: Fields for group by aggregation
         :param period: Returned result will be an array of statistics for a
                        period long of that number of seconds.
         """
@@ -656,7 +680,10 @@ class MeterController(rest.RestController):
         kwargs = _query_to_kwargs(q, storage.SampleFilter.__init__)
         kwargs['meter'] = self._id
         f = storage.SampleFilter(**kwargs)
-        computed = pecan.request.storage_conn.get_meter_statistics(f, period)
+        g = _validate_groupby_fields(groupby)
+        computed = pecan.request.storage_conn.get_meter_statistics(f,
+                                                                   period,
+                                                                   g)
         LOG.debug('computed value coming from %r', pecan.request.storage_conn)
         # Find the original timestamp in the query to use for clamping
         # the duration returned in the statistics.

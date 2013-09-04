@@ -17,6 +17,7 @@
 
 import wsme
 
+from ceilometer.api.controllers import v2 as api
 from ceilometer.api.controllers.v2 import Query
 from ceilometer.tests import base as tests_base
 
@@ -96,3 +97,32 @@ class TestQuery(tests_base.TestCase):
                       value='fake',
                       type='integer')
         self.assertRaises(wsme.exc.ClientSideError, query._get_value_as_type)
+
+
+class TestValidateGroupByFields(tests_base.TestCase):
+
+    def test_valid_field(self):
+        result = api._validate_groupby_fields(['user_id'])
+        self.assertEqual(result, ['user_id'])
+
+    def test_valid_fields_multiple(self):
+        result = set(
+            api._validate_groupby_fields(['user_id', 'project_id', 'source'])
+        )
+        self.assertEqual(result, set(['user_id', 'project_id', 'source']))
+
+    def test_invalid_field(self):
+        self.assertRaises(wsme.exc.UnknownArgument,
+                          api._validate_groupby_fields,
+                          ['wtf'])
+
+    def test_invalid_field_multiple(self):
+        self.assertRaises(wsme.exc.UnknownArgument,
+                          api._validate_groupby_fields,
+                          ['user_id', 'wtf', 'project_id', 'source'])
+
+    def test_duplicate_fields(self):
+        result = set(
+            api._validate_groupby_fields(['user_id', 'source', 'user_id'])
+        )
+        self.assertEqual(result, set(['user_id', 'source']))
