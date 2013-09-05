@@ -211,13 +211,14 @@ class Query(_Base):
         return converted_value
 
 
-def _sanitize_query(q, valid_keys):
+def _sanitize_query(q, valid_keys, headers=None):
     '''Check the query to see if:
-    1) the request is comming from admin - then allow full visibility
+    1) the request is coming from admin - then allow full visibility
     2) non-admin - make sure that the query includes the requester's
     project.
     '''
-    auth_project = acl.get_limited_to_project(pecan.request.headers)
+    auth_project = acl.get_limited_to_project(headers or
+                                              pecan.request.headers)
     if auth_project:
         proj_q = [i for i in q if i.field == 'project_id']
         for i in proj_q:
@@ -240,19 +241,11 @@ def _sanitize_query(q, valid_keys):
     return q
 
 
-def _exclude_from(keys, excluded):
-    if keys and excluded:
-        for key in excluded:
-            if key in keys:
-                keys.remove(key)
-
-
-def _query_to_kwargs(query, db_func, internal_keys=[]):
-    # TODO(dhellmann): This function needs tests of its own.
+def _query_to_kwargs(query, db_func, internal_keys=[], headers=None):
     valid_keys = inspect.getargspec(db_func)[0]
-    query = _sanitize_query(query, valid_keys)
+    query = _sanitize_query(query, valid_keys, headers=headers)
     internal_keys.append('self')
-    _exclude_from(valid_keys, internal_keys)
+    valid_keys = set(valid_keys) - set(internal_keys)
     translation = {'user_id': 'user',
                    'project_id': 'project',
                    'resource_id': 'resource'}

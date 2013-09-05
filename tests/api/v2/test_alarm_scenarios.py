@@ -206,6 +206,11 @@ class TestAlarms(FunctionalTest,
                       params=data,
                       headers=auth_headers or self.auth_headers)
 
+    def _delete_alarm(self, alarm, auth_headers=None):
+        self.delete('/alarms/%s' % alarm['alarm_id'],
+                    headers=auth_headers or self.auth_headers,
+                    status=200)
+
     def _assert_is_subset(self, expected, actual):
         for k, v in expected.iteritems():
             self.assertEqual(v, actual.get(k), 'mismatched field: %s' % k)
@@ -370,12 +375,38 @@ class TestAlarms(FunctionalTest,
                                     user_id=alarm['user_id']),
                                history[0])
         self._assert_in_json(alarm, history[0]['detail'])
+        self._assert_is_subset(dict(alarm_id=alarm['alarm_id'],
+                                    detail='{"name": "renamed"}',
+                                    on_behalf_of=alarm['project_id'],
+                                    project_id=alarm['project_id'],
+                                    type='rule change',
+                                    user_id=alarm['user_id']),
+                               history[1])
 
-    def test_get_constrained_alarm_history(self):
+    def test_get_alarm_history_ordered_by_recentness(self):
+        alarm = self._get_alarm('a')
+        for i in xrange(10):
+            self._update_alarm(alarm, dict(name='%s' % i))
+        alarm = self._get_alarm('a')
+        self._delete_alarm(alarm)
+        history = self._get_alarm_history(alarm)
+        self.assertEqual(11, len(history), 'hist: %s' % history)
+        self._assert_is_subset(dict(alarm_id=alarm['alarm_id'],
+                                    type='deletion'),
+                               history[0])
+        self._assert_in_json(alarm, history[0]['detail'])
+        for i in xrange(1, 10):
+            detail = '{"name": "%s"}' % (10 - i)
+            self._assert_is_subset(dict(alarm_id=alarm['alarm_id'],
+                                        detail=detail,
+                                        type='rule change'),
+                                   history[i])
+
+    def test_get_alarm_history_constrained_by_timestamp(self):
         alarm = self._get_alarm('a')
         self._update_alarm(alarm, dict(name='renamed'))
-        now = datetime.datetime.utcnow().isoformat()
-        query = dict(field='timestamp', op='gt', value=now)
+        after = datetime.datetime.utcnow().isoformat()
+        query = dict(field='timestamp', op='gt', value=after)
         history = self._get_alarm_history(alarm, query=query)
         self.assertEqual(0, len(history))
         query['op'] = 'le'
@@ -389,10 +420,10 @@ class TestAlarms(FunctionalTest,
                                     type='rule change',
                                     user_id=alarm['user_id']),
                                history[0])
+
+    def test_get_alarm_history_constrained_by_type(self):
         alarm = self._get_alarm('a')
-        self.delete('/alarms/%s' % alarm['alarm_id'],
-                    headers=self.auth_headers,
-                    status=200)
+        self._delete_alarm(alarm)
         query = dict(field='type', op='eq', value='deletion')
         history = self._get_alarm_history(alarm, query=query)
         self.assertEqual(1, len(history))

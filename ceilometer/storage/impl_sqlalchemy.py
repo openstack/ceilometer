@@ -634,6 +634,17 @@ class Connection(base.Connection):
                           start_timestamp=None, start_timestamp_op=None,
                           end_timestamp=None, end_timestamp_op=None):
         """Yields list of AlarmChanges describing alarm history
+
+        Changes are always sorted in reverse order of occurence, given
+        the importance of currency.
+
+        Segregation for non-administrative users is done on the basis
+        of the on_behalf_of parameter. This allows such users to have
+        visibility on both the changes initiated by themselves directly
+        (generally creation, rule changes, or deletion) and also on those
+        changes initiated on their behalf by the alarming service (state
+        transitions after alarm thresholds are crossed).
+
         :param alarm_id: ID of alarm to return changes for
         :param on_behalf_of: ID of tenant to scope changes query (None for
                              administrative user, indicating all projects)
