@@ -115,12 +115,18 @@ class Rules(dict):
     def __missing__(self, key):
         """Implements the default rule handling."""
 
+        if isinstance(self.default_rule, dict):
+            raise KeyError(key)
+
         # If the default rule isn't actually defined, do something
         # reasonably intelligent
         if not self.default_rule or self.default_rule not in self:
             raise KeyError(key)
 
-        return self[self.default_rule]
+        if isinstance(self.default_rule, BaseCheck):
+            return self.default_rule
+        elif isinstance(self.default_rule, six.string_types):
+            return self[self.default_rule]
 
     def __str__(self):
         """Dumps a string representation of the rules."""
@@ -153,7 +159,7 @@ class Enforcer(object):
     """
 
     def __init__(self, policy_file=None, rules=None, default_rule=None):
-        self.rules = Rules(rules)
+        self.rules = Rules(rules, default_rule)
         self.default_rule = default_rule or CONF.policy_default_rule
 
         self.policy_path = None
@@ -172,13 +178,14 @@ class Enforcer(object):
                             "got %s instead") % type(rules))
 
         if overwrite:
-            self.rules = Rules(rules)
+            self.rules = Rules(rules, self.default_rule)
         else:
-            self.update(rules)
+            self.rules.update(rules)
 
     def clear(self):
         """Clears Enforcer rules, policy's cache and policy's path."""
         self.set_rules({})
+        self.default_rule = None
         self.policy_path = None
 
     def load_rules(self, force_reload=False):
@@ -194,8 +201,7 @@ class Enforcer(object):
 
         reloaded, data = fileutils.read_cached_file(self.policy_path,
                                                     force_reload=force_reload)
-
-        if reloaded:
+        if reloaded or not self.rules:
             rules = Rules.load_json(data, self.default_rule)
             self.set_rules(rules)
             LOG.debug(_("Rules successfully reloaded"))
@@ -215,7 +221,7 @@ class Enforcer(object):
         if policy_file:
             return policy_file
 
-        raise cfg.ConfigFilesNotFoundError(path=CONF.policy_file)
+        raise cfg.ConfigFilesNotFoundError((CONF.policy_file,))
 
     def enforce(self, rule, target, creds, do_raise=False,
                 exc=None, *args, **kwargs):
@@ -398,7 +404,7 @@ class AndCheck(BaseCheck):
         """
 
         for rule in self.rules:
-            if not rule(target, cred):
+            if not rule(target, cred, enforcer):
                 return False
 
         return True
@@ -441,7 +447,7 @@ class OrCheck(BaseCheck):
         """
 
         for rule in self.rules:
-            if rule(target, cred):
+            if rule(target, cred, enforcer):
                 return True
 
         return False
