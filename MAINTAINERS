@@ -1,0 +1,70 @@
+= Generalist Code Reviewers =
+
+The current members of ceilometer-core are listed here:
+
+  https://launchpad.net/~ceilometer-core/+members#active
+
+This group can +2 and approve patches in Ceilometer. However, they may
+choose to seek feedback from the appropriate specialist maintainer before
+approving a patch if it is in any way controversial or risky.
+
+
+= List of Maintainers =
+
+Each  has an entry with the following keys:
+
+ M: Maintainer (irc) <email address>
+ S: Status, one of the following:
+      Maintained:  Has an active maintainer
+      Orphan:      No current maintainer, feel free to step up!
+      Obsolete:    Replaced by newer code, or a dead end, or out-dated
+ F: Wildcard patterns, relative to ceilometer/
+
+
+== alarms ==
+
+M: Eoghan Glynn (eglynn)
+M: Mehdi Abaakouk (sileht)
+S: Maintained
+F: alarm/
+
+== api ==
+
+M: Doug Hellmann (dhellmann) <doug.hellmann@dreamhost.com>
+S: Maintained
+F: api/
+
+== events ==
+
+M: Sandy Walsh (sandywalsh)
+M: Monsyne Dragon (dragondm)
+S: Maintained
+F: collector/, storage/
+
+== pipeline ==
+
+M: Julien Danjou (jd__)
+S: Maintained
+F: publisher/, transformer/, pipeline.py
+
+== storage ==
+
+-- DB2 --
+M: Tong Li (litong) <litong01@us.ibm.com>
+S: Maintained
+F: storage/impl_db2.py
+
+-- HBase --
+M:
+S: Orphan
+F: storage/impl_hbase.py
+
+-- MongoDB --
+M:
+S: Orphan
+F: storage/impl_mongodb.py
+
+-- SQLAlchemy --
+M:
+S: Orphan
+F: storage/sqlalchemy/, storage/impl_sqlalchemy.py
