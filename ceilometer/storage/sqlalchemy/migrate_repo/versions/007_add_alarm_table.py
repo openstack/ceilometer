@@ -43,7 +43,9 @@ alarm = Table(
     Column('ok_actions', Text()),
     Column('alarm_actions', Text()),
     Column('insufficient_data_actions', Text()),
-    Column('matching_metadata', Text()))
+    Column('matching_metadata', Text()),
+    mysql_engine='InnoDB',
+    mysql_charset='utf8')
 
 
 def upgrade(migrate_engine):

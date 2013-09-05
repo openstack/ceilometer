@@ -39,7 +39,8 @@ def upgrade(migrate_engine):
         Column('type', String(20)),
         Column('detail', String(255)),
         Column('timestamp', DateTime(timezone=False)),
-        mysql_engine='InnoDB')
+        mysql_engine='InnoDB',
+        mysql_charset='utf8')
 
     alarm_history.create()
 

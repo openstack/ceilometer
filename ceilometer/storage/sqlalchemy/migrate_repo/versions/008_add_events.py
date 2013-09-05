@@ -27,7 +27,9 @@ meta = MetaData()
 unique_name = Table(
     'unique_name', meta,
     Column('id', Integer, primary_key=True),
-    Column('key', String(32), index=True)
+    Column('key', String(32), index=True),
+    mysql_engine='InnoDB',
+    mysql_charset='utf8',
 )
 
 
@@ -35,7 +37,9 @@ event = Table(
     'event', meta,
     Column('id', Integer, primary_key=True),
     Column('generated', Float(asdecimal=True), index=True),
-    Column('unique_name_id', Integer, ForeignKey('unique_name.id'))
+    Column('unique_name_id', Integer, ForeignKey('unique_name.id')),
+    mysql_engine='InnoDB',
+    mysql_charset='utf8',
 )
 
 
@@ -49,7 +53,9 @@ trait = Table(
     Column('t_int', Integer, nullable=True, default=None, index=True),
     Column('t_datetime', Float(asdecimal=True), nullable=True, default=None,
            index=True),
-    Column('event_id', Integer, ForeignKey('event.id'))
+    Column('event_id', Integer, ForeignKey('event.id')),
+    mysql_engine='InnoDB',
+    mysql_charset='utf8',
 )
 
 

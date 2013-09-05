@@ -38,7 +38,9 @@ meter = Table(
     Column('counter_duration', Integer),
     Column('timestamp', DateTime(timezone=False), index=True),
     Column('message_signature', String(1000)),
-    Column('message_id', String(1000))
+    Column('message_id', String(1000)),
+    mysql_engine='InnoDB',
+    mysql_charset='utf8',
 )
 
 resource = Table(
@@ -48,17 +50,23 @@ resource = Table(
     Column('project_id', String(255), index=True),
     Column('received_timestamp', DateTime(timezone=False)),
     Column('timestamp', DateTime(timezone=False), index=True),
-    Column('user_id', String(255), index=True)
+    Column('user_id', String(255), index=True),
+    mysql_engine='InnoDB',
+    mysql_charset='utf8',
 )
 
 user = Table(
     'user', meta,
     Column('id', String(255), primary_key=True, index=True),
+    mysql_engine='InnoDB',
+    mysql_charset='utf8',
 )
 
 project = Table(
     'project', meta,
     Column('id', String(255), primary_key=True, index=True),
+    mysql_engine='InnoDB',
+    mysql_charset='utf8',
 )
 
 sourceassoc = Table(
@@ -71,13 +79,17 @@ sourceassoc = Table(
     Index('idx_su', 'source_id', 'user_id'),
     Index('idx_sp', 'source_id', 'project_id'),
     Index('idx_sr', 'source_id', 'resource_id'),
-    Index('idx_sm', 'source_id', 'meter_id')
+    Index('idx_sm', 'source_id', 'meter_id'),
+    mysql_engine='InnoDB',
+    mysql_charset='utf8',
 )
 
 source = Table(
     'source', meta,
     Column('id', String(255), primary_key=True, index=True),
-    UniqueConstraint('id')
+    UniqueConstraint('id'),
+    mysql_engine='InnoDB',
+    mysql_charset='utf8',
 )
 
 
