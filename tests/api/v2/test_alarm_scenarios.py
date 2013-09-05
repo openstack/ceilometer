@@ -1013,7 +1013,14 @@ class TestAlarms(FunctionalTest,
         }
         self.post_json('/alarms', params=new_alarm, status=201,
                        headers=self.auth_headers)
-        alarm = self.get_json('/alarms')[4]
+
+        alarms = self.get_json('/alarms',
+                               q=[{'field': 'name',
+                                   'value': 'new_alarm',
+                                   }])
+        self.assertEqual(1, len(alarms))
+        alarm = alarms[0]
+
         history = self._get_alarm_history(alarm)
         self.assertEqual(1, len(history))
         self._assert_is_subset(dict(alarm_id=alarm['alarm_id'],
