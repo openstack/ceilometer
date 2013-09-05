@@ -32,13 +32,13 @@ from alembic import op
 
 
 TABLE_NAME = 'sourceassoc'
-OLD_NAME = 'uniq_sourceassoc0meter_id'
-NEW_NAME = 'uniq_sourceassoc0meter_id0user_id'
+UNIQ_NAME = 'uniq_sourceassoc0meter_id0user_id'
 COLUMNS = ('meter_id', 'user_id')
 
 
-def change_uniq(table_name, old_name, new_name, columns):
-    engine = op.get_bind().engine
+def change_uniq(table_name, uniq_name, columns, downgrade=False):
+    bind = op.get_bind()
+    engine = bind.engine
     if engine.name == 'sqlite':
         return
     if engine.name == 'mysql':
@@ -50,12 +50,10 @@ def change_uniq(table_name, old_name, new_name, columns):
         op.drop_constraint('fk_sourceassoc_user_id',
                            table_name,
                            type_='foreignkey')
-    try:
-        # For some versions of dialects constraint can be skipped.
-        op.drop_constraint(old_name, table_name=table_name, type_='unique')
-    except Exception:
-        pass
-    op.create_unique_constraint(new_name, table_name, columns)
+    if downgrade:
+        op.drop_constraint(uniq_name, table_name=table_name, type_='unique')
+    else:
+        op.create_unique_constraint(uniq_name, table_name, columns)
     if engine.name == 'mysql':
         op.create_foreign_key('fk_sourceassoc_meter_id', table_name, 'meter',
                               ['meter_id'], ['id'])
@@ -64,8 +62,8 @@ def change_uniq(table_name, old_name, new_name, columns):
 
 
 def upgrade():
-    change_uniq(TABLE_NAME, OLD_NAME, NEW_NAME, COLUMNS)
+    change_uniq(TABLE_NAME, UNIQ_NAME, COLUMNS)
 
 
 def downgrade():
-    change_uniq(TABLE_NAME, NEW_NAME, OLD_NAME, COLUMNS)
+    change_uniq(TABLE_NAME, UNIQ_NAME, COLUMNS, downgrade=True)
