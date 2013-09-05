@@ -95,3 +95,5 @@ class Sample(object):
 TYPE_GAUGE = 'gauge'
 TYPE_DELTA = 'delta'
 TYPE_CUMULATIVE = 'cumulative'
+
+TYPES = (TYPE_GAUGE, TYPE_DELTA, TYPE_CUMULATIVE)
