@@ -139,11 +139,37 @@ class TestNovaNotifier(base.TestCase):
                               "access_ip_v6": "2001:DB8::0",
                               "metadata": {},
                               "uuid": "144e08f4-00cb-11e2-888e-5453ed1bbb5f",
-                              "system_metadata": {}}
+                              "system_metadata": {},
+                              "user_data": None,
+                              "cleaned": 0,
+                              "deleted": None,
+                              "vm_mode": None,
+                              "deleted_at": None,
+                              "disable_terminate": False,
+                              "root_device_name": None,
+                              "default_swap_device": None,
+                              "launched_on": None,
+                              "display_description": None,
+                              "key_data": None,
+                              "key_name": None,
+                              "config_drive": None,
+                              "power_state": None,
+                              "default_ephemeral_device": None,
+                              "progress": 0,
+                              "scheduled_at": None,
+                              "updated_at": None,
+                              "shutdown_terminate": False,
+                              "cell_name": 'cell',
+                              "locked": False,
+                              "locked_by": None,
+                              "launch_index": 0,
+                              "auto_disk_config": False,
+                              }
 
         self.instance = nova_instance.Instance()
-        for key, value in self.instance_data.iteritems():
-            setattr(self.instance, key, value)
+        self.instance = nova_instance.Instance._from_db_object(
+                context, self.instance, self.instance_data,
+                expected_attrs=['metadata', 'system_metadata'])
 
         self.stubs.Set(db, 'instance_info_cache_delete', self.do_nothing)
         self.stubs.Set(db, 'instance_destroy', self.do_nothing)
@@ -152,7 +178,7 @@ class TestNovaNotifier(base.TestCase):
         self.stubs.Set(db, 'block_device_mapping_get_all_by_instance',
                        lambda context, instance: {})
         self.stubs.Set(db, 'instance_update_and_get_original',
-                       lambda context, uuid, kwargs: (self.instance,
+                       lambda context, uuid, kwargs, update_cells: (self.instance,
                                                       self.instance))
         self.stubs.Set(flavors, 'extract_flavor',
                        lambda ref: {})
