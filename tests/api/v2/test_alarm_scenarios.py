@@ -179,6 +179,7 @@ class TestAlarms(FunctionalTest,
         self.assertEqual(3, len(data))
 
         self.delete('/alarms/%s' % data[0]['alarm_id'],
+                    headers=self.auth_headers,
                     status=200)
         alarms = list(self.conn.get_alarms())
         self.assertEqual(2, len(alarms))
