@@ -178,8 +178,7 @@ class TestNovaNotifier(base.TestCase):
         self.stubs.Set(db, 'block_device_mapping_get_all_by_instance',
                        lambda context, instance: {})
         self.stubs.Set(db, 'instance_update_and_get_original',
-                       lambda context, uuid, kwargs, update_cells: (self.instance,
-                                                      self.instance))
+                       lambda *args, **kwargs: (self.instance, self.instance))
         self.stubs.Set(flavors, 'extract_flavor',
                        lambda ref: {})
 
