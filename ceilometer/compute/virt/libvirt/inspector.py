@@ -111,7 +111,11 @@ class LibvirtInspector(virt_inspector.Inspector):
         domain = self._lookup_by_name(instance_name)
         tree = etree.fromstring(domain.XMLDesc(0))
         for iface in tree.findall('devices/interface'):
-            name = iface.find('target').get('dev')
+            target = iface.find('target')
+            if target is not None:
+                name = target.get('dev')
+            else:
+                continue
             mac = iface.find('mac').get('address')
             fref = iface.find('filterref')
             if fref is not None:
