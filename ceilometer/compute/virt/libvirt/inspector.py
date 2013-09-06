@@ -116,14 +116,18 @@ class LibvirtInspector(virt_inspector.Inspector):
                 name = target.get('dev')
             else:
                 continue
-            mac = iface.find('mac').get('address')
+            mac = iface.find('mac')
+            if mac is not None:
+                mac_address = mac.get('address')
+            else:
+                continue
             fref = iface.find('filterref')
             if fref is not None:
                 fref = fref.get('filter')
 
             params = dict((p.get('name').lower(), p.get('value'))
                           for p in iface.findall('filterref/parameter'))
-            interface = virt_inspector.Interface(name=name, mac=mac,
+            interface = virt_inspector.Interface(name=name, mac=mac_address,
                                                  fref=fref, parameters=params)
             rx_bytes, rx_packets, _, _, \
                 tx_bytes, tx_packets, _, _ = domain.interfaceStats(name)
