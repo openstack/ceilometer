@@ -53,10 +53,8 @@ def downgrade(migrate_engine):
     meta = sqlalchemy.MetaData(bind=migrate_engine)
     event = sqlalchemy.Table('event', meta, autoload=True)
     message_id = sqlalchemy.Column('message_id', sqlalchemy.String(50))
-    event.drop_column(message_id)
-
     cons = UniqueConstraint('message_id', table=event)
     cons.drop()
-
     index = sqlalchemy.Index('idx_event_message_id', models.Event.message_id)
     index.drop(bind=migrate_engine)
+    event.drop_column(message_id)

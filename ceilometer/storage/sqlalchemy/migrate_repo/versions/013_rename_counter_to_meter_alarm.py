@@ -18,16 +18,16 @@
 
 from sqlalchemy import MetaData, Table
 
-meta = MetaData()
-
 
 def upgrade(migrate_engine):
+    meta = MetaData()
     meta.bind = migrate_engine
     alarm = Table('alarm', meta, autoload=True)
     alarm.c.counter_name.alter(name='meter_name')
 
 
 def downgrade(migrate_engine):
+    meta = MetaData()
     meta.bind = migrate_engine
     alarm = Table('alarm', meta, autoload=True)
     alarm.c.meter_name.alter(name='counter_name')
