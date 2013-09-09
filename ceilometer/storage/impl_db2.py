@@ -22,7 +22,6 @@
 """
 
 import copy
-import urlparse
 import weakref
 
 import bson.code
@@ -138,21 +137,22 @@ class ConnectionPool(object):
         self._pool = {}
 
     def connect(self, url):
-        if url in self._pool:
-            client = self._pool.get(url)()
+        connection_options = pymongo.uri_parser.parse_uri(url)
+        del connection_options['database']
+        del connection_options['username']
+        del connection_options['password']
+        del connection_options['collection']
+        pool_key = tuple(connection_options)
+
+        if pool_key in self._pool:
+            client = self._pool.get(pool_key)()
             if client:
                 return client
-        LOG.info('connecting to DB2 on %s', url)
-        url_parsed = urlparse.urlparse(url)
-        if url_parsed.path.startswith('/ceilometer_for_tox_testing_'):
-            #note(sileht): this is a workaround for running tests without reach
-            #the maximum allowed connection of mongod in gate
-            #this only work with pymongo >= 2.6, this is not in the
-            #requirements file because is not needed for normal use of mongo
-            client = pymongo.MongoClient(url, safe=True, max_pool_size=None)
-        else:
-            client = pymongo.MongoClient(url, safe=True)
-        self._pool[url] = weakref.ref(client)
+        LOG.info('connecting to MongoDB on %s', url)
+        client = pymongo.MongoClient(
+            url,
+            safe=True)
+        self._pool[pool_key] = weakref.ref(client)
         return client
 
 
@@ -205,6 +205,9 @@ class Connection(base.Connection):
 
         connection_options = pymongo.uri_parser.parse_uri(url)
         self.db = getattr(self.conn, connection_options['database'])
+        if connection_options.get('username'):
+            self.db.authenticate(connection_options['username'],
+                                 connection_options['password'])
 
         self.upgrade()
 

@@ -36,5 +36,5 @@ done < ${MONGO_DATA}/out
 # Read the fifo for ever otherwise mongod would block
 # + that gives us the log on screen
 cat ${MONGO_DATA}/out > /dev/null &
-export CEILOMETER_TEST_MONGODB_URL="mongodb://localhost:29000/ceilometer_for_tox_testing"
+export CEILOMETER_TEST_MONGODB_URL="mongodb://localhost:29000/ceilometer"
 python setup.py testr --slowest --testr-args="$*" $COVERAGE_ARG
