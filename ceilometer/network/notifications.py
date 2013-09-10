@@ -45,7 +45,11 @@ class NetworkNotificationBase(plugin.NotificationBase):
     @property
     def event_types(self):
         return [
-            '%s.create.*' % (self.resource_name),
+            # NOTE(flwang): When the *.create.start notification sending,
+            # there is no resource id assigned by Neutron yet. So we ignore
+            # the *.create.start notification for now and only listen the
+            # *.create.end to make sure the resource id is existed.
+            '%s.create.end' % (self.resource_name),
             '%s.update.*' % (self.resource_name),
             '%s.exists' % (self.resource_name),
             # FIXME(dhellmann): Neutron delete notifications do
