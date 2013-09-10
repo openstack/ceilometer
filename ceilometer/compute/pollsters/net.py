@@ -23,6 +23,7 @@ import copy
 from ceilometer import sample
 from ceilometer.compute import plugin
 from ceilometer.compute.pollsters import util
+from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 
@@ -83,6 +84,9 @@ class _Base(plugin.ComputePollster):
                 LOG.info(self.NET_USAGE_MESSAGE, instance_name,
                          vnic.name, info.rx_bytes, info.tx_bytes)
                 yield self._get_sample(instance, vnic, info)
+        except virt_inspector.InstanceNotFoundException as err:
+            # Instance was deleted while getting samples. Ignore it.
+            LOG.debug('Exception while getting samples %s', err)
         except Exception as err:
             LOG.warning('Ignoring instance %s: %s',
                         instance_name, err)
