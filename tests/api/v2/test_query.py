@@ -101,6 +101,40 @@ class TestQuery(tests_base.TestCase):
                       type='integer')
         self.assertRaises(wsme.exc.ClientSideError, query._get_value_as_type)
 
+    def test_get_value_as_type_integer_expression_without_type(self):
+        # bug 1221736
+        query = Query(field='should_be_a_string',
+                      op='eq',
+                      value='123-1')
+        expected = '123-1'
+        self.assertEqual(query._get_value_as_type(), expected)
+
+    def test_get_value_as_type_boolean_expression_without_type(self):
+        # bug 1221736
+        query = Query(field='should_be_a_string',
+                      op='eq',
+                      value='True or False')
+        expected = 'True or False'
+        self.assertEqual(query._get_value_as_type(), expected)
+
+    def test_get_value_as_type_with_syntax_error(self):
+        # bug 1221736
+        value = 'WWW-Layer-4a80714f-0232-4580-aa5e-81494d1a4147-uolhh25p5xxm'
+        query = Query(field='group_id',
+                      op='eq',
+                      value=value)
+        expected = value
+        self.assertEqual(query._get_value_as_type(), expected)
+
+    def test_get_value_as_type_with_syntax_error_colons(self):
+        # bug 1221736
+        value = 'Ref::StackId'
+        query = Query(field='field_name',
+                      op='eq',
+                      value=value)
+        expected = value
+        self.assertEqual(query._get_value_as_type(), expected)
+
     def _fake_db_func(self, resource, on_behalf_of, x, y,
                       metaquery={}, user=None, project=None,
                       start_timestamp=None, start_timestamp_op=None,

@@ -175,7 +175,7 @@ class Query(_Base):
             if not self.type:
                 try:
                     converted_value = ast.literal_eval(self.value)
-                except ValueError:
+                except (ValueError, SyntaxError):
                     msg = _('Failed to convert the metadata value %s'
                             ' automatically') % (self.value)
                     LOG.debug(msg)
