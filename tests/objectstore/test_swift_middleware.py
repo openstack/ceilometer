@@ -240,3 +240,11 @@ class TestSwiftMiddleware(base.TestCase):
         self.assertEqual(data.resource_metadata['version'], '1.0')
         self.assertEqual(data.resource_metadata['container'], 'container')
         self.assertEqual(data.resource_metadata['object'], None)
+
+    def test_bogus_path(self):
+        app = swift_middleware.CeilometerMiddleware(FakeApp(), {})
+        req = Request.blank('//v1/account/container',
+                            environ={'REQUEST_METHOD': 'GET'})
+        list(app(req.environ, self.start_response))
+        samples = self.pipeline_manager.pipelines[0].samples
+        self.assertEqual(len(samples), 0)
