@@ -18,6 +18,7 @@
 # under the License.
 
 import cStringIO as StringIO
+import mock
 
 from oslo.config import cfg
 from webob import Request
@@ -248,3 +249,24 @@ class TestSwiftMiddleware(base.TestCase):
         list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples
         self.assertEqual(len(samples), 0)
+
+    def test_missing_resource_id(self):
+        app = swift_middleware.CeilometerMiddleware(FakeApp(), {})
+        req = Request.blank('/5.0/',
+                            environ={'REQUEST_METHOD': 'GET'})
+        list(app(req.environ, self.start_response))
+        samples = self.pipeline_manager.pipelines[0].samples
+        self.assertEqual(len(samples), 0)
+
+    @mock.patch.object(swift_middleware.CeilometerMiddleware,
+                       'publish_sample')
+    def test_publish_sample_fail(self, mocked_publish_sample):
+        mocked_publish_sample.side_effect = Exception("a exception")
+        app = swift_middleware.CeilometerMiddleware(FakeApp(body=["test"]), {})
+        req = Request.blank('/1.0/account/container',
+                            environ={'REQUEST_METHOD': 'GET'})
+        resp = list(app(req.environ, self.start_response))
+        samples = self.pipeline_manager.pipelines[0].samples
+        self.assertEqual(len(samples), 0)
+        self.assertEqual(resp, ["test"])
+        mocked_publish_sample.assert_called_once_with(mock.ANY, 0, 4)
