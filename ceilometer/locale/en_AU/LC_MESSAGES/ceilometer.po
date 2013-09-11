@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-08-30 06:04+0000\n"
+"POT-Creation-Date: 2013-09-11 06:02+0000\n"
 "PO-Revision-Date: 2012-12-11 06:53+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: English (Australia) "
@@ -113,58 +113,58 @@ msgstr ""
 msgid "comparing value %(value)s against threshold %(limit)s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:165
+#: ceilometer/api/controllers/v2.py:179
 #, python-format
 msgid "Failed to convert the metadata value %s automatically"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:183
+#: ceilometer/api/controllers/v2.py:197
 #, python-format
 msgid ""
 "Failed to convert the metadata value %(value)s to the expected data type "
 "%(type)s."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:188
+#: ceilometer/api/controllers/v2.py:202
 #, python-format
 msgid ""
 "The data type %s is not supported. The supported data type list is: "
 "integer, float, boolean and string."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:193
+#: ceilometer/api/controllers/v2.py:207
 #, python-format
 msgid ""
 "Unexpected exception converting %(value)s to the expected data type "
 "%(type)s."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:629
+#: ceilometer/api/controllers/v2.py:669
 msgid "Period must be positive."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:779
+#: ceilometer/api/controllers/v2.py:831
 msgid "Unknown resource"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:955
+#: ceilometer/api/controllers/v2.py:1010
 msgid "Unknown alarm"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1030
+#: ceilometer/api/controllers/v2.py:1140
 msgid "Alarm with that name exists"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1039
+#: ceilometer/api/controllers/v2.py:1149
 msgid "Alarm incorrect"
 msgstr ""
 
-#: ceilometer/collector/service.py:88
+#: ceilometer/collector/service.py:87
 #, python-format
 msgid "UDP: Cannot decode data sent by %s"
 msgstr ""
 
-#: ceilometer/collector/service.py:98
+#: ceilometer/collector/service.py:97
 msgid "UDP: Unable to store meter"
 msgstr ""
 
@@ -182,17 +182,17 @@ msgstr ""
 msgid "INFO %r"
 msgstr ""
 
-#: ceilometer/compute/nova_notifier.py:142
+#: ceilometer/compute/nova_notifier.py:146
 #, python-format
 msgid "ignoring %s"
 msgstr ""
 
-#: ceilometer/compute/nova_notifier.py:144
+#: ceilometer/compute/nova_notifier.py:148
 #, python-format
 msgid "processing %s"
 msgstr ""
 
-#: ceilometer/compute/nova_notifier.py:148
+#: ceilometer/compute/nova_notifier.py:152
 #, python-format
 msgid "polling final stats for %r"
 msgstr ""
@@ -364,64 +364,64 @@ msgstr ""
 msgid "Failed to understand rule %r"
 msgstr ""
 
-#: ceilometer/openstack/common/service.py:118
-#: ceilometer/openstack/common/service.py:335
+#: ceilometer/openstack/common/service.py:136
+#: ceilometer/openstack/common/service.py:346
 msgid "Full set of CONF:"
 msgstr ""
 
-#: ceilometer/openstack/common/service.py:127
-#: ceilometer/openstack/common/service.py:217
+#: ceilometer/openstack/common/service.py:143
+#: ceilometer/openstack/common/service.py:228
 #, python-format
 msgid "Caught %s, exiting"
 msgstr ""
 
-#: ceilometer/openstack/common/service.py:139
+#: ceilometer/openstack/common/service.py:155
 msgid "Exception during rpc cleanup."
 msgstr ""
 
-#: ceilometer/openstack/common/service.py:188
+#: ceilometer/openstack/common/service.py:200
 msgid "Parent process has died unexpectedly, exiting"
 msgstr ""
 
-#: ceilometer/openstack/common/service.py:223
+#: ceilometer/openstack/common/service.py:234
 msgid "Unhandled exception"
 msgstr ""
 
-#: ceilometer/openstack/common/service.py:256
+#: ceilometer/openstack/common/service.py:267
 msgid "Forking too fast, sleeping"
 msgstr ""
 
-#: ceilometer/openstack/common/service.py:278
+#: ceilometer/openstack/common/service.py:289
 #, python-format
 msgid "Started child %d"
 msgstr ""
 
-#: ceilometer/openstack/common/service.py:288
+#: ceilometer/openstack/common/service.py:299
 #, python-format
 msgid "Starting %d workers"
 msgstr ""
 
-#: ceilometer/openstack/common/service.py:305
+#: ceilometer/openstack/common/service.py:316
 #, python-format
 msgid "Child %(pid)d killed by signal %(sig)d"
 msgstr ""
 
-#: ceilometer/openstack/common/service.py:309
+#: ceilometer/openstack/common/service.py:320
 #, python-format
 msgid "Child %(pid)s exited with status %(code)d"
 msgstr ""
 
-#: ceilometer/openstack/common/service.py:313
+#: ceilometer/openstack/common/service.py:324
 #, python-format
 msgid "pid %d not in child list"
 msgstr ""
 
-#: ceilometer/openstack/common/service.py:345
+#: ceilometer/openstack/common/service.py:354
 #, python-format
 msgid "Caught %s, stopping children"
 msgstr ""
 
-#: ceilometer/openstack/common/service.py:363
+#: ceilometer/openstack/common/service.py:372
 #, python-format
 msgid "Waiting on %d children to exit"
 msgstr ""
@@ -588,57 +588,57 @@ msgstr ""
 msgid "unpacked context: %s"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/amqp.py:336
+#: ceilometer/openstack/common/rpc/amqp.py:341
 #, python-format
 msgid "UNIQUE_ID is %s."
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/amqp.py:408
+#: ceilometer/openstack/common/rpc/amqp.py:434
 #, python-format
 msgid "received %s"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/amqp.py:416
+#: ceilometer/openstack/common/rpc/amqp.py:442
 #, python-format
 msgid "no method for message: %s"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/amqp.py:417
+#: ceilometer/openstack/common/rpc/amqp.py:443
 #, python-format
 msgid "No method for message: %s"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/amqp.py:445
+#: ceilometer/openstack/common/rpc/amqp.py:471
 #: ceilometer/openstack/common/rpc/impl_zmq.py:280
 #, python-format
 msgid "Expected exception during message handling (%s)"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/amqp.py:453
+#: ceilometer/openstack/common/rpc/amqp.py:479
 #: ceilometer/openstack/common/rpc/impl_zmq.py:286
 msgid "Exception during message handling"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/amqp.py:527
+#: ceilometer/openstack/common/rpc/amqp.py:553
 #, python-format
 msgid "Making synchronous call on %s ..."
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/amqp.py:530
+#: ceilometer/openstack/common/rpc/amqp.py:556
 #, python-format
 msgid "MSG_ID is %s"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/amqp.py:556
+#: ceilometer/openstack/common/rpc/amqp.py:582
 #, python-format
 msgid "Making asynchronous cast on %s..."
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/amqp.py:565
+#: ceilometer/openstack/common/rpc/amqp.py:591
 msgid "Making asynchronous fanout cast..."
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/amqp.py:593
+#: ceilometer/openstack/common/rpc/amqp.py:619
 #, python-format
 msgid "Sending %(event_type)s on %(topic)s"
 msgstr ""
@@ -702,81 +702,86 @@ msgstr ""
 msgid "Returning exception %s to caller"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_kombu.py:162
+#: ceilometer/openstack/common/rpc/impl_kombu.py:157
 msgid "Failed to process message ... skipping it."
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_kombu.py:165
+#: ceilometer/openstack/common/rpc/impl_kombu.py:161
 msgid "Failed to process message ... will requeue."
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_kombu.py:502
+#: ceilometer/openstack/common/rpc/impl_kombu.py:496
 #, python-format
 msgid "Reconnecting to AMQP server on %(hostname)s:%(port)d"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_kombu.py:524
+#: ceilometer/openstack/common/rpc/impl_kombu.py:518
 #, python-format
 msgid "Connected to AMQP server on %(hostname)s:%(port)d"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_kombu.py:561
+#: ceilometer/openstack/common/rpc/impl_kombu.py:555
 #, python-format
 msgid ""
 "Unable to connect to AMQP server on %(hostname)s:%(port)d after "
 "%(max_retries)d tries: %(err_str)s"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_kombu.py:575
+#: ceilometer/openstack/common/rpc/impl_kombu.py:569
 #, python-format
 msgid ""
 "AMQP server on %(hostname)s:%(port)d is unreachable: %(err_str)s. Trying "
 "again in %(sleep_time)d seconds."
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_kombu.py:629
-#: ceilometer/openstack/common/rpc/impl_qpid.py:492
+#: ceilometer/openstack/common/rpc/impl_kombu.py:623
+#: ceilometer/openstack/common/rpc/impl_qpid.py:585
 #, python-format
 msgid "Failed to declare consumer for topic '%(topic)s': %(err_str)s"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_kombu.py:647
-#: ceilometer/openstack/common/rpc/impl_qpid.py:507
+#: ceilometer/openstack/common/rpc/impl_kombu.py:641
+#: ceilometer/openstack/common/rpc/impl_qpid.py:600
 #, python-format
 msgid "Timed out waiting for RPC response: %s"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_kombu.py:651
-#: ceilometer/openstack/common/rpc/impl_qpid.py:511
+#: ceilometer/openstack/common/rpc/impl_kombu.py:645
+#: ceilometer/openstack/common/rpc/impl_qpid.py:604
 #, python-format
 msgid "Failed to consume message from queue: %s"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_kombu.py:690
-#: ceilometer/openstack/common/rpc/impl_qpid.py:546
+#: ceilometer/openstack/common/rpc/impl_kombu.py:684
+#: ceilometer/openstack/common/rpc/impl_qpid.py:639
 #, python-format
 msgid "Failed to publish message to topic '%(topic)s': %(err_str)s"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_qpid.py:161
+#: ceilometer/openstack/common/rpc/impl_qpid.py:89
+#, python-format
+msgid "Invalid value for qpid_topology_version: %d"
+msgstr ""
+
+#: ceilometer/openstack/common/rpc/impl_qpid.py:191
 msgid "Failed to process message... skipping it."
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_qpid.py:434
+#: ceilometer/openstack/common/rpc/impl_qpid.py:527
 #, python-format
 msgid "Unable to connect to AMQP server: %(e)s. Sleeping %(delay)s seconds"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_qpid.py:440
+#: ceilometer/openstack/common/rpc/impl_qpid.py:533
 #, python-format
 msgid "Connected to AMQP server on %s"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_qpid.py:453
+#: ceilometer/openstack/common/rpc/impl_qpid.py:546
 msgid "Re-established AMQP queues"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_qpid.py:519
+#: ceilometer/openstack/common/rpc/impl_qpid.py:612
 msgid "Error processing message.  Skipping it."
 msgstr ""
 
@@ -842,112 +847,112 @@ msgstr ""
 msgid "In reactor registered"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_zmq.py:387
+#: ceilometer/openstack/common/rpc/impl_zmq.py:388
 msgid "Consuming socket"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_zmq.py:437
+#: ceilometer/openstack/common/rpc/impl_zmq.py:438
 #, python-format
 msgid "Creating proxy for topic: %s"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_zmq.py:443
+#: ceilometer/openstack/common/rpc/impl_zmq.py:444
 msgid "Topic contained dangerous characters."
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_zmq.py:475
+#: ceilometer/openstack/common/rpc/impl_zmq.py:476
 msgid "Topic socket file creation failed."
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_zmq.py:481
+#: ceilometer/openstack/common/rpc/impl_zmq.py:482
 #, python-format
 msgid "Local per-topic backlog buffer full for topic %(topic)s. Dropping message."
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_zmq.py:497
+#: ceilometer/openstack/common/rpc/impl_zmq.py:498
 #, python-format
 msgid "Required IPC directory does not exist at %s"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_zmq.py:506
+#: ceilometer/openstack/common/rpc/impl_zmq.py:507
 #, python-format
 msgid "Permission denied to IPC directory at %s"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_zmq.py:509
+#: ceilometer/openstack/common/rpc/impl_zmq.py:510
 msgid "Could not create ZeroMQ receiver daemon. Socket may already be in use."
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_zmq.py:543
+#: ceilometer/openstack/common/rpc/impl_zmq.py:544
 #, python-format
 msgid "CONSUMER RECEIVED DATA: %s"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_zmq.py:562
+#: ceilometer/openstack/common/rpc/impl_zmq.py:563
 msgid "ZMQ Envelope version unsupported or unknown."
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_zmq.py:590
+#: ceilometer/openstack/common/rpc/impl_zmq.py:591
 msgid "Skipping topic registration. Already registered."
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_zmq.py:597
+#: ceilometer/openstack/common/rpc/impl_zmq.py:598
 #, python-format
 msgid "Consumer is a zmq.%s"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_zmq.py:649
+#: ceilometer/openstack/common/rpc/impl_zmq.py:650
 msgid "Creating payload"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_zmq.py:662
+#: ceilometer/openstack/common/rpc/impl_zmq.py:663
 msgid "Creating queue socket for reply waiter"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_zmq.py:675
+#: ceilometer/openstack/common/rpc/impl_zmq.py:676
 msgid "Sending cast"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_zmq.py:678
+#: ceilometer/openstack/common/rpc/impl_zmq.py:679
 msgid "Cast sent; Waiting reply"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_zmq.py:681
+#: ceilometer/openstack/common/rpc/impl_zmq.py:682
 #, python-format
 msgid "Received message: %s"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_zmq.py:682
+#: ceilometer/openstack/common/rpc/impl_zmq.py:683
 msgid "Unpacking response"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_zmq.py:691
+#: ceilometer/openstack/common/rpc/impl_zmq.py:692
 msgid "Unsupported or unknown ZMQ envelope returned."
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_zmq.py:698
+#: ceilometer/openstack/common/rpc/impl_zmq.py:699
 msgid "RPC Message Invalid."
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_zmq.py:721
+#: ceilometer/openstack/common/rpc/impl_zmq.py:722
 #, python-format
 msgid "%(msg)s"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_zmq.py:724
+#: ceilometer/openstack/common/rpc/impl_zmq.py:725
 #, python-format
 msgid "Sending message(s) to: %s"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_zmq.py:728
+#: ceilometer/openstack/common/rpc/impl_zmq.py:729
 msgid "No matchmaker results. Not casting."
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_zmq.py:731
+#: ceilometer/openstack/common/rpc/impl_zmq.py:732
 msgid "No match from matchmaker."
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_zmq.py:813
+#: ceilometer/openstack/common/rpc/impl_zmq.py:814
 #, python-format
 msgid "rpc_zmq_matchmaker = %(orig)s is deprecated; use %(new)s instead"
 msgstr ""
@@ -989,13 +994,29 @@ msgstr ""
 msgid "Unable to send sample over UDP"
 msgstr ""
 
-#: ceilometer/storage/impl_db2.py:364 ceilometer/storage/impl_db2.py:432
-#: ceilometer/storage/impl_db2.py:572 ceilometer/storage/impl_hbase.py:307
-#: ceilometer/storage/impl_hbase.py:393
-#: ceilometer/storage/impl_sqlalchemy.py:297
-#: ceilometer/storage/impl_sqlalchemy.py:364
-#: ceilometer/storage/impl_sqlalchemy.py:592
+#: ceilometer/storage/impl_db2.py:397 ceilometer/storage/impl_db2.py:466
+#: ceilometer/storage/impl_db2.py:594 ceilometer/storage/impl_hbase.py:308
+#: ceilometer/storage/impl_hbase.py:392 ceilometer/storage/impl_mongodb.py:605
+#: ceilometer/storage/impl_mongodb.py:687
+#: ceilometer/storage/impl_mongodb.py:820
+#: ceilometer/storage/impl_sqlalchemy.py:295
+#: ceilometer/storage/impl_sqlalchemy.py:394
+#: ceilometer/storage/impl_sqlalchemy.py:614
 msgid "Pagination not implemented"
+msgstr ""
+
+#: ceilometer/storage/impl_sqlalchemy.py:113
+msgid "Missing required meter specifier"
+msgstr ""
+
+#: ceilometer/storage/impl_sqlalchemy.py:136
+#: ceilometer/storage/impl_sqlalchemy.py:297
+#: ceilometer/storage/impl_sqlalchemy.py:396
+msgid "metaquery not implemented"
+msgstr ""
+
+#: ceilometer/storage/impl_sqlalchemy.py:543
+msgid "Unable to group by these fields"
 msgstr ""
 
 #: ceilometer/transformer/conversions.py:67
