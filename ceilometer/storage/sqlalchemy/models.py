@@ -25,10 +25,11 @@ from oslo.config import cfg
 from sqlalchemy import Column, Integer, String, Table, ForeignKey, DateTime, \
     Index, UniqueConstraint
 from sqlalchemy import Float, Boolean, Text
+from sqlalchemy.dialects.mysql import DECIMAL
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
-from sqlalchemy.types import TypeDecorator
+from sqlalchemy.types import TypeDecorator, DATETIME
 
 from ceilometer.openstack.common import timeutils
 from ceilometer.storage import models as api_models
@@ -64,6 +65,33 @@ class JSONEncodedDict(TypeDecorator):
     def process_result_value(self, value, dialect):
         if value is not None:
             value = json.loads(value)
+        return value
+
+
+class PreciseTimestamp(TypeDecorator):
+    """Represents a timestamp precise to the microsecond."""
+
+    impl = DATETIME
+
+    def load_dialect_impl(self, dialect):
+        if dialect.name == 'mysql':
+            return dialect.type_descriptor(DECIMAL(precision=20,
+                                                   scale=6,
+                                                   asdecimal=True))
+        return dialect.type_descriptor(DATETIME())
+
+    def process_bind_param(self, value, dialect):
+        if value is None:
+            return value
+        elif dialect.name == 'mysql':
+            return utils.dt_to_decimal(value)
+        return value
+
+    def process_result_value(self, value, dialect):
+        if value is None:
+            return value
+        elif dialect.name == 'mysql':
+            return utils.decimal_to_dt(value)
         return value
 
 
@@ -133,7 +161,7 @@ class Meter(Base):
     counter_type = Column(String(255))
     counter_unit = Column(String(255))
     counter_volume = Column(Float(53))
-    timestamp = Column(DateTime, default=timeutils.utcnow)
+    timestamp = Column(PreciseTimestamp(), default=timeutils.utcnow)
     message_signature = Column(String(1000))
     message_id = Column(String(1000))
 
