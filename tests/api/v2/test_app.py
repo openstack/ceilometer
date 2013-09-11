@@ -65,6 +65,15 @@ class TestApp(base.TestCase):
         os.unlink(tmpfile)
 
 
+class TestPecanApp(FunctionalTest):
+    database_connection = tests_db.MongoDBFakeConnectionUrl()
+
+    def test_pecan_extension_guessing_unset(self):
+        # check Pecan does not assume .jpg is an extension
+        response = self.app.get(self.PATH_PREFIX + '/meters/meter.jpg')
+        self.assertEqual(response.content_type, 'application/json')
+
+
 class TestApiMiddleware(FunctionalTest):
 
     # This doesn't really matter
