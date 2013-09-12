@@ -52,8 +52,12 @@ class PollingTask(agent.PollingTask):
                         LOG.exception(err)
 
     def poll_and_publish(self):
-        self.poll_and_publish_instances(
-            self.manager.nv.instance_get_all_by_host(cfg.CONF.host))
+        try:
+            instances = self.manager.nv.instance_get_all_by_host(cfg.CONF.host)
+        except Exception as err:
+            LOG.exception('Unable to retrieve instances: %s', err)
+        else:
+            self.poll_and_publish_instances(instances)
 
 
 class AgentManager(agent.AgentManager):
