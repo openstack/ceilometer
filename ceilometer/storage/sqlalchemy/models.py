@@ -204,6 +204,22 @@ class Alarm(Base):
     matching_metadata = Column(JSONEncodedDict)
 
 
+class AlarmChange(Base):
+    """Define AlarmChange data."""
+    __tablename__ = 'alarm_history'
+    __table_args__ = (
+        Index('ix_alarm_history_alarm_id', 'alarm_id'),
+    )
+    event_id = Column(String(255), primary_key=True)
+    alarm_id = Column(String(255))
+    on_behalf_of = Column(String(255), ForeignKey('project.id'))
+    project_id = Column(String(255), ForeignKey('project.id'))
+    user_id = Column(String(255), ForeignKey('user.id'))
+    type = Column(String(20))
+    detail = Column(String(255))
+    timestamp = Column(DateTime, default=timeutils.utcnow)
+
+
 class UniqueName(Base):
     """Key names should only be stored once.
     """

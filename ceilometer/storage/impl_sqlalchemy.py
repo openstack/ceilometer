@@ -35,6 +35,7 @@ from ceilometer.storage import base
 from ceilometer.storage import models as api_models
 from ceilometer.storage.sqlalchemy import migration
 from ceilometer.storage.sqlalchemy.models import Alarm
+from ceilometer.storage.sqlalchemy.models import AlarmChange
 from ceilometer.storage.sqlalchemy.models import Base
 from ceilometer.storage.sqlalchemy.models import Event
 from ceilometer.storage.sqlalchemy.models import Meter
@@ -668,6 +669,17 @@ class Connection(base.Connection):
             session.query(Alarm).filter(Alarm.id == alarm_id).delete()
             session.flush()
 
+    @staticmethod
+    def _row_to_alarm_change_model(row):
+        return api_models.AlarmChange(event_id=row.event_id,
+                                      alarm_id=row.alarm_id,
+                                      type=row.type,
+                                      detail=row.detail,
+                                      user_id=row.user_id,
+                                      project_id=row.project_id,
+                                      on_behalf_of=row.on_behalf_of,
+                                      timestamp=row.timestamp)
+
     def get_alarm_changes(self, alarm_id, on_behalf_of,
                           user=None, project=None, type=None,
                           start_timestamp=None, start_timestamp_op=None,
@@ -695,12 +707,44 @@ class Connection(base.Connection):
         :param end_timestamp: Optional modified timestamp end range
         :param end_timestamp_op: Optional timestamp end range operation
         """
-        raise NotImplementedError('Alarm history not implemented')
+        session = sqlalchemy_session.get_session()
+        query = session.query(AlarmChange)
+        query = query.filter(AlarmChange.alarm_id == alarm_id)
+
+        if on_behalf_of is not None:
+            query = query.filter(AlarmChange.on_behalf_of == on_behalf_of)
+        if user is not None:
+            query = query.filter(AlarmChange.user_id == user)
+        if project is not None:
+            query = query.filter(AlarmChange.project_id == project)
+        if type is not None:
+            query = query.filter(AlarmChange.type == type)
+        if start_timestamp:
+            if start_timestamp_op == 'gt':
+                query = query.filter(AlarmChange.timestamp > start_timestamp)
+            else:
+                query = query.filter(AlarmChange.timestamp >= start_timestamp)
+        if end_timestamp:
+            if end_timestamp_op == 'le':
+                query = query.filter(AlarmChange.timestamp <= end_timestamp)
+            else:
+                query = query.filter(AlarmChange.timestamp < end_timestamp)
+
+        query = query.order_by(desc(AlarmChange.timestamp))
+        return (self._row_to_alarm_change_model(x) for x in query.all())
 
     def record_alarm_change(self, alarm_change):
         """Record alarm change event.
         """
-        raise NotImplementedError('Alarm history not implemented')
+        session = sqlalchemy_session.get_session()
+        with session.begin():
+            session.merge(User(id=alarm_change['user_id']))
+            session.merge(Project(id=alarm_change['project_id']))
+            session.merge(Project(id=alarm_change['on_behalf_of']))
+            alarm_change_row = AlarmChange(event_id=alarm_change['event_id'])
+            alarm_change_row.update(alarm_change)
+            session.add(alarm_change_row)
+            session.flush()
 
     @staticmethod
     def _get_unique(session, key):
