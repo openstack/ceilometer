@@ -47,6 +47,14 @@ class TestLibvirtInspection(test_base.TestCase):
         dom_xml = """
              <domain type='kvm'>
                  <devices>
+                    <!-- NOTE(dprince): interface with no target -->
+                    <interface type='bridge'>
+                       <mac address='fa:16:3e:93:31:5a'/>
+                       <source bridge='br100'/>
+                       <model type='virtio'/>
+                       <address type='pci' domain='0x0000' bus='0x00' \
+                       slot='0x03' function='0x0'/>
+                    </interface>
                     <interface type='bridge'>
                        <mac address='fa:16:3e:71:ec:6d'/>
                        <source bridge='br100'/>
