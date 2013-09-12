@@ -621,6 +621,11 @@ class MeterController(rest.RestController):
                 raise wsme.exc.InvalidInput('message_id', s.message_id,
                                             'The message_id must not be set')
 
+            if s.counter_type not in sample.TYPES:
+                raise wsme.exc.InvalidInput('counter_type', s.counter_type,
+                                            'The counter type must be: ' +
+                                            ', '.join(sample.TYPES))
+
             s.user_id = (s.user_id or def_user_id)
             s.project_id = (s.project_id or def_project_id)
             s.source = '%s:%s' % (s.project_id, (s.source or def_source))
@@ -700,9 +705,7 @@ class Meter(_Base):
     name = wtypes.text
     "The unique name for the meter"
 
-    type = wtypes.Enum(str, sample.TYPE_GAUGE,
-                       sample.TYPE_CUMULATIVE,
-                       sample.TYPE_DELTA)
+    type = wtypes.Enum(str, *sample.TYPES)
     "The meter type (see :ref:`measurements`)"
 
     unit = wtypes.text
