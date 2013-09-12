@@ -93,4 +93,5 @@ class FilePublisher(publisher.PublisherBase):
         :param samples: Samples from pipeline after transformation
         """
         if self.publisher_logger:
-            self.publisher_logger.info(samples)
+            for sample in samples:
+                self.publisher_logger.info(sample.as_dict())

@@ -66,10 +66,10 @@ class TestFilePublisher(base.TestCase):
         ),
     ]
 
-    def test_file_publisher(self):
+    def test_file_publisher_maxbytes(self):
         # Test valid configurations
-        parsed_url = urlsplit(
-            'file:///tmp/log_file?max_bytes=50&backup_count=3')
+        name = '%s/log_file' % self.tempdir.path
+        parsed_url = urlsplit('file://%s?max_bytes=50&backup_count=3' % name)
         publisher = file.FilePublisher(parsed_url)
         publisher.publish_samples(None,
                                   self.test_data)
@@ -79,13 +79,14 @@ class TestFilePublisher(base.TestCase):
                                    logging.handlers.RotatingFileHandler))
         self.assertEqual([handler.maxBytes, handler.baseFilename,
                           handler.backupCount],
-                         [50, '/tmp/log_file', 3])
+                         [50, name, 3])
         # The rotating file gets created since only allow 50 bytes.
-        self.assertTrue(os.path.exists('/tmp/log_file.1'))
+        self.assertTrue(os.path.exists('%s.1' % name))
 
+    def test_file_publisher(self):
         # Test missing max bytes, backup count configurations
-        parsed_url = urlsplit(
-            'file:///tmp/log_file_plain')
+        name = '%s/log_file_plain' % self.tempdir.path
+        parsed_url = urlsplit('file://%s' % name)
         publisher = file.FilePublisher(parsed_url)
         publisher.publish_samples(None,
                                   self.test_data)
@@ -95,14 +96,20 @@ class TestFilePublisher(base.TestCase):
                                    logging.handlers.RotatingFileHandler))
         self.assertEqual([handler.maxBytes, handler.baseFilename,
                           handler.backupCount],
-                         [0, '/tmp/log_file_plain', 0])
+                         [0, name, 0])
+        # Test the content is corrected saved in the file
+        self.assertTrue(os.path.exists(name))
+        with open(name, 'r') as f:
+            content = f.read()
+        for sample in self.test_data:
+            self.assertTrue(sample.id in content)
+            self.assertTrue(sample.timestamp in content)
 
-        # The rotating file gets created since only allow 50 bytes.
-        self.assertTrue(os.path.exists('/tmp/log_file_plain'))
-
+    def test_file_publisher_invalid(self):
         # Test invalid max bytes, backup count configurations
         parsed_url = urlsplit(
-            'file:///tmp/log_file_bad?max_bytes=yus&backup_count=5y')
+            'file://%s/log_file_bad'
+            '?max_bytes=yus&backup_count=5y' % self.tempdir.path)
         publisher = file.FilePublisher(parsed_url)
         publisher.publish_samples(None,
                                   self.test_data)
