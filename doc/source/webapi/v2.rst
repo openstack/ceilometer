@@ -231,6 +231,39 @@ durations::
          "value": "64da755c-9120-4236-bee1-54acafe24980"}]
     period: 600
 
+The *period* parameter aggregates by time range. You can also aggregate by
+field using the *groupby* parameter. Currently, the *user_id*, *resource_id*,
+*project_id*, and *source* fields are supported. Below is an example that uses
+a query filter and group by aggregation on *project_id* and *resource_id*::
+
+    GET /v2/meters/instance/statistics
+    q: [{"field": "user_id",
+        "op": "eq",
+        "value": "user-2"},
+        {"field": "source",
+         "op": "eq",
+         "value": "source-1"}]
+    groupby: ["project_id", "resource_id"]
+
+The statistics will be returned in a list, and each entry of the list will be
+labeled with the group name. For the previous example, the first entry might
+have *project_id* be "project-1" and *resource_id* be "resource-1", the second
+entry have *project_id* be "project-1" and *resource_id* be "resource-2", and
+so on.
+
+You can request both period and group by aggregation in the same query::
+
+    GET /v2/meters/instance/statistics
+    q: [{"field": "source",
+        "op": "eq",
+        "value": "source-1"}]
+    groupby: ["project_id"]
+    period: 7200
+
+Note that period aggregation is applied first, followed by group by
+aggregation. Order matters because the period aggregation determines the time
+ranges for the statistics.
+
 If you want to retrieve all the instances (not the list of samples, but the
 resource itself) that have been run during this month for a given project,
 you should ask the resource endpoint for the list of resources (all types:
