@@ -114,7 +114,10 @@ class CeilometerMiddleware(object):
 
     def publish_sample(self, env, bytes_received, bytes_sent):
         req = REQUEST.Request(env)
-        version, account, container, obj = split_path(req.path, 1, 4, True)
+        try:
+            version, account, container, obj = split_path(req.path, 1, 4, True)
+        except ValueError:
+            return
         now = timeutils.utcnow().isoformat()
 
         resource_metadata = {
