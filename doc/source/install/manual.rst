@@ -55,13 +55,14 @@ Installing the Collector
                               --role_id 462fa46c13fd4798a95a3bfbe27b5e54
 
    You'll also need to add the Ceilometer middleware to Swift to account for
-   incoming and outgoing traffic, adding this lines to
+   incoming and outgoing traffic, by adding these lines to
    ``/etc/swift/proxy-server.conf``::
 
      [filter:ceilometer]
      use = egg:ceilometer#swift
 
-   And adding ``ceilometer`` in the ``pipeline`` of that same file.
+   And adding ``ceilometer`` in the ``pipeline`` of that same file, right
+   before ``proxy-server``.
 
 4. Install MongoDB.
 
