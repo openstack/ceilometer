@@ -245,3 +245,13 @@ class BaseAgentManagerTestCase(base.TestCase):
         self.mgr.interval_task(polling_tasks.get(10))
         pub = self.mgr.pipeline_manager.pipelines[0].publishers[0]
         self.assertEqual(len(pub.samples), 0)
+
+    def test_manager_exception_persistency(self):
+        self.pipeline_cfg.append({
+            'name': "test_pipeline",
+            'interval': 60,
+            'counters': ['testanother'],
+            'transformers': [],
+            'publishers': ["test"],
+        })
+        self.setup_pipeline()

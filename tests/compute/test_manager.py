@@ -41,6 +41,9 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         setattr(instance, 'OS-EXT-STS:vm_state', state)
         return instance
 
+    def _raise_exception(self):
+        raise Exception
+
     def setup_manager(self):
         self.mgr = manager.AgentManager()
 
@@ -71,3 +74,11 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         super(TestRunTasks, self).test_interval_exception_isolation()
         self.assertEqual(len(self.PollsterException.samples), 1)
         self.assertEqual(len(self.PollsterExceptionAnother.samples), 1)
+
+    def test_manager_exception_persistency(self):
+        super(TestRunTasks, self).test_manager_exception_persistency()
+        self.stubs.Set(nova_client.Client, 'instance_get_all_by_host',
+                       lambda *x: self._raise_exception())
+        mgr = manager.AgentManager()
+        polling_task = manager.PollingTask(mgr)
+        polling_task.poll_and_publish()
