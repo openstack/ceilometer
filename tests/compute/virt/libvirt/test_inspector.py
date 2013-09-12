@@ -55,6 +55,14 @@ class TestLibvirtInspection(test_base.TestCase):
                        <address type='pci' domain='0x0000' bus='0x00' \
                        slot='0x03' function='0x0'/>
                     </interface>
+                    <!-- NOTE(dprince): interface with no mac -->
+                    <interface type='bridge'>
+                       <source bridge='br100'/>
+                       <target dev='foo'/>
+                       <model type='virtio'/>
+                       <address type='pci' domain='0x0000' bus='0x00' \
+                       slot='0x03' function='0x0'/>
+                    </interface>
                     <interface type='bridge'>
                        <mac address='fa:16:3e:71:ec:6d'/>
                        <source bridge='br100'/>
