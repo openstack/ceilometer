@@ -77,6 +77,7 @@ def setup_app(pecan_config=None, extra_hooks=None):
         force_canonical=getattr(pecan_config.app, 'force_canonical', True),
         hooks=app_hooks,
         wrap_app=middleware.ParsableErrorMiddleware,
+        guess_content_type_from_ext=False
     )
 
     if pecan_config.app.enable_acl:
