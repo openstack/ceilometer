@@ -18,13 +18,11 @@
 """Tests for ceilometer/alarm/service.py
 """
 import mock
-import uuid
 
 from stevedore import extension
 from stevedore.tests import manager as extension_tests
 
 from ceilometer.alarm import service
-from ceilometer.storage import models
 from ceilometer.tests import base
 
 
@@ -32,18 +30,19 @@ class TestSingletonAlarmService(base.TestCase):
     def setUp(self):
         super(TestSingletonAlarmService, self).setUp()
         self.threshold_eval = mock.Mock()
-        self.extension_mgr = extension_tests.TestExtensionManager(
+        self.evaluators = extension_tests.TestExtensionManager(
             [
                 extension.Extension(
-                    'threshold_eval',
+                    'threshold',
                     None,
                     None,
-                    self.threshold_eval, ),
+                    self.threshold_eval),
             ])
         self.api_client = mock.MagicMock()
         self.singleton = service.SingletonAlarmService()
         self.singleton.tg = mock.Mock()
-        self.singleton.extension_manager = self.extension_mgr
+        self.singleton.evaluators = self.evaluators
+        self.singleton.supported_evaluators = ['threshold']
 
     def test_start(self):
         with mock.patch('ceilometerclient.client.get_client',
@@ -52,46 +51,45 @@ class TestSingletonAlarmService(base.TestCase):
             expected = [
                 mock.call(60,
                           self.singleton._evaluate_all_alarms,
-                          0,
-                          self.threshold_eval,
-                          self.api_client),
+                          0),
                 mock.call(604800, mock.ANY),
             ]
             actual = self.singleton.tg.add_timer.call_args_list
             self.assertEqual(actual, expected)
 
     def test_evaluation_cycle(self):
+        alarm = mock.Mock(enabled=True,
+                          type='threshold')
+        self.api_client.alarms.list.return_value = [alarm]
+        with mock.patch('ceilometerclient.client.get_client',
+                        return_value=self.api_client):
+            self.singleton._evaluate_all_alarms()
+            self.threshold_eval.evaluate.assert_called_once_with(alarm)
+
+    def test_disabled_is_skipped(self):
         alarms = [
-            models.Alarm(name='instance_running_hot',
-                         type='threshold',
-                         user_id='foobar',
-                         project_id='snafu',
-                         enabled=True,
-                         description='',
-                         repeat_actions=False,
-                         state='insufficient data',
-                         state_timestamp=None,
-                         timestamp=None,
-                         ok_actions=[],
-                         alarm_actions=[],
-                         insufficient_data_actions=[],
-                         alarm_id=str(uuid.uuid4()),
-                         rule=dict(
-                             statistic='avg',
-                             comparison_operator='gt',
-                             threshold=80.0,
-                             evaluation_periods=5,
-                             period=60,
-                             query=[],
-                         )),
+            mock.Mock(enabled=False,
+                      type='threshold'),
+            mock.Mock(enabled=True,
+                      type='threshold'),
         ]
+
         self.api_client.alarms.list.return_value = alarms
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
             self.singleton.start()
-            self.singleton._evaluate_all_alarms(
-                self.threshold_eval,
-                self.api_client
-            )
-            self.threshold_eval.assign_alarms.assert_called_once_with(alarms)
-            self.threshold_eval.evaluate.assert_called_once_with()
+            self.singleton._evaluate_all_alarms()
+            self.threshold_eval.evaluate.assert_called_once_with(alarms[1])
+
+    def test_unknown_extention_skipped(self):
+        alarms = [
+            mock.Mock(type='not_existing_type'),
+            mock.Mock(type='threshold')
+        ]
+
+        self.api_client.alarms.list.return_value = alarms
+        with mock.patch('ceilometerclient.client.get_client',
+                        return_value=self.api_client):
+            self.singleton.start()
+            self.singleton._evaluate_all_alarms()
+            self.threshold_eval.evaluate.assert_called_once_with(alarms[1])

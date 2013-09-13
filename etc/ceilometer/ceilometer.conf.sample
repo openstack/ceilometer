@@ -610,10 +610,10 @@
 # Options defined in ceilometer.alarm.service
 #
 
-# Period of threshold evaluation cycle, should be >= than
-# configured pipeline interval for collection of underlying
-# metrics. (integer value)
-#threshold_evaluation_interval=60
+# Period of evaluation cycle, should be >= than configured
+# pipeline interval for collection of underlying metrics.
+# (integer value)
+#evaluation_interval=60
 
 
 #

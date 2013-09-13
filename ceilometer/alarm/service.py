@@ -33,11 +33,13 @@ from ceilometerclient import client as ceiloclient
 
 
 OPTS = [
-    cfg.IntOpt('threshold_evaluation_interval',
+    cfg.IntOpt('evaluation_interval',
                default=60,
-               help='Period of threshold evaluation cycle, should'
+               help='Period of evaluation cycle, should'
                     ' be >= than configured pipeline interval for'
-                    ' collection of underlying metrics.'),
+                    ' collection of underlying metrics.',
+               deprecated_opts=[cfg.DeprecatedOpt(
+                   'threshold_evaluation_interval', group='alarm')])
 ]
 
 cfg.CONF.register_opts(OPTS, group='alarm')
@@ -49,53 +51,67 @@ LOG = log.getLogger(__name__)
 
 class SingletonAlarmService(os_service.Service):
 
-    ALARM_NAMESPACE = 'ceilometer.alarm'
+    EXTENSIONS_NAMESPACE = "ceilometer.alarm.evaluator"
 
     def __init__(self):
         super(SingletonAlarmService, self).__init__()
-        self.extension_manager = extension.ExtensionManager(
-            namespace=self.ALARM_NAMESPACE,
+        self.api_client = None
+        self.evaluators = extension.ExtensionManager(
+            self.EXTENSIONS_NAMESPACE,
             invoke_on_load=True,
-            invoke_args=(rpc_alarm.RPCAlarmNotifier(),)
-        )
+            invoke_args=(rpc_alarm.RPCAlarmNotifier(),))
+        self.supported_evaluators = [ext.name for ext in
+                                     self.evaluators.extensions]
 
     def start(self):
         super(SingletonAlarmService, self).start()
-        for ext in self.extension_manager.extensions:
-            if ext.name == 'threshold_eval':
-                self.threshold_eval = ext.obj
-                interval = cfg.CONF.alarm.threshold_evaluation_interval
-                args = [ext.obj, self._client()]
-                self.tg.add_timer(
-                    interval,
-                    self._evaluate_all_alarms,
-                    0,
-                    *args)
-                break
+        interval = cfg.CONF.alarm.evaluation_interval
+        self.tg.add_timer(
+            interval,
+            self._evaluate_all_alarms,
+            0)
         # Add a dummy thread to have wait() working
         self.tg.add_timer(604800, lambda: None)
 
-    @staticmethod
-    def _client():
-        auth_config = cfg.CONF.service_credentials
-        creds = dict(
-            os_auth_url=auth_config.os_auth_url,
-            os_tenant_name=auth_config.os_tenant_name,
-            os_password=auth_config.os_password,
-            os_username=auth_config.os_username,
-            cacert=auth_config.os_cacert,
-            endpoint_type=auth_config.os_endpoint_type,
-        )
-        return ceiloclient.get_client(2, **creds)
+    @property
+    def _client(self):
+        """Construct or reuse an authenticated API client."""
+        if not self.api_client:
+            auth_config = cfg.CONF.service_credentials
+            creds = dict(
+                os_auth_url=auth_config.os_auth_url,
+                os_tenant_name=auth_config.os_tenant_name,
+                os_password=auth_config.os_password,
+                os_username=auth_config.os_username,
+                cacert=auth_config.os_cacert,
+                endpoint_type=auth_config.os_endpoint_type,
+            )
+            self.api_client = ceiloclient.get_client(2, **creds)
+        return self.api_client
 
-    @staticmethod
-    def _evaluate_all_alarms(threshold_eval, api_client):
+    def _evaluate_all_alarms(self):
         try:
-            alarms = api_client.alarms.list()
-            threshold_eval.assign_alarms(alarms)
-            threshold_eval.evaluate()
+            alarms = self._client.alarms.list()
+            LOG.info(_('initiating evaluation cycle on %d alarms') %
+                     len(alarms))
+            for alarm in alarms:
+                self._evaluate_alarm(alarm)
         except Exception:
             LOG.exception(_('threshold evaluation cycle failed'))
+
+    def _evaluate_alarm(self, alarm):
+        """Evaluate the alarms assigned to this evaluator."""
+        if not alarm.enabled:
+            LOG.debug(_('skipping alarm %s: alarm disabled') %
+                      alarm.alarm_id)
+            return
+        if alarm.type not in self.supported_evaluators:
+            LOG.debug(_('skipping alarm %s: type unsupported') %
+                      alarm.alarm_id)
+            return
+
+        LOG.debug(_('evaluating alarm %s') % alarm.alarm_id)
+        self.evaluators[alarm.type].obj.evaluate(alarm)
 
 
 def singleton_alarm():

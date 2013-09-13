@@ -15,25 +15,24 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Tests for ceilometer/alarm/threshold_evaluation.py
+"""Tests for ceilometer/alarm/evaluator/threshold.py
 """
 import datetime
 import mock
 import uuid
 
-from ceilometer.alarm import threshold_evaluation
+from ceilometer.alarm.evaluator import threshold
 from ceilometer.openstack.common import timeutils
 from ceilometer.storage import models
-from ceilometer.tests import base
 from ceilometerclient import exc
 from ceilometerclient.v2 import statistics
+from tests.alarm.evaluator import base
 
 
-class TestEvaluate(base.TestCase):
-    def setUp(self):
-        super(TestEvaluate, self).setUp()
-        self.api_client = mock.Mock()
-        self.notifier = mock.MagicMock()
+class TestEvaluate(base.TestEvaluatorBase):
+    EVALUATOR = threshold.ThresholdEvaluator
+
+    def prepare_alarms(self):
         self.alarms = [
             models.Alarm(name='instance_running_hot',
                          description='instance_running_hot',
@@ -92,24 +91,10 @@ class TestEvaluate(base.TestCase):
                                      'value': 'my_group'}])
                          ),
         ]
-        self.evaluator = threshold_evaluation.Evaluator(self.notifier)
-        self.evaluator.assign_alarms(self.alarms)
-
-    def tearDown(self):
-        super(TestEvaluate, self).tearDown()
-        timeutils.utcnow.override_time = None
 
     @staticmethod
     def _get_stat(attr, value):
         return statistics.Statistics(None, {attr: value})
-
-    def _set_all_alarms(self, state):
-        for alarm in self.alarms:
-            alarm.state = state
-
-    def _assert_all_alarms(self, state):
-        for alarm in self.alarms:
-            self.assertEqual(alarm.state, state)
 
     def test_retry_transient_api_failure(self):
         with mock.patch('ceilometerclient.client.get_client',
@@ -123,9 +108,9 @@ class TestEvaluate(base.TestCase):
                                                            broken,
                                                            avgs,
                                                            maxs]
-            self.evaluator.evaluate()
+            self._evaluate_all_alarms()
             self._assert_all_alarms('insufficient data')
-            self.evaluator.evaluate()
+            self._evaluate_all_alarms()
             self._assert_all_alarms('ok')
 
     def test_simple_insufficient(self):
@@ -133,7 +118,7 @@ class TestEvaluate(base.TestCase):
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
             self.api_client.statistics.list.return_value = []
-            self.evaluator.evaluate()
+            self._evaluate_all_alarms()
             self._assert_all_alarms('insufficient data')
             expected = [mock.call(alarm.alarm_id, state='insufficient data')
                         for alarm in self.alarms]
@@ -146,25 +131,6 @@ class TestEvaluate(base.TestCase):
                         for alarm in self.alarms]
             self.assertEqual(self.notifier.notify.call_args_list, expected)
 
-    def test_disabled_is_skipped(self):
-        self._set_all_alarms('ok')
-        self.alarms[1].enabled = False
-        with mock.patch('ceilometerclient.client.get_client',
-                        return_value=self.api_client):
-            self.api_client.statistics.list.return_value = []
-            self.evaluator.evaluate()
-            self.assertEqual(self.alarms[0].state, 'insufficient data')
-            self.assertEqual(self.alarms[1].state, 'ok')
-            self.api_client.alarms.update.assert_called_once_with(
-                self.alarms[0].alarm_id,
-                state='insufficient data'
-            )
-            self.notifier.notify.assert_called_once_with(
-                self.alarms[0],
-                'ok',
-                mock.ANY
-            )
-
     def test_simple_alarm_trip(self):
         self._set_all_alarms('ok')
         with mock.patch('ceilometerclient.client.get_client',
@@ -174,7 +140,7 @@ class TestEvaluate(base.TestCase):
             maxs = [self._get_stat('max', self.alarms[1].rule['threshold'] - v)
                     for v in xrange(4)]
             self.api_client.statistics.list.side_effect = [avgs, maxs]
-            self.evaluator.evaluate()
+            self._evaluate_all_alarms()
             self._assert_all_alarms('alarm')
             expected = [mock.call(alarm.alarm_id, state='alarm')
                         for alarm in self.alarms]
@@ -197,7 +163,7 @@ class TestEvaluate(base.TestCase):
             maxs = [self._get_stat('max', self.alarms[1].rule['threshold'] + v)
                     for v in xrange(1, 5)]
             self.api_client.statistics.list.side_effect = [avgs, maxs]
-            self.evaluator.evaluate()
+            self._evaluate_all_alarms()
             self._assert_all_alarms('ok')
             expected = [mock.call(alarm.alarm_id, state='ok')
                         for alarm in self.alarms]
@@ -220,7 +186,7 @@ class TestEvaluate(base.TestCase):
             maxs = [self._get_stat('max', self.alarms[1].rule['threshold'] - v)
                     for v in xrange(-1, 3)]
             self.api_client.statistics.list.side_effect = [avgs, maxs]
-            self.evaluator.evaluate()
+            self._evaluate_all_alarms()
             self._assert_all_alarms('ok')
             self.assertEqual(self.api_client.alarms.update.call_args_list,
                              [])
@@ -236,7 +202,7 @@ class TestEvaluate(base.TestCase):
             maxs = [self._get_stat('max', self.alarms[1].rule['threshold'] - v)
                     for v in xrange(-1, 3)]
             self.api_client.statistics.list.side_effect = [avgs, maxs]
-            self.evaluator.evaluate()
+            self._evaluate_all_alarms()
             self._assert_all_alarms('ok')
             self.assertEqual(self.api_client.alarms.update.call_args_list,
                              [])
@@ -255,7 +221,7 @@ class TestEvaluate(base.TestCase):
             maxs = [self._get_stat('max', self.alarms[1].rule['threshold'] - v)
                     for v in xrange(4)]
             self.api_client.statistics.list.side_effect = [avgs, maxs]
-            self.evaluator.evaluate()
+            self._evaluate_all_alarms()
             self._assert_all_alarms('alarm')
             self.assertEqual(self.api_client.alarms.update.call_args_list,
                              [])
@@ -275,7 +241,7 @@ class TestEvaluate(base.TestCase):
             maxs = [self._get_stat('max', self.alarms[1].rule['threshold'] - v)
                     for v in xrange(4)]
             self.api_client.statistics.list.side_effect = [avgs, maxs]
-            self.evaluator.evaluate()
+            self._evaluate_all_alarms()
             self._assert_all_alarms('alarm')
             expected = [mock.call(alarm.alarm_id, state='alarm')
                         for alarm in self.alarms]
@@ -298,7 +264,7 @@ class TestEvaluate(base.TestCase):
             maxs = [self._get_stat('max', self.alarms[1].rule['threshold'] - v)
                     for v in xrange(4)]
             self.api_client.statistics.list.side_effect = [avgs, maxs]
-            self.evaluator.evaluate()
+            self._evaluate_all_alarms()
             self._assert_all_alarms('alarm')
             expected = [mock.call(alarm.alarm_id, state='alarm')
                         for alarm in self.alarms]
