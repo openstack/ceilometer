@@ -984,6 +984,40 @@ class AlarmThresholdRule(_Base):
                            'type': 'string'}])
 
 
+class AlarmCombinationRule(_Base):
+    operator = AdvEnum('operator', str, 'or', 'and', default='and')
+    "How to combine the sub-alarms"
+
+    alarm_ids = wsme.wsattr([wtypes.text], mandatory=True)
+    "List of alarm identifiers to combine"
+
+    @property
+    def default_description(self):
+        return _('Combined state of alarms %s') % self.operator.join(
+            self.alarm_ids)
+
+    def as_dict(self):
+        return self.as_dict_from_keys(['operator', 'alarm_ids'])
+
+    @classmethod
+    def sample(cls):
+        return cls(operator='or',
+                   alarm_ids=['739e99cb-c2ec-4718-b900-332502355f38',
+                              '153462d0-a9b8-4b5b-8175-9e4b05e9b856'])
+
+    @staticmethod
+    def validate(combination_rule):
+        for id in combination_rule.alarm_ids:
+            auth_project = acl.get_limited_to_project(pecan.request.headers)
+            alarms = list(pecan.request.storage_conn.get_alarms(
+                alarm_id=id, project=auth_project))
+            if len(alarms) < 1:
+                error = _("Alarm %s doesn't exists") % id
+                pecan.response.translatable_error = error
+                raise wsme.exc.ClientSideError(unicode(error))
+        return combination_rule
+
+
 class Alarm(_Base):
     """Representation of an alarm.
     """
@@ -1024,11 +1058,15 @@ class Alarm(_Base):
     repeat_actions = wsme.wsattr(bool, default=False)
     "The actions should be re-triggered on each evaluation cycle"
 
-    type = AdvEnum('type', str, 'threshold', mandatory=True)
+    type = AdvEnum('type', str, 'threshold', 'combination', mandatory=True)
     "Explicit type specifier to select which rule to follow below."
 
     threshold_rule = AlarmThresholdRule
     "Describe when to trigger the alarm based on computed statistics"
+
+    combination_rule = AlarmCombinationRule
+    """Describe when to trigger the alarm based on combining the state of
+    other alarms"""
 
     # These settings are ignored in the PUT or POST operations, but are
     # filled in for GET
@@ -1054,8 +1092,20 @@ class Alarm(_Base):
     def __init__(self, rule=None, **kwargs):
         super(Alarm, self).__init__(**kwargs)
 
-        if rule and self.type == 'threshold':
-            self.threshold_rule = AlarmThresholdRule(**rule)
+        if rule:
+            if self.type == 'threshold':
+                self.threshold_rule = AlarmThresholdRule(**rule)
+            elif self.type == 'combination':
+                self.combination_rule = AlarmCombinationRule(**rule)
+
+    @staticmethod
+    def validate(alarm):
+        if alarm.threshold_rule and alarm.combination_rule:
+            error = _("threshold_rule and combination_rule "
+                      "cannot be set at the same time")
+            pecan.response.translatable_error = error
+            raise wsme.exc.ClientSideError(error)
+        return alarm
 
     @classmethod
     def sample(cls):
@@ -1064,6 +1114,7 @@ class Alarm(_Base):
                    description="An alarm",
                    type='threshold',
                    threshold_rule=None,
+                   combination_rule=None,
                    user_id="c96c887c216949acbdfbd8b494863567",
                    project_id="c96c887c216949acbdfbd8b494863567",
                    enabled=True,
@@ -1197,6 +1248,10 @@ class AlarmController(rest.RestController):
         else:
             data.state_timestamp = alarm_in.state_timestamp
 
+        #note(sileht): workaround for
+        #https://bugs.launchpad.net/wsme/+bug/1220678
+        Alarm.validate(data)
+
         old_alarm = Alarm.from_db_model(alarm_in).as_dict(storage.models.Alarm)
         updated_alarm = data.as_dict(storage.models.Alarm)
         try:
@@ -1286,6 +1341,10 @@ class AlarmsController(rest.RestController):
         data.project_id = pecan.request.headers.get('X-Project-Id')
         data.timestamp = now
         data.state_timestamp = now
+
+        #note(sileht): workaround for
+        #https://bugs.launchpad.net/wsme/+bug/1220678
+        Alarm.validate(data)
 
         change = data.as_dict(storage.models.Alarm)
 
