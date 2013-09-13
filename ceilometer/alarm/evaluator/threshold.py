@@ -21,6 +21,7 @@ import datetime
 import operator
 
 from ceilometer.alarm import evaluator
+from ceilometer.alarm.evaluator import OK, ALARM, UNKNOWN
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer.openstack.common.gettextutils import _
@@ -35,10 +36,6 @@ COMPARATORS = {
     'eq': operator.eq,
     'ne': operator.ne,
 }
-
-UNKNOWN = 'insufficient data'
-OK = 'ok'
-ALARM = 'alarm'
 
 
 class ThresholdEvaluator(evaluator.Evaluator):

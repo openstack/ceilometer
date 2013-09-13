@@ -28,6 +28,10 @@ from ceilometer.openstack.common.gettextutils import _
 
 LOG = log.getLogger(__name__)
 
+UNKNOWN = 'insufficient data'
+OK = 'ok'
+ALARM = 'alarm'
+
 
 class Evaluator(object):
     """Base class for alarm rule evaluator plugins."""
