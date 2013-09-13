@@ -21,6 +21,7 @@
 from ceilometer import sample
 from ceilometer.compute import plugin
 from ceilometer.compute.pollsters import util
+from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.openstack.common import log
 
 LOG = log.getLogger(__name__)
@@ -44,6 +45,9 @@ class CPUPollster(plugin.ComputePollster):
                 volume=cpu_info.time,
                 additional_metadata=cpu_num,
             )
+        except virt_inspector.InstanceNotFoundException as err:
+            # Instance was deleted while getting samples. Ignore it.
+            LOG.debug('Exception while getting samples %s', err)
         except Exception as err:
             LOG.error('could not get CPU time for %s: %s',
                       instance.id, err)
