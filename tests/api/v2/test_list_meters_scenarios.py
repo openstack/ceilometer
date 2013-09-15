@@ -131,7 +131,7 @@ class TestListMeters(FunctionalTest,
                                        'size': 0,
                                        'util': 0.58,
                                        'is_public': True},
-                    source='test_source')]:
+                    source='test_source1')]:
             msg = rpc.meter_message_from_counter(
                 cnt,
                 cfg.CONF.publisher_rpc.metering_secret)
@@ -147,6 +147,8 @@ class TestListMeters(FunctionalTest,
                               'resource-id4']))
         self.assertEqual(set(r['name'] for r in data),
                          set(['meter.test', 'meter.mine']))
+        self.assertEqual(set(r['source'] for r in data),
+                         set(['test_source', 'test_source1']))
 
     def test_list_meters_with_dict_metadata(self):
         data = self.get_json('/meters/meter.mine',
@@ -288,8 +290,24 @@ class TestListMeters(FunctionalTest,
         data = self.get_json('/meters', q=[{'field': 'resource_id',
                                             'value': 'resource-id',
                                             }])
-        ids = set(r['name'] for r in data)
-        self.assertEqual(set(['meter.test']), ids)
+        nids = set(r['name'] for r in data)
+        self.assertEqual(set(['meter.test']), nids)
+
+        sids = set(r['source'] for r in data)
+        self.assertEqual(set(['test_source']), sids)
+
+    def test_with_resource_and_source(self):
+        data = self.get_json('/meters', q=[{'field': 'resource_id',
+                                            'value': 'resource-id4',
+                                            },
+                                           {'field': 'source',
+                                            'value': 'test_source1',
+                                            }])
+        nids = set(r['name'] for r in data)
+        self.assertEqual(set(['meter.mine']), nids)
+
+        sids = set(r['source'] for r in data)
+        self.assertEqual(set(['test_source1']), sids)
 
     def test_with_resource_and_metadata_query(self):
         data = self.get_json('/meters/meter.mine',
@@ -311,11 +329,13 @@ class TestListMeters(FunctionalTest,
         data = self.get_json('/meters', q=[{'field': 'source',
                                             'value': 'test_source',
                                             }])
-        ids = set(r['resource_id'] for r in data)
+        rids = set(r['resource_id'] for r in data)
         self.assertEqual(set(['resource-id',
                               'resource-id2',
-                              'resource-id3',
-                              'resource-id4']), ids)
+                              'resource-id3']), rids)
+
+        sids = set(r['source'] for r in data)
+        self.assertEqual(set(['test_source']), sids)
 
     def test_with_source_and_metadata_query(self):
         data = self.get_json('/meters/meter.mine',
@@ -356,6 +376,25 @@ class TestListMeters(FunctionalTest,
         rids = set(r['resource_id'] for r in data)
         self.assertEqual(set(['resource-id', 'resource-id2']), rids)
 
+        sids = set(r['source'] for r in data)
+        self.assertEqual(set(['test_source']), sids)
+
+    def test_with_user_and_source(self):
+        data = self.get_json('/meters',
+                             q=[{'field': 'user_id',
+                                 'value': 'user-id4',
+                                 },
+                                {'field': 'source',
+                                 'value': 'test_source1',
+                                 }],
+                             )
+
+        uids = set(r['user_id'] for r in data)
+        self.assertEqual(set(['user-id4']), uids)
+
+        sids = set(r['source'] for r in data)
+        self.assertEqual(set(['test_source1']), sids)
+
     def test_with_user_and_metadata_query(self):
         data = self.get_json('/meters/meter.test',
                              q=[{'field': 'user_id',
@@ -385,8 +424,26 @@ class TestListMeters(FunctionalTest,
                                  'value': 'project-id2',
                                  }],
                              )
-        ids = set(r['resource_id'] for r in data)
-        self.assertEqual(set(['resource-id3', 'resource-id4']), ids)
+        rids = set(r['resource_id'] for r in data)
+        self.assertEqual(set(['resource-id3', 'resource-id4']), rids)
+
+        sids = set(r['source'] for r in data)
+        self.assertEqual(set(['test_source', 'test_source1']), sids)
+
+    def test_with_project_and_source(self):
+        data = self.get_json('/meters',
+                             q=[{'field': 'project_id',
+                                 'value': 'project-id2',
+                                 },
+                                {'field': 'source',
+                                 'value': 'test_source1',
+                                 }],
+                             )
+        rids = set(r['resource_id'] for r in data)
+        self.assertEqual(set(['resource-id4']), rids)
+
+        sids = set(r['source'] for r in data)
+        self.assertEqual(set(['test_source1']), sids)
 
     def test_with_project_and_metadata_query(self):
         data = self.get_json('/meters/meter.test',
