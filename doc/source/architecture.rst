@@ -44,17 +44,17 @@ tagged as “alarming“.
 Metering
 --------
 
-If you divide a billing process into a three steps process as is commonly done in
+If you divide a billing process into a 3 step process as is commonly done in
 the telco industry, the steps are:
 
 1. :term:`Metering` is the process of collecting information about what,
    who, when and how much regarding anything that can be billed. The result of
    this is a collection of “tickets” (a.k.a. samples) which are ready to be
    processed in anyway you want.
-1. :term:`Rating` is the process of analysing a series of tickets,
+2. :term:`Rating` is the process of analysing a series of tickets,
    according to business rules defined by marketing, in order to transform
    them into bill line items with a currency value.
-1. :term:`Billing` is the process to assemble bill line items into a
+3. :term:`Billing` is the process to assemble bill line items into a
    single per customer bill, emitting the bill to start the payment collection.
 
 Ceilometer’s initial goal was, and still is, strictly limited to step
@@ -62,7 +62,7 @@ one. This is a choice made from the beginning not to go into rating or billing,
 as the variety of possibilities seemed too huge for the project to ever deliver
 a solution that would fit everyone’s needs, from private to public clouds. This
 means that if you are looking at this project to solve your billing needs, this
-is the right way to go, but certainly not the end of the road for your. Once
+is the right way to go, but certainly not the end of the road for you. Once
 Ceilometer is in place on your OpenStack deployment, you will still have
 quite a few things to do before you can produce a bill for your customers.
 One of you first task could be: finding the right queries within the Ceilometer
@@ -109,23 +109,30 @@ collect data:
    OpenStack related project and are using the Oslo library, you are kindly
    invited to come and talk to one of the project members to learn how you
    could quickly add instrumentation for your project.
-1. :term:`Push agents` which is the only solution to fetch data within projects
+2. :term:`Push agents` which is the only solution to fetch data within projects
    which do not expose the required data in a remotely useable way. This is not
    the preferred method as it makes deployment a bit more complex having to add
    a component to each of the nodes that need to be monitored. However, we do
    prefer this compared to a polling agent method as resilience (high
    availability) will not be a problem with this method.
-1. :term:`Polling agents` which is the least preferred method, that will poll
+3. :term:`Polling agents` which is the least preferred method, that will poll
    some API or other tool to collect information at a regular interval. The main
    reason why we do not like this method is the inherent difficulty to make such
    a component be resilient.
 
+The first method is supported by the ceilometer-collector agent, which monitors
+the message queues for notifications and for metering data coming from the
+"push" and "polling" agents. Methods 2 and 3 rely on a combination of the
+ceilometer-central-agent/ceilometer-compute-agent and the collector.
+
 How to access collected data?
 -----------------------------
 
-Once collected, the data is stored in a database. There can be multiple types of
+Once collected, the data is stored in a database generally, or in a simple
+file if you do not care about API access and want to do the rest of the
+processing elsewhere. There can be multiple types of
 databases through the use of different database plugins (see the section 
-`which database to use`_). Moreover, the schema and dictionary of
+:ref:`which-db`). Moreover, the schema and dictionary of
 this database can also evolve over time. For both reasons, we offer a REST API
 that should be the only way for you to access the collected data rather than
 accessing the underlying database directly. It is possible that the way
@@ -233,7 +240,8 @@ will be critical in all cases of production deployment.
 
 .. _Autoscaling with Heat and Ceilometer: http://techs.enovance.com/5991/autoscaling-with-heat-and-ceilometer
 
-.. _which database to use:
+.. _which-db:
+
 Which database to use
 ---------------------
 
