@@ -68,7 +68,7 @@ class Evaluator(object):
                                             'state': state,
                                             'reason': reason})
 
-                self._client.alarms.update(alarm.alarm_id, **dict(state=state))
+                self._client.alarms.set_state(alarm.alarm_id, state=state)
             alarm.state = state
             if self.notifier:
                 self.notifier.notify(alarm, previous, reason)

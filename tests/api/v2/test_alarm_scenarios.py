@@ -520,6 +520,35 @@ class TestAlarms(FunctionalTest,
         alarms = list(self.conn.get_alarms())
         self.assertEqual(3, len(alarms))
 
+    def test_get_state_alarm(self):
+        data = self.get_json('/alarms')
+        self.assertEqual(4, len(data))
+
+        resp = self.get_json('/alarms/%s/state' % data[0]['alarm_id'],
+                             headers=self.auth_headers)
+        self.assertEqual(data[0]['state'], resp)
+
+    def test_set_state_alarm(self):
+        data = self.get_json('/alarms')
+        self.assertEqual(4, len(data))
+
+        resp = self.put_json('/alarms/%s/state' % data[0]['alarm_id'],
+                             headers=self.auth_headers,
+                             params='alarm')
+        alarms = list(self.conn.get_alarms(alarm_id=data[0]['alarm_id']))
+        self.assertEqual(1, len(alarms))
+        self.assertEqual(alarms[0].state, 'alarm')
+        self.assertEqual(resp.json, 'alarm')
+
+    def test_set_invalid_state_alarm(self):
+        data = self.get_json('/alarms')
+        self.assertEqual(4, len(data))
+
+        self.put_json('/alarms/%s/state' % data[0]['alarm_id'],
+                      headers=self.auth_headers,
+                      params='not valid',
+                      status=400)
+
     def _get_alarm(self, id):
         data = self.get_json('/alarms')
         match = [a for a in data if a['alarm_id'] == id]

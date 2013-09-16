@@ -70,7 +70,7 @@ ALARM_API_OPTS = [
 
 cfg.CONF.register_opts(ALARM_API_OPTS, group='alarm')
 
-
+state_kind = ["ok", "alarm", "insufficient data"]
 operation_kind = wtypes.Enum(str, 'lt', 'le', 'eq', 'ne', 'ge', 'gt')
 
 
@@ -1079,10 +1079,7 @@ class Alarm(_Base):
     timestamp = datetime.datetime
     "The date of the last alarm definition update"
 
-    #TODO(sileht): Add an explicit "set_state" operation instead of
-    #forcing the caller to PUT the entire definition of the alarm to test it.
-    #(example: POST/PUT? alarms/<alarm_id>/state)
-    state = AdvEnum('state', str, 'ok', 'alarm', 'insufficient data',
+    state = AdvEnum('state', str, *state_kind,
                     default='insufficient data')
     "The state offset the alarm"
 
@@ -1186,6 +1183,7 @@ class AlarmController(rest.RestController):
 
     _custom_actions = {
         'history': ['GET'],
+        'state': ['PUT', 'GET'],
     }
 
     def __init__(self, alarm_id):
@@ -1298,6 +1296,28 @@ class AlarmController(rest.RestController):
         return [AlarmChange.from_db_model(ac)
                 for ac in conn.get_alarm_changes(self._id, auth_project,
                                                  **kwargs)]
+
+    @wsme_pecan.wsexpose(wtypes.text, body=wtypes.text)
+    def put_state(self, state):
+        """Set the state of this alarm."""
+        if state not in state_kind:
+            error = _("state invalid")
+            pecan.response.translatable_error = error
+            raise wsme.exc.ClientSideError(unicode(error))
+        now = timeutils.utcnow()
+        alarm = self._alarm()
+        alarm.state = state
+        alarm.state_timestamp = now
+        alarm = self.conn.update_alarm(alarm)
+        change = {'state': alarm.state}
+        self._record_change(change, now, on_behalf_of=alarm.project_id,
+                            type=storage.models.AlarmChange.STATE_TRANSITION)
+        return alarm.state
+
+    @wsme_pecan.wsexpose(wtypes.text)
+    def get_state(self):
+        alarm = self._alarm()
+        return alarm.state
 
 
 class AlarmsController(rest.RestController):

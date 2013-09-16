@@ -122,7 +122,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             self._assert_all_alarms('insufficient data')
             expected = [mock.call(alarm.alarm_id, state='insufficient data')
                         for alarm in self.alarms]
-            update_calls = self.api_client.alarms.update.call_args_list
+            update_calls = self.api_client.alarms.set_state.call_args_list
             self.assertEqual(update_calls, expected)
             expected = [mock.call(alarm,
                                   'ok',
@@ -144,7 +144,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             self._assert_all_alarms('alarm')
             expected = [mock.call(alarm.alarm_id, state='alarm')
                         for alarm in self.alarms]
-            update_calls = self.api_client.alarms.update.call_args_list
+            update_calls = self.api_client.alarms.set_state.call_args_list
             self.assertEqual(update_calls, expected)
             reasons = ['Transition to alarm due to 5 samples outside'
                        ' threshold, most recent: 85.0',
@@ -167,7 +167,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             self._assert_all_alarms('ok')
             expected = [mock.call(alarm.alarm_id, state='ok')
                         for alarm in self.alarms]
-            update_calls = self.api_client.alarms.update.call_args_list
+            update_calls = self.api_client.alarms.set_state.call_args_list
             self.assertEqual(update_calls, expected)
             reasons = ['Transition to ok due to 5 samples inside'
                        ' threshold, most recent: 76.0',
@@ -188,7 +188,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             self.api_client.statistics.list.side_effect = [avgs, maxs]
             self._evaluate_all_alarms()
             self._assert_all_alarms('ok')
-            self.assertEqual(self.api_client.alarms.update.call_args_list,
+            self.assertEqual(self.api_client.alarms.set_state.call_args_list,
                              [])
             self.assertEqual(self.notifier.notify.call_args_list, [])
 
@@ -204,7 +204,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             self.api_client.statistics.list.side_effect = [avgs, maxs]
             self._evaluate_all_alarms()
             self._assert_all_alarms('ok')
-            self.assertEqual(self.api_client.alarms.update.call_args_list,
+            self.assertEqual(self.api_client.alarms.set_state.call_args_list,
                              [])
             reason = 'Remaining as ok due to 4 samples inside' \
                      ' threshold, most recent: 8.0'
@@ -223,7 +223,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             self.api_client.statistics.list.side_effect = [avgs, maxs]
             self._evaluate_all_alarms()
             self._assert_all_alarms('alarm')
-            self.assertEqual(self.api_client.alarms.update.call_args_list,
+            self.assertEqual(self.api_client.alarms.set_state.call_args_list,
                              [])
             reason = 'Remaining as alarm due to 4 samples outside' \
                      ' threshold, most recent: 7.0'
@@ -245,7 +245,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             self._assert_all_alarms('alarm')
             expected = [mock.call(alarm.alarm_id, state='alarm')
                         for alarm in self.alarms]
-            update_calls = self.api_client.alarms.update.call_args_list
+            update_calls = self.api_client.alarms.set_state.call_args_list
             self.assertEqual(update_calls, expected)
             reasons = ['Transition to alarm due to 5 samples outside'
                        ' threshold, most recent: 85.0',
@@ -268,7 +268,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             self._assert_all_alarms('alarm')
             expected = [mock.call(alarm.alarm_id, state='alarm')
                         for alarm in self.alarms]
-            update_calls = self.api_client.alarms.update.call_args_list
+            update_calls = self.api_client.alarms.set_state.call_args_list
             self.assertEqual(update_calls, expected)
             reasons = ['Transition to alarm due to 5 samples outside'
                        ' threshold, most recent: 85.0',

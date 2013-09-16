@@ -128,7 +128,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             self._assert_all_alarms('insufficient data')
             expected = [mock.call(alarm.alarm_id, state='insufficient data')
                         for alarm in self.alarms]
-            update_calls = self.api_client.alarms.update.call_args_list
+            update_calls = self.api_client.alarms.set_state.call_args_list
             self.assertEqual(update_calls, expected)
             expected = [mock.call(alarm,
                                   'ok',
@@ -150,7 +150,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             self._evaluate_all_alarms()
             expected = [mock.call(alarm.alarm_id, state='ok')
                         for alarm in self.alarms]
-            update_calls = self.api_client.alarms.update.call_args_list
+            update_calls = self.api_client.alarms.set_state.call_args_list
             self.assertEqual(update_calls, expected)
             reasons = self._combination_transition_reason('ok')
             expected = [mock.call(alarm, 'insufficient data', reason)
@@ -170,7 +170,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             self._evaluate_all_alarms()
             expected = [mock.call(alarm.alarm_id, state='ok')
                         for alarm in self.alarms]
-            update_calls = self.api_client.alarms.update.call_args_list
+            update_calls = self.api_client.alarms.set_state.call_args_list
             self.assertEqual(update_calls, expected)
             reasons = self._combination_transition_reason('ok')
             expected = [mock.call(alarm, 'alarm', reason)
@@ -190,7 +190,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             self._evaluate_all_alarms()
             expected = [mock.call(alarm.alarm_id, state='alarm')
                         for alarm in self.alarms]
-            update_calls = self.api_client.alarms.update.call_args_list
+            update_calls = self.api_client.alarms.set_state.call_args_list
             self.assertEqual(update_calls, expected)
             reasons = self._combination_transition_reason('alarm')
             expected = [mock.call(alarm, 'ok', reason)
@@ -210,7 +210,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             self._evaluate_all_alarms()
             expected = [mock.call(alarm.alarm_id, state='alarm')
                         for alarm in self.alarms]
-            update_calls = self.api_client.alarms.update.call_args_list
+            update_calls = self.api_client.alarms.set_state.call_args_list
             self.assertEqual(update_calls, expected)
             reasons = self._combination_transition_reason('alarm')
             expected = [mock.call(alarm, 'ok', reason)
@@ -231,7 +231,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             self._evaluate_all_alarms()
             expected = [mock.call(alarm.alarm_id, state='insufficient data')
                         for alarm in self.alarms]
-            update_calls = self.api_client.alarms.update.call_args_list
+            update_calls = self.api_client.alarms.set_state.call_args_list
             self.assertEqual(update_calls, expected)
             reasons = ['1 alarms in'
                        ' 9cfc3e51-2ff1-4b1d-ac01-c1bd4c6d0d1e,'
@@ -256,7 +256,7 @@ class TestEvaluate(base.TestEvaluatorBase):
                 self._get_alarm('ok'),
             ]
             self._evaluate_all_alarms()
-            update_calls = self.api_client.alarms.update.call_args_list
+            update_calls = self.api_client.alarms.set_state.call_args_list
             self.assertEqual(update_calls, [])
             self.assertEqual(self.notifier.notify.call_args_list, [])
 
@@ -273,7 +273,7 @@ class TestEvaluate(base.TestEvaluatorBase):
                 self._get_alarm('ok'),
             ]
             self._evaluate_all_alarms()
-            update_calls = self.api_client.alarms.update.call_args_list
+            update_calls = self.api_client.alarms.set_state.call_args_list
             self.assertEqual(update_calls, [])
             reasons = self._combination_remaining_reason('ok')
             expected = [mock.call(alarm, 'ok', reason)
