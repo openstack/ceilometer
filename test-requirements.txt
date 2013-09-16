@@ -13,7 +13,7 @@ http://tarballs.openstack.org/nova/nova-master.tar.gz#egg=nova
 swift
 # Docs Requirements
 sphinx>=1.1.2
-sphinxcontrib-pecanwsme>=0.2
+sphinxcontrib-pecanwsme>=0.3
 docutils==0.9.1
 oslo.sphinx
 python-subunit
