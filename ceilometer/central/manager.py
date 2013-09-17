@@ -72,7 +72,8 @@ class AgentManager(agent.AgentManager):
             tenant_id=cfg.CONF.service_credentials.os_tenant_id,
             tenant_name=cfg.CONF.service_credentials.os_tenant_name,
             cacert=cfg.CONF.service_credentials.os_cacert,
-            auth_url=cfg.CONF.service_credentials.os_auth_url)
+            auth_url=cfg.CONF.service_credentials.os_auth_url,
+            region_name=cfg.CONF.service_credentials.os_region_name)
 
         super(AgentManager, self).interval_task(task)
 
