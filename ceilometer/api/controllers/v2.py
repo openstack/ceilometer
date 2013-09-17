@@ -64,6 +64,7 @@ ALARM_API_OPTS = [
 cfg.CONF.register_opts(ALARM_API_OPTS, group='alarm')
 
 state_kind = ["ok", "alarm", "insufficient data"]
+state_kind_enum = wtypes.Enum(str, *state_kind)
 operation_kind = wtypes.Enum(str, 'lt', 'le', 'eq', 'ne', 'ge', 'gt')
 
 
@@ -78,11 +79,19 @@ class EntityNotFound(Exception):
 
 class BoundedInt(wtypes.UserType):
     basetype = int
-    name = 'bounded int'
 
     def __init__(self, min=None, max=None):
         self.min = min
         self.max = max
+
+    @property
+    def name(self):
+        if self.min is not None and self.max is not None:
+            return 'int between %d and %d' % (self.min, self.max)
+        elif self.min is not None:
+            return 'int greater than %d' % self.min
+        else:
+            return 'int lower than %d' % self.max
 
     @staticmethod
     def frombasetype(value):
@@ -1068,6 +1077,9 @@ class AlarmCombinationRule(_Base):
 
 class Alarm(_Base):
     """Representation of an alarm.
+
+    .. note::
+        combination_rule and threshold_rule are mutually exclusive.
     """
 
     alarm_id = wtypes.text
@@ -1302,14 +1314,18 @@ class AlarmController(rest.RestController):
         payload['detail'] = scrubbed_data
         _send_notification(type, payload)
 
-    @wsme_pecan.wsexpose(Alarm, wtypes.text)
+    @wsme_pecan.wsexpose(Alarm)
     def get(self):
-        """Return this alarm."""
+        """Return this alarm.
+        """
         return Alarm.from_db_model(self._alarm())
 
-    @wsme_pecan.wsexpose(Alarm, wtypes.text, body=Alarm)
+    @wsme_pecan.wsexpose(Alarm, body=Alarm)
     def put(self, data):
-        """Modify this alarm."""
+        """Modify this alarm.
+
+        :param data: a alarm within the request body.
+        """
         # Ensure alarm exists
         alarm_in = self._alarm()
 
@@ -1349,9 +1365,10 @@ class AlarmController(rest.RestController):
         self._record_change(change, now, on_behalf_of=alarm.project_id)
         return Alarm.from_db_model(alarm)
 
-    @wsme_pecan.wsexpose(None, wtypes.text, status_code=204)
+    @wsme_pecan.wsexpose(None, status_code=204)
     def delete(self):
-        """Delete this alarm."""
+        """Delete this alarm.
+        """
         # ensure alarm exists before deleting
         alarm = self._alarm()
         self.conn.delete_alarm(alarm.alarm_id)
@@ -1378,13 +1395,20 @@ class AlarmController(rest.RestController):
                 for ac in conn.get_alarm_changes(self._id, auth_project,
                                                  **kwargs)]
 
-    @wsme_pecan.wsexpose(wtypes.text, body=wtypes.text)
+    @wsme.validate(state_kind_enum)
+    @wsme_pecan.wsexpose(state_kind_enum, body=state_kind_enum)
     def put_state(self, state):
-        """Set the state of this alarm."""
+        """Set the state of this alarm.
+
+        :param state: a alarm state within the request body.
+        """
+        # note(sileht): body are not validated by wsme
+        # Workaround for https://bugs.launchpad.net/wsme/+bug/1227229
         if state not in state_kind:
             error = _("state invalid")
             pecan.response.translatable_error = error
             raise wsme.exc.ClientSideError(unicode(error))
+
         now = timeutils.utcnow()
         alarm = self._alarm()
         alarm.state = state
@@ -1395,8 +1419,10 @@ class AlarmController(rest.RestController):
                             type=storage.models.AlarmChange.STATE_TRANSITION)
         return alarm.state
 
-    @wsme_pecan.wsexpose(wtypes.text)
+    @wsme_pecan.wsexpose(state_kind_enum)
     def get_state(self):
+        """Get the state of this alarm.
+        """
         alarm = self._alarm()
         return alarm.state
 
@@ -1439,7 +1465,10 @@ class AlarmsController(rest.RestController):
 
     @wsme_pecan.wsexpose(Alarm, body=Alarm, status_code=201)
     def post(self, data):
-        """Create a new alarm."""
+        """Create a new alarm.
+
+        :param data: a alarm within the request body.
+        """
         conn = pecan.request.storage_conn
         now = timeutils.utcnow()
 

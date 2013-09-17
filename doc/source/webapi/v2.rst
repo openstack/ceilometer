@@ -40,9 +40,17 @@ Alarms
 .. rest-controller:: ceilometer.api.controllers.v2:AlarmsController
    :webprefix: /v2/alarms
 
+.. rest-controller:: ceilometer.api.controllers.v2:AlarmController
+   :webprefix: /v2/alarms
+
 .. autotype:: ceilometer.api.controllers.v2.Alarm
    :members:
 
+.. autotype:: ceilometer.api.controllers.v2.AlarmThresholdRule
+   :members:
+
+.. autotype:: ceilometer.api.controllers.v2.AlarmCombinationRule
+   :members:
 
 Filtering Queries
 =================
