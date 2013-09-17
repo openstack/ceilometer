@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-09-12 06:02+0000\n"
+"POT-Creation-Date: 2013-09-17 06:02+0000\n"
 "PO-Revision-Date: 2013-05-22 03:36+0000\n"
 "Last-Translator: daisy.ycguo <daisy.ycguo@gmail.com>\n"
 "Language-Team: German "
@@ -139,23 +139,23 @@ msgid ""
 "%(type)s."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:674
+#: ceilometer/api/controllers/v2.py:673
 msgid "Period must be positive."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:834
+#: ceilometer/api/controllers/v2.py:833
 msgid "Unknown resource"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1013
+#: ceilometer/api/controllers/v2.py:1012
 msgid "Unknown alarm"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1143
+#: ceilometer/api/controllers/v2.py:1142
 msgid "Alarm with that name exists"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1152
+#: ceilometer/api/controllers/v2.py:1151
 msgid "Alarm incorrect"
 msgstr ""
 
@@ -330,36 +330,36 @@ msgstr ""
 msgid "Policy doesn't allow %s to be performed."
 msgstr ""
 
-#: ceilometer/openstack/common/policy.py:171
+#: ceilometer/openstack/common/policy.py:177
 #, python-format
 msgid "Rules must be an instance of dict or Rules, got %s instead"
 msgstr ""
 
-#: ceilometer/openstack/common/policy.py:201
+#: ceilometer/openstack/common/policy.py:207
 msgid "Rules successfully reloaded"
 msgstr ""
 
-#: ceilometer/openstack/common/policy.py:247
+#: ceilometer/openstack/common/policy.py:253
 #, python-format
 msgid "Rule %s will be now enforced"
 msgstr ""
 
-#: ceilometer/openstack/common/policy.py:262
+#: ceilometer/openstack/common/policy.py:268
 #, python-format
 msgid "Rule [%s] doesn't exist"
 msgstr ""
 
-#: ceilometer/openstack/common/policy.py:472
+#: ceilometer/openstack/common/policy.py:478
 #, python-format
 msgid "Failed to understand rule %s"
 msgstr ""
 
-#: ceilometer/openstack/common/policy.py:482
+#: ceilometer/openstack/common/policy.py:488
 #, python-format
 msgid "No handler for matches of kind %s"
 msgstr ""
 
-#: ceilometer/openstack/common/policy.py:753
+#: ceilometer/openstack/common/policy.py:759
 #, python-format
 msgid "Failed to understand rule %r"
 msgstr ""
@@ -999,23 +999,23 @@ msgstr ""
 #: ceilometer/storage/impl_hbase.py:392 ceilometer/storage/impl_mongodb.py:605
 #: ceilometer/storage/impl_mongodb.py:687
 #: ceilometer/storage/impl_mongodb.py:820
-#: ceilometer/storage/impl_sqlalchemy.py:295
-#: ceilometer/storage/impl_sqlalchemy.py:394
-#: ceilometer/storage/impl_sqlalchemy.py:614
+#: ceilometer/storage/impl_sqlalchemy.py:296
+#: ceilometer/storage/impl_sqlalchemy.py:395
+#: ceilometer/storage/impl_sqlalchemy.py:615
 msgid "Pagination not implemented"
 msgstr ""
 
-#: ceilometer/storage/impl_sqlalchemy.py:113
+#: ceilometer/storage/impl_sqlalchemy.py:114
 msgid "Missing required meter specifier"
 msgstr ""
 
-#: ceilometer/storage/impl_sqlalchemy.py:136
-#: ceilometer/storage/impl_sqlalchemy.py:297
-#: ceilometer/storage/impl_sqlalchemy.py:396
+#: ceilometer/storage/impl_sqlalchemy.py:137
+#: ceilometer/storage/impl_sqlalchemy.py:298
+#: ceilometer/storage/impl_sqlalchemy.py:397
 msgid "metaquery not implemented"
 msgstr ""
 
-#: ceilometer/storage/impl_sqlalchemy.py:543
+#: ceilometer/storage/impl_sqlalchemy.py:544
 msgid "Unable to group by these fields"
 msgstr ""
 
