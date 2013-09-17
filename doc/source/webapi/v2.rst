@@ -99,7 +99,7 @@ A query to return the list of resources::
      curl -H 'X-Auth-Token: <inserttokenhere>' \
        "http://localhost:8777/v2/resources"
 
-A query to return the list of meters, limited to a specific meter type::
+A query to return the list of samples, limited to a specific meter type::
 
      curl -H 'X-Auth-Token: <inserttokenhere>' \
        "http://localhost:8777/v2/meters/disk.root.size"
