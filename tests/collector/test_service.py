@@ -32,7 +32,6 @@ from ceilometer.collector import service
 from ceilometer.compute import notifications
 from ceilometer.openstack.common import timeutils
 from ceilometer import sample
-from ceilometer.storage import base
 from ceilometer.storage import models
 from ceilometer.tests import base as tests_base
 
@@ -128,22 +127,49 @@ class TestUDPCollectorService(TestCollector):
             resource_metadata={},
         ).as_dict()
 
-    def test_service_has_storage_conn(self):
-        srv = service.UDPCollectorService()
-        self.assertIsNotNone(srv.storage_conn)
-
     def test_udp_receive(self):
-        self.srv.storage_conn = self.mox.CreateMock(base.Connection)
+        mock_dispatcher = MagicMock()
+        self.srv.dispatcher_manager = test_manager.TestExtensionManager(
+            [extension.Extension('test',
+                                 None,
+                                 None,
+                                 mock_dispatcher
+                                 ),
+             ])
         self.counter['source'] = 'mysource'
         self.counter['counter_name'] = self.counter['name']
         self.counter['counter_volume'] = self.counter['volume']
         self.counter['counter_type'] = self.counter['type']
         self.counter['counter_unit'] = self.counter['unit']
-        self.srv.storage_conn.record_metering_data(self.counter)
-        self.mox.ReplayAll()
 
         with patch('socket.socket', self._make_fake_socket):
             self.srv.start()
+
+        mock_dispatcher.record_metering_data.assert_called_once_with(
+            self.counter)
+
+    def test_udp_receive_storage_error(self):
+        mock_dispatcher = MagicMock()
+        self.srv.dispatcher_manager = test_manager.TestExtensionManager(
+            [extension.Extension('test',
+                                 None,
+                                 None,
+                                 mock_dispatcher
+                                 ),
+             ])
+        mock_dispatcher.record_metering_data.side_effect = self._raise_error
+
+        self.counter['source'] = 'mysource'
+        self.counter['counter_name'] = self.counter['name']
+        self.counter['counter_volume'] = self.counter['volume']
+        self.counter['counter_type'] = self.counter['type']
+        self.counter['counter_unit'] = self.counter['unit']
+
+        with patch('socket.socket', self._make_fake_socket):
+            self.srv.start()
+
+        mock_dispatcher.record_metering_data.assert_called_once_with(
+            self.counter)
 
     @staticmethod
     def _raise_error():
@@ -153,20 +179,6 @@ class TestUDPCollectorService(TestCollector):
         with patch('socket.socket', self._make_fake_socket):
             with patch('msgpack.loads', self._raise_error):
                 self.srv.start()
-
-    def test_udp_receive_storage_error(self):
-        self.srv.storage_conn = self.mox.CreateMock(base.Connection)
-        self.counter['source'] = 'mysource'
-        self.counter['counter_name'] = self.counter['name']
-        self.counter['counter_volume'] = self.counter['volume']
-        self.counter['counter_type'] = self.counter['type']
-        self.counter['counter_unit'] = self.counter['unit']
-        self.srv.storage_conn.record_metering_data(
-            self.counter).AndRaise(IOError)
-        self.mox.ReplayAll()
-
-        with patch('socket.socket', self._make_fake_socket):
-            self.srv.start()
 
 
 class MyException(Exception):
