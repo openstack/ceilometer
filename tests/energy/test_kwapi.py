@@ -17,10 +17,11 @@
 import datetime
 import mock
 
-from ceilometer.tests import base
 from ceilometer.energy import kwapi
 from ceilometer.central import manager
 from ceilometer.openstack.common import context
+from ceilometer.openstack.common import test
+from ceilometer.openstack.common.fixture import moxstubout
 
 from keystoneclient import exceptions
 
@@ -52,11 +53,12 @@ class TestManager(manager.AgentManager):
         self.keystone = None
 
 
-class TestKwapi(base.TestCase):
+class TestKwapi(test.BaseTestCase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestKwapi, self).setUp()
+        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
         self.context = context.get_admin_context()
         self.manager = TestManager()
 
@@ -72,11 +74,12 @@ class TestKwapi(base.TestCase):
         self.assertEqual(len(samples), 0)
 
 
-class TestEnergyPollster(base.TestCase):
+class TestEnergyPollster(test.BaseTestCase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestEnergyPollster, self).setUp()
+        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
         self.context = context.get_admin_context()
         self.manager = TestManager()
         self.stubs.Set(kwapi._Base, '_iter_probes',
@@ -110,7 +113,7 @@ class TestEnergyPollster(base.TestCase):
             #             power_samples)))
 
 
-class TestEnergyPollsterCache(base.TestCase):
+class TestEnergyPollsterCache(test.BaseTestCase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
@@ -132,11 +135,12 @@ class TestEnergyPollsterCache(base.TestCase):
         self.assertEqual(len(samples), 1)
 
 
-class TestPowerPollster(base.TestCase):
+class TestPowerPollster(test.BaseTestCase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestPowerPollster, self).setUp()
+        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
         self.context = context.get_admin_context()
         self.manager = TestManager()
         self.stubs.Set(kwapi._Base, '_iter_probes',
@@ -167,7 +171,7 @@ class TestPowerPollster(base.TestCase):
             self.assertEqual(sample.volume, probe['w'])
 
 
-class TestPowerPollsterCache(base.TestCase):
+class TestPowerPollsterCache(test.BaseTestCase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):

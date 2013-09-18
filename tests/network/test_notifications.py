@@ -19,7 +19,7 @@
 """
 
 from ceilometer.network import notifications
-from ceilometer.tests import base
+from ceilometer.openstack.common import test
 
 NOTIFICATION_NETWORK_CREATE = {
     u'_context_roles': [u'anotherrole',
@@ -226,7 +226,7 @@ NOTIFICATION_L3_METER = {
     u'_context_project_id': None}
 
 
-class TestNotifications(base.TestCase):
+class TestNotifications(test.BaseTestCase):
     def test_network_create(self):
         v = notifications.Network()
         samples = list(v.process_notification(NOTIFICATION_NETWORK_CREATE))
@@ -274,7 +274,7 @@ class TestNotifications(base.TestCase):
         self.assertEqual(samples[0].name, "bandwidth")
 
 
-class TestEventTypes(base.TestCase):
+class TestEventTypes(test.BaseTestCase):
 
     def test_network(self):
         v = notifications.Network()

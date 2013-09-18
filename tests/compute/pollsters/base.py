@@ -20,14 +20,16 @@
 
 import mock
 
-from ceilometer.tests import base as test_base
+from ceilometer.openstack.common import test
+from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer.compute.virt import inspector as virt_inspector
 
 
-class TestPollsterBase(test_base.TestCase):
+class TestPollsterBase(test.BaseTestCase):
 
     def setUp(self):
         super(TestPollsterBase, self).setUp()
+        self.mox = self.useFixture(moxstubout.MoxStubout()).mox
         self.mox.StubOutWithMock(virt_inspector, 'get_hypervisor_inspector')
         self.inspector = self.mox.CreateMock(virt_inspector.Inspector)
         virt_inspector.get_hypervisor_inspector().AndReturn(self.inspector)

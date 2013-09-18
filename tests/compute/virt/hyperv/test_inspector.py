@@ -20,10 +20,10 @@ Tests for Hyper-V inspector.
 import mock
 
 from ceilometer.compute.virt.hyperv import inspector as hyperv_inspector
-from ceilometer.tests import base as test_base
+from ceilometer.openstack.common import test
 
 
-class TestHyperVInspection(test_base.TestCase):
+class TestHyperVInspection(test.BaseTestCase):
 
     def setUp(self):
         self._inspector = hyperv_inspector.HyperVInspector()
