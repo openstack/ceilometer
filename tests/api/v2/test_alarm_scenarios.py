@@ -124,7 +124,7 @@ class TestAlarms(FunctionalTest,
             'statistic': 'avg',
             'repeat_actions': True,
         }
-        self.post_json('/alarms', params=json, status=200,
+        self.post_json('/alarms', params=json, status=201,
                        headers=self.auth_headers)
         alarms = list(self.conn.get_alarms())
         self.assertEqual(4, len(alarms))
@@ -180,7 +180,7 @@ class TestAlarms(FunctionalTest,
 
         self.delete('/alarms/%s' % data[0]['alarm_id'],
                     headers=self.auth_headers,
-                    status=200)
+                    status=204)
         alarms = list(self.conn.get_alarms())
         self.assertEqual(2, len(alarms))
 
@@ -210,7 +210,7 @@ class TestAlarms(FunctionalTest,
     def _delete_alarm(self, alarm, auth_headers=None):
         self.delete('/alarms/%s' % alarm['alarm_id'],
                     headers=auth_headers or self.auth_headers,
-                    status=200)
+                    status=204)
 
     def _assert_is_subset(self, expected, actual):
         for k, v in expected.iteritems():
@@ -242,7 +242,7 @@ class TestAlarms(FunctionalTest,
                          comparison_operator='le',
                          threshold=42.0,
                          statistic='max')
-        self.post_json('/alarms', params=new_alarm, status=200,
+        self.post_json('/alarms', params=new_alarm, status=201,
                        headers=self.auth_headers)
         alarm = self.get_json('/alarms')[3]
         history = self._get_alarm_history(alarm)
@@ -304,7 +304,7 @@ class TestAlarms(FunctionalTest,
                          comparison_operator='le',
                          threshold=42.0,
                          statistic='max')
-        self.post_json('/alarms', params=new_alarm, status=200,
+        self.post_json('/alarms', params=new_alarm, status=201,
                        headers=member_auth)
         alarm = self.get_json('/alarms', headers=member_auth)[0]
 
@@ -366,7 +366,7 @@ class TestAlarms(FunctionalTest,
         alarm = self._get_alarm('a')
         self.delete('/alarms/%s' % alarm['alarm_id'],
                     headers=self.auth_headers,
-                    status=200)
+                    status=204)
         history = self._get_alarm_history(alarm)
         self.assertEqual(2, len(history))
         self._assert_is_subset(dict(alarm_id=alarm['alarm_id'],

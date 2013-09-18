@@ -197,17 +197,17 @@ class Query(_Base):
             msg = _('Failed to convert the metadata value %(value)s'
                     ' to the expected data type %(type)s.') % \
                 {'value': self.value, 'type': self.type}
-            raise wsme.exc.ClientSideError(msg)
+            raise wsme.exc.ClientSideError(unicode(msg))
         except TypeError:
             msg = _('The data type %s is not supported. The supported'
                     ' data type list is: integer, float, boolean and'
                     ' string.') % (self.type)
-            raise wsme.exc.ClientSideError(msg)
+            raise wsme.exc.ClientSideError(unicode(msg))
         except Exception:
             msg = _('Unexpected exception converting %(value)s to'
                     ' the expected data type %(type)s.') % \
                 {'value': self.value, 'type': self.type}
-            raise wsme.exc.ClientSideError(msg)
+            raise wsme.exc.ClientSideError(unicode(msg))
         return converted_value
 
 
@@ -672,7 +672,7 @@ class MeterController(rest.RestController):
         if period and period < 0:
             error = _("Period must be positive.")
             pecan.response.translatable_error = error
-            raise wsme.exc.ClientSideError(error)
+            raise wsme.exc.ClientSideError(unicode(error))
 
         kwargs = _query_to_kwargs(q, storage.SampleFilter.__init__)
         kwargs['meter'] = self._id
@@ -834,7 +834,7 @@ class ResourcesController(rest.RestController):
             pecan.response.translatable_error = error
             raise wsme.exc.InvalidInput("resource_id",
                                         resource_id,
-                                        error)
+                                        unicode(error))
         return Resource.from_db_and_links(resources[0],
                                           self._resource_links(resource_id))
 
@@ -1011,7 +1011,7 @@ class AlarmController(rest.RestController):
         if len(alarms) < 1:
             error = _("Unknown alarm")
             pecan.response.translatable_error = error
-            raise wsme.exc.ClientSideError(error)
+            raise wsme.exc.ClientSideError(unicode(error))
         return alarms[0]
 
     def _record_change(self, data, now, on_behalf_of=None, type=None):
@@ -1141,7 +1141,7 @@ class AlarmsController(rest.RestController):
         if len(alarms) > 0:
             error = _("Alarm with that name exists")
             pecan.response.translatable_error = error
-            raise wsme.exc.ClientSideError(error)
+            raise wsme.exc.ClientSideError(unicode(error))
 
         try:
             kwargs = data.as_dict(storage.models.Alarm)
@@ -1150,7 +1150,7 @@ class AlarmsController(rest.RestController):
             LOG.exception(ex)
             error = _("Alarm incorrect")
             pecan.response.translatable_error = error
-            raise wsme.exc.ClientSideError(error)
+            raise wsme.exc.ClientSideError(unicode(error))
 
         alarm = conn.create_alarm(alarm_in)
         self._record_creation(conn, change, alarm.alarm_id, now)
