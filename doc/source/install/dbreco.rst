@@ -46,5 +46,5 @@ MongoDB            Yes                           Yes                 Yes
 MySQL              Yes, except metadata querying Yes                 Yes
 PostgreSQL         Yes, except metadata querying Yes                 Yes
 HBase              Yes                           Yes, except groupby No
-DB2                Yes                           No                  No
+DB2                Yes                           Yes                 No
 ================== ============================= =================== ======
