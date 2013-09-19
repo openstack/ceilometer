@@ -91,3 +91,8 @@ class TestRPCAlarmNotifier(base.TestCase):
                              self.alarms[i].state)
             self.assertEqual(self.notified[i][1]["args"]["data"]["reason"],
                              "what? %d" % i)
+
+    def test_notify_non_string_reason(self):
+        self.notifier.notify(self.alarms[0], 'ok', 42)
+        reason = self.notified[0][1]['args']['data']['reason']
+        self.assertTrue(isinstance(reason, basestring))

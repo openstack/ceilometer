@@ -44,5 +44,5 @@ class RPCAlarmNotifier(rpc_proxy.RpcProxy):
             'alarm_id': alarm.alarm_id,
             'previous': previous,
             'current': alarm.state,
-            'reason': reason})
+            'reason': unicode(reason)})
         self.cast(context.get_admin_context(), msg)
