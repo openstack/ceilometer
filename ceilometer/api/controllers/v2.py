@@ -82,6 +82,10 @@ class BoundedInt(wtypes.UserType):
         self.min = min
         self.max = max
 
+    @staticmethod
+    def frombasetype(value):
+        return int(value) if value is not None else None
+
     def validate(self, value):
         if self.min is not None and value < self.min:
             error = _('Value %(value)s is invalid (should be greater or equal '

@@ -285,8 +285,8 @@ class TestAlarms(FunctionalTest,
                 'comparison_operator': 'le',
                 'statistic': 'count',
                 'threshold': 50,
-                'evaluation_periods': 3,
-                'period': 180,
+                'evaluation_periods': '3',
+                'period': '180',
             }
         }
         self.post_json('/alarms', params=json, status=201,
@@ -296,6 +296,9 @@ class TestAlarms(FunctionalTest,
         json['threshold_rule']['query'].append({
             'field': 'project_id', 'op': 'eq',
             'value': self.auth_headers['X-Project-Id']})
+        # to check to BoundedInt type convertion
+        json['threshold_rule']['evaluation_periods'] = 3
+        json['threshold_rule']['period'] = 180
         if alarms[0].name == 'added_alarm':
             for key in json:
                 if key.endswith('_rule'):

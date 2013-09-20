@@ -29,6 +29,14 @@ class TestWsmeCustomType(base.TestCase):
         super(TestWsmeCustomType, self).setUp()
         pecan.response = mock.MagicMock()
 
+    def test_bounded_int_convertion(self):
+        bi = v2.BoundedInt(1, 5)
+        self.assertEqual(bi.frombasetype("2"), 2)
+
+    def test_bounded_int_invalid_convertion(self):
+        bi = v2.BoundedInt(1, 5)
+        self.assertRaises(TypeError, bi.frombasetype, wsme)
+
     def test_bounded_int_maxmin(self):
         bi = v2.BoundedInt(1, 5)
         self.assertRaises(wsme.exc.ClientSideError, bi.validate, -1)
