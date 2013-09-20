@@ -203,6 +203,52 @@ class TestAlarms(FunctionalTest,
         self.assertEqual(one['alarm_id'], alarms[0]['alarm_id'])
         self.assertEqual(one['repeat_actions'], alarms[0]['repeat_actions'])
 
+    def test_post_alarm_wsme_workaround(self):
+        jsons = {
+            'type': {
+                'name': 'missing type',
+                'threshold_rule': {
+                    'meter_name': 'ameter',
+                    'threshold': 2.0,
+                }
+            },
+            'name': {
+                'type': 'threshold',
+                'threshold_rule': {
+                    'meter_name': 'ameter',
+                    'threshold': 2.0,
+                }
+            },
+            'threshold_rule/meter_name': {
+                'name': 'missing meter_name',
+                'type': 'threshold',
+                'threshold_rule': {
+                    'threshold': 2.0,
+                }
+            },
+            'threshold_rule/threshold': {
+                'name': 'missing threshold',
+                'type': 'threshold',
+                'threshold_rule': {
+                    'meter_name': 'ameter',
+                }
+            },
+            'combination_rule/alarm_ids': {
+                'name': 'missing alarm_ids',
+                'type': 'combination',
+                'combination_rule': {}
+            }
+        }
+        for field, json in jsons.iteritems():
+            resp = self.post_json('/alarms', params=json, expect_errors=True,
+                                  status=400, headers=self.auth_headers)
+            self.assertEqual(
+                resp.json['error_message'],
+                '{"debuginfo": null, "faultcode": "Client", "faultstring": '
+                '"%s is mandatory"}' % field)
+        alarms = list(self.conn.get_alarms())
+        self.assertEqual(4, len(alarms))
+
     def test_post_invalid_alarm_period(self):
         json = {
             'name': 'added_alarm_invalid_period',
@@ -261,6 +307,7 @@ class TestAlarms(FunctionalTest,
             'name': 'added_alarm',
             'type': 'threshold',
             'threshold_rule': {
+                'meter_name': 'ameter',
                 'query': [{'field': 'meter',
                            'value': 'ameter'}],
                 'comparison_operator': 'gt',
@@ -271,10 +318,15 @@ class TestAlarms(FunctionalTest,
 
             }
         }
-        self.post_json('/alarms', params=json, expect_errors=True, status=400,
-                       headers=self.auth_headers)
+        resp = self.post_json('/alarms', params=json, expect_errors=True,
+                              status=400, headers=self.auth_headers)
         alarms = list(self.conn.get_alarms())
         self.assertEqual(4, len(alarms))
+        self.assertEqual(
+            resp.json['error_message'],
+            '{"debuginfo": null, "faultcode": "Client", "faultstring": '
+            '"threshold_rule and combination_rule cannot '
+            'be set at the same time"}')
 
     def test_post_alarm_defaults(self):
         to_check = {

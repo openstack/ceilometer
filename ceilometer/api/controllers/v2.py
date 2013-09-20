@@ -943,8 +943,19 @@ class AlarmThresholdRule(_Base):
 
     @staticmethod
     def validate(threshold_rule):
+        #note(sileht): wsme mandatory doesn't work as expected
+        #workaround for https://bugs.launchpad.net/wsme/+bug/1227004
+        for field in ['meter_name', 'threshold']:
+            if not getattr(threshold_rule, field):
+                error = _("threshold_rule/%s is mandatory") % field
+                pecan.response.translatable_error = error
+                raise wsme.exc.ClientSideError(unicode(error))
+
+        #note(sileht): wsme default doesn't work in some case
+        #workaround for https://bugs.launchpad.net/wsme/+bug/1227039
         if not threshold_rule.query:
             threshold_rule.query = []
+
         #note(sileht): _query_to_kwargs implicitly call _sanitize_query
         #that add project_id in query
         _query_to_kwargs(threshold_rule.query, storage.SampleFilter.__init__,
@@ -1007,6 +1018,13 @@ class AlarmCombinationRule(_Base):
 
     @staticmethod
     def validate(combination_rule):
+        #note(sileht): wsme mandatory doesn't works as expected
+        #workaround for https://bugs.launchpad.net/wsme/+bug/1227004
+        if not combination_rule.alarm_ids:
+            error = _("combination_rule/alarm_ids is mandatory")
+            pecan.response.translatable_error = error
+            raise wsme.exc.ClientSideError(unicode(error))
+
         for id in combination_rule.alarm_ids:
             auth_project = acl.get_limited_to_project(pecan.request.headers)
             alarms = list(pecan.request.storage_conn.get_alarms(
@@ -1097,11 +1115,19 @@ class Alarm(_Base):
 
     @staticmethod
     def validate(alarm):
+        #note(sileht): wsme mandatory doesn't work as expected
+        #workaround for https://bugs.launchpad.net/wsme/+bug/1227004
+        for field in ['name', 'type']:
+            if not getattr(alarm, field):
+                error = _("%s is mandatory") % field
+                pecan.response.translatable_error = error
+                raise wsme.exc.ClientSideError(unicode(error))
+
         if alarm.threshold_rule and alarm.combination_rule:
             error = _("threshold_rule and combination_rule "
                       "cannot be set at the same time")
             pecan.response.translatable_error = error
-            raise wsme.exc.ClientSideError(error)
+            raise wsme.exc.ClientSideError(unicode(error))
         return alarm
 
     @classmethod
