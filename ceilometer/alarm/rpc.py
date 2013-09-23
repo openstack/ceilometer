@@ -26,6 +26,10 @@ OPTS = [
     cfg.StrOpt('notifier_rpc_topic',
                default='alarm_notifier',
                help='the topic ceilometer uses for alarm notifier messages'),
+    cfg.StrOpt('partition_rpc_topic',
+               default='alarm_partition_coordination',
+               help='the topic ceilometer uses for alarm partition '
+                    'coordination messages'),
 ]
 
 cfg.CONF.register_opts(OPTS, group='alarm')
@@ -46,3 +50,28 @@ class RPCAlarmNotifier(rpc_proxy.RpcProxy):
             'current': alarm.state,
             'reason': unicode(reason)})
         self.cast(context.get_admin_context(), msg)
+
+
+class RPCAlarmPartitionCoordination(rpc_proxy.RpcProxy):
+    def __init__(self):
+        super(RPCAlarmPartitionCoordination, self).__init__(
+            default_version='1.0',
+            topic=cfg.CONF.alarm.partition_rpc_topic)
+
+    def presence(self, uuid, priority):
+        msg = self.make_msg('presence', data={
+            'uuid': uuid,
+            'priority': priority})
+        self.fanout_cast(context.get_admin_context(), msg)
+
+    def assign(self, uuid, alarms):
+        msg = self.make_msg('assign', data={
+            'uuid': uuid,
+            'alarms': alarms})
+        return self.fanout_cast(context.get_admin_context(), msg)
+
+    def allocate(self, uuid, alarms):
+        msg = self.make_msg('allocate', data={
+            'uuid': uuid,
+            'alarms': alarms})
+        return self.fanout_cast(context.get_admin_context(), msg)

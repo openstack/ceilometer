@@ -605,6 +605,10 @@
 # (string value)
 #notifier_rpc_topic=alarm_notifier
 
+# the topic ceilometer uses for alarm partition coordination
+# messages (string value)
+#partition_rpc_topic=alarm_partition_coordination
+
 
 #
 # Options defined in ceilometer.alarm.service
@@ -614,6 +618,9 @@
 # pipeline interval for collection of underlying metrics.
 # (integer value)
 #evaluation_interval=60
+
+# Class to launch as alarm evaluation service (string value)
+#evaluation_service=ceilometer.alarm.service.SingletonAlarmService
 
 
 #

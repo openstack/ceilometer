@@ -15,9 +15,11 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Tests for ceilometer/alarm/service.py
+"""Tests for ceilometer.alarm.service.SingletonAlarmService.
 """
 import mock
+
+from oslo.config import cfg
 
 from stevedore import extension
 from stevedore.tests import manager as extension_tests
@@ -45,12 +47,16 @@ class TestSingletonAlarmService(base.TestCase):
         self.singleton.supported_evaluators = ['threshold']
 
     def test_start(self):
+        test_interval = 120
+        cfg.CONF.set_override('evaluation_interval',
+                              test_interval,
+                              group='alarm')
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
             self.singleton.start()
             expected = [
-                mock.call(60,
-                          self.singleton._evaluate_all_alarms,
+                mock.call(test_interval,
+                          self.singleton._evaluate_assigned_alarms,
                           0),
                 mock.call(604800, mock.ANY),
             ]
@@ -63,7 +69,7 @@ class TestSingletonAlarmService(base.TestCase):
         self.api_client.alarms.list.return_value = [alarm]
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
-            self.singleton._evaluate_all_alarms()
+            self.singleton._evaluate_assigned_alarms()
             self.threshold_eval.evaluate.assert_called_once_with(alarm)
 
     def test_disabled_is_skipped(self):
@@ -78,7 +84,7 @@ class TestSingletonAlarmService(base.TestCase):
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
             self.singleton.start()
-            self.singleton._evaluate_all_alarms()
+            self.singleton._evaluate_assigned_alarms()
             self.threshold_eval.evaluate.assert_called_once_with(alarms[1])
 
     def test_unknown_extention_skipped(self):
@@ -91,5 +97,5 @@ class TestSingletonAlarmService(base.TestCase):
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
             self.singleton.start()
-            self.singleton._evaluate_all_alarms()
+            self.singleton._evaluate_assigned_alarms()
             self.threshold_eval.evaluate.assert_called_once_with(alarms[1])
