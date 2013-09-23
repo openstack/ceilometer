@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-09-17 06:02+0000\n"
+"POT-Creation-Date: 2013-09-23 06:02+0000\n"
 "PO-Revision-Date: 2013-07-04 07:30+0000\n"
 "Last-Translator: Cyryl Sochacki <cyrylsochacki@gmail.com>\n"
 "Language-Team: Polish (Poland) "
@@ -20,146 +20,237 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
-#: ceilometer/alarm/service.py:98
+#: ceilometer/alarm/service.py:95
+#, python-format
+msgid "initiating evaluation cycle on %d alarms"
+msgstr ""
+
+#: ceilometer/alarm/service.py:100
 msgid "threshold evaluation cycle failed"
 msgstr ""
 
-#: ceilometer/alarm/service.py:136
+#: ceilometer/alarm/service.py:105
+#, python-format
+msgid "skipping alarm %s: alarm disabled"
+msgstr ""
+
+#: ceilometer/alarm/service.py:109
+#, python-format
+msgid "skipping alarm %s: type unsupported"
+msgstr ""
+
+#: ceilometer/alarm/service.py:113
+#, python-format
+msgid "evaluating alarm %s"
+msgstr ""
+
+#: ceilometer/alarm/service.py:152
 #, python-format
 msgid "Unable to parse action %(action)s for alarm %(alarm_id)s"
 msgstr ""
 
-#: ceilometer/alarm/service.py:145
+#: ceilometer/alarm/service.py:161
 #, python-format
 msgid "Action %(scheme)s for alarm %(alarm_id)s is unknown, cannot notify"
 msgstr ""
 
-#: ceilometer/alarm/service.py:155
+#: ceilometer/alarm/service.py:171
 #, python-format
 msgid "Unable to notify alarm %s"
 msgstr ""
 
-#: ceilometer/alarm/service.py:174
+#: ceilometer/alarm/service.py:190
 msgid "Unable to notify for an alarm with no action"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:98
-#, python-format
-msgid "query stats from %(start)s to %(now)s"
-msgstr ""
-
-#: ceilometer/alarm/threshold_evaluation.py:111
-#, python-format
-msgid "sanitize stats %s"
-msgstr ""
-
-#: ceilometer/alarm/threshold_evaluation.py:115
-#, python-format
-msgid "pruned statistics to %d"
-msgstr ""
-
-#: ceilometer/alarm/threshold_evaluation.py:120
-#, python-format
-msgid "stats query %s"
-msgstr ""
-
-#: ceilometer/alarm/threshold_evaluation.py:126
-msgid "alarm stats retrieval failed"
-msgstr ""
-
-#: ceilometer/alarm/threshold_evaluation.py:134
+#: ceilometer/alarm/evaluator/__init__.py:66
 #, python-format
 msgid "alarm %(id)s transitioning to %(state)s because %(reason)s"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:146
+#: ceilometer/alarm/evaluator/__init__.py:78
 msgid "alarm state update failed"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:154
+#: ceilometer/alarm/evaluator/combination.py:36
+msgid "alarm retrieval failed"
+msgstr ""
+
+#: ceilometer/alarm/evaluator/combination.py:47
+#, python-format
+msgid "%(missing_states)d alarms in %(alarm_ids)s are in unknown state"
+msgstr ""
+
+#: ceilometer/alarm/evaluator/combination.py:60
+#, python-format
+msgid ""
+"Transition to %(state)s due at least to one alarm in %(alarm_ids)s in "
+"state %(state)s"
+msgstr ""
+
+#: ceilometer/alarm/evaluator/combination.py:64
+#, python-format
+msgid ""
+"Remaining as %(state)s due at least to one alarm in %(alarm_ids)s in "
+"state %(state)s"
+msgstr ""
+
+#: ceilometer/alarm/evaluator/combination.py:70
+#, python-format
+msgid ""
+"Transition to %(state)s due to all alarms (%(alarm_ids)s) in state "
+"%(state)s"
+msgstr ""
+
+#: ceilometer/alarm/evaluator/combination.py:74
+#, python-format
+msgid ""
+"Remaining as %(state)s due to all alarms (%(alarm_ids)s) in state "
+"%(state)s"
+msgstr ""
+
+#: ceilometer/alarm/evaluator/threshold.py:58
+#, python-format
+msgid "query stats from %(start)s to %(now)s"
+msgstr ""
+
+#: ceilometer/alarm/evaluator/threshold.py:71
+#, python-format
+msgid "sanitize stats %s"
+msgstr ""
+
+#: ceilometer/alarm/evaluator/threshold.py:75
+#, python-format
+msgid "pruned statistics to %d"
+msgstr ""
+
+#: ceilometer/alarm/evaluator/threshold.py:80
+#, python-format
+msgid "stats query %s"
+msgstr ""
+
+#: ceilometer/alarm/evaluator/threshold.py:86
+msgid "alarm stats retrieval failed"
+msgstr ""
+
+#: ceilometer/alarm/evaluator/threshold.py:95
 #, python-format
 msgid "%d datapoints are unknown"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:166
+#: ceilometer/alarm/evaluator/threshold.py:108
 #, python-format
 msgid ""
 "Transition to %(state)s due to %(count)d samples %(disposition)s "
 "threshold, most recent: %(last)s"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:170
+#: ceilometer/alarm/evaluator/threshold.py:112
 #, python-format
 msgid ""
 "Remaining as %(state)s due to %(count)d samples %(disposition)s "
 "threshold, most recent: %(last)s"
 msgstr ""
 
-#: ceilometer/alarm/threshold_evaluation.py:207
-#, python-format
-msgid "initiating evaluation cycle on %d alarms"
-msgstr ""
-
-#: ceilometer/alarm/threshold_evaluation.py:213
-#, python-format
-msgid "skipping alarm %s"
-msgstr ""
-
-#: ceilometer/alarm/threshold_evaluation.py:215
-#, python-format
-msgid "evaluating alarm %s"
-msgstr ""
-
-#: ceilometer/alarm/threshold_evaluation.py:233
+#: ceilometer/alarm/evaluator/threshold.py:162
 #, python-format
 msgid "comparing value %(value)s against threshold %(limit)s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:179
+#: ceilometer/api/controllers/v2.py:91
+#, python-format
+msgid "Value %(value)s is invalid (should be greater or equal to %(min)s)"
+msgstr ""
+
+#: ceilometer/api/controllers/v2.py:97
+#, python-format
+msgid "Value %(value)s is invalid (should be lower or equal to %(max)s)"
+msgstr ""
+
+#: ceilometer/api/controllers/v2.py:234
 #, python-format
 msgid "Failed to convert the metadata value %s automatically"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:197
+#: ceilometer/api/controllers/v2.py:252
 #, python-format
 msgid ""
 "Failed to convert the metadata value %(value)s to the expected data type "
 "%(type)s."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:202
+#: ceilometer/api/controllers/v2.py:257
 #, python-format
 msgid ""
 "The data type %s is not supported. The supported data type list is: "
 "integer, float, boolean and string."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:207
+#: ceilometer/api/controllers/v2.py:262
 #, python-format
 msgid ""
 "Unexpected exception converting %(value)s to the expected data type "
 "%(type)s."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:673
+#: ceilometer/api/controllers/v2.py:728
 msgid "Period must be positive."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:833
+#: ceilometer/api/controllers/v2.py:888
 msgid "Unknown resource"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1012
+#: ceilometer/api/controllers/v2.py:950
+#, python-format
+msgid "threshold_rule/%s is mandatory"
+msgstr ""
+
+#: ceilometer/api/controllers/v2.py:968
+#, python-format
+msgid ""
+"Alarm when %(meter_name)s is %(comparison_operator)s a %(statistic)s of "
+"%(threshold)s over %(period)s seconds"
+msgstr ""
+
+#: ceilometer/api/controllers/v2.py:1007
+#, python-format
+msgid "Combined state of alarms %s"
+msgstr ""
+
+#: ceilometer/api/controllers/v2.py:1024
+msgid "combination_rule/alarm_ids is mandatory"
+msgstr ""
+
+#: ceilometer/api/controllers/v2.py:1033
+#, python-format
+msgid "Alarm %s doesn't exists"
+msgstr ""
+
+#: ceilometer/api/controllers/v2.py:1122
+#, python-format
+msgid "%s is mandatory"
+msgstr ""
+
+#: ceilometer/api/controllers/v2.py:1127
+msgid "threshold_rule and combination_rule cannot be set at the same time"
+msgstr ""
+
+#: ceilometer/api/controllers/v2.py:1227
 msgid "Unknown alarm"
 msgstr "Nieznany alarm"
 
-#: ceilometer/api/controllers/v2.py:1142
-msgid "Alarm with that name exists"
-msgstr ""
-
-#: ceilometer/api/controllers/v2.py:1151
+#: ceilometer/api/controllers/v2.py:1285 ceilometer/api/controllers/v2.py:1409
 msgid "Alarm incorrect"
 msgstr "Nieprawidłowy alarm"
+
+#: ceilometer/api/controllers/v2.py:1330
+msgid "state invalid"
+msgstr ""
+
+#: ceilometer/api/controllers/v2.py:1401
+msgid "Alarm with that name exists"
+msgstr ""
 
 #: ceilometer/collector/service.py:87
 #, python-format
@@ -996,14 +1087,14 @@ msgstr ""
 msgid "Unable to send sample over UDP"
 msgstr ""
 
-#: ceilometer/storage/impl_db2.py:397 ceilometer/storage/impl_db2.py:466
-#: ceilometer/storage/impl_db2.py:594 ceilometer/storage/impl_hbase.py:308
+#: ceilometer/storage/impl_db2.py:404 ceilometer/storage/impl_db2.py:473
+#: ceilometer/storage/impl_db2.py:681 ceilometer/storage/impl_hbase.py:308
 #: ceilometer/storage/impl_hbase.py:392 ceilometer/storage/impl_mongodb.py:605
 #: ceilometer/storage/impl_mongodb.py:687
-#: ceilometer/storage/impl_mongodb.py:820
+#: ceilometer/storage/impl_mongodb.py:863
 #: ceilometer/storage/impl_sqlalchemy.py:296
 #: ceilometer/storage/impl_sqlalchemy.py:395
-#: ceilometer/storage/impl_sqlalchemy.py:615
+#: ceilometer/storage/impl_sqlalchemy.py:610
 msgid "Pagination not implemented"
 msgstr ""
 
@@ -1101,5 +1192,8 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "Unable to store events: %s"
+#~ msgstr ""
+
+#~ msgid "skipping alarm %s"
 #~ msgstr ""
 
