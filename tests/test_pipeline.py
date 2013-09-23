@@ -32,6 +32,31 @@ from ceilometer import pipeline
 from ceilometer.tests import base
 
 
+class TestTransformerAccumulator(base.TestCase):
+
+    def test_handle_sample(self):
+        test_sample = sample.Sample(
+            name='a',
+            type=sample.TYPE_GAUGE,
+            volume=1,
+            unit='B',
+            user_id="test_user",
+            project_id="test_proj",
+            resource_id="test_resource",
+            timestamp=timeutils.utcnow().isoformat(),
+            resource_metadata={}
+        )
+
+        # Test when size is set to less than 1.
+        tf = accumulator.TransformerAccumulator(size=0)
+        self.assertEqual(tf.handle_sample(None, test_sample), test_sample)
+        self.assertFalse(hasattr(tf, 'samples'))
+        # Test when size is set to greater or equal than 1.
+        tf = accumulator.TransformerAccumulator(size=2)
+        tf.handle_sample(None, test_sample)
+        self.assertEqual(len(tf.samples), 1)
+
+
 class TestPipeline(base.TestCase):
     def fake_tem_init(self):
         """Fake a transformerManager for pipeline

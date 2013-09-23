@@ -67,3 +67,6 @@ class TestUtils(tests_base.TestCase):
                                  ('b', 'B'),
                                  ('nested.a', 'A'),
                                  ('nested.b', 'B')])
+
+    def test_decimal_to_dt_with_none_parameter(self):
+        self.assertEqual(utils.decimal_to_dt(None), None)
