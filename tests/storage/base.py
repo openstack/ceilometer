@@ -295,6 +295,63 @@ class ResourceTest(DBTestBase):
         self.assertTrue(len(resources) == 4)
 
 
+class ResourceTestOrdering(DBTestBase):
+
+    def prepare_data(self):
+        sample_timings = [('resource-id-1', [(2013, 8, 10, 10, 43),
+                                             (2013, 8, 10, 10, 44),
+                                             (2013, 8, 10, 10, 42),
+                                             (2013, 8, 10, 10, 49),
+                                             (2013, 8, 10, 10, 47)]),
+                          ('resource-id-2', [(2013, 8, 10, 10, 43),
+                                             (2013, 8, 10, 10, 48),
+                                             (2013, 8, 10, 10, 42),
+                                             (2013, 8, 10, 10, 48),
+                                             (2013, 8, 10, 10, 47)]),
+                          ('resource-id-3', [(2013, 8, 10, 10, 43),
+                                             (2013, 8, 10, 10, 44),
+                                             (2013, 8, 10, 10, 50),
+                                             (2013, 8, 10, 10, 49),
+                                             (2013, 8, 10, 10, 47)])]
+        count = 0
+        for r_id, timestamps in sample_timings:
+            for timestamp in timestamps:
+                c = counter.Counter(
+                    'instance',
+                    counter.TYPE_CUMULATIVE,
+                    unit='',
+                    volume=1,
+                    user_id=str(count % 2),
+                    project_id=str(count % 3),
+                    resource_id=r_id,
+                    timestamp=datetime.datetime(*timestamp),
+                    resource_metadata={
+                        'display_name': 'test-server',
+                        'tag': 'sample-%s' % count
+                    }
+                )
+                msg = meter.meter_message_from_counter(
+                    c, cfg.CONF.metering_secret, 'test')
+                self.conn.record_metering_data(msg)
+                count += 1
+
+    def test_get_resources_ordering_all(self):
+        resources = list(self.conn.get_resources())
+        expected = set([
+            ('resource-id-1', 'sample-3'),
+            ('resource-id-2', 'sample-8'),
+            ('resource-id-3', 'sample-12')
+        ])
+        received = set([(r['resource_id'], r['metadata']['tag'])
+                       for r in resources])
+        self.assertEqual(received, expected)
+
+    def test_get_resources_ordering_single(self):
+        resource = list(self.conn.get_resources(resource='resource-id-2'))[0]
+        self.assertEqual(resource['resource_id'], 'resource-id-2')
+        self.assertEqual(resource['metadata']['tag'], 'sample-8')
+
+
 class MeterTest(DBTestBase):
 
     def test_get_meters(self):
