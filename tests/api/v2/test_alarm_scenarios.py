@@ -566,9 +566,10 @@ class TestAlarms(FunctionalTest,
         data = self.get_json('/alarms')
         self.assertEqual(4, len(data))
 
-        self.delete('/alarms/%s' % data[0]['alarm_id'],
-                    headers=self.auth_headers,
-                    status=204)
+        resp = self.delete('/alarms/%s' % data[0]['alarm_id'],
+                           headers=self.auth_headers,
+                           status=204)
+        self.assertEqual(resp.body, '')
         alarms = list(self.conn.get_alarms())
         self.assertEqual(3, len(alarms))
 
