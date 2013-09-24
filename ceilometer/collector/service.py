@@ -32,7 +32,6 @@ from ceilometer.openstack.common.rpc import service as rpc_service
 
 from ceilometer.openstack.common import timeutils
 from ceilometer import pipeline
-from ceilometer import storage
 from ceilometer.storage import models
 from ceilometer import transformer
 
@@ -60,12 +59,26 @@ cfg.CONF.register_opts(OPTS, group="collector")
 LOG = log.getLogger(__name__)
 
 
-class UDPCollectorService(os_service.Service):
-    """UDP listener for the collector service."""
+class CollectorBase(object):
 
-    def __init__(self):
-        super(UDPCollectorService, self).__init__()
-        self.storage_conn = storage.get_connection(cfg.CONF)
+    DISPATCHER_NAMESPACE = 'ceilometer.dispatcher'
+
+    def __init__(self, *args, **kwargs):
+        super(CollectorBase, self).__init__(*args, **kwargs)
+        LOG.debug('loading dispatchers from %s',
+                  self.DISPATCHER_NAMESPACE)
+        self.dispatcher_manager = named.NamedExtensionManager(
+            namespace=self.DISPATCHER_NAMESPACE,
+            names=cfg.CONF.collector.dispatcher,
+            invoke_on_load=True,
+            invoke_args=[cfg.CONF])
+        if not list(self.dispatcher_manager):
+            LOG.warning('Failed to load any dispatchers for %s',
+                        self.DISPATCHER_NAMESPACE)
+
+
+class UDPCollectorService(CollectorBase, os_service.Service):
+    """UDP listener for the collector service."""
 
     def start(self):
         """Bind the UDP socket and handle incoming data."""
@@ -82,20 +95,21 @@ class UDPCollectorService(os_service.Service):
             # enough for anybody.
             data, source = udp.recvfrom(64 * 1024)
             try:
-                counter = msgpack.loads(data)
+                sample = msgpack.loads(data)
             except Exception:
                 LOG.warn(_("UDP: Cannot decode data sent by %s"), str(source))
             else:
                 try:
-                    counter['counter_name'] = counter['name']
-                    counter['counter_volume'] = counter['volume']
-                    counter['counter_unit'] = counter['unit']
-                    counter['counter_type'] = counter['type']
-                    LOG.debug("UDP: Storing %s", str(counter))
-                    self.storage_conn.record_metering_data(counter)
-                except Exception as err:
-                    LOG.debug(_("UDP: Unable to store meter"))
-                    LOG.exception(err)
+                    sample['counter_name'] = sample['name']
+                    sample['counter_volume'] = sample['volume']
+                    sample['counter_unit'] = sample['unit']
+                    sample['counter_type'] = sample['type']
+                    LOG.debug("UDP: Storing %s", str(sample))
+                    self.dispatcher_manager.map(
+                        lambda ext, data: ext.obj.record_metering_data(data),
+                        sample)
+                except Exception:
+                    LOG.exception(_("UDP: Unable to store meter"))
 
     def stop(self):
         self.running = False
@@ -116,10 +130,9 @@ class UnableToSaveEventException(Exception):
     pass
 
 
-class CollectorService(rpc_service.Service):
+class CollectorService(CollectorBase, rpc_service.Service):
 
     COLLECTOR_NAMESPACE = 'ceilometer.collector'
-    DISPATCHER_NAMESPACE = 'ceilometer.dispatcher'
 
     def start(self):
         super(CollectorService, self).start()
@@ -147,17 +160,6 @@ class CollectorService(rpc_service.Service):
             LOG.warning('Failed to load any notification handlers for %s',
                         self.COLLECTOR_NAMESPACE)
         self.notification_manager.map(self._setup_subscription)
-
-        LOG.debug('loading dispatchers from %s',
-                  self.DISPATCHER_NAMESPACE)
-        self.dispatcher_manager = named.NamedExtensionManager(
-            namespace=self.DISPATCHER_NAMESPACE,
-            names=cfg.CONF.collector.dispatcher,
-            invoke_on_load=True,
-            invoke_args=[cfg.CONF])
-        if not list(self.dispatcher_manager):
-            LOG.warning('Failed to load any dispatchers for %s',
-                        self.DISPATCHER_NAMESPACE)
 
         # Set ourselves up as a separate worker for the metering data,
         # since the default for service is to use create_consumer().
