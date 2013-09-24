@@ -297,16 +297,17 @@ class TestCollectorService(TestCollector):
         timeutils.set_time_override(now)
 
         body = {"timestamp": str(modified)}
-        self.assertEqual(service.CollectorService._extract_when(body),
-                         modified)
+        when = service.CollectorService._extract_when(body)
+        self.assertAlmostEqual(timeutils.delta_seconds(modified, when), 0.0)
 
         body = {"_context_timestamp": str(modified)}
-        self.assertEqual(service.CollectorService._extract_when(body),
-                         modified)
+        when = service.CollectorService._extract_when(body)
+        self.assertAlmostEqual(timeutils.delta_seconds(modified, when), 0.0)
 
         then = now + datetime.timedelta(hours=1)
         body = {"timestamp": str(modified), "_context_timestamp": str(then)}
-        self.assertEqual(service.CollectorService._extract_when(body),
-                         modified)
+        when = service.CollectorService._extract_when(body)
+        self.assertAlmostEqual(timeutils.delta_seconds(modified, when), 0.0)
 
-        self.assertEqual(service.CollectorService._extract_when({}), now)
+        when = service.CollectorService._extract_when({})
+        self.assertAlmostEqual(timeutils.delta_seconds(now, when), 0.0)
