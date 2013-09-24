@@ -96,3 +96,23 @@ class TestRPCAlarmNotifier(base.TestCase):
         self.notifier.notify(self.alarms[0], 'ok', 42)
         reason = self.notified[0][1]['args']['data']['reason']
         self.assertTrue(isinstance(reason, basestring))
+
+    def test_notify_no_actions(self):
+        alarm = AlarmClient(None, info={
+            'name': 'instance_running_hot',
+            'meter_name': 'cpu_util',
+            'comparison_operator': 'gt',
+            'threshold': 80.0,
+            'evaluation_periods': 5,
+            'statistic': 'avg',
+            'state': 'ok',
+            'user_id': 'foobar',
+            'project_id': 'snafu',
+            'period': 60,
+            'ok_actions': [],
+            'alarm_id': str(uuid.uuid4()),
+            'matching_metadata': {'resource_id':
+                                  'my_instance'}
+        })
+        self.notifier.notify(alarm, 'alarm', "what?")
+        self.assertEqual(len(self.notified), 0)
