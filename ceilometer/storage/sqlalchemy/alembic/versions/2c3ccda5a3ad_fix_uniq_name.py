@@ -46,12 +46,12 @@ def change_uniq(table_name, uniq_name, columns, downgrade=False):
         #  before renaming of constraint.
         op.drop_constraint('fk_sourceassoc_meter_id',
                            table_name,
-                           type_='foreignkey')
+                           type='foreignkey')
         op.drop_constraint('fk_sourceassoc_user_id',
                            table_name,
-                           type_='foreignkey')
+                           type='foreignkey')
     if downgrade:
-        op.drop_constraint(uniq_name, table_name=table_name, type_='unique')
+        op.drop_constraint(uniq_name, table_name=table_name, type='unique')
     else:
         op.create_unique_constraint(uniq_name, table_name, columns)
     if engine.name == 'mysql':
