@@ -19,6 +19,8 @@
 
 """Command line tool for releasing Ceilometer bugs."""
 
+from __future__ import print_function
+
 import argparse
 import sys
 
@@ -26,7 +28,7 @@ try:
     from launchpadlib.launchpad import Launchpad
     from launchpadlib.uris import LPNET_SERVICE_ROOT as SERVICE_ROOT
 except ImportError:
-    print "Can't import launchpadlib."
+    print("Can't import launchpadlib.")
     sys.exit(1)
 
 
@@ -56,14 +58,14 @@ def main():
         status=PRE_RELEASE_STATUS, milestone=milestone)
     bug_count = len(bugs_for_milestone)
     if bug_count == 0:
-        print "No bugs to release for milestone %s" % milestone.name
+        print("No bugs to release for milestone %s" % milestone.name)
         sys.exit(0)
     mark_released = raw_input(RELEASE_PROMPT.format(
         bug_count=bug_count,
         pre_release_status=PRE_RELEASE_STATUS,
         milestone_title=milestone.name))
     if mark_released.lower() != "y":
-        print "Not releasing bugs."
+        print("Not releasing bugs.")
         sys.exit(0)
     for bug_task in bugs_for_milestone:
         # We re-load the bugtask to avoid having bug 369293 bite us.

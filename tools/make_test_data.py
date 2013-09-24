@@ -19,6 +19,7 @@
 
 """Command line tool for creating test data for ceilometer.
 """
+from __future__ import print_function
 
 import argparse
 import datetime
@@ -137,7 +138,7 @@ def main():
         n += 1
         timestamp = timestamp + increment
 
-    print 'Added %d new events' % n
+    print('Added %d new events' % n)
 
     return 0
 
