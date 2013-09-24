@@ -23,6 +23,7 @@
 import datetime
 import json as jsonutils
 import logging
+import mock
 import uuid
 import testscenarios
 
@@ -914,3 +915,52 @@ class TestAlarms(FunctionalTest,
         # continued existence of the alarm itself
         history = self._get_alarm_history(dict(alarm_id='foobar'))
         self.assertEqual([], history)
+
+    def test_alarms_sends_notification(self):
+        # Hit the AlarmsController ...
+        json = {
+            'name': 'sent_notification',
+            'type': 'threshold',
+            'threshold_rule': {
+                'meter_name': 'ameter',
+                'comparison_operator': 'gt',
+                'threshold': 2.0,
+                'statistic': 'avg',
+            }
+
+        }
+        with mock.patch('ceilometer.openstack.common.notifier.api.notify') \
+                as notifier:
+            self.post_json('/alarms', params=json, headers=self.auth_headers)
+
+        calls = notifier.call_args_list
+        self.assertEqual(len(calls), 1)
+        args, _ = calls[0]
+        context, publisher, event_type, priority, payload = args
+        self.assertTrue(publisher.startswith('ceilometer.api'))
+        self.assertEqual(event_type, 'alarm.creation')
+        self.assertEqual(priority, 'INFO')
+        self.assertEqual(payload['detail']['name'], 'sent_notification')
+        self.assertTrue(set(['alarm_id', 'detail', 'event_id', 'on_behalf_of',
+                             'project_id', 'timestamp', 'type',
+                             'user_id']).issubset(payload.keys()))
+
+    def test_alarm_sends_notification(self):
+        # Hit the AlarmController (with alarm_id supplied) ...
+        data = self.get_json('/alarms')
+        with mock.patch('ceilometer.openstack.common.notifier.api.notify') \
+                as notifier:
+            self.delete('/alarms/%s' % data[0]['alarm_id'],
+                        headers=self.auth_headers, status=204)
+
+        calls = notifier.call_args_list
+        self.assertEqual(len(calls), 1)
+        args, _ = calls[0]
+        context, publisher, event_type, priority, payload = args
+        self.assertTrue(publisher.startswith('ceilometer.api'))
+        self.assertEqual(event_type, 'alarm.deletion')
+        self.assertEqual(priority, 'INFO')
+        self.assertEqual(payload['detail']['name'], 'name1')
+        self.assertTrue(set(['alarm_id', 'detail', 'event_id', 'on_behalf_of',
+                             'project_id', 'timestamp', 'type',
+                             'user_id']).issubset(payload.keys()))
