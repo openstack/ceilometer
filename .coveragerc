@@ -1,0 +1,5 @@
+[report]
+# code copied from oslo openstack common code, we do not have
+# test cases particularly for these modules, excluding them
+# from coverage report
+omit = ceilometer/openstack/common/*.py
