@@ -51,6 +51,7 @@ class Client(object):
             api_key=conf.os_password,
             project_id=tenant,
             auth_url=conf.os_auth_url,
+            region_name=conf.os_region_name,
             endpoint_type=conf.os_endpoint_type,
             cacert=conf.os_cacert,
             no_cache=True)

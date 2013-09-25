@@ -80,6 +80,7 @@ class AlarmService(object):
             auth_config = cfg.CONF.service_credentials
             creds = dict(
                 os_auth_url=auth_config.os_auth_url,
+                os_region_name=auth_config.os_region_name,
                 os_tenant_name=auth_config.os_tenant_name,
                 os_password=auth_config.os_password,
                 os_username=auth_config.os_username,
