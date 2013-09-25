@@ -298,16 +298,20 @@ class TestCollectorService(TestCollector):
 
         body = {"timestamp": str(modified)}
         when = service.CollectorService._extract_when(body)
-        self.assertAlmostEqual(timeutils.delta_seconds(modified, when), 0.0)
+        self.assertAlmostEqual(timeutils.delta_seconds(modified, when), 0.0,
+                               places=5)
 
         body = {"_context_timestamp": str(modified)}
         when = service.CollectorService._extract_when(body)
-        self.assertAlmostEqual(timeutils.delta_seconds(modified, when), 0.0)
+        self.assertAlmostEqual(timeutils.delta_seconds(modified, when), 0.0,
+                               places=5)
 
         then = now + datetime.timedelta(hours=1)
         body = {"timestamp": str(modified), "_context_timestamp": str(then)}
         when = service.CollectorService._extract_when(body)
-        self.assertAlmostEqual(timeutils.delta_seconds(modified, when), 0.0)
+        self.assertAlmostEqual(timeutils.delta_seconds(modified, when), 0.0,
+                               places=5)
 
         when = service.CollectorService._extract_when({})
-        self.assertAlmostEqual(timeutils.delta_seconds(now, when), 0.0)
+        self.assertAlmostEqual(timeutils.delta_seconds(now, when), 0.0,
+                               places=5)
