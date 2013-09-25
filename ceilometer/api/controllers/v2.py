@@ -450,7 +450,7 @@ class Sample(_Base):
     """
 
     source = wtypes.text
-    "An identity source ID"
+    "The ID of the source that identifies where the sample comes from"
 
     counter_name = wtypes.text
     "The name of the meter"
@@ -774,6 +774,9 @@ class Meter(_Base):
     user_id = wtypes.text
     "The ID of the user who last triggered an update to the resource"
 
+    source = wtypes.text
+    "The ID of the source that identifies where the meter comes from"
+
     meter_id = wtypes.text
     "The unique identifier for the meter"
 
@@ -791,6 +794,7 @@ class Meter(_Base):
                    resource_id='bd9431c1-8d69-4ad3-803a-8d4a6b89fd36',
                    project_id='35b17138-b364-4e6a-a131-8f3099c5be68',
                    user_id='efd87807-12d2-4b38-9c70-5f5c2ac427ff',
+                   source='openstack',
                    )
 
 
