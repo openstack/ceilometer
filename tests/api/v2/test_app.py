@@ -45,8 +45,10 @@ class TestApp(base.TestCase):
         cfg.CONF.set_override("pipeline_cfg_file",
                               self.path_get("etc/ceilometer/pipeline.yaml"))
         cfg.CONF.set_override('connection', "log://", group="database")
+        cfg.CONF.set_override("auth_uri", None, group=acl.OPT_GROUP_NAME)
+
         api_app = app.setup_app()
-        self.assertEqual(api_app.auth_protocol, 'foottp')
+        self.assertTrue(api_app.auth_uri.startswith('foottp'))
 
     def test_keystone_middleware_parse_conffile(self):
         tmpfile = self.temp_config_file_path()
@@ -61,7 +63,7 @@ class TestApp(base.TestCase):
                                  '--config-file=%s' % tmpfile])
         cfg.CONF.set_override('connection', "log://", group="database")
         api_app = app.setup_app()
-        self.assertEqual(api_app.auth_protocol, 'barttp')
+        self.assertTrue(api_app.auth_uri.startswith('barttp'))
         os.unlink(tmpfile)
 
 
