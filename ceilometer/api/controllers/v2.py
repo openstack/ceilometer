@@ -209,7 +209,7 @@ class Query(_Base):
     def as_dict(self):
         return self.as_dict_from_keys(['field', 'op', 'type', 'value'])
 
-    def _get_value_as_type(self):
+    def _get_value_as_type(self, forced_type=None):
         """Convert metadata value to the specified data type.
 
         This method is called during metadata query to help convert the
@@ -225,9 +225,10 @@ class Query(_Base):
 
         :returns: metadata value converted with the specified data type.
         """
+        type = forced_type or self.type
         try:
             converted_value = self.value
-            if not self.type:
+            if not type:
                 try:
                     converted_value = ast.literal_eval(self.value)
                 except (ValueError, SyntaxError):
@@ -235,13 +236,13 @@ class Query(_Base):
                             ' automatically') % (self.value)
                     LOG.debug(msg)
             else:
-                if self.type == 'integer':
+                if type == 'integer':
                     converted_value = int(self.value)
-                elif self.type == 'float':
+                elif type == 'float':
                     converted_value = float(self.value)
-                elif self.type == 'boolean':
+                elif type == 'boolean':
                     converted_value = strutils.bool_from_string(self.value)
-                elif self.type == 'string':
+                elif type == 'string':
                     converted_value = self.value
                 else:
                     # For now, this method only support integer, float,
@@ -251,17 +252,17 @@ class Query(_Base):
         except ValueError:
             msg = _('Failed to convert the metadata value %(value)s'
                     ' to the expected data type %(type)s.') % \
-                {'value': self.value, 'type': self.type}
+                {'value': self.value, 'type': type}
             raise wsme.exc.ClientSideError(unicode(msg))
         except TypeError:
             msg = _('The data type %s is not supported. The supported'
                     ' data type list is: integer, float, boolean and'
-                    ' string.') % (self.type)
+                    ' string.') % (type)
             raise wsme.exc.ClientSideError(unicode(msg))
         except Exception:
             msg = _('Unexpected exception converting %(value)s to'
                     ' the expected data type %(type)s.') % \
-                {'value': self.value, 'type': self.type}
+                {'value': self.value, 'type': type}
             raise wsme.exc.ClientSideError(unicode(msg))
         return converted_value
 
@@ -323,6 +324,8 @@ def _query_to_kwargs(query, db_func, internal_keys=[], headers=None):
             if i.op == 'eq':
                 if i.field == 'search_offset':
                     stamp['search_offset'] = i.value
+                elif i.field == 'enabled':
+                    kwargs[i.field] = i._get_value_as_type('boolean')
                 elif i.field.startswith('metadata.'):
                     metaquery[i.field] = i._get_value_as_type()
                 elif i.field.startswith('resource_metadata.'):
