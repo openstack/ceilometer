@@ -102,10 +102,6 @@ class AlarmService(object):
 
     def _evaluate_alarm(self, alarm):
         """Evaluate the alarms assigned to this evaluator."""
-        if not alarm.enabled:
-            LOG.debug(_('skipping alarm %s: alarm disabled') %
-                      alarm.alarm_id)
-            return
         if alarm.type not in self.supported_evaluators:
             LOG.debug(_('skipping alarm %s: type unsupported') %
                       alarm.alarm_id)
@@ -138,7 +134,8 @@ class SingletonAlarmService(AlarmService, os_service.Service):
         self.tg.add_timer(604800, lambda: None)
 
     def _assigned_alarms(self):
-        return self._client.alarms.list()
+        return self._client.alarms.list(q=[{'field': 'enabled',
+                                            'value': True}])
 
 
 def alarm_evaluator():
