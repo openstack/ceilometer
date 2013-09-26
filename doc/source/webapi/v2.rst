@@ -265,6 +265,35 @@ Note that period aggregation is applied first, followed by group by
 aggregation. Order matters because the period aggregation determines the time
 ranges for the statistics.
 
+Below is a real-life query::
+
+    GET /v2/meters/image/statistics
+    groupby: ["project_id", "resource_id"]
+
+With the return values::
+
+    [{"count": 4, "duration_start": "2013-09-18T19:08:33", "min": 1.0,
+      "max": 1.0, "duration_end": "2013-09-18T19:27:30", "period": 0,
+      "sum": 4.0, "period_end": "2013-09-18T19:27:30", "duration": 1137.0,
+      "period_start": "2013-09-18T19:08:33", "avg": 1.0,
+      "groupby": {"project_id": "c2334f175d8b4cb8b1db49d83cecde78",
+                  "resource_id": "551f495f-7f49-4624-a34c-c422f2c5f90b"},
+      "unit": "image"},
+     {"count": 4, "duration_start": "2013-09-18T19:08:36", "min": 1.0,
+      "max": 1.0, "duration_end": "2013-09-18T19:27:30", "period": 0,
+      "sum": 4.0, "period_end": "2013-09-18T19:27:30", "duration": 1134.0,
+      "period_start": "2013-09-18T19:08:36", "avg": 1.0,
+      "groupby": {"project_id": "c2334f175d8b4cb8b1db49d83cecde78",
+                  "resource_id": "7c1157ed-cf30-48af-a868-6c7c3ad7b531"},
+      "unit": "image"},
+     {"count": 4, "duration_start": "2013-09-18T19:08:34", "min": 1.0,
+      "max": 1.0, "duration_end": "2013-09-18T19:27:30", "period": 0,
+      "sum": 4.0, "period_end": "2013-09-18T19:27:30", "duration": 1136.0,
+      "period_start": "2013-09-18T19:08:34", "avg": 1.0,
+      "groupby": {"project_id": "c2334f175d8b4cb8b1db49d83cecde78",
+                  "resource_id": "eaed9cf4-fc99-4115-93ae-4a5c37a1a7d7"},
+      "unit": "image"}]
+
 If you want to retrieve all the instances (not the list of samples, but the
 resource itself) that have been run during this month for a given project,
 you should ask the resource endpoint for the list of resources (all types:
