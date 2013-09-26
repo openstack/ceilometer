@@ -29,6 +29,9 @@ from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common.fixture import moxstubout
 
 
+cfg.CONF.import_opt('pipeline_cfg_file', 'ceilometer.pipeline')
+
+
 class TestCase(testtools.TestCase):
     def setUp(self):
         super(TestCase, self).setUp()
