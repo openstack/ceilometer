@@ -24,10 +24,12 @@
 """
 
 import datetime
+import repr
 from mock import patch
 
 from ceilometer.storage import models
 from ceilometer.storage.sqlalchemy.models import table_args
+from ceilometer.storage.sqlalchemy import models as sql_models
 from ceilometer import utils
 from ceilometer.tests import db as tests_db
 
@@ -36,6 +38,13 @@ class EventTestBase(tests_db.TestBase):
     # Note: Do not derive from SQLAlchemyEngineTestBase, since we
     # don't want to automatically inherit all the Meter setup.
     database_connection = 'sqlite://'
+
+
+class CeilometerBaseTest(EventTestBase):
+    def test_ceilometer_base(self):
+        base = sql_models.CeilometerBase()
+        base['key'] = 'value'
+        self.assertEqual(base['key'], 'value')
 
 
 class UniqueNameTest(EventTestBase):
@@ -55,6 +64,8 @@ class UniqueNameTest(EventTestBase):
         u2 = self.conn._get_or_create_unique_name("blah")
         self.assertNotEqual(u1.id, u2.id)
         self.assertNotEqual(u1.key, u2.key)
+        # Test the method __repr__ returns a string
+        self.assertTrue(repr.repr(u2))
 
 
 class MyException(Exception):
@@ -114,6 +125,16 @@ class EventTest(EventTestBase):
         self.assertEquals(2, len(problem_events))
         for bad, event in problem_events:
             self.assertEquals(models.Event.UNKNOWN_PROBLEM, bad)
+
+    def test_get_none_value_traits(self):
+        model = sql_models.Trait(None, None, 5)
+        self.assertIsNone(model.get_value())
+        self.assertTrue(repr.repr(model))
+
+    def test_event_repr(self):
+        ev = sql_models.Event('msg_id', None, False)
+        ev.id = 100
+        self.assertTrue(repr.repr(ev))
 
 
 class ModelTest(tests_db.TestBase):
