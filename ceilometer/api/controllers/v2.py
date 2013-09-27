@@ -268,6 +268,14 @@ class Query(_Base):
         return converted_value
 
 
+class ProjectNotAuthorized(Exception):
+    code = 401
+
+    def __init__(self, id):
+        super(ProjectNotAuthorized, self).__init__(
+            _("Not Authorized to access project %s") % id)
+
+
 def _sanitize_query(q, valid_keys, headers=None):
     '''Check the query to see if:
     1) the request is coming from admin - then allow full visibility
@@ -280,14 +288,7 @@ def _sanitize_query(q, valid_keys, headers=None):
         proj_q = [i for i in q if i.field == 'project_id']
         for i in proj_q:
             if auth_project != i.value or i.op != 'eq':
-                # TODO(asalkeld) in the next version of wsme (0.5b3+)
-                # activate this code to be able to return the correct
-                # status code (also update api/v2/test_acl.py).
-                #return wsme.api.Response([return_type()],
-                #                         status_code=401)
-                errstr = 'Not Authorized to access project %s %s' % (i.op,
-                                                                     i.value)
-                raise wsme.exc.ClientSideError(errstr)
+                raise ProjectNotAuthorized(i.value)
 
         if not proj_q and 'on_behalf_of' not in valid_keys:
             # The user is restricted, but they didn't specify a project
