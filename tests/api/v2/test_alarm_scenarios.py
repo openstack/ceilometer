@@ -167,6 +167,13 @@ class TestAlarms(FunctionalTest,
                              for r in data if 'combination_rule' in r),
                          set(['or']))
 
+    def test_get_not_existing_alarm(self):
+        resp = self.get_json('/alarms/alarm-id-3', expect_errors=True)
+        self.assertEqual(resp.status_code, 404)
+        self.assertEqual(jsonutils.loads(resp.body)['error_message']
+                         ['faultstring'],
+                         "Alarm alarm-id-3 Not Found")
+
     def test_get_alarm(self):
         alarms = self.get_json('/alarms',
                                q=[{'field': 'name',
