@@ -1,5 +1,3 @@
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
-
 # Copyright 2013 Cloudbase Solutions Srl
 #
 # Author: Alessandro Pilotti <apilotti@cloudbasesolutions.com>
