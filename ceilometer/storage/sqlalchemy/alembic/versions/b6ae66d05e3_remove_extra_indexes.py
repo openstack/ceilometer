@@ -65,7 +65,7 @@ def index_cleanup(engine_names, table_name, uniq_name, columns, create,
             op.create_index(uniq_name, table_name, columns, unique=unique)
     else:
         if unique:
-            op.drop_constraint(uniq_name, table_name, type_='unique')
+            op.drop_constraint(uniq_name, table_name, type='unique')
         else:
             op.drop_index(uniq_name, table_name=table_name)
 
