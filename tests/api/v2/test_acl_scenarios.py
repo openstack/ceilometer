@@ -194,9 +194,7 @@ class TestAPIACL(FunctionalTest,
                              q=[{'field': 'project_id',
                                  'value': 'project-wrong',
                                  }])
-        #TODO(asalkeld) revert this with wsme-0.5b3+
-#        self.assertEqual(data.status_int, 401)
-        self.assertEqual(data.status_int, 400)
+        self.assertEqual(data.status_int, 401)
 
     def test_non_admin_two_projects(self):
         data = self.get_json('/meters',
@@ -210,6 +208,4 @@ class TestAPIACL(FunctionalTest,
                                 {'field': 'project_id',
                                  'value': 'project-naughty',
                                  }])
-        #TODO(asalkeld) revert this with wsme-0.5b3+
-#        self.assertEqual(data.status_int, 401)
-        self.assertEqual(data.status_int, 400)
+        self.assertEqual(data.status_int, 401)
