@@ -28,6 +28,7 @@ from stevedore.tests import manager as extension_tests
 
 from ceilometer import sample
 from ceilometer import pipeline
+from ceilometer import agent
 from ceilometer.tests import base
 from ceilometer import transformer
 
@@ -245,6 +246,13 @@ class BaseAgentManagerTestCase(base.TestCase):
         self.mgr.interval_task(polling_tasks.get(10))
         pub = self.mgr.pipeline_manager.pipelines[0].publishers[0]
         self.assertEqual(len(pub.samples), 0)
+
+    def test_agent_manager_initialize_service_hook(self):
+        mgr = agent.AgentManager(self.mgr.pollster_manager)
+        mgr.create_polling_task = mock.MagicMock()
+        service = mock.MagicMock()
+        mgr.initialize_service_hook(service)
+        self.assertTrue(service.tg.add_timer.called)
 
     def test_manager_exception_persistency(self):
         self.pipeline_cfg.append({
