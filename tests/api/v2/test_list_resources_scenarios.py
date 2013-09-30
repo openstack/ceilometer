@@ -19,6 +19,7 @@
 """
 
 import datetime
+import json
 import logging
 import testscenarios
 
@@ -249,7 +250,10 @@ class TestListResources(FunctionalTest,
         self.assertEqual(resp2["resource_id"], "resource-id-2")
 
         resp3 = self.get_json('/resources/resource-id-3', expect_errors=True)
-        self.assertEqual(resp3.status_code, 400)
+        self.assertEqual(resp3.status_code, 404)
+        self.assertEqual(json.loads(resp3.body)['error_message']
+                         ['faultstring'],
+                         "Resource resource-id-3 Not Found")
 
     def test_with_user(self):
         sample1 = sample.Sample(

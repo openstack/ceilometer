@@ -2,10 +2,12 @@
 #
 # Copyright © 2012 New Dream Network, LLC (DreamHost)
 # Copyright 2013 IBM Corp.
+# Copyright © 2013 eNovance <licensing@enovance.com>
 #
-# Author: Doug Hellmann <doug.hellmann@dreamhost.com>
-#         Angus Salkeld <asalkeld@redhat.com>
-#         Eoghan Glynn <eglynn@redhat.com>
+# Authors: Doug Hellmann <doug.hellmann@dreamhost.com>
+#          Angus Salkeld <asalkeld@redhat.com>
+#          Eoghan Glynn <eglynn@redhat.com>
+#          Julien Danjou <julien@danjou.info>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -867,6 +869,14 @@ class Resource(_Base):
                    )
 
 
+class ResourceNotFound(Exception):
+    code = 404
+
+    def __init__(self, id):
+        super(ResourceNotFound, self).__init__(
+            _("Resource %s Not Found") % id)
+
+
 class ResourcesController(rest.RestController):
     """Works on resources."""
 
@@ -889,14 +899,8 @@ class ResourcesController(rest.RestController):
         authorized_project = acl.get_limited_to_project(pecan.request.headers)
         resources = list(pecan.request.storage_conn.get_resources(
             resource=resource_id, project=authorized_project))
-        # FIXME (flwang): Need to change this to return a 404 error code when
-        # we get a release of WSME that supports it.
         if not resources:
-            error = _("Unknown resource")
-            pecan.response.translatable_error = error
-            raise wsme.exc.InvalidInput("resource_id",
-                                        resource_id,
-                                        unicode(error))
+            raise ResourceNotFound(resource_id)
         return Resource.from_db_and_links(resources[0],
                                           self._resource_links(resource_id))
 

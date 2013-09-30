@@ -18,7 +18,6 @@
 # under the License.
 """Test basic ceilometer-api app
 """
-import json
 import os
 
 from oslo.config import cfg
@@ -141,8 +140,8 @@ class TestApiMiddleware(FunctionalTest):
         self.assertEqual(response.status_int, 400)
         self.assertEqual(response.content_type, "application/json")
         self.assertTrue(response.json['error_message'])
-        fault = json.loads(response.json['error_message'])
-        self.assertEqual(fault['faultstring'], self.no_lang_translated_error)
+        self.assertEqual(response.json['error_message']['faultstring'],
+                         self.no_lang_translated_error)
 
     def test_xml_parsable_error_middleware_404(self):
         response = self.get_json('/invalid_path',

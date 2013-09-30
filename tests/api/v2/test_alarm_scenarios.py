@@ -270,9 +270,8 @@ class TestAlarms(FunctionalTest,
             resp = self.post_json('/alarms', params=json, expect_errors=True,
                                   status=400, headers=self.auth_headers)
             self.assertEqual(
-                resp.json['error_message'],
-                '{"debuginfo": null, "faultcode": "Client", "faultstring": '
-                '"%s is mandatory"}' % field)
+                resp.json['error_message']['faultstring'],
+                '%s is mandatory' % field)
         alarms = list(self.conn.get_alarms())
         self.assertEqual(4, len(alarms))
 
@@ -350,10 +349,9 @@ class TestAlarms(FunctionalTest,
         alarms = list(self.conn.get_alarms())
         self.assertEqual(4, len(alarms))
         self.assertEqual(
-            resp.json['error_message'],
-            '{"debuginfo": null, "faultcode": "Client", "faultstring": '
-            '"threshold_rule and combination_rule cannot '
-            'be set at the same time"}')
+            resp.json['error_message']['faultstring'],
+            'threshold_rule and combination_rule cannot '
+            'be set at the same time')
 
     def test_post_alarm_defaults(self):
         to_check = {

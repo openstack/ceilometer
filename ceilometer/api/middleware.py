@@ -125,7 +125,7 @@ class ParsableErrorMiddleware(object):
                         fault['faultstring'] = (
                             gettextutils.get_localized_message(
                                 error, user_locale))
-                    body = [json.dumps({'error_message': json.dumps(fault)})]
+                    body = [json.dumps({'error_message': fault})]
                 except ValueError as err:
                     body = [json.dumps({'error_message': '\n'.join(app_iter)})]
                 state['headers'].append(('Content-Type', 'application/json'))
