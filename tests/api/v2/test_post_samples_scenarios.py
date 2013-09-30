@@ -198,7 +198,7 @@ class TestPostSamples(FunctionalTest,
             s_broke = copy.copy(s1)
             del s_broke[0][m]
             print('posting without %s' % m)
-            data = self.post_json('/meters/my_counter_name/', s_broke,
+            data = self.post_json('/meters/my_counter_name', s_broke,
                                   expect_errors=True)
             self.assertEqual(data.status_int, 400)
 

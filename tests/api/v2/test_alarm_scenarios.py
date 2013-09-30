@@ -279,7 +279,9 @@ class TestAlarms(FunctionalTest,
                                   status=400, headers=self.auth_headers)
             self.assertEqual(
                 resp.json['error_message']['faultstring'],
-                '%s is mandatory' % field)
+                "Invalid input for field/attribute %s."
+                " Value: \'None\'. Mandatory field missing."
+                % field.split('/', 1)[-1])
         alarms = list(self.conn.get_alarms())
         self.assertEqual(4, len(alarms))
 

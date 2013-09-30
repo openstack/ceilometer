@@ -104,6 +104,9 @@ class FunctionalTest(db_test_base.TestBase):
                 'template_path': '%s/ceilometer/api/templates' % root_dir,
                 'enable_acl': enable_acl,
             },
+            'wsme': {
+                'debug': True,
+            },
         }
 
         return pecan.testing.load_test_app(self.config)

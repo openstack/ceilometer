@@ -134,7 +134,8 @@ class TestApiMiddleware(FunctionalTest):
         # Ensure translated messages get placed properly into json faults
         self.stubs.Set(gettextutils, 'get_localized_message',
                        self._fake_get_localized_message)
-        response = self.post_json('/alarms', params={},
+        response = self.post_json('/alarms', params={'name': 'foobar',
+                                                     'type': 'threshold'},
                                   expect_errors=True,
                                   headers={"Accept":
                                            "application/json"}
@@ -169,7 +170,8 @@ class TestApiMiddleware(FunctionalTest):
         self.stubs.Set(gettextutils, 'get_localized_message',
                        self._fake_get_localized_message)
 
-        response = self.post_json('/alarms', params={},
+        response = self.post_json('/alarms', params={'name': 'foobar',
+                                                     'type': 'threshold'},
                                   expect_errors=True,
                                   headers={"Accept":
                                            "application/xml,*/*"}
@@ -186,7 +188,8 @@ class TestApiMiddleware(FunctionalTest):
         self.stubs.Set(gettextutils, 'get_localized_message',
                        self._fake_get_localized_message)
 
-        response = self.post_json('/alarms', params={},
+        response = self.post_json('/alarms', params={'name': 'foobar',
+                                                     'type': 'threshold'},
                                   expect_errors=True,
                                   headers={"Accept":
                                            "application/xml,*/*",

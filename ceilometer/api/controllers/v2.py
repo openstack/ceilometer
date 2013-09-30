@@ -524,19 +524,19 @@ class Sample(_Base):
     source = wtypes.text
     "The ID of the source that identifies where the sample comes from"
 
-    counter_name = wtypes.text
+    counter_name = wsme.wsattr(wtypes.text, mandatory=True)
     "The name of the meter"
     # FIXME(dhellmann): Make this meter_name?
 
-    counter_type = wtypes.text
+    counter_type = wsme.wsattr(wtypes.text, mandatory=True)
     "The type of the meter (see :ref:`measurements`)"
     # FIXME(dhellmann): Make this meter_type?
 
-    counter_unit = wtypes.text
+    counter_unit = wsme.wsattr(wtypes.text, mandatory=True)
     "The unit of measure for the value in counter_volume"
     # FIXME(dhellmann): Make this meter_unit?
 
-    counter_volume = float
+    counter_volume = wsme.wsattr(float, mandatory=True)
     "The actual measured value"
 
     user_id = wtypes.text
@@ -545,7 +545,7 @@ class Sample(_Base):
     project_id = wtypes.text
     "The ID of the project or tenant that owns the resource"
 
-    resource_id = wtypes.text
+    resource_id = wsme.wsattr(wtypes.text, mandatory=True)
     "The ID of the :class:`Resource` for which the measurements are taken"
 
     timestamp = datetime.datetime
@@ -569,11 +569,6 @@ class Sample(_Base):
         super(Sample, self).__init__(counter_volume=counter_volume,
                                      resource_metadata=resource_metadata,
                                      timestamp=timestamp, **kwds)
-        # Seems the mandatory option doesn't work so do it manually
-        for m in ('counter_volume', 'counter_unit',
-                  'counter_name', 'counter_type', 'resource_id'):
-            if getattr(self, m) in (wsme.Unset, None):
-                raise wsme.exc.MissingArgument(m)
 
         if self.resource_metadata in (wtypes.Unset, None):
             self.resource_metadata = {}
@@ -717,20 +712,12 @@ class MeterController(rest.RestController):
                 for e in pecan.request.storage_conn.get_samples(f, limit=limit)
                 ]
 
-    @wsme.validate([Sample])
     @wsme_pecan.wsexpose([Sample], body=[Sample])
-    def post(self, body):
+    def post(self, samples):
         """Post a list of new Samples to Ceilometer.
 
-        :param body: a list of samples within the request body.
+        :param samples: a list of samples within the request body.
         """
-        # Note:
-        #  1) the above validate decorator seems to do nothing. LP#1220678
-        #  2) the mandatory options seems to also do nothing. LP#1227004
-        #  3) the body should already be in a list of Sample's LP#1233219
-
-        samples = [Sample(**b) for b in body]
-
         now = timeutils.utcnow()
         auth_project = acl.get_limited_to_project(pecan.request.headers)
         def_source = pecan.request.cfg.sample_source
@@ -1010,14 +997,6 @@ class AlarmThresholdRule(_Base):
 
     @staticmethod
     def validate(threshold_rule):
-        #note(sileht): wsme mandatory doesn't work as expected
-        #workaround for https://bugs.launchpad.net/wsme/+bug/1227004
-        for field in ['meter_name', 'threshold']:
-            if not getattr(threshold_rule, field):
-                error = _("threshold_rule/%s is mandatory") % field
-                pecan.response.translatable_error = error
-                raise wsme.exc.ClientSideError(unicode(error))
-
         #note(sileht): wsme default doesn't work in some case
         #workaround for https://bugs.launchpad.net/wsme/+bug/1227039
         if not threshold_rule.query:
@@ -1081,17 +1060,6 @@ class AlarmCombinationRule(_Base):
         return cls(operator='or',
                    alarm_ids=['739e99cb-c2ec-4718-b900-332502355f38',
                               '153462d0-a9b8-4b5b-8175-9e4b05e9b856'])
-
-    @staticmethod
-    def validate(combination_rule):
-        #note(sileht): wsme mandatory doesn't works as expected
-        #workaround for https://bugs.launchpad.net/wsme/+bug/1227004
-        if not combination_rule.alarm_ids:
-            error = _("combination_rule/alarm_ids is mandatory")
-            pecan.response.translatable_error = error
-            raise wsme.exc.ClientSideError(unicode(error))
-
-        return combination_rule
 
 
 class Alarm(_Base):
@@ -1173,13 +1141,18 @@ class Alarm(_Base):
 
     @staticmethod
     def validate(alarm):
-        #note(sileht): wsme mandatory doesn't work as expected
-        #workaround for https://bugs.launchpad.net/wsme/+bug/1227004
-        for field in ['name', 'type']:
-            if not getattr(alarm, field):
-                error = _("%s is mandatory") % field
-                pecan.response.translatable_error = error
-                raise wsme.exc.ClientSideError(unicode(error))
+        if (alarm.threshold_rule == wtypes.Unset
+                and alarm.combination_rule == wtypes.Unset):
+            error = _("either threshold_rule or combination_rule "
+                      "must be set")
+            pecan.response.translatable_error = error
+            raise wsme.exc.ClientSideError(unicode(error))
+
+        if alarm.threshold_rule and alarm.combination_rule:
+            error = _("threshold_rule and combination_rule "
+                      "cannot be set at the same time")
+            pecan.response.translatable_error = error
+            raise wsme.exc.ClientSideError(unicode(error))
 
         if alarm.threshold_rule:
             # ensure an implicit constraint on project_id is added to
@@ -1190,20 +1163,17 @@ class Alarm(_Base):
                 on_behalf_of=alarm.project_id
             )
         elif alarm.combination_rule:
-            auth_project = _get_auth_project(alarm.project_id)
+            project = _get_auth_project(alarm.project_id
+                                        if alarm.project_id != wtypes.Unset
+                                        else None)
             for id in alarm.combination_rule.alarm_ids:
                 alarms = list(pecan.request.storage_conn.get_alarms(
-                    alarm_id=id, project=auth_project))
+                    alarm_id=id, project=project))
                 if not alarms:
                     error = _("Alarm %s doesn't exist") % id
                     pecan.response.translatable_error = error
                     raise wsme.exc.ClientSideError(unicode(error))
 
-        if alarm.threshold_rule and alarm.combination_rule:
-            error = _("threshold_rule and combination_rule "
-                      "cannot be set at the same time")
-            pecan.response.translatable_error = error
-            raise wsme.exc.ClientSideError(unicode(error))
         return alarm
 
     @classmethod
@@ -1333,7 +1303,6 @@ class AlarmController(rest.RestController):
         """Return this alarm."""
         return Alarm.from_db_model(self._alarm())
 
-    @wsme.validate(Alarm)
     @wsme_pecan.wsexpose(Alarm, wtypes.text, body=Alarm)
     def put(self, data):
         """Modify this alarm."""
@@ -1344,17 +1313,19 @@ class AlarmController(rest.RestController):
 
         data.alarm_id = self._id
         user, project = acl.get_limited_to(pecan.request.headers)
-        data.user_id = user or data.user_id or alarm_in.user_id
-        data.project_id = project or data.project_id or alarm_in.project_id
+        if user:
+            data.user_id = user
+        elif data.user_id == wtypes.Unset:
+            data.user_id = alarm_in.user_id
+        if project:
+            data.project_id = project
+        elif data.project_id == wtypes.Unset:
+            data.project_id = alarm_in.project_id
         data.timestamp = now
         if alarm_in.state != data.state:
             data.state_timestamp = now
         else:
             data.state_timestamp = alarm_in.state_timestamp
-
-        #note(sileht): workaround for
-        #https://bugs.launchpad.net/wsme/+bug/1220678
-        Alarm.validate(data)
 
         old_alarm = Alarm.from_db_model(alarm_in).as_dict(storage.models.Alarm)
         updated_alarm = data.as_dict(storage.models.Alarm)
@@ -1462,7 +1433,6 @@ class AlarmsController(rest.RestController):
         payload['detail'] = scrubbed_data
         _send_notification(type, payload)
 
-    @wsme.validate(Alarm)
     @wsme_pecan.wsexpose(Alarm, body=Alarm, status_code=201)
     def post(self, data):
         """Create a new alarm."""
@@ -1471,16 +1441,16 @@ class AlarmsController(rest.RestController):
 
         data.alarm_id = str(uuid.uuid4())
         user, project = acl.get_limited_to(pecan.request.headers)
-        data.user_id = (user or data.user_id or
-                        pecan.request.headers.get('X-User-Id'))
-        data.project_id = (project or data.project_id or
-                           pecan.request.headers.get('X-Project-Id'))
+        if user:
+            data.user_id = user
+        elif data.user_id == wtypes.Unset:
+            data.user_id = pecan.request.headers.get('X-User-Id')
+        if project:
+            data.project_id = project
+        elif data.project_id == wtypes.Unset:
+            data.project_id = pecan.request.headers.get('X-Project-Id')
         data.timestamp = now
         data.state_timestamp = now
-
-        #note(sileht): workaround for
-        #https://bugs.launchpad.net/wsme/+bug/1220678
-        Alarm.validate(data)
 
         change = data.as_dict(storage.models.Alarm)
 
