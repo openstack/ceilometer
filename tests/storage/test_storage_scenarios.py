@@ -1903,7 +1903,7 @@ class AlarmTestBase(DBTestBase):
                                                  'type': 'string'}]),
                                ),
                   models.Alarm(alarm_id='y3ll0w',
-                               enabled=True,
+                               enabled=False,
                                type='threshold',
                                name='yellow-alert',
                                description='yellow',
@@ -1943,6 +1943,21 @@ class AlarmTest(AlarmTestBase,
     def test_empty(self):
         alarms = list(self.conn.get_alarms())
         self.assertEqual([], alarms)
+
+    def test_list(self):
+        self.add_some_alarms()
+        alarms = list(self.conn.get_alarms())
+        self.assertEqual(len(alarms), 3)
+
+    def test_list_enabled(self):
+        self.add_some_alarms()
+        alarms = list(self.conn.get_alarms(enabled=True))
+        self.assertEqual(len(alarms), 2)
+
+    def test_list_disabled(self):
+        self.add_some_alarms()
+        alarms = list(self.conn.get_alarms(enabled=False))
+        self.assertEqual(len(alarms), 1)
 
     def test_add(self):
         self.add_some_alarms()

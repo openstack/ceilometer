@@ -209,7 +209,7 @@ class Connection(object):
 
     @abc.abstractmethod
     def get_alarms(self, name=None, user=None,
-                   project=None, enabled=True, alarm_id=None, pagination=None):
+                   project=None, enabled=None, alarm_id=None, pagination=None):
         """Yields a lists of alarms that match filters
         """
 

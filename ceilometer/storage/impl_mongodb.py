@@ -850,7 +850,7 @@ class Connection(base.Connection):
         alarm['rule']['query'] = query
 
     def get_alarms(self, name=None, user=None,
-                   project=None, enabled=True, alarm_id=None, pagination=None):
+                   project=None, enabled=None, alarm_id=None, pagination=None):
         """Yields a lists of alarms that match filters
         :param name: The Alarm name.
         :param user: Optional ID for user that owns the resource.

@@ -597,7 +597,7 @@ class Connection(base.Connection):
                                 repeat_actions=row.repeat_actions)
 
     def get_alarms(self, name=None, user=None,
-                   project=None, enabled=True, alarm_id=None, pagination=None):
+                   project=None, enabled=None, alarm_id=None, pagination=None):
         """Yields a lists of alarms that match filters
         :param user: Optional ID for user that owns the resource.
         :param project: Optional ID for project that owns the resource.

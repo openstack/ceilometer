@@ -183,6 +183,33 @@ class TestAlarms(FunctionalTest,
         self.assertEqual(one['alarm_id'], alarms[0]['alarm_id'])
         self.assertEqual(one['repeat_actions'], alarms[0]['repeat_actions'])
 
+    def test_get_alarm_disabled(self):
+        alarm = Alarm(name='disabled',
+                      type='combination',
+                      enabled=False,
+                      alarm_id='d',
+                      description='d',
+                      state='insufficient data',
+                      state_timestamp=None,
+                      timestamp=None,
+                      ok_actions=[],
+                      insufficient_data_actions=[],
+                      alarm_actions=[],
+                      repeat_actions=False,
+                      user_id=self.auth_headers['X-User-Id'],
+                      project_id=self.auth_headers['X-Project-Id'],
+                      rule=dict(alarm_ids=['a', 'b'], operator='or'))
+        self.conn.update_alarm(alarm)
+
+        alarms = self.get_json('/alarms',
+                               q=[{'field': 'enabled',
+                                   'value': 'False'}])
+        self.assertEqual(len(alarms), 1)
+        self.assertEqual(alarms[0]['name'], 'disabled')
+
+        one = self.get_json('/alarms/%s' % alarms[0]['alarm_id'])
+        self.assertEqual(one['name'], 'disabled')
+
     def test_get_alarm_combination(self):
         alarms = self.get_json('/alarms',
                                q=[{'field': 'name',
