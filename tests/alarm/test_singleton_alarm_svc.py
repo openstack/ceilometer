@@ -64,28 +64,12 @@ class TestSingletonAlarmService(base.TestCase):
             self.assertEqual(actual, expected)
 
     def test_evaluation_cycle(self):
-        alarm = mock.Mock(enabled=True,
-                          type='threshold')
+        alarm = mock.Mock(type='threshold')
         self.api_client.alarms.list.return_value = [alarm]
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
             self.singleton._evaluate_assigned_alarms()
             self.threshold_eval.evaluate.assert_called_once_with(alarm)
-
-    def test_disabled_is_skipped(self):
-        alarms = [
-            mock.Mock(enabled=False,
-                      type='threshold'),
-            mock.Mock(enabled=True,
-                      type='threshold'),
-        ]
-
-        self.api_client.alarms.list.return_value = alarms
-        with mock.patch('ceilometerclient.client.get_client',
-                        return_value=self.api_client):
-            self.singleton.start()
-            self.singleton._evaluate_assigned_alarms()
-            self.threshold_eval.evaluate.assert_called_once_with(alarms[1])
 
     def test_unknown_extention_skipped(self):
         alarms = [

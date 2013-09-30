@@ -301,7 +301,8 @@ class PartitionCoordinator(object):
         try:
             LOG.debug(_('%(this)s alarms for evaluation: %(alarms)s') %
                       dict(this=self.this, alarms=self.assignment))
-            return [a for a in api_client.alarms.list()
+            return [a for a in api_client.alarms.list(q=[{'field': 'enabled',
+                                                          'value': True}])
                     if a.alarm_id in self.assignment]
         except Exception:
             LOG.exception(_('assignment retrieval failed'))
