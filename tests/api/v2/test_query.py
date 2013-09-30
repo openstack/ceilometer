@@ -214,8 +214,8 @@ class TestQueryToKwArgs(tests_base.TestCase):
                    value=str(ts_start))]
         kwargs = api._query_to_kwargs(q, storage.SampleFilter.__init__)
         self.assertEqual(len(kwargs), 4)
-        self.assertEqual(kwargs['start'], ts_start)
-        self.assertEqual(kwargs['end'], ts_end)
+        self.assertTimestampEqual(kwargs['start'], ts_start)
+        self.assertTimestampEqual(kwargs['end'], ts_end)
         self.assertEqual(kwargs['start_timestamp_op'], 'gt')
         self.assertEqual(kwargs['end_timestamp_op'], 'lt')
 
