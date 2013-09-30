@@ -234,7 +234,7 @@ class AlarmNotifierService(rpc_service.Service):
         except Exception:
             LOG.error(
                 _("Unable to parse action %(action)s for alarm %(alarm_id)s"),
-                locals())
+                {'action': action, 'alarm_id': alarm_id})
             return
 
         try:
@@ -244,7 +244,7 @@ class AlarmNotifierService(rpc_service.Service):
             LOG.error(
                 _("Action %(scheme)s for alarm %(alarm_id)s is unknown, "
                   "cannot notify"),
-                locals())
+                {'scheme': scheme, 'alarm_id': alarm_id})
             return
 
         try:
