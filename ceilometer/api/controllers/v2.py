@@ -656,9 +656,9 @@ class MeterController(rest.RestController):
         :param body: a list of samples within the request body.
         """
         # Note:
-        #  1) the above validate decorator seems to do nothing.
-        #  2) the mandatory options seems to also do nothing.
-        #  3) the body should already be in a list of Sample's
+        #  1) the above validate decorator seems to do nothing. LP#1220678
+        #  2) the mandatory options seems to also do nothing. LP#1227004
+        #  3) the body should already be in a list of Sample's LP#1233219
 
         samples = [Sample(**b) for b in body]
 
