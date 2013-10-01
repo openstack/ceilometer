@@ -76,6 +76,15 @@ state_kind = ["ok", "alarm", "insufficient data"]
 operation_kind = wtypes.Enum(str, 'lt', 'le', 'eq', 'ne', 'ge', 'gt')
 
 
+class EntityNotFound(Exception):
+    code = 404
+
+    def __init__(self, entity, id):
+        super(EntityNotFound, self).__init__(
+            _("%(entity)s %(id)s Not Found") % {'entity': entity,
+                                                'id': id})
+
+
 class BoundedInt(wtypes.UserType):
     basetype = int
     name = 'bounded int'
@@ -869,14 +878,6 @@ class Resource(_Base):
                    )
 
 
-class ResourceNotFound(Exception):
-    code = 404
-
-    def __init__(self, id):
-        super(ResourceNotFound, self).__init__(
-            _("Resource %s Not Found") % id)
-
-
 class ResourcesController(rest.RestController):
     """Works on resources."""
 
@@ -900,7 +901,7 @@ class ResourcesController(rest.RestController):
         resources = list(pecan.request.storage_conn.get_resources(
             resource=resource_id, project=authorized_project))
         if not resources:
-            raise ResourceNotFound(resource_id)
+            raise EntityNotFound(_('Resource'), resource_id)
         return Resource.from_db_and_links(resources[0],
                                           self._resource_links(resource_id))
 
@@ -1232,12 +1233,8 @@ class AlarmController(rest.RestController):
         auth_project = acl.get_limited_to_project(pecan.request.headers)
         alarms = list(self.conn.get_alarms(alarm_id=self._id,
                                            project=auth_project))
-        # FIXME (flwang): Need to change this to return a 404 error code when
-        # we get a release of WSME that supports it.
         if len(alarms) < 1:
-            error = _("Unknown alarm")
-            pecan.response.translatable_error = error
-            raise wsme.exc.ClientSideError(unicode(error))
+            raise EntityNotFound(_('Alarm'), self._id)
         return alarms[0]
 
     def _record_change(self, data, now, on_behalf_of=None, type=None):

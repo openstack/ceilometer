@@ -132,11 +132,11 @@ class TestApiMiddleware(FunctionalTest):
         # Ensure translated messages get placed properly into json faults
         self.stubs.Set(gettextutils, 'get_localized_message',
                        self._fake_get_localized_message)
-        response = self.get_json('/alarms/-',
-                                 expect_errors=True,
-                                 headers={"Accept":
-                                          "application/json"}
-                                 )
+        response = self.post_json('/alarms', params={},
+                                  expect_errors=True,
+                                  headers={"Accept":
+                                           "application/json"}
+                                  )
         self.assertEqual(response.status_int, 400)
         self.assertEqual(response.content_type, "application/json")
         self.assertTrue(response.json['error_message'])
@@ -167,11 +167,11 @@ class TestApiMiddleware(FunctionalTest):
         self.stubs.Set(gettextutils, 'get_localized_message',
                        self._fake_get_localized_message)
 
-        response = self.get_json('/alarms/-',
-                                 expect_errors=True,
-                                 headers={"Accept":
-                                          "application/xml,*/*"}
-                                 )
+        response = self.post_json('/alarms', params={},
+                                  expect_errors=True,
+                                  headers={"Accept":
+                                           "application/xml,*/*"}
+                                  )
         self.assertEqual(response.status_int, 400)
         self.assertEqual(response.content_type, "application/xml")
         self.assertEqual(response.xml.tag, 'error_message')
@@ -184,13 +184,13 @@ class TestApiMiddleware(FunctionalTest):
         self.stubs.Set(gettextutils, 'get_localized_message',
                        self._fake_get_localized_message)
 
-        response = self.get_json('/alarms/-',
-                                 expect_errors=True,
-                                 headers={"Accept":
-                                          "application/xml,*/*",
-                                          "Accept-Language":
-                                          "en-US"}
-                                 )
+        response = self.post_json('/alarms', params={},
+                                  expect_errors=True,
+                                  headers={"Accept":
+                                           "application/xml,*/*",
+                                           "Accept-Language":
+                                           "en-US"}
+                                  )
         self.assertEqual(response.status_int, 400)
         self.assertEqual(response.content_type, "application/xml")
         self.assertEqual(response.xml.tag, 'error_message')
