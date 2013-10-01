@@ -59,7 +59,7 @@ ceilometer::
    enable_service ceilometer-acompute,ceilometer-acentral,ceilometer-collector
 
    # Enable the ceilometer alarming services
-   enable_service ceilometer-alarm-singleton,ceilometer-alarm-notifier
+   enable_service ceilometer-alarm-evaluator,ceilometer-alarm-notifier
 
    # Enable the ceilometer api services
    enable_service ceilometer-api
