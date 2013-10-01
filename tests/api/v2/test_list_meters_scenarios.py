@@ -213,14 +213,14 @@ class TestListMeters(FunctionalTest,
                              'value': '0',
                              'type': 'integer'}]
                              )
-        self.assertEquals(2, len(data))
-        self.assertEquals(set(r['resource_id'] for r in data),
-                          set(['resource-id',
-                               'resource-id3']))
-        self.assertEquals(set(r['counter_name'] for r in data),
-                          set(['meter.test']))
-        self.assertEquals(set(r['resource_metadata']['size'] for r in data),
-                          set(['0']))
+        self.assertEqual(2, len(data))
+        self.assertEqual(set(r['resource_id'] for r in data),
+                         set(['resource-id',
+                              'resource-id3']))
+        self.assertEqual(set(r['counter_name'] for r in data),
+                         set(['meter.test']))
+        self.assertEqual(set(r['resource_metadata']['size'] for r in data),
+                         set(['0']))
 
     def test_list_meters_query_float_metadata(self):
         data = self.get_json('/meters/meter.test',
@@ -229,14 +229,14 @@ class TestListMeters(FunctionalTest,
                              'value': '0.75',
                              'type': 'float'}]
                              )
-        self.assertEquals(2, len(data))
-        self.assertEquals(set(r['resource_id'] for r in data),
-                          set(['resource-id',
-                               'resource-id3']))
-        self.assertEquals(set(r['counter_name'] for r in data),
-                          set(['meter.test']))
-        self.assertEquals(set(r['resource_metadata']['util'] for r in data),
-                          set(['0.75']))
+        self.assertEqual(2, len(data))
+        self.assertEqual(set(r['resource_id'] for r in data),
+                         set(['resource-id',
+                              'resource-id3']))
+        self.assertEqual(set(r['counter_name'] for r in data),
+                         set(['meter.test']))
+        self.assertEqual(set(r['resource_metadata']['util'] for r in data),
+                         set(['0.75']))
 
     def test_list_meters_query_boolean_metadata(self):
         data = self.get_json('/meters/meter.mine',
@@ -245,13 +245,13 @@ class TestListMeters(FunctionalTest,
                              'value': 'False',
                              'type': 'boolean'}]
                              )
-        self.assertEquals(1, len(data))
-        self.assertEquals(set(r['resource_id'] for r in data),
-                          set(['resource-id2']))
-        self.assertEquals(set(r['counter_name'] for r in data),
-                          set(['meter.mine']))
-        self.assertEquals(set(r['resource_metadata']['is_public'] for r
-                              in data), set(['False']))
+        self.assertEqual(1, len(data))
+        self.assertEqual(set(r['resource_id'] for r in data),
+                         set(['resource-id2']))
+        self.assertEqual(set(r['counter_name'] for r in data),
+                         set(['meter.mine']))
+        self.assertEqual(set(r['resource_metadata']['is_public'] for r
+                             in data), set(['False']))
 
     def test_list_meters_query_string_metadata(self):
         data = self.get_json('/meters/meter.test',
@@ -259,13 +259,13 @@ class TestListMeters(FunctionalTest,
                              'op': 'eq',
                              'value': 'self.sample'}]
                              )
-        self.assertEquals(1, len(data))
-        self.assertEquals(set(r['resource_id'] for r in data),
-                          set(['resource-id']))
-        self.assertEquals(set(r['counter_name'] for r in data),
-                          set(['meter.test']))
-        self.assertEquals(set(r['resource_metadata']['tag'] for r in data),
-                          set(['self.sample']))
+        self.assertEqual(1, len(data))
+        self.assertEqual(set(r['resource_id'] for r in data),
+                         set(['resource-id']))
+        self.assertEqual(set(r['counter_name'] for r in data),
+                         set(['meter.test']))
+        self.assertEqual(set(r['resource_metadata']['tag'] for r in data),
+                         set(['self.sample']))
 
     def test_list_meters_query_integer_float_metadata_without_type(self):
         data = self.get_json('/meters/meter.test',
@@ -276,15 +276,15 @@ class TestListMeters(FunctionalTest,
                                  'op': 'eq',
                                  'value': '0.75'}]
                              )
-        self.assertEquals(1, len(data))
-        self.assertEquals(set(r['resource_id'] for r in data),
-                          set(['resource-id3']))
-        self.assertEquals(set(r['counter_name'] for r in data),
-                          set(['meter.test']))
-        self.assertEquals(set(r['resource_metadata']['size'] for r in data),
-                          set(['0']))
-        self.assertEquals(set(r['resource_metadata']['util'] for r in data),
-                          set(['0.75']))
+        self.assertEqual(1, len(data))
+        self.assertEqual(set(r['resource_id'] for r in data),
+                         set(['resource-id3']))
+        self.assertEqual(set(r['counter_name'] for r in data),
+                         set(['meter.test']))
+        self.assertEqual(set(r['resource_metadata']['size'] for r in data),
+                         set(['0']))
+        self.assertEqual(set(r['resource_metadata']['util'] for r in data),
+                         set(['0.75']))
 
     def test_with_resource(self):
         data = self.get_json('/meters', q=[{'field': 'resource_id',

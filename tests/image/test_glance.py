@@ -159,7 +159,7 @@ class TestImagePollster(base.TestCase):
                                                               {}))
         self.assertEqual(len(samples), 3)
         for image in IMAGE_LIST:
-            self.assert_(
+            self.assertTrue(
                 any(map(lambda sample: sample.volume == image.size,
                         samples)))
 

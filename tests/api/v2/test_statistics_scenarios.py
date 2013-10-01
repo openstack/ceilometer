@@ -186,7 +186,7 @@ class TestMaxResourceVolume(base.FunctionalTest,
                              q=[{'field': 'resource_id',
                                  'value': 'resource-id'}],
                              period=-1)
-        self.assertEquals(400, resp.status_code)
+        self.assertEqual(400, resp.status_code)
 
     def test_start_timestamp(self):
         data = self.get_json(self.PATH, q=[{'field': 'resource_id',
@@ -636,7 +636,7 @@ class TestGroupByInstance(base.FunctionalTest,
         response = self.get_json(self.PATH,
                                  expect_errors=True,
                                  groupby=['wtf'])
-        self.assertEquals(400, response.status_code)
+        self.assertEqual(400, response.status_code)
 
     def test_group_by_multiple_regular(self):
         data = self.get_json(self.PATH, groupby=['user_id', 'resource_id'])

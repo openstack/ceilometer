@@ -122,9 +122,9 @@ class EventTest(EventTestBase):
         with patch.object(self.conn, "_record_event") as mock_save:
             mock_save.side_effect = MyException("Boom")
             problem_events = self.conn.record_events(m)
-        self.assertEquals(2, len(problem_events))
+        self.assertEqual(2, len(problem_events))
         for bad, event in problem_events:
-            self.assertEquals(models.Event.UNKNOWN_PROBLEM, bad)
+            self.assertEqual(models.Event.UNKNOWN_PROBLEM, bad)
 
     def test_get_none_value_traits(self):
         model = sql_models.Trait(None, None, 5)

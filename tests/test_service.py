@@ -154,9 +154,9 @@ class ServiceRestartTest(base.TestCase):
 
         self.assertTrue(self.check_process_alive())
         self.assertTrue(self.parse_output("Caught SIGHUP").ret)
-        self.assertEquals(self.pipeline_cfg,
-                          yaml.safe_load(
-                          self.parse_output("Pipeline config: ").ret_stream))
+        self.assertEqual(self.pipeline_cfg,
+                         yaml.safe_load(
+                         self.parse_output("Pipeline config: ").ret_stream))
 
     def test_compute_service_restart(self):
         self._service_restart('ceilometer-agent-compute')

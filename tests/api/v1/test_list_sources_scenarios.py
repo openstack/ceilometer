@@ -30,7 +30,7 @@ class TestListSource(tests_api.TestBase,
 
     def test_source(self):
         ydata = self.get('/sources/test_source')
-        self.assert_("somekey" in ydata)
+        self.assertIn("somekey", ydata)
         self.assertEqual(ydata["somekey"], 666)
 
     def test_unknownsource(self):
