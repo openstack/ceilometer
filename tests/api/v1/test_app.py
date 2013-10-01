@@ -37,8 +37,10 @@ class TestApp(base.TestCase):
         cfg.CONF.set_override("auth_protocol", "foottp",
                               group=acl.OPT_GROUP_NAME)
         cfg.CONF.set_override("auth_version", "v2.0", group=acl.OPT_GROUP_NAME)
+        cfg.CONF.set_override("auth_uri", None,
+                              group=acl.OPT_GROUP_NAME)
         api_app = app.make_app(cfg.CONF, attach_storage=False)
-        self.assertEqual(api_app.wsgi_app.auth_protocol, 'foottp')
+        self.assertTrue(api_app.wsgi_app.auth_uri.startswith('foottp'))
 
     def test_keystone_middleware_parse_conffile(self):
         tmpfile = self.temp_config_file_path()
@@ -48,5 +50,5 @@ class TestApp(base.TestCase):
         service.prepare_service(['ceilometer-api',
                                  '--config-file=%s' % tmpfile])
         api_app = app.make_app(cfg.CONF, attach_storage=False)
-        self.assertEqual(api_app.wsgi_app.auth_protocol, 'barttp')
+        self.assertTrue(api_app.wsgi_app.auth_uri.startswith('barttp'))
         os.unlink(tmpfile)
