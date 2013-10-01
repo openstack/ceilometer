@@ -19,8 +19,10 @@
 """Tests for libvirt inspector.
 """
 
+from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.compute.virt.libvirt import inspector as libvirt_inspector
 from ceilometer.tests import base as test_base
+import fixtures
 
 
 class TestLibvirtInspection(test_base.TestCase):
@@ -181,3 +183,22 @@ class TestLibvirtInspection(test_base.TestCase):
         self.assertEqual(info0.read_bytes, 2L)
         self.assertEqual(info0.write_requests, 3L)
         self.assertEqual(info0.write_bytes, 4L)
+
+
+class TestLibvirtInspectionWithError(test_base.TestCase):
+
+    def setUp(self):
+        super(TestLibvirtInspectionWithError, self).setUp()
+        self.inspector = libvirt_inspector.LibvirtInspector()
+        self.useFixture(fixtures.MonkeyPatch(
+            'ceilometer.compute.virt.libvirt.inspector.'
+            'LibvirtInspector._get_connection',
+            self._dummy_get_connection))
+
+    def _dummy_get_connection(*args, **kwargs):
+        raise Exception('dummy')
+
+    def test_inspect_unknown_error(self):
+
+        self.assertRaises(virt_inspector.InspectorException,
+                          self.inspector.inspect_cpus, 'foo')
