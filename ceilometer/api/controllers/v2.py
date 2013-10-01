@@ -22,17 +22,6 @@
 # under the License.
 """Version 2 of the API.
 """
-
-# [GET ] / -- information about this version of the API
-#
-# [GET   ] /resources -- list the resources
-# [GET   ] /resources/<resource> -- information about the resource
-# [GET   ] /meters -- list the meters
-# [POST  ] /meters -- insert a new sample (and meter/resource if needed)
-# [GET   ] /meters/<meter> -- list the samples for this meter
-# [PUT   ] /meters/<meter> -- update the meter (not the samples)
-# [DELETE] /meters/<meter> -- delete the meter and samples
-#
 import ast
 import base64
 import datetime
@@ -724,9 +713,6 @@ class MeterController(rest.RestController):
                 context.get_admin_context()) as publisher:
             publisher(published_samples)
 
-        # TODO(asalkeld) this is not ideal, it would be nice if the publisher
-        # returned the created sample message with message id (or at least the
-        # a list of message_ids).
         return samples
 
     @wsme_pecan.wsexpose([Statistics], [Query], [unicode], int)
