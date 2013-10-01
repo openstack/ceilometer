@@ -25,6 +25,7 @@ import os.path
 import testtools
 from testtools import testcase
 
+from ceilometer.openstack.common import timeutils
 from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common.fixture import moxstubout
 
@@ -65,6 +66,18 @@ class TestCase(testtools.TestCase):
 
     def temp_config_file_path(self, name='ceilometer.conf'):
         return os.path.join(self.tempdir.path, name)
+
+    def assertTimestampEqual(self, first, second, msg=None):
+        """Checks that two timestamps are equals.
+
+        This relies on assertAlmostEqual to avoid rounding problem, and only
+        checks up the first microsecond values.
+
+        """
+        return self.assertAlmostEqual(
+            timeutils.delta_seconds(first, second),
+            0.0,
+            places=5)
 
 
 def _skip_decorator(func):
