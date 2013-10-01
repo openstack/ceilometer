@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-09-23 06:02+0000\n"
+"POT-Creation-Date: 2013-10-01 06:16+0000\n"
 "PO-Revision-Date: 2012-12-11 06:53+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Swahili (Kenya) "
@@ -18,55 +18,57 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
-#: ceilometer/alarm/service.py:95
+#: ceilometer/alarm/rpc.py:51
+#, python-format
+msgid ""
+"alarm %(alarm_id)s has no action configured for state transition from "
+"%(previous)s to state %(state)s, skipping the notification."
+msgstr ""
+
+#: ceilometer/alarm/service.py:96
 #, python-format
 msgid "initiating evaluation cycle on %d alarms"
 msgstr ""
 
-#: ceilometer/alarm/service.py:100
-msgid "threshold evaluation cycle failed"
+#: ceilometer/alarm/service.py:101
+msgid "alarm evaluation cycle failed"
 msgstr ""
 
-#: ceilometer/alarm/service.py:105
-#, python-format
-msgid "skipping alarm %s: alarm disabled"
-msgstr ""
-
-#: ceilometer/alarm/service.py:109
+#: ceilometer/alarm/service.py:106
 #, python-format
 msgid "skipping alarm %s: type unsupported"
 msgstr ""
 
-#: ceilometer/alarm/service.py:113
+#: ceilometer/alarm/service.py:110
 #, python-format
 msgid "evaluating alarm %s"
 msgstr ""
 
-#: ceilometer/alarm/service.py:152
+#: ceilometer/alarm/service.py:233
 #, python-format
 msgid "Unable to parse action %(action)s for alarm %(alarm_id)s"
 msgstr ""
 
-#: ceilometer/alarm/service.py:161
+#: ceilometer/alarm/service.py:242
 #, python-format
 msgid "Action %(scheme)s for alarm %(alarm_id)s is unknown, cannot notify"
 msgstr ""
 
-#: ceilometer/alarm/service.py:171
+#: ceilometer/alarm/service.py:252
 #, python-format
 msgid "Unable to notify alarm %s"
 msgstr ""
 
-#: ceilometer/alarm/service.py:190
+#: ceilometer/alarm/service.py:271
 msgid "Unable to notify for an alarm with no action"
 msgstr ""
 
-#: ceilometer/alarm/evaluator/__init__.py:66
+#: ceilometer/alarm/evaluator/__init__.py:67
 #, python-format
 msgid "alarm %(id)s transitioning to %(state)s because %(reason)s"
 msgstr ""
 
-#: ceilometer/alarm/evaluator/__init__.py:78
+#: ceilometer/alarm/evaluator/__init__.py:79
 msgid "alarm state update failed"
 msgstr ""
 
@@ -155,107 +157,230 @@ msgstr ""
 msgid "comparing value %(value)s against threshold %(limit)s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:91
+#: ceilometer/alarm/partition/coordination.py:132
+#, python-format
+msgid "triggering %s"
+msgstr ""
+
+#: ceilometer/alarm/partition/coordination.py:133
+#, python-format
+msgid "known evaluators %s"
+msgstr ""
+
+#: ceilometer/alarm/partition/coordination.py:136
+#, python-format
+msgid "per evaluator allocation %s"
+msgstr ""
+
+#: ceilometer/alarm/partition/coordination.py:146
+#, python-format
+msgid ""
+"%(this)s bailing on distribution cycle as older partition detected: "
+"%(older)s"
+msgstr ""
+
+#: ceilometer/alarm/partition/coordination.py:152
+#, python-format
+msgid "%(verb)s-ing %(alloc)s to %(eval)s"
+msgstr ""
+
+#: ceilometer/alarm/partition/coordination.py:156
+#, python-format
+msgid "master taking %s for self"
+msgstr ""
+
+#: ceilometer/alarm/partition/coordination.py:174
+#, python-format
+msgid "newly deleted alarms %s"
+msgstr ""
+
+#: ceilometer/alarm/partition/coordination.py:177
+msgid "alarm deletion activity requires rebalance"
+msgstr ""
+
+#: ceilometer/alarm/partition/coordination.py:202
+#, python-format
+msgid "%s still warming up"
+msgstr ""
+
+#: ceilometer/alarm/partition/coordination.py:207
+#, python-format
+msgid "last heard from %(report)s %(delta)s seconds ago"
+msgstr ""
+
+#: ceilometer/alarm/partition/coordination.py:212
+#, python-format
+msgid "%(this)s detects stale evaluator: %(stale)s"
+msgstr ""
+
+#: ceilometer/alarm/partition/coordination.py:217
+#, python-format
+msgid "%(this)s sees older potential master: %(older)s"
+msgstr ""
+
+#: ceilometer/alarm/partition/coordination.py:219
+#, python-format
+msgid "%(this)s is master?: %(is_master)s"
+msgstr ""
+
+#: ceilometer/alarm/partition/coordination.py:232
+#, python-format
+msgid "newly created alarms %s"
+msgstr ""
+
+#: ceilometer/alarm/partition/coordination.py:253
+#, python-format
+msgid "%s checking mastership status"
+msgstr ""
+
+#: ceilometer/alarm/partition/coordination.py:260
+msgid "mastership check failed"
+msgstr ""
+
+#: ceilometer/alarm/partition/coordination.py:270
+#, python-format
+msgid "%(this)s knows about %(reports)s"
+msgstr ""
+
+#: ceilometer/alarm/partition/coordination.py:276
+#, python-format
+msgid "%(this)s got assignment: %(alarms)s"
+msgstr ""
+
+#: ceilometer/alarm/partition/coordination.py:283
+#, python-format
+msgid "%(this)s got allocation: %(alarms)s"
+msgstr ""
+
+#: ceilometer/alarm/partition/coordination.py:289
+#, python-format
+msgid "%s reporting presence"
+msgstr ""
+
+#: ceilometer/alarm/partition/coordination.py:293
+msgid "presence reporting failed"
+msgstr ""
+
+#: ceilometer/alarm/partition/coordination.py:298
+#, python-format
+msgid "%s has no assigned alarms to evaluate"
+msgstr ""
+
+#: ceilometer/alarm/partition/coordination.py:302
+#, python-format
+msgid "%(this)s alarms for evaluation: %(alarms)s"
+msgstr ""
+
+#: ceilometer/alarm/partition/coordination.py:308
+msgid "assignment retrieval failed"
+msgstr ""
+
+#: ceilometer/api/controllers/v2.py:84
+#, python-format
+msgid "%(entity)s %(id)s Not Found"
+msgstr ""
+
+#: ceilometer/api/controllers/v2.py:102
 #, python-format
 msgid "Value %(value)s is invalid (should be greater or equal to %(min)s)"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:97
+#: ceilometer/api/controllers/v2.py:108
 #, python-format
 msgid "Value %(value)s is invalid (should be lower or equal to %(max)s)"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:234
+#: ceilometer/api/controllers/v2.py:246
 #, python-format
 msgid "Failed to convert the metadata value %s automatically"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:252
+#: ceilometer/api/controllers/v2.py:264
 #, python-format
 msgid ""
 "Failed to convert the metadata value %(value)s to the expected data type "
 "%(type)s."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:257
+#: ceilometer/api/controllers/v2.py:269
 #, python-format
 msgid ""
 "The data type %s is not supported. The supported data type list is: "
 "integer, float, boolean and string."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:262
+#: ceilometer/api/controllers/v2.py:274
 #, python-format
 msgid ""
 "Unexpected exception converting %(value)s to the expected data type "
 "%(type)s."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:728
+#: ceilometer/api/controllers/v2.py:742
 msgid "Period must be positive."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:888
-msgid "Unknown resource"
+#: ceilometer/api/controllers/v2.py:904
+msgid "Resource"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:950
+#: ceilometer/api/controllers/v2.py:962
 #, python-format
 msgid "threshold_rule/%s is mandatory"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:968
+#: ceilometer/api/controllers/v2.py:980
 #, python-format
 msgid ""
 "Alarm when %(meter_name)s is %(comparison_operator)s a %(statistic)s of "
 "%(threshold)s over %(period)s seconds"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1007
+#: ceilometer/api/controllers/v2.py:1019
 #, python-format
 msgid "Combined state of alarms %s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1024
+#: ceilometer/api/controllers/v2.py:1036
 msgid "combination_rule/alarm_ids is mandatory"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1033
+#: ceilometer/api/controllers/v2.py:1045
 #, python-format
 msgid "Alarm %s doesn't exists"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1122
+#: ceilometer/api/controllers/v2.py:1134
 #, python-format
 msgid "%s is mandatory"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1127
+#: ceilometer/api/controllers/v2.py:1139
 msgid "threshold_rule and combination_rule cannot be set at the same time"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1227
-msgid "Unknown alarm"
+#: ceilometer/api/controllers/v2.py:1237
+msgid "Alarm"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1285 ceilometer/api/controllers/v2.py:1409
+#: ceilometer/api/controllers/v2.py:1293 ceilometer/api/controllers/v2.py:1417
 msgid "Alarm incorrect"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1330
+#: ceilometer/api/controllers/v2.py:1338
 msgid "state invalid"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1401
+#: ceilometer/api/controllers/v2.py:1409
 msgid "Alarm with that name exists"
 msgstr ""
 
-#: ceilometer/collector/service.py:87
+#: ceilometer/collector/service.py:100
 #, python-format
 msgid "UDP: Cannot decode data sent by %s"
 msgstr ""
 
-#: ceilometer/collector/service.py:97
+#: ceilometer/collector/service.py:112
 msgid "UDP: Unable to store meter"
 msgstr ""
 
@@ -1184,5 +1309,17 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "skipping alarm %s"
+#~ msgstr ""
+
+#~ msgid "threshold evaluation cycle failed"
+#~ msgstr ""
+
+#~ msgid "skipping alarm %s: alarm disabled"
+#~ msgstr ""
+
+#~ msgid "Unknown resource"
+#~ msgstr ""
+
+#~ msgid "Unknown alarm"
 #~ msgstr ""
 
