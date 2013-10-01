@@ -2089,9 +2089,9 @@ class EventTest(EventTestBase):
         m = [models.Event("1", "Foo", now, None),
              models.Event("1", "Zoo", now, [])]
         problem_events = self.conn.record_events(m)
-        self.assertEquals(1, len(problem_events))
+        self.assertEqual(1, len(problem_events))
         bad = problem_events[0]
-        self.assertEquals(models.Event.DUPLICATE, bad[0])
+        self.assertEqual(models.Event.DUPLICATE, bad[0])
 
     def test_save_events_no_traits(self):
         now = datetime.datetime.utcnow()

@@ -53,4 +53,4 @@ class ModelTest(base.TestCase):
 
     def test_event_repr_no_traits(self):
         x = models.Event("1", "name", "now", None)
-        self.assertEquals("<Event: 1, name, now, >", repr(x))
+        self.assertEqual("<Event: 1, name, now, >", repr(x))

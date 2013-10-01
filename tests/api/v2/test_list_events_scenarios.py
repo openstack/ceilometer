@@ -166,7 +166,7 @@ class TestListEvents(FunctionalTest,
                                  'value': 'resource-id',
                                  }])
         sample = data[0]
-        self.assert_('resource_metadata' in sample)
+        self.assertIn('resource_metadata', sample)
         self.assertEqual(
             list(sorted(sample['resource_metadata'].iteritems())),
             [('dict_properties.key', 'value'),
