@@ -44,12 +44,29 @@ def install(app, conf):
                                    conf=dict(conf.get(OPT_GROUP_NAME)))
 
 
-def get_limited_to_project(headers):
-    """Return the tenant the request should be limited to."""
+def get_limited_to(headers):
+    """Return the user and project the request should be limited to.
+
+    :param headers: HTTP headers dictionary
+    :return: A tuple of (user, project), set to None if there's no limit on
+    one of these.
+
+    """
     global _ENFORCER
     if not _ENFORCER:
         _ENFORCER = policy.Enforcer()
     if not _ENFORCER.enforce('context_is_admin',
                              {},
                              {'roles': headers.get('X-Roles', "").split(",")}):
-        return headers.get('X-Project-Id')
+        return headers.get('X-User-Id'), headers.get('X-Project-Id')
+    return None, None
+
+
+def get_limited_to_project(headers):
+    """Return the project the request should be limited to.
+
+    :param headers: HTTP headers dictionary
+    :return: A project, or None if there's no limit on it.
+
+    """
+    return get_limited_to(headers)[1]

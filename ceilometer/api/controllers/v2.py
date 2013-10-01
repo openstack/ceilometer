@@ -1272,8 +1272,9 @@ class AlarmController(rest.RestController):
         now = timeutils.utcnow()
 
         data.alarm_id = self._id
-        data.user_id = alarm_in.user_id
-        data.project_id = alarm_in.project_id
+        user, project = acl.get_limited_to(pecan.request.headers)
+        data.user_id = user or data.user_id or alarm_in.user_id
+        data.project_id = project or data.project_id or alarm_in.project_id
         data.timestamp = now
         if alarm_in.state != data.state:
             data.state_timestamp = now
@@ -1391,8 +1392,11 @@ class AlarmsController(rest.RestController):
         now = timeutils.utcnow()
 
         data.alarm_id = str(uuid.uuid4())
-        data.user_id = pecan.request.headers.get('X-User-Id')
-        data.project_id = pecan.request.headers.get('X-Project-Id')
+        user, project = acl.get_limited_to(pecan.request.headers)
+        data.user_id = (user or data.user_id or
+                        pecan.request.headers.get('X-User-Id'))
+        data.project_id = (project or data.project_id or
+                           pecan.request.headers.get('X-Project-Id'))
         data.timestamp = now
         data.state_timestamp = now
 

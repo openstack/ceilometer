@@ -455,6 +455,141 @@ class TestAlarms(FunctionalTest,
         else:
             self.fail("Alarm not found")
 
+    def test_post_alarm_as_admin(self):
+        """Test the creation of an alarm as admin for another project."""
+        json = {
+            'enabled': False,
+            'name': 'added_alarm',
+            'state': 'ok',
+            'type': 'threshold',
+            'user_id': 'auseridthatisnotmine',
+            'project_id': 'aprojectidthatisnotmine',
+            'threshold_rule': {
+                'meter_name': 'ameter',
+                'query': [{'field': 'metadata.field',
+                           'op': 'eq',
+                           'value': '5',
+                           'type': 'string'},
+                          {'field': 'project_id', 'op': 'eq',
+                           'value': 'aprojectidthatisnotmine'}],
+                'comparison_operator': 'le',
+                'statistic': 'count',
+                'threshold': 50,
+                'evaluation_periods': 3,
+                'period': 180,
+            }
+        }
+        headers = {}
+        headers.update(self.auth_headers)
+        headers['X-Roles'] = 'admin'
+        self.post_json('/alarms', params=json, status=201,
+                       headers=headers)
+        alarms = list(self.conn.get_alarms(enabled=False))
+        self.assertEqual(1, len(alarms))
+        self.assertEqual(alarms[0].user_id, 'auseridthatisnotmine')
+        self.assertEqual(alarms[0].project_id, 'aprojectidthatisnotmine')
+        if alarms[0].name == 'added_alarm':
+            for key in json:
+                if key.endswith('_rule'):
+                    storage_key = 'rule'
+                else:
+                    storage_key = key
+                self.assertEqual(getattr(alarms[0], storage_key),
+                                 json[key])
+        else:
+            self.fail("Alarm not found")
+
+    def test_post_alarm_as_admin_no_user(self):
+        """Test the creation of an alarm as admin for another project but
+        forgetting to set the values.
+        """
+        json = {
+            'enabled': False,
+            'name': 'added_alarm',
+            'state': 'ok',
+            'type': 'threshold',
+            'project_id': 'aprojectidthatisnotmine',
+            'threshold_rule': {
+                'meter_name': 'ameter',
+                'query': [{'field': 'metadata.field',
+                           'op': 'eq',
+                           'value': '5',
+                           'type': 'string'},
+                          {'field': 'project_id', 'op': 'eq',
+                           'value': 'aprojectidthatisnotmine'}],
+                'comparison_operator': 'le',
+                'statistic': 'count',
+                'threshold': 50,
+                'evaluation_periods': 3,
+                'period': 180,
+            }
+        }
+        headers = {}
+        headers.update(self.auth_headers)
+        headers['X-Roles'] = 'admin'
+        self.post_json('/alarms', params=json, status=201,
+                       headers=headers)
+        alarms = list(self.conn.get_alarms(enabled=False))
+        self.assertEqual(1, len(alarms))
+        self.assertEqual(alarms[0].user_id, self.auth_headers['X-User-Id'])
+        self.assertEqual(alarms[0].project_id, 'aprojectidthatisnotmine')
+        if alarms[0].name == 'added_alarm':
+            for key in json:
+                if key.endswith('_rule'):
+                    storage_key = 'rule'
+                else:
+                    storage_key = key
+                self.assertEqual(getattr(alarms[0], storage_key),
+                                 json[key])
+        else:
+            self.fail("Alarm not found")
+
+    def test_post_alarm_as_admin_no_project(self):
+        """Test the creation of an alarm as admin for another project but
+        forgetting to set the values.
+        """
+        json = {
+            'enabled': False,
+            'name': 'added_alarm',
+            'state': 'ok',
+            'type': 'threshold',
+            'user_id': 'auseridthatisnotmine',
+            'threshold_rule': {
+                'meter_name': 'ameter',
+                'query': [{'field': 'metadata.field',
+                           'op': 'eq',
+                           'value': '5',
+                           'type': 'string'},
+                          {'field': 'project_id', 'op': 'eq',
+                           'value': 'aprojectidthatisnotmine'}],
+                'comparison_operator': 'le',
+                'statistic': 'count',
+                'threshold': 50,
+                'evaluation_periods': 3,
+                'period': 180,
+            }
+        }
+        headers = {}
+        headers.update(self.auth_headers)
+        headers['X-Roles'] = 'admin'
+        self.post_json('/alarms', params=json, status=201,
+                       headers=headers)
+        alarms = list(self.conn.get_alarms(enabled=False))
+        self.assertEqual(1, len(alarms))
+        self.assertEqual(alarms[0].user_id, 'auseridthatisnotmine')
+        self.assertEqual(alarms[0].project_id,
+                         self.auth_headers['X-Project-Id'])
+        if alarms[0].name == 'added_alarm':
+            for key in json:
+                if key.endswith('_rule'):
+                    storage_key = 'rule'
+                else:
+                    storage_key = key
+                self.assertEqual(getattr(alarms[0], storage_key),
+                                 json[key])
+        else:
+            self.fail("Alarm not found")
+
     def test_post_alarm_combination(self):
         json = {
             'enabled': False,
@@ -544,6 +679,58 @@ class TestAlarms(FunctionalTest,
         json['threshold_rule']['query'].append({
             'field': 'project_id', 'op': 'eq',
             'value': self.auth_headers['X-Project-Id']})
+        for key in json:
+            if key.endswith('_rule'):
+                storage_key = 'rule'
+            else:
+                storage_key = key
+            self.assertEqual(getattr(alarm, storage_key), json[key])
+
+    def test_put_alarm_as_admin(self):
+        json = {
+            'user_id': 'myuserid',
+            'project_id': 'myprojectid',
+            'enabled': False,
+            'name': 'name_put',
+            'state': 'ok',
+            'type': 'threshold',
+            'ok_actions': ['http://something/ok'],
+            'alarm_actions': ['http://something/alarm'],
+            'insufficient_data_actions': ['http://something/no'],
+            'repeat_actions': True,
+            'threshold_rule': {
+                'meter_name': 'ameter',
+                'query': [{'field': 'metadata.field',
+                           'op': 'eq',
+                           'value': '5',
+                           'type': 'string'},
+                          {'field': 'project_id', 'op': 'eq',
+                           'value': 'myprojectid'}],
+                'comparison_operator': 'le',
+                'statistic': 'count',
+                'threshold': 50,
+                'evaluation_periods': 3,
+                'period': 180,
+            }
+        }
+        headers = {}
+        headers.update(self.auth_headers)
+        headers['X-Roles'] = 'admin'
+
+        data = self.get_json('/alarms',
+                             headers=headers,
+                             q=[{'field': 'name',
+                                 'value': 'name1',
+                                 }])
+        self.assertEqual(1, len(data))
+        alarm_id = data[0]['alarm_id']
+
+        self.put_json('/alarms/%s' % alarm_id,
+                      params=json,
+                      headers=headers)
+        alarm = list(self.conn.get_alarms(alarm_id=alarm_id, enabled=False))[0]
+        self.assertEqual(alarm.user_id, 'myuserid')
+        self.assertEqual(alarm.project_id, 'myprojectid')
         for key in json:
             if key.endswith('_rule'):
                 storage_key = 'rule'
