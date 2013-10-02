@@ -252,6 +252,7 @@ class TestListMeters(FunctionalTest,
                          set(['meter.mine']))
         self.assertEqual(set(r['resource_metadata']['is_public'] for r
                              in data), set(['False']))
+        # FIXME(gordc): verify no false positive (Bug#1236496)
 
     def test_list_meters_query_string_metadata(self):
         data = self.get_json('/meters/meter.test',

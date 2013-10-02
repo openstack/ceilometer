@@ -43,8 +43,8 @@ The following is a table indicating the status of each database drivers:
 Driver             API querying                  API statistics      Alarms
 ================== ============================= =================== ======
 MongoDB            Yes                           Yes                 Yes
-MySQL              Yes, except metadata querying Yes                 Yes
-PostgreSQL         Yes, except metadata querying Yes                 Yes
+MySQL              Yes                           Yes                 Yes
+PostgreSQL         Yes                           Yes                 Yes
 HBase              Yes                           Yes, except groupby No
 DB2                Yes                           Yes                 No
 ================== ============================= =================== ======
