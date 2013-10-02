@@ -307,7 +307,7 @@ class Connection(base.Connection):
         """
         # Make sure we know about the user and project
         self.db.user.update(
-            {'_id': data['user_id']},
+            {'_id': data['user_id'] or 'null'},
             {'$addToSet': {'source': data['source'],
                            },
              },
@@ -325,7 +325,7 @@ class Connection(base.Connection):
         self.db.resource.update(
             {'_id': data['resource_id']},
             {'$set': {'project_id': data['project_id'],
-                      'user_id': data['user_id'],
+                      'user_id': data['user_id'] or 'null',
                       'metadata': data['resource_metadata'],
                       'source': data['source'],
                       },
