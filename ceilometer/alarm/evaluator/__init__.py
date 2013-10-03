@@ -80,4 +80,8 @@ class Evaluator(object):
 
     @abc.abstractmethod
     def evaluate(self, alarm):
-        pass
+        '''interface definition
+
+        evaluate an alarm
+        alarm Alarm: an instance of the Alarm
+        '''
