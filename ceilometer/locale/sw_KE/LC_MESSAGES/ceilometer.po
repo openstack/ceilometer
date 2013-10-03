@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-10-02 06:02+0000\n"
+"POT-Creation-Date: 2013-10-03 06:02+0000\n"
 "PO-Revision-Date: 2012-12-11 06:53+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Swahili (Kenya) "
@@ -316,62 +316,67 @@ msgid ""
 "%(type)s."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:728
+#: ceilometer/api/controllers/v2.py:275
+#, python-format
+msgid "Not Authorized to access project %s"
+msgstr ""
+
+#: ceilometer/api/controllers/v2.py:729
 msgid "Period must be positive."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:890
+#: ceilometer/api/controllers/v2.py:891
 msgid "Resource"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:948
+#: ceilometer/api/controllers/v2.py:949
 #, python-format
 msgid "threshold_rule/%s is mandatory"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:966
+#: ceilometer/api/controllers/v2.py:967
 #, python-format
 msgid ""
 "Alarm when %(meter_name)s is %(comparison_operator)s a %(statistic)s of "
 "%(threshold)s over %(period)s seconds"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1005
+#: ceilometer/api/controllers/v2.py:1006
 #, python-format
 msgid "Combined state of alarms %s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1022
+#: ceilometer/api/controllers/v2.py:1023
 msgid "combination_rule/alarm_ids is mandatory"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1031
+#: ceilometer/api/controllers/v2.py:1032
 #, python-format
 msgid "Alarm %s doesn't exists"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1120
+#: ceilometer/api/controllers/v2.py:1121
 #, python-format
 msgid "%s is mandatory"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1125
+#: ceilometer/api/controllers/v2.py:1126
 msgid "threshold_rule and combination_rule cannot be set at the same time"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1223
+#: ceilometer/api/controllers/v2.py:1224
 msgid "Alarm"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1280 ceilometer/api/controllers/v2.py:1407
+#: ceilometer/api/controllers/v2.py:1281 ceilometer/api/controllers/v2.py:1408
 msgid "Alarm incorrect"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1325
+#: ceilometer/api/controllers/v2.py:1326
 msgid "state invalid"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1399
+#: ceilometer/api/controllers/v2.py:1400
 msgid "Alarm with that name exists"
 msgstr ""
 
