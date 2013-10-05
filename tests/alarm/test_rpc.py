@@ -18,11 +18,13 @@
 
 
 import uuid
+import mock
 
 from oslo.config import cfg
 
 from ceilometer.alarm import rpc as rpc_alarm
 from ceilometer.openstack.common import rpc
+from ceilometer.openstack.common import timeutils
 from ceilometer.storage.models import Alarm as AlarmModel
 from ceilometer.tests import base
 from ceilometerclient.v2.alarms import Alarm as AlarmClient
@@ -116,3 +118,43 @@ class TestRPCAlarmNotifier(base.TestCase):
         })
         self.notifier.notify(alarm, 'alarm', "what?")
         self.assertEqual(len(self.notified), 0)
+
+
+class TestRPCAlarmPartitionCoordination(base.TestCase):
+    def faux_fanout_cast(self, context, topic, msg):
+        self.notified.append((topic, msg))
+
+    def setUp(self):
+        super(TestRPCAlarmPartitionCoordination, self).setUp()
+        self.notified = []
+        self.stubs.Set(rpc, 'fanout_cast', self.faux_fanout_cast)
+        self.ordination = rpc_alarm.RPCAlarmPartitionCoordination()
+        self.alarms = [mock.MagicMock(), mock.MagicMock()]
+
+    def test_ordination_presence(self):
+        id = uuid.uuid4()
+        priority = float(timeutils.utcnow().strftime('%s.%f'))
+        self.ordination.presence(id, priority)
+        topic, msg = self.notified[0]
+        self.assertEqual(topic, 'alarm_partition_coordination')
+        self.assertEqual(msg['args']['data']['uuid'], id)
+        self.assertEqual(msg['args']['data']['priority'], priority)
+        self.assertEqual(msg['method'], 'presence')
+
+    def test_ordination_assign(self):
+        id = uuid.uuid4()
+        self.ordination.assign(id, self.alarms)
+        topic, msg = self.notified[0]
+        self.assertEqual(topic, 'alarm_partition_coordination')
+        self.assertEqual(msg['args']['data']['uuid'], id)
+        self.assertEqual(len(msg['args']['data']['alarms']), 2)
+        self.assertEqual(msg['method'], 'assign')
+
+    def test_ordination_allocate(self):
+        id = uuid.uuid4()
+        self.ordination.allocate(id, self.alarms)
+        topic, msg = self.notified[0]
+        self.assertEqual(topic, 'alarm_partition_coordination')
+        self.assertEqual(msg['args']['data']['uuid'], id)
+        self.assertEqual(len(msg['args']['data']['alarms']), 2)
+        self.assertEqual(msg['method'], 'allocate')
