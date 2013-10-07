@@ -41,6 +41,7 @@ from wsme import types as wtypes
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
+from ceilometer.openstack.common.notifier import api as notify
 from ceilometer.openstack.common import strutils
 from ceilometer.openstack.common import timeutils
 from ceilometer import sample
@@ -447,6 +448,13 @@ def _make_link(rel_name, url, type, type_arg, query=None):
                                                 query['value'])
     return Link(href=('%s/v2/%s/%s%s') % (url, type, type_arg, query_str),
                 rel=rel_name)
+
+
+def _send_notification(event, payload):
+    notification = event.replace(" ", "_")
+    notification = "alarm.%s" % notification
+    notify.notify(None, notify.publisher_id("ceilometer.api"),
+                  notification, notify.INFO, payload)
 
 
 class Sample(_Base):
@@ -1228,21 +1236,28 @@ class AlarmController(rest.RestController):
         if not cfg.CONF.alarm.record_history:
             return
         type = type or storage.models.AlarmChange.RULE_CHANGE
-        detail = json.dumps(utils.stringify_timestamps(data))
+        scrubbed_data = utils.stringify_timestamps(data)
+        detail = json.dumps(scrubbed_data)
         user_id = pecan.request.headers.get('X-User-Id')
         project_id = pecan.request.headers.get('X-Project-Id')
         on_behalf_of = on_behalf_of or project_id
+        payload = dict(event_id=str(uuid.uuid4()),
+                       alarm_id=self._id,
+                       type=type,
+                       detail=detail,
+                       user_id=user_id,
+                       project_id=project_id,
+                       on_behalf_of=on_behalf_of,
+                       timestamp=now)
+
         try:
-            self.conn.record_alarm_change(dict(event_id=str(uuid.uuid4()),
-                                               alarm_id=self._id,
-                                               type=type,
-                                               detail=detail,
-                                               user_id=user_id,
-                                               project_id=project_id,
-                                               on_behalf_of=on_behalf_of,
-                                               timestamp=now))
+            self.conn.record_alarm_change(payload)
         except NotImplementedError:
             pass
+
+        # Revert to the pre-json'ed details ...
+        payload['detail'] = scrubbed_data
+        _send_notification(type, payload)
 
     @wsme_pecan.wsexpose(Alarm, wtypes.text)
     def get(self):
@@ -1356,20 +1371,27 @@ class AlarmsController(rest.RestController):
         if not cfg.CONF.alarm.record_history:
             return
         type = storage.models.AlarmChange.CREATION
-        detail = json.dumps(utils.stringify_timestamps(data))
+        scrubbed_data = utils.stringify_timestamps(data)
+        detail = json.dumps(scrubbed_data)
         user_id = pecan.request.headers.get('X-User-Id')
         project_id = pecan.request.headers.get('X-Project-Id')
+        payload = dict(event_id=str(uuid.uuid4()),
+                       alarm_id=alarm_id,
+                       type=type,
+                       detail=detail,
+                       user_id=user_id,
+                       project_id=project_id,
+                       on_behalf_of=project_id,
+                       timestamp=now)
+
         try:
-            conn.record_alarm_change(dict(event_id=str(uuid.uuid4()),
-                                          alarm_id=alarm_id,
-                                          type=type,
-                                          detail=detail,
-                                          user_id=user_id,
-                                          project_id=project_id,
-                                          on_behalf_of=project_id,
-                                          timestamp=now))
+            conn.record_alarm_change(payload)
         except NotImplementedError:
             pass
+
+        # Revert to the pre-json'ed details ...
+        payload['detail'] = scrubbed_data
+        _send_notification(type, payload)
 
     @wsme.validate(Alarm)
     @wsme_pecan.wsexpose(Alarm, body=Alarm, status_code=201)
