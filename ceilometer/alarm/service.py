@@ -19,6 +19,7 @@
 # under the License.
 
 import abc
+import six
 
 from oslo.config import cfg
 from stevedore import extension
@@ -58,9 +59,8 @@ cfg.CONF.import_opt('partition_rpc_topic', 'ceilometer.alarm.rpc',
 LOG = log.getLogger(__name__)
 
 
+@six.add_metaclass(abc.ABCMeta)
 class AlarmService(object):
-
-    __metaclass__ = abc.ABCMeta
 
     EXTENSIONS_NAMESPACE = "ceilometer.alarm.evaluator"
 

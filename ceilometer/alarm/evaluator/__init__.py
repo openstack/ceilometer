@@ -18,6 +18,7 @@
 
 
 import abc
+import six
 
 from oslo.config import cfg
 
@@ -33,10 +34,9 @@ OK = 'ok'
 ALARM = 'alarm'
 
 
+@six.add_metaclass(abc.ABCMeta)
 class Evaluator(object):
     """Base class for alarm rule evaluator plugins."""
-
-    __metaclass__ = abc.ABCMeta
 
     def __init__(self, notifier):
         self.notifier = notifier

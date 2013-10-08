@@ -17,12 +17,12 @@
 # under the License.
 
 import abc
+import six
 
 
+@six.add_metaclass(abc.ABCMeta)
 class AlarmNotifier(object):
     """Base class for alarm notifier plugins."""
-
-    __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def notify(self, action, alarm_id, previous, current, reason):

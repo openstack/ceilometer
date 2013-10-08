@@ -21,6 +21,7 @@
 import abc
 import datetime
 import math
+import six
 
 from ceilometer.openstack.common import timeutils
 
@@ -102,20 +103,18 @@ class Pagination(object):
         self.sort_dirs = sort_dirs
 
 
+@six.add_metaclass(abc.ABCMeta)
 class StorageEngine(object):
     """Base class for storage engines."""
-
-    __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def get_connection(self, conf):
         """Return a Connection instance based on the configuration settings."""
 
 
+@six.add_metaclass(abc.ABCMeta)
 class Connection(object):
     """Base class for storage system connections."""
-
-    __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def __init__(self, conf):

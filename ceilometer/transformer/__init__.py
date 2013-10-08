@@ -17,6 +17,8 @@
 # under the License.
 
 import abc
+import six
+
 from stevedore import extension
 
 
@@ -35,10 +37,9 @@ class TransformerExtensionManager(extension.ExtensionManager):
         return self.by_name[name]
 
 
+@six.add_metaclass(abc.ABCMeta)
 class TransformerBase(object):
     """Base class for plugins that transform the sample."""
-
-    __metaclass__ = abc.ABCMeta
 
     def __init__(self, **kwargs):
         """Setup transformer.

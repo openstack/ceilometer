@@ -20,6 +20,7 @@
 
 """Base classes for API tests."""
 import os
+import six
 import uuid
 import warnings
 
@@ -78,8 +79,8 @@ class DB2FakeConnectionUrl(MongoDBFakeConnectionUrl):
             self.url = self.url.replace('mongodb:', 'db2:', 1)
 
 
+@six.add_metaclass(test_base.SkipNotImplementedMeta)
 class MixinTestsWithBackendScenarios(object):
-    __metaclass__ = test_base.SkipNotImplementedMeta
 
     scenarios = [
         ('sqlalchemy', dict(database_connection='sqlite://')),

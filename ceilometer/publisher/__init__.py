@@ -21,6 +21,7 @@
 import abc
 from stevedore import driver
 from ceilometer.openstack.common import network_utils
+import six
 
 
 def get_publisher(url, namespace='ceilometer.publisher'):
@@ -34,10 +35,9 @@ def get_publisher(url, namespace='ceilometer.publisher'):
     return loaded_driver.driver(parse_result)
 
 
+@six.add_metaclass(abc.ABCMeta)
 class PublisherBase(object):
     """Base class for plugins that publish the sampler."""
-
-    __metaclass__ = abc.ABCMeta
 
     def __init__(self, parsed_url):
         pass

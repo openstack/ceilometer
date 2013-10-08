@@ -19,15 +19,15 @@
 """
 
 import abc
+import six
 
 from ceilometer import plugin
 
 
+@six.add_metaclass(abc.ABCMeta)
 class ComputePollster(plugin.PollsterBase):
     """Base class for plugins that support the polling API on the compute node.
     """
-
-    __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def get_samples(self, manager, cache, instance):
