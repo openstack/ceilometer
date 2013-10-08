@@ -24,14 +24,15 @@ import socket
 
 from mock import patch
 from mock import MagicMock
-from oslo.config import cfg
 from stevedore import extension
 from stevedore.tests import manager as test_manager
 
+from ceilometer import sample
 from ceilometer.collector import service
 from ceilometer.compute import notifications
 from ceilometer.openstack.common import timeutils
-from ceilometer import sample
+from ceilometer.openstack.common.fixture import config
+from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer.storage import models
 from ceilometer.tests import base as tests_base
 
@@ -86,18 +87,19 @@ TEST_NOTICE = {
 }
 
 
-class TestCollector(tests_base.TestCase):
+class TestCollector(tests_base.BaseTestCase):
     def setUp(self):
         super(TestCollector, self).setUp()
-        cfg.CONF.set_override("connection", "log://", group='database')
+        self.CONF = self.useFixture(config.Config()).conf
+        self.CONF.set_override("connection", "log://", group='database')
 
 
 class TestUDPCollectorService(TestCollector):
     def _make_fake_socket(self, family, type):
         udp_socket = self.mox.CreateMockAnything()
         udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        udp_socket.bind((cfg.CONF.collector.udp_address,
-                         cfg.CONF.collector.udp_port))
+        udp_socket.bind((self.CONF.collector.udp_address,
+                         self.CONF.collector.udp_port))
 
         def stop_udp(anything):
             # Make the loop stop
@@ -114,6 +116,7 @@ class TestUDPCollectorService(TestCollector):
 
     def setUp(self):
         super(TestUDPCollectorService, self).setUp()
+        self.mox = self.useFixture(moxstubout.MoxStubout()).mox
         self.srv = service.UDPCollectorService()
         self.counter = sample.Sample(
             name='foobar',
@@ -205,7 +208,7 @@ class TestCollectorService(TestCollector):
         # If we try to create a real RPC connection, init_host() never
         # returns. Mock it out so we can establish the service
         # configuration.
-        cfg.CONF.set_override("store_events", False, group="collector")
+        self.CONF.set_override("store_events", False, group="collector")
         with patch('ceilometer.openstack.common.rpc.create_connection'):
             self.srv.start()
         self.srv.pipeline_manager.pipelines[0] = MagicMock()
@@ -221,14 +224,14 @@ class TestCollectorService(TestCollector):
             self.srv.pipeline_manager.publisher.called)
 
     def test_process_notification_no_events(self):
-        cfg.CONF.set_override("store_events", False, group="collector")
+        self.CONF.set_override("store_events", False, group="collector")
         self.srv.notification_manager = MagicMock()
         with patch.object(self.srv, '_message_to_event') as fake_msg_to_event:
             self.srv.process_notification({})
             self.assertFalse(fake_msg_to_event.called)
 
     def test_process_notification_with_events(self):
-        cfg.CONF.set_override("store_events", True, group="collector")
+        self.CONF.set_override("store_events", True, group="collector")
         self.srv.notification_manager = MagicMock()
         with patch.object(self.srv, '_message_to_event') as fake_msg_to_event:
             self.srv.process_notification({})
@@ -261,7 +264,7 @@ class TestCollectorService(TestCollector):
         self.assertEqual(1, len(event.traits))
 
     def test_message_to_event_duplicate(self):
-        cfg.CONF.set_override("store_events", True, group="collector")
+        self.CONF.set_override("store_events", True, group="collector")
         mock_dispatcher = MagicMock()
         self.srv.dispatcher_manager = test_manager.TestExtensionManager(
             [extension.Extension('test',
@@ -276,7 +279,7 @@ class TestCollectorService(TestCollector):
         self.srv._message_to_event(message)  # Should return silently.
 
     def test_message_to_event_bad_event(self):
-        cfg.CONF.set_override("store_events", True, group="collector")
+        self.CONF.set_override("store_events", True, group="collector")
         mock_dispatcher = MagicMock()
         self.srv.dispatcher_manager = test_manager.TestExtensionManager(
             [extension.Extension('test',

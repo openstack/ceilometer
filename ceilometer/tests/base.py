@@ -25,6 +25,7 @@ import os.path
 import testtools
 from testtools import testcase
 
+from ceilometer.openstack.common import test
 from ceilometer.openstack.common import timeutils
 from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common.fixture import moxstubout
@@ -67,6 +68,8 @@ class TestCase(testtools.TestCase):
     def temp_config_file_path(self, name='ceilometer.conf'):
         return os.path.join(self.tempdir.path, name)
 
+
+class BaseTestCase(test.BaseTestCase):
     def assertTimestampEqual(self, first, second, msg=None):
         """Checks that two timestamps are equals.
 
