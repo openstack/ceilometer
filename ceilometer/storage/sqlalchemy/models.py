@@ -237,7 +237,7 @@ class AlarmChange(Base):
     project_id = Column(String(255), ForeignKey('project.id'))
     user_id = Column(String(255), ForeignKey('user.id'))
     type = Column(String(20))
-    detail = Column(String(255))
+    detail = Column(Text)
     timestamp = Column(DateTime, default=timeutils.utcnow)
 
 
