@@ -25,10 +25,10 @@ from stevedore import extension
 from stevedore.tests import manager as extension_tests
 
 from ceilometer.alarm import service
-from ceilometer.tests import base
+from ceilometer.openstack.common import test
 
 
-class TestSingletonAlarmService(base.TestCase):
+class TestSingletonAlarmService(test.BaseTestCase):
     def setUp(self):
         super(TestSingletonAlarmService, self).setUp()
         self.threshold_eval = mock.Mock()

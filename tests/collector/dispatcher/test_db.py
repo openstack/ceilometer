@@ -18,20 +18,23 @@
 """Tests for ceilometer/collector/dispatcher/database.py
 """
 from datetime import datetime
-from oslo.config import cfg
 
+from ceilometer.openstack.common import test
+from ceilometer.openstack.common.fixture import config
+from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer.collector.dispatcher import database
 from ceilometer.publisher import rpc
 from ceilometer.storage import base
-from ceilometer.tests import base as tests_base
 
 
-class TestDispatcherDB(tests_base.TestCase):
+class TestDispatcherDB(test.BaseTestCase):
 
     def setUp(self):
         super(TestDispatcherDB, self).setUp()
-        self.dispatcher = database.DatabaseDispatcher(cfg.CONF)
+        self.CONF = self.useFixture(config.Config()).conf
+        self.dispatcher = database.DatabaseDispatcher(self.CONF)
         self.ctx = None
+        self.mox = self.useFixture(moxstubout.MoxStubout()).mox
 
     def test_valid_message(self):
         msg = {'counter_name': 'test',
@@ -40,7 +43,7 @@ class TestDispatcherDB(tests_base.TestCase):
                }
         msg['message_signature'] = rpc.compute_signature(
             msg,
-            cfg.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher_rpc.metering_secret,
         )
 
         self.dispatcher.storage_conn = self.mox.CreateMock(base.Connection)
@@ -79,7 +82,7 @@ class TestDispatcherDB(tests_base.TestCase):
                }
         msg['message_signature'] = rpc.compute_signature(
             msg,
-            cfg.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher_rpc.metering_secret,
         )
 
         expected = {}
@@ -100,7 +103,7 @@ class TestDispatcherDB(tests_base.TestCase):
                }
         msg['message_signature'] = rpc.compute_signature(
             msg,
-            cfg.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher_rpc.metering_secret,
         )
 
         expected = {}

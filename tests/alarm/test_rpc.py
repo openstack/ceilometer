@@ -20,23 +20,25 @@
 import uuid
 import mock
 
-from oslo.config import cfg
-
 from ceilometer.alarm import rpc as rpc_alarm
 from ceilometer.openstack.common import rpc
+from ceilometer.openstack.common import test
 from ceilometer.openstack.common import timeutils
+from ceilometer.openstack.common.fixture import config
+from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer.storage.models import Alarm as AlarmModel
-from ceilometer.tests import base
 from ceilometerclient.v2.alarms import Alarm as AlarmClient
 
 
-class TestRPCAlarmNotifier(base.TestCase):
+class TestRPCAlarmNotifier(test.BaseTestCase):
     def faux_cast(self, context, topic, msg):
         self.notified.append((topic, msg))
+        self.CONF = self.useFixture(config.Config()).conf
 
     def setUp(self):
         super(TestRPCAlarmNotifier, self).setUp()
         self.notified = []
+        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
         self.stubs.Set(rpc, 'cast', self.faux_cast)
         self.notifier = rpc_alarm.RPCAlarmNotifier()
         self.alarms = [
@@ -82,7 +84,7 @@ class TestRPCAlarmNotifier(base.TestCase):
         for i, a in enumerate(self.alarms):
             actions = getattr(a, AlarmModel.ALARM_ACTIONS_MAP[a.state])
             self.assertEqual(self.notified[i][0],
-                             cfg.CONF.alarm.notifier_rpc_topic)
+                             self.CONF.alarm.notifier_rpc_topic)
             self.assertEqual(self.notified[i][1]["args"]["data"]["alarm_id"],
                              self.alarms[i].alarm_id)
             self.assertEqual(self.notified[i][1]["args"]["data"]["actions"],
@@ -120,13 +122,14 @@ class TestRPCAlarmNotifier(base.TestCase):
         self.assertEqual(len(self.notified), 0)
 
 
-class TestRPCAlarmPartitionCoordination(base.TestCase):
+class TestRPCAlarmPartitionCoordination(test.BaseTestCase):
     def faux_fanout_cast(self, context, topic, msg):
         self.notified.append((topic, msg))
 
     def setUp(self):
         super(TestRPCAlarmPartitionCoordination, self).setUp()
         self.notified = []
+        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
         self.stubs.Set(rpc, 'fanout_cast', self.faux_fanout_cast)
         self.ordination = rpc_alarm.RPCAlarmPartitionCoordination()
         self.alarms = [mock.MagicMock(), mock.MagicMock()]

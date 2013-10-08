@@ -19,11 +19,10 @@ import urlparse
 import mock
 import requests
 
-from oslo.config import cfg
-
 from ceilometer.alarm import service
 from ceilometer.openstack.common import context
-from ceilometer.tests import base
+from ceilometer.openstack.common import test
+from ceilometer.openstack.common.fixture import config
 
 
 DATA_JSON = ('{"current": "ALARM", "alarm_id": "foobar",'
@@ -35,10 +34,11 @@ NOTIFICATION = dict(alarm_id='foobar',
                     current='ALARM')
 
 
-class TestAlarmNotifier(base.TestCase):
+class TestAlarmNotifier(test.BaseTestCase):
 
     def setUp(self):
         super(TestAlarmNotifier, self).setUp()
+        self.CONF = self.useFixture(config.Config()).conf
         self.service = service.AlarmNotifierService('somehost', 'sometopic')
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
@@ -102,8 +102,8 @@ class TestAlarmNotifier(base.TestCase):
         action = 'https://host/action'
         certificate = "/etc/ssl/cert/whatever.pem"
 
-        cfg.CONF.set_override("rest_notifier_certificate_file", certificate,
-                              group='alarm')
+        self.CONF.set_override("rest_notifier_certificate_file", certificate,
+                               group='alarm')
 
         with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
             with mock.patch.object(requests, 'post') as poster:
@@ -117,10 +117,10 @@ class TestAlarmNotifier(base.TestCase):
         certificate = "/etc/ssl/cert/whatever.pem"
         key = "/etc/ssl/cert/whatever.key"
 
-        cfg.CONF.set_override("rest_notifier_certificate_file", certificate,
-                              group='alarm')
-        cfg.CONF.set_override("rest_notifier_certificate_key", key,
-                              group='alarm')
+        self.CONF.set_override("rest_notifier_certificate_file", certificate,
+                               group='alarm')
+        self.CONF.set_override("rest_notifier_certificate_key", key,
+                               group='alarm')
 
         with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
             with mock.patch.object(requests, 'post') as poster:
@@ -132,8 +132,8 @@ class TestAlarmNotifier(base.TestCase):
     def test_notify_alarm_rest_action_with_ssl_verify_disable_by_cfg(self):
         action = 'https://host/action'
 
-        cfg.CONF.set_override("rest_notifier_ssl_verify", False,
-                              group='alarm')
+        self.CONF.set_override("rest_notifier_ssl_verify", False,
+                               group='alarm')
 
         with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
             with mock.patch.object(requests, 'post') as poster:
@@ -155,8 +155,8 @@ class TestAlarmNotifier(base.TestCase):
     def test_notify_alarm_rest_action_with_ssl_verify_enable_by_user(self):
         action = 'https://host/action?ceilometer-alarm-ssl-verify=1'
 
-        cfg.CONF.set_override("rest_notifier_ssl_verify", False,
-                              group='alarm')
+        self.CONF.set_override("rest_notifier_ssl_verify", False,
+                               group='alarm')
 
         with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
             with mock.patch.object(requests, 'post') as poster:

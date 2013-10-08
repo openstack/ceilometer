@@ -21,17 +21,18 @@
 import os
 import tempfile
 import logging.handlers
-from oslo.config import cfg
 
 from ceilometer.collector.dispatcher import file
+from ceilometer.openstack.common import test
+from ceilometer.openstack.common.fixture import config
 from ceilometer.publisher import rpc
-from ceilometer.tests import base as tests_base
 
 
-class TestDispatcherFile(tests_base.TestCase):
+class TestDispatcherFile(test.BaseTestCase):
 
     def setUp(self):
         super(TestDispatcherFile, self).setUp()
+        self.CONF = self.useFixture(config.Config()).conf
 
     def test_file_dispatcher_with_all_config(self):
         # Create a temporaryFile to get a file name
@@ -39,10 +40,10 @@ class TestDispatcherFile(tests_base.TestCase):
         filename = tf.name
         tf.close()
 
-        cfg.CONF.dispatcher_file.file_path = filename
-        cfg.CONF.dispatcher_file.max_bytes = 50
-        cfg.CONF.dispatcher_file.backup_count = 5
-        dispatcher = file.FileDispatcher(cfg.CONF)
+        self.CONF.dispatcher_file.file_path = filename
+        self.CONF.dispatcher_file.max_bytes = 50
+        self.CONF.dispatcher_file.backup_count = 5
+        dispatcher = file.FileDispatcher(self.CONF)
 
         # The number of the handlers should be 1
         self.assertEqual(1, len(dispatcher.log.handlers))
@@ -57,7 +58,7 @@ class TestDispatcherFile(tests_base.TestCase):
                }
         msg['message_signature'] = rpc.compute_signature(
             msg,
-            cfg.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher_rpc.metering_secret,
         )
 
         # The record_metering_data method should exist and not produce errors.
@@ -71,10 +72,10 @@ class TestDispatcherFile(tests_base.TestCase):
         filename = tf.name
         tf.close()
 
-        cfg.CONF.dispatcher_file.file_path = filename
-        cfg.CONF.dispatcher_file.max_bytes = None
-        cfg.CONF.dispatcher_file.backup_count = None
-        dispatcher = file.FileDispatcher(cfg.CONF)
+        self.CONF.dispatcher_file.file_path = filename
+        self.CONF.dispatcher_file.max_bytes = None
+        self.CONF.dispatcher_file.backup_count = None
+        dispatcher = file.FileDispatcher(self.CONF)
 
         # The number of the handlers should be 1
         self.assertEqual(1, len(dispatcher.log.handlers))
@@ -89,7 +90,7 @@ class TestDispatcherFile(tests_base.TestCase):
                }
         msg['message_signature'] = rpc.compute_signature(
             msg,
-            cfg.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher_rpc.metering_secret,
         )
 
         # The record_metering_data method should exist and not produce errors.
@@ -98,8 +99,8 @@ class TestDispatcherFile(tests_base.TestCase):
         self.assertTrue(os.path.exists(handler.baseFilename))
 
     def test_file_dispatcher_with_no_path(self):
-        cfg.CONF.dispatcher_file.file_path = None
-        dispatcher = file.FileDispatcher(cfg.CONF)
+        self.CONF.dispatcher_file.file_path = None
+        dispatcher = file.FileDispatcher(self.CONF)
 
         # The log should be None
         self.assertIsNone(dispatcher.log)
