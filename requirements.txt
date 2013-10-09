@@ -21,7 +21,7 @@ python-ceilometerclient>=1.0.5
 python-swiftclient>=1.5
 lxml>=2.3
 requests>=1.1
-six
+six>=1.4.1
 WSME>=0.5b5
 PyYAML>=3.1.0
 oslo.config>=1.2.0
