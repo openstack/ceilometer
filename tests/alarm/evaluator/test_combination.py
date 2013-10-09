@@ -103,7 +103,7 @@ class TestEvaluate(base.TestEvaluatorBase):
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
             broken = exc.CommunicationError(message='broken')
-            self.api_client.alarm.get.side_effect = [
+            self.api_client.alarms.get.side_effect = [
                 broken,
                 broken,
                 broken,
@@ -123,7 +123,7 @@ class TestEvaluate(base.TestEvaluatorBase):
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
             broken = exc.CommunicationError(message='broken')
-            self.api_client.alarm.get.side_effect = broken
+            self.api_client.alarms.get.side_effect = broken
             self._evaluate_all_alarms()
             self._assert_all_alarms('insufficient data')
             expected = [mock.call(alarm.alarm_id, state='insufficient data')
@@ -141,7 +141,7 @@ class TestEvaluate(base.TestEvaluatorBase):
         self._set_all_alarms('insufficient data')
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
-            self.api_client.alarm.get.side_effect = [
+            self.api_client.alarms.get.side_effect = [
                 self._get_alarm('ok'),
                 self._get_alarm('ok'),
                 self._get_alarm('ok'),
@@ -161,7 +161,7 @@ class TestEvaluate(base.TestEvaluatorBase):
         self._set_all_alarms('alarm')
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
-            self.api_client.alarm.get.side_effect = [
+            self.api_client.alarms.get.side_effect = [
                 self._get_alarm('ok'),
                 self._get_alarm('ok'),
                 self._get_alarm('alarm'),
@@ -181,7 +181,7 @@ class TestEvaluate(base.TestEvaluatorBase):
         self._set_all_alarms('ok')
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
-            self.api_client.alarm.get.side_effect = [
+            self.api_client.alarms.get.side_effect = [
                 self._get_alarm('alarm'),
                 self._get_alarm('alarm'),
                 self._get_alarm('alarm'),
@@ -201,7 +201,7 @@ class TestEvaluate(base.TestEvaluatorBase):
         self._set_all_alarms('ok')
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
-            self.api_client.alarm.get.side_effect = [
+            self.api_client.alarms.get.side_effect = [
                 self._get_alarm('ok'),
                 self._get_alarm('alarm'),
                 self._get_alarm('alarm'),
@@ -222,7 +222,7 @@ class TestEvaluate(base.TestEvaluatorBase):
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
             broken = exc.CommunicationError(message='broken')
-            self.api_client.alarm.get.side_effect = [
+            self.api_client.alarms.get.side_effect = [
                 broken,
                 self._get_alarm('ok'),
                 self._get_alarm('insufficient data'),
@@ -249,7 +249,7 @@ class TestEvaluate(base.TestEvaluatorBase):
         self._set_all_alarms('ok')
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
-            self.api_client.alarm.get.side_effect = [
+            self.api_client.alarms.get.side_effect = [
                 self._get_alarm('ok'),
                 self._get_alarm('ok'),
                 self._get_alarm('ok'),
@@ -266,7 +266,7 @@ class TestEvaluate(base.TestEvaluatorBase):
         self._set_all_alarms('ok')
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
-            self.api_client.alarm.get.side_effect = [
+            self.api_client.alarms.get.side_effect = [
                 self._get_alarm('ok'),
                 self._get_alarm('ok'),
                 self._get_alarm('ok'),
