@@ -21,8 +21,6 @@ import datetime
 import json
 import testscenarios
 
-from oslo.config import cfg
-
 from ceilometer import sample
 from ceilometer.api import acl
 from ceilometer.publisher import rpc
@@ -106,7 +104,7 @@ class TestAPIACL(FunctionalTest,
                     source='test_source')]:
             msg = rpc.meter_message_from_counter(
                 cnt,
-                cfg.CONF.publisher_rpc.metering_secret)
+                self.CONF.publisher_rpc.metering_secret)
             self.conn.record_metering_data(msg)
 
     def get_json(self, path, expect_errors=False, headers=None,
@@ -119,7 +117,7 @@ class TestAPIACL(FunctionalTest,
                                                 **params)
 
     def _make_app(self):
-        cfg.CONF.set_override("cache", "fake.cache", group=acl.OPT_GROUP_NAME)
+        self.CONF.set_override("cache", "fake.cache", group=acl.OPT_GROUP_NAME)
         return super(TestAPIACL, self)._make_app(enable_acl=True)
 
     def test_non_authenticated(self):

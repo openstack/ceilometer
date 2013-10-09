@@ -27,8 +27,6 @@ import mock
 import uuid
 import testscenarios
 
-from oslo.config import cfg
-
 from .base import FunctionalTest
 
 from ceilometer.storage.models import Alarm
@@ -53,7 +51,6 @@ class TestAlarms(FunctionalTest,
 
     def setUp(self):
         super(TestAlarms, self).setUp()
-
         self.auth_headers = {'X-User-Id': str(uuid.uuid4()),
                              'X-Project-Id': str(uuid.uuid4())}
         for alarm in [Alarm(name='name1',
@@ -996,14 +993,14 @@ class TestAlarms(FunctionalTest,
                             '%s not in %s' % (fragment, actual))
 
     def test_record_alarm_history_config(self):
-        cfg.CONF.set_override('record_history', False, group='alarm')
+        self.CONF.set_override('record_history', False, group='alarm')
         alarm = self._get_alarm('a')
         history = self._get_alarm_history(alarm)
         self.assertEqual([], history)
         self._update_alarm(alarm, dict(name='renamed'))
         history = self._get_alarm_history(alarm)
         self.assertEqual([], history)
-        cfg.CONF.set_override('record_history', True, group='alarm')
+        self.CONF.set_override('record_history', True, group='alarm')
         self._update_alarm(alarm, dict(name='foobar'))
         history = self._get_alarm_history(alarm)
         self.assertEqual(1, len(history))

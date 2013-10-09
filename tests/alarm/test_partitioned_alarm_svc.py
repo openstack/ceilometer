@@ -22,22 +22,23 @@ from contextlib import nested
 from stevedore import extension
 from stevedore.tests import manager as extension_tests
 
-from oslo.config import cfg
-
 from ceilometer.alarm import service
-from ceilometer.tests import base
+from ceilometer.openstack.common import test
+from ceilometer.openstack.common.fixture import config
 
 
-class TestPartitionedAlarmService(base.TestCase):
+class TestPartitionedAlarmService(test.BaseTestCase):
     def setUp(self):
         super(TestPartitionedAlarmService, self).setUp()
         self.threshold_eval = mock.Mock()
         self.api_client = mock.MagicMock()
-        cfg.CONF.set_override('host',
-                              'fake_host')
-        cfg.CONF.set_override('partition_rpc_topic',
-                              'fake_topic',
-                              group='alarm')
+        self.CONF = self.useFixture(config.Config()).conf
+
+        self.CONF.set_override('host',
+                               'fake_host')
+        self.CONF.set_override('partition_rpc_topic',
+                               'fake_topic',
+                               group='alarm')
         self.partitioned = service.PartitionedAlarmService()
         self.partitioned.tg = mock.Mock()
         self.partitioned.partition_coordinator = mock.Mock()
@@ -54,9 +55,9 @@ class TestPartitionedAlarmService(base.TestCase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_start(self):
         test_interval = 120
-        cfg.CONF.set_override('evaluation_interval',
-                              test_interval,
-                              group='alarm')
+        self.CONF.set_override('evaluation_interval',
+                               test_interval,
+                               group='alarm')
         get_client = 'ceilometerclient.client.get_client'
         create_conn = 'ceilometer.openstack.common.rpc.create_connection'
         with nested(mock.patch(get_client, return_value=self.api_client),

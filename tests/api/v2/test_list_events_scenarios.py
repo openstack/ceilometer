@@ -23,8 +23,6 @@ import logging
 import webtest.app
 import testscenarios
 
-from oslo.config import cfg
-
 from ceilometer.publisher import rpc
 from ceilometer import sample
 from ceilometer.tests import db as tests_db
@@ -59,7 +57,7 @@ class TestListEvents(FunctionalTest,
         )
         msg = rpc.meter_message_from_counter(
             self.sample1,
-            cfg.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg)
 
@@ -79,7 +77,7 @@ class TestListEvents(FunctionalTest,
         )
         msg2 = rpc.meter_message_from_counter(
             self.sample2,
-            cfg.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg2)
 

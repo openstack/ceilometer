@@ -23,8 +23,6 @@ import json
 import logging
 import testscenarios
 
-from oslo.config import cfg
-
 from ceilometer.publisher import rpc
 from ceilometer import sample
 from ceilometer.tests import db as tests_db
@@ -60,7 +58,7 @@ class TestListResources(FunctionalTest,
         )
         msg = rpc.meter_message_from_counter(
             sample1,
-            cfg.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg)
 
@@ -84,7 +82,7 @@ class TestListResources(FunctionalTest,
         )
         msg = rpc.meter_message_from_counter(
             sample1,
-            cfg.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg)
 
@@ -104,7 +102,7 @@ class TestListResources(FunctionalTest,
         )
         msg2 = rpc.meter_message_from_counter(
             sample2,
-            cfg.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg2)
 
@@ -128,7 +126,7 @@ class TestListResources(FunctionalTest,
         )
         msg = rpc.meter_message_from_counter(
             sample1,
-            cfg.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg)
 
@@ -148,7 +146,7 @@ class TestListResources(FunctionalTest,
         )
         msg2 = rpc.meter_message_from_counter(
             sample2,
-            cfg.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg2)
 
@@ -172,7 +170,7 @@ class TestListResources(FunctionalTest,
         )
         msg = rpc.meter_message_from_counter(
             sample1,
-            cfg.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg)
 
@@ -192,7 +190,7 @@ class TestListResources(FunctionalTest,
         )
         msg2 = rpc.meter_message_from_counter(
             sample2,
-            cfg.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg2)
 
@@ -219,7 +217,7 @@ class TestListResources(FunctionalTest,
         )
         msg = rpc.meter_message_from_counter(
             sample1,
-            cfg.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg)
 
@@ -239,7 +237,7 @@ class TestListResources(FunctionalTest,
         )
         msg2 = rpc.meter_message_from_counter(
             sample2,
-            cfg.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg2)
 
@@ -272,7 +270,7 @@ class TestListResources(FunctionalTest,
         )
         msg = rpc.meter_message_from_counter(
             sample1,
-            cfg.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg)
 
@@ -292,7 +290,7 @@ class TestListResources(FunctionalTest,
         )
         msg2 = rpc.meter_message_from_counter(
             sample2,
-            cfg.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg2)
 
@@ -319,7 +317,7 @@ class TestListResources(FunctionalTest,
         )
         msg = rpc.meter_message_from_counter(
             sample1,
-            cfg.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg)
 
@@ -339,7 +337,7 @@ class TestListResources(FunctionalTest,
         )
         msg2 = rpc.meter_message_from_counter(
             sample2,
-            cfg.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg2)
 
@@ -366,7 +364,7 @@ class TestListResources(FunctionalTest,
         )
         msg2 = rpc.meter_message_from_counter(
             sample1,
-            cfg.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg2)
 
@@ -393,7 +391,7 @@ class TestListResources(FunctionalTest,
         )
         msg2 = rpc.meter_message_from_counter(
             sample1,
-            cfg.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg2)
 
@@ -422,7 +420,7 @@ class TestListResources(FunctionalTest,
         )
         msg = rpc.meter_message_from_counter(
             sample1,
-            cfg.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg)
 
@@ -452,7 +450,7 @@ class TestListResources(FunctionalTest,
         )
         msg = rpc.meter_message_from_counter(
             sample1,
-            cfg.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg)
 
