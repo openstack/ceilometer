@@ -15,6 +15,7 @@
 #    under the License.
 """Test the methods related to query."""
 import datetime
+import mock
 
 import wsme
 
@@ -169,6 +170,7 @@ class TestQueryToKwArgs(tests_base.TestCase):
     def setUp(self):
         super(TestQueryToKwArgs, self).setUp()
         self.stubs.Set(api, '_sanitize_query', lambda x, y, **z: x)
+        self.stubs.Set(api, '_verify_query_segregation', lambda x, **z: x)
 
     def test_sample_filter_single(self):
         q = [Query(field='user_id',
@@ -241,12 +243,13 @@ class TestQueryToKwArgs(tests_base.TestCase):
                          op='le',
                          value='ramdisk',
                          type='string')]
-        self.assertRaises(
-            wsme.exc.InvalidInput,
-            api._query_to_kwargs,
-            queries,
-            storage.SampleFilter.__init__,
-            headers={'X-ProjectId': 'foobar'})
+        with mock.patch('pecan.request') as request:
+            request.headers.return_value = {'X-ProjectId': 'foobar'}
+            self.assertRaises(
+                wsme.exc.InvalidInput,
+                api._query_to_kwargs,
+                queries,
+                storage.SampleFilter.__init__)
 
     def test_sample_filter_invalid_field(self):
         q = [Query(field='invalid',
@@ -278,21 +281,23 @@ class TestQueryToKwArgs(tests_base.TestCase):
                          op='eq',
                          value='fake',
                          type='string') for f in ['y', 'on_behalf_of', 'x']]
-        self.assertRaises(wsme.exc.ClientSideError,
-                          api._query_to_kwargs,
-                          queries,
-                          storage.SampleFilter.__init__,
-                          headers={'X-ProjectId': 'foobar'},
-                          internal_keys=['on_behalf_of'])
+        with mock.patch('pecan.request') as request:
+            request.headers.return_value = {'X-ProjectId': 'foobar'}
+            self.assertRaises(wsme.exc.ClientSideError,
+                              api._query_to_kwargs,
+                              queries,
+                              storage.SampleFilter.__init__,
+                              internal_keys=['on_behalf_of'])
 
     def test_sample_filter_self_always_excluded(self):
         queries = [Query(field='user_id',
                          op='eq',
                          value='20')]
-        kwargs = api._query_to_kwargs(queries,
-                                      storage.SampleFilter.__init__,
-                                      headers={'X-ProjectId': 'foobar'})
-        self.assertFalse('self' in kwargs)
+        with mock.patch('pecan.request') as request:
+            request.headers.return_value = {'X-ProjectId': 'foobar'}
+            kwargs = api._query_to_kwargs(queries,
+                                          storage.SampleFilter.__init__)
+            self.assertFalse('self' in kwargs)
 
     def test_sample_filter_translation(self):
         queries = [Query(field=f,
@@ -301,8 +306,9 @@ class TestQueryToKwArgs(tests_base.TestCase):
                          type='string') for f in ['user_id',
                                                   'project_id',
                                                   'resource_id']]
-        kwargs = api._query_to_kwargs(queries,
-                                      storage.SampleFilter.__init__,
-                                      headers={'X-ProjectId': 'foobar'})
-        for o in ['user', 'project', 'resource']:
-            self.assertEqual(kwargs.get(o), 'fake_%s_id' % o)
+        with mock.patch('pecan.request') as request:
+            request.headers.return_value = {'X-ProjectId': 'foobar'}
+            kwargs = api._query_to_kwargs(queries,
+                                          storage.SampleFilter.__init__)
+            for o in ['user', 'project', 'resource']:
+                self.assertEqual(kwargs.get(o), 'fake_%s_id' % o)

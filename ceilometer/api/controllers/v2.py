@@ -24,6 +24,7 @@
 """
 import ast
 import base64
+import copy
 import datetime
 import inspect
 import json
@@ -275,20 +276,29 @@ class ProjectNotAuthorized(Exception):
             _("Not Authorized to access project %s") % id)
 
 
-def _sanitize_query(q, valid_keys, headers=None):
+def _sanitize_query(query, db_func, on_behalf_of=None):
     '''Check the query to see if:
     1) the request is coming from admin - then allow full visibility
     2) non-admin - make sure that the query includes the requester's
     project.
     '''
-    auth_project = acl.get_limited_to_project(headers or
-                                              pecan.request.headers)
-    if auth_project:
-        proj_q = [i for i in q if i.field == 'project_id']
-        for i in proj_q:
-            if auth_project != i.value or i.op != 'eq':
-                raise ProjectNotAuthorized(i.value)
+    q = copy.copy(query)
+    auth_project = acl.get_limited_to_project(pecan.request.headers)
+    created_by = pecan.request.headers.get('X-Project-Id')
 
+    # when an alarm is created by an admin on behalf of another tenant
+    # we must ensure that an implicit query constraint on project_id is
+    # added so that admin-level visibility on statistics is not leaked,
+    # hence for null auth_project (indicating admin-ness) we check if
+    # the creating tenant differs from the tenant on whose behalf the
+    # alarm is being created
+    auth_project = (auth_project or
+                    (on_behalf_of if on_behalf_of != created_by else None))
+    if auth_project:
+        _verify_query_segregation(q, auth_project)
+
+        proj_q = [i for i in q if i.field == 'project_id']
+        valid_keys = inspect.getargspec(db_func)[0]
         if not proj_q and 'on_behalf_of' not in valid_keys:
             # The user is restricted, but they didn't specify a project
             # so add it for them.
@@ -298,11 +308,66 @@ def _sanitize_query(q, valid_keys, headers=None):
     return q
 
 
-def _query_to_kwargs(query, db_func, internal_keys=[], headers=None):
+def _verify_query_segregation(query, auth_project=None):
+    '''Ensure non-admin queries are not constrained to another project.'''
+    auth_project = (auth_project or
+                    acl.get_limited_to_project(pecan.request.headers))
+    if auth_project:
+        for q in query:
+            if q.field == 'project_id' and (auth_project != q.value or
+                                            q.op != 'eq'):
+                raise ProjectNotAuthorized(q.value)
+
+
+def _validate_query(query, db_func, internal_keys=[]):
+    _verify_query_segregation(query)
+
     valid_keys = inspect.getargspec(db_func)[0]
-    query = _sanitize_query(query, valid_keys, headers=headers)
     internal_keys.append('self')
     valid_keys = set(valid_keys) - set(internal_keys)
+    translation = {'user_id': 'user',
+                   'project_id': 'project',
+                   'resource_id': 'resource'}
+    has_timestamp = False
+    for i in query:
+        if i.field == 'timestamp':
+            has_timestamp = True
+            if i.op not in ('lt', 'le', 'gt', 'ge'):
+                raise wsme.exc.InvalidInput('op', i.op,
+                                            'unimplemented operator for %s' %
+                                            i.field)
+        else:
+            if i.op == 'eq':
+                if i.field == 'search_offset':
+                    has_timestamp = True
+                elif i.field == 'enabled':
+                    i._get_value_as_type('boolean')
+                elif i.field.startswith('metadata.'):
+                    i._get_value_as_type()
+                elif i.field.startswith('resource_metadata.'):
+                    i._get_value_as_type()
+                else:
+                    key = translation.get(i.field, i.field)
+                    if key not in valid_keys:
+                        msg = ("unrecognized field in query: %s, "
+                               "valid keys: %s") % (query, valid_keys)
+                        raise wsme.exc.UnknownArgument(key, msg)
+            else:
+                raise wsme.exc.InvalidInput('op', i.op,
+                                            'unimplemented operator for %s' %
+                                            i.field)
+
+    if has_timestamp and not ('start' in valid_keys or
+                              'start_timestamp' in valid_keys):
+        raise wsme.exc.UnknownArgument('timestamp',
+                                       "not valid for this resource")
+
+
+def _query_to_kwargs(query, db_func, internal_keys=[]):
+    _validate_query(query, db_func, internal_keys=internal_keys)
+    query = _sanitize_query(query, db_func)
+    internal_keys.append('self')
+    valid_keys = set(inspect.getargspec(db_func)[0]) - set(internal_keys)
     translation = {'user_id': 'user',
                    'project_id': 'project',
                    'resource_id': 'resource'}
@@ -317,10 +382,6 @@ def _query_to_kwargs(query, db_func, internal_keys=[], headers=None):
             elif i.op in ('gt', 'ge'):
                 stamp['start_timestamp'] = i.value
                 stamp['start_timestamp_op'] = i.op
-            else:
-                raise wsme.exc.InvalidInput('op', i.op,
-                                            'unimplemented operator for %s' %
-                                            i.field)
         else:
             if i.op == 'eq':
                 if i.field == 'search_offset':
@@ -333,15 +394,7 @@ def _query_to_kwargs(query, db_func, internal_keys=[], headers=None):
                     metaquery[i.field[9:]] = i._get_value_as_type()
                 else:
                     key = translation.get(i.field, i.field)
-                    if key not in valid_keys:
-                        msg = ("unrecognized field in query: %s, "
-                               "valid keys: %s") % (query, valid_keys)
-                        raise wsme.exc.UnknownArgument(key, msg)
                     kwargs[key] = i.value
-            else:
-                raise wsme.exc.InvalidInput('op', i.op,
-                                            'unimplemented operator for %s' %
-                                            i.field)
 
     if metaquery and 'metaquery' in valid_keys:
         kwargs['metaquery'] = metaquery
@@ -353,9 +406,6 @@ def _query_to_kwargs(query, db_func, internal_keys=[], headers=None):
         elif 'start_timestamp' in valid_keys:
             kwargs['start_timestamp'] = q_ts['query_start']
             kwargs['end_timestamp'] = q_ts['query_end']
-        else:
-            raise wsme.exc.UnknownArgument('timestamp',
-                                           "not valid for this resource")
         if 'start_timestamp_op' in stamp:
             kwargs['start_timestamp_op'] = stamp['start_timestamp_op']
         if 'end_timestamp_op' in stamp:
@@ -955,11 +1005,10 @@ class AlarmThresholdRule(_Base):
         if not threshold_rule.query:
             threshold_rule.query = []
 
-        #note(sileht): _query_to_kwargs implicitly call _sanitize_query
-        #that add project_id in query
-        _query_to_kwargs(threshold_rule.query, storage.SampleFilter.__init__,
-                         internal_keys=['timestamp', 'start', 'start_timestamp'
-                                        'end', 'end_timestamp'])
+        timestamp_keys = ['timestamp', 'start', 'start_timestamp' 'end',
+                          'end_timestamp']
+        _validate_query(threshold_rule.query, storage.SampleFilter.__init__,
+                        internal_keys=timestamp_keys)
         return threshold_rule
 
     @property
@@ -1121,6 +1170,14 @@ class Alarm(_Base):
                 error = _("%s is mandatory") % field
                 pecan.response.translatable_error = error
                 raise wsme.exc.ClientSideError(unicode(error))
+        if alarm.threshold_rule:
+            # ensure an implicit constraint on project_id is added to
+            # the query if not already present
+            alarm.threshold_rule.query = _sanitize_query(
+                alarm.threshold_rule.query,
+                storage.SampleFilter.__init__,
+                on_behalf_of=alarm.project_id
+            )
 
         if alarm.threshold_rule and alarm.combination_rule:
             error = _("threshold_rule and combination_rule "

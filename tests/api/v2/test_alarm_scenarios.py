@@ -455,7 +455,7 @@ class TestAlarms(FunctionalTest,
         else:
             self.fail("Alarm not found")
 
-    def test_post_alarm_as_admin(self):
+    def _do_test_post_alarm_as_admin(self, explicit_project_constraint):
         """Test the creation of an alarm as admin for another project."""
         json = {
             'enabled': False,
@@ -469,9 +469,7 @@ class TestAlarms(FunctionalTest,
                 'query': [{'field': 'metadata.field',
                            'op': 'eq',
                            'value': '5',
-                           'type': 'string'},
-                          {'field': 'project_id', 'op': 'eq',
-                           'value': 'aprojectidthatisnotmine'}],
+                           'type': 'string'}],
                 'comparison_operator': 'le',
                 'statistic': 'count',
                 'threshold': 50,
@@ -479,6 +477,10 @@ class TestAlarms(FunctionalTest,
                 'period': 180,
             }
         }
+        if explicit_project_constraint:
+            project_constraint = {'field': 'project_id', 'op': 'eq',
+                                  'value': 'aprojectidthatisnotmine'}
+            json['threshold_rule']['query'].append(project_constraint)
         headers = {}
         headers.update(self.auth_headers)
         headers['X-Roles'] = 'admin'
@@ -492,12 +494,34 @@ class TestAlarms(FunctionalTest,
             for key in json:
                 if key.endswith('_rule'):
                     storage_key = 'rule'
+                    if explicit_project_constraint:
+                        self.assertEqual(getattr(alarms[0], storage_key),
+                                         json[key])
+                    else:
+                        query = getattr(alarms[0], storage_key).get('query')
+                        self.assertEqual(len(query), 2)
+                        implicit_constraint = {
+                            u'field': u'project_id',
+                            u'value': u'aprojectidthatisnotmine',
+                            u'op': u'eq'
+                        }
+                        self.assertEqual(query[1], implicit_constraint)
                 else:
-                    storage_key = key
-                self.assertEqual(getattr(alarms[0], storage_key),
-                                 json[key])
+                    self.assertEqual(getattr(alarms[0], key), json[key])
         else:
             self.fail("Alarm not found")
+
+    def test_post_alarm_as_admin_explicit_project_constraint(self):
+        """Test the creation of an alarm as admin for another project,
+        with an explicit query constraint on the owner's project ID.
+        """
+        self._do_test_post_alarm_as_admin(True)
+
+    def test_post_alarm_as_admin_implicit_project_constraint(self):
+        """Test the creation of an alarm as admin for another project,
+        without an explicit query constraint on the owner's project ID.
+        """
+        self._do_test_post_alarm_as_admin(False)
 
     def test_post_alarm_as_admin_no_user(self):
         """Test the creation of an alarm as admin for another project but
