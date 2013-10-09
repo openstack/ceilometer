@@ -21,7 +21,7 @@
 from ceilometer import notifier
 from ceilometer import pipeline
 from ceilometer import transformer
-from ceilometer.tests import base as tests_base
+from ceilometer.openstack.common import test
 
 
 MESSAGE = {
@@ -64,7 +64,7 @@ MESSAGE = {
 }
 
 
-class TestNotifier(tests_base.TestCase):
+class TestNotifier(test.BaseTestCase):
 
     def test_process_notification(self):
         transformer_manager = transformer.TransformerExtensionManager(

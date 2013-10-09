@@ -20,15 +20,17 @@
 import mock
 
 import novaclient
-from ceilometer.tests import base
 from ceilometer import nova_client
+from ceilometer.openstack.common import test
+from ceilometer.openstack.common.fixture import moxstubout
 
 
-class TestNovaClient(base.TestCase):
+class TestNovaClient(test.BaseTestCase):
 
     def setUp(self):
         super(TestNovaClient, self).setUp()
         self.nv = nova_client.Client()
+        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
         self.stubs.Set(self.nv.nova_client.flavors, 'get',
                        self.fake_flavors_get)
         self.stubs.Set(self.nv.nova_client.images, 'get', self.fake_images_get)
