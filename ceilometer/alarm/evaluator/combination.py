@@ -31,7 +31,7 @@ class CombinationEvaluator(evaluator.Evaluator):
 
     def _get_alarm_state(self, alarm_id):
         try:
-            alarm = self._client.alarm.get(alarm_id)
+            alarm = self._client.alarms.get(alarm_id)
         except Exception:
             LOG.exception(_('alarm retrieval failed'))
             return None
