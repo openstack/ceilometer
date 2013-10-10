@@ -118,6 +118,19 @@
 
 
 #
+# Options defined in ceilometer.openstack.common.deprecated.wsgi
+#
+
+# Number of backlog requests to configure the socket with
+# (integer value)
+#backlog=4096
+
+# Sets the value of TCP_KEEPIDLE in seconds for each server
+# socket. Not supported on OS X. (integer value)
+#tcp_keepidle=600
+
+
+#
 # Options defined in ceilometer.openstack.common.eventlet_backdoor
 #
 
@@ -225,6 +238,15 @@
 
 
 #
+# Options defined in ceilometer.openstack.common.middleware.sizelimit
+#
+
+# the maximum body size per each request(bytes) (integer
+# value)
+#max_request_body_size=114688
+
+
+#
 # Options defined in ceilometer.openstack.common.notifier.api
 #
 
@@ -245,7 +267,7 @@
 # Options defined in ceilometer.openstack.common.notifier.rpc_notifier
 #
 
-# AMQP topic used for openstack notifications (list value)
+# AMQP topic used for OpenStack notifications (list value)
 #notification_topics=notifications
 
 
@@ -285,7 +307,7 @@
 
 # Modules of exceptions that are permitted to be recreatedupon
 # receiving exception data from an rpc call. (list value)
-#allowed_rpc_exception_modules=ceilometer.openstack.common.exception,nova.exception,cinder.exception,exceptions
+#allowed_rpc_exception_modules=nova.exception,cinder.exception,exceptions
 
 # If passed, use a fake RabbitMQ provider (boolean value)
 #fake_rabbit=false
@@ -637,7 +659,7 @@
 # Options defined in ceilometer.openstack.common.notifier.rpc_notifier2
 #
 
-# AMQP topic(s) used for openstack notifications (list value)
+# AMQP topic(s) used for OpenStack notifications (list value)
 #topics=notifications
 
 

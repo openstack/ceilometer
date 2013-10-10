@@ -221,6 +221,9 @@ class ProcessLauncher(object):
         status = None
         signo = 0
 
+        # NOTE(johannes): All exceptions are caught to ensure this
+        # doesn't fallback into the loop spawning children. It would
+        # be bad for a child to spawn more children.
         try:
             launcher.wait()
         except SignalExit as exc:
@@ -273,9 +276,6 @@ class ProcessLauncher(object):
 
         pid = os.fork()
         if pid == 0:
-            # NOTE(johannes): All exceptions are caught to ensure this
-            # doesn't fallback into the loop spawning children. It would
-            # be bad for a child to spawn more children.
             launcher = self._child_process(wrap.service)
             while True:
                 self._child_process_handle_signal()

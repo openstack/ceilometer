@@ -57,6 +57,8 @@ class RequestNotifier(base.Middleware):
 
     def __init__(self, app, **conf):
         self.service_name = conf.get('service_name', None)
+        self.ignore_req_list = [x.upper().strip() for x in
+                                conf.get('ignore_req_list', '').split(',')]
         super(RequestNotifier, self).__init__(app)
 
     @staticmethod
@@ -109,13 +111,16 @@ class RequestNotifier(base.Middleware):
 
     @webob.dec.wsgify
     def __call__(self, req):
-        self.process_request(req)
-        try:
-            response = req.get_response(self.application)
-        except Exception:
-            type, value, traceback = sys.exc_info()
-            self.process_response(req, None, value, traceback)
-            raise
+        if req.method in self.ignore_req_list:
+            return req.get_response(self.application)
         else:
-            self.process_response(req, response)
-        return response
+            self.process_request(req)
+            try:
+                response = req.get_response(self.application)
+            except Exception:
+                type, value, traceback = sys.exc_info()
+                self.process_response(req, None, value, traceback)
+                raise
+            else:
+                self.process_response(req, response)
+            return response
