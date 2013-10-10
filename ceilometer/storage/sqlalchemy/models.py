@@ -191,7 +191,7 @@ class Resource(Base):
     )
     id = Column(String(255), primary_key=True)
     sources = relationship("Source", secondary=lambda: sourceassoc)
-    resource_metadata = Column(JSONEncodedDict(5000))
+    resource_metadata = Column(JSONEncodedDict())
     user_id = Column(String(255), ForeignKey('user.id'))
     project_id = Column(String(255), ForeignKey('project.id'))
     meters = relationship("Meter", backref='resource')
