@@ -646,7 +646,104 @@ class TestAlarms(FunctionalTest,
         else:
             self.fail("Alarm not found")
 
+    def test_post_combination_alarm_as_user_with_unauthorized_alarm(self):
+        """Test that post a combination alarm as normal user/project
+        with a alarm_id unauthorized for this project/user
+        """
+        json = {
+            'enabled': False,
+            'name': 'added_alarm',
+            'state': 'ok',
+            'type': 'combination',
+            'ok_actions': ['http://something/ok'],
+            'alarm_actions': ['http://something/alarm'],
+            'insufficient_data_actions': ['http://something/no'],
+            'repeat_actions': True,
+            'combination_rule': {
+                'alarm_ids': ['a',
+                              'b'],
+                'operator': 'and',
+            }
+        }
+        an_other_user_auth = {'X-User-Id': str(uuid.uuid4()),
+                              'X-Project-Id': str(uuid.uuid4())}
+        resp = self.post_json('/alarms', params=json, status=400,
+                              headers=an_other_user_auth)
+        self.assertEqual(jsonutils.loads(resp.body)['error_message']
+                         ['faultstring'],
+                         "Alarm a doesn't exist")
+
+    def test_post_combination_alarm_as_admin_1(self):
+        """Test that post a combination alarm as admin on behalf of a other
+        user/project with a alarm_id unauthorized for this project/user
+        """
+        json = {
+            'enabled': False,
+            'name': 'added_alarm',
+            'state': 'ok',
+            'user_id': 'auseridthatisnotmine',
+            'project_id': 'aprojectidthatisnotmine',
+            'type': 'combination',
+            'ok_actions': ['http://something/ok'],
+            'alarm_actions': ['http://something/alarm'],
+            'insufficient_data_actions': ['http://something/no'],
+            'repeat_actions': True,
+            'combination_rule': {
+                'alarm_ids': ['a',
+                              'b'],
+                'operator': 'and',
+            }
+        }
+
+        headers = {}
+        headers.update(self.auth_headers)
+        headers['X-Roles'] = 'admin'
+        resp = self.post_json('/alarms', params=json, status=400,
+                              headers=headers)
+        self.assertEqual(jsonutils.loads(resp.body)['error_message']
+                         ['faultstring'],
+                         "Alarm a doesn't exist")
+
+    def test_post_combination_alarm_as_admin_2(self):
+        """Test that post a combination alarm as admin on behalf of nobody
+        with a alarm_id of someone else
+        """
+        json = {
+            'enabled': False,
+            'name': 'added_alarm',
+            'state': 'ok',
+            'type': 'combination',
+            'ok_actions': ['http://something/ok'],
+            'alarm_actions': ['http://something/alarm'],
+            'insufficient_data_actions': ['http://something/no'],
+            'repeat_actions': True,
+            'combination_rule': {
+                'alarm_ids': ['a',
+                              'b'],
+                'operator': 'and',
+            }
+        }
+
+        headers = {}
+        headers.update(self.auth_headers)
+        headers['X-Roles'] = 'admin'
+        self.post_json('/alarms', params=json, status=201,
+                       headers=headers)
+        alarms = list(self.conn.get_alarms(enabled=False))
+        if alarms[0].name == 'added_alarm':
+            for key in json:
+                if key.endswith('_rule'):
+                    storage_key = 'rule'
+                else:
+                    storage_key = key
+                self.assertEqual(getattr(alarms[0], storage_key),
+                                 json[key])
+        else:
+            self.fail("Alarm not found")
+
     def test_post_invalid_alarm_combination(self):
+        """Test that post a combination alarm with a not existing alarm id
+        """
         json = {
             'enabled': False,
             'name': 'added_alarm',

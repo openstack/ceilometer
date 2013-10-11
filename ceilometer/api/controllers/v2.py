@@ -277,6 +277,25 @@ class ProjectNotAuthorized(Exception):
             _("Not Authorized to access project %s") % id)
 
 
+def _get_auth_project(on_behalf_of=None):
+    # when an alarm is created by an admin on behalf of another tenant
+    # we must ensure for:
+    # - threshold alarm, that an implicit query constraint on project_id is
+    #   added so that admin-level visibility on statistics is not leaked
+    # - combination alarm, that alarm ids verification is scoped to
+    #   alarms owned by the alarm project.
+    # hence for null auth_project (indicating admin-ness) we check if
+    # the creating tenant differs from the tenant on whose behalf the
+    # alarm is being created
+    auth_project = acl.get_limited_to_project(pecan.request.headers)
+    created_by = pecan.request.headers.get('X-Project-Id')
+    is_admin = auth_project is None
+
+    if is_admin and on_behalf_of != created_by:
+        auth_project = on_behalf_of
+    return auth_project
+
+
 def _sanitize_query(query, db_func, on_behalf_of=None):
     '''Check the query to see if:
     1) the request is coming from admin - then allow full visibility
@@ -284,17 +303,8 @@ def _sanitize_query(query, db_func, on_behalf_of=None):
     project.
     '''
     q = copy.copy(query)
-    auth_project = acl.get_limited_to_project(pecan.request.headers)
-    created_by = pecan.request.headers.get('X-Project-Id')
 
-    # when an alarm is created by an admin on behalf of another tenant
-    # we must ensure that an implicit query constraint on project_id is
-    # added so that admin-level visibility on statistics is not leaked,
-    # hence for null auth_project (indicating admin-ness) we check if
-    # the creating tenant differs from the tenant on whose behalf the
-    # alarm is being created
-    auth_project = (auth_project or
-                    (on_behalf_of if on_behalf_of != created_by else None))
+    auth_project = _get_auth_project(on_behalf_of)
     if auth_project:
         _verify_query_segregation(q, auth_project)
 
@@ -1081,14 +1091,6 @@ class AlarmCombinationRule(_Base):
             pecan.response.translatable_error = error
             raise wsme.exc.ClientSideError(unicode(error))
 
-        for id in combination_rule.alarm_ids:
-            auth_project = acl.get_limited_to_project(pecan.request.headers)
-            alarms = list(pecan.request.storage_conn.get_alarms(
-                alarm_id=id, project=auth_project))
-            if len(alarms) < 1:
-                error = _("Alarm %s doesn't exists") % id
-                pecan.response.translatable_error = error
-                raise wsme.exc.ClientSideError(unicode(error))
         return combination_rule
 
 
@@ -1178,6 +1180,7 @@ class Alarm(_Base):
                 error = _("%s is mandatory") % field
                 pecan.response.translatable_error = error
                 raise wsme.exc.ClientSideError(unicode(error))
+
         if alarm.threshold_rule:
             # ensure an implicit constraint on project_id is added to
             # the query if not already present
@@ -1186,6 +1189,15 @@ class Alarm(_Base):
                 storage.SampleFilter.__init__,
                 on_behalf_of=alarm.project_id
             )
+        elif alarm.combination_rule:
+            auth_project = _get_auth_project(alarm.project_id)
+            for id in alarm.combination_rule.alarm_ids:
+                alarms = list(pecan.request.storage_conn.get_alarms(
+                    alarm_id=id, project=auth_project))
+                if not alarms:
+                    error = _("Alarm %s doesn't exist") % id
+                    pecan.response.translatable_error = error
+                    raise wsme.exc.ClientSideError(unicode(error))
 
         if alarm.threshold_rule and alarm.combination_rule:
             error = _("threshold_rule and combination_rule "
