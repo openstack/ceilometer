@@ -742,6 +742,10 @@
 # server. (boolean value)
 #http_connect_timeout=<None>
 
+# How many times are we trying to reconnect when communicating
+# with Identity API Server. (integer value)
+#http_request_max_retries=3
+
 # Allows to pass in the name of a fake http_handler callback
 # function used instead of httplib.HTTPConnection or
 # httplib.HTTPSConnection. Useful for unit testing where
@@ -773,6 +777,13 @@
 # Required if Keystone server requires client certificate
 # (string value)
 #keyfile=<None>
+
+# A PEM encoded Certificate Authority to use when verifying
+# HTTPs connections. Defaults to system CAs. (string value)
+#cafile=<None>
+
+# Verify HTTPS connections. (boolean value)
+#insecure=false
 
 # Directory used to cache files related to PKI tokens (string
 # value)
