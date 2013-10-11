@@ -71,12 +71,12 @@ class PreciseTimestampTest(test.BaseTestCase):
 
     def test_process_bind_param_store_none_mysql(self):
         result = self._type.process_bind_param(None, self._mysql_dialect)
-        self.assertEqual(result, None)
+        self.assertIsNone(result)
 
     def test_process_bind_param_store_none_postgres(self):
         result = self._type.process_bind_param(None,
                                                self._postgres_dialect)
-        self.assertEqual(result, None)
+        self.assertIsNone(result)
 
     def test_process_result_value_datetime_mysql(self):
         dec_value = utils.dt_to_decimal(self._date)
@@ -92,9 +92,9 @@ class PreciseTimestampTest(test.BaseTestCase):
     def test_process_result_value_none_mysql(self):
         result = self._type.process_result_value(None,
                                                  self._mysql_dialect)
-        self.assertEqual(result, None)
+        self.assertIsNone(result)
 
     def test_process_result_value_none_postgres(self):
         result = self._type.process_result_value(None,
                                                  self._postgres_dialect)
-        self.assertEqual(result, None)
+        self.assertIsNone(result)

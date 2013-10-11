@@ -69,7 +69,7 @@ class TestUtils(test.BaseTestCase):
                                  ('nested.b', 'B')])
 
     def test_decimal_to_dt_with_none_parameter(self):
-        self.assertEqual(utils.decimal_to_dt(None), None)
+        self.assertIsNone(utils.decimal_to_dt(None))
 
     def test_dict_to_kv(self):
         data = {'a': 'A',

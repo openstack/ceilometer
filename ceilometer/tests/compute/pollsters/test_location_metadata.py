@@ -101,5 +101,5 @@ class TestLocationMetadata(test.BaseTestCase):
         self.INSTANCE_PROPERTIES['image'] = ''
         self.instance = FauxInstance(**self.INSTANCE_PROPERTIES)
         md = util._get_metadata_from_object(self.instance)
-        self.assertEqual(md['image_ref'], None)
-        self.assertEqual(md['image_ref_url'], None)
+        self.assertIsNone(md['image_ref'])
+        self.assertIsNone(md['image_ref_url'])

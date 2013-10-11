@@ -977,7 +977,7 @@ class TestAlarms(FunctionalTest,
     def _assert_is_subset(self, expected, actual):
         for k, v in expected.iteritems():
             self.assertEqual(v, actual.get(k), 'mismatched field: %s' % k)
-        self.assertTrue(actual['event_id'] is not None)
+        self.assertIsNotNone(actual['event_id'])
 
     def _assert_in_json(self, expected, actual):
         for k, v in expected.iteritems():

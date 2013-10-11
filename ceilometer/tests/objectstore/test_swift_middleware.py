@@ -185,7 +185,7 @@ class TestSwiftMiddleware(test.BaseTestCase):
         self.assertEqual(data.volume, 28)
         self.assertEqual(data.resource_metadata['version'], '1.0')
         self.assertEqual(data.resource_metadata['container'], 'container')
-        self.assertEqual(data.resource_metadata['object'], None)
+        self.assertIsNone(data.resource_metadata['object'])
 
     def test_no_metadata_headers(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(), {})
@@ -200,7 +200,7 @@ class TestSwiftMiddleware(test.BaseTestCase):
         self.assertEqual(len(http_headers), 0)
         self.assertEqual(data.resource_metadata['version'], '1.0')
         self.assertEqual(data.resource_metadata['container'], 'container')
-        self.assertEqual(data.resource_metadata['object'], None)
+        self.assertIsNone(data.resource_metadata['object'])
 
     def test_metadata_headers(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(), {
@@ -219,7 +219,7 @@ class TestSwiftMiddleware(test.BaseTestCase):
         self.assertEqual(len(http_headers), 2)
         self.assertEqual(data.resource_metadata['version'], '1.0')
         self.assertEqual(data.resource_metadata['container'], 'container')
-        self.assertEqual(data.resource_metadata['object'], None)
+        self.assertIsNone(data.resource_metadata['object'])
         self.assertEqual(data.resource_metadata['http_header_x_var1'],
                          'value1')
         self.assertEqual(data.resource_metadata['http_header_x_var2'],
@@ -241,7 +241,7 @@ class TestSwiftMiddleware(test.BaseTestCase):
         self.assertEqual(len(http_headers), 0)
         self.assertEqual(data.resource_metadata['version'], '1.0')
         self.assertEqual(data.resource_metadata['container'], 'container')
-        self.assertEqual(data.resource_metadata['object'], None)
+        self.assertIsNone(data.resource_metadata['object'])
 
     def test_bogus_path(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(), {})

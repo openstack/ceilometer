@@ -395,7 +395,7 @@ class TestCoordinate(test.BaseTestCase):
         # Test when the partition to be recorded is the same as the oldest.
         self.partition_coordinator._record_oldest(
             self.partition_coordinator.oldest, True)
-        self.assertEqual(self.partition_coordinator.oldest, None)
+        self.assertIsNone(self.partition_coordinator.oldest)
 
     def test_check_mastership(self):
         # Test the method exception condition.

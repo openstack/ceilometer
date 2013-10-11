@@ -92,7 +92,7 @@ NOTIFICATION_DELETE = {"message_id": "0c65cb9c-018c-11e2-bc91-5453ed1bbb5f",
 class TestNotification(test.BaseTestCase):
 
     def _verify_common_counter(self, c, name, volume):
-        self.assertFalse(c is None)
+        self.assertIsNotNone(c)
         self.assertEqual(c.name, name)
         self.assertEqual(c.resource_id, fake_uuid('c'))
         self.assertEqual(c.timestamp, NOW)

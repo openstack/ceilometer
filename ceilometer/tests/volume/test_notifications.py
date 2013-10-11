@@ -103,7 +103,7 @@ NOTIFICATION_VOLUME_RESIZE = {
 class TestNotifications(test.BaseTestCase):
 
     def _verify_common_sample(self, s, name, notification):
-        self.assertFalse(s is None)
+        self.assertIsNotNone(s)
         self.assertEqual(s.name, name)
         self.assertEqual(s.resource_id, notification['payload']['volume_id'])
         self.assertEqual(s.timestamp, notification['timestamp'])

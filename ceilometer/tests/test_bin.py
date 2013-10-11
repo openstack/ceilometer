@@ -119,7 +119,7 @@ class BinApiTestCase(base.BaseTestCase):
                 r, c = self.http.request(url, 'GET')
             except socket.error:
                 time.sleep(.5)
-                self.assertEqual(self.subp.poll(), None)
+                self.assertIsNone(self.subp.poll())
             else:
                 return r, c
         return (None, None)
