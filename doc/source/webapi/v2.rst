@@ -75,11 +75,6 @@ Ceilometer CLI Commands::
 
      $ ceilometer --debug --os-username <username_here> --os-password <password_here> --os-auth-url http://localhost:5000/v2.0/ --os-tenant-name admin  meter-list
 
-or::
-
-     $ ceilometer --os-username admin --os-password password --os-tenant-name admin project-list
-
-
 .. note:: The *username*, *password*, and *tenant-name* options are required to be present in these commands or specified via environment variables. Note that the in-line commands will override the environment variables.
 
 
