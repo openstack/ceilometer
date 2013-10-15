@@ -241,27 +241,63 @@ class Connection(base.Connection):
         :param metaquery: Optional dict with metadata to match on.
         :param resource: Optional resource filter.
         """
-        query = model_query(Meter,
-                            session=self.session).group_by(Meter.resource_id)
-        if user is not None:
-            query = query.filter(Meter.user_id == user)
-        if source is not None:
-            query = query.filter(Meter.sources.any(id=source))
-        if start_timestamp:
-            query = query.filter(Meter.timestamp >= start_timestamp)
-        if end_timestamp:
-            query = query.filter(Meter.timestamp < end_timestamp)
-        if project is not None:
-            query = query.filter(Meter.project_id == project)
-        if resource is not None:
-            query = query.filter(Meter.resource_id == resource)
+        # We probably want to raise this early, since we don't know from here
+        # if it will be handled. We don't want extra wait or work for it to
+        # just fail.
         if metaquery:
             raise NotImplementedError('metaquery not implemented')
 
-        for meter in query.all():
-            r = row2dict(meter.resource)
-            r['resource_id'] = r['id']
-            del r['id']
+        # (thomasm) We need to get the max timestamp first, since that's the
+        # most accurate. We also need to filter down in the subquery to
+        # constrain what we have to JOIN on later.
+
+        ts_subquery = self.session.query(
+            Meter.resource_id,
+            func.max(Meter.timestamp).label("max_ts")
+        ).group_by(Meter.resource_id)
+
+        # Here are the basic 'eq' operation filters for the sample data.
+        for column, value in [(Meter.resource_id, resource),
+                              (Meter.user_id, user),
+                              (Meter.project_id, project)]:
+            if value:
+                ts_subquery = ts_subquery.filter(column == value)
+
+        if source:
+            ts_subquery = ts_subquery.filter(
+                Meter.sources.any(id=source))
+
+        # Here we limit the samples being used to a specific time period,
+        # if requested.
+        if start_timestamp:
+            ts_subquery = ts_subquery.filter(
+                Meter.timestamp >= start_timestamp
+            )
+
+        if end_timestamp:
+            ts_subquery = ts_subquery.filter(Meter.timestamp < end_timestamp)
+
+        ts_subquery = ts_subquery.subquery()
+
+        # Now we need to get the max Meter.id out of the leftover results, to
+        # break any ties.
+        agg_subquery = self.session.query(
+            func.max(Meter.id).label("max_id"),
+            ts_subquery
+        ).filter(
+            Meter.resource_id == ts_subquery.c.resource_id,
+            Meter.timestamp == ts_subquery.c.max_ts
+        ).group_by(Meter.resource_id).subquery()
+
+        query = self.session.query(
+            Meter,
+            agg_subquery.c.max_id
+        ).filter(
+            Meter.id == agg_subquery.c.max_id
+        )
+
+        for meter, _ in query.all():
+            r = row2dict(meter)
             # Replace the 'resource_metadata' with 'metadata'
             r['metadata'] = r['resource_metadata']
             del r['resource_metadata']

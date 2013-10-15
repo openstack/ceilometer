@@ -106,6 +106,11 @@ class ResourceTest(base.ResourceTest, SQLAlchemyEngineTestBase):
     pass
 
 
+class ResourceTestOrdering(base.ResourceTestOrdering,
+                           SQLAlchemyEngineTestBase):
+    pass
+
+
 class MeterTest(base.MeterTest, SQLAlchemyEngineTestBase):
     pass
 
