@@ -29,6 +29,7 @@ from ceilometer.openstack.common import importutils
 from ceilometer.openstack.common import jsonutils
 from ceilometer.openstack.common import local
 from ceilometer.openstack.common import log as logging
+from ceilometer.openstack.common import versionutils
 
 
 CONF = cfg.CONF
@@ -441,19 +442,15 @@ def client_exceptions(*exceptions):
     return outer
 
 
+# TODO(sirp): we should deprecate this in favor of
+# using `versionutils.is_compatible` directly
 def version_is_compatible(imp_version, version):
     """Determine whether versions are compatible.
 
     :param imp_version: The version implemented
     :param version: The version requested by an incoming message.
     """
-    version_parts = version.split('.')
-    imp_version_parts = imp_version.split('.')
-    if int(version_parts[0]) != int(imp_version_parts[0]):  # Major
-        return False
-    if int(version_parts[1]) > int(imp_version_parts[1]):  # Minor
-        return False
-    return True
+    return versionutils.is_compatible(version, imp_version)
 
 
 def serialize_msg(raw_msg):
