@@ -39,7 +39,7 @@ from __future__ import absolute_import
 
 from oslo.config import cfg
 from stevedore import dispatch
-from swift.common.utils import split_path
+from swift.common.utils import split_path, get_logger
 import webob
 
 REQUEST = webob
@@ -71,6 +71,7 @@ class CeilometerMiddleware(object):
 
     def __init__(self, app, conf):
         self.app = app
+        self.logger = get_logger(conf, log_route='ceilometer')
 
         self.metadata_headers = [h.strip().replace('-', '_').lower()
                                  for h in conf.get(
@@ -104,9 +105,12 @@ class CeilometerMiddleware(object):
                         bytes_sent += len(chunk)
                     yield chunk
             finally:
-                self.publish_counter(env,
-                                     input_proxy.bytes_received,
-                                     bytes_sent)
+                try:
+                    self.publish_counter(env,
+                                         input_proxy.bytes_received,
+                                         bytes_sent)
+                except Exception:
+                    self.logger.exception('Failed to publish samples')
 
         try:
             iterable = self.app(env, my_start_response)
@@ -118,7 +122,7 @@ class CeilometerMiddleware(object):
 
     def publish_counter(self, env, bytes_received, bytes_sent):
         req = REQUEST.Request(env)
-        version, account, container, obj = split_path(req.path, 1, 4, True)
+        version, account, container, obj = split_path(req.path, 2, 4, True)
         now = timeutils.utcnow().isoformat()
 
         resource_metadata = {
