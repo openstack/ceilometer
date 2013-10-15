@@ -72,8 +72,8 @@ memory                    Gauge             MB  inst ID   notification  Volume o
 cpu                       Cumulative        ns  inst ID   pollster      CPU time used
 cpu_util                  Gauge              %  inst ID   pollster      CPU utilisation
 vcpus                     Gauge           vcpu  inst ID   notification  Number of VCPUs
-disk.read.request         Cumulative   request  inst ID   pollster      Number of read requests
-disk.write.request        Cumulative   request  inst ID   pollster      Number of write requests
+disk.read.requests        Cumulative   request  inst ID   pollster      Number of read requests
+disk.write.requests       Cumulative   request  inst ID   pollster      Number of write requests
 disk.read.bytes           Cumulative         B  inst ID   pollster      Volume of read in B
 disk.write.bytes          Cumulative         B  inst ID   pollster      Volume of write in B
 disk.root.size            Gauge             GB  inst ID   notification  Size of root disk in GB
