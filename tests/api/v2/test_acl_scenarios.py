@@ -41,7 +41,7 @@ class FakeMemcache(object):
     @staticmethod
     def get(key):
         if key == "tokens/%s" % VALID_TOKEN:
-            dt = datetime.datetime.now() + datetime.timedelta(minutes=5)
+            dt = timeutils.utcnow() + datetime.timedelta(minutes=5)
             return json.dumps(({'access': {
                 'token': {'id': VALID_TOKEN},
                 'user': {
@@ -54,7 +54,7 @@ class FakeMemcache(object):
                     ]},
             }}, timeutils.isotime(dt)))
         if key == "tokens/%s" % VALID_TOKEN2:
-            dt = datetime.datetime.now() + datetime.timedelta(minutes=5)
+            dt = timeutils.utcnow() + datetime.timedelta(minutes=5)
             return json.dumps(({'access': {
                 'token': {'id': VALID_TOKEN2},
                 'user': {
