@@ -32,12 +32,35 @@ class TestLibvirtInspection(test_base.TestCase):
         self.instance_name = 'instance-00000001'
         self.inspector = libvirt_inspector.LibvirtInspector()
         self.inspector.connection = self.mox.CreateMockAnything()
-        self.inspector.connection.getCapabilities()
         self.domain = self.mox.CreateMockAnything()
-        self.inspector.connection.lookupByName(self.instance_name).AndReturn(
-            self.domain)
+
+    def test_inspect_instances(self):
+        class FakeDomain(object):
+            def name(self):
+                return 'fake_name'
+
+            def UUIDString(self):
+                return 'uuid'
+
+        fake_domain = FakeDomain()
+        self.inspector.connection.getCapabilities()
+        self.inspector.connection.numOfDomains().AndReturn(1)
+        self.inspector.connection.getCapabilities()
+        self.inspector.connection.listDomainsID().AndReturn([42])
+        self.inspector.connection.getCapabilities()
+        self.inspector.connection.lookupByID(42).AndReturn(fake_domain)
+        self.mox.ReplayAll()
+
+        inspected_instances = list(self.inspector.inspect_instances())
+        self.assertEqual(len(inspected_instances), 1)
+        inspected_instance = inspected_instances[0]
+        self.assertEqual(inspected_instance.name, 'fake_name')
+        self.assertEqual(inspected_instance.UUID, 'uuid')
 
     def test_inspect_cpus(self):
+        self.inspector.connection.getCapabilities()
+        self.inspector.connection.lookupByName(self.instance_name).AndReturn(
+            self.domain)
         self.domain.info().AndReturn((0L, 0L, 0L, 2L, 999999L))
         self.mox.ReplayAll()
 
@@ -103,6 +126,9 @@ class TestLibvirtInspection(test_base.TestCase):
              </domain>
         """
 
+        self.inspector.connection.getCapabilities()
+        self.inspector.connection.lookupByName(self.instance_name).AndReturn(
+            self.domain)
         self.domain.XMLDesc(0).AndReturn(dom_xml)
         self.domain.interfaceStats('vnet0').AndReturn((1L, 2L, 0L, 0L,
                                                        3L, 4L, 0L, 0L))
@@ -169,6 +195,9 @@ class TestLibvirtInspection(test_base.TestCase):
              </domain>
         """
 
+        self.inspector.connection.getCapabilities()
+        self.inspector.connection.lookupByName(self.instance_name).AndReturn(
+            self.domain)
         self.domain.XMLDesc(0).AndReturn(dom_xml)
 
         self.domain.blockStats('vda').AndReturn((1L, 2L, 3L, 4L, -1))
