@@ -17,8 +17,8 @@ python-swiftclient
 lxml
 requests>=1.1
 extras
-six<1.4.0
-wsme>=0.5b1
+six
+wsme>=0.5b1,<=0.5b5
 pyyaml
 oslo.config>=1.1.0
 happybase>=0.4
