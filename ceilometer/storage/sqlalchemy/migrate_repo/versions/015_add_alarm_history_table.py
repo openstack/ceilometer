@@ -20,10 +20,9 @@ from migrate import ForeignKeyConstraint
 from sqlalchemy import MetaData, Table, Column, Index
 from sqlalchemy import String, DateTime
 
-meta = MetaData()
-
 
 def upgrade(migrate_engine):
+    meta = MetaData()
     meta.bind = migrate_engine
 
     project = Table('project', meta, autoload=True)
@@ -68,6 +67,7 @@ def upgrade(migrate_engine):
 
 
 def downgrade(migrate_engine):
+    meta = MetaData()
     meta.bind = migrate_engine
     alarm_history = Table('alarm_history', meta, autoload=True)
     alarm_history.drop()
