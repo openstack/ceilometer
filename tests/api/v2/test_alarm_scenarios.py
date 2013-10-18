@@ -675,8 +675,8 @@ class TestAlarms(FunctionalTest,
                          ['faultstring'],
                          "Alarm a doesn't exist")
 
-    def test_post_combination_alarm_as_admin_1(self):
-        """Test that post a combination alarm as admin on behalf of a other
+    def test_post_combination_alarm_as_admin_on_behalf_of_an_other_user(self):
+        """Test that post a combination alarm as admin on behalf of an other
         user/project with a alarm_id unauthorized for this project/user
         """
         json = {
@@ -706,9 +706,15 @@ class TestAlarms(FunctionalTest,
                          ['faultstring'],
                          "Alarm a doesn't exist")
 
-    def test_post_combination_alarm_as_admin_2(self):
+    def test_post_combination_alarm_as_admin_success_owner_unset(self):
+        self._do_post_combination_alarm_as_admin_success(False)
+
+    def test_post_combination_alarm_as_admin_success_owner_set(self):
+        self._do_post_combination_alarm_as_admin_success(True)
+
+    def _do_post_combination_alarm_as_admin_success(self, owner_is_set):
         """Test that post a combination alarm as admin on behalf of nobody
-        with a alarm_id of someone else
+        with a alarm_id of someone else, with owner set or not
         """
         json = {
             'enabled': False,
@@ -725,12 +731,15 @@ class TestAlarms(FunctionalTest,
                 'operator': 'and',
             }
         }
+        an_other_admin_auth = {'X-User-Id': str(uuid.uuid4()),
+                               'X-Project-Id': str(uuid.uuid4()),
+                               'X-Roles': 'admin'}
+        if owner_is_set:
+            json['project_id'] = an_other_admin_auth['X-Project-Id']
+            json['user_id'] = an_other_admin_auth['X-User-Id']
 
-        headers = {}
-        headers.update(self.auth_headers)
-        headers['X-Roles'] = 'admin'
         self.post_json('/alarms', params=json, status=201,
-                       headers=headers)
+                       headers=an_other_admin_auth)
         alarms = list(self.conn.get_alarms(enabled=False))
         if alarms[0].name == 'added_alarm':
             for key in json:
