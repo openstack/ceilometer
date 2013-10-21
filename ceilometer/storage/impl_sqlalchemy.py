@@ -349,7 +349,11 @@ class Connection(base.Connection):
         ).filter(
             Meter.resource_id == ts_subquery.c.resource_id,
             Meter.timestamp == ts_subquery.c.max_ts
-        ).group_by(Meter.resource_id).subquery()
+        ).group_by(
+            ts_subquery.c.resource_id,
+            ts_subquery.c.max_ts,
+            ts_subquery.c.min_ts
+        ).subquery()
 
         query = session.query(
             Meter,
