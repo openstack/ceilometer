@@ -21,10 +21,9 @@ import json
 from sqlalchemy import MetaData, Table, Column, Index
 from sqlalchemy import String, Float, Integer, Text
 
-meta = MetaData()
-
 
 def upgrade(migrate_engine):
+    meta = MetaData()
     meta.bind = migrate_engine
     table = Table('alarm', meta, autoload=True)
 
@@ -65,6 +64,7 @@ def upgrade(migrate_engine):
 
 
 def downgrade(migrate_engine):
+    meta = MetaData()
     meta.bind = migrate_engine
     table = Table('alarm', meta, autoload=True)
 
