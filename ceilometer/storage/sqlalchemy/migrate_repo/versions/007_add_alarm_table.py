@@ -21,38 +21,36 @@
 from sqlalchemy import MetaData, Table, Column, Text
 from sqlalchemy import Boolean, Integer, String, DateTime, Float
 
-meta = MetaData()
-
-alarm = Table(
-    'alarm', meta,
-    Column('id', String(255), primary_key=True, index=True),
-    Column('enabled', Boolean),
-    Column('name', Text()),
-    Column('description', Text()),
-    Column('timestamp', DateTime(timezone=False)),
-    Column('counter_name', String(255), index=True),
-    Column('user_id', String(255), index=True),
-    Column('project_id', String(255), index=True),
-    Column('comparison_operator', String(2)),
-    Column('threshold', Float),
-    Column('statistic', String(255)),
-    Column('evaluation_periods', Integer),
-    Column('period', Integer),
-    Column('state', String(255)),
-    Column('state_timestamp', DateTime(timezone=False)),
-    Column('ok_actions', Text()),
-    Column('alarm_actions', Text()),
-    Column('insufficient_data_actions', Text()),
-    Column('matching_metadata', Text()),
-    mysql_engine='InnoDB',
-    mysql_charset='utf8')
-
 
 def upgrade(migrate_engine):
-    meta.bind = migrate_engine
+    meta = MetaData(bind=migrate_engine)
+    alarm = Table(
+        'alarm', meta,
+        Column('id', String(255), primary_key=True, index=True),
+        Column('enabled', Boolean),
+        Column('name', Text()),
+        Column('description', Text()),
+        Column('timestamp', DateTime(timezone=False)),
+        Column('counter_name', String(255), index=True),
+        Column('user_id', String(255), index=True),
+        Column('project_id', String(255), index=True),
+        Column('comparison_operator', String(2)),
+        Column('threshold', Float),
+        Column('statistic', String(255)),
+        Column('evaluation_periods', Integer),
+        Column('period', Integer),
+        Column('state', String(255)),
+        Column('state_timestamp', DateTime(timezone=False)),
+        Column('ok_actions', Text()),
+        Column('alarm_actions', Text()),
+        Column('insufficient_data_actions', Text()),
+        Column('matching_metadata', Text()),
+        mysql_engine='InnoDB',
+        mysql_charset='utf8')
     alarm.create()
 
 
 def downgrade(migrate_engine):
-    meta.bind = migrate_engine
+    meta = MetaData(bind=migrate_engine)
+    alarm = Table('alarm', meta, autoload=True)
     alarm.drop()

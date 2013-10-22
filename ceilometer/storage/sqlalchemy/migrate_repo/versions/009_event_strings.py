@@ -16,11 +16,9 @@ from sqlalchemy import MetaData
 from sqlalchemy import Table
 from sqlalchemy import VARCHAR
 
-meta = MetaData()
-
 
 def upgrade(migrate_engine):
-    meta.bind = migrate_engine
+    meta = MetaData(bind=migrate_engine)
     name = Table('unique_name', meta, autoload=True)
     name.c.key.alter(type=VARCHAR(length=255))
     trait = Table('trait', meta, autoload=True)
@@ -28,7 +26,7 @@ def upgrade(migrate_engine):
 
 
 def downgrade(migrate_engine):
-    meta.bind = migrate_engine
+    meta = MetaData(bind=migrate_engine)
     name = Table('unique_name', meta, autoload=True)
     name.c.key.alter(type=VARCHAR(length=32))
     trait = Table('trait', meta, autoload=True)

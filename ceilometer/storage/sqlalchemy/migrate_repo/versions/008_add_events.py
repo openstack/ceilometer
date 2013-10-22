@@ -21,54 +21,48 @@ from sqlalchemy import String
 from sqlalchemy import Table
 
 
-meta = MetaData()
-
-
-unique_name = Table(
-    'unique_name', meta,
-    Column('id', Integer, primary_key=True),
-    Column('key', String(32), index=True),
-    mysql_engine='InnoDB',
-    mysql_charset='utf8',
-)
-
-
-event = Table(
-    'event', meta,
-    Column('id', Integer, primary_key=True),
-    Column('generated', Float(asdecimal=True), index=True),
-    Column('unique_name_id', Integer, ForeignKey('unique_name.id')),
-    mysql_engine='InnoDB',
-    mysql_charset='utf8',
-)
-
-
-trait = Table(
-    'trait', meta,
-    Column('id', Integer, primary_key=True),
-    Column('name_id', Integer, ForeignKey('unique_name.id')),
-    Column('t_type', Integer, index=True),
-    Column('t_string', String(32), nullable=True, default=None, index=True),
-    Column('t_float', Float, nullable=True, default=None, index=True),
-    Column('t_int', Integer, nullable=True, default=None, index=True),
-    Column('t_datetime', Float(asdecimal=True), nullable=True, default=None,
-           index=True),
-    Column('event_id', Integer, ForeignKey('event.id')),
-    mysql_engine='InnoDB',
-    mysql_charset='utf8',
-)
-
-
-tables = [unique_name, event, trait]
-
-
 def upgrade(migrate_engine):
-    meta.bind = migrate_engine
-    for i in tables:
-        i.create()
+    meta = MetaData(bind=migrate_engine)
+
+    unique_name = Table(
+        'unique_name', meta,
+        Column('id', Integer, primary_key=True),
+        Column('key', String(32), index=True),
+        mysql_engine='InnoDB',
+        mysql_charset='utf8',
+    )
+    unique_name.create()
+
+    event = Table(
+        'event', meta,
+        Column('id', Integer, primary_key=True),
+        Column('generated', Float(asdecimal=True), index=True),
+        Column('unique_name_id', Integer, ForeignKey('unique_name.id')),
+        mysql_engine='InnoDB',
+        mysql_charset='utf8',
+    )
+    event.create()
+
+    trait = Table(
+        'trait', meta,
+        Column('id', Integer, primary_key=True),
+        Column('name_id', Integer, ForeignKey('unique_name.id')),
+        Column('t_type', Integer, index=True),
+        Column('t_string', String(32), nullable=True, default=None,
+               index=True),
+        Column('t_float', Float, nullable=True, default=None, index=True),
+        Column('t_int', Integer, nullable=True, default=None, index=True),
+        Column('t_datetime', Float(asdecimal=True), nullable=True,
+               default=None, index=True),
+        Column('event_id', Integer, ForeignKey('event.id')),
+        mysql_engine='InnoDB',
+        mysql_charset='utf8',
+    )
+    trait.create()
 
 
 def downgrade(migrate_engine):
-    meta.bind = migrate_engine
-    for i in reversed(tables):
-        i.drop()
+    meta = MetaData(bind=migrate_engine)
+    for name in ['trait', 'event', 'unique_name']:
+        t = Table(name, meta, autoload=True)
+        t.drop()
