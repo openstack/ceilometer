@@ -147,7 +147,7 @@ class RPCPublisher(publisher.PublisherBase):
 
         self.target = options.get('target', ['record_metering_data'])[0]
 
-        self.policy = options.get('policy', ['wait'])[-1]
+        self.policy = options.get('policy', ['default'])[-1]
         self.max_queue_length = int(options.get(
             'max_queue_length', [1024])[-1])
 
