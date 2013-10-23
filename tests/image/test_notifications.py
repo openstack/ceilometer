@@ -21,7 +21,7 @@ from datetime import datetime
 
 from ceilometer.image import notifications
 from ceilometer import sample
-from ceilometer.tests import base
+from ceilometer.openstack.common import test
 
 
 def fake_uuid(x):
@@ -89,7 +89,7 @@ NOTIFICATION_DELETE = {"message_id": "0c65cb9c-018c-11e2-bc91-5453ed1bbb5f",
                        "timestamp": NOW}
 
 
-class TestNotification(base.TestCase):
+class TestNotification(test.BaseTestCase):
 
     def _verify_common_counter(self, c, name, volume):
         self.assertFalse(c is None)

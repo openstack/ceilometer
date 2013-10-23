@@ -22,11 +22,12 @@ import mock
 from keystoneclient.v2_0 import client as ksclient
 
 from ceilometer.central import manager
-from ceilometer.tests import base
+from ceilometer.openstack.common import test
+from ceilometer.openstack.common.fixture import moxstubout
 from tests import agentbase
 
 
-class TestManager(base.TestCase):
+class TestManager(test.BaseTestCase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_load_plugins(self):
@@ -41,6 +42,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
 
     def setUp(self):
         super(TestRunTasks, self).setUp()
+        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
         self.stubs.Set(ksclient, 'Client', lambda *args, **kwargs: None)
 
     def tearDown(self):

@@ -10,8 +10,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from ceilometer.openstack.common import test
 from ceilometer.volume import notifications
-from ceilometer.tests import base
 
 NOTIFICATION_VOLUME_EXISTS = {
     u'_context_roles': [u'admin'],
@@ -100,7 +100,7 @@ NOTIFICATION_VOLUME_RESIZE = {
     u'priority': u'INFO'}
 
 
-class TestNotifications(base.TestCase):
+class TestNotifications(test.BaseTestCase):
 
     def _verify_common_sample(self, s, name, notification):
         self.assertFalse(s is None)

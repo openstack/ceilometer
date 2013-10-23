@@ -18,11 +18,11 @@
 
 import mock
 
-from ceilometer.tests import base
 from ceilometer.image import glance
 from ceilometer.central import manager
 from ceilometer.openstack.common import context
-
+from ceilometer.openstack.common import test
+from ceilometer.openstack.common.fixture import moxstubout
 
 IMAGE_LIST = [
     type('Image', (object,),
@@ -116,7 +116,7 @@ class TestManager(manager.AgentManager):
         self.keystone = None
 
 
-class TestImagePollster(base.TestCase):
+class TestImagePollster(test.BaseTestCase):
 
     def fake_get_glance_client(self, ksclient):
         glanceclient = _BaseObject()
@@ -128,6 +128,7 @@ class TestImagePollster(base.TestCase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestImagePollster, self).setUp()
+        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
         self.context = context.get_admin_context()
         self.manager = TestManager()
         self.stubs.Set(glance._Base, 'get_glance_client',

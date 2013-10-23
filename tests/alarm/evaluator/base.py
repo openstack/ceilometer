@@ -20,11 +20,11 @@
 """
 import mock
 
+from ceilometer.openstack.common import test
 from ceilometer.openstack.common import timeutils
-from ceilometer.tests import base
 
 
-class TestEvaluatorBase(base.TestCase):
+class TestEvaluatorBase(test.BaseTestCase):
     def setUp(self):
         super(TestEvaluatorBase, self).setUp()
         self.api_client = mock.Mock()
