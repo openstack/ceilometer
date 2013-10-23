@@ -50,8 +50,9 @@ config.cfg.CONF.import_opt('compute_manager', 'nova.service')
 
 # HACK(jd) Import this first because of the second HACK below, and because
 # of Nova not having these module yet as of this writing
-import ceilometer.openstack.common.fixture.config
-import ceilometer.openstack.common.fixture.moxstubout
+from ceilometer.openstack.common import test
+from ceilometer.openstack.common.fixture import config
+from ceilometer.openstack.common.fixture import moxstubout
 
 # HACK(dhellmann): Import this before any other ceilometer code
 # because the notifier module messes with the import path to force
@@ -60,13 +61,12 @@ from ceilometer.compute import nova_notifier
 
 from ceilometer import sample
 from ceilometer.compute.pollsters import util
-from ceilometer.tests import base
 
 LOG = logging.getLogger(__name__)
 nova_CONF = config.cfg.CONF
 
 
-class TestNovaNotifier(base.TestCase):
+class TestNovaNotifier(test.BaseTestCase):
 
     class Pollster(object):
         instances = []
@@ -107,6 +107,7 @@ class TestNovaNotifier(base.TestCase):
         nova_CONF.spice.enabled = False
         self.compute = importutils.import_object(nova_CONF.compute_manager)
         self.context = context.get_admin_context()
+        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
         fake_network.set_stub_network_methods(self.stubs)
 
         self.instance_data = {"display_name": "instance-1",

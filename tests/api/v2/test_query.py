@@ -22,11 +22,13 @@ import wsme
 from ceilometer import storage
 from ceilometer.api.controllers import v2 as api
 from ceilometer.api.controllers.v2 import Query
+from ceilometer.openstack.common import test
 from ceilometer.openstack.common import timeutils
+from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer.tests import base as tests_base
 
 
-class TestQuery(tests_base.TestCase):
+class TestQuery(test.BaseTestCase):
 
     def test_get_value_as_type_with_integer(self):
         query = Query(field='metadata.size',
@@ -137,7 +139,7 @@ class TestQuery(tests_base.TestCase):
         self.assertEqual(query._get_value_as_type(), expected)
 
 
-class TestValidateGroupByFields(tests_base.TestCase):
+class TestValidateGroupByFields(test.BaseTestCase):
 
     def test_valid_field(self):
         result = api._validate_groupby_fields(['user_id'])
@@ -166,9 +168,10 @@ class TestValidateGroupByFields(tests_base.TestCase):
         self.assertEqual(result, set(['user_id', 'source']))
 
 
-class TestQueryToKwArgs(tests_base.TestCase):
+class TestQueryToKwArgs(tests_base.BaseTestCase):
     def setUp(self):
         super(TestQueryToKwArgs, self).setUp()
+        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
         self.stubs.Set(api, '_sanitize_query', lambda x, y, **z: x)
         self.stubs.Set(api, '_verify_query_segregation', lambda x, **z: x)
 
