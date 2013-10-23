@@ -21,16 +21,18 @@
 
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.compute.virt.libvirt import inspector as libvirt_inspector
-from ceilometer.tests import base as test_base
 import fixtures
+from ceilometer.openstack.common import test
+from ceilometer.openstack.common.fixture import moxstubout
 
 
-class TestLibvirtInspection(test_base.TestCase):
+class TestLibvirtInspection(test.BaseTestCase):
 
     def setUp(self):
         super(TestLibvirtInspection, self).setUp()
         self.instance_name = 'instance-00000001'
         self.inspector = libvirt_inspector.LibvirtInspector()
+        self.mox = self.useFixture(moxstubout.MoxStubout()).mox
         self.inspector.connection = self.mox.CreateMockAnything()
         self.inspector.connection.getCapabilities()
         self.domain = self.mox.CreateMockAnything()
@@ -185,7 +187,7 @@ class TestLibvirtInspection(test_base.TestCase):
         self.assertEqual(info0.write_bytes, 4L)
 
 
-class TestLibvirtInspectionWithError(test_base.TestCase):
+class TestLibvirtInspectionWithError(test.BaseTestCase):
 
     def setUp(self):
         super(TestLibvirtInspectionWithError, self).setUp()

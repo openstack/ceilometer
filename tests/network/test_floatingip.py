@@ -26,14 +26,16 @@ from ceilometer.central import manager
 from ceilometer.network import floatingip
 from ceilometer import nova_client
 from ceilometer.openstack.common import context
-from ceilometer.tests import base
+from ceilometer.openstack.common import test
+from ceilometer.openstack.common.fixture import moxstubout
 
 
-class TestFloatingIPPollster(base.TestCase):
+class TestFloatingIPPollster(test.BaseTestCase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestFloatingIPPollster, self).setUp()
+        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
         self.context = context.get_admin_context()
         self.manager = manager.AgentManager()
         self.pollster = floatingip.FloatingIPPollster()

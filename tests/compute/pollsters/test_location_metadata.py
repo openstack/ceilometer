@@ -22,9 +22,9 @@
 
 import mock
 
+from ceilometer.openstack.common import test
 from ceilometer.compute import manager
 from ceilometer.compute.pollsters import util
-from ceilometer.tests import base as test_base
 
 
 class FauxInstance(object):
@@ -43,7 +43,7 @@ class FauxInstance(object):
             return default
 
 
-class TestLocationMetadata(test_base.TestCase):
+class TestLocationMetadata(test.BaseTestCase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):

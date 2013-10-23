@@ -21,10 +21,10 @@ import mock
 
 from ceilometer.compute.virt import inspector
 from ceilometer.compute.virt.hyperv import utilsv2 as utilsv2
-from ceilometer.tests import base as test_base
+from ceilometer.openstack.common import test
 
 
-class TestUtilsV2(test_base.TestCase):
+class TestUtilsV2(test.BaseTestCase):
 
     def setUp(self):
         self._utils = utilsv2.UtilsV2()

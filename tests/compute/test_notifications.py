@@ -21,8 +21,8 @@
 notification events.
 """
 
-from ceilometer.tests import base
 from ceilometer.compute import notifications
+from ceilometer.openstack.common import test
 from ceilometer import sample
 
 
@@ -398,7 +398,7 @@ INSTANCE_SCHEDULED = {
 }
 
 
-class TestNotifications(base.TestCase):
+class TestNotifications(test.BaseTestCase):
 
     def test_process_notification(self):
         info = list(notifications.Instance().process_notification(

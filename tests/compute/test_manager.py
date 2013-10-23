@@ -21,11 +21,12 @@ import mock
 
 from ceilometer import nova_client
 from ceilometer.compute import manager
-from ceilometer.tests import base
+from ceilometer.openstack.common import test
+from ceilometer.openstack.common.fixture import moxstubout
 from tests import agentbase
 
 
-class TestManager(base.TestCase):
+class TestManager(test.BaseTestCase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_load_plugins(self):
@@ -56,6 +57,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         # of instances to poll we can control the results.
         self.instance = self._fake_instance('faux', 'active')
         stillborn_instance = self._fake_instance('stillborn', 'error')
+        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
         self.stubs.Set(nova_client.Client, 'instance_get_all_by_host',
                        lambda *x: [self.instance, stillborn_instance])
 
