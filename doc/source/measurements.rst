@@ -135,7 +135,7 @@ Volume (Cinder)
 ========================  ==========  =======  ========  ============  =======================================================
 Name                      Type        Unit     Resource  Origin        Note
 ========================  ==========  =======  ========  ============  =======================================================
-volume                    Gauge        volume  vol ID    notification  Duration of volune
+volume                    Gauge        volume  vol ID    notification  Duration of volume
 volume.size               Gauge            GB  vol ID    notification  Size of volume
 ========================  ==========  =======  ========  ============  =======================================================
 
