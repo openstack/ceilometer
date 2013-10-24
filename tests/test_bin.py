@@ -19,21 +19,28 @@
 
 import httplib2
 import json
+import os
 import random
 import socket
 import subprocess
 import time
 
 from ceilometer.tests import base
+from ceilometer.openstack.common import fileutils
 
 
-class BinTestCase(base.TestCase):
+class BinTestCase(base.BaseTestCase):
     def setUp(self):
         super(BinTestCase, self).setUp()
-        self.tempfile = self.temp_config_file_path()
-        with open(self.tempfile, 'w') as tmp:
-            tmp.write("[database]\n")
-            tmp.write("connection=log://localhost\n")
+        content = "[database]\n"\
+                  "connection=log://localhost\n"
+        self.tempfile = fileutils.write_to_tempfile(content=content,
+                                                    prefix='ceilometer',
+                                                    suffix='.conf')
+
+    def tearDown(self):
+        super(BinTestCase, self).tearDown()
+        os.remove(self.tempfile)
 
     def test_dbsync_run(self):
         subp = subprocess.Popen(['ceilometer-dbsync',
@@ -46,17 +53,21 @@ class BinTestCase(base.TestCase):
         self.assertEqual(subp.wait(), 0)
 
 
-class BinSendCounterTestCase(base.TestCase):
+class BinSendCounterTestCase(base.BaseTestCase):
     def setUp(self):
         super(BinSendCounterTestCase, self).setUp()
-        self.tempfile = self.temp_config_file_path()
         pipeline_cfg_file = self.path_get('etc/ceilometer/pipeline.yaml')
-        with open(self.tempfile, 'w') as tmp:
-            tmp.write("[DEFAULT]\n")
-            tmp.write(
-                "rpc_backend=ceilometer.openstack.common.rpc.impl_fake\n")
-            tmp.write(
-                "pipeline_cfg_file=%s\n" % pipeline_cfg_file)
+        content = "[DEFAULT]\n"\
+                  "rpc_backend=ceilometer.openstack.common.rpc.impl_fake\n"\
+                  "pipeline_cfg_file={0}\n".format(pipeline_cfg_file)
+
+        self.tempfile = fileutils.write_to_tempfile(content=content,
+                                                    prefix='ceilometer',
+                                                    suffix='.conf')
+
+    def tearDown(self):
+        super(BinSendCounterTestCase, self).tearDown()
+        os.remove(self.tempfile)
 
     def test_send_counter_run(self):
         subp = subprocess.Popen([self.path_get('bin/ceilometer-send-counter'),
@@ -66,32 +77,30 @@ class BinSendCounterTestCase(base.TestCase):
         self.assertEqual(subp.wait(), 0)
 
 
-class BinApiTestCase(base.TestCase):
+class BinApiTestCase(base.BaseTestCase):
 
     def setUp(self):
         super(BinApiTestCase, self).setUp()
         self.api_port = random.randint(10000, 11000)
         self.http = httplib2.Http()
-        self.tempfile = self.temp_config_file_path()
         pipeline_cfg_file = self.path_get('etc/ceilometer/pipeline.yaml')
         policy_file = self.path_get('tests/policy.json')
-        with open(self.tempfile, 'w') as tmp:
-            tmp.write("[DEFAULT]\n")
-            tmp.write(
-                "rpc_backend=ceilometer.openstack.common.rpc.impl_fake\n")
-            tmp.write(
-                "auth_strategy=noauth\n")
-            tmp.write(
-                "debug=true\n")
-            tmp.write(
-                "pipeline_cfg_file=%s\n" % pipeline_cfg_file)
-            tmp.write(
-                "policy_file=%s\n" % policy_file)
-            tmp.write("[api]\n")
-            tmp.write(
-                "port=%s\n" % self.api_port)
-            tmp.write("[database]\n")
-            tmp.write("connection=log://localhost\n")
+        content = "[DEFAULT]\n"\
+                  "rpc_backend=ceilometer.openstack.common.rpc.impl_fake\n"\
+                  "auth_strategy=noauth\n"\
+                  "debug=true\n"\
+                  "pipeline_cfg_file={0}\n"\
+                  "policy_file={1}\n"\
+                  "[api]\n"\
+                  "port={2}\n"\
+                  "[database]\n"\
+                  "connection=log://localhost\n".format(pipeline_cfg_file,
+                                                        policy_file,
+                                                        self.api_port)
+
+        self.tempfile = fileutils.write_to_tempfile(content=content,
+                                                    prefix='ceilometer',
+                                                    suffix='.conf')
         self.subp = subprocess.Popen(['ceilometer-api',
                                       "--config-file=%s" % self.tempfile])
 
@@ -99,6 +108,7 @@ class BinApiTestCase(base.TestCase):
         super(BinApiTestCase, self).tearDown()
         self.subp.kill()
         self.subp.wait()
+        os.remove(self.tempfile)
 
     def get_response(self, path):
         url = 'http://%s:%d/%s' % ('127.0.0.1', self.api_port, path)

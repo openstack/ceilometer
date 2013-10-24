@@ -18,55 +18,12 @@
 # under the License.
 """Test base classes.
 """
-import fixtures
 import functools
-from oslo.config import cfg
 import os.path
-import testtools
 from testtools import testcase
 
 from ceilometer.openstack.common import test
 from ceilometer.openstack.common import timeutils
-from ceilometer.openstack.common.fixture import config
-from ceilometer.openstack.common.fixture import moxstubout
-
-
-cfg.CONF.import_opt('pipeline_cfg_file', 'ceilometer.pipeline')
-
-
-class TestCase(testtools.TestCase):
-    def setUp(self):
-        super(TestCase, self).setUp()
-        self.tempdir = self.useFixture(fixtures.TempDir())
-        self.useFixture(fixtures.FakeLogger())
-        self.useFixture(config.Config())
-        moxfixture = self.useFixture(moxstubout.MoxStubout())
-        self.mox = moxfixture.mox
-        self.stubs = moxfixture.stubs
-
-        cfg.CONF([], project='ceilometer')
-
-        # Set a default location for the pipeline config file so the
-        # tests work even if ceilometer is not installed globally on
-        # the system.
-        cfg.CONF.set_override(
-            'pipeline_cfg_file',
-            self.path_get('etc/ceilometer/pipeline.yaml')
-        )
-
-    def path_get(self, project_file=None):
-        root = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                            '..',
-                                            '..',
-                                            )
-                               )
-        if project_file:
-            return os.path.join(root, project_file)
-        else:
-            return root
-
-    def temp_config_file_path(self, name='ceilometer.conf'):
-        return os.path.join(self.tempdir.path, name)
 
 
 class BaseTestCase(test.BaseTestCase):

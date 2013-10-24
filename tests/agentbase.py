@@ -29,8 +29,9 @@ from stevedore.tests import manager as extension_tests
 from ceilometer import sample
 from ceilometer import pipeline
 from ceilometer import agent
-from ceilometer.tests import base
 from ceilometer import transformer
+from ceilometer.openstack.common.fixture import config
+from ceilometer.tests import base
 
 
 default_test_data = sample.Sample(
@@ -64,7 +65,7 @@ class TestPollsterException(TestPollster):
         raise Exception()
 
 
-class BaseAgentManagerTestCase(base.TestCase):
+class BaseAgentManagerTestCase(base.BaseTestCase):
 
     class Pollster(TestPollster):
         samples = []
@@ -162,6 +163,11 @@ class BaseAgentManagerTestCase(base.TestCase):
             'publishers': ["test"],
         }, ]
         self.setup_pipeline()
+        self.CONF = self.useFixture(config.Config()).conf
+        self.CONF.set_override(
+            'pipeline_cfg_file',
+            self.path_get('etc/ceilometer/pipeline.yaml')
+        )
 
     def tearDown(self):
         self.Pollster.samples = []
