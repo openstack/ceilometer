@@ -57,8 +57,37 @@ def register_opts(config):
 
 register_opts(cfg.CONF)
 
-cfg.CONF.import_opt('rabbit_max_retries',
-                    'ceilometer.openstack.common.rpc.impl_kombu')
+
+def import_backend_retry_config():
+    """Import the retry config option native to the configured
+       rpc backend (if such a native config option exists).
+    """
+    cfg.CONF.import_opt('rpc_backend',
+                        'ceilometer.openstack.common.rpc')
+    kombu = 'ceilometer.openstack.common.rpc.impl_kombu'
+    if cfg.CONF.rpc_backend == kombu:
+        try:
+            cfg.CONF.import_opt('rabbit_max_retries', kombu)
+        except ImportError:
+            pass
+
+
+import_backend_retry_config()
+
+
+def override_backend_retry_config(value):
+    """Override the retry config option native to the configured
+       rpc backend (if such a native config option exists).
+
+       :param value: the value to override
+    """
+    # TODO(eglynn): ultimately we should add to olso a more generic concept
+    # of retry config (i.e. not specific to an individual AMQP provider)
+    # see: https://bugs.launchpad.net/ceilometer/+bug/1244698
+    kombu = 'ceilometer.openstack.common.rpc.impl_kombu'
+    if cfg.CONF.rpc_backend == kombu:
+        if 'rabbit_max_retries' in cfg.CONF:
+            cfg.CONF.set_override('rabbit_max_retries', value)
 
 
 def compute_signature(message, secret):
@@ -126,8 +155,8 @@ class RPCPublisher(publisher.PublisherBase):
 
         if self.policy in ['queue', 'drop']:
             LOG.info('Publishing policy set to %s, \
-                     override rabbit_max_retries to 1' % self.policy)
-            cfg.CONF.set_override("rabbit_max_retries", 1)
+                     override backend retry config to 1' % self.policy)
+            override_backend_retry_config(1)
 
         elif self.policy == 'default':
             LOG.info('Publishing policy set to %s' % self.policy)
