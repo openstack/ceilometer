@@ -99,7 +99,7 @@ class LibvirtInspector(virt_inspector.Inspector):
                     if domain_id != 0:
                         domain = self._get_connection().lookupByID(domain_id)
                         yield virt_inspector.Instance(name=domain.name(),
-                                                      uuid=domain.UUIDString())
+                                                      UUID=domain.UUIDString())
                 except libvirt.libvirtError:
                     # Instance was deleted while listing... ignore it
                     pass
