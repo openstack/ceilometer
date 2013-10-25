@@ -201,6 +201,8 @@ class TestListResources(FunctionalTest,
                                                }])
         ids = [r['resource_id'] for r in data]
         self.assertEqual(['resource-id'], ids)
+        sources = [r['source'] for r in data]
+        self.assertEqual(['test_list_resources'], sources)
 
     def test_with_invalid_resource_id(self):
         sample1 = sample.Sample(
