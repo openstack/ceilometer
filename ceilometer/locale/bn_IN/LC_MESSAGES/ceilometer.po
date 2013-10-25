@@ -1,4 +1,4 @@
-# Tagalog translations for ceilometer.
+# Bengali (India) translations for ceilometer.
 # Copyright (C) 2013 ORGANIZATION
 # This file is distributed under the same license as the ceilometer project.
 #
@@ -8,11 +8,11 @@ msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2013-10-25 06:03+0000\n"
-"PO-Revision-Date: 2012-12-11 06:53+0000\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: Tagalog "
-"(http://www.transifex.com/projects/p/openstack/language/tl/)\n"
-"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"PO-Revision-Date: 2013-10-20 01:34+0000\n"
+"Last-Translator: Tom Fifield <tom@openstack.org>\n"
+"Language-Team: Bengali (India) "
+"(http://www.transifex.com/projects/p/openstack/language/bn_IN/)\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1290,88 +1290,4 @@ msgstr ""
 #, python-format
 msgid "dropping sample with no predecessor: %s"
 msgstr ""
-
-#~ msgid "Unable to parse action %(action)s for alarm %(alarm)s"
-#~ msgstr ""
-
-#~ msgid "Action %(scheme)s for alarm %(alarm)s is unknown, cannot notify"
-#~ msgstr ""
-
-#~ msgid "Failed to understand rule %(rule)r"
-#~ msgstr ""
-
-#~ msgid "Got unknown keyword args to utils.execute: %r"
-#~ msgstr ""
-
-#~ msgid "Running cmd (subprocess): %s"
-#~ msgstr ""
-
-#~ msgid "Result was %s"
-#~ msgstr ""
-
-#~ msgid "%r failed. Retrying."
-#~ msgstr ""
-
-#~ msgid "Running cmd (SSH): %s"
-#~ msgstr ""
-
-#~ msgid "Environment not supported over SSH"
-#~ msgstr ""
-
-#~ msgid "process_input not supported over SSH"
-#~ msgstr ""
-
-#~ msgid "Problem '%(e)s' attempting to send to notification driver %(driver)s."
-#~ msgstr ""
-
-#~ msgid "The rabbit_notifier is now deprecated. Please use rpc_notifier instead."
-#~ msgstr ""
-
-#~ msgid "Failed to sanitize %(item)s. Key error %(err)s"
-#~ msgstr ""
-
-#~ msgid "version should be an integer"
-#~ msgstr ""
-
-#~ msgid ""
-#~ msgstr ""
-
-#~ msgid "Publishing counter %(msg)s over UDP to %(host)s:%(port)d"
-#~ msgstr ""
-
-#~ msgid "Unable to send counter over UDP"
-#~ msgstr ""
-
-#~ msgid "dropping counter with no predecessor: %s"
-#~ msgstr ""
-
-#~ msgid "Unable to store events: %s"
-#~ msgstr ""
-
-#~ msgid "skipping alarm %s"
-#~ msgstr ""
-
-#~ msgid "threshold evaluation cycle failed"
-#~ msgstr ""
-
-#~ msgid "skipping alarm %s: alarm disabled"
-#~ msgstr ""
-
-#~ msgid "Unknown resource"
-#~ msgstr ""
-
-#~ msgid "Unknown alarm"
-#~ msgstr ""
-
-#~ msgid "threshold_rule/%s is mandatory"
-#~ msgstr ""
-
-#~ msgid "combination_rule/alarm_ids is mandatory"
-#~ msgstr ""
-
-#~ msgid "Alarm %s doesn't exists"
-#~ msgstr ""
-
-#~ msgid "%s is mandatory"
-#~ msgstr ""
 
