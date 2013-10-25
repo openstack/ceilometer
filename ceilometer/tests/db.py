@@ -24,27 +24,37 @@ import six
 import uuid
 import warnings
 
-from oslo.config import cfg
-
 from ceilometer import storage
+from ceilometer.openstack.common.fixture import config
 from ceilometer.tests import base as test_base
 
 
-class TestBase(test_base.TestCase):
+class TestBase(test_base.BaseTestCase):
     def setUp(self):
         super(TestBase, self).setUp()
-        cfg.CONF.set_override('connection', str(self.database_connection),
-                              group='database')
+        self.CONF = self.useFixture(config.Config()).conf
+        self.CONF.set_override('connection', str(self.database_connection),
+                               group='database')
 
         with warnings.catch_warnings():
             warnings.filterwarnings(
                 action='ignore',
                 message='.*you must provide a username and password.*')
             try:
-                self.conn = storage.get_connection(cfg.CONF)
+                self.conn = storage.get_connection(self.CONF)
             except storage.StorageBadVersion as e:
                 self.skipTest(str(e))
         self.conn.upgrade()
+
+        self.CONF([], project='ceilometer')
+
+        # Set a default location for the pipeline config file so the
+        # tests work even if ceilometer is not installed globally on
+        # the system.
+        self.CONF.set_override(
+            'pipeline_cfg_file',
+            self.path_get('etc/ceilometer/pipeline.yaml')
+        )
 
     def tearDown(self):
         self.conn.clear()

@@ -21,7 +21,6 @@
 import urllib
 
 import flask
-from oslo.config import cfg
 import pecan
 import pecan.testing
 
@@ -40,11 +39,12 @@ class TestBase(db_test_base.TestBase):
     def setUp(self):
         super(TestBase, self).setUp()
         service.prepare_service([])
-        cfg.CONF.set_override("auth_version", "v2.0", group=acl.OPT_GROUP_NAME)
-        cfg.CONF.set_override("policy_file",
-                              self.path_get('tests/policy.json'))
+        self.CONF.set_override("auth_version",
+                               "v2.0", group=acl.OPT_GROUP_NAME)
+        self.CONF.set_override("policy_file",
+                               self.path_get('tests/policy.json'))
         sources_file = self.path_get('tests/sources.json')
-        self.app = v1_app.make_app(cfg.CONF,
+        self.app = v1_app.make_app(self.CONF,
                                    enable_acl=False,
                                    attach_storage=False,
                                    sources_file=sources_file)
@@ -87,9 +87,10 @@ class FunctionalTest(db_test_base.TestBase):
 
     def setUp(self):
         super(FunctionalTest, self).setUp()
-        cfg.CONF.set_override("auth_version", "v2.0", group=acl.OPT_GROUP_NAME)
-        cfg.CONF.set_override("policy_file",
-                              self.path_get('tests/policy.json'))
+        self.CONF.set_override("auth_version", "v2.0",
+                               group=acl.OPT_GROUP_NAME)
+        self.CONF.set_override("policy_file",
+                               self.path_get('tests/policy.json'))
         self.app = self._make_app()
 
     def _make_app(self, enable_acl=False):

@@ -82,6 +82,18 @@ class BaseTestCase(test.BaseTestCase):
             0.0,
             places=5)
 
+    @staticmethod
+    def path_get(project_file=None):
+        root = os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                            '..',
+                                            '..',
+                                            )
+                               )
+        if project_file:
+            return os.path.join(root, project_file)
+        else:
+            return root
+
 
 def _skip_decorator(func):
     @functools.wraps(func)

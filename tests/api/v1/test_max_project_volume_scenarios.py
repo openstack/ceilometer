@@ -22,8 +22,6 @@
 import datetime
 import testscenarios
 
-from oslo.config import cfg
-
 from ceilometer.publisher import rpc
 from ceilometer import sample
 
@@ -38,7 +36,6 @@ class TestMaxProjectVolume(tests_api.TestBase,
 
     def setUp(self):
         super(TestMaxProjectVolume, self).setUp()
-
         for i in range(3):
             s = sample.Sample(
                 'volume.size',
@@ -56,7 +53,7 @@ class TestMaxProjectVolume(tests_api.TestBase,
             )
             msg = rpc.meter_message_from_counter(
                 s,
-                cfg.CONF.publisher_rpc.metering_secret,
+                self.CONF.publisher_rpc.metering_secret,
             )
             self.conn.record_metering_data(msg)
 

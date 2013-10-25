@@ -24,8 +24,7 @@
   running the tests. Make sure the Thrift server is running on that server.
 
 """
-from oslo.config import cfg
-
+from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer.storage.impl_hbase import Connection
 from ceilometer.storage.impl_hbase import MConnection
 from ceilometer.tests import db as tests_db
@@ -37,9 +36,13 @@ class HBaseEngineTestBase(tests_db.TestBase):
 
 class ConnectionTest(HBaseEngineTestBase):
 
+    def setUp(self):
+        super(ConnectionTest, self).setUp()
+        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
+
     def test_hbase_connection(self):
-        cfg.CONF.database.connection = self.database_connection
-        conn = Connection(cfg.CONF)
+        self.CONF.database.connection = self.database_connection
+        conn = Connection(self.CONF)
         self.assertIsInstance(conn.conn, MConnection)
 
         class TestConn(object):
@@ -49,8 +52,8 @@ class ConnectionTest(HBaseEngineTestBase):
             def open(self):
                 pass
 
-        cfg.CONF.database.connection = 'hbase://test_hbase:9090'
+        self.CONF.database.connection = 'hbase://test_hbase:9090'
         self.stubs.Set(Connection, '_get_connection',
                        lambda self, x: TestConn(x['host'], x['port']))
-        conn = Connection(cfg.CONF)
+        conn = Connection(self.CONF)
         self.assertIsInstance(conn.conn, TestConn)

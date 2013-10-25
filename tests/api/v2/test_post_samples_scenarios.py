@@ -23,10 +23,9 @@ import datetime
 import logging
 import testscenarios
 
-from oslo.config import cfg
-
 from ceilometer.openstack.common import rpc
 from ceilometer.openstack.common import timeutils
+from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer.tests import db as tests_db
 
 from .base import FunctionalTest
@@ -47,6 +46,7 @@ class TestPostSamples(FunctionalTest,
     def setUp(self):
         super(TestPostSamples, self).setUp()
         self.published = []
+        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
         self.stubs.Set(rpc, 'cast', self.faux_cast)
 
     def test_one(self):
@@ -277,7 +277,7 @@ class TestPostSamples(FunctionalTest,
             # source is modified to include the project_id.
             s['source'] = '%s:%s' % (
                 s['project_id'],
-                s.get('source', cfg.CONF.sample_source)
+                s.get('source', self.CONF.sample_source)
             )
             # Ignore message id that is randomly generated
             s['message_id'] = data.json[x]['message_id']

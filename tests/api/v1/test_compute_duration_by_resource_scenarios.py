@@ -23,6 +23,7 @@ import logging
 import testscenarios
 
 from ceilometer.openstack.common import timeutils
+from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer.storage import models
 from ceilometer.tests import api as tests_api
 from ceilometer.tests import db as tests_db
@@ -37,6 +38,8 @@ class TestComputeDurationByResource(tests_api.TestBase,
 
     def setUp(self):
         super(TestComputeDurationByResource, self).setUp()
+
+        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
 
         # Create events relative to the range and pretend
         # that the intervening events exist.

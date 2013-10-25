@@ -23,8 +23,6 @@ import datetime
 import logging
 import testscenarios
 
-from oslo.config import cfg
-
 from ceilometer.publisher import rpc
 from ceilometer import sample
 
@@ -49,7 +47,6 @@ class TestListMeters(tests_api.TestBase,
 
     def setUp(self):
         super(TestListMeters, self).setUp()
-
         for cnt in [
                 sample.Sample(
                     'meter.test',
@@ -113,7 +110,7 @@ class TestListMeters(tests_api.TestBase,
                     source='test_list_resources')]:
             msg = rpc.meter_message_from_counter(
                 cnt,
-                cfg.CONF.publisher_rpc.metering_secret)
+                self.CONF.publisher_rpc.metering_secret)
             self.conn.record_metering_data(msg)
 
     def test_list_meters(self):
