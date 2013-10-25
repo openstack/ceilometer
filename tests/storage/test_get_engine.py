@@ -19,13 +19,13 @@
 """
 
 import mox
-import testtools
 
 from ceilometer import storage
+from ceilometer.openstack.common import test
 from ceilometer.storage import impl_log
 
 
-class EngineTest(testtools.TestCase):
+class EngineTest(test.BaseTestCase):
 
     def test_get_engine(self):
         conf = mox.Mox().CreateMockAnything()

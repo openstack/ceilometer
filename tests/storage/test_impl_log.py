@@ -17,11 +17,15 @@
 # under the License.
 """Tests for ceilometer/storage/impl_log.py
 """
-from ceilometer.tests import base
+from ceilometer.openstack.common import test
+from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer.storage import impl_log
 
 
-class ConnectionTest(base.TestCase):
+class ConnectionTest(test.BaseTestCase):
+    def setUp(self):
+        super(ConnectionTest, self).setUp()
+        self.mox = self.useFixture(moxstubout.MoxStubout()).mox
 
     def test_get_connection(self):
         conf = self.mox.CreateMockAnything()

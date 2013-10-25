@@ -22,13 +22,15 @@ import datetime
 import os
 import logging
 import logging.handlers
+import tempfile
+
 from ceilometer import sample
 from ceilometer.publisher import file
-from ceilometer.tests import base
+from ceilometer.openstack.common import test
 from ceilometer.openstack.common.network_utils import urlsplit
 
 
-class TestFilePublisher(base.TestCase):
+class TestFilePublisher(test.BaseTestCase):
 
     test_data = [
         sample.Sample(
@@ -68,8 +70,10 @@ class TestFilePublisher(base.TestCase):
 
     def test_file_publisher_maxbytes(self):
         # Test valid configurations
-        name = '%s/log_file' % self.tempdir.path
-        parsed_url = urlsplit('file://%s?max_bytes=50&backup_count=3' % name)
+        tempdir = tempfile.mkdtemp()
+        name = '%s/log_file' % tempdir
+        parsed_url = urlsplit('file://%s?max_bytes=50&backup_count=3'
+                              % name)
         publisher = file.FilePublisher(parsed_url)
         publisher.publish_samples(None,
                                   self.test_data)
@@ -85,7 +89,8 @@ class TestFilePublisher(base.TestCase):
 
     def test_file_publisher(self):
         # Test missing max bytes, backup count configurations
-        name = '%s/log_file_plain' % self.tempdir.path
+        tempdir = tempfile.mkdtemp()
+        name = '%s/log_file_plain' % tempdir
         parsed_url = urlsplit('file://%s' % name)
         publisher = file.FilePublisher(parsed_url)
         publisher.publish_samples(None,
@@ -107,9 +112,10 @@ class TestFilePublisher(base.TestCase):
 
     def test_file_publisher_invalid(self):
         # Test invalid max bytes, backup count configurations
+        tempdir = tempfile.mkdtemp()
         parsed_url = urlsplit(
             'file://%s/log_file_bad'
-            '?max_bytes=yus&backup_count=5y' % self.tempdir.path)
+            '?max_bytes=yus&backup_count=5y' % tempdir)
         publisher = file.FilePublisher(parsed_url)
         publisher.publish_samples(None,
                                   self.test_data)

@@ -24,7 +24,8 @@ import testscenarios
 
 from ceilometer.central import manager
 from ceilometer.objectstore import swift
-from ceilometer.tests import base
+from ceilometer.openstack.common import test
+from ceilometer.openstack.common.fixture import moxstubout
 
 from keystoneclient import exceptions
 from swiftclient import client as swift_client
@@ -48,7 +49,7 @@ class TestManager(manager.AgentManager):
         self.keystone = mock.MagicMock()
 
 
-class TestSwiftPollster(base.TestCase):
+class TestSwiftPollster(test.BaseTestCase):
 
     # Define scenarios to run all of the tests against all of the
     # pollsters.
@@ -72,6 +73,7 @@ class TestSwiftPollster(base.TestCase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestSwiftPollster, self).setUp()
+        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
         self.pollster = self.factory()
         self.manager = TestManager()
 

@@ -20,11 +20,12 @@
 import cStringIO as StringIO
 import mock
 
-from oslo.config import cfg
 from webob import Request
 
-from ceilometer.tests import base
 from ceilometer.objectstore import swift_middleware
+from ceilometer.openstack.common import test
+from ceilometer.openstack.common.fixture import config
+from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer import pipeline
 
 
@@ -42,7 +43,7 @@ class FakeApp(object):
         return self.body
 
 
-class TestSwiftMiddleware(base.TestCase):
+class TestSwiftMiddleware(test.BaseTestCase):
 
     class _faux_pipeline_manager(pipeline.PipelineManager):
         class _faux_pipeline(object):
@@ -64,8 +65,10 @@ class TestSwiftMiddleware(base.TestCase):
 
     def setUp(self):
         super(TestSwiftMiddleware, self).setUp()
+        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
         self.pipeline_manager = self._faux_pipeline_manager()
         self.stubs.Set(pipeline, 'setup_pipeline', self._faux_setup_pipeline)
+        self.CONF = self.useFixture(config.Config()).conf
 
     @staticmethod
     def start_response(*args):
@@ -73,7 +76,7 @@ class TestSwiftMiddleware(base.TestCase):
 
     def test_rpc_setup(self):
         swift_middleware.CeilometerMiddleware(FakeApp(), {})
-        self.assertEqual(cfg.CONF.control_exchange, 'ceilometer')
+        self.assertEqual(self.CONF.control_exchange, 'ceilometer')
 
     def test_get(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(), {})
