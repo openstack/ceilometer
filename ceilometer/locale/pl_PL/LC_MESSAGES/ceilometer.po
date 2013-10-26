@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-10-25 06:03+0000\n"
+"POT-Creation-Date: 2013-10-26 06:03+0000\n"
 "PO-Revision-Date: 2013-07-04 07:30+0000\n"
 "Last-Translator: Cyryl Sochacki <cyrylsochacki@gmail.com>\n"
 "Language-Team: Polish (Poland) "
@@ -327,48 +327,48 @@ msgstr ""
 msgid "Period must be positive."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:946
+#: ceilometer/api/controllers/v2.py:950
 msgid "Resource"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1013
+#: ceilometer/api/controllers/v2.py:1017
 #, python-format
 msgid ""
 "Alarm when %(meter_name)s is %(comparison_operator)s a %(statistic)s of "
 "%(threshold)s over %(period)s seconds"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1052
+#: ceilometer/api/controllers/v2.py:1056
 #, python-format
 msgid "Combined state of alarms %s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1146
+#: ceilometer/api/controllers/v2.py:1150
 msgid "either threshold_rule or combination_rule must be set"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1152
+#: ceilometer/api/controllers/v2.py:1156
 msgid "threshold_rule and combination_rule cannot be set at the same time"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1173
+#: ceilometer/api/controllers/v2.py:1177
 #, python-format
 msgid "Alarm %s doesn't exist"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1271
+#: ceilometer/api/controllers/v2.py:1275
 msgid "Alarm"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1336 ceilometer/api/controllers/v2.py:1469
+#: ceilometer/api/controllers/v2.py:1340 ceilometer/api/controllers/v2.py:1473
 msgid "Alarm incorrect"
 msgstr "Nieprawidłowy alarm"
 
-#: ceilometer/api/controllers/v2.py:1381
+#: ceilometer/api/controllers/v2.py:1385
 msgid "state invalid"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1461
+#: ceilometer/api/controllers/v2.py:1465
 msgid "Alarm with that name exists"
 msgstr ""
 
