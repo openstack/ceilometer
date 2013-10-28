@@ -16,18 +16,18 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-
 import uuid
+
+from ceilometerclient.v2.alarms import Alarm as AlarmClient
 import mock
 
 from ceilometer.alarm import rpc as rpc_alarm
+from ceilometer.openstack.common.fixture import config
+from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer.openstack.common import rpc
 from ceilometer.openstack.common import test
 from ceilometer.openstack.common import timeutils
-from ceilometer.openstack.common.fixture import config
-from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer.storage.models import Alarm as AlarmModel
-from ceilometerclient.v2.alarms import Alarm as AlarmClient
 
 
 class TestRPCAlarmNotifier(test.BaseTestCase):

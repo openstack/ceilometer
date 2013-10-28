@@ -18,19 +18,18 @@
 # under the License.
 """Tests for ceilometer/publisher/rpc.py
 """
-
 import datetime
 
 import eventlet
 import fixtures
 import mock
 
-from ceilometer import sample
+from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import jsonutils
 from ceilometer.openstack.common import network_utils
 from ceilometer.openstack.common import test
-from ceilometer.openstack.common.fixture import config
 from ceilometer.publisher import rpc
+from ceilometer import sample
 
 
 class TestSignature(test.BaseTestCase):

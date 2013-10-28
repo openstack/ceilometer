@@ -24,8 +24,8 @@ import os
 import types
 
 from sqlalchemy import and_
-from sqlalchemy import func
 from sqlalchemy import desc
+from sqlalchemy import func
 from sqlalchemy.orm import aliased
 
 from ceilometer.openstack.common.db import exception as dbexc
@@ -40,11 +40,11 @@ from ceilometer.storage.sqlalchemy.models import Alarm
 from ceilometer.storage.sqlalchemy.models import AlarmChange
 from ceilometer.storage.sqlalchemy.models import Base
 from ceilometer.storage.sqlalchemy.models import Event
-from ceilometer.storage.sqlalchemy.models import Meter
 from ceilometer.storage.sqlalchemy.models import MetaBool
 from ceilometer.storage.sqlalchemy.models import MetaFloat
 from ceilometer.storage.sqlalchemy.models import MetaInt
 from ceilometer.storage.sqlalchemy.models import MetaText
+from ceilometer.storage.sqlalchemy.models import Meter
 from ceilometer.storage.sqlalchemy.models import Project
 from ceilometer.storage.sqlalchemy.models import Resource
 from ceilometer.storage.sqlalchemy.models import Source

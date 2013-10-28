@@ -13,8 +13,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import sqlalchemy
 from migrate.changeset.constraint import UniqueConstraint
+import sqlalchemy
 
 from ceilometer.storage.sqlalchemy import models
 

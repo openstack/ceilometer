@@ -17,7 +17,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import httplib2
 import json
 import os
 import random
@@ -25,8 +24,10 @@ import socket
 import subprocess
 import time
 
-from ceilometer.tests import base
+import httplib2
+
 from ceilometer.openstack.common import fileutils
+from ceilometer.tests import base
 
 
 class BinTestCase(base.BaseTestCase):

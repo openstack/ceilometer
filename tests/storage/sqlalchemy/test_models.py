@@ -19,12 +19,12 @@
 from datetime import datetime
 
 import mock
-from sqlalchemy.types import DATETIME, NUMERIC
 from sqlalchemy.dialects.mysql import DECIMAL
+from sqlalchemy.types import DATETIME, NUMERIC
 
-from ceilometer import utils
 from ceilometer.openstack.common import test
 from ceilometer.storage.sqlalchemy import models
+from ceilometer import utils
 
 
 class PreciseTimestampTest(test.BaseTestCase):

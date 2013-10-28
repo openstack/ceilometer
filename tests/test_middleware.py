@@ -15,9 +15,10 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-from ceilometer.openstack.common import test
-from ceilometer.openstack.common.fixture import config
+
 from ceilometer import middleware
+from ceilometer.openstack.common.fixture import config
+from ceilometer.openstack.common import test
 
 
 HTTP_REQUEST = {

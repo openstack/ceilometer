@@ -19,8 +19,8 @@ Tests for Hyper-V utilsv2.
 
 import mock
 
-from ceilometer.compute.virt import inspector
 from ceilometer.compute.virt.hyperv import utilsv2 as utilsv2
+from ceilometer.compute.virt import inspector
 from ceilometer.openstack.common import test
 
 

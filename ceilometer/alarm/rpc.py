@@ -19,9 +19,9 @@
 from oslo.config import cfg
 
 from ceilometer.openstack.common import context
-from ceilometer.openstack.common.rpc import proxy as rpc_proxy
-from ceilometer.openstack.common import log
 from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common import log
+from ceilometer.openstack.common.rpc import proxy as rpc_proxy
 from ceilometer.storage.models import Alarm
 
 OPTS = [

@@ -18,14 +18,14 @@
 # under the License.
 
 import cStringIO as StringIO
-import mock
 
+import mock
 from webob import Request
 
 from ceilometer.objectstore import swift_middleware
-from ceilometer.openstack.common import test
 from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common.fixture import moxstubout
+from ceilometer.openstack.common import test
 from ceilometer import pipeline
 
 

@@ -16,11 +16,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-
-from sqlalchemy import String
-from sqlalchemy import Text
 from sqlalchemy import MetaData
+from sqlalchemy import String
 from sqlalchemy import Table
+from sqlalchemy import Text
 
 
 def upgrade(migrate_engine):

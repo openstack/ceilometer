@@ -17,6 +17,7 @@
 # under the License.
 
 import sqlalchemy as sa
+
 from ceilometer.storage.sqlalchemy.models import PreciseTimestamp
 
 _col = 'timestamp'

@@ -20,12 +20,13 @@
 
 """Base classes for API tests."""
 import os
-import six
 import uuid
 import warnings
 
-from ceilometer import storage
+import six
+
 from ceilometer.openstack.common.fixture import config
+from ceilometer import storage
 from ceilometer.tests import base as test_base
 
 

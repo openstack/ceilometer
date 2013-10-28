@@ -22,9 +22,9 @@ import operator
 
 from ceilometer.alarm import evaluator
 from ceilometer.alarm.evaluator import OK, ALARM, UNKNOWN
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
-from ceilometer.openstack.common.gettextutils import _
 
 LOG = log.getLogger(__name__)
 

@@ -18,11 +18,12 @@
 """Test events statistics retrieval."""
 
 import datetime
+
 import testscenarios
 
 from . import base
-from ceilometer import sample
 from ceilometer.publisher import rpc
+from ceilometer import sample
 from ceilometer.tests import db as tests_db
 
 load_tests = testscenarios.load_tests_apply_scenarios

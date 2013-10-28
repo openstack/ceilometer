@@ -19,15 +19,16 @@
 """
 
 import datetime
+
 import mock
 import msgpack
 
-from ceilometer import sample
-from ceilometer.publisher import udp
-from ceilometer.openstack.common import test
-from ceilometer.openstack.common import network_utils
 from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common.fixture import moxstubout
+from ceilometer.openstack.common import network_utils
+from ceilometer.openstack.common import test
+from ceilometer.publisher import udp
+from ceilometer import sample
 
 
 COUNTER_SOURCE = 'testsource'

@@ -18,9 +18,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from ceilometer import sample
 from ceilometer.compute import plugin
 from ceilometer.compute.pollsters import util
+from ceilometer import sample
 
 
 class InstancePollster(plugin.ComputePollster):

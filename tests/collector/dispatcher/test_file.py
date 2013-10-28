@@ -18,13 +18,13 @@
 """Tests for ceilometer/collector/dispatcher/file.py
 """
 
+import logging.handlers
 import os
 import tempfile
-import logging.handlers
 
 from ceilometer.collector.dispatcher import file
-from ceilometer.openstack.common import test
 from ceilometer.openstack.common.fixture import config
+from ceilometer.openstack.common import test
 from ceilometer.publisher import rpc
 
 

@@ -22,9 +22,9 @@
 
 import mock
 
-from ceilometer.openstack.common import test
 from ceilometer.compute import manager
 from ceilometer.compute.pollsters import util
+from ceilometer.openstack.common import test
 
 
 class FauxInstance(object):

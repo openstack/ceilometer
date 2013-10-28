@@ -14,6 +14,7 @@
 # under the License.
 
 from sqlalchemy import Index
+
 from ceilometer.storage.sqlalchemy.models import Meter
 
 

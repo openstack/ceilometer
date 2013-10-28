@@ -20,14 +20,14 @@
 
 import datetime
 import logging
-import webtest.app
-import testscenarios
 
+import testscenarios
+import webtest.app
+
+from .base import FunctionalTest
 from ceilometer.publisher import rpc
 from ceilometer import sample
 from ceilometer.tests import db as tests_db
-
-from .base import FunctionalTest
 
 load_tests = testscenarios.load_tests_apply_scenarios
 

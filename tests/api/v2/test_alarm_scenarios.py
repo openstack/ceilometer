@@ -23,12 +23,12 @@
 import datetime
 import json as jsonutils
 import logging
-import mock
 import uuid
+
+import mock
 import testscenarios
 
 from .base import FunctionalTest
-
 from ceilometer.storage.models import Alarm
 from ceilometer.tests import db as tests_db
 

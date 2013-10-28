@@ -19,8 +19,8 @@
 """
 import mock
 
-from ceilometer.openstack.common import test
 from ceilometer.alarm import evaluator
+from ceilometer.openstack.common import test
 
 
 class TestEvaluatorBaseClass(test.BaseTestCase):

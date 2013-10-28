@@ -19,8 +19,8 @@
 import sys
 
 from nova import notifications
-from nova.openstack.common.notifier import api as notifier_api
 from nova.openstack.common import log as logging
+from nova.openstack.common.notifier import api as notifier_api
 
 # HACK(dhellmann): Insert the nova version of openstack.common into
 # sys.modules as though it was the copy from ceilometer, so that when

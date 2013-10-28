@@ -19,22 +19,22 @@
 # under the License.
 
 import abc
-import six
 
+from ceilometerclient import client as ceiloclient
 from oslo.config import cfg
+import six
 from stevedore import extension
 
-from ceilometer.alarm import rpc as rpc_alarm
 from ceilometer.alarm.partition import coordination
-from ceilometer.service import prepare_service
+from ceilometer.alarm import rpc as rpc_alarm
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import importutils
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import network_utils
-from ceilometer.openstack.common import service as os_service
-from ceilometer.openstack.common.gettextutils import _
-from ceilometer.openstack.common.rpc import service as rpc_service
 from ceilometer.openstack.common.rpc import dispatcher as rpc_dispatcher
-from ceilometerclient import client as ceiloclient
+from ceilometer.openstack.common.rpc import service as rpc_service
+from ceilometer.openstack.common import service as os_service
+from ceilometer.service import prepare_service
 
 
 OPTS = [

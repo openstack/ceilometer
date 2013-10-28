@@ -19,18 +19,17 @@
 """
 
 from __future__ import absolute_import
+from urlparse import urljoin
 
+from keystoneclient import exceptions
 from oslo.config import cfg
 from swiftclient import client as swift
-from keystoneclient import exceptions
 
-from ceilometer import sample
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer import plugin
-
-from urlparse import urljoin
+from ceilometer import sample
 
 
 LOG = log.getLogger(__name__)

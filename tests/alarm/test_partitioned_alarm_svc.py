@@ -17,14 +17,15 @@
 # under the License.
 """Tests for ceilometer.alarm.service.PartitionedAlarmService.
 """
-import mock
 from contextlib import nested
+
+import mock
 from stevedore import extension
 from stevedore.tests import manager as extension_tests
 
 from ceilometer.alarm import service
-from ceilometer.openstack.common import test
 from ceilometer.openstack.common.fixture import config
+from ceilometer.openstack.common import test
 
 
 class TestPartitionedAlarmService(test.BaseTestCase):

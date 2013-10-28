@@ -18,14 +18,13 @@
 
 
 import abc
-import six
-
-from oslo.config import cfg
 
 from ceilometerclient import client as ceiloclient
+from oslo.config import cfg
+import six
 
-from ceilometer.openstack.common import log
 from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common import log
 
 LOG = log.getLogger(__name__)
 

@@ -22,8 +22,8 @@ from stevedore import extension
 
 from ceilometer import agent
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import service as os_service
 from ceilometer.openstack.common.rpc import service as rpc_service
+from ceilometer.openstack.common import service as os_service
 from ceilometer import service
 
 cfg.CONF.import_group('service_credentials', 'ceilometer.service')

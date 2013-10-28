@@ -20,8 +20,8 @@
 
 from oslo.config import cfg
 
-from ceilometer import sample
 from ceilometer.openstack.common import timeutils
+from ceilometer import sample
 
 
 INSTANCE_PROPERTIES = [

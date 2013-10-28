@@ -19,8 +19,8 @@
 # under the License.
 """Tests for ceilometer/utils.py
 """
-import decimal
 import datetime
+import decimal
 
 from ceilometer.openstack.common import test
 from ceilometer import utils

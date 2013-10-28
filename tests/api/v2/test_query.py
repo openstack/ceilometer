@@ -15,16 +15,16 @@
 #    under the License.
 """Test the methods related to query."""
 import datetime
-import mock
 
+import mock
 import wsme
 
-from ceilometer import storage
 from ceilometer.api.controllers import v2 as api
 from ceilometer.api.controllers.v2 import Query
+from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer.openstack.common import test
 from ceilometer.openstack.common import timeutils
-from ceilometer.openstack.common.fixture import moxstubout
+from ceilometer import storage
 from ceilometer.tests import base as tests_base
 
 

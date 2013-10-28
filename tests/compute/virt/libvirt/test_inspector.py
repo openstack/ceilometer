@@ -19,12 +19,14 @@
 """Tests for libvirt inspector.
 """
 
+from contextlib import nested
+
+import fixtures
+import mock
+
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.compute.virt.libvirt import inspector as libvirt_inspector
-import fixtures
 from ceilometer.openstack.common import test
-import mock
-from contextlib import nested
 
 
 class TestLibvirtInspection(test.BaseTestCase):

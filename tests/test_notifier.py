@@ -19,9 +19,9 @@
 """
 
 from ceilometer import notifier
+from ceilometer.openstack.common import test
 from ceilometer import pipeline
 from ceilometer import transformer
-from ceilometer.openstack.common import test
 
 
 MESSAGE = {

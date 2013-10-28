@@ -21,14 +21,14 @@
 import copy
 import datetime
 import logging
+
 import testscenarios
 
+from .base import FunctionalTest
+from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer.openstack.common import rpc
 from ceilometer.openstack.common import timeutils
-from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer.tests import db as tests_db
-
-from .base import FunctionalTest
 
 load_tests = testscenarios.load_tests_apply_scenarios
 

@@ -18,8 +18,8 @@
 
 import fnmatch
 import itertools
-import os
 import operator
+import os
 
 from oslo.config import cfg
 import yaml

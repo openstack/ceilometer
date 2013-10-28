@@ -19,20 +19,20 @@
 """
 
 import datetime
-import msgpack
 import socket
 
+import mock
 from mock import patch
-from mock import MagicMock
+import msgpack
 from stevedore import extension
 from stevedore.tests import manager as test_manager
 
-from ceilometer import sample
 from ceilometer.collector import service
 from ceilometer.compute import notifications
-from ceilometer.openstack.common import timeutils
 from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common.fixture import moxstubout
+from ceilometer.openstack.common import timeutils
+from ceilometer import sample
 from ceilometer.storage import models
 from ceilometer.tests import base as tests_base
 
@@ -131,7 +131,7 @@ class TestUDPCollectorService(TestCollector):
         ).as_dict()
 
     def test_udp_receive(self):
-        mock_dispatcher = MagicMock()
+        mock_dispatcher = mock.MagicMock()
         self.srv.dispatcher_manager = test_manager.TestExtensionManager(
             [extension.Extension('test',
                                  None,
@@ -152,7 +152,7 @@ class TestUDPCollectorService(TestCollector):
             self.counter)
 
     def test_udp_receive_storage_error(self):
-        mock_dispatcher = MagicMock()
+        mock_dispatcher = mock.MagicMock()
         self.srv.dispatcher_manager = test_manager.TestExtensionManager(
             [extension.Extension('test',
                                  None,
@@ -195,7 +195,7 @@ class TestCollectorService(TestCollector):
         self.srv = service.CollectorService('the-host', 'the-topic')
         self.ctx = None
 
-    @patch('ceilometer.pipeline.setup_pipeline', MagicMock())
+    @patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_init_host(self):
         # If we try to create a real RPC connection, init_host() never
         # returns. Mock it out so we can establish the service
@@ -203,7 +203,7 @@ class TestCollectorService(TestCollector):
         with patch('ceilometer.openstack.common.rpc.create_connection'):
             self.srv.start()
 
-    @patch('ceilometer.pipeline.setup_pipeline', MagicMock())
+    @patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_process_notification(self):
         # If we try to create a real RPC connection, init_host() never
         # returns. Mock it out so we can establish the service
@@ -211,7 +211,7 @@ class TestCollectorService(TestCollector):
         self.CONF.set_override("store_events", False, group="collector")
         with patch('ceilometer.openstack.common.rpc.create_connection'):
             self.srv.start()
-        self.srv.pipeline_manager.pipelines[0] = MagicMock()
+        self.srv.pipeline_manager.pipelines[0] = mock.MagicMock()
         self.srv.notification_manager = test_manager.TestExtensionManager(
             [extension.Extension('test',
                                  None,
@@ -225,14 +225,14 @@ class TestCollectorService(TestCollector):
 
     def test_process_notification_no_events(self):
         self.CONF.set_override("store_events", False, group="collector")
-        self.srv.notification_manager = MagicMock()
+        self.srv.notification_manager = mock.MagicMock()
         with patch.object(self.srv, '_message_to_event') as fake_msg_to_event:
             self.srv.process_notification({})
             self.assertFalse(fake_msg_to_event.called)
 
     def test_process_notification_with_events(self):
         self.CONF.set_override("store_events", True, group="collector")
-        self.srv.notification_manager = MagicMock()
+        self.srv.notification_manager = mock.MagicMock()
         with patch.object(self.srv, '_message_to_event') as fake_msg_to_event:
             self.srv.process_notification({})
             self.assertTrue(fake_msg_to_event.called)
@@ -244,7 +244,7 @@ class TestCollectorService(TestCollector):
                    'message_id': "abc",
                    'publisher_id': "1"}
 
-        mock_dispatcher = MagicMock()
+        mock_dispatcher = mock.MagicMock()
         self.srv.dispatcher_manager = test_manager.TestExtensionManager(
             [extension.Extension('test',
                                  None,
@@ -265,7 +265,7 @@ class TestCollectorService(TestCollector):
 
     def test_message_to_event_duplicate(self):
         self.CONF.set_override("store_events", True, group="collector")
-        mock_dispatcher = MagicMock()
+        mock_dispatcher = mock.MagicMock()
         self.srv.dispatcher_manager = test_manager.TestExtensionManager(
             [extension.Extension('test',
                                  None,
@@ -280,7 +280,7 @@ class TestCollectorService(TestCollector):
 
     def test_message_to_event_bad_event(self):
         self.CONF.set_override("store_events", True, group="collector")
-        mock_dispatcher = MagicMock()
+        mock_dispatcher = mock.MagicMock()
         self.srv.dispatcher_manager = test_manager.TestExtensionManager(
             [extension.Extension('test',
                                  None,

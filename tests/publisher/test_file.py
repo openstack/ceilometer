@@ -19,15 +19,15 @@
 """
 
 import datetime
-import os
 import logging
 import logging.handlers
+import os
 import tempfile
 
-from ceilometer import sample
-from ceilometer.publisher import file
-from ceilometer.openstack.common import test
 from ceilometer.openstack.common.network_utils import urlsplit
+from ceilometer.openstack.common import test
+from ceilometer.publisher import file
+from ceilometer import sample
 
 
 class TestFilePublisher(test.BaseTestCase):

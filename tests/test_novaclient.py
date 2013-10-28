@@ -18,11 +18,11 @@
 # under the License.
 
 import mock
-
 import novaclient
+
 from ceilometer import nova_client
-from ceilometer.openstack.common import test
 from ceilometer.openstack.common.fixture import moxstubout
+from ceilometer.openstack.common import test
 
 
 class TestNovaClient(test.BaseTestCase):

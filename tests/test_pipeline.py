@@ -21,16 +21,16 @@ import datetime
 
 from stevedore import extension
 
-from ceilometer import sample
+from ceilometer.openstack.common.fixture import moxstubout
+from ceilometer.openstack.common import test
+from ceilometer.openstack.common import timeutils
+from ceilometer import pipeline
 from ceilometer import publisher
 from ceilometer.publisher import test as test_publisher
+from ceilometer import sample
 from ceilometer import transformer
 from ceilometer.transformer import accumulator
 from ceilometer.transformer import conversions
-from ceilometer.openstack.common import test
-from ceilometer.openstack.common import timeutils
-from ceilometer.openstack.common.fixture import moxstubout
-from ceilometer import pipeline
 
 
 class TestTransformerAccumulator(test.BaseTestCase):

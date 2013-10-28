@@ -15,15 +15,15 @@
 # under the License.
 
 import datetime
-from oslo.config import cfg
 
 from keystoneclient import exceptions
+from oslo.config import cfg
 import requests
 
 from ceilometer.central import plugin
-from ceilometer import sample
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
+from ceilometer import sample
 
 LOG = log.getLogger(__name__)
 

@@ -22,21 +22,21 @@
 
 import calendar
 import copy
+import json
 import operator
 import weakref
 
 import bson.code
 import bson.objectid
-import json
 import pymongo
 
 from oslo.config import cfg
 
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer import storage
 from ceilometer.storage import base
 from ceilometer.storage import models
-from ceilometer.openstack.common.gettextutils import _
 
 cfg.CONF.import_opt('time_to_live', 'ceilometer.storage',
                     group="database")

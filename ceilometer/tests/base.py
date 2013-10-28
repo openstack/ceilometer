@@ -20,6 +20,7 @@
 """
 import functools
 import os.path
+
 from testtools import testcase
 
 from ceilometer.openstack.common import test

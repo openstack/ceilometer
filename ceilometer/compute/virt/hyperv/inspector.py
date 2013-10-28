@@ -18,8 +18,8 @@
 
 from oslo.config import cfg
 
-from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.compute.virt.hyperv import utilsv2
+from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.openstack.common import log
 
 CONF = cfg.CONF

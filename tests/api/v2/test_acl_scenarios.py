@@ -19,15 +19,15 @@
 
 import datetime
 import json
+
 import testscenarios
 
-from ceilometer import sample
-from ceilometer.api import acl
-from ceilometer.publisher import rpc
-from ceilometer.tests import db as tests_db
-from ceilometer.openstack.common import timeutils
-
 from .base import FunctionalTest
+from ceilometer.api import acl
+from ceilometer.openstack.common import timeutils
+from ceilometer.publisher import rpc
+from ceilometer import sample
+from ceilometer.tests import db as tests_db
 
 load_tests = testscenarios.load_tests_apply_scenarios
 

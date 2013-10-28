@@ -20,8 +20,8 @@ import logging
 import logging.handlers
 import urlparse
 
-from ceilometer import publisher
 from ceilometer.openstack.common import log
+from ceilometer import publisher
 
 LOG = log.getLogger(__name__)
 

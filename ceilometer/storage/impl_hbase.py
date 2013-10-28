@@ -18,20 +18,21 @@
 # under the License.
 """HBase storage backend
 """
-import json
-import hashlib
-import itertools
 import copy
 import datetime
-import happybase
+import hashlib
+import itertools
+import json
 import os
 import re
 import urlparse
 
+import happybase
+
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import timeutils
 from ceilometer.openstack.common import network_utils
+from ceilometer.openstack.common import timeutils
 from ceilometer.storage import base
 from ceilometer.storage import models
 

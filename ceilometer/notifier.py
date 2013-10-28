@@ -16,10 +16,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from ceilometer import pipeline
-from ceilometer import transformer
 from ceilometer.openstack.common import context as req_context
 from ceilometer.openstack.common import log as logging
+from ceilometer import pipeline
+from ceilometer import transformer
+
 from stevedore import extension
 
 

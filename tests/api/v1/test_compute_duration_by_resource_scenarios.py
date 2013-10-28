@@ -20,10 +20,11 @@
 
 import datetime
 import logging
+
 import testscenarios
 
-from ceilometer.openstack.common import timeutils
 from ceilometer.openstack.common.fixture import moxstubout
+from ceilometer.openstack.common import timeutils
 from ceilometer.storage import models
 from ceilometer.tests import api as tests_api
 from ceilometer.tests import db as tests_db

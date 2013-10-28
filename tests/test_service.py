@@ -17,17 +17,19 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import yaml
-import subprocess
 import os
 import shutil
 import signal
-import time
+import subprocess
 import threading
-from ceilometer import service
-from ceilometer.tests import base
+import time
+
+import yaml
+
 from ceilometer.openstack.common import fileutils
 from ceilometer.openstack.common import test
+from ceilometer import service
+from ceilometer.tests import base
 
 
 class ServiceTestCase(test.BaseTestCase):

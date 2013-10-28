@@ -22,9 +22,9 @@
 
 from oslo.config import cfg
 
-from ceilometer import sample
 from ceilometer.openstack.common import log
 from ceilometer import plugin
+from ceilometer import sample
 
 OPTS = [
     cfg.StrOpt('neutron_control_exchange',

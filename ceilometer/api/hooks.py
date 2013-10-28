@@ -18,6 +18,7 @@
 # under the License.
 
 import threading
+
 from oslo.config import cfg
 from pecan import hooks
 

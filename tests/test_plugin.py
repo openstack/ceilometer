@@ -16,8 +16,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from ceilometer import plugin
 from ceilometer.openstack.common import test
+from ceilometer import plugin
 
 
 TEST_NOTIFICATION = {

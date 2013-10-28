@@ -18,7 +18,9 @@
 
 import logging
 import logging.handlers
+
 from oslo.config import cfg
+
 from ceilometer.collector import dispatcher
 
 file_dispatcher_opts = [

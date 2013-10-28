@@ -17,8 +17,9 @@
 # under the License.
 """Tests for ceilometer/storage/impl_log.py
 """
-from ceilometer.openstack.common import test
+
 from ceilometer.openstack.common.fixture import moxstubout
+from ceilometer.openstack.common import test
 from ceilometer.storage import impl_log
 
 

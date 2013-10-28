@@ -29,16 +29,16 @@ import datetime
 import inspect
 import json
 import uuid
-import pecan
-import six
-from pecan import rest
 
 from oslo.config import cfg
-
+import pecan
+from pecan import rest
+import six
 import wsme
-import wsmeext.pecan as wsme_pecan
 from wsme import types as wtypes
+import wsmeext.pecan as wsme_pecan
 
+from ceilometer.api import acl
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
@@ -48,7 +48,6 @@ from ceilometer.openstack.common import timeutils
 from ceilometer import sample
 from ceilometer import storage
 from ceilometer import utils
-from ceilometer.api import acl
 
 
 LOG = log.getLogger(__name__)

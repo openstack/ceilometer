@@ -23,14 +23,14 @@
 
 from __future__ import division
 import copy
-import weakref
+import datetime
 import itertools
+import sys
+import weakref
 
 import bson.code
 import bson.objectid
-import datetime
 import pymongo
-import sys
 
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log

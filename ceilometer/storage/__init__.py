@@ -18,15 +18,14 @@
 """Storage backend management
 """
 
-
 import urlparse
 
 from oslo.config import cfg
 from stevedore import driver
 
 from ceilometer.openstack.common import log
-from ceilometer import utils
 from ceilometer import service
+from ceilometer import utils
 
 
 LOG = log.getLogger(__name__)

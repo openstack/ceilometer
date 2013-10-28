@@ -18,13 +18,14 @@
 """Tests for ceilometer/alarm/partition/coordination.py
 """
 import datetime
-import mock
 import uuid
 
+import mock
+
 from ceilometer.alarm.partition import coordination
+from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import test
 from ceilometer.openstack.common import timeutils
-from ceilometer.openstack.common.fixture import config
 from ceilometer.storage import models
 
 

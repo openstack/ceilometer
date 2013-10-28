@@ -16,12 +16,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-
-from ceilometer import storage
 from ceilometer.collector import dispatcher
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer.publisher import rpc as publisher_rpc
+from ceilometer import storage
 
 LOG = log.getLogger(__name__)
 

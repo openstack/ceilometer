@@ -55,10 +55,10 @@ except ImportError:
     # Swift <= 1.7.5 ... module exists and has class.
     from swift.common.middleware.proxy_logging import InputProxy
 
-from ceilometer import sample
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import timeutils
 from ceilometer import pipeline
+from ceilometer import sample
 from ceilometer import service
 from ceilometer import transformer
 

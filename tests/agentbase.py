@@ -21,17 +21,17 @@
 
 import abc
 import datetime
-import mock
 
+import mock
 from stevedore import extension
 from stevedore.tests import manager as extension_tests
 
-from ceilometer import sample
-from ceilometer import pipeline
 from ceilometer import agent
-from ceilometer import transformer
 from ceilometer.openstack.common.fixture import config
+from ceilometer import pipeline
+from ceilometer import sample
 from ceilometer.tests import base
+from ceilometer import transformer
 
 
 default_test_data = sample.Sample(

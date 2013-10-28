@@ -20,8 +20,8 @@
 
 import mox
 
-from ceilometer import storage
 from ceilometer.openstack.common import test
+from ceilometer import storage
 from ceilometer.storage import impl_log
 
 

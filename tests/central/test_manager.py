@@ -18,12 +18,12 @@
 """Tests for ceilometer/central/manager.py
 """
 
-import mock
 from keystoneclient.v2_0 import client as ksclient
+import mock
 
 from ceilometer.central import manager
-from ceilometer.openstack.common import test
 from ceilometer.openstack.common.fixture import moxstubout
+from ceilometer.openstack.common import test
 from tests import agentbase
 
 

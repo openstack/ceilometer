@@ -20,16 +20,16 @@
 """
 import os
 
-from ceilometer.api import app
+from .base import FunctionalTest
 from ceilometer.api import acl
-from ceilometer import service
+from ceilometer.api import app
 from ceilometer.openstack.common import fileutils
-from ceilometer.openstack.common import gettextutils
 from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common.fixture import moxstubout
+from ceilometer.openstack.common import gettextutils
+from ceilometer import service
 from ceilometer.tests import base
 from ceilometer.tests import db as tests_db
-from .base import FunctionalTest
 
 
 class TestApp(base.BaseTestCase):

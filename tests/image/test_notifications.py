@@ -20,8 +20,8 @@
 from datetime import datetime
 
 from ceilometer.image import notifications
-from ceilometer import sample
 from ceilometer.openstack.common import test
+from ceilometer import sample
 
 
 def fake_uuid(x):

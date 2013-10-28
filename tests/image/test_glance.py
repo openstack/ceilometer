@@ -18,11 +18,11 @@
 
 import mock
 
-from ceilometer.image import glance
 from ceilometer.central import manager
+from ceilometer.image import glance
 from ceilometer.openstack.common import context
-from ceilometer.openstack.common import test
 from ceilometer.openstack.common.fixture import moxstubout
+from ceilometer.openstack.common import test
 
 IMAGE_LIST = [
     type('Image', (object,),

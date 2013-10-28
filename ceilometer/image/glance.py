@@ -19,14 +19,14 @@
 """
 
 from __future__ import absolute_import
-
 import itertools
+
 import glanceclient
 from oslo.config import cfg
 
-from ceilometer import sample
 from ceilometer.openstack.common import timeutils
 from ceilometer import plugin
+from ceilometer import sample
 
 
 class _Base(plugin.PollsterBase):

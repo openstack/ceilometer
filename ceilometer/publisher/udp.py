@@ -18,13 +18,15 @@
 """Publish a sample using an UDP mechanism
 """
 
-from ceilometer import publisher
+import socket
+
+import msgpack
+from oslo.config import cfg
+
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import network_utils
-from ceilometer.openstack.common.gettextutils import _
-import msgpack
-import socket
-from oslo.config import cfg
+from ceilometer import publisher
 
 cfg.CONF.import_opt('udp_port', 'ceilometer.collector.service',
                     group='collector')

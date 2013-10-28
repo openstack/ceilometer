@@ -19,10 +19,10 @@
 """
 from datetime import datetime
 
-from ceilometer.openstack.common import test
+from ceilometer.collector.dispatcher import database
 from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common.fixture import moxstubout
-from ceilometer.collector.dispatcher import database
+from ceilometer.openstack.common import test
 from ceilometer.publisher import rpc
 from ceilometer.storage import base
 

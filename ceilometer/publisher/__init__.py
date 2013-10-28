@@ -19,9 +19,11 @@
 # under the License.
 
 import abc
-from stevedore import driver
-from ceilometer.openstack.common import network_utils
+
 import six
+from stevedore import driver
+
+from ceilometer.openstack.common import network_utils
 
 
 def get_publisher(url, namespace='ceilometer.publisher'):

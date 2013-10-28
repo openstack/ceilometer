@@ -21,10 +21,10 @@ from sqlalchemy import Float
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import MetaData
+from sqlalchemy.sql import select
 from sqlalchemy import String
 from sqlalchemy import Table
 from sqlalchemy import Text
-from sqlalchemy.sql import select
 
 from ceilometer import utils
 

@@ -21,8 +21,8 @@ events.
 
 from oslo.config import cfg
 
-from ceilometer import sample
 from ceilometer import plugin
+from ceilometer import sample
 
 
 OPTS = [

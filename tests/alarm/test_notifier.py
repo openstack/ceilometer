@@ -16,13 +16,14 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import urlparse
+
 import mock
 import requests
 
 from ceilometer.alarm import service
 from ceilometer.openstack.common import context
-from ceilometer.openstack.common import test
 from ceilometer.openstack.common.fixture import config
+from ceilometer.openstack.common import test
 
 
 DATA_JSON = ('{"current": "ALARM", "alarm_id": "foobar",'

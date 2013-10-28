@@ -19,12 +19,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from ceilometer.central import plugin
+from ceilometer import nova_client
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
-
-from ceilometer.central import plugin
 from ceilometer import sample
-from ceilometer import nova_client
 
 
 class FloatingIPPollster(plugin.CentralPollster):

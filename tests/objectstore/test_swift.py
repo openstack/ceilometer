@@ -19,16 +19,15 @@
 
 import collections
 
+from keystoneclient import exceptions
 import mock
+from swiftclient import client as swift_client
 import testscenarios
 
 from ceilometer.central import manager
 from ceilometer.objectstore import swift
-from ceilometer.openstack.common import test
 from ceilometer.openstack.common.fixture import moxstubout
-
-from keystoneclient import exceptions
-from swiftclient import client as swift_client
+from ceilometer.openstack.common import test
 
 load_tests = testscenarios.load_tests_apply_scenarios
 

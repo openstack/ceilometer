@@ -20,15 +20,16 @@
 """
 
 import datetime
+
 import testscenarios
 
-from ceilometer.publisher import rpc
-from ceilometer.openstack.common import timeutils
 from ceilometer.openstack.common.fixture import moxstubout
+from ceilometer.openstack.common import timeutils
+from ceilometer.publisher import rpc
 from ceilometer import sample
 from ceilometer import storage
-from ceilometer.storage import models
 from ceilometer.storage.base import Pagination
+from ceilometer.storage import models
 from ceilometer.tests import db as tests_db
 
 load_tests = testscenarios.load_tests_apply_scenarios

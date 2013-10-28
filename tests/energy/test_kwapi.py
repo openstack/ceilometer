@@ -15,15 +15,16 @@
 # under the License.
 
 import datetime
-import mock
-
-from ceilometer.energy import kwapi
-from ceilometer.central import manager
-from ceilometer.openstack.common import context
-from ceilometer.openstack.common import test
-from ceilometer.openstack.common.fixture import moxstubout
 
 from keystoneclient import exceptions
+import mock
+
+from ceilometer.central import manager
+from ceilometer.energy import kwapi
+from ceilometer.openstack.common import context
+from ceilometer.openstack.common.fixture import moxstubout
+from ceilometer.openstack.common import test
+
 
 PROBE_DICT = {
     "probes": {

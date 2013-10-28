@@ -16,22 +16,22 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import socket
+
 import msgpack
 from oslo.config import cfg
-import socket
 from stevedore import extension
 from stevedore import named
 
-from ceilometer.service import prepare_service
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import service as os_service
 from ceilometer.openstack.common.rpc import dispatcher as rpc_dispatcher
 from ceilometer.openstack.common.rpc import service as rpc_service
-
+from ceilometer.openstack.common import service as os_service
 from ceilometer.openstack.common import timeutils
 from ceilometer import pipeline
+from ceilometer.service import prepare_service
 from ceilometer.storage import models
 from ceilometer import transformer
 
