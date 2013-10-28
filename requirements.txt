@@ -22,7 +22,7 @@ python-swiftclient>=1.5
 lxml>=2.3
 requests>=1.1
 six
-WSME>=0.5b5
+WSME>=0.5b5,<0.5b6
 PyYAML>=3.1.0
 oslo.config>=1.2.0
 happybase>=0.4
