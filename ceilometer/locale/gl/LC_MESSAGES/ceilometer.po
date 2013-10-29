@@ -1,4 +1,4 @@
-# Kannada translations for ceilometer.
+# Galician translations for ceilometer.
 # Copyright (C) 2013 ORGANIZATION
 # This file is distributed under the same license as the ceilometer project.
 #
@@ -8,11 +8,11 @@ msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2013-10-29 06:03+0000\n"
-"PO-Revision-Date: 2013-09-20 18:22+0000\n"
-"Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
-"Language-Team: Kannada "
-"(http://www.transifex.com/projects/p/openstack/language/kn/)\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"PO-Revision-Date: 2013-10-28 23:23+0000\n"
+"Last-Translator: Tom Fifield <tom@openstack.org>\n"
+"Language-Team: Galician "
+"(http://www.transifex.com/projects/p/openstack/language/gl/)\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1290,28 +1290,4 @@ msgstr ""
 #, python-format
 msgid "dropping sample with no predecessor: %s"
 msgstr ""
-
-#~ msgid "threshold evaluation cycle failed"
-#~ msgstr ""
-
-#~ msgid "skipping alarm %s: alarm disabled"
-#~ msgstr ""
-
-#~ msgid "Unknown resource"
-#~ msgstr ""
-
-#~ msgid "Unknown alarm"
-#~ msgstr ""
-
-#~ msgid "threshold_rule/%s is mandatory"
-#~ msgstr ""
-
-#~ msgid "combination_rule/alarm_ids is mandatory"
-#~ msgstr ""
-
-#~ msgid "Alarm %s doesn't exists"
-#~ msgstr ""
-
-#~ msgid "%s is mandatory"
-#~ msgstr ""
 
