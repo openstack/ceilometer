@@ -21,18 +21,19 @@
 import datetime
 import mock
 import msgpack
-from oslo.config import cfg
 
 from ceilometer import sample
 from ceilometer.publisher import udp
-from ceilometer.tests import base
+from ceilometer.openstack.common import test
 from ceilometer.openstack.common import network_utils
+from ceilometer.openstack.common.fixture import config
+from ceilometer.openstack.common.fixture import moxstubout
 
 
 COUNTER_SOURCE = 'testsource'
 
 
-class TestUDPPublisher(base.TestCase):
+class TestUDPPublisher(test.BaseTestCase):
 
     test_data = [
         sample.Sample(
@@ -107,6 +108,11 @@ class TestUDPPublisher(base.TestCase):
             return udp_socket
         return _fake_socket_socket
 
+    def setUp(self):
+        super(TestUDPPublisher, self).setUp()
+        self.mox = self.useFixture(moxstubout.MoxStubout()).mox
+        self.CONF = self.useFixture(config.Config()).conf
+
     def test_published(self):
         self.data_sent = []
         with mock.patch('socket.socket',
@@ -126,7 +132,7 @@ class TestUDPPublisher(base.TestCase):
 
             # Check destination
             self.assertEqual(dest, ('somehost',
-                                    cfg.CONF.collector.udp_port))
+                                    self.CONF.collector.udp_port))
 
         # Check that counters are equal
         self.assertEqual(sorted(sent_counters),

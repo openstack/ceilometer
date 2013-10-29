@@ -21,17 +21,18 @@
 
 import eventlet
 import datetime
-from oslo.config import cfg
 
 from ceilometer import sample
 from ceilometer.openstack.common import jsonutils
 from ceilometer.openstack.common import network_utils
 from ceilometer.openstack.common import rpc as oslo_rpc
+from ceilometer.openstack.common import test
+from ceilometer.openstack.common.fixture import config
+from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer.publisher import rpc
-from ceilometer.tests import base
 
 
-class TestSignature(base.TestCase):
+class TestSignature(test.BaseTestCase):
 
     def test_compute_signature_change_key(self):
         sig1 = rpc.compute_signature({'a': 'A', 'b': 'B'},
@@ -110,7 +111,7 @@ class TestSignature(base.TestCase):
         self.assertTrue(rpc.verify_signature(jsondata, 'not-so-secret'))
 
 
-class TestCounter(base.TestCase):
+class TestCounter(test.BaseTestCase):
 
     TEST_COUNTER = sample.Sample(name='name',
                                  type='typ',
@@ -142,7 +143,7 @@ class TestCounter(base.TestCase):
             yield compare, f, getattr(self.TEST_COUNTER, f), msg_f, msg[msg_f]
 
 
-class TestPublish(base.TestCase):
+class TestPublish(test.BaseTestCase):
 
     test_data = [
         sample.Sample(
@@ -214,8 +215,10 @@ class TestPublish(base.TestCase):
 
     def setUp(self):
         super(TestPublish, self).setUp()
+        self.CONF = self.useFixture(config.Config()).conf
         self.published = []
         self.rpc_unreachable = False
+        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
         self.stubs.Set(oslo_rpc, 'cast', self.faux_cast)
 
     def test_published(self):
@@ -225,7 +228,7 @@ class TestPublish(base.TestCase):
                                   self.test_data)
         self.assertEqual(len(self.published), 1)
         self.assertEqual(self.published[0][0],
-                         cfg.CONF.publisher_rpc.metering_topic)
+                         self.CONF.publisher_rpc.metering_topic)
         self.assertIsInstance(self.published[0][1]['args']['data'], list)
         self.assertEqual(self.published[0][1]['method'],
                          'record_metering_data')
@@ -237,7 +240,7 @@ class TestPublish(base.TestCase):
                                   self.test_data)
         self.assertEqual(len(self.published), 1)
         self.assertEqual(self.published[0][0],
-                         cfg.CONF.publisher_rpc.metering_topic)
+                         self.CONF.publisher_rpc.metering_topic)
         self.assertIsInstance(self.published[0][1]['args']['data'], list)
         self.assertEqual(self.published[0][1]['method'],
                          'custom_procedure_call')
@@ -251,20 +254,20 @@ class TestPublish(base.TestCase):
         for topic, rpc_call in self.published:
             meters = rpc_call['args']['data']
             self.assertIsInstance(meters, list)
-            if topic != cfg.CONF.publisher_rpc.metering_topic:
+            if topic != self.CONF.publisher_rpc.metering_topic:
                 self.assertEqual(len(set(meter['counter_name']
                                          for meter in meters)),
                                  1,
                                  "Meter are published grouped by name")
 
         topics = [topic for topic, meter in self.published]
-        self.assertIn(cfg.CONF.publisher_rpc.metering_topic, topics)
+        self.assertIn(self.CONF.publisher_rpc.metering_topic, topics)
         self.assertIn(
-            cfg.CONF.publisher_rpc.metering_topic + '.' + 'test', topics)
+            self.CONF.publisher_rpc.metering_topic + '.' + 'test', topics)
         self.assertIn(
-            cfg.CONF.publisher_rpc.metering_topic + '.' + 'test2', topics)
+            self.CONF.publisher_rpc.metering_topic + '.' + 'test2', topics)
         self.assertIn(
-            cfg.CONF.publisher_rpc.metering_topic + '.' + 'test3', topics)
+            self.CONF.publisher_rpc.metering_topic + '.' + 'test3', topics)
 
     def test_published_concurrency(self):
         """This test the concurrent access to the local queue
