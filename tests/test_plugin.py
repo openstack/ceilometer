@@ -17,7 +17,7 @@
 # under the License.
 
 from ceilometer import plugin
-from ceilometer.tests import base
+from ceilometer.openstack.common import test
 
 
 TEST_NOTIFICATION = {
@@ -70,7 +70,7 @@ TEST_NOTIFICATION = {
 }
 
 
-class NotificationBaseTestCase(base.TestCase):
+class NotificationBaseTestCase(test.BaseTestCase):
     def test_handle_event_type(self):
         self.assertFalse(plugin.NotificationBase._handle_event_type(
             'compute.instance.start', ['compute']))

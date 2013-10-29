@@ -15,9 +15,8 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-from oslo.config import cfg
-
-from ceilometer.tests import base
+from ceilometer.openstack.common import test
+from ceilometer.openstack.common.fixture import config
 from ceilometer import middleware
 
 
@@ -67,7 +66,12 @@ HTTP_RESPONSE = {
 }
 
 
-class TestNotifications(base.TestCase):
+class TestNotifications(test.BaseTestCase):
+
+    def setUp(self):
+        super(TestNotifications, self).setUp()
+        self.CONF = self.useFixture(config.Config()).conf
+
     def test_process_request_notification(self):
         sample = list(middleware.HTTPRequest().process_notification(
             HTTP_REQUEST
@@ -97,5 +101,5 @@ class TestNotifications(base.TestCase):
         self.assertEqual(sample.volume, 1)
 
     def test_exchanges(self):
-        topics = middleware.HTTPRequest().get_exchange_topics(cfg.CONF)
+        topics = middleware.HTTPRequest().get_exchange_topics(self.CONF)
         self.assertEqual(len(topics), 4)

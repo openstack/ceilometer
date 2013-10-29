@@ -27,12 +27,13 @@ from ceilometer.publisher import test as test_publisher
 from ceilometer import transformer
 from ceilometer.transformer import accumulator
 from ceilometer.transformer import conversions
+from ceilometer.openstack.common import test
 from ceilometer.openstack.common import timeutils
+from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer import pipeline
-from ceilometer.tests import base
 
 
-class TestTransformerAccumulator(base.TestCase):
+class TestTransformerAccumulator(test.BaseTestCase):
 
     def test_handle_sample(self):
         test_sample = sample.Sample(
@@ -57,7 +58,7 @@ class TestTransformerAccumulator(base.TestCase):
         self.assertEqual(len(tf.samples), 1)
 
 
-class TestPipeline(base.TestCase):
+class TestPipeline(test.BaseTestCase):
     def fake_tem_init(self):
         """Fake a transformerManager for pipeline
            The faked entry point setting is below:
@@ -148,6 +149,7 @@ class TestPipeline(base.TestCase):
             resource_metadata={}
         )
 
+        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
         self.stubs.Set(transformer.TransformerExtensionManager,
                        "__init__",
                        self.fake_tem_init)
