@@ -829,17 +829,6 @@ class Connection(base.Connection):
                 problem_events.append((api_models.Event.UNKNOWN_PROBLEM,
                                        event_model))
             events.append(event)
-
-        # Update the models with the underlying DB ID.
-        for model, actual in zip(event_models, events):
-            if not actual:
-                continue
-            actual_event, actual_traits = actual
-            model.id = actual_event.id
-            if model.traits and actual_traits:
-                for trait, actual_trait in zip(model.traits, actual_traits):
-                    trait.id = actual_trait.id
-
         return problem_events
 
     def get_events(self, event_filter):
@@ -852,14 +841,18 @@ class Connection(base.Connection):
         end = utils.dt_to_decimal(event_filter.end)
         session = sqlalchemy_session.get_session()
         with session.begin():
+            event_query_filters = [Event.generated >= start,
+                                   Event.generated <= end]
             sub_query = session.query(Event.id)\
-                .join(Trait, Trait.event_id == Event.id)\
-                .filter(Event.generated >= start, Event.generated <= end)
+                .join(Trait, Trait.event_id == Event.id)
 
             if event_filter.event_name:
                 event_name = self._get_unique(session, event_filter.event_name)
-                sub_query = sub_query.filter(Event.unique_name == event_name)
+                event_query_filters.append(Event.unique_name == event_name)
 
+            sub_query = sub_query.filter(*event_query_filters)
+
+            event_models_dict = {}
             if event_filter.traits:
                 for key, value in event_filter.traits.iteritems():
                     if key == 'key':
@@ -874,6 +867,15 @@ class Connection(base.Connection):
                         sub_query = sub_query.filter(Trait.t_datetime == dt)
                     elif key == 't_float':
                         sub_query = sub_query.filter(Trait.t_datetime == value)
+            else:
+                # Pre-populate event_models_dict to cover Events without traits
+                events = session.query(Event).filter(*event_query_filters)
+                for db_event in events.all():
+                    generated = utils.decimal_to_dt(db_event.generated)
+                    api_event = api_models.Event(db_event.message_id,
+                                                 db_event.unique_name.key,
+                                                 generated, [])
+                    event_models_dict[db_event.id] = api_event
 
             sub_query = sub_query.subquery()
 
@@ -881,7 +883,6 @@ class Connection(base.Connection):
                 .join(sub_query, Trait.event_id == sub_query.c.id)
 
             # Now convert the sqlalchemy objects back into Models ...
-            event_models_dict = {}
             for trait in all_data.all():
                 event = event_models_dict.get(trait.event_id)
                 if not event:
