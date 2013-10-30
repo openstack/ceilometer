@@ -79,3 +79,27 @@ def stringify_timestamps(data):
     isa_timestamp = lambda v: isinstance(v, datetime.datetime)
     return dict((k, v.isoformat() if isa_timestamp(v) else v)
                 for (k, v) in data.iteritems())
+
+
+def dict_to_keyval(value, key_base=None):
+    """Expand a given dict to its corresponding key-value pairs.
+
+    Generated keys are fully qualified, delimited using dot notation.
+    ie. key = 'key.child_key.grandchild_key[0]'
+    """
+    val_iter, key_func = None, None
+    if isinstance(value, dict):
+        val_iter = value.iteritems()
+        key_func = lambda k: key_base + '.' + k if key_base else k
+    elif isinstance(value, (tuple, list)):
+        val_iter = enumerate(value)
+        key_func = lambda k: key_base + '[%d]' % k
+
+    if val_iter:
+        for k, v in val_iter:
+            key_gen = key_func(k)
+            if isinstance(v, dict) or isinstance(v, (tuple, list)):
+                for key_gen, v in dict_to_keyval(v, key_gen):
+                    yield key_gen, v
+            else:
+                yield key_gen, v

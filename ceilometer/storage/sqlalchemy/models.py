@@ -141,6 +141,54 @@ class Source(Base):
     id = Column(String(255), primary_key=True)
 
 
+class MetaText(Base):
+    """Metering text metadata."""
+
+    __tablename__ = 'metadata_text'
+    __table_args__ = (
+        Index('ix_meta_text_key', 'meta_key'),
+    )
+    id = Column(Integer, ForeignKey('meter.id'), primary_key=True)
+    meta_key = Column(String(255), primary_key=True)
+    value = Column(Text)
+
+
+class MetaBool(Base):
+    """Metering boolean metadata."""
+
+    __tablename__ = 'metadata_bool'
+    __table_args__ = (
+        Index('ix_meta_bool_key', 'meta_key'),
+    )
+    id = Column(Integer, ForeignKey('meter.id'), primary_key=True)
+    meta_key = Column(String(255), primary_key=True)
+    value = Column(Boolean)
+
+
+class MetaInt(Base):
+    """Metering integer metadata."""
+
+    __tablename__ = 'metadata_int'
+    __table_args__ = (
+        Index('ix_meta_int_key', 'meta_key'),
+    )
+    id = Column(Integer, ForeignKey('meter.id'), primary_key=True)
+    meta_key = Column(String(255), primary_key=True)
+    value = Column(Integer, default=False)
+
+
+class MetaFloat(Base):
+    """Metering float metadata."""
+
+    __tablename__ = 'metadata_float'
+    __table_args__ = (
+        Index('ix_meta_float_key', 'meta_key'),
+    )
+    id = Column(Integer, ForeignKey('meter.id'), primary_key=True)
+    meta_key = Column(String(255), primary_key=True)
+    value = Column(Float, default=False)
+
+
 class Meter(Base):
     """Metering data."""
 

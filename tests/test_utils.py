@@ -70,3 +70,19 @@ class TestUtils(test.BaseTestCase):
 
     def test_decimal_to_dt_with_none_parameter(self):
         self.assertEqual(utils.decimal_to_dt(None), None)
+
+    def test_dict_to_kv(self):
+        data = {'a': 'A',
+                'b': 'B',
+                'nested': {'a': 'A',
+                           'b': 'B',
+                           },
+                'nested2': [{'c': 'A'}, {'c': 'B'}]
+                }
+        pairs = list(utils.dict_to_keyval(data))
+        self.assertEqual(pairs, [('a', 'A'),
+                                 ('b', 'B'),
+                                 ('nested2[0].c', 'A'),
+                                 ('nested2[1].c', 'B'),
+                                 ('nested.a', 'A'),
+                                 ('nested.b', 'B')])

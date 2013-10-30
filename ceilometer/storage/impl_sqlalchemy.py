@@ -18,10 +18,12 @@
 """SQLAlchemy storage backend."""
 
 from __future__ import absolute_import
-
 import datetime
 import operator
 import os
+import types
+
+from sqlalchemy import and_
 from sqlalchemy import func
 from sqlalchemy import desc
 from sqlalchemy.orm import aliased
@@ -39,6 +41,10 @@ from ceilometer.storage.sqlalchemy.models import AlarmChange
 from ceilometer.storage.sqlalchemy.models import Base
 from ceilometer.storage.sqlalchemy.models import Event
 from ceilometer.storage.sqlalchemy.models import Meter
+from ceilometer.storage.sqlalchemy.models import MetaBool
+from ceilometer.storage.sqlalchemy.models import MetaFloat
+from ceilometer.storage.sqlalchemy.models import MetaInt
+from ceilometer.storage.sqlalchemy.models import MetaText
 from ceilometer.storage.sqlalchemy.models import Project
 from ceilometer.storage.sqlalchemy.models import Resource
 from ceilometer.storage.sqlalchemy.models import Source
@@ -100,7 +106,40 @@ class SQLAlchemyStorage(base.StorageEngine):
         return Connection(conf)
 
 
-def make_query_from_filter(query, sample_filter, require_meter=True):
+META_TYPE_MAP = {bool: MetaBool,
+                 str: MetaText,
+                 unicode: MetaText,
+                 types.NoneType: MetaText,
+                 int: MetaInt,
+                 long: MetaInt,
+                 float: MetaFloat}
+
+
+def apply_metaquery_filter(session, query, metaquery):
+    """Apply provided metaquery filter to existing query.
+
+    :param session: session used for original query
+    :param query: Query instance
+    :param metaquery: dict with metadata to match on.
+    """
+
+    for k, v in metaquery.iteritems():
+        key = k[9:]  # strip out 'metadata.' prefix
+        try:
+            _model = META_TYPE_MAP[type(v)]
+        except KeyError:
+            raise NotImplementedError(_('Query on %(key)s is of %(value)s '
+                                        'type and is not supported') %
+                                      {"key": k, "value": type(v)})
+        else:
+            meta_q = session.query(_model).\
+                filter(and_(_model.meta_key == key,
+                            _model.value == v)).subquery()
+            query = query.filter_by(id=meta_q.c.id)
+    return query
+
+
+def make_query_from_filter(session, query, sample_filter, require_meter=True):
     """Return a query dictionary based on the settings in the filter.
 
     :param filter: SampleFilter instance
@@ -134,7 +173,8 @@ def make_query_from_filter(query, sample_filter, require_meter=True):
         query = query.filter_by(resource_id=sample_filter.resource)
 
     if sample_filter.metaquery:
-        raise NotImplementedError(_('metaquery not implemented'))
+        query = apply_metaquery_filter(session, query,
+                                       sample_filter.metaquery)
 
     return query
 
@@ -217,6 +257,21 @@ class Connection(base.Connection):
             meter.message_id = data['message_id']
             session.flush()
 
+            if rmetadata:
+                if isinstance(rmetadata, dict):
+                    for key, v in utils.dict_to_keyval(rmetadata):
+                        try:
+                            _model = META_TYPE_MAP[type(v)]
+                        except KeyError:
+                            LOG.warn(_("Unknown metadata type. Key (%s) will "
+                                       "not be queryable."), key)
+                        else:
+                            session.add(_model(id=meter.id,
+                                               meta_key=key,
+                                               value=v))
+
+            session.flush()
+
     @staticmethod
     def clear_expired_metering_data(ttl):
         """Clear expired data from the backend storage system according to the
@@ -294,8 +349,6 @@ class Connection(base.Connection):
         # just fail.
         if pagination:
             raise NotImplementedError(_('Pagination not implemented'))
-        if metaquery:
-            raise NotImplementedError(_('metaquery not implemented'))
 
         # (thomasm) We need to get the max timestamp first, since that's the
         # most accurate. We also need to filter down in the subquery to
@@ -318,6 +371,11 @@ class Connection(base.Connection):
         if source:
             ts_subquery = ts_subquery.filter(
                 Meter.sources.any(id=source))
+
+        if metaquery:
+            ts_subquery = apply_metaquery_filter(session,
+                                                 ts_subquery,
+                                                 metaquery)
 
         # Here we limit the samples being used to a specific time period,
         # if requested.
@@ -397,8 +455,6 @@ class Connection(base.Connection):
 
         if pagination:
             raise NotImplementedError(_('Pagination not implemented'))
-        if metaquery:
-            raise NotImplementedError(_('metaquery not implemented'))
 
         session = sqlalchemy_session.get_session()
 
@@ -421,6 +477,11 @@ class Connection(base.Connection):
         #
         query_meter = session.query(Meter).\
             join(subquery_meter, Meter.id == subquery_meter.c.id)
+
+        if metaquery:
+            query_meter = apply_metaquery_filter(session,
+                                                 query_meter,
+                                                 metaquery)
 
         alias_meter = aliased(Meter, query_meter.subquery())
         query = session.query(Resource, alias_meter).join(
@@ -457,7 +518,7 @@ class Connection(base.Connection):
 
         session = sqlalchemy_session.get_session()
         query = session.query(Meter)
-        query = make_query_from_filter(query, sample_filter,
+        query = make_query_from_filter(session, query, sample_filter,
                                        require_meter=False)
         if limit:
             query = query.limit(limit)
@@ -509,7 +570,7 @@ class Connection(base.Connection):
         if groupby:
             query = query.group_by(*group_attributes)
 
-        return make_query_from_filter(query, sample_filter)
+        return make_query_from_filter(session, query, sample_filter)
 
     @staticmethod
     def _stats_result_to_model(result, period, period_start,
