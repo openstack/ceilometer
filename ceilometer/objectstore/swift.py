@@ -67,7 +67,7 @@ class _Base(plugin.PollsterBase):
             LOG.debug(_("Swift endpoint not found"))
             raise StopIteration()
 
-        for t in cache['tenants']:
+        for t in cache[self.CACHE_KEY_TENANT]:
             yield (t.id, swift.head_account(self._neaten_url(endpoint, t.id),
                                             ksclient.auth_token))
 
