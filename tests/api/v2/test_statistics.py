@@ -20,10 +20,10 @@
 import datetime
 
 from ceilometer.api.controllers import v2
-from ceilometer.tests import base
+from ceilometer.openstack.common import test
 
 
-class TestStatisticsDuration(base.TestCase):
+class TestStatisticsDuration(test.BaseTestCase):
 
     def setUp(self):
         super(TestStatisticsDuration, self).setUp()

@@ -21,10 +21,10 @@ import pecan
 import wsme
 
 from ceilometer.api.controllers import v2
-from ceilometer.tests import base
+from ceilometer.openstack.common import test
 
 
-class TestWsmeCustomType(base.TestCase):
+class TestWsmeCustomType(test.BaseTestCase):
     def setUp(self):
         super(TestWsmeCustomType, self).setUp()
         pecan.response = mock.MagicMock()

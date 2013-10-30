@@ -21,21 +21,21 @@ import datetime
 import mock
 import uuid
 
-from oslo.config import cfg
-
 from ceilometer.alarm.partition import coordination
+from ceilometer.openstack.common import test
 from ceilometer.openstack.common import timeutils
+from ceilometer.openstack.common.fixture import config
 from ceilometer.storage import models
-from ceilometer.tests import base
 
 
-class TestCoordinate(base.TestCase):
+class TestCoordinate(test.BaseTestCase):
     def setUp(self):
         super(TestCoordinate, self).setUp()
+        self.CONF = self.useFixture(config.Config()).conf
         self.test_interval = 120
-        cfg.CONF.set_override('evaluation_interval',
-                              self.test_interval,
-                              group='alarm')
+        self.CONF.set_override('evaluation_interval',
+                               self.test_interval,
+                               group='alarm')
         self.api_client = mock.Mock()
         self.override_start = datetime.datetime(2012, 7, 2, 10, 45)
         timeutils.utcnow.override_time = self.override_start

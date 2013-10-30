@@ -20,8 +20,6 @@
 import datetime
 import testscenarios
 
-from oslo.config import cfg
-
 from . import base
 from ceilometer import sample
 from ceilometer.publisher import rpc
@@ -37,7 +35,6 @@ class TestMaxProjectVolume(base.FunctionalTest,
 
     def setUp(self):
         super(TestMaxProjectVolume, self).setUp()
-
         for i in range(3):
             s = sample.Sample(
                 'volume.size',
@@ -55,7 +52,7 @@ class TestMaxProjectVolume(base.FunctionalTest,
             )
             msg = rpc.meter_message_from_counter(
                 s,
-                cfg.CONF.publisher_rpc.metering_secret,
+                self.CONF.publisher_rpc.metering_secret,
             )
             self.conn.record_metering_data(msg)
 
@@ -136,7 +133,6 @@ class TestMaxResourceVolume(base.FunctionalTest,
 
     def setUp(self):
         super(TestMaxResourceVolume, self).setUp()
-
         for i in range(3):
             s = sample.Sample(
                 'volume.size',
@@ -154,7 +150,7 @@ class TestMaxResourceVolume(base.FunctionalTest,
             )
             msg = rpc.meter_message_from_counter(
                 s,
-                cfg.CONF.publisher_rpc.metering_secret,
+                self.CONF.publisher_rpc.metering_secret,
             )
             self.conn.record_metering_data(msg)
 
@@ -258,7 +254,6 @@ class TestSumProjectVolume(base.FunctionalTest,
 
     def setUp(self):
         super(TestSumProjectVolume, self).setUp()
-
         for i in range(3):
             s = sample.Sample(
                 'volume.size',
@@ -276,7 +271,7 @@ class TestSumProjectVolume(base.FunctionalTest,
             )
             msg = rpc.meter_message_from_counter(
                 s,
-                cfg.CONF.publisher_rpc.metering_secret,
+                self.CONF.publisher_rpc.metering_secret,
             )
             self.conn.record_metering_data(msg)
 
@@ -359,7 +354,6 @@ class TestSumResourceVolume(base.FunctionalTest,
 
     def setUp(self):
         super(TestSumResourceVolume, self).setUp()
-
         for i in range(3):
             s = sample.Sample(
                 'volume.size',
@@ -377,7 +371,7 @@ class TestSumResourceVolume(base.FunctionalTest,
             )
             msg = rpc.meter_message_from_counter(
                 s,
-                cfg.CONF.publisher_rpc.metering_secret,
+                self.CONF.publisher_rpc.metering_secret,
             )
             self.conn.record_metering_data(msg)
 
@@ -534,7 +528,7 @@ class TestGroupByInstance(base.FunctionalTest,
             )
             msg = rpc.meter_message_from_counter(
                 c,
-                cfg.CONF.publisher_rpc.metering_secret,
+                self.CONF.publisher_rpc.metering_secret,
             )
             self.conn.record_metering_data(msg)
 
@@ -1292,7 +1286,7 @@ class TestGroupBySource(base.FunctionalTest,
             )
             msg = rpc.meter_message_from_counter(
                 c,
-                cfg.CONF.publisher_rpc.metering_secret,
+                self.CONF.publisher_rpc.metering_secret,
             )
             self.conn.record_metering_data(msg)
 
