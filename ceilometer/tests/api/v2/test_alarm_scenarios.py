@@ -28,8 +28,8 @@ import uuid
 import mock
 import testscenarios
 
-from .base import FunctionalTest
 from ceilometer.storage.models import Alarm
+from ceilometer.tests.api.v2 import FunctionalTest
 from ceilometer.tests import db as tests_db
 
 

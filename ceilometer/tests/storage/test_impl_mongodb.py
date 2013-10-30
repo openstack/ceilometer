@@ -33,7 +33,7 @@ from ceilometer.storage.base import MultipleResultsFound
 from ceilometer.storage.base import NoResultFound
 from ceilometer.storage import impl_mongodb
 from ceilometer.tests import db as tests_db
-from tests.storage import test_storage_scenarios
+from ceilometer.tests.storage import test_storage_scenarios
 
 
 class MongoDBEngineTestBase(tests_db.TestBase):

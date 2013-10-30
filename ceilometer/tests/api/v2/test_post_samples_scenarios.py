@@ -24,11 +24,12 @@ import logging
 
 import testscenarios
 
-from .base import FunctionalTest
 from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer.openstack.common import rpc
 from ceilometer.openstack.common import timeutils
+from ceilometer.tests.api.v2 import FunctionalTest
 from ceilometer.tests import db as tests_db
+
 
 load_tests = testscenarios.load_tests_apply_scenarios
 

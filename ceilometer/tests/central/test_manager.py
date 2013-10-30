@@ -24,7 +24,7 @@ import mock
 from ceilometer.central import manager
 from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer.openstack.common import test
-from tests import agentbase
+from ceilometer.tests import agentbase
 
 
 class TestManager(test.BaseTestCase):

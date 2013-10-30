@@ -20,7 +20,6 @@
 """
 import os
 
-from .base import FunctionalTest
 from ceilometer.api import acl
 from ceilometer.api import app
 from ceilometer.openstack.common import fileutils
@@ -28,6 +27,7 @@ from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer.openstack.common import gettextutils
 from ceilometer import service
+from ceilometer.tests.api.v2 import FunctionalTest
 from ceilometer.tests import base
 from ceilometer.tests import db as tests_db
 

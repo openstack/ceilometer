@@ -26,9 +26,8 @@ import testscenarios
 
 from ceilometer.publisher import rpc
 from ceilometer import sample
+from ceilometer.tests.api.v2 import FunctionalTest
 from ceilometer.tests import db as tests_db
-
-from .base import FunctionalTest
 
 load_tests = testscenarios.load_tests_apply_scenarios
 

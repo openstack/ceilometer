@@ -42,8 +42,8 @@ class TestBase(db_test_base.TestBase):
         self.CONF.set_override("auth_version",
                                "v2.0", group=acl.OPT_GROUP_NAME)
         self.CONF.set_override("policy_file",
-                               self.path_get('tests/policy.json'))
-        sources_file = self.path_get('tests/sources.json')
+                               self.path_get('etc/ceilometer/policy.json'))
+        sources_file = self.path_get('ceilometer/tests/sources.json')
         self.app = v1_app.make_app(self.CONF,
                                    enable_acl=False,
                                    attach_storage=False,
@@ -83,14 +83,12 @@ class FunctionalTest(db_test_base.TestBase):
 
     PATH_PREFIX = ''
 
-    SOURCE_DATA = {'test_source': {'somekey': '666'}}
-
     def setUp(self):
         super(FunctionalTest, self).setUp()
         self.CONF.set_override("auth_version", "v2.0",
                                group=acl.OPT_GROUP_NAME)
         self.CONF.set_override("policy_file",
-                               self.path_get('tests/policy.json'))
+                               self.path_get('etc/ceilometer/policy.json'))
         self.app = self._make_app()
 
     def _make_app(self, enable_acl=False):

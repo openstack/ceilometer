@@ -23,7 +23,7 @@ from ceilometer.compute import manager
 from ceilometer import nova_client
 from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer.openstack.common import test
-from tests import agentbase
+from ceilometer.tests import agentbase
 
 
 class TestManager(test.BaseTestCase):

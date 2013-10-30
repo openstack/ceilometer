@@ -74,7 +74,7 @@ class ServiceRestartTest(base.BaseTestCase):
         shutil.copy(self.path_get('etc/ceilometer/pipeline.yaml'),
                     self.pipeline_cfg_file)
         self.pipelinecfg_read_from_file()
-        policy_file = self.path_get('tests/policy.json')
+        policy_file = self.path_get('etc/ceilometer/policy.json')
         content = "[DEFAULT]\n"\
                   "rpc_backend=ceilometer.openstack.common.rpc.impl_fake\n"\
                   "auth_strategy=noauth\n"\

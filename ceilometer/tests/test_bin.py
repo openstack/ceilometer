@@ -85,7 +85,7 @@ class BinApiTestCase(base.BaseTestCase):
         self.api_port = random.randint(10000, 11000)
         self.http = httplib2.Http()
         pipeline_cfg_file = self.path_get('etc/ceilometer/pipeline.yaml')
-        policy_file = self.path_get('tests/policy.json')
+        policy_file = self.path_get('etc/ceilometer/policy.json')
         content = "[DEFAULT]\n"\
                   "rpc_backend=ceilometer.openstack.common.rpc.impl_fake\n"\
                   "auth_strategy=noauth\n"\

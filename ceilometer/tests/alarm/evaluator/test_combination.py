@@ -22,10 +22,9 @@ import uuid
 
 from ceilometer.alarm.evaluator import combination
 from ceilometer.storage import models
+from ceilometer.tests.alarm.evaluator import base
 from ceilometerclient import exc
 from ceilometerclient.v2 import alarms
-
-from tests.alarm.evaluator import base
 
 
 class TestEvaluate(base.TestEvaluatorBase):

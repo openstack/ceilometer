@@ -24,10 +24,11 @@ import logging
 import testscenarios
 import webtest.app
 
-from .base import FunctionalTest
 from ceilometer.publisher import rpc
 from ceilometer import sample
+from ceilometer.tests.api.v2 import FunctionalTest
 from ceilometer.tests import db as tests_db
+
 
 load_tests = testscenarios.load_tests_apply_scenarios
 

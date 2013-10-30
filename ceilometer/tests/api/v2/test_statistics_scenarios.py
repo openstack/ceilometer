@@ -21,15 +21,15 @@ import datetime
 
 import testscenarios
 
-from . import base
 from ceilometer.publisher import rpc
 from ceilometer import sample
+from ceilometer.tests.api.v2 import FunctionalTest
 from ceilometer.tests import db as tests_db
 
 load_tests = testscenarios.load_tests_apply_scenarios
 
 
-class TestMaxProjectVolume(base.FunctionalTest,
+class TestMaxProjectVolume(FunctionalTest,
                            tests_db.MixinTestsWithBackendScenarios):
 
     PATH = '/meters/volume.size/statistics'
@@ -127,7 +127,7 @@ class TestMaxProjectVolume(base.FunctionalTest,
         self.assertEqual(data[0]['count'], 1)
 
 
-class TestMaxResourceVolume(base.FunctionalTest,
+class TestMaxResourceVolume(FunctionalTest,
                             tests_db.MixinTestsWithBackendScenarios):
 
     PATH = '/meters/volume.size/statistics'
@@ -248,7 +248,7 @@ class TestMaxResourceVolume(base.FunctionalTest,
         self.assertEqual(data[0]['count'], 1)
 
 
-class TestSumProjectVolume(base.FunctionalTest,
+class TestSumProjectVolume(FunctionalTest,
                            tests_db.MixinTestsWithBackendScenarios):
 
     PATH = '/meters/volume.size/statistics'
@@ -348,7 +348,7 @@ class TestSumProjectVolume(base.FunctionalTest,
         self.assertEqual(data[0]['count'], 1)
 
 
-class TestSumResourceVolume(base.FunctionalTest,
+class TestSumResourceVolume(FunctionalTest,
                             tests_db.MixinTestsWithBackendScenarios):
 
     PATH = '/meters/volume.size/statistics'
@@ -474,7 +474,7 @@ class TestSumResourceVolume(base.FunctionalTest,
         self.assertEqual(data[0]['count'], 1)
 
 
-class TestGroupByInstance(base.FunctionalTest,
+class TestGroupByInstance(FunctionalTest,
                           tests_db.MixinTestsWithBackendScenarios):
 
     PATH = '/meters/instance/statistics'
@@ -1219,7 +1219,7 @@ class TestGroupByInstance(base.FunctionalTest,
                                      u'2013-08-01T14:00:00'])
 
 
-class TestGroupBySource(base.FunctionalTest,
+class TestGroupBySource(FunctionalTest,
                         tests_db.MixinTestsWithBackendScenarios):
 
     # FIXME(terriyu): We have to put test_group_by_source in its own class

@@ -1,4 +1,0 @@
-{
-    "context_is_admin": [["role:admin"]],
-    "admin_api": [["is_admin:True"]]
-}
