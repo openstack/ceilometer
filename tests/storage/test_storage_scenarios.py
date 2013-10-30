@@ -2093,35 +2093,6 @@ class EventTest(EventTestBase):
         bad = problem_events[0]
         self.assertEqual(models.Event.DUPLICATE, bad[0])
 
-    def test_save_events_no_traits(self):
-        now = datetime.datetime.utcnow()
-        m = [models.Event("1", "Foo", now, None),
-             models.Event("2", "Zoo", now, [])]
-        self.conn.record_events(m)
-        for model in m:
-            self.assertTrue(model.id >= 0)
-        self.assertNotEqual(m[0].id, m[1].id)
-
-    def test_save_events_traits(self):
-        event_models = []
-        for event_name in ['Foo', 'Bar', 'Zoo']:
-            now = datetime.datetime.utcnow()
-            trait_models = \
-                [models.Trait(name, dtype, value)
-                    for name, dtype, value in [
-                        ('trait_A', models.Trait.TEXT_TYPE, "my_text"),
-                        ('trait_B', models.Trait.INT_TYPE, 199),
-                        ('trait_C', models.Trait.FLOAT_TYPE, 1.23456),
-                        ('trait_D', models.Trait.DATETIME_TYPE, now)]]
-            event_models.append(
-                models.Event("id_%s" % event_name,
-                             event_name, now, trait_models))
-
-        self.conn.record_events(event_models)
-        for model in event_models:
-            for trait in model.traits:
-                self.assertTrue(trait.id >= 0)
-
 
 class GetEventTest(EventTestBase):
     def prepare_data(self):
@@ -2178,3 +2149,14 @@ class GetEventTest(EventTestBase):
         self.assertEqual(1, len(events))
         self.assertEqual(events[0].event_name, "Bar")
         self.assertEqual(4, len(events[0].traits))
+
+    def test_simple_get_no_traits(self):
+        new_events = [models.Event("id_notraits", "NoTraits", self.start, [])]
+        bad_events = self.conn.record_events(new_events)
+        event_filter = storage.EventFilter(self.start, self.end, "NoTraits")
+        events = self.conn.get_events(event_filter)
+        self.assertEquals(0, len(bad_events))
+        self.assertEqual(1, len(events))
+        self.assertEqual(events[0].message_id, "id_notraits")
+        self.assertEqual(events[0].event_name, "NoTraits")
+        self.assertEqual(0, len(events[0].traits))
