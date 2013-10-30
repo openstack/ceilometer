@@ -16,6 +16,7 @@
 """Test the methods related to query."""
 import datetime
 
+import fixtures
 import mock
 import wsme
 
@@ -29,6 +30,10 @@ from ceilometer.tests import base as tests_base
 
 
 class TestQuery(test.BaseTestCase):
+    def setUp(self):
+        super(TestQuery, self).setUp()
+        self.useFixture(fixtures.MonkeyPatch(
+            'pecan.response', mock.MagicMock()))
 
     def test_get_value_as_type_with_integer(self):
         query = Query(field='metadata.size',

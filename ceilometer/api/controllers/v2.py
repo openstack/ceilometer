@@ -67,7 +67,13 @@ state_kind_enum = wtypes.Enum(str, *state_kind)
 operation_kind = wtypes.Enum(str, 'lt', 'le', 'eq', 'ne', 'ge', 'gt')
 
 
-class EntityNotFound(wsme.exc.ClientSideError):
+class ClientSideError(wsme.exc.ClientSideError):
+    def __init__(self, error, status_code=400):
+        pecan.response.translatable_error = error
+        super(ClientSideError, self).__init__(error, status_code)
+
+
+class EntityNotFound(ClientSideError):
     def __init__(self, entity, id):
         super(EntityNotFound, self).__init__(
             _("%(entity)s %(id)s Not Found") % {'entity': entity,
@@ -99,14 +105,12 @@ class BoundedInt(wtypes.UserType):
         if self.min is not None and value < self.min:
             error = _('Value %(value)s is invalid (should be greater or equal '
                       'to %(min)s)') % dict(value=value, min=self.min)
-            pecan.response.translatable_error = error
-            raise wsme.exc.ClientSideError(unicode(error))
+            raise ClientSideError(error)
 
         if self.max is not None and value > self.max:
             error = _('Value %(value)s is invalid (should be lower or equal '
                       'to %(max)s)') % dict(value=value, max=self.max)
-            pecan.response.translatable_error = error
-            raise wsme.exc.ClientSideError(unicode(error))
+            raise ClientSideError(error)
         return value
 
 
@@ -262,21 +266,21 @@ class Query(_Base):
             msg = _('Failed to convert the metadata value %(value)s'
                     ' to the expected data type %(type)s.') % \
                 {'value': self.value, 'type': type}
-            raise wsme.exc.ClientSideError(unicode(msg))
+            raise ClientSideError(msg)
         except TypeError:
             msg = _('The data type %s is not supported. The supported'
                     ' data type list is: integer, float, boolean and'
                     ' string.') % (type)
-            raise wsme.exc.ClientSideError(unicode(msg))
+            raise ClientSideError(msg)
         except Exception:
             msg = _('Unexpected exception converting %(value)s to'
                     ' the expected data type %(type)s.') % \
                 {'value': self.value, 'type': type}
-            raise wsme.exc.ClientSideError(unicode(msg))
+            raise ClientSideError(msg)
         return converted_value
 
 
-class ProjectNotAuthorized(wsme.exc.ClientSideError):
+class ProjectNotAuthorized(ClientSideError):
     def __init__(self, id):
         super(ProjectNotAuthorized, self).__init__(
             _("Not Authorized to access project %s") % id,
@@ -787,9 +791,7 @@ class MeterController(rest.RestController):
                        period long of that number of seconds.
         """
         if period and period < 0:
-            error = _("Period must be positive.")
-            pecan.response.translatable_error = error
-            raise wsme.exc.ClientSideError(unicode(error))
+            raise ClientSideError(_("Period must be positive."))
 
         kwargs = _query_to_kwargs(q, storage.SampleFilter.__init__)
         kwargs['meter'] = self._id
@@ -1158,14 +1160,12 @@ class Alarm(_Base):
                 and alarm.combination_rule == wtypes.Unset):
             error = _("either threshold_rule or combination_rule "
                       "must be set")
-            pecan.response.translatable_error = error
-            raise wsme.exc.ClientSideError(unicode(error))
+            raise ClientSideError(error)
 
         if alarm.threshold_rule and alarm.combination_rule:
             error = _("threshold_rule and combination_rule "
                       "cannot be set at the same time")
-            pecan.response.translatable_error = error
-            raise wsme.exc.ClientSideError(unicode(error))
+            raise ClientSideError(error)
 
         if alarm.threshold_rule:
             # ensure an implicit constraint on project_id is added to
@@ -1183,9 +1183,7 @@ class Alarm(_Base):
                 alarms = list(pecan.request.storage_conn.get_alarms(
                     alarm_id=id, project=project))
                 if not alarms:
-                    error = _("Alarm %s doesn't exist") % id
-                    pecan.response.translatable_error = error
-                    raise wsme.exc.ClientSideError(unicode(error))
+                    raise ClientSideError(_("Alarm %s doesn't exist") % id)
 
         return alarm
 
@@ -1350,9 +1348,7 @@ class AlarmController(rest.RestController):
             alarm_in = storage.models.Alarm(**updated_alarm)
         except Exception:
             LOG.exception("Error while putting alarm: %s" % updated_alarm)
-            error = _("Alarm incorrect")
-            pecan.response.translatable_error = error
-            raise wsme.exc.ClientSideError(unicode(error))
+            raise ClientSideError(_("Alarm incorrect"))
 
         alarm = self.conn.update_alarm(alarm_in)
 
@@ -1402,10 +1398,7 @@ class AlarmController(rest.RestController):
         # note(sileht): body are not validated by wsme
         # Workaround for https://bugs.launchpad.net/wsme/+bug/1227229
         if state not in state_kind:
-            error = _("state invalid")
-            pecan.response.translatable_error = error
-            raise wsme.exc.ClientSideError(unicode(error))
-
+            raise ClientSideError(_("state invalid"))
         now = timeutils.utcnow()
         alarm = self._alarm()
         alarm.state = state
@@ -1488,17 +1481,13 @@ class AlarmsController(rest.RestController):
         alarms = list(conn.get_alarms(name=data.name,
                                       project=data.project_id))
         if len(alarms) > 0:
-            error = _("Alarm with that name exists")
-            pecan.response.translatable_error = error
-            raise wsme.exc.ClientSideError(unicode(error))
+            raise ClientSideError(_("Alarm with that name exists"))
 
         try:
             alarm_in = storage.models.Alarm(**change)
         except Exception:
             LOG.exception("Error while posting alarm: %s" % change)
-            error = _("Alarm incorrect")
-            pecan.response.translatable_error = error
-            raise wsme.exc.ClientSideError(unicode(error))
+            raise ClientSideError(_("Alarm incorrect"))
 
         alarm = conn.create_alarm(alarm_in)
         self._record_creation(conn, change, alarm.alarm_id, now)
