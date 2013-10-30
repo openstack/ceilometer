@@ -16,21 +16,20 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Tests for ceilometer/publish.py
+"""Tests for ceilometer/publisher/rpc.py
 """
 
 import datetime
 
 import eventlet
+import fixtures
 import mock
 
 from ceilometer import sample
 from ceilometer.openstack.common import jsonutils
 from ceilometer.openstack.common import network_utils
-from ceilometer.openstack.common import rpc as oslo_rpc
 from ceilometer.openstack.common import test
 from ceilometer.openstack.common.fixture import config
-from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer.publisher import rpc
 
 
@@ -220,8 +219,9 @@ class TestPublish(test.BaseTestCase):
         self.CONF = self.useFixture(config.Config()).conf
         self.published = []
         self.rpc_unreachable = False
-        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
-        self.stubs.Set(oslo_rpc, 'cast', self.faux_cast)
+        self.useFixture(fixtures.MonkeyPatch(
+                        "ceilometer.openstack.common.rpc.cast",
+                        self.faux_cast))
 
     def test_published(self):
         publisher = rpc.RPCPublisher(
@@ -280,12 +280,16 @@ class TestPublish(test.BaseTestCase):
             self.published.append((topic, msg))
 
         def faux_cast_wait(context, topic, msg):
-            self.stubs.Set(oslo_rpc, 'cast', faux_cast_go)
+            self.useFixture(fixtures.MonkeyPatch(
+                            "ceilometer.openstack.common.rpc.cast",
+                            faux_cast_go))
             # Sleep to simulate concurrency and allow other threads to work
             eventlet.sleep(0)
             self.published.append((topic, msg))
 
-        self.stubs.Set(oslo_rpc, 'cast', faux_cast_wait)
+        self.useFixture(fixtures.MonkeyPatch(
+                        "ceilometer.openstack.common.rpc.cast",
+                        faux_cast_wait))
 
         publisher = rpc.RPCPublisher(network_utils.urlsplit('rpc://'))
         job1 = eventlet.spawn(publisher.publish_samples, None, self.test_data)
