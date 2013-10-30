@@ -26,6 +26,7 @@ from ceilometer.api import app
 from ceilometer.api import acl
 from ceilometer import service
 from ceilometer.openstack.common import gettextutils
+from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer.tests import base
 from ceilometer.tests import db as tests_db
 from .base import FunctionalTest
@@ -82,6 +83,10 @@ class TestApiMiddleware(FunctionalTest):
 
     no_lang_translated_error = 'No lang translated error'
     en_US_translated_error = 'en-US translated error'
+
+    def setUp(self):
+        super(TestApiMiddleware, self).setUp()
+        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
 
     def _fake_get_localized_message(self, message, user_locale):
         if user_locale is None:

@@ -27,8 +27,6 @@
 import copy
 import datetime
 
-from oslo.config import cfg
-
 from ceilometer.publisher import rpc
 from ceilometer import sample
 from ceilometer.storage import impl_mongodb
@@ -46,14 +44,14 @@ class MongoDBEngineTestBase(tests_db.TestBase):
 class MongoDBConnection(MongoDBEngineTestBase):
     def test_connection_pooling(self):
         self.assertEqual(self.conn.conn,
-                         impl_mongodb.Connection(cfg.CONF).conn)
+                         impl_mongodb.Connection(self.CONF).conn)
 
     def test_replica_set(self):
-        cfg.CONF.set_override(
+        self.CONF.set_override(
             'connection',
             str(tests_db.MongoDBFakeConnectionUrl()) + '?replicaSet=foobar',
             group='database')
-        conn = impl_mongodb.Connection(cfg.CONF)
+        conn = impl_mongodb.Connection(self.CONF)
         self.assertTrue(conn.conn)
 
     def test_recurse_sort_keys(self):
@@ -100,24 +98,24 @@ class IndexTest(MongoDBEngineTestBase):
     def test_meter_ttl_index_absent(self):
         # create a fake index and check it is deleted
         self.conn.db.meter.ensure_index('foo', name='meter_ttl')
-        cfg.CONF.set_override('time_to_live', -1, group='database')
+        self.CONF.set_override('time_to_live', -1, group='database')
         self.conn.upgrade()
         self.assertTrue(self.conn.db.meter.ensure_index('foo',
                                                         name='meter_ttl'))
-        cfg.CONF.set_override('time_to_live', 456789, group='database')
+        self.CONF.set_override('time_to_live', 456789, group='database')
         self.conn.upgrade()
         self.assertFalse(self.conn.db.meter.ensure_index('foo',
                                                          name='meter_ttl'))
 
     def test_meter_ttl_index_present(self):
-        cfg.CONF.set_override('time_to_live', 456789, group='database')
+        self.CONF.set_override('time_to_live', 456789, group='database')
         self.conn.upgrade()
         self.assertFalse(self.conn.db.meter.ensure_index('foo',
                                                          name='meter_ttl'))
         self.assertEqual(self.conn.db.meter.index_information()[
             'meter_ttl']['expireAfterSeconds'], 456789)
 
-        cfg.CONF.set_override('time_to_live', -1, group='database')
+        self.CONF.set_override('time_to_live', -1, group='database')
         self.conn.upgrade()
         self.assertTrue(self.conn.db.meter.ensure_index('foo',
                                                         name='meter_ttl'))

@@ -21,10 +21,10 @@
 import datetime
 
 from ceilometer.api.v1 import blueprint
-from ceilometer.tests import base
+from ceilometer.openstack.common import test
 
 
-class TestQueryTimestamps(base.TestCase):
+class TestQueryTimestamps(test.BaseTestCase):
 
     def test_get_query_timestamps_none_specified(self):
         result = blueprint._get_query_timestamps()

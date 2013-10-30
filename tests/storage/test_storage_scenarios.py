@@ -22,10 +22,9 @@
 import datetime
 import testscenarios
 
-from oslo.config import cfg
-
 from ceilometer.publisher import rpc
 from ceilometer.openstack.common import timeutils
+from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer import sample
 from ceilometer import storage
 from ceilometer.storage import models
@@ -53,13 +52,14 @@ class DBTestBase(tests_db.TestBase):
             resource_metadata=metadata, source=source
         )
         msg = rpc.meter_message_from_counter(
-            s, cfg.CONF.publisher_rpc.metering_secret
+            s, self.CONF.publisher_rpc.metering_secret
         )
         self.conn.record_metering_data(msg)
         return msg
 
     def setUp(self):
         super(DBTestBase, self).setUp()
+        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
         self.prepare_data()
 
     def tearDown(self):
@@ -628,7 +628,7 @@ class RawSampleTest(DBTestBase,
     def test_clear_metering_data(self):
         # NOTE(jd) Override this test in MongoDB because our code doesn't clear
         # the collections, this is handled by MongoDB TTL feature.
-        if cfg.CONF.database.connection.startswith('mongodb://'):
+        if self.CONF.database.connection.startswith('mongodb://'):
             return
 
         timeutils.utcnow.override_time = datetime.datetime(2012, 7, 2, 10, 45)
@@ -646,7 +646,7 @@ class RawSampleTest(DBTestBase,
     def test_clear_metering_data_no_data_to_remove(self):
         # NOTE(jd) Override this test in MongoDB because our code doesn't clear
         # the collections, this is handled by MongoDB TTL feature.
-        if cfg.CONF.database.connection.startswith('mongodb://'):
+        if self.CONF.database.connection.startswith('mongodb://'):
             return
 
         timeutils.utcnow.override_time = datetime.datetime(2010, 7, 2, 10, 45)
@@ -924,7 +924,7 @@ class StatisticsGroupByTest(DBTestBase,
             )
             msg = rpc.meter_message_from_counter(
                 c,
-                cfg.CONF.publisher_rpc.metering_secret,
+                self.CONF.publisher_rpc.metering_secret,
             )
             self.conn.record_metering_data(msg)
 
@@ -1788,7 +1788,7 @@ class CounterDataTypeTest(DBTestBase,
         )
         msg = rpc.meter_message_from_counter(
             c,
-            cfg.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher_rpc.metering_secret,
         )
 
         self.conn.record_metering_data(msg)
@@ -1807,7 +1807,7 @@ class CounterDataTypeTest(DBTestBase,
         )
         msg = rpc.meter_message_from_counter(
             c,
-            cfg.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg)
 
@@ -1825,7 +1825,7 @@ class CounterDataTypeTest(DBTestBase,
         )
         msg = rpc.meter_message_from_counter(
             c,
-            cfg.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher_rpc.metering_secret,
         )
         self.conn.record_metering_data(msg)
 
