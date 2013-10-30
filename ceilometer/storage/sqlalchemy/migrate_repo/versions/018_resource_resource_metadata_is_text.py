@@ -23,16 +23,13 @@ from sqlalchemy import MetaData
 from sqlalchemy import Table
 
 
-meta = MetaData()
-
-
 def upgrade(migrate_engine):
-    meta.bind = migrate_engine
+    meta = MetaData(bind=migrate_engine)
     resource = Table('resource', meta, autoload=True)
     resource.c.resource_metadata.alter(type=Text)
 
 
 def downgrade(migrate_engine):
-    meta.bind = migrate_engine
+    meta = MetaData(bind=migrate_engine)
     resource = Table('resource', meta, autoload=True)
     resource.c.resource_metadata.alter(type=String(5000))

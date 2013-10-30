@@ -20,11 +20,9 @@ from sqlalchemy import MetaData, Table, Column, DateTime
 
 from ceilometer.openstack.common import timeutils
 
-meta = MetaData()
-
 
 def upgrade(migrate_engine):
-    meta.bind = migrate_engine
+    meta = MetaData(bind=migrate_engine)
     resource = Table('resource', meta, autoload=True)
     timestamp = Column('timestamp', DateTime)
     resource.drop_column(timestamp)
@@ -33,7 +31,7 @@ def upgrade(migrate_engine):
 
 
 def downgrade(migrate_engine):
-    meta.bind = migrate_engine
+    meta = MetaData(bind=migrate_engine)
     resource = Table('resource', meta, autoload=True)
     timestamp = Column('timestamp', DateTime)
     resource.create_column(timestamp)

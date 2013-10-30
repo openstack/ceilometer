@@ -13,22 +13,17 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from sqlalchemy import MetaData
 from sqlalchemy import Index
 from ceilometer.storage.sqlalchemy.models import Meter
 
-meta = MetaData()
-
 
 def upgrade(migrate_engine):
-    meta.bind = migrate_engine
     index = Index('idx_meter_rid_cname', Meter.resource_id,
                   Meter.counter_name)
     index.create(bind=migrate_engine)
 
 
 def downgrade(migrate_engine):
-    meta.bind = migrate_engine
     index = Index('idx_meter_rid_cname', Meter.resource_id,
                   Meter.counter_name)
     index.drop(bind=migrate_engine)

@@ -19,18 +19,16 @@ from sqlalchemy import MetaData
 from sqlalchemy import String
 from sqlalchemy import Table
 
-meta = MetaData()
-
 
 def upgrade(migrate_engine):
-    meta.bind = migrate_engine
+    meta = MetaData(bind=migrate_engine)
     meter = Table('meter', meta, autoload=True)
     unit = Column('counter_unit', String(255))
     meter.create_column(unit)
 
 
 def downgrade(migrate_engine):
-    meta.bind = migrate_engine
+    meta = MetaData(bind=migrate_engine)
     meter = Table('meter', meta, autoload=True)
     unit = Column('counter_unit', String(255))
     meter.drop_column(unit)
