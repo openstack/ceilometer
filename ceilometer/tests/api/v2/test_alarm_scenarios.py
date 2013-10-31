@@ -514,6 +514,47 @@ class TestAlarms(FunctionalTest,
     def test_post_alarm_outlier_exclusion_defaulted(self):
         self._do_test_post_alarm()
 
+    def test_post_alarm_noauth(self):
+        json = {
+            'enabled': False,
+            'name': 'added_alarm',
+            'state': 'ok',
+            'type': 'threshold',
+            'ok_actions': ['http://something/ok'],
+            'alarm_actions': ['http://something/alarm'],
+            'insufficient_data_actions': ['http://something/no'],
+            'repeat_actions': True,
+            'threshold_rule': {
+                'meter_name': 'ameter',
+                'query': [{'field': 'metadata.field',
+                           'op': 'eq',
+                           'value': '5',
+                           'type': 'string'}],
+                'comparison_operator': 'le',
+                'statistic': 'count',
+                'threshold': 50,
+                'evaluation_periods': '3',
+                'exclude_outliers': False,
+                'period': '180',
+            }
+        }
+        self.post_json('/alarms', params=json, status=201)
+        alarms = list(self.conn.get_alarms(enabled=False))
+        self.assertEqual(1, len(alarms))
+        # to check to BoundedInt type convertion
+        json['threshold_rule']['evaluation_periods'] = 3
+        json['threshold_rule']['period'] = 180
+        if alarms[0].name == 'added_alarm':
+            for key in json:
+                if key.endswith('_rule'):
+                    storage_key = 'rule'
+                else:
+                    storage_key = key
+                self.assertEqual(getattr(alarms[0], storage_key),
+                                 json[key])
+        else:
+            self.fail("Alarm not found")
+
     def _do_test_post_alarm_as_admin(self, explicit_project_constraint):
         """Test the creation of an alarm as admin for another project."""
         json = {
