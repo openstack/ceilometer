@@ -64,11 +64,13 @@ common_cli_opts = [
 ]
 
 logging_cli_opts = [
-    cfg.StrOpt('log-config',
+    cfg.StrOpt('log-config-append',
                metavar='PATH',
-               help='If this option is specified, the logging configuration '
-                    'file specified is used and overrides any other logging '
-                    'options specified. Please see the Python logging module '
+               deprecated_name='log-config',
+               help='The name of logging configuration file. It does not '
+                    'disable existing loggers, but just appends specified '
+                    'logging configuration to any other existing logging '
+                    'options. Please see the Python logging module '
                     'documentation for details on logging configuration '
                     'files.'),
     cfg.StrOpt('log-format',
@@ -127,12 +129,13 @@ log_opts = [
                help='prefix each line of exception output with this format'),
     cfg.ListOpt('default_log_levels',
                 default=[
+                    'amqp=WARN',
                     'amqplib=WARN',
-                    'sqlalchemy=WARN',
                     'boto=WARN',
-                    'suds=INFO',
                     'keystone=INFO',
-                    'eventlet.wsgi.server=WARN'
+                    'qpid=WARN',
+                    'sqlalchemy=WARN',
+                    'suds=INFO',
                 ],
                 help='list of logger=LEVEL pairs'),
     cfg.BoolOpt('publish_errors',
@@ -354,17 +357,18 @@ class LogConfigError(Exception):
                                    err_msg=self.err_msg)
 
 
-def _load_log_config(log_config):
+def _load_log_config(log_config_append):
     try:
-        logging.config.fileConfig(log_config)
+        logging.config.fileConfig(log_config_append,
+                                  disable_existing_loggers=False)
     except moves.configparser.Error as exc:
-        raise LogConfigError(log_config, str(exc))
+        raise LogConfigError(log_config_append, str(exc))
 
 
 def setup(product_name):
     """Setup logging."""
-    if CONF.log_config:
-        _load_log_config(CONF.log_config)
+    if CONF.log_config_append:
+        _load_log_config(CONF.log_config_append)
     else:
         _setup_logging_from_conf()
     sys.excepthook = _create_logging_excepthook(product_name)
