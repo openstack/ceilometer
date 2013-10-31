@@ -33,8 +33,6 @@ class TestInstancePollster(base.TestPollsterBase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples_instance(self):
-        self.mox.ReplayAll()
-
         mgr = manager.AgentManager()
         pollster = pollsters_instance.InstancePollster()
         samples = list(pollster.get_samples(mgr, {}, self.instance))
@@ -48,8 +46,6 @@ class TestInstancePollster(base.TestPollsterBase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples_instance_flavor(self):
-        self.mox.ReplayAll()
-
         mgr = manager.AgentManager()
         pollster = pollsters_instance.InstanceFlavorPollster()
         samples = list(pollster.get_samples(mgr, {}, self.instance))
