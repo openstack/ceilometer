@@ -26,9 +26,11 @@ import time
 import threading
 from ceilometer import service
 from ceilometer.tests import base
+from ceilometer.openstack.common import fileutils
+from ceilometer.openstack.common import test
 
 
-class ServiceTestCase(base.TestCase):
+class ServiceTestCase(test.BaseTestCase):
     def test_prepare_service(self):
         service.prepare_service([])
 
@@ -60,31 +62,30 @@ class ParseOutput(threading.Thread):
         self.thread_stop = True
 
 
-class ServiceRestartTest(base.TestCase):
+class ServiceRestartTest(base.BaseTestCase):
 
     def setUp(self):
         super(ServiceRestartTest, self).setUp()
-        self.tempfile = self.temp_config_file_path()
-        self.pipeline_cfg_file = self.temp_config_file_path(name=
-                                                            'pipeline.yaml')
+        self.pipeline_cfg_file = fileutils.write_to_tempfile(content='',
+                                                             prefix='pipeline',
+                                                             suffix='.yaml')
         shutil.copy(self.path_get('etc/ceilometer/pipeline.yaml'),
                     self.pipeline_cfg_file)
         self.pipelinecfg_read_from_file()
         policy_file = self.path_get('tests/policy.json')
-        with open(self.tempfile, 'w') as tmp:
-            tmp.write("[DEFAULT]\n")
-            tmp.write(
-                "rpc_backend=ceilometer.openstack.common.rpc.impl_fake\n")
-            tmp.write(
-                "auth_strategy=noauth\n")
-            tmp.write(
-                "debug=true\n")
-            tmp.write(
-                "pipeline_cfg_file=%s\n" % self.pipeline_cfg_file)
-            tmp.write(
-                "policy_file=%s\n" % policy_file)
-            tmp.write("[database]\n")
-            tmp.write("connection=log://localhost\n")
+        content = "[DEFAULT]\n"\
+                  "rpc_backend=ceilometer.openstack.common.rpc.impl_fake\n"\
+                  "auth_strategy=noauth\n"\
+                  "debug=true\n"\
+                  "pipeline_cfg_file={0}\n"\
+                  "policy_file={1}\n"\
+                  "[database]\n"\
+                  "connection=log://localhost\n".format(self.pipeline_cfg_file,
+                                                        policy_file)
+
+        self.tempfile = fileutils.write_to_tempfile(content=content,
+                                                    prefix='ceilometer',
+                                                    suffix='.conf')
 
     def _modify_pipeline_file(self):
         with open(self.pipeline_cfg_file, 'w') as pipe_fd:
@@ -100,6 +101,8 @@ class ServiceRestartTest(base.TestCase):
         super(ServiceRestartTest, self).tearDown()
         self.sub.kill()
         self.sub.wait()
+        os.remove(self.pipeline_cfg_file)
+        os.remove(self.tempfile)
 
     @staticmethod
     def _check_process_alive(pid):

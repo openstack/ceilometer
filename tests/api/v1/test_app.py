@@ -19,36 +19,38 @@
 """
 import os
 
-from oslo.config import cfg
-
 from ceilometer.api.v1 import app
 from ceilometer.api import acl
 from ceilometer import service
-from ceilometer.tests import base
+from ceilometer.openstack.common import fileutils
+from ceilometer.openstack.common import test
+from ceilometer.openstack.common.fixture import config
 
 
-class TestApp(base.TestCase):
+class TestApp(test.BaseTestCase):
 
-    def tearDown(self):
-        super(TestApp, self).tearDown()
-        cfg.CONF.reset()
+    def setUp(self):
+        super(TestApp, self).setUp()
+        self.CONF = self.useFixture(config.Config()).conf
 
     def test_keystone_middleware_conf(self):
-        cfg.CONF.set_override("auth_protocol", "foottp",
-                              group=acl.OPT_GROUP_NAME)
-        cfg.CONF.set_override("auth_version", "v2.0", group=acl.OPT_GROUP_NAME)
-        cfg.CONF.set_override("auth_uri", None,
-                              group=acl.OPT_GROUP_NAME)
-        api_app = app.make_app(cfg.CONF, attach_storage=False)
+        self.CONF.set_override("auth_protocol", "foottp",
+                               group=acl.OPT_GROUP_NAME)
+        self.CONF.set_override("auth_version", "v2.0",
+                               group=acl.OPT_GROUP_NAME)
+        self.CONF.set_override("auth_uri", None,
+                               group=acl.OPT_GROUP_NAME)
+        api_app = app.make_app(self.CONF, attach_storage=False)
         self.assertTrue(api_app.wsgi_app.auth_uri.startswith('foottp'))
 
     def test_keystone_middleware_parse_conffile(self):
-        tmpfile = self.temp_config_file_path()
-        with open(tmpfile, "w") as f:
-            f.write("[%s]\nauth_protocol = barttp" % acl.OPT_GROUP_NAME)
-            f.write("\nauth_version = v2.0")
+        content = "[{0}]\nauth_protocol = barttp"\
+                  "\nauth_version = v2.0".format(acl.OPT_GROUP_NAME)
+        tmpfile = fileutils.write_to_tempfile(content=content,
+                                              prefix='ceilometer',
+                                              suffix='.conf')
         service.prepare_service(['ceilometer-api',
                                  '--config-file=%s' % tmpfile])
-        api_app = app.make_app(cfg.CONF, attach_storage=False)
+        api_app = app.make_app(self.CONF, attach_storage=False)
         self.assertTrue(api_app.wsgi_app.auth_uri.startswith('barttp'))
         os.unlink(tmpfile)

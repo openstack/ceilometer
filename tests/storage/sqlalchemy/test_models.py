@@ -23,11 +23,11 @@ from sqlalchemy.types import DATETIME, NUMERIC
 from sqlalchemy.dialects.mysql import DECIMAL
 
 from ceilometer import utils
+from ceilometer.openstack.common import test
 from ceilometer.storage.sqlalchemy import models
-from ceilometer.tests import base
 
 
-class PreciseTimestampTest(base.TestCase):
+class PreciseTimestampTest(test.BaseTestCase):
 
     @staticmethod
     def fake_dialect(name):

@@ -19,11 +19,11 @@
 """
 import mock
 
-from ceilometer.tests import base
+from ceilometer.openstack.common import test
 from ceilometer.alarm import evaluator
 
 
-class TestEvaluatorBaseClass(base.TestCase):
+class TestEvaluatorBaseClass(test.BaseTestCase):
     def setUp(self):
         super(TestEvaluatorBaseClass, self).setUp()
         self.called = False

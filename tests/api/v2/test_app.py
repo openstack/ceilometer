@@ -20,48 +20,52 @@
 """
 import os
 
-from oslo.config import cfg
-
 from ceilometer.api import app
 from ceilometer.api import acl
 from ceilometer import service
+from ceilometer.openstack.common import fileutils
 from ceilometer.openstack.common import gettextutils
+from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer.tests import base
 from ceilometer.tests import db as tests_db
 from .base import FunctionalTest
 
 
-class TestApp(base.TestCase):
+class TestApp(base.BaseTestCase):
 
-    def tearDown(self):
-        super(TestApp, self).tearDown()
-        cfg.CONF.reset()
+    def setUp(self):
+        super(TestApp, self).setUp()
+        self.CONF = self.useFixture(config.Config()).conf
 
     def test_keystone_middleware_conf(self):
-        cfg.CONF.set_override("auth_protocol", "foottp",
-                              group=acl.OPT_GROUP_NAME)
-        cfg.CONF.set_override("auth_version", "v2.0", group=acl.OPT_GROUP_NAME)
-        cfg.CONF.set_override("pipeline_cfg_file",
-                              self.path_get("etc/ceilometer/pipeline.yaml"))
-        cfg.CONF.set_override('connection', "log://", group="database")
-        cfg.CONF.set_override("auth_uri", None, group=acl.OPT_GROUP_NAME)
+        self.CONF.set_override("auth_protocol", "foottp",
+                               group=acl.OPT_GROUP_NAME)
+        self.CONF.set_override("auth_version", "v2.0",
+                               group=acl.OPT_GROUP_NAME)
+        self.CONF.set_override("pipeline_cfg_file",
+                               self.path_get("etc/ceilometer/pipeline.yaml"))
+        self.CONF.set_override('connection', "log://", group="database")
+        self.CONF.set_override("auth_uri", None, group=acl.OPT_GROUP_NAME)
 
         api_app = app.setup_app()
         self.assertTrue(api_app.auth_uri.startswith('foottp'))
 
     def test_keystone_middleware_parse_conffile(self):
-        tmpfile = self.temp_config_file_path()
-        with open(tmpfile, "w") as f:
-            f.write("[DEFAULT]\n")
-            f.write("pipeline_cfg_file = %s\n" %
-                    self.path_get("etc/ceilometer/pipeline.yaml"))
-            f.write("[%s]\n" % acl.OPT_GROUP_NAME)
-            f.write("auth_protocol = barttp\n")
-            f.write("auth_version = v2.0\n")
+        pipeline_conf = self.path_get("etc/ceilometer/pipeline.yaml")
+        content = "[DEFAULT]\n"\
+                  "pipeline_cfg_file = {0}\n"\
+                  "[{1}]\n"\
+                  "auth_protocol = barttp\n"\
+                  "auth_version = v2.0\n".format(pipeline_conf,
+                                                 acl.OPT_GROUP_NAME)
+
+        tmpfile = fileutils.write_to_tempfile(content=content,
+                                              prefix='ceilometer',
+                                              suffix='.conf')
         service.prepare_service(['ceilometer-api',
                                  '--config-file=%s' % tmpfile])
-        cfg.CONF.set_override('connection', "log://", group="database")
+        self.CONF.set_override('connection', "log://", group="database")
         api_app = app.setup_app()
         self.assertTrue(api_app.auth_uri.startswith('barttp'))
         os.unlink(tmpfile)
