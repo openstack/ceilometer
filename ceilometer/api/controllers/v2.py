@@ -68,13 +68,12 @@ state_kind_enum = wtypes.Enum(str, *state_kind)
 operation_kind = wtypes.Enum(str, 'lt', 'le', 'eq', 'ne', 'ge', 'gt')
 
 
-class EntityNotFound(Exception):
-    code = 404
-
+class EntityNotFound(wsme.exc.ClientSideError):
     def __init__(self, entity, id):
         super(EntityNotFound, self).__init__(
             _("%(entity)s %(id)s Not Found") % {'entity': entity,
-                                                'id': id})
+                                                'id': id},
+            status_code=404)
 
 
 class BoundedInt(wtypes.UserType):
@@ -278,12 +277,11 @@ class Query(_Base):
         return converted_value
 
 
-class ProjectNotAuthorized(Exception):
-    code = 401
-
+class ProjectNotAuthorized(wsme.exc.ClientSideError):
     def __init__(self, id):
         super(ProjectNotAuthorized, self).__init__(
-            _("Not Authorized to access project %s") % id)
+            _("Not Authorized to access project %s") % id,
+            status_code=401)
 
 
 def _get_auth_project(on_behalf_of=None):
