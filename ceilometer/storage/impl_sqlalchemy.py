@@ -916,7 +916,7 @@ class Connection(base.Connection):
                 problem_events.append((api_models.Event.DUPLICATE,
                                        event_model))
             except Exception as e:
-                LOG.exception('Failed to record event: %s', e)
+                LOG.exception(_('Failed to record event: %s') % e)
                 problem_events.append((api_models.Event.UNKNOWN_PROBLEM,
                                        event_model))
             events.append(event)

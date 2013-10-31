@@ -79,7 +79,7 @@ class CollectorService(service.DispatchedService, rpc_service.Service):
                     sample['counter_volume'] = sample['volume']
                     sample['counter_unit'] = sample['unit']
                     sample['counter_type'] = sample['type']
-                    LOG.debug("UDP: Storing %s", str(sample))
+                    LOG.debug(_("UDP: Storing %s"), str(sample))
                     self.dispatcher_manager.map_method('record_metering_data',
                                                        sample)
                 except Exception:

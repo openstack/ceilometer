@@ -18,6 +18,7 @@
 """Log alarm notifier."""
 
 from ceilometer.alarm import notifier
+from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
 
 LOG = log.getLogger(__name__)
@@ -28,5 +29,9 @@ class LogAlarmNotifier(notifier.AlarmNotifier):
 
     @staticmethod
     def notify(action, alarm_id, previous, current, reason):
-        LOG.info("Notifying alarm %s from %s to %s with action %s because %s",
-                 alarm_id, previous, current, action, reason)
+        LOG.info(_(
+            "Notifying alarm %(alarm_id)s from %(previous)s "
+            "to %(current)s with action %(action)s because "
+            "%(reason)s") % ({'alarm_id': alarm_id, 'previous': previous,
+                              'current': current, 'action': action,
+                              'reason': reason}))

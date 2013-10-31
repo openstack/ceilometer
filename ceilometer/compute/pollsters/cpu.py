@@ -21,6 +21,7 @@
 from ceilometer.compute import plugin
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
+from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
 from ceilometer import sample
 
@@ -30,12 +31,12 @@ LOG = log.getLogger(__name__)
 class CPUPollster(plugin.ComputePollster):
 
     def get_samples(self, manager, cache, instance):
-        LOG.info('checking instance %s', instance.id)
+        LOG.info(_('checking instance %s'), instance.id)
         instance_name = util.instance_name(instance)
         try:
             cpu_info = manager.inspector.inspect_cpus(instance_name)
-            LOG.info("CPUTIME USAGE: %s %d",
-                     instance.__dict__, cpu_info.time)
+            LOG.info(_("CPUTIME USAGE: %(instance)s %(time)d") % (
+                     {'instance': instance.__dict__, 'time': cpu_info.time}))
             cpu_num = {'cpu_number': cpu_info.number}
             yield util.make_sample_from_instance(
                 instance,
@@ -47,8 +48,8 @@ class CPUPollster(plugin.ComputePollster):
             )
         except virt_inspector.InstanceNotFoundException as err:
             # Instance was deleted while getting samples. Ignore it.
-            LOG.debug('Exception while getting samples %s', err)
+            LOG.debug(_('Exception while getting samples %s'), err)
         except Exception as err:
-            LOG.error('could not get CPU time for %s: %s',
-                      instance.id, err)
+            LOG.error(_('could not get CPU time for %(id)s: %(e)s') % (
+                      {'id': instance.id, 'e': err}))
             LOG.exception(err)

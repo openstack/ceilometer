@@ -29,6 +29,7 @@ import webob
 
 from ceilometer.api import hooks
 from ceilometer.openstack.common import gettextutils
+from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
 
 LOG = log.getLogger(__name__)
@@ -108,7 +109,7 @@ class ParsableErrorMiddleware(object):
                     body = ['<error_message>' + etree.tostring(fault)
                             + '</error_message>']
                 except etree.XMLSyntaxError as err:
-                    LOG.error('Error parsing HTTP response: %s' % err)
+                    LOG.error(_('Error parsing HTTP response: %s') % err)
                     body = ['<error_message>%s' % state['status_code']
                             + '</error_message>']
                 state['headers'].append(('Content-Type', 'application/xml'))

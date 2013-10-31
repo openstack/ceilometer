@@ -26,6 +26,7 @@ from oslo.config import cfg
 from stevedore import named
 
 from ceilometer.openstack.common import gettextutils
+from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import rpc
 
@@ -96,7 +97,7 @@ class DispatchedService(object):
 
     def __init__(self, *args, **kwargs):
         super(DispatchedService, self).__init__(*args, **kwargs)
-        LOG.debug('loading dispatchers from %s',
+        LOG.debug(_('loading dispatchers from %s'),
                   self.DISPATCHER_NAMESPACE)
         self.dispatcher_manager = named.NamedExtensionManager(
             namespace=self.DISPATCHER_NAMESPACE,
@@ -104,7 +105,7 @@ class DispatchedService(object):
             invoke_on_load=True,
             invoke_args=[cfg.CONF])
         if not list(self.dispatcher_manager):
-            LOG.warning('Failed to load any dispatchers for %s',
+            LOG.warning(_('Failed to load any dispatchers for %s'),
                         self.DISPATCHER_NAMESPACE)
 
 

@@ -23,6 +23,7 @@ import urlparse
 from oslo.config import cfg
 from stevedore import driver
 
+from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
 from ceilometer import service
 from ceilometer import utils
@@ -67,8 +68,9 @@ def get_engine(conf):
         conf.set_override('connection', conf.database_connection,
                           group='database')
     engine_name = urlparse.urlparse(conf.database.connection).scheme
-    LOG.debug('looking for %r driver in %r',
-              engine_name, STORAGE_ENGINE_NAMESPACE)
+    LOG.debug(_('looking for %(name)r driver in %(namespace)r') % (
+              {'name': engine_name,
+               'namespace': STORAGE_ENGINE_NAMESPACE}))
     mgr = driver.DriverManager(STORAGE_ENGINE_NAMESPACE,
                                engine_name,
                                invoke_on_load=True)
@@ -140,7 +142,7 @@ def dbsync():
 
 def expirer():
     service.prepare_service()
-    LOG.debug("Clearing expired metering data")
+    LOG.debug(_("Clearing expired metering data"))
     storage_conn = get_connection(cfg.CONF)
     storage_conn.clear_expired_metering_data(
         cfg.CONF.database.time_to_live)

@@ -17,6 +17,7 @@
 # under the License.
 
 from ceilometer import dispatcher
+from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer.publisher import rpc as publisher_rpc
@@ -46,11 +47,13 @@ class DatabaseDispatcher(dispatcher.Base):
             data = [data]
 
         for meter in data:
-            LOG.debug('metering data %s for %s @ %s: %s',
-                      meter['counter_name'],
-                      meter['resource_id'],
-                      meter.get('timestamp', 'NO TIMESTAMP'),
-                      meter['counter_volume'])
+            LOG.debug(_(
+                'metering data %(counter_name)s '
+                'for %(resource_id)s @ %(timestamp)s: %(counter_volume)s')
+                % ({'counter_name': meter['counter_name'],
+                    'resource_id': meter['resource_id'],
+                    'timestamp': meter.get('timestamp', 'NO TIMESTAMP'),
+                    'counter_volume': meter['counter_volume']}))
             if publisher_rpc.verify_signature(
                     meter,
                     self.conf.publisher_rpc.metering_secret):
@@ -63,10 +66,11 @@ class DatabaseDispatcher(dispatcher.Base):
                         meter['timestamp'] = timeutils.normalize_time(ts)
                     self.storage_conn.record_metering_data(meter)
                 except Exception as err:
-                    LOG.exception('Failed to record metering data: %s', err)
+                    LOG.exception(_('Failed to record metering data: %s'),
+                                  err)
             else:
-                LOG.warning(
-                    'message signature invalid, discarding message: %r',
+                LOG.warning(_(
+                    'message signature invalid, discarding message: %r'),
                     meter)
 
     def record_events(self, events):

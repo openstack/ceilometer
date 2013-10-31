@@ -96,8 +96,8 @@ class Connection(base.Connection):
             else:
                 # This is a in-memory usage for unit tests
                 if Connection._memory_instance is None:
-                    LOG.debug('Creating a new in-memory HBase '
-                              'Connection object')
+                    LOG.debug(_('Creating a new in-memory HBase '
+                              'Connection object'))
                     Connection._memory_instance = MConnection()
                 self.conn = Connection._memory_instance
         else:
@@ -111,7 +111,7 @@ class Connection(base.Connection):
         self.conn.create_table(self.METER_TABLE, {'f': dict()})
 
     def clear(self):
-        LOG.debug('Dropping HBase schema...')
+        LOG.debug(_('Dropping HBase schema...'))
         for table in [self.PROJECT_TABLE,
                       self.USER_TABLE,
                       self.RESOURCE_TABLE,
@@ -119,11 +119,11 @@ class Connection(base.Connection):
             try:
                 self.conn.disable_table(table)
             except Exception:
-                LOG.debug('Cannot disable table but ignoring error')
+                LOG.debug(_('Cannot disable table but ignoring error'))
             try:
                 self.conn.delete_table(table)
             except Exception:
-                LOG.debug('Cannot delete table but ignoring error')
+                LOG.debug(_('Cannot delete table but ignoring error'))
 
     @staticmethod
     def _get_connection(conf):
@@ -134,7 +134,8 @@ class Connection(base.Connection):
           The tests use a subclass to override this and return an
           in-memory connection.
         """
-        LOG.debug('connecting to HBase on %s:%s', conf['host'], conf['port'])
+        LOG.debug(_('connecting to HBase on %(host)s:%(port)s') % (
+                  {'host': conf['host'], 'port': conf['port']}))
         return happybase.Connection(host=conf['host'], port=conf['port'],
                                     table_prefix=conf['table_prefix'])
 
@@ -269,7 +270,7 @@ class Connection(base.Connection):
         :param source: Optional source filter.
         """
         user_table = self.conn.table(self.USER_TABLE)
-        LOG.debug("source: %s" % source)
+        LOG.debug(_("source: %s") % source)
         scan_args = {}
         if source:
             scan_args['columns'] = ['f:s_%s' % source]
@@ -281,7 +282,7 @@ class Connection(base.Connection):
         :param source: Optional source filter.
         """
         project_table = self.conn.table(self.PROJECT_TABLE)
-        LOG.debug("source: %s" % source)
+        LOG.debug(_("source: %s") % source)
         scan_args = {}
         if source:
             scan_args['columns'] = ['f:s_%s' % source]
@@ -338,7 +339,7 @@ class Connection(base.Connection):
                                             end_op=end_timestamp_op,
                                             require_meter=False,
                                             query_only=False)
-        LOG.debug("Query Meter table: %s" % q)
+        LOG.debug(_("Query Meter table: %s") % q)
         meters = meter_table.scan(filter=q, row_start=start_row,
                                   row_stop=stop_row)
 
@@ -395,7 +396,7 @@ class Connection(base.Connection):
         resource_table = self.conn.table(self.RESOURCE_TABLE)
         q = make_query(user=user, project=project, resource=resource,
                        source=source, require_meter=False, query_only=True)
-        LOG.debug("Query Resource table: %s" % q)
+        LOG.debug(_("Query Resource table: %s") % q)
 
         # handle metaquery
         if len(metaquery) > 0:
@@ -451,7 +452,7 @@ class Connection(base.Connection):
 
         q, start, stop = make_query_from_filter(sample_filter,
                                                 require_meter=False)
-        LOG.debug("Query Meter Table: %s" % q)
+        LOG.debug(_("Query Meter Table: %s") % q)
 
         gen = meter_table.scan(filter=q, row_start=start, row_stop=stop)
 
@@ -760,7 +761,7 @@ class MConnection(object):
         self.tables = {}
 
     def open(self):
-        LOG.debug("Opening in-memory HBase connection")
+        LOG.debug(_("Opening in-memory HBase connection"))
 
     def create_table(self, n, families={}):
         if n in self.tables:

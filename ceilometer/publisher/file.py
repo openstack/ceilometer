@@ -20,6 +20,7 @@ import logging
 import logging.handlers
 import urlparse
 
+from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
 from ceilometer import publisher
 
@@ -58,7 +59,7 @@ class FilePublisher(publisher.PublisherBase):
         self.publisher_logger = None
         path = parsed_url.path
         if not path or path.lower() == 'file':
-            LOG.error('The path for the file publisher is required')
+            LOG.error(_('The path for the file publisher is required'))
             return
 
         rfh = None
@@ -72,8 +73,8 @@ class FilePublisher(publisher.PublisherBase):
                     max_bytes = int(params.get('max_bytes')[0])
                     backup_count = int(params.get('backup_count')[0])
                 except ValueError:
-                    LOG.error('max_bytes and backup_count should be '
-                              'numbers.')
+                    LOG.error(_('max_bytes and backup_count should be '
+                              'numbers.'))
                     return
         # create rotating file handler
         rfh = logging.handlers.RotatingFileHandler(

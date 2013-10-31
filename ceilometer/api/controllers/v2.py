@@ -654,12 +654,12 @@ class Statistics(_Base):
                 self.duration_start and
                 self.duration_start < start_timestamp):
             self.duration_start = start_timestamp
-            LOG.debug('clamping min timestamp to range')
+            LOG.debug(_('clamping min timestamp to range'))
         if (end_timestamp and
                 self.duration_end and
                 self.duration_end > end_timestamp):
             self.duration_end = end_timestamp
-            LOG.debug('clamping max timestamp to range')
+            LOG.debug(_('clamping max timestamp to range'))
 
         # If we got valid timestamps back, compute a duration in seconds.
         #
@@ -800,7 +800,8 @@ class MeterController(rest.RestController):
         computed = pecan.request.storage_conn.get_meter_statistics(f,
                                                                    period,
                                                                    g)
-        LOG.debug('computed value coming from %r', pecan.request.storage_conn)
+        LOG.debug(_('computed value coming from %r'),
+                  pecan.request.storage_conn)
         # Find the original timestamp in the query to use for clamping
         # the duration returned in the statistics.
         start = end = None
@@ -1347,7 +1348,7 @@ class AlarmController(rest.RestController):
         try:
             alarm_in = storage.models.Alarm(**updated_alarm)
         except Exception:
-            LOG.exception("Error while putting alarm: %s" % updated_alarm)
+            LOG.exception(_("Error while putting alarm: %s") % updated_alarm)
             raise ClientSideError(_("Alarm incorrect"))
 
         alarm = self.conn.update_alarm(alarm_in)
@@ -1486,7 +1487,7 @@ class AlarmsController(rest.RestController):
         try:
             alarm_in = storage.models.Alarm(**change)
         except Exception:
-            LOG.exception("Error while posting alarm: %s" % change)
+            LOG.exception(_("Error while posting alarm: %s") % change)
             raise ClientSideError(_("Alarm incorrect"))
 
         alarm = conn.create_alarm(alarm_in)

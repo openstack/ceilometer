@@ -23,6 +23,7 @@ import copy
 from ceilometer.compute import plugin
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
+from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer import sample
@@ -73,7 +74,7 @@ class _Base(plugin.ComputePollster):
 
     def get_samples(self, manager, cache, instance):
         instance_name = util.instance_name(instance)
-        LOG.info('checking instance %s', instance.id)
+        LOG.info(_('checking instance %s'), instance.id)
         try:
             vnics = self._get_vnics_for_instance(
                 cache,
@@ -86,10 +87,10 @@ class _Base(plugin.ComputePollster):
                 yield self._get_sample(instance, vnic, info)
         except virt_inspector.InstanceNotFoundException as err:
             # Instance was deleted while getting samples. Ignore it.
-            LOG.debug('Exception while getting samples %s', err)
+            LOG.debug(_('Exception while getting samples %s'), err)
         except Exception as err:
-            LOG.warning('Ignoring instance %s: %s',
-                        instance_name, err)
+            LOG.warning(_('Ignoring instance %(name)s: %(error)s') % (
+                        {'name': instance_name, 'error': err}))
             LOG.exception(err)
 
 
