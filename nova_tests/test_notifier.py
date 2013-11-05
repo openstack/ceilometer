@@ -221,8 +221,11 @@ class TestNovaNotifier(test.BaseTestCase):
             mock.patch('nova.openstack.common.notifier.rpc_notifier.notify',
                        self.notify)
         ):
-            self.compute.terminate_instance(self.context,
-                                            instance=self.instance)
+            with mock.patch.object(self.compute.conductor_api,
+                                   'instance_destroy',
+                                   return_value=self.instance):
+                self.compute.terminate_instance(self.context,
+                                                instance=self.instance)
 
     def tearDown(self):
         self.Pollster.instances = []
