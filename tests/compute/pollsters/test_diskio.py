@@ -38,8 +38,7 @@ class TestDiskPollsters(base.TestPollsterBase):
 
     def setUp(self):
         super(TestDiskPollsters, self).setUp()
-        self.inspector.inspect_disks(self.instance.name).AndReturn(self.DISKS)
-        self.mox.ReplayAll()
+        self.inspector.inspect_disks = mock.Mock(return_value=self.DISKS)
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def _check_get_samples(self, factory, name, expected_volume):

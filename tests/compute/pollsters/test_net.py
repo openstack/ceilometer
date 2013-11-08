@@ -67,8 +67,7 @@ class TestNetPollster(base.TestPollsterBase):
             (self.vnic1, stats1),
             (self.vnic2, stats2),
         ]
-        self.inspector.inspect_vnics(self.instance.name).AndReturn(vnics)
-        self.mox.ReplayAll()
+        self.inspector.inspect_vnics = mock.Mock(return_value=vnics)
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def _check_get_samples(self, factory, expected):
@@ -137,10 +136,6 @@ class TestNetPollster(base.TestPollsterBase):
 
 
 class TestNetPollsterCache(base.TestPollsterBase):
-
-    def setUp(self):
-        super(TestNetPollsterCache, self).setUp()
-        self.mox.ReplayAll()
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def _check_get_samples_cache(self, factory):

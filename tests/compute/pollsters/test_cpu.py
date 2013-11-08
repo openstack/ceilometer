@@ -21,6 +21,7 @@
 import time
 
 import mock
+import six
 
 from ceilometer.compute import manager
 from ceilometer.compute.pollsters import cpu
@@ -36,14 +37,17 @@ class TestCPUPollster(base.TestPollsterBase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
-        self.inspector.inspect_cpus(self.instance.name).AndReturn(
-            virt_inspector.CPUStats(time=1 * (10 ** 6), number=2))
-        self.inspector.inspect_cpus(self.instance.name).AndReturn(
-            virt_inspector.CPUStats(time=3 * (10 ** 6), number=2))
-        # cpu_time resets on instance restart
-        self.inspector.inspect_cpus(self.instance.name).AndReturn(
-            virt_inspector.CPUStats(time=2 * (10 ** 6), number=2))
-        self.mox.ReplayAll()
+        next_value = iter((
+            virt_inspector.CPUStats(time=1 * (10 ** 6), number=2),
+            virt_inspector.CPUStats(time=3 * (10 ** 6), number=2),
+            # cpu_time resets on instance restart
+            virt_inspector.CPUStats(time=2 * (10 ** 6), number=2),
+        ))
+
+        def inspect_cpus(name):
+            return six.next(next_value)
+
+        self.inspector.inspect_cpus = mock.Mock(side_effect=inspect_cpus)
 
         mgr = manager.AgentManager()
         pollster = cpu.CPUPollster()
@@ -65,9 +69,8 @@ class TestCPUPollster(base.TestPollsterBase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples_no_caching(self):
-        self.inspector.inspect_cpus(self.instance.name).AndReturn(
-            virt_inspector.CPUStats(time=1 * (10 ** 6), number=2))
-        self.mox.ReplayAll()
+        cpu_stats = virt_inspector.CPUStats(time=1 * (10 ** 6), number=2)
+        self.inspector.inspect_cpus = mock.Mock(return_value=cpu_stats)
 
         mgr = manager.AgentManager()
         pollster = cpu.CPUPollster()

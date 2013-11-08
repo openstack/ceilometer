@@ -21,18 +21,16 @@
 import mock
 
 from ceilometer.openstack.common import test
-from ceilometer.openstack.common.fixture import moxstubout
-from ceilometer.compute.virt import inspector as virt_inspector
 
 
 class TestPollsterBase(test.BaseTestCase):
 
     def setUp(self):
         super(TestPollsterBase, self).setUp()
-        self.mox = self.useFixture(moxstubout.MoxStubout()).mox
-        self.mox.StubOutWithMock(virt_inspector, 'get_hypervisor_inspector')
-        self.inspector = self.mox.CreateMock(virt_inspector.Inspector)
-        virt_inspector.get_hypervisor_inspector().AndReturn(self.inspector)
+
+        self.addCleanup(mock.patch.stopall)
+
+        self.inspector = mock.Mock()
         self.instance = mock.MagicMock()
         self.instance.name = 'instance-00000001'
         setattr(self.instance, 'OS-EXT-SRV-ATTR:instance_name',
@@ -40,3 +38,8 @@ class TestPollsterBase(test.BaseTestCase):
         self.instance.id = 1
         self.instance.flavor = {'name': 'm1.small', 'id': 2, 'vcpus': 1,
                                 'ram': 512, 'disk': 20, 'ephemeral': 0}
+
+        patch_virt = mock.patch('ceilometer.compute.virt.inspector'
+                                '.get_hypervisor_inspector',
+                                mock.Mock(return_value=self.inspector))
+        patch_virt.start()
