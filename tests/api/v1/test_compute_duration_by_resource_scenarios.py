@@ -83,13 +83,13 @@ class TestComputeDurationByResource(tests_api.TestBase,
     def test_before_range(self):
         self._set_stats(self.early1, self.early2)
         data = self._invoke_api()
-        assert data['start_timestamp'] is None
-        assert data['end_timestamp'] is None
-        assert data['duration'] is None
+        self.assertIsNone(data['start_timestamp'])
+        self.assertIsNone(data['end_timestamp'])
+        self.assertIsNone(data['duration'])
 
     def _assert_times_match(self, actual, expected):
         actual = timeutils.parse_isotime(actual).replace(tzinfo=None)
-        assert actual == expected
+        self.assertEqual(actual, expected)
 
     def test_overlap_range_start(self):
         self._set_stats(self.early1, self.middle1)
@@ -110,7 +110,7 @@ class TestComputeDurationByResource(tests_api.TestBase,
         data = self._invoke_api()
         self._assert_times_match(data['start_timestamp'], self.middle1)
         self._assert_times_match(data['end_timestamp'], self.middle1)
-        assert data['duration'] == 0
+        self.assertEqual(data['duration'], 0)
 
     def test_overlap_range_end(self):
         self._set_stats(self.middle2, self.late1)
@@ -122,9 +122,9 @@ class TestComputeDurationByResource(tests_api.TestBase,
     def test_after_range(self):
         self._set_stats(self.late1, self.late2)
         data = self._invoke_api()
-        assert data['start_timestamp'] is None
-        assert data['end_timestamp'] is None
-        assert data['duration'] is None
+        self.assertIsNone(data['start_timestamp'])
+        self.assertIsNone(data['end_timestamp'])
+        self.assertIsNone(data['duration'])
 
     def test_without_end_timestamp(self):
         self._set_stats(self.late1, self.late2)

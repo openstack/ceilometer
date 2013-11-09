@@ -50,9 +50,9 @@ class TestStatisticsDuration(test.BaseTestCase):
                           start_timestamp=None,
                           end_timestamp=None,
                           )
-        assert s.duration_start is None
-        assert s.duration_end is None
-        assert s.duration is None
+        self.assertIsNone(s.duration_start)
+        self.assertIsNone(s.duration_end)
+        self.assertIsNone(s.duration)
 
     def test_overlap_range_start(self):
         s = v2.Statistics(duration_start=self.early1,
@@ -60,8 +60,8 @@ class TestStatisticsDuration(test.BaseTestCase):
                           start_timestamp=self.start,
                           end_timestamp=self.end,
                           )
-        assert s.duration_start == self.start
-        assert s.duration_end == self.middle1
+        self.assertEqual(s.duration_start, self.start)
+        self.assertEqual(s.duration_end, self.middle1)
         self.assertEqual(s.duration, 8 * 60 * 60)
 
     def test_within_range(self):
@@ -70,8 +70,8 @@ class TestStatisticsDuration(test.BaseTestCase):
                           start_timestamp=self.start,
                           end_timestamp=self.end,
                           )
-        assert s.duration_start == self.middle1
-        assert s.duration_end == self.middle2
+        self.assertEqual(s.duration_start, self.middle1)
+        self.assertEqual(s.duration_end, self.middle2)
         self.assertEqual(s.duration, 10 * 60 * 60)
 
     def test_within_range_zero_duration(self):
@@ -80,9 +80,9 @@ class TestStatisticsDuration(test.BaseTestCase):
                           start_timestamp=self.start,
                           end_timestamp=self.end,
                           )
-        assert s.duration_start == self.middle1
-        assert s.duration_end == self.middle1
-        assert s.duration == 0
+        self.assertEqual(s.duration_start, self.middle1)
+        self.assertEqual(s.duration_end, self.middle1)
+        self.assertEqual(s.duration, 0)
 
     def test_overlap_range_end(self):
         s = v2.Statistics(duration_start=self.middle2,
@@ -90,8 +90,8 @@ class TestStatisticsDuration(test.BaseTestCase):
                           start_timestamp=self.start,
                           end_timestamp=self.end,
                           )
-        assert s.duration_start == self.middle2
-        assert s.duration_end == self.end
+        self.assertEqual(s.duration_start, self.middle2)
+        self.assertEqual(s.duration_end, self.end)
         self.assertEqual(s.duration, ((6 * 60) - 1) * 60)
 
     def test_after_range(self):
@@ -100,9 +100,9 @@ class TestStatisticsDuration(test.BaseTestCase):
                           start_timestamp=self.start,
                           end_timestamp=self.end,
                           )
-        assert s.duration_start is None
-        assert s.duration_end is None
-        assert s.duration is None
+        self.assertIsNone(s.duration_start)
+        self.assertIsNone(s.duration_end)
+        self.assertIsNone(s.duration)
 
     def test_without_timestamp(self):
         s = v2.Statistics(duration_start=self.late1,
@@ -110,5 +110,5 @@ class TestStatisticsDuration(test.BaseTestCase):
                           start_timestamp=None,
                           end_timestamp=None,
                           )
-        assert s.duration_start == self.late1
-        assert s.duration_end == self.late2
+        self.assertEqual(s.duration_start, self.late1)
+        self.assertEqual(s.duration_end, self.late2)

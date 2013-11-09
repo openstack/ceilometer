@@ -48,8 +48,8 @@ class TestDiskPollsters(base.TestPollsterBase):
         cache = {}
         samples = list(pollster.get_samples(mgr, cache, self.instance))
         assert samples
-        assert pollster.CACHE_KEY_DISK in cache
-        assert self.instance.name in cache[pollster.CACHE_KEY_DISK]
+        self.assertIn(pollster.CACHE_KEY_DISK, cache)
+        self.assertIn(self.instance.name, cache[pollster.CACHE_KEY_DISK])
 
         self.assertEqual(set([s.name for s in samples]),
                          set([name]))

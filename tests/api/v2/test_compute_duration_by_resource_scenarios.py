@@ -106,7 +106,7 @@ class TestComputeDurationByResource(FunctionalTest,
         if actual:
             actual = timeutils.parse_isotime(actual)
         actual = actual.replace(tzinfo=None)
-        assert actual == expected
+        self.assertEqual(actual, expected)
 
     def test_overlap_range_start(self):
         self._set_interval(self.early1, self.middle1)

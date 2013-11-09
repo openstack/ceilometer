@@ -59,7 +59,7 @@ class TestMaxResourceVolume(tests_api.TestBase,
     def test_no_time_bounds(self):
         data = self.get('/resources/resource-id/meters/volume.size/volume/max')
         expected = {'volume': 7}
-        assert data == expected
+        self.assertEqual(data, expected)
 
     def test_no_time_bounds_non_admin(self):
         data = self.get('/resources/resource-id/meters/volume.size/volume/max',
@@ -77,29 +77,29 @@ class TestMaxResourceVolume(tests_api.TestBase,
         data = self.get('/resources/resource-id/meters/volume.size/volume/max',
                         start_timestamp='2012-09-25T11:30:00')
         expected = {'volume': 7}
-        assert data == expected
+        self.assertEqual(data, expected)
 
     def test_start_timestamp_after(self):
         data = self.get('/resources/resource-id/meters/volume.size/volume/max',
                         start_timestamp='2012-09-25T12:34:00')
         expected = {'volume': None}
-        assert data == expected
+        self.assertEqual(data, expected)
 
     def test_end_timestamp(self):
         data = self.get('/resources/resource-id/meters/volume.size/volume/max',
                         end_timestamp='2012-09-25T11:30:00')
         expected = {'volume': 5}
-        assert data == expected
+        self.assertEqual(data, expected)
 
     def test_end_timestamp_before(self):
         data = self.get('/resources/resource-id/meters/volume.size/volume/max',
                         end_timestamp='2012-09-25T09:54:00')
         expected = {'volume': None}
-        assert data == expected
+        self.assertEqual(data, expected)
 
     def test_start_end_timestamp(self):
         data = self.get('/resources/resource-id/meters/volume.size/volume/max',
                         start_timestamp='2012-09-25T11:30:00',
                         end_timestamp='2012-09-25T11:32:00')
         expected = {'volume': 6}
-        assert data == expected
+        self.assertEqual(data, expected)

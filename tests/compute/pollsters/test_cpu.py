@@ -58,7 +58,7 @@ class TestCPUPollster(base.TestPollsterBase):
             self.assertEqual(len(samples), 1)
             self.assertEqual(set([s.name for s in samples]),
                              set(['cpu']))
-            assert samples[0].volume == expected_time
+            self.assertEqual(samples[0].volume, expected_time)
             self.assertEqual(samples[0].resource_metadata.get('cpu_number'), 2)
             # ensure elapsed time between polling cycles is non-zero
             time.sleep(0.001)
