@@ -19,11 +19,10 @@
 """
 
 import datetime
-import logging
 
+import mock
 import testscenarios
 
-from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer.openstack.common import timeutils
 from ceilometer.storage import models
 from ceilometer.tests import api as tests_api
@@ -31,16 +30,12 @@ from ceilometer.tests import db as tests_db
 
 load_tests = testscenarios.load_tests_apply_scenarios
 
-LOG = logging.getLogger(__name__)
-
 
 class TestComputeDurationByResource(tests_api.TestBase,
                                     tests_db.MixinTestsWithBackendScenarios):
 
     def setUp(self):
         super(TestComputeDurationByResource, self).setUp()
-
-        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
 
         # Create events relative to the range and pretend
         # that the intervening events exist.
@@ -58,20 +53,18 @@ class TestComputeDurationByResource(tests_api.TestBase,
         self.late1 = datetime.datetime(2012, 8, 29, 9, 0)
         self.late2 = datetime.datetime(2012, 8, 29, 19, 0)
 
-    def _set_stats(self, start, end):
-        def get_meter_statistics(event_filter):
-            return models.Statistics(
-                unit='',
-                min=0, max=0, avg=0, sum=0, count=0,
-                period=None,
-                period_start=None,
-                period_end=None,
-                duration=end - start,
-                duration_start=start,
-                duration_end=end,
-                groupby=None)
-        self.stubs.Set(self.conn, 'get_meter_statistics',
-                       get_meter_statistics)
+    def _patch_get_stats(self, start, end):
+        statitics = models.Statistics(unit='',
+                                      min=0, max=0, avg=0, sum=0, count=0,
+                                      period=None,
+                                      period_start=None,
+                                      period_end=None,
+                                      duration=end - start,
+                                      duration_start=start,
+                                      duration_end=end,
+                                      groupby=None)
+        return mock.patch.object(self.conn, 'get_meter_statistics',
+                                 return_value=statitics)
 
     def _invoke_api(self):
         return self.get(
@@ -82,8 +75,8 @@ class TestComputeDurationByResource(tests_api.TestBase,
         )
 
     def test_before_range(self):
-        self._set_stats(self.early1, self.early2)
-        data = self._invoke_api()
+        with self._patch_get_stats(self.early1, self.early2):
+            data = self._invoke_api()
         self.assertIsNone(data['start_timestamp'])
         self.assertIsNone(data['end_timestamp'])
         self.assertIsNone(data['duration'])
@@ -93,56 +86,58 @@ class TestComputeDurationByResource(tests_api.TestBase,
         self.assertEqual(actual, expected)
 
     def test_overlap_range_start(self):
-        self._set_stats(self.early1, self.middle1)
-        data = self._invoke_api()
+        with self._patch_get_stats(self.early1, self.middle1):
+            data = self._invoke_api()
         self._assert_times_match(data['start_timestamp'], self.start)
         self._assert_times_match(data['end_timestamp'], self.middle1)
         self.assertEqual(data['duration'], 8 * 60 * 60)
 
     def test_within_range(self):
-        self._set_stats(self.middle1, self.middle2)
-        data = self._invoke_api()
+        with self._patch_get_stats(self.middle1, self.middle2):
+            data = self._invoke_api()
         self._assert_times_match(data['start_timestamp'], self.middle1)
         self._assert_times_match(data['end_timestamp'], self.middle2)
         self.assertEqual(data['duration'], 10 * 60 * 60)
 
     def test_within_range_zero_duration(self):
-        self._set_stats(self.middle1, self.middle1)
-        data = self._invoke_api()
+        with self._patch_get_stats(self.middle1, self.middle1):
+            data = self._invoke_api()
         self._assert_times_match(data['start_timestamp'], self.middle1)
         self._assert_times_match(data['end_timestamp'], self.middle1)
         self.assertEqual(data['duration'], 0)
 
     def test_overlap_range_end(self):
-        self._set_stats(self.middle2, self.late1)
-        data = self._invoke_api()
+        with self._patch_get_stats(self.middle2, self.late1):
+            data = self._invoke_api()
         self._assert_times_match(data['start_timestamp'], self.middle2)
         self._assert_times_match(data['end_timestamp'], self.end)
         self.assertEqual(data['duration'], ((6 * 60) - 1) * 60)
 
     def test_after_range(self):
-        self._set_stats(self.late1, self.late2)
-        data = self._invoke_api()
+        with self._patch_get_stats(self.late1, self.late2):
+            data = self._invoke_api()
         self.assertIsNone(data['start_timestamp'])
         self.assertIsNone(data['end_timestamp'])
         self.assertIsNone(data['duration'])
 
     def test_without_end_timestamp(self):
-        self._set_stats(self.late1, self.late2)
-        data = self.get(
-            '/resources/resource-id/meters/instance:m1.tiny/duration',
-            start_timestamp=self.late1.isoformat(),
-            search_offset=10,  # this value doesn't matter, db call is mocked
-        )
+        with self._patch_get_stats(self.late1, self.late2):
+            data = self.get(
+                '/resources/resource-id/meters/instance:m1.tiny/duration',
+                start_timestamp=self.late1.isoformat(),
+                # this value doesn't matter, db call is mocked
+                search_offset=10,
+            )
         self._assert_times_match(data['start_timestamp'], self.late1)
         self._assert_times_match(data['end_timestamp'], self.late2)
 
     def test_without_start_timestamp(self):
-        self._set_stats(self.early1, self.early2)
-        data = self.get(
-            '/resources/resource-id/meters/instance:m1.tiny/duration',
-            end_timestamp=self.early2.isoformat(),
-            search_offset=10,  # this value doesn't matter, db call is mocked
-        )
+        with self._patch_get_stats(self.early1, self.early2):
+            data = self.get(
+                '/resources/resource-id/meters/instance:m1.tiny/duration',
+                end_timestamp=self.early2.isoformat(),
+                # this value doesn't matter, db call is mocked
+                search_offset=10,
+            )
         self._assert_times_match(data['start_timestamp'], self.early1)
         self._assert_times_match(data['end_timestamp'], self.early2)
