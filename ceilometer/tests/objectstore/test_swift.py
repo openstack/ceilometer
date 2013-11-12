@@ -31,14 +31,30 @@ from ceilometer.openstack.common import test
 
 load_tests = testscenarios.load_tests_apply_scenarios
 
-ACCOUNTS = [('tenant-000', {'x-account-object-count': 12,
-                            'x-account-bytes-used': 321321321,
-                            'x-account-container-count': 7,
-                            }),
-            ('tenant-001', {'x-account-object-count': 34,
-                            'x-account-bytes-used': 9898989898,
-                            'x-account-container-count': 17,
-                            })]
+HEAD_ACCOUNTS = [('tenant-000', {'x-account-object-count': 12,
+                                 'x-account-bytes-used': 321321321,
+                                 'x-account-container-count': 7,
+                                 }),
+                 ('tenant-001', {'x-account-object-count': 34,
+                                 'x-account-bytes-used': 9898989898,
+                                 'x-account-container-count': 17,
+                                 })]
+
+GET_ACCOUNTS = [('tenant-002', ({'x-account-object-count': 10,
+                                 'x-account-bytes-used': 123123,
+                                 'x-account-container-count': 2,
+                                 },
+                                [{'count': 10,
+                                  'bytes': 123123,
+                                  'name': 'my_container'},
+                                 {'count': 0,
+                                  'bytes': 0,
+                                  'name': 'new_container'
+                                  }])),
+                ('tenant-003', ({'x-account-object-count': 0,
+                                 'x-account-bytes-used': 0,
+                                 'x-account-container-count': 0,
+                                 }, [])), ]
 
 
 class TestManager(manager.AgentManager):
@@ -59,6 +75,10 @@ class TestSwiftPollster(test.BaseTestCase):
          {'factory': swift.ObjectsSizePollster}),
         ('storage.objects.containers',
          {'factory': swift.ObjectsContainersPollster}),
+        ('storage.containers.objects',
+         {'factory': swift.ContainersObjectsPollster}),
+        ('storage.containers.objects.size',
+         {'factory': swift.ContainersSizePollster}),
     ]
 
     @staticmethod
@@ -66,7 +86,7 @@ class TestSwiftPollster(test.BaseTestCase):
         raise exceptions.EndpointNotFound("Fake keystone exception")
 
     def fake_iter_accounts(self, ksclient, cache):
-        for i in ACCOUNTS:
+        for i in self.ACCOUNTS:
             yield i
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
@@ -75,6 +95,11 @@ class TestSwiftPollster(test.BaseTestCase):
         self.pollster = self.factory()
         self.manager = TestManager()
 
+        if self.pollster.CACHE_KEY_METHOD == 'swift.head_account':
+            self.ACCOUNTS = HEAD_ACCOUNTS
+        else:
+            self.ACCOUNTS = GET_ACCOUNTS
+
     def test_iter_accounts_no_cache(self):
         cache = {}
         with PatchObject(self.factory, '_get_account_info',
@@ -82,7 +107,7 @@ class TestSwiftPollster(test.BaseTestCase):
             data = list(self.pollster._iter_accounts(mock.Mock(), cache))
 
         self.assertTrue(self.pollster.CACHE_KEY_TENANT in cache)
-        self.assertTrue(self.pollster.CACHE_KEY_HEAD in cache)
+        self.assertTrue(self.pollster.CACHE_KEY_METHOD in cache)
         self.assertEqual(data, [])
 
     def test_iter_accounts_tenants_cached(self):
@@ -94,16 +119,18 @@ class TestSwiftPollster(test.BaseTestCase):
             'should not be called',
         )
 
-        with PatchObject(swift_client, 'head_account', new=ksclient):
+        api_method = '%s_account' % self.pollster.METHOD
+        with PatchObject(swift_client, api_method, new=ksclient):
             with PatchObject(self.factory, '_neaten_url'):
                 Tenant = collections.namedtuple('Tenant', 'id')
                 cache = {
-                    self.pollster.CACHE_KEY_TENANT: [Tenant(ACCOUNTS[0][0])],
+                    self.pollster.CACHE_KEY_TENANT: [
+                        Tenant(self.ACCOUNTS[0][0])
+                    ],
                 }
                 data = list(self.pollster._iter_accounts(mock.Mock(), cache))
-
-        self.assertTrue(self.pollster.CACHE_KEY_HEAD in cache)
-        self.assertEqual(data[0][0], ACCOUNTS[0][0])
+        self.assertTrue(self.pollster.CACHE_KEY_METHOD in cache)
+        self.assertEqual(data[0][0], self.ACCOUNTS[0][0])
 
     def test_neaten_url(self):
         test_endpoint = 'http://127.0.0.1:8080'
