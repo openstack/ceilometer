@@ -24,10 +24,8 @@ import mock
 
 from ceilometer.central import manager
 from ceilometer.network import floatingip
-from ceilometer import nova_client
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import test
-from ceilometer.openstack.common.fixture import moxstubout
 
 
 class TestFloatingIPPollster(test.BaseTestCase):
@@ -35,15 +33,18 @@ class TestFloatingIPPollster(test.BaseTestCase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestFloatingIPPollster, self).setUp()
-        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
+        self.addCleanup(mock.patch.stopall)
         self.context = context.get_admin_context()
         self.manager = manager.AgentManager()
         self.pollster = floatingip.FloatingIPPollster()
-        self.stubs.Set(nova_client.Client, 'floating_ip_get_all',
-                       self.faux_get_ips)
+        fake_ips = self.fake_get_ips()
+        patch_virt = mock.patch('ceilometer.nova_client.Client.'
+                                'floating_ip_get_all',
+                                return_value=fake_ips)
+        patch_virt.start()
 
     @staticmethod
-    def faux_get_ips(self):
+    def fake_get_ips():
         ips = []
         for i in range(1, 4):
             ip = mock.MagicMock()
@@ -90,6 +91,6 @@ class TestFloatingIPPollster(test.BaseTestCase):
 
     def test_get_samples_cached(self):
         cache = {}
-        cache['floating_ips'] = self.faux_get_ips(None)[:2]
+        cache['floating_ips'] = self.fake_get_ips()[:2]
         samples = list(self.pollster.get_samples(self.manager, cache))
         self.assertEqual(len(samples), 2)
