@@ -709,6 +709,11 @@
 # communication with OpenStack services. (string value)
 #os_endpoint_type=publicURL
 
+# Does not perform X.509 certificate validation
+# whenestablishing SSL connection with identity service.
+# (boolean value)
+#insecure=false
+
 
 [dispatcher_file]
 

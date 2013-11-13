@@ -73,6 +73,10 @@ CLI_OPTIONS = [
                default=os.environ.get('OS_ENDPOINT_TYPE', 'publicURL'),
                help='Type of endpoint in Identity service catalog to use for '
                     'communication with OpenStack services.'),
+    cfg.BoolOpt('insecure',
+                default=False,
+                help='Does not perform X.509 certificate validation when'
+                     'establishing SSL connection with identity service.'),
 ]
 cfg.CONF.register_cli_opts(CLI_OPTIONS, group="service_credentials")
 
