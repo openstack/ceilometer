@@ -34,7 +34,7 @@ _pipeline_manager = None
 def _load_notification_manager():
     global _notification_manager
 
-    namespace = 'ceilometer.collector'
+    namespace = 'ceilometer.notification'
 
     LOG.debug('loading notification handlers from %s', namespace)
 

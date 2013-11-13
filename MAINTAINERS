@@ -36,10 +36,12 @@ F: api/
 
 == events ==
 
+M: Julien Danjou (jd__)
 M: Sandy Walsh (sandywalsh)
 M: Monsyne Dragon (dragondm)
 S: Maintained
-F: collector/, storage/
+F: notification.py
+F: storage/
 
 == pipeline ==
 

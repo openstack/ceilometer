@@ -370,34 +370,35 @@ Handling Notifications
 .. index::
    double: notifications; architecture
 
-The heart of the system is the collector, which monitors the message
-bus for data being provided by the pollsters via the agent as well as
-notification messages from other OpenStack components such as nova,
-glance, neutron, and swift.
+The heart of the system are the notification daemon (agent-notification) and
+the collector, which monitor the message bus for data being provided by the
+pollsters via the agent as well as notification messages from other
+OpenStack components such as nova, glance, neutron, and swift.
 
-The collector loads one or more *listener* plugins, using the namespace
-``ceilometer.collector``. Each plugin can listen to any topics, but by
-default it will listen to ``notifications.info``.
+The notification daemon loads one or more *listener* plugins, using the
+namespace ``ceilometer.notification``. Each plugin can listen to any topics,
+but by default it will listen to ``notifications.info``.
 
-The plugin provides a method to list the event types it wants and a
-callback for processing incoming messages. The registered name of the
-callback is used to enable or disable it using the global
-configuration option of the collector daemon.  The incoming messages
-are filtered based on their event type value before being passed to
-the callback so the plugin only receives events it has expressed an
-interest in seeing. For example, a callback asking for
+The plugin provides a method to list the event types it wants and a callback
+for processing incoming messages. The registered name of the callback is
+used to enable or disable it using the pipeline of the notification daemon.
+The incoming messages are filtered based on their event type value before
+being passed to the callback so the plugin only receives events it has
+expressed an interest in seeing. For example, a callback asking for
 ``compute.instance.create.end`` events under
-``ceilometer.collector.compute`` would be invoked for those
-notification events on the ``nova`` exchange using the
-``notifications.info`` topic.
+``ceilometer.collector.compute`` would be invoked for those notification
+events on the ``nova`` exchange using the ``notifications.info`` topic.
 
-The listener plugin returns an iterable with zero or more Counter
-instances based on the data in the incoming message. The collector
-framework code converts the Counter instances to metering messages and
-publishes them on the metering message bus. Although ceilomter
-includes a default storage solution to work with the API service, by
-republishing on the metering message bus we can support installations
-that want to handle their own data storage.
+The listener plugin returns an iterable with zero or more Sample instances
+based on the data in the incoming message. The collector framework code
+converts the Sample instances to metering messages and publishes them on the
+metering message bus. Although Ceilometer includes a default storage
+solution to work with the API service, by republishing on the metering
+message bus we can support installations that want to handle their own data
+storage.
+
+The Ceilometer collector daemon then receives this Sample on the bus and
+stores them into a database.
 
 Handling Metering Messages
 --------------------------

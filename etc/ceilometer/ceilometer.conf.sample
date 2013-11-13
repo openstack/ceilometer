@@ -28,6 +28,20 @@
 
 
 #
+# Options defined in ceilometer.service
+#
+
+# Name of this node.  This can be an opaque identifier.  It is
+# not necessarily a hostname, FQDN, or IP address. However,
+# the node name must be valid within an AMQP key, and if using
+# ZeroMQ, a valid hostname, FQDN, or IP address (string value)
+#host=ceilometer
+
+# dispatcher to process data (multi valued)
+#dispatcher=database
+
+
+#
 # Options defined in ceilometer.api.app
 #
 
@@ -602,6 +616,20 @@
 #time_to_live=-1
 
 
+[notification]
+
+#
+# Options defined in ceilometer.notification
+#
+
+# Acknowledge message when event persistence fails (boolean
+# value)
+#ack_on_event_error=true
+
+# Save event details (boolean value)
+#store_events=false
+
+
 [alarm]
 
 #
@@ -857,16 +885,6 @@
 
 # port to bind the UDP socket to (integer value)
 #udp_port=4952
-
-# Acknowledge message when event persistence fails (boolean
-# value)
-#ack_on_event_error=true
-
-# Save event details (boolean value)
-#store_events=false
-
-# dispatcher to process metering data (multi valued)
-#dispatcher=database
 
 
 [matchmaker_ring]
