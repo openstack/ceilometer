@@ -155,7 +155,8 @@ class ConnectionPool(object):
             client = self._pool.get(pool_key)()
             if client:
                 return client
-        LOG.info('connecting to MongoDB on %s', url)
+        LOG.info(_('Connecting to MongoDB on %s'),
+                 connection_options['nodelist'])
         client = pymongo.MongoClient(
             url,
             safe=True)
