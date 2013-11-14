@@ -184,10 +184,6 @@ class TestUDPCollectorService(TestCollector):
                 self.srv.start()
 
 
-class MyException(Exception):
-    pass
-
-
 class TestCollectorService(TestCollector):
 
     def setUp(self):
