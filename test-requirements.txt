@@ -9,7 +9,7 @@ mock>=1.0
 mox>=0.5.3
 fixtures>=0.3.14
 Babel>=0.9.6
-http://tarballs.openstack.org/nova/nova-master.tar.gz#egg=nova
+http://tarballs.openstack.org/nova/nova-stable-havana.tar.gz#egg=nova
 swift
 # Docs Requirements
 sphinx>=1.1.2
