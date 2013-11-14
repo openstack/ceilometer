@@ -20,11 +20,10 @@
 
 import copy
 import datetime
-import logging
 
 import testscenarios
 
-from ceilometer.openstack.common.fixture import moxstubout
+from ceilometer.openstack.common.fixture.mockpatch import PatchObject
 from ceilometer.openstack.common import rpc
 from ceilometer.openstack.common import timeutils
 from ceilometer.tests.api.v2 import FunctionalTest
@@ -33,13 +32,11 @@ from ceilometer.tests import db as tests_db
 
 load_tests = testscenarios.load_tests_apply_scenarios
 
-LOG = logging.getLogger(__name__)
-
 
 class TestPostSamples(FunctionalTest,
                       tests_db.MixinTestsWithBackendScenarios):
 
-    def faux_cast(self, context, topic, msg):
+    def fake_cast(self, context, topic, msg):
         for s in msg['args']['data']:
             del s['message_signature']
         self.published.append((topic, msg))
@@ -47,8 +44,7 @@ class TestPostSamples(FunctionalTest,
     def setUp(self):
         super(TestPostSamples, self).setUp()
         self.published = []
-        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
-        self.stubs.Set(rpc, 'cast', self.faux_cast)
+        self.useFixture(PatchObject(rpc, 'cast', side_effect=self.fake_cast))
 
     def test_one(self):
         s1 = [{'counter_name': 'apples',
