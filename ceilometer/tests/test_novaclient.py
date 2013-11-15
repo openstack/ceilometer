@@ -18,10 +18,11 @@
 # under the License.
 
 import mock
+from mock import patch
 import novaclient
 
 from ceilometer import nova_client
-from ceilometer.openstack.common.fixture import moxstubout
+from ceilometer.openstack.common.fixture import mockpatch
 from ceilometer.openstack.common import test
 
 
@@ -30,10 +31,12 @@ class TestNovaClient(test.BaseTestCase):
     def setUp(self):
         super(TestNovaClient, self).setUp()
         self.nv = nova_client.Client()
-        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
-        self.stubs.Set(self.nv.nova_client.flavors, 'get',
-                       self.fake_flavors_get)
-        self.stubs.Set(self.nv.nova_client.images, 'get', self.fake_images_get)
+        self.useFixture(mockpatch.PatchObject(
+            self.nv.nova_client.flavors, 'get',
+            side_effect=self.fake_flavors_get))
+        self.useFixture(mockpatch.PatchObject(
+            self.nv.nova_client.images, 'get',
+            side_effect=self.fake_images_get))
 
     @staticmethod
     def fake_flavors_get(*args, **kwargs):
@@ -87,10 +90,10 @@ class TestNovaClient(test.BaseTestCase):
         return [a]
 
     def test_instance_get_all_by_host(self):
-        self.stubs.Set(self.nv.nova_client.servers, 'list',
-                       self.fake_servers_list)
+        with patch.object(self.nv.nova_client.servers, 'list',
+                          side_effect=self.fake_servers_list):
+            instances = self.nv.instance_get_all_by_host('foobar')
 
-        instances = self.nv.instance_get_all_by_host('foobar')
         self.assertEqual(len(instances), 1)
         self.assertEqual(instances[0].flavor['name'], 'm1.tiny')
         self.assertEqual(instances[0].image['name'], 'ubuntu-12.04-x86')
@@ -106,10 +109,10 @@ class TestNovaClient(test.BaseTestCase):
         return [a]
 
     def test_instance_get_all_by_host_unknown_flavor(self):
-        self.stubs.Set(self.nv.nova_client.servers, 'list',
-                       self.fake_servers_list_unknown_flavor)
+        with patch.object(self.nv.nova_client.servers, 'list',
+                          side_effect=self.fake_servers_list_unknown_flavor):
+            instances = self.nv.instance_get_all_by_host('foobar')
 
-        instances = self.nv.instance_get_all_by_host('foobar')
         self.assertEqual(len(instances), 1)
         self.assertEqual(instances[0].flavor['name'], 'unknown-id-666')
 
@@ -130,10 +133,10 @@ class TestNovaClient(test.BaseTestCase):
         return [a]
 
     def test_instance_get_all_by_host_unknown_image(self):
-        self.stubs.Set(self.nv.nova_client.servers, 'list',
-                       self.fake_servers_list_unknown_image)
+        with patch.object(self.nv.nova_client.servers, 'list',
+                          side_effect=self.fake_servers_list_unknown_image):
+            instances = self.nv.instance_get_all_by_host('foobar')
 
-        instances = self.nv.instance_get_all_by_host('foobar')
         self.assertEqual(len(instances), 1)
         self.assertEqual(instances[0].image['name'], 'unknown-id-666')
 
