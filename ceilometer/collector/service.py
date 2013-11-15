@@ -39,24 +39,33 @@ OPTS = [
 ]
 
 cfg.CONF.register_opts(OPTS, group="collector")
+cfg.CONF.import_opt('rpc_backend', 'ceilometer.openstack.common.rpc')
+
 
 LOG = log.getLogger(__name__)
 
 
-class UDPCollectorService(service.DispatchedService, os_service.Service):
-    """UDP listener for the collector service."""
+class CollectorService(service.DispatchedService, rpc_service.Service):
+    """Listener for the collector service."""
 
     def start(self):
         """Bind the UDP socket and handle incoming data."""
-        super(UDPCollectorService, self).start()
+        if cfg.CONF.collector.udp_address:
+            self.tg.add_thread(self.start_udp)
+        if cfg.CONF.rpc_backend:
+            super(CollectorService, self).start()
+            if not cfg.CONF.collector.udp_address:
+                # Add a dummy thread to have wait() working
+                self.tg.add_timer(604800, lambda: None)
 
+    def start_udp(self):
         udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         udp.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         udp.bind((cfg.CONF.collector.udp_address,
                   cfg.CONF.collector.udp_port))
 
-        self.running = True
-        while self.running:
+        self.udp_run = True
+        while self.udp_run:
             # NOTE(jd) Arbitrary limit of 64K because that ought to be
             # enough for anybody.
             data, source = udp.recvfrom(64 * 1024)
@@ -78,21 +87,8 @@ class UDPCollectorService(service.DispatchedService, os_service.Service):
                     LOG.exception(_("UDP: Unable to store meter"))
 
     def stop(self):
-        self.running = False
-        super(UDPCollectorService, self).stop()
-
-
-def udp_collector():
-    service.prepare_service()
-    os_service.launch(UDPCollectorService()).wait()
-
-
-class CollectorService(service.DispatchedService, rpc_service.Service):
-
-    def start(self):
-        super(CollectorService, self).start()
-        # Add a dummy thread to have wait() working
-        self.tg.add_timer(604800, lambda: None)
+        self.udp_run = False
+        super(CollectorService, self).stop()
 
     def initialize_service_hook(self, service):
         '''Consumers must be declared before consume_thread start.'''

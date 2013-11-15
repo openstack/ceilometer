@@ -37,9 +37,19 @@ class TestCollector(tests_base.BaseTestCase):
         super(TestCollector, self).setUp()
         self.CONF = self.useFixture(config.Config()).conf
         self.CONF.set_override("connection", "log://", group='database')
+        self.srv = service.CollectorService('the-host', 'the-topic')
+        self.counter = sample.Sample(
+            name='foobar',
+            type='bad',
+            unit='F',
+            volume=1,
+            user_id='jd',
+            project_id='ceilometer',
+            resource_id='cat',
+            timestamp='NOW!',
+            resource_metadata={},
+        ).as_dict()
 
-
-class TestUDPCollectorService(TestCollector):
     def _make_fake_socket(self):
         def recvfrom(size):
             # Make the loop stop
@@ -56,21 +66,6 @@ class TestUDPCollectorService(TestCollector):
                                                       socket.SO_REUSEADDR, 1)
         udp_socket.bind.assert_called_once_with((conf.udp_address,
                                                  conf.udp_port))
-
-    def setUp(self):
-        super(TestUDPCollectorService, self).setUp()
-        self.srv = service.UDPCollectorService()
-        self.counter = sample.Sample(
-            name='foobar',
-            type='bad',
-            unit='F',
-            volume=1,
-            user_id='jd',
-            project_id='ceilometer',
-            resource_id='cat',
-            timestamp='NOW!',
-            resource_metadata={},
-        ).as_dict()
 
     def test_udp_receive(self):
         mock_dispatcher = mock.MagicMock()
@@ -89,7 +84,7 @@ class TestUDPCollectorService(TestCollector):
 
         udp_socket = self._make_fake_socket()
         with patch('socket.socket', return_value=udp_socket):
-            self.srv.start()
+            self.srv.start_udp()
 
         self._verify_udp_socket(udp_socket)
 
@@ -115,7 +110,7 @@ class TestUDPCollectorService(TestCollector):
 
         udp_socket = self._make_fake_socket()
         with patch('socket.socket', return_value=udp_socket):
-            self.srv.start()
+            self.srv.start_udp()
 
         self._verify_udp_socket(udp_socket)
 
@@ -130,21 +125,27 @@ class TestUDPCollectorService(TestCollector):
         udp_socket = self._make_fake_socket()
         with patch('socket.socket', return_value=udp_socket):
             with patch('msgpack.loads', self._raise_error):
-                self.srv.start()
+                self.srv.start_udp()
 
         self._verify_udp_socket(udp_socket)
-
-
-class TestCollectorService(TestCollector):
-
-    def setUp(self):
-        super(TestCollectorService, self).setUp()
-        self.srv = service.CollectorService('the-host', 'the-topic')
 
     @patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_init_host(self):
         # If we try to create a real RPC connection, init_host() never
         # returns. Mock it out so we can establish the service
         # configuration.
+        with patch('ceilometer.openstack.common.rpc.create_connection'):
+            self.srv.start()
+
+    def test_only_udp(self):
+        """Check that only UDP is started if rpc_backend is empty."""
+        self.CONF.set_override('rpc_backend', '')
+        udp_socket = self._make_fake_socket()
+        with patch('socket.socket', return_value=udp_socket):
+            self.srv.start()
+
+    def test_only_rpc(self):
+        """Check that only RPC is started if udp_address is empty."""
+        self.CONF.set_override('udp_address', '', group='collector')
         with patch('ceilometer.openstack.common.rpc.create_connection'):
             self.srv.start()
