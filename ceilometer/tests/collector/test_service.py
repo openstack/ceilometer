@@ -30,7 +30,6 @@ from stevedore.tests import manager as test_manager
 from ceilometer.collector import service
 from ceilometer.compute import notifications
 from ceilometer.openstack.common.fixture import config
-from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer.openstack.common import timeutils
 from ceilometer import sample
 from ceilometer.storage import models
@@ -95,28 +94,25 @@ class TestCollector(tests_base.BaseTestCase):
 
 
 class TestUDPCollectorService(TestCollector):
-    def _make_fake_socket(self, family, type):
-        udp_socket = self.mox.CreateMockAnything()
-        udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        udp_socket.bind((self.CONF.collector.udp_address,
-                         self.CONF.collector.udp_port))
-
-        def stop_udp(anything):
+    def _make_fake_socket(self):
+        def recvfrom(size):
             # Make the loop stop
             self.srv.stop()
+            return (msgpack.dumps(self.counter), ('127.0.0.1', 12345))
 
-        udp_socket.recvfrom(64 * 1024).WithSideEffects(
-            stop_udp).AndReturn(
-                (msgpack.dumps(self.counter),
-                 ('127.0.0.1', 12345)))
+        sock = mock.Mock()
+        sock.recvfrom = recvfrom
+        return sock
 
-        self.mox.ReplayAll()
-
-        return udp_socket
+    def _verify_udp_socket(self, udp_socket):
+        conf = self.CONF.collector
+        udp_socket.setsockopt.assert_called_once_with(socket.SOL_SOCKET,
+                                                      socket.SO_REUSEADDR, 1)
+        udp_socket.bind.assert_called_once_with((conf.udp_address,
+                                                 conf.udp_port))
 
     def setUp(self):
         super(TestUDPCollectorService, self).setUp()
-        self.mox = self.useFixture(moxstubout.MoxStubout()).mox
         self.srv = service.UDPCollectorService()
         self.counter = sample.Sample(
             name='foobar',
@@ -145,8 +141,11 @@ class TestUDPCollectorService(TestCollector):
         self.counter['counter_type'] = self.counter['type']
         self.counter['counter_unit'] = self.counter['unit']
 
-        with patch('socket.socket', self._make_fake_socket):
+        udp_socket = self._make_fake_socket()
+        with patch('socket.socket', return_value=udp_socket):
             self.srv.start()
+
+        self._verify_udp_socket(udp_socket)
 
         mock_dispatcher.record_metering_data.assert_called_once_with(
             self.counter)
@@ -168,8 +167,11 @@ class TestUDPCollectorService(TestCollector):
         self.counter['counter_type'] = self.counter['type']
         self.counter['counter_unit'] = self.counter['unit']
 
-        with patch('socket.socket', self._make_fake_socket):
+        udp_socket = self._make_fake_socket()
+        with patch('socket.socket', return_value=udp_socket):
             self.srv.start()
+
+        self._verify_udp_socket(udp_socket)
 
         mock_dispatcher.record_metering_data.assert_called_once_with(
             self.counter)
@@ -179,9 +181,12 @@ class TestUDPCollectorService(TestCollector):
         raise Exception
 
     def test_udp_receive_bad_decoding(self):
-        with patch('socket.socket', self._make_fake_socket):
+        udp_socket = self._make_fake_socket()
+        with patch('socket.socket', return_value=udp_socket):
             with patch('msgpack.loads', self._raise_error):
                 self.srv.start()
+
+        self._verify_udp_socket(udp_socket)
 
 
 class MyException(Exception):
