@@ -26,7 +26,7 @@ import testscenarios
 
 from ceilometer.central import manager
 from ceilometer.objectstore import swift
-from ceilometer.openstack.common.fixture import moxstubout
+from ceilometer.openstack.common.fixture.mockpatch import PatchObject
 from ceilometer.openstack.common import test
 
 load_tests = testscenarios.load_tests_apply_scenarios
@@ -72,17 +72,15 @@ class TestSwiftPollster(test.BaseTestCase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestSwiftPollster, self).setUp()
-        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
         self.pollster = self.factory()
         self.manager = TestManager()
 
     def test_iter_accounts_no_cache(self):
-        def empty_account_info(obj, ksclient, cache):
-            return []
-        self.stubs.Set(self.factory, '_get_account_info',
-                       empty_account_info)
         cache = {}
-        data = list(self.pollster._iter_accounts(mock.Mock(), cache))
+        with PatchObject(self.factory, '_get_account_info',
+                         return_value=[]):
+            data = list(self.pollster._iter_accounts(mock.Mock(), cache))
+
         self.assertTrue(self.pollster.CACHE_KEY_TENANT in cache)
         self.assertTrue(self.pollster.CACHE_KEY_HEAD in cache)
         self.assertEqual(data, [])
@@ -95,15 +93,15 @@ class TestSwiftPollster(test.BaseTestCase):
         ksclient.tenants.list.side_effect = AssertionError(
             'should not be called',
         )
-        self.stubs.Set(swift_client, 'head_account',
-                       ksclient)
-        self.stubs.Set(self.factory, '_neaten_url',
-                       mock.Mock())
-        Tenant = collections.namedtuple('Tenant', 'id')
-        cache = {
-            self.pollster.CACHE_KEY_TENANT: [Tenant(ACCOUNTS[0][0])],
-        }
-        data = list(self.pollster._iter_accounts(mock.Mock(), cache))
+
+        with PatchObject(swift_client, 'head_account', new=ksclient):
+            with PatchObject(self.factory, '_neaten_url'):
+                Tenant = collections.namedtuple('Tenant', 'id')
+                cache = {
+                    self.pollster.CACHE_KEY_TENANT: [Tenant(ACCOUNTS[0][0])],
+                }
+                data = list(self.pollster._iter_accounts(mock.Mock(), cache))
+
         self.assertTrue(self.pollster.CACHE_KEY_HEAD in cache)
         self.assertEqual(data[0][0], ACCOUNTS[0][0])
 
@@ -126,20 +124,23 @@ class TestSwiftPollster(test.BaseTestCase):
                                                  test_tenant_id))
 
     def test_metering(self):
-        self.stubs.Set(self.factory, '_iter_accounts',
-                       self.fake_iter_accounts)
-        samples = list(self.pollster.get_samples(self.manager, {}))
+        with PatchObject(self.factory, '_iter_accounts',
+                         side_effect=self.fake_iter_accounts):
+            samples = list(self.pollster.get_samples(self.manager, {}))
+
         self.assertEqual(len(samples), 2)
 
     def test_get_meter_names(self):
-        self.stubs.Set(self.factory, '_iter_accounts',
-                       self.fake_iter_accounts)
-        samples = list(self.pollster.get_samples(self.manager, {}))
+        with PatchObject(self.factory, '_iter_accounts',
+                         side_effect=self.fake_iter_accounts):
+            samples = list(self.pollster.get_samples(self.manager, {}))
+
         self.assertEqual(set([s.name for s in samples]),
                          set([samples[0].name]))
 
     def test_endpoint_notfound(self):
-        self.stubs.Set(self.manager.keystone.service_catalog, 'url_for',
-                       self.fake_ks_service_catalog_url_for)
-        samples = list(self.pollster.get_samples(self.manager, {}))
+        with PatchObject(self.manager.keystone.service_catalog, 'url_for',
+                         side_effect=self.fake_ks_service_catalog_url_for):
+            samples = list(self.pollster.get_samples(self.manager, {}))
+
         self.assertEqual(len(samples), 0)

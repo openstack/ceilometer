@@ -22,7 +22,7 @@ import mock
 from ceilometer.central import manager
 from ceilometer.energy import kwapi
 from ceilometer.openstack.common import context
-from ceilometer.openstack.common.fixture import moxstubout
+from ceilometer.openstack.common.fixture.mockpatch import PatchObject
 from ceilometer.openstack.common import test
 
 
@@ -59,19 +59,19 @@ class TestKwapi(test.BaseTestCase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestKwapi, self).setUp()
-        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
         self.context = context.get_admin_context()
         self.manager = TestManager()
 
     @staticmethod
-    def fake_get_kwapi_client(self, ksclient):
+    def fake_get_kwapi_client(ksclient):
         raise exceptions.EndpointNotFound("fake keystone exception")
 
     def test_endpoint_not_exist(self):
-        self.stubs.Set(kwapi._Base, 'get_kwapi_client',
-                       self.fake_get_kwapi_client)
+        with PatchObject(kwapi._Base, 'get_kwapi_client',
+                         side_effect=self.fake_get_kwapi_client):
+            pollster = kwapi.EnergyPollster()
+            samples = list(pollster.get_samples(self.manager, {}))
 
-        samples = list(kwapi.EnergyPollster().get_samples(self.manager, {}))
         self.assertEqual(len(samples), 0)
 
 
@@ -80,14 +80,13 @@ class TestEnergyPollster(test.BaseTestCase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestEnergyPollster, self).setUp()
-        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
         self.context = context.get_admin_context()
         self.manager = TestManager()
-        self.stubs.Set(kwapi._Base, '_iter_probes',
-                       self.fake_iter_probes)
+        self.useFixture(PatchObject(kwapi._Base, '_iter_probes',
+                                    side_effect=self.fake_iter_probes))
 
     @staticmethod
-    def fake_iter_probes(self, ksclient, cache):
+    def fake_iter_probes(ksclient, cache):
         probes = PROBE_DICT['probes']
         for key, value in probes.iteritems():
             probe_dict = value
@@ -141,14 +140,13 @@ class TestPowerPollster(test.BaseTestCase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestPowerPollster, self).setUp()
-        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
         self.context = context.get_admin_context()
         self.manager = TestManager()
-        self.stubs.Set(kwapi._Base, '_iter_probes',
-                       self.fake_iter_probes)
+        self.useFixture(PatchObject(kwapi._Base, '_iter_probes',
+                                    side_effect=self.fake_iter_probes))
 
     @staticmethod
-    def fake_iter_probes(self, ksclient, cache):
+    def fake_iter_probes(ksclient, cache):
         probes = PROBE_DICT['probes']
         for key, value in probes.iteritems():
             probe_dict = value

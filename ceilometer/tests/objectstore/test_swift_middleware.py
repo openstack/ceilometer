@@ -24,7 +24,7 @@ from webob import Request
 
 from ceilometer.objectstore import swift_middleware
 from ceilometer.openstack.common.fixture import config
-from ceilometer.openstack.common.fixture import moxstubout
+from ceilometer.openstack.common.fixture.mockpatch import PatchObject
 from ceilometer.openstack.common import test
 from ceilometer import pipeline
 
@@ -60,14 +60,14 @@ class TestSwiftMiddleware(test.BaseTestCase):
         def __init__(self):
             self.pipelines = [self._faux_pipeline(self)]
 
-    def _faux_setup_pipeline(self, transformer_manager):
+    def _fake_setup_pipeline(self, transformer_manager):
         return self.pipeline_manager
 
     def setUp(self):
         super(TestSwiftMiddleware, self).setUp()
-        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
         self.pipeline_manager = self._faux_pipeline_manager()
-        self.stubs.Set(pipeline, 'setup_pipeline', self._faux_setup_pipeline)
+        self.useFixture(PatchObject(pipeline, 'setup_pipeline',
+                                    side_effect=self._fake_setup_pipeline))
         self.CONF = self.useFixture(config.Config()).conf
 
     @staticmethod
