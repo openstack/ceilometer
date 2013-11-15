@@ -21,7 +21,7 @@ import mock
 from ceilometer.central import manager
 from ceilometer.image import glance
 from ceilometer.openstack.common import context
-from ceilometer.openstack.common.fixture import moxstubout
+from ceilometer.openstack.common.fixture import mockpatch
 from ceilometer.openstack.common import test
 
 IMAGE_LIST = [
@@ -128,11 +128,11 @@ class TestImagePollster(test.BaseTestCase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestImagePollster, self).setUp()
-        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
         self.context = context.get_admin_context()
         self.manager = TestManager()
-        self.stubs.Set(glance._Base, 'get_glance_client',
-                       self.fake_get_glance_client)
+        self.useFixture(mockpatch.PatchObject(
+            glance._Base, 'get_glance_client',
+            side_effect=self.fake_get_glance_client))
 
     def test_iter_images(self):
         # Tests whether the iter_images method returns an unique image
