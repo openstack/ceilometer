@@ -18,7 +18,7 @@
 """Tests for ceilometer/storage/
 """
 
-import mox
+import mock
 
 from ceilometer.openstack.common import test
 from ceilometer import storage
@@ -28,15 +28,13 @@ from ceilometer.storage import impl_log
 class EngineTest(test.BaseTestCase):
 
     def test_get_engine(self):
-        conf = mox.Mox().CreateMockAnything()
-        conf.database = mox.Mox().CreateMockAnything()
+        conf = mock.Mock()
         conf.database.connection = 'log://localhost'
         engine = storage.get_engine(conf)
         self.assertIsInstance(engine, impl_log.LogStorage)
 
     def test_get_engine_no_such_engine(self):
-        conf = mox.Mox().CreateMockAnything()
-        conf.database = mox.Mox().CreateMockAnything()
+        conf = mock.Mock()
         conf.database.connection = 'no-such-engine://localhost'
         try:
             storage.get_engine(conf)

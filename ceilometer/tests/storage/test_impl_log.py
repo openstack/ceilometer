@@ -18,18 +18,15 @@
 """Tests for ceilometer/storage/impl_log.py
 """
 
-from ceilometer.openstack.common.fixture import moxstubout
+import mock
+
 from ceilometer.openstack.common import test
 from ceilometer.storage import impl_log
 
 
 class ConnectionTest(test.BaseTestCase):
-    def setUp(self):
-        super(ConnectionTest, self).setUp()
-        self.mox = self.useFixture(moxstubout.MoxStubout()).mox
-
     def test_get_connection(self):
-        conf = self.mox.CreateMockAnything()
+        conf = mock.Mock()
         log_stg = impl_log.LogStorage()
         conn = log_stg.get_connection(conf)
         conn.record_metering_data({'counter_name': 'test',

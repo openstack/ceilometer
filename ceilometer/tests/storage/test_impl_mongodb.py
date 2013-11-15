@@ -26,6 +26,7 @@
 
 import copy
 import datetime
+from mock import patch
 
 from ceilometer.publisher import rpc
 from ceilometer import sample
@@ -160,32 +161,30 @@ class CompatibilityTest(test_storage_scenarios.DBTestBase,
 
             record = copy.copy(data)
             self.db.meter.insert(record)
-            return
 
         # Stubout with the old version DB schema, the one w/o 'counter_unit'
-        self.stubs.Set(self.conn,
-                       'record_metering_data',
-                       old_record_metering_data)
-        self.counters = []
-        c = sample.Sample(
-            'volume.size',
-            'gauge',
-            'GiB',
-            5,
-            'user-id',
-            'project1',
-            'resource-id',
-            timestamp=datetime.datetime(2012, 9, 25, 10, 30),
-            resource_metadata={'display_name': 'test-volume',
-                               'tag': 'self.counter',
-                               },
-            source='test',
-        )
-        self.counters.append(c)
-        msg = rpc.meter_message_from_counter(
-            c,
-            secret='not-so-secret')
-        self.conn.record_metering_data(self.conn, msg)
+        with patch.object(self.conn, 'record_metering_data',
+                          side_effect=old_record_metering_data):
+            self.counters = []
+            c = sample.Sample(
+                'volume.size',
+                'gauge',
+                'GiB',
+                5,
+                'user-id',
+                'project1',
+                'resource-id',
+                timestamp=datetime.datetime(2012, 9, 25, 10, 30),
+                resource_metadata={'display_name': 'test-volume',
+                                   'tag': 'self.counter',
+                                   },
+                source='test',
+            )
+            self.counters.append(c)
+            msg = rpc.meter_message_from_counter(
+                c,
+                secret='not-so-secret')
+            self.conn.record_metering_data(self.conn, msg)
 
         # Create the old format alarm with a dict instead of a
         # array for matching_metadata
