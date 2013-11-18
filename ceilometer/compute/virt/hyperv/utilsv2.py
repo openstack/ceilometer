@@ -57,8 +57,8 @@ class UtilsV2(object):
     _NET_IN_METRIC_NAME = 'Aggregated Filtered Incoming Network Traffic'
     _NET_OUT_METRIC_NAME = 'Aggregated Filtered Outgoing Network Traffic'
     # Disk metrics are supported from Hyper-V 2012 R2
-    _DISK_RD_METRIC_NAME = 'Aggregated Disk Data Read'
-    _DISK_WR_METRIC_NAME = 'Aggregated Disk Data Written'
+    _DISK_RD_METRIC_NAME = 'Disk Data Read'
+    _DISK_WR_METRIC_NAME = 'Disk Data Written'
 
     def __init__(self, host='.'):
         if sys.platform == 'win32':
