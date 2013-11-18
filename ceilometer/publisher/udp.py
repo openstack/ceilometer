@@ -28,7 +28,7 @@ from ceilometer.openstack.common import log
 from ceilometer.openstack.common import network_utils
 from ceilometer import publisher
 
-cfg.CONF.import_opt('udp_port', 'ceilometer.collector.service',
+cfg.CONF.import_opt('udp_port', 'ceilometer.collector',
                     group='collector')
 
 LOG = log.getLogger(__name__)
