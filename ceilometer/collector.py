@@ -80,9 +80,9 @@ class CollectorService(service.DispatchedService, rpc_service.Service):
                     sample['counter_unit'] = sample['unit']
                     sample['counter_type'] = sample['type']
                     LOG.debug("UDP: Storing %s", str(sample))
-                    self.dispatcher_manager.map(
-                        lambda ext, data: ext.obj.record_metering_data(data),
-                        sample)
+                    self.dispatcher_manager.map_method('record_metering_data',
+                                                       None,
+                                                       sample)
                 except Exception:
                     LOG.exception(_("UDP: Unable to store meter"))
 
@@ -106,19 +106,9 @@ class CollectorService(service.DispatchedService, rpc_service.Service):
         When the notification messages are re-published through the
         RPC publisher, this method receives them for processing.
         """
-        self.dispatcher_manager.map(self._record_metering_data_for_ext,
-                                    context=context,
-                                    data=data)
-
-    @staticmethod
-    def _record_metering_data_for_ext(ext, context, data):
-        """Wrapper for calling dispatcher plugin when a sample arrives
-
-        When a message is received by record_metering_data(), it calls
-        this method with each plugin to allow it to process the data.
-
-        """
-        ext.obj.record_metering_data(context, data)
+        self.dispatcher_manager.map_method('record_metering_data',
+                                           context=context,
+                                           data=data)
 
 
 def collector():
