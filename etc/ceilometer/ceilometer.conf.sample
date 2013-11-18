@@ -746,7 +746,7 @@
 [dispatcher_file]
 
 #
-# Options defined in ceilometer.collector.dispatcher.file
+# Options defined in ceilometer.dispatcher.file
 #
 
 # Name and the location of the file to record meters. (string
