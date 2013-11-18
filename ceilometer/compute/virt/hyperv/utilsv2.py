@@ -88,10 +88,10 @@ class UtilsV2(object):
         vm = self._lookup_vm(vm_name)
         cpu_sd = self._get_vm_resources(vm, self._PROC_SETTING)[0]
         cpu_metrics_def = self._get_metric_def(self._CPU_METRIC_NAME)
-        cpu_metric_aggr = self._get_metrics(vm, cpu_metrics_def)[0]
+        cpu_metric_aggr = self._get_metrics(vm, cpu_metrics_def)
 
-        return (int(cpu_metric_aggr.MetricValue),
-                cpu_sd.VirtualQuantity,
+        return (long(cpu_metric_aggr[0].MetricValue) if cpu_metric_aggr else 0,
+                int(cpu_sd.VirtualQuantity),
                 long(vm.OnTimeInMilliseconds))
 
     def get_vnic_metrics(self, vm_name):
