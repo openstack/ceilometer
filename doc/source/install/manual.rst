@@ -64,6 +64,13 @@ Installing the Collector
    And adding ``ceilometer`` in the ``pipeline`` of that same file, right
    before ``proxy-server``.
 
+   Additionally, if you want to store extra metadata from headers, you need
+   to set ``metadata_headers`` so it would look like::
+
+     [filter:ceilometer]
+     use = egg:ceilometer#swift
+     metadata_headers = X-FOO, X-BAR
+
 4. Install MongoDB.
 
    Follow the instructions to install the MongoDB_ package for your

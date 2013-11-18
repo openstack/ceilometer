@@ -198,7 +198,7 @@ If you plan on adding meters, please follow the convention bellow:
 3. If you have any hesitation, come and ask in #openstack-metering
 
 
-User-defined sample metadata (nova only)
+User-defined sample metadata for Nova
 =========================================
 
 Users are allowed to add additional metadata to samples of nova meter.
@@ -210,3 +210,17 @@ To do so, users should add nova user metadata prefixed with 'metering.':
 
 Note: The name of the metadata shouldn't exceed 256 characters otherwise it will be cut off.
 Also, if it has '.', this will be replaced by a '_' in ceilometer.
+
+User-defined sample metadata for Swift
+==========================================
+It's possible to add additional metadata to sample of Swift meter as well.
+You might specify headers whose values will be stored in resource_metadata as
+'resource_metadata.http_header_$name', where $name is a name of the header with
+'-' replaced by '_'.
+
+This is done using 'metadata_headers' option in middleware configuration,
+refer to :ref:`installing_manually` for details.
+
+For example, this could be used to distinguish external and internal users. You'd
+have to implement a custom Swift middleware that sets a proper header and just add
+it to metadata_headers.
