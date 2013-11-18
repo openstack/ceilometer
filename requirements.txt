@@ -4,7 +4,7 @@ kombu>=2.4.8
 iso8601>=0.1.8
 argparse
 SQLAlchemy>=0.7.8,<=0.7.99
-sqlalchemy-migrate>=0.7.2
+sqlalchemy-migrate>=0.8.2
 alembic>=0.4.1
 netaddr>=0.7.6
 pymongo>=2.4
