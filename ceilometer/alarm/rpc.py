@@ -18,10 +18,10 @@
 
 from oslo.config import cfg
 
+from ceilometer import messaging
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common.rpc import proxy as rpc_proxy
 from ceilometer.storage import models
 
 OPTS = [
@@ -40,11 +40,11 @@ cfg.CONF.register_opts(OPTS, group='alarm')
 LOG = log.getLogger(__name__)
 
 
-class RPCAlarmNotifier(rpc_proxy.RpcProxy):
+class RPCAlarmNotifier(object):
     def __init__(self):
-        super(RPCAlarmNotifier, self).__init__(
-            default_version='1.0',
-            topic=cfg.CONF.alarm.notifier_rpc_topic)
+        self.client = messaging.get_rpc_client(
+            topic=cfg.CONF.alarm.notifier_rpc_topic,
+            version="1.0")
 
     def notify(self, alarm, previous, reason, reason_data):
         actions = getattr(alarm, models.Alarm.ALARM_ACTIONS_MAP[alarm.state])
@@ -56,36 +56,36 @@ class RPCAlarmNotifier(rpc_proxy.RpcProxy):
                        'previous': previous,
                        'state': alarm.state})
             return
-        msg = self.make_msg('notify_alarm', data={
-            'actions': actions,
-            'alarm_id': alarm.alarm_id,
-            'previous': previous,
-            'current': alarm.state,
-            'reason': unicode(reason),
-            'reason_data': reason_data})
-        self.cast(context.get_admin_context(), msg)
+        self.client.cast(context.get_admin_context(),
+                         'notify_alarm', data={
+                             'actions': actions,
+                             'alarm_id': alarm.alarm_id,
+                             'previous': previous,
+                             'current': alarm.state,
+                             'reason': unicode(reason),
+                             'reason_data': reason_data})
 
 
-class RPCAlarmPartitionCoordination(rpc_proxy.RpcProxy):
+class RPCAlarmPartitionCoordination(object):
     def __init__(self):
-        super(RPCAlarmPartitionCoordination, self).__init__(
-            default_version='1.0',
-            topic=cfg.CONF.alarm.partition_rpc_topic)
+        self.client = messaging.get_rpc_client(
+            topic=cfg.CONF.alarm.partition_rpc_topic,
+            version="1.0")
 
     def presence(self, uuid, priority):
-        msg = self.make_msg('presence', data={
-            'uuid': uuid,
-            'priority': priority})
-        self.fanout_cast(context.get_admin_context(), msg)
+        cctxt = self.client.prepare(fanout=True)
+        return cctxt.cast(context.get_admin_context(),
+                          'presence', data={'uuid': uuid,
+                                            'priority': priority})
 
     def assign(self, uuid, alarms):
-        msg = self.make_msg('assign', data={
-            'uuid': uuid,
-            'alarms': alarms})
-        return self.fanout_cast(context.get_admin_context(), msg)
+        cctxt = self.client.prepare(fanout=True)
+        return cctxt.cast(context.get_admin_context(),
+                          'assign', data={'uuid': uuid,
+                                          'alarms': alarms})
 
     def allocate(self, uuid, alarms):
-        msg = self.make_msg('allocate', data={
-            'uuid': uuid,
-            'alarms': alarms})
-        return self.fanout_cast(context.get_admin_context(), msg)
+        cctxt = self.client.prepare(fanout=True)
+        return cctxt.cast(context.get_admin_context(),
+                          'allocate', data={'uuid': uuid,
+                                            'alarms': alarms})

@@ -20,6 +20,7 @@ events.
 """
 
 from oslo.config import cfg
+import oslo.messaging
 
 from ceilometer import plugin
 from ceilometer import sample
@@ -46,16 +47,13 @@ class _Base(plugin.NotificationBase):
     ]
 
     @staticmethod
-    def get_exchange_topics(conf):
-        """Return a sequence of ExchangeTopics defining the exchange and
+    def get_targets(conf):
+        """Return a sequence of oslo.messaging.Target defining the exchange and
         topics to be connected for this plugin.
         """
-        return [
-            plugin.ExchangeTopics(
-                exchange=conf.cinder_control_exchange,
-                topics=set(topic + ".info"
-                           for topic in conf.notification_topics)),
-        ]
+        return [oslo.messaging.Target(topic=topic,
+                                      exchange=conf.cinder_control_exchange)
+                for topic in conf.notification_topics]
 
 
 class Volume(_Base):

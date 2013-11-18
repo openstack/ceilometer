@@ -17,6 +17,7 @@
 # under the License.
 
 from oslo.config import cfg
+import oslo.messaging
 
 from ceilometer import plugin
 from ceilometer import sample
@@ -46,17 +47,13 @@ class HTTPRequest(plugin.NotificationBase):
     event_types = ['http.request']
 
     @staticmethod
-    def get_exchange_topics(conf):
-        """Return a sequence of ExchangeTopics defining the exchange and
+    def get_targets(conf):
+        """Return a sequence of oslo.messaging.Target defining the exchange and
         topics to be connected for this plugin.
         """
-        return [
-            plugin.ExchangeTopics(
-                exchange=exchange,
-                topics=set(topic + ".info"
-                           for topic in conf.notification_topics))
-            for exchange in conf.http_control_exchanges
-        ]
+        return [oslo.messaging.Target(topic=topic, exchange=exchange)
+                for topic in conf.notification_topics
+                for exchange in conf.http_control_exchanges]
 
     def process_notification(self, message):
         yield sample.Sample.from_notification(

@@ -33,7 +33,9 @@ from ceilometer.tests import base
 class BinTestCase(base.BaseTestCase):
     def setUp(self):
         super(BinTestCase, self).setUp()
-        content = ("[database]\n"
+        content = ("[DEFAULT]\n"
+                   "rpc_backend=fake\n"
+                   "[database]\n"
                    "connection=log://localhost\n")
         self.tempfile = fileutils.write_to_tempfile(content=content,
                                                     prefix='ceilometer',
@@ -58,7 +60,9 @@ class BinTestCase(base.BaseTestCase):
         self.assertIn("Nothing to clean", err)
 
     def test_run_expirer_ttl_enabled(self):
-        content = ("[database]\n"
+        content = ("[DEFAULT]\n"
+                   "rpc_backend=fake\n"
+                   "[database]\n"
                    "time_to_live=1\n"
                    "connection=log://localhost\n")
         self.tempfile = fileutils.write_to_tempfile(content=content,
@@ -78,7 +82,7 @@ class BinSendSampleTestCase(base.BaseTestCase):
         super(BinSendSampleTestCase, self).setUp()
         pipeline_cfg_file = self.path_get('etc/ceilometer/pipeline.yaml')
         content = "[DEFAULT]\n"\
-                  "rpc_backend=ceilometer.openstack.common.rpc.impl_fake\n"\
+                  "rpc_backend=fake\n"\
                   "pipeline_cfg_file={0}\n".format(pipeline_cfg_file)
 
         self.tempfile = fileutils.write_to_tempfile(content=content,
@@ -106,7 +110,7 @@ class BinApiTestCase(base.BaseTestCase):
         pipeline_cfg_file = self.path_get('etc/ceilometer/pipeline.yaml')
         policy_file = self.path_get('etc/ceilometer/policy.json')
         content = "[DEFAULT]\n"\
-                  "rpc_backend=ceilometer.openstack.common.rpc.impl_fake\n"\
+                  "rpc_backend=fake\n"\
                   "auth_strategy=noauth\n"\
                   "debug=true\n"\
                   "pipeline_cfg_file={0}\n"\

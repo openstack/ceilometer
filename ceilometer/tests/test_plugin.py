@@ -16,6 +16,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import test
 from ceilometer import plugin
 
@@ -71,6 +72,10 @@ TEST_NOTIFICATION = {
 
 
 class NotificationBaseTestCase(test.BaseTestCase):
+    def setUp(self):
+        super(NotificationBaseTestCase, self).setUp()
+        self.CONF = self.useFixture(config.Config()).conf
+
     def test_handle_event_type(self):
         self.assertFalse(plugin.NotificationBase._handle_event_type(
             'compute.instance.start', ['compute']))
@@ -91,7 +96,10 @@ class NotificationBaseTestCase(test.BaseTestCase):
 
     class FakePlugin(plugin.NotificationBase):
         def get_exchange_topics(self, conf):
-            return
+            return [plugin.ExchangeTopics(exchange="exchange1",
+                                          topics=["t1", "t2"]),
+                    plugin.ExchangeTopics(exchange="exchange2",
+                                          topics=['t3'])]
 
         def process_notification(self, message):
             return message
@@ -107,3 +115,13 @@ class NotificationBaseTestCase(test.BaseTestCase):
         n = self.FakeNetworkPlugin()
         self.assertTrue(len(list(c.to_samples(TEST_NOTIFICATION))) > 0)
         self.assertEqual(0, len(list(n.to_samples(TEST_NOTIFICATION))))
+
+    def test_get_targets_compat(self):
+        targets = self.FakeComputePlugin().get_targets(self.CONF)
+        self.assertEqual(3, len(targets))
+        self.assertEqual('t1', targets[0].topic)
+        self.assertEqual('exchange1', targets[0].exchange)
+        self.assertEqual('t2', targets[1].topic)
+        self.assertEqual('exchange1', targets[1].exchange)
+        self.assertEqual('t3', targets[2].topic)
+        self.assertEqual('exchange2', targets[2].exchange)

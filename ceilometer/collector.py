@@ -21,10 +21,10 @@ import socket
 import msgpack
 from oslo.config import cfg
 
+from ceilometer import messaging
 from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common.rpc import dispatcher as rpc_dispatcher
-from ceilometer.openstack.common.rpc import service as rpc_service
+from ceilometer.openstack.common import service as os_service
 from ceilometer.openstack.common import units
 from ceilometer import service
 
@@ -39,7 +39,6 @@ OPTS = [
 ]
 
 cfg.CONF.register_opts(OPTS, group="collector")
-cfg.CONF.import_opt('rpc_backend', 'ceilometer.openstack.common.rpc')
 cfg.CONF.import_opt('metering_topic', 'ceilometer.publisher.rpc',
                     group="publisher_rpc")
 
@@ -47,15 +46,25 @@ cfg.CONF.import_opt('metering_topic', 'ceilometer.publisher.rpc',
 LOG = log.getLogger(__name__)
 
 
-class CollectorService(service.DispatchedService, rpc_service.Service):
+class CollectorService(service.DispatchedService, os_service.Service):
     """Listener for the collector service."""
+
+    @staticmethod
+    def rpc_enabled():
+        # cfg.CONF opt from oslo.messaging.transport
+        return cfg.CONF.rpc_backend or cfg.CONF.transport_url
 
     def start(self):
         """Bind the UDP socket and handle incoming data."""
+        super(CollectorService, self).start()
         if cfg.CONF.collector.udp_address:
             self.tg.add_thread(self.start_udp)
-        if cfg.CONF.rpc_backend:
-            super(CollectorService, self).start()
+
+        if self.rpc_enabled():
+            self.rpc_server = messaging.get_rpc_server(
+                cfg.CONF.publisher_rpc.metering_topic, self)
+            self.rpc_server.start()
+
             if not cfg.CONF.collector.udp_address:
                 # Add a dummy thread to have wait() working
                 self.tg.add_timer(604800, lambda: None)
@@ -85,17 +94,9 @@ class CollectorService(service.DispatchedService, rpc_service.Service):
 
     def stop(self):
         self.udp_run = False
+        if self.rpc_enabled():
+            self.rpc_server.stop()
         super(CollectorService, self).stop()
-
-    def initialize_service_hook(self, service):
-        '''Consumers must be declared before consume_thread start.'''
-        # Set ourselves up as a separate worker for the metering data,
-        # since the default for service is to use create_consumer().
-        self.conn.create_worker(
-            cfg.CONF.publisher_rpc.metering_topic,
-            rpc_dispatcher.RpcDispatcher([self]),
-            'ceilometer.collector.' + cfg.CONF.publisher_rpc.metering_topic,
-        )
 
     def record_metering_data(self, context, data):
         """RPC endpoint for messages we send to ourselves.
@@ -103,5 +104,4 @@ class CollectorService(service.DispatchedService, rpc_service.Service):
         When the notification messages are re-published through the
         RPC publisher, this method receives them for processing.
         """
-        self.dispatcher_manager.map_method('record_metering_data',
-                                           data=data)
+        self.dispatcher_manager.map_method('record_metering_data', data=data)

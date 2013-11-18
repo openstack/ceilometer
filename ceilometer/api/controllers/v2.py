@@ -46,10 +46,10 @@ from wsme import types as wtypes
 import wsmeext.pecan as wsme_pecan
 
 from ceilometer.api import acl
+from ceilometer import messaging
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common.notifier import api as notify
 from ceilometer.openstack.common import strutils
 from ceilometer.openstack.common import timeutils
 from ceilometer import sample
@@ -594,8 +594,8 @@ def _make_link(rel_name, url, type, type_arg, query=None):
 def _send_notification(event, payload):
     notification = event.replace(" ", "_")
     notification = "alarm.%s" % notification
-    notify.notify(None, notify.publisher_id("ceilometer.api"),
-                  notification, notify.INFO, payload)
+    notifier = messaging.get_notifier(publisher_id="ceilometer.api")
+    notifier.info(None, notification, payload)
 
 
 class OldSample(_Base):

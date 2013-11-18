@@ -21,6 +21,7 @@ import os
 
 from ceilometer.api import acl
 from ceilometer.api.v1 import app
+from ceilometer import messaging
 from ceilometer.openstack.common import fileutils
 from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import test
@@ -32,6 +33,8 @@ class TestApp(test.BaseTestCase):
     def setUp(self):
         super(TestApp, self).setUp()
         self.CONF = self.useFixture(config.Config()).conf
+        messaging.setup('fake://')
+        self.addCleanup(messaging.cleanup)
 
     def test_keystone_middleware_conf(self):
         self.CONF.set_override("auth_protocol", "foottp",

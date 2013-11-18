@@ -26,6 +26,7 @@ import mock
 from six import moves
 
 from ceilometer.alarm.partition import coordination
+from ceilometer import messaging
 from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import test
 from ceilometer.openstack.common import timeutils
@@ -36,6 +37,9 @@ class TestCoordinate(test.BaseTestCase):
     def setUp(self):
         super(TestCoordinate, self).setUp()
         self.CONF = self.useFixture(config.Config()).conf
+        messaging.setup('fake://')
+        self.addCleanup(messaging.cleanup)
+
         self.test_interval = 120
         self.CONF.set_override('evaluation_interval',
                                self.test_interval,

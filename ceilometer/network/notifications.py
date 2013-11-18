@@ -21,6 +21,7 @@
 """
 
 from oslo.config import cfg
+import oslo.messaging
 
 from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
@@ -63,17 +64,13 @@ class NetworkNotificationBase(plugin.NotificationBase):
         ]
 
     @staticmethod
-    def get_exchange_topics(conf):
-        """Return a sequence of ExchangeTopics defining the exchange and topics
-        to be connected for this plugin.
-
+    def get_targets(conf):
+        """Return a sequence of oslo.messaging.Target defining the exchange and
+        topics to be connected for this plugin.
         """
-        return [
-            plugin.ExchangeTopics(
-                exchange=conf.neutron_control_exchange,
-                topics=set(topic + ".info"
-                           for topic in conf.notification_topics)),
-        ]
+        return [oslo.messaging.Target(topic=topic,
+                                      exchange=conf.neutron_control_exchange)
+                for topic in conf.notification_topics]
 
     def process_notification(self, message):
         LOG.info(_('network notification %r') % message)

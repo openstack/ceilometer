@@ -57,6 +57,7 @@ class TestApp(base.BaseTestCase):
     def test_keystone_middleware_parse_conffile(self):
         pipeline_conf = self.path_get("etc/ceilometer/pipeline.yaml")
         content = "[DEFAULT]\n"\
+                  "rpc_backend = fake\n"\
                   "pipeline_cfg_file = {0}\n"\
                   "[{1}]\n"\
                   "auth_protocol = barttp\n"\

@@ -18,11 +18,11 @@
 """Tests for ceilometer.alarm.service.PartitionedAlarmService.
 """
 import contextlib
-
 import mock
 from stevedore import extension
 
 from ceilometer.alarm import service
+from ceilometer import messaging
 from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import test
 
@@ -30,6 +30,9 @@ from ceilometer.openstack.common import test
 class TestPartitionedAlarmService(test.BaseTestCase):
     def setUp(self):
         super(TestPartitionedAlarmService, self).setUp()
+        messaging.setup('fake://')
+        self.addCleanup(messaging.cleanup)
+
         self.threshold_eval = mock.Mock()
         self.api_client = mock.MagicMock()
         self.CONF = self.useFixture(config.Config()).conf
@@ -60,10 +63,9 @@ class TestPartitionedAlarmService(test.BaseTestCase):
                                test_interval,
                                group='alarm')
         get_client = 'ceilometerclient.client.get_client'
-        create_conn = 'ceilometer.openstack.common.rpc.create_connection'
-        with contextlib.nested(mock.patch(get_client,
-                                          return_value=self.api_client),
-                               mock.patch(create_conn)):
+        with contextlib.nested(
+                mock.patch(get_client, return_value=self.api_client),
+                mock.patch.object(self.partitioned.rpc_server, 'start')):
             self.partitioned.start()
             pc = self.partitioned.partition_coordinator
             expected = [

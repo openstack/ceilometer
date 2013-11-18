@@ -27,11 +27,10 @@ from stevedore import extension
 
 from ceilometer.alarm.partition import coordination
 from ceilometer.alarm import rpc as rpc_alarm
+from ceilometer import messaging
 from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import network_utils
-from ceilometer.openstack.common.rpc import dispatcher as rpc_dispatcher
-from ceilometer.openstack.common.rpc import service as rpc_service
 from ceilometer.openstack.common import service as os_service
 
 
@@ -137,25 +136,16 @@ class SingletonAlarmService(AlarmService, os_service.Service):
 cfg.CONF.import_opt('host', 'ceilometer.service')
 
 
-class PartitionedAlarmService(AlarmService, rpc_service.Service):
+class PartitionedAlarmService(AlarmService, os_service.Service):
 
     def __init__(self):
-        super(PartitionedAlarmService, self).__init__(
-            cfg.CONF.host,
-            cfg.CONF.alarm.partition_rpc_topic,
-            self
-        )
+        super(PartitionedAlarmService, self).__init__()
+        self.rpc_server = messaging.get_rpc_server(
+            cfg.CONF.alarm.partition_rpc_topic, self)
+
         self._load_evaluators()
         self.api_client = None
         self.partition_coordinator = coordination.PartitionCoordinator()
-
-    def initialize_service_hook(self, service):
-        LOG.debug(_('initialize_service_hooks'))
-        self.conn.create_worker(
-            cfg.CONF.alarm.partition_rpc_topic,
-            rpc_dispatcher.RpcDispatcher([self]),
-            'ceilometer.alarm.' + cfg.CONF.alarm.partition_rpc_topic,
-        )
 
     def start(self):
         super(PartitionedAlarmService, self).start()
@@ -174,8 +164,13 @@ class PartitionedAlarmService(AlarmService, rpc_service.Service):
                 eval_interval,
                 self._evaluate_assigned_alarms,
                 eval_interval)
+        self.rpc_server.start()
         # Add a dummy thread to have wait() working
         self.tg.add_timer(604800, lambda: None)
+
+    def stop(self):
+        self.rpc_server.stop()
+        super(AlarmNotifierService, self).stop()
 
     def _assigned_alarms(self):
         return self.partition_coordinator.assigned_alarms(self._client)
@@ -193,27 +188,26 @@ class PartitionedAlarmService(AlarmService, rpc_service.Service):
                                             data.get('alarms'))
 
 
-class AlarmNotifierService(rpc_service.Service):
+class AlarmNotifierService(os_service.Service):
 
     EXTENSIONS_NAMESPACE = "ceilometer.alarm.notifier"
 
-    def __init__(self, host, topic):
-        super(AlarmNotifierService, self).__init__(host, topic, self)
+    def __init__(self):
+        super(AlarmNotifierService, self).__init__()
+        self.rpc_server = messaging.get_rpc_server(
+            cfg.CONF.alarm.notifier_rpc_topic, self)
         self.notifiers = extension.ExtensionManager(self.EXTENSIONS_NAMESPACE,
                                                     invoke_on_load=True)
 
     def start(self):
         super(AlarmNotifierService, self).start()
+        self.rpc_server.start()
         # Add a dummy thread to have wait() working
         self.tg.add_timer(604800, lambda: None)
 
-    def initialize_service_hook(self, service):
-        LOG.debug(_('initialize_service_hooks'))
-        self.conn.create_worker(
-            cfg.CONF.alarm.notifier_rpc_topic,
-            rpc_dispatcher.RpcDispatcher([self]),
-            'ceilometer.alarm.' + cfg.CONF.alarm.notifier_rpc_topic,
-        )
+    def stop(self):
+        self.rpc_server.stop()
+        super(AlarmNotifierService, self).stop()
 
     def _handle_action(self, action, alarm_id, previous,
                        current, reason, reason_data):

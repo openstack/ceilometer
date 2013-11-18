@@ -26,6 +26,7 @@ from six.moves import urllib
 from ceilometer.api import acl
 from ceilometer.api.v1 import app as v1_app
 from ceilometer.api.v1 import blueprint as v1_blueprint
+from ceilometer import messaging
 from ceilometer.openstack.common import jsonutils
 from ceilometer import service
 from ceilometer.tests import db as db_test_base
@@ -37,6 +38,8 @@ class TestBase(db_test_base.TestBase):
 
     def setUp(self):
         super(TestBase, self).setUp()
+        messaging.setup("fake://")
+        self.addCleanup(messaging.cleanup)
         service.prepare_service([])
         self.CONF.set_override("auth_version",
                                "v2.0", group=acl.OPT_GROUP_NAME)
@@ -83,6 +86,8 @@ class FunctionalTest(db_test_base.TestBase):
     PATH_PREFIX = ''
 
     def setUp(self):
+        messaging.setup("fake://")
+        self.addCleanup(messaging.cleanup)
         super(FunctionalTest, self).setUp()
         self.CONF.set_override("auth_version", "v2.0",
                                group=acl.OPT_GROUP_NAME)

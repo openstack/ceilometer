@@ -21,6 +21,7 @@ import mock
 import requests
 
 from ceilometer.alarm import service
+from ceilometer import messaging
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import test
@@ -41,15 +42,18 @@ class TestAlarmNotifier(test.BaseTestCase):
 
     def setUp(self):
         super(TestAlarmNotifier, self).setUp()
+        messaging.setup('fake://')
+        self.addCleanup(messaging.cleanup)
+
         self.CONF = self.useFixture(config.Config()).conf
-        self.service = service.AlarmNotifierService('somehost', 'sometopic')
+        self.service = service.AlarmNotifierService()
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_init_host(self):
         # If we try to create a real RPC connection, init_host() never
         # returns. Mock it out so we can establish the service
         # configuration.
-        with mock.patch('ceilometer.openstack.common.rpc.create_connection'):
+        with mock.patch.object(self.service.rpc_server, 'start'):
             self.service.start()
 
     def test_notify_alarm(self):

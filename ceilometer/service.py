@@ -24,10 +24,10 @@ import sys
 from oslo.config import cfg
 from stevedore import named
 
+from ceilometer import messaging
 from ceilometer.openstack.common import gettextutils
 from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import rpc
 from ceilometer import utils
 
 
@@ -135,7 +135,6 @@ def get_workers(name):
 def prepare_service(argv=None):
     gettextutils.install('ceilometer', lazy=True)
     gettextutils.enable_lazy()
-    rpc.set_defaults(control_exchange='ceilometer')
     cfg.set_defaults(log.log_opts,
                      default_log_levels=['amqplib=WARN',
                                          'qpid.messaging=INFO',
@@ -149,3 +148,4 @@ def prepare_service(argv=None):
         argv = sys.argv
     cfg.CONF(argv[1:], project='ceilometer')
     log.setup('ceilometer')
+    messaging.setup()

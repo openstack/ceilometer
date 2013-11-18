@@ -24,8 +24,9 @@ import sys
 
 import eventlet
 # NOTE(jd) We need to monkey patch the socket and select module for,
-# at least, oslo.rpc, otherwise everything's blocked on its first read()
-# or select()
+# at least, oslo.messaging, otherwise everything's blocked on its
+# first read() or select(), thread need to be patched too, because
+# oslo.messaging use threading.local
 eventlet.monkey_patch(socket=True, select=True, thread=True)
 
 
@@ -62,8 +63,7 @@ LOG = logging.getLogger(__name__)
 
 def alarm_notifier():
     service.prepare_service()
-    os_service.launch(alarm_service.AlarmNotifierService(
-        cfg.CONF.host, 'ceilometer.alarm')).wait()
+    os_service.launch(alarm_service.AlarmNotifierService()).wait()
 
 
 def alarm_evaluator():
@@ -86,8 +86,7 @@ def agent_notification():
     service.prepare_service()
     launcher = os_service.ProcessLauncher()
     launcher.launch_service(
-        notification.NotificationService(cfg.CONF.host,
-                                         'ceilometer.agent.notification'),
+        notification.NotificationService(),
         workers=service.get_workers('notification'))
     launcher.wait()
 
@@ -102,8 +101,7 @@ def collector_service():
     service.prepare_service()
     launcher = os_service.ProcessLauncher()
     launcher.launch_service(
-        collector.CollectorService(cfg.CONF.host,
-                                   'ceilometer.collector'),
+        collector.CollectorService(),
         workers=service.get_workers('collector'))
     launcher.wait()
 

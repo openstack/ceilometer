@@ -16,6 +16,7 @@
 """
 
 from oslo.config import cfg
+import oslo.messaging
 
 from ceilometer import plugin
 from ceilometer import sample
@@ -46,13 +47,13 @@ class StackCRUD(plugin.NotificationBase):
         ]
 
     @staticmethod
-    def get_exchange_topics(conf):
-        return [
-            plugin.ExchangeTopics(
-                exchange=conf.heat_control_exchange,
-                topics=set(topic + ".info"
-                           for topic in conf.notification_topics)),
-        ]
+    def get_targets(conf):
+        """Return a sequence of oslo.messaging.Target defining the exchange and
+        topics to be connected for this plugin.
+        """
+        return [oslo.messaging.Target(topic=topic,
+                                      exchange=conf.heat_control_exchange)
+                for topic in conf.notification_topics]
 
     def process_notification(self, message):
         name = message['event_type']                \
