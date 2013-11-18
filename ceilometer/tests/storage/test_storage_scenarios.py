@@ -23,7 +23,6 @@ import datetime
 
 import testscenarios
 
-from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer.openstack.common import timeutils
 from ceilometer.publisher import rpc
 from ceilometer import sample
@@ -60,7 +59,6 @@ class DBTestBase(tests_db.TestBase):
 
     def setUp(self):
         super(DBTestBase, self).setUp()
-        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
         self.prepare_data()
 
     def tearDown(self):
