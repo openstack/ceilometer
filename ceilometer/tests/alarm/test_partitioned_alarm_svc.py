@@ -17,7 +17,7 @@
 # under the License.
 """Tests for ceilometer.alarm.service.PartitionedAlarmService.
 """
-from contextlib import nested
+import contextlib
 
 import mock
 from stevedore import extension
@@ -61,8 +61,9 @@ class TestPartitionedAlarmService(test.BaseTestCase):
                                group='alarm')
         get_client = 'ceilometerclient.client.get_client'
         create_conn = 'ceilometer.openstack.common.rpc.create_connection'
-        with nested(mock.patch(get_client, return_value=self.api_client),
-                    mock.patch(create_conn)):
+        with contextlib.nested(mock.patch(get_client,
+                                          return_value=self.api_client),
+                               mock.patch(create_conn)):
             self.partitioned.start()
             pc = self.partitioned.partition_coordinator
             expected = [

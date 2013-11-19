@@ -27,14 +27,14 @@ from stevedore import extension
 
 from ceilometer.alarm.partition import coordination
 from ceilometer.alarm import rpc as rpc_alarm
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import importutils
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import network_utils
 from ceilometer.openstack.common.rpc import dispatcher as rpc_dispatcher
 from ceilometer.openstack.common.rpc import service as rpc_service
 from ceilometer.openstack.common import service as os_service
-from ceilometer.service import prepare_service
+from ceilometer import service
 
 
 OPTS = [
@@ -139,9 +139,9 @@ class SingletonAlarmService(AlarmService, os_service.Service):
 
 
 def alarm_evaluator():
-    prepare_service()
-    service = importutils.import_object(cfg.CONF.alarm.evaluation_service)
-    os_service.launch(service).wait()
+    service.prepare_service()
+    eval_service = importutils.import_object(cfg.CONF.alarm.evaluation_service)
+    os_service.launch(eval_service).wait()
 
 
 cfg.CONF.import_opt('host', 'ceilometer.service')
@@ -280,6 +280,6 @@ class AlarmNotifierService(rpc_service.Service):
 
 
 def alarm_notifier():
-    prepare_service()
+    service.prepare_service()
     os_service.launch(AlarmNotifierService(
         cfg.CONF.host, 'ceilometer.alarm')).wait()

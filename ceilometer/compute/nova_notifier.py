@@ -36,7 +36,7 @@ from nova import utils
 from stevedore import extension
 
 from ceilometer.compute.virt import inspector
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common.gettextutils import _  # noqa
 
 
 # This module runs inside the nova compute

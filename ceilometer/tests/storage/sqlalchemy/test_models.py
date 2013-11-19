@@ -16,7 +16,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from datetime import datetime
+import datetime
 
 import mock
 from sqlalchemy.dialects.mysql import DECIMAL
@@ -46,7 +46,7 @@ class PreciseTimestampTest(test.BaseTestCase):
         self._mysql_dialect = self.fake_dialect('mysql')
         self._postgres_dialect = self.fake_dialect('postgres')
         self._type = models.PreciseTimestamp()
-        self._date = datetime(2012, 7, 2, 10, 44)
+        self._date = datetime.datetime(2012, 7, 2, 10, 44)
 
     def test_load_dialect_impl_mysql(self):
         result = self._type.load_dialect_impl(self._mysql_dialect)

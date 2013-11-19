@@ -19,13 +19,13 @@
 """
 
 from __future__ import absolute_import
-from urlparse import urljoin
+import urlparse
 
 from keystoneclient import exceptions
 from oslo.config import cfg
 from swiftclient import client as swift
 
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer import plugin
@@ -74,7 +74,8 @@ class _Base(plugin.PollsterBase):
     def _neaten_url(endpoint, tenant_id):
         """Transform the registered url to standard and valid format.
         """
-        return urljoin(endpoint, '/v1/' + cfg.CONF.reseller_prefix + tenant_id)
+        return urlparse.urljoin(endpoint,
+                                '/v1/' + cfg.CONF.reseller_prefix + tenant_id)
 
 
 class ObjectsPollster(_Base):

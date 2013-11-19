@@ -11,8 +11,9 @@
 #    under the License.
 
 from __future__ import with_statement
+from logging import config as log_config
+
 from alembic import context
-from logging.config import fileConfig
 
 import ceilometer.openstack.common.db.sqlalchemy.session as sqlalchemy_session
 from ceilometer.storage.sqlalchemy import models
@@ -23,7 +24,7 @@ config = context.config
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
-fileConfig(config.config_file_name)
+log_config.fileConfig(config.config_file_name)
 
 # add your model's MetaData object here
 # for 'autogenerate' support

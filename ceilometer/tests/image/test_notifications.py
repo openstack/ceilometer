@@ -17,7 +17,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from datetime import datetime
+import datetime
 
 from ceilometer.image import notifications
 from ceilometer.openstack.common import test
@@ -28,7 +28,7 @@ def fake_uuid(x):
     return '%s-%s-%s-%s' % (x * 8, x * 4, x * 4, x * 12)
 
 
-NOW = datetime.isoformat(datetime.utcnow())
+NOW = datetime.datetime.isoformat(datetime.datetime.utcnow())
 
 NOTIFICATION_SEND = {
     u'event_type': u'image.send',

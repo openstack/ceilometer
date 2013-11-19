@@ -23,12 +23,9 @@ Based on pecan.middleware.errordocument
 """
 
 import json
+
+from lxml import etree
 import webob
-from xml import etree as et
-try:
-    from xml.etree.ElementTree import ParseError
-except ImportError:
-    from xml.parsers.expat import ExpatError as ParseError
 
 from ceilometer.api import hooks
 from ceilometer.openstack.common import gettextutils
@@ -101,19 +98,16 @@ class ParsableErrorMiddleware(object):
                == 'application/xml'):
                 try:
                     # simple check xml is valid
-                    fault = et.ElementTree.fromstring('\n'.join(app_iter))
+                    fault = etree.fromstring('\n'.join(app_iter))
                     # Add the translated error to the xml data
                     if error is not None:
                         for fault_string in fault.findall('faultstring'):
                             fault_string.text = (
                                 gettextutils.get_localized_message(
                                     error, user_locale))
-                    body = [et.ElementTree.tostring(
-                            et.ElementTree.fromstring(
-                                '<error_message>'
-                                + et.ElementTree.tostring(fault)
-                                + '</error_message>'))]
-                except ParseError as err:
+                    body = ['<error_message>' + etree.tostring(fault)
+                            + '</error_message>']
+                except etree.XMLSyntaxError as err:
                     LOG.error('Error parsing HTTP response: %s' % err)
                     body = ['<error_message>%s' % state['status_code']
                             + '</error_message>']

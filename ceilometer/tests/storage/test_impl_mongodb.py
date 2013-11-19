@@ -30,8 +30,7 @@ from mock import patch
 
 from ceilometer.publisher import rpc
 from ceilometer import sample
-from ceilometer.storage.base import MultipleResultsFound
-from ceilometer.storage.base import NoResultFound
+from ceilometer.storage import base
 from ceilometer.storage import impl_mongodb
 from ceilometer.tests import db as tests_db
 from ceilometer.tests.storage import test_storage_scenarios
@@ -81,7 +80,7 @@ class MongoDBTestMarkerBase(test_storage_scenarios.DBTestBase,
             ret = impl_mongodb.Connection._get_marker(self.conn.db.resource,
                                                       marker_pairs)
             self.assertEqual(ret['project_id'], 'project-id-foo')
-        except NoResultFound:
+        except base.NoResultFound:
             self.assertTrue(True)
 
     def test_get_marker_multiple(self):
@@ -90,7 +89,7 @@ class MongoDBTestMarkerBase(test_storage_scenarios.DBTestBase,
             ret = impl_mongodb.Connection._get_marker(self.conn.db.resource,
                                                       marker_pairs)
             self.assertEqual(ret['project_id'], 'project-id-foo')
-        except MultipleResultsFound:
+        except base.MultipleResultsFound:
             self.assertTrue(True)
 
 
@@ -279,7 +278,7 @@ class AlarmTestPagination(test_storage_scenarios.AlarmTestBase,
                                                       marker_pairs)
             self.assertEqual(ret['rule']['meter_name'],
                              'meter_name-foo')
-        except NoResultFound:
+        except base.NoResultFound:
             self.assertTrue(True)
 
     def test_alarm_get_marker_multiple(self):
@@ -290,5 +289,5 @@ class AlarmTestPagination(test_storage_scenarios.AlarmTestBase,
                                                       marker_pairs)
             self.assertEqual(ret['rule']['meter_name'],
                              'counter-name-foo')
-        except MultipleResultsFound:
+        except base.MultipleResultsFound:
             self.assertTrue(True)

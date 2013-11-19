@@ -28,7 +28,7 @@ import uuid
 import mock
 import testscenarios
 
-from ceilometer.storage.models import Alarm
+from ceilometer.storage import models
 from ceilometer.tests.api.v2 import FunctionalTest
 from ceilometer.tests import db as tests_db
 
@@ -53,104 +53,99 @@ class TestAlarms(FunctionalTest,
         super(TestAlarms, self).setUp()
         self.auth_headers = {'X-User-Id': str(uuid.uuid4()),
                              'X-Project-Id': str(uuid.uuid4())}
-        for alarm in [Alarm(name='name1',
-                            type='threshold',
-                            enabled=True,
-                            alarm_id='a',
-                            description='a',
-                            state='insufficient data',
-                            state_timestamp=None,
-                            timestamp=None,
-                            ok_actions=[],
-                            insufficient_data_actions=[],
-                            alarm_actions=[],
-                            repeat_actions=True,
-                            user_id=self.auth_headers['X-User-Id'],
-                            project_id=self.auth_headers['X-Project-Id'],
-                            rule=dict(comparison_operator='gt',
-                                      threshold=2.0,
-                                      statistic='avg',
-                                      evaluation_periods=60,
-                                      period=1,
-                                      meter_name='meter.test',
-                                      query=[
-                                          {'field': 'project_id',
+        for alarm in [
+            models.Alarm(name='name1',
+                         type='threshold',
+                         enabled=True,
+                         alarm_id='a',
+                         description='a',
+                         state='insufficient data',
+                         state_timestamp=None,
+                         timestamp=None,
+                         ok_actions=[],
+                         insufficient_data_actions=[],
+                         alarm_actions=[],
+                         repeat_actions=True,
+                         user_id=self.auth_headers['X-User-Id'],
+                         project_id=self.auth_headers['X-Project-Id'],
+                         rule=dict(comparison_operator='gt',
+                                   threshold=2.0,
+                                   statistic='avg',
+                                   evaluation_periods=60,
+                                   period=1,
+                                   meter_name='meter.test',
+                                   query=[{'field': 'project_id',
                                            'op': 'eq', 'value':
                                            self.auth_headers['X-Project-Id']}
-                                      ])
-                            ),
-                      Alarm(name='name2',
-                            type='threshold',
-                            enabled=True,
-                            alarm_id='b',
-                            description='b',
-                            state='insufficient data',
-                            state_timestamp=None,
-                            timestamp=None,
-                            ok_actions=[],
-                            insufficient_data_actions=[],
-                            alarm_actions=[],
-                            repeat_actions=False,
-                            user_id=self.auth_headers['X-User-Id'],
-                            project_id=self.auth_headers['X-Project-Id'],
-                            rule=dict(comparison_operator='gt',
-                                      threshold=4.0,
-                                      statistic='avg',
-                                      evaluation_periods=60,
-                                      period=1,
-                                      meter_name='meter.test',
-                                      query=[
-                                          {'field': 'project_id',
+                                          ])
+                         ),
+            models.Alarm(name='name2',
+                         type='threshold',
+                         enabled=True,
+                         alarm_id='b',
+                         description='b',
+                         state='insufficient data',
+                         state_timestamp=None,
+                         timestamp=None,
+                         ok_actions=[],
+                         insufficient_data_actions=[],
+                         alarm_actions=[],
+                         repeat_actions=False,
+                         user_id=self.auth_headers['X-User-Id'],
+                         project_id=self.auth_headers['X-Project-Id'],
+                         rule=dict(comparison_operator='gt',
+                                   threshold=4.0,
+                                   statistic='avg',
+                                   evaluation_periods=60,
+                                   period=1,
+                                   meter_name='meter.test',
+                                   query=[{'field': 'project_id',
                                            'op': 'eq', 'value':
                                            self.auth_headers['X-Project-Id']}
-                                      ])
-                            ),
-                      Alarm(name='name3',
-                            type='threshold',
-                            enabled=True,
-                            alarm_id='c',
-                            description='c',
-                            state='insufficient data',
-                            state_timestamp=None,
-                            timestamp=None,
-                            ok_actions=[],
-                            insufficient_data_actions=[],
-                            alarm_actions=[],
-                            repeat_actions=False,
-                            user_id=self.auth_headers['X-User-Id'],
-                            project_id=self.auth_headers['X-Project-Id'],
-                            rule=dict(comparison_operator='gt',
-                                      threshold=3.0,
-                                      statistic='avg',
-                                      evaluation_periods=60,
-                                      period=1,
-                                      meter_name='meter.mine',
-                                      query=[
-                                          {'field': 'project_id',
+                                          ])
+                         ),
+            models.Alarm(name='name3',
+                         type='threshold',
+                         enabled=True,
+                         alarm_id='c',
+                         description='c',
+                         state='insufficient data',
+                         state_timestamp=None,
+                         timestamp=None,
+                         ok_actions=[],
+                         insufficient_data_actions=[],
+                         alarm_actions=[],
+                         repeat_actions=False,
+                         user_id=self.auth_headers['X-User-Id'],
+                         project_id=self.auth_headers['X-Project-Id'],
+                         rule=dict(comparison_operator='gt',
+                                   threshold=3.0,
+                                   statistic='avg',
+                                   evaluation_periods=60,
+                                   period=1,
+                                   meter_name='meter.mine',
+                                   query=[{'field': 'project_id',
                                            'op': 'eq', 'value':
                                            self.auth_headers['X-Project-Id']}
-                                      ])
-                            ),
-                      Alarm(name='name4',
-                            type='combination',
-                            enabled=True,
-                            alarm_id='d',
-                            description='d',
-                            state='insufficient data',
-                            state_timestamp=None,
-                            timestamp=None,
-                            ok_actions=[],
-                            insufficient_data_actions=[],
-                            alarm_actions=[],
-                            repeat_actions=False,
-                            user_id=self.auth_headers['X-User-Id'],
-                            project_id=self.auth_headers['X-Project-Id'],
-                            rule=dict(alarm_ids=[
-                                'a',
-                                'b'],
-                                operator='or')
-                            )
-                      ]:
+                                          ])
+                         ),
+            models.Alarm(name='name4',
+                         type='combination',
+                         enabled=True,
+                         alarm_id='d',
+                         description='d',
+                         state='insufficient data',
+                         state_timestamp=None,
+                         timestamp=None,
+                         ok_actions=[],
+                         insufficient_data_actions=[],
+                         alarm_actions=[],
+                         repeat_actions=False,
+                         user_id=self.auth_headers['X-User-Id'],
+                         project_id=self.auth_headers['X-Project-Id'],
+                         rule=dict(alarm_ids=['a', 'b'],
+                                   operator='or')
+                         )]:
             self.conn.update_alarm(alarm)
 
     def test_list_alarms(self):
@@ -189,21 +184,21 @@ class TestAlarms(FunctionalTest,
         self.assertEqual(one['repeat_actions'], alarms[0]['repeat_actions'])
 
     def test_get_alarm_disabled(self):
-        alarm = Alarm(name='disabled',
-                      type='combination',
-                      enabled=False,
-                      alarm_id='d',
-                      description='d',
-                      state='insufficient data',
-                      state_timestamp=None,
-                      timestamp=None,
-                      ok_actions=[],
-                      insufficient_data_actions=[],
-                      alarm_actions=[],
-                      repeat_actions=False,
-                      user_id=self.auth_headers['X-User-Id'],
-                      project_id=self.auth_headers['X-Project-Id'],
-                      rule=dict(alarm_ids=['a', 'b'], operator='or'))
+        alarm = models.Alarm(name='disabled',
+                             type='combination',
+                             enabled=False,
+                             alarm_id='d',
+                             description='d',
+                             state='insufficient data',
+                             state_timestamp=None,
+                             timestamp=None,
+                             ok_actions=[],
+                             insufficient_data_actions=[],
+                             alarm_actions=[],
+                             repeat_actions=False,
+                             user_id=self.auth_headers['X-User-Id'],
+                             project_id=self.auth_headers['X-Project-Id'],
+                             rule=dict(alarm_ids=['a', 'b'], operator='or'))
         self.conn.update_alarm(alarm)
 
         alarms = self.get_json('/alarms',
@@ -222,15 +217,13 @@ class TestAlarms(FunctionalTest,
                                    }])
         self.assertEqual(alarms[0]['name'], 'name4')
         self.assertEqual(alarms[0]['combination_rule']['alarm_ids'],
-                         ['a',
-                          'b'])
+                         ['a', 'b'])
         self.assertEqual(alarms[0]['combination_rule']['operator'], 'or')
 
         one = self.get_json('/alarms/%s' % alarms[0]['alarm_id'])
         self.assertEqual(one['name'], 'name4')
         self.assertEqual(alarms[0]['combination_rule']['alarm_ids'],
-                         ['a',
-                          'b'])
+                         ['a', 'b'])
         self.assertEqual(alarms[0]['combination_rule']['operator'], 'or')
         self.assertEqual(one['alarm_id'], alarms[0]['alarm_id'])
         self.assertEqual(one['repeat_actions'], alarms[0]['repeat_actions'])
