@@ -45,7 +45,7 @@ class TestDispatcherDB(test.BaseTestCase):
 
         with mock.patch.object(self.dispatcher.storage_conn,
                                'record_metering_data') as record_metering_data:
-            self.dispatcher.record_metering_data(self.ctx, msg)
+            self.dispatcher.record_metering_data(msg)
 
         record_metering_data.assert_called_once_with(msg)
 
@@ -65,7 +65,7 @@ class TestDispatcherDB(test.BaseTestCase):
 
         self.dispatcher.storage_conn = ErrorConnection()
 
-        self.dispatcher.record_metering_data(self.ctx, msg)
+        self.dispatcher.record_metering_data(msg)
 
         assert not self.dispatcher.storage_conn.called, \
             'Should not have called the storage connection'
@@ -86,7 +86,7 @@ class TestDispatcherDB(test.BaseTestCase):
 
         with mock.patch.object(self.dispatcher.storage_conn,
                                'record_metering_data') as record_metering_data:
-            self.dispatcher.record_metering_data(self.ctx, msg)
+            self.dispatcher.record_metering_data(msg)
 
         record_metering_data.assert_called_once_with(expected)
 
@@ -107,6 +107,6 @@ class TestDispatcherDB(test.BaseTestCase):
 
         with mock.patch.object(self.dispatcher.storage_conn,
                                'record_metering_data') as record_metering_data:
-            self.dispatcher.record_metering_data(self.ctx, msg)
+            self.dispatcher.record_metering_data(msg)
 
         record_metering_data.assert_called_once_with(expected)

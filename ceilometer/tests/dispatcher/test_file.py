@@ -59,7 +59,7 @@ class TestDispatcherFile(test.BaseTestCase):
         )
 
         # The record_metering_data method should exist and not produce errors.
-        dispatcher.record_metering_data(None, msg)
+        dispatcher.record_metering_data(msg)
         # After the method call above, the file should have been created.
         self.assertTrue(os.path.exists(handler.baseFilename))
 
@@ -91,7 +91,7 @@ class TestDispatcherFile(test.BaseTestCase):
         )
 
         # The record_metering_data method should exist and not produce errors.
-        dispatcher.record_metering_data(None, msg)
+        dispatcher.record_metering_data(msg)
         # After the method call above, the file should have been created.
         self.assertTrue(os.path.exists(handler.baseFilename))
 

@@ -40,7 +40,7 @@ class DatabaseDispatcher(dispatcher.Base):
         super(DatabaseDispatcher, self).__init__(conf)
         self.storage_conn = storage.get_connection(conf)
 
-    def record_metering_data(self, context, data):
+    def record_metering_data(self, data):
         # We may have receive only one counter on the wire
         if not isinstance(data, list):
             data = [data]
