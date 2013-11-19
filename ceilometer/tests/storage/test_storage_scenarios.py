@@ -2021,7 +2021,7 @@ class AlarmTest(AlarmTestBase,
         survivors = list(self.conn.get_alarms())
         self.assertEqual(len(survivors), 2)
         for s in survivors:
-            self.assertNotEquals(victim.name, s.name)
+            self.assertNotEqual(victim.name, s.name)
 
 
 class AlarmTestPagination(AlarmTestBase,
@@ -2154,7 +2154,7 @@ class GetEventTest(EventTestBase):
         bad_events = self.conn.record_events(new_events)
         event_filter = storage.EventFilter(self.start, self.end, "NoTraits")
         events = self.conn.get_events(event_filter)
-        self.assertEquals(0, len(bad_events))
+        self.assertEqual(0, len(bad_events))
         self.assertEqual(1, len(events))
         self.assertEqual(events[0].message_id, "id_notraits")
         self.assertEqual(events[0].event_name, "NoTraits")
