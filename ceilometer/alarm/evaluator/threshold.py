@@ -21,7 +21,6 @@ import datetime
 import operator
 
 from ceilometer.alarm import evaluator
-from ceilometer.alarm.evaluator import OK, ALARM, UNKNOWN
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
@@ -91,17 +90,17 @@ class ThresholdEvaluator(evaluator.Evaluator):
            transitioning to unknown otherwise.
         """
         sufficient = len(statistics) >= self.quorum
-        if not sufficient and alarm.state != UNKNOWN:
+        if not sufficient and alarm.state != evaluator.UNKNOWN:
             reason = _('%d datapoints are unknown') % alarm.rule[
                 'evaluation_periods']
-            self._refresh(alarm, UNKNOWN, reason)
+            self._refresh(alarm, evaluator.UNKNOWN, reason)
         return sufficient
 
     @staticmethod
     def _reason(alarm, statistics, distilled, state):
         """Fabricate reason string."""
         count = len(statistics)
-        disposition = 'inside' if state == OK else 'outside'
+        disposition = 'inside' if state == evaluator.OK else 'outside'
         last = getattr(statistics[-1], alarm.rule['statistic'])
         transition = alarm.state != state
         if transition:
@@ -129,16 +128,16 @@ class ThresholdEvaluator(evaluator.Evaluator):
         """
         distilled = all(compared)
         unequivocal = distilled or not any(compared)
-        unknown = alarm.state == UNKNOWN
+        unknown = alarm.state == evaluator.UNKNOWN
         continuous = alarm.repeat_actions
 
         if unequivocal:
-            state = ALARM if distilled else OK
+            state = evaluator.ALARM if distilled else evaluator.OK
             reason = self._reason(alarm, statistics, distilled, state)
             if alarm.state != state or continuous:
                 self._refresh(alarm, state, reason)
         elif unknown or continuous:
-            trending_state = ALARM if compared[-1] else OK
+            trending_state = evaluator.ALARM if compared[-1] else evaluator.OK
             state = trending_state if unknown else alarm.state
             reason = self._reason(alarm, statistics, distilled, state)
             self._refresh(alarm, state, reason)

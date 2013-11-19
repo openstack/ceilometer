@@ -37,7 +37,7 @@ metadata_headers = X-TEST
 
 from __future__ import absolute_import
 
-from swift.common.utils import split_path, get_logger
+from swift.common import utils
 import webob
 
 REQUEST = webob
@@ -68,7 +68,7 @@ class CeilometerMiddleware(object):
 
     def __init__(self, app, conf):
         self.app = app
-        self.logger = get_logger(conf, log_route='ceilometer')
+        self.logger = utils.get_logger(conf, log_route='ceilometer')
 
         self.metadata_headers = [h.strip().replace('-', '_').lower()
                                  for h in conf.get(
@@ -119,7 +119,8 @@ class CeilometerMiddleware(object):
     def publish_sample(self, env, bytes_received, bytes_sent):
         req = REQUEST.Request(env)
         try:
-            version, account, container, obj = split_path(req.path, 2, 4, True)
+            version, account, container, obj = utils.split_path(req.path, 2,
+                                                                4, True)
         except ValueError:
             return
         now = timeutils.utcnow().isoformat()

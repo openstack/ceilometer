@@ -18,7 +18,6 @@
 
 
 from ceilometer.alarm import evaluator
-from ceilometer.alarm.evaluator import OK, ALARM, UNKNOWN
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 
@@ -43,12 +42,12 @@ class CombinationEvaluator(evaluator.Evaluator):
         """
         missing_states = len(alarm.rule['alarm_ids']) - len(states)
         sufficient = missing_states == 0
-        if not sufficient and alarm.state != UNKNOWN:
+        if not sufficient and alarm.state != evaluator.UNKNOWN:
             reason = _('%(missing_states)d alarms in %(alarm_ids)s'
                        ' are in unknown state') % \
                 {'missing_states': missing_states,
                  'alarm_ids': ",".join(alarm.rule['alarm_ids'])}
-            self._refresh(alarm, UNKNOWN, reason)
+            self._refresh(alarm, evaluator.UNKNOWN, reason)
         return sufficient
 
     @staticmethod
@@ -80,10 +79,10 @@ class CombinationEvaluator(evaluator.Evaluator):
         """Transition alarm state if necessary.
         """
         op = alarm.rule['operator']
-        if COMPARATORS[op](s == ALARM for s in underlying_states):
-            state = ALARM
+        if COMPARATORS[op](s == evaluator.ALARM for s in underlying_states):
+            state = evaluator.ALARM
         else:
-            state = OK
+            state = evaluator.OK
 
         continuous = alarm.repeat_actions
         reason = self._reason(alarm, state)
@@ -96,7 +95,7 @@ class CombinationEvaluator(evaluator.Evaluator):
             state = self._get_alarm_state(_id)
             #note(sileht): alarm can be evaluated only with
             #stable state of other alarm
-            if state and state != UNKNOWN:
+            if state and state != evaluator.UNKNOWN:
                 states.append(state)
 
         if self._sufficient_states(alarm, states):

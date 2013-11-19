@@ -22,8 +22,7 @@ import mock
 
 from ceilometer.compute import manager
 from ceilometer.compute.pollsters import instance as pollsters_instance
-
-from . import base
+from ceilometer.tests.compute.pollsters import base
 
 
 class TestInstancePollster(base.TestPollsterBase):

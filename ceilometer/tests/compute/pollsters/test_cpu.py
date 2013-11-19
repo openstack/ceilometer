@@ -26,8 +26,7 @@ import six
 from ceilometer.compute import manager
 from ceilometer.compute.pollsters import cpu
 from ceilometer.compute.virt import inspector as virt_inspector
-
-from . import base
+from ceilometer.tests.compute.pollsters import base
 
 
 class TestCPUPollster(base.TestPollsterBase):
