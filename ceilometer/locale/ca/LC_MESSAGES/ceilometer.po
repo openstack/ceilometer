@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-10-29 06:03+0000\n"
+"POT-Creation-Date: 2013-11-20 06:06+0000\n"
 "PO-Revision-Date: 2012-12-11 06:53+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Catalan "
@@ -63,12 +63,12 @@ msgstr ""
 msgid "Unable to notify for an alarm with no action"
 msgstr ""
 
-#: ceilometer/alarm/evaluator/__init__.py:67
+#: ceilometer/alarm/evaluator/__init__.py:66
 #, python-format
 msgid "alarm %(id)s transitioning to %(state)s because %(reason)s"
 msgstr ""
 
-#: ceilometer/alarm/evaluator/__init__.py:79
+#: ceilometer/alarm/evaluator/__init__.py:78
 msgid "alarm state update failed"
 msgstr ""
 
@@ -275,98 +275,98 @@ msgstr ""
 msgid "assignment retrieval failed"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:75
+#: ceilometer/api/controllers/v2.py:79
 #, python-format
 msgid "%(entity)s %(id)s Not Found"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:93
+#: ceilometer/api/controllers/v2.py:106
 #, python-format
 msgid "Value %(value)s is invalid (should be greater or equal to %(min)s)"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:99
+#: ceilometer/api/controllers/v2.py:111
 #, python-format
 msgid "Value %(value)s is invalid (should be lower or equal to %(max)s)"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:237
+#: ceilometer/api/controllers/v2.py:248
 #, python-format
 msgid "Failed to convert the metadata value %s automatically"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:255
+#: ceilometer/api/controllers/v2.py:266
 #, python-format
 msgid ""
 "Failed to convert the metadata value %(value)s to the expected data type "
 "%(type)s."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:260
+#: ceilometer/api/controllers/v2.py:271
 #, python-format
 msgid ""
 "The data type %s is not supported. The supported data type list is: "
 "integer, float, boolean and string."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:265
+#: ceilometer/api/controllers/v2.py:276
 #, python-format
 msgid ""
 "Unexpected exception converting %(value)s to the expected data type "
 "%(type)s."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:277
+#: ceilometer/api/controllers/v2.py:286
 #, python-format
 msgid "Not Authorized to access project %s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:784
+#: ceilometer/api/controllers/v2.py:794
 msgid "Period must be positive."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:950
+#: ceilometer/api/controllers/v2.py:958
 msgid "Resource"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1017
+#: ceilometer/api/controllers/v2.py:1025
 #, python-format
 msgid ""
 "Alarm when %(meter_name)s is %(comparison_operator)s a %(statistic)s of "
 "%(threshold)s over %(period)s seconds"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1056
+#: ceilometer/api/controllers/v2.py:1064
 #, python-format
 msgid "Combined state of alarms %s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1150
+#: ceilometer/api/controllers/v2.py:1161
 msgid "either threshold_rule or combination_rule must be set"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1156
+#: ceilometer/api/controllers/v2.py:1166
 msgid "threshold_rule and combination_rule cannot be set at the same time"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1177
+#: ceilometer/api/controllers/v2.py:1186
 #, python-format
 msgid "Alarm %s doesn't exist"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1275
+#: ceilometer/api/controllers/v2.py:1282
 msgid "Alarm"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1340 ceilometer/api/controllers/v2.py:1473
+#: ceilometer/api/controllers/v2.py:1351 ceilometer/api/controllers/v2.py:1490
 msgid "Alarm incorrect"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1385
+#: ceilometer/api/controllers/v2.py:1401
 msgid "state invalid"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1465
+#: ceilometer/api/controllers/v2.py:1484
 msgid "Alarm with that name exists"
 msgstr ""
 
@@ -422,17 +422,13 @@ msgstr ""
 msgid "Kwapi endpoint not found"
 msgstr ""
 
-#: ceilometer/objectstore/swift.py:67
+#: ceilometer/objectstore/swift.py:66
 msgid "Swift endpoint not found"
 msgstr ""
 
 #: ceilometer/openstack/common/eventlet_backdoor.py:142
 #, python-format
 msgid "Eventlet backdoor listening on %(port)s for process %(pid)d"
-msgstr ""
-
-#: ceilometer/openstack/common/exception.py:103
-msgid "Uncaught exception"
 msgstr ""
 
 #: ceilometer/openstack/common/excutils.py:64
@@ -490,22 +486,22 @@ msgstr ""
 msgid "Semaphore / lock released \"%(function)s\""
 msgstr ""
 
-#: ceilometer/openstack/common/log.py:247
+#: ceilometer/openstack/common/log.py:250
 #, python-format
 msgid "Deprecated: %s"
 msgstr ""
 
-#: ceilometer/openstack/common/log.py:346
+#: ceilometer/openstack/common/log.py:349
 #, python-format
 msgid "Error loading logging config %(log_config)s: %(err_msg)s"
 msgstr ""
 
-#: ceilometer/openstack/common/log.py:396
+#: ceilometer/openstack/common/log.py:400
 #, python-format
 msgid "syslog facility must be one of: %s"
 msgstr ""
 
-#: ceilometer/openstack/common/log.py:566
+#: ceilometer/openstack/common/log.py:570
 #, python-format
 msgid "Fatal call to deprecated config: %(msg)s"
 msgstr ""
@@ -1241,37 +1237,51 @@ msgstr ""
 msgid "Creating Consumer connection for Service %s"
 msgstr ""
 
-#: ceilometer/publisher/udp.py:55
+#: ceilometer/publisher/udp.py:57
 #, python-format
 msgid "Publishing sample %(msg)s over UDP to %(host)s:%(port)d"
 msgstr ""
 
-#: ceilometer/publisher/udp.py:62
+#: ceilometer/publisher/udp.py:64
 msgid "Unable to send sample over UDP"
 msgstr ""
 
-#: ceilometer/storage/impl_db2.py:404 ceilometer/storage/impl_db2.py:473
-#: ceilometer/storage/impl_db2.py:681 ceilometer/storage/impl_hbase.py:308
-#: ceilometer/storage/impl_hbase.py:392 ceilometer/storage/impl_mongodb.py:605
-#: ceilometer/storage/impl_mongodb.py:687
-#: ceilometer/storage/impl_mongodb.py:863
-#: ceilometer/storage/impl_sqlalchemy.py:296
-#: ceilometer/storage/impl_sqlalchemy.py:399
-#: ceilometer/storage/impl_sqlalchemy.py:614
+#: ceilometer/storage/impl_db2.py:156
+#, python-format
+msgid "Connecting to DB2 on %s"
+msgstr ""
+
+#: ceilometer/storage/impl_db2.py:405 ceilometer/storage/impl_db2.py:474
+#: ceilometer/storage/impl_db2.py:682 ceilometer/storage/impl_hbase.py:309
+#: ceilometer/storage/impl_hbase.py:393 ceilometer/storage/impl_mongodb.py:606
+#: ceilometer/storage/impl_mongodb.py:688
+#: ceilometer/storage/impl_mongodb.py:864
+#: ceilometer/storage/impl_sqlalchemy.py:351
+#: ceilometer/storage/impl_sqlalchemy.py:457
+#: ceilometer/storage/impl_sqlalchemy.py:675
 msgid "Pagination not implemented"
 msgstr ""
 
-#: ceilometer/storage/impl_sqlalchemy.py:114
+#: ceilometer/storage/impl_mongodb.py:158
+#, python-format
+msgid "Connecting to MongoDB on %s"
+msgstr ""
+
+#: ceilometer/storage/impl_sqlalchemy.py:131
+#, python-format
+msgid "Query on %(key)s is of %(value)s type and is not supported"
+msgstr ""
+
+#: ceilometer/storage/impl_sqlalchemy.py:153
 msgid "Missing required meter specifier"
 msgstr ""
 
-#: ceilometer/storage/impl_sqlalchemy.py:137
-#: ceilometer/storage/impl_sqlalchemy.py:298
-#: ceilometer/storage/impl_sqlalchemy.py:401
-msgid "metaquery not implemented"
+#: ceilometer/storage/impl_sqlalchemy.py:266
+#, python-format
+msgid "Unknown metadata type. Key (%s) will not be queryable."
 msgstr ""
 
-#: ceilometer/storage/impl_sqlalchemy.py:548
+#: ceilometer/storage/impl_sqlalchemy.py:609
 msgid "Unable to group by these fields"
 msgstr ""
 
@@ -1373,5 +1383,11 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "%s is mandatory"
+#~ msgstr ""
+
+#~ msgid "Uncaught exception"
+#~ msgstr ""
+
+#~ msgid "metaquery not implemented"
 #~ msgstr ""
 
