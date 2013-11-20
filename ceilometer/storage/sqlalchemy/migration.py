@@ -104,3 +104,21 @@ def _find_migrate_repo():
     if _REPOSITORY is None:
         _REPOSITORY = Repository(path)
     return _REPOSITORY
+
+
+def paged(query, size=1000):
+    """Page query results
+
+    :param query: the SQLAlchemy query to execute
+    :param size: the max page size
+    return: generator with query data
+    """
+    offset = 0
+    while True:
+        page = query.offset(offset).limit(size).execute()
+        if page.rowcount <= 0:
+            # There are no more rows
+            break
+        for row in page:
+            yield row
+        offset += size

@@ -244,9 +244,9 @@ class CollectorService(CollectorBase, rpc_service.Service):
         source of the notification. This will have to get added back later.
         """
         message_id = body.get('message_id')
-        event_name = body['event_type']
+        event_type = body['event_type']
         when = self._extract_when(body)
-        LOG.debug('Saving event "%s"', event_name)
+        LOG.debug('Saving event "%s"', event_type)
 
         publisher = body.get('publisher_id')
         request_id = body.get('_context_request_id')
@@ -260,7 +260,7 @@ class CollectorService(CollectorBase, rpc_service.Service):
         # Only store non-None value traits ...
         traits = [trait for trait in all_traits if trait.value is not None]
 
-        event = models.Event(message_id, event_name, when, traits)
+        event = models.Event(message_id, event_type, when, traits)
 
         problem_events = []
         for dispatcher in self.dispatcher_manager:

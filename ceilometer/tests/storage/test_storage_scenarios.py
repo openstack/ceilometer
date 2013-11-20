@@ -2101,20 +2101,20 @@ class GetEventTest(EventTestBase):
         base = 0
         self.start = datetime.datetime(2013, 12, 31, 5, 0)
         now = self.start
-        for event_name in ['Foo', 'Bar', 'Zoo']:
+        for event_type in ['Foo', 'Bar', 'Zoo']:
             trait_models = \
                 [models.Trait(name, dtype, value)
                     for name, dtype, value in [
                         ('trait_A', models.Trait.TEXT_TYPE,
-                            "my_%s_text" % event_name),
+                            "my_%s_text" % event_type),
                         ('trait_B', models.Trait.INT_TYPE,
                             base + 1),
                         ('trait_C', models.Trait.FLOAT_TYPE,
                             float(base) + 0.123456),
                         ('trait_D', models.Trait.DATETIME_TYPE, now)]]
             event_models.append(
-                models.Event("id_%s" % event_name,
-                             event_name, now, trait_models))
+                models.Event("id_%s" % event_type,
+                             event_type, now, trait_models))
             base += 100
             now = now + datetime.timedelta(hours=1)
         self.end = now
@@ -2127,7 +2127,7 @@ class GetEventTest(EventTestBase):
         self.assertEqual(3, len(events))
         start_time = None
         for i, name in enumerate(["Foo", "Bar", "Zoo"]):
-            self.assertEqual(events[i].event_name, name)
+            self.assertEqual(events[i].event_type, name)
             self.assertEqual(4, len(events[i].traits))
             # Ensure sorted results ...
             if start_time is not None:
@@ -2135,11 +2135,11 @@ class GetEventTest(EventTestBase):
                 self.assertTrue(start_time < events[i].generated)
             start_time = events[i].generated
 
-    def test_simple_get_event_name(self):
+    def test_simple_get_event_type(self):
         event_filter = storage.EventFilter(self.start, self.end, "Bar")
         events = self.conn.get_events(event_filter)
         self.assertEqual(1, len(events))
-        self.assertEqual(events[0].event_name, "Bar")
+        self.assertEqual(events[0].event_type, "Bar")
         self.assertEqual(4, len(events[0].traits))
 
     def test_get_event_trait_filter(self):
@@ -2148,7 +2148,7 @@ class GetEventTest(EventTestBase):
                                            traits=trait_filters)
         events = self.conn.get_events(event_filter)
         self.assertEqual(1, len(events))
-        self.assertEqual(events[0].event_name, "Bar")
+        self.assertEqual(events[0].event_type, "Bar")
         self.assertEqual(4, len(events[0].traits))
 
     def test_simple_get_no_traits(self):
@@ -2159,5 +2159,5 @@ class GetEventTest(EventTestBase):
         self.assertEqual(0, len(bad_events))
         self.assertEqual(1, len(events))
         self.assertEqual(events[0].message_id, "id_notraits")
-        self.assertEqual(events[0].event_name, "NoTraits")
+        self.assertEqual(events[0].event_type, "NoTraits")
         self.assertEqual(0, len(events[0].traits))

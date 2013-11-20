@@ -849,15 +849,33 @@ class Connection(base.Connection):
         values[value_map[trait_model.dtype]] = value
         return models.Trait(name, event, trait_model.dtype, **values)
 
+    @staticmethod
+    def _get_or_create_event_type(event_type, session=None):
+        """Here, we check to see if an event type with the supplied
+        name already exists. If not, we create it and return the record.
+
+        This may result in a flush.
+        """
+        if session is None:
+            session = sqlalchemy_session.get_session()
+        with session.begin(subtransactions=True):
+            et = session.query(models.EventType).filter(
+                models.EventType.desc == event_type).first()
+            if not et:
+                et = models.EventType(event_type)
+                session.add(et)
+                session.flush()
+        return et
+
     def _record_event(self, session, event_model):
         """Store a single Event, including related Traits.
         """
         with session.begin(subtransactions=True):
-            unique = self._get_or_create_unique_name(event_model.event_name,
-                                                     session=session)
+            event_type = self._get_or_create_event_type(event_model.event_type,
+                                                        session=session)
 
             generated = utils.dt_to_decimal(event_model.generated)
-            event = models.Event(event_model.message_id, unique, generated)
+            event = models.Event(event_model.message_id, event_type, generated)
             session.add(event)
 
             new_traits = []
@@ -867,7 +885,7 @@ class Connection(base.Connection):
                     session.add(t)
                     new_traits.append(t)
 
-        # Note: we don't flush here, explicitly (unless a new uniquename
+        # Note: we don't flush here, explicitly (unless a new event_type
         # does it). Otherwise, just wait until all the Events are staged.
         return (event, new_traits)
 
@@ -900,7 +918,9 @@ class Connection(base.Connection):
         return problem_events
 
     def get_events(self, event_filter):
-        """Return an iterable of model.Event objects.
+        """Return an iterable of model.Event objects. The event model objects
+        have their Trait model objects available -- filtered by any traits
+        in the event_filter.
 
         :param event_filter: EventFilter instance
         """
@@ -909,17 +929,18 @@ class Connection(base.Connection):
         end = utils.dt_to_decimal(event_filter.end)
         session = sqlalchemy_session.get_session()
         with session.begin():
-            event_query_filters = [models.Event.generated >= start,
-                                   models.Event.generated <= end]
             sub_query = session.query(models.Event.id)\
-                .join(models.Trait, models.Trait.event_id == models.Event.id)
+                .join(models.EventType,
+                      models.Event.event_type_id == models.EventType.id)\
+                .join(models.Trait,
+                      models.Trait.event_id == models.Event.id)\
+                .filter(models.Event.generated >= start,
+                        models.Event.generated <= end)
 
-            if event_filter.event_name:
-                event_name = self._get_unique(session, event_filter.event_name)
-                event_query_filters.append(
-                    models.Event.unique_name == event_name)
-
-            sub_query = sub_query.filter(*event_query_filters)
+            if event_filter.event_type:
+                event_type = event_filter.event_type
+                sub_query = sub_query\
+                    .filter(models.EventType.desc == event_type)
 
             event_models_dict = {}
             if event_filter.traits:
@@ -943,11 +964,19 @@ class Connection(base.Connection):
             else:
                 # Pre-populate event_models_dict to cover Events without traits
                 events = session.query(models.Event)\
-                    .filter(*event_query_filters)
+                    .filter(models.Event.generated >= start)\
+                    .filter(models.Event.generated <= end)
+                if event_filter.event_type:
+                    events = events\
+                        .join(models.EventType,
+                              models.EventType.id ==
+                              models.Event.event_type_id)\
+                        .filter(models.EventType.desc ==
+                                event_filter.event_type)
                 for db_event in events.all():
                     generated = utils.decimal_to_dt(db_event.generated)
                     api_event = api_models.Event(db_event.message_id,
-                                                 db_event.unique_name.key,
+                                                 db_event.event_type.desc,
                                                  generated, [])
                     event_models_dict[db_event.id] = api_event
 
@@ -962,7 +991,7 @@ class Connection(base.Connection):
                 if not event:
                     generated = utils.decimal_to_dt(trait.event.generated)
                     event = api_models.Event(trait.event.message_id,
-                                             trait.event.unique_name.key,
+                                             trait.event.event_type.desc,
                                              generated, [])
                     event_models_dict[trait.event_id] = event
                 value = trait.get_value()

@@ -52,18 +52,18 @@ class Event(Model):
     DUPLICATE = 1
     UNKNOWN_PROBLEM = 2
 
-    def __init__(self, message_id, event_name, generated, traits):
+    def __init__(self, message_id, event_type, generated, traits):
         """Create a new event.
 
         :param message_id:  Unique ID for the message this event
                             stemmed from. This is different than
                             the Event ID, which comes from the
                             underlying storage system.
-        :param event_name:  Name of the event.
+        :param event_type:  The type of the event.
         :param generated:   UTC time for when the event occured.
         :param traits:      list of Traits on this Event.
         """
-        Model.__init__(self, message_id=message_id, event_name=event_name,
+        Model.__init__(self, message_id=message_id, event_type=event_type,
                        generated=generated, traits=traits)
 
     def append_trait(self, trait_model):
@@ -74,7 +74,7 @@ class Event(Model):
         if self.traits:
             trait_list = [str(trait) for trait in self.traits]
         return "<Event: %s, %s, %s, %s>" % \
-            (self.message_id, self.event_name, self.generated,
+            (self.message_id, self.event_type, self.generated,
              " ".join(trait_list))
 
 
