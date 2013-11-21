@@ -20,11 +20,12 @@
 """
 import os
 
+import mock
+
 from ceilometer.api import acl
 from ceilometer.api import app
 from ceilometer.openstack.common import fileutils
 from ceilometer.openstack.common.fixture import config
-from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer.openstack.common import gettextutils
 from ceilometer import service
 from ceilometer.tests.api.v2 import FunctionalTest
@@ -88,10 +89,6 @@ class TestApiMiddleware(FunctionalTest):
     no_lang_translated_error = 'No lang translated error'
     en_US_translated_error = 'en-US translated error'
 
-    def setUp(self):
-        super(TestApiMiddleware, self).setUp()
-        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
-
     def _fake_get_localized_message(self, message, user_locale):
         if user_locale is None:
             return self.no_lang_translated_error
@@ -141,14 +138,14 @@ class TestApiMiddleware(FunctionalTest):
 
     def test_json_parsable_error_middleware_translation_400(self):
         # Ensure translated messages get placed properly into json faults
-        self.stubs.Set(gettextutils, 'get_localized_message',
-                       self._fake_get_localized_message)
-        response = self.post_json('/alarms', params={'name': 'foobar',
-                                                     'type': 'threshold'},
-                                  expect_errors=True,
-                                  headers={"Accept":
-                                           "application/json"}
-                                  )
+        with mock.patch.object(gettextutils, 'get_localized_message',
+                               side_effect=self._fake_get_localized_message):
+            response = self.post_json('/alarms', params={'name': 'foobar',
+                                                         'type': 'threshold'},
+                                      expect_errors=True,
+                                      headers={"Accept":
+                                               "application/json"}
+                                      )
         self.assertEqual(response.status_int, 400)
         self.assertEqual(response.content_type, "application/json")
         self.assertTrue(response.json['error_message'])
@@ -176,15 +173,14 @@ class TestApiMiddleware(FunctionalTest):
 
     def test_xml_parsable_error_middleware_translation_400(self):
         # Ensure translated messages get placed properly into xml faults
-        self.stubs.Set(gettextutils, 'get_localized_message',
-                       self._fake_get_localized_message)
-
-        response = self.post_json('/alarms', params={'name': 'foobar',
-                                                     'type': 'threshold'},
-                                  expect_errors=True,
-                                  headers={"Accept":
-                                           "application/xml,*/*"}
-                                  )
+        with mock.patch.object(gettextutils, 'get_localized_message',
+                               side_effect=self._fake_get_localized_message):
+            response = self.post_json('/alarms', params={'name': 'foobar',
+                                                         'type': 'threshold'},
+                                      expect_errors=True,
+                                      headers={"Accept":
+                                               "application/xml,*/*"}
+                                      )
         self.assertEqual(response.status_int, 400)
         self.assertEqual(response.content_type, "application/xml")
         self.assertEqual(response.xml.tag, 'error_message')
@@ -194,17 +190,17 @@ class TestApiMiddleware(FunctionalTest):
 
     def test_best_match_language(self):
         # Ensure that we are actually invoking language negotiation
-        self.stubs.Set(gettextutils, 'get_localized_message',
-                       self._fake_get_localized_message)
+        with mock.patch.object(gettextutils, 'get_localized_message',
+                               side_effect=self._fake_get_localized_message):
+            response = self.post_json('/alarms', params={'name': 'foobar',
+                                                         'type': 'threshold'},
+                                      expect_errors=True,
+                                      headers={"Accept":
+                                               "application/xml,*/*",
+                                               "Accept-Language":
+                                               "en-US"}
+                                      )
 
-        response = self.post_json('/alarms', params={'name': 'foobar',
-                                                     'type': 'threshold'},
-                                  expect_errors=True,
-                                  headers={"Accept":
-                                           "application/xml,*/*",
-                                           "Accept-Language":
-                                           "en-US"}
-                                  )
         self.assertEqual(response.status_int, 400)
         self.assertEqual(response.content_type, "application/xml")
         self.assertEqual(response.xml.tag, 'error_message')
