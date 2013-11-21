@@ -189,10 +189,6 @@ class TestUDPCollectorService(TestCollector):
         self._verify_udp_socket(udp_socket)
 
 
-class MyException(Exception):
-    pass
-
-
 class TestCollectorService(TestCollector):
 
     def setUp(self):
