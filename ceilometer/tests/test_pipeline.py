@@ -21,7 +21,7 @@ import datetime
 
 from stevedore import extension
 
-from ceilometer.openstack.common.fixture import moxstubout
+from ceilometer.openstack.common.fixture import mockpatch
 from ceilometer.openstack.common import test
 from ceilometer.openstack.common import timeutils
 from ceilometer import pipeline
@@ -149,16 +149,16 @@ class TestPipeline(test.BaseTestCase):
             resource_metadata={}
         )
 
-        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
-        self.stubs.Set(transformer.TransformerExtensionManager,
-                       "__init__",
-                       self.fake_tem_init)
+        self.useFixture(mockpatch.PatchObject(
+            transformer.TransformerExtensionManager, "__init__",
+            side_effect=self.fake_tem_init))
 
-        self.stubs.Set(transformer.TransformerExtensionManager,
-                       "get_ext",
-                       self.fake_tem_get_ext)
+        self.useFixture(mockpatch.PatchObject(
+            transformer.TransformerExtensionManager, "get_ext",
+            side_effect=self.fake_tem_get_ext))
 
-        self.stubs.Set(publisher, 'get_publisher', self.get_publisher)
+        self.useFixture(mockpatch.PatchObject(
+            publisher, 'get_publisher', side_effect=self.get_publisher))
 
         self.transformer_manager = transformer.TransformerExtensionManager()
 

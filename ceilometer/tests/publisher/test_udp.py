@@ -24,7 +24,6 @@ import mock
 import msgpack
 
 from ceilometer.openstack.common.fixture import config
-from ceilometer.openstack.common.fixture import moxstubout
 from ceilometer.openstack.common import network_utils
 from ceilometer.openstack.common import test
 from ceilometer.publisher import udp
@@ -103,15 +102,13 @@ class TestUDPPublisher(test.BaseTestCase):
         def _fake_socket_socket(family, type):
             def record_data(msg, dest):
                 published.append((msg, dest))
-            udp_socket = self.mox.CreateMockAnything()
+            udp_socket = mock.Mock()
             udp_socket.sendto = record_data
-            self.mox.ReplayAll()
             return udp_socket
         return _fake_socket_socket
 
     def setUp(self):
         super(TestUDPPublisher, self).setUp()
-        self.mox = self.useFixture(moxstubout.MoxStubout()).mox
         self.CONF = self.useFixture(config.Config()).conf
 
     def test_published(self):
@@ -140,13 +137,13 @@ class TestUDPPublisher(test.BaseTestCase):
                          sorted([dict(d.as_dict()) for d in self.test_data]))
 
     @staticmethod
-    def _raise_ioerror():
+    def _raise_ioerror(*args):
         raise IOError
 
     def _make_broken_socket(self, family, type):
-        udp_socket = self.mox.CreateMockAnything()
+        udp_socket = mock.Mock()
         udp_socket.sendto = self._raise_ioerror
-        self.mox.ReplayAll()
+        return udp_socket
 
     def test_publish_error(self):
         with mock.patch('socket.socket',
