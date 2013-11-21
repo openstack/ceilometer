@@ -965,7 +965,7 @@ class Connection(base.Connection):
 
         :param events: a list of model.Event objects.
         """
-        raise NotImplementedError('Events not implemented.')
+        raise NotImplementedError(_('Events not implemented.'))
 
     @staticmethod
     def get_events(event_filter):
@@ -973,4 +973,32 @@ class Connection(base.Connection):
 
         :param event_filter: EventFilter instance
         """
-        raise NotImplementedError('Events not implemented.')
+        raise NotImplementedError(_('Events not implemented.'))
+
+    @staticmethod
+    def get_event_types():
+        """Return all event types as an iterable of strings.
+        """
+        raise NotImplementedError(_('EventTypes not implemented.'))
+
+    @staticmethod
+    def get_trait_types(event_type):
+        """Return a dictionary containing the name and data type of
+        the trait type. Only trait types for the provided event_type are
+        returned.
+
+        :param event_type: the type of the Event
+        """
+
+        raise NotImplementedError(_('Events not implemented.'))
+
+    @staticmethod
+    def get_traits(event_type, trait_type=None):
+        """Return all trait instances associated with an event_type. If
+        trait_type is specified, only return instances of that trait type.
+
+        :param event_type: the type of the Event to filter by
+        :param trait_type: the name of the Trait to filter by
+        """
+
+        raise NotImplementedError(_('Events not implemented.'))

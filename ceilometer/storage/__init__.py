@@ -116,23 +116,28 @@ class SampleFilter(object):
 class EventFilter(object):
     """Properties for building an Event query.
 
-    :param start: UTC start datetime (mandatory)
-    :param end: UTC end datetime (mandatory)
+    :param start_time: UTC start datetime (mandatory)
+    :param end_time: UTC end datetime (mandatory)
     :param event_type: the name of the event. None for all.
-    :param traits: the trait filter dict, all of which are optional
+    :param message_id: the message_id of the event. None for all.
+    :param traits_filter: the trait filter dicts, all of which are optional.
+                   This parameter is a list of dictionaries that specify
+                   trait values:
                     {'key': <key>,
                     't_string': <value>,
                     't_int': <value>,
                     't_datetime': <value>
-                    't_float': <value>}
-                   currently, only one trait dict is supported.
+                    't_float': <value>,
+                    'op': <eq, lt, le, ne, gt or ge> }
     """
 
-    def __init__(self, start, end, event_type=None, traits={}):
-        self.start = utils.sanitize_timestamp(start)
-        self.end = utils.sanitize_timestamp(end)
+    def __init__(self, start_time=None, end_time=None, event_type=None,
+                 message_id=None, traits_filter=[]):
+        self.start_time = utils.sanitize_timestamp(start_time)
+        self.end_time = utils.sanitize_timestamp(end_time)
+        self.message_id = message_id
         self.event_type = event_type
-        self.traits = traits
+        self.traits_filter = traits_filter
 
 
 def dbsync():

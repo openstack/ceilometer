@@ -597,17 +597,17 @@ class Connection(base.Connection):
         """Yields a lists of alarms that match filters
             raise NotImplementedError('metaquery not implemented')
         """
-        raise NotImplementedError('Alarms not implemented')
+        raise NotImplementedError(_('Alarms not implemented'))
 
     def create_alarm(self, alarm):
         """update alarm
         """
-        raise NotImplementedError('Alarms not implemented')
+        raise NotImplementedError(_('Alarms not implemented'))
 
     def update_alarm(self, alarm):
         """update alarm
         """
-        raise NotImplementedError('Alarms not implemented')
+        raise NotImplementedError(_('Alarms not implemented'))
 
     def get_alarm_changes(self, alarm_id, on_behalf_of,
                           user=None, project=None, type=None,
@@ -636,31 +636,56 @@ class Connection(base.Connection):
         :param end_timestamp: Optional modified timestamp end range
         :param end_timestamp_op: Optional timestamp end range operation
         """
-        raise NotImplementedError('Alarm history not implemented')
+        raise NotImplementedError(_('Alarm history not implemented'))
 
     def record_alarm_change(self, alarm_change):
         """Record alarm change event.
         """
-        raise NotImplementedError('Alarm history not implemented')
+        raise NotImplementedError(_('Alarm history not implemented'))
 
     def delete_alarm(self, alarm_id):
         """Delete a alarm
         """
-        raise NotImplementedError('Alarms not implemented')
+        raise NotImplementedError(_('Alarms not implemented'))
 
     def record_events(self, events):
         """Write the events.
 
         :param events: a list of model.Event objects.
         """
-        raise NotImplementedError('Events not implemented.')
+        raise NotImplementedError(_('Events not implemented.'))
 
     def get_events(self, event_filter):
         """Return an iterable of model.Event objects.
 
         :param event_filter: EventFilter instance
         """
-        raise NotImplementedError('Events not implemented.')
+        raise NotImplementedError(_('Events not implemented.'))
+
+    def get_event_types(self):
+        """Return all event types as an iterable of strings.
+        """
+        raise NotImplementedError(_('Events not implemented.'))
+
+    def get_trait_types(self, event_type):
+        """Return a dictionary containing the name and data type of
+        the trait type. Only trait types for the provided event_type are
+        returned.
+
+        :param event_type: the type of the Event
+        """
+
+        raise NotImplementedError(_('Events not implemented.'))
+
+    def get_traits(self, event_type, trait_type=None):
+        """Return all trait instances associated with an event_type. If
+        trait_type is specified, only return instances of that trait type.
+
+        :param event_type: the type of the Event to filter by
+        :param trait_type: the name of the Trait to filter by
+        """
+
+        raise NotImplementedError(_('Events not implemented.'))
 
 
 ###############
