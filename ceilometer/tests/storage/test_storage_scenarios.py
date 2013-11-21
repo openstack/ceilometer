@@ -2233,7 +2233,7 @@ class GetEventTest(EventTestBase):
                 self.assertEqual(expected_val, trait.value)
 
     def test_get_event_trait_filter(self):
-        trait_filters = [{'key': 'trait_B', 't_int': 101}]
+        trait_filters = [{'key': 'trait_B', 'integer': 101}]
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
         events = self.conn.get_events(event_filter)
@@ -2242,8 +2242,8 @@ class GetEventTest(EventTestBase):
         self.assertEqual(4, len(events[0].traits))
 
     def test_get_event_multiple_trait_filter(self):
-        trait_filters = [{'key': 'trait_B', 't_int': 1},
-                         {'key': 'trait_A', 't_string': 'my_Foo_text'}]
+        trait_filters = [{'key': 'trait_B', 'integer': 1},
+                         {'key': 'trait_A', 'string': 'my_Foo_text'}]
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
         events = self.conn.get_events(event_filter)
@@ -2252,8 +2252,8 @@ class GetEventTest(EventTestBase):
         self.assertEqual(4, len(events[0].traits))
 
     def test_get_event_multiple_trait_filter_expect_none(self):
-        trait_filters = [{'key': 'trait_B', 't_int': 1},
-                         {'key': 'trait_A', 't_string': 'my_Zoo_text'}]
+        trait_filters = [{'key': 'trait_B', 'integer': 1},
+                         {'key': 'trait_A', 'string': 'my_Zoo_text'}]
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
         events = self.conn.get_events(event_filter)
