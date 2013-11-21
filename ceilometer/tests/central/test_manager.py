@@ -18,11 +18,10 @@
 """Tests for ceilometer/central/manager.py
 """
 
-from keystoneclient.v2_0 import client as ksclient
 import mock
 
 from ceilometer.central import manager
-from ceilometer.openstack.common.fixture import moxstubout
+from ceilometer.openstack.common.fixture import mockpatch
 from ceilometer.openstack.common import test
 from ceilometer.tests import agentbase
 
@@ -42,8 +41,6 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
 
     def setUp(self):
         super(TestRunTasks, self).setUp()
-        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
-        self.stubs.Set(ksclient, 'Client', lambda *args, **kwargs: None)
-
-    def tearDown(self):
-        super(TestRunTasks, self).tearDown()
+        self.useFixture(mockpatch.Patch(
+            'keystoneclient.v2_0.client.Client',
+            return_value=None))
