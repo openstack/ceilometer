@@ -29,7 +29,7 @@ import urlparse
 
 import happybase
 
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import network_utils
 from ceilometer.openstack.common import timeutils

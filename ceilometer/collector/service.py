@@ -24,14 +24,14 @@ from stevedore import extension
 from stevedore import named
 
 from ceilometer.openstack.common import context
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common.rpc import dispatcher as rpc_dispatcher
 from ceilometer.openstack.common.rpc import service as rpc_service
 from ceilometer.openstack.common import service as os_service
 from ceilometer.openstack.common import timeutils
 from ceilometer import pipeline
-from ceilometer.service import prepare_service
+from ceilometer import service
 from ceilometer.storage import models
 from ceilometer import transformer
 
@@ -117,7 +117,7 @@ class UDPCollectorService(CollectorBase, os_service.Service):
 
 
 def udp_collector():
-    prepare_service()
+    service.prepare_service()
     os_service.launch(UDPCollectorService()).wait()
 
 
@@ -294,6 +294,6 @@ class CollectorService(CollectorBase, rpc_service.Service):
 
 
 def collector():
-    prepare_service()
+    service.prepare_service()
     os_service.launch(CollectorService(cfg.CONF.host,
                                        'ceilometer.collector')).wait()

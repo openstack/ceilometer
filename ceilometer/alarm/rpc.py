@@ -19,10 +19,10 @@
 from oslo.config import cfg
 
 from ceilometer.openstack.common import context
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common.rpc import proxy as rpc_proxy
-from ceilometer.storage.models import Alarm
+from ceilometer.storage import models
 
 OPTS = [
     cfg.StrOpt('notifier_rpc_topic',
@@ -46,7 +46,7 @@ class RPCAlarmNotifier(rpc_proxy.RpcProxy):
             topic=cfg.CONF.alarm.notifier_rpc_topic)
 
     def notify(self, alarm, previous, reason):
-        actions = getattr(alarm, Alarm.ALARM_ACTIONS_MAP[alarm.state])
+        actions = getattr(alarm, models.Alarm.ALARM_ACTIONS_MAP[alarm.state])
         if not actions:
             LOG.debug(_('alarm %(alarm_id)s has no action configured '
                         'for state transition from %(previous)s to '

@@ -17,7 +17,7 @@
 # under the License.
 """Tests for ceilometer/collector/dispatcher/database.py
 """
-from datetime import datetime
+import datetime
 
 import mock
 
@@ -84,7 +84,7 @@ class TestDispatcherDB(test.BaseTestCase):
         )
 
         expected = msg.copy()
-        expected['timestamp'] = datetime(2012, 7, 2, 13, 53, 40)
+        expected['timestamp'] = datetime.datetime(2012, 7, 2, 13, 53, 40)
 
         with mock.patch.object(self.dispatcher.storage_conn,
                                'record_metering_data') as record_metering_data:
@@ -104,7 +104,8 @@ class TestDispatcherDB(test.BaseTestCase):
         )
 
         expected = msg.copy()
-        expected['timestamp'] = datetime(2012, 9, 30, 23, 31, 50, 262000)
+        expected['timestamp'] = datetime.datetime(2012, 9, 30, 23,
+                                                  31, 50, 262000)
 
         with mock.patch.object(self.dispatcher.storage_conn,
                                'record_metering_data') as record_metering_data:

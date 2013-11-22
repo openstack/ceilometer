@@ -16,9 +16,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from collections import defaultdict
+import collections
 
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer import sample
@@ -34,7 +34,7 @@ class Namespace(object):
        to yield false when used in a boolean expression.
     """
     def __init__(self, seed):
-        self.__dict__ = defaultdict(lambda: Namespace({}))
+        self.__dict__ = collections.defaultdict(lambda: Namespace({}))
         self.__dict__.update(seed)
         for k, v in self.__dict__.iteritems():
             if isinstance(v, dict):

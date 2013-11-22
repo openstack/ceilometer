@@ -30,7 +30,6 @@ from mock import patch
 
 from ceilometer.storage import models
 from ceilometer.storage.sqlalchemy import models as sql_models
-from ceilometer.storage.sqlalchemy.models import table_args
 from ceilometer.tests import db as tests_db
 from ceilometer import utils
 
@@ -142,4 +141,4 @@ class ModelTest(tests_db.TestBase):
     database_connection = 'mysql://localhost'
 
     def test_model_table_args(self):
-        self.assertIsNotNone(table_args())
+        self.assertIsNotNone(sql_models.table_args())
