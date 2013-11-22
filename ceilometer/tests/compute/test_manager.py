@@ -21,7 +21,7 @@ import mock
 
 from ceilometer.compute import manager
 from ceilometer import nova_client
-from ceilometer.openstack.common.fixture import moxstubout
+from ceilometer.openstack.common.fixture import mockpatch
 from ceilometer.openstack.common import test
 from ceilometer.tests import agentbase
 
@@ -57,9 +57,14 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         # of instances to poll we can control the results.
         self.instance = self._fake_instance('faux', 'active')
         stillborn_instance = self._fake_instance('stillborn', 'error')
-        self.stubs = self.useFixture(moxstubout.MoxStubout()).stubs
-        self.stubs.Set(nova_client.Client, 'instance_get_all_by_host',
-                       lambda *x: [self.instance, stillborn_instance])
+
+        def instance_get_all_by_host(*args):
+            return [self.instance, stillborn_instance]
+
+        self.useFixture(mockpatch.PatchObject(
+            nova_client.Client,
+            'instance_get_all_by_host',
+            side_effect=lambda *x: [self.instance, stillborn_instance]))
 
     def test_notifier_task(self):
         self.mgr.setup_notifier_task()
@@ -79,8 +84,8 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
 
     def test_manager_exception_persistency(self):
         super(TestRunTasks, self).test_manager_exception_persistency()
-        self.stubs.Set(nova_client.Client, 'instance_get_all_by_host',
-                       lambda *x: self._raise_exception())
-        mgr = manager.AgentManager()
-        polling_task = manager.PollingTask(mgr)
-        polling_task.poll_and_publish()
+        with mock.patch.object(nova_client.Client, 'instance_get_all_by_host',
+                               side_effect=lambda *x: self._raise_exception()):
+            mgr = manager.AgentManager()
+            polling_task = manager.PollingTask(mgr)
+            polling_task.poll_and_publish()
