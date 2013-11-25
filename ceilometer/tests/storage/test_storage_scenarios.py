@@ -2161,3 +2161,21 @@ class GetEventTest(EventTestBase):
         self.assertEqual(events[0].message_id, "id_notraits")
         self.assertEqual(events[0].event_type, "NoTraits")
         self.assertEqual(0, len(events[0].traits))
+
+
+class BigIntegerTest(tests_db.TestBase,
+                     tests_db.MixinTestsWithBackendScenarios):
+    def test_metadata_bigint(self):
+        metadata = {'bigint': 99999999999999}
+        s = sample.Sample(name='name',
+                          type=sample.TYPE_GAUGE,
+                          unit='B',
+                          volume=1,
+                          user_id='user-id',
+                          project_id='project-id',
+                          resource_id='resource-id',
+                          timestamp=datetime.datetime.utcnow(),
+                          resource_metadata=metadata)
+        msg = rpc.meter_message_from_counter(
+            s, self.CONF.publisher_rpc.metering_secret)
+        self.conn.record_metering_data(msg)

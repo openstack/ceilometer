@@ -23,7 +23,7 @@ import urlparse
 
 from oslo.config import cfg
 from sqlalchemy import Column, Integer, String, Table, ForeignKey, DateTime, \
-    Index, UniqueConstraint
+    Index, UniqueConstraint, BigInteger
 from sqlalchemy import Float, Boolean, Text
 from sqlalchemy.dialects.mysql import DECIMAL
 from sqlalchemy.ext.declarative import declarative_base
@@ -165,7 +165,7 @@ class MetaBool(Base):
     value = Column(Boolean)
 
 
-class MetaInt(Base):
+class MetaBigInt(Base):
     """Metering integer metadata."""
 
     __tablename__ = 'metadata_int'
@@ -174,7 +174,7 @@ class MetaInt(Base):
     )
     id = Column(Integer, ForeignKey('meter.id'), primary_key=True)
     meta_key = Column(String(255), primary_key=True)
-    value = Column(Integer, default=False)
+    value = Column(BigInteger, default=False)
 
 
 class MetaFloat(Base):
