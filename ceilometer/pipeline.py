@@ -129,6 +129,10 @@ class Pipeline(object):
 
         self.transformers = self._setup_transformers(cfg, transformer_manager)
 
+        self.resources = cfg.get('resources') or []
+        if not isinstance(self.resources, list):
+            raise PipelineException("Resources should be a list", cfg)
+
     def __str__(self):
         return self.name
 
@@ -304,6 +308,7 @@ class PipelineManager(object):
             "name": pipeline_name
             "interval": interval_time
             "meters" :  ["meter_1", "meter_2"],
+            "resources": ["resource_uri1", "resource_uri2"],
             "tranformers":[
                               {"name": "Transformer_1",
                                "parameters": {"p1": "value"}},
@@ -328,6 +333,10 @@ class PipelineManager(object):
         Valid meters definition is all "included meter names", all
         "excluded meter names", wildcard and "excluded meter names", or
         only wildcard.
+
+        The resources is list of URI indicating the resources from where
+        the meters should be polled. It's optional and it's up to the
+        specific pollster to decide how to use it.
 
         Transformer's name is plugin name in setup.py.
 
