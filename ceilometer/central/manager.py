@@ -41,9 +41,11 @@ class PollingTask(agent.PollingTask):
             for pollster in self.pollsters:
                 try:
                     LOG.info(_("Polling pollster %s"), pollster.name)
+                    resources = list(self.resources[pollster.name])
                     samples = list(pollster.obj.get_samples(
                         self.manager,
                         cache,
+                        resources=resources,
                     ))
                     publisher(samples)
                 except Exception as err:

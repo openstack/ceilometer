@@ -21,6 +21,7 @@
 import abc
 import collections
 import fnmatch
+
 from oslo.config import cfg
 import six
 
@@ -90,7 +91,7 @@ class PollsterBase(PluginBase):
     """Base class for plugins that support the polling API."""
 
     @abc.abstractmethod
-    def get_samples(self, manager, cache):
+    def get_samples(self, manager, cache, resources=[]):
         """Return a sequence of Counter instances from polling the resources.
 
         :param manager: The service manager class invoking the plugin.
@@ -98,5 +99,8 @@ class PollsterBase(PluginBase):
                       between themselves when recomputing it would be
                       expensive (e.g., asking another service for a
                       list of objects).
+        :param resources: A list of the endpoints the pollster will get data
+                          from. It's up to the specific pollster to decide
+                          how to use it.
 
         """

@@ -17,6 +17,7 @@
 # under the License.
 
 import abc
+import collections
 import itertools
 
 from ceilometer.openstack.common import context
@@ -37,11 +38,17 @@ class PollingTask(object):
     def __init__(self, agent_manager):
         self.manager = agent_manager
         self.pollsters = set()
+        # Resource definitions are indexed by the pollster
+        # Use dict of set here to remove the duplicated resource definitions
+        # for each pollster.
+        self.resources = collections.defaultdict(set)
         self.publish_context = pipeline.PublishContext(
             agent_manager.context)
 
     def add(self, pollster, pipelines):
         self.publish_context.add_pipelines(pipelines)
+        for pipeline in pipelines:
+            self.resources[pollster.name].update(pipeline.resources)
         self.pollsters.update([pollster])
 
     @abc.abstractmethod
