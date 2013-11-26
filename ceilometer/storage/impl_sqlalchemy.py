@@ -643,8 +643,8 @@ class Connection(base.Connection):
         """
         session = sqlalchemy_session.get_session()
         with session.begin():
-            session.merge(User(id=alarm.user_id))
-            session.merge(Project(id=alarm.project_id))
+            Connection._create_or_update(session, User, alarm.user_id)
+            Connection._create_or_update(session, Project, alarm.project_id)
             alarm_row = Alarm(id=alarm.alarm_id)
             alarm_row.update(alarm.as_dict())
             session.add(alarm_row)
@@ -745,9 +745,12 @@ class Connection(base.Connection):
         """
         session = sqlalchemy_session.get_session()
         with session.begin():
-            session.merge(User(id=alarm_change['user_id']))
-            session.merge(Project(id=alarm_change['project_id']))
-            session.merge(Project(id=alarm_change['on_behalf_of']))
+            Connection._create_or_update(session, User,
+                                         alarm_change['user_id'])
+            Connection._create_or_update(session, Project,
+                                         alarm_change['project_id'])
+            Connection._create_or_update(session, Project,
+                                         alarm_change['on_behalf_of'])
             alarm_change_row = AlarmChange(event_id=alarm_change['event_id'])
             alarm_change_row.update(alarm_change)
             session.add(alarm_change_row)
