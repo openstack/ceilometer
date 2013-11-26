@@ -116,7 +116,7 @@ class EventFilter(object):
 
     :param start: UTC start datetime (mandatory)
     :param end: UTC end datetime (mandatory)
-    :param event_name: the name of the event. None for all.
+    :param event_type: the name of the event. None for all.
     :param traits: the trait filter dict, all of which are optional
                     {'key': <key>,
                     't_string': <value>,
@@ -126,10 +126,10 @@ class EventFilter(object):
                    currently, only one trait dict is supported.
     """
 
-    def __init__(self, start, end, event_name=None, traits={}):
+    def __init__(self, start, end, event_type=None, traits={}):
         self.start = utils.sanitize_timestamp(start)
         self.end = utils.sanitize_timestamp(end)
-        self.event_name = event_name
+        self.event_type = event_type
         self.traits = traits
 
 

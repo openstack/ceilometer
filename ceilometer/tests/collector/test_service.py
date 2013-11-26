@@ -260,7 +260,7 @@ class TestCollectorService(TestCollector):
         events = mock_dispatcher.record_events.call_args[0]
         self.assertEqual(1, len(events))
         event = events[0]
-        self.assertEqual("foo", event.event_name)
+        self.assertEqual("foo", event.event_type)
         self.assertEqual(now, event.generated)
         self.assertEqual(1, len(event.traits))
 

@@ -68,6 +68,27 @@ class UniqueNameTest(EventTestBase):
         self.assertTrue(repr.repr(u2))
 
 
+class EventTypeTest(EventTestBase):
+    # EventType is a construct specific to sqlalchemy
+    # Not applicable to other drivers.
+
+    def test_event_type_exists(self):
+        et1 = self.conn._get_or_create_event_type("foo")
+        self.assertTrue(et1.id >= 0)
+        et2 = self.conn._get_or_create_event_type("foo")
+        self.assertEqual(et1.id, et2.id)
+        self.assertEqual(et1.desc, et2.desc)
+
+    def test_event_type_unique(self):
+        et1 = self.conn._get_or_create_event_type("foo")
+        self.assertTrue(et1.id >= 0)
+        et2 = self.conn._get_or_create_event_type("blah")
+        self.assertNotEqual(et1.id, et2.id)
+        self.assertNotEqual(et1.desc, et2.desc)
+        # Test the method __repr__ returns a string
+        self.assertTrue(repr.repr(et2))
+
+
 class MyException(Exception):
     pass
 
