@@ -47,6 +47,7 @@ def upgrade(migrate_engine):
            "ON event.unique_name_id = unique_name.id "
            "GROUP BY unique_name.id")
     conn.execute(sql)
+    conn.close()
     # Now we need to drop the foreign key constraint, rename
     # the event.unique_name column, and re-add a new foreign
     # key constraint
@@ -76,7 +77,6 @@ def upgrade(migrate_engine):
     fkey.create()
 
     event.c.unique_name_id.drop()
-    conn.close()
 
 
 def downgrade(migrate_engine):
@@ -90,6 +90,7 @@ def downgrade(migrate_engine):
     sql = ("INSERT INTO unique_name "
            "SELECT event_type.id, event_type.desc FROM event_type")
     conn.execute(sql)
+    conn.close()
     # Drop the foreign key constraint to event_type, drop the
     # event_type table, rename the event.event_type column to
     # event.unique_name, and re-add the old foreign
