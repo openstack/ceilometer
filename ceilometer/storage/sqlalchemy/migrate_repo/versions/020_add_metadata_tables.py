@@ -53,22 +53,17 @@ def upgrade(migrate_engine):
         meter_id = row['id']
         rmeta = json.loads(row['resource_metadata'])
         for key, v in utils.dict_to_keyval(rmeta):
+            ins = None
             if isinstance(v, basestring) or v is None:
-                meta_tables['metadata_text'].insert().values(id=meter_id,
-                                                             meta_key=key,
-                                                             value=v)
+                ins = meta_tables['metadata_text'].insert()
             elif isinstance(v, bool):
-                meta_tables['metadata_bool'].insert().values(id=meter_id,
-                                                             meta_key=key,
-                                                             value=v)
+                ins = meta_tables['metadata_bool'].insert()
             elif isinstance(v, (int, long)):
-                meta_tables['metadata_int'].insert().values(id=meter_id,
-                                                            meta_key=key,
-                                                            value=v)
+                ins = meta_tables['metadata_int'].insert()
             elif isinstance(v, float):
-                meta_tables['metadata_float'].insert().values(id=meter_id,
-                                                              meta_key=key,
-                                                              value=v)
+                ins = meta_tables['metadata_float'].insert()
+            if ins:
+                ins.values(id=meter_id, meta_key=key, value=v).execute()
 
 
 def downgrade(migrate_engine):
