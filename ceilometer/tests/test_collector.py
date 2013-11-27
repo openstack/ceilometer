@@ -15,9 +15,6 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Tests for ceilometer/agent/service.py
-"""
-
 import socket
 
 import mock
@@ -26,7 +23,7 @@ import msgpack
 from stevedore import extension
 from stevedore.tests import manager as test_manager
 
-from ceilometer.collector import service
+from ceilometer import collector
 from ceilometer.openstack.common.fixture import config
 from ceilometer import sample
 from ceilometer.tests import base as tests_base
@@ -37,7 +34,7 @@ class TestCollector(tests_base.BaseTestCase):
         super(TestCollector, self).setUp()
         self.CONF = self.useFixture(config.Config()).conf
         self.CONF.set_override("connection", "log://", group='database')
-        self.srv = service.CollectorService('the-host', 'the-topic')
+        self.srv = collector.CollectorService('the-host', 'the-topic')
         self.counter = sample.Sample(
             name='foobar',
             type='bad',
