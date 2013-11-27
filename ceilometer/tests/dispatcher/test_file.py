@@ -15,14 +15,11 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Tests for ceilometer/collector/dispatcher/file.py
-"""
-
 import logging.handlers
 import os
 import tempfile
 
-from ceilometer.collector.dispatcher import file
+from ceilometer.dispatcher import file
 from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import test
 from ceilometer.publisher import rpc

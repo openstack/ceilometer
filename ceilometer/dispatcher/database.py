@@ -16,7 +16,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from ceilometer.collector import dispatcher
+from ceilometer import dispatcher
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer.publisher import rpc as publisher_rpc

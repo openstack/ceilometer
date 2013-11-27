@@ -499,8 +499,8 @@ configured in ceilometer configuration file. These two dispatchers are
 shipped in the Ceilometer egg and defined in the entry_points as follows::
 
    [ceilometer.dispatcher]
-   file = ceilometer.collector.dispatcher.file:FileDispatcher
-   database = ceilometer.collector.dispatcher.database:DatabaseDispatcher
+   file = ceilometer.dispatcher.file:FileDispatcher
+   database = ceilometer.dispatcher.database:DatabaseDispatcher
 
 To use both dispatchers on a Ceilometer collector service, add the following
 line in file ceilometer.conf::

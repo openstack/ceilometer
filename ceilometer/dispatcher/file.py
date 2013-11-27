@@ -21,7 +21,7 @@ import logging.handlers
 
 from oslo.config import cfg
 
-from ceilometer.collector import dispatcher
+from ceilometer import dispatcher
 
 file_dispatcher_opts = [
     cfg.StrOpt('file_path',
