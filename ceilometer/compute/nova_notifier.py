@@ -56,15 +56,12 @@ class DeletedInstanceStatsGatherer(object):
         self.mgr = extensions
         self.inspector = inspector.get_hypervisor_inspector()
 
-    def _get_samples_from_plugin(self, ext, cache, instance, *args, **kwds):
-        """Used with the extenaion manager map() method."""
-        return ext.obj.get_samples(self, cache, instance)
-
     def __call__(self, instance):
         cache = {}
-        samples = self.mgr.map(self._get_samples_from_plugin,
-                               cache=cache,
-                               instance=instance)
+        samples = self.mgr.map_method('get_samples',
+                                      self,
+                                      cache,
+                                      instance)
         # samples is a list of lists, so flatten it before returning
         # the results
         results = []

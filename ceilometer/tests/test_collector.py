@@ -64,6 +64,22 @@ class TestCollector(tests_base.BaseTestCase):
         udp_socket.bind.assert_called_once_with((conf.udp_address,
                                                  conf.udp_port))
 
+    def test_record_metering_data(self):
+        mock_dispatcher = mock.MagicMock()
+        self.srv.dispatcher_manager = test_manager.TestExtensionManager(
+            [extension.Extension('test',
+                                 None,
+                                 None,
+                                 mock_dispatcher
+                                 ),
+             ])
+
+        self.srv.record_metering_data(None, self.counter)
+
+        mock_dispatcher.record_metering_data.assert_called_once_with(
+            context=None,
+            data=self.counter)
+
     def test_udp_receive(self):
         mock_dispatcher = mock.MagicMock()
         self.srv.dispatcher_manager = test_manager.TestExtensionManager(
@@ -86,6 +102,7 @@ class TestCollector(tests_base.BaseTestCase):
         self._verify_udp_socket(udp_socket)
 
         mock_dispatcher.record_metering_data.assert_called_once_with(
+            None,
             self.counter)
 
     def test_udp_receive_storage_error(self):
@@ -112,6 +129,7 @@ class TestCollector(tests_base.BaseTestCase):
         self._verify_udp_socket(udp_socket)
 
         mock_dispatcher.record_metering_data.assert_called_once_with(
+            None,
             self.counter)
 
     @staticmethod
