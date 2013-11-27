@@ -225,7 +225,9 @@ class TestNovaNotifier(test.BaseTestCase):
                                    'instance_destroy',
                                    return_value=self.instance):
                 self.compute.terminate_instance(self.context,
-                                                instance=self.instance)
+                                                instance=self.instance,
+                                                bdms=[],
+                                                reservations=[])
 
     def tearDown(self):
         self.Pollster.instances = []
