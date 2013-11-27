@@ -78,7 +78,7 @@ class FileDispatcher(dispatcher.Base):
             dispatcher_logger.addHandler(rfh)
             self.log = dispatcher_logger
 
-    def record_metering_data(self, context, data):
+    def record_metering_data(self, data):
         if self.log:
             self.log.info(data)
 
