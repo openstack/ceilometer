@@ -96,8 +96,8 @@ META_TYPE_MAP = {bool: models.MetaBool,
                  str: models.MetaText,
                  unicode: models.MetaText,
                  types.NoneType: models.MetaText,
-                 int: models.MetaInt,
-                 long: models.MetaInt,
+                 int: models.MetaBigInt,
+                 long: models.MetaBigInt,
                  float: models.MetaFloat}
 
 
