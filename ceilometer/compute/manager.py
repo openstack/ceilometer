@@ -75,19 +75,6 @@ class AgentManager(agent.AgentManager):
     def create_polling_task(self):
         return PollingTask(self)
 
-    def setup_notifier_task(self):
-        """For nova notifier usage."""
-        task = PollingTask(self)
-        for pollster in self.pollster_manager.extensions:
-            task.add(
-                pollster,
-                self.pipeline_manager.pipelines)
-        self.notifier_task = task
-
-    def poll_instance(self, context, instance):
-        """Poll one instance."""
-        self.notifier_task.poll_and_publish_instances([instance])
-
     @property
     def inspector(self):
         return self._inspector
