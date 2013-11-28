@@ -1,6 +1,4 @@
 *.pyc
-*.dat
-TAGS
 *.egg-info
 build
 .coverage
@@ -10,7 +8,6 @@ cover
 subunit.log
 AUTHORS
 ChangeLog
-*.deb
 dist
 *.egg
 ceilometer/versioninfo
