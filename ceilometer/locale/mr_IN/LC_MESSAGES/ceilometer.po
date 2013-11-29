@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-11-20 06:06+0000\n"
+"POT-Creation-Date: 2013-11-29 06:05+0000\n"
 "PO-Revision-Date: 2013-10-18 09:52+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Marathi (India) "
@@ -17,6 +17,15 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
+
+#: ceilometer/collector.py:75
+#, python-format
+msgid "UDP: Cannot decode data sent by %s"
+msgstr ""
+
+#: ceilometer/collector.py:86
+msgid "UDP: Unable to store meter"
+msgstr ""
 
 #: ceilometer/alarm/rpc.py:51
 #, python-format
@@ -72,87 +81,87 @@ msgstr ""
 msgid "alarm state update failed"
 msgstr ""
 
-#: ceilometer/alarm/evaluator/combination.py:36
+#: ceilometer/alarm/evaluator/combination.py:35
 msgid "alarm retrieval failed"
 msgstr ""
 
-#: ceilometer/alarm/evaluator/combination.py:47
+#: ceilometer/alarm/evaluator/combination.py:46
 #, python-format
 msgid "%(missing_states)d alarms in %(alarm_ids)s are in unknown state"
 msgstr ""
 
-#: ceilometer/alarm/evaluator/combination.py:60
+#: ceilometer/alarm/evaluator/combination.py:59
 #, python-format
 msgid ""
 "Transition to %(state)s due at least to one alarm in %(alarm_ids)s in "
 "state %(state)s"
 msgstr ""
 
-#: ceilometer/alarm/evaluator/combination.py:64
+#: ceilometer/alarm/evaluator/combination.py:63
 #, python-format
 msgid ""
 "Remaining as %(state)s due at least to one alarm in %(alarm_ids)s in "
 "state %(state)s"
 msgstr ""
 
-#: ceilometer/alarm/evaluator/combination.py:70
+#: ceilometer/alarm/evaluator/combination.py:69
 #, python-format
 msgid ""
 "Transition to %(state)s due to all alarms (%(alarm_ids)s) in state "
 "%(state)s"
 msgstr ""
 
-#: ceilometer/alarm/evaluator/combination.py:74
+#: ceilometer/alarm/evaluator/combination.py:73
 #, python-format
 msgid ""
 "Remaining as %(state)s due to all alarms (%(alarm_ids)s) in state "
 "%(state)s"
 msgstr ""
 
-#: ceilometer/alarm/evaluator/threshold.py:58
+#: ceilometer/alarm/evaluator/threshold.py:57
 #, python-format
 msgid "query stats from %(start)s to %(now)s"
 msgstr ""
 
-#: ceilometer/alarm/evaluator/threshold.py:71
+#: ceilometer/alarm/evaluator/threshold.py:70
 #, python-format
 msgid "sanitize stats %s"
 msgstr ""
 
-#: ceilometer/alarm/evaluator/threshold.py:75
+#: ceilometer/alarm/evaluator/threshold.py:74
 #, python-format
 msgid "pruned statistics to %d"
 msgstr ""
 
-#: ceilometer/alarm/evaluator/threshold.py:80
+#: ceilometer/alarm/evaluator/threshold.py:79
 #, python-format
 msgid "stats query %s"
 msgstr ""
 
-#: ceilometer/alarm/evaluator/threshold.py:86
+#: ceilometer/alarm/evaluator/threshold.py:85
 msgid "alarm stats retrieval failed"
 msgstr ""
 
-#: ceilometer/alarm/evaluator/threshold.py:95
+#: ceilometer/alarm/evaluator/threshold.py:94
 #, python-format
 msgid "%d datapoints are unknown"
 msgstr ""
 
-#: ceilometer/alarm/evaluator/threshold.py:108
+#: ceilometer/alarm/evaluator/threshold.py:107
 #, python-format
 msgid ""
 "Transition to %(state)s due to %(count)d samples %(disposition)s "
 "threshold, most recent: %(last)s"
 msgstr ""
 
-#: ceilometer/alarm/evaluator/threshold.py:112
+#: ceilometer/alarm/evaluator/threshold.py:111
 #, python-format
 msgid ""
 "Remaining as %(state)s due to %(count)d samples %(disposition)s "
 "threshold, most recent: %(last)s"
 msgstr ""
 
-#: ceilometer/alarm/evaluator/threshold.py:162
+#: ceilometer/alarm/evaluator/threshold.py:161
 #, python-format
 msgid "comparing value %(value)s against threshold %(limit)s"
 msgstr ""
@@ -370,50 +379,41 @@ msgstr ""
 msgid "Alarm with that name exists"
 msgstr ""
 
-#: ceilometer/collector/service.py:100
-#, python-format
-msgid "UDP: Cannot decode data sent by %s"
-msgstr ""
-
-#: ceilometer/collector/service.py:112
-msgid "UDP: Unable to store meter"
-msgstr ""
-
-#: ceilometer/compute/nova_notifier.py:84
+#: ceilometer/compute/nova_notifier.py:81
 #, python-format
 msgid "using provided stats gatherer %r"
 msgstr ""
 
-#: ceilometer/compute/nova_notifier.py:87
+#: ceilometer/compute/nova_notifier.py:84
 msgid "making a new stats gatherer"
 msgstr ""
 
-#: ceilometer/compute/nova_notifier.py:114
+#: ceilometer/compute/nova_notifier.py:111
 #, python-format
 msgid "INFO %r"
 msgstr ""
 
-#: ceilometer/compute/nova_notifier.py:146
+#: ceilometer/compute/nova_notifier.py:143
 #, python-format
 msgid "ignoring %s"
 msgstr ""
 
-#: ceilometer/compute/nova_notifier.py:148
+#: ceilometer/compute/nova_notifier.py:145
 #, python-format
 msgid "processing %s"
 msgstr ""
 
-#: ceilometer/compute/nova_notifier.py:152
+#: ceilometer/compute/nova_notifier.py:149
 #, python-format
 msgid "polling final stats for %r"
 msgstr ""
 
-#: ceilometer/compute/virt/hyperv/utilsv2.py:162
+#: ceilometer/compute/virt/hyperv/utilsv2.py:166
 #, python-format
 msgid "VM %s not found on Hyper-V"
 msgstr ""
 
-#: ceilometer/compute/virt/hyperv/utilsv2.py:164
+#: ceilometer/compute/virt/hyperv/utilsv2.py:168
 #, python-format
 msgid "Duplicate VM name found: %s"
 msgstr ""
@@ -1256,9 +1256,9 @@ msgstr ""
 #: ceilometer/storage/impl_hbase.py:393 ceilometer/storage/impl_mongodb.py:606
 #: ceilometer/storage/impl_mongodb.py:688
 #: ceilometer/storage/impl_mongodb.py:864
-#: ceilometer/storage/impl_sqlalchemy.py:351
-#: ceilometer/storage/impl_sqlalchemy.py:457
-#: ceilometer/storage/impl_sqlalchemy.py:675
+#: ceilometer/storage/impl_sqlalchemy.py:352
+#: ceilometer/storage/impl_sqlalchemy.py:454
+#: ceilometer/storage/impl_sqlalchemy.py:674
 msgid "Pagination not implemented"
 msgstr ""
 
@@ -1267,21 +1267,21 @@ msgstr ""
 msgid "Connecting to MongoDB on %s"
 msgstr ""
 
-#: ceilometer/storage/impl_sqlalchemy.py:131
+#: ceilometer/storage/impl_sqlalchemy.py:117
 #, python-format
 msgid "Query on %(key)s is of %(value)s type and is not supported"
 msgstr ""
 
-#: ceilometer/storage/impl_sqlalchemy.py:153
+#: ceilometer/storage/impl_sqlalchemy.py:139
 msgid "Missing required meter specifier"
 msgstr ""
 
-#: ceilometer/storage/impl_sqlalchemy.py:266
+#: ceilometer/storage/impl_sqlalchemy.py:267
 #, python-format
 msgid "Unknown metadata type. Key (%s) will not be queryable."
 msgstr ""
 
-#: ceilometer/storage/impl_sqlalchemy.py:609
+#: ceilometer/storage/impl_sqlalchemy.py:608
 msgid "Unable to group by these fields"
 msgstr ""
 
