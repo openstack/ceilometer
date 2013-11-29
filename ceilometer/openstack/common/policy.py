@@ -1,5 +1,3 @@
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
-
 # Copyright (c) 2012 OpenStack Foundation.
 # All Rights Reserved.
 #
@@ -505,7 +503,7 @@ def _parse_list_rule(rule):
             continue
 
         # Handle bare strings
-        if isinstance(inner_rule, basestring):
+        if isinstance(inner_rule, six.string_types):
             inner_rule = [inner_rule]
 
         # Parse the inner rules into Check objects
@@ -763,7 +761,7 @@ def parse_rule(rule):
     """Parses a policy rule into a tree of Check objects."""
 
     # If the rule is a string, it's in the policy language
-    if isinstance(rule, basestring):
+    if isinstance(rule, six.string_types):
         return _parse_text_rule(rule)
     return _parse_list_rule(rule)
 

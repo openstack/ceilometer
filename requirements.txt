@@ -19,6 +19,7 @@ python-novaclient>=2.15.0
 python-keystoneclient>=0.4.1
 python-ceilometerclient>=1.0.6
 python-swiftclient>=1.5
+lockfile>=0.8
 lxml>=2.3
 requests>=1.1
 six>=1.4.1

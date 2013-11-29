@@ -1,5 +1,3 @@
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
-
 # Copyright 2011 OpenStack Foundation.
 # All Rights Reserved.
 #
@@ -24,6 +22,8 @@ import datetime
 import errno
 import socket
 import time
+from xml.dom import minidom
+from xml.parsers import expat
 
 import eventlet.wsgi
 from oslo.config import cfg
@@ -32,8 +32,6 @@ import routes.middleware
 import six
 import webob.dec
 import webob.exc
-from xml.dom import minidom
-from xml.parsers import expat
 
 from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import jsonutils
@@ -41,6 +39,7 @@ from ceilometer.openstack.common import log as logging
 from ceilometer.openstack.common import service
 from ceilometer.openstack.common import sslutils
 from ceilometer.openstack.common import xmlutils
+
 
 socket_opts = [
     cfg.IntOpt('backlog',
