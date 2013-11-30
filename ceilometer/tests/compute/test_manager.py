@@ -66,13 +66,6 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
             'instance_get_all_by_host',
             side_effect=lambda *x: [self.instance, stillborn_instance]))
 
-    def test_notifier_task(self):
-        self.mgr.setup_notifier_task()
-        self.mgr.poll_instance(None, self.instance)
-        self.assertEqual(len(self.Pollster.samples), 1)
-        pub = self.mgr.pipeline_manager.pipelines[0].publishers[0]
-        self.assertEqual(pub.samples[0], self.Pollster.test_data)
-
     def test_setup_polling_tasks(self):
         super(TestRunTasks, self).test_setup_polling_tasks()
         self.assertTrue(self.Pollster.samples[0][1] is self.instance)
