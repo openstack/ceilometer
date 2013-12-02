@@ -70,6 +70,11 @@ Installing the notification agent
      use = egg:ceilometer#swift
      metadata_headers = X-FOO, X-BAR
 
+   .. note::
+
+        Please make sure that ceilometer's logging directory (if it's configured)
+        is read and write accessible for the user swift is started by.
+
 4. Clone the ceilometer git repository to the management server::
 
    $ cd /opt/stack
