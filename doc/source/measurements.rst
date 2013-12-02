@@ -180,6 +180,40 @@ energy                      Cumulative  kWh         probe ID  pollster  Amount o
 power                       Gauge       W           probe ID  pollster  Power consumption
 ==========================  ==========  ==========  ========  ========= ==============================================
 
+Network (From SDN Controller)
+=============
+
+These meters based on OpenFlow Switch metrics.
+In order to enable these meters, each driver needs to be configured.
+
+=================================  ==========  ======  =========  ========  ==============================
+Meter                              Type        Unit    Resource   Origin    Note
+=================================  ==========  ======  =========  ========  ==============================
+switch                             Gauge       switch  switch ID  pollster  Existence of switch
+switch.port                        Gauge       port    switch ID  pollster  Existence of port
+switch.port.receive.packets        Cumulative  packet  switch ID  pollster  Received Packets
+switch.port.transmit.packets       Cumulative  packet  switch ID  pollster  Transmitted Packets
+switch.port.receive.bytes          Cumulative  B       switch ID  pollster  Received Bytes
+switch.port.transmit.bytes         Cumulative  B       switch ID  pollster  Transmitted Bytes
+switch.port.receive.drops          Cumulative  packet  switch ID  pollster  Receive Drops
+switch.port.transmit.drops         Cumulative  packet  switch ID  pollster  Transmit Drops
+switch.port.receive.errors         Cumulative  packet  switch ID  pollster  Receive Errors
+switch.port.transmit.errors        Cumulative  packet  switch ID  pollster  Transmit Errors
+switch.port.receive.frame_error    Cumulative  packet  switch ID  pollster  Receive Frame Alignment Errors
+switch.port.receive.overrun_error  Cumulative  packet  switch ID  pollster  Receive Overrun Errors
+switch.port.receive.crc_error      Cumulative  packet  switch ID  pollster  Receive CRC Errors
+switch.port.collision.count        Cumulative  count   switch ID  pollster  Collisions
+switch.table                       Gauge       table   switch ID  pollster  Duration of Table
+switch.table.active.entries        Gauge       entry   switch ID  pollster  Active Entries
+switch.table.lookup.packets        Gauge       packet  switch ID  pollster  Packet Lookups
+switch.table.matched.packets       Gauge       packet  switch ID  pollster  Packet Matches
+switch.flow                        Gauge       flow    switch ID  pollster  Duration of Flow
+switch.flow.duration.seconds       Gauge       s       switch ID  pollster  Duration(seconds)
+switch.flow.duration.nanoseconds   Gauge       ns      switch ID  pollster  Duration(nanoseconds)
+switch.flow.packets                Cumulative  packet  switch ID  pollster  Received Packets
+switch.flow.bytes                  Cumulative  B       switch ID  pollster  Received Bytes
+=================================  ==========  ======  =========  ========  ==============================
+
 Dynamically retrieving the Meters via ceilometer client
 =======================================================
 
