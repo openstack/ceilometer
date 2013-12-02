@@ -4,6 +4,7 @@
     interval: 600
     meters:
         - "*"
+    resources:
     transformers:
     publishers:
         - rpc://
