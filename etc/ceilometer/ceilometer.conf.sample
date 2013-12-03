@@ -24,6 +24,7 @@
 #
 
 # Source for samples emited on this instance (string value)
+# Deprecated group/name - [DEFAULT]/counter_source
 #sample_source=openstack
 
 
@@ -108,6 +109,7 @@
 #
 
 # Exchange name for Neutron notifications (string value)
+# Deprecated group/name - [DEFAULT]/quantum_control_exchange
 #neutron_control_exchange=neutron
 
 
@@ -202,7 +204,7 @@
 #logging_exception_prefix=%(asctime)s.%(msecs)03d %(process)d TRACE %(name)s %(instance)s
 
 # list of logger=LEVEL pairs (list value)
-#default_log_levels=amqp=WARN,amqplib=WARN,boto=WARN,keystone=INFO,qpid=WARN,sqlalchemy=WARN,suds=INFO
+#default_log_levels=amqp=WARN,amqplib=WARN,boto=WARN,keystone=INFO,qpid=WARN,sqlalchemy=WARN,suds=INFO,iso8601=WARN
 
 # publish error events (boolean value)
 #publish_errors=false
@@ -223,6 +225,7 @@
 # configuration to any other existing logging options. Please
 # see the Python logging module documentation for details on
 # logging configuration files. (string value)
+# Deprecated group/name - [DEFAULT]/log_config
 #log_config_append=<None>
 
 # DEPRECATED. A logging.Formatter log message format string
@@ -238,10 +241,12 @@
 
 # (Optional) Name of log file to output to. If no default is
 # set, logging will go to stdout. (string value)
+# Deprecated group/name - [DEFAULT]/logfile
 #log_file=<None>
 
 # (Optional) The base directory used for relative --log-file
 # paths (string value)
+# Deprecated group/name - [DEFAULT]/logdir
 #log_dir=<None>
 
 # Use syslog for logging. (boolean value)
@@ -257,6 +262,7 @@
 
 # the maximum body size per each request(bytes) (integer
 # value)
+# Deprecated group/name - [DEFAULT]/osapi_max_request_body_size
 #max_request_body_size=114688
 
 
@@ -319,8 +325,8 @@
 # by impl_zmq. (integer value)
 #rpc_cast_timeout=30
 
-# Modules of exceptions that are permitted to be recreatedupon
-# receiving exception data from an rpc call. (list value)
+# Modules of exceptions that are permitted to be recreated
+# upon receiving exception data from an rpc call. (list value)
 #allowed_rpc_exception_modules=nova.exception,cinder.exception,exceptions
 
 # If passed, use a fake RabbitMQ provider (boolean value)
@@ -336,6 +342,7 @@
 #
 
 # Use durable queues in amqp. (boolean value)
+# Deprecated group/name - [DEFAULT]/rabbit_durable_queues
 #amqp_durable_queues=false
 
 # Auto-delete queues in amqp. (boolean value)
@@ -551,10 +558,12 @@
 #
 
 # The backend to use for db (string value)
+# Deprecated group/name - [DEFAULT]/db_backend
 #backend=sqlalchemy
 
 # Enable the experimental use of thread pooling for all DB API
 # calls (boolean value)
+# Deprecated group/name - [DEFAULT]/dbapi_use_tpool
 #use_tpool=false
 
 
@@ -564,6 +573,9 @@
 
 # The SQLAlchemy connection string used to connect to the
 # database (string value)
+# Deprecated group/name - [DEFAULT]/sql_connection
+# Deprecated group/name - [DATABASE]/sql_connection
+# Deprecated group/name - [sql]/connection
 #connection=sqlite:////ceilometer/openstack/common/db/$sqlite_db
 
 # The SQLAlchemy connection string used to connect to the
@@ -572,38 +584,53 @@
 
 # timeout before idle sql connections are reaped (integer
 # value)
+# Deprecated group/name - [DEFAULT]/sql_idle_timeout
+# Deprecated group/name - [DATABASE]/sql_idle_timeout
 #idle_timeout=3600
 
 # Minimum number of SQL connections to keep open in a pool
 # (integer value)
+# Deprecated group/name - [DEFAULT]/sql_min_pool_size
+# Deprecated group/name - [DATABASE]/sql_min_pool_size
 #min_pool_size=1
 
 # Maximum number of SQL connections to keep open in a pool
 # (integer value)
+# Deprecated group/name - [DEFAULT]/sql_max_pool_size
+# Deprecated group/name - [DATABASE]/sql_max_pool_size
 #max_pool_size=<None>
 
 # maximum db connection retries during startup. (setting -1
 # implies an infinite retry count) (integer value)
+# Deprecated group/name - [DEFAULT]/sql_max_retries
+# Deprecated group/name - [DATABASE]/sql_max_retries
 #max_retries=10
 
 # interval between retries of opening a sql connection
 # (integer value)
+# Deprecated group/name - [DEFAULT]/sql_retry_interval
+# Deprecated group/name - [DATABASE]/reconnect_interval
 #retry_interval=10
 
 # If set, use this value for max_overflow with sqlalchemy
 # (integer value)
+# Deprecated group/name - [DEFAULT]/sql_max_overflow
+# Deprecated group/name - [DATABASE]/sqlalchemy_max_overflow
 #max_overflow=<None>
 
 # Verbosity of SQL debugging information. 0=None,
 # 100=Everything (integer value)
+# Deprecated group/name - [DEFAULT]/sql_connection_debug
 #connection_debug=0
 
 # Add python stack traces to SQL as comment strings (boolean
 # value)
+# Deprecated group/name - [DEFAULT]/sql_connection_trace
 #connection_trace=false
 
 # If set, use this value for pool_timeout with sqlalchemy
 # (integer value)
+# Deprecated group/name - [DATABASE]/sqlalchemy_pool_timeout
 #pool_timeout=<None>
 
 
@@ -667,6 +694,7 @@
 # Period of evaluation cycle, should be >= than configured
 # pipeline interval for collection of underlying metrics.
 # (integer value)
+# Deprecated group/name - [alarm]/threshold_evaluation_interval
 #evaluation_interval=60
 
 # Class to launch as alarm evaluation service (string value)
@@ -698,6 +726,7 @@
 #
 
 # The port for the ceilometer API server (integer value)
+# Deprecated group/name - [DEFAULT]/metering_api_port
 #port=8777
 
 # The listen IP for the ceilometer API server (string value)
@@ -760,119 +789,6 @@
 #backup_count=0
 
 
-[keystone_authtoken]
-
-#
-# Options defined in keystoneclient.middleware.auth_token
-#
-
-# Prefix to prepend at the beginning of the path (string
-# value)
-#auth_admin_prefix=
-
-# Host providing the admin Identity API endpoint (string
-# value)
-#auth_host=127.0.0.1
-
-# Port of the admin Identity API endpoint (integer value)
-#auth_port=35357
-
-# Protocol of the admin Identity API endpoint(http or https)
-# (string value)
-#auth_protocol=https
-
-# Complete public Identity API endpoint (string value)
-#auth_uri=<None>
-
-# API version of the admin Identity API endpoint (string
-# value)
-#auth_version=<None>
-
-# Do not handle authorization requests within the middleware,
-# but delegate the authorization decision to downstream WSGI
-# components (boolean value)
-#delay_auth_decision=false
-
-# Request timeout value for communicating with Identity API
-# server. (boolean value)
-#http_connect_timeout=<None>
-
-# How many times are we trying to reconnect when communicating
-# with Identity API Server. (integer value)
-#http_request_max_retries=3
-
-# Allows to pass in the name of a fake http_handler callback
-# function used instead of httplib.HTTPConnection or
-# httplib.HTTPSConnection. Useful for unit testing where
-# network is not available. (string value)
-#http_handler=<None>
-
-# Single shared secret with the Keystone configuration used
-# for bootstrapping a Keystone installation, or otherwise
-# bypassing the normal authentication process. (string value)
-#admin_token=<None>
-
-# Keystone account username (string value)
-#admin_user=<None>
-
-# Keystone account password (string value)
-#admin_password=<None>
-
-# Keystone service account tenant name to validate user tokens
-# (string value)
-#admin_tenant_name=admin
-
-# Env key for the swift cache (string value)
-#cache=<None>
-
-# Required if Keystone server requires client certificate
-# (string value)
-#certfile=<None>
-
-# Required if Keystone server requires client certificate
-# (string value)
-#keyfile=<None>
-
-# A PEM encoded Certificate Authority to use when verifying
-# HTTPs connections. Defaults to system CAs. (string value)
-#cafile=<None>
-
-# Verify HTTPS connections. (boolean value)
-#insecure=false
-
-# Directory used to cache files related to PKI tokens (string
-# value)
-#signing_dir=<None>
-
-# If defined, the memcache server(s) to use for caching (list
-# value)
-#memcached_servers=<None>
-
-# In order to prevent excessive requests and validations, the
-# middleware uses an in-memory cache for the tokens the
-# Keystone API returns. This is only valid if memcache_servers
-# is defined. Set to -1 to disable caching completely.
-# (integer value)
-#token_cache_time=300
-
-# Value only used for unit testing (integer value)
-#revocation_cache_time=1
-
-# (optional) if defined, indicate whether token data should be
-# authenticated or authenticated and encrypted. Acceptable
-# values are MAC or ENCRYPT.  If MAC, token data is
-# authenticated (with HMAC) in the cache. If ENCRYPT, token
-# data is encrypted and authenticated in the cache. If the
-# value is not one of these options or empty, auth_token will
-# raise an exception on initialization. (string value)
-#memcache_security_strategy=<None>
-
-# (optional, mandatory if memcache_security_strategy is
-# defined) this string is used for key derivation. (string
-# value)
-#memcache_secret_key=<None>
-
-
 [collector]
 
 #
@@ -894,6 +810,7 @@
 #
 
 # Matchmaker ring file (JSON) (string value)
+# Deprecated group/name - [DEFAULT]/matchmaker_ringfile
 #ringfile=/etc/oslo/matchmaker_ring.json
 
 

@@ -1,5 +1,3 @@
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
-
 # Copyright 2011 OpenStack Foundation.
 # All Rights Reserved.
 #
@@ -55,7 +53,7 @@ def filter_factory(global_conf, **local_conf):
     conf = global_conf.copy()
     conf.update(local_conf)
 
-    def filter(app):
+    def f(app):
         return ContextMiddleware(app, conf)
 
-    return filter
+    return f

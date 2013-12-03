@@ -1,5 +1,3 @@
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
-
 # Copyright (c) 2013 eNovance
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -118,7 +116,7 @@ class RequestNotifier(base.Middleware):
             try:
                 response = req.get_response(self.application)
             except Exception:
-                type, value, traceback = sys.exc_info()
+                exc_type, value, traceback = sys.exc_info()
                 self.process_response(req, None, value, traceback)
                 raise
             else:

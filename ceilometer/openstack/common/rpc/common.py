@@ -1,5 +1,3 @@
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
-
 # Copyright 2010 United States Government as represented by the
 # Administrator of the National Aeronautics and Space Administration.
 # All Rights Reserved.
@@ -266,7 +264,7 @@ def _safe_log(log_func, msg, msg_data):
 
     def _fix_passwords(d):
         """Sanitizes the password fields in the dictionary."""
-        for k in d.iterkeys():
+        for k in six.iterkeys(d):
             if k.lower().find('password') != -1:
                 d[k] = '<SANITIZED>'
             elif k.lower() in SANITIZE:

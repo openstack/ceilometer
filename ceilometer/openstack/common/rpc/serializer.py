@@ -15,6 +15,7 @@
 """Provides the definition of an RPC serialization handler"""
 
 import abc
+
 import six
 
 
