@@ -20,8 +20,8 @@
 =========================
 
 :Bug tracker: http://launchpad.net/ceilometer
-:Mailing list: http://lists.openstack.org/cgi-bin/mailman/listinfo/openstack-dev (prefix subjects with ``[metering]`` for faster responses)
-:Wiki: http://wiki.openstack.org/EfficientMetering
+:Mailing list: http://lists.openstack.org/cgi-bin/mailman/listinfo/openstack-dev (prefix subjects with ``[Ceilometer]`` for faster responses)
+:Wiki: http://wiki.openstack.org/wiki/Ceilometer
 :Code Hosting: https://git.openstack.org/cgit/openstack/ceilometer/
 :Code Review: https://review.openstack.org/#/q/status:open+project:openstack/ceilometer,n,z
 

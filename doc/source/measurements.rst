@@ -189,13 +189,13 @@ Naming convention
 =================
 If you plan on adding meters, please follow the convention bellow:
 
-1. Always use '.' as separator and go from least to most discriminent word.
+1. Always use '.' as separator and go from least to most discriminant word.
    For example, do not use ephemeral_disk_size but disk.ephemeral.size
 
 2. When a part of the name is a variable, it should always be at the end and start with a ':'.
    For example do not use <type>.image but image:<type>, where type is your variable name.
 
-3. If you have any hesitation, come and ask in #openstack-metering
+3. If you have any hesitation, come and ask in #openstack-ceilometer
 
 
 User-defined sample metadata for Nova
