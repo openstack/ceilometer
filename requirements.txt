@@ -7,6 +7,7 @@ SQLAlchemy>=0.7.8,<=0.7.99
 sqlalchemy-migrate>=0.8.2
 alembic>=0.4.1
 netaddr>=0.7.6
+MySQL-python
 pymongo>=2.4
 eventlet>=0.13.0
 anyjson>=0.3.3
