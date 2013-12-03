@@ -21,6 +21,7 @@ from oslo.config import cfg
 from stevedore import extension
 
 from ceilometer import agent
+from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common.rpc import service as rpc_service
 from ceilometer.openstack.common import service as os_service
@@ -40,15 +41,16 @@ class PollingTask(agent.PollingTask):
             cache = {}
             for pollster in self.pollsters:
                 try:
-                    LOG.info("Polling pollster %s", pollster.name)
+                    LOG.info(_("Polling pollster %s"), pollster.name)
                     samples = list(pollster.obj.get_samples(
                         self.manager,
                         cache,
                     ))
                     publisher(samples)
                 except Exception as err:
-                    LOG.warning('Continue after error from %s: %s',
-                                pollster.name, err)
+                    LOG.warning(_(
+                        'Continue after error from %(name)s: %(error)s')
+                        % ({'name': pollster.name, 'error': err}))
                     LOG.exception(err)
 
 

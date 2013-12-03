@@ -117,14 +117,16 @@ def start():
     host, port = cfg.CONF.api.host, cfg.CONF.api.port
     srv = simple_server.make_server(host, port, root)
 
-    LOG.info('Starting server in PID %s' % os.getpid())
-    LOG.info("Configuration:")
+    LOG.info(_('Starting server in PID %s') % os.getpid())
+    LOG.info(_("Configuration:"))
     cfg.CONF.log_opt_values(LOG, logging.INFO)
 
     if host == '0.0.0.0':
-        LOG.info('serving on 0.0.0.0:%s, view at http://127.0.0.1:%s' %
-                 (port, port))
+        LOG.info(_(
+            'serving on 0.0.0.0:%(sport)s, view at http://127.0.0.1:%(vport)s')
+            % ({'sport': port, 'vport': port}))
     else:
-        LOG.info("serving on http://%s:%s" % (host, port))
+        LOG.info(_("serving on http://%(host)s:%(port)s") % (
+                 {'host': host, 'port': port}))
 
     srv.serve_forever()

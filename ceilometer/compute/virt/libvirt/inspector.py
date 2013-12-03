@@ -21,6 +21,7 @@ from lxml import etree
 from oslo.config import cfg
 
 from ceilometer.compute.virt import inspector as virt_inspector
+from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log as logging
 
 libvirt = None
@@ -60,7 +61,7 @@ class LibvirtInspector(virt_inspector.Inspector):
             if libvirt is None:
                 libvirt = __import__('libvirt')
 
-            LOG.debug('Connecting to libvirt: %s', self.uri)
+            LOG.debug(_('Connecting to libvirt: %s'), self.uri)
             self.connection = libvirt.openReadOnly(self.uri)
 
         return self.connection
@@ -73,7 +74,7 @@ class LibvirtInspector(virt_inspector.Inspector):
             if (e.get_error_code() == libvirt.VIR_ERR_SYSTEM_ERROR and
                 e.get_error_domain() in (libvirt.VIR_FROM_REMOTE,
                                          libvirt.VIR_FROM_RPC)):
-                LOG.debug('Connection to libvirt broke')
+                LOG.debug(_('Connection to libvirt broke'))
                 return False
             raise
 

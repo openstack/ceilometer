@@ -20,6 +20,7 @@ from oslo.config import cfg
 from stevedore import extension
 
 from ceilometer.openstack.common import context
+from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common.rpc import service as rpc_service
 from ceilometer.openstack.common import service as os_service
@@ -79,7 +80,7 @@ class NotificationService(service.DispatchedService, rpc_service.Service):
             )
 
         if not list(self.notification_manager):
-            LOG.warning('Failed to load any notification handlers for %s',
+            LOG.warning(_('Failed to load any notification handlers for %s'),
                         self.NOTIFICATION_NAMESPACE)
         self.notification_manager.map(self._setup_subscription)
 
@@ -97,9 +98,11 @@ class NotificationService(service.DispatchedService, rpc_service.Service):
         """
         handler = ext.obj
         ack_on_error = cfg.CONF.notification.ack_on_event_error
-        LOG.debug('Event types from %s: %s (ack_on_error=%s)',
-                  ext.name, ', '.join(handler.event_types),
-                  ack_on_error)
+        LOG.debug(_('Event types from %(name)s: %(type)s'
+                    ' (ack_on_error=%(error)s)') %
+                  {'name': ext.name,
+                   'type': ', '.join(handler.event_types),
+                   'error': ack_on_error})
 
         for exchange_topic in handler.get_exchange_topics(cfg.CONF):
             for topic in exchange_topic.topics:
@@ -111,8 +114,10 @@ class NotificationService(service.DispatchedService, rpc_service.Service):
                         exchange_name=exchange_topic.exchange,
                         ack_on_error=ack_on_error)
                 except Exception:
-                    LOG.exception('Could not join consumer pool %s/%s' %
-                                  (topic, exchange_topic.exchange))
+                    LOG.exception(_('Could not join consumer pool'
+                                    ' %(topic)s/%(exchange)s') %
+                                  {'topic': topic,
+                                   'exchange': exchange_topic.exchange})
 
     def process_notification(self, notification):
         """RPC endpoint for notification messages
@@ -121,7 +126,7 @@ class NotificationService(service.DispatchedService, rpc_service.Service):
         bus, this method receives it. See _setup_subscription().
 
         """
-        LOG.debug('notification %r', notification.get('event_type'))
+        LOG.debug(_('notification %r'), notification.get('event_type'))
         self.notification_manager.map(self._process_notification_for_ext,
                                       notification=notification)
 
@@ -151,7 +156,7 @@ class NotificationService(service.DispatchedService, rpc_service.Service):
         message_id = body.get('message_id')
         event_type = body['event_type']
         when = self._extract_when(body)
-        LOG.debug('Saving event "%s"', event_type)
+        LOG.debug(_('Saving event "%s"'), event_type)
 
         publisher = body.get('publisher_id')
         request_id = body.get('_context_request_id')

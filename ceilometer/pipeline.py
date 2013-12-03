@@ -24,6 +24,7 @@ import os
 from oslo.config import cfg
 import yaml
 
+from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
 from ceilometer import publisher
 
@@ -125,7 +126,7 @@ class Pipeline(object):
             try:
                 self.publishers.append(publisher.get_publisher(p))
             except Exception:
-                LOG.exception("Unable to load publisher %s", p)
+                LOG.exception(_("Unable to load publisher %s"), p)
 
         self.transformers = self._setup_transformers(cfg, transformer_manager)
 
@@ -172,11 +173,11 @@ class Pipeline(object):
                     "No transformer named %s loaded" % transformer['name'],
                     cfg)
             transformers.append(ext.plugin(**parameter))
-            LOG.info("Pipeline %s: Setup transformer instance %s "
-                     "with parameter %s",
-                     self,
-                     transformer['name'],
-                     parameter)
+            LOG.info(_(
+                "Pipeline %(pipeline)s: Setup transformer instance %(name)s "
+                "with parameter %(param)s") % ({'pipeline': self,
+                                                'name': transformer['name'],
+                                                'param': parameter}))
 
         return transformers
 
@@ -185,14 +186,18 @@ class Pipeline(object):
             for transformer in self.transformers[start:]:
                 sample = transformer.handle_sample(ctxt, sample)
                 if not sample:
-                    LOG.debug("Pipeline %s: Sample dropped by transformer %s",
-                              self, transformer)
+                    LOG.debug(_(
+                        "Pipeline %(pipeline)s: Sample dropped by "
+                        "transformer %(trans)s") % ({'pipeline': self,
+                                                     'trans': transformer}))
                     return
             return sample
         except Exception as err:
-            LOG.warning("Pipeline %s: Exit after error from transformer"
-                        "%s for %s",
-                        self, transformer, sample)
+            LOG.warning(_("Pipeline %(pipeline)s: "
+                          "Exit after error from transformer "
+                          "%(trans)s for %(smp)s") % ({'pipeline': self,
+                                                       'trans': transformer,
+                                                       'smp': sample}))
             LOG.exception(err)
 
     def _publish_samples(self, start, ctxt, samples):
@@ -208,21 +213,26 @@ class Pipeline(object):
 
         transformed_samples = []
         for sample in samples:
-            LOG.debug("Pipeline %s: Transform sample %s from %s transformer",
-                      self, sample, start)
+            LOG.debug(_(
+                "Pipeline %(pipeline)s: Transform sample "
+                "%(smp)s from %(trans)s transformer") % ({'pipeline': self,
+                                                          'smp': sample,
+                                                          'trans': start}))
             sample = self._transform_sample(start, ctxt, sample)
             if sample:
                 transformed_samples.append(sample)
 
         if transformed_samples:
-            LOG.audit("Pipeline %s: Publishing samples", self)
+            LOG.audit(_("Pipeline %s: Publishing samples"), self)
             for p in self.publishers:
                 try:
                     p.publish_samples(ctxt, transformed_samples)
                 except Exception:
-                    LOG.exception("Pipeline %s: Continue after error "
-                                  "from publisher %s", self, p)
-            LOG.audit("Pipeline %s: Published samples", self)
+                    LOG.exception(_(
+                        "Pipeline %(pipeline)s: Continue after error "
+                        "from publisher %(pub)s") % ({'pipeline': self,
+                                                      'pub': p}))
+            LOG.audit(_("Pipeline %s: Published samples") % self)
 
     def publish_sample(self, ctxt, sample):
         self.publish_samples(ctxt, [sample])
@@ -271,16 +281,16 @@ class Pipeline(object):
     def flush(self, ctxt):
         """Flush data after all samples have been injected to pipeline."""
 
-        LOG.audit("Flush pipeline %s", self)
+        LOG.audit(_("Flush pipeline %s"), self)
         for (i, transformer) in enumerate(self.transformers):
             try:
                 self._publish_samples(i + 1, ctxt,
                                       list(transformer.flush(ctxt)))
             except Exception as err:
-                LOG.warning(
-                    "Pipeline %s: Error flushing "
-                    "transformer %s",
-                    self, transformer)
+                LOG.warning(_(
+                    "Pipeline %(pipeline)s: Error flushing "
+                    "transformer %(trans)s") % ({'pipeline': self,
+                                                 'trans': transformer}))
                 LOG.exception(err)
 
     def get_interval(self):
@@ -360,13 +370,13 @@ def setup_pipeline(transformer_manager):
     if not os.path.exists(cfg_file):
         cfg_file = cfg.CONF.find_file(cfg_file)
 
-    LOG.debug("Pipeline config file: %s", cfg_file)
+    LOG.debug(_("Pipeline config file: %s"), cfg_file)
 
     with open(cfg_file) as fap:
         data = fap.read()
 
     pipeline_cfg = yaml.safe_load(data)
-    LOG.info("Pipeline config: %s", pipeline_cfg)
+    LOG.info(_("Pipeline config: %s"), pipeline_cfg)
 
     return PipelineManager(pipeline_cfg,
                            transformer_manager)

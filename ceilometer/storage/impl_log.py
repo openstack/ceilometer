@@ -53,10 +53,11 @@ class Connection(base.Connection):
         :param data: a dictionary such as returned by
                      ceilometer.meter.meter_message_from_counter
         """
-        LOG.info('metering data %s for %s: %s',
-                 data['counter_name'],
-                 data['resource_id'],
-                 data['counter_volume'])
+        LOG.info(_('metering data %(counter_name)s for %(resource_id)s: '
+                   '%(counter_volume)s')
+                 % ({'counter_name': data['counter_name'],
+                     'resource_id': data['resource_id'],
+                     'counter_volume': data['counter_volume']}))
 
     def clear_expired_metering_data(self, ttl):
         """Clear expired data from the backend storage system according to the
@@ -65,7 +66,7 @@ class Connection(base.Connection):
         :param ttl: Number of seconds to keep records for.
 
         """
-        LOG.info("Dropping data with TTL %d", ttl)
+        LOG.info(_("Dropping data with TTL %d"), ttl)
 
     def get_users(self, source=None):
         """Return an iterable of user id strings.

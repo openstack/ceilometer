@@ -160,7 +160,7 @@ class PartitionedAlarmService(AlarmService, rpc_service.Service):
         self.partition_coordinator = coordination.PartitionCoordinator()
 
     def initialize_service_hook(self, service):
-        LOG.debug('initialize_service_hooks')
+        LOG.debug(_('initialize_service_hooks'))
         self.conn.create_worker(
             cfg.CONF.alarm.partition_rpc_topic,
             rpc_dispatcher.RpcDispatcher([self]),
@@ -218,7 +218,7 @@ class AlarmNotifierService(rpc_service.Service):
         self.tg.add_timer(604800, lambda: None)
 
     def initialize_service_hook(self, service):
-        LOG.debug('initialize_service_hooks')
+        LOG.debug(_('initialize_service_hooks'))
         self.conn.create_worker(
             cfg.CONF.alarm.notifier_rpc_topic,
             rpc_dispatcher.RpcDispatcher([self]),
@@ -245,8 +245,8 @@ class AlarmNotifierService(rpc_service.Service):
             return
 
         try:
-            LOG.debug("Notifying alarm %s with action %s",
-                      alarm_id, action)
+            LOG.debug(_("Notifying alarm %(id)s with action %(act)s") % (
+                      {'id': alarm_id, 'act': action}))
             notifier.notify(action, alarm_id, previous, current, reason)
         except Exception:
             LOG.exception(_("Unable to notify alarm %s"), alarm_id)

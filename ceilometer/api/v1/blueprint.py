@@ -89,6 +89,7 @@ import datetime
 
 import flask
 
+from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 
@@ -565,14 +566,20 @@ def compute_duration_by_resource(resource, meter):
 
     # "Clamp" the timestamps we return to the original time
     # range, excluding the offset.
-    LOG.debug('start_timestamp %s, end_timestamp %s, min_ts %s, max_ts %s',
-              start_timestamp, end_timestamp, min_ts, max_ts)
+    LOG.debug(_('start_timestamp %(start_timestamp)s, '
+                'end_timestamp %(end_timestamp)s, '
+                'min_ts %(min_ts)s, '
+                'max_ts %(max_ts)s') % (
+              {'start_timestamp': start_timestamp,
+               'end_timestamp': end_timestamp,
+               'min_ts': min_ts,
+               'max_ts': max_ts}))
     if start_timestamp and min_ts and min_ts < start_timestamp:
         min_ts = start_timestamp
-        LOG.debug('clamping min timestamp to range')
+        LOG.debug(_('clamping min timestamp to range'))
     if end_timestamp and max_ts and max_ts > end_timestamp:
         max_ts = end_timestamp
-        LOG.debug('clamping max timestamp to range')
+        LOG.debug(_('clamping max timestamp to range'))
 
     # If we got valid timestamps back, compute a duration in minutes.
     #
