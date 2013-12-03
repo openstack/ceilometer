@@ -47,25 +47,36 @@ class CeilometerBaseTest(EventTestBase):
         self.assertEqual(base['key'], 'value')
 
 
-class UniqueNameTest(EventTestBase):
-    # UniqueName is a construct specific to sqlalchemy.
+class TraitTypeTest(EventTestBase):
+    # TraitType is a construct specific to sqlalchemy.
     # Not applicable to other drivers.
 
-    def test_unique_exists(self):
-        u1 = self.conn._get_or_create_unique_name("foo")
-        self.assertTrue(u1.id >= 0)
-        u2 = self.conn._get_or_create_unique_name("foo")
-        self.assertEqual(u1.id, u2.id)
-        self.assertEqual(u1.key, u2.key)
+    def test_trait_type_exists(self):
+        tt1 = self.conn._get_or_create_trait_type("foo", 0)
+        self.assertTrue(tt1.id >= 0)
+        tt2 = self.conn._get_or_create_trait_type("foo", 0)
+        self.assertEqual(tt1.id, tt2.id)
+        self.assertEqual(tt1.desc, tt2.desc)
+        self.assertEqual(tt1.data_type, tt2.data_type)
 
-    def test_new_unique(self):
-        u1 = self.conn._get_or_create_unique_name("foo")
-        self.assertTrue(u1.id >= 0)
-        u2 = self.conn._get_or_create_unique_name("blah")
-        self.assertNotEqual(u1.id, u2.id)
-        self.assertNotEqual(u1.key, u2.key)
+    def test_new_trait_type(self):
+        tt1 = self.conn._get_or_create_trait_type("foo", 0)
+        self.assertTrue(tt1.id >= 0)
+        tt2 = self.conn._get_or_create_trait_type("blah", 0)
+        self.assertNotEqual(tt1.id, tt2.id)
+        self.assertNotEqual(tt1.desc, tt2.desc)
         # Test the method __repr__ returns a string
-        self.assertTrue(repr.repr(u2))
+        self.assertTrue(repr.repr(tt2))
+
+    def test_trait_different_data_type(self):
+        tt1 = self.conn._get_or_create_trait_type("foo", 0)
+        self.assertTrue(tt1.id >= 0)
+        tt2 = self.conn._get_or_create_trait_type("foo", 1)
+        self.assertNotEqual(tt1.id, tt2.id)
+        self.assertEqual(tt1.desc, tt2.desc)
+        self.assertNotEqual(tt1.data_type, tt2.data_type)
+        # Test the method __repr__ returns a string
+        self.assertTrue(repr.repr(tt2))
 
 
 class EventTypeTest(EventTestBase):
@@ -97,43 +108,44 @@ class EventTest(EventTestBase):
     def test_string_traits(self):
         model = models.Trait("Foo", models.Trait.TEXT_TYPE, "my_text")
         trait = self.conn._make_trait(model, None)
-        self.assertEqual(trait.t_type, models.Trait.TEXT_TYPE)
+        self.assertEqual(trait.trait_type.data_type, models.Trait.TEXT_TYPE)
         self.assertIsNone(trait.t_float)
         self.assertIsNone(trait.t_int)
         self.assertIsNone(trait.t_datetime)
         self.assertEqual(trait.t_string, "my_text")
-        self.assertIsNotNone(trait.name)
+        self.assertIsNotNone(trait.trait_type.desc)
 
     def test_int_traits(self):
         model = models.Trait("Foo", models.Trait.INT_TYPE, 100)
         trait = self.conn._make_trait(model, None)
-        self.assertEqual(trait.t_type, models.Trait.INT_TYPE)
+        self.assertEqual(trait.trait_type.data_type, models.Trait.INT_TYPE)
         self.assertIsNone(trait.t_float)
         self.assertIsNone(trait.t_string)
         self.assertIsNone(trait.t_datetime)
         self.assertEqual(trait.t_int, 100)
-        self.assertIsNotNone(trait.name)
+        self.assertIsNotNone(trait.trait_type.desc)
 
     def test_float_traits(self):
         model = models.Trait("Foo", models.Trait.FLOAT_TYPE, 123.456)
         trait = self.conn._make_trait(model, None)
-        self.assertEqual(trait.t_type, models.Trait.FLOAT_TYPE)
+        self.assertEqual(trait.trait_type.data_type, models.Trait.FLOAT_TYPE)
         self.assertIsNone(trait.t_int)
         self.assertIsNone(trait.t_string)
         self.assertIsNone(trait.t_datetime)
         self.assertEqual(trait.t_float, 123.456)
-        self.assertIsNotNone(trait.name)
+        self.assertIsNotNone(trait.trait_type.desc)
 
     def test_datetime_traits(self):
         now = datetime.datetime.utcnow()
         model = models.Trait("Foo", models.Trait.DATETIME_TYPE, now)
         trait = self.conn._make_trait(model, None)
-        self.assertEqual(trait.t_type, models.Trait.DATETIME_TYPE)
+        self.assertEqual(trait.trait_type.data_type,
+                         models.Trait.DATETIME_TYPE)
         self.assertIsNone(trait.t_int)
         self.assertIsNone(trait.t_string)
         self.assertIsNone(trait.t_float)
         self.assertEqual(trait.t_datetime, utils.dt_to_decimal(now))
-        self.assertIsNotNone(trait.name)
+        self.assertIsNotNone(trait.trait_type.desc)
 
     def test_bad_event(self):
         now = datetime.datetime.utcnow()

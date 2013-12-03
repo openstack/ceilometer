@@ -289,24 +289,6 @@ class AlarmChange(Base):
     timestamp = Column(DateTime, default=timeutils.utcnow)
 
 
-class UniqueName(Base):
-    """Key names should only be stored once.
-    """
-    __tablename__ = 'unique_name'
-    __table_args__ = (
-        Index('ix_unique_name_key', 'key'),
-    )
-
-    id = Column(Integer, primary_key=True)
-    key = Column(String(255))
-
-    def __init__(self, key):
-        self.key = key
-
-    def __repr__(self):
-        return "<UniqueName: %s>" % self.key
-
-
 class EventType(Base):
     """Types of event records."""
     __tablename__ = 'event_type'
@@ -347,21 +329,45 @@ class Event(Base):
                                                               self.generated)
 
 
+class TraitType(Base):
+    """Types of event traits. A trait type includes a description
+    and a data type. Uniqueness is enforced compositely on the
+    data_type and desc fields. This is to accommodate cases, such as
+    'generated', which, depending on the corresponding event,
+    could be a date, a boolean, or a float.
+
+    """
+    __tablename__ = 'trait_type'
+    __table_args__ = (
+        UniqueConstraint('desc', 'data_type', name='tt_unique'),
+        Index('ix_trait_type', 'desc')
+    )
+
+    id = Column(Integer, primary_key=True)
+    desc = Column(String(255))
+    data_type = Column(Integer)
+
+    def __init__(self, desc, data_type):
+        self.desc = desc
+        self.data_type = data_type
+
+    def __repr__(self):
+        return "<TraitType: %s:%d>" % (self.desc, self.data_type)
+
+
 class Trait(Base):
     __tablename__ = 'trait'
     __table_args__ = (
         Index('ix_trait_t_int', 't_int'),
         Index('ix_trait_t_string', 't_string'),
         Index('ix_trait_t_datetime', 't_datetime'),
-        Index('ix_trait_t_type', 't_type'),
         Index('ix_trait_t_float', 't_float'),
     )
     id = Column(Integer, primary_key=True)
 
-    name_id = Column(Integer, ForeignKey('unique_name.id'))
-    name = relationship("UniqueName", backref=backref('name', order_by=id))
+    trait_type_id = Column(Integer, ForeignKey('trait_type.id'))
+    trait_type = relationship("TraitType", backref=backref('trait_type'))
 
-    t_type = Column(Integer)
     t_string = Column(String(255), nullable=True, default=None)
     t_float = Column(Float, nullable=True, default=None)
     t_int = Column(Integer, nullable=True, default=None)
@@ -375,10 +381,9 @@ class Trait(Base):
                   api_models.Trait.INT_TYPE: 't_int',
                   api_models.Trait.DATETIME_TYPE: 't_datetime'}
 
-    def __init__(self, name, event, t_type, t_string=None, t_float=None,
-                 t_int=None, t_datetime=None):
-        self.name = name
-        self.t_type = t_type
+    def __init__(self, trait_type, event, t_string=None,
+                 t_float=None, t_int=None, t_datetime=None):
+        self.trait_type = trait_type
         self.t_string = t_string
         self.t_float = t_float
         self.t_int = t_int
@@ -386,17 +391,31 @@ class Trait(Base):
         self.event = event
 
     def get_value(self):
-        if self.t_type == api_models.Trait.INT_TYPE:
+        if self.trait_type is None:
+            dtype = None
+        else:
+            dtype = self.trait_type.data_type
+
+        if dtype == api_models.Trait.INT_TYPE:
             return self.t_int
-        if self.t_type == api_models.Trait.FLOAT_TYPE:
+        if dtype == api_models.Trait.FLOAT_TYPE:
             return self.t_float
-        if self.t_type == api_models.Trait.DATETIME_TYPE:
+        if dtype == api_models.Trait.DATETIME_TYPE:
             return utils.decimal_to_dt(self.t_datetime)
-        if self.t_type == api_models.Trait.TEXT_TYPE:
+        if dtype == api_models.Trait.TEXT_TYPE:
             return self.t_string
+
         return None
 
     def __repr__(self):
-        return "<Trait(%s) %d=%s/%s/%s/%s on %s>" % (self.name, self.t_type,
-               self.t_string, self.t_float, self.t_int, self.t_datetime,
-               self.event)
+        name = self.trait_type.name if self.trait_type else None
+        data_type = self.trait_type.data_type if self.trait_type\
+            else api_models.Trait.NONE_TYPE
+
+        return "<Trait(%s) %d=%s/%s/%s/%s on %s>" % (name,
+                                                     data_type,
+                                                     self.t_string,
+                                                     self.t_float,
+                                                     self.t_int,
+                                                     self.t_datetime,
+                                                     self.event)
