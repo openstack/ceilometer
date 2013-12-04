@@ -50,20 +50,21 @@ def upgrade(migrate_engine):
         meta_tables[t_name].create()
 
     for row in select([meter]).execute():
-        meter_id = row['id']
-        rmeta = json.loads(row['resource_metadata'])
-        for key, v in utils.dict_to_keyval(rmeta):
-            ins = None
-            if isinstance(v, basestring) or v is None:
-                ins = meta_tables['metadata_text'].insert()
-            elif isinstance(v, bool):
-                ins = meta_tables['metadata_bool'].insert()
-            elif isinstance(v, (int, long)):
-                ins = meta_tables['metadata_int'].insert()
-            elif isinstance(v, float):
-                ins = meta_tables['metadata_float'].insert()
-            if ins:
-                ins.values(id=meter_id, meta_key=key, value=v).execute()
+        if row['resource_metadata']:
+            meter_id = row['id']
+            rmeta = json.loads(row['resource_metadata'])
+            for key, v in utils.dict_to_keyval(rmeta):
+                ins = None
+                if isinstance(v, basestring) or v is None:
+                    ins = meta_tables['metadata_text'].insert()
+                elif isinstance(v, bool):
+                    ins = meta_tables['metadata_bool'].insert()
+                elif isinstance(v, (int, long)):
+                    ins = meta_tables['metadata_int'].insert()
+                elif isinstance(v, float):
+                    ins = meta_tables['metadata_float'].insert()
+                if ins is not None:
+                    ins.values(id=meter_id, meta_key=key, value=v).execute()
 
 
 def downgrade(migrate_engine):
