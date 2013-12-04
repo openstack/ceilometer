@@ -146,6 +146,10 @@ class TestListMeters(FunctionalTest,
         self.assertEqual(set(r['source'] for r in data),
                          set(['test_source', 'test_source1']))
 
+    def test_list_samples(self):
+        data = self.get_json('/samples')
+        self.assertEqual(5, len(data))
+
     def test_list_meters_with_dict_metadata(self):
         data = self.get_json('/meters/meter.mine',
                              q=[{'field':
@@ -159,6 +163,33 @@ class TestListMeters(FunctionalTest,
         self.assertIsNotNone(metadata)
         self.assertEqual('self.sample4', metadata['tag'])
         self.assertEqual('prop_value', metadata['properties.prop_1'])
+
+    def test_list_samples_with_dict_metadata(self):
+        data = self.get_json('/samples',
+                             q=[{'field':
+                                 'metadata.properties.prop_2.sub_prop_1',
+                                 'op': 'eq',
+                                 'value': 'sub_prop_value',
+                                 }])
+        self.assertTrue('id' in data[0])
+        del data[0]['id']  # Randomly generated
+        self.assertEqual(data, [{
+            u'user_id': u'user-id4',
+            u'resource_id': u'resource-id4',
+            u'timestamp': u'2012-07-02T10:43:00',
+            u'meter': u'meter.mine',
+            u'volume': 1.0,
+            u'project_id': u'project-id2',
+            u'type': u'gauge',
+            u'unit': u'',
+            u'metadata': {u'display_name': u'test-server',
+                          u'properties.prop_2:sub_prop_1': u'sub_prop_value',
+                          u'util': u'0.58',
+                          u'tag': u'self.sample4',
+                          u'properties.prop_1': u'prop_value',
+                          u'is_public': u'True',
+                          u'size': u'0'}
+        }])
 
     def test_list_meters_metadata_query(self):
         data = self.get_json('/meters/meter.test',

@@ -527,8 +527,10 @@ def _send_notification(event, payload):
                   notification, notify.INFO, payload)
 
 
-class Sample(_Base):
+class OldSample(_Base):
     """A single measurement for a given meter and resource.
+
+    This class is deprecated in favor of Sample.
     """
 
     source = wtypes.text
@@ -576,9 +578,9 @@ class Sample(_Base):
         if timestamp and isinstance(timestamp, basestring):
             timestamp = timeutils.parse_isotime(timestamp)
 
-        super(Sample, self).__init__(counter_volume=counter_volume,
-                                     resource_metadata=resource_metadata,
-                                     timestamp=timestamp, **kwds)
+        super(OldSample, self).__init__(counter_volume=counter_volume,
+                                        resource_metadata=resource_metadata,
+                                        timestamp=timestamp, **kwds)
 
         if self.resource_metadata in (wtypes.Unset, None):
             self.resource_metadata = {}
@@ -706,7 +708,7 @@ class MeterController(rest.RestController):
         pecan.request.context['meter_id'] = meter_id
         self._id = meter_id
 
-    @wsme_pecan.wsexpose([Sample], [Query], int)
+    @wsme_pecan.wsexpose([OldSample], [Query], int)
     def get_all(self, q=[], limit=None):
         """Return samples for the meter.
 
@@ -718,11 +720,11 @@ class MeterController(rest.RestController):
         kwargs = _query_to_kwargs(q, storage.SampleFilter.__init__)
         kwargs['meter'] = self._id
         f = storage.SampleFilter(**kwargs)
-        return [Sample.from_db_model(e)
+        return [OldSample.from_db_model(e)
                 for e in pecan.request.storage_conn.get_samples(f, limit=limit)
                 ]
 
-    @wsme_pecan.wsexpose([Sample], body=[Sample])
+    @wsme_pecan.wsexpose([OldSample], body=[OldSample])
     def post(self, samples):
         """Post a list of new Samples to Ceilometer.
 
@@ -882,6 +884,89 @@ class MetersController(rest.RestController):
         kwargs = _query_to_kwargs(q, pecan.request.storage_conn.get_meters)
         return [Meter.from_db_model(m)
                 for m in pecan.request.storage_conn.get_meters(**kwargs)]
+
+
+class Sample(_Base):
+    """One measurement."""
+
+    id = wtypes.text
+    "The unique identifier for the sample."
+
+    meter = wtypes.text
+    "The meter name this sample is for."
+
+    type = wtypes.Enum(str, *sample.TYPES)
+    "The meter type (see :ref:`measurements`)"
+
+    unit = wtypes.text
+    "The unit of measure."
+
+    volume = float
+    "The metered value."
+
+    user_id = wtypes.text
+    "The user this sample was taken for."
+
+    project_id = wtypes.text
+    "The project this sample was taken for."
+
+    resource_id = wtypes.text
+    "The :class:`Resource` this sample was taken for."
+
+    source = wtypes.text
+    "The source that identifies where the sample comes from."
+
+    timestamp = datetime.datetime
+    "When the sample has been generated."
+
+    metadata = {wtypes.text: wtypes.text}
+    "Arbitrary metadata associated with the sample."
+
+    @classmethod
+    def from_db_model(cls, m):
+        return cls(id=m.message_id,
+                   meter=m.counter_name,
+                   type=m.counter_type,
+                   unit=m.counter_unit,
+                   volume=m.counter_volume,
+                   user_id=m.user_id,
+                   project_id=m.project_id,
+                   resource_id=m.resource_id,
+                   timestamp=m.timestamp,
+                   metadata=_flatten_metadata(m.resource_metadata))
+
+    @classmethod
+    def sample(cls):
+        return cls(id=str(uuid.uuid1()),
+                   meter='instance',
+                   type='gauge',
+                   unit='instance',
+                   resource_id='bd9431c1-8d69-4ad3-803a-8d4a6b89fd36',
+                   project_id='35b17138-b364-4e6a-a131-8f3099c5be68',
+                   user_id='efd87807-12d2-4b38-9c70-5f5c2ac427ff',
+                   timestamp=timeutils.utcnow(),
+                   source='openstack',
+                   metadata={'name1': 'value1',
+                             'name2': 'value2'},
+                   )
+
+
+class SamplesController(rest.RestController):
+    """Controller managing the samples."""
+
+    @wsme_pecan.wsexpose([Sample], [Query], int)
+    def get_all(self, q=[], limit=None):
+        """Return all known samples, based on the data recorded so far.
+
+        :param q: Filter rules for the samples to be returned.
+        :param limit: Maximum number of samples to be returned.
+        """
+        if limit and limit < 0:
+            raise ClientSideError(_("Limit must be positive"))
+        kwargs = _query_to_kwargs(q, storage.SampleFilter.__init__)
+        f = storage.SampleFilter(**kwargs)
+        return map(Sample.from_db_model,
+                   pecan.request.storage_conn.get_samples(f, limit=limit))
 
 
 class Resource(_Base):
@@ -1511,4 +1596,5 @@ class V2Controller(object):
 
     resources = ResourcesController()
     meters = MetersController()
+    samples = SamplesController()
     alarms = AlarmsController()
