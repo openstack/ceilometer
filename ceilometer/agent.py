@@ -21,6 +21,7 @@ import itertools
 
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import log
+from ceilometer.openstack.common import service as os_service
 from ceilometer import pipeline
 from ceilometer import transformer
 
@@ -48,9 +49,10 @@ class PollingTask(object):
         """Polling sample and publish into pipeline."""
 
 
-class AgentManager(object):
+class AgentManager(os_service.Service):
 
     def __init__(self, extension_manager):
+        super(AgentManager, self).__init__()
 
         self.pollster_manager = extension_manager
 
@@ -74,18 +76,17 @@ class AgentManager(object):
 
         return polling_tasks
 
-    def initialize_service_hook(self, service):
+    def start(self):
         self.pipeline_manager = pipeline.setup_pipeline(
             transformer.TransformerExtensionManager(
                 'ceilometer.transformer',
             ),
         )
 
-        self.service = service
         for interval, task in self.setup_polling_tasks().iteritems():
-            self.service.tg.add_timer(interval,
-                                      self.interval_task,
-                                      task=task)
+            self.tg.add_timer(interval,
+                              self.interval_task,
+                              task=task)
 
     @staticmethod
     def interval_task(task):
