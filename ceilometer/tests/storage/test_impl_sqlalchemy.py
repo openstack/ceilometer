@@ -26,29 +26,31 @@
 import datetime
 import repr
 
+from mock import MagicMock
 from mock import patch
 
 from ceilometer.storage import models
+from ceilometer.storage import impl_sqlalchemy
 from ceilometer.storage.sqlalchemy import models as sql_models
 from ceilometer.storage.sqlalchemy.models import table_args
 from ceilometer.tests import db as tests_db
 from ceilometer import utils
 
 
-class EventTestBase(tests_db.TestBase):
+class SimpleTestBase(tests_db.TestBase):
     # Note: Do not derive from SQLAlchemyEngineTestBase, since we
     # don't want to automatically inherit all the Meter setup.
     database_connection = 'sqlite://'
 
 
-class CeilometerBaseTest(EventTestBase):
+class CeilometerBaseTest(SimpleTestBase):
     def test_ceilometer_base(self):
         base = sql_models.CeilometerBase()
         base['key'] = 'value'
         self.assertEqual(base['key'], 'value')
 
 
-class UniqueNameTest(EventTestBase):
+class UniqueNameTest(SimpleTestBase):
     # UniqueName is a construct specific to sqlalchemy.
     # Not applicable to other drivers.
 
@@ -73,47 +75,55 @@ class MyException(Exception):
     pass
 
 
-class EventTest(EventTestBase):
+class EventTest(SimpleTestBase):
     def test_string_traits(self):
         model = models.Trait("Foo", models.Trait.TEXT_TYPE, "my_text")
-        trait = self.conn._make_trait(model, None)
-        self.assertEqual(trait.t_type, models.Trait.TEXT_TYPE)
-        self.assertIsNone(trait.t_float)
-        self.assertIsNone(trait.t_int)
-        self.assertIsNone(trait.t_datetime)
-        self.assertEqual(trait.t_string, "my_text")
-        self.assertIsNotNone(trait.name)
+        event = MagicMock()
+        event.id = 1
+        trait = self.conn._make_trait(model, event)
+        self.assertEqual(trait['t_type'], models.Trait.TEXT_TYPE)
+        self.assertIsNone(trait['t_float'])
+        self.assertIsNone(trait['t_int'])
+        self.assertIsNone(trait['t_datetime'])
+        self.assertEqual(trait['t_string'], "my_text")
+        self.assertIsNotNone(trait['name_id'])
 
     def test_int_traits(self):
         model = models.Trait("Foo", models.Trait.INT_TYPE, 100)
-        trait = self.conn._make_trait(model, None)
-        self.assertEqual(trait.t_type, models.Trait.INT_TYPE)
-        self.assertIsNone(trait.t_float)
-        self.assertIsNone(trait.t_string)
-        self.assertIsNone(trait.t_datetime)
-        self.assertEqual(trait.t_int, 100)
-        self.assertIsNotNone(trait.name)
+        event = MagicMock()
+        event.id = 1
+        trait = self.conn._make_trait(model, event)
+        self.assertEqual(trait['t_type'], models.Trait.INT_TYPE)
+        self.assertIsNone(trait['t_float'])
+        self.assertIsNone(trait['t_string'])
+        self.assertIsNone(trait['t_datetime'])
+        self.assertEqual(trait['t_int'], 100)
+        self.assertIsNotNone(trait['name_id'])
 
     def test_float_traits(self):
         model = models.Trait("Foo", models.Trait.FLOAT_TYPE, 123.456)
-        trait = self.conn._make_trait(model, None)
-        self.assertEqual(trait.t_type, models.Trait.FLOAT_TYPE)
-        self.assertIsNone(trait.t_int)
-        self.assertIsNone(trait.t_string)
-        self.assertIsNone(trait.t_datetime)
-        self.assertEqual(trait.t_float, 123.456)
-        self.assertIsNotNone(trait.name)
+        event = MagicMock()
+        event.id = 1
+        trait = self.conn._make_trait(model, event)
+        self.assertEqual(trait['t_type'], models.Trait.FLOAT_TYPE)
+        self.assertIsNone(trait['t_int'])
+        self.assertIsNone(trait['t_string'])
+        self.assertIsNone(trait['t_datetime'])
+        self.assertEqual(trait['t_float'], 123.456)
+        self.assertIsNotNone(trait['name_id'])
 
     def test_datetime_traits(self):
         now = datetime.datetime.utcnow()
         model = models.Trait("Foo", models.Trait.DATETIME_TYPE, now)
-        trait = self.conn._make_trait(model, None)
-        self.assertEqual(trait.t_type, models.Trait.DATETIME_TYPE)
-        self.assertIsNone(trait.t_int)
-        self.assertIsNone(trait.t_string)
-        self.assertIsNone(trait.t_float)
-        self.assertEqual(trait.t_datetime, utils.dt_to_decimal(now))
-        self.assertIsNotNone(trait.name)
+        event = MagicMock()
+        event.id = 1
+        trait = self.conn._make_trait(model, event)
+        self.assertEqual(trait['t_type'], models.Trait.DATETIME_TYPE)
+        self.assertIsNone(trait['t_float'])
+        self.assertIsNone(trait['t_string'])
+        self.assertIsNone(trait['t_int'])
+        self.assertEqual(trait['t_datetime'], utils.dt_to_decimal(now))
+        self.assertIsNotNone(trait['name_id'])
 
     def test_bad_event(self):
         now = datetime.datetime.utcnow()
@@ -143,3 +153,37 @@ class ModelTest(tests_db.TestBase):
 
     def test_model_table_args(self):
         self.assertIsNotNone(table_args())
+
+
+class LRUCacheTest(SimpleTestBase):
+    def test_max_size(self):
+        cache = impl_sqlalchemy.LRUCache(max_size=5)
+        for i in range(0, 10):
+            cache.set('key%s' % i, i)
+        self.assertEqual(5, len(cache))
+
+    def test_drops_least_recently_added(self):
+        cache = impl_sqlalchemy.LRUCache(max_size=5)
+        for i in range(0, 6):
+            cache.set('key%s' % i, i)
+
+        self.assertFalse('key0' in cache)
+        for i in range(1, 6):
+            key = 'key%s' % i
+            self.assertTrue(key in cache)
+            self.assertEqual(i, cache.get(key))
+
+    def test_drops_least_recently_used(self):
+        cache = impl_sqlalchemy.LRUCache(max_size=5)
+        for i in range(0, 5):
+            cache.set('key%s' % i, i)
+
+        cache.get('key4')
+        cache.get('key2')
+        cache.get('key0')
+        cache.get('key3')
+        cache.get('key1')
+        cache.set('newkey', 6)
+        self.assertFalse('key4' in cache)
+        self.assertTrue('newkey' in cache)
+        self.assertEqual(6, cache.get('newkey'))

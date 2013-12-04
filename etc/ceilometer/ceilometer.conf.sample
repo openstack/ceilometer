@@ -602,6 +602,14 @@
 #time_to_live=-1
 
 
+#
+# Options defined in ceilometer.storage.impl_sqlalchemy
+#
+
+# Max size of the unique name cache (integer value)
+#unique_name_cache_size=500
+
+
 [alarm]
 
 #

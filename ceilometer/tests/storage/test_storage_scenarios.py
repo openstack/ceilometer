@@ -2119,11 +2119,13 @@ class GetEventTest(EventTestBase):
             now = now + datetime.timedelta(hours=1)
         self.end = now
 
-        self.conn.record_events(event_models)
+        prob = self.conn.record_events(event_models)
+        self.assertEqual(0, len(prob), prob)
 
     def test_simple_get(self):
         event_filter = storage.EventFilter(self.start, self.end)
         events = self.conn.get_events(event_filter)
+        #self.fail(self.conn.get_traits())
         self.assertEqual(3, len(events))
         start_time = None
         for i, name in enumerate(["Foo", "Bar", "Zoo"]):

@@ -18,15 +18,18 @@
 """SQLAlchemy storage backend."""
 
 from __future__ import absolute_import
+from collections import OrderedDict
 import datetime
 import operator
 import os
 import types
 
+from oslo.config import cfg
 from sqlalchemy import and_
 from sqlalchemy import desc
 from sqlalchemy import func
 from sqlalchemy.orm import aliased
+from sqlalchemy.orm import joinedload_all
 
 from ceilometer.openstack.common.db import exception as dbexc
 import ceilometer.openstack.common.db.sqlalchemy.session as sqlalchemy_session
@@ -52,6 +55,14 @@ from ceilometer.storage.sqlalchemy.models import Trait
 from ceilometer.storage.sqlalchemy.models import UniqueName
 from ceilometer.storage.sqlalchemy.models import User
 from ceilometer import utils
+
+SQLALCHEMY_OPTS = [
+    cfg.IntOpt('unique_name_cache_size',
+               default=500,
+               help="""Max size of the unique name cache"""),
+]
+
+cfg.CONF.register_opts(SQLALCHEMY_OPTS, group='database')
 
 LOG = log.getLogger(__name__)
 
@@ -179,10 +190,46 @@ def make_query_from_filter(session, query, sample_filter, require_meter=True):
     return query
 
 
+class LRUCache(object):
+    def __init__(self, max_size=200):
+        self.items = OrderedDict()
+        self.max_size = max_size
+
+    def get(self, key):
+        item = self.items[key]
+        del self.items[key]
+        self.items[key] = item
+        return item
+
+    def set(self, key, value):
+        if key in self.items:
+            del self.items[key]
+        if len(self.items) >= self.max_size:
+            self.items.popitem(last=False)
+        self.items[key] = value
+
+    def clear(self):
+        self.items = OrderedDict()
+
+    def __iter__(self):
+        return self.items.keys().__iter__()
+
+    def __contains__(self, item):
+        return item in self.items
+
+    def __len__(self):
+        return len(self.items)
+
+    def __repr__(self):
+        return self.items.__repr__()
+
+
 class Connection(base.Connection):
     """SqlAlchemy connection."""
 
     def __init__(self, conf):
+        name_cache_size = conf.database.unique_name_cache_size
+        self.name_cache = LRUCache(max_size=name_cache_size)
         url = conf.database.connection
         if url == 'sqlite://':
             conf.database.connection = \
@@ -197,6 +244,7 @@ class Connection(base.Connection):
         engine = session.get_bind()
         for table in reversed(Base.metadata.sorted_tables):
             engine.execute(table.delete())
+        self.name_cache.clear()
 
     @staticmethod
     def record_metering_data(data):
@@ -806,9 +854,15 @@ class Connection(base.Connection):
             session.add(alarm_change_row)
             session.flush()
 
-    @staticmethod
-    def _get_unique(session, key):
-        return session.query(UniqueName).filter(UniqueName.key == key).first()
+    def _get_unique(self, session, key):
+        if key in self.name_cache:
+            return self.name_cache.get(key)
+        else:
+            query = session.query(UniqueName).filter(UniqueName.key == key)
+            unique = query.first()
+            if unique:
+                self.name_cache.set(key, unique)
+            return unique
 
     def _get_or_create_unique_name(self, key, session=None):
         """Find the UniqueName entry for a given key, creating
@@ -816,15 +870,20 @@ class Connection(base.Connection):
 
            This may result in a flush.
         """
-        if session is None:
-            session = sqlalchemy_session.get_session()
-        with session.begin(subtransactions=True):
-            unique = self._get_unique(session, key)
-            if not unique:
-                unique = UniqueName(key=key)
-                session.add(unique)
-                session.flush()
-        return unique
+        if key in self.name_cache:
+            return self.name_cache.get(key)
+        else:
+            if session is None:
+                session = sqlalchemy_session.get_session()
+            with session.begin(subtransactions=True):
+                unique = self._get_unique(session, key)
+                if not unique:
+                    unique = UniqueName(key=key)
+                    session.add(unique)
+                    session.flush()
+            if unique:
+                self.name_cache.set(key, unique)
+            return unique
 
     def _make_trait(self, trait_model, event, session=None):
         """Make a new Trait from a Trait model.
@@ -840,7 +899,10 @@ class Connection(base.Connection):
         if trait_model.dtype == api_models.Trait.DATETIME_TYPE:
             value = utils.dt_to_decimal(value)
         values[value_map[trait_model.dtype]] = value
-        return Trait(name, event, trait_model.dtype, **values)
+        values['name_id'] = name.id
+        values['event_id'] = event.id
+        values['t_type'] = trait_model.dtype
+        return values
 
     def _record_event(self, session, event_model):
         """Store a single Event, including related Traits.
@@ -852,13 +914,16 @@ class Connection(base.Connection):
             generated = utils.dt_to_decimal(event_model.generated)
             event = Event(event_model.message_id, unique, generated)
             session.add(event)
+            # NOTE(apmelton) We need to flush to get the event's ID so that we
+            # can bulk insert the traits.
+            session.flush()
 
             new_traits = []
             if event_model.traits:
                 for trait in event_model.traits:
                     t = self._make_trait(trait, event, session=session)
-                    session.add(t)
                     new_traits.append(t)
+                session.execute(Trait.__table__.insert(), new_traits)
 
         # Note: we don't flush here, explicitly (unless a new uniquename
         # does it). Otherwise, just wait until all the Events are staged.
@@ -874,13 +939,11 @@ class Connection(base.Connection):
         storage.model.Event
         """
         session = sqlalchemy_session.get_session()
-        events = []
         problem_events = []
         for event_model in event_models:
-            event = None
             try:
                 with session.begin():
-                    event = self._record_event(session, event_model)
+                    self._record_event(session, event_model)
                     session.flush()
             except dbexc.DBDuplicateEntry:
                 problem_events.append((api_models.Event.DUPLICATE,
@@ -889,7 +952,6 @@ class Connection(base.Connection):
                 LOG.exception('Failed to record event: %s', e)
                 problem_events.append((api_models.Event.UNKNOWN_PROBLEM,
                                        event_model))
-            events.append(event)
         return problem_events
 
     def get_events(self, event_filter):
