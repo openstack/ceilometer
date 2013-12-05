@@ -253,12 +253,12 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         pub = self.mgr.pipeline_manager.pipelines[0].publishers[0]
         self.assertEqual(len(pub.samples), 0)
 
-    def test_agent_manager_initialize_service_hook(self):
+    def test_agent_manager_start(self):
         mgr = agent.AgentManager(self.mgr.pollster_manager)
         mgr.create_polling_task = mock.MagicMock()
-        service = mock.MagicMock()
-        mgr.initialize_service_hook(service)
-        self.assertTrue(service.tg.add_timer.called)
+        mgr.tg = mock.MagicMock()
+        mgr.start()
+        self.assertTrue(mgr.tg.add_timer.called)
 
     def test_manager_exception_persistency(self):
         self.pipeline_cfg.append({

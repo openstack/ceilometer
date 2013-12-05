@@ -23,7 +23,6 @@ from stevedore import extension
 from ceilometer import agent
 from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common.rpc import service as rpc_service
 from ceilometer.openstack.common import service as os_service
 from ceilometer import service
 
@@ -83,6 +82,4 @@ class AgentManager(agent.AgentManager):
 
 def agent_central():
     service.prepare_service()
-    os_service.launch(rpc_service.Service(cfg.CONF.host,
-                                          'ceilometer.agent.central',
-                                          AgentManager())).wait()
+    os_service.launch(AgentManager()).wait()

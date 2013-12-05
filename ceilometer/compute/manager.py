@@ -24,7 +24,6 @@ from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer import nova_client
 from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common.rpc import service as rpc_service
 from ceilometer.openstack.common import service as os_service
 from ceilometer import service
 
@@ -84,6 +83,4 @@ class AgentManager(agent.AgentManager):
 
 def agent_compute():
     service.prepare_service()
-    os_service.launch(rpc_service.Service(cfg.CONF.host,
-                                          'ceilometer.agent.compute',
-                                          AgentManager())).wait()
+    os_service.launch(AgentManager()).wait()
