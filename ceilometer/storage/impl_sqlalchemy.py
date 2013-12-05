@@ -702,7 +702,6 @@ class Connection(base.Connection):
             alarm_row = models.Alarm(id=alarm.alarm_id)
             alarm_row.update(alarm.as_dict())
             session.add(alarm_row)
-            session.flush()
 
         return self._row_to_alarm_model(alarm_row)
 
@@ -715,7 +714,6 @@ class Connection(base.Connection):
         with session.begin():
             alarm_row = session.merge(models.Alarm(id=alarm.alarm_id))
             alarm_row.update(alarm.as_dict())
-            session.flush()
 
         return self._row_to_alarm_model(alarm_row)
 
@@ -729,7 +727,6 @@ class Connection(base.Connection):
         with session.begin():
             session.query(models.Alarm).filter(
                 models.Alarm.id == alarm_id).delete()
-            session.flush()
 
     @staticmethod
     def _row_to_alarm_change_model(row):
@@ -815,7 +812,6 @@ class Connection(base.Connection):
                 event_id=alarm_change['event_id'])
             alarm_change_row.update(alarm_change)
             session.add(alarm_change_row)
-            session.flush()
 
     @staticmethod
     def _get_or_create_trait_type(trait_type, data_type, session=None):
@@ -831,7 +827,6 @@ class Connection(base.Connection):
             if not tt:
                 tt = models.TraitType(trait_type, data_type)
                 session.add(tt)
-                session.flush()
         return tt
 
     @classmethod
@@ -867,7 +862,6 @@ class Connection(base.Connection):
             if not et:
                 et = models.EventType(event_type)
                 session.add(et)
-                session.flush()
         return et
 
     @classmethod
@@ -913,7 +907,6 @@ class Connection(base.Connection):
             try:
                 with session.begin():
                     event = self._record_event(session, event_model)
-                    session.flush()
             except dbexc.DBDuplicateEntry:
                 problem_events.append((api_models.Event.DUPLICATE,
                                        event_model))
