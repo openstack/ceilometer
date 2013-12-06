@@ -40,6 +40,8 @@ OPTS = [
 
 cfg.CONF.register_opts(OPTS, group="collector")
 cfg.CONF.import_opt('rpc_backend', 'ceilometer.openstack.common.rpc')
+cfg.CONF.import_opt('metering_topic', 'ceilometer.publisher.rpc',
+                    group="publisher_rpc")
 
 
 LOG = log.getLogger(__name__)
