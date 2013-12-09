@@ -201,7 +201,6 @@ class Meter(Base):
     )
     id = Column(Integer, primary_key=True)
     counter_name = Column(String(255))
-    sources = relationship("Source", secondary=lambda: sourceassoc)
     user_id = Column(String(255), ForeignKey('user.id'))
     project_id = Column(String(255), ForeignKey('project.id'))
     resource_id = Column(String(255), ForeignKey('resource.id'))
@@ -212,6 +211,15 @@ class Meter(Base):
     timestamp = Column(PreciseTimestamp(), default=timeutils.utcnow)
     message_signature = Column(String(1000))
     message_id = Column(String(1000))
+    sources = relationship("Source", secondary=lambda: sourceassoc)
+    meta_text = relationship("MetaText", backref="meter",
+                             cascade="all, delete-orphan")
+    meta_float = relationship("MetaFloat", backref="meter",
+                              cascade="all, delete-orphan")
+    meta_int = relationship("MetaBigInt", backref="meter",
+                            cascade="all, delete-orphan")
+    meta_bool = relationship("MetaBool", backref="meter",
+                             cascade="all, delete-orphan")
 
 
 class User(Base):

@@ -28,9 +28,12 @@ import repr
 
 from mock import patch
 
+import ceilometer.openstack.common.db.sqlalchemy.session as sqlalchemy_session
+from ceilometer.openstack.common import timeutils
 from ceilometer.storage import models
 from ceilometer.storage.sqlalchemy import models as sql_models
 from ceilometer.tests import db as tests_db
+from ceilometer.tests.storage import test_storage_scenarios as scenarios
 from ceilometer import utils
 
 
@@ -175,3 +178,42 @@ class ModelTest(tests_db.TestBase):
 
     def test_model_table_args(self):
         self.assertIsNotNone(sql_models.table_args())
+
+
+class RelationshipTest(scenarios.DBTestBase):
+    database_connection = 'mysql://localhost'
+
+    def test_clear_metering_data_meta_tables(self):
+        timeutils.utcnow.override_time = datetime.datetime(2012, 7, 2, 10, 45)
+        self.conn.clear_expired_metering_data(3 * 60)
+
+        session = sqlalchemy_session.get_session()
+        meta_tables = [sql_models.MetaText, sql_models.MetaFloat,
+                       sql_models.MetaBigInt, sql_models.MetaBool]
+        for table in meta_tables:
+            self.assertEqual(session.query(table)
+                .filter(~table.id.in_(
+                    session.query(sql_models.Meter.id)
+                        .group_by(sql_models.Meter.id)
+                        )).count(), 0)
+
+    def test_clear_metering_data_associations(self):
+        timeutils.utcnow.override_time = datetime.datetime(2012, 7, 2, 10, 45)
+        self.conn.clear_expired_metering_data(3 * 60)
+
+        session = sqlalchemy_session.get_session()
+        self.assertEqual(session.query(sql_models.sourceassoc)
+            .filter(~sql_models.sourceassoc.c.meter_id.in_(
+                session.query(sql_models.Meter.id)
+                    .group_by(sql_models.Meter.id)
+                    )).count(), 0)
+        self.assertEqual(session.query(sql_models.sourceassoc)
+            .filter(~sql_models.sourceassoc.c.project_id.in_(
+                session.query(sql_models.Project.id)
+                    .group_by(sql_models.Project.id)
+                    )).count(), 0)
+        self.assertEqual(session.query(sql_models.sourceassoc)
+            .filter(~sql_models.sourceassoc.c.user_id.in_(
+                session.query(sql_models.User.id)
+                    .group_by(sql_models.User.id)
+                    )).count(), 0)

@@ -279,28 +279,49 @@ class Connection(base.Connection):
         :param ttl: Number of seconds to keep records for.
 
         """
+
         session = sqlalchemy_session.get_session()
-        query = session.query(models.Meter.id)
-        end = timeutils.utcnow() - datetime.timedelta(seconds=ttl)
-        query = query.filter(models.Meter.timestamp < end)
-        query.delete()
+        with session.begin():
+            end = timeutils.utcnow() - datetime.timedelta(seconds=ttl)
+            meter_query = session.query(models.Meter)\
+                .filter(models.Meter.timestamp < end)
+            for meter_obj in meter_query.all():
+                session.delete(meter_obj)
 
-        query = session.query(models.User.id).filter(~models.User.id.in_(
-            session.query(models.Meter.user_id).group_by(models.Meter.user_id)
-        ))
-        query.delete(synchronize_session='fetch')
+            query = session.query(models.User).filter(
+                ~models.User.id.in_(session.query(models.Meter.user_id)
+                                    .group_by(models.Meter.user_id)),
+                ~models.User.id.in_(session.query(models.Alarm.user_id)
+                                    .group_by(models.Alarm.user_id)),
+                ~models.User.id.in_(session.query(models.AlarmChange.user_id)
+                                    .group_by(models.AlarmChange.user_id))
+            )
+            for user_obj in query.all():
+                session.delete(user_obj)
 
-        query = session.query(models.Project.id)\
-            .filter(~models.Project.id.in_(
-                session.query(models.Meter.project_id).group_by(
-                    models.Meter.project_id)))
-        query.delete(synchronize_session='fetch')
+            query = session.query(models.Project)\
+                .filter(~models.Project.id.in_(
+                    session.query(models.Meter.project_id)
+                        .group_by(models.Meter.project_id)),
+                        ~models.Project.id.in_(
+                            session.query(models.Alarm.project_id)
+                            .group_by(models.Alarm.project_id)),
+                        ~models.Project.id.in_(
+                            session.query(models.AlarmChange.project_id)
+                            .group_by(models.AlarmChange.project_id)),
+                        ~models.Project.id.in_(
+                            session.query(models.AlarmChange.on_behalf_of)
+                            .group_by(models.AlarmChange.on_behalf_of))
+                        )
+            for project_obj in query.all():
+                session.delete(project_obj)
 
-        query = session.query(models.Resource.id)\
-            .filter(~models.Resource.id.in_(
-                session.query(models.Meter.resource_id).group_by(
-                    models.Meter.resource_id)))
-        query.delete(synchronize_session='fetch')
+            query = session.query(models.Resource)\
+                .filter(~models.Resource.id.in_(
+                    session.query(models.Meter.resource_id).group_by(
+                        models.Meter.resource_id)))
+            for res_obj in query.all():
+                session.delete(res_obj)
 
     @staticmethod
     def get_users(source=None):
