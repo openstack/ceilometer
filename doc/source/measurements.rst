@@ -82,8 +82,8 @@ disk.root.size            Gauge             GB  inst ID   notification  Size of 
 disk.ephemeral.size       Gauge             GB  inst ID   notification  Size of ephemeral disk in GB
 network.incoming.bytes    Cumulative         B  iface ID  pollster      number of incoming bytes on the network for a VM interface
 network.outgoing.bytes    Cumulative         B  iface ID  pollster      number of outgoing bytes on the network for a VM interface
-network.incoming.packets  Cumulative   packets  iface ID  pollster      number of incoming packets for a VM interface
-network.outgoing.packets  Cumulative   packets  iface ID  pollster      number of outgoing packets for a VM interface
+network.incoming.packets  Cumulative    packet  iface ID  pollster      number of incoming packets for a VM interface
+network.outgoing.packets  Cumulative    packet  iface ID  pollster      number of outgoing packets for a VM interface
 ========================  ==========  ========  ========  ============  =======================================================
 
 At present, most of the Nova meters will only work with libvirt front-end
@@ -147,9 +147,9 @@ Object Storage (Swift)
 ==============================  ==========  ==========  ========  ============  ==============================================
 Name                            Type        Volume      Resource  Origin        Note
 ==============================  ==========  ==========  ========  ============  ==============================================
-storage.objects                 Gauge          objects  store ID  pollster      Number of objects
+storage.objects                 Gauge           object  store ID  pollster      Number of objects
 storage.objects.size            Gauge                B  store ID  pollster      Total size of stored objects
-storage.objects.containers      Gauge       containers  store ID  pollster      Number of containers
+storage.objects.containers      Gauge        container  store ID  pollster      Number of containers
 storage.objects.incoming.bytes  Delta                B  store ID  notification  Number of incoming bytes
 storage.objects.outgoing.bytes  Delta                B  store ID  notification  Number of outgoing bytes
 storage.api.request             Delta          request  store ID  notification  Number of API requests against swift
