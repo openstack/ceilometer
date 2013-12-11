@@ -227,10 +227,11 @@ alarms based on application centric data.
 
 
 There can be multiple form of actions, but two have been implemented so far:
-1. http call back: you provide a URL to be called whenever the alarm has been set
+
+1. :term:`HTTP callback`: you provide a URL to be called whenever the alarm has been set
    off. The payload of the request contains all the details of why the alarm went
    off.
-2. log: mostly useful for debugging, stores alarms in a log file.
+2. :term:`log`: mostly useful for debugging, stores alarms in a log file.
 
 For more details on this, I recommend you to read the blog post by
 Mehdi Abaakouk `Autoscaling with Heat and Ceilometer`_. Particular attention
