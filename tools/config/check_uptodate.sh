@@ -1,5 +1,5 @@
 #!/bin/sh
-TEMPDIR=`mktemp -d`
+TEMPDIR=`mktemp -d /tmp/ceilometer-check-config-XXXXXX`
 CFGFILE=ceilometer.conf.sample
 tools/config/generate_sample.sh -b ./ -p ceilometer -o $TEMPDIR
 if ! diff $TEMPDIR/$CFGFILE etc/ceilometer/$CFGFILE
