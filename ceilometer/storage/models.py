@@ -18,6 +18,8 @@
 """Model classes for use in the storage API.
 """
 
+from ceilometer.openstack.common import timeutils
+
 
 class Model(object):
     """Base class for storage API models.
@@ -96,6 +98,20 @@ class Trait(Model):
 
     def __repr__(self):
         return "<Trait: %s %d %s>" % (self.name, self.dtype, self.value)
+
+    @classmethod
+    def get_type_by_name(cls, type_name):
+        return getattr(cls, '%s_TYPE' % type_name.upper(), None)
+
+    @classmethod
+    def convert_value(cls, trait_type, value):
+        if trait_type is cls.INT_TYPE:
+            return int(value)
+        if trait_type is cls.FLOAT_TYPE:
+            return float(value)
+        if trait_type is cls.DATETIME_TYPE:
+            return timeutils.normalize_time(timeutils.parse_isotime(value))
+        return str(value)
 
 
 class Resource(Model):

@@ -48,6 +48,7 @@ Table of contents
 
    architecture
    measurements
+   events
    install/index
    configuration
    webapi/index

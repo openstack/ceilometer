@@ -709,6 +709,17 @@
 #record_history=true
 
 
+[matchmaker_ring]
+
+#
+# Options defined in ceilometer.openstack.common.rpc.matchmaker_ring
+#
+
+# Matchmaker ring file (JSON) (string value)
+# Deprecated group/name - [DEFAULT]/matchmaker_ringfile
+#ringfile=/etc/oslo/matchmaker_ring.json
+
+
 [rpc_notifier2]
 
 #
@@ -803,15 +814,19 @@
 #udp_port=4952
 
 
-[matchmaker_ring]
+[event]
 
 #
-# Options defined in ceilometer.openstack.common.rpc.matchmaker_ring
+# Options defined in ceilometer.event.converter
 #
 
-# Matchmaker ring file (JSON) (string value)
-# Deprecated group/name - [DEFAULT]/matchmaker_ringfile
-#ringfile=/etc/oslo/matchmaker_ring.json
+# Configuration file for event definitions (string value)
+#definitions_cfg_file=event_definitions.yaml
+
+# Drop notifications if no event definition matches.
+# (Otherwise, we convert them with just the default traits)
+# (boolean value)
+#drop_unmatched_notifications=false
 
 
 [matchmaker_redis]

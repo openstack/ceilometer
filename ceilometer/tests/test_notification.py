@@ -17,7 +17,6 @@
 # under the License.
 """Tests for Ceilometer notify daemon."""
 
-import datetime
 import mock
 
 from stevedore import extension
@@ -26,7 +25,6 @@ from stevedore.tests import manager as test_manager
 from ceilometer.compute import notifications
 from ceilometer import notification
 from ceilometer.openstack.common.fixture import config
-from ceilometer.openstack.common import timeutils
 from ceilometer.storage import models
 from ceilometer.tests import base as tests_base
 
@@ -89,6 +87,7 @@ class TestNotification(tests_base.BaseTestCase):
         self.CONF.set_override("connection", "log://", group='database')
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    @mock.patch('ceilometer.event.converter.setup_events', mock.MagicMock())
     def test_process_notification(self):
         # If we try to create a real RPC connection, init_host() never
         # returns. Mock it out so we can establish the service
@@ -124,33 +123,12 @@ class TestNotification(tests_base.BaseTestCase):
             self.srv.process_notification({})
             self.assertTrue(fake_msg_to_event.called)
 
-    def test_message_to_event_missing_keys(self):
-        now = timeutils.utcnow()
-        timeutils.set_time_override(now)
-        message = {'event_type': "foo",
-                   'message_id': "abc",
-                   'publisher_id': "1"}
-
-        mock_dispatcher = mock.MagicMock()
-        self.srv.dispatcher_manager = test_manager.TestExtensionManager(
-            [extension.Extension('test',
-                                 None,
-                                 None,
-                                 mock_dispatcher
-                                 ),
-             ])
-
-        self.srv._message_to_event(message)
-        events = mock_dispatcher.record_events.call_args[0]
-        self.assertEqual(1, len(events))
-        event = events[0]
-        self.assertEqual("foo", event.event_type)
-        self.assertEqual(now, event.generated)
-        self.assertEqual(1, len(event.traits))
-
     def test_message_to_event_duplicate(self):
         self.CONF.set_override("store_events", True, group="notification")
         mock_dispatcher = mock.MagicMock()
+        self.srv.event_converter = mock.MagicMock()
+        self.srv.event_converter.to_event.return_value = mock.MagicMock(
+            event_type='test.test')
         self.srv.dispatcher_manager = test_manager.TestExtensionManager(
             [extension.Extension('test',
                                  None,
@@ -166,6 +144,9 @@ class TestNotification(tests_base.BaseTestCase):
     def test_message_to_event_bad_event(self):
         self.CONF.set_override("store_events", True, group="notification")
         mock_dispatcher = mock.MagicMock()
+        self.srv.event_converter = mock.MagicMock()
+        self.srv.event_converter.to_event.return_value = mock.MagicMock(
+            event_type='test.test')
         self.srv.dispatcher_manager = test_manager.TestExtensionManager(
             [extension.Extension('test',
                                  None,
@@ -178,24 +159,3 @@ class TestNotification(tests_base.BaseTestCase):
         message = {'event_type': "foo", 'message_id': "abc"}
         self.assertRaises(notification.UnableToSaveEventException,
                           self.srv._message_to_event, message)
-
-    def test_extract_when(self):
-        now = timeutils.utcnow()
-        modified = now + datetime.timedelta(minutes=1)
-        timeutils.set_time_override(now)
-
-        body = {"timestamp": str(modified)}
-        when = notification.NotificationService._extract_when(body)
-        self.assertTimestampEqual(modified, when)
-
-        body = {"_context_timestamp": str(modified)}
-        when = notification.NotificationService._extract_when(body)
-        self.assertTimestampEqual(modified, when)
-
-        then = now + datetime.timedelta(hours=1)
-        body = {"timestamp": str(modified), "_context_timestamp": str(then)}
-        when = notification.NotificationService._extract_when(body)
-        self.assertTimestampEqual(modified, when)
-
-        when = notification.NotificationService._extract_when({})
-        self.assertTimestampEqual(now, when)

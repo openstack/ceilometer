@@ -1,0 +1,734 @@
+# -*- encoding: utf-8 -*-
+#
+# Copyright © 2013 Rackspace Hosting.
+#
+# Author: Monsyne Dragon <mdragon@rackspace.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+
+import datetime
+
+import jsonpath_rw
+import mock
+from oslo.config import cfg as oslo_cfg
+import six
+
+from ceilometer.event import converter
+from ceilometer.openstack.common import timeutils
+from ceilometer.storage import models
+from ceilometer.tests import base
+
+
+class ConverterBase(base.BaseTestCase):
+    def _create_test_notification(self, event_type, message_id, **kw):
+        return dict(event_type=event_type,
+                    message_id=message_id,
+                    priority="INFO",
+                    publisher_id="compute.host-1-2-3",
+                    timestamp="2013-08-08 21:06:37.803826",
+                    payload=kw,
+                    )
+
+    def assertIsValidEvent(self, event, notification):
+        self.assertIsNot(
+            None, event,
+            "Notification dropped unexpectedly:"
+            " %s" % str(notification))
+        self.assertIsInstance(event, models.Event)
+
+    def assertIsNotValidEvent(self, event, notification):
+        self.assertIs(
+            None, event,
+            "Notification NOT dropped when expected to be dropped:"
+            " %s" % str(notification))
+
+    def assertHasTrait(self, event, name, value=None, dtype=None):
+        traits = [trait for trait in event.traits if trait.name == name]
+        self.assertTrue(
+            len(traits) > 0,
+            "Trait %s not found in event %s" % (name, event))
+        trait = traits[0]
+        if value is not None:
+            self.assertEqual(trait.value, value)
+        if dtype is not None:
+            self.assertEqual(trait.dtype, dtype)
+            if dtype == models.Trait.INT_TYPE:
+                self.assertIsInstance(trait.value, int)
+            elif dtype == models.Trait.FLOAT_TYPE:
+                self.assertIsInstance(trait.value, float)
+            elif dtype == models.Trait.DATETIME_TYPE:
+                self.assertIsInstance(trait.value, datetime.datetime)
+            elif dtype == models.Trait.TEXT_TYPE:
+                self.assertIsInstance(trait.value, six.string_types)
+
+    def assertDoesNotHaveTrait(self, event, name):
+        traits = [trait for trait in event.traits if trait.name == name]
+        self.assertEqual(
+            len(traits), 0,
+            "Extra Trait %s found in event %s" % (name, event))
+
+    def assertHasDefaultTraits(self, event):
+        text = models.Trait.TEXT_TYPE
+        self.assertHasTrait(event, 'service', dtype=text)
+
+    def _cmp_tree(self, this, other):
+        if hasattr(this, 'right') and hasattr(other, 'right'):
+            return (self._cmp_tree(this.right, other.right) and
+                    self._cmp_tree(this.left, other.left))
+        if not hasattr(this, 'right') and not hasattr(other, 'right'):
+            return this == other
+        return False
+
+    def assertPathsEqual(self, path1, path2):
+        self.assertTrue(self._cmp_tree(path1, path2),
+                        'JSONPaths not equivalent %s %s' % (path1, path2))
+
+
+class TestTraitDefinition(ConverterBase):
+
+    def setUp(self):
+        super(TestTraitDefinition, self).setUp()
+        self.n1 = self._create_test_notification(
+            "test.thing",
+            "uuid-for-notif-0001",
+            instance_uuid="uuid-for-instance-0001",
+            instance_id="id-for-instance-0001",
+            instance_uuid2=None,
+            instance_id2=None,
+            host='host-1-2-3',
+            bogus_date='',
+            image_meta=dict(
+                        disk_gb='20',
+                        thing='whatzit'),
+            foobar=50)
+
+        self.ext1 = mock.MagicMock(name='mock_test_plugin')
+        self.test_plugin_class = self.ext1.plugin
+        self.test_plugin = self.test_plugin_class()
+        self.test_plugin.trait_value.return_value = 'foobar'
+        self.ext1.reset_mock()
+
+        self.ext2 = mock.MagicMock(name='mock_nothing_plugin')
+        self.nothing_plugin_class = self.ext2.plugin
+        self.nothing_plugin = self.nothing_plugin_class()
+        self.nothing_plugin.trait_value.return_value = None
+        self.ext2.reset_mock()
+
+        self.fake_plugin_mgr = dict(test=self.ext1, nothing=self.ext2)
+
+    def test_to_trait_with_plugin(self):
+        cfg = dict(type='text',
+                   fields=['payload.instance_id', 'payload.instance_uuid'],
+                   plugin=dict(name='test'))
+
+        tdef = converter.TraitDefinition('test_trait', cfg,
+                                         self.fake_plugin_mgr)
+        t = tdef.to_trait(self.n1)
+        self.assertIsInstance(t, models.Trait)
+        self.assertEqual(t.name, 'test_trait')
+        self.assertEqual(t.dtype, models.Trait.TEXT_TYPE)
+        self.assertEqual(t.value, 'foobar')
+        self.test_plugin_class.assert_called_once_with()
+        self.test_plugin.trait_value.assert_called_once_with([
+            ('payload.instance_id', 'id-for-instance-0001'),
+            ('payload.instance_uuid', 'uuid-for-instance-0001')])
+
+    def test_to_trait_null_match_with_plugin(self):
+        cfg = dict(type='text',
+                   fields=['payload.nothere', 'payload.bogus'],
+                   plugin=dict(name='test'))
+
+        tdef = converter.TraitDefinition('test_trait', cfg,
+                                         self.fake_plugin_mgr)
+        t = tdef.to_trait(self.n1)
+        self.assertIsInstance(t, models.Trait)
+        self.assertEqual(t.name, 'test_trait')
+        self.assertEqual(t.dtype, models.Trait.TEXT_TYPE)
+        self.assertEqual(t.value, 'foobar')
+        self.test_plugin_class.assert_called_once_with()
+        self.test_plugin.trait_value.assert_called_once_with([])
+
+    def test_to_trait_with_plugin_null(self):
+        cfg = dict(type='text',
+                   fields=['payload.instance_id', 'payload.instance_uuid'],
+                   plugin=dict(name='nothing'))
+
+        tdef = converter.TraitDefinition('test_trait', cfg,
+                                         self.fake_plugin_mgr)
+        t = tdef.to_trait(self.n1)
+        self.assertIs(None, t)
+        self.nothing_plugin_class.assert_called_once_with()
+        self.nothing_plugin.trait_value.assert_called_once_with([
+            ('payload.instance_id', 'id-for-instance-0001'),
+            ('payload.instance_uuid', 'uuid-for-instance-0001')])
+
+    def test_to_trait_with_plugin_with_parameters(self):
+        cfg = dict(type='text',
+                   fields=['payload.instance_id', 'payload.instance_uuid'],
+                   plugin=dict(name='test', parameters=dict(a=1, b='foo')))
+
+        tdef = converter.TraitDefinition('test_trait', cfg,
+                                         self.fake_plugin_mgr)
+        t = tdef.to_trait(self.n1)
+        self.assertIsInstance(t, models.Trait)
+        self.assertEqual(t.name, 'test_trait')
+        self.assertEqual(t.dtype, models.Trait.TEXT_TYPE)
+        self.assertEqual(t.value, 'foobar')
+        self.test_plugin_class.assert_called_once_with(a=1, b='foo')
+        self.test_plugin.trait_value.assert_called_once_with([
+            ('payload.instance_id', 'id-for-instance-0001'),
+            ('payload.instance_uuid', 'uuid-for-instance-0001')])
+
+    def test_to_trait(self):
+        cfg = dict(type='text', fields='payload.instance_id')
+        tdef = converter.TraitDefinition('test_trait', cfg,
+                                         self.fake_plugin_mgr)
+        t = tdef.to_trait(self.n1)
+        self.assertIsInstance(t, models.Trait)
+        self.assertEqual(t.name, 'test_trait')
+        self.assertEqual(t.dtype, models.Trait.TEXT_TYPE)
+        self.assertEqual(t.value, 'id-for-instance-0001')
+
+        cfg = dict(type='int', fields='payload.image_meta.disk_gb')
+        tdef = converter.TraitDefinition('test_trait', cfg,
+                                         self.fake_plugin_mgr)
+        t = tdef.to_trait(self.n1)
+        self.assertIsInstance(t, models.Trait)
+        self.assertEqual(t.name, 'test_trait')
+        self.assertEqual(t.dtype, models.Trait.INT_TYPE)
+        self.assertEqual(t.value, 20)
+
+    def test_to_trait_multiple(self):
+        cfg = dict(type='text', fields=['payload.instance_id',
+                                        'payload.instance_uuid'])
+        tdef = converter.TraitDefinition('test_trait', cfg,
+                                         self.fake_plugin_mgr)
+        t = tdef.to_trait(self.n1)
+        self.assertIsInstance(t, models.Trait)
+        self.assertEqual(t.value, 'id-for-instance-0001')
+
+        cfg = dict(type='text', fields=['payload.instance_uuid',
+                                        'payload.instance_id'])
+        tdef = converter.TraitDefinition('test_trait', cfg,
+                                         self.fake_plugin_mgr)
+        t = tdef.to_trait(self.n1)
+        self.assertIsInstance(t, models.Trait)
+        self.assertEqual(t.value, 'uuid-for-instance-0001')
+
+    def test_to_trait_multiple_different_nesting(self):
+        cfg = dict(type='int', fields=['payload.foobar',
+                   'payload.image_meta.disk_gb'])
+        tdef = converter.TraitDefinition('test_trait', cfg,
+                                         self.fake_plugin_mgr)
+        t = tdef.to_trait(self.n1)
+        self.assertIsInstance(t, models.Trait)
+        self.assertEqual(t.value, 50)
+
+        cfg = dict(type='int', fields=['payload.image_meta.disk_gb',
+                   'payload.foobar'])
+        tdef = converter.TraitDefinition('test_trait', cfg,
+                                         self.fake_plugin_mgr)
+        t = tdef.to_trait(self.n1)
+        self.assertIsInstance(t, models.Trait)
+        self.assertEqual(t.value, 20)
+
+    def test_to_trait_some_null_multiple(self):
+        cfg = dict(type='text', fields=['payload.instance_id2',
+                                        'payload.instance_uuid'])
+        tdef = converter.TraitDefinition('test_trait', cfg,
+                                         self.fake_plugin_mgr)
+        t = tdef.to_trait(self.n1)
+        self.assertIsInstance(t, models.Trait)
+        self.assertEqual(t.value, 'uuid-for-instance-0001')
+
+    def test_to_trait_some_missing_multiple(self):
+        cfg = dict(type='text', fields=['payload.not_here_boss',
+                                        'payload.instance_uuid'])
+        tdef = converter.TraitDefinition('test_trait', cfg,
+                                         self.fake_plugin_mgr)
+        t = tdef.to_trait(self.n1)
+        self.assertIsInstance(t, models.Trait)
+        self.assertEqual(t.value, 'uuid-for-instance-0001')
+
+    def test_to_trait_missing(self):
+        cfg = dict(type='text', fields='payload.not_here_boss')
+        tdef = converter.TraitDefinition('test_trait', cfg,
+                                         self.fake_plugin_mgr)
+        t = tdef.to_trait(self.n1)
+        self.assertIs(None, t)
+
+    def test_to_trait_null(self):
+        cfg = dict(type='text', fields='payload.instance_id2')
+        tdef = converter.TraitDefinition('test_trait', cfg,
+                                         self.fake_plugin_mgr)
+        t = tdef.to_trait(self.n1)
+        self.assertIs(None, t)
+
+    def test_to_trait_empty_nontext(self):
+        cfg = dict(type='datetime', fields='payload.bogus_date')
+        tdef = converter.TraitDefinition('test_trait', cfg,
+                                         self.fake_plugin_mgr)
+        t = tdef.to_trait(self.n1)
+        self.assertIs(None, t)
+
+    def test_to_trait_multiple_null_missing(self):
+        cfg = dict(type='text', fields=['payload.not_here_boss',
+                                        'payload.instance_id2'])
+        tdef = converter.TraitDefinition('test_trait', cfg,
+                                         self.fake_plugin_mgr)
+        t = tdef.to_trait(self.n1)
+        self.assertIs(None, t)
+
+    def test_missing_fields_config(self):
+        self.assertRaises(converter.EventDefinitionException,
+                          converter.TraitDefinition,
+                          'bogus_trait',
+                          dict(),
+                          self.fake_plugin_mgr)
+
+    def test_string_fields_config(self):
+        cfg = dict(fields='payload.test')
+        t = converter.TraitDefinition('test_trait', cfg, self.fake_plugin_mgr)
+        self.assertPathsEqual(t.fields, jsonpath_rw.parse('payload.test'))
+
+    def test_list_fields_config(self):
+        cfg = dict(fields=['payload.test', 'payload.other'])
+        t = converter.TraitDefinition('test_trait', cfg, self.fake_plugin_mgr)
+        self.assertPathsEqual(
+            t.fields,
+            jsonpath_rw.parse('(payload.test)|(payload.other)'))
+
+    def test_invalid_path_config(self):
+        #test invalid jsonpath...
+        cfg = dict(fields='payload.bogus(')
+        self.assertRaises(converter.EventDefinitionException,
+                          converter.TraitDefinition,
+                          'bogus_trait',
+                          cfg,
+                          self.fake_plugin_mgr)
+
+    def test_invalid_plugin_config(self):
+        #test invalid jsonpath...
+        cfg = dict(fields='payload.test', plugin=dict(bogus="true"))
+        self.assertRaises(converter.EventDefinitionException,
+                          converter.TraitDefinition,
+                          'test_trait',
+                          cfg,
+                          self.fake_plugin_mgr)
+
+    def test_unknown_plugin(self):
+        #test invalid jsonpath...
+        cfg = dict(fields='payload.test', plugin=dict(name='bogus'))
+        self.assertRaises(converter.EventDefinitionException,
+                          converter.TraitDefinition,
+                          'test_trait',
+                          cfg,
+                          self.fake_plugin_mgr)
+
+    def test_type_config(self):
+        cfg = dict(type='text', fields='payload.test')
+        t = converter.TraitDefinition('test_trait', cfg, self.fake_plugin_mgr)
+        self.assertEqual(t.trait_type, models.Trait.TEXT_TYPE)
+
+        cfg = dict(type='int', fields='payload.test')
+        t = converter.TraitDefinition('test_trait', cfg, self.fake_plugin_mgr)
+        self.assertEqual(t.trait_type, models.Trait.INT_TYPE)
+
+        cfg = dict(type='float', fields='payload.test')
+        t = converter.TraitDefinition('test_trait', cfg, self.fake_plugin_mgr)
+        self.assertEqual(t.trait_type, models.Trait.FLOAT_TYPE)
+
+        cfg = dict(type='datetime', fields='payload.test')
+        t = converter.TraitDefinition('test_trait', cfg, self.fake_plugin_mgr)
+        self.assertEqual(t.trait_type, models.Trait.DATETIME_TYPE)
+
+    def test_invalid_type_config(self):
+        #test invalid jsonpath...
+        cfg = dict(type='bogus', fields='payload.test')
+        self.assertRaises(converter.EventDefinitionException,
+                          converter.TraitDefinition,
+                          'bogus_trait',
+                          cfg,
+                          self.fake_plugin_mgr)
+
+
+class TestEventDefinition(ConverterBase):
+
+    def setUp(self):
+        super(TestEventDefinition, self).setUp()
+
+        self.traits_cfg = {
+            'instance_id': {
+                'type': 'text',
+                'fields': ['payload.instance_uuid',
+                           'payload.instance_id'],
+            },
+            'host': {
+                'type': 'text',
+                'fields': 'payload.host',
+            },
+        }
+
+        self.test_notification1 = self._create_test_notification(
+            "test.thing",
+            "uuid-for-notif-0001",
+            instance_id="uuid-for-instance-0001",
+            host='host-1-2-3')
+
+        self.test_notification2 = self._create_test_notification(
+            "test.thing",
+            "uuid-for-notif-0002",
+            instance_id="uuid-for-instance-0002")
+
+        self.test_notification3 = self._create_test_notification(
+            "test.thing",
+            "uuid-for-notif-0003",
+            instance_id="uuid-for-instance-0003",
+            host=None)
+        self.fake_plugin_mgr = {}
+
+    def test_to_event(self):
+        dtype = models.Trait.TEXT_TYPE
+        cfg = dict(event_type='test.thing', traits=self.traits_cfg)
+        edef = converter.EventDefinition(cfg, self.fake_plugin_mgr)
+
+        e = edef.to_event(self.test_notification1)
+        self.assertEqual(e.event_type, 'test.thing')
+        self.assertEqual(e.generated,
+                         datetime.datetime(2013, 8, 8, 21, 6, 37, 803826))
+
+        self.assertHasDefaultTraits(e)
+        self.assertHasTrait(e, 'host', value='host-1-2-3', dtype=dtype)
+        self.assertHasTrait(e, 'instance_id',
+                            value='uuid-for-instance-0001',
+                            dtype=dtype)
+
+    def test_to_event_missing_trait(self):
+        dtype = models.Trait.TEXT_TYPE
+        cfg = dict(event_type='test.thing', traits=self.traits_cfg)
+        edef = converter.EventDefinition(cfg, self.fake_plugin_mgr)
+
+        e = edef.to_event(self.test_notification2)
+
+        self.assertHasDefaultTraits(e)
+        self.assertHasTrait(e, 'instance_id',
+                            value='uuid-for-instance-0002',
+                            dtype=dtype)
+        self.assertDoesNotHaveTrait(e, 'host')
+
+    def test_to_event_null_trait(self):
+        dtype = models.Trait.TEXT_TYPE
+        cfg = dict(event_type='test.thing', traits=self.traits_cfg)
+        edef = converter.EventDefinition(cfg, self.fake_plugin_mgr)
+
+        e = edef.to_event(self.test_notification3)
+
+        self.assertHasDefaultTraits(e)
+        self.assertHasTrait(e, 'instance_id',
+                            value='uuid-for-instance-0003',
+                            dtype=dtype)
+        self.assertDoesNotHaveTrait(e, 'host')
+
+    def test_bogus_cfg_no_traits(self):
+        bogus = dict(event_type='test.foo')
+        self.assertRaises(converter.EventDefinitionException,
+                          converter.EventDefinition,
+                          bogus,
+                          self.fake_plugin_mgr)
+
+    def test_bogus_cfg_no_type(self):
+        bogus = dict(traits=self.traits_cfg)
+        self.assertRaises(converter.EventDefinitionException,
+                          converter.EventDefinition,
+                          bogus,
+                          self.fake_plugin_mgr)
+
+    def test_included_type_string(self):
+        cfg = dict(event_type='test.thing', traits=self.traits_cfg)
+        edef = converter.EventDefinition(cfg, self.fake_plugin_mgr)
+        self.assertEqual(len(edef._included_types), 1)
+        self.assertEqual(edef._included_types[0], 'test.thing')
+        self.assertEqual(len(edef._excluded_types), 0)
+        self.assertTrue(edef.included_type('test.thing'))
+        self.assertFalse(edef.excluded_type('test.thing'))
+        self.assertTrue(edef.match_type('test.thing'))
+        self.assertFalse(edef.match_type('random.thing'))
+
+    def test_included_type_list(self):
+        cfg = dict(event_type=['test.thing', 'other.thing'],
+                   traits=self.traits_cfg)
+        edef = converter.EventDefinition(cfg, self.fake_plugin_mgr)
+        self.assertEqual(len(edef._included_types), 2)
+        self.assertEqual(len(edef._excluded_types), 0)
+        self.assertTrue(edef.included_type('test.thing'))
+        self.assertTrue(edef.included_type('other.thing'))
+        self.assertFalse(edef.excluded_type('test.thing'))
+        self.assertTrue(edef.match_type('test.thing'))
+        self.assertTrue(edef.match_type('other.thing'))
+        self.assertFalse(edef.match_type('random.thing'))
+
+    def test_excluded_type_string(self):
+        cfg = dict(event_type='!test.thing', traits=self.traits_cfg)
+        edef = converter.EventDefinition(cfg, self.fake_plugin_mgr)
+        self.assertEqual(len(edef._included_types), 1)
+        self.assertEqual(edef._included_types[0], '*')
+        self.assertEqual(edef._excluded_types[0], 'test.thing')
+        self.assertEqual(len(edef._excluded_types), 1)
+        self.assertEqual(edef._excluded_types[0], 'test.thing')
+        self.assertTrue(edef.excluded_type('test.thing'))
+        self.assertTrue(edef.included_type('random.thing'))
+        self.assertFalse(edef.match_type('test.thing'))
+        self.assertTrue(edef.match_type('random.thing'))
+
+    def test_excluded_type_list(self):
+        cfg = dict(event_type=['!test.thing', '!other.thing'],
+                   traits=self.traits_cfg)
+        edef = converter.EventDefinition(cfg, self.fake_plugin_mgr)
+        self.assertEqual(len(edef._included_types), 1)
+        self.assertEqual(len(edef._excluded_types), 2)
+        self.assertTrue(edef.excluded_type('test.thing'))
+        self.assertTrue(edef.excluded_type('other.thing'))
+        self.assertFalse(edef.excluded_type('random.thing'))
+        self.assertFalse(edef.match_type('test.thing'))
+        self.assertFalse(edef.match_type('other.thing'))
+        self.assertTrue(edef.match_type('random.thing'))
+
+    def test_mixed_type_list(self):
+        cfg = dict(event_type=['*.thing', '!test.thing', '!other.thing'],
+                   traits=self.traits_cfg)
+        edef = converter.EventDefinition(cfg, self.fake_plugin_mgr)
+        self.assertEqual(len(edef._included_types), 1)
+        self.assertEqual(len(edef._excluded_types), 2)
+        self.assertTrue(edef.excluded_type('test.thing'))
+        self.assertTrue(edef.excluded_type('other.thing'))
+        self.assertFalse(edef.excluded_type('random.thing'))
+        self.assertFalse(edef.match_type('test.thing'))
+        self.assertFalse(edef.match_type('other.thing'))
+        self.assertFalse(edef.match_type('random.whatzit'))
+        self.assertTrue(edef.match_type('random.thing'))
+
+    def test_catchall(self):
+        cfg = dict(event_type=['*.thing', '!test.thing', '!other.thing'],
+                   traits=self.traits_cfg)
+        edef = converter.EventDefinition(cfg, self.fake_plugin_mgr)
+        self.assertFalse(edef.is_catchall)
+
+        cfg = dict(event_type=['!other.thing'],
+                   traits=self.traits_cfg)
+        edef = converter.EventDefinition(cfg, self.fake_plugin_mgr)
+        self.assertFalse(edef.is_catchall)
+
+        cfg = dict(event_type=['other.thing'],
+                   traits=self.traits_cfg)
+        edef = converter.EventDefinition(cfg, self.fake_plugin_mgr)
+        self.assertFalse(edef.is_catchall)
+
+        cfg = dict(event_type=['*', '!other.thing'],
+                   traits=self.traits_cfg)
+        edef = converter.EventDefinition(cfg, self.fake_plugin_mgr)
+        self.assertFalse(edef.is_catchall)
+
+        cfg = dict(event_type=['*'],
+                   traits=self.traits_cfg)
+        edef = converter.EventDefinition(cfg, self.fake_plugin_mgr)
+        self.assertTrue(edef.is_catchall)
+
+        cfg = dict(event_type=['*', 'foo'],
+                   traits=self.traits_cfg)
+        edef = converter.EventDefinition(cfg, self.fake_plugin_mgr)
+        self.assertTrue(edef.is_catchall)
+
+    def test_extract_when(self):
+        now = timeutils.utcnow()
+        modified = now + datetime.timedelta(minutes=1)
+        timeutils.set_time_override(now)
+
+        body = {"timestamp": str(modified)}
+        when = converter.EventDefinition._extract_when(body)
+        self.assertTimestampEqual(modified, when)
+
+        body = {"_context_timestamp": str(modified)}
+        when = converter.EventDefinition._extract_when(body)
+        self.assertTimestampEqual(modified, when)
+
+        then = now + datetime.timedelta(hours=1)
+        body = {"timestamp": str(modified), "_context_timestamp": str(then)}
+        when = converter.EventDefinition._extract_when(body)
+        self.assertTimestampEqual(modified, when)
+
+        when = converter.EventDefinition._extract_when({})
+        self.assertTimestampEqual(now, when)
+
+    def test_default_traits(self):
+        cfg = dict(event_type='test.thing', traits={})
+        edef = converter.EventDefinition(cfg, self.fake_plugin_mgr)
+        default_traits = converter.EventDefinition.DEFAULT_TRAITS.keys()
+        traits = set(edef.traits.keys())
+        for dt in default_traits:
+            self.assertIn(dt, traits)
+        self.assertEqual(len(edef.traits),
+                         len(converter.EventDefinition.DEFAULT_TRAITS))
+
+    def test_traits(self):
+        cfg = dict(event_type='test.thing', traits=self.traits_cfg)
+        edef = converter.EventDefinition(cfg, self.fake_plugin_mgr)
+        default_traits = converter.EventDefinition.DEFAULT_TRAITS.keys()
+        traits = set(edef.traits.keys())
+        for dt in default_traits:
+            self.assertIn(dt, traits)
+        self.assertIn('host', traits)
+        self.assertIn('instance_id', traits)
+        self.assertEqual(len(edef.traits),
+                         len(converter.EventDefinition.DEFAULT_TRAITS) + 2)
+
+
+class TestNotificationConverter(ConverterBase):
+
+    def setUp(self):
+        super(TestNotificationConverter, self).setUp()
+
+        self.valid_event_def1 = [{
+            'event_type': 'compute.instance.create.*',
+            'traits': {
+                'instance_id': {
+                    'type': 'text',
+                    'fields': ['payload.instance_uuid',
+                               'payload.instance_id'],
+                },
+                'host': {
+                    'type': 'text',
+                    'fields': 'payload.host',
+                },
+            },
+        }]
+
+        self.test_notification1 = self._create_test_notification(
+            "compute.instance.create.start",
+            "uuid-for-notif-0001",
+            instance_id="uuid-for-instance-0001",
+            host='host-1-2-3')
+        self.test_notification2 = self._create_test_notification(
+            "bogus.notification.from.mars",
+            "uuid-for-notif-0002",
+            weird='true',
+            host='cydonia')
+        self.fake_plugin_mgr = {}
+
+    def test_converter_missing_keys(self):
+        # test a malformed notification
+        now = timeutils.utcnow()
+        timeutils.set_time_override(now)
+        c = converter.NotificationEventsConverter(
+            [],
+            self.fake_plugin_mgr,
+            add_catchall=True)
+        message = {'event_type': "foo",
+                   'message_id': "abc",
+                   'publisher_id': "1"}
+        e = c.to_event(message)
+        self.assertIsValidEvent(e, message)
+        self.assertEqual(len(e.traits), 1)
+        self.assertEqual("foo", e.event_type)
+        self.assertEqual(now, e.generated)
+
+    def test_converter_with_catchall(self):
+        c = converter.NotificationEventsConverter(
+            self.valid_event_def1,
+            self.fake_plugin_mgr,
+            add_catchall=True)
+        self.assertEqual(len(c.definitions), 2)
+        e = c.to_event(self.test_notification1)
+        self.assertIsValidEvent(e, self.test_notification1)
+        self.assertEqual(len(e.traits), 3)
+        self.assertHasDefaultTraits(e)
+        self.assertHasTrait(e, 'instance_id')
+        self.assertHasTrait(e, 'host')
+
+        e = c.to_event(self.test_notification2)
+        self.assertIsValidEvent(e, self.test_notification2)
+        self.assertEqual(len(e.traits), 1)
+        self.assertHasDefaultTraits(e)
+        self.assertDoesNotHaveTrait(e, 'instance_id')
+        self.assertDoesNotHaveTrait(e, 'host')
+
+    def test_converter_without_catchall(self):
+        c = converter.NotificationEventsConverter(
+            self.valid_event_def1,
+            self.fake_plugin_mgr,
+            add_catchall=False)
+        self.assertEqual(len(c.definitions), 1)
+        e = c.to_event(self.test_notification1)
+        self.assertIsValidEvent(e, self.test_notification1)
+        self.assertEqual(len(e.traits), 3)
+        self.assertHasDefaultTraits(e)
+        self.assertHasTrait(e, 'instance_id')
+        self.assertHasTrait(e, 'host')
+
+        e = c.to_event(self.test_notification2)
+        self.assertIsNotValidEvent(e, self.test_notification2)
+
+    def test_converter_empty_cfg_with_catchall(self):
+        c = converter.NotificationEventsConverter(
+            [],
+            self.fake_plugin_mgr,
+            add_catchall=True)
+        self.assertEqual(len(c.definitions), 1)
+        e = c.to_event(self.test_notification1)
+        self.assertIsValidEvent(e, self.test_notification1)
+        self.assertEqual(len(e.traits), 1)
+        self.assertHasDefaultTraits(e)
+
+        e = c.to_event(self.test_notification2)
+        self.assertIsValidEvent(e, self.test_notification2)
+        self.assertEqual(len(e.traits), 1)
+        self.assertHasDefaultTraits(e)
+
+    def test_converter_empty_cfg_without_catchall(self):
+        c = converter.NotificationEventsConverter(
+            [],
+            self.fake_plugin_mgr,
+            add_catchall=False)
+        self.assertEqual(len(c.definitions), 0)
+        e = c.to_event(self.test_notification1)
+        self.assertIsNotValidEvent(e, self.test_notification1)
+
+        e = c.to_event(self.test_notification2)
+        self.assertIsNotValidEvent(e, self.test_notification2)
+
+    def test_setup_events_default_config(self):
+
+        def mock_exists(path):
+            return False
+
+        def mock_get_config_file():
+            return None
+
+        with mock.patch('ceilometer.event.converter.get_config_file',
+                        mock_get_config_file):
+
+            oslo_cfg.CONF.set_override('drop_unmatched_notifications',
+                                       False, group='event')
+
+            with mock.patch('os.path.exists', mock_exists):
+                c = converter.setup_events(self.fake_plugin_mgr)
+            self.assertIsInstance(c, converter.NotificationEventsConverter)
+            self.assertEqual(len(c.definitions), 1)
+            self.assertTrue(c.definitions[0].is_catchall)
+
+            oslo_cfg.CONF.set_override('drop_unmatched_notifications',
+                                       True, group='event')
+
+            with mock.patch('os.path.exists', mock_exists):
+                c = converter.setup_events(self.fake_plugin_mgr)
+            self.assertIsInstance(c, converter.NotificationEventsConverter)
+            self.assertEqual(len(c.definitions), 0)

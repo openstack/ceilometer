@@ -19,12 +19,12 @@
 from oslo.config import cfg
 from stevedore import extension
 
+from ceilometer.event import converter as event_converter
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common.rpc import service as rpc_service
 from ceilometer.openstack.common import service as os_service
-from ceilometer.openstack.common import timeutils
 from ceilometer import pipeline
 from ceilometer import service
 from ceilometer.storage import models
@@ -72,6 +72,11 @@ class NotificationService(service.DispatchedService, rpc_service.Service):
                 'ceilometer.transformer',
             ),
         )
+
+        LOG.debug('loading event definitions')
+        self.event_converter = event_converter.setup_events(
+            extension.ExtensionManager(
+                namespace='ceilometer.event.trait_plugin'))
 
         self.notification_manager = \
             extension.ExtensionManager(
@@ -133,52 +138,24 @@ class NotificationService(service.DispatchedService, rpc_service.Service):
         if cfg.CONF.notification.store_events:
             self._message_to_event(notification)
 
-    @staticmethod
-    def _extract_when(body):
-        """Extract the generated datetime from the notification.
-        """
-        when = body.get('timestamp', body.get('_context_timestamp'))
-        if when:
-            return timeutils.normalize_time(timeutils.parse_isotime(when))
-
-        return timeutils.utcnow()
-
     def _message_to_event(self, body):
         """Convert message to Ceilometer Event.
-
-        NOTE: this is currently based on the Nova notification format.
-        We will need to make this driver-based to support other formats.
 
         NOTE: the rpc layer currently rips out the notification
         delivery_info, which is critical to determining the
         source of the notification. This will have to get added back later.
         """
-        message_id = body.get('message_id')
-        event_type = body['event_type']
-        when = self._extract_when(body)
-        LOG.debug(_('Saving event "%s"'), event_type)
+        event = self.event_converter.to_event(body)
 
-        publisher = body.get('publisher_id')
-        request_id = body.get('_context_request_id')
-        tenant_id = body.get('_context_tenant')
-
-        text = models.Trait.TEXT_TYPE
-        all_traits = [models.Trait('service', text, publisher),
-                      models.Trait('request_id', text, request_id),
-                      models.Trait('tenant_id', text, tenant_id),
-                      ]
-        # Only store non-None value traits ...
-        traits = [trait for trait in all_traits if trait.value is not None]
-
-        event = models.Event(message_id, event_type, when, traits)
-
-        problem_events = []
-        for dispatcher in self.dispatcher_manager:
-            problem_events.extend(dispatcher.obj.record_events(event))
-        if models.Event.UNKNOWN_PROBLEM in [x[0] for x in problem_events]:
-            # Don't ack the message, raise to requeue it
-            # if ack_on_error = False
-            raise UnableToSaveEventException()
+        if event is not None:
+            LOG.debug('Saving event "%s"', event.event_type)
+            problem_events = []
+            for dispatcher in self.dispatcher_manager:
+                problem_events.extend(dispatcher.obj.record_events(event))
+            if models.Event.UNKNOWN_PROBLEM in [x[0] for x in problem_events]:
+                # Don't ack the message, raise to requeue it
+                # if ack_on_error = False
+                raise UnableToSaveEventException()
 
     def _process_notification_for_ext(self, ext, notification):
         """Wrapper for calling pipelines when a notification arrives

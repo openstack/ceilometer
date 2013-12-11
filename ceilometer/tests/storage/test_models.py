@@ -16,6 +16,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import datetime
+
 from ceilometer.openstack.common import test
 from ceilometer.storage import models
 
@@ -54,3 +56,26 @@ class ModelTest(test.BaseTestCase):
     def test_event_repr_no_traits(self):
         x = models.Event("1", "name", "now", None)
         self.assertEqual("<Event: 1, name, now, >", repr(x))
+
+
+class TestTraitModel(test.BaseTestCase):
+
+    def test_convert_value(self):
+        v = models.Trait.convert_value(
+            models.Trait.INT_TYPE, '10')
+        self.assertEqual(v, 10)
+        self.assertIsInstance(v, int)
+        v = models.Trait.convert_value(
+            models.Trait.FLOAT_TYPE, '10')
+        self.assertEqual(v, 10.0)
+        self.assertIsInstance(v, float)
+
+        v = models.Trait.convert_value(
+            models.Trait.DATETIME_TYPE, '2013-08-08 21:05:37.123456')
+        self.assertEqual(v, datetime.datetime(2013, 8, 8, 21, 5, 37, 123456))
+        self.assertIsInstance(v, datetime.datetime)
+
+        v = models.Trait.convert_value(
+            models.Trait.TEXT_TYPE, 10)
+        self.assertEqual(v, "10")
+        self.assertIsInstance(v, str)

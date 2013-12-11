@@ -147,6 +147,7 @@ class TestCollector(tests_base.BaseTestCase):
         self._verify_udp_socket(udp_socket)
 
     @patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    @patch('ceilometer.event.converter.setup_events', mock.MagicMock())
     def test_init_host(self):
         # If we try to create a real RPC connection, init_host() never
         # returns. Mock it out so we can establish the service
