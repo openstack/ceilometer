@@ -18,6 +18,8 @@
 """Tests for ceilometer/alarm/partition/coordination.py
 """
 import datetime
+import logging
+import StringIO
 import uuid
 
 import mock
@@ -42,10 +44,17 @@ class TestCoordinate(test.BaseTestCase):
         timeutils.utcnow.override_time = self.override_start
         self.partition_coordinator = coordination.PartitionCoordinator()
         self.partition_coordinator.coordination_rpc = mock.Mock()
+        #add extra logger to check exception conditions and logged content
+        self.output = StringIO.StringIO()
+        self.str_handler = logging.StreamHandler(self.output)
+        coordination.LOG.logger.addHandler(self.str_handler)
 
     def tearDown(self):
         super(TestCoordinate, self).tearDown()
         timeutils.utcnow.override_time = None
+        # clean up the logger
+        coordination.LOG.logger.removeHandler(self.str_handler)
+        self.output.close()
 
     def _no_alarms(self):
         self.api_client.alarms.list.return_value = []
@@ -381,3 +390,44 @@ class TestCoordinate(test.BaseTestCase):
 
         alarms = self.partition_coordinator.assigned_alarms(self.api_client)
         self.assertEqual(alarms, self._current_alarms())
+
+    def test__record_oldest(self):
+        # Test when the partition to be recorded is the same as the oldest.
+        self.partition_coordinator._record_oldest(
+            self.partition_coordinator.oldest, True)
+        self.assertEqual(self.partition_coordinator.oldest, None)
+
+    def test_check_mastership(self):
+        # Test the method exception condition.
+        self.partition_coordinator._is_master = mock.Mock(
+            side_effect=Exception('Boom!'))
+        self.partition_coordinator.check_mastership(10, None)
+        self.assertTrue('mastership check failed' in self.output.getvalue())
+
+    def test_report_presence(self):
+        self.partition_coordinator.coordination_rpc.presence = mock.Mock(
+            side_effect=Exception('Boom!'))
+        self.partition_coordinator.report_presence()
+        self.assertTrue('presence reporting failed' in self.output.getvalue())
+
+    def test_assigned_alarms(self):
+        api_client = mock.MagicMock()
+        api_client.alarms = mock.Mock(side_effect=Exception('Boom!'))
+        self.partition_coordinator.assignment = ['something']
+        self.partition_coordinator.assigned_alarms(api_client)
+        self.assertTrue('assignment retrieval failed' in
+                        self.output.getvalue())
+
+
+class TestPartitionIdentity(test.BaseTestCase):
+    def setUp(self):
+        super(TestPartitionIdentity, self).setUp()
+        self.id_1st = coordination.PartitionIdentity(str(uuid.uuid4()), 1)
+        self.id_2nd = coordination.PartitionIdentity(str(uuid.uuid4()), 2)
+
+    def test_identity_ops(self):
+        self.assertNotEqual(self.id_1st, 'Nothing')
+        self.assertNotEqual(self.id_1st, self.id_2nd)
+        self.assertTrue(self.id_1st < None)
+        self.assertFalse(self.id_1st < 'Nothing')
+        self.assertTrue(self.id_2nd > self.id_1st)
