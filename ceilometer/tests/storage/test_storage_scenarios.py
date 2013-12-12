@@ -16,7 +16,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-""" Base classes for DB backend implemtation test
+""" Base classes for DB backend implementation test
 """
 
 import datetime
@@ -661,6 +661,54 @@ class RawSampleTest(DBTestBase,
         self.assertEqual(len(results), 8)
         results = list(self.conn.get_resources())
         self.assertEqual(len(results), 9)
+
+    def test_clear_metering_data_with_alarms(self):
+        # NOTE(jd) Override this test in MongoDB because our code doesn't clear
+        # the collections, this is handled by MongoDB TTL feature.
+        if self.CONF.database.connection.startswith('mongodb://'):
+            return
+
+        alarm = models.Alarm(alarm_id='r3d',
+                             enabled=True,
+                             type='threshold',
+                             name='red-alert',
+                             description='my red-alert',
+                             timestamp=None,
+                             user_id='user-id',
+                             project_id='project-id',
+                             state="insufficient data",
+                             state_timestamp=None,
+                             ok_actions=[],
+                             alarm_actions=['http://nowhere/alarms'],
+                             insufficient_data_actions=[],
+                             repeat_actions=False,
+                             rule=dict(comparison_operator='eq',
+                                       threshold=36,
+                                       statistic='count',
+                                       evaluation_periods=1,
+                                       period=60,
+                                       meter_name='test.one',
+                                       query=[{'field': 'key',
+                                               'op': 'eq',
+                                               'value': 'value',
+                                              'type': 'string'}]),
+                             )
+
+        self.conn.create_alarm(alarm)
+        timeutils.utcnow.override_time = datetime.datetime(2012, 7, 2, 10, 45)
+        self.conn.clear_expired_metering_data(5)
+        # user and project with Alarms associated with it aren't deleted.
+        f = storage.SampleFilter(meter='instance')
+        results = list(self.conn.get_samples(f))
+        self.assertEqual(len(results), 2)
+        results = list(self.conn.get_users())
+        self.assertEqual(len(results), 3)
+        self.assertIn('user-id', results)
+        results = list(self.conn.get_projects())
+        self.assertEqual(len(results), 3)
+        self.assertIn('project-id', results)
+        results = list(self.conn.get_resources())
+        self.assertEqual(len(results), 2)
 
 
 class StatisticsTest(DBTestBase,
