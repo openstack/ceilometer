@@ -48,6 +48,9 @@ def dt_to_decimal(utc):
     Some databases don't store microseconds in datetime
     so we always store as Decimal unixtime.
     """
+    if utc is None:
+        return None
+
     decimal.getcontext().prec = 30
     return decimal.Decimal(str(calendar.timegm(utc.utctimetuple()))) + \
         (decimal.Decimal(str(utc.microsecond)) /
@@ -59,6 +62,7 @@ def decimal_to_dt(dec):
     """
     if dec is None:
         return None
+
     integer = int(dec)
     micro = (dec - decimal.Decimal(integer)) * decimal.Decimal(1000000)
     daittyme = datetime.datetime.utcfromtimestamp(integer)

@@ -278,3 +278,26 @@ class Connection(object):
     def get_events(self, event_filter):
         """Return an iterable of model.Event objects.
         """
+
+    @abc.abstractmethod
+    def get_event_types(self):
+        """Return all event types as an iterable of strings.
+        """
+
+    @abc.abstractmethod
+    def get_trait_types(self, event_type):
+        """Return a dictionary containing the name and data type of
+        the trait type. Only trait types for the provided event_type are
+        returned.
+
+        :param event_type: the type of the Event
+        """
+
+    @abc.abstractmethod
+    def get_traits(self, event_type, trait_type=None):
+        """Return all trait instances associated with an event_type. If
+        trait_type is specified, only return instances of that trait type.
+
+        :param event_type: the type of the Event to filter by
+        :param trait_type: the name of the Trait to filter by
+        """
