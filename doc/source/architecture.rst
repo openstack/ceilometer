@@ -328,14 +328,6 @@ for the plugin instances. Plugins are not required to subclass from
 the API definition class, but it is encouraged as a way to discover
 API changes.
 
-.. note::
-
-   There is ongoing work to add a generic plugin system to Nova.  If
-   that is implemented as part of the common library, ceilometer may
-   use it (or adapt it as necessary for our use). If it remains part
-   of Nova for Folsom we should probably not depend on it because
-   loading plugins is trivial with setuptools.
-
 Polling
 -------
 
