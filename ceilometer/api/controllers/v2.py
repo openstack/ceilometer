@@ -973,6 +973,20 @@ class SamplesController(rest.RestController):
         return map(Sample.from_db_model,
                    pecan.request.storage_conn.get_samples(f, limit=limit))
 
+    @wsme_pecan.wsexpose(Sample, wtypes.text)
+    def get_one(self, sample_id):
+        """Return a sample
+
+        :param sample_id: the id of the sample
+        """
+        f = storage.SampleFilter(message_id=sample_id)
+
+        samples = list(pecan.request.storage_conn.get_samples(f))
+        if len(samples) < 1:
+            raise EntityNotFound(_('Sample'), sample_id)
+
+        return Sample.from_db_model(samples[0])
+
 
 class Resource(_Base):
     """An externally defined object for which samples have been received.
