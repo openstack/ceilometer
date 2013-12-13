@@ -716,7 +716,7 @@ class MeterController(rest.RestController):
         :param limit: Maximum number of samples to return.
         """
         if limit and limit < 0:
-            raise ValueError("Limit must be positive")
+            raise ClientSideError(_("Limit must be positive"))
         kwargs = _query_to_kwargs(q, storage.SampleFilter.__init__)
         kwargs['meter'] = self._id
         f = storage.SampleFilter(**kwargs)
