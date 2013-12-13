@@ -109,13 +109,10 @@ class ServiceRestartTest(base.BaseTestCase):
     @staticmethod
     def _check_process_alive(pid):
         try:
-            with open("/proc/%d/status" % pid) as fd_proc:
-                for line in fd_proc.readlines():
-                    if line.startswith("State:"):
-                        state = line.split(":", 1)[1].strip().split(' ')[0]
-                        return state not in ['Z', 'T', 'Z+']
-        except IOError:
+            os.kill(pid, 0)
+        except OSError:
             return False
+        return True
 
     def check_process_alive(self):
         cond = lambda: self._check_process_alive(self.sub.pid)
