@@ -340,3 +340,108 @@ class TestQueryAlarmsController(tests_api.FunctionalTest,
 
         self.assertEqual(400, data.status_int)
         self.assertIn("Limit should be positive", data.body)
+
+
+class TestQueryAlarmsHistoryController(
+        tests_api.FunctionalTest, tests_db.MixinTestsWithBackendScenarios):
+
+    def setUp(self):
+        super(TestQueryAlarmsHistoryController, self).setUp()
+        self.url = '/query/alarms/history'
+        for id in [1, 2]:
+            for type in ["creation", "state transition"]:
+                for date in [datetime.datetime(2013, 1, 1),
+                             datetime.datetime(2013, 2, 2)]:
+                    event_id = "-".join([str(id), type, date.isoformat()])
+                    alarm_change = {"event_id": event_id,
+                                    "alarm_id": "alarm-id%d" % id,
+                                    "type": type,
+                                    "detail": "",
+                                    "user_id": "user-id%d" % id,
+                                    "project_id": "project-id%d" % id,
+                                    "on_behalf_of": "project-id%d" % id,
+                                    "timestamp": date}
+
+                    self.conn.record_alarm_change(alarm_change)
+
+    def test_query_all(self):
+        data = self.post_json(self.url,
+                              params={})
+
+        self.assertEqual(8, len(data.json))
+
+    def test_filter_with_isotime(self):
+        date_time = datetime.datetime(2013, 1, 1)
+        isotime = date_time.isoformat()
+
+        data = self.post_json(self.url,
+                              params={"filter":
+                                      '{">": {"timestamp":"'
+                                      + isotime + '"}}'})
+
+        self.assertEqual(4, len(data.json))
+        for history in data.json:
+            result_time = timeutils.parse_isotime(history['timestamp'])
+            result_time = result_time.replace(tzinfo=None)
+            self.assertTrue(result_time > date_time)
+
+    def test_non_admin_tenant_sees_only_its_own_project(self):
+        data = self.post_json(self.url,
+                              params={},
+                              headers=non_admin_header)
+        for history in data.json:
+            self.assertEqual("project-id1", history['on_behalf_of'])
+
+    def test_non_admin_tenant_cannot_query_others_project(self):
+        data = self.post_json(self.url,
+                              params={"filter":
+                                      '{"=": {"on_behalf_of":'
+                                      + ' "project-id2"}}'},
+                              expect_errors=True,
+                              headers=non_admin_header)
+
+        self.assertEqual(401, data.status_int)
+        self.assertIn("Not Authorized to access project project-id2",
+                      data.body)
+
+    def test_non_admin_tenant_can_explicitly_filter_for_own_project(self):
+        data = self.post_json(self.url,
+                              params={"filter":
+                                      '{"=": {"on_behalf_of":'
+                                      + ' "project-id1"}}'},
+                              headers=non_admin_header)
+
+        for history in data.json:
+            self.assertEqual("project-id1", history['on_behalf_of'])
+
+    def test_admin_tenant_sees_every_project(self):
+        data = self.post_json(self.url,
+                              params={},
+                              headers=admin_header)
+
+        self.assertEqual(8, len(data.json))
+        for history in data.json:
+            self.assertIn(history['on_behalf_of'],
+                          (["project-id1", "project-id2"]))
+
+    def test_query_with_filter_orderby_and_limit(self):
+        data = self.post_json(self.url,
+                              params={"filter": '{"=": {"type": "creation"}}',
+                                      "orderby": '[{"timestamp": "DESC"}]',
+                                      "limit": 3})
+
+        self.assertEqual(3, len(data.json))
+        self.assertEqual(["2013-02-02T00:00:00",
+                          "2013-02-02T00:00:00",
+                          "2013-01-01T00:00:00"],
+                         [h["timestamp"] for h in data.json])
+        for history in data.json:
+            self.assertEqual("creation", history["type"])
+
+    def test_limit_should_be_positive(self):
+        data = self.post_json(self.url,
+                              params={"limit": 0},
+                              expect_errors=True)
+
+        self.assertEqual(400, data.status_int)
+        self.assertIn("Limit should be positive", data.body)

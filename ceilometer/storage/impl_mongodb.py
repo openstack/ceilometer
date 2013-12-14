@@ -791,7 +791,8 @@ class Connection(base.Connection):
                 filter_expr)
 
         retrieve = {models.Meter: self._retrieve_samples,
-                    models.Alarm: self._retrieve_alarms}
+                    models.Alarm: self._retrieve_alarms,
+                    models.AlarmChange: self._retrieve_alarm_changes}
         return retrieve[model](query_filter, orderby_filter, limit)
 
     def query_samples(self, filter_expr=None, orderby=None, limit=None):
@@ -1014,6 +1015,21 @@ class Connection(base.Connection):
         """
         self.db.alarm.remove({'alarm_id': alarm_id})
 
+    def _retrieve_alarm_changes(self, query_filter, orderby, limit):
+        if limit is not None:
+            alarms_history = self.db.alarm_history.find(query_filter,
+                                                        limit=limit,
+                                                        sort=orderby)
+        else:
+            alarms_history = self.db.alarm_history.find(
+                query_filter, sort=orderby)
+
+        for alarm_history in alarms_history:
+            ah = {}
+            ah.update(alarm_history)
+            del ah['_id']
+            yield models.AlarmChange(**ah)
+
     def get_alarm_changes(self, alarm_id, on_behalf_of,
                           user=None, project=None, type=None,
                           start_timestamp=None, start_timestamp_op=None,
@@ -1057,12 +1073,10 @@ class Connection(base.Connection):
             if ts_range:
                 q['timestamp'] = ts_range
 
-        sort = [("timestamp", pymongo.DESCENDING)]
-        for alarm_change in self.db.alarm_history.find(q, sort=sort):
-            ac = {}
-            ac.update(alarm_change)
-            del ac['_id']
-            yield models.AlarmChange(**ac)
+        return self._retrieve_alarm_changes(q,
+                                            [("timestamp",
+                                              pymongo.DESCENDING)],
+                                            None)
 
     def record_alarm_change(self, alarm_change):
         """Record alarm change event.
@@ -1073,3 +1087,11 @@ class Connection(base.Connection):
         """Return an iterable of model.Alarm objects.
         """
         return self._retrieve_data(filter_expr, orderby, limit, models.Alarm)
+
+    def query_alarm_history(self, filter_expr=None, orderby=None, limit=None):
+        """Return an iterable of model.AlarmChange objects.
+        """
+        return self._retrieve_data(filter_expr,
+                                   orderby,
+                                   limit,
+                                   models.AlarmChange)
