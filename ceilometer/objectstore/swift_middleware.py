@@ -33,6 +33,9 @@ use = egg:ceilometer#swift
 # Some optional configuration
 # this allow to publish additional metadata
 metadata_headers = X-TEST
+
+# Set reseller prefix (defaults to "AUTH_" if not set)
+reseller_prefix = AUTH_
 """
 
 from __future__ import absolute_import
@@ -82,6 +85,9 @@ class CeilometerMiddleware(object):
                 'ceilometer.transformer',
             ),
         )
+        self.reseller_prefix = conf.get('reseller_prefix', 'AUTH_')
+        if self.reseller_prefix and self.reseller_prefix[-1] != '_':
+            self.reseller_prefix += '_'
 
     def __call__(self, env, start_response):
         start_response_args = [None]
@@ -147,7 +153,7 @@ class CeilometerMiddleware(object):
                     volume=bytes_received,
                     user_id=env.get('HTTP_X_USER_ID'),
                     project_id=env.get('HTTP_X_TENANT_ID'),
-                    resource_id=account.partition('AUTH_')[2],
+                    resource_id=account.partition(self.reseller_prefix)[2],
                     timestamp=now,
                     resource_metadata=resource_metadata)])
 
@@ -159,7 +165,7 @@ class CeilometerMiddleware(object):
                     volume=bytes_sent,
                     user_id=env.get('HTTP_X_USER_ID'),
                     project_id=env.get('HTTP_X_TENANT_ID'),
-                    resource_id=account.partition('AUTH_')[2],
+                    resource_id=account.partition(self.reseller_prefix)[2],
                     timestamp=now,
                     resource_metadata=resource_metadata)])
 
@@ -173,7 +179,7 @@ class CeilometerMiddleware(object):
                 volume=1,
                 user_id=env.get('HTTP_X_USER_ID'),
                 project_id=env.get('HTTP_X_TENANT_ID'),
-                resource_id=account.partition('AUTH_')[2],
+                resource_id=account.partition(self.reseller_prefix)[2],
                 timestamp=now,
                 resource_metadata=resource_metadata)])
 
