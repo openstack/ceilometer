@@ -2290,6 +2290,47 @@ class AlarmTestPagination(AlarmTestBase,
                          [i.name for i in page1])
 
 
+class ComplexAlarmQueryTest(AlarmTestBase,
+                            tests_db.MixinTestsWithBackendScenarios):
+
+    def test_no_filter(self):
+        self.add_some_alarms()
+        result = list(self.conn.query_alarms())
+        self.assertEqual(3, len(result))
+
+    def test_no_filter_with_limit(self):
+        self.add_some_alarms()
+        result = list(self.conn.query_alarms(limit=2))
+        self.assertEqual(2, len(result))
+
+    def test_filter(self):
+        self.add_some_alarms()
+        filter_expr = {"and":
+                       [{"or":
+                        [{"=": {"name": "yellow-alert"}},
+                         {"=": {"name": "red-alert"}}]},
+                       {"=": {"enabled": True}}]}
+
+        result = list(self.conn.query_alarms(filter_expr=filter_expr))
+
+        self.assertEqual(1, len(result))
+        for a in result:
+            self.assertIn(a.name, set(["yellow-alert", "red-alert"]))
+            self.assertTrue(a.enabled)
+
+    def test_filter_and_orderby(self):
+        self.add_some_alarms()
+        result = list(self.conn.query_alarms(filter_expr={"=":
+                                                          {"enabled":
+                                                          True}},
+                                             orderby=[{"name": "asc"}]))
+        self.assertEqual(2, len(result))
+        self.assertEqual(["orange-alert", "red-alert"],
+                         [a.name for a in result])
+        for a in result:
+            self.assertTrue(a.enabled)
+
+
 class EventTestBase(tests_db.TestBase,
                     tests_db.MixinTestsWithBackendScenarios):
     """Separate test base class because we don't want to

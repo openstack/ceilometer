@@ -331,3 +331,15 @@ class Connection(object):
 
         raise NotImplementedError(_('Complex query for samples \
             is not implemented.'))
+
+    @staticmethod
+    def query_alarms(filter_expr=None, orderby=None, limit=None):
+        """Return an iterable of model.Alarm objects.
+
+        :param filter_expr: Filter expression for query.
+        :param orderby: List of field name and direction pairs for order by.
+        :param limit: Maximum number of results to return.
+        """
+
+        raise NotImplementedError(_('Complex query for alarms \
+            is not implemented.'))

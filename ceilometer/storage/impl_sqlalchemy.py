@@ -532,10 +532,13 @@ class Connection(base.Connection):
                 source=resource.sources[0].id,
                 user_id=resource.user_id)
 
-    def _retrieve_samples(self, query, orderby, limit, table):
+    def _apply_options(self, query, orderby, limit, table):
         query = self._apply_order_by(query, orderby, table)
         if limit is not None:
             query = query.limit(limit)
+        return query
+
+    def _retrieve_samples(self, query):
         samples = query.all()
 
         for s in samples:
@@ -575,13 +578,16 @@ class Connection(base.Connection):
         query = make_query_from_filter(session, query, sample_filter,
                                        require_meter=False)
 
-        return self._retrieve_samples(query, None, limit, table)
+        query = self._apply_options(query,
+                                    None,
+                                    limit,
+                                    table)
+        return self._retrieve_samples(query)
 
-    def query_samples(self, filter_expr=None, orderby=None, limit=None):
+    def _retrieve_data(self, filter_expr, orderby, limit, table):
         if limit == 0:
             return []
 
-        table = models.Meter
         session = self._get_db_session()
         query = session.query(table)
 
@@ -590,7 +596,20 @@ class Connection(base.Connection):
                                                        table)
             query = query.filter(sql_condition)
 
-        return self._retrieve_samples(query, orderby, limit, table)
+        query = self._apply_options(query,
+                                    orderby,
+                                    limit,
+                                    table)
+
+        retrieve = {models.Meter: self._retrieve_samples,
+                    models.Alarm: self._retrieve_alarms}
+        return retrieve[table](query)
+
+    def query_samples(self, filter_expr=None, orderby=None, limit=None):
+        return self._retrieve_data(filter_expr,
+                                   orderby,
+                                   limit,
+                                   models.Meter)
 
     def _transform_expression(self, expression_tree, table):
 
@@ -735,6 +754,9 @@ class Connection(base.Connection):
                                 rule=row.rule,
                                 repeat_actions=row.repeat_actions)
 
+    def _retrieve_alarms(self, query):
+        return (self._row_to_alarm_model(x) for x in query.all())
+
     def get_alarms(self, name=None, user=None,
                    project=None, enabled=None, alarm_id=None, pagination=None):
         """Yields a lists of alarms that match filters
@@ -761,7 +783,7 @@ class Connection(base.Connection):
         if alarm_id is not None:
             query = query.filter(models.Alarm.id == alarm_id)
 
-        return (self._row_to_alarm_model(x) for x in query.all())
+        return self._retrieve_alarms(query)
 
     def create_alarm(self, alarm):
         """Create an alarm.
@@ -812,6 +834,11 @@ class Connection(base.Connection):
                                       project_id=row.project_id,
                                       on_behalf_of=row.on_behalf_of,
                                       timestamp=row.timestamp)
+
+    def query_alarms(self, filter_expr=None, orderby=None, limit=None):
+        """Yields a lists of alarms that match filter
+        """
+        return self._retrieve_data(filter_expr, orderby, limit, models.Alarm)
 
     def get_alarm_changes(self, alarm_id, on_behalf_of,
                           user=None, project=None, type=None,
