@@ -116,3 +116,18 @@ def dict_to_keyval(value, key_base=None):
                     yield key_gen, v
             else:
                 yield key_gen, v
+
+
+def lowercase_keys(mapping):
+    """Converts the values of the keys in mapping to lowercase."""
+    items = mapping.items()
+    for key, value in items:
+        del mapping[key]
+        mapping[key.lower()] = value
+
+
+def lowercase_values(mapping):
+    """Converts the values in the mapping dict to lowercase."""
+    items = mapping.items()
+    for key, value in items:
+        mapping[key] = value.lower()

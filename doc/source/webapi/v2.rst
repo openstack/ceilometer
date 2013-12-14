@@ -62,22 +62,52 @@ Alarms
 
 Filtering Queries
 =================
+Ceilometer's REST API currently supports two types of queries. The Simple
+Query functionality provides simple filtering on several fields of the
+*Sample* type. Complex Query provides the possibility to specify queries
+with logical and comparison operators on the fields of *Sample*.
 
+You may also apply filters based on the values of one or more of the
+*resource_metadata* field, which you can identify by using *metadata.<field>*
+syntax in either type of query. Note, however, that given the free-form
+nature of *resource_metadata* field, there is no practical or consistent way
+to validate the query fields under *metadata* domain like it is done for
+all other fields.
+
+.. note:: The API call will return HTTP 200 OK status for both of the
+   following cases: when a query with *metadata.<field>* does not match its
+   value, and when *<field>* itself does not exist in any of the records being
+   queried.
+
+Simple Query
+++++++++++++
 Many of the endpoints above accept a query filter argument, which
 should be a list of Query data structures. Whatever the endpoint you
 want to apply a filter on, you always filter on the fields of the *Sample*
 type (for example, if you apply a filter on a query for statistics,
 you won't target *duration_start* field of *Statistics*, but *timestamp*
-field of *Sample*). You may also apply filters based on the values of one
-or more of the *resource_metadata* field, in which case you should target
-*metadata.<field>*. Notice, however, that given the free-form nature of
-*resource_metadata* field, there is no practical or consistent way to
-validate the query fields under *metadata* domain like it is done for all other
-fields. In other words, the API call will return HTTP 200 in both scenarios:
-when a query with *metadata.<field>* does not match its value, and when
-*<field>* itself does not exist in any of the records being queried.
+field of *Sample*).
 
 .. autotype:: ceilometer.api.controllers.v2.Query
+   :members:
+
+Complex Query
++++++++++++++
+The filter expressions of the Complex Query feature operate on the fields
+of *Sample*. The following comparison operators are supported: *=*, *!=*, *<*,
+*<=*, *>* and *>=*; and the following logical operators can be used: *and* and *or*.
+
+Complex Query supports defining the list of orderby expressions in the form
+of [{"field_name": "asc"}, {"field_name2": "desc"}, ...].
+
+The number of the returned items can be bounded using the *limit* option.
+
+The *filter*, *orderby* and *limit* are all optional fields in a query.
+
+.. rest-controller:: ceilometer.api.controllers.v2:QuerySamplesController
+   :webprefix: /v2/query/samples
+
+.. autotype:: ceilometer.api.controllers.v2.ComplexQuery
    :members:
 
 Links
@@ -371,6 +401,53 @@ parameter to the query::
     limit: 3
 
 This query would only return the last 3 samples.
+
+Functional example for Complex Query
+++++++++++++++++++++++++++++++++++++
+
+This example demonstrates how complex query filter expressions can be generated and sent
+to the /v2/query/samples endpoint of Ceilometer API using POST request.
+
+To check for *cpu_util* samples reported between 18:00-18:15 or between 18:30 - 18:45
+on a particular date (2013-12-01), where the utilization is between 23 and 26 percent,
+the following filter expression can be created::
+
+    {"and":
+     [{"and":
+      [{"=": {"counter_name": "cpu_util"}},
+       {">": {"counter_volume": 0.23}},
+       {"<": {"counter_volume": 0.26}}]},
+      {"or":
+       [{"and":
+        [{">": {"timestamp": "2013-12-01T18:00:00"}},
+         {"<": {"timestamp": "2013-12-01T18:15:00"}}]},
+        {"and":
+         [{">": {"timestamp": "2013-12-01T18:30:00"}},
+          {"<": {"timestamp": "2013-12-01T18:45:00"}}]}]}]}
+
+Different sorting criteria can be defined for the query filter, for example the results
+can be ordered in an ascending order by the *counter_volume* and descending order based on
+the *timestamp*. The following order by expression has to be created for specifying this
+criteria::
+
+    [{"counter_volume": "ASC"}, {"timestamp": "DESC"}]
+
+As the current implementation accepts only string values as query filter and order by
+definitions, the above defined expressions have to be converted to string values.
+By adding a limit criteria to the request, which maximizes the number of returned samples
+to four, the query looks like the following::
+
+    {
+    "filter" : "{\"and\":[{\"and\": [{\"=\": {\"counter_name\": \"cpu_util\"}}, {\">\": {\"counter_volume\": 0.23}}, {\"<\": {\"counter_volume\": 0.26}}]}, {\"or\": [{\"and\": [{\">\": {\"timestamp\": \"2013-12-01T18:00:00\"}}, {\"<\": {\"timestamp\": \"2013-12-01T18:15:00\"}}]}, {\"and\": [{\">\": {\"timestamp\": \"2013-12-01T18:30:00\"}}, {\"<\": {\"timestamp\": \"2013-12-01T18:45:00\"}}]}]}]}",
+    "orderby" : "[{\"counter_volume\": \"ASC\"}, {\"timestamp\": \"DESC\"}]",
+    "limit" : 4
+    }
+
+A query request looks like the following with curl::
+
+    curl -X POST -H 'X-Auth-Token: <inserttokenhere>' -H 'Content-Type: application/json' \
+      -d '<insertyourqueryexpressionhere>' \
+       http://localhost:8777/v2/query/samples
 
 .. _user-defined-data:
 

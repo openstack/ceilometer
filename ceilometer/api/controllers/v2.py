@@ -29,6 +29,7 @@ import datetime
 import functools
 import inspect
 import json
+import jsonschema
 import uuid
 
 from oslo.config import cfg
@@ -990,6 +991,216 @@ class SamplesController(rest.RestController):
         return Sample.from_db_model(samples[0])
 
 
+class ComplexQuery(_Base):
+    """Holds a sample query encoded in json."""
+
+    filter = wtypes.text
+    "The filter expression encoded in json."
+
+    orderby = wtypes.text
+    "List of single-element dicts for specifing the ordering of the results."
+
+    limit = int
+    "The maximum number of results to be returned."
+
+    @classmethod
+    def sample(cls):
+        return cls(filter='{\"and\": [{\"and\": [{\"=\": ' +
+                          '{\"counter_name\": \"cpu_util\"}}, ' +
+                          '{\">\": {\"counter_volume\": 0.23}}, ' +
+                          '{\"<\": {\"counter_volume\": 0.26}}]}, ' +
+                          '{\"or\": [{\"and\": [{\">\": ' +
+                          '{\"timestamp\": \"2013-12-01T18:00:00\"}}, ' +
+                          '{\"<\": ' +
+                          '{\"timestamp\": \"2013-12-01T18:15:00\"}}]}, ' +
+                          '{\"and\": [{\">\": ' +
+                          '{\"timestamp\": \"2013-12-01T18:30:00\"}}, ' +
+                          '{\"<\": ' +
+                          '{\"timestamp\": \"2013-12-01T18:45:00\"}}]}]}]}',
+                   orderby='[{\"counter_volume\": \"ASC\"}, ' +
+                           '{\"timestamp\": \"DESC\"}]',
+                   limit=42
+                   )
+
+
+def _list_to_regexp(items):
+    regexp = ["^%s$" % item for item in items]
+    regexp = "|".join(regexp)
+    regexp = "(?i)" + regexp
+    return regexp
+
+
+class ValidatedComplexQuery(object):
+    complex_operators = ["and", "or"]
+    order_directions = ["asc", "desc"]
+    simple_ops = ["=", "!=", "<", ">", "<=", "=<", ">=", "=>"]
+
+    complex_ops = _list_to_regexp(complex_operators)
+    simple_ops = _list_to_regexp(simple_ops)
+    order_directions = _list_to_regexp(order_directions)
+
+    schema_value = {
+        "oneOf": [{"type": "string"},
+                  {"type": "number"}],
+        "minProperties": 1,
+        "maxProperties": 1}
+
+    schema_field = {
+        "type": "object",
+        "patternProperties": {"[\S]+": schema_value},
+        "additionalProperties": False,
+        "minProperties": 1,
+        "maxProperties": 1}
+
+    schema_leaf = {
+        "type": "object",
+        "patternProperties": {simple_ops: schema_field},
+        "additionalProperties": False,
+        "minProperties": 1,
+        "maxProperties": 1}
+
+    schema_and_or_array = {
+        "type": "array",
+        "items": {"$ref": "#"},
+        "minItems": 2}
+
+    schema_and_or = {
+        "type": "object",
+        "patternProperties": {complex_ops: schema_and_or_array},
+        "additionalProperties": False,
+        "minProperties": 1,
+        "maxProperties": 1}
+
+    schema = {
+        "oneOf": [{"$ref": "#/definitions/leaf"},
+                  {"$ref": "#/definitions/and_or"}],
+        "minProperties": 1,
+        "maxProperties": 1,
+        "definitions": {"leaf": schema_leaf,
+                        "and_or": schema_and_or}}
+
+    orderby_schema = {
+        "type": "array",
+        "items": {
+            "type": "object",
+            "patternProperties":
+                {"[\S]+":
+                    {"type": "string",
+                     "pattern": order_directions}},
+            "additionalProperties": False,
+            "minProperties": 1,
+            "maxProperties": 1}}
+
+    timestamp_fields = ["timestamp"]
+
+    def __init__(self, query):
+        self.original_query = query
+
+    def validate(self, visibility_field):
+        """Validates the query content and does the necessary transformations.
+        """
+        if self.original_query.filter is wtypes.Unset:
+            self.filter_expr = None
+        else:
+            self.filter_expr = json.loads(self.original_query.filter)
+            self._validate_filter(self.filter_expr)
+            self._replace_isotime_with_datetime(self.filter_expr)
+            self._convert_operator_to_lower_case(self.filter_expr)
+
+        self._force_visibility(visibility_field)
+
+        if self.original_query.orderby is wtypes.Unset:
+            self.orderby = None
+        else:
+            self.orderby = json.loads(self.original_query.orderby)
+            self._validate_orderby(self.orderby)
+            self._convert_orderby_to_lower_case(self.orderby)
+
+        if self.original_query.limit is wtypes.Unset:
+            self.limit = None
+        else:
+            self.limit = self.original_query.limit
+
+        if self.limit is not None and self.limit <= 0:
+            msg = _('Limit should be positive')
+            raise ClientSideError(msg)
+
+    @staticmethod
+    def _convert_orderby_to_lower_case(orderby):
+        for orderby_field in orderby:
+            utils.lowercase_values(orderby_field)
+
+    def _traverse_postorder(self, tree, visitor):
+        op = tree.keys()[0]
+        if op.lower() in self.complex_operators:
+            for i, operand in enumerate(tree[op]):
+                self._traverse_postorder(operand, visitor)
+
+        visitor(tree)
+
+    def _check_cross_project_references(self, own_project_id,
+                                        visibility_field):
+        """Do not allow other than own_project_id
+        """
+        def check_project_id(subfilter):
+            op = subfilter.keys()[0]
+            if (op.lower() not in self.complex_operators
+                    and subfilter[op].keys()[0] == visibility_field
+                    and subfilter[op][visibility_field] != own_project_id):
+                raise ProjectNotAuthorized(subfilter[op][visibility_field])
+
+        self._traverse_postorder(self.filter_expr, check_project_id)
+
+    def _force_visibility(self, visibility_field):
+        """If the tenant is not admin insert an extra
+        "and <visibility_field>=<tenant's project_id>" clause to the query
+        """
+        authorized_project = acl.get_limited_to_project(pecan.request.headers)
+        is_admin = authorized_project is None
+        if not is_admin:
+            self._restrict_to_project(authorized_project, visibility_field)
+            self._check_cross_project_references(authorized_project,
+                                                 visibility_field)
+
+    def _restrict_to_project(self, project_id, visibility_field):
+        restriction = {"=": {visibility_field: project_id}}
+        if self.filter_expr is None:
+            self.filter_expr = restriction
+        else:
+            self.filter_expr = {"and": [restriction, self.filter_expr]}
+
+    def _replace_isotime_with_datetime(self, filter_expr):
+        def replace_isotime(subfilter):
+            op = subfilter.keys()[0]
+            if (op.lower() not in self.complex_operators
+                    and subfilter[op].keys()[0] in self.timestamp_fields):
+                field = subfilter[op].keys()[0]
+                date_time = self._convert_to_datetime(subfilter[op][field])
+                subfilter[op][field] = date_time
+
+        self._traverse_postorder(filter_expr, replace_isotime)
+
+    def _convert_operator_to_lower_case(self, filter_expr):
+        self._traverse_postorder(filter_expr, utils.lowercase_keys)
+
+    @staticmethod
+    def _convert_to_datetime(isotime):
+        try:
+            date_time = timeutils.parse_isotime(isotime)
+            date_time = date_time.replace(tzinfo=None)
+            return date_time
+        except ValueError:
+            LOG.exception(_("String %s is not a valid isotime") % isotime)
+            msg = _('Failed to parse the timestamp value %s') % isotime
+            raise ClientSideError(msg)
+
+    def _validate_filter(self, filter_expr):
+        jsonschema.validate(filter_expr, self.schema)
+
+    def _validate_orderby(self, orderby_expr):
+        jsonschema.validate(orderby_expr, self.orderby_schema)
+
+
 class Resource(_Base):
     """An externally defined object for which samples have been received.
     """
@@ -1852,6 +2063,29 @@ class EventsController(rest.RestController):
                      traits=event.traits)
 
 
+class QuerySamplesController(rest.RestController):
+    """Provides complex query possibilities for samples
+    """
+
+    @wsme_pecan.wsexpose([Sample], body=ComplexQuery)
+    def post(self, body):
+        """Define query for retrieving Sample data.
+
+        :param body: Query rules for the samples to be returned.
+        """
+        query = ValidatedComplexQuery(body)
+        query.validate(visibility_field="project_id")
+        conn = pecan.request.storage_conn
+        return [Sample.from_db_model(s)
+                for s in conn.query_samples(query.filter_expr,
+                                            query.orderby,
+                                            query.limit)]
+
+
+class QueryController(rest.RestController):
+    samples = QuerySamplesController()
+
+
 class V2Controller(object):
     """Version 2 API controller root."""
 
@@ -1861,3 +2095,5 @@ class V2Controller(object):
     alarms = AlarmsController()
     event_types = EventTypesController()
     events = EventsController()
+
+    query = QueryController()
