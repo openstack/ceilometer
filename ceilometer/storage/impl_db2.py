@@ -349,15 +349,6 @@ class Connection(base.Connection):
             record['_id'] = str(bson.objectid.ObjectId())
         self.db.meter.insert(record)
 
-    def clear_expired_metering_data(self, ttl):
-        """Clear expired data from the backend storage system according to the
-        time-to-live.
-
-        :param ttl: Number of seconds to keep records for.
-
-        """
-        raise NotImplementedError('TTL not implemented.')
-
     def get_users(self, source=None):
         """Return an iterable of user id strings.
 
@@ -720,81 +711,3 @@ class Connection(base.Connection):
         """Delete an alarm
         """
         self.db.alarm.remove({'alarm_id': alarm_id})
-
-    def get_alarm_changes(self, alarm_id, on_behalf_of,
-                          user=None, project=None, type=None,
-                          start_timestamp=None, start_timestamp_op=None,
-                          end_timestamp=None, end_timestamp_op=None):
-        """Yields list of AlarmChanges describing alarm history
-
-        Changes are always sorted in reverse order of occurence, given
-        the importance of currency.
-
-        Segregation for non-administrative users is done on the basis
-        of the on_behalf_of parameter. This allows such users to have
-        visibility on both the changes initiated by themselves directly
-        (generally creation, rule changes, or deletion) and also on those
-        changes initiated on their behalf by the alarming service (state
-        transitions after alarm thresholds are crossed).
-
-        :param alarm_id: ID of alarm to return changes for
-        :param on_behalf_of: ID of tenant to scope changes query (None for
-                             administrative user, indicating all projects)
-        :param user: Optional ID of user to return changes for
-        :param project: Optional ID of project to return changes for
-        :project type: Optional change type
-        :param start_timestamp: Optional modified timestamp start range
-        :param start_timestamp_op: Optional timestamp start range operation
-        :param end_timestamp: Optional modified timestamp end range
-        :param end_timestamp_op: Optional timestamp end range operation
-        """
-        raise NotImplementedError(_('Alarm history not implemented'))
-
-    def record_alarm_change(self, alarm_change):
-        """Record alarm change event.
-        """
-        raise NotImplementedError(_('Alarm history not implemented'))
-
-    @staticmethod
-    def record_events(events):
-        """Write the events.
-
-        :param events: a list of model.Event objects.
-        """
-        raise NotImplementedError(_('Events not implemented.'))
-
-    @staticmethod
-    def get_events(event_filter):
-        """Return an iterable of model.Event objects.
-
-        :param event_filter: EventFilter instance
-        """
-        raise NotImplementedError(_('Events not implemented.'))
-
-    @staticmethod
-    def get_event_types():
-        """Return all event types as an iterable of strings.
-        """
-        raise NotImplementedError(_('Events not implemented.'))
-
-    @staticmethod
-    def get_trait_types(event_type):
-        """Return a dictionary containing the name and data type of
-        the trait type. Only trait types for the provided event_type are
-        returned.
-
-        :param event_type: the type of the Event
-        """
-
-        raise NotImplementedError(_('Events not implemented.'))
-
-    @staticmethod
-    def get_traits(event_type, trait_type=None):
-        """Return all trait instances associated with an event_type. If
-        trait_type is specified, only return instances of that trait type.
-
-        :param event_type: the type of the Event to filter by
-        :param trait_type: the name of the Trait to filter by
-        """
-
-        raise NotImplementedError(_('Events not implemented.'))
