@@ -863,8 +863,6 @@ class Connection(base.Connection):
         values = {'t_string': None, 't_float': None,
                   't_int': None, 't_datetime': None}
         value = trait_model.value
-        if trait_model.dtype == api_models.Trait.DATETIME_TYPE:
-            value = utils.dt_to_decimal(value)
         values[value_map[trait_model.dtype]] = value
         return models.Trait(trait_type, event, **values)
 
@@ -893,8 +891,8 @@ class Connection(base.Connection):
             event_type = cls._get_or_create_event_type(event_model.event_type,
                                                        session=session)
 
-            generated = utils.dt_to_decimal(event_model.generated)
-            event = models.Event(event_model.message_id, event_type, generated)
+            event = models.Event(event_model.message_id, event_type,
+                                 event_model.generated)
             session.add(event)
 
             new_traits = []
@@ -944,8 +942,8 @@ class Connection(base.Connection):
         :param event_filter: EventFilter instance
         """
 
-        start = utils.dt_to_decimal(event_filter.start_time)
-        end = utils.dt_to_decimal(event_filter.end_time)
+        start = event_filter.start_time
+        end = event_filter.end_time
         session = sqlalchemy_session.get_session()
         with session.begin():
             event_query = session.query(models.Event)
@@ -992,8 +990,7 @@ class Connection(base.Connection):
                         elif key == 't_int':
                             conditions.append(models.Trait.t_int == value)
                         elif key == 't_datetime':
-                            dt = utils.dt_to_decimal(value)
-                            conditions.append(models.Trait.t_datetime == dt)
+                            conditions.append(models.Trait.t_datetime == value)
                         elif key == 't_float':
                             conditions.append(models.Trait.t_float == value)
 
@@ -1030,11 +1027,10 @@ class Connection(base.Connection):
             for trait in query.all():
                 event = event_models_dict.get(trait.event_id)
                 if not event:
-                    generated = utils.decimal_to_dt(trait.event.generated)
                     event = api_models.Event(
                         trait.event.message_id,
                         trait.event.event_type.desc,
-                        generated, [])
+                        trait.event.generated, [])
                     event_models_dict[trait.event_id] = event
                 trait_model = api_models.Trait(trait.trait_type.desc,
                                                trait.trait_type.data_type,
@@ -1111,7 +1107,7 @@ class Connection(base.Connection):
                      .join(models.EventType,
                            and_(models.EventType.id ==
                                 models.Event.event_type_id,
-                           models.EventType.desc == event_type)))
+                                models.EventType.desc == event_type)))
 
             for trait in query.all():
                 type = trait.trait_type
