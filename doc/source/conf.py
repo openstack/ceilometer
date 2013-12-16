@@ -151,6 +151,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinxcontrib.pecanwsme.rest',
     'oslo.sphinx',
+    'sphinxcontrib.docbookrestapi.setup'
 ]
 
 wsme_protocols = ['restjson', 'restxml']

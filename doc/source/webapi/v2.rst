@@ -1,3 +1,5 @@
+.. docbookrestapi
+
 ============
  V2 Web API
 ============

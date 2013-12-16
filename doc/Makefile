@@ -37,6 +37,7 @@ help:
 	@echo "  changes    to make an overview of all changed/added/deprecated items"
 	@echo "  linkcheck  to check all external links for integrity"
 	@echo "  doctest    to run all doctests embedded in the documentation (if enabled)"
+	@echo "  wadl       to build a WADL file for api.openstack.org"
 
 clean:
 	-rm -rf $(BUILDDIR)/*
@@ -49,6 +50,11 @@ html: check-dependencies
 .PHONY: check-dependencies
 check-dependencies:
 	@python -c 'import sphinxcontrib.autohttp.flask' >/dev/null 2>&1 || (echo "ERROR: Missing Sphinx dependencies. Run: pip install sphinxcontrib-httpdomain" && exit 1)
+
+wadl:
+	$(SPHINXBUILD) -b docbook $(ALLSPHINXOPTS) $(BUILDDIR)/wadl
+	@echo
+	@echo "Build finished. The WADL pages are in $(BUILDDIR)/wadl."
 
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
