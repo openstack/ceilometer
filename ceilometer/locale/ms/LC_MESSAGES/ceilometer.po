@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-12-04 06:10+0000\n"
+"POT-Creation-Date: 2013-12-17 06:04+0000\n"
 "PO-Revision-Date: 2012-12-11 06:53+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Malay "
@@ -18,43 +18,38 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
-#: ceilometer/collector.py:75
+#: ceilometer/collector.py:77
 #, python-format
 msgid "UDP: Cannot decode data sent by %s"
 msgstr ""
 
-#: ceilometer/collector.py:82
+#: ceilometer/collector.py:84
 #, python-format
 msgid "UDP: Storing %s"
 msgstr ""
 
-#: ceilometer/collector.py:86
+#: ceilometer/collector.py:88
 msgid "UDP: Unable to store meter"
 msgstr ""
 
-#: ceilometer/notification.py:83 ceilometer/notifier.py:47
+#: ceilometer/notification.py:88 ceilometer/notifier.py:47
 #, python-format
 msgid "Failed to load any notification handlers for %s"
 msgstr ""
 
-#: ceilometer/notification.py:101
+#: ceilometer/notification.py:106
 #, python-format
 msgid "Event types from %(name)s: %(type)s (ack_on_error=%(error)s)"
 msgstr ""
 
-#: ceilometer/notification.py:117
+#: ceilometer/notification.py:122
 #, python-format
 msgid "Could not join consumer pool %(topic)s/%(exchange)s"
 msgstr ""
 
-#: ceilometer/notification.py:129
+#: ceilometer/notification.py:134
 #, python-format
 msgid "notification %r"
-msgstr ""
-
-#: ceilometer/notification.py:159
-#, python-format
-msgid "Saving event \"%s\""
 msgstr ""
 
 #: ceilometer/notifier.py:40
@@ -563,17 +558,17 @@ msgid ""
 "min_ts %(min_ts)s, max_ts %(max_ts)s"
 msgstr ""
 
-#: ceilometer/central/manager.py:44 ceilometer/compute/manager.py:43
+#: ceilometer/central/manager.py:43 ceilometer/compute/manager.py:42
 #, python-format
 msgid "Polling pollster %s"
 msgstr ""
 
-#: ceilometer/central/manager.py:51 ceilometer/compute/manager.py:51
+#: ceilometer/central/manager.py:50 ceilometer/compute/manager.py:50
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
 msgstr ""
 
-#: ceilometer/compute/manager.py:60
+#: ceilometer/compute/manager.py:59
 #, python-format
 msgid "Unable to retrieve instances: %s"
 msgstr ""
@@ -679,6 +674,69 @@ msgstr ""
 
 #: ceilometer/energy/kwapi.py:77
 msgid "Kwapi endpoint not found"
+msgstr ""
+
+#: ceilometer/event/converter.py:76
+#, python-format
+msgid "Plugin specified, but no plugin name supplied for trait %s"
+msgstr ""
+
+#: ceilometer/event/converter.py:85
+#, python-format
+msgid "No plugin named %(plugin)s available for trait %(trait)s"
+msgstr ""
+
+#: ceilometer/event/converter.py:95
+#, python-format
+msgid "Required field in trait definition not specified: '%s'"
+msgstr ""
+
+#: ceilometer/event/converter.py:110
+#, python-format
+msgid ""
+"Parse error in JSONPath specification '%(jsonpath)s' for %(trait)s: "
+"%(err)s"
+msgstr ""
+
+#: ceilometer/event/converter.py:116
+#, python-format
+msgid "Invalid trait type '%(type)s' for trait %(trait)s"
+msgstr ""
+
+#: ceilometer/event/converter.py:168
+#, python-format
+msgid "Required field %s not specified"
+msgstr ""
+
+#: ceilometer/event/converter.py:341
+#, python-format
+msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
+msgstr ""
+
+#: ceilometer/event/converter.py:365
+#, python-format
+msgid "Event Definitions configuration file: %s"
+msgstr ""
+
+#: ceilometer/event/converter.py:375
+#, python-format
+msgid ""
+"Invalid YAML syntax in Event Definitions file %(file)s at line: %(line)s,"
+" column: %(column)s."
+msgstr ""
+
+#: ceilometer/event/converter.py:381
+#, python-format
+msgid "YAML error reading Event Definitions file %(file)s"
+msgstr ""
+
+#: ceilometer/event/converter.py:388
+msgid "No Event Definitions configuration file found! Using default config."
+msgstr ""
+
+#: ceilometer/event/converter.py:392
+#, python-format
+msgid "Event Definitions: %s"
 msgstr ""
 
 #: ceilometer/network/floatingip.py:45
@@ -1300,53 +1358,53 @@ msgid ""
 msgstr ""
 
 #: ceilometer/openstack/common/rpc/impl_kombu.py:622
-#: ceilometer/openstack/common/rpc/impl_qpid.py:584
+#: ceilometer/openstack/common/rpc/impl_qpid.py:573
 #, python-format
 msgid "Failed to declare consumer for topic '%(topic)s': %(err_str)s"
 msgstr ""
 
 #: ceilometer/openstack/common/rpc/impl_kombu.py:640
-#: ceilometer/openstack/common/rpc/impl_qpid.py:599
+#: ceilometer/openstack/common/rpc/impl_qpid.py:588
 #, python-format
 msgid "Timed out waiting for RPC response: %s"
 msgstr ""
 
 #: ceilometer/openstack/common/rpc/impl_kombu.py:644
-#: ceilometer/openstack/common/rpc/impl_qpid.py:603
+#: ceilometer/openstack/common/rpc/impl_qpid.py:592
 #, python-format
 msgid "Failed to consume message from queue: %s"
 msgstr ""
 
 #: ceilometer/openstack/common/rpc/impl_kombu.py:683
-#: ceilometer/openstack/common/rpc/impl_qpid.py:638
+#: ceilometer/openstack/common/rpc/impl_qpid.py:627
 #, python-format
 msgid "Failed to publish message to topic '%(topic)s': %(err_str)s"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_qpid.py:88
+#: ceilometer/openstack/common/rpc/impl_qpid.py:87
 #, python-format
 msgid "Invalid value for qpid_topology_version: %d"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_qpid.py:190
+#: ceilometer/openstack/common/rpc/impl_qpid.py:191
 msgid "Failed to process message... skipping it."
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_qpid.py:526
+#: ceilometer/openstack/common/rpc/impl_qpid.py:515
 #, python-format
 msgid "Unable to connect to AMQP server: %(e)s. Sleeping %(delay)s seconds"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_qpid.py:532
+#: ceilometer/openstack/common/rpc/impl_qpid.py:521
 #, python-format
 msgid "Connected to AMQP server on %s"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_qpid.py:545
+#: ceilometer/openstack/common/rpc/impl_qpid.py:534
 msgid "Re-established AMQP queues"
 msgstr ""
 
-#: ceilometer/openstack/common/rpc/impl_qpid.py:611
+#: ceilometer/openstack/common/rpc/impl_qpid.py:600
 msgid "Error processing message.  Skipping it."
 msgstr ""
 
@@ -1608,7 +1666,7 @@ msgstr ""
 msgid "looking for %(name)r driver in %(namespace)r"
 msgstr ""
 
-#: ceilometer/storage/__init__.py:145
+#: ceilometer/storage/__init__.py:150
 msgid "Clearing expired metering data"
 msgstr ""
 
@@ -1622,10 +1680,30 @@ msgstr ""
 #: ceilometer/storage/impl_hbase.py:394 ceilometer/storage/impl_mongodb.py:606
 #: ceilometer/storage/impl_mongodb.py:688
 #: ceilometer/storage/impl_mongodb.py:864
-#: ceilometer/storage/impl_sqlalchemy.py:352
-#: ceilometer/storage/impl_sqlalchemy.py:454
-#: ceilometer/storage/impl_sqlalchemy.py:674
+#: ceilometer/storage/impl_sqlalchemy.py:373
+#: ceilometer/storage/impl_sqlalchemy.py:475
+#: ceilometer/storage/impl_sqlalchemy.py:695
 msgid "Pagination not implemented"
+msgstr ""
+
+#: ceilometer/storage/impl_db2.py:751 ceilometer/storage/impl_db2.py:756
+#: ceilometer/storage/impl_hbase.py:639 ceilometer/storage/impl_hbase.py:644
+#: ceilometer/storage/impl_log.py:209 ceilometer/storage/impl_log.py:214
+msgid "Alarm history not implemented"
+msgstr ""
+
+#: ceilometer/storage/impl_db2.py:764 ceilometer/storage/impl_db2.py:772
+#: ceilometer/storage/impl_db2.py:778 ceilometer/storage/impl_db2.py:789
+#: ceilometer/storage/impl_db2.py:800 ceilometer/storage/impl_hbase.py:656
+#: ceilometer/storage/impl_hbase.py:663 ceilometer/storage/impl_hbase.py:668
+#: ceilometer/storage/impl_hbase.py:678 ceilometer/storage/impl_hbase.py:688
+#: ceilometer/storage/impl_log.py:221 ceilometer/storage/impl_log.py:228
+#: ceilometer/storage/impl_log.py:233 ceilometer/storage/impl_log.py:243
+#: ceilometer/storage/impl_log.py:253 ceilometer/storage/impl_mongodb.py:968
+#: ceilometer/storage/impl_mongodb.py:976
+#: ceilometer/storage/impl_mongodb.py:993
+#: ceilometer/storage/impl_mongodb.py:1004
+msgid "Events not implemented."
 msgstr ""
 
 #: ceilometer/storage/impl_hbase.py:99
@@ -1669,16 +1747,21 @@ msgstr ""
 msgid "Query Meter Table: %s"
 msgstr ""
 
-#: ceilometer/storage/impl_hbase.py:764
+#: ceilometer/storage/impl_hbase.py:600 ceilometer/storage/impl_hbase.py:605
+#: ceilometer/storage/impl_hbase.py:610 ceilometer/storage/impl_hbase.py:649
+msgid "Alarms not implemented"
+msgstr ""
+
+#: ceilometer/storage/impl_hbase.py:789
 msgid "Opening in-memory HBase connection"
 msgstr ""
 
-#: ceilometer/storage/impl_log.py:56
+#: ceilometer/storage/impl_log.py:57
 #, python-format
 msgid "metering data %(counter_name)s for %(resource_id)s: %(counter_volume)s"
 msgstr ""
 
-#: ceilometer/storage/impl_log.py:69
+#: ceilometer/storage/impl_log.py:70
 #, python-format
 msgid "Dropping data with TTL %d"
 msgstr ""
@@ -1686,6 +1769,10 @@ msgstr ""
 #: ceilometer/storage/impl_mongodb.py:158
 #, python-format
 msgid "Connecting to MongoDB on %s"
+msgstr ""
+
+#: ceilometer/storage/impl_mongodb.py:982
+msgid "EventTypes not implemented."
 msgstr ""
 
 #: ceilometer/storage/impl_sqlalchemy.py:117
@@ -1702,11 +1789,11 @@ msgstr ""
 msgid "Unknown metadata type. Key (%s) will not be queryable."
 msgstr ""
 
-#: ceilometer/storage/impl_sqlalchemy.py:608
+#: ceilometer/storage/impl_sqlalchemy.py:629
 msgid "Unable to group by these fields"
 msgstr ""
 
-#: ceilometer/storage/impl_sqlalchemy.py:921
+#: ceilometer/storage/impl_sqlalchemy.py:935
 #, python-format
 msgid "Failed to record event: %s"
 msgstr ""
@@ -1823,9 +1910,6 @@ msgstr ""
 #~ msgid "metaquery not implemented"
 #~ msgstr ""
 
-#~ msgid ""
-#~ "Number of call waiters is greater "
-#~ "than warning threshhold: %d. There could"
-#~ " be a MulticallProxyWaiter leak."
+#~ msgid "Saving event \"%s\""
 #~ msgstr ""
 
