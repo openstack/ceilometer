@@ -27,6 +27,7 @@ from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import network_utils
 from ceilometer.openstack.common import test
 from ceilometer.publisher import udp
+from ceilometer.publisher import utils
 from ceilometer import sample
 
 
@@ -34,7 +35,6 @@ COUNTER_SOURCE = 'testsource'
 
 
 class TestUDPPublisher(test.BaseTestCase):
-
     test_data = [
         sample.Sample(
             name='test',
@@ -102,14 +102,17 @@ class TestUDPPublisher(test.BaseTestCase):
         def _fake_socket_socket(family, type):
             def record_data(msg, dest):
                 published.append((msg, dest))
+
             udp_socket = mock.Mock()
             udp_socket.sendto = record_data
             return udp_socket
+
         return _fake_socket_socket
 
     def setUp(self):
         super(TestUDPPublisher, self).setUp()
         self.CONF = self.useFixture(config.Config()).conf
+        self.CONF.publisher.metering_secret = 'not-so-secret'
 
     def test_published(self):
         self.data_sent = []
@@ -134,7 +137,11 @@ class TestUDPPublisher(test.BaseTestCase):
 
         # Check that counters are equal
         self.assertEqual(sorted(sent_counters),
-                         sorted([dict(d.as_dict()) for d in self.test_data]))
+                         sorted(
+                             [utils.meter_message_from_counter(
+                                 d,
+                                 "not-so-secret")
+                              for d in self.test_data]))
 
     @staticmethod
     def _raise_ioerror(*args):

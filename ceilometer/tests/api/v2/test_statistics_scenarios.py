@@ -21,7 +21,7 @@ import datetime
 
 import testscenarios
 
-from ceilometer.publisher import rpc
+from ceilometer.publisher import utils
 from ceilometer import sample
 from ceilometer.tests.api.v2 import FunctionalTest
 from ceilometer.tests import db as tests_db
@@ -51,9 +51,9 @@ class TestMaxProjectVolume(FunctionalTest,
                                    },
                 source='source1',
             )
-            msg = rpc.meter_message_from_counter(
+            msg = utils.meter_message_from_counter(
                 s,
-                self.CONF.publisher_rpc.metering_secret,
+                self.CONF.publisher.metering_secret,
             )
             self.conn.record_metering_data(msg)
 
@@ -149,9 +149,9 @@ class TestMaxResourceVolume(FunctionalTest,
                                    },
                 source='source1',
             )
-            msg = rpc.meter_message_from_counter(
+            msg = utils.meter_message_from_counter(
                 s,
-                self.CONF.publisher_rpc.metering_secret,
+                self.CONF.publisher.metering_secret,
             )
             self.conn.record_metering_data(msg)
 
@@ -270,9 +270,9 @@ class TestSumProjectVolume(FunctionalTest,
                                    },
                 source='source1',
             )
-            msg = rpc.meter_message_from_counter(
+            msg = utils.meter_message_from_counter(
                 s,
-                self.CONF.publisher_rpc.metering_secret,
+                self.CONF.publisher.metering_secret,
             )
             self.conn.record_metering_data(msg)
 
@@ -370,9 +370,9 @@ class TestSumResourceVolume(FunctionalTest,
                                    },
                 source='source1',
             )
-            msg = rpc.meter_message_from_counter(
+            msg = utils.meter_message_from_counter(
                 s,
-                self.CONF.publisher_rpc.metering_secret,
+                self.CONF.publisher.metering_secret,
             )
             self.conn.record_metering_data(msg)
 
@@ -527,9 +527,9 @@ class TestGroupByInstance(FunctionalTest,
                                    'event': test_sample['metadata_event'], },
                 source=test_sample['source'],
             )
-            msg = rpc.meter_message_from_counter(
+            msg = utils.meter_message_from_counter(
                 c,
-                self.CONF.publisher_rpc.metering_secret,
+                self.CONF.publisher.metering_secret,
             )
             self.conn.record_metering_data(msg)
 
@@ -1285,9 +1285,9 @@ class TestGroupBySource(FunctionalTest,
                                    'event': test_sample['metadata_event'], },
                 source=test_sample['source'],
             )
-            msg = rpc.meter_message_from_counter(
+            msg = utils.meter_message_from_counter(
                 c,
-                self.CONF.publisher_rpc.metering_secret,
+                self.CONF.publisher.metering_secret,
             )
             self.conn.record_metering_data(msg)
 

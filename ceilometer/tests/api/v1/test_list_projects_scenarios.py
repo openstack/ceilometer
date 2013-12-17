@@ -23,7 +23,7 @@ import datetime
 import logging
 import testscenarios
 
-from ceilometer.publisher import rpc
+from ceilometer.publisher import utils
 from ceilometer import sample
 
 from ceilometer.tests import api as tests_api
@@ -60,9 +60,9 @@ class TestListProjects(tests_api.TestBase,
                                'tag': 'self.sample'},
             source='test_list_projects',
         )
-        msg = rpc.meter_message_from_counter(
+        msg = utils.meter_message_from_counter(
             sample1,
-            self.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher.metering_secret,
         )
         self.conn.record_metering_data(msg)
 
@@ -79,9 +79,9 @@ class TestListProjects(tests_api.TestBase,
                                'tag': 'self.sample2'},
             source='test_list_users',
         )
-        msg2 = rpc.meter_message_from_counter(
+        msg2 = utils.meter_message_from_counter(
             sample2,
-            self.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher.metering_secret,
         )
         self.conn.record_metering_data(msg2)
 

@@ -877,6 +877,18 @@
 #store_events=false
 
 
+[publisher]
+
+#
+# Options defined in ceilometer.publisher.utils
+#
+
+# Secret value for signing metering messages (string value)
+# Deprecated group/name - [DEFAULT]/metering_secret
+# Deprecated group/name - [publisher_rpc]/metering_secret
+#metering_secret=change this or be hacked
+
+
 [publisher_rpc]
 
 #
@@ -886,9 +898,6 @@
 # the topic ceilometer uses for metering messages (string
 # value)
 #metering_topic=metering
-
-# Secret value for signing metering messages (string value)
-#metering_secret=change this or be hacked
 
 
 [rpc_notifier2]

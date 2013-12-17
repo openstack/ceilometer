@@ -24,7 +24,7 @@ import datetime
 import testscenarios
 
 from ceilometer.openstack.common import timeutils
-from ceilometer.publisher import rpc
+from ceilometer.publisher import utils
 from ceilometer import sample
 from ceilometer import storage
 from ceilometer.storage import base
@@ -51,8 +51,8 @@ class DBTestBase(tests_db.TestBase):
             timestamp=timestamp,
             resource_metadata=metadata, source=source
         )
-        msg = rpc.meter_message_from_counter(
-            s, self.CONF.publisher_rpc.metering_secret
+        msg = utils.meter_message_from_counter(
+            s, self.CONF.publisher.metering_secret
         )
         self.conn.record_metering_data(msg)
         return msg
@@ -730,7 +730,7 @@ class StatisticsTest(DBTestBase,
                                    },
                 source='test',
             )
-            msg = rpc.meter_message_from_counter(
+            msg = utils.meter_message_from_counter(
                 c,
                 secret='not-so-secret',
             )
@@ -750,7 +750,7 @@ class StatisticsTest(DBTestBase,
                                    },
                 source='test',
             )
-            msg = rpc.meter_message_from_counter(
+            msg = utils.meter_message_from_counter(
                 c,
                 secret='not-so-secret',
             )
@@ -971,9 +971,9 @@ class StatisticsGroupByTest(DBTestBase,
                                    'event': test_sample['metadata_event'], },
                 source=test_sample['source'],
             )
-            msg = rpc.meter_message_from_counter(
+            msg = utils.meter_message_from_counter(
                 c,
-                self.CONF.publisher_rpc.metering_secret,
+                self.CONF.publisher.metering_secret,
             )
             self.conn.record_metering_data(msg)
 
@@ -1835,9 +1835,9 @@ class CounterDataTypeTest(DBTestBase,
             resource_metadata={},
             source='test-1',
         )
-        msg = rpc.meter_message_from_counter(
+        msg = utils.meter_message_from_counter(
             c,
-            self.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher.metering_secret,
         )
 
         self.conn.record_metering_data(msg)
@@ -1854,9 +1854,9 @@ class CounterDataTypeTest(DBTestBase,
             resource_metadata={},
             source='test-1',
         )
-        msg = rpc.meter_message_from_counter(
+        msg = utils.meter_message_from_counter(
             c,
-            self.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher.metering_secret,
         )
         self.conn.record_metering_data(msg)
 
@@ -1872,9 +1872,9 @@ class CounterDataTypeTest(DBTestBase,
             resource_metadata={},
             source='test-1',
         )
-        msg = rpc.meter_message_from_counter(
+        msg = utils.meter_message_from_counter(
             c,
-            self.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher.metering_secret,
         )
         self.conn.record_metering_data(msg)
 
@@ -2356,6 +2356,6 @@ class BigIntegerTest(tests_db.TestBase,
                           resource_id='resource-id',
                           timestamp=datetime.datetime.utcnow(),
                           resource_metadata=metadata)
-        msg = rpc.meter_message_from_counter(
-            s, self.CONF.publisher_rpc.metering_secret)
+        msg = utils.meter_message_from_counter(
+            s, self.CONF.publisher.metering_secret)
         self.conn.record_metering_data(msg)

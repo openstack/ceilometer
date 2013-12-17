@@ -22,7 +22,7 @@ import tempfile
 from ceilometer.dispatcher import file
 from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import test
-from ceilometer.publisher import rpc
+from ceilometer.publisher import utils
 
 
 class TestDispatcherFile(test.BaseTestCase):
@@ -53,9 +53,9 @@ class TestDispatcherFile(test.BaseTestCase):
                'resource_id': self.id(),
                'counter_volume': 1,
                }
-        msg['message_signature'] = rpc.compute_signature(
+        msg['message_signature'] = utils.compute_signature(
             msg,
-            self.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher.metering_secret,
         )
 
         # The record_metering_data method should exist and not produce errors.
@@ -85,9 +85,9 @@ class TestDispatcherFile(test.BaseTestCase):
                'resource_id': self.id(),
                'counter_volume': 1,
                }
-        msg['message_signature'] = rpc.compute_signature(
+        msg['message_signature'] = utils.compute_signature(
             msg,
-            self.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher.metering_secret,
         )
 
         # The record_metering_data method should exist and not produce errors.

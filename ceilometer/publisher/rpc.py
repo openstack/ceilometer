@@ -18,8 +18,7 @@
 """Publish a sample using the preferred RPC mechanism.
 """
 
-import hashlib
-import hmac
+
 import itertools
 import operator
 import urlparse
@@ -30,7 +29,7 @@ from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import rpc
 from ceilometer import publisher
-from ceilometer import utils
+from ceilometer.publisher import utils
 
 
 LOG = log.getLogger(__name__)
@@ -39,12 +38,6 @@ METER_PUBLISH_OPTS = [
     cfg.StrOpt('metering_topic',
                default='metering',
                help='the topic ceilometer uses for metering messages',
-               deprecated_group="DEFAULT",
-               ),
-    cfg.StrOpt('metering_secret',
-               secret=True,
-               default='change this or be hacked',
-               help='Secret value for signing metering messages',
                deprecated_group="DEFAULT",
                ),
 ]
@@ -91,51 +84,6 @@ def override_backend_retry_config(value):
             cfg.CONF.set_override('rabbit_max_retries', value)
 
 
-def compute_signature(message, secret):
-    """Return the signature for a message dictionary.
-    """
-    digest_maker = hmac.new(secret, '', hashlib.sha256)
-    for name, value in utils.recursive_keypairs(message):
-        if name == 'message_signature':
-            # Skip any existing signature value, which would not have
-            # been part of the original message.
-            continue
-        digest_maker.update(name)
-        digest_maker.update(unicode(value).encode('utf-8'))
-    return digest_maker.hexdigest()
-
-
-def verify_signature(message, secret):
-    """Check the signature in the message against the value computed
-    from the rest of the contents.
-    """
-    old_sig = message.get('message_signature')
-    new_sig = compute_signature(message, secret)
-    return new_sig == old_sig
-
-
-def meter_message_from_counter(sample, secret):
-    """Make a metering message ready to be published or stored.
-
-    Returns a dictionary containing a metering message
-    for a notification message and a Sample instance.
-    """
-    msg = {'source': sample.source,
-           'counter_name': sample.name,
-           'counter_type': sample.type,
-           'counter_unit': sample.unit,
-           'counter_volume': sample.volume,
-           'user_id': sample.user_id,
-           'project_id': sample.project_id,
-           'resource_id': sample.resource_id,
-           'timestamp': sample.timestamp,
-           'resource_metadata': sample.resource_metadata,
-           'message_id': sample.id,
-           }
-    msg['message_signature'] = compute_signature(msg, secret)
-    return msg
-
-
 class RPCPublisher(publisher.PublisherBase):
 
     def __init__(self, parsed_url):
@@ -175,9 +123,9 @@ class RPCPublisher(publisher.PublisherBase):
         """
 
         meters = [
-            meter_message_from_counter(
+            utils.meter_message_from_counter(
                 sample,
-                cfg.CONF.publisher_rpc.metering_secret)
+                cfg.CONF.publisher.metering_secret)
             for sample in samples
         ]
 

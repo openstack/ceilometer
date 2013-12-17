@@ -2,7 +2,8 @@
 #
 # Copyright © 2013 eNovance
 #
-# Author: Julien Danjou <julien@danjou.info>
+# Author: Julien Danjou <julien@danjou.info>,
+#         Tyaptin Ilya <ityaptin@mirantis.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -27,6 +28,7 @@ from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import network_utils
 from ceilometer import publisher
+from ceilometer.publisher import utils
 
 cfg.CONF.import_opt('udp_port', 'ceilometer.collector',
                     group='collector')
@@ -35,7 +37,6 @@ LOG = log.getLogger(__name__)
 
 
 class UDPPublisher(publisher.PublisherBase):
-
     def __init__(self, parsed_url):
         self.host, self.port = network_utils.parse_host_port(
             parsed_url.netloc,
@@ -51,7 +52,9 @@ class UDPPublisher(publisher.PublisherBase):
         """
 
         for sample in samples:
-            msg = sample.as_dict()
+            msg = utils.meter_message_from_counter(
+                sample,
+                cfg.CONF.publisher.metering_secret)
             host = self.host
             port = self.port
             LOG.debug(_("Publishing sample %(msg)s over UDP to "
