@@ -62,7 +62,12 @@ type (for example, if you apply a filter on a query for statistics,
 you won't target *duration_start* field of *Statistics*, but *timestamp*
 field of *Sample*). You may also apply filters based on the values of one
 or more of the *resource_metadata* field, in which case you should target
-*metadata.<field>*.
+*metadata.<field>*. Notice, however, that given the free-form nature of
+*resource_metadata* field, there is no practical or consistent way to
+validate the query fields under *metadata* domain like it is done for all other
+fields. In other words, the API call will return HTTP 200 in both scenarios:
+when a query with *metadata.<field>* does not match its value, and when
+*<field>* itself does not exist in any of the records being queried.
 
 .. autotype:: ceilometer.api.controllers.v2.Query
    :members:
