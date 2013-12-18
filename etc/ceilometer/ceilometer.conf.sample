@@ -518,37 +518,84 @@
 #cinder_control_exchange=cinder
 
 
-[publisher_rpc]
+[alarm]
 
 #
-# Options defined in ceilometer.publisher.rpc
+# Options defined in ceilometer.alarm.notifier.rest
 #
 
-# the topic ceilometer uses for metering messages (string
-# value)
-#metering_topic=metering
+# SSL Client certificate for REST notifier (string value)
+#rest_notifier_certificate_file=
 
-# Secret value for signing metering messages (string value)
-#metering_secret=change this or be hacked
+# SSL Client private key for REST notifier (string value)
+#rest_notifier_certificate_key=
 
+# Verify the SSL Server certificate when
+# calling alarm action (boolean value)
+#rest_notifier_ssl_verify=true
 
-[ssl]
 
 #
-# Options defined in ceilometer.openstack.common.sslutils
+# Options defined in ceilometer.alarm.rpc
 #
 
-# CA certificate file to use to verify connecting clients
+# the topic ceilometer uses for alarm notifier messages
 # (string value)
-#ca_file=<None>
+#notifier_rpc_topic=alarm_notifier
 
-# Certificate file to use when starting the server securely
-# (string value)
-#cert_file=<None>
+# the topic ceilometer uses for alarm partition coordination
+# messages (string value)
+#partition_rpc_topic=alarm_partition_coordination
 
-# Private key file to use when starting the server securely
-# (string value)
-#key_file=<None>
+
+#
+# Options defined in ceilometer.alarm.service
+#
+
+# Period of evaluation cycle, should be >= than configured
+# pipeline interval for collection of underlying metrics.
+# (integer value)
+# Deprecated group/name - [alarm]/threshold_evaluation_interval
+#evaluation_interval=60
+
+# Class to launch as alarm evaluation service (string value)
+#evaluation_service=ceilometer.alarm.service.SingletonAlarmService
+
+
+#
+# Options defined in ceilometer.api.controllers.v2
+#
+
+# Record alarm change events (boolean value)
+#record_history=true
+
+
+[api]
+
+#
+# Options defined in ceilometer.api
+#
+
+# The port for the ceilometer API server (integer value)
+# Deprecated group/name - [DEFAULT]/metering_api_port
+#port=8777
+
+# The listen IP for the ceilometer API server (string value)
+#host=0.0.0.0
+
+
+[collector]
+
+#
+# Options defined in ceilometer.collector
+#
+
+# address to bind the UDP socket todisabled if set to an empty
+# string (string value)
+#udp_address=0.0.0.0
+
+# port to bind the UDP socket to (integer value)
+#udp_port=4952
 
 
 [database]
@@ -643,6 +690,65 @@
 #time_to_live=-1
 
 
+[dispatcher_file]
+
+#
+# Options defined in ceilometer.dispatcher.file
+#
+
+# Name and the location of the file to record meters. (string
+# value)
+#file_path=<None>
+
+# The max size of the file (integer value)
+#max_bytes=0
+
+# The max number of the files to keep (integer value)
+#backup_count=0
+
+
+[event]
+
+#
+# Options defined in ceilometer.event.converter
+#
+
+# Configuration file for event definitions (string value)
+#definitions_cfg_file=event_definitions.yaml
+
+# Drop notifications if no event definition matches.
+# (Otherwise, we convert them with just the default traits)
+# (boolean value)
+#drop_unmatched_notifications=false
+
+
+[matchmaker_redis]
+
+#
+# Options defined in ceilometer.openstack.common.rpc.matchmaker_redis
+#
+
+# Host to locate redis (string value)
+#host=127.0.0.1
+
+# Use this port to connect to redis host. (integer value)
+#port=6379
+
+# Password for Redis server. (optional) (string value)
+#password=<None>
+
+
+[matchmaker_ring]
+
+#
+# Options defined in ceilometer.openstack.common.rpc.matchmaker_ring
+#
+
+# Matchmaker ring file (JSON) (string value)
+# Deprecated group/name - [DEFAULT]/matchmaker_ringfile
+#ringfile=/etc/oslo/matchmaker_ring.json
+
+
 [notification]
 
 #
@@ -657,67 +763,18 @@
 #store_events=false
 
 
-[alarm]
+[publisher_rpc]
 
 #
-# Options defined in ceilometer.alarm.notifier.rest
+# Options defined in ceilometer.publisher.rpc
 #
 
-# SSL Client certificate for REST notifier (string value)
-#rest_notifier_certificate_file=
+# the topic ceilometer uses for metering messages (string
+# value)
+#metering_topic=metering
 
-# SSL Client private key for REST notifier (string value)
-#rest_notifier_certificate_key=
-
-# Verify the SSL Server certificate when
-# calling alarm action (boolean value)
-#rest_notifier_ssl_verify=true
-
-
-#
-# Options defined in ceilometer.alarm.rpc
-#
-
-# the topic ceilometer uses for alarm notifier messages
-# (string value)
-#notifier_rpc_topic=alarm_notifier
-
-# the topic ceilometer uses for alarm partition coordination
-# messages (string value)
-#partition_rpc_topic=alarm_partition_coordination
-
-
-#
-# Options defined in ceilometer.alarm.service
-#
-
-# Period of evaluation cycle, should be >= than configured
-# pipeline interval for collection of underlying metrics.
-# (integer value)
-# Deprecated group/name - [alarm]/threshold_evaluation_interval
-#evaluation_interval=60
-
-# Class to launch as alarm evaluation service (string value)
-#evaluation_service=ceilometer.alarm.service.SingletonAlarmService
-
-
-#
-# Options defined in ceilometer.api.controllers.v2
-#
-
-# Record alarm change events (boolean value)
-#record_history=true
-
-
-[matchmaker_ring]
-
-#
-# Options defined in ceilometer.openstack.common.rpc.matchmaker_ring
-#
-
-# Matchmaker ring file (JSON) (string value)
-# Deprecated group/name - [DEFAULT]/matchmaker_ringfile
-#ringfile=/etc/oslo/matchmaker_ring.json
+# Secret value for signing metering messages (string value)
+#metering_secret=change this or be hacked
 
 
 [rpc_notifier2]
@@ -728,20 +785,6 @@
 
 # AMQP topic(s) used for OpenStack notifications (list value)
 #topics=notifications
-
-
-[api]
-
-#
-# Options defined in ceilometer.api
-#
-
-# The port for the ceilometer API server (integer value)
-# Deprecated group/name - [DEFAULT]/metering_api_port
-#port=8777
-
-# The listen IP for the ceilometer API server (string value)
-#host=0.0.0.0
 
 
 [service_credentials]
@@ -783,65 +826,22 @@
 #insecure=false
 
 
-[dispatcher_file]
+[ssl]
 
 #
-# Options defined in ceilometer.dispatcher.file
+# Options defined in ceilometer.openstack.common.sslutils
 #
 
-# Name and the location of the file to record meters. (string
-# value)
-#file_path=<None>
+# CA certificate file to use to verify connecting clients
+# (string value)
+#ca_file=<None>
 
-# The max size of the file (integer value)
-#max_bytes=0
+# Certificate file to use when starting the server securely
+# (string value)
+#cert_file=<None>
 
-# The max number of the files to keep (integer value)
-#backup_count=0
-
-
-[collector]
-
-#
-# Options defined in ceilometer.collector
-#
-
-# address to bind the UDP socket todisabled if set to an empty
-# string (string value)
-#udp_address=0.0.0.0
-
-# port to bind the UDP socket to (integer value)
-#udp_port=4952
-
-
-[event]
-
-#
-# Options defined in ceilometer.event.converter
-#
-
-# Configuration file for event definitions (string value)
-#definitions_cfg_file=event_definitions.yaml
-
-# Drop notifications if no event definition matches.
-# (Otherwise, we convert them with just the default traits)
-# (boolean value)
-#drop_unmatched_notifications=false
-
-
-[matchmaker_redis]
-
-#
-# Options defined in ceilometer.openstack.common.rpc.matchmaker_redis
-#
-
-# Host to locate redis (string value)
-#host=127.0.0.1
-
-# Use this port to connect to redis host. (integer value)
-#port=6379
-
-# Password for Redis server. (optional) (string value)
-#password=<None>
+# Private key file to use when starting the server securely
+# (string value)
+#key_file=<None>
 
 
