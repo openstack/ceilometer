@@ -34,7 +34,6 @@ from ceilometer.storage import models
 from ceilometer.storage.sqlalchemy import models as sql_models
 from ceilometer.tests import db as tests_db
 from ceilometer.tests.storage import test_storage_scenarios as scenarios
-from ceilometer import utils
 
 
 class EventTestBase(tests_db.TestBase):
@@ -147,7 +146,7 @@ class EventTest(EventTestBase):
         self.assertIsNone(trait.t_int)
         self.assertIsNone(trait.t_string)
         self.assertIsNone(trait.t_float)
-        self.assertEqual(trait.t_datetime, utils.dt_to_decimal(now))
+        self.assertEqual(trait.t_datetime, now)
         self.assertIsNotNone(trait.trait_type.desc)
 
     def test_bad_event(self):

@@ -2145,7 +2145,7 @@ class EventTest(EventTestBase):
 
 class GetEventTest(EventTestBase):
     def prepare_data(self):
-        event_models = []
+        self.event_models = []
         base = 0
         self.start = datetime.datetime(2013, 12, 31, 5, 0)
         now = self.start
@@ -2160,14 +2160,28 @@ class GetEventTest(EventTestBase):
                         ('trait_C', models.Trait.FLOAT_TYPE,
                             float(base) + 0.123456),
                         ('trait_D', models.Trait.DATETIME_TYPE, now)]]
-            event_models.append(
+            self.event_models.append(
                 models.Event("id_%s_%d" % (event_type, base),
                              event_type, now, trait_models))
             base += 100
             now = now + datetime.timedelta(hours=1)
         self.end = now
 
-        self.conn.record_events(event_models)
+        self.conn.record_events(self.event_models)
+
+    def test_generated_is_datetime(self):
+        event_filter = storage.EventFilter(self.start, self.end)
+        events = self.conn.get_events(event_filter)
+        self.assertEqual(6, len(events))
+        for i, event in enumerate(events):
+            self.assertTrue(isinstance(event.generated, datetime.datetime))
+            self.assertEqual(event.generated,
+                             self.event_models[i].generated)
+            model_traits = self.event_models[i].traits
+            for j, trait in enumerate(event.traits):
+                if trait.dtype == models.Trait.DATETIME_TYPE:
+                    self.assertTrue(isinstance(trait.value, datetime.datetime))
+                    self.assertEqual(trait.value, model_traits[j].value)
 
     def test_simple_get(self):
         event_filter = storage.EventFilter(self.start, self.end)

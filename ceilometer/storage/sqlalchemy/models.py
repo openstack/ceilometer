@@ -320,7 +320,7 @@ class Event(Base):
     )
     id = Column(Integer, primary_key=True)
     message_id = Column(String(50), unique=True)
-    generated = Column(Float(asdecimal=True))
+    generated = Column(PreciseTimestamp())
 
     event_type_id = Column(Integer, ForeignKey('event_type.id'))
     event_type = relationship("EventType", backref=backref('event_type'))
@@ -379,7 +379,7 @@ class Trait(Base):
     t_string = Column(String(255), nullable=True, default=None)
     t_float = Column(Float, nullable=True, default=None)
     t_int = Column(Integer, nullable=True, default=None)
-    t_datetime = Column(Float(asdecimal=True), nullable=True, default=None)
+    t_datetime = Column(PreciseTimestamp(), nullable=True, default=None)
 
     event_id = Column(Integer, ForeignKey('event.id'))
     event = relationship("Event", backref=backref('event', order_by=id))
@@ -409,7 +409,7 @@ class Trait(Base):
         if dtype == api_models.Trait.FLOAT_TYPE:
             return self.t_float
         if dtype == api_models.Trait.DATETIME_TYPE:
-            return utils.decimal_to_dt(self.t_datetime)
+            return self.t_datetime
         if dtype == api_models.Trait.TEXT_TYPE:
             return self.t_string
 
