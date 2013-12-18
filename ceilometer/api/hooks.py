@@ -74,6 +74,9 @@ class TranslationHook(hooks.PecanHook):
         self.local_error = threading.local()
         self.local_error.translatable_error = None
 
+    def before(self, state):
+        self.local_error.translatable_error = None
+
     def after(self, state):
         if hasattr(state.response, 'translatable_error'):
             self.local_error.translatable_error = (
