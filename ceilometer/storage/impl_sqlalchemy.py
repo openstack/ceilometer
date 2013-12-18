@@ -733,6 +733,10 @@ class Connection(base.Connection):
         """
         session = sqlalchemy_session.get_session()
         with session.begin():
+            Connection._create_or_update(session, models.User,
+                                         alarm.user_id)
+            Connection._create_or_update(session, models.Project,
+                                         alarm.project_id)
             alarm_row = session.merge(models.Alarm(id=alarm.alarm_id))
             alarm_row.update(alarm.as_dict())
 
