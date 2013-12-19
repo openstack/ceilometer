@@ -2012,9 +2012,10 @@ class AlarmTest(AlarmTestBase,
         self.add_some_alarms()
         alarms = list(self.conn.get_alarms())
         self.assertEqual(len(alarms), 3)
-        self.assertEqual(alarms[0].rule['meter_name'], 'test.one')
-        self.assertEqual(alarms[1].rule['meter_name'], 'test.fourty')
-        self.assertEqual(alarms[2].rule['meter_name'], 'test.five')
+
+        meter_names = sorted([a.rule['meter_name'] for a in alarms])
+        self.assertEqual(meter_names,
+                         ['test.five', 'test.fourty', 'test.one'])
 
     def test_update(self):
         self.add_some_alarms()
