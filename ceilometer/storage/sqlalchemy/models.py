@@ -186,7 +186,7 @@ class MetaFloat(Base):
     )
     id = Column(Integer, ForeignKey('meter.id'), primary_key=True)
     meta_key = Column(String(255), primary_key=True)
-    value = Column(Float, default=False)
+    value = Column(Float(53), default=False)
 
 
 class Meter(Base):
@@ -377,7 +377,7 @@ class Trait(Base):
     trait_type = relationship("TraitType", backref=backref('trait_type'))
 
     t_string = Column(String(255), nullable=True, default=None)
-    t_float = Column(Float, nullable=True, default=None)
+    t_float = Column(Float(53), nullable=True, default=None)
     t_int = Column(Integer, nullable=True, default=None)
     t_datetime = Column(PreciseTimestamp(), nullable=True, default=None)
 
