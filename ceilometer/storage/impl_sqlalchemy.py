@@ -949,6 +949,7 @@ class Connection(base.Connection):
         start = event_filter.start_time
         end = event_filter.end_time
         session = sqlalchemy_session.get_session()
+        LOG.debug(_("Getting events that match filter: %s") % event_filter)
         with session.begin():
             event_query = session.query(models.Event)
 
@@ -989,13 +990,13 @@ class Connection(base.Connection):
                                   models.TraitType.desc == trait_name]
 
                     for key, value in trait_filter.iteritems():
-                        if key == 't_string':
+                        if key == 'string':
                             conditions.append(models.Trait.t_string == value)
-                        elif key == 't_int':
+                        elif key == 'integer':
                             conditions.append(models.Trait.t_int == value)
-                        elif key == 't_datetime':
+                        elif key == 'datetime':
                             conditions.append(models.Trait.t_datetime == value)
-                        elif key == 't_float':
+                        elif key == 'float':
                             conditions.append(models.Trait.t_float == value)
 
                     trait_query = session.query(models.Trait.event_id)\
@@ -1067,6 +1068,7 @@ class Connection(base.Connection):
         """
         session = sqlalchemy_session.get_session()
 
+        LOG.debug(_("Get traits for %s") % event_type)
         with session.begin():
             query = (session.query(models.TraitType.desc,
                                    models.TraitType.data_type)

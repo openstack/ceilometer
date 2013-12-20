@@ -21,6 +21,7 @@
 import urlparse
 
 from oslo.config import cfg
+import six
 from stevedore import driver
 
 from ceilometer.openstack.common.gettextutils import _  # noqa
@@ -124,10 +125,10 @@ class EventFilter(object):
                    This parameter is a list of dictionaries that specify
                    trait values:
                     {'key': <key>,
-                    't_string': <value>,
-                    't_int': <value>,
-                    't_datetime': <value>
-                    't_float': <value>,
+                    'string': <value>,
+                    'integer': <value>,
+                    'datetime': <value>,
+                    'float': <value>,
                     'op': <eq, lt, le, ne, gt or ge> }
     """
 
@@ -138,6 +139,16 @@ class EventFilter(object):
         self.message_id = message_id
         self.event_type = event_type
         self.traits_filter = traits_filter
+
+    def __repr__(self):
+        return ("<EventFilter(start_time: %s,"
+                " end_time: %s,"
+                " event_type: %s,"
+                " traits: %s)>" %
+                (self.start_time,
+                 self.end_time,
+                 self.event_type,
+                 six.text_type(self.traits_filter)))
 
 
 def dbsync():

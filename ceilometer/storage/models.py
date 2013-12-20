@@ -91,6 +91,14 @@ class Trait(Model):
     FLOAT_TYPE = 3
     DATETIME_TYPE = 4
 
+    type_names = {
+        NONE_TYPE: "none",
+        TEXT_TYPE: "string",
+        INT_TYPE: "integer",
+        FLOAT_TYPE: "float",
+        DATETIME_TYPE: "datetime"
+    }
+
     def __init__(self, name, dtype, value):
         if not dtype:
             dtype = Trait.NONE_TYPE
@@ -99,9 +107,20 @@ class Trait(Model):
     def __repr__(self):
         return "<Trait: %s %d %s>" % (self.name, self.dtype, self.value)
 
+    def get_type_name(self):
+        return self.get_name_by_type(self.dtype)
+
     @classmethod
     def get_type_by_name(cls, type_name):
         return getattr(cls, '%s_TYPE' % type_name.upper(), None)
+
+    @classmethod
+    def get_type_names(cls):
+        return cls.type_names.values()
+
+    @classmethod
+    def get_name_by_type(cls, type_id):
+        return cls.type_names.get(type_id, "none")
 
     @classmethod
     def convert_value(cls, trait_type, value):
