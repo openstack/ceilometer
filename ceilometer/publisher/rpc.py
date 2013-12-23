@@ -250,13 +250,13 @@ class RPCPublisher(publisher.PublisherBase):
             try:
                 rpc.cast(context, topic, msg)
             except (SystemExit, rpc.common.RPCException):
-                samples = sum([len(m['args']['data']) for _, _, m in queue])
+                samples = sum([len(m['args']['data']) for n, n, m in queue])
                 if policy == 'queue':
-                    LOG.warn("Failed to publish %s samples, queue them",
+                    LOG.warn(_("Failed to publish %d samples, queue them"),
                              samples)
                     return queue
                 elif policy == 'drop':
-                    LOG.warn("Failed to publish %d samples, dropping them",
+                    LOG.warn(_("Failed to publish %d samples, dropping them"),
                              samples)
                     return []
                 # default, occur only if rabbit_max_retries > 0
