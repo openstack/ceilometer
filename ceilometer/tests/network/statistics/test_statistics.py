@@ -13,9 +13,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from stevedore import extension
-from stevedore.tests import manager as test_manager
-
 from ceilometer.network import statistics
 from ceilometer.network.statistics import driver
 from ceilometer.openstack.common import test
@@ -72,13 +69,12 @@ class TestBaseGetSamples(test.BaseTestCase):
 
         self.pollster = FakePollster()
 
-    def _setup_ext_mgr(self, *drivers):
-        extensions = [
-            extension.Extension(str(d), None, None, d())
-            for d in drivers]
-        ext_mgr = test_manager.TestExtensionManager(
-            extensions)
-        self.pollster.extension_manager = ext_mgr
+    def tearDown(self):
+        statistics._Base.drivers = {}
+        super(TestBaseGetSamples, self).tearDown()
+
+    def _setup_ext_mgr(self, **drivers):
+        statistics._Base.drivers = drivers
 
     def _make_fake_driver(self, *return_values):
         class FakeDriver(driver.Driver):
@@ -86,12 +82,12 @@ class TestBaseGetSamples(test.BaseTestCase):
             def __init__(self):
                 self.index = 0
 
-            def get_sample_data(self, meter_name, resource, cache):
+            def get_sample_data(self, meter_name, parse_url, params, cache):
                 if self.index >= len(return_values):
-                    return None
+                    yield None
                 retval = return_values[self.index]
                 self.index += 1
-                return retval
+                yield retval
         return FakeDriver
 
     def _make_timestamps(self, count):
@@ -119,7 +115,7 @@ class TestBaseGetSamples(test.BaseTestCase):
                                               times[0]),
                                              (2, 'b', None, times[1]))
 
-        self._setup_ext_mgr(fake_driver)
+        self._setup_ext_mgr(http=fake_driver())
 
         samples = self._get_samples('http://foo')
 
@@ -133,7 +129,7 @@ class TestBaseGetSamples(test.BaseTestCase):
                                              (2, 'b', None, times[1]),
                                              (3, 'c', None, times[2]))
 
-        self._setup_ext_mgr(fake_driver)
+        self._setup_ext_mgr(http=fake_driver())
 
         samples = self._get_samples('http://foo', 'http://bar')
 
@@ -150,13 +146,12 @@ class TestBaseGetSamples(test.BaseTestCase):
         fake_driver2 = self._make_fake_driver((11, 'A', None, times[2]),
                                               (12, 'B', None, times[3]))
 
-        self._setup_ext_mgr(fake_driver1, fake_driver2)
+        self._setup_ext_mgr(http=fake_driver1(), https=fake_driver2())
 
         samples = self._get_samples('http://foo')
 
-        self.assertEqual(len(samples), 2)
+        self.assertEqual(len(samples), 1)
         self._assert_sample(samples[0], 1, 'a', {'spam': 'egg'}, times[0])
-        self._assert_sample(samples[1], 11, 'A', None, times[2])
 
     def test_get_samples_multi_samples(self):
         times = self._make_timestamps(2)
@@ -164,7 +159,7 @@ class TestBaseGetSamples(test.BaseTestCase):
                                                times[0]),
                                               (2, 'b', None, times[1])])
 
-        self._setup_ext_mgr(fake_driver)
+        self._setup_ext_mgr(http=fake_driver())
 
         samples = self._get_samples('http://foo')
 
@@ -175,7 +170,7 @@ class TestBaseGetSamples(test.BaseTestCase):
     def test_get_samples_return_none(self):
         fake_driver = self._make_fake_driver(None)
 
-        self._setup_ext_mgr(fake_driver)
+        self._setup_ext_mgr(http=fake_driver())
 
         samples = self._get_samples('http://foo')
 

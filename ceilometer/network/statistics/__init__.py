@@ -16,9 +16,11 @@
 import abc
 
 import six
-from stevedore import extension
+from six.moves.urllib import parse as url_parse
+from stevedore import driver as _driver
 
 from ceilometer.central import plugin
+from ceilometer.openstack.common import network_utils
 from ceilometer import sample
 
 
@@ -26,8 +28,7 @@ from ceilometer import sample
 class _Base(plugin.CentralPollster):
 
     NAMESPACE = 'network.statistics.drivers'
-    extension_manager = extension.ExtensionManager(namespace=NAMESPACE,
-                                                   invoke_on_load=True)
+    drivers = {}
 
     @abc.abstractproperty
     def meter_name(self):
@@ -41,12 +42,35 @@ class _Base(plugin.CentralPollster):
     def meter_unit(self):
         '''Return a Meter Unit.'''
 
+    @staticmethod
+    def _parse_my_resource(resource):
+
+        parse_url = network_utils.urlsplit(resource)
+
+        params = url_parse.parse_qs(parse_url.query)
+        parts = url_parse.ParseResult(parse_url.scheme,
+                                      parse_url.netloc,
+                                      parse_url.path,
+                                      None,
+                                      None,
+                                      None)
+        return parts, params
+
+    @staticmethod
+    def get_driver(scheme):
+        if scheme not in _Base.drivers:
+            _Base.drivers[scheme] = _driver.DriverManager(_Base.NAMESPACE,
+                                                          scheme).driver()
+        return _Base.drivers[scheme]
+
     def get_samples(self, manager, cache, resources=[]):
         for resource in resources:
-            sample_data = self.extension_manager.map_method('get_sample_data',
-                                                            self.meter_name,
-                                                            resource,
-                                                            cache)
+            parse_url, params = self._parse_my_resource(resource)
+            ext = self.get_driver(parse_url.scheme)
+            sample_data = ext.get_sample_data(self.meter_name,
+                                              parse_url,
+                                              params,
+                                              cache)
             for data in sample_data:
                 if data is None:
                     continue
