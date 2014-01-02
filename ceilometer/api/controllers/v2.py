@@ -993,10 +993,9 @@ class ComplexQuery(_Base):
                    )
 
 
-def _list_to_regexp(items):
+def _list_to_regexp(items, regexp_prefix=""):
     regexp = ["^%s$" % item for item in items]
-    regexp = "|".join(regexp)
-    regexp = "(?i)" + regexp
+    regexp = regexp_prefix + "|".join(regexp)
     return regexp
 
 
@@ -1004,10 +1003,11 @@ class ValidatedComplexQuery(object):
     complex_operators = ["and", "or"]
     order_directions = ["asc", "desc"]
     simple_ops = ["=", "!=", "<", ">", "<=", "=<", ">=", "=>"]
+    regexp_prefix = "(?i)"
 
-    complex_ops = _list_to_regexp(complex_operators)
-    simple_ops = _list_to_regexp(simple_ops)
-    order_directions = _list_to_regexp(order_directions)
+    complex_ops = _list_to_regexp(complex_operators, regexp_prefix)
+    simple_ops = _list_to_regexp(simple_ops, regexp_prefix)
+    order_directions = _list_to_regexp(order_directions, regexp_prefix)
 
     schema_value = {
         "oneOf": [{"type": "string"},
@@ -1062,8 +1062,22 @@ class ValidatedComplexQuery(object):
             "maxProperties": 1}}
 
     timestamp_fields = ["timestamp", "state_timestamp"]
+    name_mapping = {"user": "user_id",
+                    "project": "project_id",
+                    "resource": "resource_id"}
 
-    def __init__(self, query):
+    def __init__(self, query, db_model, additional_valid_keys):
+        valid_keys = db_model.get_field_names()
+        valid_keys = list(valid_keys) + additional_valid_keys
+        valid_fields = _list_to_regexp(valid_keys)
+
+        self.schema_field["patternProperties"] = {
+            valid_fields: self.schema_value}
+
+        self.orderby_schema["items"]["patternProperties"] = {
+            valid_fields: {"type": "string",
+                           "pattern": self.order_directions}}
+
         self.original_query = query
 
     def validate(self, visibility_field):
@@ -1076,6 +1090,7 @@ class ValidatedComplexQuery(object):
             self._validate_filter(self.filter_expr)
             self._replace_isotime_with_datetime(self.filter_expr)
             self._convert_operator_to_lower_case(self.filter_expr)
+            self._normalize_field_names_for_db_model(self.filter_expr)
 
         self._force_visibility(visibility_field)
 
@@ -1085,6 +1100,7 @@ class ValidatedComplexQuery(object):
             self.orderby = json.loads(self.original_query.orderby)
             self._validate_orderby(self.orderby)
             self._convert_orderby_to_lower_case(self.orderby)
+            self._normalize_field_names_in_orderby(self.orderby)
 
         if self.original_query.limit is wtypes.Unset:
             self.limit = None
@@ -1099,6 +1115,10 @@ class ValidatedComplexQuery(object):
     def _convert_orderby_to_lower_case(orderby):
         for orderby_field in orderby:
             utils.lowercase_values(orderby_field)
+
+    def _normalize_field_names_in_orderby(self, orderby):
+        for orderby_field in orderby:
+            self._replace_field_names(orderby_field)
 
     def _traverse_postorder(self, tree, visitor):
         op = tree.keys()[0]
@@ -1149,6 +1169,21 @@ class ValidatedComplexQuery(object):
                 subfilter[op][field] = date_time
 
         self._traverse_postorder(filter_expr, replace_isotime)
+
+    def _normalize_field_names_for_db_model(self, filter_expr):
+        def _normalize_field_names(subfilter):
+            op = subfilter.keys()[0]
+            if op.lower() not in self.complex_operators:
+                self._replace_field_names(subfilter.values()[0])
+        self._traverse_postorder(filter_expr,
+                                 _normalize_field_names)
+
+    def _replace_field_names(self, subfilter):
+        field = subfilter.keys()[0]
+        value = subfilter[field]
+        if field in self.name_mapping:
+            del subfilter[field]
+            subfilter[self.name_mapping[field]] = value
 
     def _convert_operator_to_lower_case(self, filter_expr):
         self._traverse_postorder(filter_expr, utils.lowercase_keys)
@@ -2043,7 +2078,9 @@ class QuerySamplesController(rest.RestController):
 
         :param body: Query rules for the samples to be returned.
         """
-        query = ValidatedComplexQuery(body)
+        query = ValidatedComplexQuery(body,
+                                      storage.models.Sample,
+                                      ["user", "project", "resource"])
         query.validate(visibility_field="project_id")
         conn = pecan.request.storage_conn
         return [Sample.from_db_model(s)
@@ -2061,7 +2098,9 @@ class QueryAlarmHistoryController(rest.RestController):
 
         :param body: Query rules for the alarm history to be returned.
         """
-        query = ValidatedComplexQuery(body)
+        query = ValidatedComplexQuery(body,
+                                      storage.models.AlarmChange,
+                                      ["user", "project"])
         query.validate(visibility_field="on_behalf_of")
         conn = pecan.request.storage_conn
         return [AlarmChange.from_db_model(s)
@@ -2081,7 +2120,9 @@ class QueryAlarmsController(rest.RestController):
 
         :param body: Query rules for the alarms to be returned.
         """
-        query = ValidatedComplexQuery(body)
+        query = ValidatedComplexQuery(body,
+                                      storage.models.Alarm,
+                                      ["user", "project"])
         query.validate(visibility_field="project_id")
         conn = pecan.request.storage_conn
         return [Alarm.from_db_model(s)

@@ -57,6 +57,33 @@ class ModelTest(test.BaseTestCase):
         x = models.Event("1", "name", "now", None)
         self.assertEqual("<Event: 1, name, now, >", repr(x))
 
+    def test_get_field_names_of_sample(self):
+        sample_fields = ["source", "counter_name", "counter_type",
+                         "counter_unit", "counter_volume", "user_id",
+                         "project_id", "resource_id", "timestamp",
+                         "resource_metadata", "message_id",
+                         "message_signature"]
+
+        self.assertEqual(set(sample_fields),
+                         set(models.Sample.get_field_names()))
+
+    def test_get_field_names_of_alarm(self):
+        alarm_fields = ["alarm_id", "type", "enabled", "name", "description",
+                        "timestamp", "user_id", "project_id", "state",
+                        "state_timestamp", "ok_actions", "alarm_actions",
+                        "insufficient_data_actions", "repeat_actions", "rule"]
+
+        self.assertEqual(set(alarm_fields),
+                         set(models.Alarm.get_field_names()))
+
+    def test_get_field_names_of_alarmchange(self):
+        alarmchange_fields = ["event_id", "alarm_id", "type", "detail",
+                              "user_id", "project_id", "on_behalf_of",
+                              "timestamp"]
+
+        self.assertEqual(set(alarmchange_fields),
+                         set(models.AlarmChange.get_field_names()))
+
 
 class TestTraitModel(test.BaseTestCase):
 
