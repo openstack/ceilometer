@@ -58,10 +58,10 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                           'project-id1',
                           'resource-id1',
                           timestamp=datetime.datetime(2012, 7, 2, 10, 40),
-                          resource_metadata={'display_name': 'test-server',
+                          resource_metadata={'display_name': 'test-server1',
                                              'tag': 'self.sample',
-                                             'size': 123,
-                                             'util': 0.75,
+                                             'size': 456,
+                                             'util': 0.25,
                                              'is_public': True},
                           source='test_source'),
             sample.Sample('meter.test',
@@ -72,10 +72,24 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                           'project-id2',
                           'resource-id2',
                           timestamp=datetime.datetime(2012, 7, 2, 10, 41),
-                          resource_metadata={'display_name': 'test-server',
+                          resource_metadata={'display_name': 'test-server2',
                                              'tag': 'self.sample',
                                              'size': 123,
                                              'util': 0.75,
+                                             'is_public': True},
+                          source='test_source'),
+            sample.Sample('meter.test',
+                          'cumulative',
+                          '',
+                          1,
+                          'user-id3',
+                          'project-id3',
+                          'resource-id3',
+                          timestamp=datetime.datetime(2012, 7, 2, 10, 42),
+                          resource_metadata={'display_name': 'test-server3',
+                                             'tag': 'self.sample',
+                                             'size': 789,
+                                             'util': 0.95,
                                              'is_public': True},
                           source='test_source')]:
 
@@ -86,7 +100,7 @@ class TestQueryMetersController(tests_api.FunctionalTest,
 
     def test_query_fields_are_optional(self):
         data = self.post_json(self.url, params={})
-        self.assertEqual(2, len(data.json))
+        self.assertEqual(3, len(data.json))
 
     def test_query_with_isotime(self):
         date_time = datetime.datetime(2012, 7, 2, 10, 41)
@@ -97,7 +111,7 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                                       '{">=": {"timestamp": "'
                                       + isotime + '"}}'})
 
-        self.assertEqual(1, len(data.json))
+        self.assertEqual(2, len(data.json))
         for sample in data.json:
             result_time = timeutils.parse_isotime(sample['timestamp'])
             result_time = result_time.replace(tzinfo=None)
@@ -135,10 +149,10 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                               params={},
                               headers=admin_header)
 
-        self.assertEqual(2, len(data.json))
+        self.assertEqual(3, len(data.json))
         for sample in data.json:
             self.assertIn(sample['project_id'],
-                          (["project-id1", "project-id2"]))
+                          (["project-id1", "project-id2", "project-id3"]))
 
     def test_admin_tenant_sees_every_project_with_complex_filter(self):
         filter = ('{"OR": ' +
@@ -179,8 +193,8 @@ class TestQueryMetersController(tests_api.FunctionalTest,
         data = self.post_json(self.url,
                               params={"orderby": '[{"project_id": "DESC"}]'})
 
-        self.assertEqual(2, len(data.json))
-        self.assertEqual(["project-id2", "project-id1"],
+        self.assertEqual(3, len(data.json))
+        self.assertEqual(["project-id3", "project-id2", "project-id1"],
                          [s["project_id"] for s in data.json])
 
     def test_query_with_field_name_project(self):
@@ -214,16 +228,16 @@ class TestQueryMetersController(tests_api.FunctionalTest,
         data = self.post_json(self.url,
                               params={"orderby": '[{"project_id": "DeSc"}]'})
 
-        self.assertEqual(2, len(data.json))
-        self.assertEqual(["project-id2", "project-id1"],
+        self.assertEqual(3, len(data.json))
+        self.assertEqual(["project-id3", "project-id2", "project-id1"],
                          [s["project_id"] for s in data.json])
 
     def test_query_with_user_field_name_orderby(self):
         data = self.post_json(self.url,
                               params={"orderby": '[{"user": "aSc"}]'})
 
-        self.assertEqual(2, len(data.json))
-        self.assertEqual(["user-id1", "user-id2"],
+        self.assertEqual(3, len(data.json))
+        self.assertEqual(["user-id1", "user-id2", "user-id3"],
                          [s["user_id"] for s in data.json])
 
     def test_query_with_missing_order_in_orderby(self):
@@ -232,6 +246,15 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                               expect_errors=True)
 
         self.assertEqual(500, data.status_int)
+
+    def test_filter_with_metadata(self):
+        data = self.post_json(self.url,
+                              params={"filter":
+                                      '{">=": {"metadata.util": 0.5}}'})
+
+        self.assertEqual(2, len(data.json))
+        for sample in data.json:
+            self.assertTrue(sample["metadata"]["util"] >= 0.5)
 
     def test_limit_should_be_positive(self):
         data = self.post_json(self.url,

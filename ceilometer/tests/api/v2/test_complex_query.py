@@ -29,11 +29,12 @@ from ceilometer import storage as storage
 
 
 class FakeComplexQuery(api.ValidatedComplexQuery):
-    def __init__(self, db_model, additional_valid_keys):
+    def __init__(self, db_model, additional_valid_keys, metadata=False):
         super(FakeComplexQuery, self).__init__(query=None,
                                                db_model=db_model,
                                                additional_valid_keys=
-                                               additional_valid_keys)
+                                               additional_valid_keys,
+                                               metadata_allowed=metadata)
 
 
 class TestComplexQuery(test.BaseTestCase):
@@ -42,7 +43,8 @@ class TestComplexQuery(test.BaseTestCase):
         self.useFixture(fixtures.MonkeyPatch(
             'pecan.response', mock.MagicMock()))
         self.query = FakeComplexQuery(storage.models.Sample,
-                                      ["user", "project", "resource"])
+                                      ["user", "project", "resource"],
+                                      True)
         self.query_alarm = FakeComplexQuery(storage.models.Alarm,
                                             ["user", "project"])
         self.query_alarmchange = FakeComplexQuery(
@@ -218,18 +220,41 @@ class TestComplexQuery(test.BaseTestCase):
                           self.query._validate_orderby,
                           orderby)
 
+    def test_validate_orderby_metadata_is_not_allowed(self):
+        orderby = [{"metadata.display_name": "asc"}]
+        self.assertRaises(jsonschema.ValidationError,
+                          self.query._validate_orderby,
+                          orderby)
+
 
 class TestFilterSyntaxValidation(test.BaseTestCase):
     def setUp(self):
         super(TestFilterSyntaxValidation, self).setUp()
         self.query = FakeComplexQuery(storage.models.Sample,
-                                      ["user", "project", "resource"])
+                                      ["user", "project", "resource"],
+                                      True)
 
     def test_simple_operator(self):
         filter = {"=": {"project_id": "string_value"}}
         self.query._validate_filter(filter)
 
         filter = {"=>": {"project_id": "string_value"}}
+        self.query._validate_filter(filter)
+
+    def test_valid_value_types(self):
+        filter = {"=": {"project_id": "string_value"}}
+        self.query._validate_filter(filter)
+
+        filter = {"=": {"project_id": 42}}
+        self.query._validate_filter(filter)
+
+        filter = {"=": {"project_id": 3.14}}
+        self.query._validate_filter(filter)
+
+        filter = {"=": {"project_id": True}}
+        self.query._validate_filter(filter)
+
+        filter = {"=": {"project_id": False}}
         self.query._validate_filter(filter)
 
     def test_invalid_simple_operator(self):
