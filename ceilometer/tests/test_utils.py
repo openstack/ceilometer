@@ -68,6 +68,20 @@ class TestUtils(test.BaseTestCase):
                                  ('nested.a', 'A'),
                                  ('nested.b', 'B')])
 
+    def test_recursive_keypairs_with_list_of_dict(self):
+        small = 1
+        big = 1 << 64
+        expected = [('a', 'A'),
+                    ('b', 'B'),
+                    ('nested:list', ['{%d: 99, %dL: 42}' % (small, big)])]
+        # the keys 1 and 1<<64 cause a hash collision on 64bit platforms
+        for nested in [{small: 99, big: 42}, {big: 42, small: 99}]:
+            data = {'a': 'A',
+                    'b': 'B',
+                    'nested': {'list': [nested]}}
+            pairs = list(utils.recursive_keypairs(data))
+            self.assertEqual(pairs, expected)
+
     def test_decimal_to_dt_with_none_parameter(self):
         self.assertEqual(utils.decimal_to_dt(None), None)
 
