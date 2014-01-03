@@ -360,3 +360,30 @@ class TestFilterSyntaxValidation(test.BaseTestCase):
         self.assertRaises(jsonschema.ValidationError,
                           self.query._validate_filter,
                           filter)
+
+    def test_not(self):
+        filter = {"not": {"=": {"project_id": "value"}}}
+        self.query._validate_filter(filter)
+
+        filter = {
+            "not":
+            {"or":
+             [{"and":
+               [{"=": {"project_id": "string_value"}},
+                {"=": {"resource_id": "value"}},
+                {"<": {"counter_name": 42}}]},
+              {"=": {"counter_name": "value"}}]}}
+        self.query._validate_filter(filter)
+
+    def test_not_with_zero_child_is_invalid(self):
+        filter = {"not": {}}
+        self.assertRaises(jsonschema.ValidationError,
+                          self.query._validate_filter,
+                          filter)
+
+    def test_not_with_more_than_one_child_is_invalid(self):
+        filter = {"not": {"=": {"project_id": "value"},
+                          "!=": {"resource_id": "value"}}}
+        self.assertRaises(jsonschema.ValidationError,
+                          self.query._validate_filter,
+                          filter)

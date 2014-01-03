@@ -27,6 +27,7 @@ from sqlalchemy import and_
 from sqlalchemy import asc
 from sqlalchemy import desc
 from sqlalchemy import func
+from sqlalchemy import not_
 from sqlalchemy import or_
 from sqlalchemy.orm import aliased
 
@@ -1207,7 +1208,8 @@ class QueryTransformer(object):
                  "in": lambda field_name, values: field_name.in_(values)}
 
     complex_operators = {"or": or_,
-                         "and": and_}
+                         "and": and_,
+                         "not": not_}
 
     ordering_functions = {"asc": asc,
                           "desc": desc}
@@ -1218,6 +1220,8 @@ class QueryTransformer(object):
 
     def _handle_complex_op(self, complex_op, nodes):
         op = self.complex_operators[complex_op]
+        if op == not_:
+            nodes = [nodes]
         element_list = []
         for node in nodes:
             element = self._transform(node)

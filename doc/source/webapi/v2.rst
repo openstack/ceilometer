@@ -96,8 +96,18 @@ Complex Query
 The filter expressions of the Complex Query feature operate on the fields
 of *Sample*, *Alarm* and *AlarmChange*. The following comparison operators are
 supported: *=*, *!=*, *<*, *<=*, *>*, *>=* and *in*; and the following logical
-operators can be used: *and* and *or*. The field names are validated against
-the database models.
+operators can be used: *and* *or* and *not*. The field names are validated
+against the database models.
+
+.. note:: The *not* operator has different meaning in Mongo DB and in SQL DB engine.
+   If the *not* operator is applied on a non existent metadata field then
+   the result depends on the DB engine. For example if
+   {"not": {"metadata.nonexistent_field" : "some value"}} filter is used in a query
+   the Mongo DB will return every Sample object as *not* operator evaluated true
+   for every Sample where the given field does not exists. See more in the Mongod DB doc.
+   In the other hand SQL based DB engine will return empty result as the join operation
+   on the metadata table will return zero row as the on clause of the join which
+   tries to match on the metadata field name is never fulfilled.
 
 Complex Query supports defining the list of orderby expressions in the form
 of [{"field_name": "asc"}, {"field_name2": "desc"}, ...].
@@ -418,13 +428,14 @@ to the /v2/query/samples endpoint of Ceilometer API using POST request.
 
 To check for *cpu_util* samples reported between 18:00-18:15 or between 18:30 - 18:45
 on a particular date (2013-12-01), where the utilization is between 23 and 26 percent,
-the following filter expression can be created::
+but not exactly 25.12 percent, the following filter expression can be created::
 
     {"and":
      [{"and":
       [{"=": {"counter_name": "cpu_util"}},
        {">": {"counter_volume": 0.23}},
-       {"<": {"counter_volume": 0.26}}]},
+       {"<": {"counter_volume": 0.26}},
+       {"not": {"=": {"counter_volume": 0.2512}}}]},
       {"or":
        [{"and":
         [{">": {"timestamp": "2013-12-01T18:00:00"}},
@@ -446,7 +457,7 @@ By adding a limit criteria to the request, which maximizes the number of returne
 to four, the query looks like the following::
 
     {
-    "filter" : "{\"and\":[{\"and\": [{\"=\": {\"counter_name\": \"cpu_util\"}}, {\">\": {\"counter_volume\": 0.23}}, {\"<\": {\"counter_volume\": 0.26}}]}, {\"or\": [{\"and\": [{\">\": {\"timestamp\": \"2013-12-01T18:00:00\"}}, {\"<\": {\"timestamp\": \"2013-12-01T18:15:00\"}}]}, {\"and\": [{\">\": {\"timestamp\": \"2013-12-01T18:30:00\"}}, {\"<\": {\"timestamp\": \"2013-12-01T18:45:00\"}}]}]}]}",
+    "filter" : "{\"and\":[{\"and\": [{\"=\": {\"counter_name\": \"cpu_util\"}}, {\">\": {\"counter_volume\": 0.23}}, {\"<\": {\"counter_volume\": 0.26}}, {\"not\": {\"=\": {\"counter_volume\": 0.2512}}}]}, {\"or\": [{\"and\": [{\">\": {\"timestamp\": \"2013-12-01T18:00:00\"}}, {\"<\": {\"timestamp\": \"2013-12-01T18:15:00\"}}]}, {\"and\": [{\">\": {\"timestamp\": \"2013-12-01T18:30:00\"}}, {\"<\": {\"timestamp\": \"2013-12-01T18:45:00\"}}]}]}]}",
     "orderby" : "[{\"counter_volume\": \"ASC\"}, {\"timestamp\": \"DESC\"}]",
     "limit" : 4
     }
