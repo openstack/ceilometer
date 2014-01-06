@@ -267,8 +267,8 @@ class Alarm(Base):
     description = Column(Text)
     timestamp = Column(PreciseTimestamp, default=timeutils.utcnow)
 
-    user_id = Column(String(255), ForeignKey('user.id'))
-    project_id = Column(String(255), ForeignKey('project.id'))
+    user_id = Column(String(255))
+    project_id = Column(String(255))
 
     state = Column(String(255))
     state_timestamp = Column(PreciseTimestamp, default=timeutils.utcnow)
