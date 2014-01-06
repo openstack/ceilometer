@@ -25,6 +25,7 @@ import testscenarios
 
 from oslo.config import cfg
 
+from ceilometer.openstack.common import timeutils
 from ceilometer.publisher import rpc
 from ceilometer import sample
 from ceilometer.tests import db as tests_db
@@ -45,7 +46,19 @@ class TestListResources(FunctionalTest,
         data = self.get_json('/resources')
         self.assertEqual([], data)
 
+    @staticmethod
+    def _isotime(timestamp):
+        # drop TZ specifier
+        return unicode(timeutils.isotime(timestamp))[:-1]
+
+    def _verify_sample_timestamps(self, res, first, last):
+        self.assertTrue('first_sample_timestamp' in res)
+        self.assertEqual(res['first_sample_timestamp'], self._isotime(first))
+        self.assertTrue('last_sample_timestamp' in res)
+        self.assertEqual(res['last_sample_timestamp'], self._isotime(last))
+
     def test_instance_no_metadata(self):
+        timestamp = datetime.datetime(2012, 7, 2, 10, 40)
         sample1 = sample.Sample(
             'instance',
             'cumulative',
@@ -54,7 +67,7 @@ class TestListResources(FunctionalTest,
             'user-id',
             'project-id',
             'resource-id',
-            timestamp=datetime.datetime(2012, 7, 2, 10, 40),
+            timestamp=timestamp,
             resource_metadata=None,
             source='test',
         )
@@ -66,8 +79,13 @@ class TestListResources(FunctionalTest,
 
         data = self.get_json('/resources')
         self.assertEqual(1, len(data))
+        self._verify_sample_timestamps(data[0], timestamp, timestamp)
 
     def test_instances(self):
+        timestamps = {
+            'resource-id': datetime.datetime(2012, 7, 2, 10, 40),
+            'resource-id-alternate': datetime.datetime(2012, 7, 2, 10, 41),
+        }
         sample1 = sample.Sample(
             'instance',
             'cumulative',
@@ -76,7 +94,7 @@ class TestListResources(FunctionalTest,
             'user-id',
             'project-id',
             'resource-id',
-            timestamp=datetime.datetime(2012, 7, 2, 10, 40),
+            timestamp=timestamps['resource-id'],
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.sample',
                                },
@@ -96,7 +114,7 @@ class TestListResources(FunctionalTest,
             'user-id',
             'project-id',
             'resource-id-alternate',
-            timestamp=datetime.datetime(2012, 7, 2, 10, 41),
+            timestamp=timestamps['resource-id-alternate'],
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.sample2',
                                },
@@ -110,6 +128,40 @@ class TestListResources(FunctionalTest,
 
         data = self.get_json('/resources')
         self.assertEqual(2, len(data))
+        for res in data:
+            timestamp = timestamps.get(res['resource_id'])
+            self._verify_sample_timestamps(res, timestamp, timestamp)
+
+    def test_instance_multiple_samples(self):
+        timestamps = [
+            datetime.datetime(2012, 7, 2, 10, 40),
+            datetime.datetime(2012, 7, 2, 10, 41),
+            datetime.datetime(2012, 7, 2, 10, 42),
+        ]
+        for timestamp in timestamps:
+            datapoint = sample.Sample(
+                'instance',
+                'cumulative',
+                '',
+                1,
+                'user-id',
+                'project-id',
+                'resource-id',
+                timestamp=timestamp,
+                resource_metadata={'display_name': 'test-server',
+                                   'tag': 'self.sample',
+                                   },
+                source='test',
+            )
+            msg = rpc.meter_message_from_counter(
+                datapoint,
+                cfg.CONF.publisher_rpc.metering_secret,
+            )
+            self.conn.record_metering_data(msg)
+
+        data = self.get_json('/resources')
+        self.assertEqual(1, len(data))
+        self._verify_sample_timestamps(data[0], timestamps[0], timestamps[-1])
 
     def test_instances_one(self):
         sample1 = sample.Sample(
