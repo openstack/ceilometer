@@ -100,7 +100,7 @@ class TestSingletonAlarmService(test.BaseTestCase):
                                       os_tenant_name=conf.os_tenant_name,
                                       os_password=conf.os_password,
                                       os_username=conf.os_username,
-                                      cacert=conf.os_cacert,
+                                      os_cacert=conf.os_cacert,
                                       os_endpoint_type=conf.os_endpoint_type)]
                 actual = client.call_args_list
                 self.assertEqual(actual, expected)
