@@ -83,3 +83,24 @@ class TestSingletonAlarmService(test.BaseTestCase):
             self.singleton.start()
             self.singleton._evaluate_assigned_alarms()
             self.threshold_eval.evaluate.assert_called_once_with(alarms[1])
+
+    def test_singleton_endpoint_types(self):
+        endpoint_types = ["internalURL", "publicURL"]
+        for endpoint_type in endpoint_types:
+            cfg.CONF.set_override('os_endpoint_type',
+                                  endpoint_type,
+                                  group='service_credentials')
+            with mock.patch('ceilometerclient.client.get_client') as client:
+                self.singleton.api_client = None
+                self.singleton._evaluate_assigned_alarms()
+                conf = cfg.CONF.service_credentials
+                expected = [mock.call(2,
+                                      os_auth_url=conf.os_auth_url,
+                                      os_region_name=conf.os_region_name,
+                                      os_tenant_name=conf.os_tenant_name,
+                                      os_password=conf.os_password,
+                                      os_username=conf.os_username,
+                                      cacert=conf.os_cacert,
+                                      os_endpoint_type=conf.os_endpoint_type)]
+                actual = client.call_args_list
+                self.assertEqual(actual, expected)

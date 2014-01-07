@@ -27,6 +27,7 @@ from ceilometer.storage import models
 from ceilometer.tests.alarm.evaluator import base
 from ceilometerclient import exc
 from ceilometerclient.v2 import statistics
+from oslo.config import cfg
 
 
 class TestEvaluate(base.TestEvaluatorBase):
@@ -289,3 +290,24 @@ class TestEvaluate(base.TestEvaluatorBase):
              'op': 'ge',
              'value': '2012-07-02T10:39:00'},
         ])
+
+    def test_threshold_endpoint_types(self):
+        endpoint_types = ["internalURL", "publicURL"]
+        for endpoint_type in endpoint_types:
+            cfg.CONF.set_override('os_endpoint_type',
+                                  endpoint_type,
+                                  group='service_credentials')
+            with mock.patch('ceilometerclient.client.get_client') as client:
+                self.evaluator.api_client = None
+                self._evaluate_all_alarms()
+                conf = cfg.CONF.service_credentials
+                expected = [mock.call(2,
+                                      os_auth_url=conf.os_auth_url,
+                                      os_region_name=conf.os_region_name,
+                                      os_tenant_name=conf.os_tenant_name,
+                                      os_password=conf.os_password,
+                                      os_username=conf.os_username,
+                                      cacert=conf.os_cacert,
+                                      os_endpoint_type=conf.os_endpoint_type)]
+                actual = client.call_args_list
+                self.assertEqual(actual, expected)
