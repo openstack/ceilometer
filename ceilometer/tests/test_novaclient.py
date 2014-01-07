@@ -132,6 +132,14 @@ class TestNovaClient(test.BaseTestCase):
         a.image = {'id': args[0]}
         return [a]
 
+    @staticmethod
+    def fake_instance_image_missing(*args, **kwargs):
+        a = mock.MagicMock()
+        a.id = 42
+        a.flavor = {'id': 666}
+        a.image = None
+        return [a]
+
     def test_instance_get_all_by_host_unknown_image(self):
         with patch.object(self.nv.nova_client.servers, 'list',
                           side_effect=self.fake_servers_list_unknown_image):
@@ -196,3 +204,11 @@ class TestNovaClient(test.BaseTestCase):
         instance = results[0]
         self.assertIsNone(instance.kernel_id)
         self.assertEqual(instance.ramdisk_id, 21)
+
+    def test_with_missing_image_instance(self):
+        instances = self.fake_instance_image_missing()
+        results = self.nv._with_flavor_and_image(instances)
+        instance = results[0]
+        self.assertIsNone(instance.kernel_id)
+        self.assertIsNone(instance.image)
+        self.assertIsNone(instance.ramdisk_id)
