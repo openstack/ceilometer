@@ -391,7 +391,7 @@ def _list_samples(meter,
                   user=None):
     """Return a list of raw samples.
 
-    Note: the API talks about "events" these are equivelent to samples.
+    Note: the API talks about "events" these are equivalent to samples.
     but we still need to return the samples within the "events" dict
     to maintain API compatibilty.
     """

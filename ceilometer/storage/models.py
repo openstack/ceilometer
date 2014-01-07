@@ -62,7 +62,7 @@ class Event(Model):
                             the Event ID, which comes from the
                             underlying storage system.
         :param event_type:  The type of the event.
-        :param generated:   UTC time for when the event occured.
+        :param generated:   UTC time for when the event occurred.
         :param traits:      list of Traits on this Event.
         """
         Model.__init__(self, message_id=message_id, event_type=event_type,
