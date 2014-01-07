@@ -16,6 +16,7 @@ docutils==0.9.1
 oslo.sphinx
 python-subunit
 sphinx>=1.1.2,<1.2
+sphinxcontrib-docbookrestapi
 sphinxcontrib-httpdomain
 sphinxcontrib-pecanwsme>=0.5
 testrepository>=0.0.17
