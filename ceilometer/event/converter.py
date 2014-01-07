@@ -375,8 +375,8 @@ def setup_events(trait_plugin_mgr):
                 errmsg = (_("Invalid YAML syntax in Event Definitions file "
                             "%(file)s at line: %(line)s, column: %(column)s.")
                           % dict(file=config_file,
-                                 line=mark.line+1,
-                                 column=mark.column+1))
+                                 line=mark.line + 1,
+                                 column=mark.column + 1))
             else:
                 errmsg = (_("YAML error reading Event Definitions file "
                             "%(file)s")
