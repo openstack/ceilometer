@@ -179,7 +179,7 @@ class TestLibvirtInspection(test.BaseTestCase):
             vnic2, info2 = interfaces[2]
             self.assertEqual(vnic2.name, 'vnet2')
             self.assertEqual(vnic2.mac, 'fa:16:3e:96:33:f0')
-            self.assertEqual(vnic2.fref, None)
+            self.assertIsNone(vnic2.fref)
             self.assertEqual(vnic2.parameters, dict())
             self.assertEqual(info2.rx_bytes, 9L)
             self.assertEqual(info2.rx_packets, 10L)
