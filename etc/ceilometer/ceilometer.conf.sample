@@ -23,7 +23,7 @@
 # Options defined in ceilometer.sample
 #
 
-# Source for samples emited on this instance (string value)
+# Source for samples emitted on this instance (string value)
 # Deprecated group/name - [DEFAULT]/counter_source
 #sample_source=openstack
 

@@ -43,7 +43,7 @@ Event Structure
 Events contain the following information:
 
 event_type
-    A dotted string defining what event occured, such as "compute.instance.resize.start"
+    A dotted string defining what event occurred, such as "compute.instance.resize.start"
 
 message_id
     A UUID for this event.

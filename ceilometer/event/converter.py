@@ -279,7 +279,7 @@ class NotificationEventsConverter(object):
                     *   ['*', '!image.*']  same as above.
         traits:  dictionary, The keys are trait names, the values are the trait
                  definitions
-            Each trait definiton is a dictionary with the following keys:
+            Each trait definition is a dictionary with the following keys:
                 type (optional): The data type for this trait. (as a string)
                     Valid options are: 'text', 'int', 'float' and 'datetime'
                     defaults to 'text' if not specified.
