@@ -23,11 +23,12 @@ import six.moves.urllib.parse as urlparse
 
 from oslo.config import cfg
 from sqlalchemy import Column, Integer, String, Table, ForeignKey, \
-    Index, UniqueConstraint, BigInteger
+    Index, UniqueConstraint, BigInteger, join
 from sqlalchemy import Float, Boolean, Text, DateTime
 from sqlalchemy.dialects.mysql import DECIMAL
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref
+from sqlalchemy.orm import column_property
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import TypeDecorator
 
@@ -189,6 +190,20 @@ class MetaFloat(Base):
     value = Column(Float(53), default=False)
 
 
+class Meter(Base):
+    """Meter definition data."""
+
+    __tablename__ = 'meter'
+    __table_args__ = (
+        UniqueConstraint('name', 'type', 'unit', name='def_unique'),
+        Index('ix_meter_name', 'name')
+    )
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255), nullable=False)
+    type = Column(String(255))
+    unit = Column(String(255))
+
+
 class Sample(Base):
     """Metering data."""
 
@@ -197,17 +212,14 @@ class Sample(Base):
         Index('ix_sample_timestamp', 'timestamp'),
         Index('ix_sample_user_id', 'user_id'),
         Index('ix_sample_project_id', 'project_id'),
-        Index('idx_sample_rid_cname', 'resource_id', 'counter_name'),
     )
     id = Column(Integer, primary_key=True)
-    counter_name = Column(String(255))
+    meter_id = Column(Integer, ForeignKey('meter.id'))
     user_id = Column(String(255), ForeignKey('user.id'))
     project_id = Column(String(255), ForeignKey('project.id'))
     resource_id = Column(String(255), ForeignKey('resource.id'))
     resource_metadata = Column(JSONEncodedDict())
-    counter_type = Column(String(255))
-    counter_unit = Column(String(255))
-    counter_volume = Column(Float(53))
+    volume = Column(Float(53))
     timestamp = Column(PreciseTimestamp(), default=timeutils.utcnow)
     recorded_at = Column(PreciseTimestamp(), default=timeutils.utcnow)
     message_signature = Column(String(1000))
@@ -221,6 +233,23 @@ class Sample(Base):
                             cascade="all, delete-orphan")
     meta_bool = relationship("MetaBool", backref="sample",
                              cascade="all, delete-orphan")
+
+
+class MeterSample(Base):
+    """Helper model as many of the filters work against Sample data
+    joined with Meter data.
+    """
+    meter = Meter.__table__
+    sample = Sample.__table__
+    __table__ = join(meter, sample)
+
+    id = column_property(sample.c.id)
+    meter_id = column_property(meter.c.id, sample.c.meter_id)
+    counter_name = column_property(meter.c.name)
+    counter_type = column_property(meter.c.type)
+    counter_unit = column_property(meter.c.unit)
+    counter_volume = column_property(sample.c.volume)
+    sources = relationship("Source", secondary=lambda: sourceassoc)
 
 
 class User(Base):
