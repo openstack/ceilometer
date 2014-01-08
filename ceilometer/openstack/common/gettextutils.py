@@ -19,7 +19,7 @@ gettext for openstack-common modules.
 
 Usual usage in an openstack.common module:
 
-    from ceilometer.openstack.common.gettextutils import _
+    from ceilometer.openstack.common.gettextutils import _  # noqa
 """
 
 import copy

@@ -121,7 +121,9 @@ def _import_module(mod_str):
 def _is_in_group(opt, group):
     "Check if opt is in group."
     for key, value in group._opts.items():
-        if value['opt'] == opt:
+        # NOTE(llu): Temporary workaround for bug #1262148, wait until
+        # newly released oslo.config support '==' operator.
+        if not(value['opt'] != opt):
             return True
     return False
 
