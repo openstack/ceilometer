@@ -95,6 +95,20 @@ class TestSignature(test.BaseTestCase):
             'not-so-secret')
         self.assertTrue(rpc.verify_signature(data, 'not-so-secret'))
 
+    def test_verify_signature_nested_list_of_dict(self):
+        small = 1
+        big = 1 << 64
+        nested = {small: 99, big: 42}
+        data = {'a': 'A',
+                'b': 'B',
+                'nested': {'list': [nested]}}
+        data['message_signature'] = rpc.compute_signature(
+            data,
+            'not-so-secret')
+        # the keys 1 and 1<<64 cause a hash collision on 64bit platforms
+        data['nested']['list'] = [{big: 42, small: 99}]
+        self.assertTrue(rpc.verify_signature(data, 'not-so-secret'))
+
     def test_verify_signature_nested_json(self):
         data = {'a': 'A',
                 'b': 'B',
