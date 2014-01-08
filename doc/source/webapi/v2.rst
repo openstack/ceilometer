@@ -54,6 +54,9 @@ Alarms
 .. autotype:: ceilometer.api.controllers.v2.AlarmCombinationRule
    :members:
 
+.. autotype:: ceilometer.api.controllers.v2.AlarmChange
+   :members:
+
 Filtering Queries
 =================
 
