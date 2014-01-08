@@ -32,7 +32,7 @@ then
     echo "Could not find mongod command" 1>&2
     exit 1
 fi
-mongod --maxConns 32 --nojournal --noprealloc --smallfiles --quiet --noauth --port ${MONGO_PORT} --dbpath "${MONGO_DATA}" --bind_ip localhost &>${MONGO_DATA}/out &
+mongod --maxConns 32 --nojournal --noprealloc --smallfiles --quiet --noauth --port ${MONGO_PORT} --dbpath "${MONGO_DATA}" --bind_ip localhost --config /dev/null &>${MONGO_DATA}/out &
 MONGO_PID=$!
 # Wait for Mongo to start listening to connections
 while read line
