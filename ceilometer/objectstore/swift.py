@@ -47,15 +47,19 @@ cfg.CONF.register_opts(OPTS)
 class _Base(plugin.PollsterBase):
 
     CACHE_KEY_TENANT = 'tenants'
-    CACHE_KEY_HEAD = 'swift.head_account'
+    METHOD = 'head'
+
+    @property
+    def CACHE_KEY_METHOD(self):
+        return 'swift.%s_account' % self.METHOD
 
     def _iter_accounts(self, ksclient, cache):
         if self.CACHE_KEY_TENANT not in cache:
             cache[self.CACHE_KEY_TENANT] = ksclient.tenants.list()
-        if self.CACHE_KEY_HEAD not in cache:
-            cache[self.CACHE_KEY_HEAD] = list(self._get_account_info(ksclient,
-                                                                     cache))
-        return iter(cache[self.CACHE_KEY_HEAD])
+        if self.CACHE_KEY_METHOD not in cache:
+            cache[self.CACHE_KEY_METHOD] = list(self._get_account_info(
+                                                ksclient, cache))
+        return iter(cache[self.CACHE_KEY_METHOD])
 
     def _get_account_info(self, ksclient, cache):
         try:
@@ -67,8 +71,10 @@ class _Base(plugin.PollsterBase):
             raise StopIteration()
 
         for t in cache[self.CACHE_KEY_TENANT]:
-            yield (t.id, swift.head_account(self._neaten_url(endpoint, t.id),
-                                            ksclient.auth_token))
+            api_method = '%s_account' % self.METHOD
+            yield (t.id, getattr(swift, api_method)
+                                (self._neaten_url(endpoint, t.id),
+                                 ksclient.auth_token))
 
     @staticmethod
     def _neaten_url(endpoint, tenant_id):
@@ -133,3 +139,49 @@ class ObjectsContainersPollster(_Base):
                 timestamp=timeutils.isotime(),
                 resource_metadata=None,
             )
+
+
+class ContainersObjectsPollster(_Base):
+    """Get info about containers using Swift API
+    """
+
+    METHOD = 'get'
+
+    def get_samples(self, manager, cache):
+        for project, account in self._iter_accounts(manager.keystone, cache):
+            containers_info = account[1]
+            for container in containers_info:
+                yield sample.Sample(
+                    name='storage.containers.objects',
+                    type=sample.TYPE_GAUGE,
+                    volume=int(container['count']),
+                    unit='object',
+                    user_id=None,
+                    project_id=project,
+                    resource_id=project + '/' + container['name'],
+                    timestamp=timeutils.isotime(),
+                    resource_metadata=None,
+                )
+
+
+class ContainersSizePollster(_Base):
+    """Get info about containers using Swift API
+    """
+
+    METHOD = 'get'
+
+    def get_samples(self, manager, cache):
+        for project, account in self._iter_accounts(manager.keystone, cache):
+            containers_info = account[1]
+            for container in containers_info:
+                yield sample.Sample(
+                    name='storage.containers.objects.size',
+                    type=sample.TYPE_GAUGE,
+                    volume=int(container['bytes']),
+                    unit='B',
+                    user_id=None,
+                    project_id=project,
+                    resource_id=project + '/' + container['name'],
+                    timestamp=timeutils.isotime(),
+                    resource_metadata=None,
+                )

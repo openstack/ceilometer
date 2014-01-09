@@ -144,16 +144,18 @@ Make sure Cinder is properly configured first: see :ref:`installing_manually`.
 Object Storage (Swift)
 ======================
 
-==============================  ==========  ==========  ========  ============  ==============================================
-Name                            Type        Volume      Resource  Origin        Note
-==============================  ==========  ==========  ========  ============  ==============================================
-storage.objects                 Gauge           object  store ID  pollster      Number of objects
-storage.objects.size            Gauge                B  store ID  pollster      Total size of stored objects
-storage.objects.containers      Gauge        container  store ID  pollster      Number of containers
-storage.objects.incoming.bytes  Delta                B  store ID  notification  Number of incoming bytes
-storage.objects.outgoing.bytes  Delta                B  store ID  notification  Number of outgoing bytes
-storage.api.request             Delta          request  store ID  notification  Number of API requests against swift
-==============================  ==========  ==========  ========  ============  ==============================================
+===============================  ==========  ==========  ===========  ============  ==========================================
+Name                             Type        Volume      Resource     Origin        Note
+===============================  ==========  ==========  ===========  ============  ==========================================
+storage.objects                  Gauge           object  store ID     pollster      Number of objects
+storage.objects.size             Gauge                B  store ID     pollster      Total size of stored objects
+storage.objects.containers       Gauge        container  store ID     pollster      Number of containers
+storage.objects.incoming.bytes   Delta                B  store ID     notification  Number of incoming bytes
+storage.objects.outgoing.bytes   Delta                B  store ID     notification  Number of outgoing bytes
+storage.api.request              Delta          request  store ID     notification  Number of API requests against swift
+storage.containers.objects       Gauge           object  str ID/cont  pollster      Number of objects in container
+storage.containers.objects.size  Gauge                B  str ID/cont  pollster      Total size of stored objects in container
+===============================  ==========  ==========  ===========  ============  ==========================================
 
 In order to use storage.objects.incoming.bytes and storage.outgoing.bytes, one must configure
 Swift as described in :ref:`installing_manually`. Note that they may not be
