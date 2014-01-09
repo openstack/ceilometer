@@ -91,7 +91,7 @@ class TestApiMiddleware(FunctionalTest):
     no_lang_translated_error = 'No lang translated error'
     en_US_translated_error = 'en-US translated error'
 
-    def _fake_get_localized_message(self, message, user_locale):
+    def _fake_translate(self, message, user_locale):
         if user_locale is None:
             return self.no_lang_translated_error
         else:
@@ -140,8 +140,8 @@ class TestApiMiddleware(FunctionalTest):
 
     def test_json_parsable_error_middleware_translation_400(self):
         # Ensure translated messages get placed properly into json faults
-        with mock.patch.object(gettextutils, 'get_localized_message',
-                               side_effect=self._fake_get_localized_message):
+        with mock.patch.object(gettextutils, 'translate',
+                               side_effect=self._fake_translate):
             response = self.post_json('/alarms', params={'name': 'foobar',
                                                          'type': 'threshold'},
                                       expect_errors=True,
@@ -175,8 +175,8 @@ class TestApiMiddleware(FunctionalTest):
 
     def test_xml_parsable_error_middleware_translation_400(self):
         # Ensure translated messages get placed properly into xml faults
-        with mock.patch.object(gettextutils, 'get_localized_message',
-                               side_effect=self._fake_get_localized_message):
+        with mock.patch.object(gettextutils, 'translate',
+                               side_effect=self._fake_translate):
             response = self.post_json('/alarms', params={'name': 'foobar',
                                                          'type': 'threshold'},
                                       expect_errors=True,
@@ -192,8 +192,8 @@ class TestApiMiddleware(FunctionalTest):
 
     def test_best_match_language(self):
         # Ensure that we are actually invoking language negotiation
-        with mock.patch.object(gettextutils, 'get_localized_message',
-                               side_effect=self._fake_get_localized_message):
+        with mock.patch.object(gettextutils, 'translate',
+                               side_effect=self._fake_translate):
             response = self.post_json('/alarms', params={'name': 'foobar',
                                                          'type': 'threshold'},
                                       expect_errors=True,

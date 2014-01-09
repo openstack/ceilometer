@@ -67,10 +67,8 @@ def generate(srcfiles):
                             os.path.basename(filepath).split('.')[0]])
         mods_by_pkg.setdefault(pkg_name, list()).append(mod_str)
     # NOTE(lzyeval): place top level modules before packages
-    pkg_names = filter(lambda x: x.endswith(PY_EXT), mods_by_pkg.keys())
-    pkg_names.sort()
-    ext_names = filter(lambda x: x not in pkg_names, mods_by_pkg.keys())
-    ext_names.sort()
+    pkg_names = sorted(pkg for pkg in mods_by_pkg if pkg.endswith(PY_EXT))
+    ext_names = sorted(pkg for pkg in mods_by_pkg if pkg not in pkg_names)
     pkg_names.extend(ext_names)
 
     # opts_by_group is a mapping of group name to an options list
@@ -120,7 +118,7 @@ def _import_module(mod_str):
 
 def _is_in_group(opt, group):
     "Check if opt is in group."
-    for key, value in group._opts.items():
+    for value in group._opts.values():
         # NOTE(llu): Temporary workaround for bug #1262148, wait until
         # newly released oslo.config support '==' operator.
         if not(value['opt'] != opt):
@@ -134,7 +132,7 @@ def _guess_groups(opt, mod_obj):
         return 'DEFAULT'
 
     # what other groups is it in?
-    for key, value in cfg.CONF.items():
+    for value in cfg.CONF.values():
         if isinstance(value, cfg.CONF.GroupAttr):
             if _is_in_group(opt, value._group):
                 return value._group.name

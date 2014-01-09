@@ -33,9 +33,11 @@ from eventlet import pools
 from eventlet import queue
 from eventlet import semaphore
 from oslo.config import cfg
+import six
+
 
 from ceilometer.openstack.common import excutils
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import local
 from ceilometer.openstack.common import log as logging
 from ceilometer.openstack.common.rpc import common as rpc_common
@@ -300,10 +302,11 @@ def pack_context(msg, context):
     """
     if isinstance(context, dict):
         context_d = dict([('_context_%s' % key, value)
-                          for (key, value) in context.iteritems()])
+                          for (key, value) in six.iteritems(context)])
     else:
         context_d = dict([('_context_%s' % key, value)
-                          for (key, value) in context.to_dict().iteritems()])
+                          for (key, value) in
+                          six.iteritems(context.to_dict())])
 
     msg.update(context_d)
 
@@ -398,7 +401,7 @@ class CallbackWrapper(_ThreadPoolWithWait):
         if self.wait_for_consumers:
             self.pool.waitall()
             if self.exc_info:
-                raise self.exc_info[1], None, self.exc_info[2]
+                six.reraise(self.exc_info[1], None, self.exc_info[2])
 
 
 class ProxyCallback(_ThreadPoolWithWait):

@@ -29,7 +29,7 @@ from oslo.config import cfg
 import six
 
 from ceilometer.openstack.common import excutils
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import network_utils
 from ceilometer.openstack.common.rpc import amqp as rpc_amqp
 from ceilometer.openstack.common.rpc import common as rpc_common
@@ -445,7 +445,7 @@ class Connection(object):
                 'virtual_host': self.conf.rabbit_virtual_host,
             }
 
-            for sp_key, value in server_params.iteritems():
+            for sp_key, value in six.iteritems(server_params):
                 p_key = server_params_to_kombu_params.get(sp_key, sp_key)
                 params[p_key] = value
 

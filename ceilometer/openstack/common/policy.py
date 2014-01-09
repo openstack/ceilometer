@@ -56,16 +56,16 @@ as it allows particular rules to be explicitly disabled.
 
 import abc
 import re
-import urllib
-import urllib2
 
 from oslo.config import cfg
 import six
 
 from ceilometer.openstack.common import fileutils
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import jsonutils
 from ceilometer.openstack.common import log as logging
+from ceilometer.openstack.common.py3kcompat import urlutils
+
 
 policy_opts = [
     cfg.StrOpt('policy_file',
@@ -824,8 +824,8 @@ class HttpCheck(Check):
         url = ('http:' + self.match) % target
         data = {'target': jsonutils.dumps(target),
                 'credentials': jsonutils.dumps(creds)}
-        post_data = urllib.urlencode(data)
-        f = urllib2.urlopen(url, post_data)
+        post_data = urlutils.urlencode(data)
+        f = urlutils.urlopen(url, post_data)
         return f.read() == "True"
 
 

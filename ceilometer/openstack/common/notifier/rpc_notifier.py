@@ -16,7 +16,7 @@
 from oslo.config import cfg
 
 from ceilometer.openstack.common import context as req_context
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log as logging
 from ceilometer.openstack.common import rpc
 

@@ -24,6 +24,7 @@ import json
 import time
 
 import eventlet
+import six
 
 from ceilometer.openstack.common.rpc import common as rpc_common
 
@@ -67,7 +68,7 @@ class Consumer(object):
                 # Caller might have called ctxt.reply() manually
                 for (reply, failure) in ctxt._response:
                     if failure:
-                        raise failure[0], failure[1], failure[2]
+                        six.reraise(failure[0], failure[1], failure[2])
                     res.append(reply)
                 # if ending not 'sent'...we might have more data to
                 # return from the function itself
