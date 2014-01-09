@@ -307,7 +307,7 @@ class Connection(base.Connection):
         if pagination:
             raise NotImplementedError(_('Pagination not implemented'))
 
-        def make_resource(data, first_ts, last_ts, meter_refs):
+        def make_resource(data, first_ts, last_ts):
             """Transform HBase fields to Resource model."""
             # convert HBase metadata e.g. f:r_display_name to display_name
             data['f:metadata'] = _metadata_from_document(data)
@@ -320,10 +320,6 @@ class Connection(base.Connection):
                 source=data['f:source'],
                 user_id=data['f:user_id'],
                 metadata=data['f:metadata'],
-                meter=[
-                    models.ResourceMeter(*(m.split("!")))
-                    for m in meter_refs
-                ],
             )
         meter_table = self.conn.table(self.METER_TABLE)
 
@@ -350,11 +346,6 @@ class Connection(base.Connection):
                 meters, key=_resource_id_from_record_tuple):
             meter_rows = [data[1] for data in sorted(
                 r_meters, key=_timestamp_from_record_tuple)]
-            meter_references = [
-                _format_meter_reference(m['f:counter_name'],
-                                        m['f:counter_type'],
-                                        m['f:counter_unit'])
-                for m in meter_rows]
 
             latest_data = meter_rows[-1]
             min_ts = timeutils.parse_strtime(meter_rows[0]['f:timestamp'])
@@ -365,15 +356,13 @@ class Connection(base.Connection):
                         yield make_resource(
                             latest_data,
                             min_ts,
-                            max_ts,
-                            meter_references
+                            max_ts
                         )
             else:
                 yield make_resource(
                     latest_data,
                     min_ts,
-                    max_ts,
-                    meter_references
+                    max_ts
                 )
 
     def get_meters(self, user=None, project=None, resource=None, source=None,

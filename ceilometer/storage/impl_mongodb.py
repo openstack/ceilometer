@@ -661,16 +661,6 @@ class Connection(base.Connection):
                 last_sample_timestamp=result['last_sample_timestamp'],
                 source=result['source'],
                 metadata=result['metadata'],
-                meter=[
-                    models.ResourceMeter(
-                        counter_name=m_n,
-                        counter_type=m_t,
-                        counter_unit=m_u,
-                    )
-                    for m_n, m_u, m_t in zip(result['meters_name'],
-                                             result['meters_unit'],
-                                             result['meters_type'])
-                ],
             )
 
     def get_meters(self, user=None, project=None, resource=None, source=None,

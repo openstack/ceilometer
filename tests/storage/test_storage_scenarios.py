@@ -174,8 +174,6 @@ class ResourceTest(DBTestBase,
             self.assertIn(resource.source, msgs_sources)
             self.assertEqual(resource.user_id, 'user-id')
             self.assertEqual(resource.metadata['display_name'], 'test-server')
-            self.assertIn(models.ResourceMeter('instance', 'cumulative', ''),
-                          resource.meter)
             break
         else:
             assert False, 'Never found resource-id'
