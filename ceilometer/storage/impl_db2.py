@@ -425,17 +425,10 @@ class Connection(base.Connection):
         resource = lambda x: x['resource_id']
         meters = self.db.meter.find(q, sort=sort_instructions)
         for resource_id, r_meters in itertools.groupby(meters, key=resource):
-            resource_meters = []
             # Because we have to know first/last timestamp, and we need a full
             # list of references to the resource's meters, we need a tuple
             # here.
             r_meters = tuple(r_meters)
-            for meter in r_meters:
-                resource_meters.append(models.ResourceMeter(
-                    counter_name=meter['counter_name'],
-                    counter_type=meter['counter_type'],
-                    counter_unit=meter.get('counter_unit', ''))
-                )
             latest_meter = r_meters[0]
             last_ts = latest_meter['timestamp']
             first_ts = r_meters[-1]['timestamp']
@@ -446,8 +439,7 @@ class Connection(base.Connection):
                                   last_sample_timestamp=last_ts,
                                   source=latest_meter['source'],
                                   user_id=latest_meter['user_id'],
-                                  metadata=latest_meter['resource_metadata'],
-                                  meter=resource_meters)
+                                  metadata=latest_meter['resource_metadata'])
 
     def get_meters(self, user=None, project=None, resource=None, source=None,
                    metaquery={}, pagination=None):
