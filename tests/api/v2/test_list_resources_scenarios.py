@@ -134,9 +134,9 @@ class TestListResources(FunctionalTest,
 
     def test_instance_multiple_samples(self):
         timestamps = [
-            datetime.datetime(2012, 7, 2, 10, 40),
             datetime.datetime(2012, 7, 2, 10, 41),
             datetime.datetime(2012, 7, 2, 10, 42),
+            datetime.datetime(2012, 7, 2, 10, 40),
         ]
         for timestamp in timestamps:
             datapoint = sample.Sample(
@@ -149,7 +149,7 @@ class TestListResources(FunctionalTest,
                 'resource-id',
                 timestamp=timestamp,
                 resource_metadata={'display_name': 'test-server',
-                                   'tag': 'self.sample',
+                                   'tag': 'self.sample-%s' % timestamp,
                                    },
                 source='test',
             )
@@ -161,7 +161,7 @@ class TestListResources(FunctionalTest,
 
         data = self.get_json('/resources')
         self.assertEqual(1, len(data))
-        self._verify_sample_timestamps(data[0], timestamps[0], timestamps[-1])
+        self._verify_sample_timestamps(data[0], timestamps[-1], timestamps[1])
 
     def test_instances_one(self):
         sample1 = sample.Sample(
