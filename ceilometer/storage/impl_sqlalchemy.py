@@ -467,14 +467,6 @@ class Connection(base.Connection):
                 source=meter.sources[0].id,
                 user_id=meter.user_id,
                 metadata=meter.resource_metadata,
-                meter=[
-                    api_models.ResourceMeter(
-                        counter_name=m.counter_name,
-                        counter_type=m.counter_type,
-                        counter_unit=m.counter_unit,
-                    )
-                    for m in meter.resource.meters
-                ],
             )
 
     @staticmethod

@@ -140,8 +140,7 @@ class Resource(Model):
     def __init__(self, resource_id, project_id,
                  first_sample_timestamp,
                  last_sample_timestamp,
-                 source, user_id, metadata,
-                 meter):
+                 source, user_id, metadata):
         """Create a new resource.
 
         :param resource_id: UUID of the resource
@@ -151,7 +150,6 @@ class Resource(Model):
         :param source:      the identifier for the user/project id definition
         :param user_id:     UUID of user owning the resource
         :param metadata:    most current metadata for the resource (a dict)
-        :param meter:       list of the meters reporting data for the resource,
         """
         Model.__init__(self,
                        resource_id=resource_id,
@@ -161,28 +159,6 @@ class Resource(Model):
                        source=source,
                        user_id=user_id,
                        metadata=metadata,
-                       meter=meter,
-                       )
-
-
-class ResourceMeter(Model):
-    """The definitions of the meters for which data has been collected
-    for a resource.
-
-    See Resource.meter field.
-    """
-
-    def __init__(self, counter_name, counter_type, counter_unit):
-        """Create a new resource meter.
-
-        :param counter_name: the name of the counter updating the resource
-        :param counter_type: one of gauge, delta, cumulative
-        :param counter_unit: official units name for the sample data
-        """
-        Model.__init__(self,
-                       counter_name=counter_name,
-                       counter_type=counter_type,
-                       counter_unit=counter_unit,
                        )
 
 
