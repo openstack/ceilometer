@@ -28,7 +28,7 @@ import copy
 import datetime
 from mock import patch
 
-from ceilometer.publisher import rpc
+from ceilometer.publisher import utils
 from ceilometer import sample
 from ceilometer.storage import base
 from ceilometer.storage import impl_mongodb
@@ -180,7 +180,7 @@ class CompatibilityTest(test_storage_scenarios.DBTestBase,
                 source='test',
             )
             self.counters.append(c)
-            msg = rpc.meter_message_from_counter(
+            msg = utils.meter_message_from_counter(
                 c,
                 secret='not-so-secret')
             self.conn.record_metering_data(self.conn, msg)

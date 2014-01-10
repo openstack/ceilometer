@@ -22,7 +22,7 @@ import mock
 from ceilometer.dispatcher import database
 from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import test
-from ceilometer.publisher import rpc
+from ceilometer.publisher import utils
 
 
 class TestDispatcherDB(test.BaseTestCase):
@@ -38,9 +38,9 @@ class TestDispatcherDB(test.BaseTestCase):
                'resource_id': self.id(),
                'counter_volume': 1,
                }
-        msg['message_signature'] = rpc.compute_signature(
+        msg['message_signature'] = utils.compute_signature(
             msg,
-            self.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher.metering_secret,
         )
 
         with mock.patch.object(self.dispatcher.storage_conn,
@@ -76,9 +76,9 @@ class TestDispatcherDB(test.BaseTestCase):
                'counter_volume': 1,
                'timestamp': '2012-07-02T13:53:40Z',
                }
-        msg['message_signature'] = rpc.compute_signature(
+        msg['message_signature'] = utils.compute_signature(
             msg,
-            self.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher.metering_secret,
         )
 
         expected = msg.copy()
@@ -96,9 +96,9 @@ class TestDispatcherDB(test.BaseTestCase):
                'counter_volume': 1,
                'timestamp': '2012-09-30T15:31:50.262-08:00',
                }
-        msg['message_signature'] = rpc.compute_signature(
+        msg['message_signature'] = utils.compute_signature(
             msg,
-            self.CONF.publisher_rpc.metering_secret,
+            self.CONF.publisher.metering_secret,
         )
 
         expected = msg.copy()

@@ -20,7 +20,7 @@ from ceilometer import dispatcher
 from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
-from ceilometer.publisher import rpc as publisher_rpc
+from ceilometer.publisher import utils as publisher_utils
 from ceilometer import storage
 
 LOG = log.getLogger(__name__)
@@ -54,9 +54,9 @@ class DatabaseDispatcher(dispatcher.Base):
                     'resource_id': meter['resource_id'],
                     'timestamp': meter.get('timestamp', 'NO TIMESTAMP'),
                     'counter_volume': meter['counter_volume']}))
-            if publisher_rpc.verify_signature(
+            if publisher_utils.verify_signature(
                     meter,
-                    self.conf.publisher_rpc.metering_secret):
+                    self.conf.publisher.metering_secret):
                 try:
                     # Convert the timestamp to a datetime instance.
                     # Storage engines are responsible for converting

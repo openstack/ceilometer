@@ -25,7 +25,7 @@ import testscenarios
 from ceilometer.api import acl
 from ceilometer.api.controllers import v2 as v2_api
 from ceilometer.openstack.common import timeutils
-from ceilometer.publisher import rpc
+from ceilometer.publisher import utils
 from ceilometer import sample
 from ceilometer.tests.api.v2 import FunctionalTest
 from ceilometer.tests import db as tests_db
@@ -104,9 +104,9 @@ class TestAPIACL(FunctionalTest,
                     resource_metadata={'display_name': 'test-server',
                                        'tag': 'self.sample4'},
                     source='test_source')]:
-            msg = rpc.meter_message_from_counter(
+            msg = utils.meter_message_from_counter(
                 cnt,
-                self.CONF.publisher_rpc.metering_secret)
+                self.CONF.publisher.metering_secret)
             self.conn.record_metering_data(msg)
 
     def get_json(self, path, expect_errors=False, headers=None,

@@ -25,140 +25,13 @@ import fixtures
 import mock
 
 from ceilometer.openstack.common.fixture import config
-from ceilometer.openstack.common import jsonutils
 from ceilometer.openstack.common import network_utils
 from ceilometer.openstack.common import test
 from ceilometer.publisher import rpc
 from ceilometer import sample
 
 
-class TestSignature(test.BaseTestCase):
-
-    def test_compute_signature_change_key(self):
-        sig1 = rpc.compute_signature({'a': 'A', 'b': 'B'},
-                                     'not-so-secret')
-        sig2 = rpc.compute_signature({'A': 'A', 'b': 'B'},
-                                     'not-so-secret')
-        self.assertNotEqual(sig1, sig2)
-
-    def test_compute_signature_change_value(self):
-        sig1 = rpc.compute_signature({'a': 'A', 'b': 'B'},
-                                     'not-so-secret')
-        sig2 = rpc.compute_signature({'a': 'a', 'b': 'B'},
-                                     'not-so-secret')
-        self.assertNotEqual(sig1, sig2)
-
-    def test_compute_signature_same(self):
-        sig1 = rpc.compute_signature({'a': 'A', 'b': 'B'},
-                                     'not-so-secret')
-        sig2 = rpc.compute_signature({'a': 'A', 'b': 'B'},
-                                     'not-so-secret')
-        self.assertEqual(sig1, sig2)
-
-    def test_compute_signature_signed(self):
-        data = {'a': 'A', 'b': 'B'}
-        sig1 = rpc.compute_signature(data, 'not-so-secret')
-        data['message_signature'] = sig1
-        sig2 = rpc.compute_signature(data, 'not-so-secret')
-        self.assertEqual(sig1, sig2)
-
-    def test_compute_signature_use_configured_secret(self):
-        data = {'a': 'A', 'b': 'B'}
-        sig1 = rpc.compute_signature(data, 'not-so-secret')
-        sig2 = rpc.compute_signature(data, 'different-value')
-        self.assertNotEqual(sig1, sig2)
-
-    def test_verify_signature_signed(self):
-        data = {'a': 'A', 'b': 'B'}
-        sig1 = rpc.compute_signature(data, 'not-so-secret')
-        data['message_signature'] = sig1
-        self.assertTrue(rpc.verify_signature(data, 'not-so-secret'))
-
-    def test_verify_signature_unsigned(self):
-        data = {'a': 'A', 'b': 'B'}
-        self.assertFalse(rpc.verify_signature(data, 'not-so-secret'))
-
-    def test_verify_signature_incorrect(self):
-        data = {'a': 'A', 'b': 'B',
-                'message_signature': 'Not the same'}
-        self.assertFalse(rpc.verify_signature(data, 'not-so-secret'))
-
-    def test_verify_signature_nested(self):
-        data = {'a': 'A',
-                'b': 'B',
-                'nested': {'a': 'A',
-                           'b': 'B',
-                           },
-                }
-        data['message_signature'] = rpc.compute_signature(
-            data,
-            'not-so-secret')
-        self.assertTrue(rpc.verify_signature(data, 'not-so-secret'))
-
-    def test_verify_signature_nested_list_of_dict(self):
-        small = 1
-        big = 1 << 64
-        nested = {small: 99, big: 42}
-        data = {'a': 'A',
-                'b': 'B',
-                'nested': {'list': [nested]}}
-        data['message_signature'] = rpc.compute_signature(
-            data,
-            'not-so-secret')
-        # the keys 1 and 1<<64 cause a hash collision on 64bit platforms
-        data['nested']['list'] = [{big: 42, small: 99}]
-        self.assertTrue(rpc.verify_signature(data, 'not-so-secret'))
-
-    def test_verify_signature_nested_json(self):
-        data = {'a': 'A',
-                'b': 'B',
-                'nested': {'a': 'A',
-                           'b': 'B',
-                           'c': ('c',),
-                           'd': ['d']
-                           },
-                }
-        data['message_signature'] = rpc.compute_signature(
-            data,
-            'not-so-secret')
-        jsondata = jsonutils.loads(jsonutils.dumps(data))
-        self.assertTrue(rpc.verify_signature(jsondata, 'not-so-secret'))
-
-
-class TestCounter(test.BaseTestCase):
-
-    TEST_COUNTER = sample.Sample(name='name',
-                                 type='typ',
-                                 unit='',
-                                 volume=1,
-                                 user_id='user',
-                                 project_id='project',
-                                 resource_id=2,
-                                 timestamp='today',
-                                 resource_metadata={'key': 'value'},
-                                 source='rpc')
-
-    def test_meter_message_from_counter_signed(self):
-        msg = rpc.meter_message_from_counter(self.TEST_COUNTER,
-                                             'not-so-secret')
-        self.assertIn('message_signature', msg)
-
-    def test_meter_message_from_counter_field(self):
-        def compare(f, c, msg_f, msg):
-            self.assertEqual(msg, c)
-        msg = rpc.meter_message_from_counter(self.TEST_COUNTER,
-                                             'not-so-secret')
-        name_map = {'name': 'counter_name',
-                    'type': 'counter_type',
-                    'unit': 'counter_unit',
-                    'volume': 'counter_volume'}
-        for f in self.TEST_COUNTER._fields:
-            msg_f = name_map.get(f, f)
-            yield compare, f, getattr(self.TEST_COUNTER, f), msg_f, msg[msg_f]
-
-
 class TestPublish(test.BaseTestCase):
-
     test_data = [
         sample.Sample(
             name='test',
@@ -233,8 +106,8 @@ class TestPublish(test.BaseTestCase):
         self.published = []
         self.rpc_unreachable = False
         self.useFixture(fixtures.MonkeyPatch(
-                        "ceilometer.openstack.common.rpc.cast",
-                        self.faux_cast))
+            "ceilometer.openstack.common.rpc.cast",
+            self.faux_cast))
 
     def test_published(self):
         publisher = rpc.RPCPublisher(
@@ -294,15 +167,15 @@ class TestPublish(test.BaseTestCase):
 
         def faux_cast_wait(context, topic, msg):
             self.useFixture(fixtures.MonkeyPatch(
-                            "ceilometer.openstack.common.rpc.cast",
-                            faux_cast_go))
+                "ceilometer.openstack.common.rpc.cast",
+                faux_cast_go))
             # Sleep to simulate concurrency and allow other threads to work
             eventlet.sleep(0)
             self.published.append((topic, msg))
 
         self.useFixture(fixtures.MonkeyPatch(
-                        "ceilometer.openstack.common.rpc.cast",
-                        faux_cast_wait))
+            "ceilometer.openstack.common.rpc.cast",
+            faux_cast_wait))
 
         publisher = rpc.RPCPublisher(network_utils.urlsplit('rpc://'))
         job1 = eventlet.spawn(publisher.publish_samples, None, self.test_data)
