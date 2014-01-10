@@ -270,3 +270,31 @@ class TestSwiftMiddleware(test.BaseTestCase):
         self.assertEqual(len(samples), 0)
         self.assertEqual(resp, ["test"])
         mocked_publish_sample.assert_called_once_with(mock.ANY, 0, 4)
+
+    def test_reseller_prefix(self):
+        # No reseller prefix set: ensure middleware uses AUTH_
+        app = swift_middleware.CeilometerMiddleware(FakeApp(), {})
+        req = webob.Request.blank('/1.0/AUTH_account/container/obj',
+                                  environ={'REQUEST_METHOD': 'GET'})
+        list(app(req.environ, self.start_response))
+        samples = self.pipeline_manager.pipelines[0].samples[0]
+        self.assertEqual(samples.resource_id, "account")
+
+        # Custom reseller prefix set
+        app = swift_middleware.CeilometerMiddleware(
+            FakeApp(), {'reseller_prefix': 'CUSTOM_'})
+        req = webob.Request.blank('/1.0/CUSTOM_account/container/obj',
+                                  environ={'REQUEST_METHOD': 'GET'})
+        list(app(req.environ, self.start_response))
+        samples = self.pipeline_manager.pipelines[0].samples[0]
+        self.assertEqual(samples.resource_id, "account")
+
+    def test_invalid_reseller_prefix(self):
+        # Custom reseller prefix set, but without trailing underscore
+        app = swift_middleware.CeilometerMiddleware(
+            FakeApp(), {'reseller_prefix': 'CUSTOM'})
+        req = webob.Request.blank('/1.0/CUSTOM_account/container/obj',
+                                  environ={'REQUEST_METHOD': 'GET'})
+        list(app(req.environ, self.start_response))
+        samples = self.pipeline_manager.pipelines[0].samples[0]
+        self.assertEqual(samples.resource_id, "account")
