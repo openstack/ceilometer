@@ -38,8 +38,17 @@ def recursive_keypairs(d, separator=':'):
             # When doing a pair of JSON encode/decode operations to the tuple,
             # the tuple would become list. So we have to generate the value as
             # list here.
-            yield name, list(map(lambda x: unicode(x).encode('utf-8'),
-                                 value))
+
+            # in the special case of the list item itself being a dict,
+            # create an equivalent dict with a predictable insertion order
+            # to avoid inconsistencies in the message signature computation
+            # for equivalent payloads modulo ordering
+            first = lambda i: i[0]
+            m = map(lambda x: unicode(dict(sorted(x.items(), key=first))
+                                      if isinstance(x, dict)
+                                      else x).encode('utf-8'),
+                    value)
+            yield name, list(m)
         else:
             yield name, value
 
