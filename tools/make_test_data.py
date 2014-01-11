@@ -28,7 +28,6 @@ import sys
 
 from oslo.config import cfg
 
-from ceilometer.publisher import rpc
 from ceilometer.publisher import utils
 from ceilometer import sample
 from ceilometer import storage
