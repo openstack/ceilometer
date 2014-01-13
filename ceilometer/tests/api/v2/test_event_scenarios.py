@@ -129,14 +129,23 @@ class TestEventAPI(EventTestBase):
             self.assertEqual(event['generated'], expected_generated)
             for trait_name in ['trait_A', 'trait_B',
                                'trait_C', 'trait_D']:
-                self.assertTrue(trait_name in event['traits'])
+                self.assertTrue(trait_name in map(lambda x: x['name'],
+                                                  event['traits']))
 
     def test_get_event_by_message_id(self):
         event = self.get_json(self.PATH + "/100", headers=headers)
-        expected_traits = {'trait_D': '2013-12-31T05:00:00',
-                           'trait_B': '101',
-                           'trait_C': '100.123456',
-                           'trait_A': 'my_Bar_text'}
+        expected_traits = [{'name': 'trait_A',
+                            'type': 'string',
+                            'value': 'my_Bar_text'},
+                           {'name': 'trait_B',
+                            'type': 'integer',
+                            'value': '101'},
+                           {'name': 'trait_C',
+                            'type': 'float',
+                            'value': '100.123456'},
+                           {'name': 'trait_D',
+                            'type': 'datetime',
+                            'value': '2013-12-31T05:00:00'}]
         self.assertEqual('100', event['message_id'])
         self.assertEqual('Bar', event['event_type'])
         self.assertEqual('2013-12-31T05:00:00', event['generated'])
@@ -168,7 +177,13 @@ class TestEventAPI(EventTestBase):
                                  'type': 'integer'}])
         self.assertEqual(1, len(data))
         self.assertEqual(data[0]['event_type'], 'Bar')
-        self.assertEqual(int(data[0]['traits']['trait_B']), 101)
+
+        traits = filter(lambda x: x['name'] == 'trait_B', data[0]['traits'])
+        self.assertEqual(1, len(traits))
+        self.assertEqual(traits[0]['type'],
+                         'integer')
+        self.assertEqual(traits[0]['value'],
+                         '101')
 
     def test_get_events_filter_float_trait(self):
         data = self.get_json(self.PATH, headers=headers,
@@ -177,7 +192,13 @@ class TestEventAPI(EventTestBase):
                                  'type': 'float'}])
         self.assertEqual(1, len(data))
         self.assertEqual(data[0]['event_type'], 'Zoo')
-        self.assertEqual(float(data[0]['traits']['trait_C']), 200.123456)
+
+        traits = filter(lambda x: x['name'] == 'trait_C', data[0]['traits'])
+        self.assertEqual(1, len(traits))
+        self.assertEqual(traits[0]['type'],
+                         'float')
+        self.assertEqual(traits[0]['value'],
+                         '200.123456')
 
     def test_get_events_filter_datetime_trait(self):
         data = self.get_json(self.PATH, headers=headers,
@@ -185,7 +206,11 @@ class TestEventAPI(EventTestBase):
                                  'value': self.trait_time.isoformat(),
                                  'type': 'datetime'}])
         self.assertEqual(3, len(data))
-        self.assertEqual(data[0]['traits']['trait_D'],
+        traits = filter(lambda x: x['name'] == 'trait_D', data[0]['traits'])
+        self.assertEqual(1, len(traits))
+        self.assertEqual(traits[0]['type'],
+                         'datetime')
+        self.assertEqual(traits[0]['value'],
                          self.trait_time.isoformat())
 
     def test_get_events_multiple_filters(self):
