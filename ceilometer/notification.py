@@ -73,7 +73,7 @@ class NotificationService(service.DispatchedService, rpc_service.Service):
             ),
         )
 
-        LOG.debug('loading event definitions')
+        LOG.debug(_('Loading event definitions'))
         self.event_converter = event_converter.setup_events(
             extension.ExtensionManager(
                 namespace='ceilometer.event.trait_plugin'))
@@ -148,7 +148,7 @@ class NotificationService(service.DispatchedService, rpc_service.Service):
         event = self.event_converter.to_event(body)
 
         if event is not None:
-            LOG.debug('Saving event "%s"', event.event_type)
+            LOG.debug(_('Saving event "%s"'), event.event_type)
             problem_events = []
             for dispatcher in self.dispatcher_manager:
                 problem_events.extend(dispatcher.obj.record_events(event))
