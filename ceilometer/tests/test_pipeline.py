@@ -1067,3 +1067,69 @@ class TestPipeline(test.BaseTestCase):
                                                     self.transformer_manager)
         self.assertEqual(len(pipeline_manager.pipelines[0].resources),
                          0)
+
+    def test_rate_of_change_mapping(self):
+        map_from = {'name': 'disk\\.(read|write)\\.(bytes|requests)',
+                    'unit': '(B|request)'}
+        map_to = {'name': 'disk.\\1.\\2.rate',
+                  'unit': '\\1/s'}
+        self.pipeline_cfg[0]['transformers'] = [
+            {
+                'name': 'rate_of_change',
+                'parameters': {
+                    'source': {
+                        'map_from': map_from
+                    },
+                    'target': {
+                        'map_to': map_to,
+                        'type': sample.TYPE_GAUGE
+                    },
+                },
+            },
+        ]
+        self.pipeline_cfg[0]['counters'] = ['disk.read.bytes',
+                                            'disk.write.requests']
+        now = timeutils.utcnow()
+        base = 1000
+        offset = 7
+        rate = 42
+        later = now + datetime.timedelta(minutes=offset)
+        counters = []
+        for v, ts in [(base, now.isoformat()),
+                      (base + (offset * 60 * rate), later.isoformat())]:
+            for n, u, r in [('disk.read.bytes', 'B', 'resource1'),
+                            ('disk.write.requests', 'request', 'resource2')]:
+                s = sample.Sample(
+                    name=n,
+                    type=sample.TYPE_CUMULATIVE,
+                    volume=v,
+                    unit=u,
+                    user_id='test_user',
+                    project_id='test_proj',
+                    resource_id=r,
+                    timestamp=ts,
+                    resource_metadata={},
+                )
+                counters.append(s)
+
+        pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager)
+        pipe = pipeline_manager.pipelines[0]
+
+        pipe.publish_samples(None, counters)
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+        self.assertEqual(len(publisher.samples), 2)
+        pipe.flush(None)
+        self.assertEqual(len(publisher.samples), 2)
+        bps = publisher.samples[0]
+        self.assertEqual(getattr(bps, 'name'), 'disk.read.bytes.rate')
+        self.assertEqual(getattr(bps, 'resource_id'), 'resource1')
+        self.assertEqual(getattr(bps, 'unit'), 'B/s')
+        self.assertEqual(getattr(bps, 'type'), sample.TYPE_GAUGE)
+        self.assertEqual(getattr(bps, 'volume'), rate)
+        rps = publisher.samples[1]
+        self.assertEqual(getattr(rps, 'name'), 'disk.write.requests.rate')
+        self.assertEqual(getattr(rps, 'resource_id'), 'resource2')
+        self.assertEqual(getattr(rps, 'unit'), 'request/s')
+        self.assertEqual(getattr(rps, 'type'), sample.TYPE_GAUGE)
+        self.assertEqual(getattr(rps, 'volume'), rate)

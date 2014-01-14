@@ -17,6 +17,7 @@
 # under the License.
 
 import collections
+import re
 
 from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
@@ -64,31 +65,45 @@ class ScalingTransformer(transformer.TransformerBase):
         """
         self.source = source
         self.target = target
+        self.scale = target.get('scale')
         LOG.debug(_('scaling conversion transformer with source:'
                     ' %(source)s target: %(target)s:')
                   % {'source': source,
                      'target': target})
         super(ScalingTransformer, self).__init__(**kwargs)
 
-    @staticmethod
-    def _scale(s, scale):
+    def _scale(self, s):
         """Apply the scaling factor (either a straight multiplicative
            factor or else a string to be eval'd).
         """
         ns = Namespace(s.as_dict())
 
+        scale = self.scale
         return ((eval(scale, {}, ns) if isinstance(scale, basestring)
                  else s.volume * scale) if scale else s.volume)
+
+    def _map(self, s, attr):
+        """Apply the name or unit mapping if configured.
+        """
+        mapped = None
+        from_ = self.source.get('map_from')
+        to_ = self.target.get('map_to')
+        if from_ and to_:
+            if from_.get(attr) and to_.get(attr):
+                try:
+                    mapped = re.sub(from_[attr], to_[attr], getattr(s, attr))
+                except Exception:
+                    pass
+        return mapped or self.target.get(attr, getattr(s, attr))
 
     def _convert(self, s, growth=1):
         """Transform the appropriate sample fields.
         """
-        scale = self.target.get('scale')
         return sample.Sample(
-            name=self.target.get('name', s.name),
-            unit=self.target.get('unit', s.unit),
+            name=self._map(s, 'name'),
+            unit=self._map(s, 'unit'),
             type=self.target.get('type', s.type),
-            volume=self._scale(s, scale) * growth,
+            volume=self._scale(s) * growth,
             user_id=s.user_id,
             project_id=s.project_id,
             resource_id=s.resource_id,
@@ -115,8 +130,9 @@ class RateOfChangeTransformer(ScalingTransformer):
     def __init__(self, **kwargs):
         """Initialize transformer with configured parameters.
         """
-        self.cache = {}
         super(RateOfChangeTransformer, self).__init__(**kwargs)
+        self.cache = {}
+        self.scale = self.scale or '1'
 
     def handle_sample(self, context, s):
         """Handle a sample, converting if necessary."""
