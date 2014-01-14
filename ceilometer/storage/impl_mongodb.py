@@ -344,7 +344,8 @@ class Connection(base.Connection):
                  "=<": "$lte",
                  ">=": "$gte",
                  "=>": "$gte",
-                 "!=": "$ne"}
+                 "!=": "$ne",
+                 "in": "$in"}
     complex_operators = {"or": "$or",
                          "and": "$and"}
 

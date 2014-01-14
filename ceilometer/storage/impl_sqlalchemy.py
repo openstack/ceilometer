@@ -169,6 +169,10 @@ def make_query_from_filter(session, query, sample_filter, require_meter=True):
     return query
 
 
+def operator_in(field_name, field_value):
+    return field_name.in_(field_value)
+
+
 class Connection(base.Connection):
     """SqlAlchemy connection."""
 
@@ -179,7 +183,8 @@ class Connection(base.Connection):
                  "=<": operator.le,
                  ">=": operator.ge,
                  "=>": operator.ge,
-                 "!=": operator.ne}
+                 "!=": operator.ne,
+                 "in": operator_in}
     complex_operators = {"or": or_,
                          "and": and_}
     ordering_functions = {"asc": asc,

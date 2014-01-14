@@ -731,6 +731,14 @@ class ComplexSampleQueryTest(DBTestBase,
                                      {"and":
                                       [{"=": {"counter_name": "cpu_util"}},
                                        {"and": and_expression}]}]}
+        in_expression = {"in": {"resource_id": ["resource-id-42",
+                                                "resource-id-43",
+                                                "resource-id-44"]}}
+        self.complex_filter_in = {"and":
+                                  [in_expression,
+                                   {"and":
+                                    [{"=": {"counter_name": "cpu_util"}},
+                                     {"and": and_expression}]}]}
 
     def _create_samples(self):
         for resource in range(42, 45):
@@ -881,6 +889,26 @@ class ComplexSampleQueryTest(DBTestBase,
                                                      self.complex_filter,
                                                      orderby=orderby))
         self.assertRaises(KeyError, query)
+
+    def test_query_complex_filter_with_in(self):
+        self._create_samples()
+        results = list(
+            self.conn.query_samples(filter_expr=self.complex_filter_in))
+        self.assertEqual(len(results), 9)
+        for sample in results:
+            self.assertIn(sample.resource_id,
+                          set(["resource-id-42",
+                               "resource-id-43",
+                               "resource-id-44"]))
+            self.assertEqual(sample.counter_name,
+                             "cpu_util")
+            self.assertTrue(sample.counter_volume > 0.4)
+            self.assertTrue(sample.counter_volume <= 0.8)
+
+    def test_query_filter_with_empty_in(self):
+        results = list(
+            self.conn.query_samples(filter_expr={"in": {"resource_id": []}}))
+        self.assertEqual(len(results), 0)
 
 
 class StatisticsTest(DBTestBase,

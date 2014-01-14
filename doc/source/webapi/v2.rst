@@ -95,7 +95,7 @@ Complex Query
 +++++++++++++
 The filter expressions of the Complex Query feature operate on the fields
 of *Sample*, *Alarm* and *AlarmChange*. The following comparison operators are
-supported: *=*, *!=*, *<*, *<=*, *>* and *>=*; and the following logical
+supported: *=*, *!=*, *<*, *<=*, *>*, *>=* and *in*; and the following logical
 operators can be used: *and* and *or*. The field names are validated against
 the database models.
 
