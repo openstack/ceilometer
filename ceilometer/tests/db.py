@@ -33,6 +33,10 @@ from ceilometer.tests import base as test_base
 class TestBase(test_base.BaseTestCase):
     def setUp(self):
         super(TestBase, self).setUp()
+
+        if self.database_connection is None:
+            self.skipTest("No connection URL set")
+
         self.CONF = self.useFixture(config.Config()).conf
         self.CONF.set_override('connection', str(self.database_connection),
                                group='database')
