@@ -510,9 +510,14 @@ shipped in the Ceilometer egg and defined in the entry_points as follows::
 To use both dispatchers on a Ceilometer collector service, add the following
 line in file ceilometer.conf::
 
-   [collector]
+   [DEFAULT]
    dispatcher=database
    dispatcher=file
+
+.. note::
+
+    dispatcher is in [collector] section in Havana release, but it is
+    deprecated in Icehouse.
 
 If there is no dispatcher present, database dispatcher is used as the
 default. If in some cases such as traffic tests, no dispatcher is needed,
