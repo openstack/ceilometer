@@ -1250,8 +1250,8 @@ class Alarm(_Base):
 
     @staticmethod
     def validate(alarm):
-        if (alarm.threshold_rule == wtypes.Unset
-                and alarm.combination_rule == wtypes.Unset):
+        if (alarm.threshold_rule in (wtypes.Unset, None)
+                and alarm.combination_rule in (wtypes.Unset, None)):
             error = _("either threshold_rule or combination_rule "
                       "must be set")
             raise ClientSideError(error)
