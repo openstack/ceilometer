@@ -82,7 +82,14 @@ class Client(object):
             instance.flavor[attr] = getattr(flavor, attr, default)
 
     def _with_image(self, instance):
-        iid = instance.image['id']
+        try:
+            iid = instance.image['id']
+        except TypeError:
+            instance.image = None
+            instance.kernel_id = None
+            instance.ramdisk_id = None
+            return
+
         try:
             image = self.nova_client.images.get(iid)
         except novaclient.exceptions.NotFound:
