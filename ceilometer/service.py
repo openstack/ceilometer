@@ -111,7 +111,7 @@ class DispatchedService(object):
 
 def prepare_service(argv=None):
     eventlet.monkey_patch()
-    gettextutils.install('ceilometer', lazy=False)
+    gettextutils.install('ceilometer', lazy=True)
     rpc.set_defaults(control_exchange='ceilometer')
     cfg.set_defaults(log.log_opts,
                      default_log_levels=['amqplib=WARN',
