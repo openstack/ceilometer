@@ -1372,7 +1372,7 @@ class AlarmController(rest.RestController):
         auth_project = acl.get_limited_to_project(pecan.request.headers)
         alarms = list(self.conn.get_alarms(alarm_id=self._id,
                                            project=auth_project))
-        if len(alarms) < 1:
+        if not alarms:
             raise EntityNotFound(_('Alarm'), self._id)
         return alarms[0]
 
@@ -1574,7 +1574,7 @@ class AlarmsController(rest.RestController):
         # make sure alarms are unique by name per project.
         alarms = list(conn.get_alarms(name=data.name,
                                       project=data.project_id))
-        if len(alarms) > 0:
+        if alarms:
             raise ClientSideError(_("Alarm with that name exists"))
 
         try:
@@ -1805,7 +1805,7 @@ class EventsController(rest.RestController):
         """
         event_filter = storage.EventFilter(message_id=message_id)
         events = pecan.request.storage_conn.get_events(event_filter)
-        if len(events) == 0:
+        if not events:
             raise EntityNotFound(_("Event"), message_id)
 
         if len(events) > 1:

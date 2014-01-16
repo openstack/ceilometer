@@ -50,7 +50,7 @@ def db_version(engine):
         meta = sqlalchemy.MetaData()
         meta.reflect(bind=engine)
         tables = meta.tables
-        if len(tables) == 0:
+        if not tables:
             db_version_control(engine, 0)
             return versioning_api.db_version(engine, repository)
 

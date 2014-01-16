@@ -379,7 +379,7 @@ class Connection(base.Connection):
         LOG.debug(_("Query Resource table: %s") % q)
 
         # handle metaquery
-        if len(metaquery) > 0:
+        if metaquery:
             meta_q = []
             for k, v in metaquery.iteritems():
                 meta_q.append(
@@ -445,7 +445,7 @@ class Connection(base.Connection):
             # TODO(jd) implements using HBase capabilities
             if limit == 0:
                 break
-            if len(metaquery) > 0:
+            if metaquery:
                 for k, v in metaquery.iteritems():
                     message = json.loads(meter['f:message'])
                     metadata = message['resource_metadata']
@@ -549,7 +549,7 @@ class Connection(base.Connection):
                     start_time, ts) / period) * period
                 period_start = start_time + datetime.timedelta(0, offset)
 
-            if not len(results) or not results[-1].period_start == \
+            if not results or not results[-1].period_start == \
                     period_start:
                 if period:
                     period_end = period_start + datetime.timedelta(
@@ -770,7 +770,7 @@ def make_query(user=None, project=None, meter=None,
                      rts_end)
 
     sample_filter = None
-    if len(q):
+    if q:
         sample_filter = " AND ".join(q)
 
     if query_only:
