@@ -56,7 +56,7 @@ This example ``localrc`` file shows all of the settings required for
 ceilometer::
 
    # Enable the ceilometer metering services
-   enable_service ceilometer-acompute,ceilometer-acentral,ceilometer-collector
+   enable_service ceilometer-acompute ceilometer-acentral ceilometer-anotification ceilometer-collector
 
    # Enable the ceilometer alarming services
    enable_service ceilometer-alarm-evaluator,ceilometer-alarm-notifier
