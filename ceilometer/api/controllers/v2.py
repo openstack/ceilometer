@@ -1096,6 +1096,9 @@ class AlarmThresholdRule(_Base):
     evaluation_periods = wsme.wsattr(BoundedInt(min=1), default=1)
     "The number of historical periods to evaluate the threshold"
 
+    exclude_outliers = wsme.wsattr(bool, default=False)
+    "Whether datapoints with anomolously low sample counts are excluded"
+
     def __init__(self, query=None, **kwargs):
         if query:
             query = [Query(**q) for q in query]
@@ -1128,7 +1131,8 @@ class AlarmThresholdRule(_Base):
     def as_dict(self):
         rule = self.as_dict_from_keys(['period', 'comparison_operator',
                                        'threshold', 'statistic',
-                                       'evaluation_periods', 'meter_name'])
+                                       'evaluation_periods', 'meter_name',
+                                       'exclude_outliers'])
         rule['query'] = [q.as_dict() for q in self.query]
         return rule
 

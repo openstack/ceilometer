@@ -94,8 +94,12 @@ class TestEvaluate(base.TestEvaluatorBase):
         ]
 
     @staticmethod
-    def _get_stat(attr, value):
-        return statistics.Statistics(None, {attr: value})
+    def _get_stat(attr, value, count=1):
+        return statistics.Statistics(None, {attr: value, 'count': count})
+
+    def _set_all_rules(self, field, value):
+        for alarm in self.alarms:
+            alarm.rule[field] = value
 
     def test_retry_transient_api_failure(self):
         with mock.patch('ceilometerclient.client.get_client',
@@ -148,9 +152,9 @@ class TestEvaluate(base.TestEvaluatorBase):
             update_calls = self.api_client.alarms.set_state.call_args_list
             self.assertEqual(update_calls, expected)
             reasons = ['Transition to alarm due to 5 samples outside'
-                       ' threshold, most recent: 85.0',
+                       ' threshold, most recent: %s' % avgs[-1].avg,
                        'Transition to alarm due to 4 samples outside'
-                       ' threshold, most recent: 7.0']
+                       ' threshold, most recent: %s' % maxs[-1].max]
             expected = [mock.call(alarm, 'ok', reason)
                         for alarm, reason in zip(self.alarms, reasons)]
             self.assertEqual(self.notifier.notify.call_args_list, expected)
@@ -171,9 +175,9 @@ class TestEvaluate(base.TestEvaluatorBase):
             update_calls = self.api_client.alarms.set_state.call_args_list
             self.assertEqual(update_calls, expected)
             reasons = ['Transition to ok due to 5 samples inside'
-                       ' threshold, most recent: 76.0',
+                       ' threshold, most recent: %s' % avgs[-1].avg,
                        'Transition to ok due to 4 samples inside'
-                       ' threshold, most recent: 14.0']
+                       ' threshold, most recent: %s' % maxs[-1].max]
             expected = [mock.call(alarm, 'alarm', reason)
                         for alarm, reason in zip(self.alarms, reasons)]
             self.assertEqual(self.notifier.notify.call_args_list, expected)
@@ -249,9 +253,9 @@ class TestEvaluate(base.TestEvaluatorBase):
             update_calls = self.api_client.alarms.set_state.call_args_list
             self.assertEqual(update_calls, expected)
             reasons = ['Transition to alarm due to 5 samples outside'
-                       ' threshold, most recent: 85.0',
+                       ' threshold, most recent: %s' % avgs[-1].avg,
                        'Transition to alarm due to 4 samples outside'
-                       ' threshold, most recent: 7.0']
+                       ' threshold, most recent: %s' % maxs[-1].max]
             expected = [mock.call(alarm, 'ok', reason)
                         for alarm, reason in zip(self.alarms, reasons)]
             self.assertEqual(self.notifier.notify.call_args_list, expected)
@@ -272,24 +276,36 @@ class TestEvaluate(base.TestEvaluatorBase):
             update_calls = self.api_client.alarms.set_state.call_args_list
             self.assertEqual(update_calls, expected)
             reasons = ['Transition to alarm due to 5 samples outside'
-                       ' threshold, most recent: 85.0',
+                       ' threshold, most recent: %s' % avgs[-1].avg,
                        'Transition to alarm due to 4 samples outside'
-                       ' threshold, most recent: 7.0']
+                       ' threshold, most recent: %s' % maxs[-1].max]
             expected = [mock.call(alarm, 'insufficient data', reason)
                         for alarm, reason in zip(self.alarms, reasons)]
             self.assertEqual(self.notifier.notify.call_args_list, expected)
 
-    def test_bound_duration(self):
+    def _do_test_bound_duration(self, start, exclude_outliers=None):
+        alarm = self.alarms[0]
+        if exclude_outliers is not None:
+            alarm.rule['exclude_outliers'] = exclude_outliers
         timeutils.utcnow.override_time = datetime.datetime(2012, 7, 2, 10, 45)
-        constraint = self.evaluator._bound_duration(self.alarms[0], [])
+        constraint = self.evaluator._bound_duration(alarm, [])
         self.assertEqual(constraint, [
             {'field': 'timestamp',
              'op': 'le',
              'value': timeutils.utcnow().isoformat()},
             {'field': 'timestamp',
              'op': 'ge',
-             'value': '2012-07-02T10:39:00'},
+             'value': start},
         ])
+
+    def test_bound_duration_outlier_exclusion_defaulted(self):
+        self._do_test_bound_duration('2012-07-02T10:39:00')
+
+    def test_bound_duration_outlier_exclusion_clear(self):
+        self._do_test_bound_duration('2012-07-02T10:39:00', False)
+
+    def test_bound_duration_outlier_exclusion_set(self):
+        self._do_test_bound_duration('2012-07-02T10:35:00', True)
 
     def test_threshold_endpoint_types(self):
         endpoint_types = ["internalURL", "publicURL"]
@@ -311,3 +327,81 @@ class TestEvaluate(base.TestEvaluatorBase):
                                       os_endpoint_type=conf.os_endpoint_type)]
                 actual = client.call_args_list
                 self.assertEqual(actual, expected)
+
+    def _do_test_simple_alarm_trip_outlier_exclusion(self, exclude_outliers):
+        self._set_all_rules('exclude_outliers', exclude_outliers)
+        self._set_all_alarms('ok')
+        with mock.patch('ceilometerclient.client.get_client',
+                        return_value=self.api_client):
+            # most recent datapoints inside threshold but with
+            # anomolously low sample count
+            threshold = self.alarms[0].rule['threshold']
+            avgs = [self._get_stat('avg',
+                                   threshold + (v if v < 10 else -v),
+                                   count=20 if v < 10 else 1)
+                    for v in xrange(1, 11)]
+            threshold = self.alarms[1].rule['threshold']
+            maxs = [self._get_stat('max',
+                                   threshold - (v if v < 7 else -v),
+                                   count=20 if v < 7 else 1)
+                    for v in xrange(8)]
+            self.api_client.statistics.list.side_effect = [avgs, maxs]
+            self._evaluate_all_alarms()
+            self._assert_all_alarms('alarm' if exclude_outliers else 'ok')
+            if exclude_outliers:
+                expected = [mock.call(alarm.alarm_id, state='alarm')
+                            for alarm in self.alarms]
+                update_calls = self.api_client.alarms.set_state.call_args_list
+                self.assertEqual(update_calls, expected)
+                reasons = ['Transition to alarm due to 5 samples outside'
+                           ' threshold, most recent: %s' % avgs[-2].avg,
+                           'Transition to alarm due to 4 samples outside'
+                           ' threshold, most recent: %s' % maxs[-2].max]
+                expected = [mock.call(alarm, 'ok', reason)
+                            for alarm, reason in zip(self.alarms, reasons)]
+                self.assertEqual(self.notifier.notify.call_args_list, expected)
+
+    def test_simple_alarm_trip_with_outlier_exclusion(self):
+        self. _do_test_simple_alarm_trip_outlier_exclusion(True)
+
+    def test_simple_alarm_no_trip_without_outlier_exclusion(self):
+        self. _do_test_simple_alarm_trip_outlier_exclusion(False)
+
+    def _do_test_simple_alarm_clear_outlier_exclusion(self, exclude_outliers):
+        self._set_all_rules('exclude_outliers', exclude_outliers)
+        self._set_all_alarms('alarm')
+        with mock.patch('ceilometerclient.client.get_client',
+                        return_value=self.api_client):
+            # most recent datapoints outside threshold but with
+            # anomolously low sample count
+            threshold = self.alarms[0].rule['threshold']
+            avgs = [self._get_stat('avg',
+                                   threshold - (v if v < 9 else -v),
+                                   count=20 if v < 9 else 1)
+                    for v in xrange(10)]
+            threshold = self.alarms[1].rule['threshold']
+            maxs = [self._get_stat('max',
+                                   threshold + (v if v < 8 else -v),
+                                   count=20 if v < 8 else 1)
+                    for v in xrange(1, 9)]
+            self.api_client.statistics.list.side_effect = [avgs, maxs]
+            self._evaluate_all_alarms()
+            self._assert_all_alarms('ok' if exclude_outliers else 'alarm')
+            if exclude_outliers:
+                expected = [mock.call(alarm.alarm_id, state='ok')
+                            for alarm in self.alarms]
+                update_calls = self.api_client.alarms.set_state.call_args_list
+                self.assertEqual(update_calls, expected)
+                reasons = ['Transition to ok due to 5 samples inside'
+                           ' threshold, most recent: %s' % avgs[-2].avg,
+                           'Transition to ok due to 4 samples inside'
+                           ' threshold, most recent: %s' % maxs[-2].max]
+                expected = [mock.call(alarm, 'alarm', reason)
+                            for alarm, reason in zip(self.alarms, reasons)]
+                self.assertEqual(self.notifier.notify.call_args_list, expected)
+
+    def test_simple_alarm_clear_with_outlier_exclusion(self):
+        self. _do_test_simple_alarm_clear_outlier_exclusion(True)
+
+    def test_simple_alarm_no_clear_without_outlier_exclusion(self):
+        self. _do_test_simple_alarm_clear_outlier_exclusion(False)
