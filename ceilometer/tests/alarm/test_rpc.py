@@ -100,7 +100,7 @@ class TestRPCAlarmNotifier(test.BaseTestCase):
     def test_notify_non_string_reason(self):
         self.notifier.notify(self.alarms[0], 'ok', 42)
         reason = self.notified[0][1]['args']['data']['reason']
-        self.assertTrue(isinstance(reason, basestring))
+        self.assertIsInstance(reason, basestring)
 
     def test_notify_no_actions(self):
         alarm = alarms.Alarm(None, info={

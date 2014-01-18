@@ -46,8 +46,8 @@ class TestDispatcherFile(test.BaseTestCase):
         self.assertEqual(1, len(dispatcher.log.handlers))
         # The handler should be RotatingFileHandler
         handler = dispatcher.log.handlers[0]
-        self.assertTrue(isinstance(handler,
-                                   logging.handlers.RotatingFileHandler))
+        self.assertIsInstance(handler,
+                              logging.handlers.RotatingFileHandler)
 
         msg = {'counter_name': 'test',
                'resource_id': self.id(),
@@ -78,8 +78,8 @@ class TestDispatcherFile(test.BaseTestCase):
         self.assertEqual(1, len(dispatcher.log.handlers))
         # The handler should be RotatingFileHandler
         handler = dispatcher.log.handlers[0]
-        self.assertTrue(isinstance(handler,
-                                   logging.FileHandler))
+        self.assertIsInstance(handler,
+                              logging.FileHandler)
 
         msg = {'counter_name': 'test',
                'resource_id': self.id(),
