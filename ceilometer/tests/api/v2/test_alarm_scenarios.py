@@ -26,6 +26,8 @@ import logging
 import uuid
 
 import mock
+
+from six import moves
 import testscenarios
 
 from ceilometer.storage import models
@@ -1177,7 +1179,7 @@ class TestAlarms(FunctionalTest,
 
     def test_get_alarm_history_ordered_by_recentness(self):
         alarm = self._get_alarm('a')
-        for i in xrange(10):
+        for i in moves.xrange(10):
             self._update_alarm(alarm, dict(name='%s' % i))
         alarm = self._get_alarm('a')
         self._delete_alarm(alarm)
@@ -1189,7 +1191,7 @@ class TestAlarms(FunctionalTest,
         alarm['rule'] = alarm['threshold_rule']
         del alarm['threshold_rule']
         self._assert_in_json(alarm, history[0]['detail'])
-        for i in xrange(1, 10):
+        for i in moves.xrange(1, 10):
             detail = '{"name": "%s"}' % (10 - i)
             self._assert_is_subset(dict(alarm_id=alarm['alarm_id'],
                                         detail=detail,
