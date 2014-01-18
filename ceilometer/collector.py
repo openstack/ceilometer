@@ -31,11 +31,11 @@ from ceilometer import service
 OPTS = [
     cfg.StrOpt('udp_address',
                default='0.0.0.0',
-               help='address to bind the UDP socket to'
-               'disabled if set to an empty string'),
+               help='Address to which the UDP socket is bound. Set to '
+               'an empty string to disable.'),
     cfg.IntOpt('udp_port',
                default=4952,
-               help='port to bind the UDP socket to'),
+               help='Port to which the UDP socket is bound'),
 ]
 
 cfg.CONF.register_opts(OPTS, group="collector")
