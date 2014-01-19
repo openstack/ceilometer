@@ -30,7 +30,7 @@ def recursive_keypairs(d, separator=':'):
     """
     for name, value in sorted(d.iteritems()):
         if isinstance(value, dict):
-            for subname, subvalue in recursive_keypairs(value):
+            for subname, subvalue in recursive_keypairs(value, separator):
                 yield ('%s%s%s' % (name, separator, subname), subvalue)
         elif isinstance(value, (tuple, list)):
             # When doing a pair of JSON encode/decode operations to the tuple,

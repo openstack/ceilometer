@@ -510,7 +510,13 @@ def _flatten_metadata(metadata):
     to unicode strings.
     """
     if metadata:
-        return dict((k, unicode(v))
+        # After changing recursive_keypairs` output we need to keep
+        # flattening output unchanged.
+        # Example: recursive_keypairs({'a': {'b':{'c':'d'}}}, '.')
+        # output before: a.b:c=d
+        # output now: a.b.c=d
+        # So to keep the first variant just replace all dots except the first
+        return dict((k.replace('.', ':').replace(':', '.', 1), unicode(v))
                     for k, v in utils.recursive_keypairs(metadata,
                                                          separator='.')
                     if type(v) is not set)
