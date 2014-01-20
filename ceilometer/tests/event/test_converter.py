@@ -24,7 +24,6 @@ from oslo.config import cfg as oslo_cfg
 import six
 
 from ceilometer.event import converter
-from ceilometer.openstack.common import timeutils
 from ceilometer.storage import models
 from ceilometer.tests import base
 
@@ -548,10 +547,11 @@ class TestEventDefinition(ConverterBase):
         edef = converter.EventDefinition(cfg, self.fake_plugin_mgr)
         self.assertTrue(edef.is_catchall)
 
-    def test_extract_when(self):
-        now = timeutils.utcnow()
+    @mock.patch('ceilometer.openstack.common.timeutils.utcnow')
+    def test_extract_when(self, mock_utcnow):
+        now = datetime.datetime.utcnow()
         modified = now + datetime.timedelta(minutes=1)
-        timeutils.set_time_override(now)
+        mock_utcnow.return_value = now
 
         body = {"timestamp": str(modified)}
         when = converter.EventDefinition._extract_when(body)
@@ -624,10 +624,11 @@ class TestNotificationConverter(ConverterBase):
             host='cydonia')
         self.fake_plugin_mgr = {}
 
-    def test_converter_missing_keys(self):
+    @mock.patch('ceilometer.openstack.common.timeutils.utcnow')
+    def test_converter_missing_keys(self, mock_utcnow):
         # test a malformed notification
-        now = timeutils.utcnow()
-        timeutils.set_time_override(now)
+        now = datetime.datetime.utcnow()
+        mock_utcnow.return_value = now
         c = converter.NotificationEventsConverter(
             [],
             self.fake_plugin_mgr,
