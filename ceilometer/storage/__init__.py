@@ -158,7 +158,10 @@ def dbsync():
 
 def expirer():
     service.prepare_service()
-    LOG.debug(_("Clearing expired metering data"))
-    storage_conn = get_connection(cfg.CONF)
-    storage_conn.clear_expired_metering_data(
-        cfg.CONF.database.time_to_live)
+    if cfg.CONF.database.time_to_live > 0:
+        LOG.debug(_("Clearing expired metering data"))
+        storage_conn = get_connection(cfg.CONF)
+        storage_conn.clear_expired_metering_data(
+            cfg.CONF.database.time_to_live)
+    else:
+        LOG.info(_("Nothing to clean, database time to live is disabled"))
