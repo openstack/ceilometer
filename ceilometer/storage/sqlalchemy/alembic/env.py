@@ -15,7 +15,6 @@ from logging import config as log_config
 
 from alembic import context
 
-import ceilometer.openstack.common.db.sqlalchemy.session as sqlalchemy_session
 from ceilometer.storage.sqlalchemy import models
 
 # this is the Alembic Config object, which provides
@@ -56,23 +55,20 @@ def run_migrations_offline():
         context.run_migrations()
 
 
-def run_migrations_online():
+def run_migrations_online(engine):
     """Run migrations in 'online' mode.
 
     In this scenario we need to create an Engine
     and associate a connection with the context.
 
     """
-    engine = sqlalchemy_session.get_session().get_bind()
-
     connection = engine.connect()
     context.configure(connection=connection, target_metadata=target_metadata)
 
     with context.begin_transaction():
         context.run_migrations()
-    connection.close()
 
 if context.is_offline_mode():
     run_migrations_offline()
 else:
-    run_migrations_online()
+    run_migrations_online(config._engine)

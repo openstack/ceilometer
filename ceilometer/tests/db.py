@@ -26,6 +26,7 @@ import warnings
 import six
 
 from ceilometer.openstack.common.fixture import config
+import ceilometer.openstack.common.fixture.mockpatch as oslo_mock
 from ceilometer import storage
 from ceilometer.tests import base as test_base
 
@@ -50,6 +51,9 @@ class TestBase(test_base.BaseTestCase):
             except storage.StorageBadVersion as e:
                 self.skipTest(str(e))
         self.conn.upgrade()
+
+        self.useFixture(oslo_mock.Patch('ceilometer.storage.get_connection',
+                                        return_value=self.conn))
 
         self.CONF([], project='ceilometer')
 

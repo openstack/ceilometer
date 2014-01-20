@@ -28,10 +28,11 @@ import repr
 
 from mock import patch
 
-import ceilometer.openstack.common.db.sqlalchemy.session as sqlalchemy_session
+from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import timeutils
 from ceilometer.storage import models
 from ceilometer.storage.sqlalchemy import models as sql_models
+from ceilometer.tests import base as tests_base
 from ceilometer.tests import db as tests_db
 from ceilometer.tests.storage import test_storage_scenarios as scenarios
 
@@ -172,21 +173,26 @@ class EventTest(EventTestBase):
         self.assertTrue(repr.repr(ev))
 
 
-class ModelTest(tests_db.TestBase):
+class ModelTest(tests_base.BaseTestCase):
     database_connection = 'mysql://localhost'
 
     def test_model_table_args(self):
+        self.CONF = self.useFixture(config.Config()).conf
+        self.CONF.set_override('connection', self.database_connection,
+                               group='database')
         self.assertIsNotNone(sql_models.table_args())
 
 
 class RelationshipTest(scenarios.DBTestBase):
-    database_connection = 'mysql://localhost'
+    # Note: Do not derive from SQLAlchemyEngineTestBase, since we
+    # don't want to automatically inherit all the Meter setup.
+    database_connection = 'sqlite://'
 
     def test_clear_metering_data_meta_tables(self):
         timeutils.utcnow.override_time = datetime.datetime(2012, 7, 2, 10, 45)
         self.conn.clear_expired_metering_data(3 * 60)
 
-        session = sqlalchemy_session.get_session()
+        session = self.conn._get_db_session()
         meta_tables = [sql_models.MetaText, sql_models.MetaFloat,
                        sql_models.MetaBigInt, sql_models.MetaBool]
         for table in meta_tables:
@@ -200,7 +206,7 @@ class RelationshipTest(scenarios.DBTestBase):
         timeutils.utcnow.override_time = datetime.datetime(2012, 7, 2, 10, 45)
         self.conn.clear_expired_metering_data(3 * 60)
 
-        session = sqlalchemy_session.get_session()
+        session = self.conn._get_db_session()
         self.assertEqual(session.query(sql_models.sourceassoc)
             .filter(~sql_models.sourceassoc.c.meter_id.in_(
                 session.query(sql_models.Meter.id)
