@@ -19,7 +19,7 @@
 """
 import datetime
 import logging
-import StringIO
+import six
 import uuid
 
 import mock
@@ -45,7 +45,7 @@ class TestCoordinate(test.BaseTestCase):
         self.partition_coordinator = coordination.PartitionCoordinator()
         self.partition_coordinator.coordination_rpc = mock.Mock()
         #add extra logger to check exception conditions and logged content
-        self.output = StringIO.StringIO()
+        self.output = six.moves.StringIO()
         self.str_handler = logging.StreamHandler(self.output)
         coordination.LOG.logger.addHandler(self.str_handler)
 

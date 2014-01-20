@@ -17,7 +17,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import cStringIO as StringIO
+import six
 
 import mock
 import webob
@@ -103,7 +103,7 @@ class TestSwiftMiddleware(test.BaseTestCase):
         req = webob.Request.blank('/1.0/account/container/obj',
                                   environ={'REQUEST_METHOD': 'PUT',
                                            'wsgi.input':
-                                           StringIO.StringIO('some stuff')})
+                                           six.moves.cStringIO('some stuff')})
         list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples
         self.assertEqual(len(samples), 2)
@@ -124,7 +124,7 @@ class TestSwiftMiddleware(test.BaseTestCase):
         req = webob.Request.blank(
             '/1.0/account/container/obj',
             environ={'REQUEST_METHOD': 'POST',
-                     'wsgi.input': StringIO.StringIO('some other stuff')})
+                     'wsgi.input': six.moves.cStringIO('some other stuff')})
         list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples
         self.assertEqual(len(samples), 2)
