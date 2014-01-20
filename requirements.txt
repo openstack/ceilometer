@@ -12,6 +12,7 @@ kombu>=2.4.8
 lockfile>=0.8
 lxml>=2.3
 msgpack-python
+netaddr>=0.7.6
 oslo.config>=1.2.0
 oslo.vmware
 pbr>=0.6,<1.0
