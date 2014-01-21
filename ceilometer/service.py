@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 #
-# Copyright © 2012 eNovance <licensing@enovance.com>
+# Copyright © 2012-2014 eNovance <licensing@enovance.com>
 #
 # Author: Julien Danjou <julien@danjou.info>
 #
@@ -17,7 +17,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import eventlet
 import os
 import socket
 import sys
@@ -110,7 +109,6 @@ class DispatchedService(object):
 
 
 def prepare_service(argv=None):
-    eventlet.monkey_patch()
     gettextutils.install('ceilometer', lazy=True)
     rpc.set_defaults(control_exchange='ceilometer')
     cfg.set_defaults(log.log_opts,
