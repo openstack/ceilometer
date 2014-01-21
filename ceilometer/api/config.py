@@ -22,8 +22,6 @@ app = {
     'modules': ['ceilometer.api'],
     'static_root': '%(confdir)s/public',
     'template_path': '%(confdir)s/ceilometer/api/templates',
-    'debug': False,
-    'enable_acl': True,
 }
 
 # Custom Configurations must be in Python dictionary format::
