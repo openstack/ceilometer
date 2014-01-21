@@ -10,7 +10,7 @@ mox>=0.5.3
 fixtures>=0.3.14
 Babel>=1.3
 http://tarballs.openstack.org/nova/nova-stable-havana.tar.gz#egg=nova
-swift
+http://tarballs.openstack.org/swift/swift-master.tar.gz#egg=swift
 # Docs Requirements
 sphinx>=1.1.2,<1.2
 sphinxcontrib-pecanwsme>=0.5
