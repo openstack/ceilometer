@@ -1091,6 +1091,11 @@ class AlarmCombinationRule(_Base):
 
 class Alarm(_Base):
     """Representation of an alarm.
+
+    .. note::
+        combination_rule and threshold_rule are mutually exclusive. The *type*
+        of the alarm should be set to *threshold* or *combination* and the
+        appropriate rule should be filled.
     """
 
     alarm_id = wtypes.text
@@ -1206,9 +1211,9 @@ class Alarm(_Base):
         return cls(alarm_id=None,
                    name="SwiftObjectAlarm",
                    description="An alarm",
-                   type='threshold',
+                   type='combination',
                    threshold_rule=None,
-                   combination_rule=None,
+                   combination_rule=AlarmCombinationRule.sample(),
                    user_id="c96c887c216949acbdfbd8b494863567",
                    project_id="c96c887c216949acbdfbd8b494863567",
                    enabled=True,
