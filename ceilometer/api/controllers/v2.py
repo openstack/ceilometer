@@ -1679,16 +1679,23 @@ class Event(_Base):
     def get_traits(self):
         return self._traits
 
-    def set_traits(self, traits):
-        self._traits = {}
-        for trait in traits:
-            if trait.dtype == storage.models.Trait.DATETIME_TYPE:
-                value = trait.value.isoformat()
-            else:
-                value = six.text_type(trait.value)
-            self._traits[trait.name] = value
+    @staticmethod
+    def _convert_storage_trait(t):
+        """Helper method to convert a storage model into an API trait
+        instance. If an API trait instance is passed in, just return it.
+        """
+        if isinstance(t, Trait):
+            return t
+        value = (six.text_type(t.value)
+                 if not t.dtype == storage.models.Trait.DATETIME_TYPE
+                 else t.value.isoformat())
+        type = storage.models.Trait.get_name_by_type(t.dtype)
+        return Trait(name=t.name, type=type, value=value)
 
-    traits = wsme.wsproperty({wtypes.text: wtypes.text},
+    def set_traits(self, traits):
+        self._traits = map(self._convert_storage_trait, traits)
+
+    traits = wsme.wsproperty(wtypes.ArrayType(Trait),
                              get_traits,
                              set_traits)
     "Event specific properties"
