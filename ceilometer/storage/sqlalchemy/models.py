@@ -22,7 +22,7 @@ import json
 import urlparse
 
 from oslo.config import cfg
-from sqlalchemy import Column, Integer, String, Table, ForeignKey, DateTime, \
+from sqlalchemy import Column, Integer, String, Table, ForeignKey, \
     Index, UniqueConstraint, BigInteger
 from sqlalchemy import Float, Boolean, Text
 from sqlalchemy.dialects.mysql import DECIMAL
@@ -265,13 +265,13 @@ class Alarm(Base):
     name = Column(Text)
     type = Column(String(50))
     description = Column(Text)
-    timestamp = Column(DateTime, default=timeutils.utcnow)
+    timestamp = Column(PreciseTimestamp, default=timeutils.utcnow)
 
     user_id = Column(String(255), ForeignKey('user.id'))
     project_id = Column(String(255), ForeignKey('project.id'))
 
     state = Column(String(255))
-    state_timestamp = Column(DateTime, default=timeutils.utcnow)
+    state_timestamp = Column(PreciseTimestamp, default=timeutils.utcnow)
 
     ok_actions = Column(JSONEncodedDict)
     alarm_actions = Column(JSONEncodedDict)
@@ -294,7 +294,7 @@ class AlarmChange(Base):
     user_id = Column(String(255), ForeignKey('user.id'))
     type = Column(String(20))
     detail = Column(Text)
-    timestamp = Column(DateTime, default=timeutils.utcnow)
+    timestamp = Column(PreciseTimestamp, default=timeutils.utcnow)
 
 
 class EventType(Base):
