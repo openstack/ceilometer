@@ -293,6 +293,20 @@ class TestAlarms(FunctionalTest,
         alarms = list(self.conn.get_alarms())
         self.assertEqual(4, len(alarms))
 
+    def test_post_null_threshold_rule(self):
+        json = {
+            'name': 'added_alarm_invalid_threshold_rule',
+            'type': 'threshold',
+            'threshold_rule': None,
+            'combination_rule': None,
+        }
+        resp = self.post_json('/alarms', params=json, expect_errors=True,
+                              status=400, headers=self.auth_headers)
+        self.assertEqual(
+            resp.json['error_message']['faultstring'],
+            "either threshold_rule or combination_rule "
+            "must be set")
+
     def test_post_invalid_alarm_statistic(self):
         json = {
             'name': 'added_alarm',
