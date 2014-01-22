@@ -14,17 +14,17 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import ConfigParser
 import functools
 import os
+import subprocess
 
 import lockfile
+from six import moves
 import sqlalchemy
 import sqlalchemy.exc
 
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log as logging
-from ceilometer.openstack.common import processutils
 from ceilometer.openstack.common.py3kcompat import urlutils
 from ceilometer.openstack.common import test
 
@@ -130,13 +130,13 @@ class BaseMigrationTestCase(test.BaseTestCase):
         # once. No need to re-run this on each test...
         LOG.debug('config_path is %s' % self.CONFIG_FILE_PATH)
         if os.path.exists(self.CONFIG_FILE_PATH):
-            cp = ConfigParser.RawConfigParser()
+            cp = moves.configparser.RawConfigParser()
             try:
                 cp.read(self.CONFIG_FILE_PATH)
                 defaults = cp.defaults()
                 for key, value in defaults.items():
                     self.test_databases[key] = value
-            except ConfigParser.ParsingError as e:
+            except moves.configparser.ParsingError as e:
                 self.fail("Failed to read test_migrations.conf config "
                           "file. Got error: %s" % e)
         else:
@@ -158,13 +158,13 @@ class BaseMigrationTestCase(test.BaseTestCase):
         super(BaseMigrationTestCase, self).tearDown()
 
     def execute_cmd(self, cmd=None):
-        out, err = processutils.trycmd(cmd, shell=True, discard_warnings=True)
-        output = out or err
+        process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,
+                                   stderr=subprocess.STDOUT)
+        output = process.communicate()[0]
         LOG.debug(output)
-        self.assertEqual('', err,
+        self.assertEqual(0, process.returncode,
                          "Failed to run: %s\n%s" % (cmd, output))
 
-    @_set_db_lock('pgadmin', 'tests-')
     def _reset_pg(self, conn_pieces):
         (user, password, database, host) = get_db_connection_info(conn_pieces)
         os.environ['PGPASSWORD'] = password
@@ -186,6 +186,7 @@ class BaseMigrationTestCase(test.BaseTestCase):
         os.unsetenv('PGPASSWORD')
         os.unsetenv('PGUSER')
 
+    @_set_db_lock(lock_prefix='migration_tests-')
     def _reset_databases(self):
         for key, engine in self.engines.items():
             conn_string = self.test_databases[key]

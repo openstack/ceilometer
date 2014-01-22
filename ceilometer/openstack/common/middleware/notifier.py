@@ -19,10 +19,11 @@ import os.path
 import sys
 import traceback as tb
 
+import six
 import webob.dec
 
 from ceilometer.openstack.common import context
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log as logging
 from ceilometer.openstack.common.middleware import base
 from ceilometer.openstack.common.notifier import api
@@ -65,7 +66,7 @@ class RequestNotifier(base.Middleware):
         include them.
 
         """
-        return dict((k, v) for k, v in environ.iteritems()
+        return dict((k, v) for k, v in six.iteritems(environ)
                     if k.isupper())
 
     @log_and_ignore_error

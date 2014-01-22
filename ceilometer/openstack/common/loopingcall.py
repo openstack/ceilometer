@@ -20,7 +20,7 @@ import sys
 from eventlet import event
 from eventlet import greenthread
 
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log as logging
 from ceilometer.openstack.common import timeutils
 

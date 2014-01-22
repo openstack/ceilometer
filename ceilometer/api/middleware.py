@@ -104,7 +104,7 @@ class ParsableErrorMiddleware(object):
                     if error is not None:
                         for fault_string in fault.findall('faultstring'):
                             fault_string.text = (
-                                gettextutils.get_localized_message(
+                                gettextutils.translate(
                                     error, user_locale))
                     body = ['<error_message>' + etree.tostring(fault)
                             + '</error_message>']
@@ -118,7 +118,7 @@ class ParsableErrorMiddleware(object):
                     fault = json.loads('\n'.join(app_iter))
                     if error is not None and 'faultstring' in fault:
                         fault['faultstring'] = (
-                            gettextutils.get_localized_message(
+                            gettextutils.translate(
                                 error, user_locale))
                     body = [json.dumps({'error_message': fault})]
                 except ValueError as err:

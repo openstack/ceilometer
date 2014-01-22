@@ -29,7 +29,7 @@ import weakref
 from oslo.config import cfg
 
 from ceilometer.openstack.common import fileutils
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import local
 from ceilometer.openstack.common import log as logging
 
@@ -138,25 +138,46 @@ _semaphores_lock = threading.Lock()
 
 
 @contextlib.contextmanager
-def lock(name, lock_file_prefix=None, external=False, lock_path=None):
-    """Context based lock
+def external_lock(name, lock_file_prefix=None, lock_path=None):
+    with internal_lock(name):
+        LOG.debug(_('Attempting to grab file lock "%(lock)s"'),
+                  {'lock': name})
 
-    This function yields a `threading.Semaphore` instance (if we don't use
-    eventlet.monkey_patch(), else `semaphore.Semaphore`) unless external is
-    True, in which case, it'll yield an InterProcessLock instance.
+        # We need a copy of lock_path because it is non-local
+        local_lock_path = lock_path or CONF.lock_path
+        if not local_lock_path:
+            raise cfg.RequiredOptError('lock_path')
 
-    :param lock_file_prefix: The lock_file_prefix argument is used to provide
-    lock files on disk with a meaningful prefix.
+        if not os.path.exists(local_lock_path):
+            fileutils.ensure_tree(local_lock_path)
+            LOG.info(_('Created lock path: %s'), local_lock_path)
 
-    :param external: The external keyword argument denotes whether this lock
-    should work across multiple processes. This means that if two different
-    workers both run a a method decorated with @synchronized('mylock',
-    external=True), only one of them will execute at a time.
+        def add_prefix(name, prefix):
+            if not prefix:
+                return name
+            sep = '' if prefix.endswith('-') else '-'
+            return '%s%s%s' % (prefix, sep, name)
 
-    :param lock_path: The lock_path keyword argument is used to specify a
-    special location for external lock files to live. If nothing is set, then
-    CONF.lock_path is used as a default.
-    """
+        # NOTE(mikal): the lock name cannot contain directory
+        # separators
+        lock_file_name = add_prefix(name.replace(os.sep, '_'),
+                                    lock_file_prefix)
+
+        lock_file_path = os.path.join(local_lock_path, lock_file_name)
+
+        try:
+            lock = InterProcessLock(lock_file_path)
+            with lock as lock:
+                LOG.debug(_('Got file lock "%(lock)s" at %(path)s'),
+                          {'lock': name, 'path': lock_file_path})
+                yield lock
+        finally:
+            LOG.debug(_('Released file lock "%(lock)s" at %(path)s'),
+                      {'lock': name, 'path': lock_file_path})
+
+
+@contextlib.contextmanager
+def internal_lock(name):
     with _semaphores_lock:
         try:
             sem = _semaphores[name]
@@ -173,46 +194,37 @@ def lock(name, lock_file_prefix=None, external=False, lock_path=None):
         local.strong_store.locks_held.append(name)
 
         try:
-            if external and not CONF.disable_process_locking:
-                LOG.debug(_('Attempting to grab file lock "%(lock)s"'),
-                          {'lock': name})
-
-                # We need a copy of lock_path because it is non-local
-                local_lock_path = lock_path or CONF.lock_path
-                if not local_lock_path:
-                    raise cfg.RequiredOptError('lock_path')
-
-                if not os.path.exists(local_lock_path):
-                    fileutils.ensure_tree(local_lock_path)
-                    LOG.info(_('Created lock path: %s'), local_lock_path)
-
-                def add_prefix(name, prefix):
-                    if not prefix:
-                        return name
-                    sep = '' if prefix.endswith('-') else '-'
-                    return '%s%s%s' % (prefix, sep, name)
-
-                # NOTE(mikal): the lock name cannot contain directory
-                # separators
-                lock_file_name = add_prefix(name.replace(os.sep, '_'),
-                                            lock_file_prefix)
-
-                lock_file_path = os.path.join(local_lock_path, lock_file_name)
-
-                try:
-                    lock = InterProcessLock(lock_file_path)
-                    with lock as lock:
-                        LOG.debug(_('Got file lock "%(lock)s" at %(path)s'),
-                                  {'lock': name, 'path': lock_file_path})
-                        yield lock
-                finally:
-                    LOG.debug(_('Released file lock "%(lock)s" at %(path)s'),
-                              {'lock': name, 'path': lock_file_path})
-            else:
-                yield sem
-
+            yield sem
         finally:
             local.strong_store.locks_held.remove(name)
+
+
+@contextlib.contextmanager
+def lock(name, lock_file_prefix=None, external=False, lock_path=None):
+    """Context based lock
+
+    This function yields a `threading.Semaphore` instance (if we don't use
+    eventlet.monkey_patch(), else `semaphore.Semaphore`) unless external is
+    True, in which case, it'll yield an InterProcessLock instance.
+
+    :param lock_file_prefix: The lock_file_prefix argument is used to provide
+      lock files on disk with a meaningful prefix.
+
+    :param external: The external keyword argument denotes whether this lock
+      should work across multiple processes. This means that if two different
+      workers both run a a method decorated with @synchronized('mylock',
+      external=True), only one of them will execute at a time.
+
+    :param lock_path: The lock_path keyword argument is used to specify a
+      special location for external lock files to live. If nothing is set, then
+      CONF.lock_path is used as a default.
+    """
+    if external and not CONF.disable_process_locking:
+        with external_lock(name, lock_file_prefix, lock_path) as lock:
+            yield lock
+    else:
+        with internal_lock(name) as lock:
+            yield lock
 
 
 def synchronized(name, lock_file_prefix=None, external=False, lock_path=None):

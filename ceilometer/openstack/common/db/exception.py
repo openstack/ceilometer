@@ -16,7 +16,7 @@
 
 """DB related custom exceptions."""
 
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 
 
 class DBError(Exception):

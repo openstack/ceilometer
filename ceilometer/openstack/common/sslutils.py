@@ -17,7 +17,7 @@ import ssl
 
 from oslo.config import cfg
 
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 
 
 ssl_opts = [

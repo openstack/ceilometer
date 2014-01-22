@@ -20,8 +20,7 @@ from oslo.config import cfg
 import webob.dec
 import webob.exc
 
-from ceilometer.openstack.common.deprecated import wsgi
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common.middleware import base
 
 
@@ -69,7 +68,7 @@ class LimitingReader(object):
 class RequestBodySizeLimiter(base.Middleware):
     """Limit the size of incoming requests."""
 
-    @webob.dec.wsgify(RequestClass=wsgi.Request)
+    @webob.dec.wsgify
     def __call__(self, req):
         if req.content_length > CONF.max_request_body_size:
             msg = _("Request is too large.")

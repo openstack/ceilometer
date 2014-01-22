@@ -41,7 +41,7 @@ from oslo.config import cfg
 import six
 from six import moves
 
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import importutils
 from ceilometer.openstack.common import jsonutils
 from ceilometer.openstack.common import local
@@ -130,7 +130,7 @@ generic_log_opts = [
 log_opts = [
     cfg.StrOpt('logging_context_format_string',
                default='%(asctime)s.%(msecs)03d %(process)d %(levelname)s '
-                       '%(name)s [%(request_id)s %(user)s %(tenant)s] '
+                       '%(name)s [%(request_id)s %(user_identity)s] '
                        '%(instance)s%(message)s',
                help='format string to use for log messages with context'),
     cfg.StrOpt('logging_default_format_string',
@@ -149,7 +149,6 @@ log_opts = [
                     'amqp=WARN',
                     'amqplib=WARN',
                     'boto=WARN',
-                    'keystone=INFO',
                     'qpid=WARN',
                     'sqlalchemy=WARN',
                     'suds=INFO',
@@ -236,10 +235,11 @@ def mask_password(message, secret="***"):
     """Replace password with 'secret' in message.
 
     :param message: The string which includes security information.
-    :param secret: value with which to replace passwords, defaults to "***".
+    :param secret: value with which to replace passwords.
     :returns: The unicode value of message with the password fields masked.
 
     For example:
+
     >>> mask_password("'adminPass' : 'aaaaa'")
     "'adminPass' : '***'"
     >>> mask_password("'admin_pass' : 'aaaaa'")
@@ -332,10 +332,12 @@ class ContextAdapter(BaseLoggerAdapter):
         elif instance_uuid:
             instance_extra = (CONF.instance_uuid_format
                               % {'uuid': instance_uuid})
-        extra.update({'instance': instance_extra})
+        extra['instance'] = instance_extra
 
-        extra.update({"project": self.project})
-        extra.update({"version": self.version})
+        extra.setdefault('user_identity', kwargs.pop('user_identity', None))
+
+        extra['project'] = self.project
+        extra['version'] = self.version
         extra['extra'] = extra.copy()
         return msg, kwargs
 
@@ -389,7 +391,7 @@ class JSONFormatter(logging.Formatter):
 def _create_logging_excepthook(product_name):
     def logging_excepthook(exc_type, value, tb):
         extra = {}
-        if CONF.verbose:
+        if CONF.verbose or CONF.debug:
             extra['exc_info'] = (exc_type, value, tb)
         getLogger(product_name).critical(str(value), **extra)
     return logging_excepthook
