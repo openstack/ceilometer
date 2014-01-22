@@ -19,7 +19,6 @@
 
 from __future__ import absolute_import
 import datetime
-import eventlet
 import operator
 import os
 import types
@@ -28,7 +27,6 @@ from sqlalchemy import and_
 from sqlalchemy import desc
 from sqlalchemy import func
 from sqlalchemy.orm import aliased
-from sqlalchemy import pool
 
 from ceilometer.openstack.common.db import exception as dbexc
 import ceilometer.openstack.common.db.sqlalchemy.session as sqlalchemy_session
@@ -178,14 +176,6 @@ class Connection(base.Connection):
             conf.database.connection = \
                 os.environ.get('CEILOMETER_TEST_SQL_URL', url)
 
-        session = sqlalchemy_session.get_session()
-        engine = session.get_bind()
-        if isinstance(engine.pool, pool.QueuePool):
-            poolsize = engine.pool.size() + engine.pool._max_overflow
-            self.pool = eventlet.GreenPool(poolsize)
-        else:
-            self.pool = None
-
     def upgrade(self):
         session = sqlalchemy_session.get_session()
         migration.db_sync(session.get_bind())
@@ -231,17 +221,8 @@ class Connection(base.Connection):
             setattr(obj, k, kwargs[k])
         return obj
 
-    def record_metering_data(self, data):
-        if self.pool:
-            if self.pool.waiting() > 0:
-                LOG.warn(_("Sqlalchemy connection pool is full, "
-                           "perhaps pool_size should be increased"))
-            self.pool.spawn(self._real_record_metering_data, data)
-        else:
-            self._real_record_metering_data(data)
-
     @classmethod
-    def _real_record_metering_data(cls, data):
+    def record_metering_data(cls, data):
         """Write the data to the backend storage system.
 
         :param data: a dictionary such as returned by
