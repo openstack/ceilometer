@@ -159,6 +159,8 @@ def make_query_from_filter(session, query, sample_filter, require_meter=True):
         query = query.filter_by(project_id=sample_filter.project)
     if sample_filter.resource:
         query = query.filter_by(resource_id=sample_filter.resource)
+    if sample_filter.message_id:
+        query = query.filter_by(message_id=sample_filter.message_id)
 
     if sample_filter.metaquery:
         query = apply_metaquery_filter(session, query,

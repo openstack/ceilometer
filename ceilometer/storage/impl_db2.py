@@ -128,6 +128,8 @@ def make_query_from_filter(sample_filter, require_meter=True):
         q['resource_id'] = sample_filter.resource
     if sample_filter.source:
         q['source'] = sample_filter.source
+    if sample_filter.message_id:
+        q['message_id'] = sample_filter.message_id
 
     # so the samples call metadata resource_metadata, so we convert
     # to that.

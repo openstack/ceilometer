@@ -95,13 +95,15 @@ class SampleFilter(object):
     :param resource: Optional filter for resource id.
     :param meter: Optional filter for meter type using the meter name.
     :param source: Optional source filter.
+    :param message_id: Optional sample_id filter.
     :param metaquery: Optional filter on the metadata
     """
     def __init__(self, user=None, project=None,
                  start=None, start_timestamp_op=None,
                  end=None, end_timestamp_op=None,
                  resource=None, meter=None,
-                 source=None, metaquery={}):
+                 source=None, message_id=None,
+                 metaquery={}):
         self.user = user
         self.project = project
         self.start = utils.sanitize_timestamp(start)
@@ -112,6 +114,7 @@ class SampleFilter(object):
         self.meter = meter
         self.source = source
         self.metaquery = metaquery
+        self.message_id = message_id
 
 
 class EventFilter(object):
