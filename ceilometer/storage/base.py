@@ -23,6 +23,8 @@ import datetime
 import math
 import six
 
+from six import moves
+
 from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import timeutils
 
@@ -39,7 +41,7 @@ def iter_period(start, end, period):
     """
     period_start = start
     increment = datetime.timedelta(seconds=period)
-    for i in xrange(int(math.ceil(
+    for i in moves.xrange(int(math.ceil(
             timeutils.delta_seconds(start, end)
             / float(period)))):
         next_start = period_start + increment

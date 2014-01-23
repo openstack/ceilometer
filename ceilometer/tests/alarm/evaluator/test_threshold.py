@@ -21,6 +21,8 @@ import datetime
 import mock
 import uuid
 
+from six import moves
+
 from ceilometer.alarm.evaluator import threshold
 from ceilometer.openstack.common import timeutils
 from ceilometer.storage import models
@@ -102,9 +104,9 @@ class TestEvaluate(base.TestEvaluatorBase):
                         return_value=self.api_client):
             broken = exc.CommunicationError(message='broken')
             avgs = [self._get_stat('avg', self.alarms[0].rule['threshold'] - v)
-                    for v in xrange(5)]
+                    for v in moves.xrange(5)]
             maxs = [self._get_stat('max', self.alarms[1].rule['threshold'] + v)
-                    for v in xrange(1, 4)]
+                    for v in moves.xrange(1, 4)]
             self.api_client.statistics.list.side_effect = [broken,
                                                            broken,
                                                            avgs,
@@ -137,9 +139,9 @@ class TestEvaluate(base.TestEvaluatorBase):
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
             avgs = [self._get_stat('avg', self.alarms[0].rule['threshold'] + v)
-                    for v in xrange(1, 6)]
+                    for v in moves.xrange(1, 6)]
             maxs = [self._get_stat('max', self.alarms[1].rule['threshold'] - v)
-                    for v in xrange(4)]
+                    for v in moves.xrange(4)]
             self.api_client.statistics.list.side_effect = [avgs, maxs]
             self._evaluate_all_alarms()
             self._assert_all_alarms('alarm')
@@ -160,9 +162,9 @@ class TestEvaluate(base.TestEvaluatorBase):
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
             avgs = [self._get_stat('avg', self.alarms[0].rule['threshold'] - v)
-                    for v in xrange(5)]
+                    for v in moves.xrange(5)]
             maxs = [self._get_stat('max', self.alarms[1].rule['threshold'] + v)
-                    for v in xrange(1, 5)]
+                    for v in moves.xrange(1, 5)]
             self.api_client.statistics.list.side_effect = [avgs, maxs]
             self._evaluate_all_alarms()
             self._assert_all_alarms('ok')
@@ -183,9 +185,9 @@ class TestEvaluate(base.TestEvaluatorBase):
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
             avgs = [self._get_stat('avg', self.alarms[0].rule['threshold'] + v)
-                    for v in xrange(5)]
+                    for v in moves.xrange(5)]
             maxs = [self._get_stat('max', self.alarms[1].rule['threshold'] - v)
-                    for v in xrange(-1, 3)]
+                    for v in moves.xrange(-1, 3)]
             self.api_client.statistics.list.side_effect = [avgs, maxs]
             self._evaluate_all_alarms()
             self._assert_all_alarms('ok')
@@ -199,9 +201,9 @@ class TestEvaluate(base.TestEvaluatorBase):
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
             avgs = [self._get_stat('avg', self.alarms[0].rule['threshold'] + v)
-                    for v in xrange(5)]
+                    for v in moves.xrange(5)]
             maxs = [self._get_stat('max', self.alarms[1].rule['threshold'] - v)
-                    for v in xrange(-1, 3)]
+                    for v in moves.xrange(-1, 3)]
             self.api_client.statistics.list.side_effect = [avgs, maxs]
             self._evaluate_all_alarms()
             self._assert_all_alarms('ok')
@@ -218,9 +220,9 @@ class TestEvaluate(base.TestEvaluatorBase):
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
             avgs = [self._get_stat('avg', self.alarms[0].rule['threshold'] + v)
-                    for v in xrange(1, 6)]
+                    for v in moves.xrange(1, 6)]
             maxs = [self._get_stat('max', self.alarms[1].rule['threshold'] - v)
-                    for v in xrange(4)]
+                    for v in moves.xrange(4)]
             self.api_client.statistics.list.side_effect = [avgs, maxs]
             self._evaluate_all_alarms()
             self._assert_all_alarms('alarm')
@@ -238,9 +240,9 @@ class TestEvaluate(base.TestEvaluatorBase):
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
             avgs = [self._get_stat('avg', self.alarms[0].rule['threshold'] + v)
-                    for v in xrange(1, 6)]
+                    for v in moves.xrange(1, 6)]
             maxs = [self._get_stat('max', self.alarms[1].rule['threshold'] - v)
-                    for v in xrange(4)]
+                    for v in moves.xrange(4)]
             self.api_client.statistics.list.side_effect = [avgs, maxs]
             self._evaluate_all_alarms()
             self._assert_all_alarms('alarm')
@@ -261,9 +263,9 @@ class TestEvaluate(base.TestEvaluatorBase):
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
             avgs = [self._get_stat('avg', self.alarms[0].rule['threshold'] + v)
-                    for v in xrange(1, 6)]
+                    for v in moves.xrange(1, 6)]
             maxs = [self._get_stat('max', self.alarms[1].rule['threshold'] - v)
-                    for v in xrange(4)]
+                    for v in moves.xrange(4)]
             self.api_client.statistics.list.side_effect = [avgs, maxs]
             self._evaluate_all_alarms()
             self._assert_all_alarms('alarm')
