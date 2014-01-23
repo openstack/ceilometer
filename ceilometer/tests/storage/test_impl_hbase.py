@@ -31,13 +31,13 @@ from ceilometer.tests import db as tests_db
 
 
 class HBaseEngineTestBase(tests_db.TestBase):
-    database_connection = 'hbase://__test__'
+    database_connection = tests_db.HBaseFakeConnectionUrl()
 
 
 class ConnectionTest(HBaseEngineTestBase):
 
     def test_hbase_connection(self):
-        self.CONF.database.connection = self.database_connection
+        self.CONF.database.connection = str(self.database_connection)
         conn = hbase.Connection(self.CONF)
         self.assertIsInstance(conn.conn, hbase.MConnection)
 
