@@ -97,7 +97,7 @@ How is data collected?
 
 In a perfect world, each and every project that you want to instrument should
 send events on the Oslo bus about anything that could be of interest to
-your. Unfortunately, not all
+you. Unfortunately, not all
 projects have implemented this and you will often need to instrument
 other tools which may not use the same bus as OpenStack has defined. To
 circumvent this, the Ceilometer project created 3 independent methods to
@@ -145,7 +145,7 @@ lead us to improve the API.
    :align: center
    :alt: data access model
 
-   This is a representation of how to access data stored by ceilometer
+   This is a representation of how to access data stored by Ceilometer
 
 The :ref:`list of currently built in meters <measurements>` is
 available in the developer documentation,
@@ -159,7 +159,7 @@ samples for new meters using those sources. This means that you can collect
 data for applications running on top of OpenStack, such as a PaaS or SaaS
 layer, and use the same tools for metering your entire cloud.
 
-Moreover, end users can also :ref:`send their own application centric data <user-defined-data>` into the
+Moreover, end users can also :ref:`send their own application specific data <user-defined-data>` into the
 database through the REST API for a various set of use cases (see the section
 “Alarming” later in this article).
 
@@ -173,7 +173,7 @@ Multi-Publisher
    :align: center
    :alt: Ceilometer pipeline
 
-   The assembly of component making the ceilometer pipeline
+   The assembly of components making the Ceilometer pipeline
 
 Publishing meters for different uses is actually a two dimensional problem.
 The first variable is the frequency of publication. Typically a meter that
@@ -211,7 +211,7 @@ Oslo RPC queue based, and one using UDP packets.
 Alarming
 --------
 
-The Alarming component of Ceilometer, which is being delivered in the Havana
+The Alarming component of Ceilometer, first delivered in the Havana
 version, allows you to set alarms based on threshold evaluation for a collection
 of samples. An alarm can be set on a single meter, or on a combination. For
 example, you may want to trigger an alarm when the memory consumption
@@ -233,7 +233,7 @@ There can be multiple form of actions, but two have been implemented so far:
    off.
 2. :term:`log`: mostly useful for debugging, stores alarms in a log file.
 
-For more details on this, I recommend you to read the blog post by
+For more details on this, I recommend you read the blog post by
 Mehdi Abaakouk `Autoscaling with Heat and Ceilometer`_. Particular attention
 should be given to the section “Some notes about deploying alarming” as the
 database setup (using a separate database from the one used for metering)
@@ -286,9 +286,9 @@ Plugins
    single: plugins; setuptools
    single: plugins; entry points
 
-Although we have described a list of the metrics ceilometer should
+Although we have described a list of the metrics Ceilometer should
 collect, we cannot predict all of the ways deployers will want to
-measure the resources their customers use. This means that ceilometer
+measure the resources their customers use. This means that Ceilometer
 needs to be easy to extend and configure so it can be tuned for each
 installation. A plugin system based on `setuptools entry points`_
 makes it easy to add new monitors in the collector or subagents for
