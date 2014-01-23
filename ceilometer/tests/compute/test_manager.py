@@ -45,8 +45,9 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
     def _raise_exception(self):
         raise Exception
 
-    def setup_manager(self):
-        self.mgr = manager.AgentManager()
+    @staticmethod
+    def create_manager():
+        return manager.AgentManager()
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):

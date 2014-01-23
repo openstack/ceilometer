@@ -23,10 +23,10 @@ import abc
 import datetime
 
 import mock
+import six
 from stevedore import extension
 from stevedore.tests import manager as extension_tests
 
-from ceilometer import agent
 from ceilometer.openstack.common.fixture import config
 from ceilometer import pipeline
 from ceilometer import plugin
@@ -68,6 +68,7 @@ class TestPollsterException(TestPollster):
         raise Exception()
 
 
+@six.add_metaclass(abc.ABCMeta)
 class BaseAgentManagerTestCase(base.BaseTestCase):
 
     class Pollster(TestPollster):
@@ -154,13 +155,13 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         )
 
     @abc.abstractmethod
-    def setup_manager(self):
-        """Setup subclass specific managers."""
+    def create_manager(self):
+        """Return subclass specific manager."""
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(BaseAgentManagerTestCase, self).setUp()
-        self.setup_manager()
+        self.mgr = self.create_manager()
         self.mgr.pollster_manager = self.create_extension_manager()
         self.pipeline_cfg = [{
             'name': "test_pipeline",
@@ -276,7 +277,8 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.assertEqual(len(pub.samples), 0)
 
     def test_agent_manager_start(self):
-        mgr = agent.AgentManager(self.mgr.pollster_manager)
+        mgr = self.create_manager()
+        mgr.pollster_manager = self.mgr.pollster_manager
         mgr.create_polling_task = mock.MagicMock()
         mgr.tg = mock.MagicMock()
         mgr.start()

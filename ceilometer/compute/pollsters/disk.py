@@ -21,6 +21,8 @@
 import abc
 import collections
 
+import six
+
 from ceilometer.compute import plugin
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
@@ -37,6 +39,7 @@ DiskIOData = collections.namedtuple(
 )
 
 
+@six.add_metaclass(abc.ABCMeta)
 class _Base(plugin.ComputePollster):
 
     DISKIO_USAGE_MESSAGE = ' '.join(["DISKIO USAGE:",
