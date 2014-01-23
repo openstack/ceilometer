@@ -1298,7 +1298,7 @@ class Alarm(_Base):
                 alarms = list(pecan.request.storage_conn.get_alarms(
                     alarm_id=id, project=project))
                 if not alarms:
-                    raise ClientSideError(_("Alarm %s doesn't exist") % id)
+                    raise EntityNotFound(_('Alarm'), id)
 
         return alarm
 
@@ -1596,7 +1596,9 @@ class AlarmsController(rest.RestController):
         alarms = list(conn.get_alarms(name=data.name,
                                       project=data.project_id))
         if alarms:
-            raise ClientSideError(_("Alarm with that name exists"))
+            raise ClientSideError(
+                _("Alarm with name='%s' exists") % data.name,
+                status_code=409)
 
         try:
             alarm_in = storage.models.Alarm(**change)
@@ -1731,7 +1733,7 @@ def requires_admin(func):
         usr_limit, proj_limit = acl.get_limited_to(pecan.request.headers)
         # If User and Project are None, you have full access.
         if usr_limit and proj_limit:
-            raise ClientSideError(_("Not Authorized"), status_code=403)
+            raise ProjectNotAuthorized(proj_limit)
         return func(*args, **kwargs)
 
     return wrapped

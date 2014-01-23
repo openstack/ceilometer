@@ -225,6 +225,6 @@ class TestAPIACL(FunctionalTest,
                                    "X-Auth-Token": VALID_TOKEN2,
                                    "X-Project-Id": "project-good"})
         except v2_api.ClientSideError as ex:
-            self.assertEqual(403, ex.code)
+            self.assertEqual(401, ex.code)
         else:
             self.fail()
