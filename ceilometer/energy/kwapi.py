@@ -82,7 +82,7 @@ class _Base(plugin.CentralPollster):
 class EnergyPollster(_Base):
     """Measures energy consumption."""
 
-    def get_samples(self, manager, cache):
+    def get_samples(self, manager, cache, resources=[]):
         """Returns all samples."""
         for probe in self._iter_probes(manager.keystone, cache):
             yield sample.Sample(
@@ -102,7 +102,7 @@ class EnergyPollster(_Base):
 class PowerPollster(_Base):
     """Measures power consumption."""
 
-    def get_samples(self, manager, cache):
+    def get_samples(self, manager, cache, resources=[]):
         """Returns all samples."""
         for probe in self._iter_probes(manager.keystone, cache):
             yield sample.Sample(

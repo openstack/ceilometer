@@ -101,7 +101,7 @@ class _Base(plugin.PollsterBase):
 
 class ImagePollster(_Base):
 
-    def get_samples(self, manager, cache):
+    def get_samples(self, manager, cache, resources=[]):
         for image in self._iter_images(manager.keystone, cache):
             yield sample.Sample(
                 name='image',
@@ -118,7 +118,7 @@ class ImagePollster(_Base):
 
 class ImageSizePollster(_Base):
 
-    def get_samples(self, manager, cache):
+    def get_samples(self, manager, cache, resources=[]):
         for image in self._iter_images(manager.keystone, cache):
             yield sample.Sample(
                 name='image.size',

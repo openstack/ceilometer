@@ -44,3 +44,8 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         self.useFixture(mockpatch.Patch(
             'keystoneclient.v2_0.client.Client',
             return_value=None))
+
+    def test_get_sample_resources(self):
+        polling_tasks = self.mgr.setup_polling_tasks()
+        self.mgr.interval_task(polling_tasks.values()[0])
+        self.assertTrue(self.Pollster.resources)
