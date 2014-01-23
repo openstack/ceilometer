@@ -110,7 +110,7 @@ collect data:
    invited to come and talk to one of the project members to learn how you
    could quickly add instrumentation for your project.
 2. :term:`Push agents` which is the only solution to fetch data within projects
-   which do not expose the required data in a remotely useable way. This is not
+   which do not expose the required data in a remotely usable way. This is not
    the preferred method as it makes deployment a bit more complex having to add
    a component to each of the nodes that need to be monitored. However, we do
    prefer this compared to a polling agent method as resilience (high
