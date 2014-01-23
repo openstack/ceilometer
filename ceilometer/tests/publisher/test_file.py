@@ -79,8 +79,8 @@ class TestFilePublisher(test.BaseTestCase):
                                   self.test_data)
 
         handler = publisher.publisher_logger.handlers[0]
-        self.assertTrue(isinstance(handler,
-                                   logging.handlers.RotatingFileHandler))
+        self.assertIsInstance(handler,
+                              logging.handlers.RotatingFileHandler)
         self.assertEqual([handler.maxBytes, handler.baseFilename,
                           handler.backupCount],
                          [50, name, 3])
@@ -97,8 +97,8 @@ class TestFilePublisher(test.BaseTestCase):
                                   self.test_data)
 
         handler = publisher.publisher_logger.handlers[0]
-        self.assertTrue(isinstance(handler,
-                                   logging.handlers.RotatingFileHandler))
+        self.assertIsInstance(handler,
+                              logging.handlers.RotatingFileHandler)
         self.assertEqual([handler.maxBytes, handler.baseFilename,
                           handler.backupCount],
                          [0, name, 0])
