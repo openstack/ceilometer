@@ -18,6 +18,7 @@
 # under the License.
 
 import datetime
+import yaml
 
 from stevedore import extension
 
@@ -1068,6 +1069,48 @@ class TestPipeline(test.BaseTestCase):
         self.assertEqual(len(pipeline_manager.pipelines[0].resources),
                          0)
 
+    def _do_test_rate_of_change_mapping(self, pipe, meters, units):
+        now = timeutils.utcnow()
+        base = 1000
+        offset = 7
+        rate = 42
+        later = now + datetime.timedelta(minutes=offset)
+        counters = []
+        for v, ts in [(base, now.isoformat()),
+                      (base + (offset * 60 * rate), later.isoformat())]:
+            for n, u, r in [(meters[0], units[0], 'resource1'),
+                            (meters[1], units[1], 'resource2')]:
+                s = sample.Sample(
+                    name=n,
+                    type=sample.TYPE_CUMULATIVE,
+                    volume=v,
+                    unit=u,
+                    user_id='test_user',
+                    project_id='test_proj',
+                    resource_id=r,
+                    timestamp=ts,
+                    resource_metadata={},
+                )
+                counters.append(s)
+
+        pipe.publish_samples(None, counters)
+        publisher = pipe.publishers[0]
+        self.assertEqual(len(publisher.samples), 2)
+        pipe.flush(None)
+        self.assertEqual(len(publisher.samples), 2)
+        bps = publisher.samples[0]
+        self.assertEqual(getattr(bps, 'name'), '%s.rate' % meters[0])
+        self.assertEqual(getattr(bps, 'resource_id'), 'resource1')
+        self.assertEqual(getattr(bps, 'unit'), '%s/s' % units[0])
+        self.assertEqual(getattr(bps, 'type'), sample.TYPE_GAUGE)
+        self.assertEqual(getattr(bps, 'volume'), rate)
+        rps = publisher.samples[1]
+        self.assertEqual(getattr(rps, 'name'), '%s.rate' % meters[1])
+        self.assertEqual(getattr(rps, 'resource_id'), 'resource2')
+        self.assertEqual(getattr(rps, 'unit'), '%s/s' % units[1])
+        self.assertEqual(getattr(rps, 'type'), sample.TYPE_GAUGE)
+        self.assertEqual(getattr(rps, 'volume'), rate)
+
     def test_rate_of_change_mapping(self):
         map_from = {'name': 'disk\\.(read|write)\\.(bytes|requests)',
                     'unit': '(B|request)'}
@@ -1089,47 +1132,49 @@ class TestPipeline(test.BaseTestCase):
         ]
         self.pipeline_cfg[0]['counters'] = ['disk.read.bytes',
                                             'disk.write.requests']
-        now = timeutils.utcnow()
-        base = 1000
-        offset = 7
-        rate = 42
-        later = now + datetime.timedelta(minutes=offset)
-        counters = []
-        for v, ts in [(base, now.isoformat()),
-                      (base + (offset * 60 * rate), later.isoformat())]:
-            for n, u, r in [('disk.read.bytes', 'B', 'resource1'),
-                            ('disk.write.requests', 'request', 'resource2')]:
-                s = sample.Sample(
-                    name=n,
-                    type=sample.TYPE_CUMULATIVE,
-                    volume=v,
-                    unit=u,
-                    user_id='test_user',
-                    project_id='test_proj',
-                    resource_id=r,
-                    timestamp=ts,
-                    resource_metadata={},
-                )
-                counters.append(s)
-
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
                                                     self.transformer_manager)
         pipe = pipeline_manager.pipelines[0]
+        meters = ('disk.read.bytes', 'disk.write.requests')
+        units = ('B', 'request')
+        self._do_test_rate_of_change_mapping(pipe, meters, units)
 
-        pipe.publish_samples(None, counters)
-        publisher = pipeline_manager.pipelines[0].publishers[0]
-        self.assertEqual(len(publisher.samples), 2)
-        pipe.flush(None)
-        self.assertEqual(len(publisher.samples), 2)
-        bps = publisher.samples[0]
-        self.assertEqual(getattr(bps, 'name'), 'disk.read.bytes.rate')
-        self.assertEqual(getattr(bps, 'resource_id'), 'resource1')
-        self.assertEqual(getattr(bps, 'unit'), 'B/s')
-        self.assertEqual(getattr(bps, 'type'), sample.TYPE_GAUGE)
-        self.assertEqual(getattr(bps, 'volume'), rate)
-        rps = publisher.samples[1]
-        self.assertEqual(getattr(rps, 'name'), 'disk.write.requests.rate')
-        self.assertEqual(getattr(rps, 'resource_id'), 'resource2')
-        self.assertEqual(getattr(rps, 'unit'), 'request/s')
-        self.assertEqual(getattr(rps, 'type'), sample.TYPE_GAUGE)
-        self.assertEqual(getattr(rps, 'volume'), rate)
+    def _do_test_rate_of_change_in_boilerplate_pipeline_cfg(self, index,
+                                                            meters, units):
+        with open('etc/ceilometer/pipeline.yaml') as fap:
+            data = fap.read()
+        pipeline_cfg = yaml.safe_load(data)
+        for p in pipeline_cfg:
+            p['publishers'] = ['test://']
+        pipeline_manager = pipeline.PipelineManager(pipeline_cfg,
+                                                    self.transformer_manager)
+        pipe = pipeline_manager.pipelines[index]
+        self._do_test_rate_of_change_mapping(pipe, meters, units)
+
+    def test_rate_of_change_boilerplate_disk_read_cfg(self):
+        meters = ('disk.read.bytes', 'disk.read.requests')
+        units = ('B', 'request')
+        self._do_test_rate_of_change_in_boilerplate_pipeline_cfg(2,
+                                                                 meters,
+                                                                 units)
+
+    def test_rate_of_change_boilerplate_disk_write_cfg(self):
+        meters = ('disk.write.bytes', 'disk.write.requests')
+        units = ('B', 'request')
+        self._do_test_rate_of_change_in_boilerplate_pipeline_cfg(2,
+                                                                 meters,
+                                                                 units)
+
+    def test_rate_of_change_boilerplate_network_incoming_cfg(self):
+        meters = ('network.incoming.bytes', 'network.incoming.packets')
+        units = ('B', 'packet')
+        self._do_test_rate_of_change_in_boilerplate_pipeline_cfg(3,
+                                                                 meters,
+                                                                 units)
+
+    def test_rate_of_change_boilerplate_network_outgoing_cfg(self):
+        meters = ('network.outgoing.bytes', 'network.outgoing.packets')
+        units = ('B', 'packet')
+        self._do_test_rate_of_change_in_boilerplate_pipeline_cfg(3,
+                                                                 meters,
+                                                                 units)
