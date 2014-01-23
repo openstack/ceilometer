@@ -505,14 +505,15 @@ def _get_query_timestamps(args={}):
 
 
 def _flatten_metadata(metadata):
-    """Return flattened resource metadata without nested structures
-    and with all values converted to unicode strings.
+    """Return flattened resource metadata with flattened nested
+    structures (except nested sets) and with all values converted
+    to unicode strings.
     """
     if metadata:
         return dict((k, unicode(v))
                     for k, v in utils.recursive_keypairs(metadata,
                                                          separator='.')
-                    if type(v) not in set([list, set]))
+                    if type(v) is not set)
     return {}
 
 

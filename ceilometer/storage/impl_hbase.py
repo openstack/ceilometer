@@ -35,6 +35,7 @@ from ceilometer.openstack.common import network_utils
 from ceilometer.openstack.common import timeutils
 from ceilometer.storage import base
 from ceilometer.storage import models
+from ceilometer import utils
 
 LOG = log.getLogger(__name__)
 
@@ -174,10 +175,11 @@ class Connection(base.Connection):
 
         # store metadata fields with prefix "r_"
         resource_metadata = {}
-        if data['resource_metadata']:
-            resource_metadata = dict(('f:r_%s' % k, v)
-                                     for (k, v)
-                                     in data['resource_metadata'].iteritems())
+        res_meta_copy = data['resource_metadata']
+        if res_meta_copy:
+            for key, v in utils.recursive_keypairs(res_meta_copy,
+                                                   separator='.'):
+                resource_metadata['f:r_%s' % key] = unicode(v)
 
         # Make sure we know about the user and project
         if data['user_id']:

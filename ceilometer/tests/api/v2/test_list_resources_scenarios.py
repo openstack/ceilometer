@@ -466,7 +466,7 @@ class TestListResources(FunctionalTest,
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.sample',
                                'dict_properties': {'key': 'value'},
-                               'ignored_list': ['not-returned'],
+                               'not_ignored_list': ['returned'],
                                },
             source='test',
         )
@@ -481,6 +481,7 @@ class TestListResources(FunctionalTest,
         self.assertEqual(
             [(u'dict_properties.key', u'value'),
              (u'display_name', u'test-server'),
+             (u'not_ignored_list', u"['returned']"),
              (u'tag', u'self.sample')
              ],
             list(sorted(metadata.iteritems())))
