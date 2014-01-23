@@ -171,7 +171,7 @@ class Meter(Model):
         """Create a new meter.
 
         :param name: name of the meter
-        :param type: type of the meter (guage, counter)
+        :param type: type of the meter (gauge, delta, cumulative)
         :param unit: unit of the meter
         :param resource_id: UUID of the resource
         :param project_id: UUID of project owning the resource

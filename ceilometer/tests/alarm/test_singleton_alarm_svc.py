@@ -71,7 +71,7 @@ class TestSingletonAlarmService(test.BaseTestCase):
             self.singleton._evaluate_assigned_alarms()
             self.threshold_eval.evaluate.assert_called_once_with(alarm)
 
-    def test_unknown_extention_skipped(self):
+    def test_unknown_extension_skipped(self):
         alarms = [
             mock.Mock(type='not_existing_type'),
             mock.Mock(type='threshold')
