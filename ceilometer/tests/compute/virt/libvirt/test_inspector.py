@@ -36,6 +36,8 @@ class TestLibvirtInspection(test.BaseTestCase):
         self.instance_name = 'instance-00000001'
         self.inspector = libvirt_inspector.LibvirtInspector()
         self.inspector.connection = mock.Mock()
+        libvirt_inspector.libvirt = mock.Mock()
+        libvirt_inspector.libvirt.VIR_DOMAIN_SHUTOFF = 5
         self.domain = mock.Mock()
         self.addCleanup(mock.patch.stopall)
 
@@ -144,7 +146,10 @@ class TestLibvirtInspection(test.BaseTestCase):
                                                  return_value=dom_xml),
                                mock.patch.object(self.domain,
                                                  'interfaceStats',
-                                                 side_effect=interfaceStats)):
+                                                 side_effect=interfaceStats),
+                               mock.patch.object(self.domain, 'info',
+                                                 return_value=(0L, 0L, 0L,
+                                                 2L, 999999L))):
             interfaces = list(self.inspector.inspect_vnics(self.instance_name))
 
             self.assertEqual(len(interfaces), 3)
@@ -186,6 +191,16 @@ class TestLibvirtInspection(test.BaseTestCase):
             self.assertEqual(info2.tx_bytes, 11L)
             self.assertEqual(info2.tx_packets, 12L)
 
+    def test_inspect_vnics_with_domain_shutoff(self):
+        connection = self.inspector.connection
+        with contextlib.nested(mock.patch.object(connection, 'lookupByName',
+                                                 return_value=self.domain),
+                               mock.patch.object(self.domain, 'info',
+                                                 return_value=(5L, 0L, 0L,
+                                                 2L, 999999L))):
+            interfaces = list(self.inspector.inspect_vnics(self.instance_name))
+            self.assertEqual(interfaces, [])
+
     def test_inspect_disks(self):
         dom_xml = """
              <domain type='kvm'>
@@ -209,7 +224,10 @@ class TestLibvirtInspection(test.BaseTestCase):
                                                  return_value=dom_xml),
                                mock.patch.object(self.domain, 'blockStats',
                                                  return_value=(1L, 2L, 3L,
-                                                              4L, -1))):
+                                                              4L, -1)),
+                               mock.patch.object(self.domain, 'info',
+                                                 return_value=(0L, 0L, 0L,
+                                                 2L, 999999L))):
                 disks = list(self.inspector.inspect_disks(self.instance_name))
 
                 self.assertEqual(len(disks), 1)
@@ -220,8 +238,21 @@ class TestLibvirtInspection(test.BaseTestCase):
                 self.assertEqual(info0.write_requests, 3L)
                 self.assertEqual(info0.write_bytes, 4L)
 
+    def test_inspect_disks_with_domain_shutoff(self):
+        connection = self.inspector.connection
+        with contextlib.nested(mock.patch.object(connection, 'lookupByName',
+                                                 return_value=self.domain),
+                               mock.patch.object(self.domain, 'info',
+                                                 return_value=(5L, 0L, 0L,
+                                                 2L, 999999L))):
+            disks = list(self.inspector.inspect_disks(self.instance_name))
+            self.assertEqual(disks, [])
+
 
 class TestLibvirtInspectionWithError(test.BaseTestCase):
+
+    class fakeLibvirtError(Exception):
+        pass
 
     def setUp(self):
         super(TestLibvirtInspectionWithError, self).setUp()
@@ -230,11 +261,12 @@ class TestLibvirtInspectionWithError(test.BaseTestCase):
             'ceilometer.compute.virt.libvirt.inspector.'
             'LibvirtInspector._get_connection',
             self._dummy_get_connection))
+        libvirt_inspector.libvirt = mock.Mock()
+        libvirt_inspector.libvirt.libvirtError = self.fakeLibvirtError
 
     def _dummy_get_connection(*args, **kwargs):
         raise Exception('dummy')
 
     def test_inspect_unknown_error(self):
-
         self.assertRaises(virt_inspector.InspectorException,
                           self.inspector.inspect_cpus, 'foo')

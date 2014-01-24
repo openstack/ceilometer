@@ -107,11 +107,17 @@ class LibvirtInspector(virt_inspector.Inspector):
 
     def inspect_cpus(self, instance_name):
         domain = self._lookup_by_name(instance_name)
-        (_, _, _, num_cpu, cpu_time) = domain.info()
+        (__, __, __, num_cpu, cpu_time) = domain.info()
         return virt_inspector.CPUStats(number=num_cpu, time=cpu_time)
 
     def inspect_vnics(self, instance_name):
         domain = self._lookup_by_name(instance_name)
+        (state, __, __, __, __) = domain.info()
+        if state == libvirt.VIR_DOMAIN_SHUTOFF:
+            LOG.warn(_('Failed to inspect vnics of %(instance_name)s, '
+                       'domain is in state of SHUTOFF'),
+                     {'instance_name': instance_name})
+            return
         tree = etree.fromstring(domain.XMLDesc(0))
         for iface in tree.findall('devices/interface'):
             target = iface.find('target')
@@ -132,8 +138,8 @@ class LibvirtInspector(virt_inspector.Inspector):
                           for p in iface.findall('filterref/parameter'))
             interface = virt_inspector.Interface(name=name, mac=mac_address,
                                                  fref=fref, parameters=params)
-            rx_bytes, rx_packets, _, _, \
-                tx_bytes, tx_packets, _, _ = domain.interfaceStats(name)
+            rx_bytes, rx_packets, __, __, \
+                tx_bytes, tx_packets, __, __ = domain.interfaceStats(name)
             stats = virt_inspector.InterfaceStats(rx_bytes=rx_bytes,
                                                   rx_packets=rx_packets,
                                                   tx_bytes=tx_bytes,
@@ -142,6 +148,12 @@ class LibvirtInspector(virt_inspector.Inspector):
 
     def inspect_disks(self, instance_name):
         domain = self._lookup_by_name(instance_name)
+        (state, __, __, __, __) = domain.info()
+        if state == libvirt.VIR_DOMAIN_SHUTOFF:
+            LOG.warn(_('Failed to inspect disks of %(instance_name)s, '
+                       'domain is in state of SHUTOFF'),
+                     {'instance_name': instance_name})
+            return
         tree = etree.fromstring(domain.XMLDesc(0))
         for device in filter(
                 bool,
