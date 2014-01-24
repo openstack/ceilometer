@@ -710,9 +710,9 @@ class MeterController(rest.RestController):
         'statistics': ['GET'],
     }
 
-    def __init__(self, meter_id):
-        pecan.request.context['meter_id'] = meter_id
-        self._id = meter_id
+    def __init__(self, meter_name):
+        pecan.request.context['meter_name'] = meter_name
+        self.meter_name = meter_name
 
     @wsme_pecan.wsexpose([OldSample], [Query], int)
     def get_all(self, q=[], limit=None):
@@ -724,7 +724,7 @@ class MeterController(rest.RestController):
         if limit and limit < 0:
             raise ClientSideError(_("Limit must be positive"))
         kwargs = _query_to_kwargs(q, storage.SampleFilter.__init__)
-        kwargs['meter'] = self._id
+        kwargs['meter'] = self.meter_name
         f = storage.SampleFilter(**kwargs)
         return [OldSample.from_db_model(e)
                 for e in pecan.request.storage_conn.get_samples(f, limit=limit)
@@ -744,9 +744,9 @@ class MeterController(rest.RestController):
 
         published_samples = []
         for s in samples:
-            if self._id != s.counter_name:
+            if self.meter_name != s.counter_name:
                 raise wsme.exc.InvalidInput('counter_name', s.counter_name,
-                                            'should be %s' % self._id)
+                                            'should be %s' % self.meter_name)
 
             if s.message_id:
                 raise wsme.exc.InvalidInput('message_id', s.message_id,
@@ -802,7 +802,7 @@ class MeterController(rest.RestController):
             raise ClientSideError(_("Period must be positive."))
 
         kwargs = _query_to_kwargs(q, storage.SampleFilter.__init__)
-        kwargs['meter'] = self._id
+        kwargs['meter'] = self.meter_name
         f = storage.SampleFilter(**kwargs)
         g = _validate_groupby_fields(groupby)
         computed = pecan.request.storage_conn.get_meter_statistics(f,
@@ -875,11 +875,11 @@ class MetersController(rest.RestController):
     """Works on meters."""
 
     @pecan.expose()
-    def _lookup(self, meter_id, *remainder):
+    def _lookup(self, meter_name, *remainder):
         # NOTE(gordc): drop last path if empty (Bug #1202739)
         if remainder and not remainder[-1]:
             remainder = remainder[:-1]
-        return MeterController(meter_id), remainder
+        return MeterController(meter_name), remainder
 
     @wsme_pecan.wsexpose([Meter], [Query])
     def get_all(self, q=[]):
