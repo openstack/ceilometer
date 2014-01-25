@@ -312,8 +312,6 @@ class Connection(base.Connection):
             query = session.query(models.User).filter(
                 ~models.User.id.in_(session.query(models.Meter.user_id)
                                     .group_by(models.Meter.user_id)),
-                ~models.User.id.in_(session.query(models.Alarm.user_id)
-                                    .group_by(models.Alarm.user_id)),
                 ~models.User.id.in_(session.query(models.AlarmChange.user_id)
                                     .group_by(models.AlarmChange.user_id))
             )
@@ -324,9 +322,6 @@ class Connection(base.Connection):
                 .filter(~models.Project.id.in_(
                     session.query(models.Meter.project_id)
                         .group_by(models.Meter.project_id)),
-                        ~models.Project.id.in_(
-                            session.query(models.Alarm.project_id)
-                            .group_by(models.Alarm.project_id)),
                         ~models.Project.id.in_(
                             session.query(models.AlarmChange.project_id)
                             .group_by(models.AlarmChange.project_id)),
@@ -729,10 +724,6 @@ class Connection(base.Connection):
         """
         session = sqlalchemy_session.get_session()
         with session.begin():
-            Connection._create_or_update(session, models.User,
-                                         alarm.user_id)
-            Connection._create_or_update(session, models.Project,
-                                         alarm.project_id)
             alarm_row = models.Alarm(id=alarm.alarm_id)
             alarm_row.update(alarm.as_dict())
             session.add(alarm_row)
