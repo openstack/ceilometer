@@ -118,7 +118,8 @@ class Message(six.text_type):
     and can be treated as such.
     """
 
-    def __new__(cls, msgid, msgtext=None, params=None, domain='ceilometer', *args):
+    def __new__(cls, msgid, msgtext=None, params=None,
+                domain='ceilometer', *args):
         """Create a new Message object.
 
         In order for translation to work gettext requires a message ID, this
@@ -193,10 +194,11 @@ class Message(six.text_type):
         # When we mod a Message we want the actual operation to be performed
         # by the parent class (i.e. unicode()), the only thing  we do here is
         # save the original msgid and the parameters in case of a translation
-        unicode_mod = super(Message, self).__mod__(other)
+        params = self._sanitize_mod_params(other)
+        unicode_mod = super(Message, self).__mod__(params)
         modded = Message(self.msgid,
                          msgtext=unicode_mod,
-                         params=self._sanitize_mod_params(other),
+                         params=params,
                          domain=self.domain)
         return modded
 
@@ -235,8 +237,17 @@ class Message(six.text_type):
             params = self._copy_param(dict_param)
         else:
             params = {}
+            # Save our existing parameters as defaults to protect
+            # ourselves from losing values if we are called through an
+            # (erroneous) chain that builds a valid Message with
+            # arguments, and then does something like "msg % kwds"
+            # where kwds is an empty dictionary.
+            src = {}
+            if isinstance(self.params, dict):
+                src.update(self.params)
+            src.update(dict_param)
             for key in keys:
-                params[key] = self._copy_param(dict_param[key])
+                params[key] = self._copy_param(src[key])
 
         return params
 
@@ -287,9 +298,27 @@ def get_available_languages(domain):
     list_identifiers = (getattr(localedata, 'list', None) or
                         getattr(localedata, 'locale_identifiers'))
     locale_identifiers = list_identifiers()
+
     for i in locale_identifiers:
         if find(i) is not None:
             language_list.append(i)
+
+    # NOTE(luisg): Babel>=1.0,<1.3 has a bug where some OpenStack supported
+    # locales (e.g. 'zh_CN', and 'zh_TW') aren't supported even though they
+    # are perfectly legitimate locales:
+    #     https://github.com/mitsuhiko/babel/issues/37
+    # In Babel 1.3 they fixed the bug and they support these locales, but
+    # they are still not explicitly "listed" by locale_identifiers().
+    # That is  why we add the locales here explicitly if necessary so that
+    # they are listed as supported.
+    aliases = {'zh': 'zh_CN',
+               'zh_Hant_HK': 'zh_HK',
+               'zh_Hant': 'zh_TW',
+               'fil': 'tl_PH'}
+    for (locale, alias) in six.iteritems(aliases):
+        if locale in language_list and alias not in language_list:
+            language_list.append(alias)
+
     _AVAILABLE_LANGUAGES[domain] = language_list
     return copy.copy(language_list)
 
