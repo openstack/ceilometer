@@ -165,6 +165,8 @@ database through the REST API for a various set of use cases (see the section
 
 .. _send their own application centric data: ./webapi/v2.html#user-defined-data
 
+.. _multi-publisher:
+
 Multi-Publisher
 ---------------
 
@@ -334,6 +336,8 @@ API changes.
    use it (or adapt it as necessary for our use). If it remains part
    of Nova for Folsom we should probably not depend on it because
    loading plugins is trivial with setuptools.
+
+.. _polling:
 
 Polling
 -------
