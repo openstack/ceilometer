@@ -18,21 +18,10 @@
 
 import sqlalchemy as sa
 
+from ceilometer.storage.sqlalchemy import migration
 from ceilometer.storage.sqlalchemy import models
 
 _col = 'timestamp'
-
-
-def _paged(query, size):
-    offset = 0
-    while True:
-        page = query.offset(offset).limit(size).execute()
-        if page.rowcount <= 0:
-            # There are no more rows
-            break
-        for row in page:
-            yield row
-        offset += size
 
 
 def _convert_data_type(table, col, from_t, to_t, pk_attr='id', index=False):
@@ -49,7 +38,7 @@ def _convert_data_type(table, col, from_t, to_t, pk_attr='id', index=False):
     new_col = getattr(table.c, temp_col_n)
 
     query = sa.select([key_attr, orig_col])
-    for key, value in _paged(query, 1000):
+    for key, value in migration.paged(query):
         table.update().where(key_attr == key)\
             .values({temp_col_n: value}).execute()
 
