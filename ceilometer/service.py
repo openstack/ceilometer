@@ -33,15 +33,13 @@ from ceilometer.openstack.common import rpc
 OPTS = [
     cfg.StrOpt('host',
                default=socket.gethostname(),
-               help='Name of this node.  This can be an opaque identifier.  '
-               'It is not necessarily a hostname, FQDN, or IP address. '
-               'However, the node name must be valid within '
-               'an AMQP key, and if using ZeroMQ, a valid '
-               'hostname, FQDN, or IP address'),
+               help='Name of this node, which must be valid in an AMQP '
+               'key. Can be an opaque identifier. For ZeroMQ only, must '
+               'be a valid host name, FQDN, or IP address.'),
     cfg.MultiStrOpt('dispatcher',
                     deprecated_group="collector",
                     default=['database'],
-                    help='dispatcher to process data'),
+                    help='Dispatcher to process data'),
 ]
 cfg.CONF.register_opts(OPTS)
 
@@ -49,20 +47,20 @@ CLI_OPTIONS = [
     cfg.StrOpt('os-username',
                deprecated_group="DEFAULT",
                default=os.environ.get('OS_USERNAME', 'ceilometer'),
-               help='Username to use for openstack service access'),
+               help='User name to use for OpenStack service access'),
     cfg.StrOpt('os-password',
                deprecated_group="DEFAULT",
                secret=True,
                default=os.environ.get('OS_PASSWORD', 'admin'),
-               help='Password to use for openstack service access'),
+               help='Password to use for OpenStack service access'),
     cfg.StrOpt('os-tenant-id',
                deprecated_group="DEFAULT",
                default=os.environ.get('OS_TENANT_ID', ''),
-               help='Tenant ID to use for openstack service access'),
+               help='Tenant ID to use for OpenStack service access'),
     cfg.StrOpt('os-tenant-name',
                deprecated_group="DEFAULT",
                default=os.environ.get('OS_TENANT_NAME', 'admin'),
-               help='Tenant name to use for openstack service access'),
+               help='Tenant name to use for OpenStack service access'),
     cfg.StrOpt('os-cacert',
                default=os.environ.get('OS_CACERT', None),
                help='Certificate chain for SSL validation'),
@@ -70,19 +68,19 @@ CLI_OPTIONS = [
                deprecated_group="DEFAULT",
                default=os.environ.get('OS_AUTH_URL',
                                       'http://localhost:5000/v2.0'),
-               help='Auth URL to use for openstack service access'),
+               help='Auth URL to use for OpenStack service access'),
     cfg.StrOpt('os-region-name',
                deprecated_group="DEFAULT",
                default=os.environ.get('OS_REGION_NAME', None),
-               help='Region name to use for openstack service endpoints'),
+               help='Region name to use for OpenStack service endpoints'),
     cfg.StrOpt('os-endpoint-type',
                default=os.environ.get('OS_ENDPOINT_TYPE', 'publicURL'),
                help='Type of endpoint in Identity service catalog to use for '
                     'communication with OpenStack services.'),
     cfg.BoolOpt('insecure',
                 default=False,
-                help='Does not perform X.509 certificate validation when'
-                     'establishing SSL connection with identity service.'),
+                help='Disables X.509 certificate validation when an '
+                     'SSL connection to Identity Service is established.'),
 ]
 cfg.CONF.register_cli_opts(CLI_OPTIONS, group="service_credentials")
 

@@ -32,13 +32,12 @@
 # Options defined in ceilometer.service
 #
 
-# Name of this node.  This can be an opaque identifier.  It is
-# not necessarily a hostname, FQDN, or IP address. However,
-# the node name must be valid within an AMQP key, and if using
-# ZeroMQ, a valid hostname, FQDN, or IP address (string value)
+# Name of this node, which must be valid in an AMQP key. Can
+# be an opaque identifier. For ZeroMQ only, must be a valid
+# host name, FQDN, or IP address. (string value)
 #host=ceilometer
 
-# dispatcher to process data (multi valued)
+# Dispatcher to process data (multi valued)
 #dispatcher=database
 
 
@@ -66,11 +65,11 @@
 # Options defined in ceilometer.compute.pollsters.util
 #
 
-# list of metadata prefixes reserved for metering use (list
+# List of metadata prefixes reserved for metering use (list
 # value)
 #reserved_metadata_namespace=metering.
 
-# limit on length of reserved metadata values (integer value)
+# Limit on length of reserved metadata values (integer value)
 #reserved_metadata_length=256
 
 
@@ -539,12 +538,12 @@
 # Options defined in ceilometer.alarm.rpc
 #
 
-# the topic ceilometer uses for alarm notifier messages
+# The topic that ceilometer uses for alarm notifier messages
 # (string value)
 #notifier_rpc_topic=alarm_notifier
 
-# the topic ceilometer uses for alarm partition coordination
-# messages (string value)
+# The topic that ceilometer uses for alarm partition
+# coordination messages (string value)
 #partition_rpc_topic=alarm_partition_coordination
 
 
@@ -590,11 +589,11 @@
 # Options defined in ceilometer.collector
 #
 
-# address to bind the UDP socket todisabled if set to an empty
-# string (string value)
+# Address to which the UDP socket is bound. Set to an empty
+# string to disable. (string value)
 #udp_address=0.0.0.0
 
-# port to bind the UDP socket to (integer value)
+# Port to which the UDP socket is bound (integer value)
 #udp_port=4952
 
 
@@ -897,7 +896,7 @@
 # Options defined in ceilometer.publisher.rpc
 #
 
-# the topic ceilometer uses for metering messages (string
+# The topic that ceilometer uses for metering messages (string
 # value)
 #metering_topic=metering
 
@@ -918,26 +917,26 @@
 # Options defined in ceilometer.service
 #
 
-# Username to use for openstack service access (string value)
+# User name to use for OpenStack service access (string value)
 #os_username=ceilometer
 
-# Password to use for openstack service access (string value)
+# Password to use for OpenStack service access (string value)
 #os_password=admin
 
-# Tenant ID to use for openstack service access (string value)
+# Tenant ID to use for OpenStack service access (string value)
 #os_tenant_id=
 
-# Tenant name to use for openstack service access (string
+# Tenant name to use for OpenStack service access (string
 # value)
 #os_tenant_name=admin
 
 # Certificate chain for SSL validation (string value)
 #os_cacert=<None>
 
-# Auth URL to use for openstack service access (string value)
+# Auth URL to use for OpenStack service access (string value)
 #os_auth_url=http://localhost:5000/v2.0
 
-# Region name to use for openstack service endpoints (string
+# Region name to use for OpenStack service endpoints (string
 # value)
 #os_region_name=<None>
 
@@ -945,9 +944,8 @@
 # communication with OpenStack services. (string value)
 #os_endpoint_type=publicURL
 
-# Does not perform X.509 certificate validation
-# whenestablishing SSL connection with identity service.
-# (boolean value)
+# Disables X.509 certificate validation when an SSL connection
+# to Identity Service is established. (boolean value)
 #insecure=false
 
 

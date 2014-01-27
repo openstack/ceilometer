@@ -27,10 +27,11 @@ from ceilometer.storage import models
 OPTS = [
     cfg.StrOpt('notifier_rpc_topic',
                default='alarm_notifier',
-               help='the topic ceilometer uses for alarm notifier messages'),
+               help='The topic that ceilometer uses for alarm notifier '
+                    'messages'),
     cfg.StrOpt('partition_rpc_topic',
                default='alarm_partition_coordination',
-               help='the topic ceilometer uses for alarm partition '
+               help='The topic that ceilometer uses for alarm partition '
                     'coordination messages'),
 ]
 
