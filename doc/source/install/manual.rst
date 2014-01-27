@@ -467,6 +467,23 @@ Configuring keystone to work with API
    default port value for ceilometer API is 8777. If the port value
    has been customized, adjust accordingly.
 
+
+Configuring Heat to send notifications
+======================================
+
+Configure the driver in ``heat.conf``
+
+   ::
+
+        notification_driver=heat.openstack.common.notifier.rpc_notifier
+
+Or if migration to oslo.messaging is done for Icehouse:
+
+   ::
+
+        notification_driver=oslo.messaging.notifier.Notifier
+
+
 Notifications queues
 ========================
 
