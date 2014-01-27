@@ -21,7 +21,6 @@ import contextlib
 
 import mock
 from stevedore import extension
-from stevedore.tests import manager as extension_tests
 
 from ceilometer.alarm import service
 from ceilometer.openstack.common.fixture import config
@@ -43,14 +42,15 @@ class TestPartitionedAlarmService(test.BaseTestCase):
         self.partitioned = service.PartitionedAlarmService()
         self.partitioned.tg = mock.Mock()
         self.partitioned.partition_coordinator = mock.Mock()
-        self.extension_mgr = extension_tests.TestExtensionManager(
+        self.extension_mgr = extension.ExtensionManager.make_test_instance(
             [
                 extension.Extension(
                     'threshold',
                     None,
                     None,
                     self.threshold_eval, ),
-            ])
+            ]
+        )
         self.partitioned.extension_manager = self.extension_mgr
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())

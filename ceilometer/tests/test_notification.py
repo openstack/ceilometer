@@ -20,7 +20,6 @@
 import mock
 
 from stevedore import extension
-from stevedore.tests import manager as test_manager
 
 from ceilometer.compute.notifications import instance
 from ceilometer import notification
@@ -86,6 +85,16 @@ class TestNotification(tests_base.BaseTestCase):
         self.CONF = self.useFixture(config.Config()).conf
         self.CONF.set_override("connection", "log://", group='database')
 
+    def _make_test_manager(self, plugin):
+        return extension.ExtensionManager.make_test_instance(
+            [
+                extension.Extension('test',
+                                    None,
+                                    None,
+                                    plugin),
+            ]
+        )
+
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     @mock.patch('ceilometer.event.converter.setup_events', mock.MagicMock())
     def test_process_notification(self):
@@ -96,13 +105,9 @@ class TestNotification(tests_base.BaseTestCase):
         with mock.patch('ceilometer.openstack.common.rpc.create_connection'):
             self.srv.start()
         self.srv.pipeline_manager.pipelines[0] = mock.MagicMock()
-        self.srv.notification_manager = test_manager.TestExtensionManager(
-            [extension.Extension('test',
-                                 None,
-                                 None,
-                                 instance.Instance(),
-                                 ),
-             ])
+        self.srv.notification_manager = self._make_test_manager(
+            instance.Instance()
+        )
         self.srv.process_notification(TEST_NOTICE)
         self.assertTrue(
             self.srv.pipeline_manager.publisher.called)
@@ -129,13 +134,7 @@ class TestNotification(tests_base.BaseTestCase):
         self.srv.event_converter = mock.MagicMock()
         self.srv.event_converter.to_event.return_value = mock.MagicMock(
             event_type='test.test')
-        self.srv.dispatcher_manager = test_manager.TestExtensionManager(
-            [extension.Extension('test',
-                                 None,
-                                 None,
-                                 mock_dispatcher
-                                 ),
-             ])
+        self.srv.dispatcher_manager = self._make_test_manager(mock_dispatcher)
         mock_dispatcher.record_events.return_value = [
             (models.Event.DUPLICATE, object())]
         message = {'event_type': "foo", 'message_id': "abc"}
@@ -147,13 +146,7 @@ class TestNotification(tests_base.BaseTestCase):
         self.srv.event_converter = mock.MagicMock()
         self.srv.event_converter.to_event.return_value = mock.MagicMock(
             event_type='test.test')
-        self.srv.dispatcher_manager = test_manager.TestExtensionManager(
-            [extension.Extension('test',
-                                 None,
-                                 None,
-                                 mock_dispatcher
-                                 ),
-             ])
+        self.srv.dispatcher_manager = self._make_test_manager(mock_dispatcher)
         mock_dispatcher.record_events.return_value = [
             (models.Event.UNKNOWN_PROBLEM, object())]
         message = {'event_type': "foo", 'message_id': "abc"}

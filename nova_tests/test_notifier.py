@@ -25,7 +25,6 @@ import datetime
 import mock
 
 from stevedore import extension
-from stevedore.tests import manager as test_manager
 
 ## NOTE(dhellmann): These imports are not in the generally approved
 ## alphabetical order, but they are in the order that actually
@@ -187,13 +186,15 @@ class TestNovaNotifier(test.BaseTestCase):
         # plugin and to invoke our notifier plugin.
         self.notifications = []
 
-        ext_mgr = test_manager.TestExtensionManager([
-            extension.Extension('test',
-                                None,
-                                None,
-                                self.Pollster(),
+        ext_mgr = extension.ExtensionManager.make_test_instance(
+            extensions=[
+                extension.Extension('test',
+                                    None,
+                                    None,
+                                    self.Pollster(),
                                 ),
-        ])
+            ],
+        )
         self.ext_mgr = ext_mgr
         self.gatherer = nova_notifier.DeletedInstanceStatsGatherer(ext_mgr)
         # Initialize the global _gatherer in nova_notifier to use the
