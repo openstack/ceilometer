@@ -105,19 +105,19 @@ Network (Neutron)
 ========================  ==========  ========  ========  ============  ======================================================
 Name                      Type        Unit      Resource  Origin        Note
 ========================  ==========  ========  ========  ============  ======================================================
-network                   Gauge       network   netw ID   notification  Duration of network
+network                   Gauge       network   netw ID   notification  Existence of network
 network.create            Delta       network   netw ID   notification  Creation requests for this network
 network.update            Delta       network   netw ID   notification  Update requests for this network
-subnet                    Gauge       subnet    subnt ID  notification  Duration of subnet
+subnet                    Gauge       subnet    subnt ID  notification  Existence of subnet
 subnet.create             Delta       subnet    subnt ID  notification  Creation requests for this subnet
 subnet.update             Delta       subnet    subnt ID  notification  Update requests for this subnet
-port                      Gauge       port      port ID   notification  Duration of port
+port                      Gauge       port      port ID   notification  Existence of port
 port.create               Delta       port      port ID   notification  Creation requests for this port
 port.update               Delta       port      port ID   notification  Update requests for this port
-router                    Gauge       router    rtr ID    notification  Duration of router
+router                    Gauge       router    rtr ID    notification  Existence of router
 router.create             Delta       router    rtr ID    notification  Creation requests for this router
 router.update             Delta       router    rtr ID    notification  Update requests for this router
-ip.floating               Gauge       ip        ip ID     both          Duration of floating ip
+ip.floating               Gauge       ip        ip ID     both          Existence of floating ip
 ip.floating.create        Delta       ip        ip ID     notification  Creation requests for this floating ip
 ip.floating.update        Delta       ip        ip ID     notification  Update requests for this floating ip
 ========================  ==========  ========  ========  ============  ======================================================
@@ -143,7 +143,7 @@ Volume (Cinder)
 ========================  ==========  =======  ========  ============  =======================================================
 Name                      Type        Unit     Resource  Origin        Note
 ========================  ==========  =======  ========  ============  =======================================================
-volume                    Gauge        volume  vol ID    notification  Duration of volume
+volume                    Gauge        volume  vol ID    notification  Existence of volume
 volume.size               Gauge            GB  vol ID    notification  Size of volume
 ========================  ==========  =======  ========  ============  =======================================================
 
