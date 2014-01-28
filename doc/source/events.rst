@@ -63,7 +63,7 @@ Events from Notifications
 Events are primarily created via the notifications system in OpenStack.
 OpenStack systems, such as Nova, Glance, Neutron, etc. will emit
 notifications in a JSON format to message queue when some notable action is
-taken by that system. Ceilometer will consume such notifications from the
+taken by that system. Ceilometer will consume such notifications from the
 message queue, and process them.
 
 The general philosophy of notifications in OpenStack is to emit any and all
@@ -94,7 +94,7 @@ to Traits, and optional plugins for doing any programmatic translations
 
 The mapping of notifications to events is defined per event_type, which
 can be wildcarded. Traits are added to events if the corresponding fields
-in the notification exist and are non-null. (As a special case, an empty
+in the notification exist and are non-null. (As a special case, an empty
 string is considered null for non-text traits. This is due to some openstack
 projects (mostly Nova) using empty string for null dates.)
 

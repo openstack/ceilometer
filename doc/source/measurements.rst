@@ -96,7 +96,7 @@ network.outgoing.packets.rate  Gauge       packet/s  iface ID  pollster      Ave
 
 At present, most of the Nova meters will only work with libvirt front-end
 hypervisors while test coverage was mostly done based on KVM. Contributors
-are welcome to implement other virtualization backends’ meters or complete
+are welcome to implement other virtualization backends' meters or complete
 the existing ones.
 
 Network (Neutron)
