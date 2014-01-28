@@ -62,7 +62,7 @@ class FileDispatcher(dispatcher.Base):
 
         # if the directory and path are configured, then log to the file
         if self.conf.dispatcher_file.file_path:
-            dispatcher_logger = logging.Logger('dispather.file')
+            dispatcher_logger = logging.Logger('dispatcher.file')
             dispatcher_logger.setLevel(logging.INFO)
             # create rotating file handler which logs meters
             rfh = logging.handlers.RotatingFileHandler(
