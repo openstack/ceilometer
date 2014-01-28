@@ -54,8 +54,8 @@ Units
 Dimension     Unit      Abbreviations   Note
 ============  ========  ==============  =====
 None          N/A                       Dimension-less variable
-Volume        byte                   B
-Time          seconds                s
+Volume        byte      B
+Time          seconds   s
 ============  ========  ==============  =====
 
 Here are the meter types by components that are currently implemented:
@@ -128,13 +128,13 @@ Image (Glance)
 ========================  ==========  =======  ========  ============  =======================================================
 Name                      Type        Unit     Resource  Origin        Note
 ========================  ==========  =======  ========  ============  =======================================================
-image                     Gauge         image  image ID  both          Image polling -> it (still) exists
-image.size                Gauge             B  image ID  both          Uploaded image size
-image.update              Delta         image  image ID  notification  Number of update on the image
-image.upload              Delta         image  image ID  notification  Number of upload of the image
-image.delete              Delta         image  image ID  notification  Number of delete on the image
-image.download            Delta             B  image ID  notification  Image is downloaded
-image.serve               Delta             B  image ID  notification  Image is served out
+image                     Gauge       image    image ID  both          Image polling -> it (still) exists
+image.size                Gauge       B        image ID  both          Uploaded image size
+image.update              Delta       image    image ID  notification  Number of update on the image
+image.upload              Delta       image    image ID  notification  Number of upload of the image
+image.delete              Delta       image    image ID  notification  Number of delete on the image
+image.download            Delta       B        image ID  notification  Image is downloaded
+image.serve               Delta       B        image ID  notification  Image is served out
 ========================  ==========  =======  ========  ============  =======================================================
 
 Volume (Cinder)
@@ -143,8 +143,8 @@ Volume (Cinder)
 ========================  ==========  =======  ========  ============  =======================================================
 Name                      Type        Unit     Resource  Origin        Note
 ========================  ==========  =======  ========  ============  =======================================================
-volume                    Gauge        volume  vol ID    notification  Existence of volume
-volume.size               Gauge            GB  vol ID    notification  Size of volume
+volume                    Gauge       volume   vol ID    notification  Existence of volume
+volume.size               Gauge       GB       vol ID    notification  Size of volume
 ========================  ==========  =======  ========  ============  =======================================================
 
 Make sure Cinder is properly configured first: see :ref:`installing_manually`.
@@ -153,16 +153,16 @@ Object Storage (Swift)
 ======================
 
 ===============================  ==========  ==========  ===========  ============  ==========================================
-Name                             Type        Volume      Resource     Origin        Note
+Name                             Type        Unit        Resource     Origin        Note
 ===============================  ==========  ==========  ===========  ============  ==========================================
-storage.objects                  Gauge           object  store ID     pollster      Number of objects
-storage.objects.size             Gauge                B  store ID     pollster      Total size of stored objects
-storage.objects.containers       Gauge        container  store ID     pollster      Number of containers
-storage.objects.incoming.bytes   Delta                B  store ID     notification  Number of incoming bytes
-storage.objects.outgoing.bytes   Delta                B  store ID     notification  Number of outgoing bytes
-storage.api.request              Delta          request  store ID     notification  Number of API requests against swift
-storage.containers.objects       Gauge           object  str ID/cont  pollster      Number of objects in container
-storage.containers.objects.size  Gauge                B  str ID/cont  pollster      Total size of stored objects in container
+storage.objects                  Gauge       object      store ID     pollster      Number of objects
+storage.objects.size             Gauge       B           store ID     pollster      Total size of stored objects
+storage.objects.containers       Gauge       container   store ID     pollster      Number of containers
+storage.objects.incoming.bytes   Delta       B           store ID     notification  Number of incoming bytes
+storage.objects.outgoing.bytes   Delta       B           store ID     notification  Number of outgoing bytes
+storage.api.request              Delta       request     store ID     notification  Number of API requests against swift
+storage.containers.objects       Gauge       object      str ID/cont  pollster      Number of objects in container
+storage.containers.objects.size  Gauge       B           str ID/cont  pollster      Total size of stored objects in container
 ===============================  ==========  ==========  ===========  ============  ==========================================
 
 In order to use storage.objects.incoming.bytes and storage.outgoing.bytes, one must configure
@@ -174,10 +174,10 @@ Energy (Kwapi)
 ==============
 
 ==========================  ==========  ==========  ========  ========= ==============================================
-Name                        Type        Volume      Resource  Origin    Note
+Name                        Type        Unit        Resource  Origin    Note
 ==========================  ==========  ==========  ========  ========= ==============================================
-energy                      Cumulative         kWh  probe ID  pollster  Amount of energy
-power                       Gauge                W  probe ID  pollster  Power consumption
+energy                      Cumulative  kWh         probe ID  pollster  Amount of energy
+power                       Gauge       W           probe ID  pollster  Power consumption
 ==========================  ==========  ==========  ========  ========= ==============================================
 
 Dynamically retrieving the Meters via ceilometer client
