@@ -183,7 +183,8 @@ class FunctionalTest(db_test_base.TestBase):
         return response
 
     def get_json(self, path, expect_errors=False, headers=None,
-                 extra_environ=None, q=[], groupby=[], **params):
+                 extra_environ=None, q=[], groupby=[], status=None,
+                 **params):
         """Sends simulated HTTP GET request to Pecan test app.
 
         :param path: url path of target service
@@ -195,6 +196,7 @@ class FunctionalTest(db_test_base.TestBase):
         :param q: list of queries consisting of: field, value, op, and type
                   keys
         :param groupby: list of fields to group by
+        :param status: Expected status code of response
         :param params: content for wsgi.input of request
         """
         full_path = self.PATH_PREFIX + path
@@ -217,7 +219,8 @@ class FunctionalTest(db_test_base.TestBase):
                                 params=all_params,
                                 headers=headers,
                                 extra_environ=extra_environ,
-                                expect_errors=expect_errors)
+                                expect_errors=expect_errors,
+                                status=status)
         if not expect_errors:
             response = response.json
         print('GOT:%s' % response)
