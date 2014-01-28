@@ -905,13 +905,8 @@ class TestAlarms(FunctionalTest,
         alarm_id = data[0]['alarm_id']
 
         resp = self.put_json('/alarms/%s' % alarm_id,
-                             expect_errors=True,
                              params=json,
                              headers=self.auth_headers)
-
-        json['threshold_rule']['query'].append({
-            'field': 'project_id', 'op': 'eq',
-            'value': self.auth_headers['X-Project-Id']})
         self.assertEqual(resp.status_code, 200)
 
     def test_delete_alarm(self):
