@@ -21,7 +21,6 @@ import mock
 from mock import patch
 import msgpack
 from stevedore import extension
-from stevedore.tests import manager as test_manager
 
 from ceilometer import collector
 from ceilometer.openstack.common.fixture import config
@@ -52,6 +51,16 @@ class TestCollector(tests_base.BaseTestCase):
             resource_metadata={},
         ).as_dict()
 
+    def _make_test_manager(self, plugin):
+        return extension.ExtensionManager.make_test_instance([
+            extension.Extension(
+                'test',
+                None,
+                None,
+                plugin,
+            ),
+        ])
+
     def _make_fake_socket(self):
         def recvfrom(size):
             # Make the loop stop
@@ -71,13 +80,7 @@ class TestCollector(tests_base.BaseTestCase):
 
     def test_record_metering_data(self):
         mock_dispatcher = mock.MagicMock()
-        self.srv.dispatcher_manager = test_manager.TestExtensionManager(
-            [extension.Extension('test',
-                                 None,
-                                 None,
-                                 mock_dispatcher
-                                 ),
-             ])
+        self.srv.dispatcher_manager = self._make_test_manager(mock_dispatcher)
 
         self.srv.record_metering_data(None, self.counter)
 
@@ -86,13 +89,7 @@ class TestCollector(tests_base.BaseTestCase):
 
     def test_udp_receive(self):
         mock_dispatcher = mock.MagicMock()
-        self.srv.dispatcher_manager = test_manager.TestExtensionManager(
-            [extension.Extension('test',
-                                 None,
-                                 None,
-                                 mock_dispatcher
-                                 ),
-             ])
+        self.srv.dispatcher_manager = self._make_test_manager(mock_dispatcher)
         self.counter['source'] = 'mysource'
         self.counter['counter_name'] = self.counter['name']
         self.counter['counter_volume'] = self.counter['volume']
@@ -110,13 +107,7 @@ class TestCollector(tests_base.BaseTestCase):
 
     def test_udp_receive_storage_error(self):
         mock_dispatcher = mock.MagicMock()
-        self.srv.dispatcher_manager = test_manager.TestExtensionManager(
-            [extension.Extension('test',
-                                 None,
-                                 None,
-                                 mock_dispatcher
-                                 ),
-             ])
+        self.srv.dispatcher_manager = self._make_test_manager(mock_dispatcher)
         mock_dispatcher.record_metering_data.side_effect = self._raise_error
 
         self.counter['source'] = 'mysource'

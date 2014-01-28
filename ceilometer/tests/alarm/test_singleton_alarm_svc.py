@@ -22,7 +22,6 @@ import mock
 from oslo.config import cfg
 
 from stevedore import extension
-from stevedore.tests import manager as extension_tests
 
 from ceilometer.alarm import service
 from ceilometer.openstack.common import test
@@ -32,14 +31,15 @@ class TestSingletonAlarmService(test.BaseTestCase):
     def setUp(self):
         super(TestSingletonAlarmService, self).setUp()
         self.threshold_eval = mock.Mock()
-        self.evaluators = extension_tests.TestExtensionManager(
+        self.evaluators = extension.ExtensionManager.make_test_instance(
             [
                 extension.Extension(
                     'threshold',
                     None,
                     None,
                     self.threshold_eval),
-            ])
+            ]
+        )
         self.api_client = mock.MagicMock()
         self.singleton = service.SingletonAlarmService()
         self.singleton.tg = mock.Mock()

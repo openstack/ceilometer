@@ -24,7 +24,6 @@ import datetime
 
 import mock
 from stevedore import extension
-from stevedore.tests import manager as extension_tests
 
 from ceilometer import agent
 from ceilometer.openstack.common.fixture import config
@@ -126,7 +125,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
             self.transformer_manager)
 
     def create_extension_manager(self):
-        return extension_tests.TestExtensionManager(
+        return extension.ExtensionManager.make_test_instance(
             [
                 extension.Extension(
                     'test',
@@ -149,8 +148,6 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
                     None,
                     self.PollsterExceptionAnother(), ),
             ],
-            'fake',
-            invoke_on_load=False,
         )
 
     @abc.abstractmethod
