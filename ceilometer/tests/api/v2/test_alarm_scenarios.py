@@ -438,6 +438,35 @@ class TestAlarms(FunctionalTest,
         else:
             self.fail("Alarm not found")
 
+    def test_post_conflict(self):
+        json = {
+            'enabled': False,
+            'name': 'added_alarm',
+            'state': 'ok',
+            'type': 'threshold',
+            'ok_actions': ['http://something/ok'],
+            'alarm_actions': ['http://something/alarm'],
+            'insufficient_data_actions': ['http://something/no'],
+            'repeat_actions': True,
+            'threshold_rule': {
+                'meter_name': 'ameter',
+                'query': [{'field': 'metadata.field',
+                           'op': 'eq',
+                           'value': '5',
+                           'type': 'string'}],
+                'comparison_operator': 'le',
+                'statistic': 'count',
+                'threshold': 50,
+                'evaluation_periods': '3',
+                'period': '180',
+            }
+        }
+
+        self.post_json('/alarms', params=json, status=201,
+                       headers=self.auth_headers)
+        self.post_json('/alarms', params=json, status=409,
+                       headers=self.auth_headers)
+
     def _do_test_post_alarm(self, exclude_outliers=None):
         json = {
             'enabled': False,
@@ -679,11 +708,11 @@ class TestAlarms(FunctionalTest,
         }
         an_other_user_auth = {'X-User-Id': str(uuid.uuid4()),
                               'X-Project-Id': str(uuid.uuid4())}
-        resp = self.post_json('/alarms', params=json, status=400,
+        resp = self.post_json('/alarms', params=json, status=404,
                               headers=an_other_user_auth)
-        self.assertEqual(jsonutils.loads(resp.body)['error_message']
-                         ['faultstring'],
-                         "Alarm a doesn't exist")
+        self.assertEqual("Alarm a Not Found",
+                         jsonutils.loads(resp.body)['error_message']
+                         ['faultstring'])
 
     def test_post_combination_alarm_as_admin_on_behalf_of_an_other_user(self):
         """Test that post a combination alarm as admin on behalf of an other
@@ -710,11 +739,11 @@ class TestAlarms(FunctionalTest,
         headers = {}
         headers.update(self.auth_headers)
         headers['X-Roles'] = 'admin'
-        resp = self.post_json('/alarms', params=json, status=400,
+        resp = self.post_json('/alarms', params=json, status=404,
                               headers=headers)
-        self.assertEqual(jsonutils.loads(resp.body)['error_message']
-                         ['faultstring'],
-                         "Alarm a doesn't exist")
+        self.assertEqual("Alarm a Not Found",
+                         jsonutils.loads(resp.body)['error_message']
+                         ['faultstring'])
 
     def test_post_combination_alarm_as_admin_success_owner_unset(self):
         self._do_post_combination_alarm_as_admin_success(False)
@@ -780,7 +809,7 @@ class TestAlarms(FunctionalTest,
                 'operator': 'and',
             }
         }
-        self.post_json('/alarms', params=json, status=400,
+        self.post_json('/alarms', params=json, status=404,
                        headers=self.auth_headers)
         alarms = list(self.conn.get_alarms(enabled=False))
         self.assertEqual(0, len(alarms))
