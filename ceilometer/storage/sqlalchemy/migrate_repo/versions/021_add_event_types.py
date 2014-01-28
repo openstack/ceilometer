@@ -11,8 +11,6 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
-from ceilometer.storage.sqlalchemy import migration
 from migrate import ForeignKeyConstraint
 from sqlalchemy import Column
 from sqlalchemy import Integer
@@ -20,6 +18,8 @@ from sqlalchemy import MetaData
 from sqlalchemy import select
 from sqlalchemy import String
 from sqlalchemy import Table
+
+from ceilometer.storage.sqlalchemy import migration
 
 
 def upgrade(migrate_engine):
