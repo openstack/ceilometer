@@ -18,6 +18,7 @@
 
 from __future__ import print_function
 
+import argparse
 import imp
 import os
 import re
@@ -27,6 +28,7 @@ import textwrap
 
 from oslo.config import cfg
 import six
+import stevedore.named
 
 from ceilometer.openstack.common import gettextutils
 from ceilometer.openstack.common import importutils
@@ -59,9 +61,16 @@ BASEDIR = os.path.abspath(os.path.join(os.path.dirname(__file__),
 WORDWRAP_WIDTH = 60
 
 
-def generate(srcfiles):
+def generate(argv):
+    parser = argparse.ArgumentParser(
+        description='generate sample configuration file',
+    )
+    parser.add_argument('-l', dest='libraries', action='append')
+    parser.add_argument('srcfiles', nargs='*')
+    parsed_args = parser.parse_args(argv)
+
     mods_by_pkg = dict()
-    for filepath in srcfiles:
+    for filepath in parsed_args.srcfiles:
         pkg_name = filepath.split(os.sep)[1]
         mod_str = '.'.join(['.'.join(filepath.split(os.sep)[:-1]),
                             os.path.basename(filepath).split('.')[0]])
@@ -84,6 +93,23 @@ def generate(srcfiles):
                 for group, opts in _list_opts(module):
                     opts_by_group.setdefault(group, []).append((module_name,
                                                                 opts))
+
+    # Look for entry points defined in libraries (or applications) for
+    # option discovery, and include their return values in the output.
+    #
+    # Each entry point should be a function returning an iterable
+    # of pairs with the group name (or None for the default group)
+    # and the list of Opt instances for that group.
+    if parsed_args.libraries:
+        loader = stevedore.named.NamedExtensionManager(
+            'oslo.config.opts',
+            names=list(set(parsed_args.libraries)),
+            invoke_on_load=False,
+        )
+        for ext in loader:
+            for group, opts in ext.plugin():
+                opt_list = opts_by_group.setdefault(group or 'DEFAULT', [])
+                opt_list.append((ext.name, opts))
 
     for pkg_name in pkg_names:
         mods = mods_by_pkg.get(pkg_name)

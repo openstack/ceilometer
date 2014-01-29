@@ -484,11 +484,12 @@ class Services(object):
         done.wait()
 
 
-def launch(service, workers=None):
-    if workers:
-        launcher = ProcessLauncher()
-        launcher.launch_service(service, workers=workers)
-    else:
+def launch(service, workers=1):
+    if workers is None or workers == 1:
         launcher = ServiceLauncher()
         launcher.launch_service(service)
+    else:
+        launcher = ProcessLauncher()
+        launcher.launch_service(service, workers=workers)
+
     return launcher

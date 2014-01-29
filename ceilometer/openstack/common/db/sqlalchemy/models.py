@@ -102,8 +102,8 @@ class ModelBase(object):
 
 
 class TimestampMixin(object):
-    created_at = Column(DateTime, default=timeutils.utcnow)
-    updated_at = Column(DateTime, onupdate=timeutils.utcnow)
+    created_at = Column(DateTime, default=lambda: timeutils.utcnow())
+    updated_at = Column(DateTime, onupdate=lambda: timeutils.utcnow())
 
 
 class SoftDeleteMixin(object):

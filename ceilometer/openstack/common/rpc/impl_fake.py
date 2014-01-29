@@ -11,6 +11,7 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+
 """Fake RPC implementation which calls proxy methods directly with no
 queues.  Casts will block, but this is very useful for tests.
 """

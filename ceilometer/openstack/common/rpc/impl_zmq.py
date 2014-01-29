@@ -80,7 +80,7 @@ CONF = cfg.CONF
 CONF.register_opts(zmq_opts)
 
 ZMQ_CTX = None  # ZeroMQ Context, must be global.
-matchmaker = None  # memoized matchmaker object
+matchmaker = None  # memorized matchmaker object
 
 
 def _serialize(data):

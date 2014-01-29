@@ -125,24 +125,11 @@
 # Options defined in ceilometer.openstack.common.db.sqlalchemy.session
 #
 
-# the filename to use with sqlite (string value)
+# The file name to use with SQLite (string value)
 #sqlite_db=ceilometer.sqlite
 
-# If true, use synchronous mode for sqlite (boolean value)
+# If True, SQLite uses synchronous mode (boolean value)
 #sqlite_synchronous=true
-
-
-#
-# Options defined in ceilometer.openstack.common.deprecated.wsgi
-#
-
-# Number of backlog requests to configure the socket with
-# (integer value)
-#backlog=4096
-
-# Sets the value of TCP_KEEPIDLE in seconds for each server
-# socket. Not supported on OS X. (integer value)
-#tcp_keepidle=600
 
 
 #
@@ -186,29 +173,29 @@
 # Log output to standard error (boolean value)
 #use_stderr=true
 
-# format string to use for log messages with context (string
+# Format string to use for log messages with context (string
 # value)
 #logging_context_format_string=%(asctime)s.%(msecs)03d %(process)d %(levelname)s %(name)s [%(request_id)s %(user_identity)s] %(instance)s%(message)s
 
-# format string to use for log messages without context
+# Format string to use for log messages without context
 # (string value)
 #logging_default_format_string=%(asctime)s.%(msecs)03d %(process)d %(levelname)s %(name)s [-] %(instance)s%(message)s
 
-# data to append to log format when level is DEBUG (string
+# Data to append to log format when level is DEBUG (string
 # value)
 #logging_debug_format_suffix=%(funcName)s %(pathname)s:%(lineno)d
 
-# prefix each line of exception output with this format
+# Prefix each line of exception output with this format
 # (string value)
 #logging_exception_prefix=%(asctime)s.%(msecs)03d %(process)d TRACE %(name)s %(instance)s
 
-# list of logger=LEVEL pairs (list value)
-#default_log_levels=amqp=WARN,amqplib=WARN,boto=WARN,qpid=WARN,sqlalchemy=WARN,suds=INFO,iso8601=WARN
+# List of logger=LEVEL pairs (list value)
+#default_log_levels=amqp=WARN,amqplib=WARN,boto=WARN,qpid=WARN,sqlalchemy=WARN,suds=INFO,iso8601=WARN,requests.packages.urllib3.connectionpool=WARN
 
-# publish error events (boolean value)
+# Publish error events (boolean value)
 #publish_errors=false
 
-# make deprecations fatal (boolean value)
+# Make deprecations fatal (boolean value)
 #fatal_deprecations=false
 
 # If an instance is passed with the log message, format it
@@ -248,10 +235,18 @@
 # Deprecated group/name - [DEFAULT]/logdir
 #log_dir=<None>
 
-# Use syslog for logging. (boolean value)
+# Use syslog for logging. Existing syslog format is DEPRECATED
+# during I, and then will be changed in J to honor RFC5424
+# (boolean value)
 #use_syslog=false
 
-# syslog facility to receive log lines (string value)
+# (Optional) Use syslog rfc5424 format for logging. If
+# enabled, will add APP-NAME (RFC5424) before the MSG part of
+# the syslog message.  The old format without APP-NAME is
+# deprecated in I, and will be removed in J. (boolean value)
+#use_syslog_rfc_format=false
+
+# Syslog facility to receive log lines (string value)
 #syslog_log_facility=LOG_USER
 
 
@@ -259,8 +254,7 @@
 # Options defined in ceilometer.openstack.common.middleware.sizelimit
 #
 
-# the maximum body size per each request(bytes) (integer
-# value)
+# The maximum body size per request, in bytes (integer value)
 # Deprecated group/name - [DEFAULT]/osapi_max_request_body_size
 #max_request_body_size=114688
 
@@ -352,9 +346,9 @@
 # Options defined in ceilometer.openstack.common.rpc.impl_kombu
 #
 
-# SSL version to use (valid only if SSL enabled). valid values
-# are TLSv1, SSLv23 and SSLv3. SSLv2 may be available on some
-# distributions (string value)
+# If SSL is enabled, the SSL version to use. Valid values are
+# TLSv1, SSLv23 and SSLv3. SSLv2 might be available on some
+# distributions. (string value)
 #kombu_ssl_version=
 
 # SSL key file (valid only if SSL enabled) (string value)
@@ -378,33 +372,32 @@
 # RabbitMQ HA cluster host:port pairs (list value)
 #rabbit_hosts=$rabbit_host:$rabbit_port
 
-# connect over SSL for RabbitMQ (boolean value)
+# Connect over SSL for RabbitMQ (boolean value)
 #rabbit_use_ssl=false
 
-# the RabbitMQ userid (string value)
+# The RabbitMQ userid (string value)
 #rabbit_userid=guest
 
-# the RabbitMQ password (string value)
+# The RabbitMQ password (string value)
 #rabbit_password=guest
 
-# the RabbitMQ virtual host (string value)
+# The RabbitMQ virtual host (string value)
 #rabbit_virtual_host=/
 
-# how frequently to retry connecting with RabbitMQ (integer
+# How frequently to retry connecting with RabbitMQ (integer
 # value)
 #rabbit_retry_interval=1
 
-# how long to backoff for between retries when connecting to
+# How long to backoff for between retries when connecting to
 # RabbitMQ (integer value)
 #rabbit_retry_backoff=2
 
-# maximum retries with trying to connect to RabbitMQ (the
-# default of 0 implies an infinite retry count) (integer
-# value)
+# Maximum number of RabbitMQ connection retries. Default is 0
+# (infinite retry count) (integer value)
 #rabbit_max_retries=0
 
-# use H/A queues in RabbitMQ (x-ha-policy: all).You need to
-# wipe RabbitMQ database when changing this option. (boolean
+# Use HA queues in RabbitMQ (x-ha-policy: all). If you change
+# this option, you must wipe the RabbitMQ database. (boolean
 # value)
 #rabbit_ha_queues=false
 
@@ -623,7 +616,7 @@
 # slave database (string value)
 #slave_connection=
 
-# timeout before idle sql connections are reaped (integer
+# Timeout before idle sql connections are reaped (integer
 # value)
 # Deprecated group/name - [DEFAULT]/sql_idle_timeout
 # Deprecated group/name - [DATABASE]/sql_idle_timeout
@@ -642,13 +635,13 @@
 # Deprecated group/name - [DATABASE]/sql_max_pool_size
 #max_pool_size=<None>
 
-# maximum db connection retries during startup. (setting -1
+# Maximum db connection retries during startup. (setting -1
 # implies an infinite retry count) (integer value)
 # Deprecated group/name - [DEFAULT]/sql_max_retries
 # Deprecated group/name - [DATABASE]/sql_max_retries
 #max_retries=10
 
-# interval between retries of opening a sql connection
+# Interval between retries of opening a sql connection
 # (integer value)
 # Deprecated group/name - [DEFAULT]/sql_retry_interval
 # Deprecated group/name - [DATABASE]/reconnect_interval
