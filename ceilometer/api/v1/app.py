@@ -53,10 +53,8 @@ def make_app(conf, enable_acl=True, attach_storage=True,
     if attach_storage:
         @app.before_request
         def attach_storage():
-            storage_engine = storage.get_engine(conf)
-            flask.request.storage_engine = storage_engine
             flask.request.storage_conn = \
-                storage_engine.get_connection(conf)
+                storage.get_connection(conf)
 
     # Install the middleware wrapper
     if enable_acl:

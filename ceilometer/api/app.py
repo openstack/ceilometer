@@ -53,12 +53,10 @@ def get_pecan_config():
 
 
 def setup_app(pecan_config=None, extra_hooks=None):
-    storage_engine = storage.get_engine(cfg.CONF)
     # FIXME: Replace DBHook with a hooks.TransactionHook
     app_hooks = [hooks.ConfigHook(),
                  hooks.DBHook(
-                     storage_engine,
-                     storage_engine.get_connection(cfg.CONF),
+                     storage.get_connection(cfg.CONF),
                  ),
                  hooks.PipelineHook(),
                  hooks.TranslationHook()]
