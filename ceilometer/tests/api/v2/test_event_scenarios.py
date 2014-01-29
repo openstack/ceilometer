@@ -84,6 +84,11 @@ class TestTraitAPI(EventTestBase):
 
         self.assertEqual(4, len(data))
 
+    def test_get_event_invalid_path(self):
+        data = self.get_json('/event_types/trait_A/', headers=headers,
+                             expect_errors=True)
+        self.assertEqual(404, data.status_int)
+
     def test_get_traits_for_non_existent_event(self):
         path = self.PATH % "NO_SUCH_EVENT_TYPE"
         data = self.get_json(path, headers=headers)
