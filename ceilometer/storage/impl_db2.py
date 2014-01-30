@@ -345,6 +345,7 @@ class Connection(base.Connection):
         # modify a data structure owned by our caller (the driver adds
         # a new key '_id').
         record = copy.copy(data)
+        record['recorded_at'] = timeutils.utcnow()
         # Make sure that the data does have field _id which db2 wont add
         # automatically.
         if record.get('_id') is None:

@@ -560,6 +560,7 @@ class Connection(base.Connection):
                 project_id=s.project_id,
                 resource_id=s.resource_id,
                 timestamp=s.timestamp,
+                recorded_at=s.recorded_at,
                 resource_metadata=s.resource_metadata,
                 message_id=s.message_id,
                 message_signature=s.message_signature,

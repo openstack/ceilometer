@@ -3,7 +3,8 @@
 # Copyright © 2013 Intel Corp.
 #
 # Author: Lianhao Lu <lianhao.lu@intel.com>
-# Author: Shane Wang <shane.wang@intel.com>
+#         Shane Wang <shane.wang@intel.com>
+#         Julien Danjou <julien@danjou.info>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -59,11 +60,9 @@ class DBTestBase(tests_db.TestBase):
 
     def setUp(self):
         super(DBTestBase, self).setUp()
+        timeutils.set_time_override(
+            datetime.datetime(2015, 7, 2, 10, 39))
         self.prepare_data()
-
-    def tearDown(self):
-        timeutils.utcnow.override_time = None
-        super(DBTestBase, self).tearDown()
 
     def prepare_data(self):
         original_timestamps = [(2012, 7, 2, 10, 40), (2012, 7, 2, 10, 41),
@@ -484,6 +483,9 @@ class RawSampleTest(DBTestBase,
         f = storage.SampleFilter()
         results = list(self.conn.get_samples(f, limit=3))
         self.assertEqual(len(results), 3)
+        for result in results:
+            self.assertTimestampEqual(result.recorded_at,
+                                      timeutils.utcnow())
 
     def test_get_samples_in_default_order(self):
         f = storage.SampleFilter()
@@ -498,7 +500,11 @@ class RawSampleTest(DBTestBase,
         results = list(self.conn.get_samples(f))
         self.assertEqual(len(results), 3)
         for meter in results:
-            self.assertIn(meter.as_dict(), self.msgs[:3])
+            d = meter.as_dict()
+            self.assertTimestampEqual(d['recorded_at'],
+                                      timeutils.utcnow())
+            del d['recorded_at']
+            self.assertIn(d, self.msgs[:3])
 
     def test_get_samples_by_user_limit(self):
         f = storage.SampleFilter(user='user-id')
@@ -513,25 +519,35 @@ class RawSampleTest(DBTestBase,
     def test_get_samples_by_project(self):
         f = storage.SampleFilter(project='project-id')
         results = list(self.conn.get_samples(f))
-        assert results
+        self.assertIsNotNone(results)
         for meter in results:
-            self.assertIn(meter.as_dict(), self.msgs[:4])
+            d = meter.as_dict()
+            self.assertTimestampEqual(d['recorded_at'],
+                                      timeutils.utcnow())
+            del d['recorded_at']
+            self.assertIn(d, self.msgs[:4])
 
     def test_get_samples_by_resource(self):
         f = storage.SampleFilter(user='user-id', resource='resource-id')
         results = list(self.conn.get_samples(f))
         assert results
         meter = results[1]
-        assert meter is not None
-        self.assertEqual(meter.as_dict(), self.msgs[0])
+        d = meter.as_dict()
+        self.assertEqual(d['recorded_at'], timeutils.utcnow())
+        del d['recorded_at']
+        self.assertEqual(d, self.msgs[0])
 
     def test_get_samples_by_metaquery(self):
         q = {'metadata.display_name': 'test-server'}
         f = storage.SampleFilter(metaquery=q)
         results = list(self.conn.get_samples(f))
-        assert results
+        self.assertIsNotNone(results)
         for meter in results:
-            self.assertIn(meter.as_dict(), self.msgs)
+            d = meter.as_dict()
+            self.assertTimestampEqual(d['recorded_at'],
+                                      timeutils.utcnow())
+            del d['recorded_at']
+            self.assertIn(d, self.msgs)
 
     def test_get_samples_by_start_time(self):
         timestamp = datetime.datetime(2012, 7, 2, 10, 41)
@@ -744,7 +760,9 @@ class ComplexSampleQueryTest(DBTestBase,
         results = list(self.conn.query_samples())
         self.assertEqual(len(results), len(self.msgs))
         for sample in results:
-            self.assertIn(sample.as_dict(), self.msgs)
+            d = sample.as_dict()
+            del d['recorded_at']
+            self.assertIn(d, self.msgs)
 
     def test_no_filter_with_zero_limit(self):
         limit = 0

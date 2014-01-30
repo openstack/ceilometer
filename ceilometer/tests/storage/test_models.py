@@ -62,7 +62,7 @@ class ModelTest(test.BaseTestCase):
                          "counter_unit", "counter_volume", "user_id",
                          "project_id", "resource_id", "timestamp",
                          "resource_metadata", "message_id",
-                         "message_signature"]
+                         "message_signature", "recorded_at"]
 
         self.assertEqual(set(sample_fields),
                          set(models.Sample.get_field_names()))

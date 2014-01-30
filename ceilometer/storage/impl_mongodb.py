@@ -35,6 +35,7 @@ from oslo.config import cfg
 
 from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
+from ceilometer.openstack.common import timeutils
 from ceilometer import storage
 from ceilometer.storage import base
 from ceilometer.storage import models
@@ -470,6 +471,7 @@ class Connection(base.Connection):
         # modify a data structure owned by our caller (the driver adds
         # a new key '_id').
         record = copy.copy(data)
+        record['recorded_at'] = timeutils.utcnow()
         self.db.meter.insert(record)
 
     def clear_expired_metering_data(self, ttl):

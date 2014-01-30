@@ -205,6 +205,7 @@ class Sample(Model):
                  timestamp, resource_metadata,
                  message_id,
                  message_signature,
+                 recorded_at,
                  ):
         """Create a new sample.
 
@@ -219,6 +220,7 @@ class Sample(Model):
         :param timestamp: the time of the measurement
         :param resource_metadata: extra details about the resource
         :param message_id: a message identifier
+        :param recorded_at: sample record timestamp
         :param message_signature: a hash created from the rest of the
                                   message data
         """
@@ -234,7 +236,8 @@ class Sample(Model):
                        timestamp=timestamp,
                        resource_metadata=resource_metadata,
                        message_id=message_id,
-                       message_signature=message_signature)
+                       message_signature=message_signature,
+                       recorded_at=recorded_at)
 
 
 class Statistics(Model):

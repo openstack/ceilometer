@@ -24,12 +24,12 @@ import six.moves.urllib.parse as urlparse
 from oslo.config import cfg
 from sqlalchemy import Column, Integer, String, Table, ForeignKey, \
     Index, UniqueConstraint, BigInteger
-from sqlalchemy import Float, Boolean, Text
+from sqlalchemy import Float, Boolean, Text, DateTime
 from sqlalchemy.dialects.mysql import DECIMAL
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
-from sqlalchemy.types import TypeDecorator, DATETIME
+from sqlalchemy.types import TypeDecorator
 
 from ceilometer.openstack.common import timeutils
 from ceilometer.storage import models as api_models
@@ -71,14 +71,14 @@ class JSONEncodedDict(TypeDecorator):
 class PreciseTimestamp(TypeDecorator):
     """Represents a timestamp precise to the microsecond."""
 
-    impl = DATETIME
+    impl = DateTime
 
     def load_dialect_impl(self, dialect):
         if dialect.name == 'mysql':
             return dialect.type_descriptor(DECIMAL(precision=20,
                                                    scale=6,
                                                    asdecimal=True))
-        return dialect.type_descriptor(DATETIME())
+        return self.impl
 
     def process_bind_param(self, value, dialect):
         if value is None:
@@ -209,6 +209,7 @@ class Meter(Base):
     counter_unit = Column(String(255))
     counter_volume = Column(Float(53))
     timestamp = Column(PreciseTimestamp(), default=timeutils.utcnow)
+    recorded_at = Column(PreciseTimestamp(), default=timeutils.utcnow)
     message_signature = Column(String(1000))
     message_id = Column(String(1000))
     sources = relationship("Source", secondary=lambda: sourceassoc)

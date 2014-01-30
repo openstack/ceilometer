@@ -19,8 +19,9 @@
 import datetime
 
 import mock
+import sqlalchemy
 from sqlalchemy.dialects.mysql import DECIMAL
-from sqlalchemy.types import DATETIME, NUMERIC
+from sqlalchemy.types import NUMERIC
 
 from ceilometer.openstack.common import test
 from ceilometer.storage.sqlalchemy import models
@@ -34,8 +35,6 @@ class PreciseTimestampTest(test.BaseTestCase):
         def _type_descriptor_mock(desc):
             if type(desc) == DECIMAL:
                 return NUMERIC(precision=desc.precision, scale=desc.scale)
-            if type(desc) == DATETIME:
-                return DATETIME()
         dialect = mock.MagicMock()
         dialect.name = name
         dialect.type_descriptor = _type_descriptor_mock
@@ -57,7 +56,7 @@ class PreciseTimestampTest(test.BaseTestCase):
 
     def test_load_dialect_impl_postgres(self):
         result = self._type.load_dialect_impl(self._postgres_dialect)
-        self.assertEqual(type(result), DATETIME)
+        self.assertEqual(type(result), sqlalchemy.DateTime)
 
     def test_process_bind_param_store_decimal_mysql(self):
         expected = utils.dt_to_decimal(self._date)

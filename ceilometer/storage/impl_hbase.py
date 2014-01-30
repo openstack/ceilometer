@@ -230,8 +230,11 @@ class Connection(base.Connection):
         # alphabetically.
         row = "%s_%d_%s" % (data['counter_name'], rts, m.hexdigest())
 
+        recorded_at = timeutils.utcnow()
+
         # Convert timestamp to string as json.dumps won't
         ts = timeutils.strtime(data['timestamp'])
+        recorded_at_ts = timeutils.strtime(recorded_at)
 
         record = {'f:timestamp': ts,
                   'f:counter_name': data['counter_name'],
@@ -246,6 +249,7 @@ class Connection(base.Connection):
                   'f:message_id': data['message_id'],
                   'f:resource_id': data['resource_id'],
                   'f:source': data['source'],
+                  'f:recorded_at': recorded_at,
                   # add in reversed_ts here for time range scan
                   'f:rts': str(rts)
                   }
@@ -254,6 +258,7 @@ class Connection(base.Connection):
         # Don't want to be changing the original data object.
         data = copy.copy(data)
         data['timestamp'] = ts
+        data['recorded_at'] = recorded_at_ts
         # Save original meter.
         record['f:message'] = json.dumps(data)
         meter_table.put(row, record)
@@ -419,17 +424,20 @@ class Connection(base.Connection):
                 user_id=data['f:user_id'],
             )
 
+    @staticmethod
+    def _make_sample(data):
+        """Transform HBase fields to Sample model."""
+        data = json.loads(data['f:message'])
+        data['timestamp'] = timeutils.parse_strtime(data['timestamp'])
+        data['recorded_at'] = timeutils.parse_strtime(data['recorded_at'])
+        return models.Sample(**data)
+
     def get_samples(self, sample_filter, limit=None):
         """Return an iterable of models.Sample instances.
 
         :param sample_filter: Filter.
         :param limit: Maximum number of results to return.
         """
-        def make_sample(data):
-            """Transform HBase fields to Sample model."""
-            data = json.loads(data['f:message'])
-            data['timestamp'] = timeutils.parse_strtime(data['timestamp'])
-            return models.Sample(**data)
 
         meter_table = self.conn.table(self.METER_TABLE)
 
@@ -467,11 +475,11 @@ class Connection(base.Connection):
                 else:
                     if limit:
                         limit -= 1
-                    yield make_sample(meter)
+                    yield self._make_sample(meter)
             else:
                 if limit:
                     limit -= 1
-                yield make_sample(meter)
+                yield self._make_sample(meter)
 
     @staticmethod
     def _update_meter_stats(stat, meter):
