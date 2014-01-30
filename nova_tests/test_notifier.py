@@ -164,6 +164,7 @@ class TestNovaNotifier(test.BaseTestCase):
                               "locked_by": None,
                               "launch_index": 0,
                               "auto_disk_config": False,
+                              "ephemeral_key_uuid": None
                               }
 
         self.instance = nova_instance.Instance()
