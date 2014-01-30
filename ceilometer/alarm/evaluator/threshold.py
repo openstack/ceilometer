@@ -111,25 +111,35 @@ class ThresholdEvaluator(evaluator.Evaluator):
         if not sufficient and alarm.state != evaluator.UNKNOWN:
             reason = _('%d datapoints are unknown') % alarm.rule[
                 'evaluation_periods']
-            self._refresh(alarm, evaluator.UNKNOWN, reason)
+            reason_data = self._reason_data('unknown',
+                                            alarm.rule['evaluation_periods'],
+                                            None)
+            self._refresh(alarm, evaluator.UNKNOWN, reason, reason_data)
         return sufficient
 
     @staticmethod
-    def _reason(alarm, statistics, distilled, state):
+    def _reason_data(disposition, count, most_recent):
+        """Create a reason data dictionary for this evaluator type.
+        """
+        return {'type': 'threshold', 'disposition': disposition,
+                'count': count, 'most_recent': most_recent}
+
+    @classmethod
+    def _reason(cls, alarm, statistics, distilled, state):
         """Fabricate reason string."""
         count = len(statistics)
         disposition = 'inside' if state == evaluator.OK else 'outside'
         last = getattr(statistics[-1], alarm.rule['statistic'])
         transition = alarm.state != state
+        reason_data = cls._reason_data(disposition, count, last)
         if transition:
             return (_('Transition to %(state)s due to %(count)d samples'
-                      ' %(disposition)s threshold, most recent: %(last)s') %
-                    {'state': state, 'count': count,
-                     'disposition': disposition, 'last': last})
+                      ' %(disposition)s threshold, most recent:'
+                      ' %(most_recent)s')
+                    % dict(reason_data, state=state)), reason_data
         return (_('Remaining as %(state)s due to %(count)d samples'
-                  ' %(disposition)s threshold, most recent: %(last)s') %
-                {'state': state, 'count': count,
-                 'disposition': disposition, 'last': last})
+                  ' %(disposition)s threshold, most recent: %(most_recent)s')
+                % dict(reason_data, state=state)), reason_data
 
     def _transition(self, alarm, statistics, compared):
         """Transition alarm state if necessary.
@@ -151,14 +161,16 @@ class ThresholdEvaluator(evaluator.Evaluator):
 
         if unequivocal:
             state = evaluator.ALARM if distilled else evaluator.OK
-            reason = self._reason(alarm, statistics, distilled, state)
+            reason, reason_data = self._reason(alarm, statistics,
+                                               distilled, state)
             if alarm.state != state or continuous:
-                self._refresh(alarm, state, reason)
+                self._refresh(alarm, state, reason, reason_data)
         elif unknown or continuous:
             trending_state = evaluator.ALARM if compared[-1] else evaluator.OK
             state = trending_state if unknown else alarm.state
-            reason = self._reason(alarm, statistics, distilled, state)
-            self._refresh(alarm, state, reason)
+            reason, reason_data = self._reason(alarm, statistics,
+                                               distilled, state)
+            self._refresh(alarm, state, reason, reason_data)
 
     def evaluate(self, alarm):
         query = self._bound_duration(

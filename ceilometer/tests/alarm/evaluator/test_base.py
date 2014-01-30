@@ -28,7 +28,7 @@ class TestEvaluatorBaseClass(test.BaseTestCase):
         super(TestEvaluatorBaseClass, self).setUp()
         self.called = False
 
-    def _notify(self, alarm, previous, reason):
+    def _notify(self, alarm, previous, reason, details):
         self.called = True
         raise Exception('Boom!')
 
@@ -42,5 +42,6 @@ class TestEvaluatorBaseClass(test.BaseTestCase):
 
         ev = EvaluatorSub(notifier)
         ev.api_client = mock.MagicMock()
-        ev._refresh(mock.MagicMock(), mock.MagicMock(), mock.MagicMock())
+        ev._refresh(mock.MagicMock(), mock.MagicMock(),
+                    mock.MagicMock(), mock.MagicMock())
         self.assertTrue(self.called)

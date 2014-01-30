@@ -80,7 +80,8 @@ class TestRPCAlarmNotifier(test.BaseTestCase):
     def test_notify_alarm(self):
         previous = ['alarm', 'ok']
         for i, a in enumerate(self.alarms):
-            self.notifier.notify(a, previous[i], "what? %d" % i)
+            self.notifier.notify(a, previous[i], "what? %d" % i,
+                                 {'fire': '%d' % i})
         self.assertEqual(len(self.notified), 2)
         for i, a in enumerate(self.alarms):
             actions = getattr(a, models.Alarm.ALARM_ACTIONS_MAP[a.state])
@@ -96,9 +97,12 @@ class TestRPCAlarmNotifier(test.BaseTestCase):
                              self.alarms[i].state)
             self.assertEqual(self.notified[i][1]["args"]["data"]["reason"],
                              "what? %d" % i)
+            self.assertEqual(
+                self.notified[i][1]["args"]["data"]["reason_data"],
+                {'fire': '%d' % i})
 
     def test_notify_non_string_reason(self):
-        self.notifier.notify(self.alarms[0], 'ok', 42)
+        self.notifier.notify(self.alarms[0], 'ok', 42, {})
         reason = self.notified[0][1]['args']['data']['reason']
         self.assertIsInstance(reason, basestring)
 
@@ -119,7 +123,7 @@ class TestRPCAlarmNotifier(test.BaseTestCase):
             'matching_metadata': {'resource_id':
                                   'my_instance'}
         })
-        self.notifier.notify(alarm, 'alarm', "what?")
+        self.notifier.notify(alarm, 'alarm', "what?", {})
         self.assertEqual(len(self.notified), 0)
 
 

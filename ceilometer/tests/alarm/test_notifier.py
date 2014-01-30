@@ -27,10 +27,12 @@ from ceilometer.openstack.common import test
 
 
 DATA_JSON = ('{"current": "ALARM", "alarm_id": "foobar",'
-             ' "reason": "what ?", "previous": "OK"}')
+             ' "reason": "what ?", "reason_data": {"test": "test"},'
+             ' "previous": "OK"}')
 NOTIFICATION = dict(alarm_id='foobar',
                     condition=dict(threshold=42),
                     reason='what ?',
+                    reason_data={'test': 'test'},
                     previous='OK',
                     current='ALARM')
 
@@ -57,6 +59,7 @@ class TestAlarmNotifier(test.BaseTestCase):
             'previous': 'OK',
             'current': 'ALARM',
             'reason': 'Everything is on fire',
+            'reason_data': {'fire': 'everywhere'}
         }
         self.service.notify_alarm(context.get_admin_context(), data)
         notifications = self.service.notifiers['test'].obj.notifications
@@ -66,7 +69,8 @@ class TestAlarmNotifier(test.BaseTestCase):
             data['alarm_id'],
             data['previous'],
             data['current'],
-            data['reason']))
+            data['reason'],
+            data['reason_data']))
 
     def test_notify_alarm_no_action(self):
         self.service.notify_alarm(context.get_admin_context(), {})
