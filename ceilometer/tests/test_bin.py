@@ -73,9 +73,9 @@ class BinTestCase(base.BaseTestCase):
         self.assertIn("Dropping data with TTL 1", err)
 
 
-class BinSendCounterTestCase(base.BaseTestCase):
+class BinSendSampleTestCase(base.BaseTestCase):
     def setUp(self):
-        super(BinSendCounterTestCase, self).setUp()
+        super(BinSendSampleTestCase, self).setUp()
         pipeline_cfg_file = self.path_get('etc/ceilometer/pipeline.yaml')
         content = "[DEFAULT]\n"\
                   "rpc_backend=ceilometer.openstack.common.rpc.impl_fake\n"\
@@ -86,14 +86,14 @@ class BinSendCounterTestCase(base.BaseTestCase):
                                                     suffix='.conf')
 
     def tearDown(self):
-        super(BinSendCounterTestCase, self).tearDown()
+        super(BinSendSampleTestCase, self).tearDown()
         os.remove(self.tempfile)
 
     def test_send_counter_run(self):
-        subp = subprocess.Popen([self.path_get('bin/ceilometer-send-counter'),
+        subp = subprocess.Popen(['ceilometer-send-sample',
                                  "--config-file=%s" % self.tempfile,
-                                 "--counter-resource=someuuid",
-                                 "--counter-name=mycounter"])
+                                 "--sample-resource=someuuid",
+                                 "--sample-name=mycounter"])
         self.assertEqual(subp.wait(), 0)
 
 
