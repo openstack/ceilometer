@@ -1797,12 +1797,13 @@ class EventTypesController(rest.RestController):
 
     traits = TraitsController()
 
-    # FIXME(herndon): due to a bug in pecan, making this method
-    # get_all instead of get will hide the traits subcontroller.
-    # https://bugs.launchpad.net/pecan/+bug/1262277
+    @pecan.expose()
+    def get_one(self, event_type):
+        pecan.abort(404)
+
     @requires_admin
     @wsme_pecan.wsexpose([unicode])
-    def get(self):
+    def get_all(self):
         """Get all event types.
         """
         return list(pecan.request.storage_conn.get_event_types())
