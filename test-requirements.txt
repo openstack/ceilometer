@@ -5,7 +5,6 @@ coverage>=3.6
 discover
 fixtures>=0.3.14
 httplib2>=0.7.5
-http://tarballs.openstack.org/nova/nova-master.tar.gz#egg=nova
 http://tarballs.openstack.org/swift/swift-master.tar.gz#egg=swift
 mock>=1.0
 mox>=0.5.3

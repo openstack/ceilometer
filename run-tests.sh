@@ -13,12 +13,6 @@ if [ "$1" = "--coverage" ]; then
 	shift
 fi
 
-if [ ! "$COVERAGE_ARGS" ]; then
-	# Nova notifier tests
-	bash tools/init_testr_if_needed.sh
-	python setup.py testr --slowest --testr-args="--here=nova_tests $*"
-fi
-
 # Main unit tests
 MONGO_DATA=`mktemp -d /tmp/CEILO-MONGODB-XXXXX`
 MONGO_PORT=29000
