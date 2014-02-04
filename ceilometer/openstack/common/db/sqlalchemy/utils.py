@@ -16,6 +16,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import logging
 import re
 
 from migrate.changeset import UniqueConstraint
@@ -37,8 +38,6 @@ from sqlalchemy import Table
 from sqlalchemy.types import NullType
 
 from ceilometer.openstack.common.gettextutils import _
-
-from ceilometer.openstack.common import log as logging
 from ceilometer.openstack.common import timeutils
 
 

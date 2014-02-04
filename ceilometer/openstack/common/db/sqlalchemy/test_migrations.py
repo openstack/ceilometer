@@ -15,6 +15,7 @@
 #    under the License.
 
 import functools
+import logging
 import os
 import subprocess
 
@@ -25,7 +26,6 @@ import sqlalchemy.exc
 
 from ceilometer.openstack.common.db.sqlalchemy import utils
 from ceilometer.openstack.common.gettextutils import _
-from ceilometer.openstack.common import log as logging
 from ceilometer.openstack.common.py3kcompat import urlutils
 from ceilometer.openstack.common import test
 

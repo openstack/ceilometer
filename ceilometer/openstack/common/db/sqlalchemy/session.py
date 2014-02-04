@@ -271,6 +271,7 @@ Efficient use of soft deletes:
 """
 
 import functools
+import logging
 import os.path
 import re
 import time
@@ -285,7 +286,6 @@ from sqlalchemy.sql.expression import literal_column
 
 from ceilometer.openstack.common.db import exception
 from ceilometer.openstack.common.gettextutils import _
-from ceilometer.openstack.common import log as logging
 from ceilometer.openstack.common import timeutils
 
 sqlite_db_opts = [
@@ -737,13 +737,16 @@ def create_engine(sql_connection, sqlite_fk=False,
     if engine.name in ['mysql', 'ibm_db_sa']:
         callback = functools.partial(_ping_listener, engine)
         sqlalchemy.event.listen(engine, 'checkout', callback)
-        if mysql_traditional_mode:
-            sqlalchemy.event.listen(engine, 'checkout', _set_mode_traditional)
-        else:
-            LOG.warning(_("This application has not enabled MySQL traditional"
-                          " mode, which means silent data corruption may"
-                          " occur. Please encourage the application"
-                          " developers to enable this mode."))
+        if engine.name == 'mysql':
+            if mysql_traditional_mode:
+                sqlalchemy.event.listen(engine, 'checkout',
+                                        _set_mode_traditional)
+            else:
+                LOG.warning(_("This application has not enabled MySQL "
+                              "traditional mode, which means silent "
+                              "data corruption may occur. "
+                              "Please encourage the application "
+                              "developers to enable this mode."))
     elif 'sqlite' in connection_dict.drivername:
         if not CONF.sqlite_synchronous:
             sqlalchemy.event.listen(engine, 'connect',

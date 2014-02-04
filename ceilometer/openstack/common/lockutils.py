@@ -114,10 +114,10 @@ class _InterProcessLock(object):
         try:
             self.unlock()
             self.lockfile.close()
+            LOG.debug(_('Released file lock "%s"'), self.fname)
         except IOError:
             LOG.exception(_("Could not release the acquired lock `%s`"),
                           self.fname)
-        LOG.debug(_('Released file lock "%s"'), self.fname)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.release()
