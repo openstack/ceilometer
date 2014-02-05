@@ -922,7 +922,7 @@ class Connection(base.Connection):
     create_alarm = update_alarm
 
     def delete_alarm(self, alarm_id):
-        """Delete a alarm
+        """Delete an alarm
         """
         self.db.alarm.remove({'alarm_id': alarm_id})
 

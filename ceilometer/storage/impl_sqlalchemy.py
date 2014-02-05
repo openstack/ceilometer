@@ -720,7 +720,7 @@ class Connection(base.Connection):
         return self._row_to_alarm_model(alarm_row)
 
     def delete_alarm(self, alarm_id):
-        """Delete a alarm
+        """Delete an alarm
 
         :param alarm_id: ID of the alarm to delete
         """
