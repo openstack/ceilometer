@@ -24,6 +24,7 @@ import datetime
 import json as jsonutils
 import logging
 import testscenarios
+import webtest.app
 
 from ceilometer.publisher import utils
 from ceilometer import sample
@@ -41,6 +42,30 @@ class TestListEmptyMeters(FunctionalTest,
     def test_empty(self):
         data = self.get_json('/meters')
         self.assertEqual([], data)
+
+
+class TestValidateUserInput(FunctionalTest,
+                            tests_db.MixinTestsWithBackendScenarios):
+
+    def test_list_meters_query_float_metadata(self):
+        self.assertRaises(webtest.app.AppError, self.get_json,
+                          '/meters/meter.test',
+                          q=[{'field': 'metadata.util',
+                          'op': 'eq',
+                          'value': '0.7.5',
+                          'type': 'float'}])
+        self.assertRaises(webtest.app.AppError, self.get_json,
+                          '/meters/meter.test',
+                          q=[{'field': 'metadata.util',
+                          'op': 'eq',
+                          'value': 'abacaba',
+                          'type': 'boolean'}])
+        self.assertRaises(webtest.app.AppError, self.get_json,
+                          '/meters/meter.test',
+                          q=[{'field': 'metadata.util',
+                          'op': 'eq',
+                          'value': '45.765',
+                          'type': 'integer'}])
 
 
 class TestListMeters(FunctionalTest,
@@ -309,7 +334,6 @@ class TestListMeters(FunctionalTest,
                          set(['meter.mine']))
         self.assertEqual(set(r['resource_metadata']['is_public'] for r
                              in data), set(['False']))
-        # FIXME(gordc): verify no false positive (Bug#1236496)
 
     def test_list_meters_query_string_metadata(self):
         data = self.get_json('/meters/meter.test',
