@@ -17,9 +17,7 @@
 
 import os
 
-import alembic
 from alembic import config as alembic_config
-
 from migrate import exceptions as versioning_exceptions
 from migrate.versioning import api as versioning_api
 from migrate.versioning.repository import Repository
@@ -34,7 +32,6 @@ def db_sync(engine):
     versioning_api.upgrade(engine, repository)
     config = _alembic_config()
     config._engine = engine
-    alembic.command.upgrade(config, "head")
 
 
 def _alembic_config():
