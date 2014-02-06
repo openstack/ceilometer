@@ -76,27 +76,27 @@ class TestSwiftMiddleware(test.BaseTestCase):
 
     def test_rpc_setup(self):
         swift_middleware.CeilometerMiddleware(FakeApp(), {})
-        self.assertEqual(self.CONF.control_exchange, 'ceilometer')
+        self.assertEqual('ceilometer', self.CONF.control_exchange)
 
     def test_get(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(), {})
         req = webob.Request.blank('/1.0/account/container/obj',
                                   environ={'REQUEST_METHOD': 'GET'})
         resp = app(req.environ, self.start_response)
-        self.assertEqual(list(resp), ["This string is 28 bytes long"])
+        self.assertEqual(["This string is 28 bytes long"], list(resp))
         samples = self.pipeline_manager.pipelines[0].samples
-        self.assertEqual(len(samples), 2)
+        self.assertEqual(2, len(samples))
         data = samples[0]
-        self.assertEqual(data.volume, 28)
-        self.assertEqual(data.resource_metadata['version'], '1.0')
-        self.assertEqual(data.resource_metadata['container'], 'container')
-        self.assertEqual(data.resource_metadata['object'], 'obj')
+        self.assertEqual(28, data.volume)
+        self.assertEqual('1.0', data.resource_metadata['version'])
+        self.assertEqual('container', data.resource_metadata['container'])
+        self.assertEqual('obj', data.resource_metadata['object'])
 
         # test the # of request and the request method
         data = samples[1]
-        self.assertEqual(data.name, 'storage.api.request')
-        self.assertEqual(data.volume, 1)
-        self.assertEqual(data.resource_metadata['method'], 'get')
+        self.assertEqual('storage.api.request', data.name)
+        self.assertEqual(1, data.volume)
+        self.assertEqual('get', data.resource_metadata['method'])
 
     def test_put(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(body=['']), {})
@@ -106,18 +106,18 @@ class TestSwiftMiddleware(test.BaseTestCase):
                                            six.moves.cStringIO('some stuff')})
         list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples
-        self.assertEqual(len(samples), 2)
+        self.assertEqual(2, len(samples))
         data = samples[0]
-        self.assertEqual(data.volume, 10)
-        self.assertEqual(data.resource_metadata['version'], '1.0')
-        self.assertEqual(data.resource_metadata['container'], 'container')
-        self.assertEqual(data.resource_metadata['object'], 'obj')
+        self.assertEqual(10, data.volume)
+        self.assertEqual('1.0', data.resource_metadata['version'])
+        self.assertEqual('container', data.resource_metadata['container'])
+        self.assertEqual('obj', data.resource_metadata['object'])
 
         # test the # of request and the request method
         data = samples[1]
-        self.assertEqual(data.name, 'storage.api.request')
-        self.assertEqual(data.volume, 1)
-        self.assertEqual(data.resource_metadata['method'], 'put')
+        self.assertEqual('storage.api.request', data.name)
+        self.assertEqual(1, data.volume)
+        self.assertEqual('put', data.resource_metadata['method'])
 
     def test_post(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(body=['']), {})
@@ -127,18 +127,18 @@ class TestSwiftMiddleware(test.BaseTestCase):
                      'wsgi.input': six.moves.cStringIO('some other stuff')})
         list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples
-        self.assertEqual(len(samples), 2)
+        self.assertEqual(2, len(samples))
         data = samples[0]
-        self.assertEqual(data.volume, 16)
-        self.assertEqual(data.resource_metadata['version'], '1.0')
-        self.assertEqual(data.resource_metadata['container'], 'container')
-        self.assertEqual(data.resource_metadata['object'], 'obj')
+        self.assertEqual(16, data.volume)
+        self.assertEqual('1.0', data.resource_metadata['version'])
+        self.assertEqual('container', data.resource_metadata['container'])
+        self.assertEqual('obj', data.resource_metadata['object'])
 
         # test the # of request and the request method
         data = samples[1]
-        self.assertEqual(data.name, 'storage.api.request')
-        self.assertEqual(data.volume, 1)
-        self.assertEqual(data.resource_metadata['method'], 'post')
+        self.assertEqual('storage.api.request', data.name)
+        self.assertEqual(1, data.volume)
+        self.assertEqual('post', data.resource_metadata['method'])
 
     def test_head(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(body=['']), {})
@@ -146,15 +146,15 @@ class TestSwiftMiddleware(test.BaseTestCase):
                                   environ={'REQUEST_METHOD': 'HEAD'})
         list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples
-        self.assertEqual(len(samples), 1)
+        self.assertEqual(1, len(samples))
         data = samples[0]
-        self.assertEqual(data.resource_metadata['version'], '1.0')
-        self.assertEqual(data.resource_metadata['container'], 'container')
-        self.assertEqual(data.resource_metadata['object'], 'obj')
-        self.assertEqual(data.resource_metadata['method'], 'head')
+        self.assertEqual('1.0', data.resource_metadata['version'])
+        self.assertEqual('container', data.resource_metadata['container'])
+        self.assertEqual('obj', data.resource_metadata['object'])
+        self.assertEqual('head', data.resource_metadata['method'])
 
-        self.assertEqual(data.name, 'storage.api.request')
-        self.assertEqual(data.volume, 1)
+        self.assertEqual('storage.api.request', data.name)
+        self.assertEqual(1, data.volume)
 
     def test_bogus_request(self):
         """Test even for arbitrary request method, this will still work."""
@@ -164,15 +164,15 @@ class TestSwiftMiddleware(test.BaseTestCase):
         list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples
 
-        self.assertEqual(len(samples), 1)
+        self.assertEqual(1, len(samples))
         data = samples[0]
-        self.assertEqual(data.resource_metadata['version'], '1.0')
-        self.assertEqual(data.resource_metadata['container'], 'container')
-        self.assertEqual(data.resource_metadata['object'], 'obj')
-        self.assertEqual(data.resource_metadata['method'], 'bogus')
+        self.assertEqual('1.0', data.resource_metadata['version'])
+        self.assertEqual('container', data.resource_metadata['container'])
+        self.assertEqual('obj', data.resource_metadata['object'])
+        self.assertEqual('bogus', data.resource_metadata['method'])
 
-        self.assertEqual(data.name, 'storage.api.request')
-        self.assertEqual(data.volume, 1)
+        self.assertEqual('storage.api.request', data.name)
+        self.assertEqual(1, data.volume)
 
     def test_get_container(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(), {})
@@ -180,11 +180,11 @@ class TestSwiftMiddleware(test.BaseTestCase):
                                   environ={'REQUEST_METHOD': 'GET'})
         list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples
-        self.assertEqual(len(samples), 2)
+        self.assertEqual(2, len(samples))
         data = samples[0]
-        self.assertEqual(data.volume, 28)
-        self.assertEqual(data.resource_metadata['version'], '1.0')
-        self.assertEqual(data.resource_metadata['container'], 'container')
+        self.assertEqual(28, data.volume)
+        self.assertEqual('1.0', data.resource_metadata['version'])
+        self.assertEqual('container', data.resource_metadata['container'])
         self.assertIsNone(data.resource_metadata['object'])
 
     def test_no_metadata_headers(self):
@@ -193,13 +193,13 @@ class TestSwiftMiddleware(test.BaseTestCase):
                                   environ={'REQUEST_METHOD': 'GET'})
         list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples
-        self.assertEqual(len(samples), 2)
+        self.assertEqual(2, len(samples))
         data = samples[0]
         http_headers = [k for k in data.resource_metadata.keys()
                         if k.startswith('http_header_')]
-        self.assertEqual(len(http_headers), 0)
-        self.assertEqual(data.resource_metadata['version'], '1.0')
-        self.assertEqual(data.resource_metadata['container'], 'container')
+        self.assertEqual(0, len(http_headers))
+        self.assertEqual('1.0', data.resource_metadata['version'])
+        self.assertEqual('container', data.resource_metadata['container'])
         self.assertIsNone(data.resource_metadata['object'])
 
     def test_metadata_headers(self):
@@ -212,18 +212,18 @@ class TestSwiftMiddleware(test.BaseTestCase):
                                            'X_VAR2': 'value2'})
         list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples
-        self.assertEqual(len(samples), 2)
+        self.assertEqual(2, len(samples))
         data = samples[0]
         http_headers = [k for k in data.resource_metadata.keys()
                         if k.startswith('http_header_')]
-        self.assertEqual(len(http_headers), 2)
-        self.assertEqual(data.resource_metadata['version'], '1.0')
-        self.assertEqual(data.resource_metadata['container'], 'container')
+        self.assertEqual(2, len(http_headers))
+        self.assertEqual('1.0', data.resource_metadata['version'])
+        self.assertEqual('container', data.resource_metadata['container'])
         self.assertIsNone(data.resource_metadata['object'])
-        self.assertEqual(data.resource_metadata['http_header_x_var1'],
-                         'value1')
-        self.assertEqual(data.resource_metadata['http_header_x_var2'],
-                         'value2')
+        self.assertEqual('value1',
+                         data.resource_metadata['http_header_x_var1'])
+        self.assertEqual('value2',
+                         data.resource_metadata['http_header_x_var2'])
         self.assertFalse('http_header_x_var3' in data.resource_metadata)
 
     def test_metadata_headers_on_not_existing_header(self):
@@ -234,13 +234,13 @@ class TestSwiftMiddleware(test.BaseTestCase):
                                   environ={'REQUEST_METHOD': 'GET'})
         list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples
-        self.assertEqual(len(samples), 2)
+        self.assertEqual(2, len(samples))
         data = samples[0]
         http_headers = [k for k in data.resource_metadata.keys()
                         if k.startswith('http_header_')]
-        self.assertEqual(len(http_headers), 0)
-        self.assertEqual(data.resource_metadata['version'], '1.0')
-        self.assertEqual(data.resource_metadata['container'], 'container')
+        self.assertEqual(0, len(http_headers))
+        self.assertEqual('1.0', data.resource_metadata['version'])
+        self.assertEqual('container', data.resource_metadata['container'])
         self.assertIsNone(data.resource_metadata['object'])
 
     def test_bogus_path(self):
@@ -249,14 +249,14 @@ class TestSwiftMiddleware(test.BaseTestCase):
                                   environ={'REQUEST_METHOD': 'GET'})
         list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples
-        self.assertEqual(len(samples), 0)
+        self.assertEqual(0, len(samples))
 
     def test_missing_resource_id(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(), {})
         req = webob.Request.blank('/5.0/', environ={'REQUEST_METHOD': 'GET'})
         list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples
-        self.assertEqual(len(samples), 0)
+        self.assertEqual(0, len(samples))
 
     @mock.patch.object(swift_middleware.CeilometerMiddleware,
                        'publish_sample')
@@ -267,8 +267,8 @@ class TestSwiftMiddleware(test.BaseTestCase):
                                   environ={'REQUEST_METHOD': 'GET'})
         resp = list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples
-        self.assertEqual(len(samples), 0)
-        self.assertEqual(resp, ["test"])
+        self.assertEqual(0, len(samples))
+        self.assertEqual(["test"], resp)
         mocked_publish_sample.assert_called_once_with(mock.ANY, 0, 4)
 
     def test_reseller_prefix(self):
@@ -278,7 +278,7 @@ class TestSwiftMiddleware(test.BaseTestCase):
                                   environ={'REQUEST_METHOD': 'GET'})
         list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples[0]
-        self.assertEqual(samples.resource_id, "account")
+        self.assertEqual("account", samples.resource_id)
 
         # Custom reseller prefix set
         app = swift_middleware.CeilometerMiddleware(
@@ -287,7 +287,7 @@ class TestSwiftMiddleware(test.BaseTestCase):
                                   environ={'REQUEST_METHOD': 'GET'})
         list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples[0]
-        self.assertEqual(samples.resource_id, "account")
+        self.assertEqual("account", samples.resource_id)
 
     def test_invalid_reseller_prefix(self):
         # Custom reseller prefix set, but without trailing underscore
@@ -297,4 +297,4 @@ class TestSwiftMiddleware(test.BaseTestCase):
                                   environ={'REQUEST_METHOD': 'GET'})
         list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples[0]
-        self.assertEqual(samples.resource_id, "account")
+        self.assertEqual("account", samples.resource_id)

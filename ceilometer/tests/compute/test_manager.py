@@ -73,8 +73,8 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
 
     def test_interval_exception_isolation(self):
         super(TestRunTasks, self).test_interval_exception_isolation()
-        self.assertEqual(len(self.PollsterException.samples), 1)
-        self.assertEqual(len(self.PollsterExceptionAnother.samples), 1)
+        self.assertEqual(1, len(self.PollsterException.samples))
+        self.assertEqual(1, len(self.PollsterExceptionAnother.samples))
 
     def test_manager_exception_persistency(self):
         super(TestRunTasks, self).test_manager_exception_persistency()

@@ -31,26 +31,26 @@ class TestSplitterPlugin(test.BaseTestCase):
         plugin = self.pclass(**param)
         match_list = [('test.thing', 'test-foobar-baz')]
         value = plugin.trait_value(match_list)
-        self.assertEqual(value, 'test')
+        self.assertEqual('test', value)
 
         param = dict(separator='-', segment=1)
         plugin = self.pclass(**param)
         match_list = [('test.thing', 'test-foobar-baz')]
         value = plugin.trait_value(match_list)
-        self.assertEqual(value, 'foobar')
+        self.assertEqual('foobar', value)
 
         param = dict(separator='-', segment=1, max_split=1)
         plugin = self.pclass(**param)
         match_list = [('test.thing', 'test-foobar-baz')]
         value = plugin.trait_value(match_list)
-        self.assertEqual(value, 'foobar-baz')
+        self.assertEqual('foobar-baz', value)
 
     def test_no_sep(self):
         param = dict(separator='-', segment=0)
         plugin = self.pclass(**param)
         match_list = [('test.thing', 'test.foobar.baz')]
         value = plugin.trait_value(match_list)
-        self.assertEqual(value, 'test.foobar.baz')
+        self.assertEqual('test.foobar.baz', value)
 
     def test_no_segment(self):
         param = dict(separator='-', segment=5)
@@ -90,7 +90,7 @@ class TestBitfieldPlugin(test.BaseTestCase):
 
         plugin = self.pclass(**self.params)
         value = plugin.trait_value(match_list)
-        self.assertEqual(value, 0x412)
+        self.assertEqual(0x412, value)
 
     def test_initial(self):
         match_list = [('payload.foo', 12),
@@ -99,13 +99,13 @@ class TestBitfieldPlugin(test.BaseTestCase):
         self.params['initial_bitfield'] = 0x2000
         plugin = self.pclass(**self.params)
         value = plugin.trait_value(match_list)
-        self.assertEqual(value, 0x2412)
+        self.assertEqual(0x2412, value)
 
     def test_no_match(self):
         match_list = []
         plugin = self.pclass(**self.params)
         value = plugin.trait_value(match_list)
-        self.assertEqual(value, self.init)
+        self.assertEqual(self.init, value)
 
     def test_multi(self):
         match_list = [('payload.foo', 12),
@@ -115,4 +115,4 @@ class TestBitfieldPlugin(test.BaseTestCase):
 
         plugin = self.pclass(**self.params)
         value = plugin.trait_value(match_list)
-        self.assertEqual(value, 0x412)
+        self.assertEqual(0x412, value)

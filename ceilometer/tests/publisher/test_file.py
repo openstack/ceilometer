@@ -81,9 +81,9 @@ class TestFilePublisher(test.BaseTestCase):
         handler = publisher.publisher_logger.handlers[0]
         self.assertIsInstance(handler,
                               logging.handlers.RotatingFileHandler)
-        self.assertEqual([handler.maxBytes, handler.baseFilename,
-                          handler.backupCount],
-                         [50, name, 3])
+        self.assertEqual([50, name, 3], [handler.maxBytes,
+                                         handler.baseFilename,
+                                         handler.backupCount])
         # The rotating file gets created since only allow 50 bytes.
         self.assertTrue(os.path.exists('%s.1' % name))
 
@@ -99,9 +99,9 @@ class TestFilePublisher(test.BaseTestCase):
         handler = publisher.publisher_logger.handlers[0]
         self.assertIsInstance(handler,
                               logging.handlers.RotatingFileHandler)
-        self.assertEqual([handler.maxBytes, handler.baseFilename,
-                          handler.backupCount],
-                         [0, name, 0])
+        self.assertEqual([0, name, 0], [handler.maxBytes,
+                                        handler.baseFilename,
+                                        handler.backupCount])
         # Test the content is corrected saved in the file
         self.assertTrue(os.path.exists(name))
         with open(name, 'r') as f:

@@ -69,28 +69,27 @@ class TestFloatingIPPollster(test.BaseTestCase):
 
     def test_get_samples_not_empty(self):
         samples = list(self.pollster.get_samples(self.manager, {}))
-        self.assertEqual(len(samples), 3)
+        self.assertEqual(3, len(samples))
         # It's necessary to verify all the attributes extracted by Nova
         # API /os-floating-ips to make sure they're available and correct.
-        self.assertEqual(samples[0].resource_id, 1)
-        self.assertEqual(samples[0].resource_metadata["address"], "1.1.1.1")
-        self.assertEqual(samples[0].resource_metadata["pool"], "public")
+        self.assertEqual(1, samples[0].resource_id)
+        self.assertEqual("1.1.1.1", samples[0].resource_metadata["address"])
+        self.assertEqual("public", samples[0].resource_metadata["pool"])
 
-        self.assertEqual(samples[1].resource_id, 2)
-        self.assertEqual(samples[1].resource_metadata["address"], "1.1.1.2")
-        self.assertEqual(samples[1].resource_metadata["pool"], "public")
+        self.assertEqual(2, samples[1].resource_id)
+        self.assertEqual("1.1.1.2", samples[1].resource_metadata["address"])
+        self.assertEqual("public", samples[1].resource_metadata["pool"])
 
-        self.assertEqual(samples[2].resource_id, 3)
-        self.assertEqual(samples[2].resource_metadata["address"], "1.1.1.3")
-        self.assertEqual(samples[2].resource_metadata["pool"], "public")
+        self.assertEqual(3, samples[2].resource_id)
+        self.assertEqual("1.1.1.3", samples[2].resource_metadata["address"])
+        self.assertEqual("public", samples[2].resource_metadata["pool"])
 
     def test_get_meter_names(self):
         samples = list(self.pollster.get_samples(self.manager, {}))
-        self.assertEqual(set([s.name for s in samples]),
-                         set(['ip.floating']))
+        self.assertEqual(set(['ip.floating']), set([s.name for s in samples]))
 
     def test_get_samples_cached(self):
         cache = {}
         cache['floating_ips'] = self.fake_get_ips()[:2]
         samples = list(self.pollster.get_samples(self.manager, cache))
-        self.assertEqual(len(samples), 2)
+        self.assertEqual(2, len(samples))

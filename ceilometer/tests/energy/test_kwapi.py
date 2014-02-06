@@ -72,7 +72,7 @@ class TestKwapi(test.BaseTestCase):
             pollster = kwapi.EnergyPollster()
             samples = list(pollster.get_samples(self.manager, {}))
 
-        self.assertEqual(len(samples), 0)
+        self.assertEqual(0, len(samples))
 
 
 class TestEnergyPollster(test.BaseTestCase):
@@ -99,15 +99,15 @@ class TestEnergyPollster(test.BaseTestCase):
             self.manager,
             cache,
         ))
-        self.assertEqual(len(samples), 3)
+        self.assertEqual(3, len(samples))
         samples_by_name = dict((s.resource_id, s) for s in samples)
         for name, probe in PROBE_DICT['probes'].items():
             sample = samples_by_name[name]
             expected = datetime.datetime.fromtimestamp(
                 probe['timestamp']
             ).isoformat()
-            self.assertEqual(sample.timestamp, expected)
-            self.assertEqual(sample.volume, probe['kwh'])
+            self.assertEqual(expected, sample.timestamp)
+            self.assertEqual(probe['kwh'], sample.volume)
             # self.assert_(
             #     any(map(lambda sample: sample.volume == probe['w'],
             #             power_samples)))
@@ -132,7 +132,7 @@ class TestEnergyPollsterCache(test.BaseTestCase):
         with mock.patch.object(pollster, '_get_probes') as do_not_call:
             do_not_call.side_effect = AssertionError('should not be called')
             samples = list(pollster.get_samples(self.manager, cache))
-        self.assertEqual(len(samples), 1)
+        self.assertEqual(1, len(samples))
 
 
 class TestPowerPollster(test.BaseTestCase):
@@ -159,15 +159,15 @@ class TestPowerPollster(test.BaseTestCase):
             self.manager,
             cache,
         ))
-        self.assertEqual(len(samples), 3)
+        self.assertEqual(3, len(samples))
         samples_by_name = dict((s.resource_id, s) for s in samples)
         for name, probe in PROBE_DICT['probes'].items():
             sample = samples_by_name[name]
             expected = datetime.datetime.fromtimestamp(
                 probe['timestamp']
             ).isoformat()
-            self.assertEqual(sample.timestamp, expected)
-            self.assertEqual(sample.volume, probe['w'])
+            self.assertEqual(expected, sample.timestamp)
+            self.assertEqual(probe['w'], sample.volume)
 
 
 class TestPowerPollsterCache(test.BaseTestCase):
@@ -189,4 +189,4 @@ class TestPowerPollsterCache(test.BaseTestCase):
         with mock.patch.object(pollster, '_get_probes') as do_not_call:
             do_not_call.side_effect = AssertionError('should not be called')
             samples = list(pollster.get_samples(self.manager, cache))
-        self.assertEqual(len(samples), 1)
+        self.assertEqual(1, len(samples))

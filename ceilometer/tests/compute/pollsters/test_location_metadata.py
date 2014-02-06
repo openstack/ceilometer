@@ -90,12 +90,12 @@ class TestLocationMetadata(test.BaseTestCase):
                     prop = "host"
                 elif prop == 'OS-EXT-SRV-ATTR:instance_name':
                     prop = 'name'
-                self.assertEqual(md[prop], value)
+                self.assertEqual(value, md[prop])
         user_metadata = md['user_metadata']
         expected = self.INSTANCE_PROPERTIES[
             'metadata']['metering.autoscale.group'][:256]
-        self.assertEqual(user_metadata['autoscale_group'], expected)
-        self.assertEqual(len(user_metadata), 1)
+        self.assertEqual(expected, user_metadata['autoscale_group'])
+        self.assertEqual(1, len(user_metadata))
 
     def test_metadata_empty_image(self):
         self.INSTANCE_PROPERTIES['image'] = ''

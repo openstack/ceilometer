@@ -114,38 +114,37 @@ class TestPublish(test.BaseTestCase):
             network_utils.urlsplit('rpc://'))
         publisher.publish_samples(None,
                                   self.test_data)
-        self.assertEqual(len(self.published), 1)
-        self.assertEqual(self.published[0][0],
-                         self.CONF.publisher_rpc.metering_topic)
+        self.assertEqual(1, len(self.published))
+        self.assertEqual(self.CONF.publisher_rpc.metering_topic,
+                         self.published[0][0])
         self.assertIsInstance(self.published[0][1]['args']['data'], list)
-        self.assertEqual(self.published[0][1]['method'],
-                         'record_metering_data')
+        self.assertEqual('record_metering_data',
+                         self.published[0][1]['method'])
 
     def test_publish_target(self):
         publisher = rpc.RPCPublisher(
             network_utils.urlsplit('rpc://?target=custom_procedure_call'))
         publisher.publish_samples(None,
                                   self.test_data)
-        self.assertEqual(len(self.published), 1)
-        self.assertEqual(self.published[0][0],
-                         self.CONF.publisher_rpc.metering_topic)
+        self.assertEqual(1, len(self.published))
+        self.assertEqual(self.CONF.publisher_rpc.metering_topic,
+                         self.published[0][0])
         self.assertIsInstance(self.published[0][1]['args']['data'], list)
-        self.assertEqual(self.published[0][1]['method'],
-                         'custom_procedure_call')
+        self.assertEqual('custom_procedure_call',
+                         self.published[0][1]['method'])
 
     def test_published_with_per_meter_topic(self):
         publisher = rpc.RPCPublisher(
             network_utils.urlsplit('rpc://?per_meter_topic=1'))
         publisher.publish_samples(None,
                                   self.test_data)
-        self.assertEqual(len(self.published), 4)
+        self.assertEqual(4, len(self.published))
         for topic, rpc_call in self.published:
             meters = rpc_call['args']['data']
             self.assertIsInstance(meters, list)
             if topic != self.CONF.publisher_rpc.metering_topic:
-                self.assertEqual(len(set(meter['counter_name']
-                                         for meter in meters)),
-                                 1,
+                self.assertEqual(1, len(set(meter['counter_name']
+                                        for meter in meters)),
                                  "Meter are published grouped by name")
 
         topics = [topic for topic, meter in self.published]
@@ -184,9 +183,9 @@ class TestPublish(test.BaseTestCase):
         job1.wait()
         job2.wait()
 
-        self.assertEqual(publisher.policy, 'default')
-        self.assertEqual(len(self.published), 2)
-        self.assertEqual(len(publisher.local_queue), 0)
+        self.assertEqual('default', publisher.policy)
+        self.assertEqual(2, len(self.published))
+        self.assertEqual(0, len(publisher.local_queue))
 
     @mock.patch('ceilometer.publisher.rpc.LOG')
     def test_published_with_no_policy(self, mylog):
@@ -199,9 +198,9 @@ class TestPublish(test.BaseTestCase):
             SystemExit,
             publisher.publish_samples,
             None, self.test_data)
-        self.assertEqual(publisher.policy, 'default')
-        self.assertEqual(len(self.published), 0)
-        self.assertEqual(len(publisher.local_queue), 0)
+        self.assertEqual('default', publisher.policy)
+        self.assertEqual(0, len(self.published))
+        self.assertEqual(0, len(publisher.local_queue))
 
     @mock.patch('ceilometer.publisher.rpc.LOG')
     def test_published_with_policy_block(self, mylog):
@@ -213,8 +212,8 @@ class TestPublish(test.BaseTestCase):
             SystemExit,
             publisher.publish_samples,
             None, self.test_data)
-        self.assertEqual(len(self.published), 0)
-        self.assertEqual(len(publisher.local_queue), 0)
+        self.assertEqual(0, len(self.published))
+        self.assertEqual(0, len(publisher.local_queue))
 
     @mock.patch('ceilometer.publisher.rpc.LOG')
     def test_published_with_policy_incorrect(self, mylog):
@@ -226,9 +225,9 @@ class TestPublish(test.BaseTestCase):
             publisher.publish_samples,
             None, self.test_data)
         self.assertTrue(mylog.warn.called)
-        self.assertEqual(publisher.policy, 'default')
-        self.assertEqual(len(self.published), 0)
-        self.assertEqual(len(publisher.local_queue), 0)
+        self.assertEqual('default', publisher.policy)
+        self.assertEqual(0, len(self.published))
+        self.assertEqual(0, len(publisher.local_queue))
 
     def test_published_with_policy_drop_and_rpc_down(self):
         self.rpc_unreachable = True
@@ -236,8 +235,8 @@ class TestPublish(test.BaseTestCase):
             network_utils.urlsplit('rpc://?policy=drop'))
         publisher.publish_samples(None,
                                   self.test_data)
-        self.assertEqual(len(self.published), 0)
-        self.assertEqual(len(publisher.local_queue), 0)
+        self.assertEqual(0, len(self.published))
+        self.assertEqual(0, len(publisher.local_queue))
 
     def test_published_with_policy_queue_and_rpc_down(self):
         self.rpc_unreachable = True
@@ -245,8 +244,8 @@ class TestPublish(test.BaseTestCase):
             network_utils.urlsplit('rpc://?policy=queue'))
         publisher.publish_samples(None,
                                   self.test_data)
-        self.assertEqual(len(self.published), 0)
-        self.assertEqual(len(publisher.local_queue), 1)
+        self.assertEqual(0, len(self.published))
+        self.assertEqual(1, len(publisher.local_queue))
 
     def test_published_with_policy_queue_and_rpc_down_up(self):
         self.rpc_unreachable = True
@@ -254,15 +253,15 @@ class TestPublish(test.BaseTestCase):
             network_utils.urlsplit('rpc://?policy=queue'))
         publisher.publish_samples(None,
                                   self.test_data)
-        self.assertEqual(len(self.published), 0)
-        self.assertEqual(len(publisher.local_queue), 1)
+        self.assertEqual(0, len(self.published))
+        self.assertEqual(1, len(publisher.local_queue))
 
         self.rpc_unreachable = False
         publisher.publish_samples(None,
                                   self.test_data)
 
-        self.assertEqual(len(self.published), 2)
-        self.assertEqual(len(publisher.local_queue), 0)
+        self.assertEqual(2, len(self.published))
+        self.assertEqual(0, len(publisher.local_queue))
 
     def test_published_with_policy_sized_queue_and_rpc_down(self):
         self.rpc_unreachable = True
@@ -273,20 +272,17 @@ class TestPublish(test.BaseTestCase):
                 s.source = 'test-%d' % i
             publisher.publish_samples(None,
                                       self.test_data)
-        self.assertEqual(len(self.published), 0)
-        self.assertEqual(len(publisher.local_queue), 3)
-        self.assertEqual(
-            publisher.local_queue[0][2]['args']['data'][0]['source'],
-            'test-2'
-        )
-        self.assertEqual(
-            publisher.local_queue[1][2]['args']['data'][0]['source'],
-            'test-3'
-        )
-        self.assertEqual(
-            publisher.local_queue[2][2]['args']['data'][0]['source'],
-            'test-4'
-        )
+        self.assertEqual(0, len(self.published))
+        self.assertEqual(3, len(publisher.local_queue))
+        self.assertEqual('test-2',
+                         publisher.local_queue[0][2]['args']['data'][0]
+                         ['source'])
+        self.assertEqual('test-3',
+                         publisher.local_queue[1][2]['args']['data'][0]
+                         ['source'])
+        self.assertEqual('test-4',
+                         publisher.local_queue[2][2]['args']['data'][0]
+                         ['source'])
 
     def test_published_with_policy_default_sized_queue_and_rpc_down(self):
         self.rpc_unreachable = True
@@ -297,13 +293,11 @@ class TestPublish(test.BaseTestCase):
                 s.source = 'test-%d' % i
             publisher.publish_samples(None,
                                       self.test_data)
-        self.assertEqual(len(self.published), 0)
-        self.assertEqual(len(publisher.local_queue), 1024)
-        self.assertEqual(
-            publisher.local_queue[0][2]['args']['data'][0]['source'],
-            'test-976'
-        )
-        self.assertEqual(
-            publisher.local_queue[1023][2]['args']['data'][0]['source'],
-            'test-1999'
-        )
+        self.assertEqual(0, len(self.published))
+        self.assertEqual(1024, len(publisher.local_queue))
+        self.assertEqual('test-976',
+                         publisher.local_queue[0][2]['args']['data'][0]
+                         ['source'])
+        self.assertEqual('test-1999',
+                         publisher.local_queue[1023][2]['args']['data'][0]
+                         ['source'])
