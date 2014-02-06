@@ -54,8 +54,8 @@ def outside(s, key, lower=0.0, upper=0.0):
     return v < lower or v > upper
 
 
-def anomolies(s, key, lower=0.0, upper=0.0):
-    """Separate anomolous datapoints from the inliers.
+def anomalies(s, key, lower=0.0, upper=0.0):
+    """Separate anomalous data points from the in-liers.
     """
     inliers = []
     outliers = []
