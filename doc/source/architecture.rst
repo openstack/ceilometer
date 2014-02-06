@@ -165,6 +165,8 @@ database through the REST API for a various set of use cases (see the section
 
 .. _send their own application centric data: ./webapi/v2.html#user-defined-data
 
+.. _multi-publisher:
+
 Multi-Publisher
 ---------------
 
@@ -327,6 +329,8 @@ Each plugin API is defined by the namespace and an abstract base class
 for the plugin instances. Plugins are not required to subclass from
 the API definition class, but it is encouraged as a way to discover
 API changes.
+
+.. _polling:
 
 Polling
 -------
