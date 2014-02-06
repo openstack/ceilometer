@@ -432,12 +432,12 @@ def _load_log_config(log_config_append):
         raise LogConfigError(log_config_append, str(exc))
 
 
-def setup(product_name):
+def setup(product_name, version='unknown'):
     """Setup logging."""
     if CONF.log_config_append:
         _load_log_config(CONF.log_config_append)
     else:
-        _setup_logging_from_conf()
+        _setup_logging_from_conf(product_name, version)
     sys.excepthook = _create_logging_excepthook(product_name)
 
 
@@ -482,7 +482,7 @@ class RFCSysLogHandler(logging.handlers.SysLogHandler):
         return msg
 
 
-def _setup_logging_from_conf():
+def _setup_logging_from_conf(project, version):
     log_root = getLogger(None).logger
     for handler in log_root.handlers:
         log_root.removeHandler(handler)
@@ -530,7 +530,9 @@ def _setup_logging_from_conf():
             log_root.info('Deprecated: log_format is now deprecated and will '
                           'be removed in the next release')
         else:
-            handler.setFormatter(ContextFormatter(datefmt=datefmt))
+            handler.setFormatter(ContextFormatter(project=project,
+                                                  version=version,
+                                                  datefmt=datefmt))
 
     if CONF.debug:
         log_root.setLevel(logging.DEBUG)
@@ -588,10 +590,42 @@ class ContextFormatter(logging.Formatter):
     For information about what variables are available for the formatter see:
     http://docs.python.org/library/logging.html#formatter
 
+    If available, uses the context value stored in TLS - local.store.context
+
     """
+
+    def __init__(self, *args, **kwargs):
+        """Initialize ContextFormatter instance
+
+        Takes additional keyword arguments which can be used in the message
+        format string.
+
+        :keyword project: project name
+        :type project: string
+        :keyword version: project version
+        :type version: string
+
+        """
+
+        self.project = kwargs.pop('project', 'unknown')
+        self.version = kwargs.pop('version', 'unknown')
+
+        logging.Formatter.__init__(self, *args, **kwargs)
 
     def format(self, record):
         """Uses contextstring if request_id is set, otherwise default."""
+
+        # store project info
+        record.project = self.project
+        record.version = self.version
+
+        # store request info
+        context = getattr(local.store, 'context', None)
+        if context:
+            d = _dictify_context(context)
+            for k, v in d.items():
+                setattr(record, k, v)
+
         # NOTE(sdague): default the fancier formatting params
         # to an empty string so we don't throw an exception if
         # they get used

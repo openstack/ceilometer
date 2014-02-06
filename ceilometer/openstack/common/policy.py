@@ -119,11 +119,16 @@ class Rules(dict):
 
         # If the default rule isn't actually defined, do something
         # reasonably intelligent
-        if not self.default_rule or self.default_rule not in self:
+        if not self.default_rule:
             raise KeyError(key)
 
         if isinstance(self.default_rule, BaseCheck):
             return self.default_rule
+
+        # We need to check this or we can get infinite recursion
+        if self.default_rule not in self:
+            raise KeyError(key)
+
         elif isinstance(self.default_rule, six.string_types):
             return self[self.default_rule]
 
