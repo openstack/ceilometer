@@ -153,17 +153,16 @@ class TestCoordinate(test.BaseTestCase):
             target, alarms = args
             self.assertTrue(target in uneffected)
             uneffected.remove(target)
-            self.assertEqual(len(alarms), per_worker)
+            self.assertEqual(per_worker, len(alarms))
             for aid in alarms:
                 self.assertTrue(aid in remainder)
                 remainder.remove(aid)
-        self.assertEqual(set(uneffected), set(expect_uneffected))
+        self.assertEqual(set(expect_uneffected), set(uneffected))
         return remainder
 
     def _forget_assignments(self, expected_assignments):
         rpc = self.partition_coordinator.coordination_rpc
-        self.assertEqual(len(rpc.assign.call_args_list),
-                         expected_assignments)
+        self.assertEqual(expected_assignments, len(rpc.assign.call_args_list))
         rpc.reset_mock()
 
     def test_mastership_not_assumed_during_warmup(self):
@@ -237,8 +236,8 @@ class TestCoordinate(test.BaseTestCase):
         self._check_mastership(True)
 
         remainder = self._check_assignments(others, alarm_ids, 10)
-        self.assertEqual(set(remainder),
-                         set(self.partition_coordinator.assignment))
+        self.assertEqual(set(self.partition_coordinator.assignment),
+                         set(remainder))
 
     def test_rebalance_on_partition_startup(self):
         alarm_ids = self._some_alarms(49)
@@ -255,8 +254,8 @@ class TestCoordinate(test.BaseTestCase):
         self._check_mastership(True)
 
         remainder = self._check_assignments(others, alarm_ids, 9)
-        self.assertEqual(set(remainder),
-                         set(self.partition_coordinator.assignment))
+        self.assertEqual(set(self.partition_coordinator.assignment),
+                         set(remainder))
 
     def test_rebalance_on_partition_staleness(self):
         alarm_ids = self._some_alarms(49)
@@ -278,8 +277,8 @@ class TestCoordinate(test.BaseTestCase):
         self._check_mastership(True)
 
         remainder = self._check_assignments(others, alarm_ids, 13, [stale])
-        self.assertEqual(set(remainder),
-                         set(self.partition_coordinator.assignment))
+        self.assertEqual(set(self.partition_coordinator.assignment),
+                         set(remainder))
 
     def test_rebalance_on_sufficient_deletion(self):
         alarm_ids = self._some_alarms(49)
@@ -297,8 +296,8 @@ class TestCoordinate(test.BaseTestCase):
         self._check_mastership(True)
 
         remainder = self._check_assignments(others, alarm_ids, 5)
-        self.assertEqual(set(remainder),
-                         set(self.partition_coordinator.assignment))
+        self.assertEqual(set(self.partition_coordinator.assignment),
+                         set(remainder))
 
     def test_no_rebalance_on_insufficient_deletion(self):
         alarm_ids = self._some_alarms(49)
@@ -335,9 +334,9 @@ class TestCoordinate(test.BaseTestCase):
         self._check_mastership(True)
 
         remainder = self._check_allocation(others, new_alarm_ids, 2)
-        self.assertEqual(len(remainder), 0)
-        self.assertEqual(master_assignment,
-                         set(self.partition_coordinator.assignment))
+        self.assertEqual(0, len(remainder))
+        self.assertEqual(set(self.partition_coordinator.assignment),
+                         master_assignment)
 
     def test_bail_when_overtaken_in_distribution(self):
         self._some_alarms(49)
@@ -355,11 +354,11 @@ class TestCoordinate(test.BaseTestCase):
 
         self._check_mastership(False)
 
-        self.assertEqual(len(rpc.assign.call_args_list), 1)
+        self.assertEqual(1, len(rpc.assign.call_args_list))
 
     def test_assigned_alarms_no_assignment(self):
         alarms = self.partition_coordinator.assigned_alarms(self.api_client)
-        self.assertEqual(len(alarms), 0)
+        self.assertEqual(0, len(alarms))
 
     def test_assigned_alarms_assignment(self):
         alarm_ids = self._some_alarms(6)
@@ -368,7 +367,7 @@ class TestCoordinate(test.BaseTestCase):
         self.partition_coordinator.assign(uuid, alarm_ids)
 
         alarms = self.partition_coordinator.assigned_alarms(self.api_client)
-        self.assertEqual(alarms, self._current_alarms())
+        self.assertEqual(self._current_alarms(), alarms)
 
     def test_assigned_alarms_allocation(self):
         alarm_ids = self._some_alarms(6)
@@ -380,7 +379,7 @@ class TestCoordinate(test.BaseTestCase):
         self.partition_coordinator.allocate(uuid, new_alarm_ids)
 
         alarms = self.partition_coordinator.assigned_alarms(self.api_client)
-        self.assertEqual(alarms, self._current_alarms())
+        self.assertEqual(self._current_alarms(), alarms)
 
     def test_assigned_alarms_deleted_assignment(self):
         alarm_ids = self._some_alarms(6)
@@ -391,7 +390,7 @@ class TestCoordinate(test.BaseTestCase):
         self._dump_alarms(len(alarm_ids) / 2)
 
         alarms = self.partition_coordinator.assigned_alarms(self.api_client)
-        self.assertEqual(alarms, self._current_alarms())
+        self.assertEqual(self._current_alarms(), alarms)
 
     def test__record_oldest(self):
         # Test when the partition to be recorded is the same as the oldest.

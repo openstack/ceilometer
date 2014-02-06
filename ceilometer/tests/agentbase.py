@@ -265,16 +265,16 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
 
     def test_setup_polling_tasks(self):
         polling_tasks = self.mgr.setup_polling_tasks()
-        self.assertEqual(len(polling_tasks), 1)
+        self.assertEqual(1, len(polling_tasks))
         self.assertTrue(60 in polling_tasks.keys())
         per_task_resources = polling_tasks[60].resources
-        self.assertEqual(len(per_task_resources), 1)
-        self.assertEqual(set(per_task_resources['test'].resources),
-                         set(self.pipeline_cfg[0]['resources']))
+        self.assertEqual(1, len(per_task_resources))
+        self.assertEqual(set(self.pipeline_cfg[0]['resources']),
+                         set(per_task_resources['test'].resources))
         self.mgr.interval_task(polling_tasks.values()[0])
         pub = self.mgr.pipeline_manager.pipelines[0].publishers[0]
         del pub.samples[0].resource_metadata['resources']
-        self.assertEqual(pub.samples[0], self.Pollster.test_data)
+        self.assertEqual(self.Pollster.test_data, pub.samples[0])
 
     def test_setup_polling_tasks_multiple_interval(self):
         self.pipeline_cfg.append({
@@ -287,7 +287,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         })
         self.setup_pipeline()
         polling_tasks = self.mgr.setup_polling_tasks()
-        self.assertEqual(len(polling_tasks), 2)
+        self.assertEqual(2, len(polling_tasks))
         self.assertTrue(60 in polling_tasks.keys())
         self.assertTrue(10 in polling_tasks.keys())
 
@@ -302,7 +302,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
                 'publishers': ["test"],
             })
         polling_tasks = self.mgr.setup_polling_tasks()
-        self.assertEqual(len(polling_tasks), 1)
+        self.assertEqual(1, len(polling_tasks))
         self.assertTrue(60 in polling_tasks.keys())
 
     def test_setup_polling_task_same_interval(self):
@@ -316,15 +316,15 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         })
         self.setup_pipeline()
         polling_tasks = self.mgr.setup_polling_tasks()
-        self.assertEqual(len(polling_tasks), 1)
+        self.assertEqual(1, len(polling_tasks))
         pollsters = polling_tasks.get(60).pollsters
-        self.assertEqual(len(pollsters), 2)
+        self.assertEqual(2, len(pollsters))
         per_task_resources = polling_tasks[60].resources
-        self.assertEqual(len(per_task_resources), 2)
-        self.assertEqual(set(per_task_resources['test'].resources),
-                         set(self.pipeline_cfg[0]['resources']))
-        self.assertEqual(set(per_task_resources['testanother'].resources),
-                         set(self.pipeline_cfg[1]['resources']))
+        self.assertEqual(2, len(per_task_resources))
+        self.assertEqual(set(self.pipeline_cfg[0]['resources']),
+                         set(per_task_resources['test'].resources))
+        self.assertEqual(set(self.pipeline_cfg[1]['resources']),
+                         set(per_task_resources['testanother'].resources))
 
     def test_interval_exception_isolation(self):
         self.pipeline_cfg = [
@@ -350,11 +350,11 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
             self.transformer_manager)
 
         polling_tasks = self.mgr.setup_polling_tasks()
-        self.assertEqual(len(polling_tasks.keys()), 1)
+        self.assertEqual(1, len(polling_tasks.keys()))
         polling_tasks.get(10)
         self.mgr.interval_task(polling_tasks.get(10))
         pub = self.mgr.pipeline_manager.pipelines[0].publishers[0]
-        self.assertEqual(len(pub.samples), 0)
+        self.assertEqual(0, len(pub.samples))
 
     def test_agent_manager_start(self):
         mgr = self.create_manager()
@@ -375,9 +375,9 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.setup_pipeline()
 
     def _verify_discovery_params(self, expected):
-        self.assertEqual(self.Discovery.params, expected)
-        self.assertEqual(self.DiscoveryAnother.params, expected)
-        self.assertEqual(self.DiscoveryException.params, expected)
+        self.assertEqual(expected, self.Discovery.params)
+        self.assertEqual(expected, self.DiscoveryAnother.params)
+        self.assertEqual(expected, self.DiscoveryException.params)
 
     def _do_test_per_agent_discovery(self,
                                      discovered_resources,
@@ -396,8 +396,8 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self._verify_discovery_params([None] if discovered_resources else [])
         discovery = self.Discovery.resources + self.DiscoveryAnother.resources
         # compare resource lists modulo ordering
-        self.assertEqual(set(self.Pollster.resources),
-                         set(static_resources or discovery))
+        self.assertEqual(set(static_resources or discovery),
+                         set(self.Pollster.resources))
 
     def test_per_agent_discovery_discovered_only(self):
         self._do_test_per_agent_discovery(['discovered_1', 'discovered_2'],
@@ -424,8 +424,8 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.setup_pipeline()
         polling_tasks = self.mgr.setup_polling_tasks()
         self.mgr.interval_task(polling_tasks.get(60))
-        self.assertEqual(set(self.Pollster.resources),
-                         set(self.DiscoveryAnother.resources))
+        self.assertEqual(set(self.DiscoveryAnother.resources),
+                         set(self.Pollster.resources))
 
     def _do_test_per_pipeline_discovery(self,
                                         discovered_resources,
@@ -444,8 +444,8 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.mgr.interval_task(polling_tasks.get(60))
         discovery = self.Discovery.resources + self.DiscoveryAnother.resources
         # compare resource lists modulo ordering
-        self.assertEqual(set(self.Pollster.resources),
-                         set(static_resources + discovery))
+        self.assertEqual(set(static_resources + discovery),
+                         set(self.Pollster.resources))
 
     def test_per_pipeline_discovery_discovered_only(self):
         self._do_test_per_pipeline_discovery(['discovered_1', 'discovered_2'],
@@ -476,16 +476,16 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.Discovery.resources = []
         self.setup_pipeline()
         polling_tasks = self.mgr.setup_polling_tasks()
-        self.assertEqual(len(polling_tasks), 1)
+        self.assertEqual(1, len(polling_tasks))
         self.assertTrue(60 in polling_tasks.keys())
         self.mgr.interval_task(polling_tasks.get(60))
         self._verify_discovery_params([])
-        self.assertEqual(len(self.Pollster.samples), 1)
+        self.assertEqual(1, len(self.Pollster.samples))
         amalgamated_resources = set(['test://', 'another://'])
-        self.assertEqual(set(self.Pollster.samples[0][1]),
-                         amalgamated_resources)
+        self.assertEqual(amalgamated_resources,
+                         set(self.Pollster.samples[0][1]))
         for pipeline in self.mgr.pipeline_manager.pipelines:
-            self.assertEqual(len(pipeline.publishers[0].samples), 1)
+            self.assertEqual(1, len(pipeline.publishers[0].samples))
             published = pipeline.publishers[0].samples[0]
-            self.assertEqual(set(published.resource_metadata['resources']),
-                             amalgamated_resources)
+            self.assertEqual(amalgamated_resources,
+                             set(published.resource_metadata['resources']))

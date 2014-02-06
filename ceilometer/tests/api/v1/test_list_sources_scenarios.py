@@ -31,8 +31,8 @@ class TestListSource(tests_api.TestBase,
     def test_source(self):
         ydata = self.get('/sources/test_source')
         self.assertIn("somekey", ydata)
-        self.assertEqual(ydata["somekey"], 666)
+        self.assertEqual(666, ydata["somekey"])
 
     def test_unknownsource(self):
         ydata = self.get('/sources/test_source_that_does_not_exist')
-        self.assertEqual(ydata, {})
+        self.assertEqual({}, ydata)

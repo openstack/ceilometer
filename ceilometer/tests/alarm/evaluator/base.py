@@ -50,4 +50,4 @@ class TestEvaluatorBase(test.BaseTestCase):
 
     def _assert_all_alarms(self, state):
         for alarm in self.alarms:
-            self.assertEqual(alarm.state, state)
+            self.assertEqual(state, alarm.state)

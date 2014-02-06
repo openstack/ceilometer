@@ -99,46 +99,46 @@ class TestComputeDurationByResource(FunctionalTest,
     def test_before_range(self):
         with self._patch_get_interval(self.early1, self.early2):
             data = self._invoke_api()
-        self.assertEqual(data, [])
+        self.assertEqual([], data)
 
     def _assert_times_match(self, actual, expected):
         if actual:
             actual = timeutils.parse_isotime(actual)
         actual = actual.replace(tzinfo=None)
-        self.assertEqual(actual, expected)
+        self.assertEqual(expected, actual)
 
     def test_overlap_range_start(self):
         with self._patch_get_interval(self.early1, self.middle1):
             data = self._invoke_api()
         self._assert_times_match(data[0]['duration_start'], self.start)
         self._assert_times_match(data[0]['duration_end'], self.middle1)
-        self.assertEqual(data[0]['duration'], 8 * 60 * 60)
+        self.assertEqual(8 * 60 * 60, data[0]['duration'])
 
     def test_within_range(self):
         with self._patch_get_interval(self.middle1, self.middle2):
             data = self._invoke_api()
         self._assert_times_match(data[0]['duration_start'], self.middle1)
         self._assert_times_match(data[0]['duration_end'], self.middle2)
-        self.assertEqual(data[0]['duration'], 10 * 60 * 60)
+        self.assertEqual(10 * 60 * 60, data[0]['duration'])
 
     def test_within_range_zero_duration(self):
         with self._patch_get_interval(self.middle1, self.middle1):
             data = self._invoke_api()
         self._assert_times_match(data[0]['duration_start'], self.middle1)
         self._assert_times_match(data[0]['duration_end'], self.middle1)
-        self.assertEqual(data[0]['duration'], 0)
+        self.assertEqual(0, data[0]['duration'])
 
     def test_overlap_range_end(self):
         with self._patch_get_interval(self.middle2, self.late1):
             data = self._invoke_api()
         self._assert_times_match(data[0]['duration_start'], self.middle2)
         self._assert_times_match(data[0]['duration_end'], self.end)
-        self.assertEqual(data[0]['duration'], ((6 * 60) - 1) * 60)
+        self.assertEqual(((6 * 60) - 1) * 60, data[0]['duration'])
 
     def test_after_range(self):
         with self._patch_get_interval(self.late1, self.late2):
             data = self._invoke_api()
-        self.assertEqual(data, [])
+        self.assertEqual([], data)
 
     def test_without_end_timestamp(self):
         statistics = [

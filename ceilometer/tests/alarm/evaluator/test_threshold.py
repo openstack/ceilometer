@@ -148,7 +148,7 @@ class TestEvaluate(base.TestEvaluatorBase):
                                   alarm.rule['evaluation_periods'],
                                   None))
                 for alarm in self.alarms]
-            self.assertEqual(self.notifier.notify.call_args_list, expected)
+            self.assertEqual(expected, self.notifier.notify.call_args_list)
 
     def test_simple_alarm_trip(self):
         self._set_all_alarms('ok')
@@ -164,7 +164,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             expected = [mock.call(alarm.alarm_id, state='alarm')
                         for alarm in self.alarms]
             update_calls = self.api_client.alarms.set_state.call_args_list
-            self.assertEqual(update_calls, expected)
+            self.assertEqual(expected, update_calls)
             reasons = ['Transition to alarm due to 5 samples outside'
                        ' threshold, most recent: %s' % avgs[-1].avg,
                        'Transition to alarm due to 4 samples outside'
@@ -174,7 +174,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             expected = [mock.call(alarm, 'ok', reason, reason_data)
                         for alarm, reason, reason_data
                         in zip(self.alarms, reasons, reason_datas)]
-            self.assertEqual(self.notifier.notify.call_args_list, expected)
+            self.assertEqual(expected, self.notifier.notify.call_args_list)
 
     def test_simple_alarm_clear(self):
         self._set_all_alarms('alarm')
@@ -190,7 +190,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             expected = [mock.call(alarm.alarm_id, state='ok')
                         for alarm in self.alarms]
             update_calls = self.api_client.alarms.set_state.call_args_list
-            self.assertEqual(update_calls, expected)
+            self.assertEqual(expected, update_calls)
             reasons = ['Transition to ok due to 5 samples inside'
                        ' threshold, most recent: %s' % avgs[-1].avg,
                        'Transition to ok due to 4 samples inside'
@@ -200,7 +200,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             expected = [mock.call(alarm, 'alarm', reason, reason_data)
                         for alarm, reason, reason_data
                         in zip(self.alarms, reasons, reason_datas)]
-            self.assertEqual(self.notifier.notify.call_args_list, expected)
+            self.assertEqual(expected, self.notifier.notify.call_args_list)
 
     def test_equivocal_from_known_state(self):
         self._set_all_alarms('ok')
@@ -213,50 +213,55 @@ class TestEvaluate(base.TestEvaluatorBase):
             self.api_client.statistics.list.side_effect = [avgs, maxs]
             self._evaluate_all_alarms()
             self._assert_all_alarms('ok')
-            self.assertEqual(self.api_client.alarms.set_state.call_args_list,
-                             [])
-            self.assertEqual(self.notifier.notify.call_args_list, [])
+            self.assertEqual(
+                [],
+                self.api_client.alarms.set_state.call_args_list)
+            self.assertEqual([], self.notifier.notify.call_args_list)
 
     def test_equivocal_from_known_state_and_repeat_actions(self):
         self._set_all_alarms('ok')
         self.alarms[1].repeat_actions = True
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
-            avgs = [self._get_stat('avg', self.alarms[0].rule['threshold'] + v)
+            avgs = [self._get_stat('avg',
+                                   self.alarms[0].rule['threshold'] + v)
                     for v in moves.xrange(5)]
-            maxs = [self._get_stat('max', self.alarms[1].rule['threshold'] - v)
+            maxs = [self._get_stat('max',
+                                   self.alarms[1].rule['threshold'] - v)
                     for v in moves.xrange(-1, 3)]
             self.api_client.statistics.list.side_effect = [avgs, maxs]
             self._evaluate_all_alarms()
             self._assert_all_alarms('ok')
-            self.assertEqual(self.api_client.alarms.set_state.call_args_list,
-                             [])
+            self.assertEqual([],
+                             self.api_client.alarms.set_state.call_args_list)
             reason = 'Remaining as ok due to 4 samples inside' \
                      ' threshold, most recent: 8.0'
             reason_datas = self._reason_data('inside', 4, 8.0)
             expected = [mock.call(self.alarms[1], 'ok', reason, reason_datas)]
-            self.assertEqual(self.notifier.notify.call_args_list, expected)
+            self.assertEqual(expected, self.notifier.notify.call_args_list)
 
     def test_unequivocal_from_known_state_and_repeat_actions(self):
         self._set_all_alarms('alarm')
         self.alarms[1].repeat_actions = True
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
-            avgs = [self._get_stat('avg', self.alarms[0].rule['threshold'] + v)
+            avgs = [self._get_stat('avg',
+                                   self.alarms[0].rule['threshold'] + v)
                     for v in moves.xrange(1, 6)]
-            maxs = [self._get_stat('max', self.alarms[1].rule['threshold'] - v)
+            maxs = [self._get_stat('max',
+                                   self.alarms[1].rule['threshold'] - v)
                     for v in moves.xrange(4)]
             self.api_client.statistics.list.side_effect = [avgs, maxs]
             self._evaluate_all_alarms()
             self._assert_all_alarms('alarm')
-            self.assertEqual(self.api_client.alarms.set_state.call_args_list,
-                             [])
+            self.assertEqual([],
+                             self.api_client.alarms.set_state.call_args_list)
             reason = 'Remaining as alarm due to 4 samples outside' \
                      ' threshold, most recent: 7.0'
             reason_datas = self._reason_data('outside', 4, 7.0)
             expected = [mock.call(self.alarms[1], 'alarm',
                                   reason, reason_datas)]
-            self.assertEqual(self.notifier.notify.call_args_list, expected)
+            self.assertEqual(expected, self.notifier.notify.call_args_list)
 
     def test_state_change_and_repeat_actions(self):
         self._set_all_alarms('ok')
@@ -274,7 +279,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             expected = [mock.call(alarm.alarm_id, state='alarm')
                         for alarm in self.alarms]
             update_calls = self.api_client.alarms.set_state.call_args_list
-            self.assertEqual(update_calls, expected)
+            self.assertEqual(expected, update_calls)
             reasons = ['Transition to alarm due to 5 samples outside'
                        ' threshold, most recent: %s' % avgs[-1].avg,
                        'Transition to alarm due to 4 samples outside'
@@ -284,7 +289,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             expected = [mock.call(alarm, 'ok', reason, reason_data)
                         for alarm, reason, reason_data
                         in zip(self.alarms, reasons, reason_datas)]
-            self.assertEqual(self.notifier.notify.call_args_list, expected)
+            self.assertEqual(expected, self.notifier.notify.call_args_list)
 
     def test_equivocal_from_unknown(self):
         self._set_all_alarms('insufficient data')
@@ -300,7 +305,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             expected = [mock.call(alarm.alarm_id, state='alarm')
                         for alarm in self.alarms]
             update_calls = self.api_client.alarms.set_state.call_args_list
-            self.assertEqual(update_calls, expected)
+            self.assertEqual(expected, update_calls)
             reasons = ['Transition to alarm due to 5 samples outside'
                        ' threshold, most recent: %s' % avgs[-1].avg,
                        'Transition to alarm due to 4 samples outside'
@@ -311,7 +316,7 @@ class TestEvaluate(base.TestEvaluatorBase):
                                   reason, reason_data)
                         for alarm, reason, reason_data
                         in zip(self.alarms, reasons, reason_datas)]
-            self.assertEqual(self.notifier.notify.call_args_list, expected)
+            self.assertEqual(expected, self.notifier.notify.call_args_list)
 
     def _do_test_bound_duration(self, start, exclude_outliers=None):
         alarm = self.alarms[0]
@@ -319,14 +324,14 @@ class TestEvaluate(base.TestEvaluatorBase):
             alarm.rule['exclude_outliers'] = exclude_outliers
         timeutils.utcnow.override_time = datetime.datetime(2012, 7, 2, 10, 45)
         constraint = self.evaluator._bound_duration(alarm, [])
-        self.assertEqual(constraint, [
+        self.assertEqual([
             {'field': 'timestamp',
              'op': 'le',
              'value': timeutils.utcnow().isoformat()},
             {'field': 'timestamp',
              'op': 'ge',
              'value': start},
-        ])
+        ], constraint)
 
     def test_bound_duration_outlier_exclusion_defaulted(self):
         self._do_test_bound_duration('2012-07-02T10:39:00')
@@ -357,7 +362,7 @@ class TestEvaluate(base.TestEvaluatorBase):
                                       os_endpoint_type=conf.os_endpoint_type,
                                       insecure=conf.insecure)]
                 actual = client.call_args_list
-                self.assertEqual(actual, expected)
+                self.assertEqual(expected, actual)
 
     def _do_test_simple_alarm_trip_outlier_exclusion(self, exclude_outliers):
         self._set_all_rules('exclude_outliers', exclude_outliers)
@@ -383,7 +388,7 @@ class TestEvaluate(base.TestEvaluatorBase):
                 expected = [mock.call(alarm.alarm_id, state='alarm')
                             for alarm in self.alarms]
                 update_calls = self.api_client.alarms.set_state.call_args_list
-                self.assertEqual(update_calls, expected)
+                self.assertEqual(expected, update_calls)
                 reasons = ['Transition to alarm due to 5 samples outside'
                            ' threshold, most recent: %s' % avgs[-2].avg,
                            'Transition to alarm due to 4 samples outside'
@@ -393,7 +398,7 @@ class TestEvaluate(base.TestEvaluatorBase):
                 expected = [mock.call(alarm, 'ok', reason, reason_data)
                             for alarm, reason, reason_data
                             in zip(self.alarms, reasons, reason_datas)]
-                self.assertEqual(self.notifier.notify.call_args_list, expected)
+                self.assertEqual(expected, self.notifier.notify.call_args_list)
 
     def test_simple_alarm_trip_with_outlier_exclusion(self):
         self. _do_test_simple_alarm_trip_outlier_exclusion(True)
@@ -425,7 +430,7 @@ class TestEvaluate(base.TestEvaluatorBase):
                 expected = [mock.call(alarm.alarm_id, state='ok')
                             for alarm in self.alarms]
                 update_calls = self.api_client.alarms.set_state.call_args_list
-                self.assertEqual(update_calls, expected)
+                self.assertEqual(expected, update_calls)
                 reasons = ['Transition to ok due to 5 samples inside'
                            ' threshold, most recent: %s' % avgs[-2].avg,
                            'Transition to ok due to 4 samples inside'
@@ -435,7 +440,7 @@ class TestEvaluate(base.TestEvaluatorBase):
                 expected = [mock.call(alarm, 'alarm', reason, reason_data)
                             for alarm, reason, reason_data
                             in zip(self.alarms, reasons, reason_datas)]
-                self.assertEqual(self.notifier.notify.call_args_list, expected)
+                self.assertEqual(expected, self.notifier.notify.call_args_list)
 
     def test_simple_alarm_clear_with_outlier_exclusion(self):
         self. _do_test_simple_alarm_clear_outlier_exclusion(True)

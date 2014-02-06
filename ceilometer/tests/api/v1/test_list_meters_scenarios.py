@@ -116,23 +116,23 @@ class TestListMeters(tests_api.TestBase,
     def test_list_meters(self):
         data = self.get('/meters')
         self.assertEqual(4, len(data['meters']))
-        self.assertEqual(set(r['resource_id'] for r in data['meters']),
-                         set(['resource-id',
+        self.assertEqual(set(['resource-id',
                               'resource-id2',
                               'resource-id3',
-                              'resource-id4']))
-        self.assertEqual(set(r['name'] for r in data['meters']),
-                         set(['meter.test', 'meter.mine']))
+                              'resource-id4']),
+                         set(r['resource_id'] for r in data['meters']))
+        self.assertEqual(set(['meter.test', 'meter.mine']),
+                         set(r['name'] for r in data['meters']))
 
     def test_list_meters_non_admin(self):
         data = self.get('/meters',
                         headers={"X-Roles": "Member",
                                  "X-Project-Id": "project-id"})
         self.assertEqual(2, len(data['meters']))
-        self.assertEqual(set(r['resource_id'] for r in data['meters']),
-                         set(['resource-id', 'resource-id2']))
-        self.assertEqual(set(r['name'] for r in data['meters']),
-                         set(['meter.test', 'meter.mine']))
+        self.assertEqual(set(['resource-id', 'resource-id2']),
+                         set(r['resource_id'] for r in data['meters']))
+        self.assertEqual(set(['meter.test', 'meter.mine']),
+                         set(r['name'] for r in data['meters']))
 
     def test_with_resource(self):
         data = self.get('/resources/resource-id/meters')
@@ -156,7 +156,7 @@ class TestListMeters(tests_api.TestBase,
 
     def test_with_source_non_existent(self):
         data = self.get('/sources/test_list_resources_dont_exist/meters')
-        self.assertEqual(data['meters'], [])
+        self.assertEqual([], data['meters'])
 
     def test_with_user(self):
         data = self.get('/users/user-id/meters')
@@ -182,11 +182,11 @@ class TestListMeters(tests_api.TestBase,
                         headers={"X-Roles": "Member",
                                  "X-Project-Id": "project666"})
 
-        self.assertEqual(data['meters'], [])
+        self.assertEqual([], data['meters'])
 
     def test_with_user_non_existent(self):
         data = self.get('/users/user-id-foobar123/meters')
-        self.assertEqual(data['meters'], [])
+        self.assertEqual([], data['meters'])
 
     def test_with_project(self):
         data = self.get('/projects/project-id2/meters')
@@ -204,11 +204,11 @@ class TestListMeters(tests_api.TestBase,
         data = self.get('/projects/project-id2/meters',
                         headers={"X-Roles": "Member",
                                  "X-Project-Id": "project-id"})
-        self.assertEqual(data.status_code, 404)
+        self.assertEqual(404, data.status_code)
 
     def test_with_project_non_existent(self):
         data = self.get('/projects/jd-was-here/meters')
-        self.assertEqual(data['meters'], [])
+        self.assertEqual([], data['meters'])
 
 
 class TestListMetersMetaquery(TestListMeters,

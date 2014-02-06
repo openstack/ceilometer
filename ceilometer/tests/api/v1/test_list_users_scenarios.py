@@ -101,7 +101,7 @@ class TestListUsers(tests_api.TestBase,
 
     def test_with_source(self):
         data = self.get('/sources/test_list_users/users')
-        self.assertEqual(['user-id'], data['users'])
+        self.assertEqual(data['users'], ['user-id'])
 
     def test_with_source_non_admin(self):
         data = self.get('/sources/test_list_users/users',
