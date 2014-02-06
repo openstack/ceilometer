@@ -78,7 +78,7 @@ class ThresholdEvaluator(evaluator.Evaluator):
             stddev = utils.stddev(statistics, key, mean)
             lower = mean - 2 * stddev
             upper = mean + 2 * stddev
-            inliers, outliers = utils.anomolies(statistics, key, lower, upper)
+            inliers, outliers = utils.anomalies(statistics, key, lower, upper)
             if outliers:
                 LOG.debug(_('excluded weak datapoints with sample counts %s'),
                           [s.count for s in outliers])
