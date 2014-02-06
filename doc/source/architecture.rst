@@ -424,7 +424,7 @@ verification by consumers who access the data via the API.
 RPC
 ---
 
-Ceilomter uses ``openstack.common.rpc`` to cast messages from the
+Ceilometer uses ``openstack.common.rpc`` to cast messages from the
 agent to the collector.
 
 .. seealso::

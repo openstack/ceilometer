@@ -25,7 +25,7 @@ Please note that ceilometer uses openstack-common extensively, which requires th
 the other parameters are set appropriately. For information we are listing the configuration
 elements that we use after the ceilometer specific elements.
 
-If you use sql alchemy, its specific paramaters will need to be set.
+If you use sql alchemy, its specific parameters will need to be set.
 
 
 ===============================  ====================================  ==============================================================
