@@ -55,9 +55,9 @@ class SQLAlchemyStorage(base.StorageEngine):
           - { id: source id }
         - project
           - { id: project uuid }
-        - meter
+        - sample
           - the raw incoming data
-          - { id: meter id
+          - { id: sample id
               counter_name: counter name
               user_id: user uuid            (->user.id)
               project_id: project uuid      (->project.id)
@@ -79,7 +79,7 @@ class SQLAlchemyStorage(base.StorageEngine):
               }
         - sourceassoc
           - the relationships
-          - { meter_id: meter id            (->meter.id)
+          - { sample_id: sample id           (->sample.id)
               project_id: project uuid      (->project.id)
               resource_id: resource uuid    (->resource.id)
               user_id: user uuid            (->user.id)
@@ -138,23 +138,24 @@ def make_query_from_filter(session, query, sample_filter, require_meter=True):
     """
 
     if sample_filter.meter:
-        query = query.filter(models.Meter.counter_name == sample_filter.meter)
+        query = query.filter(models.Sample.counter_name == sample_filter.meter)
     elif require_meter:
         raise RuntimeError(_('Missing required meter specifier'))
     if sample_filter.source:
-        query = query.filter(models.Meter.sources.any(id=sample_filter.source))
+        query = query.filter(models.Sample.sources.any(
+            id=sample_filter.source))
     if sample_filter.start:
         ts_start = sample_filter.start
         if sample_filter.start_timestamp_op == 'gt':
-            query = query.filter(models.Meter.timestamp > ts_start)
+            query = query.filter(models.Sample.timestamp > ts_start)
         else:
-            query = query.filter(models.Meter.timestamp >= ts_start)
+            query = query.filter(models.Sample.timestamp >= ts_start)
     if sample_filter.end:
         ts_end = sample_filter.end
         if sample_filter.end_timestamp_op == 'le':
-            query = query.filter(models.Meter.timestamp <= ts_end)
+            query = query.filter(models.Sample.timestamp <= ts_end)
         else:
-            query = query.filter(models.Meter.timestamp < ts_end)
+            query = query.filter(models.Sample.timestamp < ts_end)
     if sample_filter.user:
         query = query.filter_by(user_id=sample_filter.user)
     if sample_filter.project:
@@ -270,21 +271,21 @@ class Connection(base.Connection):
                                               user=user, project=project,
                                               resource_metadata=rmetadata)
 
-            # Record the raw data for the meter.
-            meter = models.Meter(counter_type=data['counter_type'],
-                                 counter_unit=data['counter_unit'],
-                                 counter_name=data['counter_name'],
-                                 resource=resource)
-            session.add(meter)
-            if not filter(lambda x: x.id == source.id, meter.sources):
-                meter.sources.append(source)
-            meter.project = project
-            meter.user = user
-            meter.timestamp = data['timestamp']
-            meter.resource_metadata = rmetadata
-            meter.counter_volume = data['counter_volume']
-            meter.message_signature = data['message_signature']
-            meter.message_id = data['message_id']
+            # Record the raw data for the sample.
+            sample = models.Sample(counter_type=data['counter_type'],
+                                   counter_unit=data['counter_unit'],
+                                   counter_name=data['counter_name'],
+                                   resource=resource)
+            session.add(sample)
+            if not filter(lambda x: x.id == source.id, sample.sources):
+                sample.sources.append(source)
+            sample.project = project
+            sample.user = user
+            sample.timestamp = data['timestamp']
+            sample.resource_metadata = rmetadata
+            sample.counter_volume = data['counter_volume']
+            sample.message_signature = data['message_signature']
+            sample.message_id = data['message_id']
             session.flush()
 
             if rmetadata:
@@ -296,7 +297,7 @@ class Connection(base.Connection):
                             LOG.warn(_("Unknown metadata type. Key (%s) will "
                                        "not be queryable."), key)
                         else:
-                            session.add(_model(id=meter.id,
+                            session.add(_model(id=sample.id,
                                                meta_key=key,
                                                value=v))
 
@@ -311,14 +312,14 @@ class Connection(base.Connection):
         session = self._get_db_session()
         with session.begin():
             end = timeutils.utcnow() - datetime.timedelta(seconds=ttl)
-            meter_query = session.query(models.Meter)\
-                .filter(models.Meter.timestamp < end)
-            for meter_obj in meter_query.all():
-                session.delete(meter_obj)
+            sample_query = session.query(models.Sample)\
+                .filter(models.Sample.timestamp < end)
+            for sample_obj in sample_query.all():
+                session.delete(sample_obj)
 
             query = session.query(models.User).filter(
-                ~models.User.id.in_(session.query(models.Meter.user_id)
-                                    .group_by(models.Meter.user_id)),
+                ~models.User.id.in_(session.query(models.Sample.user_id)
+                                    .group_by(models.Sample.user_id)),
                 ~models.User.id.in_(session.query(models.AlarmChange.user_id)
                                     .group_by(models.AlarmChange.user_id))
             )
@@ -327,8 +328,8 @@ class Connection(base.Connection):
 
             query = session.query(models.Project)\
                 .filter(~models.Project.id.in_(
-                    session.query(models.Meter.project_id)
-                        .group_by(models.Meter.project_id)),
+                    session.query(models.Sample.project_id)
+                        .group_by(models.Sample.project_id)),
                         ~models.Project.id.in_(
                             session.query(models.AlarmChange.project_id)
                             .group_by(models.AlarmChange.project_id)),
@@ -341,8 +342,8 @@ class Connection(base.Connection):
 
             query = session.query(models.Resource)\
                 .filter(~models.Resource.id.in_(
-                    session.query(models.Meter.resource_id).group_by(
-                        models.Meter.resource_id)))
+                    session.query(models.Sample.resource_id).group_by(
+                        models.Sample.resource_id)))
             for res_obj in query.all():
                 session.delete(res_obj)
 
@@ -396,21 +397,21 @@ class Connection(base.Connection):
         # most accurate. We also need to filter down in the subquery to
         # constrain what we have to JOIN on later.
         ts_subquery = session.query(
-            models.Meter.resource_id,
-            func.max(models.Meter.timestamp).label("max_ts"),
-            func.min(models.Meter.timestamp).label("min_ts")
-        ).group_by(models.Meter.resource_id)
+            models.Sample.resource_id,
+            func.max(models.Sample.timestamp).label("max_ts"),
+            func.min(models.Sample.timestamp).label("min_ts")
+        ).group_by(models.Sample.resource_id)
 
         # Here are the basic 'eq' operation filters for the sample data.
-        for column, value in [(models.Meter.resource_id, resource),
-                              (models.Meter.user_id, user),
-                              (models.Meter.project_id, project)]:
+        for column, value in [(models.Sample.resource_id, resource),
+                              (models.Sample.user_id, user),
+                              (models.Sample.project_id, project)]:
             if value:
                 ts_subquery = ts_subquery.filter(column == value)
 
         if source:
             ts_subquery = ts_subquery.filter(
-                models.Meter.sources.any(id=source))
+                models.Sample.sources.any(id=source))
 
         if metaquery:
             ts_subquery = apply_metaquery_filter(session,
@@ -422,27 +423,27 @@ class Connection(base.Connection):
         if start_timestamp:
             if start_timestamp_op == 'gt':
                 ts_subquery = ts_subquery.filter(
-                    models.Meter.timestamp > start_timestamp)
+                    models.Sample.timestamp > start_timestamp)
             else:
                 ts_subquery = ts_subquery.filter(
-                    models.Meter.timestamp >= start_timestamp)
+                    models.Sample.timestamp >= start_timestamp)
         if end_timestamp:
             if end_timestamp_op == 'le':
                 ts_subquery = ts_subquery.filter(
-                    models.Meter.timestamp <= end_timestamp)
+                    models.Sample.timestamp <= end_timestamp)
             else:
                 ts_subquery = ts_subquery.filter(
-                    models.Meter.timestamp < end_timestamp)
+                    models.Sample.timestamp < end_timestamp)
         ts_subquery = ts_subquery.subquery()
 
-        # Now we need to get the max Meter.id out of the leftover results, to
+        # Now we need to get the max Sample.id out of the leftover results, to
         # break any ties.
         agg_subquery = session.query(
-            func.max(models.Meter.id).label("max_id"),
+            func.max(models.Sample.id).label("max_id"),
             ts_subquery
         ).filter(
-            models.Meter.resource_id == ts_subquery.c.resource_id,
-            models.Meter.timestamp == ts_subquery.c.max_ts
+            models.Sample.resource_id == ts_subquery.c.resource_id,
+            models.Sample.timestamp == ts_subquery.c.max_ts
         ).group_by(
             ts_subquery.c.resource_id,
             ts_subquery.c.max_ts,
@@ -450,22 +451,22 @@ class Connection(base.Connection):
         ).subquery()
 
         query = session.query(
-            models.Meter,
+            models.Sample,
             agg_subquery.c.min_ts,
             agg_subquery.c.max_ts
         ).filter(
-            models.Meter.id == agg_subquery.c.max_id
+            models.Sample.id == agg_subquery.c.max_id
         )
 
-        for meter, first_ts, last_ts in query.all():
+        for sample, first_ts, last_ts in query.all():
             yield api_models.Resource(
-                resource_id=meter.resource_id,
-                project_id=meter.project_id,
+                resource_id=sample.resource_id,
+                project_id=sample.project_id,
                 first_sample_timestamp=first_ts,
                 last_sample_timestamp=last_ts,
-                source=meter.sources[0].id,
-                user_id=meter.user_id,
-                metadata=meter.resource_metadata,
+                source=sample.sources[0].id,
+                user_id=sample.user_id,
+                metadata=sample.resource_metadata,
             )
 
     def get_meters(self, user=None, project=None, resource=None, source=None,
@@ -485,35 +486,36 @@ class Connection(base.Connection):
 
         session = self._get_db_session()
 
-        # Meter table will store large records and join with resource
+        # Sample table will store large records and join with resource
         # will be very slow.
-        # subquery_meter is used to reduce meter records
+        # subquery_sample is used to reduce sample records
         # by selecting a record for each (resource_id, counter_name).
-        # max() is used to choice a meter record, so the latest record
+        # max() is used to choice a sample record, so the latest record
         # is selected for each (resource_id, counter_name).
         #
-        subquery_meter = session.query(func.max(models.Meter.id).label('id'))\
-            .group_by(models.Meter.resource_id,
-                      models.Meter.counter_name).subquery()
+        subquery_sample = session.query(
+            func.max(models.Sample.id).label('id'))\
+            .group_by(models.Sample.resource_id,
+                      models.Sample.counter_name).subquery()
 
-        # The SQL of query_meter is essentially:
+        # The SQL of query_sample is essentially:
         #
-        # SELECT meter.* FROM meter INNER JOIN
-        #  (SELECT max(meter.id) AS id FROM meter
-        #   GROUP BY meter.resource_id, meter.counter_name) AS anon_2
-        # ON meter.id = anon_2.id
+        # SELECT sample.* FROM sample INNER JOIN
+        #  (SELECT max(sample.id) AS id FROM sample
+        #   GROUP BY sample.resource_id, sample.counter_name) AS anon_2
+        # ON sample.id = anon_2.id
         #
-        query_meter = session.query(models.Meter).\
-            join(subquery_meter, models.Meter.id == subquery_meter.c.id)
+        query_sample = session.query(models.Sample).\
+            join(subquery_sample, models.Sample.id == subquery_sample.c.id)
 
         if metaquery:
-            query_meter = apply_metaquery_filter(session,
-                                                 query_meter,
-                                                 metaquery)
+            query_sample = apply_metaquery_filter(session,
+                                                  query_sample,
+                                                  metaquery)
 
-        alias_meter = aliased(models.Meter, query_meter.subquery())
-        query = session.query(models.Resource, alias_meter).join(
-            alias_meter, models.Resource.id == alias_meter.resource_id)
+        alias_sample = aliased(models.Sample, query_sample.subquery())
+        query = session.query(models.Resource, alias_sample).join(
+            alias_sample, models.Resource.id == alias_sample.resource_id)
 
         if user is not None:
             query = query.filter(models.Resource.user_id == user)
@@ -524,11 +526,11 @@ class Connection(base.Connection):
         if project is not None:
             query = query.filter(models.Resource.project_id == project)
 
-        for resource, meter in query.all():
+        for resource, sample in query.all():
             yield api_models.Meter(
-                name=meter.counter_name,
-                type=meter.counter_type,
-                unit=meter.counter_unit,
+                name=sample.counter_name,
+                type=sample.counter_type,
+                unit=sample.counter_unit,
                 resource_id=resource.id,
                 project_id=resource.project_id,
                 source=resource.sources[0].id,
@@ -549,7 +551,7 @@ class Connection(base.Connection):
             # detail that should not leak outside of the driver.
             yield api_models.Sample(
                 # Replace 'sources' with 'source' to meet the caller's
-                # expectation, Meter.sources contains one and only one
+                # expectation, Sample.sources contains one and only one
                 # source in the current implementation.
                 source=s.sources[0].id,
                 counter_name=s.counter_name,
@@ -575,7 +577,7 @@ class Connection(base.Connection):
         if limit == 0:
             return []
 
-        table = models.Meter
+        table = models.Sample
         session = self._get_db_session()
         query = session.query(table)
         query = make_query_from_filter(session, query, sample_filter,
@@ -604,7 +606,7 @@ class Connection(base.Connection):
                                     limit,
                                     table)
 
-        retrieve = {models.Meter: self._retrieve_samples,
+        retrieve = {models.Sample: self._retrieve_samples,
                     models.Alarm: self._retrieve_alarms,
                     models.AlarmChange: self._retrieve_alarm_history}
         return retrieve[table](query)
@@ -613,7 +615,7 @@ class Connection(base.Connection):
         return self._retrieve_data(filter_expr,
                                    orderby,
                                    limit,
-                                   models.Meter)
+                                   models.Sample)
 
     def _transform_expression(self, expression_tree, table):
 
@@ -646,20 +648,20 @@ class Connection(base.Connection):
 
     def _make_stats_query(self, sample_filter, groupby):
         select = [
-            models.Meter.counter_unit.label('unit'),
-            func.min(models.Meter.timestamp).label('tsmin'),
-            func.max(models.Meter.timestamp).label('tsmax'),
-            func.avg(models.Meter.counter_volume).label('avg'),
-            func.sum(models.Meter.counter_volume).label('sum'),
-            func.min(models.Meter.counter_volume).label('min'),
-            func.max(models.Meter.counter_volume).label('max'),
-            func.count(models.Meter.counter_volume).label('count'),
+            models.Sample.counter_unit.label('unit'),
+            func.min(models.Sample.timestamp).label('tsmin'),
+            func.max(models.Sample.timestamp).label('tsmax'),
+            func.avg(models.Sample.counter_volume).label('avg'),
+            func.sum(models.Sample.counter_volume).label('sum'),
+            func.min(models.Sample.counter_volume).label('min'),
+            func.max(models.Sample.counter_volume).label('max'),
+            func.count(models.Sample.counter_volume).label('count'),
         ]
 
         session = self._get_db_session()
 
         if groupby:
-            group_attributes = [getattr(models.Meter, g) for g in groupby]
+            group_attributes = [getattr(models.Sample, g) for g in groupby]
             select.extend(group_attributes)
 
         query = session.query(*select)
@@ -726,8 +728,8 @@ class Connection(base.Connection):
                 sample_filter.start or res.tsmin,
                 sample_filter.end or res.tsmax,
                 period):
-            q = query.filter(models.Meter.timestamp >= period_start)
-            q = q.filter(models.Meter.timestamp < period_end)
+            q = query.filter(models.Sample.timestamp >= period_start)
+            q = q.filter(models.Sample.timestamp < period_end)
             for r in q.all():
                 if r.count:
                     yield self._stats_result_to_model(

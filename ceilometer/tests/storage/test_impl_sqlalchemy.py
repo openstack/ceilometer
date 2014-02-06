@@ -198,8 +198,8 @@ class RelationshipTest(scenarios.DBTestBase):
         for table in meta_tables:
             self.assertEqual(session.query(table)
                 .filter(~table.id.in_(
-                    session.query(sql_models.Meter.id)
-                        .group_by(sql_models.Meter.id)
+                    session.query(sql_models.Sample.id)
+                        .group_by(sql_models.Sample.id)
                         )).count(), 0)
 
     def test_clear_metering_data_associations(self):
@@ -208,9 +208,9 @@ class RelationshipTest(scenarios.DBTestBase):
 
         session = self.conn._get_db_session()
         self.assertEqual(session.query(sql_models.sourceassoc)
-            .filter(~sql_models.sourceassoc.c.meter_id.in_(
-                session.query(sql_models.Meter.id)
-                    .group_by(sql_models.Meter.id)
+            .filter(~sql_models.sourceassoc.c.sample_id.in_(
+                session.query(sql_models.Sample.id)
+                    .group_by(sql_models.Sample.id)
                     )).count(), 0)
         self.assertEqual(session.query(sql_models.sourceassoc)
             .filter(~sql_models.sourceassoc.c.project_id.in_(

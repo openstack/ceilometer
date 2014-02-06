@@ -116,8 +116,8 @@ Base = declarative_base(cls=CeilometerBase)
 
 
 sourceassoc = Table('sourceassoc', Base.metadata,
-                    Column('meter_id', Integer,
-                           ForeignKey("meter.id")),
+                    Column('sample_id', Integer,
+                           ForeignKey("sample.id")),
                     Column('project_id', String(255),
                            ForeignKey("project.id")),
                     Column('resource_id', String(255),
@@ -130,10 +130,10 @@ sourceassoc = Table('sourceassoc', Base.metadata,
 Index('idx_su', sourceassoc.c['source_id'], sourceassoc.c['user_id']),
 Index('idx_sp', sourceassoc.c['source_id'], sourceassoc.c['project_id']),
 Index('idx_sr', sourceassoc.c['source_id'], sourceassoc.c['resource_id']),
-Index('idx_sm', sourceassoc.c['source_id'], sourceassoc.c['meter_id']),
+Index('idx_ss', sourceassoc.c['source_id'], sourceassoc.c['sample_id']),
 Index('ix_sourceassoc_source_id', sourceassoc.c['source_id'])
-UniqueConstraint(sourceassoc.c['meter_id'], sourceassoc.c['user_id'],
-                 name='uniq_sourceassoc0meter_id0user_id')
+UniqueConstraint(sourceassoc.c['sample_id'], sourceassoc.c['user_id'],
+                 name='uniq_sourceassoc0sample_id0user_id')
 
 
 class Source(Base):
@@ -148,7 +148,7 @@ class MetaText(Base):
     __table_args__ = (
         Index('ix_meta_text_key', 'meta_key'),
     )
-    id = Column(Integer, ForeignKey('meter.id'), primary_key=True)
+    id = Column(Integer, ForeignKey('sample.id'), primary_key=True)
     meta_key = Column(String(255), primary_key=True)
     value = Column(Text)
 
@@ -160,7 +160,7 @@ class MetaBool(Base):
     __table_args__ = (
         Index('ix_meta_bool_key', 'meta_key'),
     )
-    id = Column(Integer, ForeignKey('meter.id'), primary_key=True)
+    id = Column(Integer, ForeignKey('sample.id'), primary_key=True)
     meta_key = Column(String(255), primary_key=True)
     value = Column(Boolean)
 
@@ -172,7 +172,7 @@ class MetaBigInt(Base):
     __table_args__ = (
         Index('ix_meta_int_key', 'meta_key'),
     )
-    id = Column(Integer, ForeignKey('meter.id'), primary_key=True)
+    id = Column(Integer, ForeignKey('sample.id'), primary_key=True)
     meta_key = Column(String(255), primary_key=True)
     value = Column(BigInteger, default=False)
 
@@ -184,20 +184,20 @@ class MetaFloat(Base):
     __table_args__ = (
         Index('ix_meta_float_key', 'meta_key'),
     )
-    id = Column(Integer, ForeignKey('meter.id'), primary_key=True)
+    id = Column(Integer, ForeignKey('sample.id'), primary_key=True)
     meta_key = Column(String(255), primary_key=True)
     value = Column(Float(53), default=False)
 
 
-class Meter(Base):
+class Sample(Base):
     """Metering data."""
 
-    __tablename__ = 'meter'
+    __tablename__ = 'sample'
     __table_args__ = (
-        Index('ix_meter_timestamp', 'timestamp'),
-        Index('ix_meter_user_id', 'user_id'),
-        Index('ix_meter_project_id', 'project_id'),
-        Index('idx_meter_rid_cname', 'resource_id', 'counter_name'),
+        Index('ix_sample_timestamp', 'timestamp'),
+        Index('ix_sample_user_id', 'user_id'),
+        Index('ix_sample_project_id', 'project_id'),
+        Index('idx_sample_rid_cname', 'resource_id', 'counter_name'),
     )
     id = Column(Integer, primary_key=True)
     counter_name = Column(String(255))
@@ -213,13 +213,13 @@ class Meter(Base):
     message_signature = Column(String(1000))
     message_id = Column(String(1000))
     sources = relationship("Source", secondary=lambda: sourceassoc)
-    meta_text = relationship("MetaText", backref="meter",
+    meta_text = relationship("MetaText", backref="sample",
                              cascade="all, delete-orphan")
-    meta_float = relationship("MetaFloat", backref="meter",
+    meta_float = relationship("MetaFloat", backref="sample",
                               cascade="all, delete-orphan")
-    meta_int = relationship("MetaBigInt", backref="meter",
+    meta_int = relationship("MetaBigInt", backref="sample",
                             cascade="all, delete-orphan")
-    meta_bool = relationship("MetaBool", backref="meter",
+    meta_bool = relationship("MetaBool", backref="sample",
                              cascade="all, delete-orphan")
 
 
@@ -228,7 +228,7 @@ class User(Base):
     id = Column(String(255), primary_key=True)
     sources = relationship("Source", secondary=lambda: sourceassoc)
     resources = relationship("Resource", backref='user')
-    meters = relationship("Meter", backref='user')
+    samples = relationship("Sample", backref='user')
 
 
 class Project(Base):
@@ -236,7 +236,7 @@ class Project(Base):
     id = Column(String(255), primary_key=True)
     sources = relationship("Source", secondary=lambda: sourceassoc)
     resources = relationship("Resource", backref='project')
-    meters = relationship("Meter", backref='project')
+    samples = relationship("Sample", backref='project')
 
 
 class Resource(Base):
@@ -251,7 +251,7 @@ class Resource(Base):
     resource_metadata = Column(JSONEncodedDict())
     user_id = Column(String(255), ForeignKey('user.id'))
     project_id = Column(String(255), ForeignKey('project.id'))
-    meters = relationship("Meter", backref='resource')
+    samples = relationship("Sample", backref='resource')
 
 
 class Alarm(Base):
