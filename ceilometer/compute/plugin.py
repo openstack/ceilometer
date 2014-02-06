@@ -30,10 +30,10 @@ class ComputePollster(plugin.PollsterBase):
     """
 
     @abc.abstractmethod
-    def get_samples(self, manager, cache, instance):
+    def get_samples(self, manager, cache, resources):
         """Return a sequence of Counter instances from polling the resources.
 
         :param manager: The service manager invoking the plugin
         :param cache: A dictionary for passing data between plugins
-        :param instance: The instance to examine
+        :param resources: The resources to examine (expected to be instances)
         """

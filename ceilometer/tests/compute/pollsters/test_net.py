@@ -72,7 +72,7 @@ class TestNetPollster(base.TestPollsterBase):
     def _check_get_samples(self, factory, expected):
         mgr = manager.AgentManager()
         pollster = factory()
-        samples = list(pollster.get_samples(mgr, {}, self.instance))
+        samples = list(pollster.get_samples(mgr, {}, [self.instance]))
         self.assertEqual(len(samples), 3)  # one for each nic
         self.assertEqual(set([s.name for s in samples]),
                          set([samples[0].name]))
@@ -157,7 +157,7 @@ class TestNetPollsterCache(base.TestPollsterBase):
                 self.instance.name: vnics,
             },
         }
-        samples = list(pollster.get_samples(mgr, cache, self.instance))
+        samples = list(pollster.get_samples(mgr, cache, [self.instance]))
         self.assertEqual(len(samples), 1)
 
     def test_incoming_bytes(self):

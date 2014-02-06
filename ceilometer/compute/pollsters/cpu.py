@@ -30,26 +30,28 @@ LOG = log.getLogger(__name__)
 
 class CPUPollster(plugin.ComputePollster):
 
-    def get_samples(self, manager, cache, instance):
-        LOG.info(_('checking instance %s'), instance.id)
-        instance_name = util.instance_name(instance)
-        try:
-            cpu_info = manager.inspector.inspect_cpus(instance_name)
-            LOG.info(_("CPUTIME USAGE: %(instance)s %(time)d") % (
-                     {'instance': instance.__dict__, 'time': cpu_info.time}))
-            cpu_num = {'cpu_number': cpu_info.number}
-            yield util.make_sample_from_instance(
-                instance,
-                name='cpu',
-                type=sample.TYPE_CUMULATIVE,
-                unit='ns',
-                volume=cpu_info.time,
-                additional_metadata=cpu_num,
-            )
-        except virt_inspector.InstanceNotFoundException as err:
-            # Instance was deleted while getting samples. Ignore it.
-            LOG.debug(_('Exception while getting samples %s'), err)
-        except Exception as err:
-            LOG.error(_('could not get CPU time for %(id)s: %(e)s') % (
-                      {'id': instance.id, 'e': err}))
-            LOG.exception(err)
+    def get_samples(self, manager, cache, resources):
+        for instance in resources:
+            LOG.info(_('checking instance %s'), instance.id)
+            instance_name = util.instance_name(instance)
+            try:
+                cpu_info = manager.inspector.inspect_cpus(instance_name)
+                LOG.info(_("CPUTIME USAGE: %(instance)s %(time)d") % (
+                         {'instance': instance.__dict__,
+                          'time': cpu_info.time}))
+                cpu_num = {'cpu_number': cpu_info.number}
+                yield util.make_sample_from_instance(
+                    instance,
+                    name='cpu',
+                    type=sample.TYPE_CUMULATIVE,
+                    unit='ns',
+                    volume=cpu_info.time,
+                    additional_metadata=cpu_num,
+                )
+            except virt_inspector.InstanceNotFoundException as err:
+                # Instance was deleted while getting samples. Ignore it.
+                LOG.debug(_('Exception while getting samples %s'), err)
+            except Exception as err:
+                LOG.error(_('could not get CPU time for %(id)s: %(e)s') % (
+                          {'id': instance.id, 'e': err}))
+                LOG.exception(err)

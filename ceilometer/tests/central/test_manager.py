@@ -40,6 +40,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         return manager.AgentManager()
 
     def setUp(self):
+        self.source_resources = True
         super(TestRunTasks, self).setUp()
         self.useFixture(mockpatch.Patch(
             'keystoneclient.v2_0.client.Client',

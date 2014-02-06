@@ -53,7 +53,7 @@ class TestCPUPollster(base.TestPollsterBase):
 
         def _verify_cpu_metering(expected_time):
             cache = {}
-            samples = list(pollster.get_samples(mgr, cache, self.instance))
+            samples = list(pollster.get_samples(mgr, cache, [self.instance]))
             self.assertEqual(len(samples), 1)
             self.assertEqual(set([s.name for s in samples]),
                              set(['cpu']))
@@ -75,7 +75,7 @@ class TestCPUPollster(base.TestPollsterBase):
         pollster = cpu.CPUPollster()
 
         cache = {}
-        samples = list(pollster.get_samples(mgr, cache, self.instance))
+        samples = list(pollster.get_samples(mgr, cache, [self.instance]))
         self.assertEqual(len(samples), 1)
         self.assertEqual(samples[0].volume, 10 ** 6)
         self.assertEqual(len(cache), 0)
