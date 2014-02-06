@@ -49,9 +49,9 @@ class TestListResources(FunctionalTest,
 
     def _verify_sample_timestamps(self, res, first, last):
         self.assertTrue('first_sample_timestamp' in res)
-        self.assertEqual(res['first_sample_timestamp'], self._isotime(first))
+        self.assertEqual(self._isotime(first), res['first_sample_timestamp'])
         self.assertTrue('last_sample_timestamp' in res)
-        self.assertEqual(res['last_sample_timestamp'], self._isotime(last))
+        self.assertEqual(self._isotime(last), res['last_sample_timestamp'])
 
     def test_instance_no_metadata(self):
         timestamp = datetime.datetime(2012, 7, 2, 10, 40)
@@ -294,16 +294,16 @@ class TestListResources(FunctionalTest,
         self.conn.record_metering_data(msg2)
 
         resp1 = self.get_json('/resources/resource-id-1')
-        self.assertEqual(resp1["resource_id"], "resource-id-1")
+        self.assertEqual("resource-id-1", resp1["resource_id"])
 
         resp2 = self.get_json('/resources/resource-id-2')
-        self.assertEqual(resp2["resource_id"], "resource-id-2")
+        self.assertEqual("resource-id-2", resp2["resource_id"])
 
         resp3 = self.get_json('/resources/resource-id-3', expect_errors=True)
-        self.assertEqual(resp3.status_code, 404)
-        self.assertEqual(json.loads(resp3.body)['error_message']
-                         ['faultstring'],
-                         "Resource resource-id-3 Not Found")
+        self.assertEqual(404, resp3.status_code)
+        self.assertEqual("Resource resource-id-3 Not Found",
+                         json.loads(resp3.body)['error_message']
+                         ['faultstring'])
 
     def test_with_user(self):
         sample1 = sample.Sample(
@@ -478,13 +478,11 @@ class TestListResources(FunctionalTest,
 
         data = self.get_json('/resources')
         metadata = data[0]['metadata']
-        self.assertEqual(
-            [(u'dict_properties.key', u'value'),
-             (u'display_name', u'test-server'),
-             (u'not_ignored_list', u"['returned']"),
-             (u'tag', u'self.sample')
-             ],
-            list(sorted(metadata.iteritems())))
+        self.assertEqual([(u'dict_properties.key', u'value'),
+                          (u'display_name', u'test-server'),
+                          (u'not_ignored_list', u"['returned']"),
+                          (u'tag', u'self.sample')],
+                         list(sorted(metadata.iteritems())))
 
     def test_resource_meter_links(self):
         sample1 = sample.Sample(
@@ -509,11 +507,11 @@ class TestListResources(FunctionalTest,
 
         data = self.get_json('/resources')
         links = data[0]['links']
-        self.assertEqual(len(links), 2)
-        self.assertEqual(links[0]['rel'], 'self')
+        self.assertEqual(2, len(links))
+        self.assertEqual('self', links[0]['rel'])
         self.assertTrue((self.PATH_PREFIX + '/resources/resource-id')
                         in links[0]['href'])
-        self.assertEqual(links[1]['rel'], 'instance')
+        self.assertEqual('instance', links[1]['rel'])
         self.assertTrue((self.PATH_PREFIX + '/meters/instance?'
                          'q.field=resource_id&q.value=resource-id')
                         in links[1]['href'])

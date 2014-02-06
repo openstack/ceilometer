@@ -94,7 +94,7 @@ class TestMetricsNotifications(test.BaseTestCase):
         self.assertIn(METRICS_UPDATE['event_type'],
                       ic.event_types)
         samples = list(ic.process_notification(METRICS_UPDATE))
-        self.assertEqual(samples[0].resource_id, RES_ID)
+        self.assertEqual(RES_ID, samples[0].resource_id)
         return samples[0]
 
     def test_compute_metrics(self):
@@ -104,56 +104,56 @@ class TestMetricsNotifications(test.BaseTestCase):
         info = ic._get_sample(METRICS_UPDATE, 'cpu.frequency')
         info_none = ic._get_sample(METRICS_UPDATE, 'abc.efg')
         info_error = ic._get_sample(ERROR_METRICS, 'cpu.frequency')
-        self.assertEqual(info['payload']['name'], 'cpu.frequency')
+        self.assertEqual('cpu.frequency', info['payload']['name'])
         self.assertIsNone(info_none)
         self.assertIsNone(info_error)
 
     def test_compute_cpu_frequency(self):
         c = self._process_notification(cpu.CpuFrequency())
-        self.assertEqual(c.name, 'compute.node.cpu.frequency')
-        self.assertEqual(c.volume, 1600)
+        self.assertEqual('compute.node.cpu.frequency', c.name)
+        self.assertEqual(1600, c.volume)
 
     def test_compute_cpu_user_time(self):
         c = self._process_notification(cpu.CpuUserTime())
-        self.assertEqual(c.name, 'compute.node.cpu.user.time')
-        self.assertEqual(c.volume, 17421440000000L)
+        self.assertEqual('compute.node.cpu.user.time', c.name)
+        self.assertEqual(17421440000000L, c.volume)
 
     def test_compute_cpu_kernel_time(self):
         c = self._process_notification(cpu.CpuKernelTime())
-        self.assertEqual(c.name, 'compute.node.cpu.kernel.time')
-        self.assertEqual(c.volume, 7852600000000L)
+        self.assertEqual('compute.node.cpu.kernel.time', c.name)
+        self.assertEqual(7852600000000L, c.volume)
 
     def test_compute_cpu_idle_time(self):
         c = self._process_notification(cpu.CpuIdleTime())
-        self.assertEqual(c.name, 'compute.node.cpu.idle.time')
-        self.assertEqual(c.volume, 1307374400000000L)
+        self.assertEqual('compute.node.cpu.idle.time', c.name)
+        self.assertEqual(1307374400000000L, c.volume)
 
     def test_compute_cpu_iowait_time(self):
         c = self._process_notification(cpu.CpuIowaitTime())
-        self.assertEqual(c.name, 'compute.node.cpu.iowait.time')
-        self.assertEqual(c.volume, 11697470000000L)
+        self.assertEqual('compute.node.cpu.iowait.time', c.name)
+        self.assertEqual(11697470000000L, c.volume)
 
     def test_compute_cpu_kernel_percent(self):
         c = self._process_notification(cpu.CpuKernelPercent())
-        self.assertEqual(c.name, 'compute.node.cpu.kernel.percent')
-        self.assertEqual(c.volume, 0.5841204961898534)
+        self.assertEqual('compute.node.cpu.kernel.percent', c.name)
+        self.assertEqual(0.5841204961898534, c.volume)
 
     def test_compute_cpu_idle_percent(self):
         c = self._process_notification(cpu.CpuIdlePercent())
-        self.assertEqual(c.name, 'compute.node.cpu.idle.percent')
-        self.assertEqual(c.volume, 97.24985141658965)
+        self.assertEqual('compute.node.cpu.idle.percent', c.name)
+        self.assertEqual(97.24985141658965, c.volume)
 
     def test_compute_cpu_user_percent(self):
         c = self._process_notification(cpu.CpuUserPercent())
-        self.assertEqual(c.name, 'compute.node.cpu.user.percent')
-        self.assertEqual(c.volume, 1.2959045637294348)
+        self.assertEqual('compute.node.cpu.user.percent', c.name)
+        self.assertEqual(1.2959045637294348, c.volume)
 
     def test_compute_cpu_iowait_percent(self):
         c = self._process_notification(cpu.CpuIowaitPercent())
-        self.assertEqual(c.name, 'compute.node.cpu.iowait.percent')
-        self.assertEqual(c.volume, 0.8701235234910634)
+        self.assertEqual('compute.node.cpu.iowait.percent', c.name)
+        self.assertEqual(0.8701235234910634, c.volume)
 
     def test_compute_cpu_percent(self):
         c = self._process_notification(cpu.CpuPercent())
-        self.assertEqual(c.name, 'compute.node.cpu.percent')
-        self.assertEqual(c.volume, 2.7501485834103515)
+        self.assertEqual('compute.node.cpu.percent', c.name)
+        self.assertEqual(2.7501485834103515, c.volume)

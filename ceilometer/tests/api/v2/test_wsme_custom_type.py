@@ -29,9 +29,9 @@ class TestWsmeCustomType(test.BaseTestCase):
             ae = v2.AdvEnum("name", str, "one", "other", default="other")
 
         obj = dummybase()
-        self.assertEqual(obj.ae, "other")
+        self.assertEqual("other", obj.ae)
 
         obj = dummybase(ae="one")
-        self.assertEqual(obj.ae, "one")
+        self.assertEqual("one", obj.ae)
 
         self.assertRaises(ValueError, dummybase, ae="not exists")

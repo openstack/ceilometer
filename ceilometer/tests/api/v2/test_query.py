@@ -40,7 +40,7 @@ class TestQuery(test.BaseTestCase):
                           value='123',
                           type='integer')
         expected = 123
-        self.assertEqual(query._get_value_as_type(), expected)
+        self.assertEqual(expected, query._get_value_as_type())
 
     def test_get_value_as_type_with_float(self):
         query = api.Query(field='metadata.size',
@@ -48,7 +48,7 @@ class TestQuery(test.BaseTestCase):
                           value='123.456',
                           type='float')
         expected = 123.456
-        self.assertEqual(query._get_value_as_type(), expected)
+        self.assertEqual(expected, query._get_value_as_type())
 
     def test_get_value_as_type_with_boolean(self):
         query = api.Query(field='metadata.is_public',
@@ -56,7 +56,7 @@ class TestQuery(test.BaseTestCase):
                           value='True',
                           type='boolean')
         expected = True
-        self.assertEqual(query._get_value_as_type(), expected)
+        self.assertEqual(expected, query._get_value_as_type())
 
     def test_get_value_as_type_with_string(self):
         query = api.Query(field='metadata.name',
@@ -64,35 +64,35 @@ class TestQuery(test.BaseTestCase):
                           value='linux',
                           type='string')
         expected = 'linux'
-        self.assertEqual(query._get_value_as_type(), expected)
+        self.assertEqual(expected, query._get_value_as_type())
 
     def test_get_value_as_type_with_integer_without_type(self):
         query = api.Query(field='metadata.size',
                           op='eq',
                           value='123')
         expected = 123
-        self.assertEqual(query._get_value_as_type(), expected)
+        self.assertEqual(expected, query._get_value_as_type())
 
     def test_get_value_as_type_with_float_without_type(self):
         query = api.Query(field='metadata.size',
                           op='eq',
                           value='123.456')
         expected = 123.456
-        self.assertEqual(query._get_value_as_type(), expected)
+        self.assertEqual(expected, query._get_value_as_type())
 
     def test_get_value_as_type_with_boolean_without_type(self):
         query = api.Query(field='metadata.is_public',
                           op='eq',
                           value='True')
         expected = True
-        self.assertEqual(query._get_value_as_type(), expected)
+        self.assertEqual(expected, query._get_value_as_type())
 
     def test_get_value_as_type_with_string_without_type(self):
         query = api.Query(field='metadata.name',
                           op='eq',
                           value='linux')
         expected = 'linux'
-        self.assertEqual(query._get_value_as_type(), expected)
+        self.assertEqual(expected, query._get_value_as_type())
 
     def test_get_value_as_type_with_bad_type(self):
         query = api.Query(field='metadata.size',
@@ -114,7 +114,7 @@ class TestQuery(test.BaseTestCase):
                           op='eq',
                           value='123-1')
         expected = '123-1'
-        self.assertEqual(query._get_value_as_type(), expected)
+        self.assertEqual(expected, query._get_value_as_type())
 
     def test_get_value_as_type_boolean_expression_without_type(self):
         # bug 1221736
@@ -122,7 +122,7 @@ class TestQuery(test.BaseTestCase):
                           op='eq',
                           value='True or False')
         expected = 'True or False'
-        self.assertEqual(query._get_value_as_type(), expected)
+        self.assertEqual(expected, query._get_value_as_type())
 
     def test_get_value_as_type_with_syntax_error(self):
         # bug 1221736
@@ -131,7 +131,7 @@ class TestQuery(test.BaseTestCase):
                           op='eq',
                           value=value)
         expected = value
-        self.assertEqual(query._get_value_as_type(), expected)
+        self.assertEqual(expected, query._get_value_as_type())
 
     def test_get_value_as_type_with_syntax_error_colons(self):
         # bug 1221736
@@ -140,20 +140,20 @@ class TestQuery(test.BaseTestCase):
                           op='eq',
                           value=value)
         expected = value
-        self.assertEqual(query._get_value_as_type(), expected)
+        self.assertEqual(expected, query._get_value_as_type())
 
 
 class TestValidateGroupByFields(test.BaseTestCase):
 
     def test_valid_field(self):
         result = api._validate_groupby_fields(['user_id'])
-        self.assertEqual(result, ['user_id'])
+        self.assertEqual(['user_id'], result)
 
     def test_valid_fields_multiple(self):
         result = set(
             api._validate_groupby_fields(['user_id', 'project_id', 'source'])
         )
-        self.assertEqual(result, set(['user_id', 'project_id', 'source']))
+        self.assertEqual(set(['user_id', 'project_id', 'source']), result)
 
     def test_invalid_field(self):
         self.assertRaises(wsme.exc.UnknownArgument,
@@ -169,7 +169,7 @@ class TestValidateGroupByFields(test.BaseTestCase):
         result = set(
             api._validate_groupby_fields(['user_id', 'source', 'user_id'])
         )
-        self.assertEqual(result, set(['user_id', 'source']))
+        self.assertEqual(set(['user_id', 'source']), result)
 
 
 class TestQueryToKwArgs(tests_base.BaseTestCase):
@@ -186,8 +186,8 @@ class TestQueryToKwArgs(tests_base.BaseTestCase):
                        value='uid')]
         kwargs = api._query_to_kwargs(q, storage.SampleFilter.__init__)
         self.assertIn('user', kwargs)
-        self.assertEqual(len(kwargs), 1)
-        self.assertEqual(kwargs['user'], 'uid')
+        self.assertEqual(1, len(kwargs))
+        self.assertEqual('uid', kwargs['user'])
 
     def test_sample_filter_multi(self):
         q = [api.Query(field='user_id',
@@ -206,12 +206,12 @@ class TestQueryToKwArgs(tests_base.BaseTestCase):
                        op='eq',
                        value='meter_name')]
         kwargs = api._query_to_kwargs(q, storage.SampleFilter.__init__)
-        self.assertEqual(len(kwargs), 5)
-        self.assertEqual(kwargs['user'], 'uid')
-        self.assertEqual(kwargs['project'], 'pid')
-        self.assertEqual(kwargs['resource'], 'rid')
-        self.assertEqual(kwargs['source'], 'source_name')
-        self.assertEqual(kwargs['meter'], 'meter_name')
+        self.assertEqual(5, len(kwargs))
+        self.assertEqual('uid', kwargs['user'])
+        self.assertEqual('pid', kwargs['project'])
+        self.assertEqual('rid', kwargs['resource'])
+        self.assertEqual('source_name', kwargs['source'])
+        self.assertEqual('meter_name', kwargs['meter'])
 
     def test_sample_filter_timestamp(self):
         ts_start = timeutils.utcnow()
@@ -223,11 +223,11 @@ class TestQueryToKwArgs(tests_base.BaseTestCase):
                        op='gt',
                        value=str(ts_start))]
         kwargs = api._query_to_kwargs(q, storage.SampleFilter.__init__)
-        self.assertEqual(len(kwargs), 4)
+        self.assertEqual(4, len(kwargs))
         self.assertTimestampEqual(kwargs['start'], ts_start)
         self.assertTimestampEqual(kwargs['end'], ts_end)
-        self.assertEqual(kwargs['start_timestamp_op'], 'gt')
-        self.assertEqual(kwargs['end_timestamp_op'], 'lt')
+        self.assertEqual('gt', kwargs['start_timestamp_op'])
+        self.assertEqual('lt', kwargs['end_timestamp_op'])
 
     def test_sample_filter_meta(self):
         q = [api.Query(field='metadata.size',
@@ -237,10 +237,10 @@ class TestQueryToKwArgs(tests_base.BaseTestCase):
                        op='eq',
                        value='meta_id')]
         kwargs = api._query_to_kwargs(q, storage.SampleFilter.__init__)
-        self.assertEqual(len(kwargs), 1)
-        self.assertEqual(len(kwargs['metaquery']), 2)
-        self.assertEqual(kwargs['metaquery']['metadata.size'], 20)
-        self.assertEqual(kwargs['metaquery']['metadata.id'], 'meta_id')
+        self.assertEqual(1, len(kwargs))
+        self.assertEqual(2, len(kwargs['metaquery']))
+        self.assertEqual(20, kwargs['metaquery']['metadata.size'])
+        self.assertEqual('meta_id', kwargs['metaquery']['metadata.id'])
 
     def test_sample_filter_non_equality_on_metadata(self):
         queries = [api.Query(field='resource_metadata.image_id',
@@ -320,4 +320,4 @@ class TestQueryToKwArgs(tests_base.BaseTestCase):
             kwargs = api._query_to_kwargs(queries,
                                           storage.SampleFilter.__init__)
             for o in ['user', 'project', 'resource']:
-                self.assertEqual(kwargs.get(o), 'fake_%s_id' % o)
+                self.assertEqual('fake_%s_id' % o, kwargs.get(o))

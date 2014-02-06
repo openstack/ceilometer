@@ -88,8 +88,8 @@ class TestListEvents(FunctionalTest,
         data = self.get_json('/meters/instance')
         self.assertEqual(2, len(data))
         for s in data:
-            self.assertEqual(s['recorded_at'],
-                             timeutils.utcnow.override_time.isoformat())
+            self.assertEqual(timeutils.utcnow.override_time.isoformat(),
+                             s['recorded_at'])
 
     def test_all_trailing_slash(self):
         data = self.get_json('/meters/instance/')
@@ -172,9 +172,9 @@ class TestListEvents(FunctionalTest,
         sample = data[0]
         self.assertIn('resource_metadata', sample)
         self.assertEqual(
-            list(sorted(sample['resource_metadata'].iteritems())),
             [('dict_properties.key', 'value'),
              ('display_name', 'test-server'),
              ('not_ignored_list', "['returned']"),
              ('tag', 'self.sample'),
-             ])
+             ],
+            list(sorted(sample['resource_metadata'].iteritems())))

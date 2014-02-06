@@ -84,8 +84,8 @@ class TestPostSamples(FunctionalTest,
         data = self.post_json('/meters/my_counter_name/', s1,
                               expect_errors=True)
 
-        self.assertEqual(data.status_int, 400)
-        self.assertEqual(len(self.published), 0)
+        self.assertEqual(400, data.status_int)
+        self.assertEqual(0, len(self.published))
 
     def test_messsage_id_provided(self):
         """Do not accept sample with message_id."""
@@ -104,8 +104,8 @@ class TestPostSamples(FunctionalTest,
         data = self.post_json('/meters/my_counter_name/', s1,
                               expect_errors=True)
 
-        self.assertEqual(data.status_int, 400)
-        self.assertEqual(len(self.published), 0)
+        self.assertEqual(400, data.status_int)
+        self.assertEqual(0, len(self.published))
 
     def test_wrong_project_id(self):
         """Do not accept cross posting samples to different projects."""
@@ -129,8 +129,8 @@ class TestPostSamples(FunctionalTest,
                                   "bc23a9d531064583ace8f67dad60f6bb",
                               })
 
-        self.assertEqual(data.status_int, 400)
-        self.assertEqual(len(self.published), 0)
+        self.assertEqual(400, data.status_int)
+        self.assertEqual(0, len(self.published))
 
     def test_multiple_samples(self):
         """Send multiple samples.
@@ -197,7 +197,7 @@ class TestPostSamples(FunctionalTest,
             print('posting without %s' % m)
             data = self.post_json('/meters/my_counter_name', s_broke,
                                   expect_errors=True)
-            self.assertEqual(data.status_int, 400)
+            self.assertEqual(400, data.status_int)
 
     def test_multiple_project_id_and_admin(self):
         """Allow admin is allowed to set multiple project_id."""
@@ -223,7 +223,7 @@ class TestPostSamples(FunctionalTest,
         data = self.post_json('/meters/my_counter_name/', s1,
                               headers={"X-Roles": "admin"})
 
-        self.assertEqual(data.status_int, 200)
+        self.assertEqual(200, data.status_int)
         for x, s in enumerate(s1):
             # source is modified to include the project_id.
             s['source'] = '%s:%s' % (s['project_id'],
@@ -269,7 +269,7 @@ class TestPostSamples(FunctionalTest,
                                      'name2': 'value2'}}]
         data = self.post_json('/meters/my_counter_name/', s1,
                               expect_errors=True)
-        self.assertEqual(data.status_int, 200)
+        self.assertEqual(200, data.status_int)
         for x, s in enumerate(s1):
             # source is modified to include the project_id.
             s['source'] = '%s:%s' % (
@@ -306,7 +306,7 @@ class TestPostSamples(FunctionalTest,
                                   'X-User-Id': user_id,
                               })
 
-        self.assertEqual(data.status_int, 200)
+        self.assertEqual(200, data.status_int)
         for x, s in enumerate(s1):
             # source is modified to include the project_id.
             s['source'] = '%s:%s' % (project_id,
