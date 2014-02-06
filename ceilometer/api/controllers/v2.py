@@ -733,7 +733,7 @@ class MeterController(rest.RestController):
 
     @wsme_pecan.wsexpose([OldSample], body=[OldSample])
     def post(self, samples):
-        """Post a list of new Samples to Ceilometer.
+        """Post a list of new Samples to Telemetry.
 
         :param samples: a list of samples within the request body.
         """
