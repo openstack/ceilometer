@@ -189,7 +189,8 @@ class Query(_Base):
     # Functions to convert the data field to the correct type.
     _type_converters = {'integer': int,
                         'float': float,
-                        'boolean': strutils.bool_from_string,
+                        'boolean': functools.partial(
+                            strutils.bool_from_string, strict=True),
                         'string': six.text_type,
                         'datetime': timeutils.parse_isotime}
 
