@@ -106,4 +106,4 @@ class NotificationBaseTestCase(test.BaseTestCase):
         c = self.FakeComputePlugin()
         n = self.FakeNetworkPlugin()
         self.assertTrue(len(list(c.to_samples(TEST_NOTIFICATION))) > 0)
-        self.assertEqual(len(list(n.to_samples(TEST_NOTIFICATION))), 0)
+        self.assertEqual(0, len(list(n.to_samples(TEST_NOTIFICATION))))

@@ -32,27 +32,22 @@ class TestUtils(test.BaseTestCase):
         expected = 1356093296.12
         utc_datetime = datetime.datetime.utcfromtimestamp(expected)
         actual = utils.dt_to_decimal(utc_datetime)
-        self.assertEqual(float(actual), expected)
+        self.assertEqual(expected, float(actual))
 
     def test_decimal_to_datetime(self):
         expected = 1356093296.12
         dexpected = decimal.Decimal(str(expected))  # Python 2.6 wants str()
         expected_datetime = datetime.datetime.utcfromtimestamp(expected)
         actual_datetime = utils.decimal_to_dt(dexpected)
-        self.assertEqual(actual_datetime, expected_datetime)
+        self.assertEqual(expected_datetime, actual_datetime)
 
     def test_recursive_keypairs(self):
-        data = {'a': 'A',
-                'b': 'B',
-                'nested': {'a': 'A',
-                           'b': 'B',
-                           },
-                }
+        data = {'a': 'A', 'b': 'B',
+                'nested': {'a': 'A', 'b': 'B'}}
         pairs = list(utils.recursive_keypairs(data))
-        self.assertEqual(pairs, [('a', 'A'),
-                                 ('b', 'B'),
-                                 ('nested:a', 'A'),
-                                 ('nested:b', 'B')])
+        self.assertEqual([('a', 'A'), ('b', 'B'),
+                          ('nested:a', 'A'), ('nested:b', 'B')],
+                         pairs)
 
     def test_recursive_keypairs_with_separator(self):
         data = {'a': 'A',
@@ -63,10 +58,11 @@ class TestUtils(test.BaseTestCase):
                 }
         separator = '.'
         pairs = list(utils.recursive_keypairs(data, separator))
-        self.assertEqual(pairs, [('a', 'A'),
-                                 ('b', 'B'),
-                                 ('nested.a', 'A'),
-                                 ('nested.b', 'B')])
+        self.assertEqual([('a', 'A'),
+                          ('b', 'B'),
+                          ('nested.a', 'A'),
+                          ('nested.b', 'B')],
+                         pairs)
 
     def test_recursive_keypairs_with_list_of_dict(self):
         small = 1
@@ -80,7 +76,7 @@ class TestUtils(test.BaseTestCase):
                     'b': 'B',
                     'nested': {'list': [nested]}}
             pairs = list(utils.recursive_keypairs(data))
-            self.assertEqual(pairs, expected)
+            self.assertEqual(expected, pairs)
 
     def test_decimal_to_dt_with_none_parameter(self):
         self.assertIsNone(utils.decimal_to_dt(None))
@@ -94,9 +90,9 @@ class TestUtils(test.BaseTestCase):
                 'nested2': [{'c': 'A'}, {'c': 'B'}]
                 }
         pairs = list(utils.dict_to_keyval(data))
-        self.assertEqual(pairs, [('a', 'A'),
-                                 ('b', 'B'),
-                                 ('nested2[0].c', 'A'),
-                                 ('nested2[1].c', 'B'),
-                                 ('nested.a', 'A'),
-                                 ('nested.b', 'B')])
+        self.assertEqual([('a', 'A'), ('b', 'B'),
+                         ('nested2[0].c', 'A'),
+                         ('nested2[1].c', 'B'),
+                         ('nested.a', 'A'),
+                         ('nested.b', 'B')],
+                         pairs)

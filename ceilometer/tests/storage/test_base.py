@@ -29,34 +29,32 @@ class BaseTest(test.BaseTestCase):
             datetime.datetime(2013, 1, 1, 12, 0),
             datetime.datetime(2013, 1, 1, 13, 0),
             60))
-        self.assertEqual(len(times), 60)
-        self.assertEqual(times[10],
-                         (datetime.datetime(2013, 1, 1, 12, 10),
-                          datetime.datetime(2013, 1, 1, 12, 11)))
-        self.assertEqual(times[21],
-                         (datetime.datetime(2013, 1, 1, 12, 21),
-                          datetime.datetime(2013, 1, 1, 12, 22)))
+        self.assertEqual(60, len(times))
+        self.assertEqual((datetime.datetime(2013, 1, 1, 12, 10),
+                          datetime.datetime(2013, 1, 1, 12, 11)), times[10])
+        self.assertEqual((datetime.datetime(2013, 1, 1, 12, 21),
+                          datetime.datetime(2013, 1, 1, 12, 22)), times[21])
 
     def test_iter_period_bis(self):
         times = list(base.iter_period(
             datetime.datetime(2013, 1, 2, 13, 0),
             datetime.datetime(2013, 1, 2, 14, 0),
             55))
-        self.assertEqual(len(times), math.ceil(3600 / 55.0))
-        self.assertEqual(times[10],
-                         (datetime.datetime(2013, 1, 2, 13, 9, 10),
-                          datetime.datetime(2013, 1, 2, 13, 10, 5)))
-        self.assertEqual(times[21],
-                         (datetime.datetime(2013, 1, 2, 13, 19, 15),
-                          datetime.datetime(2013, 1, 2, 13, 20, 10)))
+        self.assertEqual(math.ceil(3600 / 55.0), len(times))
+        self.assertEqual((datetime.datetime(2013, 1, 2, 13, 9, 10),
+                          datetime.datetime(2013, 1, 2, 13, 10, 5)),
+                         times[10])
+        self.assertEqual((datetime.datetime(2013, 1, 2, 13, 19, 15),
+                          datetime.datetime(2013, 1, 2, 13, 20, 10)),
+                         times[21])
 
     def test_handle_sort_key(self):
         sort_keys_alarm = base._handle_sort_key('alarm')
-        self.assertEqual(sort_keys_alarm, ['name', 'user_id', 'project_id'])
+        self.assertEqual(['name', 'user_id', 'project_id'], sort_keys_alarm)
 
         sort_keys_meter = base._handle_sort_key('meter', 'foo')
-        self.assertEqual(sort_keys_meter, ['foo', 'user_id', 'project_id'])
+        self.assertEqual(['foo', 'user_id', 'project_id'], sort_keys_meter)
 
         sort_keys_resource = base._handle_sort_key('resource', 'project_id')
-        self.assertEqual(sort_keys_resource,
-                         ['project_id', 'user_id', 'timestamp'])
+        self.assertEqual(['project_id', 'user_id', 'timestamp'],
+                         sort_keys_resource)

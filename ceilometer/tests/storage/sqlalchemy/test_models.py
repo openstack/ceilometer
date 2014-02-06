@@ -49,24 +49,24 @@ class PreciseTimestampTest(test.BaseTestCase):
 
     def test_load_dialect_impl_mysql(self):
         result = self._type.load_dialect_impl(self._mysql_dialect)
-        self.assertEqual(type(result), NUMERIC)
-        self.assertEqual(result.precision, 20)
-        self.assertEqual(result.scale, 6)
+        self.assertEqual(NUMERIC, type(result))
+        self.assertEqual(20, result.precision)
+        self.assertEqual(6, result.scale)
         self.assertTrue(result.asdecimal)
 
     def test_load_dialect_impl_postgres(self):
         result = self._type.load_dialect_impl(self._postgres_dialect)
-        self.assertEqual(type(result), sqlalchemy.DateTime)
+        self.assertEqual(sqlalchemy.DateTime, type(result))
 
     def test_process_bind_param_store_decimal_mysql(self):
         expected = utils.dt_to_decimal(self._date)
         result = self._type.process_bind_param(self._date, self._mysql_dialect)
-        self.assertEqual(result, expected)
+        self.assertEqual(expected, result)
 
     def test_process_bind_param_store_datetime_postgres(self):
         result = self._type.process_bind_param(self._date,
                                                self._postgres_dialect)
-        self.assertEqual(result, self._date)
+        self.assertEqual(self._date, result)
 
     def test_process_bind_param_store_none_mysql(self):
         result = self._type.process_bind_param(None, self._mysql_dialect)
@@ -81,12 +81,12 @@ class PreciseTimestampTest(test.BaseTestCase):
         dec_value = utils.dt_to_decimal(self._date)
         result = self._type.process_result_value(dec_value,
                                                  self._mysql_dialect)
-        self.assertEqual(result, self._date)
+        self.assertEqual(self._date, result)
 
     def test_process_result_value_datetime_postgres(self):
         result = self._type.process_result_value(self._date,
                                                  self._postgres_dialect)
-        self.assertEqual(result, self._date)
+        self.assertEqual(self._date, result)
 
     def test_process_result_value_none_mysql(self):
         result = self._type.process_result_value(None,

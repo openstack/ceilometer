@@ -94,11 +94,11 @@ class TestNovaClient(test.BaseTestCase):
                           side_effect=self.fake_servers_list):
             instances = self.nv.instance_get_all_by_host('foobar')
 
-        self.assertEqual(len(instances), 1)
-        self.assertEqual(instances[0].flavor['name'], 'm1.tiny')
-        self.assertEqual(instances[0].image['name'], 'ubuntu-12.04-x86')
-        self.assertEqual(instances[0].kernel_id, 11)
-        self.assertEqual(instances[0].ramdisk_id, 21)
+        self.assertEqual(1, len(instances))
+        self.assertEqual('m1.tiny', instances[0].flavor['name'])
+        self.assertEqual('ubuntu-12.04-x86', instances[0].image['name'])
+        self.assertEqual(11, instances[0].kernel_id)
+        self.assertEqual(21, instances[0].ramdisk_id)
 
     @staticmethod
     def fake_servers_list_unknown_flavor(*args, **kwargs):
@@ -113,8 +113,8 @@ class TestNovaClient(test.BaseTestCase):
                           side_effect=self.fake_servers_list_unknown_flavor):
             instances = self.nv.instance_get_all_by_host('foobar')
 
-        self.assertEqual(len(instances), 1)
-        self.assertEqual(instances[0].flavor['name'], 'unknown-id-666')
+        self.assertEqual(1, len(instances))
+        self.assertEqual('unknown-id-666', instances[0].flavor['name'])
 
     @staticmethod
     def fake_servers_list_unknown_image(*args, **kwargs):
@@ -145,22 +145,22 @@ class TestNovaClient(test.BaseTestCase):
                           side_effect=self.fake_servers_list_unknown_image):
             instances = self.nv.instance_get_all_by_host('foobar')
 
-        self.assertEqual(len(instances), 1)
-        self.assertEqual(instances[0].image['name'], 'unknown-id-666')
+        self.assertEqual(1, len(instances))
+        self.assertEqual('unknown-id-666', instances[0].image['name'])
 
     def test_with_flavor_and_image(self):
         results = self.nv._with_flavor_and_image(self.fake_servers_list())
         instance = results[0]
-        self.assertEqual(instance.image['name'], 'ubuntu-12.04-x86')
-        self.assertEqual(instance.flavor['name'], 'm1.tiny')
-        self.assertEqual(instance.kernel_id, 11)
-        self.assertEqual(instance.ramdisk_id, 21)
+        self.assertEqual('ubuntu-12.04-x86', instance.image['name'])
+        self.assertEqual('m1.tiny', instance.flavor['name'])
+        self.assertEqual(11, instance.kernel_id)
+        self.assertEqual(21, instance.ramdisk_id)
 
     def test_with_flavor_and_image_unknown_image(self):
         instances = self.fake_servers_list_unknown_image()
         results = self.nv._with_flavor_and_image(instances)
         instance = results[0]
-        self.assertEqual(instance.image['name'], 'unknown-id-666')
+        self.assertEqual('unknown-id-666', instance.image['name'])
         self.assertNotEqual(instance.flavor['name'], 'unknown-id-666')
         self.assertIsNone(instance.kernel_id)
         self.assertIsNone(instance.ramdisk_id)
@@ -169,13 +169,13 @@ class TestNovaClient(test.BaseTestCase):
         instances = self.fake_servers_list_unknown_flavor()
         results = self.nv._with_flavor_and_image(instances)
         instance = results[0]
-        self.assertEqual(instance.flavor['name'], 'unknown-id-666')
-        self.assertEqual(instance.flavor['vcpus'], 0)
-        self.assertEqual(instance.flavor['ram'], 0)
-        self.assertEqual(instance.flavor['disk'], 0)
+        self.assertEqual('unknown-id-666', instance.flavor['name'])
+        self.assertEqual(0, instance.flavor['vcpus'])
+        self.assertEqual(0, instance.flavor['ram'])
+        self.assertEqual(0, instance.flavor['disk'])
         self.assertNotEqual(instance.image['name'], 'unknown-id-666')
-        self.assertEqual(instance.kernel_id, 11)
-        self.assertEqual(instance.ramdisk_id, 21)
+        self.assertEqual(11, instance.kernel_id)
+        self.assertEqual(21, instance.ramdisk_id)
 
     def test_with_flavor_and_image_none_metadata(self):
         instances = self.fake_servers_list_image_missing_metadata(3)
@@ -195,7 +195,7 @@ class TestNovaClient(test.BaseTestCase):
         instances = self.fake_servers_list_image_missing_metadata(5)
         results = self.nv._with_flavor_and_image(instances)
         instance = results[0]
-        self.assertEqual(instance.kernel_id, 11)
+        self.assertEqual(11, instance.kernel_id)
         self.assertIsNone(instance.ramdisk_id)
 
     def test_with_flavor_and_image_missing_kernel(self):
@@ -203,7 +203,7 @@ class TestNovaClient(test.BaseTestCase):
         results = self.nv._with_flavor_and_image(instances)
         instance = results[0]
         self.assertIsNone(instance.kernel_id)
-        self.assertEqual(instance.ramdisk_id, 21)
+        self.assertEqual(21, instance.ramdisk_id)
 
     def test_with_missing_image_instance(self):
         instances = self.fake_instance_image_missing()
