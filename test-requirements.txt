@@ -11,11 +11,11 @@ mox>=0.5.3
 # Docs Requirements
 docutils==0.9.1
 oslo.sphinx
-python-subunit
+python-subunit>=0.0.18
 sphinx>=1.1.2,<1.2
 sphinxcontrib-docbookrestapi
 sphinxcontrib-httpdomain
 sphinxcontrib-pecanwsme>=0.6
 testrepository>=0.0.17
 testscenarios>=0.4
-testtools>=0.9.32
+testtools>=0.9.34
