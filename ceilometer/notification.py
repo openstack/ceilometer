@@ -38,11 +38,11 @@ OPTS = [
     cfg.BoolOpt('ack_on_event_error',
                 default=True,
                 deprecated_group='collector',
-                help='Acknowledge message when event persistence fails'),
+                help='Acknowledge message when event persistence fails.'),
     cfg.BoolOpt('store_events',
                 deprecated_group='collector',
                 default=False,
-                help='Save event details'),
+                help='Save event details.'),
 ]
 
 cfg.CONF.register_opts(OPTS, group="notification")

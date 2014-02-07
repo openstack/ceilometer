@@ -24,11 +24,11 @@ API_SERVICE_OPTS = [
                default=8777,
                deprecated_name='metering_api_port',
                deprecated_group='DEFAULT',
-               help='The port for the ceilometer API server',
+               help='The port for the ceilometer API server.',
                ),
     cfg.StrOpt('host',
                default='0.0.0.0',
-               help='The listen IP for the ceilometer API server',
+               help='The listen IP for the ceilometer API server.',
                ),
 ]
 

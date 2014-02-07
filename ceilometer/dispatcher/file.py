@@ -30,10 +30,10 @@ file_dispatcher_opts = [
                     'meters.'),
     cfg.IntOpt('max_bytes',
                default=0,
-               help='The max size of the file'),
+               help='The max size of the file.'),
     cfg.IntOpt('backup_count',
                default=0,
-               help='The max number of the files to keep'),
+               help='The max number of the files to keep.'),
 ]
 
 cfg.CONF.register_opts(file_dispatcher_opts, group="dispatcher_file")

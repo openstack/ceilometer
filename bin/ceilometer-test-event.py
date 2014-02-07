@@ -41,7 +41,7 @@ cfg.CONF.register_cli_opts([
                ' defaults to stdin.'),
     cfg.StrOpt('output-file',
                short='o',
-               help='File to write results to. Defaults to stdout'),
+               help='File to write results to. Defaults to stdout.'),
 ])
 
 TYPES = {1: 'text',

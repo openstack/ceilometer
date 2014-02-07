@@ -47,7 +47,7 @@ OPTS = [
                    'threshold_evaluation_interval', group='alarm')]),
     cfg.StrOpt('evaluation_service',
                default='ceilometer.alarm.service.SingletonAlarmService',
-               help='Class to launch as alarm evaluation service'),
+               help='Class to launch as alarm evaluation service.'),
 ]
 
 cfg.CONF.register_opts(OPTS, group='alarm')

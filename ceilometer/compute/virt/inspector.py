@@ -30,7 +30,7 @@ from ceilometer.openstack.common import log
 OPTS = [
     cfg.StrOpt('hypervisor_inspector',
                default='libvirt',
-               help='Inspector to use for inspecting the hypervisor layer'),
+               help='Inspector to use for inspecting the hypervisor layer.'),
 ]
 
 cfg.CONF.register_opts(OPTS)

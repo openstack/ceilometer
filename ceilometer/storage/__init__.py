@@ -38,7 +38,7 @@ OLD_STORAGE_OPTS = [
     cfg.StrOpt('database_connection',
                secret=True,
                default=None,
-               help='DEPRECATED - Database connection string',
+               help='DEPRECATED - Database connection string.',
                ),
 ]
 
@@ -48,8 +48,8 @@ cfg.CONF.register_opts(OLD_STORAGE_OPTS)
 STORAGE_OPTS = [
     cfg.IntOpt('time_to_live',
                default=-1,
-               help="""number of seconds that samples are kept
-in the database for (<= 0 means forever)"""),
+               help="Number of seconds that samples are kept "
+               "in the database for (<= 0 means forever)."),
 ]
 
 cfg.CONF.register_opts(STORAGE_OPTS, group='database')

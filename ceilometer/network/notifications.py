@@ -30,7 +30,7 @@ from ceilometer import sample
 OPTS = [
     cfg.StrOpt('neutron_control_exchange',
                default='neutron',
-               help="Exchange name for Neutron notifications",
+               help="Exchange name for Neutron notifications.",
                deprecated_name='quantum_control_exchange'),
 ]
 

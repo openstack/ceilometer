@@ -38,7 +38,7 @@ from ceilometer import utils
 sql_opts = [
     cfg.StrOpt('mysql_engine',
                default='InnoDB',
-               help='MySQL engine')
+               help='MySQL engine to use.')
 ]
 
 cfg.CONF.register_opts(sql_opts)

@@ -57,7 +57,7 @@ LOG = log.getLogger(__name__)
 ALARM_API_OPTS = [
     cfg.BoolOpt('record_history',
                 default=True,
-                help='Record alarm change events'
+                help='Record alarm change events.'
                 ),
 ]
 

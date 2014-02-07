@@ -30,7 +30,7 @@ METER_PUBLISH_OPTS = [
     cfg.StrOpt('metering_secret',
                secret=True,
                default='change this or be hacked',
-               help='Secret value for signing metering messages',
+               help='Secret value for signing metering messages.',
                deprecated_opts=[cfg.DeprecatedOpt("metering_secret",
                                                   "DEFAULT"),
                                 cfg.DeprecatedOpt("metering_secret",
