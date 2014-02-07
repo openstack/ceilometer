@@ -30,7 +30,7 @@ community started to realize that a secondary goal could be added to
 Ceilometer: become a standard way to collect metric, regardless of the
 purpose of the collection.  For example, Ceilometer can now publish information for
 monitoring, debugging and graphing tools in addition or in parallel to the
-metering backend. We labelled this effort as “multi-publisher“.
+metering backend. We labelled this effort as "multi-publisher".
 
 .. _increasing number of metrics: http://docs.openstack.org/developer/ceilometer/measurements.html
 
@@ -39,7 +39,7 @@ life, it soon became clear that the OpenStack project needed a tool to watch for
 variations in key values in order to trigger various reactions.
 As Ceilometer already had the tooling to collect vast quantities of data, it
 seemed logical to add this as an extension of the Ceilometer project, which we
-tagged as “alarming“.
+tagged as "alarming".
 
 Metering
 --------
@@ -49,7 +49,7 @@ the telco industry, the steps are:
 
 1. :term:`Metering` is the process of collecting information about what,
    who, when and how much regarding anything that can be billed. The result of
-   this is a collection of “tickets” (a.k.a. samples) which are ready to be
+   this is a collection of "tickets" (a.k.a. samples) which are ready to be
    processed in anyway you want.
 2. :term:`Rating` is the process of analysing a series of tickets,
    according to business rules defined by marketing, in order to transform
@@ -57,10 +57,10 @@ the telco industry, the steps are:
 3. :term:`Billing` is the process to assemble bill line items into a
    single per customer bill, emitting the bill to start the payment collection.
 
-Ceilometer’s initial goal was, and still is, strictly limited to step
+Ceilometer's initial goal was, and still is, strictly limited to step
 one. This is a choice made from the beginning not to go into rating or billing,
 as the variety of possibilities seemed too huge for the project to ever deliver
-a solution that would fit everyone’s needs, from private to public clouds. This
+a solution that would fit everyone's needs, from private to public clouds. This
 means that if you are looking at this project to solve your billing needs, this
 is the right way to go, but certainly not the end of the road for you. Once
 Ceilometer is in place on your OpenStack deployment, you will still have
@@ -79,7 +79,7 @@ but this is fully left up to the implementor.
 
 .. note::
 
-   We do not guarantee that we won’t change the DB schema, so it is
+   We do not guarantee that we won't change the DB schema, so it is
    highly recommended to access the database through the API and not use
    direct queries.
 
@@ -131,12 +131,12 @@ How to access collected data?
 Once collected, the data is stored in a database generally, or in a simple
 file if you do not care about API access and want to do the rest of the
 processing elsewhere. There can be multiple types of
-databases through the use of different database plugins (see the section 
+databases through the use of different database plugins (see the section
 :ref:`which-db`). Moreover, the schema and dictionary of
 this database can also evolve over time. For both reasons, we offer a REST API
 that should be the only way for you to access the collected data rather than
 accessing the underlying database directly. It is possible that the way
-you’d like to access your data is not yet supported by the API. If you think
+you'd like to access your data is not yet supported by the API. If you think
 this is the case, please contact us with your feedback as this will certainly
 lead us to improve the API.
 
@@ -161,7 +161,7 @@ layer, and use the same tools for metering your entire cloud.
 
 Moreover, end users can also :ref:`send their own application specific data <user-defined-data>` into the
 database through the REST API for a various set of use cases (see the section
-“Alarming” later in this article).
+"Alarming" later in this article).
 
 .. _send their own application centric data: ./webapi/v2.html#user-defined-data
 
@@ -218,7 +218,7 @@ version, allows you to set alarms based on threshold evaluation for a collection
 of samples. An alarm can be set on a single meter, or on a combination. For
 example, you may want to trigger an alarm when the memory consumption
 reaches 70% on a given instance if the instance has been up for more than
-10 min. To setup an alarm, you will call :ref:`Ceilometer’s API server <alarms-api>` specifying
+10 min. To setup an alarm, you will call :ref:`Ceilometer's API server <alarms-api>` specifying
 the alarm conditions and an action to take.
 
 Of course, if you are not administrator of the cloud itself, you can only
@@ -237,7 +237,7 @@ There can be multiple form of actions, but two have been implemented so far:
 
 For more details on this, I recommend you read the blog post by
 Mehdi Abaakouk `Autoscaling with Heat and Ceilometer`_. Particular attention
-should be given to the section “Some notes about deploying alarming” as the
+should be given to the section "Some notes about deploying alarming" as the
 database setup (using a separate database from the one used for metering)
 will be critical in all cases of production deployment.
 
@@ -259,7 +259,7 @@ Since the beginning of the project, a plugin model has been put in place
 to allow for various types of database backends to be used. However, not
 all implementations are equal and, at the time of writing, MongoDB
 is the recommended backend of choice because it is the most tested. Have a look
-at the “choosing a database backend” section of the documentation for more
+at the "choosing a database backend" section of the documentation for more
 details. In short, ensure a dedicated database is used when deploying
 Ceilometer as the volume of data generated can be extensive in a production
 environment and will generally use a lot of I/O.
