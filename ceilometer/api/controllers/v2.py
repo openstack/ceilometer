@@ -1435,7 +1435,7 @@ class AlarmController(rest.RestController):
     def put(self, data):
         """Modify this alarm.
 
-        :param data: a alarm within the request body.
+        :param data: an alarm within the request body.
         """
         # Ensure alarm exists
         alarm_in = self._alarm()
@@ -1509,7 +1509,7 @@ class AlarmController(rest.RestController):
     def put_state(self, state):
         """Set the state of this alarm.
 
-        :param state: a alarm state within the request body.
+        :param state: an alarm state within the request body.
         """
         # note(sileht): body are not validated by wsme
         # Workaround for https://bugs.launchpad.net/wsme/+bug/1227229
@@ -1573,7 +1573,7 @@ class AlarmsController(rest.RestController):
     def post(self, data):
         """Create a new alarm.
 
-        :param data: a alarm within the request body.
+        :param data: an alarm within the request body.
         """
         conn = pecan.request.storage_conn
         now = timeutils.utcnow()

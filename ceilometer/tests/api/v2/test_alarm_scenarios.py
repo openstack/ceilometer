@@ -689,7 +689,7 @@ class TestAlarms(FunctionalTest,
 
     def test_post_combination_alarm_as_user_with_unauthorized_alarm(self):
         """Test that post a combination alarm as normal user/project
-        with a alarm_id unauthorized for this project/user
+        with an alarm_id unauthorized for this project/user
         """
         json = {
             'enabled': False,
@@ -716,7 +716,7 @@ class TestAlarms(FunctionalTest,
 
     def test_post_combination_alarm_as_admin_on_behalf_of_an_other_user(self):
         """Test that post a combination alarm as admin on behalf of an other
-        user/project with a alarm_id unauthorized for this project/user
+        user/project with an alarm_id unauthorized for this project/user
         """
         json = {
             'enabled': False,
@@ -753,7 +753,7 @@ class TestAlarms(FunctionalTest,
 
     def _do_post_combination_alarm_as_admin_success(self, owner_is_set):
         """Test that post a combination alarm as admin on behalf of nobody
-        with a alarm_id of someone else, with owner set or not
+        with an alarm_id of someone else, with owner set or not
         """
         json = {
             'enabled': False,

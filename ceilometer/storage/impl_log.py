@@ -176,4 +176,4 @@ class Connection(base.Connection):
         return alarm
 
     def delete_alarm(self, alarm_id):
-        """Delete a alarm."""
+        """Delete an alarm."""
