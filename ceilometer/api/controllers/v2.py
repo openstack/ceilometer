@@ -82,39 +82,6 @@ class EntityNotFound(ClientSideError):
             status_code=404)
 
 
-class BoundedInt(wtypes.UserType):
-    basetype = int
-
-    def __init__(self, min=None, max=None):
-        self.min = min
-        self.max = max
-
-    @property
-    def name(self):
-        if self.min is not None and self.max is not None:
-            return 'int between %d and %d' % (self.min, self.max)
-        elif self.min is not None:
-            return 'int greater than %d' % self.min
-        else:
-            return 'int lower than %d' % self.max
-
-    @staticmethod
-    def frombasetype(value):
-        return int(value) if value is not None else None
-
-    def validate(self, value):
-        if self.min is not None and value < self.min:
-            error = _('Value %(value)s is invalid (should be greater or equal '
-                      'to %(min)s)') % dict(value=value, min=self.min)
-            raise ClientSideError(error)
-
-        if self.max is not None and value > self.max:
-            error = _('Value %(value)s is invalid (should be lower or equal '
-                      'to %(max)s)') % dict(value=value, max=self.max)
-            raise ClientSideError(error)
-        return value
-
-
 class AdvEnum(wtypes.wsproperty):
     """Handle default and mandatory for wtypes.Enum
     """
@@ -1094,7 +1061,7 @@ class AlarmThresholdRule(_Base):
     Ownership settings are automatically included based on the Alarm owner.
     """
 
-    period = wsme.wsattr(BoundedInt(min=1), default=60)
+    period = wsme.wsattr(wtypes.IntegerType(minimum=1), default=60)
     "The time range in seconds over which query"
 
     comparison_operator = AdvEnum('comparison_operator', str,
@@ -1109,7 +1076,7 @@ class AlarmThresholdRule(_Base):
                         'count', default='avg')
     "The statistic to compare to the threshold"
 
-    evaluation_periods = wsme.wsattr(BoundedInt(min=1), default=1)
+    evaluation_periods = wsme.wsattr(wtypes.IntegerType(minimum=1), default=1)
     "The number of historical periods to evaluate the threshold"
 
     exclude_outliers = wsme.wsattr(bool, default=False)
