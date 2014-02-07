@@ -65,34 +65,34 @@ Compute (Nova)
 
 All meters are related to the guest machine, not the host.
 
-=============================  ==========  ========  ========  ============  ==================================================================
-Name                           Type        Unit      Resource  Origin        Note
-=============================  ==========  ========  ========  ============  ==================================================================
-instance                       Gauge       instance  inst ID   both          Existence of instance
-instance:<type>                Gauge       instance  inst ID   both          Existence of instance <type> (openstack types)
-memory                         Gauge       MB        inst ID   notification  Volume of RAM in MB
-cpu                            Cumulative  ns        inst ID   pollster      CPU time used
-cpu_util                       Gauge       %         inst ID   pollster      Average CPU utilisation
-vcpus                          Gauge       vcpu      inst ID   notification  Number of VCPUs
-disk.read.requests             Cumulative  request   inst ID   pollster      Number of read requests
-disk.read.requests.rate        Gauge       request/s inst ID   pollster      Average rate of read requests per second
-disk.write.requests            Cumulative  request   inst ID   pollster      Number of write requests
-disk.write.requests.rate       Cumulative  request/s inst ID   pollster      Average rate of write requests per second
-disk.read.bytes                Cumulative  B         inst ID   pollster      Volume of reads in B
-disk.read.bytes.rate           Cumulative  B/s       inst ID   pollster      Average rate of reads in B per second
-disk.write.bytes               Cumulative  B         inst ID   pollster      Volume of writes in B
-disk.write.bytes.rate          Cumulative  B/s       inst ID   pollster      Average volume of writes in B per second
-disk.root.size                 Gauge       GB        inst ID   notification  Size of root disk in GB
-disk.ephemeral.size            Gauge       GB        inst ID   notification  Size of ephemeral disk in GB
-network.incoming.bytes         Cumulative  B         iface ID  pollster      Number of incoming bytes on a VM network interface
-network.incoming.bytes.rate    Gauge       B/s       iface ID  pollster      Average rate per sec of incoming bytes on a VM network interface
-network.outgoing.bytes         Cumulative  B         iface ID  pollster      Number of outgoing bytes on a VM network interface
-network.outgoing.bytes.rate    Gauge       B/s       iface ID  pollster      Average rate per sec of outgoing bytes on a VM network interface
-network.incoming.packets       Cumulative  packet    iface ID  pollster      Number of incoming packets on a VM network interface
-network.incoming.packets.rate  Gauge       packet/s  iface ID  pollster      Average rate per sec of incoming packets on a VM network interface
-network.outgoing.packets       Cumulative  packet    iface ID  pollster      Number of outgoing packets on a VM network interface
-network.outgoing.packets.rate  Gauge       packet/s  iface ID  pollster      Average rate per sec of outgoing packets on a VM network interface
-=============================  ==========  ========  ========  ============  ==================================================================
+=============================  ==========  =========  ========  ============  ==================================================================
+Name                           Type        Unit       Resource  Origin        Note
+=============================  ==========  =========  ========  ============  ==================================================================
+instance                       Gauge       instance   inst ID   both          Existence of instance
+instance:<type>                Gauge       instance   inst ID   both          Existence of instance <type> (openstack types)
+memory                         Gauge       MB         inst ID   notification  Volume of RAM in MB
+cpu                            Cumulative  ns         inst ID   pollster      CPU time used
+cpu_util                       Gauge       %          inst ID   pollster      Average CPU utilisation
+vcpus                          Gauge       vcpu       inst ID   notification  Number of VCPUs
+disk.read.requests             Cumulative  request    inst ID   pollster      Number of read requests
+disk.read.requests.rate        Gauge       request/s  inst ID   pollster      Average rate of read requests per second
+disk.write.requests            Cumulative  request    inst ID   pollster      Number of write requests
+disk.write.requests.rate       Cumulative  request/s  inst ID   pollster      Average rate of write requests per second
+disk.read.bytes                Cumulative  B          inst ID   pollster      Volume of reads in B
+disk.read.bytes.rate           Cumulative  B/s        inst ID   pollster      Average rate of reads in B per second
+disk.write.bytes               Cumulative  B          inst ID   pollster      Volume of writes in B
+disk.write.bytes.rate          Cumulative  B/s        inst ID   pollster      Average volume of writes in B per second
+disk.root.size                 Gauge       GB         inst ID   notification  Size of root disk in GB
+disk.ephemeral.size            Gauge       GB         inst ID   notification  Size of ephemeral disk in GB
+network.incoming.bytes         Cumulative  B          iface ID  pollster      Number of incoming bytes on a VM network interface
+network.incoming.bytes.rate    Gauge       B/s        iface ID  pollster      Average rate per sec of incoming bytes on a VM network interface
+network.outgoing.bytes         Cumulative  B          iface ID  pollster      Number of outgoing bytes on a VM network interface
+network.outgoing.bytes.rate    Gauge       B/s        iface ID  pollster      Average rate per sec of outgoing bytes on a VM network interface
+network.incoming.packets       Cumulative  packet     iface ID  pollster      Number of incoming packets on a VM network interface
+network.incoming.packets.rate  Gauge       packet/s   iface ID  pollster      Average rate per sec of incoming packets on a VM network interface
+network.outgoing.packets       Cumulative  packet     iface ID  pollster      Number of outgoing packets on a VM network interface
+network.outgoing.packets.rate  Gauge       packet/s   iface ID  pollster      Average rate per sec of outgoing packets on a VM network interface
+=============================  ==========  =========  ========  ============  ==================================================================
 
 At present, most of the Nova meters will only work with libvirt front-end
 hypervisors while test coverage was mostly done based on KVM. Contributors
