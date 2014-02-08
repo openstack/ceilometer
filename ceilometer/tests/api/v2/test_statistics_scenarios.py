@@ -1231,7 +1231,7 @@ class TestGroupBySource(FunctionalTest,
     scenarios = [
         ('mongodb',
          dict(database_connection=tests_db.MongoDBFakeConnectionUrl())),
-        ('hbase', dict(database_connection='hbase://__test__')),
+        ('hbase', dict(database_connection=tests_db.HBaseFakeConnectionUrl())),
         ('db2', dict(database_connection=tests_db.DB2FakeConnectionUrl())),
     ]
 
@@ -1290,6 +1290,10 @@ class TestGroupBySource(FunctionalTest,
                 self.CONF.publisher.metering_secret,
             )
             self.conn.record_metering_data(msg)
+
+    def tearDown(self):
+        self.conn.clear()
+        super(TestGroupBySource, self).tearDown()
 
     def test_group_by_source(self):
         data = self.get_json(self.PATH, groupby=['source'])
