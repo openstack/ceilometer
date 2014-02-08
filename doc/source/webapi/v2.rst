@@ -25,6 +25,9 @@ Meters
 .. autotype:: ceilometer.api.controllers.v2.Meter
    :members:
 
+.. autotype:: ceilometer.api.controllers.v2.OldSample
+   :members:
+
 Samples and Statistics
 ======================
 
