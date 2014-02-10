@@ -176,17 +176,26 @@ class Connection(base.Connection):
             conf.database.connection = \
                 os.environ.get('CEILOMETER_TEST_SQL_URL', url)
 
-    @staticmethod
-    def _get_db_session():
-        return sqlalchemy_session.get_session()
+        # NOTE(Alexei_987) Related to bug #1271103
+        #                  we steal objects from sqlalchemy_session
+        #                  to manage their lifetime on our own.
+        #                  This is needed to open several db connections
+        self._engine = sqlalchemy_session.get_engine()
+        self._maker = sqlalchemy_session.get_maker(self._engine)
+        sqlalchemy_session._ENGINE = None
+        sqlalchemy_session._MAKER = None
+
+    def _get_db_session(self):
+        return self._maker()
 
     def upgrade(self):
-        migration.db_sync(self._get_db_session().get_bind())
+        migration.db_sync(self._engine)
 
     def clear(self):
-        engine = self._get_db_session().get_bind()
         for table in reversed(models.Base.metadata.sorted_tables):
-            engine.execute(table.delete())
+            self._engine.execute(table.delete())
+        self._maker.close_all()
+        self._engine.dispose()
 
     @staticmethod
     def _create_or_update(session, model_class, _id, source=None, **kwargs):

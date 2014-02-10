@@ -32,7 +32,9 @@ def db_sync(engine):
     db_version(engine)  # This is needed to create a version stamp in empty DB
     repository = _find_migrate_repo()
     versioning_api.upgrade(engine, repository)
-    alembic.command.upgrade(_alembic_config(), "head")
+    config = _alembic_config()
+    config._engine = engine
+    alembic.command.upgrade(config, "head")
 
 
 def _alembic_config():
