@@ -500,7 +500,7 @@ class TestAlarms(FunctionalTest,
         json['threshold_rule']['query'].append({
             'field': 'project_id', 'op': 'eq',
             'value': self.auth_headers['X-Project-Id']})
-        # to check to BoundedInt type conversion
+        # to check to IntegerType type conversion
         json['threshold_rule']['evaluation_periods'] = 3
         json['threshold_rule']['period'] = 180
         self._verify_alarm(json, alarms[0], 'added_alarm')

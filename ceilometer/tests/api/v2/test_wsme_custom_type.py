@@ -29,30 +29,6 @@ class TestWsmeCustomType(test.BaseTestCase):
         super(TestWsmeCustomType, self).setUp()
         pecan.response = mock.MagicMock()
 
-    def test_bounded_int_convertion(self):
-        bi = v2.BoundedInt(1, 5)
-        self.assertEqual(bi.frombasetype("2"), 2)
-
-    def test_bounded_int_invalid_convertion(self):
-        bi = v2.BoundedInt(1, 5)
-        self.assertRaises(TypeError, bi.frombasetype, wsme)
-
-    def test_bounded_int_maxmin(self):
-        bi = v2.BoundedInt(1, 5)
-        self.assertRaises(wsme.exc.ClientSideError, bi.validate, -1)
-        self.assertRaises(wsme.exc.ClientSideError, bi.validate, 7)
-        self.assertEqual(bi.validate(2), 2)
-
-    def test_bounded_int_max(self):
-        bi = v2.BoundedInt(max=5)
-        self.assertEqual(bi.validate(-1), -1)
-        self.assertRaises(wsme.exc.ClientSideError, bi.validate, 7)
-
-    def test_bounded_int_min(self):
-        bi = v2.BoundedInt(min=5)
-        self.assertEqual(bi.validate(7), 7)
-        self.assertRaises(wsme.exc.ClientSideError, bi.validate, -1)
-
     def test_advenum_default(self):
         class dummybase(wsme.types.Base):
             ae = v2.AdvEnum("name", str, "one", "other", default="other")
