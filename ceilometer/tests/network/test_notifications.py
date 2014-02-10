@@ -202,6 +202,28 @@ NOTIFICATION_FLOATINGIP_EXISTS = {
     u'publisher_id': u'network.ubuntu-VirtualBox',
     u'message_id': u'9e839576-cc47-4c60-a7d8-5743681213b1'}
 
+
+NOTIFICATION_FLOATINGIP_UPDATE = {
+    u'_context_roles': [u'anotherrole',
+                        u'Member'],
+    u'_context_read_deleted': u'no',
+    u'event_type': u'floatingip.update.start',
+    u'timestamp': u'2012-09-27 14:11:27.086575',
+    u'_context_tenant_id': u'82ed0c40ebe64d0bb3310027039c8ed2',
+    u'payload': {u'floatingip':
+                   {u'fixed_ip_address': u'172.24.4.227',
+                    u'id': u'a68c9390-829e-4732-bad4-e0a978498cc5',
+                    u'port_id': u'e12150f2-885b-45bc-a248-af1c23787d55'}},
+    u'priority': u'INFO',
+    u'_unique_id': u'e483db017b2341fd9ec314dcda88d3e9',
+    u'_context_is_admin': False,
+    u'_context_project_id': u'82ed0c40ebe64d0bb3310027039c8ed2',
+    u'_context_timestamp': u'2012-09-27 14:11:26.924779',
+    u'_context_user_id': u'b44b7ce67fc84414a5c1660a92a1b862',
+    u'publisher_id': u'network.ubuntu-VirtualBox',
+    u'message_id': u'9e839576-cc47-4c60-a7d8-5743681213b1'}
+
+
 NOTIFICATION_L3_METER = {
     u'_context_roles': [u'admin'],
     u'_context_read_deleted': u'no',
@@ -265,6 +287,12 @@ class TestNotifications(test.BaseTestCase):
         v = notifications.FloatingIP()
         samples = list(v.process_notification(NOTIFICATION_FLOATINGIP_EXISTS))
         self.assertEqual(len(samples), 1)
+        self.assertEqual(samples[0].name, "ip.floating")
+
+    def test_floatingip_update(self):
+        v = notifications.FloatingIP()
+        samples = list(v.process_notification(NOTIFICATION_FLOATINGIP_UPDATE))
+        self.assertEqual(len(samples), 2)
         self.assertEqual(samples[0].name, "ip.floating")
 
     def test_metering_report(self):
