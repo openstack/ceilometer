@@ -35,9 +35,9 @@ class TestManager(test.BaseTestCase):
 
 
 class TestRunTasks(agentbase.BaseAgentManagerTestCase):
-
-    def setup_manager(self):
-        self.mgr = manager.AgentManager()
+    @staticmethod
+    def create_manager():
+        return manager.AgentManager()
 
     def setUp(self):
         super(TestRunTasks, self).setUp()
