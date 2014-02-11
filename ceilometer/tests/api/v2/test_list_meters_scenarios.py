@@ -213,8 +213,8 @@ class TestListMeters(FunctionalTest,
             u'volume': 3.0})
 
     def test_get_not_existing_sample(self):
-        resp = self.get_json('/samples/not_exists', expect_errors=True)
-        self.assertEqual(resp.status_code, 404)
+        resp = self.get_json('/samples/not_exists', expect_errors=True,
+                             status=404)
         self.assertEqual(jsonutils.loads(resp.body)['error_message']
                          ['faultstring'],
                          "Sample not_exists Not Found")
