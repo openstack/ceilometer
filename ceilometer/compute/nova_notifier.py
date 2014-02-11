@@ -30,6 +30,7 @@ import ceilometer  # noqa
 for name in ['openstack', 'openstack.common', 'openstack.common.log']:
     sys.modules['ceilometer.' + name] = sys.modules['nova.' + name]
 
+from nova.compute import flavors
 from nova import conductor
 from nova import utils
 
@@ -106,8 +107,10 @@ class Instance(object):
                 setattr(self, k, utils.metadata_to_dict(v))
             else:
                 setattr(self, k, v)
-        self.flavor_name = conductor_api.instance_type_get(
-            context, self.instance_type_id).get('name', 'UNKNOWN')
+
+        instance_type = flavors.extract_flavor(info)
+        self.flavor_name = instance_type.get('name', 'UNKNOWN')
+        self.instance_flavor_id = instance_type.get('flavorid', '')
         LOG.debug(_('INFO %r'), info)
 
     @property
@@ -118,6 +121,7 @@ class Instance(object):
     def flavor(self):
         return {
             'id': self.instance_type_id,
+            'flavor_id': self.instance_flavor_id,
             'name': self.flavor_name,
             'vcpus': self.vcpus,
             'ram': self.memory_mb,
