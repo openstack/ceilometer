@@ -19,7 +19,7 @@
 """
 
 from __future__ import absolute_import
-import urlparse
+import six.moves.urllib.parse as urlparse
 
 from keystoneclient import exceptions
 from oslo.config import cfg

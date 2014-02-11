@@ -19,7 +19,7 @@ SQLAlchemy models for Ceilometer data.
 """
 
 import json
-import urlparse
+import six.moves.urllib.parse as urlparse
 
 from oslo.config import cfg
 from sqlalchemy import Column, Integer, String, Table, ForeignKey, \

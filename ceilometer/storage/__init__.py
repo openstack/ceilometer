@@ -18,7 +18,7 @@
 """Storage backend management
 """
 
-import urlparse
+import six.moves.urllib.parse as urlparse
 
 from oslo.config import cfg
 import six
