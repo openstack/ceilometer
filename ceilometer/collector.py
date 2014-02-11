@@ -35,7 +35,7 @@ OPTS = [
                'an empty string to disable.'),
     cfg.IntOpt('udp_port',
                default=4952,
-               help='Port to which the UDP socket is bound'),
+               help='Port to which the UDP socket is bound.'),
 ]
 
 cfg.CONF.register_opts(OPTS, group="collector")

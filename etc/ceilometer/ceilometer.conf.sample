@@ -4,7 +4,7 @@
 # Options defined in ceilometer.middleware
 #
 
-# Exchanges name to listen for notifications (multi valued)
+# Exchanges name to listen for notifications. (multi valued)
 #http_control_exchanges=nova
 #http_control_exchanges=glance
 #http_control_exchanges=neutron
@@ -15,7 +15,7 @@
 # Options defined in ceilometer.pipeline
 #
 
-# Configuration file for pipeline definition (string value)
+# Configuration file for pipeline definition. (string value)
 #pipeline_cfg_file=pipeline.yaml
 
 
@@ -23,7 +23,7 @@
 # Options defined in ceilometer.sample
 #
 
-# Source for samples emitted on this instance (string value)
+# Source for samples emitted on this instance. (string value)
 # Deprecated group/name - [DEFAULT]/counter_source
 #sample_source=openstack
 
@@ -37,7 +37,7 @@
 # host name, FQDN, or IP address. (string value)
 #host=ceilometer
 
-# Dispatcher to process data (multi valued)
+# Dispatcher to process data. (multi valued)
 #dispatcher=database
 
 
@@ -57,7 +57,7 @@
 # Options defined in ceilometer.compute.notifications
 #
 
-# Exchange name for Nova notifications (string value)
+# Exchange name for Nova notifications. (string value)
 #nova_control_exchange=nova
 
 
@@ -65,11 +65,11 @@
 # Options defined in ceilometer.compute.pollsters.util
 #
 
-# List of metadata prefixes reserved for metering use (list
+# List of metadata prefixes reserved for metering use. (list
 # value)
 #reserved_metadata_namespace=metering.
 
-# Limit on length of reserved metadata values (integer value)
+# Limit on length of reserved metadata values. (integer value)
 #reserved_metadata_length=256
 
 
@@ -77,8 +77,8 @@
 # Options defined in ceilometer.compute.virt.inspector
 #
 
-# Inspector to use for inspecting the hypervisor layer (string
-# value)
+# Inspector to use for inspecting the hypervisor layer.
+# (string value)
 #hypervisor_inspector=libvirt
 
 
@@ -87,11 +87,11 @@
 #
 
 # Libvirt domain type (valid options are: kvm, lxc, qemu, uml,
-# xen) (string value)
+# xen). (string value)
 #libvirt_type=kvm
 
 # Override the default libvirt URI (which is dependent on
-# libvirt_type) (string value)
+# libvirt_type). (string value)
 #libvirt_uri=
 
 
@@ -99,7 +99,7 @@
 # Options defined in ceilometer.image.notifications
 #
 
-# Exchange name for Glance notifications (string value)
+# Exchange name for Glance notifications. (string value)
 #glance_control_exchange=glance
 
 
@@ -107,7 +107,7 @@
 # Options defined in ceilometer.network.notifications
 #
 
-# Exchange name for Neutron notifications (string value)
+# Exchange name for Neutron notifications. (string value)
 # Deprecated group/name - [DEFAULT]/quantum_control_exchange
 #neutron_control_exchange=neutron
 
@@ -151,7 +151,7 @@
 # Options defined in ceilometer.openstack.common.lockutils
 #
 
-# Whether to disable inter-process locks (boolean value)
+# Whether to disable inter-process locks. (boolean value)
 #disable_process_locking=false
 
 # Directory to use for lock files. (string value)
@@ -490,7 +490,7 @@
 # Options defined in ceilometer.storage
 #
 
-# DEPRECATED - Database connection string (string value)
+# DEPRECATED - Database connection string. (string value)
 #database_connection=<None>
 
 
@@ -498,7 +498,7 @@
 # Options defined in ceilometer.storage.sqlalchemy.models
 #
 
-# MySQL engine (string value)
+# MySQL engine to use. (string value)
 #mysql_engine=InnoDB
 
 
@@ -506,7 +506,7 @@
 # Options defined in ceilometer.volume.notifications
 #
 
-# Exchange name for Cinder notifications (string value)
+# Exchange name for Cinder notifications. (string value)
 #cinder_control_exchange=cinder
 
 
@@ -516,14 +516,14 @@
 # Options defined in ceilometer.alarm.notifier.rest
 #
 
-# SSL Client certificate for REST notifier (string value)
+# SSL Client certificate for REST notifier. (string value)
 #rest_notifier_certificate_file=
 
-# SSL Client private key for REST notifier (string value)
+# SSL Client private key for REST notifier. (string value)
 #rest_notifier_certificate_key=
 
-# Verify the SSL Server certificate when
-# calling alarm action (boolean value)
+# Whether to verify the SSL Server certificate when calling
+# alarm action. (boolean value)
 #rest_notifier_ssl_verify=true
 
 
@@ -531,12 +531,12 @@
 # Options defined in ceilometer.alarm.rpc
 #
 
-# The topic that ceilometer uses for alarm notifier messages
+# The topic that ceilometer uses for alarm notifier messages.
 # (string value)
 #notifier_rpc_topic=alarm_notifier
 
 # The topic that ceilometer uses for alarm partition
-# coordination messages (string value)
+# coordination messages. (string value)
 #partition_rpc_topic=alarm_partition_coordination
 
 
@@ -550,7 +550,7 @@
 # Deprecated group/name - [alarm]/threshold_evaluation_interval
 #evaluation_interval=60
 
-# Class to launch as alarm evaluation service (string value)
+# Class to launch as alarm evaluation service. (string value)
 #evaluation_service=ceilometer.alarm.service.SingletonAlarmService
 
 
@@ -558,7 +558,7 @@
 # Options defined in ceilometer.api.controllers.v2
 #
 
-# Record alarm change events (boolean value)
+# Record alarm change events. (boolean value)
 #record_history=true
 
 
@@ -568,11 +568,11 @@
 # Options defined in ceilometer.api
 #
 
-# The port for the ceilometer API server (integer value)
+# The port for the ceilometer API server. (integer value)
 # Deprecated group/name - [DEFAULT]/metering_api_port
 #port=8777
 
-# The listen IP for the ceilometer API server (string value)
+# The listen IP for the ceilometer API server. (string value)
 #host=0.0.0.0
 
 
@@ -586,7 +586,7 @@
 # string to disable. (string value)
 #udp_address=0.0.0.0
 
-# Port to which the UDP socket is bound (integer value)
+# Port to which the UDP socket is bound. (integer value)
 #udp_port=4952
 
 
@@ -673,8 +673,8 @@
 # Options defined in ceilometer.storage
 #
 
-# number of seconds that samples are kept in the database for
-# (<= 0 means forever) (integer value)
+# Number of seconds that samples are kept in the database for
+# (<= 0 means forever). (integer value)
 #time_to_live=-1
 
 
@@ -688,10 +688,10 @@
 # value)
 #file_path=<None>
 
-# The max size of the file (integer value)
+# The max size of the file. (integer value)
 #max_bytes=0
 
-# The max number of the files to keep (integer value)
+# The max number of the files to keep. (integer value)
 #backup_count=0
 
 
@@ -701,7 +701,7 @@
 # Options defined in ceilometer.event.converter
 #
 
-# Configuration file for event definitions (string value)
+# Configuration file for event definitions. (string value)
 #definitions_cfg_file=event_definitions.yaml
 
 # Drop notifications if no event definition matches.
@@ -874,11 +874,11 @@
 # Options defined in ceilometer.notification
 #
 
-# Acknowledge message when event persistence fails (boolean
+# Acknowledge message when event persistence fails. (boolean
 # value)
 #ack_on_event_error=true
 
-# Save event details (boolean value)
+# Save event details. (boolean value)
 #store_events=false
 
 
@@ -888,7 +888,7 @@
 # Options defined in ceilometer.publisher.utils
 #
 
-# Secret value for signing metering messages (string value)
+# Secret value for signing metering messages. (string value)
 # Deprecated group/name - [DEFAULT]/metering_secret
 # Deprecated group/name - [publisher_rpc]/metering_secret
 #metering_secret=change this or be hacked
@@ -900,8 +900,8 @@
 # Options defined in ceilometer.publisher.rpc
 #
 
-# The topic that ceilometer uses for metering messages (string
-# value)
+# The topic that ceilometer uses for metering messages.
+# (string value)
 #metering_topic=metering
 
 
@@ -921,26 +921,28 @@
 # Options defined in ceilometer.service
 #
 
-# User name to use for OpenStack service access (string value)
+# User name to use for OpenStack service access. (string
+# value)
 #os_username=ceilometer
 
-# Password to use for OpenStack service access (string value)
+# Password to use for OpenStack service access. (string value)
 #os_password=admin
 
-# Tenant ID to use for OpenStack service access (string value)
+# Tenant ID to use for OpenStack service access. (string
+# value)
 #os_tenant_id=
 
-# Tenant name to use for OpenStack service access (string
+# Tenant name to use for OpenStack service access. (string
 # value)
 #os_tenant_name=admin
 
-# Certificate chain for SSL validation (string value)
+# Certificate chain for SSL validation. (string value)
 #os_cacert=<None>
 
-# Auth URL to use for OpenStack service access (string value)
+# Auth URL to use for OpenStack service access. (string value)
 #os_auth_url=http://localhost:5000/v2.0
 
-# Region name to use for OpenStack service endpoints (string
+# Region name to use for OpenStack service endpoints. (string
 # value)
 #os_region_name=<None>
 

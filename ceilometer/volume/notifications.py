@@ -28,7 +28,7 @@ from ceilometer import sample
 OPTS = [
     cfg.StrOpt('cinder_control_exchange',
                default='cinder',
-               help="Exchange name for Cinder notifications"),
+               help="Exchange name for Cinder notifications."),
 ]
 
 

@@ -36,7 +36,7 @@ OPTS = [
                              cfg.CONF.glance_control_exchange,
                              cfg.CONF.neutron_control_exchange,
                              cfg.CONF.cinder_control_exchange],
-                    help="Exchanges name to listen for notifications"),
+                    help="Exchanges name to listen for notifications."),
 ]
 
 cfg.CONF.register_opts(OPTS)

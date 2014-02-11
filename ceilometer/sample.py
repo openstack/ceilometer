@@ -34,7 +34,7 @@ OPTS = [
     cfg.StrOpt('sample_source',
                default='openstack',
                deprecated_name='counter_source',
-               help='Source for samples emitted on this instance'),
+               help='Source for samples emitted on this instance.'),
 ]
 
 cfg.CONF.register_opts(OPTS)

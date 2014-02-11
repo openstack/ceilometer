@@ -33,16 +33,16 @@ LOG = log.getLogger(__name__)
 REST_NOTIFIER_OPTS = [
     cfg.StrOpt('rest_notifier_certificate_file',
                default='',
-               help='SSL Client certificate for REST notifier'
+               help='SSL Client certificate for REST notifier.'
                ),
     cfg.StrOpt('rest_notifier_certificate_key',
                default='',
-               help='SSL Client private key for REST notifier'
+               help='SSL Client private key for REST notifier.'
                ),
     cfg.BoolOpt('rest_notifier_ssl_verify',
                 default=True,
-                help='Verify the SSL Server certificate when \
-                calling alarm action'
+                help='Whether to verify the SSL Server certificate when '
+                'calling alarm action.'
                 ),
 
 ]

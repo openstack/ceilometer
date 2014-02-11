@@ -31,7 +31,7 @@ from ceilometer.storage import models
 OPTS = [
     cfg.StrOpt('definitions_cfg_file',
                default="event_definitions.yaml",
-               help="Configuration file for event definitions"
+               help="Configuration file for event definitions."
                ),
     cfg.BoolOpt('drop_unmatched_notifications',
                 default=False,

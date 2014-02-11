@@ -32,11 +32,11 @@ libvirt_opts = [
     cfg.StrOpt('libvirt_type',
                default='kvm',
                help='Libvirt domain type (valid options are: '
-                    'kvm, lxc, qemu, uml, xen)'),
+                    'kvm, lxc, qemu, uml, xen).'),
     cfg.StrOpt('libvirt_uri',
                default='',
                help='Override the default libvirt URI '
-                    '(which is dependent on libvirt_type)'),
+                    '(which is dependent on libvirt_type).'),
 ]
 
 CONF = cfg.CONF

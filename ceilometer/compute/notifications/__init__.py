@@ -24,7 +24,7 @@ from ceilometer import plugin
 OPTS = [
     cfg.StrOpt('nova_control_exchange',
                default='nova',
-               help="Exchange name for Nova notifications"),
+               help="Exchange name for Nova notifications."),
 ]
 
 

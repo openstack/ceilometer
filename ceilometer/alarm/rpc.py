@@ -28,11 +28,11 @@ OPTS = [
     cfg.StrOpt('notifier_rpc_topic',
                default='alarm_notifier',
                help='The topic that ceilometer uses for alarm notifier '
-                    'messages'),
+                    'messages.'),
     cfg.StrOpt('partition_rpc_topic',
                default='alarm_partition_coordination',
                help='The topic that ceilometer uses for alarm partition '
-                    'coordination messages'),
+                    'coordination messages.'),
 ]
 
 cfg.CONF.register_opts(OPTS, group='alarm')

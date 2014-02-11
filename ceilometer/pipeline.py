@@ -32,7 +32,7 @@ from ceilometer import publisher
 OPTS = [
     cfg.StrOpt('pipeline_cfg_file',
                default="pipeline.yaml",
-               help="Configuration file for pipeline definition"
+               help="Configuration file for pipeline definition."
                ),
 ]
 
