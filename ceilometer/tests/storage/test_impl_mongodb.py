@@ -31,7 +31,7 @@ from ceilometer.tests.storage import test_storage_scenarios
 
 
 class MongoDBEngineTestBase(tests_db.TestBase):
-    database_connection = tests_db.MongoDBFakeConnectionUrl()
+    db_manager = tests_db.MongoDbManager()
 
 
 class MongoDBConnection(MongoDBEngineTestBase):
@@ -42,7 +42,7 @@ class MongoDBConnection(MongoDBEngineTestBase):
     def test_replica_set(self):
         self.CONF.set_override(
             'connection',
-            str(tests_db.MongoDBFakeConnectionUrl()) + '?replicaSet=foobar',
+            self.db_manager.connection + '?replicaSet=foobar',
             group='database')
         conn = impl_mongodb.Connection(self.CONF)
         self.assertTrue(conn.conn)

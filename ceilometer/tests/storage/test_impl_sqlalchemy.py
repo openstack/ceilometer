@@ -38,7 +38,7 @@ from ceilometer.tests.storage import test_storage_scenarios as scenarios
 class EventTestBase(tests_db.TestBase):
     # Note: Do not derive from SQLAlchemyEngineTestBase, since we
     # don't want to automatically inherit all the Meter setup.
-    database_connection = 'sqlite://'
+    db_manager = tests_db.SQLiteManager()
 
 
 class CeilometerBaseTest(EventTestBase):
@@ -174,7 +174,7 @@ class EventTest(EventTestBase):
 class RelationshipTest(scenarios.DBTestBase):
     # Note: Do not derive from SQLAlchemyEngineTestBase, since we
     # don't want to automatically inherit all the Meter setup.
-    database_connection = 'sqlite://'
+    db_manager = tests_db.SQLiteManager()
 
     def test_clear_metering_data_meta_tables(self):
         timeutils.utcnow.override_time = datetime.datetime(2012, 7, 2, 10, 45)

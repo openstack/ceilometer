@@ -1224,10 +1224,9 @@ class TestGroupBySource(FunctionalTest,
     # tests.
 
     scenarios = [
-        ('mongodb',
-         dict(database_connection=tests_db.MongoDBFakeConnectionUrl())),
-        ('hbase', dict(database_connection=tests_db.HBaseFakeConnectionUrl())),
-        ('db2', dict(database_connection=tests_db.DB2FakeConnectionUrl())),
+        ('mongodb', {'db_manager': tests_db.MongoDbManager()}),
+        ('hbase', {'db_manager': tests_db.HBaseManager()}),
+        ('db2', {'db_manager': tests_db.DB2Manager()}),
     ]
 
     PATH = '/meters/instance/statistics'
@@ -1580,10 +1579,9 @@ class TestUnparameterizedAggregates(FunctionalTest,
     # in the usual way.
 
     scenarios = [
-        ('mongodb',
-         dict(database_connection=tests_db.MongoDBFakeConnectionUrl())),
-        ('hbase', dict(database_connection=tests_db.HBaseFakeConnectionUrl())),
-        ('db2', dict(database_connection=tests_db.DB2FakeConnectionUrl())),
+        ('mongodb', {'db_manager': tests_db.MongoDbManager()}),
+        ('hbase', {'db_manager': tests_db.HBaseManager()}),
+        ('db2', {'db_manager': tests_db.DB2Manager()}),
     ]
 
     PATH = '/meters/instance/statistics'

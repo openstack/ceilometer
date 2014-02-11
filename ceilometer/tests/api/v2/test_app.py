@@ -75,7 +75,8 @@ class TestApp(base.BaseTestCase):
 
 
 class TestPecanApp(FunctionalTest):
-    database_connection = tests_db.MongoDBFakeConnectionUrl()
+
+    db_manager = tests_db.MongoDbManager()
 
     def test_pecan_extension_guessing_unset(self):
         # check Pecan does not assume .jpg is an extension
@@ -85,8 +86,7 @@ class TestPecanApp(FunctionalTest):
 
 class TestApiMiddleware(FunctionalTest):
 
-    # This doesn't really matter
-    database_connection = tests_db.MongoDBFakeConnectionUrl()
+    db_manager = tests_db.MongoDbManager()
 
     no_lang_translated_error = 'No lang translated error'
     en_US_translated_error = 'en-US translated error'

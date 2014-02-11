@@ -31,10 +31,8 @@ class CompatibilityTest(test_storage_scenarios.DBTestBase,
                         tests_db.MixinTestsWithBackendScenarios):
 
     scenarios = [
-        ('mongodb',
-         dict(database_connection=tests_db.MongoDBFakeConnectionUrl())),
-        ('db2',
-         dict(database_connection=tests_db.DB2FakeConnectionUrl())),
+        ('mongodb', {'db_manager': tests_db.MongoDbManager()}),
+        ('db2', {'db_manager': tests_db.DB2Manager()}),
     ]
 
     def prepare_data(self):

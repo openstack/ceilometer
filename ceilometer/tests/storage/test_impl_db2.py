@@ -28,7 +28,7 @@ from ceilometer.tests import db as tests_db
 
 
 class DB2EngineTestBase(tests_db.TestBase):
-    database_connection = tests_db.DB2FakeConnectionUrl()
+    db_manager = tests_db.DB2Manager()
 
 
 class CapabilitiesTest(DB2EngineTestBase):

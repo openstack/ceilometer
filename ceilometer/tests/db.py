@@ -19,6 +19,7 @@
 # under the License.
 
 """Base classes for API tests."""
+import fixtures
 import os
 import uuid
 import warnings
@@ -36,11 +37,10 @@ class TestBase(testscenarios.testcase.WithScenarios, test_base.BaseTestCase):
     def setUp(self):
         super(TestBase, self).setUp()
 
-        if self.database_connection is None:
-            self.skipTest("No connection URL set")
+        self.useFixture(self.db_manager)
 
         self.CONF = self.useFixture(config.Config()).conf
-        self.CONF.set_override('connection', str(self.database_connection),
+        self.CONF.set_override('connection', self.db_manager.connection,
                                group='database')
 
         with warnings.catch_warnings():
@@ -72,7 +72,7 @@ class TestBase(testscenarios.testcase.WithScenarios, test_base.BaseTestCase):
         super(TestBase, self).tearDown()
 
 
-class MongoDBFakeConnectionUrl(object):
+class MongoDbManager(fixtures.Fixture):
 
     def __init__(self):
         self.url = os.environ.get('CEILOMETER_TEST_MONGODB_URL')
@@ -81,11 +81,15 @@ class MongoDBFakeConnectionUrl(object):
                 "No MongoDB test URL set,"
                 "export CEILOMETER_TEST_MONGODB_URL environment variable")
 
-    def __str__(self):
-        return '%(url)s_%(db)s' % dict(url=self.url, db=uuid.uuid4().hex)
+    def setUp(self):
+        super(MongoDbManager, self).setUp()
+        self.connection = '%(url)s_%(db)s' % {
+            'url': self.url,
+            'db': uuid.uuid4().hex
+        }
 
 
-class DB2FakeConnectionUrl(MongoDBFakeConnectionUrl):
+class DB2Manager(MongoDbManager):
     def __init__(self):
         self.url = (os.environ.get('CEILOMETER_TEST_DB2_URL') or
                     os.environ.get('CEILOMETER_TEST_MONGODB_URL'))
@@ -99,25 +103,32 @@ class DB2FakeConnectionUrl(MongoDBFakeConnectionUrl):
             self.url = self.url.replace('mongodb:', 'db2:', 1)
 
 
-class HBaseFakeConnectionUrl(object):
+class HBaseManager(fixtures.Fixture):
     def __init__(self):
         self.url = os.environ.get('CEILOMETER_TEST_HBASE_URL')
         if not self.url:
             self.url = 'hbase://__test__'
 
-    def __str__(self):
-        s = '%s?table_prefix=%s' % (
+    def setUp(self):
+        super(HBaseManager, self).setUp()
+        self.connection = '%s?table_prefix=%s' % (
             self.url,
             uuid.uuid4().hex)
-        return s
+
+
+class SQLiteManager(fixtures.Fixture):
+
+    def setUp(self):
+        super(SQLiteManager, self).setUp()
+        self.connection = 'sqlite://'
 
 
 @six.add_metaclass(test_base.SkipNotImplementedMeta)
 class MixinTestsWithBackendScenarios(object):
 
     scenarios = [
-        ('sqlalchemy', dict(database_connection='sqlite://')),
-        ('mongodb', dict(database_connection=MongoDBFakeConnectionUrl())),
-        ('hbase', dict(database_connection=HBaseFakeConnectionUrl())),
-        ('db2', dict(database_connection=DB2FakeConnectionUrl())),
+        ('sqlite', {'db_manager': SQLiteManager()}),
+        ('mongodb', {'db_manager': MongoDbManager()}),
+        ('hbase', {'db_manager': HBaseManager()}),
+        ('db2', {'db_manager': DB2Manager()})
     ]
