@@ -708,6 +708,181 @@ class RawSampleTest(DBTestBase,
         self.assertEqual(len(results), 2)
 
 
+class ComplexSampleQueryTest(DBTestBase,
+                             tests_db.MixinTestsWithBackendScenarios):
+    def setUp(self):
+        super(ComplexSampleQueryTest, self).setUp()
+        self.complex_filter = {"and":
+                               [{"or":
+                                 [{"=": {"resource_id": "resource-id-42"}},
+                                  {"=": {"resource_id": "resource-id-44"}}]},
+                                {"and":
+                                 [{"=": {"counter_name": "cpu_util"}},
+                                  {"and":
+                                   [{">": {"counter_volume": 0.4}},
+                                    {"<=": {"counter_volume": 0.8}}]}]}]}
+        or_expression = [{"=": {"resource_id": "resource-id-42"}},
+                         {"=": {"resource_id": "resource-id-43"}},
+                         {"=": {"resource_id": "resource-id-44"}}]
+        and_expression = [{">": {"counter_volume": 0.4}},
+                          {"<=": {"counter_volume": 0.8}}]
+        self.complex_filter_list = {"and":
+                                    [{"or": or_expression},
+                                     {"and":
+                                      [{"=": {"counter_name": "cpu_util"}},
+                                       {"and": and_expression}]}]}
+
+    def _create_samples(self):
+        for resource in range(42, 45):
+            for volume in [0.79, 0.41, 0.4, 0.8, 0.39, 0.81]:
+                self.create_and_store_sample(resource_id="resource-id-%s"
+                                                         % resource,
+                                             name="cpu_util",
+                                             volume=volume)
+
+    def test_no_filter(self):
+        results = list(self.conn.query_samples())
+        self.assertEqual(len(results), len(self.msgs))
+        for sample in results:
+            self.assertIn(sample.as_dict(), self.msgs)
+
+    def test_no_filter_with_zero_limit(self):
+        limit = 0
+        results = list(self.conn.query_samples(limit=limit))
+        self.assertEqual(len(results), limit)
+
+    def test_no_filter_with_limit(self):
+        limit = 3
+        results = list(self.conn.query_samples(limit=limit))
+        self.assertEqual(len(results), limit)
+
+    def test_query_simple_filter(self):
+        simple_filter = {"=": {"resource_id": "resource-id-8"}}
+        results = list(self.conn.query_samples(filter_expr=simple_filter))
+        self.assertEqual(len(results), 1)
+        for sample in results:
+            self.assertEqual(sample.resource_id, "resource-id-8")
+
+    def test_query_simple_filter_with_not_equal_relation(self):
+        simple_filter = {"!=": {"resource_id": "resource-id-8"}}
+        results = list(self.conn.query_samples(filter_expr=simple_filter))
+        self.assertEqual(len(results), len(self.msgs) - 1)
+        for sample in results:
+            self.assertNotEqual(sample.resource_id, "resource-id-8")
+
+    def test_query_complex_filter(self):
+        self._create_samples()
+        results = list(self.conn.query_samples(filter_expr=
+                                               self.complex_filter))
+        self.assertEqual(len(results), 6)
+        for sample in results:
+            self.assertIn(sample.resource_id,
+                          set(["resource-id-42", "resource-id-44"]))
+            self.assertEqual(sample.counter_name,
+                             "cpu_util")
+            self.assertTrue(sample.counter_volume > 0.4)
+            self.assertTrue(sample.counter_volume <= 0.8)
+
+    def test_query_complex_filter_with_limit(self):
+        self._create_samples()
+        limit = 3
+        results = list(self.conn.query_samples(filter_expr=self.complex_filter,
+                                               limit=limit))
+        self.assertEqual(len(results), limit)
+
+    def test_query_complex_filter_with_simple_orderby(self):
+        self._create_samples()
+        expected_volume_order = [0.41, 0.41, 0.79, 0.79, 0.8, 0.8]
+        orderby = [{"counter_volume": "asc"}]
+        results = list(self.conn.query_samples(filter_expr=self.complex_filter,
+                                               orderby=orderby))
+        self.assertEqual(expected_volume_order,
+                         [s.counter_volume for s in results])
+
+    def test_query_complex_filter_with_complex_orderby(self):
+        self._create_samples()
+        expected_volume_order = [0.41, 0.41, 0.79, 0.79, 0.8, 0.8]
+        expected_resource_id_order = ["resource-id-44", "resource-id-42",
+                                      "resource-id-44", "resource-id-42",
+                                      "resource-id-44", "resource-id-42"]
+
+        orderby = [{"counter_volume": "asc"}, {"resource_id": "desc"}]
+
+        results = list(self.conn.query_samples(filter_expr=self.complex_filter,
+                       orderby=orderby))
+
+        self.assertEqual(expected_volume_order,
+                         [s.counter_volume for s in results])
+        self.assertEqual(expected_resource_id_order,
+                         [s.resource_id for s in results])
+
+    def test_query_complex_filter_with_list(self):
+        self._create_samples()
+        results = list(
+            self.conn.query_samples(filter_expr=self.complex_filter_list))
+        self.assertEqual(len(results), 9)
+        for sample in results:
+            self.assertIn(sample.resource_id,
+                          set(["resource-id-42",
+                               "resource-id-43",
+                               "resource-id-44"]))
+            self.assertEqual(sample.counter_name,
+                             "cpu_util")
+            self.assertTrue(sample.counter_volume > 0.4)
+            self.assertTrue(sample.counter_volume <= 0.8)
+
+    def test_query_complex_filter_with_list_with_limit(self):
+        self._create_samples()
+        limit = 3
+        results = list(
+            self.conn.query_samples(filter_expr=self.complex_filter_list,
+                                    limit=limit))
+        self.assertEqual(len(results), limit)
+
+    def test_query_complex_filter_with_list_with_simple_orderby(self):
+        self._create_samples()
+        expected_volume_order = [0.41, 0.41, 0.41, 0.79, 0.79,
+                                 0.79, 0.8, 0.8, 0.8]
+        orderby = [{"counter_volume": "asc"}]
+        results = list(
+            self.conn.query_samples(filter_expr=self.complex_filter_list,
+                                    orderby=orderby))
+        self.assertEqual(expected_volume_order,
+                         [s.counter_volume for s in results])
+
+    def test_query_complex_filterwith_list_with_complex_orderby(self):
+        self._create_samples()
+        expected_volume_order = [0.41, 0.41, 0.41, 0.79, 0.79,
+                                 0.79, 0.8, 0.8, 0.8]
+        expected_resource_id_order = ["resource-id-44", "resource-id-43",
+                                      "resource-id-42", "resource-id-44",
+                                      "resource-id-43", "resource-id-42",
+                                      "resource-id-44", "resource-id-43",
+                                      "resource-id-42"]
+
+        orderby = [{"counter_volume": "asc"}, {"resource_id": "desc"}]
+
+        results = list(
+            self.conn.query_samples(filter_expr=self.complex_filter_list,
+                                    orderby=orderby))
+
+        self.assertEqual(expected_volume_order,
+                         [s.counter_volume for s in results])
+        self.assertEqual(expected_resource_id_order,
+                         [s.resource_id for s in results])
+
+    def test_query_complex_filter_with_wrong_order_in_orderby(self):
+        self._create_samples()
+
+        orderby = [{"counter_volume": "not valid order"},
+                   {"resource_id": "desc"}]
+
+        query = lambda: list(self.conn.query_samples(filter_expr=
+                                                     self.complex_filter,
+                                                     orderby=orderby))
+        self.assertRaises(KeyError, query)
+
+
 class StatisticsTest(DBTestBase,
                      tests_db.MixinTestsWithBackendScenarios):
 
