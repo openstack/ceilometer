@@ -3,7 +3,7 @@ anyjson>=0.3.3
 argparse
 eventlet>=0.13.0
 Flask>=0.10,<1.0
-happybase>=0.4
+happybase>=0.4,<=0.6
 iso8601>=0.1.8
 jsonpath-rw>=1.2.0,<2.0
 jsonschema>=2.0.0,<3.0.0
