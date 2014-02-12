@@ -58,7 +58,7 @@ class Evaluator(object):
             self.api_client = ceiloclient.get_client(2, **creds)
         return self.api_client
 
-    def _refresh(self, alarm, state, reason):
+    def _refresh(self, alarm, state, reason, reason_data):
         """Refresh alarm state."""
         try:
             previous = alarm.state
@@ -71,7 +71,7 @@ class Evaluator(object):
                 self._client.alarms.set_state(alarm.alarm_id, state=state)
             alarm.state = state
             if self.notifier:
-                self.notifier.notify(alarm, previous, reason)
+                self.notifier.notify(alarm, previous, reason, reason_data)
         except Exception:
             # retry will occur naturally on the next evaluation
             # cycle (unless alarm state reverts in the meantime)

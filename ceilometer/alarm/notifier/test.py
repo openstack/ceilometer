@@ -26,9 +26,10 @@ class TestAlarmNotifier(notifier.AlarmNotifier):
     def __init__(self):
         self.notifications = []
 
-    def notify(self, action, alarm_id, previous, current, reason):
+    def notify(self, action, alarm_id, previous, current, reason, reason_data):
         self.notifications.append((action,
                                    alarm_id,
                                    previous,
                                    current,
-                                   reason))
+                                   reason,
+                                   reason_data))

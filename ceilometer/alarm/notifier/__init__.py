@@ -25,7 +25,7 @@ class AlarmNotifier(object):
     """Base class for alarm notifier plugins."""
 
     @abc.abstractmethod
-    def notify(self, action, alarm_id, previous, current, reason):
+    def notify(self, action, alarm_id, previous, current, reason, reason_data):
         """Notify that an alarm has been triggered.
 
         :param action: The action that is being attended, as a parsed URL.
@@ -33,4 +33,5 @@ class AlarmNotifier(object):
         :param previous: The previous state of the alarm.
         :param current: The current state of the alarm.
         :param reason: The reason the alarm changed its state.
+        :param reason_data: A dict representation of the reason.
         """

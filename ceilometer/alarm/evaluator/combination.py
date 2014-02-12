@@ -17,6 +17,8 @@
 # under the License.
 
 
+import itertools
+
 from ceilometer.alarm import evaluator
 from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
@@ -40,63 +42,63 @@ class CombinationEvaluator(evaluator.Evaluator):
         """Ensure there is sufficient data for evaluation,
         transitioning to unknown otherwise.
         """
-        missing_states = len(alarm.rule['alarm_ids']) - len(states)
-        sufficient = missing_states == 0
+        #note(sileht): alarm can be evaluated only with
+        #stable state of other alarm
+        alarms_missing_states = [alarm_id for alarm_id, state in states
+                                 if not state or state == evaluator.UNKNOWN]
+        sufficient = len(alarms_missing_states) == 0
         if not sufficient and alarm.state != evaluator.UNKNOWN:
-            reason = _('%(missing_states)d alarms in %(alarm_ids)s'
+            reason = _('Alarms %(alarm_ids)s'
                        ' are in unknown state') % \
-                {'missing_states': missing_states,
-                 'alarm_ids': ",".join(alarm.rule['alarm_ids'])}
-            self._refresh(alarm, evaluator.UNKNOWN, reason)
+                {'alarm_ids': ",".join(alarms_missing_states)}
+            reason_data = self._reason_data(alarms_missing_states)
+            self._refresh(alarm, evaluator.UNKNOWN, reason, reason_data)
         return sufficient
 
     @staticmethod
-    def _reason(alarm, state):
+    def _reason_data(alarm_ids):
+        """Create a reason data dictionary for this evaluator type.
+        """
+        return {'type': 'combination', 'alarm_ids': alarm_ids}
+
+    @classmethod
+    def _reason(cls, alarm, state, underlying_states):
         """Fabricate reason string."""
         transition = alarm.state != state
-        if alarm.rule['operator'] == 'or':
-            if transition:
-                return (_('Transition to %(state)s due at least to one alarm'
-                          ' in %(alarm_ids)s in state %(state)s') %
-                        {'state': state,
-                         'alarm_ids': ",".join(alarm.rule['alarm_ids'])})
-            return (_('Remaining as %(state)s due at least to one alarm in'
+
+        alarms_to_report = [alarm_id for alarm_id, alarm_state
+                            in underlying_states
+                            if alarm_state == state]
+        reason_data = cls._reason_data(alarms_to_report)
+        if transition:
+            return (_('Transition to %(state)s due to alarms'
                       ' %(alarm_ids)s in state %(state)s') %
                     {'state': state,
-                     'alarm_ids': ",".join(alarm.rule['alarm_ids'])})
-        elif alarm.rule['operator'] == 'and':
-            if transition:
-                return (_('Transition to %(state)s due to all alarms'
-                          ' (%(alarm_ids)s) in state %(state)s') %
-                        {'state': state,
-                         'alarm_ids': ",".join(alarm.rule['alarm_ids'])})
-            return (_('Remaining as %(state)s due to all alarms'
-                      ' (%(alarm_ids)s) in state %(state)s') %
-                    {'state': state,
-                     'alarm_ids': ",".join(alarm.rule['alarm_ids'])})
+                     'alarm_ids': ",".join(alarms_to_report)}), reason_data
+        return (_('Remaining as %(state)s due to alarms'
+                  ' %(alarm_ids)s in state %(state)s') %
+                {'state': state,
+                 'alarm_ids': ",".join(alarms_to_report)}), reason_data
 
     def _transition(self, alarm, underlying_states):
         """Transition alarm state if necessary.
         """
         op = alarm.rule['operator']
-        if COMPARATORS[op](s == evaluator.ALARM for s in underlying_states):
+        if COMPARATORS[op](s == evaluator.ALARM
+                           for __, s in underlying_states):
             state = evaluator.ALARM
         else:
             state = evaluator.OK
 
         continuous = alarm.repeat_actions
-        reason = self._reason(alarm, state)
+        reason, reason_data = self._reason(alarm, state, underlying_states)
         if alarm.state != state or continuous:
-            self._refresh(alarm, state, reason)
+            self._refresh(alarm, state, reason, reason_data)
 
     def evaluate(self, alarm):
-        states = []
-        for _id in alarm.rule['alarm_ids']:
-            state = self._get_alarm_state(_id)
-            #note(sileht): alarm can be evaluated only with
-            #stable state of other alarm
-            if state and state != evaluator.UNKNOWN:
-                states.append(state)
+        states = zip(alarm.rule['alarm_ids'],
+                     itertools.imap(self._get_alarm_state,
+                                    alarm.rule['alarm_ids']))
 
         if self._sufficient_states(alarm, states):
             self._transition(alarm, states)
