@@ -103,7 +103,7 @@ API Queries
 +++++++++++
 Ceilometer API calls:
 
-.. note:: To successfully query the Ceilometer you must first get a project-specific token from the Keystone service and add it to any API calls that you execute against that project. See the `Openstack credentials documentation <http://docs.openstack.org/api/quick-start/content/index.html#getting-credentials-a00665>`_ for additional details.
+.. note:: To successfully query the Ceilometer you must first get a project-specific token from the Keystone service and add it to any API calls that you execute against that project. See the `OpenStack credentials documentation <http://docs.openstack.org/api/quick-start/content/index.html#getting-credentials-a00665>`_ for additional details.
 
 A simple query to return a list of available meters::
 
