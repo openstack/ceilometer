@@ -646,7 +646,7 @@ class Statistics(_Base):
         # "invalid."
         #
         # If the timestamps are invalid, return None as a
-        # sentinal indicating that there is something "funny"
+        # sentinel indicating that there is something "funny"
         # about the range.
         if (self.duration_start and
                 self.duration_end and

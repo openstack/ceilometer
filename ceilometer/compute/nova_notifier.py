@@ -96,7 +96,7 @@ class Instance(object):
 
     The pollsters all expect an instance that looks like what the
     novaclient gives them, but the conductor API gives us a
-    dictionary. This class makes an object from the dictonary so we
+    dictionary. This class makes an object from the dictionary so we
     can pass it to the pollsters.
     """
     def __init__(self, context, info):
