@@ -268,7 +268,7 @@ class TestPublish(test.BaseTestCase):
         self.rpc_unreachable = True
         publisher = rpc.RPCPublisher(
             network_utils.urlsplit('rpc://?policy=queue&max_queue_length=3'))
-        for i in range(0, 5):
+        for i in range(5):
             for s in self.test_data:
                 s.source = 'test-%d' % i
             publisher.publish_samples(None,
@@ -292,7 +292,7 @@ class TestPublish(test.BaseTestCase):
         self.rpc_unreachable = True
         publisher = rpc.RPCPublisher(
             network_utils.urlsplit('rpc://?policy=queue'))
-        for i in range(0, 2000):
+        for i in range(2000):
             for s in self.test_data:
                 s.source = 'test-%d' % i
             publisher.publish_samples(None,

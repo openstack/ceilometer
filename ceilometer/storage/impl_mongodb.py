@@ -546,7 +546,7 @@ class Connection(base.Connection):
         if marker is not None:
             sort_criteria_list = []
 
-            for i in range(0, len(sort_keys)):
+            for i in range(len(sort_keys)):
                 sort_criteria_list.append(cls._recurse_sort_keys(
                                           sort_keys[:(len(sort_keys) - i)],
                                           marker, _op))
