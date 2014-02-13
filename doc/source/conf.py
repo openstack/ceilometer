@@ -150,7 +150,7 @@ extensions = [
     'sphinx.ext.pngmath',
     'sphinx.ext.viewcode',
     'sphinxcontrib.pecanwsme.rest',
-    'oslo.sphinx',
+    'oslosphinx',
     'sphinxcontrib.docbookrestapi.setup'
 ]
 
