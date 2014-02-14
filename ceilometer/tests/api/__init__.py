@@ -18,11 +18,10 @@
 """Base classes for API tests.
 """
 
-import urllib
-
 import flask
 import pecan
 import pecan.testing
+from six.moves import urllib
 
 from ceilometer.api import acl
 from ceilometer.api.v1 import app as v1_app
@@ -61,7 +60,7 @@ class TestBase(db_test_base.TestBase):
 
     def get(self, path, headers=None, **kwds):
         if kwds:
-            query = path + '?' + urllib.urlencode(kwds)
+            query = path + '?' + urllib.parse.urlencode(kwds)
         else:
             query = path
         rv = self.test_app.get(query, headers=headers)
