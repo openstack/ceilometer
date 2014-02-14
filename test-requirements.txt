@@ -10,7 +10,7 @@ mock>=1.0
 mox>=0.5.3
 # Docs Requirements
 docutils==0.9.1
-oslo.sphinx
+oslosphinx
 python-subunit>=0.0.18
 sphinx>=1.1.2,<1.2
 sphinxcontrib-docbookrestapi
