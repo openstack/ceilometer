@@ -105,8 +105,8 @@ class TestMetricsNotifications(test.BaseTestCase):
         info_none = ic._get_sample(METRICS_UPDATE, 'abc.efg')
         info_error = ic._get_sample(ERROR_METRICS, 'cpu.frequency')
         self.assertEqual(info['payload']['name'], 'cpu.frequency')
-        self.assertEqual(info_none, None)
-        self.assertEqual(info_error, None)
+        self.assertIsNone(info_none)
+        self.assertIsNone(info_error)
 
     def test_compute_cpu_frequency(self):
         c = self._process_notification(cpu.CpuFrequency())
