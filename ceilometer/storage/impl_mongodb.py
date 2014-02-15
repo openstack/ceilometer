@@ -25,7 +25,6 @@ import copy
 import json
 import operator
 import uuid
-import weakref
 
 import bson.code
 import bson.objectid
@@ -39,6 +38,7 @@ from ceilometer.openstack.common import timeutils
 from ceilometer import storage
 from ceilometer.storage import base
 from ceilometer.storage import models
+from ceilometer.storage import pymongo_base
 
 cfg.CONF.import_opt('time_to_live', 'ceilometer.storage',
                     group="database")
@@ -78,101 +78,11 @@ class MongoDBStorage(base.StorageEngine):
         return Connection(conf)
 
 
-def make_timestamp_range(start, end,
-                         start_timestamp_op=None, end_timestamp_op=None):
-    """Given two possible datetimes and their operations, create the query
-    document to find timestamps within that range.
-    By default, using $gte for the lower bound and $lt for the
-    upper bound.
-    """
-    ts_range = {}
-
-    if start:
-        if start_timestamp_op == 'gt':
-            start_timestamp_op = '$gt'
-        else:
-            start_timestamp_op = '$gte'
-        ts_range[start_timestamp_op] = start
-
-    if end:
-        if end_timestamp_op == 'le':
-            end_timestamp_op = '$lte'
-        else:
-            end_timestamp_op = '$lt'
-        ts_range[end_timestamp_op] = end
-    return ts_range
-
-
-def make_query_from_filter(sample_filter, require_meter=True):
-    """Return a query dictionary based on the settings in the filter.
-
-    :param filter: SampleFilter instance
-    :param require_meter: If true and the filter does not have a meter,
-                          raise an error.
-    """
-    q = {}
-
-    if sample_filter.user:
-        q['user_id'] = sample_filter.user
-    if sample_filter.project:
-        q['project_id'] = sample_filter.project
-
-    if sample_filter.meter:
-        q['counter_name'] = sample_filter.meter
-    elif require_meter:
-        raise RuntimeError('Missing required meter specifier')
-
-    ts_range = make_timestamp_range(sample_filter.start, sample_filter.end,
-                                    sample_filter.start_timestamp_op,
-                                    sample_filter.end_timestamp_op)
-    if ts_range:
-        q['timestamp'] = ts_range
-
-    if sample_filter.resource:
-        q['resource_id'] = sample_filter.resource
-    if sample_filter.source:
-        q['source'] = sample_filter.source
-    if sample_filter.message_id:
-        q['message_id'] = sample_filter.message_id
-
-    # so the samples call metadata resource_metadata, so we convert
-    # to that.
-    q.update(dict(('resource_%s' % k, v)
-                  for (k, v) in sample_filter.metaquery.iteritems()))
-    return q
-
-
-class ConnectionPool(object):
-
-    def __init__(self):
-        self._pool = {}
-
-    def connect(self, url):
-        connection_options = pymongo.uri_parser.parse_uri(url)
-        del connection_options['database']
-        del connection_options['username']
-        del connection_options['password']
-        del connection_options['collection']
-        pool_key = tuple(connection_options)
-
-        if pool_key in self._pool:
-            client = self._pool.get(pool_key)()
-            if client:
-                return client
-        LOG.info(_('Connecting to MongoDB on %s'),
-                 connection_options['nodelist'])
-        client = pymongo.MongoClient(
-            url,
-            safe=True)
-        self._pool[pool_key] = weakref.ref(client)
-        return client
-
-
-class Connection(base.Connection):
+class Connection(pymongo_base.Connection):
     """MongoDB connection.
     """
 
-    CONNECTION_POOL = ConnectionPool()
+    CONNECTION_POOL = pymongo_base.ConnectionPool()
 
     REDUCE_GROUP_CLEAN = bson.code.Code("""
     function ( curr, result ) {
@@ -610,32 +520,6 @@ class Connection(base.Connection):
             limit = 0
         return db_collection.find(q, limit=limit, sort=all_sort)
 
-    def get_users(self, source=None):
-        """Return an iterable of user id strings.
-
-        :param source: Optional source filter.
-        """
-        q = {}
-        if source is not None:
-            q['source'] = source
-
-        return (doc['_id'] for doc in
-                self.db.user.find(q, fields=['_id'],
-                                  sort=[('_id', pymongo.ASCENDING)]))
-
-    def get_projects(self, source=None):
-        """Return an iterable of project id strings.
-
-        :param source: Optional source filter.
-        """
-        q = {}
-        if source is not None:
-            q['source'] = source
-
-        return (doc['_id'] for doc in
-                self.db.project.find(q, fields=['_id'],
-                                     sort=[('_id', pymongo.ASCENDING)]))
-
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
                       end_timestamp=None, end_timestamp_op=None,
@@ -677,9 +561,10 @@ class Connection(base.Connection):
             # Look for resources matching the above criteria and with
             # samples in the time range we care about, then change the
             # resource query to return just those resources by id.
-            ts_range = make_timestamp_range(start_timestamp, end_timestamp,
-                                            start_timestamp_op,
-                                            end_timestamp_op)
+            ts_range = pymongo_base.make_timestamp_range(start_timestamp,
+                                                         end_timestamp,
+                                                         start_timestamp_op,
+                                                         end_timestamp_op)
             if ts_range:
                 q['timestamp'] = ts_range
 
@@ -710,45 +595,6 @@ class Connection(base.Connection):
         finally:
             self.db[out].drop()
 
-    def get_meters(self, user=None, project=None, resource=None, source=None,
-                   metaquery={}, pagination=None):
-        """Return an iterable of models.Meter instances
-
-        :param user: Optional ID for user that owns the resource.
-        :param project: Optional ID for project that owns the resource.
-        :param resource: Optional resource filter.
-        :param source: Optional source filter.
-        :param metaquery: Optional dict with metadata to match on.
-        :param pagination: Optional pagination query.
-        """
-        if pagination:
-            raise NotImplementedError(_('Pagination not implemented'))
-
-        q = {}
-        if user is not None:
-            q['user_id'] = user
-        if project is not None:
-            q['project_id'] = project
-        if resource is not None:
-            q['_id'] = resource
-        if source is not None:
-            q['source'] = source
-        q.update(metaquery)
-
-        for r in self.db.resource.find(q):
-            for r_meter in r['meter']:
-                yield models.Meter(
-                    name=r_meter['counter_name'],
-                    type=r_meter['counter_type'],
-                    # Return empty string if 'counter_unit' is not valid for
-                    # backward compatibility.
-                    unit=r_meter.get('counter_unit', ''),
-                    resource_id=r['_id'],
-                    project_id=r['project_id'],
-                    source=r['source'],
-                    user_id=r['user_id'],
-                )
-
     def _retrieve_samples(self, query, orderby, limit):
         if limit is not None:
             samples = self.db.meter.find(query,
@@ -775,7 +621,8 @@ class Connection(base.Connection):
         """
         if limit == 0:
             return []
-        q = make_query_from_filter(sample_filter, require_meter=False)
+        q = pymongo_base.make_query_from_filter(sample_filter,
+                                                require_meter=False)
 
         return self._retrieve_samples(q,
                                       [("timestamp", pymongo.DESCENDING)],
@@ -851,7 +698,7 @@ class Connection(base.Connection):
                                     'resource_id', 'source'])):
             raise NotImplementedError("Unable to group by these fields")
 
-        q = make_query_from_filter(sample_filter)
+        q = pymongo_base.make_query_from_filter(sample_filter)
 
         if period:
             if sample_filter.start:
@@ -888,69 +735,6 @@ class Connection(base.Connection):
         return sorted(
             (models.Statistics(**(r['value'])) for r in results['results']),
             key=operator.attrgetter('period_start'))
-
-    @staticmethod
-    def _decode_matching_metadata(matching_metadata):
-        if isinstance(matching_metadata, dict):
-            #note(sileht): keep compatibility with alarm
-            #with matching_metadata as a dict
-            return matching_metadata
-        else:
-            new_matching_metadata = {}
-            for elem in matching_metadata:
-                new_matching_metadata[elem['key']] = elem['value']
-            return new_matching_metadata
-
-    @classmethod
-    def _ensure_encapsulated_rule_format(cls, alarm):
-        """This ensure the alarm returned by the storage have the correct
-        format. The previous format looks like:
-        {
-            'alarm_id': '0ld-4l3rt',
-            'enabled': True,
-            'name': 'old-alert',
-            'description': 'old-alert',
-            'timestamp': None,
-            'meter_name': 'cpu',
-            'user_id': 'me',
-            'project_id': 'and-da-boys',
-            'comparison_operator': 'lt',
-            'threshold': 36,
-            'statistic': 'count',
-            'evaluation_periods': 1,
-            'period': 60,
-            'state': "insufficient data",
-            'state_timestamp': None,
-            'ok_actions': [],
-            'alarm_actions': ['http://nowhere/alarms'],
-            'insufficient_data_actions': [],
-            'repeat_actions': False,
-            'matching_metadata': {'key': 'value'}
-            # or 'matching_metadata': [{'key': 'key', 'value': 'value'}]
-        }
-        """
-
-        if isinstance(alarm.get('rule'), dict):
-            return
-
-        alarm['type'] = 'threshold'
-        alarm['rule'] = {}
-        alarm['matching_metadata'] = cls._decode_matching_metadata(
-            alarm['matching_metadata'])
-        for field in ['period', 'evaluation_periods', 'threshold',
-                      'statistic', 'comparison_operator', 'meter_name']:
-            if field in alarm:
-                alarm['rule'][field] = alarm[field]
-                del alarm[field]
-
-        query = []
-        for key in alarm['matching_metadata']:
-            query.append({'field': key,
-                          'op': 'eq',
-                          'value': alarm['matching_metadata'][key],
-                          'type': 'string'})
-        del alarm['matching_metadata']
-        alarm['rule']['query'] = query
 
     def _retrieve_alarms(self, query_filter, orderby, limit):
         if limit is not None:
@@ -994,28 +778,6 @@ class Connection(base.Connection):
             q['alarm_id'] = alarm_id
 
         return self._retrieve_alarms(q, [], None)
-
-    def update_alarm(self, alarm):
-        """update alarm
-        """
-        data = alarm.as_dict()
-
-        self.db.alarm.update(
-            {'alarm_id': alarm.alarm_id},
-            {'$set': data},
-            upsert=True)
-
-        stored_alarm = self.db.alarm.find({'alarm_id': alarm.alarm_id})[0]
-        del stored_alarm['_id']
-        self._ensure_encapsulated_rule_format(stored_alarm)
-        return models.Alarm(**stored_alarm)
-
-    create_alarm = update_alarm
-
-    def delete_alarm(self, alarm_id):
-        """Delete an alarm
-        """
-        self.db.alarm.remove({'alarm_id': alarm_id})
 
     def _retrieve_alarm_changes(self, query_filter, orderby, limit):
         if limit is not None:
@@ -1069,9 +831,10 @@ class Connection(base.Connection):
         if type is not None:
             q['type'] = type
         if start_timestamp or end_timestamp:
-            ts_range = make_timestamp_range(start_timestamp, end_timestamp,
-                                            start_timestamp_op,
-                                            end_timestamp_op)
+            ts_range = pymongo_base.make_timestamp_range(start_timestamp,
+                                                         end_timestamp,
+                                                         start_timestamp_op,
+                                                         end_timestamp_op)
             if ts_range:
                 q['timestamp'] = ts_range
 
