@@ -317,7 +317,8 @@ def _verify_query_segregation(query, auth_project=None):
                 raise ProjectNotAuthorized(q.value)
 
 
-def _validate_query(query, db_func, internal_keys=[]):
+def _validate_query(query, db_func, internal_keys=[],
+                    is_timestamp_valid=True):
     _verify_query_segregation(query)
 
     valid_keys = inspect.getargspec(db_func)[0]
@@ -326,23 +327,28 @@ def _validate_query(query, db_func, internal_keys=[]):
     translation = {'user_id': 'user',
                    'project_id': 'project',
                    'resource_id': 'resource'}
-    has_timestamp = False
+
+    has_timestamp_query = _validate_timestamp_fields(query,
+                                                     'timestamp',
+                                                     ('lt', 'le', 'gt', 'ge'),
+                                                     is_timestamp_valid)
+    has_search_offset_query = _validate_timestamp_fields(query,
+                                                         'search_offset',
+                                                         ('eq'),
+                                                         is_timestamp_valid)
+
+    if has_search_offset_query and not has_timestamp_query:
+        raise wsme.exc.InvalidInput('field', 'search_offset',
+                                    "search_offset cannot be used without " +
+                                    "timestamp")
+
     for i in query:
-        if i.field == 'timestamp':
-            has_timestamp = True
-            if i.op not in ('lt', 'le', 'gt', 'ge'):
-                raise wsme.exc.InvalidInput('op', i.op,
-                                            'unimplemented operator for %s' %
-                                            i.field)
-        else:
+        if i.field not in ('timestamp', 'search_offset'):
             if i.op == 'eq':
-                if i.field == 'search_offset':
-                    has_timestamp = True
-                elif i.field == 'enabled':
+                if i.field == 'enabled':
                     i._get_value_as_type('boolean')
-                elif i.field.startswith('metadata.'):
-                    i._get_value_as_type()
-                elif i.field.startswith('resource_metadata.'):
+                elif (i.field.startswith('metadata.') or
+                      i.field.startswith('resource_metadata.')):
                     i._get_value_as_type()
                 else:
                     key = translation.get(i.field, i.field)
@@ -355,14 +361,30 @@ def _validate_query(query, db_func, internal_keys=[]):
                                             'unimplemented operator for %s' %
                                             i.field)
 
-    if has_timestamp and not ('start' in valid_keys or
-                              'start_timestamp' in valid_keys):
-        raise wsme.exc.UnknownArgument('timestamp',
-                                       "not valid for this resource")
+
+def _validate_timestamp_fields(query, field_name, operator_list,
+                               is_timestamp_valid):
+    for item in query:
+        if item.field == field_name:
+            #If *timestamp* or *search_offset* field was specified in the
+            #query, but timestamp is not supported on that resource, on
+            #which the query was invoked, then raise an exception.
+            if not is_timestamp_valid:
+                raise wsme.exc.UnknownArgument(field_name,
+                                               "not valid for " +
+                                               "this resource")
+            if item.op not in operator_list:
+                raise wsme.exc.InvalidInput('op', item.op,
+                                            'unimplemented operator for %s' %
+                                            item.field)
+            return True
+    return False
 
 
-def _query_to_kwargs(query, db_func, internal_keys=[]):
-    _validate_query(query, db_func, internal_keys=internal_keys)
+def _query_to_kwargs(query, db_func, internal_keys=[],
+                     is_timestamp_valid=True):
+    _validate_query(query, db_func, internal_keys=internal_keys,
+                    is_timestamp_valid=is_timestamp_valid)
     query = _sanitize_query(query, db_func)
     internal_keys.append('self')
     valid_keys = set(inspect.getargspec(db_func)[0]) - set(internal_keys)
@@ -859,7 +881,9 @@ class MetersController(rest.RestController):
 
         :param q: Filter rules for the meters to be returned.
         """
-        kwargs = _query_to_kwargs(q, pecan.request.storage_conn.get_meters)
+        #Timestamp field is not supported for Meter queries
+        kwargs = _query_to_kwargs(q, pecan.request.storage_conn.get_meters,
+                                  is_timestamp_valid=False)
         return [Meter.from_db_model(m)
                 for m in pecan.request.storage_conn.get_meters(**kwargs)]
 
@@ -1308,10 +1332,12 @@ class AlarmThresholdRule(_Base):
         if not threshold_rule.query:
             threshold_rule.query = []
 
-        timestamp_keys = ['timestamp', 'start', 'start_timestamp' 'end',
-                          'end_timestamp']
+        #Timestamp is not allowed for AlarmThresholdRule query, as the alarm
+        #evaluator will construct timestamp bounds for the sequence of
+        #statistics queries as the sliding evaluation window advances
+        #over time.
         _validate_query(threshold_rule.query, storage.SampleFilter.__init__,
-                        internal_keys=timestamp_keys)
+                        is_timestamp_valid=False)
         return threshold_rule
 
     @property
@@ -1798,8 +1824,10 @@ class AlarmsController(rest.RestController):
 
         :param q: Filter rules for the alarms to be returned.
         """
+        #Timestamp is not supported field for Simple Alarm queries
         kwargs = _query_to_kwargs(q,
-                                  pecan.request.storage_conn.get_alarms)
+                                  pecan.request.storage_conn.get_alarms,
+                                  is_timestamp_valid=False)
         return [Alarm.from_db_model(m)
                 for m in pecan.request.storage_conn.get_alarms(**kwargs)]
 
