@@ -68,6 +68,13 @@ run through tox_.
 
       $ tox -e py27 -- api.v2
 
+   To debug tests (ie. break into pdb debugger), you can use ''venv'' command::
+
+      $ tox -e venv "python -m unittest discover ceilometer"
+
+   Unfortunately, debugging currently has some limitations:
+   You cannot run a specific test, you have to launch the whole test suite.
+
 .. seealso::
 
    * tox_
