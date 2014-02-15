@@ -13,6 +13,7 @@ lxml>=2.3
 msgpack-python
 MySQL-python
 oslo.config>=1.2.0
+oslo.vmware
 pbr>=0.6,<1.0
 pecan>=0.4.5
 pymongo>=2.4
