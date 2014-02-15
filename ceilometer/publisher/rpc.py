@@ -21,7 +21,7 @@
 
 import itertools
 import operator
-import urlparse
+import six.moves.urllib.parse as urlparse
 
 from oslo.config import cfg
 

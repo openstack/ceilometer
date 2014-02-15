@@ -25,7 +25,7 @@ import itertools
 import json
 import os
 import re
-import urlparse
+import six.moves.urllib.parse as urlparse
 
 import happybase
 
