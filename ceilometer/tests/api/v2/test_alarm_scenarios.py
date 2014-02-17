@@ -786,6 +786,32 @@ class TestAlarms(FunctionalTest,
                          jsonutils.loads(resp.body)['error_message']
                          ['faultstring'])
 
+    def test_post_combination_alarm_with_reasonable_description(self):
+        """Test that post a combination alarm with two blanks around the
+        operator in alarm description.
+        """
+        json = {
+            'enabled': False,
+            'name': 'added_alarm',
+            'state': 'ok',
+            'type': 'combination',
+            'ok_actions': ['http://something/ok'],
+            'alarm_actions': ['http://something/alarm'],
+            'insufficient_data_actions': ['http://something/no'],
+            'repeat_actions': True,
+            'combination_rule': {
+                'alarm_ids': ['a',
+                              'b'],
+                'operator': 'and',
+            }
+        }
+        self.post_json('/alarms', params=json, status=201,
+                       headers=self.auth_headers)
+        alarms = list(self.conn.get_alarms(enabled=False))
+        self.assertEqual(1, len(alarms))
+        self.assertEqual(u'Combined state of alarms a and b',
+                         alarms[0].description)
+
     def test_post_combination_alarm_as_admin_success_owner_unset(self):
         self._do_post_combination_alarm_as_admin_success(False)
 
