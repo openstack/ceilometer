@@ -223,6 +223,7 @@ class TestListMeters(FunctionalTest,
         sample_id = self.messages[1]['message_id']
         data = self.get_json('/samples/%s' % sample_id)
         self.assertIn('id', data)
+        del data['recorded_at']
         self.assertEqual(data, {
             u'id': sample_id,
             u'metadata': {u'display_name': u'test-server',
@@ -256,6 +257,7 @@ class TestListMeters(FunctionalTest,
                                  }])
         self.assertIn('id', data[0])
         del data[0]['id']  # Randomly generated
+        del data[0]['recorded_at']
         self.assertEqual(data, [{
             u'user_id': u'user-id4',
             u'resource_id': u'resource-id4',

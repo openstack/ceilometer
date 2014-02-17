@@ -569,6 +569,9 @@ class OldSample(_Base):
     timestamp = datetime.datetime
     "UTC date and time when the measurement was made"
 
+    recorded_at = datetime.datetime
+    "When the sample has been recorded."
+
     resource_metadata = {wtypes.text: wtypes.text}
     "Arbitrary metadata associated with the resource"
 
@@ -601,6 +604,7 @@ class OldSample(_Base):
                    resource_id='bd9431c1-8d69-4ad3-803a-8d4a6b89fd36',
                    project_id='35b17138-b364-4e6a-a131-8f3099c5be68',
                    user_id='efd87807-12d2-4b38-9c70-5f5c2ac427ff',
+                   recorded_at=datetime.datetime.utcnow(),
                    timestamp=datetime.datetime.utcnow(),
                    resource_metadata={'name1': 'value1',
                                       'name2': 'value2'},
@@ -924,6 +928,9 @@ class Sample(_Base):
     timestamp = datetime.datetime
     "When the sample has been generated."
 
+    recorded_at = datetime.datetime
+    "When the sample has been recorded."
+
     metadata = {wtypes.text: wtypes.text}
     "Arbitrary metadata associated with the sample."
 
@@ -939,6 +946,7 @@ class Sample(_Base):
                    resource_id=m.resource_id,
                    source=m.source,
                    timestamp=m.timestamp,
+                   recorded_at=m.recorded_at,
                    metadata=_flatten_metadata(m.resource_metadata))
 
     @classmethod
@@ -952,6 +960,7 @@ class Sample(_Base):
                    project_id='35b17138-b364-4e6a-a131-8f3099c5be68',
                    user_id='efd87807-12d2-4b38-9c70-5f5c2ac427ff',
                    timestamp=timeutils.utcnow(),
+                   recorded_at=datetime.datetime.utcnow(),
                    source='openstack',
                    metadata={'name1': 'value1',
                              'name2': 'value2'},
