@@ -26,12 +26,20 @@ import testscenarios
 from ceilometer.openstack.common import timeutils
 from ceilometer.publisher import utils
 from ceilometer import sample
+from ceilometer.storage import models
 from ceilometer.tests.api import v2 as tests_api
 from ceilometer.tests import db as tests_db
 
 load_tests = testscenarios.load_tests_apply_scenarios
 
 LOG = logging.getLogger(__name__)
+
+admin_header = {"X-Roles": "admin",
+                "X-Project-Id":
+                "project-id1"}
+non_admin_header = {"X-Roles": "Member",
+                    "X-Project-Id":
+                    "project-id1"}
 
 
 class TestQueryMetersController(tests_api.FunctionalTest,
@@ -40,12 +48,7 @@ class TestQueryMetersController(tests_api.FunctionalTest,
     def setUp(self):
         super(TestQueryMetersController, self).setUp()
         self.url = '/query/samples'
-        self.admin_header = {"X-Roles": "admin",
-                             "X-Project-Id":
-                             "project-id1"}
-        self.non_admin_header = {"X-Roles": "Member",
-                                 "X-Project-Id":
-                                 "project-id1"}
+
         for cnt in [
             sample.Sample('meter.test',
                           'cumulative',
@@ -103,7 +106,7 @@ class TestQueryMetersController(tests_api.FunctionalTest,
     def test_non_admin_tenant_sees_only_its_own_project(self):
         data = self.post_json(self.url,
                               params={},
-                              headers=self.non_admin_header)
+                              headers=non_admin_header)
         for sample in data.json:
             self.assertEqual("project-id1", sample['project_id'])
 
@@ -112,7 +115,7 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                               params={"filter":
                                       '{"=": {"project_id": "project-id2"}}'},
                               expect_errors=True,
-                              headers=self.non_admin_header)
+                              headers=non_admin_header)
 
         self.assertEqual(401, data.status_int)
         self.assertIn("Not Authorized to access project project-id2",
@@ -122,7 +125,7 @@ class TestQueryMetersController(tests_api.FunctionalTest,
         data = self.post_json(self.url,
                               params={"filter":
                                       '{"=": {"project_id": "project-id1"}}'},
-                              headers=self.non_admin_header)
+                              headers=non_admin_header)
 
         for sample in data.json:
             self.assertEqual("project-id1", sample['project_id'])
@@ -130,7 +133,7 @@ class TestQueryMetersController(tests_api.FunctionalTest,
     def test_admin_tenant_sees_every_project(self):
         data = self.post_json(self.url,
                               params={},
-                              headers=self.admin_header)
+                              headers=admin_header)
 
         self.assertEqual(2, len(data.json))
         for sample in data.json:
@@ -143,7 +146,7 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                   '{"=": {"project_id": "project-id2"}}]}')
         data = self.post_json(self.url,
                               params={"filter": filter},
-                              headers=self.admin_header)
+                              headers=admin_header)
 
         self.assertEqual(2, len(data.json))
         for sample in data.json:
@@ -154,7 +157,7 @@ class TestQueryMetersController(tests_api.FunctionalTest,
         data = self.post_json(self.url,
                               params={"filter":
                                       '{"=": {"project_id": "project-id2"}}'},
-                              headers=self.admin_header)
+                              headers=admin_header)
 
         self.assertEqual(1, len(data.json))
         for sample in data.json:
@@ -185,6 +188,153 @@ class TestQueryMetersController(tests_api.FunctionalTest,
 
     def test_limit_should_be_positive(self):
         data = self.post_json(self.url,
+                              params={"limit": 0},
+                              expect_errors=True)
+
+        self.assertEqual(400, data.status_int)
+        self.assertIn("Limit should be positive", data.body)
+
+
+class TestQueryAlarmsController(tests_api.FunctionalTest,
+                                tests_db.MixinTestsWithBackendScenarios):
+
+    def setUp(self):
+        super(TestQueryAlarmsController, self).setUp()
+        self.alarm_url = '/query/alarms'
+
+        for state in ['ok', 'alarm', 'insufficient data']:
+            for date in [datetime.datetime(2013, 1, 1),
+                         datetime.datetime(2013, 2, 2)]:
+                for id in [1, 2]:
+                    alarm_id = "-".join([state, date.isoformat(), str(id)])
+                    project_id = "project-id%d" % id
+                    alarm = models.Alarm(name=alarm_id,
+                                         type='threshold',
+                                         enabled=True,
+                                         alarm_id=alarm_id,
+                                         description='a',
+                                         state=state,
+                                         state_timestamp=date,
+                                         timestamp=date,
+                                         ok_actions=[],
+                                         insufficient_data_actions=[],
+                                         alarm_actions=[],
+                                         repeat_actions=True,
+                                         user_id="user-id%d" % id,
+                                         project_id=project_id,
+                                         rule=dict(comparison_operator='gt',
+                                                   threshold=2.0,
+                                                   statistic='avg',
+                                                   evaluation_periods=60,
+                                                   period=1,
+                                                   meter_name='meter.test',
+                                                   query=[{'field':
+                                                           'project_id',
+                                                           'op': 'eq',
+                                                           'value':
+                                                           project_id}]))
+                    self.conn.update_alarm(alarm)
+
+    def test_query_all(self):
+        data = self.post_json(self.alarm_url,
+                              params={})
+
+        self.assertEqual(12, len(data.json))
+
+    def test_filter_with_isotime_timestamp(self):
+        date_time = datetime.datetime(2013, 1, 1)
+        isotime = date_time.isoformat()
+
+        data = self.post_json(self.alarm_url,
+                              params={"filter":
+                                      '{">": {"timestamp": "'
+                                      + isotime + '"}}'})
+
+        self.assertEqual(6, len(data.json))
+        for alarm in data.json:
+            result_time = timeutils.parse_isotime(alarm['timestamp'])
+            result_time = result_time.replace(tzinfo=None)
+            self.assertTrue(result_time > date_time)
+
+    def test_filter_with_isotime_state_timestamp(self):
+        date_time = datetime.datetime(2013, 1, 1)
+        isotime = date_time.isoformat()
+
+        data = self.post_json(self.alarm_url,
+                              params={"filter":
+                                      '{">": {"state_timestamp": "'
+                                      + isotime + '"}}'})
+
+        self.assertEqual(6, len(data.json))
+        for alarm in data.json:
+            result_time = timeutils.parse_isotime(alarm['state_timestamp'])
+            result_time = result_time.replace(tzinfo=None)
+            self.assertTrue(result_time > date_time)
+
+    def test_non_admin_tenant_sees_only_its_own_project(self):
+        data = self.post_json(self.alarm_url,
+                              params={},
+                              headers=non_admin_header)
+        for alarm in data.json:
+            self.assertEqual("project-id1", alarm['project_id'])
+
+    def test_non_admin_tenant_cannot_query_others_project(self):
+        data = self.post_json(self.alarm_url,
+                              params={"filter":
+                                      '{"=": {"project_id": "project-id2"}}'},
+                              expect_errors=True,
+                              headers=non_admin_header)
+
+        self.assertEqual(401, data.status_int)
+        self.assertIn("Not Authorized to access project project-id2",
+                      data.body)
+
+    def test_non_admin_tenant_can_explicitly_filter_for_own_project(self):
+        data = self.post_json(self.alarm_url,
+                              params={"filter":
+                                      '{"=": {"project_id": "project-id1"}}'},
+                              headers=non_admin_header)
+
+        for alarm in data.json:
+            self.assertEqual("project-id1", alarm['project_id'])
+
+    def test_admin_tenant_sees_every_project(self):
+        data = self.post_json(self.alarm_url,
+                              params={},
+                              headers=admin_header)
+
+        self.assertEqual(12, len(data.json))
+        for alarm in data.json:
+            self.assertIn(alarm['project_id'],
+                          (["project-id1", "project-id2"]))
+
+    def test_admin_tenant_can_query_any_project(self):
+        data = self.post_json(self.alarm_url,
+                              params={"filter":
+                                      '{"=": {"project_id": "project-id2"}}'},
+                              headers=admin_header)
+
+        self.assertEqual(6, len(data.json))
+        for alarm in data.json:
+            self.assertIn(alarm['project_id'], set(["project-id2"]))
+
+    def test_query_with_filter_orderby_and_limit(self):
+        orderby = '[{"state_timestamp": "DESC"}]'
+        data = self.post_json(self.alarm_url,
+                              params={"filter": '{"=": {"state": "alarm"}}',
+                                      "orderby": orderby,
+                                      "limit": 3})
+
+        self.assertEqual(3, len(data.json))
+        self.assertEqual(["2013-02-02T00:00:00",
+                          "2013-02-02T00:00:00",
+                          "2013-01-01T00:00:00"],
+                         [a["state_timestamp"] for a in data.json])
+        for alarm in data.json:
+            self.assertEqual("alarm", alarm["state"])
+
+    def test_limit_should_be_positive(self):
+        data = self.post_json(self.alarm_url,
                               params={"limit": 0},
                               expect_errors=True)
 

@@ -3,11 +3,14 @@
 # Copyright © 2012 New Dream Network, LLC (DreamHost)
 # Copyright 2013 IBM Corp.
 # Copyright © 2013 eNovance <licensing@enovance.com>
+# Copyright Ericsson AB 2013. All rights reserved
 #
 # Authors: Doug Hellmann <doug.hellmann@dreamhost.com>
 #          Angus Salkeld <asalkeld@redhat.com>
 #          Eoghan Glynn <eglynn@redhat.com>
 #          Julien Danjou <julien@danjou.info>
+#          Ildiko Vancsa <ildiko.vancsa@ericsson.com>
+#          Balazs Gibizer <balazs.gibizer@ericsson.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -1058,7 +1061,7 @@ class ValidatedComplexQuery(object):
             "minProperties": 1,
             "maxProperties": 1}}
 
-    timestamp_fields = ["timestamp"]
+    timestamp_fields = ["timestamp", "state_timestamp"]
 
     def __init__(self, query):
         self.original_query = query
@@ -2049,8 +2052,28 @@ class QuerySamplesController(rest.RestController):
                                             query.limit)]
 
 
+class QueryAlarmsController(rest.RestController):
+    """Provides complex query possibilities for alarms
+    """
+    @wsme_pecan.wsexpose([Alarm], body=ComplexQuery)
+    def post(self, body):
+        """Define query for retrieving Alarm data.
+
+        :param body: Query rules for the alarms to be returned.
+        """
+        query = ValidatedComplexQuery(body)
+        query.validate(visibility_field="project_id")
+        conn = pecan.request.storage_conn
+        return [Alarm.from_db_model(s)
+                for s in conn.query_alarms(query.filter_expr,
+                                           query.orderby,
+                                           query.limit)]
+
+
 class QueryController(rest.RestController):
+
     samples = QuerySamplesController()
+    alarms = QueryAlarmsController()
 
 
 class V2Controller(object):

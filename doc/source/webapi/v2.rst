@@ -94,8 +94,9 @@ field of *Sample*).
 Complex Query
 +++++++++++++
 The filter expressions of the Complex Query feature operate on the fields
-of *Sample*. The following comparison operators are supported: *=*, *!=*, *<*,
-*<=*, *>* and *>=*; and the following logical operators can be used: *and* and *or*.
+of *Sample* and *Alarm*. The following comparison operators are supported: *=*,
+*!=*, *<*, *<=*, *>* and *>=*; and the following logical operators can be
+used: *and* and *or*.
 
 Complex Query supports defining the list of orderby expressions in the form
 of [{"field_name": "asc"}, {"field_name2": "desc"}, ...].
@@ -106,6 +107,9 @@ The *filter*, *orderby* and *limit* are all optional fields in a query.
 
 .. rest-controller:: ceilometer.api.controllers.v2:QuerySamplesController
    :webprefix: /v2/query/samples
+
+.. rest-controller:: ceilometer.api.controllers.v2:QueryAlarmsController
+   :webprefix: /v2/query/alarms
 
 .. autotype:: ceilometer.api.controllers.v2.ComplexQuery
    :members:
