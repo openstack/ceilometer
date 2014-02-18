@@ -102,7 +102,7 @@ class Client(object):
         image_metadata = getattr(image, 'metadata', None)
 
         for attr in ['kernel_id', 'ramdisk_id']:
-            ameta = image_metadata.get(attr, None) if image_metadata else None
+            ameta = image_metadata.get(attr) if image_metadata else None
             setattr(instance, attr, ameta)
 
     @logged

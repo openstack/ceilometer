@@ -2441,7 +2441,7 @@ class GetEventTest(EventTestBase):
                 self.fail("Unexpected event ID returned:" % event.message_id)
 
             for trait in event.traits:
-                expected_val = trait_values.get(trait.name, None)
+                expected_val = trait_values.get(trait.name)
                 if not expected_val:
                     self.fail("Unexpected trait type: %s" % trait.dtype)
                 self.assertEqual(expected_val, trait.value)
