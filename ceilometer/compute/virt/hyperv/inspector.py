@@ -21,6 +21,7 @@ from oslo.config import cfg
 from ceilometer.compute.virt.hyperv import utilsv2
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.openstack.common import log
+from ceilometer.openstack.common import units
 
 CONF = cfg.CONF
 LOG = log.getLogger(__name__)
@@ -46,8 +47,7 @@ class HyperVInspector(virt_inspector.Inspector):
         cpu_percent_used = (cpu_clock_used /
                             float(host_cpu_clock * cpu_count))
         # Nanoseconds
-        cpu_time = (long(uptime * cpu_percent_used) *
-                    1000)
+        cpu_time = (long(uptime * cpu_percent_used) * units.k)
 
         return virt_inspector.CPUStats(number=cpu_count, time=cpu_time)
 
@@ -77,9 +77,9 @@ class HyperVInspector(virt_inspector.Inspector):
             stats = virt_inspector.DiskStats(
                 read_requests=0,
                 # Return bytes
-                read_bytes=disk_metrics['read_mb'] * 1024,
+                read_bytes=disk_metrics['read_mb'] * units.Ki,
                 write_requests=0,
-                write_bytes=disk_metrics['write_mb'] * 1024,
+                write_bytes=disk_metrics['write_mb'] * units.Ki,
                 errors=0)
 
             yield (disk, stats)

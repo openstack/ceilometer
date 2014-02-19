@@ -23,6 +23,7 @@ import datetime
 import decimal
 
 from ceilometer.openstack.common import timeutils
+from ceilometer.openstack.common import units
 
 
 def recursive_keypairs(d, separator=':'):
@@ -73,7 +74,7 @@ def decimal_to_dt(dec):
         return None
 
     integer = int(dec)
-    micro = (dec - decimal.Decimal(integer)) * decimal.Decimal(1000000)
+    micro = (dec - decimal.Decimal(integer)) * decimal.Decimal(units.M)
     daittyme = datetime.datetime.utcfromtimestamp(integer)
     return daittyme.replace(microsecond=int(round(micro)))
 
