@@ -982,3 +982,27 @@
 #key_file=<None>
 
 
+[vmware]
+
+#
+# Options defined in ceilometer.compute.virt.vmware.inspector
+#
+
+# IP address of the VMware Vsphere host (string value)
+#host_ip=
+
+# Username of VMware Vsphere (string value)
+#host_username=
+
+# Password of VMware Vsphere (string value)
+#host_password=
+
+# Number of times a VMware Vsphere API must be retried
+# (integer value)
+#api_retry_count=10
+
+# Sleep time in seconds for polling an ongoing async task
+# (floating point value)
+#task_poll_interval=0.5
+
+

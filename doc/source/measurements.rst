@@ -70,7 +70,8 @@ Name                           Type        Unit       Resource  Origin        No
 =============================  ==========  =========  ========  ============  ==================================================================
 instance                       Gauge       instance   inst ID   both          Existence of instance
 instance:<type>                Gauge       instance   inst ID   both          Existence of instance <type> (openstack types)
-memory                         Gauge       MB         inst ID   notification  Volume of RAM in MB
+memory                         Gauge       MB         inst ID   notification  Volume of RAM allocated in MB
+memory.usage                   Gauge       MB         inst ID   pollster      Volume of RAM used in MB
 cpu                            Cumulative  ns         inst ID   pollster      CPU time used
 cpu_util                       Gauge       %          inst ID   pollster      Average CPU utilisation
 vcpus                          Gauge       vcpu       inst ID   notification  Number of VCPUs

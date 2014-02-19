@@ -53,6 +53,12 @@ Instance = collections.namedtuple('Instance', ['name', 'UUID'])
 #
 CPUStats = collections.namedtuple('CPUStats', ['number', 'time'])
 
+# Named tuple representing Memory usage statistics.
+#
+# usage: Amount of memory used
+#
+MemoryUsageStats = collections.namedtuple('MemoryUsageStats', ['usage'])
+
 
 # Named tuple representing vNICs.
 #
@@ -140,6 +146,14 @@ class Inspector(object):
         :param instance_name: the name of the target instance
         :return: for each disk, the number of bytes & operations
                  read and written, and the error count
+        """
+        raise NotImplementedError()
+
+    def inspect_memory_usage(self, instance):
+        """Inspect the memory usage statistics for an instance.
+
+        :param instance: the target instance
+        :return: the amount of memory used
         """
         raise NotImplementedError()
 
