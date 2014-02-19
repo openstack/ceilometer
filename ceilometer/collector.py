@@ -26,6 +26,7 @@ from ceilometer.openstack.common import log
 from ceilometer.openstack.common.rpc import dispatcher as rpc_dispatcher
 from ceilometer.openstack.common.rpc import service as rpc_service
 from ceilometer.openstack.common import service as os_service
+from ceilometer.openstack.common import units
 from ceilometer import service
 
 OPTS = [
@@ -70,7 +71,7 @@ class CollectorService(service.DispatchedService, rpc_service.Service):
         while self.udp_run:
             # NOTE(jd) Arbitrary limit of 64K because that ought to be
             # enough for anybody.
-            data, source = udp.recvfrom(64 * 1024)
+            data, source = udp.recvfrom(64 * units.Ki)
             try:
                 sample = msgpack.loads(data)
             except Exception:
