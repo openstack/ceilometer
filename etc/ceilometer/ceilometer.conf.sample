@@ -487,6 +487,14 @@
 
 
 #
+# Options defined in ceilometer.orchestration.notifications
+#
+
+# Exchange name for Heat notifications (string value)
+#heat_control_exchange=heat
+
+
+#
 # Options defined in ceilometer.storage
 #
 

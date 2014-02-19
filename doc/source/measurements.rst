@@ -170,6 +170,21 @@ Swift as described in :ref:`installing_manually`. Note that they may not be
 updated right after an upload/download, since Swift takes some time to update
 the container properties.
 
+Orchestration (Heat)
+====================
+
+===============================  ==========  ==========  ===========  ============  ==========================================
+Name                             Type        Unit        Resource     Origin        Note
+===============================  ==========  ==========  ===========  ============  ==========================================
+stack.create                     Delta       stack       stack ID     notification  Creation requests for a stack successful
+stack.update                     Delta       stack       stack ID     notification  Updating requests for a stack successful
+stack.delete                     Delta       stack       stack ID     notification  Deletion requests for a stack successful
+stack.resume                     Delta       stack       stack ID     notification  Resuming requests for a stack successful
+stack.suspend                    Delta       stack       stack ID     notification  Suspending requests for a stack successful
+===============================  ==========  ==========  ===========  ============  ==========================================
+
+To enable Heat notifications configure Heat as described in :ref:`installing_manually`.
+
 Energy (Kwapi)
 ==============
 
