@@ -32,7 +32,7 @@ Installing the notification agent
 
 2. If you want to be able to retrieve volume samples, you need to instruct
    Cinder to send notifications to the bus by changing ``notification_driver``
-   to ``cinder.openstack.common.notifier.rabbit_notifier`` and
+   to ``cinder.openstack.common.notifier.rpc_notifier`` and
    ``control_exchange`` to ``cinder``, before restarting the service.
 
 3. In order to retrieve object store statistics, ceilometer needs
