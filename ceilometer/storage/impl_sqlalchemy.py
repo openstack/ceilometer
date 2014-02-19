@@ -602,7 +602,8 @@ class Connection(base.Connection):
                                     table)
 
         retrieve = {models.Meter: self._retrieve_samples,
-                    models.Alarm: self._retrieve_alarms}
+                    models.Alarm: self._retrieve_alarms,
+                    models.AlarmChange: self._retrieve_alarm_history}
         return retrieve[table](query)
 
     def query_samples(self, filter_expr=None, orderby=None, limit=None):
@@ -840,6 +841,17 @@ class Connection(base.Connection):
         """
         return self._retrieve_data(filter_expr, orderby, limit, models.Alarm)
 
+    def _retrieve_alarm_history(self, query):
+        return (self._row_to_alarm_change_model(x) for x in query.all())
+
+    def query_alarm_history(self, filter_expr=None, orderby=None, limit=None):
+        """Return an iterable of model.AlarmChange objects.
+        """
+        return self._retrieve_data(filter_expr,
+                                   orderby,
+                                   limit,
+                                   models.AlarmChange)
+
     def get_alarm_changes(self, alarm_id, on_behalf_of,
                           user=None, project=None, type=None,
                           start_timestamp=None, start_timestamp_op=None,
@@ -896,7 +908,7 @@ class Connection(base.Connection):
                     models.AlarmChange.timestamp < end_timestamp)
 
         query = query.order_by(desc(models.AlarmChange.timestamp))
-        return (self._row_to_alarm_change_model(x) for x in query.all())
+        return self._retrieve_alarm_history(query)
 
     def record_alarm_change(self, alarm_change):
         """Record alarm change event.

@@ -2052,9 +2052,29 @@ class QuerySamplesController(rest.RestController):
                                             query.limit)]
 
 
+class QueryAlarmHistoryController(rest.RestController):
+    """Provides complex query possibilites for alarm history
+    """
+    @wsme_pecan.wsexpose([AlarmChange], body=ComplexQuery)
+    def post(self, body):
+        """Define query for retrieving AlarmChange data.
+
+        :param body: Query rules for the alarm history to be returned.
+        """
+        query = ValidatedComplexQuery(body)
+        query.validate(visibility_field="on_behalf_of")
+        conn = pecan.request.storage_conn
+        return [AlarmChange.from_db_model(s)
+                for s in conn.query_alarm_history(query.filter_expr,
+                                                  query.orderby,
+                                                  query.limit)]
+
+
 class QueryAlarmsController(rest.RestController):
     """Provides complex query possibilities for alarms
     """
+    history = QueryAlarmHistoryController()
+
     @wsme_pecan.wsexpose([Alarm], body=ComplexQuery)
     def post(self, body):
         """Define query for retrieving Alarm data.

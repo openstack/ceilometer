@@ -2331,6 +2331,131 @@ class ComplexAlarmQueryTest(AlarmTestBase,
             self.assertTrue(a.enabled)
 
 
+class ComplexAlarmHistoryQueryTest(AlarmTestBase,
+                                   tests_db.MixinTestsWithBackendScenarios):
+    def setUp(self):
+        super(DBTestBase, self).setUp()
+        self.filter_expr = {"and":
+                            [{"or":
+                              [{"=": {"type": "rule change"}},
+                               {"=": {"type": "state transition"}}]},
+                             {"=": {"alarm_id": "0r4ng3"}}]}
+        self.add_some_alarms()
+        self.prepare_alarm_history()
+
+    def prepare_alarm_history(self):
+        alarms = list(self.conn.get_alarms())
+        for alarm in alarms:
+            i = alarms.index(alarm)
+            alarm_change = dict(event_id=
+                                "16fd2706-8baf-433b-82eb-8c7fada847c%s" % i,
+                                alarm_id=alarm.alarm_id,
+                                type=models.AlarmChange.CREATION,
+                                detail="detail %s" % alarm.name,
+                                user_id=alarm.user_id,
+                                project_id=alarm.project_id,
+                                on_behalf_of=alarm.project_id,
+                                timestamp=datetime.datetime(2012, 9, 24,
+                                                            7 + i,
+                                                            30 + i))
+            self.conn.record_alarm_change(alarm_change=alarm_change)
+
+            alarm_change2 = dict(event_id=
+                                 "16fd2706-8baf-433b-82eb-8c7fada847d%s" % i,
+                                 alarm_id=alarm.alarm_id,
+                                 type=models.AlarmChange.RULE_CHANGE,
+                                 detail="detail %s" % i,
+                                 user_id=alarm.user_id,
+                                 project_id=alarm.project_id,
+                                 on_behalf_of=alarm.project_id,
+                                 timestamp=datetime.datetime(2012, 9, 25,
+                                                             10 + i,
+                                                             30 + i))
+            self.conn.record_alarm_change(alarm_change=alarm_change2)
+
+            alarm_change3 = dict(event_id=
+                                 "16fd2706-8baf-433b-82eb-8c7fada847e%s"
+                                 % i,
+                                 alarm_id=alarm.alarm_id,
+                                 type=models.AlarmChange.STATE_TRANSITION,
+                                 detail="detail %s" % (i + 1),
+                                 user_id=alarm.user_id,
+                                 project_id=alarm.project_id,
+                                 on_behalf_of=alarm.project_id,
+                                 timestamp=datetime.datetime(2012, 9, 26,
+                                                             10 + i,
+                                                             30 + i))
+
+            if alarm.name == "red-alert":
+                alarm_change3['on_behalf_of'] = 'and-da-girls'
+
+            self.conn.record_alarm_change(alarm_change=alarm_change3)
+
+            if alarm.name in ["red-alert", "yellow-alert"]:
+                alarm_change4 = dict(event_id=
+                                     "16fd2706-8baf-433b-82eb-8c7fada847f%s"
+                                     % i,
+                                     alarm_id=alarm.alarm_id,
+                                     type=models.AlarmChange.DELETION,
+                                     detail="detail %s" % (i + 2),
+                                     user_id=alarm.user_id,
+                                     project_id=alarm.project_id,
+                                     on_behalf_of=alarm.project_id,
+                                     timestamp=datetime.datetime(2012, 9, 27,
+                                                                 10 + i,
+                                                                 30 + i))
+                self.conn.record_alarm_change(alarm_change=alarm_change4)
+
+    def test_alarm_history_with_no_filter(self):
+        history = list(self.conn.query_alarm_history())
+        self.assertEqual(11, len(history))
+
+    def test_alarm_history_with_no_filter_and_limit(self):
+        history = list(self.conn.query_alarm_history(limit=3))
+        self.assertEqual(3, len(history))
+
+    def test_alarm_history_with_filter(self):
+        history = list(
+            self.conn.query_alarm_history(filter_expr=self.filter_expr))
+        self.assertEqual(2, len(history))
+
+    def test_alarm_history_with_filter_and_orderby(self):
+        history = list(
+            self.conn.query_alarm_history(filter_expr=self.filter_expr,
+                                          orderby=[{"timestamp":
+                                                   "asc"}]))
+        self.assertEqual([models.AlarmChange.RULE_CHANGE,
+                          models.AlarmChange.STATE_TRANSITION],
+                         [h.type for h in history])
+
+    def test_alarm_history_with_filter_and_orderby_and_limit(self):
+        history = list(
+            self.conn.query_alarm_history(filter_expr=self.filter_expr,
+                                          orderby=[{"timestamp":
+                                                    "asc"}],
+                                          limit=1))
+        self.assertEqual(models.AlarmChange.RULE_CHANGE, history[0].type)
+
+    def test_alarm_history_with_on_behalf_of_filter(self):
+        filter_expr = {"=": {"on_behalf_of": "and-da-girls"}}
+        history = list(self.conn.query_alarm_history(filter_expr=filter_expr))
+        self.assertEqual(1, len(history))
+        self.assertEqual("16fd2706-8baf-433b-82eb-8c7fada847e0",
+                         history[0].event_id)
+
+    def test_alarm_history_with_alarm_id_as_filter(self):
+        filter_expr = {"=": {"alarm_id": "r3d"}}
+        history = list(self.conn.query_alarm_history(filter_expr=filter_expr,
+                                                     orderby=[{"timestamp":
+                                                               "asc"}]))
+        self.assertEqual(4, len(history))
+        self.assertEqual([models.AlarmChange.CREATION,
+                          models.AlarmChange.RULE_CHANGE,
+                          models.AlarmChange.STATE_TRANSITION,
+                          models.AlarmChange.DELETION],
+                         [h.type for h in history])
+
+
 class EventTestBase(tests_db.TestBase,
                     tests_db.MixinTestsWithBackendScenarios):
     """Separate test base class because we don't want to
