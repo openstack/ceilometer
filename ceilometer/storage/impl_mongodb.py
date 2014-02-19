@@ -547,6 +547,14 @@ class Connection(base.Connection):
             sort_criteria_list = []
 
             for i in range(len(sort_keys)):
+                #NOTE(fengqian): Generate the query criteria recursively.
+                #sort_keys=[k1, k2, k3], maker_value=[v1, v2, v3]
+                #sort_flags = ['$lt', '$gt', 'lt'].
+                #The query criteria should be
+                #{'k3': {'$lt': 'v3'}, 'k2': {'eq': 'v2'}, 'k1': {'eq': 'v1'}},
+                #{'k2': {'$gt': 'v2'}, 'k1': {'eq': 'v1'}},
+                #{'k1': {'$lt': 'v1'}} with 'OR' operation.
+                #Each recurse will generate one items of three.
                 sort_criteria_list.append(cls._recurse_sort_keys(
                                           sort_keys[:(len(sort_keys) - i)],
                                           marker, _op))
