@@ -17,6 +17,7 @@
 # under the License.
 """Model classes for use in the storage API.
 """
+import inspect
 
 from ceilometer.openstack.common import timeutils
 
@@ -43,6 +44,11 @@ class Model(object):
 
     def __eq__(self, other):
         return self.as_dict() == other.as_dict()
+
+    @classmethod
+    def get_field_names(cls):
+        fields = inspect.getargspec(cls.__init__)[0]
+        return set(fields) - set(["self"])
 
 
 class Event(Model):

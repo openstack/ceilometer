@@ -25,11 +25,15 @@ import wsme
 
 from ceilometer.api.controllers import v2 as api
 from ceilometer.openstack.common import test
+from ceilometer import storage as storage
 
 
 class FakeComplexQuery(api.ValidatedComplexQuery):
-    def __init__(self):
-        super(FakeComplexQuery, self).__init__(query=None)
+    def __init__(self, db_model, additional_valid_keys):
+        super(FakeComplexQuery, self).__init__(query=None,
+                                               db_model=db_model,
+                                               additional_valid_keys=
+                                               additional_valid_keys)
 
 
 class TestComplexQuery(test.BaseTestCase):
@@ -37,7 +41,13 @@ class TestComplexQuery(test.BaseTestCase):
         super(TestComplexQuery, self).setUp()
         self.useFixture(fixtures.MonkeyPatch(
             'pecan.response', mock.MagicMock()))
-        self.query = api.ValidatedComplexQuery(FakeComplexQuery())
+        self.query = FakeComplexQuery(storage.models.Sample,
+                                      ["user", "project", "resource"])
+        self.query_alarm = FakeComplexQuery(storage.models.Alarm,
+                                            ["user", "project"])
+        self.query_alarmchange = FakeComplexQuery(
+            storage.models.AlarmChange,
+            ["user", "project"])
 
     def test_replace_isotime_utc(self):
         filter_expr = {"=": {"timestamp": "2013-12-05T19:38:29Z"}}
@@ -92,37 +102,118 @@ class TestComplexQuery(test.BaseTestCase):
         self.assertEqual("or", filter_expr.keys()[0])
         self.assertEqual("and", filter_expr["or"][1].keys()[0])
 
+    def test_invalid_filter_misstyped_field_name_samples(self):
+        filter = {"=": {"project_id11": 42}}
+        self.assertRaises(jsonschema.ValidationError,
+                          self.query._validate_filter,
+                          filter)
+
+    def test_invalid_filter_misstyped_field_name_alarms(self):
+        filter = {"=": {"enabbled": True}}
+        self.assertRaises(jsonschema.ValidationError,
+                          self.query_alarm._validate_filter,
+                          filter)
+
+    def test_invalid_filter_misstyped_field_name_alarmchange(self):
+        filter = {"=": {"tpe": "rule change"}}
+        self.assertRaises(jsonschema.ValidationError,
+                          self.query_alarmchange._validate_filter,
+                          filter)
+
+    def test_invalid_complex_filter_wrong_field_names(self):
+        filter = {"and":
+                  [{"=": {"non_existing_field": 42}},
+                   {"=": {"project_id": 42}}]}
+        self.assertRaises(jsonschema.ValidationError,
+                          self.query._validate_filter,
+                          filter)
+
+        filter = {"and":
+                  [{"=": {"project_id": 42}},
+                   {"=": {"non_existing_field": 42}}]}
+        self.assertRaises(jsonschema.ValidationError,
+                          self.query_alarm._validate_filter,
+                          filter)
+
+        filter = {"and":
+                  [{"=": {"project_id11": 42}},
+                   {"=": {"project_id": 42}}]}
+        self.assertRaises(jsonschema.ValidationError,
+                          self.query_alarmchange._validate_filter,
+                          filter)
+
+        filter = {"or":
+                  [{"=": {"non_existing_field": 42}},
+                   {"and":
+                    [{"=": {"project_id": 44}},
+                     {"=": {"project_id": 42}}]}]}
+        self.assertRaises(jsonschema.ValidationError,
+                          self.query._validate_filter,
+                          filter)
+
+        filter = {"or":
+                  [{"=": {"project_id": 43}},
+                   {"and":
+                    [{"=": {"project_id": 44}},
+                     {"=": {"non_existing_field": 42}}]}]}
+        self.assertRaises(jsonschema.ValidationError,
+                          self.query_alarm._validate_filter,
+                          filter)
+
     def test_convert_orderby(self):
         orderby = []
         self.query._convert_orderby_to_lower_case(orderby)
         self.assertEqual([], orderby)
 
-        orderby = [{"field1": "DESC"}]
+        orderby = [{"project_id": "DESC"}]
         self.query._convert_orderby_to_lower_case(orderby)
-        self.assertEqual([{"field1": "desc"}], orderby)
+        self.assertEqual([{"project_id": "desc"}], orderby)
 
-        orderby = [{"field1": "ASC"}, {"field2": "DESC"}]
+        orderby = [{"project_id": "ASC"}, {"resource_id": "DESC"}]
         self.query._convert_orderby_to_lower_case(orderby)
-        self.assertEqual([{"field1": "asc"}, {"field2": "desc"}], orderby)
+        self.assertEqual([{"project_id": "asc"}, {"resource_id": "desc"}],
+                         orderby)
 
     def test_validate_orderby_empty_direction(self):
-        orderby = [{"field1": ""}]
+        orderby = [{"project_id": ""}]
         self.assertRaises(jsonschema.ValidationError,
                           self.query._validate_orderby,
                           orderby)
-        orderby = [{"field1": "asc"}, {"field2": ""}]
+        orderby = [{"project_id": "asc"}, {"resource_id": ""}]
         self.assertRaises(jsonschema.ValidationError,
                           self.query._validate_orderby,
                           orderby)
 
     def test_validate_orderby_wrong_order_string(self):
-        orderby = [{"field1": "not a valid order"}]
+        orderby = [{"project_id": "not a valid order"}]
         self.assertRaises(jsonschema.ValidationError,
                           self.query._validate_orderby,
                           orderby)
 
     def test_validate_orderby_wrong_multiple_item_order_string(self):
-        orderby = [{"field2": "not a valid order"}, {"field1": "ASC"}]
+        orderby = [{"project_id": "not a valid order"}, {"resource_id": "ASC"}]
+        self.assertRaises(jsonschema.ValidationError,
+                          self.query._validate_orderby,
+                          orderby)
+
+    def test_validate_orderby_empty_field_name(self):
+        orderby = [{"": "ASC"}]
+        self.assertRaises(jsonschema.ValidationError,
+                          self.query._validate_orderby,
+                          orderby)
+        orderby = [{"project_id": "asc"}, {"": "desc"}]
+        self.assertRaises(jsonschema.ValidationError,
+                          self.query._validate_orderby,
+                          orderby)
+
+    def test_validate_orderby_wrong_field_name(self):
+        orderby = [{"project_id11": "ASC"}]
+        self.assertRaises(jsonschema.ValidationError,
+                          self.query._validate_orderby,
+                          orderby)
+
+    def test_validate_orderby_wrong_field_name_multiple_item_orderby(self):
+        orderby = [{"project_id": "asc"}, {"resource_id11": "ASC"}]
         self.assertRaises(jsonschema.ValidationError,
                           self.query._validate_orderby,
                           orderby)
@@ -131,28 +222,29 @@ class TestComplexQuery(test.BaseTestCase):
 class TestFilterSyntaxValidation(test.BaseTestCase):
     def setUp(self):
         super(TestFilterSyntaxValidation, self).setUp()
-        self.query = api.ValidatedComplexQuery(FakeComplexQuery())
+        self.query = FakeComplexQuery(storage.models.Sample,
+                                      ["user", "project", "resource"])
 
     def test_simple_operator(self):
-        filter = {"=": {"field_name": "string_value"}}
+        filter = {"=": {"project_id": "string_value"}}
         self.query._validate_filter(filter)
 
-        filter = {"=>": {"field_name": "string_value"}}
+        filter = {"=>": {"project_id": "string_value"}}
         self.query._validate_filter(filter)
 
     def test_invalid_simple_operator(self):
-        filter = {"==": {"field_name": "string_value"}}
+        filter = {"==": {"project_id": "string_value"}}
         self.assertRaises(jsonschema.ValidationError,
                           self.query._validate_filter,
                           filter)
 
-        filter = {"": {"field_name": "string_value"}}
+        filter = {"": {"project_id": "string_value"}}
         self.assertRaises(jsonschema.ValidationError,
                           self.query._validate_filter,
                           filter)
 
     def test_more_than_one_operator_is_invalid(self):
-        filter = {"=": {"field_name": "string_value"},
+        filter = {"=": {"project_id": "string_value"},
                   "<": {"": ""}}
         self.assertRaises(jsonschema.ValidationError,
                           self.query._validate_filter,
@@ -181,7 +273,7 @@ class TestFilterSyntaxValidation(test.BaseTestCase):
                           filter)
 
     def test_more_than_one_field_is_invalid(self):
-        filter = {"=": {"field": "value", "field2": "value"}}
+        filter = {"=": {"project_id": "value", "resource_id": "value"}}
         self.assertRaises(jsonschema.ValidationError,
                           self.query._validate_filter,
                           filter)
@@ -193,30 +285,30 @@ class TestFilterSyntaxValidation(test.BaseTestCase):
                           filter)
 
     def test_and_or(self):
-        filter = {"and": [{"=": {"field_name": "string_value"}},
-                          {"=": {"field2": "value"}}]}
+        filter = {"and": [{"=": {"project_id": "string_value"}},
+                          {"=": {"resource_id": "value"}}]}
         self.query._validate_filter(filter)
 
-        filter = {"or": [{"and": [{"=": {"field_name": "string_value"}},
-                                  {"=": {"field2": "value"}}]},
-                         {"=": {"field3": "value"}}]}
+        filter = {"or": [{"and": [{"=": {"project_id": "string_value"}},
+                                  {"=": {"resource_id": "value"}}]},
+                         {"=": {"counter_name": "value"}}]}
         self.query._validate_filter(filter)
 
-        filter = {"or": [{"and": [{"=": {"field_name": "string_value"}},
-                                  {"=": {"field2": "value"}},
-                                  {"<": {"field3": 42}}]},
-                         {"=": {"field3": "value"}}]}
+        filter = {"or": [{"and": [{"=": {"project_id": "string_value"}},
+                                  {"=": {"resource_id": "value"}},
+                                  {"<": {"counter_name": 42}}]},
+                         {"=": {"counter_name": "value"}}]}
         self.query._validate_filter(filter)
 
     def test_invalid_complex_operator(self):
-        filter = {"xor": [{"=": {"field_name": "string_value"}},
-                          {"=": {"field2": "value"}}]}
+        filter = {"xor": [{"=": {"project_id": "string_value"}},
+                          {"=": {"resource_id": "value"}}]}
         self.assertRaises(jsonschema.ValidationError,
                           self.query._validate_filter,
                           filter)
 
     def test_and_or_with_one_child_is_invalid(self):
-        filter = {"or": [{"=": {"field_name": "string_value"}}]}
+        filter = {"or": [{"=": {"project_id": "string_value"}}]}
         self.assertRaises(jsonschema.ValidationError,
                           self.query._validate_filter,
                           filter)
@@ -228,10 +320,10 @@ class TestFilterSyntaxValidation(test.BaseTestCase):
                           filter)
 
     def test_more_than_one_complex_operator_is_invalid(self):
-        filter = {"and": [{"=": {"field_name": "string_value"}},
-                          {"=": {"field2": "value"}}],
-                  "or": [{"=": {"field_name": "string_value"}},
-                         {"=": {"field2": "value"}}]}
+        filter = {"and": [{"=": {"project_id": "string_value"}},
+                          {"=": {"resource_id": "value"}}],
+                  "or": [{"=": {"project_id": "string_value"}},
+                         {"=": {"resource_id": "value"}}]}
         self.assertRaises(jsonschema.ValidationError,
                           self.query._validate_filter,
                           filter)

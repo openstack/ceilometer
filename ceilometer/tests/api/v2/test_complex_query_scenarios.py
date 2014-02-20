@@ -54,7 +54,7 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                           'cumulative',
                           '',
                           1,
-                          'user-id',
+                          'user-id1',
                           'project-id1',
                           'resource-id1',
                           timestamp=datetime.datetime(2012, 7, 2, 10, 40),
@@ -68,7 +68,7 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                           'cumulative',
                           '',
                           1,
-                          'user-id',
+                          'user-id2',
                           'project-id2',
                           'resource-id2',
                           timestamp=datetime.datetime(2012, 7, 2, 10, 41),
@@ -171,6 +171,33 @@ class TestQueryMetersController(tests_api.FunctionalTest,
         self.assertEqual(["project-id2", "project-id1"],
                          [s["project_id"] for s in data.json])
 
+    def test_query_with_field_name_project(self):
+        data = self.post_json(self.url,
+                              params={"filter":
+                                      '{"=": {"project": "project-id2"}}'})
+
+        self.assertEqual(1, len(data.json))
+        for sample in data.json:
+            self.assertIn(sample['project_id'], set(["project-id2"]))
+
+    def test_query_with_field_name_resource(self):
+        data = self.post_json(self.url,
+                              params={"filter":
+                                      '{"=": {"resource": "resource-id2"}}'})
+
+        self.assertEqual(1, len(data.json))
+        for sample in data.json:
+            self.assertIn(sample['resource_id'], set(["resource-id2"]))
+
+    def test_query_with_field_name_user(self):
+        data = self.post_json(self.url,
+                              params={"filter":
+                                      '{"=": {"user": "user-id2"}}'})
+
+        self.assertEqual(1, len(data.json))
+        for sample in data.json:
+            self.assertIn(sample['user_id'], set(["user-id2"]))
+
     def test_query_with_lower_and_upper_case_orderby(self):
         data = self.post_json(self.url,
                               params={"orderby": '[{"project_id": "DeSc"}]'})
@@ -178,6 +205,14 @@ class TestQueryMetersController(tests_api.FunctionalTest,
         self.assertEqual(2, len(data.json))
         self.assertEqual(["project-id2", "project-id1"],
                          [s["project_id"] for s in data.json])
+
+    def test_query_with_user_field_name_orderby(self):
+        data = self.post_json(self.url,
+                              params={"orderby": '[{"user": "aSc"}]'})
+
+        self.assertEqual(2, len(data.json))
+        self.assertEqual(["user-id1", "user-id2"],
+                         [s["user_id"] for s in data.json])
 
     def test_query_with_missing_order_in_orderby(self):
         data = self.post_json(self.url,
@@ -318,6 +353,24 @@ class TestQueryAlarmsController(tests_api.FunctionalTest,
         for alarm in data.json:
             self.assertIn(alarm['project_id'], set(["project-id2"]))
 
+    def test_query_with_field_project(self):
+        data = self.post_json(self.alarm_url,
+                              params={"filter":
+                                      '{"=": {"project": "project-id2"}}'})
+
+        self.assertEqual(6, len(data.json))
+        for sample in data.json:
+            self.assertIn(sample['project_id'], set(["project-id2"]))
+
+    def test_query_with_field_user_in_orderby(self):
+        data = self.post_json(self.alarm_url,
+                              params={"filter": '{"=": {"state": "alarm"}}',
+                                      "orderby": '[{"user": "DESC"}]'})
+
+        self.assertEqual(4, len(data.json))
+        self.assertEqual(["user-id2", "user-id2", "user-id1", "user-id1"],
+                         [s["user_id"] for s in data.json])
+
     def test_query_with_filter_orderby_and_limit(self):
         orderby = '[{"state_timestamp": "DESC"}]'
         data = self.post_json(self.alarm_url,
@@ -424,6 +477,21 @@ class TestQueryAlarmsHistoryController(
             self.assertIn(history['on_behalf_of'],
                           (["project-id1", "project-id2"]))
 
+    def test_query_with_filter_for_project_orderby_with_user(self):
+        data = self.post_json(self.url,
+                              params={"filter":
+                                      '{"=": {"project": "project-id1"}}',
+                                      "orderby": '[{"user": "DESC"}]',
+                                      "limit": 3})
+
+        self.assertEqual(3, len(data.json))
+        self.assertEqual(["user-id1",
+                          "user-id1",
+                          "user-id1"],
+                         [h["user_id"] for h in data.json])
+        for history in data.json:
+            self.assertEqual("project-id1", history['project_id'])
+
     def test_query_with_filter_orderby_and_limit(self):
         data = self.post_json(self.url,
                               params={"filter": '{"=": {"type": "creation"}}',
@@ -436,7 +504,7 @@ class TestQueryAlarmsHistoryController(
                           "2013-01-01T00:00:00"],
                          [h["timestamp"] for h in data.json])
         for history in data.json:
-            self.assertEqual("creation", history["type"])
+            self.assertEqual("creation", history['type'])
 
     def test_limit_should_be_positive(self):
         data = self.post_json(self.url,
