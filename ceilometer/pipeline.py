@@ -75,7 +75,7 @@ class Pipeline(object):
     """Sample handling pipeline
 
     Pipeline describes a chain of handlers. The chain starts with
-    tranformer and ends with one or more publishers.
+    transformer and ends with one or more publishers.
 
     The first transformer in the chain gets sample from data collector, i.e.
     pollster or notification handler, takes some action like dropping,
@@ -313,13 +313,13 @@ class PipelineManager(object):
         The top of the cfg is a list of pipeline definitions.
 
         Pipeline definition is an dictionary specifying the target samples,
-        the tranformers involved, and the target publishers:
+        the transformers involved, and the target publishers:
         {
             "name": pipeline_name
             "interval": interval_time
             "meters" :  ["meter_1", "meter_2"],
             "resources": ["resource_uri1", "resource_uri2"],
-            "tranformers":[
+            "transformers":[
                               {"name": "Transformer_1",
                                "parameters": {"p1": "value"}},
 
@@ -348,9 +348,9 @@ class PipelineManager(object):
         the meters should be polled. It's optional and it's up to the
         specific pollster to decide how to use it.
 
-        Transformer's name is plugin name in setup.py.
+        Transformer's name is plugin name in setup.cfg.
 
-        Publisher's name is plugin name in setup.py
+        Publisher's name is plugin name in setup.cfg
 
         """
         self.pipelines = [Pipeline(pipedef, transformer_manager)

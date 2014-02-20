@@ -130,7 +130,9 @@ def apply_metaquery_filter(session, query, metaquery):
 def make_query_from_filter(session, query, sample_filter, require_meter=True):
     """Return a query dictionary based on the settings in the filter.
 
-    :param filter: SampleFilter instance
+    :param session: session used for original query
+    :param query: Query instance
+    :param sample_filter: SampleFilter instance
     :param require_meter: If true and the filter does not have a meter,
                           raise an error.
     """
