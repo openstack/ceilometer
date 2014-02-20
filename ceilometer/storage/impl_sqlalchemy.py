@@ -796,7 +796,7 @@ class Connection(base.Connection):
 
     @staticmethod
     def _row_to_alarm_model(row):
-        return api_models.Alarm(alarm_id=row.id,
+        return api_models.Alarm(alarm_id=row.alarm_id,
                                 enabled=row.enabled,
                                 type=row.type,
                                 name=row.name,
@@ -841,7 +841,7 @@ class Connection(base.Connection):
         if project is not None:
             query = query.filter(models.Alarm.project_id == project)
         if alarm_id is not None:
-            query = query.filter(models.Alarm.id == alarm_id)
+            query = query.filter(models.Alarm.alarm_id == alarm_id)
 
         return self._retrieve_alarms(query)
 
@@ -852,7 +852,7 @@ class Connection(base.Connection):
         """
         session = self._get_db_session()
         with session.begin():
-            alarm_row = models.Alarm(id=alarm.alarm_id)
+            alarm_row = models.Alarm(alarm_id=alarm.alarm_id)
             alarm_row.update(alarm.as_dict())
             session.add(alarm_row)
 
@@ -869,7 +869,7 @@ class Connection(base.Connection):
                                          alarm.user_id)
             Connection._create_or_update(session, models.Project,
                                          alarm.project_id)
-            alarm_row = session.merge(models.Alarm(id=alarm.alarm_id))
+            alarm_row = session.merge(models.Alarm(alarm_id=alarm.alarm_id))
             alarm_row.update(alarm.as_dict())
 
         return self._row_to_alarm_model(alarm_row)
@@ -882,7 +882,7 @@ class Connection(base.Connection):
         session = self._get_db_session()
         with session.begin():
             session.query(models.Alarm).filter(
-                models.Alarm.id == alarm_id).delete()
+                models.Alarm.alarm_id == alarm_id).delete()
 
     @staticmethod
     def _row_to_alarm_change_model(row):

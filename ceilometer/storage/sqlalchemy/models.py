@@ -290,7 +290,7 @@ class Alarm(Base):
         Index('ix_alarm_user_id', 'user_id'),
         Index('ix_alarm_project_id', 'project_id'),
     )
-    id = Column(String(255), primary_key=True)
+    alarm_id = Column(String(255), primary_key=True)
     enabled = Column(Boolean)
     name = Column(Text)
     type = Column(String(50))

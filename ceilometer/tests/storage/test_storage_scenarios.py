@@ -2550,6 +2550,16 @@ class ComplexAlarmQueryTest(AlarmTestBase,
             self.assertIn(a.name, set(["yellow-alert", "red-alert"]))
             self.assertTrue(a.enabled)
 
+    def test_filter_for_alarm_id(self):
+        self.add_some_alarms()
+        filter_expr = {"=": {"alarm_id": "0r4ng3"}}
+
+        result = list(self.conn.query_alarms(filter_expr=filter_expr))
+
+        self.assertEqual(1, len(result))
+        for a in result:
+            self.assertEqual(a.alarm_id, "0r4ng3")
+
     def test_filter_and_orderby(self):
         self.add_some_alarms()
         result = list(self.conn.query_alarms(filter_expr={"=":
