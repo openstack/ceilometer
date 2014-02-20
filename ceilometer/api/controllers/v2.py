@@ -1356,8 +1356,8 @@ class AlarmCombinationRule(_Base):
 
     @property
     def default_description(self):
-        return _('Combined state of alarms %s') % self.operator.join(
-            self.alarm_ids)
+        joiner = ' %s ' % self.operator
+        return _('Combined state of alarms %s') % joiner.join(self.alarm_ids)
 
     def as_dict(self):
         return self.as_dict_from_keys(['operator', 'alarm_ids'])
