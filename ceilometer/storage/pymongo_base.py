@@ -209,6 +209,7 @@ class Connection(base.Connection):
         stored_alarm = self.db.alarm.find({'alarm_id': alarm.alarm_id})[0]
         del stored_alarm['_id']
         self._ensure_encapsulated_rule_format(stored_alarm)
+        self._ensure_time_constraints(stored_alarm)
         return models.Alarm(**stored_alarm)
 
     create_alarm = update_alarm
@@ -317,6 +318,7 @@ class Connection(base.Connection):
             a.update(alarm)
             del a['_id']
             self._ensure_encapsulated_rule_format(a)
+            self._ensure_time_constraints(a)
             yield models.Alarm(**a)
 
     def _retrieve_alarm_changes(self, query_filter, orderby, limit):
@@ -396,6 +398,12 @@ class Connection(base.Connection):
             for elem in matching_metadata:
                 new_matching_metadata[elem['key']] = elem['value']
             return new_matching_metadata
+
+    @staticmethod
+    def _ensure_time_constraints(alarm):
+        """Ensures the alarm has a time constraints field."""
+        if 'time_constraints' not in alarm:
+            alarm['time_constraints'] = []
 
 
 class QueryTransformer(object):

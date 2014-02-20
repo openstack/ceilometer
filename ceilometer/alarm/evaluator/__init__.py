@@ -18,6 +18,9 @@
 
 
 import abc
+import croniter
+import datetime
+import pytz
 
 from ceilometerclient import client as ceiloclient
 from oslo.config import cfg
@@ -25,6 +28,7 @@ import six
 
 from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
+from ceilometer.openstack.common import timeutils
 
 LOG = log.getLogger(__name__)
 
@@ -76,6 +80,39 @@ class Evaluator(object):
             # retry will occur naturally on the next evaluation
             # cycle (unless alarm state reverts in the meantime)
             LOG.exception(_('alarm state update failed'))
+
+    @classmethod
+    def within_time_constraint(cls, alarm):
+        """Check whether the alarm is within at least one of its time
+        constraints. If there are none, then the answer is yes.
+        """
+        if not alarm.time_constraints:
+            return True
+
+        now_utc = timeutils.utcnow()
+        for tc in alarm.time_constraints:
+            tz = pytz.timezone(tc['timezone']) if tc['timezone'] else None
+            now_tz = now_utc.astimezone(tz) if tz else now_utc
+            start_cron = croniter.croniter(tc['start'], now_tz)
+            if cls._is_exact_match(start_cron, now_tz):
+                return True
+            latest_start = start_cron.get_prev(datetime.datetime)
+            duration = datetime.timedelta(seconds=tc['duration'])
+            if latest_start <= now_tz <= latest_start + duration:
+                return True
+        return False
+
+    @staticmethod
+    def _is_exact_match(cron, ts):
+        """Handle edge case where if the timestamp is the same as the
+        cron point in time to the minute, croniter returns the previous
+        start, not the current. We can check this by first going one
+        step back and then one step forward and check if we are
+        at the original point in time.
+        """
+        cron.get_prev()
+        diff = timeutils.total_seconds(ts - cron.get_next(datetime.datetime))
+        return abs(diff) < 60  # minute precision
 
     @abc.abstractmethod
     def evaluate(self, alarm):

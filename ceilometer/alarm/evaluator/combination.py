@@ -96,6 +96,11 @@ class CombinationEvaluator(evaluator.Evaluator):
             self._refresh(alarm, state, reason, reason_data)
 
     def evaluate(self, alarm):
+        if not self.within_time_constraint(alarm):
+            LOG.debug(_('Attempted to evaluate alarm %s, but it is not '
+                        'within its time constraint.') % alarm.alarm_id)
+            return
+
         states = zip(alarm.rule['alarm_ids'],
                      itertools.imap(self._get_alarm_state,
                                     alarm.rule['alarm_ids']))

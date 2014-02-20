@@ -309,6 +309,7 @@ class Alarm(Base):
     repeat_actions = Column(Boolean)
 
     rule = Column(JSONEncodedDict)
+    time_constraints = Column(JSONEncodedDict)
 
 
 class AlarmChange(Base):

@@ -256,6 +256,10 @@ class CompatibilityTest(test_storage_scenarios.DBTestBase,
         self.assertEqual(old.rule['comparison_operator'], 'lt')
         self.assertEqual(old.rule['threshold'], 36)
 
+    def test_alarm_without_time_constraints(self):
+        old = list(self.conn.get_alarms(name='other-old-alaert'))[0]
+        self.assertEqual([], old.time_constraints)
+
     def test_counter_unit(self):
         meters = list(self.conn.get_meters())
         self.assertEqual(len(meters), 1)

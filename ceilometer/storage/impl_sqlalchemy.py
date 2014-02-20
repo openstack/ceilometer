@@ -746,6 +746,7 @@ class Connection(base.Connection):
                                 insufficient_data_actions=
                                 row.insufficient_data_actions,
                                 rule=row.rule,
+                                time_constraints=row.time_constraints,
                                 repeat_actions=row.repeat_actions)
 
     def _retrieve_alarms(self, query):
