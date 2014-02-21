@@ -940,6 +940,7 @@ class Sample(_Base):
                    user_id=m.user_id,
                    project_id=m.project_id,
                    resource_id=m.resource_id,
+                   source=m.source,
                    timestamp=m.timestamp,
                    metadata=_flatten_metadata(m.resource_metadata))
 
@@ -949,6 +950,7 @@ class Sample(_Base):
                    meter='instance',
                    type='gauge',
                    unit='instance',
+                   volume=1,
                    resource_id='bd9431c1-8d69-4ad3-803a-8d4a6b89fd36',
                    project_id='35b17138-b364-4e6a-a131-8f3099c5be68',
                    user_id='efd87807-12d2-4b38-9c70-5f5c2ac427ff',
