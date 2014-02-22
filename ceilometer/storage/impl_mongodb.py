@@ -758,68 +758,6 @@ class Connection(pymongo_base.Connection):
             (g, result['groupby'][g]) for g in groupby) if groupby else None)
         return models.Statistics(**stats_args)
 
-    def get_alarm_changes(self, alarm_id, on_behalf_of,
-                          user=None, project=None, type=None,
-                          start_timestamp=None, start_timestamp_op=None,
-                          end_timestamp=None, end_timestamp_op=None):
-        """Yields list of AlarmChanges describing alarm history
-
-        Changes are always sorted in reverse order of occurrence, given
-        the importance of currency.
-
-        Segregation for non-administrative users is done on the basis
-        of the on_behalf_of parameter. This allows such users to have
-        visibility on both the changes initiated by themselves directly
-        (generally creation, rule changes, or deletion) and also on those
-        changes initiated on their behalf by the alarming service (state
-        transitions after alarm thresholds are crossed).
-
-        :param alarm_id: ID of alarm to return changes for
-        :param on_behalf_of: ID of tenant to scope changes query (None for
-                             administrative user, indicating all projects)
-        :param user: Optional ID of user to return changes for
-        :param project: Optional ID of project to return changes for
-        :project type: Optional change type
-        :param start_timestamp: Optional modified timestamp start range
-        :param start_timestamp_op: Optional timestamp start range operation
-        :param end_timestamp: Optional modified timestamp end range
-        :param end_timestamp_op: Optional timestamp end range operation
-        """
-        q = dict(alarm_id=alarm_id)
-        if on_behalf_of is not None:
-            q['on_behalf_of'] = on_behalf_of
-        if user is not None:
-            q['user_id'] = user
-        if project is not None:
-            q['project_id'] = project
-        if type is not None:
-            q['type'] = type
-        if start_timestamp or end_timestamp:
-            ts_range = pymongo_base.make_timestamp_range(start_timestamp,
-                                                         end_timestamp,
-                                                         start_timestamp_op,
-                                                         end_timestamp_op)
-            if ts_range:
-                q['timestamp'] = ts_range
-
-        return self._retrieve_alarm_changes(q,
-                                            [("timestamp",
-                                              pymongo.DESCENDING)],
-                                            None)
-
-    def record_alarm_change(self, alarm_change):
-        """Record alarm change event.
-        """
-        self.db.alarm_history.insert(alarm_change)
-
-    def query_alarm_history(self, filter_expr=None, orderby=None, limit=None):
-        """Return an iterable of model.AlarmChange objects.
-        """
-        return self._retrieve_data(filter_expr,
-                                   orderby,
-                                   limit,
-                                   models.AlarmChange)
-
     def get_capabilities(self):
         """Return an dictionary representing the capabilities of this driver.
         """
