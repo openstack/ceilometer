@@ -580,7 +580,7 @@ class TestAlarms(FunctionalTest,
         self.post_json('/alarms', params=json, status=201)
         alarms = list(self.conn.get_alarms(enabled=False))
         self.assertEqual(1, len(alarms))
-        # to check to BoundedInt type convertion
+        # to check to BoundedInt type conversion
         json['threshold_rule']['evaluation_periods'] = 3
         json['threshold_rule']['period'] = 180
         if alarms[0].name == 'added_alarm':
