@@ -33,6 +33,23 @@ from ceilometer import pipeline
 LOG = log.getLogger(__name__)
 
 
+class Resources(object):
+    def __init__(self, agent_manager):
+        self.agent_manager = agent_manager
+        self._resources = []
+        self._discovery = []
+
+    def extend(self, pipeline):
+        self._resources.extend(pipeline.resources)
+        self._discovery.extend(pipeline.discovery)
+
+    @property
+    def resources(self):
+        source_discovery = (self.agent_manager.discover(self._discovery)
+                            if self._discovery else [])
+        return self._resources + source_discovery
+
+
 class PollingTask(object):
     """Polling task for polling samples and inject into pipeline.
     A polling task can be invoked periodically or only once.
@@ -41,17 +58,20 @@ class PollingTask(object):
     def __init__(self, agent_manager):
         self.manager = agent_manager
         self.pollsters = set()
-        # Resource definitions are indexed by the pollster
-        # Use dict of set here to remove the duplicated resource definitions
-        # for each pollster.
-        self.resources = collections.defaultdict(set)
+        # we extend the amalgamation of all static resources for this
+        # set of pollsters with a common interval, so as to also
+        # include any dynamically discovered resources specific to
+        # the matching pipelines (if either is present, the per-agent
+        # default discovery is overridden)
+        resource_factory = lambda: Resources(agent_manager)
+        self.resources = collections.defaultdict(resource_factory)
         self.publish_context = pipeline.PublishContext(
             agent_manager.context)
 
     def add(self, pollster, pipelines):
         self.publish_context.add_pipelines(pipelines)
         for pipeline in pipelines:
-            self.resources[pollster.name].update(pipeline.resources)
+            self.resources[pollster.name].extend(pipeline)
         self.pollsters.update([pollster])
 
     def poll_and_publish(self):
@@ -60,8 +80,9 @@ class PollingTask(object):
         with self.publish_context as publisher:
             cache = {}
             for pollster in self.pollsters:
-                LOG.info(_("Polling pollster %s"), pollster.name)
-                source_resources = list(self.resources[pollster.name])
+                key = pollster.name
+                LOG.info(_("Polling pollster %s"), key)
+                source_resources = list(self.resources[key].resources)
                 try:
                     samples = list(pollster.obj.get_samples(
                         self.manager,
