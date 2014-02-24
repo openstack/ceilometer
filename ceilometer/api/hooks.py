@@ -23,7 +23,6 @@ from oslo.config import cfg
 from pecan import hooks
 
 from ceilometer import pipeline
-from ceilometer import transformer
 
 
 class ConfigHook(hooks.PecanHook):
@@ -55,9 +54,7 @@ class PipelineHook(hooks.PecanHook):
         if self.__class__.pipeline_manager is None:
             # this is done here as the cfg options are not available
             # when the file is imported.
-            self.__class__.pipeline_manager = pipeline.setup_pipeline(
-                transformer.TransformerExtensionManager(
-                    'ceilometer.transformer'))
+            self.__class__.pipeline_manager = pipeline.setup_pipeline()
 
     def before(self, state):
         state.request.pipeline_manager = self.pipeline_manager

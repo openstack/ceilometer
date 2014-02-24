@@ -273,16 +273,27 @@ A sample configuration file can be found in `ceilometer.conf.sample`_.
 Pipelines
 =========
 
-Pipelines describe chains of handlers, which can be transformers and/or
-publishers.
+Pipelines describe a coupling between sources of samples and the
+corresponding sinks for transformation and publication of these
+data.
 
-The chain can start with a transformer, which is responsible for converting
-the data, coming from the pollsters or notification handlers (for further
-information see the :ref:`polling` section), to the required format, which
-can mean dropping some parts of the sample, doing aggregation, changing
-field or deriving samples for secondary meters, like in case of *cpu_util*,
-see the example below, in the configuration details. The pipeline can contain
-multiple transformers or none at all.
+A source is a producer of samples, in effect a set of pollsters and/or
+notification handlers emitting samples for a set of matching meters.
+
+Each source configuration encapsulates meter name matching, polling
+interval determination, optional resource enumeration or discovery,
+and mapping to one or more sinks for publication.
+
+A sink on the other hand is a consumer of samples, providing logic for
+the transformation and publication of samples emitted from related sources.
+Each sink configuration is concerned `only` with the transformation rules
+and publication conduits for samples.
+
+In effect, a sink describes a chain of handlers. The chain starts with
+zero or more transformers and ends with one or more publishers. The first
+transformer in the chain is passed samples from the corresponding source,
+takes some action such as deriving rate of change, performing unit conversion,
+or aggregating, before passing the modified sample to next step.
 
 The chains end with one or more publishers. This component makes it possible
 to persist the data into storage through the message bus or to send it to one
@@ -300,21 +311,30 @@ ceilometer.conf. Multiple chains can be defined in one configuration file.
 The chain definition looks like the following::
 
     ---
-    -
-    name: 'name of the pipeline'
-    interval: 'how often should the samples be injected into the pipeline'
-    meters:
-        - 'meter filter'
-    transformers: 'definition of transformers'
-    publishers:
-        - 'list of publishers'
+    sources:
+      - name: 'source name'
+        interval: 'how often should the samples be injected into the pipeline'
+        meters:
+          - 'meter filter'
+        resources:
+          - 'list of resource URLs'
+        sinks
+          - 'sink name'
+    sinks:
+      - name: 'sink name'
+        transformers: 'definition of transformers'
+        publishers:
+          - 'list of publishers'
 
-The *interval* should be defined in seconds.
+The *interval* parameter in the sources section should be defined in seconds. It
+determines the cadence of sample injection into the pipeline, where samples are
+produced under the direct control of an agent, i.e. via a polling cycle as opposed
+to incoming notifications.
 
-There are several ways to define the list of meters for a pipeline. The list
-of valid meters can be found in the :ref:`measurements` section. There is
+There are several ways to define the list of meters for a pipeline source. The
+list of valid meters can be found in the :ref:`measurements` section. There is
 a possibility to define all the meters, or just included or excluded meters,
-with which a pipeline should operate:
+with which a source should operate:
 
 * To include all meters, use the '*' wildcard symbol.
 * To define the list of meters, use either of the following:
@@ -337,8 +357,13 @@ The above definition methods can be used in the following combinations:
     pipeline. Wildcard and included meters cannot co-exist in the same
     pipeline definition section.
 
-The *transformers* section provides the possibility to add a list of
-transformer definitions. The names of the transformers should be the same
+The optional *resources* section of a pipeline source allows a static
+list of resource URLs to be to be configured. An amalgamated list of all
+statically configured resources for a set of pipeline sources with a
+common interval is passed to individual pollsters matching those pipelines.
+
+The *transformers* section of a pipeline sink provides the possibility to add a
+list of transformer definitions. The names of the transformers should be the same
 as the names of the related extensions in setup.cfg.
 
 The definition of transformers can contain the following fields::

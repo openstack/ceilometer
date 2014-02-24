@@ -63,7 +63,6 @@ from ceilometer.openstack.common import timeutils
 from ceilometer import pipeline
 from ceilometer import sample
 from ceilometer import service
-from ceilometer import transformer
 
 
 class CeilometerMiddleware(object):
@@ -80,11 +79,7 @@ class CeilometerMiddleware(object):
 
         service.prepare_service([])
 
-        self.pipeline_manager = pipeline.setup_pipeline(
-            transformer.TransformerExtensionManager(
-                'ceilometer.transformer',
-            ),
-        )
+        self.pipeline_manager = pipeline.setup_pipeline()
         self.reseller_prefix = conf.get('reseller_prefix', 'AUTH_')
         if self.reseller_prefix and self.reseller_prefix[-1] != '_':
             self.reseller_prefix += '_'

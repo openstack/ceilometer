@@ -29,7 +29,6 @@ from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import service as os_service
 from ceilometer import pipeline
-from ceilometer import transformer
 
 LOG = log.getLogger(__name__)
 
@@ -105,20 +104,16 @@ class AgentManager(os_service.Service):
                 self.pipeline_manager.pipelines,
                 self.pollster_manager.extensions):
             if pipeline.support_meter(pollster.name):
-                polling_task = polling_tasks.get(pipeline.interval)
+                polling_task = polling_tasks.get(pipeline.get_interval())
                 if not polling_task:
                     polling_task = self.create_polling_task()
-                    polling_tasks[pipeline.interval] = polling_task
+                    polling_tasks[pipeline.get_interval()] = polling_task
                 polling_task.add(pollster, [pipeline])
 
         return polling_tasks
 
     def start(self):
-        self.pipeline_manager = pipeline.setup_pipeline(
-            transformer.TransformerExtensionManager(
-                'ceilometer.transformer',
-            ),
-        )
+        self.pipeline_manager = pipeline.setup_pipeline()
 
         for interval, task in self.setup_polling_tasks().iteritems():
             self.tg.add_timer(interval,
