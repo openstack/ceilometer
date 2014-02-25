@@ -13,18 +13,20 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from sqlalchemy import Index
-
-from ceilometer.storage.sqlalchemy import models
+import sqlalchemy as sa
 
 
 def upgrade(migrate_engine):
-    index = Index('idx_meter_rid_cname', models.Meter.resource_id,
-                  models.Meter.counter_name)
+    meta = sa.MetaData(bind=migrate_engine)
+    meter = sa.Table('meter', meta, autoload=True)
+    index = sa.Index('idx_meter_rid_cname', meter.c.resource_id,
+                     meter.c.counter_name)
     index.create(bind=migrate_engine)
 
 
 def downgrade(migrate_engine):
-    index = Index('idx_meter_rid_cname', models.Meter.resource_id,
-                  models.Meter.counter_name)
+    meta = sa.MetaData(bind=migrate_engine)
+    meter = sa.Table('meter', meta, autoload=True)
+    index = sa.Index('idx_meter_rid_cname', meter.c.resource_id,
+                     meter.c.counter_name)
     index.drop(bind=migrate_engine)
