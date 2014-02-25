@@ -551,7 +551,8 @@ class Connection(base.Connection):
             timeutils.delta_seconds(stat.duration_start,
                                     stat.duration_end)
 
-    def get_meter_statistics(self, sample_filter, period=None, groupby=None):
+    def get_meter_statistics(self, sample_filter, period=None, groupby=None,
+                             aggregate=None):
         """Return an iterable of models.Statistics instances containing meter
         statistics described by the query parameters.
 
@@ -566,6 +567,10 @@ class Connection(base.Connection):
         """
         if groupby:
             raise NotImplementedError("Group by not implemented.")
+
+        if aggregate:
+            msg = _('Selectable aggregates not implemented')
+            raise NotImplementedError(msg)
 
         meter_table = self.conn.table(self.METER_TABLE)
 

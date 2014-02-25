@@ -330,7 +330,8 @@ class Connection(pymongo_base.Connection):
                                   user_id=latest_meter['user_id'],
                                   metadata=latest_meter['resource_metadata'])
 
-    def get_meter_statistics(self, sample_filter, period=None, groupby=None):
+    def get_meter_statistics(self, sample_filter, period=None, groupby=None,
+                             aggregate=None):
         """Return an iterable of models.Statistics instance containing meter
         statistics described by the query parameters.
 
@@ -340,6 +341,10 @@ class Connection(pymongo_base.Connection):
                 set(groupby) - set(['user_id', 'project_id',
                                     'resource_id', 'source'])):
             raise NotImplementedError("Unable to group by these fields")
+
+        if aggregate:
+            msg = _('Selectable aggregates not implemented')
+            raise NotImplementedError(msg)
 
         q = pymongo_base.make_query_from_filter(sample_filter)
 
@@ -376,8 +381,12 @@ class Connection(pymongo_base.Connection):
                     'seconds': (periods * period) % self.SECONDS_IN_A_DAY}
 
         for key, grouped_meters in itertools.groupby(meters, key=_group_key):
-            stat = models.Statistics(None, sys.maxint, -sys.maxint, 0, 0, 0,
-                                     0, 0, 0, 0, 0, 0, None)
+            stat = models.Statistics(unit=None,
+                                     min=sys.maxint, max=-sys.maxint,
+                                     avg=0, sum=0, count=0,
+                                     period=0, period_start=0, period_end=0,
+                                     duration=0, duration_start=0,
+                                     duration_end=0, groupby=None)
 
             for meter in grouped_meters:
                 stat.unit = meter.get('counter_unit', '')

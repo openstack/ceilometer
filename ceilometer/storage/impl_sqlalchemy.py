@@ -108,6 +108,14 @@ META_TYPE_MAP = {bool: models.MetaBool,
                  long: models.MetaBigInt,
                  float: models.MetaFloat}
 
+STANDARD_AGGREGATES = dict(
+    avg=func.avg(models.Sample.volume).label('avg'),
+    sum=func.sum(models.Sample.volume).label('sum'),
+    min=func.min(models.Sample.volume).label('min'),
+    max=func.max(models.Sample.volume).label('max'),
+    count=func.count(models.Sample.volume).label('count')
+)
+
 
 def apply_metaquery_filter(session, query, metaquery):
     """Apply provided metaquery filter to existing query.
@@ -634,17 +642,31 @@ class Connection(base.Connection):
                                    limit,
                                    models.MeterSample)
 
-    def _make_stats_query(self, sample_filter, groupby):
+    @staticmethod
+    def _get_aggregate_functions(aggregate):
+        if not aggregate:
+            return [f for f in STANDARD_AGGREGATES.values()]
+
+        functions = []
+
+        for a in aggregate:
+            if a.func in STANDARD_AGGREGATES:
+                functions.append(STANDARD_AGGREGATES[a.func])
+            else:
+                raise NotImplementedError(_('Selectable aggregate function %s'
+                                            ' is not supported') % a.func)
+
+        return functions
+
+    def _make_stats_query(self, sample_filter, groupby, aggregate):
+
         select = [
             models.Meter.unit,
             func.min(models.Sample.timestamp).label('tsmin'),
             func.max(models.Sample.timestamp).label('tsmax'),
-            func.avg(models.Sample.volume).label('avg'),
-            func.sum(models.Sample.volume).label('sum'),
-            func.min(models.Sample.volume).label('min'),
-            func.max(models.Sample.volume).label('max'),
-            func.count(models.Sample.volume).label('count')
         ]
+
+        select.extend(self._get_aggregate_functions(aggregate))
 
         session = self._get_db_session()
 
@@ -660,29 +682,40 @@ class Connection(base.Connection):
         return make_query_from_filter(session, query, sample_filter)
 
     @staticmethod
+    def _stats_result_aggregates(result, aggregate):
+        stats_args = {}
+        if isinstance(result.count, (int, long)):
+            stats_args['count'] = result.count
+        for attr in ['min', 'max', 'sum', 'avg']:
+            if hasattr(result, attr):
+                stats_args[attr] = getattr(result, attr)
+        if aggregate:
+            stats_args['aggregate'] = dict(
+                ('%s%s' % (a.func, '/%s' % a.param if a.param else ''),
+                 getattr(result, a.func)) for a in aggregate
+            )
+        return stats_args
+
+    @staticmethod
     def _stats_result_to_model(result, period, period_start,
-                               period_end, groupby):
+                               period_end, groupby, aggregate):
+        stats_args = Connection._stats_result_aggregates(result, aggregate)
+        stats_args['unit'] = result.unit
         duration = (timeutils.delta_seconds(result.tsmin, result.tsmax)
                     if result.tsmin is not None and result.tsmax is not None
                     else None)
-        return api_models.Statistics(
-            unit=result.unit,
-            count=int(result.count),
-            min=result.min,
-            max=result.max,
-            avg=result.avg,
-            sum=result.sum,
-            duration_start=result.tsmin,
-            duration_end=result.tsmax,
-            duration=duration,
-            period=period,
-            period_start=period_start,
-            period_end=period_end,
-            groupby=(dict((g, getattr(result, g)) for g in groupby)
-                     if groupby else None)
-        )
+        stats_args['duration'] = duration
+        stats_args['duration_start'] = result.tsmin
+        stats_args['duration_end'] = result.tsmax
+        stats_args['period'] = period
+        stats_args['period_start'] = period_start
+        stats_args['period_end'] = period_end
+        stats_args['groupby'] = (dict(
+            (g, getattr(result, g)) for g in groupby) if groupby else None)
+        return api_models.Statistics(**stats_args)
 
-    def get_meter_statistics(self, sample_filter, period=None, groupby=None):
+    def get_meter_statistics(self, sample_filter, period=None, groupby=None,
+                             aggregate=None):
         """Return an iterable of api_models.Statistics instances containing
         meter statistics described by the query parameters.
 
@@ -696,17 +729,22 @@ class Connection(base.Connection):
                         _("Unable to group by these fields"))
 
         if not period:
-            for res in self._make_stats_query(sample_filter, groupby):
+            for res in self._make_stats_query(sample_filter,
+                                              groupby,
+                                              aggregate):
                 if res.count:
                     yield self._stats_result_to_model(res, 0,
                                                       res.tsmin, res.tsmax,
-                                                      groupby)
+                                                      groupby,
+                                                      aggregate)
             return
 
         if not sample_filter.start or not sample_filter.end:
-            res = self._make_stats_query(sample_filter, None).first()
+            res = self._make_stats_query(sample_filter,
+                                         None,
+                                         aggregate).first()
 
-        query = self._make_stats_query(sample_filter, groupby)
+        query = self._make_stats_query(sample_filter, groupby, aggregate)
         # HACK(jd) This is an awful method to compute stats by period, but
         # since we're trying to be SQL agnostic we have to write portable
         # code, so here it is, admire! We're going to do one request to get
@@ -726,7 +764,8 @@ class Connection(base.Connection):
                                                            period_end)),
                         period_start=period_start,
                         period_end=period_end,
-                        groupby=groupby
+                        groupby=groupby,
+                        aggregate=aggregate
                     )
 
     @staticmethod
@@ -1299,7 +1338,14 @@ class QueryTransformer(object):
             'statistics': {'groupby': True,
                            'query': {'simple': True,
                                      'metadata': True},
-                           'aggregation': {'standard': True}},
+                           'aggregation': {'standard': True,
+                                           'selectable': {
+                                               'max': True,
+                                               'min': True,
+                                               'sum': True,
+                                               'avg': True,
+                                               'count': True}}
+                           },
             'alarms': {'query': {'simple': True,
                                  'complex': True},
                        'history': {'query': {'simple': True,

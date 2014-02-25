@@ -137,7 +137,8 @@ class Connection(base.Connection):
         """
         return []
 
-    def get_meter_statistics(self, sample_filter, period=None, groupby=None):
+    def get_meter_statistics(self, sample_filter, period=None, groupby=None,
+                             aggregate=None):
         """Return a dictionary containing meter statistics.
         described by the query parameters.
 
