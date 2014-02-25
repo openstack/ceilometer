@@ -354,6 +354,8 @@ class Connection(pymongo_base.Connection):
             del s['_id']
             # Backward compatibility for samples without units
             s['counter_unit'] = s.get('counter_unit', '')
+            # Tolerate absence of recorded_at in older datapoints
+            s['recorded_at'] = s.get('recorded_at')
             yield models.Sample(**s)
 
     def get_meter_statistics(self, sample_filter, period=None, groupby=None):
