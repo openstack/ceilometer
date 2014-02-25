@@ -153,6 +153,18 @@ class TestQueryMetersController(tests_api.FunctionalTest,
             self.assertIn(sample['project_id'],
                           (["project-id1", "project-id2"]))
 
+    def test_admin_tenant_sees_every_project_with_in_filter(self):
+        filter = ('{"In": ' +
+                  '{"project_id": ["project-id1", "project-id2"]}}')
+        data = self.post_json(self.url,
+                              params={"filter": filter},
+                              headers=admin_header)
+
+        self.assertEqual(2, len(data.json))
+        for sample in data.json:
+            self.assertIn(sample['project_id'],
+                          (["project-id1", "project-id2"]))
+
     def test_admin_tenant_can_query_any_project(self):
         data = self.post_json(self.url,
                               params={"filter":

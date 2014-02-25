@@ -300,6 +300,14 @@ class TestFilterSyntaxValidation(test.BaseTestCase):
                          {"=": {"counter_name": "value"}}]}
         self.query._validate_filter(filter)
 
+    def test_complex_operator_with_in(self):
+        filter = {"and": [{"<": {"counter_volume": 42}},
+                          {">=": {"counter_volume": 36}},
+                          {"in": {"project_id": ["project_id1",
+                                                 "project_id2",
+                                                 "project_id3"]}}]}
+        self.query._validate_filter(filter)
+
     def test_invalid_complex_operator(self):
         filter = {"xor": [{"=": {"project_id": "string_value"}},
                           {"=": {"resource_id": "value"}}]}

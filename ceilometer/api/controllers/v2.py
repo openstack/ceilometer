@@ -1053,6 +1053,11 @@ class ValidatedComplexQuery(object):
         "minProperties": 1,
         "maxProperties": 1}
 
+    schema_value_in = {
+        "type": "array",
+        "items": {"oneOf": [{"type": "string"},
+                            {"type": "number"}]}}
+
     schema_field = {
         "type": "object",
         "patternProperties": {"[\S]+": schema_value},
@@ -1060,7 +1065,28 @@ class ValidatedComplexQuery(object):
         "minProperties": 1,
         "maxProperties": 1}
 
+    schema_field_in = {
+        "type": "object",
+        "patternProperties": {"[\S]+": schema_value_in},
+        "additionalProperties": False,
+        "minProperties": 1,
+        "maxProperties": 1}
+
     schema_leaf = {
+        "type": "object",
+        "patternProperties": {simple_ops: schema_field},
+        "additionalProperties": False,
+        "minProperties": 1,
+        "maxProperties": 1}
+
+    schema_leaf_in = {
+        "type": "object",
+        "patternProperties": {"(?i)^in$": schema_field_in},
+        "additionalProperties": False,
+        "minProperties": 1,
+        "maxProperties": 1}
+
+    schema_leaf_simple_ops = {
         "type": "object",
         "patternProperties": {simple_ops: schema_field},
         "additionalProperties": False,
@@ -1080,11 +1106,13 @@ class ValidatedComplexQuery(object):
         "maxProperties": 1}
 
     schema = {
-        "oneOf": [{"$ref": "#/definitions/leaf"},
+        "oneOf": [{"$ref": "#/definitions/leaf_simple_ops"},
+                  {"$ref": "#/definitions/leaf_in"},
                   {"$ref": "#/definitions/and_or"}],
         "minProperties": 1,
         "maxProperties": 1,
-        "definitions": {"leaf": schema_leaf,
+        "definitions": {"leaf_simple_ops": schema_leaf_simple_ops,
+                        "leaf_in": schema_leaf_in,
                         "and_or": schema_and_or}}
 
     orderby_schema = {
@@ -1111,6 +1139,9 @@ class ValidatedComplexQuery(object):
 
         self.schema_field["patternProperties"] = {
             valid_fields: self.schema_value}
+
+        self.schema_field_in["patternProperties"] = {
+            valid_fields: self.schema_value_in}
 
         self.orderby_schema["items"]["patternProperties"] = {
             valid_fields: {"type": "string",
