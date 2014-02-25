@@ -26,6 +26,7 @@ import types
 from sqlalchemy import and_
 from sqlalchemy import asc
 from sqlalchemy import desc
+from sqlalchemy import distinct
 from sqlalchemy import func
 from sqlalchemy import not_
 from sqlalchemy import or_
@@ -36,6 +37,7 @@ import ceilometer.openstack.common.db.sqlalchemy.session as sqlalchemy_session
 from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
+from ceilometer import storage
 from ceilometer.storage import base
 from ceilometer.storage import models as api_models
 from ceilometer.storage.sqlalchemy import migration
@@ -114,6 +116,21 @@ STANDARD_AGGREGATES = dict(
     min=func.min(models.Sample.volume).label('min'),
     max=func.max(models.Sample.volume).label('max'),
     count=func.count(models.Sample.volume).label('count')
+)
+
+UNPARAMETERIZED_AGGREGATES = dict(
+    stddev=func.stddev_pop(models.Sample.volume).label('stddev')
+)
+
+PARAMETERIZED_AGGREGATES = dict(
+    validate=dict(
+        cardinality=lambda p: p in ['resource_id', 'user_id', 'project_id']
+    ),
+    compute=dict(
+        cardinality=lambda p: func.count(
+            distinct(getattr(models.Sample, p))
+        ).label('cardinality')
+    )
 )
 
 
@@ -652,6 +669,15 @@ class Connection(base.Connection):
         for a in aggregate:
             if a.func in STANDARD_AGGREGATES:
                 functions.append(STANDARD_AGGREGATES[a.func])
+            elif a.func in UNPARAMETERIZED_AGGREGATES:
+                functions.append(UNPARAMETERIZED_AGGREGATES[a.func])
+            elif a.func in PARAMETERIZED_AGGREGATES['compute']:
+                validate = PARAMETERIZED_AGGREGATES['validate'].get(a.func)
+                if not (validate and validate(a.param)):
+                    raise storage.StorageBadAggregate('Bad aggregate: %s.%s'
+                                                      % (a.func, a.param))
+                compute = PARAMETERIZED_AGGREGATES['compute'][a.func]
+                functions.append(compute(a.param))
             else:
                 raise NotImplementedError(_('Selectable aggregate function %s'
                                             ' is not supported') % a.func)
@@ -1344,7 +1370,9 @@ class QueryTransformer(object):
                                                'min': True,
                                                'sum': True,
                                                'avg': True,
-                                               'count': True}}
+                                               'count': True,
+                                               'stddev': True,
+                                               'cardinality': True}}
                            },
             'alarms': {'query': {'simple': True,
                                  'complex': True},
