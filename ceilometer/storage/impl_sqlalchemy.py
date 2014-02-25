@@ -1282,3 +1282,28 @@ class QueryTransformer(object):
 
     def get_query(self):
         return self.query
+
+    def get_capabilities(self):
+        """Return an dictionary representing the capabilities of this driver.
+        """
+        available = {
+            'meters': {'query': {'simple': True,
+                                 'metadata': True}},
+            'resources': {'query': {'simple': True,
+                                    'metadata': True}},
+            'samples': {'pagination': True,
+                        'groupby': True,
+                        'query': {'simple': True,
+                                  'metadata': True,
+                                  'complex': True}},
+            'statistics': {'groupby': True,
+                           'query': {'simple': True,
+                                     'metadata': True},
+                           'aggregation': {'standard': True}},
+            'alarms': {'query': {'simple': True,
+                                 'complex': True},
+                       'history': {'query': {'simple': True,
+                                             'complex': True}}},
+            'events': {'query': {'simple': True}},
+        }
+        return utils.update_nested(self.DEFAULT_CAPABILITIES, available)

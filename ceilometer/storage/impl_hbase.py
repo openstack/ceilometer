@@ -629,6 +629,22 @@ class Connection(base.Connection):
             self._update_meter_stats(results[-1], meter)
         return results
 
+    def get_capabilities(self):
+        """Return an dictionary representing the capabilities of this driver.
+        """
+        available = {
+            'meters': {'query': {'simple': True,
+                                 'metadata': True}},
+            'resources': {'query': {'simple': True,
+                                    'metadata': True}},
+            'samples': {'query': {'simple': True,
+                                  'metadata': True}},
+            'statistics': {'query': {'simple': True,
+                                     'metadata': True},
+                           'aggregation': {'standard': True}},
+        }
+        return utils.update_nested(self.DEFAULT_CAPABILITIES, available)
+
 
 ###############
 # This is a very crude version of "in-memory HBase", which implements just

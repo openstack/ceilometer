@@ -2213,6 +2213,71 @@ class QueryController(rest.RestController):
     alarms = QueryAlarmsController()
 
 
+def _flatten_capabilities(capabilities):
+    return dict((k, v) for k, v in utils.recursive_keypairs(capabilities))
+
+
+class Capabilities(_Base):
+    """A representation of the API capabilities, usually constrained
+       by restrictions imposed by the storage driver.
+    """
+
+    api = {wtypes.text: bool}
+    "A flattened dictionary of API capabilities"
+
+    @classmethod
+    def sample(cls):
+        return cls(
+            api=_flatten_capabilities({
+                'meters': {'pagination': True,
+                           'query': {'simple': True,
+                                     'metadata': True,
+                                     'complex': False}},
+                'resources': {'pagination': False,
+                              'query': {'simple': True,
+                                        'metadata': True,
+                                        'complex': False}},
+                'samples': {'pagination': True,
+                            'groupby': True,
+                            'query': {'simple': True,
+                                      'metadata': True,
+                                      'complex': True}},
+                'statistics': {'pagination': True,
+                               'groupby': True,
+                               'query': {'simple': True,
+                                         'metadata': True,
+                                         'complex': False},
+                               'aggregation': {'standard': True,
+                                               'selectable': {
+                                                   'max': True,
+                                                   'min': True,
+                                                   'sum': True,
+                                                   'avg': True,
+                                                   'count': True,
+                                                   'stddev': True,
+                                                   'cardinality': True,
+                                                   'quartile': False}}},
+                'alarms': {'query': {'simple': True,
+                                     'complex': True},
+                           'history': {'query': {'simple': True,
+                                                 'complex': True}}},
+                'events': {'query': {'simple': True}},
+            })
+        )
+
+
+class CapabilitiesController(rest.RestController):
+    """Manages capabilities queries.
+    """
+
+    @wsme_pecan.wsexpose(Capabilities)
+    def get(self):
+        # variation in API capabilities is effectively determined by
+        # the lack of strict feature parity across storage drivers
+        driver_capabilities = pecan.request.storage_conn.get_capabilities()
+        return Capabilities(api=_flatten_capabilities(driver_capabilities))
+
+
 class V2Controller(object):
     """Version 2 API controller root."""
 
@@ -2222,5 +2287,5 @@ class V2Controller(object):
     alarms = AlarmsController()
     event_types = EventTypesController()
     events = EventsController()
-
     query = QueryController()
+    capabilities = CapabilitiesController()
