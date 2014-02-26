@@ -16,6 +16,6 @@ sphinx>=1.1.2,<1.2
 sphinxcontrib-docbookrestapi
 sphinxcontrib-httpdomain
 sphinxcontrib-pecanwsme>=0.6
-testrepository>=0.0.17
+testrepository>=0.0.18
 testscenarios>=0.4
 testtools>=0.9.34
