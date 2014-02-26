@@ -119,7 +119,8 @@ def prepare_service(argv=None):
                                          'sqlalchemy=WARN',
                                          'keystoneclient=INFO',
                                          'stevedore=INFO',
-                                         'eventlet.wsgi.server=WARN'
+                                         'eventlet.wsgi.server=WARN',
+                                         'iso8601=WARN'
                                          ])
     if argv is None:
         argv = sys.argv
