@@ -281,7 +281,6 @@ class Pipeline(object):
     def flush(self, ctxt):
         """Flush data after all samples have been injected to pipeline."""
 
-        LOG.audit(_("Flush pipeline %s"), self)
         for (i, transformer) in enumerate(self.transformers):
             try:
                 self._publish_samples(i + 1, ctxt,
