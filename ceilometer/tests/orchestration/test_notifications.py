@@ -14,6 +14,7 @@
 
 import datetime
 
+import mock
 from oslo.config import cfg
 
 from ceilometer.openstack.common import test
@@ -102,7 +103,7 @@ class TestNotification(test.BaseTestCase):
 
     def _test_operation(self, operation, trust=None):
         notif = stack_notification_for(operation, trust)
-        handler = notifications.StackCRUD()
+        handler = notifications.StackCRUD(mock.Mock())
         data = list(handler.process_notification(notif))
         self.assertEqual(len(data), 1)
         if trust:

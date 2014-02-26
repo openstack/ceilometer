@@ -597,7 +597,7 @@ INSTANCE_SCHEDULED = {
 class TestNotifications(test.BaseTestCase):
 
     def test_process_notification(self):
-        info = list(instance.Instance().process_notification(
+        info = list(instance.Instance(None).process_notification(
             INSTANCE_CREATE_END
         ))[0]
         for name, actual, expected in [
@@ -629,42 +629,42 @@ class TestNotifications(test.BaseTestCase):
         self.assertNotIn('foo.bar', user_meta)
 
     def test_instance_create_instance(self):
-        ic = instance.Instance()
+        ic = instance.Instance(None)
         counters = list(ic.process_notification(INSTANCE_CREATE_END))
         self.assertEqual(1, len(counters))
         c = counters[0]
         self.assertEqual(1, c.volume)
 
     def test_instance_create_flavor(self):
-        ic = instance.InstanceFlavor()
+        ic = instance.InstanceFlavor(None)
         counters = list(ic.process_notification(INSTANCE_CREATE_END))
         self.assertEqual(1, len(counters))
         c = counters[0]
         self.assertEqual(1, c.volume)
 
     def test_instance_create_memory(self):
-        ic = instance.Memory()
+        ic = instance.Memory(None)
         counters = list(ic.process_notification(INSTANCE_CREATE_END))
         self.assertEqual(1, len(counters))
         c = counters[0]
         self.assertEqual(INSTANCE_CREATE_END['payload']['memory_mb'], c.volume)
 
     def test_instance_create_vcpus(self):
-        ic = instance.VCpus()
+        ic = instance.VCpus(None)
         counters = list(ic.process_notification(INSTANCE_CREATE_END))
         self.assertEqual(1, len(counters))
         c = counters[0]
         self.assertEqual(INSTANCE_CREATE_END['payload']['vcpus'], c.volume)
 
     def test_instance_create_root_disk_size(self):
-        ic = instance.RootDiskSize()
+        ic = instance.RootDiskSize(None)
         counters = list(ic.process_notification(INSTANCE_CREATE_END))
         self.assertEqual(1, len(counters))
         c = counters[0]
         self.assertEqual(INSTANCE_CREATE_END['payload']['root_gb'], c.volume)
 
     def test_instance_create_ephemeral_disk_size(self):
-        ic = instance.EphemeralDiskSize()
+        ic = instance.EphemeralDiskSize(None)
         counters = list(ic.process_notification(INSTANCE_CREATE_END))
         self.assertEqual(1, len(counters))
         c = counters[0]
@@ -672,32 +672,32 @@ class TestNotifications(test.BaseTestCase):
                          c.volume)
 
     def test_instance_exists_instance(self):
-        ic = instance.Instance()
+        ic = instance.Instance(None)
         counters = list(ic.process_notification(INSTANCE_EXISTS))
         self.assertEqual(1, len(counters))
 
     def test_instance_exists_metadata_list(self):
-        ic = instance.Instance()
+        ic = instance.Instance(None)
         counters = list(ic.process_notification(INSTANCE_EXISTS_METADATA_LIST))
         self.assertEqual(1, len(counters))
 
     def test_instance_exists_flavor(self):
-        ic = instance.Instance()
+        ic = instance.Instance(None)
         counters = list(ic.process_notification(INSTANCE_EXISTS))
         self.assertEqual(1, len(counters))
 
     def test_instance_delete_instance(self):
-        ic = instance.Instance()
+        ic = instance.Instance(None)
         counters = list(ic.process_notification(INSTANCE_DELETE_START))
         self.assertEqual(1, len(counters))
 
     def test_instance_delete_flavor(self):
-        ic = instance.Instance()
+        ic = instance.Instance(None)
         counters = list(ic.process_notification(INSTANCE_DELETE_START))
         self.assertEqual(1, len(counters))
 
     def test_instance_finish_resize_instance(self):
-        ic = instance.Instance()
+        ic = instance.Instance(None)
         counters = list(ic.process_notification(INSTANCE_FINISH_RESIZE_END))
         self.assertEqual(1, len(counters))
         c = counters[0]
@@ -705,7 +705,7 @@ class TestNotifications(test.BaseTestCase):
         self._verify_user_metadata(c.resource_metadata)
 
     def test_instance_finish_resize_flavor(self):
-        ic = instance.InstanceFlavor()
+        ic = instance.InstanceFlavor(None)
         counters = list(ic.process_notification(INSTANCE_FINISH_RESIZE_END))
         self.assertEqual(1, len(counters))
         c = counters[0]
@@ -714,7 +714,7 @@ class TestNotifications(test.BaseTestCase):
         self._verify_user_metadata(c.resource_metadata)
 
     def test_instance_finish_resize_memory(self):
-        ic = instance.Memory()
+        ic = instance.Memory(None)
         counters = list(ic.process_notification(INSTANCE_FINISH_RESIZE_END))
         self.assertEqual(1, len(counters))
         c = counters[0]
@@ -723,7 +723,7 @@ class TestNotifications(test.BaseTestCase):
         self._verify_user_metadata(c.resource_metadata)
 
     def test_instance_finish_resize_vcpus(self):
-        ic = instance.VCpus()
+        ic = instance.VCpus(None)
         counters = list(ic.process_notification(INSTANCE_FINISH_RESIZE_END))
         self.assertEqual(1, len(counters))
         c = counters[0]
@@ -732,7 +732,7 @@ class TestNotifications(test.BaseTestCase):
         self._verify_user_metadata(c.resource_metadata)
 
     def test_instance_resize_finish_instance(self):
-        ic = instance.Instance()
+        ic = instance.Instance(None)
         counters = list(ic.process_notification(INSTANCE_FINISH_RESIZE_END))
         self.assertEqual(1, len(counters))
         c = counters[0]
@@ -740,7 +740,7 @@ class TestNotifications(test.BaseTestCase):
         self._verify_user_metadata(c.resource_metadata)
 
     def test_instance_resize_finish_flavor(self):
-        ic = instance.InstanceFlavor()
+        ic = instance.InstanceFlavor(None)
         counters = list(ic.process_notification(INSTANCE_RESIZE_REVERT_END))
         self.assertEqual(1, len(counters))
         c = counters[0]
@@ -749,7 +749,7 @@ class TestNotifications(test.BaseTestCase):
         self._verify_user_metadata(c.resource_metadata)
 
     def test_instance_resize_finish_memory(self):
-        ic = instance.Memory()
+        ic = instance.Memory(None)
         counters = list(ic.process_notification(INSTANCE_RESIZE_REVERT_END))
         self.assertEqual(1, len(counters))
         c = counters[0]
@@ -758,7 +758,7 @@ class TestNotifications(test.BaseTestCase):
         self._verify_user_metadata(c.resource_metadata)
 
     def test_instance_resize_finish_vcpus(self):
-        ic = instance.VCpus()
+        ic = instance.VCpus(None)
         counters = list(ic.process_notification(INSTANCE_RESIZE_REVERT_END))
         self.assertEqual(1, len(counters))
         c = counters[0]
@@ -767,7 +767,7 @@ class TestNotifications(test.BaseTestCase):
         self._verify_user_metadata(c.resource_metadata)
 
     def test_instance_delete_samples(self):
-        ic = instance.InstanceDelete()
+        ic = instance.InstanceDelete(None)
         counters = list(ic.process_notification(INSTANCE_DELETE_SAMPLES))
         self.assertEqual(2, len(counters))
         names = [c.name for c in counters]
@@ -776,7 +776,7 @@ class TestNotifications(test.BaseTestCase):
         self._verify_user_metadata(c.resource_metadata)
 
     def test_instance_scheduled(self):
-        ic = instance.InstanceScheduled()
+        ic = instance.InstanceScheduled(None)
 
         self.assertIn(INSTANCE_SCHEDULED['event_type'],
                       ic.event_types)

@@ -16,6 +16,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import mock
+
 from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import test
 from ceilometer import plugin
@@ -110,14 +112,26 @@ class NotificationBaseTestCase(test.BaseTestCase):
     class FakeNetworkPlugin(FakePlugin):
         event_types = ['network.*']
 
-    def test_to_samples(self):
-        c = self.FakeComputePlugin()
-        n = self.FakeNetworkPlugin()
-        self.assertTrue(len(list(c.to_samples(TEST_NOTIFICATION))) > 0)
-        self.assertEqual(0, len(list(n.to_samples(TEST_NOTIFICATION))))
+    def _do_test_to_samples(self, plugin_class, match):
+        pm = mock.MagicMock()
+        plug = plugin_class(pm)
+        publish = pm.publisher.return_value.__enter__.return_value
+
+        plug.to_samples_and_publish(mock.Mock(), TEST_NOTIFICATION)
+
+        if match:
+            publish.assert_called_once_with(list(TEST_NOTIFICATION))
+        else:
+            self.assertEqual(0, publish.call_count)
+
+    def test_to_samples_match(self):
+        self._do_test_to_samples(self.FakeComputePlugin, True)
+
+    def test_to_samples_no_match(self):
+        self._do_test_to_samples(self.FakeNetworkPlugin, False)
 
     def test_get_targets_compat(self):
-        targets = self.FakeComputePlugin().get_targets(self.CONF)
+        targets = self.FakeComputePlugin(mock.Mock()).get_targets(self.CONF)
         self.assertEqual(3, len(targets))
         self.assertEqual('t1', targets[0].topic)
         self.assertEqual('exchange1', targets[0].exchange)

@@ -63,11 +63,11 @@ def get_rpc_client(**kwargs):
     return oslo.messaging.RPCClient(TRANSPORT, target)
 
 
-def get_notification_listener(targets, endpoint):
+def get_notification_listener(targets, endpoints):
     """Return a configured oslo.messaging notification listener."""
     global TRANSPORT
     return oslo.messaging.get_notification_listener(
-        TRANSPORT, targets, [endpoint], executor='eventlet')
+        TRANSPORT, targets, endpoints, executor='eventlet')
 
 
 def get_notifier(publisher_id):
