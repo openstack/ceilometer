@@ -728,20 +728,21 @@ class ComplexSampleQueryTest(DBTestBase,
                              tests_db.MixinTestsWithBackendScenarios):
     def setUp(self):
         super(ComplexSampleQueryTest, self).setUp()
-        self.complex_filter = {"and":
-                               [{"or":
-                                 [{"=": {"resource_id": "resource-id-42"}},
-                                  {"=": {"resource_id": "resource-id-44"}}]},
-                                {"and":
-                                 [{"=": {"counter_name": "cpu_util"}},
-                                  {"and":
-                                   [{">": {"counter_volume": 0.4}},
-                                    {"<=": {"counter_volume": 0.8}}]}]}]}
+        self.complex_filter = {
+            "and":
+            [{"or":
+              [{"=": {"resource_id": "resource-id-42"}},
+               {"=": {"resource_id": "resource-id-44"}}]},
+             {"and":
+              [{"=": {"counter_name": "cpu_util"}},
+               {"and":
+                [{">": {"counter_volume": 0.4}},
+                 {"not": {">": {"counter_volume": 0.8}}}]}]}]}
         or_expression = [{"=": {"resource_id": "resource-id-42"}},
                          {"=": {"resource_id": "resource-id-43"}},
                          {"=": {"resource_id": "resource-id-44"}}]
         and_expression = [{">": {"counter_volume": 0.4}},
-                          {"<=": {"counter_volume": 0.8}}]
+                          {"not": {">": {"counter_volume": 0.8}}}]
         self.complex_filter_list = {"and":
                                     [{"or": or_expression},
                                      {"and":
@@ -1016,6 +1017,95 @@ class ComplexSampleQueryTest(DBTestBase,
 
         results = list(self.conn.query_samples(filter_expr=filter_expr))
         self.assertEqual(len(results), 0)
+
+    def test_query_negated_metadata(self):
+        self._create_samples()
+
+        filter_expr = {
+            "and": [{"=": {"resource_id": "resource-id-42"}},
+                    {"not": {"or": [{">": {"resource_metadata.an_int_key":
+                                           43}},
+                                    {"<=": {"resource_metadata.a_float_key":
+                                            0.41}}]}}]}
+
+        results = list(self.conn.query_samples(filter_expr=filter_expr))
+
+        self.assertEqual(len(results), 3)
+        for sample in results:
+            self.assertEqual(sample.resource_id, "resource-id-42")
+            self.assertTrue(sample.resource_metadata["an_int_key"] <= 43)
+            self.assertTrue(sample.resource_metadata["a_float_key"] > 0.41)
+
+    def test_query_negated_complex_expression(self):
+        self._create_samples()
+        filter_expr = {
+            "and":
+            [{"=": {"counter_name": "cpu_util"}},
+             {"not":
+              {"or":
+               [{"or":
+                 [{"=": {"resource_id": "resource-id-42"}},
+                  {"=": {"resource_id": "resource-id-44"}}]},
+                {"and":
+                 [{">": {"counter_volume": 0.4}},
+                  {"<": {"counter_volume": 0.8}}]}]}}]}
+
+        results = list(self.conn.query_samples(filter_expr=filter_expr))
+
+        self.assertEqual(len(results), 4)
+        for sample in results:
+            self.assertEqual(sample.resource_id,
+                             "resource-id-43")
+            self.assertIn(sample.counter_volume, [0.39, 0.4, 0.8, 0.81])
+            self.assertEqual(sample.counter_name,
+                             "cpu_util")
+
+    def test_query_with_double_negation(self):
+        self._create_samples()
+        filter_expr = {
+            "and":
+            [{"=": {"counter_name": "cpu_util"}},
+             {"not":
+              {"or":
+               [{"or":
+                 [{"=": {"resource_id": "resource-id-42"}},
+                  {"=": {"resource_id": "resource-id-44"}}]},
+                {"and": [{"not": {"<=": {"counter_volume": 0.4}}},
+                         {"<": {"counter_volume": 0.8}}]}]}}]}
+
+        results = list(self.conn.query_samples(filter_expr=filter_expr))
+
+        self.assertEqual(len(results), 4)
+        for sample in results:
+            self.assertEqual(sample.resource_id,
+                             "resource-id-43")
+            self.assertIn(sample.counter_volume, [0.39, 0.4, 0.8, 0.81])
+            self.assertEqual(sample.counter_name,
+                             "cpu_util")
+
+    def test_query_negate_not_equal(self):
+        self._create_samples()
+        filter_expr = {"not": {"!=": {"resource_id": "resource-id-43"}}}
+
+        results = list(self.conn.query_samples(filter_expr=filter_expr))
+
+        self.assertEqual(len(results), 6)
+        for sample in results:
+            self.assertEqual(sample.resource_id,
+                             "resource-id-43")
+
+    def test_query_negated_in_op(self):
+        self._create_samples()
+        filter_expr = {
+            "and": [{"not": {"in": {"counter_volume": [0.39, 0.4, 0.79]}}},
+                    {"=": {"resource_id": "resource-id-42"}}]}
+
+        results = list(self.conn.query_samples(filter_expr=filter_expr))
+
+        self.assertEqual(len(results), 3)
+        for sample in results:
+            self.assertIn(sample.counter_volume,
+                          [0.41, 0.8, 0.81])
 
 
 class StatisticsTest(DBTestBase,

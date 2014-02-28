@@ -130,21 +130,6 @@ class Connection(base.Connection):
     """Base Connection class for MongoDB and DB2 drivers.
     """
 
-    operators = {"<": "$lt",
-                 ">": "$gt",
-                 "<=": "$lte",
-                 "=<": "$lte",
-                 ">=": "$gte",
-                 "=>": "$gte",
-                 "!=": "$ne",
-                 "in": "$in"}
-
-    complex_operators = {"or": "$or",
-                         "and": "$and"}
-
-    ordering_functions = {"asc": pymongo.ASCENDING,
-                          "desc": pymongo.DESCENDING}
-
     def get_users(self, source=None):
         """Return an iterable of user id strings.
 
@@ -288,10 +273,11 @@ class Connection(base.Connection):
             return []
         query_filter = {}
         orderby_filter = [("timestamp", pymongo.DESCENDING)]
+        transformer = QueryTransformer()
         if orderby is not None:
-            orderby_filter = self._transform_orderby(orderby)
+            orderby_filter = transformer.transform_orderby(orderby)
         if filter_expr is not None:
-            query_filter = self._transform_filter(filter_expr)
+            query_filter = transformer.transform_filter(filter_expr)
 
         retrieve = {models.Meter: self._retrieve_samples,
                     models.Alarm: self._retrieve_alarms,
@@ -347,45 +333,6 @@ class Connection(base.Connection):
             ah.update(alarm_history)
             del ah['_id']
             yield models.AlarmChange(**ah)
-
-    def _transform_orderby(self, orderby):
-        orderby_filter = []
-
-        for field in orderby:
-            field_name = field.keys()[0]
-            ordering = self.ordering_functions[field.values()[0]]
-            orderby_filter.append((field_name, ordering))
-        return orderby_filter
-
-    def _transform_filter(self, condition):
-
-        def process_json_tree(condition_tree):
-            operator_node = condition_tree.keys()[0]
-            nodes = condition_tree.values()[0]
-
-            if operator_node in self.complex_operators:
-                element_list = []
-                for node in nodes:
-                    element = process_json_tree(node)
-                    element_list.append(element)
-                complex_operator = self.complex_operators[operator_node]
-                op = {complex_operator: element_list}
-                return op
-            else:
-                field_name = nodes.keys()[0]
-                field_value = nodes.values()[0]
-                # no operator for equal in Mongo
-                if operator_node == "=":
-                    op = {field_name: field_value}
-                    return op
-                if operator_node in self.operators:
-                    operator = self.operators[operator_node]
-                    op = {
-                        field_name: {
-                            operator: field_value}}
-                    return op
-
-        return process_json_tree(condition)
 
     @classmethod
     def _ensure_encapsulated_rule_format(cls, alarm):
@@ -449,3 +396,124 @@ class Connection(base.Connection):
             for elem in matching_metadata:
                 new_matching_metadata[elem['key']] = elem['value']
             return new_matching_metadata
+
+
+class QueryTransformer(object):
+
+    operators = {"<": "$lt",
+                 ">": "$gt",
+                 "<=": "$lte",
+                 "=<": "$lte",
+                 ">=": "$gte",
+                 "=>": "$gte",
+                 "!=": "$ne",
+                 "in": "$in"}
+
+    complex_operators = {"or": "$or",
+                         "and": "$and"}
+
+    ordering_functions = {"asc": pymongo.ASCENDING,
+                          "desc": pymongo.DESCENDING}
+
+    def transform_orderby(self, orderby):
+        orderby_filter = []
+
+        for field in orderby:
+            field_name = field.keys()[0]
+            ordering = self.ordering_functions[field.values()[0]]
+            orderby_filter.append((field_name, ordering))
+        return orderby_filter
+
+    @staticmethod
+    def _move_negation_to_leaf(condition):
+        """Moves every not operator to the leafs by
+        applying the De Morgan rules and anihilating
+        double negations
+        """
+        def _apply_de_morgan(tree, negated_subtree, negated_op):
+            if negated_op == "and":
+                new_op = "or"
+            else:
+                new_op = "and"
+
+            tree[new_op] = [{"not": child}
+                            for child in negated_subtree[negated_op]]
+            del tree["not"]
+
+        def transform(subtree):
+            op = subtree.keys()[0]
+            if op in ["and", "or"]:
+                [transform(child) for child in subtree[op]]
+            elif op == "not":
+                negated_tree = subtree[op]
+                negated_op = negated_tree.keys()[0]
+                if negated_op == "and":
+                    _apply_de_morgan(subtree, negated_tree, negated_op)
+                    transform(subtree)
+                elif negated_op == "or":
+                    _apply_de_morgan(subtree, negated_tree, negated_op)
+                    transform(subtree)
+                elif negated_op == "not":
+                    # two consecutive not annihilates theirselves
+                    new_op = negated_tree.values()[0].keys()[0]
+                    subtree[new_op] = negated_tree[negated_op][new_op]
+                    del subtree["not"]
+                    transform(subtree)
+
+        transform(condition)
+
+    def transform_filter(self, condition):
+        # in Mongo not operator can only be applied to
+        # simple expressions so we have to move every
+        # not operator to the leafs of the expression tree
+        self._move_negation_to_leaf(condition)
+        return self._process_json_tree(condition)
+
+    def _handle_complex_op(self, complex_op, nodes):
+        element_list = []
+        for node in nodes:
+            element = self._process_json_tree(node)
+            element_list.append(element)
+        complex_operator = self.complex_operators[complex_op]
+        op = {complex_operator: element_list}
+        return op
+
+    def _handle_not_op(self, negated_tree):
+        # assumes that not is moved to the leaf already
+        # so we are next to a leaf
+        negated_op = negated_tree.keys()[0]
+        negated_field = negated_tree[negated_op].keys()[0]
+        value = negated_tree[negated_op][negated_field]
+        if negated_op == "=":
+            return {negated_field: {"$ne": value}}
+        elif negated_op == "!=":
+            return {negated_field: value}
+        else:
+            return {negated_field: {"$not":
+                                    {self.operators[negated_op]: value}}}
+
+    def _handle_simple_op(self, simple_op, nodes):
+        field_name = nodes.keys()[0]
+        field_value = nodes.values()[0]
+
+        # no operator for equal in Mongo
+        if simple_op == "=":
+            op = {field_name: field_value}
+            return op
+
+        operator = self.operators[simple_op]
+        op = {field_name: {operator: field_value}}
+        return op
+
+    def _process_json_tree(self, condition_tree):
+        operator_node = condition_tree.keys()[0]
+        nodes = condition_tree.values()[0]
+
+        if operator_node in self.complex_operators:
+            return self._handle_complex_op(operator_node, nodes)
+
+        if operator_node == "not":
+            negated_tree = condition_tree[operator_node]
+            return self._handle_not_op(negated_tree)
+
+        return self._handle_simple_op(operator_node, nodes)

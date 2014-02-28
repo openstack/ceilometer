@@ -256,6 +256,15 @@ class TestQueryMetersController(tests_api.FunctionalTest,
         for sample in data.json:
             self.assertTrue(sample["metadata"]["util"] >= 0.5)
 
+    def test_filter_with_negation(self):
+        filter_expr = '{"not": {">=": {"metadata.util": 0.5}}}'
+        data = self.post_json(self.url,
+                              params={"filter": filter_expr})
+
+        self.assertEqual(1, len(data.json))
+        for sample in data.json:
+            self.assertTrue(float(sample["metadata"]["util"]) < 0.5)
+
     def test_limit_should_be_positive(self):
         data = self.post_json(self.url,
                               params={"limit": 0},

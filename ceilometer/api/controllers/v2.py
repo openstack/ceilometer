@@ -1115,15 +1115,24 @@ class ValidatedComplexQuery(object):
             "minProperties": 1,
             "maxProperties": 1}
 
+        schema_not = {
+            "type": "object",
+            "patternProperties": {"(?i)^not$": {"$ref": "#"}},
+            "additionalProperties": False,
+            "minProperties": 1,
+            "maxProperties": 1}
+
         self.schema = {
             "oneOf": [{"$ref": "#/definitions/leaf_simple_ops"},
                       {"$ref": "#/definitions/leaf_in"},
-                      {"$ref": "#/definitions/and_or"}],
+                      {"$ref": "#/definitions/and_or"},
+                      {"$ref": "#/definitions/not"}],
             "minProperties": 1,
             "maxProperties": 1,
             "definitions": {"leaf_simple_ops": schema_leaf_simple_ops,
                             "leaf_in": schema_leaf_in,
-                            "and_or": schema_and_or}}
+                            "and_or": schema_and_or,
+                            "not": schema_not}}
 
         self.orderby_schema = {
             "type": "array",
@@ -1184,6 +1193,8 @@ class ValidatedComplexQuery(object):
         if op.lower() in self.complex_operators:
             for i, operand in enumerate(tree[op]):
                 self._traverse_postorder(operand, visitor)
+        if op.lower() == "not":
+            self._traverse_postorder(tree[op], visitor)
 
         visitor(tree)
 
