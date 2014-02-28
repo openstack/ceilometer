@@ -48,7 +48,6 @@ class UtilsV2(object):
     _ETH_PORT_ALLOC = 'Msvm_EthernetPortAllocationSettingData'
     _STORAGE_ALLOC = 'Msvm_StorageAllocationSettingData'
     _VS_SETTING_DATA = 'Msvm_VirtualSystemSettingData'
-    _AGGREG_METRIC = 'Msvm_AggregationMetricDefinition'
     _METRICS_ME = 'Msvm_MetricForME'
 
     _CPU_METRIC_NAME = 'Aggregated Average CPU Utilization'
