@@ -72,26 +72,27 @@ class _Base(plugin.ComputePollster):
             )
         return i_cache[instance_name]
 
-    def get_samples(self, manager, cache, instance):
-        instance_name = util.instance_name(instance)
-        LOG.info(_('checking instance %s'), instance.id)
-        try:
-            vnics = self._get_vnics_for_instance(
-                cache,
-                manager.inspector,
-                instance_name,
-            )
-            for vnic, info in vnics:
-                LOG.info(self.NET_USAGE_MESSAGE, instance_name,
-                         vnic.name, info.rx_bytes, info.tx_bytes)
-                yield self._get_sample(instance, vnic, info)
-        except virt_inspector.InstanceNotFoundException as err:
-            # Instance was deleted while getting samples. Ignore it.
-            LOG.debug(_('Exception while getting samples %s'), err)
-        except Exception as err:
-            LOG.warning(_('Ignoring instance %(name)s: %(error)s') % (
-                        {'name': instance_name, 'error': err}))
-            LOG.exception(err)
+    def get_samples(self, manager, cache, resources):
+        for instance in resources:
+            instance_name = util.instance_name(instance)
+            LOG.info(_('checking instance %s'), instance.id)
+            try:
+                vnics = self._get_vnics_for_instance(
+                    cache,
+                    manager.inspector,
+                    instance_name,
+                )
+                for vnic, info in vnics:
+                    LOG.info(self.NET_USAGE_MESSAGE, instance_name,
+                             vnic.name, info.rx_bytes, info.tx_bytes)
+                    yield self._get_sample(instance, vnic, info)
+            except virt_inspector.InstanceNotFoundException as err:
+                # Instance was deleted while getting samples. Ignore it.
+                LOG.debug(_('Exception while getting samples %s'), err)
+            except Exception as err:
+                LOG.warning(_('Ignoring instance %(name)s: %(error)s') % (
+                            {'name': instance_name, 'error': err}))
+                LOG.exception(err)
 
 
 class IncomingBytesPollster(_Base):

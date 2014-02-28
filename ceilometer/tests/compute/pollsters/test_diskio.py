@@ -45,7 +45,7 @@ class TestDiskPollsters(base.TestPollsterBase):
 
         mgr = manager.AgentManager()
         cache = {}
-        samples = list(pollster.get_samples(mgr, cache, self.instance))
+        samples = list(pollster.get_samples(mgr, cache, [self.instance]))
         assert samples
         self.assertIn(pollster.CACHE_KEY_DISK, cache)
         self.assertIn(self.instance.name, cache[pollster.CACHE_KEY_DISK])

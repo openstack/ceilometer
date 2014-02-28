@@ -19,6 +19,7 @@
 """
 import mock
 
+from ceilometer import agent
 from ceilometer.compute import manager
 from ceilometer import nova_client
 from ceilometer.openstack.common.fixture import mockpatch
@@ -51,25 +52,24 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
+        self.source_resources = False
         super(TestRunTasks, self).setUp()
 
         # Set up a fake instance value to be returned by
         # instance_get_all_by_host() so when the manager gets the list
         # of instances to poll we can control the results.
-        self.instance = self._fake_instance('faux', 'active')
+        self.instances = [self._fake_instance('doing', 'active'),
+                          self._fake_instance('resting', 'paused')]
         stillborn_instance = self._fake_instance('stillborn', 'error')
-
-        def instance_get_all_by_host(*args):
-            return [self.instance, stillborn_instance]
 
         self.useFixture(mockpatch.PatchObject(
             nova_client.Client,
             'instance_get_all_by_host',
-            side_effect=lambda *x: [self.instance, stillborn_instance]))
+            side_effect=lambda *x: self.instances + [stillborn_instance]))
 
     def test_setup_polling_tasks(self):
         super(TestRunTasks, self).test_setup_polling_tasks()
-        self.assertTrue(self.Pollster.samples[0][1] is self.instance)
+        self.assertEqual(self.Pollster.samples[0][1], self.instances)
 
     def test_interval_exception_isolation(self):
         super(TestRunTasks, self).test_interval_exception_isolation()
@@ -81,5 +81,14 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         with mock.patch.object(nova_client.Client, 'instance_get_all_by_host',
                                side_effect=lambda *x: self._raise_exception()):
             mgr = manager.AgentManager()
-            polling_task = manager.PollingTask(mgr)
+            polling_task = agent.PollingTask(mgr)
             polling_task.poll_and_publish()
+
+    def self_local_instances_default_agent_discovery(self):
+        self.setup_pipeline()
+        self.assertEqual(self.mgr.default_discovery, ['local_instances'])
+        polling_tasks = self.mgr.setup_polling_tasks()
+        self.mgr.interval_task(polling_tasks.get(60))
+        self._verify_discovery_params([None])
+        self.assertEqual(set(self.Pollster.resources),
+                         set(self.instances))

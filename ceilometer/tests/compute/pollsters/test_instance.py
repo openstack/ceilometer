@@ -34,7 +34,7 @@ class TestInstancePollster(base.TestPollsterBase):
     def test_get_samples_instance(self):
         mgr = manager.AgentManager()
         pollster = pollsters_instance.InstancePollster()
-        samples = list(pollster.get_samples(mgr, {}, self.instance))
+        samples = list(pollster.get_samples(mgr, {}, [self.instance]))
         self.assertEqual(len(samples), 1)
         self.assertEqual(samples[0].name, 'instance')
         self.assertEqual(samples[0].resource_metadata['vcpus'], 1)
@@ -47,6 +47,6 @@ class TestInstancePollster(base.TestPollsterBase):
     def test_get_samples_instance_flavor(self):
         mgr = manager.AgentManager()
         pollster = pollsters_instance.InstanceFlavorPollster()
-        samples = list(pollster.get_samples(mgr, {}, self.instance))
+        samples = list(pollster.get_samples(mgr, {}, [self.instance]))
         self.assertEqual(len(samples), 1)
         self.assertEqual(samples[0].name, 'instance:m1.small')

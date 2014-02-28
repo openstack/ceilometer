@@ -104,3 +104,12 @@ class PollsterBase(PluginBase):
                           how to use it.
 
         """
+
+
+@six.add_metaclass(abc.ABCMeta)
+class DiscoveryBase(object):
+    @abc.abstractmethod
+    def discover(self, param=None):
+        """Discover resources to monitor.
+        :param param: an optional parameter to guide the discovery
+        """
