@@ -1047,105 +1047,95 @@ class ValidatedComplexQuery(object):
     simple_ops = _list_to_regexp(simple_ops, regexp_prefix)
     order_directions = _list_to_regexp(order_directions, regexp_prefix)
 
-    schema_value = {
-        "oneOf": [{"type": "string"},
-                  {"type": "number"}],
-        "minProperties": 1,
-        "maxProperties": 1}
-
-    schema_value_in = {
-        "type": "array",
-        "items": {"oneOf": [{"type": "string"},
-                            {"type": "number"}]}}
-
-    schema_field = {
-        "type": "object",
-        "patternProperties": {"[\S]+": schema_value},
-        "additionalProperties": False,
-        "minProperties": 1,
-        "maxProperties": 1}
-
-    schema_field_in = {
-        "type": "object",
-        "patternProperties": {"[\S]+": schema_value_in},
-        "additionalProperties": False,
-        "minProperties": 1,
-        "maxProperties": 1}
-
-    schema_leaf = {
-        "type": "object",
-        "patternProperties": {simple_ops: schema_field},
-        "additionalProperties": False,
-        "minProperties": 1,
-        "maxProperties": 1}
-
-    schema_leaf_in = {
-        "type": "object",
-        "patternProperties": {"(?i)^in$": schema_field_in},
-        "additionalProperties": False,
-        "minProperties": 1,
-        "maxProperties": 1}
-
-    schema_leaf_simple_ops = {
-        "type": "object",
-        "patternProperties": {simple_ops: schema_field},
-        "additionalProperties": False,
-        "minProperties": 1,
-        "maxProperties": 1}
-
-    schema_and_or_array = {
-        "type": "array",
-        "items": {"$ref": "#"},
-        "minItems": 2}
-
-    schema_and_or = {
-        "type": "object",
-        "patternProperties": {complex_ops: schema_and_or_array},
-        "additionalProperties": False,
-        "minProperties": 1,
-        "maxProperties": 1}
-
-    schema = {
-        "oneOf": [{"$ref": "#/definitions/leaf_simple_ops"},
-                  {"$ref": "#/definitions/leaf_in"},
-                  {"$ref": "#/definitions/and_or"}],
-        "minProperties": 1,
-        "maxProperties": 1,
-        "definitions": {"leaf_simple_ops": schema_leaf_simple_ops,
-                        "leaf_in": schema_leaf_in,
-                        "and_or": schema_and_or}}
-
-    orderby_schema = {
-        "type": "array",
-        "items": {
-            "type": "object",
-            "patternProperties":
-                {"[\S]+":
-                    {"type": "string",
-                     "pattern": order_directions}},
-            "additionalProperties": False,
-            "minProperties": 1,
-            "maxProperties": 1}}
-
     timestamp_fields = ["timestamp", "state_timestamp"]
     name_mapping = {"user": "user_id",
                     "project": "project_id",
                     "resource": "resource_id"}
 
-    def __init__(self, query, db_model, additional_valid_keys):
+    def __init__(self, query, db_model, additional_valid_keys,
+                 metadata_allowed=False):
         valid_keys = db_model.get_field_names()
         valid_keys = list(valid_keys) + additional_valid_keys
         valid_fields = _list_to_regexp(valid_keys)
 
-        self.schema_field["patternProperties"] = {
-            valid_fields: self.schema_value}
+        if metadata_allowed:
+            valid_filter_fields = valid_fields + "|^metadata\.[\S]+$"
+        else:
+            valid_filter_fields = valid_fields
 
-        self.schema_field_in["patternProperties"] = {
-            valid_fields: self.schema_value_in}
+        schema_value = {
+            "oneOf": [{"type": "string"},
+                      {"type": "number"},
+                      {"type": "boolean"}],
+            "minProperties": 1,
+            "maxProperties": 1}
 
-        self.orderby_schema["items"]["patternProperties"] = {
-            valid_fields: {"type": "string",
-                           "pattern": self.order_directions}}
+        schema_value_in = {
+            "type": "array",
+            "items": {"oneOf": [{"type": "string"},
+                                {"type": "number"}]}}
+
+        schema_field = {
+            "type": "object",
+            "patternProperties": {valid_filter_fields: schema_value},
+            "additionalProperties": False,
+            "minProperties": 1,
+            "maxProperties": 1}
+
+        schema_field_in = {
+            "type": "object",
+            "patternProperties": {valid_filter_fields: schema_value_in},
+            "additionalProperties": False,
+            "minProperties": 1,
+            "maxProperties": 1}
+
+        schema_leaf_in = {
+            "type": "object",
+            "patternProperties": {"(?i)^in$": schema_field_in},
+            "additionalProperties": False,
+            "minProperties": 1,
+            "maxProperties": 1}
+
+        schema_leaf_simple_ops = {
+            "type": "object",
+            "patternProperties": {self.simple_ops: schema_field},
+            "additionalProperties": False,
+            "minProperties": 1,
+            "maxProperties": 1}
+
+        schema_and_or_array = {
+            "type": "array",
+            "items": {"$ref": "#"},
+            "minItems": 2}
+
+        schema_and_or = {
+            "type": "object",
+            "patternProperties": {self.complex_ops: schema_and_or_array},
+            "additionalProperties": False,
+            "minProperties": 1,
+            "maxProperties": 1}
+
+        self.schema = {
+            "oneOf": [{"$ref": "#/definitions/leaf_simple_ops"},
+                      {"$ref": "#/definitions/leaf_in"},
+                      {"$ref": "#/definitions/and_or"}],
+            "minProperties": 1,
+            "maxProperties": 1,
+            "definitions": {"leaf_simple_ops": schema_leaf_simple_ops,
+                            "leaf_in": schema_leaf_in,
+                            "and_or": schema_and_or}}
+
+        self.orderby_schema = {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "patternProperties":
+                    {valid_fields:
+                        {"type": "string",
+                         "pattern": self.order_directions}},
+                "additionalProperties": False,
+                "minProperties": 1,
+                "maxProperties": 1}}
 
         self.original_query = query
 
@@ -1253,6 +1243,9 @@ class ValidatedComplexQuery(object):
         if field in self.name_mapping:
             del subfilter[field]
             subfilter[self.name_mapping[field]] = value
+        if field.startswith("metadata."):
+            del subfilter[field]
+            subfilter["resource_" + field] = value
 
     def _convert_operator_to_lower_case(self, filter_expr):
         self._traverse_postorder(filter_expr, utils.lowercase_keys)
@@ -2151,7 +2144,8 @@ class QuerySamplesController(rest.RestController):
         """
         query = ValidatedComplexQuery(body,
                                       storage.models.Sample,
-                                      ["user", "project", "resource"])
+                                      ["user", "project", "resource"],
+                                      metadata_allowed=True)
         query.validate(visibility_field="project_id")
         conn = pecan.request.storage_conn
         return [Sample.from_db_model(s)

@@ -759,8 +759,14 @@ class ComplexSampleQueryTest(DBTestBase,
     def _create_samples(self):
         for resource in range(42, 45):
             for volume in [0.79, 0.41, 0.4, 0.8, 0.39, 0.81]:
+                metadata = {'a_string_key': "meta-value" + str(volume),
+                            'a_float_key': volume,
+                            'an_int_key': resource,
+                            'a_bool_key': (resource == 43)}
+
                 self.create_and_store_sample(resource_id="resource-id-%s"
                                                          % resource,
+                                             metadata=metadata,
                                              name="cpu_util",
                                              volume=volume)
 
@@ -926,6 +932,89 @@ class ComplexSampleQueryTest(DBTestBase,
     def test_query_filter_with_empty_in(self):
         results = list(
             self.conn.query_samples(filter_expr={"in": {"resource_id": []}}))
+        self.assertEqual(len(results), 0)
+
+    def test_query_simple_metadata_filter(self):
+        self._create_samples()
+
+        filter_expr = {"=": {"resource_metadata.a_bool_key": True}}
+
+        results = list(self.conn.query_samples(filter_expr=filter_expr))
+
+        self.assertEqual(len(results), 6)
+        for sample in results:
+            self.assertTrue(sample.resource_metadata["a_bool_key"])
+
+    def test_query_simple_metadata_with_in_op(self):
+        self._create_samples()
+
+        filter_expr = {"in": {"resource_metadata.an_int_key": [42, 43]}}
+
+        results = list(self.conn.query_samples(filter_expr=filter_expr))
+
+        self.assertEqual(len(results), 12)
+        for sample in results:
+            self.assertIn(sample.resource_metadata["an_int_key"], [42, 43])
+
+    def test_query_complex_metadata_filter(self):
+        self._create_samples()
+        subfilter = {"or": [{"=": {"resource_metadata.a_string_key":
+                                   "meta-value0.81"}},
+                            {"<=": {"resource_metadata.a_float_key": 0.41}}]}
+        filter_expr = {"and": [{">": {"resource_metadata.an_int_key": 42}},
+                               subfilter]}
+
+        results = list(self.conn.query_samples(filter_expr=filter_expr))
+
+        self.assertEqual(len(results), 8)
+        for sample in results:
+            self.assertTrue((sample.resource_metadata["a_string_key"] ==
+                            "meta-value0.81" or
+                            sample.resource_metadata["a_float_key"] <= 0.41))
+            self.assertTrue(sample.resource_metadata["an_int_key"] > 42)
+
+    def test_query_mixed_data_and_metadata_filter(self):
+        self._create_samples()
+        subfilter = {"or": [{"=": {"resource_metadata.a_string_key":
+                                   "meta-value0.81"}},
+                            {"<=": {"resource_metadata.a_float_key": 0.41}}]}
+
+        filter_expr = {"and": [{"=": {"resource_id": "resource-id-42"}},
+                               subfilter]}
+
+        results = list(self.conn.query_samples(filter_expr=filter_expr))
+
+        self.assertEqual(len(results), 4)
+        for sample in results:
+            self.assertTrue((sample.resource_metadata["a_string_key"] ==
+                            "meta-value0.81" or
+                            sample.resource_metadata["a_float_key"] <= 0.41))
+            self.assertEqual(sample.resource_id, "resource-id-42")
+
+    def test_query_non_existing_metadata_with_result(self):
+        self._create_samples()
+
+        filter_expr = {
+            "or": [{"=": {"resource_metadata.a_string_key":
+                          "meta-value0.81"}},
+                   {"<=": {"resource_metadata.key_not_exists": 0.41}}]}
+
+        results = list(self.conn.query_samples(filter_expr=filter_expr))
+
+        self.assertEqual(len(results), 3)
+        for sample in results:
+            self.assertEqual(sample.resource_metadata["a_string_key"],
+                             "meta-value0.81")
+
+    def test_query_non_existing_metadata_without_result(self):
+        self._create_samples()
+
+        filter_expr = {
+            "or": [{"=": {"resource_metadata.key_not_exists":
+                          "meta-value0.81"}},
+                   {"<=": {"resource_metadata.key_not_exists": 0.41}}]}
+
+        results = list(self.conn.query_samples(filter_expr=filter_expr))
         self.assertEqual(len(results), 0)
 
 
