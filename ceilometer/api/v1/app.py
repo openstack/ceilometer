@@ -20,7 +20,6 @@
 import flask
 from oslo.config import cfg
 
-from ceilometer.api import acl
 from ceilometer.api.v1 import blueprint as v1_blueprint
 from ceilometer.openstack.common import jsonutils
 from ceilometer import storage
@@ -32,7 +31,7 @@ class JSONEncoder(flask.json.JSONEncoder):
         return jsonutils.to_primitive(o)
 
 
-def make_app(conf, enable_acl=True, attach_storage=True,
+def make_app(conf, attach_storage=True,
              sources_file='sources.json'):
     app = flask.Flask('ceilometer.api')
     app.register_blueprint(v1_blueprint.blueprint, url_prefix='/v1')
@@ -56,11 +55,7 @@ def make_app(conf, enable_acl=True, attach_storage=True,
             flask.request.storage_conn = \
                 storage.get_connection(conf)
 
-    # Install the middleware wrapper
-    if enable_acl:
-        app.wsgi_app = acl.install(app.wsgi_app, conf)
-
     return app
 
 # For documentation
-app = make_app(cfg.CONF, enable_acl=False, attach_storage=False)
+app = make_app(cfg.CONF, attach_storage=False)

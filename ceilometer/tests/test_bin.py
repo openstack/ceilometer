@@ -105,6 +105,17 @@ class BinApiTestCase(base.BaseTestCase):
 
     def setUp(self):
         super(BinApiTestCase, self).setUp()
+        # create api_paste.ini file without authentication
+        content = \
+            "[pipeline:main]\n"\
+            "pipeline = api-server\n"\
+            "[app:api-server]\n"\
+            "paste.app_factory = ceilometer.api.app:app_factory\n"
+        self.paste = fileutils.write_to_tempfile(content=content,
+                                                 prefix='api_paste',
+                                                 suffix='.ini')
+
+        # create ceilometer.conf file
         self.api_port = random.randint(10000, 11000)
         self.http = httplib2.Http()
         pipeline_cfg_file = self.path_get('etc/ceilometer/pipeline.yaml')
@@ -115,11 +126,13 @@ class BinApiTestCase(base.BaseTestCase):
                   "debug=true\n"\
                   "pipeline_cfg_file={0}\n"\
                   "policy_file={1}\n"\
+                  "api_paste_config={2}\n"\
                   "[api]\n"\
-                  "port={2}\n"\
+                  "port={3}\n"\
                   "[database]\n"\
                   "connection=log://localhost\n".format(pipeline_cfg_file,
                                                         policy_file,
+                                                        self.paste,
                                                         self.api_port)
 
         self.tempfile = fileutils.write_to_tempfile(content=content,

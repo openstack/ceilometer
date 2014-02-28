@@ -20,11 +20,14 @@
 import datetime
 import json
 
-from ceilometer.api import acl
+import webtest
+
+from ceilometer.api import app
 from ceilometer.api.controllers import v2 as v2_api
 from ceilometer.openstack.common import timeutils
 from ceilometer.publisher import utils
 from ceilometer import sample
+from ceilometer.tests import api as acl
 from ceilometer.tests.api.v2 import FunctionalTest
 from ceilometer.tests import db as tests_db
 
@@ -115,7 +118,9 @@ class TestAPIACL(FunctionalTest,
 
     def _make_app(self):
         self.CONF.set_override("cache", "fake.cache", group=acl.OPT_GROUP_NAME)
-        return super(TestAPIACL, self)._make_app(enable_acl=True)
+        file_name = self.path_get('etc/ceilometer/api_paste.ini')
+        self.CONF.set_override("api_paste_config", file_name)
+        return webtest.TestApp(app.load_app())
 
     def test_non_authenticated(self):
         response = self.get_json('/meters', expect_errors=True)
