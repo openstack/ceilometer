@@ -43,7 +43,7 @@ Setting up a Development Sandbox
 Running the Tests
 =================
 
-Ceiloemter includes an extensive set of automated unit tests which are
+Ceilometer includes an extensive set of automated unit tests which are
 run through tox_.
 
 1. Install ``tox``::
