@@ -16,8 +16,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import mock
-import pecan
 import wsme
 
 from ceilometer.api.controllers import v2
@@ -25,9 +23,6 @@ from ceilometer.openstack.common import test
 
 
 class TestWsmeCustomType(test.BaseTestCase):
-    def setUp(self):
-        super(TestWsmeCustomType, self).setUp()
-        pecan.response = mock.MagicMock()
 
     def test_advenum_default(self):
         class dummybase(wsme.types.Base):
