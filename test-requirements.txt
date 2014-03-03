@@ -8,9 +8,11 @@ httplib2>=0.7.5
 http://tarballs.openstack.org/swift/swift-master.tar.gz#egg=swift
 mock>=1.0
 mox>=0.5.3
+MySQL-python
 # Docs Requirements
 docutils==0.9.1
 oslosphinx
+pymongo>=2.4
 python-subunit>=0.0.18
 sphinx>=1.1.2,<1.2
 sphinxcontrib-docbookrestapi
