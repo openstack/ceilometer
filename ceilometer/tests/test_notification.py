@@ -114,6 +114,12 @@ class TestNotification(tests_base.BaseTestCase):
             self.srv.start()
         self.fake_event_endpoint = fake_event_endpoint_class.return_value
 
+    def test_start_multiple_listeners(self):
+        urls = ["fake://vhost1", "fake://vhost2"]
+        self.CONF.set_override("messaging_urls", urls, group="notification")
+        self._do_process_notification_manager_start()
+        self.assertEqual(2, len(self.srv.listeners))
+
     def test_process_notification(self):
         self._do_process_notification_manager_start()
         self.srv.pipeline_manager.pipelines[0] = mock.MagicMock()
@@ -122,18 +128,18 @@ class TestNotification(tests_base.BaseTestCase):
                          'compute.instance.create.end',
                          TEST_NOTICE_PAYLOAD, TEST_NOTICE_METADATA)
 
-        self.assertEqual(1, len(self.srv.listener.dispatcher.endpoints))
+        self.assertEqual(1, len(self.srv.listeners[0].dispatcher.endpoints))
         self.assertTrue(self.srv.pipeline_manager.publisher.called)
 
     def test_process_notification_no_events(self):
         self._do_process_notification_manager_start()
-        self.assertEqual(1, len(self.srv.listener.dispatcher.endpoints))
+        self.assertEqual(1, len(self.srv.listeners[0].dispatcher.endpoints))
         self.assertNotEqual(self.fake_event_endpoint,
-                            self.srv.listener.dispatcher.endpoints[0])
+                            self.srv.listeners[0].dispatcher.endpoints[0])
 
     def test_process_notification_with_events(self):
         self.CONF.set_override("store_events", True, group="notification")
         self._do_process_notification_manager_start()
-        self.assertEqual(2, len(self.srv.listener.dispatcher.endpoints))
+        self.assertEqual(2, len(self.srv.listeners[0].dispatcher.endpoints))
         self.assertEqual(self.fake_event_endpoint,
-                         self.srv.listener.dispatcher.endpoints[0])
+                         self.srv.listeners[0].dispatcher.endpoints[0])

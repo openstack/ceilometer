@@ -39,6 +39,12 @@ OPTS = [
                 deprecated_group='collector',
                 default=False,
                 help='Save event details.'),
+    cfg.MultiStrOpt('messaging_urls',
+                    default=[],
+                    help="Messaging URLs to listen for notifications. "
+                         "Example: transport://user:pass@host1:port"
+                         "[,hostN:portN]/virtual_host "
+                         "(DEFAULT/transport_url is used if empty)"),
 ]
 
 cfg.CONF.register_opts(OPTS, group="notification")
@@ -83,12 +89,18 @@ class NotificationService(os_service.Service):
             targets.extend(handler.get_targets(cfg.CONF))
             endpoints.append(handler)
 
-        self.listener = messaging.get_notification_listener(targets, endpoints)
-        self.listener.start()
+        urls = cfg.CONF.notification.messaging_urls or [None]
+        self.listeners = []
+        for url in urls:
+            listener = messaging.get_notification_listener(targets,
+                                                           endpoints,
+                                                           url)
+            listener.start()
+            self.listeners.append(listener)
 
         # Add a dummy thread to have wait() working
         self.tg.add_timer(604800, lambda: None)
 
     def stop(self):
-        self.listener.stop()
+        map(lambda x: x.stop(), self.listeners)
         super(NotificationService, self).stop()
