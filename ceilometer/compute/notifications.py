@@ -20,9 +20,13 @@
 """Converters for producing compute sample messages from notification events.
 """
 
+import abc
+import six
+
 from oslo.config import cfg
 
 from ceilometer import sample
+from ceilometer.compute import util
 from ceilometer import plugin
 
 
@@ -50,10 +54,36 @@ class ComputeNotificationBase(plugin.NotificationBase):
         ]
 
 
-class InstanceScheduled(ComputeNotificationBase):
-    event_types = ['scheduler.run_instance.scheduled']
+@six.add_metaclass(abc.ABCMeta)
+class UserMetadataAwareInstanceNotificationBase(ComputeNotificationBase):
+    """Consumes notifications containing instance user metadata.
+    """
 
     def process_notification(self, message):
+        instance_properties = self.get_instance_properties(message)
+        if 'metadata' in instance_properties:
+            src_metadata = instance_properties['metadata']
+            del instance_properties['metadata']
+            util.add_reserved_user_metadata(src_metadata, instance_properties)
+        return self.get_sample(message)
+
+    def get_instance_properties(self, message):
+        """Retrieve instance properties from notification payload."""
+        return message['payload']
+
+    @abc.abstractmethod
+    def get_sample(self, message):
+        """Derive sample from notification payload."""
+
+
+class InstanceScheduled(UserMetadataAwareInstanceNotificationBase):
+    event_types = ['scheduler.run_instance.scheduled']
+
+    def get_instance_properties(self, message):
+        """Retrieve instance properties from notification payload."""
+        return message['payload']['request_spec']['instance_properties']
+
+    def get_sample(self, message):
         yield sample.Sample.from_notification(
             name='instance.scheduled',
             type=sample.TYPE_DELTA,
@@ -67,14 +97,15 @@ class InstanceScheduled(ComputeNotificationBase):
             message=message)
 
 
-class ComputeInstanceNotificationBase(ComputeNotificationBase):
+class ComputeInstanceNotificationBase(
+        UserMetadataAwareInstanceNotificationBase):
     """Convert compute.instance.* notifications into Samples
     """
     event_types = ['compute.instance.*']
 
 
 class Instance(ComputeInstanceNotificationBase):
-    def process_notification(self, message):
+    def get_sample(self, message):
         yield sample.Sample.from_notification(
             name='instance',
             type=sample.TYPE_GAUGE,
@@ -87,7 +118,7 @@ class Instance(ComputeInstanceNotificationBase):
 
 
 class Memory(ComputeInstanceNotificationBase):
-    def process_notification(self, message):
+    def get_sample(self, message):
         yield sample.Sample.from_notification(
             name='memory',
             type=sample.TYPE_GAUGE,
@@ -100,7 +131,7 @@ class Memory(ComputeInstanceNotificationBase):
 
 
 class VCpus(ComputeInstanceNotificationBase):
-    def process_notification(self, message):
+    def get_sample(self, message):
         yield sample.Sample.from_notification(
             name='vcpus',
             type=sample.TYPE_GAUGE,
@@ -113,7 +144,7 @@ class VCpus(ComputeInstanceNotificationBase):
 
 
 class RootDiskSize(ComputeInstanceNotificationBase):
-    def process_notification(self, message):
+    def get_sample(self, message):
         yield sample.Sample.from_notification(
             name='disk.root.size',
             type=sample.TYPE_GAUGE,
@@ -126,7 +157,7 @@ class RootDiskSize(ComputeInstanceNotificationBase):
 
 
 class EphemeralDiskSize(ComputeInstanceNotificationBase):
-    def process_notification(self, message):
+    def get_sample(self, message):
         yield sample.Sample.from_notification(
             name='disk.ephemeral.size',
             type=sample.TYPE_GAUGE,
@@ -139,7 +170,7 @@ class EphemeralDiskSize(ComputeInstanceNotificationBase):
 
 
 class InstanceFlavor(ComputeInstanceNotificationBase):
-    def process_notification(self, message):
+    def get_sample(self, message):
         instance_type = message.get('payload', {}).get('instance_type')
         if instance_type:
             yield sample.Sample.from_notification(
@@ -160,7 +191,7 @@ class InstanceDelete(ComputeInstanceNotificationBase):
 
     event_types = ['compute.instance.delete.samples']
 
-    def process_notification(self, message):
+    def get_sample(self, message):
         for s in message['payload'].get('samples', []):
             yield sample.Sample.from_notification(
                 name=s['name'],

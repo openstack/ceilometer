@@ -48,7 +48,7 @@
 
 
 #
-# Options defined in ceilometer.compute.pollsters.util
+# Options defined in ceilometer.compute.util
 #
 
 # list of metadata prefixes reserved for metering use (list
