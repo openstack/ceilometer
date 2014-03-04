@@ -95,6 +95,12 @@ class _Base(plugin.ComputePollster):
             except virt_inspector.InstanceNotFoundException as err:
                 # Instance was deleted while getting samples. Ignore it.
                 LOG.debug(_('Exception while getting samples %s'), err)
+            except NotImplementedError:
+                # Selected inspector does not implement this pollster.
+                LOG.debug(_('%(inspector)s does not provide data for '
+                            ' %(pollster)s'), ({
+                          'inspector': manager.inspector.__class__.__name__,
+                          'pollster': self.__class__.__name__}))
             except Exception as err:
                 LOG.warning(_('Ignoring instance %(name)s: %(error)s') % (
                             {'name': instance_name, 'error': err}))
@@ -150,4 +156,105 @@ class WriteBytesPollster(_Base):
             type=sample.TYPE_CUMULATIVE,
             unit='B',
             volume=c_data.w_bytes,
+        )
+
+
+@six.add_metaclass(abc.ABCMeta)
+class _DiskRatesPollsterBase(plugin.ComputePollster):
+
+    CACHE_KEY_DISK_RATE = 'diskio-rate'
+
+    def _populate_cache(self, inspector, cache, instance):
+        i_cache = cache.setdefault(self.CACHE_KEY_DISK_RATE, {})
+        if instance.id not in i_cache:
+            r_bytes_rate = 0
+            r_requests_rate = 0
+            w_bytes_rate = 0
+            w_requests_rate = 0
+            for disk, info in inspector.inspect_disk_rates(instance):
+                r_bytes_rate += info.read_bytes_rate
+                r_requests_rate += info.read_requests_rate
+                w_bytes_rate += info.write_bytes_rate
+                w_requests_rate += info.write_requests_rate
+            i_cache[instance.id] = virt_inspector.DiskRateStats(
+                r_bytes_rate,
+                r_requests_rate,
+                w_bytes_rate,
+                w_requests_rate
+            )
+        return i_cache[instance.id]
+
+    @abc.abstractmethod
+    def _get_sample(self, instance, disk_rates_info):
+        """Return one Sample."""
+
+    def get_samples(self, manager, cache, resources):
+        for instance in resources:
+            try:
+                disk_rates_info = self._populate_cache(
+                    manager.inspector,
+                    cache,
+                    instance,
+                )
+                yield self._get_sample(instance, disk_rates_info)
+            except virt_inspector.InstanceNotFoundException as err:
+                # Instance was deleted while getting samples. Ignore it.
+                LOG.debug(_('Exception while getting samples %s'), err)
+            except NotImplementedError:
+                # Selected inspector does not implement this pollster.
+                LOG.debug(_('%(inspector)s does not provide data for '
+                            ' %(pollster)s'), ({
+                          'inspector': manager.inspector.__class__.__name__,
+                          'pollster': self.__class__.__name__}))
+            except Exception as err:
+                instance_name = util.instance_name(instance)
+                LOG.error(_('Ignoring instance %(name)s: %(error)s') % (
+                    {'name': instance_name, 'error': err}))
+
+
+class ReadBytesRatePollster(_DiskRatesPollsterBase):
+
+    def _get_sample(self, instance, disk_rates_info):
+        return util.make_sample_from_instance(
+            instance,
+            name='disk.read.bytes.rate',
+            type=sample.TYPE_GAUGE,
+            unit='B/s',
+            volume=disk_rates_info.read_bytes_rate,
+        )
+
+
+class ReadRequestsRatePollster(_DiskRatesPollsterBase):
+
+    def _get_sample(self, instance, disk_rates_info):
+        return util.make_sample_from_instance(
+            instance,
+            name='disk.read.requests.rate',
+            type=sample.TYPE_GAUGE,
+            unit='requests/s',
+            volume=disk_rates_info.read_requests_rate,
+        )
+
+
+class WriteBytesRatePollster(_DiskRatesPollsterBase):
+
+    def _get_sample(self, instance, disk_rates_info):
+        return util.make_sample_from_instance(
+            instance,
+            name='disk.write.bytes.rate',
+            type=sample.TYPE_GAUGE,
+            unit='B/s',
+            volume=disk_rates_info.write_bytes_rate,
+        )
+
+
+class WriteRequestsRatePollster(_DiskRatesPollsterBase):
+
+    def _get_sample(self, instance, disk_rates_info):
+        return util.make_sample_from_instance(
+            instance,
+            name='disk.write.requests.rate',
+            type=sample.TYPE_GAUGE,
+            unit='requests/s',
+            volume=disk_rates_info.write_requests_rate,
         )

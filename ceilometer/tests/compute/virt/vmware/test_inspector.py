@@ -121,3 +121,48 @@ class TestVsphereInspection(test.BaseTestCase):
 
         for vnic, rates_info in result:
             self.assertEqual(expected_stats[vnic.name], rates_info)
+
+    def test_inspect_disk_rates(self):
+
+        # construct test data
+        test_vm_moid = "vm-21"
+        disk1 = "disk-1"
+        disk2 = "disk-2"
+        counter_name_to_id_map = {
+            vsphere_inspector.VC_DISK_READ_RATE_CNTR: 1,
+            vsphere_inspector.VC_DISK_READ_REQUESTS_RATE_CNTR: 2,
+            vsphere_inspector.VC_DISK_WRITE_RATE_CNTR: 3,
+            vsphere_inspector.VC_DISK_WRITE_REQUESTS_RATE_CNTR: 4
+        }
+        counter_id_to_stats_map = {
+            1: {disk1: 1, disk2: 2},
+            2: {disk1: 300, disk2: 400},
+            3: {disk1: 5, disk2: 6},
+            4: {disk1: 700},
+        }
+
+        def get_counter_id_side_effect(counter_full_name):
+            return counter_name_to_id_map[counter_full_name]
+
+        def query_stat_side_effect(vm_moid, counter_id):
+            # assert inputs
+            self.assertEqual(test_vm_moid, vm_moid)
+            self.assertTrue(counter_id in counter_id_to_stats_map)
+            return counter_id_to_stats_map[counter_id]
+
+        # configure vsphere operations mock with the test data
+        ops_mock = self._inspector._ops
+        ops_mock.get_vm_moid.return_value = test_vm_moid
+        ops_mock.get_perf_counter_id.side_effect = get_counter_id_side_effect
+        ops_mock.query_vm_device_stats.side_effect = query_stat_side_effect
+
+        result = self._inspector.inspect_disk_rates(mock.MagicMock())
+
+        # validate result
+        expected_stats = {
+            disk1: virt_inspector.DiskRateStats(1024, 300, 5120, 700),
+            disk2: virt_inspector.DiskRateStats(2048, 400, 6144, 0)
+        }
+
+        actual_stats = dict((disk.device, rates) for (disk, rates) in result)
+        self.assertEqual(expected_stats, actual_stats)
