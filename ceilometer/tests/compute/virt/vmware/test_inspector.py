@@ -80,3 +80,44 @@ class TestVsphereInspection(test.BaseTestCase):
             fake_cpu_util_value
         cpu_util_stat = self._inspector.inspect_cpu_util(fake_instance)
         self.assertEqual(fake_stat, cpu_util_stat)
+
+    def test_inspect_vnic_rates(self):
+
+        # construct test data
+        test_vm_moid = "vm-21"
+        vnic1 = "vnic-1"
+        vnic2 = "vnic-2"
+        counter_name_to_id_map = {
+            vsphere_inspector.VC_NETWORK_RX_BYTES_COUNTER: 1,
+            vsphere_inspector.VC_NETWORK_TX_BYTES_COUNTER: 2
+        }
+        counter_id_to_stats_map = {
+            1: {vnic1: 1000.0, vnic2: 3000.0},
+            2: {vnic1: 2000.0, vnic2: 4000.0},
+        }
+
+        def get_counter_id_side_effect(counter_full_name):
+            return counter_name_to_id_map[counter_full_name]
+
+        def query_stat_side_effect(vm_moid, counter_id):
+            # assert inputs
+            self.assertEqual(test_vm_moid, vm_moid)
+            self.assertTrue(counter_id in counter_id_to_stats_map)
+            return counter_id_to_stats_map[counter_id]
+
+        # configure vsphere operations mock with the test data
+        ops_mock = self._inspector._ops
+        ops_mock.get_vm_moid.return_value = test_vm_moid
+        ops_mock.get_perf_counter_id.side_effect = get_counter_id_side_effect
+        ops_mock.query_vm_device_stats.side_effect = \
+            query_stat_side_effect
+        result = self._inspector.inspect_vnic_rates(mock.MagicMock())
+
+        # validate result
+        expected_stats = {
+            vnic1: virt_inspector.InterfaceRateStats(1.0, 2.0),
+            vnic2: virt_inspector.InterfaceRateStats(3.0, 4.0)
+        }
+
+        for vnic, rates_info in result:
+            self.assertEqual(expected_stats[vnic.name], rates_info)

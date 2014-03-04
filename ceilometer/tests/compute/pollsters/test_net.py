@@ -171,3 +171,89 @@ class TestNetPollsterCache(base.TestPollsterBase):
 
     def test_outgoing_packets(self):
         self._check_get_samples_cache(net.OutgoingPacketsPollster)
+
+
+class TestNetRatesPollster(base.TestPollsterBase):
+
+    def setUp(self):
+        super(TestNetRatesPollster, self).setUp()
+        self.vnic0 = virt_inspector.Interface(
+            name='vnet0',
+            fref='fa163e71ec6e',
+            mac='fa:16:3e:71:ec:6d',
+            parameters=dict(ip='10.0.0.2',
+                            projmask='255.255.255.0',
+                            projnet='proj1',
+                            dhcp_server='10.0.0.1'))
+        stats0 = virt_inspector.InterfaceRateStats(rx_bytes_rate=1L,
+                                                   tx_bytes_rate=2L)
+        self.vnic1 = virt_inspector.Interface(
+            name='vnet1',
+            fref='fa163e71ec6f',
+            mac='fa:16:3e:71:ec:6e',
+            parameters=dict(ip='192.168.0.3',
+                            projmask='255.255.255.0',
+                            projnet='proj2',
+                            dhcp_server='10.0.0.2'))
+        stats1 = virt_inspector.InterfaceRateStats(rx_bytes_rate=3L,
+                                                   tx_bytes_rate=4L)
+        self.vnic2 = virt_inspector.Interface(
+            name='vnet2',
+            fref=None,
+            mac='fa:18:4e:72:fc:7e',
+            parameters=dict(ip='192.168.0.4',
+                            projmask='255.255.255.0',
+                            projnet='proj3',
+                            dhcp_server='10.0.0.3'))
+        stats2 = virt_inspector.InterfaceRateStats(rx_bytes_rate=5L,
+                                                   tx_bytes_rate=6L)
+
+        vnics = [
+            (self.vnic0, stats0),
+            (self.vnic1, stats1),
+            (self.vnic2, stats2),
+        ]
+        self.inspector.inspect_vnic_rates = mock.Mock(return_value=vnics)
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def _check_get_samples(self, factory, expected):
+        mgr = manager.AgentManager()
+        pollster = factory()
+        samples = list(pollster.get_samples(mgr, {}, [self.instance]))
+        self.assertEqual(3, len(samples))  # one for each nic
+        self.assertEqual(set([samples[0].name]),
+                         set([s.name for s in samples]))
+
+        def _verify_vnic_metering(ip, expected_volume, expected_rid):
+            match = [s for s in samples
+                     if s.resource_metadata['parameters']['ip'] == ip
+                     ]
+            self.assertEqual(1, len(match), 'missing ip %s' % ip)
+            self.assertEqual(expected_volume, match[0].volume)
+            self.assertEqual('gauge', match[0].type)
+            self.assertEqual(expected_rid, match[0].resource_id)
+
+        for ip, volume, rid in expected:
+            _verify_vnic_metering(ip, volume, rid)
+
+    def test_incoming_bytes_rate(self):
+        instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
+        self._check_get_samples(
+            net.IncomingBytesRatePollster,
+            [('10.0.0.2', 1L, self.vnic0.fref),
+             ('192.168.0.3', 3L, self.vnic1.fref),
+             ('192.168.0.4', 5L,
+              "%s-%s" % (instance_name_id, self.vnic2.name)),
+             ],
+        )
+
+    def test_outgoing_bytes(self):
+        instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
+        self._check_get_samples(
+            net.OutgoingBytesRatePollster,
+            [('10.0.0.2', 2L, self.vnic0.fref),
+             ('192.168.0.3', 4L, self.vnic1.fref),
+             ('192.168.0.4', 6L,
+              "%s-%s" % (instance_name_id, self.vnic2.name)),
+             ],
+        )
