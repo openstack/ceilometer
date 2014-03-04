@@ -23,7 +23,6 @@ import eventlet
 import mock
 from oslo.config import fixture as fixture_config
 import oslo.messaging
-import oslo.messaging._drivers.common
 from oslo.utils import netutils
 import testscenarios.testcase
 
@@ -209,12 +208,11 @@ class TestPublisher(testscenarios.testcase.WithScenarios,
     def test_published_with_no_policy(self, mylog):
         publisher = self.publisher_cls(
             netutils.urlsplit('%s://' % self.protocol))
-        side_effect = oslo.messaging._drivers.common.RPCException()
+        side_effect = oslo.messaging.MessageDeliveryFailure()
         with mock.patch.object(publisher, '_send') as fake_send:
             fake_send.side_effect = side_effect
-
             self.assertRaises(
-                oslo.messaging._drivers.common.RPCException,
+                oslo.messaging.MessageDeliveryFailure,
                 publisher.publish_samples,
                 mock.MagicMock(), self.test_data)
             self.assertTrue(mylog.info.called)
@@ -228,11 +226,11 @@ class TestPublisher(testscenarios.testcase.WithScenarios,
     def test_published_with_policy_block(self, mylog):
         publisher = self.publisher_cls(
             netutils.urlsplit('%s://?policy=default' % self.protocol))
-        side_effect = oslo.messaging._drivers.common.RPCException()
+        side_effect = oslo.messaging.MessageDeliveryFailure()
         with mock.patch.object(publisher, '_send') as fake_send:
             fake_send.side_effect = side_effect
             self.assertRaises(
-                oslo.messaging._drivers.common.RPCException,
+                oslo.messaging.MessageDeliveryFailure,
                 publisher.publish_samples,
                 mock.MagicMock(), self.test_data)
             self.assertTrue(mylog.info.called)
@@ -245,11 +243,11 @@ class TestPublisher(testscenarios.testcase.WithScenarios,
     def test_published_with_policy_incorrect(self, mylog):
         publisher = self.publisher_cls(
             netutils.urlsplit('%s://?policy=notexist' % self.protocol))
-        side_effect = oslo.messaging._drivers.common.RPCException()
+        side_effect = oslo.messaging.MessageDeliveryFailure()
         with mock.patch.object(publisher, '_send') as fake_send:
             fake_send.side_effect = side_effect
             self.assertRaises(
-                oslo.messaging._drivers.common.RPCException,
+                oslo.messaging.MessageDeliveryFailure,
                 publisher.publish_samples,
                 mock.MagicMock(), self.test_data)
             self.assertTrue(mylog.warn.called)
@@ -262,7 +260,7 @@ class TestPublisher(testscenarios.testcase.WithScenarios,
     def test_published_with_policy_drop_and_rpc_down(self):
         publisher = self.publisher_cls(
             netutils.urlsplit('%s://?policy=drop' % self.protocol))
-        side_effect = oslo.messaging._drivers.common.RPCException()
+        side_effect = oslo.messaging.MessageDeliveryFailure()
         with mock.patch.object(publisher, '_send') as fake_send:
             fake_send.side_effect = side_effect
             publisher.publish_samples(mock.MagicMock(),
@@ -275,7 +273,7 @@ class TestPublisher(testscenarios.testcase.WithScenarios,
     def test_published_with_policy_queue_and_rpc_down(self):
         publisher = self.publisher_cls(
             netutils.urlsplit('%s://?policy=queue' % self.protocol))
-        side_effect = oslo.messaging._drivers.common.RPCException()
+        side_effect = oslo.messaging.MessageDeliveryFailure()
         with mock.patch.object(publisher, '_send') as fake_send:
             fake_send.side_effect = side_effect
 
@@ -291,7 +289,7 @@ class TestPublisher(testscenarios.testcase.WithScenarios,
         publisher = self.publisher_cls(
             netutils.urlsplit('%s://?policy=queue' % self.protocol))
 
-        side_effect = oslo.messaging._drivers.common.RPCException()
+        side_effect = oslo.messaging.MessageDeliveryFailure()
         with mock.patch.object(publisher, '_send') as fake_send:
             fake_send.side_effect = side_effect
             publisher.publish_samples(mock.MagicMock(),
@@ -315,7 +313,7 @@ class TestPublisher(testscenarios.testcase.WithScenarios,
         publisher = self.publisher_cls(netutils.urlsplit(
             '%s://?policy=queue&max_queue_length=3' % self.protocol))
 
-        side_effect = oslo.messaging._drivers.common.RPCException()
+        side_effect = oslo.messaging.MessageDeliveryFailure()
         with mock.patch.object(publisher, '_send') as fake_send:
             fake_send.side_effect = side_effect
             for i in range(0, 5):
@@ -342,7 +340,7 @@ class TestPublisher(testscenarios.testcase.WithScenarios,
         publisher = self.publisher_cls(
             netutils.urlsplit('%s://?policy=queue' % self.protocol))
 
-        side_effect = oslo.messaging._drivers.common.RPCException()
+        side_effect = oslo.messaging.MessageDeliveryFailure()
         with mock.patch.object(publisher, '_send') as fake_send:
             fake_send.side_effect = side_effect
             for i in range(0, 2000):
