@@ -247,7 +247,8 @@ class Connection(object):
         raise NotImplementedError(_('Samples not implemented'))
 
     @staticmethod
-    def get_meter_statistics(sample_filter, period=None, groupby=None):
+    def get_meter_statistics(sample_filter, period=None, groupby=None,
+                             aggregate=None):
         """Return an iterable of model.Statistics instances.
 
         The filter must have a meter value set.

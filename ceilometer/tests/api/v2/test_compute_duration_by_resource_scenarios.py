@@ -57,7 +57,7 @@ class TestComputeDurationByResource(FunctionalTest,
         self.late2 = datetime.datetime(2012, 8, 29, 19, 0)
 
     def _patch_get_interval(self, start, end):
-        def get_interval(event_filter, period, groupby):
+        def get_interval(event_filter, period, groupby, aggregate):
             assert event_filter.start
             assert event_filter.end
             if (event_filter.start > end or event_filter.end < start):

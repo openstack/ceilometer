@@ -637,6 +637,9 @@ class Statistics(_Base):
     count = int
     "The number of samples seen"
 
+    aggregate = {wtypes.text: float}
+    "The selectable aggregate value(s)"
+
     duration = float
     "The difference, in seconds, between the oldest and newest timestamp"
 
@@ -705,6 +708,27 @@ class Statistics(_Base):
                    period_start=datetime.datetime(2013, 1, 4, 16, 00),
                    period_end=datetime.datetime(2013, 1, 4, 18, 00),
                    )
+
+
+class Aggregate(_Base):
+
+    func = wsme.wsattr(wtypes.text, mandatory=True)
+    "The aggregation function name"
+
+    param = wsme.wsattr(wtypes.text, default=None)
+    "The paramter to the aggregation function"
+
+    def __init__(self, **kwargs):
+        super(Aggregate, self).__init__(**kwargs)
+
+    @staticmethod
+    def validate(aggregate):
+        return aggregate
+
+    @classmethod
+    def sample(cls):
+        return cls(func='cardinality',
+                   param='resource_id')
 
 
 class MeterController(rest.RestController):
@@ -793,14 +817,15 @@ class MeterController(rest.RestController):
 
         return samples
 
-    @wsme_pecan.wsexpose([Statistics], [Query], [unicode], int)
-    def statistics(self, q=[], groupby=[], period=None):
+    @wsme_pecan.wsexpose([Statistics], [Query], [unicode], int, [Aggregate])
+    def statistics(self, q=[], groupby=[], period=None, aggregate=[]):
         """Computes the statistics of the samples in the time range given.
 
         :param q: Filter rules for the data to be returned.
         :param groupby: Fields for group by aggregation
         :param period: Returned result will be an array of statistics for a
                        period long of that number of seconds.
+        :param aggregate: The selectable aggregation functions to be applied.
         """
         if period and period < 0:
             raise ClientSideError(_("Period must be positive."))
@@ -811,7 +836,8 @@ class MeterController(rest.RestController):
         g = _validate_groupby_fields(groupby)
         computed = pecan.request.storage_conn.get_meter_statistics(f,
                                                                    period,
-                                                                   g)
+                                                                   g,
+                                                                   aggregate)
         LOG.debug(_('computed value coming from %r'),
                   pecan.request.storage_conn)
         # Find the original timestamp in the query to use for clamping

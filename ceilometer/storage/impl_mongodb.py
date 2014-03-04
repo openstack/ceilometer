@@ -591,7 +591,8 @@ class Connection(pymongo_base.Connection):
         finally:
             self.db[out].drop()
 
-    def get_meter_statistics(self, sample_filter, period=None, groupby=None):
+    def get_meter_statistics(self, sample_filter, period=None, groupby=None,
+                             aggregate=None):
         """Return an iterable of models.Statistics instance containing meter
         statistics described by the query parameters.
 
@@ -602,6 +603,10 @@ class Connection(pymongo_base.Connection):
                 set(groupby) - set(['user_id', 'project_id',
                                     'resource_id', 'source'])):
             raise NotImplementedError("Unable to group by these fields")
+
+        if aggregate:
+            msg = _('Selectable aggregates not implemented')
+            raise NotImplementedError(msg)
 
         q = pymongo_base.make_query_from_filter(sample_filter)
 
