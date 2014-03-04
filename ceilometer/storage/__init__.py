@@ -63,6 +63,11 @@ class StorageBadVersion(Exception):
     """Error raised when the storage backend version is not good enough."""
 
 
+class StorageBadAggregate(Exception):
+    """Error raised when an aggregate is unacceptable to storage backend."""
+    code = 400
+
+
 def get_engine(conf):
     """Load the configured engine and return an instance."""
     if conf.database_connection:
