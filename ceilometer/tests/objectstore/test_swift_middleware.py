@@ -60,7 +60,7 @@ class TestSwiftMiddleware(test.BaseTestCase):
         def __init__(self):
             self.pipelines = [self._faux_pipeline(self)]
 
-    def _fake_setup_pipeline(self, transformer_manager):
+    def _fake_setup_pipeline(self, transformer_manager=None):
         return self.pipeline_manager
 
     def setUp(self):
