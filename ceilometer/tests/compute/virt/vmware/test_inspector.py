@@ -59,3 +59,24 @@ class TestVsphereInspection(test.BaseTestCase):
             fake_memory_value
         memory_stat = self._inspector.inspect_memory_usage(fake_instance)
         self.assertEqual(fake_stat, memory_stat)
+
+    def test_inspect_cpu_util(self):
+        fake_instance_moid = 'fake_instance_moid'
+        fake_instance_id = 'fake_instance_id'
+        fake_perf_counter_id = 'fake_perf_counter_id'
+        fake_cpu_util_value = 60
+        fake_stat = virt_inspector.CPUUtilStats(util=60)
+
+        def construct_mock_instance_object(fake_instance_id):
+            instance_object = mock.MagicMock()
+            instance_object.id = fake_instance_id
+            return instance_object
+
+        fake_instance = construct_mock_instance_object(fake_instance_id)
+        self._inspector._ops.get_vm_moid.return_value = fake_instance_moid
+        self._inspector._ops.get_perf_counter_id.return_value = \
+            fake_perf_counter_id
+        self._inspector._ops.query_vm_aggregate_stats.return_value = \
+            fake_cpu_util_value
+        cpu_util_stat = self._inspector.inspect_cpu_util(fake_instance)
+        self.assertEqual(fake_stat, cpu_util_stat)

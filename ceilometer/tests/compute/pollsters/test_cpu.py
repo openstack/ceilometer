@@ -79,3 +79,36 @@ class TestCPUPollster(base.TestPollsterBase):
         self.assertEqual(len(samples), 1)
         self.assertEqual(samples[0].volume, 10 ** 6)
         self.assertEqual(len(cache), 0)
+
+
+class TestCPUUtilPollster(base.TestPollsterBase):
+
+    def setUp(self):
+        super(TestCPUUtilPollster, self).setUp()
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def test_get_samples(self):
+        next_value = iter((
+            virt_inspector.CPUUtilStats(util=40),
+            virt_inspector.CPUUtilStats(util=60),
+        ))
+
+        def inspect_cpu_util(name):
+            return six.next(next_value)
+
+        self.inspector.inspect_cpu_util = \
+            mock.Mock(side_effect=inspect_cpu_util)
+
+        mgr = manager.AgentManager()
+        pollster = cpu.CPUUtilPollster()
+
+        def _verify_cpu_util_metering(expected_util):
+            cache = {}
+            samples = list(pollster.get_samples(mgr, cache, [self.instance]))
+            self.assertEqual(1, len(samples))
+            self.assertEqual(set(['cpu_util']),
+                             set([s.name for s in samples]))
+            self.assertEqual(expected_util, samples[0].volume)
+
+        _verify_cpu_util_metering(40)
+        _verify_cpu_util_metering(60)
