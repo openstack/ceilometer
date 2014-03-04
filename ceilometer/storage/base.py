@@ -118,6 +118,44 @@ class StorageEngine(object):
 class Connection(object):
     """Base class for storage system connections."""
 
+    """A dictionary representing the capabilities of this driver.
+    """
+    DEFAULT_CAPABILITIES = {
+        'meters': {'pagination': False,
+                   'query': {'simple': False,
+                             'metadata': False,
+                             'complex': False}},
+        'resources': {'pagination': False,
+                      'query': {'simple': False,
+                                'metadata': False,
+                                'complex': False}},
+        'samples': {'pagination': False,
+                    'groupby': False,
+                    'query': {'simple': False,
+                              'metadata': False,
+                              'complex': False}},
+        'statistics': {'pagination': False,
+                       'groupby': False,
+                       'query': {'simple': False,
+                                 'metadata': False,
+                                 'complex': False},
+                       'aggregation': {'standard': False,
+                                       'selectable': {
+                                           'max': False,
+                                           'min': False,
+                                           'sum': False,
+                                           'avg': False,
+                                           'count': False,
+                                           'stddev': False,
+                                           'cardinality': False}}
+                       },
+        'alarms': {'query': {'simple': False,
+                             'complex': False},
+                   'history': {'query': {'simple': False,
+                                         'complex': False}}},
+        'events': {'query': {'simple': False}},
+    }
+
     @staticmethod
     def __init__(conf):
         """Constructor."""
@@ -355,3 +393,9 @@ class Connection(object):
 
         raise NotImplementedError(_('Complex query for alarms \
             history is not implemented.'))
+
+    @staticmethod
+    def get_capabilities():
+        """Return an dictionary representing the capabilities of this driver.
+        """
+        raise NotImplementedError(_('Capabilities not implemented.'))

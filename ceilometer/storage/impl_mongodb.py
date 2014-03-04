@@ -39,6 +39,7 @@ from ceilometer import storage
 from ceilometer.storage import base
 from ceilometer.storage import models
 from ceilometer.storage import pymongo_base
+from ceilometer import utils
 
 cfg.CONF.import_opt('time_to_live', 'ceilometer.storage',
                     group="database")
@@ -701,3 +702,25 @@ class Connection(pymongo_base.Connection):
                                    orderby,
                                    limit,
                                    models.AlarmChange)
+
+    def get_capabilities(self):
+        """Return an dictionary representing the capabilities of this driver.
+        """
+        available = {
+            'meters': {'query': {'simple': True,
+                                 'metadata': True}},
+            'resources': {'query': {'simple': True,
+                                    'metadata': True}},
+            'samples': {'query': {'simple': True,
+                                  'metadata': True,
+                                  'complex': True}},
+            'statistics': {'groupby': True,
+                           'query': {'simple': True,
+                                     'metadata': True},
+                           'aggregation': {'standard': True}},
+            'alarms': {'query': {'simple': True,
+                                 'complex': True},
+                       'history': {'query': {'simple': True,
+                                             'complex': True}}},
+        }
+        return utils.update_nested(self.DEFAULT_CAPABILITIES, available)

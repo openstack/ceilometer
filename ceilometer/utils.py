@@ -132,3 +132,16 @@ def lowercase_values(mapping):
     items = mapping.items()
     for key, value in items:
         mapping[key] = value.lower()
+
+
+def update_nested(d, u):
+    """Updates the leaf nodes in a nest dict, without replacing
+       entire sub-dicts.
+    """
+    for k, v in u.iteritems():
+        if isinstance(v, dict):
+            r = update_nested(d.get(k, {}), v)
+            d[k] = r
+        else:
+            d[k] = u[k]
+    return d
