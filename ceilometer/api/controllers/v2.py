@@ -28,11 +28,13 @@
 import ast
 import base64
 import copy
+import croniter
 import datetime
 import functools
 import inspect
 import json
 import jsonschema
+import pytz
 import uuid
 
 from oslo.config import cfg
@@ -106,6 +108,18 @@ class AdvEnum(wtypes.wsproperty):
     def _set(self, parent, value):
         if self.datatype.validate(value):
             setattr(parent, self._name, value)
+
+
+class CronType(wtypes.UserType):
+    """A user type that represents a cron format."""
+    basetype = six.string_types
+    name = 'cron'
+
+    @staticmethod
+    def validate(value):
+        # raises ValueError if invalid
+        croniter.croniter(value)
+        return value
 
 
 class _Base(wtypes.Base):
@@ -1505,6 +1519,59 @@ class AlarmCombinationRule(_Base):
                               '153462d0-a9b8-4b5b-8175-9e4b05e9b856'])
 
 
+class AlarmTimeConstraint(_Base):
+    """Representation of a time constraint on an alarm."""
+
+    name = wsme.wsattr(wtypes.text, mandatory=True)
+    "The name of the constraint"
+
+    _description = None  # provide a default
+
+    def get_description(self):
+        if not self._description:
+            return 'Time constraint at %s lasting for %s seconds' \
+                   % (self.start, self.duration)
+        return self._description
+
+    def set_description(self, value):
+        self._description = value
+
+    description = wsme.wsproperty(wtypes.text, get_description,
+                                  set_description)
+    "The description of the constraint"
+
+    start = wsme.wsattr(CronType(), mandatory=True)
+    "Start point of the time constraint, in cron format"
+
+    duration = wsme.wsattr(wtypes.IntegerType(minimum=0), mandatory=True)
+    "How long the constraint should last, in seconds"
+
+    timezone = wsme.wsattr(wtypes.text, default="")
+    "Timezone of the constraint"
+
+    def as_dict(self):
+        return self.as_dict_from_keys(['name', 'description', 'start',
+                                       'duration', 'timezone'])
+
+    @staticmethod
+    def validate(tc):
+        if tc.timezone:
+            try:
+                pytz.timezone(tc.timezone)
+            except Exception:
+                raise ClientSideError(_("Timezone %s is not valid")
+                                      % tc.timezone)
+        return tc
+
+    @classmethod
+    def sample(cls):
+        return cls(name='SampleConstraint',
+                   description='nightly build every night at 23h for 3 hours',
+                   start='0 23 * * *',
+                   duration=10800,
+                   timezone='Europe/Ljubljana')
+
+
 class Alarm(_Base):
     """Representation of an alarm.
 
@@ -1560,6 +1627,9 @@ class Alarm(_Base):
     """Describe when to trigger the alarm based on combining the state of
     other alarms"""
 
+    time_constraints = wtypes.wsattr([AlarmTimeConstraint], default=[])
+    """Describe time constraints for the alarm"""
+
     # These settings are ignored in the PUT or POST operations, but are
     # filled in for GET
     project_id = wtypes.text
@@ -1578,7 +1648,7 @@ class Alarm(_Base):
     state_timestamp = datetime.datetime
     "The date of the last alarm state changed"
 
-    def __init__(self, rule=None, **kwargs):
+    def __init__(self, rule=None, time_constraints=None, **kwargs):
         super(Alarm, self).__init__(**kwargs)
 
         if rule:
@@ -1586,6 +1656,9 @@ class Alarm(_Base):
                 self.threshold_rule = AlarmThresholdRule(**rule)
             elif self.type == 'combination':
                 self.combination_rule = AlarmCombinationRule(**rule)
+        if time_constraints:
+            self.time_constraints = [AlarmTimeConstraint(**tc)
+                                     for tc in time_constraints]
 
     @staticmethod
     def validate(alarm):
@@ -1628,6 +1701,7 @@ class Alarm(_Base):
                    type='combination',
                    threshold_rule=None,
                    combination_rule=AlarmCombinationRule.sample(),
+                   time_constraints=[AlarmTimeConstraint.sample().as_dict()],
                    user_id="c96c887c216949acbdfbd8b494863567",
                    project_id="c96c887c216949acbdfbd8b494863567",
                    enabled=True,
@@ -1646,6 +1720,7 @@ class Alarm(_Base):
             if k.endswith('_rule'):
                 del d[k]
         d['rule'] = getattr(self, "%s_rule" % self.type).as_dict()
+        d['time_constraints'] = [tc.as_dict() for tc in self.time_constraints]
         return d
 
 

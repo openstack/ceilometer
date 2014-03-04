@@ -71,7 +71,8 @@ class ModelTest(test.BaseTestCase):
         alarm_fields = ["alarm_id", "type", "enabled", "name", "description",
                         "timestamp", "user_id", "project_id", "state",
                         "state_timestamp", "ok_actions", "alarm_actions",
-                        "insufficient_data_actions", "repeat_actions", "rule"]
+                        "insufficient_data_actions", "repeat_actions", "rule",
+                        "time_constraints"]
 
         self.assertEqual(set(alarm_fields),
                          set(models.Alarm.get_field_names()))

@@ -19,6 +19,7 @@
 """
 import datetime
 import mock
+import pytz
 import uuid
 
 from six import moves
@@ -51,6 +52,7 @@ class TestEvaluate(base.TestEvaluatorBase):
                          ok_actions=[],
                          alarm_actions=[],
                          repeat_actions=False,
+                         time_constraints=[],
                          rule=dict(
                              comparison_operator='gt',
                              threshold=80.0,
@@ -79,6 +81,7 @@ class TestEvaluate(base.TestEvaluatorBase):
                          alarm_actions=[],
                          repeat_actions=False,
                          alarm_id=str(uuid.uuid4()),
+                         time_constraints=[],
                          rule=dict(
                              comparison_operator='le',
                              threshold=10.0,
@@ -438,3 +441,64 @@ class TestEvaluate(base.TestEvaluatorBase):
 
     def test_simple_alarm_no_clear_without_outlier_exclusion(self):
         self. _do_test_simple_alarm_clear_outlier_exclusion(False)
+
+    def test_state_change_inside_time_constraint(self):
+        self._set_all_alarms('ok')
+        self.alarms[0].time_constraints = [
+            {'name': 'test',
+             'description': 'test',
+             'start': '0 11 * * *',  # daily at 11:00
+             'duration': 10800,  # 3 hours
+             'timezone': 'Europe/Ljubljana'}
+        ]
+        self.alarms[1].time_constraints = self.alarms[0].time_constraints
+        dt = datetime.datetime(2014, 1, 1, 12, 0, 0,
+                               tzinfo=pytz.timezone('Europe/Ljubljana'))
+        with mock.patch('ceilometerclient.client.get_client',
+                        return_value=self.api_client):
+            timeutils.set_time_override(dt.astimezone(pytz.UTC))
+            # the following part based on test_simple_insufficient
+            self.api_client.statistics.list.return_value = []
+            self._evaluate_all_alarms()
+            self._assert_all_alarms('insufficient data')
+            expected = [mock.call(alarm.alarm_id,
+                                  state='insufficient data')
+                        for alarm in self.alarms]
+            update_calls = self.api_client.alarms.set_state.call_args_list
+            self.assertEqual(expected, update_calls,
+                             "Alarm should change state if the current "
+                             "time is inside its time constraint.")
+            expected = [mock.call(
+                alarm,
+                'ok',
+                ('%d datapoints are unknown'
+                 % alarm.rule['evaluation_periods']),
+                self._reason_data('unknown',
+                                  alarm.rule['evaluation_periods'],
+                                  None))
+                for alarm in self.alarms]
+            self.assertEqual(expected, self.notifier.notify.call_args_list)
+
+    def test_no_state_change_outside_time_constraint(self):
+        self._set_all_alarms('ok')
+        self.alarms[0].time_constraints = [
+            {'name': 'test',
+             'description': 'test',
+             'start': '0 11 * * *',  # daily at 11:00
+             'duration': 10800,  # 3 hours
+             'timezone': 'Europe/Ljubljana'}
+        ]
+        self.alarms[1].time_constraints = self.alarms[0].time_constraints
+        dt = datetime.datetime(2014, 1, 1, 15, 0, 0,
+                               tzinfo=pytz.timezone('Europe/Ljubljana'))
+        with mock.patch('ceilometerclient.client.get_client',
+                        return_value=self.api_client):
+            timeutils.set_time_override(dt.astimezone(pytz.UTC))
+            self.api_client.statistics.list.return_value = []
+            self._evaluate_all_alarms()
+            self._assert_all_alarms('ok')
+            update_calls = self.api_client.alarms.set_state.call_args_list
+            self.assertEqual([], update_calls,
+                             "Alarm should not change state if the current "
+                             " time is outside its time constraint.")
+            self.assertEqual([], self.notifier.notify.call_args_list)

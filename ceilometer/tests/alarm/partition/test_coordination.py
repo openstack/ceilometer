@@ -100,6 +100,7 @@ class TestCoordinate(test.BaseTestCase):
                             alarm_actions=[],
                             insufficient_data_actions=[],
                             alarm_id=uuid,
+                            time_constraints=[],
                             rule=dict(
                                 statistic='avg',
                                 comparison_operator='gt',

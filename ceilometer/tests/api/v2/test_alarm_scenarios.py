@@ -70,6 +70,9 @@ class TestAlarms(FunctionalTest,
                          repeat_actions=True,
                          user_id=self.auth_headers['X-User-Id'],
                          project_id=self.auth_headers['X-Project-Id'],
+                         time_constraints=[dict(name='testcons',
+                                                start='0 11 * * *',
+                                                duration=300)],
                          rule=dict(comparison_operator='gt',
                                    threshold=2.0,
                                    statistic='avg',
@@ -95,6 +98,7 @@ class TestAlarms(FunctionalTest,
                          repeat_actions=False,
                          user_id=self.auth_headers['X-User-Id'],
                          project_id=self.auth_headers['X-Project-Id'],
+                         time_constraints=[],
                          rule=dict(comparison_operator='gt',
                                    threshold=4.0,
                                    statistic='avg',
@@ -120,6 +124,7 @@ class TestAlarms(FunctionalTest,
                          repeat_actions=False,
                          user_id=self.auth_headers['X-User-Id'],
                          project_id=self.auth_headers['X-Project-Id'],
+                         time_constraints=[],
                          rule=dict(comparison_operator='gt',
                                    threshold=3.0,
                                    statistic='avg',
@@ -145,6 +150,7 @@ class TestAlarms(FunctionalTest,
                          repeat_actions=False,
                          user_id=self.auth_headers['X-User-Id'],
                          project_id=self.auth_headers['X-Project-Id'],
+                         time_constraints=[],
                          rule=dict(alarm_ids=['a', 'b'],
                                    operator='or')
                          )]:
@@ -215,6 +221,8 @@ class TestAlarms(FunctionalTest,
                          'meter.test')
         self.assertEqual(one['alarm_id'], alarms[0]['alarm_id'])
         self.assertEqual(one['repeat_actions'], alarms[0]['repeat_actions'])
+        self.assertEqual(one['time_constraints'],
+                         alarms[0]['time_constraints'])
 
     def test_get_alarm_disabled(self):
         alarm = models.Alarm(name='disabled',
@@ -231,6 +239,7 @@ class TestAlarms(FunctionalTest,
                              repeat_actions=False,
                              user_id=self.auth_headers['X-User-Id'],
                              project_id=self.auth_headers['X-Project-Id'],
+                             time_constraints=[],
                              rule=dict(alarm_ids=['a', 'b'], operator='or'))
         self.conn.update_alarm(alarm)
 
@@ -305,6 +314,70 @@ class TestAlarms(FunctionalTest,
                 "Invalid input for field/attribute %s."
                 " Value: \'None\'. Mandatory field missing."
                 % field.split('/', 1)[-1])
+        alarms = list(self.conn.get_alarms())
+        self.assertEqual(4, len(alarms))
+
+    def test_post_invalid_alarm_time_constraint_start(self):
+        json = {
+            'name': 'added_alarm_invalid_constraint_duration',
+            'type': 'threshold',
+            'time_constraints': [
+                {
+                    'name': 'testcons',
+                    'start': '11:00am',
+                    'duration': 10
+                }
+            ],
+            'threshold_rule': {
+                'meter_name': 'ameter',
+                'threshold': 300.0
+            }
+        }
+        self.post_json('/alarms', params=json, expect_errors=True, status=400,
+                       headers=self.auth_headers)
+        alarms = list(self.conn.get_alarms())
+        self.assertEqual(4, len(alarms))
+
+    def test_post_invalid_alarm_time_constraint_duration(self):
+        json = {
+            'name': 'added_alarm_invalid_constraint_duration',
+            'type': 'threshold',
+            'time_constraints': [
+                {
+                    'name': 'testcons',
+                    'start': '* 11 * * *',
+                    'duration': -1,
+                }
+            ],
+            'threshold_rule': {
+                'meter_name': 'ameter',
+                'threshold': 300.0
+            }
+        }
+        self.post_json('/alarms', params=json, expect_errors=True, status=400,
+                       headers=self.auth_headers)
+        alarms = list(self.conn.get_alarms())
+        self.assertEqual(4, len(alarms))
+
+    def test_post_invalid_alarm_time_constraint_timezone(self):
+        json = {
+            'name': 'added_alarm_invalid_constraint_timezone',
+            'type': 'threshold',
+            'time_constraints': [
+                {
+                    'name': 'testcons',
+                    'start': '* 11 * * *',
+                    'duration': 10,
+                    'timezone': 'aaaa'
+                }
+            ],
+            'threshold_rule': {
+                'meter_name': 'ameter',
+                'threshold': 300.0
+            }
+        }
+        self.post_json('/alarms', params=json, expect_errors=True, status=400,
+                       headers=self.auth_headers)
         alarms = list(self.conn.get_alarms())
         self.assertEqual(4, len(alarms))
 
@@ -1120,8 +1193,9 @@ class TestAlarms(FunctionalTest,
         self.assertIsNotNone(actual['event_id'])
 
     def _assert_in_json(self, expected, actual):
+        actual = jsonutils.dumps(jsonutils.loads(actual), sort_keys=True)
         for k, v in expected.iteritems():
-            fragment = jsonutils.dumps({k: v})[1:-1]
+            fragment = jsonutils.dumps({k: v}, sort_keys=True)[1:-1]
             self.assertTrue(fragment in actual,
                             '%s not in %s' % (fragment, actual))
 

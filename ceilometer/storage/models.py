@@ -299,6 +299,7 @@ class Alarm(Model):
     :param project_id: the project_id of the creator
     :param evaluation_periods: the number of periods
     :param period: the time period in seconds
+    :param time_constraints: the list of the alarm's time constraints, if any
     :param timestamp: the timestamp when the alarm was last updated
     :param state_timestamp: the timestamp of the last state change
     :param ok_actions: the list of webhooks to call when entering the ok state
@@ -312,7 +313,7 @@ class Alarm(Model):
     def __init__(self, alarm_id, type, enabled, name, description,
                  timestamp, user_id, project_id, state, state_timestamp,
                  ok_actions, alarm_actions, insufficient_data_actions,
-                 repeat_actions, rule):
+                 repeat_actions, rule, time_constraints):
         Model.__init__(
             self,
             alarm_id=alarm_id,
@@ -330,7 +331,8 @@ class Alarm(Model):
             insufficient_data_actions=
             insufficient_data_actions,
             repeat_actions=repeat_actions,
-            rule=rule)
+            rule=rule,
+            time_constraints=time_constraints)
 
 
 class AlarmChange(Model):

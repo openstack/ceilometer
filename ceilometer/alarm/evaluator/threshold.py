@@ -173,6 +173,11 @@ class ThresholdEvaluator(evaluator.Evaluator):
             self._refresh(alarm, state, reason, reason_data)
 
     def evaluate(self, alarm):
+        if not self.within_time_constraint(alarm):
+            LOG.debug(_('Attempted to evaluate alarm %s, but it is not '
+                        'within its time constraint.') % alarm.alarm_id)
+            return
+
         query = self._bound_duration(
             alarm,
             alarm.rule['query']
