@@ -108,6 +108,10 @@ class Source(object):
         if not isinstance(self.resources, list):
             raise PipelineException("Resources should be a list", cfg)
 
+        self.discovery = cfg.get('discovery') or []
+        if not isinstance(self.discovery, list):
+            raise PipelineException("Discovery should be a list", cfg)
+
         self._check_meters()
 
     def __str__(self):
@@ -350,6 +354,10 @@ class Pipeline(object):
     @property
     def resources(self):
         return self.source.resources
+
+    @property
+    def discovery(self):
+        return self.source.discovery
 
     def support_meter(self, meter_name):
         return self.source.support_meter(meter_name)

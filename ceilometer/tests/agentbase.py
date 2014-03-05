@@ -269,7 +269,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.assertTrue(60 in polling_tasks.keys())
         per_task_resources = polling_tasks[60].resources
         self.assertEqual(len(per_task_resources), 1)
-        self.assertEqual(per_task_resources['test'],
+        self.assertEqual(set(per_task_resources['test'].resources),
                          set(self.pipeline_cfg[0]['resources']))
         self.mgr.interval_task(polling_tasks.values()[0])
         pub = self.mgr.pipeline_manager.pipelines[0].publishers[0]
@@ -321,9 +321,9 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.assertEqual(len(pollsters), 2)
         per_task_resources = polling_tasks[60].resources
         self.assertEqual(len(per_task_resources), 2)
-        self.assertEqual(per_task_resources['test'],
+        self.assertEqual(set(per_task_resources['test'].resources),
                          set(self.pipeline_cfg[0]['resources']))
-        self.assertEqual(per_task_resources['testanother'],
+        self.assertEqual(set(per_task_resources['testanother'].resources),
                          set(self.pipeline_cfg[1]['resources']))
 
     def test_interval_exception_isolation(self):
@@ -410,6 +410,54 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
     def test_per_agent_discovery_discovered_overridden_by_static(self):
         self._do_test_per_agent_discovery(['discovered_1', 'discovered_2'],
                                           ['static_1', 'static_2'])
+
+    def test_per_agent_discovery_overridden_by_per_pipeline_discovery(self):
+        discovered_resources = ['discovered_1', 'discovered_2']
+        self.mgr.discovery_manager = self.create_discovery_manager()
+        self.Discovery.resources = discovered_resources
+        self.DiscoveryAnother.resources = [d[::-1]
+                                           for d in discovered_resources]
+        self.pipeline_cfg[0]['discovery'] = ['testdiscoveryanother',
+                                             'testdiscoverynonexistent',
+                                             'testdiscoveryexception']
+        self.pipeline_cfg[0]['resources'] = []
+        self.setup_pipeline()
+        polling_tasks = self.mgr.setup_polling_tasks()
+        self.mgr.interval_task(polling_tasks.get(60))
+        self.assertEqual(set(self.Pollster.resources),
+                         set(self.DiscoveryAnother.resources))
+
+    def _do_test_per_pipeline_discovery(self,
+                                        discovered_resources,
+                                        static_resources):
+        self.mgr.discovery_manager = self.create_discovery_manager()
+        self.Discovery.resources = discovered_resources
+        self.DiscoveryAnother.resources = [d[::-1]
+                                           for d in discovered_resources]
+        self.pipeline_cfg[0]['discovery'] = ['testdiscovery',
+                                             'testdiscoveryanother',
+                                             'testdiscoverynonexistent',
+                                             'testdiscoveryexception']
+        self.pipeline_cfg[0]['resources'] = static_resources
+        self.setup_pipeline()
+        polling_tasks = self.mgr.setup_polling_tasks()
+        self.mgr.interval_task(polling_tasks.get(60))
+        discovery = self.Discovery.resources + self.DiscoveryAnother.resources
+        # compare resource lists modulo ordering
+        self.assertEqual(set(self.Pollster.resources),
+                         set(static_resources + discovery))
+
+    def test_per_pipeline_discovery_discovered_only(self):
+        self._do_test_per_pipeline_discovery(['discovered_1', 'discovered_2'],
+                                             [])
+
+    def test_per_pipeline_discovery_static_only(self):
+        self._do_test_per_pipeline_discovery([],
+                                             ['static_1', 'static_2'])
+
+    def test_per_pipeline_discovery_discovered_augmented_by_static(self):
+        self._do_test_per_pipeline_discovery(['discovered_1', 'discovered_2'],
+                                             ['static_1', 'static_2'])
 
     def test_multiple_pipelines_different_static_resources(self):
         # assert that the amalgation of all static resources for a set
