@@ -13,6 +13,7 @@ lockfile>=0.8
 lxml>=2.3
 msgpack-python
 oslo.config>=1.2.0
+oslo.vmware
 pbr>=0.6,<1.0
 pecan>=0.4.5
 pysnmp>=4.2.1,<5.0.0
