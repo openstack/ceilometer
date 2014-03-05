@@ -20,6 +20,7 @@ from keystoneclient.v2_0 import client as ksclient
 from oslo.config import cfg
 
 from ceilometer import agent
+from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import service as os_service
 from ceilometer import service
@@ -35,15 +36,19 @@ class AgentManager(agent.AgentManager):
         super(AgentManager, self).__init__('central')
 
     def interval_task(self, task):
-        self.keystone = ksclient.Client(
-            username=cfg.CONF.service_credentials.os_username,
-            password=cfg.CONF.service_credentials.os_password,
-            tenant_id=cfg.CONF.service_credentials.os_tenant_id,
-            tenant_name=cfg.CONF.service_credentials.os_tenant_name,
-            cacert=cfg.CONF.service_credentials.os_cacert,
-            auth_url=cfg.CONF.service_credentials.os_auth_url,
-            region_name=cfg.CONF.service_credentials.os_region_name,
-            insecure=cfg.CONF.service_credentials.insecure)
+        try:
+            self.keystone = ksclient.Client(
+                username=cfg.CONF.service_credentials.os_username,
+                password=cfg.CONF.service_credentials.os_password,
+                tenant_id=cfg.CONF.service_credentials.os_tenant_id,
+                tenant_name=cfg.CONF.service_credentials.os_tenant_name,
+                cacert=cfg.CONF.service_credentials.os_cacert,
+                auth_url=cfg.CONF.service_credentials.os_auth_url,
+                region_name=cfg.CONF.service_credentials.os_region_name,
+                insecure=cfg.CONF.service_credentials.insecure)
+        except Exception as e:
+            LOG.error(_('Skip interval_task because Keystone error: %s'), e)
+            return
 
         super(AgentManager, self).interval_task(task)
 
