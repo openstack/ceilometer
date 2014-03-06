@@ -26,6 +26,8 @@ from ceilometer.openstack.common import test
 
 class TestUtilsV2(test.BaseTestCase):
 
+    _FAKE_RETURN_CLASS = 'fake_return_class'
+
     def setUp(self):
         self._utils = utilsv2.UtilsV2()
         self._utils._conn = mock.MagicMock()
@@ -83,7 +85,11 @@ class TestUtilsV2(test.BaseTestCase):
         self.assertEqual(fake_cpu_count, cpu_metrics[1])
         self.assertEqual(fake_uptime, cpu_metrics[2])
 
-    def test_get_vnic_metrics(self):
+    @mock.patch('ceilometer.compute.virt.hyperv.utilsv2.UtilsV2'
+                '._sum_metric_values_by_defs')
+    @mock.patch('ceilometer.compute.virt.hyperv.utilsv2.UtilsV2'
+                '._get_metric_value_instances')
+    def test_get_vnic_metrics(self, mock_get_instances, mock_get_by_defs):
         fake_vm_element_name = "fake_vm_element_name"
         fake_vnic_element_name = "fake_vnic_name"
         fake_vnic_address = "fake_vnic_address"
@@ -106,9 +112,7 @@ class TestUtilsV2(test.BaseTestCase):
 
         self._utils._get_metric_def = mock.MagicMock()
 
-        self._utils._get_metric_values = mock.MagicMock()
-        self._utils._get_metric_values.return_value = [fake_rx_bytes,
-                                                       fake_tx_bytes]
+        mock_get_by_defs.return_value = [fake_rx_bytes, fake_tx_bytes]
 
         vnic_metrics = list(self._utils.get_vnic_metrics(fake_vm_element_name))
 
@@ -147,6 +151,19 @@ class TestUtilsV2(test.BaseTestCase):
         self.assertEqual(fake_write_mb, disk_metrics[0]['write_mb'])
         self.assertEqual(fake_instance_id, disk_metrics[0]['instance_id'])
         self.assertEqual(fake_host_resource, disk_metrics[0]['host_resource'])
+
+    def test_get_metric_value_instances(self):
+        mock_el1 = mock.MagicMock()
+        mock_associator = mock.MagicMock()
+        mock_el1.associators.return_value = [mock_associator]
+
+        mock_el2 = mock.MagicMock()
+        mock_el2.associators.return_value = []
+
+        returned = self._utils._get_metric_value_instances(
+            [mock_el1, mock_el2], self._FAKE_RETURN_CLASS)
+
+        self.assertEqual([mock_associator], returned)
 
     def test_lookup_vm(self):
         fake_vm_element_name = "fake_vm_element_name"
