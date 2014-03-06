@@ -1708,17 +1708,8 @@ class Alarm(_Base):
 
     @staticmethod
     def validate(alarm):
-        if (alarm.threshold_rule in (wtypes.Unset, None)
-                and alarm.combination_rule in (wtypes.Unset, None)):
-            error = _("either threshold_rule or combination_rule "
-                      "must be set")
-            raise ClientSideError(error)
 
-        if alarm.threshold_rule and alarm.combination_rule:
-            error = _("threshold_rule and combination_rule "
-                      "cannot be set at the same time")
-            raise ClientSideError(error)
-
+        Alarm.check_rule(alarm)
         if alarm.threshold_rule:
             # ensure an implicit constraint on project_id is added to
             # the query if not already present
@@ -1738,6 +1729,18 @@ class Alarm(_Base):
                     raise EntityNotFound(_('Alarm'), id)
 
         return alarm
+
+    @staticmethod
+    def check_rule(alarm):
+        rule = '%s_rule' % alarm.type
+        if getattr(alarm, rule) in (wtypes.Unset, None):
+            error = _("%(rule)s must be set for %(type)s"
+                      " type alarm") % {"rule": rule, "type": alarm.type}
+            raise ClientSideError(error)
+        if alarm.threshold_rule and alarm.combination_rule:
+            error = _("threshold_rule and combination_rule "
+                      "cannot be set at the same time")
+            raise ClientSideError(error)
 
     @classmethod
     def sample(cls):
