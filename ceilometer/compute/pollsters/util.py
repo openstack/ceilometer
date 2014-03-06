@@ -18,8 +18,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from oslo.config import cfg
-
+from ceilometer.compute import util as compute_util
 from ceilometer.openstack.common import timeutils
 from ceilometer import sample
 
@@ -34,35 +33,6 @@ INSTANCE_PROPERTIES = [
     'os_type',
     'ramdisk_id',
 ]
-
-OPTS = [
-    cfg.ListOpt('reserved_metadata_namespace',
-                default=['metering.'],
-                help='List of metadata prefixes reserved for metering use.'),
-    cfg.IntOpt('reserved_metadata_length',
-               default=256,
-               help='Limit on length of reserved metadata values.'),
-]
-
-cfg.CONF.register_opts(OPTS)
-
-
-def _add_reserved_user_metadata(instance, metadata):
-    limit = cfg.CONF.reserved_metadata_length
-    user_metadata = {}
-    for prefix in cfg.CONF.reserved_metadata_namespace:
-        md = dict(
-            (k[len(prefix):].replace('.', '_'),
-             v[:limit] if isinstance(v, basestring) else v)
-            for k, v in instance.metadata.items()
-            if (k.startswith(prefix) and
-                k[len(prefix):].replace('.', '_') not in metadata)
-        )
-        user_metadata.update(md)
-    if user_metadata:
-        metadata['user_metadata'] = user_metadata
-
-    return metadata
 
 
 def _get_metadata_from_object(instance):
@@ -97,7 +67,7 @@ def _get_metadata_from_object(instance):
     metadata['root_gb'] = int(metadata['disk_gb']) - \
         int(metadata['ephemeral_gb'])
 
-    return _add_reserved_user_metadata(instance, metadata)
+    return compute_util.add_reserved_user_metadata(instance.metadata, metadata)
 
 
 def make_sample_from_instance(instance, name, type, unit, volume,
