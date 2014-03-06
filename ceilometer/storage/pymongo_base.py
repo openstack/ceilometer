@@ -169,7 +169,7 @@ class Connection(base.Connection):
         """
 
         if pagination:
-            raise NotImplementedError(_('Pagination not implemented'))
+            raise NotImplementedError('Pagination not implemented')
 
         q = {}
         if user is not None:
@@ -250,7 +250,7 @@ class Connection(base.Connection):
         :param pagination: Optional pagination query.
         """
         if pagination:
-            raise NotImplementedError(_('Pagination not implemented'))
+            raise NotImplementedError('Pagination not implemented')
 
         q = {}
         if user is not None:

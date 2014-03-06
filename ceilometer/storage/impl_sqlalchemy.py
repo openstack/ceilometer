@@ -177,8 +177,8 @@ def apply_metaquery_filter(session, query, metaquery):
         try:
             _model = META_TYPE_MAP[type(v)]
         except KeyError:
-            raise NotImplementedError(_('Query on %(key)s is of %(value)s '
-                                        'type and is not supported') %
+            raise NotImplementedError('Query on %(key)s is of %(value)s '
+                                      'type and is not supported' %
                                       {"key": k, "value": type(v)})
         else:
             meta_q = session.query(_model).\
@@ -201,7 +201,7 @@ def make_query_from_filter(session, query, sample_filter, require_meter=True):
     if sample_filter.meter:
         query = query.filter(models.Meter.name == sample_filter.meter)
     elif require_meter:
-        raise RuntimeError(_('Missing required meter specifier'))
+        raise RuntimeError('Missing required meter specifier')
     if sample_filter.source:
         query = query.filter(models.Sample.sources.any(
             id=sample_filter.source))
@@ -466,7 +466,7 @@ class Connection(base.Connection):
         # if they will be handled. We don't want extra wait or work for it to
         # just fail.
         if pagination:
-            raise NotImplementedError(_('Pagination not implemented'))
+            raise NotImplementedError('Pagination not implemented')
 
         session = self._get_db_session()
 
@@ -559,7 +559,7 @@ class Connection(base.Connection):
         """
 
         if pagination:
-            raise NotImplementedError(_('Pagination not implemented'))
+            raise NotImplementedError('Pagination not implemented')
 
         session = self._get_db_session()
 
@@ -711,8 +711,8 @@ class Connection(base.Connection):
                 compute = PARAMETERIZED_AGGREGATES['compute'][a.func]
                 functions.append(compute(a.param))
             else:
-                raise NotImplementedError(_('Selectable aggregate function %s'
-                                            ' is not supported') % a.func)
+                raise NotImplementedError('Selectable aggregate function %s'
+                                          ' is not supported' % a.func)
 
         return functions
 
@@ -784,8 +784,8 @@ class Connection(base.Connection):
         if groupby:
             for group in groupby:
                 if group not in ['user_id', 'project_id', 'resource_id']:
-                    raise NotImplementedError(
-                        _("Unable to group by these fields"))
+                    raise NotImplementedError('Unable to group by '
+                                              'these fields')
 
         if not period:
             for res in self._make_stats_query(sample_filter,
@@ -861,7 +861,7 @@ class Connection(base.Connection):
         """
 
         if pagination:
-            raise NotImplementedError(_('Pagination not implemented'))
+            raise NotImplementedError('Pagination not implemented')
 
         session = self._get_db_session()
         query = session.query(models.Alarm)
@@ -1343,8 +1343,8 @@ class QueryTransformer(object):
 
     def _handle_metadata(self, op, field_name, value):
         if op == self.operators["in"]:
-            raise NotImplementedError(
-                _("Metadata query with in operator is not implemented"))
+            raise NotImplementedError('Metadata query with in '
+                                      'operator is not implemented')
 
         field_name = field_name[len('resource_metadata.'):]
         meta_table = META_TYPE_MAP[type(value)]

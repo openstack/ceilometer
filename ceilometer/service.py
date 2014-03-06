@@ -113,6 +113,7 @@ def prepare_service(argv=None):
     # or select()
     eventlet.monkey_patch(socket=True, select=True)
     gettextutils.install('ceilometer', lazy=True)
+    gettextutils.enable_lazy()
     rpc.set_defaults(control_exchange='ceilometer')
     cfg.set_defaults(log.log_opts,
                      default_log_levels=['amqplib=WARN',

@@ -302,7 +302,7 @@ class Connection(pymongo_base.Connection):
         :param pagination: Optional pagination query.
         """
         if pagination:
-            raise NotImplementedError(_('Pagination not implemented'))
+            raise NotImplementedError('Pagination not implemented')
 
         q = {}
         if user is not None:
@@ -364,8 +364,7 @@ class Connection(pymongo_base.Connection):
             raise NotImplementedError("Unable to group by these fields")
 
         if aggregate:
-            msg = _('Selectable aggregates not implemented')
-            raise NotImplementedError(msg)
+            raise NotImplementedError('Selectable aggregates not implemented')
 
         q = pymongo_base.make_query_from_filter(sample_filter)
 
