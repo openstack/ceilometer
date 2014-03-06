@@ -75,14 +75,14 @@ class HardwarePollster(plugin.CentralPollster):
         # because of the interface requirement
         return ()
 
-    def generate_samples(self, host_url, datas):
-        """Generate an interable Sample from the datas returned by inspector
+    def generate_samples(self, host_url, data):
+        """Generate an iterable Sample from the data returned by inspector
 
         :param host_url: host url of the endpoint
-        :param datas: list of data returned by the corresponding inspector
+        :param data: list of data returned by the corresponding inspector
 
         """
-        return (self.generate_one_sample(host_url, data) for data in datas)
+        return (self.generate_one_sample(host_url, datum) for datum in data)
 
     @abc.abstractmethod
     def generate_one_sample(self, host_url, c_data):
@@ -91,7 +91,7 @@ class HardwarePollster(plugin.CentralPollster):
         :param host_url: host url of the endpoint
         :param c_data: data returned by the corresponding inspector, of
                        one of the types defined in the file
-                       ceiloemter.hardware.inspector.base.CPUStats
+                       ceilometer.hardware.inspector.base.CPUStats
         """
 
     def _get_inspector(self, parsed_url):

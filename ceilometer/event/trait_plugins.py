@@ -131,7 +131,7 @@ class BitfieldTraitPlugin(TraitPluginBase):
                       keys:
                             path: jsonpath of field to match.
                             bit: (int) number of bit to set (lsb is bit 0)
-                            value: set bit if corrosponding field's value
+                            value: set bit if corresponding field's value
                                    matches this. If value is not provided,
                                    bit will be set if the field exists (and
                                    is non-null), regardless of it's value.

@@ -1442,7 +1442,7 @@ class AlarmThresholdRule(_Base):
     "The number of historical periods to evaluate the threshold"
 
     exclude_outliers = wsme.wsattr(bool, default=False)
-    "Whether datapoints with anomolously low sample counts are excluded"
+    "Whether datapoints with anomalously low sample counts are excluded"
 
     def __init__(self, query=None, **kwargs):
         if query:
