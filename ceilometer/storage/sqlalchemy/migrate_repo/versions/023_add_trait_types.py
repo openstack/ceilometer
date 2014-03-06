@@ -30,7 +30,9 @@ def upgrade(migrate_engine):
         Column('id', Integer, primary_key=True),
         Column('desc', String(255)),
         Column('data_type', Integer),
-        UniqueConstraint('desc', 'data_type', name="tt_unique")
+        UniqueConstraint('desc', 'data_type', name="tt_unique"),
+        mysql_engine='InnoDB',
+        mysql_charset='utf8',
     )
     trait = Table('trait', meta, autoload=True)
     unique_name = Table('unique_name', meta, autoload=True)
@@ -90,7 +92,9 @@ def downgrade(migrate_engine):
     unique_name = Table(
         'unique_name', meta,
         Column('id', Integer, primary_key=True),
-        Column('key', String(255), unique=True)
+        Column('key', String(255), unique=True),
+        mysql_engine='InnoDB',
+        mysql_charset='utf8',
     )
 
     trait_type = Table('trait_type', meta, autoload=True)
