@@ -1117,6 +1117,46 @@ class TestAlarms(FunctionalTest,
                              headers=self.auth_headers)
         self.assertEqual(resp.status_code, 200)
 
+    def test_put_alarm_with_existing_name(self):
+        """Test that update a threshold alarm with an existing name.
+        """
+        json = {
+            'enabled': False,
+            'name': 'name1',
+            'state': 'ok',
+            'type': 'threshold',
+            'ok_actions': ['http://something/ok'],
+            'alarm_actions': ['http://something/alarm'],
+            'insufficient_data_actions': ['http://something/no'],
+            'repeat_actions': True,
+            'threshold_rule': {
+                'meter_name': 'ameter',
+                'query': [{'field': 'metadata.field',
+                           'op': 'eq',
+                           'value': '5',
+                           'type': 'string'}],
+                'comparison_operator': 'le',
+                'statistic': 'count',
+                'threshold': 50,
+                'evaluation_periods': 3,
+                'period': 180,
+            }
+        }
+        data = self.get_json('/alarms',
+                             q=[{'field': 'name',
+                                 'value': 'name2',
+                                 }])
+        self.assertEqual(1, len(data))
+        alarm_id = data[0]['alarm_id']
+
+        resp = self.put_json('/alarms/%s' % alarm_id,
+                             expect_errors=True, status=409,
+                             params=json,
+                             headers=self.auth_headers)
+        self.assertEqual(
+            'Alarm with name=name1 exists',
+            resp.json['error_message']['faultstring'])
+
     def test_delete_alarm(self):
         data = self.get_json('/alarms')
         self.assertEqual(4, len(data))
