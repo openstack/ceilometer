@@ -21,6 +21,7 @@
 
 import base64
 import datetime
+import json as jsonutils
 import logging
 import testscenarios
 
@@ -149,6 +150,33 @@ class TestListMeters(FunctionalTest,
                          set(['meter.test', 'meter.mine']))
         self.assertEqual(set(r['source'] for r in data),
                          set(['test_source', 'test_source1']))
+
+    def test_list_meters_query_with_timestamp(self):
+        date_time = datetime.datetime(2012, 7, 2, 10, 41)
+        isotime = date_time.isoformat()
+        resp = self.get_json('/meters',
+                             q=[{'field': 'timestamp',
+                                 'op': 'gt',
+                                 'value': isotime}],
+                             expect_errors=True)
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(jsonutils.loads(resp.body)['error_message']
+                         ['faultstring'],
+                         'Unknown argument: "timestamp": '
+                         'not valid for this resource')
+
+    def test_query_samples_with_search_offset(self):
+        resp = self.get_json('/meters/meter.mine',
+                             q=[{'field': 'search_offset',
+                                 'op': 'eq',
+                                 'value': 42}],
+                             expect_errors=True)
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(jsonutils.loads(resp.body)['error_message']
+                         ['faultstring'],
+                         "Invalid input for field/attribute field. "
+                         "Value: 'search_offset'. "
+                         "search_offset cannot be used without timestamp")
 
     def test_list_meters_with_dict_metadata(self):
         data = self.get_json('/meters/meter.mine',
