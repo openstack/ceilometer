@@ -332,7 +332,29 @@ def _verify_query_segregation(query, auth_project=None):
 
 
 def _validate_query(query, db_func, internal_keys=[],
-                    is_timestamp_valid=True):
+                    allow_timestamps=True):
+    """Validates the syntax of the query and verifies that the query
+    request is authorized for the included project.
+
+    :param query: Query expression that should be validated
+    :param db_func: the function on the storage level, of which arguments
+        will form the valid_keys list, which defines the valid fields for a
+        query expression
+    :param internal_keys: internally used field names, that should not be
+        used for querying
+    :param allow_timestamps: defines whether the timestamp-based constraint is
+        applicable for this query or not
+
+    :returns: None, if the query is valid
+
+    :raises InvalidInput: if an operator is not supported for a given field
+    :raises InvalidInput: if timestamp constraints are allowed, but
+        search_offset was included without timestamp constraint
+    :raises: UnknownArgument: if a field name is not a timestamp field, nor
+        in the list of valid keys
+
+    """
+
     _verify_query_segregation(query)
 
     valid_keys = inspect.getargspec(db_func)[0]
@@ -345,11 +367,11 @@ def _validate_query(query, db_func, internal_keys=[],
     has_timestamp_query = _validate_timestamp_fields(query,
                                                      'timestamp',
                                                      ('lt', 'le', 'gt', 'ge'),
-                                                     is_timestamp_valid)
+                                                     allow_timestamps)
     has_search_offset_query = _validate_timestamp_fields(query,
                                                          'search_offset',
                                                          ('eq'),
-                                                         is_timestamp_valid)
+                                                         allow_timestamps)
 
     if has_search_offset_query and not has_timestamp_query:
         raise wsme.exc.InvalidInput('field', 'search_offset',
@@ -377,13 +399,37 @@ def _validate_query(query, db_func, internal_keys=[],
 
 
 def _validate_timestamp_fields(query, field_name, operator_list,
-                               is_timestamp_valid):
+                               allow_timestamps):
+    """Validates the timestamp related constraints in a query expression, if
+    there are any.
+
+    :param query: query expression that may contain the timestamp fields
+    :param field_name: timestamp name, which should be checked (timestamp,
+        search_offset)
+    :param operator_list: list of operators that are supported for that
+        timestamp, which was specified in the parameter field_name
+    :param allow_timestamps: defines whether the timestamp-based constraint is
+        applicable to this query or not
+
+    :returns: True, if there was a timestamp constraint, containing
+        a timestamp field named as defined in field_name, in the query and it
+        was allowed and syntactically correct.
+    :returns: False, if there wasn't timestamp constraint, containing a
+        timestamp field named as defined in field_name, in the query
+
+    :raises InvalidInput: if an operator is unsupported for a given timestamp
+        field
+    :raises UnknownArgument: if the timestamp constraint is not allowed in
+        the query
+
+    """
+
     for item in query:
         if item.field == field_name:
             #If *timestamp* or *search_offset* field was specified in the
             #query, but timestamp is not supported on that resource, on
             #which the query was invoked, then raise an exception.
-            if not is_timestamp_valid:
+            if not allow_timestamps:
                 raise wsme.exc.UnknownArgument(field_name,
                                                "not valid for " +
                                                "this resource")
@@ -396,9 +442,9 @@ def _validate_timestamp_fields(query, field_name, operator_list,
 
 
 def _query_to_kwargs(query, db_func, internal_keys=[],
-                     is_timestamp_valid=True):
+                     allow_timestamps=True):
     _validate_query(query, db_func, internal_keys=internal_keys,
-                    is_timestamp_valid=is_timestamp_valid)
+                    allow_timestamps=allow_timestamps)
     query = _sanitize_query(query, db_func)
     internal_keys.append('self')
     valid_keys = set(inspect.getargspec(db_func)[0]) - set(internal_keys)
@@ -930,7 +976,7 @@ class MetersController(rest.RestController):
         """
         #Timestamp field is not supported for Meter queries
         kwargs = _query_to_kwargs(q, pecan.request.storage_conn.get_meters,
-                                  is_timestamp_valid=False)
+                                  allow_timestamps=False)
         return [Meter.from_db_model(m)
                 for m in pecan.request.storage_conn.get_meters(**kwargs)]
 
@@ -1461,7 +1507,7 @@ class AlarmThresholdRule(_Base):
         #statistics queries as the sliding evaluation window advances
         #over time.
         _validate_query(threshold_rule.query, storage.SampleFilter.__init__,
-                        is_timestamp_valid=False)
+                        allow_timestamps=False)
         return threshold_rule
 
     @property
@@ -2010,7 +2056,7 @@ class AlarmsController(rest.RestController):
         #Timestamp is not supported field for Simple Alarm queries
         kwargs = _query_to_kwargs(q,
                                   pecan.request.storage_conn.get_alarms,
-                                  is_timestamp_valid=False)
+                                  allow_timestamps=False)
         return [Alarm.from_db_model(m)
                 for m in pecan.request.storage_conn.get_alarms(**kwargs)]
 
