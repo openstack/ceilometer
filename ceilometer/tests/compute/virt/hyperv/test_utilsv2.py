@@ -94,8 +94,8 @@ class TestUtilsV2(test.BaseTestCase):
         fake_vnic_element_name = "fake_vnic_name"
         fake_vnic_address = "fake_vnic_address"
         fake_vnic_path = "fake_vnic_path"
-        fake_rx_bytes = 1000
-        fake_tx_bytes = 2000
+        fake_rx_mb = 1000
+        fake_tx_mb = 2000
 
         self._utils._lookup_vm = mock.MagicMock()
         self._utils._get_vm_resources = mock.MagicMock()
@@ -112,13 +112,13 @@ class TestUtilsV2(test.BaseTestCase):
 
         self._utils._get_metric_def = mock.MagicMock()
 
-        mock_get_by_defs.return_value = [fake_rx_bytes, fake_tx_bytes]
+        mock_get_by_defs.return_value = [fake_rx_mb, fake_tx_mb]
 
         vnic_metrics = list(self._utils.get_vnic_metrics(fake_vm_element_name))
 
         self.assertEqual(1, len(vnic_metrics))
-        self.assertEqual(fake_rx_bytes, vnic_metrics[0]['rx_bytes'])
-        self.assertEqual(fake_tx_bytes, vnic_metrics[0]['tx_bytes'])
+        self.assertEqual(fake_rx_mb, vnic_metrics[0]['rx_mb'])
+        self.assertEqual(fake_tx_mb, vnic_metrics[0]['tx_mb'])
         self.assertEqual(fake_vnic_element_name,
                          vnic_metrics[0]['element_name'])
         self.assertEqual(fake_vnic_address, vnic_metrics[0]['address'])

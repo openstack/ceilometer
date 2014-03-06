@@ -115,8 +115,8 @@ class UtilsV2(object):
                 metric_value_instances, [metric_def_in, metric_def_out])
 
             yield {
-                'rx_bytes': metric_values[0],
-                'tx_bytes': metric_values[1],
+                'rx_mb': metric_values[0],
+                'tx_mb': metric_values[1],
                 'element_name': vnic.ElementName,
                 'address': vnic.Address
             }
