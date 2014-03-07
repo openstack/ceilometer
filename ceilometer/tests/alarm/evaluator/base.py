@@ -21,7 +21,6 @@
 import mock
 
 from ceilometer.openstack.common import test
-from ceilometer.openstack.common import timeutils
 
 
 class TestEvaluatorBase(test.BaseTestCase):
@@ -31,10 +30,6 @@ class TestEvaluatorBase(test.BaseTestCase):
         self.notifier = mock.MagicMock()
         self.evaluator = self.EVALUATOR(self.notifier)
         self.prepare_alarms()
-
-    def tearDown(self):
-        super(TestEvaluatorBase, self).tearDown()
-        timeutils.utcnow.override_time = None
 
     @staticmethod
     def prepare_alarms(self):

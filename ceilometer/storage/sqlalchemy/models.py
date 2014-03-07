@@ -203,8 +203,9 @@ class Sample(Base):
     resource_id = Column(String(255), ForeignKey('resource.id'))
     resource_metadata = Column(JSONEncodedDict())
     volume = Column(Float(53))
-    timestamp = Column(PreciseTimestamp(), default=timeutils.utcnow)
-    recorded_at = Column(PreciseTimestamp(), default=timeutils.utcnow)
+    timestamp = Column(PreciseTimestamp(), default=lambda: timeutils.utcnow())
+    recorded_at = Column(PreciseTimestamp(),
+                         default=lambda: timeutils.utcnow())
     message_signature = Column(String(1000))
     message_id = Column(String(1000))
     sources = relationship("Source", secondary=lambda: sourceassoc)
@@ -278,13 +279,14 @@ class Alarm(Base):
     name = Column(Text)
     type = Column(String(50))
     description = Column(Text)
-    timestamp = Column(PreciseTimestamp, default=timeutils.utcnow)
+    timestamp = Column(PreciseTimestamp, default=lambda: timeutils.utcnow())
 
     user_id = Column(String(255))
     project_id = Column(String(255))
 
     state = Column(String(255))
-    state_timestamp = Column(PreciseTimestamp, default=timeutils.utcnow)
+    state_timestamp = Column(PreciseTimestamp,
+                             default=lambda: timeutils.utcnow())
 
     ok_actions = Column(JSONEncodedDict)
     alarm_actions = Column(JSONEncodedDict)
@@ -308,7 +310,7 @@ class AlarmChange(Base):
     user_id = Column(String(255), ForeignKey('user.id'))
     type = Column(String(20))
     detail = Column(Text)
-    timestamp = Column(PreciseTimestamp, default=timeutils.utcnow)
+    timestamp = Column(PreciseTimestamp, default=lambda: timeutils.utcnow())
 
 
 class EventType(Base):

@@ -322,16 +322,17 @@ class TestEvaluate(base.TestEvaluatorBase):
         alarm = self.alarms[0]
         if exclude_outliers is not None:
             alarm.rule['exclude_outliers'] = exclude_outliers
-        timeutils.utcnow.override_time = datetime.datetime(2012, 7, 2, 10, 45)
-        constraint = self.evaluator._bound_duration(alarm, [])
-        self.assertEqual([
-            {'field': 'timestamp',
-             'op': 'le',
-             'value': timeutils.utcnow().isoformat()},
-            {'field': 'timestamp',
-             'op': 'ge',
-             'value': start},
-        ], constraint)
+        with mock.patch.object(timeutils, 'utcnow') as mock_utcnow:
+            mock_utcnow.return_value = datetime.datetime(2012, 7, 2, 10, 45)
+            constraint = self.evaluator._bound_duration(alarm, [])
+            self.assertEqual([
+                {'field': 'timestamp',
+                 'op': 'le',
+                 'value': timeutils.utcnow().isoformat()},
+                {'field': 'timestamp',
+                 'op': 'ge',
+                 'value': start},
+            ], constraint)
 
     def test_bound_duration_outlier_exclusion_defaulted(self):
         self._do_test_bound_duration('2012-07-02T10:39:00')
@@ -448,7 +449,8 @@ class TestEvaluate(base.TestEvaluatorBase):
     def test_simple_alarm_no_clear_without_outlier_exclusion(self):
         self. _do_test_simple_alarm_clear_outlier_exclusion(False)
 
-    def test_state_change_inside_time_constraint(self):
+    @mock.patch.object(timeutils, 'utcnow')
+    def test_state_change_inside_time_constraint(self, mock_utcnow):
         self._set_all_alarms('ok')
         self.alarms[0].time_constraints = [
             {'name': 'test',
@@ -460,9 +462,9 @@ class TestEvaluate(base.TestEvaluatorBase):
         self.alarms[1].time_constraints = self.alarms[0].time_constraints
         dt = datetime.datetime(2014, 1, 1, 12, 0, 0,
                                tzinfo=pytz.timezone('Europe/Ljubljana'))
+        mock_utcnow.return_value = dt.astimezone(pytz.UTC)
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
-            timeutils.set_time_override(dt.astimezone(pytz.UTC))
             # the following part based on test_simple_insufficient
             self.api_client.statistics.list.return_value = []
             self._evaluate_all_alarms()
@@ -485,7 +487,8 @@ class TestEvaluate(base.TestEvaluatorBase):
                 for alarm in self.alarms]
             self.assertEqual(expected, self.notifier.notify.call_args_list)
 
-    def test_no_state_change_outside_time_constraint(self):
+    @mock.patch.object(timeutils, 'utcnow')
+    def test_no_state_change_outside_time_constraint(self, mock_utcnow):
         self._set_all_alarms('ok')
         self.alarms[0].time_constraints = [
             {'name': 'test',
@@ -497,9 +500,9 @@ class TestEvaluate(base.TestEvaluatorBase):
         self.alarms[1].time_constraints = self.alarms[0].time_constraints
         dt = datetime.datetime(2014, 1, 1, 15, 0, 0,
                                tzinfo=pytz.timezone('Europe/Ljubljana'))
+        mock_utcnow.return_value = dt.astimezone(pytz.UTC)
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
-            timeutils.set_time_override(dt.astimezone(pytz.UTC))
             self.api_client.statistics.list.return_value = []
             self._evaluate_all_alarms()
             self._assert_all_alarms('ok')

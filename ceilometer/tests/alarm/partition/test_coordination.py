@@ -42,7 +42,10 @@ class TestCoordinate(test.BaseTestCase):
                                group='alarm')
         self.api_client = mock.Mock()
         self.override_start = datetime.datetime(2012, 7, 2, 10, 45)
-        timeutils.utcnow.override_time = self.override_start
+        patcher = mock.patch.object(timeutils, 'utcnow')
+        self.addCleanup(patcher.stop)
+        self.mock_utcnow = patcher.start()
+        self.mock_utcnow.return_value = self.override_start
         self.partition_coordinator = coordination.PartitionCoordinator()
         self.partition_coordinator.coordination_rpc = mock.Mock()
         #add extra logger to check exception conditions and logged content
@@ -52,7 +55,6 @@ class TestCoordinate(test.BaseTestCase):
 
     def tearDown(self):
         super(TestCoordinate, self).tearDown()
-        timeutils.utcnow.override_time = None
         # clean up the logger
         coordination.LOG.logger.removeHandler(self.str_handler)
         self.output.close()
@@ -112,7 +114,7 @@ class TestCoordinate(test.BaseTestCase):
 
     def _advance_time(self, factor):
         delta = datetime.timedelta(seconds=self.test_interval * factor)
-        timeutils.utcnow.override_time += delta
+        self.mock_utcnow.return_value = timeutils.utcnow() + delta
 
     def _younger_by(self, offset):
         return self.partition_coordinator.this.priority + offset
