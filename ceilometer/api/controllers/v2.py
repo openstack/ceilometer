@@ -1379,10 +1379,10 @@ class Resource(_Base):
     "The ID of the user who created the resource or updated it last"
 
     first_sample_timestamp = datetime.datetime
-    "UTC date & time of the first sample associated with the resource"
+    "UTC date & time not later than the first sample known for this resource"
 
     last_sample_timestamp = datetime.datetime
-    "UTC date & time of the last sample associated with the resource"
+    "UTC date & time not earlier than the last sample known for this resource"
 
     metadata = {wtypes.text: wtypes.text}
     "Arbitrary metadata associated with the resource"

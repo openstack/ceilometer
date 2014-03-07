@@ -262,9 +262,21 @@ class ResourceTest(DBTestBase,
 
     def test_get_resources_by_user(self):
         resources = list(self.conn.get_resources(user='user-id'))
-        self.assertEqual(len(resources), 2)
+        self.assertTrue(len(resources) == 2 or len(resources) == 1)
         ids = set(r.resource_id for r in resources)
-        self.assertEqual(ids, set(['resource-id', 'resource-id-alternate']))
+        # tolerate storage driver only reporting latest owner of resource
+        resources_ever_owned_by = set(['resource-id',
+                                       'resource-id-alternate'])
+        resources_now_owned_by = set(['resource-id'])
+        self.assertTrue(ids == resources_ever_owned_by or
+                        ids == resources_now_owned_by,
+                        'unexpected resources: %s' % ids)
+
+    def test_get_resources_by_alternate_user(self):
+        resources = list(self.conn.get_resources(user='user-id-alternate'))
+        self.assertEqual(1, len(resources))
+        # only a single resource owned by this user ever
+        self.assertEqual('resource-id-alternate', resources[0].resource_id)
 
     def test_get_resources_by_project(self):
         resources = list(self.conn.get_resources(project='project-id'))
