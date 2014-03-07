@@ -1153,6 +1153,39 @@ class StatisticsTest(DBTestBase,
                 secret='not-so-secret',
             )
             self.conn.record_metering_data(msg)
+        for i in range(3):
+            c = sample.Sample(
+                'memory',
+                'gauge',
+                'MB',
+                8 + i,
+                'user-5',
+                'project2',
+                'resource-6',
+                timestamp=datetime.datetime(2012, 9, 25, 10 + i, 30 + i),
+                resource_metadata={},
+                source='test',
+            )
+            msg = utils.meter_message_from_counter(
+                c,
+                secret='not-so-secret',
+            )
+            self.conn.record_metering_data(msg)
+
+    def test_by_meter(self):
+        f = storage.SampleFilter(
+            meter='memory'
+        )
+        results = list(self.conn.get_meter_statistics(f))[0]
+        self.assertEqual(results.duration,
+                         (datetime.datetime(2012, 9, 25, 12, 32)
+                          - datetime.datetime(2012, 9, 25, 10, 30)).seconds)
+        self.assertEqual(results.count, 3)
+        self.assertEqual(results.unit, 'MB')
+        self.assertEqual(results.min, 8)
+        self.assertEqual(results.max, 10)
+        self.assertEqual(results.sum, 27)
+        self.assertEqual(results.avg, 9)
 
     def test_by_user(self):
         f = storage.SampleFilter(
