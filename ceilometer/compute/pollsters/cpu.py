@@ -51,7 +51,40 @@ class CPUPollster(plugin.ComputePollster):
             except virt_inspector.InstanceNotFoundException as err:
                 # Instance was deleted while getting samples. Ignore it.
                 LOG.debug(_('Exception while getting samples %s'), err)
+            except NotImplementedError:
+                # Selected inspector does not implement this pollster.
+                LOG.debug(_('Obtaining CPU time is not implemented for %s'
+                            ), manager.inspector.__class__.__name__)
             except Exception as err:
                 LOG.error(_('could not get CPU time for %(id)s: %(e)s') % (
                           {'id': instance.id, 'e': err}))
                 LOG.exception(err)
+
+
+class CPUUtilPollster(plugin.ComputePollster):
+
+    def get_samples(self, manager, cache, resources):
+        for instance in resources:
+            LOG.debug(_('Checking CPU util for instance %s'), instance.id)
+            try:
+                cpu_info = manager.inspector.inspect_cpu_util(instance)
+                LOG.debug(_("CPU UTIL: %(instance)s %(util)d"),
+                          ({'instance': instance.__dict__,
+                            'util': cpu_info.util}))
+                yield util.make_sample_from_instance(
+                    instance,
+                    name='cpu_util',
+                    type=sample.TYPE_GAUGE,
+                    unit='%',
+                    volume=cpu_info.util,
+                )
+            except virt_inspector.InstanceNotFoundException as err:
+                # Instance was deleted while getting samples. Ignore it.
+                LOG.debug(_('Exception while getting samples %s'), err)
+            except NotImplementedError:
+                # Selected inspector does not implement this pollster.
+                LOG.debug(_('Obtaining CPU Util is not implemented for %s'
+                            ), manager.inspector.__class__.__name__)
+            except Exception as err:
+                LOG.error(_('Could not get CPU Util for %(id)s: %(e)s'), (
+                          {'id': instance.id, 'e': err}))

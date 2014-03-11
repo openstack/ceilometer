@@ -53,6 +53,12 @@ Instance = collections.namedtuple('Instance', ['name', 'UUID'])
 #
 CPUStats = collections.namedtuple('CPUStats', ['number', 'time'])
 
+# Named tuple representing CPU Utilization statistics.
+#
+# util: CPU utilization in percentage
+#
+CPUUtilStats = collections.namedtuple('CPUUtilStats', ['util'])
+
 # Named tuple representing Memory usage statistics.
 #
 # usage: Amount of memory used
@@ -128,6 +134,14 @@ class Inspector(object):
 
         :param instance_name: the name of the target instance
         :return: the number of CPUs and cumulative CPU time
+        """
+        raise NotImplementedError()
+
+    def inspect_cpu_util(self, instance):
+        """Inspect the CPU Utilization (%) for an instance.
+
+        :param instance: the target instance
+        :return: the percentage of CPU utilization
         """
         raise NotImplementedError()
 

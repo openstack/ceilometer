@@ -50,6 +50,7 @@ cfg.CONF.register_group(opt_group)
 cfg.CONF.register_opts(OPTS, group=opt_group)
 
 VC_AVERAGE_MEMORY_CONSUMED_CNTR = 'mem:consumed:average'
+VC_AVERAGE_CPU_CONSUMED_CNTR = 'cpu:usage:average'
 
 
 def get_api_session():
@@ -77,6 +78,17 @@ class VsphereInspector(virt_inspector.Inspector):
 
     def inspect_cpus(self, instance_name):
         raise NotImplementedError()
+
+    def inspect_cpu_util(self, instance):
+        vm_moid = self._ops.get_vm_moid(instance.id)
+        if vm_moid is None:
+            raise virt_inspector.InstanceNotFoundException(
+                _('VM %s not found in VMware Vsphere') % instance.id)
+        cpu_util_counter_id = self._ops.get_perf_counter_id(
+            VC_AVERAGE_CPU_CONSUMED_CNTR)
+        cpu_util = self._ops.query_vm_aggregate_stats(vm_moid,
+                                                      cpu_util_counter_id)
+        return virt_inspector.CPUUtilStats(util=cpu_util)
 
     def inspect_vnics(self, instance_name):
         raise NotImplementedError()
