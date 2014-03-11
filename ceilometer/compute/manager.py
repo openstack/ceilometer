@@ -19,8 +19,6 @@
 from ceilometer import agent
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import service as os_service
-from ceilometer import service
 
 LOG = log.getLogger(__name__)
 
@@ -34,8 +32,3 @@ class AgentManager(agent.AgentManager):
     @property
     def inspector(self):
         return self._inspector
-
-
-def agent_compute():
-    service.prepare_service()
-    os_service.launch(AgentManager()).wait()

@@ -28,13 +28,11 @@ from stevedore import extension
 from ceilometer.alarm.partition import coordination
 from ceilometer.alarm import rpc as rpc_alarm
 from ceilometer.openstack.common.gettextutils import _  # noqa
-from ceilometer.openstack.common import importutils
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import network_utils
 from ceilometer.openstack.common.rpc import dispatcher as rpc_dispatcher
 from ceilometer.openstack.common.rpc import service as rpc_service
 from ceilometer.openstack.common import service as os_service
-from ceilometer import service
 
 
 OPTS = [
@@ -45,9 +43,6 @@ OPTS = [
                     ' collection of underlying metrics.',
                deprecated_opts=[cfg.DeprecatedOpt(
                    'threshold_evaluation_interval', group='alarm')]),
-    cfg.StrOpt('evaluation_service',
-               default='ceilometer.alarm.service.SingletonAlarmService',
-               help='Class to launch as alarm evaluation service.'),
 ]
 
 cfg.CONF.register_opts(OPTS, group='alarm')
@@ -137,12 +132,6 @@ class SingletonAlarmService(AlarmService, os_service.Service):
     def _assigned_alarms(self):
         return self._client.alarms.list(q=[{'field': 'enabled',
                                             'value': True}])
-
-
-def alarm_evaluator():
-    service.prepare_service()
-    eval_service = importutils.import_object(cfg.CONF.alarm.evaluation_service)
-    os_service.launch(eval_service).wait()
 
 
 cfg.CONF.import_opt('host', 'ceilometer.service')
@@ -282,9 +271,3 @@ class AlarmNotifierService(rpc_service.Service):
                                 data.get('current'),
                                 data.get('reason'),
                                 data.get('reason_data'))
-
-
-def alarm_notifier():
-    service.prepare_service()
-    os_service.launch(AlarmNotifierService(
-        cfg.CONF.host, 'ceilometer.alarm')).wait()

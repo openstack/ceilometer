@@ -26,7 +26,6 @@ from stevedore import driver
 
 from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
-from ceilometer import service
 from ceilometer import utils
 
 
@@ -157,19 +156,3 @@ class EventFilter(object):
                  self.end_time,
                  self.event_type,
                  six.text_type(self.traits_filter)))
-
-
-def dbsync():
-    service.prepare_service()
-    get_connection(cfg.CONF).upgrade()
-
-
-def expirer():
-    service.prepare_service()
-    if cfg.CONF.database.time_to_live > 0:
-        LOG.debug(_("Clearing expired metering data"))
-        storage_conn = get_connection(cfg.CONF)
-        storage_conn.clear_expired_metering_data(
-            cfg.CONF.database.time_to_live)
-    else:
-        LOG.info(_("Nothing to clean, database time to live is disabled"))

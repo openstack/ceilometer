@@ -21,7 +21,6 @@ import os
 import socket
 import sys
 
-import eventlet
 from oslo.config import cfg
 from stevedore import named
 
@@ -108,10 +107,6 @@ class DispatchedService(object):
 
 
 def prepare_service(argv=None):
-    # NOTE(jd) We need to monkey patch the socket and select module for,
-    # at least, oslo.rpc, otherwise everything's blocked on its first read()
-    # or select()
-    eventlet.monkey_patch(socket=True, select=True)
     gettextutils.install('ceilometer', lazy=True)
     rpc.set_defaults(control_exchange='ceilometer')
     cfg.set_defaults(log.log_opts,

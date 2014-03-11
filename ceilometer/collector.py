@@ -25,7 +25,6 @@ from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common.rpc import dispatcher as rpc_dispatcher
 from ceilometer.openstack.common.rpc import service as rpc_service
-from ceilometer.openstack.common import service as os_service
 from ceilometer.openstack.common import units
 from ceilometer import service
 
@@ -106,9 +105,3 @@ class CollectorService(service.DispatchedService, rpc_service.Service):
         """
         self.dispatcher_manager.map_method('record_metering_data',
                                            data=data)
-
-
-def collector():
-    service.prepare_service()
-    os_service.launch(CollectorService(cfg.CONF.host,
-                                       'ceilometer.collector')).wait()
