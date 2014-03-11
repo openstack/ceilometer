@@ -21,7 +21,10 @@ import sqlalchemy as sa
 def get_alembic_version(meta):
     """Return Alembic version or None if no Alembic table exists."""
     try:
-        a_ver = sa.Table('alembic_version', meta, autoload=True)
+        a_ver = sa.Table(
+            'alembic_version',
+            meta,
+            autoload=True)
         return sa.select([a_ver.c.version_num]).scalar()
     except sa.exc.NoSuchTableError:
         return None
@@ -29,7 +32,10 @@ def get_alembic_version(meta):
 
 def delete_alembic(meta):
     try:
-        sa.Table('alembic_version', meta, autoload=True).drop()
+        sa.Table(
+            'alembic_version',
+            meta,
+            autoload=True).drop(checkfirst=True)
     except sa.exc.NoSuchTableError:
         pass
 
