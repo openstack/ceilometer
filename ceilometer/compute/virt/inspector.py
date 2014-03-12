@@ -89,6 +89,15 @@ InterfaceStats = collections.namedtuple('InterfaceStats',
                                          'tx_bytes', 'tx_packets'])
 
 
+# Named tuple representing vNIC rate statistics.
+#
+# rx_bytes_rate: rate of received bytes
+# tx_bytes_rate: rate of transmitted bytes
+#
+InterfaceRateStats = collections.namedtuple('InterfaceRateStats',
+                                            ['rx_bytes_rate', 'tx_bytes_rate'])
+
+
 # Named tuple representing disks.
 #
 # device: the device name for the disk
@@ -150,6 +159,15 @@ class Inspector(object):
 
         :param instance_name: the name of the target instance
         :return: for each vNIC, the number of bytes & packets
+                 received and transmitted
+        """
+        raise NotImplementedError()
+
+    def inspect_vnic_rates(self, instance):
+        """Inspect the vNIC rate statistics for an instance.
+
+        :param instance: the target instance
+        :return: for each vNIC, the rate of bytes & packets
                  received and transmitted
         """
         raise NotImplementedError()

@@ -51,6 +51,8 @@ cfg.CONF.register_opts(OPTS, group=opt_group)
 
 VC_AVERAGE_MEMORY_CONSUMED_CNTR = 'mem:consumed:average'
 VC_AVERAGE_CPU_CONSUMED_CNTR = 'cpu:usage:average'
+VC_NETWORK_RX_BYTES_COUNTER = 'net:bytesRx:average'
+VC_NETWORK_TX_BYTES_COUNTER = 'net:bytesTx:average'
 
 
 def get_api_session():
@@ -92,6 +94,38 @@ class VsphereInspector(virt_inspector.Inspector):
 
     def inspect_vnics(self, instance_name):
         raise NotImplementedError()
+
+    def inspect_vnic_rates(self, instance):
+        vm_moid = self._ops.get_vm_moid(instance.id)
+        if not vm_moid:
+            raise virt_inspector.InstanceNotFoundException(
+                _('VM %s not found in VMware Vsphere') % instance.id)
+
+        vnic_stats = {}
+        vnic_ids = set()
+
+        for net_counter in (VC_NETWORK_RX_BYTES_COUNTER,
+                            VC_NETWORK_TX_BYTES_COUNTER):
+            net_counter_id = self._ops.get_perf_counter_id(net_counter)
+            vnic_id_to_stats_map = \
+                self._ops.query_vm_device_stats(vm_moid, net_counter_id)
+            vnic_stats[net_counter] = vnic_id_to_stats_map
+            vnic_ids.update(vnic_id_to_stats_map.iterkeys())
+
+        for vnic_id in vnic_ids:
+            rx_bytes_rate = (vnic_stats[VC_NETWORK_RX_BYTES_COUNTER]
+                             .get(vnic_id, 0) / units.k)
+            tx_bytes_rate = (vnic_stats[VC_NETWORK_TX_BYTES_COUNTER]
+                             .get(vnic_id, 0) / units.k)
+
+            stats = virt_inspector.InterfaceRateStats(rx_bytes_rate,
+                                                      tx_bytes_rate)
+            interface = virt_inspector.Interface(
+                name=vnic_id,
+                mac=None,
+                fref=None,
+                parameters=None)
+            yield (interface, stats)
 
     def inspect_disks(self, instance_name):
         raise NotImplementedError()

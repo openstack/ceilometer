@@ -64,35 +64,71 @@ class _Base(plugin.ComputePollster):
 
     CACHE_KEY_VNIC = 'vnics'
 
-    def _get_vnics_for_instance(self, cache, inspector, instance_name):
+    def _get_vnic_info(self, inspector, instance):
+        instance_name = util.instance_name(instance)
+        return inspector.inspect_vnics(instance_name)
+
+    def _get_rx_info(self, info):
+        return info.rx_bytes
+
+    def _get_tx_info(self, info):
+        return info.tx_bytes
+
+    def _get_vnics_for_instance(self, cache, inspector, instance):
+        instance_name = util.instance_name(instance)
         i_cache = cache.setdefault(self.CACHE_KEY_VNIC, {})
         if instance_name not in i_cache:
             i_cache[instance_name] = list(
-                inspector.inspect_vnics(instance_name)
+                self._get_vnic_info(inspector, instance)
             )
         return i_cache[instance_name]
 
     def get_samples(self, manager, cache, resources):
         for instance in resources:
             instance_name = util.instance_name(instance)
-            LOG.info(_('checking instance %s'), instance.id)
+            LOG.debug(_('checking net info for instance %s'), instance.id)
             try:
                 vnics = self._get_vnics_for_instance(
                     cache,
                     manager.inspector,
-                    instance_name,
+                    instance,
                 )
                 for vnic, info in vnics:
-                    LOG.info(self.NET_USAGE_MESSAGE, instance_name,
-                             vnic.name, info.rx_bytes, info.tx_bytes)
+                    LOG.debug(self.NET_USAGE_MESSAGE, instance_name,
+                              vnic.name, self._get_rx_info(info),
+                              self._get_tx_info(info))
                     yield self._get_sample(instance, vnic, info)
             except virt_inspector.InstanceNotFoundException as err:
                 # Instance was deleted while getting samples. Ignore it.
                 LOG.debug(_('Exception while getting samples %s'), err)
+            except NotImplementedError:
+                # Selected inspector does not implement this pollster.
+                LOG.debug(_('%(inspector)s does not provide data for '
+                            ' %(pollster)s'), ({
+                          'inspector': manager.inspector.__class__.__name__,
+                          'pollster': self.__class__.__name__}))
             except Exception as err:
                 LOG.warning(_('Ignoring instance %(name)s: %(error)s') % (
                             {'name': instance_name, 'error': err}))
                 LOG.exception(err)
+
+
+class _RateBase(_Base):
+
+    NET_USAGE_MESSAGE = ' '.join(["NETWORK RATE:", "%s %s:",
+                                 "read-bytes-rate=%d",
+                                 "write-bytes-rate=%d"])
+
+    CACHE_KEY_VNIC = 'vnic-rates'
+
+    def _get_vnic_info(self, inspector, instance):
+        return inspector.inspect_vnic_rates(instance)
+
+    def _get_rx_info(self, info):
+        return info.rx_bytes_rate
+
+    def _get_tx_info(self, info):
+        return info.tx_bytes_rate
 
 
 class IncomingBytesPollster(_Base):
@@ -143,5 +179,31 @@ class OutgoingPacketsPollster(_Base):
             type=sample.TYPE_CUMULATIVE,
             unit='packet',
             volume=info.tx_packets,
+            vnic_data=vnic,
+        )
+
+
+class IncomingBytesRatePollster(_RateBase):
+
+    def _get_sample(self, instance, vnic, info):
+        return self.make_vnic_sample(
+            instance,
+            name='network.incoming.bytes.rate',
+            type=sample.TYPE_GAUGE,
+            unit='B/s',
+            volume=info.rx_bytes_rate,
+            vnic_data=vnic,
+        )
+
+
+class OutgoingBytesRatePollster(_RateBase):
+
+    def _get_sample(self, instance, vnic, info):
+        return self.make_vnic_sample(
+            instance,
+            name='network.outgoing.bytes.rate',
+            type=sample.TYPE_GAUGE,
+            unit='B/s',
+            volume=info.tx_bytes_rate,
             vnic_data=vnic,
         )
