@@ -50,13 +50,13 @@ Units
    and Documentation) and new sampling code should not be merged without the
    appropriate documentation.
 
-============  ========  ==============  =====
+============  ========  ==============  =======================
 Dimension     Unit      Abbreviations   Note
-============  ========  ==============  =====
+============  ========  ==============  =======================
 None          N/A                       Dimension-less variable
 Volume        byte      B
 Time          seconds   s
-============  ========  ==============  =====
+============  ========  ==============  =======================
 
 Here are the meter types by components that are currently implemented:
 
@@ -65,40 +65,52 @@ Compute (Nova)
 
 All meters are related to the guest machine, not the host.
 
-=============================  ==========  =========  ========  ============  ==================================================================
-Name                           Type        Unit       Resource  Origin        Note
-=============================  ==========  =========  ========  ============  ==================================================================
-instance                       Gauge       instance   inst ID   both          Existence of instance
-instance:<type>                Gauge       instance   inst ID   both          Existence of instance <type> (openstack types)
-memory                         Gauge       MB         inst ID   notification  Volume of RAM allocated in MB
-memory.usage                   Gauge       MB         inst ID   pollster      Volume of RAM used in MB
-cpu                            Cumulative  ns         inst ID   pollster      CPU time used
-cpu_util                       Gauge       %          inst ID   pollster      Average CPU utilisation
-vcpus                          Gauge       vcpu       inst ID   notification  Number of VCPUs
-disk.read.requests             Cumulative  request    inst ID   pollster      Number of read requests
-disk.read.requests.rate        Gauge       request/s  inst ID   pollster      Average rate of read requests per second
-disk.write.requests            Cumulative  request    inst ID   pollster      Number of write requests
-disk.write.requests.rate       Gauge       request/s  inst ID   pollster      Average rate of write requests per second
-disk.read.bytes                Cumulative  B          inst ID   pollster      Volume of reads in B
-disk.read.bytes.rate           Gauge       B/s        inst ID   pollster      Average rate of reads in B per second
-disk.write.bytes               Cumulative  B          inst ID   pollster      Volume of writes in B
-disk.write.bytes.rate          Gauge       B/s        inst ID   pollster      Average volume of writes in B per second
-disk.root.size                 Gauge       GB         inst ID   notification  Size of root disk in GB
-disk.ephemeral.size            Gauge       GB         inst ID   notification  Size of ephemeral disk in GB
-network.incoming.bytes         Cumulative  B          iface ID  pollster      Number of incoming bytes on a VM network interface
-network.incoming.bytes.rate    Gauge       B/s        iface ID  pollster      Average rate per sec of incoming bytes on a VM network interface
-network.outgoing.bytes         Cumulative  B          iface ID  pollster      Number of outgoing bytes on a VM network interface
-network.outgoing.bytes.rate    Gauge       B/s        iface ID  pollster      Average rate per sec of outgoing bytes on a VM network interface
-network.incoming.packets       Cumulative  packet     iface ID  pollster      Number of incoming packets on a VM network interface
-network.incoming.packets.rate  Gauge       packet/s   iface ID  pollster      Average rate per sec of incoming packets on a VM network interface
-network.outgoing.packets       Cumulative  packet     iface ID  pollster      Number of outgoing packets on a VM network interface
-network.outgoing.packets.rate  Gauge       packet/s   iface ID  pollster      Average rate per sec of outgoing packets on a VM network interface
-=============================  ==========  =========  ========  ============  ==================================================================
+=============================  =====  =========  ========  ========  ==========  ==================================================================
+Name                           Type*  Unit       Resource  Origin**  Support***  Note
+=============================  =====  =========  ========  ========  ==========  ==================================================================
+instance                       g      instance   inst ID   both      1, 2, 3     Existence of instance
+instance:<type>                g      instance   inst ID   both      1, 2, 3     Existence of instance <type> (openstack types)
+memory                         g      MB         inst ID   n         1, 2        Volume of RAM allocated in MB
+memory.usage                   g      MB         inst ID   p         3           Volume of RAM used in MB
+cpu                            c      ns         inst ID   p         1, 2        CPU time used
+cpu_util                       g      %          inst ID   p         1, 2, 3     Average CPU utilisation
+vcpus                          g      vcpu       inst ID   n         1, 2        Number of VCPUs
+disk.read.requests             c      request    inst ID   p         1, 2        Number of read requests
+disk.read.requests.rate        g      request/s  inst ID   p         1, 2, 3     Average rate of read requests per second
+disk.write.requests            c      request    inst ID   p         1, 2        Number of write requests
+disk.write.requests.rate       g      request/s  inst ID   p         1, 2, 3     Average rate of write requests per second
+disk.read.bytes                c      B          inst ID   p         1, 2        Volume of reads in B
+disk.read.bytes.rate           g      B/s        inst ID   p         1, 2, 3     Average rate of reads in B per second
+disk.write.bytes               c      B          inst ID   p         1, 2        Volume of writes in B
+disk.write.bytes.rate          g      B/s        inst ID   p         1, 2, 3     Average volume of writes in B per second
+disk.root.size                 g      GB         inst ID   n         1, 2        Size of root disk in GB
+disk.ephemeral.size            g      GB         inst ID   n         1, 2        Size of ephemeral disk in GB
+network.incoming.bytes         c      B          iface ID  p         1, 2        Number of incoming bytes on a VM network interface
+network.incoming.bytes.rate    g      B/s        iface ID  p         1, 2, 3     Average rate per sec of incoming bytes on a VM network interface
+network.outgoing.bytes         c      B          iface ID  p         1, 2        Number of outgoing bytes on a VM network interface
+network.outgoing.bytes.rate    g      B/s        iface ID  p         1, 2, 3     Average rate per sec of outgoing bytes on a VM network interface
+network.incoming.packets       c      packet     iface ID  p         1, 2        Number of incoming packets on a VM network interface
+network.incoming.packets.rate  g      packet/s   iface ID  p         1, 2, 3     Average rate per sec of incoming packets on a VM network interface
+network.outgoing.packets       c      packet     iface ID  p         1, 2        Number of outgoing packets on a VM network interface
+network.outgoing.packets.rate  g      packet/s   iface ID  p         1, 2, 3     Average rate per sec of outgoing packets on a VM network interface
+=============================  =====  =========  ========  ========  ==========  ==================================================================
 
-At present, most of the Nova meters will only work with libvirt front-end
-hypervisors while test coverage was mostly done based on KVM. Contributors
-are welcome to implement other virtualization backends' meters or complete
-the existing ones.
+::
+
+  Legend:
+  *
+  [g]: gauge
+  [c]: cumulative
+  **
+  [p]: pollster
+  [n]: notification
+  ***
+  [1]: Libvirt support
+  [2]: HyperV support
+  [3]: Vsphere support
+
+Contributors are welcome to extend other virtualization backends' meters
+or complete the existing ones.
 
 The meters below are related to the host machine.
 
@@ -220,7 +232,7 @@ power                       Gauge       W           probe ID  pollster  Power co
 ==========================  ==========  ==========  ========  ========= ==============================================
 
 Network (From SDN Controller)
-=============
+=============================
 
 These meters based on OpenFlow Switch metrics.
 In order to enable these meters, each driver needs to be configured.
@@ -270,7 +282,7 @@ resource instances available, use the ``meter-list`` command:
 
 Naming convention
 =================
-If you plan on adding meters, please follow the convention bellow:
+If you plan on adding meters, please follow the convention below:
 
 1. Always use '.' as separator and go from least to most discriminant word.
    For example, do not use ephemeral_disk_size but disk.ephemeral.size
