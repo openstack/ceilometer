@@ -40,6 +40,14 @@
 # Dispatcher to process data. (multi valued)
 #dispatcher=database
 
+# Number of workers for collector service. The default will be
+# equal to the number of CPUs available. (integer value)
+#collector_workers=<None>
+
+# Number of workers for notification service. The default will
+# be equal to the number of CPUs available. (integer value)
+#notification_workers=<None>
+
 
 #
 # Options defined in ceilometer.api.app

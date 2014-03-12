@@ -22,6 +22,7 @@ import calendar
 import copy
 import datetime
 import decimal
+import multiprocessing
 
 from ceilometer.openstack.common import timeutils
 from ceilometer.openstack.common import units
@@ -147,3 +148,10 @@ def update_nested(original_dict, updates):
         else:
             dict_to_update[key] = updates[key]
     return dict_to_update
+
+
+def cpu_count():
+    try:
+        return multiprocessing.cpu_count() or 1
+    except NotImplementedError:
+        return 1
