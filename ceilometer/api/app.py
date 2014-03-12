@@ -121,6 +121,21 @@ def get_server_cls(host):
     return server_cls
 
 
+def get_handler_cls():
+    cls = simple_server.WSGIRequestHandler
+
+    # old-style class doesn't support super
+    class CeilometerHandler(cls, object):
+        def address_string(self):
+            if cfg.CONF.api.enable_reverse_dns_lookup:
+                return super(CeilometerHandler, self).address_string()
+            else:
+                # disable reverse dns lookup, directly return ip adress
+                return self.client_address[0]
+
+    return CeilometerHandler
+
+
 def build_server():
     # Build the WSGI app
     root = VersionSelectorApplication()
@@ -128,7 +143,8 @@ def build_server():
     # Create the WSGI server and start it
     host, port = cfg.CONF.api.host, cfg.CONF.api.port
     server_cls = get_server_cls(host)
-    srv = simple_server.make_server(host, port, root, server_cls)
+    srv = simple_server.make_server(host, port, root,
+                                    server_cls, get_handler_cls())
 
     LOG.info(_('Starting server in PID %s') % os.getpid())
     LOG.info(_("Configuration:"))
