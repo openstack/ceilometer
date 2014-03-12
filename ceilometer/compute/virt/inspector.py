@@ -118,6 +118,19 @@ DiskStats = collections.namedtuple('DiskStats',
                                     'write_bytes', 'write_requests',
                                     'errors'])
 
+# Named tuple representing disk rate statistics.
+#
+# read_bytes_rate: number of bytes read per second
+# read_requests_rate: number of read operations per second
+# write_bytes_rate: number of bytes written per second
+# write_requests_rate: number of write operations per second
+#
+DiskRateStats = collections.namedtuple('DiskRateStats',
+                                       ['read_bytes_rate',
+                                        'read_requests_rate',
+                                        'write_bytes_rate',
+                                        'write_requests_rate'])
+
 
 # Exception types
 #
@@ -186,6 +199,15 @@ class Inspector(object):
 
         :param instance: the target instance
         :return: the amount of memory used
+        """
+        raise NotImplementedError()
+
+    def inspect_disk_rates(self, instance):
+        """Inspect the disk statistics as rates for an instance.
+
+        :param instance: the target instance
+        :return: for each disk, the number of bytes & operations
+                 read and written per second, with the error count
         """
         raise NotImplementedError()
 

@@ -53,6 +53,10 @@ VC_AVERAGE_MEMORY_CONSUMED_CNTR = 'mem:consumed:average'
 VC_AVERAGE_CPU_CONSUMED_CNTR = 'cpu:usage:average'
 VC_NETWORK_RX_BYTES_COUNTER = 'net:bytesRx:average'
 VC_NETWORK_TX_BYTES_COUNTER = 'net:bytesTx:average'
+VC_DISK_READ_RATE_CNTR = "disk:read:average"
+VC_DISK_READ_REQUESTS_RATE_CNTR = "disk:numberReadAveraged:average"
+VC_DISK_WRITE_RATE_CNTR = "disk:write:average"
+VC_DISK_WRITE_REQUESTS_RATE_CNTR = "disk:numberWriteAveraged:average"
 
 
 def get_api_session():
@@ -138,6 +142,42 @@ class VsphereInspector(virt_inspector.Inspector):
         mem_counter_id = self._ops.get_perf_counter_id(
             VC_AVERAGE_MEMORY_CONSUMED_CNTR)
         memory = self._ops.query_vm_aggregate_stats(vm_moid, mem_counter_id)
-        #Stat provided from VMware Vsphere is in Bytes, converting it to MB.
+        # Stat provided from VMware Vsphere is in Bytes, converting it to MB.
         memory = memory / (units.Mi)
         return virt_inspector.MemoryUsageStats(usage=memory)
+
+    def inspect_disk_rates(self, instance):
+        vm_moid = self._ops.get_vm_moid(instance.id)
+        if not vm_moid:
+            raise virt_inspector.InstanceNotFoundException(
+                _('VM %s not found in VMware Vsphere') % instance.id)
+
+        disk_stats = {}
+        disk_ids = set()
+        disk_counters = [
+            VC_DISK_READ_RATE_CNTR,
+            VC_DISK_READ_REQUESTS_RATE_CNTR,
+            VC_DISK_WRITE_RATE_CNTR,
+            VC_DISK_WRITE_REQUESTS_RATE_CNTR
+        ]
+
+        for disk_counter in disk_counters:
+            disk_counter_id = self._ops.get_perf_counter_id(disk_counter)
+            disk_id_to_stat_map = self._ops.query_vm_device_stats(
+                vm_moid, disk_counter_id)
+            disk_stats[disk_counter] = disk_id_to_stat_map
+            disk_ids.update(disk_id_to_stat_map.iterkeys())
+
+        for disk_id in disk_ids:
+
+            def stat_val(counter_name):
+                return disk_stats[counter_name].get(disk_id, 0)
+
+            disk = virt_inspector.Disk(device=disk_id)
+            disk_rate_info = virt_inspector.DiskRateStats(
+                read_bytes_rate=stat_val(VC_DISK_READ_RATE_CNTR) * units.Ki,
+                read_requests_rate=stat_val(VC_DISK_READ_REQUESTS_RATE_CNTR),
+                write_bytes_rate=stat_val(VC_DISK_WRITE_RATE_CNTR) * units.Ki,
+                write_requests_rate=stat_val(VC_DISK_WRITE_REQUESTS_RATE_CNTR)
+            )
+            yield(disk, disk_rate_info)
