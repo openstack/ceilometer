@@ -22,7 +22,7 @@ import six
 class Driver():
 
     @abc.abstractmethod
-    def get_sample_data(self, meter_name, resource, cache):
+    def get_sample_data(self, meter_name, parse_url, params, cache):
         '''Return volume, resource_id, resource_metadata, timestamp in tuple.
 
         If not implemented for meter_name, returns None
