@@ -91,7 +91,7 @@ class HardwarePollster(plugin.CentralPollster):
         :param host_url: host url of the endpoint
         :param c_data: data returned by the corresponding inspector, of
                        one of the types defined in the file
-                       ceiloemter.hardware.inspector.base.CPUStats
+                       ceilometer.hardware.inspector.base.CPUStats
         """
 
     def _get_inspector(self, parsed_url):
