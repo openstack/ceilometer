@@ -700,7 +700,8 @@ class Connection(base.Connection):
             group_attributes = [getattr(models.Sample, g) for g in groupby]
             select.extend(group_attributes)
 
-        query = session.query(*select)
+        query = session.query(*select).filter(
+            models.Meter.id == models.Sample.meter_id)
 
         if groupby:
             query = query.group_by(*group_attributes)
