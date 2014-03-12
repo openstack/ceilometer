@@ -74,8 +74,8 @@ class TestPollsterBase(test_base.BaseTestCase):
         self.assertIn(pollster.CACHE_KEY, cache)
         self.assertIn(self.host[0], cache[pollster.CACHE_KEY])
 
-        self.assertEqual(set([s.name for s in samples]),
-                         set([name]))
+        self.assertEqual(set([name]),
+                         set([s.name for s in samples]))
         match = [s for s in samples if s.name == name]
-        self.assertEqual(match[0].volume, expected_value)
-        self.assertEqual(match[0].type, expected_type)
+        self.assertEqual(expected_value, match[0].volume)
+        self.assertEqual(expected_type, match[0].type)

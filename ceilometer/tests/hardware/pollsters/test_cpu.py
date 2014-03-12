@@ -23,13 +23,16 @@ from ceilometer.tests.hardware.pollsters import base
 
 class TestCPUPollsters(base.TestPollsterBase):
     def test_1min(self):
-        self._check_get_samples(cpu.CPUUtil1MinPollster, 'cpu.util.1min',
+        self._check_get_samples(cpu.CPUUtil1MinPollster,
+                                'hardware.cpu.util.1min',
                                 0.99, sample.TYPE_GAUGE)
 
     def test_5min(self):
-        self._check_get_samples(cpu.CPUUtil5MinPollster, 'cpu.util.5min',
+        self._check_get_samples(cpu.CPUUtil5MinPollster,
+                                'hardware.cpu.util.5min',
                                 0.77, sample.TYPE_GAUGE)
 
     def test_15min(self):
-        self._check_get_samples(cpu.CPUUtil15MinPollster, 'cpu.util.15min',
+        self._check_get_samples(cpu.CPUUtil15MinPollster,
+                                'hardware.cpu.util.15min',
                                 0.55, sample.TYPE_GAUGE)

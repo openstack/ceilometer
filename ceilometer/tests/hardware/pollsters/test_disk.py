@@ -23,9 +23,11 @@ from ceilometer.tests.hardware.pollsters import base
 
 class TestDiskPollsters(base.TestPollsterBase):
     def test_disk_size_total(self):
-        self._check_get_samples(disk.DiskTotalPollster, 'disk.size.total',
+        self._check_get_samples(disk.DiskTotalPollster,
+                                'hardware.disk.size.total',
                                 1000, sample.TYPE_GAUGE)
 
     def test_disk_size_used(self):
-        self._check_get_samples(disk.DiskUsedPollster, 'disk.size.used',
+        self._check_get_samples(disk.DiskUsedPollster,
+                                'hardware.disk.size.used',
                                 90, sample.TYPE_GAUGE)
