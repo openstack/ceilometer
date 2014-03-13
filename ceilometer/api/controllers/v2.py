@@ -2419,6 +2419,9 @@ class CapabilitiesController(rest.RestController):
 
     @wsme_pecan.wsexpose(Capabilities)
     def get(self):
+        """Returns a flattened dictionary of API capabilities supported
+           by the currently configured storage driver.
+        """
         # variation in API capabilities is effectively determined by
         # the lack of strict feature parity across storage drivers
         driver_capabilities = pecan.request.storage_conn.get_capabilities()

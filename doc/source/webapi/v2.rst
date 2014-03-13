@@ -37,6 +37,41 @@ Samples and Statistics
 .. autotype:: ceilometer.api.controllers.v2.Statistics
    :members:
 
+When a simple statistics request is invoked (using GET /v2/meters/<meter_name>/statistics), it will return the standard set of *Statistics*: *avg*, *sum*,
+*min*, *max*, and *count*.
+
+Selectable Aggregates
++++++++++++++++++++++
+
+The Statistics API has been extended to include the aggregate functions *stddev* and *cardinality*. You can explicitly select these functions or any from the
+standard set by specifying an aggregate function in the statistics query::
+
+    GET /v2/meters/<meter_name>/statistics?aggregate.func=<name>&aggregate.param=<value>
+
+(where aggregate.param is optional). See the :ref:`functional-examples`
+section for more detail.
+
+.. note:: Currently only *cardinality* needs aggregate.param to be specified.
+
+.. autotype:: ceilometer.api.controllers.v2.Aggregate
+   :members:
+
+Capabilities
+============
+
+The Capabilities API allows you to directly discover which functions from the
+V2 API functionality, including the selectable aggregate functions, are
+supported by the currently configured storage driver. A capabilities query
+returns a flattened dictionary of properties with associated boolean values -
+a 'False' or absent value means that the corresponding feature is not
+available in the backend.
+
+.. rest-controller:: ceilometer.api.controllers.v2:CapabilitiesController
+   :webprefix: /v2/capabilities
+
+.. autotype:: ceilometer.api.controllers.v2.Capabilities
+   :members:
+
 .. _alarms-api:
 
 Alarms
@@ -193,6 +228,15 @@ You can specify multiple filters by using an array of queries (order matters)::
        "?q.field=metadata.event_type&q.value=compute.instance.exists"\
        "&q.field=timestamp&q.op=gt&q.value=2013-07-03T13:34:17"
 
+A query to find the maximum value and standard deviation (*max*, *stddev*) of
+the CPU utilization for a given instance (identified by *resource_id*)::
+
+     curl -H 'X-Auth-Token: <inserttokenhere>' \
+       "http://localhost:8777/v2/meters/cpu_util/statistics?aggregate.func=max&aggregate.func=stddev"\
+       "&q.field=resource_id&q.op=eq&q.value=64da755c-9120-4236-bee1-54acafe24980"
+
+.. note:: If any of the requested aggregates are not supported by the storage driver, a HTTP 400 error code will be returned along with an appropriate error message.
+
 
 JSON based example::
 
@@ -207,6 +251,7 @@ JSON based example with multiple filters::
        "'{"field": "project_id","op": "eq","value":"8d6057bc-5b90-4296-afe0-84acaa2ef909"}]}' \
        http://localhost:8777/v2/meters/instance
 
+.. _functional-examples:
 
 Functional examples
 +++++++++++++++++++
@@ -227,7 +272,8 @@ Get the list of samples about instances running for June 2013::
            "value": "2013-07-01T00:00:00"}]
 
 
-Get the list of samples about instances running for June 2013 for a particular project::
+Get the list of samples about instances running for June 2013 for a particular
+project::
 
     GET /v2/meters/instance
     q: [{"field": "timestamp",
@@ -240,7 +286,8 @@ Get the list of samples about instances running for June 2013 for a particular p
          "op": "eq",
          "value": "8d6057bc-5b90-4296-afe0-84acaa2ef909"}]
 
-Get the list of samples about instances with *m1.tiny* flavor running for June 2013 for a particular project::
+Get the list of samples about instances with *m1.tiny* flavor running for June
+2013 for a particular project::
 
     GET /v2/meters/instance:m1.tiny
     q: [{"field": "timestamp",
@@ -360,6 +407,79 @@ With the return values::
       "groupby": {"project_id": "c2334f175d8b4cb8b1db49d83cecde78",
                   "resource_id": "eaed9cf4-fc99-4115-93ae-4a5c37a1a7d7"},
       "unit": "image"}]
+
+You can request specific aggregate functions as well. For example, if you only
+want the average CPU utilization, the GET request would look like this::
+
+    GET /v2/meters/cpu_util/statistics?aggregate.func=avg
+
+Use the same syntax to access the aggregate functions not in the standard set,
+e.g. *stddev* and *cardinality*. A request for the standard deviation of CPU utilization would take the form::
+
+    GET /v2/meters/cpu_util/statistics?aggregate.func=stddev
+
+And would give a response such as the example::
+
+    [{"aggregate": {"stddev":0.6858829535841072},
+      "duration_start": "2014-01-30T11:13:23",
+      "duration_end": "2014-01-31T16:07:13",
+      "duration": 104030.0,
+      "period": 0,
+      "period_start": "2014-01-30T11:13:23",
+      "period_end": "2014-01-31T16:07:13",
+      "groupby": null,
+      "unit" : "%"}]
+
+The request syntax is similar for *cardinality* but with the aggregate.param
+option provided. So, for example, if you want to know the number of distinct
+tenants with images, you would do::
+
+     GET /v2/meters/image/statistics?aggregate.func=cardinality
+                                       &aggregate.param=project_id
+
+For a more involved example, consider a requirement for determining, for some
+tenant, the number of distinct instances (*cardinality*) as well as the total
+number of instance samples (*count*). You might also want to see this
+information with 15 minute long intervals. Then, using the *period* and
+*groupby* options, a query would look like the following::
+
+    GET /v2/meters/instance/statistics?aggregate.func=cardinality
+                                      &aggregate.param=resource_id
+                                      &aggregate.func=count
+                                      &groupby=project_id&period=900
+
+This would give an example response of the form::
+
+    [{"count": 19,
+      "aggregate": {"count": 19.0, "cardinality/resource_id": 3.0},
+      "duration": 328.478029,
+      "duration_start": "2014-01-31T10:00:41.823919",
+      "duration_end": "2014-01-31T10:06:10.301948",
+      "period": 900,
+      "period_start": "2014-01-31T10:00:00",
+      "period_end": "2014-01-31T10:15:00",
+      "groupby": {"project_id": "061a5c91811e4044b7dc86c6136c4f99"},
+      "unit": "instance"},
+     {"count": 22,
+      "aggregate": {"count": 22.0, "cardinality/resource_id": 4.0},
+      "duration": 808.00384,
+      "duration_start": "2014-01-31T10:15:15",
+      "duration_end": "2014-01-31T10:28:43.003840",
+      "period": 900,
+      "period_start": "2014-01-31T10:15:00",
+      "period_end": "2014-01-31T10:30:00",
+      "groupby": {"project_id": "061a5c91811e4044b7dc86c6136c4f99"},
+      "unit": "instance"},
+     {"count": 2,
+      "aggregate": {"count": 2.0, "cardinality/resource_id": 2.0},
+      "duration": 0.0,
+      "duration_start": "2014-01-31T10:35:15",
+      "duration_end": "2014-01-31T10:35:15",
+      "period": 900,
+      "period_start": "2014-01-31T10:30:00",
+      "period_end": "2014-01-31T10:45:00",
+      "groupby": {"project_id": "061a5c91811e4044b7dc86c6136c4f99"},
+      "unit": "instance"}]
 
 If you want to retrieve all the instances (not the list of samples, but the
 resource itself) that have been run during this month for a given project,
