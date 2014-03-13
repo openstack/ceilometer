@@ -515,3 +515,31 @@ class TestListResources(FunctionalTest,
         self.assertTrue((self.PATH_PREFIX + '/meters/instance?'
                          'q.field=resource_id&q.value=resource-id')
                         in links[1]['href'])
+
+    def test_resource_skip_meter_links(self):
+        sample1 = sample.Sample(
+            'instance',
+            'cumulative',
+            '',
+            1,
+            'user-id',
+            'project-id',
+            'resource-id',
+            timestamp=datetime.datetime(2012, 7, 2, 10, 40),
+            resource_metadata={'display_name': 'test-server',
+                               'tag': 'self.sample',
+                               },
+            source='test_list_resources',
+        )
+        msg = utils.meter_message_from_counter(
+            sample1,
+            self.CONF.publisher.metering_secret,
+        )
+        self.conn.record_metering_data(msg)
+
+        data = self.get_json('/resources?meter_links=0')
+        links = data[0]['links']
+        self.assertEqual(len(links), 1)
+        self.assertEqual(links[0]['rel'], 'self')
+        self.assertTrue((self.PATH_PREFIX + '/resources/resource-id')
+                        in links[0]['href'])

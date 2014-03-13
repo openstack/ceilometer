@@ -1425,14 +1425,15 @@ class Resource(_Base):
 class ResourcesController(rest.RestController):
     """Works on resources."""
 
-    def _resource_links(self, resource_id):
+    def _resource_links(self, resource_id, meter_links=1):
         links = [_make_link('self', pecan.request.host_url, 'resources',
                             resource_id)]
-        for meter in pecan.request.storage_conn.get_meters(resource=
-                                                           resource_id):
-            query = {'field': 'resource_id', 'value': resource_id}
-            links.append(_make_link(meter.name, pecan.request.host_url,
-                                    'meters', meter.name, query=query))
+        if meter_links:
+            for meter in pecan.request.storage_conn.get_meters(resource=
+                                                               resource_id):
+                query = {'field': 'resource_id', 'value': resource_id}
+                links.append(_make_link(meter.name, pecan.request.host_url,
+                                        'meters', meter.name, query=query))
         return links
 
     @wsme_pecan.wsexpose(Resource, unicode)
@@ -1449,16 +1450,18 @@ class ResourcesController(rest.RestController):
         return Resource.from_db_and_links(resources[0],
                                           self._resource_links(resource_id))
 
-    @wsme_pecan.wsexpose([Resource], [Query])
-    def get_all(self, q=[]):
+    @wsme_pecan.wsexpose([Resource], [Query], int)
+    def get_all(self, q=[], meter_links=1):
         """Retrieve definitions of all of the resources.
 
         :param q: Filter rules for the resources to be returned.
+        :param meter_links: option to include related meter links
         """
         kwargs = _query_to_kwargs(q, pecan.request.storage_conn.get_resources)
         resources = [
             Resource.from_db_and_links(r,
-                                       self._resource_links(r.resource_id))
+                                       self._resource_links(r.resource_id,
+                                                            meter_links))
             for r in pecan.request.storage_conn.get_resources(**kwargs)]
         return resources
 
