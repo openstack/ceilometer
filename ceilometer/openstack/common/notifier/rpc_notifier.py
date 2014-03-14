@@ -16,7 +16,7 @@
 from oslo.config import cfg
 
 from ceilometer.openstack.common import context as req_context
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common.gettextutils import _LE
 from ceilometer.openstack.common import log as logging
 from ceilometer.openstack.common import rpc
 
@@ -42,6 +42,6 @@ def notify(context, message):
         try:
             rpc.notify(context, topic, message)
         except Exception:
-            LOG.exception(_("Could not send notification to %(topic)s. "
-                            "Payload=%(message)s"),
+            LOG.exception(_LE("Could not send notification to %(topic)s. "
+                              "Payload=%(message)s"),
                           {"topic": topic, "message": message})

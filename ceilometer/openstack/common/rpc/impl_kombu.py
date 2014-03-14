@@ -29,7 +29,7 @@ from oslo.config import cfg
 import six
 
 from ceilometer.openstack.common import excutils
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common.gettextutils import _, _LE, _LI
 from ceilometer.openstack.common import network_utils
 from ceilometer.openstack.common.rpc import amqp as rpc_amqp
 from ceilometer.openstack.common.rpc import common as rpc_common
@@ -153,12 +153,12 @@ class ConsumerBase(object):
             callback(msg)
         except Exception:
             if self.ack_on_error:
-                LOG.exception(_("Failed to process message"
-                                " ... skipping it."))
+                LOG.exception(_LE("Failed to process message"
+                                  " ... skipping it."))
                 message.ack()
             else:
-                LOG.exception(_("Failed to process message"
-                                " ... will requeue."))
+                LOG.exception(_LE("Failed to process message"
+                                  " ... will requeue."))
                 message.requeue()
         else:
             message.ack()
@@ -458,6 +458,9 @@ class Connection(object):
 
         self.params_list = params_list
 
+        brokers_count = len(self.params_list)
+        self.next_broker_indices = itertools.cycle(range(brokers_count))
+
         self.memory_transport = self.conf.fake_rabbit
 
         self.connection = None
@@ -492,7 +495,7 @@ class Connection(object):
         be handled by the caller.
         """
         if self.connection:
-            LOG.info(_("Reconnecting to AMQP server on "
+            LOG.info(_LI("Reconnecting to AMQP server on "
                      "%(hostname)s:%(port)d") % params)
             try:
                 self.connection.release()
@@ -514,7 +517,7 @@ class Connection(object):
             self.channel._new_queue('ae.undeliver')
         for consumer in self.consumers:
             consumer.reconnect(self.channel)
-        LOG.info(_('Connected to AMQP server on %(hostname)s:%(port)d') %
+        LOG.info(_LI('Connected to AMQP server on %(hostname)s:%(port)d') %
                  params)
 
     def reconnect(self):
@@ -528,7 +531,7 @@ class Connection(object):
 
         attempt = 0
         while True:
-            params = self.params_list[attempt % len(self.params_list)]
+            params = self.params_list[next(self.next_broker_indices)]
             attempt += 1
             try:
                 self._connect(params)
@@ -565,9 +568,9 @@ class Connection(object):
                 sleep_time = min(sleep_time, self.interval_max)
 
             log_info['sleep_time'] = sleep_time
-            LOG.error(_('AMQP server on %(hostname)s:%(port)d is '
-                        'unreachable: %(err_str)s. Trying again in '
-                        '%(sleep_time)d seconds.') % log_info)
+            LOG.error(_LE('AMQP server on %(hostname)s:%(port)d is '
+                          'unreachable: %(err_str)s. Trying again in '
+                          '%(sleep_time)d seconds.') % log_info)
             time.sleep(sleep_time)
 
     def ensure(self, error_callback, method, *args, **kwargs):
@@ -619,7 +622,7 @@ class Connection(object):
 
         def _connect_error(exc):
             log_info = {'topic': topic, 'err_str': str(exc)}
-            LOG.error(_("Failed to declare consumer for topic '%(topic)s': "
+            LOG.error(_LE("Failed to declare consumer for topic '%(topic)s': "
                       "%(err_str)s") % log_info)
 
         def _declare_consumer():
@@ -637,11 +640,11 @@ class Connection(object):
 
         def _error_callback(exc):
             if isinstance(exc, socket.timeout):
-                LOG.debug(_('Timed out waiting for RPC response: %s') %
+                LOG.debug('Timed out waiting for RPC response: %s' %
                           str(exc))
                 raise rpc_common.Timeout()
             else:
-                LOG.exception(_('Failed to consume message from queue: %s') %
+                LOG.exception(_LE('Failed to consume message from queue: %s') %
                               str(exc))
                 info['do_consume'] = True
 
@@ -680,7 +683,7 @@ class Connection(object):
 
         def _error_callback(exc):
             log_info = {'topic': topic, 'err_str': str(exc)}
-            LOG.exception(_("Failed to publish message to topic "
+            LOG.exception(_LE("Failed to publish message to topic "
                           "'%(topic)s': %(err_str)s") % log_info)
 
         def _publish():

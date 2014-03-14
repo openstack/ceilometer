@@ -23,6 +23,7 @@ import operator
 import os
 import types
 
+from oslo.config import cfg
 from sqlalchemy import and_
 from sqlalchemy import asc
 from sqlalchemy import desc
@@ -33,6 +34,7 @@ from sqlalchemy import or_
 from sqlalchemy.orm import aliased
 
 from ceilometer.openstack.common.db import exception as dbexc
+from ceilometer.openstack.common.db.sqlalchemy import migration
 import ceilometer.openstack.common.db.sqlalchemy.session as sqlalchemy_session
 from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
@@ -40,7 +42,6 @@ from ceilometer.openstack.common import timeutils
 from ceilometer import storage
 from ceilometer.storage import base
 from ceilometer.storage import models as api_models
-from ceilometer.storage.sqlalchemy import migration
 from ceilometer.storage.sqlalchemy import models
 from ceilometer import utils
 
@@ -246,26 +247,20 @@ class Connection(base.Connection):
             conf.database.connection = \
                 os.environ.get('CEILOMETER_TEST_SQL_URL', url)
 
-        # NOTE(Alexei_987) Related to bug #1271103
-        #                  we steal objects from sqlalchemy_session
-        #                  to manage their lifetime on our own.
-        #                  This is needed to open several db connections
-        self._engine = sqlalchemy_session.get_engine()
-        self._maker = sqlalchemy_session.get_maker(self._engine)
-        sqlalchemy_session._ENGINE = None
-        sqlalchemy_session._MAKER = None
-
-    def _get_db_session(self):
-        return self._maker()
+        self._engine_facade = sqlalchemy_session.EngineFacade.from_config(
+            conf.database.connection, cfg.CONF)
 
     def upgrade(self):
-        migration.db_sync(self._engine)
+        path = os.path.join(os.path.abspath(os.path.dirname(__file__)),
+                            'sqlalchemy', 'migrate_repo')
+        migration.db_sync(self._engine_facade.get_engine(), path)
 
     def clear(self):
+        engine = self._engine_facade.get_engine()
         for table in reversed(models.Base.metadata.sorted_tables):
-            self._engine.execute(table.delete())
-        self._maker.close_all()
-        self._engine.dispose()
+            engine.execute(table.delete())
+        self._engine_facade._session_maker.close_all()
+        engine.dispose()
 
     @staticmethod
     def _create_or_update(session, model_class, _id, source=None, **kwargs):
@@ -313,7 +308,7 @@ class Connection(base.Connection):
         :param data: a dictionary such as returned by
                      ceilometer.meter.meter_message_from_counter
         """
-        session = self._get_db_session()
+        session = self._engine_facade.get_session()
         with session.begin():
             # Record the updated resource metadata
             rmetadata = data['resource_metadata']
@@ -368,7 +363,7 @@ class Connection(base.Connection):
 
         """
 
-        session = self._get_db_session()
+        session = self._engine_facade.get_session()
         with session.begin():
             end = timeutils.utcnow() - datetime.timedelta(seconds=ttl)
             sample_query = session.query(models.Sample)\
@@ -411,7 +406,7 @@ class Connection(base.Connection):
 
         :param source: Optional source filter.
         """
-        query = self._get_db_session().query(models.User.id)
+        query = self._engine_facade.get_session().query(models.User.id)
         if source is not None:
             query = query.filter(models.User.sources.any(id=source))
         return (x[0] for x in query.all())
@@ -421,7 +416,7 @@ class Connection(base.Connection):
 
         :param source: Optional source filter.
         """
-        query = self._get_db_session().query(models.Project.id)
+        query = self._engine_facade.get_session().query(models.Project.id)
         if source:
             query = query.filter(models.Project.sources.any(id=source))
         return (x[0] for x in query.all())
@@ -474,7 +469,7 @@ class Connection(base.Connection):
                         models.Sample.timestamp < end_timestamp)
             return query
 
-        session = self._get_db_session()
+        session = self._engine_facade.get_session()
         # get list of resource_ids
         res_q = session.query(distinct(models.Sample.resource_id))
         res_q = _apply_filters(res_q)
@@ -534,7 +529,7 @@ class Connection(base.Connection):
                 query = apply_metaquery_filter(session, query, metaquery)
             return query
 
-        session = self._get_db_session()
+        session = self._engine_facade.get_session()
 
         # sample_subq is used to reduce sample records
         # by selecting a record for each (resource_id, meter_id).
@@ -599,7 +594,7 @@ class Connection(base.Connection):
             return []
 
         table = models.MeterSample
-        session = self._get_db_session()
+        session = self._engine_facade.get_session()
         query = session.query(table)
         query = make_query_from_filter(session, query, sample_filter,
                                        require_meter=False)
@@ -612,7 +607,7 @@ class Connection(base.Connection):
         if limit == 0:
             return []
 
-        session = self._get_db_session()
+        session = self._engine_facade.get_session()
         query = session.query(table)
         transformer = QueryTransformer(table, query)
         if filter_expr is not None:
@@ -667,7 +662,7 @@ class Connection(base.Connection):
 
         select.extend(self._get_aggregate_functions(aggregate))
 
-        session = self._get_db_session()
+        session = self._engine_facade.get_session()
 
         if groupby:
             group_attributes = [getattr(models.Sample, g) for g in groupby]
@@ -804,7 +799,7 @@ class Connection(base.Connection):
         if pagination:
             raise NotImplementedError('Pagination not implemented')
 
-        session = self._get_db_session()
+        session = self._engine_facade.get_session()
         query = session.query(models.Alarm)
         if name is not None:
             query = query.filter(models.Alarm.name == name)
@@ -824,7 +819,7 @@ class Connection(base.Connection):
 
         :param alarm: The alarm to create.
         """
-        session = self._get_db_session()
+        session = self._engine_facade.get_session()
         with session.begin():
             alarm_row = models.Alarm(alarm_id=alarm.alarm_id)
             alarm_row.update(alarm.as_dict())
@@ -837,7 +832,7 @@ class Connection(base.Connection):
 
         :param alarm: the new Alarm to update
         """
-        session = self._get_db_session()
+        session = self._engine_facade.get_session()
         with session.begin():
             Connection._create_or_update(session, models.User,
                                          alarm.user_id)
@@ -853,7 +848,7 @@ class Connection(base.Connection):
 
         :param alarm_id: ID of the alarm to delete
         """
-        session = self._get_db_session()
+        session = self._engine_facade.get_session()
         with session.begin():
             session.query(models.Alarm).filter(
                 models.Alarm.alarm_id == alarm_id).delete()
@@ -912,7 +907,7 @@ class Connection(base.Connection):
         :param end_timestamp: Optional modified timestamp end range
         :param end_timestamp_op: Optional timestamp end range operation
         """
-        session = self._get_db_session()
+        session = self._engine_facade.get_session()
         query = session.query(models.AlarmChange)
         query = query.filter(models.AlarmChange.alarm_id == alarm_id)
 
@@ -946,7 +941,7 @@ class Connection(base.Connection):
     def record_alarm_change(self, alarm_change):
         """Record alarm change event.
         """
-        session = self._get_db_session()
+        session = self._engine_facade.get_session()
         with session.begin():
             Connection._create_or_update(session, models.User,
                                          alarm_change['user_id'])
@@ -964,7 +959,7 @@ class Connection(base.Connection):
         if it does not, create a new entry in the trait type table.
         """
         if session is None:
-            session = self._get_db_session()
+            session = self._engine_facade.get_session()
         with session.begin(subtransactions=True):
             tt = session.query(models.TraitType).filter(
                 models.TraitType.desc == trait_type,
@@ -996,7 +991,7 @@ class Connection(base.Connection):
         This may result in a flush.
         """
         if session is None:
-            session = self._get_db_session()
+            session = self._engine_facade.get_session()
         with session.begin(subtransactions=True):
             et = session.query(models.EventType).filter(
                 models.EventType.desc == event_type).first()
@@ -1039,7 +1034,7 @@ class Connection(base.Connection):
         Flush when they're all added, unless new EventTypes or
         TraitTypes are added along the way.
         """
-        session = self._get_db_session()
+        session = self._engine_facade.get_session()
         events = []
         problem_events = []
         for event_model in event_models:
@@ -1065,7 +1060,7 @@ class Connection(base.Connection):
 
         start = event_filter.start_time
         end = event_filter.end_time
-        session = self._get_db_session()
+        session = self._engine_facade.get_session()
         LOG.debug(_("Getting events that match filter: %s") % event_filter)
         with session.begin():
             event_query = session.query(models.Event)
@@ -1166,7 +1161,7 @@ class Connection(base.Connection):
         """Return all event types as an iterable of strings.
         """
 
-        session = self._get_db_session()
+        session = self._engine_facade.get_session()
         with session.begin():
             query = session.query(models.EventType.desc)\
                 .order_by(models.EventType.desc)
@@ -1181,7 +1176,7 @@ class Connection(base.Connection):
 
         :param event_type: the type of the Event
         """
-        session = self._get_db_session()
+        session = self._engine_facade.get_session()
 
         LOG.debug(_("Get traits for %s") % event_type)
         with session.begin():
@@ -1213,7 +1208,7 @@ class Connection(base.Connection):
         :param trait_type: the name of the Trait to filter by
         """
 
-        session = self._get_db_session()
+        session = self._engine_facade.get_session()
         with session.begin():
             trait_type_filters = [models.TraitType.id ==
                                   models.Trait.trait_type_id]

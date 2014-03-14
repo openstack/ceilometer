@@ -20,7 +20,7 @@ import sys
 from eventlet import event
 from eventlet import greenthread
 
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common.gettextutils import _LE, _LW
 from ceilometer.openstack.common import log as logging
 from ceilometer.openstack.common import timeutils
 
@@ -79,14 +79,14 @@ class FixedIntervalLoopingCall(LoopingCallBase):
                         break
                     delay = interval - timeutils.delta_seconds(start, end)
                     if delay <= 0:
-                        LOG.warn(_('task run outlasted interval by %s sec') %
+                        LOG.warn(_LW('task run outlasted interval by %s sec') %
                                  -delay)
                     greenthread.sleep(delay if delay > 0 else 0)
             except LoopingCallDone as e:
                 self.stop()
                 done.send(e.retvalue)
             except Exception:
-                LOG.exception(_('in fixed duration looping call'))
+                LOG.exception(_LE('in fixed duration looping call'))
                 done.send_exception(*sys.exc_info())
                 return
             else:
@@ -126,14 +126,14 @@ class DynamicLoopingCall(LoopingCallBase):
 
                     if periodic_interval_max is not None:
                         idle = min(idle, periodic_interval_max)
-                    LOG.debug(_('Dynamic looping call sleeping for %.02f '
-                                'seconds'), idle)
+                    LOG.debug('Dynamic looping call sleeping for %.02f '
+                              'seconds', idle)
                     greenthread.sleep(idle)
             except LoopingCallDone as e:
                 self.stop()
                 done.send(e.retvalue)
             except Exception:
-                LOG.exception(_('in dynamic looping call'))
+                LOG.exception(_LE('in dynamic looping call'))
                 done.send_exception(*sys.exc_info())
                 return
             else:

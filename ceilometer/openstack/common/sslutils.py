@@ -24,15 +24,15 @@ ssl_opts = [
     cfg.StrOpt('ca_file',
                default=None,
                help="CA certificate file to use to verify "
-                    "connecting clients"),
+                    "connecting clients."),
     cfg.StrOpt('cert_file',
                default=None,
                help="Certificate file to use when starting "
-                    "the server securely"),
+                    "the server securely."),
     cfg.StrOpt('key_file',
                default=None,
                help="Private key file to use when starting "
-                    "the server securely"),
+                    "the server securely."),
 ]
 
 

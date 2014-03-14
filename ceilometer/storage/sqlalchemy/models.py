@@ -19,9 +19,7 @@ SQLAlchemy models for Ceilometer data.
 """
 
 import json
-import six.moves.urllib.parse as urlparse
 
-from oslo.config import cfg
 from sqlalchemy import Column, Integer, String, Table, ForeignKey, \
     Index, UniqueConstraint, BigInteger, join
 from sqlalchemy import Float, Boolean, Text, DateTime
@@ -35,22 +33,6 @@ from sqlalchemy.types import TypeDecorator
 from ceilometer.openstack.common import timeutils
 from ceilometer.storage import models as api_models
 from ceilometer import utils
-
-sql_opts = [
-    cfg.StrOpt('mysql_engine',
-               default='InnoDB',
-               help='MySQL engine to use.')
-]
-
-cfg.CONF.register_opts(sql_opts)
-
-
-def table_args():
-    engine_name = urlparse.urlparse(cfg.CONF.database.connection).scheme
-    if engine_name == 'mysql':
-        return {'mysql_engine': cfg.CONF.mysql_engine,
-                'mysql_charset': "utf8"}
-    return None
 
 
 class JSONEncodedDict(TypeDecorator):
@@ -98,7 +80,8 @@ class PreciseTimestamp(TypeDecorator):
 
 class CeilometerBase(object):
     """Base class for Ceilometer Models."""
-    __table_args__ = table_args()
+    __table_args__ = {'mysql_charset': "utf8",
+                      'mysql_engine': "InnoDB"}
     __table_initialized__ = False
 
     def __setitem__(self, key, value):

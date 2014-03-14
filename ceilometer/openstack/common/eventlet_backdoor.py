@@ -29,7 +29,7 @@ import eventlet.backdoor
 import greenlet
 from oslo.config import cfg
 
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common.gettextutils import _LI
 from ceilometer.openstack.common import log as logging
 
 help_for_backdoor_port = (
@@ -137,8 +137,10 @@ def initialize_if_enabled():
     # In the case of backdoor port being zero, a port number is assigned by
     # listen().  In any case, pull the port number out here.
     port = sock.getsockname()[1]
-    LOG.info(_('Eventlet backdoor listening on %(port)s for process %(pid)d') %
-             {'port': port, 'pid': os.getpid()})
+    LOG.info(
+        _LI('Eventlet backdoor listening on %(port)s for process %(pid)d') %
+        {'port': port, 'pid': os.getpid()}
+    )
     eventlet.spawn_n(eventlet.backdoor.backdoor_server, sock,
                      locals=backdoor_locals)
     return port

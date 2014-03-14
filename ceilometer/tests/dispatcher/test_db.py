@@ -30,6 +30,7 @@ class TestDispatcherDB(test.BaseTestCase):
     def setUp(self):
         super(TestDispatcherDB, self).setUp()
         self.CONF = self.useFixture(config.Config()).conf
+        self.CONF.set_override('connection', 'sqlite://', group='database')
         self.dispatcher = database.DatabaseDispatcher(self.CONF)
         self.ctx = None
 

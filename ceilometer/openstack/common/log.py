@@ -15,7 +15,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-"""Openstack logging handler.
+"""OpenStack logging handler.
 
 This module adds to logging functionality by adding the option to specify
 a context object when calling the various log methods.  If the context object
@@ -305,18 +305,39 @@ class ContextAdapter(BaseLoggerAdapter):
         self.logger = logger
         self.project = project_name
         self.version = version_string
+        self._deprecated_messages_sent = dict()
 
     @property
     def handlers(self):
         return self.logger.handlers
 
     def deprecated(self, msg, *args, **kwargs):
+        """Call this method when a deprecated feature is used.
+
+        If the system is configured for fatal deprecations then the message
+        is logged at the 'critical' level and :class:`DeprecatedConfig` will
+        be raised.
+
+        Otherwise, the message will be logged (once) at the 'warn' level.
+
+        :raises: :class:`DeprecatedConfig` if the system is configured for
+                 fatal deprecations.
+
+        """
         stdmsg = _("Deprecated: %s") % msg
         if CONF.fatal_deprecations:
             self.critical(stdmsg, *args, **kwargs)
             raise DeprecatedConfig(msg=stdmsg)
-        else:
-            self.warn(stdmsg, *args, **kwargs)
+
+        # Using a list because a tuple with dict can't be stored in a set.
+        sent_args = self._deprecated_messages_sent.setdefault(msg, list())
+
+        if args in sent_args:
+            # Already logged this message, so don't log it again.
+            return
+
+        sent_args.append(args)
+        self.warn(stdmsg, *args, **kwargs)
 
     def process(self, msg, kwargs):
         # NOTE(mrodden): catch any Message/other object and
@@ -337,7 +358,7 @@ class ContextAdapter(BaseLoggerAdapter):
             extra.update(_dictify_context(context))
 
         instance = kwargs.pop('instance', None)
-        instance_uuid = (extra.get('instance_uuid', None) or
+        instance_uuid = (extra.get('instance_uuid') or
                          kwargs.pop('instance_uuid', None))
         instance_extra = ''
         if instance:
@@ -630,11 +651,11 @@ class ContextFormatter(logging.Formatter):
         # NOTE(sdague): default the fancier formatting params
         # to an empty string so we don't throw an exception if
         # they get used
-        for key in ('instance', 'color'):
+        for key in ('instance', 'color', 'user_identity'):
             if key not in record.__dict__:
                 record.__dict__[key] = ''
 
-        if record.__dict__.get('request_id', None):
+        if record.__dict__.get('request_id'):
             self._fmt = CONF.logging_context_format_string
         else:
             self._fmt = CONF.logging_default_format_string

@@ -54,7 +54,7 @@ STORAGE_OPTS = [
 cfg.CONF.register_opts(STORAGE_OPTS, group='database')
 
 cfg.CONF.import_opt('connection',
-                    'ceilometer.openstack.common.db.sqlalchemy.session',
+                    'ceilometer.openstack.common.db.options',
                     group='database')
 
 

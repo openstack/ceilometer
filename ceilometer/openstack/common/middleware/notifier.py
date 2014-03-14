@@ -24,7 +24,7 @@ import six
 import webob.dec
 
 from ceilometer.openstack.common import context
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common.gettextutils import _LE
 from ceilometer.openstack.common import log as logging
 from ceilometer.openstack.common.middleware import base
 from ceilometer.openstack.common.notifier import api
@@ -37,8 +37,8 @@ def log_and_ignore_error(fn):
         try:
             return fn(*args, **kwargs)
         except Exception as e:
-            LOG.exception(_('An exception occurred processing '
-                            'the API call: %s ') % e)
+            LOG.exception(_LE('An exception occurred processing '
+                              'the API call: %s ') % e)
     return wrapped
 
 
@@ -56,7 +56,7 @@ class RequestNotifier(base.Middleware):
         return _factory
 
     def __init__(self, app, **conf):
-        self.service_name = conf.get('service_name', None)
+        self.service_name = conf.get('service_name')
         self.ignore_req_list = [x.upper().strip() for x in
                                 conf.get('ignore_req_list', '').split(',')]
         super(RequestNotifier, self).__init__(app)

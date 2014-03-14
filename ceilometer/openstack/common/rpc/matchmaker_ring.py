@@ -22,7 +22,7 @@ import json
 
 from oslo.config import cfg
 
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common.gettextutils import _LW
 from ceilometer.openstack.common import log as logging
 from ceilometer.openstack.common.rpc import matchmaker as mm
 
@@ -53,9 +53,8 @@ class RingExchange(mm.Exchange):
         if ring:
             self.ring = ring
         else:
-            fh = open(CONF.matchmaker_ring.ringfile, 'r')
-            self.ring = json.load(fh)
-            fh.close()
+            with open(CONF.matchmaker_ring.ringfile, 'r') as fh:
+                self.ring = json.load(fh)
 
         self.ring0 = {}
         for k in self.ring.keys():
@@ -73,8 +72,8 @@ class RoundRobinRingExchange(RingExchange):
     def run(self, key):
         if not self._ring_has(key):
             LOG.warn(
-                _("No key defining hosts for topic '%s', "
-                  "see ringfile") % (key, )
+                _LW("No key defining hosts for topic '%s', "
+                    "see ringfile") % (key, )
             )
             return []
         host = next(self.ring0[key])
@@ -91,8 +90,8 @@ class FanoutRingExchange(RingExchange):
         nkey = key.split('fanout~')[1:][0]
         if not self._ring_has(nkey):
             LOG.warn(
-                _("No key defining hosts for topic '%s', "
-                  "see ringfile") % (nkey, )
+                _LW("No key defining hosts for topic '%s', "
+                    "see ringfile") % (nkey, )
             )
             return []
         return map(lambda x: (key + '.' + x, x), self.ring[nkey])

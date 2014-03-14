@@ -18,11 +18,11 @@ import functools
 import os
 
 import fixtures
-from oslo.config import cfg
 import six
 
 from ceilometer.openstack.common.db.sqlalchemy import session
 from ceilometer.openstack.common.db.sqlalchemy import utils
+from ceilometer.openstack.common.fixture import lockutils
 from ceilometer.openstack.common import test
 
 
@@ -38,18 +38,17 @@ class DbFixture(fixtures.Fixture):
     def _get_uri(self):
         return os.getenv('OS_TEST_DBAPI_CONNECTION', 'sqlite://')
 
-    def __init__(self):
+    def __init__(self, test):
         super(DbFixture, self).__init__()
-        self.conf = cfg.CONF
-        self.conf.import_opt('connection',
-                             'ceilometer.openstack.common.db.sqlalchemy.session',
-                             group='database')
+
+        self.test = test
 
     def setUp(self):
         super(DbFixture, self).setUp()
 
-        self.conf.set_default('connection', self._get_uri(), group='database')
-        self.addCleanup(self.conf.reset)
+        self.test.engine = session.create_engine(self._get_uri())
+        self.test.sessionmaker = session.get_maker(self.test.engine)
+        self.addCleanup(self.test.engine.dispose)
 
 
 class DbTestCase(test.BaseTestCase):
@@ -64,9 +63,7 @@ class DbTestCase(test.BaseTestCase):
 
     def setUp(self):
         super(DbTestCase, self).setUp()
-        self.useFixture(self.FIXTURE())
-
-        self.addCleanup(session.cleanup)
+        self.useFixture(self.FIXTURE(self))
 
 
 ALLOWED_DIALECTS = ['sqlite', 'mysql', 'postgresql']
@@ -83,11 +80,10 @@ def backend_specific(*dialects):
             if not set(dialects).issubset(ALLOWED_DIALECTS):
                 raise ValueError(
                     "Please use allowed dialects: %s" % ALLOWED_DIALECTS)
-            engine = session.get_engine()
-            if engine.name not in dialects:
+            if self.engine.name not in dialects:
                 msg = ('The test "%s" can be run '
                        'only on %s. Current engine is %s.')
-                args = (f.__name__, ' '.join(dialects), engine.name)
+                args = (f.__name__, ' '.join(dialects), self.engine.name)
                 self.skip(msg % args)
             else:
                 return f(self)
@@ -125,6 +121,9 @@ class OpportunisticTestCase(DbTestCase):
     FIXTURE = abc.abstractproperty(lambda: None)
 
     def setUp(self):
+        # TODO(bnemec): Remove this once infra is ready for
+        # https://review.openstack.org/#/c/74963/ to merge.
+        self.useFixture(lockutils.LockFixture('opportunistic-db'))
         credentials = {
             'backend': self.FIXTURE.DRIVER,
             'user': self.FIXTURE.USERNAME,

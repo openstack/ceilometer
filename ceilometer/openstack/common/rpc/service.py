@@ -15,7 +15,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log as logging
 from ceilometer.openstack.common import rpc
 from ceilometer.openstack.common.rpc import dispatcher as rpc_dispatcher
@@ -44,7 +43,7 @@ class Service(service.Service):
         super(Service, self).start()
 
         self.conn = rpc.create_connection(new=True)
-        LOG.debug(_("Creating Consumer connection for Service %s") %
+        LOG.debug("Creating Consumer connection for Service %s" %
                   self.topic)
 
         dispatcher = rpc_dispatcher.RpcDispatcher([self.manager],
