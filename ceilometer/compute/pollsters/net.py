@@ -68,10 +68,12 @@ class _Base(plugin.ComputePollster):
         instance_name = util.instance_name(instance)
         return inspector.inspect_vnics(instance_name)
 
-    def _get_rx_info(self, info):
+    @staticmethod
+    def _get_rx_info(info):
         return info.rx_bytes
 
-    def _get_tx_info(self, info):
+    @staticmethod
+    def _get_tx_info(info):
         return info.tx_bytes
 
     def _get_vnics_for_instance(self, cache, inspector, instance):
@@ -105,13 +107,12 @@ class _Base(plugin.ComputePollster):
             except NotImplementedError:
                 # Selected inspector does not implement this pollster.
                 LOG.debug(_('%(inspector)s does not provide data for '
-                            ' %(pollster)s'), ({
-                          'inspector': manager.inspector.__class__.__name__,
-                          'pollster': self.__class__.__name__}))
+                            ' %(pollster)s'),
+                          {'inspector': manager.inspector.__class__.__name__,
+                           'pollster': self.__class__.__name__})
             except Exception as err:
-                LOG.warning(_('Ignoring instance %(name)s: %(error)s') % (
-                            {'name': instance_name, 'error': err}))
-                LOG.exception(err)
+                LOG.exception(_('Ignoring instance %(name)s: %(error)s'),
+                              {'name': instance_name, 'error': err})
 
 
 class _RateBase(_Base):
@@ -126,10 +127,12 @@ class _RateBase(_Base):
         return inspector.inspect_vnic_rates(instance,
                                             self._inspection_duration)
 
-    def _get_rx_info(self, info):
+    @staticmethod
+    def _get_rx_info(info):
         return info.rx_bytes_rate
 
-    def _get_tx_info(self, info):
+    @staticmethod
+    def _get_tx_info(info):
         return info.tx_bytes_rate
 
 
