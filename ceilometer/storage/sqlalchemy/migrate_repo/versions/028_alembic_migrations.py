@@ -49,7 +49,7 @@ INDEXES = (
     (['mysql'], 'source', 'id', ('id',), False, True, False))
 
 
-def index_cleanup(meta, engine_names, table_name, uniq_name, columns,
+def index_cleanup(meta, table_name, uniq_name, columns,
                   create, unique, limited):
     table = sa.Table(table_name, meta, autoload=True)
     if create:
@@ -67,10 +67,11 @@ def index_cleanup(meta, engine_names, table_name, uniq_name, columns,
             sa.Index(uniq_name, *cols, unique=unique).create()
     else:
         if unique:
-            migrate.UniqueConstraint(*columns, table=table).drop()
+            migrate.UniqueConstraint(*columns, table=table,
+                                     name=uniq_name).drop()
         else:
             cols = [table.c[col] for col in columns]
-            sa.Index(uniq_name, *cols, unique=unique).drop()
+            sa.Index(uniq_name, *cols).drop()
 
 
 def change_uniq(meta, downgrade=False):
@@ -130,8 +131,8 @@ def upgrade(migrate_engine):
     if a_ver == '17738166b91':
         for (engine_names, table_name, uniq_name,
              columns, create, uniq, limited) in INDEXES:
-            if migrate_engine in engine_names:
-                index_cleanup(meta, engine_names, table_name, uniq_name,
+            if migrate_engine.name in engine_names:
+                index_cleanup(meta, table_name, uniq_name,
                               columns, create, uniq, limited)
         a_ver = 'b6ae66d05e3'
 
@@ -148,8 +149,8 @@ def downgrade(migrate_engine):
 
     for (engine_names, table_name, uniq_name,
          columns, create, uniq, limited) in INDEXES:
-        if migrate_engine in engine_names:
-            index_cleanup(meta, engine_names, table_name, uniq_name,
+        if migrate_engine.name in engine_names:
+            index_cleanup(meta, table_name, uniq_name,
                           columns, not create, uniq, limited)
 
     meter = sa.Table('meter', meta, autoload=True)
