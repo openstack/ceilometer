@@ -92,7 +92,7 @@ class TestCPUUtilPollster(base.TestPollsterBase):
             virt_inspector.CPUUtilStats(util=60),
         ))
 
-        def inspect_cpu_util(name):
+        def inspect_cpu_util(name, duration):
             return six.next(next_value)
 
         self.inspector.inspect_cpu_util = \

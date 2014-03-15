@@ -84,6 +84,7 @@ class _Base(plugin.ComputePollster):
         return i_cache[instance_name]
 
     def get_samples(self, manager, cache, resources):
+        self._inspection_duration = self._record_poll_time()
         for instance in resources:
             instance_name = util.instance_name(instance)
             LOG.debug(_('checking net info for instance %s'), instance.id)
@@ -122,7 +123,8 @@ class _RateBase(_Base):
     CACHE_KEY_VNIC = 'vnic-rates'
 
     def _get_vnic_info(self, inspector, instance):
-        return inspector.inspect_vnic_rates(instance)
+        return inspector.inspect_vnic_rates(instance,
+                                            self._inspection_duration)
 
     def _get_rx_info(self, info):
         return info.rx_bytes_rate

@@ -138,34 +138,38 @@ class VsphereOperations(object):
         return session.invoke_api(vim_util, "get_object_property",
                                   session.vim, vm_mobj, property_name)
 
-    def query_vm_aggregate_stats(self, vm_moid, counter_id):
+    def query_vm_aggregate_stats(self, vm_moid, counter_id, duration):
         """Method queries the aggregated real-time stat value for a VM.
 
         This method should be used for aggregate counters.
 
         :param vm_moid: moid of the VM
         :param counter_id: id of the perf counter in VC
+        :param duration: in seconds from current time,
+            over which the stat value was applicable
         :return: the aggregated stats value for the counter
         """
         # For aggregate counters, device_name should be ""
-        stats = self._query_vm_perf_stats(vm_moid, counter_id, "")
+        stats = self._query_vm_perf_stats(vm_moid, counter_id, "", duration)
 
         # Performance manager provides the aggregated stats value
         # with device name -> None
         return stats.get(None, 0)
 
-    def query_vm_device_stats(self, vm_moid, counter_id):
+    def query_vm_device_stats(self, vm_moid, counter_id, duration):
         """Method queries the real-time stat values for a VM, for all devices.
 
         This method should be used for device(non-aggregate) counters.
 
         :param vm_moid: moid of the VM
         :param counter_id: id of the perf counter in VC
+        :param duration: in seconds from current time,
+            over which the stat value was applicable
         :return: a map containing the stat values keyed by the device ID/name
         """
         # For device counters, device_name should be "*" to get stat values
         # for all devices.
-        stats = self._query_vm_perf_stats(vm_moid, counter_id, "*")
+        stats = self._query_vm_perf_stats(vm_moid, counter_id, "*", duration)
 
         # For some device counters, in addition to the per device value
         # the Performance manager also returns the aggregated value.
@@ -173,7 +177,7 @@ class VsphereOperations(object):
         stats.pop(None, None)
         return stats
 
-    def _query_vm_perf_stats(self, vm_moid, counter_id, device_name):
+    def _query_vm_perf_stats(self, vm_moid, counter_id, device_name, duration):
         """Method queries the real-time stat values for a VM.
 
         :param vm_moid: moid of the VM for which stats are needed
@@ -182,6 +186,8 @@ class VsphereOperations(object):
             queried. For aggregate counters pass empty string ("").
             For device counters pass "*", if stats are required over all
             devices.
+        :param duration: in seconds from current time,
+            over which the stat value was applicable
         :return: a map containing the stat values keyed by the device ID/name
         """
 
@@ -197,8 +203,10 @@ class VsphereOperations(object):
         query_spec.entity = vim_util.get_moref(vm_moid, "VirtualMachine")
         query_spec.metricId = [metric_id]
         query_spec.intervalId = VC_REAL_TIME_SAMPLING_INTERVAL
-        # The following setting ensures that we need only one latest sample
-        query_spec.maxSample = 1
+        # We query all samples which are applicable over the specified duration
+        samples_cnt = (duration / VC_REAL_TIME_SAMPLING_INTERVAL if duration
+                       else 1)
+        query_spec.maxSample = samples_cnt
 
         perf_manager = session.vim.service_content.perfManager
         perf_stats = session.invoke_api(session.vim, 'QueryPerf', perf_manager,
@@ -208,11 +216,12 @@ class VsphereOperations(object):
         if perf_stats:
             entity_metric = perf_stats[0]
             sample_infos = entity_metric.sampleInfo
-            samples_count = len(sample_infos)
 
-            if samples_count > 0:
+            if len(sample_infos) > 0:
                 for metric_series in entity_metric.value:
-                    stat_value = float(metric_series.value[samples_count - 1])
+                    # Take the average of all samples to improve the accuracy
+                    # of the stat value
+                    stat_value = float(sum(metric_series.value)) / samples_cnt
                     device_id = metric_series.id.instance
                     stat_values[device_id] = stat_value
 

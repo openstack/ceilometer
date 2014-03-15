@@ -161,14 +161,14 @@ class VsphereOperationsTest(test.BaseTestCase):
         ops = self._vsphere_ops
 
         # test aggregate stat
-        stat_val = ops.query_vm_aggregate_stats(vm_moid, counter_id)
-        self.assertEqual(333, stat_val)
+        stat_val = ops.query_vm_aggregate_stats(vm_moid, counter_id, 60)
+        self.assertEqual(222, stat_val)
 
         # test per-device(non-aggregate) stats
         expected_device_stats = {
-            device1: 300,
-            device2: 30,
-            device3: 3
+            device1: 200,
+            device2: 20,
+            device3: 2
         }
-        stats = ops.query_vm_device_stats(vm_moid, counter_id)
+        stats = ops.query_vm_device_stats(vm_moid, counter_id, 60)
         self.assertEqual(expected_device_stats, stats)

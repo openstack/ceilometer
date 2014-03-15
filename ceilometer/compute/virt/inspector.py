@@ -159,10 +159,12 @@ class Inspector(object):
         """
         raise NotImplementedError()
 
-    def inspect_cpu_util(self, instance):
+    def inspect_cpu_util(self, instance, duration=None):
         """Inspect the CPU Utilization (%) for an instance.
 
         :param instance: the target instance
+        :param duration: the last 'n' seconds, over which the value should be
+               inspected
         :return: the percentage of CPU utilization
         """
         raise NotImplementedError()
@@ -176,10 +178,12 @@ class Inspector(object):
         """
         raise NotImplementedError()
 
-    def inspect_vnic_rates(self, instance):
+    def inspect_vnic_rates(self, instance, duration=None):
         """Inspect the vNIC rate statistics for an instance.
 
         :param instance: the target instance
+        :param duration: the last 'n' seconds, over which the value should be
+               inspected
         :return: for each vNIC, the rate of bytes & packets
                  received and transmitted
         """
@@ -194,18 +198,22 @@ class Inspector(object):
         """
         raise NotImplementedError()
 
-    def inspect_memory_usage(self, instance):
+    def inspect_memory_usage(self, instance, duration=None):
         """Inspect the memory usage statistics for an instance.
 
         :param instance: the target instance
+        :param duration: the last 'n' seconds, over which the value should be
+               inspected
         :return: the amount of memory used
         """
         raise NotImplementedError()
 
-    def inspect_disk_rates(self, instance):
+    def inspect_disk_rates(self, instance, duration=None):
         """Inspect the disk statistics as rates for an instance.
 
         :param instance: the target instance
+        :param duration: the last 'n' seconds, over which the value should be
+               inspected
         :return: for each disk, the number of bytes & operations
                  read and written per second, with the error count
         """

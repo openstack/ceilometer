@@ -34,7 +34,7 @@ class TestMemoryPollster(base.TestPollsterBase):
             virt_inspector.MemoryUsageStats(usage=2.0),
         ))
 
-        def inspect_memory_usage(name):
+        def inspect_memory_usage(instance, duration):
             return six.next(next_value)
 
         self.inspector.inspect_memory_usage = \

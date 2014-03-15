@@ -43,7 +43,7 @@ OPTS = [
     cfg.FloatOpt('task_poll_interval',
                  default=0.5,
                  help='Sleep time in seconds for polling an ongoing async '
-                 'task'),
+                 'task')
 ]
 
 cfg.CONF.register_group(opt_group)
@@ -79,21 +79,15 @@ class VsphereInspector(virt_inspector.Inspector):
         self._ops = vsphere_operations.VsphereOperations(
             get_api_session(), 1000)
 
-    def inspect_instances(self):
-        raise NotImplementedError()
-
-    def inspect_cpus(self, instance_name):
-        raise NotImplementedError()
-
-    def inspect_cpu_util(self, instance):
+    def inspect_cpu_util(self, instance, duration=None):
         vm_moid = self._ops.get_vm_moid(instance.id)
         if vm_moid is None:
             raise virt_inspector.InstanceNotFoundException(
                 _('VM %s not found in VMware Vsphere') % instance.id)
         cpu_util_counter_id = self._ops.get_perf_counter_id(
             VC_AVERAGE_CPU_CONSUMED_CNTR)
-        cpu_util = self._ops.query_vm_aggregate_stats(vm_moid,
-                                                      cpu_util_counter_id)
+        cpu_util = self._ops.query_vm_aggregate_stats(
+            vm_moid, cpu_util_counter_id, duration)
 
         # For this counter vSphere returns values scaled-up by 100, since the
         # corresponding API can't return decimals, but only longs.
@@ -102,10 +96,7 @@ class VsphereInspector(virt_inspector.Inspector):
         cpu_util = cpu_util / 100
         return virt_inspector.CPUUtilStats(util=cpu_util)
 
-    def inspect_vnics(self, instance_name):
-        raise NotImplementedError()
-
-    def inspect_vnic_rates(self, instance):
+    def inspect_vnic_rates(self, instance, duration=None):
         vm_moid = self._ops.get_vm_moid(instance.id)
         if not vm_moid:
             raise virt_inspector.InstanceNotFoundException(
@@ -116,8 +107,8 @@ class VsphereInspector(virt_inspector.Inspector):
 
         for net_counter in (VC_NETWORK_RX_COUNTER, VC_NETWORK_TX_COUNTER):
             net_counter_id = self._ops.get_perf_counter_id(net_counter)
-            vnic_id_to_stats_map = \
-                self._ops.query_vm_device_stats(vm_moid, net_counter_id)
+            vnic_id_to_stats_map = self._ops.query_vm_device_stats(
+                vm_moid, net_counter_id, duration)
             vnic_stats[net_counter] = vnic_id_to_stats_map
             vnic_ids.update(vnic_id_to_stats_map.iterkeys())
 
@@ -137,22 +128,20 @@ class VsphereInspector(virt_inspector.Inspector):
                 parameters=None)
             yield (interface, stats)
 
-    def inspect_disks(self, instance_name):
-        raise NotImplementedError()
-
-    def inspect_memory_usage(self, instance):
+    def inspect_memory_usage(self, instance, duration=None):
         vm_moid = self._ops.get_vm_moid(instance.id)
         if vm_moid is None:
             raise virt_inspector.InstanceNotFoundException(
                 _('VM %s not found in VMware Vsphere') % instance.id)
         mem_counter_id = self._ops.get_perf_counter_id(
             VC_AVERAGE_MEMORY_CONSUMED_CNTR)
-        memory = self._ops.query_vm_aggregate_stats(vm_moid, mem_counter_id)
+        memory = self._ops.query_vm_aggregate_stats(
+            vm_moid, mem_counter_id, duration)
         # Stat provided from vSphere is in KB, converting it to MB.
         memory = memory / units.Ki
         return virt_inspector.MemoryUsageStats(usage=memory)
 
-    def inspect_disk_rates(self, instance):
+    def inspect_disk_rates(self, instance, duration=None):
         vm_moid = self._ops.get_vm_moid(instance.id)
         if not vm_moid:
             raise virt_inspector.InstanceNotFoundException(
@@ -170,7 +159,7 @@ class VsphereInspector(virt_inspector.Inspector):
         for disk_counter in disk_counters:
             disk_counter_id = self._ops.get_perf_counter_id(disk_counter)
             disk_id_to_stat_map = self._ops.query_vm_device_stats(
-                vm_moid, disk_counter_id)
+                vm_moid, disk_counter_id, duration)
             disk_stats[disk_counter] = disk_id_to_stat_map
             disk_ids.update(disk_id_to_stat_map.iterkeys())
 

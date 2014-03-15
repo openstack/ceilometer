@@ -171,7 +171,9 @@ class _DiskRatesPollsterBase(plugin.ComputePollster):
             r_requests_rate = 0
             w_bytes_rate = 0
             w_requests_rate = 0
-            for disk, info in inspector.inspect_disk_rates(instance):
+            disk_rates = inspector.inspect_disk_rates(
+                instance, self._inspection_duration)
+            for disk, info in disk_rates:
                 r_bytes_rate += info.read_bytes_rate
                 r_requests_rate += info.read_requests_rate
                 w_bytes_rate += info.write_bytes_rate
@@ -189,6 +191,7 @@ class _DiskRatesPollsterBase(plugin.ComputePollster):
         """Return one Sample."""
 
     def get_samples(self, manager, cache, resources):
+        self._inspection_duration = self._record_poll_time()
         for instance in resources:
             try:
                 disk_rates_info = self._populate_cache(

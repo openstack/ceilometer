@@ -64,10 +64,12 @@ class CPUPollster(plugin.ComputePollster):
 class CPUUtilPollster(plugin.ComputePollster):
 
     def get_samples(self, manager, cache, resources):
+        self._inspection_duration = self._record_poll_time()
         for instance in resources:
             LOG.debug(_('Checking CPU util for instance %s'), instance.id)
             try:
-                cpu_info = manager.inspector.inspect_cpu_util(instance)
+                cpu_info = manager.inspector.inspect_cpu_util(
+                    instance, self._inspection_duration)
                 LOG.debug(_("CPU UTIL: %(instance)s %(util)d"),
                           ({'instance': instance.__dict__,
                             'util': cpu_info.util}))

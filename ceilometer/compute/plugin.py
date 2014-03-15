@@ -21,6 +21,7 @@
 import abc
 import six
 
+from ceilometer.openstack.common import timeutils
 from ceilometer import plugin
 
 
@@ -37,3 +38,16 @@ class ComputePollster(plugin.PollsterBase):
         :param cache: A dictionary for passing data between plugins
         :param resources: The resources to examine (expected to be instances)
         """
+
+    def _record_poll_time(self):
+        """Method records current time as the poll time.
+
+        :return: time in seconds since the last poll time was recorded
+        """
+        current_time = timeutils.utcnow()
+        duration = None
+        if hasattr(self, '_last_poll_time'):
+            duration = timeutils.delta_seconds(self._last_poll_time,
+                                               current_time)
+        self._last_poll_time = current_time
+        return duration

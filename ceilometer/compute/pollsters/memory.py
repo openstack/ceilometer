@@ -26,10 +26,12 @@ LOG = log.getLogger(__name__)
 class MemoryUsagePollster(plugin.ComputePollster):
 
     def get_samples(self, manager, cache, resources):
+        self._inspection_duration = self._record_poll_time()
         for instance in resources:
             LOG.debug(_('Checking memory usage for instance %s'), instance.id)
             try:
-                memory_info = manager.inspector.inspect_memory_usage(instance)
+                memory_info = manager.inspector.inspect_memory_usage(
+                    instance, self._inspection_duration)
                 LOG.debug(_("MEMORY USAGE: %(instance)s %(usage)f"),
                           ({'instance': instance.__dict__,
                             'usage': memory_info.usage}))

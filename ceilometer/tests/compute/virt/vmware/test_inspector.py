@@ -99,7 +99,7 @@ class TestVsphereInspection(test.BaseTestCase):
         def get_counter_id_side_effect(counter_full_name):
             return counter_name_to_id_map[counter_full_name]
 
-        def query_stat_side_effect(vm_moid, counter_id):
+        def query_stat_side_effect(vm_moid, counter_id, duration):
             # assert inputs
             self.assertEqual(test_vm_moid, vm_moid)
             self.assertTrue(counter_id in counter_id_to_stats_map)
@@ -144,7 +144,7 @@ class TestVsphereInspection(test.BaseTestCase):
         def get_counter_id_side_effect(counter_full_name):
             return counter_name_to_id_map[counter_full_name]
 
-        def query_stat_side_effect(vm_moid, counter_id):
+        def query_stat_side_effect(vm_moid, counter_id, duration):
             # assert inputs
             self.assertEqual(test_vm_moid, vm_moid)
             self.assertTrue(counter_id in counter_id_to_stats_map)
