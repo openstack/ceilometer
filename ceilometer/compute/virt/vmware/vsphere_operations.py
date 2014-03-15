@@ -55,9 +55,11 @@ class VsphereOperations(object):
         while result:
             for vm_object in result.objects:
                 vm_moid = vm_object.obj.value
-                vm_instance_id = vm_object.propSet[0].val
-                if vm_instance_id:
-                    self._vm_moid_lookup_map[vm_instance_id] = vm_moid
+                # propSet will be set only if the server provides value
+                if hasattr(vm_object, 'propSet') and vm_object.propSet:
+                    vm_instance_id = vm_object.propSet[0].val
+                    if vm_instance_id:
+                        self._vm_moid_lookup_map[vm_instance_id] = vm_moid
 
             result = session.invoke_api(vim_util, "continue_retrieval",
                                         session.vim, result)
@@ -210,7 +212,7 @@ class VsphereOperations(object):
 
             if samples_count > 0:
                 for metric_series in entity_metric.value:
-                    stat_value = metric_series.value[samples_count - 1]
+                    stat_value = float(metric_series.value[samples_count - 1])
                     device_id = metric_series.id.instance
                     stat_values[device_id] = stat_value
 

@@ -43,7 +43,7 @@ class TestVsphereInspection(test.BaseTestCase):
         fake_instance_moid = 'fake_instance_moid'
         fake_instance_id = 'fake_instance_id'
         fake_perf_counter_id = 'fake_perf_counter_id'
-        fake_memory_value = 1048576.0
+        fake_memory_value = 1024.0
         fake_stat = virt_inspector.MemoryUsageStats(usage=1.0)
 
         def construct_mock_instance_object(fake_instance_id):
@@ -77,7 +77,7 @@ class TestVsphereInspection(test.BaseTestCase):
         self._inspector._ops.get_perf_counter_id.return_value = \
             fake_perf_counter_id
         self._inspector._ops.query_vm_aggregate_stats.return_value = \
-            fake_cpu_util_value
+            fake_cpu_util_value * 100
         cpu_util_stat = self._inspector.inspect_cpu_util(fake_instance)
         self.assertEqual(fake_stat, cpu_util_stat)
 
@@ -88,12 +88,12 @@ class TestVsphereInspection(test.BaseTestCase):
         vnic1 = "vnic-1"
         vnic2 = "vnic-2"
         counter_name_to_id_map = {
-            vsphere_inspector.VC_NETWORK_RX_BYTES_COUNTER: 1,
-            vsphere_inspector.VC_NETWORK_TX_BYTES_COUNTER: 2
+            vsphere_inspector.VC_NETWORK_RX_COUNTER: 1,
+            vsphere_inspector.VC_NETWORK_TX_COUNTER: 2
         }
         counter_id_to_stats_map = {
-            1: {vnic1: 1000.0, vnic2: 3000.0},
-            2: {vnic1: 2000.0, vnic2: 4000.0},
+            1: {vnic1: 1, vnic2: 3},
+            2: {vnic1: 2, vnic2: 4},
         }
 
         def get_counter_id_side_effect(counter_full_name):
@@ -115,8 +115,8 @@ class TestVsphereInspection(test.BaseTestCase):
 
         # validate result
         expected_stats = {
-            vnic1: virt_inspector.InterfaceRateStats(1.0, 2.0),
-            vnic2: virt_inspector.InterfaceRateStats(3.0, 4.0)
+            vnic1: virt_inspector.InterfaceRateStats(1024, 2048),
+            vnic2: virt_inspector.InterfaceRateStats(3072, 4096)
         }
 
         for vnic, rates_info in result:
