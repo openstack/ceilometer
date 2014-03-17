@@ -46,13 +46,15 @@ class UtilsV2(object):
     _PROC_SETTING = 'Msvm_ProcessorSettingData'
     _SYNTH_ETH_PORT = 'Msvm_SyntheticEthernetPortSettingData'
     _ETH_PORT_ALLOC = 'Msvm_EthernetPortAllocationSettingData'
+    _PORT_ACL_SET_DATA = 'Msvm_EthernetSwitchPortAclSettingData'
     _STORAGE_ALLOC = 'Msvm_StorageAllocationSettingData'
     _VS_SETTING_DATA = 'Msvm_VirtualSystemSettingData'
     _METRICS_ME = 'Msvm_MetricForME'
+    _BASE_METRICS_VALUE = 'Msvm_BaseMetricValue'
 
     _CPU_METRIC_NAME = 'Aggregated Average CPU Utilization'
-    _NET_IN_METRIC_NAME = 'Aggregated Filtered Incoming Network Traffic'
-    _NET_OUT_METRIC_NAME = 'Aggregated Filtered Outgoing Network Traffic'
+    _NET_IN_METRIC_NAME = 'Filtered Incoming Network Traffic'
+    _NET_OUT_METRIC_NAME = 'Filtered Outgoing Network Traffic'
     # Disk metrics are supported from Hyper-V 2012 R2
     _DISK_RD_METRIC_NAME = 'Disk Data Read'
     _DISK_WR_METRIC_NAME = 'Disk Data Written'
@@ -105,8 +107,12 @@ class UtilsV2(object):
 
         for port in ports:
             vnic = [v for v in vnics if port.Parent == v.path_()][0]
-            metric_values = self._get_metric_values(
-                port, [metric_def_in, metric_def_out])
+
+            metric_value_instances = self._get_metric_value_instances(
+                port.associators(wmi_result_class=self._PORT_ACL_SET_DATA),
+                self._BASE_METRICS_VALUE)
+            metric_values = self._sum_metric_values_by_defs(
+                metric_value_instances, [metric_def_in, metric_def_out])
 
             yield {
                 'rx_bytes': metric_values[0],
@@ -143,10 +149,7 @@ class UtilsV2(object):
             tot_metric_val += long(metric.MetricValue)
         return tot_metric_val
 
-    def _get_metric_values(self, element, metric_defs):
-        element_metrics = element.associators(
-            wmi_association_class=self._METRICS_ME)
-
+    def _sum_metric_values_by_defs(self, element_metrics, metric_defs):
         metric_values = []
         for metric_def in metric_defs:
             if metric_def:
@@ -156,6 +159,20 @@ class UtilsV2(object):
                 # In case the metric is not defined on this host
                 metric_values.append(0)
         return metric_values
+
+    def _get_metric_value_instances(self, elements, result_class):
+        instances = []
+        for el in elements:
+            associators = el.associators(wmi_result_class=result_class)
+            if associators:
+                instances.append(associators[0])
+
+        return instances
+
+    def _get_metric_values(self, element, metric_defs):
+        element_metrics = element.associators(
+            wmi_association_class=self._METRICS_ME)
+        return self._sum_metric_values_by_defs(element_metrics, metric_defs)
 
     def _lookup_vm(self, vm_name):
         vms = self._conn.Msvm_ComputerSystem(ElementName=vm_name)
