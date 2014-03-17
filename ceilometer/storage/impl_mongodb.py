@@ -82,6 +82,34 @@ class MongoDBStorage(base.StorageEngine):
         return Connection(conf)
 
 
+AVAILABLE_CAPABILITIES = {
+    'meters': {'query': {'simple': True,
+                         'metadata': True}},
+    'resources': {'query': {'simple': True,
+                            'metadata': True}},
+    'samples': {'query': {'simple': True,
+                          'metadata': True,
+                          'complex': True}},
+    'statistics': {'groupby': True,
+                   'query': {'simple': True,
+                             'metadata': True},
+                   'aggregation': {'standard': True,
+                                   'selectable': {
+                                       'max': True,
+                                       'min': True,
+                                       'sum': True,
+                                       'avg': True,
+                                       'count': True,
+                                       'stddev': True,
+                                       'cardinality': True}}
+                   },
+    'alarms': {'query': {'simple': True,
+                         'complex': True},
+               'history': {'query': {'simple': True,
+                                     'complex': True}}},
+}
+
+
 class Connection(pymongo_base.Connection):
     """MongoDB connection.
     """
@@ -408,6 +436,9 @@ class Connection(pymongo_base.Connection):
         if connection_options.get('username'):
             self.db.authenticate(connection_options['username'],
                                  connection_options['password'])
+
+        self.CAPABILITIES = utils.update_nested(self.DEFAULT_CAPABILITIES,
+                                                AVAILABLE_CAPABILITIES)
 
         # NOTE(jd) Upgrading is just about creating index, so let's do this
         # on connection to be sure at least the TTL is correcly updated if
@@ -956,30 +987,4 @@ class Connection(pymongo_base.Connection):
     def get_capabilities(self):
         """Return an dictionary representing the capabilities of this driver.
         """
-        available = {
-            'meters': {'query': {'simple': True,
-                                 'metadata': True}},
-            'resources': {'query': {'simple': True,
-                                    'metadata': True}},
-            'samples': {'query': {'simple': True,
-                                  'metadata': True,
-                                  'complex': True}},
-            'statistics': {'groupby': True,
-                           'query': {'simple': True,
-                                     'metadata': True},
-                           'aggregation': {'standard': True,
-                                           'selectable': {
-                                               'max': True,
-                                               'min': True,
-                                               'sum': True,
-                                               'avg': True,
-                                               'count': True,
-                                               'stddev': True,
-                                               'cardinality': True}}
-                           },
-            'alarms': {'query': {'simple': True,
-                                 'complex': True},
-                       'history': {'query': {'simple': True,
-                                             'complex': True}}},
-        }
-        return utils.update_nested(self.DEFAULT_CAPABILITIES, available)
+        return self.CAPABILITIES

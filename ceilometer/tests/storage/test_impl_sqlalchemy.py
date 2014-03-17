@@ -222,3 +222,48 @@ class RelationshipTest(scenarios.DBTestBase):
                 session.query(sql_models.User.id)
                     .group_by(sql_models.User.id)
                     )).count(), 0)
+
+
+class CapabilitiesTest(EventTestBase):
+    # Check the returned capabilities list, which is specific to each DB
+    # driver
+
+    def test_capabilities(self):
+        expected_capabilities = {
+            'meters': {'pagination': False,
+                       'query': {'simple': True,
+                                 'metadata': True,
+                                 'complex': False}},
+            'resources': {'pagination': False,
+                          'query': {'simple': True,
+                                    'metadata': True,
+                                    'complex': False}},
+            'samples': {'pagination': True,
+                        'groupby': True,
+                        'query': {'simple': True,
+                                  'metadata': True,
+                                  'complex': True}},
+            'statistics': {'pagination': False,
+                           'groupby': True,
+                           'query': {'simple': True,
+                                     'metadata': True,
+                                     'complex': False},
+                           'aggregation': {'standard': True,
+                                           'selectable': {
+                                               'max': True,
+                                               'min': True,
+                                               'sum': True,
+                                               'avg': True,
+                                               'count': True,
+                                               'stddev': True,
+                                               'cardinality': True}}
+                           },
+            'alarms': {'query': {'simple': True,
+                                 'complex': True},
+                       'history': {'query': {'simple': True,
+                                             'complex': True}}},
+            'events': {'query': {'simple': True}}
+        }
+
+        actual_capabilities = self.conn.get_capabilities()
+        self.assertEqual(expected_capabilities, actual_capabilities)

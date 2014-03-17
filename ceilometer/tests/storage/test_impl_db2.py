@@ -1,9 +1,8 @@
 # -*- encoding: utf-8 -*-
 #
-# Copyright © 2012, 2013 Dell Inc.
+# Copyright Ericsson AB 2014. All rights reserved
 #
-# Author: Stas Maksimov <Stanislav_M@dell.com>
-# Author: Shengjie Min <Shengjie_Min@dell.com>
+# Authors: Ildiko Vancsa <ildiko.vancsa@ericsson.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -16,49 +15,23 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Tests for ceilometer/storage/impl_hbase.py
+"""Tests for ceilometer/storage/impl_db2.py
 
 .. note::
-  In order to run the tests against real HBase server set the environment
-  variable CEILOMETER_TEST_HBASE_URL to point to that HBase instance before
-  running the tests. Make sure the Thrift server is running on that server.
+  In order to run the tests against another MongoDB server set the
+  environment variable CEILOMETER_TEST_DB2_URL to point to a DB2
+  server before running the tests.
 
 """
-from mock import patch
 
-from ceilometer.storage import impl_hbase as hbase
 from ceilometer.tests import db as tests_db
 
 
-class HBaseEngineTestBase(tests_db.TestBase):
-    database_connection = tests_db.HBaseFakeConnectionUrl()
+class DB2EngineTestBase(tests_db.TestBase):
+    database_connection = tests_db.DB2FakeConnectionUrl()
 
 
-class ConnectionTest(HBaseEngineTestBase):
-
-    def test_hbase_connection(self):
-        self.CONF.database.connection = str(self.database_connection)
-        conn = hbase.Connection(self.CONF)
-        self.assertIsInstance(conn.conn, hbase.MConnection)
-
-        class TestConn(object):
-            def __init__(self, host, port):
-                self.netloc = '%s:%s' % (host, port)
-
-            def open(self):
-                pass
-
-        def get_connection(conf):
-            return TestConn(conf['host'], conf['port'])
-
-        self.CONF.database.connection = 'hbase://test_hbase:9090'
-        with patch.object(hbase.Connection, '_get_connection',
-                          side_effect=get_connection):
-            conn = hbase.Connection(self.CONF)
-        self.assertIsInstance(conn.conn, TestConn)
-
-
-class CapabilitiesTest(HBaseEngineTestBase):
+class CapabilitiesTest(DB2EngineTestBase):
     # Check the returned capabilities list, which is specific to each DB
     # driver
 
@@ -76,9 +49,9 @@ class CapabilitiesTest(HBaseEngineTestBase):
                         'groupby': False,
                         'query': {'simple': True,
                                   'metadata': True,
-                                  'complex': False}},
+                                  'complex': True}},
             'statistics': {'pagination': False,
-                           'groupby': False,
+                           'groupby': True,
                            'query': {'simple': True,
                                      'metadata': True,
                                      'complex': False},
@@ -92,9 +65,9 @@ class CapabilitiesTest(HBaseEngineTestBase):
                                                'stddev': False,
                                                'cardinality': False}}
                            },
-            'alarms': {'query': {'simple': False,
-                                 'complex': False},
-                       'history': {'query': {'simple': False,
+            'alarms': {'query': {'simple': True,
+                                 'complex': True},
+                       'history': {'query': {'simple': True,
                                              'complex': False}}},
             'events': {'query': {'simple': False}}
         }

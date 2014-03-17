@@ -19,6 +19,7 @@
 """Utilities and helper functions."""
 
 import calendar
+import copy
 import datetime
 import decimal
 
@@ -134,14 +135,15 @@ def lowercase_values(mapping):
         mapping[key] = value.lower()
 
 
-def update_nested(d, u):
+def update_nested(original_dict, updates):
     """Updates the leaf nodes in a nest dict, without replacing
        entire sub-dicts.
     """
-    for k, v in u.iteritems():
-        if isinstance(v, dict):
-            r = update_nested(d.get(k, {}), v)
-            d[k] = r
+    dict_to_update = copy.deepcopy(original_dict)
+    for key, value in updates.iteritems():
+        if isinstance(value, dict):
+            sub_dict = update_nested(dict_to_update.get(key, {}), value)
+            dict_to_update[key] = sub_dict
         else:
-            d[k] = u[k]
-    return d
+            dict_to_update[key] = updates[key]
+    return dict_to_update

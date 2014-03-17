@@ -133,6 +133,36 @@ PARAMETERIZED_AGGREGATES = dict(
     )
 )
 
+AVAILABLE_CAPABILITIES = {
+    'meters': {'query': {'simple': True,
+                         'metadata': True}},
+    'resources': {'query': {'simple': True,
+                            'metadata': True}},
+    'samples': {'pagination': True,
+                'groupby': True,
+                'query': {'simple': True,
+                          'metadata': True,
+                          'complex': True}},
+    'statistics': {'groupby': True,
+                   'query': {'simple': True,
+                             'metadata': True},
+                   'aggregation': {'standard': True,
+                                   'selectable': {
+                                       'max': True,
+                                       'min': True,
+                                       'sum': True,
+                                       'avg': True,
+                                       'count': True,
+                                       'stddev': True,
+                                       'cardinality': True}}
+                   },
+    'alarms': {'query': {'simple': True,
+                         'complex': True},
+               'history': {'query': {'simple': True,
+                                     'complex': True}}},
+    'events': {'query': {'simple': True}},
+}
+
 
 def apply_metaquery_filter(session, query, metaquery):
     """Apply provided metaquery filter to existing query.
@@ -223,6 +253,8 @@ class Connection(base.Connection):
         self._maker = sqlalchemy_session.get_maker(self._engine)
         sqlalchemy_session._ENGINE = None
         sqlalchemy_session._MAKER = None
+        self._CAPABILITIES = utils.update_nested(self.DEFAULT_CAPABILITIES,
+                                                 AVAILABLE_CAPABILITIES)
 
     def _get_db_session(self):
         return self._maker()
@@ -1262,6 +1294,11 @@ class Connection(base.Connection):
                                        dtype=type.data_type,
                                        value=trait.get_value())
 
+    def get_capabilities(self):
+        """Return an dictionary representing the capabilities of this driver.
+        """
+        return self._CAPABILITIES
+
 
 class QueryTransformer(object):
     operators = {"=": operator.eq,
@@ -1349,37 +1386,3 @@ class QueryTransformer(object):
 
     def get_query(self):
         return self.query
-
-    def get_capabilities(self):
-        """Return an dictionary representing the capabilities of this driver.
-        """
-        available = {
-            'meters': {'query': {'simple': True,
-                                 'metadata': True}},
-            'resources': {'query': {'simple': True,
-                                    'metadata': True}},
-            'samples': {'pagination': True,
-                        'groupby': True,
-                        'query': {'simple': True,
-                                  'metadata': True,
-                                  'complex': True}},
-            'statistics': {'groupby': True,
-                           'query': {'simple': True,
-                                     'metadata': True},
-                           'aggregation': {'standard': True,
-                                           'selectable': {
-                                               'max': True,
-                                               'min': True,
-                                               'sum': True,
-                                               'avg': True,
-                                               'count': True,
-                                               'stddev': True,
-                                               'cardinality': True}}
-                           },
-            'alarms': {'query': {'simple': True,
-                                 'complex': True},
-                       'history': {'query': {'simple': True,
-                                             'complex': True}}},
-            'events': {'query': {'simple': True}},
-        }
-        return utils.update_nested(self.DEFAULT_CAPABILITIES, available)

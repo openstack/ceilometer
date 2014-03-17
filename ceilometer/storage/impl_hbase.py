@@ -94,6 +94,19 @@ class HBaseStorage(base.StorageEngine):
         return Connection(conf)
 
 
+AVAILABLE_CAPABILITIES = {
+    'meters': {'query': {'simple': True,
+                         'metadata': True}},
+    'resources': {'query': {'simple': True,
+                            'metadata': True}},
+    'samples': {'query': {'simple': True,
+                          'metadata': True}},
+    'statistics': {'query': {'simple': True,
+                             'metadata': True},
+                   'aggregation': {'standard': True}},
+}
+
+
 class Connection(base.Connection):
     """HBase connection.
     """
@@ -127,6 +140,9 @@ class Connection(base.Connection):
         else:
             self.conn = self._get_connection(opts)
         self.conn.open()
+
+        self.CAPABILITIES = utils.update_nested(self.DEFAULT_CAPABILITIES,
+                                                AVAILABLE_CAPABILITIES)
 
     def upgrade(self):
         self.conn.create_table(self.PROJECT_TABLE, {'f': dict()})
@@ -565,18 +581,7 @@ class Connection(base.Connection):
     def get_capabilities(self):
         """Return an dictionary representing the capabilities of this driver.
         """
-        available = {
-            'meters': {'query': {'simple': True,
-                                 'metadata': True}},
-            'resources': {'query': {'simple': True,
-                                    'metadata': True}},
-            'samples': {'query': {'simple': True,
-                                  'metadata': True}},
-            'statistics': {'query': {'simple': True,
-                                     'metadata': True},
-                           'aggregation': {'standard': True}},
-        }
-        return utils.update_nested(self.DEFAULT_CAPABILITIES, available)
+        return self.CAPABILITIES
 
 
 ###############
