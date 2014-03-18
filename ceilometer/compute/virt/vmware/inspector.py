@@ -51,8 +51,8 @@ cfg.CONF.register_opts(OPTS, group=opt_group)
 
 VC_AVERAGE_MEMORY_CONSUMED_CNTR = 'mem:consumed:average'
 VC_AVERAGE_CPU_CONSUMED_CNTR = 'cpu:usage:average'
-VC_NETWORK_RX_BYTES_COUNTER = 'net:bytesRx:average'
-VC_NETWORK_TX_BYTES_COUNTER = 'net:bytesTx:average'
+VC_NETWORK_RX_COUNTER = 'net:received:average'
+VC_NETWORK_TX_COUNTER = 'net:transmitted:average'
 VC_DISK_READ_RATE_CNTR = "disk:read:average"
 VC_DISK_READ_REQUESTS_RATE_CNTR = "disk:numberReadAveraged:average"
 VC_DISK_WRITE_RATE_CNTR = "disk:write:average"
@@ -94,6 +94,12 @@ class VsphereInspector(virt_inspector.Inspector):
             VC_AVERAGE_CPU_CONSUMED_CNTR)
         cpu_util = self._ops.query_vm_aggregate_stats(vm_moid,
                                                       cpu_util_counter_id)
+
+        # For this counter vSphere returns values scaled-up by 100, since the
+        # corresponding API can't return decimals, but only longs.
+        # For e.g. if the utilization is 12.34%, the value returned is 1234.
+        # Hence, dividing by 100.
+        cpu_util = cpu_util / 100
         return virt_inspector.CPUUtilStats(util=cpu_util)
 
     def inspect_vnics(self, instance_name):
@@ -108,19 +114,19 @@ class VsphereInspector(virt_inspector.Inspector):
         vnic_stats = {}
         vnic_ids = set()
 
-        for net_counter in (VC_NETWORK_RX_BYTES_COUNTER,
-                            VC_NETWORK_TX_BYTES_COUNTER):
+        for net_counter in (VC_NETWORK_RX_COUNTER, VC_NETWORK_TX_COUNTER):
             net_counter_id = self._ops.get_perf_counter_id(net_counter)
             vnic_id_to_stats_map = \
                 self._ops.query_vm_device_stats(vm_moid, net_counter_id)
             vnic_stats[net_counter] = vnic_id_to_stats_map
             vnic_ids.update(vnic_id_to_stats_map.iterkeys())
 
+        # Stats provided from vSphere are in KB/s, converting it to B/s.
         for vnic_id in vnic_ids:
-            rx_bytes_rate = (vnic_stats[VC_NETWORK_RX_BYTES_COUNTER]
-                             .get(vnic_id, 0) / units.k)
-            tx_bytes_rate = (vnic_stats[VC_NETWORK_TX_BYTES_COUNTER]
-                             .get(vnic_id, 0) / units.k)
+            rx_bytes_rate = (vnic_stats[VC_NETWORK_RX_COUNTER]
+                             .get(vnic_id, 0) * units.Ki)
+            tx_bytes_rate = (vnic_stats[VC_NETWORK_TX_COUNTER]
+                             .get(vnic_id, 0) * units.Ki)
 
             stats = virt_inspector.InterfaceRateStats(rx_bytes_rate,
                                                       tx_bytes_rate)
@@ -142,8 +148,8 @@ class VsphereInspector(virt_inspector.Inspector):
         mem_counter_id = self._ops.get_perf_counter_id(
             VC_AVERAGE_MEMORY_CONSUMED_CNTR)
         memory = self._ops.query_vm_aggregate_stats(vm_moid, mem_counter_id)
-        # Stat provided from VMware Vsphere is in Bytes, converting it to MB.
-        memory = memory / (units.Mi)
+        # Stat provided from vSphere is in KB, converting it to MB.
+        memory = memory / units.Ki
         return virt_inspector.MemoryUsageStats(usage=memory)
 
     def inspect_disk_rates(self, instance):
@@ -174,6 +180,7 @@ class VsphereInspector(virt_inspector.Inspector):
                 return disk_stats[counter_name].get(disk_id, 0)
 
             disk = virt_inspector.Disk(device=disk_id)
+            # Stats provided from vSphere are in KB/s, converting it to B/s.
             disk_rate_info = virt_inspector.DiskRateStats(
                 read_bytes_rate=stat_val(VC_DISK_READ_RATE_CNTR) * units.Ki,
                 read_requests_rate=stat_val(VC_DISK_READ_REQUESTS_RATE_CNTR),
