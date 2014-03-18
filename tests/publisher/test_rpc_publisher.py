@@ -19,9 +19,11 @@
 """Tests for ceilometer/publish.py
 """
 
-import eventlet
 import datetime
 from oslo.config import cfg
+
+import eventlet
+import mock
 
 from ceilometer import sample
 from ceilometer.openstack.common import jsonutils
@@ -307,10 +309,13 @@ class TestPublish(base.TestCase):
         self.assertEqual(len(self.published), 2)
         self.assertEqual(len(publisher.local_queue), 0)
 
-    def test_published_with_no_policy(self):
+    @mock.patch('ceilometer.publisher.rpc.LOG')
+    def test_published_with_no_policy(self, mylog):
         self.rpc_unreachable = True
         publisher = rpc.RPCPublisher(
             network_utils.urlsplit('rpc://'))
+        self.assertTrue(mylog.info.called)
+
         self.assertRaises(
             SystemExit,
             publisher.publish_samples,
@@ -319,10 +324,12 @@ class TestPublish(base.TestCase):
         self.assertEqual(len(self.published), 0)
         self.assertEqual(len(publisher.local_queue), 0)
 
-    def test_published_with_policy_block(self):
+    @mock.patch('ceilometer.publisher.rpc.LOG')
+    def test_published_with_policy_block(self, mylog):
         self.rpc_unreachable = True
         publisher = rpc.RPCPublisher(
             network_utils.urlsplit('rpc://?policy=default'))
+        self.assertTrue(mylog.info.called)
         self.assertRaises(
             SystemExit,
             publisher.publish_samples,
@@ -330,7 +337,8 @@ class TestPublish(base.TestCase):
         self.assertEqual(len(self.published), 0)
         self.assertEqual(len(publisher.local_queue), 0)
 
-    def test_published_with_policy_incorrect(self):
+    @mock.patch('ceilometer.publisher.rpc.LOG')
+    def test_published_with_policy_incorrect(self, mylog):
         self.rpc_unreachable = True
         publisher = rpc.RPCPublisher(
             network_utils.urlsplit('rpc://?policy=notexist'))
@@ -338,6 +346,7 @@ class TestPublish(base.TestCase):
             SystemExit,
             publisher.publish_samples,
             None, self.test_data)
+        self.assertTrue(mylog.warn.called)
         self.assertEqual(publisher.policy, 'default')
         self.assertEqual(len(self.published), 0)
         self.assertEqual(len(publisher.local_queue), 0)
