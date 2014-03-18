@@ -100,6 +100,29 @@ hypervisors while test coverage was mostly done based on KVM. Contributors
 are welcome to implement other virtualization backends' meters or complete
 the existing ones.
 
+The meters below are related to the host machine.
+
+.. note::
+
+By default, Nova will not collect the following meters related to the host
+compute node machine. Nova option 'compute_monitors = ComputeDriverCPUMonitor'
+should be set in nova.conf to enable meters.
+
+===============================  ==========  =========  ========  ============  ========================
+Name                             Type        Unit       Resource  Origin        Note
+===============================  ==========  =========  ========  ============  ========================
+compute.node.cpu.frequency       Gauge       MHz        host ID   notification  CPU frequency
+compute.node.cpu.kernel.time     Cumulative  ns         host ID   notification  CPU kernel time
+compute.node.cpu.idle.time       Cumulative  ns         host ID   notification  CPU idle time
+compute.node.cpu.user.time       Cumulative  ns         host ID   notification  CPU user mode time
+compute.node.cpu.iowait.time     Cumulative  ns         host ID   notification  CPU I/O wait time
+compute.node.cpu.kernel.percent  Gauge       %          host ID   notification  CPU kernel percentage
+compute.node.cpu.idle.percent    Gauge       %          host ID   notification  CPU idle percentage
+compute.node.cpu.user.percent    Gauge       %          host ID   notification  CPU user mode percentage
+compute.node.cpu.iowait.percent  Gauge       %          host ID   notification  CPU I/O wait percentage
+compute.node.cpu.percent         Gauge       %          host ID   notification  CPU utilization
+===============================  ==========  =========  ========  ============  ========================
+
 Network (Neutron)
 =================
 
