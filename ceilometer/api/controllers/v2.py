@@ -378,24 +378,28 @@ def _validate_query(query, db_func, internal_keys=[],
                                     "search_offset cannot be used without " +
                                     "timestamp")
 
+    def _is_field_metadata(field):
+        return (field.startswith('metadata.') or
+                field.startswith('resource_metadata.'))
+
     for i in query:
         if i.field not in ('timestamp', 'search_offset'):
-            if i.op == 'eq':
-                if i.field == 'enabled':
-                    i._get_value_as_type('boolean')
-                elif (i.field.startswith('metadata.') or
-                      i.field.startswith('resource_metadata.')):
-                    i._get_value_as_type()
+            key = translation.get(i.field, i.field)
+            operator = i.op
+            if (key in valid_keys or _is_field_metadata(i.field)):
+                if operator == 'eq':
+                    if key == 'enabled':
+                        i._get_value_as_type('boolean')
+                    elif _is_field_metadata(key):
+                        i._get_value_as_type()
                 else:
-                    key = translation.get(i.field, i.field)
-                    if key not in valid_keys:
-                        msg = ("unrecognized field in query: %s, "
-                               "valid keys: %s") % (query, valid_keys)
-                        raise wsme.exc.UnknownArgument(key, msg)
+                    raise wsme.exc.InvalidInput('op', i.op,
+                                                'unimplemented operator for '
+                                                '%s' % i.field)
             else:
-                raise wsme.exc.InvalidInput('op', i.op,
-                                            'unimplemented operator for %s' %
-                                            i.field)
+                msg = ("unrecognized field in query: %s, "
+                       "valid keys: %s") % (query, valid_keys)
+                raise wsme.exc.UnknownArgument(key, msg)
 
 
 def _validate_timestamp_fields(query, field_name, operator_list,
