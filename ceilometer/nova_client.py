@@ -55,6 +55,7 @@ class Client(object):
             region_name=conf.os_region_name,
             endpoint_type=conf.os_endpoint_type,
             cacert=conf.os_cacert,
+            insecure=conf.insecure,
             no_cache=True)
 
     def _with_flavor_and_image(self, instances):
