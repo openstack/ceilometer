@@ -364,7 +364,7 @@ class TestEvaluate(base.TestEvaluatorBase):
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
             # most recent datapoints inside threshold but with
-            # anomolously low sample count
+            # anomalously low sample count
             threshold = self.alarms[0].rule['threshold']
             avgs = [self._get_stat('avg',
                                    threshold + (v if v < 10 else -v),
@@ -406,7 +406,7 @@ class TestEvaluate(base.TestEvaluatorBase):
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
             # most recent datapoints outside threshold but with
-            # anomolously low sample count
+            # anomalously low sample count
             threshold = self.alarms[0].rule['threshold']
             avgs = [self._get_stat('avg',
                                    threshold - (v if v < 9 else -v),

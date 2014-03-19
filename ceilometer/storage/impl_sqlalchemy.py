@@ -454,7 +454,7 @@ class Connection(base.Connection):
         :param project: Optional ID for project that owns the resource.
         :param source: Optional source filter.
         :param start_timestamp: Optional modified timestamp start range.
-        :param start_timestamp_op: Optonal start time operator, like gt, ge.
+        :param start_timestamp_op: Optional start time operator, like gt, ge.
         :param end_timestamp: Optional modified timestamp end range.
         :param end_timestamp_op: Optional end time operator, like lt, le.
         :param metaquery: Optional dict with metadata to match on.
