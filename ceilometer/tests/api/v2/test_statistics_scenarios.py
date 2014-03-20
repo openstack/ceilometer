@@ -61,8 +61,8 @@ class TestMaxProjectVolume(FunctionalTest,
         data = self.get_json(self.PATH, q=[{'field': 'project_id',
                                             'value': 'project1',
                                             }])
-        self.assertEqual(data[0]['max'], 7)
-        self.assertEqual(data[0]['count'], 3)
+        self.assertEqual(7, data[0]['max'])
+        self.assertEqual(3, data[0]['count'])
 
     def test_start_timestamp(self):
         data = self.get_json(self.PATH, q=[{'field': 'project_id',
@@ -73,8 +73,8 @@ class TestMaxProjectVolume(FunctionalTest,
                                             'value': '2012-09-25T11:30:00',
                                             },
                                            ])
-        self.assertEqual(data[0]['max'], 7)
-        self.assertEqual(data[0]['count'], 2)
+        self.assertEqual(7, data[0]['max'])
+        self.assertEqual(2, data[0]['count'])
 
     def test_start_timestamp_after(self):
         data = self.get_json(self.PATH, q=[{'field': 'project_id',
@@ -85,7 +85,7 @@ class TestMaxProjectVolume(FunctionalTest,
                                             'value': '2012-09-25T12:34:00',
                                             },
                                            ])
-        self.assertEqual(data, [])
+        self.assertEqual([], data)
 
     def test_end_timestamp(self):
         data = self.get_json(self.PATH, q=[{'field': 'project_id',
@@ -96,8 +96,8 @@ class TestMaxProjectVolume(FunctionalTest,
                                             'value': '2012-09-25T11:30:00',
                                             },
                                            ])
-        self.assertEqual(data[0]['max'], 5)
-        self.assertEqual(data[0]['count'], 1)
+        self.assertEqual(5, data[0]['max'])
+        self.assertEqual(1, data[0]['count'])
 
     def test_end_timestamp_before(self):
         data = self.get_json(self.PATH, q=[{'field': 'project_id',
@@ -108,7 +108,7 @@ class TestMaxProjectVolume(FunctionalTest,
                                             'value': '2012-09-25T09:54:00',
                                             },
                                            ])
-        self.assertEqual(data, [])
+        self.assertEqual([], data)
 
     def test_start_end_timestamp(self):
         data = self.get_json(self.PATH, q=[{'field': 'project_id',
@@ -123,8 +123,8 @@ class TestMaxProjectVolume(FunctionalTest,
                                             'value': '2012-09-25T11:32:00',
                                             },
                                            ])
-        self.assertEqual(data[0]['max'], 6)
-        self.assertEqual(data[0]['count'], 1)
+        self.assertEqual(6, data[0]['max'])
+        self.assertEqual(1, data[0]['count'])
 
 
 class TestMaxResourceVolume(FunctionalTest,
@@ -159,24 +159,24 @@ class TestMaxResourceVolume(FunctionalTest,
         data = self.get_json(self.PATH, q=[{'field': 'resource_id',
                                             'value': 'resource-id',
                                             }])
-        self.assertEqual(data[0]['max'], 7)
-        self.assertEqual(data[0]['count'], 3)
+        self.assertEqual(7, data[0]['max'])
+        self.assertEqual(3, data[0]['count'])
 
     def test_no_time_bounds_with_period(self):
         data = self.get_json(self.PATH,
                              q=[{'field': 'resource_id',
                                  'value': 'resource-id'}],
                              period=3600)
-        self.assertEqual(len(data), 3)
-        self.assertEqual(set(x['duration_start'] for x in data),
-                         set([u'2012-09-25T10:30:00',
+        self.assertEqual(3, len(data))
+        self.assertEqual(set([u'2012-09-25T10:30:00',
                               u'2012-09-25T12:32:00',
-                              u'2012-09-25T11:31:00']))
-        self.assertEqual(data[0]['period'], 3600)
-        self.assertEqual(set(x['period_start'] for x in data),
-                         set([u'2012-09-25T10:30:00',
+                              u'2012-09-25T11:31:00']),
+                         set(x['duration_start'] for x in data))
+        self.assertEqual(3600, data[0]['period'])
+        self.assertEqual(set([u'2012-09-25T10:30:00',
                               u'2012-09-25T11:30:00',
-                              u'2012-09-25T12:30:00']))
+                              u'2012-09-25T12:30:00']),
+                         set(x['period_start'] for x in data))
 
     def test_period_with_negative_value(self):
         resp = self.get_json(self.PATH, expect_errors=True,
@@ -194,8 +194,8 @@ class TestMaxResourceVolume(FunctionalTest,
                                             'value': '2012-09-25T11:30:00',
                                             },
                                            ])
-        self.assertEqual(data[0]['max'], 7)
-        self.assertEqual(data[0]['count'], 2)
+        self.assertEqual(7, data[0]['max'])
+        self.assertEqual(2, data[0]['count'])
 
     def test_start_timestamp_after(self):
         data = self.get_json(self.PATH, q=[{'field': 'resource_id',
@@ -206,7 +206,7 @@ class TestMaxResourceVolume(FunctionalTest,
                                             'value': '2012-09-25T12:34:00',
                                             },
                                            ])
-        self.assertEqual(data, [])
+        self.assertEqual([], data)
 
     def test_end_timestamp(self):
         data = self.get_json(self.PATH, q=[{'field': 'resource_id',
@@ -217,8 +217,8 @@ class TestMaxResourceVolume(FunctionalTest,
                                             'value': '2012-09-25T11:30:00',
                                             },
                                            ])
-        self.assertEqual(data[0]['max'], 5)
-        self.assertEqual(data[0]['count'], 1)
+        self.assertEqual(5, data[0]['max'])
+        self.assertEqual(1, data[0]['count'])
 
     def test_end_timestamp_before(self):
         data = self.get_json(self.PATH, q=[{'field': 'resource_id',
@@ -229,7 +229,7 @@ class TestMaxResourceVolume(FunctionalTest,
                                             'value': '2012-09-25T09:54:00',
                                             },
                                            ])
-        self.assertEqual(data, [])
+        self.assertEqual([], data)
 
     def test_start_end_timestamp(self):
         data = self.get_json(self.PATH, q=[{'field': 'resource_id',
@@ -244,8 +244,8 @@ class TestMaxResourceVolume(FunctionalTest,
                                             'value': '2012-09-25T11:32:00',
                                             },
                                            ])
-        self.assertEqual(data[0]['max'], 6)
-        self.assertEqual(data[0]['count'], 1)
+        self.assertEqual(6, data[0]['max'])
+        self.assertEqual(1, data[0]['count'])
 
 
 class TestSumProjectVolume(FunctionalTest,
@@ -281,8 +281,8 @@ class TestSumProjectVolume(FunctionalTest,
                                             'value': 'project1',
                                             }])
         expected = 5 + 6 + 7
-        self.assertEqual(data[0]['sum'], expected)
-        self.assertEqual(data[0]['count'], 3)
+        self.assertEqual(expected, data[0]['sum'])
+        self.assertEqual(3, data[0]['count'])
 
     def test_start_timestamp(self):
         data = self.get_json(self.PATH, q=[{'field': 'project_id',
@@ -294,8 +294,8 @@ class TestSumProjectVolume(FunctionalTest,
                                             },
                                            ])
         expected = 6 + 7
-        self.assertEqual(data[0]['sum'], expected)
-        self.assertEqual(data[0]['count'], 2)
+        self.assertEqual(expected, data[0]['sum'])
+        self.assertEqual(2, data[0]['count'])
 
     def test_start_timestamp_after(self):
         data = self.get_json(self.PATH, q=[{'field': 'project_id',
@@ -306,7 +306,7 @@ class TestSumProjectVolume(FunctionalTest,
                                             'value': '2012-09-25T12:34:00',
                                             },
                                            ])
-        self.assertEqual(data, [])
+        self.assertEqual([], data)
 
     def test_end_timestamp(self):
         data = self.get_json(self.PATH, q=[{'field': 'project_id',
@@ -317,8 +317,8 @@ class TestSumProjectVolume(FunctionalTest,
                                             'value': '2012-09-25T11:30:00',
                                             },
                                            ])
-        self.assertEqual(data[0]['sum'], 5)
-        self.assertEqual(data[0]['count'], 1)
+        self.assertEqual(5, data[0]['sum'])
+        self.assertEqual(1, data[0]['count'])
 
     def test_end_timestamp_before(self):
         data = self.get_json(self.PATH, q=[{'field': 'project_id',
@@ -329,7 +329,7 @@ class TestSumProjectVolume(FunctionalTest,
                                             'value': '2012-09-25T09:54:00',
                                             },
                                            ])
-        self.assertEqual(data, [])
+        self.assertEqual([], data)
 
     def test_start_end_timestamp(self):
         data = self.get_json(self.PATH, q=[{'field': 'project_id',
@@ -344,8 +344,8 @@ class TestSumProjectVolume(FunctionalTest,
                                             'value': '2012-09-25T11:32:00',
                                             },
                                            ])
-        self.assertEqual(data[0]['sum'], 6)
-        self.assertEqual(data[0]['count'], 1)
+        self.assertEqual(6, data[0]['sum'])
+        self.assertEqual(1, data[0]['count'])
 
 
 class TestSumResourceVolume(FunctionalTest,
@@ -380,24 +380,24 @@ class TestSumResourceVolume(FunctionalTest,
         data = self.get_json(self.PATH, q=[{'field': 'resource_id',
                                             'value': 'resource-id',
                                             }])
-        self.assertEqual(data[0]['sum'], 5 + 6 + 7)
-        self.assertEqual(data[0]['count'], 3)
+        self.assertEqual(5 + 6 + 7, data[0]['sum'])
+        self.assertEqual(3, data[0]['count'])
 
     def test_no_time_bounds_with_period(self):
         data = self.get_json(self.PATH,
                              q=[{'field': 'resource_id',
                                  'value': 'resource-id'}],
                              period=1800)
-        self.assertEqual(len(data), 3)
-        self.assertEqual(set(x['duration_start'] for x in data),
-                         set([u'2012-09-25T10:30:00',
+        self.assertEqual(3, len(data))
+        self.assertEqual(set([u'2012-09-25T10:30:00',
                               u'2012-09-25T12:32:00',
-                              u'2012-09-25T11:31:00']))
-        self.assertEqual(data[0]['period'], 1800)
-        self.assertEqual(set(x['period_start'] for x in data),
-                         set([u'2012-09-25T10:30:00',
+                              u'2012-09-25T11:31:00']),
+                         set(x['duration_start'] for x in data))
+        self.assertEqual(1800, data[0]['period'])
+        self.assertEqual(set([u'2012-09-25T10:30:00',
                               u'2012-09-25T11:30:00',
-                              u'2012-09-25T12:30:00']))
+                              u'2012-09-25T12:30:00']),
+                         set(x['period_start'] for x in data))
 
     def test_start_timestamp(self):
         data = self.get_json(self.PATH, q=[{'field': 'resource_id',
@@ -407,8 +407,8 @@ class TestSumResourceVolume(FunctionalTest,
                                             'op': 'ge',
                                             'value': '2012-09-25T11:30:00',
                                             }])
-        self.assertEqual(data[0]['sum'], 6 + 7)
-        self.assertEqual(data[0]['count'], 2)
+        self.assertEqual(6 + 7, data[0]['sum'])
+        self.assertEqual(2, data[0]['count'])
 
     def test_start_timestamp_with_period(self):
         data = self.get_json(self.PATH,
@@ -418,14 +418,14 @@ class TestSumResourceVolume(FunctionalTest,
                                  'op': 'ge',
                                  'value': '2012-09-25T10:15:00'}],
                              period=7200)
-        self.assertEqual(len(data), 2)
-        self.assertEqual(set(x['duration_start'] for x in data),
-                         set([u'2012-09-25T10:30:00',
-                              u'2012-09-25T12:32:00']))
-        self.assertEqual(data[0]['period'], 7200)
-        self.assertEqual(set(x['period_start'] for x in data),
-                         set([u'2012-09-25T10:15:00',
-                              u'2012-09-25T12:15:00']))
+        self.assertEqual(2, len(data))
+        self.assertEqual(set([u'2012-09-25T10:30:00',
+                              u'2012-09-25T12:32:00']),
+                         set(x['duration_start'] for x in data))
+        self.assertEqual(7200, data[0]['period'])
+        self.assertEqual(set([u'2012-09-25T10:15:00',
+                              u'2012-09-25T12:15:00']),
+                         set(x['period_start'] for x in data))
 
     def test_start_timestamp_after(self):
         data = self.get_json(self.PATH, q=[{'field': 'resource_id',
@@ -435,7 +435,7 @@ class TestSumResourceVolume(FunctionalTest,
                                             'op': 'ge',
                                             'value': '2012-09-25T12:34:00',
                                             }])
-        self.assertEqual(data, [])
+        self.assertEqual([], data)
 
     def test_end_timestamp(self):
         data = self.get_json(self.PATH, q=[{'field': 'resource_id',
@@ -445,8 +445,8 @@ class TestSumResourceVolume(FunctionalTest,
                                             'op': 'le',
                                             'value': '2012-09-25T11:30:00',
                                             }])
-        self.assertEqual(data[0]['sum'], 5)
-        self.assertEqual(data[0]['count'], 1)
+        self.assertEqual(5, data[0]['sum'])
+        self.assertEqual(1, data[0]['count'])
 
     def test_end_timestamp_before(self):
         data = self.get_json(self.PATH, q=[{'field': 'resource_id',
@@ -456,7 +456,7 @@ class TestSumResourceVolume(FunctionalTest,
                                             'op': 'le',
                                             'value': '2012-09-25T09:54:00',
                                             }])
-        self.assertEqual(data, [])
+        self.assertEqual([], data)
 
     def test_start_end_timestamp(self):
         data = self.get_json(self.PATH, q=[{'field': 'resource_id',
@@ -470,8 +470,8 @@ class TestSumResourceVolume(FunctionalTest,
                                             'op': 'lt',
                                             'value': '2012-09-25T11:32:00',
                                             }])
-        self.assertEqual(data[0]['sum'], 6)
-        self.assertEqual(data[0]['count'], 1)
+        self.assertEqual(6, data[0]['sum'])
+        self.assertEqual(1, data[0]['count'])
 
 
 class TestGroupByInstance(FunctionalTest,
@@ -539,32 +539,32 @@ class TestGroupByInstance(FunctionalTest,
                                for x in sub_dict['groupby'].keys())
         groupby_vals_set = set(x for sub_dict in data
                                for x in sub_dict['groupby'].values())
-        self.assertEqual(groupby_keys_set, set(['user_id']))
-        self.assertEqual(groupby_vals_set, set(['user-1', 'user-2', 'user-3']))
+        self.assertEqual(set(['user_id']), groupby_keys_set)
+        self.assertEqual(set(['user-1', 'user-2', 'user-3']), groupby_vals_set)
 
         for r in data:
             grp = r['groupby']
             if grp == {'user_id': 'user-1'}:
-                self.assertEqual(r['count'], 2)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 2)
-                self.assertEqual(r['max'], 2)
-                self.assertEqual(r['sum'], 4)
-                self.assertEqual(r['avg'], 2)
+                self.assertEqual(2, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(2, r['min'])
+                self.assertEqual(2, r['max'])
+                self.assertEqual(4, r['sum'])
+                self.assertEqual(2, r['avg'])
             elif grp == {'user_id': 'user-2'}:
-                self.assertEqual(r['count'], 4)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 1)
-                self.assertEqual(r['max'], 4)
-                self.assertEqual(r['sum'], 8)
-                self.assertEqual(r['avg'], 2)
+                self.assertEqual(4, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(1, r['min'])
+                self.assertEqual(4, r['max'])
+                self.assertEqual(8, r['sum'])
+                self.assertEqual(2, r['avg'])
             elif grp == {'user_id': 'user-3'}:
-                self.assertEqual(r['count'], 1)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 4)
-                self.assertEqual(r['max'], 4)
-                self.assertEqual(r['sum'], 4)
-                self.assertEqual(r['avg'], 4)
+                self.assertEqual(1, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(4, r['min'])
+                self.assertEqual(4, r['max'])
+                self.assertEqual(4, r['sum'])
+                self.assertEqual(4, r['avg'])
 
     def test_group_by_resource(self):
         data = self.get_json(self.PATH, groupby=['resource_id'])
@@ -572,34 +572,33 @@ class TestGroupByInstance(FunctionalTest,
                                for x in sub_dict['groupby'].keys())
         groupby_vals_set = set(x for sub_dict in data
                                for x in sub_dict['groupby'].values())
-        self.assertEqual(groupby_keys_set, set(['resource_id']))
-        self.assertEqual(groupby_vals_set, set(['resource-1',
-                                                'resource-2',
-                                                'resource-3']))
+        self.assertEqual(set(['resource_id']), groupby_keys_set)
+        self.assertEqual(set(['resource-1', 'resource-2', 'resource-3']),
+                         groupby_vals_set)
 
         for r in data:
             grp = r['groupby']
             if grp == {'resource_id': 'resource-1'}:
-                self.assertEqual(r['count'], 3)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 2)
-                self.assertEqual(r['max'], 2)
-                self.assertEqual(r['sum'], 6)
-                self.assertEqual(r['avg'], 2)
+                self.assertEqual(3, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(2, r['min'])
+                self.assertEqual(2, r['max'])
+                self.assertEqual(6, r['sum'])
+                self.assertEqual(2, r['avg'])
             elif grp == {'resource_id': 'resource-2'}:
-                self.assertEqual(r['count'], 3)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 1)
-                self.assertEqual(r['max'], 4)
-                self.assertEqual(r['sum'], 6)
-                self.assertEqual(r['avg'], 2)
+                self.assertEqual(3, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(1, r['min'])
+                self.assertEqual(4, r['max'])
+                self.assertEqual(6, r['sum'])
+                self.assertEqual(2, r['avg'])
             elif grp == {'resource_id': 'resource-3'}:
-                self.assertEqual(r['count'], 1)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 4)
-                self.assertEqual(r['max'], 4)
-                self.assertEqual(r['sum'], 4)
-                self.assertEqual(r['avg'], 4)
+                self.assertEqual(1, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(4, r['min'])
+                self.assertEqual(4, r['max'])
+                self.assertEqual(4, r['sum'])
+                self.assertEqual(4, r['avg'])
 
     def test_group_by_project(self):
         data = self.get_json(self.PATH, groupby=['project_id'])
@@ -607,25 +606,25 @@ class TestGroupByInstance(FunctionalTest,
                                for x in sub_dict['groupby'].keys())
         groupby_vals_set = set(x for sub_dict in data
                                for x in sub_dict['groupby'].values())
-        self.assertEqual(groupby_keys_set, set(['project_id']))
-        self.assertEqual(groupby_vals_set, set(['project-1', 'project-2']))
+        self.assertEqual(set(['project_id']), groupby_keys_set)
+        self.assertEqual(set(['project-1', 'project-2']), groupby_vals_set)
 
         for r in data:
             grp = r['groupby']
             if grp == {'project_id': 'project-1'}:
-                self.assertEqual(r['count'], 5)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 1)
-                self.assertEqual(r['max'], 4)
-                self.assertEqual(r['sum'], 10)
-                self.assertEqual(r['avg'], 2)
+                self.assertEqual(5, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(1, r['min'])
+                self.assertEqual(4, r['max'])
+                self.assertEqual(10, r['sum'])
+                self.assertEqual(2, r['avg'])
             elif grp == {'project_id': 'project-2'}:
-                self.assertEqual(r['count'], 2)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 2)
-                self.assertEqual(r['max'], 4)
-                self.assertEqual(r['sum'], 6)
-                self.assertEqual(r['avg'], 3)
+                self.assertEqual(2, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(2, r['min'])
+                self.assertEqual(4, r['max'])
+                self.assertEqual(6, r['sum'])
+                self.assertEqual(3, r['avg'])
 
     def test_group_by_unknown_field(self):
         response = self.get_json(self.PATH,
@@ -639,45 +638,45 @@ class TestGroupByInstance(FunctionalTest,
                                for x in sub_dict['groupby'].keys())
         groupby_vals_set = set(x for sub_dict in data
                                for x in sub_dict['groupby'].values())
-        self.assertEqual(groupby_keys_set, set(['user_id', 'resource_id']))
-        self.assertEqual(groupby_vals_set, set(['user-1', 'user-2',
-                                                'user-3', 'resource-1',
-                                                'resource-2', 'resource-3']))
+        self.assertEqual(set(['user_id', 'resource_id']), groupby_keys_set)
+        self.assertEqual(set(['user-1', 'user-2', 'user-3', 'resource-1',
+                              'resource-2', 'resource-3']),
+                         groupby_vals_set)
 
         for r in data:
             grp = r['groupby']
             if grp == {'user_id': 'user-1',
                                   'resource_id': 'resource-1'}:
-                self.assertEqual(r['count'], 2)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 2)
-                self.assertEqual(r['max'], 2)
-                self.assertEqual(r['sum'], 4)
-                self.assertEqual(r['avg'], 2)
+                self.assertEqual(2, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(2, r['min'])
+                self.assertEqual(2, r['max'])
+                self.assertEqual(4, r['sum'])
+                self.assertEqual(2, r['avg'])
             elif grp == {'user_id': 'user-2',
                          'resource_id': 'resource-1'}:
-                self.assertEqual(r['count'], 1)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 2)
-                self.assertEqual(r['max'], 2)
-                self.assertEqual(r['sum'], 2)
-                self.assertEqual(r['avg'], 2)
+                self.assertEqual(1, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(2, r['min'])
+                self.assertEqual(2, r['max'])
+                self.assertEqual(2, r['sum'])
+                self.assertEqual(2, r['avg'])
             elif grp == {'user_id': 'user-2',
                          'resource_id': 'resource-2'}:
-                self.assertEqual(r['count'], 3)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 1)
-                self.assertEqual(r['max'], 4)
-                self.assertEqual(r['sum'], 6)
-                self.assertEqual(r['avg'], 2)
+                self.assertEqual(3, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(1, r['min'])
+                self.assertEqual(4, r['max'])
+                self.assertEqual(6, r['sum'])
+                self.assertEqual(2, r['avg'])
             elif grp == {'user_id': 'user-3',
                          'resource_id': 'resource-3'}:
-                self.assertEqual(r['count'], 1)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 4)
-                self.assertEqual(r['max'], 4)
-                self.assertEqual(r['sum'], 4)
-                self.assertEqual(r['avg'], 4)
+                self.assertEqual(1, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(4, r['min'])
+                self.assertEqual(4, r['max'])
+                self.assertEqual(4, r['sum'])
+                self.assertEqual(4, r['avg'])
             else:
                 self.assertNotEqual(grp, {'user_id': 'user-1',
                                           'resource_id': 'resource-2'})
@@ -700,34 +699,33 @@ class TestGroupByInstance(FunctionalTest,
                                for x in sub_dict['groupby'].keys())
         groupby_vals_set = set(x for sub_dict in data
                                for x in sub_dict['groupby'].values())
-        self.assertEqual(groupby_keys_set, set(['resource_id']))
-        self.assertEqual(groupby_vals_set, set(['resource-1',
-                                                'resource-2',
-                                                'resource-3']))
+        self.assertEqual(set(['resource_id']), groupby_keys_set)
+        self.assertEqual(set(['resource-1', 'resource-2', 'resource-3']),
+                         groupby_vals_set)
 
         for r in data:
             grp = r['groupby']
             if grp == {'resource_id': 'resource-1'}:
-                self.assertEqual(r['count'], 2)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 2)
-                self.assertEqual(r['max'], 2)
-                self.assertEqual(r['sum'], 4)
-                self.assertEqual(r['avg'], 2)
+                self.assertEqual(2, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(2, r['min'])
+                self.assertEqual(2, r['max'])
+                self.assertEqual(4, r['sum'])
+                self.assertEqual(2, r['avg'])
             elif grp == {'resource_id': 'resource-2'}:
-                self.assertEqual(r['count'], 2)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 1)
-                self.assertEqual(r['max'], 1)
-                self.assertEqual(r['sum'], 2)
-                self.assertEqual(r['avg'], 1)
+                self.assertEqual(2, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(1, r['min'])
+                self.assertEqual(1, r['max'])
+                self.assertEqual(2, r['sum'])
+                self.assertEqual(1, r['avg'])
             elif grp == {'resource_id': 'resource-3'}:
-                self.assertEqual(r['count'], 1)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 4)
-                self.assertEqual(r['max'], 4)
-                self.assertEqual(r['sum'], 4)
-                self.assertEqual(r['avg'], 4)
+                self.assertEqual(1, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(4, r['min'])
+                self.assertEqual(4, r['max'])
+                self.assertEqual(4, r['sum'])
+                self.assertEqual(4, r['avg'])
 
     def test_group_by_with_query_filter_multiple(self):
         data = self.get_json(self.PATH,
@@ -742,36 +740,37 @@ class TestGroupByInstance(FunctionalTest,
                                for x in sub_dict['groupby'].keys())
         groupby_vals_set = set(x for sub_dict in data
                                for x in sub_dict['groupby'].values())
-        self.assertEqual(groupby_keys_set, set(['project_id', 'resource_id']))
-        self.assertEqual(groupby_vals_set, set(['project-1', 'project-2',
-                                                'resource-1', 'resource-2']))
+        self.assertEqual(set(['project_id', 'resource_id']), groupby_keys_set)
+        self.assertEqual(set(['project-1', 'project-2',
+                              'resource-1', 'resource-2']),
+                         groupby_vals_set)
 
         for r in data:
             grp = r['groupby']
             if grp == {'project_id': 'project-1',
                        'resource_id': 'resource-1'}:
-                self.assertEqual(r['count'], 1)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 2)
-                self.assertEqual(r['max'], 2)
-                self.assertEqual(r['sum'], 2)
-                self.assertEqual(r['avg'], 2)
+                self.assertEqual(1, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(2, r['min'])
+                self.assertEqual(2, r['max'])
+                self.assertEqual(2, r['sum'])
+                self.assertEqual(2, r['avg'])
             elif grp == {'project_id': 'project-1',
                          'resource_id': 'resource-2'}:
-                self.assertEqual(r['count'], 2)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 1)
-                self.assertEqual(r['max'], 1)
-                self.assertEqual(r['sum'], 2)
-                self.assertEqual(r['avg'], 1)
+                self.assertEqual(2, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(1, r['min'])
+                self.assertEqual(1, r['max'])
+                self.assertEqual(2, r['sum'])
+                self.assertEqual(1, r['avg'])
             elif grp == {'project_id': 'project-2',
                          'resource_id': 'resource-2'}:
-                self.assertEqual(r['count'], 1)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 4)
-                self.assertEqual(r['max'], 4)
-                self.assertEqual(r['sum'], 4)
-                self.assertEqual(r['avg'], 4)
+                self.assertEqual(1, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(4, r['min'])
+                self.assertEqual(4, r['max'])
+                self.assertEqual(4, r['sum'])
+                self.assertEqual(4, r['avg'])
             else:
                 self.assertNotEqual(grp, {'project_id': 'project-2',
                                           'resource_id': 'resource-1'})
@@ -784,69 +783,69 @@ class TestGroupByInstance(FunctionalTest,
                                for x in sub_dict['groupby'].keys())
         groupby_vals_set = set(x for sub_dict in data
                                for x in sub_dict['groupby'].values())
-        self.assertEqual(groupby_keys_set, set(['project_id']))
-        self.assertEqual(groupby_vals_set, set(['project-1', 'project-2']))
+        self.assertEqual(set(['project_id']), groupby_keys_set)
+        self.assertEqual(set(['project-1', 'project-2']), groupby_vals_set)
         period_start_set = set(sub_dict['period_start'] for sub_dict in data)
         period_start_valid = set([u'2013-08-01T10:11:00',
                                   u'2013-08-01T14:11:00',
                                   u'2013-08-01T16:11:00'])
-        self.assertEqual(period_start_set, period_start_valid)
+        self.assertEqual(period_start_valid, period_start_set)
 
         for r in data:
             grp = r['groupby']
             period_start = r['period_start']
             if (grp == {'project_id': 'project-1'} and
                     period_start == u'2013-08-01T10:11:00'):
-                self.assertEqual(r['count'], 3)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 1)
-                self.assertEqual(r['max'], 4)
-                self.assertEqual(r['sum'], 6)
-                self.assertEqual(r['avg'], 2)
-                self.assertEqual(r['duration'], 4260)
-                self.assertEqual(r['duration_start'], u'2013-08-01T10:11:00')
-                self.assertEqual(r['duration_end'], u'2013-08-01T11:22:00')
-                self.assertEqual(r['period'], 7200)
-                self.assertEqual(r['period_end'], u'2013-08-01T12:11:00')
+                self.assertEqual(3, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(1, r['min'])
+                self.assertEqual(4, r['max'])
+                self.assertEqual(6, r['sum'])
+                self.assertEqual(2, r['avg'])
+                self.assertEqual(4260, r['duration'])
+                self.assertEqual(u'2013-08-01T10:11:00', r['duration_start'])
+                self.assertEqual(u'2013-08-01T11:22:00', r['duration_end'])
+                self.assertEqual(7200, r['period'])
+                self.assertEqual(u'2013-08-01T12:11:00', r['period_end'])
             elif (grp == {'project_id': 'project-1'} and
                     period_start == u'2013-08-01T14:11:00'):
-                self.assertEqual(r['count'], 2)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 2)
-                self.assertEqual(r['max'], 2)
-                self.assertEqual(r['sum'], 4)
-                self.assertEqual(r['avg'], 2)
-                self.assertEqual(r['duration'], 4260)
-                self.assertEqual(r['duration_start'], u'2013-08-01T14:59:00')
-                self.assertEqual(r['duration_end'], u'2013-08-01T16:10:00')
-                self.assertEqual(r['period'], 7200)
-                self.assertEqual(r['period_end'], u'2013-08-01T16:11:00')
+                self.assertEqual(2, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(2, r['min'])
+                self.assertEqual(2, r['max'])
+                self.assertEqual(4, r['sum'])
+                self.assertEqual(2, r['avg'])
+                self.assertEqual(4260, r['duration'])
+                self.assertEqual(u'2013-08-01T14:59:00', r['duration_start'])
+                self.assertEqual(u'2013-08-01T16:10:00', r['duration_end'])
+                self.assertEqual(7200, r['period'])
+                self.assertEqual(u'2013-08-01T16:11:00', r['period_end'])
             elif (grp == {'project_id': 'project-2'} and
                     period_start == u'2013-08-01T14:11:00'):
-                self.assertEqual(r['count'], 1)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 2)
-                self.assertEqual(r['max'], 2)
-                self.assertEqual(r['sum'], 2)
-                self.assertEqual(r['avg'], 2)
-                self.assertEqual(r['duration'], 0)
-                self.assertEqual(r['duration_start'], u'2013-08-01T15:37:00')
-                self.assertEqual(r['duration_end'], u'2013-08-01T15:37:00')
-                self.assertEqual(r['period'], 7200)
-                self.assertEqual(r['period_end'], u'2013-08-01T16:11:00')
+                self.assertEqual(1, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(2, r['min'])
+                self.assertEqual(2, r['max'])
+                self.assertEqual(2, r['sum'])
+                self.assertEqual(2, r['avg'])
+                self.assertEqual(0, r['duration'])
+                self.assertEqual(u'2013-08-01T15:37:00', r['duration_start'])
+                self.assertEqual(u'2013-08-01T15:37:00', r['duration_end'])
+                self.assertEqual(7200, r['period'])
+                self.assertEqual(u'2013-08-01T16:11:00', r['period_end'])
             elif (grp == {'project_id': 'project-2'} and
                     period_start == u'2013-08-01T16:11:00'):
-                self.assertEqual(r['count'], 1)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 4)
-                self.assertEqual(r['max'], 4)
-                self.assertEqual(r['sum'], 4)
-                self.assertEqual(r['avg'], 4)
-                self.assertEqual(r['duration'], 0)
-                self.assertEqual(r['duration_start'], u'2013-08-01T17:28:00')
-                self.assertEqual(r['duration_end'], u'2013-08-01T17:28:00')
-                self.assertEqual(r['period'], 7200)
-                self.assertEqual(r['period_end'], u'2013-08-01T18:11:00')
+                self.assertEqual(1, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(4, r['min'])
+                self.assertEqual(4, r['max'])
+                self.assertEqual(4, r['sum'])
+                self.assertEqual(4, r['avg'])
+                self.assertEqual(0, r['duration'])
+                self.assertEqual(u'2013-08-01T17:28:00', r['duration_start'])
+                self.assertEqual(u'2013-08-01T17:28:00', r['duration_end'])
+                self.assertEqual(7200, r['period'])
+                self.assertEqual(u'2013-08-01T18:11:00', r['period_end'])
             else:
                 self.assertNotEqual([grp, period_start],
                                     [{'project_id': 'project-1'},
@@ -866,56 +865,56 @@ class TestGroupByInstance(FunctionalTest,
                                for x in sub_dict['groupby'].keys())
         groupby_vals_set = set(x for sub_dict in data
                                for x in sub_dict['groupby'].values())
-        self.assertEqual(groupby_keys_set, set(['project_id']))
-        self.assertEqual(groupby_vals_set, set(['project-1', 'project-2']))
+        self.assertEqual(set(['project_id']), groupby_keys_set)
+        self.assertEqual(set(['project-1', 'project-2']), groupby_vals_set)
         period_start_set = set(sub_dict['period_start'] for sub_dict in data)
         period_start_valid = set([u'2013-08-01T10:11:00',
                                   u'2013-08-01T14:11:00',
                                   u'2013-08-01T16:11:00'])
-        self.assertEqual(period_start_set, period_start_valid)
+        self.assertEqual(period_start_valid, period_start_set)
 
         for r in data:
             grp = r['groupby']
             period_start = r['period_start']
             if (grp == {'project_id': 'project-1'} and
                     period_start == u'2013-08-01T10:11:00'):
-                self.assertEqual(r['count'], 2)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 1)
-                self.assertEqual(r['max'], 1)
-                self.assertEqual(r['sum'], 2)
-                self.assertEqual(r['avg'], 1)
-                self.assertEqual(r['duration'], 1740)
-                self.assertEqual(r['duration_start'], u'2013-08-01T10:11:00')
-                self.assertEqual(r['duration_end'], u'2013-08-01T10:40:00')
-                self.assertEqual(r['period'], 7200)
-                self.assertEqual(r['period_end'], u'2013-08-01T12:11:00')
+                self.assertEqual(2, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(1, r['min'])
+                self.assertEqual(1, r['max'])
+                self.assertEqual(2, r['sum'])
+                self.assertEqual(1, r['avg'])
+                self.assertEqual(1740, r['duration'])
+                self.assertEqual(u'2013-08-01T10:11:00', r['duration_start'])
+                self.assertEqual(u'2013-08-01T10:40:00', r['duration_end'])
+                self.assertEqual(7200, r['period'])
+                self.assertEqual(u'2013-08-01T12:11:00', r['period_end'])
             elif (grp == {'project_id': 'project-1'} and
                     period_start == u'2013-08-01T14:11:00'):
-                self.assertEqual(r['count'], 1)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 2)
-                self.assertEqual(r['max'], 2)
-                self.assertEqual(r['sum'], 2)
-                self.assertEqual(r['avg'], 2)
-                self.assertEqual(r['duration'], 0)
-                self.assertEqual(r['duration_start'], u'2013-08-01T14:59:00')
-                self.assertEqual(r['duration_end'], u'2013-08-01T14:59:00')
-                self.assertEqual(r['period'], 7200)
-                self.assertEqual(r['period_end'], u'2013-08-01T16:11:00')
+                self.assertEqual(1, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(2, r['min'])
+                self.assertEqual(2, r['max'])
+                self.assertEqual(2, r['sum'])
+                self.assertEqual(2, r['avg'])
+                self.assertEqual(0, r['duration'])
+                self.assertEqual(u'2013-08-01T14:59:00', r['duration_start'])
+                self.assertEqual(u'2013-08-01T14:59:00', r['duration_end'])
+                self.assertEqual(7200, r['period'])
+                self.assertEqual(u'2013-08-01T16:11:00', r['period_end'])
             elif (grp == {'project_id': 'project-2'} and
                     period_start == u'2013-08-01T16:11:00'):
-                self.assertEqual(r['count'], 1)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 4)
-                self.assertEqual(r['max'], 4)
-                self.assertEqual(r['sum'], 4)
-                self.assertEqual(r['avg'], 4)
-                self.assertEqual(r['duration'], 0)
-                self.assertEqual(r['duration_start'], u'2013-08-01T17:28:00')
-                self.assertEqual(r['duration_end'], u'2013-08-01T17:28:00')
-                self.assertEqual(r['period'], 7200)
-                self.assertEqual(r['period_end'], u'2013-08-01T18:11:00')
+                self.assertEqual(1, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(4, r['min'])
+                self.assertEqual(4, r['max'])
+                self.assertEqual(4, r['sum'])
+                self.assertEqual(4, r['avg'])
+                self.assertEqual(0, r['duration'])
+                self.assertEqual(u'2013-08-01T17:28:00', r['duration_start'])
+                self.assertEqual(u'2013-08-01T17:28:00', r['duration_end'])
+                self.assertEqual(7200, r['period'])
+                self.assertEqual(u'2013-08-01T18:11:00', r['period_end'])
             else:
                 self.assertNotEqual([grp, period_start],
                                     [{'project_id': 'project-1'},
@@ -933,7 +932,7 @@ class TestGroupByInstance(FunctionalTest,
                                  'op': 'ge',
                                  'value': '2013-08-01T17:28:01'}],
                              groupby=['project_id'])
-        self.assertEqual(data, [])
+        self.assertEqual([], data)
 
     def test_group_by_end_timestamp_before(self):
         data = self.get_json(self.PATH,
@@ -941,7 +940,7 @@ class TestGroupByInstance(FunctionalTest,
                                  'op': 'le',
                                  'value': '2013-08-01T10:10:59'}],
                              groupby=['project_id'])
-        self.assertEqual(data, [])
+        self.assertEqual([], data)
 
     def test_group_by_start_timestamp(self):
         data = self.get_json(self.PATH,
@@ -953,25 +952,25 @@ class TestGroupByInstance(FunctionalTest,
                                for x in sub_dict['groupby'].keys())
         groupby_vals_set = set(x for sub_dict in data
                                for x in sub_dict['groupby'].values())
-        self.assertEqual(groupby_keys_set, set(['project_id']))
-        self.assertEqual(groupby_vals_set, set(['project-1', 'project-2']))
+        self.assertEqual(set(['project_id']), groupby_keys_set)
+        self.assertEqual(set(['project-1', 'project-2']), groupby_vals_set)
 
         for r in data:
             grp = r['groupby']
             if grp == {'project_id': 'project-1'}:
-                self.assertEqual(r['count'], 2)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 2)
-                self.assertEqual(r['max'], 2)
-                self.assertEqual(r['sum'], 4)
-                self.assertEqual(r['avg'], 2)
+                self.assertEqual(2, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(2, r['min'])
+                self.assertEqual(2, r['max'])
+                self.assertEqual(4, r['sum'])
+                self.assertEqual(2, r['avg'])
             elif grp == {'project_id': 'project-2'}:
-                self.assertEqual(r['count'], 2)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 2)
-                self.assertEqual(r['max'], 4)
-                self.assertEqual(r['sum'], 6)
-                self.assertEqual(r['avg'], 3)
+                self.assertEqual(2, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(2, r['min'])
+                self.assertEqual(4, r['max'])
+                self.assertEqual(6, r['sum'])
+                self.assertEqual(3, r['avg'])
 
     def test_group_by_end_timestamp(self):
         data = self.get_json(self.PATH,
@@ -983,18 +982,18 @@ class TestGroupByInstance(FunctionalTest,
                                for x in sub_dict['groupby'].keys())
         groupby_vals_set = set(x for sub_dict in data
                                for x in sub_dict['groupby'].values())
-        self.assertEqual(groupby_keys_set, set(['project_id']))
-        self.assertEqual(groupby_vals_set, set(['project-1']))
+        self.assertEqual(set(['project_id']), groupby_keys_set)
+        self.assertEqual(set(['project-1']), groupby_vals_set)
 
         for r in data:
             grp = r['groupby']
             if grp == {'project_id': 'project-1'}:
-                self.assertEqual(r['count'], 3)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 1)
-                self.assertEqual(r['max'], 4)
-                self.assertEqual(r['sum'], 6)
-                self.assertEqual(r['avg'], 2)
+                self.assertEqual(3, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(1, r['min'])
+                self.assertEqual(4, r['max'])
+                self.assertEqual(6, r['sum'])
+                self.assertEqual(2, r['avg'])
 
     def test_group_by_start_end_timestamp(self):
         data = self.get_json(self.PATH,
@@ -1009,25 +1008,25 @@ class TestGroupByInstance(FunctionalTest,
                                for x in sub_dict['groupby'].keys())
         groupby_vals_set = set(x for sub_dict in data
                                for x in sub_dict['groupby'].values())
-        self.assertEqual(groupby_keys_set, set(['project_id']))
-        self.assertEqual(groupby_vals_set, set(['project-1', 'project-2']))
+        self.assertEqual(set(['project_id']), groupby_keys_set)
+        self.assertEqual(set(['project-1', 'project-2']), groupby_vals_set)
 
         for r in data:
             grp = r['groupby']
             if grp == {'project_id': 'project-1'}:
-                self.assertEqual(r['count'], 5)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 1)
-                self.assertEqual(r['max'], 4)
-                self.assertEqual(r['sum'], 10)
-                self.assertEqual(r['avg'], 2)
+                self.assertEqual(5, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(1, r['min'])
+                self.assertEqual(4, r['max'])
+                self.assertEqual(10, r['sum'])
+                self.assertEqual(2, r['avg'])
             elif grp == {'project_id': 'project-2'}:
-                self.assertEqual(r['count'], 2)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 2)
-                self.assertEqual(r['max'], 4)
-                self.assertEqual(r['sum'], 6)
-                self.assertEqual(r['avg'], 3)
+                self.assertEqual(2, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(2, r['min'])
+                self.assertEqual(4, r['max'])
+                self.assertEqual(6, r['sum'])
+                self.assertEqual(3, r['avg'])
 
     def test_group_by_start_end_timestamp_with_query_filter(self):
         data = self.get_json(self.PATH,
@@ -1045,25 +1044,25 @@ class TestGroupByInstance(FunctionalTest,
                                for x in sub_dict['groupby'].keys())
         groupby_vals_set = set(x for sub_dict in data
                                for x in sub_dict['groupby'].values())
-        self.assertEqual(groupby_keys_set, set(['resource_id']))
-        self.assertEqual(groupby_vals_set, set(['resource-1', 'resource-3']))
+        self.assertEqual(set(['resource_id']), groupby_keys_set)
+        self.assertEqual(set(['resource-1', 'resource-3']), groupby_vals_set)
 
         for r in data:
             grp = r['groupby']
             if grp == {'resource_id': 'resource-1'}:
-                self.assertEqual(r['count'], 2)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 2)
-                self.assertEqual(r['max'], 2)
-                self.assertEqual(r['sum'], 4)
-                self.assertEqual(r['avg'], 2)
+                self.assertEqual(2, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(2, r['min'])
+                self.assertEqual(2, r['max'])
+                self.assertEqual(4, r['sum'])
+                self.assertEqual(2, r['avg'])
             elif grp == {'resource_id': 'resource-3'}:
-                self.assertEqual(r['count'], 1)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 4)
-                self.assertEqual(r['max'], 4)
-                self.assertEqual(r['sum'], 4)
-                self.assertEqual(r['avg'], 4)
+                self.assertEqual(1, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(4, r['min'])
+                self.assertEqual(4, r['max'])
+                self.assertEqual(4, r['sum'])
+                self.assertEqual(4, r['avg'])
 
     def test_group_by_start_end_timestamp_with_period(self):
         data = self.get_json(self.PATH,
@@ -1079,56 +1078,56 @@ class TestGroupByInstance(FunctionalTest,
                                for x in sub_dict['groupby'].keys())
         groupby_vals_set = set(x for sub_dict in data
                                for x in sub_dict['groupby'].values())
-        self.assertEqual(groupby_keys_set, set(['project_id']))
-        self.assertEqual(groupby_vals_set, set(['project-1', 'project-2']))
+        self.assertEqual(set(['project_id']), groupby_keys_set)
+        self.assertEqual(set(['project-1', 'project-2']), groupby_vals_set)
         period_start_set = set(sub_dict['period_start'] for sub_dict in data)
         period_start_valid = set([u'2013-08-01T14:00:00',
                                   u'2013-08-01T15:00:00',
                                   u'2013-08-01T16:00:00'])
-        self.assertEqual(period_start_set, period_start_valid)
+        self.assertEqual(period_start_valid, period_start_set)
 
         for r in data:
             grp = r['groupby']
             period_start = r['period_start']
             if (grp == {'project_id': 'project-1'} and
                     period_start == u'2013-08-01T14:00:00'):
-                self.assertEqual(r['count'], 1)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 2)
-                self.assertEqual(r['max'], 2)
-                self.assertEqual(r['sum'], 2)
-                self.assertEqual(r['avg'], 2)
-                self.assertEqual(r['duration'], 0)
-                self.assertEqual(r['duration_start'], u'2013-08-01T14:59:00')
-                self.assertEqual(r['duration_end'], u'2013-08-01T14:59:00')
-                self.assertEqual(r['period'], 3600)
-                self.assertEqual(r['period_end'], u'2013-08-01T15:00:00')
+                self.assertEqual(1, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(2, r['min'])
+                self.assertEqual(2, r['max'])
+                self.assertEqual(2, r['sum'])
+                self.assertEqual(2, r['avg'])
+                self.assertEqual(0, r['duration'])
+                self.assertEqual(u'2013-08-01T14:59:00', r['duration_start'])
+                self.assertEqual(u'2013-08-01T14:59:00', r['duration_end'])
+                self.assertEqual(3600, r['period'])
+                self.assertEqual(u'2013-08-01T15:00:00', r['period_end'])
             elif (grp == {'project_id': 'project-1'} and
                     period_start == u'2013-08-01T16:00:00'):
-                self.assertEqual(r['count'], 1)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 2)
-                self.assertEqual(r['max'], 2)
-                self.assertEqual(r['sum'], 2)
-                self.assertEqual(r['avg'], 2)
-                self.assertEqual(r['duration'], 0)
-                self.assertEqual(r['duration_start'], u'2013-08-01T16:10:00')
-                self.assertEqual(r['duration_end'], u'2013-08-01T16:10:00')
-                self.assertEqual(r['period'], 3600)
-                self.assertEqual(r['period_end'], u'2013-08-01T17:00:00')
+                self.assertEqual(1, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(2, r['min'])
+                self.assertEqual(2, r['max'])
+                self.assertEqual(2, r['sum'])
+                self.assertEqual(2, r['avg'])
+                self.assertEqual(0, r['duration'])
+                self.assertEqual(u'2013-08-01T16:10:00', r['duration_start'])
+                self.assertEqual(u'2013-08-01T16:10:00', r['duration_end'])
+                self.assertEqual(3600, r['period'])
+                self.assertEqual(u'2013-08-01T17:00:00', r['period_end'])
             elif (grp == {'project_id': 'project-2'} and
                     period_start == u'2013-08-01T15:00:00'):
-                self.assertEqual(r['count'], 1)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 2)
-                self.assertEqual(r['max'], 2)
-                self.assertEqual(r['sum'], 2)
-                self.assertEqual(r['avg'], 2)
-                self.assertEqual(r['duration'], 0)
-                self.assertEqual(r['duration_start'], u'2013-08-01T15:37:00')
-                self.assertEqual(r['duration_end'], u'2013-08-01T15:37:00')
-                self.assertEqual(r['period'], 3600)
-                self.assertEqual(r['period_end'], u'2013-08-01T16:00:00')
+                self.assertEqual(1, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(2, r['min'])
+                self.assertEqual(2, r['max'])
+                self.assertEqual(2, r['sum'])
+                self.assertEqual(2, r['avg'])
+                self.assertEqual(0, r['duration'])
+                self.assertEqual(u'2013-08-01T15:37:00', r['duration_start'])
+                self.assertEqual(u'2013-08-01T15:37:00', r['duration_end'])
+                self.assertEqual(3600, r['period'])
+                self.assertEqual(u'2013-08-01T16:00:00', r['period_end'])
             else:
                 self.assertNotEqual([grp, period_start],
                                     [{'project_id': 'project-1'},
@@ -1157,56 +1156,56 @@ class TestGroupByInstance(FunctionalTest,
                                for x in sub_dict['groupby'].keys())
         groupby_vals_set = set(x for sub_dict in data
                                for x in sub_dict['groupby'].values())
-        self.assertEqual(groupby_keys_set, set(['project_id']))
-        self.assertEqual(groupby_vals_set, set(['project-1', 'project-2']))
+        self.assertEqual(set(['project_id']), groupby_keys_set)
+        self.assertEqual(set(['project-1', 'project-2']), groupby_vals_set)
         period_start_set = set(sub_dict['period_start'] for sub_dict in data)
         period_start_valid = set([u'2013-08-01T10:00:00',
                                   u'2013-08-01T14:00:00',
                                   u'2013-08-01T16:00:00'])
-        self.assertEqual(period_start_set, period_start_valid)
+        self.assertEqual(period_start_valid, period_start_set)
 
         for r in data:
             grp = r['groupby']
             period_start = r['period_start']
             if (grp == {'project_id': 'project-1'} and
                     period_start == u'2013-08-01T10:00:00'):
-                self.assertEqual(r['count'], 2)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 1)
-                self.assertEqual(r['max'], 1)
-                self.assertEqual(r['sum'], 2)
-                self.assertEqual(r['avg'], 1)
-                self.assertEqual(r['duration'], 1740)
-                self.assertEqual(r['duration_start'], u'2013-08-01T10:11:00')
-                self.assertEqual(r['duration_end'], u'2013-08-01T10:40:00')
-                self.assertEqual(r['period'], 7200)
-                self.assertEqual(r['period_end'], u'2013-08-01T12:00:00')
+                self.assertEqual(2, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(1, r['min'])
+                self.assertEqual(1, r['max'])
+                self.assertEqual(2, r['sum'])
+                self.assertEqual(1, r['avg'])
+                self.assertEqual(1740, r['duration'])
+                self.assertEqual(u'2013-08-01T10:11:00', r['duration_start'])
+                self.assertEqual(u'2013-08-01T10:40:00', r['duration_end'])
+                self.assertEqual(7200, r['period'])
+                self.assertEqual(u'2013-08-01T12:00:00', r['period_end'])
             elif (grp == {'project_id': 'project-1'} and
                     period_start == u'2013-08-01T14:00:00'):
-                self.assertEqual(r['count'], 1)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 2)
-                self.assertEqual(r['max'], 2)
-                self.assertEqual(r['sum'], 2)
-                self.assertEqual(r['avg'], 2)
-                self.assertEqual(r['duration'], 0)
-                self.assertEqual(r['duration_start'], u'2013-08-01T14:59:00')
-                self.assertEqual(r['duration_end'], u'2013-08-01T14:59:00')
-                self.assertEqual(r['period'], 7200)
-                self.assertEqual(r['period_end'], u'2013-08-01T16:00:00')
+                self.assertEqual(1, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(2, r['min'])
+                self.assertEqual(2, r['max'])
+                self.assertEqual(2, r['sum'])
+                self.assertEqual(2, r['avg'])
+                self.assertEqual(0, r['duration'])
+                self.assertEqual(u'2013-08-01T14:59:00', r['duration_start'])
+                self.assertEqual(u'2013-08-01T14:59:00', r['duration_end'])
+                self.assertEqual(7200, r['period'])
+                self.assertEqual(u'2013-08-01T16:00:00', r['period_end'])
             elif (grp == {'project_id': 'project-2'} and
                     period_start == u'2013-08-01T16:00:00'):
-                self.assertEqual(r['count'], 1)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 4)
-                self.assertEqual(r['max'], 4)
-                self.assertEqual(r['sum'], 4)
-                self.assertEqual(r['avg'], 4)
-                self.assertEqual(r['duration'], 0)
-                self.assertEqual(r['duration_start'], u'2013-08-01T17:28:00')
-                self.assertEqual(r['duration_end'], u'2013-08-01T17:28:00')
-                self.assertEqual(r['period'], 7200)
-                self.assertEqual(r['period_end'], u'2013-08-01T18:00:00')
+                self.assertEqual(1, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(4, r['min'])
+                self.assertEqual(4, r['max'])
+                self.assertEqual(4, r['sum'])
+                self.assertEqual(4, r['avg'])
+                self.assertEqual(0, r['duration'])
+                self.assertEqual(u'2013-08-01T17:28:00', r['duration_start'])
+                self.assertEqual(u'2013-08-01T17:28:00', r['duration_end'])
+                self.assertEqual(7200, r['period'])
+                self.assertEqual(u'2013-08-01T18:00:00', r['period_end'])
             else:
                 self.assertNotEqual([grp, period_start],
                                     [{'project_id': 'project-1'},
@@ -1301,34 +1300,33 @@ class TestGroupBySource(FunctionalTest,
                                for x in sub_dict['groupby'].keys())
         groupby_vals_set = set(x for sub_dict in data
                                for x in sub_dict['groupby'].values())
-        self.assertEqual(groupby_keys_set, set(['source']))
-        self.assertEqual(groupby_vals_set, set(['source-1',
-                                                'source-2',
-                                                'source-3']))
+        self.assertEqual(set(['source']), groupby_keys_set)
+        self.assertEqual(set(['source-1', 'source-2', 'source-3']),
+                         groupby_vals_set)
 
         for r in data:
             grp = r['groupby']
             if grp == {'source': 'source-1'}:
-                self.assertEqual(r['count'], 4)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 1)
-                self.assertEqual(r['max'], 4)
-                self.assertEqual(r['sum'], 8)
-                self.assertEqual(r['avg'], 2)
+                self.assertEqual(4, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(1, r['min'])
+                self.assertEqual(4, r['max'])
+                self.assertEqual(8, r['sum'])
+                self.assertEqual(2, r['avg'])
             elif grp == {'source': 'source-2'}:
-                self.assertEqual(r['count'], 2)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 2)
-                self.assertEqual(r['max'], 2)
-                self.assertEqual(r['sum'], 4)
-                self.assertEqual(r['avg'], 2)
+                self.assertEqual(2, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(2, r['min'])
+                self.assertEqual(2, r['max'])
+                self.assertEqual(4, r['sum'])
+                self.assertEqual(2, r['avg'])
             elif grp == {'source': 'source-3'}:
-                self.assertEqual(r['count'], 1)
-                self.assertEqual(r['unit'], 's')
-                self.assertEqual(r['min'], 4)
-                self.assertEqual(r['max'], 4)
-                self.assertEqual(r['sum'], 4)
-                self.assertEqual(r['avg'], 4)
+                self.assertEqual(1, r['count'])
+                self.assertEqual('s', r['unit'])
+                self.assertEqual(4, r['min'])
+                self.assertEqual(4, r['max'])
+                self.assertEqual(4, r['sum'])
+                self.assertEqual(4, r['avg'])
 
 
 class TestSelectableAggregates(FunctionalTest,
@@ -1403,9 +1401,9 @@ class TestSelectableAggregates(FunctionalTest,
                                for x in sub_dict['groupby'].keys())
         groupby_vals_set = set(x for sub_dict in data
                                for x in sub_dict['groupby'].values())
-        self.assertEqual(groupby_keys_set, set(['project_id']))
+        self.assertEqual(set(['project_id']), groupby_keys_set)
         projects = ['project-1', 'project-2', 'project-3']
-        self.assertEqual(groupby_vals_set, set(projects))
+        self.assertEqual(set(projects), groupby_vals_set)
 
         standard_aggregates = set(['count', 'min', 'max', 'sum', 'avg'])
         for r in data:
@@ -1413,7 +1411,7 @@ class TestSelectableAggregates(FunctionalTest,
             for project in projects:
                 if grp == {'project_id': project}:
                     expected = expected_values[projects.index(project)]
-                    self.assertEqual(r['unit'], 'instance')
+                    self.assertEqual('instance', r['unit'])
                     self.assertAlmostEqual(r[aggregate], expected)
                     self.assertIn('aggregate', r)
                     self.assertIn(aggregate, r['aggregate'])
@@ -1449,9 +1447,9 @@ class TestSelectableAggregates(FunctionalTest,
                                for x in sub_dict['groupby'].keys())
         groupby_vals_set = set(x for sub_dict in data
                                for x in sub_dict['groupby'].values())
-        self.assertEqual(groupby_keys_set, set(['project_id']))
+        self.assertEqual(set(['project_id']), groupby_keys_set)
         projects = ['project-1', 'project-2', 'project-3']
-        self.assertEqual(groupby_vals_set, set(projects))
+        self.assertEqual(set(projects), groupby_vals_set)
 
         aggregate = 'cardinality/resource_id'
         expected_values = [2.0, 3.0, 1.0]
@@ -1461,11 +1459,11 @@ class TestSelectableAggregates(FunctionalTest,
             for project in projects:
                 if grp == {'project_id': project}:
                     expected = expected_values[projects.index(project)]
-                    self.assertEqual(r['unit'], 'instance')
+                    self.assertEqual('instance', r['unit'])
                     self.assertNotIn(aggregate, r)
                     self.assertIn('aggregate', r)
                     self.assertIn(aggregate, r['aggregate'])
-                    self.assertEqual(r['aggregate'][aggregate], expected)
+                    self.assertEqual(expected, r['aggregate'][aggregate])
                     for a in standard_aggregates:
                         self.assertNotIn(a, r)
 
@@ -1476,8 +1474,8 @@ class TestSelectableAggregates(FunctionalTest,
                              groupby=['project_id'], **agg_args)
         self.assertTrue(400, resp.status_code)
         self.assertTrue('error_message' in resp.json)
-        self.assertEqual(resp.json['error_message'].get('faultstring'),
-                         'Bad aggregate: cardinality.injection_attack')
+        self.assertEqual('Bad aggregate: cardinality.injection_attack',
+                         resp.json['error_message'].get('faultstring'))
 
 
 class TestUnparameterizedAggregates(FunctionalTest,
@@ -1565,9 +1563,9 @@ class TestUnparameterizedAggregates(FunctionalTest,
                                for x in sub_dict['groupby'].keys())
         groupby_vals_set = set(x for sub_dict in data
                                for x in sub_dict['groupby'].values())
-        self.assertEqual(groupby_keys_set, set(['project_id']))
+        self.assertEqual(set(['project_id']), groupby_keys_set)
         projects = ['project-1', 'project-2', 'project-3']
-        self.assertEqual(groupby_vals_set, set(projects))
+        self.assertEqual(set(projects), groupby_vals_set)
 
         aggregate = 'stddev'
         expected_values = [1.4142, 1.0897, 0.0]
@@ -1577,7 +1575,7 @@ class TestUnparameterizedAggregates(FunctionalTest,
             for project in projects:
                 if grp == {'project_id': project}:
                     expected = expected_values[projects.index(project)]
-                    self.assertEqual(r['unit'], 'instance')
+                    self.assertEqual('instance', r['unit'])
                     self.assertNotIn(aggregate, r)
                     self.assertIn('aggregate', r)
                     self.assertIn(aggregate, r['aggregate'])
