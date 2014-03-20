@@ -29,12 +29,19 @@ from ceilometer import storage as storage
 
 
 class FakeComplexQuery(api.ValidatedComplexQuery):
-    def __init__(self, db_model, additional_valid_keys, metadata=False):
+    def __init__(self, db_model, additional_name_mapping={}, metadata=False):
         super(FakeComplexQuery, self).__init__(query=None,
                                                db_model=db_model,
-                                               additional_valid_keys=
-                                               additional_valid_keys,
+                                               additional_name_mapping=
+                                               additional_name_mapping,
                                                metadata_allowed=metadata)
+
+
+sample_name_mapping = {"resource": "resource_id",
+                       "meter": "counter_name",
+                       "type": "counter_type",
+                       "unit": "counter_unit",
+                       "volume": "counter_volume"}
 
 
 class TestComplexQuery(test.BaseTestCase):
@@ -43,13 +50,11 @@ class TestComplexQuery(test.BaseTestCase):
         self.useFixture(fixtures.MonkeyPatch(
             'pecan.response', mock.MagicMock()))
         self.query = FakeComplexQuery(storage.models.Sample,
-                                      ["user", "project", "resource"],
+                                      sample_name_mapping,
                                       True)
-        self.query_alarm = FakeComplexQuery(storage.models.Alarm,
-                                            ["user", "project"])
+        self.query_alarm = FakeComplexQuery(storage.models.Alarm)
         self.query_alarmchange = FakeComplexQuery(
-            storage.models.AlarmChange,
-            ["user", "project"])
+            storage.models.AlarmChange)
 
     def test_replace_isotime_utc(self):
         filter_expr = {"=": {"timestamp": "2013-12-05T19:38:29Z"}}
@@ -231,7 +236,7 @@ class TestFilterSyntaxValidation(test.BaseTestCase):
     def setUp(self):
         super(TestFilterSyntaxValidation, self).setUp()
         self.query = FakeComplexQuery(storage.models.Sample,
-                                      ["user", "project", "resource"],
+                                      sample_name_mapping,
                                       True)
 
     def test_simple_operator(self):

@@ -1134,14 +1134,14 @@ class ValidatedComplexQuery(object):
     order_directions = _list_to_regexp(order_directions, regexp_prefix)
 
     timestamp_fields = ["timestamp", "state_timestamp"]
-    name_mapping = {"user": "user_id",
-                    "project": "project_id",
-                    "resource": "resource_id"}
 
-    def __init__(self, query, db_model, additional_valid_keys,
+    def __init__(self, query, db_model, additional_name_mapping={},
                  metadata_allowed=False):
+        self.name_mapping = {"user": "user_id",
+                             "project": "project_id"}
+        self.name_mapping.update(additional_name_mapping)
         valid_keys = db_model.get_field_names()
-        valid_keys = list(valid_keys) + additional_valid_keys
+        valid_keys = list(valid_keys) + self.name_mapping.keys()
         valid_fields = _list_to_regexp(valid_keys)
 
         if metadata_allowed:
@@ -2300,9 +2300,15 @@ class QuerySamplesController(rest.RestController):
 
         :param body: Query rules for the samples to be returned.
         """
+        sample_name_mapping = {"resource": "resource_id",
+                               "meter": "counter_name",
+                               "type": "counter_type",
+                               "unit": "counter_unit",
+                               "volume": "counter_volume"}
+
         query = ValidatedComplexQuery(body,
                                       storage.models.Sample,
-                                      ["user", "project", "resource"],
+                                      sample_name_mapping,
                                       metadata_allowed=True)
         query.validate(visibility_field="project_id")
         conn = pecan.request.storage_conn
@@ -2322,8 +2328,7 @@ class QueryAlarmHistoryController(rest.RestController):
         :param body: Query rules for the alarm history to be returned.
         """
         query = ValidatedComplexQuery(body,
-                                      storage.models.AlarmChange,
-                                      ["user", "project"])
+                                      storage.models.AlarmChange)
         query.validate(visibility_field="on_behalf_of")
         conn = pecan.request.storage_conn
         return [AlarmChange.from_db_model(s)
@@ -2344,8 +2349,7 @@ class QueryAlarmsController(rest.RestController):
         :param body: Query rules for the alarms to be returned.
         """
         query = ValidatedComplexQuery(body,
-                                      storage.models.Alarm,
-                                      ["user", "project"])
+                                      storage.models.Alarm)
         query.validate(visibility_field="project_id")
         conn = pecan.request.storage_conn
         return [Alarm.from_db_model(s)

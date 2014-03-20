@@ -67,7 +67,7 @@ class TestQueryMetersController(tests_api.FunctionalTest,
             sample.Sample('meter.test',
                           'cumulative',
                           '',
-                          1,
+                          2,
                           'user-id2',
                           'project-id2',
                           'resource-id2',
@@ -81,7 +81,7 @@ class TestQueryMetersController(tests_api.FunctionalTest,
             sample.Sample('meter.test',
                           'cumulative',
                           '',
-                          1,
+                          3,
                           'user-id3',
                           'project-id3',
                           'resource-id3',
@@ -224,6 +224,15 @@ class TestQueryMetersController(tests_api.FunctionalTest,
         for sample in data.json:
             self.assertIn(sample['user_id'], set(["user-id2"]))
 
+    def test_query_with_field_name_meter(self):
+        data = self.post_json(self.url,
+                              params={"filter":
+                                      '{"=": {"meter": "meter.test"}}'})
+
+        self.assertEqual(3, len(data.json))
+        for sample in data.json:
+            self.assertIn(sample['meter'], set(["meter.test"]))
+
     def test_query_with_lower_and_upper_case_orderby(self):
         data = self.post_json(self.url,
                               params={"orderby": '[{"project_id": "DeSc"}]'})
@@ -239,6 +248,14 @@ class TestQueryMetersController(tests_api.FunctionalTest,
         self.assertEqual(3, len(data.json))
         self.assertEqual(["user-id1", "user-id2", "user-id3"],
                          [s["user_id"] for s in data.json])
+
+    def test_query_with_volume_field_name_orderby(self):
+        data = self.post_json(self.url,
+                              params={"orderby": '[{"volume": "deSc"}]'})
+
+        self.assertEqual(3, len(data.json))
+        self.assertEqual([3, 2, 1],
+                         [s["volume"] for s in data.json])
 
     def test_query_with_missing_order_in_orderby(self):
         data = self.post_json(self.url,
