@@ -39,7 +39,7 @@ def make_sample_from_host(host_url, name, type, unit, volume,
     resource_metadata.update(get_metadata_from_host(host_url))
 
     return sample.Sample(
-        name=name,
+        name='hardware.' + name,
         type=type,
         unit=unit,
         volume=volume,

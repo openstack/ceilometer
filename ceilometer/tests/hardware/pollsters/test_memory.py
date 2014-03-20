@@ -24,10 +24,10 @@ from ceilometer.tests.hardware.pollsters import base
 class TestMemoryPollsters(base.TestPollsterBase):
     def test_memory_size_total(self):
         self._check_get_samples(memory.MemoryTotalPollster,
-                                'memory.total',
+                                'hardware.memory.total',
                                 1000, sample.TYPE_GAUGE)
 
     def test_memory_size_used(self):
         self._check_get_samples(memory.MemoryUsedPollster,
-                                'memory.used',
+                                'hardware.memory.used',
                                 90, sample.TYPE_GAUGE)
