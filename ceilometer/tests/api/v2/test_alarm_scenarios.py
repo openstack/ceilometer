@@ -409,9 +409,8 @@ class TestAlarms(FunctionalTest,
         resp = self.post_json('/alarms', params=json, expect_errors=True,
                               status=400, headers=self.auth_headers)
         self.assertEqual(
-            resp.json['error_message']['faultstring'],
-            "either threshold_rule or combination_rule "
-            "must be set")
+            "threshold_rule must be set for threshold type alarm",
+            resp.json['error_message']['faultstring'])
 
     def test_post_invalid_alarm_statistic(self):
         json = {
@@ -929,6 +928,63 @@ class TestAlarms(FunctionalTest,
 
     def test_post_combination_alarm_as_admin_success_owner_set(self):
         self._do_post_combination_alarm_as_admin_success(True)
+
+    def test_post_combination_alarm_with_threshold_rule(self):
+        """Test the creation of an combination alarm with threshold rule.
+        """
+        json = {
+            'enabled': False,
+            'name': 'added_alarm',
+            'state': 'ok',
+            'type': 'combination',
+            'ok_actions': ['http://something/ok'],
+            'alarm_actions': ['http://something/alarm'],
+            'insufficient_data_actions': ['http://something/no'],
+            'repeat_actions': True,
+            'threshold_rule': {
+                'meter_name': 'ameter',
+                'query': [{'field': 'metadata.field',
+                           'op': 'eq',
+                           'value': '5',
+                           'type': 'string'}],
+                'comparison_operator': 'le',
+                'statistic': 'count',
+                'threshold': 50,
+                'evaluation_periods': '3',
+                'period': '180',
+            }
+        }
+        resp = self.post_json('/alarms', params=json,
+                              expect_errors=True, status=400,
+                              headers=self.auth_headers)
+        self.assertEqual(
+            "combination_rule must be set for combination type alarm",
+            resp.json['error_message']['faultstring'])
+
+    def test_post_threshold_alarm_with_combination_rule(self):
+        """Test the creation of an threshold alarm with combination rule.
+        """
+        json = {
+            'enabled': False,
+            'name': 'added_alarm',
+            'state': 'ok',
+            'type': 'threshold',
+            'ok_actions': ['http://something/ok'],
+            'alarm_actions': ['http://something/alarm'],
+            'insufficient_data_actions': ['http://something/no'],
+            'repeat_actions': True,
+            'combination_rule': {
+                'alarm_ids': ['a',
+                              'b'],
+                'operator': 'and',
+            }
+        }
+        resp = self.post_json('/alarms', params=json,
+                              expect_errors=True, status=400,
+                              headers=self.auth_headers)
+        self.assertEqual(
+            "threshold_rule must be set for threshold type alarm",
+            resp.json['error_message']['faultstring'])
 
     def _do_post_combination_alarm_as_admin_success(self, owner_is_set):
         """Test that post a combination alarm as admin on behalf of nobody
