@@ -272,56 +272,39 @@ class Connection(base.Connection):
     def _create_or_update(session, model_class, _id, source=None, **kwargs):
         if not _id:
             return None
-
         try:
-            # create a nested session for the case of two call of
-            # record_metering_data run in parallel to not fail the
-            # record of this sample
-            # (except for sqlite, that doesn't support nested
-            # transaction and doesn't have concurrency problem)
-            nested = session.connection().dialect.name != 'sqlite'
+            with session.begin(subtransactions=True):
+                obj = session.query(model_class).get(str(_id))
+                if obj is None:
+                    obj = model_class(id=str(_id))
+                    session.add(obj)
 
-            # raise dbexc.DBDuplicateEntry manually for sqlite
-            # to not break the current session
-            if not nested and session.query(model_class).get(str(_id)):
-                raise dbexc.DBDuplicateEntry()
-
-            with session.begin(nested=nested,
-                               subtransactions=not nested):
-                obj = model_class(id=str(_id))
-                session.add(obj)
+                if source and not filter(lambda x: x.id == source.id,
+                                         obj.sources):
+                    obj.sources.append(source)
+                for k in kwargs:
+                    setattr(obj, k, kwargs[k])
         except dbexc.DBDuplicateEntry:
             # requery the object from the db if this is an other
             # parallel/previous call of record_metering_data that
             # have successfully created this object
-            obj = session.query(model_class).get(str(_id))
-
-        # update the object
-        if source and not filter(lambda x: x.id == source.id, obj.sources):
-            obj.sources.append(source)
-        for k in kwargs:
-            setattr(obj, k, kwargs[k])
+            obj = Connection._create_or_update(session, model_class,
+                                               _id, source, **kwargs)
         return obj
 
     @staticmethod
     def _create_meter(session, name, type, unit):
         try:
-            nested = session.connection().dialect.name != 'sqlite'
-            if not nested and session.query(models.Meter)\
+            with session.begin(subtransactions=True):
+                obj = session.query(models.Meter)\
                     .filter(models.Meter.name == name)\
                     .filter(models.Meter.type == type)\
-                    .filter(models.Meter.unit == unit).count() > 0:
-                raise dbexc.DBDuplicateEntry()
-
-            with session.begin(nested=nested,
-                               subtransactions=not nested):
-                obj = models.Meter(name=name, type=type, unit=unit)
-                session.add(obj)
+                    .filter(models.Meter.unit == unit).first()
+                if obj is None:
+                    obj = models.Meter(name=name, type=type, unit=unit)
+                    session.add(obj)
         except dbexc.DBDuplicateEntry:
-            obj = session.query(models.Meter)\
-                .filter(models.Meter.name == name)\
-                .filter(models.Meter.type == type)\
-                .filter(models.Meter.unit == unit).first()
+            obj = Connection._create_meter(session, name, type, unit)
 
         return obj
 
