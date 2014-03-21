@@ -521,6 +521,14 @@
 [alarm]
 
 #
+# Options defined in ceilometer.cli
+#
+
+# Class to launch as alarm evaluation service. (string value)
+#evaluation_service=ceilometer.alarm.service.SingletonAlarmService
+
+
+#
 # Options defined in ceilometer.alarm.notifier.rest
 #
 
@@ -557,9 +565,6 @@
 # (integer value)
 # Deprecated group/name - [alarm]/threshold_evaluation_interval
 #evaluation_interval=60
-
-# Class to launch as alarm evaluation service. (string value)
-#evaluation_service=ceilometer.alarm.service.SingletonAlarmService
 
 
 #

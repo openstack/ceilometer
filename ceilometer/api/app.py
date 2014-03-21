@@ -30,7 +30,6 @@ from ceilometer.api import config as api_config
 from ceilometer.api import hooks
 from ceilometer.api import middleware
 from ceilometer.openstack.common import log
-from ceilometer import service
 from ceilometer import storage
 
 LOG = log.getLogger(__name__)
@@ -122,9 +121,7 @@ def get_server_cls(host):
     return server_cls
 
 
-def start():
-    service.prepare_service()
-
+def build_server():
     # Build the WSGI app
     root = VersionSelectorApplication()
 
@@ -144,5 +141,4 @@ def start():
     else:
         LOG.info(_("serving on http://%(host)s:%(port)s") % (
                  {'host': host, 'port': port}))
-
-    srv.serve_forever()
+    return srv

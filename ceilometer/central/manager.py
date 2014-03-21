@@ -21,8 +21,6 @@ from oslo.config import cfg
 
 from ceilometer import agent
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import service as os_service
-from ceilometer import service
 
 cfg.CONF.import_group('service_credentials', 'ceilometer.service')
 
@@ -46,8 +44,3 @@ class AgentManager(agent.AgentManager):
             insecure=cfg.CONF.service_credentials.insecure)
 
         super(AgentManager, self).interval_task(task)
-
-
-def agent_central():
-    service.prepare_service()
-    os_service.launch(AgentManager()).wait()

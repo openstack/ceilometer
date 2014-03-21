@@ -24,7 +24,6 @@ from ceilometer.openstack.common import context
 from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common.rpc import service as rpc_service
-from ceilometer.openstack.common import service as os_service
 from ceilometer import pipeline
 from ceilometer import service
 from ceilometer.storage import models
@@ -163,10 +162,3 @@ class NotificationService(service.DispatchedService, rpc_service.Service):
         with self.pipeline_manager.publisher(context.get_admin_context()) as p:
             # FIXME(dhellmann): Spawn green thread?
             p(list(ext.obj.to_samples(notification)))
-
-
-def agent():
-    service.prepare_service()
-    os_service.launch(NotificationService(
-        cfg.CONF.host,
-        'ceilometer.agent.notification')).wait()
