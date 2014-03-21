@@ -453,18 +453,24 @@ class Connection(pymongo_base.Connection):
         # project_id values are usually mutually exclusive in the
         # queries, so the database won't take advantage of an index
         # including both.
+        name_qualifier = dict(user_id='', project_id='project_')
+        background = dict(user_id=False, project_id=True)
         for primary in ['user_id', 'project_id']:
+            name = 'resource_%sidx' % name_qualifier[primary]
             self.db.resource.ensure_index([
                 (primary, pymongo.ASCENDING),
                 ('source', pymongo.ASCENDING),
-            ], name='resource_idx')
+            ], name=name, background=background[primary])
+
+            name = 'meter_%sidx' % name_qualifier[primary]
             self.db.meter.ensure_index([
                 ('resource_id', pymongo.ASCENDING),
                 (primary, pymongo.ASCENDING),
                 ('counter_name', pymongo.ASCENDING),
                 ('timestamp', pymongo.ASCENDING),
                 ('source', pymongo.ASCENDING),
-            ], name='meter_idx')
+            ], name=name, background=background[primary])
+
         self.db.resource.ensure_index([('last_sample_timestamp',
                                         pymongo.DESCENDING)],
                                       name='last_sample_timestamp_idx',
