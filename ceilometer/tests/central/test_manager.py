@@ -50,3 +50,12 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         polling_tasks = self.mgr.setup_polling_tasks()
         self.mgr.interval_task(polling_tasks.values()[0])
         self.assertTrue(self.Pollster.resources)
+
+    def test_skip_task_when_keystone_fail(self):
+        """Test for https://bugs.launchpad.net/ceilometer/+bug/1287613."""
+        self.useFixture(mockpatch.Patch(
+            'keystoneclient.v2_0.client.Client',
+            side_effect=Exception))
+        polling_tasks = self.mgr.setup_polling_tasks()
+        self.mgr.interval_task(polling_tasks.values()[0])
+        self.assertFalse(self.Pollster.samples)
