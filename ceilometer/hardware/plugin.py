@@ -21,7 +21,7 @@
 """Base class for plugins used by the hardware agent."""
 
 import abc
-
+import itertools
 import six
 
 from ceilometer.central import plugin
@@ -52,6 +52,7 @@ class HardwarePollster(plugin.CentralPollster):
         :param resources: end point to poll data from
         """
         h_cache = cache.setdefault(self.CACHE_KEY, {})
+        sample_iters = []
         for res in resources:
             parsed_url = network_utils.urlsplit(res)
             inspector = self._get_inspector(parsed_url)
@@ -64,16 +65,15 @@ class HardwarePollster(plugin.CentralPollster):
                     i_cache[res] = list(func(parsed_url))
                 # Generate samples
                 if i_cache[res]:
-                    return self.generate_samples(parsed_url, i_cache[res])
+                    sample_iters.append(self.generate_samples(parsed_url,
+                                                              i_cache[res]))
             except Exception as err:
                 LOG.exception(_('inspector call %(func)r failed for '
                                 'host %(host)s: %(err)s'),
                               dict(func=func,
                                    host=parsed_url.hostname,
                                    err=err))
-        # if no resources, we still need to return an iterable
-        # because of the interface requirement
-        return ()
+        return itertools.chain(*sample_iters)
 
     def generate_samples(self, host_url, data):
         """Generate an iterable Sample from the data returned by inspector
