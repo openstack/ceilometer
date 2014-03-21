@@ -164,15 +164,15 @@ class TestListMeters(FunctionalTest,
     def test_list_meters(self):
         data = self.get_json('/meters')
         self.assertEqual(4, len(data))
-        self.assertEqual(set(r['resource_id'] for r in data),
-                         set(['resource-id',
+        self.assertEqual(set(['resource-id',
                               'resource-id2',
                               'resource-id3',
-                              'resource-id4']))
-        self.assertEqual(set(r['name'] for r in data),
-                         set(['meter.test', 'meter.mine']))
-        self.assertEqual(set(r['source'] for r in data),
-                         set(['test_source', 'test_source1']))
+                              'resource-id4']),
+                         set(r['resource_id'] for r in data))
+        self.assertEqual(set(['meter.test', 'meter.mine']),
+                         set(r['name'] for r in data))
+        self.assertEqual(set(['test_source', 'test_source1']),
+                         set(r['source'] for r in data))
 
     def test_meters_query_with_timestamp(self):
         date_time = datetime.datetime(2012, 7, 2, 10, 41)
@@ -182,11 +182,11 @@ class TestListMeters(FunctionalTest,
                                  'op': 'gt',
                                  'value': isotime}],
                              expect_errors=True)
-        self.assertEqual(resp.status_code, 400)
-        self.assertEqual(jsonutils.loads(resp.body)['error_message']
-                         ['faultstring'],
-                         'Unknown argument: "timestamp": '
-                         'not valid for this resource')
+        self.assertEqual(400, resp.status_code)
+        self.assertEqual('Unknown argument: "timestamp": '
+                         'not valid for this resource',
+                         jsonutils.loads(resp.body)['error_message']
+                         ['faultstring'])
 
     def test_list_samples(self):
         resp = self.get_json('/samples',
@@ -194,12 +194,12 @@ class TestListMeters(FunctionalTest,
                                  'op': 'eq',
                                  'value': 42}],
                              expect_errors=True)
-        self.assertEqual(resp.status_code, 400)
-        self.assertEqual(jsonutils.loads(resp.body)['error_message']
-                         ['faultstring'],
-                         "Invalid input for field/attribute field. "
+        self.assertEqual(400, resp.status_code)
+        self.assertEqual("Invalid input for field/attribute field. "
                          "Value: 'search_offset'. "
-                         "search_offset cannot be used without timestamp")
+                         "search_offset cannot be used without timestamp",
+                         jsonutils.loads(resp.body)['error_message']
+                         ['faultstring'])
 
     def test_query_samples_with_search_offset(self):
         data = self.get_json('/samples')
@@ -224,7 +224,7 @@ class TestListMeters(FunctionalTest,
         data = self.get_json('/samples/%s' % sample_id)
         self.assertIn('id', data)
         del data['recorded_at']
-        self.assertEqual(data, {
+        self.assertEqual({
             u'id': sample_id,
             u'metadata': {u'display_name': u'test-server',
                           u'is_public': u'False',
@@ -239,14 +239,14 @@ class TestListMeters(FunctionalTest,
             u'unit': u'',
             u'source': 'test_source',
             u'user_id': u'user-id',
-            u'volume': 3.0})
+            u'volume': 3.0}, data)
 
     def test_get_not_existing_sample(self):
         resp = self.get_json('/samples/not_exists', expect_errors=True,
                              status=404)
-        self.assertEqual(jsonutils.loads(resp.body)['error_message']
-                         ['faultstring'],
-                         "Sample not_exists Not Found")
+        self.assertEqual("Sample not_exists Not Found",
+                         jsonutils.loads(resp.body)['error_message']
+                         ['faultstring'])
 
     def test_list_samples_with_dict_metadata(self):
         data = self.get_json('/samples',
@@ -258,7 +258,7 @@ class TestListMeters(FunctionalTest,
         self.assertIn('id', data[0])
         del data[0]['id']  # Randomly generated
         del data[0]['recorded_at']
-        self.assertEqual(data, [{
+        self.assertEqual([{
             u'user_id': u'user-id4',
             u'resource_id': u'resource-id4',
             u'timestamp': u'2012-07-02T10:43:00',
@@ -275,7 +275,7 @@ class TestListMeters(FunctionalTest,
                           u'properties.prop_1': u'prop_value',
                           u'is_public': u'True',
                           u'size': u'0'}
-        }])
+        }], data)
 
     def test_list_meters_metadata_query(self):
         data = self.get_json('/meters/meter.test',
@@ -284,10 +284,10 @@ class TestListMeters(FunctionalTest,
                                  'value': 'self.sample1',
                                  }],)
         self.assertEqual(1, len(data))
-        self.assertEqual(set(r['resource_id'] for r in data),
-                         set(['resource-id']))
-        self.assertEqual(set(r['counter_name'] for r in data),
-                         set(['meter.test']))
+        self.assertEqual(set(['resource-id']),
+                         set(r['resource_id'] for r in data))
+        self.assertEqual(set(['meter.test']),
+                         set(r['counter_name'] for r in data))
 
     def test_list_meters_resource_metadata_query(self):
         # NOTE(jd) Same test as above, but with the alias resource_metadata
@@ -298,10 +298,10 @@ class TestListMeters(FunctionalTest,
                                  'value': 'self.sample1',
                                  }],)
         self.assertEqual(1, len(data))
-        self.assertEqual(set(r['resource_id'] for r in data),
-                         set(['resource-id']))
-        self.assertEqual(set(r['counter_name'] for r in data),
-                         set(['meter.test']))
+        self.assertEqual(set(['resource-id']),
+                         set(r['resource_id'] for r in data))
+        self.assertEqual(set(['meter.test']),
+                         set(r['counter_name'] for r in data))
 
     def test_list_meters_multi_metadata_query(self):
         data = self.get_json('/meters/meter.test',
@@ -314,10 +314,10 @@ class TestListMeters(FunctionalTest,
                                  'value': 'test-server',
                                  }],)
         self.assertEqual(1, len(data))
-        self.assertEqual(set(r['resource_id'] for r in data),
-                         set(['resource-id']))
-        self.assertEqual(set(r['counter_name'] for r in data),
-                         set(['meter.test']))
+        self.assertEqual(set(['resource-id']),
+                         set(r['resource_id'] for r in data))
+        self.assertEqual(set(['meter.test']),
+                         set(r['counter_name'] for r in data))
 
     def test_list_meters_query_integer_metadata(self):
         data = self.get_json('/meters/meter.test',
@@ -327,13 +327,13 @@ class TestListMeters(FunctionalTest,
                              'type': 'integer'}]
                              )
         self.assertEqual(2, len(data))
-        self.assertEqual(set(r['resource_id'] for r in data),
-                         set(['resource-id',
-                              'resource-id3']))
-        self.assertEqual(set(r['counter_name'] for r in data),
-                         set(['meter.test']))
-        self.assertEqual(set(r['resource_metadata']['size'] for r in data),
-                         set(['0']))
+        self.assertEqual(set(['resource-id',
+                              'resource-id3']),
+                         set(r['resource_id'] for r in data))
+        self.assertEqual(set(['meter.test']),
+                         set(r['counter_name'] for r in data))
+        self.assertEqual(set(['0']),
+                         set(r['resource_metadata']['size'] for r in data))
 
     def test_list_meters_query_float_metadata(self):
         data = self.get_json('/meters/meter.test',
@@ -343,13 +343,13 @@ class TestListMeters(FunctionalTest,
                              'type': 'float'}]
                              )
         self.assertEqual(2, len(data))
-        self.assertEqual(set(r['resource_id'] for r in data),
-                         set(['resource-id',
-                              'resource-id3']))
-        self.assertEqual(set(r['counter_name'] for r in data),
-                         set(['meter.test']))
-        self.assertEqual(set(r['resource_metadata']['util'] for r in data),
-                         set(['0.75']))
+        self.assertEqual(set(['resource-id',
+                              'resource-id3']),
+                         set(r['resource_id'] for r in data))
+        self.assertEqual(set(['meter.test']),
+                         set(r['counter_name'] for r in data))
+        self.assertEqual(set(['0.75']),
+                         set(r['resource_metadata']['util'] for r in data))
 
     def test_list_meters_query_boolean_metadata(self):
         data = self.get_json('/meters/meter.mine',
@@ -359,12 +359,13 @@ class TestListMeters(FunctionalTest,
                              'type': 'boolean'}]
                              )
         self.assertEqual(1, len(data))
-        self.assertEqual(set(r['resource_id'] for r in data),
-                         set(['resource-id2']))
-        self.assertEqual(set(r['counter_name'] for r in data),
-                         set(['meter.mine']))
-        self.assertEqual(set(r['resource_metadata']['is_public'] for r
-                             in data), set(['False']))
+        self.assertEqual(set(['resource-id2']),
+                         set(r['resource_id'] for r in data))
+        self.assertEqual(set(['meter.mine']),
+                         set(r['counter_name'] for r in data))
+        self.assertEqual(set(['False']),
+                         set(r['resource_metadata']['is_public']
+                             for r in data))
 
     def test_list_meters_query_string_metadata(self):
         data = self.get_json('/meters/meter.test',
@@ -373,12 +374,12 @@ class TestListMeters(FunctionalTest,
                              'value': 'self.sample'}]
                              )
         self.assertEqual(1, len(data))
-        self.assertEqual(set(r['resource_id'] for r in data),
-                         set(['resource-id']))
-        self.assertEqual(set(r['counter_name'] for r in data),
-                         set(['meter.test']))
-        self.assertEqual(set(r['resource_metadata']['tag'] for r in data),
-                         set(['self.sample']))
+        self.assertEqual(set(['resource-id']),
+                         set(r['resource_id'] for r in data))
+        self.assertEqual(set(['meter.test']),
+                         set(r['counter_name'] for r in data))
+        self.assertEqual(set(['self.sample']),
+                         set(r['resource_metadata']['tag'] for r in data))
 
     def test_list_meters_query_integer_float_metadata_without_type(self):
         data = self.get_json('/meters/meter.test',
@@ -390,14 +391,14 @@ class TestListMeters(FunctionalTest,
                                  'value': '0.75'}]
                              )
         self.assertEqual(1, len(data))
-        self.assertEqual(set(r['resource_id'] for r in data),
-                         set(['resource-id3']))
-        self.assertEqual(set(r['counter_name'] for r in data),
-                         set(['meter.test']))
-        self.assertEqual(set(r['resource_metadata']['size'] for r in data),
-                         set(['0']))
-        self.assertEqual(set(r['resource_metadata']['util'] for r in data),
-                         set(['0.75']))
+        self.assertEqual(set(['resource-id3']),
+                         set(r['resource_id'] for r in data))
+        self.assertEqual(set(['meter.test']),
+                         set(r['counter_name'] for r in data))
+        self.assertEqual(set(['0']),
+                         set(r['resource_metadata']['size'] for r in data))
+        self.assertEqual(set(['0.75']),
+                         set(r['resource_metadata']['util'] for r in data))
 
     def test_with_resource(self):
         data = self.get_json('/meters', q=[{'field': 'resource_id',
@@ -433,10 +434,10 @@ class TestListMeters(FunctionalTest,
                                  'value': 'self.sample2',
                                  }])
         self.assertEqual(1, len(data))
-        self.assertEqual(set(r['resource_id'] for r in data),
-                         set(['resource-id2']))
-        self.assertEqual(set(r['counter_name'] for r in data),
-                         set(['meter.mine']))
+        self.assertEqual(set(['resource-id2']),
+                         set(r['resource_id'] for r in data))
+        self.assertEqual(set(['meter.mine']),
+                         set(r['counter_name'] for r in data))
 
     def test_with_source(self):
         data = self.get_json('/meters', q=[{'field': 'source',
@@ -461,9 +462,10 @@ class TestListMeters(FunctionalTest,
                                  'value': 'self.sample2',
                                  }])
         self.assertEqual(1, len(data))
-        self.assertEqual(set(r['source'] for r in data), set(['test_source']))
-        self.assertEqual(set(r['counter_name'] for r in data),
-                         set(['meter.mine']))
+        self.assertEqual(set(['test_source']),
+                         set(r['source'] for r in data))
+        self.assertEqual(set(['meter.mine']),
+                         set(r['counter_name'] for r in data))
 
     def test_with_source_non_existent(self):
         data = self.get_json('/meters',
@@ -519,9 +521,9 @@ class TestListMeters(FunctionalTest,
                                  'value': 'self.sample1',
                                  }])
         self.assertEqual(1, len(data))
-        self.assertEqual(set(r['user_id'] for r in data), set(['user-id']))
-        self.assertEqual(set(r['counter_name'] for r in data),
-                         set(['meter.test']))
+        self.assertEqual(set(['user-id']), set(r['user_id'] for r in data))
+        self.assertEqual(set(['meter.test']),
+                         set(r['counter_name'] for r in data))
 
     def test_with_user_non_existent(self):
         data = self.get_json('/meters',
@@ -529,7 +531,7 @@ class TestListMeters(FunctionalTest,
                                  'value': 'user-id-foobar123',
                                  }],
                              )
-        self.assertEqual(data, [])
+        self.assertEqual([], data)
 
     def test_with_project(self):
         data = self.get_json('/meters',
@@ -569,10 +571,10 @@ class TestListMeters(FunctionalTest,
                                  'value': 'self.sample1',
                                  }])
         self.assertEqual(1, len(data))
-        self.assertEqual(set(r['project_id'] for r in data),
-                         set(['project-id']))
-        self.assertEqual(set(r['counter_name'] for r in data),
-                         set(['meter.test']))
+        self.assertEqual(set(['project-id']),
+                         set(r['project_id'] for r in data))
+        self.assertEqual(set(['meter.test']),
+                         set(r['counter_name'] for r in data))
 
     def test_with_project_non_existent(self):
         data = self.get_json('/meters',
@@ -580,7 +582,7 @@ class TestListMeters(FunctionalTest,
                                  'value': 'jd-was-here',
                                  }],
                              )
-        self.assertEqual(data, [])
+        self.assertEqual([], data)
 
     def test_list_meters_meter_id(self):
         data = self.get_json('/meters')
