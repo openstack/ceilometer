@@ -73,14 +73,14 @@ class ComputeMetricsNotificationBase(notifications.ComputeNotificationBase):
 class CpuFrequency(ComputeMetricsNotificationBase):
     """Handle CPU current frequency message."""
     metric = 'cpu.frequency'
-    sample_type = sample.TYPE_GAUGE,
+    sample_type = sample.TYPE_GAUGE
     unit = 'MHz'
 
 
 class CpuUserTime(ComputeMetricsNotificationBase):
     """Handle CPU user mode time message."""
     metric = 'cpu.user.time'
-    sample_type = sample.TYPE_CUMULATIVE,
+    sample_type = sample.TYPE_CUMULATIVE
     unit = 'ns'
 
 
@@ -88,53 +88,53 @@ class CpuKernelTime(ComputeMetricsNotificationBase):
     """Handle CPU kernel time message."""
     metric = 'cpu.kernel.time'
     unit = 'ns'
-    sample_type = sample.TYPE_CUMULATIVE,
+    sample_type = sample.TYPE_CUMULATIVE
 
 
 class CpuIdleTime(ComputeMetricsNotificationBase):
     """Handle CPU idle time message."""
     metric = 'cpu.idle.time'
     unit = 'ns'
-    sample_type = sample.TYPE_CUMULATIVE,
+    sample_type = sample.TYPE_CUMULATIVE
 
 
 class CpuIowaitTime(ComputeMetricsNotificationBase):
     """Handle CPU I/O wait time message."""
     metric = 'cpu.iowait.time'
     unit = 'ns'
-    sample_type = sample.TYPE_CUMULATIVE,
+    sample_type = sample.TYPE_CUMULATIVE
 
 
 class CpuKernelPercent(ComputeMetricsNotificationBase):
     """Handle CPU kernel percentage message."""
     metric = 'cpu.kernel.percent'
     unit = '%'
-    sample_type = sample.TYPE_GAUGE,
+    sample_type = sample.TYPE_GAUGE
 
 
 class CpuIdlePercent(ComputeMetricsNotificationBase):
     """Handle CPU idle percentage message."""
     metric = 'cpu.idle.percent'
     unit = '%'
-    sample_type = sample.TYPE_GAUGE,
+    sample_type = sample.TYPE_GAUGE
 
 
 class CpuUserPercent(ComputeMetricsNotificationBase):
     """Handle CPU user mode percentage message."""
     metric = 'cpu.user.percent'
     unit = '%'
-    sample_type = sample.TYPE_GAUGE,
+    sample_type = sample.TYPE_GAUGE
 
 
 class CpuIowaitPercent(ComputeMetricsNotificationBase):
     """Handle CPU I/O wait percentage message."""
     metric = 'cpu.iowait.percent'
     unit = '%'
-    sample_type = sample.TYPE_GAUGE,
+    sample_type = sample.TYPE_GAUGE
 
 
 class CpuPercent(ComputeMetricsNotificationBase):
     """Handle generic CPU utilization message."""
     metric = 'cpu.percent'
     unit = '%'
-    sample_type = sample.TYPE_GAUGE,
+    sample_type = sample.TYPE_GAUGE
