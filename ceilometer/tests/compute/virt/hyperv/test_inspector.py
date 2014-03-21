@@ -21,6 +21,7 @@ import mock
 
 from ceilometer.compute.virt.hyperv import inspector as hyperv_inspector
 from ceilometer.openstack.common import test
+from ceilometer.openstack.common import units
 
 
 class TestHyperVInspection(test.BaseTestCase):
@@ -69,14 +70,14 @@ class TestHyperVInspection(test.BaseTestCase):
 
     def test_inspect_vnics(self):
         fake_instance_name = 'fake_instance_name'
-        fake_rx_bytes = 1000
-        fake_tx_bytes = 2000
+        fake_rx_mb = 1000
+        fake_tx_mb = 2000
         fake_element_name = 'fake_element_name'
         fake_address = 'fake_address'
 
         self._inspector._utils.get_vnic_metrics.return_value = [{
-            'rx_bytes': fake_rx_bytes,
-            'tx_bytes': fake_tx_bytes,
+            'rx_mb': fake_rx_mb,
+            'tx_mb': fake_tx_mb,
             'element_name': fake_element_name,
             'address': fake_address}]
 
@@ -91,8 +92,8 @@ class TestHyperVInspection(test.BaseTestCase):
         self.assertEqual(fake_element_name, inspected_vnic.name)
         self.assertEqual(fake_address, inspected_vnic.mac)
 
-        self.assertEqual(fake_rx_bytes, inspected_stats.rx_bytes)
-        self.assertEqual(fake_tx_bytes, inspected_stats.tx_bytes)
+        self.assertEqual(fake_rx_mb * units.Mi, inspected_stats.rx_bytes)
+        self.assertEqual(fake_tx_mb * units.Mi, inspected_stats.tx_bytes)
 
     def test_inspect_disks(self):
         fake_instance_name = 'fake_instance_name'
@@ -120,5 +121,5 @@ class TestHyperVInspection(test.BaseTestCase):
 
         self.assertEqual(fake_device, inspected_disk.device)
 
-        self.assertEqual(fake_read_mb * 1024, inspected_stats.read_bytes)
-        self.assertEqual(fake_write_mb * 1024, inspected_stats.write_bytes)
+        self.assertEqual(fake_read_mb * units.Mi, inspected_stats.read_bytes)
+        self.assertEqual(fake_write_mb * units.Mi, inspected_stats.write_bytes)
