@@ -78,11 +78,11 @@ vcpus                          Gauge       vcpu       inst ID   notification  Nu
 disk.read.requests             Cumulative  request    inst ID   pollster      Number of read requests
 disk.read.requests.rate        Gauge       request/s  inst ID   pollster      Average rate of read requests per second
 disk.write.requests            Cumulative  request    inst ID   pollster      Number of write requests
-disk.write.requests.rate       Cumulative  request/s  inst ID   pollster      Average rate of write requests per second
+disk.write.requests.rate       Gauge       request/s  inst ID   pollster      Average rate of write requests per second
 disk.read.bytes                Cumulative  B          inst ID   pollster      Volume of reads in B
-disk.read.bytes.rate           Cumulative  B/s        inst ID   pollster      Average rate of reads in B per second
+disk.read.bytes.rate           Gauge       B/s        inst ID   pollster      Average rate of reads in B per second
 disk.write.bytes               Cumulative  B          inst ID   pollster      Volume of writes in B
-disk.write.bytes.rate          Cumulative  B/s        inst ID   pollster      Average volume of writes in B per second
+disk.write.bytes.rate          Gauge       B/s        inst ID   pollster      Average volume of writes in B per second
 disk.root.size                 Gauge       GB         inst ID   notification  Size of root disk in GB
 disk.ephemeral.size            Gauge       GB         inst ID   notification  Size of ephemeral disk in GB
 network.incoming.bytes         Cumulative  B          iface ID  pollster      Number of incoming bytes on a VM network interface
