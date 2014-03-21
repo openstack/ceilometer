@@ -58,10 +58,10 @@ class TestLibvirtInspection(test.BaseTestCase):
                                mock.patch.object(connection, 'lookupByID',
                                                  return_value=fake_domain)):
             inspected_instances = list(self.inspector.inspect_instances())
-            self.assertEqual(len(inspected_instances), 1)
+            self.assertEqual(1, len(inspected_instances))
             inspected_instance = inspected_instances[0]
-            self.assertEqual(inspected_instance.name, 'fake_name')
-            self.assertEqual(inspected_instance.UUID, 'uuid')
+            self.assertEqual('fake_name', inspected_instance.name)
+            self.assertEqual('uuid', inspected_instance.UUID)
 
     def test_inspect_cpus(self):
         with contextlib.nested(mock.patch.object(self.inspector.connection,
@@ -71,8 +71,8 @@ class TestLibvirtInspection(test.BaseTestCase):
                                                  return_value=(0L, 0L, 0L,
                                                                2L, 999999L))):
                 cpu_info = self.inspector.inspect_cpus(self.instance_name)
-                self.assertEqual(cpu_info.number, 2L)
-                self.assertEqual(cpu_info.time, 999999L)
+                self.assertEqual(2L, cpu_info.number)
+                self.assertEqual(999999L, cpu_info.time)
 
     def test_inspect_vnics(self):
         dom_xml = """
@@ -152,44 +152,42 @@ class TestLibvirtInspection(test.BaseTestCase):
                                                  2L, 999999L))):
             interfaces = list(self.inspector.inspect_vnics(self.instance_name))
 
-            self.assertEqual(len(interfaces), 3)
+            self.assertEqual(3, len(interfaces))
             vnic0, info0 = interfaces[0]
-            self.assertEqual(vnic0.name, 'vnet0')
-            self.assertEqual(vnic0.mac, 'fa:16:3e:71:ec:6d')
-            self.assertEqual(vnic0.fref,
-                             'nova-instance-00000001-fa163e71ec6d')
-            self.assertEqual(vnic0.parameters.get('projmask'), '255.255.255.0')
-            self.assertEqual(vnic0.parameters.get('ip'), '10.0.0.2')
-            self.assertEqual(vnic0.parameters.get('projnet'), '10.0.0.0')
-            self.assertEqual(vnic0.parameters.get('dhcpserver'), '10.0.0.1')
-            self.assertEqual(info0.rx_bytes, 1L)
-            self.assertEqual(info0.rx_packets, 2L)
-            self.assertEqual(info0.tx_bytes, 3L)
-            self.assertEqual(info0.tx_packets, 4L)
+            self.assertEqual('vnet0', vnic0.name)
+            self.assertEqual('fa:16:3e:71:ec:6d', vnic0.mac)
+            self.assertEqual('nova-instance-00000001-fa163e71ec6d', vnic0.fref)
+            self.assertEqual('255.255.255.0', vnic0.parameters.get('projmask'))
+            self.assertEqual('10.0.0.2', vnic0.parameters.get('ip'))
+            self.assertEqual('10.0.0.0', vnic0.parameters.get('projnet'))
+            self.assertEqual('10.0.0.1', vnic0.parameters.get('dhcpserver'))
+            self.assertEqual(1L, info0.rx_bytes)
+            self.assertEqual(2L, info0.rx_packets)
+            self.assertEqual(3L, info0.tx_bytes)
+            self.assertEqual(4L, info0.tx_packets)
 
             vnic1, info1 = interfaces[1]
-            self.assertEqual(vnic1.name, 'vnet1')
-            self.assertEqual(vnic1.mac, 'fa:16:3e:71:ec:6e')
-            self.assertEqual(vnic1.fref,
-                             'nova-instance-00000001-fa163e71ec6e')
-            self.assertEqual(vnic1.parameters.get('projmask'), '255.255.255.0')
-            self.assertEqual(vnic1.parameters.get('ip'), '192.168.0.2')
-            self.assertEqual(vnic1.parameters.get('projnet'), '192.168.0.0')
-            self.assertEqual(vnic1.parameters.get('dhcpserver'), '192.168.0.1')
-            self.assertEqual(info1.rx_bytes, 5L)
-            self.assertEqual(info1.rx_packets, 6L)
-            self.assertEqual(info1.tx_bytes, 7L)
-            self.assertEqual(info1.tx_packets, 8L)
+            self.assertEqual('vnet1', vnic1.name)
+            self.assertEqual('fa:16:3e:71:ec:6e', vnic1.mac)
+            self.assertEqual('nova-instance-00000001-fa163e71ec6e', vnic1.fref)
+            self.assertEqual('255.255.255.0', vnic1.parameters.get('projmask'))
+            self.assertEqual('192.168.0.2', vnic1.parameters.get('ip'))
+            self.assertEqual('192.168.0.0', vnic1.parameters.get('projnet'))
+            self.assertEqual('192.168.0.1', vnic1.parameters.get('dhcpserver'))
+            self.assertEqual(5L, info1.rx_bytes)
+            self.assertEqual(6L, info1.rx_packets)
+            self.assertEqual(7L, info1.tx_bytes)
+            self.assertEqual(8L, info1.tx_packets)
 
             vnic2, info2 = interfaces[2]
-            self.assertEqual(vnic2.name, 'vnet2')
-            self.assertEqual(vnic2.mac, 'fa:16:3e:96:33:f0')
+            self.assertEqual('vnet2', vnic2.name)
+            self.assertEqual('fa:16:3e:96:33:f0', vnic2.mac)
             self.assertIsNone(vnic2.fref)
-            self.assertEqual(vnic2.parameters, dict())
-            self.assertEqual(info2.rx_bytes, 9L)
-            self.assertEqual(info2.rx_packets, 10L)
-            self.assertEqual(info2.tx_bytes, 11L)
-            self.assertEqual(info2.tx_packets, 12L)
+            self.assertEqual(dict(), vnic2.parameters)
+            self.assertEqual(9L, info2.rx_bytes)
+            self.assertEqual(10L, info2.rx_packets)
+            self.assertEqual(11L, info2.tx_bytes)
+            self.assertEqual(12L, info2.tx_packets)
 
     def test_inspect_vnics_with_domain_shutoff(self):
         connection = self.inspector.connection
@@ -230,13 +228,13 @@ class TestLibvirtInspection(test.BaseTestCase):
                                                  2L, 999999L))):
                 disks = list(self.inspector.inspect_disks(self.instance_name))
 
-                self.assertEqual(len(disks), 1)
+                self.assertEqual(1, len(disks))
                 disk0, info0 = disks[0]
-                self.assertEqual(disk0.device, 'vda')
-                self.assertEqual(info0.read_requests, 1L)
-                self.assertEqual(info0.read_bytes, 2L)
-                self.assertEqual(info0.write_requests, 3L)
-                self.assertEqual(info0.write_bytes, 4L)
+                self.assertEqual('vda', disk0.device)
+                self.assertEqual(1L, info0.read_requests)
+                self.assertEqual(2L, info0.read_bytes)
+                self.assertEqual(3L, info0.write_requests)
+                self.assertEqual(4L, info0.write_bytes)
 
     def test_inspect_disks_with_domain_shutoff(self):
         connection = self.inspector.connection

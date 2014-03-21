@@ -50,13 +50,12 @@ class TestDiskPollsters(base.TestPollsterBase):
         self.assertIn(pollster.CACHE_KEY_DISK, cache)
         self.assertIn(self.instance.name, cache[pollster.CACHE_KEY_DISK])
 
-        self.assertEqual(set([s.name for s in samples]),
-                         set([name]))
+        self.assertEqual(set([name]), set([s.name for s in samples]))
 
         match = [s for s in samples if s.name == name]
         self.assertEqual(len(match), 1, 'missing counter %s' % name)
-        self.assertEqual(match[0].volume, expected_volume)
-        self.assertEqual(match[0].type, 'cumulative')
+        self.assertEqual(expected_volume, match[0].volume)
+        self.assertEqual('cumulative', match[0].type)
 
     def test_disk_read_requests(self):
         self._check_get_samples(disk.ReadRequestsPollster,

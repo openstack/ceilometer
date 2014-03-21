@@ -108,7 +108,7 @@ class TestSwiftPollster(test.BaseTestCase):
 
         self.assertTrue(self.pollster.CACHE_KEY_TENANT in cache)
         self.assertTrue(self.pollster.CACHE_KEY_METHOD in cache)
-        self.assertEqual(data, [])
+        self.assertEqual([], data)
 
     def test_iter_accounts_tenants_cached(self):
         # Verify that if there are tenants pre-cached then the account
@@ -130,7 +130,7 @@ class TestSwiftPollster(test.BaseTestCase):
                 }
                 data = list(self.pollster._iter_accounts(mock.Mock(), cache))
         self.assertTrue(self.pollster.CACHE_KEY_METHOD in cache)
-        self.assertEqual(data[0][0], self.ACCOUNTS[0][0])
+        self.assertEqual(self.ACCOUNTS[0][0], data[0][0])
 
     def test_neaten_url(self):
         test_endpoint = 'http://127.0.0.1:8080'
@@ -155,19 +155,19 @@ class TestSwiftPollster(test.BaseTestCase):
                          side_effect=self.fake_iter_accounts):
             samples = list(self.pollster.get_samples(self.manager, {}))
 
-        self.assertEqual(len(samples), 2)
+        self.assertEqual(2, len(samples))
 
     def test_get_meter_names(self):
         with PatchObject(self.factory, '_iter_accounts',
                          side_effect=self.fake_iter_accounts):
             samples = list(self.pollster.get_samples(self.manager, {}))
 
-        self.assertEqual(set([s.name for s in samples]),
-                         set([samples[0].name]))
+        self.assertEqual(set([samples[0].name]),
+                         set([s.name for s in samples]))
 
     def test_endpoint_notfound(self):
         with PatchObject(self.manager.keystone.service_catalog, 'url_for',
                          side_effect=self.fake_ks_service_catalog_url_for):
             samples = list(self.pollster.get_samples(self.manager, {}))
 
-        self.assertEqual(len(samples), 0)
+        self.assertEqual(0, len(samples))

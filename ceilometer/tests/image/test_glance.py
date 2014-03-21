@@ -139,7 +139,7 @@ class TestImagePollster(test.BaseTestCase):
         # list when there is nothing in the cache
         images = list(glance.ImagePollster().
                       _iter_images(self.manager.keystone, {}))
-        self.assertEqual(len(images), len(set(image.id for image in images)))
+        self.assertEqual(len(set(image.id for image in images)), len(images))
 
     def test_iter_images_cached(self):
         # Tests whether the iter_images method returns the values from
@@ -147,18 +147,18 @@ class TestImagePollster(test.BaseTestCase):
         cache = {'images': []}
         images = list(glance.ImagePollster().
                       _iter_images(self.manager.keystone, cache))
-        self.assertEqual(images, [])
+        self.assertEqual([], images)
 
     def test_image(self):
         samples = list(glance.ImagePollster().get_samples(self.manager, {}))
-        self.assertEqual(len(samples), 3)
+        self.assertEqual(3, len(samples))
         for sample in samples:
-            self.assertEqual(sample.volume, 1)
+            self.assertEqual(1, sample.volume)
 
     def test_image_size(self):
         samples = list(glance.ImageSizePollster().get_samples(self.manager,
                                                               {}))
-        self.assertEqual(len(samples), 3)
+        self.assertEqual(3, len(samples))
         for image in IMAGE_LIST:
             self.assertTrue(
                 any(map(lambda sample: sample.volume == image.size,
@@ -166,11 +166,9 @@ class TestImagePollster(test.BaseTestCase):
 
     def test_image_get_sample_names(self):
         samples = list(glance.ImagePollster().get_samples(self.manager, {}))
-        self.assertEqual(set([s.name for s in samples]),
-                         set(['image']))
+        self.assertEqual(set(['image']), set([s.name for s in samples]))
 
     def test_image_size_get_sample_names(self):
         samples = list(glance.ImageSizePollster().get_samples(self.manager,
                                                               {}))
-        self.assertEqual(set([s.name for s in samples]),
-                         set(['image.size']))
+        self.assertEqual(set(['image.size']), set([s.name for s in samples]))

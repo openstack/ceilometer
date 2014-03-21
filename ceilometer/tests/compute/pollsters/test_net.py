@@ -73,18 +73,18 @@ class TestNetPollster(base.TestPollsterBase):
         mgr = manager.AgentManager()
         pollster = factory()
         samples = list(pollster.get_samples(mgr, {}, [self.instance]))
-        self.assertEqual(len(samples), 3)  # one for each nic
-        self.assertEqual(set([s.name for s in samples]),
-                         set([samples[0].name]))
+        self.assertEqual(3, len(samples))  # one for each nic
+        self.assertEqual(set([samples[0].name]),
+                         set([s.name for s in samples]))
 
         def _verify_vnic_metering(ip, expected_volume, expected_rid):
             match = [s for s in samples
                      if s.resource_metadata['parameters']['ip'] == ip
                      ]
             self.assertEqual(len(match), 1, 'missing ip %s' % ip)
-            self.assertEqual(match[0].volume, expected_volume)
-            self.assertEqual(match[0].type, 'cumulative')
-            self.assertEqual(match[0].resource_id, expected_rid)
+            self.assertEqual(expected_volume, match[0].volume)
+            self.assertEqual('cumulative', match[0].type)
+            self.assertEqual(expected_rid, match[0].resource_id)
 
         for ip, volume, rid in expected:
             _verify_vnic_metering(ip, volume, rid)
@@ -158,7 +158,7 @@ class TestNetPollsterCache(base.TestPollsterBase):
             },
         }
         samples = list(pollster.get_samples(mgr, cache, [self.instance]))
-        self.assertEqual(len(samples), 1)
+        self.assertEqual(1, len(samples))
 
     def test_incoming_bytes(self):
         self._check_get_samples_cache(net.IncomingBytesPollster)

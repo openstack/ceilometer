@@ -123,7 +123,7 @@ class TestUDPPublisher(test.BaseTestCase):
         publisher.publish_samples(None,
                                   self.test_data)
 
-        self.assertEqual(len(self.data_sent), 5)
+        self.assertEqual(5, len(self.data_sent))
 
         sent_counters = []
 
@@ -132,16 +132,13 @@ class TestUDPPublisher(test.BaseTestCase):
             sent_counters.append(counter)
 
             # Check destination
-            self.assertEqual(dest, ('somehost',
-                                    self.CONF.collector.udp_port))
+            self.assertEqual(('somehost',
+                              self.CONF.collector.udp_port), dest)
 
         # Check that counters are equal
-        self.assertEqual(sorted(sent_counters),
-                         sorted(
-                             [utils.meter_message_from_counter(
-                                 d,
-                                 "not-so-secret")
-                              for d in self.test_data]))
+        self.assertEqual(sorted(
+            [utils.meter_message_from_counter(d, "not-so-secret")
+             for d in self.test_data]), sorted(sent_counters))
 
     @staticmethod
     def _raise_ioerror(*args):

@@ -58,9 +58,9 @@ class ConverterBase(base.BaseTestCase):
             "Trait %s not found in event %s" % (name, event))
         trait = traits[0]
         if value is not None:
-            self.assertEqual(trait.value, value)
+            self.assertEqual(value, trait.value)
         if dtype is not None:
-            self.assertEqual(trait.dtype, dtype)
+            self.assertEqual(dtype, trait.dtype)
             if dtype == models.Trait.INT_TYPE:
                 self.assertIsInstance(trait.value, int)
             elif dtype == models.Trait.FLOAT_TYPE:
@@ -134,9 +134,9 @@ class TestTraitDefinition(ConverterBase):
                                          self.fake_plugin_mgr)
         t = tdef.to_trait(self.n1)
         self.assertIsInstance(t, models.Trait)
-        self.assertEqual(t.name, 'test_trait')
-        self.assertEqual(t.dtype, models.Trait.TEXT_TYPE)
-        self.assertEqual(t.value, 'foobar')
+        self.assertEqual('test_trait', t.name)
+        self.assertEqual(models.Trait.TEXT_TYPE, t.dtype)
+        self.assertEqual('foobar', t.value)
         self.test_plugin_class.assert_called_once_with()
         self.test_plugin.trait_value.assert_called_once_with([
             ('payload.instance_id', 'id-for-instance-0001'),
@@ -151,9 +151,9 @@ class TestTraitDefinition(ConverterBase):
                                          self.fake_plugin_mgr)
         t = tdef.to_trait(self.n1)
         self.assertIsInstance(t, models.Trait)
-        self.assertEqual(t.name, 'test_trait')
-        self.assertEqual(t.dtype, models.Trait.TEXT_TYPE)
-        self.assertEqual(t.value, 'foobar')
+        self.assertEqual('test_trait', t.name)
+        self.assertEqual(models.Trait.TEXT_TYPE, t.dtype)
+        self.assertEqual('foobar', t.value)
         self.test_plugin_class.assert_called_once_with()
         self.test_plugin.trait_value.assert_called_once_with([])
 
@@ -180,9 +180,9 @@ class TestTraitDefinition(ConverterBase):
                                          self.fake_plugin_mgr)
         t = tdef.to_trait(self.n1)
         self.assertIsInstance(t, models.Trait)
-        self.assertEqual(t.name, 'test_trait')
-        self.assertEqual(t.dtype, models.Trait.TEXT_TYPE)
-        self.assertEqual(t.value, 'foobar')
+        self.assertEqual('test_trait', t.name)
+        self.assertEqual(models.Trait.TEXT_TYPE, t.dtype)
+        self.assertEqual('foobar', t.value)
         self.test_plugin_class.assert_called_once_with(a=1, b='foo')
         self.test_plugin.trait_value.assert_called_once_with([
             ('payload.instance_id', 'id-for-instance-0001'),
@@ -194,18 +194,18 @@ class TestTraitDefinition(ConverterBase):
                                          self.fake_plugin_mgr)
         t = tdef.to_trait(self.n1)
         self.assertIsInstance(t, models.Trait)
-        self.assertEqual(t.name, 'test_trait')
-        self.assertEqual(t.dtype, models.Trait.TEXT_TYPE)
-        self.assertEqual(t.value, 'id-for-instance-0001')
+        self.assertEqual('test_trait', t.name)
+        self.assertEqual(models.Trait.TEXT_TYPE, t.dtype)
+        self.assertEqual('id-for-instance-0001', t.value)
 
         cfg = dict(type='int', fields='payload.image_meta.disk_gb')
         tdef = converter.TraitDefinition('test_trait', cfg,
                                          self.fake_plugin_mgr)
         t = tdef.to_trait(self.n1)
         self.assertIsInstance(t, models.Trait)
-        self.assertEqual(t.name, 'test_trait')
-        self.assertEqual(t.dtype, models.Trait.INT_TYPE)
-        self.assertEqual(t.value, 20)
+        self.assertEqual('test_trait', t.name)
+        self.assertEqual(models.Trait.INT_TYPE, t.dtype)
+        self.assertEqual(20, t.value)
 
     def test_to_trait_multiple(self):
         cfg = dict(type='text', fields=['payload.instance_id',
@@ -214,7 +214,7 @@ class TestTraitDefinition(ConverterBase):
                                          self.fake_plugin_mgr)
         t = tdef.to_trait(self.n1)
         self.assertIsInstance(t, models.Trait)
-        self.assertEqual(t.value, 'id-for-instance-0001')
+        self.assertEqual('id-for-instance-0001', t.value)
 
         cfg = dict(type='text', fields=['payload.instance_uuid',
                                         'payload.instance_id'])
@@ -222,7 +222,7 @@ class TestTraitDefinition(ConverterBase):
                                          self.fake_plugin_mgr)
         t = tdef.to_trait(self.n1)
         self.assertIsInstance(t, models.Trait)
-        self.assertEqual(t.value, 'uuid-for-instance-0001')
+        self.assertEqual('uuid-for-instance-0001', t.value)
 
     def test_to_trait_multiple_different_nesting(self):
         cfg = dict(type='int', fields=['payload.foobar',
@@ -231,7 +231,7 @@ class TestTraitDefinition(ConverterBase):
                                          self.fake_plugin_mgr)
         t = tdef.to_trait(self.n1)
         self.assertIsInstance(t, models.Trait)
-        self.assertEqual(t.value, 50)
+        self.assertEqual(50, t.value)
 
         cfg = dict(type='int', fields=['payload.image_meta.disk_gb',
                    'payload.foobar'])
@@ -239,7 +239,7 @@ class TestTraitDefinition(ConverterBase):
                                          self.fake_plugin_mgr)
         t = tdef.to_trait(self.n1)
         self.assertIsInstance(t, models.Trait)
-        self.assertEqual(t.value, 20)
+        self.assertEqual(20, t.value)
 
     def test_to_trait_some_null_multiple(self):
         cfg = dict(type='text', fields=['payload.instance_id2',
@@ -248,7 +248,7 @@ class TestTraitDefinition(ConverterBase):
                                          self.fake_plugin_mgr)
         t = tdef.to_trait(self.n1)
         self.assertIsInstance(t, models.Trait)
-        self.assertEqual(t.value, 'uuid-for-instance-0001')
+        self.assertEqual('uuid-for-instance-0001', t.value)
 
     def test_to_trait_some_missing_multiple(self):
         cfg = dict(type='text', fields=['payload.not_here_boss',
@@ -257,7 +257,7 @@ class TestTraitDefinition(ConverterBase):
                                          self.fake_plugin_mgr)
         t = tdef.to_trait(self.n1)
         self.assertIsInstance(t, models.Trait)
-        self.assertEqual(t.value, 'uuid-for-instance-0001')
+        self.assertEqual('uuid-for-instance-0001', t.value)
 
     def test_to_trait_missing(self):
         cfg = dict(type='text', fields='payload.not_here_boss')
@@ -337,19 +337,19 @@ class TestTraitDefinition(ConverterBase):
     def test_type_config(self):
         cfg = dict(type='text', fields='payload.test')
         t = converter.TraitDefinition('test_trait', cfg, self.fake_plugin_mgr)
-        self.assertEqual(t.trait_type, models.Trait.TEXT_TYPE)
+        self.assertEqual(models.Trait.TEXT_TYPE, t.trait_type)
 
         cfg = dict(type='int', fields='payload.test')
         t = converter.TraitDefinition('test_trait', cfg, self.fake_plugin_mgr)
-        self.assertEqual(t.trait_type, models.Trait.INT_TYPE)
+        self.assertEqual(models.Trait.INT_TYPE, t.trait_type)
 
         cfg = dict(type='float', fields='payload.test')
         t = converter.TraitDefinition('test_trait', cfg, self.fake_plugin_mgr)
-        self.assertEqual(t.trait_type, models.Trait.FLOAT_TYPE)
+        self.assertEqual(models.Trait.FLOAT_TYPE, t.trait_type)
 
         cfg = dict(type='datetime', fields='payload.test')
         t = converter.TraitDefinition('test_trait', cfg, self.fake_plugin_mgr)
-        self.assertEqual(t.trait_type, models.Trait.DATETIME_TYPE)
+        self.assertEqual(models.Trait.DATETIME_TYPE, t.trait_type)
 
     def test_invalid_type_config(self):
         #test invalid jsonpath...
@@ -402,9 +402,9 @@ class TestEventDefinition(ConverterBase):
         edef = converter.EventDefinition(cfg, self.fake_plugin_mgr)
 
         e = edef.to_event(self.test_notification1)
-        self.assertEqual(e.event_type, 'test.thing')
-        self.assertEqual(e.generated,
-                         datetime.datetime(2013, 8, 8, 21, 6, 37, 803826))
+        self.assertEqual('test.thing', e.event_type)
+        self.assertEqual(datetime.datetime(2013, 8, 8, 21, 6, 37, 803826),
+                         e.generated)
 
         self.assertHasDefaultTraits(e)
         self.assertHasTrait(e, 'host', value='host-1-2-3', dtype=dtype)
@@ -455,9 +455,9 @@ class TestEventDefinition(ConverterBase):
     def test_included_type_string(self):
         cfg = dict(event_type='test.thing', traits=self.traits_cfg)
         edef = converter.EventDefinition(cfg, self.fake_plugin_mgr)
-        self.assertEqual(len(edef._included_types), 1)
-        self.assertEqual(edef._included_types[0], 'test.thing')
-        self.assertEqual(len(edef._excluded_types), 0)
+        self.assertEqual(1, len(edef._included_types))
+        self.assertEqual('test.thing', edef._included_types[0])
+        self.assertEqual(0, len(edef._excluded_types))
         self.assertTrue(edef.included_type('test.thing'))
         self.assertFalse(edef.excluded_type('test.thing'))
         self.assertTrue(edef.match_type('test.thing'))
@@ -467,8 +467,8 @@ class TestEventDefinition(ConverterBase):
         cfg = dict(event_type=['test.thing', 'other.thing'],
                    traits=self.traits_cfg)
         edef = converter.EventDefinition(cfg, self.fake_plugin_mgr)
-        self.assertEqual(len(edef._included_types), 2)
-        self.assertEqual(len(edef._excluded_types), 0)
+        self.assertEqual(2, len(edef._included_types))
+        self.assertEqual(0, len(edef._excluded_types))
         self.assertTrue(edef.included_type('test.thing'))
         self.assertTrue(edef.included_type('other.thing'))
         self.assertFalse(edef.excluded_type('test.thing'))
@@ -479,11 +479,11 @@ class TestEventDefinition(ConverterBase):
     def test_excluded_type_string(self):
         cfg = dict(event_type='!test.thing', traits=self.traits_cfg)
         edef = converter.EventDefinition(cfg, self.fake_plugin_mgr)
-        self.assertEqual(len(edef._included_types), 1)
-        self.assertEqual(edef._included_types[0], '*')
-        self.assertEqual(edef._excluded_types[0], 'test.thing')
-        self.assertEqual(len(edef._excluded_types), 1)
-        self.assertEqual(edef._excluded_types[0], 'test.thing')
+        self.assertEqual(1, len(edef._included_types))
+        self.assertEqual('*', edef._included_types[0])
+        self.assertEqual('test.thing', edef._excluded_types[0])
+        self.assertEqual(1, len(edef._excluded_types))
+        self.assertEqual('test.thing', edef._excluded_types[0])
         self.assertTrue(edef.excluded_type('test.thing'))
         self.assertTrue(edef.included_type('random.thing'))
         self.assertFalse(edef.match_type('test.thing'))
@@ -493,8 +493,8 @@ class TestEventDefinition(ConverterBase):
         cfg = dict(event_type=['!test.thing', '!other.thing'],
                    traits=self.traits_cfg)
         edef = converter.EventDefinition(cfg, self.fake_plugin_mgr)
-        self.assertEqual(len(edef._included_types), 1)
-        self.assertEqual(len(edef._excluded_types), 2)
+        self.assertEqual(1, len(edef._included_types))
+        self.assertEqual(2, len(edef._excluded_types))
         self.assertTrue(edef.excluded_type('test.thing'))
         self.assertTrue(edef.excluded_type('other.thing'))
         self.assertFalse(edef.excluded_type('random.thing'))
@@ -506,8 +506,8 @@ class TestEventDefinition(ConverterBase):
         cfg = dict(event_type=['*.thing', '!test.thing', '!other.thing'],
                    traits=self.traits_cfg)
         edef = converter.EventDefinition(cfg, self.fake_plugin_mgr)
-        self.assertEqual(len(edef._included_types), 1)
-        self.assertEqual(len(edef._excluded_types), 2)
+        self.assertEqual(1, len(edef._included_types))
+        self.assertEqual(2, len(edef._excluded_types))
         self.assertTrue(edef.excluded_type('test.thing'))
         self.assertTrue(edef.excluded_type('other.thing'))
         self.assertFalse(edef.excluded_type('random.thing'))
@@ -576,8 +576,8 @@ class TestEventDefinition(ConverterBase):
         traits = set(edef.traits.keys())
         for dt in default_traits:
             self.assertIn(dt, traits)
-        self.assertEqual(len(edef.traits),
-                         len(converter.EventDefinition.DEFAULT_TRAITS))
+        self.assertEqual(len(converter.EventDefinition.DEFAULT_TRAITS),
+                         len(edef.traits))
 
     def test_traits(self):
         cfg = dict(event_type='test.thing', traits=self.traits_cfg)
@@ -588,8 +588,8 @@ class TestEventDefinition(ConverterBase):
             self.assertIn(dt, traits)
         self.assertIn('host', traits)
         self.assertIn('instance_id', traits)
-        self.assertEqual(len(edef.traits),
-                         len(converter.EventDefinition.DEFAULT_TRAITS) + 2)
+        self.assertEqual(len(converter.EventDefinition.DEFAULT_TRAITS) + 2,
+                         len(edef.traits))
 
 
 class TestNotificationConverter(ConverterBase):
@@ -638,7 +638,7 @@ class TestNotificationConverter(ConverterBase):
                    'publisher_id': "1"}
         e = c.to_event(message)
         self.assertIsValidEvent(e, message)
-        self.assertEqual(len(e.traits), 1)
+        self.assertEqual(1, len(e.traits))
         self.assertEqual("foo", e.event_type)
         self.assertEqual(now, e.generated)
 
@@ -647,17 +647,17 @@ class TestNotificationConverter(ConverterBase):
             self.valid_event_def1,
             self.fake_plugin_mgr,
             add_catchall=True)
-        self.assertEqual(len(c.definitions), 2)
+        self.assertEqual(2, len(c.definitions))
         e = c.to_event(self.test_notification1)
         self.assertIsValidEvent(e, self.test_notification1)
-        self.assertEqual(len(e.traits), 3)
+        self.assertEqual(3, len(e.traits))
         self.assertHasDefaultTraits(e)
         self.assertHasTrait(e, 'instance_id')
         self.assertHasTrait(e, 'host')
 
         e = c.to_event(self.test_notification2)
         self.assertIsValidEvent(e, self.test_notification2)
-        self.assertEqual(len(e.traits), 1)
+        self.assertEqual(1, len(e.traits))
         self.assertHasDefaultTraits(e)
         self.assertDoesNotHaveTrait(e, 'instance_id')
         self.assertDoesNotHaveTrait(e, 'host')
@@ -667,10 +667,10 @@ class TestNotificationConverter(ConverterBase):
             self.valid_event_def1,
             self.fake_plugin_mgr,
             add_catchall=False)
-        self.assertEqual(len(c.definitions), 1)
+        self.assertEqual(1, len(c.definitions))
         e = c.to_event(self.test_notification1)
         self.assertIsValidEvent(e, self.test_notification1)
-        self.assertEqual(len(e.traits), 3)
+        self.assertEqual(3, len(e.traits))
         self.assertHasDefaultTraits(e)
         self.assertHasTrait(e, 'instance_id')
         self.assertHasTrait(e, 'host')
@@ -683,15 +683,15 @@ class TestNotificationConverter(ConverterBase):
             [],
             self.fake_plugin_mgr,
             add_catchall=True)
-        self.assertEqual(len(c.definitions), 1)
+        self.assertEqual(1, len(c.definitions))
         e = c.to_event(self.test_notification1)
         self.assertIsValidEvent(e, self.test_notification1)
-        self.assertEqual(len(e.traits), 1)
+        self.assertEqual(1, len(e.traits))
         self.assertHasDefaultTraits(e)
 
         e = c.to_event(self.test_notification2)
         self.assertIsValidEvent(e, self.test_notification2)
-        self.assertEqual(len(e.traits), 1)
+        self.assertEqual(1, len(e.traits))
         self.assertHasDefaultTraits(e)
 
     def test_converter_empty_cfg_without_catchall(self):
@@ -699,7 +699,7 @@ class TestNotificationConverter(ConverterBase):
             [],
             self.fake_plugin_mgr,
             add_catchall=False)
-        self.assertEqual(len(c.definitions), 0)
+        self.assertEqual(0, len(c.definitions))
         e = c.to_event(self.test_notification1)
         self.assertIsNotValidEvent(e, self.test_notification1)
 
@@ -723,7 +723,7 @@ class TestNotificationConverter(ConverterBase):
             with mock.patch('os.path.exists', mock_exists):
                 c = converter.setup_events(self.fake_plugin_mgr)
             self.assertIsInstance(c, converter.NotificationEventsConverter)
-            self.assertEqual(len(c.definitions), 1)
+            self.assertEqual(1, len(c.definitions))
             self.assertTrue(c.definitions[0].is_catchall)
 
             oslo_cfg.CONF.set_override('drop_unmatched_notifications',
@@ -732,4 +732,4 @@ class TestNotificationConverter(ConverterBase):
             with mock.patch('os.path.exists', mock_exists):
                 c = converter.setup_events(self.fake_plugin_mgr)
             self.assertIsInstance(c, converter.NotificationEventsConverter)
-            self.assertEqual(len(c.definitions), 0)
+            self.assertEqual(0, len(c.definitions))
