@@ -105,61 +105,61 @@ class TestNotifications(test.BaseTestCase):
     def _verify_common_sample(self, s, name, notification):
         self.assertIsNotNone(s)
         self.assertEqual(s.name, name)
-        self.assertEqual(s.resource_id, notification['payload']['volume_id'])
-        self.assertEqual(s.timestamp, notification['timestamp'])
+        self.assertEqual(notification['payload']['volume_id'], s.resource_id)
+        self.assertEqual(notification['timestamp'], s.timestamp)
         metadata = s.resource_metadata
-        self.assertEqual(metadata.get('host'), notification['publisher_id'])
+        self.assertEqual(notification['publisher_id'], metadata.get('host'))
 
     def test_volume_exists(self):
         v = notifications.Volume()
         samples = list(v.process_notification(NOTIFICATION_VOLUME_EXISTS))
-        self.assertEqual(len(samples), 1)
+        self.assertEqual(1, len(samples))
         s = samples[0]
         self._verify_common_sample(s, 'volume', NOTIFICATION_VOLUME_EXISTS)
-        self.assertEqual(s.volume, 1)
+        self.assertEqual(1, s.volume)
 
     def test_volume_size_exists(self):
         v = notifications.VolumeSize()
         samples = list(v.process_notification(NOTIFICATION_VOLUME_EXISTS))
-        self.assertEqual(len(samples), 1)
+        self.assertEqual(1, len(samples))
         s = samples[0]
         self._verify_common_sample(s, 'volume.size',
                                    NOTIFICATION_VOLUME_EXISTS)
-        self.assertEqual(s.volume,
-                         NOTIFICATION_VOLUME_EXISTS['payload']['size'])
+        self.assertEqual(NOTIFICATION_VOLUME_EXISTS['payload']['size'],
+                         s.volume)
 
     def test_volume_delete(self):
         v = notifications.Volume()
         samples = list(v.process_notification(NOTIFICATION_VOLUME_DELETE))
-        self.assertEqual(len(samples), 1)
+        self.assertEqual(1, len(samples))
         s = samples[0]
         self._verify_common_sample(s, 'volume', NOTIFICATION_VOLUME_DELETE)
-        self.assertEqual(s.volume, 1)
+        self.assertEqual(1, s.volume)
 
     def test_volume_size_delete(self):
         v = notifications.VolumeSize()
         samples = list(v.process_notification(NOTIFICATION_VOLUME_DELETE))
-        self.assertEqual(len(samples), 1)
+        self.assertEqual(1, len(samples))
         s = samples[0]
         self._verify_common_sample(s, 'volume.size',
                                    NOTIFICATION_VOLUME_DELETE)
-        self.assertEqual(s.volume,
-                         NOTIFICATION_VOLUME_DELETE['payload']['size'])
+        self.assertEqual(NOTIFICATION_VOLUME_DELETE['payload']['size'],
+                         s.volume)
 
     def test_volume_resize(self):
         v = notifications.Volume()
         samples = list(v.process_notification(NOTIFICATION_VOLUME_RESIZE))
-        self.assertEqual(len(samples), 1)
+        self.assertEqual(1, len(samples))
         s = samples[0]
         self._verify_common_sample(s, 'volume', NOTIFICATION_VOLUME_RESIZE)
-        self.assertEqual(s.volume, 1)
+        self.assertEqual(1, s.volume)
 
     def test_volume_size_resize(self):
         v = notifications.VolumeSize()
         samples = list(v.process_notification(NOTIFICATION_VOLUME_RESIZE))
-        self.assertEqual(len(samples), 1)
+        self.assertEqual(1, len(samples))
         s = samples[0]
         self._verify_common_sample(s, 'volume.size',
                                    NOTIFICATION_VOLUME_RESIZE)
-        self.assertEqual(s.volume,
-                         NOTIFICATION_VOLUME_RESIZE['payload']['size'])
+        self.assertEqual(NOTIFICATION_VOLUME_RESIZE['payload']['size'],
+                         s.volume)

@@ -77,30 +77,26 @@ class TestNotifications(test.BaseTestCase):
         sample = list(middleware.HTTPRequest().process_notification(
             HTTP_REQUEST
         ))[0]
-        self.assertEqual(sample.user_id,
-                         HTTP_REQUEST['payload']['request']['HTTP_X_USER_ID'])
-        self.assertEqual(sample.project_id,
-                         HTTP_REQUEST['payload']['request']
-                         ['HTTP_X_PROJECT_ID'])
-        self.assertEqual(sample.resource_id,
-                         HTTP_REQUEST['payload']['request']
-                         ['HTTP_X_SERVICE_NAME'])
-        self.assertEqual(sample.volume, 1)
+        self.assertEqual(HTTP_REQUEST['payload']['request']['HTTP_X_USER_ID'],
+                         sample.user_id)
+        self.assertEqual(HTTP_REQUEST['payload']['request']
+                         ['HTTP_X_PROJECT_ID'], sample.project_id)
+        self.assertEqual(HTTP_REQUEST['payload']['request']
+                         ['HTTP_X_SERVICE_NAME'], sample.resource_id)
+        self.assertEqual(1, sample.volume)
 
     def test_process_response_notification(self):
         sample = list(middleware.HTTPResponse().process_notification(
             HTTP_RESPONSE
         ))[0]
-        self.assertEqual(sample.user_id,
-                         HTTP_RESPONSE['payload']['request']['HTTP_X_USER_ID'])
-        self.assertEqual(sample.project_id,
-                         HTTP_RESPONSE['payload']['request']
-                         ['HTTP_X_PROJECT_ID'])
-        self.assertEqual(sample.resource_id,
-                         HTTP_RESPONSE['payload']['request']
-                         ['HTTP_X_SERVICE_NAME'])
-        self.assertEqual(sample.volume, 1)
+        self.assertEqual(HTTP_RESPONSE['payload']['request']['HTTP_X_USER_ID'],
+                         sample.user_id)
+        self.assertEqual(HTTP_RESPONSE['payload']['request']
+                         ['HTTP_X_PROJECT_ID'], sample.project_id)
+        self.assertEqual(HTTP_RESPONSE['payload']['request']
+                         ['HTTP_X_SERVICE_NAME'], sample.resource_id)
+        self.assertEqual(1, sample.volume)
 
     def test_exchanges(self):
         topics = middleware.HTTPRequest().get_exchange_topics(self.CONF)
-        self.assertEqual(len(topics), 4)
+        self.assertEqual(4, len(topics))

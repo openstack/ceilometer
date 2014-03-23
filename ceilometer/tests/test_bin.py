@@ -46,7 +46,7 @@ class BinTestCase(base.BaseTestCase):
     def test_dbsync_run(self):
         subp = subprocess.Popen(['ceilometer-dbsync',
                                  "--config-file=%s" % self.tempfile])
-        self.assertEqual(subp.wait(), 0)
+        self.assertEqual(0, subp.wait())
 
     def test_run_expirer_ttl_disabled(self):
         subp = subprocess.Popen(['ceilometer-expirer',
@@ -54,7 +54,7 @@ class BinTestCase(base.BaseTestCase):
                                  "--config-file=%s" % self.tempfile],
                                 stderr=subprocess.PIPE)
         __, err = subp.communicate()
-        self.assertEqual(subp.poll(), 0)
+        self.assertEqual(0, subp.poll())
         self.assertIn("Nothing to clean", err)
 
     def test_run_expirer_ttl_enabled(self):
@@ -69,7 +69,7 @@ class BinTestCase(base.BaseTestCase):
                                  "--config-file=%s" % self.tempfile],
                                 stderr=subprocess.PIPE)
         __, err = subp.communicate()
-        self.assertEqual(subp.poll(), 0)
+        self.assertEqual(0, subp.poll())
         self.assertIn("Dropping data with TTL 1", err)
 
 
@@ -94,7 +94,7 @@ class BinSendSampleTestCase(base.BaseTestCase):
                                  "--config-file=%s" % self.tempfile,
                                  "--sample-resource=someuuid",
                                  "--sample-name=mycounter"])
-        self.assertEqual(subp.wait(), 0)
+        self.assertEqual(0, subp.wait())
 
 
 class BinApiTestCase(base.BaseTestCase):
@@ -145,10 +145,10 @@ class BinApiTestCase(base.BaseTestCase):
 
     def test_v1(self):
         response, content = self.get_response('v1/meters')
-        self.assertEqual(response.status, 200)
-        self.assertEqual(json.loads(content), {'meters': []})
+        self.assertEqual(200, response.status)
+        self.assertEqual({'meters': []}, json.loads(content))
 
     def test_v2(self):
         response, content = self.get_response('v2/meters')
-        self.assertEqual(response.status, 200)
-        self.assertEqual(json.loads(content), [])
+        self.assertEqual(200, response.status)
+        self.assertEqual([], json.loads(content))

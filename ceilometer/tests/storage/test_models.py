@@ -31,27 +31,29 @@ class ModelTest(test.BaseTestCase):
 
     def test_create_attributes(self):
         m = FakeModel(1, 2)
-        self.assertEqual(m.arg1, 1)
-        self.assertEqual(m.arg2, 2)
+        self.assertEqual(1, m.arg1)
+        self.assertEqual(2, m.arg2)
 
     def test_as_dict(self):
         m = FakeModel(1, 2)
         d = m.as_dict()
-        self.assertEqual(d, {'arg1': 1, 'arg2': 2})
+        self.assertEqual({'arg1': 1, 'arg2': 2}, d)
 
     def test_as_dict_recursive(self):
         m = FakeModel(1, FakeModel('a', 'b'))
         d = m.as_dict()
-        self.assertEqual(d, {'arg1': 1,
-                             'arg2': {'arg1': 'a',
-                                      'arg2': 'b'}})
+        self.assertEqual({'arg1': 1,
+                          'arg2': {'arg1': 'a',
+                                   'arg2': 'b'}},
+                         d)
 
     def test_as_dict_recursive_list(self):
         m = FakeModel(1, [FakeModel('a', 'b')])
         d = m.as_dict()
-        self.assertEqual(d, {'arg1': 1,
-                             'arg2': [{'arg1': 'a',
-                                       'arg2': 'b'}]})
+        self.assertEqual({'arg1': 1,
+                          'arg2': [{'arg1': 'a',
+                                    'arg2': 'b'}]},
+                         d)
 
     def test_event_repr_no_traits(self):
         x = models.Event("1", "name", "now", None)
@@ -91,19 +93,19 @@ class TestTraitModel(test.BaseTestCase):
     def test_convert_value(self):
         v = models.Trait.convert_value(
             models.Trait.INT_TYPE, '10')
-        self.assertEqual(v, 10)
+        self.assertEqual(10, v)
         self.assertIsInstance(v, int)
         v = models.Trait.convert_value(
             models.Trait.FLOAT_TYPE, '10')
-        self.assertEqual(v, 10.0)
+        self.assertEqual(10.0, v)
         self.assertIsInstance(v, float)
 
         v = models.Trait.convert_value(
             models.Trait.DATETIME_TYPE, '2013-08-08 21:05:37.123456')
-        self.assertEqual(v, datetime.datetime(2013, 8, 8, 21, 5, 37, 123456))
+        self.assertEqual(datetime.datetime(2013, 8, 8, 21, 5, 37, 123456), v)
         self.assertIsInstance(v, datetime.datetime)
 
         v = models.Trait.convert_value(
             models.Trait.TEXT_TYPE, 10)
-        self.assertEqual(v, "10")
+        self.assertEqual("10", v)
         self.assertIsInstance(v, str)

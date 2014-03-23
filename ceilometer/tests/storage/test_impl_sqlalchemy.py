@@ -47,7 +47,7 @@ class CeilometerBaseTest(EventTestBase):
     def test_ceilometer_base(self):
         base = sql_models.CeilometerBase()
         base['key'] = 'value'
-        self.assertEqual(base['key'], 'value')
+        self.assertEqual('value', base['key'])
 
 
 class TraitTypeTest(EventTestBase):
@@ -58,9 +58,9 @@ class TraitTypeTest(EventTestBase):
         tt1 = self.conn._get_or_create_trait_type("foo", 0)
         self.assertTrue(tt1.id >= 0)
         tt2 = self.conn._get_or_create_trait_type("foo", 0)
-        self.assertEqual(tt1.id, tt2.id)
-        self.assertEqual(tt1.desc, tt2.desc)
-        self.assertEqual(tt1.data_type, tt2.data_type)
+        self.assertEqual(tt2.id, tt1.id)
+        self.assertEqual(tt2.desc, tt1.desc)
+        self.assertEqual(tt2.data_type, tt1.data_type)
 
     def test_new_trait_type(self):
         tt1 = self.conn._get_or_create_trait_type("foo", 0)
@@ -76,7 +76,7 @@ class TraitTypeTest(EventTestBase):
         self.assertTrue(tt1.id >= 0)
         tt2 = self.conn._get_or_create_trait_type("foo", 1)
         self.assertNotEqual(tt1.id, tt2.id)
-        self.assertEqual(tt1.desc, tt2.desc)
+        self.assertEqual(tt2.desc, tt1.desc)
         self.assertNotEqual(tt1.data_type, tt2.data_type)
         # Test the method __repr__ returns a string
         self.assertTrue(repr.repr(tt2))
@@ -90,8 +90,8 @@ class EventTypeTest(EventTestBase):
         et1 = self.conn._get_or_create_event_type("foo")
         self.assertTrue(et1.id >= 0)
         et2 = self.conn._get_or_create_event_type("foo")
-        self.assertEqual(et1.id, et2.id)
-        self.assertEqual(et1.desc, et2.desc)
+        self.assertEqual(et2.id, et1.id)
+        self.assertEqual(et2.desc, et1.desc)
 
     def test_event_type_unique(self):
         et1 = self.conn._get_or_create_event_type("foo")
@@ -111,43 +111,43 @@ class EventTest(EventTestBase):
     def test_string_traits(self):
         model = models.Trait("Foo", models.Trait.TEXT_TYPE, "my_text")
         trait = self.conn._make_trait(model, None)
-        self.assertEqual(trait.trait_type.data_type, models.Trait.TEXT_TYPE)
+        self.assertEqual(models.Trait.TEXT_TYPE, trait.trait_type.data_type)
         self.assertIsNone(trait.t_float)
         self.assertIsNone(trait.t_int)
         self.assertIsNone(trait.t_datetime)
-        self.assertEqual(trait.t_string, "my_text")
+        self.assertEqual("my_text", trait.t_string)
         self.assertIsNotNone(trait.trait_type.desc)
 
     def test_int_traits(self):
         model = models.Trait("Foo", models.Trait.INT_TYPE, 100)
         trait = self.conn._make_trait(model, None)
-        self.assertEqual(trait.trait_type.data_type, models.Trait.INT_TYPE)
+        self.assertEqual(models.Trait.INT_TYPE, trait.trait_type.data_type)
         self.assertIsNone(trait.t_float)
         self.assertIsNone(trait.t_string)
         self.assertIsNone(trait.t_datetime)
-        self.assertEqual(trait.t_int, 100)
+        self.assertEqual(100, trait.t_int)
         self.assertIsNotNone(trait.trait_type.desc)
 
     def test_float_traits(self):
         model = models.Trait("Foo", models.Trait.FLOAT_TYPE, 123.456)
         trait = self.conn._make_trait(model, None)
-        self.assertEqual(trait.trait_type.data_type, models.Trait.FLOAT_TYPE)
+        self.assertEqual(models.Trait.FLOAT_TYPE, trait.trait_type.data_type)
         self.assertIsNone(trait.t_int)
         self.assertIsNone(trait.t_string)
         self.assertIsNone(trait.t_datetime)
-        self.assertEqual(trait.t_float, 123.456)
+        self.assertEqual(123.456, trait.t_float)
         self.assertIsNotNone(trait.trait_type.desc)
 
     def test_datetime_traits(self):
         now = datetime.datetime.utcnow()
         model = models.Trait("Foo", models.Trait.DATETIME_TYPE, now)
         trait = self.conn._make_trait(model, None)
-        self.assertEqual(trait.trait_type.data_type,
-                         models.Trait.DATETIME_TYPE)
+        self.assertEqual(models.Trait.DATETIME_TYPE,
+                         trait.trait_type.data_type)
         self.assertIsNone(trait.t_int)
         self.assertIsNone(trait.t_string)
         self.assertIsNone(trait.t_float)
-        self.assertEqual(trait.t_datetime, now)
+        self.assertEqual(now, trait.t_datetime)
         self.assertIsNotNone(trait.trait_type.desc)
 
     def test_bad_event(self):
@@ -160,7 +160,7 @@ class EventTest(EventTestBase):
             problem_events = self.conn.record_events(m)
         self.assertEqual(2, len(problem_events))
         for bad, event in problem_events:
-            self.assertEqual(models.Event.UNKNOWN_PROBLEM, bad)
+            self.assertEqual(bad, models.Event.UNKNOWN_PROBLEM)
 
     def test_get_none_value_traits(self):
         model = sql_models.Trait(None, None, 5)
@@ -196,32 +196,32 @@ class RelationshipTest(scenarios.DBTestBase):
         meta_tables = [sql_models.MetaText, sql_models.MetaFloat,
                        sql_models.MetaBigInt, sql_models.MetaBool]
         for table in meta_tables:
-            self.assertEqual(session.query(table)
+            self.assertEqual(0, session.query(table)
                 .filter(~table.id.in_(
                     session.query(sql_models.Sample.id)
                         .group_by(sql_models.Sample.id)
-                        )).count(), 0)
+                        )).count())
 
     def test_clear_metering_data_associations(self):
         timeutils.utcnow.override_time = datetime.datetime(2012, 7, 2, 10, 45)
         self.conn.clear_expired_metering_data(3 * 60)
 
         session = self.conn._get_db_session()
-        self.assertEqual(session.query(sql_models.sourceassoc)
+        self.assertEqual(0, session.query(sql_models.sourceassoc)
             .filter(~sql_models.sourceassoc.c.sample_id.in_(
                 session.query(sql_models.Sample.id)
                     .group_by(sql_models.Sample.id)
-                    )).count(), 0)
-        self.assertEqual(session.query(sql_models.sourceassoc)
+                    )).count())
+        self.assertEqual(0, session.query(sql_models.sourceassoc)
             .filter(~sql_models.sourceassoc.c.project_id.in_(
                 session.query(sql_models.Project.id)
                     .group_by(sql_models.Project.id)
-                    )).count(), 0)
-        self.assertEqual(session.query(sql_models.sourceassoc)
+                    )).count())
+        self.assertEqual(0, session.query(sql_models.sourceassoc)
             .filter(~sql_models.sourceassoc.c.user_id.in_(
                 session.query(sql_models.User.id)
                     .group_by(sql_models.User.id)
-                    )).count(), 0)
+                    )).count())
 
 
 class CapabilitiesTest(EventTestBase):
