@@ -58,7 +58,7 @@ class TestPollsterBase(test_base.BaseTestCase):
 
     def setUp(self):
         super(TestPollsterBase, self).setUp()
-        self.host = ["test://test"]
+        self.hosts = ["test://test", "test://test2"]
         self.useFixture(fixtures.MonkeyPatch(
             'ceilometer.hardware.inspector.get_inspector',
             self.faux_get_inspector))
@@ -69,10 +69,11 @@ class TestPollsterBase(test_base.BaseTestCase):
         mgr = manager.AgentManager()
         pollster = factory()
         cache = {}
-        samples = list(pollster.get_samples(mgr, cache, self.host))
+        samples = list(pollster.get_samples(mgr, cache, self.hosts))
         self.assertTrue(samples)
         self.assertIn(pollster.CACHE_KEY, cache)
-        self.assertIn(self.host[0], cache[pollster.CACHE_KEY])
+        for host in self.hosts:
+            self.assertIn(host, cache[pollster.CACHE_KEY])
 
         self.assertEqual(set([name]),
                          set([s.name for s in samples]))
