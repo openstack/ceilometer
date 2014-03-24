@@ -840,7 +840,7 @@ class Connection(pymongo_base.Connection):
         :param pagination: Optional pagination query.
         """
         if pagination:
-            raise NotImplementedError(_('Pagination not implemented'))
+            raise NotImplementedError('Pagination not implemented')
 
         query = {}
         if user is not None:
@@ -884,8 +884,8 @@ class Connection(pymongo_base.Connection):
                 params = dict(aggregate_param=a.param)
                 fragments += (fragment_map[a.func] % params)
             else:
-                raise NotImplementedError(_('Selectable aggregate function %s'
-                                            ' is not supported') % a.func)
+                raise NotImplementedError('Selectable aggregate function %s'
+                                          ' is not supported' % a.func)
 
         return fragments
 

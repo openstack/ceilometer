@@ -36,9 +36,9 @@ class CPUPollster(plugin.ComputePollster):
             instance_name = util.instance_name(instance)
             try:
                 cpu_info = manager.inspector.inspect_cpus(instance_name)
-                LOG.info(_("CPUTIME USAGE: %(instance)s %(time)d") % (
+                LOG.info(_("CPUTIME USAGE: %(instance)s %(time)d"),
                          {'instance': instance.__dict__,
-                          'time': cpu_info.time}))
+                          'time': cpu_info.time})
                 cpu_num = {'cpu_number': cpu_info.number}
                 yield util.make_sample_from_instance(
                     instance,

@@ -49,7 +49,7 @@ class TestBase(test_base.BaseTestCase):
             try:
                 self.conn = storage.get_connection(self.CONF)
             except storage.StorageBadVersion as e:
-                self.skipTest(str(e))
+                self.skipTest(six.text_type(e))
         self.conn.upgrade()
 
         self.useFixture(oslo_mock.Patch('ceilometer.storage.get_connection',

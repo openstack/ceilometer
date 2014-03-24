@@ -20,6 +20,7 @@
 """
 import functools
 import os.path
+import six
 
 from testtools import testcase
 
@@ -59,10 +60,10 @@ def _skip_decorator(func):
         try:
             return func(*args, **kwargs)
         except NotImplementedError as e:
-            raise testcase.TestSkipped(str(e))
+            raise testcase.TestSkipped(six.text_type(e))
         except Exception as e:
-            if 'not implemented' in str(e):
-                raise testcase.TestSkipped(str(e))
+            if 'not implemented' in six.text_type(e):
+                raise testcase.TestSkipped(six.text_type(e))
             raise
     return skip_if_not_implemented
 

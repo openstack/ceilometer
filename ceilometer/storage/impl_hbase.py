@@ -228,7 +228,7 @@ class Connection(base.Connection):
                    project=None, enabled=None, alarm_id=None, pagination=None):
 
         if pagination:
-            raise NotImplementedError(_('Pagination not implemented'))
+            raise NotImplementedError('Pagination not implemented')
 
         alarm_table = self.conn.table(self.ALARM_TABLE)
 
@@ -373,7 +373,7 @@ class Connection(base.Connection):
         :param pagination: Optional pagination query.
         """
         if pagination:
-            raise NotImplementedError(_('Pagination not implemented'))
+            raise NotImplementedError('Pagination not implemented')
 
         meter_table = self.conn.table(self.METER_TABLE)
 
@@ -427,7 +427,7 @@ class Connection(base.Connection):
         """
 
         if pagination:
-            raise NotImplementedError(_('Pagination not implemented'))
+            raise NotImplementedError('Pagination not implemented')
         resource_table = self.conn.table(self.RESOURCE_TABLE)
         q = make_query(metaquery=metaquery, user_id=user, project_id=project,
                        resource_id=resource, source=source)
@@ -516,8 +516,7 @@ class Connection(base.Connection):
             raise NotImplementedError("Group by not implemented.")
 
         if aggregate:
-            msg = _('Selectable aggregates not implemented')
-            raise NotImplementedError(msg)
+            raise NotImplementedError('Selectable aggregates not implemented')
 
         meter_table = self.conn.table(self.METER_TABLE)
         q, start, stop = make_sample_query_from_filter(sample_filter)
