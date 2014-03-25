@@ -338,6 +338,35 @@ class TestAlarms(FunctionalTest,
         alarms = list(self.conn.get_alarms())
         self.assertEqual(4, len(alarms))
 
+    def test_post_duplicate_time_constraint_name(self):
+        json = {
+            'name': 'added_alarm_duplicate_constraint_name',
+            'type': 'threshold',
+            'time_constraints': [
+                {
+                    'name': 'testcons',
+                    'start': '* 11 * * *',
+                    'duration': 10
+                },
+                {
+                    'name': 'testcons',
+                    'start': '* * * * *',
+                    'duration': 20
+                }
+            ],
+            'threshold_rule': {
+                'meter_name': 'ameter',
+                'threshold': 300.0
+            }
+        }
+        resp = self.post_json('/alarms', params=json, expect_errors=True,
+                              status=400, headers=self.auth_headers)
+        self.assertEqual(
+            "Time constraint names must be unique for a given alarm.",
+            resp.json['error_message']['faultstring'])
+        alarms = list(self.conn.get_alarms())
+        self.assertEqual(4, len(alarms))
+
     def test_post_invalid_alarm_time_constraint_duration(self):
         json = {
             'name': 'added_alarm_invalid_constraint_duration',

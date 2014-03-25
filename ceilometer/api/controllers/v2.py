@@ -1732,6 +1732,12 @@ class Alarm(_Base):
                 if not alarms:
                     raise EntityNotFound(_('Alarm'), id)
 
+        tc_names = [tc.name for tc in alarm.time_constraints]
+        if len(tc_names) > len(set(tc_names)):
+            error = _("Time constraint names must be "
+                      "unique for a given alarm.")
+            raise ClientSideError(error)
+
         return alarm
 
     @staticmethod
