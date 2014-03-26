@@ -272,9 +272,10 @@ class Query(_Base):
 
 
 class ProjectNotAuthorized(ClientSideError):
-    def __init__(self, id):
+    def __init__(self, id, aspect='project'):
+        params = dict(aspect=aspect, id=id)
         super(ProjectNotAuthorized, self).__init__(
-            _("Not Authorized to access project %s") % id,
+            _("Not Authorized to access %(aspect)s %(id)s") % params,
             status_code=401)
 
 
@@ -2037,15 +2038,24 @@ class AlarmsController(rest.RestController):
         now = timeutils.utcnow()
 
         data.alarm_id = str(uuid.uuid4())
-        user, project = acl.get_limited_to(pecan.request.headers)
-        if user:
-            data.user_id = user
-        elif data.user_id == wtypes.Unset:
-            data.user_id = pecan.request.headers.get('X-User-Id')
-        if project:
-            data.project_id = project
-        elif data.project_id == wtypes.Unset:
-            data.project_id = pecan.request.headers.get('X-Project-Id')
+        user_limit, project_limit = acl.get_limited_to(pecan.request.headers)
+
+        def _set_ownership(aspect, owner_limitation, header):
+            attr = '%s_id' % aspect
+            requested_owner = getattr(data, attr)
+            explicit_owner = requested_owner != wtypes.Unset
+            caller = pecan.request.headers.get(header)
+            if (owner_limitation and explicit_owner
+                    and requested_owner != caller):
+                raise ProjectNotAuthorized(requested_owner, aspect)
+
+            actual_owner = (owner_limitation or
+                            requested_owner if explicit_owner else caller)
+            setattr(data, attr, actual_owner)
+
+        _set_ownership('user', user_limit, 'X-User-Id')
+        _set_ownership('project', project_limit, 'X-Project-Id')
+
         data.timestamp = now
         data.state_timestamp = now
 
