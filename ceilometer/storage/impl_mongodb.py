@@ -218,42 +218,37 @@ class Connection(pymongo_base.Connection):
         emit_initial=dict(
             cardinality=(
                 'var aggregate = {};'
-                'aggregate["cardinality/%(aggregate_param)s"] ='
-                '  this["%(aggregate_param)s"];'
+                'aggregate["cardinality/%(aggregate_param)s"] = 1;'
+                'var distincts = {};'
+                'distincts[this["%(aggregate_param)s"]] = true;'
             )
         ),
         emit_body=dict(
-            cardinality='aggregate : aggregate,'
-        ),
-        reduce_initial=dict(
             cardinality=(
-                'var distincts = {};'
-                'distincts[values[0].aggregate['
-                '  "cardinality/%(aggregate_param)s"]] = true;'
-                'var aggregate = {};'
-                'aggregate["cardinality/%(aggregate_param)s"] = NumberInt(1);'
+                'aggregate : aggregate,'
+                'distincts : distincts ,'
+                '%(aggregate_param)s : this["%(aggregate_param)s"],'
             )
         ),
+        reduce_initial=dict(
+            cardinality=''
+        ),
         reduce_body=dict(
-            cardinality='aggregate : aggregate,'
+            cardinality=(
+                'aggregate : values[0].aggregate,'
+                'distincts: values[0].distincts,'
+                '%(aggregate_param)s : values[0]["%(aggregate_param)s"],'
+            )
         ),
         reduce_computation=dict(
             cardinality=(
-                'if (!(values[i].aggregate["cardinality/%(aggregate_param)s"]'
-                '    in distincts)) {'
-                '  distincts[values[i].aggregate['
-                '    "cardinality/%(aggregate_param)s"]] = true;'
-                '  res.aggregate["cardinality/%(aggregate_param)s"] ='
-                '    NumberInt(Object.keys(distincts).length);}'
+                'if (!(values[i]["%(aggregate_param)s"] in res.distincts)) {'
+                '  res.distincts[values[i]["%(aggregate_param)s"]] = true;'
+                '  res.aggregate["cardinality/%(aggregate_param)s"] += 1;}'
             )
         ),
         finalize=dict(
-            cardinality=(
-                'if (typeof value.aggregate['
-                '    "cardinality/%(aggregate_param)s"] !== "number") {'
-                '  value.aggregate["cardinality/%(aggregate_param)s"] ='
-                '     NumberInt(1);}'
-            )
+            cardinality=''
         ),
     )
 

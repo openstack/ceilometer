@@ -1467,6 +1467,45 @@ class TestSelectableAggregates(FunctionalTest,
                     for a in standard_aggregates:
                         self.assertNotIn(a, r)
 
+    def test_large_quantum_selectable_parameterized_aggregate(self):
+        # add a large number of datapoints that won't impact on cardinality
+        # if the computation logic is tolerant of different DB behavior on
+        # larger numbers of samples per-period
+        for i in xrange(200):
+            s = sample.Sample(
+                'instance',
+                sample.TYPE_GAUGE,
+                unit='instance',
+                volume=i * 1.0,
+                user_id='user-1',
+                project_id='project-1',
+                resource_id='resource-1',
+                timestamp=datetime.datetime(2013, 8, 1, 11, i % 60),
+                resource_metadata={'flavor': 'm1.tiny',
+                                   'event': 'event-1', },
+                source='source',
+            )
+            msg = utils.meter_message_from_counter(
+                s,
+                self.CONF.publisher.metering_secret,
+            )
+            self.conn.record_metering_data(msg)
+
+        agg_args = {'aggregate.func': 'cardinality',
+                    'aggregate.param': 'resource_id'}
+        data = self.get_json(self.PATH, **agg_args)
+
+        aggregate = 'cardinality/resource_id'
+        expected_value = 5.0
+        standard_aggregates = set(['count', 'min', 'max', 'sum', 'avg'])
+        r = data[0]
+        self.assertNotIn(aggregate, r)
+        self.assertIn('aggregate', r)
+        self.assertIn(aggregate, r['aggregate'])
+        self.assertEqual(expected_value, r['aggregate'][aggregate])
+        for a in standard_aggregates:
+            self.assertNotIn(a, r)
+
     def test_bad_selectable_parameterized_aggregate(self):
         agg_args = {'aggregate.func': 'cardinality',
                     'aggregate.param': 'injection_attack'}
