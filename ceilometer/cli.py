@@ -84,8 +84,12 @@ def agent_compute():
 
 def agent_notification():
     service.prepare_service()
-    os_service.launch(notification.NotificationService(
-        cfg.CONF.host, 'ceilometer.agent.notification')).wait()
+    launcher = os_service.ProcessLauncher()
+    launcher.launch_service(
+        notification.NotificationService(cfg.CONF.host,
+                                         'ceilometer.agent.notification'),
+        workers=service.get_workers('notification'))
+    launcher.wait()
 
 
 def api():
@@ -96,8 +100,12 @@ def api():
 
 def collector_service():
     service.prepare_service()
-    os_service.launch(collector.CollectorService(
-        cfg.CONF.host, 'ceilometer.collector')).wait()
+    launcher = os_service.ProcessLauncher()
+    launcher.launch_service(
+        collector.CollectorService(cfg.CONF.host,
+                                   'ceilometer.collector'),
+        workers=service.get_workers('collector'))
+    launcher.wait()
 
 
 def storage_dbsync():
