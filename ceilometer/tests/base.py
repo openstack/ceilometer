@@ -59,6 +59,8 @@ def _skip_decorator(func):
     def skip_if_not_implemented(*args, **kwargs):
         try:
             return func(*args, **kwargs)
+        except AssertionError:
+            raise
         except NotImplementedError as e:
             raise testcase.TestSkipped(six.text_type(e))
         except Exception as e:

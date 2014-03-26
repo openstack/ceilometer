@@ -1470,12 +1470,13 @@ class TestSelectableAggregates(FunctionalTest,
     def test_bad_selectable_parameterized_aggregate(self):
         agg_args = {'aggregate.func': 'cardinality',
                     'aggregate.param': 'injection_attack'}
-        resp = self.get_json(self.PATH, expect_errors=True,
+        resp = self.get_json(self.PATH, status=[400],
                              groupby=['project_id'], **agg_args)
-        self.assertTrue(400, resp.status_code)
-        self.assertTrue('error_message' in resp.json)
-        self.assertEqual('Bad aggregate: cardinality.injection_attack',
-                         resp.json['error_message'].get('faultstring'))
+        self.assertTrue('error_message' in resp)
+        self.assertEqual(resp['error_message'].get('faultcode'),
+                         'Client')
+        self.assertEqual(resp['error_message'].get('faultstring'),
+                         'Bad aggregate: cardinality.injection_attack')
 
 
 class TestUnparameterizedAggregates(FunctionalTest,
