@@ -1909,6 +1909,15 @@ class AlarmController(rest.RestController):
         else:
             data.state_timestamp = alarm_in.state_timestamp
 
+        # make sure alarms are unique by name per project.
+        if alarm_in.name != data.name:
+            alarms = list(self.conn.get_alarms(name=data.name,
+                                               project=data.project_id))
+            if alarms:
+                raise ClientSideError(
+                    _("Alarm with name=%s exists") % data.name,
+                    status_code=409)
+
         old_alarm = Alarm.from_db_model(alarm_in).as_dict(storage.models.Alarm)
         updated_alarm = data.as_dict(storage.models.Alarm)
         try:
