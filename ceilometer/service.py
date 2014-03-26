@@ -106,8 +106,8 @@ class DispatchedService(object):
 
     DISPATCHER_NAMESPACE = 'ceilometer.dispatcher'
 
-    def __init__(self, *args, **kwargs):
-        super(DispatchedService, self).__init__(*args, **kwargs)
+    def start(self):
+        super(DispatchedService, self).start()
         LOG.debug(_('loading dispatchers from %s'),
                   self.DISPATCHER_NAMESPACE)
         self.dispatcher_manager = named.NamedExtensionManager(
