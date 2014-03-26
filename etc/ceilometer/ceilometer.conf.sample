@@ -40,13 +40,13 @@
 # Dispatcher to process data. (multi valued)
 #dispatcher=database
 
-# Number of workers for collector service. The default will be
-# equal to the number of CPUs available. (integer value)
-#collector_workers=<None>
+# Number of workers for collector service. A single
+# collector is enabled by default. (integer value)
+#collector_workers=1
 
-# Number of workers for notification service. The default will
-# be equal to the number of CPUs available. (integer value)
-#notification_workers=<None>
+# Number of workers for notification service. A single
+# notification agent is enabled by default. (integer value)
+#notification_workers=1
 
 
 #

@@ -42,11 +42,13 @@ OPTS = [
                     default=['database'],
                     help='Dispatcher to process data.'),
     cfg.IntOpt('collector_workers',
-               help='Number of workers for collector service. The default '
-               'will be equal to the number of CPUs available.'),
+               default=1,
+               help='Number of workers for collector service. A single '
+               'collector is enabled by default.'),
     cfg.IntOpt('notification_workers',
-               help='Number of workers for notification service. The default '
-               'will be equal to the number of CPUs available.'),
+               default=1,
+               help='Number of workers for notification service. A single '
+               'notification agent is enabled by default.'),
 ]
 cfg.CONF.register_opts(OPTS)
 
