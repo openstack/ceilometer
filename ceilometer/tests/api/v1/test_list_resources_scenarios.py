@@ -112,18 +112,18 @@ class TestListResources(TestListResourcesBase):
     def test_list_resources(self):
         data = self.get('/resources')
         self.assertEqual(3, len(data['resources']))
-        self.assertEqual(set(r['resource_id'] for r in data['resources']),
-                         set(['resource-id',
+        self.assertEqual(set(['resource-id',
                               'resource-id-alternate',
-                              'resource-id2']))
+                              'resource-id2']),
+                         set(r['resource_id'] for r in data['resources']))
 
     def test_list_resources_non_admin(self):
         data = self.get('/resources',
                         headers={"X-Roles": "Member",
                                  "X-Project-Id": "project-id"})
         self.assertEqual(2, len(data['resources']))
-        self.assertEqual(set(r['resource_id'] for r in data['resources']),
-                         set(['resource-id', 'resource-id-alternate']))
+        self.assertEqual(set(['resource-id', 'resource-id-alternate']),
+                         set(r['resource_id'] for r in data['resources']))
 
     def test_list_resources_with_timestamps(self):
         data = self.get('/resources',
@@ -131,8 +131,8 @@ class TestListResources(TestListResourcesBase):
                             2012, 7, 2, 10, 41).isoformat(),
                         end_timestamp=datetime.datetime(
                             2012, 7, 2, 10, 43).isoformat())
-        self.assertEqual(set(r['resource_id'] for r in data['resources']),
-                         set(['resource-id-alternate', 'resource-id2']))
+        self.assertEqual(set(['resource-id-alternate', 'resource-id2']),
+                         set(r['resource_id'] for r in data['resources']))
 
     def test_list_resources_with_timestamps_non_admin(self):
         data = self.get('/resources',
@@ -142,8 +142,8 @@ class TestListResources(TestListResourcesBase):
                             2012, 7, 2, 10, 43).isoformat(),
                         headers={"X-Roles": "Member",
                                  "X-Project-Id": "project-id"})
-        self.assertEqual(set(r['resource_id'] for r in data['resources']),
-                         set(['resource-id-alternate']))
+        self.assertEqual(set(['resource-id-alternate']),
+                         set(r['resource_id'] for r in data['resources']))
 
     def test_with_source(self):
         data = self.get('/sources/test_list_resources/resources')
@@ -181,7 +181,7 @@ class TestListResources(TestListResourcesBase):
 
     def test_with_source_non_existent(self):
         data = self.get('/sources/test_list_resources_dont_exist/resources')
-        self.assertEqual(data['resources'], [])
+        self.assertEqual([], data['resources'])
 
     def test_with_user(self):
         data = self.get('/users/user-id/resources')
@@ -224,7 +224,7 @@ class TestListResources(TestListResourcesBase):
 
     def test_with_user_non_existent(self):
         data = self.get('/users/user-id-foobar123/resources')
-        self.assertEqual(data['resources'], [])
+        self.assertEqual([], data['resources'])
 
     def test_with_project(self):
         data = self.get('/projects/project-id/resources')
@@ -260,7 +260,7 @@ class TestListResources(TestListResourcesBase):
 
     def test_with_project_non_existent(self):
         data = self.get('/projects/jd-was-here/resources')
-        self.assertEqual(data['resources'], [])
+        self.assertEqual([], data['resources'])
 
 
 class TestListResourcesMetaquery(TestListResourcesBase,

@@ -135,7 +135,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             expected = [mock.call(alarm.alarm_id, state='insufficient data')
                         for alarm in self.alarms]
             update_calls = self.api_client.alarms.set_state.call_args_list
-            self.assertEqual(update_calls, expected)
+            self.assertEqual(expected, update_calls)
             expected = [mock.call(
                 alarm,
                 'ok',
@@ -143,7 +143,7 @@ class TestEvaluate(base.TestEvaluatorBase):
                  (",".join(alarm.rule['alarm_ids']))),
                 self._reason_data(alarm.rule['alarm_ids']))
                 for alarm in self.alarms]
-            self.assertEqual(self.notifier.notify.call_args_list, expected)
+            self.assertEqual(expected, self.notifier.notify.call_args_list)
 
     def test_to_ok_with_all_ok(self):
         self._set_all_alarms('insufficient data')
@@ -159,7 +159,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             expected = [mock.call(alarm.alarm_id, state='ok')
                         for alarm in self.alarms]
             update_calls = self.api_client.alarms.set_state.call_args_list
-            self.assertEqual(update_calls, expected)
+            self.assertEqual(expected, update_calls)
             reasons, reason_datas = self._combination_transition_reason(
                 'ok',
                 self.alarms[0].rule['alarm_ids'],
@@ -168,7 +168,7 @@ class TestEvaluate(base.TestEvaluatorBase):
                                   reason, reason_data)
                         for alarm, reason, reason_data
                         in zip(self.alarms, reasons, reason_datas)]
-            self.assertEqual(self.notifier.notify.call_args_list, expected)
+            self.assertEqual(expected, self.notifier.notify.call_args_list)
 
     def test_to_ok_with_one_alarm(self):
         self._set_all_alarms('alarm')
@@ -184,7 +184,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             expected = [mock.call(alarm.alarm_id, state='ok')
                         for alarm in self.alarms]
             update_calls = self.api_client.alarms.set_state.call_args_list
-            self.assertEqual(update_calls, expected)
+            self.assertEqual(expected, update_calls)
             reasons, reason_datas = self._combination_transition_reason(
                 'ok',
                 self.alarms[0].rule['alarm_ids'],
@@ -192,7 +192,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             expected = [mock.call(alarm, 'alarm', reason, reason_data)
                         for alarm, reason, reason_data
                         in zip(self.alarms, reasons, reason_datas)]
-            self.assertEqual(self.notifier.notify.call_args_list, expected)
+            self.assertEqual(expected, self.notifier.notify.call_args_list)
 
     def test_to_alarm_with_all_alarm(self):
         self._set_all_alarms('ok')
@@ -208,7 +208,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             expected = [mock.call(alarm.alarm_id, state='alarm')
                         for alarm in self.alarms]
             update_calls = self.api_client.alarms.set_state.call_args_list
-            self.assertEqual(update_calls, expected)
+            self.assertEqual(expected, update_calls)
             reasons, reason_datas = self._combination_transition_reason(
                 'alarm',
                 self.alarms[0].rule['alarm_ids'],
@@ -216,7 +216,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             expected = [mock.call(alarm, 'ok', reason, reason_data)
                         for alarm, reason, reason_data
                         in zip(self.alarms, reasons, reason_datas)]
-            self.assertEqual(self.notifier.notify.call_args_list, expected)
+            self.assertEqual(expected, self.notifier.notify.call_args_list)
 
     def test_to_alarm_with_one_ok(self):
         self._set_all_alarms('ok')
@@ -232,7 +232,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             expected = [mock.call(alarm.alarm_id, state='alarm')
                         for alarm in self.alarms]
             update_calls = self.api_client.alarms.set_state.call_args_list
-            self.assertEqual(update_calls, expected)
+            self.assertEqual(expected, update_calls)
             reasons, reason_datas = self._combination_transition_reason(
                 'alarm',
                 [self.alarms[0].rule['alarm_ids'][1]],
@@ -240,7 +240,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             expected = [mock.call(alarm, 'ok', reason, reason_data)
                         for alarm, reason, reason_data
                         in zip(self.alarms, reasons, reason_datas)]
-            self.assertEqual(self.notifier.notify.call_args_list, expected)
+            self.assertEqual(expected, self.notifier.notify.call_args_list)
 
     def test_to_unknown(self):
         self._set_all_alarms('ok')
@@ -257,7 +257,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             expected = [mock.call(alarm.alarm_id, state='insufficient data')
                         for alarm in self.alarms]
             update_calls = self.api_client.alarms.set_state.call_args_list
-            self.assertEqual(update_calls, expected)
+            self.assertEqual(expected, update_calls)
             reasons = ['Alarms %s are in unknown state'
                        % self.alarms[0].rule['alarm_ids'][0],
                        'Alarms %s are in unknown state'
@@ -268,7 +268,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             expected = [mock.call(alarm, 'ok', reason, reason_data)
                         for alarm, reason, reason_data
                         in zip(self.alarms, reasons, reason_datas)]
-            self.assertEqual(self.notifier.notify.call_args_list, expected)
+            self.assertEqual(expected, self.notifier.notify.call_args_list)
 
     def test_no_state_change(self):
         self._set_all_alarms('ok')
@@ -282,8 +282,8 @@ class TestEvaluate(base.TestEvaluatorBase):
             ]
             self._evaluate_all_alarms()
             update_calls = self.api_client.alarms.set_state.call_args_list
-            self.assertEqual(update_calls, [])
-            self.assertEqual(self.notifier.notify.call_args_list, [])
+            self.assertEqual([], update_calls)
+            self.assertEqual([], self.notifier.notify.call_args_list)
 
     def test_no_state_change_and_repeat_actions(self):
         self.alarms[0].repeat_actions = True
@@ -299,7 +299,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             ]
             self._evaluate_all_alarms()
             update_calls = self.api_client.alarms.set_state.call_args_list
-            self.assertEqual(update_calls, [])
+            self.assertEqual([], update_calls)
             reasons, reason_datas = self._combination_remaining_reason(
                 'ok',
                 self.alarms[0].rule['alarm_ids'],
@@ -308,7 +308,7 @@ class TestEvaluate(base.TestEvaluatorBase):
                         for alarm, reason, reason_data
                         in zip(self.alarms, reasons, reason_datas)]
 
-            self.assertEqual(self.notifier.notify.call_args_list, expected)
+            self.assertEqual(expected, self.notifier.notify.call_args_list)
 
     def test_state_change_inside_time_constraint(self):
         self._set_all_alarms('insufficient data')

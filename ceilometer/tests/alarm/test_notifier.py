@@ -63,14 +63,14 @@ class TestAlarmNotifier(test.BaseTestCase):
         }
         self.service.notify_alarm(context.get_admin_context(), data)
         notifications = self.service.notifiers['test'].obj.notifications
-        self.assertEqual(len(notifications), 1)
-        self.assertEqual(notifications[0], (
-            urlparse.urlsplit(data['actions'][0]),
-            data['alarm_id'],
-            data['previous'],
-            data['current'],
-            data['reason'],
-            data['reason_data']))
+        self.assertEqual(1, len(notifications))
+        self.assertEqual((urlparse.urlsplit(data['actions'][0]),
+                          data['alarm_id'],
+                          data['previous'],
+                          data['current'],
+                          data['reason'],
+                          data['reason_data']),
+                         notifications[0])
 
     def test_notify_alarm_no_action(self):
         self.service.notify_alarm(context.get_admin_context(), {})

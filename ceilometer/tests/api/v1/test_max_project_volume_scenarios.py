@@ -60,47 +60,47 @@ class TestMaxProjectVolume(tests_api.TestBase,
     def test_no_time_bounds(self):
         data = self.get('/projects/project1/meters/volume.size/volume/max')
         expected = {'volume': 7}
-        self.assertEqual(data, expected)
+        self.assertEqual(expected, data)
 
     def test_no_time_bounds_non_admin(self):
         data = self.get('/projects/project1/meters/volume.size/volume/max',
                         headers={"X-Roles": "Member",
                                  "X-Project-Id": "project1"})
-        self.assertEqual(data, {'volume': 7})
+        self.assertEqual({'volume': 7}, data)
 
     def test_no_time_bounds_wrong_tenant(self):
         resp = self.get('/projects/project1/meters/volume.size/volume/max',
                         headers={"X-Roles": "Member",
                                  "X-Project-Id": "?"})
-        self.assertEqual(resp.status_code, 404)
+        self.assertEqual(404, resp.status_code)
 
     def test_start_timestamp(self):
         data = self.get('/projects/project1/meters/volume.size/volume/max',
                         start_timestamp='2012-09-25T11:30:00')
         expected = {'volume': 7}
-        self.assertEqual(data, expected)
+        self.assertEqual(expected, data)
 
     def test_start_timestamp_after(self):
         data = self.get('/projects/project1/meters/volume.size/volume/max',
                         start_timestamp='2012-09-25T12:34:00')
         expected = {'volume': None}
-        self.assertEqual(data, expected)
+        self.assertEqual(expected, data)
 
     def test_end_timestamp(self):
         data = self.get('/projects/project1/meters/volume.size/volume/max',
                         end_timestamp='2012-09-25T11:30:00')
         expected = {'volume': 5}
-        self.assertEqual(data, expected)
+        self.assertEqual(expected, data)
 
     def test_end_timestamp_before(self):
         data = self.get('/projects/project1/meters/volume.size/volume/max',
                         end_timestamp='2012-09-25T09:54:00')
         expected = {'volume': None}
-        self.assertEqual(data, expected)
+        self.assertEqual(expected, data)
 
     def test_start_end_timestamp(self):
         data = self.get('/projects/project1/meters/volume.size/volume/max',
                         start_timestamp='2012-09-25T11:30:00',
                         end_timestamp='2012-09-25T11:32:00')
         expected = {'volume': 6}
-        self.assertEqual(data, expected)
+        self.assertEqual(expected, data)

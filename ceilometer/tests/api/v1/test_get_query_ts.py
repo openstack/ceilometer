@@ -34,7 +34,7 @@ class TestQueryTimestamps(test.BaseTestCase):
                     'query_end': None,
                     'search_offset': 0,
                     }
-        self.assertEqual(result, expected)
+        self.assertEqual(expected, result)
 
     def test_get_query_timestamps_start(self):
         args = {'start_timestamp': '2012-09-20T12:13:14'}
@@ -47,7 +47,7 @@ class TestQueryTimestamps(test.BaseTestCase):
                     'query_end': None,
                     'search_offset': 0,
                     }
-        self.assertEqual(result, expected)
+        self.assertEqual(expected, result)
 
     def test_get_query_timestamps_end(self):
         args = {'end_timestamp': '2012-09-20T12:13:14'}
@@ -60,7 +60,7 @@ class TestQueryTimestamps(test.BaseTestCase):
                     'query_start': None,
                     'search_offset': 0,
                     }
-        self.assertEqual(result, expected)
+        self.assertEqual(expected, result)
 
     def test_get_query_timestamps_with_offset(self):
         args = {'start_timestamp': '2012-09-20T12:13:14',
@@ -78,4 +78,4 @@ class TestQueryTimestamps(test.BaseTestCase):
                                                          12, 13, 14),
                     'search_offset': 20,
                     }
-        self.assertEqual(result, expected)
+        self.assertEqual(expected, result)

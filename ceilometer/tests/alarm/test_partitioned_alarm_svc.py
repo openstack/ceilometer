@@ -81,7 +81,7 @@ class TestPartitionedAlarmService(test.BaseTestCase):
                 mock.call(604800, mock.ANY),
             ]
             actual = self.partitioned.tg.add_timer.call_args_list
-            self.assertEqual(actual, expected)
+            self.assertEqual(expected, actual)
 
     def test_presence_reporting(self):
         priority = 42

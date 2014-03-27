@@ -124,7 +124,7 @@ class TestAPIACL(FunctionalTest,
 
     def test_non_authenticated(self):
         response = self.get_json('/meters', expect_errors=True)
-        self.assertEqual(response.status_int, 401)
+        self.assertEqual(401, response.status_int)
 
     def test_authenticated_wrong_role(self):
         response = self.get_json('/meters',
@@ -135,7 +135,7 @@ class TestAPIACL(FunctionalTest,
                                      "X-Project-Id":
                                      "bc23a9d531064583ace8f67dad60f6bb",
                                  })
-        self.assertEqual(response.status_int, 401)
+        self.assertEqual(401, response.status_int)
 
     # FIXME(dhellmann): This test is not properly looking at the tenant
     # info. We do not correctly detect the improper tenant. That's
@@ -150,7 +150,7 @@ class TestAPIACL(FunctionalTest,
     #             "X-Tenant-Name": "achoo",
     #             "X-Project-Id": "bc23a9d531064583ace8f67dad60f6bb",
     #             })
-    #     self.assertEqual(response.status_int, 401)
+    #     self.assertEqual(401, response.status_int)
 
     def test_authenticated(self):
         data = self.get_json('/meters',
@@ -191,7 +191,7 @@ class TestAPIACL(FunctionalTest,
                              q=[{'field': 'project_id',
                                  'value': 'project-wrong',
                                  }])
-        self.assertEqual(data.status_int, 401)
+        self.assertEqual(401, data.status_int)
 
     def test_non_admin_two_projects(self):
         data = self.get_json('/meters',
@@ -205,7 +205,7 @@ class TestAPIACL(FunctionalTest,
                                 {'field': 'project_id',
                                  'value': 'project-naughty',
                                  }])
-        self.assertEqual(data.status_int, 401)
+        self.assertEqual(401, data.status_int)
 
     def test_non_admin_get_events(self):
 
