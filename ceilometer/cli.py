@@ -26,7 +26,7 @@ import eventlet
 # NOTE(jd) We need to monkey patch the socket and select module for,
 # at least, oslo.rpc, otherwise everything's blocked on its first read()
 # or select()
-eventlet.monkey_patch(socket=True, select=True)
+eventlet.monkey_patch(socket=True, select=True, thread=True)
 
 
 from oslo.config import cfg

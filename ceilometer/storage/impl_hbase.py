@@ -129,59 +129,62 @@ class Connection(base.Connection):
             if url:
                 # Reparse URL, but from the env variable now
                 opts = self._parse_connection_url(url)
-                self.conn = self._get_connection(opts)
+                self.conn_pool = self._get_connection_pool(opts)
             else:
                 # This is a in-memory usage for unit tests
                 if Connection._memory_instance is None:
                     LOG.debug(_('Creating a new in-memory HBase '
                               'Connection object'))
-                    Connection._memory_instance = MConnection()
-                self.conn = Connection._memory_instance
+                    Connection._memory_instance = MConnectionPool()
+                self.conn_pool = Connection._memory_instance
         else:
-            self.conn = self._get_connection(opts)
-        self.conn.open()
+            self.conn_pool = self._get_connection_pool(opts)
 
         self.CAPABILITIES = utils.update_nested(self.DEFAULT_CAPABILITIES,
                                                 AVAILABLE_CAPABILITIES)
 
     def upgrade(self):
-        self.conn.create_table(self.PROJECT_TABLE, {'f': dict()})
-        self.conn.create_table(self.USER_TABLE, {'f': dict()})
-        self.conn.create_table(self.RESOURCE_TABLE, {'f': dict()})
-        self.conn.create_table(self.METER_TABLE, {'f': dict()})
-        self.conn.create_table(self.ALARM_TABLE, {'f': dict()})
-        self.conn.create_table(self.ALARM_HISTORY_TABLE, {'f': dict()})
+        with self.conn_pool.connection() as conn:
+            conn.create_table(self.PROJECT_TABLE, {'f': dict()})
+            conn.create_table(self.USER_TABLE, {'f': dict()})
+            conn.create_table(self.RESOURCE_TABLE, {'f': dict()})
+            conn.create_table(self.METER_TABLE, {'f': dict()})
+            conn.create_table(self.ALARM_TABLE, {'f': dict()})
+            conn.create_table(self.ALARM_HISTORY_TABLE, {'f': dict()})
 
     def clear(self):
         LOG.debug(_('Dropping HBase schema...'))
-        for table in [self.PROJECT_TABLE,
-                      self.USER_TABLE,
-                      self.RESOURCE_TABLE,
-                      self.METER_TABLE,
-                      self.ALARM_TABLE,
-                      self.ALARM_HISTORY_TABLE]:
-            try:
-                self.conn.disable_table(table)
-            except Exception:
-                LOG.debug(_('Cannot disable table but ignoring error'))
-            try:
-                self.conn.delete_table(table)
-            except Exception:
-                LOG.debug(_('Cannot delete table but ignoring error'))
+        with self.conn_pool.connection() as conn:
+            for table in [self.PROJECT_TABLE,
+                          self.USER_TABLE,
+                          self.RESOURCE_TABLE,
+                          self.METER_TABLE,
+                          self.ALARM_TABLE,
+                          self.ALARM_HISTORY_TABLE]:
+
+                try:
+                    conn.disable_table(table)
+                except Exception:
+                    LOG.debug(_('Cannot disable table but ignoring error'))
+                try:
+                    conn.delete_table(table)
+                except Exception:
+                    LOG.debug(_('Cannot delete table but ignoring error'))
 
     @staticmethod
-    def _get_connection(conf):
-        """Return a connection to the database.
+    def _get_connection_pool(conf):
+        """Return a connection pool to the database.
 
         .. note::
 
           The tests use a subclass to override this and return an
-          in-memory connection.
+          in-memory connection pool.
         """
         LOG.debug(_('connecting to HBase on %(host)s:%(port)s') % (
                   {'host': conf['host'], 'port': conf['port']}))
-        return happybase.Connection(host=conf['host'], port=conf['port'],
-                                    table_prefix=conf['table_prefix'])
+        return happybase.ConnectionPool(size=100, host=conf['host'],
+                                        port=conf['port'],
+                                        table_prefix=conf['table_prefix'])
 
     @staticmethod
     def _parse_connection_url(url):
@@ -211,18 +214,19 @@ class Connection(base.Connection):
         call as_dict()
         """
         _id = alarm.alarm_id
-        alarm_table = self.conn.table(self.ALARM_TABLE)
-
         alarm_to_store = serialize_entry(alarm.as_dict())
-        alarm_table.put(_id, alarm_to_store)
-        stored_alarm = deserialize_entry(alarm_table.row(_id))[0]
+        with self.conn_pool.connection() as conn:
+            alarm_table = conn.table(self.ALARM_TABLE)
+            alarm_table.put(_id, alarm_to_store)
+            stored_alarm = deserialize_entry(alarm_table.row(_id))[0]
         return models.Alarm(**stored_alarm)
 
     create_alarm = update_alarm
 
     def delete_alarm(self, alarm_id):
-        alarm_table = self.conn.table(self.ALARM_TABLE)
-        alarm_table.delete(alarm_id)
+        with self.conn_pool.connection() as conn:
+            alarm_table = conn.table(self.ALARM_TABLE)
+            alarm_table.delete(alarm_id)
 
     def get_alarms(self, name=None, user=None,
                    project=None, enabled=None, alarm_id=None, pagination=None):
@@ -230,36 +234,34 @@ class Connection(base.Connection):
         if pagination:
             raise NotImplementedError('Pagination not implemented')
 
-        alarm_table = self.conn.table(self.ALARM_TABLE)
-
         q = make_query(alarm_id=alarm_id, name=name, enabled=enabled,
                        user_id=user, project_id=project)
 
-        gen = alarm_table.scan(filter=q)
-        for ignored, data in gen:
-            stored_alarm = deserialize_entry(data)[0]
-            yield models.Alarm(**stored_alarm)
+        with self.conn_pool.connection() as conn:
+            alarm_table = conn.table(self.ALARM_TABLE)
+            gen = alarm_table.scan(filter=q)
+            for ignored, data in gen:
+                stored_alarm = deserialize_entry(data)[0]
+                yield models.Alarm(**stored_alarm)
 
     def get_alarm_changes(self, alarm_id, on_behalf_of,
                           user=None, project=None, type=None,
                           start_timestamp=None, start_timestamp_op=None,
                           end_timestamp=None, end_timestamp_op=None):
-        alarm_history_table = self.conn.table(self.ALARM_HISTORY_TABLE)
-
         q = make_query(alarm_id=alarm_id, on_behalf_of=on_behalf_of, type=type,
                        user_id=user, project_id=project)
-
         start_row, end_row = make_timestamp_query(
             _make_general_rowkey_scan,
             start=start_timestamp, start_op=start_timestamp_op,
             end=end_timestamp, end_op=end_timestamp_op, bounds_only=True,
             some_id=alarm_id)
-
-        gen = alarm_history_table.scan(filter=q, row_start=start_row,
-                                       row_stop=end_row)
-        for ignored, data in gen:
-            stored_entry = deserialize_entry(data)[0]
-            yield models.AlarmChange(**stored_entry)
+        with self.conn_pool.connection() as conn:
+            alarm_history_table = conn.table(self.ALARM_HISTORY_TABLE)
+            gen = alarm_history_table.scan(filter=q, row_start=start_row,
+                                           row_stop=end_row)
+            for ignored, data in gen:
+                stored_entry = deserialize_entry(data)[0]
+                yield models.AlarmChange(**stored_entry)
 
     def record_alarm_change(self, alarm_change):
         """Record alarm change event.
@@ -267,10 +269,10 @@ class Connection(base.Connection):
         alarm_change_dict = serialize_entry(alarm_change)
         ts = alarm_change.get('timestamp') or datetime.datetime.now()
         rts = reverse_timestamp(ts)
-
-        alarm_history_table = self.conn.table(self.ALARM_HISTORY_TABLE)
-        alarm_history_table.put(alarm_change.get('alarm_id') + "_" + str(rts),
-                                alarm_change_dict)
+        with self.conn_pool.connection() as conn:
+            alarm_history_table = conn.table(self.ALARM_HISTORY_TABLE)
+            alarm_history_table.put(alarm_change.get('alarm_id') + "_" +
+                                    str(rts), alarm_change_dict)
 
     def record_metering_data(self, data):
         """Write the data to the backend storage system.
@@ -278,52 +280,57 @@ class Connection(base.Connection):
         :param data: a dictionary such as returned by
                      ceilometer.meter.meter_message_from_counter
         """
-        project_table = self.conn.table(self.PROJECT_TABLE)
-        user_table = self.conn.table(self.USER_TABLE)
-        resource_table = self.conn.table(self.RESOURCE_TABLE)
-        meter_table = self.conn.table(self.METER_TABLE)
+        with self.conn_pool.connection() as conn:
+            project_table = conn.table(self.PROJECT_TABLE)
+            user_table = conn.table(self.USER_TABLE)
+            resource_table = conn.table(self.RESOURCE_TABLE)
+            meter_table = conn.table(self.METER_TABLE)
 
-        # Make sure we know about the user and project
-        if data['user_id']:
-            self._update_sources(user_table, data['user_id'], data['source'])
-        self._update_sources(project_table, data['project_id'], data['source'])
+            # Make sure we know about the user and project
+            if data['user_id']:
+                self._update_sources(user_table, data['user_id'],
+                                     data['source'])
+            self._update_sources(project_table, data['project_id'],
+                                 data['source'])
 
-        # Get metadata from user's data
-        resource_metadata = data.get('resource_metadata', {})
-        # Determine the name of new meter
-        new_meter = _format_meter_reference(
-            data['counter_name'], data['counter_type'], data['counter_unit'])
+            # Get metadata from user's data
+            resource_metadata = data.get('resource_metadata', {})
+            # Determine the name of new meter
+            new_meter = _format_meter_reference(
+                data['counter_name'], data['counter_type'],
+                data['counter_unit'])
+            flatten_result, sources, meters, metadata = \
+                deserialize_entry(resource_table.row(data['resource_id']))
 
-        flatten_result, sources, meters, metadata = \
-            deserialize_entry(resource_table.row(data['resource_id']))
+            # Update if resource has new information
+            if (data['source'] not in sources) or (
+                    new_meter not in meters) or (
+                    metadata != resource_metadata):
+                resource_table.put(data['resource_id'],
+                                   serialize_entry(
+                                       **{'sources': [data['source']],
+                                          'meters': [new_meter],
+                                          'metadata': resource_metadata,
+                                          'resource_id': data['resource_id'],
+                                          'project_id': data['project_id'],
+                                          'user_id': data['user_id']}))
 
-        # Update if resource has new information
-        if (data['source'] not in sources) or (new_meter not in meters) or (
-                metadata != resource_metadata):
-            resource_table.put(data['resource_id'],
-                               serialize_entry(
-                                   **{'sources': [data['source']],
-                                      'meters': [new_meter],
-                                      'metadata': resource_metadata,
-                                      'resource_id': data['resource_id'],
-                                      'project_id': data['project_id'],
-                                      'user_id': data['user_id']}))
+            # Rowkey consists of reversed timestamp, meter and an md5 of
+            # user+resource+project for purposes of uniqueness
+            m = hashlib.md5()
+            m.update("%s%s%s" % (data['user_id'], data['resource_id'],
+                                 data['project_id']))
 
-        # Rowkey consists of reversed timestamp, meter and an md5 of
-        # user+resource+project for purposes of uniqueness
-        m = hashlib.md5()
-        m.update("%s%s%s" % (data['user_id'], data['resource_id'],
-                             data['project_id']))
-
-        # We use reverse timestamps in rowkeys as they are sorted
-        # alphabetically.
-        rts = reverse_timestamp(data['timestamp'])
-        row = "%s_%d_%s" % (data['counter_name'], rts, m.hexdigest())
-        record = serialize_entry(data, **{'metadata': resource_metadata,
-                                          'rts': rts,
-                                          'message': data,
-                                          'recorded_at': timeutils.utcnow()})
-        meter_table.put(row, record)
+            # We use reverse timestamps in rowkeys as they are sorted
+            # alphabetically.
+            rts = reverse_timestamp(data['timestamp'])
+            row = "%s_%d_%s" % (data['counter_name'], rts, m.hexdigest())
+            record = serialize_entry(data, **{'metadata': resource_metadata,
+                                              'rts': rts,
+                                              'message': data,
+                                              'recorded_at': timeutils.utcnow(
+                                              )})
+            meter_table.put(row, record)
 
     def _update_sources(self, table, id, source):
         user, sources, _, _ = deserialize_entry(table.row(id))
@@ -336,24 +343,26 @@ class Connection(base.Connection):
 
         :param source: Optional source filter.
         """
-        user_table = self.conn.table(self.USER_TABLE)
-        LOG.debug(_("source: %s") % source)
-        scan_args = {}
-        if source:
-            scan_args['columns'] = ['f:s_%s' % source]
-        return sorted(key for key, ignored in user_table.scan(**scan_args))
+        with self.conn_pool.connection() as conn:
+            user_table = conn.table(self.USER_TABLE)
+            LOG.debug(_("source: %s") % source)
+            scan_args = {}
+            if source:
+                scan_args['columns'] = ['f:s_%s' % source]
+            return sorted(key for key, ignored in user_table.scan(**scan_args))
 
     def get_projects(self, source=None):
         """Return an iterable of project id strings.
 
         :param source: Optional source filter.
         """
-        project_table = self.conn.table(self.PROJECT_TABLE)
-        LOG.debug(_("source: %s") % source)
-        scan_args = {}
-        if source:
-            scan_args['columns'] = ['f:s_%s' % source]
-        return (key for key, ignored in project_table.scan(**scan_args))
+        with self.conn_pool.connection() as conn:
+            project_table = conn.table(self.PROJECT_TABLE)
+            LOG.debug(_("source: %s") % source)
+            scan_args = {}
+            if source:
+                scan_args['columns'] = ['f:s_%s' % source]
+            return (key for key, ignored in project_table.scan(**scan_args))
 
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
@@ -375,8 +384,6 @@ class Connection(base.Connection):
         if pagination:
             raise NotImplementedError('Pagination not implemented')
 
-        meter_table = self.conn.table(self.METER_TABLE)
-
         sample_filter = storage.SampleFilter(
             user=user, project=project,
             start=start_timestamp, start_timestamp_op=start_timestamp_op,
@@ -385,34 +392,37 @@ class Connection(base.Connection):
         q, start_row, stop_row = make_sample_query_from_filter(
             sample_filter, require_meter=False)
 
-        LOG.debug(_("Query Meter table: %s") % q)
-        meters = meter_table.scan(filter=q, row_start=start_row,
-                                  row_stop=stop_row)
-        d_meters = []
-        for i, m in meters:
-            d_meters.append(deserialize_entry(m))
+        with self.conn_pool.connection() as conn:
+            meter_table = conn.table(self.METER_TABLE)
+            LOG.debug(_("Query Meter table: %s") % q)
+            meters = meter_table.scan(filter=q, row_start=start_row,
+                                      row_stop=stop_row)
+            d_meters = []
+            for i, m in meters:
+                d_meters.append(deserialize_entry(m))
 
-        # We have to sort on resource_id before we can group by it. According
-        # to the itertools documentation a new group is generated when the
-        # value of the key function changes (it breaks there).
-        meters = sorted(d_meters, key=_resource_id_from_record_tuple)
-        for resource_id, r_meters in itertools.groupby(
-                meters, key=_resource_id_from_record_tuple):
-            # We need deserialized entry(data[0]) and metadata(data[3])
-            meter_rows = [(data[0], data[3]) for data in sorted(
-                r_meters, key=_timestamp_from_record_tuple)]
-            latest_data = meter_rows[-1]
-            min_ts = meter_rows[0][0]['timestamp']
-            max_ts = latest_data[0]['timestamp']
-            yield models.Resource(
-                resource_id=resource_id,
-                first_sample_timestamp=min_ts,
-                last_sample_timestamp=max_ts,
-                project_id=latest_data[0]['project_id'],
-                source=latest_data[0]['source'],
-                user_id=latest_data[0]['user_id'],
-                metadata=latest_data[1],
-            )
+            # We have to sort on resource_id before we can group by it.
+            # According to the itertools documentation a new group is
+            # generated when the value of the key function changes
+            # (it breaks there).
+            meters = sorted(d_meters, key=_resource_id_from_record_tuple)
+            for resource_id, r_meters in itertools.groupby(
+                    meters, key=_resource_id_from_record_tuple):
+                # We need deserialized entry(data[0]) and metadata(data[3])
+                meter_rows = [(data[0], data[3]) for data in sorted(
+                    r_meters, key=_timestamp_from_record_tuple)]
+                latest_data = meter_rows[-1]
+                min_ts = meter_rows[0][0]['timestamp']
+                max_ts = latest_data[0]['timestamp']
+                yield models.Resource(
+                    resource_id=resource_id,
+                    first_sample_timestamp=min_ts,
+                    last_sample_timestamp=max_ts,
+                    project_id=latest_data[0]['project_id'],
+                    source=latest_data[0]['source'],
+                    user_id=latest_data[0]['user_id'],
+                    metadata=latest_data[1],
+                )
 
     def get_meters(self, user=None, project=None, resource=None, source=None,
                    metaquery={}, pagination=None):
@@ -427,30 +437,32 @@ class Connection(base.Connection):
         """
 
         if pagination:
-            raise NotImplementedError('Pagination not implemented')
-        resource_table = self.conn.table(self.RESOURCE_TABLE)
-        q = make_query(metaquery=metaquery, user_id=user, project_id=project,
-                       resource_id=resource, source=source)
-        LOG.debug(_("Query Resource table: %s") % q)
+            raise NotImplementedError(_('Pagination not implemented'))
+        with self.conn_pool.connection() as conn:
+            resource_table = conn.table(self.RESOURCE_TABLE)
+            q = make_query(metaquery=metaquery, user_id=user,
+                           project_id=project, resource_id=resource,
+                           source=source)
+            LOG.debug(_("Query Resource table: %s") % q)
 
-        gen = resource_table.scan(filter=q)
+            gen = resource_table.scan(filter=q)
 
-        for ignored, data in gen:
-            flatten_result, s, m, md = deserialize_entry(data)
-            if not m:
-                continue
-            # Meter table may have only one "meter" and "source". That's why
-            # only first lists element is get in this method
-            name, type, unit = m[0].split("!")
-            yield models.Meter(
-                name=name,
-                type=type,
-                unit=unit,
-                resource_id=flatten_result['resource_id'],
-                project_id=flatten_result['project_id'],
-                source=s[0] if s else None,
-                user_id=flatten_result['user_id'],
-            )
+            for ignored, data in gen:
+                flatten_result, s, m, md = deserialize_entry(data)
+                if not m:
+                    continue
+                # Meter table may have only one "meter" and "source". That's
+                # why only first lists element is get in this method
+                name, type, unit = m[0].split("!")
+                yield models.Meter(
+                    name=name,
+                    type=type,
+                    unit=unit,
+                    resource_id=flatten_result['resource_id'],
+                    project_id=flatten_result['project_id'],
+                    source=s[0] if s else None,
+                    user_id=flatten_result['user_id'],
+                )
 
     def get_samples(self, sample_filter, limit=None):
         """Return an iterable of models.Sample instances.
@@ -458,21 +470,22 @@ class Connection(base.Connection):
         :param sample_filter: Filter.
         :param limit: Maximum number of results to return.
         """
-        meter_table = self.conn.table(self.METER_TABLE)
+        with self.conn_pool.connection() as conn:
+            meter_table = conn.table(self.METER_TABLE)
 
-        q, start, stop = make_sample_query_from_filter(
-            sample_filter, require_meter=False)
-        LOG.debug(_("Query Meter Table: %s") % q)
-        gen = meter_table.scan(filter=q, row_start=start, row_stop=stop)
-        for ignored, meter in gen:
-            if limit is not None:
-                if limit == 0:
-                    break
-                else:
-                    limit -= 1
-            d_meter = deserialize_entry(meter)[0]
-            d_meter['message']['recorded_at'] = d_meter['recorded_at']
-            yield models.Sample(**d_meter['message'])
+            q, start, stop = make_sample_query_from_filter(
+                sample_filter, require_meter=False)
+            LOG.debug(_("Query Meter Table: %s") % q)
+            gen = meter_table.scan(filter=q, row_start=start, row_stop=stop)
+            for ignored, meter in gen:
+                if limit is not None:
+                    if limit == 0:
+                        break
+                    else:
+                        limit -= 1
+                d_meter = deserialize_entry(meter)[0]
+                d_meter['message']['recorded_at'] = d_meter['recorded_at']
+                yield models.Sample(**d_meter['message'])
 
     @staticmethod
     def _update_meter_stats(stat, meter):
@@ -518,11 +531,12 @@ class Connection(base.Connection):
         if aggregate:
             raise NotImplementedError('Selectable aggregates not implemented')
 
-        meter_table = self.conn.table(self.METER_TABLE)
-        q, start, stop = make_sample_query_from_filter(sample_filter)
-        meters = map(deserialize_entry, list(meter for (ignored, meter) in
-                     meter_table.scan(filter=q, row_start=start,
-                                      row_stop=stop)))
+        with self.conn_pool.connection() as conn:
+            meter_table = conn.table(self.METER_TABLE)
+            q, start, stop = make_sample_query_from_filter(sample_filter)
+            meters = map(deserialize_entry, list(meter for (ignored, meter) in
+                         meter_table.scan(filter=q, row_start=start,
+                                          row_stop=stop)))
 
         if sample_filter.start:
             start_time = sample_filter.start
@@ -677,11 +691,25 @@ class MTable(object):
         return r
 
 
+class MConnectionPool(object):
+    def __init__(self):
+        self.conn = MConnection()
+
+    def connection(self):
+        return self.conn
+
+
 class MConnection(object):
     """HappyBase.Connection mock
     """
     def __init__(self):
         self.tables = {}
+
+    def __enter__(self, *args, **kwargs):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
 
     def open(self):
         LOG.debug(_("Opening in-memory HBase connection"))
