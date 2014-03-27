@@ -217,16 +217,15 @@ class Connection(pymongo_base.Connection):
         ),
         emit_initial=dict(
             cardinality=(
-                'var aggregate = {};'
                 'aggregate["cardinality/%(aggregate_param)s"] = 1;'
-                'var distincts = {};'
-                'distincts[this["%(aggregate_param)s"]] = true;'
+                'var distinct_%(aggregate_param)s = {};'
+                'distinct_%(aggregate_param)s[this["%(aggregate_param)s"]]'
+                '   = true;'
             )
         ),
         emit_body=dict(
             cardinality=(
-                'aggregate : aggregate,'
-                'distincts : distincts ,'
+                'distinct_%(aggregate_param)s : distinct_%(aggregate_param)s,'
                 '%(aggregate_param)s : this["%(aggregate_param)s"],'
             )
         ),
@@ -236,14 +235,17 @@ class Connection(pymongo_base.Connection):
         reduce_body=dict(
             cardinality=(
                 'aggregate : values[0].aggregate,'
-                'distincts: values[0].distincts,'
+                'distinct_%(aggregate_param)s:'
+                '  values[0].distinct_%(aggregate_param)s,'
                 '%(aggregate_param)s : values[0]["%(aggregate_param)s"],'
             )
         ),
         reduce_computation=dict(
             cardinality=(
-                'if (!(values[i]["%(aggregate_param)s"] in res.distincts)) {'
-                '  res.distincts[values[i]["%(aggregate_param)s"]] = true;'
+                'if (!(values[i]["%(aggregate_param)s"] in'
+                '      res.distinct_%(aggregate_param)s)) {'
+                '  res.distinct_%(aggregate_param)s[values[i]'
+                '    ["%(aggregate_param)s"]] = true;'
                 '  res.aggregate["cardinality/%(aggregate_param)s"] += 1;}'
             )
         ),
@@ -253,8 +255,10 @@ class Connection(pymongo_base.Connection):
     )
 
     EMIT_STATS_COMMON = """
+        var aggregate = {};
         %(aggregate_initial_placeholder)s
         emit(%(key_val)s, { unit: this.counter_unit,
+                            aggregate : aggregate,
                             %(aggregate_body_placeholder)s
                             groupby : %(groupby_val)s,
                             duration_start : this.timestamp,
@@ -347,6 +351,7 @@ class Connection(pymongo_base.Connection):
     function (key, values) {
         %(aggregate_initial_val)s
         var res = { unit: values[0].unit,
+                    aggregate: values[0].aggregate,
                     %(aggregate_body_val)s
                     groupby: values[0].groupby,
                     period_start: values[0].period_start,

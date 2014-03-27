@@ -1506,6 +1506,60 @@ class TestSelectableAggregates(FunctionalTest,
         for a in standard_aggregates:
             self.assertNotIn(a, r)
 
+    def test_repeated_unparameterized_aggregate(self):
+        agg_params = 'aggregate.func=count&aggregate.func=count'
+        data = self.get_json(self.PATH, override_params=agg_params)
+
+        aggregate = 'count'
+        expected_value = 8.0
+        standard_aggregates = set(['min', 'max', 'sum', 'avg'])
+        r = data[0]
+        self.assertIn(aggregate, r)
+        self.assertEqual(expected_value, r[aggregate])
+        self.assertIn('aggregate', r)
+        self.assertIn(aggregate, r['aggregate'])
+        self.assertEqual(expected_value, r['aggregate'][aggregate])
+        for a in standard_aggregates:
+            self.assertNotIn(a, r)
+
+    def test_fully_repeated_parameterized_aggregate(self):
+        agg_params = ('aggregate.func=cardinality&'
+                      'aggregate.param=resource_id&'
+                      'aggregate.func=cardinality&'
+                      'aggregate.param=resource_id&')
+        data = self.get_json(self.PATH, override_params=agg_params)
+
+        aggregate = 'cardinality/resource_id'
+        expected_value = 5.0
+        standard_aggregates = set(['count', 'min', 'max', 'sum', 'avg'])
+        r = data[0]
+        self.assertIn('aggregate', r)
+        self.assertNotIn(aggregate, r)
+        self.assertIn(aggregate, r['aggregate'])
+        self.assertEqual(expected_value, r['aggregate'][aggregate])
+        for a in standard_aggregates:
+            self.assertNotIn(a, r)
+
+    def test_partially_repeated_parameterized_aggregate(self):
+        agg_params = ('aggregate.func=cardinality&'
+                      'aggregate.param=resource_id&'
+                      'aggregate.func=cardinality&'
+                      'aggregate.param=project_id&')
+        data = self.get_json(self.PATH, override_params=agg_params)
+
+        expected_values = {'cardinality/resource_id': 5.0,
+                           'cardinality/project_id': 3.0}
+        standard_aggregates = set(['count', 'min', 'max', 'sum', 'avg'])
+        r = data[0]
+        self.assertIn('aggregate', r)
+        for aggregate in expected_values.keys():
+            self.assertNotIn(aggregate, r)
+            self.assertIn(aggregate, r['aggregate'])
+            self.assertEqual(expected_values[aggregate],
+                             r['aggregate'][aggregate])
+        for a in standard_aggregates:
+            self.assertNotIn(a, r)
+
     def test_bad_selectable_parameterized_aggregate(self):
         agg_args = {'aggregate.func': 'cardinality',
                     'aggregate.param': 'injection_attack'}

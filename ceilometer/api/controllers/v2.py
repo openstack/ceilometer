@@ -899,6 +899,8 @@ class MeterController(rest.RestController):
         kwargs['meter'] = self.meter_name
         f = storage.SampleFilter(**kwargs)
         g = _validate_groupby_fields(groupby)
+
+        aggregate = utils.uniq(aggregate, ['func', 'param'])
         computed = pecan.request.storage_conn.get_meter_statistics(f,
                                                                    period,
                                                                    g,

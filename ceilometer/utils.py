@@ -155,3 +155,15 @@ def cpu_count():
         return multiprocessing.cpu_count() or 1
     except NotImplementedError:
         return 1
+
+
+def uniq(dupes, attrs):
+    """Exclude elements of dupes with a duplicated set of attribute values."""
+    key = lambda d: '/'.join([getattr(d, a) or '' for a in attrs])
+    keys = []
+    deduped = []
+    for d in dupes:
+        if key(d) not in keys:
+            deduped.append(d)
+            keys.append(key(d))
+    return deduped
