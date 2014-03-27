@@ -107,7 +107,6 @@ class DispatchedService(object):
     DISPATCHER_NAMESPACE = 'ceilometer.dispatcher'
 
     def start(self):
-        super(DispatchedService, self).start()
         LOG.debug(_('loading dispatchers from %s'),
                   self.DISPATCHER_NAMESPACE)
         self.dispatcher_manager = named.NamedExtensionManager(
@@ -118,6 +117,8 @@ class DispatchedService(object):
         if not list(self.dispatcher_manager):
             LOG.warning(_('Failed to load any dispatchers for %s'),
                         self.DISPATCHER_NAMESPACE)
+        # ensure dispatcher is configured before starting other services
+        super(DispatchedService, self).start()
 
 
 def get_workers(name):
