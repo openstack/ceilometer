@@ -81,7 +81,7 @@ class CollectorService(service.DispatchedService, os_service.Service):
             # enough for anybody.
             data, source = udp.recvfrom(64 * units.Ki)
             try:
-                sample = msgpack.loads(data)
+                sample = msgpack.loads(data, encoding='utf-8')
             except Exception:
                 LOG.warn(_("UDP: Cannot decode data sent by %s"), str(source))
             else:
