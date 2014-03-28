@@ -20,8 +20,6 @@ from migrate import ForeignKeyConstraint
 from sqlalchemy import MetaData, Table
 from sqlalchemy.sql.expression import select
 
-from ceilometer.openstack.common.db.sqlalchemy import utils
-
 TABLES = ['user', 'project', 'alarm']
 
 INDEXES = {
@@ -56,18 +54,11 @@ def downgrade(migrate_engine):
                        for table_name in TABLES)
     for table_name, indexes in INDEXES.items():
         table = load_tables[table_name]
-        # Save data that conflicted with FK.
-        columns = [column.copy() for column in table.columns]
-        table_dump = Table('dump027_' + table_name, meta, *columns)
-        table_dump.create()
         for column, ref_table_name, ref_column_name in indexes:
             ref_table = load_tables[ref_table_name]
             subq = select([getattr(ref_table.c, ref_column_name)])
-            sql = utils.InsertFromSelect(table_dump, table.select().where(
-                ~ getattr(table.c, column).in_(subq)))
             sql_del = table.delete().where(
                 ~ getattr(table.c, column).in_(subq))
-            migrate_engine.execute(sql)
             migrate_engine.execute(sql_del)
 
             params = {'columns': [table.c[column]],
