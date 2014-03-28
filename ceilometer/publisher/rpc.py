@@ -103,8 +103,8 @@ class RPCPublisher(publisher.PublisherBase):
         self.local_queue = []
 
         if self.policy in ['queue', 'drop']:
-            LOG.info(_('Publishing policy set to %s, \
-                     override backend retry config to 1') % self.policy)
+            LOG.info(_('Publishing policy set to %s, '
+                       'override backend retry config to 1') % self.policy)
             override_backend_retry_config(1)
 
         elif self.policy == 'default':

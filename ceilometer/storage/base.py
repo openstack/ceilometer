@@ -368,8 +368,8 @@ class Connection(object):
         :param limit: Maximum number of results to return.
         """
 
-        raise NotImplementedError('Complex query for samples \
-            is not implemented.')
+        raise NotImplementedError('Complex query for samples '
+                                  'is not implemented.')
 
     @staticmethod
     def query_alarms(filter_expr=None, orderby=None, limit=None):
@@ -380,8 +380,8 @@ class Connection(object):
         :param limit: Maximum number of results to return.
         """
 
-        raise NotImplementedError('Complex query for alarms \
-            is not implemented.')
+        raise NotImplementedError('Complex query for alarms '
+                                  'is not implemented.')
 
     @staticmethod
     def query_alarm_history(filter_expr=None, orderby=None, limit=None):
@@ -392,8 +392,8 @@ class Connection(object):
         :param limit: Maximum number of results to return.
         """
 
-        raise NotImplementedError('Complex query for alarms \
-            history is not implemented.')
+        raise NotImplementedError('Complex query for alarms '
+                                  'history is not implemented.')
 
     @staticmethod
     def get_capabilities():
