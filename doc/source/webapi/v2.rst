@@ -48,8 +48,13 @@ standard set by specifying an aggregate function in the statistics query::
 
     GET /v2/meters/<meter_name>/statistics?aggregate.func=<name>&aggregate.param=<value>
 
-(where aggregate.param is optional). See the :ref:`functional-examples`
-section for more detail.
+(where aggregate.param is optional).
+
+Duplicate aggregate function and parameter pairs are silently discarded from the statistics query. Partial duplicates, in the sense of the same function but differing parameters, for example::
+
+    GET /v2/meters/<meter_name>/statistics?aggregate.func=cardinality&aggregate.param=resource_id&aggregate.func=cardinality&aggregate.param=project_id
+
+are, on the other hand, both allowed by the API and supported by the storage drivers.  See the :ref:`functional-examples` section for more detail.
 
 .. note:: Currently only *cardinality* needs aggregate.param to be specified.
 
