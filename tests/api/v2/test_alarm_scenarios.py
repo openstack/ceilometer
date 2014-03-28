@@ -349,6 +349,30 @@ class TestAlarms(FunctionalTest,
         alarms = list(self.conn.get_alarms())
         self.assertEqual(4, len(alarms))
 
+    def test_post_invalid_alarm_query_field_type(self):
+        json = {
+            'name': 'added_alarm',
+            'type': 'threshold',
+            'threshold_rule': {
+                'meter_name': 'ameter',
+                'query': [{'field': 'metadata.valid',
+                           'op': 'eq',
+                           'value': 'value',
+                           'type': 'blob'}],
+                'comparison_operator': 'gt',
+                'threshold': 2.0,
+                'statistic': 'avg',
+            }
+        }
+        resp = self.post_json('/alarms', params=json, expect_errors=True,
+                              status=400, headers=self.auth_headers)
+        expected_error_message = 'The data type blob is not supported.'
+        resp_string = jsonutils.loads(resp.body)
+        fault_string = resp_string['error_message']['faultstring']
+        self.assertTrue(fault_string.startswith(expected_error_message))
+        alarms = list(self.conn.get_alarms())
+        self.assertEqual(4, len(alarms))
+
     def test_post_invalid_alarm_have_multiple_rules(self):
         json = {
             'name': 'added_alarm',
