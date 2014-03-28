@@ -18,9 +18,12 @@
 # under the License.
 """Test basic ceilometer-api app
 """
+import json
+import mock
 import os
 
 from oslo.config import cfg
+import wsme
 
 from ceilometer.api import app
 from ceilometer.api import acl
@@ -199,3 +202,19 @@ class TestApiMiddleware(FunctionalTest):
         fault = response.xml.findall('./error/faultstring')
         for fault_string in fault:
             self.assertEqual(fault_string.text, self.en_US_translated_error)
+
+    def test_translated_then_untranslated_error(self):
+        resp = self.get_json('/alarms/alarm-id-3', expect_errors=True)
+        self.assertEqual(resp.status_code, 404)
+        self.assertEqual(json.loads(resp.body)['error_message']
+                         ['faultstring'], "Alarm alarm-id-3 Not Found")
+
+        cls = 'ceilometer.api.controllers.v2.EntityNotFound'
+        with mock.patch(cls) as CustomErrorClass:
+            CustomErrorClass.return_value = wsme.exc.ClientSideError(
+                "untranslated_error")
+            resp = self.get_json('/alarms/alarm-id-5', expect_errors=True)
+
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(json.loads(resp.body)['error_message']
+                         ['faultstring'], "untranslated_error")
