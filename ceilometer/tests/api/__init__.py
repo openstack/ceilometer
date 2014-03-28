@@ -179,7 +179,7 @@ class FunctionalTest(db_test_base.TestBase):
 
     def get_json(self, path, expect_errors=False, headers=None,
                  extra_environ=None, q=[], groupby=[], status=None,
-                 **params):
+                 override_params=None, **params):
         """Sends simulated HTTP GET request to Pecan test app.
 
         :param path: url path of target service
@@ -192,23 +192,27 @@ class FunctionalTest(db_test_base.TestBase):
                   keys
         :param groupby: list of fields to group by
         :param status: Expected status code of response
+        :param override_params: literally encoded query param string
         :param params: content for wsgi.input of request
         """
         full_path = self.PATH_PREFIX + path
-        query_params = {'q.field': [],
-                        'q.value': [],
-                        'q.op': [],
-                        'q.type': [],
-                        }
-        for query in q:
-            for name in ['field', 'op', 'value', 'type']:
-                query_params['q.%s' % name].append(query.get(name, ''))
-        all_params = {}
-        all_params.update(params)
-        if q:
-            all_params.update(query_params)
-        if groupby:
-            all_params.update({'groupby': groupby})
+        if override_params:
+            all_params = override_params
+        else:
+            query_params = {'q.field': [],
+                            'q.value': [],
+                            'q.op': [],
+                            'q.type': [],
+                            }
+            for query in q:
+                for name in ['field', 'op', 'value', 'type']:
+                    query_params['q.%s' % name].append(query.get(name, ''))
+            all_params = {}
+            all_params.update(params)
+            if q:
+                all_params.update(query_params)
+            if groupby:
+                all_params.update({'groupby': groupby})
         response = self.app.get(full_path,
                                 params=all_params,
                                 headers=headers,

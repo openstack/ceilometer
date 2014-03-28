@@ -129,7 +129,7 @@ PARAMETERIZED_AGGREGATES = dict(
     compute=dict(
         cardinality=lambda p: func.count(
             distinct(getattr(models.Sample, p))
-        ).label('cardinality')
+        ).label('cardinality/%s' % p)
     )
 )
 
@@ -691,10 +691,10 @@ class Connection(base.Connection):
             if hasattr(result, attr):
                 stats_args[attr] = getattr(result, attr)
         if aggregate:
-            stats_args['aggregate'] = dict(
-                ('%s%s' % (a.func, '/%s' % a.param if a.param else ''),
-                 getattr(result, a.func)) for a in aggregate
-            )
+            stats_args['aggregate'] = {}
+            for a in aggregate:
+                key = '%s%s' % (a.func, '/%s' % a.param if a.param else '')
+                stats_args['aggregate'][key] = getattr(result, key)
         return stats_args
 
     @staticmethod
