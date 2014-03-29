@@ -42,7 +42,6 @@ from ceilometer import storage
 from ceilometer.storage import base
 from ceilometer.storage import models
 from ceilometer.storage import pymongo_base
-from ceilometer import utils
 
 cfg.CONF.import_opt('time_to_live', 'ceilometer.storage',
                     group="database")
@@ -83,30 +82,19 @@ class MongoDBStorage(base.StorageEngine):
 
 
 AVAILABLE_CAPABILITIES = {
-    'meters': {'query': {'simple': True,
-                         'metadata': True}},
     'resources': {'query': {'simple': True,
                             'metadata': True}},
-    'samples': {'query': {'simple': True,
-                          'metadata': True,
-                          'complex': True}},
     'statistics': {'groupby': True,
                    'query': {'simple': True,
                              'metadata': True},
                    'aggregation': {'standard': True,
-                                   'selectable': {
-                                       'max': True,
-                                       'min': True,
-                                       'sum': True,
-                                       'avg': True,
-                                       'count': True,
-                                       'stddev': True,
-                                       'cardinality': True}}
-                   },
-    'alarms': {'query': {'simple': True,
-                         'complex': True},
-               'history': {'query': {'simple': True,
-                                     'complex': True}}},
+                                   'selectable': {'max': True,
+                                                  'min': True,
+                                                  'sum': True,
+                                                  'avg': True,
+                                                  'count': True,
+                                                  'stddev': True,
+                                                  'cardinality': True}}}
 }
 
 
@@ -419,6 +407,7 @@ class Connection(pymongo_base.Connection):
                                     hour=23, minute=59, second=59)
 
     def __init__(self, conf):
+        super(Connection, self).__init__(conf, AVAILABLE_CAPABILITIES)
         url = conf.database.connection
 
         # NOTE(jd) Use our own connection pooling on top of the Pymongo one.
@@ -436,9 +425,6 @@ class Connection(pymongo_base.Connection):
         if connection_options.get('username'):
             self.db.authenticate(connection_options['username'],
                                  connection_options['password'])
-
-        self.CAPABILITIES = utils.update_nested(self.DEFAULT_CAPABILITIES,
-                                                AVAILABLE_CAPABILITIES)
 
         # NOTE(jd) Upgrading is just about creating index, so let's do this
         # on connection to be sure at least the TTL is correcly updated if
@@ -989,8 +975,3 @@ class Connection(pymongo_base.Connection):
         stats_args['groupby'] = (dict(
             (g, result['groupby'][g]) for g in groupby) if groupby else None)
         return models.Statistics(**stats_args)
-
-    def get_capabilities(self):
-        """Return an dictionary representing the capabilities of this driver.
-        """
-        return self.CAPABILITIES

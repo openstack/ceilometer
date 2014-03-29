@@ -38,7 +38,6 @@ from ceilometer import storage
 from ceilometer.storage import base
 from ceilometer.storage import models
 from ceilometer.storage import pymongo_base
-from ceilometer import utils
 
 LOG = log.getLogger(__name__)
 
@@ -76,20 +75,12 @@ class DB2Storage(base.StorageEngine):
 
 
 AVAILABLE_CAPABILITIES = {
-    'meters': {'query': {'simple': True,
-                         'metadata': True}},
     'resources': {'query': {'simple': True,
                             'metadata': True}},
-    'samples': {'query': {'simple': True,
-                          'metadata': True,
-                          'complex': True}},
     'statistics': {'groupby': True,
                    'query': {'simple': True,
                              'metadata': True},
-                   'aggregation': {'standard': True}},
-    'alarms': {'query': {'simple': True,
-                         'complex': True},
-               'history': {'query': {'simple': True}}},
+                   'aggregation': {'standard': True}}
 }
 
 
@@ -121,6 +112,7 @@ class Connection(pymongo_base.Connection):
     SECONDS_IN_A_DAY = 86400
 
     def __init__(self, conf):
+        super(Connection, self).__init__(conf, AVAILABLE_CAPABILITIES)
         url = conf.database.connection
 
         # Since we are using pymongo, even though we are connecting to DB2
@@ -149,9 +141,6 @@ class Connection(pymongo_base.Connection):
         if connection_options.get('username'):
             self.db.authenticate(connection_options['username'],
                                  connection_options['password'])
-
-        self.CAPABILITIES = utils.update_nested(self.DEFAULT_CAPABILITIES,
-                                                AVAILABLE_CAPABILITIES)
 
         self.upgrade()
 
@@ -439,8 +428,3 @@ class Connection(pymongo_base.Connection):
                 stat.period_start = stat.duration_start
                 stat.period_end = stat.duration_end
             yield stat
-
-    def get_capabilities(self):
-        """Return an dictionary representing the capabilities of this driver.
-        """
-        return self.CAPABILITIES

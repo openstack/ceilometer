@@ -27,6 +27,7 @@ from ceilometer.openstack.common import log
 from ceilometer.openstack.common import network_utils
 from ceilometer.storage import base
 from ceilometer.storage import models
+from ceilometer import utils
 
 LOG = log.getLogger(__name__)
 
@@ -126,9 +127,28 @@ class ConnectionPool(object):
         return client
 
 
+COMMON_AVAILABLE_CAPABILITIES = {
+    'meters': {'query': {'simple': True,
+                         'metadata': True}},
+    'samples': {'query': {'simple': True,
+                          'metadata': True,
+                          'complex': True}},
+    'alarms': {'query': {'simple': True,
+                         'complex': True},
+               'history': {'query': {'simple': True,
+                                     'complex': True}}},
+}
+
+
 class Connection(base.Connection):
     """Base Connection class for MongoDB and DB2 drivers.
     """
+
+    def __init__(self, conf, AVAILABLE_CAPABILITIES):
+        super(Connection, self).__init__(
+            conf,
+            utils.update_nested(COMMON_AVAILABLE_CAPABILITIES,
+                                AVAILABLE_CAPABILITIES))
 
     def get_users(self, source=None):
         """Return an iterable of user id strings.

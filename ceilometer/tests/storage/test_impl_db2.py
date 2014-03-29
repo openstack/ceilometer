@@ -68,7 +68,7 @@ class CapabilitiesTest(DB2EngineTestBase):
             'alarms': {'query': {'simple': True,
                                  'complex': True},
                        'history': {'query': {'simple': True,
-                                             'complex': False}}},
+                                             'complex': True}}},
             'events': {'query': {'simple': False}}
         }
 

@@ -122,6 +122,7 @@ class Connection(base.Connection):
 
     def __init__(self, conf):
         """Hbase Connection Initialization."""
+        super(Connection, self).__init__(conf, AVAILABLE_CAPABILITIES)
         opts = self._parse_connection_url(conf.database.connection)
 
         if opts['host'] == '__test__':
@@ -139,9 +140,6 @@ class Connection(base.Connection):
                 self.conn_pool = Connection._memory_instance
         else:
             self.conn_pool = self._get_connection_pool(opts)
-
-        self.CAPABILITIES = utils.update_nested(self.DEFAULT_CAPABILITIES,
-                                                AVAILABLE_CAPABILITIES)
 
     def upgrade(self):
         with self.conn_pool.connection() as conn:
@@ -590,11 +588,6 @@ class Connection(base.Connection):
                 )
             self._update_meter_stats(results[-1], meter[0])
         return results
-
-    def get_capabilities(self):
-        """Return an dictionary representing the capabilities of this driver.
-        """
-        return self.CAPABILITIES
 
 
 ###############

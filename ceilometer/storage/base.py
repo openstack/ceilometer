@@ -27,6 +27,7 @@ from six import moves
 
 from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import timeutils
+from ceilometer import utils
 
 
 def iter_period(start, end, period):
@@ -156,9 +157,10 @@ class Connection(object):
         'events': {'query': {'simple': False}},
     }
 
-    @staticmethod
-    def __init__(conf):
+    def __init__(self, conf, AVAILABLE_CAPABILITIES):
         """Constructor."""
+        self._CAPABILITIES = utils.update_nested(self.DEFAULT_CAPABILITIES,
+                                                 AVAILABLE_CAPABILITIES)
 
     @staticmethod
     def upgrade():
@@ -395,8 +397,7 @@ class Connection(object):
         raise NotImplementedError('Complex query for alarms '
                                   'history is not implemented.')
 
-    @staticmethod
-    def get_capabilities():
-        """Return an dictionary representing the capabilities of this driver.
+    def get_capabilities(self):
+        """Return an dictionary representing the capabilities of each driver.
         """
-        raise NotImplementedError('Capabilities not implemented.')
+        return self._CAPABILITIES

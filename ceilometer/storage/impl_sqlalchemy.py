@@ -240,6 +240,7 @@ class Connection(base.Connection):
     """SqlAlchemy connection."""
 
     def __init__(self, conf):
+        super(Connection, self).__init__(conf, AVAILABLE_CAPABILITIES)
         url = conf.database.connection
         if url == 'sqlite://':
             conf.database.connection = \
@@ -253,8 +254,6 @@ class Connection(base.Connection):
         self._maker = sqlalchemy_session.get_maker(self._engine)
         sqlalchemy_session._ENGINE = None
         sqlalchemy_session._MAKER = None
-        self._CAPABILITIES = utils.update_nested(self.DEFAULT_CAPABILITIES,
-                                                 AVAILABLE_CAPABILITIES)
 
     def _get_db_session(self):
         return self._maker()
@@ -1235,11 +1234,6 @@ class Connection(base.Connection):
                 yield api_models.Trait(name=type.desc,
                                        dtype=type.data_type,
                                        value=trait.get_value())
-
-    def get_capabilities(self):
-        """Return an dictionary representing the capabilities of this driver.
-        """
-        return self._CAPABILITIES
 
 
 class QueryTransformer(object):

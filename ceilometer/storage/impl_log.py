@@ -40,7 +40,7 @@ class Connection(base.Connection):
     """
 
     def __init__(self, conf):
-        pass
+        super(Connection, self).__init__(conf, {})
 
     def upgrade(self):
         pass
