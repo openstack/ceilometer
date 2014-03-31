@@ -61,6 +61,7 @@ class TestLocationMetadata(test.BaseTestCase):
                                     'kernel_id': 'kernel id',
                                     'os_type': 'linux',
                                     'ramdisk_id': 'ramdisk id',
+                                    'status': 'active',
                                     'ephemeral_gb': 0,
                                     'root_gb': 20,
                                     'disk_gb': 20,

@@ -42,6 +42,7 @@ class TestInstancePollster(base.TestPollsterBase):
         self.assertEqual(20, samples[0].resource_metadata['disk_gb'])
         self.assertEqual(20, samples[0].resource_metadata['root_gb'])
         self.assertEqual(0, samples[0].resource_metadata['ephemeral_gb'])
+        self.assertEqual('active', samples[0].resource_metadata['status'])
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples_instance_flavor(self):

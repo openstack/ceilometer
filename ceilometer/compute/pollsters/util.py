@@ -44,6 +44,7 @@ def _get_metadata_from_object(instance):
         'instance_type': (instance.flavor['id'] if instance.flavor else None),
         'host': instance.hostId,
         'flavor': instance.flavor,
+        'status': instance.status.lower(),
         # Image properties
         'image': instance.image,
         'image_ref': (instance.image['id'] if instance.image else None),
