@@ -1,5 +1,5 @@
-# Persian translations for ceilometer.
-# Copyright (C) 2013 ORGANIZATION
+# Albanian translations for ceilometer.
+# Copyright (C) 2014 ORGANIZATION
 # This file is distributed under the same license as the ceilometer project.
 #
 # Translators:
@@ -8,11 +8,11 @@ msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2014-03-31 06:07+0000\n"
-"PO-Revision-Date: 2013-11-19 11:53+0000\n"
-"Last-Translator: Tom Fifield <tom@openstack.org>\n"
-"Language-Team: Persian "
-"(http://www.transifex.com/projects/p/openstack/language/fa/)\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"PO-Revision-Date: 2014-03-28 18:51+0000\n"
+"Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
+"Language-Team: Albanian "
+"(http://www.transifex.com/projects/p/openstack/language/sq/)\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1925,163 +1925,4 @@ msgstr ""
 #, python-format
 msgid "dropping sample with no predecessor: %s"
 msgstr ""
-
-#~ msgid ""
-#~ msgstr ""
-
-#~ msgid "Saving event \"%s\""
-#~ msgstr ""
-
-#~ msgid "%(missing_states)d alarms in %(alarm_ids)s are in unknown state"
-#~ msgstr ""
-
-#~ msgid "Value %(value)s is invalid (should be greater or equal to %(min)s)"
-#~ msgstr ""
-
-#~ msgid "Value %(value)s is invalid (should be lower or equal to %(max)s)"
-#~ msgstr ""
-
-#~ msgid "Alarm %s doesn't exist"
-#~ msgstr ""
-
-#~ msgid "Alarm with that name exists"
-#~ msgstr ""
-
-#~ msgid "Attempting to grab file lock \"%(lock)s\""
-#~ msgstr ""
-
-#~ msgid "Got file lock \"%(lock)s\" at %(path)s"
-#~ msgstr ""
-
-#~ msgid "Released file lock \"%(lock)s\" at %(path)s"
-#~ msgstr ""
-
-#~ msgid "Got unknown keyword args to utils.execute: %r"
-#~ msgstr ""
-
-#~ msgid "Running cmd (subprocess): %s"
-#~ msgstr ""
-
-#~ msgid "Result was %s"
-#~ msgstr ""
-
-#~ msgid "%r failed. Retrying."
-#~ msgstr ""
-
-#~ msgid "Running cmd (SSH): %s"
-#~ msgstr ""
-
-#~ msgid "Environment not supported over SSH"
-#~ msgstr ""
-
-#~ msgid "process_input not supported over SSH"
-#~ msgstr ""
-
-#~ msgid "Upgrade DB using Essex release first."
-#~ msgstr ""
-
-#~ msgid "Got mysql server has gone away: %s"
-#~ msgstr ""
-
-#~ msgid "Could not bind to %(host)s:%(port)s after trying for 30 seconds"
-#~ msgstr ""
-
-#~ msgid "Unsupported Content-Type"
-#~ msgstr ""
-
-#~ msgid "Malformed request body"
-#~ msgstr ""
-
-#~ msgid "Empty body provided in request"
-#~ msgstr ""
-
-#~ msgid "Unrecognized Content-Type provided in request"
-#~ msgstr ""
-
-#~ msgid "No Content-Type provided in request"
-#~ msgstr ""
-
-#~ msgid "Unable to deserialize body as provided Content-Type"
-#~ msgstr ""
-
-#~ msgid "cannot understand JSON"
-#~ msgstr ""
-
-#~ msgid "cannot understand XML"
-#~ msgstr ""
-
-#~ msgid "Connecting to DB2 on %s"
-#~ msgstr ""
-
-#~ msgid "Connecting to MongoDB on %s"
-#~ msgstr ""
-
-#~ msgid "EventTypes not implemented."
-#~ msgstr ""
-
-#~ msgid "Flush pipeline %s"
-#~ msgstr ""
-
-#~ msgid "Not Authorized to access project %s"
-#~ msgstr ""
-
-#~ msgid "either threshold_rule or combination_rule must be set"
-#~ msgstr ""
-
-#~ msgid "Unable to retrieve instances: %s"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Publishing policy set to %s,"
-#~ "                      override backend retry "
-#~ "config to 1"
-#~ msgstr ""
-
-#~ msgid "Projects not implemented"
-#~ msgstr ""
-
-#~ msgid "Clearing samples not implemented"
-#~ msgstr ""
-
-#~ msgid "Users not implemented"
-#~ msgstr ""
-
-#~ msgid "Resources not implemented"
-#~ msgstr ""
-
-#~ msgid "Meters not implemented"
-#~ msgstr ""
-
-#~ msgid "Samples not implemented"
-#~ msgstr ""
-
-#~ msgid "Statistics not implemented"
-#~ msgstr ""
-
-#~ msgid "Alarms not implemented"
-#~ msgstr ""
-
-#~ msgid "Alarm history not implemented"
-#~ msgstr ""
-
-#~ msgid "Events not implemented."
-#~ msgstr ""
-
-#~ msgid "Complex query for samples             is not implemented."
-#~ msgstr ""
-
-#~ msgid "Complex query for alarms             is not implemented."
-#~ msgstr ""
-
-#~ msgid "Complex query for alarms             history is not implemented."
-#~ msgstr ""
-
-#~ msgid "Query on %(key)s is of %(value)s type and is not supported"
-#~ msgstr ""
-
-#~ msgid "Missing required meter specifier"
-#~ msgstr ""
-
-#~ msgid "Unable to group by these fields"
-#~ msgstr ""
 
