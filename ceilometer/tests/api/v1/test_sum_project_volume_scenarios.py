@@ -20,15 +20,12 @@
 """
 
 import datetime
-import testscenarios
 
 from ceilometer.publisher import utils
 from ceilometer import sample
 
 from ceilometer.tests import api as tests_api
 from ceilometer.tests import db as tests_db
-
-load_tests = testscenarios.load_tests_apply_scenarios
 
 
 class TestSumProjectVolume(tests_api.TestBase,

@@ -20,8 +20,6 @@
 import datetime
 import json
 
-import testscenarios
-
 from ceilometer.api import acl
 from ceilometer.api.controllers import v2 as v2_api
 from ceilometer.openstack.common import timeutils
@@ -29,9 +27,6 @@ from ceilometer.publisher import utils
 from ceilometer import sample
 from ceilometer.tests.api.v2 import FunctionalTest
 from ceilometer.tests import db as tests_db
-
-
-load_tests = testscenarios.load_tests_apply_scenarios
 
 VALID_TOKEN = '4562138218392831'
 VALID_TOKEN2 = '4562138218392832'

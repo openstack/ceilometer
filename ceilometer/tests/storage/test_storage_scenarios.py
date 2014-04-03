@@ -22,8 +22,6 @@
 
 import datetime
 
-import testscenarios
-
 from ceilometer.openstack.common import timeutils
 from ceilometer.publisher import utils
 from ceilometer import sample
@@ -31,8 +29,6 @@ from ceilometer import storage
 from ceilometer.storage import base
 from ceilometer.storage import models
 from ceilometer.tests import db as tests_db
-
-load_tests = testscenarios.load_tests_apply_scenarios
 
 
 class DBTestBase(tests_db.TestBase):

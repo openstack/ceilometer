@@ -22,14 +22,12 @@ import collections
 from keystoneclient import exceptions
 import mock
 from swiftclient import client as swift_client
-import testscenarios
+import testscenarios.testcase
 
 from ceilometer.central import manager
 from ceilometer.objectstore import swift
 from ceilometer.openstack.common.fixture.mockpatch import PatchObject
 from ceilometer.openstack.common import test
-
-load_tests = testscenarios.load_tests_apply_scenarios
 
 HEAD_ACCOUNTS = [('tenant-000', {'x-account-object-count': 12,
                                  'x-account-bytes-used': 321321321,
@@ -64,7 +62,8 @@ class TestManager(manager.AgentManager):
         self.keystone = mock.MagicMock()
 
 
-class TestSwiftPollster(test.BaseTestCase):
+class TestSwiftPollster(testscenarios.testcase.WithScenarios,
+                        test.BaseTestCase):
 
     # Define scenarios to run all of the tests against all of the
     # pollsters.

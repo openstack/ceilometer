@@ -24,6 +24,7 @@ import uuid
 import warnings
 
 import six
+import testscenarios.testcase
 
 from ceilometer.openstack.common.fixture import config
 import ceilometer.openstack.common.fixture.mockpatch as oslo_mock
@@ -31,7 +32,7 @@ from ceilometer import storage
 from ceilometer.tests import base as test_base
 
 
-class TestBase(test_base.BaseTestCase):
+class TestBase(testscenarios.testcase.WithScenarios, test_base.BaseTestCase):
     def setUp(self):
         super(TestBase, self).setUp()
 

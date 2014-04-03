@@ -23,15 +23,12 @@ import base64
 import datetime
 import json as jsonutils
 import logging
-import testscenarios
 import webtest.app
 
 from ceilometer.publisher import utils
 from ceilometer import sample
 from ceilometer.tests.api.v2 import FunctionalTest
 from ceilometer.tests import db as tests_db
-
-load_tests = testscenarios.load_tests_apply_scenarios
 
 LOG = logging.getLogger(__name__)
 

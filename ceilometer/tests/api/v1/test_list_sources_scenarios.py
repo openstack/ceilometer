@@ -17,12 +17,8 @@
 # under the License.
 """Test listing users.
 """
-import testscenarios
-
 from ceilometer.tests import api as tests_api
 from ceilometer.tests import db as tests_db
-
-load_tests = testscenarios.load_tests_apply_scenarios
 
 
 class TestListSource(tests_api.TestBase,
