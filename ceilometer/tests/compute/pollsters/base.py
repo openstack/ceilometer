@@ -20,10 +20,10 @@
 
 import mock
 
-from ceilometer.openstack.common import test
+import ceilometer.tests.base as base
 
 
-class TestPollsterBase(test.BaseTestCase):
+class TestPollsterBase(base.BaseTestCase):
 
     def setUp(self):
         super(TestPollsterBase, self).setUp()

@@ -67,8 +67,8 @@ class TestDispatcherDB(test.BaseTestCase):
 
         self.dispatcher.record_metering_data(msg)
 
-        assert not self.dispatcher.storage_conn.called, \
-            'Should not have called the storage connection'
+        if self.dispatcher.storage_conn.called:
+            self.fail('Should not have called the storage connection')
 
     def test_timestamp_conversion(self):
         msg = {'counter_name': 'test',

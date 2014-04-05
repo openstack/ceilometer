@@ -41,6 +41,20 @@ class BaseTestCase(test.BaseTestCase):
             0.0,
             places=5)
 
+    def assertIsEmpty(self, obj):
+        try:
+            if len(obj) != 0:
+                self.fail("%s is not empty" % type(obj))
+        except (TypeError, AttributeError):
+            self.fail("%s doesn't have length" % type(obj))
+
+    def assertIsNotEmpty(self, obj):
+        try:
+            if len(obj) == 0:
+                self.fail("%s is empty" % type(obj))
+        except (TypeError, AttributeError):
+            self.fail("%s doesn't have length" % type(obj))
+
     @staticmethod
     def path_get(project_file=None):
         root = os.path.abspath(os.path.join(os.path.dirname(__file__),

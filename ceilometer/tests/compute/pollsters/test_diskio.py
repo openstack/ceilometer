@@ -46,7 +46,7 @@ class TestDiskPollsters(base.TestPollsterBase):
         mgr = manager.AgentManager()
         cache = {}
         samples = list(pollster.get_samples(mgr, cache, [self.instance]))
-        assert samples
+        self.assertIsNotEmpty(samples)
         self.assertIn(pollster.CACHE_KEY_DISK, cache)
         self.assertIn(self.instance.name, cache[pollster.CACHE_KEY_DISK])
 
@@ -96,7 +96,7 @@ class TestDiskRatePollsters(base.TestPollsterBase):
         mgr = manager.AgentManager()
         cache = {}
         samples = list(pollster.get_samples(mgr, cache, [self.instance]))
-        assert samples
+        self.assertIsNotEmpty(samples)
         self.assertIsNotNone(samples)
         self.assertIn(pollster.CACHE_KEY_DISK_RATE, cache)
         self.assertIn(self.instance.id, cache[pollster.CACHE_KEY_DISK_RATE])
