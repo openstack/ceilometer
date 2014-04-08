@@ -54,6 +54,20 @@ def recursive_keypairs(d, separator=':'):
             yield name, value
 
 
+def restore_nesting(d, separator=':'):
+    """Unwinds a flattened dict to restore nesting.
+    """
+    d = copy.copy(d) if any([separator in k for k in d.keys()]) else d
+    for k, v in d.items():
+        if separator in k:
+            top, rem = k.split(separator, 1)
+            nest = d[top] if isinstance(d.get(top), dict) else {}
+            nest[rem] = v
+            d[top] = restore_nesting(nest, separator)
+            del d[k]
+    return d
+
+
 def dt_to_decimal(utc):
     """Datetime to Decimal.
 
