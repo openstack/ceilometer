@@ -64,6 +64,36 @@ class TestPostSamples(FunctionalTest,
         self.assertEqual(s1, data.json)
         self.assertEqual(s1[0], self.published[0][1]['args']['data'][0])
 
+    def test_nested_metadata(self):
+        s1 = [{'counter_name': 'apples',
+               'counter_type': 'gauge',
+               'counter_unit': 'instance',
+               'counter_volume': 1,
+               'resource_id': 'bd9431c1-8d69-4ad3-803a-8d4a6b89fd36',
+               'project_id': '35b17138-b364-4e6a-a131-8f3099c5be68',
+               'user_id': 'efd87807-12d2-4b38-9c70-5f5c2ac427ff',
+               'resource_metadata': {'nest.name1': 'value1',
+                                     'name2': 'value2',
+                                     'nest.name2': 'value3'}}]
+
+        data = self.post_json('/meters/apples/', s1)
+
+        # timestamp not given so it is generated.
+        s1[0]['timestamp'] = data.json[0]['timestamp']
+        # Ignore message id that is randomly generated
+        s1[0]['message_id'] = data.json[0]['message_id']
+        # source is generated if not provided.
+        s1[0]['source'] = '%s:openstack' % s1[0]['project_id']
+
+        unwound = copy.copy(s1[0])
+        unwound['resource_metadata'] = {'nest': {'name1': 'value1',
+                                                 'name2': 'value3'},
+                                        'name2': 'value2'}
+        # only the published sample should be unwound, not the representation
+        # in the API response
+        self.assertEqual(s1[0], data.json[0])
+        self.assertEqual(unwound, self.published[0][1]['args']['data'][0])
+
     def test_invalid_counter_type(self):
         s1 = [{'counter_name': 'my_counter_name',
                'counter_type': 'INVALID_TYPE',
