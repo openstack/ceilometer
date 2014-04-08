@@ -78,6 +78,41 @@ class TestUtils(test.BaseTestCase):
             pairs = list(utils.recursive_keypairs(data))
             self.assertEqual(expected, pairs)
 
+    def test_restore_nesting_unested(self):
+        metadata = {'a': 'A', 'b': 'B'}
+        unwound = utils.restore_nesting(metadata)
+        self.assertIs(metadata, unwound)
+
+    def test_restore_nesting(self):
+        metadata = {'a': 'A', 'b': 'B',
+                    'nested:a': 'A',
+                    'nested:b': 'B',
+                    'nested:twice:c': 'C',
+                    'nested:twice:d': 'D',
+                    'embedded:e': 'E'}
+        unwound = utils.restore_nesting(metadata)
+        expected = {'a': 'A', 'b': 'B',
+                    'nested': {'a': 'A', 'b': 'B',
+                               'twice': {'c': 'C', 'd': 'D'}},
+                    'embedded': {'e': 'E'}}
+        self.assertEqual(expected, unwound)
+        self.assertIsNot(metadata, unwound)
+
+    def test_restore_nesting_with_separator(self):
+        metadata = {'a': 'A', 'b': 'B',
+                    'nested.a': 'A',
+                    'nested.b': 'B',
+                    'nested.twice.c': 'C',
+                    'nested.twice.d': 'D',
+                    'embedded.e': 'E'}
+        unwound = utils.restore_nesting(metadata, separator='.')
+        expected = {'a': 'A', 'b': 'B',
+                    'nested': {'a': 'A', 'b': 'B',
+                               'twice': {'c': 'C', 'd': 'D'}},
+                    'embedded': {'e': 'E'}}
+        self.assertEqual(expected, unwound)
+        self.assertIsNot(metadata, unwound)
+
     def test_decimal_to_dt_with_none_parameter(self):
         self.assertIsNone(utils.decimal_to_dt(None))
 

@@ -870,7 +870,8 @@ class MeterController(rest.RestController):
                 project_id=s.project_id,
                 resource_id=s.resource_id,
                 timestamp=s.timestamp.isoformat(),
-                resource_metadata=s.resource_metadata,
+                resource_metadata=utils.restore_nesting(s.resource_metadata,
+                                                        separator='.'),
                 source=s.source)
             published_samples.append(published_sample)
 
