@@ -163,3 +163,89 @@ class RateOfChangeTransformer(ScalingTransformer):
                      (s,))
             s = None
         return s
+
+
+class AggregatorTransformer(ScalingTransformer):
+    """Transformer that aggregate sample until a threshold or/and a
+    retention_time, and then flush them out in the wild.
+
+    Example:
+      To aggregate sample by resource_metadata and keep the
+      resource_metadata of the latest received sample;
+
+        AggregatorTransformer(retention_time=60, resource_metadata='last')
+
+      To aggregate sample by user_id and resource_metadata and keep the
+      user_id of the first received sample and drop the resource_metadata.
+
+        AggregatorTransformer(size=15, user_id='first',
+                              resource_metadata='drop')
+
+    """
+
+    def __init__(self, size=1, retention_time=None,
+                 project_id=None, user_id=None, resource_metadata="last",
+                 **kwargs):
+        super(AggregatorTransformer, self).__init__(**kwargs)
+        self.samples = {}
+        self.size = size
+        self.retention_time = retention_time
+        self.initial_timestamp = None
+        self.aggregated_samples = 0
+
+        self.key_attributes = []
+        self.merged_attribute_policy = {}
+
+        self._init_attribute('project_id', project_id)
+        self._init_attribute('user_id', user_id)
+        self._init_attribute('resource_metadata', resource_metadata,
+                             is_droppable=True, mandatory=True)
+
+    def _init_attribute(self, name, value, is_droppable=False,
+                        mandatory=False):
+        drop = ['drop'] if is_droppable else []
+        if value or mandatory:
+            if value not in ['last', 'first'] + drop:
+                LOG.warn('%s is unknown (%s), using last' % (name, value))
+                value = 'last'
+            self.merged_attribute_policy[name] = value
+        else:
+            self.key_attributes.append(name)
+
+    def _get_unique_key(self, s):
+        non_aggregated_keys = "-".join([getattr(s, field)
+                                        for field in self.key_attributes])
+        #NOTE(sileht): it assumes, a meter always have the same unit/type
+        return "%s-%s-%s" % (s.name, s.resource_id, non_aggregated_keys)
+
+    def handle_sample(self, context, sample):
+        if not self.initial_timestamp:
+            self.initial_timestamp = timeutils.parse_strtime(
+                sample.timestamp)
+
+        self.aggregated_samples += 1
+        key = self._get_unique_key(sample)
+        if key not in self.samples:
+            self.samples[key] = self._convert(sample)
+            if self.merged_attribute_policy[
+                    'resource_metadata'] == 'drop':
+                self.samples[key].resource_metadata = {}
+        else:
+            self.samples[key].volume += self._scale(sample)
+            for field in self.merged_attribute_policy:
+                if self.merged_attribute_policy[field] == 'last':
+                    setattr(self.samples[key], field,
+                            getattr(sample, field))
+
+    def flush(self, context):
+        expired = self.retention_time and \
+            timeutils.is_older_than(self.initial_timestamp,
+                                    self.retention_time)
+        full = self.aggregated_samples >= self.size
+        if full or expired:
+            x = self.samples.values()
+            self.samples = {}
+            self.aggregated_samples = 0
+            self.initial_timestamp = None
+            return x
+        return []
