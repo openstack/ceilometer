@@ -1,11 +1,11 @@
 alembic>=0.4.1
 anyjson>=0.3.3
 argparse
-croniter>=0.3.4
+croniter>=0.3.4 # MIT License
 eventlet>=0.13.0
 Flask>=0.10,<1.0
-happybase>=0.4,<=0.6
-iso8601>=0.1.8
+happybase>=0.5,!=0.7
+iso8601>=0.1.9
 jsonpath-rw>=1.2.0,<2.0
 jsonschema>=2.0.0,<3.0.0
 kombu>=2.4.8
@@ -14,22 +14,22 @@ lxml>=2.3
 msgpack-python
 netaddr>=0.7.6
 oslo.config>=1.2.0
-oslo.vmware
+oslo.vmware>=0.2                        # Apache-2.0
 pbr>=0.6,<1.0
 pecan>=0.4.5
 posix_ipc
 pysnmp>=4.2.1,<5.0.0
 python-ceilometerclient>=1.0.6
 python-glanceclient>=0.9.0
-python-keystoneclient>=0.6.0
-python-novaclient>=2.15.0
+python-keystoneclient>=0.7.0
+python-novaclient>=2.17.0
 python-swiftclient>=1.6
 pytz>=2010h
 PyYAML>=3.1.0
 requests>=1.1
 six>=1.5.2
-SQLAlchemy>=0.7.8,<=0.8.99
-sqlalchemy-migrate>=0.8.2
+SQLAlchemy>=0.7.8,<=0.9.99
+sqlalchemy-migrate>=0.8.2,!=0.8.4
 stevedore>=0.14
 WebOb>=1.2.3
 WSME>=0.6
