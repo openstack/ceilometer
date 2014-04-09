@@ -1671,6 +1671,32 @@ class TestAlarms(FunctionalTest,
         del alarm['threshold_rule']
         self._assert_in_json(alarm, history[0]['detail'])
 
+    def test_get_alarm_history_constrained_by_alarm_id_failed(self):
+        alarm = self._get_alarm('b')
+        query = dict(field='alarm_id', op='eq', value='b')
+        resp = self._get_alarm_history(alarm, query=query,
+                                       expect_errors=True, status=400)
+        self.assertEqual('Unknown argument: "alarm_id": unrecognized'
+                         ' field in query: [<Query u\'alarm_id\' eq'
+                         ' u\'b\' Unset>], valid keys: set('
+                         '[\'start_timestamp\', \'end_timestamp_op\','
+                         ' \'project\', \'user\', \'start_timestamp_op\''
+                         ', \'type\', \'end_timestamp\'])',
+                         resp.json['error_message']['faultstring'])
+
+    def test_get_alarm_history_constrained_by_not_supported_rule(self):
+        alarm = self._get_alarm('b')
+        query = dict(field='abcd', op='eq', value='abcd')
+        resp = self._get_alarm_history(alarm, query=query,
+                                       expect_errors=True, status=400)
+        self.assertEqual('Unknown argument: "abcd": unrecognized'
+                         ' field in query: [<Query u\'abcd\' eq'
+                         ' u\'abcd\' Unset>], valid keys: set('
+                         '[\'start_timestamp\', \'end_timestamp_op\','
+                         ' \'project\', \'user\', \'start_timestamp_op\''
+                         ', \'type\', \'end_timestamp\'])',
+                         resp.json['error_message']['faultstring'])
+
     def test_get_nonexistent_alarm_history(self):
         # the existence of alarm history is independent of the
         # continued existence of the alarm itself

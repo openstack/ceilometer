@@ -1966,7 +1966,8 @@ class AlarmController(rest.RestController):
         # avoid inappropriate cross-tenant visibility of alarm history
         auth_project = acl.get_limited_to_project(pecan.request.headers)
         conn = pecan.request.storage_conn
-        kwargs = _query_to_kwargs(q, conn.get_alarm_changes, ['on_behalf_of'])
+        kwargs = _query_to_kwargs(q, conn.get_alarm_changes, ['on_behalf_of',
+                                                              'alarm_id'])
         return [AlarmChange.from_db_model(ac)
                 for ac in conn.get_alarm_changes(self._id, auth_project,
                                                  **kwargs)]
