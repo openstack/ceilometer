@@ -242,11 +242,6 @@ class Connection(base.Connection):
 
     def __init__(self, conf):
         super(Connection, self).__init__(conf, AVAILABLE_CAPABILITIES)
-        url = conf.database.connection
-        if url == 'sqlite://':
-            conf.database.connection = \
-                os.environ.get('CEILOMETER_TEST_SQL_URL', url)
-
         self._engine_facade = sqlalchemy_session.EngineFacade.from_config(
             conf.database.connection, cfg.CONF)
 
