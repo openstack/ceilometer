@@ -1569,6 +1569,11 @@ class AlarmCombinationRule(_Base):
     def as_dict(self):
         return self.as_dict_from_keys(['operator', 'alarm_ids'])
 
+    @staticmethod
+    def validate(rule):
+        rule.alarm_ids = sorted(set(rule.alarm_ids), key=rule.alarm_ids.index)
+        return rule
+
     @classmethod
     def sample(cls):
         return cls(operator='or',
