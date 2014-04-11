@@ -176,8 +176,9 @@ class RelationshipTest(scenarios.DBTestBase):
     # don't want to automatically inherit all the Meter setup.
     db_manager = tests_db.SQLiteManager()
 
-    def test_clear_metering_data_meta_tables(self):
-        timeutils.utcnow.override_time = datetime.datetime(2012, 7, 2, 10, 45)
+    @patch.object(timeutils, 'utcnow')
+    def test_clear_metering_data_meta_tables(self, mock_utcnow):
+        mock_utcnow.return_value = datetime.datetime(2012, 7, 2, 10, 45)
         self.conn.clear_expired_metering_data(3 * 60)
 
         session = self.conn._engine_facade.get_session()
@@ -190,8 +191,9 @@ class RelationshipTest(scenarios.DBTestBase):
                         .group_by(sql_models.Sample.id)
                         )).count())
 
-    def test_clear_metering_data_associations(self):
-        timeutils.utcnow.override_time = datetime.datetime(2012, 7, 2, 10, 45)
+    @patch.object(timeutils, 'utcnow')
+    def test_clear_metering_data_associations(self, mock_utcnow):
+        mock_utcnow.return_value = datetime.datetime(2012, 7, 2, 10, 45)
         self.conn.clear_expired_metering_data(3 * 60)
 
         session = self.conn._engine_facade.get_session()

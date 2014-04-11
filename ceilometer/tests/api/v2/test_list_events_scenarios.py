@@ -21,6 +21,7 @@
 import datetime
 import logging
 
+import mock
 import webtest.app
 
 from ceilometer.openstack.common import timeutils
@@ -38,7 +39,10 @@ class TestListEvents(FunctionalTest,
 
     def setUp(self):
         super(TestListEvents, self).setUp()
-        timeutils.utcnow.override_time = datetime.datetime(2014, 2, 11, 16, 42)
+        patcher = mock.patch.object(timeutils, 'utcnow')
+        self.addCleanup(patcher.stop)
+        self.mock_utcnow = patcher.start()
+        self.mock_utcnow.return_value = datetime.datetime(2014, 2, 11, 16, 42)
         self.sample1 = sample.Sample(
             'instance',
             'cumulative',
@@ -85,8 +89,7 @@ class TestListEvents(FunctionalTest,
         data = self.get_json('/meters/instance')
         self.assertEqual(2, len(data))
         for s in data:
-            self.assertEqual(timeutils.utcnow.override_time.isoformat(),
-                             s['recorded_at'])
+            self.assertEqual(timeutils.utcnow().isoformat(), s['recorded_at'])
 
     def test_all_trailing_slash(self):
         data = self.get_json('/meters/instance/')

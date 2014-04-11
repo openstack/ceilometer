@@ -22,6 +22,8 @@
 
 import datetime
 
+import mock
+
 from ceilometer.openstack.common import timeutils
 from ceilometer.publisher import utils
 from ceilometer import sample
@@ -56,8 +58,10 @@ class DBTestBase(tests_db.TestBase):
 
     def setUp(self):
         super(DBTestBase, self).setUp()
-        timeutils.set_time_override(
-            datetime.datetime(2015, 7, 2, 10, 39))
+        patcher = mock.patch.object(timeutils, 'utcnow')
+        self.addCleanup(patcher.stop)
+        self.mock_utcnow = patcher.start()
+        self.mock_utcnow.return_value = datetime.datetime(2015, 7, 2, 10, 39)
         self.prepare_data()
 
     def prepare_data(self):
@@ -654,7 +658,7 @@ class RawSampleTest(DBTestBase,
         if self.CONF.database.connection.startswith('mongodb://'):
             return
 
-        timeutils.utcnow.override_time = datetime.datetime(2012, 7, 2, 10, 45)
+        self.mock_utcnow.return_value = datetime.datetime(2012, 7, 2, 10, 45)
         self.conn.clear_expired_metering_data(3 * 60)
         f = storage.SampleFilter(meter='instance')
         results = list(self.conn.get_samples(f))
@@ -672,7 +676,7 @@ class RawSampleTest(DBTestBase,
         if self.CONF.database.connection.startswith('mongodb://'):
             return
 
-        timeutils.utcnow.override_time = datetime.datetime(2010, 7, 2, 10, 45)
+        self.mock_utcnow.return_value = datetime.datetime(2010, 7, 2, 10, 45)
         self.conn.clear_expired_metering_data(3 * 60)
         f = storage.SampleFilter(meter='instance')
         results = list(self.conn.get_samples(f))
@@ -718,7 +722,7 @@ class RawSampleTest(DBTestBase,
                              )
 
         self.conn.create_alarm(alarm)
-        timeutils.utcnow.override_time = datetime.datetime(2012, 7, 2, 10, 45)
+        self.mock_utcnow.return_value = datetime.datetime(2012, 7, 2, 10, 45)
         self.conn.clear_expired_metering_data(5)
         f = storage.SampleFilter(meter='instance')
         results = list(self.conn.get_samples(f))

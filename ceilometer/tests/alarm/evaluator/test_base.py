@@ -49,7 +49,8 @@ class TestEvaluatorBaseClass(test.BaseTestCase):
                     mock.MagicMock(), mock.MagicMock())
         self.assertTrue(self.called)
 
-    def test_base_time_constraints(self):
+    @mock.patch.object(timeutils, 'utcnow')
+    def test_base_time_constraints(self, mock_utcnow):
         alarm = mock.MagicMock()
         alarm.time_constraints = [
             {'name': 'test',
@@ -64,16 +65,17 @@ class TestEvaluatorBaseClass(test.BaseTestCase):
              'timezone': ''},
         ]
         cls = evaluator.Evaluator
-        timeutils.set_time_override(datetime.datetime(2014, 1, 1, 12, 0, 0))
+        mock_utcnow.return_value = datetime.datetime(2014, 1, 1, 12, 0, 0)
         self.assertTrue(cls.within_time_constraint(alarm))
 
-        timeutils.set_time_override(datetime.datetime(2014, 1, 2, 1, 0, 0))
+        mock_utcnow.return_value = datetime.datetime(2014, 1, 2, 1, 0, 0)
         self.assertTrue(cls.within_time_constraint(alarm))
 
-        timeutils.set_time_override(datetime.datetime(2014, 1, 2, 5, 0, 0))
+        mock_utcnow.return_value = datetime.datetime(2014, 1, 2, 5, 0, 0)
         self.assertFalse(cls.within_time_constraint(alarm))
 
-    def test_base_time_constraints_complex(self):
+    @mock.patch.object(timeutils, 'utcnow')
+    def test_base_time_constraints_complex(self, mock_utcnow):
         alarm = mock.MagicMock()
         alarm.time_constraints = [
             {'name': 'test',
@@ -87,38 +89,39 @@ class TestEvaluatorBaseClass(test.BaseTestCase):
         cls = evaluator.Evaluator
 
         # test minutes inside
-        timeutils.set_time_override(datetime.datetime(2014, 1, 5, 3, 3, 0))
+        mock_utcnow.return_value = datetime.datetime(2014, 1, 5, 3, 3, 0)
         self.assertTrue(cls.within_time_constraint(alarm))
-        timeutils.set_time_override(datetime.datetime(2014, 1, 5, 3, 31, 0))
+        mock_utcnow.return_value = datetime.datetime(2014, 1, 5, 3, 31, 0)
         self.assertTrue(cls.within_time_constraint(alarm))
-        timeutils.set_time_override(datetime.datetime(2014, 1, 5, 3, 57, 0))
+        mock_utcnow.return_value = datetime.datetime(2014, 1, 5, 3, 57, 0)
         self.assertTrue(cls.within_time_constraint(alarm))
 
         # test minutes outside
-        timeutils.set_time_override(datetime.datetime(2014, 1, 5, 3, 2, 0))
+        mock_utcnow.return_value = datetime.datetime(2014, 1, 5, 3, 2, 0)
         self.assertFalse(cls.within_time_constraint(alarm))
-        timeutils.set_time_override(datetime.datetime(2014, 1, 5, 3, 4, 0))
+        mock_utcnow.return_value = datetime.datetime(2014, 1, 5, 3, 4, 0)
         self.assertFalse(cls.within_time_constraint(alarm))
-        timeutils.set_time_override(datetime.datetime(2014, 1, 5, 3, 58, 0))
+        mock_utcnow.return_value = datetime.datetime(2014, 1, 5, 3, 58, 0)
         self.assertFalse(cls.within_time_constraint(alarm))
 
         # test hours inside
-        timeutils.set_time_override(datetime.datetime(2014, 1, 5, 3, 31, 0))
+        mock_utcnow.return_value = datetime.datetime(2014, 1, 5, 3, 31, 0)
         self.assertTrue(cls.within_time_constraint(alarm))
-        timeutils.set_time_override(datetime.datetime(2014, 1, 5, 5, 31, 0))
+        mock_utcnow.return_value = datetime.datetime(2014, 1, 5, 5, 31, 0)
         self.assertTrue(cls.within_time_constraint(alarm))
-        timeutils.set_time_override(datetime.datetime(2014, 1, 5, 11, 31, 0))
+        mock_utcnow.return_value = datetime.datetime(2014, 1, 5, 11, 31, 0)
         self.assertTrue(cls.within_time_constraint(alarm))
 
         # test hours outside
-        timeutils.set_time_override(datetime.datetime(2014, 1, 5, 1, 31, 0))
+        mock_utcnow.return_value = datetime.datetime(2014, 1, 5, 1, 31, 0)
         self.assertFalse(cls.within_time_constraint(alarm))
-        timeutils.set_time_override(datetime.datetime(2014, 1, 5, 4, 31, 0))
+        mock_utcnow.return_value = datetime.datetime(2014, 1, 5, 4, 31, 0)
         self.assertFalse(cls.within_time_constraint(alarm))
-        timeutils.set_time_override(datetime.datetime(2014, 1, 5, 12, 31, 0))
+        mock_utcnow.return_value = datetime.datetime(2014, 1, 5, 12, 31, 0)
         self.assertFalse(cls.within_time_constraint(alarm))
 
-    def test_base_time_constraints_timezone(self):
+    @mock.patch.object(timeutils, 'utcnow')
+    def test_base_time_constraints_timezone(self, mock_utcnow):
         alarm = mock.MagicMock()
         alarm.time_constraints = [
             {'name': 'test',
@@ -132,8 +135,8 @@ class TestEvaluatorBaseClass(test.BaseTestCase):
                                   tzinfo=pytz.timezone('Europe/Ljubljana'))
         dt_us = datetime.datetime(2014, 1, 1, 12, 0, 0,
                                   tzinfo=pytz.timezone('US/Eastern'))
-        timeutils.set_time_override(dt_eu.astimezone(pytz.UTC))
+        mock_utcnow.return_value = dt_eu.astimezone(pytz.UTC)
         self.assertTrue(cls.within_time_constraint(alarm))
 
-        timeutils.set_time_override(dt_us.astimezone(pytz.UTC))
+        mock_utcnow.return_value = dt_us.astimezone(pytz.UTC)
         self.assertFalse(cls.within_time_constraint(alarm))

@@ -310,7 +310,8 @@ class TestEvaluate(base.TestEvaluatorBase):
 
             self.assertEqual(expected, self.notifier.notify.call_args_list)
 
-    def test_state_change_inside_time_constraint(self):
+    @mock.patch.object(timeutils, 'utcnow')
+    def test_state_change_inside_time_constraint(self, mock_utcnow):
         self._set_all_alarms('insufficient data')
         self.alarms[0].time_constraints = [
             {'name': 'test',
@@ -322,9 +323,9 @@ class TestEvaluate(base.TestEvaluatorBase):
         self.alarms[1].time_constraints = self.alarms[0].time_constraints
         dt = datetime.datetime(2014, 1, 1, 12, 0, 0,
                                tzinfo=pytz.timezone('Europe/Ljubljana'))
+        mock_utcnow.return_value = dt.astimezone(pytz.UTC)
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
-            timeutils.set_time_override(dt.astimezone(pytz.UTC))
             self.api_client.alarms.get.side_effect = [
                 self._get_alarm('ok'),
                 self._get_alarm('ok'),
@@ -348,7 +349,8 @@ class TestEvaluate(base.TestEvaluatorBase):
                         in zip(self.alarms, reasons, reason_datas)]
             self.assertEqual(expected, self.notifier.notify.call_args_list)
 
-    def test_no_state_change_outside_time_constraint(self):
+    @mock.patch.object(timeutils, 'utcnow')
+    def test_no_state_change_outside_time_constraint(self, mock_utcnow):
         self._set_all_alarms('insufficient data')
         self.alarms[0].time_constraints = [
             {'name': 'test',
@@ -360,9 +362,9 @@ class TestEvaluate(base.TestEvaluatorBase):
         self.alarms[1].time_constraints = self.alarms[0].time_constraints
         dt = datetime.datetime(2014, 1, 1, 15, 0, 0,
                                tzinfo=pytz.timezone('Europe/Ljubljana'))
+        mock_utcnow.return_value = dt.astimezone(pytz.UTC)
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
-            timeutils.set_time_override(dt.astimezone(pytz.UTC))
             self.api_client.alarms.get.side_effect = [
                 self._get_alarm('ok'),
                 self._get_alarm('ok'),
