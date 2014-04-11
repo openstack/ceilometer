@@ -1107,20 +1107,20 @@ class ComplexQuery(_Base):
 
     @classmethod
     def sample(cls):
-        return cls(filter='{\"and\": [{\"and\": [{\"=\": ' +
-                          '{\"counter_name\": \"cpu_util\"}}, ' +
-                          '{\">\": {\"counter_volume\": 0.23}}, ' +
-                          '{\"<\": {\"counter_volume\": 0.26}}]}, ' +
-                          '{\"or\": [{\"and\": [{\">\": ' +
-                          '{\"timestamp\": \"2013-12-01T18:00:00\"}}, ' +
-                          '{\"<\": ' +
-                          '{\"timestamp\": \"2013-12-01T18:15:00\"}}]}, ' +
-                          '{\"and\": [{\">\": ' +
-                          '{\"timestamp\": \"2013-12-01T18:30:00\"}}, ' +
-                          '{\"<\": ' +
-                          '{\"timestamp\": \"2013-12-01T18:45:00\"}}]}]}]}',
-                   orderby='[{\"counter_volume\": \"ASC\"}, ' +
-                           '{\"timestamp\": \"DESC\"}]',
+        return cls(filter='{"and": [{"and": [{"=": ' +
+                          '{"counter_name": "cpu_util"}}, ' +
+                          '{">": {"counter_volume": 0.23}}, ' +
+                          '{"<": {"counter_volume": 0.26}}]}, ' +
+                          '{"or": [{"and": [{">": ' +
+                          '{"timestamp": "2013-12-01T18:00:00"}}, ' +
+                          '{"<": ' +
+                          '{"timestamp": "2013-12-01T18:15:00"}}]}, ' +
+                          '{"and": [{">": ' +
+                          '{"timestamp": "2013-12-01T18:30:00"}}, ' +
+                          '{"<": ' +
+                          '{"timestamp": "2013-12-01T18:45:00"}}]}]}]}',
+                   orderby='[{"counter_volume": "ASC"}, ' +
+                           '{"timestamp": "DESC"}]',
                    limit=42
                    )
 
