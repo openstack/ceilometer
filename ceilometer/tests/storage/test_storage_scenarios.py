@@ -174,7 +174,7 @@ class ResourceTest(DBTestBase,
             self.assertEqual(resource.metadata['display_name'], 'test-server')
             break
         else:
-            assert False, 'Never found resource-id'
+            self.fail('Never found resource-id')
 
     def test_get_resources_start_timestamp(self):
         timestamp = datetime.datetime(2012, 7, 2, 10, 42)
@@ -425,7 +425,7 @@ class MeterTest(DBTestBase,
     def test_get_meters_by_metaquery(self):
         q = {'metadata.display_name': 'test-server'}
         results = list(self.conn.get_meters(metaquery=q))
-        assert results
+        self.assertIsNotEmpty(results)
         self.assertEqual(len(results), 9)
 
     def test_get_meters_by_empty_metaquery(self):
@@ -542,7 +542,7 @@ class RawSampleTest(DBTestBase,
     def test_get_samples_by_resource(self):
         f = storage.SampleFilter(user='user-id', resource='resource-id')
         results = list(self.conn.get_samples(f))
-        assert results
+        self.assertIsNotEmpty(results)
         meter = results[1]
         d = meter.as_dict()
         self.assertEqual(d['recorded_at'], timeutils.utcnow())
@@ -640,12 +640,12 @@ class RawSampleTest(DBTestBase,
     def test_get_samples_by_name(self):
         f = storage.SampleFilter(user='user-id', meter='no-such-meter')
         results = list(self.conn.get_samples(f))
-        assert not results
+        self.assertIsEmpty(results)
 
     def test_get_samples_by_name2(self):
         f = storage.SampleFilter(user='user-id', meter='instance')
         results = list(self.conn.get_samples(f))
-        assert results
+        self.assertIsNotEmpty(results)
 
     def test_get_samples_by_source(self):
         f = storage.SampleFilter(source='test-1')

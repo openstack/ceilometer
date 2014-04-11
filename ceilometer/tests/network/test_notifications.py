@@ -19,7 +19,7 @@
 """
 
 from ceilometer.network import notifications
-from ceilometer.openstack.common import test
+from ceilometer.tests import base as test
 
 NOTIFICATION_NETWORK_CREATE = {
     u'_context_roles': [u'anotherrole',
@@ -307,17 +307,17 @@ class TestEventTypes(test.BaseTestCase):
     def test_network(self):
         v = notifications.Network()
         events = v.event_types
-        assert events
+        self.assertIsNotEmpty(events)
 
     def test_subnet(self):
         v = notifications.Subnet()
         events = v.event_types
-        assert events
+        self.assertIsNotEmpty(events)
 
     def test_port(self):
         v = notifications.Port()
         events = v.event_types
-        assert events
+        self.assertIsNotEmpty(events)
 
     def test_router(self):
         self.assertTrue(notifications.Router().event_types)

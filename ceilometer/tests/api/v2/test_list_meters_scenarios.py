@@ -527,7 +527,7 @@ class TestListMeters(FunctionalTest,
                                  'value': 'test_source_doesnt_exist',
                                  }],
                              )
-        assert not data
+        self.assertIsEmpty(data)
 
     def test_with_user(self):
         data = self.get_json('/meters',

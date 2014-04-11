@@ -54,8 +54,8 @@ class TestComputeDurationByResource(FunctionalTest,
 
     def _patch_get_interval(self, start, end):
         def get_interval(event_filter, period, groupby, aggregate):
-            assert event_filter.start
-            assert event_filter.end
+            self.assertIsNotNone(event_filter.start)
+            self.assertIsNotNone(event_filter.end)
             if (event_filter.start > end or event_filter.end < start):
                 return []
             duration_start = max(event_filter.start, start)
