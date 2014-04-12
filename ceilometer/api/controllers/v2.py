@@ -1925,6 +1925,13 @@ class AlarmController(rest.RestController):
                     _("Alarm with name=%s exists") % data.name,
                     status_code=409)
 
+        # should check if there is any circle in the dependency, but for
+        # efficiency reason, here only check alarm cannot depend on itself
+        if data.type == 'combination':
+            if self._id in data.combination_rule.alarm_ids:
+                raise ClientSideError(_('Cannot specify alarm %s itself in '
+                                        'combination rule') % self._id)
+
         old_alarm = Alarm.from_db_model(alarm_in).as_dict(storage.models.Alarm)
         updated_alarm = data.as_dict(storage.models.Alarm)
         try:
