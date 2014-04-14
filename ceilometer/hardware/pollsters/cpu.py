@@ -30,37 +30,37 @@ class _Base(plugin.HardwarePollster):
     INSPECT_METHOD = 'inspect_cpu'
 
 
-class CPUUtil1MinPollster(_Base):
+class CPULoad1MinPollster(_Base):
 
     @staticmethod
     def generate_one_sample(host, c_data):
         return util.make_sample_from_host(host,
-                                          name='cpu.util.1min',
+                                          name='cpu.load.1min',
                                           type=sample.TYPE_GAUGE,
-                                          unit='%',
+                                          unit='process',
                                           volume=c_data.cpu_1_min,
                                           )
 
 
-class CPUUtil5MinPollster(_Base):
+class CPULoad5MinPollster(_Base):
 
     @staticmethod
     def generate_one_sample(host, c_data):
         return util.make_sample_from_host(host,
-                                          name='cpu.util.5min',
+                                          name='cpu.load.5min',
                                           type=sample.TYPE_GAUGE,
-                                          unit='%',
+                                          unit='process',
                                           volume=c_data.cpu_5_min,
                                           )
 
 
-class CPUUtil15MinPollster(_Base):
+class CPULoad15MinPollster(_Base):
 
     @staticmethod
     def generate_one_sample(host, c_data):
         return util.make_sample_from_host(host,
-                                          name='cpu.util.15min',
+                                          name='cpu.load.15min',
                                           type=sample.TYPE_GAUGE,
-                                          unit='%',
+                                          unit='process',
                                           volume=c_data.cpu_15_min,
                                           )
