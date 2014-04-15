@@ -65,7 +65,7 @@ class TestPollsterBase(test_base.BaseTestCase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def _check_get_samples(self, factory, name,
-                           expected_value, expected_type):
+                           expected_value, expected_type, expected_unit=None):
         mgr = manager.AgentManager()
         pollster = factory()
         cache = {}
@@ -80,3 +80,5 @@ class TestPollsterBase(test_base.BaseTestCase):
         match = [s for s in samples if s.name == name]
         self.assertEqual(expected_value, match[0].volume)
         self.assertEqual(expected_type, match[0].type)
+        if expected_unit:
+            self.assertEqual(expected_unit, match[0].unit)
