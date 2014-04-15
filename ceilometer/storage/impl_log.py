@@ -29,10 +29,10 @@ class LogStorage(base.StorageEngine):
     """Log the data
     """
 
-    def get_connection(self, conf):
-        """Return a Connection instance based on the configuration settings.
+    def get_connection(self, url):
+        """Return a Connection instance based on the url.
         """
-        return Connection(conf)
+        return Connection(url)
 
 
 class Connection(base.Connection):

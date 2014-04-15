@@ -18,8 +18,6 @@
 """Tests for ceilometer/storage/
 """
 
-import mock
-
 from ceilometer.openstack.common import test
 from ceilometer import storage
 from ceilometer.storage import impl_log
@@ -28,15 +26,11 @@ from ceilometer.storage import impl_log
 class EngineTest(test.BaseTestCase):
 
     def test_get_connection(self):
-        conf = mock.Mock()
-        conf.database.connection = 'log://localhost'
-        engine = storage.get_connection(conf)
+        engine = storage.get_connection('log://localhost')
         self.assertIsInstance(engine, impl_log.Connection)
 
     def test_get_connection_no_such_engine(self):
-        conf = mock.Mock()
-        conf.database.connection = 'no-such-engine://localhost'
         try:
-            storage.get_connection(conf)
+            storage.get_connection('no-such-engine://localhost')
         except RuntimeError as err:
             self.assertIn('no-such-engine', unicode(err))

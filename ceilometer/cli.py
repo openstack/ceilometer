@@ -108,14 +108,14 @@ def collector_service():
 
 def storage_dbsync():
     service.prepare_service()
-    storage.get_connection(cfg.CONF).upgrade()
+    storage.get_connection_from_config(cfg.CONF).upgrade()
 
 
 def storage_expirer():
     service.prepare_service()
     if cfg.CONF.database.time_to_live > 0:
         LOG.debug(_("Clearing expired metering data"))
-        storage_conn = storage.get_connection(cfg.CONF)
+        storage_conn = storage.get_connection_from_config(cfg.CONF)
         storage_conn.clear_expired_metering_data(
             cfg.CONF.database.time_to_live)
     else:
