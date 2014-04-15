@@ -80,11 +80,8 @@ def get_connection(url):
     LOG.debug(_('looking for %(name)r driver in %(namespace)r') % (
               {'name': engine_name,
                'namespace': STORAGE_ENGINE_NAMESPACE}))
-    mgr = driver.DriverManager(STORAGE_ENGINE_NAMESPACE,
-                               engine_name,
-                               invoke_on_load=True)
-
-    return mgr.driver.get_connection(url)
+    mgr = driver.DriverManager(STORAGE_ENGINE_NAMESPACE, engine_name)
+    return mgr.driver(url)
 
 
 class SampleFilter(object):

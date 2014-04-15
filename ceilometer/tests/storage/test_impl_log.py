@@ -18,17 +18,13 @@
 """Tests for ceilometer/storage/impl_log.py
 """
 
-import mock
-
 from ceilometer.openstack.common import test
 from ceilometer.storage import impl_log
 
 
 class ConnectionTest(test.BaseTestCase):
     def test_get_connection(self):
-        conf = mock.Mock()
-        log_stg = impl_log.LogStorage()
-        conn = log_stg.get_connection(conf)
+        conn = impl_log.Connection(None)
         conn.record_metering_data({'counter_name': 'test',
                                    'resource_id': __name__,
                                    'counter_volume': 1,

@@ -25,18 +25,8 @@ from ceilometer.storage import base
 LOG = log.getLogger(__name__)
 
 
-class LogStorage(base.StorageEngine):
-    """Log the data
-    """
-
-    def get_connection(self, url):
-        """Return a Connection instance based on the url.
-        """
-        return Connection(url)
-
-
 class Connection(base.Connection):
-    """Base class for storage system connections.
+    """Log the data.
     """
 
     def upgrade(self):
