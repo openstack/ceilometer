@@ -27,16 +27,16 @@ from ceilometer.storage import impl_log
 
 class EngineTest(test.BaseTestCase):
 
-    def test_get_engine(self):
+    def test_get_connection(self):
         conf = mock.Mock()
         conf.database.connection = 'log://localhost'
-        engine = storage.get_engine(conf)
-        self.assertIsInstance(engine, impl_log.LogStorage)
+        engine = storage.get_connection(conf)
+        self.assertIsInstance(engine, impl_log.Connection)
 
-    def test_get_engine_no_such_engine(self):
+    def test_get_connection_no_such_engine(self):
         conf = mock.Mock()
         conf.database.connection = 'no-such-engine://localhost'
         try:
-            storage.get_engine(conf)
+            storage.get_connection(conf)
         except RuntimeError as err:
             self.assertIn('no-such-engine', unicode(err))
