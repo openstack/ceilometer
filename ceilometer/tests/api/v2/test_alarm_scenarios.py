@@ -1178,6 +1178,22 @@ class TestAlarms(FunctionalTest,
         alarms = list(self.conn.get_alarms(enabled=False))
         self.assertEqual(0, len(alarms))
 
+    def test_post_alarm_combination_duplicate_alarm_ids(self):
+        """Test combination alarm doesn't allow duplicate alarm ids."""
+        json_body = {
+            'name': 'dup_alarm_id',
+            'type': 'combination',
+            'combination_rule': {
+                'alarm_ids': ['a', 'a', 'd', 'a', 'c', 'c', 'b'],
+            }
+        }
+        self.post_json('/alarms', params=json_body, status=201,
+                       headers=self.auth_headers)
+        alarms = list(self.conn.get_alarms(name='dup_alarm_id'))
+        self.assertEqual(1, len(alarms))
+        self.assertEqual(['a', 'd', 'c', 'b'],
+                         alarms[0].rule.get('alarm_ids'))
+
     def test_put_alarm(self):
         json = {
             'enabled': False,
@@ -1365,6 +1381,30 @@ class TestAlarms(FunctionalTest,
 
         msg = 'Cannot specify alarm %s itself in combination rule' % alarm_id
         self.assertEqual(msg, resp.json['error_message']['faultstring'])
+
+    def test_put_combination_alarm_with_duplicate_ids(self):
+        """Test combination alarm doesn't allow duplicate alarm ids."""
+        alarms = self.get_json('/alarms',
+                               q=[{'field': 'name',
+                                   'value': 'name4',
+                                   }])
+        self.assertEqual(1, len(alarms))
+        alarm_id = alarms[0]['alarm_id']
+
+        json_body = {
+            'name': 'name4',
+            'type': 'combination',
+            'combination_rule': {
+                'alarm_ids': ['c', 'a', 'b', 'a', 'c', 'b'],
+            }
+        }
+        self.put_json('/alarms/%s' % alarm_id,
+                      params=json_body, status=200,
+                      headers=self.auth_headers)
+
+        alarms = list(self.conn.get_alarms(alarm_id=alarm_id))
+        self.assertEqual(1, len(alarms))
+        self.assertEqual(['c', 'a', 'b'], alarms[0].rule.get('alarm_ids'))
 
     def test_delete_alarm(self):
         data = self.get_json('/alarms')
