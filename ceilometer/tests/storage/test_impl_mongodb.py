@@ -26,6 +26,7 @@
 
 from ceilometer.storage import base
 from ceilometer.storage import impl_mongodb
+from ceilometer.tests import base as test_base
 from ceilometer.tests import db as tests_db
 from ceilometer.tests.storage import test_storage_scenarios
 
@@ -145,7 +146,7 @@ class AlarmTestPagination(test_storage_scenarios.AlarmTestBase,
             self.assertTrue(True)
 
 
-class CapabilitiesTest(MongoDBEngineTestBase):
+class CapabilitiesTest(test_base.BaseTestCase):
     # Check the returned capabilities list, which is specific to each DB
     # driver
 
@@ -186,5 +187,5 @@ class CapabilitiesTest(MongoDBEngineTestBase):
             'events': {'query': {'simple': False}}
         }
 
-        actual_capabilities = self.conn.get_capabilities()
+        actual_capabilities = impl_mongodb.Connection.get_capabilities()
         self.assertEqual(expected_capabilities, actual_capabilities)

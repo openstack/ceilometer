@@ -39,9 +39,6 @@ class Connection(base.Connection):
     """Base class for storage system connections.
     """
 
-    def __init__(self, conf):
-        super(Connection, self).__init__(conf, {})
-
     def upgrade(self):
         pass
 

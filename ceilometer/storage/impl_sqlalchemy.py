@@ -239,9 +239,10 @@ def make_query_from_filter(session, query, sample_filter, require_meter=True):
 
 class Connection(base.Connection):
     """SqlAlchemy connection."""
+    CAPABILITIES = utils.update_nested(base.Connection.CAPABILITIES,
+                                       AVAILABLE_CAPABILITIES)
 
     def __init__(self, conf):
-        super(Connection, self).__init__(conf, AVAILABLE_CAPABILITIES)
         self._engine_facade = sqlalchemy_session.EngineFacade.from_config(
             conf.database.connection, cfg.CONF)
 

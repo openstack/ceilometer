@@ -29,8 +29,11 @@ import repr
 from mock import patch
 
 from ceilometer.openstack.common import timeutils
+from ceilometer.storage import impl_sqlalchemy
 from ceilometer.storage import models
 from ceilometer.storage.sqlalchemy import models as sql_models
+
+from ceilometer.tests import base as test_base
 from ceilometer.tests import db as tests_db
 from ceilometer.tests.storage import test_storage_scenarios as scenarios
 
@@ -214,7 +217,7 @@ class RelationshipTest(scenarios.DBTestBase):
                     )).count())
 
 
-class CapabilitiesTest(EventTestBase):
+class CapabilitiesTest(test_base.BaseTestCase):
     # Check the returned capabilities list, which is specific to each DB
     # driver
 
@@ -255,5 +258,5 @@ class CapabilitiesTest(EventTestBase):
             'events': {'query': {'simple': True}}
         }
 
-        actual_capabilities = self.conn.get_capabilities()
+        actual_capabilities = impl_sqlalchemy.Connection.get_capabilities()
         self.assertEqual(expected_capabilities, actual_capabilities)

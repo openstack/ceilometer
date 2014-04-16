@@ -38,6 +38,7 @@ from ceilometer import storage
 from ceilometer.storage import base
 from ceilometer.storage import models
 from ceilometer.storage import pymongo_base
+from ceilometer import utils
 
 LOG = log.getLogger(__name__)
 
@@ -88,6 +89,8 @@ class Connection(pymongo_base.Connection):
     """DB2 connection.
     """
 
+    CAPABILITIES = utils.update_nested(pymongo_base.Connection.CAPABILITIES,
+                                       AVAILABLE_CAPABILITIES)
     CONNECTION_POOL = pymongo_base.ConnectionPool()
 
     GROUP = {'_id': '$counter_name',
@@ -112,7 +115,6 @@ class Connection(pymongo_base.Connection):
     SECONDS_IN_A_DAY = 86400
 
     def __init__(self, conf):
-        super(Connection, self).__init__(conf, AVAILABLE_CAPABILITIES)
         url = conf.database.connection
 
         # Since we are using pymongo, even though we are connecting to DB2

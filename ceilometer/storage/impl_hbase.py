@@ -110,6 +110,8 @@ AVAILABLE_CAPABILITIES = {
 class Connection(base.Connection):
     """HBase connection.
     """
+    CAPABILITIES = utils.update_nested(base.Connection.CAPABILITIES,
+                                       AVAILABLE_CAPABILITIES)
 
     _memory_instance = None
 
@@ -122,7 +124,6 @@ class Connection(base.Connection):
 
     def __init__(self, conf):
         """Hbase Connection Initialization."""
-        super(Connection, self).__init__(conf, AVAILABLE_CAPABILITIES)
         opts = self._parse_connection_url(conf.database.connection)
 
         if opts['host'] == '__test__':

@@ -42,6 +42,7 @@ from ceilometer import storage
 from ceilometer.storage import base
 from ceilometer.storage import models
 from ceilometer.storage import pymongo_base
+from ceilometer import utils
 
 cfg.CONF.import_opt('time_to_live', 'ceilometer.storage',
                     group="database")
@@ -101,6 +102,8 @@ AVAILABLE_CAPABILITIES = {
 class Connection(pymongo_base.Connection):
     """MongoDB connection.
     """
+    CAPABILITIES = utils.update_nested(pymongo_base.Connection.CAPABILITIES,
+                                       AVAILABLE_CAPABILITIES)
 
     CONNECTION_POOL = pymongo_base.ConnectionPool()
 
@@ -407,7 +410,6 @@ class Connection(pymongo_base.Connection):
                                     hour=23, minute=59, second=59)
 
     def __init__(self, conf):
-        super(Connection, self).__init__(conf, AVAILABLE_CAPABILITIES)
         url = conf.database.connection
 
         # NOTE(jd) Use our own connection pooling on top of the Pymongo one.
