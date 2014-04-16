@@ -67,7 +67,7 @@ class StorageBadAggregate(Exception):
     code = 400
 
 
-def get_engine(conf):
+def _get_engine(conf):
     """Load the configured engine and return an instance."""
     if conf.database_connection:
         conf.set_override('connection', conf.database_connection,
@@ -84,7 +84,7 @@ def get_engine(conf):
 
 def get_connection(conf):
     """Return an open connection to the database."""
-    return get_engine(conf).get_connection(conf)
+    return _get_engine(conf).get_connection(conf)
 
 
 class SampleFilter(object):
