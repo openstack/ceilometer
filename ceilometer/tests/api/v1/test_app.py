@@ -34,17 +34,17 @@ class TestApp(test.BaseTestCase):
         self.CONF = self.useFixture(config.Config()).conf
 
     def test_keystone_middleware_conf(self):
-        self.CONF.set_override("auth_protocol", "foottp",
+        self.CONF.set_override("auth_protocol", "file",
                                group=acl.OPT_GROUP_NAME)
         self.CONF.set_override("auth_version", "v2.0",
                                group=acl.OPT_GROUP_NAME)
         self.CONF.set_override("auth_uri", None,
                                group=acl.OPT_GROUP_NAME)
         api_app = app.make_app(self.CONF, attach_storage=False)
-        self.assertTrue(api_app.wsgi_app.auth_uri.startswith('foottp'))
+        self.assertTrue(api_app.wsgi_app.auth_uri.startswith('file'))
 
     def test_keystone_middleware_parse_conffile(self):
-        content = "[{0}]\nauth_protocol = barttp"\
+        content = "[{0}]\nauth_protocol = file"\
                   "\nauth_version = v2.0".format(acl.OPT_GROUP_NAME)
         tmpfile = fileutils.write_to_tempfile(content=content,
                                               prefix='ceilometer',
@@ -52,5 +52,5 @@ class TestApp(test.BaseTestCase):
         service.prepare_service(['ceilometer-api',
                                  '--config-file=%s' % tmpfile])
         api_app = app.make_app(self.CONF, attach_storage=False)
-        self.assertTrue(api_app.wsgi_app.auth_uri.startswith('barttp'))
+        self.assertTrue(api_app.wsgi_app.auth_uri.startswith('file'))
         os.unlink(tmpfile)
