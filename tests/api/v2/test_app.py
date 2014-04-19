@@ -41,7 +41,7 @@ class TestApp(base.TestCase):
         cfg.CONF.reset()
 
     def test_keystone_middleware_conf(self):
-        cfg.CONF.set_override("auth_protocol", "foottp",
+        cfg.CONF.set_override("auth_protocol", "file",
                               group=acl.OPT_GROUP_NAME)
         cfg.CONF.set_override("auth_version", "v2.0", group=acl.OPT_GROUP_NAME)
         cfg.CONF.set_override("pipeline_cfg_file",
@@ -50,7 +50,7 @@ class TestApp(base.TestCase):
         cfg.CONF.set_override("auth_uri", None, group=acl.OPT_GROUP_NAME)
 
         api_app = app.setup_app()
-        self.assertTrue(api_app.auth_uri.startswith('foottp'))
+        self.assertTrue(api_app.auth_uri.startswith('file'))
 
     def test_keystone_middleware_parse_conffile(self):
         tmpfile = self.temp_config_file_path()
@@ -59,13 +59,13 @@ class TestApp(base.TestCase):
             f.write("pipeline_cfg_file = %s\n" %
                     self.path_get("etc/ceilometer/pipeline.yaml"))
             f.write("[%s]\n" % acl.OPT_GROUP_NAME)
-            f.write("auth_protocol = barttp\n")
+            f.write("auth_protocol = file\n")
             f.write("auth_version = v2.0\n")
         service.prepare_service(['ceilometer-api',
                                  '--config-file=%s' % tmpfile])
         cfg.CONF.set_override('connection', "log://", group="database")
         api_app = app.setup_app()
-        self.assertTrue(api_app.auth_uri.startswith('barttp'))
+        self.assertTrue(api_app.auth_uri.startswith('file'))
         os.unlink(tmpfile)
 
 
