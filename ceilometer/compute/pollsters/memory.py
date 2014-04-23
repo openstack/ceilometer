@@ -50,5 +50,6 @@ class MemoryUsagePollster(plugin.ComputePollster):
                 LOG.debug(_('Obtaining Memory Usage is not implemented for %s'
                             ), manager.inspector.__class__.__name__)
             except Exception as err:
-                LOG.error(_('Could not get Memory Usage for %(id)s: %(e)s'), (
-                          {'id': instance.id, 'e': err}))
+                LOG.exception(_('Could not get Memory Usage for '
+                                '%(id)s: %(e)s'), {'id': instance.id,
+                                                   'e': err})

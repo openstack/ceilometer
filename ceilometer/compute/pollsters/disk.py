@@ -98,13 +98,12 @@ class _Base(plugin.ComputePollster):
             except NotImplementedError:
                 # Selected inspector does not implement this pollster.
                 LOG.debug(_('%(inspector)s does not provide data for '
-                            ' %(pollster)s'), ({
-                          'inspector': manager.inspector.__class__.__name__,
-                          'pollster': self.__class__.__name__}))
+                            ' %(pollster)s'),
+                          {'inspector': manager.inspector.__class__.__name__,
+                           'pollster': self.__class__.__name__})
             except Exception as err:
-                LOG.warning(_('Ignoring instance %(name)s: %(error)s') % (
-                            {'name': instance_name, 'error': err}))
-                LOG.exception(err)
+                LOG.exception(_('Ignoring instance %(name)s: %(error)s'),
+                              {'name': instance_name, 'error': err})
 
 
 class ReadRequestsPollster(_Base):
@@ -206,13 +205,13 @@ class _DiskRatesPollsterBase(plugin.ComputePollster):
             except NotImplementedError:
                 # Selected inspector does not implement this pollster.
                 LOG.debug(_('%(inspector)s does not provide data for '
-                            ' %(pollster)s'), ({
-                          'inspector': manager.inspector.__class__.__name__,
-                          'pollster': self.__class__.__name__}))
+                            ' %(pollster)s'),
+                          {'inspector': manager.inspector.__class__.__name__,
+                           'pollster': self.__class__.__name__})
             except Exception as err:
                 instance_name = util.instance_name(instance)
-                LOG.error(_('Ignoring instance %(name)s: %(error)s') % (
-                    {'name': instance_name, 'error': err}))
+                LOG.exception(_('Ignoring instance %(name)s: %(error)s'),
+                              {'name': instance_name, 'error': err})
 
 
 class ReadBytesRatePollster(_DiskRatesPollsterBase):
