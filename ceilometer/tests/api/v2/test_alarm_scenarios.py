@@ -1194,6 +1194,34 @@ class TestAlarms(FunctionalTest,
         self.assertEqual(['a', 'd', 'c', 'b'],
                          alarms[0].rule.get('alarm_ids'))
 
+    def _test_post_alarm_combination_rule_less_than_two_alarms(self,
+                                                               alarm_ids=[]):
+        json_body = {
+            'name': 'one_alarm_in_combination_rule',
+            'type': 'combination',
+            'combination_rule': {
+                'alarm_ids': alarm_ids
+            }
+        }
+
+        resp = self.post_json('/alarms', params=json_body,
+                              expect_errors=True, status=400,
+                              headers=self.auth_headers)
+        self.assertEqual(
+            'Alarm combination rule should contain at'
+            ' least two different alarm ids.',
+            resp.json['error_message']['faultstring'])
+
+    def test_post_alarm_combination_rule_with_no_alarm(self):
+        self._test_post_alarm_combination_rule_less_than_two_alarms()
+
+    def test_post_alarm_combination_rule_with_one_alarm(self):
+        self._test_post_alarm_combination_rule_less_than_two_alarms(['a'])
+
+    def test_post_alarm_combination_rule_with_two_same_alarms(self):
+        self._test_post_alarm_combination_rule_less_than_two_alarms(['a',
+                                                                     'a'])
+
     def test_put_alarm(self):
         json = {
             'enabled': False,
@@ -1363,7 +1391,7 @@ class TestAlarms(FunctionalTest,
             'name': 'name4',
             'type': 'combination',
             'combination_rule': {
-                'alarm_ids': ['d'],
+                'alarm_ids': ['d', 'a'],
             }
         }
 
@@ -1381,6 +1409,41 @@ class TestAlarms(FunctionalTest,
 
         msg = 'Cannot specify alarm %s itself in combination rule' % alarm_id
         self.assertEqual(msg, resp.json['error_message']['faultstring'])
+
+    def _test_put_alarm_combination_rule_less_than_two_alarms(self,
+                                                              alarm_ids=[]):
+        json_body = {
+            'name': 'name4',
+            'type': 'combination',
+            'combination_rule': {
+                'alarm_ids': alarm_ids
+            }
+        }
+
+        data = self.get_json('/alarms',
+                             q=[{'field': 'name',
+                                 'value': 'name4',
+                                 }])
+        self.assertEqual(1, len(data))
+        alarm_id = data[0]['alarm_id']
+
+        resp = self.put_json('/alarms/%s' % alarm_id, params=json_body,
+                             expect_errors=True, status=400,
+                             headers=self.auth_headers)
+        self.assertEqual(
+            'Alarm combination rule should contain at'
+            ' least two different alarm ids.',
+            resp.json['error_message']['faultstring'])
+
+    def test_put_alarm_combination_rule_with_no_alarm(self):
+        self._test_put_alarm_combination_rule_less_than_two_alarms()
+
+    def test_put_alarm_combination_rule_with_one_alarm(self):
+        self._test_put_alarm_combination_rule_less_than_two_alarms(['a'])
+
+    def test_put_alarm_combination_rule_with_two_same_alarm_itself(self):
+        self._test_put_alarm_combination_rule_less_than_two_alarms(['d',
+                                                                    'd'])
 
     def test_put_combination_alarm_with_duplicate_ids(self):
         """Test combination alarm doesn't allow duplicate alarm ids."""

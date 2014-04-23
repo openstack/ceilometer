@@ -1572,6 +1572,9 @@ class AlarmCombinationRule(_Base):
     @staticmethod
     def validate(rule):
         rule.alarm_ids = sorted(set(rule.alarm_ids), key=rule.alarm_ids.index)
+        if len(rule.alarm_ids) <= 1:
+            raise ClientSideError(_('Alarm combination rule should contain at'
+                                    ' least two different alarm ids.'))
         return rule
 
     @classmethod
