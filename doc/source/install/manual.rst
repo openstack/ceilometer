@@ -20,6 +20,102 @@
  Installing Manually
 =====================
 
+
+Storage Backend Installation
+============================
+
+This step is a prerequisite for the collector, notification agent and API
+services. You may use one of the listed database backends below to store
+Ceilometer data.
+
+.. note::
+   Please notice, MongoDB (and some other backends like DB2 and HBase)
+   require pymongo_ to be installed on the system. The required minimum
+   version of pymongo is 2.4.
+..
+
+
+MongoDB
+-------
+
+   The recommended Ceilometer storage backend is `MongoDB`. Follow the
+   instructions to install the MongoDB_ package for your operating system, then
+   start the service. The required minimum version of MongoDB is 2.4.
+
+   To use MongoDB as the storage backend, change the 'database' section in
+   ceilometer.conf as follows::
+
+    [database]
+    connection = mongodb://username:password@host:27017/ceilometer
+
+SQLalchemy-supported DBs
+------------------------
+
+   You may alternatively use `MySQL` (or any other SQLAlchemy-supported DB
+   like `PostgreSQL`).
+
+   In case of SQL-based database backends, you need to create a `ceilometer`
+   database first and then initialise it by running::
+
+    ceilometer-dbsync
+
+   To use MySQL as the storage backend, change the 'database' section in
+   ceilometer.conf as follows::
+
+    [database]
+    connection = mysql://username:password@host/ceilometer?charset=utf8
+
+HBase
+-----
+
+   HBase backend is implemented to use HBase Thrift interface, therefore it is
+   mandatory to have the HBase Thrift server installed and running. To start
+   the Thrift server, please run the following command::
+
+    ${HBASE_HOME}/bin/hbase thrift start
+
+   The implementation uses `HappyBase`_, which is a wrapper library used to
+   interact with HBase via Thrift protocol. You can verify the thrift
+   connection by running a quick test from a client::
+
+    import happybase
+
+    conn = happybase.Connection(host=$hbase-thrift-server, port=9090, table_prefix=None)
+    print conn.tables() # this returns a list of HBase tables in your HBase server
+
+   .. note::
+      HappyBase version 0.5 or greater is required. Additionally, version 0.7
+      is not currently supported.
+   ..
+
+   In case of HBase, the needed database tables (`project`, `user`, `resource`,
+   `meter`, `alarm`, `alarm_h`) should be created manually with `f` column
+   family for each one.
+
+   To use HBase as the storage backend, change the 'database' section in
+   ceilometer.conf as follows::
+
+    [database]
+    connection = hbase://hbase-thrift-host:9090
+
+DB2
+---
+
+   DB2 installation should follow fresh IBM DB2 NoSQL installation docs.
+
+   To use DB2 as the storage backend, change the 'database' section in
+   ceilometer.conf as follows::
+
+    [database]
+    connection = db2://username:password@host:27017/ceilometer
+
+
+.. _HappyBase: http://happybase.readthedocs.org/en/latest/index.html#
+.. _MongoDB: http://www.mongodb.org/
+.. _pymongo: https://pypi.python.org/pypi/pymongo/
+
+
+
 Installing the notification agent
 ======================================
 .. index::
@@ -145,23 +241,20 @@ Installing the collector
 .. index::
    double: installing; collector
 
-1. Install MongoDB.
+.. _storage_backends:
 
-   Follow the instructions to install the MongoDB_ package for your
-   operating system, then start the service.
-
-2. Clone the ceilometer git repository to the management server::
+1. Clone the ceilometer git repository to the management server::
 
    $ cd /opt/stack
    $ git clone https://git.openstack.org/openstack/ceilometer.git
 
-3. As a user with ``root`` permissions or ``sudo`` privileges, run the
+2. As a user with ``root`` permissions or ``sudo`` privileges, run the
    ceilometer installer::
 
    $ cd ceilometer
    $ sudo python setup.py install
 
-4. Copy the sample configuration files from the source tree
+3. Copy the sample configuration files from the source tree
    to their final location.
 
    ::
@@ -171,7 +264,7 @@ Installing the collector
       $ cp etc/ceilometer/*.yaml /etc/ceilometer
       $ cp etc/ceilometer/ceilometer.conf.sample /etc/ceilometer/ceilometer.conf
 
-5. Edit ``/etc/ceilometer/ceilometer.conf``
+4. Edit ``/etc/ceilometer/ceilometer.conf``
 
    1. Configure RPC
 
@@ -200,7 +293,7 @@ Installing the collector
    Refer to :doc:`/configuration` for details about any other options
    you might want to modify before starting the service.
 
-6. Start the collector.
+5. Start the collector.
 
    ::
 
@@ -212,8 +305,6 @@ Installing the collector
       stderr, so you may want to run this step using a screen session
       or other tool for maintaining a long-running program in the
       background.
-
-.. _MongoDB: http://www.mongodb.org/
 
 
 Installing the Compute Agent
@@ -544,25 +635,3 @@ one can configure the line like the following::
 
 With above configuration, no dispatcher is used by the Ceilometer collector
 service, all metering data received by Ceilometer collector will be dropped.
-
-
-Using other databases
-=========================
-.. index::
-   double: installing; database, hbase, mysql, db2
-
-Ceilometer by default uses mongodb as its backend data repository.
-A deployment can choose to use other databases, currently the supported
-databases are mongodb, hbase, mysql (or sqlalchemy-enabled databases) and
-db2. To use a database other than MongoDB, edit the database section in
-ceilometer.conf:
-
-To use db2 as the data repository, make the section look like this::
-
-   [database]
-   connection = db2://username:password@host:27017/ceilometer
-
-To use mongodb as the data repository, make the section look like this::
-
-   [database]
-   connection = mongodb://username:password@host:27017/ceilometer
