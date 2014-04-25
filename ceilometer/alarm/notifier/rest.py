@@ -54,7 +54,8 @@ class RestAlarmNotifier(notifier.AlarmNotifier):
     """Rest alarm notifier."""
 
     @staticmethod
-    def notify(action, alarm_id, previous, current, reason, reason_data):
+    def notify(action, alarm_id, previous, current, reason, reason_data,
+               headers=None):
         LOG.info(_(
             "Notifying alarm %(alarm_id)s from %(previous)s "
             "to %(current)s with action %(action)s because "
@@ -65,6 +66,8 @@ class RestAlarmNotifier(notifier.AlarmNotifier):
                 'current': current, 'reason': reason,
                 'reason_data': reason_data}
         kwargs = {'data': jsonutils.dumps(body)}
+        if headers:
+            kwargs['headers'] = headers
 
         if action.scheme == 'https':
             default_verify = int(cfg.CONF.alarm.rest_notifier_ssl_verify)
