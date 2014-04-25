@@ -48,7 +48,7 @@ import wsmeext.pecan as wsme_pecan
 from ceilometer.api import acl
 from ceilometer import messaging
 from ceilometer.openstack.common import context
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import strutils
 from ceilometer.openstack.common import timeutils

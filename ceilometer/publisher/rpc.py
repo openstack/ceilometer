@@ -28,7 +28,7 @@ import oslo.messaging
 import oslo.messaging._drivers.common
 
 from ceilometer import messaging
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer import publisher
 from ceilometer.publisher import utils

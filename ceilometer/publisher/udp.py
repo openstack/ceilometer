@@ -24,7 +24,7 @@ import socket
 import msgpack
 from oslo.config import cfg
 
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import network_utils
 from ceilometer import publisher

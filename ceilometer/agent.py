@@ -25,7 +25,7 @@ import urlparse
 from stevedore import extension
 
 from ceilometer.openstack.common import context
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import service as os_service
 from ceilometer import pipeline

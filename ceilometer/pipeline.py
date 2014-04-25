@@ -26,7 +26,7 @@ import os
 from oslo.config import cfg
 import yaml
 
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer import publisher
 from ceilometer import transformer as xformer

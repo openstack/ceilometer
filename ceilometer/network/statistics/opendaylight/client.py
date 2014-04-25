@@ -20,7 +20,7 @@ import requests
 from requests import auth
 import six
 
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 
 

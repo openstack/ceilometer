@@ -21,7 +21,7 @@
 
 from ceilometer.central import plugin
 from ceilometer import nova_client
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer import sample
