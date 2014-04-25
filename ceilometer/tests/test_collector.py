@@ -15,9 +15,9 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+import contextlib
 import socket
 
-import eventlet
 import mock
 import msgpack
 import oslo.messaging
@@ -159,32 +159,36 @@ class TestCollector(tests_base.BaseTestCase):
 
         self._verify_udp_socket(udp_socket)
 
+    @staticmethod
+    def _dummy_thread_group_add_thread(method):
+        method()
+
     @mock.patch.object(oslo.messaging.MessageHandlingServer, 'start')
     @mock.patch.object(collector.CollectorService, 'start_udp')
     def test_only_udp(self, udp_start, rpc_start):
         """Check that only UDP is started if rpc_backend is empty."""
         self.CONF.set_override('rpc_backend', '')
         udp_socket = self._make_fake_socket(self.counter)
-        with mock.patch('socket.socket', return_value=udp_socket):
+        with contextlib.nested(
+                mock.patch.object(
+                    self.srv.tg, 'add_thread',
+                    side_effect=self._dummy_thread_group_add_thread),
+                mock.patch('socket.socket', return_value=udp_socket)):
             self.srv.start()
-
-        # UDP run into its own thread, so we need to sleep to get
-        # the thread start
-        eventlet.sleep(0)
-        self.assertEqual(0, rpc_start.call_count)
-        self.assertEqual(1, udp_start.call_count)
+            self.assertEqual(0, rpc_start.call_count)
+            self.assertEqual(1, udp_start.call_count)
 
     @mock.patch.object(oslo.messaging.MessageHandlingServer, 'start')
     @mock.patch.object(collector.CollectorService, 'start_udp')
     def test_only_rpc(self, udp_start, rpc_start):
         """Check that only RPC is started if udp_address is empty."""
         self.CONF.set_override('udp_address', '', group='collector')
-        self.srv.start()
-        # UDP run into its own thread, so we need to sleep to get
-        # the thread start
-        eventlet.sleep(0)
-        self.assertEqual(1, rpc_start.call_count)
-        self.assertEqual(0, udp_start.call_count)
+        with mock.patch.object(
+                self.srv.tg, 'add_thread',
+                side_effect=self._dummy_thread_group_add_thread):
+            self.srv.start()
+            self.assertEqual(1, rpc_start.call_count)
+            self.assertEqual(0, udp_start.call_count)
 
     def test_udp_receive_valid_encoding(self):
         self.data_sent = []
