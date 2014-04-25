@@ -22,6 +22,7 @@ import contextlib
 
 import fixtures
 import mock
+from oslo.utils import units
 from oslotest import base
 
 from ceilometer.compute.virt import inspector as virt_inspector
@@ -244,6 +245,44 @@ class TestLibvirtInspection(base.BaseTestCase):
                                                                2L, 999999L))):
             disks = list(self.inspector.inspect_disks(self.instance_name))
             self.assertEqual(disks, [])
+
+    def test_inspect_memory_usage(self):
+        fake_memory_stats = {'available': 51200L, 'unused': 25600L}
+        connection = self.inspector.connection
+        with mock.patch.object(connection, 'lookupByName',
+                               return_value=self.domain):
+            with mock.patch.object(self.domain, 'info',
+                                   return_value=(0L, 0L, 51200L,
+                                                 2L, 999999L)):
+                with mock.patch.object(self.domain, 'memoryStats',
+                                       return_value=fake_memory_stats):
+                    memory = self.inspector.inspect_memory_usage(
+                        self.instance_name)
+                    self.assertEqual(25600L / units.Ki, memory.usage)
+
+    def test_inspect_memory_usage_with_domain_shutoff(self):
+        connection = self.inspector.connection
+        with mock.patch.object(connection, 'lookupByName',
+                               return_value=self.domain):
+            with mock.patch.object(self.domain, 'info',
+                                   return_value=(5L, 0L, 0L,
+                                                 2L, 999999L)):
+                memory = self.inspector.inspect_memory_usage(
+                    self.instance_name)
+                self.assertIsNone(memory)
+
+    def test_inspect_memory_usage_with_empty_stats(self):
+        connection = self.inspector.connection
+        with mock.patch.object(connection, 'lookupByName',
+                               return_value=self.domain):
+            with mock.patch.object(self.domain, 'info',
+                                   return_value=(0L, 0L, 51200L,
+                                                 2L, 999999L)):
+                with mock.patch.object(self.domain, 'memoryStats',
+                                       return_value={}):
+                    memory = self.inspector.inspect_memory_usage(
+                        self.instance_name)
+                    self.assertIsNone(memory)
 
 
 class TestLibvirtInspectionWithError(base.BaseTestCase):

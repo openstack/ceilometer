@@ -71,7 +71,7 @@ Name                             Type*  Unit       Resource  Origin**  Support**
 instance                         g      instance   inst ID   both      1, 2, 3, 4     Existence of instance
 instance:<type>                  g      instance   inst ID   both      1, 2, 3, 4     Existence of instance <type> (openstack types)
 memory                           g      MB         inst ID   n         1, 2           Volume of RAM allocated in MB
-memory.usage                     g      MB         inst ID   p         3, 4           Volume of RAM used in MB
+memory.usage                     g      MB         inst ID   p         1, 3, 4        Volume of RAM used in MB
 cpu                              c      ns         inst ID   p         1, 2           CPU time used
 cpu_util                         g      %          inst ID   p         1, 2, 3, 4     Average CPU utilisation
 vcpus                            g      vcpu       inst ID   n         1, 2           Number of VCPUs
@@ -117,6 +117,12 @@ network.outgoing.packets.rate    g      packet/s   iface ID  p         1, 2, 3, 
   [2]: HyperV support
   [3]: Vsphere support
   [4]: XenAPI support
+
+.. note:: To enable the libvirt memory.usage supporting, you need libvirt
+   version 1.1.1+, qemu version 1.5+, and you need to prepare suitable balloon
+   driver in the image, particularly for Windows guests, most modern Linuxes
+   have it built in. The memory.usage meters can't be fetched without image
+   balloon driver.
 
 Contributors are welcome to extend other virtualization backends' meters
 or complete the existing ones.
