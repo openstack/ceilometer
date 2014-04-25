@@ -24,14 +24,11 @@
 
 """
 
-from ceilometer.tests import db as tests_db
+from ceilometer.storage import impl_db2
+from ceilometer.tests import base as test_base
 
 
-class DB2EngineTestBase(tests_db.TestBase):
-    db_manager = tests_db.DB2Manager()
-
-
-class CapabilitiesTest(DB2EngineTestBase):
+class CapabilitiesTest(test_base.BaseTestCase):
     # Check the returned capabilities list, which is specific to each DB
     # driver
 
@@ -72,5 +69,5 @@ class CapabilitiesTest(DB2EngineTestBase):
             'events': {'query': {'simple': False}}
         }
 
-        actual_capabilities = self.conn.get_capabilities()
+        actual_capabilities = impl_db2.Connection.get_capabilities()
         self.assertEqual(expected_capabilities, actual_capabilities)

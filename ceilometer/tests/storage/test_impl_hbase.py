@@ -27,6 +27,7 @@
 from mock import patch
 
 from ceilometer.storage import impl_hbase as hbase
+from ceilometer.tests import base as test_base
 from ceilometer.tests import db as tests_db
 
 
@@ -58,7 +59,7 @@ class ConnectionTest(HBaseEngineTestBase):
         self.assertIsInstance(conn.conn_pool, TestConn)
 
 
-class CapabilitiesTest(HBaseEngineTestBase):
+class CapabilitiesTest(test_base.BaseTestCase):
     # Check the returned capabilities list, which is specific to each DB
     # driver
 
@@ -99,5 +100,5 @@ class CapabilitiesTest(HBaseEngineTestBase):
             'events': {'query': {'simple': False}}
         }
 
-        actual_capabilities = self.conn.get_capabilities()
+        actual_capabilities = hbase.Connection.get_capabilities()
         self.assertEqual(expected_capabilities, actual_capabilities)

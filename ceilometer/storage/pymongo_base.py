@@ -143,12 +143,8 @@ COMMON_AVAILABLE_CAPABILITIES = {
 class Connection(base.Connection):
     """Base Connection class for MongoDB and DB2 drivers.
     """
-
-    def __init__(self, conf, AVAILABLE_CAPABILITIES):
-        super(Connection, self).__init__(
-            conf,
-            utils.update_nested(COMMON_AVAILABLE_CAPABILITIES,
-                                AVAILABLE_CAPABILITIES))
+    CAPABILITIES = utils.update_nested(base.Connection.CAPABILITIES,
+                                       COMMON_AVAILABLE_CAPABILITIES)
 
     def get_users(self, source=None):
         """Return an iterable of user id strings.
