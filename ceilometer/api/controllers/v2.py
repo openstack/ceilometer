@@ -1167,7 +1167,8 @@ class ValidatedComplexQuery(object):
         schema_value_in = {
             "type": "array",
             "items": {"oneOf": [{"type": "string"},
-                                {"type": "number"}]}}
+                                {"type": "number"}]},
+            "minItems": 1}
 
         schema_field = {
             "type": "object",

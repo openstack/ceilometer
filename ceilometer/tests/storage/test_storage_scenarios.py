@@ -943,11 +943,6 @@ class ComplexSampleQueryTest(DBTestBase,
             self.assertTrue(sample.counter_volume > 0.4)
             self.assertTrue(sample.counter_volume <= 0.8)
 
-    def test_query_filter_with_empty_in(self):
-        results = list(
-            self.conn.query_samples(filter_expr={"in": {"resource_id": []}}))
-        self.assertEqual(len(results), 0)
-
     def test_query_simple_metadata_filter(self):
         self._create_samples()
 

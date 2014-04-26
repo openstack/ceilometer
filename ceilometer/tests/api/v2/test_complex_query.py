@@ -392,3 +392,9 @@ class TestFilterSyntaxValidation(test.BaseTestCase):
         self.assertRaises(jsonschema.ValidationError,
                           self.query._validate_filter,
                           filter)
+
+    def test_empty_in_query_not_passing(self):
+        filter = {"in": {"resource_id": []}}
+        self.assertRaises(jsonschema.ValidationError,
+                          self.query._validate_filter,
+                          filter)
