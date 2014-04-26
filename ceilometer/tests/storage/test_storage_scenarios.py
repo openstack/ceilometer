@@ -1359,6 +1359,14 @@ class StatisticsTest(DBTestBase,
         self.assertEqual(results.sum, 18)
         self.assertEqual(results.avg, 6)
 
+    def test_with_no_sample(self):
+        f = storage.SampleFilter(
+            user='user-not-exists',
+            meter='volume.size',
+        )
+        results = list(self.conn.get_meter_statistics(f, period=1800))
+        self.assertEqual([], results)
+
 
 class StatisticsGroupByTest(DBTestBase,
                             tests_db.MixinTestsWithBackendScenarios):

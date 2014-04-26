@@ -735,6 +735,10 @@ class Connection(base.Connection):
             res = self._make_stats_query(sample_filter,
                                          None,
                                          aggregate).first()
+            if not res:
+                # NOTE(liusheng):The 'res' may be NoneType, because no
+                # sample has found with sample filter(s).
+                return
 
         query = self._make_stats_query(sample_filter, groupby, aggregate)
         # HACK(jd) This is an awful method to compute stats by period, but
