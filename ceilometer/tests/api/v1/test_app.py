@@ -19,13 +19,15 @@
 """
 import os
 
-from ceilometer.api import acl
+from keystoneclient.middleware import auth_token
+
 from ceilometer.api.v1 import app
 from ceilometer import messaging
 from ceilometer.openstack.common import fileutils
 from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import test
 from ceilometer import service
+from ceilometer.tests import api as acl
 
 
 class TestApp(test.BaseTestCase):
@@ -44,7 +46,10 @@ class TestApp(test.BaseTestCase):
         self.CONF.set_override("auth_uri", None,
                                group=acl.OPT_GROUP_NAME)
         api_app = app.make_app(self.CONF, attach_storage=False)
-        self.assertTrue(api_app.wsgi_app.auth_uri.startswith('file'))
+        conf = dict(self.CONF.get(acl.OPT_GROUP_NAME))
+        api_app = auth_token.AuthProtocol(api_app,
+                                          conf=conf)
+        self.assertTrue(api_app.auth_uri.startswith('file'))
 
     def test_keystone_middleware_parse_conffile(self):
         content = "[{0}]\nauth_protocol = file"\
@@ -55,5 +60,8 @@ class TestApp(test.BaseTestCase):
         service.prepare_service(['ceilometer-api',
                                  '--config-file=%s' % tmpfile])
         api_app = app.make_app(self.CONF, attach_storage=False)
-        self.assertTrue(api_app.wsgi_app.auth_uri.startswith('file'))
+        conf = dict(self.CONF.get(acl.OPT_GROUP_NAME))
+        api_app = auth_token.AuthProtocol(api_app,
+                                          conf=conf)
+        self.assertTrue(api_app.auth_uri.startswith('file'))
         os.unlink(tmpfile)

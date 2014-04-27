@@ -23,9 +23,9 @@ from wsgiref import simple_server
 
 import netaddr
 from oslo.config import cfg
+from paste import deploy
 import pecan
 
-from ceilometer.api import acl
 from ceilometer.api import config as api_config
 from ceilometer.api import hooks
 from ceilometer.api import middleware
@@ -35,12 +35,13 @@ from ceilometer import storage
 LOG = log.getLogger(__name__)
 
 auth_opts = [
-    cfg.StrOpt('auth_strategy',
-               default='keystone',
-               help='The strategy to use for auth: noauth or keystone.'),
     cfg.BoolOpt('enable_v1_api',
                 default=True,
                 help='Deploy the deprecated v1 API.'),
+    cfg.StrOpt('api_paste_config',
+               default="api_paste.ini",
+               help="Configuration file for WSGI definition of API."
+               ),
 ]
 
 CONF = cfg.CONF
@@ -80,9 +81,6 @@ def setup_app(pecan_config=None, extra_hooks=None):
         guess_content_type_from_ext=False
     )
 
-    if getattr(pecan_config.app, 'enable_acl', True):
-        return acl.install(app, cfg.CONF)
-
     return app
 
 
@@ -90,10 +88,9 @@ class VersionSelectorApplication(object):
     def __init__(self):
         pc = get_pecan_config()
         pc.app.debug = CONF.debug
-        pc.app.enable_acl = (CONF.auth_strategy == 'keystone')
         if cfg.CONF.enable_v1_api:
             from ceilometer.api.v1 import app as v1app
-            self.v1 = v1app.make_app(cfg.CONF, enable_acl=pc.app.enable_acl)
+            self.v1 = v1app.make_app(cfg.CONF)
         else:
             def not_found(environ, start_response):
                 start_response('404 Not Found', [])
@@ -136,14 +133,36 @@ def get_handler_cls():
     return CeilometerHandler
 
 
-def build_server():
+def load_app():
     # Build the WSGI app
-    root = VersionSelectorApplication()
+    cfg_file = cfg.CONF.api_paste_config
+    LOG.info("WSGI config requested: %s" % cfg_file)
+    if not os.path.exists(cfg_file):
+        # this code is to work around chicken-egg dependency between
+        # ceilometer gate jobs use of devstack and this change.
+        # The gate job uses devstack to run tempest.
+        # devstack does not copy api_paste.ini into /etc/ceilometer because it
+        # is introduced in this change. Once this is merged, we will change
+        # devstack to copy api_paste.ini and once that is merged will remove
+        # this code.
+        root = os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                            '..', '..', 'etc', 'ceilometer'
+                                            )
+                               )
+        cfg_file = os.path.join(root, cfg_file)
+    if not os.path.exists(cfg_file):
+        raise Exception('api_paste_config file not found')
+    LOG.info("Full WSGI config used: %s" % cfg_file)
+    return deploy.loadapp("config:" + cfg_file)
 
+
+def build_server():
+    app = load_app()
     # Create the WSGI server and start it
     host, port = cfg.CONF.api.host, cfg.CONF.api.port
     server_cls = get_server_cls(host)
-    srv = simple_server.make_server(host, port, root,
+
+    srv = simple_server.make_server(host, port, app,
                                     server_cls, get_handler_cls())
 
     LOG.info(_('Starting server in PID %s') % os.getpid())
@@ -157,4 +176,9 @@ def build_server():
     else:
         LOG.info(_("serving on http://%(host)s:%(port)s") % (
                  {'host': host, 'port': port}))
+
     return srv
+
+
+def app_factory(global_config, **local_conf):
+    return VersionSelectorApplication()

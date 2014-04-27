@@ -23,13 +23,14 @@ import pecan
 import pecan.testing
 from six.moves import urllib
 
-from ceilometer.api import acl
 from ceilometer.api.v1 import app as v1_app
 from ceilometer.api.v1 import blueprint as v1_blueprint
 from ceilometer import messaging
 from ceilometer.openstack.common import jsonutils
 from ceilometer import service
 from ceilometer.tests import db as db_test_base
+
+OPT_GROUP_NAME = 'keystone_authtoken'
 
 
 class TestBase(db_test_base.TestBase):
@@ -42,12 +43,11 @@ class TestBase(db_test_base.TestBase):
         self.addCleanup(messaging.cleanup)
         service.prepare_service([])
         self.CONF.set_override("auth_version",
-                               "v2.0", group=acl.OPT_GROUP_NAME)
+                               "v2.0", group=OPT_GROUP_NAME)
         self.CONF.set_override("policy_file",
                                self.path_get('etc/ceilometer/policy.json'))
         sources_file = self.path_get('ceilometer/tests/sources.json')
         self.app = v1_app.make_app(self.CONF,
-                                   enable_acl=False,
                                    attach_storage=False,
                                    sources_file=sources_file)
 
@@ -90,7 +90,7 @@ class FunctionalTest(db_test_base.TestBase):
         self.addCleanup(messaging.cleanup)
         super(FunctionalTest, self).setUp()
         self.CONF.set_override("auth_version", "v2.0",
-                               group=acl.OPT_GROUP_NAME)
+                               group=OPT_GROUP_NAME)
         self.CONF.set_override("policy_file",
                                self.path_get('etc/ceilometer/policy.json'))
         self.app = self._make_app()
