@@ -31,7 +31,6 @@ import bson.code
 import bson.objectid
 import pymongo
 
-from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer import storage
