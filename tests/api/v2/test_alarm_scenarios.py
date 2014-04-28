@@ -677,6 +677,23 @@ class TestAlarms(FunctionalTest,
         else:
             self.fail("Alarm not found")
 
+    def test_post_alarm_threshold_zero(self):
+        """Alarm should allow threshold value to be zero."""
+        json_body = {
+            'type': 'threshold',
+            'name': 'zero-test',
+            'threshold_rule': {
+                'threshold': 0.0,
+                'meter_name': 'instance',
+            }
+        }
+
+        self.post_json('/alarms', params=json_body, status=201,
+                       headers=self.auth_headers)
+        alarms = list(self.conn.get_alarms(name='zero-test'))
+        self.assertEqual(1, len(alarms))
+        self.assertEqual(0.0, alarms[0].rule['threshold'])
+
     def test_post_alarm_combination(self):
         json = {
             'enabled': False,
@@ -964,6 +981,30 @@ class TestAlarms(FunctionalTest,
             'field': 'project_id', 'op': 'eq',
             'value': self.auth_headers['X-Project-Id']})
         self.assertEqual(resp.status_code, 200)
+
+    def test_put_alarm_threshold_zero(self):
+        """Alarm should allow threshold value to be zero."""
+        json_body = {
+            'type': 'threshold',
+            'name': 'name1',
+            'threshold_rule': {
+                'threshold': 0.0,
+                'meter_name': 'instance',
+            }
+        }
+
+        alarms = self.get_json('/alarms',
+                               q=[{'field': 'name',
+                                   'value': 'name1',
+                                   }])
+        self.assertEqual(1, len(alarms))
+        alarm_id = alarms[0]['alarm_id']
+
+        self.put_json('/alarms/%s' % alarm_id, params=json_body,
+                      status=200, headers=self.auth_headers)
+        alarms = list(self.conn.get_alarms(name='name1'))
+        self.assertEqual(1, len(alarms))
+        self.assertEqual(0.0, alarms[0].rule['threshold'])
 
     def test_delete_alarm(self):
         data = self.get_json('/alarms')

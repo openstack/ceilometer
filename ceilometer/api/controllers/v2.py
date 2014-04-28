@@ -1082,7 +1082,7 @@ class AlarmThresholdRule(_Base):
         #note(sileht): wsme mandatory doesn't work as expected
         #workaround for https://bugs.launchpad.net/wsme/+bug/1227004
         for field in ['meter_name', 'threshold']:
-            if not getattr(threshold_rule, field):
+            if getattr(threshold_rule, field) in (wsme.Unset, None):
                 error = _("threshold_rule/%s is mandatory") % field
                 pecan.response.translatable_error = error
                 raise wsme.exc.ClientSideError(unicode(error))
