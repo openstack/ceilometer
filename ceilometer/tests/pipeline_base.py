@@ -20,6 +20,7 @@
 import abc
 import datetime
 
+import mock
 import six
 from stevedore import extension
 
@@ -52,6 +53,7 @@ class BasePipelineTestCase(test.BaseTestCase):
             'except': self.TransformerClassException,
             'drop': self.TransformerClassDrop,
             'cache': accumulator.TransformerAccumulator,
+            'aggregator': conversions.AggregatorTransformer,
             'unit_conversion': conversions.ScalingTransformer,
             'rate_of_change': conversions.RateOfChangeTransformer,
         }
@@ -1113,3 +1115,329 @@ class BasePipelineTestCase(test.BaseTestCase):
         meters = ('disk.read.bytes', 'disk.write.requests')
         units = ('B', 'request')
         self._do_test_rate_of_change_mapping(pipe, meters, units)
+
+    def _do_test_aggregator(self, parameters, expected_length):
+        transformer_cfg = [
+            {
+                'name': 'aggregator',
+                'parameters': parameters,
+            },
+        ]
+        self._set_pipeline_cfg('transformers', transformer_cfg)
+        self._set_pipeline_cfg('counters', ['storage.objects.incoming.bytes'])
+        counters = [
+            sample.Sample(
+                name='storage.objects.incoming.bytes',
+                type=sample.TYPE_DELTA,
+                volume=26,
+                unit='B',
+                user_id='test_user',
+                project_id='test_proj',
+                resource_id='test_resource',
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata={'version': '1.0'}
+            ),
+            sample.Sample(
+                name='storage.objects.incoming.bytes',
+                type=sample.TYPE_DELTA,
+                volume=16,
+                unit='B',
+                user_id='test_user',
+                project_id='test_proj',
+                resource_id='test_resource',
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata={'version': '2.0'}
+            ),
+            sample.Sample(
+                name='storage.objects.incoming.bytes',
+                type=sample.TYPE_DELTA,
+                volume=53,
+                unit='B',
+                user_id='test_user_bis',
+                project_id='test_proj_bis',
+                resource_id='test_resource',
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata={'version': '1.0'}
+            ),
+            sample.Sample(
+                name='storage.objects.incoming.bytes',
+                type=sample.TYPE_DELTA,
+                volume=42,
+                unit='B',
+                user_id='test_user_bis',
+                project_id='test_proj_bis',
+                resource_id='test_resource',
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata={'version': '2.0'}
+            ),
+            sample.Sample(
+                name='storage.objects.incoming.bytes',
+                type=sample.TYPE_DELTA,
+                volume=15,
+                unit='B',
+                user_id='test_user',
+                project_id='test_proj_bis',
+                resource_id='test_resource',
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata={'version': '2.0'}
+            ),
+            sample.Sample(
+                name='storage.objects.incoming.bytes',
+                type=sample.TYPE_DELTA,
+                volume=2,
+                unit='B',
+                user_id='test_user_bis',
+                project_id='test_proj',
+                resource_id='test_resource',
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata={'version': '3.0'}
+            ),
+        ]
+
+        pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager)
+        pipe = pipeline_manager.pipelines[0]
+
+        pipe.publish_samples(None, counters)
+        pipe.flush(None)
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+        self.assertEqual(expected_length, len(publisher.samples))
+        return sorted(publisher.samples, key=lambda s: s.volume)
+
+    def test_aggregator_metadata(self):
+        for conf, expected_version in [('last', '2.0'), ('first', '1.0')]:
+            samples = self._do_test_aggregator({
+                'resource_metadata': conf,
+                'target': {'name': 'aggregated-bytes'}
+            }, expected_length=4)
+            s = samples[0]
+            self.assertEqual('aggregated-bytes', s.name)
+            self.assertEqual(2, s.volume)
+            self.assertEqual('test_user_bis', s.user_id)
+            self.assertEqual('test_proj', s.project_id)
+            self.assertEqual({'version': '3.0'},
+                             s.resource_metadata)
+            s = samples[1]
+            self.assertEqual('aggregated-bytes', s.name)
+            self.assertEqual(15, s.volume)
+            self.assertEqual('test_user', s.user_id)
+            self.assertEqual('test_proj_bis', s.project_id)
+            self.assertEqual({'version': '2.0'},
+                             s.resource_metadata)
+            s = samples[2]
+            self.assertEqual('aggregated-bytes', s.name)
+            self.assertEqual(42, s.volume)
+            self.assertEqual('test_user', s.user_id)
+            self.assertEqual('test_proj', s.project_id)
+            self.assertEqual({'version': expected_version},
+                             s.resource_metadata)
+            s = samples[3]
+            self.assertEqual('aggregated-bytes', s.name)
+            self.assertEqual(95, s.volume)
+            self.assertEqual('test_user_bis', s.user_id)
+            self.assertEqual('test_proj_bis', s.project_id)
+            self.assertEqual({'version': expected_version},
+                             s.resource_metadata)
+
+    def test_aggregator_user_last_and_metadata_last(self):
+        samples = self._do_test_aggregator({
+            'resource_metadata': 'last',
+            'user_id': 'last',
+            'target': {'name': 'aggregated-bytes'}
+        }, expected_length=2)
+        s = samples[0]
+        self.assertEqual('aggregated-bytes', s.name)
+        self.assertEqual(44, s.volume)
+        self.assertEqual('test_user_bis', s.user_id)
+        self.assertEqual('test_proj', s.project_id)
+        self.assertEqual({'version': '3.0'},
+                         s.resource_metadata)
+        s = samples[1]
+        self.assertEqual('aggregated-bytes', s.name)
+        self.assertEqual(110, s.volume)
+        self.assertEqual('test_user', s.user_id)
+        self.assertEqual('test_proj_bis', s.project_id)
+        self.assertEqual({'version': '2.0'},
+                         s.resource_metadata)
+
+    def test_aggregator_user_first_and_metadata_last(self):
+        samples = self._do_test_aggregator({
+            'resource_metadata': 'last',
+            'user_id': 'first',
+            'target': {'name': 'aggregated-bytes'}
+        }, expected_length=2)
+        s = samples[0]
+        self.assertEqual('aggregated-bytes', s.name)
+        self.assertEqual(44, s.volume)
+        self.assertEqual('test_user', s.user_id)
+        self.assertEqual('test_proj', s.project_id)
+        self.assertEqual({'version': '3.0'},
+                         s.resource_metadata)
+        s = samples[1]
+        self.assertEqual('aggregated-bytes', s.name)
+        self.assertEqual(110, s.volume)
+        self.assertEqual('test_user_bis', s.user_id)
+        self.assertEqual('test_proj_bis', s.project_id)
+        self.assertEqual({'version': '2.0'},
+                         s.resource_metadata)
+
+    def test_aggregator_all_first(self):
+        samples = self._do_test_aggregator({
+            'resource_metadata': 'first',
+            'user_id': 'first',
+            'project_id': 'first',
+            'target': {'name': 'aggregated-bytes'}
+        }, expected_length=1)
+        s = samples[0]
+        self.assertEqual('aggregated-bytes', s.name)
+        self.assertEqual(154, s.volume)
+        self.assertEqual('test_user', s.user_id)
+        self.assertEqual('test_proj', s.project_id)
+        self.assertEqual({'version': '1.0'},
+                         s.resource_metadata)
+
+    def test_aggregator_all_last(self):
+        samples = self._do_test_aggregator({
+            'resource_metadata': 'last',
+            'user_id': 'last',
+            'project_id': 'last',
+            'target': {'name': 'aggregated-bytes'}
+        }, expected_length=1)
+        s = samples[0]
+        self.assertEqual('aggregated-bytes', s.name)
+        self.assertEqual(154, s.volume)
+        self.assertEqual('test_user_bis', s.user_id)
+        self.assertEqual('test_proj', s.project_id)
+        self.assertEqual({'version': '3.0'},
+                         s.resource_metadata)
+
+    def test_aggregator_all_mixed(self):
+        samples = self._do_test_aggregator({
+            'resource_metadata': 'drop',
+            'user_id': 'first',
+            'project_id': 'last',
+            'target': {'name': 'aggregated-bytes'}
+        }, expected_length=1)
+        s = samples[0]
+        self.assertEqual('aggregated-bytes', s.name)
+        self.assertEqual(154, s.volume)
+        self.assertEqual('test_user', s.user_id)
+        self.assertEqual('test_proj', s.project_id)
+        self.assertEqual({}, s.resource_metadata)
+
+    def test_aggregator_metadata_default(self):
+        samples = self._do_test_aggregator({
+            'user_id': 'last',
+            'project_id': 'last',
+            'target': {'name': 'aggregated-bytes'}
+        }, expected_length=1)
+        s = samples[0]
+        self.assertEqual('aggregated-bytes', s.name)
+        self.assertEqual(154, s.volume)
+        self.assertEqual('test_user_bis', s.user_id)
+        self.assertEqual('test_proj', s.project_id)
+        self.assertEqual({'version': '3.0'},
+                         s.resource_metadata)
+
+    @mock.patch('ceilometer.transformer.conversions.LOG')
+    def test_aggregator_metadata_invalid(self, mylog):
+        samples = self._do_test_aggregator({
+            'resource_metadata': 'invalid',
+            'user_id': 'last',
+            'project_id': 'last',
+            'target': {'name': 'aggregated-bytes'}
+        }, expected_length=1)
+        s = samples[0]
+        self.assertTrue(mylog.warn.called)
+        self.assertEqual('aggregated-bytes', s.name)
+        self.assertEqual(154, s.volume)
+        self.assertEqual('test_user_bis', s.user_id)
+        self.assertEqual('test_proj', s.project_id)
+        self.assertEqual({'version': '3.0'},
+                         s.resource_metadata)
+
+    def test_aggregator_sized_flush(self):
+        transformer_cfg = [
+            {
+                'name': 'aggregator',
+                'parameters': {'size': 2},
+            },
+        ]
+        self._set_pipeline_cfg('transformers', transformer_cfg)
+        self._set_pipeline_cfg('counters', ['storage.objects.incoming.bytes'])
+        counters = [
+            sample.Sample(
+                name='storage.objects.incoming.bytes',
+                type=sample.TYPE_DELTA,
+                volume=26,
+                unit='B',
+                user_id='test_user',
+                project_id='test_proj',
+                resource_id='test_resource',
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata={'version': '1.0'}
+            ),
+            sample.Sample(
+                name='storage.objects.incoming.bytes',
+                type=sample.TYPE_DELTA,
+                volume=16,
+                unit='B',
+                user_id='test_user_bis',
+                project_id='test_proj_bis',
+                resource_id='test_resource',
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata={'version': '2.0'}
+            )
+        ]
+
+        pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager)
+        pipe = pipeline_manager.pipelines[0]
+
+        pipe.publish_samples(None, [counters[0]])
+        pipe.flush(None)
+        publisher = pipe.publishers[0]
+        self.assertEqual(0, len(publisher.samples))
+
+        pipe.publish_samples(None, [counters[1]])
+        pipe.flush(None)
+        publisher = pipe.publishers[0]
+        self.assertEqual(2, len(publisher.samples))
+
+    def test_aggregator_timed_flush(self):
+        timeutils.set_time_override()
+        transformer_cfg = [
+            {
+                'name': 'aggregator',
+                'parameters': {'size': 900, 'retention_time': 60},
+            },
+        ]
+        self._set_pipeline_cfg('transformers', transformer_cfg)
+        self._set_pipeline_cfg('counters', ['storage.objects.incoming.bytes'])
+        counters = [
+            sample.Sample(
+                name='storage.objects.incoming.bytes',
+                type=sample.TYPE_DELTA,
+                volume=26,
+                unit='B',
+                user_id='test_user',
+                project_id='test_proj',
+                resource_id='test_resource',
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata={'version': '1.0'}
+            ),
+        ]
+
+        pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager)
+        pipe = pipeline_manager.pipelines[0]
+
+        pipe.publish_samples(None, counters)
+        pipe.flush(None)
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+        self.assertEqual(0, len(publisher.samples))
+
+        timeutils.advance_time_seconds(120)
+        pipe.flush(None)
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+        self.assertEqual(1, len(publisher.samples))
