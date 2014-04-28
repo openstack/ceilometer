@@ -242,9 +242,9 @@ class Query(_Base):
                 try:
                     converted_value = ast.literal_eval(self.value)
                 except (ValueError, SyntaxError):
-                    msg = _('Failed to convert the metadata value %s'
-                            ' automatically') % (self.value)
-                    LOG.debug(msg)
+                    # Unable to convert the metadata value automatically
+                    # let it default to self.value
+                    pass
             else:
                 if type not in self._supported_types:
                     # Types must be explicitly declared so the
@@ -254,7 +254,7 @@ class Query(_Base):
                     raise TypeError()
                 converted_value = self._type_converters[type](self.value)
         except ValueError:
-            msg = _('Failed to convert the value %(value)s'
+            msg = _('Unable to convert the value %(value)s'
                     ' to the expected data type %(type)s.') % \
                 {'value': self.value, 'type': type}
             raise ClientSideError(msg)
