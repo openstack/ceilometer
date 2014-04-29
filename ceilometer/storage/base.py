@@ -25,7 +25,6 @@ import six
 
 from six import moves
 
-from ceilometer.openstack.common.gettextutils import _  # noqa
 from ceilometer.openstack.common import timeutils
 
 
