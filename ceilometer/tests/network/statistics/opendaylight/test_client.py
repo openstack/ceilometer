@@ -19,7 +19,7 @@ import six
 from six.moves.urllib import parse as url_parse
 
 from ceilometer.network.statistics.opendaylight import client
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import test
 
 

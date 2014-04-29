@@ -21,7 +21,7 @@ from lxml import etree
 from oslo.config import cfg
 
 from ceilometer.compute.virt import inspector as virt_inspector
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log as logging
 
 libvirt = None

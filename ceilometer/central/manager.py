@@ -20,7 +20,7 @@ from keystoneclient.v2_0 import client as ksclient
 from oslo.config import cfg
 
 from ceilometer import agent
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 
 cfg.CONF.import_group('service_credentials', 'ceilometer.service')

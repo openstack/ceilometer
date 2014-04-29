@@ -36,7 +36,7 @@ from sqlalchemy.orm import aliased
 from ceilometer.openstack.common.db import exception as dbexc
 from ceilometer.openstack.common.db.sqlalchemy import migration
 import ceilometer.openstack.common.db.sqlalchemy.session as sqlalchemy_session
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer import storage

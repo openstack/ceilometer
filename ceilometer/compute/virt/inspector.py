@@ -23,7 +23,7 @@ import collections
 from oslo.config import cfg
 from stevedore import driver
 
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 
 

@@ -25,7 +25,7 @@ from keystoneclient import exceptions
 from oslo.config import cfg
 from swiftclient import client as swift
 
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer import plugin

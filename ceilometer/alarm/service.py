@@ -28,7 +28,7 @@ from stevedore import extension
 from ceilometer.alarm.partition import coordination
 from ceilometer.alarm import rpc as rpc_alarm
 from ceilometer import messaging
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import network_utils
 from ceilometer.openstack.common import service as os_service

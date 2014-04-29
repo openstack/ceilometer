@@ -24,7 +24,7 @@ from stevedore import extension
 
 from ceilometer.event import converter as event_converter
 from ceilometer import messaging
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer import service
 from ceilometer.storage import models
 

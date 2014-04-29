@@ -21,7 +21,7 @@ from oslo.config import cfg
 import requests
 
 from ceilometer.central import plugin
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer import sample
 

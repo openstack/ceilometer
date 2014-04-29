@@ -29,7 +29,7 @@ import webob
 
 from ceilometer.api import hooks
 from ceilometer.openstack.common import gettextutils
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 
 LOG = log.getLogger(__name__)

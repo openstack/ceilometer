@@ -24,7 +24,7 @@ import six.moves.urllib.parse as urlparse
 from oslo.config import cfg
 
 from ceilometer.alarm import notifier
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import jsonutils
 from ceilometer.openstack.common import log
 

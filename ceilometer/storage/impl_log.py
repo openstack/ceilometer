@@ -18,7 +18,7 @@
 """Simple logging storage backend.
 """
 
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.storage import base
 

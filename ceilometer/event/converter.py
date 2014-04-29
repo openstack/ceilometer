@@ -24,7 +24,7 @@ from oslo.config import cfg
 import six
 import yaml
 
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer.storage import models

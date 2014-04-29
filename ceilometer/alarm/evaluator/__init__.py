@@ -26,7 +26,7 @@ from ceilometerclient import client as ceiloclient
 from oslo.config import cfg
 import six
 
-from ceilometer.openstack.common.gettextutils import _  # noqa
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 
