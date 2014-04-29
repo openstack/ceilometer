@@ -91,16 +91,15 @@ class TestEventEndpoint(tests_base.BaseTestCase):
         self.CONF.set_override("connection", "log://", group='database')
         self.CONF.set_override("store_events", True, group="notification")
 
-        self.endpoint = event_endpoint.EventsNotificationEndpoint()
-
         self.mock_dispatcher = mock.MagicMock()
-        self.endpoint.event_converter = mock.MagicMock()
-        self.endpoint.event_converter.to_event.return_value = mock.MagicMock(
-            event_type='test.test')
+        self.endpoint = event_endpoint.EventsNotificationEndpoint()
         self.endpoint.dispatcher_manager = \
             extension.ExtensionManager.make_test_instance([
                 extension.Extension('test', None, None, self.mock_dispatcher)
             ])
+        self.endpoint.event_converter = mock.MagicMock()
+        self.endpoint.event_converter.to_event.return_value = mock.MagicMock(
+            event_type='test.test')
 
     def test_message_to_event(self):
         self.endpoint.info(TEST_NOTICE_CTXT, 'compute.vagrant-precise',
