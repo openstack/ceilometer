@@ -88,10 +88,10 @@ class HBaseStorage(base.StorageEngine):
     """
 
     @staticmethod
-    def get_connection(conf):
+    def get_connection(url):
         """Return a Connection instance based on the configuration settings.
         """
-        return Connection(conf)
+        return Connection(url)
 
 
 AVAILABLE_CAPABILITIES = {
@@ -122,9 +122,9 @@ class Connection(base.Connection):
     ALARM_TABLE = "alarm"
     ALARM_HISTORY_TABLE = "alarm_h"
 
-    def __init__(self, conf):
+    def __init__(self, url):
         """Hbase Connection Initialization."""
-        opts = self._parse_connection_url(conf.database.connection)
+        opts = self._parse_connection_url(url)
 
         if opts['host'] == '__test__':
             url = os.environ.get('CEILOMETER_TEST_HBASE_URL')

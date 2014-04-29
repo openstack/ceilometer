@@ -29,6 +29,7 @@ from ceilometer.publisher import utils
 from ceilometer import sample
 from ceilometer import storage
 from ceilometer.storage import base
+from ceilometer.storage import impl_mongodb as mongodb
 from ceilometer.storage import models
 from ceilometer.tests import db as tests_db
 
@@ -655,7 +656,7 @@ class RawSampleTest(DBTestBase,
     def test_clear_metering_data(self):
         # NOTE(jd) Override this test in MongoDB because our code doesn't clear
         # the collections, this is handled by MongoDB TTL feature.
-        if self.CONF.database.connection.startswith('mongodb://'):
+        if isinstance(self.conn, mongodb.Connection):
             return
 
         self.mock_utcnow.return_value = datetime.datetime(2012, 7, 2, 10, 45)
@@ -673,7 +674,7 @@ class RawSampleTest(DBTestBase,
     def test_clear_metering_data_no_data_to_remove(self):
         # NOTE(jd) Override this test in MongoDB because our code doesn't clear
         # the collections, this is handled by MongoDB TTL feature.
-        if self.CONF.database.connection.startswith('mongodb://'):
+        if isinstance(self.conn, mongodb.Connection):
             return
 
         self.mock_utcnow.return_value = datetime.datetime(2010, 7, 2, 10, 45)
@@ -691,7 +692,7 @@ class RawSampleTest(DBTestBase,
     def test_clear_metering_data_with_alarms(self):
         # NOTE(jd) Override this test in MongoDB because our code doesn't clear
         # the collections, this is handled by MongoDB TTL feature.
-        if self.CONF.database.connection.startswith('mongodb://'):
+        if isinstance(self.conn, mongodb.Connection):
             return
 
         alarm = models.Alarm(alarm_id='r3d',

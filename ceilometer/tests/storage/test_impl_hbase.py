@@ -38,8 +38,7 @@ class HBaseEngineTestBase(tests_db.TestBase):
 class ConnectionTest(HBaseEngineTestBase):
 
     def test_hbase_connection(self):
-        self.CONF.database.connection = self.db_manager.connection
-        conn = hbase.Connection(self.CONF)
+        conn = hbase.Connection(self.db_manager.connection)
         self.assertIsInstance(conn.conn_pool.connection(), hbase.MConnection)
 
         class TestConn(object):
@@ -52,10 +51,9 @@ class ConnectionTest(HBaseEngineTestBase):
         def get_connection_pool(conf):
             return TestConn(conf['host'], conf['port'])
 
-        self.CONF.database.connection = 'hbase://test_hbase:9090'
         with patch.object(hbase.Connection, '_get_connection_pool',
                           side_effect=get_connection_pool):
-            conn = hbase.Connection(self.CONF)
+            conn = hbase.Connection('hbase://test_hbase:9090')
         self.assertIsInstance(conn.conn_pool, TestConn)
 
 

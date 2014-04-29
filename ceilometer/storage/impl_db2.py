@@ -68,10 +68,10 @@ class DB2Storage(base.StorageEngine):
             }
     """
 
-    def get_connection(self, conf):
-        """Return a Connection instance based on the configuration settings.
+    def get_connection(self, url):
+        """Return a Connection instance based on the url.
         """
-        return Connection(conf)
+        return Connection(url)
 
 
 AVAILABLE_CAPABILITIES = {
@@ -113,8 +113,7 @@ class Connection(pymongo_base.Connection):
 
     SECONDS_IN_A_DAY = 86400
 
-    def __init__(self, conf):
-        url = conf.database.connection
+    def __init__(self, url):
 
         # Since we are using pymongo, even though we are connecting to DB2
         # we still have to make sure that the scheme which used to distinguish

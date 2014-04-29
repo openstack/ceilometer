@@ -75,10 +75,10 @@ class MongoDBStorage(base.StorageEngine):
             }
     """
 
-    def get_connection(self, conf):
-        """Return a Connection instance based on the configuration settings.
+    def get_connection(self, url):
+        """Return a Connection instance based on the url.
         """
-        return Connection(conf)
+        return Connection(url)
 
 
 AVAILABLE_CAPABILITIES = {
@@ -408,8 +408,7 @@ class Connection(pymongo_base.Connection):
     _APOCALYPSE = datetime.datetime(year=datetime.MAXYEAR, month=12, day=31,
                                     hour=23, minute=59, second=59)
 
-    def __init__(self, conf):
-        url = conf.database.connection
+    def __init__(self, url):
 
         # NOTE(jd) Use our own connection pooling on top of the Pymongo one.
         # We need that otherwise we overflow the MongoDB instance with new

@@ -110,8 +110,8 @@ class StorageEngine(object):
     """Base class for storage engines."""
 
     @abc.abstractmethod
-    def get_connection(self, conf):
-        """Return a Connection instance based on the configuration settings."""
+    def get_connection(self, url):
+        """Return a Connection instance based on the url."""
 
 
 class Connection(object):
@@ -155,7 +155,7 @@ class Connection(object):
         'events': {'query': {'simple': False}},
     }
 
-    def __init__(self, conf):
+    def __init__(self, url):
         """Constructor."""
         pass
 

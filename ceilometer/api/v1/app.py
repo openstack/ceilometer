@@ -53,7 +53,7 @@ def make_app(conf, attach_storage=True,
         @app.before_request
         def attach_storage():
             flask.request.storage_conn = \
-                storage.get_connection(conf)
+                storage.get_connection_from_config(conf)
 
     return app
 

@@ -67,24 +67,24 @@ class StorageBadAggregate(Exception):
     code = 400
 
 
-def _get_engine(conf):
-    """Load the configured engine and return an instance."""
+def get_connection_from_config(conf):
     if conf.database_connection:
         conf.set_override('connection', conf.database_connection,
                           group='database')
-    engine_name = urlparse.urlparse(conf.database.connection).scheme
+    return get_connection(conf.database.connection)
+
+
+def get_connection(url):
+    """Return an open connection to the database."""
+    engine_name = urlparse.urlparse(url).scheme
     LOG.debug(_('looking for %(name)r driver in %(namespace)r') % (
               {'name': engine_name,
                'namespace': STORAGE_ENGINE_NAMESPACE}))
     mgr = driver.DriverManager(STORAGE_ENGINE_NAMESPACE,
                                engine_name,
                                invoke_on_load=True)
-    return mgr.driver
 
-
-def get_connection(conf):
-    """Return an open connection to the database."""
-    return _get_engine(conf).get_connection(conf)
+    return mgr.driver.get_connection(url)
 
 
 class SampleFilter(object):

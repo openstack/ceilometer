@@ -97,10 +97,10 @@ class SQLAlchemyStorage(base.StorageEngine):
     """
 
     @staticmethod
-    def get_connection(conf):
-        """Return a Connection instance based on the configuration settings.
+    def get_connection(url):
+        """Return a Connection instance based on the url.
         """
-        return Connection(conf)
+        return Connection(url)
 
 
 META_TYPE_MAP = {bool: models.MetaBool,
@@ -242,9 +242,11 @@ class Connection(base.Connection):
     CAPABILITIES = utils.update_nested(base.Connection.CAPABILITIES,
                                        AVAILABLE_CAPABILITIES)
 
-    def __init__(self, conf):
+    def __init__(self, url):
         self._engine_facade = sqlalchemy_session.EngineFacade.from_config(
-            conf.database.connection, cfg.CONF)
+            url,
+            cfg.CONF  # TODO(Alexei_987) Remove access to global CONF object
+        )
 
     def upgrade(self):
         path = os.path.join(os.path.abspath(os.path.dirname(__file__)),

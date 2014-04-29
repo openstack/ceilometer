@@ -37,15 +37,12 @@ class MongoDBEngineTestBase(tests_db.TestBase):
 
 class MongoDBConnection(MongoDBEngineTestBase):
     def test_connection_pooling(self):
-        self.assertEqual(self.conn.conn,
-                         impl_mongodb.Connection(self.CONF).conn)
+        test_conn = impl_mongodb.Connection(self.db_manager.connection)
+        self.assertEqual(self.conn.conn, test_conn.conn)
 
     def test_replica_set(self):
-        self.CONF.set_override(
-            'connection',
-            self.db_manager.connection + '?replicaSet=foobar',
-            group='database')
-        conn = impl_mongodb.Connection(self.CONF)
+        url = self.db_manager.connection + '?replicaSet=foobar'
+        conn = impl_mongodb.Connection(url)
         self.assertTrue(conn.conn)
 
     def test_recurse_sort_keys(self):

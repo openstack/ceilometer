@@ -40,15 +40,13 @@ class TestBase(testscenarios.testcase.WithScenarios, test_base.BaseTestCase):
         self.useFixture(self.db_manager)
 
         self.CONF = self.useFixture(config.Config()).conf
-        self.CONF.set_override('connection', self.db_manager.connection,
-                               group='database')
 
         with warnings.catch_warnings():
             warnings.filterwarnings(
                 action='ignore',
                 message='.*you must provide a username and password.*')
             try:
-                self.conn = storage.get_connection(self.CONF)
+                self.conn = storage.get_connection(self.db_manager.connection)
             except storage.StorageBadVersion as e:
                 self.skipTest(six.text_type(e))
         self.conn.upgrade()
