@@ -88,7 +88,7 @@ class ObjectsPollster(_Base):
     """Iterate over all accounts, using keystone.
     """
 
-    def get_samples(self, manager, cache, resources=[]):
+    def get_samples(self, manager, cache, resources=None):
         for tenant, account in self._iter_accounts(manager.keystone, cache):
             yield sample.Sample(
                 name='storage.objects',
@@ -107,7 +107,7 @@ class ObjectsSizePollster(_Base):
     """Iterate over all accounts, using keystone.
     """
 
-    def get_samples(self, manager, cache, resources=[]):
+    def get_samples(self, manager, cache, resources=None):
         for tenant, account in self._iter_accounts(manager.keystone, cache):
             yield sample.Sample(
                 name='storage.objects.size',
@@ -126,7 +126,7 @@ class ObjectsContainersPollster(_Base):
     """Iterate over all accounts, using keystone.
     """
 
-    def get_samples(self, manager, cache, resources=[]):
+    def get_samples(self, manager, cache, resources=None):
         for tenant, account in self._iter_accounts(manager.keystone, cache):
             yield sample.Sample(
                 name='storage.objects.containers',
@@ -147,7 +147,7 @@ class ContainersObjectsPollster(_Base):
 
     METHOD = 'get'
 
-    def get_samples(self, manager, cache, resources=[]):
+    def get_samples(self, manager, cache, resources=None):
         for project, account in self._iter_accounts(manager.keystone, cache):
             containers_info = account[1]
             for container in containers_info:
@@ -170,7 +170,7 @@ class ContainersSizePollster(_Base):
 
     METHOD = 'get'
 
-    def get_samples(self, manager, cache, resources=[]):
+    def get_samples(self, manager, cache, resources=None):
         for project, account in self._iter_accounts(manager.keystone, cache):
             containers_info = account[1]
             for container in containers_info:

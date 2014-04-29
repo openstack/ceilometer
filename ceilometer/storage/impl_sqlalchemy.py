@@ -360,7 +360,7 @@ class Connection(base.Connection):
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
                       end_timestamp=None, end_timestamp_op=None,
-                      metaquery={}, resource=None, pagination=None):
+                      metaquery=None, resource=None, pagination=None):
         """Return an iterable of api_models.Resource instances
 
         :param user: Optional ID for user that owns the resource.
@@ -376,6 +376,8 @@ class Connection(base.Connection):
         """
         if pagination:
             raise NotImplementedError('Pagination not implemented')
+
+        metaquery = metaquery or {}
 
         def _apply_filters(query):
             # TODO(gordc) this should be merged with make_query_from_filter
@@ -437,7 +439,7 @@ class Connection(base.Connection):
                 )
 
     def get_meters(self, user=None, project=None, resource=None, source=None,
-                   metaquery={}, pagination=None):
+                   metaquery=None, pagination=None):
         """Return an iterable of api_models.Meter instances
 
         :param user: Optional ID for user that owns the resource.
@@ -450,6 +452,8 @@ class Connection(base.Connection):
 
         if pagination:
             raise NotImplementedError('Pagination not implemented')
+
+        metaquery = metaquery or {}
 
         def _apply_filters(query):
             # TODO(gordc) this should be merged with make_query_from_filter

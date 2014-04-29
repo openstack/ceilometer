@@ -83,8 +83,8 @@ class NoResultFound(Exception):
 class Pagination(object):
     """Class for pagination query."""
 
-    def __init__(self, limit=None, primary_sort_dir='desc', sort_keys=[],
-                 sort_dirs=[], marker_value=None):
+    def __init__(self, limit=None, primary_sort_dir='desc', sort_keys=None,
+                 sort_dirs=None, marker_value=None):
         """This puts all parameters used for paginate query together.
 
         :param limit: Maximum number of items to return;
@@ -99,8 +99,8 @@ class Pagination(object):
         self.limit = limit
         self.primary_sort_dir = primary_sort_dir
         self.marker_value = marker_value
-        self.sort_keys = sort_keys
-        self.sort_dirs = sort_dirs
+        self.sort_keys = sort_keys or []
+        self.sort_dirs = sort_dirs or []
 
 
 class Connection(object):
@@ -177,7 +177,7 @@ class Connection(object):
     def get_resources(user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
                       end_timestamp=None, end_timestamp_op=None,
-                      metaquery={}, resource=None, pagination=None):
+                      metaquery=None, resource=None, pagination=None):
         """Return an iterable of models.Resource instances containing
         resource information.
 
@@ -196,7 +196,7 @@ class Connection(object):
 
     @staticmethod
     def get_meters(user=None, project=None, resource=None, source=None,
-                   metaquery={}, pagination=None):
+                   metaquery=None, pagination=None):
         """Return an iterable of model.Meter instances containing meter
         information.
 

@@ -332,7 +332,7 @@ def _verify_query_segregation(query, auth_project=None):
                 raise ProjectNotAuthorized(q.value)
 
 
-def _validate_query(query, db_func, internal_keys=[],
+def _validate_query(query, db_func, internal_keys=None,
                     allow_timestamps=True):
     """Validates the syntax of the query and verifies that the query
     request is authorized for the included project.
@@ -356,6 +356,7 @@ def _validate_query(query, db_func, internal_keys=[],
 
     """
 
+    internal_keys = internal_keys or []
     _verify_query_segregation(query)
 
     valid_keys = inspect.getargspec(db_func)[0]
@@ -446,8 +447,9 @@ def _validate_timestamp_fields(query, field_name, operator_list,
     return False
 
 
-def _query_to_kwargs(query, db_func, internal_keys=[],
+def _query_to_kwargs(query, db_func, internal_keys=None,
                      allow_timestamps=True):
+    internal_keys = internal_keys or []
     _validate_query(query, db_func, internal_keys=internal_keys,
                     allow_timestamps=allow_timestamps)
     query = _sanitize_query(query, db_func)
@@ -519,7 +521,7 @@ def _validate_groupby_fields(groupby_fields):
     return list(set(groupby_fields))
 
 
-def _get_query_timestamps(args={}):
+def _get_query_timestamps(args=None):
     """Return any optional timestamp information in the request.
 
     Determine the desired range, if any, from the GET arguments. Set
@@ -536,6 +538,12 @@ def _get_query_timestamps(args={}):
     search_offset: search_offset parameter from request
 
     """
+    if args is None:
+        return {'query_start': None,
+                'query_end': None,
+                'start_timestamp': None,
+                'end_timestamp': None,
+                'search_offset': 0}
     search_offset = int(args.get('search_offset', 0))
 
     start_timestamp = args.get('start_timestamp')
@@ -645,8 +653,9 @@ class OldSample(_Base):
     message_id = wtypes.text
     "A unique identifier for the sample"
 
-    def __init__(self, counter_volume=None, resource_metadata={},
+    def __init__(self, counter_volume=None, resource_metadata=None,
                  timestamp=None, **kwds):
+        resource_metadata = resource_metadata or {}
         if counter_volume is not None:
             counter_volume = float(counter_volume)
         resource_metadata = _flatten_metadata(resource_metadata)
@@ -810,12 +819,13 @@ class MeterController(rest.RestController):
         self.meter_name = meter_name
 
     @wsme_pecan.wsexpose([OldSample], [Query], int)
-    def get_all(self, q=[], limit=None):
+    def get_all(self, q=None, limit=None):
         """Return samples for the meter.
 
         :param q: Filter rules for the data to be returned.
         :param limit: Maximum number of samples to return.
         """
+        q = q or []
         if limit and limit < 0:
             raise ClientSideError(_("Limit must be positive"))
         kwargs = _query_to_kwargs(q, storage.SampleFilter.__init__)
@@ -886,7 +896,7 @@ class MeterController(rest.RestController):
         return samples
 
     @wsme_pecan.wsexpose([Statistics], [Query], [unicode], int, [Aggregate])
-    def statistics(self, q=[], groupby=[], period=None, aggregate=[]):
+    def statistics(self, q=None, groupby=None, period=None, aggregate=None):
         """Computes the statistics of the samples in the time range given.
 
         :param q: Filter rules for the data to be returned.
@@ -895,6 +905,10 @@ class MeterController(rest.RestController):
                        period long of that number of seconds.
         :param aggregate: The selectable aggregation functions to be applied.
         """
+        q = q or []
+        groupby = groupby or []
+        aggregate = aggregate or []
+
         if period and period < 0:
             raise ClientSideError(_("Period must be positive."))
 
@@ -979,11 +993,13 @@ class MetersController(rest.RestController):
         return MeterController(meter_name), remainder
 
     @wsme_pecan.wsexpose([Meter], [Query])
-    def get_all(self, q=[]):
+    def get_all(self, q=None):
         """Return all known meters, based on the data recorded so far.
 
         :param q: Filter rules for the meters to be returned.
         """
+        q = q or []
+
         #Timestamp field is not supported for Meter queries
         kwargs = _query_to_kwargs(q, pecan.request.storage_conn.get_meters,
                                   allow_timestamps=False)
@@ -1067,12 +1083,14 @@ class SamplesController(rest.RestController):
     """Controller managing the samples."""
 
     @wsme_pecan.wsexpose([Sample], [Query], int)
-    def get_all(self, q=[], limit=None):
+    def get_all(self, q=None, limit=None):
         """Return all known samples, based on the data recorded so far.
 
         :param q: Filter rules for the samples to be returned.
         :param limit: Maximum number of samples to be returned.
         """
+        q = q or []
+
         if limit and limit < 0:
             raise ClientSideError(_("Limit must be positive"))
         kwargs = _query_to_kwargs(q, storage.SampleFilter.__init__)
@@ -1145,8 +1163,9 @@ class ValidatedComplexQuery(object):
 
     timestamp_fields = ["timestamp", "state_timestamp"]
 
-    def __init__(self, query, db_model, additional_name_mapping={},
+    def __init__(self, query, db_model, additional_name_mapping=None,
                  metadata_allowed=False):
+        additional_name_mapping = additional_name_mapping or {}
         self.name_mapping = {"user": "user_id",
                              "project": "project_id"}
         self.name_mapping.update(additional_name_mapping)
@@ -1404,7 +1423,8 @@ class Resource(_Base):
     source = wtypes.text
     "The source where the resource come from"
 
-    def __init__(self, metadata={}, **kwds):
+    def __init__(self, metadata=None, **kwds):
+        metadata = metadata or {}
         metadata = _flatten_metadata(metadata)
         super(Resource, self).__init__(metadata=metadata, **kwds)
 
@@ -1457,12 +1477,13 @@ class ResourcesController(rest.RestController):
                                           self._resource_links(resource_id))
 
     @wsme_pecan.wsexpose([Resource], [Query], int)
-    def get_all(self, q=[], meter_links=1):
+    def get_all(self, q=None, meter_links=1):
         """Retrieve definitions of all of the resources.
 
         :param q: Filter rules for the resources to be returned.
         :param meter_links: option to include related meter links
         """
+        q = q or []
         kwargs = _query_to_kwargs(q, pecan.request.storage_conn.get_resources)
         resources = [
             Resource.from_db_and_links(r,
@@ -1974,11 +1995,12 @@ class AlarmController(rest.RestController):
     # TODO(eglynn): add pagination marker to signature once overall
     #               API support for pagination is finalized
     @wsme_pecan.wsexpose([AlarmChange], [Query])
-    def history(self, q=[]):
+    def history(self, q=None):
         """Assembles the alarm history requested.
 
         :param q: Filter rules for the changes to be described.
         """
+        q = q or []
         # allow history to be returned for deleted alarms, but scope changes
         # returned to those carried out on behalf of the auth'd tenant, to
         # avoid inappropriate cross-tenant visibility of alarm history
@@ -2105,11 +2127,12 @@ class AlarmsController(rest.RestController):
         return Alarm.from_db_model(alarm)
 
     @wsme_pecan.wsexpose([Alarm], [Query])
-    def get_all(self, q=[]):
+    def get_all(self, q=None):
         """Return all alarms, based on the query provided.
 
         :param q: Filter rules for the alarms to be returned.
         """
+        q = q or []
         #Timestamp is not supported field for Simple Alarm queries
         kwargs = _query_to_kwargs(q,
                                   pecan.request.storage_conn.get_alarms,
@@ -2310,11 +2333,12 @@ class EventsController(rest.RestController):
 
     @requires_admin
     @wsme_pecan.wsexpose([Event], [EventQuery])
-    def get_all(self, q=[]):
+    def get_all(self, q=None):
         """Return all events matching the query filters.
 
         :param q: Filter arguments for which Events to return
         """
+        q = q or []
         event_filter = _event_query_to_event_filter(q)
         return [Event(message_id=event.message_id,
                       event_type=event.event_type,

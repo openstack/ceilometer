@@ -72,7 +72,8 @@ default_test_data = TestSample(
 class TestPollster(plugin.PollsterBase):
     test_data = default_test_data
 
-    def get_samples(self, manager, cache, resources=[]):
+    def get_samples(self, manager, cache, resources=None):
+        resources = resources or []
         self.samples.append((manager, resources))
         self.resources.extend(resources)
         c = copy.copy(self.test_data)
@@ -81,7 +82,8 @@ class TestPollster(plugin.PollsterBase):
 
 
 class TestPollsterException(TestPollster):
-    def get_samples(self, manager, cache, resources=[]):
+    def get_samples(self, manager, cache, resources=None):
+        resources = resources or []
         self.samples.append((manager, resources))
         self.resources.extend(resources)
         raise Exception()

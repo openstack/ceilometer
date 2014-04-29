@@ -138,7 +138,7 @@ class FunctionalTest(db_test_base.TestBase):
         return response
 
     def get_json(self, path, expect_errors=False, headers=None,
-                 extra_environ=None, q=[], groupby=[], status=None,
+                 extra_environ=None, q=None, groupby=None, status=None,
                  override_params=None, **params):
         """Sends simulated HTTP GET request to Pecan test app.
 
@@ -155,6 +155,8 @@ class FunctionalTest(db_test_base.TestBase):
         :param override_params: literally encoded query param string
         :param params: content for wsgi.input of request
         """
+        q = q or []
+        groupby = groupby or []
         full_path = self.PATH_PREFIX + path
         if override_params:
             all_params = override_params

@@ -147,7 +147,7 @@ class Connection(base.Connection):
                                        COMMON_AVAILABLE_CAPABILITIES)
 
     def get_meters(self, user=None, project=None, resource=None, source=None,
-                   metaquery={}, pagination=None):
+                   metaquery=None, pagination=None):
         """Return an iterable of models.Meter instances
 
         :param user: Optional ID for user that owns the resource.
@@ -160,6 +160,8 @@ class Connection(base.Connection):
 
         if pagination:
             raise NotImplementedError('Pagination not implemented')
+
+        metaquery = metaquery or {}
 
         q = {}
         if user is not None:

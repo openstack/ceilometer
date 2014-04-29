@@ -310,7 +310,7 @@ class Connection(base.Connection):
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
                       end_timestamp=None, end_timestamp_op=None,
-                      metaquery={}, resource=None, pagination=None):
+                      metaquery=None, resource=None, pagination=None):
         """Return an iterable of models.Resource instances
 
         :param user: Optional ID for user that owns the resource.
@@ -326,6 +326,8 @@ class Connection(base.Connection):
         """
         if pagination:
             raise NotImplementedError('Pagination not implemented')
+
+        metaquery = metaquery or {}
 
         sample_filter = storage.SampleFilter(
             user=user, project=project,
@@ -368,7 +370,7 @@ class Connection(base.Connection):
                 )
 
     def get_meters(self, user=None, project=None, resource=None, source=None,
-                   metaquery={}, pagination=None):
+                   metaquery=None, pagination=None):
         """Return an iterable of models.Meter instances
 
         :param user: Optional ID for user that owns the resource.
@@ -378,6 +380,8 @@ class Connection(base.Connection):
         :param metaquery: Optional dict with metadata to match on.
         :param pagination: Optional pagination query.
         """
+
+        metaquery = metaquery or {}
 
         if pagination:
             raise NotImplementedError(_('Pagination not implemented'))
@@ -568,7 +572,8 @@ class MTable(object):
     def delete(self, key):
         del self._rows[key]
 
-    def scan(self, filter=None, columns=[], row_start=None, row_stop=None):
+    def scan(self, filter=None, columns=None, row_start=None, row_stop=None):
+        columns = columns or []
         sorted_keys = sorted(self._rows)
         # copy data between row_start and row_stop into a dict
         rows = {}
@@ -661,7 +666,8 @@ class MConnection(object):
     def open(self):
         LOG.debug(_("Opening in-memory HBase connection"))
 
-    def create_table(self, n, families={}):
+    def create_table(self, n, families=None):
+        families = families or {}
         if n in self.tables:
             return self.tables[n]
         t = MTable(n, families)
@@ -879,12 +885,13 @@ def deserialize_entry(entry, get_raw_meta=True):
     return flatten_result, sources, meters, metadata
 
 
-def serialize_entry(data={}, **kwargs):
+def serialize_entry(data=None, **kwargs):
     """Return a dict that is ready to be stored to HBase
 
     :param data: dict to be serialized
     :param kwargs: additional args
     """
+    data = data or {}
     entry_dict = copy.copy(data)
     entry_dict.update(**kwargs)
 
