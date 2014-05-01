@@ -22,17 +22,19 @@ from oslo.config import cfg
 import oslo.messaging
 from stevedore import extension
 
+from ceilometer import dispatcher
 from ceilometer.event import converter as event_converter
 from ceilometer import messaging
 from ceilometer.openstack.common.gettextutils import _
-from ceilometer import service
 from ceilometer.storage import models
 
 LOG = logging.getLogger(__name__)
 
 
-class EventsNotificationEndpoint(service.DispatchedService):
+class EventsNotificationEndpoint(object):
     def __init__(self):
+        super(EventsNotificationEndpoint, self).__init__()
+        self.dispatcher_manager = dispatcher.load_dispatcher_manager()
         LOG.debug(_('Loading event definitions'))
         self.event_converter = event_converter.setup_events(
             extension.ExtensionManager(
@@ -48,9 +50,9 @@ class EventsNotificationEndpoint(service.DispatchedService):
         :param metadata: metadata about the notification
         """
 
-        #NOTE: the rpc layer currently rips out the notification
-        #delivery_info, which is critical to determining the
-        #source of the notification. This will have to get added back later.
+        # NOTE: the rpc layer currently rips out the notification
+        # delivery_info, which is critical to determining the
+        # source of the notification. This will have to get added back later.
         notification = messaging.convert_to_old_notification_format(
             'info', ctxt, publisher_id, event_type, payload, metadata)
         self.process_notification(notification)
@@ -61,8 +63,8 @@ class EventsNotificationEndpoint(service.DispatchedService):
         if event is not None:
             LOG.debug(_('Saving event "%s"'), event.event_type)
             problem_events = []
-            for dispatcher in self.dispatcher_manager:
-                problem_events.extend(dispatcher.obj.record_events(event))
+            for dispatcher_ext in self.dispatcher_manager:
+                problem_events.extend(dispatcher_ext.obj.record_events(event))
             if models.Event.UNKNOWN_PROBLEM in [x[0] for x in problem_events]:
                 if not cfg.CONF.notification.ack_on_event_error:
                     return oslo.messaging.NotificationResult.REQUEUE

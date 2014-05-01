@@ -21,12 +21,12 @@ import socket
 import msgpack
 from oslo.config import cfg
 
+from ceilometer import dispatcher
 from ceilometer import messaging
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import service as os_service
 from ceilometer.openstack.common import units
-from ceilometer import service
 
 OPTS = [
     cfg.StrOpt('udp_address',
@@ -46,7 +46,7 @@ cfg.CONF.import_opt('metering_topic', 'ceilometer.publisher.rpc',
 LOG = log.getLogger(__name__)
 
 
-class CollectorService(service.DispatchedService, os_service.Service):
+class CollectorService(os_service.Service):
     """Listener for the collector service."""
 
     @staticmethod
@@ -56,6 +56,8 @@ class CollectorService(service.DispatchedService, os_service.Service):
 
     def start(self):
         """Bind the UDP socket and handle incoming data."""
+        # ensure dispatcher is configured before starting other services
+        self.dispatcher_manager = dispatcher.load_dispatcher_manager()
         super(CollectorService, self).start()
         if cfg.CONF.collector.udp_address:
             self.tg.add_thread(self.start_udp)

@@ -143,3 +143,18 @@ class TestNotification(tests_base.BaseTestCase):
         self.assertEqual(2, len(self.srv.listeners[0].dispatcher.endpoints))
         self.assertEqual(self.fake_event_endpoint,
                          self.srv.listeners[0].dispatcher.endpoints[0])
+
+    @mock.patch('ceilometer.event.converter.get_config_file',
+                mock.MagicMock(return_value=None))
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    @mock.patch.object(oslo.messaging.MessageHandlingServer, 'start',
+                       mock.MagicMock())
+    def test_event_dispatcher_loaded(self):
+        self.CONF.set_override("store_events", True, group="notification")
+        with mock.patch.object(self.srv, '_get_notifications_manager') \
+                as get_nm:
+            get_nm.side_effect = self.fake_get_notifications_manager
+            self.srv.start()
+        self.assertEqual(2, len(self.srv.listeners[0].dispatcher.endpoints))
+        event_endpoint = self.srv.listeners[0].dispatcher.endpoints[0]
+        self.assertEqual(1, len(list(event_endpoint.dispatcher_manager)))
