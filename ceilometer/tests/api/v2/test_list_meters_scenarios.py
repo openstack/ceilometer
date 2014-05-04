@@ -203,7 +203,7 @@ class TestListMeters(FunctionalTest,
         expected_error_message = ('Unknown argument: "non_valid_field_name"'
                                   ': unrecognized field in query: '
                                   '[<Query u\'non_valid_field_name\' '
-                                  'gt u\'3\' None>]')
+                                  'gt u\'3\' ')
         self.assertEqual(400, resp.status_code)
         self.assertTrue(fault_string.startswith(expected_error_message))
 
@@ -218,7 +218,7 @@ class TestListMeters(FunctionalTest,
         expected_error_message = ('Unknown argument: "non_valid_field_name"'
                                   ': unrecognized field in query: '
                                   '[<Query u\'non_valid_field_name\' '
-                                  'eq u\'3\' None>]')
+                                  'eq u\'3\' ')
         self.assertEqual(400, resp.status_code)
         self.assertTrue(fault_string.startswith(expected_error_message))
 
