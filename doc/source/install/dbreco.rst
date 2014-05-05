@@ -13,6 +13,8 @@
       License for the specific language governing permissions and limitations
       under the License.
 
+.. _choosing_db_backend:
+
 =============================
  Choosing a database backend
 =============================
