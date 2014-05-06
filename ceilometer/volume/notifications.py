@@ -37,14 +37,7 @@ cfg.CONF.register_opts(OPTS)
 
 
 class _Base(plugin.NotificationBase):
-    """Convert volume notifications into Counters."""
-
-    event_types = [
-        'volume.exists',
-        'volume.create.*',
-        'volume.delete.*',
-        'volume.resize.*',
-    ]
+    """Convert volume/snapshot notification into Counters."""
 
     @staticmethod
     def get_targets(conf):
@@ -56,7 +49,18 @@ class _Base(plugin.NotificationBase):
                 for topic in conf.notification_topics]
 
 
-class Volume(_Base):
+class _VolumeBase(_Base):
+    """Convert volume notifications into Counters."""
+
+    event_types = [
+        'volume.exists',
+        'volume.create.*',
+        'volume.delete.*',
+        'volume.resize.*',
+    ]
+
+
+class Volume(_VolumeBase):
     def process_notification(self, message):
         yield sample.Sample.from_notification(
             name='volume',
@@ -69,7 +73,7 @@ class Volume(_Base):
             message=message)
 
 
-class VolumeSize(_Base):
+class VolumeSize(_VolumeBase):
     def process_notification(self, message):
         yield sample.Sample.from_notification(
             name='volume.size',
@@ -79,4 +83,41 @@ class VolumeSize(_Base):
             user_id=message['payload']['user_id'],
             project_id=message['payload']['tenant_id'],
             resource_id=message['payload']['volume_id'],
+            message=message)
+
+
+class _SnapshotBase(_Base):
+    """Convert snapshot notifications into Counters."""
+
+    event_types = [
+        'snapshot.exists',
+        'snapshot.create.*',
+        'snapshot.delete.*',
+        'snapshot.resize.*',
+    ]
+
+
+class Snapshot(_SnapshotBase):
+    def process_notification(self, message):
+        yield sample.Sample.from_notification(
+            name='snapshot',
+            type=sample.TYPE_GAUGE,
+            unit='snapshot',
+            volume=1,
+            user_id=message['payload']['user_id'],
+            project_id=message['payload']['tenant_id'],
+            resource_id=message['payload']['snapshot_id'],
+            message=message)
+
+
+class SnapshotSize(_SnapshotBase):
+    def process_notification(self, message):
+        yield sample.Sample.from_notification(
+            name='snapshot.size',
+            type=sample.TYPE_GAUGE,
+            unit='GB',
+            volume=message['payload']['volume_size'],
+            user_id=message['payload']['user_id'],
+            project_id=message['payload']['tenant_id'],
+            resource_id=message['payload']['snapshot_id'],
             message=message)

@@ -45,7 +45,6 @@ NOTIFICATION_VOLUME_EXISTS = {
     u'priority': u'INFO'
 }
 
-
 NOTIFICATION_VOLUME_DELETE = {
     u'_context_roles': [u'Member', u'admin'],
     u'_context_request_id': u'req-6ba8ccb4-1093-4a39-b029-adfaa3fc7ceb',
@@ -102,9 +101,39 @@ NOTIFICATION_VOLUME_RESIZE = {
     u'priority': u'INFO'}
 
 
+NOTIFICATION_SNAPSHOT_EXISTS = {
+    u'_context_roles': [u'admin'],
+    u'_context_request_id': u'req-7ef29a5d-adeb-48a8-b104-59c05361aa27',
+    u'_context_quota_class': None,
+    u'event_type': u'snapshot.exists',
+    u'timestamp': u'2012-09-21 09:29:10.620731',
+    u'message_id': u'e0e6a5ad-2fc9-453c-b3fb-03fe504538dc',
+    u'_context_auth_token': None,
+    u'_context_is_admin': True,
+    u'_context_project_id': None,
+    u'_context_timestamp': u'2012-09-21T09:29:10.266928',
+    u'_context_read_deleted': u'no',
+    u'_context_user_id': None,
+    u'_context_remote_address': None,
+    u'publisher_id': u'volume.ubuntu-VirtualBox',
+    u"payload": {u"audit_period_beginning": u"2014-05-06 11:00:00",
+                 u"audit_period_ending": u"2014-05-06 12:00:00",
+                 u"availability_zone": u"left",
+                 u"created_at": u"2014-05-06 09:33:43",
+                 u"deleted": u"",
+                 u"display_name": "lil snapshot",
+                 u"snapshot_id": u"dd163129-9476-4cf5-9311-dd425324d8d8",
+                 u"status": u"available",
+                 u"tenant_id": u"compliance",
+                 u"user_id": u"e0271f64847b49429bb304c775c7427a",
+                 u"volume_id": u"b96e026e-c9bf-4418-8d6f-4ba493bbb7d6",
+                 u"volume_size": 3},
+    u'priority': u'INFO'}
+
+
 class TestNotifications(test.BaseTestCase):
 
-    def _verify_common_sample(self, s, name, notification):
+    def _verify_common_sample_volume(self, s, name, notification):
         self.assertIsNotNone(s)
         self.assertEqual(s.name, name)
         self.assertEqual(notification['payload']['volume_id'], s.resource_id)
@@ -117,7 +146,8 @@ class TestNotifications(test.BaseTestCase):
         samples = list(v.process_notification(NOTIFICATION_VOLUME_EXISTS))
         self.assertEqual(1, len(samples))
         s = samples[0]
-        self._verify_common_sample(s, 'volume', NOTIFICATION_VOLUME_EXISTS)
+        self._verify_common_sample_volume(
+            s, 'volume', NOTIFICATION_VOLUME_EXISTS)
         self.assertEqual(1, s.volume)
 
     def test_volume_size_exists(self):
@@ -125,8 +155,8 @@ class TestNotifications(test.BaseTestCase):
         samples = list(v.process_notification(NOTIFICATION_VOLUME_EXISTS))
         self.assertEqual(1, len(samples))
         s = samples[0]
-        self._verify_common_sample(s, 'volume.size',
-                                   NOTIFICATION_VOLUME_EXISTS)
+        self._verify_common_sample_volume(s, 'volume.size',
+                                          NOTIFICATION_VOLUME_EXISTS)
         self.assertEqual(NOTIFICATION_VOLUME_EXISTS['payload']['size'],
                          s.volume)
 
@@ -135,7 +165,8 @@ class TestNotifications(test.BaseTestCase):
         samples = list(v.process_notification(NOTIFICATION_VOLUME_DELETE))
         self.assertEqual(1, len(samples))
         s = samples[0]
-        self._verify_common_sample(s, 'volume', NOTIFICATION_VOLUME_DELETE)
+        self._verify_common_sample_volume(
+            s, 'volume', NOTIFICATION_VOLUME_DELETE)
         self.assertEqual(1, s.volume)
 
     def test_volume_size_delete(self):
@@ -143,8 +174,8 @@ class TestNotifications(test.BaseTestCase):
         samples = list(v.process_notification(NOTIFICATION_VOLUME_DELETE))
         self.assertEqual(1, len(samples))
         s = samples[0]
-        self._verify_common_sample(s, 'volume.size',
-                                   NOTIFICATION_VOLUME_DELETE)
+        self._verify_common_sample_volume(s, 'volume.size',
+                                          NOTIFICATION_VOLUME_DELETE)
         self.assertEqual(NOTIFICATION_VOLUME_DELETE['payload']['size'],
                          s.volume)
 
@@ -153,7 +184,8 @@ class TestNotifications(test.BaseTestCase):
         samples = list(v.process_notification(NOTIFICATION_VOLUME_RESIZE))
         self.assertEqual(1, len(samples))
         s = samples[0]
-        self._verify_common_sample(s, 'volume', NOTIFICATION_VOLUME_RESIZE)
+        self._verify_common_sample_volume(
+            s, 'volume', NOTIFICATION_VOLUME_RESIZE)
         self.assertEqual(1, s.volume)
 
     def test_volume_size_resize(self):
@@ -161,7 +193,34 @@ class TestNotifications(test.BaseTestCase):
         samples = list(v.process_notification(NOTIFICATION_VOLUME_RESIZE))
         self.assertEqual(1, len(samples))
         s = samples[0]
-        self._verify_common_sample(s, 'volume.size',
-                                   NOTIFICATION_VOLUME_RESIZE)
+        self._verify_common_sample_volume(s, 'volume.size',
+                                          NOTIFICATION_VOLUME_RESIZE)
         self.assertEqual(NOTIFICATION_VOLUME_RESIZE['payload']['size'],
                          s.volume)
+
+    def _verify_common_sample_snapshot(self, s, name, notification):
+        self.assertIsNotNone(s)
+        self.assertEqual(name, s.name)
+        self.assertEqual(notification['payload']['snapshot_id'], s.resource_id)
+        self.assertEqual(notification['timestamp'], s.timestamp)
+        metadata = s.resource_metadata
+        self.assertEqual(notification['publisher_id'], metadata.get('host'))
+
+    def test_snapshot_exists(self):
+        v = notifications.Snapshot(mock.Mock())
+        samples = list(v.process_notification(NOTIFICATION_SNAPSHOT_EXISTS))
+        self.assertEqual(1, len(samples))
+        s = samples[0]
+        self._verify_common_sample_snapshot(s, 'snapshot',
+                                            NOTIFICATION_SNAPSHOT_EXISTS)
+        self.assertEqual(1, s.volume)
+
+    def test_snapshot_size_exists(self):
+        v = notifications.SnapshotSize(mock.Mock())
+        samples = list(v.process_notification(NOTIFICATION_SNAPSHOT_EXISTS))
+        self.assertEqual(1, len(samples))
+        s = samples[0]
+        self._verify_common_sample_snapshot(s, 'snapshot.size',
+                                            NOTIFICATION_SNAPSHOT_EXISTS)
+        volume_size = NOTIFICATION_SNAPSHOT_EXISTS['payload']['volume_size']
+        self.assertEqual(volume_size, s.volume)
