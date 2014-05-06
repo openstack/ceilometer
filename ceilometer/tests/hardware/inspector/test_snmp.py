@@ -214,13 +214,6 @@ class TestSNMPInspector(Base, test_base.BaseTestCase):
         self.useFixture(mockpatch.PatchObject(
             self.inspector._cmdGen, 'nextCmd', new=faux_nextCmd))
 
-    def test_get_security_name(self):
-        self.assertEqual(self.inspector._get_security_name(self.host),
-                         self.inspector._security_name)
-        host2 = network_utils.urlsplit("snmp://foo:80?security_name=fake")
-        self.assertEqual(self.inspector._get_security_name(host2),
-                         'fake')
-
     def test_get_cmd_error(self):
         self.useFixture(mockpatch.PatchObject(
             self.inspector, '_memory_total_oid', new='failure'))
