@@ -44,13 +44,13 @@ tagged as "alarming".
 Metering
 --------
 
-If you divide a billing process into a 3 step process as is commonly done in
+If you divide a billing process into a 3 step process, as is commonly done in
 the telco industry, the steps are:
 
 1. :term:`Metering` is the process of collecting information about what,
    who, when and how much regarding anything that can be billed. The result of
    this is a collection of "tickets" (a.k.a. samples) which are ready to be
-   processed in anyway you want.
+   processed in any way you want.
 2. :term:`Rating` is the process of analysing a series of tickets,
    according to business rules defined by marketing, in order to transform
    them into bill line items with a currency value.
@@ -64,11 +64,11 @@ a solution that would fit everyone's needs, from private to public clouds. This
 means that if you are looking at this project to solve your billing needs, this
 is the right way to go, but certainly not the end of the road for you. Once
 Ceilometer is in place on your OpenStack deployment, you will still have
-quite a few things to do before you can produce a bill for your customers.
+several things to do before you can produce a bill for your customers.
 One of you first task could be: finding the right queries within the Ceilometer
 API to extract the information you need for your very own rating engine.
 
-You can of course use the same API to satisfy other needs, such as a data mining
+You can, of course, use the same API to satisfy other needs, such as a data mining
 solution to help you identify unexpected or new usage types, or a capacity
 planning solution. In general, it is recommended to download the data from the API in
 order to work on it in a separate database to avoid overloading the one which
@@ -104,7 +104,7 @@ circumvent this, the Ceilometer project created 3 independent methods to
 collect data:
 
 1. :term:`Bus listener agent` which takes events generated on the Oslo
-   notification bus and transforms them into Ceilometer sample. Again this
+   notification bus and transforms them into Ceilometer samples. This
    is the preferred method of data collection. If you are working on some
    OpenStack related project and are using the Oslo library, you are kindly
    invited to come and talk to one of the project members to learn how you
@@ -116,9 +116,9 @@ collect data:
    prefer this compared to a polling agent method as resilience (high
    availability) will not be a problem with this method.
 3. :term:`Polling agents` which is the least preferred method, that will poll
-   some API or other tool to collect information at a regular interval. The main
-   reason why we do not like this method is the inherent difficulty to make such
-   a component be resilient.
+   some API or other tool to collect information at a regular interval. 
+   This method is least preferred due to the inherent difficulty in making such
+   a component resilient.
 
 The first method is supported by the ceilometer-collector agent, which monitors
 the message queues for notifications and for metering data coming from the
@@ -128,17 +128,18 @@ ceilometer-central-agent/ceilometer-compute-agent and the collector.
 How to access collected data?
 -----------------------------
 
-Once collected, the data is stored in a database generally, or in a simple
+Once collected, the data is usually stored in a database, or in a simple
 file if you do not care about API access and want to do the rest of the
 processing elsewhere. There can be multiple types of
 databases through the use of different database plugins (see the section
 :ref:`which-db`). Moreover, the schema and dictionary of
-this database can also evolve over time. For both reasons, we offer a REST API
-that should be the only way for you to access the collected data rather than
-accessing the underlying database directly. It is possible that the way
-you'd like to access your data is not yet supported by the API. If you think
-this is the case, please contact us with your feedback as this will certainly
-lead us to improve the API.
+this database may evolve over time. For these reasons, we offer a REST API,
+and recommend that you access the collected data that way, rather than
+by accessing the underlying database directly.
+
+If the way in which you wish to access your data is not yet supported by the API,
+please contact us with your feedback, so that we can improve the API
+accordingly.
 
 .. figure:: ./2-accessmodel.png
    :figwidth: 100%
@@ -184,13 +185,13 @@ same meter needed for performance tuning may be needed every 10 seconds.
 
 The second variable is the transport. In the case of data intended for a
 monitoring system, losing an update or not ensuring security
-(non-repudiability) of a message is not really a problem while the same meter
+(non-repudiability) of a message is not really a problem, while the same meter
 will need both security and guaranteed delivery in the case of data intended
 for rating and billing systems.
 
 To solve this, the notion of multi-publisher can now be configured for each
 meter within Ceilometer, allowing the same technical meter to be published
-multiple times to multiple destination each potentially using a different
+multiple times to multiple destinations, each potentially using a different
 transport and frequency of publication. At the time of writing, two
 transports have been implemented so far: the original and relatively secure
 Oslo RPC queue based, and one using UDP packets.
@@ -222,20 +223,18 @@ reaches 70% on a given instance if the instance has been up for more than
 the alarm conditions and an action to take.
 
 Of course, if you are not administrator of the cloud itself, you can only
-set alarms on meters for your own components. Good news, you can also
+set alarms on meters for your own components. You can also
 :ref:`send your own meters <user-defined-data>` from within your instances,
 meaning that you can trigger
 alarms based on application centric data.
 
-
 There can be multiple form of actions, but two have been implemented so far:
 
 1. :term:`HTTP callback`: you provide a URL to be called whenever the alarm has been set
-   off. The payload of the request contains all the details of why the alarm went
-   off.
+   off. The payload of the request contains all the details of why the alarm was triggered.
 2. :term:`log`: mostly useful for debugging, stores alarms in a log file.
 
-For more details on this, I recommend you read the blog post by
+For more details on this, we recommend that you read the blog post by
 Mehdi Abaakouk `Autoscaling with Heat and Ceilometer`_. Particular attention
 should be given to the section "Some notes about deploying alarming" as the
 database setup (using a separate database from the one used for metering)
@@ -259,7 +258,7 @@ Since the beginning of the project, a plugin model has been put in place
 to allow for various types of database backends to be used. However, not
 all implementations are equal and, at the time of writing, MongoDB
 is the recommended backend of choice because it is the most tested. Have a look
-at the "choosing a database backend" section of the documentation for more
+at the :ref:`choosing_db_backend` section of the documentation for more
 details. In short, ensure a dedicated database is used when deploying
 Ceilometer as the volume of data generated can be extensive in a production
 environment and will generally use a lot of I/O.
