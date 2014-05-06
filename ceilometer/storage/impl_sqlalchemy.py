@@ -48,61 +48,6 @@ from ceilometer import utils
 LOG = log.getLogger(__name__)
 
 
-class SQLAlchemyStorage(base.StorageEngine):
-    """Put the data into a SQLAlchemy database.
-
-    Tables::
-
-        - user
-          - { id: user uuid }
-        - source
-          - { id: source id }
-        - project
-          - { id: project uuid }
-        - meter
-          - meter definition
-          - { id: meter def id
-              name: meter name
-              type: meter type
-              unit: meter unit
-              }
-        - sample
-          - the raw incoming data
-          - { id: sample id
-              meter_id: meter id            (->meter.id)
-              user_id: user uuid            (->user.id)
-              project_id: project uuid      (->project.id)
-              resource_id: resource uuid    (->resource.id)
-              resource_metadata: metadata dictionaries
-              volume: sample volume
-              timestamp: datetime
-              message_signature: message signature
-              message_id: message uuid
-              }
-        - resource
-          - the metadata for resources
-          - { id: resource uuid
-              resource_metadata: metadata dictionaries
-              project_id: project uuid      (->project.id)
-              user_id: user uuid            (->user.id)
-              }
-        - sourceassoc
-          - the relationships
-          - { sample_id: sample id           (->sample.id)
-              project_id: project uuid      (->project.id)
-              resource_id: resource uuid    (->resource.id)
-              user_id: user uuid            (->user.id)
-              source_id: source id          (->source.id)
-              }
-    """
-
-    @staticmethod
-    def get_connection(url):
-        """Return a Connection instance based on the url.
-        """
-        return Connection(url)
-
-
 META_TYPE_MAP = {bool: models.MetaBool,
                  str: models.MetaText,
                  unicode: models.MetaText,
@@ -238,7 +183,52 @@ def make_query_from_filter(session, query, sample_filter, require_meter=True):
 
 
 class Connection(base.Connection):
-    """SqlAlchemy connection."""
+    """Put the data into a SQLAlchemy database.
+
+    Tables::
+
+        - user
+          - { id: user uuid }
+        - source
+          - { id: source id }
+        - project
+          - { id: project uuid }
+        - meter
+          - meter definition
+          - { id: meter def id
+              name: meter name
+              type: meter type
+              unit: meter unit
+              }
+        - sample
+          - the raw incoming data
+          - { id: sample id
+              meter_id: meter id            (->meter.id)
+              user_id: user uuid            (->user.id)
+              project_id: project uuid      (->project.id)
+              resource_id: resource uuid    (->resource.id)
+              resource_metadata: metadata dictionaries
+              volume: sample volume
+              timestamp: datetime
+              message_signature: message signature
+              message_id: message uuid
+              }
+        - resource
+          - the metadata for resources
+          - { id: resource uuid
+              resource_metadata: metadata dictionaries
+              project_id: project uuid      (->project.id)
+              user_id: user uuid            (->user.id)
+              }
+        - sourceassoc
+          - the relationships
+          - { sample_id: sample id           (->sample.id)
+              project_id: project uuid      (->project.id)
+              resource_id: resource uuid    (->resource.id)
+              user_id: user uuid            (->user.id)
+              source_id: source id          (->source.id)
+              }
+    """
     CAPABILITIES = utils.update_nested(base.Connection.CAPABILITIES,
                                        AVAILABLE_CAPABILITIES)
 

@@ -49,7 +49,24 @@ cfg.CONF.import_opt('time_to_live', 'ceilometer.storage',
 LOG = log.getLogger(__name__)
 
 
-class MongoDBStorage(base.StorageEngine):
+AVAILABLE_CAPABILITIES = {
+    'resources': {'query': {'simple': True,
+                            'metadata': True}},
+    'statistics': {'groupby': True,
+                   'query': {'simple': True,
+                             'metadata': True},
+                   'aggregation': {'standard': True,
+                                   'selectable': {'max': True,
+                                                  'min': True,
+                                                  'sum': True,
+                                                  'avg': True,
+                                                  'count': True,
+                                                  'stddev': True,
+                                                  'cardinality': True}}}
+}
+
+
+class Connection(pymongo_base.Connection):
     """Put the data into a MongoDB database
 
     Collections::
@@ -75,35 +92,8 @@ class MongoDBStorage(base.StorageEngine):
             }
     """
 
-    def get_connection(self, url):
-        """Return a Connection instance based on the url.
-        """
-        return Connection(url)
-
-
-AVAILABLE_CAPABILITIES = {
-    'resources': {'query': {'simple': True,
-                            'metadata': True}},
-    'statistics': {'groupby': True,
-                   'query': {'simple': True,
-                             'metadata': True},
-                   'aggregation': {'standard': True,
-                                   'selectable': {'max': True,
-                                                  'min': True,
-                                                  'sum': True,
-                                                  'avg': True,
-                                                  'count': True,
-                                                  'stddev': True,
-                                                  'cardinality': True}}}
-}
-
-
-class Connection(pymongo_base.Connection):
-    """MongoDB connection.
-    """
     CAPABILITIES = utils.update_nested(pymongo_base.Connection.CAPABILITIES,
                                        AVAILABLE_CAPABILITIES)
-
     CONNECTION_POOL = pymongo_base.ConnectionPool()
 
     REDUCE_GROUP_CLEAN = bson.code.Code("""

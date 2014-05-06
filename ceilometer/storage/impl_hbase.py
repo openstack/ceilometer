@@ -42,7 +42,20 @@ from ceilometer import utils
 LOG = log.getLogger(__name__)
 
 
-class HBaseStorage(base.StorageEngine):
+AVAILABLE_CAPABILITIES = {
+    'meters': {'query': {'simple': True,
+                         'metadata': True}},
+    'resources': {'query': {'simple': True,
+                            'metadata': True}},
+    'samples': {'query': {'simple': True,
+                          'metadata': True}},
+    'statistics': {'query': {'simple': True,
+                             'metadata': True},
+                   'aggregation': {'standard': True}},
+}
+
+
+class Connection(base.Connection):
     """Put the data into a HBase database
 
     Collections:
@@ -108,32 +121,8 @@ class HBaseStorage(base.StorageEngine):
              if not determined
     """
 
-    @staticmethod
-    def get_connection(url):
-        """Return a Connection instance based on the configuration settings.
-        """
-        return Connection(url)
-
-
-AVAILABLE_CAPABILITIES = {
-    'meters': {'query': {'simple': True,
-                         'metadata': True}},
-    'resources': {'query': {'simple': True,
-                            'metadata': True}},
-    'samples': {'query': {'simple': True,
-                          'metadata': True}},
-    'statistics': {'query': {'simple': True,
-                             'metadata': True},
-                   'aggregation': {'standard': True}},
-}
-
-
-class Connection(base.Connection):
-    """HBase connection.
-    """
     CAPABILITIES = utils.update_nested(base.Connection.CAPABILITIES,
                                        AVAILABLE_CAPABILITIES)
-
     _memory_instance = None
 
     PROJECT_TABLE = "project"

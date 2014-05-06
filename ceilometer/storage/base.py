@@ -18,10 +18,8 @@
 """Base classes for storage engines
 """
 
-import abc
 import datetime
 import math
-import six
 
 from six import moves
 
@@ -103,15 +101,6 @@ class Pagination(object):
         self.marker_value = marker_value
         self.sort_keys = sort_keys
         self.sort_dirs = sort_dirs
-
-
-@six.add_metaclass(abc.ABCMeta)
-class StorageEngine(object):
-    """Base class for storage engines."""
-
-    @abc.abstractmethod
-    def get_connection(self, url):
-        """Return a Connection instance based on the url."""
 
 
 class Connection(object):
