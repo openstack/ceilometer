@@ -18,8 +18,6 @@
 from oslo.config import cfg
 import oslo.messaging
 
-from ceilometer.openstack.common import context
-
 TRANSPORT = None
 NOTIFIER = None
 
@@ -30,27 +28,6 @@ _ALIASES = {
 }
 
 
-class RequestContextSerializer(oslo.messaging.Serializer):
-    def __init__(self, base):
-        self._base = base
-
-    def serialize_entity(self, ctxt, entity):
-        if not self._base:
-            return entity
-        return self._base.serialize_entity(ctxt, entity)
-
-    def deserialize_entity(self, ctxt, entity):
-        if not self._base:
-            return entity
-        return self._base.deserialize_entity(ctxt, entity)
-
-    def serialize_context(self, ctxt):
-        return ctxt.to_dict()
-
-    def deserialize_context(self, ctxt):
-        return context.RequestContext(ctxt)
-
-
 def setup(url=None):
     """Initialise the oslo.messaging layer."""
     global TRANSPORT, NOTIFIER
@@ -59,8 +36,7 @@ def setup(url=None):
         TRANSPORT = oslo.messaging.get_transport(cfg.CONF, url,
                                                  aliases=_ALIASES)
     if not NOTIFIER:
-        serializer = RequestContextSerializer(None)
-        NOTIFIER = oslo.messaging.Notifier(TRANSPORT, serializer=serializer)
+        NOTIFIER = oslo.messaging.Notifier(TRANSPORT)
 
 
 def cleanup():
@@ -76,19 +52,15 @@ def get_rpc_server(topic, endpoint):
     """Return a configured oslo.messaging rpc server."""
     global TRANSPORT
     target = oslo.messaging.Target(server=cfg.CONF.host, topic=topic)
-    serializer = RequestContextSerializer(None)
     return oslo.messaging.get_rpc_server(TRANSPORT, target, [endpoint],
-                                         executor='eventlet',
-                                         serializer=serializer)
+                                         executor='eventlet')
 
 
 def get_rpc_client(**kwargs):
     """Return a configured oslo.messaging RPCClient."""
     global TRANSPORT
     target = oslo.messaging.Target(**kwargs)
-    serializer = RequestContextSerializer(None)
-    return oslo.messaging.RPCClient(TRANSPORT, target,
-                                    serializer=serializer)
+    return oslo.messaging.RPCClient(TRANSPORT, target)
 
 
 def get_notification_listener(targets, endpoints, url=None):
@@ -99,10 +71,8 @@ def get_notification_listener(targets, endpoints, url=None):
                                                  _ALIASES)
     else:
         transport = TRANSPORT
-    serializer = RequestContextSerializer(None)
     return oslo.messaging.get_notification_listener(
-        transport, targets, endpoints, executor='eventlet',
-        serializer=serializer)
+        transport, targets, endpoints, executor='eventlet')
 
 
 def get_notifier(publisher_id):
@@ -113,9 +83,9 @@ def get_notifier(publisher_id):
 
 def convert_to_old_notification_format(priority, ctxt, publisher_id,
                                        event_type, payload, metadata):
-    # FIXME(sileht): temporary convert notification to old format
-    # to focus on oslo.messaging migration before refactoring the code to
-    # use the new oslo.messaging facilities
+    #FIXME(sileht): temporary convert notification to old format
+    #to focus on oslo.messaging migration before refactoring the code to
+    #use the new oslo.messaging facilities
     notification = {'priority': priority,
                     'payload': payload,
                     'event_type': event_type,

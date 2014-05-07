@@ -142,7 +142,7 @@ class RPCPublisher(publisher.PublisherBase):
         self.flush()
 
     def flush(self):
-        # NOTE(sileht):
+        #note(sileht):
         # IO of the rpc stuff in handled by eventlet,
         # this is why the self.local_queue, is emptied before processing the
         # queue and the remaining messages in the queue are added to
@@ -164,7 +164,7 @@ class RPCPublisher(publisher.PublisherBase):
                      "dropping %d oldest samples") % count)
 
     def _process_queue(self, queue, policy):
-        # NOTE(sileht):
+        #note(sileht):
         # the behavior of rpc.cast call depends of rabbit_max_retries
         # if rabbit_max_retries <= 0:
         #   it returns only if the msg has been sent on the amqp queue
@@ -178,7 +178,7 @@ class RPCPublisher(publisher.PublisherBase):
             context, topic, meters = queue[0]
             try:
                 self.rpc_client.prepare(topic=topic).cast(
-                    context, self.target, data=meters)
+                    context.to_dict(), self.target, data=meters)
             except oslo.messaging._drivers.common.RPCException:
                 samples = sum([len(m) for __, __, m in queue])
                 if policy == 'queue':

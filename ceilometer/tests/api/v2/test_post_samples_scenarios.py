@@ -23,7 +23,6 @@ import datetime
 
 import mock
 
-from ceilometer.openstack.common import context
 from ceilometer.openstack.common.fixture import mockpatch
 from ceilometer.openstack.common import timeutils
 from ceilometer.tests.api.v2 import FunctionalTest
@@ -33,7 +32,6 @@ from ceilometer.tests import db as tests_db
 class TestPostSamples(FunctionalTest,
                       tests_db.MixinTestsWithBackendScenarios):
     def fake_cast(self, ctxt, target, data):
-        self.assertIsInstance(ctxt, context.RequestContext)
         for m in data:
             del m['message_signature']
         self.published.append(data)

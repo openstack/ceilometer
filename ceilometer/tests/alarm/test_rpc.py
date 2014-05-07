@@ -23,7 +23,6 @@ import mock
 
 from ceilometer.alarm import rpc as rpc_alarm
 from ceilometer import messaging
-from ceilometer.openstack.common import context
 from ceilometer.openstack.common.fixture import mockpatch
 from ceilometer.openstack.common import test
 from ceilometer.openstack.common import timeutils
@@ -31,8 +30,7 @@ from ceilometer.storage import models
 
 
 class TestRPCAlarmNotifier(test.BaseTestCase):
-    def fake_cast(self, ctxt, method, **args):
-        self.assertIsInstance(ctxt, context.RequestContext)
+    def fake_cast(self, context, method, **args):
         self.notified.append((method, args))
 
     def setUp(self):
@@ -132,8 +130,7 @@ class TestRPCAlarmNotifier(test.BaseTestCase):
 
 
 class TestRPCAlarmPartitionCoordination(test.BaseTestCase):
-    def fake_fanout_cast(self, ctxt, method, **args):
-        self.assertIsInstance(ctxt, context.RequestContext)
+    def fake_fanout_cast(self, context, method, **args):
         self.notified.append((method, args))
 
     def fake_prepare(self, fanout):
