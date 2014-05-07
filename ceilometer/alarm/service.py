@@ -170,7 +170,7 @@ class PartitionedAlarmService(AlarmService, os_service.Service):
 
     def stop(self):
         self.rpc_server.stop()
-        super(AlarmNotifierService, self).stop()
+        super(PartitionedAlarmService, self).stop()
 
     def _assigned_alarms(self):
         return self.partition_coordinator.assigned_alarms(self._client)

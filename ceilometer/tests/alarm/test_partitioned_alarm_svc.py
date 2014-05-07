@@ -57,7 +57,7 @@ class TestPartitionedAlarmService(test.BaseTestCase):
         self.partitioned.extension_manager = self.extension_mgr
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
-    def test_start(self):
+    def test_lifecycle(self):
         test_interval = 120
         self.CONF.set_override('evaluation_interval',
                                test_interval,
@@ -84,6 +84,7 @@ class TestPartitionedAlarmService(test.BaseTestCase):
             ]
             actual = self.partitioned.tg.add_timer.call_args_list
             self.assertEqual(expected, actual)
+            self.partitioned.stop()
 
     def test_presence_reporting(self):
         priority = 42
