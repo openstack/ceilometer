@@ -26,6 +26,7 @@ import oslo.messaging
 import oslo.messaging._drivers.common
 
 from ceilometer import messaging
+from ceilometer.openstack.common import context
 from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import network_utils
 from ceilometer.openstack.common import test
@@ -95,25 +96,36 @@ class TestPublish(test.BaseTestCase):
     def setUp(self):
         super(TestPublish, self).setUp()
         self.CONF = self.useFixture(config.Config()).conf
-
         messaging.setup('fake://')
         self.addCleanup(messaging.cleanup)
-
         self.published = []
 
-    def test_published(self):
+    def test_published_no_mock(self):
         publisher = rpc.RPCPublisher(
             network_utils.urlsplit('rpc://'))
-        cast_context = mock.MagicMock()
-        with mock.patch.object(publisher.rpc_client, 'prepare') as prepare:
-            prepare.return_value = cast_context
-            publisher.publish_samples(mock.MagicMock(),
-                                      self.test_data)
 
-        prepare.assert_called_once_with(
-            topic=self.CONF.publisher_rpc.metering_topic)
-        cast_context.cast.assert_called_once_with(
-            mock.ANY, 'record_metering_data', data=mock.ANY)
+        endpoint = mock.MagicMock(['record_metering_data'])
+        collector = messaging.get_rpc_server(
+            self.CONF.publisher_rpc.metering_topic, endpoint)
+        endpoint.record_metering_data.side_effect = \
+            lambda *args, **kwds: collector.stop()
+
+        collector.start()
+        eventlet.sleep()
+        publisher.publish_samples(context.RequestContext(),
+                                  self.test_data)
+        collector.wait()
+
+        class Matcher(object):
+            @staticmethod
+            def __eq__(data):
+                for i, sample in enumerate(data):
+                    if sample['counter_name'] != self.test_data[i].name:
+                        return False
+                return True
+
+        endpoint.record_metering_data.assert_called_once_with(
+            mock.ANY, data=Matcher())
 
     def test_publish_target(self):
         publisher = rpc.RPCPublisher(

@@ -25,7 +25,9 @@ from stevedore import extension
 
 from ceilometer import collector
 from ceilometer import messaging
+from ceilometer.openstack.common import context
 from ceilometer.openstack.common.fixture import config
+from ceilometer.openstack.common import timeutils
 from ceilometer.publisher import utils
 from ceilometer import sample
 from ceilometer.tests import base as tests_base
@@ -41,10 +43,11 @@ class TestCollector(tests_base.BaseTestCase):
         super(TestCollector, self).setUp()
         messaging.setup('fake://')
         self.addCleanup(messaging.cleanup)
+
         self.CONF = self.useFixture(config.Config()).conf
         self.CONF.set_override("connection", "log://", group='database')
-        self.srv = collector.CollectorService()
-        self.CONF.publisher.metering_secret = 'not-so-secret'
+        self.CONF.set_override('metering_secret', 'not-so-secret',
+                               group='publisher')
         self.counter = sample.Sample(
             name='foobar',
             type='bad',
@@ -53,7 +56,7 @@ class TestCollector(tests_base.BaseTestCase):
             user_id='jd',
             project_id='ceilometer',
             resource_id='cat',
-            timestamp='NOW!',
+            timestamp=timeutils.utcnow().isoformat(),
             resource_metadata={},
         ).as_dict()
 
@@ -66,11 +69,13 @@ class TestCollector(tests_base.BaseTestCase):
                 user_id=u'test',
                 project_id=u'test',
                 resource_id=u'test_run_tasks',
-                timestamp=u'NOW!',
+                timestamp=timeutils.utcnow().isoformat(),
                 resource_metadata={u'name': [([u'TestPublish'])]},
                 source=u'testsource',
             ),
             'not-so-secret')
+
+        self.srv = collector.CollectorService()
 
     def _make_test_manager(self, plugin):
         return extension.ExtensionManager.make_test_instance([
@@ -202,3 +207,18 @@ class TestCollector(tests_base.BaseTestCase):
             self.assertTrue(utils.verify_signature(
                 mock_dispatcher.method_calls[0][1][0],
                 "not-so-secret"))
+
+    @mock.patch('ceilometer.storage.impl_log.LOG')
+    def test_collector_no_mock(self, mylog):
+        self.CONF.set_override('udp_address', '', group='collector')
+        self.srv.start()
+        mylog.info.side_effect = lambda *args: self.srv.stop()
+
+        client = messaging.get_rpc_client(version='1.0')
+        cclient = client.prepare(topic='metering')
+        cclient.cast(context.RequestContext(),
+                     'record_metering_data', data=[self.utf8_msg])
+
+        self.srv.rpc_server.wait()
+        mylog.info.assert_called_once_with(
+            'metering data test for test_run_tasks: 1')

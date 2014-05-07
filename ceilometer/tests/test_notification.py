@@ -20,11 +20,15 @@
 import mock
 
 import oslo.messaging
+import oslo.messaging.conffixture
 from stevedore import extension
+import yaml
 
 from ceilometer.compute.notifications import instance
 from ceilometer import messaging
 from ceilometer import notification
+from ceilometer.openstack.common import context
+from ceilometer.openstack.common import fileutils
 from ceilometer.openstack.common.fixture import config
 from ceilometer.tests import base as tests_base
 
@@ -158,3 +162,57 @@ class TestNotification(tests_base.BaseTestCase):
         self.assertEqual(2, len(self.srv.listeners[0].dispatcher.endpoints))
         event_endpoint = self.srv.listeners[0].dispatcher.endpoints[0]
         self.assertEqual(1, len(list(event_endpoint.dispatcher_manager)))
+
+
+class TestRealNotification(tests_base.BaseTestCase):
+    def setUp(self):
+        super(TestRealNotification, self).setUp()
+        self.CONF = self.useFixture(config.Config()).conf
+        self.useFixture(oslo.messaging.conffixture.ConfFixture(self.CONF))
+
+        pipeline = yaml.dump([{
+            'name': 'test_pipeline',
+            'interval': 5,
+            'counters': ['*'],
+            'transformers': [],
+            'publishers': ['test://'],
+        }])
+        pipeline_cfg_file = fileutils.write_to_tempfile(content=pipeline,
+                                                        prefix="pipeline",
+                                                        suffix="yaml")
+        self.CONF.set_override("pipeline_cfg_file", pipeline_cfg_file)
+        self.CONF.set_override("notification_driver", "messaging")
+        self.CONF.set_override("control_exchange", "nova")
+        messaging.setup('fake://')
+        self.addCleanup(messaging.cleanup)
+
+        self.srv = notification.NotificationService()
+
+    @mock.patch('ceilometer.publisher.test.TestPublisher')
+    def test_notification_service(self, fake_publisher_cls):
+        self.srv.start()
+
+        fake_publisher = fake_publisher_cls.return_value
+        fake_publisher.publish_samples.side_effect = \
+            lambda *args: self.srv.stop()
+
+        notifier = messaging.get_notifier("compute.vagrant-precise")
+        notifier.info(context.RequestContext(), 'compute.instance.create.end',
+                      TEST_NOTICE_PAYLOAD)
+
+        self.srv.listeners[0].wait()
+
+        class SamplesMatcher(object):
+            def __eq__(self, samples):
+                for s in samples:
+                    if s.resource_id != "9f9d01b9-4a58-4271-9e27-398b21ab20d1":
+                        return False
+                return True
+
+        fake_publisher.publish_samples.assert_has_calls([
+            mock.call(mock.ANY, SamplesMatcher()),
+            mock.call(mock.ANY, SamplesMatcher()),
+            mock.call(mock.ANY, SamplesMatcher()),
+            mock.call(mock.ANY, SamplesMatcher()),
+            mock.call(mock.ANY, SamplesMatcher()),
+        ])

@@ -26,7 +26,7 @@ import logging
 import uuid
 
 import mock
-
+import oslo.messaging.conffixture
 from six import moves
 
 from ceilometer import messaging
@@ -1844,21 +1844,40 @@ class TestAlarms(FunctionalTest,
             }
 
         }
-        with mock.patch.object(messaging, 'get_notifier') as get_notifier:
-            notifier = get_notifier.return_value
+        endpoint = mock.MagicMock()
+        target = oslo.messaging.Target(topic="notifications",
+                                       exchange="ceilometer")
+        listener = messaging.get_notification_listener([target],
+                                                       [endpoint])
+        listener.start()
+        endpoint.info.side_effect = lambda *args: listener.stop()
+        self.post_json('/alarms', params=json, headers=self.auth_headers)
+        listener.wait()
 
-            self.post_json('/alarms', params=json, headers=self.auth_headers)
-            get_notifier.assert_called_once_with(publisher_id='ceilometer.api')
+        class PayloadMatcher(object):
+            def __eq__(self, payload):
+                return payload['detail']['name'] == 'sent_notification' and \
+                    payload['type'] == 'creation' and \
+                    payload['detail']['rule']['meter_name'] == 'ameter' and \
+                    set(['alarm_id', 'detail', 'event_id', 'on_behalf_of',
+                         'project_id', 'timestamp',
+                         'user_id']).issubset(payload.keys())
 
-        calls = notifier.info.call_args_list
-        self.assertEqual(1, len(calls))
-        args, _ = calls[0]
-        context, event_type, payload = args
-        self.assertEqual('alarm.creation', event_type)
-        self.assertEqual('sent_notification', payload['detail']['name'])
-        self.assertTrue(set(['alarm_id', 'detail', 'event_id', 'on_behalf_of',
-                             'project_id', 'timestamp', 'type',
-                             'user_id']).issubset(payload.keys()))
+        endpoint.info.assert_called_once_with(
+            {'instance_uuid': None,
+             'domain': None,
+             'project_domain': None,
+             'auth_token': None,
+             'is_admin': False,
+             'user': None,
+             'tenant': None,
+             'read_only': False,
+             'show_deleted': False,
+             'user_identity': '- - - - -',
+             'request_id': mock.ANY,
+             'user_domain': None},
+            'ceilometer.api', 'alarm.creation',
+            PayloadMatcher(), mock.ANY)
 
     def test_alarm_sends_notification(self):
         # Hit the AlarmController (with alarm_id supplied) ...
