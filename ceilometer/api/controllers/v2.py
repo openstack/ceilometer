@@ -595,7 +595,7 @@ def _send_notification(event, payload):
     notification = event.replace(" ", "_")
     notification = "alarm.%s" % notification
     notifier = messaging.get_notifier(publisher_id="ceilometer.api")
-    notifier.info(None, notification, payload)
+    notifier.info(context.RequestContext(), notification, payload)
 
 
 class OldSample(_Base):
