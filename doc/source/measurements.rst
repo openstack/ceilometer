@@ -297,11 +297,12 @@ User-defined sample metadata for Nova
 =========================================
 
 Users are allowed to add additional metadata to samples of nova meter.
-These additional metadata are stored in 'resource_metadata.user_metadata.*' of the sample
+These additional metadata are stored in 'resource_metadata.user_metadata.*' of the sample.
 To do so, users should add nova user metadata prefixed with 'metering.':
 
 ::
-    $ nova boot --meta metering.custom_metadata=a_value my_vm
+
+   $ nova boot --meta metering.custom_metadata=a_value my_vm
 
 Note: The name of the metadata shouldn't exceed 256 characters otherwise it will be cut off.
 Also, if it has '.', this will be replaced by a '_' in ceilometer.
