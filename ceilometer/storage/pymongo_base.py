@@ -238,7 +238,7 @@ class Connection(base.Connection):
     def record_alarm_change(self, alarm_change):
         """Record alarm change event.
         """
-        self.db.alarm_history.insert(alarm_change)
+        self.db.alarm_history.insert(alarm_change.copy())
 
     def get_samples(self, sample_filter, limit=None):
         """Return an iterable of model.Sample instances.
