@@ -1,0 +1,73 @@
+# Copyright (C) 2014 eNovance SAS <licensing@enovance.com>
+#
+# Author: Sylvain Afchain <sylvain.afchain@enovance.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+
+import functools
+
+from neutronclient.v2_0 import client as clientv20
+from oslo.config import cfg
+
+from ceilometer.openstack.common import log
+
+cfg.CONF.import_group('service_credentials', 'ceilometer.service')
+
+LOG = log.getLogger(__name__)
+
+
+def logged(func):
+
+    @functools.wraps(func)
+    def with_logging(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            LOG.exception(e)
+            raise
+
+    return with_logging
+
+
+class Client(object):
+    """A client which gets information via python-neutronclient."""
+
+    def __init__(self):
+        conf = cfg.CONF.service_credentials
+        params = {
+            'insecure': conf.insecure,
+            'ca_cert': conf.os_cacert,
+            'username': conf.os_username,
+            'password': conf.os_password,
+            'auth_url': conf.os_auth_url,
+            'region_name': conf.os_region_name,
+            'endpoint_type': conf.os_endpoint_type
+        }
+
+        if conf.os_tenant_id:
+            params['tenant_id'] = conf.os_tenant_id
+        else:
+            params['tenant_name'] = conf.os_tenant_name
+
+        self.client = clientv20.Client(**params)
+
+    @logged
+    def network_get_all(self):
+        """Returns all networks."""
+        resp = self.client.list_networks()
+        return resp.get('networks')
+
+    @logged
+    def port_get_all(self):
+        resp = self.client.list_ports()
+        return resp.get('ports')
