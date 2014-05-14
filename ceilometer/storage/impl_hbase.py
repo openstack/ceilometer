@@ -438,14 +438,8 @@ class Connection(base.Connection):
                 sample_filter, require_meter=False)
             LOG.debug(_("Query Meter Table: %s") % q)
             gen = meter_table.scan(filter=q, row_start=start, row_stop=stop,
-                                   columns=columns)
+                                   columns=columns, limit=limit)
             for ignored, meter in gen:
-                if limit is not None:
-                    if limit == 0:
-                        break
-                    else:
-                        limit -= 1
-
                 d_meter = deserialize_entry(meter)[0]
                 d_meter['message']['recorded_at'] = d_meter['recorded_at']
                 yield models.Sample(**d_meter['message'])
@@ -586,7 +580,8 @@ class MTable(object):
     def delete(self, key):
         del self._rows[key]
 
-    def scan(self, filter=None, columns=None, row_start=None, row_stop=None):
+    def scan(self, filter=None, columns=None, row_start=None, row_stop=None,
+             limit=None):
         columns = columns or []
         sorted_keys = sorted(self._rows)
         # copy data between row_start and row_stop into a dict
@@ -623,7 +618,7 @@ class MTable(object):
                 else:
                     raise NotImplementedError("%s filter is not implemented, "
                                               "you may want to add it!")
-        for k in sorted(rows):
+        for k in sorted(rows)[:limit]:
             yield k, rows[k]
 
     @staticmethod
