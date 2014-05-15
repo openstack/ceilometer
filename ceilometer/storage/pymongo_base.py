@@ -146,32 +146,6 @@ class Connection(base.Connection):
     CAPABILITIES = utils.update_nested(base.Connection.CAPABILITIES,
                                        COMMON_AVAILABLE_CAPABILITIES)
 
-    def get_users(self, source=None):
-        """Return an iterable of user id strings.
-
-        :param source: Optional source filter.
-        """
-        q = {}
-        if source is not None:
-            q['source'] = source
-
-        return (doc['_id'] for doc in
-                self.db.user.find(q, fields=['_id'],
-                                  sort=[('_id', pymongo.ASCENDING)]))
-
-    def get_projects(self, source=None):
-        """Return an iterable of project id strings.
-
-        :param source: Optional source filter.
-        """
-        q = {}
-        if source is not None:
-            q['source'] = source
-
-        return (doc['_id'] for doc in
-                self.db.project.find(q, fields=['_id'],
-                                     sort=[('_id', pymongo.ASCENDING)]))
-
     def get_meters(self, user=None, project=None, resource=None, source=None,
                    metaquery={}, pagination=None):
         """Return an iterable of models.Meter instances

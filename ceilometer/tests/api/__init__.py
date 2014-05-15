@@ -18,63 +18,15 @@
 """Base classes for API tests.
 """
 
-import flask
+from oslo.config import cfg
 import pecan
 import pecan.testing
-from six.moves import urllib
 
-from ceilometer.api.v1 import app as v1_app
-from ceilometer.api.v1 import blueprint as v1_blueprint
 from ceilometer import messaging
-from ceilometer.openstack.common import jsonutils
-from ceilometer import service
 from ceilometer.tests import db as db_test_base
 
 OPT_GROUP_NAME = 'keystone_authtoken'
-
-
-class TestBase(db_test_base.TestBase):
-    """Use only for v1 API tests.
-    """
-
-    def setUp(self):
-        super(TestBase, self).setUp()
-        messaging.setup("fake://")
-        self.addCleanup(messaging.cleanup)
-        service.prepare_service([])
-        self.CONF.set_override("auth_version",
-                               "v2.0", group=OPT_GROUP_NAME)
-        self.CONF.set_override("policy_file",
-                               self.path_get('etc/ceilometer/policy.json'))
-        sources_file = self.path_get('ceilometer/tests/sources.json')
-        self.app = v1_app.make_app(self.CONF,
-                                   attach_storage=False,
-                                   sources_file=sources_file)
-
-        # this is needed to pass over unhandled exceptions
-        self.app.debug = True
-
-        self.app.register_blueprint(v1_blueprint.blueprint)
-        self.test_app = self.app.test_client()
-
-        @self.app.before_request
-        def attach_storage_connection():
-            flask.request.storage_conn = self.conn
-
-    def get(self, path, headers=None, **kwds):
-        if kwds:
-            query = path + '?' + urllib.parse.urlencode(kwds)
-        else:
-            query = path
-        rv = self.test_app.get(query, headers=headers)
-        if rv.status_code == 200 and rv.content_type == 'application/json':
-            try:
-                data = jsonutils.loads(rv.data)
-            except ValueError:
-                print('RAW DATA:%s' % rv)
-                raise
-            return data
-        return rv
+cfg.CONF.import_group(OPT_GROUP_NAME, "keystoneclient.middleware.auth_token")
 
 
 class FunctionalTest(db_test_base.TestBase):

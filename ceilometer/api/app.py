@@ -35,9 +35,6 @@ from ceilometer import storage
 LOG = log.getLogger(__name__)
 
 auth_opts = [
-    cfg.BoolOpt('enable_v1_api',
-                default=True,
-                help='Deploy the deprecated v1 API.'),
     cfg.StrOpt('api_paste_config',
                default="api_paste.ini",
                help="Configuration file for WSGI definition of API."
@@ -88,14 +85,12 @@ class VersionSelectorApplication(object):
     def __init__(self):
         pc = get_pecan_config()
         pc.app.debug = CONF.debug
-        if cfg.CONF.enable_v1_api:
-            from ceilometer.api.v1 import app as v1app
-            self.v1 = v1app.make_app(cfg.CONF)
-        else:
-            def not_found(environ, start_response):
-                start_response('404 Not Found', [])
-                return []
-            self.v1 = not_found
+
+        def not_found(environ, start_response):
+            start_response('404 Not Found', [])
+            return []
+
+        self.v1 = not_found
         self.v2 = setup_app(pecan_config=pc)
 
     def __call__(self, environ, start_response):

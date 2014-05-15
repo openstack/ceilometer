@@ -3,7 +3,6 @@ anyjson>=0.3.3
 argparse
 croniter>=0.3.4 # MIT License
 eventlet>=0.13.0
-Flask>=0.10,<1.0
 happybase>=0.5,!=0.7
 iso8601>=0.1.9
 jsonpath-rw>=1.2.0,<2.0

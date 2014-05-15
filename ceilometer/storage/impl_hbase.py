@@ -334,32 +334,6 @@ class Connection(base.Connection):
                                               )})
             meter_table.put(row, record)
 
-    def get_users(self, source=None):
-        """Return an iterable of user id strings.
-
-        :param source: Optional source filter.
-        """
-        with self.conn_pool.connection() as conn:
-            user_table = conn.table(self.USER_TABLE)
-            LOG.debug(_("Query User table: source=%s") % source)
-            scan_args = {}
-            if source:
-                scan_args['columns'] = ['f:s_%s' % source]
-            return sorted(key for key, ignored in user_table.scan(**scan_args))
-
-    def get_projects(self, source=None):
-        """Return an iterable of project id strings.
-
-        :param source: Optional source filter.
-        """
-        with self.conn_pool.connection() as conn:
-            project_table = conn.table(self.PROJECT_TABLE)
-            LOG.debug(_("Query Project table: source=%s") % source)
-            scan_args = {}
-            if source:
-                scan_args['columns'] = ['f:s_%s' % source]
-            return (key for key, ignored in project_table.scan(**scan_args))
-
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
                       end_timestamp=None, end_timestamp_op=None,

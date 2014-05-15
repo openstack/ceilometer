@@ -121,37 +121,6 @@ class DBTestBase(tests_db.TestBase):
             )
 
 
-class UserTest(DBTestBase,
-               tests_db.MixinTestsWithBackendScenarios):
-
-    def test_get_users(self):
-        users = self.conn.get_users()
-        expected = set(['user-id', 'user-id-alternate', 'user-id-2',
-                        'user-id-3', 'user-id-4', 'user-id-5', 'user-id-6',
-                        'user-id-7', 'user-id-8'])
-        self.assertEqual(set(users), expected)
-
-    def test_get_users_by_source(self):
-        users = self.conn.get_users(source='test-1')
-        self.assertEqual(list(users), ['user-id'])
-
-
-class ProjectTest(DBTestBase,
-                  tests_db.MixinTestsWithBackendScenarios):
-
-    def test_get_projects(self):
-        projects = self.conn.get_projects()
-        expected = set(['project-id', 'project-id-2', 'project-id-3',
-                        'project-id-4', 'project-id-5', 'project-id-6',
-                        'project-id-7', 'project-id-8'])
-        self.assertEqual(set(projects), expected)
-
-    def test_get_projects_by_source(self):
-        projects = self.conn.get_projects(source='test-1')
-        expected = ['project-id']
-        self.assertEqual(list(projects), expected)
-
-
 class ResourceTest(DBTestBase,
                    tests_db.MixinTestsWithBackendScenarios):
 
@@ -664,10 +633,6 @@ class RawSampleTest(DBTestBase,
         f = storage.SampleFilter(meter='instance')
         results = list(self.conn.get_samples(f))
         self.assertEqual(len(results), 5)
-        results = list(self.conn.get_users())
-        self.assertEqual(len(results), 5)
-        results = list(self.conn.get_projects())
-        self.assertEqual(len(results), 5)
         results = list(self.conn.get_resources())
         self.assertEqual(len(results), 5)
 
@@ -682,10 +647,6 @@ class RawSampleTest(DBTestBase,
         f = storage.SampleFilter(meter='instance')
         results = list(self.conn.get_samples(f))
         self.assertEqual(len(results), 11)
-        results = list(self.conn.get_users())
-        self.assertEqual(len(results), 9)
-        results = list(self.conn.get_projects())
-        self.assertEqual(len(results), 8)
         results = list(self.conn.get_resources())
         self.assertEqual(len(results), 9)
 
@@ -728,12 +689,6 @@ class RawSampleTest(DBTestBase,
         f = storage.SampleFilter(meter='instance')
         results = list(self.conn.get_samples(f))
         self.assertEqual(len(results), 2)
-        results = list(self.conn.get_users())
-        self.assertEqual(len(results), 2)
-        self.assertNotIn('user-id', results)
-        results = list(self.conn.get_projects())
-        self.assertEqual(len(results), 2)
-        self.assertNotIn('project-id', results)
         results = list(self.conn.get_resources())
         self.assertEqual(len(results), 2)
 

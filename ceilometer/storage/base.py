@@ -174,22 +174,6 @@ class Connection(object):
         raise NotImplementedError('Clearing samples not implemented')
 
     @staticmethod
-    def get_users(source=None):
-        """Return an iterable of user id strings.
-
-        :param source: Optional source filter.
-        """
-        raise NotImplementedError('Users not implemented')
-
-    @staticmethod
-    def get_projects(source=None):
-        """Return an iterable of project id strings.
-
-        :param source: Optional source filter.
-        """
-        raise NotImplementedError('Projects not implemented')
-
-    @staticmethod
     def get_resources(user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
                       end_timestamp=None, end_timestamp_op=None,

@@ -160,11 +160,6 @@ class BinApiTestCase(base.BaseTestCase):
                 return r, c
         return (None, None)
 
-    def test_v1(self):
-        response, content = self.get_response('v1/meters')
-        self.assertEqual(200, response.status)
-        self.assertEqual({'meters': []}, json.loads(content))
-
     def test_v2(self):
         response, content = self.get_response('v2/meters')
         self.assertEqual(200, response.status)

@@ -389,26 +389,6 @@ class Connection(base.Connection):
             for res_obj in query.all():
                 session.delete(res_obj)
 
-    def get_users(self, source=None):
-        """Return an iterable of user id strings.
-
-        :param source: Optional source filter.
-        """
-        query = self._engine_facade.get_session().query(models.User.id)
-        if source is not None:
-            query = query.filter(models.User.sources.any(id=source))
-        return (x[0] for x in query.all())
-
-    def get_projects(self, source=None):
-        """Return an iterable of project id strings.
-
-        :param source: Optional source filter.
-        """
-        query = self._engine_facade.get_session().query(models.Project.id)
-        if source:
-            query = query.filter(models.Project.sources.any(id=source))
-        return (x[0] for x in query.all())
-
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
                       end_timestamp=None, end_timestamp_op=None,
