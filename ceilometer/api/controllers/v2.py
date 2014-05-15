@@ -420,6 +420,10 @@ def _validate_query(query, db_func, internal_keys=None,
     _verify_query_segregation(query)
 
     valid_keys = inspect.getargspec(db_func)[0]
+    if 'alarm_type' in valid_keys:
+        valid_keys.remove('alarm_type')
+        valid_keys.append('type')
+
     internal_keys.append('self')
     valid_keys = set(valid_keys) - set(internal_keys)
     translation = {'user_id': 'user',
@@ -515,7 +519,8 @@ def _query_to_kwargs(query, db_func, internal_keys=None,
     valid_keys = set(inspect.getargspec(db_func)[0]) - set(internal_keys)
     translation = {'user_id': 'user',
                    'project_id': 'project',
-                   'resource_id': 'resource'}
+                   'resource_id': 'resource',
+                   'type': 'alarm_type'}
     stamp = {}
     metaquery = {}
     kwargs = {}
