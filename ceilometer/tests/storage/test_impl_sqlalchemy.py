@@ -205,16 +205,6 @@ class RelationshipTest(scenarios.DBTestBase):
                 session.query(sql_models.Sample.id)
                     .group_by(sql_models.Sample.id)
                     )).count())
-        self.assertEqual(0, session.query(sql_models.sourceassoc)
-            .filter(~sql_models.sourceassoc.c.project_id.in_(
-                session.query(sql_models.Project.id)
-                    .group_by(sql_models.Project.id)
-                    )).count())
-        self.assertEqual(0, session.query(sql_models.sourceassoc)
-            .filter(~sql_models.sourceassoc.c.user_id.in_(
-                session.query(sql_models.User.id)
-                    .group_by(sql_models.User.id)
-                    )).count())
 
 
 class CapabilitiesTest(test_base.BaseTestCase):

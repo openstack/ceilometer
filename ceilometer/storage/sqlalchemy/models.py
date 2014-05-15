@@ -102,22 +102,15 @@ Base = declarative_base(cls=CeilometerBase)
 sourceassoc = Table('sourceassoc', Base.metadata,
                     Column('sample_id', Integer,
                            ForeignKey("sample.id")),
-                    Column('project_id', String(255),
-                           ForeignKey("project.id")),
                     Column('resource_id', String(255),
                            ForeignKey("resource.id")),
-                    Column('user_id', String(255),
-                           ForeignKey("user.id")),
                     Column('source_id', String(255),
                            ForeignKey("source.id")))
 
-Index('idx_su', sourceassoc.c['source_id'], sourceassoc.c['user_id']),
-Index('idx_sp', sourceassoc.c['source_id'], sourceassoc.c['project_id']),
 Index('idx_sr', sourceassoc.c['source_id'], sourceassoc.c['resource_id']),
 Index('idx_ss', sourceassoc.c['source_id'], sourceassoc.c['sample_id']),
 Index('ix_sourceassoc_source_id', sourceassoc.c['source_id'])
-UniqueConstraint(sourceassoc.c['sample_id'], sourceassoc.c['user_id'],
-                 name='uniq_sourceassoc0sample_id0user_id')
+UniqueConstraint(sourceassoc.c['sample_id'], name='uniq_sourceassoc0sample_id')
 
 
 class Source(Base):
@@ -198,8 +191,8 @@ class Sample(Base):
     )
     id = Column(Integer, primary_key=True)
     meter_id = Column(Integer, ForeignKey('meter.id'))
-    user_id = Column(String(255), ForeignKey('user.id'))
-    project_id = Column(String(255), ForeignKey('project.id'))
+    user_id = Column(String(255))
+    project_id = Column(String(255))
     resource_id = Column(String(255), ForeignKey('resource.id'))
     resource_metadata = Column(JSONEncodedDict())
     volume = Column(Float(53))
@@ -236,22 +229,6 @@ class MeterSample(Base):
     sources = relationship("Source", secondary=lambda: sourceassoc)
 
 
-class User(Base):
-    __tablename__ = 'user'
-    id = Column(String(255), primary_key=True)
-    sources = relationship("Source", secondary=lambda: sourceassoc)
-    resources = relationship("Resource", backref='user')
-    samples = relationship("Sample", backref='user')
-
-
-class Project(Base):
-    __tablename__ = 'project'
-    id = Column(String(255), primary_key=True)
-    sources = relationship("Source", secondary=lambda: sourceassoc)
-    resources = relationship("Resource", backref='project')
-    samples = relationship("Sample", backref='project')
-
-
 class Resource(Base):
     __tablename__ = 'resource'
     __table_args__ = (
@@ -262,8 +239,8 @@ class Resource(Base):
     id = Column(String(255), primary_key=True)
     sources = relationship("Source", secondary=lambda: sourceassoc)
     resource_metadata = Column(JSONEncodedDict())
-    user_id = Column(String(255), ForeignKey('user.id'))
-    project_id = Column(String(255), ForeignKey('project.id'))
+    user_id = Column(String(255))
+    project_id = Column(String(255))
     samples = relationship("Sample", backref='resource')
 
 
@@ -305,9 +282,9 @@ class AlarmChange(Base):
     )
     event_id = Column(String(255), primary_key=True)
     alarm_id = Column(String(255))
-    on_behalf_of = Column(String(255), ForeignKey('project.id'))
-    project_id = Column(String(255), ForeignKey('project.id'))
-    user_id = Column(String(255), ForeignKey('user.id'))
+    on_behalf_of = Column(String(255))
+    project_id = Column(String(255))
+    user_id = Column(String(255))
     type = Column(String(20))
     detail = Column(Text)
     timestamp = Column(PreciseTimestamp, default=lambda: timeutils.utcnow())

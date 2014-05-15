@@ -60,16 +60,6 @@ class Connection(base.Connection):
 
     Collections:
 
-    - user
-      - row_key: user_id
-      - Column Families:
-          f: contains all sources with 's' prefix
-
-    - project
-      - row_key: project_id
-      - Column Families:
-          f: contains all sources with 's' prefix
-
     - meter (describes sample actually)
       - row-key: consists of reversed timestamp, meter and an md5 of
                  user+resource+project for purposes of uniqueness
@@ -125,8 +115,6 @@ class Connection(base.Connection):
                                        AVAILABLE_CAPABILITIES)
     _memory_instance = None
 
-    PROJECT_TABLE = "project"
-    USER_TABLE = "user"
     RESOURCE_TABLE = "resource"
     METER_TABLE = "meter"
     ALARM_TABLE = "alarm"
@@ -154,8 +142,6 @@ class Connection(base.Connection):
 
     def upgrade(self):
         with self.conn_pool.connection() as conn:
-            conn.create_table(self.PROJECT_TABLE, {'f': dict(max_versions=1)})
-            conn.create_table(self.USER_TABLE, {'f': dict(max_versions=1)})
             conn.create_table(self.RESOURCE_TABLE, {'f': dict(max_versions=1)})
             conn.create_table(self.METER_TABLE, {'f': dict(max_versions=1)})
             conn.create_table(self.ALARM_TABLE, {'f': dict()})
@@ -164,13 +150,10 @@ class Connection(base.Connection):
     def clear(self):
         LOG.debug(_('Dropping HBase schema...'))
         with self.conn_pool.connection() as conn:
-            for table in [self.PROJECT_TABLE,
-                          self.USER_TABLE,
-                          self.RESOURCE_TABLE,
+            for table in [self.RESOURCE_TABLE,
                           self.METER_TABLE,
                           self.ALARM_TABLE,
                           self.ALARM_HISTORY_TABLE]:
-
                 try:
                     conn.disable_table(table)
                 except Exception:
@@ -290,18 +273,8 @@ class Connection(base.Connection):
                      ceilometer.meter.meter_message_from_counter
         """
         with self.conn_pool.connection() as conn:
-            project_table = conn.table(self.PROJECT_TABLE)
-            user_table = conn.table(self.USER_TABLE)
             resource_table = conn.table(self.RESOURCE_TABLE)
             meter_table = conn.table(self.METER_TABLE)
-
-            if data['user_id']:
-                user_table.put(data['user_id'], serialize_entry(
-                    **{'source': data['source']}))
-
-            project_table.put(data['project_id'], serialize_entry(
-                **{'source': data['source']})
-            )
 
             resource_metadata = data.get('resource_metadata', {})
             # Determine the name of new meter

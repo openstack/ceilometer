@@ -57,14 +57,6 @@ class Connection(pymongo_base.Connection):
 
     Collections::
 
-        - user
-          - { _id: user id
-              source: [ array of source ids reporting for the user ]
-              }
-        - project
-          - { _id: project id
-              source: [ array of source ids reporting for the project ]
-              }
         - meter
           - the raw incoming data
         - resource
@@ -191,20 +183,13 @@ class Connection(pymongo_base.Connection):
             self.db.resource.remove({'_id': resource_id})
             self.db.meter.remove({'_id': meter_id})
 
-            # The following code is to ensure that the keys for collections
-            # are set as objectId so that db2 index on key can be created
-            # correctly
-            user_id = str(bson.objectid.ObjectId())
-            self.db.user.insert({'_id': user_id})
-            self.db.user.remove({'_id': user_id})
-
-            project_id = str(bson.objectid.ObjectId())
-            self.db.project.insert({'_id': project_id})
-            self.db.project.remove({'_id': project_id})
+        # remove API v1 related table
+        self.db.user.drop()
+        self.db.project.drop()
 
     def clear(self):
         # db2 does not support drop_database, remove all collections
-        for col in ['user', 'project', 'resource', 'meter']:
+        for col in ['resource', 'meter']:
             self.db[col].drop()
         # drop_database command does nothing on db2 database since this has
         # not been implemented. However calling this method is important for
@@ -219,22 +204,6 @@ class Connection(pymongo_base.Connection):
         :param data: a dictionary such as returned by
                      ceilometer.meter.meter_message_from_counter
         """
-        # Make sure we know about the user and project
-        self.db.user.update(
-            {'_id': data['user_id'] or 'null'},
-            {'$addToSet': {'source': data['source'],
-                           },
-             },
-            upsert=True,
-        )
-        self.db.project.update(
-            {'_id': data['project_id']},
-            {'$addToSet': {'source': data['source'],
-                           },
-             },
-            upsert=True,
-        )
-
         # Record the updated resource metadata
         self.db.resource.update(
             {'_id': data['resource_id']},

@@ -71,14 +71,6 @@ class Connection(pymongo_base.Connection):
 
     Collections::
 
-        - user
-          - { _id: user id
-              source: [ array of source ids reporting for the user ]
-              }
-        - project
-          - { _id: project id
-              source: [ array of source ids reporting for the project ]
-              }
         - meter
           - the raw incoming data
         - resource
@@ -100,10 +92,6 @@ class Connection(pymongo_base.Connection):
     function ( curr, result ) {
         if (result.resources.indexOf(curr.resource_id) < 0)
             result.resources.push(curr.resource_id);
-        if (result.users.indexOf(curr.user_id) < 0)
-            result.users.push(curr.user_id);
-        if (result.projects.indexOf(curr.project_id) < 0)
-            result.projects.push(curr.project_id);
     }
     """)
 
@@ -453,6 +441,9 @@ class Connection(pymongo_base.Connection):
                                       sparse=True)
         self.db.meter.ensure_index([('timestamp', pymongo.DESCENDING)],
                                    name='timestamp_idx')
+        # remove API v1 related table
+        self.db.user.drop()
+        self.db.project.drop()
 
         indexes = self.db.meter.index_information()
 
@@ -489,22 +480,6 @@ class Connection(pymongo_base.Connection):
         :param data: a dictionary such as returned by
                      ceilometer.meter.meter_message_from_counter
         """
-        # Make sure we know about the user and project
-        self.db.user.update(
-            {'_id': data['user_id']},
-            {'$addToSet': {'source': data['source'],
-                           },
-             },
-            upsert=True,
-        )
-        self.db.project.update(
-            {'_id': data['project_id']},
-            {'$addToSet': {'source': data['source'],
-                           },
-             },
-            upsert=True,
-        )
-
         # Record the updated resource metadata - we use $setOnInsert to
         # unconditionally insert sample timestamps and resource metadata
         # (in the update case, this must be conditional on the sample not
@@ -573,13 +548,9 @@ class Connection(pymongo_base.Connection):
             reduce=self.REDUCE_GROUP_CLEAN,
             initial={
                 'resources': [],
-                'users': [],
-                'projects': [],
             }
         )[0]
 
-        self.db.user.remove({'_id': {'$nin': results['users']}})
-        self.db.project.remove({'_id': {'$nin': results['projects']}})
         self.db.resource.remove({'_id': {'$nin': results['resources']}})
 
     @staticmethod

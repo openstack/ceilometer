@@ -187,12 +187,8 @@ class Connection(base.Connection):
 
     Tables::
 
-        - user
-          - { id: user uuid }
         - source
           - { id: source id }
-        - project
-          - { id: project uuid }
         - meter
           - meter definition
           - { id: meter def id
@@ -204,8 +200,8 @@ class Connection(base.Connection):
           - the raw incoming data
           - { id: sample id
               meter_id: meter id            (->meter.id)
-              user_id: user uuid            (->user.id)
-              project_id: project uuid      (->project.id)
+              user_id: user uuid
+              project_id: project uuid
               resource_id: resource uuid    (->resource.id)
               resource_metadata: metadata dictionaries
               volume: sample volume
@@ -217,15 +213,13 @@ class Connection(base.Connection):
           - the metadata for resources
           - { id: resource uuid
               resource_metadata: metadata dictionaries
-              project_id: project uuid      (->project.id)
-              user_id: user uuid            (->user.id)
+              project_id: project uuid
+              user_id: user uuid
               }
         - sourceassoc
           - the relationships
           - { sample_id: sample id           (->sample.id)
-              project_id: project uuid      (->project.id)
               resource_id: resource uuid    (->resource.id)
-              user_id: user uuid            (->user.id)
               source_id: source id          (->source.id)
               }
     """
@@ -302,13 +296,10 @@ class Connection(base.Connection):
             rmetadata = data['resource_metadata']
             source = self._create_or_update(session, models.Source,
                                             data['source'])
-            user = self._create_or_update(session, models.User,
-                                          data['user_id'], source)
-            project = self._create_or_update(session, models.Project,
-                                             data['project_id'], source)
             resource = self._create_or_update(session, models.Resource,
                                               data['resource_id'], source,
-                                              user=user, project=project,
+                                              user_id=data['user_id'],
+                                              project_id=data['project_id'],
                                               resource_metadata=rmetadata)
 
             # Record the raw data for the sample.
@@ -321,8 +312,8 @@ class Connection(base.Connection):
             session.add(sample)
             if not filter(lambda x: x.id == source.id, sample.sources):
                 sample.sources.append(source)
-            sample.project = project
-            sample.user = user
+            sample.project_id = data['project_id']
+            sample.user_id = data['user_id']
             sample.timestamp = data['timestamp']
             sample.resource_metadata = rmetadata
             sample.volume = data['counter_volume']
@@ -359,29 +350,6 @@ class Connection(base.Connection):
             for sample_obj in sample_query.all():
                 session.delete(sample_obj)
 
-            query = session.query(models.User).filter(
-                ~models.User.id.in_(session.query(models.Sample.user_id)
-                                    .group_by(models.Sample.user_id)),
-                ~models.User.id.in_(session.query(models.AlarmChange.user_id)
-                                    .group_by(models.AlarmChange.user_id))
-            )
-            for user_obj in query.all():
-                session.delete(user_obj)
-
-            query = session.query(models.Project)\
-                .filter(~models.Project.id.in_(
-                    session.query(models.Sample.project_id)
-                        .group_by(models.Sample.project_id)),
-                        ~models.Project.id.in_(
-                            session.query(models.AlarmChange.project_id)
-                            .group_by(models.AlarmChange.project_id)),
-                        ~models.Project.id.in_(
-                            session.query(models.AlarmChange.on_behalf_of)
-                            .group_by(models.AlarmChange.on_behalf_of))
-                        )
-            for project_obj in query.all():
-                session.delete(project_obj)
-
             query = session.query(models.Resource)\
                 .filter(~models.Resource.id.in_(
                     session.query(models.Sample.resource_id).group_by(
@@ -410,7 +378,7 @@ class Connection(base.Connection):
             raise NotImplementedError('Pagination not implemented')
 
         def _apply_filters(query):
-            #TODO(gordc) this should be merged with make_query_from_filter
+            # TODO(gordc) this should be merged with make_query_from_filter
             for column, value in [(models.Sample.resource_id, resource),
                                   (models.Sample.user_id, user),
                                   (models.Sample.project_id, project)]:
@@ -484,7 +452,7 @@ class Connection(base.Connection):
             raise NotImplementedError('Pagination not implemented')
 
         def _apply_filters(query):
-            #TODO(gordc) this should be merged with make_query_from_filter
+            # TODO(gordc) this should be merged with make_query_from_filter
             for column, value in [(models.Sample.resource_id, resource),
                                   (models.Sample.user_id, user),
                                   (models.Sample.project_id, project)]:
@@ -807,10 +775,6 @@ class Connection(base.Connection):
         """
         session = self._engine_facade.get_session()
         with session.begin():
-            Connection._create_or_update(session, models.User,
-                                         alarm.user_id)
-            Connection._create_or_update(session, models.Project,
-                                         alarm.project_id)
             alarm_row = session.merge(models.Alarm(alarm_id=alarm.alarm_id))
             alarm_row.update(alarm.as_dict())
 
@@ -916,12 +880,6 @@ class Connection(base.Connection):
         """
         session = self._engine_facade.get_session()
         with session.begin():
-            Connection._create_or_update(session, models.User,
-                                         alarm_change['user_id'])
-            Connection._create_or_update(session, models.Project,
-                                         alarm_change['project_id'])
-            Connection._create_or_update(session, models.Project,
-                                         alarm_change['on_behalf_of'])
             alarm_change_row = models.AlarmChange(
                 event_id=alarm_change['event_id'])
             alarm_change_row.update(alarm_change)
