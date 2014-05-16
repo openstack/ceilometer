@@ -16,3 +16,4 @@ doc/source/api/tests.*.rst
 doc/source/api/autoindex.rst
 doc/source/sourcecode
 *.mo
+etc/ceilometer/ceilometer.conf.sample
