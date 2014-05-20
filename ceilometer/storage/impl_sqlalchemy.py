@@ -154,8 +154,8 @@ def make_query_from_filter(session, query, sample_filter, require_meter=True):
     elif require_meter:
         raise RuntimeError('Missing required meter specifier')
     if sample_filter.source:
-        query = query.filter(models.Sample.sources.any(
-            id=sample_filter.source))
+        query = query.filter(
+            models.Sample.source_id == sample_filter.source)
     if sample_filter.start:
         ts_start = sample_filter.start
         if sample_filter.start_timestamp_op == 'gt':
@@ -192,8 +192,6 @@ class Connection(base.Connection):
 
     Tables::
 
-        - source
-          - { id: source id }
         - meter
           - meter definition
           - { id: meter def id
@@ -207,25 +205,13 @@ class Connection(base.Connection):
               meter_id: meter id            (->meter.id)
               user_id: user uuid
               project_id: project uuid
-              resource_id: resource uuid    (->resource.id)
+              resource_id: resource uuid
+              source_id: source id
               resource_metadata: metadata dictionaries
               volume: sample volume
               timestamp: datetime
               message_signature: message signature
               message_id: message uuid
-              }
-        - resource
-          - the metadata for resources
-          - { id: resource uuid
-              resource_metadata: metadata dictionaries
-              project_id: project uuid
-              user_id: user uuid
-              }
-        - sourceassoc
-          - the relationships
-          - { sample_id: sample id           (->sample.id)
-              resource_id: resource uuid    (->resource.id)
-              source_id: source id          (->source.id)
               }
     """
     CAPABILITIES = utils.update_nested(base.Connection.CAPABILITIES,
@@ -250,33 +236,11 @@ class Connection(base.Connection):
         engine.dispose()
 
     @staticmethod
-    def _create_or_update(session, model_class, _id, source=None, **kwargs):
-        if not _id:
-            return None
-        try:
-            with session.begin(subtransactions=True):
-                obj = session.query(model_class).get(str(_id))
-                if obj is None:
-                    obj = model_class(id=str(_id))
-                    session.add(obj)
-
-                if source and not filter(lambda x: x.id == source.id,
-                                         obj.sources):
-                    obj.sources.append(source)
-                for k in kwargs:
-                    setattr(obj, k, kwargs[k])
-        except dbexc.DBDuplicateEntry:
-            # requery the object from the db if this is an other
-            # parallel/previous call of record_metering_data that
-            # have successfully created this object
-            obj = Connection._create_or_update(session, model_class,
-                                               _id, source, **kwargs)
-        return obj
-
-    @staticmethod
     def _create_meter(session, name, type, unit):
         try:
-            with session.begin(subtransactions=True):
+            nested = session.connection().dialect.name != 'sqlite'
+            with session.begin(nested=nested,
+                               subtransactions=not nested):
                 obj = session.query(models.Meter)\
                     .filter(models.Meter.name == name)\
                     .filter(models.Meter.type == type)\
@@ -285,6 +249,7 @@ class Connection(base.Connection):
                     obj = models.Meter(name=name, type=type, unit=unit)
                     session.add(obj)
         except dbexc.DBDuplicateEntry:
+            # retry function to pick up duplicate committed object
             obj = Connection._create_meter(session, name, type, unit)
 
         return obj
@@ -297,26 +262,15 @@ class Connection(base.Connection):
         """
         session = self._engine_facade.get_session()
         with session.begin():
-            # Record the updated resource metadata
-            rmetadata = data['resource_metadata']
-            source = self._create_or_update(session, models.Source,
-                                            data['source'])
-            resource = self._create_or_update(session, models.Resource,
-                                              data['resource_id'], source,
-                                              user_id=data['user_id'],
-                                              project_id=data['project_id'],
-                                              resource_metadata=rmetadata)
-
             # Record the raw data for the sample.
+            rmetadata = data['resource_metadata']
             meter = self._create_meter(session,
                                        data['counter_name'],
                                        data['counter_type'],
                                        data['counter_unit'])
-            sample = models.Sample(meter_id=meter.id,
-                                   resource=resource)
+            sample = models.Sample(meter_id=meter.id)
             session.add(sample)
-            if not filter(lambda x: x.id == source.id, sample.sources):
-                sample.sources.append(source)
+            sample.resource_id = data['resource_id']
             sample.project_id = data['project_id']
             sample.user_id = data['user_id']
             sample.timestamp = data['timestamp']
@@ -324,6 +278,7 @@ class Connection(base.Connection):
             sample.volume = data['counter_volume']
             sample.message_signature = data['message_signature']
             sample.message_id = data['message_id']
+            sample.source_id = data['source']
             session.flush()
 
             if rmetadata:
@@ -355,13 +310,6 @@ class Connection(base.Connection):
             for sample_obj in sample_query.all():
                 session.delete(sample_obj)
 
-            query = session.query(models.Resource)\
-                .filter(~models.Resource.id.in_(
-                    session.query(models.Sample.resource_id).group_by(
-                        models.Sample.resource_id)))
-            for res_obj in query.all():
-                session.delete(res_obj)
-
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
                       end_timestamp=None, end_timestamp_op=None,
@@ -388,12 +336,10 @@ class Connection(base.Connection):
             # TODO(gordc) this should be merged with make_query_from_filter
             for column, value in [(models.Sample.resource_id, resource),
                                   (models.Sample.user_id, user),
-                                  (models.Sample.project_id, project)]:
+                                  (models.Sample.project_id, project),
+                                  (models.Sample.source_id, source)]:
                 if value:
                     query = query.filter(column == value)
-            if source:
-                query = query.filter(
-                    models.Sample.sources.any(id=source))
             if metaquery:
                 query = apply_metaquery_filter(session, query, metaquery)
             if start_timestamp:
@@ -438,7 +384,7 @@ class Connection(base.Connection):
                     project_id=sample.project_id,
                     first_sample_timestamp=min_q.first().timestamp,
                     last_sample_timestamp=sample.timestamp,
-                    source=sample.sources[0].id,
+                    source=sample.source_id,
                     user_id=sample.user_id,
                     metadata=sample.resource_metadata
                 )
@@ -464,12 +410,10 @@ class Connection(base.Connection):
             # TODO(gordc) this should be merged with make_query_from_filter
             for column, value in [(models.Sample.resource_id, resource),
                                   (models.Sample.user_id, user),
-                                  (models.Sample.project_id, project)]:
+                                  (models.Sample.project_id, project),
+                                  (models.Sample.source_id, source)]:
                 if value:
                     query = query.filter(column == value)
-            if source is not None:
-                query = query.filter(
-                    models.Sample.sources.any(id=source))
             if metaquery:
                 query = apply_metaquery_filter(session, query, metaquery)
             return query
@@ -500,7 +444,7 @@ class Connection(base.Connection):
                 unit=sample.counter_unit,
                 resource_id=sample.resource_id,
                 project_id=sample.project_id,
-                source=sample.sources[0].id,
+                source=sample.source_id,
                 user_id=sample.user_id)
 
     def _retrieve_samples(self, query):
@@ -511,10 +455,7 @@ class Connection(base.Connection):
             # the sample was inserted. It is an implementation
             # detail that should not leak outside of the driver.
             yield api_models.Sample(
-                # Replace 'sources' with 'source' to meet the caller's
-                # expectation, Sample.sources contains one and only one
-                # source in the current implementation.
-                source=s.sources[0].id,
+                source=s.source_id,
                 counter_name=s.counter_name,
                 counter_type=s.counter_type,
                 counter_unit=s.counter_unit,

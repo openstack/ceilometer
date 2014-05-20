@@ -194,18 +194,6 @@ class RelationshipTest(scenarios.DBTestBase):
                         .group_by(sql_models.Sample.id)
                         )).count())
 
-    @patch.object(timeutils, 'utcnow')
-    def test_clear_metering_data_associations(self, mock_utcnow):
-        mock_utcnow.return_value = datetime.datetime(2012, 7, 2, 10, 45)
-        self.conn.clear_expired_metering_data(3 * 60)
-
-        session = self.conn._engine_facade.get_session()
-        self.assertEqual(0, session.query(sql_models.sourceassoc)
-            .filter(~sql_models.sourceassoc.c.sample_id.in_(
-                session.query(sql_models.Sample.id)
-                    .group_by(sql_models.Sample.id)
-                    )).count())
-
 
 class CapabilitiesTest(test_base.BaseTestCase):
     # Check the returned capabilities list, which is specific to each DB

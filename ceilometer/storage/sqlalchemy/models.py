@@ -20,7 +20,7 @@ SQLAlchemy models for Ceilometer data.
 
 import json
 
-from sqlalchemy import Column, Integer, String, Table, ForeignKey, \
+from sqlalchemy import Column, Integer, String, ForeignKey, \
     Index, UniqueConstraint, BigInteger, join
 from sqlalchemy import Float, Boolean, Text, DateTime
 from sqlalchemy.dialects.mysql import DECIMAL
@@ -99,25 +99,6 @@ class CeilometerBase(object):
 Base = declarative_base(cls=CeilometerBase)
 
 
-sourceassoc = Table('sourceassoc', Base.metadata,
-                    Column('sample_id', Integer,
-                           ForeignKey("sample.id")),
-                    Column('resource_id', String(255),
-                           ForeignKey("resource.id")),
-                    Column('source_id', String(255),
-                           ForeignKey("source.id")))
-
-Index('idx_sr', sourceassoc.c['source_id'], sourceassoc.c['resource_id']),
-Index('idx_ss', sourceassoc.c['source_id'], sourceassoc.c['sample_id']),
-Index('ix_sourceassoc_source_id', sourceassoc.c['source_id'])
-UniqueConstraint(sourceassoc.c['sample_id'], name='uniq_sourceassoc0sample_id')
-
-
-class Source(Base):
-    __tablename__ = 'source'
-    id = Column(String(255), primary_key=True)
-
-
 class MetaText(Base):
     """Metering text metadata."""
 
@@ -193,7 +174,7 @@ class Sample(Base):
     meter_id = Column(Integer, ForeignKey('meter.id'))
     user_id = Column(String(255))
     project_id = Column(String(255))
-    resource_id = Column(String(255), ForeignKey('resource.id'))
+    resource_id = Column(String(255))
     resource_metadata = Column(JSONEncodedDict())
     volume = Column(Float(53))
     timestamp = Column(PreciseTimestamp(), default=lambda: timeutils.utcnow())
@@ -201,7 +182,7 @@ class Sample(Base):
                          default=lambda: timeutils.utcnow())
     message_signature = Column(String(1000))
     message_id = Column(String(1000))
-    sources = relationship("Source", secondary=lambda: sourceassoc)
+    source_id = Column(String(255))
     meta_text = relationship("MetaText", backref="sample",
                              cascade="all, delete-orphan")
     meta_float = relationship("MetaFloat", backref="sample",
@@ -226,22 +207,6 @@ class MeterSample(Base):
     counter_type = column_property(meter.c.type)
     counter_unit = column_property(meter.c.unit)
     counter_volume = column_property(sample.c.volume)
-    sources = relationship("Source", secondary=lambda: sourceassoc)
-
-
-class Resource(Base):
-    __tablename__ = 'resource'
-    __table_args__ = (
-        Index('ix_resource_project_id', 'project_id'),
-        Index('ix_resource_user_id', 'user_id'),
-        Index('resource_user_id_project_id_key', 'user_id', 'project_id')
-    )
-    id = Column(String(255), primary_key=True)
-    sources = relationship("Source", secondary=lambda: sourceassoc)
-    resource_metadata = Column(JSONEncodedDict())
-    user_id = Column(String(255))
-    project_id = Column(String(255))
-    samples = relationship("Sample", backref='resource')
 
 
 class Alarm(Base):
