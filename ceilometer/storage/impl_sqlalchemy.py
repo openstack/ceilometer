@@ -117,20 +117,25 @@ def apply_metaquery_filter(session, query, metaquery):
     :param query: Query instance
     :param metaquery: dict with metadata to match on.
     """
-
-    for k, v in metaquery.iteritems():
+    for k, value in metaquery.iteritems():
         key = k[9:]  # strip out 'metadata.' prefix
         try:
-            _model = META_TYPE_MAP[type(v)]
+            _model = META_TYPE_MAP[type(value)]
         except KeyError:
             raise NotImplementedError('Query on %(key)s is of %(value)s '
                                       'type and is not supported' %
-                                      {"key": k, "value": type(v)})
+                                      {"key": k, "value": type(value)})
         else:
-            meta_q = session.query(_model).\
-                filter(and_(_model.meta_key == key,
-                            _model.value == v)).subquery()
-            query = query.filter(models.Sample.id == meta_q.c.id)
+            meta_alias = aliased(_model)
+            on_clause = and_(models.Sample.id == meta_alias.id,
+                             meta_alias.meta_key == key)
+            # outer join is needed to support metaquery
+            # with or operator on non existent metadata field
+            # see: test_query_non_existing_metadata_with_result
+            # test case.
+            query = query.outerjoin(meta_alias, on_clause)
+            query = query.filter(meta_alias.value == value)
+
     return query
 
 
