@@ -15,15 +15,9 @@
 # under the License.
 """Rest alarm notifier with trusted authentication."""
 
-try:
-    import urllib.parse
-    SplitResult = urllib.parse.SplitResult
-except ImportError:
-    import urlparse
-    SplitResult = urlparse.SplitResult
-
 from keystoneclient.v3 import client as keystone_client
 from oslo.config import cfg
+from six.moves.urllib import parse
 
 from ceilometer.alarm import notifier
 
@@ -58,8 +52,8 @@ class TrustRestAlarmNotifier(notifier.rest.RestAlarmNotifier):
         # Remove the trust prefix
         scheme = action.scheme[6:]
 
-        action = SplitResult(scheme, netloc, action.path, action.query,
-                             action.fragment)
+        action = parse.SplitResult(scheme, netloc, action.path, action.query,
+                                   action.fragment)
 
         headers = {'X-Auth-Token': client.auth_token}
         notifier.rest.RestAlarmNotifier.notify(
