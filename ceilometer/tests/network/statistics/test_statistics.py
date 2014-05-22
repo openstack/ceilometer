@@ -175,3 +175,13 @@ class TestBaseGetSamples(test.BaseTestCase):
         samples = self._get_samples('http://foo')
 
         self.assertEqual(len(samples), 0)
+
+    def test_get_samples_return_no_generator(self):
+        class NoneFakeDriver(driver.Driver):
+
+            def get_sample_data(self, meter_name, parse_url, params, cache):
+                return None
+
+        self._setup_ext_mgr(http=NoneFakeDriver())
+        samples = self._get_samples('http://foo')
+        self.assertFalse(samples)

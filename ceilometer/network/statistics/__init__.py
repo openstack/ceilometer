@@ -71,7 +71,8 @@ class _Base(plugin.CentralPollster):
                                               parse_url,
                                               params,
                                               cache)
-            for data in sample_data:
+
+            for data in sample_data or []:
                 if data is None:
                     continue
                 if not isinstance(data, list):
