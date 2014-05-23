@@ -71,3 +71,27 @@ class Client(object):
     def port_get_all(self):
         resp = self.client.list_ports()
         return resp.get('ports')
+
+    @logged
+    def vip_get_all(self):
+        resp = self.client.list_vips()
+        return resp.get('vips')
+
+    @logged
+    def pool_get_all(self):
+        resp = self.client.list_pools()
+        return resp.get('pools')
+
+    @logged
+    def member_get_all(self):
+        resp = self.client.list_members()
+        return resp.get('members')
+
+    @logged
+    def health_monitor_get_all(self):
+        resp = self.client.list_health_monitors()
+        return resp.get('health_monitors')
+
+    @logged
+    def pool_stats(self, pool):
+        return self.client.retrieve_pool_stats(pool)
