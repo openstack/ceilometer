@@ -176,12 +176,14 @@ image.serve               Delta       B        image ID  notification  Image is 
 Volume (Cinder)
 ===============
 
-========================  ==========  =======  ========  ============  =======================================================
-Name                      Type        Unit     Resource  Origin        Note
-========================  ==========  =======  ========  ============  =======================================================
-volume                    Gauge       volume   vol ID    notification  Existence of volume
-volume.size               Gauge       GB       vol ID    notification  Size of volume
-========================  ==========  =======  ========  ============  =======================================================
+========================  ==========  ========  ========  ============  =======================================================
+Name                      Type        Unit      Resource  Origin        Note
+========================  ==========  ========  ========  ============  =======================================================
+volume                    Gauge       volume    vol ID    notification  Existence of volume
+volume.size               Gauge       GB        vol ID    notification  Size of volume
+snapshot                  Gauge       snapshot  snap ID   notification  Existence of snapshot
+snapshot.size             Gauge       GB        snap ID   notification  Size of snapshot's volume
+========================  ==========  ========  ========  ============  =======================================================
 
 Make sure Cinder is properly configured first: see :ref:`installing_manually`.
 
