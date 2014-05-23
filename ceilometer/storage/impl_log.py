@@ -59,7 +59,7 @@ class Connection(base.Connection):
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
                       end_timestamp=None, end_timestamp_op=None,
-                      metaquery={}, resource=None, pagination=None):
+                      metaquery=None, resource=None, pagination=None):
         """Return an iterable of dictionaries containing resource information.
 
         { 'resource_id': UUID of the resource,
@@ -84,7 +84,7 @@ class Connection(base.Connection):
         return []
 
     def get_meters(self, user=None, project=None, resource=None, source=None,
-                   limit=None, metaquery={}, pagination=None):
+                   limit=None, metaquery=None, pagination=None):
         """Return an iterable of dictionaries containing meter information.
 
         { 'name': name of the meter,

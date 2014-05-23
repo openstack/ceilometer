@@ -99,8 +99,9 @@ class PollingTask(object):
 
 class AgentManager(os_service.Service):
 
-    def __init__(self, namespace, default_discovery=[]):
+    def __init__(self, namespace, default_discovery=None):
         super(AgentManager, self).__init__()
+        default_discovery = default_discovery or []
         self.default_discovery = default_discovery
         self.pollster_manager = self._extensions('poll', namespace)
         self.discovery_manager = self._extensions('discover')
@@ -156,7 +157,7 @@ class AgentManager(os_service.Service):
                 return d.obj
         return None
 
-    def discover(self, discovery=[]):
+    def discover(self, discovery=None):
         resources = []
         for url in (discovery or self.default_discovery):
             name, param = self._parse_discoverer(url)

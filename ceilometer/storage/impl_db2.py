@@ -127,7 +127,7 @@ class Connection(pymongo_base.Connection):
         self.upgrade()
 
     @classmethod
-    def _build_sort_instructions(cls, sort_keys=[], sort_dir='desc'):
+    def _build_sort_instructions(cls, sort_keys=None, sort_dir='desc'):
         """Returns a sort_instruction.
 
         Sort instructions are used in the query to determine what attributes
@@ -137,6 +137,7 @@ class Connection(pymongo_base.Connection):
         :param sort_dir: direction in which results be sorted (asc, desc).
         :return: sort parameters
         """
+        sort_keys = sort_keys or []
         sort_instructions = []
         _sort_dir = cls.SORT_OPERATION_MAP.get(
             sort_dir, cls.SORT_OPERATION_MAP['desc'])
@@ -235,7 +236,7 @@ class Connection(pymongo_base.Connection):
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
                       end_timestamp=None, end_timestamp_op=None,
-                      metaquery={}, resource=None, pagination=None):
+                      metaquery=None, resource=None, pagination=None):
         """Return an iterable of models.Resource instances
 
         :param user: Optional ID for user that owns the resource.
@@ -251,6 +252,8 @@ class Connection(pymongo_base.Connection):
         """
         if pagination:
             raise NotImplementedError('Pagination not implemented')
+
+        metaquery = metaquery or {}
 
         q = {}
         if user is not None:

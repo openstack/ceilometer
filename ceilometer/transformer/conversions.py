@@ -55,7 +55,7 @@ class ScalingTransformer(transformer.TransformerBase):
     """Transformer to apply a scaling conversion.
     """
 
-    def __init__(self, source={}, target={}, **kwargs):
+    def __init__(self, source=None, target=None, **kwargs):
         """Initialize transformer with configured parameters.
 
         :param source: dict containing source sample unit
@@ -63,6 +63,8 @@ class ScalingTransformer(transformer.TransformerBase):
                        unit and scaling factor (a missing value
                        connotes no change)
         """
+        source = source or {}
+        target = target or {}
         self.source = source
         self.target = target
         self.scale = target.get('scale')

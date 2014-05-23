@@ -77,7 +77,8 @@ def _get_metadata_from_object(instance):
 
 
 def make_sample_from_instance(instance, name, type, unit, volume,
-                              additional_metadata={}):
+                              additional_metadata=None):
+    additional_metadata = additional_metadata or {}
     resource_metadata = _get_metadata_from_object(instance)
     resource_metadata.update(additional_metadata)
     return sample.Sample(

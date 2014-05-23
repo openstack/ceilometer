@@ -104,7 +104,7 @@ class SampleFilter(object):
                  end=None, end_timestamp_op=None,
                  resource=None, meter=None,
                  source=None, message_id=None,
-                 metaquery={}):
+                 metaquery=None):
         self.user = user
         self.project = project
         self.start = utils.sanitize_timestamp(start)
@@ -114,7 +114,7 @@ class SampleFilter(object):
         self.resource = resource
         self.meter = meter
         self.source = source
-        self.metaquery = metaquery
+        self.metaquery = metaquery or {}
         self.message_id = message_id
 
 
@@ -137,12 +137,12 @@ class EventFilter(object):
     """
 
     def __init__(self, start_time=None, end_time=None, event_type=None,
-                 message_id=None, traits_filter=[]):
+                 message_id=None, traits_filter=None):
         self.start_time = utils.sanitize_timestamp(start_time)
         self.end_time = utils.sanitize_timestamp(end_time)
         self.message_id = message_id
         self.event_type = event_type
-        self.traits_filter = traits_filter
+        self.traits_filter = traits_filter or []
 
     def __repr__(self):
         return ("<EventFilter(start_time: %s,"

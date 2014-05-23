@@ -586,7 +586,7 @@ class Connection(pymongo_base.Connection):
         return dict(criteria_equ, ** criteria_cmp)
 
     @classmethod
-    def _build_paginate_query(cls, marker, sort_keys=[], sort_dir='desc'):
+    def _build_paginate_query(cls, marker, sort_keys=None, sort_dir='desc'):
         """Returns a query with sorting / pagination.
 
         Pagination works by requiring sort_key and sort_dir.
@@ -600,6 +600,7 @@ class Connection(pymongo_base.Connection):
         :return: sort parameters, query to use
         """
         all_sort = []
+        sort_keys = sort_keys or []
         all_sort, _op = cls._build_sort_instructions(sort_keys, sort_dir)
 
         if marker is not None:
@@ -625,7 +626,7 @@ class Connection(pymongo_base.Connection):
         return all_sort, metaquery
 
     @classmethod
-    def _build_sort_instructions(cls, sort_keys=[], sort_dir='desc'):
+    def _build_sort_instructions(cls, sort_keys=None, sort_dir='desc'):
         """Returns a sort_instruction and paging operator.
 
         Sort instructions are used in the query to determine what attributes
@@ -635,6 +636,7 @@ class Connection(pymongo_base.Connection):
         :param sort_dir: direction in which results be sorted (asc, desc).
         :return: sort instructions and paging operator
         """
+        sort_keys = sort_keys or []
         sort_instructions = []
         _sort_dir, operation = cls.SORT_OPERATION_MAPPING.get(
             sort_dir, cls.SORT_OPERATION_MAPPING['desc'])
@@ -647,7 +649,7 @@ class Connection(pymongo_base.Connection):
 
     @classmethod
     def paginate_query(cls, q, db_collection, limit=None, marker=None,
-                       sort_keys=[], sort_dir='desc'):
+                       sort_keys=None, sort_dir='desc'):
         """Returns a query result with sorting / pagination.
 
         Pagination works by requiring sort_key and sort_dir.
@@ -663,6 +665,7 @@ class Connection(pymongo_base.Connection):
         return: The query with sorting/pagination added.
         """
 
+        sort_keys = sort_keys or []
         all_sort, query = cls._build_paginate_query(marker,
                                                     sort_keys,
                                                     sort_dir)
@@ -772,7 +775,7 @@ class Connection(pymongo_base.Connection):
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
                       end_timestamp=None, end_timestamp_op=None,
-                      metaquery={}, resource=None, pagination=None):
+                      metaquery=None, resource=None, pagination=None):
         """Return an iterable of models.Resource instances
 
         :param user: Optional ID for user that owns the resource.
@@ -788,6 +791,8 @@ class Connection(pymongo_base.Connection):
         """
         if pagination:
             raise NotImplementedError('Pagination not implemented')
+
+        metaquery = metaquery or {}
 
         query = {}
         if user is not None:

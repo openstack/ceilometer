@@ -130,7 +130,7 @@ class PollsterBase(PluginBase):
     """Base class for plugins that support the polling API."""
 
     @abc.abstractmethod
-    def get_samples(self, manager, cache, resources=[]):
+    def get_samples(self, manager, cache, resources=None):
         """Return a sequence of Counter instances from polling the resources.
 
         :param manager: The service manager class invoking the plugin.

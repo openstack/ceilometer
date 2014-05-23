@@ -55,7 +55,8 @@ class PipelineException(Exception):
 
 class PublishContext(object):
 
-    def __init__(self, context, pipelines=[]):
+    def __init__(self, context, pipelines=None):
+        pipelines = pipelines or []
         self.pipelines = set(pipelines)
         self.context = context
 

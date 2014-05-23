@@ -108,11 +108,11 @@ class TestAPIACL(FunctionalTest,
             self.conn.record_metering_data(msg)
 
     def get_json(self, path, expect_errors=False, headers=None,
-                 q=[], **params):
+                 q=None, **params):
         return super(TestAPIACL, self).get_json(path,
                                                 expect_errors=expect_errors,
                                                 headers=headers,
-                                                q=q,
+                                                q=q or [],
                                                 extra_environ=self.environ,
                                                 **params)
 
