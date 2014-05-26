@@ -24,6 +24,8 @@ import datetime
 import decimal
 import multiprocessing
 
+import six
+
 from ceilometer.openstack.common import timeutils
 from ceilometer.openstack.common import units
 
@@ -45,9 +47,9 @@ def recursive_keypairs(d, separator=':'):
             # to avoid inconsistencies in the message signature computation
             # for equivalent payloads modulo ordering
             first = lambda i: i[0]
-            m = map(lambda x: unicode(dict(sorted(x.items(), key=first))
-                                      if isinstance(x, dict)
-                                      else x).encode('utf-8'),
+            m = map(lambda x: six.text_type(dict(sorted(x.items(), key=first))
+                                            if isinstance(x, dict)
+                                            else x).encode('utf-8'),
                     value)
             yield name, list(m)
         else:

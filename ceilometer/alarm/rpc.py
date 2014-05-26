@@ -17,6 +17,7 @@
 # under the License.
 
 from oslo.config import cfg
+import six
 
 from ceilometer import messaging
 from ceilometer.openstack.common import context
@@ -62,7 +63,7 @@ class RPCAlarmNotifier(object):
                              'alarm_id': alarm.alarm_id,
                              'previous': previous,
                              'current': alarm.state,
-                             'reason': unicode(reason),
+                             'reason': six.text_type(reason),
                              'reason_data': reason_data})
 
 
