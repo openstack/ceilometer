@@ -62,7 +62,7 @@ class JsonPayloadSerializer(oslo.messaging.NoOpSerializer):
         return jsonutils.to_primitive(entity, convert_instances=True)
 
 
-def setup(url=None):
+def setup(url=None, optional=False):
     """Initialise the oslo.messaging layer."""
     global TRANSPORT, NOTIFIER
 
@@ -73,9 +73,17 @@ def setup(url=None):
 
     if not TRANSPORT:
         oslo.messaging.set_transport_defaults('ceilometer')
-        TRANSPORT = oslo.messaging.get_transport(cfg.CONF, url,
-                                                 aliases=_ALIASES)
-    if not NOTIFIER:
+        try:
+            TRANSPORT = oslo.messaging.get_transport(cfg.CONF, url,
+                                                     aliases=_ALIASES)
+        except oslo.messaging.InvalidTransportURL as e:
+            TRANSPORT = None
+            if not optional or e.url:
+                # NOTE(sileht): oslo.messaging is configured but unloadable
+                # so reraise the exception
+                raise
+
+    if not NOTIFIER and TRANSPORT:
         serializer = RequestContextSerializer(JsonPayloadSerializer())
         NOTIFIER = oslo.messaging.Notifier(TRANSPORT, serializer=serializer)
 
@@ -83,10 +91,9 @@ def setup(url=None):
 def cleanup():
     """Cleanup the oslo.messaging layer."""
     global TRANSPORT, NOTIFIER
-    assert TRANSPORT is not None
-    assert NOTIFIER is not None
-    TRANSPORT.cleanup()
-    TRANSPORT = NOTIFIER = None
+    if TRANSPORT:
+        TRANSPORT.cleanup()
+        TRANSPORT = NOTIFIER = None
 
 
 def get_rpc_server(topic, endpoint):
