@@ -20,7 +20,6 @@ import datetime
 from mock import call
 from mock import patch
 import pymongo
-import testscenarios
 
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.publisher import utils
@@ -29,16 +28,10 @@ from ceilometer.storage import pymongo_base
 from ceilometer.tests import db as tests_db
 from ceilometer.tests.storage import test_storage_scenarios
 
-load_tests = testscenarios.load_tests_apply_scenarios
 
-
+@tests_db.run_with('mongodb', 'db2')
 class CompatibilityTest(test_storage_scenarios.DBTestBase,
                         tests_db.MixinTestsWithBackendScenarios):
-
-    scenarios = [
-        ('mongodb', {'db_manager': tests_db.MongoDbManager()}),
-        ('db2', {'db_manager': tests_db.DB2Manager()}),
-    ]
 
     def prepare_data(self):
         def old_record_metering_data(self, data):

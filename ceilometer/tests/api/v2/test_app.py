@@ -32,7 +32,6 @@ from ceilometer import service
 from ceilometer.tests import api as acl
 from ceilometer.tests.api.v2 import FunctionalTest
 from ceilometer.tests import base
-from ceilometer.tests import db as tests_db
 
 
 class TestApp(base.BaseTestCase):
@@ -82,8 +81,6 @@ class TestApp(base.BaseTestCase):
 
 class TestPecanApp(FunctionalTest):
 
-    db_manager = tests_db.MongoDbManager()
-
     def test_pecan_extension_guessing_unset(self):
         # check Pecan does not assume .jpg is an extension
         response = self.app.get(self.PATH_PREFIX + '/meters/meter.jpg')
@@ -91,8 +88,6 @@ class TestPecanApp(FunctionalTest):
 
 
 class TestApiMiddleware(FunctionalTest):
-
-    db_manager = tests_db.MongoDbManager()
 
     no_lang_translated_error = 'No lang translated error'
     en_US_translated_error = 'en-US translated error'

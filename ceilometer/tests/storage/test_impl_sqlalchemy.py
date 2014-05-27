@@ -38,20 +38,17 @@ from ceilometer.tests import db as tests_db
 from ceilometer.tests.storage import test_storage_scenarios as scenarios
 
 
-class EventTestBase(tests_db.TestBase):
-    # Note: Do not derive from SQLAlchemyEngineTestBase, since we
-    # don't want to automatically inherit all the Meter setup.
-    db_manager = tests_db.SQLiteManager()
+@tests_db.run_with('sqlite')
+class CeilometerBaseTest(tests_db.TestBase):
 
-
-class CeilometerBaseTest(EventTestBase):
     def test_ceilometer_base(self):
         base = sql_models.CeilometerBase()
         base['key'] = 'value'
         self.assertEqual('value', base['key'])
 
 
-class TraitTypeTest(EventTestBase):
+@tests_db.run_with('sqlite')
+class TraitTypeTest(tests_db.TestBase):
     # TraitType is a construct specific to sqlalchemy.
     # Not applicable to other drivers.
 
@@ -83,7 +80,8 @@ class TraitTypeTest(EventTestBase):
         self.assertTrue(repr.repr(tt2))
 
 
-class EventTypeTest(EventTestBase):
+@tests_db.run_with('sqlite')
+class EventTypeTest(tests_db.TestBase):
     # EventType is a construct specific to sqlalchemy
     # Not applicable to other drivers.
 
@@ -108,7 +106,8 @@ class MyException(Exception):
     pass
 
 
-class EventTest(EventTestBase):
+@tests_db.run_with('sqlite')
+class EventTest(tests_db.TestBase):
     def test_string_traits(self):
         model = models.Trait("Foo", models.Trait.TEXT_TYPE, "my_text")
         trait = self.conn._make_trait(model, None)
@@ -174,10 +173,10 @@ class EventTest(EventTestBase):
         self.assertTrue(repr.repr(ev))
 
 
+@tests_db.run_with('sqlite')
 class RelationshipTest(scenarios.DBTestBase):
     # Note: Do not derive from SQLAlchemyEngineTestBase, since we
     # don't want to automatically inherit all the Meter setup.
-    db_manager = tests_db.SQLiteManager()
 
     @patch.object(timeutils, 'utcnow')
     def test_clear_metering_data_meta_tables(self, mock_utcnow):
