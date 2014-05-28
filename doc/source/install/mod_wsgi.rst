@@ -43,7 +43,7 @@ work with a copy of ceilometer installed via devstack.
    conflicts with Horizon's default configuration.
 
 3. Modify the ``WSGIDaemonProcess`` directive to set the
-  ``user`` and ``group`` values to a user available on your server.
+   ``user`` and ``group`` values to a user available on your server.
 
 4. Modify the ``APACHE_RUN_USER`` and ``APACHE_RUN_GROUP`` values to
    the name of a user and group available on your server.

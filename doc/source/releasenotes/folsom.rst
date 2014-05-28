@@ -13,12 +13,14 @@
       License for the specific language governing permissions and limitations
       under the License.
 
+.. _folsom:
+
 ====================
-Version 0.1 (Folsom)
+Folsom
 ====================
 
-This is the first release of ceilometer. Please take all appropriate caution
-in using it, as it is a technology preview at this time.
+This is the first release (Version 0.1) of Ceilometer. Please take all appropriate
+caution in using it, as it is a technology preview at this time.
 
 Version of OpenStack
    It is curently tested to work with OpenStack 2012.2 Folsom. Due to its use of

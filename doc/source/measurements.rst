@@ -114,11 +114,9 @@ or complete the existing ones.
 
 The meters below are related to the host machine.
 
-.. note::
-
-By default, Nova will not collect the following meters related to the host
-compute node machine. Nova option 'compute_monitors = ComputeDriverCPUMonitor'
-should be set in nova.conf to enable meters.
+.. note:: By default, Nova will not collect the following meters related to the host
+   compute node machine. Nova option 'compute_monitors = ComputeDriverCPUMonitor'
+   should be set in nova.conf to enable meters.
 
 ===============================  ==========  =========  ========  ============  ========================
 Name                             Type        Unit       Resource  Origin        Note

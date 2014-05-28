@@ -47,15 +47,9 @@ Metering
 If you divide a billing process into a 3 step process, as is commonly done in
 the telco industry, the steps are:
 
-1. :term:`Metering` is the process of collecting information about what,
-   who, when and how much regarding anything that can be billed. The result of
-   this is a collection of "tickets" (a.k.a. samples) which are ready to be
-   processed in any way you want.
-2. :term:`Rating` is the process of analysing a series of tickets,
-   according to business rules defined by marketing, in order to transform
-   them into bill line items with a currency value.
-3. :term:`Billing` is the process to assemble bill line items into a
-   single per customer bill, emitting the bill to start the payment collection.
+1. :term:`Metering`
+2. :term:`Rating`
+3. :term:`Billing`
 
 Ceilometer's initial goal was, and still is, strictly limited to step
 one. This is a choice made from the beginning not to go into rating or billing,
