@@ -1,6 +1,5 @@
-# -*- encoding: utf-8 -*-
 #
-# Copyright © 2012, 2013 Dell Inc.
+# Copyright 2012, 2013 Dell Inc.
 #
 # Author: Stas Maksimov <Stanislav_M@dell.com>
 # Author: Shengjie Min <Shengjie_Min@dell.com>

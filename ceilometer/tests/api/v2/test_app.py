@@ -1,7 +1,6 @@
-# -*- encoding: utf-8 -*-
 #
 # Copyright 2013 IBM Corp.
-# Copyright © 2013 Julien Danjou
+# Copyright 2013 Julien Danjou
 #
 # Author: Julien Danjou <julien@danjou.info>
 #

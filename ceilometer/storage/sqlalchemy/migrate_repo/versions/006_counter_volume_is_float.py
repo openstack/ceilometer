@@ -1,6 +1,6 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
-# Copyright © 2013 eNovance SAS <licensing@enovance.com>
+# Copyright 2013 eNovance SAS <licensing@enovance.com>
 # Author: François Charlier <francois.charlier@enovance.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may

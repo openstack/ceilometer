@@ -1,6 +1,5 @@
-# -*- encoding: utf-8 -*-
 #
-# Copyright © 2013 Rackspace Hosting
+# Copyright 2013 Rackspace Hosting
 #
 # Author: Thomas Maddox <thomas.maddox@rackspace.com>
 #

@@ -1,7 +1,6 @@
-# -*- encoding: utf-8 -*-
 #
-# Copyright © 2013 Intel Corp.
-# Copyright © 2014 Red Hat, Inc
+# Copyright 2013 Intel Corp.
+# Copyright 2014 Red Hat, Inc
 #
 # Authors: Yunhong Jiang <yunhong.jiang@intel.com>
 #          Eoghan Glynn <eglynn@redhat.com>

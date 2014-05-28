@@ -1,6 +1,5 @@
-# -*- encoding: utf-8 -*-
 #
-# Copyright © 2014 Red Hat, Inc
+# Copyright 2014 Red Hat, Inc
 #
 # Author: Eoghan Glynn <eglynn@redhat.com>
 #

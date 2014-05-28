@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 #
 # Author: Julien Danjou <julien@danjou.info>
 #

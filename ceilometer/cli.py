@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
-# Copyright © 2012-2014 Julien Danjou
+# Copyright 2012-2014 Julien Danjou
 #
 # Author: Julien Danjou <julien@danjou.info>
 #

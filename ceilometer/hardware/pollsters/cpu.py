@@ -1,7 +1,6 @@
-# -*- encoding: utf-8 -*-
 #
-# Copyright © 2013 ZHAW SoE
-# Copyright © 2014 Intel Corp.
+# Copyright 2013 ZHAW SoE
+# Copyright 2014 Intel Corp.
 #
 # Authors: Lucas Graf <graflu0@students.zhaw.ch>
 #          Toni Zehnder <zehndton@students.zhaw.ch>

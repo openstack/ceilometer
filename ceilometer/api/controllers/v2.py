@@ -1,8 +1,7 @@
-# -*- encoding: utf-8 -*-
 #
-# Copyright © 2012 New Dream Network, LLC (DreamHost)
+# Copyright 2012 New Dream Network, LLC (DreamHost)
 # Copyright 2013 IBM Corp.
-# Copyright © 2013 eNovance <licensing@enovance.com>
+# Copyright 2013 eNovance <licensing@enovance.com>
 # Copyright Ericsson AB 2013. All rights reserved
 #
 # Authors: Doug Hellmann <doug.hellmann@dreamhost.com>

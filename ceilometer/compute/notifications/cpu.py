@@ -1,6 +1,5 @@
-# -*- encoding: utf-8 -*-
 #
-# Copyright © 2013 Intel
+# Copyright 2013 Intel
 #
 # Author: Shuangtai Tian <shuangtai.tian@intel.com>
 #

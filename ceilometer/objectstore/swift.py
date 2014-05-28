@@ -1,6 +1,5 @@
-# -*- encoding: utf-8 -*-
 #
-# Copyright © 2012 eNovance
+# Copyright 2012 eNovance
 #
 # Author: Guillaume Pernot <gpernot@praksys.org>
 #

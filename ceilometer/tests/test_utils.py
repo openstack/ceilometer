@@ -1,6 +1,5 @@
-# -*- encoding: utf-8 -*-
 #
-# Copyright © 2012 New Dream Network, LLC (DreamHost)
+# Copyright 2012 New Dream Network, LLC (DreamHost)
 # Copyright (c) 2013 OpenStack Foundation
 #
 # Author: Doug Hellmann <doug.hellmann@dreamhost.com>
