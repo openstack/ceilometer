@@ -168,6 +168,7 @@ class Sample(Base):
         Index('ix_sample_timestamp', 'timestamp'),
         Index('ix_sample_user_id', 'user_id'),
         Index('ix_sample_project_id', 'project_id'),
+        Index('ix_sample_meter_id', 'meter_id')
     )
     id = Column(Integer, primary_key=True)
     meter_id = Column(Integer, ForeignKey('meter.id'))
