@@ -231,7 +231,7 @@ class Connection(object):
         raise NotImplementedError('Statistics not implemented')
 
     @staticmethod
-    def get_alarms(name=None, user=None,
+    def get_alarms(name=None, user=None, state=None, meter=None,
                    project=None, enabled=None, alarm_id=None, pagination=None):
         """Yields a lists of alarms that match filters."""
         raise NotImplementedError('Alarms not implemented')

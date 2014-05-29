@@ -685,10 +685,12 @@ class Connection(base.Connection):
     def _retrieve_alarms(self, query):
         return (self._row_to_alarm_model(x) for x in query.all())
 
-    def get_alarms(self, name=None, user=None,
+    def get_alarms(self, name=None, user=None, state=None, meter=None,
                    project=None, enabled=None, alarm_id=None, pagination=None):
         """Yields a lists of alarms that match filters
         :param user: Optional ID for user that owns the resource.
+        :param state: Optional string for alarm state.
+        :param meter: Optional string for alarms associated with meter.
         :param project: Optional ID for project that owns the resource.
         :param enabled: Optional boolean to list disable alarm.
         :param alarm_id: Optional alarm_id to return one alarm.
@@ -710,8 +712,18 @@ class Connection(base.Connection):
             query = query.filter(models.Alarm.project_id == project)
         if alarm_id is not None:
             query = query.filter(models.Alarm.alarm_id == alarm_id)
+        if state is not None:
+            query = query.filter(models.Alarm.state == state)
 
-        return self._retrieve_alarms(query)
+        alarms = self._retrieve_alarms(query)
+
+        # TODO(cmart): improve this by using sqlalchemy.func factory
+        if meter is not None:
+            alarms = filter(lambda row:
+                            row.rule.get('meter_name', None) == meter,
+                            alarms)
+
+        return alarms
 
     def create_alarm(self, alarm):
         """Create an alarm.

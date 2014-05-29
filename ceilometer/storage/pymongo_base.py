@@ -269,11 +269,13 @@ class Connection(base.Connection):
                                       [("timestamp", pymongo.DESCENDING)],
                                       limit)
 
-    def get_alarms(self, name=None, user=None,
+    def get_alarms(self, name=None, user=None, state=None, meter=None,
                    project=None, enabled=None, alarm_id=None, pagination=None):
         """Yields a lists of alarms that match filters
         :param name: The Alarm name.
         :param user: Optional ID for user that owns the resource.
+        :param state: Optional string for alarm state.
+        :param meter: Optional string for alarms associated with meter.
         :param project: Optional ID for project that owns the resource.
         :param enabled: Optional boolean to list disable alarm.
         :param alarm_id: Optional alarm_id to return one alarm.
@@ -293,6 +295,10 @@ class Connection(base.Connection):
             q['enabled'] = enabled
         if alarm_id is not None:
             q['alarm_id'] = alarm_id
+        if state is not None:
+            q['state'] = state
+        if meter is not None:
+            q['rule.meter_name'] = meter
 
         return self._retrieve_alarms(q, [], None)
 

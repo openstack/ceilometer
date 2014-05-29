@@ -248,14 +248,16 @@ class Connection(base.Connection):
             alarm_table = conn.table(self.ALARM_TABLE)
             alarm_table.delete(alarm_id)
 
-    def get_alarms(self, name=None, user=None,
+    def get_alarms(self, name=None, user=None, state=None, meter=None,
                    project=None, enabled=None, alarm_id=None, pagination=None):
 
         if pagination:
             raise NotImplementedError('Pagination not implemented')
+        if meter:
+            raise NotImplementedError('Filter by meter not implemented')
 
         q = make_query(alarm_id=alarm_id, name=name, enabled=enabled,
-                       user_id=user, project_id=project)
+                       user_id=user, project_id=project, state=state)
 
         with self.conn_pool.connection() as conn:
             alarm_table = conn.table(self.ALARM_TABLE)
