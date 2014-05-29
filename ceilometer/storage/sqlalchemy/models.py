@@ -158,6 +158,7 @@ class Meter(Base):
     name = Column(String(255), nullable=False)
     type = Column(String(255))
     unit = Column(String(255))
+    samples = relationship("Sample", backref="meter")
 
 
 class Sample(Base):

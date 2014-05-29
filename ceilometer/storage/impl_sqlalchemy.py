@@ -316,10 +316,22 @@ class Connection(base.Connection):
         session = self._engine_facade.get_session()
         with session.begin():
             end = timeutils.utcnow() - datetime.timedelta(seconds=ttl)
-            sample_query = (session.query(models.Sample)
-                            .filter(models.Sample.timestamp < end))
-            for sample_obj in sample_query.all():
-                session.delete(sample_obj)
+            sample_q = (session.query(models.Sample)
+                        .filter(models.Sample.timestamp < end))
+
+            sample_subq = sample_q.subquery()
+            for table in [models.MetaText, models.MetaBigInt,
+                          models.MetaFloat, models.MetaBool]:
+                (session.query(table)
+                 .join(sample_subq, sample_subq.c.id == table.id)
+                 .delete())
+
+            rows = sample_q.delete()
+            # remove Meter defintions with no matching samples
+            (session.query(models.Meter)
+             .filter(~models.Meter.samples.any())
+             .delete(synchronize_session='fetch'))
+            LOG.info(_("%d samples removed from database"), rows)
 
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
