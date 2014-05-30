@@ -19,6 +19,7 @@
    events.
 
 """
+import copy
 
 from oslo.config import cfg
 
@@ -77,32 +78,35 @@ class NetworkNotificationBase(plugin.NotificationBase):
 
     def process_notification(self, message):
         LOG.info(_('network notification %r') % message)
-        message['payload'] = message['payload'][self.resource_name]
         counter_name = getattr(self, 'counter_name', self.resource_name)
         unit_value = getattr(self, 'unit', self.resource_name)
 
-        yield sample.Sample.from_notification(
-            name=counter_name,
-            type=sample.TYPE_GAUGE,
-            unit=unit_value,
-            volume=1,
-            user_id=message['_context_user_id'],
-            project_id=message['_context_tenant_id'],
-            resource_id=message['payload']['id'],
-            message=message)
-
-        event_type_split = message['event_type'].split('.')
-        if len(event_type_split) > 2:
+        payload = message['payload'].get(self.resource_name)
+        payloads = message['payload'].get(self.resource_name + 's')
+        payload_list = copy.copy([payload] if payload else payloads)
+        for p in payload_list:
+            message['payload'] = p
             yield sample.Sample.from_notification(
-                name=counter_name
-                + "." + event_type_split[1],
-                type=sample.TYPE_DELTA,
+                name=counter_name,
+                type=sample.TYPE_GAUGE,
                 unit=unit_value,
                 volume=1,
                 user_id=message['_context_user_id'],
                 project_id=message['_context_tenant_id'],
                 resource_id=message['payload']['id'],
                 message=message)
+            event_type_split = message['event_type'].split('.')
+            if len(event_type_split) > 2:
+                yield sample.Sample.from_notification(
+                    name=counter_name
+                    + "." + event_type_split[1],
+                    type=sample.TYPE_DELTA,
+                    unit=unit_value,
+                    volume=1,
+                    user_id=message['_context_user_id'],
+                    project_id=message['_context_tenant_id'],
+                    resource_id=message['payload']['id'],
+                    message=message)
 
 
 class Network(NetworkNotificationBase):
