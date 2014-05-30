@@ -132,8 +132,8 @@ class RPCPublisher(publisher.PublisherBase):
                     operator.itemgetter('counter_name')):
                 meter_list = list(meter_list)
                 topic_name = topic + '.' + meter_name
-                LOG.audit(_('Publishing %(m)d samples on %(n)s') % (
-                          {'m': len(meter_list), 'n': topic_name}))
+                LOG.debug('Publishing %(m)d samples on %(n)s',
+                          {'m': len(meter_list), 'n': topic_name})
                 self.local_queue.append((context, topic_name, meter_list))
 
         self.flush()
