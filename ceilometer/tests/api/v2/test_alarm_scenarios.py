@@ -1344,6 +1344,30 @@ class TestAlarms(FunctionalTest,
             'Alarm with name=name1 exists',
             resp.json['error_message']['faultstring'])
 
+    def test_put_alarm_combination_cannot_specify_itself(self):
+        json = {
+            'name': 'name4',
+            'type': 'combination',
+            'combination_rule': {
+                'alarm_ids': ['d'],
+            }
+        }
+
+        data = self.get_json('/alarms',
+                             q=[{'field': 'name',
+                                 'value': 'name4',
+                                 }])
+        self.assertEqual(1, len(data))
+        alarm_id = data[0]['alarm_id']
+
+        resp = self.put_json('/alarms/%s' % alarm_id,
+                             expect_errors=True, status=400,
+                             params=json,
+                             headers=self.auth_headers)
+
+        msg = 'Cannot specify alarm %s itself in combination rule' % alarm_id
+        self.assertEqual(msg, resp.json['error_message']['faultstring'])
+
     def test_delete_alarm(self):
         data = self.get_json('/alarms')
         self.assertEqual(4, len(data))
