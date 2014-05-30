@@ -13,14 +13,19 @@
 """Tests the mongodb and db2 common functionality
 """
 
+import contextlib
 import copy
 import datetime
 
+from mock import call
 from mock import patch
+import pymongo
 import testscenarios
 
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.publisher import utils
 from ceilometer import sample
+from ceilometer.storage import pymongo_base
 from ceilometer.tests import db as tests_db
 from ceilometer.tests.storage import test_storage_scenarios
 
@@ -172,3 +177,40 @@ class CompatibilityTest(test_storage_scenarios.DBTestBase,
     def test_counter_unit(self):
         meters = list(self.conn.get_meters())
         self.assertEqual(1, len(meters))
+
+    def test_mongodb_connect_raises_after_custom_number_of_attempts(self):
+        retry_interval = 13
+        max_retries = 37
+        self.CONF.set_override(
+            'retry_interval', retry_interval, group='database')
+        self.CONF.set_override(
+            'max_retries', max_retries, group='database')
+        # PyMongo is being used to connect even to DB2, but it only
+        # accepts URLs with the 'mongodb' scheme. This replacement is
+        # usually done in the DB2 connection implementation, but since
+        # we don't call that, we have to do it here.
+        self.CONF.set_override(
+            'connection', self.db_manager.url.replace('db2:', 'mongodb:', 1),
+            group='database')
+
+        pool = pymongo_base.ConnectionPool()
+        with contextlib.nested(
+                patch('pymongo.MongoClient',
+                      side_effect=pymongo.errors.ConnectionFailure('foo')),
+                patch.object(pymongo_base.LOG, 'error'),
+                patch.object(pymongo_base.LOG, 'warn'),
+                patch.object(pymongo_base.time, 'sleep')
+        ) as (MockMongo, MockLOGerror, MockLOGwarn, Mocksleep):
+            self.assertRaises(pymongo.errors.ConnectionFailure,
+                              pool.connect, self.CONF.database.connection)
+            Mocksleep.assert_has_calls([call(retry_interval)
+                                        for i in range(max_retries)])
+            MockLOGwarn.assert_any_call(
+                _('Unable to connect to the database server: %(errmsg)s.'
+                  ' Trying again in %(retry_interval)d seconds.') %
+                {'errmsg': 'foo',
+                 'retry_interval': retry_interval})
+            MockLOGerror.assert_called_with(
+                _('Unable to connect to the database after '
+                  '%(retries)d retries. Giving up.') %
+                {'retries': max_retries})
