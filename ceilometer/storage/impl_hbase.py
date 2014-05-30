@@ -55,6 +55,11 @@ AVAILABLE_CAPABILITIES = {
 }
 
 
+AVAILABLE_STORAGE_CAPABILITIES = {
+    'storage': {'production_ready': True},
+}
+
+
 class Connection(base.Connection):
     """Put the data into a HBase database
 
@@ -113,6 +118,10 @@ class Connection(base.Connection):
 
     CAPABILITIES = utils.update_nested(base.Connection.CAPABILITIES,
                                        AVAILABLE_CAPABILITIES)
+    STORAGE_CAPABILITIES = utils.update_nested(
+        base.Connection.STORAGE_CAPABILITIES,
+        AVAILABLE_STORAGE_CAPABILITIES,
+    )
     _memory_instance = None
 
     RESOURCE_TABLE = "resource"

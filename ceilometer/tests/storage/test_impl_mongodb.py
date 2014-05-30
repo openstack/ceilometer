@@ -186,3 +186,11 @@ class CapabilitiesTest(test_base.BaseTestCase):
 
         actual_capabilities = impl_mongodb.Connection.get_capabilities()
         self.assertEqual(expected_capabilities, actual_capabilities)
+
+    def test_storage_capabilities(self):
+        expected_capabilities = {
+            'storage': {'production_ready': True},
+        }
+        actual_capabilities = impl_mongodb.Connection.\
+            get_storage_capabilities()
+        self.assertEqual(expected_capabilities, actual_capabilities)

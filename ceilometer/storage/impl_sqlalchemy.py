@@ -110,6 +110,11 @@ AVAILABLE_CAPABILITIES = {
 }
 
 
+AVAILABLE_STORAGE_CAPABILITIES = {
+    'storage': {'production_ready': True},
+}
+
+
 def apply_metaquery_filter(session, query, metaquery):
     """Apply provided metaquery filter to existing query.
 
@@ -216,6 +221,10 @@ class Connection(base.Connection):
     """
     CAPABILITIES = utils.update_nested(base.Connection.CAPABILITIES,
                                        AVAILABLE_CAPABILITIES)
+    STORAGE_CAPABILITIES = utils.update_nested(
+        base.Connection.STORAGE_CAPABILITIES,
+        AVAILABLE_STORAGE_CAPABILITIES,
+    )
 
     def __init__(self, url):
         self._engine_facade = sqlalchemy_session.EngineFacade.from_config(

@@ -2450,12 +2450,14 @@ def _flatten_capabilities(capabilities):
 
 
 class Capabilities(_Base):
-    """A representation of the API capabilities, usually constrained
-       by restrictions imposed by the storage driver.
+    """A representation of the API and storage capabilities, usually
+       constrained by restrictions imposed by the storage driver.
     """
 
     api = {wtypes.text: bool}
     "A flattened dictionary of API capabilities"
+    storage = {wtypes.text: bool}
+    "A flattened dictionary of storage capabilities"
 
     @classmethod
     def sample(cls):
@@ -2494,7 +2496,8 @@ class Capabilities(_Base):
                            'history': {'query': {'simple': True,
                                                  'complex': True}}},
                 'events': {'query': {'simple': True}},
-            })
+            }),
+            storage=_flatten_capabilities({'production_ready': True}),
         )
 
 
@@ -2510,7 +2513,9 @@ class CapabilitiesController(rest.RestController):
         # variation in API capabilities is effectively determined by
         # the lack of strict feature parity across storage drivers
         driver_capabilities = pecan.request.storage_conn.get_capabilities()
-        return Capabilities(api=_flatten_capabilities(driver_capabilities))
+        driver_perf = pecan.request.storage_conn.get_storage_capabilities()
+        return Capabilities(api=_flatten_capabilities(driver_capabilities),
+                            storage=_flatten_capabilities(driver_perf))
 
 
 class V2Controller(object):

@@ -140,11 +140,21 @@ COMMON_AVAILABLE_CAPABILITIES = {
 }
 
 
+AVAILABLE_STORAGE_CAPABILITIES = {
+    'storage': {'production_ready': True},
+}
+
+
 class Connection(base.Connection):
     """Base Connection class for MongoDB and DB2 drivers.
     """
     CAPABILITIES = utils.update_nested(base.Connection.CAPABILITIES,
                                        COMMON_AVAILABLE_CAPABILITIES)
+
+    STORAGE_CAPABILITIES = utils.update_nested(
+        base.Connection.STORAGE_CAPABILITIES,
+        AVAILABLE_STORAGE_CAPABILITIES,
+    )
 
     def get_meters(self, user=None, project=None, resource=None, source=None,
                    metaquery=None, pagination=None):
