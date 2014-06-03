@@ -19,6 +19,7 @@
 
 from lxml import etree
 from oslo.config import cfg
+import six
 
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.openstack.common.gettextutils import _
@@ -83,7 +84,7 @@ class LibvirtInspector(virt_inspector.Inspector):
             return self._get_connection().lookupByName(instance_name)
         except Exception as ex:
             if not libvirt or not isinstance(ex, libvirt.libvirtError):
-                raise virt_inspector.InspectorException(unicode(ex))
+                raise virt_inspector.InspectorException(six.text_type(ex))
             error_code = ex.get_error_code()
             msg = ("Error from libvirt while looking up %(instance_name)s: "
                    "[Error Code %(error_code)s] "

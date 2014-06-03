@@ -22,6 +22,8 @@ from ceilometer.openstack.common import test
 from ceilometer import storage
 from ceilometer.storage import impl_log
 
+import six
+
 
 class EngineTest(test.BaseTestCase):
 
@@ -33,4 +35,4 @@ class EngineTest(test.BaseTestCase):
         try:
             storage.get_connection('no-such-engine://localhost')
         except RuntimeError as err:
-            self.assertIn('no-such-engine', unicode(err))
+            self.assertIn('no-such-engine', six.text_type(err))

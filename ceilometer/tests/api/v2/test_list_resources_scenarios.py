@@ -22,6 +22,8 @@ import datetime
 import json
 import logging
 
+import six
+
 from ceilometer.openstack.common import timeutils
 from ceilometer.publisher import utils
 from ceilometer import sample
@@ -41,7 +43,7 @@ class TestListResources(FunctionalTest,
     @staticmethod
     def _isotime(timestamp):
         # drop TZ specifier
-        return unicode(timeutils.isotime(timestamp))[:-1]
+        return six.text_type(timeutils.isotime(timestamp))[:-1]
 
     def _verify_sample_timestamps(self, res, first, last):
         self.assertTrue('first_sample_timestamp' in res)
