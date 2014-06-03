@@ -64,7 +64,12 @@ class EventsNotificationEndpoint(object):
             LOG.debug(_('Saving event "%s"'), event.event_type)
             problem_events = []
             for dispatcher_ext in self.dispatcher_manager:
-                problem_events.extend(dispatcher_ext.obj.record_events(event))
+                try:
+                    problem_events.extend(
+                        dispatcher_ext.obj.record_events(event))
+                except NotImplementedError:
+                    LOG.warn(_('Event is not implemented with the storage'
+                               ' backend'))
             if models.Event.UNKNOWN_PROBLEM in [x[0] for x in problem_events]:
                 if not cfg.CONF.notification.ack_on_event_error:
                     return oslo.messaging.NotificationResult.REQUEUE
