@@ -18,5 +18,13 @@
 ============================
 
 .. toctree::
+   :hidden:
 
    folsom
+
+* :ref:`folsom`
+* `Havana`_
+* `Icehouse`_
+
+.. _Havana: https://wiki.openstack.org/wiki/ReleaseNotes/Havana#OpenStack_Metering_.28Ceilometer.29
+.. _IceHouse: https://wiki.openstack.org/wiki/ReleaseNotes/Icehouse#Ceilometer

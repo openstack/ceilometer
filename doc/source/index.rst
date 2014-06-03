@@ -17,7 +17,7 @@
 Welcome to the Ceilometer developer documentation!
 ==================================================
 
-The :term:`ceilometer` project aims to deliver a unique point of
+The :term:`Ceilometer` project aims to deliver a unique point of
 contact for billing systems to acquire all of the measurements they
 need to establish customer billing, across all current OpenStack core
 components with work underway to support future OpenStack components.
@@ -37,7 +37,7 @@ What is the purpose of the project and vision for it?
   users through a REST API.
 * The metering messages are signed and :term:`non-repudiable`.
 
-This documentation offers information on how ceilometer works and how to
+This documentation offers information on how Ceilometer works and how to
 contribute to the project.
 
 Table of contents
@@ -55,26 +55,7 @@ Table of contents
    contributing/index
    releasenotes/index
    glossary
-
-.. - installation
-..   - devstack
-..   - take content from "initial setup"
-.. - configuration
-..   - talk about copying nova config file
-.. - running the services
-..   - agent on compute node
-..   - collector on controller (non-compute) node
-.. - contributing
-..   - joining the project (take this from another set of docs?)
-..   - reporting bugs
-..   - running tests
-..   - submitting patches for review
-.. - writing plugins
-..   - general plugin-based architecture information
-..     - reference to setuptools entry points docs
-..   - pollsters
-..   - notifications
-..   - database engine
+   sourcecode/autoindex
 
 .. update index
 
@@ -84,8 +65,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
-To Do
-=====
-
-.. todolist::
