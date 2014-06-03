@@ -94,11 +94,20 @@ class TestTraitAPI(EventTestBase):
     def test_get_trait_data_for_event(self):
         path = (self.PATH % "Foo") + "/trait_A"
         data = self.get_json(path, headers=headers)
-
         self.assertEqual(1, len(data))
+        self.assertEqual("trait_A", data[0]['name'])
 
-        trait = data[0]
-        self.assertEqual("trait_A", trait['name'])
+        path = (self.PATH % "Foo") + "/trait_B"
+        data = self.get_json(path, headers=headers)
+        self.assertEqual(1, len(data))
+        self.assertEqual("trait_B", data[0]['name'])
+        self.assertEqual("1", data[0]['value'])
+
+        path = (self.PATH % "Foo") + "/trait_D"
+        data = self.get_json(path, headers=headers)
+        self.assertEqual(1, len(data))
+        self.assertEqual("trait_D", data[0]['name'])
+        self.assertEqual(self.trait_time.isoformat(), data[0]['value'])
 
     def test_get_trait_data_for_non_existent_event(self):
         path = (self.PATH % "NO_SUCH_EVENT") + "/trait_A"
