@@ -31,7 +31,6 @@ class TestVsphereInspection(test.BaseTestCase):
         api_session = api.VMwareAPISession("test_server", "test_user",
                                            "test_password", 0, None,
                                            create_session=False)
-        api_session._vim = mock.MagicMock()
         vsphere_inspector.get_api_session = mock.Mock(
             return_value=api_session)
         self._inspector = vsphere_inspector.VsphereInspector()
