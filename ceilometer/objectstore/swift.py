@@ -80,8 +80,8 @@ class _Base(plugin.PollsterBase):
     def _neaten_url(endpoint, tenant_id):
         """Transform the registered url to standard and valid format.
         """
-        return urlparse.urljoin(endpoint,
-                                '/v1/' + cfg.CONF.reseller_prefix + tenant_id)
+        return urlparse.urljoin(endpoint.split('/v1')[0].rstrip('/') + '/',
+                                'v1/' + cfg.CONF.reseller_prefix + tenant_id)
 
 
 class ObjectsPollster(_Base):
