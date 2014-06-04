@@ -17,7 +17,6 @@
 
 from oslo.config import cfg
 from oslo.vmware import api
-from oslo.vmware import vim
 
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.compute.virt.vmware import vsphere_operations
@@ -61,15 +60,12 @@ VC_DISK_WRITE_REQUESTS_RATE_CNTR = "disk:numberWriteAveraged:average"
 
 
 def get_api_session():
-    hostIp = cfg.CONF.vmware.host_ip
-    wsdl_loc = vim.Vim._get_wsdl_loc("https", hostIp)
     api_session = api.VMwareAPISession(
-        hostIp,
+        cfg.CONF.vmware.host_ip,
         cfg.CONF.vmware.host_username,
         cfg.CONF.vmware.host_password,
         cfg.CONF.vmware.api_retry_count,
-        cfg.CONF.vmware.task_poll_interval,
-        wsdl_loc=wsdl_loc)
+        cfg.CONF.vmware.task_poll_interval)
     return api_session
 
 
