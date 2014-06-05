@@ -25,7 +25,7 @@ class TestNetPollsters(base.TestPollsterBase):
     def test_bandwidth(self):
         self._check_get_samples(net.BandwidthBytesPollster,
                                 'hardware.network.bandwidth.bytes',
-                                1000, sample.TYPE_CUMULATIVE)
+                                1000, sample.TYPE_GAUGE)
 
     def test_incoming(self):
         self._check_get_samples(net.IncomingBytesPollster,
