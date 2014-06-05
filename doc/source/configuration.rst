@@ -88,6 +88,25 @@ keyfile                                                                Required 
                                                                        the same as certfile if the certfile includes the private key.
 ===============================  ====================================  ==============================================================
 
+VMware Configuration Options
+============================
+
+The following lists the various options that the VMware driver supports and must be placed
+under a section called '[vmware]'.
+
+==========================  ====================================  =================================================================
+Parameter                   Default                               Note
+==========================  ====================================  =================================================================
+host_ip                     ""                                    (Str) IP address of the VMware Vsphere host.
+host_password               ""                                    (Str) Password of VMware Vsphere.
+host_username               ""                                    (Str) Username of VMware Vsphere.
+api_retry_count             10                                    (Int) Number of times a VMware Vsphere API must be retried.
+task_poll_interval          0.5                                   (Float) Sleep time in seconds for polling an ongoing async task.
+wsdl_location               None                                  (Str) Optional vim Service WSDL location
+                                                                  e.g http://<server>/vimService.wsdl. Optional over-ride to
+                                                                  default location for bug work-arounds.
+==========================  ====================================  =================================================================
+
 SQL Alchemy
 ===========
 
