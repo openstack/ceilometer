@@ -170,30 +170,27 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
             self.pipeline_cfg,
             self.transformer_manager)
 
+    def get_extention_list(self):
+        return [extension.Extension('test',
+                                    None,
+                                    None,
+                                    self.Pollster(), ),
+                extension.Extension('testanother',
+                                    None,
+                                    None,
+                                    self.PollsterAnother(), ),
+                extension.Extension('testexception',
+                                    None,
+                                    None,
+                                    self.PollsterException(), ),
+                extension.Extension('testexceptionanother',
+                                    None,
+                                    None,
+                                    self.PollsterExceptionAnother(), )]
+
     def create_pollster_manager(self):
         return extension.ExtensionManager.make_test_instance(
-            [
-                extension.Extension(
-                    'test',
-                    None,
-                    None,
-                    self.Pollster(), ),
-                extension.Extension(
-                    'testanother',
-                    None,
-                    None,
-                    self.PollsterAnother(), ),
-                extension.Extension(
-                    'testexception',
-                    None,
-                    None,
-                    self.PollsterException(), ),
-                extension.Extension(
-                    'testexceptionanother',
-                    None,
-                    None,
-                    self.PollsterExceptionAnother(), ),
-            ],
+            self.get_extention_list(),
         )
 
     def create_discovery_manager(self):

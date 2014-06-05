@@ -19,10 +19,13 @@
 """
 
 import mock
+from stevedore import extension
 
 from ceilometer.central import manager
+from ceilometer.central import plugin
 from ceilometer.openstack.common.fixture import mockpatch
 from ceilometer.openstack.common import test
+from ceilometer import pipeline
 from ceilometer.tests import agentbase
 
 
@@ -34,7 +37,31 @@ class TestManager(test.BaseTestCase):
         self.assertIsNotNone(list(mgr.pollster_manager))
 
 
+class TestPollsterKeystone(agentbase.TestPollster):
+    @plugin.check_keystone
+    def get_samples(self, manager, cache, resources=None):
+        func = super(TestPollsterKeystone, self).get_samples
+        return func(manager=manager,
+                    cache=cache,
+                    resources=resources)
+
+
 class TestRunTasks(agentbase.BaseAgentManagerTestCase):
+
+    class PollsterKeystone(TestPollsterKeystone):
+        samples = []
+        resources = []
+        test_data = agentbase.TestSample(
+            name='testkeystone',
+            type=agentbase.default_test_data.type,
+            unit=agentbase.default_test_data.unit,
+            volume=agentbase.default_test_data.volume,
+            user_id=agentbase.default_test_data.user_id,
+            project_id=agentbase.default_test_data.project_id,
+            resource_id=agentbase.default_test_data.resource_id,
+            timestamp=agentbase.default_test_data.timestamp,
+            resource_metadata=agentbase.default_test_data.resource_metadata)
+
     @staticmethod
     def create_manager():
         return manager.AgentManager()
@@ -44,18 +71,45 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         super(TestRunTasks, self).setUp()
         self.useFixture(mockpatch.Patch(
             'keystoneclient.v2_0.client.Client',
-            return_value=None))
+            return_value=mock.Mock()))
+
+    def tearDown(self):
+        self.PollsterKeystone.samples = []
+        self.PollsterKeystone.resources = []
+        super(TestRunTasks, self).tearDown()
+
+    def get_extention_list(self):
+        exts = super(TestRunTasks, self).get_extention_list()
+        exts.append(extension.Extension('testkeystone',
+                                        None,
+                                        None,
+                                        self.PollsterKeystone(),))
+        return exts
 
     def test_get_sample_resources(self):
         polling_tasks = self.mgr.setup_polling_tasks()
         self.mgr.interval_task(polling_tasks.values()[0])
         self.assertTrue(self.Pollster.resources)
 
-    def test_skip_task_when_keystone_fail(self):
-        """Test for https://bugs.launchpad.net/ceilometer/+bug/1287613."""
+    def test_when_keystone_fail(self):
+        """Test for bug 1316532.
+        """
         self.useFixture(mockpatch.Patch(
             'keystoneclient.v2_0.client.Client',
             side_effect=Exception))
+        self.pipeline_cfg = [
+            {
+                'name': "test_keystone",
+                'interval': 10,
+                'counters': ['testkeystone'],
+                'resources': ['test://'] if self.source_resources else [],
+                'transformers': [],
+                'publishers': ["test"],
+            },
+        ]
+        self.mgr.pipeline_manager = pipeline.PipelineManager(
+            self.pipeline_cfg,
+            self.transformer_manager)
         polling_tasks = self.mgr.setup_polling_tasks()
         self.mgr.interval_task(polling_tasks.values()[0])
-        self.assertFalse(self.Pollster.samples)
+        self.assertFalse(self.PollsterKeystone.samples)
