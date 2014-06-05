@@ -48,13 +48,10 @@ class PipelineHook(hooks.PecanHook):
     new samples can be posted via the /v2/meters/ API.
     '''
 
-    pipeline_manager = None
-
     def __init__(self):
-        if self.__class__.pipeline_manager is None:
-            # this is done here as the cfg options are not available
-            # when the file is imported.
-            self.__class__.pipeline_manager = pipeline.setup_pipeline()
+        # this is done here as the cfg options are not available
+        # when the file is imported.
+        self.pipeline_manager = pipeline.setup_pipeline()
 
     def before(self, state):
         state.request.pipeline_manager = self.pipeline_manager
