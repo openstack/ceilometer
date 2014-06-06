@@ -144,6 +144,10 @@ class Connection(object):
         'events': {'query': {'simple': False}},
     }
 
+    STORAGE_CAPABILITIES = {
+        'storage': {'production_ready': False},
+    }
+
     def __init__(self, url):
         """Constructor."""
         pass
@@ -372,3 +376,11 @@ class Connection(object):
         """Return an dictionary representing the capabilities of each driver.
         """
         return cls.CAPABILITIES
+
+    @classmethod
+    def get_storage_capabilities(cls):
+        """Return a dictionary representing the performance capabilities.
+
+        This is needed to evaluate the performance of each driver.
+        """
+        return cls.STORAGE_CAPABILITIES

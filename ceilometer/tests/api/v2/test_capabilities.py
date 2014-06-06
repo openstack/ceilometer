@@ -33,5 +33,8 @@ class TestCapabilitiesController(tests_api.FunctionalTest,
 
     def test_capabilities(self):
         data = self.get_json(self.url)
+        # check that capabilities data contains both 'api' and 'storage' fields
         self.assertIsNotNone(data)
         self.assertNotEqual({}, data)
+        self.assertIn('api', data)
+        self.assertIn('storage', data)
