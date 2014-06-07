@@ -24,9 +24,11 @@ import oslo.messaging
 from stevedore import extension
 
 from ceilometer import collector
+from ceilometer import dispatcher
 from ceilometer import messaging
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common.fixture import config
+from ceilometer.openstack.common.fixture import mockpatch
 from ceilometer.openstack.common import timeutils
 from ceilometer.publisher import utils
 from ceilometer import sample
@@ -41,13 +43,14 @@ class FakeConnection():
 class TestCollector(tests_base.BaseTestCase):
     def setUp(self):
         super(TestCollector, self).setUp()
-        messaging.setup('fake://')
-        self.addCleanup(messaging.cleanup)
-
         self.CONF = self.useFixture(config.Config()).conf
         self.CONF.set_override("connection", "log://", group='database')
         self.CONF.set_override('metering_secret', 'not-so-secret',
                                group='publisher')
+        self.useFixture(oslo.messaging.conffixture.ConfFixture(self.CONF))
+        self._setup_messaging('fake://')
+        self.addCleanup(messaging.cleanup)
+
         self.counter = sample.Sample(
             name='foobar',
             type='bad',
@@ -77,15 +80,28 @@ class TestCollector(tests_base.BaseTestCase):
 
         self.srv = collector.CollectorService()
 
-    def _make_test_manager(self, plugin):
-        return extension.ExtensionManager.make_test_instance([
-            extension.Extension(
-                'test',
-                None,
-                None,
-                plugin,
-            ),
+        self.useFixture(mockpatch.PatchObject(
+            self.srv.tg, 'add_thread',
+            side_effect=self._dummy_thread_group_add_thread))
+
+    @staticmethod
+    def _dummy_thread_group_add_thread(method):
+        method()
+
+    def _setup_messaging(self, url):
+        messaging.cleanup()
+        self.CONF.set_override('rpc_backend', '')
+        messaging.setup(url, optional=True)
+
+    def _setup_fake_dispatcher(self):
+        plugin = mock.MagicMock()
+        fake_dispatcher = extension.ExtensionManager.make_test_instance([
+            extension.Extension('test', None, None, plugin,),
         ])
+        self.useFixture(mockpatch.Patch(
+            'ceilometer.dispatcher.load_dispatcher_manager',
+            return_value=fake_dispatcher))
+        return plugin
 
     def _make_fake_socket(self, sample):
         def recvfrom(size):
@@ -105,16 +121,15 @@ class TestCollector(tests_base.BaseTestCase):
                                                  conf.udp_port))
 
     def test_record_metering_data(self):
-        mock_dispatcher = mock.MagicMock()
-        self.srv.dispatcher_manager = self._make_test_manager(mock_dispatcher)
+        mock_dispatcher = self._setup_fake_dispatcher()
+        self.srv.dispatcher_manager = dispatcher.load_dispatcher_manager()
         self.srv.record_metering_data(None, self.counter)
         mock_dispatcher.record_metering_data.assert_called_once_with(
             data=self.counter)
 
-    def test_udp_receive(self):
-        self.CONF.set_override('rpc_backend', '')
-        mock_dispatcher = mock.MagicMock()
-        self.srv.dispatcher_manager = self._make_test_manager(mock_dispatcher)
+    def test_udp_receive_base(self):
+        self._setup_messaging('')
+        mock_dispatcher = self._setup_fake_dispatcher()
         self.counter['source'] = 'mysource'
         self.counter['counter_name'] = self.counter['name']
         self.counter['counter_volume'] = self.counter['volume']
@@ -122,8 +137,9 @@ class TestCollector(tests_base.BaseTestCase):
         self.counter['counter_unit'] = self.counter['unit']
 
         udp_socket = self._make_fake_socket(self.counter)
+
         with mock.patch('socket.socket', return_value=udp_socket):
-            self.srv.start_udp()
+            self.srv.start()
 
         self._verify_udp_socket(udp_socket)
 
@@ -131,9 +147,8 @@ class TestCollector(tests_base.BaseTestCase):
             self.counter)
 
     def test_udp_receive_storage_error(self):
-        self.CONF.set_override('rpc_backend', '')
-        mock_dispatcher = mock.MagicMock()
-        self.srv.dispatcher_manager = self._make_test_manager(mock_dispatcher)
+        self._setup_messaging('')
+        mock_dispatcher = self._setup_fake_dispatcher()
         mock_dispatcher.record_metering_data.side_effect = self._raise_error
 
         self.counter['source'] = 'mysource'
@@ -144,7 +159,7 @@ class TestCollector(tests_base.BaseTestCase):
 
         udp_socket = self._make_fake_socket(self.counter)
         with mock.patch('socket.socket', return_value=udp_socket):
-            self.srv.start_udp()
+            self.srv.start()
 
         self._verify_udp_socket(udp_socket)
 
@@ -156,29 +171,22 @@ class TestCollector(tests_base.BaseTestCase):
         raise Exception
 
     def test_udp_receive_bad_decoding(self):
-        self.CONF.set_override('rpc_backend', '')
+        self._setup_messaging('')
         udp_socket = self._make_fake_socket(self.counter)
-        with mock.patch('socket.socket', return_value=udp_socket):
-            with mock.patch('msgpack.loads', self._raise_error):
-                self.srv.start_udp()
+        with contextlib.nested(
+                mock.patch('socket.socket', return_value=udp_socket),
+                mock.patch('msgpack.loads', self._raise_error)):
+            self.srv.start()
 
         self._verify_udp_socket(udp_socket)
-
-    @staticmethod
-    def _dummy_thread_group_add_thread(method):
-        method()
 
     @mock.patch.object(oslo.messaging.MessageHandlingServer, 'start')
     @mock.patch.object(collector.CollectorService, 'start_udp')
     def test_only_udp(self, udp_start, rpc_start):
-        """Check that only UDP is started if rpc_backend is empty."""
-        self.CONF.set_override('rpc_backend', '')
+        """Check that only UDP is started if messaging transport is unset."""
+        self._setup_messaging('')
         udp_socket = self._make_fake_socket(self.counter)
-        with contextlib.nested(
-                mock.patch.object(
-                    self.srv.tg, 'add_thread',
-                    side_effect=self._dummy_thread_group_add_thread),
-                mock.patch('socket.socket', return_value=udp_socket)):
+        with mock.patch('socket.socket', return_value=udp_socket):
             self.srv.start()
             self.assertEqual(0, rpc_start.call_count)
             self.assertEqual(1, udp_start.call_count)
@@ -188,22 +196,17 @@ class TestCollector(tests_base.BaseTestCase):
     def test_only_rpc(self, udp_start, rpc_start):
         """Check that only RPC is started if udp_address is empty."""
         self.CONF.set_override('udp_address', '', group='collector')
-        with mock.patch.object(
-                self.srv.tg, 'add_thread',
-                side_effect=self._dummy_thread_group_add_thread):
-            self.srv.start()
-            self.assertEqual(1, rpc_start.call_count)
-            self.assertEqual(0, udp_start.call_count)
+        self.srv.start()
+        self.assertEqual(1, rpc_start.call_count)
+        self.assertEqual(0, udp_start.call_count)
 
     def test_udp_receive_valid_encoding(self):
+        self._setup_messaging('')
+        mock_dispatcher = self._setup_fake_dispatcher()
         self.data_sent = []
         with mock.patch('socket.socket',
                         return_value=self._make_fake_socket(self.utf8_msg)):
-            self.srv.rpc_server = mock.MagicMock()
-            mock_dispatcher = mock.MagicMock()
-            self.srv.dispatcher_manager = \
-                self._make_test_manager(mock_dispatcher)
-            self.srv.start_udp()
+            self.srv.start()
             self.assertTrue(utils.verify_signature(
                 mock_dispatcher.method_calls[0][1][0],
                 "not-so-secret"))

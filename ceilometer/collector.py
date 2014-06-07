@@ -48,21 +48,17 @@ LOG = log.getLogger(__name__)
 
 class CollectorService(os_service.Service):
     """Listener for the collector service."""
-
-    @staticmethod
-    def rpc_enabled():
-        # cfg.CONF opt from oslo.messaging.transport
-        return cfg.CONF.rpc_backend or cfg.CONF.transport_url
-
     def start(self):
         """Bind the UDP socket and handle incoming data."""
         # ensure dispatcher is configured before starting other services
         self.dispatcher_manager = dispatcher.load_dispatcher_manager()
+        self.rpc_server = None
         super(CollectorService, self).start()
+
         if cfg.CONF.collector.udp_address:
             self.tg.add_thread(self.start_udp)
 
-        if self.rpc_enabled():
+        if messaging.TRANSPORT is not None:
             self.rpc_server = messaging.get_rpc_server(
                 cfg.CONF.publisher_rpc.metering_topic, self)
             self.rpc_server.start()
@@ -96,7 +92,7 @@ class CollectorService(os_service.Service):
 
     def stop(self):
         self.udp_run = False
-        if self.rpc_enabled():
+        if self.rpc_server:
             self.rpc_server.stop()
         super(CollectorService, self).stop()
 
