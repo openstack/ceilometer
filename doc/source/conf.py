@@ -51,10 +51,9 @@ def write_autodoc_index():
     RSTDIR = os.path.abspath(os.path.join(BASE_DIR, "sourcecode"))
     SRCS = {'ceilometer': ROOT}
 
-    EXCLUDED_MODULES = ('ceilometer.tests','ceilometer.compute.nova_notifier',
-                        'ceilometer.openstack.common.middleware.audit',
-                        'ceilometer.openstack.common.middleware.notifier',
-                        'ceilometer.openstack.common.log_handler')
+    EXCLUDED_MODULES = ('ceilometer.compute.nova_notifier',
+                        'ceilometer.openstack.common.log_handler',
+                        'ceilometer.tests')
     CURRENT_SOURCES = {}
 
     if not(os.path.exists(RSTDIR)):
