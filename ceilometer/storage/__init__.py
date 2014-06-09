@@ -124,14 +124,16 @@ class EventFilter(object):
     :param event_type: the name of the event. None for all.
     :param message_id: the message_id of the event. None for all.
     :param traits_filter: the trait filter dicts, all of which are optional.
-                   This parameter is a list of dictionaries that specify
-                   trait values:
-                    {'key': <key>,
-                    'string': <value>,
-                    'integer': <value>,
-                    'datetime': <value>,
-                    'float': <value>,
-                    'op': <eq, lt, le, ne, gt or ge> }
+      This parameter is a list of dictionaries that specify trait values:
+
+    .. code-block:: python
+
+        {'key': <key>,
+        'string': <value>,
+        'integer': <value>,
+        'datetime': <value>,
+        'float': <value>,
+        'op': <eq, lt, le, ne, gt or ge> }
     """
 
     def __init__(self, start_time=None, end_time=None, event_type=None,

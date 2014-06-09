@@ -34,8 +34,9 @@ class FilePublisher(publisher.PublisherBase):
     If a file name and location is not specified, this File Publisher will not
     log any meters other than log a warning in Ceilometer log file.
 
-    To enable this publisher, add the following section to file
-    /etc/ceilometer/publisher.yaml or simply add it to an existing pipeline.
+    To enable this publisher, add the following section to the
+    /etc/ceilometer/publisher.yaml file or simply add it to an existing
+    pipeline::
 
         -
             name: meter_file

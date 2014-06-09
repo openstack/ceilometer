@@ -51,24 +51,25 @@ class TraitPluginBase(object):
         appropriate type for the trait.
 
         :param match_list: A list (may be empty if no matches) of *tuples*.
-                          Each tuple is (field_path, value) where field_path
-                          is the jsonpath for that specific field,
+          Each tuple is (field_path, value) where field_path is the jsonpath
+          for that specific field.
 
-        Example:
+        Example::
+
             trait's fields definition: ['payload.foobar',
                                         'payload.baz',
                                         'payload.thing.*']
             notification body:
                         {
-                            'message_id': '12345',
-                            'publisher':    'someservice.host',
-                            'payload':  {
-                                            'foobar': 'test',
-                                            'thing':    {
-                                                            'bar': 12,
-                                                            'boing': 13,
-                                                        }
-                                        }
+                         'message_id': '12345',
+                         'publisher': 'someservice.host',
+                         'payload': {
+                                     'foobar': 'test',
+                                     'thing': {
+                                               'bar': 12,
+                                               'boing': 13,
+                                              }
+                                    }
                         }
             match_list will be: [('payload.foobar','test'),
                                  ('payload.thing.bar',12),
@@ -76,16 +77,19 @@ class TraitPluginBase(object):
 
         Here is a plugin that emulates the default (no plugin) behavior:
 
-        class DefaultPlugin(TraitPluginBase):
-            "Plugin that returns the first field value"
+        .. code-block:: python
 
-            def __init__(self, **kw):
-                super(DefaultPlugin, self).__init__()
+          class DefaultPlugin(TraitPluginBase):
+              "Plugin that returns the first field value."
 
-            def trait_value(self, match_list):
-                if not match_list:
-                    return None
-                return match_list[0][1]
+              def __init__(self, **kw):
+                  super(DefaultPlugin, self).__init__()
+
+              def trait_value(self, match_list):
+                  if not match_list:
+                      return None
+                  return match_list[0][1]
+
         """
 
 
