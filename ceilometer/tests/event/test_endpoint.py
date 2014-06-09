@@ -101,6 +101,15 @@ class TestEventEndpoint(tests_base.BaseTestCase):
         self.endpoint.event_converter.to_event.return_value = mock.MagicMock(
             event_type='test.test')
 
+    @mock.patch('ceilometer.event.endpoint.LOG')
+    def test_event_not_implemented(self, log):
+        self.mock_dispatcher.record_events.side_effect = NotImplementedError
+        message = {'event_type': "foo", 'message_id': "abc"}
+        ret = self.endpoint.process_notification(message)
+        log.warn.assert_called_once_with(
+            'Event is not implemented with the storage backend')
+        self.assertEqual(oslo.messaging.NotificationResult.HANDLED, ret)
+
     def test_message_to_event(self):
         self.endpoint.info(TEST_NOTICE_CTXT, 'compute.vagrant-precise',
                            'compute.instance.create.end',
