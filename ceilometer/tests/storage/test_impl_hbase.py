@@ -25,6 +25,7 @@
 """
 from mock import patch
 
+from ceilometer.storage.hbase import inmemory as hbase_inmemory
 from ceilometer.storage import impl_hbase as hbase
 from ceilometer.tests import base as test_base
 from ceilometer.tests import db as tests_db
@@ -36,7 +37,8 @@ class ConnectionTest(tests_db.TestBase,
     @tests_db.run_with('hbase')
     def test_hbase_connection(self):
         conn = hbase.Connection(self.db_manager.url)
-        self.assertIsInstance(conn.conn_pool.connection(), hbase.MConnection)
+        self.assertIsInstance(conn.conn_pool.connection(),
+                              hbase_inmemory.MConnection)
 
         class TestConn(object):
             def __init__(self, host, port):
