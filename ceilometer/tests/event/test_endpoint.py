@@ -19,6 +19,7 @@
 
 import mock
 
+from oslo.config import cfg
 import oslo.messaging
 from stevedore import extension
 
@@ -78,6 +79,10 @@ TEST_NOTICE_PAYLOAD = {
     u'kernel_id': u'1e3ce043029547f1a61c1996d1a531a5',
     u'ramdisk_id': u'1e3ce043029547f1a61c1996d1a531a6',
 }
+
+
+cfg.CONF.import_opt('store_events', 'ceilometer.notification',
+                    group='notification')
 
 
 class TestEventEndpoint(tests_base.BaseTestCase):
