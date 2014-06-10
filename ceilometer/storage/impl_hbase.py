@@ -31,6 +31,7 @@ import time
 import bson.json_util
 import happybase
 
+from ceilometer.alarm.storage import models as alarm_models
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import network_utils
@@ -263,7 +264,7 @@ class Connection(base.Connection):
             alarm_table = conn.table(self.ALARM_TABLE)
             alarm_table.put(_id, alarm_to_store)
             stored_alarm = deserialize_entry(alarm_table.row(_id))[0]
-        return models.Alarm(**stored_alarm)
+        return alarm_models.Alarm(**stored_alarm)
 
     create_alarm = update_alarm
 
@@ -288,7 +289,7 @@ class Connection(base.Connection):
             gen = alarm_table.scan(filter=q)
             for ignored, data in gen:
                 stored_alarm = deserialize_entry(data)[0]
-                yield models.Alarm(**stored_alarm)
+                yield alarm_models.Alarm(**stored_alarm)
 
     def get_alarm_changes(self, alarm_id, on_behalf_of,
                           user=None, project=None, type=None,
@@ -307,7 +308,7 @@ class Connection(base.Connection):
                                            row_stop=end_row)
             for ignored, data in gen:
                 stored_entry = deserialize_entry(data)[0]
-                yield models.AlarmChange(**stored_entry)
+                yield alarm_models.AlarmChange(**stored_entry)
 
     def record_alarm_change(self, alarm_change):
         """Record alarm change event.

@@ -44,6 +44,7 @@ import wsme
 from wsme import types as wtypes
 import wsmeext.pecan as wsme_pecan
 
+from ceilometer.alarm.storage import models as alarm_models
 from ceilometer.api import acl
 from ceilometer import messaging
 from ceilometer.openstack.common import context
@@ -1894,7 +1895,7 @@ class AlarmController(rest.RestController):
     def _record_change(self, data, now, on_behalf_of=None, type=None):
         if not cfg.CONF.alarm.record_history:
             return
-        type = type or storage.models.AlarmChange.RULE_CHANGE
+        type = type or alarm_models.AlarmChange.RULE_CHANGE
         scrubbed_data = utils.stringify_timestamps(data)
         detail = json.dumps(scrubbed_data)
         user_id = pecan.request.headers.get('X-User-Id')
@@ -1967,10 +1968,10 @@ class AlarmController(rest.RestController):
                 raise ClientSideError(_('Cannot specify alarm %s itself in '
                                         'combination rule') % self._id)
 
-        old_alarm = Alarm.from_db_model(alarm_in).as_dict(storage.models.Alarm)
-        updated_alarm = data.as_dict(storage.models.Alarm)
+        old_alarm = Alarm.from_db_model(alarm_in).as_dict(alarm_models.Alarm)
+        updated_alarm = data.as_dict(alarm_models.Alarm)
         try:
-            alarm_in = storage.models.Alarm(**updated_alarm)
+            alarm_in = alarm_models.Alarm(**updated_alarm)
         except Exception:
             LOG.exception(_("Error while putting alarm: %s") % updated_alarm)
             raise ClientSideError(_("Alarm incorrect"))
@@ -1990,10 +1991,10 @@ class AlarmController(rest.RestController):
         # ensure alarm exists before deleting
         alarm = self._alarm()
         self.conn.delete_alarm(alarm.alarm_id)
-        change = Alarm.from_db_model(alarm).as_dict(storage.models.Alarm)
+        change = Alarm.from_db_model(alarm).as_dict(alarm_models.Alarm)
         self._record_change(change,
                             timeutils.utcnow(),
-                            type=storage.models.AlarmChange.DELETION)
+                            type=alarm_models.AlarmChange.DELETION)
 
     # TODO(eglynn): add pagination marker to signature once overall
     #               API support for pagination is finalized
@@ -2033,7 +2034,7 @@ class AlarmController(rest.RestController):
         alarm = self.conn.update_alarm(alarm)
         change = {'state': alarm.state}
         self._record_change(change, now, on_behalf_of=alarm.project_id,
-                            type=storage.models.AlarmChange.STATE_TRANSITION)
+                            type=alarm_models.AlarmChange.STATE_TRANSITION)
         return alarm.state
 
     @wsme_pecan.wsexpose(state_kind_enum)
@@ -2055,7 +2056,7 @@ class AlarmsController(rest.RestController):
     def _record_creation(self, conn, data, alarm_id, now):
         if not cfg.CONF.alarm.record_history:
             return
-        type = storage.models.AlarmChange.CREATION
+        type = alarm_models.AlarmChange.CREATION
         scrubbed_data = utils.stringify_timestamps(data)
         detail = json.dumps(scrubbed_data)
         user_id = pecan.request.headers.get('X-User-Id')
@@ -2109,7 +2110,7 @@ class AlarmsController(rest.RestController):
         data.timestamp = now
         data.state_timestamp = now
 
-        change = data.as_dict(storage.models.Alarm)
+        change = data.as_dict(alarm_models.Alarm)
 
         # make sure alarms are unique by name per project.
         alarms = list(conn.get_alarms(name=data.name,
@@ -2120,7 +2121,7 @@ class AlarmsController(rest.RestController):
                 status_code=409)
 
         try:
-            alarm_in = storage.models.Alarm(**change)
+            alarm_in = alarm_models.Alarm(**change)
         except Exception:
             LOG.exception(_("Error while posting alarm: %s") % change)
             raise ClientSideError(_("Alarm incorrect"))
@@ -2412,7 +2413,7 @@ class QueryAlarmHistoryController(rest.RestController):
         :param body: Query rules for the alarm history to be returned.
         """
         query = ValidatedComplexQuery(body,
-                                      storage.models.AlarmChange)
+                                      alarm_models.AlarmChange)
         query.validate(visibility_field="on_behalf_of")
         conn = pecan.request.storage_conn
         return [AlarmChange.from_db_model(s)
@@ -2433,7 +2434,7 @@ class QueryAlarmsController(rest.RestController):
         :param body: Query rules for the alarms to be returned.
         """
         query = ValidatedComplexQuery(body,
-                                      storage.models.Alarm)
+                                      alarm_models.Alarm)
         query.validate(visibility_field="project_id")
         conn = pecan.request.storage_conn
         return [Alarm.from_db_model(s)

@@ -24,6 +24,7 @@ from oslo.config import cfg
 import pymongo
 import weakref
 
+from ceilometer.alarm.storage import models as alarm_models
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import network_utils
@@ -240,7 +241,7 @@ class Connection(base.Connection):
         del stored_alarm['_id']
         self._ensure_encapsulated_rule_format(stored_alarm)
         self._ensure_time_constraints(stored_alarm)
-        return models.Alarm(**stored_alarm)
+        return alarm_models.Alarm(**stored_alarm)
 
     create_alarm = update_alarm
 
@@ -357,7 +358,8 @@ class Connection(base.Connection):
     def query_alarms(self, filter_expr=None, orderby=None, limit=None):
         """Return an iterable of model.Alarm objects.
         """
-        return self._retrieve_data(filter_expr, orderby, limit, models.Alarm)
+        return self._retrieve_data(filter_expr, orderby, limit,
+                                   alarm_models.Alarm)
 
     def query_alarm_history(self, filter_expr=None, orderby=None, limit=None):
         """Return an iterable of model.AlarmChange objects.
@@ -365,7 +367,7 @@ class Connection(base.Connection):
         return self._retrieve_data(filter_expr,
                                    orderby,
                                    limit,
-                                   models.AlarmChange)
+                                   alarm_models.AlarmChange)
 
     def _retrieve_data(self, filter_expr, orderby, limit, model):
         if limit == 0:
@@ -379,8 +381,8 @@ class Connection(base.Connection):
             query_filter = transformer.transform_filter(filter_expr)
 
         retrieve = {models.Meter: self._retrieve_samples,
-                    models.Alarm: self._retrieve_alarms,
-                    models.AlarmChange: self._retrieve_alarm_changes}
+                    alarm_models.Alarm: self._retrieve_alarms,
+                    alarm_models.AlarmChange: self._retrieve_alarm_changes}
         return retrieve[model](query_filter, orderby_filter, limit)
 
     def _retrieve_samples(self, query, orderby, limit):
@@ -417,7 +419,7 @@ class Connection(base.Connection):
             del a['_id']
             self._ensure_encapsulated_rule_format(a)
             self._ensure_time_constraints(a)
-            yield models.Alarm(**a)
+            yield alarm_models.Alarm(**a)
 
     def _retrieve_alarm_changes(self, query_filter, orderby, limit):
         if limit is not None:
@@ -432,7 +434,7 @@ class Connection(base.Connection):
             ah = {}
             ah.update(alarm_history)
             del ah['_id']
-            yield models.AlarmChange(**ah)
+            yield alarm_models.AlarmChange(**ah)
 
     @classmethod
     def _ensure_encapsulated_rule_format(cls, alarm):
