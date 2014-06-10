@@ -92,7 +92,7 @@ class CapabilitiesTest(test_base.BaseTestCase):
                                  'complex': False},
                        'history': {'query': {'simple': False,
                                              'complex': False}}},
-            'events': {'query': {'simple': False}}
+            'events': {'query': {'simple': True}},
         }
 
         actual_capabilities = hbase.Connection.get_capabilities()
