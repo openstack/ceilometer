@@ -1214,6 +1214,7 @@ class TestGroupByInstance(FunctionalTest,
                                      u'2013-08-01T14:00:00'])
 
 
+@tests_db.run_with('mongodb', 'hbase', 'db2')
 class TestGroupBySource(FunctionalTest,
                         tests_db.MixinTestsWithBackendScenarios):
 
@@ -1222,12 +1223,6 @@ class TestGroupBySource(FunctionalTest,
     # When group by source is supported in SQLAlchemy, this test should be
     # moved to TestGroupByInstance with all the other group by statistics
     # tests.
-
-    scenarios = [
-        ('mongodb', {'db_manager': tests_db.MongoDbManager()}),
-        ('hbase', {'db_manager': tests_db.HBaseManager()}),
-        ('db2', {'db_manager': tests_db.DB2Manager()}),
-    ]
 
     PATH = '/meters/instance/statistics'
 
@@ -1567,6 +1562,7 @@ class TestSelectableAggregates(FunctionalTest,
                          'Bad aggregate: cardinality.injection_attack')
 
 
+@tests_db.run_with('mongodb', 'hbase', 'db2')
 class TestUnparameterizedAggregates(FunctionalTest,
                                     tests_db.MixinTestsWithBackendScenarios):
 
@@ -1577,12 +1573,6 @@ class TestUnparameterizedAggregates(FunctionalTest,
     # test the corresponding functionality in the mongo driver.
     # For hbase & db2, the skip on NotImplementedError logic works
     # in the usual way.
-
-    scenarios = [
-        ('mongodb', {'db_manager': tests_db.MongoDbManager()}),
-        ('hbase', {'db_manager': tests_db.HBaseManager()}),
-        ('db2', {'db_manager': tests_db.DB2Manager()}),
-    ]
 
     PATH = '/meters/instance/statistics'
 

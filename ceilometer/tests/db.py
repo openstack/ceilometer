@@ -21,11 +21,13 @@
 """Base classes for API tests."""
 import fixtures
 import os
+import urlparse
 import uuid
 import warnings
 
 import six
 import testscenarios.testcase
+from testtools import testcase
 
 from ceilometer.openstack.common.fixture import config
 import ceilometer.openstack.common.fixture.mockpatch as oslo_mock
@@ -33,32 +35,95 @@ from ceilometer import storage
 from ceilometer.tests import base as test_base
 
 
-class TestBase(testscenarios.testcase.WithScenarios, test_base.BaseTestCase):
+class MongoDbManager(fixtures.Fixture):
+
+    def __init__(self, url):
+        self._url = url
+
     def setUp(self):
-        super(TestBase, self).setUp()
-
-        self.useFixture(self.db_manager)
-
-        self.CONF = self.useFixture(config.Config()).conf
-
+        super(MongoDbManager, self).setUp()
         with warnings.catch_warnings():
             warnings.filterwarnings(
                 action='ignore',
                 message='.*you must provide a username and password.*')
             try:
-                self.conn = storage.get_connection(self.db_manager.connection)
+                self.connection = storage.get_connection(self.url)
             except storage.StorageBadVersion as e:
-                self.skipTest(six.text_type(e))
+                raise testcase.TestSkipped(six.text_type(e))
+
+    @property
+    def url(self):
+        return '%(url)s_%(db)s' % {
+            'url': self._url,
+            'db': uuid.uuid4().hex
+        }
+
+
+class HBaseManager(fixtures.Fixture):
+    def __init__(self, url):
+        self._url = url
+
+    def setUp(self):
+        super(HBaseManager, self).setUp()
+        self.connection = storage.get_connection(self.url)
+
+    @property
+    def url(self):
+        return '%s?table_prefix=%s' % (
+            self._url,
+            uuid.uuid4().hex
+        )
+
+
+class SQLiteManager(fixtures.Fixture):
+
+    def __init__(self, url):
+        self.url = url
+
+    def setUp(self):
+        super(SQLiteManager, self).setUp()
+        self.connection = storage.get_connection(self.url)
+
+
+class TestBase(testscenarios.testcase.WithScenarios, test_base.BaseTestCase):
+
+    DRIVER_MANAGERS = {
+        'mongodb': MongoDbManager,
+        'db2': MongoDbManager,
+        'sqlite': SQLiteManager,
+        'hbase': HBaseManager,
+    }
+
+    db_url = 'sqlite://'  # NOTE(Alexei_987) Set default db url
+
+    def setUp(self):
+        super(TestBase, self).setUp()
+
+        engine = urlparse.urlparse(self.db_url).scheme
+
+        # NOTE(Alexei_987) Shortcut to skip expensive db setUp
+        test_method = self._get_test_method()
+        if (hasattr(test_method, '_run_with')
+                and engine not in test_method._run_with):
+            raise testcase.TestSkipped(
+                'Test is not applicable for %s' % engine)
+
+        self.db_manager = self._get_driver_manager(engine)(self.db_url)
+        self.useFixture(self.db_manager)
+
+        self.conn = self.db_manager.connection
         self.conn.upgrade()
 
         self.useFixture(oslo_mock.Patch('ceilometer.storage.get_connection',
                                         return_value=self.conn))
 
+        self.CONF = self.useFixture(config.Config()).conf
         self.CONF([], project='ceilometer')
 
         # Set a default location for the pipeline config file so the
         # tests work even if ceilometer is not installed globally on
         # the system.
+        self.CONF.import_opt('pipeline_cfg_file', 'ceilometer.pipeline')
         self.CONF.set_override(
             'pipeline_cfg_file',
             self.path_get('etc/ceilometer/pipeline.yaml')
@@ -69,64 +134,38 @@ class TestBase(testscenarios.testcase.WithScenarios, test_base.BaseTestCase):
         self.conn = None
         super(TestBase, self).tearDown()
 
-
-class MongoDbManager(fixtures.Fixture):
-
-    def __init__(self):
-        self.url = os.environ.get('CEILOMETER_TEST_MONGODB_URL')
-        if not self.url:
-            raise RuntimeError(
-                "No MongoDB test URL set,"
-                "export CEILOMETER_TEST_MONGODB_URL environment variable")
-
-    def setUp(self):
-        super(MongoDbManager, self).setUp()
-        self.connection = '%(url)s_%(db)s' % {
-            'url': self.url,
-            'db': uuid.uuid4().hex
-        }
+    def _get_driver_manager(self, engine):
+        manager = self.DRIVER_MANAGERS.get(engine)
+        if not manager:
+            raise ValueError('No manager available for %s' % engine)
+        return manager
 
 
-class DB2Manager(MongoDbManager):
-    def __init__(self):
-        self.url = (os.environ.get('CEILOMETER_TEST_DB2_URL') or
-                    os.environ.get('CEILOMETER_TEST_MONGODB_URL'))
-        if not self.url:
-            raise RuntimeError(
-                "No DB2 test URL set, "
-                "export CEILOMETER_TEST_DB2_URL environment variable")
+def run_with(*drivers):
+    """Used to mark tests that are only applicable for certain db driver.
+    Skips test if driver is not available
+    """
+    def decorator(test):
+        if isinstance(test, type) and issubclass(test, TestBase):
+            # Decorate all test methods
+            for attr in dir(test):
+                value = getattr(test, attr)
+                if callable(value) and attr.startswith('test_'):
+                    value.__func__._run_with = drivers
         else:
-            # This is to make sure that the db2 driver is used when
-            # CEILOMETER_TEST_DB2_URL was not set
-            self.url = self.url.replace('mongodb:', 'db2:', 1)
-
-
-class HBaseManager(fixtures.Fixture):
-    def __init__(self):
-        self.url = os.environ.get('CEILOMETER_TEST_HBASE_URL')
-        if not self.url:
-            self.url = 'hbase://__test__'
-
-    def setUp(self):
-        super(HBaseManager, self).setUp()
-        self.connection = '%s?table_prefix=%s' % (
-            self.url,
-            uuid.uuid4().hex)
-
-
-class SQLiteManager(fixtures.Fixture):
-
-    def setUp(self):
-        super(SQLiteManager, self).setUp()
-        self.connection = 'sqlite://'
+            test._run_with = drivers
+        return test
+    return decorator
 
 
 @six.add_metaclass(test_base.SkipNotImplementedMeta)
 class MixinTestsWithBackendScenarios(object):
 
     scenarios = [
-        ('sqlite', {'db_manager': SQLiteManager()}),
-        ('mongodb', {'db_manager': MongoDbManager()}),
-        ('hbase', {'db_manager': HBaseManager()}),
-        ('db2', {'db_manager': DB2Manager()})
+        ('sqlite', {'db_url': 'sqlite://'}),
+        ('mongodb', {'db_url': os.environ.get('CEILOMETER_TEST_MONGODB_URL')}),
+        ('hbase', {'db_url': os.environ.get('CEILOMETER_TEST_HBASE_URL',
+                                            'hbase://__test__')}),
+        ('db2', {'db_url': (os.environ.get('CEILOMETER_TEST_DB2_URL') or
+                            os.environ.get('CEILOMETER_TEST_MONGODB_URL'))})
     ]

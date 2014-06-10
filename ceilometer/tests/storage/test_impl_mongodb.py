@@ -31,17 +31,14 @@ from ceilometer.tests import db as tests_db
 from ceilometer.tests.storage import test_storage_scenarios
 
 
-class MongoDBEngineTestBase(tests_db.TestBase):
-    db_manager = tests_db.MongoDbManager()
-
-
-class MongoDBConnection(MongoDBEngineTestBase):
+@tests_db.run_with('mongodb')
+class MongoDBConnection(tests_db.TestBase):
     def test_connection_pooling(self):
-        test_conn = impl_mongodb.Connection(self.db_manager.connection)
+        test_conn = impl_mongodb.Connection(self.db_manager.url)
         self.assertEqual(self.conn.conn, test_conn.conn)
 
     def test_replica_set(self):
-        url = self.db_manager.connection + '?replicaSet=foobar'
+        url = self.db_manager._url + '?replicaSet=foobar'
         conn = impl_mongodb.Connection(url)
         self.assertTrue(conn.conn)
 
@@ -56,8 +53,8 @@ class MongoDBConnection(MongoDBEngineTestBase):
         self.assertEqual(expect, ret)
 
 
-class MongoDBTestMarkerBase(test_storage_scenarios.DBTestBase,
-                            MongoDBEngineTestBase):
+@tests_db.run_with('mongodb')
+class MongoDBTestMarkerBase(test_storage_scenarios.DBTestBase):
     #NOTE(Fengqian): All these three test case are the same for resource
     #and meter collection. As to alarm, we will set up in AlarmTestPagination.
     def test_get_marker(self):
@@ -85,7 +82,8 @@ class MongoDBTestMarkerBase(test_storage_scenarios.DBTestBase,
             self.assertTrue(True)
 
 
-class IndexTest(MongoDBEngineTestBase):
+@tests_db.run_with('mongodb')
+class IndexTest(tests_db.TestBase):
     def test_meter_ttl_index_absent(self):
         # create a fake index and check it is deleted
         self.conn.db.meter.ensure_index('foo', name='meter_ttl')
@@ -113,8 +111,8 @@ class IndexTest(MongoDBEngineTestBase):
                                                         name='meter_ttl'))
 
 
-class AlarmTestPagination(test_storage_scenarios.AlarmTestBase,
-                          MongoDBEngineTestBase):
+@tests_db.run_with('mongodb')
+class AlarmTestPagination(test_storage_scenarios.AlarmTestBase):
     def test_alarm_get_marker(self):
         self.add_some_alarms()
         marker_pairs = {'name': 'red-alert'}
