@@ -275,8 +275,8 @@ network.services.lb.pool                 Gauge       pool          pool ID     p
 network.services.lb.vip                  Gauge       vip           vip ID      pollster   Existence of a LB Vip
 network.services.lb.member               Gauge       member        member ID   pollster   Existence of a LB Member
 network.services.lb.health_monitor       Gauge       monitor       monitor ID  pollster   Existence of a LB Health Probe
-network.services.lb.total_connections    Delta       connection    pool ID     pollster   Total connections on a LB
-network.services.lb.active_connections   Delta       connection    pool ID     pollster   Active connections on a LB
+network.services.lb.total.connections    Gauge       connection    pool ID     pollster   Total connections on a LB
+network.services.lb.active.connections   Gauge       connection    pool ID     pollster   Active connections on a LB
 network.services.lb.incoming.bytes       Cumulative  B             pool ID     pollster   Number of incoming Bytes
 network.services.lb.outgoing.bytes       Cumulative  B             pool ID     pollster   Number of outgoing Bytes
 =======================================  ==========  ==========    ==========  =========  ==============================
