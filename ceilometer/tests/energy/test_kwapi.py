@@ -51,7 +51,7 @@ class TestManager(manager.AgentManager):
 
     def __init__(self):
         super(TestManager, self).__init__()
-        self.keystone = None
+        self.keystone = mock.Mock()
 
 
 class TestKwapi(test.BaseTestCase):

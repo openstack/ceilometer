@@ -84,8 +84,8 @@ class PollingTask(object):
                 source_resources = list(self.resources[key].resources)
                 try:
                     samples = list(pollster.obj.get_samples(
-                        self.manager,
-                        cache,
+                        manager=self.manager,
+                        cache=cache,
                         resources=source_resources or agent_resources,
                     ))
                     publisher(samples)

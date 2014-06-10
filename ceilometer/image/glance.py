@@ -23,12 +23,12 @@ import itertools
 import glanceclient
 from oslo.config import cfg
 
+from ceilometer.central import plugin
 from ceilometer.openstack.common import timeutils
-from ceilometer import plugin
 from ceilometer import sample
 
 
-class _Base(plugin.PollsterBase):
+class _Base(plugin.CentralPollster):
 
     @staticmethod
     def get_glance_client(ksclient):
@@ -102,7 +102,7 @@ class _Base(plugin.PollsterBase):
 
 
 class ImagePollster(_Base):
-
+    @plugin.check_keystone
     def get_samples(self, manager, cache, resources=None):
         for image in self._iter_images(manager.keystone, cache):
             yield sample.Sample(
@@ -119,7 +119,7 @@ class ImagePollster(_Base):
 
 
 class ImageSizePollster(_Base):
-
+    @plugin.check_keystone
     def get_samples(self, manager, cache, resources=None):
         for image in self._iter_images(manager.keystone, cache):
             yield sample.Sample(
