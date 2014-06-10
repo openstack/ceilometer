@@ -23,7 +23,7 @@ import pymongo
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.publisher import utils
 from ceilometer import sample
-from ceilometer.storage import pymongo_base
+from ceilometer.storage.mongo import utils as pymongo_utils
 from ceilometer.tests import db as tests_db
 from ceilometer.tests.storage import test_storage_scenarios
 
@@ -185,13 +185,13 @@ class CompatibilityTest(test_storage_scenarios.DBTestBase,
             'connection', self.db_manager.url.replace('db2:', 'mongodb:', 1),
             group='database')
 
-        pool = pymongo_base.ConnectionPool()
+        pool = pymongo_utils.ConnectionPool()
         with contextlib.nested(
                 patch('pymongo.MongoClient',
                       side_effect=pymongo.errors.ConnectionFailure('foo')),
-                patch.object(pymongo_base.LOG, 'error'),
-                patch.object(pymongo_base.LOG, 'warn'),
-                patch.object(pymongo_base.time, 'sleep')
+                patch.object(pymongo_utils.LOG, 'error'),
+                patch.object(pymongo_utils.LOG, 'warn'),
+                patch.object(pymongo_utils.time, 'sleep')
         ) as (MockMongo, MockLOGerror, MockLOGwarn, Mocksleep):
             self.assertRaises(pymongo.errors.ConnectionFailure,
                               pool.connect, self.CONF.database.connection)
