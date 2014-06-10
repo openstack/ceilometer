@@ -303,7 +303,6 @@ class Sink(object):
                 transformed_samples.append(sample)
 
         if transformed_samples:
-            LOG.audit(_("Pipeline %s: Publishing samples"), self)
             for p in self.publishers:
                 try:
                     p.publish_samples(ctxt, transformed_samples)
@@ -312,7 +311,6 @@ class Sink(object):
                         "Pipeline %(pipeline)s: Continue after error "
                         "from publisher %(pub)s") % ({'pipeline': self,
                                                       'pub': p}))
-            LOG.audit(_("Pipeline %s: Published samples") % self)
 
     def publish_samples(self, ctxt, samples):
         for meter_name, samples in itertools.groupby(
