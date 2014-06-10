@@ -367,7 +367,8 @@ class TestLBStatsPollster(_BaseTestLBPollster):
                 }
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
-    def _check_get_samples(self, factory, sample_name, expected_volume):
+    def _check_get_samples(self, factory, sample_name, expected_volume,
+                           expected_type):
         pollster = factory()
 
         cache = {}
@@ -380,20 +381,24 @@ class TestLBStatsPollster(_BaseTestLBPollster):
         match = [s for s in samples if s.name == sample_name]
         self.assertEqual(1, len(match), 'missing counter %s' % sample_name)
         self.assertEqual(expected_volume, match[0].volume)
-        self.assertEqual('gauge', match[0].type)
+        self.assertEqual(expected_type, match[0].type)
 
     def test_lb_total_connections(self):
         self._check_get_samples(lbaas.LBTotalConnectionsPollster,
-                                'network.services.lb.total.connections', 4L)
+                                'network.services.lb.total.connections',
+                                4L, 'gauge')
 
     def test_lb_active_connections(self):
         self._check_get_samples(lbaas.LBActiveConnectionsPollster,
-                                'network.services.lb.active.connections', 2L)
+                                'network.services.lb.active.connections',
+                                2L, 'gauge')
 
     def test_lb_incoming_bytes(self):
         self._check_get_samples(lbaas.LBBytesInPollster,
-                                'network.services.lb.incoming.bytes', 1L)
+                                'network.services.lb.incoming.bytes',
+                                1L, 'cumulative')
 
     def test_lb_outgoing_bytes(self):
         self._check_get_samples(lbaas.LBBytesOutPollster,
-                                'network.services.lb.outgoing.bytes', 3L)
+                                'network.services.lb.outgoing.bytes',
+                                3L, 'cumulative')
