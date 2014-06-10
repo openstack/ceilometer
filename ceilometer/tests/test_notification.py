@@ -16,6 +16,7 @@
 # under the License.
 """Tests for Ceilometer notify daemon."""
 
+import eventlet.semaphore
 import mock
 
 import oslo.messaging
@@ -172,10 +173,14 @@ class TestRealNotification(tests_base.BaseTestCase):
         pipeline = yaml.dump([{
             'name': 'test_pipeline',
             'interval': 5,
-            'counters': ['*'],
+            'counters': ['instance', 'memory'],
             'transformers': [],
             'publishers': ['test://'],
         }])
+
+        self.expected_samples = 2
+        self.sem = eventlet.semaphore.Semaphore(0)
+
         pipeline_cfg_file = fileutils.write_to_tempfile(content=pipeline,
                                                         prefix="pipeline",
                                                         suffix="yaml")
@@ -193,13 +198,17 @@ class TestRealNotification(tests_base.BaseTestCase):
 
         fake_publisher = fake_publisher_cls.return_value
         fake_publisher.publish_samples.side_effect = \
-            lambda *args: self.srv.stop()
+            lambda *args: self.sem.release()
 
         notifier = messaging.get_notifier("compute.vagrant-precise")
         notifier.info(context.RequestContext(), 'compute.instance.create.end',
                       TEST_NOTICE_PAYLOAD)
-
-        self.srv.listeners[0].wait()
+        # we should wait all the expected notification listeners finished
+        # processing the notification
+        for i in range(self.expected_samples):
+            self.sem.acquire(timeout=30)
+        # stop NotificationService
+        self.srv.stop()
 
         class SamplesMatcher(object):
             def __eq__(self, samples):
@@ -208,10 +217,6 @@ class TestRealNotification(tests_base.BaseTestCase):
                         return False
                 return True
 
-        fake_publisher.publish_samples.assert_has_calls([
-            mock.call(mock.ANY, SamplesMatcher()),
-            mock.call(mock.ANY, SamplesMatcher()),
-            mock.call(mock.ANY, SamplesMatcher()),
-            mock.call(mock.ANY, SamplesMatcher()),
-            mock.call(mock.ANY, SamplesMatcher()),
-        ])
+        fake_publisher.publish_samples.assert_has_calls(
+            [mock.call(mock.ANY, SamplesMatcher())] * self.expected_samples
+        )
