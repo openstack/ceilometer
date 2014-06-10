@@ -35,25 +35,19 @@ class TestPostSamples(FunctionalTest,
             del m['message_signature']
         self.published.append(data)
 
-    def patch_publishers(self):
+    def fake_get_rpc_client(self, **kwargs):
         cast_ctxt = mock.Mock()
         cast_ctxt.cast.side_effect = self.fake_cast
-        found = False
-        pipeline_hook = self.app.app.application.app.hooks[2]
-        for pipeline in pipeline_hook.pipeline_manager.pipelines:
-            for publisher in pipeline.publishers:
-                if hasattr(publisher, 'rpc_client'):
-                    self.useFixture(mockpatch.PatchObject(
-                        publisher.rpc_client, 'prepare',
-                        return_value=cast_ctxt))
-                    found = True
-        if not found:
-            raise Exception('fail to patch the rpc publisher')
+        client = mock.Mock()
+        client.prepare.return_value = cast_ctxt
+        return client
 
     def setUp(self):
-        super(TestPostSamples, self).setUp()
         self.published = []
-        self.patch_publishers()
+        self.useFixture(mockpatch.Patch(
+                        'ceilometer.messaging.get_rpc_client',
+                        new=self.fake_get_rpc_client))
+        super(TestPostSamples, self).setUp()
 
     def test_one(self):
         s1 = [{'counter_name': 'apples',
