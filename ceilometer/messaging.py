@@ -1,5 +1,5 @@
-# -*- encoding: utf-8 -*-
-# Copyright © 2013 eNovance <licensing@enovance.com>
+# -*- coding: utf-8 -*-
+# Copyright 2013 eNovance <licensing@enovance.com>
 #
 # Author: Mehdi Abaakouk <mehdi.abaakouk@enovance.com>
 #

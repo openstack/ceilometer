@@ -1,9 +1,8 @@
-# -*- encoding: utf-8 -*-
 #
-# Copyright © 2012 New Dream Network, LLC (DreamHost)
-# Copyright © 2013 Intel corp.
-# Copyright © 2013 eNovance
-# Copyright © 2014 Red Hat, Inc
+# Copyright 2012 New Dream Network, LLC (DreamHost)
+# Copyright 2013 Intel corp.
+# Copyright 2013 eNovance
+# Copyright 2014 Red Hat, Inc
 #
 # Authors: Yunhong Jiang <yunhong.jiang@intel.com>
 #          Julien Danjou <julien@danjou.info>

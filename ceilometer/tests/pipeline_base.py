@@ -1,6 +1,6 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
-# Copyright © 2013 Intel Corp.
+# Copyright 2013 Intel Corp.
 #
 # Authors: Yunhong Jiang <yunhong.jiang@intel.com>
 #          Julien Danjou <julien@danjou.info>

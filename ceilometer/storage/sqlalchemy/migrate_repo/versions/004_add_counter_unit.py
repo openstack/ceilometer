@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 #
 # Author: Guillaume Pernot <gpernot@praksys.org>
 #

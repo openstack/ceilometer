@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-# -*- encoding: utf-8 -*-
 #
-# Copyright © 2012 New Dream Network (DreamHost)
+# Copyright 2012 New Dream Network (DreamHost)
 #
 # Author: Doug Hellmann <doug.hellmann@dreamhost.com>
 #

@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 #
 # Author: Nejc Saje <nejc.saje@xlab.si>
 #

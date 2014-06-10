@@ -1,6 +1,5 @@
-# -*- encoding: utf-8 -*-
 #
-# Copyright © 2013 IBM
+# Copyright 2013 IBM
 #
 # Author: Tong Li <litong01@us.ibm.com>
 #

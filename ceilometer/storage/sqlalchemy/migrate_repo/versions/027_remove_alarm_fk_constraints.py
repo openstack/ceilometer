@@ -1,6 +1,5 @@
-# -*- encoding: utf-8 -*-
 #
-# Copyright © 2014 Intel Crop.
+# Copyright 2014 Intel Crop.
 #
 # Author: Lianhao Lu <lianhao.lu@intel.com>
 #

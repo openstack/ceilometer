@@ -1,7 +1,6 @@
-# -*- encoding: utf-8 -*-
 #
-# Copyright © 2013 Intel Corp.
-# Copyright © 2013 eNovance
+# Copyright 2013 Intel Corp.
+# Copyright 2013 eNovance
 #
 # Author: Yunhong Jiang <yunhong.jiang@intel.com>
 #         Julien Danjou <julien@danjou.info>

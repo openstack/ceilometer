@@ -1,6 +1,5 @@
-# -*- encoding: utf-8 -*-
 #
-# Copyright © 2013 eNovance
+# Copyright 2013 eNovance
 #
 # Author: Julien Danjou <julien@danjou.info>,
 #         Tyaptin Ilya <ityaptin@mirantis.com>

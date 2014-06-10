@@ -1,7 +1,6 @@
-# -*- encoding: utf-8 -*-
 #
-# Copyright © 2013 Julien Danjou
-# Copyright © 2014 Red Hat, Inc
+# Copyright 2013 Julien Danjou
+# Copyright 2014 Red Hat, Inc
 #
 # Authors: Julien Danjou <julien@danjou.info>
 #          Eoghan Glynn <eglynn@redhat.com>

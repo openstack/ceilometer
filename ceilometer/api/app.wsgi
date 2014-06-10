@@ -1,7 +1,6 @@
 # -*- mode: python -*-
-# -*- encoding: utf-8 -*-
 #
-# Copyright © 2013 New Dream Network, LLC (DreamHost)
+# Copyright 2013 New Dream Network, LLC (DreamHost)
 #
 # Author: Doug Hellmann <doug.hellmann@dreamhost.com>
 #

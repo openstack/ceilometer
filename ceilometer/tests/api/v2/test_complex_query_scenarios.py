@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 #
 # Copyright Ericsson AB 2013. All rights reserved
 #

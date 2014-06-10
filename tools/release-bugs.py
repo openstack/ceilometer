@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-# -*- encoding: utf-8 -*-
 #
-# Copyright © 2012 Graham Binns for Canonical
+# Copyright 2012 Graham Binns for Canonical
 #
 # Author: Graham Binns <graham.binns@gmail.com>
 #

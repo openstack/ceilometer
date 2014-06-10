@@ -1,8 +1,7 @@
-# -*- encoding: utf-8 -*-
 #
-# Copyright © 2012 New Dream Network, LLC (DreamHost)
-# Copyright © 2013 eNovance
-# Copyright © 2014 Red Hat, Inc
+# Copyright 2012 New Dream Network, LLC (DreamHost)
+# Copyright 2013 eNovance
+# Copyright 2014 Red Hat, Inc
 #
 # Authors: Doug Hellmann <doug.hellmann@dreamhost.com>
 #          Julien Danjou <julien@danjou.info>

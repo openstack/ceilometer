@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Ceilometer documentation build configuration file, created by
 # sphinx-quickstart on Thu Oct 27 11:38:59 2011.

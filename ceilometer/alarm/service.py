@@ -1,7 +1,6 @@
-# -*- encoding: utf-8 -*-
 #
-# Copyright © 2013 Red Hat, Inc
-# Copyright © 2013 eNovance <licensing@enovance.com>
+# Copyright 2013 Red Hat, Inc
+# Copyright 2013 eNovance <licensing@enovance.com>
 #
 # Authors: Eoghan Glynn <eglynn@redhat.com>
 #          Julien Danjou <julien@danjou.info>

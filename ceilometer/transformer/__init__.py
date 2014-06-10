@@ -1,6 +1,5 @@
-# -*- encoding: utf-8 -*-
 #
-# Copyright © 2013 Intel Corp.
+# Copyright 2013 Intel Corp.
 #
 # Author: Yunhong Jiang <yunhong.jiang@intel.com>
 #
