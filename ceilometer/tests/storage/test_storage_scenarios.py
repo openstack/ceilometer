@@ -2718,6 +2718,7 @@ class EventTestBase(tests_db.TestBase,
 
 
 class EventTest(EventTestBase):
+    @tests_db.run_with('sqlite', 'mongodb', 'db2')
     def test_duplicate_message_id(self):
         now = datetime.datetime.utcnow()
         m = [models.Event("1", "Foo", now, None),
