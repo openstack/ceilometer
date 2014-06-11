@@ -97,8 +97,7 @@ class _Base(plugin.CentralPollster):
                         "checksum",
                         "deleted_at",
                         "min_ram",
-                        "size",
-                    ])
+                        "size", ])
 
 
 class ImagePollster(_Base):

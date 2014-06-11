@@ -38,8 +38,7 @@ class DBTestBase(tests_db.TestBase):
     def create_and_store_sample(self, timestamp=datetime.datetime.utcnow(),
                                 metadata={
                                     'display_name': 'test-server',
-                                    'tag': 'self.counter'
-                                },
+                                    'tag': 'self.counter'},
                                 name='instance',
                                 sample_type=sample.TYPE_CUMULATIVE, unit='',
                                 volume=1, user_id='user-id',

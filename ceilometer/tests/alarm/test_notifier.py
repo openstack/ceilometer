@@ -81,8 +81,7 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
                                   {
                                       'actions': ['log://'],
                                       'alarm_id': 'foobar',
-                                      'condition': {'threshold': 42},
-                                  })
+                                      'condition': {'threshold': 42}})
 
     @staticmethod
     def _fake_spawn_n(func, *args, **kwargs):
