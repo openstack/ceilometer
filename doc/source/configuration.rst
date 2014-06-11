@@ -241,9 +241,25 @@ rpc_cast_timeout             30                                    Seconds to wa
 dispatchers                  database                              The list of dispatchers to process metering data.
 ===========================  ====================================  ==============================================================
 
-A sample configuration file can be found in `ceilometer.conf.sample`_.
 
-.. _ceilometer.conf.sample: https://git.openstack.org/cgit/openstack/ceilometer/tree/etc/ceilometer/ceilometer.conf.sample
+Sample Configuration file
+=========================
+
+The sample configuration file for Ceilometer, named
+etc/ceilometer/ceilometer.conf.sample, was removed from version control after
+the Icehouse release. For more details, please read the file
+etc/ceilometer/README-ceilometer.conf.txt. You can generate this sample
+configuration file by running ``tox -e genconfig``.
+
+.. note::
+    tox version 1.7.0 and 1.7.1 have a `backward compatibility issue`_
+    with OpenStack projects. If you meet the "tox.ConfigError: ConfigError:
+    substitution key 'posargs' not found" problem, run
+    ``sudo pip install -U "tox>=1.6.1,!=1.7.0,!=1.7.1"`` to get a proper
+    version, then try ``tox -e genconfig`` again.
+
+.. _`backward compatibility issue`: https://bitbucket.org/hpk42/tox/issue/150/posargs-configerror
+
 
 Pipelines
 =========
