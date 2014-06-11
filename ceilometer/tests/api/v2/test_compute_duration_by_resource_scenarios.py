@@ -18,7 +18,6 @@
 """
 
 import datetime
-import logging
 
 import mock
 
@@ -26,8 +25,6 @@ from ceilometer.openstack.common import timeutils
 from ceilometer.storage import models
 from ceilometer.tests.api.v2 import FunctionalTest
 from ceilometer.tests import db as tests_db
-
-LOG = logging.getLogger(__name__)
 
 
 class TestComputeDurationByResource(FunctionalTest,
