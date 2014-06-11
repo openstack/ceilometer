@@ -43,6 +43,9 @@ class TestCollector(tests_base.BaseTestCase):
     def setUp(self):
         super(TestCollector, self).setUp()
         self.CONF = self.useFixture(config.Config()).conf
+        self.CONF.import_opt("connection",
+                             "ceilometer.openstack.common.db.options",
+                             group="database")
         self.CONF.set_override("connection", "log://", group='database')
         self.CONF.set_override('metering_secret', 'not-so-secret',
                                group='publisher')

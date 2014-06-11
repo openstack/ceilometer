@@ -23,6 +23,7 @@ import six
 
 import eventlet
 import oslo.messaging
+import oslo.messaging.conffixture
 from testtools import testcase
 
 from ceilometer import messaging

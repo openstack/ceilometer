@@ -19,7 +19,7 @@ import mock
 
 from ceilometer import middleware
 from ceilometer.openstack.common.fixture import config
-from ceilometer.openstack.common import test
+from ceilometer.tests import base
 
 
 HTTP_REQUEST = {
@@ -68,11 +68,12 @@ HTTP_RESPONSE = {
 }
 
 
-class TestNotifications(test.BaseTestCase):
+class TestNotifications(base.BaseTestCase):
 
     def setUp(self):
         super(TestNotifications, self).setUp()
         self.CONF = self.useFixture(config.Config()).conf
+        self.setup_messaging(self.CONF)
 
     def test_process_request_notification(self):
         sample = list(middleware.HTTPRequest(mock.Mock()).process_notification(
