@@ -24,7 +24,6 @@ from ceilometer import dispatcher
 
 file_dispatcher_opts = [
     cfg.StrOpt('file_path',
-               default=None,
                help='Name and the location of the file to record '
                     'meters.'),
     cfg.IntOpt('max_bytes',
