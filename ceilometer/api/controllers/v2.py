@@ -324,11 +324,13 @@ def _verify_query_segregation(query, auth_project=None):
     '''Ensure non-admin queries are not constrained to another project.'''
     auth_project = (auth_project or
                     acl.get_limited_to_project(pecan.request.headers))
-    if auth_project:
-        for q in query:
-            if q.field == 'project_id' and (auth_project != q.value or
-                                            q.op != 'eq'):
-                raise ProjectNotAuthorized(q.value)
+
+    if not auth_project:
+        return
+
+    for q in query:
+        if q.field in ('project', 'project_id') and auth_project != q.value:
+            raise ProjectNotAuthorized(q.value)
 
 
 def _validate_query(query, db_func, internal_keys=None,

@@ -265,6 +265,55 @@ class TestAlarms(FunctionalTest,
         self.assertEqual(alarms[0]['alarm_id'], one['alarm_id'])
         self.assertEqual(alarms[0]['repeat_actions'], one['repeat_actions'])
 
+    def test_get_alarm_project_filter_wrong_op_normal_user(self):
+        project = self.auth_headers['X-Project-Id']
+
+        def _test(field, op):
+            response = self.get_json('/alarms',
+                                     q=[{'field': field,
+                                         'op': op,
+                                         'value': project}],
+                                     expect_errors=True,
+                                     status=400,
+                                     headers=self.auth_headers)
+            faultstring = ('Invalid input for field/attribute op. '
+                           'Value: \'%(op)s\'. unimplemented operator '
+                           'for %(field)s' % {'field': field, 'op': op})
+            self.assertEqual(faultstring,
+                             response.json['error_message']['faultstring'])
+
+        _test('project', 'ne')
+        _test('project_id', 'ne')
+
+    def test_get_alarm_project_filter_normal_user(self):
+        project = self.auth_headers['X-Project-Id']
+
+        def _test(field):
+            alarms = self.get_json('/alarms',
+                                   q=[{'field': field,
+                                       'op': 'eq',
+                                       'value': project}])
+            self.assertEqual(4, len(alarms))
+
+        _test('project')
+        _test('project_id')
+
+    def test_get_alarm_other_project_normal_user(self):
+        def _test(field):
+            response = self.get_json('/alarms',
+                                     q=[{'field': field,
+                                         'op': 'eq',
+                                         'value': 'other-project'}],
+                                     expect_errors=True,
+                                     status=401,
+                                     headers=self.auth_headers)
+            faultstring = 'Not Authorized to access project other-project'
+            self.assertEqual(faultstring,
+                             response.json['error_message']['faultstring'])
+
+        _test('project')
+        _test('project_id')
+
     def test_post_alarm_wsme_workaround(self):
         jsons = {
             'type': {
