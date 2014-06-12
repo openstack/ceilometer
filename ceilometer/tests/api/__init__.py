@@ -18,11 +18,10 @@
 """
 
 from oslo.config import cfg
-import oslo.messaging.conffixture
 import pecan
 import pecan.testing
 
-from ceilometer import messaging
+from ceilometer.openstack.common.fixture import config
 from ceilometer.tests import db as db_test_base
 
 OPT_GROUP_NAME = 'keystone_authtoken'
@@ -39,10 +38,9 @@ class FunctionalTest(db_test_base.TestBase):
 
     def setUp(self):
         super(FunctionalTest, self).setUp()
-        self.useFixture(oslo.messaging.conffixture.ConfFixture(self.CONF))
-        self.CONF.set_override("notification_driver", "messaging")
-        messaging.setup("fake://")
-        self.addCleanup(messaging.cleanup)
+        self.CONF = self.useFixture(config.Config()).conf
+        self.setup_messaging(self.CONF)
+
         self.CONF.set_override("auth_version", "v2.0",
                                group=OPT_GROUP_NAME)
         self.CONF.set_override("policy_file",

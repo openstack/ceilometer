@@ -139,8 +139,9 @@ class PartitionedAlarmService(AlarmService, os_service.Service):
 
     def __init__(self):
         super(PartitionedAlarmService, self).__init__()
+        transport = messaging.get_transport()
         self.rpc_server = messaging.get_rpc_server(
-            cfg.CONF.alarm.partition_rpc_topic, self)
+            transport, cfg.CONF.alarm.partition_rpc_topic, self)
 
         self._load_evaluators()
         self.api_client = None
@@ -193,8 +194,9 @@ class AlarmNotifierService(os_service.Service):
 
     def __init__(self):
         super(AlarmNotifierService, self).__init__()
+        transport = messaging.get_transport()
         self.rpc_server = messaging.get_rpc_server(
-            cfg.CONF.alarm.notifier_rpc_topic, self)
+            transport, cfg.CONF.alarm.notifier_rpc_topic, self)
         self.notifiers = extension.ExtensionManager(self.EXTENSIONS_NAMESPACE,
                                                     invoke_on_load=True)
 

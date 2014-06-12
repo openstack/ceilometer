@@ -15,16 +15,14 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import eventlet
 from oslo.config import cfg
 import oslo.messaging
 
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import jsonutils
 
-
-TRANSPORT = None
-NOTIFIER = None
+DEFAULT_URL = "__default__"
+TRANSPORTS = {}
 
 _ALIASES = {
     'ceilometer.openstack.common.rpc.impl_kombu': 'rabbit',
@@ -62,75 +60,69 @@ class JsonPayloadSerializer(oslo.messaging.NoOpSerializer):
         return jsonutils.to_primitive(entity, convert_instances=True)
 
 
-def setup(url=None, optional=False):
+def setup():
+    oslo.messaging.set_transport_defaults('ceilometer')
+
+
+def get_transport(url=None, optional=False, cache=True):
     """Initialise the oslo.messaging layer."""
-    global TRANSPORT, NOTIFIER
-
-    if url and url.startswith("fake://"):
-        # NOTE(sileht): oslo.messaging fake driver uses time.sleep
-        # for task switch, so we need to monkey_patch it
-        eventlet.monkey_patch(time=True)
-
-    if not TRANSPORT:
-        oslo.messaging.set_transport_defaults('ceilometer')
+    global TRANSPORTS, DEFAULT_URL
+    transport = TRANSPORTS.get(url)
+    if not transport:
         try:
-            TRANSPORT = oslo.messaging.get_transport(cfg.CONF, url,
+            transport = oslo.messaging.get_transport(cfg.CONF, url,
                                                      aliases=_ALIASES)
         except oslo.messaging.InvalidTransportURL as e:
-            TRANSPORT = None
             if not optional or e.url:
                 # NOTE(sileht): oslo.messaging is configured but unloadable
                 # so reraise the exception
                 raise
-
-    if not NOTIFIER and TRANSPORT:
-        serializer = RequestContextSerializer(JsonPayloadSerializer())
-        NOTIFIER = oslo.messaging.Notifier(TRANSPORT, serializer=serializer)
+            return None
+        else:
+            if not url:
+                url = DEFAULT_URL
+            if cache:
+                TRANSPORTS[url] = transport
+    return transport
 
 
 def cleanup():
     """Cleanup the oslo.messaging layer."""
-    global TRANSPORT, NOTIFIER
-    if TRANSPORT:
-        TRANSPORT.cleanup()
-        TRANSPORT = NOTIFIER = None
+    global TRANSPORTS, NOTIFIERS
+    NOTIFIERS = {}
+    for url in TRANSPORTS:
+        TRANSPORTS[url].cleanup()
+        del TRANSPORTS[url]
 
 
-def get_rpc_server(topic, endpoint):
+def get_rpc_server(transport, topic, endpoint):
     """Return a configured oslo.messaging rpc server."""
-    global TRANSPORT
     target = oslo.messaging.Target(server=cfg.CONF.host, topic=topic)
     serializer = RequestContextSerializer(JsonPayloadSerializer())
-    return oslo.messaging.get_rpc_server(TRANSPORT, target, [endpoint],
-                                         executor='eventlet',
+    return oslo.messaging.get_rpc_server(transport, target,
+                                         [endpoint], executor='eventlet',
                                          serializer=serializer)
 
 
-def get_rpc_client(**kwargs):
+def get_rpc_client(transport, **kwargs):
     """Return a configured oslo.messaging RPCClient."""
-    global TRANSPORT
     target = oslo.messaging.Target(**kwargs)
     serializer = RequestContextSerializer(JsonPayloadSerializer())
-    return oslo.messaging.RPCClient(TRANSPORT, target,
+    return oslo.messaging.RPCClient(transport, target,
                                     serializer=serializer)
 
 
-def get_notification_listener(targets, endpoints, url=None):
+def get_notification_listener(transport, targets, endpoints):
     """Return a configured oslo.messaging notification listener."""
-    global TRANSPORT
-    if url:
-        transport = oslo.messaging.get_transport(cfg.CONF, url,
-                                                 _ALIASES)
-    else:
-        transport = TRANSPORT
     return oslo.messaging.get_notification_listener(
         transport, targets, endpoints, executor='eventlet')
 
 
-def get_notifier(publisher_id):
+def get_notifier(transport, publisher_id):
     """Return a configured oslo.messaging notifier."""
-    global NOTIFIER
-    return NOTIFIER.prepare(publisher_id=publisher_id)
+    serializer = RequestContextSerializer(JsonPayloadSerializer())
+    notifier = oslo.messaging.Notifier(transport, serializer=serializer)
+    return notifier.prepare(publisher_id=publisher_id)
 
 
 def convert_to_old_notification_format(priority, ctxt, publisher_id,

@@ -18,20 +18,19 @@
 """
 import mock
 
-from oslo.config import cfg
 
 from stevedore import extension
 
 from ceilometer.alarm import service
-from ceilometer import messaging
-from ceilometer.openstack.common import test
+from ceilometer.openstack.common.fixture import config
+from ceilometer.tests import base as tests_base
 
 
-class TestSingletonAlarmService(test.BaseTestCase):
+class TestSingletonAlarmService(tests_base.BaseTestCase):
     def setUp(self):
         super(TestSingletonAlarmService, self).setUp()
-        messaging.setup('fake://')
-        self.addCleanup(messaging.cleanup)
+        self.CONF = self.useFixture(config.Config()).conf
+        self.setup_messaging(self.CONF)
 
         self.threshold_eval = mock.Mock()
         self.evaluators = extension.ExtensionManager.make_test_instance(
@@ -51,9 +50,9 @@ class TestSingletonAlarmService(test.BaseTestCase):
 
     def test_start(self):
         test_interval = 120
-        cfg.CONF.set_override('evaluation_interval',
-                              test_interval,
-                              group='alarm')
+        self.CONF.set_override('evaluation_interval',
+                               test_interval,
+                               group='alarm')
         with mock.patch('ceilometerclient.client.get_client',
                         return_value=self.api_client):
             self.singleton.start()
@@ -90,13 +89,13 @@ class TestSingletonAlarmService(test.BaseTestCase):
     def test_singleton_endpoint_types(self):
         endpoint_types = ["internalURL", "publicURL"]
         for endpoint_type in endpoint_types:
-            cfg.CONF.set_override('os_endpoint_type',
-                                  endpoint_type,
-                                  group='service_credentials')
+            self.CONF.set_override('os_endpoint_type',
+                                   endpoint_type,
+                                   group='service_credentials')
             with mock.patch('ceilometerclient.client.get_client') as client:
                 self.singleton.api_client = None
                 self.singleton._evaluate_assigned_alarms()
-                conf = cfg.CONF.service_credentials
+                conf = self.CONF.service_credentials
                 expected = [mock.call(2,
                                       os_auth_url=conf.os_auth_url,
                                       os_region_name=conf.os_region_name,

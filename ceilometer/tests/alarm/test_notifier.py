@@ -20,11 +20,10 @@ import mock
 import requests
 
 from ceilometer.alarm import service
-from ceilometer import messaging
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common.fixture import mockpatch
-from ceilometer.openstack.common import test
+from ceilometer.tests import base as tests_base
 
 
 DATA_JSON = ('{"current": "ALARM", "alarm_id": "foobar",'
@@ -38,14 +37,12 @@ NOTIFICATION = dict(alarm_id='foobar',
                     current='ALARM')
 
 
-class TestAlarmNotifier(test.BaseTestCase):
+class TestAlarmNotifier(tests_base.BaseTestCase):
 
     def setUp(self):
         super(TestAlarmNotifier, self).setUp()
-        messaging.setup('fake://')
-        self.addCleanup(messaging.cleanup)
-
         self.CONF = self.useFixture(config.Config()).conf
+        self.setup_messaging(self.CONF)
         self.service = service.AlarmNotifierService()
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())

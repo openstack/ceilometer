@@ -106,7 +106,8 @@ class RPCPublisher(publisher.PublisherBase):
                      % self.policy)
             self.policy = 'default'
 
-        self.rpc_client = messaging.get_rpc_client(version='1.0')
+        transport = messaging.get_transport()
+        self.rpc_client = messaging.get_rpc_client(transport, version='1.0')
 
     def publish_samples(self, context, samples):
         """Publish samples on RPC.

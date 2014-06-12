@@ -23,7 +23,6 @@ import oslo.messaging
 from stevedore import extension
 
 from ceilometer.event import endpoint as event_endpoint
-from ceilometer import messaging
 from ceilometer.openstack.common.fixture import config
 from ceilometer.storage import models
 from ceilometer.tests import base as tests_base
@@ -90,10 +89,9 @@ class TestEventEndpoint(tests_base.BaseTestCase):
         super(TestEventEndpoint, self).setUp()
         self.CONF = self.useFixture(config.Config()).conf
         self.CONF([])
-        messaging.setup('fake://')
-        self.addCleanup(messaging.cleanup)
         self.CONF.set_override("connection", "log://", group='database')
         self.CONF.set_override("store_events", True, group="notification")
+        self.setup_messaging(self.CONF)
 
         self.mock_dispatcher = mock.MagicMock()
         self.endpoint = event_endpoint.EventsNotificationEndpoint()

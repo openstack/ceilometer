@@ -21,16 +21,13 @@ import mock
 from stevedore import extension
 
 from ceilometer.alarm import service
-from ceilometer import messaging
 from ceilometer.openstack.common.fixture import config
-from ceilometer.openstack.common import test
+from ceilometer.tests import base as tests_base
 
 
-class TestPartitionedAlarmService(test.BaseTestCase):
+class TestPartitionedAlarmService(tests_base.BaseTestCase):
     def setUp(self):
         super(TestPartitionedAlarmService, self).setUp()
-        messaging.setup('fake://')
-        self.addCleanup(messaging.cleanup)
 
         self.threshold_eval = mock.Mock()
         self.api_client = mock.MagicMock()
@@ -41,6 +38,8 @@ class TestPartitionedAlarmService(test.BaseTestCase):
         self.CONF.set_override('partition_rpc_topic',
                                'fake_topic',
                                group='alarm')
+        self.setup_messaging(self.CONF)
+
         self.partitioned = service.PartitionedAlarmService()
         self.partitioned.tg = mock.Mock()
         self.partitioned.partition_coordinator = mock.Mock()

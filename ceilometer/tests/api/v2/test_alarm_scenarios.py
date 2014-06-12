@@ -1933,10 +1933,9 @@ class TestAlarms(FunctionalTest,
 
         }
         endpoint = mock.MagicMock()
-        target = oslo.messaging.Target(topic="notifications",
-                                       exchange="ceilometer")
-        listener = messaging.get_notification_listener([target],
-                                                       [endpoint])
+        target = oslo.messaging.Target(topic="notifications")
+        listener = messaging.get_notification_listener(
+            self.transport, [target], [endpoint])
         listener.start()
         endpoint.info.side_effect = lambda *args: listener.stop()
         self.post_json('/alarms', params=json, headers=self.auth_headers)
@@ -1975,7 +1974,8 @@ class TestAlarms(FunctionalTest,
 
             self.delete('/alarms/%s' % data[0]['alarm_id'],
                         headers=self.auth_headers, status=204)
-            get_notifier.assert_called_once_with(publisher_id='ceilometer.api')
+            get_notifier.assert_called_once_with(mock.ANY,
+                                                 publisher_id='ceilometer.api')
 
         calls = notifier.info.call_args_list
         self.assertEqual(1, len(calls))

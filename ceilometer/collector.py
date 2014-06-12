@@ -57,9 +57,10 @@ class CollectorService(os_service.Service):
         if cfg.CONF.collector.udp_address:
             self.tg.add_thread(self.start_udp)
 
-        if messaging.TRANSPORT is not None:
+        transport = messaging.get_transport(optional=True)
+        if transport:
             self.rpc_server = messaging.get_rpc_server(
-                cfg.CONF.publisher_rpc.metering_topic, self)
+                transport, cfg.CONF.publisher_rpc.metering_topic, self)
             self.rpc_server.start()
 
             if not cfg.CONF.collector.udp_address:

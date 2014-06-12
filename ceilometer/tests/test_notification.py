@@ -16,7 +16,7 @@
 # under the License.
 """Tests for Ceilometer notify daemon."""
 
-import eventlet.semaphore
+import eventlet
 import mock
 
 import oslo.messaging
@@ -30,6 +30,8 @@ from ceilometer import notification
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import fileutils
 from ceilometer.openstack.common.fixture import config
+from ceilometer.openstack.common import timeutils
+from ceilometer.publisher import test as test_publisher
 from ceilometer.tests import base as tests_base
 
 TEST_NOTICE_CTXT = {
@@ -89,10 +91,9 @@ class TestNotification(tests_base.BaseTestCase):
     def setUp(self):
         super(TestNotification, self).setUp()
         self.CONF = self.useFixture(config.Config()).conf
-        messaging.setup('fake://')
-        self.addCleanup(messaging.cleanup)
         self.CONF.set_override("connection", "log://", group='database')
         self.CONF.set_override("store_events", False, group="notification")
+        self.setup_messaging(self.CONF)
         self.srv = notification.NotificationService()
 
     def fake_get_notifications_manager(self, pm):
@@ -168,7 +169,7 @@ class TestRealNotification(tests_base.BaseTestCase):
     def setUp(self):
         super(TestRealNotification, self).setUp()
         self.CONF = self.useFixture(config.Config()).conf
-        self.useFixture(oslo.messaging.conffixture.ConfFixture(self.CONF))
+        self.setup_messaging(self.CONF, 'nova')
 
         pipeline = yaml.dump([{
             'name': 'test_pipeline',
@@ -179,44 +180,31 @@ class TestRealNotification(tests_base.BaseTestCase):
         }])
 
         self.expected_samples = 2
-        self.sem = eventlet.semaphore.Semaphore(0)
 
         pipeline_cfg_file = fileutils.write_to_tempfile(content=pipeline,
                                                         prefix="pipeline",
                                                         suffix="yaml")
         self.CONF.set_override("pipeline_cfg_file", pipeline_cfg_file)
-        self.CONF.set_override("notification_driver", "messaging")
-        self.CONF.set_override("control_exchange", "nova")
-        messaging.setup('fake://')
-        self.addCleanup(messaging.cleanup)
-
         self.srv = notification.NotificationService()
+        self.publisher = test_publisher.TestPublisher("")
 
     @mock.patch('ceilometer.publisher.test.TestPublisher')
     def test_notification_service(self, fake_publisher_cls):
+        fake_publisher_cls.return_value = self.publisher
         self.srv.start()
 
-        fake_publisher = fake_publisher_cls.return_value
-        fake_publisher.publish_samples.side_effect = \
-            lambda *args: self.sem.release()
-
-        notifier = messaging.get_notifier("compute.vagrant-precise")
+        notifier = messaging.get_notifier(self.transport,
+                                          "compute.vagrant-precise")
         notifier.info(context.RequestContext(), 'compute.instance.create.end',
                       TEST_NOTICE_PAYLOAD)
-        # we should wait all the expected notification listeners finished
-        # processing the notification
-        for i in range(self.expected_samples):
-            self.sem.acquire(timeout=30)
-        # stop NotificationService
+        start = timeutils.utcnow()
+        while timeutils.delta_seconds(start, timeutils.utcnow()) < 600:
+            if len(self.publisher.samples) >= self.expected_samples:
+                break
+            eventlet.sleep(0)
+
         self.srv.stop()
 
-        class SamplesMatcher(object):
-            def __eq__(self, samples):
-                for s in samples:
-                    if s.resource_id != "9f9d01b9-4a58-4271-9e27-398b21ab20d1":
-                        return False
-                return True
-
-        fake_publisher.publish_samples.assert_has_calls(
-            [mock.call(mock.ANY, SamplesMatcher())] * self.expected_samples
-        )
+        resources = list(set(s.resource_id for s in self.publisher.samples))
+        self.assertEqual(self.expected_samples, len(self.publisher.samples))
+        self.assertEqual(["9f9d01b9-4a58-4271-9e27-398b21ab20d1"], resources)

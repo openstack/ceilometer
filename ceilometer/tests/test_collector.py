@@ -46,9 +46,7 @@ class TestCollector(tests_base.BaseTestCase):
         self.CONF.set_override("connection", "log://", group='database')
         self.CONF.set_override('metering_secret', 'not-so-secret',
                                group='publisher')
-        self.useFixture(oslo.messaging.conffixture.ConfFixture(self.CONF))
-        self._setup_messaging('fake://')
-        self.addCleanup(messaging.cleanup)
+        self._setup_messaging()
 
         self.counter = sample.Sample(
             name='foobar',
@@ -87,10 +85,13 @@ class TestCollector(tests_base.BaseTestCase):
     def _dummy_thread_group_add_thread(method):
         method()
 
-    def _setup_messaging(self, url):
-        messaging.cleanup()
-        self.CONF.set_override('rpc_backend', '')
-        messaging.setup(url, optional=True)
+    def _setup_messaging(self, enabled=True):
+        if enabled:
+            self.setup_messaging(self.CONF)
+        else:
+            self.useFixture(mockpatch.Patch(
+                'ceilometer.messaging.get_transport',
+                return_value=None))
 
     def _setup_fake_dispatcher(self):
         plugin = mock.MagicMock()
@@ -127,7 +128,7 @@ class TestCollector(tests_base.BaseTestCase):
             data=self.counter)
 
     def test_udp_receive_base(self):
-        self._setup_messaging('')
+        self._setup_messaging(False)
         mock_dispatcher = self._setup_fake_dispatcher()
         self.counter['source'] = 'mysource'
         self.counter['counter_name'] = self.counter['name']
@@ -146,7 +147,7 @@ class TestCollector(tests_base.BaseTestCase):
             self.counter)
 
     def test_udp_receive_storage_error(self):
-        self._setup_messaging('')
+        self._setup_messaging(False)
         mock_dispatcher = self._setup_fake_dispatcher()
         mock_dispatcher.record_metering_data.side_effect = self._raise_error
 
@@ -170,7 +171,7 @@ class TestCollector(tests_base.BaseTestCase):
         raise Exception
 
     def test_udp_receive_bad_decoding(self):
-        self._setup_messaging('')
+        self._setup_messaging(False)
         udp_socket = self._make_fake_socket(self.counter)
         with contextlib.nested(
                 mock.patch('socket.socket', return_value=udp_socket),
@@ -183,7 +184,7 @@ class TestCollector(tests_base.BaseTestCase):
     @mock.patch.object(collector.CollectorService, 'start_udp')
     def test_only_udp(self, udp_start, rpc_start):
         """Check that only UDP is started if messaging transport is unset."""
-        self._setup_messaging('')
+        self._setup_messaging(False)
         udp_socket = self._make_fake_socket(self.counter)
         with mock.patch('socket.socket', return_value=udp_socket):
             self.srv.start()
@@ -200,7 +201,7 @@ class TestCollector(tests_base.BaseTestCase):
         self.assertEqual(0, udp_start.call_count)
 
     def test_udp_receive_valid_encoding(self):
-        self._setup_messaging('')
+        self._setup_messaging(False)
         mock_dispatcher = self._setup_fake_dispatcher()
         self.data_sent = []
         with mock.patch('socket.socket',
@@ -216,7 +217,7 @@ class TestCollector(tests_base.BaseTestCase):
         self.srv.start()
         mylog.info.side_effect = lambda *args: self.srv.stop()
 
-        client = messaging.get_rpc_client(version='1.0')
+        client = messaging.get_rpc_client(self.transport, version='1.0')
         cclient = client.prepare(topic='metering')
         cclient.cast(context.RequestContext(),
                      'record_metering_data', data=[self.utf8_msg])

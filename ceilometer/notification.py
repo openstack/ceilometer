@@ -63,6 +63,15 @@ class NotificationService(os_service.Service):
 
     def start(self):
         super(NotificationService, self).start()
+        # FIXME(sileht): endpoint use notification_topics option
+        # and it should not because this is oslo.messaging option
+        # not a ceilometer, until we have a something to get
+        # the notification_topics in an other way
+        # we must create a transport to ensure the option have
+        # beeen registered by oslo.messaging
+        transport = messaging.get_transport()
+        messaging.get_notifier(transport, '')
+
         self.pipeline_manager = pipeline.setup_pipeline()
 
         self.notification_manager = self._get_notifications_manager(
@@ -91,9 +100,9 @@ class NotificationService(os_service.Service):
         urls = cfg.CONF.notification.messaging_urls or [None]
         self.listeners = []
         for url in urls:
-            listener = messaging.get_notification_listener(targets,
-                                                           endpoints,
-                                                           url)
+            transport = messaging.get_transport(url)
+            listener = messaging.get_notification_listener(
+                transport, targets, endpoints)
             listener.start()
             self.listeners.append(listener)
 

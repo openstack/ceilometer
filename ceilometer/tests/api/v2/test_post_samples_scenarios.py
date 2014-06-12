@@ -35,7 +35,7 @@ class TestPostSamples(FunctionalTest,
             del m['message_signature']
         self.published.append(data)
 
-    def fake_get_rpc_client(self, **kwargs):
+    def fake_get_rpc_client(self, *args, **kwargs):
         cast_ctxt = mock.Mock()
         cast_ctxt.cast.side_effect = self.fake_cast
         client = mock.Mock()
