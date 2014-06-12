@@ -58,18 +58,24 @@ class Client(object):
             no_cache=True)
 
     def _with_flavor_and_image(self, instances):
+        flavor_cache = {}
+        image_cache = {}
         for instance in instances:
-            self._with_flavor(instance)
-            self._with_image(instance)
+            self._with_flavor(instance, flavor_cache)
+            self._with_image(instance, image_cache)
 
         return instances
 
-    def _with_flavor(self, instance):
+    def _with_flavor(self, instance, cache):
         fid = instance.flavor['id']
-        try:
-            flavor = self.nova_client.flavors.get(fid)
-        except novaclient.exceptions.NotFound:
-            flavor = None
+        if fid in cache:
+            flavor = cache.get(fid)
+        else:
+            try:
+                flavor = self.nova_client.flavors.get(fid)
+            except novaclient.exceptions.NotFound:
+                flavor = None
+            cache[fid] = flavor
 
         attr_defaults = [('name', 'unknown-id-%s' % fid),
                          ('vcpus', 0), ('ram', 0), ('disk', 0),
@@ -81,7 +87,7 @@ class Client(object):
                 continue
             instance.flavor[attr] = getattr(flavor, attr, default)
 
-    def _with_image(self, instance):
+    def _with_image(self, instance, cache):
         try:
             iid = instance.image['id']
         except TypeError:
@@ -90,19 +96,24 @@ class Client(object):
             instance.ramdisk_id = None
             return
 
-        try:
-            image = self.nova_client.images.get(iid)
-        except novaclient.exceptions.NotFound:
-            instance.image['name'] = 'unknown-id-%s' % iid
-            instance.kernel_id = None
-            instance.ramdisk_id = None
-            return
+        if iid in cache:
+            image = cache.get(iid)
+        else:
+            try:
+                image = self.nova_client.images.get(iid)
+            except novaclient.exceptions.NotFound:
+                image = None
+            cache[iid] = image
 
-        instance.image['name'] = getattr(image, 'name')
+        attr_defaults = [('kernel_id', None),
+                         ('ramdisk_id', None)]
+
+        instance.image['name'] = \
+            getattr(image, 'name') if image else 'unknown-id-%s' % iid
         image_metadata = getattr(image, 'metadata', None)
 
-        for attr in ['kernel_id', 'ramdisk_id']:
-            ameta = image_metadata.get(attr) if image_metadata else None
+        for attr, default in attr_defaults:
+            ameta = image_metadata.get(attr) if image_metadata else default
             setattr(instance, attr, ameta)
 
     @logged
