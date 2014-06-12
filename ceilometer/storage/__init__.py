@@ -35,7 +35,6 @@ STORAGE_ENGINE_NAMESPACE = 'ceilometer.storage'
 OLD_STORAGE_OPTS = [
     cfg.StrOpt('database_connection',
                secret=True,
-               default=None,
                help='DEPRECATED - Database connection string.',
                ),
 ]
