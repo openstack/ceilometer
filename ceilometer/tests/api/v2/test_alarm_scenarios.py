@@ -195,6 +195,46 @@ class TestAlarms(FunctionalTest,
                          'Unknown argument: "timestamp": '
                          'not valid for this resource')
 
+    def test_alarms_query_with_meter(self):
+        resp = self.get_json('/alarms',
+                             q=[{'field': 'meter',
+                                 'op': 'eq',
+                                 'value': 'meter.mine'}],
+                             )
+        self.assertEqual(1, len(resp))
+        self.assertEqual('c',
+                         resp[0]['alarm_id'])
+        self.assertEqual('meter.mine',
+                         resp[0]
+                         ['threshold_rule']
+                         ['meter_name'])
+
+    def test_alarms_query_with_state(self):
+        alarm = models.Alarm(name='disabled',
+                             type='combination',
+                             enabled=False,
+                             alarm_id='d',
+                             description='d',
+                             state='ok',
+                             state_timestamp=None,
+                             timestamp=None,
+                             ok_actions=[],
+                             insufficient_data_actions=[],
+                             alarm_actions=[],
+                             repeat_actions=False,
+                             user_id=self.auth_headers['X-User-Id'],
+                             project_id=self.auth_headers['X-Project-Id'],
+                             time_constraints=[],
+                             rule=dict(alarm_ids=['a', 'b'], operator='or'))
+        self.conn.update_alarm(alarm)
+        resp = self.get_json('/alarms',
+                             q=[{'field': 'state',
+                                 'op': 'eq',
+                                 'value': 'ok'}],
+                             )
+        self.assertEqual(1, len(resp))
+        self.assertEqual('ok', resp[0]['state'])
+
     def test_get_not_existing_alarm(self):
         resp = self.get_json('/alarms/alarm-id-3', expect_errors=True)
         self.assertEqual(404, resp.status_code)
