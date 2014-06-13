@@ -418,7 +418,7 @@ class TestCoordinate(test.BaseTestCase):
 
     def test_assigned_alarms(self):
         api_client = mock.MagicMock()
-        api_client.alarms = mock.Mock(side_effect=Exception('Boom!'))
+        api_client.alarms.list = mock.Mock(side_effect=Exception('Boom!'))
         self.partition_coordinator.assignment = ['something']
         self.partition_coordinator.assigned_alarms(api_client)
         self.assertTrue('assignment retrieval failed' in
