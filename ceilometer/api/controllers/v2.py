@@ -2187,6 +2187,19 @@ class Trait(_Base):
     type = wtypes.text
     "the type of the trait (string, integer, float or datetime)"
 
+    @staticmethod
+    def _convert_storage_trait(trait):
+        """Helper method to convert a storage model into an API trait
+        instance. If an API trait instance is passed in, just return it.
+        """
+        if isinstance(trait, Trait):
+            return trait
+        value = (six.text_type(trait.value)
+                 if not trait.dtype == storage.models.Trait.DATETIME_TYPE
+                 else trait.value.isoformat())
+        trait_type = storage.models.Trait.get_name_by_type(trait.dtype)
+        return Trait(name=trait.name, type=trait_type, value=value)
+
     @classmethod
     def sample(cls):
         return cls(name='service',
@@ -2209,21 +2222,8 @@ class Event(_Base):
     def get_traits(self):
         return self._traits
 
-    @staticmethod
-    def _convert_storage_trait(t):
-        """Helper method to convert a storage model into an API trait
-        instance. If an API trait instance is passed in, just return it.
-        """
-        if isinstance(t, Trait):
-            return t
-        value = (six.text_type(t.value)
-                 if not t.dtype == storage.models.Trait.DATETIME_TYPE
-                 else t.value.isoformat())
-        type = storage.models.Trait.get_name_by_type(t.dtype)
-        return Trait(name=t.name, type=type, value=value)
-
     def set_traits(self, traits):
-        self._traits = map(self._convert_storage_trait, traits)
+        self._traits = map(Trait._convert_storage_trait, traits)
 
     traits = wsme.wsproperty(wtypes.ArrayType(Trait),
                              get_traits,
@@ -2295,7 +2295,7 @@ class TraitsController(rest.RestController):
         :param trait_name: Trait to return values for
         """
         LOG.debug(_("Getting traits for %s") % event_type)
-        return [Trait(name=t.name, type=t.get_type_name(), value=t.value)
+        return [Trait._convert_storage_trait(t)
                 for t in pecan.request.storage_conn
                 .get_traits(event_type, trait_name)]
 
