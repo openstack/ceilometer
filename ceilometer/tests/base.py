@@ -51,6 +51,12 @@ class BaseTestCase(test.BaseTestCase):
             'ceilometer.messaging.get_transport',
             return_value=self.transport))
 
+    def setUp(self):
+        super(BaseTestCase, self).setUp()
+        self.useFixture(mockpatch.Patch(
+            'oslo.config.cfg._get_config_dirs',
+            return_value=[self.path_get('etc/ceilometer')]))
+
     def assertTimestampEqual(self, first, second, msg=None):
         """Checks that two timestamps are equals.
 
