@@ -18,10 +18,10 @@ from keystoneclient.v3 import client as keystone_client
 from oslo.config import cfg
 from six.moves.urllib import parse
 
-from ceilometer.alarm import notifier
+from ceilometer.alarm.notifier import rest
 
 
-class TrustRestAlarmNotifier(notifier.rest.RestAlarmNotifier):
+class TrustRestAlarmNotifier(rest.RestAlarmNotifier):
     """Notifier supporting keystone trust authentication.
 
     This alarm notifier is intended to be used to call an endpoint using
@@ -55,5 +55,5 @@ class TrustRestAlarmNotifier(notifier.rest.RestAlarmNotifier):
                                    action.fragment)
 
         headers = {'X-Auth-Token': client.auth_token}
-        notifier.rest.RestAlarmNotifier.notify(
+        rest.RestAlarmNotifier.notify(
             action, alarm_id, previous, current, reason, reason_data, headers)
