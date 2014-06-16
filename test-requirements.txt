@@ -12,6 +12,7 @@ MySQL-python
 # Docs Requirements
 docutils==0.9.1
 oslosphinx
+oslotest
 pymongo>=2.4
 python-subunit>=0.0.18
 sphinx>=1.2.1,<1.3
