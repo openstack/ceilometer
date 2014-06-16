@@ -19,8 +19,8 @@
 
 import collections
 import itertools
-import urlparse
 
+from six.moves.urllib import parse as urlparse
 from stevedore import extension
 
 from ceilometer.openstack.common import context

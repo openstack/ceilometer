@@ -15,7 +15,7 @@
 # under the License.
 
 import mock
-from six.moves.urllib import parse as url_parse
+from six.moves.urllib import parse as urlparse
 
 from ceilometer.network.statistics.opencontrail import driver
 from ceilometer.openstack.common import test
@@ -37,9 +37,9 @@ class TestOpencontrailDriver(test.BaseTestCase):
         self.nc_networks.start()
 
         self.driver = driver.OpencontrailDriver()
-        self.parse_url = url_parse.ParseResult('opencontrail',
-                                               '127.0.0.1:8143',
-                                               '/', None, None, None)
+        self.parse_url = urlparse.ParseResult('opencontrail',
+                                              '127.0.0.1:8143',
+                                              '/', None, None, None)
         self.params = {'password': ['admin'],
                        'scheme': ['http'],
                        'username': ['admin'],

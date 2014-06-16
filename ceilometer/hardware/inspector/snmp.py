@@ -17,10 +17,10 @@
 # under the License.
 """Inspector for collecting data over SNMP"""
 
-import urlparse
+from pysnmp.entity.rfc3413.oneliner import cmdgen
+from six.moves.urllib import parse as urlparse
 
 from ceilometer.hardware.inspector import base
-from pysnmp.entity.rfc3413.oneliner import cmdgen
 
 
 class SNMPException(Exception):

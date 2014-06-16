@@ -15,7 +15,7 @@
 
 import six
 from six import moves
-from six.moves.urllib import parse as url_parse
+from six.moves.urllib import parse as urlparse
 
 from ceilometer.network.statistics import driver
 from ceilometer.network.statistics.opendaylight import client
@@ -187,13 +187,13 @@ class OpenDayLightDriver(driver.Driver):
             # OpenDaylight REST API has not api to getting meter.
             return None
 
-        parts = url_parse.ParseResult(params.get('scheme', ['http'])[0],
-                                      parse_url.netloc,
-                                      parse_url.path,
-                                      None,
-                                      None,
-                                      None)
-        endpoint = url_parse.urlunparse(parts)
+        parts = urlparse.ParseResult(params.get('scheme', ['http'])[0],
+                                     parse_url.netloc,
+                                     parse_url.path,
+                                     None,
+                                     None,
+                                     None)
+        endpoint = urlparse.urlunparse(parts)
 
         data = self._prepare_cache(endpoint, params, cache)
 

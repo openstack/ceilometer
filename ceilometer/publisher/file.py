@@ -17,7 +17,8 @@
 
 import logging
 import logging.handlers
-import six.moves.urllib.parse as urlparse
+
+from six.moves.urllib import parse as urlparse
 
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log

@@ -17,10 +17,9 @@
 """Rest alarm notifier."""
 
 import eventlet
-import requests
-import six.moves.urllib.parse as urlparse
-
 from oslo.config import cfg
+import requests
+from six.moves.urllib import parse as urlparse
 
 from ceilometer.alarm import notifier
 from ceilometer.openstack.common.gettextutils import _

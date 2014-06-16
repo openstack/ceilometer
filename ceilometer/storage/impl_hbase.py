@@ -16,10 +16,10 @@ import datetime
 import hashlib
 import operator
 import os
-import six.moves.urllib.parse as urlparse
 import time
 
 import happybase
+from six.moves.urllib import parse as urlparse
 
 from ceilometer.alarm.storage import models as alarm_models
 from ceilometer.openstack.common.gettextutils import _
