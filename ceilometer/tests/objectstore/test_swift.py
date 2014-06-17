@@ -131,22 +131,21 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
         self.assertEqual(self.ACCOUNTS[0][0], data[0][0])
 
     def test_neaten_url(self):
-        test_endpoint = 'http://127.0.0.1:8080'
+        test_endpoints = ['http://127.0.0.1:8080',
+                          'http://127.0.0.1:8080/swift']
         test_tenant_id = 'a7fd1695fa154486a647e44aa99a1b9b'
-        standard_url = test_endpoint + '/v1/' + 'AUTH_' + test_tenant_id
+        for test_endpoint in test_endpoints:
+            standard_url = test_endpoint + '/v1/AUTH_' + test_tenant_id
 
-        self.assertEqual(standard_url,
-                         swift._Base._neaten_url(test_endpoint,
-                                                 test_tenant_id))
-        self.assertEqual(standard_url,
-                         swift._Base._neaten_url(test_endpoint + '/',
-                                                 test_tenant_id))
-        self.assertEqual(standard_url,
-                         swift._Base._neaten_url(test_endpoint + '/v1',
-                                                 test_tenant_id))
-        self.assertEqual(standard_url,
-                         swift._Base._neaten_url(standard_url,
-                                                 test_tenant_id))
+            url = swift._Base._neaten_url(test_endpoint, test_tenant_id)
+            self.assertEqual(standard_url, url)
+            url = swift._Base._neaten_url(test_endpoint + '/', test_tenant_id)
+            self.assertEqual(standard_url, url)
+            url = swift._Base._neaten_url(test_endpoint + '/v1',
+                                          test_tenant_id)
+            self.assertEqual(standard_url, url)
+            url = swift._Base._neaten_url(standard_url, test_tenant_id)
+            self.assertEqual(standard_url, url)
 
     def test_metering(self):
         with PatchObject(self.factory, '_iter_accounts',
