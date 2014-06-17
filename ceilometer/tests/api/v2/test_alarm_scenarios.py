@@ -21,7 +21,6 @@
 
 import datetime
 import json as jsonutils
-import logging
 import uuid
 
 import mock
@@ -32,9 +31,6 @@ from ceilometer.alarm.storage import models
 from ceilometer import messaging
 from ceilometer.tests.api.v2 import FunctionalTest
 from ceilometer.tests import db as tests_db
-
-
-LOG = logging.getLogger(__name__)
 
 
 class TestListEmptyAlarms(FunctionalTest,

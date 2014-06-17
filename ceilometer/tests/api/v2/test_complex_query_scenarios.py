@@ -19,7 +19,6 @@
 """
 
 import datetime
-import logging
 
 from ceilometer.alarm.storage import models
 from ceilometer.openstack.common import timeutils
@@ -28,7 +27,6 @@ from ceilometer import sample
 from ceilometer.tests.api import v2 as tests_api
 from ceilometer.tests import db as tests_db
 
-LOG = logging.getLogger(__name__)
 
 admin_header = {"X-Roles": "admin",
                 "X-Project-Id":
