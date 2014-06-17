@@ -28,8 +28,8 @@ import mock
 import oslo.messaging.conffixture
 from six import moves
 
+from ceilometer.alarm.storage import models
 from ceilometer import messaging
-from ceilometer.storage import models
 from ceilometer.tests.api.v2 import FunctionalTest
 from ceilometer.tests import db as tests_db
 

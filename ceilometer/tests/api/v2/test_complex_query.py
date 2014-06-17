@@ -22,9 +22,10 @@ import jsonschema
 import mock
 import wsme
 
+from ceilometer.alarm.storage import models as alarm_models
 from ceilometer.api.controllers import v2 as api
 from ceilometer.openstack.common import test
-from ceilometer import storage as storage
+from ceilometer import storage
 
 
 class FakeComplexQuery(api.ValidatedComplexQuery):
@@ -51,9 +52,9 @@ class TestComplexQuery(test.BaseTestCase):
         self.query = FakeComplexQuery(storage.models.Sample,
                                       sample_name_mapping,
                                       True)
-        self.query_alarm = FakeComplexQuery(storage.models.Alarm)
+        self.query_alarm = FakeComplexQuery(alarm_models.Alarm)
         self.query_alarmchange = FakeComplexQuery(
-            storage.models.AlarmChange)
+            alarm_models.AlarmChange)
 
     def test_replace_isotime_utc(self):
         filter_expr = {"=": {"timestamp": "2013-12-05T19:38:29Z"}}

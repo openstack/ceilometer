@@ -23,6 +23,7 @@ import datetime
 
 import mock
 
+from ceilometer.alarm.storage import models as alarm_models
 from ceilometer.openstack.common import timeutils
 from ceilometer.publisher import utils
 from ceilometer import sample
@@ -655,32 +656,32 @@ class RawSampleTest(DBTestBase,
         if isinstance(self.conn, mongodb.Connection):
             return
 
-        alarm = models.Alarm(alarm_id='r3d',
-                             enabled=True,
-                             type='threshold',
-                             name='red-alert',
-                             description='my red-alert',
-                             timestamp=None,
-                             user_id='user-id',
-                             project_id='project-id',
-                             state="insufficient data",
-                             state_timestamp=None,
-                             ok_actions=[],
-                             alarm_actions=['http://nowhere/alarms'],
-                             insufficient_data_actions=[],
-                             repeat_actions=False,
-                             time_constraints=[],
-                             rule=dict(comparison_operator='eq',
-                                       threshold=36,
-                                       statistic='count',
-                                       evaluation_periods=1,
-                                       period=60,
-                                       meter_name='test.one',
-                                       query=[{'field': 'key',
-                                               'op': 'eq',
-                                               'value': 'value',
-                                              'type': 'string'}]),
-                             )
+        alarm = alarm_models.Alarm(alarm_id='r3d',
+                                   enabled=True,
+                                   type='threshold',
+                                   name='red-alert',
+                                   description='my red-alert',
+                                   timestamp=None,
+                                   user_id='user-id',
+                                   project_id='project-id',
+                                   state="insufficient data",
+                                   state_timestamp=None,
+                                   ok_actions=[],
+                                   alarm_actions=['http://nowhere/alarms'],
+                                   insufficient_data_actions=[],
+                                   repeat_actions=False,
+                                   time_constraints=[],
+                                   rule=dict(comparison_operator='eq',
+                                             threshold=36,
+                                             statistic='count',
+                                             evaluation_periods=1,
+                                             period=60,
+                                             meter_name='test.one',
+                                             query=[{'field': 'key',
+                                                     'op': 'eq',
+                                                     'value': 'value',
+                                                     'type': 'string'}]),
+                                   )
 
         self.conn.create_alarm(alarm)
         self.mock_utcnow.return_value = datetime.datetime(2012, 7, 2, 10, 45)
@@ -2302,91 +2303,91 @@ class CounterDataTypeTest(DBTestBase,
 
 class AlarmTestBase(DBTestBase):
     def add_some_alarms(self):
-        alarms = [models.Alarm(alarm_id='r3d',
-                               enabled=True,
-                               type='threshold',
-                               name='red-alert',
-                               description='my red-alert',
-                               timestamp=None,
-                               user_id='me',
-                               project_id='and-da-boys',
-                               state="insufficient data",
-                               state_timestamp=None,
-                               ok_actions=[],
-                               alarm_actions=['http://nowhere/alarms'],
-                               insufficient_data_actions=[],
-                               repeat_actions=False,
-                               time_constraints=[dict(name='testcons',
-                                                      start='0 11 * * *',
-                                                      duration=300)],
-                               rule=dict(comparison_operator='eq',
-                                         threshold=36,
-                                         statistic='count',
-                                         evaluation_periods=1,
-                                         period=60,
-                                         meter_name='test.one',
-                                         query=[{'field': 'key',
-                                                 'op': 'eq',
-                                                 'value': 'value',
-                                                 'type': 'string'}]),
-                               ),
-                  models.Alarm(alarm_id='0r4ng3',
-                               enabled=True,
-                               type='threshold',
-                               name='orange-alert',
-                               description='a orange',
-                               timestamp=None,
-                               user_id='me',
-                               project_id='and-da-boys',
-                               state="insufficient data",
-                               state_timestamp=None,
-                               ok_actions=[],
-                               alarm_actions=['http://nowhere/alarms'],
-                               insufficient_data_actions=[],
-                               repeat_actions=False,
-                               time_constraints=[],
-                               rule=dict(comparison_operator='gt',
-                                         threshold=75,
-                                         statistic='avg',
-                                         evaluation_periods=1,
-                                         period=60,
-                                         meter_name='test.fourty',
-                                         query=[{'field': 'key2',
-                                                 'op': 'eq',
-                                                 'value': 'value2',
-                                                 'type': 'string'}]),
-                               ),
-                  models.Alarm(alarm_id='y3ll0w',
-                               enabled=False,
-                               type='threshold',
-                               name='yellow-alert',
-                               description='yellow',
-                               timestamp=None,
-                               user_id='me',
-                               project_id='and-da-boys',
-                               state="insufficient data",
-                               state_timestamp=None,
-                               ok_actions=[],
-                               alarm_actions=['http://nowhere/alarms'],
-                               insufficient_data_actions=[],
-                               repeat_actions=False,
-                               time_constraints=[],
-                               rule=dict(comparison_operator='lt',
-                                         threshold=10,
-                                         statistic='min',
-                                         evaluation_periods=1,
-                                         period=60,
-                                         meter_name='test.five',
-                                         query=[{'field': 'key2',
-                                                 'op': 'eq',
-                                                 'value': 'value2',
-                                                 'type': 'string'},
-                                                {'field':
-                                                 'user_metadata.key3',
-                                                 'op': 'eq',
-                                                 'value': 'value3',
-                                                 'type': 'string'}]),
-                               )]
+        alarms = [alarm_models.Alarm(alarm_id='r3d',
+                                     enabled=True,
+                                     type='threshold',
+                                     name='red-alert',
+                                     description='my red-alert',
+                                     timestamp=None,
+                                     user_id='me',
+                                     project_id='and-da-boys',
+                                     state="insufficient data",
+                                     state_timestamp=None,
+                                     ok_actions=[],
+                                     alarm_actions=['http://nowhere/alarms'],
+                                     insufficient_data_actions=[],
+                                     repeat_actions=False,
+                                     time_constraints=[dict(name='testcons',
+                                                            start='0 11 * * *',
+                                                            duration=300)],
+                                     rule=dict(comparison_operator='eq',
+                                               threshold=36,
+                                               statistic='count',
+                                               evaluation_periods=1,
+                                               period=60,
+                                               meter_name='test.one',
+                                               query=[{'field': 'key',
+                                                       'op': 'eq',
+                                                       'value': 'value',
+                                                       'type': 'string'}]),
+                                     ),
+                  alarm_models.Alarm(alarm_id='0r4ng3',
+                                     enabled=True,
+                                     type='threshold',
+                                     name='orange-alert',
+                                     description='a orange',
+                                     timestamp=None,
+                                     user_id='me',
+                                     project_id='and-da-boys',
+                                     state="insufficient data",
+                                     state_timestamp=None,
+                                     ok_actions=[],
+                                     alarm_actions=['http://nowhere/alarms'],
+                                     insufficient_data_actions=[],
+                                     repeat_actions=False,
+                                     time_constraints=[],
+                                     rule=dict(comparison_operator='gt',
+                                               threshold=75,
+                                               statistic='avg',
+                                               evaluation_periods=1,
+                                               period=60,
+                                               meter_name='test.fourty',
+                                               query=[{'field': 'key2',
+                                                       'op': 'eq',
+                                                       'value': 'value2',
+                                                       'type': 'string'}]),
+                                     ),
+                  alarm_models.Alarm(alarm_id='y3ll0w',
+                                     enabled=False,
+                                     type='threshold',
+                                     name='yellow-alert',
+                                     description='yellow',
+                                     timestamp=None,
+                                     user_id='me',
+                                     project_id='and-da-boys',
+                                     state="insufficient data",
+                                     state_timestamp=None,
+                                     ok_actions=[],
+                                     alarm_actions=['http://nowhere/alarms'],
+                                     insufficient_data_actions=[],
+                                     repeat_actions=False,
+                                     time_constraints=[],
+                                     rule=dict(comparison_operator='lt',
+                                               threshold=10,
+                                               statistic='min',
+                                               evaluation_periods=1,
+                                               period=60,
+                                               meter_name='test.five',
+                                               query=[{'field': 'key2',
+                                                       'op': 'eq',
+                                                       'value': 'value2',
+                                                       'type': 'string'},
+                                                      {'field':
+                                                       'user_metadata.key3',
+                                                       'op': 'eq',
+                                                       'value': 'value3',
+                                                       'type': 'string'}]),
+                                     )]
 
         for a in alarms:
             self.conn.create_alarm(a)
@@ -2427,7 +2428,7 @@ class AlarmTest(AlarmTestBase,
         self.add_some_alarms()
         orange = list(self.conn.get_alarms(name='orange-alert'))[0]
         orange.enabled = False
-        orange.state = models.Alarm.ALARM_INSUFFICIENT_DATA
+        orange.state = alarm_models.Alarm.ALARM_INSUFFICIENT_DATA
         query = [{'field': 'metadata.group',
                   'op': 'eq',
                   'value': 'test.updated',
@@ -2436,36 +2437,37 @@ class AlarmTest(AlarmTestBase,
         orange.rule['meter_name'] = 'new_meter_name'
         updated = self.conn.update_alarm(orange)
         self.assertEqual(updated.enabled, False)
-        self.assertEqual(updated.state, models.Alarm.ALARM_INSUFFICIENT_DATA)
+        self.assertEqual(updated.state,
+                         alarm_models.Alarm.ALARM_INSUFFICIENT_DATA)
         self.assertEqual(updated.rule['query'], query)
         self.assertEqual(updated.rule['meter_name'], 'new_meter_name')
 
     def test_update_llu(self):
-        llu = models.Alarm(alarm_id='llu',
-                           enabled=True,
-                           type='threshold',
-                           name='llu',
-                           description='llu',
-                           timestamp=None,
-                           user_id='bla',
-                           project_id='ffo',
-                           state="insufficient data",
-                           state_timestamp=None,
-                           ok_actions=[],
-                           alarm_actions=[],
-                           insufficient_data_actions=[],
-                           repeat_actions=False,
-                           time_constraints=[],
-                           rule=dict(comparison_operator='lt',
-                                     threshold=34,
-                                     statistic='max',
-                                     evaluation_periods=1,
-                                     period=60,
-                                     meter_name='llt',
-                                     query=[])
-                           )
+        llu = alarm_models.Alarm(alarm_id='llu',
+                                 enabled=True,
+                                 type='threshold',
+                                 name='llu',
+                                 description='llu',
+                                 timestamp=None,
+                                 user_id='bla',
+                                 project_id='ffo',
+                                 state="insufficient data",
+                                 state_timestamp=None,
+                                 ok_actions=[],
+                                 alarm_actions=[],
+                                 insufficient_data_actions=[],
+                                 repeat_actions=False,
+                                 time_constraints=[],
+                                 rule=dict(comparison_operator='lt',
+                                           threshold=34,
+                                           statistic='max',
+                                           evaluation_periods=1,
+                                           period=60,
+                                           meter_name='llt',
+                                           query=[])
+                                 )
         updated = self.conn.update_alarm(llu)
-        updated.state = models.Alarm.ALARM_OK
+        updated.state = alarm_models.Alarm.ALARM_OK
         updated.description = ':)'
         self.conn.update_alarm(updated)
 
@@ -2595,7 +2597,7 @@ class ComplexAlarmHistoryQueryTest(AlarmTestBase,
             alarm_change = dict(event_id=
                                 "16fd2706-8baf-433b-82eb-8c7fada847c%s" % i,
                                 alarm_id=alarm.alarm_id,
-                                type=models.AlarmChange.CREATION,
+                                type=alarm_models.AlarmChange.CREATION,
                                 detail="detail %s" % alarm.name,
                                 user_id=alarm.user_id,
                                 project_id=alarm.project_id,
@@ -2608,7 +2610,7 @@ class ComplexAlarmHistoryQueryTest(AlarmTestBase,
             alarm_change2 = dict(event_id=
                                  "16fd2706-8baf-433b-82eb-8c7fada847d%s" % i,
                                  alarm_id=alarm.alarm_id,
-                                 type=models.AlarmChange.RULE_CHANGE,
+                                 type=alarm_models.AlarmChange.RULE_CHANGE,
                                  detail="detail %s" % i,
                                  user_id=alarm.user_id,
                                  project_id=alarm.project_id,
@@ -2618,18 +2620,16 @@ class ComplexAlarmHistoryQueryTest(AlarmTestBase,
                                                              30 + i))
             self.conn.record_alarm_change(alarm_change=alarm_change2)
 
-            alarm_change3 = dict(event_id=
-                                 "16fd2706-8baf-433b-82eb-8c7fada847e%s"
-                                 % i,
-                                 alarm_id=alarm.alarm_id,
-                                 type=models.AlarmChange.STATE_TRANSITION,
-                                 detail="detail %s" % (i + 1),
-                                 user_id=alarm.user_id,
-                                 project_id=alarm.project_id,
-                                 on_behalf_of=alarm.project_id,
-                                 timestamp=datetime.datetime(2012, 9, 26,
-                                                             10 + i,
-                                                             30 + i))
+            alarm_change3 = dict(
+                event_id="16fd2706-8baf-433b-82eb-8c7fada847e%s" % i,
+                alarm_id=alarm.alarm_id,
+                type=alarm_models.AlarmChange.STATE_TRANSITION,
+                detail="detail %s" % (i + 1),
+                user_id=alarm.user_id,
+                project_id=alarm.project_id,
+                on_behalf_of=alarm.project_id,
+                timestamp=datetime.datetime(2012, 9, 26, 10 + i, 30 + i)
+            )
 
             if alarm.name == "red-alert":
                 alarm_change3['on_behalf_of'] = 'and-da-girls'
@@ -2641,7 +2641,7 @@ class ComplexAlarmHistoryQueryTest(AlarmTestBase,
                                      "16fd2706-8baf-433b-82eb-8c7fada847f%s"
                                      % i,
                                      alarm_id=alarm.alarm_id,
-                                     type=models.AlarmChange.DELETION,
+                                     type=alarm_models.AlarmChange.DELETION,
                                      detail="detail %s" % (i + 2),
                                      user_id=alarm.user_id,
                                      project_id=alarm.project_id,
@@ -2669,8 +2669,8 @@ class ComplexAlarmHistoryQueryTest(AlarmTestBase,
             self.conn.query_alarm_history(filter_expr=self.filter_expr,
                                           orderby=[{"timestamp":
                                                    "asc"}]))
-        self.assertEqual([models.AlarmChange.RULE_CHANGE,
-                          models.AlarmChange.STATE_TRANSITION],
+        self.assertEqual([alarm_models.AlarmChange.RULE_CHANGE,
+                          alarm_models.AlarmChange.STATE_TRANSITION],
                          [h.type for h in history])
 
     def test_alarm_history_with_filter_and_orderby_and_limit(self):
@@ -2679,7 +2679,7 @@ class ComplexAlarmHistoryQueryTest(AlarmTestBase,
                                           orderby=[{"timestamp":
                                                     "asc"}],
                                           limit=1))
-        self.assertEqual(models.AlarmChange.RULE_CHANGE, history[0].type)
+        self.assertEqual(alarm_models.AlarmChange.RULE_CHANGE, history[0].type)
 
     def test_alarm_history_with_on_behalf_of_filter(self):
         filter_expr = {"=": {"on_behalf_of": "and-da-girls"}}
@@ -2694,10 +2694,10 @@ class ComplexAlarmHistoryQueryTest(AlarmTestBase,
                                                      orderby=[{"timestamp":
                                                                "asc"}]))
         self.assertEqual(4, len(history))
-        self.assertEqual([models.AlarmChange.CREATION,
-                          models.AlarmChange.RULE_CHANGE,
-                          models.AlarmChange.STATE_TRANSITION,
-                          models.AlarmChange.DELETION],
+        self.assertEqual([alarm_models.AlarmChange.CREATION,
+                          alarm_models.AlarmChange.RULE_CHANGE,
+                          alarm_models.AlarmChange.STATE_TRANSITION,
+                          alarm_models.AlarmChange.DELETION],
                          [h.type for h in history])
 
 

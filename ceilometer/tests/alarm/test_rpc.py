@@ -21,11 +21,11 @@ from ceilometerclient.v2 import alarms
 import eventlet
 
 from ceilometer.alarm import rpc as rpc_alarm
+from ceilometer.alarm.storage import models
 from ceilometer import messaging
 from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import timeutils
-from ceilometer.storage import models
-from ceilometer.tests import base
+from ceilometer.tests import base as tests_base
 
 
 class FakeNotifier(object):
@@ -44,7 +44,7 @@ class FakeNotifier(object):
             self.rpc.stop()
 
 
-class TestRPCAlarmNotifier(base.BaseTestCase):
+class TestRPCAlarmNotifier(tests_base.BaseTestCase):
     def setUp(self):
         super(TestRPCAlarmNotifier, self).setUp()
         self.CONF = self.useFixture(config.Config()).conf
@@ -165,7 +165,7 @@ class FakeCoordinator(object):
         self.rpc.stop()
 
 
-class TestRPCAlarmPartitionCoordination(base.BaseTestCase):
+class TestRPCAlarmPartitionCoordination(tests_base.BaseTestCase):
     def setUp(self):
         super(TestRPCAlarmPartitionCoordination, self).setUp()
         self.CONF = self.useFixture(config.Config()).conf

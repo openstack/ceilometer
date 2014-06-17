@@ -17,13 +17,15 @@
 
 import datetime
 
+from ceilometer.alarm.storage import models as alarm_models
 from ceilometer.openstack.common import test
+from ceilometer.storage import base
 from ceilometer.storage import models
 
 
-class FakeModel(models.Model):
+class FakeModel(base.Model):
     def __init__(self, arg1, arg2):
-        models.Model.__init__(self, arg1=arg1, arg2=arg2)
+        base.Model.__init__(self, arg1=arg1, arg2=arg2)
 
 
 class ModelTest(test.BaseTestCase):
@@ -76,7 +78,7 @@ class ModelTest(test.BaseTestCase):
                         "time_constraints"]
 
         self.assertEqual(set(alarm_fields),
-                         set(models.Alarm.get_field_names()))
+                         set(alarm_models.Alarm.get_field_names()))
 
     def test_get_field_names_of_alarmchange(self):
         alarmchange_fields = ["event_id", "alarm_id", "type", "detail",
@@ -84,7 +86,7 @@ class ModelTest(test.BaseTestCase):
                               "timestamp"]
 
         self.assertEqual(set(alarmchange_fields),
-                         set(models.AlarmChange.get_field_names()))
+                         set(alarm_models.AlarmChange.get_field_names()))
 
 
 class TestTraitModel(test.BaseTestCase):

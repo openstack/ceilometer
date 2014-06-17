@@ -25,9 +25,9 @@ import mock
 from six import moves
 
 from ceilometer.alarm.partition import coordination
+from ceilometer.alarm.storage import models
 from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import timeutils
-from ceilometer.storage import models
 from ceilometer.tests import base as tests_base
 
 

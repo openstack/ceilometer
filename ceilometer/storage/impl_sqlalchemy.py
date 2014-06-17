@@ -32,6 +32,7 @@ from sqlalchemy import not_
 from sqlalchemy import or_
 from sqlalchemy.orm import aliased
 
+from ceilometer.alarm.storage import models as alarm_api_models
 from ceilometer.openstack.common.db import exception as dbexc
 from ceilometer.openstack.common.db.sqlalchemy import migration
 import ceilometer.openstack.common.db.sqlalchemy.session as sqlalchemy_session
@@ -664,23 +665,23 @@ class Connection(base.Connection):
 
     @staticmethod
     def _row_to_alarm_model(row):
-        return api_models.Alarm(alarm_id=row.alarm_id,
-                                enabled=row.enabled,
-                                type=row.type,
-                                name=row.name,
-                                description=row.description,
-                                timestamp=row.timestamp,
-                                user_id=row.user_id,
-                                project_id=row.project_id,
-                                state=row.state,
-                                state_timestamp=row.state_timestamp,
-                                ok_actions=row.ok_actions,
-                                alarm_actions=row.alarm_actions,
-                                insufficient_data_actions=
-                                row.insufficient_data_actions,
-                                rule=row.rule,
-                                time_constraints=row.time_constraints,
-                                repeat_actions=row.repeat_actions)
+        return alarm_api_models.Alarm(alarm_id=row.alarm_id,
+                                      enabled=row.enabled,
+                                      type=row.type,
+                                      name=row.name,
+                                      description=row.description,
+                                      timestamp=row.timestamp,
+                                      user_id=row.user_id,
+                                      project_id=row.project_id,
+                                      state=row.state,
+                                      state_timestamp=row.state_timestamp,
+                                      ok_actions=row.ok_actions,
+                                      alarm_actions=row.alarm_actions,
+                                      insufficient_data_actions=
+                                      row.insufficient_data_actions,
+                                      rule=row.rule,
+                                      time_constraints=row.time_constraints,
+                                      repeat_actions=row.repeat_actions)
 
     def _retrieve_alarms(self, query):
         return (self._row_to_alarm_model(x) for x in query.all())
@@ -762,14 +763,14 @@ class Connection(base.Connection):
 
     @staticmethod
     def _row_to_alarm_change_model(row):
-        return api_models.AlarmChange(event_id=row.event_id,
-                                      alarm_id=row.alarm_id,
-                                      type=row.type,
-                                      detail=row.detail,
-                                      user_id=row.user_id,
-                                      project_id=row.project_id,
-                                      on_behalf_of=row.on_behalf_of,
-                                      timestamp=row.timestamp)
+        return alarm_api_models.AlarmChange(event_id=row.event_id,
+                                            alarm_id=row.alarm_id,
+                                            type=row.type,
+                                            detail=row.detail,
+                                            user_id=row.user_id,
+                                            project_id=row.project_id,
+                                            on_behalf_of=row.on_behalf_of,
+                                            timestamp=row.timestamp)
 
     def query_alarms(self, filter_expr=None, orderby=None, limit=None):
         """Yields a lists of alarms that match filter
