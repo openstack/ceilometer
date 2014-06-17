@@ -93,14 +93,22 @@ class CeilometerMiddleware(object):
             start_response_args[0] = (status, list(headers), exc_info)
 
         def iter_response(iterable):
+            iterator = iter(iterable)
+            try:
+                chunk = iterator.next()
+                while not chunk:
+                    chunk = iterator.next()
+            except StopIteration:
+                chunk = ''
+
             if start_response_args[0]:
                 start_response(*start_response_args[0])
             bytes_sent = 0
             try:
-                for chunk in iterable:
-                    if chunk:
-                        bytes_sent += len(chunk)
+                while chunk:
+                    bytes_sent += len(chunk)
                     yield chunk
+                    chunk = iterator.next()
             finally:
                 try:
                     self.publish_sample(env,
