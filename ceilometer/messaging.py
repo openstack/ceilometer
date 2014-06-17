@@ -67,8 +67,9 @@ def setup():
 def get_transport(url=None, optional=False, cache=True):
     """Initialise the oslo.messaging layer."""
     global TRANSPORTS, DEFAULT_URL
-    transport = TRANSPORTS.get(url)
-    if not transport:
+    cache_key = url or DEFAULT_URL
+    transport = TRANSPORTS.get(cache_key)
+    if not transport or not cache:
         try:
             transport = oslo.messaging.get_transport(cfg.CONF, url,
                                                      aliases=_ALIASES)
@@ -79,10 +80,8 @@ def get_transport(url=None, optional=False, cache=True):
                 raise
             return None
         else:
-            if not url:
-                url = DEFAULT_URL
             if cache:
-                TRANSPORTS[url] = transport
+                TRANSPORTS[cache_key] = transport
     return transport
 
 
