@@ -21,22 +21,20 @@ from ceilometer.tests.hardware.pollsters import base
 
 
 class TestNetPollsters(base.TestPollsterBase):
-    def test_bandwidth(self):
-        self._check_get_samples(net.BandwidthBytesPollster,
-                                'hardware.network.bandwidth.bytes',
-                                1000, sample.TYPE_GAUGE)
-
     def test_incoming(self):
         self._check_get_samples(net.IncomingBytesPollster,
                                 'hardware.network.incoming.bytes',
-                                90, sample.TYPE_CUMULATIVE)
+                                90, sample.TYPE_CUMULATIVE,
+                                expected_unit='B')
 
     def test_outgoing(self):
         self._check_get_samples(net.OutgoingBytesPollster,
                                 'hardware.network.outgoing.bytes',
-                                80, sample.TYPE_CUMULATIVE)
+                                80, sample.TYPE_CUMULATIVE,
+                                expected_unit='B')
 
     def test_error(self):
         self._check_get_samples(net.OutgoingErrorsPollster,
                                 'hardware.network.outgoing.errors',
-                                1, sample.TYPE_CUMULATIVE)
+                                1, sample.TYPE_CUMULATIVE,
+                                expected_unit='packet')

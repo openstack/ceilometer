@@ -59,20 +59,19 @@ DiskStats = collections.namedtuple('DiskStats', ['size', 'used'])
 # name: the name of the interface
 # mac: the MAC of the interface
 # ip: the IP of the interface
+# speed: the speed of the interface (bytes/s)
 #
-Interface = collections.namedtuple('Interface', ['name', 'mac', 'ip'])
+Interface = collections.namedtuple('Interface', ['name', 'mac', 'ip', 'speed'])
 
 
 # Named tuple representing network interface statistics.
 #
-# bandwidth: current bandwidth (bytes/s)
 # rx_bytes: total number of octets received (bytes)
 # tx_bytes: total number of octets transmitted (bytes)
 # error: number of outbound packets not transmitted because of errors
 #
-InterfaceStats = collections.namedtuple(
-    'InterfaceStats',
-    ['bandwidth', 'rx_bytes', 'tx_bytes', 'error'])
+InterfaceStats = collections.namedtuple('InterfaceStats',
+                                        ['rx_bytes', 'tx_bytes', 'error'])
 
 
 @six.add_metaclass(abc.ABCMeta)

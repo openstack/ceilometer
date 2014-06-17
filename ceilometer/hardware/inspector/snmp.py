@@ -67,7 +67,7 @@ class SNMPInspector(base.Inspector):
     #Network Interface OIDs
     _interface_index_oid = "1.3.6.1.2.1.2.2.1.1"
     _interface_name_oid = "1.3.6.1.2.1.2.2.1.2"
-    _interface_bandwidth_oid = "1.3.6.1.2.1.2.2.1.5"
+    _interface_speed_oid = "1.3.6.1.2.1.2.2.1.5"
     _interface_mac_oid = "1.3.6.1.2.1.2.2.1.6"
     _interface_ip_oid = "1.3.6.1.2.1.4.20.1.2"
     _interface_received_oid = "1.3.6.1.2.1.2.2.1.10"
@@ -162,10 +162,10 @@ class SNMPInspector(base.Inspector):
                 mac_oid = "%s.%s" % (self._interface_mac_oid,
                                      str(value))
                 mac = self._get_value_from_oid(mac_oid, host)
-                bw_oid = "%s.%s" % (self._interface_bandwidth_oid,
-                                    str(value))
+                speed_oid = "%s.%s" % (self._interface_speed_oid,
+                                       str(value))
                 # bits/s to byte/s
-                bandwidth = self._get_value_from_oid(bw_oid, host) / 8
+                speed = self._get_value_from_oid(speed_oid, host) / 8
                 rx_oid = "%s.%s" % (self._interface_received_oid,
                                     str(value))
                 rx_bytes = self._get_value_from_oid(rx_oid, host)
@@ -179,9 +179,9 @@ class SNMPInspector(base.Inspector):
                 adapted_mac = mac.prettyPrint().replace('0x', '')
                 interface = base.Interface(name=str(name),
                                            mac=adapted_mac,
-                                           ip=str(ip))
-                stats = base.InterfaceStats(bandwidth=int(bandwidth),
-                                            rx_bytes=int(rx_bytes),
+                                           ip=str(ip),
+                                           speed=int(speed))
+                stats = base.InterfaceStats(rx_bytes=int(rx_bytes),
                                             tx_bytes=int(tx_bytes),
                                             error=int(error))
                 yield (interface, stats)
