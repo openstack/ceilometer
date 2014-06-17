@@ -380,7 +380,7 @@ class Connection(base.Connection):
                                        (sample_filter, require_meter=False))
             LOG.debug(_("Query Meter Table: %s") % q)
             gen = meter_table.scan(filter=q, row_start=start, row_stop=stop,
-                                   limit=limit)
+                                   limit=limit, columns=columns)
             for ignored, meter in gen:
                 d_meter = hbase_utils.deserialize_entry(meter)[0]
                 d_meter['message']['recorded_at'] = d_meter['recorded_at']
