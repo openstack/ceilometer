@@ -52,7 +52,6 @@ def write_autodoc_index():
     SRCS = {'ceilometer': ROOT}
 
     EXCLUDED_MODULES = ('ceilometer.tests','ceilometer.compute.nova_notifier',
-                        'ceilometer.openstack.common.db.sqlalchemy.session',
                         'ceilometer.openstack.common.middleware.audit',
                         'ceilometer.openstack.common.middleware.notifier',
                         'ceilometer.openstack.common.log_handler')
