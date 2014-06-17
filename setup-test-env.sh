@@ -9,7 +9,7 @@ function clean_exit(){
 }
 
 # Setup MongoDB test server
-MONGO_DATA=`mktemp -d /tmp/CEILO-MONGODB-XXXXX`
+MONGO_DATA=`mktemp -d --tmpdir CEILO-MONGODB-XXXXX`
 MONGO_PORT=29000
 trap "clean_exit" EXIT
 mkfifo ${MONGO_DATA}/out
