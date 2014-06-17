@@ -251,71 +251,74 @@ class NotificationEventsConverter(object):
     notification will be processed according to the LAST definition that
     matches it's event_type. (We use the last matching definition because that
     allows you to use YAML merge syntax in the definitions file.)
-    Each definition is a dictionary with the following keys (all are required):
-        event_type: this is a list of notification event_types this definition
-                    will handle. These can be wildcarded with unix shell glob
-                    (not regex!) wildcards.
-                    An exclusion listing (starting with a '!') will exclude any
-                    types listed from matching. If ONLY exclusions are listed,
-                    the definition will match anything not matching the
-                    exclusions.
-                    This item can also be a string, which will be taken as
-                    equivalent to 1 item list.
+    Each definition is a dictionary with the following keys (all are
+    required):
 
-                    Examples:
-                    *   ['compute.instance.exists'] will only match
-                            compute.intance.exists notifications
-                    *   "compute.instance.exists"   Same as above.
-                    *   ["image.create", "image.delete"]  will match
-                         image.create and image.delete, but not anything else.
-                    *   'compute.instance.*" will match
-                        compute.instance.create.start but not image.upload
-                    *   ['*.start','*.end', '!scheduler.*'] will match
-                        compute.instance.create.start, and image.delete.end,
-                        but NOT compute.instance.exists or
-                        scheduler.run_instance.start
-                    *   '!image.*' matches any notification except image
-                        notifications.
-                    *   ['*', '!image.*']  same as above.
-        traits:  dictionary, The keys are trait names, the values are the trait
-                 definitions
-            Each trait definition is a dictionary with the following keys:
-                type (optional): The data type for this trait. (as a string)
-                    Valid options are: 'text', 'int', 'float' and 'datetime'
-                    defaults to 'text' if not specified.
-                fields:  a path specification for the field(s) in the
-                    notification you wish to extract. The paths can be
-                    specified with a dot syntax (e.g. 'payload.host').
-                    dictionary syntax (e.g. 'payload[host]') is also supported.
-                    in either case, if the key for the field you are looking
-                    for contains special charecters, like '.', it will need to
-                    be quoted (with double or single quotes) like so:
+    - event_type: this is a list of notification event_types this definition
+      will handle. These can be wildcarded with unix shell glob (not regex!)
+      wildcards.
+      An exclusion listing (starting with a '!') will exclude any types listed
+      from matching. If ONLY exclusions are listed, the definition will match
+      anything not matching the exclusions.
+      This item can also be a string, which will be taken as equivalent to 1
+      item list.
 
-                          "payload.image_meta.'org.openstack__1__architecture'"
+                Examples:
 
-                    The syntax used for the field specification is a variant
-                    of JSONPath, and is fairly flexible.
-                    (see: https://github.com/kennknowles/python-jsonpath-rw
-                    for more info)  Specifications can be written to match
-                    multiple possible fields, the value for the trait will
-                    be derived from the matching fields that exist and have
-                    a non-null (i.e. is not None) values in the notification.
-                    By default the value will be the first such field.
-                    (plugins can alter that, if they wish)
+                * ['compute.instance.exists'] will only match
+                  compute.intance.exists notifications
+                * "compute.instance.exists"   Same as above.
+                * ["image.create", "image.delete"]  will match
+                  image.create and image.delete, but not anything else.
+                * "compute.instance.*" will match
+                  compute.instance.create.start but not image.upload
+                * ['*.start','*.end', '!scheduler.*'] will match
+                  compute.instance.create.start, and image.delete.end,
+                  but NOT compute.instance.exists or
+                  scheduler.run_instance.start
+                * '!image.*' matches any notification except image
+                  notifications.
+                * ['*', '!image.*']  same as above.
 
-                    This configuration value is normally a string, for
-                    convenience, it can be specified as a list of
-                    specifications, which will be OR'ed together (a union
-                    query in jsonpath terms)
-                plugin (optional): (dictionary) with the following keys:
-                    name: (string) name of a plugin to load
-                    parameters: (optional) Dictionary of keyword args to pass
-                                to the plugin on initialization.
-                                See documentation on each plugin to see what
-                                arguments it accepts.
-                    For convenience, this value can also be specified as a
-                    string, which is interpreted as a plugin name, which will
-                    be loaded with no parameters.
+    - traits: (dict) The keys are trait names, the values are the trait
+      definitions. Each trait definition is a dictionary with the following
+      keys:
+
+      - type (optional): The data type for this trait. (as a string)
+        Valid options are: 'text', 'int', 'float' and 'datetime', defaults to
+        'text' if not specified.
+      - fields:  a path specification for the field(s) in the notification you
+        wish to extract. The paths can be specified with a dot syntax
+        (e.g. 'payload.host') or dictionary syntax (e.g. 'payload[host]') is
+        also supported.
+        In either case, if the key for the field you are looking for contains
+        special charecters, like '.', it will need to be quoted (with double
+        or single quotes) like so::
+
+         "payload.image_meta.'org.openstack__1__architecture'"
+
+        The syntax used for the field specification is a variant of JSONPath,
+        and is fairly flexible.
+        (see: https://github.com/kennknowles/python-jsonpath-rw for more info)
+        Specifications can be written to match multiple possible fields, the
+        value for the trait will be derived from the matching fields that
+        exist and have a non-null (i.e. is not None) values in the
+        notification.
+        By default the value will be the first such field. (plugins can alter
+        that, if they wish)
+
+        This configuration value is normally a string, for convenience, it can
+        be specified as a list of specifications, which will be OR'ed together
+        (a union query in jsonpath terms)
+    - plugin (optional): (dictionary) with the following keys:
+
+      - name: (string) name of a plugin to load
+      - parameters: (optional) Dictionary of keyword args to pass
+        to the plugin on initialization. See documentation on each plugin to
+        see what arguments it accepts.
+
+      For convenience, this value can also be specified as a string, which is
+      interpreted as a plugin name, which will be loaded with no parameters.
 
     """
 

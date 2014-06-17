@@ -71,65 +71,88 @@ class Connection(base.Connection):
 
     Collections:
 
-    - meter (describes sample actually)
-      - row-key: consists of reversed timestamp, meter and an md5 of
-                 user+resource+project for purposes of uniqueness
-      - Column Families:
-          f: contains the following qualifiers:
-               -counter_name : <name of counter>
-               -counter_type : <type of counter>
-               -counter_unit : <unit of counter>
-               -counter_volume : <volume of counter>
-               -message: <raw incoming data>
-               -message_id: <id of message>
-               -message_signature: <signature of message>
-               -resource_metadata: raw metadata for corresponding resource
-                of the meter
-               -project_id: <id of project>
-               -resource_id: <id of resource>
-               -user_id: <id of user>
-               -recorded_at: <datetime when sample has been recorded (utc.now)>
-               -flattened metadata with prefix r_metadata. e.g.
-                f:r_metadata.display_name or f:r_metadata.tag
-               -rts: <reversed timestamp of entry>
-               -timestamp: <meter's timestamp (came from message)>
-               -source for meter with prefix 's'
+    - meter (describes sample actually):
 
-    - resource
+      - row-key: consists of reversed timestamp, meter and an md5 of
+        user+resource+project for purposes of uniqueness
+      - Column Families:
+
+        f: contains the following qualifiers:
+
+          - counter_name: <name of counter>
+          - counter_type: <type of counter>
+          - counter_unit: <unit of counter>
+          - counter_volume: <volume of counter>
+          - message: <raw incoming data>
+          - message_id: <id of message>
+          - message_signature: <signature of message>
+          - resource_metadata: raw metadata for corresponding resource
+            of the meter
+          - project_id: <id of project>
+          - resource_id: <id of resource>
+          - user_id: <id of user>
+          - recorded_at: <datetime when sample has been recorded (utc.now)>
+          - flattened metadata with prefix r_metadata. e.g.::
+
+             f:r_metadata.display_name or f:r_metadata.tag
+
+          - rts: <reversed timestamp of entry>
+          - timestamp: <meter's timestamp (came from message)>
+          - source for meter with prefix 's'
+
+    - resource:
+
       - row_key: uuid of resource
       - Column Families:
-          f: contains the following qualifiers:
-               -resource_metadata: raw metadata for corresponding resource
-               -project_id: <id of project>
-               -resource_id: <id of resource>
-               -user_id: <id of user>
-               -flattened metadata with prefix r_metadata. e.g.
-                f:r_metadata.display_name or f:r_metadata.tag
-               -sources for all corresponding meters with prefix 's'
-               -all meters for this resource in format
-                "%s+%s+%s!%s!%s" % (rts, source, counter_name, counter_type,
-                 counter_unit)
 
-    - alarm
+        f: contains the following qualifiers:
+
+          - resource_metadata: raw metadata for corresponding resource
+          - project_id: <id of project>
+          - resource_id: <id of resource>
+          - user_id: <id of user>
+          - flattened metadata with prefix r_metadata. e.g.::
+
+             f:r_metadata.display_name or f:r_metadata.tag
+
+          - sources for all corresponding meters with prefix 's'
+          - all meters for this resource in format:
+
+            .. code-block:: python
+
+              "%s+%s+%s!%s!%s" % (rts, source, counter_name, counter_type,
+              counter_unit)
+
+    - alarm:
+
       - row_key: uuid of alarm
       - Column Families:
-          f: contains the raw incoming alarm data
 
-    - alarm_h
+        f: contains the raw incoming alarm data
+
+    - alarm_h:
+
       - row_key: uuid of alarm + "_" + reversed timestamp
       - Column Families:
-          f: raw incoming alarm_history data. Timestamp becomes now()
-             if not determined
 
-    - events
+        f: raw incoming alarm_history data. Timestamp becomes now()
+          if not determined
+
+    - events:
+
       - row_key: timestamp of event's generation + uuid of event
-                 in format: "%s+%s" % (ts, Event.message_id)
-      -Column Families:
-          f: contains the following qualifiers:
-              -event_type: description of event's type
-              -timestamp: time stamp of event generation
-              -all traits for this event in format
-               "%s+%s" % (trait_name, trait_type)
+        in format: "%s+%s" % (ts, Event.message_id)
+      - Column Families:
+
+        f: contains the following qualifiers:
+
+          - event_type: description of event's type
+          - timestamp: time stamp of event generation
+          - all traits for this event in format:
+
+            .. code-block:: python
+
+              "%s+%s" % (trait_name, trait_type)
     """
 
     CAPABILITIES = utils.update_nested(base.Connection.CAPABILITIES,
@@ -212,8 +235,8 @@ class Connection(base.Connection):
 
         .. note::
 
-        HBase Thrift does not support authentication and there is no
-        database name, so we are not looking for these in the url.
+          HBase Thrift does not support authentication and there is no
+          database name, so we are not looking for these in the url.
         """
         opts = {}
         result = network_utils.urlsplit(url)
@@ -230,8 +253,9 @@ class Connection(base.Connection):
 
     def update_alarm(self, alarm):
         """Create an alarm.
+
         :param alarm: The alarm to create. It is Alarm object, so we need to
-        call as_dict()
+          call as_dict()
         """
         _id = alarm.alarm_id
         alarm_to_store = serialize_entry(alarm.as_dict())
@@ -300,7 +324,7 @@ class Connection(base.Connection):
         """Write the data to the backend storage system.
 
         :param data: a dictionary such as returned by
-                     ceilometer.meter.meter_message_from_counter
+          ceilometer.meter.meter_message_from_counter
         """
         with self.conn_pool.connection() as conn:
             resource_table = conn.table(self.RESOURCE_TABLE)
@@ -496,9 +520,9 @@ class Connection(base.Connection):
 
         .. note::
 
-           Due to HBase limitations the aggregations are implemented
-           in the driver itself, therefore this method will be quite slow
-           because of all the Thrift traffic it is going to create.
+          Due to HBase limitations the aggregations are implemented
+          in the driver itself, therefore this method will be quite slow
+          because of all the Thrift traffic it is going to create.
 
         """
         if groupby:
@@ -575,6 +599,9 @@ class Connection(base.Connection):
         """Write the events to Hbase.
 
         :param event_models: a list of models.Event objects.
+        :return problem_events: a list of events that could not be saved in a
+          (reason, event) tuple. From the reasons that are enumerated in
+          storage.models.Event only the UNKNOWN_PROBLEM is applicable here.
         """
         problem_events = []
 
@@ -607,7 +634,7 @@ class Connection(base.Connection):
         """Return an iterable of models.Event objects.
 
         :param event_filter: storage.EventFilter object, consists of filters
-                             for events that are stored in database.
+          for events that are stored in database.
         """
         q, start, stop = make_events_query_from_filter(event_filter)
         with self.conn_pool.connection() as conn:
@@ -656,6 +683,7 @@ class Connection(base.Connection):
         """Return a dictionary containing the name and data type of the trait.
 
         Only trait types for the provided event_type are returned.
+
         :param event_type: the type of the Event
         """
 
@@ -809,7 +837,7 @@ class MTable(object):
     @staticmethod
     def SingleColumnValueFilter(args, rows):
         """This method is called from scan() when 'SingleColumnValueFilter'
-        is found in the 'filter' argument
+        is found in the 'filter' argument.
         """
         op = args[2]
         column = "%s:%s" % (args[0], args[1])
@@ -841,9 +869,10 @@ class MTable(object):
         """This is filter for testing "in-memory HBase".
 
         This method is called from scan() when 'ColumnPrefixFilter' is found
-        in the 'filter' argument
-        :param args is list of filter arguments, contain prefix of column
-        :param rows is dict of row prefixes for filtering
+        in the 'filter' argument.
+
+        :param args: a list of filter arguments, contain prefix of column
+        :param rows: a dict of row prefixes for filtering
         """
         value = args[0]
         column = 'f:' + value
@@ -860,11 +889,12 @@ class MTable(object):
     def RowFilter(args, rows):
         """This is filter for testing "in-memory HBase".
 
-        This method is called from scan() when 'RowFilter'
-        is found in the 'filter' argument
-        :param args is list of filter arguments, it contains operator and
-        sought string
-        :param rows is dict of rows which are filtered
+        This method is called from scan() when 'RowFilter' is found in the
+        'filter' argument.
+
+        :param args: a list of filter arguments, it contains operator and
+          sought string
+        :param rows: a dict of rows which are filtered
         """
         op = args[0]
         value = args[1]
@@ -962,10 +992,10 @@ def timestamp(dt, reverse=True):
     the 'oldest' entries will be on top of the table or it should be the newest
     ones (reversed timestamp case).
 
-    :param: dt: datetime which is translated to timestamp
-    :param: reverse: a boolean parameter for reverse or straight count of
-    timestamp in milliseconds
-    :return count or reversed count of milliseconds since start of epoch
+    :param dt: datetime which is translated to timestamp
+    :param reverse: a boolean parameter for reverse or straight count of
+      timestamp in milliseconds
+    :return: count or reversed count of milliseconds since start of epoch
     """
     epoch = datetime.datetime(1970, 1, 1)
     td = dt - epoch
@@ -1008,7 +1038,8 @@ def make_events_query_from_filter(event_filter):
 def make_timestamp_query(func, start=None, start_op=None, end=None,
                          end_op=None, bounds_only=False, **kwargs):
     """Return a filter start and stop row for filtering and a query
-    which based on the fact that CF-name is 'rts'
+    which based on the fact that CF-name is 'rts'.
+
     :param start: Optional start timestamp
     :param start_op: Optional start timestamp operator, like gt, ge
     :param end: Optional end timestamp
@@ -1059,7 +1090,7 @@ def make_query(metaquery=None, trait_query=None, **kwargs):
     :param metaquery: optional metaquery dict
     :param trait_query: optional boolean, for trait_query from kwargs
     :param kwargs: key-value pairs to filter on. Key should be a real
-     column name in db
+      column name in db
     """
     q = []
     res_q = None
@@ -1119,7 +1150,7 @@ def _get_meter_columns(metaquery, **kwargs):
 
     :param metaquery: optional metaquery dict
     :param kwargs: key-value pairs to filter on. Key should be a real
-     column name in db
+      column name in db
     """
     columns = ['f:message', 'f:recorded_at']
     columns.extend(["f:%s" % k for k, v in kwargs.items() if v])
@@ -1133,7 +1164,7 @@ def make_sample_query_from_filter(sample_filter, require_meter=True):
 
     :param sample_filter: SampleFilter instance
     :param require_meter: If true and the filter does not have a meter,
-                          raise an error.
+      raise an error.
     """
 
     meter = sample_filter.meter
@@ -1240,9 +1271,8 @@ def deserialize_entry(entry, get_raw_meta=True):
     get_raw_meta is False.
 
     :param entry: entry from HBase, without row name and timestamp
-    :param get_raw_meta: If true then raw metadata will be returned
-                         If False metadata will be constructed from
-                         'f:r_metadata.' fields
+    :param get_raw_meta: If true then raw metadata will be returned,
+      if False metadata will be constructed from 'f:r_metadata.' fields
     """
     flatten_result = {}
     sources = []

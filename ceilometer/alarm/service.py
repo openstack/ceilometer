@@ -242,17 +242,16 @@ class AlarmNotifierService(os_service.Service):
     def notify_alarm(self, context, data):
         """Notify that alarm has been triggered.
 
-        data should be a dict with the following keys:
-        - actions, the URL of the action to run;
-          this is a mapped to extensions automatically
-        - alarm_id, the ID of the alarm that has been triggered
-        - previous, the previous state of the alarm
-        - current, the new state the alarm has transitioned to
-        - reason, the reason the alarm changed its state
-        - reason_data, a dict representation of the reason
+           :param context: Request context.
+           :param data: (dict):
 
-        :param context: Request context.
-        :param data: A dict as described above.
+             - actions, the URL of the action to run; this is mapped to
+               extensions automatically
+             - alarm_id, the ID of the alarm that has been triggered
+             - previous, the previous state of the alarm
+             - current, the new state the alarm has transitioned to
+             - reason, the reason the alarm changed its state
+             - reason_data, a dict representation of the reason
         """
         actions = data.get('actions')
         if not actions:

@@ -27,27 +27,30 @@ class OpencontrailDriver(driver.Driver):
 
     This driver uses resources in "pipeline.yaml".
     Resource requires below conditions:
+
     * resource is url
     * scheme is "opencontrail"
 
     This driver can be configured via query parameters.
     Supported parameters:
-    * scheme:
-        The scheme of request url to Opencontrail Analytics endpoint.
-        (default http)
-    * username:
-        This is username used by Opencontrail Analytics.(default None)
-    * password:
-        This is password used by Opencontrail Analytics.(default None)
-    * domain
-        This is domain used by Opencontrail Analytics.(default None)
-    * verify_ssl
-        Specify if the certificate will be checked for https request.
-        (default false)
 
-    e.g.
-        opencontrail://localhost:8143/?username=admin&password=admin&
-        scheme=https&domain=&verify_ssl=true
+    * scheme:
+      The scheme of request url to Opencontrail Analytics endpoint.
+      (default http)
+    * username:
+      This is username used by Opencontrail Analytics.(default None)
+    * password:
+      This is password used by Opencontrail Analytics.(default None)
+    * domain:
+      This is domain used by Opencontrail Analytics.(default None)
+    * verify_ssl:
+      Specify if the certificate will be checked for https request.
+      (default false)
+
+    e.g.::
+
+      opencontrail://localhost:8143/?username=admin&password=admin&
+      scheme=https&domain=&verify_ssl=true
     """
     @staticmethod
     def _prepare_cache(endpoint, params, cache):

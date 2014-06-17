@@ -654,6 +654,7 @@ class Connection(pymongo_base.Connection):
         Pagination works by requiring sort_key and sort_dir.
         We use the last item in previous page as the 'marker' for pagination.
         So we return values that follow the passed marker in the order.
+
         :param q: the query dict passed in.
         :param db_collection: Database collection that be query.
         :param limit: maximum number of items to return.
@@ -661,7 +662,8 @@ class Connection(pymongo_base.Connection):
                        results after this item.
         :param sort_keys: array of attributes by which results be sorted.
         :param sort_dir: direction in which results be sorted (asc, desc).
-        return: The query with sorting/pagination added.
+
+        :return: The query with sorting/pagination added.
         """
 
         sort_keys = sort_keys or []

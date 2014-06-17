@@ -26,15 +26,17 @@ Configuration:
 In /etc/swift/proxy-server.conf on the main pipeline add "ceilometer" just
 before "proxy-server" and add the following filter in the file:
 
-[filter:ceilometer]
-use = egg:ceilometer#swift
+.. code-block:: python
 
-# Some optional configuration
-# this allow to publish additional metadata
-metadata_headers = X-TEST
+    [filter:ceilometer]
+    use = egg:ceilometer#swift
 
-# Set reseller prefix (defaults to "AUTH_" if not set)
-reseller_prefix = AUTH_
+    # Some optional configuration
+    # this allow to publish additional metadata
+    metadata_headers = X-TEST
+
+    # Set reseller prefix (defaults to "AUTH_" if not set)
+    reseller_prefix = AUTH_
 """
 
 from __future__ import absolute_import
