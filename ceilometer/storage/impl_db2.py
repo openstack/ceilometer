@@ -35,6 +35,7 @@ from ceilometer.openstack.common import timeutils
 from ceilometer import storage
 from ceilometer.storage import base
 from ceilometer.storage import models
+from ceilometer.storage.mongo import utils as pymongo_utils
 from ceilometer.storage import pymongo_base
 from ceilometer import utils
 
@@ -71,7 +72,7 @@ class Connection(pymongo_base.Connection):
 
     CAPABILITIES = utils.update_nested(pymongo_base.Connection.CAPABILITIES,
                                        AVAILABLE_CAPABILITIES)
-    CONNECTION_POOL = pymongo_base.ConnectionPool()
+    CONNECTION_POOL = pymongo_utils.ConnectionPool()
 
     GROUP = {'_id': '$counter_name',
              'unit': {'$min': '$counter_unit'},
@@ -271,10 +272,10 @@ class Connection(pymongo_base.Connection):
             # Look for resources matching the above criteria and with
             # samples in the time range we care about, then change the
             # resource query to return just those resources by id.
-            ts_range = pymongo_base.make_timestamp_range(start_timestamp,
-                                                         end_timestamp,
-                                                         start_timestamp_op,
-                                                         end_timestamp_op)
+            ts_range = pymongo_utils.make_timestamp_range(start_timestamp,
+                                                          end_timestamp,
+                                                          start_timestamp_op,
+                                                          end_timestamp_op)
             if ts_range:
                 q['timestamp'] = ts_range
 
@@ -316,7 +317,7 @@ class Connection(pymongo_base.Connection):
         if aggregate:
             raise NotImplementedError('Selectable aggregates not implemented')
 
-        q = pymongo_base.make_query_from_filter(sample_filter)
+        q = pymongo_utils.make_query_from_filter(sample_filter)
 
         if period:
             if sample_filter.start:
