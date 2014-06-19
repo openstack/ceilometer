@@ -29,7 +29,7 @@ from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import gettextutils
 from ceilometer import service
 from ceilometer.tests import api as acl
-from ceilometer.tests.api.v2 import FunctionalTest
+from ceilometer.tests.api import v2
 from ceilometer.tests import base
 
 
@@ -78,7 +78,7 @@ class TestApp(base.BaseTestCase):
         os.unlink(tmpfile)
 
 
-class TestPecanApp(FunctionalTest):
+class TestPecanApp(v2.FunctionalTest):
 
     def test_pecan_extension_guessing_unset(self):
         # check Pecan does not assume .jpg is an extension
@@ -86,7 +86,7 @@ class TestPecanApp(FunctionalTest):
         self.assertEqual('application/json', response.content_type)
 
 
-class TestApiMiddleware(FunctionalTest):
+class TestApiMiddleware(v2.FunctionalTest):
 
     no_lang_translated_error = 'No lang translated error'
     en_US_translated_error = 'en-US translated error'

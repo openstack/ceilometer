@@ -21,7 +21,7 @@ import mock
 import wsme
 
 from ceilometer.api.controllers import v2 as api
-from ceilometer.openstack.common.fixture.mockpatch import PatchObject
+from ceilometer.openstack.common.fixture import mockpatch
 from ceilometer.openstack.common import test
 from ceilometer.openstack.common import timeutils
 from ceilometer import storage
@@ -175,10 +175,10 @@ class TestValidateGroupByFields(test.BaseTestCase):
 class TestQueryToKwArgs(tests_base.BaseTestCase):
     def setUp(self):
         super(TestQueryToKwArgs, self).setUp()
-        self.useFixture(PatchObject(api, '_sanitize_query',
-                        side_effect=lambda x, y, **z: x))
-        self.useFixture(PatchObject(api, '_verify_query_segregation',
-                        side_effect=lambda x, **z: x))
+        self.useFixture(mockpatch.PatchObject(
+            api, '_sanitize_query', side_effect=lambda x, y, **z: x))
+        self.useFixture(mockpatch.PatchObject(
+            api, '_verify_query_segregation', side_effect=lambda x, **z: x))
 
     def test_sample_filter_single(self):
         q = [api.Query(field='user_id',

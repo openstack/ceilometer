@@ -24,11 +24,11 @@ import mock
 
 from ceilometer.openstack.common.fixture import mockpatch
 from ceilometer.openstack.common import timeutils
-from ceilometer.tests.api.v2 import FunctionalTest
+from ceilometer.tests.api import v2
 from ceilometer.tests import db as tests_db
 
 
-class TestPostSamples(FunctionalTest,
+class TestPostSamples(v2.FunctionalTest,
                       tests_db.MixinTestsWithBackendScenarios):
     def fake_cast(self, ctxt, target, data):
         for m in data:

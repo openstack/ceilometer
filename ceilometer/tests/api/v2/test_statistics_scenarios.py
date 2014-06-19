@@ -20,11 +20,11 @@ import datetime
 
 from ceilometer.publisher import utils
 from ceilometer import sample
-from ceilometer.tests.api.v2 import FunctionalTest
+from ceilometer.tests.api import v2
 from ceilometer.tests import db as tests_db
 
 
-class TestMaxProjectVolume(FunctionalTest,
+class TestMaxProjectVolume(v2.FunctionalTest,
                            tests_db.MixinTestsWithBackendScenarios):
 
     PATH = '/meters/volume.size/statistics'
@@ -122,7 +122,7 @@ class TestMaxProjectVolume(FunctionalTest,
         self.assertEqual(1, data[0]['count'])
 
 
-class TestMaxResourceVolume(FunctionalTest,
+class TestMaxResourceVolume(v2.FunctionalTest,
                             tests_db.MixinTestsWithBackendScenarios):
 
     PATH = '/meters/volume.size/statistics'
@@ -243,7 +243,7 @@ class TestMaxResourceVolume(FunctionalTest,
         self.assertEqual(1, data[0]['count'])
 
 
-class TestSumProjectVolume(FunctionalTest,
+class TestSumProjectVolume(v2.FunctionalTest,
                            tests_db.MixinTestsWithBackendScenarios):
 
     PATH = '/meters/volume.size/statistics'
@@ -343,7 +343,7 @@ class TestSumProjectVolume(FunctionalTest,
         self.assertEqual(1, data[0]['count'])
 
 
-class TestSumResourceVolume(FunctionalTest,
+class TestSumResourceVolume(v2.FunctionalTest,
                             tests_db.MixinTestsWithBackendScenarios):
 
     PATH = '/meters/volume.size/statistics'
@@ -469,7 +469,7 @@ class TestSumResourceVolume(FunctionalTest,
         self.assertEqual(1, data[0]['count'])
 
 
-class TestGroupByInstance(FunctionalTest,
+class TestGroupByInstance(v2.FunctionalTest,
                           tests_db.MixinTestsWithBackendScenarios):
 
     PATH = '/meters/instance/statistics'
@@ -1214,7 +1214,7 @@ class TestGroupByInstance(FunctionalTest,
 
 
 @tests_db.run_with('mongodb', 'hbase', 'db2')
-class TestGroupBySource(FunctionalTest,
+class TestGroupBySource(v2.FunctionalTest,
                         tests_db.MixinTestsWithBackendScenarios):
 
     # FIXME(terriyu): We have to put test_group_by_source in its own class
@@ -1318,7 +1318,7 @@ class TestGroupBySource(FunctionalTest,
                 self.assertEqual(4, r['avg'])
 
 
-class TestSelectableAggregates(FunctionalTest,
+class TestSelectableAggregates(v2.FunctionalTest,
                                tests_db.MixinTestsWithBackendScenarios):
 
     PATH = '/meters/instance/statistics'
@@ -1562,7 +1562,7 @@ class TestSelectableAggregates(FunctionalTest,
 
 
 @tests_db.run_with('mongodb', 'hbase', 'db2')
-class TestUnparameterizedAggregates(FunctionalTest,
+class TestUnparameterizedAggregates(v2.FunctionalTest,
                                     tests_db.MixinTestsWithBackendScenarios):
 
     # We put the stddev test case in a separate class so that we

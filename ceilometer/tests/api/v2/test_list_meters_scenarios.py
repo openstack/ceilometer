@@ -25,11 +25,11 @@ import webtest.app
 
 from ceilometer.publisher import utils
 from ceilometer import sample
-from ceilometer.tests.api.v2 import FunctionalTest
+from ceilometer.tests.api import v2
 from ceilometer.tests import db as tests_db
 
 
-class TestListEmptyMeters(FunctionalTest,
+class TestListEmptyMeters(v2.FunctionalTest,
                           tests_db.MixinTestsWithBackendScenarios):
 
     def test_empty(self):
@@ -37,7 +37,7 @@ class TestListEmptyMeters(FunctionalTest,
         self.assertEqual([], data)
 
 
-class TestValidateUserInput(FunctionalTest,
+class TestValidateUserInput(v2.FunctionalTest,
                             tests_db.MixinTestsWithBackendScenarios):
 
     def test_list_meters_query_float_metadata(self):
@@ -61,7 +61,7 @@ class TestValidateUserInput(FunctionalTest,
                           'type': 'integer'}])
 
 
-class TestListMeters(FunctionalTest,
+class TestListMeters(v2.FunctionalTest,
                      tests_db.MixinTestsWithBackendScenarios):
 
     def setUp(self):

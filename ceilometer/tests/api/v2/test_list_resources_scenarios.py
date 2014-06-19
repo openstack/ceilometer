@@ -25,11 +25,11 @@ import six
 from ceilometer.openstack.common import timeutils
 from ceilometer.publisher import utils
 from ceilometer import sample
-from ceilometer.tests.api.v2 import FunctionalTest
+from ceilometer.tests.api import v2
 from ceilometer.tests import db as tests_db
 
 
-class TestListResources(FunctionalTest,
+class TestListResources(v2.FunctionalTest,
                         tests_db.MixinTestsWithBackendScenarios):
 
     def test_empty(self):

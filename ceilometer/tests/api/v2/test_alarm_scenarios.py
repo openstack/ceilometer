@@ -29,11 +29,11 @@ from six import moves
 
 from ceilometer.alarm.storage import models
 from ceilometer import messaging
-from ceilometer.tests.api.v2 import FunctionalTest
+from ceilometer.tests.api import v2
 from ceilometer.tests import db as tests_db
 
 
-class TestListEmptyAlarms(FunctionalTest,
+class TestListEmptyAlarms(v2.FunctionalTest,
                           tests_db.MixinTestsWithBackendScenarios):
 
     def test_empty(self):
@@ -41,7 +41,7 @@ class TestListEmptyAlarms(FunctionalTest,
         self.assertEqual([], data)
 
 
-class TestAlarms(FunctionalTest,
+class TestAlarms(v2.FunctionalTest,
                  tests_db.MixinTestsWithBackendScenarios):
 
     def setUp(self):
