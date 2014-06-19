@@ -25,7 +25,7 @@
 import datetime
 import repr
 
-from mock import patch
+import mock
 
 from ceilometer.openstack.common import timeutils
 from ceilometer.storage import impl_sqlalchemy
@@ -154,7 +154,7 @@ class EventTest(tests_db.TestBase):
         m = [models.Event("1", "Foo", now, []),
              models.Event("2", "Zoo", now, [])]
 
-        with patch.object(self.conn, "_record_event") as mock_save:
+        with mock.patch.object(self.conn, "_record_event") as mock_save:
             mock_save.side_effect = MyException("Boom")
             problem_events = self.conn.record_events(m)
         self.assertEqual(2, len(problem_events))
@@ -177,7 +177,7 @@ class RelationshipTest(scenarios.DBTestBase):
     # Note: Do not derive from SQLAlchemyEngineTestBase, since we
     # don't want to automatically inherit all the Meter setup.
 
-    @patch.object(timeutils, 'utcnow')
+    @mock.patch.object(timeutils, 'utcnow')
     def test_clear_metering_data_meta_tables(self, mock_utcnow):
         mock_utcnow.return_value = datetime.datetime(2012, 7, 2, 10, 45)
         self.conn.clear_expired_metering_data(3 * 60)

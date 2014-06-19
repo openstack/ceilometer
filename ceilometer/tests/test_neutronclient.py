@@ -14,7 +14,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from mock import patch
+import mock
 
 from ceilometer import neutron_client
 from ceilometer.openstack.common import test
@@ -42,8 +42,8 @@ class TestNeutronClient(test.BaseTestCase):
                  ]}
 
     def test_port_get_all(self):
-        with patch.object(self.nc.client, 'list_ports',
-                          side_effect=self.fake_ports_list):
+        with mock.patch.object(self.nc.client, 'list_ports',
+                               side_effect=self.fake_ports_list):
             ports = self.nc.port_get_all()
 
         self.assertEqual(1, len(ports))
@@ -67,8 +67,8 @@ class TestNeutronClient(test.BaseTestCase):
                  ]}
 
     def test_network_get_all(self):
-        with patch.object(self.nc.client, 'list_networks',
-                          side_effect=self.fake_networks_list):
+        with mock.patch.object(self.nc.client, 'list_networks',
+                               side_effect=self.fake_networks_list):
             networks = self.nc.network_get_all()
 
         self.assertEqual(1, len(networks))
@@ -94,8 +94,8 @@ class TestNeutronClient(test.BaseTestCase):
                           ]}
 
     def test_pool_list(self):
-        with patch.object(self.nc.client, 'list_pools',
-                          side_effect=self.fake_pool_list):
+        with mock.patch.object(self.nc.client, 'list_pools',
+                               side_effect=self.fake_pool_list):
             pools = self.nc.pool_get_all()
 
         self.assertEqual(1, len(pools))
@@ -122,8 +122,8 @@ class TestNeutronClient(test.BaseTestCase):
                          ]}
 
     def test_vip_list(self):
-        with patch.object(self.nc.client, 'list_vips',
-                          side_effect=self.fake_vip_list):
+        with mock.patch.object(self.nc.client, 'list_vips',
+                               side_effect=self.fake_vip_list):
             vips = self.nc.vip_get_all()
 
         self.assertEqual(1, len(vips))
@@ -144,8 +144,8 @@ class TestNeutronClient(test.BaseTestCase):
                             ]}
 
     def test_member_list(self):
-        with patch.object(self.nc.client, 'list_members',
-                          side_effect=self.fake_member_list):
+        with mock.patch.object(self.nc.client, 'list_members',
+                               side_effect=self.fake_member_list):
             members = self.nc.member_get_all()
 
         self.assertEqual(1, len(members))
@@ -166,8 +166,8 @@ class TestNeutronClient(test.BaseTestCase):
                   }]}
 
     def test_monitor_list(self):
-        with patch.object(self.nc.client, 'list_health_monitors',
-                          side_effect=self.fake_monitors_list):
+        with mock.patch.object(self.nc.client, 'list_health_monitors',
+                               side_effect=self.fake_monitors_list):
             monitors = self.nc.health_monitor_get_all()
 
         self.assertEqual(1, len(monitors))
@@ -184,8 +184,8 @@ class TestNeutronClient(test.BaseTestCase):
                   }]}
 
     def test_pool_stats(self):
-        with patch.object(self.nc.client, 'retrieve_pool_stats',
-                          side_effect=self.fake_pool_stats):
+        with mock.patch.object(self.nc.client, 'retrieve_pool_stats',
+                               side_effect=self.fake_pool_stats):
             stats = self.nc.pool_stats('fake_pool')['stats']
 
         self.assertEqual(1, len(stats))

@@ -23,11 +23,11 @@ import mock
 
 from ceilometer.openstack.common import timeutils
 from ceilometer.storage import models
-from ceilometer.tests.api.v2 import FunctionalTest
+from ceilometer.tests.api import v2
 from ceilometer.tests import db as tests_db
 
 
-class TestComputeDurationByResource(FunctionalTest,
+class TestComputeDurationByResource(v2.FunctionalTest,
                                     tests_db.MixinTestsWithBackendScenarios):
 
     def setUp(self):

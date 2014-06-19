@@ -22,7 +22,7 @@ import mock
 from ceilometer.central import manager
 from ceilometer.energy import kwapi
 from ceilometer.openstack.common import context
-from ceilometer.openstack.common.fixture.mockpatch import PatchObject
+from ceilometer.openstack.common.fixture import mockpatch
 from ceilometer.openstack.common import test
 
 
@@ -67,8 +67,8 @@ class TestKwapi(test.BaseTestCase):
         raise exceptions.EndpointNotFound("fake keystone exception")
 
     def test_endpoint_not_exist(self):
-        with PatchObject(kwapi._Base, 'get_kwapi_client',
-                         side_effect=self.fake_get_kwapi_client):
+        with mockpatch.PatchObject(kwapi._Base, 'get_kwapi_client',
+                                   side_effect=self.fake_get_kwapi_client):
             pollster = kwapi.EnergyPollster()
             samples = list(pollster.get_samples(self.manager, {}))
 
@@ -82,8 +82,8 @@ class TestEnergyPollster(test.BaseTestCase):
         super(TestEnergyPollster, self).setUp()
         self.context = context.get_admin_context()
         self.manager = TestManager()
-        self.useFixture(PatchObject(kwapi._Base, '_iter_probes',
-                                    side_effect=self.fake_iter_probes))
+        self.useFixture(mockpatch.PatchObject(
+            kwapi._Base, '_iter_probes', side_effect=self.fake_iter_probes))
 
     @staticmethod
     def fake_iter_probes(ksclient, cache):
@@ -142,8 +142,8 @@ class TestPowerPollster(test.BaseTestCase):
         super(TestPowerPollster, self).setUp()
         self.context = context.get_admin_context()
         self.manager = TestManager()
-        self.useFixture(PatchObject(kwapi._Base, '_iter_probes',
-                                    side_effect=self.fake_iter_probes))
+        self.useFixture(mockpatch.PatchObject(
+            kwapi._Base, '_iter_probes', side_effect=self.fake_iter_probes))
 
     @staticmethod
     def fake_iter_probes(ksclient, cache):

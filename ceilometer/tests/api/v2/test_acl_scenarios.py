@@ -27,7 +27,7 @@ from ceilometer.openstack.common import timeutils
 from ceilometer.publisher import utils
 from ceilometer import sample
 from ceilometer.tests import api as acl
-from ceilometer.tests.api.v2 import FunctionalTest
+from ceilometer.tests.api import v2
 from ceilometer.tests import db as tests_db
 
 VALID_TOKEN = '4562138218392831'
@@ -71,7 +71,7 @@ class FakeMemcache(object):
         pass
 
 
-class TestAPIACL(FunctionalTest,
+class TestAPIACL(v2.FunctionalTest,
                  tests_db.MixinTestsWithBackendScenarios):
 
     def setUp(self):

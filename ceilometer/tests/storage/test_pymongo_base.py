@@ -16,8 +16,7 @@ import contextlib
 import copy
 import datetime
 
-from mock import call
-from mock import patch
+import mock
 import pymongo
 
 from ceilometer.openstack.common.gettextutils import _
@@ -72,8 +71,8 @@ class CompatibilityTest(test_storage_scenarios.DBTestBase,
             self.db.meter.insert(record)
 
         # Stubout with the old version DB schema, the one w/o 'counter_unit'
-        with patch.object(self.conn, 'record_metering_data',
-                          side_effect=old_record_metering_data):
+        with mock.patch.object(self.conn, 'record_metering_data',
+                               side_effect=old_record_metering_data):
             self.counters = []
             c = sample.Sample(
                 'volume.size',
@@ -187,15 +186,16 @@ class CompatibilityTest(test_storage_scenarios.DBTestBase,
 
         pool = pymongo_utils.ConnectionPool()
         with contextlib.nested(
-                patch('pymongo.MongoClient',
-                      side_effect=pymongo.errors.ConnectionFailure('foo')),
-                patch.object(pymongo_utils.LOG, 'error'),
-                patch.object(pymongo_utils.LOG, 'warn'),
-                patch.object(pymongo_utils.time, 'sleep')
+                mock.patch(
+                    'pymongo.MongoClient',
+                    side_effect=pymongo.errors.ConnectionFailure('foo')),
+                mock.patch.object(pymongo_utils.LOG, 'error'),
+                mock.patch.object(pymongo_utils.LOG, 'warn'),
+                mock.patch.object(pymongo_utils.time, 'sleep')
         ) as (MockMongo, MockLOGerror, MockLOGwarn, Mocksleep):
             self.assertRaises(pymongo.errors.ConnectionFailure,
                               pool.connect, self.CONF.database.connection)
-            Mocksleep.assert_has_calls([call(retry_interval)
+            Mocksleep.assert_has_calls([mock.call(retry_interval)
                                         for i in range(max_retries)])
             MockLOGwarn.assert_any_call(
                 _('Unable to connect to the database server: %(errmsg)s.'

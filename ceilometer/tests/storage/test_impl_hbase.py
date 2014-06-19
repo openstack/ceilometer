@@ -23,7 +23,7 @@
   running the tests. Make sure the Thrift server is running on that server.
 
 """
-from mock import patch
+import mock
 
 from ceilometer.storage.hbase import inmemory as hbase_inmemory
 from ceilometer.storage import impl_hbase as hbase
@@ -50,8 +50,8 @@ class ConnectionTest(tests_db.TestBase,
         def get_connection_pool(conf):
             return TestConn(conf['host'], conf['port'])
 
-        with patch.object(hbase.Connection, '_get_connection_pool',
-                          side_effect=get_connection_pool):
+        with mock.patch.object(hbase.Connection, '_get_connection_pool',
+                               side_effect=get_connection_pool):
             conn = hbase.Connection('hbase://test_hbase:9090')
         self.assertIsInstance(conn.conn_pool, TestConn)
 

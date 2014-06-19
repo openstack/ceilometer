@@ -53,10 +53,11 @@ except ImportError:
 
 try:
     # Swift > 1.7.5 ... module exists but doesn't contain class.
-    from swift.common.utils import InputProxy
-except ImportError:
+    InputProxy = utils.InputProxy
+except AttributeError:
     # Swift <= 1.7.5 ... module exists and has class.
-    from swift.common.middleware.proxy_logging import InputProxy
+    from swift.common.middleware import proxy_logging
+    InputProxy = proxy_logging.InputProxy
 
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import timeutils

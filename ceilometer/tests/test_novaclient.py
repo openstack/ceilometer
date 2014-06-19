@@ -17,7 +17,6 @@
 # under the License.
 
 import mock
-from mock import patch
 import novaclient
 
 from ceilometer import nova_client
@@ -85,8 +84,8 @@ class TestNovaClient(test.BaseTestCase):
         return [a, b]
 
     def test_instance_get_all_by_host(self):
-        with patch.object(self.nv.nova_client.servers, 'list',
-                          side_effect=self.fake_servers_list):
+        with mock.patch.object(self.nv.nova_client.servers, 'list',
+                               side_effect=self.fake_servers_list):
             instances = self.nv.instance_get_all_by_host('foobar')
 
         self.assertEqual(2, len(instances))
@@ -104,8 +103,9 @@ class TestNovaClient(test.BaseTestCase):
         return [a]
 
     def test_instance_get_all_by_host_unknown_flavor(self):
-        with patch.object(self.nv.nova_client.servers, 'list',
-                          side_effect=self.fake_servers_list_unknown_flavor):
+        with mock.patch.object(
+                self.nv.nova_client.servers, 'list',
+                side_effect=self.fake_servers_list_unknown_flavor):
             instances = self.nv.instance_get_all_by_host('foobar')
 
         self.assertEqual(1, len(instances))
@@ -136,8 +136,9 @@ class TestNovaClient(test.BaseTestCase):
         return [a]
 
     def test_instance_get_all_by_host_unknown_image(self):
-        with patch.object(self.nv.nova_client.servers, 'list',
-                          side_effect=self.fake_servers_list_unknown_image):
+        with mock.patch.object(
+                self.nv.nova_client.servers, 'list',
+                side_effect=self.fake_servers_list_unknown_image):
             instances = self.nv.instance_get_all_by_host('foobar')
 
         self.assertEqual(1, len(instances))
