@@ -42,6 +42,7 @@ control_exchange                 ceilometer                            AMQP exch
 database_connection              mongodb://localhost:27017/ceilometer  Database connection string
 metering_api_port                8777                                  The port for the ceilometer API server
 reseller_prefix                  AUTH\_                                Prefix used by swift for reseller token
+nova_http_log_debug              False                                 Log request/response parameters between nova and ceilometer
 ===============================  ====================================  ==============================================================
 
 Service polling authentication
