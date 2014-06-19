@@ -78,7 +78,7 @@ def bool_from_string(subject, strict=False, default=False):
     Strings yielding False are 'f', 'false', 'off', 'n', 'no', or '0'.
     """
     if not isinstance(subject, six.string_types):
-        subject = str(subject)
+        subject = six.text_type(subject)
 
     lowered = subject.strip().lower()
 
@@ -159,19 +159,13 @@ def safe_encode(text, incoming=None,
                     sys.getdefaultencoding())
 
     if isinstance(text, six.text_type):
-        if six.PY3:
-            return text.encode(encoding, errors).decode(incoming)
-        else:
-            return text.encode(encoding, errors)
+        return text.encode(encoding, errors)
     elif text and encoding != incoming:
         # Decode text before encoding it with `encoding`
         text = safe_decode(text, incoming, errors)
-        if six.PY3:
-            return text.encode(encoding, errors).decode(incoming)
-        else:
-            return text.encode(encoding, errors)
-
-    return text
+        return text.encode(encoding, errors)
+    else:
+        return text
 
 
 def string_to_bytes(text, unit_system='IEC', return_int=False):

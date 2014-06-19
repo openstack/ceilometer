@@ -29,8 +29,8 @@ from ceilometer.openstack.common.middleware import base
 max_req_body_size = cfg.IntOpt('max_request_body_size',
                                deprecated_name='osapi_max_request_body_size',
                                default=114688,
-                               help='The maximum body size '
-                                    'per request, in bytes')
+                               help='The maximum body size for each '
+                                    ' request, in bytes.')
 
 CONF = cfg.CONF
 CONF.register_opt(max_req_body_size)
@@ -71,7 +71,8 @@ class RequestBodySizeLimiter(base.Middleware):
 
     @webob.dec.wsgify
     def __call__(self, req):
-        if req.content_length > CONF.max_request_body_size:
+        if (req.content_length is not None and
+                req.content_length > CONF.max_request_body_size):
             msg = _("Request is too large.")
             raise webob.exc.HTTPRequestEntityTooLarge(explanation=msg)
         if req.content_length is None and req.is_body_readable:
