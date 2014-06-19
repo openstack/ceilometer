@@ -58,13 +58,16 @@ class TestManager(manager.AgentManager):
         self.keystone = mock.Mock()
 
 
-class TestKwapi(base.BaseTestCase):
+class _BaseTestCase(base.BaseTestCase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
-        super(TestKwapi, self).setUp()
+        super(_BaseTestCase, self).setUp()
         self.context = context.get_admin_context()
         self.manager = TestManager()
+
+
+class TestKwapi(_BaseTestCase):
 
     @staticmethod
     def fake_get_kwapi_client(ksclient, endpoint):
@@ -80,13 +83,12 @@ class TestKwapi(base.BaseTestCase):
         self.assertEqual(0, len(samples))
 
 
-class TestEnergyPollster(base.BaseTestCase):
+class TestEnergyPollster(_BaseTestCase):
+    pollster_cls = kwapi.EnergyPollster
+    unit = 'kwh'
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestEnergyPollster, self).setUp()
-        self.context = context.get_admin_context()
-        self.manager = TestManager()
         self.useFixture(mockpatch.PatchObject(
             kwapi._Base, '_iter_probes', side_effect=self.fake_iter_probes))
 
@@ -104,12 +106,9 @@ class TestEnergyPollster(base.BaseTestCase):
 
     def test_sample(self):
         cache = {}
-        samples = list(kwapi.EnergyPollster().get_samples(
-            self.manager,
-            cache,
-            [ENDPOINT]
-        ))
-        self.assertEqual(3, len(samples))
+        samples = list(self.pollster_cls().get_samples(self.manager, cache,
+                                                       [ENDPOINT]))
+        self.assertEqual(len(PROBE_DICT['probes']), len(samples))
         samples_by_name = dict((s.resource_id, s) for s in samples)
         for name, probe in PROBE_DICT['probes'].items():
             sample = samples_by_name[name]
@@ -117,29 +116,25 @@ class TestEnergyPollster(base.BaseTestCase):
                 probe['timestamp']
             ).isoformat()
             self.assertEqual(expected, sample.timestamp)
-            self.assertEqual(probe['kwh'], sample.volume)
-            # self.assert_(
-            #     any(map(lambda sample: sample.volume == probe['w'],
-            #             power_samples)))
+            self.assertEqual(probe[self.unit], sample.volume)
 
 
-class TestEnergyPollsterCache(base.BaseTestCase):
+class TestPowerPollster(TestEnergyPollster):
+    pollster_cls = kwapi.PowerPollster
+    unit = 'w'
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
-    def setUp(self):
-        super(TestEnergyPollsterCache, self).setUp()
-        self.context = context.get_admin_context()
-        self.manager = TestManager()
+
+class TestEnergyPollsterCache(_BaseTestCase):
+    pollster_cls = kwapi.EnergyPollster
 
     def test_get_samples_cached(self):
         probe = {'id': 'A'}
         probe.update(PROBE_DICT['probes']['A'])
         cache = {
-            '%s-%s' % (ENDPOINT, kwapi.EnergyPollster.CACHE_KEY_PROBE):
-                [probe],
+            '%s-%s' % (ENDPOINT, self.pollster_cls.CACHE_KEY_PROBE): [probe],
         }
         self.manager.keystone = mock.Mock()
-        pollster = kwapi.EnergyPollster()
+        pollster = self.pollster_cls()
         with mock.patch.object(pollster, '_get_probes') as do_not_call:
             do_not_call.side_effect = AssertionError('should not be called')
             samples = list(pollster.get_samples(self.manager, cache,
@@ -147,64 +142,5 @@ class TestEnergyPollsterCache(base.BaseTestCase):
         self.assertEqual(1, len(samples))
 
 
-class TestPowerPollster(base.BaseTestCase):
-
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
-    def setUp(self):
-        super(TestPowerPollster, self).setUp()
-        self.context = context.get_admin_context()
-        self.manager = TestManager()
-        self.useFixture(mockpatch.PatchObject(
-            kwapi._Base, '_iter_probes', side_effect=self.fake_iter_probes))
-
-    @staticmethod
-    def fake_iter_probes(ksclient, cache, endpoint):
-        probes = PROBE_DICT['probes']
-        for key, value in six.iteritems(probes):
-            probe_dict = value
-            probe_dict['id'] = key
-            yield probe_dict
-
-    def test_default_discovery(self):
-        pollster = kwapi.PowerPollster()
-        self.assertEqual('endpoint:energy', pollster.default_discovery)
-
-    def test_sample(self):
-        cache = {}
-        samples = list(kwapi.PowerPollster().get_samples(
-            self.manager,
-            cache,
-            [ENDPOINT]
-        ))
-        self.assertEqual(3, len(samples))
-        samples_by_name = dict((s.resource_id, s) for s in samples)
-        for name, probe in PROBE_DICT['probes'].items():
-            sample = samples_by_name[name]
-            expected = datetime.datetime.fromtimestamp(
-                probe['timestamp']
-            ).isoformat()
-            self.assertEqual(expected, sample.timestamp)
-            self.assertEqual(probe['w'], sample.volume)
-
-
-class TestPowerPollsterCache(base.BaseTestCase):
-
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
-    def setUp(self):
-        super(TestPowerPollsterCache, self).setUp()
-        self.context = context.get_admin_context()
-        self.manager = TestManager()
-
-    def test_get_samples_cached(self):
-        probe = {'id': 'A'}
-        probe.update(PROBE_DICT['probes']['A'])
-        cache = {
-            '%s-%s' % (ENDPOINT, kwapi.PowerPollster.CACHE_KEY_PROBE): [probe],
-        }
-        self.manager.keystone = mock.Mock()
-        pollster = kwapi.PowerPollster()
-        with mock.patch.object(pollster, '_get_probes') as do_not_call:
-            do_not_call.side_effect = AssertionError('should not be called')
-            samples = list(pollster.get_samples(self.manager, cache,
-                                                [ENDPOINT]))
-        self.assertEqual(1, len(samples))
+class TestPowerPollsterCache(TestEnergyPollsterCache):
+    pollster_cls = kwapi.PowerPollster
