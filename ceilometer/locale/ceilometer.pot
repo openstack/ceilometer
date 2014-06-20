@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 2014.2.dev50.ga2139d8\n"
+"Project-Id-Version: ceilometer 2014.2.dev56.g0da00bf\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-06-19 06:01+0000\n"
+"POT-Creation-Date: 2014-06-20 06:01+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -921,11 +921,11 @@ msgstr ""
 msgid "Swift endpoint not found"
 msgstr ""
 
-#: ceilometer/openstack/common/gettextutils.py:271
+#: ceilometer/openstack/common/gettextutils.py:320
 msgid "Message objects do not support addition."
 msgstr ""
 
-#: ceilometer/openstack/common/gettextutils.py:280
+#: ceilometer/openstack/common/gettextutils.py:330
 msgid ""
 "Message objects do not support str() because they may contain non-ascii "
 "characters. Please use unicode() or translate() instead."
@@ -941,35 +941,35 @@ msgstr ""
 msgid "Deprecated: %s"
 msgstr ""
 
-#: ceilometer/openstack/common/log.py:438
+#: ceilometer/openstack/common/log.py:436
 #, python-format
 msgid "Error loading logging config %(log_config)s: %(err_msg)s"
 msgstr ""
 
-#: ceilometer/openstack/common/log.py:489
+#: ceilometer/openstack/common/log.py:487
 #, python-format
 msgid "syslog facility must be one of: %s"
 msgstr ""
 
-#: ceilometer/openstack/common/log.py:710
+#: ceilometer/openstack/common/log.py:725
 #, python-format
 msgid "Fatal call to deprecated config: %(msg)s"
 msgstr ""
 
 #: ceilometer/openstack/common/policy.py:96
-msgid "JSON file containing policy"
+msgid "The JSON file that defines policies."
 msgstr ""
 
 #: ceilometer/openstack/common/policy.py:99
-msgid "Rule enforced when requested rule is not found"
+msgid "Default rule. Enforced when a requested rule is not found."
 msgstr ""
 
-#: ceilometer/openstack/common/policy.py:113
+#: ceilometer/openstack/common/policy.py:114
 #, python-format
 msgid "Policy doesn't allow %s to be performed."
 msgstr ""
 
-#: ceilometer/openstack/common/policy.py:207
+#: ceilometer/openstack/common/policy.py:208
 #, python-format
 msgid "Rules must be an instance of dict or Rules, got %s instead"
 msgstr ""
@@ -979,12 +979,12 @@ msgstr ""
 msgid "Unrecognized value '%(val)s', acceptable values are: %(acceptable)s"
 msgstr ""
 
-#: ceilometer/openstack/common/strutils.py:203
+#: ceilometer/openstack/common/strutils.py:197
 #, python-format
 msgid "Invalid unit system: \"%s\""
 msgstr ""
 
-#: ceilometer/openstack/common/strutils.py:212
+#: ceilometer/openstack/common/strutils.py:206
 #, python-format
 msgid "Invalid string format: %s"
 msgstr ""
@@ -1039,27 +1039,27 @@ msgstr ""
 msgid "model should be a subclass of ModelBase"
 msgstr ""
 
-#: ceilometer/openstack/common/db/sqlalchemy/utils.py:286
+#: ceilometer/openstack/common/db/sqlalchemy/utils.py:294
 #, python-format
 msgid ""
 "Please specify column %s in col_name_col_instance param. It is required "
 "because column has unsupported type by sqlite)."
 msgstr ""
 
-#: ceilometer/openstack/common/db/sqlalchemy/utils.py:292
+#: ceilometer/openstack/common/db/sqlalchemy/utils.py:300
 #, python-format
 msgid ""
 "col_name_col_instance param has wrong type of column instance for column "
 "%s It should be instance of sqlalchemy.Column."
 msgstr ""
 
-#: ceilometer/openstack/common/db/sqlalchemy/utils.py:400
+#: ceilometer/openstack/common/db/sqlalchemy/utils.py:408
 msgid "Unsupported id columns type"
 msgstr ""
 
 #: ceilometer/openstack/common/middleware/sizelimit.py:55
 #: ceilometer/openstack/common/middleware/sizelimit.py:64
-#: ceilometer/openstack/common/middleware/sizelimit.py:75
+#: ceilometer/openstack/common/middleware/sizelimit.py:76
 msgid "Request is too large."
 msgstr ""
 

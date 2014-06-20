@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 2014.2.dev50.ga2139d8\n"
+"Project-Id-Version: ceilometer 2014.2.dev56.g0da00bf\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-06-19 06:01+0000\n"
+"POT-Creation-Date: 2014-06-20 06:01+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,7 +22,19 @@ msgstr ""
 msgid "task run outlasted interval by %s sec"
 msgstr ""
 
-#: ceilometer/openstack/common/service.py:363
+#: ceilometer/openstack/common/network_utils.py:149
+msgid "tcp_keepidle not available on your system"
+msgstr ""
+
+#: ceilometer/openstack/common/network_utils.py:156
+msgid "tcp_keepintvl not available on your system"
+msgstr ""
+
+#: ceilometer/openstack/common/network_utils.py:163
+msgid "tcp_keepknt not available on your system"
+msgstr ""
+
+#: ceilometer/openstack/common/service.py:364
 #, python-format
 msgid "pid %d not in child list"
 msgstr ""

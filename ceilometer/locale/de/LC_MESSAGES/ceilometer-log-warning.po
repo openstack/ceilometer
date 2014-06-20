@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-06-19 06:01+0000\n"
+"POT-Creation-Date: 2014-06-20 06:01+0000\n"
 "PO-Revision-Date: 2014-06-14 19:30+0000\n"
 "Last-Translator: Andreas Jaeger <jaegerandi@gmail.com>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/ceilometer/"
@@ -25,7 +25,19 @@ msgstr ""
 msgid "task run outlasted interval by %s sec"
 msgstr "Ausgeführte Task hat Intervall um %s Sekunden überschritten"
 
-#: ceilometer/openstack/common/service.py:363
+#: ceilometer/openstack/common/network_utils.py:149
+msgid "tcp_keepidle not available on your system"
+msgstr ""
+
+#: ceilometer/openstack/common/network_utils.py:156
+msgid "tcp_keepintvl not available on your system"
+msgstr ""
+
+#: ceilometer/openstack/common/network_utils.py:163
+msgid "tcp_keepknt not available on your system"
+msgstr ""
+
+#: ceilometer/openstack/common/service.py:364
 #, python-format
 msgid "pid %d not in child list"
 msgstr "PID %d nicht in Liste untergeordneter Elemente"
