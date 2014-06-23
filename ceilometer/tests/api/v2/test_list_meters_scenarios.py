@@ -166,6 +166,17 @@ class TestListMeters(FunctionalTest,
                                        'size': 0,
                                        'util': 0.58,
                                        'is_public': True},
+                    source='test_source1'),
+                sample.Sample(
+                    u'meter.accent\xe9\u0437',
+                    'gauge',
+                    '',
+                    1,
+                    'user-id4',
+                    'project-id2',
+                    'resource-id4',
+                    timestamp=datetime.datetime(2014, 7, 2, 10, 43),
+                    resource_metadata={},
                     source='test_source1')]:
             msg = utils.meter_message_from_counter(
                 cnt,
@@ -175,13 +186,14 @@ class TestListMeters(FunctionalTest,
 
     def test_list_meters(self):
         data = self.get_json('/meters')
-        self.assertEqual(5, len(data))
+        self.assertEqual(6, len(data))
         self.assertEqual(set(['resource-id',
                               'resource-id2',
                               'resource-id3',
                               'resource-id4']),
                          set(r['resource_id'] for r in data))
-        self.assertEqual(set(['meter.test', 'meter.mine', 'meter.test.new']),
+        self.assertEqual(set(['meter.test', 'meter.mine', 'meter.test.new',
+                              u'meter.accent\xe9\u0437']),
                          set(r['name'] for r in data))
         self.assertEqual(set(['test_source', 'test_source1']),
                          set(r['source'] for r in data))
@@ -202,7 +214,7 @@ class TestListMeters(FunctionalTest,
 
     def test_list_samples(self):
         data = self.get_json('/samples')
-        self.assertEqual(6, len(data))
+        self.assertEqual(7, len(data))
 
     def test_query_samples_with_invalid_field_name_and_non_eq_operator(self):
         resp = self.get_json('/samples',
@@ -487,7 +499,7 @@ class TestListMeters(FunctionalTest,
                                             'value': 'test_source1',
                                             }])
         nids = set(r['name'] for r in data)
-        self.assertEqual(set(['meter.mine']), nids)
+        self.assertEqual(set(['meter.mine', u'meter.accent\xe9\u0437']), nids)
 
         sids = set(r['source'] for r in data)
         self.assertEqual(set(['test_source1']), sids)
@@ -657,6 +669,6 @@ class TestListMeters(FunctionalTest,
     def test_list_meters_meter_id(self):
         data = self.get_json('/meters')
         for i in data:
-            expected = base64.encodestring('%s+%s' % (i['resource_id'],
-                                                      i['name']))
+            meter_id = '%s+%s' % (i['resource_id'], i['name'])
+            expected = base64.encodestring(meter_id.encode('utf-8'))
             self.assertEqual(expected, i['meter_id'])
