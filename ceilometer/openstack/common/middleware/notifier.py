@@ -66,7 +66,7 @@ class RequestNotifier(base.Middleware):
 
         """
         return dict((k, v) for k, v in environ.iteritems()
-                    if k.isupper())
+                    if k.isupper() and k != 'HTTP_X_AUTH_TOKEN')
 
     @log_and_ignore_error
     def process_request(self, request):
