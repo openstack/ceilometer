@@ -283,7 +283,7 @@ class Event(Base):
     generated = Column(PreciseTimestamp())
 
     event_type_id = Column(Integer, ForeignKey('event_type.id'))
-    event_type = relationship("EventType", backref=backref('event_type'))
+    event_type = relationship("EventType", backref='events')
 
     def __init__(self, message_id, event_type, generated):
         self.message_id = message_id
@@ -334,7 +334,7 @@ class Trait(Base):
     id = Column(Integer, primary_key=True)
 
     trait_type_id = Column(Integer, ForeignKey('trait_type.id'))
-    trait_type = relationship("TraitType", backref=backref('trait_type'))
+    trait_type = relationship("TraitType", backref='traits')
 
     t_string = Column(String(255), nullable=True, default=None)
     t_float = Column(Float(53), nullable=True, default=None)
@@ -342,7 +342,7 @@ class Trait(Base):
     t_datetime = Column(PreciseTimestamp(), nullable=True, default=None)
 
     event_id = Column(Integer, ForeignKey('event.id'))
-    event = relationship("Event", backref=backref('event', order_by=id))
+    event = relationship("Event", backref=backref('traits', order_by=id))
 
     _value_map = {api_models.Trait.TEXT_TYPE: 't_string',
                   api_models.Trait.FLOAT_TYPE: 't_float',
@@ -376,7 +376,7 @@ class Trait(Base):
         return None
 
     def __repr__(self):
-        name = self.trait_type.name if self.trait_type else None
+        name = self.trait_type.desc if self.trait_type else None
         data_type = (self.trait_type.data_type if self.trait_type else
                      api_models.Trait.NONE_TYPE)
 
