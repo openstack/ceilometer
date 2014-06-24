@@ -46,6 +46,10 @@ AVAILABLE_CAPABILITIES = {
                              'metadata': True},
                    'aggregation': {'standard': True}},
     'events': {'query': {'simple': True}},
+    'alarms': {'query': {'simple': True,
+                         'complex': False},
+               'history': {'query': {'simple': True,
+                                     'complex': False}}},
 }
 
 

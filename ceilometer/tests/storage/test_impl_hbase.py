@@ -90,9 +90,9 @@ class CapabilitiesTest(test_base.BaseTestCase):
                                                'stddev': False,
                                                'cardinality': False}}
                            },
-            'alarms': {'query': {'simple': False,
+            'alarms': {'query': {'simple': True,
                                  'complex': False},
-                       'history': {'query': {'simple': False,
+                       'history': {'query': {'simple': True,
                                              'complex': False}}},
             'events': {'query': {'simple': True}},
         }
