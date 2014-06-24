@@ -13,9 +13,9 @@ MySQL-python
 docutils==0.9.1
 oslosphinx
 oslotest
-pymongo>=2.4
+pymongo>=2.5
 python-subunit>=0.0.18
-sphinx>=1.2.1,<1.3
+sphinx>=1.1.2,!=1.2.0,<1.3
 sphinxcontrib-docbookrestapi
 sphinxcontrib-httpdomain
 sphinxcontrib-pecanwsme>=0.8
