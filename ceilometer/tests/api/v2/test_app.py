@@ -18,64 +18,12 @@
 """Test basic ceilometer-api app
 """
 import json
-import os
 
 import mock
 import wsme
 
-from ceilometer.api import app
-from ceilometer.openstack.common import fileutils
-from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import gettextutils
-from ceilometer import service
-from ceilometer.tests import api as acl
 from ceilometer.tests.api import v2
-from ceilometer.tests import base
-
-
-class TestApp(base.BaseTestCase):
-
-    def setUp(self):
-        super(TestApp, self).setUp()
-        self.CONF = self.useFixture(config.Config()).conf
-
-    def test_keystone_middleware_conf(self):
-        self.CONF.set_override("auth_protocol", "file",
-                               group=acl.OPT_GROUP_NAME)
-        self.CONF.set_override("auth_version", "v2.0",
-                               group=acl.OPT_GROUP_NAME)
-        self.CONF.set_override("pipeline_cfg_file",
-                               self.path_get("etc/ceilometer/pipeline.yaml"))
-        self.CONF.set_override('connection', "log://", group="database")
-        self.CONF.set_override("auth_uri", None, group=acl.OPT_GROUP_NAME)
-        file_name = self.path_get('etc/ceilometer/api_paste.ini')
-        self.CONF.set_override("api_paste_config", file_name)
-
-        api_app = app.load_app()
-        self.assertTrue(api_app.auth_uri.startswith('file'))
-
-    def test_keystone_middleware_parse_conffile(self):
-        pipeline_conf = self.path_get("etc/ceilometer/pipeline.yaml")
-        api_conf = self.path_get('etc/ceilometer/api_paste.ini')
-        content = ("[DEFAULT]\n"
-                   "rpc_backend = fake\n"
-                   "pipeline_cfg_file = {0}\n"
-                   "api_paste_config = {1}\n"
-                   "[{2}]\n"
-                   "auth_protocol = file\n"
-                   "auth_version = v2.0\n".format(pipeline_conf,
-                                                  api_conf,
-                                                  acl.OPT_GROUP_NAME))
-
-        tmpfile = fileutils.write_to_tempfile(content=content,
-                                              prefix='ceilometer',
-                                              suffix='.conf')
-        service.prepare_service(['ceilometer-api',
-                                 '--config-file=%s' % tmpfile])
-        self.CONF.set_override('connection', "log://", group="database")
-        api_app = app.load_app()
-        self.assertTrue(api_app.auth_uri.startswith('file'))
-        os.unlink(tmpfile)
 
 
 class TestPecanApp(v2.FunctionalTest):
