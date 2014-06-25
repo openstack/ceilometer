@@ -64,9 +64,8 @@ class InstanceScheduled(UserMetadataAwareInstanceNotificationBase):
             volume=1,
             unit='instance',
             user_id=None,
-            project_id=
-            message['payload']['request_spec']
-            ['instance_properties']['project_id'],
+            project_id=message['payload']['request_spec']
+                              ['instance_properties']['project_id'],
             resource_id=message['payload']['instance_id'],
             message=message)
 

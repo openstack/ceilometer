@@ -773,8 +773,8 @@ class ComplexSampleQueryTest(DBTestBase,
 
     def test_query_complex_filter(self):
         self._create_samples()
-        results = list(self.conn.query_samples(filter_expr=
-                                               self.complex_filter))
+        results = list(self.conn.query_samples(filter_expr=(
+                                               self.complex_filter)))
         self.assertEqual(len(results), 6)
         for sample in results:
             self.assertIn(sample.resource_id,
@@ -878,8 +878,8 @@ class ComplexSampleQueryTest(DBTestBase,
         orderby = [{"counter_volume": "not valid order"},
                    {"resource_id": "desc"}]
 
-        query = lambda: list(self.conn.query_samples(filter_expr=
-                                                     self.complex_filter,
+        query = lambda: list(self.conn.query_samples(filter_expr=(
+                                                     self.complex_filter),
                                                      orderby=orderby))
         self.assertRaises(KeyError, query)
 
@@ -2566,8 +2566,8 @@ class ComplexAlarmQueryTest(AlarmTestBase,
 
     def test_filter_and_orderby(self):
         self.add_some_alarms()
-        result = list(self.conn.query_alarms(filter_expr=
-                                             {"=": {"enabled": True}},
+        result = list(self.conn.query_alarms(filter_expr=(
+                                             {"=": {"enabled": True}}),
                                              orderby=[{"name": "asc"}]))
         self.assertEqual(2, len(result))
         self.assertEqual(["orange-alert", "red-alert"],
@@ -2592,8 +2592,8 @@ class ComplexAlarmHistoryQueryTest(AlarmTestBase,
         alarms = list(self.conn.get_alarms())
         for alarm in alarms:
             i = alarms.index(alarm)
-            alarm_change = dict(event_id=
-                                "16fd2706-8baf-433b-82eb-8c7fada847c%s" % i,
+            alarm_change = dict(event_id=(
+                                "16fd2706-8baf-433b-82eb-8c7fada847c%s" % i),
                                 alarm_id=alarm.alarm_id,
                                 type=alarm_models.AlarmChange.CREATION,
                                 detail="detail %s" % alarm.name,
@@ -2605,8 +2605,8 @@ class ComplexAlarmHistoryQueryTest(AlarmTestBase,
                                                             30 + i))
             self.conn.record_alarm_change(alarm_change=alarm_change)
 
-            alarm_change2 = dict(event_id=
-                                 "16fd2706-8baf-433b-82eb-8c7fada847d%s" % i,
+            alarm_change2 = dict(event_id=(
+                                 "16fd2706-8baf-433b-82eb-8c7fada847d%s" % i),
                                  alarm_id=alarm.alarm_id,
                                  type=alarm_models.AlarmChange.RULE_CHANGE,
                                  detail="detail %s" % i,
@@ -2635,9 +2635,9 @@ class ComplexAlarmHistoryQueryTest(AlarmTestBase,
             self.conn.record_alarm_change(alarm_change=alarm_change3)
 
             if alarm.name in ["red-alert", "yellow-alert"]:
-                alarm_change4 = dict(event_id=
+                alarm_change4 = dict(event_id=(
                                      "16fd2706-8baf-433b-82eb-8c7fada847f%s"
-                                     % i,
+                                     % i),
                                      alarm_id=alarm.alarm_id,
                                      type=alarm_models.AlarmChange.DELETION,
                                      detail="detail %s" % (i + 2),

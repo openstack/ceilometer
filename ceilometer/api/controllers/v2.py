@@ -1461,8 +1461,8 @@ class ResourcesController(rest.RestController):
         links = [_make_link('self', pecan.request.host_url, 'resources',
                             resource_id)]
         if meter_links:
-            for meter in pecan.request.storage_conn.get_meters(resource=
-                                                               resource_id):
+            for meter in pecan.request.storage_conn.get_meters(
+                    resource=resource_id):
                 query = {'field': 'resource_id', 'value': resource_id}
                 links.append(_make_link(meter.name, pecan.request.host_url,
                                         'meters', meter.name, query=query))

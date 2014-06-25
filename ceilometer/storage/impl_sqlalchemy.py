@@ -677,8 +677,8 @@ class Connection(base.Connection):
                                       state_timestamp=row.state_timestamp,
                                       ok_actions=row.ok_actions,
                                       alarm_actions=row.alarm_actions,
-                                      insufficient_data_actions=
-                                      row.insufficient_data_actions,
+                                      insufficient_data_actions=(
+                                          row.insufficient_data_actions),
                                       rule=row.rule,
                                       time_constraints=row.time_constraints,
                                       repeat_actions=row.repeat_actions)

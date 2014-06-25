@@ -32,8 +32,9 @@ class FakeComplexQuery(api.ValidatedComplexQuery):
     def __init__(self, db_model, additional_name_mapping=None, metadata=False):
         super(FakeComplexQuery, self).__init__(query=None,
                                                db_model=db_model,
-                                               additional_name_mapping=
-                                               additional_name_mapping or {},
+                                               additional_name_mapping=(
+                                                   additional_name_mapping or
+                                                   {}),
                                                metadata_allowed=metadata)
 
 

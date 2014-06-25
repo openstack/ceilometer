@@ -74,8 +74,7 @@ class Alarm(base.Model):
             state_timestamp=state_timestamp,
             ok_actions=ok_actions,
             alarm_actions=alarm_actions,
-            insufficient_data_actions=
-            insufficient_data_actions,
+            insufficient_data_actions=insufficient_data_actions,
             repeat_actions=repeat_actions,
             rule=rule,
             time_constraints=time_constraints)
