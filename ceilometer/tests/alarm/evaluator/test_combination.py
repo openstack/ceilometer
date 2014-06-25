@@ -88,16 +88,16 @@ class TestEvaluate(base.TestEvaluatorBase):
 
     def _combination_transition_reason(self, state, alarm_ids1, alarm_ids2):
         return ([('Transition to %(state)s due to alarms %(alarm_ids)s'
-                ' in state %(state)s')
+                  ' in state %(state)s')
                 % {'state': state, 'alarm_ids': ",".join(alarm_ids1)},
                 ('Transition to %(state)s due to alarms %(alarm_ids)s'
-                ' in state %(state)s')
+                 ' in state %(state)s')
                 % {'state': state, 'alarm_ids': ",".join(alarm_ids2)}],
                 [self._reason_data(alarm_ids1), self._reason_data(alarm_ids2)])
 
     def _combination_remaining_reason(self, state, alarm_ids1, alarm_ids2):
         return ([('Remaining as %(state)s due to alarms %(alarm_ids)s'
-                 ' in state %(state)s')
+                  ' in state %(state)s')
                 % {'state': state, 'alarm_ids': ",".join(alarm_ids1)},
                 ('Remaining as %(state)s due to alarms %(alarm_ids)s'
                  ' in state %(state)s')

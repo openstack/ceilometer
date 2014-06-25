@@ -186,11 +186,11 @@ class RelationshipTest(scenarios.DBTestBase):
         meta_tables = [sql_models.MetaText, sql_models.MetaFloat,
                        sql_models.MetaBigInt, sql_models.MetaBool]
         for table in meta_tables:
-            self.assertEqual(0, session.query(table)
-                .filter(~table.id.in_(
-                    session.query(sql_models.Sample.id)
-                        .group_by(sql_models.Sample.id)
-                        )).count())
+            self.assertEqual(0, (session.query(table)
+                                 .filter(~table.id.in_(
+                                     session.query(sql_models.Sample.id)
+                                     .group_by(sql_models.Sample.id))).count()
+                                 ))
 
 
 class CapabilitiesTest(test_base.BaseTestCase):

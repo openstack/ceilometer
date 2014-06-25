@@ -240,7 +240,7 @@ class PartitionCoordinator(object):
             still_ahead = self.this < self.oldest
         self.last_alarms = set(alarms)
         LOG.info(_('%(this)s not overtaken as master? %(still_ahead)s') %
-                ({'this': self.this, 'still_ahead': still_ahead}))
+                 ({'this': self.this, 'still_ahead': still_ahead}))
         return still_ahead
 
     def check_mastership(self, eval_interval, api_client):

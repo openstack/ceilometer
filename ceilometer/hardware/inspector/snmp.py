@@ -95,8 +95,8 @@ class SNMPInspector(base.Inspector):
         (error, data) = parse_snmp_return(ret)
         if error:
             raise SNMPException("An error occurred, oid %(oid)s, "
-                                "host %(host)s, %(err)s" % dict(oid=oid,
-                                host=host.hostname, err=data))
+                                "host %(host)s, %(err)s" %
+                                dict(oid=oid, host=host.hostname, err=data))
         else:
             return ret_func(data)
 

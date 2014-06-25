@@ -148,7 +148,7 @@ class TestLibvirtInspection(test.BaseTestCase):
                                                  side_effect=interfaceStats),
                                mock.patch.object(self.domain, 'info',
                                                  return_value=(0L, 0L, 0L,
-                                                 2L, 999999L))):
+                                                               2L, 999999L))):
             interfaces = list(self.inspector.inspect_vnics(self.instance_name))
 
             self.assertEqual(3, len(interfaces))
@@ -194,7 +194,7 @@ class TestLibvirtInspection(test.BaseTestCase):
                                                  return_value=self.domain),
                                mock.patch.object(self.domain, 'info',
                                                  return_value=(5L, 0L, 0L,
-                                                 2L, 999999L))):
+                                                               2L, 999999L))):
             interfaces = list(self.inspector.inspect_vnics(self.instance_name))
             self.assertEqual(interfaces, [])
 
@@ -221,10 +221,10 @@ class TestLibvirtInspection(test.BaseTestCase):
                                                  return_value=dom_xml),
                                mock.patch.object(self.domain, 'blockStats',
                                                  return_value=(1L, 2L, 3L,
-                                                              4L, -1)),
+                                                               4L, -1)),
                                mock.patch.object(self.domain, 'info',
                                                  return_value=(0L, 0L, 0L,
-                                                 2L, 999999L))):
+                                                               2L, 999999L))):
                 disks = list(self.inspector.inspect_disks(self.instance_name))
 
                 self.assertEqual(1, len(disks))
@@ -241,7 +241,7 @@ class TestLibvirtInspection(test.BaseTestCase):
                                                  return_value=self.domain),
                                mock.patch.object(self.domain, 'info',
                                                  return_value=(5L, 0L, 0L,
-                                                 2L, 999999L))):
+                                                               2L, 999999L))):
             disks = list(self.inspector.inspect_disks(self.instance_name))
             self.assertEqual(disks, [])
 

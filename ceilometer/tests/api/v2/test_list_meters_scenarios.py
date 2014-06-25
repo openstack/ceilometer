@@ -44,21 +44,21 @@ class TestValidateUserInput(v2.FunctionalTest,
         self.assertRaises(webtest.app.AppError, self.get_json,
                           '/meters/meter.test',
                           q=[{'field': 'metadata.util',
-                          'op': 'eq',
-                          'value': '0.7.5',
-                          'type': 'float'}])
+                              'op': 'eq',
+                              'value': '0.7.5',
+                              'type': 'float'}])
         self.assertRaises(webtest.app.AppError, self.get_json,
                           '/meters/meter.test',
                           q=[{'field': 'metadata.util',
-                          'op': 'eq',
-                          'value': 'abacaba',
-                          'type': 'boolean'}])
+                              'op': 'eq',
+                              'value': 'abacaba',
+                              'type': 'boolean'}])
         self.assertRaises(webtest.app.AppError, self.get_json,
                           '/meters/meter.test',
                           q=[{'field': 'metadata.util',
-                          'op': 'eq',
-                          'value': '45.765',
-                          'type': 'integer'}])
+                              'op': 'eq',
+                              'value': '45.765',
+                              'type': 'integer'}])
 
 
 class TestListMeters(v2.FunctionalTest,
@@ -260,9 +260,9 @@ class TestListMeters(v2.FunctionalTest,
     def test_list_meters_query_wrong_type_metadata(self):
         resp = self.get_json('/meters/meter.test',
                              q=[{'field': 'metadata.size',
-                             'op': 'eq',
-                             'value': '0',
-                             'type': 'blob'}],
+                                 'op': 'eq',
+                                 'value': '0',
+                                 'type': 'blob'}],
                              expect_errors=True
                              )
         expected_error_message = 'The data type blob is not supported.'
@@ -400,9 +400,9 @@ class TestListMeters(v2.FunctionalTest,
     def test_list_meters_query_integer_metadata(self):
         data = self.get_json('/meters/meter.test',
                              q=[{'field': 'metadata.size',
-                             'op': 'eq',
-                             'value': '0',
-                             'type': 'integer'}]
+                                 'op': 'eq',
+                                 'value': '0',
+                                 'type': 'integer'}]
                              )
         self.assertEqual(2, len(data))
         self.assertEqual(set(['resource-id',
@@ -416,9 +416,9 @@ class TestListMeters(v2.FunctionalTest,
     def test_list_meters_query_float_metadata(self):
         data = self.get_json('/meters/meter.test',
                              q=[{'field': 'metadata.util',
-                             'op': 'eq',
-                             'value': '0.75',
-                             'type': 'float'}]
+                                 'op': 'eq',
+                                 'value': '0.75',
+                                 'type': 'float'}]
                              )
         self.assertEqual(2, len(data))
         self.assertEqual(set(['resource-id',
@@ -432,9 +432,9 @@ class TestListMeters(v2.FunctionalTest,
     def test_list_meters_query_boolean_metadata(self):
         data = self.get_json('/meters/meter.mine',
                              q=[{'field': 'metadata.is_public',
-                             'op': 'eq',
-                             'value': 'False',
-                             'type': 'boolean'}]
+                                 'op': 'eq',
+                                 'value': 'False',
+                                 'type': 'boolean'}]
                              )
         self.assertEqual(1, len(data))
         self.assertEqual(set(['resource-id2']),
@@ -448,8 +448,8 @@ class TestListMeters(v2.FunctionalTest,
     def test_list_meters_query_string_metadata(self):
         data = self.get_json('/meters/meter.test',
                              q=[{'field': 'metadata.tag',
-                             'op': 'eq',
-                             'value': 'self.sample'}]
+                                 'op': 'eq',
+                                 'value': 'self.sample'}]
                              )
         self.assertEqual(1, len(data))
         self.assertEqual(set(['resource-id']),

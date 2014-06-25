@@ -934,7 +934,7 @@ class ComplexSampleQueryTest(DBTestBase,
         for sample in results:
             self.assertTrue((sample.resource_metadata["a_string_key"] ==
                             "meta-value0.81" or
-                            sample.resource_metadata["a_float_key"] <= 0.41))
+                             sample.resource_metadata["a_float_key"] <= 0.41))
             self.assertTrue(sample.resource_metadata["an_int_key"] > 42)
 
     def test_query_mixed_data_and_metadata_filter(self):
@@ -952,7 +952,7 @@ class ComplexSampleQueryTest(DBTestBase,
         for sample in results:
             self.assertTrue((sample.resource_metadata["a_string_key"] ==
                             "meta-value0.81" or
-                            sample.resource_metadata["a_float_key"] <= 0.41))
+                             sample.resource_metadata["a_float_key"] <= 0.41))
             self.assertEqual(sample.resource_id, "resource-id-42")
 
     def test_query_non_existing_metadata_with_result(self):
@@ -2545,7 +2545,7 @@ class ComplexAlarmQueryTest(AlarmTestBase,
                        [{"or":
                         [{"=": {"name": "yellow-alert"}},
                          {"=": {"name": "red-alert"}}]},
-                       {"=": {"enabled": True}}]}
+                        {"=": {"enabled": True}}]}
 
         result = list(self.conn.query_alarms(filter_expr=filter_expr))
 
@@ -2566,9 +2566,8 @@ class ComplexAlarmQueryTest(AlarmTestBase,
 
     def test_filter_and_orderby(self):
         self.add_some_alarms()
-        result = list(self.conn.query_alarms(filter_expr={"=":
-                                                          {"enabled":
-                                                          True}},
+        result = list(self.conn.query_alarms(filter_expr=
+                                             {"=": {"enabled": True}},
                                              orderby=[{"name": "asc"}]))
         self.assertEqual(2, len(result))
         self.assertEqual(["orange-alert", "red-alert"],

@@ -117,8 +117,8 @@ class _Base(plugin.ComputePollster):
 class _RateBase(_Base):
 
     NET_USAGE_MESSAGE = ' '.join(["NETWORK RATE:", "%s %s:",
-                                 "read-bytes-rate=%d",
-                                 "write-bytes-rate=%d"])
+                                  "read-bytes-rate=%d",
+                                  "write-bytes-rate=%d"])
 
     CACHE_KEY_VNIC = 'vnic-rates'
 
