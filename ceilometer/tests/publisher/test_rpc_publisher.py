@@ -117,8 +117,8 @@ class TestPublish(tests_base.BaseTestCase):
         class Matcher(object):
             @staticmethod
             def __eq__(data):
-                for i, sample in enumerate(data):
-                    if sample['counter_name'] != self.test_data[i].name:
+                for i, sample_item in enumerate(data):
+                    if sample_item['counter_name'] != self.test_data[i].name:
                         return False
                 return True
 

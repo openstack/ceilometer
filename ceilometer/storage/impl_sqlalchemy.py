@@ -1029,11 +1029,11 @@ class Connection(base.Connection):
                           and_(*event_join_conditions))
                 if event_filter_conditions:
                     query = query.filter(and_(*event_filter_conditions))
-                for (id, generated, message_id, desc) in query.all():
-                    event_models_dict[id] = api_models.Event(message_id,
-                                                             desc,
-                                                             generated,
-                                                             [])
+                for (id_, generated, message_id, desc_) in query.all():
+                    event_models_dict[id_] = api_models.Event(message_id,
+                                                              desc_,
+                                                              generated,
+                                                              [])
 
             # Build event models for the events
             event_query = event_query.subquery()
@@ -1099,8 +1099,8 @@ class Connection(base.Connection):
                                models.TraitType.data_type)
                      .distinct())
 
-            for desc, type in query.all():
-                yield {'name': desc, 'data_type': type}
+            for desc_, dtype in query.all():
+                yield {'name': desc_, 'data_type': dtype}
 
     def get_traits(self, event_type, trait_type=None):
         """Return all trait instances associated with an event_type. If
