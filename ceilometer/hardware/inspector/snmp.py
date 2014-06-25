@@ -51,20 +51,20 @@ def parse_snmp_return(ret):
 
 
 class SNMPInspector(base.Inspector):
-    #CPU OIDs
+    # CPU OIDs
     _cpu_1_min_load_oid = "1.3.6.1.4.1.2021.10.1.3.1"
     _cpu_5_min_load_oid = "1.3.6.1.4.1.2021.10.1.3.2"
     _cpu_15_min_load_oid = "1.3.6.1.4.1.2021.10.1.3.3"
-    #Memory OIDs
+    # Memory OIDs
     _memory_total_oid = "1.3.6.1.4.1.2021.4.5.0"
     _memory_used_oid = "1.3.6.1.4.1.2021.4.6.0"
-    #Disk OIDs
+    # Disk OIDs
     _disk_index_oid = "1.3.6.1.4.1.2021.9.1.1"
     _disk_path_oid = "1.3.6.1.4.1.2021.9.1.2"
     _disk_device_oid = "1.3.6.1.4.1.2021.9.1.3"
     _disk_size_oid = "1.3.6.1.4.1.2021.9.1.6"
     _disk_used_oid = "1.3.6.1.4.1.2021.9.1.8"
-    #Network Interface OIDs
+    # Network Interface OIDs
     _interface_index_oid = "1.3.6.1.2.1.2.2.1.1"
     _interface_name_oid = "1.3.6.1.2.1.2.2.1.2"
     _interface_bandwidth_oid = "1.3.6.1.2.1.2.2.1.5"
@@ -73,7 +73,7 @@ class SNMPInspector(base.Inspector):
     _interface_received_oid = "1.3.6.1.2.1.2.2.1.10"
     _interface_transmitted_oid = "1.3.6.1.2.1.2.2.1.16"
     _interface_error_oid = "1.3.6.1.2.1.2.2.1.20"
-    #Default port and security name
+    # Default port and security name
     _port = 161
     _security_name = 'public'
 
@@ -107,13 +107,13 @@ class SNMPInspector(base.Inspector):
         return self._get_or_walk_oid(oid, host, False)
 
     def inspect_cpu(self, host):
-        #get 1 minute load
+        # get 1 minute load
         cpu_1_min_load = \
             str(self._get_value_from_oid(self._cpu_1_min_load_oid, host))
-        #get 5 minute load
+        # get 5 minute load
         cpu_5_min_load = \
             str(self._get_value_from_oid(self._cpu_5_min_load_oid, host))
-        #get 15 minute load
+        # get 15 minute load
         cpu_15_min_load = \
             str(self._get_value_from_oid(self._cpu_15_min_load_oid, host))
 
@@ -122,9 +122,9 @@ class SNMPInspector(base.Inspector):
                             cpu_15_min=float(cpu_15_min_load))
 
     def inspect_memory(self, host):
-        #get total memory
+        # get total memory
         total = self._get_value_from_oid(self._memory_total_oid, host)
-        #get used memory
+        # get used memory
         used = self._get_value_from_oid(self._memory_used_oid, host)
 
         yield base.MemoryStats(total=int(total), used=int(used))

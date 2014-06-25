@@ -190,7 +190,7 @@ class Query(_Base):
     field = wtypes.text
     "The name of the field to test"
 
-    #op = wsme.wsattr(operation_kind, default='eq')
+    # op = wsme.wsattr(operation_kind, default='eq')
     # this ^ doesn't seem to work.
     op = wsme.wsproperty(operation_kind, get_op, set_op)
     "The comparison operator. Defaults to 'eq'."
@@ -434,9 +434,9 @@ def _validate_timestamp_fields(query, field_name, operator_list,
 
     for item in query:
         if item.field == field_name:
-            #If *timestamp* or *search_offset* field was specified in the
-            #query, but timestamp is not supported on that resource, on
-            #which the query was invoked, then raise an exception.
+            # If *timestamp* or *search_offset* field was specified in the
+            # query, but timestamp is not supported on that resource, on
+            # which the query was invoked, then raise an exception.
             if not allow_timestamps:
                 raise wsme.exc.UnknownArgument(field_name,
                                                "not valid for " +
@@ -1006,7 +1006,7 @@ class MetersController(rest.RestController):
         """
         q = q or []
 
-        #Timestamp field is not supported for Meter queries
+        # Timestamp field is not supported for Meter queries
         kwargs = _query_to_kwargs(q, pecan.request.storage_conn.get_meters,
                                   allow_timestamps=False)
         return [Meter.from_db_model(m)
@@ -1503,8 +1503,8 @@ class AlarmThresholdRule(_Base):
     meter_name = wsme.wsattr(wtypes.text, mandatory=True)
     "The name of the meter"
 
-    #FIXME(sileht): default doesn't work
-    #workaround: default is set in validate method
+    # FIXME(sileht): default doesn't work
+    # workaround: default is set in validate method
     query = wsme.wsattr([Query], default=[])
     """The query to find the data for computing statistics.
     Ownership settings are automatically included based on the Alarm owner.
@@ -1538,15 +1538,15 @@ class AlarmThresholdRule(_Base):
 
     @staticmethod
     def validate(threshold_rule):
-        #note(sileht): wsme default doesn't work in some case
-        #workaround for https://bugs.launchpad.net/wsme/+bug/1227039
+        # note(sileht): wsme default doesn't work in some case
+        # workaround for https://bugs.launchpad.net/wsme/+bug/1227039
         if not threshold_rule.query:
             threshold_rule.query = []
 
-        #Timestamp is not allowed for AlarmThresholdRule query, as the alarm
-        #evaluator will construct timestamp bounds for the sequence of
-        #statistics queries as the sliding evaluation window advances
-        #over time.
+        # Timestamp is not allowed for AlarmThresholdRule query, as the alarm
+        # evaluator will construct timestamp bounds for the sequence of
+        # statistics queries as the sliding evaluation window advances
+        # over time.
         _validate_query(threshold_rule.query, storage.SampleFilter.__init__,
                         allow_timestamps=False)
         return threshold_rule
@@ -2139,7 +2139,7 @@ class AlarmsController(rest.RestController):
         :param q: Filter rules for the alarms to be returned.
         """
         q = q or []
-        #Timestamp is not supported field for Simple Alarm queries
+        # Timestamp is not supported field for Simple Alarm queries
         kwargs = _query_to_kwargs(q,
                                   pecan.request.storage_conn.get_alarms,
                                   allow_timestamps=False)

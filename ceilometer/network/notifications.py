@@ -60,7 +60,7 @@ class NetworkNotificationBase(plugin.NotificationBase):
             # it may mean we miss charging for some amount of time,
             # but it is better than throwing away the existing
             # metadata for a resource when it is deleted.
-            ##'%s.delete.start' % (self.resource_name),
+            # '%s.delete.start' % (self.resource_name),
         ]
 
     @staticmethod

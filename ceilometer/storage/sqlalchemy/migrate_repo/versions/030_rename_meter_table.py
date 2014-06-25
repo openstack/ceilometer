@@ -105,7 +105,7 @@ def upgrade(migrate_engine):
     _alter_sourceassoc(meta, 'meter', 'idx_sm')
     sourceassoc = sa.Table('sourceassoc', meta, autoload=True)
     sourceassoc.c.meter_id.alter(name='sample_id')
-    #re-bind metadata to pick up alter name change
+    # re-bind metadata to pick up alter name change
     meta = sa.MetaData(bind=migrate_engine)
     _alter_sourceassoc(meta, 'sample', 'idx_ss', True)
 

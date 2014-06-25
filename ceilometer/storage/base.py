@@ -62,7 +62,7 @@ def _handle_sort_key(model_name, sort_key=None):
     if not sort_key:
         return sort_keys
     # NOTE(Fengqian): We need to put the sort key from user
-    #in the first place of sort keys list.
+    # in the first place of sort keys list.
     try:
         sort_keys.remove(sort_key)
     except ValueError:

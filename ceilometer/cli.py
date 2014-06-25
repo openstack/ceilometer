@@ -25,7 +25,7 @@ import sys
 import eventlet
 # NOTE(jd) We need to monkey patch the socket and select module for,
 # at least, oslo.messaging, otherwise everything's blocked on its
-# first read() or select(), thread need to be patched too, because
+# first read() or select(), thread need to be patched too, because
 # oslo.messaging use threading.local
 eventlet.monkey_patch(socket=True, select=True, thread=True)
 

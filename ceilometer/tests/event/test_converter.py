@@ -307,7 +307,7 @@ class TestTraitDefinition(ConverterBase):
             jsonpath_rw.parse('(payload.test)|(payload.other)'))
 
     def test_invalid_path_config(self):
-        #test invalid jsonpath...
+        # test invalid jsonpath...
         cfg = dict(fields='payload.bogus(')
         self.assertRaises(converter.EventDefinitionException,
                           converter.TraitDefinition,
@@ -316,7 +316,7 @@ class TestTraitDefinition(ConverterBase):
                           self.fake_plugin_mgr)
 
     def test_invalid_plugin_config(self):
-        #test invalid jsonpath...
+        # test invalid jsonpath...
         cfg = dict(fields='payload.test', plugin=dict(bogus="true"))
         self.assertRaises(converter.EventDefinitionException,
                           converter.TraitDefinition,
@@ -325,7 +325,7 @@ class TestTraitDefinition(ConverterBase):
                           self.fake_plugin_mgr)
 
     def test_unknown_plugin(self):
-        #test invalid jsonpath...
+        # test invalid jsonpath...
         cfg = dict(fields='payload.test', plugin=dict(name='bogus'))
         self.assertRaises(converter.EventDefinitionException,
                           converter.TraitDefinition,
@@ -351,7 +351,7 @@ class TestTraitDefinition(ConverterBase):
         self.assertEqual(models.Trait.DATETIME_TYPE, t.trait_type)
 
     def test_invalid_type_config(self):
-        #test invalid jsonpath...
+        # test invalid jsonpath...
         cfg = dict(type='bogus', fields='payload.test')
         self.assertRaises(converter.EventDefinitionException,
                           converter.TraitDefinition,

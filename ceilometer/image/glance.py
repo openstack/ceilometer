@@ -45,11 +45,11 @@ class _Base(plugin.CentralPollster):
 
     def _get_images(self, ksclient):
         client = self.get_glance_client(ksclient)
-        #TODO(eglynn): use pagination to protect against unbounded
+        # TODO(eglynn): use pagination to protect against unbounded
         #              memory usage
         rawImageList = list(itertools.chain(
             client.images.list(filters={"is_public": True}),
-            #TODO(eglynn): extend glance API with all_tenants logic to
+            # TODO(eglynn): extend glance API with all_tenants logic to
             #              avoid second call to retrieve private images
             client.images.list(filters={"is_public": False})))
 

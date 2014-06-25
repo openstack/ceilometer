@@ -66,7 +66,7 @@ class TestCoordinate(tests_base.BaseTestCase):
         self.mock_utcnow.return_value = self.override_start
         self.partition_coordinator = coordination.PartitionCoordinator()
         self.partition_coordinator.coordination_rpc = mock.Mock()
-        #add extra logger to check exception conditions and logged content
+        # add extra logger to check exception conditions and logged content
         self.str_handler = MockLoggingHandler()
         coordination.LOG.logger.addHandler(self.str_handler)
 

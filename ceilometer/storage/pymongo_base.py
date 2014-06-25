@@ -365,8 +365,8 @@ class Connection(base.Connection):
     @staticmethod
     def _decode_matching_metadata(matching_metadata):
         if isinstance(matching_metadata, dict):
-            #note(sileht): keep compatibility with alarm
-            #with matching_metadata as a dict
+            # note(sileht): keep compatibility with alarm
+            # with matching_metadata as a dict
             return matching_metadata
         else:
             new_matching_metadata = {}

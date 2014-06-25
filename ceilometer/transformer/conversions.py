@@ -216,7 +216,7 @@ class AggregatorTransformer(ScalingTransformer):
     def _get_unique_key(self, s):
         non_aggregated_keys = "-".join([getattr(s, field)
                                         for field in self.key_attributes])
-        #NOTE(sileht): it assumes, a meter always have the same unit/type
+        # NOTE(sileht): it assumes, a meter always have the same unit/type
         return "%s-%s-%s" % (s.name, s.resource_id, non_aggregated_keys)
 
     def handle_sample(self, context, sample):

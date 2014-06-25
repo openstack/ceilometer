@@ -333,7 +333,7 @@ class Connection(base.Connection):
                 data['counter_name'], data['counter_type'],
                 data['counter_unit'], rts, data['source'])
 
-            #TODO(nprivalova): try not to store resource_id
+            # TODO(nprivalova): try not to store resource_id
             resource = hbase_utils.serialize_entry(**{
                 'source': data['source'],
                 'meter': {new_meter: data['timestamp']},
@@ -348,7 +348,7 @@ class Connection(base.Connection):
             ts = int(time.mktime(data['timestamp'].timetuple()) * 1000)
             resource_table.put(data['resource_id'], resource, ts)
 
-            #TODO(nprivalova): improve uniqueness
+            # TODO(nprivalova): improve uniqueness
             # Rowkey consists of reversed timestamp, meter and an md5 of
             # user+resource+project for purposes of uniqueness
             m = hashlib.md5()

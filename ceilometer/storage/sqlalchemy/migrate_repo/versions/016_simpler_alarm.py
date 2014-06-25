@@ -81,7 +81,7 @@ def downgrade(migrate_engine):
 
     for row in table.select().execute().fetchall():
         if row.type != 'threshold':
-            #note: type insupported in previous version
+            # note: type insupported in previous version
             table.delete().where(table.c.id == row.id).execute()
         else:
             rule = json.loads(row.rule)
@@ -93,7 +93,7 @@ def downgrade(migrate_engine):
                       'meter_name': int(rule['mater_name']),
                       'matching_metadata': {}}
 
-            #note: op are ignored because previous format don't support it
+            # note: op are ignored because previous format don't support it
             for q in rule['query']:
                 values['matching_metadata'][q['field']] = q['value']
             values['matching_metadata'] = json.dumps(

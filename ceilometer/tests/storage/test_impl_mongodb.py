@@ -54,8 +54,8 @@ class MongoDBConnection(tests_db.TestBase):
 
 @tests_db.run_with('mongodb')
 class MongoDBTestMarkerBase(test_storage_scenarios.DBTestBase):
-    #NOTE(Fengqian): All these three test case are the same for resource
-    #and meter collection. As to alarm, we will set up in AlarmTestPagination.
+    # NOTE(Fengqian): All these three test case are the same for resource
+    # and meter collection. As to alarm, we will set up in AlarmTestPagination.
     def test_get_marker(self):
         marker_pairs = {'user_id': 'user-id-4'}
         ret = impl_mongodb.Connection._get_marker(self.conn.db.resource,

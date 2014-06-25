@@ -16,7 +16,7 @@ from sqlalchemy import Index, MetaData, Table
 
 
 INDEXES = {
-    #`table_name`: ((`index_name`, `column`),)
+    # `table_name`: ((`index_name`, `column`),)
     "user": (('ix_user_id', 'id'),),
     "source": (('ix_source_id', 'id'),),
     "project": (('ix_project_id', 'id'),),

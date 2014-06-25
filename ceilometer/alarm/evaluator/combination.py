@@ -41,8 +41,8 @@ class CombinationEvaluator(evaluator.Evaluator):
         """Ensure there is sufficient data for evaluation,
         transitioning to unknown otherwise.
         """
-        #note(sileht): alarm can be evaluated only with
-        #stable state of other alarm
+        # note(sileht): alarm can be evaluated only with
+        # stable state of other alarm
         alarms_missing_states = [alarm_id for alarm_id, state in states
                                  if not state or state == evaluator.UNKNOWN]
         sufficient = len(alarms_missing_states) == 0

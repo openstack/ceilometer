@@ -60,7 +60,7 @@ class NotificationBase(PluginBase):
         :param conf: Configuration.
         """
 
-        #TODO(sileht): Backwards compatibility, remove in J+1
+        # TODO(sileht): Backwards compatibility, remove in J+1
         if hasattr(self, 'get_exchange_topics'):
             LOG.warn(_('get_exchange_topics API of NotificationPlugin is'
                        'deprecated, implements get_targets instead.'))
@@ -114,8 +114,8 @@ class NotificationBase(PluginBase):
 
         """
 
-        #TODO(sileht): this will be moved into oslo.messaging
-        #see oslo.messaging bp notification-dispatcher-filter
+        # TODO(sileht): this will be moved into oslo.messaging
+        # see oslo.messaging bp notification-dispatcher-filter
         if not self._handle_event_type(notification['event_type'],
                                        self.event_types):
             return

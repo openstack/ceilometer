@@ -2868,8 +2868,7 @@ class GetEventTest(EventTestBase):
 
     def test_get_traits(self):
         traits = self.conn.get_traits("Bar")
-        #format results in a way that makes them easier to
-        #work with
+        # format results in a way that makes them easier to work with
         trait_dict = {}
         for trait in traits:
             trait_dict[trait.name] = trait.dtype
