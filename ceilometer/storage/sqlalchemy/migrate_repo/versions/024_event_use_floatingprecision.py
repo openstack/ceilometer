@@ -36,8 +36,8 @@ def _convert_data_type(table, col, from_t, to_t, pk_attr='id', index=False):
 
     query = sa.select([key_attr, orig_col])
     for key, value in migration.paged(query):
-        table.update().where(key_attr == key)\
-            .values({temp_col_n: value}).execute()
+        (table.update().where(key_attr == key).values({temp_col_n: value}).
+         execute())
 
     orig_col.drop()
     new_col.alter(name=col)

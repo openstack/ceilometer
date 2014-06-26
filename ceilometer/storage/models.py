@@ -51,9 +51,9 @@ class Event(base.Model):
         trait_list = []
         if self.traits:
             trait_list = [str(trait) for trait in self.traits]
-        return "<Event: %s, %s, %s, %s>" % \
-            (self.message_id, self.event_type, self.generated,
-             " ".join(trait_list))
+        return ("<Event: %s, %s, %s, %s>" %
+                (self.message_id, self.event_type, self.generated,
+                 " ".join(trait_list)))
 
 
 class Trait(base.Model):

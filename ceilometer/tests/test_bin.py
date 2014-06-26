@@ -80,9 +80,9 @@ class BinSendSampleTestCase(base.BaseTestCase):
     def setUp(self):
         super(BinSendSampleTestCase, self).setUp()
         pipeline_cfg_file = self.path_get('etc/ceilometer/pipeline.yaml')
-        content = "[DEFAULT]\n"\
-                  "rpc_backend=fake\n"\
-                  "pipeline_cfg_file={0}\n".format(pipeline_cfg_file)
+        content = ("[DEFAULT]\n"
+                   "rpc_backend=fake\n"
+                   "pipeline_cfg_file={0}\n".format(pipeline_cfg_file))
 
         self.tempfile = fileutils.write_to_tempfile(content=content,
                                                     prefix='ceilometer',
@@ -105,11 +105,10 @@ class BinApiTestCase(base.BaseTestCase):
     def setUp(self):
         super(BinApiTestCase, self).setUp()
         # create api_paste.ini file without authentication
-        content = \
-            "[pipeline:main]\n"\
-            "pipeline = api-server\n"\
-            "[app:api-server]\n"\
-            "paste.app_factory = ceilometer.api.app:app_factory\n"
+        content = ("[pipeline:main]\n"
+                   "pipeline = api-server\n"
+                   "[app:api-server]\n"
+                   "paste.app_factory = ceilometer.api.app:app_factory\n")
         self.paste = fileutils.write_to_tempfile(content=content,
                                                  prefix='api_paste',
                                                  suffix='.ini')
@@ -119,20 +118,20 @@ class BinApiTestCase(base.BaseTestCase):
         self.http = httplib2.Http()
         pipeline_cfg_file = self.path_get('etc/ceilometer/pipeline.yaml')
         policy_file = self.path_get('etc/ceilometer/policy.json')
-        content = "[DEFAULT]\n"\
-                  "rpc_backend=fake\n"\
-                  "auth_strategy=noauth\n"\
-                  "debug=true\n"\
-                  "pipeline_cfg_file={0}\n"\
-                  "policy_file={1}\n"\
-                  "api_paste_config={2}\n"\
-                  "[api]\n"\
-                  "port={3}\n"\
-                  "[database]\n"\
-                  "connection=log://localhost\n".format(pipeline_cfg_file,
-                                                        policy_file,
-                                                        self.paste,
-                                                        self.api_port)
+        content = ("[DEFAULT]\n"
+                   "rpc_backend=fake\n"
+                   "auth_strategy=noauth\n"
+                   "debug=true\n"
+                   "pipeline_cfg_file={0}\n"
+                   "policy_file={1}\n"
+                   "api_paste_config={2}\n"
+                   "[api]\n"
+                   "port={3}\n"
+                   "[database]\n"
+                   "connection=log://localhost\n".format(pipeline_cfg_file,
+                                                         policy_file,
+                                                         self.paste,
+                                                         self.api_port))
 
         self.tempfile = fileutils.write_to_tempfile(content=content,
                                                     prefix='ceilometer',

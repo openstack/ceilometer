@@ -157,10 +157,10 @@ class OpenDayLightDriver(driver.Driver):
                     user_links.append(user_link)
 
                 # get link status to hosts
-                container_data['active_hosts'] = cs.host_tracker.\
-                    get_active_hosts(container_name)
-                container_data['inactive_hosts'] = cs.host_tracker.\
-                    get_inactive_hosts(container_name)
+                container_data['active_hosts'] = (
+                    cs.host_tracker.get_active_hosts(container_name))
+                container_data['inactive_hosts'] = (
+                    cs.host_tracker.get_inactive_hosts(container_name))
 
                 container_data['timestamp'] = timeutils.isotime()
 

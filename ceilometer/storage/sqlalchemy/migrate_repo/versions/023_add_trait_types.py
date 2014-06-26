@@ -65,8 +65,8 @@ def upgrade(migrate_engine):
     # Move data from name_id column into trait_type_id column
     query = select([trait.c.id, trait.c.name_id])
     for key, value in migration.paged(query):
-        trait.update().where(trait.c.id == key)\
-            .values({"trait_type_id": value}).execute()
+        (trait.update().where(trait.c.id == key).
+         values({"trait_type_id": value}).execute())
 
     trait.c.name_id.drop()
 
@@ -128,14 +128,14 @@ def downgrade(migrate_engine):
     # copy data from trait_type.data_type into trait.t_type
     query = select([trait_type.c.id, trait_type.c.data_type])
     for key, value in migration.paged(query):
-        trait.update().where(trait.c.trait_type_id == key)\
-            .values({"t_type": value}).execute()
+        (trait.update().where(trait.c.trait_type_id == key).
+         values({"t_type": value}).execute())
 
     # Move data from name_id column into trait_type_id column
     query = select([trait.c.id, trait.c.trait_type_id])
     for key, value in migration.paged(query):
-        trait.update().where(trait.c.id == key)\
-            .values({"name_id": value}).execute()
+        (trait.update().where(trait.c.id == key).
+         values({"name_id": value}).execute())
 
     # Add a foreign key to the unique_name table
     params = {'columns': [trait.c.name_id],

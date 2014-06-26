@@ -108,14 +108,14 @@ class SNMPInspector(base.Inspector):
 
     def inspect_cpu(self, host):
         # get 1 minute load
-        cpu_1_min_load = \
-            str(self._get_value_from_oid(self._cpu_1_min_load_oid, host))
+        cpu_1_min_load = (
+            str(self._get_value_from_oid(self._cpu_1_min_load_oid, host)))
         # get 5 minute load
-        cpu_5_min_load = \
-            str(self._get_value_from_oid(self._cpu_5_min_load_oid, host))
+        cpu_5_min_load = (
+            str(self._get_value_from_oid(self._cpu_5_min_load_oid, host)))
         # get 15 minute load
-        cpu_15_min_load = \
-            str(self._get_value_from_oid(self._cpu_15_min_load_oid, host))
+        cpu_15_min_load = (
+            str(self._get_value_from_oid(self._cpu_15_min_load_oid, host)))
 
         yield base.CPUStats(cpu_1_min=float(cpu_1_min_load),
                             cpu_5_min=float(cpu_5_min_load),

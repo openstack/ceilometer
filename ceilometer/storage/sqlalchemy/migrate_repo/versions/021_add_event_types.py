@@ -63,10 +63,9 @@ def upgrade(migrate_engine):
     # and delete the entry from the unique_name table
     query = select([event.c.id, event.c.unique_name_id])
     for key, value in migration.paged(query):
-        event.update().where(event.c.id == key)\
-            .values({"event_type_id": value}).execute()
-        unique_name.delete()\
-            .where(unique_name.c.id == key).execute()
+        (event.update().where(event.c.id == key).
+         values({"event_type_id": value}).execute())
+        unique_name.delete().where(unique_name.c.id == key).execute()
 
     params = {'columns': [event.c.event_type_id],
               'refcolumns': [event_type.c.id]}
@@ -108,8 +107,8 @@ def downgrade(migrate_engine):
     # Move data from event_type_id column to unique_name_id column
     query = select([event.c.id, event.c.event_type_id])
     for key, value in migration.paged(query):
-        event.update().where(event.c.id == key)\
-            .values({"unique_name_id": value}).execute()
+        (event.update().where(event.c.id == key).
+         values({"unique_name_id": value}).execute())
 
     event.c.event_type_id.drop()
     params = {'columns': [event.c.unique_name_id],

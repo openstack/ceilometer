@@ -73,11 +73,11 @@ def upgrade(migrate_engine):
     index.create(bind=migrate_engine)
 
     for row in sa.select([meter]).execute():
-        sample.update()\
-            .where(sa.and_(sample.c.counter_name == row['name'],
-                           sample.c.counter_type == row['type'],
-                           sample.c.counter_unit == row['unit']))\
-            .values({sample.c.meter_id: row['id']}).execute()
+        (sample.update().
+         where(sa.and_(sample.c.counter_name == row['name'],
+                       sample.c.counter_type == row['type'],
+                       sample.c.counter_unit == row['unit'])).
+         values({sample.c.meter_id: row['id']}).execute())
 
     handle_rid_index(meta)
 
@@ -96,11 +96,11 @@ def downgrade(migrate_engine):
     sa.Column('counter_unit', sa.String(255)).create(sample)
     meter = sa.Table('meter', meta, autoload=True)
     for row in sa.select([meter]).execute():
-        sample.update()\
-            .where(sample.c.meter_id == row['id'])\
-            .values({sample.c.counter_name: row['name'],
-                     sample.c.counter_type: row['type'],
-                     sample.c.counter_unit: row['unit']}).execute()
+        (sample.update().
+         where(sample.c.meter_id == row['id']).
+         values({sample.c.counter_name: row['name'],
+                 sample.c.counter_type: row['type'],
+                 sample.c.counter_unit: row['unit']}).execute())
 
     params = {'columns': [sample.c.meter_id],
               'refcolumns': [meter.c.id]}

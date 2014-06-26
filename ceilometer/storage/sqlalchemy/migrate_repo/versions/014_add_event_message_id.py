@@ -40,10 +40,8 @@ def upgrade(migrate_engine):
                                from_obj=join)
 
     for event_id, value in traits.execute():
-        event.update().\
-            where(event.c.id == event_id).\
-            values(message_id=value).\
-            execute()
+        (event.update().where(event.c.id == event_id).values(message_id=value).
+         execute())
 
     # Leave the Trait, makes the rollback easier and won't really hurt anyone.
 

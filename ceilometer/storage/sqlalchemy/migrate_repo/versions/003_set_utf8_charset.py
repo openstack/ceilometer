@@ -23,8 +23,8 @@ def upgrade(migrate_engine):
         for table in tables:
             sql += "ALTER TABLE %s CONVERT TO CHARACTER SET utf8;" % table
         sql += "SET foreign_key_checks = 1;"
-        sql += "ALTER DATABASE %s DEFAULT CHARACTER SET utf8;" \
-            % migrate_engine.url.database
+        sql += ("ALTER DATABASE %s DEFAULT CHARACTER SET utf8;" %
+                migrate_engine.url.database)
         migrate_engine.execute(sql)
 
 
@@ -38,6 +38,6 @@ def downgrade(migrate_engine):
         for table in tables:
             sql += "ALTER TABLE %s CONVERT TO CHARACTER SET latin1;" % table
         sql += "SET foreign_key_checks = 1;"
-        sql += "ALTER DATABASE %s DEFAULT CHARACTER SET latin1;" \
-            % migrate_engine.url.database
+        sql += ("ALTER DATABASE %s DEFAULT CHARACTER SET latin1;" %
+                migrate_engine.url.database)
         migrate_engine.execute(sql)

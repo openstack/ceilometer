@@ -94,8 +94,8 @@ class TestCPUUtilPollster(base.TestPollsterBase):
         def inspect_cpu_util(name, duration):
             return six.next(next_value)
 
-        self.inspector.inspect_cpu_util = \
-            mock.Mock(side_effect=inspect_cpu_util)
+        self.inspector.inspect_cpu_util = (mock.
+                                           Mock(side_effect=inspect_cpu_util))
 
         mgr = manager.AgentManager()
         pollster = cpu.CPUUtilPollster()

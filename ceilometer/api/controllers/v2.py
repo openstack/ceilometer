@@ -254,19 +254,19 @@ class Query(_Base):
                     raise TypeError()
                 converted_value = self._type_converters[type](self.value)
         except ValueError:
-            msg = _('Unable to convert the value %(value)s'
-                    ' to the expected data type %(type)s.') % \
-                {'value': self.value, 'type': type}
+            msg = (_('Unable to convert the value %(value)s'
+                     ' to the expected data type %(type)s.') %
+                   {'value': self.value, 'type': type})
             raise ClientSideError(msg)
         except TypeError:
-            msg = _('The data type %(type)s is not supported. The supported'
-                    ' data type list is: %(supported)s') % \
-                {'type': type, 'supported': self._supported_types}
+            msg = (_('The data type %(type)s is not supported. The supported'
+                     ' data type list is: %(supported)s') %
+                   {'type': type, 'supported': self._supported_types})
             raise ClientSideError(msg)
         except Exception:
-            msg = _('Unexpected exception converting %(value)s to'
-                    ' the expected data type %(type)s.') % \
-                {'value': self.value, 'type': type}
+            msg = (_('Unexpected exception converting %(value)s to'
+                     ' the expected data type %(type)s.') %
+                   {'value': self.value, 'type': type})
             raise ClientSideError(msg)
         return converted_value
 
@@ -1553,14 +1553,13 @@ class AlarmThresholdRule(_Base):
 
     @property
     def default_description(self):
-        return _(
-            'Alarm when %(meter_name)s is %(comparison_operator)s a '
-            '%(statistic)s of %(threshold)s over %(period)s seconds') % \
-            dict(comparison_operator=self.comparison_operator,
-                 statistic=self.statistic,
-                 threshold=self.threshold,
-                 meter_name=self.meter_name,
-                 period=self.period)
+        return (_('Alarm when %(meter_name)s is %(comparison_operator)s a '
+                  '%(statistic)s of %(threshold)s over %(period)s seconds') %
+                dict(comparison_operator=self.comparison_operator,
+                     statistic=self.statistic,
+                     threshold=self.threshold,
+                     meter_name=self.meter_name,
+                     period=self.period))
 
     def as_dict(self):
         rule = self.as_dict_from_keys(['period', 'comparison_operator',
@@ -1624,8 +1623,8 @@ class AlarmTimeConstraint(_Base):
 
     def get_description(self):
         if not self._description:
-            return 'Time constraint at %s lasting for %s seconds' \
-                   % (self.start, self.duration)
+            return ('Time constraint at %s lasting for %s seconds'
+                    % (self.start, self.duration))
         return self._description
 
     def set_description(self, value):

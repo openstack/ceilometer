@@ -213,9 +213,9 @@ class MTable(object):
             data = rows[row]
             r_data = {}
             for key in data:
-                if (op == '=' and key.startswith(column)) or \
-                        (op == '>=' and key >= column) or \
-                        (op == '<=' and key <= column):
+                if ((op == '=' and key.startswith(column)) or
+                        (op == '>=' and key >= column) or
+                        (op == '<=' and key <= column)):
                     r_data[key] = data[key]
                 else:
                     raise NotImplementedError("In-memory QualifierFilter "

@@ -382,10 +382,12 @@ class Connection(pymongo_base.Connection):
             if period:
                 stat.period = period
                 periods = key.get('timestamp')
-                stat.period_start = period_start + \
-                    datetime.timedelta(**(_to_offset(periods)))
-                stat.period_end = period_start + \
-                    datetime.timedelta(**(_to_offset(periods + 1)))
+                stat.period_start = (period_start +
+                                     datetime.
+                                     timedelta(**(_to_offset(periods))))
+                stat.period_end = (period_start +
+                                   datetime.
+                                   timedelta(**(_to_offset(periods + 1))))
             else:
                 stat.period_start = stat.duration_start
                 stat.period_end = stat.duration_end

@@ -47,9 +47,9 @@ class CombinationEvaluator(evaluator.Evaluator):
                                  if not state or state == evaluator.UNKNOWN]
         sufficient = len(alarms_missing_states) == 0
         if not sufficient and alarm.state != evaluator.UNKNOWN:
-            reason = _('Alarms %(alarm_ids)s'
-                       ' are in unknown state') % \
-                {'alarm_ids': ",".join(alarms_missing_states)}
+            reason = (_('Alarms %(alarm_ids)s'
+                        ' are in unknown state') %
+                      {'alarm_ids': ",".join(alarms_missing_states)})
             reason_data = self._reason_data(alarms_missing_states)
             self._refresh(alarm, evaluator.UNKNOWN, reason, reason_data)
         return sufficient

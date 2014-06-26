@@ -108,8 +108,8 @@ class Client(object):
         attr_defaults = [('kernel_id', None),
                          ('ramdisk_id', None)]
 
-        instance.image['name'] = \
-            getattr(image, 'name') if image else 'unknown-id-%s' % iid
+        instance.image['name'] = (
+            getattr(image, 'name') if image else 'unknown-id-%s' % iid)
         image_metadata = getattr(image, 'metadata', None)
 
         for attr, default in attr_defaults:

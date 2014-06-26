@@ -2737,16 +2737,15 @@ class GetEventTest(EventTestBase):
         self.start = datetime.datetime(2013, 12, 31, 5, 0)
         now = self.start
         for event_type in ['Foo', 'Bar', 'Zoo', 'Foo', 'Bar', 'Zoo']:
-            trait_models = \
-                [models.Trait(name, dtype, value)
-                    for name, dtype, value in [
-                        ('trait_A', models.Trait.TEXT_TYPE,
-                            "my_%s_text" % event_type),
-                        ('trait_B', models.Trait.INT_TYPE,
-                            base + 1),
-                        ('trait_C', models.Trait.FLOAT_TYPE,
-                            float(base) + 0.123456),
-                        ('trait_D', models.Trait.DATETIME_TYPE, now)]]
+            trait_models = [models.Trait(name, dtype, value)
+                            for name, dtype, value in [
+                                ('trait_A', models.Trait.TEXT_TYPE,
+                                    "my_%s_text" % event_type),
+                                ('trait_B', models.Trait.INT_TYPE,
+                                    base + 1),
+                                ('trait_C', models.Trait.FLOAT_TYPE,
+                                    float(base) + 0.123456),
+                                ('trait_D', models.Trait.DATETIME_TYPE, now)]]
             self.event_models.append(
                 models.Event("id_%s_%d" % (event_type, base),
                              event_type, now, trait_models))
@@ -2888,8 +2887,7 @@ class GetEventTest(EventTestBase):
                          trait_dict["trait_D"])
 
     def test_get_all_traits(self):
-        traits = self.conn.\
-            get_traits("Foo")
+        traits = self.conn.get_traits("Foo")
         traits = [t for t in traits]
         self.assertEqual(8, len(traits))
 

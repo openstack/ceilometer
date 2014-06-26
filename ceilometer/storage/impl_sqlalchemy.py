@@ -250,10 +250,10 @@ class Connection(base.Connection):
             nested = session.connection().dialect.name != 'sqlite'
             with session.begin(nested=nested,
                                subtransactions=not nested):
-                obj = session.query(models.Meter)\
-                    .filter(models.Meter.name == name)\
-                    .filter(models.Meter.type == type)\
-                    .filter(models.Meter.unit == unit).first()
+                obj = (session.query(models.Meter)
+                       .filter(models.Meter.name == name)
+                       .filter(models.Meter.type == type)
+                       .filter(models.Meter.unit == unit).first())
                 if obj is None:
                     obj = models.Meter(name=name, type=type, unit=unit)
                     session.add(obj)
@@ -314,8 +314,8 @@ class Connection(base.Connection):
         session = self._engine_facade.get_session()
         with session.begin():
             end = timeutils.utcnow() - datetime.timedelta(seconds=ttl)
-            sample_query = session.query(models.Sample)\
-                .filter(models.Sample.timestamp < end)
+            sample_query = (session.query(models.Sample)
+                            .filter(models.Sample.timestamp < end))
             for sample_obj in sample_query.all():
                 session.delete(sample_obj)
 
@@ -374,15 +374,15 @@ class Connection(base.Connection):
 
         for res_id in res_q.all():
             # get latest Sample
-            max_q = session.query(models.Sample)\
-                .filter(models.Sample.resource_id == res_id[0])
+            max_q = (session.query(models.Sample)
+                     .filter(models.Sample.resource_id == res_id[0]))
             max_q = _apply_filters(max_q)
             max_q = max_q.order_by(models.Sample.timestamp.desc(),
                                    models.Sample.id.desc()).limit(1)
 
             # get the min timestamp value.
-            min_q = session.query(models.Sample.timestamp)\
-                .filter(models.Sample.resource_id == res_id[0])
+            min_q = (session.query(models.Sample.timestamp)
+                     .filter(models.Sample.resource_id == res_id[0]))
             min_q = _apply_filters(min_q)
             min_q = min_q.order_by(models.Sample.timestamp.asc()).limit(1)
 
@@ -433,17 +433,19 @@ class Connection(base.Connection):
         # by selecting a record for each (resource_id, meter_id).
         # max() is used to choice a sample record, so the latest record
         # is selected for each (resource_id, meter_id).
-        sample_subq = session.query(
-            func.max(models.Sample.id).label('id'))\
-            .group_by(models.Sample.meter_id, models.Sample.resource_id)
+        sample_subq = (session.query(
+                       func.max(models.Sample.id).label('id'))
+                       .group_by(models.Sample.meter_id,
+                                 models.Sample.resource_id))
         sample_subq = sample_subq.subquery()
 
         # SELECT sample.* FROM sample INNER JOIN
         #  (SELECT max(sample.id) AS id FROM sample
         #   GROUP BY sample.resource_id, sample.meter_id) AS anon_2
         # ON sample.id = anon_2.id
-        query_sample = session.query(models.MeterSample).\
-            join(sample_subq, models.MeterSample.id == sample_subq.c.id)
+        query_sample = (session.query(models.MeterSample).
+                        join(sample_subq, models.MeterSample.id ==
+                        sample_subq.c.id))
         query_sample = _apply_filters(query_sample)
 
         for sample in query_sample.all():
@@ -563,9 +565,9 @@ class Connection(base.Connection):
             group_attributes = [getattr(models.Sample, g) for g in groupby]
             select.extend(group_attributes)
 
-        query = session.query(*select).filter(
-            models.Meter.id == models.Sample.meter_id)\
-            .group_by(models.Meter.unit)
+        query = (session.query(*select).filter(
+                 models.Meter.id == models.Sample.meter_id).
+                 group_by(models.Meter.unit))
 
         if groupby:
             query = query.group_by(*group_attributes)
@@ -972,8 +974,8 @@ class Connection(base.Connection):
                                      models.Event.event_type_id]
 
             if event_filter.event_type:
-                event_join_conditions\
-                    .append(models.EventType.desc == event_filter.event_type)
+                event_join_conditions.append(models.EventType.desc ==
+                                             event_filter.event_type)
 
             event_query = event_query.join(models.EventType,
                                            and_(*event_join_conditions))
@@ -981,16 +983,16 @@ class Connection(base.Connection):
             # Build up the where conditions
             event_filter_conditions = []
             if event_filter.message_id:
-                event_filter_conditions\
-                    .append(models.Event.message_id == event_filter.message_id)
+                event_filter_conditions.append(models.Event.message_id ==
+                                               event_filter.message_id)
             if start:
                 event_filter_conditions.append(models.Event.generated >= start)
             if end:
                 event_filter_conditions.append(models.Event.generated <= end)
 
             if event_filter_conditions:
-                event_query = event_query\
-                    .filter(and_(*event_filter_conditions))
+                event_query = (event_query.
+                               filter(and_(*event_filter_conditions)))
 
             event_models_dict = {}
             if event_filter.traits_filter:
@@ -1013,20 +1015,20 @@ class Connection(base.Connection):
                         elif key == 'float':
                             conditions.append(models.Trait.t_float == value)
 
-                    trait_query = session.query(models.Trait.event_id)\
-                        .join(models.TraitType, and_(*conditions)).subquery()
+                    trait_query = (session.query(models.Trait.event_id).
+                                   join(models.TraitType,
+                                        and_(*conditions)).subquery())
 
-                    event_query = event_query\
-                        .join(trait_query,
-                              models.Event.id == trait_query.c.event_id)
+                    event_query = (event_query.
+                                   join(trait_query, models.Event.id ==
+                                        trait_query.c.event_id))
             else:
                 # If there are no trait filters, grab the events from the db
-                query = session.query(models.Event.id,
-                                      models.Event.generated,
-                                      models.Event.message_id,
-                                      models.EventType.desc)\
-                    .join(models.EventType,
-                          and_(*event_join_conditions))
+                query = (session.query(models.Event.id,
+                                       models.Event.generated,
+                                       models.Event.message_id,
+                                       models.EventType.desc).
+                         join(models.EventType, and_(*event_join_conditions)))
                 if event_filter_conditions:
                     query = query.filter(and_(*event_filter_conditions))
                 for (id_, generated, message_id, desc_) in query.all():
@@ -1037,10 +1039,11 @@ class Connection(base.Connection):
 
             # Build event models for the events
             event_query = event_query.subquery()
-            query = session.query(models.Trait)\
-                .join(models.TraitType,
-                      models.Trait.trait_type_id == models.TraitType.id)\
-                .join(event_query, models.Trait.event_id == event_query.c.id)
+            query = (session.query(models.Trait).
+                     join(models.TraitType, models.Trait.trait_type_id ==
+                          models.TraitType.id).
+                     join(event_query, models.Trait.event_id ==
+                          event_query.c.id))
 
             # Now convert the sqlalchemy objects back into Models ...
             for trait in query.all():
@@ -1065,8 +1068,8 @@ class Connection(base.Connection):
 
         session = self._engine_facade.get_session()
         with session.begin():
-            query = session.query(models.EventType.desc)\
-                .order_by(models.EventType.desc)
+            query = (session.query(models.EventType.desc).
+                     order_by(models.EventType.desc))
             for name in query.all():
                 # The query returns a tuple with one element.
                 yield name[0]
