@@ -234,7 +234,7 @@ class TestAlarms(v2.FunctionalTest,
     def test_get_not_existing_alarm(self):
         resp = self.get_json('/alarms/alarm-id-3', expect_errors=True)
         self.assertEqual(404, resp.status_code)
-        self.assertEqual("Alarm alarm-id-3 Not Found",
+        self.assertEqual('Alarm alarm-id-3 not found',
                          jsonutils.loads(resp.body)['error_message']
                          ['faultstring'])
 
@@ -1088,7 +1088,9 @@ class TestAlarms(v2.FunctionalTest,
                               'X-Project-Id': str(uuid.uuid4())}
         resp = self.post_json('/alarms', params=json, status=404,
                               headers=an_other_user_auth)
-        self.assertEqual("Alarm a Not Found",
+        self.assertEqual("Alarm a not found in project "
+                         "%s" %
+                         an_other_user_auth['X-Project-Id'],
                          jsonutils.loads(resp.body)['error_message']
                          ['faultstring'])
 
@@ -1121,7 +1123,8 @@ class TestAlarms(v2.FunctionalTest,
         headers['X-Roles'] = 'admin'
         resp = self.post_json('/alarms', params=json, status=404,
                               headers=headers)
-        self.assertEqual("Alarm a Not Found",
+        self.assertEqual("Alarm a not found in project "
+                         "aprojectidthatisnotmine",
                          jsonutils.loads(resp.body)['error_message']
                          ['faultstring'])
 
