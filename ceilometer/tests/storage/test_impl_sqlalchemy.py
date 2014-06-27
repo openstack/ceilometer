@@ -31,7 +31,6 @@ from ceilometer.openstack.common import timeutils
 from ceilometer.storage import impl_sqlalchemy
 from ceilometer.storage import models
 from ceilometer.storage.sqlalchemy import models as sql_models
-
 from ceilometer.tests import base as test_base
 from ceilometer.tests import db as tests_db
 from ceilometer.tests.storage import test_storage_scenarios as scenarios

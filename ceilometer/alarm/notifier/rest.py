@@ -19,7 +19,7 @@
 import eventlet
 from oslo.config import cfg
 import requests
-from six.moves.urllib import parse as urlparse
+import six.moves.urllib.parse as urlparse
 
 from ceilometer.alarm import notifier
 from ceilometer.openstack.common.gettextutils import _

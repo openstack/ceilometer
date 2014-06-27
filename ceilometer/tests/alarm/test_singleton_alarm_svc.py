@@ -17,8 +17,6 @@
 """Tests for ceilometer.alarm.service.SingletonAlarmService.
 """
 import mock
-
-
 from stevedore import extension
 
 from ceilometer.alarm import service

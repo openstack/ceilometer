@@ -16,8 +16,8 @@
 # under the License.
 
 import abc
-import six
 
+import six
 from stevedore import extension
 
 

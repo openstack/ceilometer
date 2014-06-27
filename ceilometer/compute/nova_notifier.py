@@ -17,27 +17,24 @@
 
 import sys
 
+from nova.compute import flavors
+from nova import conductor
 from nova import notifications
 from nova.openstack.common import log as logging
 from nova.openstack.common.notifier import api as notifier_api
+from nova import utils
+from stevedore import extension
 
 # HACK(dhellmann): Insert the nova version of openstack.common into
 # sys.modules as though it was the copy from ceilometer, so that when
 # we use modules from ceilometer below they do not re-define options.
 # use the real ceilometer base package
 import ceilometer  # noqa
-for name in ['openstack', 'openstack.common', 'openstack.common.log']:
-    sys.modules['ceilometer.' + name] = sys.modules['nova.' + name]
-
-from nova.compute import flavors
-from nova import conductor
-from nova import utils
-
-from stevedore import extension
-
 from ceilometer.compute.virt import inspector
 from ceilometer.openstack.common.gettextutils import _
 
+for name in ['openstack', 'openstack.common', 'openstack.common.log']:
+    sys.modules['ceilometer.' + name] = sys.modules['nova.' + name]
 
 # This module runs inside the nova compute
 # agent, which only configures the "nova" logger.

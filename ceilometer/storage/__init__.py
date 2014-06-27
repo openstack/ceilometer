@@ -19,7 +19,7 @@
 
 from oslo.config import cfg
 import six
-from six.moves.urllib import parse as urlparse
+import six.moves.urllib.parse as urlparse
 from stevedore import driver
 
 from ceilometer.openstack.common.gettextutils import _

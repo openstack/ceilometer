@@ -15,13 +15,13 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from stevedore import extension
+
 from ceilometer.openstack.common import context as req_context
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log as logging
 from ceilometer import pipeline
 from ceilometer import transformer
-
-from ceilometer.openstack.common.gettextutils import _
-from stevedore import extension
 
 
 LOG = logging.getLogger(__name__)

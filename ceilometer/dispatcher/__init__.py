@@ -16,9 +16,9 @@
 # under the License.
 
 import abc
-import six
 
 from oslo.config import cfg
+import six
 from stevedore import named
 
 from ceilometer.openstack.common.gettextutils import _

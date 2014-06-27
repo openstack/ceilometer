@@ -17,6 +17,7 @@ import datetime
 import mock
 from oslo.config import cfg
 
+from ceilometer.openstack.common import log
 from ceilometer.openstack.common import test
 from ceilometer.orchestration import notifications
 from ceilometer import sample
@@ -38,7 +39,6 @@ STACK_ARN = u'arn:openstack:heat::%s:stacks/%s/%s' % (TENANT_ID,
 CONF = cfg.CONF
 CONF.set_override('use_stderr', True)
 
-from ceilometer.openstack.common import log
 LOG = log.getLogger(__name__)
 
 

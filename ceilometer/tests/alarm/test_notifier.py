@@ -17,7 +17,7 @@
 
 import mock
 import requests
-from six.moves.urllib import parse as urlparse
+import six.moves.urllib.parse as urlparse
 
 from ceilometer.alarm import service
 from ceilometer.openstack.common import context

@@ -16,9 +16,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import mock
 import six
 
-import mock
 try:
     # Swift >= 1.7.5
     import swift.common.swob
