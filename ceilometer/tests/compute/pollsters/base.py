@@ -19,6 +19,7 @@
 
 import mock
 
+from ceilometer.openstack.common.fixture import mockpatch
 import ceilometer.tests.base as base
 
 
@@ -26,8 +27,6 @@ class TestPollsterBase(base.BaseTestCase):
 
     def setUp(self):
         super(TestPollsterBase, self).setUp()
-
-        self.addCleanup(mock.patch.stopall)
 
         self.inspector = mock.Mock()
         self.instance = mock.MagicMock()
@@ -39,7 +38,7 @@ class TestPollsterBase(base.BaseTestCase):
                                 'ram': 512, 'disk': 20, 'ephemeral': 0}
         self.instance.status = 'active'
 
-        patch_virt = mock.patch('ceilometer.compute.virt.inspector'
-                                '.get_hypervisor_inspector',
-                                mock.Mock(return_value=self.inspector))
-        patch_virt.start()
+        patch_virt = mockpatch.Patch(
+            'ceilometer.compute.virt.inspector.get_hypervisor_inspector',
+            new=mock.Mock(return_value=self.inspector))
+        self.useFixture(patch_virt)
