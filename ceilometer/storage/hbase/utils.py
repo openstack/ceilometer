@@ -200,9 +200,9 @@ def get_meter_columns(metaquery, **kwargs):
       column name in db
     """
     columns = ['f:message', 'f:recorded_at']
-    columns.extend(["f:%s" % k for k, v in kwargs.items() if v])
+    columns.extend("f:%s" % k for k, v in kwargs.items() if v)
     if metaquery:
-        columns.extend(["f:r_%s" % k for k, v in metaquery.items() if v])
+        columns.extend("f:r_%s" % k for k, v in metaquery.items() if v)
     return columns
 
 

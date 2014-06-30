@@ -213,8 +213,8 @@ class Client():
         dump.append('HTTP %.1f %s %s\n' % (resp.raw.version,
                                            resp.status_code,
                                            resp.reason))
-        dump.extend(['%s: %s\n' % (k, v)
-                     for k, v in six.iteritems(resp.headers)])
+        dump.extend('%s: %s\n' % (k, v)
+                    for k, v in six.iteritems(resp.headers))
         dump.append('\n')
         if resp.content:
             dump.extend([resp.content, '\n'])
