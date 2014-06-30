@@ -132,9 +132,6 @@ class SingletonAlarmService(AlarmService, os_service.Service):
                                             'value': True}])
 
 
-cfg.CONF.import_opt('host', 'ceilometer.service')
-
-
 class PartitionedAlarmService(AlarmService, os_service.Service):
 
     def __init__(self):

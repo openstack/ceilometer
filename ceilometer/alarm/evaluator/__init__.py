@@ -35,6 +35,8 @@ UNKNOWN = 'insufficient data'
 OK = 'ok'
 ALARM = 'alarm'
 
+cfg.CONF.import_group('service_credentials', 'ceilometer.service')
+
 
 @six.add_metaclass(abc.ABCMeta)
 class Evaluator(object):

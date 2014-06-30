@@ -96,6 +96,7 @@ def cleanup():
 
 def get_rpc_server(transport, topic, endpoint):
     """Return a configured oslo.messaging rpc server."""
+    cfg.CONF.import_opt('host', 'ceilometer.service')
     target = oslo.messaging.Target(server=cfg.CONF.host, topic=topic)
     serializer = RequestContextSerializer(JsonPayloadSerializer())
     return oslo.messaging.get_rpc_server(transport, target,

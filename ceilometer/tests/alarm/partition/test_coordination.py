@@ -55,6 +55,9 @@ class TestCoordinate(tests_base.BaseTestCase):
         self.setup_messaging(self.CONF)
 
         self.test_interval = 120
+        self.CONF.import_opt('evaluation_interval',
+                             'ceilometer.alarm.service',
+                             group='alarm')
         self.CONF.set_override('evaluation_interval',
                                self.test_interval,
                                group='alarm')

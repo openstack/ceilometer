@@ -26,6 +26,7 @@ from ceilometer.tests import db as db_test_base
 
 OPT_GROUP_NAME = 'keystone_authtoken'
 cfg.CONF.import_group(OPT_GROUP_NAME, "keystoneclient.middleware.auth_token")
+cfg.CONF.import_opt("policy_file", "ceilometer.openstack.common.policy")
 
 
 class FunctionalTest(db_test_base.TestBase):
