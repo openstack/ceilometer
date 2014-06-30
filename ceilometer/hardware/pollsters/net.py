@@ -29,20 +29,6 @@ class _Base(plugin.HardwarePollster):
     INSPECT_METHOD = 'inspect_network'
 
 
-class BandwidthBytesPollster(_Base):
-
-    @staticmethod
-    def generate_one_sample(host, c_data):
-        (nic, info) = c_data
-        return util.make_sample_from_host(host,
-                                          name='network.bandwidth.bytes',
-                                          type=sample.TYPE_GAUGE,
-                                          unit='B',
-                                          volume=info.bandwidth,
-                                          res_metadata=nic,
-                                          )
-
-
 class IncomingBytesPollster(_Base):
 
     @staticmethod

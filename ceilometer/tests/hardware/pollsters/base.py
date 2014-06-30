@@ -32,9 +32,9 @@ class FakeInspector(inspector_base.Inspector):
     MEMORY = inspector_base.MemoryStats(total=1000, used=90)
     NET = (inspector_base.Interface(name='test.teest',
                                     mac='001122334455',
-                                    ip='10.0.0.2'),
-           inspector_base.InterfaceStats(bandwidth=1000,
-                                         rx_bytes=90,
+                                    ip='10.0.0.2',
+                                    speed=1000),
+           inspector_base.InterfaceStats(rx_bytes=90,
                                          tx_bytes=80,
                                          error=1))
 
