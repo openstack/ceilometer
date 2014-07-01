@@ -337,3 +337,17 @@ refer to :ref:`installing_manually` for details.
 For example, this could be used to distinguish external and internal users. You'd
 have to implement a custom Swift middleware that sets a proper header and just add
 it to metadata_headers.
+
+
+OSprofiler data
+===============
+
+All messages with event type "profiler.*" will be collected as profiling data.
+Using notification plugin profiler/notifications.py.
+
+.. note::
+
+  Be sparing with heavy usage of OSprofiler, especially in case of complex
+  operations like booting and deleting instance that may create over 100kb of
+  sample data per each request.
+
