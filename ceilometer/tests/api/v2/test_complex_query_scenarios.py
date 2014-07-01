@@ -106,8 +106,8 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                                       + isotime + '"}}'})
 
         self.assertEqual(2, len(data.json))
-        for sample in data.json:
-            result_time = timeutils.parse_isotime(sample['timestamp'])
+        for sample_item in data.json:
+            result_time = timeutils.parse_isotime(sample_item['timestamp'])
             result_time = result_time.replace(tzinfo=None)
             self.assertTrue(result_time >= date_time)
 
@@ -115,8 +115,8 @@ class TestQueryMetersController(tests_api.FunctionalTest,
         data = self.post_json(self.url,
                               params={},
                               headers=non_admin_header)
-        for sample in data.json:
-            self.assertEqual("project-id1", sample['project_id'])
+        for sample_item in data.json:
+            self.assertEqual("project-id1", sample_item['project_id'])
 
     def test_non_admin_tenant_cannot_query_others_project(self):
         data = self.post_json(self.url,
@@ -135,8 +135,8 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                                       '{"=": {"project_id": "project-id1"}}'},
                               headers=non_admin_header)
 
-        for sample in data.json:
-            self.assertEqual("project-id1", sample['project_id'])
+        for sample_item in data.json:
+            self.assertEqual("project-id1", sample_item['project_id'])
 
     def test_admin_tenant_sees_every_project(self):
         data = self.post_json(self.url,
@@ -144,8 +144,8 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                               headers=admin_header)
 
         self.assertEqual(3, len(data.json))
-        for sample in data.json:
-            self.assertIn(sample['project_id'],
+        for sample_item in data.json:
+            self.assertIn(sample_item['project_id'],
                           (["project-id1", "project-id2", "project-id3"]))
 
     def test_admin_tenant_sees_every_project_with_complex_filter(self):
@@ -157,8 +157,8 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                               headers=admin_header)
 
         self.assertEqual(2, len(data.json))
-        for sample in data.json:
-            self.assertIn(sample['project_id'],
+        for sample_item in data.json:
+            self.assertIn(sample_item['project_id'],
                           (["project-id1", "project-id2"]))
 
     def test_admin_tenant_sees_every_project_with_in_filter(self):
@@ -169,8 +169,8 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                               headers=admin_header)
 
         self.assertEqual(2, len(data.json))
-        for sample in data.json:
-            self.assertIn(sample['project_id'],
+        for sample_item in data.json:
+            self.assertIn(sample_item['project_id'],
                           (["project-id1", "project-id2"]))
 
     def test_admin_tenant_can_query_any_project(self):
@@ -180,8 +180,8 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                               headers=admin_header)
 
         self.assertEqual(1, len(data.json))
-        for sample in data.json:
-            self.assertIn(sample['project_id'], set(["project-id2"]))
+        for sample_item in data.json:
+            self.assertIn(sample_item['project_id'], set(["project-id2"]))
 
     def test_query_with_orderby(self):
         data = self.post_json(self.url,
@@ -197,8 +197,8 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                                       '{"=": {"project": "project-id2"}}'})
 
         self.assertEqual(1, len(data.json))
-        for sample in data.json:
-            self.assertIn(sample['project_id'], set(["project-id2"]))
+        for sample_item in data.json:
+            self.assertIn(sample_item['project_id'], set(["project-id2"]))
 
     def test_query_with_field_name_resource(self):
         data = self.post_json(self.url,
@@ -206,8 +206,8 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                                       '{"=": {"resource": "resource-id2"}}'})
 
         self.assertEqual(1, len(data.json))
-        for sample in data.json:
-            self.assertIn(sample['resource_id'], set(["resource-id2"]))
+        for sample_item in data.json:
+            self.assertIn(sample_item['resource_id'], set(["resource-id2"]))
 
     def test_query_with_field_name_user(self):
         data = self.post_json(self.url,
@@ -215,8 +215,8 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                                       '{"=": {"user": "user-id2"}}'})
 
         self.assertEqual(1, len(data.json))
-        for sample in data.json:
-            self.assertIn(sample['user_id'], set(["user-id2"]))
+        for sample_item in data.json:
+            self.assertIn(sample_item['user_id'], set(["user-id2"]))
 
     def test_query_with_field_name_meter(self):
         data = self.post_json(self.url,
@@ -224,8 +224,8 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                                       '{"=": {"meter": "meter.test"}}'})
 
         self.assertEqual(3, len(data.json))
-        for sample in data.json:
-            self.assertIn(sample['meter'], set(["meter.test"]))
+        for sample_item in data.json:
+            self.assertIn(sample_item['meter'], set(["meter.test"]))
 
     def test_query_with_lower_and_upper_case_orderby(self):
         data = self.post_json(self.url,
@@ -264,8 +264,8 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                                       '{">=": {"metadata.util": 0.5}}'})
 
         self.assertEqual(2, len(data.json))
-        for sample in data.json:
-            self.assertTrue(sample["metadata"]["util"] >= 0.5)
+        for sample_item in data.json:
+            self.assertTrue(sample_item["metadata"]["util"] >= 0.5)
 
     def test_filter_with_negation(self):
         filter_expr = '{"not": {">=": {"metadata.util": 0.5}}}'
@@ -273,8 +273,8 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                               params={"filter": filter_expr})
 
         self.assertEqual(1, len(data.json))
-        for sample in data.json:
-            self.assertTrue(float(sample["metadata"]["util"]) < 0.5)
+        for sample_item in data.json:
+            self.assertTrue(float(sample_item["metadata"]["util"]) < 0.5)
 
     def test_limit_should_be_positive(self):
         data = self.post_json(self.url,
@@ -415,8 +415,8 @@ class TestQueryAlarmsController(tests_api.FunctionalTest,
                                       '{"=": {"project": "project-id2"}}'})
 
         self.assertEqual(6, len(data.json))
-        for sample in data.json:
-            self.assertIn(sample['project_id'], set(["project-id2"]))
+        for sample_item in data.json:
+            self.assertIn(sample_item['project_id'], set(["project-id2"]))
 
     def test_query_with_field_user_in_orderby(self):
         data = self.post_json(self.alarm_url,

@@ -482,8 +482,8 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         amalgamated_resources = set(['test://', 'another://'])
         self.assertEqual(amalgamated_resources,
                          set(self.Pollster.samples[0][1]))
-        for pipeline in self.mgr.pipeline_manager.pipelines:
-            self.assertEqual(1, len(pipeline.publishers[0].samples))
-            published = pipeline.publishers[0].samples[0]
+        for pipe_line in self.mgr.pipeline_manager.pipelines:
+            self.assertEqual(1, len(pipe_line.publishers[0].samples))
+            published = pipe_line.publishers[0].samples[0]
             self.assertEqual(amalgamated_resources,
                              set(published.resource_metadata['resources']))

@@ -471,10 +471,10 @@ class RawSampleTest(DBTestBase,
     def test_get_samples_in_default_order(self):
         f = storage.SampleFilter()
         prev_timestamp = None
-        for sample in self.conn.get_samples(f):
+        for sample_item in self.conn.get_samples(f):
             if prev_timestamp is not None:
-                self.assertTrue(prev_timestamp >= sample.timestamp)
-            prev_timestamp = sample.timestamp
+                self.assertTrue(prev_timestamp >= sample_item.timestamp)
+            prev_timestamp = sample_item.timestamp
 
     def test_get_samples_by_user(self):
         f = storage.SampleFilter(user='user-id')
@@ -742,8 +742,8 @@ class ComplexSampleQueryTest(DBTestBase,
     def test_no_filter(self):
         results = list(self.conn.query_samples())
         self.assertEqual(len(results), len(self.msgs))
-        for sample in results:
-            d = sample.as_dict()
+        for sample_item in results:
+            d = sample_item.as_dict()
             del d['recorded_at']
             self.assertIn(d, self.msgs)
 
@@ -761,28 +761,28 @@ class ComplexSampleQueryTest(DBTestBase,
         simple_filter = {"=": {"resource_id": "resource-id-8"}}
         results = list(self.conn.query_samples(filter_expr=simple_filter))
         self.assertEqual(len(results), 1)
-        for sample in results:
-            self.assertEqual(sample.resource_id, "resource-id-8")
+        for sample_item in results:
+            self.assertEqual(sample_item.resource_id, "resource-id-8")
 
     def test_query_simple_filter_with_not_equal_relation(self):
         simple_filter = {"!=": {"resource_id": "resource-id-8"}}
         results = list(self.conn.query_samples(filter_expr=simple_filter))
         self.assertEqual(len(results), len(self.msgs) - 1)
-        for sample in results:
-            self.assertNotEqual(sample.resource_id, "resource-id-8")
+        for sample_item in results:
+            self.assertNotEqual(sample_item.resource_id, "resource-id-8")
 
     def test_query_complex_filter(self):
         self._create_samples()
         results = list(self.conn.query_samples(filter_expr=(
                                                self.complex_filter)))
         self.assertEqual(len(results), 6)
-        for sample in results:
-            self.assertIn(sample.resource_id,
+        for sample_item in results:
+            self.assertIn(sample_item.resource_id,
                           set(["resource-id-42", "resource-id-44"]))
-            self.assertEqual(sample.counter_name,
+            self.assertEqual(sample_item.counter_name,
                              "cpu_util")
-            self.assertTrue(sample.counter_volume > 0.4)
-            self.assertTrue(sample.counter_volume <= 0.8)
+            self.assertTrue(sample_item.counter_volume > 0.4)
+            self.assertTrue(sample_item.counter_volume <= 0.8)
 
     def test_query_complex_filter_with_limit(self):
         self._create_samples()
@@ -822,15 +822,15 @@ class ComplexSampleQueryTest(DBTestBase,
         results = list(
             self.conn.query_samples(filter_expr=self.complex_filter_list))
         self.assertEqual(len(results), 9)
-        for sample in results:
-            self.assertIn(sample.resource_id,
+        for sample_item in results:
+            self.assertIn(sample_item.resource_id,
                           set(["resource-id-42",
                                "resource-id-43",
                                "resource-id-44"]))
-            self.assertEqual(sample.counter_name,
+            self.assertEqual(sample_item.counter_name,
                              "cpu_util")
-            self.assertTrue(sample.counter_volume > 0.4)
-            self.assertTrue(sample.counter_volume <= 0.8)
+            self.assertTrue(sample_item.counter_volume > 0.4)
+            self.assertTrue(sample_item.counter_volume <= 0.8)
 
     def test_query_complex_filter_with_list_with_limit(self):
         self._create_samples()
@@ -888,15 +888,15 @@ class ComplexSampleQueryTest(DBTestBase,
         results = list(
             self.conn.query_samples(filter_expr=self.complex_filter_in))
         self.assertEqual(len(results), 9)
-        for sample in results:
-            self.assertIn(sample.resource_id,
+        for sample_item in results:
+            self.assertIn(sample_item.resource_id,
                           set(["resource-id-42",
                                "resource-id-43",
                                "resource-id-44"]))
-            self.assertEqual(sample.counter_name,
+            self.assertEqual(sample_item.counter_name,
                              "cpu_util")
-            self.assertTrue(sample.counter_volume > 0.4)
-            self.assertTrue(sample.counter_volume <= 0.8)
+            self.assertTrue(sample_item.counter_volume > 0.4)
+            self.assertTrue(sample_item.counter_volume <= 0.8)
 
     def test_query_simple_metadata_filter(self):
         self._create_samples()
@@ -906,8 +906,8 @@ class ComplexSampleQueryTest(DBTestBase,
         results = list(self.conn.query_samples(filter_expr=filter_expr))
 
         self.assertEqual(len(results), 6)
-        for sample in results:
-            self.assertTrue(sample.resource_metadata["a_bool_key"])
+        for sample_item in results:
+            self.assertTrue(sample_item.resource_metadata["a_bool_key"])
 
     def test_query_simple_metadata_with_in_op(self):
         self._create_samples()
@@ -917,8 +917,9 @@ class ComplexSampleQueryTest(DBTestBase,
         results = list(self.conn.query_samples(filter_expr=filter_expr))
 
         self.assertEqual(len(results), 12)
-        for sample in results:
-            self.assertIn(sample.resource_metadata["an_int_key"], [42, 43])
+        for sample_item in results:
+            self.assertIn(sample_item.resource_metadata["an_int_key"],
+                          [42, 43])
 
     def test_query_complex_metadata_filter(self):
         self._create_samples()
@@ -931,11 +932,12 @@ class ComplexSampleQueryTest(DBTestBase,
         results = list(self.conn.query_samples(filter_expr=filter_expr))
 
         self.assertEqual(len(results), 8)
-        for sample in results:
-            self.assertTrue((sample.resource_metadata["a_string_key"] ==
+        for sample_item in results:
+            self.assertTrue((sample_item.resource_metadata["a_string_key"] ==
                             "meta-value0.81" or
-                             sample.resource_metadata["a_float_key"] <= 0.41))
-            self.assertTrue(sample.resource_metadata["an_int_key"] > 42)
+                             sample_item.resource_metadata["a_float_key"] <=
+                             0.41))
+            self.assertTrue(sample_item.resource_metadata["an_int_key"] > 42)
 
     def test_query_mixed_data_and_metadata_filter(self):
         self._create_samples()
@@ -949,11 +951,12 @@ class ComplexSampleQueryTest(DBTestBase,
         results = list(self.conn.query_samples(filter_expr=filter_expr))
 
         self.assertEqual(len(results), 4)
-        for sample in results:
-            self.assertTrue((sample.resource_metadata["a_string_key"] ==
+        for sample_item in results:
+            self.assertTrue((sample_item.resource_metadata["a_string_key"] ==
                             "meta-value0.81" or
-                             sample.resource_metadata["a_float_key"] <= 0.41))
-            self.assertEqual(sample.resource_id, "resource-id-42")
+                             sample_item.resource_metadata["a_float_key"] <=
+                             0.41))
+            self.assertEqual(sample_item.resource_id, "resource-id-42")
 
     def test_query_non_existing_metadata_with_result(self):
         self._create_samples()
@@ -966,8 +969,8 @@ class ComplexSampleQueryTest(DBTestBase,
         results = list(self.conn.query_samples(filter_expr=filter_expr))
 
         self.assertEqual(len(results), 3)
-        for sample in results:
-            self.assertEqual(sample.resource_metadata["a_string_key"],
+        for sample_item in results:
+            self.assertEqual(sample_item.resource_metadata["a_string_key"],
                              "meta-value0.81")
 
     def test_query_non_existing_metadata_without_result(self):
@@ -994,10 +997,11 @@ class ComplexSampleQueryTest(DBTestBase,
         results = list(self.conn.query_samples(filter_expr=filter_expr))
 
         self.assertEqual(len(results), 3)
-        for sample in results:
-            self.assertEqual(sample.resource_id, "resource-id-42")
-            self.assertTrue(sample.resource_metadata["an_int_key"] <= 43)
-            self.assertTrue(sample.resource_metadata["a_float_key"] > 0.41)
+        for sample_item in results:
+            self.assertEqual(sample_item.resource_id, "resource-id-42")
+            self.assertTrue(sample_item.resource_metadata["an_int_key"] <= 43)
+            self.assertTrue(sample_item.resource_metadata["a_float_key"] >
+                            0.41)
 
     def test_query_negated_complex_expression(self):
         self._create_samples()
@@ -1016,11 +1020,11 @@ class ComplexSampleQueryTest(DBTestBase,
         results = list(self.conn.query_samples(filter_expr=filter_expr))
 
         self.assertEqual(len(results), 4)
-        for sample in results:
-            self.assertEqual(sample.resource_id,
+        for sample_item in results:
+            self.assertEqual(sample_item.resource_id,
                              "resource-id-43")
-            self.assertIn(sample.counter_volume, [0.39, 0.4, 0.8, 0.81])
-            self.assertEqual(sample.counter_name,
+            self.assertIn(sample_item.counter_volume, [0.39, 0.4, 0.8, 0.81])
+            self.assertEqual(sample_item.counter_name,
                              "cpu_util")
 
     def test_query_with_double_negation(self):
@@ -1039,11 +1043,11 @@ class ComplexSampleQueryTest(DBTestBase,
         results = list(self.conn.query_samples(filter_expr=filter_expr))
 
         self.assertEqual(len(results), 4)
-        for sample in results:
-            self.assertEqual(sample.resource_id,
+        for sample_item in results:
+            self.assertEqual(sample_item.resource_id,
                              "resource-id-43")
-            self.assertIn(sample.counter_volume, [0.39, 0.4, 0.8, 0.81])
-            self.assertEqual(sample.counter_name,
+            self.assertIn(sample_item.counter_volume, [0.39, 0.4, 0.8, 0.81])
+            self.assertEqual(sample_item.counter_name,
                              "cpu_util")
 
     def test_query_negate_not_equal(self):
@@ -1053,8 +1057,8 @@ class ComplexSampleQueryTest(DBTestBase,
         results = list(self.conn.query_samples(filter_expr=filter_expr))
 
         self.assertEqual(len(results), 6)
-        for sample in results:
-            self.assertEqual(sample.resource_id,
+        for sample_item in results:
+            self.assertEqual(sample_item.resource_id,
                              "resource-id-43")
 
     def test_query_negated_in_op(self):
@@ -1066,8 +1070,8 @@ class ComplexSampleQueryTest(DBTestBase,
         results = list(self.conn.query_samples(filter_expr=filter_expr))
 
         self.assertEqual(len(results), 3)
-        for sample in results:
-            self.assertIn(sample.counter_volume,
+        for sample_item in results:
+            self.assertIn(sample_item.counter_volume,
                           [0.41, 0.8, 0.81])
 
 

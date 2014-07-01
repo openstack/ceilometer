@@ -104,9 +104,9 @@ class TestFilePublisher(test.BaseTestCase):
         self.assertTrue(os.path.exists(name))
         with open(name, 'r') as f:
             content = f.read()
-        for sample in self.test_data:
-            self.assertTrue(sample.id in content)
-            self.assertTrue(sample.timestamp in content)
+        for sample_item in self.test_data:
+            self.assertTrue(sample_item.id in content)
+            self.assertTrue(sample_item.timestamp in content)
 
     def test_file_publisher_invalid(self):
         # Test invalid max bytes, backup count configurations
