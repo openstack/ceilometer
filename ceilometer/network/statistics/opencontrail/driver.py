@@ -14,7 +14,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from six.moves.urllib import parse as url_parse
+from six.moves.urllib import parse as urlparse
 
 from ceilometer.network.statistics import driver
 from ceilometer.network.statistics.opencontrail import client
@@ -73,13 +73,13 @@ class OpencontrailDriver(driver.Driver):
 
     def get_sample_data(self, meter_name, parse_url, params, cache):
 
-        parts = url_parse.ParseResult(params.get('scheme', ['http'])[0],
-                                      parse_url.netloc,
-                                      parse_url.path,
-                                      None,
-                                      None,
-                                      None)
-        endpoint = url_parse.urlunparse(parts)
+        parts = urlparse.ParseResult(params.get('scheme', ['http'])[0],
+                                     parse_url.netloc,
+                                     parse_url.path,
+                                     None,
+                                     None,
+                                     None)
+        endpoint = urlparse.urlunparse(parts)
 
         iter = self._get_iter(meter_name)
         if iter is None:

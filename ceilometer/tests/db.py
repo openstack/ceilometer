@@ -20,11 +20,11 @@
 """Base classes for API tests."""
 import fixtures
 import os
-import urlparse
 import uuid
 import warnings
 
 import six
+from six.moves.urllib import parse as urlparse
 import testscenarios.testcase
 from testtools import testcase
 

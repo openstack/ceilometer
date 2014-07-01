@@ -14,10 +14,10 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-import six.moves.urllib.parse as urlparse
 
 import mock
 import requests
+from six.moves.urllib import parse as urlparse
 
 from ceilometer.alarm import service
 from ceilometer.openstack.common import context

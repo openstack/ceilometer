@@ -19,7 +19,8 @@
 # under the License.
 
 import copy
-import urlparse
+
+from six.moves.urllib import parse as urlparse
 
 from ceilometer.openstack.common import timeutils
 from ceilometer import sample

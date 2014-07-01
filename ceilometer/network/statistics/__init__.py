@@ -16,7 +16,7 @@
 import abc
 
 import six
-from six.moves.urllib import parse as url_parse
+from six.moves.urllib import parse as urlparse
 from stevedore import driver as _driver
 
 from ceilometer.central import plugin
@@ -47,13 +47,13 @@ class _Base(plugin.CentralPollster):
 
         parse_url = network_utils.urlsplit(resource)
 
-        params = url_parse.parse_qs(parse_url.query)
-        parts = url_parse.ParseResult(parse_url.scheme,
-                                      parse_url.netloc,
-                                      parse_url.path,
-                                      None,
-                                      None,
-                                      None)
+        params = urlparse.parse_qs(parse_url.query)
+        parts = urlparse.ParseResult(parse_url.scheme,
+                                     parse_url.netloc,
+                                     parse_url.path,
+                                     None,
+                                     None,
+                                     None)
         return parts, params
 
     @staticmethod

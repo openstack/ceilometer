@@ -13,11 +13,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import abc
-import mock
 
+import mock
 import six
 from six import moves
-from six.moves.urllib import parse as url_parse
+from six.moves.urllib import parse as urlparse
 
 from ceilometer.network.statistics.opendaylight import driver
 from ceilometer.openstack.common import test
@@ -58,20 +58,20 @@ class _Base(test.BaseTestCase):
     def inactive_hosts_data(self):
         pass
 
-    fake_odl_url = url_parse.ParseResult('opendaylight',
-                                         'localhost:8080',
-                                         'controller/nb/v2',
-                                         None,
-                                         None,
-                                         None)
+    fake_odl_url = urlparse.ParseResult('opendaylight',
+                                        'localhost:8080',
+                                        'controller/nb/v2',
+                                        None,
+                                        None,
+                                        None)
 
-    fake_params = url_parse.parse_qs('user=admin&password=admin&scheme=http&'
-                                     'container_name=default&auth=basic')
+    fake_params = urlparse.parse_qs('user=admin&password=admin&scheme=http&'
+                                    'container_name=default&auth=basic')
 
     fake_params_multi_container = \
-        url_parse.parse_qs('user=admin&password=admin&scheme=http&'
-                           'container_name=first&container_name=second&'
-                           'auth=basic')
+        urlparse.parse_qs('user=admin&password=admin&scheme=http&'
+                          'container_name=first&container_name=second&'
+                          'auth=basic')
 
     def setUp(self):
         super(_Base, self).setUp()

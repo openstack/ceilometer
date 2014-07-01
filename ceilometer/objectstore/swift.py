@@ -18,10 +18,10 @@
 """
 
 from __future__ import absolute_import
-import six.moves.urllib.parse as urlparse
 
 from keystoneclient import exceptions
 from oslo.config import cfg
+from six.moves.urllib import parse as urlparse
 from swiftclient import client as swift
 
 from ceilometer.central import plugin

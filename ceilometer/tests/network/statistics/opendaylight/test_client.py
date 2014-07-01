@@ -13,10 +13,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import mock
-
 from requests import auth as req_auth
 import six
-from six.moves.urllib import parse as url_parse
+from six.moves.urllib import parse as urlparse
 
 from ceilometer.network.statistics.opendaylight import client
 from ceilometer.openstack.common.gettextutils import _
@@ -30,16 +29,16 @@ class TestClientHTTPBasicAuth(test.BaseTestCase):
 
     def setUp(self):
         super(TestClientHTTPBasicAuth, self).setUp()
-        self.parsed_url = url_parse.urlparse(
+        self.parsed_url = urlparse.urlparse(
             'http://127.0.0.1:8080/controller/nb/v2?container_name=default&'
             'container_name=egg&auth=%s&user=admin&password=admin_pass&'
             'scheme=%s' % (self.auth_way, self.scheme))
-        self.params = url_parse.parse_qs(self.parsed_url.query)
-        self.endpoint = url_parse.urlunparse(
-            url_parse.ParseResult(self.scheme,
-                                  self.parsed_url.netloc,
-                                  self.parsed_url.path,
-                                  None, None, None))
+        self.params = urlparse.parse_qs(self.parsed_url.query)
+        self.endpoint = urlparse.urlunparse(
+            urlparse.ParseResult(self.scheme,
+                                 self.parsed_url.netloc,
+                                 self.parsed_url.path,
+                                 None, None, None))
         odl_params = {}
         odl_params['auth'] = self.params.get('auth')[0]
         odl_params['user'] = self.params.get('user')[0]
