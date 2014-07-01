@@ -30,6 +30,38 @@ sources:
           - "network.outgoing.packets"
       sinks:
           - network_sink
+    - name: lb_pool_source
+      interval: 600
+      meters:
+          - "network.services.lb.pool"
+      discovery:
+          - "lb_pools"
+      sinks:
+          - meter_sink
+    - name: lb_health_monitor_source
+      interval: 600
+      meters:
+         - "network.services.lb.health_monitor"
+      discovery:
+         - "lb_health_probes"
+      sinks:
+          - meter_sink
+    - name: lb_vip_source
+      interval: 600
+      meters:
+          - "network.services.lb.vip"
+      discovery:
+          - "lb_vips"
+      sinks:
+          - meter_sink
+    - name: lb_member_source
+      interval: 600
+      meters:
+          - "network.services.lb.member"
+      discovery:
+          - "lb_members"
+      sinks:
+          - meter_sink
 sinks:
     - name: meter_sink
       transformers:

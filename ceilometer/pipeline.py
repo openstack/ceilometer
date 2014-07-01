@@ -98,7 +98,6 @@ class Source(object):
         except KeyError as err:
             raise PipelineException(
                 "Required field %s not specified" % err.args[0], cfg)
-
         if self.interval <= 0:
             raise PipelineException("Interval value should > 0", cfg)
 
@@ -109,7 +108,6 @@ class Source(object):
         self.discovery = cfg.get('discovery') or []
         if not isinstance(self.discovery, list):
             raise PipelineException("Discovery should be a list", cfg)
-
         self._check_meters()
 
     def __str__(self):
