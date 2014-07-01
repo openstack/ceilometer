@@ -534,11 +534,10 @@ class Connection(pymongo_base.Connection):
         self.db.meter.insert(record)
 
     def clear_expired_metering_data(self, ttl):
-        """Clear expired data from the backend storage system according to the
-        time-to-live.
+        """Clear expired data from the backend storage system.
 
+        Clearing occurs according to the time-to-live.
         :param ttl: Number of seconds to keep records for.
-
         """
         results = self.db.meter.group(
             key={},
@@ -683,9 +682,9 @@ class Connection(pymongo_base.Connection):
                                         start_timestamp, start_timestamp_op,
                                         end_timestamp, end_timestamp_op,
                                         metaquery, resource):
-        """Return an iterable of models.Resource instances constrained
-           by sample timestamp.
+        """Return an iterable of models.Resource instances
 
+        Items are constrained by sample timestamp.
         :param query: project/user/source query
         :param start_timestamp: modified timestamp start range.
         :param start_timestamp_op: start time operator, like gt, ge.
@@ -743,9 +742,9 @@ class Connection(pymongo_base.Connection):
             self.db[out].drop()
 
     def _get_floating_resources(self, query, metaquery, resource):
-        """Return an iterable of models.Resource instances unconstrained
-           by timestamp.
+        """Return an iterable of models.Resource instances
 
+        Items are unconstrained by timestamp.
         :param query: project/user/source query
         :param metaquery: dict with metadata to match on.
         :param resource: resource filter.
@@ -844,11 +843,10 @@ class Connection(pymongo_base.Connection):
 
     def get_meter_statistics(self, sample_filter, period=None, groupby=None,
                              aggregate=None):
-        """Return an iterable of models.Statistics instance containing meter
-        statistics described by the query parameters.
+        """Return an iterable of models.Statistics instance.
 
-        The filter must have a meter value set.
-
+        Items are containing meter statistics described by the query
+        parameters. The filter must have a meter value set.
         """
         if (groupby and
                 set(groupby) - set(['user_id', 'project_id',

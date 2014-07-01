@@ -51,9 +51,9 @@ def timestamp(dt, reverse=True):
 
 
 def make_events_query_from_filter(event_filter):
-    """Return start and stop row for filtering and a query which based on the
-    selected parameter.
+    """Return start and stop row for filtering and a query.
 
+    Query is based on the selected parameter.
     :param event_filter: storage.EventFilter object.
     """
     q = []
@@ -84,9 +84,9 @@ def make_events_query_from_filter(event_filter):
 
 def make_timestamp_query(func, start=None, start_op=None, end=None,
                          end_op=None, bounds_only=False, **kwargs):
-    """Return a filter start and stop row for filtering and a query
-    which based on the fact that CF-name is 'rts'.
+    """Return a filter start and stop row for filtering and a query.
 
+    Query is based on the fact that CF-name is 'rts'.
     :param start: Optional start timestamp
     :param start_op: Optional start timestamp operator, like gt, ge
     :param end: Optional end timestamp
@@ -245,8 +245,8 @@ def make_meter_query_for_resource(start_timestamp, start_timestamp_op,
                                   end_timestamp, end_timestamp_op, source,
                                   query=None):
     """This method is used when Resource table should be filtered by meters.
-       In this method we are looking into all qualifiers with m_ prefix.
 
+    In this method we are looking into all qualifiers with m_ prefix.
     :param start_timestamp: meter's timestamp start range.
     :param start_timestamp_op: meter's start time operator, like ge, gt.
     :param end_timestamp: meter's timestamp end range.
@@ -279,8 +279,9 @@ def make_meter_query_for_resource(start_timestamp, start_timestamp_op,
 
 
 def make_general_rowkey_scan(rts_start=None, rts_end=None, some_id=None):
-    """If it's filter on some_id without start and end,
-        start_row = some_id while end_row = some_id + MAX_BYTE
+    """If it's filter on some_id without start and end.
+
+    start_row = some_id while end_row = some_id + MAX_BYTE.
     """
     if some_id is None:
         return None, None
@@ -293,33 +294,32 @@ def make_general_rowkey_scan(rts_start=None, rts_end=None, some_id=None):
 
 
 def format_meter_reference(c_name, c_type, c_unit, rts, source):
-    """Format reference to meter data.
-    """
+    """Format reference to meter data."""
     return "%s+%s+%s!%s!%s" % (rts, source, c_name, c_type, c_unit)
 
 
 def timestamp_from_record_tuple(record):
-    """Extract timestamp from HBase tuple record
-    """
+    """Extract timestamp from HBase tuple record."""
     return record[0]['timestamp']
 
 
 def resource_id_from_record_tuple(record):
-    """Extract resource_id from HBase tuple record
-    """
+    """Extract resource_id from HBase tuple record."""
     return record[0]['resource_id']
 
 
 def deserialize_entry(entry, get_raw_meta=True):
-    """Return a list of flatten_result, sources, meters and metadata
-    flatten_result contains a dict of simple structures such as 'resource_id':1
+    """Return a list of flatten_result, sources, meters and metadata.
+
+    Flatten_result contains a dict of simple structures such as 'resource_id':1
     sources/meters are the lists of sources and meters correspondingly.
     metadata is metadata dict. This dict may be returned as flattened if
     get_raw_meta is False.
 
     :param entry: entry from HBase, without row name and timestamp
     :param get_raw_meta: If true then raw metadata will be returned,
-      if False metadata will be constructed from 'f:r_metadata.' fields
+                         if False metadata will be constructed from
+                         'f:r_metadata.' fields
     """
     flatten_result = {}
     sources = []

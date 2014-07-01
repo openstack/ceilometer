@@ -28,8 +28,7 @@ LOG = log.getLogger(__name__)
 
 
 class ComputeMetricsNotificationBase(notifications.ComputeNotificationBase):
-    """Convert compute.metrics.update notifications into Samples
-    """
+    """Convert compute.metrics.update notifications into Samples."""
     event_types = ['compute.metrics.update']
     metric = None
     sample_type = None

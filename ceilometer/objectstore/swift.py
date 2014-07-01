@@ -77,15 +77,13 @@ class _Base(plugin.CentralPollster):
 
     @staticmethod
     def _neaten_url(endpoint, tenant_id):
-        """Transform the registered url to standard and valid format.
-        """
+        """Transform the registered url to standard and valid format."""
         return urlparse.urljoin(endpoint.split('/v1')[0].rstrip('/') + '/',
                                 'v1/' + cfg.CONF.reseller_prefix + tenant_id)
 
 
 class ObjectsPollster(_Base):
-    """Iterate over all accounts, using keystone.
-    """
+    """Iterate over all accounts, using keystone."""
     @plugin.check_keystone
     def get_samples(self, manager, cache, resources=None):
         for tenant, account in self._iter_accounts(manager.keystone, cache):
@@ -103,8 +101,7 @@ class ObjectsPollster(_Base):
 
 
 class ObjectsSizePollster(_Base):
-    """Iterate over all accounts, using keystone.
-    """
+    """Iterate over all accounts, using keystone."""
     @plugin.check_keystone
     def get_samples(self, manager, cache, resources=None):
         for tenant, account in self._iter_accounts(manager.keystone, cache):
@@ -122,8 +119,7 @@ class ObjectsSizePollster(_Base):
 
 
 class ObjectsContainersPollster(_Base):
-    """Iterate over all accounts, using keystone.
-    """
+    """Iterate over all accounts, using keystone."""
     @plugin.check_keystone
     def get_samples(self, manager, cache, resources=None):
         for tenant, account in self._iter_accounts(manager.keystone, cache):
@@ -141,8 +137,7 @@ class ObjectsContainersPollster(_Base):
 
 
 class ContainersObjectsPollster(_Base):
-    """Get info about containers using Swift API
-    """
+    """Get info about containers using Swift API."""
 
     METHOD = 'get'
 
@@ -165,8 +160,7 @@ class ContainersObjectsPollster(_Base):
 
 
 class ContainersSizePollster(_Base):
-    """Get info about containers using Swift API
-    """
+    """Get info about containers using Swift API."""
 
     METHOD = 'get'
 

@@ -65,8 +65,10 @@ class NetworkNotificationBase(plugin.NotificationBase):
 
     @staticmethod
     def get_targets(conf):
-        """Return a sequence of oslo.messaging.Target defining the exchange and
-        topics to be connected for this plugin.
+        """Return a sequence of oslo.messaging.Target
+
+        This sequence is defining the exchange and topics to be connected for
+        this plugin.
         """
         return [oslo.messaging.Target(topic=topic,
                                       exchange=conf.neutron_control_exchange)
@@ -106,41 +108,41 @@ class NetworkNotificationBase(plugin.NotificationBase):
 
 
 class Network(NetworkNotificationBase):
-    """Listen for Neutron network notifications in order to mediate with the
-    metering framework.
+    """Listen for Neutron network notifications.
 
+    Listen in order to mediate with the metering framework.
     """
     resource_name = 'network'
 
 
 class Subnet(NetworkNotificationBase):
-    """Listen for Neutron notifications in order to mediate with the
-    metering framework.
+    """Listen for Neutron notifications.
 
+    Listen in order to mediate with the metering framework.
     """
     resource_name = 'subnet'
 
 
 class Port(NetworkNotificationBase):
-    """Listen for Neutron notifications in order to mediate with the
-    metering framework.
+    """Listen for Neutron notifications.
 
+    Listen in order to mediate with the metering framework.
     """
     resource_name = 'port'
 
 
 class Router(NetworkNotificationBase):
-    """Listen for Neutron notifications in order to mediate with the
-    metering framework.
+    """Listen for Neutron notifications.
 
+    Listen in order to mediate with the metering framework.
     """
     resource_name = 'router'
 
 
 class FloatingIP(NetworkNotificationBase):
-    """Listen for Neutron notifications in order to mediate with the
-    metering framework.
+    """Listen for Neutron notifications.
 
+    Listen in order to mediate with the metering framework.
     """
     resource_name = 'floatingip'
     counter_name = 'ip.floating'
@@ -148,9 +150,9 @@ class FloatingIP(NetworkNotificationBase):
 
 
 class Bandwidth(NetworkNotificationBase):
-    """Listen for Neutron notifications in order to mediate with the
-    metering framework.
+    """Listen for Neutron notifications.
 
+    Listen in order to mediate with the metering framework.
     """
     event_types = ['l3.meter']
 

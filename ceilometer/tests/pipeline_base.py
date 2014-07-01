@@ -39,11 +39,12 @@ from ceilometer.transformer import conversions
 @six.add_metaclass(abc.ABCMeta)
 class BasePipelineTestCase(test.BaseTestCase):
     def fake_tem_init(self):
-        """Fake a transformerManager for pipeline
-           The faked entry point setting is below:
-           update: TransformerClass
-           except: TransformerClassException
-           drop:   TransformerClassDrop
+        """Fake a transformerManager for pipeline.
+
+        The faked entry point setting is below:
+        update: TransformerClass
+        except: TransformerClassException
+        drop:   TransformerClassDrop
         """
         pass
 

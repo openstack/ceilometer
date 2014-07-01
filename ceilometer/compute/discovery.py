@@ -27,8 +27,7 @@ class InstanceDiscovery(plugin.DiscoveryBase):
         self.nova_cli = nova_client.Client()
 
     def discover(self, param=None):
-        """Discover resources to monitor.
-        """
+        """Discover resources to monitor."""
         instances = self.nova_cli.instance_get_all_by_host(cfg.CONF.host)
         return [i for i in instances
                 if getattr(i, 'OS-EXT-STS:vm_state', None) != 'error']

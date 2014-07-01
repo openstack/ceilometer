@@ -40,10 +40,10 @@ cfg.CONF.import_opt('retry_interval', 'ceilometer.openstack.common.db.options',
 def make_timestamp_range(start, end,
                          start_timestamp_op=None, end_timestamp_op=None):
 
-    """Given two possible datetimes and their operations, create the query
-    document to find timestamps within that range.
-    By default, using $gte for the lower bound and $lt for the
-    upper bound.
+    """Create the query document to find timestamps within that range.
+
+    This is done by given two possible datetimes and their operations.
+    By default, using $gte for the lower bound and $lt for the upper bound.
     """
     ts_range = {}
 
@@ -66,7 +66,7 @@ def make_timestamp_range(start, end,
 def make_query_from_filter(sample_filter, require_meter=True):
     """Return a query dictionary based on the settings in the filter.
 
-    :param filter: SampleFilter instance
+    :param sample_filter: SampleFilter instance
     :param require_meter: If true and the filter does not have a meter,
                           raise an error.
     """
@@ -181,9 +181,10 @@ class QueryTransformer(object):
 
     @staticmethod
     def _move_negation_to_leaf(condition):
-        """Moves every not operator to the leafs by
-        applying the De Morgan rules and anihilating
-        double negations
+        """Moves every not operator to the leafs.
+
+        Moving is going by applying the De Morgan rules and anihilating
+        double negations.
         """
         def _apply_de_morgan(tree, negated_subtree, negated_op):
             if negated_op == "and":

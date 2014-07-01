@@ -38,7 +38,9 @@ class CombinationEvaluator(evaluator.Evaluator):
         return alarm.state
 
     def _sufficient_states(self, alarm, states):
-        """Ensure there is sufficient data for evaluation,
+        """Check for the sufficiency of the data for evaluation.
+
+        Ensure that there is sufficient data for evaluation,
         transitioning to unknown otherwise.
         """
         # note(sileht): alarm can be evaluated only with
@@ -56,8 +58,7 @@ class CombinationEvaluator(evaluator.Evaluator):
 
     @staticmethod
     def _reason_data(alarm_ids):
-        """Create a reason data dictionary for this evaluator type.
-        """
+        """Create a reason data dictionary for this evaluator type."""
         return {'type': 'combination', 'alarm_ids': alarm_ids}
 
     @classmethod
@@ -80,8 +81,7 @@ class CombinationEvaluator(evaluator.Evaluator):
                  'alarm_ids': ",".join(alarms_to_report)}), reason_data
 
     def _transition(self, alarm, underlying_states):
-        """Transition alarm state if necessary.
-        """
+        """Transition alarm state if necessary."""
         op = alarm.rule['operator']
         if COMPARATORS[op](s == evaluator.ALARM
                            for __, s in underlying_states):

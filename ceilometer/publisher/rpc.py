@@ -45,8 +45,7 @@ METER_PUBLISH_OPTS = [
 
 
 def register_opts(config):
-    """Register the options for publishing metering messages.
-    """
+    """Register the options for publishing metering messages."""
     config.register_opts(METER_PUBLISH_OPTS, group="publisher_rpc")
 
 
@@ -63,10 +62,10 @@ def oslo_messaging_is_rabbit():
 
 
 def override_backend_retry_config(value):
-    """Override the retry config option native to the configured
-       rpc backend (if such a native config option exists).
+    """Override the retry config option native to the configured rpc backend.
 
-       :param value: the value to override
+    It is done if such a native config option exists.
+    :param value: the value to override
     """
     # TODO(sileht): ultimately we should add to olso a more generic concept
     # of retry config (i.e. not specific to an individual AMQP provider)

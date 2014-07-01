@@ -25,8 +25,7 @@ LOG = log.getLogger(__name__)
 
 
 class MTable(object):
-    """HappyBase.Table mock
-    """
+    """HappyBase.Table mock."""
     def __init__(self, name, families):
         self.name = name
         self.families = families
@@ -119,7 +118,9 @@ class MTable(object):
 
     @staticmethod
     def SingleColumnValueFilter(args, rows):
-        """This method is called from scan() when 'SingleColumnValueFilter'
+        """This is filter for testing "in-memory HBase".
+
+        This method is called from scan() when 'SingleColumnValueFilter'
         is found in the 'filter' argument.
         """
         op = args[2]
@@ -200,8 +201,10 @@ class MTable(object):
 
     @staticmethod
     def QualifierFilter(args, rows):
-        """This method is called from scan() when 'QualifierFilter'
-        is found in the 'filter' argument
+        """This is filter for testing "in-memory HBase".
+
+        This method is called from scan() when 'QualifierFilter' is found in
+        the 'filter' argument
         """
         op = args[0]
         value = args[1]
@@ -235,8 +238,7 @@ class MConnectionPool(object):
 
 
 class MConnection(object):
-    """HappyBase.Connection mock
-    """
+    """HappyBase.Connection mock."""
     def __init__(self):
         self.tables = {}
 

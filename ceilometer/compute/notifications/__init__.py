@@ -34,8 +34,10 @@ cfg.CONF.register_opts(OPTS)
 class ComputeNotificationBase(plugin.NotificationBase):
     @staticmethod
     def get_targets(conf):
-        """Return a sequence of oslo.messaging.Target defining the exchange and
-        topics to be connected for this plugin.
+        """Return a sequence of oslo.messaging.Target
+
+        This sequence is defining the exchange and topics to be connected for
+        this plugin.
         """
         return [oslo.messaging.Target(topic=topic,
                                       exchange=conf.nova_control_exchange)

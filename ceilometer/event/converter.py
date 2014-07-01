@@ -212,8 +212,7 @@ class EventDefinition(object):
 
     @staticmethod
     def _extract_when(body):
-        """Extract the generated datetime from the notification.
-        """
+        """Extract the generated datetime from the notification."""
         # NOTE: I am keeping the logic the same as it was in the collector,
         # However, *ALL* notifications should have a 'timestamp' field, it's
         # part of the notification envelope spec. If this was put here because

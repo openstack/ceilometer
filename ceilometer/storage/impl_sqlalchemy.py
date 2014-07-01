@@ -304,11 +304,10 @@ class Connection(base.Connection):
                                                value=v))
 
     def clear_expired_metering_data(self, ttl):
-        """Clear expired data from the backend storage system according to the
-        time-to-live.
+        """Clear expired data from the backend storage system.
 
+        Clearing occurs according to the time-to-live.
         :param ttl: Number of seconds to keep records for.
-
         """
 
         session = self._engine_facade.get_session()
@@ -609,11 +608,10 @@ class Connection(base.Connection):
 
     def get_meter_statistics(self, sample_filter, period=None, groupby=None,
                              aggregate=None):
-        """Return an iterable of api_models.Statistics instances containing
-        meter statistics described by the query parameters.
+        """Return an iterable of api_models.Statistics instances.
 
-        The filter must have a meter value set.
-
+        Items are containing meter statistics described by the query
+        parameters. The filter must have a meter value set.
         """
         if groupby:
             for group in groupby:
@@ -691,6 +689,7 @@ class Connection(base.Connection):
     def get_alarms(self, name=None, user=None, state=None, meter=None,
                    project=None, enabled=None, alarm_id=None, pagination=None):
         """Yields a lists of alarms that match filters
+
         :param user: Optional ID for user that owns the resource.
         :param state: Optional string for alarm state.
         :param meter: Optional string for alarms associated with meter.
@@ -775,16 +774,14 @@ class Connection(base.Connection):
                                             timestamp=row.timestamp)
 
     def query_alarms(self, filter_expr=None, orderby=None, limit=None):
-        """Yields a lists of alarms that match filter
-        """
+        """Yields a lists of alarms that match filter."""
         return self._retrieve_data(filter_expr, orderby, limit, models.Alarm)
 
     def _retrieve_alarm_history(self, query):
         return (self._row_to_alarm_change_model(x) for x in query.all())
 
     def query_alarm_history(self, filter_expr=None, orderby=None, limit=None):
-        """Return an iterable of model.AlarmChange objects.
-        """
+        """Return an iterable of model.AlarmChange objects."""
         return self._retrieve_data(filter_expr,
                                    orderby,
                                    limit,
@@ -849,8 +846,7 @@ class Connection(base.Connection):
         return self._retrieve_alarm_history(query)
 
     def record_alarm_change(self, alarm_change):
-        """Record alarm change event.
-        """
+        """Record alarm change event."""
         session = self._engine_facade.get_session()
         with session.begin():
             alarm_change_row = models.AlarmChange(
@@ -859,8 +855,9 @@ class Connection(base.Connection):
             session.add(alarm_change_row)
 
     def _get_or_create_trait_type(self, trait_type, data_type, session=None):
-        """Find if this trait already exists in the database, and
-        if it does not, create a new entry in the trait type table.
+        """Find if this trait already exists in the database.
+
+        If it does not, create a new entry in the trait type table.
         """
         if session is None:
             session = self._engine_facade.get_session()
@@ -889,10 +886,9 @@ class Connection(base.Connection):
         return models.Trait(trait_type, event, **values)
 
     def _get_or_create_event_type(self, event_type, session=None):
-        """Here, we check to see if an event type with the supplied
-        name already exists. If not, we create it and return the record.
+        """Check if an event type with the supplied name is already exists.
 
-        This may result in a flush.
+        If not, we create it and return the record. This may result in a flush.
         """
         if session is None:
             session = self._engine_facade.get_session()
@@ -905,8 +901,7 @@ class Connection(base.Connection):
         return et
 
     def _record_event(self, session, event_model):
-        """Store a single Event, including related Traits.
-        """
+        """Store a single Event, including related Traits."""
         with session.begin(subtransactions=True):
             event_type = self._get_or_create_event_type(event_model.event_type,
                                                         session=session)
@@ -1063,8 +1058,7 @@ class Connection(base.Connection):
         return sorted(event_models, key=operator.attrgetter('generated'))
 
     def get_event_types(self):
-        """Return all event types as an iterable of strings.
-        """
+        """Return all event types as an iterable of strings."""
 
         session = self._engine_facade.get_session()
         with session.begin():
@@ -1075,10 +1069,9 @@ class Connection(base.Connection):
                 yield name[0]
 
     def get_trait_types(self, event_type):
-        """Return a dictionary containing the name and data type of
-        the trait type. Only trait types for the provided event_type are
-        returned.
+        """Return a dictionary containing the name and data type of the trait.
 
+        Only trait types for the provided event_type are returned.
         :param event_type: the type of the Event
         """
         session = self._engine_facade.get_session()
@@ -1106,9 +1099,9 @@ class Connection(base.Connection):
                 yield {'name': desc_, 'data_type': dtype}
 
     def get_traits(self, event_type, trait_type=None):
-        """Return all trait instances associated with an event_type. If
-        trait_type is specified, only return instances of that trait type.
+        """Return all trait instances associated with an event_type.
 
+        If trait_type is specified, only return instances of that trait type.
         :param event_type: the type of the Event to filter by
         :param trait_type: the name of the Trait to filter by
         """

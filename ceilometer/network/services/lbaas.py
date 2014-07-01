@@ -63,8 +63,7 @@ class _BasePollster(plugin.PollsterBase):
 
 
 class LBPoolPollster(_BasePollster):
-    """Pollster to capture Load Balancer pool status samples.
-    """
+    """Pollster to capture Load Balancer pool status samples."""
     FIELDS = ['admin_state_up',
               'description',
               'lb_method',
@@ -104,8 +103,7 @@ class LBPoolPollster(_BasePollster):
 
 
 class LBVipPollster(_BasePollster):
-    """Pollster to capture Load Balancer Vip status samples.
-    """
+    """Pollster to capture Load Balancer Vip status samples."""
     FIELDS = ['admin_state_up',
               'address',
               'connection_limit',
@@ -148,8 +146,7 @@ class LBVipPollster(_BasePollster):
 
 
 class LBMemberPollster(_BasePollster):
-    """Pollster to capture Load Balancer Member status samples.
-    """
+    """Pollster to capture Load Balancer Member status samples."""
     FIELDS = ['admin_state_up',
               'address',
               'pool_id',
@@ -184,8 +181,7 @@ class LBMemberPollster(_BasePollster):
 
 
 class LBHealthMonitorPollster(_BasePollster):
-    """Pollster to capture Load Balancer Health probes status samples.
-    """
+    """Pollster to capture Load Balancer Health probes status samples."""
     FIELDS = ['admin_state_up',
               'delay',
               'max_retries',
@@ -216,8 +212,10 @@ class LBHealthMonitorPollster(_BasePollster):
 
 @six.add_metaclass(abc.ABCMeta)
 class _LBStatsPollster(_BasePollster):
-    """Base Statistics pollster capturing the statistics info
-     and yielding samples for connections and bandwidth.
+    """Base Statistics pollster.
+
+    It is capturing the statistics info and yielding samples for connections
+    and bandwidth.
     """
 
     def _get_lb_pools(self):
@@ -270,8 +268,7 @@ class _LBStatsPollster(_BasePollster):
 
 
 class LBActiveConnectionsPollster(_LBStatsPollster):
-    """Pollster to capture Active Load Balancer connections.
-    """
+    """Pollster to capture Active Load Balancer connections."""
 
     @staticmethod
     def _get_sample(pool, data):
@@ -285,8 +282,7 @@ class LBActiveConnectionsPollster(_LBStatsPollster):
 
 
 class LBTotalConnectionsPollster(_LBStatsPollster):
-    """Pollster to capture Total Load Balancer connections
-    """
+    """Pollster to capture Total Load Balancer connections."""
 
     @staticmethod
     def _get_sample(pool, data):
@@ -300,8 +296,7 @@ class LBTotalConnectionsPollster(_LBStatsPollster):
 
 
 class LBBytesInPollster(_LBStatsPollster):
-    """Pollster to capture incoming bytes.
-    """
+    """Pollster to capture incoming bytes."""
 
     @staticmethod
     def _get_sample(pool, data):
@@ -315,8 +310,7 @@ class LBBytesInPollster(_LBStatsPollster):
 
 
 class LBBytesOutPollster(_LBStatsPollster):
-    """Pollster to capture outgoing bytes.
-    """
+    """Pollster to capture outgoing bytes."""
 
     @staticmethod
     def _get_sample(pool, data):

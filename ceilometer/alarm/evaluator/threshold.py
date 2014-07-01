@@ -68,8 +68,7 @@ class ThresholdEvaluator(evaluator.Evaluator):
 
     @staticmethod
     def _sanitize(alarm, statistics):
-        """Sanitize statistics.
-        """
+        """Sanitize statistics."""
         LOG.debug(_('sanitize stats %s') % statistics)
         if alarm.rule.get('exclude_outliers'):
             key = operator.attrgetter('count')
@@ -103,8 +102,10 @@ class ThresholdEvaluator(evaluator.Evaluator):
             return []
 
     def _sufficient(self, alarm, statistics):
-        """Ensure there is sufficient data for evaluation,
-           transitioning to unknown otherwise.
+        """Check for the sufficiency of the data for evaluation.
+
+        Ensure there is sufficient data for evaluation, transitioning to
+        unknown otherwise.
         """
         sufficient = len(statistics) >= self.quorum
         if not sufficient and alarm.state != evaluator.UNKNOWN:
@@ -118,8 +119,7 @@ class ThresholdEvaluator(evaluator.Evaluator):
 
     @staticmethod
     def _reason_data(disposition, count, most_recent):
-        """Create a reason data dictionary for this evaluator type.
-        """
+        """Create a reason data dictionary for this evaluator type."""
         return {'type': 'threshold', 'disposition': disposition,
                 'count': count, 'most_recent': most_recent}
 

@@ -25,8 +25,7 @@ LOG = log.getLogger(__name__)
 
 
 class Connection(base.Connection):
-    """Log the data.
-    """
+    """Log the data."""
 
     def upgrade(self):
         pass
@@ -38,7 +37,7 @@ class Connection(base.Connection):
         """Write the data to the backend storage system.
 
         :param data: a dictionary such as returned by
-                     ceilometer.meter.meter_message_from_counter
+                     ceilometer.meter.meter_message_from_counter.
         """
         LOG.info(_('metering data %(counter_name)s for %(resource_id)s: '
                    '%(counter_volume)s')
@@ -47,11 +46,10 @@ class Connection(base.Connection):
                      'counter_volume': data['counter_volume']}))
 
     def clear_expired_metering_data(self, ttl):
-        """Clear expired data from the backend storage system according to the
-        time-to-live.
+        """Clear expired data from the backend storage system.
 
+        Clearing occurs according to the time-to-live.
         :param ttl: Number of seconds to keep records for.
-
         """
         LOG.info(_("Dropping data with TTL %d"), ttl)
 
@@ -104,7 +102,9 @@ class Connection(base.Connection):
         return []
 
     def get_samples(self, sample_filter):
-        """Return an iterable of samples as created by
+        """Return an iterable of samples.
+
+        Items are created by
         :func:`ceilometer.meter.meter_message_from_counter`.
         """
         return []
@@ -112,8 +112,8 @@ class Connection(base.Connection):
     def get_meter_statistics(self, sample_filter, period=None, groupby=None,
                              aggregate=None):
         """Return a dictionary containing meter statistics.
-        described by the query parameters.
 
+        Meter statistics is described by the query parameters.
         The filter must have a meter value set.
 
         { 'min':
@@ -128,24 +128,20 @@ class Connection(base.Connection):
           'duration_start':
           'duration_end':
           }
-
         """
         return []
 
     def get_alarms(self, name=None, user=None, state=None, meter=None,
                    project=None, enabled=None, alarm_id=None, pagination=None):
-        """Yields a lists of alarms that match filters
-        """
+        """Yields a lists of alarms that match filters."""
         return []
 
     def create_alarm(self, alarm):
-        """Create alarm.
-        """
+        """Create alarm."""
         return alarm
 
     def update_alarm(self, alarm):
-        """update alarm
-        """
+        """Update alarm."""
         return alarm
 
     def delete_alarm(self, alarm_id):

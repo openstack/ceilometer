@@ -30,9 +30,10 @@ cfg.CONF.import_opt("policy_file", "ceilometer.openstack.common.policy")
 
 
 class FunctionalTest(db_test_base.TestBase):
-    """Used for functional tests of Pecan controllers where you need to
-    test your literal application and its integration with the
-    framework.
+    """Used for functional tests of Pecan controllers.
+
+    Used in case when you need to test your literal application and its
+    integration with the framework.
     """
 
     PATH_PREFIX = ''

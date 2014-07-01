@@ -2705,8 +2705,9 @@ class ComplexAlarmHistoryQueryTest(AlarmTestBase,
 
 class EventTestBase(tests_db.TestBase,
                     tests_db.MixinTestsWithBackendScenarios):
-    """Separate test base class because we don't want to
-    inherit all the Meter stuff.
+    """Separate test base class.
+
+    We don't want to inherit all the Meter stuff.
     """
 
     def setUp(self):

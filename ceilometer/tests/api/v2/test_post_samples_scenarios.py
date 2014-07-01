@@ -166,6 +166,7 @@ class TestPostSamples(v2.FunctionalTest,
 
     def test_multiple_samples(self):
         """Send multiple samples.
+
         The usecase here is to reduce the chatter and send the counters
         at a slower cadence.
         """
@@ -269,8 +270,10 @@ class TestPostSamples(v2.FunctionalTest,
             self.assertEqual(s, self.published[0][x])
 
     def test_multiple_samples_multiple_sources(self):
-        """Do accept a single post with some multiples sources
-        with some of them null
+        """Test posting with special conditions.
+
+        Do accept a single post with some multiples sources with some of them
+        null.
         """
         s1 = [{'counter_name': 'my_counter_name',
                'counter_type': 'gauge',
@@ -317,8 +320,7 @@ class TestPostSamples(v2.FunctionalTest,
             self.assertEqual(s, self.published[0][x])
 
     def test_missing_project_user_id(self):
-        """Ensure missing project & user IDs are defaulted appropriately.
-        """
+        """Ensure missing project & user IDs are defaulted appropriately."""
         s1 = [{'counter_name': 'my_counter_name',
                'counter_type': 'gauge',
                'counter_unit': 'instance',

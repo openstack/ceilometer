@@ -306,8 +306,7 @@ class Connection(base.Connection):
                 yield alarm_models.AlarmChange(**stored_entry)
 
     def record_alarm_change(self, alarm_change):
-        """Record alarm change event.
-        """
+        """Record alarm change event."""
         alarm_change_dict = hbase_utils.serialize_entry(alarm_change)
         ts = alarm_change.get('timestamp') or datetime.datetime.now()
         rts = hbase_utils.timestamp(ts)
@@ -513,17 +512,16 @@ class Connection(base.Connection):
 
     def get_meter_statistics(self, sample_filter, period=None, groupby=None,
                              aggregate=None):
-        """Return an iterable of models.Statistics instances containing meter
-        statistics described by the query parameters.
+        """Return an iterable of models.Statistics instances.
 
-        The filter must have a meter value set.
+        Items are containing meter statistics described by the query
+        parameters. The filter must have a meter value set.
 
         .. note::
 
           Due to HBase limitations the aggregations are implemented
           in the driver itself, therefore this method will be quite slow
           because of all the Thrift traffic it is going to create.
-
         """
         if groupby:
             raise NotImplementedError("Group by not implemented.")
@@ -714,9 +712,9 @@ class Connection(base.Connection):
                         yield {'name': name, 'data_type': data_type}
 
     def get_traits(self, event_type, trait_type=None):
-        """Return all trait instances associated with an event_type. If
-        trait_type is specified, only return instances of that trait type.
+        """Return all trait instances associated with an event_type.
 
+        If trait_type is specified, only return instances of that trait type.
         :param event_type: the type of the Event to filter by
         :param trait_type: the name of the Trait to filter by
         """

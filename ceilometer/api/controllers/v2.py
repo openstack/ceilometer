@@ -89,8 +89,7 @@ class EntityNotFound(ClientSideError):
 
 
 class AdvEnum(wtypes.wsproperty):
-    """Handle default and mandatory for wtypes.Enum
-    """
+    """Handle default and mandatory for wtypes.Enum."""
     def __init__(self, name, *args, **kwargs):
         self._name = '_advenum_%s' % name
         self._default = kwargs.pop('default', None)
@@ -146,8 +145,7 @@ class _Base(wtypes.Base):
 
 
 class Link(_Base):
-    """A link representation
-    """
+    """A link representation."""
 
     href = wtypes.text
     "The url of a link"
@@ -165,8 +163,7 @@ class Link(_Base):
 
 
 class Query(_Base):
-    """Query filter.
-    """
+    """Query filter."""
 
     # The data types supported by the query.
     _supported_types = ['integer', 'float', 'string', 'boolean']
@@ -299,11 +296,12 @@ def _get_auth_project(on_behalf_of=None):
 
 
 def _sanitize_query(query, db_func, on_behalf_of=None):
-    '''Check the query to see if:
+    """Check the query.
+
+    See if:
     1) the request is coming from admin - then allow full visibility
-    2) non-admin - make sure that the query includes the requester's
-    project.
-    '''
+    2) non-admin - make sure that the query includes the requester's project.
+    """
     q = copy.copy(query)
 
     auth_project = _get_auth_project(on_behalf_of)
@@ -322,7 +320,7 @@ def _sanitize_query(query, db_func, on_behalf_of=None):
 
 
 def _verify_query_segregation(query, auth_project=None):
-    '''Ensure non-admin queries are not constrained to another project.'''
+    """Ensure non-admin queries are not constrained to another project."""
     auth_project = (auth_project or
                     acl.get_limited_to_project(pecan.request.headers))
 
@@ -336,9 +334,10 @@ def _verify_query_segregation(query, auth_project=None):
 
 def _validate_query(query, db_func, internal_keys=None,
                     allow_timestamps=True):
-    """Validates the syntax of the query and verifies that the query
-    request is authorized for the included project.
+    """Validates the syntax of the query and verifies the query.
 
+    Verification check if the query request is authorized for the included
+    project.
     :param query: Query expression that should be validated
     :param db_func: the function on the storage level, of which arguments
         will form the valid_keys list, which defines the valid fields for a
@@ -355,7 +354,6 @@ def _validate_query(query, db_func, internal_keys=None,
         search_offset was included without timestamp constraint
     :raises: UnknownArgument: if a field name is not a timestamp field, nor
         in the list of valid keys
-
     """
 
     internal_keys = internal_keys or []
@@ -408,8 +406,7 @@ def _validate_query(query, db_func, internal_keys=None,
 
 def _validate_timestamp_fields(query, field_name, operator_list,
                                allow_timestamps):
-    """Validates the timestamp related constraints in a query expression, if
-    there are any.
+    """Validates the timestamp related constraints in a query if there are any.
 
     :param query: query expression that may contain the timestamp fields
     :param field_name: timestamp name, which should be checked (timestamp,
@@ -429,7 +426,6 @@ def _validate_timestamp_fields(query, field_name, operator_list,
         field
     :raises UnknownArgument: if the timestamp constraint is not allowed in
         the query
-
     """
 
     for item in query:
@@ -504,9 +500,9 @@ def _query_to_kwargs(query, db_func, internal_keys=None,
 
 
 def _validate_groupby_fields(groupby_fields):
-    """Checks that the list of groupby fields from request is valid and
-    if all fields are valid, returns fields with duplicates removed
+    """Checks that the list of groupby fields from request is valid.
 
+    If all fields are valid, returns fields with duplicates removed.
     """
     # NOTE(terriyu): Currently, metadata fields are not supported in our
     # group by statistics implementation
@@ -574,9 +570,10 @@ def _get_query_timestamps(args=None):
 
 
 def _flatten_metadata(metadata):
-    """Return flattened resource metadata with flattened nested
-    structures (except nested sets) and with all values converted
-    to unicode strings.
+    """Return flattened resource metadata.
+
+    Metadata is returned with flattened nested structures (except nested sets)
+    and with all values converted to unicode strings.
     """
     if metadata:
         # After changing recursive_keypairs` output we need to keep
@@ -693,8 +690,7 @@ class OldSample(_Base):
 
 
 class Statistics(_Base):
-    """Computed statistics for a query.
-    """
+    """Computed statistics for a query."""
 
     groupby = {wtypes.text: wtypes.text}
     "Dictionary of field names for group, if groupby statistics are requested"
@@ -812,8 +808,7 @@ class Aggregate(_Base):
 
 
 class MeterController(rest.RestController):
-    """Manages operations on a single meter.
-    """
+    """Manages operations on a single meter."""
     _custom_actions = {
         'statistics': ['GET'],
     }
@@ -944,8 +939,7 @@ class MeterController(rest.RestController):
 
 
 class Meter(_Base):
-    """One category of measurements.
-    """
+    """One category of measurements."""
 
     name = wtypes.text
     "The unique name for the meter"
@@ -1271,8 +1265,7 @@ class ValidatedComplexQuery(object):
         self.original_query = query
 
     def validate(self, visibility_field):
-        """Validates the query content and does the necessary transformations.
-        """
+        """Validates the query content and does the necessary conversions."""
         if self.original_query.filter is wtypes.Unset:
             self.filter_expr = None
         else:
@@ -1322,8 +1315,7 @@ class ValidatedComplexQuery(object):
 
     def _check_cross_project_references(self, own_project_id,
                                         visibility_field):
-        """Do not allow other than own_project_id
-        """
+        """Do not allow other than own_project_id."""
         def check_project_id(subfilter):
             op = subfilter.keys()[0]
             if (op.lower() not in self.complex_operators
@@ -1334,8 +1326,10 @@ class ValidatedComplexQuery(object):
         self._traverse_postorder(self.filter_expr, check_project_id)
 
     def _force_visibility(self, visibility_field):
-        """If the tenant is not admin insert an extra
-        "and <visibility_field>=<tenant's project_id>" clause to the query
+        """Force visibility field.
+
+        If the tenant is not admin insert an extra
+        "and <visibility_field>=<tenant's project_id>" clause to the query.
         """
         authorized_project = acl.get_limited_to_project(pecan.request.headers)
         is_admin = authorized_project is None
@@ -1402,8 +1396,7 @@ class ValidatedComplexQuery(object):
 
 
 class Resource(_Base):
-    """An externally defined object for which samples have been received.
-    """
+    """An externally defined object for which samples have been received."""
 
     resource_id = wtypes.text
     "The unique identifier for the resource"
@@ -1828,8 +1821,7 @@ class Alarm(_Base):
 
 
 class AlarmChange(_Base):
-    """Representation of an event in an alarm's history
-    """
+    """Representation of an event in an alarm's history."""
 
     event_id = wtypes.text
     "The UUID of the change event"
@@ -1872,8 +1864,7 @@ class AlarmChange(_Base):
 
 
 class AlarmController(rest.RestController):
-    """Manages operations on a single alarm.
-    """
+    """Manages operations on a single alarm."""
 
     _custom_actions = {
         'history': ['GET'],
@@ -1922,8 +1913,7 @@ class AlarmController(rest.RestController):
 
     @wsme_pecan.wsexpose(Alarm)
     def get(self):
-        """Return this alarm.
-        """
+        """Return this alarm."""
         return Alarm.from_db_model(self._alarm())
 
     @wsme_pecan.wsexpose(Alarm, body=Alarm)
@@ -1987,8 +1977,7 @@ class AlarmController(rest.RestController):
 
     @wsme_pecan.wsexpose(None, status_code=204)
     def delete(self):
-        """Delete this alarm.
-        """
+        """Delete this alarm."""
         # ensure alarm exists before deleting
         alarm = self._alarm()
         self.conn.delete_alarm(alarm.alarm_id)
@@ -2040,15 +2029,13 @@ class AlarmController(rest.RestController):
 
     @wsme_pecan.wsexpose(state_kind_enum)
     def get_state(self):
-        """Get the state of this alarm.
-        """
+        """Get the state of this alarm."""
         alarm = self._alarm()
         return alarm.state
 
 
 class AlarmsController(rest.RestController):
-    """Manages operations on the alarms collection.
-    """
+    """Manages operations on the alarms collection."""
 
     @pecan.expose()
     def _lookup(self, alarm_id, *remainder):
@@ -2192,8 +2179,9 @@ class Trait(_Base):
 
     @staticmethod
     def _convert_storage_trait(trait):
-        """Helper method to convert a storage model into an API trait
-        instance. If an API trait instance is passed in, just return it.
+        """Helper method to convert a storage model into an API trait instance.
+
+        If an API trait instance is passed in, just return it.
         """
         if isinstance(trait, Trait):
             return trait
@@ -2328,8 +2316,7 @@ class EventTypesController(rest.RestController):
     @requires_admin
     @wsme_pecan.wsexpose([unicode])
     def get_all(self):
-        """Get all event types.
-        """
+        """Get all event types."""
         return list(pecan.request.storage_conn.get_event_types())
 
 
@@ -2377,8 +2364,7 @@ class EventsController(rest.RestController):
 
 
 class QuerySamplesController(rest.RestController):
-    """Provides complex query possibilities for samples
-    """
+    """Provides complex query possibilities for samples."""
 
     @wsme_pecan.wsexpose([Sample], body=ComplexQuery)
     def post(self, body):
@@ -2405,8 +2391,7 @@ class QuerySamplesController(rest.RestController):
 
 
 class QueryAlarmHistoryController(rest.RestController):
-    """Provides complex query possibilites for alarm history
-    """
+    """Provides complex query possibilites for alarm history."""
     @wsme_pecan.wsexpose([AlarmChange], body=ComplexQuery)
     def post(self, body):
         """Define query for retrieving AlarmChange data.
@@ -2424,8 +2409,7 @@ class QueryAlarmHistoryController(rest.RestController):
 
 
 class QueryAlarmsController(rest.RestController):
-    """Provides complex query possibilities for alarms
-    """
+    """Provides complex query possibilities for alarms."""
     history = QueryAlarmHistoryController()
 
     @wsme_pecan.wsexpose([Alarm], body=ComplexQuery)
@@ -2455,8 +2439,9 @@ def _flatten_capabilities(capabilities):
 
 
 class Capabilities(_Base):
-    """A representation of the API and storage capabilities, usually
-       constrained by restrictions imposed by the storage driver.
+    """A representation of the API and storage capabilities.
+
+    Usually constrained by restrictions imposed by the storage driver.
     """
 
     api = {wtypes.text: bool}
@@ -2507,13 +2492,13 @@ class Capabilities(_Base):
 
 
 class CapabilitiesController(rest.RestController):
-    """Manages capabilities queries.
-    """
+    """Manages capabilities queries."""
 
     @wsme_pecan.wsexpose(Capabilities)
     def get(self):
-        """Returns a flattened dictionary of API capabilities supported
-           by the currently configured storage driver.
+        """Returns a flattened dictionary of API capabilities.
+
+        Capabilities supported by the currently configured storage driver.
         """
         # variation in API capabilities is effectively determined by
         # the lack of strict feature parity across storage drivers

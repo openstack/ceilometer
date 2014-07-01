@@ -26,8 +26,10 @@ from ceilometer import plugin
 
 @six.add_metaclass(abc.ABCMeta)
 class ComputePollster(plugin.PollsterBase):
-    """Base class for plugins that support the polling API on the compute node.
-    """
+    """Base class for plugins.
+
+     It supports the polling API on the compute node.
+     """
 
     @abc.abstractmethod
     def get_samples(self, manager, cache, resources):
