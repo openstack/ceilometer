@@ -175,7 +175,7 @@ class TestRPCAlarmPartitionCoordination(tests_base.BaseTestCase):
         self.coordinator_server.rpc.start()
         eventlet.sleep()  # must be sure that fanout queue is created
 
-        self.ordination = rpc_alarm.RPCAlarmPartitionCoordination()
+        self.coordination = rpc_alarm.RPCAlarmPartitionCoordination()
         self.alarms = [
             alarms.Alarm(None, info={
                 'name': 'instance_running_hot',
@@ -211,28 +211,28 @@ class TestRPCAlarmPartitionCoordination(tests_base.BaseTestCase):
             }),
         ]
 
-    def test_ordination_presence(self):
+    def test_coordination_presence(self):
         id = str(uuid.uuid4())
         priority = float(timeutils.utcnow().strftime('%s.%f'))
-        self.ordination.presence(id, priority)
+        self.coordination.presence(id, priority)
         self.coordinator_server.rpc.wait()
         method, args = self.coordinator_server.notified[0]
         self.assertEqual(id, args['uuid'])
         self.assertEqual(priority, args['priority'])
         self.assertEqual('presence', method)
 
-    def test_ordination_assign(self):
+    def test_coordination_assign(self):
         id = str(uuid.uuid4())
-        self.ordination.assign(id, self.alarms)
+        self.coordination.assign(id, self.alarms)
         self.coordinator_server.rpc.wait()
         method, args = self.coordinator_server.notified[0]
         self.assertEqual(id, args['uuid'])
         self.assertEqual(2, len(args['alarms']))
         self.assertEqual('assign', method)
 
-    def test_ordination_allocate(self):
+    def test_coordination_allocate(self):
         id = str(uuid.uuid4())
-        self.ordination.allocate(id, self.alarms)
+        self.coordination.allocate(id, self.alarms)
         self.coordinator_server.rpc.wait()
         method, args = self.coordinator_server.notified[0]
         self.assertEqual(id, args['uuid'])
