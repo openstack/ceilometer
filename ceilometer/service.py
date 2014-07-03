@@ -87,6 +87,8 @@ CLI_OPTIONS = [
 ]
 cfg.CONF.register_cli_opts(CLI_OPTIONS, group="service_credentials")
 
+cfg.CONF.import_opt('default_log_levels',
+                    'ceilometer.openstack.common.log')
 
 LOG = log.getLogger(__name__)
 
@@ -110,15 +112,10 @@ def get_workers(name):
 def prepare_service(argv=None):
     gettextutils.install('ceilometer', lazy=True)
     gettextutils.enable_lazy()
+    log_levels = (cfg.CONF.default_log_levels +
+                  ['stevedore=INFO', 'keystoneclient=INFO'])
     cfg.set_defaults(log.log_opts,
-                     default_log_levels=['amqplib=WARN',
-                                         'qpid.messaging=INFO',
-                                         'sqlalchemy=WARN',
-                                         'keystoneclient=INFO',
-                                         'stevedore=INFO',
-                                         'eventlet.wsgi.server=WARN',
-                                         'iso8601=WARN'
-                                         ])
+                     default_log_levels=log_levels)
     if argv is None:
         argv = sys.argv
     cfg.CONF(argv[1:], project='ceilometer')
