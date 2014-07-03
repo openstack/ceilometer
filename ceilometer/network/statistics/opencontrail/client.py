@@ -14,6 +14,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import copy
+
 from oslo_config import cfg
 import requests
 import six
@@ -37,52 +39,21 @@ class OpencontrailAPIFailed(Exception):
 class AnalyticsAPIBaseClient(object):
     """Opencontrail Base Statistics REST API Client."""
 
-    def __init__(self, endpoint, username, password, domain, verify_ssl=True):
+    def __init__(self, endpoint, data):
         self.endpoint = endpoint
-        self.username = username
-        self.password = password
-        self.domain = domain
-        self.verify_ssl = verify_ssl
-        self.sid = None
+        self.data = data or {}
 
-    def authenticate(self):
-        path = '/authenticate'
-        data = {'username': self.username,
-                'password': self.password,
-                'domain': self.domain}
+    def request(self, path, fqdn_uuid, data=None):
+        req_data = copy.copy(self.data)
+        if data:
+            req_data.update(data)
 
-        req_params = self._get_req_params(data=data)
-        url = urlparse.urljoin(self.endpoint, path)
-        resp = requests.post(url, **req_params)
-        if resp.status_code != 302:
-            raise OpencontrailAPIFailed(
-                _('Opencontrail API returned %(status)s %(reason)s') %
-                {'status': resp.status_code, 'reason': resp.reason})
-        self.sid = resp.cookies['connect.sid']
+        req_params = self._get_req_params(data=req_data)
 
-    def request(self, path, fqdn_uuid, data, retry=True):
-        if not self.sid:
-            self.authenticate()
-
-        if not data:
-            data = {'fqnUUID': fqdn_uuid}
-        else:
-            data['fqnUUID'] = fqdn_uuid
-
-        req_params = self._get_req_params(data=data,
-                                          cookies={'connect.sid': self.sid})
-
-        url = urlparse.urljoin(self.endpoint, path)
+        url = urlparse.urljoin(self.endpoint, path + fqdn_uuid)
         self._log_req(url, req_params)
         resp = requests.get(url, **req_params)
         self._log_res(resp)
-
-        # it seems that the sid token has to be renewed
-        if resp.status_code == 302:
-            self.sid = 0
-            if retry:
-                return self.request(path, fqdn_uuid, data,
-                                    retry=False)
 
         if resp.status_code != 200:
             raise OpencontrailAPIFailed(
@@ -91,15 +62,13 @@ class AnalyticsAPIBaseClient(object):
 
         return resp
 
-    def _get_req_params(self, params=None, data=None, cookies=None):
+    def _get_req_params(self, data=None):
         req_params = {
             'headers': {
                 'Accept': 'application/json'
             },
             'data': data,
-            'verify': self.verify_ssl,
             'allow_redirects': False,
-            'cookies': cookies,
             'timeout': CONF.http_timeout,
         }
 
@@ -143,24 +112,20 @@ class AnalyticsAPIBaseClient(object):
 class NetworksAPIClient(AnalyticsAPIBaseClient):
     """Opencontrail Statistics REST API Client."""
 
-    def get_port_statistics(self, fqdn_uuid):
-        """Get port statistics of a network
+    def get_vm_statistics(self, fqdn_uuid, data=None):
+        """Get statistics of a virtual-machines.
 
         URL:
-            /tenant/networking/virtual-machines/details
-        PARAMS:
-            fqdnUUID=fqdn_uuid
-            type=vn
+            {endpoint}/analytics/uves/virtual-machine/{fqdn_uuid}
         """
 
-        path = '/api/tenant/networking/virtual-machines/details'
-        resp = self.request(path, fqdn_uuid, {'type': 'vn'})
+        path = '/analytics/uves/virtual-machine/'
+        resp = self.request(path, fqdn_uuid, data)
 
         return resp.json()
 
 
 class Client(object):
 
-    def __init__(self, endpoint, username, password, domain, verify_ssl=True):
-        self.networks = NetworksAPIClient(endpoint, username, password,
-                                          domain, verify_ssl)
+    def __init__(self, endpoint, data=None):
+        self.networks = NetworksAPIClient(endpoint, data)

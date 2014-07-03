@@ -13,6 +13,9 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+
+import re
+
 from oslo_utils import timeutils
 from six.moves.urllib import parse as urlparse
 
@@ -25,6 +28,7 @@ class OpencontrailDriver(driver.Driver):
     """Driver of network analytics of Opencontrail.
 
     This driver uses resources in "pipeline.yaml".
+
     Resource requires below conditions:
 
     * resource is url
@@ -35,21 +39,26 @@ class OpencontrailDriver(driver.Driver):
 
     * scheme:
       The scheme of request url to Opencontrail Analytics endpoint.
-      (default http)
-    * username:
-      This is username used by Opencontrail Analytics.(default None)
-    * password:
-      This is password used by Opencontrail Analytics.(default None)
-    * domain:
-      This is domain used by Opencontrail Analytics.(default None)
-    * verify_ssl:
-      Specify if the certificate will be checked for https request.
-      (default false)
+      (default "http")
+    * virtual_network
+      Specify the virtual network.
+      (default None)
+    * fqdn_uuid:
+      Specify the VM fqdn UUID.
+      (default "*")
+    * resource:
+      The resource on which the counters are retrieved.
+      (default "if_stats_list")
+
+      * fip_stats_list:
+        Traffic on floating ips
+      * if_stats_list:
+        Traffic on VM interfaces
 
     e.g.::
 
-      opencontrail://localhost:8143/?username=admin&password=admin&
-      scheme=https&domain=&verify_ssl=true
+      opencontrail://localhost:8081/?resource=fip_stats_list&
+      virtual_network=default-domain:openstack:public
     """
     @staticmethod
     def _prepare_cache(endpoint, params, cache):
@@ -58,11 +67,7 @@ class OpencontrailDriver(driver.Driver):
             return cache['network.statistics.opencontrail']
 
         data = {
-            'o_client': client.Client(endpoint,
-                                      params['username'],
-                                      params['password'],
-                                      params.get('domain'),
-                                      params.get('verify_ssl') == 'true'),
+            'o_client': client.Client(endpoint),
             'n_client': neutron_client.Client()
         }
 
@@ -95,23 +100,22 @@ class OpencontrailDriver(driver.Driver):
         data = self._prepare_cache(endpoint, params, cache)
 
         ports = data['n_client'].port_get_all()
-        ports_map = dict((port['id'], port['tenant_id']) for port in ports)
+        ports_map = dict((port['id'], port) for port in ports)
 
-        networks = data['n_client'].network_get_all()
+        resource = params.get('resource', ['if_stats_list'])[0]
+        fqdn_uuid = params.get('fqdn_uuid', ['*'])[0]
+        virtual_network = params.get('virtual_network', [None])[0]
 
-        for network in networks:
-            net_id = network['id']
+        timestamp = timeutils.utcnow().isoformat()
+        statistics = data['o_client'].networks.get_vm_statistics(fqdn_uuid)
+        if not statistics:
+            return
 
-            timestamp = timeutils.utcnow().isoformat()
-            statistics = data['o_client'].networks.get_port_statistics(net_id)
-            if not statistics:
-                continue
-
-            for value in statistics['value']:
-                for sample in iter(extractor, value, ports_map):
-                    if sample is not None:
-                        sample[2]['network_id'] = net_id
-                        yield sample + (timestamp, )
+        for value in statistics['value']:
+            for sample in iter(extractor, value, ports_map,
+                               resource, virtual_network):
+                if sample is not None:
+                    yield sample + (timestamp, )
 
     def _get_iter(self, meter_name):
         if meter_name.startswith('switch.port'):
@@ -122,17 +126,65 @@ class OpencontrailDriver(driver.Driver):
         return getattr(self, method_name, None)
 
     @staticmethod
-    def _iter_port(extractor, value, ports_map):
-        ifstats = value['value']['UveVirtualMachineAgent']['if_stats_list']
-        for ifstat in ifstats:
-            name = ifstat['name']
-            device_owner_id, port_id = name.split(':')
+    def _explode_name(fq_name):
+        m = re.match(
+            "(?P<domain>[^:]+):(?P<project>.+):(?P<port_id>[^:]+)",
+            fq_name)
+        if not m:
+            return
+        return m.group('domain'), m.group('project'), m.group('port_id')
 
-            tenant_id = ports_map.get(port_id)
+    @staticmethod
+    def _get_resource_meta(ports_map, stat, resource, network):
+        if resource == 'fip_stats_list':
+            if network and (network != stat['virtual_network']):
+                return
+            name = stat['iface_name']
+        else:
+            name = stat['name']
 
-            resource_meta = {'device_owner_id': device_owner_id,
-                             'tenant_id': tenant_id}
-            yield extractor(ifstat, port_id, resource_meta)
+        domain, project, port_id = OpencontrailDriver._explode_name(name)
+        port = ports_map.get(port_id)
+
+        tenant_id = None
+        network_id = None
+        device_owner_id = None
+
+        if port:
+            tenant_id = port['tenant_id']
+            network_id = port['network_id']
+            device_owner_id = port['device_id']
+
+        resource_meta = {'device_owner_id': device_owner_id,
+                         'network_id': network_id,
+                         'project_id': tenant_id,
+                         'project': project,
+                         'resource': resource,
+                         'domain': domain}
+
+        return port_id, resource_meta
+
+    @staticmethod
+    def _iter_port(extractor, value, ports_map, resource,
+                   virtual_network=None):
+        stats = value['value']['UveVirtualMachineAgent'].get(resource, [])
+        for stat in stats:
+            if type(stat) is list:
+                for sub_stats, node in zip(*[iter(stat)] * 2):
+                    for sub_stat in sub_stats:
+                        result = OpencontrailDriver._get_resource_meta(
+                            ports_map, sub_stat, resource, virtual_network)
+                        if not result:
+                            continue
+                        port_id, resource_meta = result
+                        yield extractor(sub_stat, port_id, resource_meta)
+            else:
+                result = OpencontrailDriver._get_resource_meta(
+                    ports_map, stat, resource, virtual_network)
+                if not result:
+                    continue
+                port_id, resource_meta = result
+                yield extractor(stat, port_id, resource_meta)
 
     @staticmethod
     def _switch_port_receive_packets(statistic, resource_id, resource_meta):

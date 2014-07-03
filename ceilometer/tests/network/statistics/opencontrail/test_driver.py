@@ -31,11 +31,6 @@ class TestOpencontrailDriver(base.BaseTestCase):
                                    return_value=self.fake_ports())
         self.nc_ports.start()
 
-        self.nc_networks = mock.patch('ceilometer.neutron_client'
-                                      '.Client.network_get_all',
-                                      return_value=self.fake_networks())
-        self.nc_networks.start()
-
         self.driver = driver.OpencontrailDriver()
         self.parse_url = urlparse.ParseResult('opencontrail',
                                               '127.0.0.1:8143',
@@ -43,7 +38,8 @@ class TestOpencontrailDriver(base.BaseTestCase):
         self.params = {'password': ['admin'],
                        'scheme': ['http'],
                        'username': ['admin'],
-                       'verify_ssl': ['false']}
+                       'verify_ssl': ['false'],
+                       'resource': ['if_stats_list']}
 
     @staticmethod
     def fake_ports():
@@ -59,20 +55,6 @@ class TestOpencontrailDriver(base.BaseTestCase):
                  'tenant_id': '89271fa581ab4380bf172f868c3615f9'}]
 
     @staticmethod
-    def fake_networks():
-        return [{'admin_state_up': True,
-                 'id': '298a3088-a446-4d5a-bad8-f92ecacd786b',
-                 'name': 'public',
-                 'provider:network_type': 'gre',
-                 'provider:physical_network': None,
-                 'provider:segmentation_id': 2,
-                 'router:external': True,
-                 'shared': False,
-                 'status': 'ACTIVE',
-                 'subnets': [u'c4b6f5b8-3508-4896-b238-a441f25fb492'],
-                 'tenant_id': '62d6f08bbd3a44f6ad6f00ca15cce4e5'}]
-
-    @staticmethod
     def fake_port_stats():
         return {"value": [{
             "name": "c588ebb7-ae52-485a-9f0c-b2791c5da196",
@@ -85,61 +67,200 @@ class TestOpencontrailDriver(base.BaseTestCase):
                         "out_bandwidth_usage": 0,
                         "out_pkts": 5,
                         "in_pkts": 6,
-                        "name": ("674e553b-8df9-4321-87d9-93ba05b93558:"
+                        "name": ("default-domain:demo:"
                                  "96d49cc3-4e01-40ce-9cac-c0e32642a442")
-                    }]}}}]}
+                    }],
+                    "fip_stats_list": [{
+                        "in_bytes": 33,
+                        "iface_name": ("default-domain:demo:"
+                                       "96d49cc3-4e01-40ce-9cac-c0e32642a442"),
+                        "out_bytes": 44,
+                        "out_pkts": 10,
+                        "virtual_network": "default-domain:openstack:public",
+                        "in_pkts": 11,
+                        "ip_address": "1.1.1.1"
+                    }]
+                }}}]}
 
-    def _test_meter(self, meter_name, expected):
+    @staticmethod
+    def fake_port_stats_with_node():
+        return {"value": [{
+            "name": "c588ebb7-ae52-485a-9f0c-b2791c5da196",
+            "value": {
+                "UveVirtualMachineAgent": {
+                    "if_stats_list": [
+                        [[{
+                            "out_bytes": 22,
+                            "in_bandwidth_usage": 0,
+                            "in_bytes": 23,
+                            "out_bandwidth_usage": 0,
+                            "out_pkts": 5,
+                            "in_pkts": 6,
+                            "name": ("default-domain:demo:"
+                                     "96d49cc3-4e01-40ce-9cac-c0e32642a442")
+                        }], 'node1'],
+                        [[{
+                            "out_bytes": 22,
+                            "in_bandwidth_usage": 0,
+                            "in_bytes": 23,
+                            "out_bandwidth_usage": 0,
+                            "out_pkts": 4,
+                            "in_pkts": 13,
+                            "name": ("default-domain:demo:"
+                                     "96d49cc3-4e01-40ce-9cac-c0e32642a442")}],
+                            'node2']
+                    ]
+                }}}]}
+
+    def _test_meter(self, meter_name, expected, fake_port_stats=None):
+        if not fake_port_stats:
+            fake_port_stats = self.fake_port_stats()
         with mock.patch('ceilometer.network.'
                         'statistics.opencontrail.'
                         'client.NetworksAPIClient.'
-                        'get_port_statistics',
-                        return_value=self.fake_port_stats()) as port_stats:
+                        'get_vm_statistics',
+                        return_value=fake_port_stats) as port_stats:
 
             samples = self.driver.get_sample_data(meter_name, self.parse_url,
                                                   self.params, {})
 
             self.assertEqual(expected, [s for s in samples])
 
-            net_id = '298a3088-a446-4d5a-bad8-f92ecacd786b'
-            port_stats.assert_called_with(net_id)
+            port_stats.assert_called_with('*')
+
+    def test_switch_port_receive_packets_with_node(self):
+        expected = [(6,
+                     '96d49cc3-4e01-40ce-9cac-c0e32642a442',
+                     {'device_owner_id':
+                      '674e553b-8df9-4321-87d9-93ba05b93558',
+                      'domain': 'default-domain',
+                      'network_id': '298a3088-a446-4d5a-bad8-f92ecacd786b',
+                      'project': 'demo',
+                      'project_id': '89271fa581ab4380bf172f868c3615f9',
+                      'resource': 'if_stats_list'},
+                     mock.ANY),
+                    (13,
+                     '96d49cc3-4e01-40ce-9cac-c0e32642a442',
+                     {'device_owner_id':
+                      '674e553b-8df9-4321-87d9-93ba05b93558',
+                      'domain': 'default-domain',
+                      'network_id': '298a3088-a446-4d5a-bad8-f92ecacd786b',
+                      'project': 'demo',
+                      'project_id': '89271fa581ab4380bf172f868c3615f9',
+                      'resource': 'if_stats_list'},
+                     mock.ANY)]
+        self._test_meter('switch.port.receive.packets', expected,
+                         self.fake_port_stats_with_node())
 
     def test_switch_port_receive_packets(self):
-        expected = [
-            (6,
-             '96d49cc3-4e01-40ce-9cac-c0e32642a442',
-             {'device_owner_id': '674e553b-8df9-4321-87d9-93ba05b93558',
-              'network_id': '298a3088-a446-4d5a-bad8-f92ecacd786b',
-              'tenant_id': '89271fa581ab4380bf172f868c3615f9'},
-             mock.ANY)]
+        expected = [(6,
+                     '96d49cc3-4e01-40ce-9cac-c0e32642a442',
+                     {'device_owner_id':
+                      '674e553b-8df9-4321-87d9-93ba05b93558',
+                      'domain': 'default-domain',
+                      'network_id': '298a3088-a446-4d5a-bad8-f92ecacd786b',
+                      'project': 'demo',
+                      'project_id': '89271fa581ab4380bf172f868c3615f9',
+                      'resource': 'if_stats_list'},
+                     mock.ANY)]
         self._test_meter('switch.port.receive.packets', expected)
 
     def test_switch_port_transmit_packets(self):
-        expected = [
-            (5,
-             '96d49cc3-4e01-40ce-9cac-c0e32642a442',
-             {'device_owner_id': '674e553b-8df9-4321-87d9-93ba05b93558',
-              'network_id': '298a3088-a446-4d5a-bad8-f92ecacd786b',
-              'tenant_id': '89271fa581ab4380bf172f868c3615f9'},
-             mock.ANY)]
+        expected = [(5,
+                     '96d49cc3-4e01-40ce-9cac-c0e32642a442',
+                     {'device_owner_id':
+                      '674e553b-8df9-4321-87d9-93ba05b93558',
+                      'domain': 'default-domain',
+                      'network_id': '298a3088-a446-4d5a-bad8-f92ecacd786b',
+                      'project': 'demo',
+                      'project_id': '89271fa581ab4380bf172f868c3615f9',
+                      'resource': 'if_stats_list'},
+                     mock.ANY)]
         self._test_meter('switch.port.transmit.packets', expected)
 
     def test_switch_port_receive_bytes(self):
-        expected = [
-            (23,
-             '96d49cc3-4e01-40ce-9cac-c0e32642a442',
-             {'device_owner_id': '674e553b-8df9-4321-87d9-93ba05b93558',
-              'network_id': '298a3088-a446-4d5a-bad8-f92ecacd786b',
-              'tenant_id': '89271fa581ab4380bf172f868c3615f9'},
-             mock.ANY)]
+        expected = [(23,
+                     '96d49cc3-4e01-40ce-9cac-c0e32642a442',
+                     {'device_owner_id':
+                      '674e553b-8df9-4321-87d9-93ba05b93558',
+                      'domain': 'default-domain',
+                      'network_id': '298a3088-a446-4d5a-bad8-f92ecacd786b',
+                      'project': 'demo',
+                      'project_id': '89271fa581ab4380bf172f868c3615f9',
+                      'resource': 'if_stats_list'},
+                     mock.ANY)]
         self._test_meter('switch.port.receive.bytes', expected)
 
     def test_switch_port_transmit_bytes(self):
-        expected = [
-            (22,
-             '96d49cc3-4e01-40ce-9cac-c0e32642a442',
-             {'device_owner_id': '674e553b-8df9-4321-87d9-93ba05b93558',
-              'network_id': '298a3088-a446-4d5a-bad8-f92ecacd786b',
-              'tenant_id': '89271fa581ab4380bf172f868c3615f9'},
-             mock.ANY)]
+        expected = [(22,
+                     '96d49cc3-4e01-40ce-9cac-c0e32642a442',
+                     {'device_owner_id':
+                      '674e553b-8df9-4321-87d9-93ba05b93558',
+                      'domain': 'default-domain',
+                      'network_id': '298a3088-a446-4d5a-bad8-f92ecacd786b',
+                      'project': 'demo',
+                      'project_id': '89271fa581ab4380bf172f868c3615f9',
+                      'resource': 'if_stats_list'},
+                     mock.ANY)]
         self._test_meter('switch.port.transmit.bytes', expected)
+
+    def test_switch_port_receive_packets_fip(self):
+        self.params['resource'] = ['fip_stats_list']
+        expected = [(11,
+                     '96d49cc3-4e01-40ce-9cac-c0e32642a442',
+                     {'device_owner_id':
+                      '674e553b-8df9-4321-87d9-93ba05b93558',
+                      'domain': 'default-domain',
+                      'network_id': '298a3088-a446-4d5a-bad8-f92ecacd786b',
+                      'project': 'demo',
+                      'project_id': '89271fa581ab4380bf172f868c3615f9',
+                      'resource': 'fip_stats_list'},
+                     mock.ANY)]
+        self._test_meter('switch.port.receive.packets', expected)
+
+    def test_switch_port_transmit_packets_fip(self):
+        self.params['resource'] = ['fip_stats_list']
+        expected = [(10,
+                     '96d49cc3-4e01-40ce-9cac-c0e32642a442',
+                     {'device_owner_id':
+                      '674e553b-8df9-4321-87d9-93ba05b93558',
+                      'domain': 'default-domain',
+                      'network_id': '298a3088-a446-4d5a-bad8-f92ecacd786b',
+                      'project': 'demo',
+                      'project_id': '89271fa581ab4380bf172f868c3615f9',
+                      'resource': 'fip_stats_list'},
+                     mock.ANY)]
+        self._test_meter('switch.port.transmit.packets', expected)
+
+    def test_switch_port_receive_bytes_fip(self):
+        self.params['resource'] = ['fip_stats_list']
+        expected = [(33,
+                     '96d49cc3-4e01-40ce-9cac-c0e32642a442',
+                     {'device_owner_id':
+                      '674e553b-8df9-4321-87d9-93ba05b93558',
+                      'domain': 'default-domain',
+                      'network_id': '298a3088-a446-4d5a-bad8-f92ecacd786b',
+                      'project': 'demo',
+                      'project_id': '89271fa581ab4380bf172f868c3615f9',
+                      'resource': 'fip_stats_list'},
+                     mock.ANY)]
+        self._test_meter('switch.port.receive.bytes', expected)
+
+    def test_switch_port_transmit_bytes_fip(self):
+        self.params['resource'] = ['fip_stats_list']
+        expected = [(44,
+                     '96d49cc3-4e01-40ce-9cac-c0e32642a442',
+                     {'device_owner_id':
+                      '674e553b-8df9-4321-87d9-93ba05b93558',
+                      'domain': 'default-domain',
+                      'network_id': '298a3088-a446-4d5a-bad8-f92ecacd786b',
+                      'project': 'demo',
+                      'project_id': '89271fa581ab4380bf172f868c3615f9',
+                      'resource': 'fip_stats_list'},
+                     mock.ANY)]
+        self._test_meter('switch.port.transmit.bytes', expected)
+
+    def test_switch_port_transmit_bytes_non_existing_network(self):
+        self.params['virtual_network'] = ['aaa']
+        self.params['resource'] = ['fip_stats_list']
+        self._test_meter('switch.port.transmit.bytes', [])
