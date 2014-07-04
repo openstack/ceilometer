@@ -19,11 +19,10 @@
 """
 import functools
 import os.path
-import six
 
 import eventlet
 import oslo.messaging
-import oslo.messaging.conffixture
+import six
 from testtools import testcase
 
 from ceilometer import messaging
@@ -51,12 +50,6 @@ class BaseTestCase(test.BaseTestCase):
         self.useFixture(mockpatch.Patch(
             'ceilometer.messaging.get_transport',
             return_value=self.transport))
-
-    def setUp(self):
-        super(BaseTestCase, self).setUp()
-        self.useFixture(mockpatch.Patch(
-            'oslo.config.cfg._get_config_dirs',
-            return_value=[self.path_get('etc/ceilometer')]))
 
     def assertTimestampEqual(self, first, second, msg=None):
         """Checks that two timestamps are equals.

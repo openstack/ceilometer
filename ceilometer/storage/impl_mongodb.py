@@ -29,9 +29,8 @@ import uuid
 
 import bson.code
 import bson.objectid
-import pymongo
-
 from oslo.config import cfg
+import pymongo
 
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils

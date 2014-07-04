@@ -19,15 +19,16 @@
 import abc
 import croniter
 import datetime
-import pytz
 
 from ceilometerclient import client as ceiloclient
 from oslo.config import cfg
+import pytz
 import six
 
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
+
 
 LOG = log.getLogger(__name__)
 

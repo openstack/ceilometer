@@ -21,7 +21,7 @@ from __future__ import absolute_import
 
 from keystoneclient import exceptions
 from oslo.config import cfg
-from six.moves.urllib import parse as urlparse
+import six.moves.urllib.parse as urlparse
 from swiftclient import client as swift
 
 from ceilometer.central import plugin

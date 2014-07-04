@@ -18,7 +18,6 @@
 
 import eventlet
 import mock
-
 import oslo.messaging
 import oslo.messaging.conffixture
 from stevedore import extension

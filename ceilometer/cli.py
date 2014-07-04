@@ -28,8 +28,6 @@ import eventlet
 # first read() or select(), thread need to be patched too, because
 # oslo.messaging use threading.local
 eventlet.monkey_patch(socket=True, select=True, thread=True)
-
-
 from oslo.config import cfg
 
 from ceilometer.alarm import service as alarm_service
@@ -47,6 +45,7 @@ from ceilometer import sample
 from ceilometer import service
 from ceilometer import storage
 from ceilometer import transformer
+
 
 OPTS = [
     cfg.StrOpt('evaluation_service',

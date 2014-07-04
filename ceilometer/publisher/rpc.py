@@ -24,7 +24,7 @@ import operator
 from oslo.config import cfg
 import oslo.messaging
 import oslo.messaging._drivers.common
-from six.moves.urllib import parse as urlparse
+import six.moves.urllib.parse as urlparse
 
 from ceilometer import messaging
 from ceilometer.openstack.common.gettextutils import _
