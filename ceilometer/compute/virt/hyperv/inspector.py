@@ -45,6 +45,11 @@ class HyperVInspector(virt_inspector.Inspector):
 
         return virt_inspector.CPUStats(number=cpu_count, time=cpu_time)
 
+    def inspect_memory_usage(self, instance, duration=None):
+        instance_name = util.instance_name(instance)
+        usage = self._utils.get_memory_metrics(instance_name)
+        return virt_inspector.MemoryUsageStats(usage=usage)
+
     def inspect_vnics(self, instance):
         instance_name = util.instance_name(instance)
         for vnic_metrics in self._utils.get_vnic_metrics(instance_name):

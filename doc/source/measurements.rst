@@ -71,7 +71,7 @@ Name                             Type*  Unit       Resource  Origin**  Support**
 instance                         g      instance   inst ID   both      1, 2, 3, 4     Existence of instance
 instance:<type>                  g      instance   inst ID   both      1, 2, 3, 4     Existence of instance <type> (openstack types)
 memory                           g      MB         inst ID   n         1, 2           Volume of RAM allocated
-memory.usage                     g      MB         inst ID   p         1, 3, 4        Volume of RAM used
+memory.usage                     g      MB         inst ID   p         1, 2, 3, 4     Volume of RAM used
 cpu                              c      ns         inst ID   p         1, 2           CPU time used
 cpu_util                         g      %          inst ID   p         1, 2, 3, 4     Average CPU utilisation
 vcpus                            g      vcpu       inst ID   n         1, 2           Number of VCPUs

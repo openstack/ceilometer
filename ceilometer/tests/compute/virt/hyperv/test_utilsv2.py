@@ -33,6 +33,28 @@ class TestUtilsV2(base.BaseTestCase):
 
         super(TestUtilsV2, self).setUp()
 
+    @mock.patch.object(utilsv2.UtilsV2, '_get_metrics')
+    @mock.patch.object(utilsv2.UtilsV2, '_get_metric_def')
+    @mock.patch.object(utilsv2.UtilsV2, '_lookup_vm')
+    def test_get_memory_metrics(self, mock_lookup_vm, mock_get_metric_def,
+                                mock_get_metrics):
+        mock_vm = mock_lookup_vm.return_value
+
+        mock_metric_def = mock_get_metric_def.return_value
+
+        metric_memory = mock.MagicMock()
+        metric_memory.MetricValue = 3
+        mock_get_metrics.return_value = [metric_memory]
+
+        response = self._utils.get_memory_metrics(mock.sentinel._FAKE_INSTANCE)
+
+        mock_lookup_vm.assert_called_once_with(mock.sentinel._FAKE_INSTANCE)
+        mock_get_metric_def.assert_called_once_with(
+            self._utils._MEMORY_METRIC_NAME)
+        mock_get_metrics.assert_called_once_with(mock_vm, mock_metric_def)
+
+        self.assertEqual(3, response)
+
     def test_get_host_cpu_info(self):
         _fake_clock_speed = 1000
         _fake_cpu_count = 2
