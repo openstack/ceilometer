@@ -83,11 +83,11 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
             polling_task = agent.PollingTask(mgr)
             polling_task.poll_and_publish()
 
-    def self_local_instances_default_agent_discovery(self):
+    def test_local_instances_default_agent_discovery(self):
         self.setup_pipeline()
         self.assertEqual(self.mgr.default_discovery, ['local_instances'])
         polling_tasks = self.mgr.setup_polling_tasks()
         self.mgr.interval_task(polling_tasks.get(60))
-        self._verify_discovery_params([None])
+        self._verify_discovery_params([])
         self.assertEqual(set(self.Pollster.resources),
                          set(self.instances))
