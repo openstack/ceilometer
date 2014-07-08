@@ -1,0 +1,176 @@
+#
+# Copyright 2014 Red Hat
+#
+# Author: Chris Dent <chdent@redhat.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+"""Converters for producing hardware sensor data sample messages from
+notification events.
+"""
+
+from oslo.config import cfg
+from oslo import messaging
+
+from ceilometer.openstack.common import log
+from ceilometer import plugin
+from ceilometer import sample
+
+LOG = log.getLogger(__name__)
+
+OPTS = [
+    cfg.StrOpt('ironic_exchange',
+               default='ironic',
+               help='Exchange name for Ironic notifications.'),
+]
+
+
+cfg.CONF.register_opts(OPTS)
+
+
+# Map unit name to SI
+UNIT_MAP = {
+    'Watts': 'W',
+    'Volts': 'V',
+}
+
+
+class InvalidSensorData(ValueError):
+    pass
+
+
+class SensorNotification(plugin.NotificationBase):
+    """A generic class for extracting samples from sensor data notifications.
+
+    A notification message can contain multiple samples from multiple
+    sensors, all with the same basic structure: the volume for the sample
+    is found as part of the value of a 'Sensor Reading' key. The unit
+    is in the same value.
+
+    Subclasses exist solely to allow flexibility with stevedore configuration.
+    """
+
+    event_types = ['hardware.ipmi.*']
+    metric = None
+
+    @staticmethod
+    def get_targets(conf):
+        """oslo.messaging.TargetS for this this plugin."""
+        return [messaging.Target(topic=topic,
+                                 exchange=conf.ironic_exchange)
+                for topic in conf.notification_topics]
+
+    def _get_sample(self, message):
+        try:
+            return (payload for _, payload
+                    in message['payload'][self.metric].items())
+        except KeyError:
+            return []
+
+    @staticmethod
+    def _validate_reading(data):
+        """Some sensors read "Disabled"."""
+        return data != 'Disabled'
+
+    @staticmethod
+    def _transform_id(data):
+        return data.lower().replace(' ', '_')
+
+    @staticmethod
+    def _parse_reading(data):
+        try:
+            volume, unit = data.split(' ', 1)
+            unit = unit.rsplit(' ', 1)[-1]
+            return float(volume), UNIT_MAP.get(unit, unit)
+        except ValueError:
+            raise InvalidSensorData('unable to parse sensor reading: %s' %
+                                    data)
+
+    def _package_payload(self, message, payload):
+        info = {}
+        info['publisher_id'] = message['publisher_id']
+        info['timestamp'] = message['payload']['timestamp']
+        info['event_type'] = message['payload']['event_type']
+        info['user_id'] = message['payload'].get('user_id')
+        info['project_id'] = message['payload'].get('project_id')
+        # NOTE(chdent): How much of the payload should we keep?
+        info['payload'] = payload
+        return info
+
+    def process_notification(self, message):
+        """Read and process a notification.
+
+        The guts of a message are in dict value of a 'payload' key
+        which then itself has a payload key containing a dict of
+        multiple sensor readings.
+
+        If expected keys in the payload are missing or values
+        are not in the expected form for transformations,
+        KeyError and ValueError are caught and the current
+        sensor payload is skipped.
+        """
+        payloads = self._get_sample(message['payload'])
+        for payload in payloads:
+            try:
+                # Provide a fallback resource_id in case parts are missing.
+                resource_id = 'missing id'
+                try:
+                    resource_id = '%(nodeid)s-%(sensorid)s' % {
+                        'nodeid': message['payload']['node_uuid'],
+                        'sensorid': self._transform_id(payload['Sensor ID'])
+                    }
+                except KeyError as exc:
+                    raise InvalidSensorData('missing key in payload: %s' % exc)
+
+                info = self._package_payload(message, payload)
+
+                try:
+                    sensor_reading = info['payload']['Sensor Reading']
+                except KeyError as exc:
+                    raise InvalidSensorData(
+                        "missing 'Sensor Reading' in payload"
+                    )
+
+                if self._validate_reading(sensor_reading):
+                    volume, unit = self._parse_reading(sensor_reading)
+                    yield sample.Sample.from_notification(
+                        name='hardware.ipmi.%s' % self.metric.lower(),
+                        type=sample.TYPE_GAUGE,
+                        unit=unit,
+                        volume=volume,
+                        resource_id=resource_id,
+                        message=info,
+                        user_id=info['user_id'],
+                        project_id=info['project_id'])
+
+            except InvalidSensorData as exc:
+                LOG.warn(
+                    'invalid sensor data for %(resource)s: %(error)s' %
+                    dict(resource=resource_id, error=exc)
+                )
+                continue
+
+
+class TemperatureSensorNotification(SensorNotification):
+    metric = 'Temperature'
+
+
+class CurrentSensorNotification(SensorNotification):
+    metric = 'Current'
+
+
+class FanSensorNotification(SensorNotification):
+    metric = 'Fan'
+
+
+class VoltageSensorNotification(SensorNotification):
+    metric = 'Voltage'

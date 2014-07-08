@@ -281,6 +281,23 @@ network.services.lb.incoming.bytes       Cumulative  B             pool ID     p
 network.services.lb.outgoing.bytes       Cumulative  B             pool ID     pollster   Number of outgoing Bytes
 =======================================  ==========  ==========    ==========  =========  ==============================
 
+Ironic Hardware IPMI Sensor Data
+================================
+
+IPMI sensor data is not available by default in Ironic. To enable these meters
+see the `Ironic Installation Guide`_.
+
+.. _Ironic Installation Guide: http://docs.openstack.org/developer/ironic/deploy/install-guide.html
+
+=============================  ==========  ======  ==============  ============  ==========================
+Meter                          Type        Unit    Resource        Origin        Note
+=============================  ==========  ======  ==============  ============  ==========================
+hardware.ipmi.fan              Gauge       RPM     fan sensor      notification  Fan RPM
+hardware.ipmi.temperature      Gauge       C       temp sensor     notification  Sensor Temperature Reading
+hardware.ipmi.current          Gauge       W       current sensor  notification  Sensor Current Reading
+hardware.ipmi.voltage          Gauge       V       voltage sensor  notification  Sensor Voltage Reading
+=============================  ==========  ======  ==============  ============  ==========================
+
 
 Dynamically retrieving the Meters via ceilometer client
 =======================================================
