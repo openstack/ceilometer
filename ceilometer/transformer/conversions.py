@@ -239,9 +239,9 @@ class AggregatorTransformer(ScalingTransformer):
                             getattr(sample, field))
 
     def flush(self, context):
-        expired = self.retention_time and \
-            timeutils.is_older_than(self.initial_timestamp,
-                                    self.retention_time)
+        expired = (self.retention_time and
+                   timeutils.is_older_than(self.initial_timestamp,
+                                           self.retention_time))
         full = self.aggregated_samples >= self.size
         if full or expired:
             x = self.samples.values()

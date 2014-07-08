@@ -233,8 +233,8 @@ class TestEvaluate(base.TestEvaluatorBase):
             self._assert_all_alarms('ok')
             self.assertEqual([],
                              self.api_client.alarms.set_state.call_args_list)
-            reason = 'Remaining as ok due to 4 samples inside' \
-                     ' threshold, most recent: 8.0'
+            reason = ('Remaining as ok due to 4 samples inside'
+                      ' threshold, most recent: 8.0')
             reason_datas = self._reason_data('inside', 4, 8.0)
             expected = [mock.call(self.alarms[1], 'ok', reason, reason_datas)]
             self.assertEqual(expected, self.notifier.notify.call_args_list)
@@ -255,8 +255,8 @@ class TestEvaluate(base.TestEvaluatorBase):
             self._assert_all_alarms('alarm')
             self.assertEqual([],
                              self.api_client.alarms.set_state.call_args_list)
-            reason = 'Remaining as alarm due to 4 samples outside' \
-                     ' threshold, most recent: 7.0'
+            reason = ('Remaining as alarm due to 4 samples outside'
+                      ' threshold, most recent: 7.0')
             reason_datas = self._reason_data('outside', 4, 7.0)
             expected = [mock.call(self.alarms[1], 'alarm',
                                   reason, reason_datas)]

@@ -1939,12 +1939,12 @@ class TestAlarms(v2.FunctionalTest,
 
         class PayloadMatcher(object):
             def __eq__(self, payload):
-                return payload['detail']['name'] == 'sent_notification' and \
-                    payload['type'] == 'creation' and \
-                    payload['detail']['rule']['meter_name'] == 'ameter' and \
-                    set(['alarm_id', 'detail', 'event_id', 'on_behalf_of',
-                         'project_id', 'timestamp',
-                         'user_id']).issubset(payload.keys())
+                return (payload['detail']['name'] == 'sent_notification' and
+                        payload['type'] == 'creation' and
+                        payload['detail']['rule']['meter_name'] == 'ameter' and
+                        set(['alarm_id', 'detail', 'event_id', 'on_behalf_of',
+                             'project_id', 'timestamp',
+                             'user_id']).issubset(payload.keys()))
 
         endpoint.info.assert_called_once_with(
             {'instance_uuid': None,

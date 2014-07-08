@@ -37,8 +37,8 @@ class TestMemoryPollster(base.TestPollsterBase):
         def inspect_memory_usage(instance, duration):
             return six.next(next_value)
 
-        self.inspector.inspect_memory_usage = \
-            mock.Mock(side_effect=inspect_memory_usage)
+        (self.inspector.
+         inspect_memory_usage) = mock.Mock(side_effect=inspect_memory_usage)
 
         mgr = manager.AgentManager()
         pollster = memory.MemoryUsagePollster()

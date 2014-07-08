@@ -19,8 +19,8 @@ SQLAlchemy models for Ceilometer data.
 
 import json
 
-from sqlalchemy import Column, Integer, String, ForeignKey, \
-    Index, UniqueConstraint, BigInteger, join
+from sqlalchemy import (Column, Integer, String, ForeignKey, Index,
+                        UniqueConstraint, BigInteger, join)
 from sqlalchemy import Float, Boolean, Text, DateTime
 from sqlalchemy.dialects.mysql import DECIMAL
 from sqlalchemy.ext.declarative import declarative_base
@@ -375,8 +375,8 @@ class Trait(Base):
 
     def __repr__(self):
         name = self.trait_type.name if self.trait_type else None
-        data_type = self.trait_type.data_type if self.trait_type\
-            else api_models.Trait.NONE_TYPE
+        data_type = (self.trait_type.data_type if self.trait_type else
+                     api_models.Trait.NONE_TYPE)
 
         return "<Trait(%s) %d=%s/%s/%s/%s on %s>" % (name,
                                                      data_type,

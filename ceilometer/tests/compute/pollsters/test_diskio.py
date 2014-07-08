@@ -85,8 +85,7 @@ class TestDiskRatePollsters(base.TestPollsterBase):
 
     def setUp(self):
         super(TestDiskRatePollsters, self).setUp()
-        self.inspector.inspect_disk_rates = \
-            mock.Mock(return_value=self.DISKS)
+        self.inspector.inspect_disk_rates = mock.Mock(return_value=self.DISKS)
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def _check_get_samples(self, factory, sample_name, expected_volume):

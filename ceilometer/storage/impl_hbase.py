@@ -176,8 +176,8 @@ class Connection(base.Connection):
                 if Connection._memory_instance is None:
                     LOG.debug(_('Creating a new in-memory HBase '
                               'Connection object'))
-                    Connection._memory_instance = \
-                        hbase_inmemory.MConnectionPool()
+                    Connection._memory_instance = (hbase_inmemory.
+                                                   MConnectionPool())
                 self.conn_pool = Connection._memory_instance
         else:
             self.conn_pool = self._get_connection_pool(opts)
@@ -477,9 +477,9 @@ class Connection(base.Connection):
             return
         with self.conn_pool.connection() as conn:
             meter_table = conn.table(self.METER_TABLE)
-            q, start, stop, columns = \
-                hbase_utils.make_sample_query_from_filter(
-                    sample_filter, require_meter=False)
+            q, start, stop, columns = (hbase_utils.
+                                       make_sample_query_from_filter
+                                       (sample_filter, require_meter=False))
             LOG.debug(_("Query Meter Table: %s") % q)
             gen = meter_table.scan(filter=q, row_start=start, row_stop=stop,
                                    limit=limit)
@@ -508,9 +508,8 @@ class Connection(base.Connection):
         stat.avg = (stat.sum / float(stat.count))
         stat.duration_start = min(ts, stat.duration_start or ts)
         stat.duration_end = max(ts, stat.duration_end or ts)
-        stat.duration = \
-            timeutils.delta_seconds(stat.duration_start,
-                                    stat.duration_end)
+        stat.duration = (timeutils.delta_seconds(stat.duration_start,
+                                                 stat.duration_end))
 
     def get_meter_statistics(self, sample_filter, period=None, groupby=None,
                              aggregate=None):
@@ -534,8 +533,9 @@ class Connection(base.Connection):
 
         with self.conn_pool.connection() as conn:
             meter_table = conn.table(self.METER_TABLE)
-            q, start, stop, columns = \
-                hbase_utils.make_sample_query_from_filter(sample_filter)
+            q, start, stop, columns = (hbase_utils.
+                                       make_sample_query_from_filter
+                                       (sample_filter))
             # These fields are used in statistics' calculating
             columns.extend(['f:timestamp', 'f:counter_volume',
                             'f:counter_unit'])
@@ -575,8 +575,7 @@ class Connection(base.Connection):
                     start_time, ts) / period) * period
                 period_start = start_time + datetime.timedelta(0, offset)
 
-            if not results or not results[-1].period_start == \
-                    period_start:
+            if not results or not results[-1].period_start == period_start:
                 if period:
                     period_end = period_start + datetime.timedelta(
                         0, period)

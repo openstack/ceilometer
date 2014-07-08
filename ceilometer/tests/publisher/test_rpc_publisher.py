@@ -105,8 +105,8 @@ class TestPublish(tests_base.BaseTestCase):
         endpoint = mock.MagicMock(['record_metering_data'])
         collector = messaging.get_rpc_server(
             self.transport, self.CONF.publisher_rpc.metering_topic, endpoint)
-        endpoint.record_metering_data.side_effect = \
-            lambda *args, **kwds: collector.stop()
+        endpoint.record_metering_data.side_effect = (lambda *args, **kwds:
+                                                     collector.stop())
 
         collector.start()
         eventlet.sleep()

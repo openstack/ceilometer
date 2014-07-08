@@ -112,8 +112,8 @@ class TestNotification(tests_base.BaseTestCase):
     @mock.patch('ceilometer.event.endpoint.EventsNotificationEndpoint')
     def _do_process_notification_manager_start(self,
                                                fake_event_endpoint_class):
-        with mock.patch.object(self.srv, '_get_notifications_manager') \
-                as get_nm:
+        with mock.patch.object(self.srv,
+                               '_get_notifications_manager') as get_nm:
             get_nm.side_effect = self.fake_get_notifications_manager
             self.srv.start()
         self.fake_event_endpoint = fake_event_endpoint_class.return_value
@@ -155,8 +155,8 @@ class TestNotification(tests_base.BaseTestCase):
                        mock.MagicMock())
     def test_event_dispatcher_loaded(self):
         self.CONF.set_override("store_events", True, group="notification")
-        with mock.patch.object(self.srv, '_get_notifications_manager') \
-                as get_nm:
+        with mock.patch.object(self.srv,
+                               '_get_notifications_manager') as get_nm:
             get_nm.side_effect = self.fake_get_notifications_manager
             self.srv.start()
         self.assertEqual(2, len(self.srv.listeners[0].dispatcher.endpoints))

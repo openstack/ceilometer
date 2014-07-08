@@ -130,8 +130,8 @@ class Source(object):
         if not meters:
             raise PipelineException("No meter specified", self.cfg)
 
-        if [x for x in meters if x[0] not in '!*'] and \
-           [x for x in meters if x[0] == '!']:
+        if ([x for x in meters if x[0] not in '!*'] and
+           [x for x in meters if x[0] == '!']):
             raise PipelineException(
                 "Both included and excluded meters specified",
                 cfg)

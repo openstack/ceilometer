@@ -866,9 +866,9 @@ class BasePipelineTestCase(test.BaseTestCase):
 
     def _do_test_rate_of_change_conversion(self, prev, curr, type, expected,
                                            offset=1, weight=None):
-        s = "(resource_metadata.user_metadata.autoscaling_weight or 1.0)" \
-            "* (resource_metadata.non.existent or 1.0)" \
-            "* (100.0 / (10**9 * (resource_metadata.cpu_number or 1)))"
+        s = ("(resource_metadata.user_metadata.autoscaling_weight or 1.0)"
+             "* (resource_metadata.non.existent or 1.0)"
+             "* (100.0 / (10**9 * (resource_metadata.cpu_number or 1)))")
         transformer_cfg = [
             {
                 'name': 'rate_of_change',

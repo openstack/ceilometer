@@ -46,11 +46,11 @@ def upgrade(migrate_engine):
                 params = {'columns': [table.c[column]],
                           'refcolumns': [ref_table.c[ref_column_name]]}
 
-                if migrate_engine.name == "mysql" and \
-                        table_name != 'alarm_history':
+                if (migrate_engine.name == "mysql" and
+                        table_name != 'alarm_history'):
                     params['name'] = "_".join(('fk', table_name, column))
-                elif migrate_engine.name == "postgresql" and \
-                        table_name == "sample":
+                elif (migrate_engine.name == "postgresql" and
+                        table_name == "sample"):
                     # The fk contains the old table name
                     params['name'] = "_".join(('meter', column, 'fkey'))
 
@@ -163,11 +163,11 @@ def downgrade(migrate_engine):
                 params = {'columns': [table.c[column]],
                           'refcolumns': [ref_table.c[ref_column_name]]}
 
-                if migrate_engine.name == "mysql" and \
-                        table_name != 'alarm_history':
+                if (migrate_engine.name == "mysql" and
+                        table_name != 'alarm_history'):
                     params['name'] = "_".join(('fk', table_name, column))
-                elif migrate_engine.name == "postgresql" and \
-                        table_name == "sample":
+                elif (migrate_engine.name == "postgresql" and
+                        table_name == "sample"):
                     # The fk contains the old table name
                     params['name'] = "_".join(('meter', column, 'fkey'))
 

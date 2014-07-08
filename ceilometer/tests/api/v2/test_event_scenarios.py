@@ -36,17 +36,16 @@ class EventTestBase(v2.FunctionalTest,
         base = 0
         self.trait_time = datetime.datetime(2013, 12, 31, 5, 0)
         for event_type in ['Foo', 'Bar', 'Zoo']:
-            trait_models = \
-                [models.Trait(name, type, value)
-                    for name, type, value in [
-                        ('trait_A', models.Trait.TEXT_TYPE,
-                            "my_%s_text" % event_type),
-                        ('trait_B', models.Trait.INT_TYPE,
-                            base + 1),
-                        ('trait_C', models.Trait.FLOAT_TYPE,
-                            float(base) + 0.123456),
-                        ('trait_D', models.Trait.DATETIME_TYPE,
-                            self.trait_time)]]
+            trait_models = [models.Trait(name, type, value)
+                            for name, type, value in [
+                                ('trait_A', models.Trait.TEXT_TYPE,
+                                    "my_%s_text" % event_type),
+                                ('trait_B', models.Trait.INT_TYPE,
+                                    base + 1),
+                                ('trait_C', models.Trait.FLOAT_TYPE,
+                                    float(base) + 0.123456),
+                                ('trait_D', models.Trait.DATETIME_TYPE,
+                                    self.trait_time)]]
 
             # Message ID for test will be 'base'. So, message ID for the first
             # event will be '0', the second '100', and so on.

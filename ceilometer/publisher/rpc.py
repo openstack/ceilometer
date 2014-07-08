@@ -148,8 +148,8 @@ class RPCPublisher(publisher.PublisherBase):
         # something in the self.local_queue
         queue = self.local_queue
         self.local_queue = []
-        self.local_queue = self._process_queue(queue, self.policy) + \
-            self.local_queue
+        self.local_queue = (self._process_queue(queue, self.policy) +
+                            self.local_queue)
         if self.policy == 'queue':
             self._check_queue_length()
 

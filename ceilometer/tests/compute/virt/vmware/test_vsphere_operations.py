@@ -111,8 +111,8 @@ class VsphereOperationsTest(test.BaseTestCase):
             counter_info1 = construct_mock_counter_info("a", "b", "c", 1)
             counter_info2 = construct_mock_counter_info("x", "y", "z", 2)
             result = mock.MagicMock()
-            result.objects[0].propSet[0].val.PerfCounterInfo.__iter__. \
-                return_value = [counter_info1, counter_info2]
+            (result.objects[0].propSet[0].val.PerfCounterInfo.__iter__.
+             return_value) = [counter_info1, counter_info2]
             return result
 
         vim_mock = self._vsphere_ops._api_session._vim

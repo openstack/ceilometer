@@ -58,11 +58,11 @@ def upgrade(migrate_engine):
 
     # move source values to samples
     sourceassoc = load_tables['sourceassoc']
-    query = sa.select([sourceassoc.c.sample_id, sourceassoc.c.source_id])\
-        .where(sourceassoc.c.sample_id.isnot(None))
+    query = (sa.select([sourceassoc.c.sample_id, sourceassoc.c.source_id]).
+             where(sourceassoc.c.sample_id.isnot(None)))
     for sample_id, source_id in migration.paged(query):
-        sample.update().where(sample_id == sample.c.id)\
-            .values({'source_id': source_id}).execute()
+        (sample.update().where(sample_id == sample.c.id).
+         values({'source_id': source_id}).execute())
 
     # drop tables
     for table_name in DROP_TABLES:

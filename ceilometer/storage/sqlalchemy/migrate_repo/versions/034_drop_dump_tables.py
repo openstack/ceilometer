@@ -21,14 +21,14 @@ def upgrade(migrate_engine):
     meta = sa.MetaData(bind=migrate_engine)
     for table_name in TABLES_027:
         try:
-            sa.Table('dump027_' + table_name, meta, autoload=True)\
-                .drop(checkfirst=True)
+            (sa.Table('dump027_' + table_name, meta, autoload=True).
+             drop(checkfirst=True))
         except sa.exc.NoSuchTableError:
             pass
     for table_name in TABLES_012:
         try:
-            sa.Table('dump_' + table_name, meta, autoload=True)\
-                .drop(checkfirst=True)
+            (sa.Table('dump_' + table_name, meta, autoload=True).
+             drop(checkfirst=True))
         except sa.exc.NoSuchTableError:
             pass
 
