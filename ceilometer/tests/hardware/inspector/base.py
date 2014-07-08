@@ -19,9 +19,7 @@ from ceilometer.hardware.inspector import base
 
 
 class InspectorBaseTest(object):
-    """Subclass must set self.inspector and self.host in
-    self.setUp()
-    """
+    """Subclass must set self.inspector and self.host in self.setUp()."""
 
     cpu = [base.CPUStats(cpu_1_min=0.1,
                          cpu_5_min=0.2,

@@ -28,10 +28,11 @@ LOG = log.getLogger(__name__)
 
 
 class Namespace(object):
-    """Encapsulates the namespace wrapping the evaluation of the
-       configured scale factor. This allows nested dicts to be
-       accessed in the attribute style, and missing attributes
-       to yield false when used in a boolean expression.
+    """Encapsulates the namespace.
+
+    Encapsulation is going by wrapping the evaluation of the configured scale
+    factor. This allows nested dicts to be accessed in the attribute style,
+    and missing attributes to yield false when used in a boolean expression.
     """
     def __init__(self, seed):
         self.__dict__ = collections.defaultdict(lambda: Namespace({}))
@@ -51,8 +52,7 @@ class Namespace(object):
 
 
 class ScalingTransformer(transformer.TransformerBase):
-    """Transformer to apply a scaling conversion.
-    """
+    """Transformer to apply a scaling conversion."""
 
     def __init__(self, source=None, target=None, **kwargs):
         """Initialize transformer with configured parameters.
@@ -74,8 +74,9 @@ class ScalingTransformer(transformer.TransformerBase):
         super(ScalingTransformer, self).__init__(**kwargs)
 
     def _scale(self, s):
-        """Apply the scaling factor (either a straight multiplicative
-           factor or else a string to be eval'd).
+        """Apply the scaling factor.
+
+        Either a straight multiplicative factor or else a string to be eval'd.
         """
         ns = Namespace(s.as_dict())
 
@@ -84,8 +85,7 @@ class ScalingTransformer(transformer.TransformerBase):
                  else s.volume * scale) if scale else s.volume)
 
     def _map(self, s, attr):
-        """Apply the name or unit mapping if configured.
-        """
+        """Apply the name or unit mapping if configured."""
         mapped = None
         from_ = self.source.get('map_from')
         to_ = self.target.get('map_to')
@@ -98,8 +98,7 @@ class ScalingTransformer(transformer.TransformerBase):
         return mapped or self.target.get(attr, getattr(s, attr))
 
     def _convert(self, s, growth=1):
-        """Transform the appropriate sample fields.
-        """
+        """Transform the appropriate sample fields."""
         return sample.Sample(
             name=self._map(s, 'name'),
             unit=self._map(s, 'unit'),
@@ -122,15 +121,14 @@ class ScalingTransformer(transformer.TransformerBase):
 
 
 class RateOfChangeTransformer(ScalingTransformer):
-    """Transformer based on the rate of change of a sample volume,
-       for example taking the current and previous volumes of a
-       cumulative sample and producing a gauge value based on the
-       proportion of some maximum used.
+    """Transformer based on the rate of change of a sample volume.
+
+    For example taking the current and previous volumes of a cumulative sample
+    and producing a gauge value based on the proportion of some maximum used.
     """
 
     def __init__(self, **kwargs):
-        """Initialize transformer with configured parameters.
-        """
+        """Initialize transformer with configured parameters."""
         super(RateOfChangeTransformer, self).__init__(**kwargs)
         self.cache = {}
         self.scale = self.scale or '1'
@@ -167,8 +165,10 @@ class RateOfChangeTransformer(ScalingTransformer):
 
 
 class AggregatorTransformer(ScalingTransformer):
-    """Transformer that aggregate sample until a threshold or/and a
-    retention_time, and then flush them out in the wild.
+    """Transformer that aggregate sample.
+
+    Aggregation goes until a threshold or/and a retention_time, and then flush
+    them out in the wild.
 
     Example:
       To aggregate sample by resource_metadata and keep the
@@ -181,7 +181,6 @@ class AggregatorTransformer(ScalingTransformer):
 
         AggregatorTransformer(size=15, user_id='first',
                               resource_metadata='drop')
-
     """
 
     def __init__(self, size=1, retention_time=None,

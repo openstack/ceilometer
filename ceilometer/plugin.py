@@ -36,8 +36,7 @@ ExchangeTopics = collections.namedtuple('ExchangeTopics',
 
 
 class PluginBase(object):
-    """Base class for all plugins.
-    """
+    """Base class for all plugins."""
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -49,14 +48,16 @@ class NotificationBase(PluginBase):
 
     @abc.abstractproperty
     def event_types(self):
-        """Return a sequence of strings defining the event types to be
-        given to this plugin.
+        """Return a sequence of strings.
+
+        Strings are defining the event types to be given to this plugin.
         """
 
     def get_targets(self, conf):
-        """Return a sequence of oslo.messaging.Target defining the exchange and
-        topics to be connected for this plugin.
+        """Return a sequence of oslo.messaging.Target.
 
+        Sequence is defining the exchange and topics to be connected for this
+        plugin.
         :param conf: Configuration.
         """
 
@@ -81,9 +82,9 @@ class NotificationBase(PluginBase):
 
     @staticmethod
     def _handle_event_type(event_type, event_type_to_handle):
-        """Check whether event_type should be handled according to
-        event_type_to_handle.
+        """Check whether event_type should be handled.
 
+        It is according to event_type_to_handle.
         """
         return any(map(lambda e: fnmatch.fnmatch(event_type, e),
                        event_type_to_handle))
@@ -106,12 +107,11 @@ class NotificationBase(PluginBase):
         self.to_samples_and_publish(context.get_admin_context(), notification)
 
     def to_samples_and_publish(self, context, notification):
-        """Return samples produced by *process_notification* for the given
-        notification.
+        """Return samples produced by *process_notification*.
 
+        Samples produced for the given notification.
         :param context: Execution context from the service or RPC call
         :param notification: The notification to process.
-
         """
 
         # TODO(sileht): this will be moved into oslo.messaging
@@ -149,5 +149,6 @@ class DiscoveryBase(object):
     @abc.abstractmethod
     def discover(self, param=None):
         """Discover resources to monitor.
+
         :param param: an optional parameter to guide the discovery
         """

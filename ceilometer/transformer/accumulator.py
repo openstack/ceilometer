@@ -19,9 +19,9 @@ from ceilometer import transformer
 
 
 class TransformerAccumulator(transformer.TransformerBase):
-    """Transformer that accumulates sample until a threshold, and then flush
-    them out in the wild.
+    """Transformer that accumulates sample until a threshold.
 
+    And then flush them out in the wild.
     """
 
     def __init__(self, size=1, **kwargs):

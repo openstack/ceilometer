@@ -21,8 +21,9 @@ import six
 
 @six.add_metaclass(abc.ABCMeta)
 class TraitPluginBase(object):
-    """Base class for plugins that convert notification fields to
-       Trait values.
+    """Base class for plugins.
+
+    It converts notification fields to Trait values.
     """
 
     def __init__(self, **kw):
@@ -89,7 +90,6 @@ class TraitPluginBase(object):
                   if not match_list:
                       return None
                   return match_list[0][1]
-
         """
 
 

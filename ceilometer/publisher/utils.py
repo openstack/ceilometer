@@ -40,8 +40,7 @@ METER_PUBLISH_OPTS = [
 
 
 def register_opts(config):
-    """Register the options for publishing metering messages.
-    """
+    """Register the options for publishing metering messages."""
     config.register_opts(METER_PUBLISH_OPTS, group="publisher")
 
 
@@ -49,8 +48,7 @@ register_opts(cfg.CONF)
 
 
 def compute_signature(message, secret):
-    """Return the signature for a message dictionary.
-    """
+    """Return the signature for a message dictionary."""
     digest_maker = hmac.new(secret, '', hashlib.sha256)
     for name, value in utils.recursive_keypairs(message):
         if name == 'message_signature':
@@ -63,8 +61,10 @@ def compute_signature(message, secret):
 
 
 def verify_signature(message, secret):
-    """Check the signature in the message against the value computed
-    from the rest of the contents.
+    """Check the signature in the message.
+
+    Message is verified against the value computed from the rest of the
+    contents.
     """
     old_sig = message.get('message_signature')
     new_sig = compute_signature(message, secret)

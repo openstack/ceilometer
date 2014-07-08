@@ -30,8 +30,7 @@ from ceilometer import sample
 @six.add_metaclass(abc.ABCMeta)
 class UserMetadataAwareInstanceNotificationBase(
         notifications.ComputeNotificationBase):
-    """Consumes notifications containing instance user metadata.
-    """
+    """Consumes notifications containing instance user metadata."""
 
     def process_notification(self, message):
         instance_properties = self.get_instance_properties(message)
@@ -72,8 +71,7 @@ class InstanceScheduled(UserMetadataAwareInstanceNotificationBase):
 
 class ComputeInstanceNotificationBase(
         UserMetadataAwareInstanceNotificationBase):
-    """Convert compute.instance.* notifications into Samples
-    """
+    """Convert compute.instance.* notifications into Samples."""
     event_types = ['compute.instance.*']
 
 
@@ -158,8 +156,9 @@ class InstanceFlavor(ComputeInstanceNotificationBase):
 
 
 class InstanceDelete(ComputeInstanceNotificationBase):
-    """Handle the messages sent by the nova notifier plugin
-    when an instance is being deleted.
+    """Handle the messages sent by the nova notifier plugin.
+
+    Messages are sent when an instance is being deleted.
     """
 
     event_types = ['compute.instance.delete.samples']

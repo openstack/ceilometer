@@ -35,7 +35,7 @@ from ceilometer import utils
 
 
 class JSONEncodedDict(TypeDecorator):
-    "Represents an immutable structure as a json-encoded string."
+    """Represents an immutable structure as a json-encoded string."""
 
     impl = String
 
@@ -194,8 +194,10 @@ class Sample(Base):
 
 
 class MeterSample(Base):
-    """Helper model as many of the filters work against Sample data
-    joined with Meter data.
+    """Helper model.
+
+    It's needed as many of the filters work against Sample data joined with
+    Meter data.
     """
     meter = Meter.__table__
     sample = Sample.__table__
@@ -296,12 +298,12 @@ class Event(Base):
 
 
 class TraitType(Base):
-    """Types of event traits. A trait type includes a description
-    and a data type. Uniqueness is enforced compositely on the
-    data_type and desc fields. This is to accommodate cases, such as
-    'generated', which, depending on the corresponding event,
-    could be a date, a boolean, or a float.
+    """Types of event traits.
 
+    A trait type includes a description and a data type. Uniqueness is
+    enforced compositely on the data_type and desc fields. This is to
+    accommodate cases, such as 'generated', which, depending on the
+    corresponding event, could be a date, a boolean, or a float.
     """
     __tablename__ = 'trait_type'
     __table_args__ = (

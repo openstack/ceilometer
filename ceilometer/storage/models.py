@@ -57,8 +57,9 @@ class Event(base.Model):
 
 
 class Trait(base.Model):
-    """A Trait is a key/value pair of data on an Event. The value is variant
-    record of basic data types (int, date, float, etc).
+    """A Trait is a key/value pair of data on an Event.
+
+    The value is variant record of basic data types (int, date, float, etc).
     """
 
     NONE_TYPE = 0
@@ -110,8 +111,7 @@ class Trait(base.Model):
 
 
 class Resource(base.Model):
-    """Something for which sample data has been collected.
-    """
+    """Something for which sample data has been collected."""
 
     def __init__(self, resource_id, project_id,
                  first_sample_timestamp,
@@ -139,8 +139,7 @@ class Resource(base.Model):
 
 
 class Meter(base.Model):
-    """Definition of a meter for which sample data has been collected.
-    """
+    """Definition of a meter for which sample data has been collected."""
 
     def __init__(self, name, type, unit, resource_id, project_id, source,
                  user_id):
@@ -166,8 +165,7 @@ class Meter(base.Model):
 
 
 class Sample(base.Model):
-    """One collected data point.
-    """
+    """One collected data point."""
     def __init__(self,
                  source,
                  counter_name, counter_type, counter_unit, counter_volume,
@@ -211,8 +209,7 @@ class Sample(base.Model):
 
 
 class Statistics(base.Model):
-    """Computed statistics based on a set of sample data.
-    """
+    """Computed statistics based on a set of sample data."""
     def __init__(self, unit,
                  period, period_start, period_end,
                  duration, duration_start, duration_end,

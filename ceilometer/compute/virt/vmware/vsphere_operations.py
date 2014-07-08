@@ -32,8 +32,10 @@ VC_REAL_TIME_SAMPLING_INTERVAL = 20
 
 
 class VsphereOperations(object):
-    """Class to invoke vSphere APIs calls required by various
-       pollsters, collecting data from VMware infrastructure.
+    """Class to invoke vSphere APIs calls.
+
+    vSphere APIs calls are required by various pollsters, collecting data from
+    VMware infrastructure.
     """
     def __init__(self, api_session, max_objects):
         self._api_session = api_session
@@ -65,8 +67,7 @@ class VsphereOperations(object):
                                         session.vim, result)
 
     def get_vm_moid(self, vm_instance_id):
-        """Method returns VC MOID of the VM by its NOVA instance ID.
-        """
+        """Method returns VC MOID of the VM by its NOVA instance ID."""
         if vm_instance_id not in self._vm_moid_lookup_map:
             self._init_vm_moid_lookup_map()
 

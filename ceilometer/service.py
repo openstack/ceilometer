@@ -94,8 +94,7 @@ LOG = log.getLogger(__name__)
 
 
 class WorkerException(Exception):
-    """Exception for errors relating to service workers
-    """
+    """Exception for errors relating to service workers."""
 
 
 def get_workers(name):

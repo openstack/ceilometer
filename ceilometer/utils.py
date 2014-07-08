@@ -31,8 +31,7 @@ from ceilometer.openstack.common import units
 
 
 def recursive_keypairs(d, separator=':'):
-    """Generator that produces sequence of keypairs for nested dictionaries.
-    """
+    """Generator that produces sequence of keypairs for nested dictionaries."""
     for name, value in sorted(d.iteritems()):
         if isinstance(value, dict):
             for subname, subvalue in recursive_keypairs(value, separator):
@@ -57,8 +56,7 @@ def recursive_keypairs(d, separator=':'):
 
 
 def restore_nesting(d, separator=':'):
-    """Unwinds a flattened dict to restore nesting.
-    """
+    """Unwinds a flattened dict to restore nesting."""
     d = copy.copy(d) if any([separator in k for k in d.keys()]) else d
     for k, v in d.items():
         if separator in k:
@@ -86,8 +84,7 @@ def dt_to_decimal(utc):
 
 
 def decimal_to_dt(dec):
-    """Return a datetime from Decimal unixtime format.
-    """
+    """Return a datetime from Decimal unixtime format."""
     if dec is None:
         return None
 
@@ -153,8 +150,9 @@ def lowercase_values(mapping):
 
 
 def update_nested(original_dict, updates):
-    """Updates the leaf nodes in a nest dict, without replacing
-       entire sub-dicts.
+    """Updates the leaf nodes in a nest dict.
+
+     Updates occur without replacing entire sub-dicts.
     """
     dict_to_update = copy.deepcopy(original_dict)
     for key, value in updates.iteritems():

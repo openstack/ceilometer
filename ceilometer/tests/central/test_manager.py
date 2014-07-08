@@ -91,8 +91,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         self.assertTrue(self.Pollster.resources)
 
     def test_when_keystone_fail(self):
-        """Test for bug 1316532.
-        """
+        """Test for bug 1316532."""
         self.useFixture(mockpatch.Patch(
             'keystoneclient.v2_0.client.Client',
             side_effect=Exception))

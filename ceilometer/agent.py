@@ -51,6 +51,7 @@ class Resources(object):
 
 class PollingTask(object):
     """Polling task for polling samples and inject into pipeline.
+
     A polling task can be invoked periodically or only once.
     """
 

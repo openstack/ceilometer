@@ -24,9 +24,9 @@ class ProfilerNotifications(plugin.NotificationBase):
     event_types = ["profiler.*"]
 
     def get_targets(self, conf):
-        """Return a sequence of oslo.messaging.Target defining the exchange and
-        topics to be connected for this plugin.
+        """Return a sequence of oslo.messaging.Target
 
+        It is defining the exchange and topics to be connected for this plugin.
         :param conf: Configuration.
         """
         targets = []

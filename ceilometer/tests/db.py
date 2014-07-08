@@ -142,7 +142,8 @@ class TestBase(testscenarios.testcase.WithScenarios, test_base.BaseTestCase):
 
 def run_with(*drivers):
     """Used to mark tests that are only applicable for certain db driver.
-    Skips test if driver is not available
+
+    Skips test if driver is not available.
     """
     def decorator(test):
         if isinstance(test, type) and issubclass(test, TestBase):

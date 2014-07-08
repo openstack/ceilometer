@@ -304,10 +304,10 @@ class Connection(pymongo_base.Connection):
 
     def get_meter_statistics(self, sample_filter, period=None, groupby=None,
                              aggregate=None):
-        """Return an iterable of models.Statistics instance containing meter
-        statistics described by the query parameters.
+        """Return an iterable of models.Statistics instance.
 
-        The filter must have a meter value set.
+        Items are containing meter statistics described by the query
+        parameters. The filter must have a meter value set.
         """
         if (groupby and
                 set(groupby) - set(['user_id', 'project_id',

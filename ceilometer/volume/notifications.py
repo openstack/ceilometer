@@ -40,8 +40,10 @@ class _Base(plugin.NotificationBase):
 
     @staticmethod
     def get_targets(conf):
-        """Return a sequence of oslo.messaging.Target defining the exchange and
-        topics to be connected for this plugin.
+        """Return a sequence of oslo.messaging.Target
+
+        Sequence defining the exchange and topics to be connected for this
+        plugin.
         """
         return [oslo.messaging.Target(topic=topic,
                                       exchange=conf.cinder_control_exchange)

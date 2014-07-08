@@ -27,14 +27,14 @@ from ceilometer.openstack.common import timeutils
 
 
 def iter_period(start, end, period):
-    """Split a time from start to end in periods of a number of seconds. This
-    function yield the (start, end) time for each period composing the time
-    passed as argument.
+    """Split a time from start to end in periods of a number of seconds.
+
+    This function yields the (start, end) time for each period composing the
+    time passed as argument.
 
     :param start: When the period set start.
     :param end: When the period end starts.
     :param period: The duration of the period.
-
     """
     period_start = start
     increment = datetime.timedelta(seconds=period)
@@ -104,8 +104,7 @@ class Pagination(object):
 
 
 class Model(object):
-    """Base class for storage API models.
-    """
+    """Base class for storage API models."""
 
     def __init__(self, **kwds):
         self.fields = list(kwds)
@@ -198,11 +197,11 @@ class Connection(object):
 
     @staticmethod
     def clear_expired_metering_data(ttl):
-        """Clear expired data from the backend storage system according to the
-        time-to-live.
+        """Clear expired data from the backend storage system.
+
+        Clearing occurs according to the time-to-live.
 
         :param ttl: Number of seconds to keep records for.
-
         """
         raise NotImplementedError('Clearing samples not implemented')
 
@@ -211,9 +210,9 @@ class Connection(object):
                       start_timestamp=None, start_timestamp_op=None,
                       end_timestamp=None, end_timestamp_op=None,
                       metaquery=None, resource=None, pagination=None):
-        """Return an iterable of models.Resource instances containing
-        resource information.
+        """Return an iterable of models.Resource instances.
 
+        Iterable items containing resource information.
         :param user: Optional ID for user that owns the resource.
         :param project: Optional ID for project that owns the resource.
         :param source: Optional source filter.
@@ -230,9 +229,9 @@ class Connection(object):
     @staticmethod
     def get_meters(user=None, project=None, resource=None, source=None,
                    metaquery=None, pagination=None):
-        """Return an iterable of model.Meter instances containing meter
-        information.
+        """Return an iterable of model.Meter instances.
 
+        Iterable items containing meter information.
         :param user: Optional ID for user that owns the resource.
         :param project: Optional ID for project that owns the resource.
         :param resource: Optional resource filter.
@@ -333,31 +332,29 @@ class Connection(object):
 
     @staticmethod
     def get_events(event_filter):
-        """Return an iterable of model.Event objects.
-        """
+        """Return an iterable of model.Event objects."""
         raise NotImplementedError('Events not implemented.')
 
     @staticmethod
     def get_event_types():
-        """Return all event types as an iterable of strings.
-        """
+        """Return all event types as an iterable of strings."""
         raise NotImplementedError('Events not implemented.')
 
     @staticmethod
     def get_trait_types(event_type):
-        """Return a dictionary containing the name and data type of
-        the trait type. Only trait types for the provided event_type are
-        returned.
+        """Return a dictionary containing the name and data type of the trait.
 
+        Only trait types for the provided event_type are
+        returned.
         :param event_type: the type of the Event
         """
         raise NotImplementedError('Events not implemented.')
 
     @staticmethod
     def get_traits(event_type, trait_type=None):
-        """Return all trait instances associated with an event_type. If
-        trait_type is specified, only return instances of that trait type.
+        """Return all trait instances associated with an event_type.
 
+        If trait_type is specified, only return instances of that trait type.
         :param event_type: the type of the Event to filter by
         :param trait_type: the name of the Trait to filter by
         """
@@ -402,8 +399,7 @@ class Connection(object):
 
     @classmethod
     def get_capabilities(cls):
-        """Return an dictionary representing the capabilities of each driver.
-        """
+        """Return an dictionary with the capabilities of each driver."""
         return cls.CAPABILITIES
 
     @classmethod

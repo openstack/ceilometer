@@ -855,19 +855,23 @@ class TestAlarms(v2.FunctionalTest,
             self.fail("Alarm not found")
 
     def test_post_alarm_as_admin_explicit_project_constraint(self):
-        """Test the creation of an alarm as admin for another project,
-        with an explicit query constraint on the owner's project ID.
+        """Test the creation of an alarm as admin for another project.
+
+        With an explicit query constraint on the owner's project ID.
         """
         self._do_test_post_alarm_as_admin(True)
 
     def test_post_alarm_as_admin_implicit_project_constraint(self):
-        """Test the creation of an alarm as admin for another project,
-        without an explicit query constraint on the owner's project ID.
+        """Test the creation of an alarm as admin for another project.
+
+        Test without an explicit query constraint on the owner's project ID.
         """
         self._do_test_post_alarm_as_admin(False)
 
     def test_post_alarm_as_admin_no_user(self):
-        """Test the creation of an alarm as admin for another project but
+        """Test the creation of an alarm.
+
+        Test the creation of an alarm as admin for another project but
         forgetting to set the values.
         """
         json = {
@@ -903,7 +907,9 @@ class TestAlarms(v2.FunctionalTest,
         self._verify_alarm(json, alarms[0], 'added_alarm')
 
     def test_post_alarm_as_admin_no_project(self):
-        """Test the creation of an alarm as admin for another project but
+        """Test the creation of an alarm.
+
+        Test the creation of an alarm as admin for another project but
         forgetting to set the values.
         """
         json = {
@@ -965,7 +971,9 @@ class TestAlarms(v2.FunctionalTest,
 
     def _do_test_post_alarm_as_nonadmin_on_behalf_of_another(self,
                                                              identifiers):
-        """Test that posting an alarm as non-admin on behalf of another
+        """Test posting an alarm.
+
+        Test that posting an alarm as non-admin on behalf of another
         user/project fails with an explicit 401 instead of reverting
         to the requestor's identity.
         """
@@ -995,7 +1003,9 @@ class TestAlarms(v2.FunctionalTest,
         self._do_test_post_alarm_as_nonadmin_on_behalf_of_another(identifiers)
 
     def _do_test_post_alarm_as_nonadmin_on_behalf_of_self(self, identifiers):
-        """Test posting an alarm as non-admin on behalf of own user/project
+        """Test posting an alarm.
+
+        Test posting an alarm as non-admin on behalf of own user/project
         creates alarm associated with the requestor's identity.
         """
         json = self._alarm_representation_owned_by(identifiers)
@@ -1054,7 +1064,9 @@ class TestAlarms(v2.FunctionalTest,
             self.fail("Alarm not found")
 
     def test_post_combination_alarm_as_user_with_unauthorized_alarm(self):
-        """Test that post a combination alarm as normal user/project
+        """Test posting a combination alarm.
+
+        Test that post a combination alarm as normal user/project
         with an alarm_id unauthorized for this project/user
         """
         json = {
@@ -1081,7 +1093,9 @@ class TestAlarms(v2.FunctionalTest,
                          ['faultstring'])
 
     def test_post_combination_alarm_as_admin_on_behalf_of_an_other_user(self):
-        """Test that post a combination alarm as admin on behalf of an other
+        """Test posting a combination alarm.
+
+        Test that post a combination alarm as admin on behalf of an other
         user/project with an alarm_id unauthorized for this project/user
         """
         json = {
@@ -1112,7 +1126,9 @@ class TestAlarms(v2.FunctionalTest,
                          ['faultstring'])
 
     def test_post_combination_alarm_with_reasonable_description(self):
-        """Test that post a combination alarm with two blanks around the
+        """Test posting a combination alarm.
+
+        Test that post a combination alarm with two blanks around the
         operator in alarm description.
         """
         json = {
@@ -1144,8 +1160,7 @@ class TestAlarms(v2.FunctionalTest,
         self._do_post_combination_alarm_as_admin_success(True)
 
     def test_post_combination_alarm_with_threshold_rule(self):
-        """Test the creation of an combination alarm with threshold rule.
-        """
+        """Test the creation of an combination alarm with threshold rule."""
         json = {
             'enabled': False,
             'name': 'added_alarm',
@@ -1176,8 +1191,7 @@ class TestAlarms(v2.FunctionalTest,
             resp.json['error_message']['faultstring'])
 
     def test_post_threshold_alarm_with_combination_rule(self):
-        """Test the creation of an threshold alarm with combination rule.
-        """
+        """Test the creation of an threshold alarm with combination rule."""
         json = {
             'enabled': False,
             'name': 'added_alarm',
@@ -1201,7 +1215,9 @@ class TestAlarms(v2.FunctionalTest,
             resp.json['error_message']['faultstring'])
 
     def _do_post_combination_alarm_as_admin_success(self, owner_is_set):
-        """Test that post a combination alarm as admin on behalf of nobody
+        """Test posting a combination alarm.
+
+        Test that post a combination alarm as admin on behalf of nobody
         with an alarm_id of someone else, with owner set or not
         """
         json = {
@@ -1240,8 +1256,7 @@ class TestAlarms(v2.FunctionalTest,
             self.fail("Alarm not found")
 
     def test_post_invalid_alarm_combination(self):
-        """Test that post a combination alarm with a not existing alarm id
-        """
+        """Test that post a combination alarm with a not existing alarm id."""
         json = {
             'enabled': False,
             'name': 'added_alarm',
@@ -1431,8 +1446,7 @@ class TestAlarms(v2.FunctionalTest,
         self.assertEqual(200, resp.status_code)
 
     def test_put_alarm_with_existing_name(self):
-        """Test that update a threshold alarm with an existing name.
-        """
+        """Test that update a threshold alarm with an existing name."""
         json = {
             'enabled': False,
             'name': 'name1',

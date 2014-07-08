@@ -167,9 +167,7 @@ class TestPublish(tests_base.BaseTestCase):
             self.assertEqual(expected, prepare.mock_calls)
 
     def test_published_concurrency(self):
-        """This test the concurrent access to the local queue
-        of the rpc publisher
-        """
+        """Test concurrent access to the local queue of the rpc publisher."""
 
         publisher = rpc.RPCPublisher(network_utils.urlsplit('rpc://'))
         cast_context = mock.MagicMock()

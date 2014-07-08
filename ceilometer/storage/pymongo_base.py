@@ -50,8 +50,7 @@ AVAILABLE_STORAGE_CAPABILITIES = {
 
 
 class Connection(base.Connection):
-    """Base Connection class for MongoDB and DB2 drivers.
-    """
+    """Base Connection class for MongoDB and DB2 drivers."""
     CAPABILITIES = utils.update_nested(base.Connection.CAPABILITIES,
                                        COMMON_AVAILABLE_CAPABILITIES)
 
@@ -103,8 +102,7 @@ class Connection(base.Connection):
                 )
 
     def update_alarm(self, alarm):
-        """update alarm
-        """
+        """Update alarm."""
         data = alarm.as_dict()
 
         self.db.alarm.update(
@@ -121,13 +119,11 @@ class Connection(base.Connection):
     create_alarm = update_alarm
 
     def delete_alarm(self, alarm_id):
-        """Delete an alarm
-        """
+        """Delete an alarm."""
         self.db.alarm.remove({'alarm_id': alarm_id})
 
     def record_alarm_change(self, alarm_change):
-        """Record alarm change event.
-        """
+        """Record alarm change event."""
         self.db.alarm_history.insert(alarm_change.copy())
 
     def get_samples(self, sample_filter, limit=None):
@@ -148,6 +144,7 @@ class Connection(base.Connection):
     def get_alarms(self, name=None, user=None, state=None, meter=None,
                    project=None, enabled=None, alarm_id=None, pagination=None):
         """Yields a lists of alarms that match filters
+
         :param name: The Alarm name.
         :param user: Optional ID for user that owns the resource.
         :param state: Optional string for alarm state.
@@ -231,14 +228,12 @@ class Connection(base.Connection):
         return self._retrieve_data(filter_expr, orderby, limit, models.Meter)
 
     def query_alarms(self, filter_expr=None, orderby=None, limit=None):
-        """Return an iterable of model.Alarm objects.
-        """
+        """Return an iterable of model.Alarm objects."""
         return self._retrieve_data(filter_expr, orderby, limit,
                                    alarm_models.Alarm)
 
     def query_alarm_history(self, filter_expr=None, orderby=None, limit=None):
-        """Return an iterable of model.AlarmChange objects.
-        """
+        """Return an iterable of model.AlarmChange objects."""
         return self._retrieve_data(filter_expr,
                                    orderby,
                                    limit,
@@ -313,8 +308,9 @@ class Connection(base.Connection):
 
     @classmethod
     def _ensure_encapsulated_rule_format(cls, alarm):
-        """This ensure the alarm returned by the storage have the correct
-        format. The previous format looks like:
+        """Ensure the alarm returned by the storage have the correct format.
+
+        The previous format looks like:
         {
             'alarm_id': '0ld-4l3rt',
             'enabled': True,
