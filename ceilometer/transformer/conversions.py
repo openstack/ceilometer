@@ -15,7 +15,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import collections
 import re
 
 from ceilometer.openstack.common.gettextutils import _
@@ -25,30 +24,6 @@ from ceilometer import sample
 from ceilometer import transformer
 
 LOG = log.getLogger(__name__)
-
-
-class Namespace(object):
-    """Encapsulates the namespace.
-
-    Encapsulation is going by wrapping the evaluation of the configured scale
-    factor. This allows nested dicts to be accessed in the attribute style,
-    and missing attributes to yield false when used in a boolean expression.
-    """
-    def __init__(self, seed):
-        self.__dict__ = collections.defaultdict(lambda: Namespace({}))
-        self.__dict__.update(seed)
-        for k, v in self.__dict__.iteritems():
-            if isinstance(v, dict):
-                self.__dict__[k] = Namespace(v)
-
-    def __getattr__(self, attr):
-        return self.__dict__[attr]
-
-    def __getitem__(self, key):
-        return self.__dict__[key]
-
-    def __nonzero__(self):
-        return len(self.__dict__) > 0
 
 
 class ScalingTransformer(transformer.TransformerBase):
@@ -78,7 +53,7 @@ class ScalingTransformer(transformer.TransformerBase):
 
         Either a straight multiplicative factor or else a string to be eval'd.
         """
-        ns = Namespace(s.as_dict())
+        ns = transformer.Namespace(s.as_dict())
 
         scale = self.scale
         return ((eval(scale, {}, ns) if isinstance(scale, basestring)

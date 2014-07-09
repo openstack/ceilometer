@@ -33,6 +33,7 @@ from ceilometer.publisher import test as test_publisher
 from ceilometer import sample
 from ceilometer import transformer
 from ceilometer.transformer import accumulator
+from ceilometer.transformer import arithmetic
 from ceilometer.transformer import conversions
 
 
@@ -57,6 +58,7 @@ class BasePipelineTestCase(test.BaseTestCase):
             'aggregator': conversions.AggregatorTransformer,
             'unit_conversion': conversions.ScalingTransformer,
             'rate_of_change': conversions.RateOfChangeTransformer,
+            'arithmetic': arithmetic.ArithmeticTransformer,
         }
 
         if name in class_name_ext:
@@ -1503,3 +1505,215 @@ class BasePipelineTestCase(test.BaseTestCase):
         self.assertEqual(42, getattr(publisher.samples[0], 'volume'))
         self.assertEqual("test_resource", getattr(publisher.samples[0],
                                                   'resource_id'))
+
+    def _do_test_arithmetic_expr_parse(self, expr, expected):
+        actual = arithmetic.ArithmeticTransformer.parse_expr(expr)
+        self.assertEqual(expected, actual)
+
+    def test_arithmetic_expr_parse(self):
+        expr = '$(cpu) + $(cpu.util)'
+        expected = ('cpu.volume + _cpu_util_ESC.volume',
+                    {
+                        'cpu': 'cpu',
+                        'cpu.util': '_cpu_util_ESC'
+                    })
+        self._do_test_arithmetic_expr_parse(expr, expected)
+
+    def test_arithmetic_expr_parse_parameter(self):
+        expr = '$(cpu) + $(cpu.util).resource_metadata'
+        expected = ('cpu.volume + _cpu_util_ESC.resource_metadata',
+                    {
+                        'cpu': 'cpu',
+                        'cpu.util': '_cpu_util_ESC'
+                    })
+        self._do_test_arithmetic_expr_parse(expr, expected)
+
+    def test_arithmetic_expr_parse_reserved_keyword(self):
+        expr = '$(class) + $(cpu.util)'
+        expected = ('_class_ESC.volume + _cpu_util_ESC.volume',
+                    {
+                        'class': '_class_ESC',
+                        'cpu.util': '_cpu_util_ESC'
+                    })
+        self._do_test_arithmetic_expr_parse(expr, expected)
+
+    def test_arithmetic_expr_parse_already_escaped(self):
+        expr = '$(class) + $(_class_ESC)'
+        expected = ('_class_ESC.volume + __class_ESC_ESC.volume',
+                    {
+                        'class': '_class_ESC',
+                        '_class_ESC': '__class_ESC_ESC'
+                    })
+        self._do_test_arithmetic_expr_parse(expr, expected)
+
+    def _do_test_arithmetic(self, expression, scenario, expected):
+        transformer_cfg = [
+            {
+                'name': 'arithmetic',
+                'parameters': {
+                    'target': {'name': 'new_meter',
+                               'unit': '%',
+                               'type': sample.TYPE_GAUGE,
+                               'expr': expression},
+                }
+            },
+        ]
+        self._set_pipeline_cfg('transformers', transformer_cfg)
+        self._set_pipeline_cfg('counters',
+                               list(set(s['name'] for s in scenario)))
+        counters = []
+        test_resources = ['test_resource1', 'test_resource2']
+        for resource_id in test_resources:
+            for s in scenario:
+                counters.append(sample.Sample(
+                    name=s['name'],
+                    type=sample.TYPE_CUMULATIVE,
+                    volume=s['volume'],
+                    unit='ns',
+                    user_id='test_user',
+                    project_id='test_proj',
+                    resource_id=resource_id,
+                    timestamp=timeutils.utcnow().isoformat(),
+                    resource_metadata=s.get('metadata')
+                ))
+
+        pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager)
+        pipe = pipeline_manager.pipelines[0]
+
+        pipe.publish_samples(None, counters)
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+        expected_len = len(test_resources) * len(expected)
+        self.assertEqual(0, len(publisher.samples))
+        pipe.flush(None)
+        self.assertEqual(expected_len, len(publisher.samples))
+
+        # bucket samples by resource first
+        samples_by_resource = dict((r, []) for r in test_resources)
+        for s in publisher.samples:
+            samples_by_resource[s.resource_id].append(s)
+
+        for resource_id in samples_by_resource:
+            self.assertEqual(len(expected),
+                             len(samples_by_resource[resource_id]))
+            for i, s in enumerate(samples_by_resource[resource_id]):
+                self.assertEqual('new_meter', getattr(s, 'name'))
+                self.assertEqual(resource_id, getattr(s, 'resource_id'))
+                self.assertEqual('%', getattr(s, 'unit'))
+                self.assertEqual(sample.TYPE_GAUGE, getattr(s, 'type'))
+                self.assertEqual(expected[i], getattr(s, 'volume'))
+
+    def test_arithmetic_transformer(self):
+        expression = '100.0 * $(memory.usage) / $(memory)'
+        scenario = [
+            dict(name='memory', volume=1024.0),
+            dict(name='memory.usage', volume=512.0),
+        ]
+        expected = [50.0]
+        self._do_test_arithmetic(expression, scenario, expected)
+
+    def test_arithmetic_transformer_expr_empty(self):
+        expression = ''
+        scenario = [
+            dict(name='memory', volume=1024.0),
+            dict(name='memory.usage', volume=512.0),
+        ]
+        expected = []
+        self._do_test_arithmetic(expression, scenario, expected)
+
+    def test_arithmetic_transformer_expr_misconfigured(self):
+        expression = '512.0 * 3'
+        scenario = [
+            dict(name='memory', volume=1024.0),
+            dict(name='memory.usage', volume=512.0),
+        ]
+        expected = []
+        self._do_test_arithmetic(expression, scenario, expected)
+
+    def test_arithmetic_transformer_nan(self):
+        expression = 'float(\'nan\') * $(memory.usage) / $(memory)'
+        scenario = [
+            dict(name='memory', volume=1024.0),
+            dict(name='memory.usage', volume=512.0),
+        ]
+        expected = []
+        self._do_test_arithmetic(expression, scenario, expected)
+
+    def test_arithmetic_transformer_exception(self):
+        expression = '$(memory) / 0'
+        scenario = [
+            dict(name='memory', volume=1024.0),
+            dict(name='memory.usage', volume=512.0),
+        ]
+        expected = []
+        self._do_test_arithmetic(expression, scenario, expected)
+
+    def test_arithmetic_transformer_multiple_samples(self):
+        expression = '100.0 * $(memory.usage) / $(memory)'
+        scenario = [
+            dict(name='memory', volume=2048.0),
+            dict(name='memory.usage', volume=512.0),
+            dict(name='memory', volume=1024.0),
+        ]
+        expected = [50.0]
+        self._do_test_arithmetic(expression, scenario, expected)
+
+    def test_arithmetic_transformer_missing(self):
+        expression = '100.0 * $(memory.usage) / $(memory)'
+        scenario = [dict(name='memory.usage', volume=512.0)]
+        expected = []
+        self._do_test_arithmetic(expression, scenario, expected)
+
+    def test_arithmetic_transformer_more_than_needed(self):
+        expression = '100.0 * $(memory.usage) / $(memory)'
+        scenario = [
+            dict(name='memory', volume=1024.0),
+            dict(name='memory.usage', volume=512.0),
+            dict(name='cpu_util', volume=90.0),
+        ]
+        expected = [50.0]
+        self._do_test_arithmetic(expression, scenario, expected)
+
+    def test_arithmetic_transformer_cache_cleared(self):
+        transformer_cfg = [
+            {
+                'name': 'arithmetic',
+                'parameters': {
+                    'target': {'name': 'new_meter',
+                               'expr': '$(memory.usage) + 2'}
+                }
+            },
+        ]
+        self._set_pipeline_cfg('transformers', transformer_cfg)
+        self._set_pipeline_cfg('counters', ['memory.usage'])
+        counter = sample.Sample(
+            name='memory.usage',
+            type=sample.TYPE_GAUGE,
+            volume=1024.0,
+            unit='MB',
+            user_id='test_user',
+            project_id='test_proj',
+            resource_id='test_resource',
+            timestamp=timeutils.utcnow().isoformat(),
+            resource_metadata=None
+        )
+
+        pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager)
+        pipe = pipeline_manager.pipelines[0]
+
+        pipe.publish_samples(None, [counter])
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+        self.assertEqual(0, len(publisher.samples))
+        pipe.flush(None)
+        self.assertEqual(1, len(publisher.samples))
+        self.assertEqual(1026.0, publisher.samples[0].volume)
+
+        pipe.flush(None)
+        self.assertEqual(1, len(publisher.samples))
+
+        counter.volume = 2048.0
+        pipe.publish_samples(None, [counter])
+        pipe.flush(None)
+        self.assertEqual(2, len(publisher.samples))
+        self.assertEqual(2050.0, publisher.samples[1].volume)

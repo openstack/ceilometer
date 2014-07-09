@@ -16,6 +16,7 @@
 # under the License.
 
 import abc
+import collections
 
 import six
 from stevedore import extension
@@ -66,3 +67,27 @@ class TransformerBase(object):
         :param context: Passed from the data collector.
         """
         return []
+
+
+class Namespace(object):
+    """Encapsulates the namespace.
+
+    Encapsulation is done by wrapping the evaluation of the configured rule.
+    This allows nested dicts to be accessed in the attribute style,
+    and missing attributes to yield false when used in a boolean expression.
+    """
+    def __init__(self, seed):
+        self.__dict__ = collections.defaultdict(lambda: Namespace({}))
+        self.__dict__.update(seed)
+        for k, v in self.__dict__.iteritems():
+            if isinstance(v, dict):
+                self.__dict__[k] = Namespace(v)
+
+    def __getattr__(self, attr):
+        return self.__dict__[attr]
+
+    def __getitem__(self, key):
+        return self.__dict__[key]
+
+    def __nonzero__(self):
+        return len(self.__dict__) > 0
