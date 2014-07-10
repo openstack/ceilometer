@@ -134,7 +134,7 @@ class TestImagePollster(test.BaseTestCase):
             side_effect=self.fake_get_glance_client))
 
     def test_iter_images(self):
-        # Tests whether the iter_images method returns an unique image
+        # Tests whether the iter_images method returns a unique image
         # list when there is nothing in the cache
         images = list(glance.ImagePollster().
                       _iter_images(self.manager.keystone, {}))

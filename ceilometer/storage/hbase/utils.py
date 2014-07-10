@@ -102,7 +102,7 @@ def make_timestamp_query(func, start=None, start_op=None, end=None,
         return start_row, end_row
 
     q = []
-    # We dont need to dump here because get_start_end_rts returns strings
+    # We don't need to dump here because get_start_end_rts returns strings
     if rts_start:
         q.append("SingleColumnValueFilter ('f', 'rts', <=, 'binary:%s')" %
                  rts_start)
@@ -143,7 +143,7 @@ def make_query(metaquery=None, trait_query=None, **kwargs):
     res_q = None
 
     # Query for traits differs from others. It is constructed with
-    # SingleColumnValueFilter with the possibility to choose comparision
+    # SingleColumnValueFilter with the possibility to choose comparison
     # operator
     if trait_query:
         trait_name = kwargs.pop('key')

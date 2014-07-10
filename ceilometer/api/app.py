@@ -120,7 +120,7 @@ def get_handler_cls():
             if cfg.CONF.api.enable_reverse_dns_lookup:
                 return super(CeilometerHandler, self).address_string()
             else:
-                # disable reverse dns lookup, directly return ip adress
+                # disable reverse dns lookup, directly return ip address
                 return self.client_address[0]
 
     return CeilometerHandler

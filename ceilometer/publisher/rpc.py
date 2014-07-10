@@ -166,7 +166,7 @@ class RPCPublisher(publisher.PublisherBase):
         # if rabbit_max_retries <= 0:
         #   it returns only if the msg has been sent on the amqp queue
         # if rabbit_max_retries > 0:
-        #   it raises a exception if rabbitmq is unreachable
+        #   it raises an exception if rabbitmq is unreachable
         #
         # the default policy just respect the rabbitmq configuration
         # nothing special is done if rabbit_max_retries <= 0
