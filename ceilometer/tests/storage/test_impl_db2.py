@@ -65,7 +65,7 @@ class CapabilitiesTest(test_base.BaseTestCase):
                                  'complex': True},
                        'history': {'query': {'simple': True,
                                              'complex': True}}},
-            'events': {'query': {'simple': False}}
+            'events': {'query': {'simple': True}}
         }
 
         actual_capabilities = impl_db2.Connection.get_capabilities()

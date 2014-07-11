@@ -36,6 +36,10 @@ cfg.CONF.import_opt('max_retries', 'ceilometer.openstack.common.db.options',
 cfg.CONF.import_opt('retry_interval', 'ceilometer.openstack.common.db.options',
                     group="database")
 
+EVENT_TRAIT_TYPES = {'none': 0, 'string': 1, 'integer': 2, 'float': 3,
+                     'datetime': 4}
+OP_SIGN = {'lt': '$lt', 'le': '$lte', 'ne': '$ne', 'gt': '$gt', 'ge': '$gte'}
+
 
 def make_timestamp_range(start, end,
                          start_timestamp_op=None, end_timestamp_op=None):
@@ -61,6 +65,51 @@ def make_timestamp_range(start, end,
             end_timestamp_op = '$lt'
         ts_range[end_timestamp_op] = end
     return ts_range
+
+
+def make_events_query_from_filter(event_filter):
+    """Return start and stop row for filtering and a query.
+
+    Query is based on the selected parameter.
+
+    :param event_filter: storage.EventFilter object.
+    """
+    q = {}
+    ts_range = make_timestamp_range(event_filter.start_time,
+                                    event_filter.end_time)
+    if ts_range:
+        q['timestamp'] = ts_range
+    if event_filter.event_type:
+        q['event_type'] = event_filter.event_type
+    if event_filter.message_id:
+        q['_id'] = event_filter.message_id
+
+    if event_filter.traits_filter:
+        q.setdefault('traits')
+        for trait_filter in event_filter.traits_filter:
+            op = trait_filter.pop('op', 'eq')
+            dict_query = {}
+            for k, v in trait_filter.iteritems():
+                if v is not None:
+                    # All parameters in EventFilter['traits'] are optional, so
+                    # we need to check if they are in the query or no.
+                    if k == 'key':
+                        dict_query.setdefault('trait_name', v)
+                    elif k in ['string', 'integer', 'datetime', 'float']:
+                        dict_query.setdefault('trait_type',
+                                              EVENT_TRAIT_TYPES[k])
+                        dict_query.setdefault('trait_value',
+                                              v if op == 'eq'
+                                              else {OP_SIGN[op]: v})
+            dict_query = {'$elemMatch': dict_query}
+            if q['traits'] is None:
+                q['traits'] = dict_query
+            elif q.get('$and') is None:
+                q.setdefault('$and', [{'traits': q.pop('traits')},
+                                      {'traits': dict_query}])
+            else:
+                q['$and'].append({'traits': dict_query})
+    return q
 
 
 def make_query_from_filter(sample_filter, require_meter=True):
