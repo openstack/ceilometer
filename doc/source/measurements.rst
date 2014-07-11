@@ -290,7 +290,7 @@ resource instances available, use the ``meter-list`` command:
 
 ::
 
-    $ ceilometer meter-list -s openstack
+    $ ceilometer meter-list
     +------------+-------+--------------------------------------+---------+----------------------------------+
     | Name       | Type  | Resource ID                          | User ID | Project ID                       |
     +------------+-------+--------------------------------------+---------+----------------------------------+
