@@ -52,7 +52,7 @@ class TestComputeDurationByResource(v2.FunctionalTest,
         def get_interval(event_filter, period, groupby, aggregate):
             self.assertIsNotNone(event_filter.start)
             self.assertIsNotNone(event_filter.end)
-            if (event_filter.start > end or event_filter.end < start):
+            if event_filter.start > end or event_filter.end < start:
                 return []
             duration_start = max(event_filter.start, start)
             duration_end = min(event_filter.end, end)

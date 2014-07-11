@@ -230,7 +230,7 @@ class PartitionCoordinator(object):
         created_alarms = list(set(alarms) - self.last_alarms)
         LOG.debug(_('newly created alarms %s') % created_alarms)
         sufficient_deletion = self._deletion_requires_rebalance(alarms)
-        if (assuming or sufficient_deletion or self.presence_changed):
+        if assuming or sufficient_deletion or self.presence_changed:
             still_ahead = self._distribute(alarms, rebalance=True)
         elif created_alarms:
             still_ahead = self._distribute(list(created_alarms),
