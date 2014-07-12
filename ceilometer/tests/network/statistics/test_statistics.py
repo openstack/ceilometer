@@ -13,6 +13,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import datetime
+
 from ceilometer.network import statistics
 from ceilometer.network.statistics import driver
 from ceilometer.openstack.common import test
@@ -91,7 +93,9 @@ class TestBaseGetSamples(test.BaseTestCase):
         return FakeDriver
 
     def _make_timestamps(self, count):
-        return [timeutils.isotime() for i in range(count)]
+        now = timeutils.utcnow()
+        return [timeutils.isotime(now + datetime.timedelta(seconds=i))
+                for i in range(count)]
 
     def _get_samples(self, *resources):
 
@@ -134,7 +138,7 @@ class TestBaseGetSamples(test.BaseTestCase):
         samples = self._get_samples('http://foo', 'http://bar')
 
         self.assertEqual(len(samples), 2)
-        self._assert_sample(samples[0], 1, 'a', {'spam': 'egg'}, times[2])
+        self._assert_sample(samples[0], 1, 'a', {'spam': 'egg'}, times[0])
         self._assert_sample(samples[1], 2, 'b', None, times[1])
 
     def test_get_samples_two_driver_one_resource(self):
