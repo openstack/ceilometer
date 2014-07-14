@@ -1,0 +1,84 @@
+#
+# Copyright 2014 Cisco Systems,Inc.
+#
+# Author: Pradeep Kilambi <pkilambi@cisco.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+
+from ceilometer.network.services import base
+from ceilometer.openstack.common import log
+from ceilometer.openstack.common import timeutils
+from ceilometer import sample
+
+LOG = log.getLogger(__name__)
+
+
+class FirewallPollster(base.BaseServicesPollster):
+    """Pollster to capture firewalls status samples."""
+
+    FIELDS = ['admin_state_up',
+              'description',
+              'name',
+              'status',
+              'firewall_policy_id',
+              ]
+
+    def get_samples(self, manager, cache, resources=None):
+        for fw in resources:
+            LOG.debug("Firewall : %s" % fw)
+            status = self.get_status_id(fw['status'])
+            if status == -1:
+                # unknown status, skip this sample
+                LOG.warn("Unknown status %s received on firewall %s, "
+                         "skipping sample" % (fw['status'], fw['id']))
+                continue
+
+            yield sample.Sample(
+                name='network.services.firewall',
+                type=sample.TYPE_GAUGE,
+                unit='firewall',
+                volume=status,
+                user_id=None,
+                project_id=fw['tenant_id'],
+                resource_id=fw['id'],
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata=self.extract_metadata(fw)
+            )
+
+
+class FirewallPolicyPollster(base.BaseServicesPollster):
+    """Pollster to capture firewalls status samples."""
+
+    FIELDS = ['name',
+              'description',
+              'name',
+              'firewall_rules',
+              'shared',
+              'audited',
+              ]
+
+    def get_samples(self, manager, cache, resources=None):
+        for fw in resources:
+            LOG.debug("Firewall Policy: %s" % fw)
+
+            yield sample.Sample(
+                name='network.services.firewall.policy',
+                type=sample.TYPE_GAUGE,
+                unit='policy',
+                volume=1,
+                user_id=None,
+                project_id=fw['tenant_id'],
+                resource_id=fw['id'],
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata=self.extract_metadata(fw)
+            )
