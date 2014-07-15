@@ -169,7 +169,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
             self.pipeline_cfg,
             self.transformer_manager)
 
-    def get_extention_list(self):
+    def get_extension_list(self):
         return [extension.Extension('test',
                                     None,
                                     None,
@@ -189,7 +189,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
 
     def create_pollster_manager(self):
         return extension.ExtensionManager.make_test_instance(
-            self.get_extention_list(),
+            self.get_extension_list(),
         )
 
     def create_discovery_manager(self):
