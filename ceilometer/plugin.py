@@ -68,9 +68,9 @@ class NotificationBase(PluginBase):
 
             targets = []
             for exchange, topics in self.get_exchange_topics(conf):
-                targets.extend([oslo.messaging.Target(topic=topic,
-                                                      exchange=exchange)
-                                for topic in topics])
+                targets.extend(oslo.messaging.Target(topic=topic,
+                                                     exchange=exchange)
+                               for topic in topics)
             return targets
 
     @abc.abstractmethod
