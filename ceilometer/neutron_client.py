@@ -96,3 +96,13 @@ class Client(object):
     @logged
     def pool_stats(self, pool):
         return self.client.retrieve_pool_stats(pool)
+
+    @logged
+    def vpn_get_all(self):
+        resp = self.client.list_vpnservices()
+        return resp.get('vpnservices')
+
+    @logged
+    def ipsec_site_connections_get_all(self):
+        resp = self.client.list_ipsec_site_connections()
+        return resp.get('ipsec_site_connections')
