@@ -372,7 +372,7 @@ def _validate_query(query, db_func, internal_keys=None,
                                                      allow_timestamps)
     has_search_offset_query = _validate_timestamp_fields(query,
                                                          'search_offset',
-                                                         ('eq'),
+                                                         'eq',
                                                          allow_timestamps)
 
     if has_search_offset_query and not has_timestamp_query:
@@ -388,7 +388,7 @@ def _validate_query(query, db_func, internal_keys=None,
         if i.field not in ('timestamp', 'search_offset'):
             key = translation.get(i.field, i.field)
             operator = i.op
-            if (key in valid_keys or _is_field_metadata(i.field)):
+            if key in valid_keys or _is_field_metadata(i.field):
                 if operator == 'eq':
                     if key == 'enabled':
                         i._get_value_as_type('boolean')
@@ -595,7 +595,7 @@ def _make_link(rel_name, url, type, type_arg, query=None):
     if query:
         query_str = '?q.field=%s&q.value=%s' % (query['field'],
                                                 query['value'])
-    return Link(href=('%s/v2/%s/%s%s') % (url, type, type_arg, query_str),
+    return Link(href='%s/v2/%s/%s%s' % (url, type, type_arg, query_str),
                 rel=rel_name)
 
 
