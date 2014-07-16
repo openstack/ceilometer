@@ -205,8 +205,8 @@ class VsphereOperations(object):
         query_spec.metricId = [metric_id]
         query_spec.intervalId = VC_REAL_TIME_SAMPLING_INTERVAL
         # We query all samples which are applicable over the specified duration
-        samples_cnt = (duration / VC_REAL_TIME_SAMPLING_INTERVAL if duration
-                       else 1)
+        samples_cnt = (int(duration / VC_REAL_TIME_SAMPLING_INTERVAL)
+                       if duration else 1)
         query_spec.maxSample = samples_cnt
 
         perf_manager = session.vim.service_content.perfManager
