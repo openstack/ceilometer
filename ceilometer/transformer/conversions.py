@@ -188,8 +188,8 @@ class AggregatorTransformer(ScalingTransformer):
                  **kwargs):
         super(AggregatorTransformer, self).__init__(**kwargs)
         self.samples = {}
-        self.size = size
-        self.retention_time = retention_time
+        self.size = int(size) if size else None
+        self.retention_time = float(retention_time) if retention_time else None
         self.initial_timestamp = None
         self.aggregated_samples = 0
 
@@ -220,8 +220,7 @@ class AggregatorTransformer(ScalingTransformer):
 
     def handle_sample(self, context, sample):
         if not self.initial_timestamp:
-            self.initial_timestamp = timeutils.parse_strtime(
-                sample.timestamp)
+            self.initial_timestamp = timeutils.parse_isotime(sample.timestamp)
 
         self.aggregated_samples += 1
         key = self._get_unique_key(sample)
