@@ -13,10 +13,16 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from oslo.config import cfg
 import oslo.messaging
 
 from ceilometer import plugin
 from ceilometer import sample
+
+
+# TODO(boris-42): remove after adding keystone audit plugins.
+cfg.CONF.import_opt('keystone_control_exchange',
+                    'ceilometer.identity.notifications')
 
 
 class ProfilerNotifications(plugin.NotificationBase):
@@ -35,7 +41,8 @@ class ProfilerNotifications(plugin.NotificationBase):
             conf.cinder_control_exchange,
             conf.glance_control_exchange,
             conf.neutron_control_exchange,
-            conf.heat_control_exchange
+            conf.heat_control_exchange,
+            conf.keystone_control_exchange
         ]
 
         for exchange in exchanges:
