@@ -115,7 +115,7 @@ class AlarmTestPagination(test_storage_scenarios.AlarmTestBase):
     def test_alarm_get_marker(self):
         self.add_some_alarms()
         marker_pairs = {'name': 'red-alert'}
-        ret = impl_mongodb.Connection._get_marker(self.conn.db.alarm,
+        ret = impl_mongodb.Connection._get_marker(self.alarm_conn.db.alarm,
                                                   marker_pairs=marker_pairs)
         self.assertEqual('test.one', ret['rule']['meter_name'])
 
@@ -123,7 +123,7 @@ class AlarmTestPagination(test_storage_scenarios.AlarmTestBase):
         self.add_some_alarms()
         try:
             marker_pairs = {'name': 'user-id-foo'}
-            ret = impl_mongodb.Connection._get_marker(self.conn.db.alarm,
+            ret = impl_mongodb.Connection._get_marker(self.alarm_conn.db.alarm,
                                                       marker_pairs)
             self.assertEqual('meter_name-foo', ret['rule']['meter_name'])
         except base.NoResultFound:
@@ -133,7 +133,7 @@ class AlarmTestPagination(test_storage_scenarios.AlarmTestBase):
         self.add_some_alarms()
         try:
             marker_pairs = {'user_id': 'me'}
-            ret = impl_mongodb.Connection._get_marker(self.conn.db.alarm,
+            ret = impl_mongodb.Connection._get_marker(self.alarm_conn.db.alarm,
                                                       marker_pairs)
             self.assertEqual('counter-name-foo', ret['rule']['meter_name'])
         except base.MultipleResultsFound:

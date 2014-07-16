@@ -29,7 +29,6 @@ from ceilometer.publisher import utils
 from ceilometer import sample
 from ceilometer import storage
 from ceilometer.storage import base
-from ceilometer.storage import impl_mongodb as mongodb
 from ceilometer.storage import models
 from ceilometer.tests import db as tests_db
 
@@ -621,11 +620,10 @@ class RawSampleTest(DBTestBase,
         results = list(self.conn.get_samples(f))
         self.assertEqual(len(results), 2)
 
+    @tests_db.run_with('sqlite', 'hbase', 'db2')
     def test_clear_metering_data(self):
         # NOTE(jd) Override this test in MongoDB because our code doesn't clear
         # the collections, this is handled by MongoDB TTL feature.
-        if isinstance(self.conn, mongodb.Connection):
-            return
 
         self.mock_utcnow.return_value = datetime.datetime(2012, 7, 2, 10, 45)
         self.conn.clear_expired_metering_data(3 * 60)
@@ -635,11 +633,10 @@ class RawSampleTest(DBTestBase,
         results = list(self.conn.get_resources())
         self.assertEqual(len(results), 5)
 
+    @tests_db.run_with('sqlite', 'hbase', 'db2')
     def test_clear_metering_data_no_data_to_remove(self):
         # NOTE(jd) Override this test in MongoDB because our code doesn't clear
         # the collections, this is handled by MongoDB TTL feature.
-        if isinstance(self.conn, mongodb.Connection):
-            return
 
         self.mock_utcnow.return_value = datetime.datetime(2010, 7, 2, 10, 45)
         self.conn.clear_expired_metering_data(3 * 60)
@@ -649,11 +646,10 @@ class RawSampleTest(DBTestBase,
         results = list(self.conn.get_resources())
         self.assertEqual(len(results), 9)
 
+    @tests_db.run_with('sqlite', 'hbase', 'db2')
     def test_clear_metering_data_with_alarms(self):
         # NOTE(jd) Override this test in MongoDB because our code doesn't clear
         # the collections, this is handled by MongoDB TTL feature.
-        if isinstance(self.conn, mongodb.Connection):
-            return
 
         alarm = alarm_models.Alarm(alarm_id='r3d',
                                    enabled=True,
@@ -682,7 +678,7 @@ class RawSampleTest(DBTestBase,
                                                      'type': 'string'}]),
                                    )
 
-        self.conn.create_alarm(alarm)
+        self.alarm_conn.create_alarm(alarm)
         self.mock_utcnow.return_value = datetime.datetime(2012, 7, 2, 10, 45)
         self.conn.clear_expired_metering_data(5)
         f = storage.SampleFilter(meter='instance')
@@ -2393,34 +2389,34 @@ class AlarmTestBase(DBTestBase):
                                      )]
 
         for a in alarms:
-            self.conn.create_alarm(a)
+            self.alarm_conn.create_alarm(a)
 
 
 class AlarmTest(AlarmTestBase,
                 tests_db.MixinTestsWithBackendScenarios):
 
     def test_empty(self):
-        alarms = list(self.conn.get_alarms())
+        alarms = list(self.alarm_conn.get_alarms())
         self.assertEqual([], alarms)
 
     def test_list(self):
         self.add_some_alarms()
-        alarms = list(self.conn.get_alarms())
+        alarms = list(self.alarm_conn.get_alarms())
         self.assertEqual(len(alarms), 3)
 
     def test_list_enabled(self):
         self.add_some_alarms()
-        alarms = list(self.conn.get_alarms(enabled=True))
+        alarms = list(self.alarm_conn.get_alarms(enabled=True))
         self.assertEqual(len(alarms), 2)
 
     def test_list_disabled(self):
         self.add_some_alarms()
-        alarms = list(self.conn.get_alarms(enabled=False))
+        alarms = list(self.alarm_conn.get_alarms(enabled=False))
         self.assertEqual(len(alarms), 1)
 
     def test_add(self):
         self.add_some_alarms()
-        alarms = list(self.conn.get_alarms())
+        alarms = list(self.alarm_conn.get_alarms())
         self.assertEqual(len(alarms), 3)
 
         meter_names = sorted([a.rule['meter_name'] for a in alarms])
@@ -2429,7 +2425,7 @@ class AlarmTest(AlarmTestBase,
 
     def test_update(self):
         self.add_some_alarms()
-        orange = list(self.conn.get_alarms(name='orange-alert'))[0]
+        orange = list(self.alarm_conn.get_alarms(name='orange-alert'))[0]
         orange.enabled = False
         orange.state = alarm_models.Alarm.ALARM_INSUFFICIENT_DATA
         query = [{'field': 'metadata.group',
@@ -2438,7 +2434,7 @@ class AlarmTest(AlarmTestBase,
                   'type': 'string'}]
         orange.rule['query'] = query
         orange.rule['meter_name'] = 'new_meter_name'
-        updated = self.conn.update_alarm(orange)
+        updated = self.alarm_conn.update_alarm(orange)
         self.assertEqual(updated.enabled, False)
         self.assertEqual(updated.state,
                          alarm_models.Alarm.ALARM_INSUFFICIENT_DATA)
@@ -2469,19 +2465,19 @@ class AlarmTest(AlarmTestBase,
                                            meter_name='llt',
                                            query=[])
                                  )
-        updated = self.conn.update_alarm(llu)
+        updated = self.alarm_conn.update_alarm(llu)
         updated.state = alarm_models.Alarm.ALARM_OK
         updated.description = ':)'
-        self.conn.update_alarm(updated)
+        self.alarm_conn.update_alarm(updated)
 
-        all = list(self.conn.get_alarms())
+        all = list(self.alarm_conn.get_alarms())
         self.assertEqual(len(all), 1)
 
     def test_delete(self):
         self.add_some_alarms()
-        victim = list(self.conn.get_alarms(name='orange-alert'))[0]
-        self.conn.delete_alarm(victim.alarm_id)
-        survivors = list(self.conn.get_alarms())
+        victim = list(self.alarm_conn.get_alarms(name='orange-alert'))[0]
+        self.alarm_conn.delete_alarm(victim.alarm_id)
+        survivors = list(self.alarm_conn.get_alarms())
         self.assertEqual(len(survivors), 2)
         for s in survivors:
             self.assertNotEqual(victim.name, s.name)
@@ -2493,26 +2489,26 @@ class AlarmTestPagination(AlarmTestBase,
     def test_get_alarm_all_limit(self):
         self.add_some_alarms()
         pagination = base.Pagination(limit=2)
-        alarms = list(self.conn.get_alarms(pagination=pagination))
+        alarms = list(self.alarm_conn.get_alarms(pagination=pagination))
         self.assertEqual(len(alarms), 2)
 
         pagination = base.Pagination(limit=1)
-        alarms = list(self.conn.get_alarms(pagination=pagination))
+        alarms = list(self.alarm_conn.get_alarms(pagination=pagination))
         self.assertEqual(len(alarms), 1)
 
     def test_get_alarm_all_marker(self):
         self.add_some_alarms()
 
         pagination = base.Pagination(marker_value='orange-alert')
-        alarms = list(self.conn.get_alarms(pagination=pagination))
+        alarms = list(self.alarm_conn.get_alarms(pagination=pagination))
         self.assertEqual(len(alarms), 0)
 
         pagination = base.Pagination(marker_value='red-alert')
-        alarms = list(self.conn.get_alarms(pagination=pagination))
+        alarms = list(self.alarm_conn.get_alarms(pagination=pagination))
         self.assertEqual(len(alarms), 1)
 
         pagination = base.Pagination(marker_value='yellow-alert')
-        alarms = list(self.conn.get_alarms(pagination=pagination))
+        alarms = list(self.alarm_conn.get_alarms(pagination=pagination))
         self.assertEqual(len(alarms), 2)
 
     def test_get_alarm_paginate(self):
@@ -2520,12 +2516,12 @@ class AlarmTestPagination(AlarmTestBase,
         self.add_some_alarms()
 
         pagination = base.Pagination(limit=4, marker_value='yellow-alert')
-        page = list(self.conn.get_alarms(pagination=pagination))
+        page = list(self.alarm_conn.get_alarms(pagination=pagination))
         self.assertEqual(['red-alert', 'orange-alert'], [i.name for i in page])
 
         pagination = base.Pagination(limit=2, marker_value='orange-alert',
                                      primary_sort_dir='asc')
-        page1 = list(self.conn.get_alarms(pagination=pagination))
+        page1 = list(self.alarm_conn.get_alarms(pagination=pagination))
         self.assertEqual(['red-alert', 'yellow-alert'],
                          [i.name for i in page1])
 
@@ -2535,12 +2531,12 @@ class ComplexAlarmQueryTest(AlarmTestBase,
 
     def test_no_filter(self):
         self.add_some_alarms()
-        result = list(self.conn.query_alarms())
+        result = list(self.alarm_conn.query_alarms())
         self.assertEqual(3, len(result))
 
     def test_no_filter_with_limit(self):
         self.add_some_alarms()
-        result = list(self.conn.query_alarms(limit=2))
+        result = list(self.alarm_conn.query_alarms(limit=2))
         self.assertEqual(2, len(result))
 
     def test_filter(self):
@@ -2551,7 +2547,7 @@ class ComplexAlarmQueryTest(AlarmTestBase,
                          {"=": {"name": "red-alert"}}]},
                         {"=": {"enabled": True}}]}
 
-        result = list(self.conn.query_alarms(filter_expr=filter_expr))
+        result = list(self.alarm_conn.query_alarms(filter_expr=filter_expr))
 
         self.assertEqual(1, len(result))
         for a in result:
@@ -2562,7 +2558,7 @@ class ComplexAlarmQueryTest(AlarmTestBase,
         self.add_some_alarms()
         filter_expr = {"=": {"alarm_id": "0r4ng3"}}
 
-        result = list(self.conn.query_alarms(filter_expr=filter_expr))
+        result = list(self.alarm_conn.query_alarms(filter_expr=filter_expr))
 
         self.assertEqual(1, len(result))
         for a in result:
@@ -2570,9 +2566,9 @@ class ComplexAlarmQueryTest(AlarmTestBase,
 
     def test_filter_and_orderby(self):
         self.add_some_alarms()
-        result = list(self.conn.query_alarms(filter_expr=(
-                                             {"=": {"enabled": True}}),
-                                             orderby=[{"name": "asc"}]))
+        result = list(self.alarm_conn.query_alarms(filter_expr=(
+            {"=": {"enabled": True}}),
+            orderby=[{"name": "asc"}]))
         self.assertEqual(2, len(result))
         self.assertEqual(["orange-alert", "red-alert"],
                          [a.name for a in result])
@@ -2593,7 +2589,7 @@ class ComplexAlarmHistoryQueryTest(AlarmTestBase,
         self.prepare_alarm_history()
 
     def prepare_alarm_history(self):
-        alarms = list(self.conn.get_alarms())
+        alarms = list(self.alarm_conn.get_alarms())
         for alarm in alarms:
             i = alarms.index(alarm)
             alarm_change = dict(event_id=(
@@ -2607,7 +2603,7 @@ class ComplexAlarmHistoryQueryTest(AlarmTestBase,
                                 timestamp=datetime.datetime(2012, 9, 24,
                                                             7 + i,
                                                             30 + i))
-            self.conn.record_alarm_change(alarm_change=alarm_change)
+            self.alarm_conn.record_alarm_change(alarm_change=alarm_change)
 
             alarm_change2 = dict(event_id=(
                                  "16fd2706-8baf-433b-82eb-8c7fada847d%s" % i),
@@ -2620,7 +2616,7 @@ class ComplexAlarmHistoryQueryTest(AlarmTestBase,
                                  timestamp=datetime.datetime(2012, 9, 25,
                                                              10 + i,
                                                              30 + i))
-            self.conn.record_alarm_change(alarm_change=alarm_change2)
+            self.alarm_conn.record_alarm_change(alarm_change=alarm_change2)
 
             alarm_change3 = dict(
                 event_id="16fd2706-8baf-433b-82eb-8c7fada847e%s" % i,
@@ -2636,7 +2632,7 @@ class ComplexAlarmHistoryQueryTest(AlarmTestBase,
             if alarm.name == "red-alert":
                 alarm_change3['on_behalf_of'] = 'and-da-girls'
 
-            self.conn.record_alarm_change(alarm_change=alarm_change3)
+            self.alarm_conn.record_alarm_change(alarm_change=alarm_change3)
 
             if alarm.name in ["red-alert", "yellow-alert"]:
                 alarm_change4 = dict(event_id=(
@@ -2651,50 +2647,50 @@ class ComplexAlarmHistoryQueryTest(AlarmTestBase,
                                      timestamp=datetime.datetime(2012, 9, 27,
                                                                  10 + i,
                                                                  30 + i))
-                self.conn.record_alarm_change(alarm_change=alarm_change4)
+                self.alarm_conn.record_alarm_change(alarm_change=alarm_change4)
 
     def test_alarm_history_with_no_filter(self):
-        history = list(self.conn.query_alarm_history())
+        history = list(self.alarm_conn.query_alarm_history())
         self.assertEqual(11, len(history))
 
     def test_alarm_history_with_no_filter_and_limit(self):
-        history = list(self.conn.query_alarm_history(limit=3))
+        history = list(self.alarm_conn.query_alarm_history(limit=3))
         self.assertEqual(3, len(history))
 
     def test_alarm_history_with_filter(self):
         history = list(
-            self.conn.query_alarm_history(filter_expr=self.filter_expr))
+            self.alarm_conn.query_alarm_history(filter_expr=self.filter_expr))
         self.assertEqual(2, len(history))
 
     def test_alarm_history_with_filter_and_orderby(self):
         history = list(
-            self.conn.query_alarm_history(filter_expr=self.filter_expr,
-                                          orderby=[{"timestamp":
-                                                   "asc"}]))
+            self.alarm_conn.query_alarm_history(filter_expr=self.filter_expr,
+                                                orderby=[{"timestamp":
+                                                          "asc"}]))
         self.assertEqual([alarm_models.AlarmChange.RULE_CHANGE,
                           alarm_models.AlarmChange.STATE_TRANSITION],
                          [h.type for h in history])
 
     def test_alarm_history_with_filter_and_orderby_and_limit(self):
         history = list(
-            self.conn.query_alarm_history(filter_expr=self.filter_expr,
-                                          orderby=[{"timestamp":
-                                                    "asc"}],
-                                          limit=1))
+            self.alarm_conn.query_alarm_history(filter_expr=self.filter_expr,
+                                                orderby=[{"timestamp":
+                                                          "asc"}],
+                                                limit=1))
         self.assertEqual(alarm_models.AlarmChange.RULE_CHANGE, history[0].type)
 
     def test_alarm_history_with_on_behalf_of_filter(self):
         filter_expr = {"=": {"on_behalf_of": "and-da-girls"}}
-        history = list(self.conn.query_alarm_history(filter_expr=filter_expr))
+        history = list(self.alarm_conn.query_alarm_history(
+            filter_expr=filter_expr))
         self.assertEqual(1, len(history))
         self.assertEqual("16fd2706-8baf-433b-82eb-8c7fada847e0",
                          history[0].event_id)
 
     def test_alarm_history_with_alarm_id_as_filter(self):
         filter_expr = {"=": {"alarm_id": "r3d"}}
-        history = list(self.conn.query_alarm_history(filter_expr=filter_expr,
-                                                     orderby=[{"timestamp":
-                                                               "asc"}]))
+        history = list(self.alarm_conn.query_alarm_history(
+            filter_expr=filter_expr, orderby=[{"timestamp": "asc"}]))
         self.assertEqual(4, len(history))
         self.assertEqual([alarm_models.AlarmChange.CREATION,
                           alarm_models.AlarmChange.RULE_CHANGE,

@@ -17,9 +17,11 @@
 """Tests for ceilometer/storage/
 """
 
+from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import test
 from ceilometer import storage
 from ceilometer.storage import impl_log
+from ceilometer.storage import impl_sqlalchemy
 
 import six
 
@@ -27,11 +29,39 @@ import six
 class EngineTest(test.BaseTestCase):
 
     def test_get_connection(self):
-        engine = storage.get_connection('log://localhost')
+        engine = storage.get_connection('log://localhost',
+                                        'ceilometer.metering.storage')._conn
         self.assertIsInstance(engine, impl_log.Connection)
 
     def test_get_connection_no_such_engine(self):
         try:
-            storage.get_connection('no-such-engine://localhost')
+            storage.get_connection('no-such-engine://localhost',
+                                   'ceilometer.metering.storage')
         except RuntimeError as err:
             self.assertIn('no-such-engine', six.text_type(err))
+
+
+class ConnectionConfigTest(test.BaseTestCase):
+    def setUp(self):
+        super(ConnectionConfigTest, self).setUp()
+        self.CONF = self.useFixture(config.Config()).conf
+
+    def test_only_default_url(self):
+        self.CONF.set_override("connection", "log://", group="database")
+        conn = storage.get_connection_from_config(self.CONF)._conn
+        self.assertIsInstance(conn, impl_log.Connection)
+        conn = storage.get_connection_from_config(self.CONF, 'metering')._conn
+        self.assertIsInstance(conn, impl_log.Connection)
+        conn = storage.get_connection_from_config(self.CONF, 'alarm')._conn
+        self.assertIsInstance(conn, impl_log.Connection)
+
+    def test_two_urls(self):
+        self.CONF.set_override("connection", "log://", group="database")
+        self.CONF.set_override("alarm_connection", "sqlite://",
+                               group="database")
+        conn = storage.get_connection_from_config(self.CONF)._conn
+        self.assertIsInstance(conn, impl_log.Connection)
+        conn = storage.get_connection_from_config(self.CONF, 'metering')._conn
+        self.assertIsInstance(conn, impl_log.Connection)
+        conn = storage.get_connection_from_config(self.CONF, 'alarm')._conn
+        self.assertIsInstance(conn, impl_sqlalchemy.Connection)

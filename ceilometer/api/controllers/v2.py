@@ -1764,7 +1764,7 @@ class Alarm(_Base):
                                         if alarm.project_id != wtypes.Unset
                                         else None)
             for id in alarm.combination_rule.alarm_ids:
-                alarms = list(pecan.request.storage_conn.get_alarms(
+                alarms = list(pecan.request.alarm_storage_conn.get_alarms(
                     alarm_id=id, project=project))
                 if not alarms:
                     raise EntityNotFound(_('Alarm'), id)
@@ -1876,7 +1876,7 @@ class AlarmController(rest.RestController):
         self._id = alarm_id
 
     def _alarm(self):
-        self.conn = pecan.request.storage_conn
+        self.conn = pecan.request.alarm_storage_conn
         auth_project = acl.get_limited_to_project(pecan.request.headers)
         alarms = list(self.conn.get_alarms(alarm_id=self._id,
                                            project=auth_project))
@@ -1999,7 +1999,7 @@ class AlarmController(rest.RestController):
         # returned to those carried out on behalf of the auth'd tenant, to
         # avoid inappropriate cross-tenant visibility of alarm history
         auth_project = acl.get_limited_to_project(pecan.request.headers)
-        conn = pecan.request.storage_conn
+        conn = pecan.request.alarm_storage_conn
         kwargs = _query_to_kwargs(q, conn.get_alarm_changes, ['on_behalf_of',
                                                               'alarm_id'])
         return [AlarmChange.from_db_model(ac)
@@ -2073,7 +2073,7 @@ class AlarmsController(rest.RestController):
 
         :param data: an alarm within the request body.
         """
-        conn = pecan.request.storage_conn
+        conn = pecan.request.alarm_storage_conn
         now = timeutils.utcnow()
 
         data.alarm_id = str(uuid.uuid4())
@@ -2127,10 +2127,10 @@ class AlarmsController(rest.RestController):
         q = q or []
         # Timestamp is not supported field for Simple Alarm queries
         kwargs = _query_to_kwargs(q,
-                                  pecan.request.storage_conn.get_alarms,
+                                  pecan.request.alarm_storage_conn.get_alarms,
                                   allow_timestamps=False)
         return [Alarm.from_db_model(m)
-                for m in pecan.request.storage_conn.get_alarms(**kwargs)]
+                for m in pecan.request.alarm_storage_conn.get_alarms(**kwargs)]
 
 
 class TraitDescription(_Base):
@@ -2401,7 +2401,7 @@ class QueryAlarmHistoryController(rest.RestController):
         query = ValidatedComplexQuery(body,
                                       alarm_models.AlarmChange)
         query.validate(visibility_field="on_behalf_of")
-        conn = pecan.request.storage_conn
+        conn = pecan.request.alarm_storage_conn
         return [AlarmChange.from_db_model(s)
                 for s in conn.query_alarm_history(query.filter_expr,
                                                   query.orderby,
@@ -2421,7 +2421,7 @@ class QueryAlarmsController(rest.RestController):
         query = ValidatedComplexQuery(body,
                                       alarm_models.Alarm)
         query.validate(visibility_field="project_id")
-        conn = pecan.request.storage_conn
+        conn = pecan.request.alarm_storage_conn
         return [Alarm.from_db_model(s)
                 for s in conn.query_alarms(query.filter_expr,
                                            query.orderby,
@@ -2447,6 +2447,8 @@ class Capabilities(_Base):
     api = {wtypes.text: bool}
     "A flattened dictionary of API capabilities"
     storage = {wtypes.text: bool}
+    "A flattened dictionary of storage capabilities"
+    alarm_storage = {wtypes.text: bool}
     "A flattened dictionary of storage capabilities"
 
     @classmethod
@@ -2488,6 +2490,7 @@ class Capabilities(_Base):
                 'events': {'query': {'simple': True}},
             }),
             storage=_flatten_capabilities({'production_ready': True}),
+            alarm_storage=_flatten_capabilities({'production_ready': True}),
         )
 
 
@@ -2502,10 +2505,16 @@ class CapabilitiesController(rest.RestController):
         """
         # variation in API capabilities is effectively determined by
         # the lack of strict feature parity across storage drivers
-        driver_capabilities = pecan.request.storage_conn.get_capabilities()
-        driver_perf = pecan.request.storage_conn.get_storage_capabilities()
+        conn = pecan.request.storage_conn
+        alarm_conn = pecan.request.alarm_storage_conn
+        driver_capabilities = conn.get_capabilities().copy()
+        driver_capabilities['alarms'] = alarm_conn.get_capabilities()['alarms']
+        driver_perf = conn.get_storage_capabilities()
+        alarm_driver_perf = alarm_conn.get_storage_capabilities()
         return Capabilities(api=_flatten_capabilities(driver_capabilities),
-                            storage=_flatten_capabilities(driver_perf))
+                            storage=_flatten_capabilities(driver_perf),
+                            alarm_storage=_flatten_capabilities(
+                                alarm_driver_perf))
 
 
 class V2Controller(object):

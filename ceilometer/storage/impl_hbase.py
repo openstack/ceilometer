@@ -21,6 +21,7 @@ import time
 import happybase
 from six.moves.urllib import parse as urlparse
 
+from ceilometer.alarm.storage import base as alarm_base
 from ceilometer.alarm.storage import models as alarm_models
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
@@ -58,7 +59,7 @@ AVAILABLE_STORAGE_CAPABILITIES = {
 }
 
 
-class Connection(base.Connection):
+class Connection(base.Connection, alarm_base.Connection):
     """Put the data into a HBase database
 
     Collections:

@@ -17,6 +17,7 @@
 """Simple logging storage backend.
 """
 
+from ceilometer.alarm.storage import base as alarm_base
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.storage import base
@@ -24,7 +25,7 @@ from ceilometer.storage import base
 LOG = log.getLogger(__name__)
 
 
-class Connection(base.Connection):
+class Connection(base.Connection, alarm_base.Connection):
     """Log the data."""
 
     def upgrade(self):

@@ -324,7 +324,7 @@ class TestQueryAlarmsController(tests_api.FunctionalTest,
                                                            'op': 'eq',
                                                            'value':
                                                            project_id}]))
-                    self.conn.update_alarm(alarm)
+                    self.alarm_conn.update_alarm(alarm)
 
     def test_query_all(self):
         data = self.post_json(self.alarm_url,
@@ -471,7 +471,7 @@ class TestQueryAlarmsHistoryController(
                                     "on_behalf_of": "project-id%d" % id,
                                     "timestamp": date}
 
-                    self.conn.record_alarm_change(alarm_change)
+                    self.alarm_conn.record_alarm_change(alarm_change)
 
     def test_query_all(self):
         data = self.post_json(self.url,

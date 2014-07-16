@@ -117,7 +117,7 @@ class CompatibilityTest(test_storage_scenarios.DBTestBase,
                      repeat_actions=False,
                      matching_metadata={'key': 'value'})
 
-        self.conn.db.alarm.update(
+        self.alarm_conn.db.alarm.update(
             {'alarm_id': alarm['alarm_id']},
             {'$set': alarm},
             upsert=True)
@@ -126,13 +126,13 @@ class CompatibilityTest(test_storage_scenarios.DBTestBase,
         alarm['name'] = 'other-old-alaert'
         alarm['matching_metadata'] = [{'key': 'key1', 'value': 'value1'},
                                       {'key': 'key2', 'value': 'value2'}]
-        self.conn.db.alarm.update(
+        self.alarm_conn.db.alarm.update(
             {'alarm_id': alarm['alarm_id']},
             {'$set': alarm},
             upsert=True)
 
     def test_alarm_get_old_format_matching_metadata_dict(self):
-        old = list(self.conn.get_alarms(name='old-alert'))[0]
+        old = list(self.alarm_conn.get_alarms(name='old-alert'))[0]
         self.assertEqual('threshold', old.type)
         self.assertEqual([{'field': 'key',
                            'op': 'eq',
@@ -147,7 +147,7 @@ class CompatibilityTest(test_storage_scenarios.DBTestBase,
         self.assertEqual(36, old.rule['threshold'])
 
     def test_alarm_get_old_format_matching_metadata_array(self):
-        old = list(self.conn.get_alarms(name='other-old-alaert'))[0]
+        old = list(self.alarm_conn.get_alarms(name='other-old-alaert'))[0]
         self.assertEqual('threshold', old.type)
         self.assertEqual(sorted([{'field': 'key1',
                                   'op': 'eq',

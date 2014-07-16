@@ -23,6 +23,7 @@ import operator
 
 import pymongo
 
+from ceilometer.alarm.storage import base as alarm_base
 from ceilometer.alarm.storage import models as alarm_models
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
@@ -53,10 +54,12 @@ AVAILABLE_STORAGE_CAPABILITIES = {
 }
 
 
-class Connection(base.Connection):
+class Connection(base.Connection, alarm_base.Connection):
     """Base Connection class for MongoDB and DB2 drivers."""
     CAPABILITIES = utils.update_nested(base.Connection.CAPABILITIES,
-                                       COMMON_AVAILABLE_CAPABILITIES)
+                                       utils.update_nested(
+                                           alarm_base.Connection.CAPABILITIES,
+                                           COMMON_AVAILABLE_CAPABILITIES))
 
     STORAGE_CAPABILITIES = utils.update_nested(
         base.Connection.STORAGE_CAPABILITIES,

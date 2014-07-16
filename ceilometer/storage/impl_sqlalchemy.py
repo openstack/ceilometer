@@ -32,6 +32,7 @@ from sqlalchemy import not_
 from sqlalchemy import or_
 from sqlalchemy.orm import aliased
 
+from ceilometer.alarm.storage import base as alarm_base
 from ceilometer.alarm.storage import models as alarm_api_models
 from ceilometer.openstack.common.db import exception as dbexc
 from ceilometer.openstack.common.db.sqlalchemy import migration
@@ -220,7 +221,9 @@ class Connection(base.Connection):
               }
     """
     CAPABILITIES = utils.update_nested(base.Connection.CAPABILITIES,
-                                       AVAILABLE_CAPABILITIES)
+                                       utils.update_nested(
+                                           alarm_base.Connection.CAPABILITIES,
+                                           AVAILABLE_CAPABILITIES))
     STORAGE_CAPABILITIES = utils.update_nested(
         base.Connection.STORAGE_CAPABILITIES,
         AVAILABLE_STORAGE_CAPABILITIES,

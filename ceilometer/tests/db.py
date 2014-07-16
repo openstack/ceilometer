@@ -46,7 +46,10 @@ class MongoDbManager(fixtures.Fixture):
                 action='ignore',
                 message='.*you must provide a username and password.*')
             try:
-                self.connection = storage.get_connection(self.url)
+                self.connection = storage.get_connection(
+                    self.url, 'ceilometer.metering.storage')
+                self.alarm_connection = storage.get_connection(
+                    self.url, 'ceilometer.alarm.storage')
             except storage.StorageBadVersion as e:
                 raise testcase.TestSkipped(six.text_type(e))
 
@@ -64,7 +67,10 @@ class HBaseManager(fixtures.Fixture):
 
     def setUp(self):
         super(HBaseManager, self).setUp()
-        self.connection = storage.get_connection(self.url)
+        self.connection = storage.get_connection(
+            self.url, 'ceilometer.metering.storage')
+        self.alarm_connection = storage.get_connection(
+            self.url, 'ceilometer.alarm.storage')
 
     @property
     def url(self):
@@ -81,7 +87,10 @@ class SQLiteManager(fixtures.Fixture):
 
     def setUp(self):
         super(SQLiteManager, self).setUp()
-        self.connection = storage.get_connection(self.url)
+        self.connection = storage.get_connection(
+            self.url, 'ceilometer.metering.storage')
+        self.alarm_connection = storage.get_connection(
+            self.url, 'ceilometer.alarm.storage')
 
 
 class TestBase(testscenarios.testcase.WithScenarios, test_base.BaseTestCase):
@@ -113,8 +122,11 @@ class TestBase(testscenarios.testcase.WithScenarios, test_base.BaseTestCase):
         self.conn = self.db_manager.connection
         self.conn.upgrade()
 
+        self.alarm_conn = self.db_manager.alarm_connection
+        self.alarm_conn.upgrade()
+
         self.useFixture(oslo_mock.Patch('ceilometer.storage.get_connection',
-                                        return_value=self.conn))
+                                        side_effect=self._get_connection))
 
         self.CONF = self.useFixture(config.Config()).conf
         self.CONF([], project='ceilometer')
@@ -129,9 +141,16 @@ class TestBase(testscenarios.testcase.WithScenarios, test_base.BaseTestCase):
         )
 
     def tearDown(self):
+        self.alarm_conn.clear()
+        self.alarm_conn = None
         self.conn.clear()
         self.conn = None
         super(TestBase, self).tearDown()
+
+    def _get_connection(self, url, namespace):
+        if namespace == "ceilometer.alarm.storage":
+            return self.alarm_conn
+        return self.conn
 
     def _get_driver_manager(self, engine):
         manager = self.DRIVER_MANAGERS.get(engine)
