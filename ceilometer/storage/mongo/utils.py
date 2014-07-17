@@ -232,7 +232,7 @@ class QueryTransformer(object):
     def _move_negation_to_leaf(condition):
         """Moves every not operator to the leafs.
 
-        Moving is going by applying the De Morgan rules and anihilating
+        Moving is going by applying the De Morgan rules and annihilating
         double negations.
         """
         def _apply_de_morgan(tree, negated_subtree, negated_op):
@@ -259,7 +259,7 @@ class QueryTransformer(object):
                     _apply_de_morgan(subtree, negated_tree, negated_op)
                     transform(subtree)
                 elif negated_op == "not":
-                    # two consecutive not annihilates theirselves
+                    # two consecutive not annihilates themselves
                     new_op = negated_tree.values()[0].keys()[0]
                     subtree[new_op] = negated_tree[negated_op][new_op]
                     del subtree["not"]

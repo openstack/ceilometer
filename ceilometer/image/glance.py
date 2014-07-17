@@ -62,7 +62,7 @@ class _Base(plugin.CentralPollster):
         # all the public images together with private images.
         # As a result, if the user/tenant has an admin role
         # for ceilometer to collect image list,
-        # the _Base.iter_images method will return a image list
+        # the _Base.iter_images method will return an image list
         # which contains duplicate images. Add the following
         # code to avoid recording down duplicate image events.
         imageIdSet = set(image.id for image in rawImageList)

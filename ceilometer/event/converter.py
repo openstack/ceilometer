@@ -291,7 +291,7 @@ class NotificationEventsConverter(object):
         (e.g. 'payload.host') or dictionary syntax (e.g. 'payload[host]') is
         also supported.
         In either case, if the key for the field you are looking for contains
-        special charecters, like '.', it will need to be quoted (with double
+        special characters, like '.', it will need to be quoted (with double
         or single quotes) like so::
 
          "payload.image_meta.'org.openstack__1__architecture'"
