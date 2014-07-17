@@ -93,7 +93,7 @@ class Evaluator(object):
         if not alarm.time_constraints:
             return True
 
-        now_utc = timeutils.utcnow()
+        now_utc = timeutils.utcnow().replace(tzinfo=pytz.utc)
         for tc in alarm.time_constraints:
             tz = pytz.timezone(tc['timezone']) if tc['timezone'] else None
             now_tz = now_utc.astimezone(tz) if tz else now_utc
