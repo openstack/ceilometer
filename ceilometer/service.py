@@ -109,7 +109,7 @@ def get_workers(name):
 
 
 def prepare_service(argv=None):
-    gettextutils.install('ceilometer', lazy=True)
+    gettextutils.install('ceilometer')
     gettextutils.enable_lazy()
     log_levels = (cfg.CONF.default_log_levels +
                   ['stevedore=INFO', 'keystoneclient=INFO'])
