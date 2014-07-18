@@ -1205,6 +1205,15 @@ class BasePipelineTestCase(test.BaseTestCase):
         self.assertEqual(expected_length, len(publisher.samples))
         return sorted(publisher.samples, key=lambda s: s.volume)
 
+    def test_aggregator_input_validation(self):
+        aggregator = conversions.AggregatorTransformer("1", "15", None,
+                                                       None, None)
+        self.assertEqual(1, aggregator.size)
+        self.assertEqual(15, aggregator.retention_time)
+
+        self.assertRaises(ValueError, conversions.AggregatorTransformer,
+                          "abc", "cde", None, None, None)
+
     def test_aggregator_metadata(self):
         for conf, expected_version in [('last', '2.0'), ('first', '1.0')]:
             samples = self._do_test_aggregator({
