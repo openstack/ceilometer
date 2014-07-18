@@ -1442,3 +1442,55 @@ class BasePipelineTestCase(test.BaseTestCase):
         pipe.flush(None)
         publisher = pipeline_manager.pipelines[0].publishers[0]
         self.assertEqual(1, len(publisher.samples))
+
+    def test_aggregator_without_authentication(self):
+        transformer_cfg = [
+            {
+                'name': 'aggregator',
+                'parameters': {'size': 2},
+            },
+        ]
+        self._set_pipeline_cfg('transformers', transformer_cfg)
+        self._set_pipeline_cfg('counters', ['storage.objects.outgoing.bytes'])
+        counters = [
+            sample.Sample(
+                name='storage.objects.outgoing.bytes',
+                type=sample.TYPE_DELTA,
+                volume=26,
+                unit='B',
+                user_id=None,
+                project_id=None,
+                resource_id='test_resource',
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata={'version': '1.0'}
+            ),
+            sample.Sample(
+                name='storage.objects.outgoing.bytes',
+                type=sample.TYPE_DELTA,
+                volume=16,
+                unit='B',
+                user_id=None,
+                project_id=None,
+                resource_id='test_resource',
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata={'version': '2.0'}
+            )
+        ]
+
+        pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager)
+        pipe = pipeline_manager.pipelines[0]
+
+        pipe.publish_samples(None, [counters[0]])
+        pipe.flush(None)
+        publisher = pipe.publishers[0]
+        self.assertEqual(0, len(publisher.samples))
+
+        pipe.publish_samples(None, [counters[1]])
+        pipe.flush(None)
+        publisher = pipe.publishers[0]
+
+        self.assertEqual(1, len(publisher.samples))
+        self.assertEqual(42, getattr(publisher.samples[0], 'volume'))
+        self.assertEqual("test_resource", getattr(publisher.samples[0],
+                                                  'resource_id'))
