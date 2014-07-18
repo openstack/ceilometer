@@ -21,6 +21,12 @@ from oslo.config import cfg
 
 from ceilometer.openstack.common import log
 
+nova_opts = [
+    cfg.BoolOpt('nova_http_log_debug',
+                default=False,
+                help='Allow novaclient\'s debug log output.'),
+]
+cfg.CONF.register_opts(nova_opts)
 cfg.CONF.import_group('service_credentials', 'ceilometer.service')
 
 LOG = log.getLogger(__name__)
@@ -55,6 +61,7 @@ class Client(object):
             endpoint_type=conf.os_endpoint_type,
             cacert=conf.os_cacert,
             insecure=conf.insecure,
+            http_log_debug=cfg.CONF.nova_http_log_debug,
             no_cache=True)
 
     def _with_flavor_and_image(self, instances):

@@ -20,6 +20,7 @@ import mock
 import novaclient
 
 from ceilometer import nova_client
+from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common.fixture import mockpatch
 from ceilometer.openstack.common import test
 
@@ -37,6 +38,7 @@ class TestNovaClient(test.BaseTestCase):
         self.useFixture(mockpatch.PatchObject(
             self.nv.nova_client.images, 'get',
             side_effect=self.fake_images_get))
+        self.CONF = self.useFixture(config.Config()).conf
 
     def fake_flavors_get(self, *args, **kwargs):
         self._flavors_count += 1
@@ -233,3 +235,8 @@ class TestNovaClient(test.BaseTestCase):
         self.assertIsNone(instance.kernel_id)
         self.assertIsNone(instance.image)
         self.assertIsNone(instance.ramdisk_id)
+
+    def test_with_nova_http_log_debug(self):
+        self.CONF.set_override("nova_http_log_debug", True)
+        self.nv = nova_client.Client()
+        self.assertTrue(self.nv.nova_client.client.http_log_debug)
