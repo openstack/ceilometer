@@ -23,6 +23,7 @@
 
 """
 
+from ceilometer.alarm.storage import impl_db2 as impl_db2_alarm
 from ceilometer.storage import impl_db2
 from ceilometer.tests import base as test_base
 
@@ -61,14 +62,21 @@ class CapabilitiesTest(test_base.BaseTestCase):
                                                'stddev': False,
                                                'cardinality': False}}
                            },
-            'alarms': {'query': {'simple': True,
-                                 'complex': True},
-                       'history': {'query': {'simple': True,
-                                             'complex': True}}},
             'events': {'query': {'simple': True}}
         }
 
         actual_capabilities = impl_db2.Connection.get_capabilities()
+        self.assertEqual(expected_capabilities, actual_capabilities)
+
+    def test_alarm_capabilities(self):
+        expected_capabilities = {
+            'alarms': {'query': {'simple': True,
+                                 'complex': True},
+                       'history': {'query': {'simple': True,
+                                             'complex': True}}},
+        }
+
+        actual_capabilities = impl_db2_alarm.Connection.get_capabilities()
         self.assertEqual(expected_capabilities, actual_capabilities)
 
     def test_storage_capabilities(self):
