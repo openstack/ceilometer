@@ -27,6 +27,7 @@ import repr
 
 import mock
 
+from ceilometer.alarm.storage import impl_sqlalchemy as impl_sqla_alarm
 from ceilometer.openstack.common import timeutils
 from ceilometer.storage import impl_sqlalchemy
 from ceilometer.storage import models
@@ -226,14 +227,21 @@ class CapabilitiesTest(test_base.BaseTestCase):
                                                'stddev': True,
                                                'cardinality': True}}
                            },
-            'alarms': {'query': {'simple': True,
-                                 'complex': True},
-                       'history': {'query': {'simple': True,
-                                             'complex': True}}},
             'events': {'query': {'simple': True}}
         }
 
         actual_capabilities = impl_sqlalchemy.Connection.get_capabilities()
+        self.assertEqual(expected_capabilities, actual_capabilities)
+
+    def test_alarm_capabilities(self):
+        expected_capabilities = {
+            'alarms': {'query': {'simple': True,
+                                 'complex': True},
+                       'history': {'query': {'simple': True,
+                                             'complex': True}}},
+        }
+
+        actual_capabilities = impl_sqla_alarm.Connection.get_capabilities()
         self.assertEqual(expected_capabilities, actual_capabilities)
 
     def test_storage_capabilities(self):

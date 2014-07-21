@@ -18,11 +18,11 @@
 """
 
 from ceilometer.alarm.storage import impl_log as impl_log_alarm
+from ceilometer.alarm.storage import impl_sqlalchemy as impl_sqlalchemy_alarm
 from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import test
 from ceilometer import storage
 from ceilometer.storage import impl_log
-from ceilometer.storage import impl_sqlalchemy
 
 import six
 
@@ -65,4 +65,4 @@ class ConnectionConfigTest(test.BaseTestCase):
         conn = storage.get_connection_from_config(self.CONF, 'metering')._conn
         self.assertIsInstance(conn, impl_log.Connection)
         conn = storage.get_connection_from_config(self.CONF, 'alarm')._conn
-        self.assertIsInstance(conn, impl_sqlalchemy.Connection)
+        self.assertIsInstance(conn, impl_sqlalchemy_alarm.Connection)
