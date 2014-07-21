@@ -20,8 +20,8 @@ import bson.json_util
 
 from ceilometer import utils
 
-DTYPE_NAMES = {'none': 0, 'string': 1, 'integer': 2, 'float': 3,
-               'datetime': 4}
+EVENT_TRAIT_TYPES = {'none': 0, 'string': 1, 'integer': 2, 'float': 3,
+                     'datetime': 4}
 OP_SIGN = {'eq': '=', 'lt': '<', 'le': '<=', 'ne': '!=', 'gt': '>',
            'ge': '>='}
 
@@ -152,7 +152,7 @@ def make_query(metaquery=None, trait_query=None, **kwargs):
             if v is not None:
                 res_q = ("SingleColumnValueFilter "
                          "('f', '%s+%d', %s, 'binary:%s', true, true)" %
-                         (trait_name, DTYPE_NAMES[k], OP_SIGN[op],
+                         (trait_name, EVENT_TRAIT_TYPES[k], OP_SIGN[op],
                           dump(v)))
         return res_q
 

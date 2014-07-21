@@ -633,7 +633,7 @@ class Connection(base.Connection, alarm_base.Connection):
         return problem_events
 
     def get_events(self, event_filter):
-        """Return an iterable of models.Event objects.
+        """Return an iter of models.Event objects.
 
         :param event_filter: storage.EventFilter object, consists of filters
           for events that are stored in database.
@@ -645,7 +645,6 @@ class Connection(base.Connection, alarm_base.Connection):
 
             gen = events_table.scan(filter=q, row_start=start, row_stop=stop)
 
-        events = []
         for event_id, data in gen:
             traits = []
             events_dict = hbase_utils.deserialize_entry(data)[0]
@@ -658,14 +657,13 @@ class Connection(base.Connection, alarm_base.Connection):
                                                value=value))
             ts, mess = event_id.split('_', 1)
 
-            events.append(models.Event(
+            yield models.Event(
                 message_id=mess,
                 event_type=events_dict['event_type'],
                 generated=events_dict['timestamp'],
-                traits=sorted(traits, key=(lambda item:
-                                           getattr(item, 'dtype')))
-            ))
-        return events
+                traits=sorted(traits,
+                              key=operator.attrgetter('dtype'))
+            )
 
     def get_event_types(self):
         """Return all event types as an iterable of strings."""
@@ -691,7 +689,7 @@ class Connection(base.Connection, alarm_base.Connection):
         """
 
         q = hbase_utils.make_query(event_type=event_type)
-        trait_types = set()
+        trait_names = set()
         with self.conn_pool.connection() as conn:
             events_table = conn.table(self.EVENT_TABLE)
             gen = events_table.scan(filter=q)
@@ -700,17 +698,17 @@ class Connection(base.Connection, alarm_base.Connection):
             for key, value in events_dict.items():
                 if (not key.startswith('event_type') and
                         not key.startswith('timestamp')):
-                    name, tt_number = key.rsplit('+', 1)
-                    if name not in trait_types:
+                    trait_name, trait_type = key.rsplit('+', 1)
+                    if trait_name not in trait_names:
                         # Here we check that our method return only unique
                         # trait types, for ex. if it is found the same trait
                         # types in different events with equal event_type,
                         # method will return only one trait type. It is
                         # proposed that certain trait name could have only one
                         # trait type.
-                        trait_types.add(name)
-                        data_type = models.Trait.type_names[int(tt_number)]
-                        yield {'name': name, 'data_type': data_type}
+                        trait_names.add(trait_name)
+                        data_type = models.Trait.type_names[int(trait_type)]
+                        yield {'name': trait_name, 'data_type': data_type}
 
     def get_traits(self, event_type, trait_type=None):
         """Return all trait instances associated with an event_type.
@@ -721,7 +719,6 @@ class Connection(base.Connection, alarm_base.Connection):
         """
         q = hbase_utils.make_query(event_type=event_type,
                                    trait_type=trait_type)
-        traits = []
         with self.conn_pool.connection() as conn:
             events_table = conn.table(self.EVENT_TABLE)
             gen = events_table.scan(filter=q)
@@ -730,8 +727,6 @@ class Connection(base.Connection, alarm_base.Connection):
             for key, value in events_dict.items():
                 if (not key.startswith('event_type') and
                         not key.startswith('timestamp')):
-                    name, tt_number = key.rsplit('+', 1)
-                    traits.append(models.Trait(name=name,
-                                  dtype=int(tt_number), value=value))
-        for trait in sorted(traits, key=operator.attrgetter('dtype')):
-            yield trait
+                    trait_name, trait_type = key.rsplit('+', 1)
+                    yield models.Trait(name=trait_name,
+                                       dtype=int(trait_type), value=value)

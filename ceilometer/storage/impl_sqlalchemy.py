@@ -944,7 +944,8 @@ class Connection(base.Connection):
             try:
                 with session.begin():
                     event = self._record_event(session, event_model)
-            except dbexc.DBDuplicateEntry:
+            except dbexc.DBDuplicateEntry as e:
+                LOG.exception(_("Failed to record duplicated event: %s") % e)
                 problem_events.append((api_models.Event.DUPLICATE,
                                        event_model))
             except Exception as e:

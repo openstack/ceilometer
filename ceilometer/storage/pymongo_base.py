@@ -17,10 +17,6 @@
 # under the License.
 """Common functions for MongoDB and DB2 backends
 """
-
-
-import operator
-
 import pymongo
 
 from ceilometer.openstack.common.gettextutils import _
@@ -139,7 +135,8 @@ class Connection(base.Connection):
                      'event_type': event_model.event_type,
                      'timestamp': event_model.generated,
                      'traits': traits})
-            except pymongo.errors.DuplicateKeyError:
+            except pymongo.errors.DuplicateKeyError as ex:
+                LOG.exception(_("Failed to record duplicated event: %s") % ex)
                 problem_events.append((models.Event.DUPLICATE,
                                        event_model))
             except Exception as ex:
@@ -149,24 +146,22 @@ class Connection(base.Connection):
         return problem_events
 
     def get_events(self, event_filter):
-        """Return a list of models.Event objects.
+        """Return an iter of models.Event objects.
 
         :param event_filter: storage.EventFilter object, consists of filters
                              for events that are stored in database.
         """
         q = pymongo_utils.make_events_query_from_filter(event_filter)
-        res_events = []
         for event in self.db.event.find(q):
             traits = []
             for trait in event['traits']:
                 traits.append(models.Trait(name=trait['trait_name'],
                                            dtype=int(trait['trait_type']),
                                            value=trait['trait_value']))
-            res_events.append(models.Event(message_id=event['_id'],
-                                           event_type=event['event_type'],
-                                           generated=event['timestamp'],
-                                           traits=traits))
-        return res_events
+            yield models.Event(message_id=event['_id'],
+                               event_type=event['event_type'],
+                               generated=event['timestamp'],
+                               traits=traits)
 
     def get_event_types(self):
         """Return all event types as an iter of strings."""
@@ -219,14 +214,11 @@ class Connection(base.Connection):
                                         {'traits': {'$elemMatch':
                                                     {'trait_name': trait_name}}
                                          })
-        traits = []
         for event in events:
             for trait in event['traits']:
-                traits.append(models.Trait(name=trait['trait_name'],
-                                           dtype=trait['trait_type'],
-                                           value=trait['trait_value']))
-        for trait in sorted(traits, key=operator.attrgetter('dtype')):
-            yield trait
+                yield models.Trait(name=trait['trait_name'],
+                                   dtype=trait['trait_type'],
+                                   value=trait['trait_value'])
 
     def query_samples(self, filter_expr=None, orderby=None, limit=None):
         if limit == 0:

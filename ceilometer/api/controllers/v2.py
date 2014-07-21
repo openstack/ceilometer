@@ -2347,7 +2347,8 @@ class EventsController(rest.RestController):
         :param message_id: Message ID of the Event to be returned
         """
         event_filter = storage.EventFilter(message_id=message_id)
-        events = pecan.request.storage_conn.get_events(event_filter)
+        events = [event for event
+                  in pecan.request.storage_conn.get_events(event_filter)]
         if not events:
             raise EntityNotFound(_("Event"), message_id)
 
