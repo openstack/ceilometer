@@ -154,11 +154,11 @@ class TestCoordinate(tests_base.BaseTestCase):
         return (pid, younger)
 
     def _check_assignments(self, others, alarm_ids, per_worker,
-                           expect_uneffected=[]):
+                           expect_uneffected=None):
         rpc = self.partition_coordinator.coordination_rpc
         calls = rpc.assign.call_args_list
         return self._check_distribution(others, alarm_ids, per_worker, calls,
-                                        expect_uneffected)
+                                        expect_uneffected or [])
 
     def _check_allocation(self, others, alarm_ids, per_worker):
         rpc = self.partition_coordinator.coordination_rpc
@@ -166,7 +166,8 @@ class TestCoordinate(tests_base.BaseTestCase):
         return self._check_distribution(others, alarm_ids, per_worker, calls)
 
     def _check_distribution(self, others, alarm_ids, per_worker, calls,
-                            expect_uneffected=[]):
+                            expect_uneffected=None):
+        expect_uneffected = expect_uneffected or []
         uneffected = [pid for pid, _ in others]
         uneffected.extend(expect_uneffected)
         remainder = list(alarm_ids)

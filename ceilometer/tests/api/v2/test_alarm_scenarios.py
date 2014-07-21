@@ -1294,12 +1294,12 @@ class TestAlarms(v2.FunctionalTest,
                          alarms[0].rule.get('alarm_ids'))
 
     def _test_post_alarm_combination_rule_less_than_two_alarms(self,
-                                                               alarm_ids=[]):
+                                                               alarm_ids=None):
         json_body = {
             'name': 'one_alarm_in_combination_rule',
             'type': 'combination',
             'combination_rule': {
-                'alarm_ids': alarm_ids
+                'alarm_ids': alarm_ids or []
             }
         }
 
@@ -1511,12 +1511,12 @@ class TestAlarms(v2.FunctionalTest,
         self.assertEqual(msg, resp.json['error_message']['faultstring'])
 
     def _test_put_alarm_combination_rule_less_than_two_alarms(self,
-                                                              alarm_ids=[]):
+                                                              alarm_ids=None):
         json_body = {
             'name': 'name4',
             'type': 'combination',
             'combination_rule': {
-                'alarm_ids': alarm_ids
+                'alarm_ids': alarm_ids or []
             }
         }
 
