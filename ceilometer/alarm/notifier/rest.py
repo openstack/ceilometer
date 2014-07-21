@@ -63,9 +63,10 @@ class RestAlarmNotifier(notifier.AlarmNotifier):
         body = {'alarm_id': alarm_id, 'previous': previous,
                 'current': current, 'reason': reason,
                 'reason_data': reason_data}
-        kwargs = {'data': jsonutils.dumps(body)}
-        if headers:
-            kwargs['headers'] = headers
+        headers = headers or {}
+        headers['content-type'] = 'application/json'
+        kwargs = {'data': jsonutils.dumps(body),
+                  'headers': headers}
 
         if action.scheme == 'https':
             default_verify = int(cfg.CONF.alarm.rest_notifier_ssl_verify)
