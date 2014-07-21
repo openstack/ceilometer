@@ -18,7 +18,7 @@
 =====================
 
 The Ceilometer project maintains a list of things that need to be worked on at:
-http://wiki.openstack.org/EfficientMetering/RoadMap but feel free to work on
+https://wiki.openstack.org/wiki/Ceilometer/RoadMap but feel free to work on
 something else.
 
 Plugins
@@ -39,13 +39,13 @@ Core
 The core parts of ceilometer, not separated into a plugin, are fairly
 simple but depend on code that is part of ``nova`` right now. One
 project goal is to move the rest of those dependencies out of ``nova``
-and into ``openstack-common``. Logging and RPC are already done, but
+and into ``oslo``. Logging and RPC are already done, but
 the service and manager base classes still need to move.
 
 .. seealso::
 
    * https://launchpad.net/nova
-   * https://launchpad.net/openstack-common
+   * https://launchpad.net/oslo
 
 Testing
 =======
