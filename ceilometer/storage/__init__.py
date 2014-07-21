@@ -70,57 +70,6 @@ class StorageBadAggregate(Exception):
     code = 400
 
 
-STORAGE_ALARM_METHOD = [
-    'get_alarms', 'create_alarm', 'update_alarm', 'delete_alarm',
-    'get_alarm_changes', 'record_alarm_change',
-    'query_alarms', 'query_alarm_history',
-]
-
-
-class ConnectionProxy(object):
-    """Proxy to the real connection object
-
-    This proxy filter out method that must not be available for a driver
-    namespace for driver not yet moved to the ceilometer/alarm/storage subtree.
-
-    This permit to migrate each driver in a different patch.
-
-    This class will be removed when all drivers have been splitted and moved to
-    the new subtree.
-    """
-
-    def __init__(self, conn, namespace):
-        self._conn = conn
-        self._namespace = namespace
-
-        # NOTE(sileht): private object used in pymongo storage tests
-        if hasattr(self._conn, 'db'):
-            self.db = self._conn.db
-
-    def get_meter_statistics(self, *args, **kwargs):
-        # NOTE(sileht): must be defined to have mock working in
-        # test_compute_duration_by_resource_scenarios
-        method = self.__getattr__('get_meter_statistics')
-        return method(*args, **kwargs)
-
-    def __getattr__(self, attr):
-        # NOTE(sileht): this can raise the real AttributeError
-        value = getattr(self._conn, attr)
-        is_shared = attr in ['upgrade', 'clear', 'get_capabilities',
-                             'get_storage_capabilities']
-        is_alarm = (self._namespace == 'ceilometer.alarm.storage'
-                    and attr in STORAGE_ALARM_METHOD)
-        is_metering = (self._namespace == 'ceilometer.metering.storage'
-                       and attr not in STORAGE_ALARM_METHOD)
-        if is_shared or is_alarm or is_metering:
-            return value
-        # NOTE(sileht): we try to access to an attribute not allowed for
-        # this namespace
-        raise AttributeError(
-            'forbidden access to the hidden attribute %s for %s',
-            attr, self._namespace)
-
-
 def get_connection_from_config(conf, purpose=None):
     if conf.database_connection:
         conf.set_override('connection', conf.database_connection,
@@ -139,7 +88,7 @@ def get_connection(url, namespace):
     LOG.debug(_('looking for %(name)r driver in %(namespace)r') % (
               {'name': engine_name, 'namespace': namespace}))
     mgr = driver.DriverManager(namespace, engine_name)
-    return ConnectionProxy(mgr.driver(url), namespace)
+    return mgr.driver(url)
 
 
 class SampleFilter(object):

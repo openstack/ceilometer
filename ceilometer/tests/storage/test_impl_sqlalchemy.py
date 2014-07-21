@@ -154,7 +154,7 @@ class EventTest(tests_db.TestBase):
         m = [models.Event("1", "Foo", now, []),
              models.Event("2", "Zoo", now, [])]
 
-        with mock.patch.object(self.conn._conn, "_record_event") as mock_save:
+        with mock.patch.object(self.conn, "_record_event") as mock_save:
             mock_save.side_effect = MyException("Boom")
             problem_events = self.conn.record_events(m)
         self.assertEqual(2, len(problem_events))

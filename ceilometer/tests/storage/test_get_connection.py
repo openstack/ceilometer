@@ -31,7 +31,7 @@ class EngineTest(test.BaseTestCase):
 
     def test_get_connection(self):
         engine = storage.get_connection('log://localhost',
-                                        'ceilometer.metering.storage')._conn
+                                        'ceilometer.metering.storage')
         self.assertIsInstance(engine, impl_log.Connection)
 
     def test_get_connection_no_such_engine(self):
@@ -49,20 +49,20 @@ class ConnectionConfigTest(test.BaseTestCase):
 
     def test_only_default_url(self):
         self.CONF.set_override("connection", "log://", group="database")
-        conn = storage.get_connection_from_config(self.CONF)._conn
+        conn = storage.get_connection_from_config(self.CONF)
         self.assertIsInstance(conn, impl_log.Connection)
-        conn = storage.get_connection_from_config(self.CONF, 'metering')._conn
+        conn = storage.get_connection_from_config(self.CONF, 'metering')
         self.assertIsInstance(conn, impl_log.Connection)
-        conn = storage.get_connection_from_config(self.CONF, 'alarm')._conn
+        conn = storage.get_connection_from_config(self.CONF, 'alarm')
         self.assertIsInstance(conn, impl_log_alarm.Connection)
 
     def test_two_urls(self):
         self.CONF.set_override("connection", "log://", group="database")
         self.CONF.set_override("alarm_connection", "sqlite://",
                                group="database")
-        conn = storage.get_connection_from_config(self.CONF)._conn
+        conn = storage.get_connection_from_config(self.CONF)
         self.assertIsInstance(conn, impl_log.Connection)
-        conn = storage.get_connection_from_config(self.CONF, 'metering')._conn
+        conn = storage.get_connection_from_config(self.CONF, 'metering')
         self.assertIsInstance(conn, impl_log.Connection)
-        conn = storage.get_connection_from_config(self.CONF, 'alarm')._conn
+        conn = storage.get_connection_from_config(self.CONF, 'alarm')
         self.assertIsInstance(conn, impl_sqlalchemy_alarm.Connection)
