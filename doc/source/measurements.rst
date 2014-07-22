@@ -281,6 +281,17 @@ network.services.lb.incoming.bytes       Cumulative  B             pool ID     p
 network.services.lb.outgoing.bytes       Cumulative  B             pool ID     pollster   Number of outgoing Bytes
 =======================================  ==========  ==========    ==========  =========  ==============================
 
+VPN as a Service (VPNaaS)
+=========================
+
+================================  =====  ==========    =============  ========  ===============================
+Meter                             Type   Unit          Resource       Origin    Note
+================================  =====  ==========    =============  ========  ===============================
+network.services.vpn              Gauge  vpn           vpn ID         pollster  Existence of a VPN service
+network.services.vpn.connections  Gauge  connection    connection ID  pollster  Existence of a IPSec Connection
+================================  =====  ==========    =============  ========  ===============================
+
+
 Ironic Hardware IPMI Sensor Data
 ================================
 
