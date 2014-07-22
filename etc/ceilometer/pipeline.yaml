@@ -78,6 +78,22 @@ sources:
           - "ipsec_connections"
       sinks:
           - "meter_sink"
+    - name: firewall_source
+      interval: 600
+      meters:
+          - "network.services.firewall"
+      discovery:
+          - "fw_services"
+      sinks:
+          - "meter_sink"
+    - name: fw_policy_source
+      interval: 600
+      meters:
+          - "network.services.firewall.policy"
+      discovery:
+          - "fw_policy"
+      sinks:
+          - "meter_sink"
 sinks:
     - name: meter_sink
       transformers:

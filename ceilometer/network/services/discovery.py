@@ -101,3 +101,27 @@ class IPSecConnectionsDiscovery(_BaseServicesDiscovery):
 
         conns = self.neutron_cli.ipsec_site_connections_get_all()
         return conns
+
+
+class FirewallDiscovery(_BaseServicesDiscovery):
+
+    def __init__(self):
+        super(FirewallDiscovery, self).__init__()
+
+    def discover(self, param=None):
+        """Discover resources to monitor."""
+
+        fw = self.neutron_cli.firewall_get_all()
+        return [i for i in fw
+                if i.get('status', None) != 'error']
+
+
+class FirewallPolicyDiscovery(_BaseServicesDiscovery):
+
+    def __init__(self):
+        super(FirewallPolicyDiscovery, self).__init__()
+
+    def discover(self, param=None):
+        """Discover resources to monitor."""
+
+        return self.neutron_cli.fw_policy_get_all()

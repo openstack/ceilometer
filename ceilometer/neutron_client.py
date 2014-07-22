@@ -106,3 +106,13 @@ class Client(object):
     def ipsec_site_connections_get_all(self):
         resp = self.client.list_ipsec_site_connections()
         return resp.get('ipsec_site_connections')
+
+    @logged
+    def firewall_get_all(self):
+        resp = self.client.list_firewalls()
+        return resp.get('firewalls')
+
+    @logged
+    def fw_policy_get_all(self):
+        resp = self.client.list_firewall_policies()
+        return resp.get('firewall_policies')
