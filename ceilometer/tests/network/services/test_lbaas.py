@@ -18,6 +18,7 @@
 import mock
 
 from ceilometer.central import manager
+from ceilometer.network.services import discovery
 from ceilometer.network.services import lbaas
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common.fixture import mockpatch
@@ -106,25 +107,55 @@ class TestLBPoolPollster(_BaseTestLBPollster):
                  'subnet_id': 'bbe3d818-bdcb-4e4b-b47f-5650dc8a9d7a',
                  'tenant_id': 'a4eb9f4938bb418bbc4f8eb31802fefa',
                  'health_monitors_status': []},
+                {'status': 'error',
+                 'lb_method': 'ROUND_ROBIN',
+                 'protocol': 'HTTP',
+                 'description': '',
+                 'health_monitors': [],
+                 'members': [],
+                 'provider': 'haproxy',
+                 'status_description': None,
+                 'id': 'fe7rad36-437d-4c84-aee1-186027d3bdcd',
+                 'vip_id': 'cd6a6fee-e2fa-4e6c-b3c2-bfbe395752c1',
+                 'name': 'mylb_error',
+                 'admin_state_up': True,
+                 'subnet_id': 'bbe3d818-bdcb-4e4b-b47f-5650dc8a9d7a',
+                 'tenant_id': 'a4eb9f4938bb418bbc4f8eb31802fefa',
+                 'health_monitors_status': []},
                 ]
 
     def test_pool_get_samples(self):
-        samples = list(self.pollster.get_samples(self.manager, {}))
+        samples = list(self.pollster.get_samples(
+            self.manager, {},
+            resources=self.fake_get_pools()))
         self.assertEqual(3, len(samples))
         for field in self.pollster.FIELDS:
             self.assertEqual(self.fake_get_pools()[0][field],
                              samples[0].resource_metadata[field])
 
     def test_pool_volume(self):
-        samples = list(self.pollster.get_samples(self.manager, {}))
+        samples = list(self.pollster.get_samples(
+            self.manager, {},
+            resources=self.fake_get_pools()))
         self.assertEqual(1, samples[0].volume)
         self.assertEqual(0, samples[1].volume)
         self.assertEqual(2, samples[2].volume)
 
     def test_get_pool_meter_names(self):
-        samples = list(self.pollster.get_samples(self.manager, {}))
+        samples = list(self.pollster.get_samples(
+            self.manager, {},
+            resources=self.fake_get_pools()))
         self.assertEqual(set(['network.services.lb.pool']),
                          set([s.name for s in samples]))
+
+    def test_pool_discovery(self):
+        discovered_pools = discovery.LBPoolsDiscovery().discover()
+        self.assertEqual(4, len(discovered_pools))
+        for pool in self.fake_get_pools():
+            if pool['status'] == 'error':
+                self.assertTrue(pool not in discovered_pools)
+            else:
+                self.assertTrue(pool in discovered_pools)
 
 
 class TestLBVipPollster(_BaseTestLBPollster):
@@ -199,25 +230,55 @@ class TestLBVipPollster(_BaseTestLBPollster):
                  'port_id': '3df3c4de-b32e-4ca1-a7f4-84323ba5f291',
                  'id': 'fg6a6fee-e2fa-4e6c-b3c2-bfbe395752c1',
                  'name': 'myvip03'},
+                {'status': 'error',
+                 'status_description': None,
+                 'protocol': 'HTTP',
+                 'description': '',
+                 'admin_state_up': True,
+                 'subnet_id': 'bbe3d818-bdcb-4e4b-b47f-5650dc8a9d7a',
+                 'tenant_id': 'a4eb9f4938bb418bbc4f8eb31802fefa',
+                 'connection_limit': -1,
+                 'pool_id': 'ce73ad36-437d-4c84-aee1-186027d3da9a',
+                 'session_persistence': None,
+                 'address': '10.0.0.8',
+                 'protocol_port': 80,
+                 'port_id': '3df3c4de-b32e-4ca1-a7f4-84323ba5f291',
+                 'id': 'fg6a6fee-e2fa-4e6c-b3c2-bfbe395752c1',
+                 'name': 'myvip_error'},
                 ]
 
     def test_vip_get_samples(self):
-        samples = list(self.pollster.get_samples(self.manager, {}))
+        samples = list(self.pollster.get_samples(
+            self.manager, {},
+            resources=self.fake_get_vips()))
         self.assertEqual(3, len(samples))
         for field in self.pollster.FIELDS:
             self.assertEqual(self.fake_get_vips()[0][field],
                              samples[0].resource_metadata[field])
 
     def test_pool_volume(self):
-        samples = list(self.pollster.get_samples(self.manager, {}))
+        samples = list(self.pollster.get_samples(
+            self.manager, {},
+            resources=self.fake_get_vips()))
         self.assertEqual(1, samples[0].volume)
         self.assertEqual(0, samples[1].volume)
         self.assertEqual(2, samples[2].volume)
 
     def test_get_vip_meter_names(self):
-        samples = list(self.pollster.get_samples(self.manager, {}))
+        samples = list(self.pollster.get_samples(
+            self.manager, {},
+            resources=self.fake_get_vips()))
         self.assertEqual(set(['network.services.lb.vip']),
                          set([s.name for s in samples]))
+
+    def test_vip_discovery(self):
+        discovered_vips = discovery.LBVipsDiscovery().discover()
+        self.assertEqual(4, len(discovered_vips))
+        for pool in self.fake_get_vips():
+            if pool['status'] == 'error':
+                self.assertTrue(pool not in discovered_vips)
+            else:
+                self.assertTrue(pool in discovered_vips)
 
 
 class TestLBMemberPollster(_BaseTestLBPollster):
@@ -268,25 +329,49 @@ class TestLBMemberPollster(_BaseTestLBPollster):
                  'address': '10.0.0.6',
                  'status_description': None,
                  'id': '45630b61eb-07bc-4372-9fbf-36459dd0f96b'},
+                {'status': 'error',
+                 'protocol_port': 80,
+                 'weight': 1,
+                 'admin_state_up': True,
+                 'tenant_id': 'a4eb9f4938bb418bbc4f8eb31802fefa',
+                 'pool_id': 'ce73ad36-437d-4c84-aee1-186027d3da9a',
+                 'address': '10.0.0.6',
+                 'status_description': None,
+                 'id': '45630b61eb-07bc-4372-9fbf-36459dd0f96b'},
                 ]
 
     def test_get_samples_not_empty(self):
-        samples = list(self.pollster.get_samples(self.manager, {}))
+        samples = list(self.pollster.get_samples(
+            self.manager, {},
+            self.fake_get_members()))
         self.assertEqual(3, len(samples))
         for field in self.pollster.FIELDS:
             self.assertEqual(self.fake_get_members()[0][field],
                              samples[0].resource_metadata[field])
 
     def test_pool_volume(self):
-        samples = list(self.pollster.get_samples(self.manager, {}))
+        samples = list(self.pollster.get_samples(
+            self.manager, {},
+            self.fake_get_members()))
         self.assertEqual(1, samples[0].volume)
         self.assertEqual(0, samples[1].volume)
         self.assertEqual(2, samples[2].volume)
 
     def test_get_meter_names(self):
-        samples = list(self.pollster.get_samples(self.manager, {}))
+        samples = list(self.pollster.get_samples(
+            self.manager, {},
+            self.fake_get_members()))
         self.assertEqual(set(['network.services.lb.member']),
                          set([s.name for s in samples]))
+
+    def test_members_discovery(self):
+        discovered_members = discovery.LBMembersDiscovery().discover()
+        self.assertEqual(4, len(discovered_members))
+        for pool in self.fake_get_members():
+            if pool['status'] == 'error':
+                self.assertTrue(pool not in discovered_members)
+            else:
+                self.assertTrue(pool in discovered_members)
 
 
 class TestLBHealthProbePollster(_BaseTestLBPollster):
@@ -312,16 +397,24 @@ class TestLBHealthProbePollster(_BaseTestLBPollster):
                  }]
 
     def test_get_samples_not_empty(self):
-        samples = list(self.pollster.get_samples(self.manager, {}))
+        samples = list(self.pollster.get_samples(
+            self.manager, {},
+            self.fake_get_health_monitor()))
         self.assertEqual(1, len(samples))
         for field in self.pollster.FIELDS:
             self.assertEqual(self.fake_get_health_monitor()[0][field],
                              samples[0].resource_metadata[field])
 
     def test_get_meter_names(self):
-        samples = list(self.pollster.get_samples(self.manager, {}))
+        samples = list(self.pollster.get_samples(
+            self.manager, {},
+            self.fake_get_health_monitor()))
         self.assertEqual(set(['network.services.lb.health_monitor']),
                          set([s.name for s in samples]))
+
+    def test_probes_discovery(self):
+        discovered_probes = discovery.LBHealthMonitorsDiscovery().discover()
+        self.assertEqual(discovered_probes, self.fake_get_health_monitor())
 
 
 class TestLBStatsPollster(_BaseTestLBPollster):

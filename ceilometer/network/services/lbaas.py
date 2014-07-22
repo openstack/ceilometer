@@ -19,11 +19,10 @@ import abc
 import collections
 import six
 
-from ceilometer import neutron_client
+from ceilometer.network.services import base
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
-from ceilometer import plugin
 from ceilometer import sample
 
 LOG = log.getLogger(__name__)
@@ -33,37 +32,10 @@ LBStatsData = collections.namedtuple(
     ['active_connections', 'total_connections', 'bytes_in', 'bytes_out']
 )
 
-# status map for converting metric status to volume int
-STATUS = {
-    'inactive': 0,
-    'active': 1,
-    'pending_create': 2,
-}
 
-
-class _BasePollster(plugin.PollsterBase):
-
-    FIELDS = []
-    nc = neutron_client.Client()
-
-    def _iter_cache(self, cache, meter_name, method):
-        if meter_name not in cache:
-            cache[meter_name] = list(method())
-        return iter(cache[meter_name])
-
-    def extract_metadata(self, metric):
-        return dict((k, metric[k]) for k in self.FIELDS)
-
-    @staticmethod
-    def get_status_id(value):
-        status = value.lower()
-        if status not in STATUS:
-            return -1
-        return STATUS[status]
-
-
-class LBPoolPollster(_BasePollster):
+class LBPoolPollster(base.BaseServicesPollster):
     """Pollster to capture Load Balancer pool status samples."""
+
     FIELDS = ['admin_state_up',
               'description',
               'lb_method',
@@ -76,11 +48,8 @@ class LBPoolPollster(_BasePollster):
               'vip_id'
               ]
 
-    def _get_lb_pools(self):
-        return self.nc.pool_get_all()
-
     def get_samples(self, manager, cache, resources=None):
-        for pool in self._iter_cache(cache, 'pool', self._get_lb_pools):
+        for pool in resources:
             LOG.debug("Load Balancer Pool : %s" % pool)
             status = self.get_status_id(pool['status'])
             if status == -1:
@@ -102,8 +71,9 @@ class LBPoolPollster(_BasePollster):
             )
 
 
-class LBVipPollster(_BasePollster):
+class LBVipPollster(base.BaseServicesPollster):
     """Pollster to capture Load Balancer Vip status samples."""
+
     FIELDS = ['admin_state_up',
               'address',
               'connection_limit',
@@ -119,11 +89,8 @@ class LBVipPollster(_BasePollster):
               'session_persistence',
               ]
 
-    def _get_lb_vips(self):
-        return self.nc.vip_get_all()
-
     def get_samples(self, manager, cache, resources=None):
-        for vip in self._iter_cache(cache, 'vip', self._get_lb_vips):
+        for vip in resources:
             LOG.debug("Load Balancer Vip : %s" % vip)
             status = self.get_status_id(vip['status'])
             if status == -1:
@@ -145,8 +112,9 @@ class LBVipPollster(_BasePollster):
             )
 
 
-class LBMemberPollster(_BasePollster):
+class LBMemberPollster(base.BaseServicesPollster):
     """Pollster to capture Load Balancer Member status samples."""
+
     FIELDS = ['admin_state_up',
               'address',
               'pool_id',
@@ -156,11 +124,8 @@ class LBMemberPollster(_BasePollster):
               'weight',
               ]
 
-    def _get_lb_members(self):
-        return self.nc.member_get_all()
-
     def get_samples(self, manager, cache, resources=None):
-        for member in self._iter_cache(cache, 'member', self._get_lb_members):
+        for member in resources:
             LOG.debug("Load Balancer Member : %s" % member)
             status = self.get_status_id(member['status'])
             if status == -1:
@@ -180,8 +145,9 @@ class LBMemberPollster(_BasePollster):
             )
 
 
-class LBHealthMonitorPollster(_BasePollster):
+class LBHealthMonitorPollster(base.BaseServicesPollster):
     """Pollster to capture Load Balancer Health probes status samples."""
+
     FIELDS = ['admin_state_up',
               'delay',
               'max_retries',
@@ -190,12 +156,8 @@ class LBHealthMonitorPollster(_BasePollster):
               'type'
               ]
 
-    def _get_lb_health_probes(self):
-        return self.nc.health_monitor_get_all()
-
     def get_samples(self, manager, cache, resources=None):
-        for probe in self._iter_cache(cache, 'monitor',
-                                      self._get_lb_health_probes):
+        for probe in resources:
             LOG.debug("Load Balancer Health probe : %s" % probe)
             yield sample.Sample(
                 name='network.services.lb.health_monitor',
@@ -211,11 +173,11 @@ class LBHealthMonitorPollster(_BasePollster):
 
 
 @six.add_metaclass(abc.ABCMeta)
-class _LBStatsPollster(_BasePollster):
+class _LBStatsPollster(base.BaseServicesPollster):
     """Base Statistics pollster.
 
-    It is capturing the statistics info and yielding samples for connections
-    and bandwidth.
+     It is capturing the statistics info and yielding samples for connections
+     and bandwidth.
     """
 
     def _get_lb_pools(self):
