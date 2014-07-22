@@ -16,6 +16,7 @@
 # under the License.
 
 from ceilometer.network.services import base
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer import sample
@@ -34,13 +35,16 @@ class FirewallPollster(base.BaseServicesPollster):
               ]
 
     def get_samples(self, manager, cache, resources=None):
+        resources = resources or []
+
         for fw in resources:
             LOG.debug("Firewall : %s" % fw)
             status = self.get_status_id(fw['status'])
             if status == -1:
                 # unknown status, skip this sample
-                LOG.warn("Unknown status %s received on firewall %s, "
-                         "skipping sample" % (fw['status'], fw['id']))
+                LOG.warn(_("Unknown status %(stat)s received on fw %(id)s,"
+                           "skipping sample") % {'stat': fw['status'],
+                                                 'id': fw['id']})
                 continue
 
             yield sample.Sample(
@@ -57,7 +61,7 @@ class FirewallPollster(base.BaseServicesPollster):
 
 
 class FirewallPolicyPollster(base.BaseServicesPollster):
-    """Pollster to capture firewalls status samples."""
+    """Pollster to capture firewall policy samples."""
 
     FIELDS = ['name',
               'description',
@@ -68,6 +72,8 @@ class FirewallPolicyPollster(base.BaseServicesPollster):
               ]
 
     def get_samples(self, manager, cache, resources=None):
+        resources = resources or []
+
         for fw in resources:
             LOG.debug("Firewall Policy: %s" % fw)
 
