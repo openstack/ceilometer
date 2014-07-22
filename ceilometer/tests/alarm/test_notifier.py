@@ -94,6 +94,8 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
         notification['actions'] = [action]
         return notification
 
+    HTTP_HEADERS = {'content-type': 'application/json'}
+
     def test_notify_alarm_rest_action_ok(self):
         action = 'http://host/action'
 
@@ -101,7 +103,8 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
             with mock.patch.object(requests, 'post') as poster:
                 self.service.notify_alarm(context.get_admin_context(),
                                           self._notification(action))
-                poster.assert_called_with(action, data=DATA_JSON)
+                poster.assert_called_with(action, data=DATA_JSON,
+                                          headers=self.HTTP_HEADERS)
 
     def test_notify_alarm_rest_action_with_ssl_client_cert(self):
         action = 'https://host/action'
@@ -115,6 +118,7 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
                 self.service.notify_alarm(context.get_admin_context(),
                                           self._notification(action))
                 poster.assert_called_with(action, data=DATA_JSON,
+                                          headers=self.HTTP_HEADERS,
                                           cert=certificate, verify=True)
 
     def test_notify_alarm_rest_action_with_ssl_client_cert_and_key(self):
@@ -132,6 +136,7 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
                 self.service.notify_alarm(context.get_admin_context(),
                                           self._notification(action))
                 poster.assert_called_with(action, data=DATA_JSON,
+                                          headers=self.HTTP_HEADERS,
                                           cert=(certificate, key), verify=True)
 
     def test_notify_alarm_rest_action_with_ssl_verify_disable_by_cfg(self):
@@ -145,6 +150,7 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
                 self.service.notify_alarm(context.get_admin_context(),
                                           self._notification(action))
                 poster.assert_called_with(action, data=DATA_JSON,
+                                          headers=self.HTTP_HEADERS,
                                           verify=False)
 
     def test_notify_alarm_rest_action_with_ssl_verify_disable(self):
@@ -155,6 +161,7 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
                 self.service.notify_alarm(context.get_admin_context(),
                                           self._notification(action))
                 poster.assert_called_with(action, data=DATA_JSON,
+                                          headers=self.HTTP_HEADERS,
                                           verify=False)
 
     def test_notify_alarm_rest_action_with_ssl_verify_enable_by_user(self):
@@ -168,6 +175,7 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
                 self.service.notify_alarm(context.get_admin_context(),
                                           self._notification(action))
                 poster.assert_called_with(action, data=DATA_JSON,
+                                          headers=self.HTTP_HEADERS,
                                           verify=True)
 
     @staticmethod
@@ -214,6 +222,7 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
             with mock.patch.object(requests, 'post') as poster:
                 self.service.notify_alarm(context.get_admin_context(),
                                           self._notification(action))
+                headers = {'X-Auth-Token': 'token_1234'}
+                headers.update(self.HTTP_HEADERS)
                 poster.assert_called_with(
-                    url, data=DATA_JSON,
-                    headers={'X-Auth-Token': 'token_1234'})
+                    url, data=DATA_JSON, headers=headers)
