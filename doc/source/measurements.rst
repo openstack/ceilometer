@@ -292,6 +292,17 @@ network.services.vpn.connections  Gauge  connection    connection ID  pollster  
 ================================  =====  ==========    =============  ========  ===============================
 
 
+Firewall as a Service (FWaaS)
+=============================
+
+================================  =====  ========    ===========  ========  ===============================
+Meter                             Type   Unit        Resource     Origin    Note
+================================  =====  ========    ===========  ========  ===============================
+network.services.firewall         Gauge  firewall    firewall ID  pollster  Existence of a Firewall service
+network.services.firewall.policy  Gauge  policy      policy ID    pollster  Existance of Firewall Policy
+================================  =====  ========    ===========  ========  ===============================
+
+
 Ironic Hardware IPMI Sensor Data
 ================================
 
