@@ -17,6 +17,7 @@
 """Tests for ceilometer/storage/
 """
 
+from ceilometer.alarm.storage import impl_log as impl_log_alarm
 from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import test
 from ceilometer import storage
@@ -53,7 +54,7 @@ class ConnectionConfigTest(test.BaseTestCase):
         conn = storage.get_connection_from_config(self.CONF, 'metering')._conn
         self.assertIsInstance(conn, impl_log.Connection)
         conn = storage.get_connection_from_config(self.CONF, 'alarm')._conn
-        self.assertIsInstance(conn, impl_log.Connection)
+        self.assertIsInstance(conn, impl_log_alarm.Connection)
 
     def test_two_urls(self):
         self.CONF.set_override("connection", "log://", group="database")

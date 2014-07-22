@@ -17,7 +17,6 @@
 """Simple logging storage backend.
 """
 
-from ceilometer.alarm.storage import base as alarm_base
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.storage import base
@@ -25,7 +24,7 @@ from ceilometer.storage import base
 LOG = log.getLogger(__name__)
 
 
-class Connection(base.Connection, alarm_base.Connection):
+class Connection(base.Connection):
     """Log the data."""
 
     def upgrade(self):
@@ -131,19 +130,3 @@ class Connection(base.Connection, alarm_base.Connection):
           }
         """
         return []
-
-    def get_alarms(self, name=None, user=None, state=None, meter=None,
-                   project=None, enabled=None, alarm_id=None, pagination=None):
-        """Yields a lists of alarms that match filters."""
-        return []
-
-    def create_alarm(self, alarm):
-        """Create alarm."""
-        return alarm
-
-    def update_alarm(self, alarm):
-        """Update alarm."""
-        return alarm
-
-    def delete_alarm(self, alarm_id):
-        """Delete an alarm."""
