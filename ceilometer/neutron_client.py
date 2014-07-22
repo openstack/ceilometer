@@ -79,7 +79,6 @@ class Client(object):
 
     @logged
     def pool_get_all(self):
-        LOG.debug("NEUTRON POOL GET")
         resp = self.client.list_pools()
         return resp.get('pools')
 

@@ -1,6 +1,5 @@
-# -*- encoding: utf-8 -*-
 #
-# Copyright © 2014 Cisco Systems, Inc
+# Copyright (c) 2014 Cisco Systems, Inc
 #
 # Author:Pradeep Kilambi <pkilambi@cisco.com>
 #
@@ -29,9 +28,6 @@ class _BaseServicesDiscovery(plugin.DiscoveryBase):
 
 class LBPoolsDiscovery(_BaseServicesDiscovery):
 
-    def __init__(self):
-        super(LBPoolsDiscovery, self).__init__()
-
     def discover(self, param=None):
         """Discover resources to monitor."""
 
@@ -41,9 +37,6 @@ class LBPoolsDiscovery(_BaseServicesDiscovery):
 
 
 class LBVipsDiscovery(_BaseServicesDiscovery):
-
-    def __init__(self):
-        super(LBVipsDiscovery, self).__init__()
 
     def discover(self, param=None):
         """Discover resources to monitor."""
@@ -55,9 +48,6 @@ class LBVipsDiscovery(_BaseServicesDiscovery):
 
 class LBMembersDiscovery(_BaseServicesDiscovery):
 
-    def __init__(self):
-        super(LBMembersDiscovery, self).__init__()
-
     def discover(self, param=None):
         """Discover resources to monitor."""
 
@@ -68,9 +58,6 @@ class LBMembersDiscovery(_BaseServicesDiscovery):
 
 class LBHealthMonitorsDiscovery(_BaseServicesDiscovery):
 
-    def __init__(self):
-        super(LBHealthMonitorsDiscovery, self).__init__()
-
     def discover(self, param=None):
         """Discover resources to monitor."""
 
@@ -79,9 +66,6 @@ class LBHealthMonitorsDiscovery(_BaseServicesDiscovery):
 
 
 class VPNServicesDiscovery(_BaseServicesDiscovery):
-
-    def __init__(self):
-        super(VPNServicesDiscovery, self).__init__()
 
     def discover(self, param=None):
         """Discover resources to monitor."""
@@ -93,9 +77,6 @@ class VPNServicesDiscovery(_BaseServicesDiscovery):
 
 class IPSecConnectionsDiscovery(_BaseServicesDiscovery):
 
-    def __init__(self):
-        super(IPSecConnectionsDiscovery, self).__init__()
-
     def discover(self, param=None):
         """Discover resources to monitor."""
 
@@ -104,9 +85,6 @@ class IPSecConnectionsDiscovery(_BaseServicesDiscovery):
 
 
 class FirewallDiscovery(_BaseServicesDiscovery):
-
-    def __init__(self):
-        super(FirewallDiscovery, self).__init__()
 
     def discover(self, param=None):
         """Discover resources to monitor."""
@@ -117,9 +95,6 @@ class FirewallDiscovery(_BaseServicesDiscovery):
 
 
 class FirewallPolicyDiscovery(_BaseServicesDiscovery):
-
-    def __init__(self):
-        super(FirewallPolicyDiscovery, self).__init__()
 
     def discover(self, param=None):
         """Discover resources to monitor."""

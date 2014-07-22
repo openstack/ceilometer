@@ -49,13 +49,16 @@ class LBPoolPollster(base.BaseServicesPollster):
               ]
 
     def get_samples(self, manager, cache, resources=None):
+        resources = resources or []
+
         for pool in resources:
             LOG.debug("Load Balancer Pool : %s" % pool)
             status = self.get_status_id(pool['status'])
             if status == -1:
                 # unknown status, skip this sample
-                LOG.warn("Unknown status %s received on pool %s, "
-                         "skipping sample" % (pool['status'], pool['id']))
+                LOG.warn(_("Unknown status %(stat)s received on pool %(id)s, "
+                           "skipping sample") % {'stat': pool['status'],
+                                                 'id': pool['id']})
                 continue
 
             yield sample.Sample(
@@ -90,13 +93,16 @@ class LBVipPollster(base.BaseServicesPollster):
               ]
 
     def get_samples(self, manager, cache, resources=None):
+        resources = resources or []
+
         for vip in resources:
             LOG.debug("Load Balancer Vip : %s" % vip)
             status = self.get_status_id(vip['status'])
             if status == -1:
                 # unknown status, skip this sample
-                LOG.warn("Unknown status %s received on vip %s, "
-                         "skipping sample" % (vip['status'], vip['id']))
+                LOG.warn(_("Unknown status %(stat)s received on vip %(id)s, "
+                         "skipping sample") % {'stat': vip['status'],
+                                               'id': vip['id']})
                 continue
 
             yield sample.Sample(
@@ -125,12 +131,15 @@ class LBMemberPollster(base.BaseServicesPollster):
               ]
 
     def get_samples(self, manager, cache, resources=None):
+        resources = resources or []
+
         for member in resources:
             LOG.debug("Load Balancer Member : %s" % member)
             status = self.get_status_id(member['status'])
             if status == -1:
-                LOG.warn("Unknown status %s received on member %s, "
-                         "skipping sample" % (member['status'], member['id']))
+                LOG.warn(_("Unknown status %(stat)s received on member %(id)s,"
+                         "skipping sample") % {'stat': member['status'],
+                                               'id': member['id']})
                 continue
             yield sample.Sample(
                 name='network.services.lb.member',

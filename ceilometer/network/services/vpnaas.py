@@ -16,6 +16,7 @@
 # under the License.
 
 from ceilometer.network.services import base
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer import sample
@@ -35,13 +36,16 @@ class VPNServicesPollster(base.BaseServicesPollster):
               ]
 
     def get_samples(self, manager, cache, resources=None):
+        resources = resources or []
+
         for vpn in resources:
             LOG.debug("VPN : %s" % vpn)
             status = self.get_status_id(vpn['status'])
             if status == -1:
                 # unknown status, skip this sample
-                LOG.warn("Unknown status %s received on vpn %s, "
-                         "skipping sample" % (vpn['status'], vpn['id']))
+                LOG.warn(_("Unknown status %(stat)s received on vpn %(id)s,"
+                           "skipping sample") % {'stat': vpn['status'],
+                                                 'id': vpn['id']})
                 continue
 
             yield sample.Sample(
@@ -58,7 +62,7 @@ class VPNServicesPollster(base.BaseServicesPollster):
 
 
 class IPSecConnectionsPollster(base.BaseServicesPollster):
-    """Pollster to capture VPN status samples."""
+    """Pollster to capture vpn ipsec connections status samples."""
 
     FIELDS = ['name',
               'description',
@@ -77,6 +81,8 @@ class IPSecConnectionsPollster(base.BaseServicesPollster):
               ]
 
     def get_samples(self, manager, cache, resources=None):
+        resources = resources or []
+
         for conn in resources:
             LOG.debug("IPSec Connection Info: %s" % conn)
 
