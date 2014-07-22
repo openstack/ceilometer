@@ -76,3 +76,28 @@ class LBHealthMonitorsDiscovery(_BaseServicesDiscovery):
 
         probes = self.neutron_cli.health_monitor_get_all()
         return probes
+
+
+class VPNServicesDiscovery(_BaseServicesDiscovery):
+
+    def __init__(self):
+        super(VPNServicesDiscovery, self).__init__()
+
+    def discover(self, param=None):
+        """Discover resources to monitor."""
+
+        vpnservices = self.neutron_cli.vpn_get_all()
+        return [i for i in vpnservices
+                if i.get('status', None) != 'error']
+
+
+class IPSecConnectionsDiscovery(_BaseServicesDiscovery):
+
+    def __init__(self):
+        super(IPSecConnectionsDiscovery, self).__init__()
+
+    def discover(self, param=None):
+        """Discover resources to monitor."""
+
+        conns = self.neutron_cli.ipsec_site_connections_get_all()
+        return conns

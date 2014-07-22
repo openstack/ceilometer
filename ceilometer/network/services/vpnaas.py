@@ -1,0 +1,93 @@
+#
+# Copyright 2014 Cisco Systems,Inc.
+#
+# Author: Pradeep Kilambi <pkilambi@cisco.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+
+from ceilometer.network.services import base
+from ceilometer.openstack.common import log
+from ceilometer.openstack.common import timeutils
+from ceilometer import sample
+
+LOG = log.getLogger(__name__)
+
+
+class VPNServicesPollster(base.BaseServicesPollster):
+    """Pollster to capture VPN status samples."""
+
+    FIELDS = ['admin_state_up',
+              'description',
+              'name',
+              'status',
+              'subnet_id',
+              'router_id'
+              ]
+
+    def get_samples(self, manager, cache, resources=None):
+        for vpn in resources:
+            LOG.debug("VPN : %s" % vpn)
+            status = self.get_status_id(vpn['status'])
+            if status == -1:
+                # unknown status, skip this sample
+                LOG.warn("Unknown status %s received on vpn %s, "
+                         "skipping sample" % (vpn['status'], vpn['id']))
+                continue
+
+            yield sample.Sample(
+                name='network.services.vpn',
+                type=sample.TYPE_GAUGE,
+                unit='vpn',
+                volume=status,
+                user_id=None,
+                project_id=vpn['tenant_id'],
+                resource_id=vpn['id'],
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata=self.extract_metadata(vpn)
+            )
+
+
+class IPSecConnectionsPollster(base.BaseServicesPollster):
+    """Pollster to capture VPN status samples."""
+
+    FIELDS = ['name',
+              'description',
+              'peer_address',
+              'peer_id',
+              'peer_cidrs',
+              'psk',
+              'initiator',
+              'ikepolicy_id',
+              'dpd',
+              'ipsecpolicy_id',
+              'vpnservice_id',
+              'mtu',
+              'admin_state_up',
+              'tenant_id'
+              ]
+
+    def get_samples(self, manager, cache, resources=None):
+        for conn in resources:
+            LOG.debug("IPSec Connection Info: %s" % conn)
+
+            yield sample.Sample(
+                name='network.services.vpn.connections',
+                type=sample.TYPE_GAUGE,
+                unit='vpn',
+                volume=1,
+                user_id=None,
+                project_id=conn['tenant_id'],
+                resource_id=conn['id'],
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata=self.extract_metadata(conn)
+            )

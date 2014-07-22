@@ -62,6 +62,22 @@ sources:
           - "lb_members"
       sinks:
           - meter_sink
+    - name: vpn_services_source
+      interval: 600
+      meters:
+          - "network.services.vpn"
+      discovery:
+          - "vpn_services"
+      sinks:
+          - "meter_sink"
+    - name: vpn_conns_source
+      interval: 600
+      meters:
+          - "network.services.vpn.connections"
+      discovery:
+          - "ipsec_connections"
+      sinks:
+          - "meter_sink"
 sinks:
     - name: meter_sink
       transformers:
