@@ -44,6 +44,9 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
         self.CONF = self.useFixture(config.Config()).conf
         self.setup_messaging(self.CONF)
         self.service = service.AlarmNotifierService()
+        self.useFixture(mockpatch.Patch(
+            'ceilometer.openstack.common.context.generate_request_id',
+            self._fake_generate_request_id))
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_init_host(self):
@@ -94,13 +97,17 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
         notification['actions'] = [action]
         return notification
 
-    HTTP_HEADERS = {'content-type': 'application/json'}
+    HTTP_HEADERS = {'x-openstack-request-id': 'fake_request_id',
+                    'content-type': 'application/json'}
+
+    def _fake_generate_request_id(self):
+        return self.HTTP_HEADERS['x-openstack-request-id']
 
     def test_notify_alarm_rest_action_ok(self):
         action = 'http://host/action'
 
         with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
-            with mock.patch.object(requests, 'post') as poster:
+            with mock.patch.object(requests.Session, 'post') as poster:
                 self.service.notify_alarm(context.get_admin_context(),
                                           self._notification(action))
                 poster.assert_called_with(action, data=DATA_JSON,
@@ -114,7 +121,7 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
                                group='alarm')
 
         with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
-            with mock.patch.object(requests, 'post') as poster:
+            with mock.patch.object(requests.Session, 'post') as poster:
                 self.service.notify_alarm(context.get_admin_context(),
                                           self._notification(action))
                 poster.assert_called_with(action, data=DATA_JSON,
@@ -132,7 +139,7 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
                                group='alarm')
 
         with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
-            with mock.patch.object(requests, 'post') as poster:
+            with mock.patch.object(requests.Session, 'post') as poster:
                 self.service.notify_alarm(context.get_admin_context(),
                                           self._notification(action))
                 poster.assert_called_with(action, data=DATA_JSON,
@@ -146,7 +153,7 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
                                group='alarm')
 
         with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
-            with mock.patch.object(requests, 'post') as poster:
+            with mock.patch.object(requests.Session, 'post') as poster:
                 self.service.notify_alarm(context.get_admin_context(),
                                           self._notification(action))
                 poster.assert_called_with(action, data=DATA_JSON,
@@ -157,7 +164,7 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
         action = 'https://host/action?ceilometer-alarm-ssl-verify=0'
 
         with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
-            with mock.patch.object(requests, 'post') as poster:
+            with mock.patch.object(requests.Session, 'post') as poster:
                 self.service.notify_alarm(context.get_admin_context(),
                                           self._notification(action))
                 poster.assert_called_with(action, data=DATA_JSON,
@@ -171,7 +178,7 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
                                group='alarm')
 
         with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
-            with mock.patch.object(requests, 'post') as poster:
+            with mock.patch.object(requests.Session, 'post') as poster:
                 self.service.notify_alarm(context.get_admin_context(),
                                           self._notification(action))
                 poster.assert_called_with(action, data=DATA_JSON,
@@ -214,12 +221,14 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
 
         client = mock.MagicMock()
         client.auth_token = 'token_1234'
+        headers = {'X-Auth-Token': 'token_1234'}
+        headers.update(self.HTTP_HEADERS)
 
         self.useFixture(mockpatch.Patch('keystoneclient.v3.client.Client',
                                         lambda **kwargs: client))
 
         with mock.patch('eventlet.spawn_n', self._fake_spawn_n):
-            with mock.patch.object(requests, 'post') as poster:
+            with mock.patch.object(requests.Session, 'post') as poster:
                 self.service.notify_alarm(context.get_admin_context(),
                                           self._notification(action))
                 headers = {'X-Auth-Token': 'token_1234'}
