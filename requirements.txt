@@ -27,7 +27,7 @@ pytz>=2010h
 PyYAML>=3.1.0
 requests>=1.1
 six>=1.6.0
-SQLAlchemy>=0.7.8,<=0.9.99
+SQLAlchemy>=0.7.8,!=0.9.5,<=0.9.99
 sqlalchemy-migrate>=0.8.2,!=0.8.4
 stevedore>=0.14
 WebOb>=1.2.3
