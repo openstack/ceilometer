@@ -135,8 +135,6 @@ class RPCPublisher(publisher.PublisherBase):
             'version': '1.0',
             'args': {'data': meters},
         }
-        LOG.audit(_('Publishing %(m)d samples on %(t)s') % (
-                  {'m': len(msg['args']['data']), 't': topic}))
         self.local_queue.append((context, topic, msg))
 
         if self.per_meter_topic:
