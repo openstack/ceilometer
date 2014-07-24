@@ -24,34 +24,26 @@ from ceilometer.tests import base as test_base
 
 
 class FakeInspector(inspector_base.Inspector):
-    CPU = inspector_base.CPUStats(cpu_1_min=0.99,
-                                  cpu_5_min=0.77,
-                                  cpu_15_min=0.55)
-    DISK = (inspector_base.Disk(device='/dev/sda1', path='/'),
-            inspector_base.DiskStats(size=1000, used=90))
-    MEMORY = inspector_base.MemoryStats(total=1000, used=90)
-    NET = (inspector_base.Interface(name='test.teest',
-                                    mac='001122334455',
-                                    ip='10.0.0.2',
-                                    speed=1000),
-           inspector_base.InterfaceStats(rx_bytes=90,
-                                         tx_bytes=80,
-                                         error=1))
-
-    def inspect_cpu(self, host):
-        yield self.CPU
-
-    def inspect_disk(self, host):
-        yield self.DISK
-
-    def inspect_memory(self, host):
-        yield self.MEMORY
-
-    def inspect_network(self, host):
-        yield self.NET
+    net_metadata = dict(name='test.teest',
+                        mac='001122334455',
+                        ip='10.0.0.2',
+                        speed=1000)
+    disk_metadata = dict(device='/dev/sda1', path='/')
+    DATA = {
+        'cpu.load.1min': (0.99, {}, {}),
+        'cpu.load.5min': (0.77, {}, {}),
+        'cpu.load.15min': (0.55, {}, {}),
+        'memory.total': (1000, {}, {}),
+        'memory.used': (90, {}, {}),
+        'network.incoming.bytes': (90, net_metadata, {}),
+        'network.outgoing.bytes': (80, net_metadata, {}),
+        'network.outgoing.errors': (1, net_metadata, {}),
+        'disk.size.total': (1000, disk_metadata, {}),
+        'disk.size.used': (90, disk_metadata, {}),
+    }
 
     def inspect_generic(self, host, identifier, cache):
-        yield (None, {}, {})
+        yield self.DATA[identifier]
 
 
 class TestPollsterBase(test_base.BaseTestCase):

@@ -26,28 +26,21 @@ from ceilometer import sample
 class _Base(plugin.HardwarePollster):
 
     CACHE_KEY = 'memory'
-    INSPECT_METHOD = 'inspect_memory'
+
+    def generate_one_sample(self, host, c_data):
+        value, metadata, extra = c_data
+        return util.make_sample_from_host(host,
+                                          name=self.IDENTIFIER,
+                                          sample_type=sample.TYPE_GAUGE,
+                                          unit='B',
+                                          volume=value,
+                                          res_metadata=metadata,
+                                          extra=extra)
 
 
 class MemoryTotalPollster(_Base):
-
-    @staticmethod
-    def generate_one_sample(host, c_data):
-        return util.make_sample_from_host(host,
-                                          name='memory.total',
-                                          type=sample.TYPE_GAUGE,
-                                          unit='B',
-                                          volume=c_data.total,
-                                          )
+    IDENTIFIER = 'memory.total'
 
 
 class MemoryUsedPollster(_Base):
-
-    @staticmethod
-    def generate_one_sample(host, c_data):
-        return util.make_sample_from_host(host,
-                                          name='memory.used',
-                                          type=sample.TYPE_GAUGE,
-                                          unit='B',
-                                          volume=c_data.used,
-                                          )
+    IDENTIFIER = 'memory.used'

@@ -26,32 +26,25 @@ from ceilometer import sample
 class _Base(plugin.HardwarePollster):
 
     CACHE_KEY = 'disk'
-    INSPECT_METHOD = 'inspect_disk'
+
+    def generate_one_sample(self, host, c_data):
+        value, metadata, extra = c_data
+        res_id = host.hostname
+        if metadata.get('device'):
+            res_id = res_id + ".%s" % metadata.get('device')
+        return util.make_sample_from_host(host,
+                                          name=self.IDENTIFIER,
+                                          sample_type=sample.TYPE_GAUGE,
+                                          unit='B',
+                                          volume=value,
+                                          res_metadata=metadata,
+                                          extra=extra,
+                                          resource_id=res_id)
 
 
 class DiskTotalPollster(_Base):
-
-    @staticmethod
-    def generate_one_sample(host, c_data):
-        (disk, info) = c_data
-        return util.make_sample_from_host(host,
-                                          name='disk.size.total',
-                                          type=sample.TYPE_GAUGE,
-                                          unit='B',
-                                          volume=info.size,
-                                          res_metadata=disk,
-                                          )
+    IDENTIFIER = 'disk.size.total'
 
 
 class DiskUsedPollster(_Base):
-
-    @staticmethod
-    def generate_one_sample(host, c_data):
-        (disk, info) = c_data
-        return util.make_sample_from_host(host,
-                                          name='disk.size.used',
-                                          type=sample.TYPE_GAUGE,
-                                          unit='B',
-                                          volume=info.used,
-                                          res_metadata=disk,
-                                          )
+    IDENTIFIER = 'disk.size.used'

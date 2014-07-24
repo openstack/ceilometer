@@ -26,40 +26,25 @@ from ceilometer import sample
 class _Base(plugin.HardwarePollster):
 
     CACHE_KEY = 'cpu'
-    INSPECT_METHOD = 'inspect_cpu'
+
+    def generate_one_sample(self, host, c_data):
+        value, metadata, extra = c_data
+        return util.make_sample_from_host(host,
+                                          name=self.IDENTIFIER,
+                                          sample_type=sample.TYPE_GAUGE,
+                                          unit='process',
+                                          volume=value,
+                                          res_metadata=metadata,
+                                          extra=extra)
 
 
 class CPULoad1MinPollster(_Base):
-
-    @staticmethod
-    def generate_one_sample(host, c_data):
-        return util.make_sample_from_host(host,
-                                          name='cpu.load.1min',
-                                          type=sample.TYPE_GAUGE,
-                                          unit='process',
-                                          volume=c_data.cpu_1_min,
-                                          )
+    IDENTIFIER = 'cpu.load.1min'
 
 
 class CPULoad5MinPollster(_Base):
-
-    @staticmethod
-    def generate_one_sample(host, c_data):
-        return util.make_sample_from_host(host,
-                                          name='cpu.load.5min',
-                                          type=sample.TYPE_GAUGE,
-                                          unit='process',
-                                          volume=c_data.cpu_5_min,
-                                          )
+    IDENTIFIER = 'cpu.load.5min'
 
 
 class CPULoad15MinPollster(_Base):
-
-    @staticmethod
-    def generate_one_sample(host, c_data):
-        return util.make_sample_from_host(host,
-                                          name='cpu.load.15min',
-                                          type=sample.TYPE_GAUGE,
-                                          unit='process',
-                                          volume=c_data.cpu_15_min,
-                                          )
+    IDENTIFIER = 'cpu.load.15min'

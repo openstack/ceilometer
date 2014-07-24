@@ -256,7 +256,6 @@ class SNMPInspector(base.Inspector):
         else:
             for name, val in data:
                 oid_cache[name.prettyPrint()] = val
-        cache[self._CACHE_KEY_OID] = oid_cache
 
     @staticmethod
     def find_matching_oids(oid_cache, oid, match_type, find_one=True):
@@ -351,33 +350,12 @@ class SNMPInspector(base.Inspector):
                                        PREFIX):
             # populate the oid into cache
             self._query_oids(host, [self._interface_ip_oid], cache, True)
-            oid_cache = cache[self._CACHE_KEY_OID]
         ip_addr = ''
         for k, v in oid_cache.iteritems():
             if k.startswith(self._interface_ip_oid) and v == int(suffix[1:]):
                 ip_addr = k.replace(self._interface_ip_oid + ".", "")
         metadata.update(ip=ip_addr)
         return value
-
-    def _get_or_walk_oid(self, oid, host, get=True):
-        if get:
-            func = self._cmdGen.getCmd
-            ret_func = lambda x: x[0][1]
-        else:
-            func = self._cmdGen.nextCmd
-            ret_func = lambda x: x
-
-        ret = func(self._get_auth_strategy(host),
-                   cmdgen.UdpTransportTarget((host.hostname,
-                                              host.port or self._port)),
-                   oid)
-        (error, data) = parse_snmp_return(ret)
-        if error:
-            raise SNMPException("An error occurred, oid %(oid)s, "
-                                "host %(host)s, %(err)s" %
-                                dict(oid=oid, host=host.hostname, err=data))
-        else:
-            return ret_func(data)
 
     def _get_auth_strategy(self, host):
         if host.password:
@@ -387,96 +365,3 @@ class SNMPInspector(base.Inspector):
             auth_strategy = cmdgen.CommunityData(host.username or 'public')
 
         return auth_strategy
-
-    def _get_value_from_oid(self, oid, host):
-        return self._get_or_walk_oid(oid, host, True)
-
-    def _walk_oid(self, oid, host):
-        return self._get_or_walk_oid(oid, host, False)
-
-    def inspect_cpu(self, host):
-        # get 1 minute load
-        cpu_1_min_load = (
-            str(self._get_value_from_oid(self._cpu_1_min_load_oid, host)))
-        # get 5 minute load
-        cpu_5_min_load = (
-            str(self._get_value_from_oid(self._cpu_5_min_load_oid, host)))
-        # get 15 minute load
-        cpu_15_min_load = (
-            str(self._get_value_from_oid(self._cpu_15_min_load_oid, host)))
-
-        yield base.CPUStats(cpu_1_min=float(cpu_1_min_load),
-                            cpu_5_min=float(cpu_5_min_load),
-                            cpu_15_min=float(cpu_15_min_load))
-
-    def inspect_memory(self, host):
-        # get total memory
-        total = self._get_value_from_oid(self._memory_total_oid, host)
-        # get used memory
-        used = self._get_value_from_oid(self._memory_used_oid, host)
-
-        yield base.MemoryStats(total=int(total), used=int(used))
-
-    def inspect_disk(self, host):
-        disks = self._walk_oid(self._disk_index_oid, host)
-
-        for disk in disks:
-            for object_name, value in disk:
-                path_oid = "%s.%s" % (self._disk_path_oid, str(value))
-                path = self._get_value_from_oid(path_oid, host)
-                device_oid = "%s.%s" % (self._disk_device_oid, str(value))
-                device = self._get_value_from_oid(device_oid, host)
-                size_oid = "%s.%s" % (self._disk_size_oid, str(value))
-                size = self._get_value_from_oid(size_oid, host)
-                used_oid = "%s.%s" % (self._disk_used_oid, str(value))
-                used = self._get_value_from_oid(used_oid, host)
-
-                disk = base.Disk(device=str(device),
-                                 path=str(path))
-                stats = base.DiskStats(size=int(size),
-                                       used=int(used))
-
-                yield (disk, stats)
-
-    def inspect_network(self, host):
-        net_interfaces = self._walk_oid(self._interface_index_oid, host)
-
-        for interface in net_interfaces:
-            for object_name, value in interface:
-                ip = self._get_ip_for_interface(host, value)
-                name_oid = "%s.%s" % (self._interface_name_oid,
-                                      str(value))
-                name = self._get_value_from_oid(name_oid, host)
-                mac_oid = "%s.%s" % (self._interface_mac_oid,
-                                     str(value))
-                mac = self._get_value_from_oid(mac_oid, host)
-                speed_oid = "%s.%s" % (self._interface_speed_oid,
-                                       str(value))
-                # bits/s to byte/s
-                speed = self._get_value_from_oid(speed_oid, host) / 8
-                rx_oid = "%s.%s" % (self._interface_received_oid,
-                                    str(value))
-                rx_bytes = self._get_value_from_oid(rx_oid, host)
-                tx_oid = "%s.%s" % (self._interface_transmitted_oid,
-                                    str(value))
-                tx_bytes = self._get_value_from_oid(tx_oid, host)
-                error_oid = "%s.%s" % (self._interface_error_oid,
-                                       str(value))
-                error = self._get_value_from_oid(error_oid, host)
-
-                adapted_mac = mac.prettyPrint().replace('0x', '')
-                interface = base.Interface(name=str(name),
-                                           mac=adapted_mac,
-                                           ip=str(ip),
-                                           speed=int(speed))
-                stats = base.InterfaceStats(rx_bytes=int(rx_bytes),
-                                            tx_bytes=int(tx_bytes),
-                                            error=int(error))
-                yield (interface, stats)
-
-    def _get_ip_for_interface(self, host, interface_id):
-        ip_addresses = self._walk_oid(self._interface_ip_oid, host)
-        for ip in ip_addresses:
-            for name, value in ip:
-                if value == interface_id:
-                    return str(name).replace(self._interface_ip_oid + ".", "")
