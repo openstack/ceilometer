@@ -107,3 +107,16 @@ class Inspector(object):
         :param : the target host
         :return: iterator of tuple (Interface, InterfaceStats)
         """
+
+    @abc.abstractmethod
+    def inspect_generic(self, host, identifier, cache):
+        """A generic inspect function.
+
+        :param host: the target host
+        :param identifier: the identifier of the metric
+        :param cache: cache passed from the pollster
+        :return: an iterator of (value, metadata, extra)
+        :return value: the sample value
+        :return metadata: dict to construct sample's metadata
+        :return extra: dict of extra info to help constructing sample
+        """

@@ -50,6 +50,9 @@ class FakeInspector(inspector_base.Inspector):
     def inspect_network(self, host):
         yield self.NET
 
+    def inspect_generic(self, host, identifier, cache):
+        yield (None, {}, {})
+
 
 class TestPollsterBase(test_base.BaseTestCase):
     def faux_get_inspector(url, namespace=None):
