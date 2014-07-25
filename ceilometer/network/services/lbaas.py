@@ -19,6 +19,7 @@ import abc
 import collections
 import six
 
+from ceilometer.central import plugin
 from ceilometer.network.services import base
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
@@ -228,6 +229,7 @@ class _LBStatsPollster(base.BaseServicesPollster):
     def _get_sample(pool, c_data):
         """Return one Sample."""
 
+    @plugin.check_keystone('network', 'nc')
     def get_samples(self, manager, cache, resources=None):
         for pool in self._get_lb_pools():
             try:

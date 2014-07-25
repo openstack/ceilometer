@@ -35,6 +35,9 @@ class TestFloatingIPPollster(base.BaseTestCase):
         self.addCleanup(mock.patch.stopall)
         self.context = context.get_admin_context()
         self.manager = manager.AgentManager()
+        self.manager.keystone = mock.Mock()
+        self.manager.keystone.service_catalog.get_endpoints = mock.Mock(
+            return_value={'network': mock.ANY})
         self.pollster = floatingip.FloatingIPPollster()
         fake_ips = self.fake_get_ips()
         patch_virt = mock.patch('ceilometer.nova_client.Client.'

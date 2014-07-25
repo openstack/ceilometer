@@ -117,7 +117,7 @@ class _Base(plugin.CentralPollster):
 
 
 class ImagePollster(_Base):
-    @plugin.check_keystone
+    @plugin.check_keystone('image')
     def get_samples(self, manager, cache, resources=None):
         for image in self._iter_images(manager.keystone, cache):
             yield sample.Sample(
@@ -134,7 +134,7 @@ class ImagePollster(_Base):
 
 
 class ImageSizePollster(_Base):
-    @plugin.check_keystone
+    @plugin.check_keystone('image')
     def get_samples(self, manager, cache, resources=None):
         for image in self._iter_images(manager.keystone, cache):
             yield sample.Sample(
