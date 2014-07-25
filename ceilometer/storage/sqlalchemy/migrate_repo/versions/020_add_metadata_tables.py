@@ -15,6 +15,7 @@
 # under the License.
 import json
 
+import six
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Float
@@ -55,7 +56,7 @@ def upgrade(migrate_engine):
             rmeta = json.loads(row['resource_metadata'])
             for key, v in utils.dict_to_keyval(rmeta):
                 ins = None
-                if isinstance(v, basestring) or v is None:
+                if isinstance(v, six.string_types) or v is None:
                     ins = meta_tables['metadata_text'].insert()
                 elif isinstance(v, bool):
                     ins = meta_tables['metadata_bool'].insert()

@@ -16,6 +16,7 @@
 # under the License.
 
 from oslo.config import cfg
+import six
 
 
 OPTS = [
@@ -36,7 +37,7 @@ def add_reserved_user_metadata(src_metadata, dest_metadata):
     for prefix in cfg.CONF.reserved_metadata_namespace:
         md = dict(
             (k[len(prefix):].replace('.', '_'),
-             v[:limit] if isinstance(v, basestring) else v)
+             v[:limit] if isinstance(v, six.string_types) else v)
             for k, v in src_metadata.items()
             if (k.startswith(prefix) and
                 k[len(prefix):].replace('.', '_') not in dest_metadata)
