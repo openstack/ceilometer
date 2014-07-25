@@ -351,25 +351,35 @@ NOTIFICATION_FLOATINGIP_EXISTS = {
     u'message_id': u'9e839576-cc47-4c60-a7d8-5743681213b1'}
 
 
-NOTIFICATION_FLOATINGIP_UPDATE = {
-    u'_context_roles': [u'anotherrole',
-                        u'Member'],
-    u'_context_read_deleted': u'no',
-    u'event_type': u'floatingip.update.start',
-    u'timestamp': u'2012-09-27 14:11:27.086575',
-    u'_context_tenant_id': u'82ed0c40ebe64d0bb3310027039c8ed2',
-    u'payload': {u'floatingip':
-                   {u'fixed_ip_address': u'172.24.4.227',
-                    u'id': u'a68c9390-829e-4732-bad4-e0a978498cc5',
-                    u'port_id': u'e12150f2-885b-45bc-a248-af1c23787d55'}},
-    u'priority': u'INFO',
-    u'_unique_id': u'e483db017b2341fd9ec314dcda88d3e9',
-    u'_context_is_admin': False,
-    u'_context_project_id': u'82ed0c40ebe64d0bb3310027039c8ed2',
-    u'_context_timestamp': u'2012-09-27 14:11:26.924779',
-    u'_context_user_id': u'b44b7ce67fc84414a5c1660a92a1b862',
-    u'publisher_id': u'network.ubuntu-VirtualBox',
-    u'message_id': u'9e839576-cc47-4c60-a7d8-5743681213b1'}
+NOTIFICATION_FLOATINGIP_UPDATE_START = {
+    '_context_roles': [u'_member_',
+                       u'admin',
+                       u'heat_stack_owner'],
+    '_context_request_id': u'req-bd5ed336-242f-4705-836e-8e8f3d0d1ced',
+    '_context_read_deleted': u'no',
+    'event_type': u'floatingip.update.start',
+    '_context_user_name': u'admin',
+    '_context_project_name': u'admin',
+    'timestamp': u'2014-05-3107: 19: 43.463101',
+    '_context_tenant_id': u'9fc714821a3747c8bc4e3a9bfbe82732',
+    '_context_tenant_name': u'admin',
+    '_context_tenant': u'9fc714821a3747c8bc4e3a9bfbe82732',
+    'message_id': u'0ab6d71f-ba0a-4501-86fe-6cc20521ef5a',
+    'priority': 'info',
+    '_context_is_admin': True,
+    '_context_project_id': u'9fc714821a3747c8bc4e3a9bfbe82732',
+    '_context_timestamp': u'2014-05-3107: 19: 43.460767',
+    '_context_user': u'6ca7b13b33e4425cae0b85e2cf93d9a1',
+    '_context_user_id': u'6ca7b13b33e4425cae0b85e2cf93d9a1',
+    'publisher_id': u'network.devstack',
+    'payload': {
+        u'id': u'64262b2a-8f5d-4ade-9405-0cbdd03c1555',
+        u'floatingip': {
+            u'fixed_ip_address': u'172.24.4.227',
+            u'port_id': u'8ab815c8-03cc-4b45-a673-79bdd0c258f2'
+        }
+    }
+}
 
 
 NOTIFICATION_L3_METER = {
@@ -467,9 +477,10 @@ class TestNotifications(test.BaseTestCase):
 
     def test_floatingip_update(self):
         v = notifications.FloatingIP()
-        samples = list(v.process_notification(NOTIFICATION_FLOATINGIP_UPDATE))
+        samples = list(v.process_notification(
+            NOTIFICATION_FLOATINGIP_UPDATE_START))
         self.assertEqual(len(samples), 2)
-        self.assertEqual(samples[0].name, "ip.floating")
+        self.assertEqual("ip.floating", samples[0].name)
 
     def test_metering_report(self):
         v = notifications.Bandwidth()
