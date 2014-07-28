@@ -77,8 +77,8 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         self.PollsterKeystone.resources = []
         super(TestRunTasks, self).tearDown()
 
-    def get_extention_list(self):
-        exts = super(TestRunTasks, self).get_extention_list()
+    def get_extension_list(self):
+        exts = super(TestRunTasks, self).get_extension_list()
         exts.append(extension.Extension('testkeystone',
                                         None,
                                         None,
