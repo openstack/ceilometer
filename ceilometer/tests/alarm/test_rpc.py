@@ -19,6 +19,7 @@ import uuid
 
 from ceilometerclient.v2 import alarms
 import eventlet
+import six
 
 from ceilometer.alarm import rpc as rpc_alarm
 from ceilometer.alarm.storage import models
@@ -122,7 +123,7 @@ class TestRPCAlarmNotifier(tests_base.BaseTestCase):
         self.notifier.notify(self.alarms[0], 'ok', 42, {})
         self.notifier_server.rpc.wait()
         reason = self.notifier_server.notified[0]['reason']
-        self.assertIsInstance(reason, basestring)
+        self.assertIsInstance(reason, six.string_types)
 
     def test_notify_no_actions(self):
         alarm = alarms.Alarm(None, info={

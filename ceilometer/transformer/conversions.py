@@ -17,6 +17,8 @@
 
 import re
 
+import six
+
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
@@ -56,7 +58,7 @@ class ScalingTransformer(transformer.TransformerBase):
         ns = transformer.Namespace(s.as_dict())
 
         scale = self.scale
-        return ((eval(scale, {}, ns) if isinstance(scale, basestring)
+        return ((eval(scale, {}, ns) if isinstance(scale, six.string_types)
                  else s.volume * scale) if scale else s.volume)
 
     def _map(self, s, attr):

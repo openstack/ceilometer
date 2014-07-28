@@ -661,7 +661,7 @@ class OldSample(_Base):
             counter_volume = float(counter_volume)
         resource_metadata = _flatten_metadata(resource_metadata)
         # this is to make it easier for clients to pass a timestamp in
-        if timestamp and isinstance(timestamp, basestring):
+        if timestamp and isinstance(timestamp, six.string_types):
             timestamp = timeutils.parse_isotime(timestamp)
 
         super(OldSample, self).__init__(counter_volume=counter_volume,
