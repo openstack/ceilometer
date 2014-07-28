@@ -20,6 +20,8 @@ import keyword
 import math
 import re
 
+import six
+
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer import sample
@@ -69,7 +71,7 @@ class ArithmeticTransformer(transformer.TransformerBase):
     def _calculate(self, resource_id):
         """Evaluate the expression and return a new sample if successful."""
         ns_dict = dict((m, s.as_dict()) for m, s
-                       in self.cache[resource_id].iteritems())
+                       in six.iteritems(self.cache[resource_id]))
         ns = transformer.Namespace(ns_dict)
         try:
             new_volume = eval(self.expr_escaped, {}, ns)

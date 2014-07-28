@@ -25,6 +25,7 @@ import uuid
 
 import mock
 import oslo.messaging.conffixture
+import six
 from six import moves
 
 from ceilometer.alarm.storage import models
@@ -386,7 +387,7 @@ class TestAlarms(v2.FunctionalTest,
                 'combination_rule': {}
             }
         }
-        for field, json in jsons.iteritems():
+        for field, json in six.iteritems(jsons):
             resp = self.post_json('/alarms', params=json, expect_errors=True,
                                   status=400, headers=self.auth_headers)
             self.assertEqual("Invalid input for field/attribute %s."
@@ -965,7 +966,7 @@ class TestAlarms(v2.FunctionalTest,
                 'period': 180,
             }
         }
-        for aspect, id in identifiers.iteritems():
+        for aspect, id in six.iteritems(identifiers):
             json['%s_id' % aspect] = id
         return json
 
@@ -1640,13 +1641,13 @@ class TestAlarms(v2.FunctionalTest,
                     status=204)
 
     def _assert_is_subset(self, expected, actual):
-        for k, v in expected.iteritems():
+        for k, v in six.iteritems(expected):
             self.assertEqual(v, actual.get(k), 'mismatched field: %s' % k)
         self.assertIsNotNone(actual['event_id'])
 
     def _assert_in_json(self, expected, actual):
         actual = jsonutils.dumps(jsonutils.loads(actual), sort_keys=True)
-        for k, v in expected.iteritems():
+        for k, v in six.iteritems(expected):
             fragment = jsonutils.dumps({k: v}, sort_keys=True)[1:-1]
             self.assertTrue(fragment in actual,
                             '%s not in %s' % (fragment, actual))

@@ -19,6 +19,7 @@ import datetime
 from keystoneclient import exceptions
 from oslo.config import cfg
 import requests
+import six
 
 from ceilometer.central import plugin
 from ceilometer.openstack.common.gettextutils import _
@@ -45,7 +46,7 @@ class KwapiClient(object):
         request = requests.get(probes_url, headers=headers)
         message = request.json()
         probes = message['probes']
-        for key, value in probes.iteritems():
+        for key, value in six.iteritems(probes):
             probe_dict = value
             probe_dict['id'] = key
             yield probe_dict

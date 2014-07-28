@@ -21,6 +21,7 @@ import datetime
 import inspect
 import math
 
+import six
 from six import moves
 
 from ceilometer.openstack.common import timeutils
@@ -108,7 +109,7 @@ class Model(object):
 
     def __init__(self, **kwds):
         self.fields = list(kwds)
-        for k, v in kwds.iteritems():
+        for k, v in six.iteritems(kwds):
             setattr(self, k, v)
 
     def as_dict(self):

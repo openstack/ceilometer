@@ -20,6 +20,7 @@ from __future__ import print_function
 import sys
 
 from oslo.config import cfg
+import six
 
 from ceilometer import storage
 
@@ -38,7 +39,7 @@ def show_resources(db, args):
         print(u)
         for resource in db.get_resources(user=u):
             print('  %(resource_id)s %(timestamp)s' % resource)
-            for k, v in sorted(resource['metadata'].iteritems()):
+            for k, v in sorted(six.iteritems(resource['metadata'])):
                 print('      %-10s : %s' % (k, v))
             for meter in resource['meter']:
                 totals = db.get_statistics(storage.SampleFilter(

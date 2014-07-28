@@ -20,6 +20,7 @@
 import datetime
 
 import mock
+import six
 import webtest.app
 
 from ceilometer.openstack.common import timeutils
@@ -172,4 +173,4 @@ class TestListEvents(v2.FunctionalTest,
              ('not_ignored_list', "['returned']"),
              ('tag', 'self.sample'),
              ],
-            list(sorted(sample['resource_metadata'].iteritems())))
+            list(sorted(six.iteritems(sample['resource_metadata']))))

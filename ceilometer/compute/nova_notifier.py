@@ -23,6 +23,7 @@ from nova import notifications
 from nova.openstack.common import log as logging
 from nova.openstack.common.notifier import api as notifier_api
 from nova import utils
+import six
 from stevedore import extension
 
 # HACK(dhellmann): Insert the nova version of openstack.common into
@@ -96,7 +97,7 @@ class Instance(object):
     can pass it to the pollsters.
     """
     def __init__(self, context, info):
-        for k, v in info.iteritems():
+        for k, v in six.iteritems(info):
             if k == 'name':
                 setattr(self, 'OS-EXT-SRV-ATTR:instance_name', v)
             elif k == 'metadata':
