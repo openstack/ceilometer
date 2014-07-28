@@ -334,51 +334,36 @@ class Connection(base.Connection):
         if pagination:
             raise NotImplementedError('Pagination not implemented')
 
-        metaquery = metaquery or {}
-
-        def _apply_filters(query):
-            # TODO(gordc) this should be merged with make_query_from_filter
-            for column, value in [(models.Sample.resource_id, resource),
-                                  (models.Sample.user_id, user),
-                                  (models.Sample.project_id, project),
-                                  (models.Sample.source_id, source)]:
-                if value:
-                    query = query.filter(column == value)
-            if metaquery:
-                query = apply_metaquery_filter(session, query, metaquery)
-            if start_timestamp:
-                if start_timestamp_op == 'gt':
-                    query = query.filter(
-                        models.Sample.timestamp > start_timestamp)
-                else:
-                    query = query.filter(
-                        models.Sample.timestamp >= start_timestamp)
-            if end_timestamp:
-                if end_timestamp_op == 'le':
-                    query = query.filter(
-                        models.Sample.timestamp <= end_timestamp)
-                else:
-                    query = query.filter(
-                        models.Sample.timestamp < end_timestamp)
-            return query
+        s_filter = storage.SampleFilter(user=user,
+                                        project=project,
+                                        source=source,
+                                        start=start_timestamp,
+                                        start_timestamp_op=start_timestamp_op,
+                                        end=end_timestamp,
+                                        end_timestamp_op=end_timestamp_op,
+                                        metaquery=metaquery,
+                                        resource=resource)
 
         session = self._engine_facade.get_session()
         # get list of resource_ids
         res_q = session.query(distinct(models.Sample.resource_id))
-        res_q = _apply_filters(res_q)
+        res_q = make_query_from_filter(session, res_q, s_filter,
+                                       require_meter=False)
 
         for res_id in res_q.all():
             # get latest Sample
             max_q = (session.query(models.Sample)
                      .filter(models.Sample.resource_id == res_id[0]))
-            max_q = _apply_filters(max_q)
+            max_q = make_query_from_filter(session, max_q, s_filter,
+                                           require_meter=False)
             max_q = max_q.order_by(models.Sample.timestamp.desc(),
                                    models.Sample.id.desc()).limit(1)
 
             # get the min timestamp value.
             min_q = (session.query(models.Sample.timestamp)
                      .filter(models.Sample.resource_id == res_id[0]))
-            min_q = _apply_filters(min_q)
+            min_q = make_query_from_filter(session, min_q, s_filter,
+                                           require_meter=False)
             min_q = min_q.order_by(models.Sample.timestamp.asc()).limit(1)
 
             sample = max_q.first()
@@ -408,19 +393,11 @@ class Connection(base.Connection):
         if pagination:
             raise NotImplementedError('Pagination not implemented')
 
-        metaquery = metaquery or {}
-
-        def _apply_filters(query):
-            # TODO(gordc) this should be merged with make_query_from_filter
-            for column, value in [(models.Sample.resource_id, resource),
-                                  (models.Sample.user_id, user),
-                                  (models.Sample.project_id, project),
-                                  (models.Sample.source_id, source)]:
-                if value:
-                    query = query.filter(column == value)
-            if metaquery:
-                query = apply_metaquery_filter(session, query, metaquery)
-            return query
+        s_filter = storage.SampleFilter(user=user,
+                                        project=project,
+                                        source=source,
+                                        metaquery=metaquery,
+                                        resource=resource)
 
         session = self._engine_facade.get_session()
 
@@ -441,7 +418,8 @@ class Connection(base.Connection):
         query_sample = (session.query(models.MeterSample).
                         join(sample_subq, models.MeterSample.id ==
                         sample_subq.c.id))
-        query_sample = _apply_filters(query_sample)
+        query_sample = make_query_from_filter(session, query_sample, s_filter,
+                                              require_meter=False)
 
         for sample in query_sample.all():
             yield api_models.Meter(
