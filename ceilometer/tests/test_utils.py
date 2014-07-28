@@ -31,14 +31,17 @@ class TestUtils(test.BaseTestCase):
         expected = 1356093296.12
         utc_datetime = datetime.datetime.utcfromtimestamp(expected)
         actual = utils.dt_to_decimal(utc_datetime)
-        self.assertEqual(expected, float(actual))
+        self.assertAlmostEqual(expected, float(actual), places=5)
 
     def test_decimal_to_datetime(self):
         expected = 1356093296.12
         dexpected = decimal.Decimal(str(expected))  # Python 2.6 wants str()
         expected_datetime = datetime.datetime.utcfromtimestamp(expected)
         actual_datetime = utils.decimal_to_dt(dexpected)
-        self.assertEqual(expected_datetime, actual_datetime)
+        # Python 3 have rounding issue on this, so use float
+        self.assertAlmostEqual(utils.dt_to_decimal(expected_datetime),
+                               utils.dt_to_decimal(actual_datetime),
+                               places=5)
 
     def test_recursive_keypairs(self):
         data = {'a': 'A', 'b': 'B',
@@ -68,14 +71,26 @@ class TestUtils(test.BaseTestCase):
         big = 1 << 64
         expected = [('a', 'A'),
                     ('b', 'B'),
-                    ('nested:list', ['{%d: 99, %dL: 42}' % (small, big)])]
-        # the keys 1 and 1<<64 cause a hash collision on 64bit platforms
-        for nested in [{small: 99, big: 42}, {big: 42, small: 99}]:
-            data = {'a': 'A',
-                    'b': 'B',
-                    'nested': {'list': [nested]}}
-            pairs = list(utils.recursive_keypairs(data))
-            self.assertEqual(expected, pairs)
+                    ('nested:list', ['{%d: 99, %d: 42}' % (small, big)])]
+        data = {'a': 'A',
+                'b': 'B',
+                'nested': {'list': [{small: 99, big: 42}]}}
+        pairs = list(utils.recursive_keypairs(data))
+        self.assertEqual(len(expected), len(pairs))
+        for k, v in pairs:
+            # the keys 1 and 1<<64 cause a hash collision on 64bit platforms
+            if k == 'nested:list':
+                self.assertIn(v,
+                              [[('{%d: 99, %d: 42}'
+                                 % (small, big)).encode('ascii')],
+                               [('{%d: 99, %dL: 42}'
+                                 % (small, big)).encode('ascii')],
+                               [('{%d: 42, %d: 99}'
+                                 % (big, small)).encode('ascii')],
+                               [('{%dL: 42, %d: 99}'
+                                 % (big, small)).encode('ascii')]])
+            else:
+                self.assertIn((k, v), expected)
 
     def test_restore_nesting_unested(self):
         metadata = {'a': 'A', 'b': 'B'}
@@ -124,9 +139,9 @@ class TestUtils(test.BaseTestCase):
                 'nested2': [{'c': 'A'}, {'c': 'B'}]
                 }
         pairs = list(utils.dict_to_keyval(data))
-        self.assertEqual([('a', 'A'), ('b', 'B'),
-                         ('nested2[0].c', 'A'),
-                         ('nested2[1].c', 'B'),
-                         ('nested.a', 'A'),
-                         ('nested.b', 'B')],
-                         pairs)
+        self.assertEqual(set([('a', 'A'), ('b', 'B'),
+                              ('nested2[0].c', 'A'),
+                              ('nested2[1].c', 'B'),
+                              ('nested.a', 'A'),
+                              ('nested.b', 'B')]),
+                         set(pairs))

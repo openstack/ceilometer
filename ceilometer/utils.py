@@ -58,7 +58,7 @@ def recursive_keypairs(d, separator=':'):
 def restore_nesting(d, separator=':'):
     """Unwinds a flattened dict to restore nesting."""
     d = copy.copy(d) if any([separator in k for k in d.keys()]) else d
-    for k, v in d.items():
+    for k, v in d.copy().items():
         if separator in k:
             top, rem = k.split(separator, 1)
             nest = d[top] if isinstance(d.get(top), dict) else {}
