@@ -411,7 +411,7 @@ def _validate_query(query, db_func, internal_keys=None,
                                                 '%s' % i.field)
             else:
                 msg = ("unrecognized field in query: %s, "
-                       "valid keys: %s") % (query, valid_keys)
+                       "valid keys: %s") % (query, sorted(valid_keys))
                 raise wsme.exc.UnknownArgument(key, msg)
 
 

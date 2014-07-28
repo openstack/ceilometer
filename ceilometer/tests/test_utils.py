@@ -139,9 +139,10 @@ class TestUtils(test.BaseTestCase):
                 'nested2': [{'c': 'A'}, {'c': 'B'}]
                 }
         pairs = list(utils.dict_to_keyval(data))
-        self.assertEqual(set([('a', 'A'), ('b', 'B'),
-                              ('nested2[0].c', 'A'),
-                              ('nested2[1].c', 'B'),
-                              ('nested.a', 'A'),
-                              ('nested.b', 'B')]),
-                         set(pairs))
+        self.assertEqual([('a', 'A'),
+                          ('b', 'B'),
+                         ('nested.a', 'A'),
+                         ('nested.b', 'B'),
+                         ('nested2[0].c', 'A'),
+                         ('nested2[1].c', 'B')],
+                         sorted(pairs, key=lambda x: x[0]))
