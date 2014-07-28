@@ -16,13 +16,21 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-"""Command line tool for creating test data for ceilometer.
+"""Command line tool for creating test data for Ceilometer.
+
+Usage:
+
+Generate testing data for e.g. for default time span
+
+source .tox/py27/bin/activate
+./tools/make_test_data.py --user 1 --project 1 1 cpu_util 20
 """
 from __future__ import print_function
 
 import argparse
 import datetime
 import logging
+import random
 import sys
 
 from oslo.config import cfg
@@ -31,6 +39,62 @@ from ceilometer.publisher import utils
 from ceilometer import sample
 from ceilometer import storage
 from ceilometer.openstack.common import timeutils
+
+def make_test_data(conn, name, meter_type, unit, volume, random_min,
+                   random_max, user_id, project_id, resource_id, start,
+                   end, interval, resource_metadata={}, source='artificial',):
+
+    # Compute start and end timestamps for the new data.
+    if isinstance(start, datetime.datetime):
+        timestamp = start
+    else:
+        timestamp = timeutils.parse_strtime(start)
+
+    if not isinstance(end, datetime.datetime):
+        end = timeutils.parse_strtime(end)
+
+    increment = datetime.timedelta(minutes=interval)
+
+
+    print('Adding new events for meter %s.' % (name))
+    # Generate events
+    n = 0
+    total_volume = volume
+    while timestamp <= end:
+        if (random_min >= 0 and random_max >= 0):
+            # If there is a random element defined, we will add it to
+            # user given volume.
+            if isinstance(random_min, int) and isinstance(random_max, int):
+                total_volume += random.randint(random_min, random_max)
+            else:
+                total_volume += random.uniform(random_min, random_max)
+
+
+        c = sample.Sample(name=name,
+                          type=meter_type,
+                          unit=unit,
+                          volume=total_volume,
+                          user_id=user_id,
+                          project_id=project_id,
+                          resource_id=resource_id,
+                          timestamp=timestamp,
+                          resource_metadata=resource_metadata,
+                          source=source,
+                          )
+        data = utils.meter_message_from_counter(
+            c,
+            cfg.CONF.publisher.metering_secret)
+        conn.record_metering_data(data)
+        n += 1
+        timestamp = timestamp + increment
+
+        if (meter_type == 'gauge' or meter_type == 'delta'):
+            # For delta and gauge, we don't want to increase the value
+            # in time by random element. So we always set it back to
+            # volume.
+            total_volume = volume
+
+    print('Added %d new events for meter %s.' % (n, name))
 
 
 def main():
@@ -75,6 +139,18 @@ def main():
         help='User id of owner.',
     )
     parser.add_argument(
+        '--random_min',
+        help='The random min border of amount for added to given volume.',
+        type=int,
+        default=0,
+    )
+    parser.add_argument(
+        '--random_max',
+        help='The random max border of amount for added to given volume.',
+        type=int,
+        default=0,
+    )
+    parser.add_argument(
         'resource',
         help='The resource id for the meter data.',
     )
@@ -110,34 +186,25 @@ def main():
                 args.project = r.project_id
                 break
 
-    # Compute start and end timestamps for the
-    # new data.
-    timestamp = timeutils.parse_isotime(args.start)
-    end = timeutils.parse_isotime(args.end)
-    increment = datetime.timedelta(minutes=args.interval)
+    # Compute the correct time span
+    start = datetime.datetime.utcnow() - datetime.timedelta(days=args.start)
+    end = datetime.datetime.utcnow() + datetime.timedelta(days=args.end)
 
-    # Generate events
-    n = 0
-    while timestamp <= end:
-        c = sample.Sample(name=args.counter,
-                            type=args.type,
-                            unit=args.unit,
-                            volume=args.volume,
-                            user_id=args.user,
-                            project_id=args.project,
-                            resource_id=args.resource,
-                            timestamp=timestamp,
-                            resource_metadata={},
-                            source='artificial',
-                            )
-        data = utils.meter_message_from_counter(
-            c,
-            cfg.CONF.publisher.metering_secret)
-        conn.record_metering_data(data)
-        n += 1
-        timestamp = timestamp + increment
-
-    print('Added %d new events' % n)
+    make_test_data(conn = conn,
+                   name=args.counter,
+                   meter_type=args.type,
+                   unit=args.unit,
+                   volume=args.volume,
+                   random_min=args.random_min,
+                   random_max=args.random_max,
+                   user_id=args.user,
+                   project_id=args.project,
+                   resource_id=args.resource,
+                   start=start,
+                   end=end,
+                   interval=args.interval,
+                   resource_metadata={},
+                   source='artificial',)
 
     return 0
 
