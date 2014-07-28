@@ -79,7 +79,7 @@ class Namespace(object):
     def __init__(self, seed):
         self.__dict__ = collections.defaultdict(lambda: Namespace({}))
         self.__dict__.update(seed)
-        for k, v in self.__dict__.iteritems():
+        for k, v in six.iteritems(self.__dict__):
             if isinstance(v, dict):
                 self.__dict__[k] = Namespace(v)
 

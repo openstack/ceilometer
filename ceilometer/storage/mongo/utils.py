@@ -23,6 +23,7 @@ import time
 
 from oslo.config import cfg
 import pymongo
+import six
 import weakref
 
 from ceilometer.openstack.common.gettextutils import _
@@ -89,7 +90,7 @@ def make_events_query_from_filter(event_filter):
         for trait_filter in event_filter.traits_filter:
             op = trait_filter.pop('op', 'eq')
             dict_query = {}
-            for k, v in trait_filter.iteritems():
+            for k, v in six.iteritems(trait_filter):
                 if v is not None:
                     # All parameters in EventFilter['traits'] are optional, so
                     # we need to check if they are in the query or no.
@@ -149,7 +150,7 @@ def make_query_from_filter(sample_filter, require_meter=True):
     # so the samples call metadata resource_metadata, so we convert
     # to that.
     q.update(dict(('resource_%s' % k, v)
-                  for (k, v) in sample_filter.metaquery.iteritems()))
+                  for (k, v) in six.iteritems(sample_filter.metaquery)))
     return q
 
 

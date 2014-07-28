@@ -20,6 +20,7 @@
 import collections
 import itertools
 
+import six
 from six.moves.urllib import parse as urlparse
 from stevedore import extension
 
@@ -137,7 +138,7 @@ class AgentManager(os_service.Service):
     def start(self):
         self.pipeline_manager = pipeline.setup_pipeline()
 
-        for interval, task in self.setup_polling_tasks().iteritems():
+        for interval, task in six.iteritems(self.setup_polling_tasks()):
             self.tg.add_timer(interval,
                               self.interval_task,
                               task=task)

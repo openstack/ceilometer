@@ -22,6 +22,7 @@ import operator
 import os
 
 from oslo.config import cfg
+import six
 from sqlalchemy import and_
 from sqlalchemy import distinct
 from sqlalchemy import func
@@ -105,7 +106,7 @@ def apply_metaquery_filter(session, query, metaquery):
     :param query: Query instance
     :param metaquery: dict with metadata to match on.
     """
-    for k, value in metaquery.iteritems():
+    for k, value in six.iteritems(metaquery):
         key = k[9:]  # strip out 'metadata.' prefix
         try:
             _model = sql_utils.META_TYPE_MAP[type(value)]
@@ -795,7 +796,7 @@ class Connection(base.Connection):
                                   models.TraitType.id,
                                   models.TraitType.desc == trait_name]
 
-                    for key, value in trait_filter.iteritems():
+                    for key, value in six.iteritems(trait_filter):
                         if key == 'string':
                             conditions.append(models.Trait.t_string == value)
                         elif key == 'integer':

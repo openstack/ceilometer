@@ -18,6 +18,7 @@ import datetime
 
 from keystoneclient import exceptions
 import mock
+import six
 
 from ceilometer.central import manager
 from ceilometer.energy import kwapi
@@ -88,7 +89,7 @@ class TestEnergyPollster(test.BaseTestCase):
     @staticmethod
     def fake_iter_probes(ksclient, cache):
         probes = PROBE_DICT['probes']
-        for key, value in probes.iteritems():
+        for key, value in six.iteritems(probes):
             probe_dict = value
             probe_dict['id'] = key
             yield probe_dict
@@ -148,7 +149,7 @@ class TestPowerPollster(test.BaseTestCase):
     @staticmethod
     def fake_iter_probes(ksclient, cache):
         probes = PROBE_DICT['probes']
-        for key, value in probes.iteritems():
+        for key, value in six.iteritems(probes):
             probe_dict = value
             probe_dict['id'] = key
             yield probe_dict

@@ -32,7 +32,7 @@ from ceilometer.openstack.common import units
 
 def recursive_keypairs(d, separator=':'):
     """Generator that produces sequence of keypairs for nested dictionaries."""
-    for name, value in sorted(d.iteritems()):
+    for name, value in sorted(six.iteritems(d)):
         if isinstance(value, dict):
             for subname, subvalue in recursive_keypairs(value, separator):
                 yield ('%s%s%s' % (name, separator, subname), subvalue)
@@ -107,7 +107,7 @@ def stringify_timestamps(data):
     """Stringify any datetimes in given dict."""
     isa_timestamp = lambda v: isinstance(v, datetime.datetime)
     return dict((k, v.isoformat() if isa_timestamp(v) else v)
-                for (k, v) in data.iteritems())
+                for (k, v) in six.iteritems(data))
 
 
 def dict_to_keyval(value, key_base=None):
@@ -118,7 +118,7 @@ def dict_to_keyval(value, key_base=None):
     """
     val_iter, key_func = None, None
     if isinstance(value, dict):
-        val_iter = value.iteritems()
+        val_iter = six.iteritems(value)
         key_func = lambda k: key_base + '.' + k if key_base else k
     elif isinstance(value, (tuple, list)):
         val_iter = enumerate(value)
@@ -155,7 +155,7 @@ def update_nested(original_dict, updates):
      Updates occur without replacing entire sub-dicts.
     """
     dict_to_update = copy.deepcopy(original_dict)
-    for key, value in updates.iteritems():
+    for key, value in six.iteritems(updates):
         if isinstance(value, dict):
             sub_dict = update_nested(dict_to_update.get(key, {}), value)
             dict_to_update[key] = sub_dict

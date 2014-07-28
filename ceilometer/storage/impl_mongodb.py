@@ -31,6 +31,7 @@ import bson.code
 import bson.objectid
 from oslo.config import cfg
 import pymongo
+import six
 
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
@@ -698,7 +699,7 @@ class Connection(pymongo_base.Connection):
 
         # Add resource_ prefix so it matches the field in the db
         query.update(dict(('resource_' + k, v)
-                          for (k, v) in metaquery.iteritems()))
+                          for (k, v) in six.iteritems(metaquery)))
 
         # FIXME(dhellmann): This may not perform very well,
         # but doing any better will require changing the database
@@ -753,7 +754,7 @@ class Connection(pymongo_base.Connection):
             query['_id'] = resource
 
         query.update(dict((k, v)
-                          for (k, v) in metaquery.iteritems()))
+                          for (k, v) in six.iteritems(metaquery)))
 
         keys = base._handle_sort_key('resource')
         sort_keys = ['last_sample_timestamp' if i == 'timestamp' else i

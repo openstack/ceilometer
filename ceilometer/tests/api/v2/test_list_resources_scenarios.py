@@ -476,7 +476,7 @@ class TestListResources(v2.FunctionalTest,
                           (u'display_name', u'test-server'),
                           (u'not_ignored_list', u"['returned']"),
                           (u'tag', u'self.sample')],
-                         list(sorted(metadata.iteritems())))
+                         list(sorted(six.iteritems(metadata))))
 
     def test_resource_meter_links(self):
         sample1 = sample.Sample(
