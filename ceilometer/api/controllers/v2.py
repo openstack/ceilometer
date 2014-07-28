@@ -88,6 +88,17 @@ class EntityNotFound(ClientSideError):
             status_code=404)
 
 
+class AlarmNotFound(ClientSideError):
+    def __init__(self, alarm, auth_project):
+        if not auth_project:
+            msg = _('Alarm %s not found') % alarm
+        else:
+            msg = _('Alarm %(alarm_id)s not found in project %'
+                    '(project)s') % {
+                        'alarm_id': alarm, 'project': auth_project}
+        super(AlarmNotFound, self).__init__(msg, status_code=404)
+
+
 class AdvEnum(wtypes.wsproperty):
     """Handle default and mandatory for wtypes.Enum."""
     def __init__(self, name, *args, **kwargs):
@@ -1767,7 +1778,7 @@ class Alarm(_Base):
                 alarms = list(pecan.request.alarm_storage_conn.get_alarms(
                     alarm_id=id, project=project))
                 if not alarms:
-                    raise EntityNotFound(_('Alarm'), id)
+                    raise AlarmNotFound(id, project)
 
         tc_names = [tc.name for tc in alarm.time_constraints]
         if len(tc_names) > len(set(tc_names)):
@@ -1881,7 +1892,7 @@ class AlarmController(rest.RestController):
         alarms = list(self.conn.get_alarms(alarm_id=self._id,
                                            project=auth_project))
         if not alarms:
-            raise EntityNotFound(_('Alarm'), self._id)
+            raise AlarmNotFound(alarm=self._id, auth_project=auth_project)
         return alarms[0]
 
     def _record_change(self, data, now, on_behalf_of=None, type=None):

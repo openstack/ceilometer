@@ -213,12 +213,12 @@ class TestApiMiddleware(v2.FunctionalTest):
     def test_translated_then_untranslated_error(self):
         resp = self.get_json('/alarms/alarm-id-3', expect_errors=True)
         self.assertEqual(404, resp.status_code)
-        self.assertEqual("Alarm alarm-id-3 Not Found",
+        self.assertEqual("Alarm alarm-id-3 not found",
                          json.loads(resp.body)['error_message']
                          ['faultstring'])
 
         with mock.patch('ceilometer.api.controllers.'
-                        'v2.EntityNotFound') as CustomErrorClass:
+                        'v2.AlarmNotFound') as CustomErrorClass:
             CustomErrorClass.return_value = wsme.exc.ClientSideError(
                 "untranslated_error", status_code=404)
             resp = self.get_json('/alarms/alarm-id-5', expect_errors=True)
