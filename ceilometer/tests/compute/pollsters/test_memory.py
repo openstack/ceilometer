@@ -14,7 +14,6 @@
 #    under the License.
 
 import mock
-import six
 
 from ceilometer.compute import manager
 from ceilometer.compute.pollsters import memory
@@ -35,7 +34,7 @@ class TestMemoryPollster(base.TestPollsterBase):
         ))
 
         def inspect_memory_usage(instance, duration):
-            return six.next(next_value)
+            return next(next_value)
 
         (self.inspector.
          inspect_memory_usage) = mock.Mock(side_effect=inspect_memory_usage)

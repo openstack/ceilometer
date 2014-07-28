@@ -96,9 +96,9 @@ class CeilometerMiddleware(object):
         def iter_response(iterable):
             iterator = iter(iterable)
             try:
-                chunk = iterator.next()
+                chunk = next(iterator)
                 while not chunk:
-                    chunk = iterator.next()
+                    chunk = next(iterator)
             except StopIteration:
                 chunk = ''
 
@@ -109,7 +109,7 @@ class CeilometerMiddleware(object):
                 while chunk:
                     bytes_sent += len(chunk)
                     yield chunk
-                    chunk = iterator.next()
+                    chunk = next(iterator)
             finally:
                 try:
                     self.publish_sample(env,

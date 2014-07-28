@@ -20,7 +20,6 @@
 import time
 
 import mock
-import six
 
 from ceilometer.compute import manager
 from ceilometer.compute.pollsters import cpu
@@ -43,7 +42,7 @@ class TestCPUPollster(base.TestPollsterBase):
         ))
 
         def inspect_cpus(name):
-            return six.next(next_value)
+            return next(next_value)
 
         self.inspector.inspect_cpus = mock.Mock(side_effect=inspect_cpus)
 
@@ -92,7 +91,7 @@ class TestCPUUtilPollster(base.TestPollsterBase):
         ))
 
         def inspect_cpu_util(name, duration):
-            return six.next(next_value)
+            return next(next_value)
 
         self.inspector.inspect_cpu_util = (mock.
                                            Mock(side_effect=inspect_cpu_util))

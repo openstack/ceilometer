@@ -43,7 +43,7 @@ class ProfilerNotificationsTestCase(test.BaseTestCase):
 
     def test_process_notification(self):
         prof = notifications.ProfilerNotifications(None)
-        info = prof.process_notification(NOTIFICATION).next()
+        info = next(prof.process_notification(NOTIFICATION))
 
         self.assertEqual(NOTIFICATION["payload"]["name"], info.name)
         self.assertEqual(sample.TYPE_GAUGE, info.type)
