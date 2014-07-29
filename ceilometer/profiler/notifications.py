@@ -42,7 +42,8 @@ class ProfilerNotifications(plugin.NotificationBase):
             conf.glance_control_exchange,
             conf.neutron_control_exchange,
             conf.heat_control_exchange,
-            conf.keystone_control_exchange
+            conf.keystone_control_exchange,
+            conf.sahara_control_exchange,
         ]
 
         for exchange in exchanges:
