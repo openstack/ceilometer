@@ -15,7 +15,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Tests for ceilometer/publisher/rpc.py
+"""Tests for ceilometer/publisher/messaging.py
 """
 import datetime
 
@@ -25,15 +25,16 @@ from oslo.config import fixture as fixture_config
 import oslo.messaging
 import oslo.messaging._drivers.common
 from oslo.utils import netutils
+import testscenarios.testcase
 
 from ceilometer import messaging
 from ceilometer.openstack.common import context
-from ceilometer.publisher import rpc
+from ceilometer.publisher import messaging as msg_publisher
 from ceilometer import sample
 from ceilometer.tests import base as tests_base
 
 
-class TestPublish(tests_base.BaseTestCase):
+class BasePublisherTestCase(tests_base.BaseTestCase):
     test_data = [
         sample.Sample(
             name='test',
@@ -93,13 +94,15 @@ class TestPublish(tests_base.BaseTestCase):
     ]
 
     def setUp(self):
-        super(TestPublish, self).setUp()
+        super(BasePublisherTestCase, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
         self.setup_messaging(self.CONF)
         self.published = []
 
+
+class RpcOnlyPublisherTest(BasePublisherTestCase):
     def test_published_no_mock(self):
-        publisher = rpc.RPCPublisher(
+        publisher = msg_publisher.RPCPublisher(
             netutils.urlsplit('rpc://'))
 
         endpoint = mock.MagicMock(['record_metering_data'])
@@ -126,7 +129,7 @@ class TestPublish(tests_base.BaseTestCase):
             mock.ANY, data=Matcher())
 
     def test_publish_target(self):
-        publisher = rpc.RPCPublisher(
+        publisher = msg_publisher.RPCPublisher(
             netutils.urlsplit('rpc://?target=custom_procedure_call'))
         cast_context = mock.MagicMock()
         with mock.patch.object(publisher.rpc_client, 'prepare') as prepare:
@@ -140,7 +143,7 @@ class TestPublish(tests_base.BaseTestCase):
             mock.ANY, 'custom_procedure_call', data=mock.ANY)
 
     def test_published_with_per_meter_topic(self):
-        publisher = rpc.RPCPublisher(
+        publisher = msg_publisher.RPCPublisher(
             netutils.urlsplit('rpc://?per_meter_topic=1'))
         with mock.patch.object(publisher.rpc_client, 'prepare') as prepare:
             publisher.publish_samples(mock.MagicMock(),
@@ -166,23 +169,29 @@ class TestPublish(tests_base.BaseTestCase):
                                          data=MeterGroupMatcher())]
             self.assertEqual(expected, prepare.mock_calls)
 
+
+class TestPublisher(testscenarios.testcase.WithScenarios,
+                    BasePublisherTestCase):
+    scenarios = [
+        ('notifier', dict(protocol="notifier",
+                          publisher_cls=msg_publisher.NotifierPublisher)),
+        ('rpc', dict(protocol="rpc",
+                     publisher_cls=msg_publisher.RPCPublisher)),
+    ]
+
     def test_published_concurrency(self):
         """Test concurrent access to the local queue of the rpc publisher."""
 
-        publisher = rpc.RPCPublisher(netutils.urlsplit('rpc://'))
-        cast_context = mock.MagicMock()
+        publisher = self.publisher_cls(
+            netutils.urlsplit('%s://' % self.protocol))
 
-        with mock.patch.object(publisher.rpc_client, 'prepare') as prepare:
-            def fake_prepare_go(topic):
-                return cast_context
-
-            def fake_prepare_wait(topic):
-                prepare.side_effect = fake_prepare_go
+        with mock.patch.object(publisher, '_send') as fake_send:
+            def fake_send_wait(ctxt, topic, meters):
+                fake_send.side_effect = mock.Mock()
                 # Sleep to simulate concurrency and allow other threads to work
                 eventlet.sleep(0)
-                return cast_context
 
-            prepare.side_effect = fake_prepare_wait
+            fake_send.side_effect = fake_send_wait
 
             job1 = eventlet.spawn(publisher.publish_samples,
                                   mock.MagicMock(), self.test_data)
@@ -193,16 +202,16 @@ class TestPublish(tests_base.BaseTestCase):
             job2.wait()
 
         self.assertEqual('default', publisher.policy)
-        self.assertEqual(2, len(cast_context.cast.mock_calls))
+        self.assertEqual(2, len(fake_send.mock_calls))
         self.assertEqual(0, len(publisher.local_queue))
 
-    @mock.patch('ceilometer.publisher.rpc.LOG')
+    @mock.patch('ceilometer.publisher.messaging.LOG')
     def test_published_with_no_policy(self, mylog):
-        publisher = rpc.RPCPublisher(
-            netutils.urlsplit('rpc://'))
+        publisher = self.publisher_cls(
+            netutils.urlsplit('%s://' % self.protocol))
         side_effect = oslo.messaging._drivers.common.RPCException()
-        with mock.patch.object(publisher.rpc_client, 'prepare') as prepare:
-            prepare.side_effect = side_effect
+        with mock.patch.object(publisher, '_send') as fake_send:
+            fake_send.side_effect = side_effect
 
             self.assertRaises(
                 oslo.messaging._drivers.common.RPCException,
@@ -211,32 +220,34 @@ class TestPublish(tests_base.BaseTestCase):
             self.assertTrue(mylog.info.called)
             self.assertEqual('default', publisher.policy)
             self.assertEqual(0, len(publisher.local_queue))
-            prepare.assert_called_once_with(
-                topic=self.CONF.publisher_rpc.metering_topic)
+            fake_send.assert_called_once_with(
+                mock.ANY, self.CONF.publisher_rpc.metering_topic,
+                mock.ANY)
 
-    @mock.patch('ceilometer.publisher.rpc.LOG')
+    @mock.patch('ceilometer.publisher.messaging.LOG')
     def test_published_with_policy_block(self, mylog):
-        publisher = rpc.RPCPublisher(
-            netutils.urlsplit('rpc://?policy=default'))
+        publisher = self.publisher_cls(
+            netutils.urlsplit('%s://?policy=default' % self.protocol))
         side_effect = oslo.messaging._drivers.common.RPCException()
-        with mock.patch.object(publisher.rpc_client, 'prepare') as prepare:
-            prepare.side_effect = side_effect
+        with mock.patch.object(publisher, '_send') as fake_send:
+            fake_send.side_effect = side_effect
             self.assertRaises(
                 oslo.messaging._drivers.common.RPCException,
                 publisher.publish_samples,
                 mock.MagicMock(), self.test_data)
             self.assertTrue(mylog.info.called)
             self.assertEqual(0, len(publisher.local_queue))
-            prepare.assert_called_once_with(
-                topic=self.CONF.publisher_rpc.metering_topic)
+            fake_send.assert_called_once_with(
+                mock.ANY, self.CONF.publisher_rpc.metering_topic,
+                mock.ANY)
 
-    @mock.patch('ceilometer.publisher.rpc.LOG')
+    @mock.patch('ceilometer.publisher.messaging.LOG')
     def test_published_with_policy_incorrect(self, mylog):
-        publisher = rpc.RPCPublisher(
-            netutils.urlsplit('rpc://?policy=notexist'))
+        publisher = self.publisher_cls(
+            netutils.urlsplit('%s://?policy=notexist' % self.protocol))
         side_effect = oslo.messaging._drivers.common.RPCException()
-        with mock.patch.object(publisher.rpc_client, 'prepare') as prepare:
-            prepare.side_effect = side_effect
+        with mock.patch.object(publisher, '_send') as fake_send:
+            fake_send.side_effect = side_effect
             self.assertRaises(
                 oslo.messaging._drivers.common.RPCException,
                 publisher.publish_samples,
@@ -244,66 +255,69 @@ class TestPublish(tests_base.BaseTestCase):
             self.assertTrue(mylog.warn.called)
             self.assertEqual('default', publisher.policy)
             self.assertEqual(0, len(publisher.local_queue))
-            prepare.assert_called_once_with(
-                topic=self.CONF.publisher_rpc.metering_topic)
+            fake_send.assert_called_once_with(
+                mock.ANY, self.CONF.publisher_rpc.metering_topic,
+                mock.ANY)
 
     def test_published_with_policy_drop_and_rpc_down(self):
-        publisher = rpc.RPCPublisher(
-            netutils.urlsplit('rpc://?policy=drop'))
+        publisher = self.publisher_cls(
+            netutils.urlsplit('%s://?policy=drop' % self.protocol))
         side_effect = oslo.messaging._drivers.common.RPCException()
-        with mock.patch.object(publisher.rpc_client, 'prepare') as prepare:
-            prepare.side_effect = side_effect
+        with mock.patch.object(publisher, '_send') as fake_send:
+            fake_send.side_effect = side_effect
             publisher.publish_samples(mock.MagicMock(),
                                       self.test_data)
             self.assertEqual(0, len(publisher.local_queue))
-            prepare.assert_called_once_with(
-                topic=self.CONF.publisher_rpc.metering_topic)
+            fake_send.assert_called_once_with(
+                mock.ANY, self.CONF.publisher_rpc.metering_topic,
+                mock.ANY)
 
     def test_published_with_policy_queue_and_rpc_down(self):
-        publisher = rpc.RPCPublisher(
-            netutils.urlsplit('rpc://?policy=queue'))
+        publisher = self.publisher_cls(
+            netutils.urlsplit('%s://?policy=queue' % self.protocol))
         side_effect = oslo.messaging._drivers.common.RPCException()
-        with mock.patch.object(publisher.rpc_client, 'prepare') as prepare:
-            prepare.side_effect = side_effect
+        with mock.patch.object(publisher, '_send') as fake_send:
+            fake_send.side_effect = side_effect
 
             publisher.publish_samples(mock.MagicMock(),
                                       self.test_data)
             self.assertEqual(1, len(publisher.local_queue))
-            prepare.assert_called_once_with(
-                topic=self.CONF.publisher_rpc.metering_topic)
+            fake_send.assert_called_once_with(
+                mock.ANY, self.CONF.publisher_rpc.metering_topic,
+                mock.ANY)
 
     def test_published_with_policy_queue_and_rpc_down_up(self):
         self.rpc_unreachable = True
-        publisher = rpc.RPCPublisher(
-            netutils.urlsplit('rpc://?policy=queue'))
+        publisher = self.publisher_cls(
+            netutils.urlsplit('%s://?policy=queue' % self.protocol))
 
         side_effect = oslo.messaging._drivers.common.RPCException()
-        with mock.patch.object(publisher.rpc_client, 'prepare') as prepare:
-            prepare.side_effect = side_effect
+        with mock.patch.object(publisher, '_send') as fake_send:
+            fake_send.side_effect = side_effect
             publisher.publish_samples(mock.MagicMock(),
                                       self.test_data)
 
             self.assertEqual(1, len(publisher.local_queue))
 
-            prepare.side_effect = mock.MagicMock()
+            fake_send.side_effect = mock.MagicMock()
             publisher.publish_samples(mock.MagicMock(),
                                       self.test_data)
 
             self.assertEqual(0, len(publisher.local_queue))
 
             topic = self.CONF.publisher_rpc.metering_topic
-            expected = [mock.call(topic=topic),
-                        mock.call(topic=topic),
-                        mock.call(topic=topic)]
-            self.assertEqual(expected, prepare.mock_calls)
+            expected = [mock.call(mock.ANY, topic, mock.ANY),
+                        mock.call(mock.ANY, topic, mock.ANY),
+                        mock.call(mock.ANY, topic, mock.ANY)]
+            self.assertEqual(expected, fake_send.mock_calls)
 
     def test_published_with_policy_sized_queue_and_rpc_down(self):
-        publisher = rpc.RPCPublisher(
-            netutils.urlsplit('rpc://?policy=queue&max_queue_length=3'))
+        publisher = self.publisher_cls(netutils.urlsplit(
+            '%s://?policy=queue&max_queue_length=3' % self.protocol))
 
         side_effect = oslo.messaging._drivers.common.RPCException()
-        with mock.patch.object(publisher.rpc_client, 'prepare') as prepare:
-            prepare.side_effect = side_effect
+        with mock.patch.object(publisher, '_send') as fake_send:
+            fake_send.side_effect = side_effect
             for i in range(0, 5):
                 for s in self.test_data:
                     s.source = 'test-%d' % i
@@ -325,12 +339,12 @@ class TestPublish(tests_base.BaseTestCase):
         )
 
     def test_published_with_policy_default_sized_queue_and_rpc_down(self):
-        publisher = rpc.RPCPublisher(
-            netutils.urlsplit('rpc://?policy=queue'))
+        publisher = self.publisher_cls(
+            netutils.urlsplit('%s://?policy=queue' % self.protocol))
 
         side_effect = oslo.messaging._drivers.common.RPCException()
-        with mock.patch.object(publisher.rpc_client, 'prepare') as prepare:
-            prepare.side_effect = side_effect
+        with mock.patch.object(publisher, '_send') as fake_send:
+            fake_send.side_effect = side_effect
             for i in range(0, 2000):
                 for s in self.test_data:
                     s.source = 'test-%d' % i

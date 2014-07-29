@@ -200,7 +200,8 @@ class TestCollector(tests_base.BaseTestCase):
         """Check that only RPC is started if udp_address is empty."""
         self.CONF.set_override('udp_address', '', group='collector')
         self.srv.start()
-        self.assertEqual(1, rpc_start.call_count)
+        # two calls because two servers (notification and rpc)
+        self.assertEqual(2, rpc_start.call_count)
         self.assertEqual(0, udp_start.call_count)
 
     def test_udp_receive_valid_encoding(self):

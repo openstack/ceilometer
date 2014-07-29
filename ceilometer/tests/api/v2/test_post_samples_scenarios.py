@@ -30,23 +30,17 @@ from ceilometer.tests import db as tests_db
 
 class TestPostSamples(v2.FunctionalTest,
                       tests_db.MixinTestsWithBackendScenarios):
-    def fake_cast(self, ctxt, target, data):
-        for m in data:
+    def fake_notifier_sample(self, ctxt, event_type, payload):
+        for m in payload:
             del m['message_signature']
-        self.published.append(data)
-
-    def fake_get_rpc_client(self, *args, **kwargs):
-        cast_ctxt = mock.Mock()
-        cast_ctxt.cast.side_effect = self.fake_cast
-        client = mock.Mock()
-        client.prepare.return_value = cast_ctxt
-        return client
+        self.published.append(payload)
 
     def setUp(self):
         self.published = []
-        self.useFixture(mockpatch.Patch(
-                        'ceilometer.messaging.get_rpc_client',
-                        new=self.fake_get_rpc_client))
+        notifier = mock.Mock()
+        notifier.sample.side_effect = self.fake_notifier_sample
+        self.useFixture(mockpatch.Patch('oslo.messaging.Notifier',
+                                        return_value=notifier))
         super(TestPostSamples, self).setUp()
 
     def test_one(self):
