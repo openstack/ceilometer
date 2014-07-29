@@ -96,6 +96,16 @@ class TestNovaClient(test.BaseTestCase):
         self.assertEqual(11, instances[0].kernel_id)
         self.assertEqual(21, instances[0].ramdisk_id)
 
+    def test_instance_get_all(self):
+        with mock.patch.object(self.nv.nova_client.servers, 'list',
+                               side_effect=self.fake_servers_list):
+            instances = self.nv.instance_get_all()
+
+        self.assertEqual(2, len(instances))
+        self.assertEqual(42, instances[0].id)
+        self.assertEqual(1, instances[0].flavor['id'])
+        self.assertEqual(1, instances[0].image['id'])
+
     @staticmethod
     def fake_servers_list_unknown_flavor(*args, **kwargs):
         a = mock.MagicMock()

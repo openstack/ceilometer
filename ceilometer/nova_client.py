@@ -132,6 +132,14 @@ class Client(object):
             search_opts=search_opts))
 
     @logged
+    def instance_get_all(self):
+        """Returns list of all instances."""
+        search_opts = {'all_tenants': True}
+        return self.nova_client.servers.list(
+            detailed=True,
+            search_opts=search_opts)
+
+    @logged
     def floating_ip_get_all(self):
         """Returns all floating ips."""
         return self.nova_client.floating_ips.list()

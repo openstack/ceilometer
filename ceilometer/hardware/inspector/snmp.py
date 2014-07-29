@@ -18,7 +18,6 @@
 """Inspector for collecting data over SNMP"""
 
 from pysnmp.entity.rfc3413.oneliner import cmdgen
-from six.moves.urllib import parse as urlparse
 
 from ceilometer.hardware.inspector import base
 
@@ -73,9 +72,8 @@ class SNMPInspector(base.Inspector):
     _interface_received_oid = "1.3.6.1.2.1.2.2.1.10"
     _interface_transmitted_oid = "1.3.6.1.2.1.2.2.1.16"
     _interface_error_oid = "1.3.6.1.2.1.2.2.1.20"
-    # Default port and security name
+    # Default port
     _port = 161
-    _security_name = 'public'
 
     def __init__(self):
         super(SNMPInspector, self).__init__()
@@ -88,7 +86,8 @@ class SNMPInspector(base.Inspector):
         else:
             func = self._cmdGen.nextCmd
             ret_func = lambda x: x
-        ret = func(cmdgen.CommunityData(self._get_security_name(host)),
+
+        ret = func(self._get_auth_strategy(host),
                    cmdgen.UdpTransportTarget((host.hostname,
                                               host.port or self._port)),
                    oid)
@@ -99,6 +98,15 @@ class SNMPInspector(base.Inspector):
                                 dict(oid=oid, host=host.hostname, err=data))
         else:
             return ret_func(data)
+
+    def _get_auth_strategy(self, host):
+        if host.password:
+            auth_strategy = cmdgen.UsmUserData(host.username,
+                                               authKey=host.password)
+        else:
+            auth_strategy = cmdgen.CommunityData(host.username or 'public')
+
+        return auth_strategy
 
     def _get_value_from_oid(self, oid, host):
         return self._get_or_walk_oid(oid, host, True)
@@ -185,10 +193,6 @@ class SNMPInspector(base.Inspector):
                                             tx_bytes=int(tx_bytes),
                                             error=int(error))
                 yield (interface, stats)
-
-    def _get_security_name(self, host):
-        options = urlparse.parse_qs(host.query)
-        return options.get('security_name', [self._security_name])[-1]
 
     def _get_ip_for_interface(self, host, interface_id):
         ip_addresses = self._walk_oid(self._interface_ip_oid, host)
