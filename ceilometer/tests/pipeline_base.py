@@ -1219,6 +1219,42 @@ class BasePipelineTestCase(test.BaseTestCase):
         self.assertEqual(expected_length, len(publisher.samples))
         return sorted(publisher.samples, key=lambda s: s.volume)
 
+    def test_aggregator_meter_type(self):
+        volumes = [1.0, 2.0, 3.0]
+        transformer_cfg = [
+            {
+                'name': 'aggregator',
+                'parameters': {'size': len(volumes) * len(sample.TYPES)}
+            },
+        ]
+        self._set_pipeline_cfg('transformers', transformer_cfg)
+        self._set_pipeline_cfg('counters',
+                               ['testgauge', 'testcumulative', 'testdelta'])
+        counters = []
+        for sample_type in sample.TYPES:
+            for volume in volumes:
+                counters.append(sample.Sample(
+                    name='test' + sample_type,
+                    type=sample_type,
+                    volume=volume,
+                    unit='B',
+                    user_id='test_user',
+                    project_id='test_proj',
+                    resource_id='test_resource',
+                    timestamp=timeutils.utcnow().isoformat(),
+                    resource_metadata={'version': '1.0'}
+                ))
+
+        pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager)
+        pipe = pipeline_manager.pipelines[0]
+
+        pipe.publish_samples(None, counters)
+        pipe.flush(None)
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+        actual = sorted(s.volume for s in publisher.samples)
+        self.assertEqual([2.0, 3.0, 6.0], actual)
+
     def test_aggregator_input_validation(self):
         aggregator = conversions.AggregatorTransformer("1", "15", None,
                                                        None, None)
