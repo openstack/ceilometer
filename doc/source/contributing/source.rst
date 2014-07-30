@@ -68,12 +68,14 @@ run through tox_.
 
       $ tox -e py27 -- api.v2
 
-   To debug tests (ie. break into pdb debugger), you can use ''venv'' command::
+   To debug tests (ie. break into pdb debugger), you can use ''debug'' tox
+   environment. Here's an example, passing the name of a test since you'll
+   normally only want to run the test that hits your breakpoint::
 
-      $ tox -e venv "python -m unittest discover ceilometer"
+       $ tox -e debug ceilometer.tests.test_bin
 
-   Unfortunately, debugging currently has some limitations:
-   You cannot run a specific test, you have to launch the whole test suite.
+   For reference, the ``debug`` tox environment implements the instructions
+   here: https://wiki.openstack.org/wiki/Testr#Debugging_.28pdb.29_Tests
 
 .. seealso::
 
