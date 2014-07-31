@@ -1425,6 +1425,15 @@ class AlarmController(rest.RestController):
         #https://bugs.launchpad.net/wsme/+bug/1220678
         Alarm.validate(data)
 
+        # should check if there is any circle in the dependency, but for
+        # efficiency reason, here only check alarm cannot depend on itself
+        if data.type == 'combination':
+            if self._id in data.combination_rule.alarm_ids:
+                error = _('Cannot specify alarm %s itself in '
+                          'combination rule') % self._id
+                pecan.response.translatable_error = error
+                raise wsme.exc.ClientSideError(unicode(error))
+
         old_alarm = Alarm.from_db_model(alarm_in).as_dict(storage.models.Alarm)
         updated_alarm = data.as_dict(storage.models.Alarm)
         try:
