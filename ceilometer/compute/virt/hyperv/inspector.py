@@ -62,9 +62,9 @@ class HyperVInspector(virt_inspector.Inspector):
                 parameters=None)
 
             stats = virt_inspector.InterfaceStats(
-                rx_bytes=vnic_metrics['rx_bytes'],
+                rx_bytes=vnic_metrics['rx_mb'] * 1024 * 1024,
                 rx_packets=0,
-                tx_bytes=vnic_metrics['tx_bytes'],
+                tx_bytes=vnic_metrics['tx_mb'] * 1024 * 1024,
                 tx_packets=0)
 
             yield (interface, stats)
@@ -79,9 +79,9 @@ class HyperVInspector(virt_inspector.Inspector):
             stats = virt_inspector.DiskStats(
                 read_requests=0,
                 # Return bytes
-                read_bytes=disk_metrics['read_mb'] * 1024,
+                read_bytes=disk_metrics['read_mb'] * 1024 * 1024,
                 write_requests=0,
-                write_bytes=disk_metrics['write_mb'] * 1024,
+                write_bytes=disk_metrics['write_mb'] * 1024 * 1024,
                 errors=0)
 
             yield (disk, stats)
