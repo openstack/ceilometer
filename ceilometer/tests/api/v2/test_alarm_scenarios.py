@@ -1909,11 +1909,11 @@ class TestAlarms(v2.FunctionalTest,
         resp = self._get_alarm_history(alarm, query=query,
                                        expect_errors=True, status=400)
         self.assertEqual('Unknown argument: "alarm_id": unrecognized'
-                         ' field in query: [<Query u\'alarm_id\' eq'
-                         ' u\'b\' Unset>], valid keys: set('
-                         '[\'start_timestamp\', \'end_timestamp_op\','
-                         ' \'project\', \'user\', \'start_timestamp_op\''
-                         ', \'type\', \'end_timestamp\'])',
+                         " field in query: [<Query u'alarm_id' eq"
+                         " u'b' Unset>], valid keys: ['end_timestamp',"
+                         " 'end_timestamp_op', 'project',"
+                         " 'start_timestamp', 'start_timestamp_op',"
+                         " 'type', 'user']",
                          resp.json['error_message']['faultstring'])
 
     def test_get_alarm_history_constrained_by_not_supported_rule(self):
@@ -1922,11 +1922,11 @@ class TestAlarms(v2.FunctionalTest,
         resp = self._get_alarm_history(alarm, query=query,
                                        expect_errors=True, status=400)
         self.assertEqual('Unknown argument: "abcd": unrecognized'
-                         ' field in query: [<Query u\'abcd\' eq'
-                         ' u\'abcd\' Unset>], valid keys: set('
-                         '[\'start_timestamp\', \'end_timestamp_op\','
-                         ' \'project\', \'user\', \'start_timestamp_op\''
-                         ', \'type\', \'end_timestamp\'])',
+                         " field in query: [<Query u'abcd' eq"
+                         " u'abcd' Unset>], valid keys: ['end_timestamp',"
+                         " 'end_timestamp_op', 'project',"
+                         " 'start_timestamp', 'start_timestamp_op',"
+                         " 'type', 'user']",
                          resp.json['error_message']['faultstring'])
 
     def test_get_nonexistent_alarm_history(self):
