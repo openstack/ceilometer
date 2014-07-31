@@ -64,7 +64,7 @@ class SensorNotification(plugin.NotificationBase):
 
     @staticmethod
     def get_targets(conf):
-        """oslo.messaging.TargetS for this this plugin."""
+        """oslo.messaging.TargetS for this plugin."""
         return [messaging.Target(topic=topic,
                                  exchange=conf.ironic_exchange)
                 for topic in conf.notification_topics]
