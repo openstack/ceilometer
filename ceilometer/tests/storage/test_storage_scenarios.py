@@ -36,14 +36,14 @@ from ceilometer.tests import db as tests_db
 
 class DBTestBase(tests_db.TestBase):
     def create_and_store_sample(self, timestamp=datetime.datetime.utcnow(),
-                                metadata={
-                                    'display_name': 'test-server',
-                                    'tag': 'self.counter'},
+                                metadata=None,
                                 name='instance',
                                 sample_type=sample.TYPE_CUMULATIVE, unit='',
                                 volume=1, user_id='user-id',
                                 project_id='project-id',
                                 resource_id='resource-id', source=None):
+        metadata = metadata or {'display_name': 'test-server',
+                                'tag': 'self.counter'}
         s = sample.Sample(
             name, sample_type, unit=unit, volume=volume, user_id=user_id,
             project_id=project_id, resource_id=resource_id,

@@ -35,8 +35,9 @@ from ceilometer.tests import base as tests_base
 
 
 class FakeApp(object):
-    def __init__(self, body=['This string is 28 bytes long']):
-        self.body = body
+    def __init__(self, body=None):
+
+        self.body = body or ['This string is 28 bytes long']
 
     def __call__(self, env, start_response):
         yield
