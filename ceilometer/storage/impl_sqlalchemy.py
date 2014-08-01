@@ -308,7 +308,7 @@ class Connection(base.Connection):
                  .delete())
 
             rows = sample_q.delete()
-            # remove Meter defintions with no matching samples
+            # remove Meter definitions with no matching samples
             (session.query(models.Meter)
              .filter(~models.Meter.samples.any())
              .delete(synchronize_session='fetch'))
