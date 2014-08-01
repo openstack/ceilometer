@@ -89,7 +89,7 @@ class IPSecConnectionsPollster(base.BaseServicesPollster):
             yield sample.Sample(
                 name='network.services.vpn.connections',
                 type=sample.TYPE_GAUGE,
-                unit='vpn',
+                unit='connection',
                 volume=1,
                 user_id=None,
                 project_id=conn['tenant_id'],
