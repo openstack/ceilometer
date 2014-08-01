@@ -13,7 +13,6 @@
 """HBase storage backend
 """
 import datetime
-import hashlib
 import operator
 import os
 import time
@@ -60,8 +59,8 @@ class Connection(base.Connection):
 
     - meter (describes sample actually):
 
-      - row-key: consists of reversed timestamp, meter and an md5 of
-        user+resource+project for purposes of uniqueness
+      - row-key: consists of reversed timestamp, meter and a message signature
+        for purposes of uniqueness
       - Column Families:
 
         f: contains the following qualifiers:
@@ -250,13 +249,10 @@ class Connection(base.Connection):
             ts = int(time.mktime(data['timestamp'].timetuple()) * 1000)
             resource_table.put(data['resource_id'], resource, ts)
 
-            # TODO(nprivalova): improve uniqueness
-            # Rowkey consists of reversed timestamp, meter and an md5 of
-            # user+resource+project for purposes of uniqueness
-            m = hashlib.md5()
-            m.update("%s%s%s" % (data['user_id'], data['resource_id'],
-                                 data['project_id']))
-            row = "%s_%d_%s" % (data['counter_name'], rts, m.hexdigest())
+            # Rowkey consists of reversed timestamp, meter and a
+            # message signature for purposes of uniqueness
+            row = "%s_%d_%s" % (data['counter_name'], rts,
+                                data['message_signature'])
             record = hbase_utils.serialize_entry(
                 data, **{'source': data['source'], 'rts': rts,
                          'message': data, 'recorded_at': timeutils.utcnow()})
