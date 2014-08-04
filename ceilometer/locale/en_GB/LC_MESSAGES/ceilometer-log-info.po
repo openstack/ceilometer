@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the ceilometer project.
 #
 # Translators:
+# Andi Chandler <andi@gowling.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-06-20 06:01+0000\n"
-"PO-Revision-Date: 2014-06-19 07:49+0000\n"
-"Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
+"POT-Creation-Date: 2014-08-04 06:08+0000\n"
+"PO-Revision-Date: 2014-07-25 15:11+0000\n"
+"Last-Translator: Andi Chandler <andi@gowling.com>\n"
 "Language-Team: English (United Kingdom) (http://www.transifex.com/projects/p/"
 "ceilometer/language/en_GB/)\n"
 "Language: en_GB\n"
@@ -32,7 +33,7 @@ msgstr "Created lock path: %s"
 #: ceilometer/openstack/common/lockutils.py:250
 #, python-format
 msgid "Failed to remove file %(file)s"
-msgstr ""
+msgstr "Failed to remove file %(file)s"
 
 #: ceilometer/openstack/common/service.py:176
 #, python-format
@@ -46,7 +47,7 @@ msgstr "Parent process has died unexpectedly, exiting"
 #: ceilometer/openstack/common/service.py:271
 #, python-format
 msgid "Child caught %s, exiting"
-msgstr ""
+msgstr "Child caught %s, exiting"
 
 #: ceilometer/openstack/common/service.py:310
 msgid "Forking too fast, sleeping"
@@ -79,7 +80,7 @@ msgstr "Caught %s, stopping children"
 
 #: ceilometer/openstack/common/service.py:408
 msgid "Wait called after thread killed.  Cleaning up."
-msgstr ""
+msgstr "Wait called after thread killed.  Cleaning up."
 
 #: ceilometer/openstack/common/service.py:424
 #, python-format

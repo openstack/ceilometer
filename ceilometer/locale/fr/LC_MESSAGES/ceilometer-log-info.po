@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the ceilometer project.
 #
 # Translators:
+# Frédéric <frosmont@free.fr>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-06-20 06:01+0000\n"
-"PO-Revision-Date: 2014-06-19 07:49+0000\n"
-"Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
+"POT-Creation-Date: 2014-08-04 06:08+0000\n"
+"PO-Revision-Date: 2014-07-16 14:42+0000\n"
+"Last-Translator: Frédéric <frosmont@free.fr>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/ceilometer/"
 "language/fr/)\n"
 "Language: fr\n"
@@ -79,7 +80,7 @@ msgstr "%s interceptée, arrêt de l'enfant"
 
 #: ceilometer/openstack/common/service.py:408
 msgid "Wait called after thread killed.  Cleaning up."
-msgstr ""
+msgstr "Pause demandée après suppression de thread. Nettoyage."
 
 #: ceilometer/openstack/common/service.py:424
 #, python-format

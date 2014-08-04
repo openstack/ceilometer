@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-06-19 06:01+0000\n"
-"PO-Revision-Date: 2014-06-18 08:06+0000\n"
-"Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
+"POT-Creation-Date: 2014-08-04 06:08+0000\n"
+"PO-Revision-Date: 2014-07-16 14:42+0000\n"
+"Last-Translator: Ying Chun Guo <daisy.ycguo@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/projects/p/ceilometer/"
 "language/ja/)\n"
 "Language: ja\n"
@@ -38,21 +38,21 @@ msgstr "取得したロック `%s` を解放できませんでした"
 msgid "in fixed duration looping call"
 msgstr "一定期間の呼び出しループ"
 
-#: ceilometer/openstack/common/loopingcall.py:136
+#: ceilometer/openstack/common/loopingcall.py:131
 msgid "in dynamic looping call"
 msgstr "動的呼び出しループ"
 
-#: ceilometer/openstack/common/policy.py:510
+#: ceilometer/openstack/common/policy.py:511
 #, python-format
 msgid "Failed to understand rule %s"
 msgstr "ルール %s を解釈できませんでした"
 
-#: ceilometer/openstack/common/policy.py:520
+#: ceilometer/openstack/common/policy.py:521
 #, python-format
 msgid "No handler for matches of kind %s"
 msgstr "種類 %s の一致向けのハンドラーがありません"
 
-#: ceilometer/openstack/common/policy.py:790
+#: ceilometer/openstack/common/policy.py:791
 #, python-format
 msgid "Failed to understand rule %r"
 msgstr "ルール %r を解釈できませんでした"
@@ -61,7 +61,7 @@ msgstr "ルール %r を解釈できませんでした"
 msgid "Exception during rpc cleanup."
 msgstr "RPCクリーンアップ中に例外が発生"
 
-#: ceilometer/openstack/common/service.py:276
+#: ceilometer/openstack/common/service.py:277
 msgid "Unhandled exception"
 msgstr "未処理例外"
 
