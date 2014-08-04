@@ -44,7 +44,43 @@ def notification_for(resource_type, operation, resource_id):
     }
 
 
-class TestNotification(test.BaseTestCase):
+def authn_notification_for(outcome):
+
+    return {
+        u'event_type': u'identity.authenticate',
+        u'message_id': u'1371a590-d5fd-448f-b3bb-a14dead6f4cb',
+        u'payload': {
+            u'typeURI': u'http://schemas.dmtf.org/cloud/audit/1.0/event',
+            u'initiator': {
+                u'typeURI': u'service/security/account/user',
+                u'host': {
+                    u'agent': u'python-keystoneclient',
+                    u'address': u'10.0.2.15'
+                },
+                u'id': USER_ID,
+                u'name': u'openstack:demo_user'
+            },
+            u'target': {
+                u'typeURI': u'service/security/account/user',
+                u'id': u'openstack:44b3d8cb-5f16-46e9-9b1b-ac90b64c2530'
+            },
+            u'observer': {
+                u'typeURI': u'service/security',
+                u'id': u'openstack:55a9e88c-a4b1-4864-9339-62b7e6ecb6a7'
+            },
+            u'eventType': u'activity',
+            u'eventTime': u'2014-08-04T05:38:59.978898+0000',
+            u'action': u'authenticate',
+            u'outcome': outcome,
+            u'id': u'openstack:eca02fef-9394-4008-8fb3-c434133ca4b2'
+        },
+        u'priority': u'INFO',
+        u'publisher_id': PUBLISHER_ID,
+        u'timestamp': NOW
+    }
+
+
+class TestCRUDNotification(test.BaseTestCase):
 
     def _verify_common_sample(self, s):
         self.assertIsNotNone(s)
@@ -110,3 +146,35 @@ class TestNotification(test.BaseTestCase):
 
     def test_delete_trust(self):
         self._test_operation('trust', 'deleted', TRUST_ID, notifications.Trust)
+
+
+class TestAuthenticationNotification(test.BaseTestCase):
+
+    def _verify_common_sample(self, s):
+        self.assertIsNotNone(s)
+        self.assertEqual(NOW, s.timestamp)
+        self.assertEqual(sample.TYPE_DELTA, s.type)
+        self.assertIsNone(s.project_id)
+        self.assertEqual(USER_ID, s.user_id)
+        self.assertEqual(USER_ID, s.resource_id)
+        self.assertEqual('user', s.unit)
+        metadata = s.resource_metadata
+        self.assertEqual(PUBLISHER_ID, metadata.get('host'))
+
+    def _test_operation(self, outcome):
+        notif = authn_notification_for(outcome)
+        handler = notifications.Authenticate(mock.Mock())
+        data = list(handler.process_notification(notif))
+        self.assertEqual(1, len(data))
+        name = '%s.%s.%s' % (notifications.SERVICE, 'authenticate', outcome)
+        self.assertEqual(name, data[0].name)
+        self._verify_common_sample(data[0])
+
+    def test_authn_success(self):
+        self._test_operation('success')
+
+    def test_authn_failure(self):
+        self._test_operation('failure')
+
+    def test_authn_pending(self):
+        self._test_operation('pending')
