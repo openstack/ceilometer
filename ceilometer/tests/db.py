@@ -116,6 +116,9 @@ class TestBase(testscenarios.testcase.WithScenarios, test_base.BaseTestCase):
             raise testcase.TestSkipped(
                 'Test is not applicable for %s' % engine)
 
+        self.CONF = self.useFixture(fixture_config.Config()).conf
+        self.CONF([], project='ceilometer')
+
         self.db_manager = self._get_driver_manager(engine)(self.db_url)
         self.useFixture(self.db_manager)
 
@@ -127,9 +130,6 @@ class TestBase(testscenarios.testcase.WithScenarios, test_base.BaseTestCase):
 
         self.useFixture(mockpatch.Patch('ceilometer.storage.get_connection',
                                         side_effect=self._get_connection))
-
-        self.CONF = self.useFixture(fixture_config.Config()).conf
-        self.CONF([], project='ceilometer')
 
         # Set a default location for the pipeline config file so the
         # tests work even if ceilometer is not installed globally on

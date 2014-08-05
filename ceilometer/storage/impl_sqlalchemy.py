@@ -22,6 +22,9 @@ import operator
 import os
 
 from oslo.config import cfg
+from oslo.db import exception as dbexc
+from oslo.db.sqlalchemy import migration
+from oslo.db.sqlalchemy import session as db_session
 from oslo.utils import timeutils
 import six
 from sqlalchemy import and_
@@ -29,9 +32,6 @@ from sqlalchemy import distinct
 from sqlalchemy import func
 from sqlalchemy.orm import aliased
 
-from ceilometer.openstack.common.db import exception as dbexc
-from ceilometer.openstack.common.db.sqlalchemy import migration
-import ceilometer.openstack.common.db.sqlalchemy.session as sqlalchemy_session
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer import storage
@@ -211,9 +211,9 @@ class Connection(base.Connection):
     )
 
     def __init__(self, url):
-        self._engine_facade = sqlalchemy_session.EngineFacade.from_config(
+        self._engine_facade = db_session.EngineFacade(
             url,
-            cfg.CONF  # TODO(Alexei_987) Remove access to global CONF object
+            **dict(cfg.CONF.database.items())
         )
 
     def upgrade(self):
