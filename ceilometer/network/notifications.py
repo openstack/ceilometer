@@ -80,6 +80,10 @@ class NetworkNotificationBase(plugin.NotificationBase):
 
         resource = message['payload'].get(self.resource_name)
         if resource:
+            # NOTE(liusheng): In %s.update.start notifications, the id is in
+            # message['payload'] instead of resource itself.
+            if message['event_type'].endswith('update.start'):
+                resource['id'] = message['payload']['id']
             resources = [resource]
         else:
             resources = message['payload'].get(self.resource_name + 's')
