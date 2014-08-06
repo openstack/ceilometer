@@ -118,7 +118,7 @@ def main(argv):
         #ceilometer collector by default.
         default_config_files=['/etc/ceilometer/ceilometer.conf'],
     )
-    db = storage.get_connection(cfg.CONF)
+    db = storage.get_connection_from_config(cfg.CONF)
     command = extra_args[0] if extra_args else 'help'
     COMMANDS[command](db, extra_args[1:])
 

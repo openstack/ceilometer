@@ -100,14 +100,14 @@ def main():
     root_logger.setLevel(logging.DEBUG)
 
     # Connect to the metering database
-    conn = storage.get_connection(cfg.CONF)
+    conn = storage.get_connection_from_config(cfg.CONF)
 
     # Find the user and/or project for a real resource
     if not (args.user or args.project):
         for r in conn.get_resources():
-            if r['resource_id'] == args.resource:
-                args.user = r['user_id']
-                args.project = r['project_id']
+            if r.resource_id == args.resource:
+                args.user = r.user_id
+                args.project = r.project_id
                 break
 
     # Compute start and end timestamps for the
