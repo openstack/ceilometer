@@ -30,13 +30,19 @@ def get_metadata_from_host(host_url):
     return {'resource_url': urlparse.urlunsplit(host_url)}
 
 
-def make_sample_from_host(host_url, name, type, unit, volume,
-                          project_id=None, user_id=None, res_metadata=None):
+def make_resource_metadata(res_metadata=None, host_url=None):
     resource_metadata = dict()
     if res_metadata is not None:
         metadata = copy.copy(res_metadata)
         resource_metadata = dict(zip(metadata._fields, metadata))
     resource_metadata.update(get_metadata_from_host(host_url))
+    return resource_metadata
+
+
+def make_sample_from_host(host_url, name, type, unit, volume,
+                          project_id=None, user_id=None, res_metadata=None):
+
+    resource_metadata = make_resource_metadata(res_metadata, host_url)
 
     return sample.Sample(
         name='hardware.' + name,
