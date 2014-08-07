@@ -522,3 +522,44 @@ and then flushes them all down the pipeline at once.
       parameters:
           size: 15
 
+Multi meter arithmetic transformer
+++++++++++++++++++++++++++++++++++
+
+This transformer enables us to perform arithmetic calculations
+over one or more meters and/or their metadata, for example:
+
+    memory_util = 100 * memory.usage / memory .
+
+A new sample is created with the properties described in the 'target'
+section of the transformer's configuration. The sample's volume is the result
+of the provided expression. The calculation is performed on samples from the
+same resource.
+
+.. note::
+    The calculation is limited to meters with the same interval.
+
+Example configuration::
+
+    transformers:
+    - name: "arithmetic"
+      parameters:
+        target:
+          name: "memory_util"
+          unit: "%"
+          type: "gauge"
+          expr: "100 * $(memory.usage) / $(memory)"
+
+To demonstrate the use of metadata, here is the implementation of
+a silly metric that shows average CPU time per core::
+
+    transformers:
+    - name: "arithmetic"
+      parameters:
+        target:
+          name: "avg_cpu_per_core"
+          unit: "ns"
+          type: "cumulative"
+          expr: "$(cpu) / ($(cpu).resource_metadata.cpu_number or 1)"
+
+Expression evaluation gracefully handles NaNs and exceptions. In such
+a case it does not create a new sample but only logs a warning.
