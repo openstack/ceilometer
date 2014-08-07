@@ -58,6 +58,8 @@ class _VolumeBase(_Base):
         'volume.create.*',
         'volume.delete.*',
         'volume.resize.*',
+        'volume.attach.*',
+        'volume.detach.*',
     ]
 
 
