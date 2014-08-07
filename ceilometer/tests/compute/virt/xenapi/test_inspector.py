@@ -19,6 +19,7 @@
 import mock
 from oslotest import base
 
+from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.compute.virt.xenapi import inspector as xenapi_inspector
 
 
@@ -46,3 +47,30 @@ class TestXenapiInspection(base.BaseTestCase):
             inspected_instance = inspected_instances[0]
             self.assertEqual('fake_name', inspected_instance.name)
             self.assertEqual('fake_uuid', inspected_instance.UUID)
+
+    def test_inspect_cpu_util(self):
+        fake_instance = {'OS-EXT-SRV-ATTR:instance_name': 'fake_instance_name',
+                         'id': 'fake_instance_id'}
+        fake_stat = virt_inspector.CPUUtilStats(util=40)
+
+        def fake_xenapi_request(method, args):
+            metrics_rec = {
+                'memory_actual': '536870912',
+                'VCPUs_number': '1',
+                'VCPUs_utilisation': {'0': 0.4, }
+            }
+
+            if method == 'VM.get_by_name_label':
+                return ['vm_ref']
+            elif method == 'VM.get_metrics':
+                return 'metrics_ref'
+            elif method == 'VM_metrics.get_record':
+                return metrics_rec
+            else:
+                return None
+
+        session = self.inspector.session
+        with mock.patch.object(session, 'xenapi_request',
+                               side_effect=fake_xenapi_request):
+            cpu_util_stat = self.inspector.inspect_cpu_util(fake_instance)
+            self.assertEqual(fake_stat, cpu_util_stat)
