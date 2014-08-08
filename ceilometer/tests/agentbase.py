@@ -520,3 +520,27 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.assertEqual(1, len(self.PollsterAnother.samples))
         self.assertEqual(['discovered_3', 'discovered_4'],
                          self.PollsterAnother.resources)
+
+    def test_multiple_sinks_same_discoverer(self):
+        self.Discovery.resources = ['discovered_1', 'discovered_2']
+        sources = [{'name': 'test_source_1',
+                    'interval': 60,
+                    'counters': ['test'],
+                    'discovery': ['testdiscovery'],
+                    'sinks': ['test_sink_1', 'test_sink_2']}]
+        sinks = [{'name': 'test_sink_1',
+                  'transformers': [],
+                  'publishers': ['test://']},
+                 {'name': 'test_sink_2',
+                  'transformers': [],
+                  'publishers': ['test://']}]
+        self.pipeline_cfg = {'sources': sources, 'sinks': sinks}
+        self.mgr.discovery_manager = self.create_discovery_manager()
+        self.setup_pipeline()
+        polling_tasks = self.mgr.setup_polling_tasks()
+        self.assertEqual(1, len(polling_tasks))
+        self.assertTrue(60 in polling_tasks.keys())
+        self.mgr.interval_task(polling_tasks.get(60))
+        self.assertEqual(1, len(self.Pollster.samples))
+        self.assertEqual(['discovered_1', 'discovered_2'],
+                         self.Pollster.resources)
