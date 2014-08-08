@@ -98,6 +98,10 @@ class TestEnergyPollster(base.BaseTestCase):
             probe_dict['id'] = key
             yield probe_dict
 
+    def test_default_discovery(self):
+        pollster = kwapi.EnergyPollster()
+        self.assertEqual('endpoint:energy', pollster.default_discovery)
+
     def test_sample(self):
         cache = {}
         samples = list(kwapi.EnergyPollster().get_samples(
@@ -160,6 +164,10 @@ class TestPowerPollster(base.BaseTestCase):
             probe_dict = value
             probe_dict['id'] = key
             yield probe_dict
+
+    def test_default_discovery(self):
+        pollster = kwapi.PowerPollster()
+        self.assertEqual('endpoint:energy', pollster.default_discovery)
 
     def test_sample(self):
         cache = {}

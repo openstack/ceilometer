@@ -17,6 +17,8 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+
+from oslo.config import cfg
 from oslo.utils import timeutils
 
 from ceilometer.central import plugin
@@ -25,7 +27,10 @@ from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer import sample
 
+
 LOG = log.getLogger(__name__)
+
+cfg.CONF.import_group('service_types', 'ceilometer.nova_client')
 
 
 class FloatingIPPollster(plugin.CentralPollster):
@@ -43,7 +48,7 @@ class FloatingIPPollster(plugin.CentralPollster):
 
     @property
     def default_discovery(self):
-        return 'endpoint:compute'
+        return 'endpoint:%s' % cfg.CONF.service_types.nova
 
     def get_samples(self, manager, cache, resources):
         for endpoint in resources:

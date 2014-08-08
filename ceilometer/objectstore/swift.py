@@ -40,7 +40,14 @@ OPTS = [
                "reseller_prefix in proxy-server.conf."),
 ]
 
+service_types_opts = [
+    cfg.StrOpt('swift',
+               default='object-store',
+               help='Swift service type.'),
+]
+
 cfg.CONF.register_opts(OPTS)
+cfg.CONF.register_opts(service_types_opts, group='service_types')
 
 
 class _Base(plugin.CentralPollster):
@@ -62,11 +69,10 @@ class _Base(plugin.CentralPollster):
         # only ever called once
         if _Base._ENDPOINT is None:
             try:
-                endpoint_type = cfg.CONF.service_credentials.os_endpoint_type
-                endpoint = ksclient.service_catalog.url_for(
-                    service_type='object-store',
-                    endpoint_type=endpoint_type)
-                _Base._ENDPOINT = endpoint
+                conf = cfg.CONF.service_credentials
+                _Base._ENDPOINT = ksclient.service_catalog.url_for(
+                    service_type=cfg.CONF.service_types.swift,
+                    endpoint_type=conf.os_endpoint_type)
             except exceptions.EndpointNotFound:
                 LOG.debug(_("Swift endpoint not found"))
         return _Base._ENDPOINT

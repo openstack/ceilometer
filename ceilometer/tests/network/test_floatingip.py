@@ -56,6 +56,9 @@ class TestFloatingIPPollster(base.BaseTestCase):
             ips.append(ip)
         return ips
 
+    def test_default_discovery(self):
+        self.assertEqual('endpoint:compute', self.pollster.default_discovery)
+
     # FIXME(dhellmann): Is there a useful way to define this
     # test without a database?
     #

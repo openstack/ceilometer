@@ -39,14 +39,21 @@ OPTS = [
                     "(default value in glanceclient is used)."),
 ]
 
+service_types_opts = [
+    cfg.StrOpt('glance',
+               default='image',
+               help='Glance service type.'),
+]
+
 cfg.CONF.register_opts(OPTS)
+cfg.CONF.register_opts(service_types_opts, group='service_types')
 
 
 class _Base(plugin.CentralPollster):
 
     @property
     def default_discovery(self):
-        return 'endpoint:image'
+        return 'endpoint:%s' % cfg.CONF.service_types.glance
 
     @staticmethod
     def get_glance_client(ksclient, endpoint):

@@ -67,6 +67,23 @@ pecan_debug                      The value of DEFAULT.debug            Toggle Pe
                                                                        processes with mod_wsgi.
 ===============================  ====================================  ===============================================================
 
+Service polling configuration
+==============================
+
+The following options must be placed under a [service_types] section
+and will be used by Ceilometer to retrieve information from OpenStack
+components.
+
+===============================  ====================================  ==============================================================
+Parameter                        Default                               Note
+===============================  ====================================  ==============================================================
+nova                             compute                               The service type for nova
+neutron                          network                               The service type for neutron
+glance                           image                                 The service type for glance
+swift                            object-store                          The service type for swift
+kwapi                            energy                                The service type for kwapi
+===============================  ====================================  ==============================================================
+
 Service polling authentication
 ==============================
 
