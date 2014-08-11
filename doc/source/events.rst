@@ -40,7 +40,10 @@ consistently (you do not want to lose one).
 Event Structure
 ===============
 
-Events contain the following information:
+To facilitate downstream processing (billing and/or aggregation), a
+:doc:`minimum required data set and format <format>` has been defined for
+services, however events generally contain the following information:
+
 
 event_type
     A dotted string defining what event occurred, such as "compute.instance.resize.start"
