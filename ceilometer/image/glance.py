@@ -28,6 +28,20 @@ from ceilometer.openstack.common import timeutils
 from ceilometer import sample
 
 
+OPTS = [
+    cfg.IntOpt('glance_page_size',
+               default=0,
+               help="Number of items to request in "
+                    "each paginated Glance API request "
+                    "(parameter used by glancecelient). "
+                    "If this is less than or equal to 0, "
+                    "page size is not specified "
+                    "(default value in glanceclient is used)."),
+]
+
+cfg.CONF.register_opts(OPTS)
+
+
 class _Base(plugin.CentralPollster):
 
     @staticmethod
@@ -45,13 +59,15 @@ class _Base(plugin.CentralPollster):
 
     def _get_images(self, ksclient):
         client = self.get_glance_client(ksclient)
-        # TODO(eglynn): use pagination to protect against unbounded
-        #              memory usage
+        page_size = cfg.CONF.glance_page_size
+        kwargs = {}
+        if page_size > 0:
+            kwargs['page_size'] = page_size
         rawImageList = list(itertools.chain(
-            client.images.list(filters={"is_public": True}),
+            client.images.list(filters={"is_public": True}, **kwargs),
             # TODO(eglynn): extend glance API with all_tenants logic to
             #              avoid second call to retrieve private images
-            client.images.list(filters={"is_public": False})))
+            client.images.list(filters={"is_public": False}, **kwargs)))
 
         # When retrieving images from glance, glance will check
         # whether the user is of 'admin_role' which is

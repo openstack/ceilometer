@@ -20,6 +20,7 @@ import mock
 from ceilometer.central import manager
 from ceilometer.image import glance
 from ceilometer.openstack.common import context
+from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common.fixture import mockpatch
 from ceilometer.openstack.common import test
 
@@ -108,11 +109,54 @@ class _BaseObject(object):
     pass
 
 
+class FakeGlanceClient(object):
+    class images(object):
+        pass
+
+
 class TestManager(manager.AgentManager):
 
     def __init__(self):
         super(TestManager, self).__init__()
         self.keystone = mock.Mock()
+
+
+class TestImagePollsterPageSize(test.BaseTestCase):
+
+    def fake_get_glance_client(self, ksclient):
+        glanceclient = FakeGlanceClient()
+        glanceclient.images.list = mock.MagicMock(return_value=IMAGE_LIST)
+        return glanceclient
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def setUp(self):
+        super(TestImagePollsterPageSize, self).setUp()
+        self.context = context.get_admin_context()
+        self.manager = TestManager()
+        self.useFixture(mockpatch.PatchObject(
+            glance._Base, 'get_glance_client',
+            side_effect=self.fake_get_glance_client))
+        self.CONF = self.useFixture(config.Config()).conf
+
+    def _do_test_iter_images(self, page_size=0):
+        self.CONF.set_override("glance_page_size", page_size)
+        images = list(glance.ImagePollster().
+                      _iter_images(self.manager.keystone, {}))
+        kwargs = {}
+        if page_size > 0:
+            kwargs['page_size'] = page_size
+        FakeGlanceClient.images.list.assert_called_with(
+            filters={'is_public': False}, **kwargs)
+        self.assertEqual(len(set(image.id for image in images)), len(images))
+
+    def test_page_size(self):
+        self._do_test_iter_images(100)
+
+    def test_page_size_default(self):
+        self._do_test_iter_images()
+
+    def test_page_size_negative_number(self):
+        self._do_test_iter_images(-1)
 
 
 class TestImagePollster(test.BaseTestCase):

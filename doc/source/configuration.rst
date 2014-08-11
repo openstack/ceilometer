@@ -43,6 +43,12 @@ database_connection              mongodb://localhost:27017/ceilometer  Database 
 metering_api_port                8777                                  The port for the ceilometer API server
 reseller_prefix                  AUTH\_                                Prefix used by swift for reseller token
 nova_http_log_debug              False                                 Log request/response parameters between nova and ceilometer
+glance_page_size                 0                                     Number of items to request in each paginated Glance API
+                                                                       request (parameter used by glancecelient). If this is less
+                                                                       than or equal to 0, page size is not specified (default value
+                                                                       in glanceclient is used). It is better to check and set
+                                                                       appropriate value in line with each environment when calling
+                                                                       glanceclient, than to define higher default value.
 ===============================  ====================================  ==============================================================
 
 Service polling authentication
