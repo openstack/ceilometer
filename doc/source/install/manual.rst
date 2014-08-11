@@ -583,6 +583,22 @@ Or if migration to oslo.messaging is done for Icehouse:
         notification_driver=oslo.messaging.notifier.Notifier
 
 
+Configuring Sahara to send notifications
+========================================
+
+Configure the driver in ``sahara.conf``
+
+   ::
+
+        enable_notifications=true
+        notification_driver=messaging
+
+Also you need to configure RPC-related options correctly as written above
+for other parts of installation guide. Refer to :doc:`/configuration` for
+details about any other options you might want to modify before starting
+the service.
+
+
 Notifications queues
 ========================
 

@@ -230,6 +230,19 @@ stack.suspend                    Delta       stack       stack ID     notificati
 
 To enable Heat notifications configure Heat as described in :ref:`installing_manually`.
 
+Data Processing (Sahara)
+========================
+
+===============================  ==========  ==========  ===========  ============  =================================================
+Name                             Type        Unit        Resource     Origin        Note
+===============================  ==========  ==========  ===========  ============  =================================================
+cluster.create                   Delta       cluster     cluster ID   notification  Creation requests for a cluster successful
+cluster.update                   Delta       cluster     cluster ID   notification  Updating status requests for a cluster successful
+cluster.delete                   Delta       cluster     cluster ID   notification  Deletion requests for a cluster successful
+===============================  ==========  ==========  ===========  ============  =================================================
+
+To enable Sahara notifications configure Sahara as described in :ref:`installing_manually`.
+
 Energy (Kwapi)
 ==============
 
