@@ -35,5 +35,6 @@ six>=1.7.0
 SQLAlchemy>=0.8.4,<=0.8.99,>=0.9.7,<=0.9.99
 sqlalchemy-migrate>=0.9.1
 stevedore>=0.14
+tooz>=0.3
 WebOb>=1.2.3
 WSME>=0.6

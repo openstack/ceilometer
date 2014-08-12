@@ -20,6 +20,14 @@ from oslo.config import cfg
 from ceilometer import nova_client
 from ceilometer import plugin
 
+OPTS = [
+    cfg.BoolOpt('workload_partitioning',
+                default=False,
+                help='Enable work-load partitioning, allowing multiple '
+                     'compute agents to be run simultaneously.')
+]
+cfg.CONF.register_opts(OPTS, group='compute')
+
 
 class InstanceDiscovery(plugin.DiscoveryBase):
     def __init__(self):
@@ -31,3 +39,10 @@ class InstanceDiscovery(plugin.DiscoveryBase):
         instances = self.nova_cli.instance_get_all_by_host(cfg.CONF.host)
         return [i for i in instances
                 if getattr(i, 'OS-EXT-STS:vm_state', None) != 'error']
+
+    @property
+    def group_id(self):
+        if cfg.CONF.compute.workload_partitioning:
+            return cfg.CONF.host
+        else:
+            return None

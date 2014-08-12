@@ -152,3 +152,21 @@ class DiscoveryBase(object):
 
         :param param: an optional parameter to guide the discovery
         """
+
+    @property
+    def group_id(self):
+        """Return group id of this discovery.
+
+        All running recoveries with the same group_id should return the same
+        set of resources at a given point in time. By default, a discovery is
+        put into a global group, meaning that all discoveries of its type
+        running anywhere in the cloud, return the same set of resources.
+
+        This property can be overridden to provide correct grouping of
+        localized discoveries. For example, compute discovery is localized
+        to a host, which is reflected in its group_id.
+
+        A None value signifies that this discovery does not want to be part
+        of workload partitioning at all.
+        """
+        return 'global'
