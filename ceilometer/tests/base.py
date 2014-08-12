@@ -21,7 +21,7 @@ import functools
 import os.path
 
 import eventlet
-import oslo.messaging
+import oslo.messaging.conffixture
 import six
 from testtools import testcase
 
