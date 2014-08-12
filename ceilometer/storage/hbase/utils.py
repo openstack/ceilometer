@@ -17,8 +17,13 @@ import datetime
 import json
 
 import bson.json_util
+from happybase.hbase import ttypes
 
+from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common import log
 from ceilometer import utils
+
+LOG = log.getLogger(__name__)
 
 EVENT_TRAIT_TYPES = {'none': 0, 'string': 1, 'integer': 2, 'float': 3,
                      'datetime': 4}
@@ -416,3 +421,21 @@ def object_hook(dct):
         dt = bson.json_util.object_hook(dct)
         return dt.replace(tzinfo=None)
     return bson.json_util.object_hook(dct)
+
+
+def create_tables(conn, tables, column_families):
+    for table in tables:
+        try:
+            conn.create_table(table, column_families)
+        except ttypes.AlreadyExists:
+            if conn.table_prefix:
+                table = ("%(table_prefix)s"
+                         "%(separator)s"
+                         "%(table_name)s" %
+                         dict(table_prefix=conn.table_prefix,
+                              separator=conn.table_prefix_separator,
+                              table_name=table))
+
+            LOG.warn(_("Cannot create table %(table_name)s   "
+                       "it already exists. Ignoring error")
+                     % {'table_name': table})

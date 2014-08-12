@@ -98,9 +98,10 @@ class Connection(base.Connection):
             self.conn_pool = self._get_connection_pool(opts)
 
     def upgrade(self):
+        tables = [self.ALARM_HISTORY_TABLE, self.ALARM_TABLE]
+        column_families = {'f': dict()}
         with self.conn_pool.connection() as conn:
-            conn.create_table(self.ALARM_TABLE, {'f': dict()})
-            conn.create_table(self.ALARM_HISTORY_TABLE, {'f': dict()})
+            hbase_utils.create_tables(conn, tables, column_families)
 
     def clear(self):
         LOG.debug(_('Dropping HBase schema...'))

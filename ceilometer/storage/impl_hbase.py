@@ -161,10 +161,10 @@ class Connection(base.Connection):
             self.conn_pool = self._get_connection_pool(opts)
 
     def upgrade(self):
+        tables = [self.RESOURCE_TABLE, self.METER_TABLE, self.EVENT_TABLE]
+        column_families = {'f': dict(max_versions=1)}
         with self.conn_pool.connection() as conn:
-            conn.create_table(self.RESOURCE_TABLE, {'f': dict(max_versions=1)})
-            conn.create_table(self.METER_TABLE, {'f': dict(max_versions=1)})
-            conn.create_table(self.EVENT_TABLE, {'f': dict(max_versions=1)})
+            hbase_utils.create_tables(conn, tables, column_families)
 
     def clear(self):
         LOG.debug(_('Dropping HBase schema...'))
