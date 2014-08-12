@@ -46,6 +46,8 @@ class _Base(plugin.NotificationBase):
                                       exchange=conf.keystone_control_exchange)
                 for topic in conf.notification_topics]
 
+
+class IdentityCRUD(_Base):
     def process_notification(self, message):
         yield sample.Sample.from_notification(
             name=message['event_type'],
@@ -58,7 +60,7 @@ class _Base(plugin.NotificationBase):
             message=message)
 
 
-class User(_Base):
+class User(IdentityCRUD):
 
     resource_type = 'user'
     resource_name = '%s.%s' % (SERVICE, resource_type)
@@ -68,7 +70,7 @@ class User(_Base):
         return ['%s.*' % (self.resource_name)]
 
 
-class Group(_Base):
+class Group(IdentityCRUD):
 
     resource_type = 'group'
     resource_name = '%s.%s' % (SERVICE, resource_type)
@@ -78,7 +80,7 @@ class Group(_Base):
         return ['%s.*' % (self.resource_name)]
 
 
-class Project(_Base):
+class Project(IdentityCRUD):
 
     resource_type = 'project'
     resource_name = '%s.%s' % (SERVICE, resource_type)
@@ -88,7 +90,7 @@ class Project(_Base):
         return ['%s.*' % (self.resource_name)]
 
 
-class Role(_Base):
+class Role(IdentityCRUD):
 
     resource_type = 'role'
     resource_name = '%s.%s' % (SERVICE, resource_type)
@@ -98,7 +100,7 @@ class Role(_Base):
         return ['%s.*' % (self.resource_name)]
 
 
-class Trust(_Base):
+class Trust(IdentityCRUD):
 
     resource_type = 'trust'
     resource_name = '%s.%s' % (SERVICE, resource_type)
@@ -109,3 +111,28 @@ class Trust(_Base):
             '%s.created' % (self.resource_name),
             '%s.deleted' % (self.resource_name)
         ]
+
+
+class Authenticate(_Base):
+    """Convert identity authentication notifications into Samples."""
+
+    resource_type = 'authenticate'
+    event_name = '%s.%s' % (SERVICE, resource_type)
+
+    def process_notification(self, message):
+        outcome = message['payload']['outcome']
+        meter_name = '%s.%s.%s' % (SERVICE, self.resource_type, outcome)
+
+        yield sample.Sample.from_notification(
+            name=meter_name,
+            type=sample.TYPE_DELTA,
+            unit='user',
+            volume=1,
+            resource_id=message['payload']['initiator']['id'],
+            user_id=message['payload']['initiator']['id'],
+            project_id=None,
+            message=message)
+
+    @property
+    def event_types(self):
+        return [self.event_name]
