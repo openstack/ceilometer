@@ -37,11 +37,11 @@ class Resources(object):
     def __init__(self, agent_manager):
         self.agent_manager = agent_manager
         self._resources = []
-        self._discovery = []
+        self._discovery = set([])
 
     def extend(self, pipeline):
         self._resources.extend(pipeline.resources)
-        self._discovery.extend(pipeline.discovery)
+        self._discovery.update(set(pipeline.discovery))
 
     @property
     def resources(self):
