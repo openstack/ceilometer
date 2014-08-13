@@ -273,6 +273,8 @@ Detailed Description
    as their communication via the messaging bus. More work is needed
    before the data store and API server designs can be documented.
 
+.. _plugins-and-containers:
+
 Plugins
 -------
 
@@ -287,9 +289,13 @@ measure the resources their customers use. This means that Ceilometer
 needs to be easy to extend and configure so it can be tuned for each
 installation. A plugin system based on `setuptools entry points`_
 makes it easy to add new monitors in the collector or subagents for
-polling.
+polling.  In particular, Ceilometer now uses Stevedore_, and you
+should put your entry point definitions in the ``entry_points.txt``
+file of your Ceilometer egg.
 
 .. _setuptools entry points: http://pythonhosted.org/setuptools/setuptools.html#dynamic-discovery-of-services-and-plugins
+
+.. _Stevedore: http://stevedore.readthedocs.org
 
 Each daemon provides basic essential services in a framework to be
 shared by the plugins, and the plugins do the specialized work.  As a
@@ -351,8 +357,8 @@ The pollster plugins do not communicate with the message bus directly,
 unless it is necessary to do so in order to collect the information
 for which they are polling.
 
-All polling happens with the same frequency, controlled by a global
-setting for the agent.
+The frequency of polling is controlled via the pipeline configuration.
+See :ref:`Pipeline-Configuration` for details.
 
 Handling Notifications
 ----------------------

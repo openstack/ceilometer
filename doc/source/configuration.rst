@@ -286,6 +286,7 @@ configuration file by running ``tox -e genconfig``.
 
 .. _`backward compatibility issue`: https://bitbucket.org/hpk42/tox/issue/150/posargs-configerror
 
+.. _Pipeline-Configuration:
 
 Pipelines
 =========
@@ -296,6 +297,8 @@ data.
 
 A source is a producer of samples, in effect a set of pollsters and/or
 notification handlers emitting samples for a set of matching meters.
+See :doc:`contributing/plugins` and :ref:`plugins-and-containers` for
+details on how to write and plug in your plugins.
 
 Each source configuration encapsulates meter name matching, polling
 interval determination, optional resource enumeration or discovery,
@@ -316,6 +319,7 @@ The chains end with one or more publishers. This component makes it possible
 to persist the data into storage through the message bus or to send it to one
 or more external consumers. One chain can contain multiple publishers, see the
 :ref:`multi-publisher` section.
+
 
 Pipeline configuration
 ----------------------
@@ -342,6 +346,10 @@ The chain definition looks like the following::
         transformers: 'definition of transformers'
         publishers:
           - 'list of publishers'
+
+The *name* parameter of a source is unrelated to anything else;
+nothing references a source by name, and a source's name does not have
+to match anything.
 
 The *interval* parameter in the sources section should be defined in seconds. It
 determines the cadence of sample injection into the pipeline, where samples are
@@ -373,6 +381,11 @@ The above definition methods can be used in the following combinations:
     section. Included and excluded meters cannot co-exist in the same
     pipeline. Wildcard and included meters cannot co-exist in the same
     pipeline definition section.
+
+A given polling plugin is invoked according to each source section
+whose *meters* parameter matches the plugin's meter name.  That is,
+the matching source sections are combined by union, not intersection,
+of the prescribed time series.
 
 The optional *resources* section of a pipeline source allows a static
 list of resource URLs to be to be configured. An amalgamated list of all
