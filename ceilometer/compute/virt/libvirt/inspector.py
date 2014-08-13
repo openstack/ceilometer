@@ -43,6 +43,22 @@ CONF = cfg.CONF
 CONF.register_opts(libvirt_opts)
 
 
+def retry_on_disconnect(function):
+    def decorator(self, *args, **kwargs):
+        try:
+            return function(self, *args, **kwargs)
+        except libvirt.libvirtError as e:
+            if (e.get_error_code() == libvirt.VIR_ERR_SYSTEM_ERROR and
+                e.get_error_domain() in (libvirt.VIR_FROM_REMOTE,
+                                         libvirt.VIR_FROM_RPC)):
+                LOG.debug('Connection to libvirt broken')
+                self.connection = None
+                return function(self, *args, **kwargs)
+            else:
+                raise
+    return decorator
+
+
 class LibvirtInspector(virt_inspector.Inspector):
 
     per_type_uris = dict(uml='uml:///system', xen='xen:///', lxc='lxc:///')
@@ -56,28 +72,16 @@ class LibvirtInspector(virt_inspector.Inspector):
                                                           'qemu:///system')
 
     def _get_connection(self):
-        if not self.connection or not self._test_connection():
+        if not self.connection:
             global libvirt
             if libvirt is None:
                 libvirt = __import__('libvirt')
-
-            LOG.debug(_('Connecting to libvirt: %s'), self.uri)
+            LOG.debug('Connecting to libvirt: %s', self.uri)
             self.connection = libvirt.openReadOnly(self.uri)
 
         return self.connection
 
-    def _test_connection(self):
-        try:
-            self.connection.getCapabilities()
-            return True
-        except libvirt.libvirtError as e:
-            if (e.get_error_code() == libvirt.VIR_ERR_SYSTEM_ERROR and
-                e.get_error_domain() in (libvirt.VIR_FROM_REMOTE,
-                                         libvirt.VIR_FROM_RPC)):
-                LOG.debug(_('Connection to libvirt broke'))
-                return False
-            raise
-
+    @retry_on_disconnect
     def _lookup_by_name(self, instance_name):
         try:
             return self._get_connection().lookupByName(instance_name)
@@ -85,6 +89,10 @@ class LibvirtInspector(virt_inspector.Inspector):
             if not libvirt or not isinstance(ex, libvirt.libvirtError):
                 raise virt_inspector.InspectorException(six.text_type(ex))
             error_code = ex.get_error_code()
+            if (error_code == libvirt.VIR_ERR_SYSTEM_ERROR and
+                ex.get_error_domain() in (libvirt.VIR_FROM_REMOTE,
+                                          libvirt.VIR_FROM_RPC)):
+                raise
             msg = ("Error from libvirt while looking up %(instance_name)s: "
                    "[Error Code %(error_code)s] "
                    "%(ex)s" % {'instance_name': instance_name,
@@ -92,18 +100,22 @@ class LibvirtInspector(virt_inspector.Inspector):
                                'ex': ex})
             raise virt_inspector.InstanceNotFoundException(msg)
 
+    @retry_on_disconnect
+    def inspect_instance(self, domain_id):
+        domain = self._get_connection().lookupByID(domain_id)
+        return virt_inspector.Instance(name=domain.name(),
+                                       UUID=domain.UUIDString())
+
+    @retry_on_disconnect
     def inspect_instances(self):
         if self._get_connection().numOfDomains() > 0:
             for domain_id in self._get_connection().listDomainsID():
-                try:
-                    # We skip domains with ID 0 (hypervisors).
-                    if domain_id != 0:
-                        domain = self._get_connection().lookupByID(domain_id)
-                        yield virt_inspector.Instance(name=domain.name(),
-                                                      UUID=domain.UUIDString())
-                except libvirt.libvirtError:
-                    # Instance was deleted while listing... ignore it
-                    pass
+                if domain_id != 0:
+                    try:
+                        yield self.inspect_instance(domain_id)
+                    except libvirt.libvirtError:
+                        # Instance was deleted while listing... ignore it
+                        pass
 
     def inspect_cpus(self, instance_name):
         domain = self._lookup_by_name(instance_name)
