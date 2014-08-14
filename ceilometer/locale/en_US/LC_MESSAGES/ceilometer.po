@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-08-04 06:08+0000\n"
+"POT-Creation-Date: 2014-08-14 06:08+0000\n"
 "PO-Revision-Date: 2012-12-11 06:53+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: English (United States) "
@@ -410,27 +410,27 @@ msgid "assignment retrieval failed"
 msgstr ""
 
 #: ceilometer/alarm/storage/impl_hbase.py:91
-#: ceilometer/storage/impl_hbase.py:155
+#: ceilometer/storage/impl_hbase.py:154
 msgid "Creating a new in-memory HBase Connection object"
 msgstr ""
 
 #: ceilometer/alarm/storage/impl_hbase.py:105
-#: ceilometer/storage/impl_hbase.py:170
+#: ceilometer/storage/impl_hbase.py:169
 msgid "Dropping HBase schema..."
 msgstr ""
 
 #: ceilometer/alarm/storage/impl_hbase.py:112
-#: ceilometer/storage/impl_hbase.py:178
+#: ceilometer/storage/impl_hbase.py:177
 msgid "Cannot disable table but ignoring error"
 msgstr ""
 
 #: ceilometer/alarm/storage/impl_hbase.py:116
-#: ceilometer/storage/impl_hbase.py:182
+#: ceilometer/storage/impl_hbase.py:181
 msgid "Cannot delete table but ignoring error"
 msgstr ""
 
 #: ceilometer/alarm/storage/impl_hbase.py:127
-#: ceilometer/storage/impl_hbase.py:193
+#: ceilometer/storage/impl_hbase.py:192
 #, python-format
 msgid "connecting to HBase on %(host)s:%(port)s"
 msgstr ""
@@ -778,33 +778,24 @@ msgstr ""
 msgid "Duplicate VM name found: %s"
 msgstr ""
 
-#: ceilometer/compute/virt/libvirt/inspector.py:64
-#, python-format
-msgid "Connecting to libvirt: %s"
-msgstr ""
-
-#: ceilometer/compute/virt/libvirt/inspector.py:77
-msgid "Connection to libvirt broke"
-msgstr ""
-
-#: ceilometer/compute/virt/libvirt/inspector.py:117
+#: ceilometer/compute/virt/libvirt/inspector.py:129
 #, python-format
 msgid ""
 "Failed to inspect vnics of %(instance_name)s, domain is in state of "
 "SHUTOFF"
 msgstr ""
 
-#: ceilometer/compute/virt/libvirt/inspector.py:152
+#: ceilometer/compute/virt/libvirt/inspector.py:164
 #, python-format
 msgid ""
 "Failed to inspect disks of %(instance_name)s, domain is in state of "
 "SHUTOFF"
 msgstr ""
 
-#: ceilometer/compute/virt/vmware/inspector.py:88
-#: ceilometer/compute/virt/vmware/inspector.py:105
-#: ceilometer/compute/virt/vmware/inspector.py:137
-#: ceilometer/compute/virt/vmware/inspector.py:150
+#: ceilometer/compute/virt/vmware/inspector.py:89
+#: ceilometer/compute/virt/vmware/inspector.py:106
+#: ceilometer/compute/virt/vmware/inspector.py:138
+#: ceilometer/compute/virt/vmware/inspector.py:151
 #, python-format
 msgid "VM %s not found in VMware Vsphere"
 msgstr ""
@@ -1185,21 +1176,21 @@ msgstr ""
 msgid "looking for %(name)r driver in %(namespace)r"
 msgstr ""
 
-#: ceilometer/storage/impl_hbase.py:295 ceilometer/storage/impl_hbase.py:344
+#: ceilometer/storage/impl_hbase.py:291 ceilometer/storage/impl_hbase.py:340
 #, python-format
 msgid "Query Resource table: %s"
 msgstr ""
 
-#: ceilometer/storage/impl_hbase.py:337
+#: ceilometer/storage/impl_hbase.py:333
 msgid "Pagination not implemented"
 msgstr ""
 
-#: ceilometer/storage/impl_hbase.py:385
+#: ceilometer/storage/impl_hbase.py:381
 #, python-format
 msgid "Query Meter Table: %s"
 msgstr ""
 
-#: ceilometer/storage/impl_hbase.py:532
+#: ceilometer/storage/impl_hbase.py:528
 #: ceilometer/storage/impl_sqlalchemy.py:744
 #: ceilometer/storage/pymongo_base.py:143
 #, python-format
