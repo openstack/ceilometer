@@ -20,12 +20,17 @@
 # under the License.
 """MongoDB storage backend"""
 
+from oslo_config import cfg
 import pymongo
 
 from ceilometer.alarm.storage import pymongo_base
 from ceilometer.openstack.common import log
 from ceilometer import storage
+from ceilometer.storage import impl_mongodb
 from ceilometer.storage.mongo import utils as pymongo_utils
+
+cfg.CONF.import_opt('alarm_history_time_to_live', 'ceilometer.alarm.storage',
+                    group="database")
 
 LOG = log.getLogger(__name__)
 
@@ -64,8 +69,23 @@ class Connection(pymongo_base.Connection):
             self.db.conn.create_collection('alarm')
         if 'alarm_history' not in self.db.conn.collection_names():
             self.db.conn.create_collection('alarm_history')
+        # Establish indexes
+        ttl = cfg.CONF.database.alarm_history_time_to_live
+        impl_mongodb.Connection.update_ttl(
+            ttl, 'alarm_history_ttl', 'timestamp', self.db.alarm_history)
 
     def clear(self):
         self.conn.drop_database(self.db.name)
         # Connection will be reopened automatically if needed
         self.conn.close()
+
+    def clear_expired_alarm_history_data(self, alarm_history_ttl):
+        """Clear expired alarm history data from the backend storage system.
+
+        Clearing occurs according to the time-to-live.
+
+        :param alarm_history_ttl: Number of seconds to keep alarm history
+                                  records for.
+        """
+        LOG.debug("Clearing expired alarm history data is based on native "
+                  "MongoDB time to live feature and going in background.")

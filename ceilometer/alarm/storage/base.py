@@ -153,3 +153,15 @@ class Connection(object):
         This is needed to evaluate the performance of each driver.
         """
         return cls.STORAGE_CAPABILITIES
+
+    @staticmethod
+    def clear_expired_alarm_history_data(alarm_history_ttl):
+        """Clear expired alarm history data from the backend storage system.
+
+        Clearing occurs according to the time-to-live.
+
+        :param alarm_history_ttl: Number of seconds to keep alarm history
+                                  records for.
+        """
+        raise ceilometer.NotImplementedError('Clearing alarm history '
+                                             'not implemented')

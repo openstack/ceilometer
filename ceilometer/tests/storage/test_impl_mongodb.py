@@ -109,6 +109,10 @@ class IndexTest(tests_db.TestBase,
         self._test_ttl_index_absent(self.event_conn, 'event',
                                     'event_time_to_live')
 
+    def test_alarm_history_ttl_index_absent(self):
+        self._test_ttl_index_absent(self.alarm_conn, 'alarm_history',
+                                    'alarm_history_time_to_live')
+
     def _test_ttl_index_present(self, conn, coll_name, ttl_opt):
         coll = getattr(conn.db, coll_name)
         self.CONF.set_override(ttl_opt, 456789, group='database')
@@ -129,6 +133,10 @@ class IndexTest(tests_db.TestBase,
     def test_event_ttl_index_present(self):
         self._test_ttl_index_present(self.event_conn, 'event',
                                      'event_time_to_live')
+
+    def test_alarm_history_ttl_index_present(self):
+        self._test_ttl_index_present(self.alarm_conn, 'alarm_history',
+                                     'alarm_history_time_to_live')
 
 
 @tests_db.run_with('mongodb')
