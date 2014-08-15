@@ -135,8 +135,14 @@ class MTable(object):
             if op == '=':
                 if column in data and data[column] == value:
                     r[row] = data
+            elif op == '<':
+                if column in data and data[column] < value:
+                    r[row] = data
             elif op == '<=':
                 if column in data and data[column] <= value:
+                    r[row] = data
+            elif op == '>':
+                if column in data and data[column] > value:
                     r[row] = data
             elif op == '>=':
                 if column in data and data[column] >= value:
@@ -218,7 +224,9 @@ class MTable(object):
             for key in data:
                 if ((op == '=' and key.startswith(column)) or
                         (op == '>=' and key >= column) or
-                        (op == '<=' and key <= column)):
+                        (op == '<=' and key <= column) or
+                        (op == '>' and key > column) or
+                        (op == '<' and key < column)):
                     r_data[key] = data[key]
                 else:
                     raise NotImplementedError("In-memory QualifierFilter "
