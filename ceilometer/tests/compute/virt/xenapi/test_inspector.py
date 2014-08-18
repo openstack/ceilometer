@@ -99,3 +99,43 @@ class TestXenapiInspection(base.BaseTestCase):
                                side_effect=fake_xenapi_request):
             memory_stat = self.inspector.inspect_memory_usage(fake_instance)
             self.assertEqual(fake_stat, memory_stat)
+
+    def test_inspect_vnic_rates(self):
+        fake_instance = {'OS-EXT-SRV-ATTR:instance_name': 'fake_instance_name',
+                         'id': 'fake_instance_id'}
+
+        def fake_xenapi_request(method, args):
+            vif_rec = {
+                'metrics': 'vif_metrics_ref',
+                'uuid': 'vif_uuid',
+                'MAC': 'vif_mac',
+            }
+
+            vif_metrics_rec = {
+                'io_read_kbs': '1',
+                'io_write_kbs': '2',
+            }
+            if method == 'VM.get_by_name_label':
+                return ['vm_ref']
+            elif method == 'VM.get_VIFs':
+                return ['vif_ref']
+            elif method == 'VIF.get_record':
+                return vif_rec
+            elif method == 'VIF.get_metrics':
+                return 'vif_metrics_ref'
+            elif method == 'VIF_metrics.get_record':
+                return vif_metrics_rec
+            else:
+                return None
+
+        session = self.inspector.session
+        with mock.patch.object(session, 'xenapi_request',
+                               side_effect=fake_xenapi_request):
+            interfaces = list(self.inspector.inspect_vnic_rates(fake_instance))
+
+            self.assertEqual(1, len(interfaces))
+            vnic0, info0 = interfaces[0]
+            self.assertEqual('vif_uuid', vnic0.name)
+            self.assertEqual('vif_mac', vnic0.mac)
+            self.assertEqual(1024, info0.rx_bytes_rate)
+            self.assertEqual(2048, info0.tx_bytes_rate)

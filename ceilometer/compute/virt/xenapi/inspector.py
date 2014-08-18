@@ -145,3 +145,25 @@ class XenapiInspector(virt_inspector.Inspector):
         # Stat provided from XenServer is in B, converting it to MB.
         memory = long(metrics_rec['memory_actual']) / units.Mi
         return virt_inspector.MemoryUsageStats(usage=memory)
+
+    def inspect_vnic_rates(self, instance, duration=None):
+        instance_name = util.instance_name(instance)
+        vm_ref = self._lookup_by_name(instance_name)
+        vif_refs = self._call_xenapi("VM.get_VIFs", vm_ref)
+        if vif_refs:
+            for vif_ref in vif_refs:
+                vif_rec = self._call_xenapi("VIF.get_record", vif_ref)
+                vif_metrics_ref = self._call_xenapi(
+                    "VIF.get_metrics", vif_ref)
+                vif_metrics_rec = self._call_xenapi(
+                    "VIF_metrics.get_record", vif_metrics_ref)
+
+                interface = virt_inspector.Interface(
+                    name=vif_rec['uuid'],
+                    mac=vif_rec['MAC'],
+                    fref=None,
+                    parameters=None)
+                rx_rate = float(vif_metrics_rec['io_read_kbs']) * units.Ki
+                tx_rate = float(vif_metrics_rec['io_write_kbs']) * units.Ki
+                stats = virt_inspector.InterfaceRateStats(rx_rate, tx_rate)
+                yield (interface, stats)
