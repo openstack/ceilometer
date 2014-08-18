@@ -17,6 +17,7 @@
 
 from eventlet import timeout
 from oslo.config import cfg
+from oslo.utils import units
 try:
     import XenAPI as api
 except ImportError:
@@ -134,3 +135,13 @@ class XenapiInspector(virt_inspector.Inspector):
             utils += vcpus_utils.get(str(num))
         utils = utils / int(vcpus_number) * 100
         return virt_inspector.CPUUtilStats(util=utils)
+
+    def inspect_memory_usage(self, instance, duration=None):
+        instance_name = util.instance_name(instance)
+        vm_ref = self._lookup_by_name(instance_name)
+        metrics_ref = self._call_xenapi("VM.get_metrics", vm_ref)
+        metrics_rec = self._call_xenapi("VM_metrics.get_record",
+                                        metrics_ref)
+        # Stat provided from XenServer is in B, converting it to MB.
+        memory = long(metrics_rec['memory_actual']) / units.Mi
+        return virt_inspector.MemoryUsageStats(usage=memory)

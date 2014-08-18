@@ -74,3 +74,28 @@ class TestXenapiInspection(base.BaseTestCase):
                                side_effect=fake_xenapi_request):
             cpu_util_stat = self.inspector.inspect_cpu_util(fake_instance)
             self.assertEqual(fake_stat, cpu_util_stat)
+
+    def test_inspect_memory_usage(self):
+        fake_instance = {'OS-EXT-SRV-ATTR:instance_name': 'fake_instance_name',
+                         'id': 'fake_instance_id'}
+        fake_stat = virt_inspector.MemoryUsageStats(usage=128)
+
+        def fake_xenapi_request(method, args):
+            metrics_rec = {
+                'memory_actual': '134217728',
+            }
+
+            if method == 'VM.get_by_name_label':
+                return ['vm_ref']
+            elif method == 'VM.get_metrics':
+                return 'metrics_ref'
+            elif method == 'VM_metrics.get_record':
+                return metrics_rec
+            else:
+                return None
+
+        session = self.inspector.session
+        with mock.patch.object(session, 'xenapi_request',
+                               side_effect=fake_xenapi_request):
+            memory_stat = self.inspector.inspect_memory_usage(fake_instance)
+            self.assertEqual(fake_stat, memory_stat)
