@@ -75,7 +75,7 @@ def _get_metadata_from_object(instance):
 
 
 def make_sample_from_instance(instance, name, type, unit, volume,
-                              additional_metadata=None):
+                              resource_id=None, additional_metadata=None):
     additional_metadata = additional_metadata or {}
     resource_metadata = _get_metadata_from_object(instance)
     resource_metadata.update(additional_metadata)
@@ -86,7 +86,7 @@ def make_sample_from_instance(instance, name, type, unit, volume,
         volume=volume,
         user_id=instance.user_id,
         project_id=instance.tenant_id,
-        resource_id=instance.id,
+        resource_id=resource_id or instance.id,
         timestamp=timeutils.isotime(),
         resource_metadata=resource_metadata,
     )

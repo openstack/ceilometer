@@ -1,9 +1,11 @@
 #
 # Copyright 2012 eNovance <licensing@enovance.com>
 # Copyright 2012 Red Hat, Inc
-#
+# Copyright 2014 Cisco Systems, Inc
+
 # Author: Julien Danjou <julien@danjou.info>
 # Author: Eoghan Glynn <eglynn@redhat.com>
+# Author: Pradeep Kilambi <pkilambi@cisco.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -25,13 +27,50 @@ from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.tests.compute.pollsters import base
 
 
-class TestDiskPollsters(base.TestPollsterBase):
+class TestBaseDistIO(base.TestPollsterBase):
+
+    TYPE = 'cumulative'
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def _check_get_samples(self, factory, name):
+        pass
+
+    def _check_aggregate_samples(self, factory, name,
+                                 expected_volume,
+                                 expected_device=None):
+        match = self._check_get_samples(factory, name)
+        self.assertEqual(expected_volume, match[0].volume)
+        self.assertEqual(self.TYPE, match[0].type)
+        self.assertEqual(expected_device,
+                         match[0].resource_metadata.get('device'))
+        self.assertEqual(self.instance.id, match[0].resource_id)
+
+    def _check_per_device_samples(self, factory, name,
+                                  expected_volume,
+                                  expected_device=None):
+        match = self._check_get_samples(factory, name, expected_count=2)
+        match_dict = {}
+        for m in match:
+            match_dict[m.resource_id] = m
+        key = "%s-%s" % (self.instance.id, expected_device)
+        self.assertEqual(expected_volume,
+                         match_dict[key].volume)
+        self.assertEqual(self.TYPE, match_dict[key].type)
+
+        self.assertEqual(key, match_dict[key].resource_id)
+
+
+class TestDiskPollsters(TestBaseDistIO):
 
     DISKS = [
-        (virt_inspector.Disk(device='vda'),
+        (virt_inspector.Disk(device='vda1'),
          virt_inspector.DiskStats(read_bytes=1L, read_requests=2L,
                                   write_bytes=3L, write_requests=4L,
-                                  errors=-1L))
+                                  errors=-1L)),
+        (virt_inspector.Disk(device='vda2'),
+         virt_inspector.DiskStats(read_bytes=2L, read_requests=3L,
+                                  write_bytes=5L, write_requests=7L,
+                                  errors=-1L)),
     ]
 
     def setUp(self):
@@ -39,7 +78,7 @@ class TestDiskPollsters(base.TestPollsterBase):
         self.inspector.inspect_disks = mock.Mock(return_value=self.DISKS)
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
-    def _check_get_samples(self, factory, name, expected_volume):
+    def _check_get_samples(self, factory, name, expected_count=1):
         pollster = factory()
 
         mgr = manager.AgentManager()
@@ -48,32 +87,67 @@ class TestDiskPollsters(base.TestPollsterBase):
         self.assertIsNotEmpty(samples)
         self.assertIn(pollster.CACHE_KEY_DISK, cache)
         self.assertIn(self.instance.name, cache[pollster.CACHE_KEY_DISK])
-
         self.assertEqual(set([name]), set([s.name for s in samples]))
 
         match = [s for s in samples if s.name == name]
-        self.assertEqual(len(match), 1, 'missing counter %s' % name)
-        self.assertEqual(expected_volume, match[0].volume)
-        self.assertEqual('cumulative', match[0].type)
+        self.assertEqual(len(match), expected_count,
+                         'missing counter %s' % name)
+        return match
 
     def test_disk_read_requests(self):
-        self._check_get_samples(disk.ReadRequestsPollster,
-                                'disk.read.requests', 2L)
+        self._check_aggregate_samples(disk.ReadRequestsPollster,
+                                      'disk.read.requests', 5L,
+                                      expected_device=['vda1', 'vda2'])
 
     def test_disk_read_bytes(self):
-        self._check_get_samples(disk.ReadBytesPollster,
-                                'disk.read.bytes', 1L)
+        self._check_aggregate_samples(disk.ReadBytesPollster,
+                                      'disk.read.bytes', 3L,
+                                      expected_device=['vda1', 'vda2'])
 
     def test_disk_write_requests(self):
-        self._check_get_samples(disk.WriteRequestsPollster,
-                                'disk.write.requests', 4L)
+        self._check_aggregate_samples(disk.WriteRequestsPollster,
+                                      'disk.write.requests', 11L,
+                                      expected_device=['vda1', 'vda2'])
 
     def test_disk_write_bytes(self):
-        self._check_get_samples(disk.WriteBytesPollster,
-                                'disk.write.bytes', 3L)
+        self._check_aggregate_samples(disk.WriteBytesPollster,
+                                      'disk.write.bytes', 8L,
+                                      expected_device=['vda1', 'vda2'])
+
+    def test_per_disk_read_requests(self):
+        self._check_per_device_samples(disk.PerDeviceReadRequestsPollster,
+                                       'disk.device.read.requests', 2L,
+                                       'vda1')
+        self._check_per_device_samples(disk.PerDeviceReadRequestsPollster,
+                                       'disk.device.read.requests', 3L,
+                                       'vda2')
+
+    def test_per_disk_write_requests(self):
+        self._check_per_device_samples(disk.PerDeviceWriteRequestsPollster,
+                                       'disk.device.write.requests', 4L,
+                                       'vda1')
+        self._check_per_device_samples(disk.PerDeviceWriteRequestsPollster,
+                                       'disk.device.write.requests', 7L,
+                                       'vda2')
+
+    def test_per_disk_read_bytes(self):
+        self._check_per_device_samples(disk.PerDeviceReadBytesPollster,
+                                       'disk.device.read.bytes', 1L,
+                                       'vda1')
+        self._check_per_device_samples(disk.PerDeviceReadBytesPollster,
+                                       'disk.device.read.bytes', 2L,
+                                       'vda2')
+
+    def test_per_disk_write_bytes(self):
+        self._check_per_device_samples(disk.PerDeviceWriteBytesPollster,
+                                       'disk.device.write.bytes', 3L,
+                                       'vda1')
+        self._check_per_device_samples(disk.PerDeviceWriteBytesPollster,
+                                       'disk.device.write.bytes', 5L,
+                                       'vda2')
 
 
-class TestDiskRatePollsters(base.TestPollsterBase):
+class TestDiskRatePollsters(TestBaseDistIO):
 
     DISKS = [
         (virt_inspector.Disk(device='disk1'),
@@ -82,13 +156,15 @@ class TestDiskRatePollsters(base.TestPollsterBase):
         (virt_inspector.Disk(device='disk2'),
          virt_inspector.DiskRateStats(2048, 400, 6144, 800))
     ]
+    TYPE = 'gauge'
 
     def setUp(self):
         super(TestDiskRatePollsters, self).setUp()
         self.inspector.inspect_disk_rates = mock.Mock(return_value=self.DISKS)
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
-    def _check_get_samples(self, factory, sample_name, expected_volume):
+    def _check_get_samples(self, factory, sample_name,
+                           expected_count=1):
         pollster = factory()
 
         mgr = manager.AgentManager()
@@ -102,22 +178,58 @@ class TestDiskRatePollsters(base.TestPollsterBase):
         self.assertEqual(set([sample_name]), set([s.name for s in samples]))
 
         match = [s for s in samples if s.name == sample_name]
-        self.assertEqual(1, len(match), 'missing counter %s' % sample_name)
-        self.assertEqual(expected_volume, match[0].volume)
-        self.assertEqual('gauge', match[0].type)
+        self.assertEqual(expected_count, len(match),
+                         'missing counter %s' % sample_name)
+        return match
 
     def test_disk_read_bytes_rate(self):
-        self._check_get_samples(disk.ReadBytesRatePollster,
-                                'disk.read.bytes.rate', 3072L)
+        self._check_aggregate_samples(disk.ReadBytesRatePollster,
+                                      'disk.read.bytes.rate', 3072L,
+                                      expected_device=['disk1', 'disk2'])
 
     def test_disk_read_requests_rate(self):
-        self._check_get_samples(disk.ReadRequestsRatePollster,
-                                'disk.read.requests.rate', 700L)
+        self._check_aggregate_samples(disk.ReadRequestsRatePollster,
+                                      'disk.read.requests.rate', 700L,
+                                      expected_device=['disk1', 'disk2'])
 
     def test_disk_write_bytes_rate(self):
-        self._check_get_samples(disk.WriteBytesRatePollster,
-                                'disk.write.bytes.rate', 11264L)
+        self._check_aggregate_samples(disk.WriteBytesRatePollster,
+                                      'disk.write.bytes.rate', 11264L,
+                                      expected_device=['disk1', 'disk2'])
 
     def test_disk_write_requests_rate(self):
-        self._check_get_samples(disk.WriteRequestsRatePollster,
-                                'disk.write.requests.rate', 1500L)
+        self._check_aggregate_samples(disk.WriteRequestsRatePollster,
+                                      'disk.write.requests.rate', 1500L,
+                                      expected_device=['disk1', 'disk2'])
+
+    def test_per_disk_read_bytes_rate(self):
+        self._check_per_device_samples(disk.PerDeviceReadBytesRatePollster,
+                                       'disk.device.read.bytes.rate',
+                                       1024L, 'disk1')
+        self._check_per_device_samples(disk.PerDeviceReadBytesRatePollster,
+                                       'disk.device.read.bytes.rate',
+                                       2048L, 'disk2')
+
+    def test_per_disk_read_requests_rate(self):
+        self._check_per_device_samples(disk.PerDeviceReadRequestsRatePollster,
+                                       'disk.device.read.requests.rate',
+                                       300L, 'disk1')
+        self._check_per_device_samples(disk.PerDeviceReadRequestsRatePollster,
+                                       'disk.device.read.requests.rate',
+                                       400L, 'disk2')
+
+    def test_per_disk_write_bytes_rate(self):
+        self._check_per_device_samples(disk.PerDeviceWriteBytesRatePollster,
+                                       'disk.device.write.bytes.rate',
+                                       5120L, 'disk1')
+        self._check_per_device_samples(disk.PerDeviceWriteBytesRatePollster,
+                                       'disk.device.write.bytes.rate', 6144L,
+                                       'disk2')
+
+    def test_per_disk_write_requests_rate(self):
+        self._check_per_device_samples(disk.PerDeviceWriteRequestsRatePollster,
+                                       'disk.device.write.requests.rate', 700L,
+                                       'disk1')
+        self._check_per_device_samples(disk.PerDeviceWriteRequestsRatePollster,
+                                       'disk.device.write.requests.rate', 800L,
+                                       'disk2')
