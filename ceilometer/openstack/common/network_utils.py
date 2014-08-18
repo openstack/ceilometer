@@ -17,12 +17,12 @@
 Network-related utilities and helper functions.
 """
 
+import logging
 import socket
 
 from six.moves.urllib import parse
 
 from ceilometer.openstack.common.gettextutils import _LW
-from ceilometer.openstack.common import log as logging
 
 LOG = logging.getLogger(__name__)
 
