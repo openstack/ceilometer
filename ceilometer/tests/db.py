@@ -23,6 +23,7 @@ import os
 import uuid
 import warnings
 
+import mock
 from oslo.config import fixture as fixture_config
 from oslotest import mockpatch
 import six
@@ -32,6 +33,7 @@ from testtools import testcase
 
 from ceilometer import storage
 from ceilometer.tests import base as test_base
+from ceilometer.tests import mocks
 
 
 class MongoDbManager(fixtures.Fixture):
@@ -71,12 +73,31 @@ class HBaseManager(fixtures.Fixture):
             self.url, 'ceilometer.metering.storage')
         self.alarm_connection = storage.get_connection(
             self.url, 'ceilometer.alarm.storage')
+        # Unique prefix for each test to keep data is distinguished because
+        # all test data is stored in one table
+        data_prefix = str(uuid.uuid4().hex)
+
+        def table(conn, name):
+            return mocks.MockHBaseTable(name, conn, data_prefix)
+
+        # Mock only real HBase connection, MConnection "table" method
+        # stays origin.
+        mock.patch('happybase.Connection.table', new=table).start()
+        # We shouldn't delete data and tables after each test,
+        # because it last for too long.
+        # All tests tables will be deleted in setup-test-env.sh
+        mock.patch("happybase.Connection.disable_table",
+                   new=mock.MagicMock()).start()
+        mock.patch("happybase.Connection.delete_table",
+                   new=mock.MagicMock()).start()
+        mock.patch("happybase.Connection.create_table",
+                   new=mock.MagicMock()).start()
 
     @property
     def url(self):
         return '%s?table_prefix=%s' % (
             self._url,
-            uuid.uuid4().hex
+            os.getenv("CEILOMETER_TEST_HBASE_TABLE_PREFIX", "test")
         )
 
 
@@ -106,7 +127,6 @@ class TestBase(testscenarios.testcase.WithScenarios, test_base.BaseTestCase):
 
     def setUp(self):
         super(TestBase, self).setUp()
-
         engine = urlparse.urlparse(self.db_url).scheme
 
         # NOTE(Alexei_987) Shortcut to skip expensive db setUp
