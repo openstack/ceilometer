@@ -41,8 +41,9 @@ class TestBaseDistIO(base.TestPollsterBase):
         match = self._check_get_samples(factory, name)
         self.assertEqual(expected_volume, match[0].volume)
         self.assertEqual(self.TYPE, match[0].type)
-        self.assertEqual(expected_device,
-                         match[0].resource_metadata.get('device'))
+        if expected_device is not None:
+            self.assertEqual(set(expected_device),
+                             set(match[0].resource_metadata.get('device')))
         self.assertEqual(self.instance.id, match[0].resource_id)
 
     def _check_per_device_samples(self, factory, name,
