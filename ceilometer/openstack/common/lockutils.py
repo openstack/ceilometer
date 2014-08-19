@@ -15,8 +15,8 @@
 
 import contextlib
 import errno
-import fcntl
 import functools
+import logging
 import os
 import shutil
 import subprocess
@@ -30,7 +30,6 @@ from oslo.config import cfg
 
 from ceilometer.openstack.common import fileutils
 from ceilometer.openstack.common.gettextutils import _, _LE, _LI
-from ceilometer.openstack.common import log as logging
 
 
 LOG = logging.getLogger(__name__)
@@ -102,10 +101,8 @@ class _FileLock(object):
                     raise threading.ThreadError(_("Unable to acquire lock on"
                                                   " `%(filename)s` due to"
                                                   " %(exception)s") %
-                                                {
-                                                    'filename': self.fname,
-                                                    'exception': e,
-                                                })
+                                                {'filename': self.fname,
+                                                    'exception': e})
 
     def __enter__(self):
         self.acquire()
@@ -195,7 +192,9 @@ if os.name == 'nt':
     FileLock = _WindowsLock
 else:
     import base64
+    import fcntl
     import hashlib
+
     import posix_ipc
     InterProcessLock = _PosixLock
     FileLock = _FcntlLock

@@ -25,7 +25,7 @@ from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common.middleware import base
 
 
-#default request size is 112k
+# default request size is 112k
 max_req_body_size = cfg.IntOpt('max_request_body_size',
                                deprecated_name='osapi_max_request_body_size',
                                default=114688,
