@@ -18,17 +18,17 @@ import datetime
 
 import fixtures
 import mock
+from oslotest import base
+from oslotest import mockpatch
 import wsme
 
 from ceilometer.api.controllers import v2 as api
-from ceilometer.openstack.common.fixture import mockpatch
-from ceilometer.openstack.common import test
 from ceilometer.openstack.common import timeutils
 from ceilometer import storage
 from ceilometer.tests import base as tests_base
 
 
-class TestQuery(test.BaseTestCase):
+class TestQuery(base.BaseTestCase):
     def setUp(self):
         super(TestQuery, self).setUp()
         self.useFixture(fixtures.MonkeyPatch(
@@ -143,7 +143,7 @@ class TestQuery(test.BaseTestCase):
         self.assertEqual(expected, query._get_value_as_type())
 
 
-class TestValidateGroupByFields(test.BaseTestCase):
+class TestValidateGroupByFields(base.BaseTestCase):
 
     def test_valid_field(self):
         result = api._validate_groupby_fields(['user_id'])

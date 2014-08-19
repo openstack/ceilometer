@@ -18,13 +18,13 @@ Tests for VMware Vsphere inspector.
 
 import mock
 from oslo.vmware import api
+from oslotest import base
 
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.compute.virt.vmware import inspector as vsphere_inspector
-from ceilometer.openstack.common import test
 
 
-class TestVsphereInspection(test.BaseTestCase):
+class TestVsphereInspection(base.BaseTestCase):
 
     def setUp(self):
         api_session = api.VMwareAPISession("test_server", "test_user",

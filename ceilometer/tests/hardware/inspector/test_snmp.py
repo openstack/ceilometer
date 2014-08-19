@@ -16,9 +16,9 @@
 # under the License.
 """Tests for ceilometer/hardware/inspector/snmp/inspector.py
 """
+from oslotest import mockpatch
 
 from ceilometer.hardware.inspector import snmp
-from ceilometer.openstack.common.fixture import mockpatch
 from ceilometer.openstack.common import network_utils
 from ceilometer.tests import base as test_base
 from ceilometer.tests.hardware.inspector import base

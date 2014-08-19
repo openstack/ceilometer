@@ -16,13 +16,13 @@
 # under the License.
 
 import mock
+from oslo.config import fixture as fixture_config
+from oslotest import base
+from oslotest import mockpatch
 
 from ceilometer.central import manager
 from ceilometer.image import glance
 from ceilometer.openstack.common import context
-from ceilometer.openstack.common.fixture import config
-from ceilometer.openstack.common.fixture import mockpatch
-from ceilometer.openstack.common import test
 
 IMAGE_LIST = [
     type('Image', (object,),
@@ -121,7 +121,7 @@ class TestManager(manager.AgentManager):
         self.keystone = mock.Mock()
 
 
-class TestImagePollsterPageSize(test.BaseTestCase):
+class TestImagePollsterPageSize(base.BaseTestCase):
 
     def fake_get_glance_client(self, ksclient):
         glanceclient = FakeGlanceClient()
@@ -136,7 +136,7 @@ class TestImagePollsterPageSize(test.BaseTestCase):
         self.useFixture(mockpatch.PatchObject(
             glance._Base, 'get_glance_client',
             side_effect=self.fake_get_glance_client))
-        self.CONF = self.useFixture(config.Config()).conf
+        self.CONF = self.useFixture(fixture_config.Config()).conf
 
     def _do_test_iter_images(self, page_size=0):
         self.CONF.set_override("glance_page_size", page_size)
@@ -159,7 +159,7 @@ class TestImagePollsterPageSize(test.BaseTestCase):
         self._do_test_iter_images(-1)
 
 
-class TestImagePollster(test.BaseTestCase):
+class TestImagePollster(base.BaseTestCase):
 
     def fake_get_glance_client(self, ksclient):
         glanceclient = _BaseObject()

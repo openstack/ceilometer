@@ -18,8 +18,8 @@
 # under the License.
 
 import mock
+from oslotest import mockpatch
 
-from ceilometer.openstack.common.fixture import mockpatch
 import ceilometer.tests.base as base
 
 

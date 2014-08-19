@@ -1,5 +1,5 @@
 #
-# Copyright 2013 eNovance
+# Copyright 2013-2014 eNovance
 #
 # Author: Julien Danjou <julien@danjou.info>
 #
@@ -14,11 +14,10 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
 import mock
+from oslo.config import fixture as fixture_config
 
 from ceilometer import middleware
-from ceilometer.openstack.common.fixture import config
 from ceilometer.tests import base
 
 
@@ -72,7 +71,7 @@ class TestNotifications(base.BaseTestCase):
 
     def setUp(self):
         super(TestNotifications, self).setUp()
-        self.CONF = self.useFixture(config.Config()).conf
+        self.CONF = self.useFixture(fixture_config.Config()).conf
         self.setup_messaging(self.CONF)
 
     def test_process_request_notification(self):

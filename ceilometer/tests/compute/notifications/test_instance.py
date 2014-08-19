@@ -19,9 +19,9 @@
 """Tests for converters for producing compute counter messages from
 notification events.
 """
+from oslotest import base
 
 from ceilometer.compute.notifications import instance
-from ceilometer.openstack.common import test
 from ceilometer import sample
 
 
@@ -593,7 +593,7 @@ INSTANCE_SCHEDULED = {
 }
 
 
-class TestNotifications(test.BaseTestCase):
+class TestNotifications(base.BaseTestCase):
 
     def test_process_notification(self):
         info = list(instance.Instance(None).process_notification(

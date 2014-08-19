@@ -18,16 +18,16 @@
 import datetime
 
 import mock
+from oslotest import base
 import sqlalchemy
 from sqlalchemy.dialects.mysql import DECIMAL
 from sqlalchemy.types import NUMERIC
 
-from ceilometer.openstack.common import test
 from ceilometer.storage.sqlalchemy import models
 from ceilometer import utils
 
 
-class PreciseTimestampTest(test.BaseTestCase):
+class PreciseTimestampTest(base.BaseTestCase):
 
     @staticmethod
     def fake_dialect(name):

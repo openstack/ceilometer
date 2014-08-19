@@ -18,10 +18,10 @@
 """
 import contextlib
 import mock
+from oslo.config import fixture as fixture_config
 from stevedore import extension
 
 from ceilometer.alarm import service
-from ceilometer.openstack.common.fixture import config
 from ceilometer.tests import base as tests_base
 
 
@@ -31,7 +31,7 @@ class TestPartitionedAlarmService(tests_base.BaseTestCase):
 
         self.threshold_eval = mock.Mock()
         self.api_client = mock.MagicMock()
-        self.CONF = self.useFixture(config.Config()).conf
+        self.CONF = self.useFixture(fixture_config.Config()).conf
 
         self.CONF.set_override('host',
                                'fake_host')

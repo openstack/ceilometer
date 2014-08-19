@@ -16,9 +16,9 @@ import datetime
 
 import mock
 from oslo.config import cfg
+from oslotest import base
 
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import test
 from ceilometer.orchestration import notifications
 from ceilometer import sample
 
@@ -88,7 +88,7 @@ def stack_notification_for(operation, use_trust=None):
     }
 
 
-class TestNotification(test.BaseTestCase):
+class TestNotification(base.BaseTestCase):
 
     def _verify_common_sample(self, s, name, volume):
         self.assertIsNotNone(s)

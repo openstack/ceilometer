@@ -1,5 +1,5 @@
 #
-# Copyright 2013 eNovance
+# Copyright 2013-2014 eNovance
 #
 # Author: Julien Danjou <julien@danjou.info>
 #
@@ -17,13 +17,13 @@
 
 import anyjson
 import mock
+from oslo.config import fixture as fixture_config
+from oslotest import mockpatch
 import requests
 import six.moves.urllib.parse as urlparse
 
 from ceilometer.alarm import service
 from ceilometer.openstack.common import context
-from ceilometer.openstack.common.fixture import config
-from ceilometer.openstack.common.fixture import mockpatch
 from ceilometer.tests import base as tests_base
 
 
@@ -44,7 +44,7 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
 
     def setUp(self):
         super(TestAlarmNotifier, self).setUp()
-        self.CONF = self.useFixture(config.Config()).conf
+        self.CONF = self.useFixture(fixture_config.Config()).conf
         self.setup_messaging(self.CONF)
         self.service = service.AlarmNotifierService()
         self.useFixture(mockpatch.Patch(

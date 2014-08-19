@@ -12,12 +12,12 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+from oslotest import base
 
 from ceilometer.network.statistics import driver
-from ceilometer.openstack.common import test
 
 
-class TestDriver(test.BaseTestCase):
+class TestDriver(base.BaseTestCase):
 
     def test_driver_ok(self):
 

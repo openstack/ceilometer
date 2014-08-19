@@ -17,8 +17,9 @@
 
 import datetime
 
+from oslotest import base as testbase
+
 from ceilometer.alarm.storage import models as alarm_models
-from ceilometer.openstack.common import test
 from ceilometer.storage import base
 from ceilometer.storage import models
 
@@ -28,7 +29,7 @@ class FakeModel(base.Model):
         base.Model.__init__(self, arg1=arg1, arg2=arg2)
 
 
-class ModelTest(test.BaseTestCase):
+class ModelTest(testbase.BaseTestCase):
 
     def test_create_attributes(self):
         m = FakeModel(1, 2)
@@ -89,7 +90,7 @@ class ModelTest(test.BaseTestCase):
                          set(alarm_models.AlarmChange.get_field_names()))
 
 
-class TestTraitModel(test.BaseTestCase):
+class TestTraitModel(testbase.BaseTestCase):
 
     def test_convert_value(self):
         v = models.Trait.convert_value(

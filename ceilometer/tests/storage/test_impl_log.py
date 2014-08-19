@@ -16,12 +16,12 @@
 # under the License.
 """Tests for ceilometer/storage/impl_log.py
 """
+from oslotest import base
 
-from ceilometer.openstack.common import test
 from ceilometer.storage import impl_log
 
 
-class ConnectionTest(test.BaseTestCase):
+class ConnectionTest(base.BaseTestCase):
     def test_get_connection(self):
         conn = impl_log.Connection(None)
         conn.record_metering_data({'counter_name': 'test',

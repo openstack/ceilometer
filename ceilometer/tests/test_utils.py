@@ -21,11 +21,12 @@
 import datetime
 import decimal
 
-from ceilometer.openstack.common import test
+from oslotest import base
+
 from ceilometer import utils
 
 
-class TestUtils(test.BaseTestCase):
+class TestUtils(base.BaseTestCase):
 
     def test_datetime_to_decimal(self):
         expected = 1356093296.12

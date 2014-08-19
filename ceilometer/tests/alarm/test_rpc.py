@@ -1,5 +1,5 @@
 #
-# Copyright 2013 eNovance <licensing@enovance.com>
+# Copyright 2013-2014 eNovance <licensing@enovance.com>
 #
 # Authors: Mehdi Abaakouk <mehdi.abaakouk@enovance.com>
 #
@@ -19,12 +19,12 @@ import uuid
 
 from ceilometerclient.v2 import alarms
 import eventlet
+from oslo.config import fixture as fixture_config
 import six
 
 from ceilometer.alarm import rpc as rpc_alarm
 from ceilometer.alarm.storage import models
 from ceilometer import messaging
-from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import timeutils
 from ceilometer.tests import base as tests_base
 
@@ -48,7 +48,7 @@ class FakeNotifier(object):
 class TestRPCAlarmNotifier(tests_base.BaseTestCase):
     def setUp(self):
         super(TestRPCAlarmNotifier, self).setUp()
-        self.CONF = self.useFixture(config.Config()).conf
+        self.CONF = self.useFixture(fixture_config.Config()).conf
         self.setup_messaging(self.CONF)
 
         self.notifier_server = FakeNotifier(self.transport)
@@ -169,7 +169,7 @@ class FakeCoordinator(object):
 class TestRPCAlarmPartitionCoordination(tests_base.BaseTestCase):
     def setUp(self):
         super(TestRPCAlarmPartitionCoordination, self).setUp()
-        self.CONF = self.useFixture(config.Config()).conf
+        self.CONF = self.useFixture(fixture_config.Config()).conf
         self.setup_messaging(self.CONF)
 
         self.coordinator_server = FakeCoordinator(self.transport)

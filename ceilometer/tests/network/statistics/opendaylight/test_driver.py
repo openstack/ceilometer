@@ -15,16 +15,16 @@
 import abc
 
 import mock
+from oslotest import base
 import six
 from six import moves
 from six.moves.urllib import parse as url_parse
 
 from ceilometer.network.statistics.opendaylight import driver
-from ceilometer.openstack.common import test
 
 
 @six.add_metaclass(abc.ABCMeta)
-class _Base(test.BaseTestCase):
+class _Base(base.BaseTestCase):
 
     @abc.abstractproperty
     def flow_data(self):

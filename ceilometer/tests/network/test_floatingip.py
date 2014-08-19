@@ -20,14 +20,14 @@
 # under the License.
 
 import mock
+from oslotest import base
 
 from ceilometer.central import manager
 from ceilometer.network import floatingip
 from ceilometer.openstack.common import context
-from ceilometer.openstack.common import test
 
 
-class TestFloatingIPPollster(test.BaseTestCase):
+class TestFloatingIPPollster(base.BaseTestCase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):

@@ -17,17 +17,17 @@
 """Tests for ceilometer.alarm.service.SingletonAlarmService.
 """
 import mock
+from oslo.config import fixture as fixture_config
 from stevedore import extension
 
 from ceilometer.alarm import service
-from ceilometer.openstack.common.fixture import config
 from ceilometer.tests import base as tests_base
 
 
 class TestSingletonAlarmService(tests_base.BaseTestCase):
     def setUp(self):
         super(TestSingletonAlarmService, self).setUp()
-        self.CONF = self.useFixture(config.Config()).conf
+        self.CONF = self.useFixture(fixture_config.Config()).conf
         self.setup_messaging(self.CONF)
 
         self.threshold_eval = mock.Mock()

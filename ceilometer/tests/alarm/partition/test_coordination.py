@@ -21,11 +21,11 @@ import logging
 import uuid
 
 import mock
+from oslo.config import fixture as fixture_config
 from six import moves
 
 from ceilometer.alarm.partition import coordination
 from ceilometer.alarm.storage import models
-from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import timeutils
 from ceilometer.tests import base as tests_base
 
@@ -51,7 +51,7 @@ class MockLoggingHandler(logging.Handler):
 class TestCoordinate(tests_base.BaseTestCase):
     def setUp(self):
         super(TestCoordinate, self).setUp()
-        self.CONF = self.useFixture(config.Config()).conf
+        self.CONF = self.useFixture(fixture_config.Config()).conf
         self.setup_messaging(self.CONF)
 
         self.test_interval = 120

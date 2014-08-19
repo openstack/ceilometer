@@ -18,13 +18,13 @@
 # under the License.
 """Tests for ceilometer/publisher/utils.py
 """
+from oslotest import base
 
 from ceilometer.openstack.common import jsonutils
-from ceilometer.openstack.common import test
 from ceilometer.publisher import utils
 
 
-class TestSignature(test.BaseTestCase):
+class TestSignature(base.BaseTestCase):
     def test_compute_signature_change_key(self):
         sig1 = utils.compute_signature({'a': 'A', 'b': 'B'},
                                        'not-so-secret')

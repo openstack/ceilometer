@@ -18,10 +18,10 @@
 """
 
 from oslo.config import cfg
+from oslo.config import fixture as fixture_config
 import pecan
 import pecan.testing
 
-from ceilometer.openstack.common.fixture import config
 from ceilometer.tests import db as db_test_base
 
 OPT_GROUP_NAME = 'keystone_authtoken'
@@ -40,7 +40,7 @@ class FunctionalTest(db_test_base.TestBase):
 
     def setUp(self):
         super(FunctionalTest, self).setUp()
-        self.CONF = self.useFixture(config.Config()).conf
+        self.CONF = self.useFixture(fixture_config.Config()).conf
         self.setup_messaging(self.CONF)
 
         self.CONF.set_override("auth_version", "v2.0",

@@ -13,18 +13,17 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
+from oslo.config import fixture as fixture_config
 import oslo.messaging
+from oslotest import base
 
 from ceilometer import messaging
-from ceilometer.openstack.common.fixture import config
-from ceilometer.openstack.common import test
 
 
-class MessagingTests(test.BaseTestCase):
+class MessagingTests(base.BaseTestCase):
     def setUp(self):
         super(MessagingTests, self).setUp()
-        self.CONF = self.useFixture(config.Config()).conf
+        self.CONF = self.useFixture(fixture_config.Config()).conf
         self.useFixture(oslo.messaging.conffixture.ConfFixture(self.CONF))
 
     def test_get_transport_invalid_url(self):

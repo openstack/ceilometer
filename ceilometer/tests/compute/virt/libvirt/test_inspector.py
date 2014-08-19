@@ -22,13 +22,13 @@ import contextlib
 
 import fixtures
 import mock
+from oslotest import base
 
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.compute.virt.libvirt import inspector as libvirt_inspector
-from ceilometer.openstack.common import test
 
 
-class TestLibvirtInspection(test.BaseTestCase):
+class TestLibvirtInspection(base.BaseTestCase):
 
     def setUp(self):
         super(TestLibvirtInspection, self).setUp()
@@ -246,7 +246,7 @@ class TestLibvirtInspection(test.BaseTestCase):
             self.assertEqual(disks, [])
 
 
-class TestLibvirtInspectionWithError(test.BaseTestCase):
+class TestLibvirtInspectionWithError(base.BaseTestCase):
 
     class fakeLibvirtError(Exception):
         pass

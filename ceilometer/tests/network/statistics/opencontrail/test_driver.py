@@ -15,13 +15,13 @@
 # under the License.
 
 import mock
+from oslotest import base
 from six.moves.urllib import parse as urlparse
 
 from ceilometer.network.statistics.opencontrail import driver
-from ceilometer.openstack.common import test
 
 
-class TestOpencontrailDriver(test.BaseTestCase):
+class TestOpencontrailDriver(base.BaseTestCase):
 
     def setUp(self):
         super(TestOpencontrailDriver, self).setUp()

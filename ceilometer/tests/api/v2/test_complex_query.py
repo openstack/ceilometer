@@ -21,11 +21,11 @@ import datetime
 import fixtures
 import jsonschema
 import mock
+from oslotest import base
 import wsme
 
 from ceilometer.alarm.storage import models as alarm_models
 from ceilometer.api.controllers import v2 as api
-from ceilometer.openstack.common import test
 from ceilometer.storage import models
 
 
@@ -46,7 +46,7 @@ sample_name_mapping = {"resource": "resource_id",
                        "volume": "counter_volume"}
 
 
-class TestComplexQuery(test.BaseTestCase):
+class TestComplexQuery(base.BaseTestCase):
     def setUp(self):
         super(TestComplexQuery, self).setUp()
         self.useFixture(fixtures.MonkeyPatch(
@@ -234,7 +234,7 @@ class TestComplexQuery(test.BaseTestCase):
                           orderby)
 
 
-class TestFilterSyntaxValidation(test.BaseTestCase):
+class TestFilterSyntaxValidation(base.BaseTestCase):
     def setUp(self):
         super(TestFilterSyntaxValidation, self).setUp()
         self.query = FakeComplexQuery(models.Sample,

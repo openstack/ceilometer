@@ -13,16 +13,16 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import mock
+from oslotest import base
 from requests import auth as req_auth
 import six
 from six.moves.urllib import parse as urlparse
 
 from ceilometer.network.statistics.opendaylight import client
 from ceilometer.openstack.common.gettextutils import _
-from ceilometer.openstack.common import test
 
 
-class TestClientHTTPBasicAuth(test.BaseTestCase):
+class TestClientHTTPBasicAuth(base.BaseTestCase):
 
     auth_way = 'basic'
     scheme = 'http'

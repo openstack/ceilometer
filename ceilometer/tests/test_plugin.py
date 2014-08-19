@@ -16,9 +16,9 @@
 # under the License.
 
 import mock
+from oslo.config import fixture as fixture_config
+from oslotest import base
 
-from ceilometer.openstack.common.fixture import config
-from ceilometer.openstack.common import test
 from ceilometer import plugin
 
 
@@ -72,10 +72,10 @@ TEST_NOTIFICATION = {
 }
 
 
-class NotificationBaseTestCase(test.BaseTestCase):
+class NotificationBaseTestCase(base.BaseTestCase):
     def setUp(self):
         super(NotificationBaseTestCase, self).setUp()
-        self.CONF = self.useFixture(config.Config()).conf
+        self.CONF = self.useFixture(fixture_config.Config()).conf
 
     def test_handle_event_type(self):
         self.assertFalse(plugin.NotificationBase._handle_event_type(

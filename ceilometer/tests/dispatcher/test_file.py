@@ -18,17 +18,18 @@ import logging.handlers
 import os
 import tempfile
 
+from oslo.config import fixture as fixture_config
+from oslotest import base
+
 from ceilometer.dispatcher import file
-from ceilometer.openstack.common.fixture import config
-from ceilometer.openstack.common import test
 from ceilometer.publisher import utils
 
 
-class TestDispatcherFile(test.BaseTestCase):
+class TestDispatcherFile(base.BaseTestCase):
 
     def setUp(self):
         super(TestDispatcherFile, self).setUp()
-        self.CONF = self.useFixture(config.Config()).conf
+        self.CONF = self.useFixture(fixture_config.Config()).conf
 
     def test_file_dispatcher_with_all_config(self):
         # Create a temporaryFile to get a file name

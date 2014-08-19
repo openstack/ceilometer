@@ -13,10 +13,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from ceilometer.openstack.common import test
+from oslotest import base
 
 
-class _PollsterTestBase(test.BaseTestCase):
+class _PollsterTestBase(base.BaseTestCase):
 
     def _test_pollster(self, pollster_class, meter_name,
                        meter_type, meter_unit):

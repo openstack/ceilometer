@@ -21,12 +21,12 @@ import datetime
 
 import eventlet
 import mock
+from oslo.config import fixture as fixture_config
 import oslo.messaging
 import oslo.messaging._drivers.common
 
 from ceilometer import messaging
 from ceilometer.openstack.common import context
-from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import network_utils
 from ceilometer.publisher import rpc
 from ceilometer import sample
@@ -94,7 +94,7 @@ class TestPublish(tests_base.BaseTestCase):
 
     def setUp(self):
         super(TestPublish, self).setUp()
-        self.CONF = self.useFixture(config.Config()).conf
+        self.CONF = self.useFixture(fixture_config.Config()).conf
         self.setup_messaging(self.CONF)
         self.published = []
 

@@ -17,18 +17,18 @@
 import datetime
 
 import mock
+from oslo.config import fixture as fixture_config
+from oslotest import base
 
 from ceilometer.dispatcher import database
-from ceilometer.openstack.common.fixture import config
-from ceilometer.openstack.common import test
 from ceilometer.publisher import utils
 
 
-class TestDispatcherDB(test.BaseTestCase):
+class TestDispatcherDB(base.BaseTestCase):
 
     def setUp(self):
         super(TestDispatcherDB, self).setUp()
-        self.CONF = self.useFixture(config.Config()).conf
+        self.CONF = self.useFixture(fixture_config.Config()).conf
         self.CONF.set_override('connection', 'sqlite://', group='database')
         self.dispatcher = database.DatabaseDispatcher(self.CONF)
         self.ctx = None

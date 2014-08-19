@@ -22,11 +22,11 @@ import datetime
 import traceback
 
 import mock
+from oslotest import base
+from oslotest import mockpatch
 import six
 from stevedore import extension
 
-from ceilometer.openstack.common.fixture import mockpatch
-from ceilometer.openstack.common import test
 from ceilometer.openstack.common import timeutils
 from ceilometer import pipeline
 from ceilometer import publisher
@@ -39,7 +39,7 @@ from ceilometer.transformer import conversions
 
 
 @six.add_metaclass(abc.ABCMeta)
-class BasePipelineTestCase(test.BaseTestCase):
+class BasePipelineTestCase(base.BaseTestCase):
     def fake_tem_init(self):
         """Fake a transformerManager for pipeline.
 

@@ -22,7 +22,8 @@ import contextlib
 import datetime
 
 import mock
-
+from oslotest import base
+from oslotest import moxstubout
 from stevedore import extension
 
 ## NOTE(dhellmann): These imports are not in the generally approved
@@ -46,12 +47,6 @@ from nova.openstack.common import log as logging
 # sure it is defined.
 config.cfg.CONF.import_opt('compute_manager', 'nova.service')
 
-# HACK(jd) Import this first because of the second HACK below, and because
-# of Nova not having these module yet as of this writing
-from ceilometer.openstack.common import test
-from ceilometer.openstack.common.fixture import config
-from ceilometer.openstack.common.fixture import moxstubout
-
 # HACK(dhellmann): Import this before any other ceilometer code
 # because the notifier module messes with the import path to force
 # nova's version of oslo to be used instead of ceilometer's.
@@ -64,7 +59,7 @@ LOG = logging.getLogger(__name__)
 nova_CONF = config.cfg.CONF
 
 
-class TestNovaNotifier(test.BaseTestCase):
+class TestNovaNotifier(base.BaseTestCase):
 
     class Pollster(object):
         instances = []

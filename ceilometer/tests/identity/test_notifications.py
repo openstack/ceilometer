@@ -13,9 +13,9 @@
 import datetime
 
 import mock
+from oslotest import base
 
 from ceilometer.identity import notifications
-from ceilometer.openstack.common import test
 from ceilometer import sample
 
 
@@ -80,7 +80,7 @@ def authn_notification_for(outcome):
     }
 
 
-class TestCRUDNotification(test.BaseTestCase):
+class TestCRUDNotification(base.BaseTestCase):
 
     def _verify_common_sample(self, s):
         self.assertIsNotNone(s)
@@ -148,7 +148,7 @@ class TestCRUDNotification(test.BaseTestCase):
         self._test_operation('trust', 'deleted', TRUST_ID, notifications.Trust)
 
 
-class TestAuthenticationNotification(test.BaseTestCase):
+class TestAuthenticationNotification(base.BaseTestCase):
 
     def _verify_common_sample(self, s):
         self.assertIsNotNone(s)

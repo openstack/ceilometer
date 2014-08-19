@@ -19,15 +19,15 @@ import socket
 
 import mock
 import msgpack
+from oslo.config import fixture as fixture_config
 import oslo.messaging
+from oslotest import mockpatch
 from stevedore import extension
 
 from ceilometer import collector
 from ceilometer import dispatcher
 from ceilometer import messaging
 from ceilometer.openstack.common import context
-from ceilometer.openstack.common.fixture import config
-from ceilometer.openstack.common.fixture import mockpatch
 from ceilometer.openstack.common import timeutils
 from ceilometer.publisher import utils
 from ceilometer import sample
@@ -42,7 +42,7 @@ class FakeConnection():
 class TestCollector(tests_base.BaseTestCase):
     def setUp(self):
         super(TestCollector, self).setUp()
-        self.CONF = self.useFixture(config.Config()).conf
+        self.CONF = self.useFixture(fixture_config.Config()).conf
         self.CONF.import_opt("connection",
                              "ceilometer.openstack.common.db.options",
                              group="database")

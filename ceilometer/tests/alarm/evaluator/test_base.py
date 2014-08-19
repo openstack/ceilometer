@@ -18,13 +18,13 @@
 """
 import datetime
 import mock
+from oslotest import base
 
 from ceilometer.alarm import evaluator
-from ceilometer.openstack.common import test
 from ceilometer.openstack.common import timeutils
 
 
-class TestEvaluatorBaseClass(test.BaseTestCase):
+class TestEvaluatorBaseClass(base.BaseTestCase):
     def setUp(self):
         super(TestEvaluatorBaseClass, self).setUp()
         self.called = False

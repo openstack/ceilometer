@@ -25,11 +25,11 @@ import copy
 import datetime
 
 import mock
+from oslo.config import fixture as fixture_config
+from oslotest import mockpatch
 import six
 from stevedore import extension
 
-from ceilometer.openstack.common.fixture import config
-from ceilometer.openstack.common.fixture import mockpatch
 from ceilometer import pipeline
 from ceilometer import plugin
 from ceilometer import publisher
@@ -231,7 +231,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
             'publishers': ["test"],
         }, ]
         self.setup_pipeline()
-        self.CONF = self.useFixture(config.Config()).conf
+        self.CONF = self.useFixture(fixture_config.Config()).conf
         self.CONF.set_override(
             'pipeline_cfg_file',
             self.path_get('etc/ceilometer/pipeline.yaml')
