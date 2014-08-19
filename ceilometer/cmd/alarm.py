@@ -24,8 +24,12 @@ from ceilometer import service
 
 
 OPTS = [
-    cfg.StrOpt('evaluation_service', default='singleton',
-               help='Driver to use for alarm evaluation service.'),
+    cfg.StrOpt('evaluation_service', default='default',
+               help='Driver to use for alarm evaluation service. DEPRECATED: '
+                    '"singleton" and "partitioned" alarm evaluator '
+                    'services will be removed in Kilo in favour of the '
+                    'default alarm evaluation service using tooz for '
+                    'partitioning.'),
 ]
 
 cfg.CONF.register_opts(OPTS, group='alarm')
