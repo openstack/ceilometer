@@ -18,12 +18,12 @@ import datetime
 
 import fixtures
 import mock
+from oslo.utils import timeutils
 from oslotest import base
 from oslotest import mockpatch
 import wsme
 
 from ceilometer.api.controllers import v2 as api
-from ceilometer.openstack.common import timeutils
 from ceilometer import storage
 from ceilometer.tests import base as tests_base
 

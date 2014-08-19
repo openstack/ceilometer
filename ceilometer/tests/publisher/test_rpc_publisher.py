@@ -24,10 +24,10 @@ import mock
 from oslo.config import fixture as fixture_config
 import oslo.messaging
 import oslo.messaging._drivers.common
+from oslo.utils import netutils
 
 from ceilometer import messaging
 from ceilometer.openstack.common import context
-from ceilometer.openstack.common import network_utils
 from ceilometer.publisher import rpc
 from ceilometer import sample
 from ceilometer.tests import base as tests_base
@@ -100,7 +100,7 @@ class TestPublish(tests_base.BaseTestCase):
 
     def test_published_no_mock(self):
         publisher = rpc.RPCPublisher(
-            network_utils.urlsplit('rpc://'))
+            netutils.urlsplit('rpc://'))
 
         endpoint = mock.MagicMock(['record_metering_data'])
         collector = messaging.get_rpc_server(
@@ -127,7 +127,7 @@ class TestPublish(tests_base.BaseTestCase):
 
     def test_publish_target(self):
         publisher = rpc.RPCPublisher(
-            network_utils.urlsplit('rpc://?target=custom_procedure_call'))
+            netutils.urlsplit('rpc://?target=custom_procedure_call'))
         cast_context = mock.MagicMock()
         with mock.patch.object(publisher.rpc_client, 'prepare') as prepare:
             prepare.return_value = cast_context
@@ -141,7 +141,7 @@ class TestPublish(tests_base.BaseTestCase):
 
     def test_published_with_per_meter_topic(self):
         publisher = rpc.RPCPublisher(
-            network_utils.urlsplit('rpc://?per_meter_topic=1'))
+            netutils.urlsplit('rpc://?per_meter_topic=1'))
         with mock.patch.object(publisher.rpc_client, 'prepare') as prepare:
             publisher.publish_samples(mock.MagicMock(),
                                       self.test_data)
@@ -169,7 +169,7 @@ class TestPublish(tests_base.BaseTestCase):
     def test_published_concurrency(self):
         """Test concurrent access to the local queue of the rpc publisher."""
 
-        publisher = rpc.RPCPublisher(network_utils.urlsplit('rpc://'))
+        publisher = rpc.RPCPublisher(netutils.urlsplit('rpc://'))
         cast_context = mock.MagicMock()
 
         with mock.patch.object(publisher.rpc_client, 'prepare') as prepare:
@@ -199,7 +199,7 @@ class TestPublish(tests_base.BaseTestCase):
     @mock.patch('ceilometer.publisher.rpc.LOG')
     def test_published_with_no_policy(self, mylog):
         publisher = rpc.RPCPublisher(
-            network_utils.urlsplit('rpc://'))
+            netutils.urlsplit('rpc://'))
         side_effect = oslo.messaging._drivers.common.RPCException()
         with mock.patch.object(publisher.rpc_client, 'prepare') as prepare:
             prepare.side_effect = side_effect
@@ -217,7 +217,7 @@ class TestPublish(tests_base.BaseTestCase):
     @mock.patch('ceilometer.publisher.rpc.LOG')
     def test_published_with_policy_block(self, mylog):
         publisher = rpc.RPCPublisher(
-            network_utils.urlsplit('rpc://?policy=default'))
+            netutils.urlsplit('rpc://?policy=default'))
         side_effect = oslo.messaging._drivers.common.RPCException()
         with mock.patch.object(publisher.rpc_client, 'prepare') as prepare:
             prepare.side_effect = side_effect
@@ -233,7 +233,7 @@ class TestPublish(tests_base.BaseTestCase):
     @mock.patch('ceilometer.publisher.rpc.LOG')
     def test_published_with_policy_incorrect(self, mylog):
         publisher = rpc.RPCPublisher(
-            network_utils.urlsplit('rpc://?policy=notexist'))
+            netutils.urlsplit('rpc://?policy=notexist'))
         side_effect = oslo.messaging._drivers.common.RPCException()
         with mock.patch.object(publisher.rpc_client, 'prepare') as prepare:
             prepare.side_effect = side_effect
@@ -249,7 +249,7 @@ class TestPublish(tests_base.BaseTestCase):
 
     def test_published_with_policy_drop_and_rpc_down(self):
         publisher = rpc.RPCPublisher(
-            network_utils.urlsplit('rpc://?policy=drop'))
+            netutils.urlsplit('rpc://?policy=drop'))
         side_effect = oslo.messaging._drivers.common.RPCException()
         with mock.patch.object(publisher.rpc_client, 'prepare') as prepare:
             prepare.side_effect = side_effect
@@ -261,7 +261,7 @@ class TestPublish(tests_base.BaseTestCase):
 
     def test_published_with_policy_queue_and_rpc_down(self):
         publisher = rpc.RPCPublisher(
-            network_utils.urlsplit('rpc://?policy=queue'))
+            netutils.urlsplit('rpc://?policy=queue'))
         side_effect = oslo.messaging._drivers.common.RPCException()
         with mock.patch.object(publisher.rpc_client, 'prepare') as prepare:
             prepare.side_effect = side_effect
@@ -275,7 +275,7 @@ class TestPublish(tests_base.BaseTestCase):
     def test_published_with_policy_queue_and_rpc_down_up(self):
         self.rpc_unreachable = True
         publisher = rpc.RPCPublisher(
-            network_utils.urlsplit('rpc://?policy=queue'))
+            netutils.urlsplit('rpc://?policy=queue'))
 
         side_effect = oslo.messaging._drivers.common.RPCException()
         with mock.patch.object(publisher.rpc_client, 'prepare') as prepare:
@@ -299,7 +299,7 @@ class TestPublish(tests_base.BaseTestCase):
 
     def test_published_with_policy_sized_queue_and_rpc_down(self):
         publisher = rpc.RPCPublisher(
-            network_utils.urlsplit('rpc://?policy=queue&max_queue_length=3'))
+            netutils.urlsplit('rpc://?policy=queue&max_queue_length=3'))
 
         side_effect = oslo.messaging._drivers.common.RPCException()
         with mock.patch.object(publisher.rpc_client, 'prepare') as prepare:
@@ -326,7 +326,7 @@ class TestPublish(tests_base.BaseTestCase):
 
     def test_published_with_policy_default_sized_queue_and_rpc_down(self):
         publisher = rpc.RPCPublisher(
-            network_utils.urlsplit('rpc://?policy=queue'))
+            netutils.urlsplit('rpc://?policy=queue'))
 
         side_effect = oslo.messaging._drivers.common.RPCException()
         with mock.patch.object(publisher.rpc_client, 'prepare') as prepare:

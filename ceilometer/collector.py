@@ -19,13 +19,13 @@ import socket
 
 import msgpack
 from oslo.config import cfg
+from oslo.utils import units
 
 from ceilometer import dispatcher
 from ceilometer import messaging
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import service as os_service
-from ceilometer.openstack.common import units
 
 OPTS = [
     cfg.StrOpt('udp_address',

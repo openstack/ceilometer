@@ -41,9 +41,10 @@ before "proxy-server" and add the following filter in the file:
 
 from __future__ import absolute_import
 
+from oslo.utils import timeutils
+
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import timeutils
 from ceilometer import pipeline
 from ceilometer import sample
 from ceilometer import service

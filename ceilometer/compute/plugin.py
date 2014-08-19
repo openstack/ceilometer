@@ -18,9 +18,10 @@
 """
 
 import abc
+
+from oslo.utils import timeutils
 import six
 
-from ceilometer.openstack.common import timeutils
 from ceilometer import plugin
 
 

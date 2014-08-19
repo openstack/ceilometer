@@ -15,11 +15,11 @@
 
 import datetime
 
+from oslo.utils import timeutils
 from oslotest import base
 
 from ceilometer.network import statistics
 from ceilometer.network.statistics import driver
-from ceilometer.openstack.common import timeutils
 from ceilometer import sample
 
 

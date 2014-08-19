@@ -29,9 +29,9 @@ import eventlet
 # oslo.messaging use threading.local
 eventlet.monkey_patch(socket=True, select=True, thread=True)
 from oslo.config import cfg
+from oslo.utils import timeutils
 
 from ceilometer.openstack.common import context
-from ceilometer.openstack.common import timeutils
 from ceilometer import pipeline
 from ceilometer import sample
 from ceilometer import service

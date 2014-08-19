@@ -16,10 +16,10 @@
 # under the License.
 """Tests for ceilometer/hardware/inspector/snmp/inspector.py
 """
+from oslo.utils import netutils
 from oslotest import mockpatch
 
 from ceilometer.hardware.inspector import snmp
-from ceilometer.openstack.common import network_utils
 from ceilometer.tests import base as test_base
 from ceilometer.tests.hardware.inspector import base
 
@@ -250,7 +250,7 @@ class TestSNMPInspector(Base, test_base.BaseTestCase):
     def setUp(self):
         super(TestSNMPInspector, self).setUp()
         self.inspector = snmp.SNMPInspector()
-        self.host = network_utils.urlsplit("snmp://localhost")
+        self.host = netutils.urlsplit("snmp://localhost")
         self.inspector.MAPPING = self.mapping
         self.useFixture(mockpatch.PatchObject(
             self.inspector._cmdGen, 'getCmd', new=faux_getCmd))

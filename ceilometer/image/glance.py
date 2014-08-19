@@ -22,9 +22,9 @@ import itertools
 
 import glanceclient
 from oslo.config import cfg
+from oslo.utils import timeutils
 
 from ceilometer.central import plugin
-from ceilometer.openstack.common import timeutils
 from ceilometer import sample
 
 

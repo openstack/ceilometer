@@ -16,13 +16,13 @@ import datetime
 import os
 
 import happybase
+from oslo.utils import netutils
 from six.moves.urllib import parse as urlparse
 
 from ceilometer.alarm.storage import base
 from ceilometer.alarm.storage import models
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import network_utils
 from ceilometer.storage.hbase import inmemory as hbase_inmemory
 from ceilometer.storage.hbase import utils as hbase_utils
 from ceilometer import utils
@@ -140,7 +140,7 @@ class Connection(base.Connection):
           database name, so we are not looking for these in the url.
         """
         opts = {}
-        result = network_utils.urlsplit(url)
+        result = netutils.urlsplit(url)
         opts['table_prefix'] = urlparse.parse_qs(
             result.query).get('table_prefix', [None])[0]
         opts['dbtype'] = result.scheme

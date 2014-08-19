@@ -19,6 +19,7 @@ pbr>=0.6,!=0.7,<1.0
 pecan>=0.5.0
 posix_ipc
 oslo.messaging>=1.3.0
+oslo.utils>=0.2.0
 pysnmp>=4.2.1,<5.0.0
 python-ceilometerclient>=1.0.6
 python-glanceclient>=0.13.1

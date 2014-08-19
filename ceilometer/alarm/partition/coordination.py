@@ -19,10 +19,11 @@ import math
 import random
 import uuid
 
+from oslo.utils import timeutils
+
 from ceilometer.alarm import rpc as rpc_alarm
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import timeutils
 
 
 LOG = log.getLogger(__name__)

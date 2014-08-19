@@ -21,11 +21,11 @@ import mock
 import pytz
 import uuid
 
+from oslo.utils import timeutils
 from six import moves
 
 from ceilometer.alarm.evaluator import threshold
 from ceilometer.alarm.storage import models
-from ceilometer.openstack.common import timeutils
 from ceilometer.tests.alarm.evaluator import base
 from ceilometerclient import exc
 from ceilometerclient.v2 import statistics

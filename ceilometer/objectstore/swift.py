@@ -21,13 +21,13 @@ from __future__ import absolute_import
 
 from keystoneclient import exceptions
 from oslo.config import cfg
+from oslo.utils import timeutils
 import six.moves.urllib.parse as urlparse
 from swiftclient import client as swift
 
 from ceilometer.central import plugin
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import timeutils
 from ceilometer import sample
 
 

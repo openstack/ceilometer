@@ -24,10 +24,9 @@ import datetime
 import decimal
 import multiprocessing
 
+from oslo.utils import timeutils
+from oslo.utils import units
 import six
-
-from ceilometer.openstack.common import timeutils
-from ceilometer.openstack.common import units
 
 
 def recursive_keypairs(d, separator=':'):

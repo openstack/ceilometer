@@ -22,11 +22,11 @@ import uuid
 
 import mock
 from oslo.config import fixture as fixture_config
+from oslo.utils import timeutils
 from six import moves
 
 from ceilometer.alarm.partition import coordination
 from ceilometer.alarm.storage import models
-from ceilometer.openstack.common import timeutils
 from ceilometer.tests import base as tests_base
 
 

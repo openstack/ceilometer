@@ -22,10 +22,10 @@ import socket
 
 import msgpack
 from oslo.config import cfg
+from oslo.utils import netutils
 
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import network_utils
 from ceilometer import publisher
 from ceilometer.publisher import utils
 
@@ -37,7 +37,7 @@ LOG = log.getLogger(__name__)
 
 class UDPPublisher(publisher.PublisherBase):
     def __init__(self, parsed_url):
-        self.host, self.port = network_utils.parse_host_port(
+        self.host, self.port = netutils.parse_host_port(
             parsed_url.netloc,
             default_port=cfg.CONF.collector.udp_port)
         self.socket = socket.socket(socket.AF_INET,

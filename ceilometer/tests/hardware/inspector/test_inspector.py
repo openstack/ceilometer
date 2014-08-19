@@ -14,20 +14,20 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+from oslo.utils import netutils
 
 from ceilometer.hardware import inspector
-from ceilometer.openstack.common import network_utils
 from ceilometer.tests import base
 
 
 class TestHardwareInspector(base.BaseTestCase):
     def test_get_inspector(self):
-        url = network_utils.urlsplit("snmp://")
+        url = netutils.urlsplit("snmp://")
         driver = inspector.get_inspector(url)
         self.assertTrue(driver)
 
     def test_get_inspector_illegal(self):
-        url = network_utils.urlsplit("illegal://")
+        url = netutils.urlsplit("illegal://")
         self.assertRaises(RuntimeError,
                           inspector.get_inspector,
                           url)

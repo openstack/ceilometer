@@ -37,6 +37,8 @@ import pytz
 import uuid
 
 from oslo.config import cfg
+from oslo.utils import strutils
+from oslo.utils import timeutils
 import pecan
 from pecan import rest
 import six
@@ -50,8 +52,6 @@ from ceilometer import messaging
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import strutils
-from ceilometer.openstack.common import timeutils
 from ceilometer import sample
 from ceilometer import storage
 from ceilometer import utils

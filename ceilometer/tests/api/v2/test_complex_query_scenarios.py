@@ -20,8 +20,9 @@
 
 import datetime
 
+from oslo.utils import timeutils
+
 from ceilometer.alarm.storage import models
-from ceilometer.openstack.common import timeutils
 from ceilometer.publisher import utils
 from ceilometer import sample
 from ceilometer.tests.api import v2 as tests_api

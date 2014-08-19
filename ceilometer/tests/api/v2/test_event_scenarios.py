@@ -16,7 +16,8 @@
 
 import datetime
 
-from ceilometer.openstack.common import timeutils
+from oslo.utils import timeutils
+
 from ceilometer.storage import models
 from ceilometer.tests.api import v2
 from ceilometer.tests import db as tests_db

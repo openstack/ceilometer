@@ -22,12 +22,12 @@ import datetime
 import traceback
 
 import mock
+from oslo.utils import timeutils
 from oslotest import base
 from oslotest import mockpatch
 import six
 from stevedore import extension
 
-from ceilometer.openstack.common import timeutils
 from ceilometer import pipeline
 from ceilometer import publisher
 from ceilometer.publisher import test as test_publisher

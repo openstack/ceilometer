@@ -30,11 +30,11 @@ import uuid
 import bson.code
 import bson.objectid
 from oslo.config import cfg
+from oslo.utils import timeutils
 import pymongo
 import six
 
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import timeutils
 from ceilometer import storage
 from ceilometer.storage import base
 from ceilometer.storage import models

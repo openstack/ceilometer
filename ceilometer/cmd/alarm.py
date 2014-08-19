@@ -15,9 +15,9 @@
 # under the License.
 
 from oslo.config import cfg
+from oslo.utils import importutils
 
 from ceilometer.alarm import service as alarm_service
-from ceilometer.openstack.common import importutils
 from ceilometer.openstack.common import service as os_service
 from ceilometer import service
 

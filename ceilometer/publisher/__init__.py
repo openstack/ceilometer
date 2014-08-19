@@ -1,6 +1,6 @@
 #
 # Copyright 2013 Intel Corp.
-# Copyright 2013 eNovance
+# Copyright 2013-2014 eNovance
 #
 # Author: Yunhong Jiang <yunhong.jiang@intel.com>
 #         Julien Danjou <julien@danjou.info>
@@ -19,10 +19,9 @@
 
 import abc
 
+from oslo.utils import netutils
 import six
 from stevedore import driver
-
-from ceilometer.openstack.common import network_utils
 
 
 def get_publisher(url, namespace='ceilometer.publisher'):
@@ -31,7 +30,7 @@ def get_publisher(url, namespace='ceilometer.publisher'):
     :param URL: URL for the publisher
     :param namespace: Namespace to use to look for drivers.
     """
-    parse_result = network_utils.urlsplit(url)
+    parse_result = netutils.urlsplit(url)
     loaded_driver = driver.DriverManager(namespace, parse_result.scheme)
     return loaded_driver.driver(parse_result)
 

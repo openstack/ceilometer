@@ -20,12 +20,12 @@ import uuid
 from ceilometerclient.v2 import alarms
 import eventlet
 from oslo.config import fixture as fixture_config
+from oslo.utils import timeutils
 import six
 
 from ceilometer.alarm import rpc as rpc_alarm
 from ceilometer.alarm.storage import models
 from ceilometer import messaging
-from ceilometer.openstack.common import timeutils
 from ceilometer.tests import base as tests_base
 
 

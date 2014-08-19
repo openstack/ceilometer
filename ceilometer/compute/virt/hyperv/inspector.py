@@ -17,11 +17,11 @@
 """Implementation of Inspector abstraction for Hyper-V"""
 
 from oslo.config import cfg
+from oslo.utils import units
 
 from ceilometer.compute.virt.hyperv import utilsv2
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import units
 
 CONF = cfg.CONF
 LOG = log.getLogger(__name__)

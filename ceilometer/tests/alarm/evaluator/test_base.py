@@ -17,11 +17,12 @@
 """class for tests in ceilometer/alarm/evaluator/__init__.py
 """
 import datetime
+
 import mock
+from oslo.utils import timeutils
 from oslotest import base
 
 from ceilometer.alarm import evaluator
-from ceilometer.openstack.common import timeutils
 
 
 class TestEvaluatorBaseClass(base.BaseTestCase):

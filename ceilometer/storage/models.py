@@ -16,8 +16,8 @@
 # under the License.
 """Model classes for use in the storage API.
 """
+from oslo.utils import timeutils
 
-from ceilometer.openstack.common import timeutils
 from ceilometer.storage import base
 
 
