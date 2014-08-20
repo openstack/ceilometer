@@ -26,7 +26,7 @@ LOG = log.getLogger(__name__)
 
 
 class DatabaseDispatcher(dispatcher.Base):
-    '''Dispatcher class for recording metering data into database.
+    """Dispatcher class for recording metering data into database.
 
     The dispatcher class which records each meter into a database configured
     in ceilometer configuration file.
@@ -35,7 +35,7 @@ class DatabaseDispatcher(dispatcher.Base):
     ceilometer.conf file
 
     dispatchers = database
-    '''
+    """
     def __init__(self, conf):
         super(DatabaseDispatcher, self).__init__(conf)
         self.storage_conn = storage.get_connection_from_config(conf)
