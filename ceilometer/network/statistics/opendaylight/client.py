@@ -188,8 +188,7 @@ class Client():
 
     def _log_req(self, url):
 
-        curl_command = ['REQ: curl -i -X GET ']
-        curl_command.append('"%s" ' % (url))
+        curl_command = ['REQ: curl -i -X GET ', '"%s" ' % (url)]
 
         if 'auth' in self._req_params:
             auth_class = self._req_params['auth']
@@ -209,10 +208,9 @@ class Client():
     @staticmethod
     def _log_res(resp):
 
-        dump = ['RES: \n']
-        dump.append('HTTP %.1f %s %s\n' % (resp.raw.version,
-                                           resp.status_code,
-                                           resp.reason))
+        dump = ['RES: \n', 'HTTP %.1f %s %s\n' % (resp.raw.version,
+                                                  resp.status_code,
+                                                  resp.reason)]
         dump.extend('%s: %s\n' % (k, v)
                     for k, v in six.iteritems(resp.headers))
         dump.append('\n')
