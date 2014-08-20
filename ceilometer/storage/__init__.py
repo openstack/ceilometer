@@ -84,7 +84,10 @@ def get_connection_from_config(conf, purpose=None):
 
 def get_connection(url, namespace):
     """Return an open connection to the database."""
-    engine_name = urlparse.urlparse(url).scheme
+    connection_scheme = urlparse.urlparse(url).scheme
+    # SqlAlchemy connections specify may specify a 'dialect' or
+    # 'dialect+driver'. Handle the case where driver is specified.
+    engine_name = connection_scheme.split('+')[0]
     LOG.debug(_('looking for %(name)r driver in %(namespace)r') % (
               {'name': engine_name, 'namespace': namespace}))
     mgr = driver.DriverManager(namespace, engine_name)

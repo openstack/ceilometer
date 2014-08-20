@@ -23,6 +23,7 @@ from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import test
 from ceilometer import storage
 from ceilometer.storage import impl_log
+from ceilometer.storage import impl_sqlalchemy
 
 import six
 
@@ -64,5 +65,15 @@ class ConnectionConfigTest(test.BaseTestCase):
         self.assertIsInstance(conn, impl_log.Connection)
         conn = storage.get_connection_from_config(self.CONF, 'metering')
         self.assertIsInstance(conn, impl_log.Connection)
+        conn = storage.get_connection_from_config(self.CONF, 'alarm')
+        self.assertIsInstance(conn, impl_sqlalchemy_alarm.Connection)
+
+    def test_sqlalchemy_driver(self):
+        self.CONF.set_override("connection", "sqlite+pysqlite://",
+                               group="database")
+        conn = storage.get_connection_from_config(self.CONF)
+        self.assertIsInstance(conn, impl_sqlalchemy.Connection)
+        conn = storage.get_connection_from_config(self.CONF, 'metering')
+        self.assertIsInstance(conn, impl_sqlalchemy.Connection)
         conn = storage.get_connection_from_config(self.CONF, 'alarm')
         self.assertIsInstance(conn, impl_sqlalchemy_alarm.Connection)
