@@ -22,8 +22,7 @@
 class Connection(object):
     """Base class for alarm storage system connections."""
 
-    """A dictionary representing the capabilities of this driver.
-    """
+    # A dictionary representing the capabilities of this driver.
     CAPABILITIES = {
         'alarms': {'query': {'simple': False,
                              'complex': False},
