@@ -38,9 +38,9 @@ class DataProcessing(plugin.NotificationBase):
     @property
     def event_types(self):
         return [
-            '%s.create' % (self.resource_name),
-            '%s.update' % (self.resource_name),
-            '%s.delete' % (self.resource_name),
+            '%s.create' % self.resource_name,
+            '%s.update' % self.resource_name,
+            '%s.delete' % self.resource_name,
         ]
 
     @staticmethod

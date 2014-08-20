@@ -692,7 +692,7 @@ class Connection(base.Connection):
 
         # Note: we don't flush here, explicitly (unless a new trait or event
         # does it). Otherwise, just wait until all the Events are staged.
-        return (event, new_traits)
+        return event, new_traits
 
     def record_events(self, event_models):
         """Write the events to SQL database via sqlalchemy.

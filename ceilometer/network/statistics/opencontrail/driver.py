@@ -137,16 +137,16 @@ class OpencontrailDriver(driver.Driver):
 
     @staticmethod
     def _switch_port_receive_packets(statistic, resource_id, resource_meta):
-        return (int(statistic['in_pkts']), resource_id, resource_meta)
+        return int(statistic['in_pkts']), resource_id, resource_meta
 
     @staticmethod
     def _switch_port_transmit_packets(statistic, resource_id, resource_meta):
-        return (int(statistic['out_pkts']), resource_id, resource_meta)
+        return int(statistic['out_pkts']), resource_id, resource_meta
 
     @staticmethod
     def _switch_port_receive_bytes(statistic, resource_id, resource_meta):
-        return (int(statistic['in_bytes']), resource_id, resource_meta)
+        return int(statistic['in_bytes']), resource_id, resource_meta
 
     @staticmethod
     def _switch_port_transmit_bytes(statistic, resource_id, resource_meta):
-        return (int(statistic['out_bytes']), resource_id, resource_meta)
+        return int(statistic['out_bytes']), resource_id, resource_meta

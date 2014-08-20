@@ -227,5 +227,5 @@ def get_hypervisor_inspector():
                                    invoke_on_load=True)
         return mgr.driver
     except ImportError as e:
-        LOG.error(_("Unable to load the hypervisor inspector: %s") % (e))
+        LOG.error(_("Unable to load the hypervisor inspector: %s") % e)
         return Inspector()

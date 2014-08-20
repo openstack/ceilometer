@@ -202,14 +202,14 @@ def faux_getCmd(authData, transportTarget, oid):
     try:
         return GETCMD_MAP[oid]
     except KeyError:
-        return ("faux_getCmd Error", None, 0, [])
+        return "faux_getCmd Error", None, 0, []
 
 
 def faux_nextCmd(authData, transportTarget, oid):
     try:
         return NEXTCMD_MAP[oid]
     except KeyError:
-        return ("faux_nextCmd Error", None, 0, [])
+        return "faux_nextCmd Error", None, 0, []
 
 
 def faux_getCmd_new(authData, transportTarget, *oids, **kwargs):

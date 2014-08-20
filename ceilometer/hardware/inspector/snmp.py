@@ -51,7 +51,7 @@ def parse_snmp_return(ret, is_bulk=False):
     else:
         err = False
         data = varBinds
-    return (err, data)
+    return err, data
 
 
 EXACT = 'type_exact'

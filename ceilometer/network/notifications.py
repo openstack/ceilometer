@@ -50,9 +50,9 @@ class NetworkNotificationBase(plugin.NotificationBase):
             # there is no resource id assigned by Neutron yet. So we ignore
             # the *.create.start notification for now and only listen the
             # *.create.end to make sure the resource id is existed.
-            '%s.create.end' % (self.resource_name),
-            '%s.update.*' % (self.resource_name),
-            '%s.exists' % (self.resource_name),
+            '%s.create.end' % self.resource_name,
+            '%s.update.*' % self.resource_name,
+            '%s.exists' % self.resource_name,
             # FIXME(dhellmann): Neutron delete notifications do
             # not include the same metadata as the other messages,
             # so we ignore them for now. This isn't ideal, since

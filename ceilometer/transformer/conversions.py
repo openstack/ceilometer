@@ -92,7 +92,7 @@ class ScalingTransformer(transformer.TransformerBase):
     def handle_sample(self, context, s):
         """Handle a sample, converting if necessary."""
         LOG.debug(_('handling sample %s'), (s,))
-        if (self.source.get('unit', s.unit) == s.unit):
+        if self.source.get('unit', s.unit) == s.unit:
             s = self._convert(s)
             LOG.debug(_('converted to: %s'), (s,))
         return s
