@@ -173,6 +173,14 @@ To find out more about supported storage backends please take a look on the
 Event Conversion
 ================
 
+[notification] configuration section switches on events storing.
+
+==================================  ======================================  ==============================================================
+Parameter                           Default                                 Note
+==================================  ======================================  ==============================================================
+store_events                        False                                   Boolean variable that switch on/off events storing
+==================================  ======================================  ==============================================================
+
 The following options in the [event] configuration section affect the extraction of Event data from notifications.
 
 ==================================  ======================================  ==============================================================
