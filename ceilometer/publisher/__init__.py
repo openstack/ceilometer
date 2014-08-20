@@ -45,4 +45,4 @@ class PublisherBase(object):
 
     @abc.abstractmethod
     def publish_samples(self, context, samples):
-        "Publish samples into final conduit."
+        """Publish samples into final conduit."""

@@ -37,19 +37,19 @@ class TestBase(test.BaseTestCase):
     def test_subclass_ng(self):
 
         class NgSubclass1(statistics._Base):
-            '''meter_name is lost.'''
+            """meter_name is lost."""
 
             meter_type = sample.TYPE_GAUGE
             meter_unit = 'B'
 
         class NgSubclass2(statistics._Base):
-            '''meter_type is lost.'''
+            """meter_type is lost."""
 
             meter_name = 'foo'
             meter_unit = 'B'
 
         class NgSubclass3(statistics._Base):
-            '''meter_unit is lost.'''
+            """meter_unit is lost."""
 
             meter_name = 'foo'
             meter_type = sample.TYPE_GAUGE

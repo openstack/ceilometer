@@ -32,15 +32,15 @@ class _Base(plugin.CentralPollster):
 
     @abc.abstractproperty
     def meter_name(self):
-        '''Return a Meter Name.'''
+        """Return a Meter Name."""
 
     @abc.abstractproperty
     def meter_type(self):
-        '''Return a Meter Type.'''
+        """Return a Meter Type."""
 
     @abc.abstractproperty
     def meter_unit(self):
-        '''Return a Meter Unit.'''
+        """Return a Meter Unit."""
 
     @staticmethod
     def _parse_my_resource(resource):

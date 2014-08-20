@@ -38,7 +38,7 @@ cfg.CONF.register_opts(file_dispatcher_opts, group="dispatcher_file")
 
 
 class FileDispatcher(dispatcher.Base):
-    '''Dispatcher class for recording metering data to a file.
+    """Dispatcher class for recording metering data to a file.
 
     The dispatcher class which logs each meter into a file configured in
     ceilometer configuration file. An example configuration may look like the
@@ -52,7 +52,7 @@ class FileDispatcher(dispatcher.Base):
 
     [collector]
     dispatchers = file
-    '''
+    """
 
     def __init__(self, conf):
         super(FileDispatcher, self).__init__(conf)
