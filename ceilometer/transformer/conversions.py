@@ -143,10 +143,10 @@ class RateOfChangeTransformer(ScalingTransformer):
 
 
 class AggregatorTransformer(ScalingTransformer):
-    """Transformer that aggregate sample.
+    """Transformer that aggregates samples.
 
-    Aggregation goes until a threshold or/and a retention_time, and then flush
-    them out in the wild.
+    Aggregation goes until a threshold or/and a retention_time, and then
+    flushes them out into the wild.
 
     Example:
       To aggregate sample by resource_metadata and keep the
