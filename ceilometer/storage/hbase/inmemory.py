@@ -214,8 +214,12 @@ class MTable(object):
         """
         op = args[0]
         value = args[1]
+        is_regex = False
         if value.startswith('binaryprefix:'):
             value = value[len('binaryprefix:'):]
+        if value.startswith('regexstring:'):
+            value = value[len('regexstring:'):]
+            is_regex = True
         column = 'f:' + value
         r = {}
         for row in rows:
@@ -226,7 +230,8 @@ class MTable(object):
                         (op == '>=' and key >= column) or
                         (op == '<=' and key <= column) or
                         (op == '>' and key > column) or
-                        (op == '<' and key < column)):
+                        (op == '<' and key < column) or
+                        (is_regex and re.search(value, key))):
                     r_data[key] = data[key]
                 else:
                     raise ceilometer.NotImplementedError(

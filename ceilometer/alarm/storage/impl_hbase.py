@@ -25,6 +25,7 @@ from ceilometer.alarm.storage import models
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.storage.hbase import inmemory as hbase_inmemory
+from ceilometer.storage.hbase import migration as hbase_migration
 from ceilometer.storage.hbase import utils as hbase_utils
 from ceilometer import utils
 
@@ -102,6 +103,7 @@ class Connection(base.Connection):
         column_families = {'f': dict()}
         with self.conn_pool.connection() as conn:
             hbase_utils.create_tables(conn, tables, column_families)
+            hbase_migration.migrate_tables(conn, tables)
 
     def clear(self):
         LOG.debug(_('Dropping HBase schema...'))

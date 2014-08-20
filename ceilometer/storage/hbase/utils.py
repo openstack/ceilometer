@@ -18,6 +18,7 @@ import json
 
 import bson.json_util
 from happybase.hbase import ttypes
+import six
 
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
@@ -319,6 +320,20 @@ def format_meter_reference(c_name, c_type, c_unit, rts, source):
     return "%s+%s+%s!%s!%s" % (rts, source, c_name, c_type, c_unit)
 
 
+def prepare_key(*args):
+    """Prepares names for rows and columns with correct separator.
+
+    :param args: strings or numbers that we want our key construct of
+    :return: key with quoted args that are separated with character ":"
+    """
+    key_quote = []
+    for key in args:
+        if isinstance(key, int):
+            key = str(key)
+        key_quote.append(quote(key))
+    return ":".join(key_quote)
+
+
 def timestamp_from_record_tuple(record):
     """Extract timestamp from HBase tuple record."""
     return record[0]['timestamp']
@@ -439,3 +454,22 @@ def create_tables(conn, tables, column_families):
             LOG.warn(_("Cannot create table %(table_name)s   "
                        "it already exists. Ignoring error")
                      % {'table_name': table})
+
+
+def quote(s, *args):
+    """Return quoted string even if it is unicode one.
+
+    :param s: string that should be quoted
+    :param args: any symbol we want to stay unquoted
+    """
+    s_en = s.encode('utf8')
+    return six.moves.urllib.parse.quote(s_en, *args)
+
+
+def unquote(s):
+    """Return unquoted and decoded string.
+
+    :param s: string that should be unquoted
+    """
+    s_de = six.moves.urllib.parse.unquote(s)
+    return s_de.decode('utf8')
