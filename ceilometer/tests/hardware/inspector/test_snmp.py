@@ -190,6 +190,14 @@ NEXTCMD_MAP = {
 }
 
 
+class FakeObjectName(object):
+    def __init__(self, name):
+        self.name = name
+
+    def prettyPrint(self):
+        return str(self.name)
+
+
 def faux_getCmd(authData, transportTarget, oid):
     try:
         return GETCMD_MAP[oid]
@@ -204,11 +212,46 @@ def faux_nextCmd(authData, transportTarget, oid):
         return ("faux_nextCmd Error", None, 0, [])
 
 
+def faux_getCmd_new(authData, transportTarget, *oids, **kwargs):
+    varBinds = [(FakeObjectName(oid),
+                 int(oid.split('.')[-1])) for oid in oids]
+    return (None, None, 0, varBinds)
+
+
+def faux_bulkCmd_new(authData, transportTarget, nonRepeaters, maxRepetitions,
+                     *oids, **kwargs):
+    varBindTable = [
+        [(FakeObjectName(oid + ".%d" % i), i) for i in range(1, 3)]
+        for oid in oids
+    ]
+    return (None, None, 0, varBindTable)
+
+
 class TestSNMPInspector(Base, test_base.BaseTestCase):
+    mapping = {
+        'test_exact': {
+            'matching_type': snmp.EXACT,
+            'metric_oid': ('1.3.6.1.4.1.2021.10.1.3.1', int),
+            'metadata': {
+                'meta': ('1.3.6.1.4.1.2021.10.1.3.8', int)
+            },
+            'post_op': '_fake_post_op',
+        },
+        'test_prefix': {
+            'matching_type': snmp.PREFIX,
+            'metric_oid': ('1.3.6.1.4.1.2021.9.1.8', int),
+            'metadata': {
+                'meta': ('1.3.6.1.4.1.2021.9.1.3', int)
+            },
+            'post_op': None,
+        },
+    }
+
     def setUp(self):
         super(TestSNMPInspector, self).setUp()
         self.inspector = snmp.SNMPInspector()
         self.host = network_utils.urlsplit("snmp://localhost")
+        self.inspector.MAPPING = self.mapping
         self.useFixture(mockpatch.PatchObject(
             self.inspector._cmdGen, 'getCmd', new=faux_getCmd))
         self.useFixture(mockpatch.PatchObject(
@@ -225,3 +268,56 @@ class TestSNMPInspector(Base, test_base.BaseTestCase):
                           get_list,
                           self.inspector.inspect_memory,
                           self.host)
+
+    def _fake_post_op(self, host, cache, meter_def,
+                      value, metadata, extra, suffix):
+        metadata.update(post_op_meta=4)
+        extra.update(project_id=2)
+        return value
+
+    def test_inspect_generic_exact(self):
+        self.useFixture(mockpatch.PatchObject(
+            self.inspector._cmdGen, 'getCmd', new=faux_getCmd_new))
+        self.inspector._fake_post_op = self._fake_post_op
+        cache = {}
+        ret = list(self.inspector.inspect_generic(self.host,
+                                                  'test_exact',
+                                                  cache))
+        keys = cache[ins._CACHE_KEY_OID].keys()
+        self.assertIn('1.3.6.1.4.1.2021.10.1.3.1', keys)
+        self.assertIn('1.3.6.1.4.1.2021.10.1.3.8', keys)
+        self.assertEqual(1, len(ret))
+        self.assertEqual(1, ret[0][0])
+        self.assertEqual(8, ret[0][1]['meta'])
+        self.assertEqual(4, ret[0][1]['post_op_meta'])
+        self.assertEqual(2, ret[0][2]['project_id'])
+
+    def test_inspect_generic_prefix(self):
+        self.useFixture(mockpatch.PatchObject(
+            self.inspector._cmdGen, 'bulkCmd', new=faux_bulkCmd_new))
+        cache = {}
+        ret = list(self.inspector.inspect_generic(self.host,
+                                                  'test_prefix',
+                                                  cache))
+        keys = cache[ins._CACHE_KEY_OID].keys()
+        self.assertIn('1.3.6.1.4.1.2021.9.1.8' + '.1', keys)
+        self.assertIn('1.3.6.1.4.1.2021.9.1.8' + '.2', keys)
+        self.assertIn('1.3.6.1.4.1.2021.9.1.3' + '.1', keys)
+        self.assertIn('1.3.6.1.4.1.2021.9.1.3' + '.2', keys)
+        self.assertEqual(2, len(ret))
+        self.assertIn(ret[0][0], (1, 2))
+        self.assertEqual(ret[0][0], ret[0][1]['meta'])
+
+    def test_post_op_net(self):
+        self.useFixture(mockpatch.PatchObject(
+            self.inspector._cmdGen, 'bulkCmd', new=faux_bulkCmd_new))
+        cache = {}
+        metadata = {}
+        ret = self.inspector._post_op_net(self.host, cache, None,
+                                          value=8,
+                                          metadata=metadata,
+                                          extra={},
+                                          suffix=".2")
+        self.assertEqual(8, ret)
+        self.assertIn('ip', metadata)
+        self.assertIn("2", metadata['ip'])
