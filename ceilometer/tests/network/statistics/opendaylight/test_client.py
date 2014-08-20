@@ -39,10 +39,9 @@ class TestClientHTTPBasicAuth(test.BaseTestCase):
                                  self.parsed_url.netloc,
                                  self.parsed_url.path,
                                  None, None, None))
-        odl_params = {}
-        odl_params['auth'] = self.params.get('auth')[0]
-        odl_params['user'] = self.params.get('user')[0]
-        odl_params['password'] = self.params.get('password')[0]
+        odl_params = {'auth': self.params.get('auth')[0],
+                      'user': self.params.get('user')[0],
+                      'password': self.params.get('password')[0]}
         self.client = client.Client(self.endpoint, odl_params)
 
         self.resp = mock.MagicMock()
