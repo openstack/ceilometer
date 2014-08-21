@@ -96,14 +96,13 @@ class SensorNotification(plugin.NotificationBase):
                                     data)
 
     def _package_payload(self, message, payload):
-        info = {}
-        info['publisher_id'] = message['publisher_id']
-        info['timestamp'] = message['payload']['timestamp']
-        info['event_type'] = message['payload']['event_type']
-        info['user_id'] = message['payload'].get('user_id')
-        info['project_id'] = message['payload'].get('project_id')
         # NOTE(chdent): How much of the payload should we keep?
-        info['payload'] = payload
+        info = {'publisher_id': message['publisher_id'],
+                'timestamp': message['payload']['timestamp'],
+                'event_type': message['payload']['event_type'],
+                'user_id': message['payload'].get('user_id'),
+                'project_id': message['payload'].get('project_id'),
+                'payload': payload}
         return info
 
     def process_notification(self, message):

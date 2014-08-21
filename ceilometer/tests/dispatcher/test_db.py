@@ -53,8 +53,7 @@ class TestDispatcherDB(test.BaseTestCase):
         msg = {'counter_name': 'test',
                'resource_id': self.id(),
                'counter_volume': 1,
-               }
-        msg['message_signature'] = 'invalid-signature'
+               'message_signature': 'invalid-signature'}
 
         class ErrorConnection:
 

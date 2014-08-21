@@ -88,7 +88,6 @@ class TestFloatingIPPollster(test.BaseTestCase):
         self.assertEqual(set(['ip.floating']), set([s.name for s in samples]))
 
     def test_get_samples_cached(self):
-        cache = {}
-        cache['floating_ips'] = self.fake_get_ips()[:2]
+        cache = {'floating_ips': self.fake_get_ips()[:2]}
         samples = list(self.pollster.get_samples(self.manager, cache))
         self.assertEqual(2, len(samples))
