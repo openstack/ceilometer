@@ -126,10 +126,9 @@ class AnalyticsAPIBaseClient(object):
         if not CONF.debug:
             return
 
-        dump = ['RES: \n']
-        dump.append('HTTP %.1f %s %s\n' % (resp.raw.version,
-                                           resp.status_code,
-                                           resp.reason))
+        dump = ['RES: \n', 'HTTP %.1f %s %s\n' % (resp.raw.version,
+                                                  resp.status_code,
+                                                  resp.reason)]
         dump.extend('%s: %s\n' % (k, v)
                     for k, v in six.iteritems(resp.headers))
         dump.append('\n')
