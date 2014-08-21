@@ -41,29 +41,45 @@ before "proxy-server" and add the following filter in the file:
 
 from __future__ import absolute_import
 
-from swift.common import utils
-
-try:
-    # Swift >= 1.7.5
-    import swift.common.swob
-    REQUEST = swift.common.swob
-except ImportError:
-    import webob
-    REQUEST = webob
-
-try:
-    # Swift > 1.7.5 ... module exists but doesn't contain class.
-    InputProxy = utils.InputProxy
-except AttributeError:
-    # Swift <= 1.7.5 ... module exists and has class.
-    from swift.common.middleware import proxy_logging
-    InputProxy = proxy_logging.InputProxy
-
 from ceilometer.openstack.common import context
+from ceilometer.openstack.common import log
 from ceilometer.openstack.common import timeutils
 from ceilometer import pipeline
 from ceilometer import sample
 from ceilometer import service
+
+
+LOG = log.getLogger(__name__)
+
+
+class InputProxy(object):
+    """File-like object that counts bytes read.
+
+    To be swapped in for wsgi.input for accounting purposes.
+    Borrowed from swift.common.utils. Duplidated here to avoid
+    dependency on swift package.
+    """
+    def __init__(self, wsgi_input):
+        self.wsgi_input = wsgi_input
+        self.bytes_received = 0
+
+    def read(self, *args, **kwargs):
+        """Pass read request to the underlying file-like object
+
+        Add bytes read to total.
+        """
+        chunk = self.wsgi_input.read(*args, **kwargs)
+        self.bytes_received += len(chunk)
+        return chunk
+
+    def readline(self, *args, **kwargs):
+        """Pass readline request to the underlying file-like object
+
+        Add bytes read to total.
+        """
+        line = self.wsgi_input.readline(*args, **kwargs)
+        self.bytes_received += len(line)
+        return line
 
 
 class CeilometerMiddleware(object):
@@ -71,7 +87,6 @@ class CeilometerMiddleware(object):
 
     def __init__(self, app, conf):
         self.app = app
-        self.logger = utils.get_logger(conf, log_route='ceilometer')
 
         self.metadata_headers = [h.strip().replace('-', '_').lower()
                                  for h in conf.get(
@@ -116,7 +131,7 @@ class CeilometerMiddleware(object):
                                         input_proxy.bytes_received,
                                         bytes_sent)
                 except Exception:
-                    self.logger.exception('Failed to publish samples')
+                    LOG.exception('Failed to publish samples')
 
         try:
             iterable = self.app(env, my_start_response)
@@ -127,24 +142,37 @@ class CeilometerMiddleware(object):
             return iter_response(iterable)
 
     def publish_sample(self, env, bytes_received, bytes_sent):
-        req = REQUEST.Request(env)
+        path = env['PATH_INFO']
+        method = env['REQUEST_METHOD']
+        headers = dict((header.strip('HTTP_'), env[header]) for header
+                       in env if header.startswith('HTTP_'))
+
         try:
-            version, account, container, obj = utils.split_path(req.path, 2,
-                                                                4, True)
+            container = obj = None
+            version, account, remainder = path.replace(
+                '/', '', 1).split('/', 2)
+            if not version or not account:
+                raise ValueError('Invalid path: %s' % path)
+            if remainder:
+                if '/' in remainder:
+                    container, obj = remainder.split('/', 1)
+                else:
+                    container = remainder
         except ValueError:
             return
+
         now = timeutils.utcnow().isoformat()
 
         resource_metadata = {
-            "path": req.path,
+            "path": path,
             "version": version,
             "container": container,
             "object": obj,
         }
 
         for header in self.metadata_headers:
-            if header.upper() in req.headers:
-                resource_metadata['http_header_%s' % header] = req.headers.get(
+            if header.upper() in headers:
+                resource_metadata['http_header_%s' % header] = headers.get(
                     header.upper())
 
         with self.pipeline_manager.publisher(
@@ -175,7 +203,7 @@ class CeilometerMiddleware(object):
 
             # publish the event for each request
             # request method will be recorded in the metadata
-            resource_metadata['method'] = req.method.lower()
+            resource_metadata['method'] = method.lower()
             publisher([sample.Sample(
                 name='storage.api.request',
                 type=sample.TYPE_DELTA,

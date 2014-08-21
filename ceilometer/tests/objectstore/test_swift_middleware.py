@@ -19,14 +19,6 @@
 import mock
 import six
 
-try:
-    # Swift >= 1.7.5
-    import swift.common.swob
-    REQUEST = swift.common.swob
-except ImportError:
-    import webob
-    REQUEST = webob
-
 from ceilometer.objectstore import swift_middleware
 from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common.fixture import mockpatch
@@ -49,6 +41,27 @@ class FakeApp(object):
             pass
         for line in self.body:
             yield line
+
+
+class FakeRequest(object):
+    """A bare bones request object
+
+    The middleware will inspect this for request method,
+    wsgi.input and headers.
+    """
+
+    def __init__(self, path, environ=None, headers=None):
+        environ = environ or {}
+        headers = headers or {}
+
+        environ['PATH_INFO'] = path
+
+        if 'wsgi.input' not in environ:
+            environ['wsgi.input'] = six.moves.cStringIO('')
+
+        for header, value in headers.iteritems():
+            environ['HTTP_%s' % header.upper()] = value
+        self.environ = environ
 
 
 class TestSwiftMiddleware(tests_base.BaseTestCase):
@@ -86,8 +99,8 @@ class TestSwiftMiddleware(tests_base.BaseTestCase):
 
     def test_get(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(), {})
-        req = REQUEST.Request.blank('/1.0/account/container/obj',
-                                    environ={'REQUEST_METHOD': 'GET'})
+        req = FakeRequest('/1.0/account/container/obj',
+                          environ={'REQUEST_METHOD': 'GET'})
         resp = app(req.environ, self.start_response)
         self.assertEqual(["This string is 28 bytes long"], list(resp))
         samples = self.pipeline_manager.pipelines[0].samples
@@ -106,7 +119,7 @@ class TestSwiftMiddleware(tests_base.BaseTestCase):
 
     def test_put(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(body=['']), {})
-        req = REQUEST.Request.blank(
+        req = FakeRequest(
             '/1.0/account/container/obj',
             environ={'REQUEST_METHOD': 'PUT',
                      'wsgi.input':
@@ -128,7 +141,7 @@ class TestSwiftMiddleware(tests_base.BaseTestCase):
 
     def test_post(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(body=['']), {})
-        req = REQUEST.Request.blank(
+        req = FakeRequest(
             '/1.0/account/container/obj',
             environ={'REQUEST_METHOD': 'POST',
                      'wsgi.input': six.moves.cStringIO('some other stuff')})
@@ -149,8 +162,8 @@ class TestSwiftMiddleware(tests_base.BaseTestCase):
 
     def test_head(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(body=['']), {})
-        req = REQUEST.Request.blank('/1.0/account/container/obj',
-                                    environ={'REQUEST_METHOD': 'HEAD'})
+        req = FakeRequest('/1.0/account/container/obj',
+                          environ={'REQUEST_METHOD': 'HEAD'})
         list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples
         self.assertEqual(1, len(samples))
@@ -166,8 +179,8 @@ class TestSwiftMiddleware(tests_base.BaseTestCase):
     def test_bogus_request(self):
         """Test even for arbitrary request method, this will still work."""
         app = swift_middleware.CeilometerMiddleware(FakeApp(body=['']), {})
-        req = REQUEST.Request.blank('/1.0/account/container/obj',
-                                    environ={'REQUEST_METHOD': 'BOGUS'})
+        req = FakeRequest('/1.0/account/container/obj',
+                          environ={'REQUEST_METHOD': 'BOGUS'})
         list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples
 
@@ -183,8 +196,8 @@ class TestSwiftMiddleware(tests_base.BaseTestCase):
 
     def test_get_container(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(), {})
-        req = REQUEST.Request.blank('/1.0/account/container',
-                                    environ={'REQUEST_METHOD': 'GET'})
+        req = FakeRequest('/1.0/account/container',
+                          environ={'REQUEST_METHOD': 'GET'})
         list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples
         self.assertEqual(2, len(samples))
@@ -196,8 +209,8 @@ class TestSwiftMiddleware(tests_base.BaseTestCase):
 
     def test_no_metadata_headers(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(), {})
-        req = REQUEST.Request.blank('/1.0/account/container',
-                                    environ={'REQUEST_METHOD': 'GET'})
+        req = FakeRequest('/1.0/account/container',
+                          environ={'REQUEST_METHOD': 'GET'})
         list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples
         self.assertEqual(2, len(samples))
@@ -213,10 +226,10 @@ class TestSwiftMiddleware(tests_base.BaseTestCase):
         app = swift_middleware.CeilometerMiddleware(FakeApp(), {
             'metadata_headers': 'X_VAR1, x-var2, x-var3'
         })
-        req = REQUEST.Request.blank('/1.0/account/container',
-                                    environ={'REQUEST_METHOD': 'GET'},
-                                    headers={'X_VAR1': 'value1',
-                                             'X_VAR2': 'value2'})
+        req = FakeRequest('/1.0/account/container',
+                          environ={'REQUEST_METHOD': 'GET'},
+                          headers={'X_VAR1': 'value1',
+                                   'X_VAR2': 'value2'})
         list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples
         self.assertEqual(2, len(samples))
@@ -237,8 +250,8 @@ class TestSwiftMiddleware(tests_base.BaseTestCase):
         app = swift_middleware.CeilometerMiddleware(FakeApp(), {
             'metadata_headers': 'x-var3'
         })
-        req = REQUEST.Request.blank('/1.0/account/container',
-                                    environ={'REQUEST_METHOD': 'GET'})
+        req = FakeRequest('/1.0/account/container',
+                          environ={'REQUEST_METHOD': 'GET'})
         list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples
         self.assertEqual(2, len(samples))
@@ -252,15 +265,15 @@ class TestSwiftMiddleware(tests_base.BaseTestCase):
 
     def test_bogus_path(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(), {})
-        req = REQUEST.Request.blank('/5.0//',
-                                    environ={'REQUEST_METHOD': 'GET'})
+        req = FakeRequest('/5.0//',
+                          environ={'REQUEST_METHOD': 'GET'})
         list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples
         self.assertEqual(0, len(samples))
 
     def test_missing_resource_id(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(), {})
-        req = REQUEST.Request.blank('/v1/', environ={'REQUEST_METHOD': 'GET'})
+        req = FakeRequest('/v1/', environ={'REQUEST_METHOD': 'GET'})
         list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples
         self.assertEqual(0, len(samples))
@@ -270,8 +283,8 @@ class TestSwiftMiddleware(tests_base.BaseTestCase):
     def test_publish_sample_fail(self, mocked_publish_sample):
         mocked_publish_sample.side_effect = Exception("a exception")
         app = swift_middleware.CeilometerMiddleware(FakeApp(body=["test"]), {})
-        req = REQUEST.Request.blank('/1.0/account/container',
-                                    environ={'REQUEST_METHOD': 'GET'})
+        req = FakeRequest('/1.0/account/container',
+                          environ={'REQUEST_METHOD': 'GET'})
         resp = list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples
         self.assertEqual(0, len(samples))
@@ -281,8 +294,8 @@ class TestSwiftMiddleware(tests_base.BaseTestCase):
     def test_reseller_prefix(self):
         # No reseller prefix set: ensure middleware uses AUTH_
         app = swift_middleware.CeilometerMiddleware(FakeApp(), {})
-        req = REQUEST.Request.blank('/1.0/AUTH_account/container/obj',
-                                    environ={'REQUEST_METHOD': 'GET'})
+        req = FakeRequest('/1.0/AUTH_account/container/obj',
+                          environ={'REQUEST_METHOD': 'GET'})
         list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples[0]
         self.assertEqual("account", samples.resource_id)
@@ -290,8 +303,8 @@ class TestSwiftMiddleware(tests_base.BaseTestCase):
         # Custom reseller prefix set
         app = swift_middleware.CeilometerMiddleware(
             FakeApp(), {'reseller_prefix': 'CUSTOM_'})
-        req = REQUEST.Request.blank('/1.0/CUSTOM_account/container/obj',
-                                    environ={'REQUEST_METHOD': 'GET'})
+        req = FakeRequest('/1.0/CUSTOM_account/container/obj',
+                          environ={'REQUEST_METHOD': 'GET'})
         list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples[0]
         self.assertEqual("account", samples.resource_id)
@@ -300,8 +313,8 @@ class TestSwiftMiddleware(tests_base.BaseTestCase):
         # Custom reseller prefix set, but without trailing underscore
         app = swift_middleware.CeilometerMiddleware(
             FakeApp(), {'reseller_prefix': 'CUSTOM'})
-        req = REQUEST.Request.blank('/1.0/CUSTOM_account/container/obj',
-                                    environ={'REQUEST_METHOD': 'GET'})
+        req = FakeRequest('/1.0/CUSTOM_account/container/obj',
+                          environ={'REQUEST_METHOD': 'GET'})
         list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples[0]
         self.assertEqual("account", samples.resource_id)
