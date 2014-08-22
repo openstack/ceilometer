@@ -20,11 +20,11 @@
 """
 
 import mock
+from oslotest import base
 import six
 
 from ceilometer.compute import manager
 from ceilometer.compute.pollsters import util
-from ceilometer.openstack.common import test
 
 
 class FauxInstance(object):
@@ -43,7 +43,7 @@ class FauxInstance(object):
             return default
 
 
-class TestLocationMetadata(test.BaseTestCase):
+class TestLocationMetadata(base.BaseTestCase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):

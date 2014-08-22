@@ -18,13 +18,13 @@ Tests for Hyper-V inspector.
 """
 
 import mock
+from oslotest import base
 
 from ceilometer.compute.virt.hyperv import inspector as hyperv_inspector
-from ceilometer.openstack.common import test
 from ceilometer.openstack.common import units
 
 
-class TestHyperVInspection(test.BaseTestCase):
+class TestHyperVInspection(base.BaseTestCase):
 
     def setUp(self):
         self._inspector = hyperv_inspector.HyperVInspector()

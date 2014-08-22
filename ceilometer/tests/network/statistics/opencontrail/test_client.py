@@ -15,12 +15,12 @@
 # under the License.
 
 import mock
+from oslotest import base
 
 from ceilometer.network.statistics.opencontrail import client
-from ceilometer.openstack.common import test
 
 
-class TestOpencontrailClient(test.BaseTestCase):
+class TestOpencontrailClient(base.BaseTestCase):
 
     def setUp(self):
         super(TestOpencontrailClient, self).setUp()

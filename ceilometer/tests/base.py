@@ -22,16 +22,16 @@ import os.path
 
 import eventlet
 import oslo.messaging.conffixture
+from oslotest import base
+from oslotest import mockpatch
 import six
 from testtools import testcase
 
 from ceilometer import messaging
-from ceilometer.openstack.common.fixture import mockpatch
-from ceilometer.openstack.common import test
 from ceilometer.openstack.common import timeutils
 
 
-class BaseTestCase(test.BaseTestCase):
+class BaseTestCase(base.BaseTestCase):
     def setup_messaging(self, conf, exchange=None):
         self.useFixture(oslo.messaging.conffixture.ConfFixture(conf))
         conf.set_override("notification_driver", "messaging")

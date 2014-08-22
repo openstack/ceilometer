@@ -17,11 +17,12 @@
 import datetime
 import math
 
-from ceilometer.openstack.common import test
+from oslotest import base as testbase
+
 from ceilometer.storage import base
 
 
-class BaseTest(test.BaseTestCase):
+class BaseTest(testbase.BaseTestCase):
 
     def test_iter_period(self):
         times = list(base.iter_period(

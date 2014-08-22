@@ -17,16 +17,16 @@
 """Tests for ceilometer/agent/manager.py
 """
 import mock
+from oslotest import base
+from oslotest import mockpatch
 
 from ceilometer import agent
 from ceilometer.compute import manager
 from ceilometer import nova_client
-from ceilometer.openstack.common.fixture import mockpatch
-from ceilometer.openstack.common import test
 from ceilometer.tests import agentbase
 
 
-class TestManager(test.BaseTestCase):
+class TestManager(base.BaseTestCase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_load_plugins(self):

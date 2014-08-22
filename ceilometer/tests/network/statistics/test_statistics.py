@@ -15,14 +15,15 @@
 
 import datetime
 
+from oslotest import base
+
 from ceilometer.network import statistics
 from ceilometer.network.statistics import driver
-from ceilometer.openstack.common import test
 from ceilometer.openstack.common import timeutils
 from ceilometer import sample
 
 
-class TestBase(test.BaseTestCase):
+class TestBase(base.BaseTestCase):
 
     def test_subclass_ok(self):
 
@@ -59,7 +60,7 @@ class TestBase(test.BaseTestCase):
         self.assertRaises(TypeError, NgSubclass3)
 
 
-class TestBaseGetSamples(test.BaseTestCase):
+class TestBaseGetSamples(base.BaseTestCase):
 
     def setUp(self):
         super(TestBaseGetSamples, self).setUp()

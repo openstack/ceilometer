@@ -18,6 +18,7 @@
 
 import eventlet
 import mock
+from oslo.config import fixture as fixture_config
 import oslo.messaging
 import oslo.messaging.conffixture
 from stevedore import extension
@@ -28,7 +29,6 @@ from ceilometer import messaging
 from ceilometer import notification
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import fileutils
-from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import timeutils
 from ceilometer.publisher import test as test_publisher
 from ceilometer.tests import base as tests_base
@@ -89,7 +89,7 @@ class TestNotification(tests_base.BaseTestCase):
 
     def setUp(self):
         super(TestNotification, self).setUp()
-        self.CONF = self.useFixture(config.Config()).conf
+        self.CONF = self.useFixture(fixture_config.Config()).conf
         self.CONF.set_override("connection", "log://", group='database')
         self.CONF.set_override("store_events", False, group="notification")
         self.setup_messaging(self.CONF)
@@ -167,7 +167,7 @@ class TestNotification(tests_base.BaseTestCase):
 class TestRealNotification(tests_base.BaseTestCase):
     def setUp(self):
         super(TestRealNotification, self).setUp()
-        self.CONF = self.useFixture(config.Config()).conf
+        self.CONF = self.useFixture(fixture_config.Config()).conf
         self.setup_messaging(self.CONF, 'nova')
 
         pipeline = yaml.dump([{

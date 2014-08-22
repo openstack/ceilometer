@@ -16,16 +16,16 @@
 # under the License.
 
 import mock
+from oslotest import base
+from oslotest import mockpatch
 
 from ceilometer.central import manager
 from ceilometer.network.services import discovery
 from ceilometer.network.services import vpnaas
 from ceilometer.openstack.common import context
-from ceilometer.openstack.common.fixture import mockpatch
-from ceilometer.openstack.common import test
 
 
-class _BaseTestVPNPollster(test.BaseTestCase):
+class _BaseTestVPNPollster(base.BaseTestCase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):

@@ -20,8 +20,9 @@ notification events.
 
 import copy
 
+from oslotest import base
+
 from ceilometer.compute.notifications import cpu
-from ceilometer.openstack.common import test
 
 
 METRICS_UPDATE = {
@@ -88,7 +89,7 @@ RES_ID = '%s_%s' % (METRICS_UPDATE['payload']['host'],
                     METRICS_UPDATE['payload']['nodename'])
 
 
-class TestMetricsNotifications(test.BaseTestCase):
+class TestMetricsNotifications(base.BaseTestCase):
     def _process_notification(self, ic):
         self.assertIn(METRICS_UPDATE['event_type'],
                       ic.event_types)

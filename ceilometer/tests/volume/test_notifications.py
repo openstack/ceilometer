@@ -11,8 +11,8 @@
 #    under the License.
 
 import mock
+from oslotest import base
 
-from ceilometer.openstack.common import test
 from ceilometer.volume import notifications
 
 NOTIFICATION_VOLUME_EXISTS = {
@@ -187,7 +187,7 @@ NOTIFICATION_SNAPSHOT_EXISTS = {
     u'priority': u'INFO'}
 
 
-class TestNotifications(test.BaseTestCase):
+class TestNotifications(base.BaseTestCase):
 
     def _verify_common_sample_volume(self, s, name, notification):
         self.assertIsNotNone(s)

@@ -18,11 +18,10 @@
 """Base class for tests in ceilometer/alarm/evaluator/
 """
 import mock
+from oslotest import base
 
-from ceilometer.openstack.common import test
 
-
-class TestEvaluatorBase(test.BaseTestCase):
+class TestEvaluatorBase(base.BaseTestCase):
     def setUp(self):
         super(TestEvaluatorBase, self).setUp()
         self.api_client = mock.Mock()

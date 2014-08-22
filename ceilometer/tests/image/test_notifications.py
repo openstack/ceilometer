@@ -19,9 +19,9 @@
 import datetime
 
 import mock
+from oslotest import base
 
 from ceilometer.image import notifications
-from ceilometer.openstack.common import test
 from ceilometer import sample
 
 
@@ -90,7 +90,7 @@ NOTIFICATION_DELETE = {"message_id": "0c65cb9c-018c-11e2-bc91-5453ed1bbb5f",
                        "timestamp": NOW}
 
 
-class TestNotification(test.BaseTestCase):
+class TestNotification(base.BaseTestCase):
 
     def _verify_common_counter(self, c, name, volume):
         self.assertIsNotNone(c)

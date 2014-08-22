@@ -16,11 +16,11 @@
 # under the License.
 """Tests for ceilometer/storage/
 """
+from oslo.config import fixture as fixture_config
+from oslotest import base
 
 from ceilometer.alarm.storage import impl_log as impl_log_alarm
 from ceilometer.alarm.storage import impl_sqlalchemy as impl_sqlalchemy_alarm
-from ceilometer.openstack.common.fixture import config
-from ceilometer.openstack.common import test
 from ceilometer import storage
 from ceilometer.storage import impl_log
 from ceilometer.storage import impl_sqlalchemy
@@ -28,7 +28,7 @@ from ceilometer.storage import impl_sqlalchemy
 import six
 
 
-class EngineTest(test.BaseTestCase):
+class EngineTest(base.BaseTestCase):
 
     def test_get_connection(self):
         engine = storage.get_connection('log://localhost',
@@ -43,10 +43,10 @@ class EngineTest(test.BaseTestCase):
             self.assertIn('no-such-engine', six.text_type(err))
 
 
-class ConnectionConfigTest(test.BaseTestCase):
+class ConnectionConfigTest(base.BaseTestCase):
     def setUp(self):
         super(ConnectionConfigTest, self).setUp()
-        self.CONF = self.useFixture(config.Config()).conf
+        self.CONF = self.useFixture(fixture_config.Config()).conf
 
     def test_only_default_url(self):
         self.CONF.set_override("connection", "log://", group="database")

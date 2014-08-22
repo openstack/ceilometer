@@ -21,10 +21,10 @@ import datetime
 
 import mock
 import msgpack
+from oslo.config import fixture as fixture_config
+from oslotest import base
 
-from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import network_utils
-from ceilometer.openstack.common import test
 from ceilometer.publisher import udp
 from ceilometer.publisher import utils
 from ceilometer import sample
@@ -33,7 +33,7 @@ from ceilometer import sample
 COUNTER_SOURCE = 'testsource'
 
 
-class TestUDPPublisher(test.BaseTestCase):
+class TestUDPPublisher(base.BaseTestCase):
     test_data = [
         sample.Sample(
             name='test',
@@ -110,7 +110,7 @@ class TestUDPPublisher(test.BaseTestCase):
 
     def setUp(self):
         super(TestUDPPublisher, self).setUp()
-        self.CONF = self.useFixture(config.Config()).conf
+        self.CONF = self.useFixture(fixture_config.Config()).conf
         self.CONF.publisher.metering_secret = 'not-so-secret'
 
     def test_published(self):

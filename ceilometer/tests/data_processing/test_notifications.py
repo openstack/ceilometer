@@ -17,10 +17,10 @@ import datetime
 
 import mock
 from oslo.config import cfg
+from oslotest import base
 
 from ceilometer.data_processing import notifications
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import test
 from ceilometer import sample
 
 NOW = datetime.datetime.isoformat(datetime.datetime.utcnow())
@@ -71,7 +71,7 @@ def _dp_notification_for(operation):
     }
 
 
-class TestNotification(test.BaseTestCase):
+class TestNotification(base.BaseTestCase):
     def _verify_common_sample(self, actual, operation):
         self.assertIsNotNone(actual)
         self.assertEqual('cluster.%s' % operation, actual.name)

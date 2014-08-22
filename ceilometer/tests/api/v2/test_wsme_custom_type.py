@@ -14,14 +14,13 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
+from oslotest import base
 import wsme
 
 from ceilometer.api.controllers import v2
-from ceilometer.openstack.common import test
 
 
-class TestWsmeCustomType(test.BaseTestCase):
+class TestWsmeCustomType(base.BaseTestCase):
 
     def test_advenum_default(self):
         class dummybase(wsme.types.Base):

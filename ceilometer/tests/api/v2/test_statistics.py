@@ -18,11 +18,12 @@
 
 import datetime
 
+from oslotest import base
+
 from ceilometer.api.controllers import v2
-from ceilometer.openstack.common import test
 
 
-class TestStatisticsDuration(test.BaseTestCase):
+class TestStatisticsDuration(base.BaseTestCase):
 
     def setUp(self):
         super(TestStatisticsDuration, self).setUp()

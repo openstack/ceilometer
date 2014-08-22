@@ -18,11 +18,11 @@
 
 import mock
 from oslo.config import cfg
+from oslo.config import fixture as fixture_config
 import oslo.messaging
 from stevedore import extension
 
 from ceilometer.event import endpoint as event_endpoint
-from ceilometer.openstack.common.fixture import config
 from ceilometer.storage import models
 from ceilometer.tests import base as tests_base
 
@@ -86,7 +86,7 @@ class TestEventEndpoint(tests_base.BaseTestCase):
 
     def setUp(self):
         super(TestEventEndpoint, self).setUp()
-        self.CONF = self.useFixture(config.Config()).conf
+        self.CONF = self.useFixture(fixture_config.Config()).conf
         self.CONF([])
         self.CONF.set_override("connection", "log://", group='database')
         self.CONF.set_override("store_events", True, group="notification")

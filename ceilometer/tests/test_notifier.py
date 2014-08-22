@@ -16,9 +16,9 @@
 # under the License.
 """Tests for ceilometer/notifier.py
 """
+from oslotest import base
 
 from ceilometer import notifier
-from ceilometer.openstack.common import test
 from ceilometer import pipeline
 from ceilometer import transformer
 
@@ -63,7 +63,7 @@ MESSAGE = {
 }
 
 
-class TestNotifier(test.BaseTestCase):
+class TestNotifier(base.BaseTestCase):
 
     def test_process_notification(self):
         transformer_manager = transformer.TransformerExtensionManager(

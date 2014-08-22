@@ -17,11 +17,11 @@
 # under the License.
 
 import mock
+from oslo.config import fixture as fixture_config
+from oslotest import mockpatch
 import six
 
 from ceilometer.objectstore import swift_middleware
-from ceilometer.openstack.common.fixture import config
-from ceilometer.openstack.common.fixture import mockpatch
 from ceilometer import pipeline
 from ceilometer.tests import base as tests_base
 
@@ -90,7 +90,7 @@ class TestSwiftMiddleware(tests_base.BaseTestCase):
         self.useFixture(mockpatch.PatchObject(
             pipeline, 'setup_pipeline',
             side_effect=self._fake_setup_pipeline))
-        self.CONF = self.useFixture(config.Config()).conf
+        self.CONF = self.useFixture(fixture_config.Config()).conf
         self.setup_messaging(self.CONF)
 
     @staticmethod

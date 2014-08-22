@@ -18,14 +18,14 @@
 """
 
 import mock
+from oslotest import base
 
 from ceilometer.hardware.notifications import ipmi
-from ceilometer.openstack.common import test
 from ceilometer import sample
 from ceilometer.tests.hardware.notifications import ipmi_test_data
 
 
-class TestNotifications(test.BaseTestCase):
+class TestNotifications(base.BaseTestCase):
 
     def test_ipmi_temperature_notification(self):
         """Test IPMI Temperature sensor data.

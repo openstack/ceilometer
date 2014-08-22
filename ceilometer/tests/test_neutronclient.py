@@ -15,12 +15,12 @@
 # under the License.
 
 import mock
+from oslotest import base
 
 from ceilometer import neutron_client
-from ceilometer.openstack.common import test
 
 
-class TestNeutronClient(test.BaseTestCase):
+class TestNeutronClient(base.BaseTestCase):
 
     def setUp(self):
         super(TestNeutronClient, self).setUp()

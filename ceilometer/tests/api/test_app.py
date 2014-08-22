@@ -18,9 +18,9 @@
 import socket
 
 from oslo.config import cfg
+from oslo.config import fixture as fixture_config
 
 from ceilometer.api import app
-from ceilometer.openstack.common.fixture import config
 from ceilometer.tests import base
 
 
@@ -28,7 +28,7 @@ class TestApp(base.BaseTestCase):
 
     def setUp(self):
         super(TestApp, self).setUp()
-        self.CONF = self.useFixture(config.Config()).conf
+        self.CONF = self.useFixture(fixture_config.Config()).conf
 
     def test_WSGI_address_family(self):
         self.CONF.set_override('host', '::', group='api')

@@ -22,13 +22,14 @@ import logging.handlers
 import os
 import tempfile
 
+from oslotest import base
+
 from ceilometer.openstack.common import network_utils as utils
-from ceilometer.openstack.common import test
 from ceilometer.publisher import file
 from ceilometer import sample
 
 
-class TestFilePublisher(test.BaseTestCase):
+class TestFilePublisher(base.BaseTestCase):
 
     test_data = [
         sample.Sample(

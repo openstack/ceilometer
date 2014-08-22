@@ -18,13 +18,13 @@ Tests for Hyper-V utilsv2.
 """
 
 import mock
+from oslotest import base
 
 from ceilometer.compute.virt.hyperv import utilsv2 as utilsv2
 from ceilometer.compute.virt import inspector
-from ceilometer.openstack.common import test
 
 
-class TestUtilsV2(test.BaseTestCase):
+class TestUtilsV2(base.BaseTestCase):
 
     _FAKE_RETURN_CLASS = 'fake_return_class'
 
