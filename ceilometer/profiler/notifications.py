@@ -20,6 +20,13 @@ from ceilometer import plugin
 from ceilometer import sample
 
 
+OPTS = [
+    cfg.StrOpt('trove_control_exchange',
+               default='trove',
+               help="Exchange name for DBaaS notifications"),
+]
+
+cfg.CONF.register_opts(OPTS)
 # TODO(boris-42): remove after adding keystone audit plugins.
 cfg.CONF.import_opt('keystone_control_exchange',
                     'ceilometer.identity.notifications')
@@ -44,6 +51,7 @@ class ProfilerNotifications(plugin.NotificationBase):
             conf.heat_control_exchange,
             conf.keystone_control_exchange,
             conf.sahara_control_exchange,
+            conf.trove_control_exchange,
         ]
 
         for exchange in exchanges:
