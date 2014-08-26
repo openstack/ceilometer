@@ -151,7 +151,7 @@ class TestCoordinate(tests_base.BaseTestCase):
         younger = self._younger_by(offset)
         pid = uuid.uuid4()
         self.partition_coordinator.presence(pid, younger)
-        return (pid, younger)
+        return pid, younger
 
     def _check_assignments(self, others, alarm_ids, per_worker,
                            expect_uneffected=None):

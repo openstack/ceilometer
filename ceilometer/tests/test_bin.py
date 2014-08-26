@@ -156,7 +156,7 @@ class BinApiTestCase(base.BaseTestCase):
                 self.assertIsNone(self.subp.poll())
             else:
                 return r, c
-        return (None, None)
+        return None, None
 
     def test_v2(self):
         response, content = self.get_response('v2/meters')

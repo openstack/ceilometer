@@ -39,11 +39,11 @@ class StackCRUD(plugin.NotificationBase):
     @property
     def event_types(self):
         return [
-            '%s.create.end' % (self.resource_name),
-            '%s.update.end' % (self.resource_name),
-            '%s.delete.end' % (self.resource_name),
-            '%s.resume.end' % (self.resource_name),
-            '%s.suspend.end' % (self.resource_name),
+            '%s.create.end' % self.resource_name,
+            '%s.update.end' % self.resource_name,
+            '%s.delete.end' % self.resource_name,
+            '%s.resume.end' % self.resource_name,
+            '%s.suspend.end' % self.resource_name,
         ]
 
     @staticmethod

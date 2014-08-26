@@ -67,7 +67,7 @@ class User(IdentityCRUD):
 
     @property
     def event_types(self):
-        return ['%s.*' % (self.resource_name)]
+        return ['%s.*' % self.resource_name]
 
 
 class Group(IdentityCRUD):
@@ -77,7 +77,7 @@ class Group(IdentityCRUD):
 
     @property
     def event_types(self):
-        return ['%s.*' % (self.resource_name)]
+        return ['%s.*' % self.resource_name]
 
 
 class Project(IdentityCRUD):
@@ -87,7 +87,7 @@ class Project(IdentityCRUD):
 
     @property
     def event_types(self):
-        return ['%s.*' % (self.resource_name)]
+        return ['%s.*' % self.resource_name]
 
 
 class Role(IdentityCRUD):
@@ -97,7 +97,7 @@ class Role(IdentityCRUD):
 
     @property
     def event_types(self):
-        return ['%s.*' % (self.resource_name)]
+        return ['%s.*' % self.resource_name]
 
 
 class Trust(IdentityCRUD):
@@ -108,8 +108,8 @@ class Trust(IdentityCRUD):
     @property
     def event_types(self):
         return [
-            '%s.created' % (self.resource_name),
-            '%s.deleted' % (self.resource_name)
+            '%s.created' % self.resource_name,
+            '%s.deleted' % self.resource_name,
         ]
 
 
