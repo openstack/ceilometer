@@ -485,6 +485,7 @@ Installing the API Server
    ::
 
       $ mkdir -p /etc/ceilometer
+      $ cp etc/ceilometer/api_paste.ini /etc/ceilometer
       $ cp etc/ceilometer/*.json /etc/ceilometer
       $ cp etc/ceilometer/*.yaml /etc/ceilometer
       $ cp etc/ceilometer/ceilometer.conf.sample /etc/ceilometer/ceilometer.conf
@@ -511,7 +512,14 @@ Installing the API Server
    Refer to :doc:`/configuration` for details about any other options
    you might want to modify before starting the service.
 
-5. Start the API server.
+5. (Optional) As of the Juno release, Ceilometer utilises Paste Deploy to
+   manage WSGI applications. Ceilometer uses keystonemiddleware by default but
+   additional middleware and applications can be configured in api_paste.ini.
+   For examples on how to use Paste Deploy, refer to this documentation_.
+
+.. _documentation: http://pythonpaste.org/deploy/
+
+6. Start the API server.
 
    ::
 
