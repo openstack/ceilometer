@@ -2001,3 +2001,118 @@ class TestAlarms(v2.FunctionalTest,
         self.assertTrue(set(['alarm_id', 'detail', 'event_id', 'on_behalf_of',
                              'project_id', 'timestamp', 'type',
                              'user_id']).issubset(payload.keys()))
+
+
+class TestAlarmsQuotas(v2.FunctionalTest,
+                       tests_db.MixinTestsWithBackendScenarios):
+
+    def setUp(self):
+        super(TestAlarmsQuotas, self).setUp()
+
+        self.auth_headers = {'X-User-Id': str(uuid.uuid4()),
+                             'X-Project-Id': str(uuid.uuid4())}
+
+    def _test_alarm_quota(self):
+        alarm = {
+            'name': 'alarm',
+            'type': 'threshold',
+            'user_id': self.auth_headers['X-User-Id'],
+            'project_id': self.auth_headers['X-Project-Id'],
+            'threshold_rule': {
+                'meter_name': 'testmeter',
+                'query': [],
+                'comparison_operator': 'le',
+                'statistic': 'max',
+                'threshold': 42.0,
+                'period': 60,
+                'evaluation_periods': 1,
+            }
+        }
+
+        resp = self.post_json('/alarms', params=alarm,
+                              headers=self.auth_headers)
+        self.assertEqual(201, resp.status_code)
+        alarms = self.get_json('/alarms')
+        self.assertEqual(1, len(alarms))
+
+        alarm['name'] = 'another_user_alarm'
+        resp = self.post_json('/alarms', params=alarm,
+                              expect_errors=True,
+                              headers=self.auth_headers)
+        self.assertEqual(403, resp.status_code)
+        faultstring = 'Alarm quota exceeded for user'
+        self.assertIn(faultstring,
+                      resp.json['error_message']['faultstring'])
+
+        alarms = self.get_json('/alarms')
+        self.assertEqual(1, len(alarms))
+
+    def test_alarms_quotas(self):
+        self.CONF.set_override('user_alarm_quota', 1, group='alarm')
+        self.CONF.set_override('project_alarm_quota', 1, group='alarm')
+        self._test_alarm_quota()
+
+    def test_project_alarms_quotas(self):
+        self.CONF.set_override('project_alarm_quota', 1, group='alarm')
+        self._test_alarm_quota()
+
+    def test_user_alarms_quotas(self):
+        self.CONF.set_override('user_alarm_quota', 1, group='alarm')
+        self._test_alarm_quota()
+
+    def test_larger_limit_project_alarms_quotas(self):
+        self.CONF.set_override('user_alarm_quota', 1, group='alarm')
+        self.CONF.set_override('project_alarm_quota', 2, group='alarm')
+        self._test_alarm_quota()
+
+    def test_larger_limit_user_alarms_quotas(self):
+        self.CONF.set_override('user_alarm_quota', 2, group='alarm')
+        self.CONF.set_override('project_alarm_quota', 1, group='alarm')
+        self._test_alarm_quota()
+
+    def test_larger_limit_user_alarm_quotas_multitenant_user(self):
+        self.CONF.set_override('user_alarm_quota', 2, group='alarm')
+        self.CONF.set_override('project_alarm_quota', 1, group='alarm')
+
+        def _test(field, value):
+            query = [{
+                'field': field,
+                'op': 'eq',
+                'value': value
+            }]
+            alarms = self.get_json('/alarms', q=query)
+            self.assertEqual(1, len(alarms))
+
+        alarm = {
+            'name': 'alarm',
+            'type': 'threshold',
+            'user_id': self.auth_headers['X-User-Id'],
+            'project_id': self.auth_headers['X-Project-Id'],
+            'threshold_rule': {
+                'meter_name': 'testmeter',
+                'query': [],
+                'comparison_operator': 'le',
+                'statistic': 'max',
+                'threshold': 42.0,
+                'period': 60,
+                'evaluation_periods': 1,
+            }
+        }
+
+        resp = self.post_json('/alarms', params=alarm,
+                              headers=self.auth_headers)
+
+        self.assertEqual(201, resp.status_code)
+        _test('project_id', self.auth_headers['X-Project-Id'])
+
+        self.auth_headers['X-Project-Id'] = str(uuid.uuid4())
+        alarm['name'] = 'another_user_alarm'
+        alarm['project_id'] = self.auth_headers['X-Project-Id']
+        resp = self.post_json('/alarms', params=alarm,
+                              headers=self.auth_headers)
+
+        self.assertEqual(201, resp.status_code)
+        _test('project_id', self.auth_headers['X-Project-Id'])
+
+        alarms = self.get_json('/alarms')
+        self.assertEqual(2, len(alarms))

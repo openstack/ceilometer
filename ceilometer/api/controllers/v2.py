@@ -65,6 +65,14 @@ ALARM_API_OPTS = [
                 default=True,
                 help='Record alarm change events.'
                 ),
+    cfg.IntOpt('user_alarm_quota',
+               default=None,
+               help='Maximum number of alarms defined for a user.'
+               ),
+    cfg.IntOpt('project_alarm_quota',
+               default=None,
+               help='Maximum number of alarms defined for a project.'
+               ),
 ]
 
 cfg.CONF.register_opts(ALARM_API_OPTS, group='alarm')
@@ -97,6 +105,43 @@ class AlarmNotFound(ClientSideError):
                     '(project)s') % {
                         'alarm_id': alarm, 'project': auth_project}
         super(AlarmNotFound, self).__init__(msg, status_code=404)
+
+
+class OverQuota(ClientSideError):
+    def __init__(self, data):
+        d = {
+            'u': data.user_id,
+            'p': data.project_id
+        }
+        super(OverQuota, self).__init__(
+            _("Alarm quota exceeded for user %(u)s on project %(p)s") % d,
+            status_code=403)
+
+
+def is_over_quota(conn, project_id, user_id):
+    """Returns False if an alarm is within the set quotas, True otherwise.
+
+    :param conn: a backend connection object
+    :param project_id: the ID of the project setting the alarm
+    :param user_id: the ID of the user setting the alarm
+    """
+
+    over_quota = False
+
+    # Start by checking for user quota
+    user_alarm_quota = cfg.CONF.alarm.user_alarm_quota
+    if user_alarm_quota is not None:
+        user_alarms = list(conn.get_alarms(user=user_id))
+        over_quota = len(user_alarms) >= user_alarm_quota
+
+    # If the user quota isn't reached, we check for the project quota
+    if not over_quota:
+        project_alarm_quota = cfg.CONF.alarm.project_alarm_quota
+        if project_alarm_quota is not None:
+            project_alarms = list(conn.get_alarms(project=project_id))
+            over_quota = len(project_alarms) >= project_alarm_quota
+
+    return over_quota
 
 
 class AdvEnum(wtypes.wsproperty):
@@ -2105,6 +2150,10 @@ class AlarmsController(rest.RestController):
 
         _set_ownership('user', user_limit, 'X-User-Id')
         _set_ownership('project', project_limit, 'X-Project-Id')
+
+        # Check if there's room for one more alarm
+        if is_over_quota(conn, data.project_id, data.user_id):
+            raise OverQuota(data)
 
         data.timestamp = now
         data.state_timestamp = now
