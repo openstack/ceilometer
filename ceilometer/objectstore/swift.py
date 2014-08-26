@@ -84,7 +84,7 @@ class _Base(plugin.CentralPollster):
 
 class ObjectsPollster(_Base):
     """Iterate over all accounts, using keystone."""
-    @plugin.check_keystone
+    @plugin.check_keystone('object-store')
     def get_samples(self, manager, cache, resources=None):
         for tenant, account in self._iter_accounts(manager.keystone, cache):
             yield sample.Sample(
@@ -102,7 +102,7 @@ class ObjectsPollster(_Base):
 
 class ObjectsSizePollster(_Base):
     """Iterate over all accounts, using keystone."""
-    @plugin.check_keystone
+    @plugin.check_keystone('object-store')
     def get_samples(self, manager, cache, resources=None):
         for tenant, account in self._iter_accounts(manager.keystone, cache):
             yield sample.Sample(
@@ -120,7 +120,7 @@ class ObjectsSizePollster(_Base):
 
 class ObjectsContainersPollster(_Base):
     """Iterate over all accounts, using keystone."""
-    @plugin.check_keystone
+    @plugin.check_keystone('object-store')
     def get_samples(self, manager, cache, resources=None):
         for tenant, account in self._iter_accounts(manager.keystone, cache):
             yield sample.Sample(
@@ -141,7 +141,7 @@ class ContainersObjectsPollster(_Base):
 
     METHOD = 'get'
 
-    @plugin.check_keystone
+    @plugin.check_keystone('object-store')
     def get_samples(self, manager, cache, resources=None):
         for project, account in self._iter_accounts(manager.keystone, cache):
             containers_info = account[1]
@@ -164,7 +164,7 @@ class ContainersSizePollster(_Base):
 
     METHOD = 'get'
 
-    @plugin.check_keystone
+    @plugin.check_keystone('object-store')
     def get_samples(self, manager, cache, resources=None):
         for project, account in self._iter_accounts(manager.keystone, cache):
             containers_info = account[1]

@@ -39,6 +39,7 @@ class FloatingIPPollster(plugin.CentralPollster):
             cache['floating_ips'] = list(self._get_floating_ips())
         return iter(cache['floating_ips'])
 
+    @plugin.check_keystone('network')
     def get_samples(self, manager, cache, resources=None):
         for ip in self._iter_floating_ips(cache):
             LOG.info(_("FLOATING IP USAGE: %s") % ip.ip)

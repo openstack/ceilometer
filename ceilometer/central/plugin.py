@@ -28,16 +28,33 @@ class CentralPollster(plugin.PollsterBase):
     """Base class for plugins that support the polling API."""
 
 
-def check_keystone(f):
-    """Decorator function to check if manager has valid keystone client."""
-    def func(self, *args, **kwargs):
-        manager = kwargs.get('manager')
-        if not manager and len(args) > 0:
-            manager = args[0]
-        keystone = getattr(manager, 'keystone', None)
-        if not keystone or isinstance(keystone, Exception):
-            LOG.error(_('Skip due to keystone error %s'),
-                      str(keystone) if keystone else '')
-            return iter([])
-        return f(self, *args, **kwargs)
-    return func
+def check_keystone(service_type=None, client=None):
+    """Decorator function to check if manager has valid keystone client.
+
+       Also checks if the service is registered/enabled in Keystone.
+
+       :param service_type: name of service in Keystone
+       :param client: client name if not passed in as function param
+    """
+    def wrapped(f):
+        def func(self, *args, **kwargs):
+            if client:
+                manager = getattr(self, client, None)
+            else:
+                manager = kwargs.get('manager')
+            if not manager and len(args) > 0:
+                manager = args[0]
+            keystone = getattr(manager, 'keystone', None)
+            if not keystone or isinstance(keystone, Exception):
+                LOG.error(_('Skip due to keystone error %s'),
+                          str(keystone) if keystone else '')
+                return iter([])
+            elif service_type:
+                endpoints = keystone.service_catalog.get_endpoints()
+                if not endpoints.get(service_type):
+                    LOG.warning(_('Skipping because service is not'
+                                  'registered in keystone'))
+                    return iter([])
+            return f(self, *args, **kwargs)
+        return func
+    return wrapped

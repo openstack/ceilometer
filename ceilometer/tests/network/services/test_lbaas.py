@@ -22,6 +22,7 @@ from oslotest import mockpatch
 from ceilometer.central import manager
 from ceilometer.network.services import discovery
 from ceilometer.network.services import lbaas
+from ceilometer import neutron_client as cli
 from ceilometer.openstack.common import context
 
 
@@ -33,6 +34,9 @@ class _BaseTestLBPollster(base.BaseTestCase):
         self.addCleanup(mock.patch.stopall)
         self.context = context.get_admin_context()
         self.manager = manager.AgentManager()
+        cli.Client.keystone = mock.Mock()
+        cli.Client.keystone.service_catalog.get_endpoints = mock.Mock(
+            return_value={'network': mock.ANY})
 
 
 class TestLBPoolPollster(_BaseTestLBPollster):
