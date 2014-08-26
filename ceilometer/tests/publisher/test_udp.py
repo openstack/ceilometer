@@ -1,5 +1,5 @@
 #
-# Copyright 2013 eNovance
+# Copyright 2013-2014 eNovance
 #
 # Author: Julien Danjou <julien@danjou.info>
 #
@@ -22,9 +22,9 @@ import datetime
 import mock
 import msgpack
 from oslo.config import fixture as fixture_config
+from oslo.utils import netutils
 from oslotest import base
 
-from ceilometer.openstack.common import network_utils
 from ceilometer.publisher import udp
 from ceilometer.publisher import utils
 from ceilometer import sample
@@ -118,7 +118,7 @@ class TestUDPPublisher(base.BaseTestCase):
         with mock.patch('socket.socket',
                         self._make_fake_socket(self.data_sent)):
             publisher = udp.UDPPublisher(
-                network_utils.urlsplit('udp://somehost'))
+                netutils.urlsplit('udp://somehost'))
         publisher.publish_samples(None,
                                   self.test_data)
 
@@ -152,6 +152,6 @@ class TestUDPPublisher(base.BaseTestCase):
         with mock.patch('socket.socket',
                         self._make_broken_socket):
             publisher = udp.UDPPublisher(
-                network_utils.urlsplit('udp://localhost'))
+                netutils.urlsplit('udp://localhost'))
         publisher.publish_samples(None,
                                   self.test_data)

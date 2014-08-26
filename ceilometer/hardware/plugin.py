@@ -21,13 +21,13 @@
 
 import abc
 import itertools
+from oslo.utils import netutils
 import six
 
 from ceilometer.central import plugin
 from ceilometer.hardware import inspector as insloader
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import network_utils
 
 LOG = log.getLogger(__name__)
 
@@ -54,7 +54,7 @@ class HardwarePollster(plugin.CentralPollster):
         h_cache = cache.setdefault(self.CACHE_KEY, {})
         sample_iters = []
         for res in resources:
-            parsed_url = network_utils.urlsplit(res)
+            parsed_url = netutils.urlsplit(res)
             inspector = self._get_inspector(parsed_url)
             func = getattr(inspector, self.INSPECT_METHOD)
 

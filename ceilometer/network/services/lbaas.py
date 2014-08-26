@@ -17,12 +17,13 @@
 
 import abc
 import collections
+
+from oslo.utils import timeutils
 import six
 
 from ceilometer.network.services import base
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import timeutils
 from ceilometer import sample
 
 LOG = log.getLogger(__name__)

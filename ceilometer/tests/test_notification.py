@@ -21,6 +21,7 @@ import mock
 from oslo.config import fixture as fixture_config
 import oslo.messaging
 import oslo.messaging.conffixture
+from oslo.utils import timeutils
 from stevedore import extension
 import yaml
 
@@ -29,7 +30,6 @@ from ceilometer import messaging
 from ceilometer import notification
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import fileutils
-from ceilometer.openstack.common import timeutils
 from ceilometer.publisher import test as test_publisher
 from ceilometer.tests import base as tests_base
 

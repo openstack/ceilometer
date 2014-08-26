@@ -19,6 +19,7 @@ SQLAlchemy models for Ceilometer data.
 
 import json
 
+from oslo.utils import timeutils
 import six
 from sqlalchemy import (Column, Integer, String, ForeignKey, Index,
                         UniqueConstraint, BigInteger, join)
@@ -30,7 +31,6 @@ from sqlalchemy.orm import column_property
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import TypeDecorator
 
-from ceilometer.openstack.common import timeutils
 from ceilometer.storage import models as api_models
 from ceilometer import utils
 

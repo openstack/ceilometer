@@ -22,13 +22,13 @@
 import time
 
 from oslo.config import cfg
+from oslo.utils import netutils
 import pymongo
 import six
 import weakref
 
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import network_utils
 
 LOG = log.getLogger(__name__)
 
@@ -171,7 +171,7 @@ class ConnectionPool(object):
             client = self._pool.get(pool_key)()
             if client:
                 return client
-        splitted_url = network_utils.urlsplit(url)
+        splitted_url = netutils.urlsplit(url)
         log_data = {'db': splitted_url.scheme,
                     'nodelist': connection_options['nodelist']}
         LOG.info(_('Connecting to %(db)s on %(nodelist)s') % log_data)

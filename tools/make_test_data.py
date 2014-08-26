@@ -34,11 +34,12 @@ import random
 import sys
 
 from oslo.config import cfg
+from oslo.utils import timeutils
 
 from ceilometer.publisher import utils
 from ceilometer import sample
 from ceilometer import storage
-from ceilometer.openstack.common import timeutils
+
 
 def make_test_data(conn, name, meter_type, unit, volume, random_min,
                    random_max, user_id, project_id, resource_id, start,

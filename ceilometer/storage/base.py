@@ -21,10 +21,9 @@ import datetime
 import inspect
 import math
 
+from oslo.utils import timeutils
 import six
 from six import moves
-
-from ceilometer.openstack.common import timeutils
 
 
 def iter_period(start, end, period):

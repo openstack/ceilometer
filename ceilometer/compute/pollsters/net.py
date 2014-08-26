@@ -19,12 +19,13 @@
 
 import copy
 
+from oslo.utils import timeutils
+
 from ceilometer.compute import plugin
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import timeutils
 from ceilometer import sample
 
 LOG = log.getLogger(__name__)

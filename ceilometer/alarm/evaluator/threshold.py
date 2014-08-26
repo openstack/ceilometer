@@ -19,11 +19,12 @@
 import datetime
 import operator
 
+from oslo.utils import timeutils
+
 from ceilometer.alarm import evaluator
 from ceilometer.alarm.evaluator import utils
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import timeutils
 
 LOG = log.getLogger(__name__)
 

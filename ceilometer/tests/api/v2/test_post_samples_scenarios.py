@@ -21,9 +21,9 @@ import copy
 import datetime
 
 import mock
+from oslo.utils import timeutils
 from oslotest import mockpatch
 
-from ceilometer.openstack.common import timeutils
 from ceilometer.tests.api import v2
 from ceilometer.tests import db as tests_db
 

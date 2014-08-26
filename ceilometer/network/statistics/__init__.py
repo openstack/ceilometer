@@ -15,12 +15,12 @@
 
 import abc
 
+from oslo.utils import netutils
 import six
 from six.moves.urllib import parse as urlparse
 from stevedore import driver as _driver
 
 from ceilometer.central import plugin
-from ceilometer.openstack.common import network_utils
 from ceilometer import sample
 
 
@@ -45,7 +45,7 @@ class _Base(plugin.CentralPollster):
     @staticmethod
     def _parse_my_resource(resource):
 
-        parse_url = network_utils.urlsplit(resource)
+        parse_url = netutils.urlsplit(resource)
 
         params = urlparse.parse_qs(parse_url.query)
         parts = urlparse.ParseResult(parse_url.scheme,

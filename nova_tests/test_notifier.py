@@ -22,8 +22,10 @@ import contextlib
 import datetime
 
 import mock
+from oslo.utils import importutils
 from oslotest import base
 from oslotest import moxstubout
+
 from stevedore import extension
 
 ## NOTE(dhellmann): These imports are not in the generally approved
@@ -40,7 +42,6 @@ from nova.objects import instance as nova_instance
 from nova import config
 from nova import context
 from nova import db
-from nova.openstack.common import importutils
 from nova.openstack.common import log as logging
 
 # This option is used in the nova_notifier module, so make

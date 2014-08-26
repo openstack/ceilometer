@@ -17,11 +17,11 @@
 """Converters for producing compute CPU sample messages from notification
 events.
 """
+from oslo.utils import timeutils
 
 from ceilometer.compute import notifications
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import timeutils
 from ceilometer import sample
 
 LOG = log.getLogger(__name__)

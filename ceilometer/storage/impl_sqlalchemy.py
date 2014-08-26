@@ -22,6 +22,7 @@ import operator
 import os
 
 from oslo.config import cfg
+from oslo.utils import timeutils
 import six
 from sqlalchemy import and_
 from sqlalchemy import distinct
@@ -33,7 +34,6 @@ from ceilometer.openstack.common.db.sqlalchemy import migration
 import ceilometer.openstack.common.db.sqlalchemy.session as sqlalchemy_session
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import timeutils
 from ceilometer import storage
 from ceilometer.storage import base
 from ceilometer.storage import models as api_models

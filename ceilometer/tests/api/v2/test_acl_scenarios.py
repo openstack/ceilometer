@@ -19,11 +19,11 @@
 import datetime
 import json
 
+from oslo.utils import timeutils
 import webtest
 
 from ceilometer.api import app
 from ceilometer.api.controllers import v2 as v2_api
-from ceilometer.openstack.common import timeutils
 from ceilometer.publisher import utils
 from ceilometer import sample
 from ceilometer.tests import api as acl

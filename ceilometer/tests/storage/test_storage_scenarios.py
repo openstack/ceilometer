@@ -23,9 +23,9 @@ import datetime
 import operator
 
 import mock
+from oslo.utils import timeutils
 
 from ceilometer.alarm.storage import models as alarm_models
-from ceilometer.openstack.common import timeutils
 from ceilometer.publisher import utils
 from ceilometer import sample
 from ceilometer import storage

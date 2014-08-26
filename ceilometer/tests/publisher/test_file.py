@@ -1,5 +1,5 @@
 #
-# Copyright 2013 eNovance
+# Copyright 2013-2014 eNovance
 #
 # Author: Julien Danjou <julien@danjou.info>
 #
@@ -22,9 +22,9 @@ import logging.handlers
 import os
 import tempfile
 
+from oslo.utils import netutils
 from oslotest import base
 
-from ceilometer.openstack.common import network_utils as utils
 from ceilometer.publisher import file
 from ceilometer import sample
 
@@ -71,8 +71,8 @@ class TestFilePublisher(base.BaseTestCase):
         # Test valid configurations
         tempdir = tempfile.mkdtemp()
         name = '%s/log_file' % tempdir
-        parsed_url = utils.urlsplit('file://%s?max_bytes=50&backup_count=3'
-                                    % name)
+        parsed_url = netutils.urlsplit('file://%s?max_bytes=50&backup_count=3'
+                                       % name)
         publisher = file.FilePublisher(parsed_url)
         publisher.publish_samples(None,
                                   self.test_data)
@@ -90,7 +90,7 @@ class TestFilePublisher(base.BaseTestCase):
         # Test missing max bytes, backup count configurations
         tempdir = tempfile.mkdtemp()
         name = '%s/log_file_plain' % tempdir
-        parsed_url = utils.urlsplit('file://%s' % name)
+        parsed_url = netutils.urlsplit('file://%s' % name)
         publisher = file.FilePublisher(parsed_url)
         publisher.publish_samples(None,
                                   self.test_data)
@@ -112,7 +112,7 @@ class TestFilePublisher(base.BaseTestCase):
     def test_file_publisher_invalid(self):
         # Test invalid max bytes, backup count configurations
         tempdir = tempfile.mkdtemp()
-        parsed_url = utils.urlsplit(
+        parsed_url = netutils.urlsplit(
             'file://%s/log_file_bad'
             '?max_bytes=yus&backup_count=5y' % tempdir)
         publisher = file.FilePublisher(parsed_url)

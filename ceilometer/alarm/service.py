@@ -21,6 +21,7 @@ import abc
 
 from ceilometerclient import client as ceiloclient
 from oslo.config import cfg
+from oslo.utils import netutils
 import six
 from stevedore import extension
 
@@ -29,7 +30,6 @@ from ceilometer.alarm import rpc as rpc_alarm
 from ceilometer import messaging
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
-from ceilometer.openstack.common import network_utils
 from ceilometer.openstack.common import service as os_service
 
 
@@ -210,7 +210,7 @@ class AlarmNotifierService(os_service.Service):
     def _handle_action(self, action, alarm_id, previous,
                        current, reason, reason_data):
         try:
-            action = network_utils.urlsplit(action)
+            action = netutils.urlsplit(action)
         except Exception:
             LOG.error(
                 _("Unable to parse action %(action)s for alarm %(alarm_id)s"),
