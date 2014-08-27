@@ -20,12 +20,12 @@ from __future__ import absolute_import
 import os
 
 from oslo.config import cfg
+from oslo.db.sqlalchemy import migration
+from oslo.db.sqlalchemy import session as db_session
 from sqlalchemy import desc
 
 from ceilometer.alarm.storage import base
 from ceilometer.alarm.storage import models as alarm_api_models
-from ceilometer.openstack.common.db.sqlalchemy import migration
-import ceilometer.openstack.common.db.sqlalchemy.session as sqlalchemy_session
 from ceilometer.openstack.common import log
 from ceilometer.storage.sqlalchemy import models
 from ceilometer.storage.sqlalchemy import utils as sql_utils
@@ -81,9 +81,9 @@ class Connection(base.Connection):
     )
 
     def __init__(self, url):
-        self._engine_facade = sqlalchemy_session.EngineFacade.from_config(
+        self._engine_facade = db_session.EngineFacade(
             url,
-            cfg.CONF  # TODO(Alexei_987) Remove access to global CONF object
+            **dict(cfg.CONF.database.items())
         )
 
     def upgrade(self):

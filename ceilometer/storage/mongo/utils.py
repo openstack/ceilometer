@@ -32,10 +32,8 @@ from ceilometer.openstack.common import log
 
 LOG = log.getLogger(__name__)
 
-cfg.CONF.import_opt('max_retries', 'ceilometer.openstack.common.db.options',
-                    group="database")
-cfg.CONF.import_opt('retry_interval', 'ceilometer.openstack.common.db.options',
-                    group="database")
+cfg.CONF.import_opt('max_retries', 'oslo.db.options', group="database")
+cfg.CONF.import_opt('retry_interval', 'oslo.db.options', group="database")
 
 EVENT_TRAIT_TYPES = {'none': 0, 'string': 1, 'integer': 2, 'float': 3,
                      'datetime': 4}

@@ -18,6 +18,7 @@
 """
 
 from oslo.config import cfg
+from oslo.db import options as db_options
 import six
 import six.moves.urllib.parse as urlparse
 from stevedore import driver
@@ -56,9 +57,8 @@ STORAGE_OPTS = [
 
 cfg.CONF.register_opts(STORAGE_OPTS, group='database')
 
-cfg.CONF.import_opt('connection',
-                    'ceilometer.openstack.common.db.options',
-                    group='database')
+db_options.set_defaults(cfg.CONF)
+cfg.CONF.import_opt('connection', 'oslo.db.options', group='database')
 
 
 class StorageBadVersion(Exception):
