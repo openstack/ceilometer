@@ -56,7 +56,6 @@ from ceilometer import sample
 from ceilometer import storage
 from ceilometer import utils
 
-
 LOG = log.getLogger(__name__)
 
 
@@ -79,7 +78,8 @@ cfg.CONF.register_opts(ALARM_API_OPTS, group='alarm')
 
 state_kind = ["ok", "alarm", "insufficient data"]
 state_kind_enum = wtypes.Enum(str, *state_kind)
-operation_kind = wtypes.Enum(str, 'lt', 'le', 'eq', 'ne', 'ge', 'gt')
+operation_kind = ('lt', 'le', 'eq', 'ne', 'ge', 'gt')
+operation_kind_enum = wtypes.Enum(str, *operation_kind)
 
 
 class ClientSideError(wsme.exc.ClientSideError):
@@ -245,7 +245,7 @@ class Query(_Base):
 
     # op = wsme.wsattr(operation_kind, default='eq')
     # this ^ doesn't seem to work.
-    op = wsme.wsproperty(operation_kind, get_op, set_op)
+    op = wsme.wsproperty(operation_kind_enum, get_op, set_op)
     "The comparison operator. Defaults to 'eq'."
 
     value = wtypes.text
@@ -2321,16 +2321,17 @@ def _event_query_to_event_filter(q):
     traits_filter = []
 
     for i in q:
-        # FIXME(herndon): Support for operators other than
-        # 'eq' will come later.
-        if i.op != 'eq':
-            error = _("operator %s not supported") % i.op
+        if not i.op:
+            i.op = 'eq'
+        elif i.op not in operation_kind:
+            error = _("operator {} is incorrect").format(i.op)
             raise ClientSideError(error)
         if i.field in evt_model_filter:
             evt_model_filter[i.field] = i.value
         else:
             traits_filter.append({"key": i.field,
-                                  i.type: i._get_value_as_type()})
+                                  i.type: i._get_value_as_type(),
+                                  "op": i.op})
     return storage.EventFilter(traits_filter=traits_filter, **evt_model_filter)
 
 

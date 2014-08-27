@@ -131,7 +131,6 @@ class MTable(object):
         r = {}
         for row in rows:
             data = rows[row]
-
             if op == '=':
                 if column in data and data[column] == value:
                     r[row] = data
@@ -147,11 +146,9 @@ class MTable(object):
             elif op == '>=':
                 if column in data and data[column] >= value:
                     r[row] = data
-            else:
-                raise NotImplementedError("In-memory "
-                                          "SingleColumnValueFilter "
-                                          "doesn't support the %s operation "
-                                          "yet" % op)
+            elif op == '!=':
+                if column in data and data[column] != value:
+                    r[row] = data
         return r
 
     @staticmethod
