@@ -192,6 +192,20 @@ drop_unmatched_notifications        False                                   If s
 definitions_cfg_file                event_definitions.yaml                  Name of event definitions config file (yaml format)
 ==================================  ======================================  ==============================================================
 
+Alarming
+========
+
+The following options in the [alarm] configuration section affect the configuration of alarm services
+
+======================  ==============  ====================================================================================
+Parameter               Default         Note
+======================  ==============  ====================================================================================
+evaluation_service      singleton       Driver to use for alarm evaluation service:
+                                          * singleton:   All alarms are evaluated by one alarm evaluation service instance
+                                          * partitioned: All alarms are dispatched across all alarm evaluation service
+                                            instances to be evaluate
+======================  ==============  ====================================================================================
+
 
 
 General options
