@@ -47,9 +47,12 @@ PROBE_DICT = {
     }
 }
 
+ENDPOINT = 'end://point'
+
 
 class TestManager(manager.AgentManager):
 
+    @mock.patch('keystoneclient.v2_0.client', mock.MagicMock())
     def __init__(self):
         super(TestManager, self).__init__()
         self.keystone = mock.Mock()
@@ -64,14 +67,15 @@ class TestKwapi(base.BaseTestCase):
         self.manager = TestManager()
 
     @staticmethod
-    def fake_get_kwapi_client(ksclient):
+    def fake_get_kwapi_client(ksclient, endpoint):
         raise exceptions.EndpointNotFound("fake keystone exception")
 
     def test_endpoint_not_exist(self):
         with mockpatch.PatchObject(kwapi._Base, 'get_kwapi_client',
                                    side_effect=self.fake_get_kwapi_client):
             pollster = kwapi.EnergyPollster()
-            samples = list(pollster.get_samples(self.manager, {}))
+            samples = list(pollster.get_samples(self.manager, {},
+                                                [ENDPOINT]))
 
         self.assertEqual(0, len(samples))
 
@@ -87,7 +91,7 @@ class TestEnergyPollster(base.BaseTestCase):
             kwapi._Base, '_iter_probes', side_effect=self.fake_iter_probes))
 
     @staticmethod
-    def fake_iter_probes(ksclient, cache):
+    def fake_iter_probes(ksclient, cache, endpoint):
         probes = PROBE_DICT['probes']
         for key, value in six.iteritems(probes):
             probe_dict = value
@@ -99,6 +103,7 @@ class TestEnergyPollster(base.BaseTestCase):
         samples = list(kwapi.EnergyPollster().get_samples(
             self.manager,
             cache,
+            [ENDPOINT]
         ))
         self.assertEqual(3, len(samples))
         samples_by_name = dict((s.resource_id, s) for s in samples)
@@ -126,13 +131,15 @@ class TestEnergyPollsterCache(base.BaseTestCase):
         probe = {'id': 'A'}
         probe.update(PROBE_DICT['probes']['A'])
         cache = {
-            kwapi.EnergyPollster.CACHE_KEY_PROBE: [probe],
+            '%s-%s' % (ENDPOINT, kwapi.EnergyPollster.CACHE_KEY_PROBE):
+                [probe],
         }
         self.manager.keystone = mock.Mock()
         pollster = kwapi.EnergyPollster()
         with mock.patch.object(pollster, '_get_probes') as do_not_call:
             do_not_call.side_effect = AssertionError('should not be called')
-            samples = list(pollster.get_samples(self.manager, cache))
+            samples = list(pollster.get_samples(self.manager, cache,
+                                                [ENDPOINT]))
         self.assertEqual(1, len(samples))
 
 
@@ -147,7 +154,7 @@ class TestPowerPollster(base.BaseTestCase):
             kwapi._Base, '_iter_probes', side_effect=self.fake_iter_probes))
 
     @staticmethod
-    def fake_iter_probes(ksclient, cache):
+    def fake_iter_probes(ksclient, cache, endpoint):
         probes = PROBE_DICT['probes']
         for key, value in six.iteritems(probes):
             probe_dict = value
@@ -159,6 +166,7 @@ class TestPowerPollster(base.BaseTestCase):
         samples = list(kwapi.PowerPollster().get_samples(
             self.manager,
             cache,
+            [ENDPOINT]
         ))
         self.assertEqual(3, len(samples))
         samples_by_name = dict((s.resource_id, s) for s in samples)
@@ -183,11 +191,12 @@ class TestPowerPollsterCache(base.BaseTestCase):
         probe = {'id': 'A'}
         probe.update(PROBE_DICT['probes']['A'])
         cache = {
-            kwapi.PowerPollster.CACHE_KEY_PROBE: [probe],
+            '%s-%s' % (ENDPOINT, kwapi.PowerPollster.CACHE_KEY_PROBE): [probe],
         }
         self.manager.keystone = mock.Mock()
         pollster = kwapi.PowerPollster()
         with mock.patch.object(pollster, '_get_probes') as do_not_call:
             do_not_call.side_effect = AssertionError('should not be called')
-            samples = list(pollster.get_samples(self.manager, cache))
+            samples = list(pollster.get_samples(self.manager, cache,
+                                                [ENDPOINT]))
         self.assertEqual(1, len(samples))

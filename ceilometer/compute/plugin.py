@@ -32,6 +32,11 @@ class ComputePollster(plugin.PollsterBase):
     It supports the polling API on the compute node.
     """
 
+    @property
+    def default_discovery(self):
+        # get resources from agent-default discovery
+        return None
+
     @abc.abstractmethod
     def get_samples(self, manager, cache, resources):
         """Return a sequence of Counter instances from polling the resources.

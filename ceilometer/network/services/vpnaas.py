@@ -35,7 +35,11 @@ class VPNServicesPollster(base.BaseServicesPollster):
               'router_id'
               ]
 
-    def get_samples(self, manager, cache, resources=None):
+    @property
+    def default_discovery(self):
+        return 'vpn_services'
+
+    def get_samples(self, manager, cache, resources):
         resources = resources or []
 
         for vpn in resources:
@@ -80,7 +84,11 @@ class IPSecConnectionsPollster(base.BaseServicesPollster):
               'tenant_id'
               ]
 
-    def get_samples(self, manager, cache, resources=None):
+    @property
+    def default_discovery(self):
+        return 'ipsec_connections'
+
+    def get_samples(self, manager, cache, resources):
         resources = resources or []
 
         for conn in resources:

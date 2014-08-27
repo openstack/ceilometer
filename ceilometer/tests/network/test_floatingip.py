@@ -70,7 +70,7 @@ class TestFloatingIPPollster(base.BaseTestCase):
     #         assert False, 'Should have seen an error'
 
     def test_get_samples_not_empty(self):
-        samples = list(self.pollster.get_samples(self.manager, {}))
+        samples = list(self.pollster.get_samples(self.manager, {}, ['e']))
         self.assertEqual(3, len(samples))
         # It's necessary to verify all the attributes extracted by Nova
         # API /os-floating-ips to make sure they're available and correct.
@@ -87,10 +87,10 @@ class TestFloatingIPPollster(base.BaseTestCase):
         self.assertEqual("public", samples[2].resource_metadata["pool"])
 
     def test_get_meter_names(self):
-        samples = list(self.pollster.get_samples(self.manager, {}))
+        samples = list(self.pollster.get_samples(self.manager, {}, ['e']))
         self.assertEqual(set(['ip.floating']), set([s.name for s in samples]))
 
     def test_get_samples_cached(self):
-        cache = {'floating_ips': self.fake_get_ips()[:2]}
-        samples = list(self.pollster.get_samples(self.manager, cache))
+        cache = {'e-floating_ips': self.fake_get_ips()[:2]}
+        samples = list(self.pollster.get_samples(self.manager, cache, ['e']))
         self.assertEqual(2, len(samples))

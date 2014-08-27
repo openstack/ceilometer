@@ -34,7 +34,11 @@ class FirewallPollster(base.BaseServicesPollster):
               'firewall_policy_id',
               ]
 
-    def get_samples(self, manager, cache, resources=None):
+    @property
+    def default_discovery(self):
+        return 'fw_services'
+
+    def get_samples(self, manager, cache, resources):
         resources = resources or []
 
         for fw in resources:
@@ -71,7 +75,11 @@ class FirewallPolicyPollster(base.BaseServicesPollster):
               'audited',
               ]
 
-    def get_samples(self, manager, cache, resources=None):
+    @property
+    def default_discovery(self):
+        return 'fw_policy'
+
+    def get_samples(self, manager, cache, resources):
         resources = resources or []
 
         for fw in resources:

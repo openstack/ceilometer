@@ -104,6 +104,8 @@ IMAGE_LIST = [
           u'size': 2048}),
 ]
 
+ENDPOINT = 'end://point'
+
 
 class _BaseObject(object):
     pass
@@ -125,7 +127,7 @@ class TestManager(manager.AgentManager):
 
 class TestImagePollsterPageSize(base.BaseTestCase):
 
-    def fake_get_glance_client(self, ksclient):
+    def fake_get_glance_client(self, ksclient, endpoint):
         glanceclient = FakeGlanceClient()
         glanceclient.images.list = mock.MagicMock(return_value=IMAGE_LIST)
         return glanceclient
@@ -143,7 +145,7 @@ class TestImagePollsterPageSize(base.BaseTestCase):
     def _do_test_iter_images(self, page_size=0):
         self.CONF.set_override("glance_page_size", page_size)
         images = list(glance.ImagePollster().
-                      _iter_images(self.manager.keystone, {}))
+                      _iter_images(self.manager.keystone, {}, ENDPOINT))
         kwargs = {}
         if page_size > 0:
             kwargs['page_size'] = page_size
@@ -163,7 +165,7 @@ class TestImagePollsterPageSize(base.BaseTestCase):
 
 class TestImagePollster(base.BaseTestCase):
 
-    def fake_get_glance_client(self, ksclient):
+    def fake_get_glance_client(self, ksclient, endpoint):
         glanceclient = _BaseObject()
         setattr(glanceclient, "images", _BaseObject())
         setattr(glanceclient.images,
@@ -183,26 +185,29 @@ class TestImagePollster(base.BaseTestCase):
         # Tests whether the iter_images method returns a unique image
         # list when there is nothing in the cache
         images = list(glance.ImagePollster().
-                      _iter_images(self.manager.keystone, {}))
+                      _iter_images(self.manager.keystone, {}, ENDPOINT))
         self.assertEqual(len(set(image.id for image in images)), len(images))
 
     def test_iter_images_cached(self):
         # Tests whether the iter_images method returns the values from
         # the cache
-        cache = {'images': []}
+        cache = {'%s-images' % ENDPOINT: []}
         images = list(glance.ImagePollster().
-                      _iter_images(self.manager.keystone, cache))
+                      _iter_images(self.manager.keystone, cache,
+                                   ENDPOINT))
         self.assertEqual([], images)
 
     def test_image(self):
-        samples = list(glance.ImagePollster().get_samples(self.manager, {}))
+        samples = list(glance.ImagePollster().get_samples(self.manager, {},
+                                                          [ENDPOINT]))
         self.assertEqual(3, len(samples))
         for sample in samples:
             self.assertEqual(1, sample.volume)
 
     def test_image_size(self):
         samples = list(glance.ImageSizePollster().get_samples(self.manager,
-                                                              {}))
+                                                              {},
+                                                              [ENDPOINT]))
         self.assertEqual(3, len(samples))
         for image in IMAGE_LIST:
             self.assertTrue(
@@ -210,10 +215,12 @@ class TestImagePollster(base.BaseTestCase):
                         samples)))
 
     def test_image_get_sample_names(self):
-        samples = list(glance.ImagePollster().get_samples(self.manager, {}))
+        samples = list(glance.ImagePollster().get_samples(self.manager, {},
+                                                          [ENDPOINT]))
         self.assertEqual(set(['image']), set([s.name for s in samples]))
 
     def test_image_size_get_sample_names(self):
         samples = list(glance.ImageSizePollster().get_samples(self.manager,
-                                                              {}))
+                                                              {},
+                                                              [ENDPOINT]))
         self.assertEqual(set(['image.size']), set([s.name for s in samples]))

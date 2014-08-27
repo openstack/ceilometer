@@ -38,7 +38,7 @@ class TestManager(base.BaseTestCase):
 
 class TestPollsterKeystone(agentbase.TestPollster):
     @plugin.check_keystone
-    def get_samples(self, manager, cache, resources=None):
+    def get_samples(self, manager, cache, resources):
         func = super(TestPollsterKeystone, self).get_samples
         return func(manager=manager,
                     cache=cache,

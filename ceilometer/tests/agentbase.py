@@ -71,8 +71,13 @@ default_test_data = TestSample(
 
 class TestPollster(plugin.PollsterBase):
     test_data = default_test_data
+    discovery = None
 
-    def get_samples(self, manager, cache, resources=None):
+    @property
+    def default_discovery(self):
+        return self.discovery
+
+    def get_samples(self, manager, cache, resources):
         resources = resources or []
         self.samples.append((manager, resources))
         self.resources.extend(resources)
@@ -82,7 +87,7 @@ class TestPollster(plugin.PollsterBase):
 
 
 class TestPollsterException(TestPollster):
-    def get_samples(self, manager, cache, resources=None):
+    def get_samples(self, manager, cache, resources):
         resources = resources or []
         self.samples.append((manager, resources))
         self.resources.extend(resources)
@@ -257,9 +262,13 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
 
     def tearDown(self):
         self.Pollster.samples = []
+        self.Pollster.discovery = []
         self.PollsterAnother.samples = []
+        self.PollsterAnother.discovery = []
         self.PollsterException.samples = []
+        self.PollsterException.discovery = []
         self.PollsterExceptionAnother.samples = []
+        self.PollsterExceptionAnother.discovery = []
         self.Pollster.resources = []
         self.PollsterAnother.resources = []
         self.PollsterException.resources = []
@@ -442,6 +451,23 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self._do_test_per_agent_discovery(['discovered_1', 'discovered_2'],
                                           ['static_1', 'static_2'])
 
+    def test_per_agent_discovery_overridden_by_per_pollster_discovery(self):
+        discovered_resources = ['discovered_1', 'discovered_2']
+        self.mgr.discovery_manager = self.create_discovery_manager()
+        self.Pollster.discovery = 'testdiscovery'
+        self.mgr.default_discovery = ['testdiscoveryanother',
+                                      'testdiscoverynonexistent',
+                                      'testdiscoveryexception']
+        self.pipeline_cfg[0]['resources'] = []
+        self.Discovery.resources = discovered_resources
+        self.DiscoveryAnother.resources = [d[::-1]
+                                           for d in discovered_resources]
+        self.setup_pipeline()
+        polling_tasks = self.mgr.setup_polling_tasks()
+        self.mgr.interval_task(polling_tasks.get(60))
+        self.assertEqual(set(self.Discovery.resources),
+                         set(self.Pollster.resources))
+
     def test_per_agent_discovery_overridden_by_per_pipeline_discovery(self):
         discovered_resources = ['discovered_1', 'discovered_2']
         self.mgr.discovery_manager = self.create_discovery_manager()
@@ -457,6 +483,57 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.mgr.interval_task(polling_tasks.get(60))
         self.assertEqual(set(self.DiscoveryAnother.resources),
                          set(self.Pollster.resources))
+
+    def _do_test_per_pollster_discovery(self, discovered_resources,
+                                        static_resources):
+        self.Pollster.discovery = 'testdiscovery'
+        self.mgr.discovery_manager = self.create_discovery_manager()
+        self.Discovery.resources = discovered_resources
+        self.DiscoveryAnother.resources = [d[::-1]
+                                           for d in discovered_resources]
+        if static_resources:
+            # just so we can test that static + pre_pipeline amalgamated
+            # override per_pollster
+            self.pipeline_cfg[0]['discovery'] = ['testdiscoveryanother',
+                                                 'testdiscoverynonexistent',
+                                                 'testdiscoveryexception']
+        self.pipeline_cfg[0]['resources'] = static_resources
+        self.setup_pipeline()
+        polling_tasks = self.mgr.setup_polling_tasks()
+        self.mgr.interval_task(polling_tasks.get(60))
+        if static_resources:
+            self.assertEqual(set(static_resources +
+                                 self.DiscoveryAnother.resources),
+                             set(self.Pollster.resources))
+        else:
+            self.assertEqual(set(self.Discovery.resources),
+                             set(self.Pollster.resources))
+
+    def test_per_pollster_discovery(self):
+        self._do_test_per_pollster_discovery(['discovered_1', 'discovered_2'],
+                                             [])
+
+    def test_per_pollster_discovery_overridden_by_per_pipeline_discovery(self):
+        # ensure static+per_source_discovery overrides per_pollster_discovery
+        self._do_test_per_pollster_discovery(['discovered_1', 'discovered_2'],
+                                             ['static_1', 'static_2'])
+
+    def test_per_pollster_discovery_caching(self):
+        # ensure single discovery associated with multiple pollsters
+        # only called once per polling cycle
+        discovered_resources = ['discovered_1', 'discovered_2']
+        self.Pollster.discovery = 'testdiscovery'
+        self.PollsterAnother.discovery = 'testdiscovery'
+        self.mgr.discovery_manager = self.create_discovery_manager()
+        self.Discovery.resources = discovered_resources
+        self.pipeline_cfg[0]['counters'].append('testanother')
+        self.pipeline_cfg[0]['resources'] = []
+        self.setup_pipeline()
+        polling_tasks = self.mgr.setup_polling_tasks()
+        self.mgr.interval_task(polling_tasks.get(60))
+        self.assertEqual(1, len(self.Discovery.params))
+        self.assertEqual(discovered_resources, self.Pollster.resources)
+        self.assertEqual(discovered_resources, self.PollsterAnother.resources)
 
     def _do_test_per_pipeline_discovery(self,
                                         discovered_resources,

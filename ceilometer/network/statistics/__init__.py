@@ -30,6 +30,13 @@ class _Base(plugin.CentralPollster):
     NAMESPACE = 'network.statistics.drivers'
     drivers = {}
 
+    @property
+    def default_discovery(self):
+        # this signifies that the pollster gets its resources from
+        # elsewhere, in this case they're manually listed in the
+        # pipeline configuration
+        return None
+
     @abc.abstractproperty
     def meter_name(self):
         """Return a Meter Name."""
@@ -63,7 +70,7 @@ class _Base(plugin.CentralPollster):
                                                           scheme).driver()
         return _Base.drivers[scheme]
 
-    def get_samples(self, manager, cache, resources=None):
+    def get_samples(self, manager, cache, resources):
         resources = resources or []
         for resource in resources:
             parse_url, params = self._parse_my_resource(resource)

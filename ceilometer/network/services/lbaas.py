@@ -21,7 +21,6 @@ import collections
 from oslo.utils import timeutils
 import six
 
-from ceilometer.central import plugin
 from ceilometer.network.services import base
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
@@ -50,7 +49,11 @@ class LBPoolPollster(base.BaseServicesPollster):
               'vip_id'
               ]
 
-    def get_samples(self, manager, cache, resources=None):
+    @property
+    def default_discovery(self):
+        return 'lb_pools'
+
+    def get_samples(self, manager, cache, resources):
         resources = resources or []
 
         for pool in resources:
@@ -94,7 +97,11 @@ class LBVipPollster(base.BaseServicesPollster):
               'session_persistence',
               ]
 
-    def get_samples(self, manager, cache, resources=None):
+    @property
+    def default_discovery(self):
+        return 'lb_vips'
+
+    def get_samples(self, manager, cache, resources):
         resources = resources or []
 
         for vip in resources:
@@ -132,7 +139,11 @@ class LBMemberPollster(base.BaseServicesPollster):
               'weight',
               ]
 
-    def get_samples(self, manager, cache, resources=None):
+    @property
+    def default_discovery(self):
+        return 'lb_members'
+
+    def get_samples(self, manager, cache, resources):
         resources = resources or []
 
         for member in resources:
@@ -167,7 +178,11 @@ class LBHealthMonitorPollster(base.BaseServicesPollster):
               'type'
               ]
 
-    def get_samples(self, manager, cache, resources=None):
+    @property
+    def default_discovery(self):
+        return 'lb_health_probes'
+
+    def get_samples(self, manager, cache, resources):
         for probe in resources:
             LOG.debug("Load Balancer Health probe : %s" % probe)
             yield sample.Sample(
@@ -226,13 +241,16 @@ class _LBStatsPollster(base.BaseServicesPollster):
             )
         return i_cache[pool_id]
 
+    @property
+    def default_discovery(self):
+        return 'lb_pools'
+
     @abc.abstractmethod
     def _get_sample(pool, c_data):
         """Return one Sample."""
 
-    @plugin.check_keystone('network', 'nc')
-    def get_samples(self, manager, cache, resources=None):
-        for pool in self._get_lb_pools():
+    def get_samples(self, manager, cache, resources):
+        for pool in resources:
             try:
                 c_data = self._populate_stats_cache(pool['id'], cache)
                 yield self._get_sample(pool, c_data)
