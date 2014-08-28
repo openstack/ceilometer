@@ -19,6 +19,7 @@ import socket
 
 import msgpack
 from oslo.config import cfg
+import oslo.messaging
 from oslo.utils import units
 
 from ceilometer import dispatcher
@@ -38,8 +39,10 @@ OPTS = [
 ]
 
 cfg.CONF.register_opts(OPTS, group="collector")
-cfg.CONF.import_opt('metering_topic', 'ceilometer.publisher.rpc',
+cfg.CONF.import_opt('metering_topic', 'ceilometer.publisher.messaging',
                     group="publisher_rpc")
+cfg.CONF.import_opt('metering_topic', 'ceilometer.publisher.messaging',
+                    group="publisher_notifier")
 
 
 LOG = log.getLogger(__name__)
@@ -52,6 +55,7 @@ class CollectorService(os_service.Service):
         # ensure dispatcher is configured before starting other services
         self.dispatcher_manager = dispatcher.load_dispatcher_manager()
         self.rpc_server = None
+        self.notification_server = None
         super(CollectorService, self).start()
 
         if cfg.CONF.collector.udp_address:
@@ -61,7 +65,14 @@ class CollectorService(os_service.Service):
         if transport:
             self.rpc_server = messaging.get_rpc_server(
                 transport, cfg.CONF.publisher_rpc.metering_topic, self)
+
+            target = oslo.messaging.Target(
+                topic=cfg.CONF.publisher_notifier.metering_topic)
+            self.notification_server = messaging.get_notification_listener(
+                transport, [target], [self])
+
             self.rpc_server.start()
+            self.notification_server.start()
 
             if not cfg.CONF.collector.udp_address:
                 # Add a dummy thread to have wait() working
@@ -94,7 +105,19 @@ class CollectorService(os_service.Service):
         self.udp_run = False
         if self.rpc_server:
             self.rpc_server.stop()
+        if self.notification_server:
+            self.notification_server.stop()
         super(CollectorService, self).stop()
+
+    def sample(self, ctxt, publisher_id, event_type, payload, metadata):
+        """RPC endpoint for notification messages
+
+        When another service sends a notification over the message
+        bus, this method receives it.
+
+        """
+        self.dispatcher_manager.map_method('record_metering_data',
+                                           data=payload)
 
     def record_metering_data(self, context, data):
         """RPC endpoint for messages we send to ourselves.

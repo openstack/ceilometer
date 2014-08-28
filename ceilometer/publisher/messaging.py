@@ -17,13 +17,14 @@
 """Publish a sample using the preferred RPC mechanism.
 """
 
-
+import abc
 import itertools
 import operator
 
 from oslo.config import cfg
 import oslo.messaging
 import oslo.messaging._drivers.common
+import six
 import six.moves.urllib.parse as urlparse
 
 from ceilometer import messaging
@@ -35,7 +36,7 @@ from ceilometer.publisher import utils
 
 LOG = log.getLogger(__name__)
 
-METER_PUBLISH_OPTS = [
+METER_PUBLISH_RPC_OPTS = [
     cfg.StrOpt('metering_topic',
                default='metering',
                help='The topic that ceilometer uses for metering messages.',
@@ -43,13 +44,24 @@ METER_PUBLISH_OPTS = [
                ),
 ]
 
+METER_PUBLISH_NOTIFIER_OPTS = [
+    cfg.StrOpt('metering_topic',
+               default='metering',
+               help='The topic that ceilometer uses for metering '
+               'notifications.',
+               ),
+    cfg.StrOpt('metering_driver',
+               default='messagingv2',
+               help='The driver that ceilometer uses for metering '
+               'notifications.',
+               )
+]
 
-def register_opts(config):
-    """Register the options for publishing metering messages."""
-    config.register_opts(METER_PUBLISH_OPTS, group="publisher_rpc")
-
-
-register_opts(cfg.CONF)
+cfg.CONF.register_opts(METER_PUBLISH_RPC_OPTS,
+                       group="publisher_rpc")
+cfg.CONF.register_opts(METER_PUBLISH_NOTIFIER_OPTS,
+                       group="publisher_notifier")
+cfg.CONF.import_opt('host', 'ceilometer.service')
 
 
 def oslo_messaging_is_rabbit():
@@ -76,7 +88,8 @@ def override_backend_retry_config(value):
             cfg.CONF.set_override('rabbit_max_retries', value)
 
 
-class RPCPublisher(publisher.PublisherBase):
+@six.add_metaclass(abc.ABCMeta)
+class MessagingPublisher(publisher.PublisherBase):
 
     def __init__(self, parsed_url):
         options = urlparse.parse_qs(parsed_url.query)
@@ -85,8 +98,6 @@ class RPCPublisher(publisher.PublisherBase):
         # is provided more than once
         self.per_meter_topic = bool(int(
             options.get('per_meter_topic', [0])[-1]))
-
-        self.target = options.get('target', ['record_metering_data'])[0]
 
         self.policy = options.get('policy', ['default'])[-1]
         self.max_queue_length = int(options.get(
@@ -104,9 +115,6 @@ class RPCPublisher(publisher.PublisherBase):
             LOG.warn(_('Publishing policy is unknown (%s) force to default')
                      % self.policy)
             self.policy = 'default'
-
-        transport = messaging.get_transport()
-        self.rpc_client = messaging.get_rpc_client(transport, version='1.0')
 
     def publish_samples(self, context, samples):
         """Publish samples on RPC.
@@ -174,8 +182,7 @@ class RPCPublisher(publisher.PublisherBase):
         while queue:
             context, topic, meters = queue[0]
             try:
-                self.rpc_client.prepare(topic=topic).cast(
-                    context, self.target, data=meters)
+                self._send(context, topic, meters)
             except oslo.messaging._drivers.common.RPCException:
                 samples = sum([len(m) for __, __, m in queue])
                 if policy == 'queue':
@@ -191,3 +198,39 @@ class RPCPublisher(publisher.PublisherBase):
             else:
                 queue.pop(0)
         return []
+
+    @abc.abstractmethod
+    def _send(self, context, topic, meters):
+        """Send the meters to the messaging topic."""
+
+
+class RPCPublisher(MessagingPublisher):
+    def __init__(self, parsed_url):
+        super(RPCPublisher, self).__init__(parsed_url)
+
+        options = urlparse.parse_qs(parsed_url.query)
+        self.target = options.get('target', ['record_metering_data'])[0]
+
+        self.rpc_client = messaging.get_rpc_client(
+            messaging.get_transport(),
+            version='1.0'
+        )
+
+    def _send(self, context, topic, meters):
+        self.rpc_client.prepare(topic=topic).cast(context, self.target,
+                                                  data=meters)
+
+
+class NotifierPublisher(MessagingPublisher):
+    def __init__(self, parsed_url):
+        super(NotifierPublisher, self).__init__(parsed_url)
+        self.notifier = oslo.messaging.Notifier(
+            messaging.get_transport(),
+            driver=cfg.CONF.publisher_notifier.metering_driver,
+            publisher_id='metering.publisher.%s' % cfg.CONF.host,
+            topic=cfg.CONF.publisher_notifier.metering_topic
+        )
+
+    def _send(self, context, event_type, meters):
+        self.notifier.sample(context.to_dict(), event_type=event_type,
+                             payload=meters)
