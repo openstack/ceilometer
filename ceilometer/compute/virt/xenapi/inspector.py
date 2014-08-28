@@ -22,6 +22,7 @@ try:
 except ImportError:
     api = None
 
+from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.openstack.common.gettextutils import _
 
@@ -96,6 +97,18 @@ class XenapiInspector(virt_inspector.Inspector):
         for vm_ref in vms.keys():
             yield vm_ref, vms[vm_ref]
 
+    def _lookup_by_name(self, instance_name):
+        vm_refs = self._call_xenapi("VM.get_by_name_label", instance_name)
+        n = len(vm_refs)
+        if n == 0:
+            raise virt_inspector.InstanceNotFoundException(
+                _('VM %s not found in XenServer') % instance_name)
+        elif n > 1:
+            raise XenapiException(
+                _('Multiple VM %s found in XenServer') % instance_name)
+        else:
+            return vm_refs[0]
+
     def inspect_instances(self):
         for vm_ref, vm_rec in self._list_vms():
             name = vm_rec['name_label']
@@ -103,3 +116,21 @@ class XenapiInspector(virt_inspector.Inspector):
             uuid = other_config.get('nova_uuid')
             if uuid:
                 yield virt_inspector.Instance(name, uuid)
+
+    def inspect_cpu_util(self, instance, duration=None):
+        instance_name = util.instance_name(instance)
+        vm_ref = self._lookup_by_name(instance_name)
+        metrics_ref = self._call_xenapi("VM.get_metrics", vm_ref)
+        metrics_rec = self._call_xenapi("VM_metrics.get_record",
+                                        metrics_ref)
+        vcpus_number = metrics_rec['VCPUs_number']
+        vcpus_utils = metrics_rec['VCPUs_utilisation']
+        if len(vcpus_utils) == 0:
+            msg = _("Could not get VM %s CPU Utilization") % instance_name
+            raise XenapiException(msg)
+
+        utils = 0.0
+        for num in range(int(vcpus_number)):
+            utils += vcpus_utils.get(str(num))
+        utils = utils / int(vcpus_number) * 100
+        return virt_inspector.CPUUtilStats(util=utils)
