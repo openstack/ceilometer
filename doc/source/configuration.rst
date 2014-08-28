@@ -31,6 +31,7 @@ If you use sql alchemy, its specific parameters will need to be set.
 ===============================  ====================================  ==============================================================
 Parameter                        Default                               Note
 ===============================  ====================================  ==============================================================
+api_paste_config                 api_paste.ini                         Configuration file for WSGI definition of the API
 nova_control_exchange            nova                                  Exchange name for Nova notifications
 glance_control_exchange          glance                                Exchange name for Glance notifications
 cinder_control_exchange          cinder                                Exchange name for Cinder notifications
