@@ -19,7 +19,6 @@
 """
 import datetime
 import logging
-import six
 import uuid
 
 import mock
@@ -30,6 +29,24 @@ from ceilometer.openstack.common.fixture import config
 from ceilometer.openstack.common import test
 from ceilometer.openstack.common import timeutils
 from ceilometer.storage import models
+
+
+class MockLoggingHandler(logging.Handler):
+    """Mock logging handler to check for expected logs."""
+
+    def __init__(self, *args, **kwargs):
+        self.reset()
+        logging.Handler.__init__(self, *args, **kwargs)
+
+    def emit(self, record):
+        self.messages[record.levelname.lower()].append(record.getMessage())
+
+    def reset(self):
+        self.messages = {'debug': [],
+                         'info': [],
+                         'warning': [],
+                         'error': [],
+                         'critical': []}
 
 
 class TestCoordinate(test.BaseTestCase):
@@ -46,8 +63,7 @@ class TestCoordinate(test.BaseTestCase):
         self.partition_coordinator = coordination.PartitionCoordinator()
         self.partition_coordinator.coordination_rpc = mock.Mock()
         #add extra logger to check exception conditions and logged content
-        self.output = six.moves.StringIO()
-        self.str_handler = logging.StreamHandler(self.output)
+        self.str_handler = MockLoggingHandler()
         coordination.LOG.logger.addHandler(self.str_handler)
 
     def tearDown(self):
@@ -55,7 +71,7 @@ class TestCoordinate(test.BaseTestCase):
         timeutils.utcnow.override_time = None
         # clean up the logger
         coordination.LOG.logger.removeHandler(self.str_handler)
-        self.output.close()
+        self.str_handler.close()
 
     def _no_alarms(self):
         self.api_client.alarms.list.return_value = []
@@ -403,21 +419,23 @@ class TestCoordinate(test.BaseTestCase):
         self.partition_coordinator._is_master = mock.Mock(
             side_effect=Exception('Boom!'))
         self.partition_coordinator.check_mastership(10, None)
-        self.assertTrue('mastership check failed' in self.output.getvalue())
+        self.assertIn('mastership check failed',
+                      self.str_handler.messages['error'])
 
     def test_report_presence(self):
         self.partition_coordinator.coordination_rpc.presence = mock.Mock(
             side_effect=Exception('Boom!'))
         self.partition_coordinator.report_presence()
-        self.assertTrue('presence reporting failed' in self.output.getvalue())
+        self.assertIn('presence reporting failed',
+                      self.str_handler.messages['error'])
 
     def test_assigned_alarms(self):
         api_client = mock.MagicMock()
         api_client.alarms = mock.Mock(side_effect=Exception('Boom!'))
         self.partition_coordinator.assignment = ['something']
         self.partition_coordinator.assigned_alarms(api_client)
-        self.assertTrue('assignment retrieval failed' in
-                        self.output.getvalue())
+        self.assertIn('assignment retrieval failed',
+                      self.str_handler.messages['error'])
 
 
 class TestPartitionIdentity(test.BaseTestCase):
