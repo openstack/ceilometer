@@ -8,7 +8,7 @@ httplib2>=0.7.5
 mock>=1.0
 mox>=0.5.3
 # Docs Requirements
-oslosphinx
+oslosphinx>=2.2.0.0a2
 oslotest
 pymongo>=2.5
 python-subunit>=0.0.18
