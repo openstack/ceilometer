@@ -770,19 +770,14 @@ class Connection(base.Connection):
                     # Build a sub query that joins Trait to TraitType
                     # where the trait name matches
                     trait_name = trait_filter.pop('key')
+                    op = trait_filter.pop('op', 'eq')
                     conditions = [models.Trait.trait_type_id ==
                                   models.TraitType.id,
                                   models.TraitType.desc == trait_name]
 
                     for key, value in six.iteritems(trait_filter):
-                        if key == 'string':
-                            conditions.append(models.Trait.t_string == value)
-                        elif key == 'integer':
-                            conditions.append(models.Trait.t_int == value)
-                        elif key == 'datetime':
-                            conditions.append(models.Trait.t_datetime == value)
-                        elif key == 'float':
-                            conditions.append(models.Trait.t_float == value)
+                        sql_utils.trait_op_condition(conditions,
+                                                     key, value, op)
 
                     trait_query = (session.query(models.Trait.event_id).
                                    join(models.TraitType,

@@ -17,6 +17,7 @@
 import datetime
 
 from oslo.utils import timeutils
+import webtest.app
 
 from ceilometer.storage import models
 from ceilometer.tests.api import v2
@@ -50,13 +51,16 @@ class EventTestBase(v2.FunctionalTest,
 
             # Message ID for test will be 'base'. So, message ID for the first
             # event will be '0', the second '100', and so on.
+            # trait_time in first event will be equal to self.trait_time
+            # (datetime.datetime(2013, 12, 31, 5, 0)), next will add 1 day, so
+            # second will be (datetime.datetime(2014, 01, 01, 5, 0)) and so on.
             event_models.append(
                 models.Event(message_id=str(base),
                              event_type=event_type,
                              generated=self.trait_time,
                              traits=trait_models))
             base += 100
-
+            self.trait_time += datetime.timedelta(days=1)
         self.conn.record_events(event_models)
 
 
@@ -107,7 +111,8 @@ class TestTraitAPI(EventTestBase):
         data = self.get_json(path, headers=headers)
         self.assertEqual(1, len(data))
         self.assertEqual("trait_D", data[0]['name'])
-        self.assertEqual(self.trait_time.isoformat(), data[0]['value'])
+        self.assertEqual((self.trait_time - datetime.timedelta(days=3)).
+                         isoformat(), data[0]['value'])
 
     def test_get_trait_data_for_non_existent_event(self):
         path = (self.PATH % "NO_SUCH_EVENT") + "/trait_A"
@@ -125,15 +130,17 @@ class TestTraitAPI(EventTestBase):
 class TestEventAPI(EventTestBase):
 
     PATH = '/events'
+    START_TRAIT_TIME = datetime.datetime(2013, 12, 31, 5, 0)
 
     def test_get_events(self):
         data = self.get_json(self.PATH, headers=headers)
         self.assertEqual(3, len(data))
         # We expect to get native UTC generated time back
-        expected_generated = timeutils.strtime(
-            at=timeutils.normalize_time(self.trait_time),
-            fmt=timeutils._ISO8601_TIME_FORMAT)
+        trait_time = self.START_TRAIT_TIME
         for event in data:
+            expected_generated = timeutils.strtime(
+                at=timeutils.normalize_time(trait_time),
+                fmt=timeutils._ISO8601_TIME_FORMAT)
             self.assertTrue(event['event_type'] in ['Foo', 'Bar', 'Zoo'])
             self.assertEqual(4, len(event['traits']))
             self.assertEqual(expected_generated, event['generated'])
@@ -141,6 +148,7 @@ class TestEventAPI(EventTestBase):
                                'trait_C', 'trait_D']:
                 self.assertTrue(trait_name in map(lambda x: x['name'],
                                                   event['traits']))
+            trait_time += datetime.timedelta(days=1)
 
     def test_get_event_by_message_id(self):
         event = self.get_json(self.PATH + "/100", headers=headers)
@@ -155,10 +163,10 @@ class TestEventAPI(EventTestBase):
                             'value': '100.123456'},
                            {'name': 'trait_D',
                             'type': 'datetime',
-                            'value': '2013-12-31T05:00:00'}]
+                            'value': '2014-01-01T05:00:00'}]
         self.assertEqual('100', event['message_id'])
         self.assertEqual('Bar', event['event_type'])
-        self.assertEqual('2013-12-31T05:00:00', event['generated'])
+        self.assertEqual('2014-01-01T05:00:00', event['generated'])
         self.assertEqual(expected_traits, event['traits'])
 
     def test_get_event_by_message_id_no_such_id(self):
@@ -209,13 +217,13 @@ class TestEventAPI(EventTestBase):
     def test_get_events_filter_datetime_trait(self):
         data = self.get_json(self.PATH, headers=headers,
                              q=[{'field': 'trait_D',
-                                 'value': self.trait_time.isoformat(),
+                                 'value': '2014-01-01T05:00:00',
                                  'type': 'datetime'}])
-        self.assertEqual(3, len(data))
+        self.assertEqual(1, len(data))
         traits = filter(lambda x: x['name'] == 'trait_D', data[0]['traits'])
         self.assertEqual(1, len(traits))
         self.assertEqual('datetime', traits[0]['type'])
-        self.assertEqual(self.trait_time.isoformat(), traits[0]['value'])
+        self.assertEqual('2014-01-01T05:00:00', traits[0]['value'])
 
     def test_get_events_multiple_filters(self):
         data = self.get_json(self.PATH, headers=headers,
@@ -243,3 +251,163 @@ class TestEventAPI(EventTestBase):
         data = self.get_json(self.PATH, headers=headers,
                              q=[])
         self.assertEqual(3, len(data))
+
+    def test_get_events_filter_op_string(self):
+        data = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_A',
+                                 'value': 'my_Foo_text',
+                                 'type': 'string',
+                                 'op': 'eq'}])
+        self.assertEqual(1, len(data))
+        data = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_A',
+                                 'value': 'my_Bar_text',
+                                 'type': 'string',
+                                 'op': 'lt'}])
+        self.assertEqual(0, len(data))
+        data = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_A',
+                                 'value': 'my_Zoo_text',
+                                 'type': 'string',
+                                 'op': 'le'}])
+        self.assertEqual(3, len(data))
+        data = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_A',
+                                 'value': 'my_Foo_text',
+                                 'type': 'string',
+                                 'op': 'ne'}])
+        self.assertEqual(2, len(data))
+        data = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_A',
+                                 'value': 'my_Bar_text',
+                                 'type': 'string',
+                                 'op': 'gt'}])
+        self.assertEqual(2, len(data))
+        data = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_A',
+                                 'value': 'my_Zoo_text',
+                                 'type': 'string',
+                                 'op': 'ge'}])
+        self.assertEqual(1, len(data))
+
+    def test_get_events_filter_op_integer(self):
+        data = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_B',
+                                 'value': '101',
+                                 'type': 'integer',
+                                 'op': 'eq'}])
+        self.assertEqual(1, len(data))
+        data = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_B',
+                                 'value': '201',
+                                 'type': 'integer',
+                                 'op': 'lt'}])
+        self.assertEqual(2, len(data))
+        data = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_B',
+                                 'value': '1',
+                                 'type': 'integer',
+                                 'op': 'le'}])
+        self.assertEqual(1, len(data))
+        data = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_B',
+                                 'value': '101',
+                                 'type': 'integer',
+                                 'op': 'ne'}])
+        self.assertEqual(2, len(data))
+        data = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_B',
+                                 'value': '201',
+                                 'type': 'integer',
+                                 'op': 'gt'}])
+        self.assertEqual(0, len(data))
+        data = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_B',
+                                 'value': '1',
+                                 'type': 'integer',
+                                 'op': 'ge'}])
+        self.assertEqual(3, len(data))
+
+    def test_get_events_filter_op_float(self):
+        data = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_C',
+                                 'value': '100.123456',
+                                 'type': 'float',
+                                 'op': 'eq'}])
+        self.assertEqual(1, len(data))
+        data = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_C',
+                                 'value': '200.123456',
+                                 'type': 'float',
+                                 'op': 'lt'}])
+        self.assertEqual(2, len(data))
+        data = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_C',
+                                 'value': '0.123456',
+                                 'type': 'float',
+                                 'op': 'le'}])
+        self.assertEqual(1, len(data))
+        data = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_C',
+                                 'value': '100.123456',
+                                 'type': 'float',
+                                 'op': 'ne'}])
+        self.assertEqual(2, len(data))
+        data = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_C',
+                                 'value': '200.123456',
+                                 'type': 'float',
+                                 'op': 'gt'}])
+        self.assertEqual(0, len(data))
+        data = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_C',
+                                 'value': '0.123456',
+                                 'type': 'float',
+                                 'op': 'ge'}])
+        self.assertEqual(3, len(data))
+
+    def test_get_events_filter_op_datatime(self):
+        data = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_D',
+                                 'value': '2014-01-01T05:00:00',
+                                 'type': 'datetime',
+                                 'op': 'eq'}])
+        self.assertEqual(1, len(data))
+        data = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_D',
+                                 'value': '2014-01-02T05:00:00',
+                                 'type': 'datetime',
+                                 'op': 'lt'}])
+        self.assertEqual(2, len(data))
+        data = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_D',
+                                 'value': '2013-12-31T05:00:00',
+                                 'type': 'datetime',
+                                 'op': 'le'}])
+        self.assertEqual(1, len(data))
+        data = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_D',
+                                 'value': '2014-01-01T05:00:00',
+                                 'type': 'datetime',
+                                 'op': 'ne'}])
+        self.assertEqual(2, len(data))
+        data = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_D',
+                                 'value': '2014-01-02T05:00:00',
+                                 'type': 'datetime',
+                                 'op': 'gt'}])
+        self.assertEqual(0, len(data))
+        data = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_D',
+                                 'value': '2013-12-31T05:00:00',
+                                 'type': 'datetime',
+                                 'op': 'ge'}])
+        self.assertEqual(3, len(data))
+
+    def test_get_events_filter_wrong_op(self):
+        self.assertRaises(webtest.app.AppError,
+                          self.get_json, self.PATH, headers=headers,
+                          q=[{'field': 'trait_B',
+                              'value': '1',
+                              'type': 'integer',
+                              'op': 'el'}])
