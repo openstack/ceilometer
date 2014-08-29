@@ -63,6 +63,23 @@ class MongoDbManager(fixtures.Fixture):
         }
 
 
+class MySQLDbManager(fixtures.Fixture):
+
+    def __init__(self, url):
+        self._url = url
+
+    def setUp(self):
+        super(MySQLDbManager, self).setUp()
+        self.connection = storage.get_connection(
+            self.url, 'ceilometer.metering.storage')
+        self.alarm_connection = storage.get_connection(
+            self.url, 'ceilometer.alarm.storage')
+
+    @property
+    def url(self):
+        return self._url
+
+
 class HBaseManager(fixtures.Fixture):
     def __init__(self, url):
         self._url = url
@@ -118,6 +135,7 @@ class TestBase(testscenarios.testcase.WithScenarios, test_base.BaseTestCase):
 
     DRIVER_MANAGERS = {
         'mongodb': MongoDbManager,
+        'mysql': MySQLDbManager,
         'db2': MongoDbManager,
         'sqlite': SQLiteManager,
         'hbase': HBaseManager,
@@ -202,11 +220,24 @@ class MixinTestsWithBackendScenarios(object):
 
     scenarios = [
         ('sqlite', {'db_url': 'sqlite://'}),
-        ('mongodb', {'db_url': os.environ.get('CEILOMETER_TEST_MONGODB_URL')}),
-        ('hbase', {'db_url': os.environ.get('CEILOMETER_TEST_HBASE_URL',
-                                            'hbase://__test__')}),
-        ('db2', {'db_url': (os.environ.get('CEILOMETER_TEST_DB2_URL') or
-                            os.environ.get('CEILOMETER_TEST_MONGODB_URL',
-                                           '').replace('mongodb://',
-                                                       'db2://'))})
     ]
+
+    for db in ('MONGODB', 'MYSQL', 'HBASE', 'DB2'):
+        if os.environ.get('CEILOMETER_TEST_%s_URL' % db):
+            scenarios.append(
+                (db.lower(), {'db_url': os.environ.get(
+                    'CEILOMETER_TEST_%s_URL' % db)}))
+
+    scenarios_db = [db for db, _ in scenarios]
+
+    # Insert default value for hbase test
+    if 'hbase' not in scenarios_db:
+        scenarios.append(
+            ('hbase', {'db_url': 'hbase://__test__'}))
+
+    # Insert default value for db2 test
+    if 'mongodb' in scenarios_db and 'db2' not in scenarios_db:
+        scenarios.append(
+            ('db2', {'db_url': os.environ.get('CEILOMETER_TEST_MONGODB_URL',
+                                              '').replace('mongodb://',
+                                                          'db2://')}))
