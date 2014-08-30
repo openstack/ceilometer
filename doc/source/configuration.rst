@@ -429,6 +429,40 @@ The default configuration can be found in `pipeline.yaml`_.
 
 .. _pipeline.yaml: https://git.openstack.org/cgit/openstack/ceilometer/tree/etc/ceilometer/pipeline.yaml
 
+.. _publishers:
+
+Publishers
+++++++++++
+
+The definition of publishers looks like::
+
+    publishers:
+        - udp://10.0.0.2:1234
+        - rpc://?per_meter_topic=1
+        - notifier://?policy=drop&max_queue_length=512
+
+The udp publisher is configurable like this: *udp://<host>:<port>/*
+
+The rpc publisher is configurable like this:
+*rpc://?option1=value1&option2=value2*
+
+Same thing for the notifier publisher:
+*notifier://?option1=value1&option2=value2*
+
+For rpc and notifier the options are:
+
+- *per_meter_topic=1* to publish the samples on additional
+  *<metering_topic>.<sample_name>* topic queue besides the *<metering_topic>*
+  queue
+- *policy=(default|drop|queue)* to configure the behavior when the publisher
+  fails to send the samples, where the predefined values mean the following:
+
+  - *default*, wait and block until the samples have been sent
+  - *drop*, drop the samples which are failed to be sent
+  - *queue*, create an in-memory queue and retry to send the samples on the
+    queue on the next samples publishing (the queue length can be configured
+    with *max_queue_length=1024*, 1024 is the default)
+
 .. _transformers:
 
 Transformers
