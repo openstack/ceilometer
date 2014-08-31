@@ -18,18 +18,43 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
 import mock
+from oslotest import mockpatch
 
 from ceilometer.compute import manager
 from ceilometer.compute.pollsters import disk
 from ceilometer.compute.virt import inspector as virt_inspector
-from ceilometer.tests.compute.pollsters import base
+import ceilometer.tests.base as base
 
 
-class TestBaseDistIO(base.TestPollsterBase):
+class TestBaseDiskIO(base.BaseTestCase):
 
     TYPE = 'cumulative'
+
+    def setUp(self):
+        super(TestBaseDiskIO, self).setUp()
+
+        self.inspector = mock.Mock()
+        self.instance = self._get_fake_instances()
+        patch_virt = mockpatch.Patch(
+            'ceilometer.compute.virt.inspector.get_hypervisor_inspector',
+            new=mock.Mock(return_value=self.inspector))
+        self.useFixture(patch_virt)
+
+    @staticmethod
+    def _get_fake_instances():
+        instances = []
+        for i in [1, 2]:
+            instance = mock.MagicMock()
+            instance.name = 'instance-%s' % i
+            setattr(instance, 'OS-EXT-SRV-ATTR:instance_name',
+                    instance.name)
+            instance.id = i
+            instance.flavor = {'name': 'm1.small', 'id': 2, 'vcpus': 1,
+                               'ram': 512, 'disk': 20, 'ephemeral': 0}
+            instance.status = 'active'
+            instances.append(instance)
+        return instances
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def _check_get_samples(self, factory, name):
@@ -44,24 +69,27 @@ class TestBaseDistIO(base.TestPollsterBase):
         if expected_device is not None:
             self.assertEqual(set(expected_device),
                              set(match[0].resource_metadata.get('device')))
-        self.assertEqual(self.instance.id, match[0].resource_id)
+        instances = [i.id for i in self.instance]
+        for m in match:
+            self.assertIn(m.resource_id, instances)
 
     def _check_per_device_samples(self, factory, name,
                                   expected_volume,
                                   expected_device=None):
-        match = self._check_get_samples(factory, name, expected_count=2)
+        match = self._check_get_samples(factory, name, expected_count=4)
         match_dict = {}
         for m in match:
             match_dict[m.resource_id] = m
-        key = "%s-%s" % (self.instance.id, expected_device)
-        self.assertEqual(expected_volume,
-                         match_dict[key].volume)
-        self.assertEqual(self.TYPE, match_dict[key].type)
+        for instance in self.instance:
+            key = "%s-%s" % (instance.id, expected_device)
+            self.assertEqual(expected_volume,
+                             match_dict[key].volume)
+            self.assertEqual(self.TYPE, match_dict[key].type)
 
-        self.assertEqual(key, match_dict[key].resource_id)
+            self.assertEqual(key, match_dict[key].resource_id)
 
 
-class TestDiskPollsters(TestBaseDistIO):
+class TestDiskPollsters(TestBaseDiskIO):
 
     DISKS = [
         (virt_inspector.Disk(device='vda1'),
@@ -79,15 +107,16 @@ class TestDiskPollsters(TestBaseDistIO):
         self.inspector.inspect_disks = mock.Mock(return_value=self.DISKS)
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
-    def _check_get_samples(self, factory, name, expected_count=1):
+    def _check_get_samples(self, factory, name, expected_count=2):
         pollster = factory()
 
         mgr = manager.AgentManager()
         cache = {}
-        samples = list(pollster.get_samples(mgr, cache, [self.instance]))
+        samples = list(pollster.get_samples(mgr, cache, self.instance))
         self.assertIsNotEmpty(samples)
         self.assertIn(pollster.CACHE_KEY_DISK, cache)
-        self.assertIn(self.instance.name, cache[pollster.CACHE_KEY_DISK])
+        for instance in self.instance:
+            self.assertIn(instance.name, cache[pollster.CACHE_KEY_DISK])
         self.assertEqual(set([name]), set([s.name for s in samples]))
 
         match = [s for s in samples if s.name == name]
@@ -148,7 +177,7 @@ class TestDiskPollsters(TestBaseDistIO):
                                        'vda2')
 
 
-class TestDiskRatePollsters(TestBaseDistIO):
+class TestDiskRatePollsters(TestBaseDiskIO):
 
     DISKS = [
         (virt_inspector.Disk(device='disk1'),
@@ -165,16 +194,17 @@ class TestDiskRatePollsters(TestBaseDistIO):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def _check_get_samples(self, factory, sample_name,
-                           expected_count=1):
+                           expected_count=2):
         pollster = factory()
 
         mgr = manager.AgentManager()
         cache = {}
-        samples = list(pollster.get_samples(mgr, cache, [self.instance]))
+        samples = list(pollster.get_samples(mgr, cache, self.instance))
         self.assertIsNotEmpty(samples)
         self.assertIsNotNone(samples)
         self.assertIn(pollster.CACHE_KEY_DISK_RATE, cache)
-        self.assertIn(self.instance.id, cache[pollster.CACHE_KEY_DISK_RATE])
+        for instance in self.instance:
+            self.assertIn(instance.id, cache[pollster.CACHE_KEY_DISK_RATE])
 
         self.assertEqual(set([sample_name]), set([s.name for s in samples]))
 
