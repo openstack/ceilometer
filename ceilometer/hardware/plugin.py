@@ -37,7 +37,7 @@ class HardwarePollster(plugin.CentralPollster):
     """Base class for plugins that support the polling API."""
 
     CACHE_KEY = None
-    INSPECT_METHOD = None
+    IDENTIFIER = None
 
     def __init__(self):
         super(HardwarePollster, self).__init__()
@@ -55,22 +55,24 @@ class HardwarePollster(plugin.CentralPollster):
         sample_iters = []
         for res in resources:
             parsed_url = netutils.urlsplit(res)
-            inspector = self._get_inspector(parsed_url)
-            func = getattr(inspector, self.INSPECT_METHOD)
-
+            ins = self._get_inspector(parsed_url)
             try:
                 # Call hardware inspector to poll for the data
                 i_cache = h_cache.setdefault(res, {})
-                if res not in i_cache:
-                    i_cache[res] = list(func(parsed_url))
+                if self.IDENTIFIER not in i_cache:
+                    i_cache[self.IDENTIFIER] = list(ins.inspect_generic(
+                        parsed_url,
+                        self.IDENTIFIER,
+                        i_cache))
                 # Generate samples
-                if i_cache[res]:
-                    sample_iters.append(self.generate_samples(parsed_url,
-                                                              i_cache[res]))
+                if i_cache[self.IDENTIFIER]:
+                    sample_iters.append(self.generate_samples(
+                        parsed_url,
+                        i_cache[self.IDENTIFIER]))
             except Exception as err:
-                LOG.exception(_('inspector call %(func)r failed for '
+                LOG.exception(_('inspector call failed for %(ident)s '
                                 'host %(host)s: %(err)s'),
-                              dict(func=func,
+                              dict(ident=self.IDENTIFIER,
                                    host=parsed_url.hostname,
                                    err=err))
         return itertools.chain(*sample_iters)
@@ -89,9 +91,8 @@ class HardwarePollster(plugin.CentralPollster):
         """Return one Sample.
 
         :param host_url: host url of the endpoint
-        :param c_data: data returned by the corresponding inspector, of
-                       one of the types defined in the file
-                       ceilometer.hardware.inspector.base.CPUStats
+        :param c_data: data returned by the inspector.inspect_generic,
+                       tuple of (value, metadata, extra)
         """
 
     def _get_inspector(self, parsed_url):

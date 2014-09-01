@@ -26,46 +26,32 @@ from ceilometer import sample
 class _Base(plugin.HardwarePollster):
 
     CACHE_KEY = 'nic'
-    INSPECT_METHOD = 'inspect_network'
+
+    def generate_one_sample(self, host, c_data):
+        value, metadata, extra = c_data
+        res_id = host.hostname
+        if metadata.get('name'):
+            res_id = res_id + ".%s" % metadata.get('name')
+        return util.make_sample_from_host(host,
+                                          name=self.IDENTIFIER,
+                                          sample_type=sample.TYPE_CUMULATIVE,
+                                          unit=self.unit,
+                                          volume=value,
+                                          res_metadata=metadata,
+                                          extra=extra,
+                                          resource_id=res_id)
 
 
 class IncomingBytesPollster(_Base):
-
-    @staticmethod
-    def generate_one_sample(host, c_data):
-        (nic, info) = c_data
-        return util.make_sample_from_host(host,
-                                          name='network.incoming.bytes',
-                                          type=sample.TYPE_CUMULATIVE,
-                                          unit='B',
-                                          volume=info.rx_bytes,
-                                          res_metadata=nic,
-                                          )
+    IDENTIFIER = 'network.incoming.bytes'
+    unit = 'B'
 
 
 class OutgoingBytesPollster(_Base):
-
-    @staticmethod
-    def generate_one_sample(host, c_data):
-        (nic, info) = c_data
-        return util.make_sample_from_host(host,
-                                          name='network.outgoing.bytes',
-                                          type=sample.TYPE_CUMULATIVE,
-                                          unit='B',
-                                          volume=info.tx_bytes,
-                                          res_metadata=nic,
-                                          )
+    IDENTIFIER = 'network.outgoing.bytes'
+    unit = 'B'
 
 
 class OutgoingErrorsPollster(_Base):
-
-    @staticmethod
-    def generate_one_sample(host, c_data):
-        (nic, info) = c_data
-        return util.make_sample_from_host(host,
-                                          name='network.outgoing.errors',
-                                          type=sample.TYPE_CUMULATIVE,
-                                          unit='packet',
-                                          volume=info.error,
-                                          res_metadata=nic,
-                                          )
+    IDENTIFIER = 'network.outgoing.errors'
+    unit = 'packet'

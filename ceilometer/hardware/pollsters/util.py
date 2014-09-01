@@ -34,24 +34,26 @@ def make_resource_metadata(res_metadata=None, host_url=None):
     resource_metadata = dict()
     if res_metadata is not None:
         metadata = copy.copy(res_metadata)
-        resource_metadata = dict(zip(metadata._fields, metadata))
+        resource_metadata.update(metadata)
     resource_metadata.update(get_metadata_from_host(host_url))
     return resource_metadata
 
 
-def make_sample_from_host(host_url, name, type, unit, volume,
-                          project_id=None, user_id=None, res_metadata=None):
+def make_sample_from_host(host_url, name, sample_type, unit, volume,
+                          project_id=None, user_id=None, resource_id=None,
+                          res_metadata=None, extra={}):
 
     resource_metadata = make_resource_metadata(res_metadata, host_url)
 
+    res_id = extra.get('resource_id') or resource_id or host_url.hostname
     return sample.Sample(
         name='hardware.' + name,
-        type=type,
+        type=sample_type,
         unit=unit,
         volume=volume,
-        user_id=project_id,
-        project_id=user_id,
-        resource_id=host_url.hostname,
+        user_id=extra.get('user_id') or user_id,
+        project_id=extra.get('project_id') or project_id,
+        resource_id=res_id,
         timestamp=timeutils.isotime(),
         resource_metadata=resource_metadata,
         source='hardware',
