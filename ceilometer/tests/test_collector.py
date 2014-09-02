@@ -34,6 +34,10 @@ from ceilometer import sample
 from ceilometer.tests import base as tests_base
 
 
+class FakeException(Exception):
+    pass
+
+
 class FakeConnection():
     def create_worker(self, topic, proxy, pool_name):
         pass
@@ -227,3 +231,26 @@ class TestCollector(tests_base.BaseTestCase):
         self.srv.rpc_server.wait()
         mylog.info.assert_called_once_with(
             'metering data test for test_run_tasks: 1')
+
+    @mock.patch.object(oslo.messaging.MessageHandlingServer, 'start')
+    @mock.patch.object(collector.CollectorService, 'start_udp')
+    def test_collector_requeue(self, udp_start, rpc_start):
+        self.CONF.set_override('requeue_sample_on_dispatcher_error', True,
+                               group='collector')
+        self.srv.start()
+        with mock.patch.object(self.srv.dispatcher_manager, 'map_method',
+                               side_effect=Exception('boom')):
+            ret = self.srv.sample({}, 'pub_id', 'event', {}, {})
+            self.assertEqual(oslo.messaging.NotificationResult.REQUEUE,
+                             ret)
+
+    @mock.patch.object(oslo.messaging.MessageHandlingServer, 'start')
+    @mock.patch.object(collector.CollectorService, 'start_udp')
+    def test_collector_no_requeue(self, udp_start, rpc_start):
+        self.CONF.set_override('requeue_sample_on_dispatcher_error', False,
+                               group='collector')
+        self.srv.start()
+        with mock.patch.object(self.srv.dispatcher_manager, 'map_method',
+                               side_effect=FakeException('boom')):
+            self.assertRaises(FakeException, self.srv.sample, {}, 'pub_id',
+                              'event', {}, {})

@@ -25,6 +25,7 @@ from oslo.utils import units
 from ceilometer import dispatcher
 from ceilometer import messaging
 from ceilometer.openstack.common.gettextutils import _
+from ceilometer.openstack.common.gettextutils import _LE
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import service as os_service
 
@@ -36,6 +37,11 @@ OPTS = [
     cfg.IntOpt('udp_port',
                default=4952,
                help='Port to which the UDP socket is bound.'),
+    cfg.BoolOpt('requeue_sample_on_dispatcher_error',
+                default=False,
+                help='Requeue the sample on the collector sample queue '
+                'when the collector fails to dispatch it. This is only valid '
+                'if the sample come from the notifier publisher'),
 ]
 
 cfg.CONF.register_opts(OPTS, group="collector")
@@ -61,6 +67,7 @@ class CollectorService(os_service.Service):
         if cfg.CONF.collector.udp_address:
             self.tg.add_thread(self.start_udp)
 
+        allow_requeue = cfg.CONF.collector.requeue_sample_on_dispatcher_error
         transport = messaging.get_transport(optional=True)
         if transport:
             self.rpc_server = messaging.get_rpc_server(
@@ -69,7 +76,8 @@ class CollectorService(os_service.Service):
             target = oslo.messaging.Target(
                 topic=cfg.CONF.publisher_notifier.metering_topic)
             self.notification_server = messaging.get_notification_listener(
-                transport, [target], [self])
+                transport, [target], [self],
+                allow_requeue=allow_requeue)
 
             self.rpc_server.start()
             self.notification_server.start()
@@ -116,8 +124,15 @@ class CollectorService(os_service.Service):
         bus, this method receives it.
 
         """
-        self.dispatcher_manager.map_method('record_metering_data',
-                                           data=payload)
+        try:
+            self.dispatcher_manager.map_method('record_metering_data',
+                                               data=payload)
+        except Exception:
+            if cfg.CONF.collector.requeue_sample_on_dispatcher_error:
+                LOG.exception(_LE("Dispatcher failed to handle the sample, "
+                                  "requeue it."))
+                return oslo.messaging.NotificationResult.REQUEUE
+            raise
 
     def record_metering_data(self, context, data):
         """RPC endpoint for messages we send to ourselves.

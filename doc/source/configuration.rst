@@ -208,6 +208,20 @@ evaluation_service      singleton       Driver to use for alarm evaluation servi
 ======================  ==============  ====================================================================================
 
 
+Collector
+=========
+
+The following options in the [collector] configuration section affect the collector service
+
+=====================================  ======================================  ==============================================================
+Parameter                              Default                                 Note
+=====================================  ======================================  ==============================================================
+requeue_sample_on_dispatcher_error     False                                   Requeue the sample on the collector sample queue when the
+                                                                               collector fails to dispatch it. This option is only valid if
+                                                                               the sample comes from the notifier publisher
+=====================================  ======================================  ==============================================================
+
+
 
 General options
 ===============
