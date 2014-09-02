@@ -17,6 +17,7 @@
 
 import socket
 
+import mock
 from oslo.config import cfg
 from oslo.config import fixture as fixture_config
 
@@ -42,3 +43,9 @@ class TestApp(base.BaseTestCase):
         self.CONF.set_override('host', 'ddddd', group='api')
         server_cls = app.get_server_cls(cfg.CONF.api.host)
         self.assertEqual(server_cls.address_family, socket.AF_INET)
+
+    def test_api_paste_file_not_exist(self):
+        self.CONF.set_override('api_paste_config', 'non-existent-file')
+        with mock.patch.object(self.CONF, 'find_file') as ff:
+            ff.return_value = None
+            self.assertRaises(cfg.ConfigFilesNotFoundError, app.load_app)

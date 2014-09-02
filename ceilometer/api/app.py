@@ -129,23 +129,15 @@ def get_handler_cls():
 
 def load_app():
     # Build the WSGI app
-    cfg_file = cfg.CONF.api_paste_config
-    LOG.info("WSGI config requested: %s" % cfg_file)
-    if not os.path.exists(cfg_file):
-        # this code is to work around chicken-egg dependency between
-        # ceilometer gate jobs use of devstack and this change.
-        # The gate job uses devstack to run tempest.
-        # devstack does not copy api_paste.ini into /etc/ceilometer because it
-        # is introduced in this change. Once this is merged, we will change
-        # devstack to copy api_paste.ini and once that is merged will remove
-        # this code.
-        root = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                            '..', '..', 'etc', 'ceilometer'
-                                            )
-                               )
-        cfg_file = os.path.join(root, cfg_file)
-    if not os.path.exists(cfg_file):
-        raise Exception('api_paste_config file not found')
+    cfg_file = None
+    cfg_path = cfg.CONF.api_paste_config
+    if not os.path.isabs(cfg_path):
+        cfg_file = CONF.find_file(cfg_path)
+    elif os.path.exists(cfg_path):
+        cfg_file = cfg_path
+
+    if not cfg_file:
+        raise cfg.ConfigFilesNotFoundError([cfg.CONF.api_paste_config])
     LOG.info("Full WSGI config used: %s" % cfg_file)
     return deploy.loadapp("config:" + cfg_file)
 
