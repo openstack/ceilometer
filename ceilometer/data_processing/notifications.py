@@ -24,7 +24,7 @@ from ceilometer import sample
 OPTS = [
     cfg.StrOpt('sahara_control_exchange',
                default='sahara',
-               help="Exchange name for Data Processing notifications"),
+               help="Exchange name for Data Processing notifications."),
 ]
 
 cfg.CONF.register_opts(OPTS)

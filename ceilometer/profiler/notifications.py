@@ -23,7 +23,7 @@ from ceilometer import sample
 OPTS = [
     cfg.StrOpt('trove_control_exchange',
                default='trove',
-               help="Exchange name for DBaaS notifications"),
+               help="Exchange name for DBaaS notifications."),
 ]
 
 cfg.CONF.register_opts(OPTS)

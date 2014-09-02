@@ -32,12 +32,13 @@ opt_group = cfg.OptGroup(name='xenapi',
 
 xenapi_opts = [
     cfg.StrOpt('connection_url',
-               help='URL for connection to XenServer/Xen Cloud Platform'),
+               help='URL for connection to XenServer/Xen Cloud Platform.'),
     cfg.StrOpt('connection_username',
                default='root',
-               help='Username for connection to XenServer/Xen Cloud Platform'),
+               help='Username for connection to XenServer/Xen Cloud '
+                    'Platform.'),
     cfg.StrOpt('connection_password',
-               help='Password for connection to XenServer/Xen Cloud Platform',
+               help='Password for connection to XenServer/Xen Cloud Platform.',
                secret=True),
     cfg.IntOpt('login_timeout',
                default=10,
