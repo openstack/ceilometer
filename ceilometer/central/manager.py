@@ -21,6 +21,16 @@ from oslo.config import cfg
 from ceilometer import agent
 from ceilometer.openstack.common import log
 
+OPTS = [
+    cfg.StrOpt('partitioning_group_prefix',
+               default=None,
+               help='Work-load partitioning group prefix. Use only if you '
+                    'want to run multiple central agents with different '
+                    'config files. For each sub-group of the central agent '
+                    'pool with the same partitioning_group_prefix a disjoint '
+                    'subset of pollsters should be loaded.'),
+]
+cfg.CONF.register_opts(OPTS, group='central')
 cfg.CONF.import_group('service_credentials', 'ceilometer.service')
 
 LOG = log.getLogger(__name__)
@@ -29,7 +39,8 @@ LOG = log.getLogger(__name__)
 class AgentManager(agent.AgentManager):
 
     def __init__(self):
-        super(AgentManager, self).__init__('central')
+        super(AgentManager, self).__init__(
+            'central', group_prefix=cfg.CONF.central.partitioning_group_prefix)
 
     def interval_task(self, task):
         try:

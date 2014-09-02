@@ -4,6 +4,7 @@
 #
 # Authors: Julien Danjou <julien@danjou.info>
 #          Eoghan Glynn <eglynn@redhat.com>
+#          Nejc Saje <nsaje@redhat.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -20,10 +21,12 @@
 import collections
 import itertools
 
+from oslo.config import cfg
 import six
 from six.moves.urllib import parse as urlparse
 from stevedore import extension
 
+from ceilometer import coordination
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
@@ -31,6 +34,9 @@ from ceilometer.openstack.common import service as os_service
 from ceilometer import pipeline
 
 LOG = log.getLogger(__name__)
+
+cfg.CONF.import_opt('heartbeat', 'ceilometer.coordination',
+                    group='coordination')
 
 
 class Resources(object):
@@ -100,13 +106,16 @@ class PollingTask(object):
 
 class AgentManager(os_service.Service):
 
-    def __init__(self, namespace, default_discovery=None):
+    def __init__(self, namespace, default_discovery=None, group_prefix=None):
         super(AgentManager, self).__init__()
         default_discovery = default_discovery or []
         self.default_discovery = default_discovery
         self.pollster_manager = self._extensions('poll', namespace)
         self.discovery_manager = self._extensions('discover')
         self.context = context.RequestContext('admin', 'admin', is_admin=True)
+        self.partition_coordinator = coordination.PartitionCoordinator()
+        self.group_prefix = ('%s-%s' % (namespace, group_prefix)
+                             if group_prefix else namespace)
 
     @staticmethod
     def _extensions(category, agent_ns=None):
@@ -116,6 +125,12 @@ class AgentManager(os_service.Service):
             namespace=namespace,
             invoke_on_load=True,
         )
+
+    def join_partitioning_groups(self):
+        groups = set([self._construct_group_id(d.obj.group_id)
+                      for d in self.discovery_manager])
+        for group in groups:
+            self.partition_coordinator.join_group(group)
 
     def create_polling_task(self):
         """Create an initially empty polling task."""
@@ -135,13 +150,27 @@ class AgentManager(os_service.Service):
 
         return polling_tasks
 
+    def _construct_group_id(self, discovery_group_id):
+        return ('%s-%s' % (self.group_prefix,
+                           discovery_group_id)
+                if discovery_group_id else None)
+
     def start(self):
         self.pipeline_manager = pipeline.setup_pipeline()
+
+        self.partition_coordinator.start()
+        self.join_partitioning_groups()
+
+        # allow time for coordination if necessary
+        delay_start = self.partition_coordinator.is_active()
 
         for interval, task in six.iteritems(self.setup_polling_tasks()):
             self.tg.add_timer(interval,
                               self.interval_task,
+                              initial_delay=interval if delay_start else None,
                               task=task)
+        self.tg.add_timer(cfg.CONF.coordination.heartbeat,
+                          self.partition_coordinator.heartbeat)
 
     @staticmethod
     def interval_task(task):
@@ -166,7 +195,10 @@ class AgentManager(os_service.Service):
             if discoverer:
                 try:
                     discovered = discoverer.discover(param)
-                    resources.extend(discovered)
+                    partitioned = self.partition_coordinator.extract_my_subset(
+                        self._construct_group_id(discoverer.group_id),
+                        discovered)
+                    resources.extend(partitioned)
                 except Exception as err:
                     LOG.exception(_('Unable to discover resources: %s') % err)
             else:
