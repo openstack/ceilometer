@@ -139,3 +139,40 @@ class TestXenapiInspection(base.BaseTestCase):
             self.assertEqual('vif_mac', vnic0.mac)
             self.assertEqual(1024, info0.rx_bytes_rate)
             self.assertEqual(2048, info0.tx_bytes_rate)
+
+    def test_inspect_disk_rates(self):
+        fake_instance = {'OS-EXT-SRV-ATTR:instance_name': 'fake_instance_name',
+                         'id': 'fake_instance_id'}
+
+        def fake_xenapi_request(method, args):
+            vbd_rec = {
+                'device': 'xvdd'
+            }
+
+            vbd_metrics_rec = {
+                'io_read_kbs': '1',
+                'io_write_kbs': '2'
+            }
+            if method == 'VM.get_by_name_label':
+                return ['vm_ref']
+            elif method == 'VM.get_VBDs':
+                return ['vbd_ref']
+            elif method == 'VBD.get_record':
+                return vbd_rec
+            elif method == 'VBD.get_metrics':
+                return 'vbd_metrics_ref'
+            elif method == 'VBD_metrics.get_record':
+                return vbd_metrics_rec
+            else:
+                return None
+
+        session = self.inspector.session
+        with mock.patch.object(session, 'xenapi_request',
+                               side_effect=fake_xenapi_request):
+            disks = list(self.inspector.inspect_disk_rates(fake_instance))
+
+            self.assertEqual(1, len(disks))
+            disk0, info0 = disks[0]
+            self.assertEqual('xvdd', disk0.device)
+            self.assertEqual(1024, info0.read_bytes_rate)
+            self.assertEqual(2048, info0.write_bytes_rate)

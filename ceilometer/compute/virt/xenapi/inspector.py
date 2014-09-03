@@ -167,3 +167,27 @@ class XenapiInspector(virt_inspector.Inspector):
                 tx_rate = float(vif_metrics_rec['io_write_kbs']) * units.Ki
                 stats = virt_inspector.InterfaceRateStats(rx_rate, tx_rate)
                 yield (interface, stats)
+
+    def inspect_disk_rates(self, instance, duration=None):
+        instance_name = util.instance_name(instance)
+        vm_ref = self._lookup_by_name(instance_name)
+        vbd_refs = self._call_xenapi("VM.get_VBDs", vm_ref)
+        if vbd_refs:
+            for vbd_ref in vbd_refs:
+                vbd_rec = self._call_xenapi("VBD.get_record", vbd_ref)
+                vbd_metrics_ref = self._call_xenapi("VBD.get_metrics",
+                                                    vbd_ref)
+                vbd_metrics_rec = self._call_xenapi("VBD_metrics.get_record",
+                                                    vbd_metrics_ref)
+
+                disk = virt_inspector.Disk(device=vbd_rec['device'])
+                # Stats provided from XenServer are in KB/s,
+                # converting it to B/s.
+                read_rate = float(vbd_metrics_rec['io_read_kbs']) * units.Ki
+                write_rate = float(vbd_metrics_rec['io_write_kbs']) * units.Ki
+                disk_rate_info = virt_inspector.DiskRateStats(
+                    read_bytes_rate=read_rate,
+                    read_requests_rate=0,
+                    write_bytes_rate=write_rate,
+                    write_requests_rate=0)
+                yield(disk, disk_rate_info)
