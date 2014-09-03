@@ -32,7 +32,10 @@ OPTS = [
     cfg.StrOpt('partition_rpc_topic',
                default='alarm_partition_coordination',
                help='The topic that ceilometer uses for alarm partition '
-                    'coordination messages.'),
+                    'coordination messages. DEPRECATED: RPC-based partitioned'
+                    'alarm evaluation service will be removed in Kilo in '
+                    'favour of the default alarm evaluation service using '
+                    'tooz for partitioning.'),
 ]
 
 cfg.CONF.register_opts(OPTS, group='alarm')

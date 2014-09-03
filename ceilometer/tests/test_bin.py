@@ -130,7 +130,10 @@ class BinAlarmEvaluatorServiceTestCase(base.BaseTestCase):
         os.remove(self.tempfile)
 
     def test_default_config(self):
-        self._do_test(None, "SingletonAlarmService")
+        self._do_test(None, "AlarmEvaluationService")
+
+    def test_singleton_driver(self):
+        self._do_test('singleton', "SingletonAlarmService")
 
     def test_backward_compat(self):
         self._do_test("ceilometer.alarm.service.PartitionedAlarmService",
