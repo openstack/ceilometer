@@ -37,6 +37,7 @@ import pytz
 import uuid
 
 from oslo.config import cfg
+from oslo.utils import netutils
 from oslo.utils import strutils
 from oslo.utils import timeutils
 import pecan
@@ -46,6 +47,7 @@ import wsme
 from wsme import types as wtypes
 import wsmeext.pecan as wsme_pecan
 
+from ceilometer.alarm import service as alarm_service
 from ceilometer.alarm.storage import models as alarm_models
 from ceilometer.api import acl
 from ceilometer import messaging
@@ -1807,6 +1809,7 @@ class Alarm(_Base):
     def validate(alarm):
 
         Alarm.check_rule(alarm)
+        Alarm.check_alarm_actions(alarm)
         if alarm.threshold_rule:
             # ensure an implicit constraint on project_id is added to
             # the query if not already present
@@ -1844,6 +1847,25 @@ class Alarm(_Base):
             error = _("threshold_rule and combination_rule "
                       "cannot be set at the same time")
             raise ClientSideError(error)
+
+    @staticmethod
+    def check_alarm_actions(alarm):
+        actions_schema = alarm_service.AlarmNotifierService.notifiers_schemas
+        for state in state_kind:
+            actions_name = state.replace(" ", "_") + '_actions'
+            actions = getattr(alarm, actions_name)
+            if not actions:
+                continue
+
+            for action in actions:
+                try:
+                    url = netutils.urlsplit(action)
+                except Exception:
+                    error = _("Unable to parse action %s") % action
+                    raise ClientSideError(error)
+                if url.scheme not in actions_schema:
+                    error = _("Unsupported action %s") % action
+                    raise ClientSideError(error)
 
     @classmethod
     def sample(cls):
