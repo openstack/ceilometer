@@ -1,5 +1,5 @@
 #
-# Copyright 2013 eNovance
+# Copyright 2013-2014 eNovance
 #
 # Author: Mehdi Abaakouk <mehdi.abaakouk@enovance.com>
 #
@@ -18,13 +18,13 @@
 
 import eventlet
 from oslo.config import cfg
+from oslo.serialization import jsonutils
 import requests
 import six.moves.urllib.parse as urlparse
 
 from ceilometer.alarm import notifier
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common.gettextutils import _
-from ceilometer.openstack.common import jsonutils
 from ceilometer.openstack.common import log
 
 LOG = log.getLogger(__name__)
