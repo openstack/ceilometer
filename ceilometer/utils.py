@@ -27,9 +27,30 @@ import hashlib
 import multiprocessing
 import struct
 
+from ceilometer.openstack.common import processutils
+from oslo.config import cfg
 from oslo.utils import timeutils
 from oslo.utils import units
 import six
+
+
+rootwrap_conf = cfg.StrOpt('rootwrap_config',
+                           default="/etc/ceilometer/rootwrap.conf",
+                           help='Path to the rootwrap configuration file to'
+                                'use for running commands as root')
+CONF = cfg.CONF
+CONF.register_opt(rootwrap_conf)
+
+
+def _get_root_helper():
+    return 'sudo ceilometer-rootwrap %s' % CONF.rootwrap_config
+
+
+def execute(*cmd, **kwargs):
+    """Convenience wrapper around oslo's execute() method."""
+    if 'run_as_root' in kwargs and 'root_helper' not in kwargs:
+        kwargs['root_helper'] = _get_root_helper()
+    return processutils.execute(*cmd, **kwargs)
 
 
 def recursive_keypairs(d, separator=':'):
