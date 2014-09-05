@@ -2305,7 +2305,11 @@ def requires_admin(func):
         usr_limit, proj_limit = acl.get_limited_to(pecan.request.headers)
         # If User and Project are None, you have full access.
         if usr_limit and proj_limit:
-            raise ProjectNotAuthorized(proj_limit)
+            # since this decorator get's called out of wsme context
+            # raising exception results internal error so call abort
+            # for handling the error
+            ex = ProjectNotAuthorized(proj_limit)
+            pecan.core.abort(status_code=ex.code, detail=ex.msg)
         return func(*args, **kwargs)
 
     return wrapped

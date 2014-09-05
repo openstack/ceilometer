@@ -23,7 +23,6 @@ from oslo.utils import timeutils
 import webtest
 
 from ceilometer.api import app
-from ceilometer.api.controllers import v2 as v2_api
 from ceilometer.publisher import utils
 from ceilometer import sample
 from ceilometer.tests import api as acl
@@ -209,23 +208,8 @@ class TestAPIACL(v2.FunctionalTest,
         self.assertEqual(401, data.status_int)
 
     def test_non_admin_get_events(self):
-
-        # NOTE(herndon): wsme does not handle the  error that is being
-        # raised in by requires_admin dues to the decorator ordering. wsme
-        # does not play nice with other decorators, and so requires_admin
-        # must call wsme.wsexpose, and not the other way arou. The
-        # implication is that I can't look at the status code in the
-        # return value. Work around is to catch the exception here and
-        # verify that the status code is correct.
-
-        try:
-            # Intentionally *not* using assertRaises here so I can look
-            # at the status code of the exception.
-            self.get_json('/event_types', expect_errors=True,
-                          headers={"X-Roles": "Member",
-                                   "X-Auth-Token": VALID_TOKEN2,
-                                   "X-Project-Id": "project-good"})
-        except v2_api.ClientSideError as ex:
-            self.assertEqual(401, ex.code)
-        else:
-            self.fail()
+        data = self.get_json('/event_types', expect_errors=True,
+                             headers={"X-Roles": "Member",
+                                      "X-Auth-Token": VALID_TOKEN2,
+                                      "X-Project-Id": "project-good"})
+        self.assertEqual(401, data.status_int)
