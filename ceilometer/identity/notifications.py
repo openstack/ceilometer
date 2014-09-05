@@ -136,3 +136,35 @@ class Authenticate(_Base):
     @property
     def event_types(self):
         return [self.event_name]
+
+
+class RoleAssignment(_Base):
+    """Convert role assignment notifications into Samples."""
+
+    resource_type = 'role_assignment'
+    resource_name = '%s.%s' % (SERVICE, resource_type)
+
+    def process_notification(self, message):
+        # NOTE(stevemar): action is created.role_assignment
+        action = message['payload']['action']
+        event, resource_type = action.split(".")
+
+        # NOTE(stevemar): meter_name is identity.role_assignment.created
+        meter_name = '%s.%s.%s' % (SERVICE, resource_type, event)
+
+        yield sample.Sample.from_notification(
+            name=meter_name,
+            type=sample.TYPE_DELTA,
+            unit=self.resource_type,
+            volume=1,
+            resource_id=message['payload']['role'],
+            user_id=message['payload']['initiator']['id'],
+            project_id=None,
+            message=message)
+
+    @property
+    def event_types(self):
+        return [
+            '%s.created' % self.resource_name,
+            '%s.deleted' % self.resource_name,
+        ]
