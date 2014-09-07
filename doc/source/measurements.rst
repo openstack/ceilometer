@@ -194,6 +194,32 @@ snapshot.size             Gauge       GB        snap ID   notification  Size of 
 
 Make sure Cinder is properly configured first: see :ref:`installing_manually`.
 
+Identity (Keystone)
+===================
+
+================================  ==========  ===============  ==========  ============  ===========================================
+Name                              Type        Unit             Resource    Origin        Note
+================================  ==========  ===============  ==========  ============  ===========================================
+identity.authenticate.success     Delta       user             user ID     notification  User successfully authenticates
+identity.authenticate.pending     Delta       user             user ID     notification  User pending authentication
+identity.authenticate.failure     Delta       user             user ID     notification  User failed authentication
+identity.user.created             Delta       user             user ID     notification  A user is created
+identity.user.deleted             Delta       user             user ID     notification  A user is deleted
+identity.user.updated             Delta       user             user ID     notification  A user is updated
+identity.group.created            Delta       group            group ID    notification  A group is created
+identity.group.deleted            Delta       group            group ID    notification  A group is deleted
+identity.group.updated            Delta       group            group ID    notification  A group is updated
+identity.role.created             Delta       role             role ID     notification  A role is created
+identity.role.deleted             Delta       role             role ID     notification  A role is deleted
+identity.role.updated             Delta       role             role ID     notification  A role is updated
+identity.project.created          Delta       project          project ID  notification  A project is created
+identity.project.deleted          Delta       project          project ID  notification  A project is deleted
+identity.project.updated          Delta       project          project ID  notification  A project is updated
+identity.trust.created            Delta       trust            trust ID    notification  A trust is created
+identity.trust.deleted            Delta       trust            trust ID    notification  A trust is deleted
+================================  ==========  ===============  ==========  ============  ===========================================
+
+
 Object Storage (Swift)
 ======================
 
