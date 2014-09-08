@@ -47,7 +47,36 @@ class HardwarePollster(plugin.CentralPollster):
     def default_discovery(self):
         return 'tripleo_overcloud_nodes'
 
-    def get_samples(self, manager, cache, resources):
+    @staticmethod
+    def _parse_resource(res):
+        """Parse resource from discovery.
+
+        Either URL can be given or dict. Dict has to contain at least
+        keys 'resource_id' and 'resource_url', all the dict keys will be stored
+        as metadata.
+
+        :param res: URL or dict containing all resource info.
+        :return parsed_url, resource_id, metadata: Returns parsed URL used for
+            SNMP query, unique identifier of the resource and metadata
+            of the resource.
+        """
+
+        if isinstance(res, dict):
+            if 'resource_url' not in res or 'resource_id' not in res:
+                LOG.exception(_('Passed resource dict must contain keys '
+                                'resource_id and resource_url.'))
+
+            metadata = res
+            parsed_url = netutils.urlsplit(res['resource_url'])
+            resource_id = res['resource_id']
+        else:
+            metadata = {}
+            parsed_url = netutils.urlsplit(res)
+            resource_id = res
+
+        return parsed_url, resource_id, metadata
+
+    def get_samples(self, manager, cache, resources=None):
         """Return an iterable of Sample instances from polling the resources.
 
         :param manager: The service manager invoking the plugin
@@ -57,17 +86,19 @@ class HardwarePollster(plugin.CentralPollster):
         resources = resources or []
         h_cache = cache.setdefault(self.CACHE_KEY, {})
         sample_iters = []
-        for res in resources:
-            parsed_url = netutils.urlsplit(res)
+        for resource in resources:
+            parsed_url, res, extra_metadata = self._parse_resource(resource)
             ins = self._get_inspector(parsed_url)
             try:
                 # Call hardware inspector to poll for the data
                 i_cache = h_cache.setdefault(res, {})
+
                 if self.IDENTIFIER not in i_cache:
                     i_cache[self.IDENTIFIER] = list(ins.inspect_generic(
                         parsed_url,
                         self.IDENTIFIER,
-                        i_cache))
+                        i_cache,
+                        extra_metadata))
                 # Generate samples
                 if i_cache[self.IDENTIFIER]:
                     sample_iters.append(self.generate_samples(

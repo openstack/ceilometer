@@ -54,3 +54,8 @@ class TestPollsterUtils(test_base.BaseTestCase):
         self.assertEqual(None, s.user_id)
         self.assertEqual('project', s.project_id)
         self.assertEqual('resource', s.resource_id)
+        self.assertEqual({'resource_url': 'snmp://127.0.0.1:161',
+                          'project_id': 'project',
+                          'resource_id':
+                          'resource'},
+                         s.resource_metadata)

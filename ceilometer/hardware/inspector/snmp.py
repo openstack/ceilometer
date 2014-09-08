@@ -354,7 +354,7 @@ class SNMPInspector(base.Inspector):
                 new_oids.append(metadata[0])
         return new_oids
 
-    def inspect_generic(self, host, identifier, cache):
+    def inspect_generic(self, host, identifier, cache, extra_metadata=None):
         # the snmp definition for the corresponding meter
         meter_def = self.MAPPING[identifier]
         # collect oids that needs to be queried
@@ -373,6 +373,7 @@ class SNMPInspector(base.Inspector):
             meter_def['metric_oid'][0],
             meter_def['matching_type'],
             False)
+        extra_metadata = extra_metadata or {}
         for oid in oids_for_sample_values:
             suffix = oid[len(meter_def['metric_oid'][0]):]
             value = self.get_oid_value(oid_cache,
@@ -382,15 +383,14 @@ class SNMPInspector(base.Inspector):
             metadata = self.construct_metadata(oid_cache,
                                                meter_def['metadata'],
                                                suffix)
-            extra = {}
             # call post_op for special cases
             if meter_def['post_op']:
                 func = getattr(self, meter_def['post_op'], None)
                 if func:
                     value = func(host, cache, meter_def,
-                                 value, metadata, extra,
+                                 value, metadata, extra_metadata,
                                  suffix)
-            yield (value, metadata, extra)
+            yield (value, metadata, extra_metadata)
 
     def _post_op_net(self, host, cache, meter_def,
                      value, metadata, extra, suffix):

@@ -42,7 +42,7 @@ class FakeInspector(inspector_base.Inspector):
         'disk.size.used': (90, disk_metadata, {}),
     }
 
-    def inspect_generic(self, host, identifier, cache):
+    def inspect_generic(self, host, identifier, cache, extra_metadata=None):
         yield self.DATA[identifier]
 
 
