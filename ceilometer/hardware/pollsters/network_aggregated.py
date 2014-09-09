@@ -1,11 +1,3 @@
-#
-# Copyright 2013 ZHAW SoE
-# Copyright 2014 Intel Corp.
-#
-# Authors: Lucas Graf <graflu0@students.zhaw.ch>
-#          Toni Zehnder <zehndton@students.zhaw.ch>
-#          Lianhao Lu <lianhao.lu@intel.com>
-#
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
 # a copy of the License at
@@ -25,30 +17,22 @@ from ceilometer import sample
 
 class _Base(plugin.HardwarePollster):
 
-    CACHE_KEY = 'memory'
+    CACHE_KEY = 'network'
 
     def generate_one_sample(self, host, c_data):
         value, metadata, extra = c_data
         return util.make_sample_from_host(host,
                                           name=self.IDENTIFIER,
-                                          sample_type=sample.TYPE_GAUGE,
-                                          unit='B',
+                                          sample_type=sample.TYPE_CUMULATIVE,
+                                          unit='datagrams',
                                           volume=value,
                                           res_metadata=metadata,
                                           extra=extra)
 
 
-class MemoryTotalPollster(_Base):
-    IDENTIFIER = 'memory.total'
+class NetworkAggregatedIPOutRequests(_Base):
+    IDENTIFIER = 'network.ip.outgoing.datagrams'
 
 
-class MemoryUsedPollster(_Base):
-    IDENTIFIER = 'memory.used'
-
-
-class MemorySwapTotalPollster(_Base):
-    IDENTIFIER = 'memory.swap.total'
-
-
-class MemorySwapAvailPollster(_Base):
-    IDENTIFIER = 'memory.swap.avail'
+class NetworkAggregatedIPInReceives(_Base):
+    IDENTIFIER = 'network.ip.incoming.datagrams'

@@ -66,6 +66,8 @@ class SNMPInspector(base.Inspector):
     # Memory OIDs
     _memory_total_oid = "1.3.6.1.4.1.2021.4.5.0"
     _memory_used_oid = "1.3.6.1.4.1.2021.4.6.0"
+    _memory_total_swap_oid = "1.3.6.1.4.1.2021.4.3.0"
+    _memory_avail_swap_oid = "1.3.6.1.4.1.2021.4.4.0"
     # Disk OIDs
     _disk_index_oid = "1.3.6.1.4.1.2021.9.1.1"
     _disk_path_oid = "1.3.6.1.4.1.2021.9.1.2"
@@ -81,6 +83,13 @@ class SNMPInspector(base.Inspector):
     _interface_received_oid = "1.3.6.1.2.1.2.2.1.10"
     _interface_transmitted_oid = "1.3.6.1.2.1.2.2.1.16"
     _interface_error_oid = "1.3.6.1.2.1.2.2.1.20"
+    # System stats
+    _system_stats_cpu_idle_oid = "1.3.6.1.4.1.2021.11.11.0"
+    _system_stats_io_raw_sent_oid = "1.3.6.1.4.1.2021.11.57.0"
+    _system_stats_io_raw_received_oid = "1.3.6.1.4.1.2021.11.58.0"
+    # Network stats
+    _network_ip_out_requests_oid = "1.3.6.1.2.1.4.10.0"
+    _network_ip_in_receives_oid = "1.3.6.1.2.1.4.3.0"
     # Default port
     _port = 161
 
@@ -186,6 +195,18 @@ class SNMPInspector(base.Inspector):
             'metadata': {},
             'post_op': None,
         },
+        'memory.swap.total': {
+            'matching_type': EXACT,
+            'metric_oid': (_memory_total_swap_oid, int),
+            'metadata': {},
+            'post_op': None,
+        },
+        'memory.swap.avail': {
+            'matching_type': EXACT,
+            'metric_oid': (_memory_avail_swap_oid, int),
+            'metadata': {},
+            'post_op': None,
+        },
         'disk.size.total': {
             'matching_type': PREFIX,
             'metric_oid': (_disk_size_oid, int),
@@ -215,6 +236,36 @@ class SNMPInspector(base.Inspector):
             'metric_oid': (_interface_error_oid, int),
             'metadata': _net_metadata,
             'post_op': "_post_op_net",
+        },
+        'network.ip.outgoing.datagrams': {
+            'matching_type': EXACT,
+            'metric_oid': (_network_ip_out_requests_oid, int),
+            'metadata': {},
+            'post_op': None,
+        },
+        'network.ip.incoming.datagrams': {
+            'matching_type': EXACT,
+            'metric_oid': (_network_ip_in_receives_oid, int),
+            'metadata': {},
+            'post_op': None,
+        },
+        'system_stats.cpu.idle': {
+            'matching_type': EXACT,
+            'metric_oid': (_system_stats_cpu_idle_oid, int),
+            'metadata': {},
+            'post_op': None,
+        },
+        'system_stats.io.outgoing.blocks': {
+            'matching_type': EXACT,
+            'metric_oid': (_system_stats_io_raw_sent_oid, int),
+            'metadata': {},
+            'post_op': None,
+        },
+        'system_stats.io.incoming.blocks': {
+            'matching_type': EXACT,
+            'metric_oid': (_system_stats_io_raw_received_oid, int),
+            'metadata': {},
+            'post_op': None,
         },
     }
 
