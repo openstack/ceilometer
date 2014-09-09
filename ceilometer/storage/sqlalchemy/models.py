@@ -16,18 +16,19 @@
 """
 SQLAlchemy models for Ceilometer data.
 """
-
+import hashlib
 import json
 
 from oslo.utils import timeutils
 import six
 from sqlalchemy import (Column, Integer, String, ForeignKey, Index,
-                        UniqueConstraint, BigInteger, join)
+                        UniqueConstraint, BigInteger)
+from sqlalchemy import event, select
 from sqlalchemy import Float, Boolean, Text, DateTime
 from sqlalchemy.dialects.mysql import DECIMAL
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref
-from sqlalchemy.orm import column_property
+from sqlalchemy.orm import deferred
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import TypeDecorator
 
@@ -106,7 +107,7 @@ class MetaText(Base):
     __table_args__ = (
         Index('ix_meta_text_key', 'meta_key'),
     )
-    id = Column(Integer, ForeignKey('sample.id'), primary_key=True)
+    id = Column(Integer, ForeignKey('resource.internal_id'), primary_key=True)
     meta_key = Column(String(255), primary_key=True)
     value = Column(Text)
 
@@ -118,7 +119,7 @@ class MetaBool(Base):
     __table_args__ = (
         Index('ix_meta_bool_key', 'meta_key'),
     )
-    id = Column(Integer, ForeignKey('sample.id'), primary_key=True)
+    id = Column(Integer, ForeignKey('resource.internal_id'), primary_key=True)
     meta_key = Column(String(255), primary_key=True)
     value = Column(Boolean)
 
@@ -130,7 +131,7 @@ class MetaBigInt(Base):
     __table_args__ = (
         Index('ix_meta_int_key', 'meta_key'),
     )
-    id = Column(Integer, ForeignKey('sample.id'), primary_key=True)
+    id = Column(Integer, ForeignKey('resource.internal_id'), primary_key=True)
     meta_key = Column(String(255), primary_key=True)
     value = Column(BigInteger, default=False)
 
@@ -142,7 +143,7 @@ class MetaFloat(Base):
     __table_args__ = (
         Index('ix_meta_float_key', 'meta_key'),
     )
-    id = Column(Integer, ForeignKey('sample.id'), primary_key=True)
+    id = Column(Integer, ForeignKey('resource.internal_id'), primary_key=True)
     meta_key = Column(String(255), primary_key=True)
     value = Column(Float(53), default=False)
 
@@ -153,7 +154,7 @@ class Meter(Base):
     __tablename__ = 'meter'
     __table_args__ = (
         UniqueConstraint('name', 'type', 'unit', name='def_unique'),
-        Index('ix_meter_name', 'name')
+        Index('ix_meter_name', 'name'),
     )
     id = Column(Integer, primary_key=True)
     name = Column(String(255), nullable=False)
@@ -162,55 +163,88 @@ class Meter(Base):
     samples = relationship("Sample", backref="meter")
 
 
+class Resource(Base):
+    """Resource data."""
+
+    __tablename__ = 'resource'
+    __table_args__ = (
+        # TODO(gordc): this should exist but the attribute values we set
+        #              for user/project/source/resource id's are too large
+        #              for a uuid.
+        # UniqueConstraint('resource_id', 'user_id', 'project_id',
+        #                  'source_id', 'metadata_hash',
+        #                  name='res_def_unique'),
+        Index('ix_resource_resource_id', 'resource_id'),
+    )
+
+    internal_id = Column(Integer, primary_key=True)
+    user_id = Column(String(255))
+    project_id = Column(String(255))
+    source_id = Column(String(255))
+    resource_id = Column(String(255), nullable=False)
+    resource_metadata = deferred(Column(JSONEncodedDict()))
+    metadata_hash = deferred(Column(String(32)))
+    samples = relationship("Sample", backref="resource")
+    meta_text = relationship("MetaText", backref="resource",
+                             cascade="all, delete-orphan")
+    meta_float = relationship("MetaFloat", backref="resource",
+                              cascade="all, delete-orphan")
+    meta_int = relationship("MetaBigInt", backref="resource",
+                            cascade="all, delete-orphan")
+    meta_bool = relationship("MetaBool", backref="resource",
+                             cascade="all, delete-orphan")
+
+
+@event.listens_for(Resource, "before_insert")
+def before_insert(mapper, connection, target):
+    metadata = json.dumps(target.resource_metadata, sort_keys=True)
+    target.metadata_hash = hashlib.md5(metadata).hexdigest()
+
+
 class Sample(Base):
     """Metering data."""
 
     __tablename__ = 'sample'
     __table_args__ = (
         Index('ix_sample_timestamp', 'timestamp'),
-        Index('ix_sample_user_id', 'user_id'),
-        Index('ix_sample_project_id', 'project_id'),
-        Index('ix_sample_meter_id', 'meter_id')
+        Index('ix_sample_resource_id', 'resource_id'),
+        Index('ix_sample_meter_id', 'meter_id'),
+        Index('ix_sample_meter_id_resource_id', 'meter_id', 'resource_id')
     )
     id = Column(Integer, primary_key=True)
     meter_id = Column(Integer, ForeignKey('meter.id'))
-    user_id = Column(String(255))
-    project_id = Column(String(255))
-    resource_id = Column(String(255))
-    resource_metadata = Column(JSONEncodedDict())
+    resource_id = Column(Integer, ForeignKey('resource.internal_id'))
     volume = Column(Float(53))
     timestamp = Column(PreciseTimestamp(), default=lambda: timeutils.utcnow())
     recorded_at = Column(PreciseTimestamp(),
                          default=lambda: timeutils.utcnow())
     message_signature = Column(String(1000))
     message_id = Column(String(1000))
-    source_id = Column(String(255))
-    meta_text = relationship("MetaText", backref="sample",
-                             cascade="all, delete-orphan")
-    meta_float = relationship("MetaFloat", backref="sample",
-                              cascade="all, delete-orphan")
-    meta_int = relationship("MetaBigInt", backref="sample",
-                            cascade="all, delete-orphan")
-    meta_bool = relationship("MetaBool", backref="sample",
-                             cascade="all, delete-orphan")
 
 
-class MeterSample(Base):
-    """Helper model.
+class FullSample(Base):
+    """Mapper model.
 
-    It's needed as many of the filters work against Sample data joined with
-    Meter data.
+    It's needed as many of the filters work against raw data which is split
+    between Meter, Sample, and Resource tables
     """
     meter = Meter.__table__
     sample = Sample.__table__
-    __table__ = join(meter, sample)
-
-    id = column_property(sample.c.id)
-    meter_id = column_property(meter.c.id, sample.c.meter_id)
-    counter_name = column_property(meter.c.name)
-    counter_type = column_property(meter.c.type)
-    counter_unit = column_property(meter.c.unit)
-    counter_volume = column_property(sample.c.volume)
+    resource = Resource.__table__
+    __table__ = (select([sample.c.id, meter.c.name.label('counter_name'),
+                         meter.c.type.label('counter_type'),
+                         meter.c.unit.label('counter_unit'),
+                         sample.c.volume.label('counter_volume'),
+                         resource.c.resource_id, resource.c.source_id,
+                         resource.c.user_id, resource.c.project_id,
+                         resource.c.resource_metadata, resource.c.internal_id,
+                         sample.c.timestamp, sample.c.message_id,
+                         sample.c.message_signature, sample.c.recorded_at])
+                 .select_from(
+                     sample.join(meter, sample.c.meter_id == meter.c.id).join(
+                         resource,
+                         sample.c.resource_id == resource.c.internal_id))
+                 .alias())
 
 
 class Alarm(Base):

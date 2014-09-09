@@ -85,7 +85,7 @@ class QueryTransformer(object):
         field_name = field_name[len('resource_metadata.'):]
         meta_table = META_TYPE_MAP[type(value)]
         meta_alias = aliased(meta_table)
-        on_clause = and_(self.table.id == meta_alias.id,
+        on_clause = and_(self.table.internal_id == meta_alias.id,
                          meta_alias.meta_key == field_name)
         # outer join is needed to support metaquery
         # with or operator on non existent metadata field
