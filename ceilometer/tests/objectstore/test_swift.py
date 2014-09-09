@@ -53,6 +53,8 @@ GET_ACCOUNTS = [('tenant-002', ({'x-account-object-count': 10,
                                  'x-account-container-count': 0,
                                  }, [])), ]
 
+ENDPOINT = 'end://point'
+
 
 class TestManager(manager.AgentManager):
 
@@ -83,7 +85,7 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
     def fake_ks_service_catalog_url_for(*args, **kwargs):
         raise exceptions.EndpointNotFound("Fake keystone exception")
 
-    def fake_iter_accounts(self, ksclient, cache):
+    def fake_iter_accounts(self, ksclient, cache, endpoint):
         for i in self.ACCOUNTS:
             yield i
 
@@ -102,10 +104,13 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
         cache = {}
         with mockpatch.PatchObject(self.factory, '_get_account_info',
                                    return_value=[]):
-            data = list(self.pollster._iter_accounts(mock.Mock(), cache))
+            data = list(self.pollster._iter_accounts(mock.Mock(), cache,
+                                                     ENDPOINT))
 
-        self.assertTrue(self.pollster.CACHE_KEY_TENANT in cache)
-        self.assertTrue(self.pollster.CACHE_KEY_METHOD in cache)
+        self.assertTrue('%s-%s' % (ENDPOINT, self.pollster.CACHE_KEY_TENANT)
+                        in cache)
+        self.assertTrue('%s-%s' % (ENDPOINT, self.pollster.CACHE_KEY_METHOD)
+                        in cache)
         self.assertEqual([], data)
 
     def test_iter_accounts_tenants_cached(self):
@@ -119,15 +124,17 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
 
         api_method = '%s_account' % self.pollster.METHOD
         with mockpatch.PatchObject(swift_client, api_method, new=ksclient):
+            key = '%s-%s' % (ENDPOINT, self.pollster.CACHE_KEY_TENANT)
             with mockpatch.PatchObject(self.factory, '_neaten_url'):
                 Tenant = collections.namedtuple('Tenant', 'id')
                 cache = {
-                    self.pollster.CACHE_KEY_TENANT: [
+                    key: [
                         Tenant(self.ACCOUNTS[0][0])
                     ],
                 }
-                data = list(self.pollster._iter_accounts(mock.Mock(), cache))
-        self.assertTrue(self.pollster.CACHE_KEY_METHOD in cache)
+                data = list(self.pollster._iter_accounts(mock.Mock(), cache,
+                                                         ENDPOINT))
+        self.assertTrue(key in cache)
         self.assertEqual(self.ACCOUNTS[0][0], data[0][0])
 
     def test_neaten_url(self):
@@ -150,14 +157,16 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
     def test_metering(self):
         with mockpatch.PatchObject(self.factory, '_iter_accounts',
                                    side_effect=self.fake_iter_accounts):
-            samples = list(self.pollster.get_samples(self.manager, {}))
+            samples = list(self.pollster.get_samples(self.manager, {},
+                                                     [ENDPOINT]))
 
         self.assertEqual(2, len(samples))
 
     def test_get_meter_names(self):
         with mockpatch.PatchObject(self.factory, '_iter_accounts',
                                    side_effect=self.fake_iter_accounts):
-            samples = list(self.pollster.get_samples(self.manager, {}))
+            samples = list(self.pollster.get_samples(self.manager, {},
+                                                     [ENDPOINT]))
 
         self.assertEqual(set([samples[0].name]),
                          set([s.name for s in samples]))
@@ -166,6 +175,7 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
         with mockpatch.PatchObject(
                 self.manager.keystone.service_catalog, 'url_for',
                 side_effect=self.fake_ks_service_catalog_url_for):
-            samples = list(self.pollster.get_samples(self.manager, {}))
+            samples = list(self.pollster.get_samples(self.manager, {},
+                                                     [ENDPOINT]))
 
         self.assertEqual(0, len(samples))

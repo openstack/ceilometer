@@ -43,7 +43,11 @@ class HardwarePollster(plugin.CentralPollster):
         super(HardwarePollster, self).__init__()
         self.inspectors = {}
 
-    def get_samples(self, manager, cache, resources=None):
+    @property
+    def default_discovery(self):
+        return 'tripleo_overcloud_nodes'
+
+    def get_samples(self, manager, cache, resources):
         """Return an iterable of Sample instances from polling the resources.
 
         :param manager: The service manager invoking the plugin

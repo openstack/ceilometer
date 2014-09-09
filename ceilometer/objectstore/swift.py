@@ -19,14 +19,12 @@
 
 from __future__ import absolute_import
 
-from keystoneclient import exceptions
 from oslo.config import cfg
 from oslo.utils import timeutils
 import six.moves.urllib.parse as urlparse
 from swiftclient import client as swift
 
 from ceilometer.central import plugin
-from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer import sample
 
@@ -49,27 +47,26 @@ class _Base(plugin.CentralPollster):
     METHOD = 'head'
 
     @property
+    def default_discovery(self):
+        return 'endpoint:object-store'
+
+    @property
     def CACHE_KEY_METHOD(self):
         return 'swift.%s_account' % self.METHOD
 
-    def _iter_accounts(self, ksclient, cache):
-        if self.CACHE_KEY_TENANT not in cache:
-            cache[self.CACHE_KEY_TENANT] = ksclient.tenants.list()
-        if self.CACHE_KEY_METHOD not in cache:
-            cache[self.CACHE_KEY_METHOD] = list(self._get_account_info(
-                                                ksclient, cache))
-        return iter(cache[self.CACHE_KEY_METHOD])
+    def _iter_accounts(self, ksclient, cache, endpoint):
+        key_tenant = '%s-%s' % (endpoint, self.CACHE_KEY_TENANT)
+        key_method = '%s-%s' % (endpoint, self.CACHE_KEY_METHOD)
+        if key_tenant not in cache:
+            cache[key_tenant] = ksclient.tenants.list()
+        if key_method not in cache:
+            cache[key_method] = list(self._get_account_info(
+                                     ksclient, cache, endpoint))
+        return iter(cache[key_method])
 
-    def _get_account_info(self, ksclient, cache):
-        try:
-            endpoint = ksclient.service_catalog.url_for(
-                service_type='object-store',
-                endpoint_type=cfg.CONF.service_credentials.os_endpoint_type)
-        except exceptions.EndpointNotFound:
-            LOG.debug(_("Swift endpoint not found"))
-            raise StopIteration()
-
-        for t in cache[self.CACHE_KEY_TENANT]:
+    def _get_account_info(self, ksclient, cache, endpoint):
+        key_tenant = '%s-%s' % (endpoint, self.CACHE_KEY_TENANT)
+        for t in cache[key_tenant]:
             api_method = '%s_account' % self.METHOD
             yield (t.id, getattr(swift, api_method)
                                 (self._neaten_url(endpoint, t.id),
@@ -84,56 +81,59 @@ class _Base(plugin.CentralPollster):
 
 class ObjectsPollster(_Base):
     """Iterate over all accounts, using keystone."""
-    @plugin.check_keystone('object-store')
-    def get_samples(self, manager, cache, resources=None):
-        for tenant, account in self._iter_accounts(manager.keystone, cache):
-            yield sample.Sample(
-                name='storage.objects',
-                type=sample.TYPE_GAUGE,
-                volume=int(account['x-account-object-count']),
-                unit='object',
-                user_id=None,
-                project_id=tenant,
-                resource_id=tenant,
-                timestamp=timeutils.isotime(),
-                resource_metadata=None,
-            )
+    def get_samples(self, manager, cache, resources):
+        for endpoint in resources:
+            for tenant, account in self._iter_accounts(manager.keystone,
+                                                       cache, endpoint):
+                yield sample.Sample(
+                    name='storage.objects',
+                    type=sample.TYPE_GAUGE,
+                    volume=int(account['x-account-object-count']),
+                    unit='object',
+                    user_id=None,
+                    project_id=tenant,
+                    resource_id=tenant,
+                    timestamp=timeutils.isotime(),
+                    resource_metadata=None,
+                )
 
 
 class ObjectsSizePollster(_Base):
     """Iterate over all accounts, using keystone."""
-    @plugin.check_keystone('object-store')
-    def get_samples(self, manager, cache, resources=None):
-        for tenant, account in self._iter_accounts(manager.keystone, cache):
-            yield sample.Sample(
-                name='storage.objects.size',
-                type=sample.TYPE_GAUGE,
-                volume=int(account['x-account-bytes-used']),
-                unit='B',
-                user_id=None,
-                project_id=tenant,
-                resource_id=tenant,
-                timestamp=timeutils.isotime(),
-                resource_metadata=None,
-            )
+    def get_samples(self, manager, cache, resources):
+        for endpoint in resources:
+            for tenant, account in self._iter_accounts(manager.keystone,
+                                                       cache, endpoint):
+                yield sample.Sample(
+                    name='storage.objects.size',
+                    type=sample.TYPE_GAUGE,
+                    volume=int(account['x-account-bytes-used']),
+                    unit='B',
+                    user_id=None,
+                    project_id=tenant,
+                    resource_id=tenant,
+                    timestamp=timeutils.isotime(),
+                    resource_metadata=None,
+                )
 
 
 class ObjectsContainersPollster(_Base):
     """Iterate over all accounts, using keystone."""
-    @plugin.check_keystone('object-store')
-    def get_samples(self, manager, cache, resources=None):
-        for tenant, account in self._iter_accounts(manager.keystone, cache):
-            yield sample.Sample(
-                name='storage.objects.containers',
-                type=sample.TYPE_GAUGE,
-                volume=int(account['x-account-container-count']),
-                unit='container',
-                user_id=None,
-                project_id=tenant,
-                resource_id=tenant,
-                timestamp=timeutils.isotime(),
-                resource_metadata=None,
-            )
+    def get_samples(self, manager, cache, resources):
+        for endpoint in resources:
+            for tenant, account in self._iter_accounts(manager.keystone,
+                                                       cache, endpoint):
+                yield sample.Sample(
+                    name='storage.objects.containers',
+                    type=sample.TYPE_GAUGE,
+                    volume=int(account['x-account-container-count']),
+                    unit='container',
+                    user_id=None,
+                    project_id=tenant,
+                    resource_id=tenant,
+                    timestamp=timeutils.isotime(),
+                    resource_metadata=None,
+                )
 
 
 class ContainersObjectsPollster(_Base):
@@ -141,22 +141,23 @@ class ContainersObjectsPollster(_Base):
 
     METHOD = 'get'
 
-    @plugin.check_keystone('object-store')
-    def get_samples(self, manager, cache, resources=None):
-        for project, account in self._iter_accounts(manager.keystone, cache):
-            containers_info = account[1]
-            for container in containers_info:
-                yield sample.Sample(
-                    name='storage.containers.objects',
-                    type=sample.TYPE_GAUGE,
-                    volume=int(container['count']),
-                    unit='object',
-                    user_id=None,
-                    project_id=project,
-                    resource_id=project + '/' + container['name'],
-                    timestamp=timeutils.isotime(),
-                    resource_metadata=None,
-                )
+    def get_samples(self, manager, cache, resources):
+        for endpoint in resources:
+            for project, account in self._iter_accounts(manager.keystone,
+                                                        cache, endpoint):
+                containers_info = account[1]
+                for container in containers_info:
+                    yield sample.Sample(
+                        name='storage.containers.objects',
+                        type=sample.TYPE_GAUGE,
+                        volume=int(container['count']),
+                        unit='object',
+                        user_id=None,
+                        project_id=project,
+                        resource_id=project + '/' + container['name'],
+                        timestamp=timeutils.isotime(),
+                        resource_metadata=None,
+                    )
 
 
 class ContainersSizePollster(_Base):
@@ -164,19 +165,20 @@ class ContainersSizePollster(_Base):
 
     METHOD = 'get'
 
-    @plugin.check_keystone('object-store')
-    def get_samples(self, manager, cache, resources=None):
-        for project, account in self._iter_accounts(manager.keystone, cache):
-            containers_info = account[1]
-            for container in containers_info:
-                yield sample.Sample(
-                    name='storage.containers.objects.size',
-                    type=sample.TYPE_GAUGE,
-                    volume=int(container['bytes']),
-                    unit='B',
-                    user_id=None,
-                    project_id=project,
-                    resource_id=project + '/' + container['name'],
-                    timestamp=timeutils.isotime(),
-                    resource_metadata=None,
-                )
+    def get_samples(self, manager, cache, resources):
+        for endpoint in resources:
+            for project, account in self._iter_accounts(manager.keystone,
+                                                        cache, endpoint):
+                containers_info = account[1]
+                for container in containers_info:
+                    yield sample.Sample(
+                        name='storage.containers.objects.size',
+                        type=sample.TYPE_GAUGE,
+                        volume=int(container['bytes']),
+                        unit='B',
+                        user_id=None,
+                        project_id=project,
+                        resource_id=project + '/' + container['name'],
+                        timestamp=timeutils.isotime(),
+                        resource_metadata=None,
+                    )

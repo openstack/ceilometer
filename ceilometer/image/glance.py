@@ -44,12 +44,12 @@ cfg.CONF.register_opts(OPTS)
 
 class _Base(plugin.CentralPollster):
 
-    @staticmethod
-    def get_glance_client(ksclient):
-        endpoint = ksclient.service_catalog.url_for(
-            service_type='image',
-            endpoint_type=cfg.CONF.service_credentials.os_endpoint_type)
+    @property
+    def default_discovery(self):
+        return 'endpoint:image'
 
+    @staticmethod
+    def get_glance_client(ksclient, endpoint):
         # hard-code v1 glance API version selection while v2 API matures
         service_credentials = cfg.CONF.service_credentials
         return glanceclient.Client('1', endpoint,
@@ -57,8 +57,8 @@ class _Base(plugin.CentralPollster):
                                    cacert=service_credentials.os_cacert,
                                    insecure=service_credentials.insecure)
 
-    def _get_images(self, ksclient):
-        client = self.get_glance_client(ksclient)
+    def _get_images(self, ksclient, endpoint):
+        client = self.get_glance_client(ksclient, endpoint)
         page_size = cfg.CONF.glance_page_size
         kwargs = {}
         if page_size > 0:
@@ -88,11 +88,12 @@ class _Base(plugin.CentralPollster):
                 imageIdSet -= set([image.id])
                 yield image
 
-    def _iter_images(self, ksclient, cache):
+    def _iter_images(self, ksclient, cache, endpoint):
         """Iterate over all images."""
-        if 'images' not in cache:
-            cache['images'] = list(self._get_images(ksclient))
-        return iter(cache['images'])
+        key = '%s-images' % endpoint
+        if key not in cache:
+            cache[key] = list(self._get_images(ksclient, endpoint))
+        return iter(cache[key])
 
     @staticmethod
     def extract_image_metadata(image):
@@ -117,34 +118,34 @@ class _Base(plugin.CentralPollster):
 
 
 class ImagePollster(_Base):
-    @plugin.check_keystone('image')
-    def get_samples(self, manager, cache, resources=None):
-        for image in self._iter_images(manager.keystone, cache):
-            yield sample.Sample(
-                name='image',
-                type=sample.TYPE_GAUGE,
-                unit='image',
-                volume=1,
-                user_id=None,
-                project_id=image.owner,
-                resource_id=image.id,
-                timestamp=timeutils.isotime(),
-                resource_metadata=self.extract_image_metadata(image),
-            )
+    def get_samples(self, manager, cache, resources):
+        for endpoint in resources:
+            for image in self._iter_images(manager.keystone, cache, endpoint):
+                yield sample.Sample(
+                    name='image',
+                    type=sample.TYPE_GAUGE,
+                    unit='image',
+                    volume=1,
+                    user_id=None,
+                    project_id=image.owner,
+                    resource_id=image.id,
+                    timestamp=timeutils.isotime(),
+                    resource_metadata=self.extract_image_metadata(image),
+                )
 
 
 class ImageSizePollster(_Base):
-    @plugin.check_keystone('image')
-    def get_samples(self, manager, cache, resources=None):
-        for image in self._iter_images(manager.keystone, cache):
-            yield sample.Sample(
-                name='image.size',
-                type=sample.TYPE_GAUGE,
-                unit='B',
-                volume=image.size,
-                user_id=None,
-                project_id=image.owner,
-                resource_id=image.id,
-                timestamp=timeutils.isotime(),
-                resource_metadata=self.extract_image_metadata(image),
-            )
+    def get_samples(self, manager, cache, resources):
+        for endpoint in resources:
+            for image in self._iter_images(manager.keystone, cache, endpoint):
+                yield sample.Sample(
+                    name='image.size',
+                    type=sample.TYPE_GAUGE,
+                    unit='B',
+                    volume=image.size,
+                    user_id=None,
+                    project_id=image.owner,
+                    resource_id=image.id,
+                    timestamp=timeutils.isotime(),
+                    resource_metadata=self.extract_image_metadata(image),
+                )

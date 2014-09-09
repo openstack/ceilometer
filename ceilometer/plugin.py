@@ -128,8 +128,23 @@ class NotificationBase(PluginBase):
 class PollsterBase(PluginBase):
     """Base class for plugins that support the polling API."""
 
+    @abc.abstractproperty
+    def default_discovery(self):
+        """Default discovery to use for this pollster.
+
+        There are three ways a pollster can get a list of resources to poll,
+        listed here in ascending order of precedence:
+        1. from the per-agent discovery,
+        2. from the per-pollster discovery (defined here)
+        3. from the per-pipeline configured discovery and/or per-pipeline
+        configured static resources.
+
+        If a pollster should only get resources from #1 or #3, this property
+        should be set to None.
+        """
+
     @abc.abstractmethod
-    def get_samples(self, manager, cache, resources=None):
+    def get_samples(self, manager, cache, resources):
         """Return a sequence of Counter instances from polling the resources.
 
         :param manager: The service manager class invoking the plugin.
@@ -137,9 +152,10 @@ class PollsterBase(PluginBase):
                       between themselves when recomputing it would be
                       expensive (e.g., asking another service for a
                       list of objects).
-        :param resources: A list of the endpoints the pollster will get data
+        :param resources: A list of resources the pollster will get data
                           from. It's up to the specific pollster to decide
-                          how to use it.
+                          how to use it. It is usually supplied by a discovery,
+                          see ``default_discovery`` for more information.
 
         """
 

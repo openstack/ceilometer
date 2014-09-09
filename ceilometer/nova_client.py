@@ -48,7 +48,7 @@ def logged(func):
 class Client(object):
     """A client which gets information via python-novaclient."""
 
-    def __init__(self):
+    def __init__(self, bypass_url=None, auth_token=None):
         """Initialize a nova client object."""
         conf = cfg.CONF.service_credentials
         tenant = conf.os_tenant_id or conf.os_tenant_name
@@ -57,8 +57,10 @@ class Client(object):
             api_key=conf.os_password,
             project_id=tenant,
             auth_url=conf.os_auth_url,
+            auth_token=auth_token,
             region_name=conf.os_region_name,
             endpoint_type=conf.os_endpoint_type,
+            bypass_url=bypass_url,
             cacert=conf.os_cacert,
             insecure=conf.insecure,
             http_log_debug=cfg.CONF.nova_http_log_debug,

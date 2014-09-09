@@ -469,7 +469,8 @@ class TestLBStatsPollster(_BaseTestLBPollster):
         pollster = factory()
 
         cache = {}
-        samples = list(pollster.get_samples(self.manager, cache))
+        samples = list(pollster.get_samples(self.manager, cache,
+                                            self.fake_get_pools()))
         self.assertEqual(1, len(samples))
         self.assertIsNotNone(samples)
         self.assertIn('lbstats', cache)

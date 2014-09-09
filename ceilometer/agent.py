@@ -86,15 +86,22 @@ class PollingTask(object):
         agent_resources = self.manager.discover()
         with self.publish_context as publisher:
             cache = {}
+            discovery_cache = {}
             for pollster in self.pollsters:
                 key = pollster.name
                 LOG.info(_("Polling pollster %s"), key)
+                pollster_resources = None
+                if pollster.obj.default_discovery:
+                    pollster_resources = self.manager.discover(
+                        [pollster.obj.default_discovery], discovery_cache)
                 source_resources = list(self.resources[key].resources)
                 try:
                     samples = list(pollster.obj.get_samples(
                         manager=self.manager,
                         cache=cache,
-                        resources=source_resources or agent_resources,
+                        resources=(source_resources or
+                                   pollster_resources or
+                                   agent_resources)
                     ))
                     publisher(samples)
                 except Exception as err:
@@ -187,9 +194,12 @@ class AgentManager(os_service.Service):
                 return d.obj
         return None
 
-    def discover(self, discovery=None):
+    def discover(self, discovery=None, discovery_cache=None):
         resources = []
         for url in (discovery or self.default_discovery):
+            if discovery_cache is not None and url in discovery_cache:
+                resources.extend(discovery_cache[url])
+                continue
             name, param = self._parse_discoverer(url)
             discoverer = self._discoverer(name)
             if discoverer:
@@ -199,6 +209,8 @@ class AgentManager(os_service.Service):
                         self._construct_group_id(discoverer.group_id),
                         discovered)
                     resources.extend(partitioned)
+                    if discovery_cache is not None:
+                        discovery_cache[url] = partitioned
                 except Exception as err:
                     LOG.exception(_('Unable to discover resources: %s') % err)
             else:
