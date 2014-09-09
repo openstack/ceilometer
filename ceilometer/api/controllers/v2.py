@@ -1325,8 +1325,12 @@ class ValidatedComplexQuery(object):
         if self.original_query.filter is wtypes.Unset:
             self.filter_expr = None
         else:
-            self.filter_expr = json.loads(self.original_query.filter)
-            self._validate_filter(self.filter_expr)
+            try:
+                self.filter_expr = json.loads(self.original_query.filter)
+                self._validate_filter(self.filter_expr)
+            except (ValueError, jsonschema.exceptions.ValidationError) as e:
+                raise ClientSideError(_("Filter expression not valid: %s") %
+                                      e.message)
             self._replace_isotime_with_datetime(self.filter_expr)
             self._convert_operator_to_lower_case(self.filter_expr)
             self._normalize_field_names_for_db_model(self.filter_expr)
@@ -1336,8 +1340,12 @@ class ValidatedComplexQuery(object):
         if self.original_query.orderby is wtypes.Unset:
             self.orderby = None
         else:
-            self.orderby = json.loads(self.original_query.orderby)
-            self._validate_orderby(self.orderby)
+            try:
+                self.orderby = json.loads(self.original_query.orderby)
+                self._validate_orderby(self.orderby)
+            except (ValueError, jsonschema.exceptions.ValidationError) as e:
+                raise ClientSideError(_("Order-by expression not valid: %s") %
+                                      e.message)
             self._convert_orderby_to_lower_case(self.orderby)
             self._normalize_field_names_in_orderby(self.orderby)
 
