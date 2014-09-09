@@ -166,6 +166,16 @@ class DiscoveryBase(object):
     def discover(self, manager, param=None):
         """Discover resources to monitor.
 
+        The most fine-grained discovery should be preferred, so the work is
+        the most evenly distributed among multiple agents (if they exist).
+
+        For example:
+        if the pollster can separately poll individual resources, it should
+        have its own discovery implementation to discover those resources. If
+        it can only poll per-tenant, then the `TenantDiscovery` should be
+        used. If even that is not possible, use `EndpointDiscovery` (see
+        their respective docstrings).
+
         :param manager: The service manager class invoking the plugin.
         :param param: an optional parameter to guide the discovery
         """
