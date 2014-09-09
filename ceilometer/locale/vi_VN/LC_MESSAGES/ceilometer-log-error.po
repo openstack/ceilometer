@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-09-02 06:09+0000\n"
+"POT-Creation-Date: 2014-09-09 06:08+0000\n"
 "PO-Revision-Date: 2014-09-02 00:36+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Vietnamese (Viet Nam) (http://www.transifex.com/projects/p/"
@@ -22,6 +22,18 @@ msgstr ""
 
 #: ceilometer/collector.py:132
 msgid "Dispatcher failed to handle the sample, requeue it."
+msgstr ""
+
+#: ceilometer/coordination.py:76
+msgid "Error connecting to coordination backend."
+msgstr ""
+
+#: ceilometer/coordination.py:89
+msgid "Error sending a heartbeat to coordination backend."
+msgstr ""
+
+#: ceilometer/coordination.py:142
+msgid "Error getting group membership info from coordination backend."
 msgstr ""
 
 #: ceilometer/openstack/common/excutils.py:76
