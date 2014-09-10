@@ -73,7 +73,7 @@ Appendix
 
    releasenotes/index
    glossary
-   sourcecode/autoindex
+   api/index
 
 
 .. update index
