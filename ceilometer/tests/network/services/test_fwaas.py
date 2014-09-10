@@ -106,7 +106,7 @@ class TestFirewallPollster(_BaseTestFWPollster):
                          set([s.name for s in samples]))
 
     def test_vpn_discovery(self):
-        discovered_fws = discovery.FirewallDiscovery().discover()
+        discovered_fws = discovery.FirewallDiscovery().discover(self.manager)
         self.assertEqual(3, len(discovered_fws))
 
         for vpn in self.fake_get_fw_service():
@@ -165,6 +165,7 @@ class TestIPSecConnectionsPollster(_BaseTestFWPollster):
                          set([s.name for s in samples]))
 
     def test_fw_policy_discovery(self):
-        discovered_policy = discovery.FirewallPolicyDiscovery().discover()
+        discovered_policy = discovery.FirewallPolicyDiscovery().discover(
+            self.manager)
         self.assertEqual(1, len(discovered_policy))
         self.assertEqual(self.fake_get_fw_policy(), discovered_policy)

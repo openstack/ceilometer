@@ -204,7 +204,7 @@ class AgentManager(os_service.Service):
             discoverer = self._discoverer(name)
             if discoverer:
                 try:
-                    discovered = discoverer.discover(param)
+                    discovered = discoverer.discover(self, param)
                     partitioned = self.partition_coordinator.extract_my_subset(
                         self._construct_group_id(discoverer.group_id),
                         discovered)

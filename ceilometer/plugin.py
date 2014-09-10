@@ -163,9 +163,10 @@ class PollsterBase(PluginBase):
 @six.add_metaclass(abc.ABCMeta)
 class DiscoveryBase(object):
     @abc.abstractmethod
-    def discover(self, param=None):
+    def discover(self, manager, param=None):
         """Discover resources to monitor.
 
+        :param manager: The service manager class invoking the plugin.
         :param param: an optional parameter to guide the discovery
         """
 

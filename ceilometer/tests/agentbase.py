@@ -95,13 +95,13 @@ class TestPollsterException(TestPollster):
 
 
 class TestDiscovery(plugin.DiscoveryBase):
-    def discover(self, param=None):
+    def discover(self, manager, param=None):
         self.params.append(param)
         return self.resources
 
 
 class TestDiscoveryException(plugin.DiscoveryBase):
-    def discover(self, param=None):
+    def discover(self, manager, param=None):
         self.params.append(param)
         raise Exception()
 

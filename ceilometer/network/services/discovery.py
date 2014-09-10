@@ -29,7 +29,7 @@ class _BaseServicesDiscovery(base_plugin.DiscoveryBase):
 
 class LBPoolsDiscovery(_BaseServicesDiscovery):
     @plugin.check_keystone('network')
-    def discover(self, param=None):
+    def discover(self, manager, param=None):
         """Discover resources to monitor."""
 
         pools = self.neutron_cli.pool_get_all()
@@ -39,7 +39,7 @@ class LBPoolsDiscovery(_BaseServicesDiscovery):
 
 class LBVipsDiscovery(_BaseServicesDiscovery):
     @plugin.check_keystone('network')
-    def discover(self, param=None):
+    def discover(self, manager, param=None):
         """Discover resources to monitor."""
 
         vips = self.neutron_cli.vip_get_all()
@@ -49,7 +49,7 @@ class LBVipsDiscovery(_BaseServicesDiscovery):
 
 class LBMembersDiscovery(_BaseServicesDiscovery):
     @plugin.check_keystone('network')
-    def discover(self, param=None):
+    def discover(self, manager, param=None):
         """Discover resources to monitor."""
 
         members = self.neutron_cli.member_get_all()
@@ -59,7 +59,7 @@ class LBMembersDiscovery(_BaseServicesDiscovery):
 
 class LBHealthMonitorsDiscovery(_BaseServicesDiscovery):
     @plugin.check_keystone('network')
-    def discover(self, param=None):
+    def discover(self, manager, param=None):
         """Discover resources to monitor."""
 
         probes = self.neutron_cli.health_monitor_get_all()
@@ -68,7 +68,7 @@ class LBHealthMonitorsDiscovery(_BaseServicesDiscovery):
 
 class VPNServicesDiscovery(_BaseServicesDiscovery):
     @plugin.check_keystone('network')
-    def discover(self, param=None):
+    def discover(self, manager, param=None):
         """Discover resources to monitor."""
 
         vpnservices = self.neutron_cli.vpn_get_all()
@@ -78,7 +78,7 @@ class VPNServicesDiscovery(_BaseServicesDiscovery):
 
 class IPSecConnectionsDiscovery(_BaseServicesDiscovery):
     @plugin.check_keystone('network')
-    def discover(self, param=None):
+    def discover(self, manager, param=None):
         """Discover resources to monitor."""
 
         conns = self.neutron_cli.ipsec_site_connections_get_all()
@@ -87,7 +87,7 @@ class IPSecConnectionsDiscovery(_BaseServicesDiscovery):
 
 class FirewallDiscovery(_BaseServicesDiscovery):
     @plugin.check_keystone('network')
-    def discover(self, param=None):
+    def discover(self, manager, param=None):
         """Discover resources to monitor."""
 
         fw = self.neutron_cli.firewall_get_all()
@@ -97,7 +97,7 @@ class FirewallDiscovery(_BaseServicesDiscovery):
 
 class FirewallPolicyDiscovery(_BaseServicesDiscovery):
     @plugin.check_keystone('network')
-    def discover(self, param=None):
+    def discover(self, manager, param=None):
         """Discover resources to monitor."""
 
         return self.neutron_cli.fw_policy_get_all()

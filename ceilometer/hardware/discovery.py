@@ -45,7 +45,7 @@ class NodesDiscoveryTripleO(plugin.DiscoveryBase):
     def _address(instance, field):
         return instance.addresses['ctlplane'][0].get(field)
 
-    def discover(self, param=None):
+    def discover(self, manager, param=None):
         """Discover resources to monitor."""
 
         instances = self.nova_cli.instance_get_all()

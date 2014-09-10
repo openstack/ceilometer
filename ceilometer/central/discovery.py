@@ -15,7 +15,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from keystoneclient.v2_0 import client as ksclient
 from oslo.config import cfg
 
 from ceilometer.openstack.common.gettextutils import _LW
@@ -28,22 +27,11 @@ cfg.CONF.import_group('service_credentials', 'ceilometer.service')
 
 
 class EndpointDiscovery(plugin.DiscoveryBase):
-    def __init__(self):
-        super(EndpointDiscovery, self).__init__()
-        self.keystone = ksclient.Client(
-            username=cfg.CONF.service_credentials.os_username,
-            password=cfg.CONF.service_credentials.os_password,
-            tenant_id=cfg.CONF.service_credentials.os_tenant_id,
-            tenant_name=cfg.CONF.service_credentials.os_tenant_name,
-            cacert=cfg.CONF.service_credentials.os_cacert,
-            auth_url=cfg.CONF.service_credentials.os_auth_url,
-            region_name=cfg.CONF.service_credentials.os_region_name,
-            insecure=cfg.CONF.service_credentials.insecure)
 
-    def discover(self, param=None):
+    def discover(self, manager, param=None):
         if not param:
             return []
-        endpoints = self.keystone.service_catalog.get_urls(
+        endpoints = manager.keystone.service_catalog.get_urls(
             service_type=param,
             endpoint_type=cfg.CONF.service_credentials.os_endpoint_type,
             region_name=cfg.CONF.service_credentials.os_region_name)

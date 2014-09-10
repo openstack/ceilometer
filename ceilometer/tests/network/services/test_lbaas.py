@@ -153,7 +153,7 @@ class TestLBPoolPollster(_BaseTestLBPollster):
                          set([s.name for s in samples]))
 
     def test_pool_discovery(self):
-        discovered_pools = discovery.LBPoolsDiscovery().discover()
+        discovered_pools = discovery.LBPoolsDiscovery().discover(self.manager)
         self.assertEqual(4, len(discovered_pools))
         for pool in self.fake_get_pools():
             if pool['status'] == 'error':
@@ -276,7 +276,7 @@ class TestLBVipPollster(_BaseTestLBPollster):
                          set([s.name for s in samples]))
 
     def test_vip_discovery(self):
-        discovered_vips = discovery.LBVipsDiscovery().discover()
+        discovered_vips = discovery.LBVipsDiscovery().discover(self.manager)
         self.assertEqual(4, len(discovered_vips))
         for pool in self.fake_get_vips():
             if pool['status'] == 'error':
@@ -369,7 +369,8 @@ class TestLBMemberPollster(_BaseTestLBPollster):
                          set([s.name for s in samples]))
 
     def test_members_discovery(self):
-        discovered_members = discovery.LBMembersDiscovery().discover()
+        discovered_members = discovery.LBMembersDiscovery().discover(
+            self.manager)
         self.assertEqual(4, len(discovered_members))
         for pool in self.fake_get_members():
             if pool['status'] == 'error':
@@ -417,7 +418,8 @@ class TestLBHealthProbePollster(_BaseTestLBPollster):
                          set([s.name for s in samples]))
 
     def test_probes_discovery(self):
-        discovered_probes = discovery.LBHealthMonitorsDiscovery().discover()
+        discovered_probes = discovery.LBHealthMonitorsDiscovery().discover(
+            self.manager)
         self.assertEqual(discovered_probes, self.fake_get_health_monitor())
 
 
