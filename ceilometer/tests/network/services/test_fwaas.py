@@ -20,9 +20,9 @@ from oslotest import base
 from oslotest import mockpatch
 
 from ceilometer.central import manager
+from ceilometer.central import plugin
 from ceilometer.network.services import discovery
 from ceilometer.network.services import fwaas
-from ceilometer import neutron_client as cli
 from ceilometer.openstack.common import context
 
 
@@ -34,8 +34,8 @@ class _BaseTestFWPollster(base.BaseTestCase):
         self.addCleanup(mock.patch.stopall)
         self.context = context.get_admin_context()
         self.manager = manager.AgentManager()
-        cli.Client.keystone = mock.Mock()
-        cli.Client.keystone.service_catalog.get_endpoints = mock.Mock(
+        plugin._get_keystone = mock.Mock()
+        plugin._get_keystone.service_catalog.get_endpoints = mock.MagicMock(
             return_value={'network': mock.ANY})
 
 
