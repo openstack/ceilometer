@@ -44,6 +44,25 @@ UNIT_MAP = {
 }
 
 
+def validate_reading(data):
+    """Some sensors read "Disabled"."""
+    return data != 'Disabled'
+
+
+def transform_id(data):
+    return data.lower().replace(' ', '_')
+
+
+def parse_reading(data):
+    try:
+        volume, unit = data.split(' ', 1)
+        unit = unit.rsplit(' ', 1)[-1]
+        return float(volume), UNIT_MAP.get(unit, unit)
+    except ValueError:
+        raise InvalidSensorData('unable to parse sensor reading: %s' %
+                                data)
+
+
 class InvalidSensorData(ValueError):
     pass
 
@@ -76,25 +95,6 @@ class SensorNotification(plugin.NotificationBase):
         except KeyError:
             return []
 
-    @staticmethod
-    def _validate_reading(data):
-        """Some sensors read "Disabled"."""
-        return data != 'Disabled'
-
-    @staticmethod
-    def _transform_id(data):
-        return data.lower().replace(' ', '_')
-
-    @staticmethod
-    def _parse_reading(data):
-        try:
-            volume, unit = data.split(' ', 1)
-            unit = unit.rsplit(' ', 1)[-1]
-            return float(volume), UNIT_MAP.get(unit, unit)
-        except ValueError:
-            raise InvalidSensorData('unable to parse sensor reading: %s' %
-                                    data)
-
     def _package_payload(self, message, payload):
         # NOTE(chdent): How much of the payload should we keep?
         info = {'publisher_id': message['publisher_id'],
@@ -125,7 +125,7 @@ class SensorNotification(plugin.NotificationBase):
                 try:
                     resource_id = '%(nodeid)s-%(sensorid)s' % {
                         'nodeid': message['payload']['node_uuid'],
-                        'sensorid': self._transform_id(payload['Sensor ID'])
+                        'sensorid': transform_id(payload['Sensor ID'])
                     }
                 except KeyError as exc:
                     raise InvalidSensorData('missing key in payload: %s' % exc)
@@ -139,8 +139,8 @@ class SensorNotification(plugin.NotificationBase):
                         "missing 'Sensor Reading' in payload"
                     )
 
-                if self._validate_reading(sensor_reading):
-                    volume, unit = self._parse_reading(sensor_reading)
+                if validate_reading(sensor_reading):
+                    volume, unit = parse_reading(sensor_reading)
                     yield sample.Sample.from_notification(
                         name='hardware.ipmi.%s' % self.metric.lower(),
                         type=sample.TYPE_GAUGE,

@@ -20,9 +20,9 @@
 import mock
 from oslotest import base
 
-from ceilometer.hardware.notifications import ipmi
+from ceilometer.ipmi.notifications import ironic as ipmi
 from ceilometer import sample
-from ceilometer.tests.hardware.notifications import ipmi_test_data
+from ceilometer.tests.ipmi.notifications import ipmi_test_data
 
 
 class TestNotifications(base.BaseTestCase):
@@ -144,7 +144,7 @@ class TestNotifications(base.BaseTestCase):
 
         self.assertEqual(0, len(counters), 'expected 0 readings')
 
-    @mock.patch('ceilometer.hardware.notifications.ipmi.LOG')
+    @mock.patch('ceilometer.ipmi.notifications.ironic.LOG')
     def test_missing_sensor_data(self, mylog):
         processor = ipmi.TemperatureSensorNotification(None)
 
@@ -160,7 +160,7 @@ class TestNotifications(base.BaseTestCase):
             messages[0]
         )
 
-    @mock.patch('ceilometer.hardware.notifications.ipmi.LOG')
+    @mock.patch('ceilometer.ipmi.notifications.ironic.LOG')
     def test_sensor_data_malformed(self, mylog):
         processor = ipmi.TemperatureSensorNotification(None)
 
@@ -176,7 +176,7 @@ class TestNotifications(base.BaseTestCase):
             messages[0]
         )
 
-    @mock.patch('ceilometer.hardware.notifications.ipmi.LOG')
+    @mock.patch('ceilometer.ipmi.notifications.ironic.LOG')
     def test_missing_node_uuid(self, mylog):
         """Test for desired error message when 'node_uuid' missing.
 
@@ -196,7 +196,7 @@ class TestNotifications(base.BaseTestCase):
             messages[0]
         )
 
-    @mock.patch('ceilometer.hardware.notifications.ipmi.LOG')
+    @mock.patch('ceilometer.ipmi.notifications.ironic.LOG')
     def test_missing_sensor_id(self, mylog):
         """Test for desired error message when 'Sensor ID' missing."""
         processor = ipmi.TemperatureSensorNotification(None)

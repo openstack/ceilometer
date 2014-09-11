@@ -368,6 +368,21 @@ hardware.ipmi.current          Gauge       W       current sensor  notification 
 hardware.ipmi.voltage          Gauge       V       voltage sensor  notification  Sensor Voltage Reading
 =============================  ==========  ======  ==============  ============  ==========================
 
+There is another way to retrieve IPMI data, by deploying the Ceilometer IPMI
+agent on each IPMI-capable node in order to poll local sensor data. To avoid
+duplication of metering data and unnecessary load on the IPMI interface, the
+IPMI agent should not be deployed if the node is managed by Ironic and the
+'conductor.send_sensor_data' option is set to true in the Ironic configuration.
+
+IPMI agent also retrieve following Node Manager meter besides original IPMI
+sensor data:
+
+===============================  ==========  ======  ==============  ============  ==========================
+Meter                            Type        Unit    Resource        Origin        Note
+===============================  ==========  ======  ==============  ============  ==========================
+hardware.ipmi.node.power         Gauge       W       host ID         pollster      System Current Power
+hardware.ipmi.node.temperature   Gauge       C       host ID         pollster      System Current Temperature
+===============================  ==========  ======  ==============  ============  ==========================
 
 Dynamically retrieving the Meters via ceilometer client
 =======================================================
