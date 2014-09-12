@@ -63,3 +63,6 @@ ceilometer::
 
    # Enable the ceilometer api services
    enable_service ceilometer-api
+
+6. If you use Data Processing (Sahara) service at your DevStack, it will
+   generate notifications by default.
