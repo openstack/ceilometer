@@ -143,7 +143,6 @@ write_autodoc_index()
 # or your custom ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.intersphinx',
     'sphinxcontrib.autohttp.flask',
     'wsmeext.sphinxext',
     'sphinx.ext.coverage',
