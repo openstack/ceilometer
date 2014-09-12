@@ -25,14 +25,15 @@ import six
 @six.add_metaclass(abc.ABCMeta)
 class Inspector(object):
     @abc.abstractmethod
-    def inspect_generic(self, host, identifier, cache):
+    def inspect_generic(self, host, identifier, cache, extra_metadata=None):
         """A generic inspect function.
 
         :param host: the target host
         :param identifier: the identifier of the metric
         :param cache: cache passed from the pollster
+        :param extra_metadata: extra dict to be used as metadata
         :return: an iterator of (value, metadata, extra)
         :return value: the sample value
         :return metadata: dict to construct sample's metadata
-        :return extra: dict of extra info to help constructing sample
+        :return extra: dict of extra metadata to help constructing sample
         """

@@ -41,22 +41,36 @@ class NodesDiscoveryTripleO(plugin.DiscoveryBase):
         super(NodesDiscoveryTripleO, self).__init__()
         self.nova_cli = nova_client.Client()
 
+    @staticmethod
+    def _address(instance, field):
+        return instance.addresses['ctlplane'][0].get(field)
+
     def discover(self, param=None):
         """Discover resources to monitor."""
 
         instances = self.nova_cli.instance_get_all()
-        ip_addresses = []
+        resources = []
         for instance in instances:
             try:
-                ip_address = instance.addresses['ctlplane'][0]['addr']
+                ip_address = self._address(instance, 'addr')
                 final_address = (
                     cfg.CONF.hardware.url_scheme +
                     cfg.CONF.hardware.readonly_user_name + ':' +
                     cfg.CONF.hardware.readonly_user_password + '@' +
                     ip_address)
-                ip_addresses.append(final_address)
+
+                resource = {
+                    'resource_id': instance.id,
+                    'resource_url': final_address,
+                    'mac_addr': self._address(instance,
+                                              'OS-EXT-IPS-MAC:mac_addr'),
+                    'image_id': instance.image['id'],
+                    'flavor_id': instance.flavor['id']
+                }
+
+                resources.append(resource)
             except KeyError:
                 LOG.error(_("Couldn't obtain IP address of"
                             "instance %s") % instance.id)
 
-        return ip_addresses
+        return resources

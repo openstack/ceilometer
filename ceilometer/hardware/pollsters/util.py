@@ -44,15 +44,16 @@ def make_sample_from_host(host_url, name, sample_type, unit, volume,
                           res_metadata=None, extra={}):
 
     resource_metadata = make_resource_metadata(res_metadata, host_url)
+    resource_metadata.update(extra)
 
-    res_id = extra.get('resource_id') or resource_id or host_url.hostname
+    res_id = resource_id or extra.get('resource_id') or host_url.hostname
     return sample.Sample(
         name='hardware.' + name,
         type=sample_type,
         unit=unit,
         volume=volume,
-        user_id=extra.get('user_id') or user_id,
-        project_id=extra.get('project_id') or project_id,
+        user_id=user_id or extra.get('user_id'),
+        project_id=project_id or extra.get('project_id'),
         resource_id=res_id,
         timestamp=timeutils.isotime(),
         resource_metadata=resource_metadata,

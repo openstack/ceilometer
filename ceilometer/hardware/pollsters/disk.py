@@ -29,7 +29,7 @@ class _Base(plugin.HardwarePollster):
 
     def generate_one_sample(self, host, c_data):
         value, metadata, extra = c_data
-        res_id = host.hostname
+        res_id = extra.get('resource_id') or host.hostname
         if metadata.get('device'):
             res_id = res_id + ".%s" % metadata.get('device')
         return util.make_sample_from_host(host,
