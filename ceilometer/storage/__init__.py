@@ -127,6 +127,30 @@ class SampleFilter(object):
         self.metaquery = metaquery or {}
         self.message_id = message_id
 
+    def __repr__(self):
+        return ("<SampleFilter(user: %s,"
+                " project: %s,"
+                " start: %s,"
+                " start_timestamp_op: %s,"
+                " end: %s,"
+                " end_timestamp_op: %s,"
+                " resource: %s,"
+                " meter: %s,"
+                " source: %s,"
+                " metaquery: %s,"
+                " message_id: %s)>" %
+                (self.user,
+                 self.project,
+                 self.start,
+                 self.start_timestamp_op,
+                 self.end,
+                 self.end_timestamp_op,
+                 self.resource,
+                 self.meter,
+                 self.source,
+                 self.metaquery,
+                 self.message_id))
+
 
 class EventFilter(object):
     """Properties for building an Event query.
