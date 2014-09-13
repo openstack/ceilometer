@@ -210,6 +210,24 @@ class TestQueryMetersController(tests_api.FunctionalTest,
         for sample_item in data.json:
             self.assertIn(sample_item['resource_id'], set(["resource-id2"]))
 
+    def test_query_with_wrong_field_name(self):
+        data = self.post_json(self.url,
+                              params={"filter":
+                                      '{"=": {"unknown": "resource-id2"}}'},
+                              expect_errors=True)
+
+        self.assertEqual(400, data.status_int)
+        self.assertIn("is not valid under any of the given schemas", data.body)
+
+    def test_query_with_wrong_json(self):
+        data = self.post_json(self.url,
+                              params={"filter":
+                                      '{"=": "resource": "resource-id2"}}'},
+                              expect_errors=True)
+
+        self.assertEqual(400, data.status_int)
+        self.assertIn("Filter expression not valid", data.body)
+
     def test_query_with_field_name_user(self):
         data = self.post_json(self.url,
                               params={"filter":
@@ -257,7 +275,16 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                               params={"orderby": '[{"project_id": ""}]'},
                               expect_errors=True)
 
-        self.assertEqual(500, data.status_int)
+        self.assertEqual(400, data.status_int)
+        self.assertIn("does not match '(?i)^asc$|^desc$'", data.body)
+
+    def test_query_with_wrong_json_in_orderby(self):
+        data = self.post_json(self.url,
+                              params={"orderby": '{"project_id": "desc"}]'},
+                              expect_errors=True)
+
+        self.assertEqual(400, data.status_int)
+        self.assertIn("Order-by expression not valid: Extra data", data.body)
 
     def test_filter_with_metadata(self):
         data = self.post_json(self.url,
