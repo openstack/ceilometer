@@ -628,6 +628,64 @@ class TestAlarms(v2.FunctionalTest,
             'not valid for this resource',
             resp.json['error_message']['faultstring'])
 
+    def _do_post_alarm_invalid_action(self, ok_actions=[], alarm_actions=[],
+                                      insufficient_data_actions=[],
+                                      error_message=None):
+        json = {
+            'enabled': False,
+            'name': 'added_alarm',
+            'state': 'ok',
+            'type': 'threshold',
+            'ok_actions': ok_actions,
+            'alarm_actions': alarm_actions,
+            'insufficient_data_actions': insufficient_data_actions,
+            'repeat_actions': True,
+            'threshold_rule': {
+                'meter_name': 'ameter',
+                'query': [{'field': 'metadata.field',
+                           'op': 'eq',
+                           'value': '5',
+                           'type': 'string'}],
+                'comparison_operator': 'le',
+                'statistic': 'count',
+                'threshold': 50,
+                'evaluation_periods': '3',
+                'period': '180',
+            }
+        }
+        resp = self.post_json('/alarms', params=json, status=400,
+                              headers=self.auth_headers)
+        alarms = list(self.alarm_conn.get_alarms())
+        self.assertEqual(4, len(alarms))
+        self.assertEqual(error_message,
+                         resp.json['error_message']['faultstring'])
+
+    def test_post_invalid_alarm_ok_actions(self):
+        self._do_post_alarm_invalid_action(
+            ok_actions=['spam://something/ok'],
+            error_message='Unsupported action spam://something/ok')
+
+    def test_post_invalid_alarm_alarm_actions(self):
+        self._do_post_alarm_invalid_action(
+            alarm_actions=['spam://something/alarm'],
+            error_message='Unsupported action spam://something/alarm')
+
+    def test_post_invalid_alarm_insufficient_data_actions(self):
+        self._do_post_alarm_invalid_action(
+            insufficient_data_actions=['spam://something/insufficient'],
+            error_message='Unsupported action spam://something/insufficient')
+
+    @staticmethod
+    def _fake_urlsplit(*args, **kwargs):
+        raise Exception("Evil urlsplit!")
+
+    def test_post_invalid_alarm_actions_format(self):
+        with mock.patch('oslo.utils.netutils.urlsplit',
+                        self._fake_urlsplit):
+            self._do_post_alarm_invalid_action(
+                alarm_actions=['http://[::1'],
+                error_message='Unable to parse action http://[::1')
+
     def test_post_alarm_defaults(self):
         to_check = {
             'enabled': True,
@@ -1487,6 +1545,44 @@ class TestAlarms(v2.FunctionalTest,
                              headers=self.auth_headers)
         self.assertEqual(
             'Alarm with name=name1 exists',
+            resp.json['error_message']['faultstring'])
+
+    def test_put_invalid_alarm_actions(self):
+        json = {
+            'enabled': False,
+            'name': 'name1',
+            'state': 'ok',
+            'type': 'threshold',
+            'ok_actions': ['spam://something/ok'],
+            'alarm_actions': ['http://something/alarm'],
+            'insufficient_data_actions': ['http://something/no'],
+            'repeat_actions': True,
+            'threshold_rule': {
+                'meter_name': 'ameter',
+                'query': [{'field': 'metadata.field',
+                           'op': 'eq',
+                           'value': '5',
+                           'type': 'string'}],
+                'comparison_operator': 'le',
+                'statistic': 'count',
+                'threshold': 50,
+                'evaluation_periods': 3,
+                'period': 180,
+            }
+        }
+        data = self.get_json('/alarms',
+                             q=[{'field': 'name',
+                                 'value': 'name2',
+                                 }])
+        self.assertEqual(1, len(data))
+        alarm_id = data[0]['alarm_id']
+
+        resp = self.put_json('/alarms/%s' % alarm_id,
+                             expect_errors=True, status=400,
+                             params=json,
+                             headers=self.auth_headers)
+        self.assertEqual(
+            'Unsupported action spam://something/ok',
             resp.json['error_message']['faultstring'])
 
     def test_put_alarm_combination_cannot_specify_itself(self):
