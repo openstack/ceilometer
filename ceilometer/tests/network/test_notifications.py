@@ -407,6 +407,796 @@ NOTIFICATION_L3_METER = {
     u'_context_project_id': None}
 
 
+NOTIFICATION_POOL_CREATE = {
+    "_context_roles": ["heat_stack_owner", "admin"],
+    "_context_request_id": "req-10715057-7590-4529-8020-b994295ee6f4",
+    "event_type": "pool.create.end",
+    "timestamp": "2014-09-15 17:20:50.687649",
+    "_context_tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_user": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "_unique_id": "ce255443233748ce9cc71b480974df28",
+    "_context_tenant_name": "demo",
+    "_context_user_id": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "payload": {
+        "pool": {
+            "status": "ACTIVE",
+            "lb_method": "ROUND_ROBIN",
+            "protocol": "HTTP", "description": "",
+            "health_monitors": [],
+            "members": [],
+            "status_description": None,
+            "id": "6d726518-f3aa-4dd4-ac34-e156a35c0aff",
+            "vip_id": None,
+            "name": "my_pool",
+            "admin_state_up": True,
+            "subnet_id": "afaf251b-2ec3-42ac-9fa9-82a4195724fa",
+            "tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+            "health_monitors_status": [],
+            "provider": "haproxy"}},
+    "_context_project_name": "demo",
+    "_context_read_deleted": "no",
+    "_context_auth_token": "e6daf56d7d1787e1fbefff0ecf29703f",
+    "_context_tenant": "a820f2d6293b4a7587d1c582767f43fb",
+    "priority": "INFO",
+    "_context_is_admin": True,
+    "_context_project_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_timestamp": "2014-09-15 17:20:49.600299",
+    "_context_user_name": "admin",
+    "publisher_id": "network.ubuntu",
+    "message_id": "0a5ed7a6-e516-4aed-9968-4ee9f1b65cc2"}
+
+
+NOTIFICATION_VIP_CREATE = {
+    "_context_roles": ["heat_stack_owner", "admin"],
+    "_context_request_id": "req-e56a8a5e-5d42-43e8-9677-2d36e6e17d5e",
+    "event_type": "vip.create.end",
+    "timestamp": "2014-09-15 17:22:11.323644",
+    "_context_tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_user": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "_unique_id": "f112a185e1d1424eba3a13df9e0f0277",
+    "_context_tenant_name": "demo",
+    "_context_user_id": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "payload": {
+        "vip": {
+            "status": "ACTIVE",
+            "protocol": "HTTP",
+            "description": "",
+            "address": "10.0.0.2",
+            "protocol_port": 80,
+            "port_id": "2b5dd476-11da-4d46-9f1e-7a75436062f6",
+            "id": "87a5ce35-f278-47f3-8990-7f695f52f9bf",
+            "status_description": None,
+            "name": "my_vip",
+            "admin_state_up": True,
+            "subnet_id": "afaf251b-2ec3-42ac-9fa9-82a4195724fa",
+            "tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+            "connection_limit": -1,
+            "pool_id": "6d726518-f3aa-4dd4-ac34-e156a35c0aff",
+            "session_persistence": {"type": "SOURCE_IP"}}},
+    "_context_project_name": "demo",
+    "_context_read_deleted": "no",
+    "_context_auth_token": "e6daf56d7d1787e1fbefff0ecf29703f",
+    "_context_tenant": "a820f2d6293b4a7587d1c582767f43fb",
+    "priority": "INFO",
+    "_context_is_admin": True,
+    "_context_project_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_timestamp": "2014-09-15 17:22:11.187163",
+    "_context_user_name": "admin",
+    "publisher_id": "network.ubuntu",
+    "message_id": "3895ad11-98a3-4031-92af-f76e96736661"}
+
+
+NOTIFICATION_HEALTH_MONITORS_CREATE = {
+    "_context_roles": ["heat_stack_owner", "admin"],
+    "_context_request_id": "req-e56a8a5e-5d42-43e8-9677-2d36e6e17d5e",
+    "event_type": "health_monitor.create.end",
+    "timestamp": "2014-09-15 17:22:11.323644",
+    "_context_tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_user": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "_unique_id": "f112a185e1d1424eba3a13df9e0f0277",
+    "_context_tenant_name": "demo",
+    "_context_user_id": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "payload": {
+        "health_monitor": {
+            "admin_state_up": True,
+            "tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+            "delay": 10,
+            "max_retries": 10,
+            "timeout": 10,
+            "pools": [],
+            "type": "PING",
+            "id": "6dea2d01-c3af-4696-9192-6c938f391f01"}},
+    "_context_project_name": "demo",
+    "_context_read_deleted": "no",
+    "_context_auth_token": "e6daf56d7d1787e1fbefff0ecf29703f",
+    "_context_tenant": "a820f2d6293b4a7587d1c582767f43fb",
+    "priority": "INFO",
+    "_context_is_admin": True,
+    "_context_project_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_timestamp": "2014-09-15 17:22:11.187163",
+    "_context_user_name": "admin",
+    "publisher_id": "network.ubuntu",
+    "message_id": "65067e3f-830d-4fbb-87e2-f0e51fda83d2"}
+
+
+NOTIFICATION_MEMBERS_CREATE = {
+    "_context_roles": ["heat_stack_owner", "admin"],
+    "_context_request_id": "req-e56a8a5e-5d42-43e8-9677-2d36e6e17d5e",
+    "event_type": "member.create.end",
+    "timestamp": "2014-09-15 17:22:11.323644",
+    "_context_tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_user": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "_unique_id": "f112a185e1d1424eba3a13df9e0f0277",
+    "_context_tenant_name": "demo",
+    "_context_user_id": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "payload": {
+        "member": {"admin_state_up": True,
+                   "status": "ACTIVE",
+                   "status_description": None,
+                   "weight": 1,
+                   "address": "10.0.0.3",
+                   "tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+                   "protocol_port": 80,
+                   "id": "5e32f960-63ae-4a93-bfa2-339aa83d82ce",
+                   "pool_id": "6b73b9f8-d807-4553-87df-eb34cdd08070"}},
+    "_context_project_name": "demo",
+    "_context_read_deleted": "no",
+    "_context_auth_token": "e6daf56d7d1787e1fbefff0ecf29703f",
+    "_context_tenant": "a820f2d6293b4a7587d1c582767f43fb",
+    "priority": "INFO",
+    "_context_is_admin": True,
+    "_context_project_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_timestamp": "2014-09-15 17:22:11.187163",
+    "_context_user_name": "admin",
+    "publisher_id": "network.ubuntu",
+    "message_id": "65067e3f-830d-4fbb-87e2-f0e51fda83d2"}
+
+
+NOTIFICATION_FIREWALL_CREATE = {
+    "_context_roles": ["heat_stack_owner", "admin"],
+    "_context_request_id": "req-e56a8a5e-5d42-43e8-9677-2d36e6e17d5e",
+    "event_type": "firewall.create.end",
+    "timestamp": "2014-09-15 17:22:11.323644",
+    "_context_tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_user": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "_unique_id": "f112a185e1d1424eba3a13df9e0f0277",
+    "_context_tenant_name": "demo",
+    "_context_user_id": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "payload": {
+        "firewall": {
+            "status": "ACTIVE",
+            "name": "my_firewall",
+            "admin_state_up": True,
+            "tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+            "firewall_policy_id": "c46a1c15-0496-41c9-beff-9a309a25653e",
+            "id": "e2d1155f-6bc4-4292-9cfa-ea91af4b38c8",
+            "description": ""}},
+    "_context_project_name": "demo",
+    "_context_read_deleted": "no",
+    "_context_auth_token": "e6daf56d7d1787e1fbefff0ecf29703f",
+    "_context_tenant": "a820f2d6293b4a7587d1c582767f43fb",
+    "priority": "INFO",
+    "_context_is_admin": True,
+    "_context_project_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_timestamp": "2014-09-15 17:22:11.187163",
+    "_context_user_name": "admin",
+    "publisher_id": "network.ubuntu",
+    "message_id": "fdffeca1-2b5a-4dc9-b8ae-87c482a83e0d"}
+
+
+NOTIFICATION_FIREWALL_RULE_CREATE = {
+    "_context_roles": ["heat_stack_owner", "admin"],
+    "_context_request_id": "req-e56a8a5e-5d42-43e8-9677-2d36e6e17d5e",
+    "event_type": "firewall_rule.create.end",
+    "timestamp": "2014-09-15 17:22:11.323644",
+    "_context_tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_user": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "_unique_id": "f112a185e1d1424eba3a13df9e0f0277",
+    "_context_tenant_name": "demo",
+    "_context_user_id": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "payload": {
+        "firewall_rule": {
+            "protocol": "tcp",
+            "description": "",
+            "source_port": 80,
+            "source_ip_address": '192.168.255.10',
+            "destination_ip_address": '10.10.10.1',
+            "firewall_policy_id": '',
+            "position": None,
+            "destination_port": 80,
+            "id": "53b7c0d3-cb87-4069-9e29-1e866583cc8c",
+            "name": "rule_01",
+            "tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+            "enabled": True,
+            "action": "allow",
+            "ip_version": 4,
+            "shared": False}},
+    "_context_project_name": "demo",
+    "_context_read_deleted": "no",
+    "_context_auth_token": "e6daf56d7d1787e1fbefff0ecf29703f",
+    "_context_tenant": "a820f2d6293b4a7587d1c582767f43fb",
+    "priority": "INFO",
+    "_context_is_admin": True,
+    "_context_project_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_timestamp": "2014-09-15 17:22:11.187163",
+    "_context_user_name": "admin",
+    "publisher_id": "network.ubuntu",
+    "message_id": "fdffeca1-2b5a-4dc9-b8ae-87c482a83e0d"}
+
+
+NOTIFICATION_FIREWALL_POLICY_CREATE = {
+    "_context_roles": ["heat_stack_owner", "admin"],
+    "_context_request_id": "req-e56a8a5e-5d42-43e8-9677-2d36e6e17d5e",
+    "event_type": "firewall_policy.create.end",
+    "timestamp": "2014-09-15 17:22:11.323644",
+    "_context_tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_user": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "_unique_id": "f112a185e1d1424eba3a13df9e0f0277",
+    "_context_tenant_name": "demo",
+    "_context_user_id": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "payload": {
+        "firewall_policy": {"name": "my_policy",
+                            "firewall_rules": [],
+                            "tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+                            "audited": False,
+                            "shared": False,
+                            "id": "c46a1c15-0496-41c9-beff-9a309a25653e",
+                            "description": ""}},
+    "_context_project_name": "demo",
+    "_context_read_deleted": "no",
+    "_context_auth_token": "e6daf56d7d1787e1fbefff0ecf29703f",
+    "_context_tenant": "a820f2d6293b4a7587d1c582767f43fb",
+    "priority": "INFO",
+    "_context_is_admin": True,
+    "_context_project_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_timestamp": "2014-09-15 17:22:11.187163",
+    "_context_user_name": "admin",
+    "publisher_id": "network.ubuntu",
+    "message_id": "fdffeca1-2b5a-4dc9-b8ae-87c482a83e0d"}
+
+
+NOTIFICATION_VPNSERVICE_CREATE = {
+    "_context_roles": ["heat_stack_owner", "admin"],
+    "_context_request_id": "req-e56a8a5e-5d42-43e8-9677-2d36e6e17d5e",
+    "event_type": "vpnservice.create.end",
+    "timestamp": "2014-09-15 17:22:11.323644",
+    "_context_tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_user": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "_unique_id": "f112a185e1d1424eba3a13df9e0f0277",
+    "_context_tenant_name": "demo",
+    "_context_user_id": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "payload": {
+        "vpnservice": {"router_id": "75871c53-e722-4b21-93ed-20cb40b6b672",
+                       "status": "ACTIVE",
+                       "name": "my_vpn",
+                       "admin_state_up": True,
+                       "subnet_id": "afaf251b-2ec3-42ac-9fa9-82a4195724fa",
+                       "tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+                       "id": "270c40cc-28d5-4a7e-83da-cc33088ee5d6",
+                       "description": ""}},
+    "_context_project_name": "demo",
+    "_context_read_deleted": "no",
+    "_context_auth_token": "e6daf56d7d1787e1fbefff0ecf29703f",
+    "_context_tenant": "a820f2d6293b4a7587d1c582767f43fb",
+    "priority": "INFO",
+    "_context_is_admin": True,
+    "_context_project_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_timestamp": "2014-09-15 17:22:11.187163",
+    "_context_user_name": "admin",
+    "publisher_id": "network.ubuntu",
+    "message_id": "65067e3f-830d-4fbb-87e2-f0e51fda83d2"}
+
+
+NOTIFICATION_IPSEC_POLICY_CREATE = {
+    "_context_roles": ["heat_stack_owner", "admin"],
+    "_context_request_id": "req-e56a8a5e-5d42-43e8-9677-2d36e6e17d5e",
+    "event_type": "ipsecpolicy.create.end",
+    "timestamp": "2014-09-15 17:22:11.323644",
+    "_context_tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_user": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "_unique_id": "f112a185e1d1424eba3a13df9e0f0277",
+    "_context_tenant_name": "demo",
+    "_context_user_id": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "payload": {
+        "ipsecpolicy": {"encapsulation_mode": "tunnel",
+                        "encryption_algorithm": "aes-128",
+                        "pfs": "group5",
+                        "lifetime": {
+                            "units": "seconds",
+                            "value": 3600},
+                        "name": "my_ipsec_polixy",
+                        "transform_protocol": "esp",
+                        "tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+                        "id": "998d910d-4506-47c9-a160-47ec51ff53fc",
+                        "auth_algorithm": "sha1",
+                        "description": ""}},
+    "_context_project_name": "demo",
+    "_context_read_deleted": "no",
+    "_context_auth_token": "e6daf56d7d1787e1fbefff0ecf29703f",
+    "_context_tenant": "a820f2d6293b4a7587d1c582767f43fb",
+    "priority": "INFO",
+    "_context_is_admin": True,
+    "_context_project_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_timestamp": "2014-09-15 17:22:11.187163",
+    "_context_user_name": "admin",
+    "publisher_id": "network.ubuntu",
+    "message_id": "4c0e6ecb-2e40-4975-aee2-d88045c747bf"}
+
+
+NOTIFICATION_IKE_POLICY_CREATE = {
+    "_context_roles": ["heat_stack_owner", "admin"],
+    "_context_request_id": "req-e56a8a5e-5d42-43e8-9677-2d36e6e17d5e",
+    "event_type": "ikepolicy.create.end",
+    "timestamp": "2014-09-15 17:22:11.323644",
+    "_context_tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_user": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "_unique_id": "f112a185e1d1424eba3a13df9e0f0277",
+    "_context_tenant_name": "demo",
+    "_context_user_id": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "payload": {
+        "ikepolicy": {"encryption_algorithm": "aes-128",
+                      "pfs": "group5",
+                      "name": "my_ike_policy",
+                      "phase1_negotiation_mode": "main",
+                      "lifetime": {"units": "seconds",
+                                   "value": 3600},
+                      "tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+                      "ike_version": "v1",
+                      "id": "11cef94e-3f6a-4b65-8058-7deb1838633a",
+                      "auth_algorithm": "sha1",
+                      "description": ""}},
+    "_context_project_name": "demo",
+    "_context_read_deleted": "no",
+    "_context_auth_token": "e6daf56d7d1787e1fbefff0ecf29703f",
+    "_context_tenant": "a820f2d6293b4a7587d1c582767f43fb",
+    "priority": "INFO",
+    "_context_is_admin": True,
+    "_context_project_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_timestamp": "2014-09-15 17:22:11.187163",
+    "_context_user_name": "admin",
+    "publisher_id": "network.ubuntu",
+    "message_id": "4c0e6ecb-2e40-4975-aee2-d88045c747bf"}
+
+
+NOTIFICATION_IPSEC_SITE_CONN_CREATE = {
+    "_context_roles": ["heat_stack_owner", "admin"],
+    "_context_request_id": "req-e56a8a5e-5d42-43e8-9677-2d36e6e17d5e",
+    "event_type": "ipsec_site_connection.create.end",
+    "timestamp": "2014-09-15 17:22:11.323644",
+    "_context_tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_user": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "_unique_id": "f112a185e1d1424eba3a13df9e0f0277",
+    "_context_tenant_name": "demo",
+    "_context_user_id": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "payload": {
+        "ipsec_site_connection": {
+            "status": "ACTIVE",
+            "psk": "test",
+            "initiator": "bi-directional",
+            "name": "my_ipsec_connection",
+            "admin_state_up": True,
+            "tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+            "ipsecpolicy_id": "998d910d-4506-47c9-a160-47ec51ff53fc",
+            "auth_mode": "psk", "peer_cidrs": ["192.168.255.0/24"],
+            "mtu": 1500,
+            "ikepolicy_id": "11cef94e-3f6a-4b65-8058-7deb1838633a",
+            "dpd": {"action": "hold",
+                    "interval": 30,
+                    "timeout": 120},
+            "route_mode": "static",
+            "vpnservice_id": "270c40cc-28d5-4a7e-83da-cc33088ee5d6",
+            "peer_address": "10.0.0.1",
+            "peer_id": "10.0.0.254",
+            "id": "06f3c1ec-2e01-4ad6-9c98-4252751fc60a",
+            "description": ""}},
+    "_context_project_name": "demo",
+    "_context_read_deleted": "no",
+    "_context_auth_token": "e6daf56d7d1787e1fbefff0ecf29703f",
+    "_context_tenant": "a820f2d6293b4a7587d1c582767f43fb",
+    "priority": "INFO",
+    "_context_is_admin": True,
+    "_context_project_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_timestamp": "2014-09-15 17:22:11.187163",
+    "_context_user_name": "admin",
+    "publisher_id": "network.ubuntu",
+    "message_id": "4c0e6ecb-2e40-4975-aee2-d88045c747bf"}
+
+
+NOTIFICATION_POOL_UPDATE = {
+    "_context_roles": ["admin"],
+    "_context_request_id": "req-10715057-7590-4529-8020-b994295ee6f4",
+    "event_type": "pool.update.end",
+    "timestamp": "2014-09-15 17:20:50.687649",
+    "_context_tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_user": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "_unique_id": "ce255443233748ce9cc71b480974df28",
+    "_context_tenant_name": "demo",
+    "_context_user_id": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "payload": {
+        "pool": {
+            "status": "ACTIVE",
+            "lb_method": "ROUND_ROBIN",
+            "protocol": "HTTP", "description": "",
+            "health_monitors": [],
+            "members": [],
+            "status_description": None,
+            "id": "6d726518-f3aa-4dd4-ac34-e156a35c0aff",
+            "vip_id": None,
+            "name": "my_pool",
+            "admin_state_up": True,
+            "subnet_id": "afaf251b-2ec3-42ac-9fa9-82a4195724fa",
+            "tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+            "health_monitors_status": [],
+            "provider": "haproxy"}},
+    "_context_project_name": "demo",
+    "_context_read_deleted": "no",
+    "_context_auth_token": "e6daf56d7d1787e1fbefff0ecf29703f",
+    "_context_tenant": "a820f2d6293b4a7587d1c582767f43fb",
+    "priority": "INFO",
+    "_context_is_admin": True,
+    "_context_project_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_timestamp": "2014-09-15 17:20:49.600299",
+    "_context_user_name": "admin",
+    "publisher_id": "network.ubuntu",
+    "message_id": "0a5ed7a6-e516-4aed-9968-4ee9f1b65cc2"}
+
+
+NOTIFICATION_VIP_UPDATE = {
+    "_context_roles": ["admin"],
+    "_context_request_id": "req-e56a8a5e-5d42-43e8-9677-2d36e6e17d5e",
+    "event_type": "vip.update.end",
+    "timestamp": "2014-09-15 17:22:11.323644",
+    "_context_tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_user": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "_unique_id": "f112a185e1d1424eba3a13df9e0f0277",
+    "_context_tenant_name": "demo",
+    "_context_user_id": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "payload": {
+        "vip": {
+            "status": "ACTIVE",
+            "protocol": "HTTP",
+            "description": "",
+            "address": "10.0.0.2",
+            "protocol_port": 80,
+            "port_id": "2b5dd476-11da-4d46-9f1e-7a75436062f6",
+            "id": "87a5ce35-f278-47f3-8990-7f695f52f9bf",
+            "status_description": None,
+            "name": "my_vip",
+            "admin_state_up": True,
+            "subnet_id": "afaf251b-2ec3-42ac-9fa9-82a4195724fa",
+            "tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+            "connection_limit": -1,
+            "pool_id": "6d726518-f3aa-4dd4-ac34-e156a35c0aff",
+            "session_persistence": {"type": "SOURCE_IP"}}},
+    "_context_project_name": "demo",
+    "_context_read_deleted": "no",
+    "_context_auth_token": "e6daf56d7d1787e1fbefff0ecf29703f",
+    "_context_tenant": "a820f2d6293b4a7587d1c582767f43fb",
+    "priority": "INFO",
+    "_context_is_admin": True,
+    "_context_project_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_timestamp": "2014-09-15 17:22:11.187163",
+    "_context_user_name": "admin",
+    "publisher_id": "network.ubuntu",
+    "message_id": "3895ad11-98a3-4031-92af-f76e96736661"}
+
+
+NOTIFICATION_HEALTH_MONITORS_UPDATE = {
+    "_context_roles": ["admin"],
+    "_context_request_id": "req-e56a8a5e-5d42-43e8-9677-2d36e6e17d5e",
+    "event_type": "health_monitor.update.end",
+    "timestamp": "2014-09-15 17:22:11.323644",
+    "_context_tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_user": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "_unique_id": "f112a185e1d1424eba3a13df9e0f0277",
+    "_context_tenant_name": "demo",
+    "_context_user_id": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "payload": {
+        "health_monitor": {
+            "admin_state_up": True,
+            "tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+            "delay": 10,
+            "max_retries": 10,
+            "timeout": 10,
+            "pools": [],
+            "type": "PING",
+            "id": "6dea2d01-c3af-4696-9192-6c938f391f01"}},
+    "_context_project_name": "demo",
+    "_context_read_deleted": "no",
+    "_context_auth_token": "e6daf56d7d1787e1fbefff0ecf29703f",
+    "_context_tenant": "a820f2d6293b4a7587d1c582767f43fb",
+    "priority": "INFO",
+    "_context_is_admin": True,
+    "_context_project_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_timestamp": "2014-09-15 17:22:11.187163",
+    "_context_user_name": "admin",
+    "publisher_id": "network.ubuntu",
+    "message_id": "65067e3f-830d-4fbb-87e2-f0e51fda83d2"}
+
+
+NOTIFICATION_MEMBERS_UPDATE = {
+    "_context_roles": ["admin"],
+    "_context_request_id": "req-e56a8a5e-5d42-43e8-9677-2d36e6e17d5e",
+    "event_type": "member.update.end",
+    "timestamp": "2014-09-15 17:22:11.323644",
+    "_context_tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_user": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "_unique_id": "f112a185e1d1424eba3a13df9e0f0277",
+    "_context_tenant_name": "demo",
+    "_context_user_id": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "payload": {
+        "member": {"admin_state_up": True,
+                   "status": "ACTIVE",
+                   "status_description": None,
+                   "weight": 1,
+                   "address": "10.0.0.3",
+                   "tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+                   "protocol_port": 80,
+                   "id": "5e32f960-63ae-4a93-bfa2-339aa83d82ce",
+                   "pool_id": "6b73b9f8-d807-4553-87df-eb34cdd08070"}},
+    "_context_project_name": "demo",
+    "_context_read_deleted": "no",
+    "_context_auth_token": "e6daf56d7d1787e1fbefff0ecf29703f",
+    "_context_tenant": "a820f2d6293b4a7587d1c582767f43fb",
+    "priority": "INFO",
+    "_context_is_admin": True,
+    "_context_project_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_timestamp": "2014-09-15 17:22:11.187163",
+    "_context_user_name": "admin",
+    "publisher_id": "network.ubuntu",
+    "message_id": "65067e3f-830d-4fbb-87e2-f0e51fda83d2"}
+
+
+NOTIFICATION_FIREWALL_UPDATE = {
+    "_context_roles": ["admin"],
+    "_context_request_id": "req-e56a8a5e-5d42-43e8-9677-2d36e6e17d5e",
+    "event_type": "firewall.update.end",
+    "timestamp": "2014-09-15 17:22:11.323644",
+    "_context_tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_user": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "_unique_id": "f112a185e1d1424eba3a13df9e0f0277",
+    "_context_tenant_name": "demo",
+    "_context_user_id": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "payload": {
+        "firewall": {
+            "status": "ACTIVE",
+            "name": "my_firewall",
+            "admin_state_up": True,
+            "tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+            "firewall_policy_id": "c46a1c15-0496-41c9-beff-9a309a25653e",
+            "id": "e2d1155f-6bc4-4292-9cfa-ea91af4b38c8",
+            "description": ""}},
+    "_context_project_name": "demo",
+    "_context_read_deleted": "no",
+    "_context_auth_token": "e6daf56d7d1787e1fbefff0ecf29703f",
+    "_context_tenant": "a820f2d6293b4a7587d1c582767f43fb",
+    "priority": "INFO",
+    "_context_is_admin": True,
+    "_context_project_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_timestamp": "2014-09-15 17:22:11.187163",
+    "_context_user_name": "admin",
+    "publisher_id": "network.ubuntu",
+    "message_id": "fdffeca1-2b5a-4dc9-b8ae-87c482a83e0d"}
+
+
+NOTIFICATION_FIREWALL_RULE_UPDATE = {
+    "_context_roles": ["admin"],
+    "_context_request_id": "req-e56a8a5e-5d42-43e8-9677-2d36e6e17d5e",
+    "event_type": "firewall_rule.update.end",
+    "timestamp": "2014-09-15 17:22:11.323644",
+    "_context_tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_user": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "_unique_id": "f112a185e1d1424eba3a13df9e0f0277",
+    "_context_tenant_name": "demo",
+    "_context_user_id": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "payload": {
+        "firewall_rule": {
+            "protocol": "tcp",
+            "description": "",
+            "source_port": 80,
+            "source_ip_address": '192.168.255.10',
+            "destination_ip_address": '10.10.10.1',
+            "firewall_policy_id": '',
+            "position": None,
+            "destination_port": 80,
+            "id": "53b7c0d3-cb87-4069-9e29-1e866583cc8c",
+            "name": "rule_01",
+            "tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+            "enabled": True,
+            "action": "allow",
+            "ip_version": 4,
+            "shared": False}},
+    "_context_project_name": "demo",
+    "_context_read_deleted": "no",
+    "_context_auth_token": "e6daf56d7d1787e1fbefff0ecf29703f",
+    "_context_tenant": "a820f2d6293b4a7587d1c582767f43fb",
+    "priority": "INFO",
+    "_context_is_admin": True,
+    "_context_project_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_timestamp": "2014-09-15 17:22:11.187163",
+    "_context_user_name": "admin",
+    "publisher_id": "network.ubuntu",
+    "message_id": "fdffeca1-2b5a-4dc9-b8ae-87c482a83e0d"}
+
+
+NOTIFICATION_FIREWALL_POLICY_UPDATE = {
+    "_context_roles": ["admin"],
+    "_context_request_id": "req-e56a8a5e-5d42-43e8-9677-2d36e6e17d5e",
+    "event_type": "firewall_policy.update.end",
+    "timestamp": "2014-09-15 17:22:11.323644",
+    "_context_tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_user": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "_unique_id": "f112a185e1d1424eba3a13df9e0f0277",
+    "_context_tenant_name": "demo",
+    "_context_user_id": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "payload": {
+        "firewall_policy": {"name": "my_policy",
+                            "firewall_rules": [],
+                            "tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+                            "audited": False,
+                            "shared": False,
+                            "id": "c46a1c15-0496-41c9-beff-9a309a25653e",
+                            "description": ""}},
+    "_context_project_name": "demo",
+    "_context_read_deleted": "no",
+    "_context_auth_token": "e6daf56d7d1787e1fbefff0ecf29703f",
+    "_context_tenant": "a820f2d6293b4a7587d1c582767f43fb",
+    "priority": "INFO",
+    "_context_is_admin": True,
+    "_context_project_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_timestamp": "2014-09-15 17:22:11.187163",
+    "_context_user_name": "admin",
+    "publisher_id": "network.ubuntu",
+    "message_id": "fdffeca1-2b5a-4dc9-b8ae-87c482a83e0d"}
+
+
+NOTIFICATION_VPNSERVICE_UPDATE = {
+    "_context_roles": ["admin"],
+    "_context_request_id": "req-e56a8a5e-5d42-43e8-9677-2d36e6e17d5e",
+    "event_type": "vpnservice.update.end",
+    "timestamp": "2014-09-15 17:22:11.323644",
+    "_context_tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_user": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "_unique_id": "f112a185e1d1424eba3a13df9e0f0277",
+    "_context_tenant_name": "demo",
+    "_context_user_id": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "payload": {
+        "vpnservice": {"router_id": "75871c53-e722-4b21-93ed-20cb40b6b672",
+                       "status": "ACTIVE",
+                       "name": "my_vpn",
+                       "admin_state_up": True,
+                       "subnet_id": "afaf251b-2ec3-42ac-9fa9-82a4195724fa",
+                       "tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+                       "id": "270c40cc-28d5-4a7e-83da-cc33088ee5d6",
+                       "description": ""}},
+    "_context_project_name": "demo",
+    "_context_read_deleted": "no",
+    "_context_auth_token": "e6daf56d7d1787e1fbefff0ecf29703f",
+    "_context_tenant": "a820f2d6293b4a7587d1c582767f43fb",
+    "priority": "INFO",
+    "_context_is_admin": True,
+    "_context_project_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_timestamp": "2014-09-15 17:22:11.187163",
+    "_context_user_name": "admin",
+    "publisher_id": "network.ubuntu",
+    "message_id": "65067e3f-830d-4fbb-87e2-f0e51fda83d2"}
+
+
+NOTIFICATION_IPSEC_POLICY_UPDATE = {
+    "_context_roles": ["admin"],
+    "_context_request_id": "req-e56a8a5e-5d42-43e8-9677-2d36e6e17d5e",
+    "event_type": "ipsecpolicy.update.end",
+    "timestamp": "2014-09-15 17:22:11.323644",
+    "_context_tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_user": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "_unique_id": "f112a185e1d1424eba3a13df9e0f0277",
+    "_context_tenant_name": "demo",
+    "_context_user_id": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "payload": {
+        "ipsecpolicy": {"encapsulation_mode": "tunnel",
+                        "encryption_algorithm": "aes-128",
+                        "pfs": "group5",
+                        "lifetime": {
+                            "units": "seconds",
+                            "value": 3600},
+                        "name": "my_ipsec_polixy",
+                        "transform_protocol": "esp",
+                        "tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+                        "id": "998d910d-4506-47c9-a160-47ec51ff53fc",
+                        "auth_algorithm": "sha1",
+                        "description": ""}},
+    "_context_project_name": "demo",
+    "_context_read_deleted": "no",
+    "_context_auth_token": "e6daf56d7d1787e1fbefff0ecf29703f",
+    "_context_tenant": "a820f2d6293b4a7587d1c582767f43fb",
+    "priority": "INFO",
+    "_context_is_admin": True,
+    "_context_project_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_timestamp": "2014-09-15 17:22:11.187163",
+    "_context_user_name": "admin",
+    "publisher_id": "network.ubuntu",
+    "message_id": "4c0e6ecb-2e40-4975-aee2-d88045c747bf"}
+
+
+NOTIFICATION_IKE_POLICY_UPDATE = {
+    "_context_roles": ["admin"],
+    "_context_request_id": "req-e56a8a5e-5d42-43e8-9677-2d36e6e17d5e",
+    "event_type": "ikepolicy.update.end",
+    "timestamp": "2014-09-15 17:22:11.323644",
+    "_context_tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_user": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "_unique_id": "f112a185e1d1424eba3a13df9e0f0277",
+    "_context_tenant_name": "demo",
+    "_context_user_id": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "payload": {
+        "ikepolicy": {"encryption_algorithm": "aes-128",
+                      "pfs": "group5",
+                      "name": "my_ike_policy",
+                      "phase1_negotiation_mode": "main",
+                      "lifetime": {"units": "seconds",
+                                   "value": 3600},
+                      "tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+                      "ike_version": "v1",
+                      "id": "11cef94e-3f6a-4b65-8058-7deb1838633a",
+                      "auth_algorithm": "sha1",
+                      "description": ""}},
+    "_context_project_name": "demo",
+    "_context_read_deleted": "no",
+    "_context_auth_token": "e6daf56d7d1787e1fbefff0ecf29703f",
+    "_context_tenant": "a820f2d6293b4a7587d1c582767f43fb",
+    "priority": "INFO",
+    "_context_is_admin": True,
+    "_context_project_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_timestamp": "2014-09-15 17:22:11.187163",
+    "_context_user_name": "admin",
+    "publisher_id": "network.ubuntu",
+    "message_id": "4c0e6ecb-2e40-4975-aee2-d88045c747bf"}
+
+
+NOTIFICATION_IPSEC_SITE_CONN_UPDATE = {
+    "_context_roles": ["admin"],
+    "_context_request_id": "req-e56a8a5e-5d42-43e8-9677-2d36e6e17d5e",
+    "event_type": "ipsec_site_connection.update.end",
+    "timestamp": "2014-09-15 17:22:11.323644",
+    "_context_tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_user": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "_unique_id": "f112a185e1d1424eba3a13df9e0f0277",
+    "_context_tenant_name": "demo",
+    "_context_user_id": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "payload": {
+        "ipsec_site_connection": {
+            "status": "ACTIVE",
+            "psk": "test",
+            "initiator": "bi-directional",
+            "name": "my_ipsec_connection",
+            "admin_state_up": True,
+            "tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+            "ipsecpolicy_id": "998d910d-4506-47c9-a160-47ec51ff53fc",
+            "auth_mode": "psk", "peer_cidrs": ["192.168.255.0/24"],
+            "mtu": 1500,
+            "ikepolicy_id": "11cef94e-3f6a-4b65-8058-7deb1838633a",
+            "dpd": {"action": "hold",
+                    "interval": 30,
+                    "timeout": 120},
+            "route_mode": "static",
+            "vpnservice_id": "270c40cc-28d5-4a7e-83da-cc33088ee5d6",
+            "peer_address": "10.0.0.1",
+            "peer_id": "10.0.0.254",
+            "id": "06f3c1ec-2e01-4ad6-9c98-4252751fc60a",
+            "description": ""}},
+    "_context_project_name": "demo",
+    "_context_read_deleted": "no",
+    "_context_auth_token": "e6daf56d7d1787e1fbefff0ecf29703f",
+    "_context_tenant": "a820f2d6293b4a7587d1c582767f43fb",
+    "priority": "INFO",
+    "_context_is_admin": True,
+    "_context_project_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_timestamp": "2014-09-15 17:22:11.187163",
+    "_context_user_name": "admin",
+    "publisher_id": "network.ubuntu",
+    "message_id": "4c0e6ecb-2e40-4975-aee2-d88045c747bf"}
+
+
 class TestNotifications(test.BaseTestCase):
     def test_network_create(self):
         v = notifications.Network(mock.Mock())
@@ -489,6 +1279,150 @@ class TestNotifications(test.BaseTestCase):
         self.assertEqual(1, len(samples))
         self.assertEqual("bandwidth", samples[0].name)
 
+    def test_pool_create(self):
+        v = notifications.Pool(mock.Mock())
+        samples = list(v.process_notification(NOTIFICATION_POOL_CREATE))
+        self.assertEqual(2, len(samples))
+        self.assertEqual("pool", samples[0].name)
+
+    def test_vip_create(self):
+        v = notifications.Vip(mock.Mock())
+        samples = list(v.process_notification(NOTIFICATION_VIP_CREATE))
+        self.assertEqual(2, len(samples))
+        self.assertEqual("vip", samples[0].name)
+
+    def test_member_create(self):
+        v = notifications.Member(mock.Mock())
+        samples = list(v.process_notification(NOTIFICATION_MEMBERS_CREATE))
+        self.assertEqual(2, len(samples))
+        self.assertEqual("member", samples[0].name)
+
+    def test_health_monitor_create(self):
+        v = notifications.HealthMonitor(mock.Mock())
+        samples = list(v.process_notification(
+            NOTIFICATION_HEALTH_MONITORS_CREATE))
+        self.assertEqual(2, len(samples))
+        self.assertEqual("health_monitor", samples[0].name)
+
+    def test_firewall_create(self):
+        v = notifications.Firewall(mock.Mock())
+        samples = list(v.process_notification(NOTIFICATION_FIREWALL_CREATE))
+        self.assertEqual(2, len(samples))
+        self.assertEqual("firewall", samples[0].name)
+
+    def test_vpnservice_create(self):
+        v = notifications.VPNService(mock.Mock())
+        samples = list(v.process_notification(NOTIFICATION_VPNSERVICE_CREATE))
+        self.assertEqual(2, len(samples))
+        self.assertEqual("vpnservice", samples[0].name)
+
+    def test_ipsec_connection_create(self):
+        v = notifications.IPSecSiteConnection(mock.Mock())
+        samples = list(v.process_notification(
+            NOTIFICATION_IPSEC_SITE_CONN_CREATE))
+        self.assertEqual(2, len(samples))
+        self.assertEqual("ipsec_site_connection", samples[0].name)
+
+    def test_firewall_policy_create(self):
+        v = notifications.FirewallPolicy(mock.Mock())
+        samples = list(v.process_notification(
+            NOTIFICATION_FIREWALL_POLICY_CREATE))
+        self.assertEqual(2, len(samples))
+        self.assertEqual("firewall_policy", samples[0].name)
+
+    def test_firewall_rule_create(self):
+        v = notifications.FirewallRule(mock.Mock())
+        samples = list(v.process_notification(
+            NOTIFICATION_FIREWALL_RULE_CREATE))
+        self.assertEqual(2, len(samples))
+        self.assertEqual("firewall_rule", samples[0].name)
+
+    def test_ipsec_policy_create(self):
+        v = notifications.IPSecPolicy(mock.Mock())
+        samples = list(v.process_notification(
+            NOTIFICATION_IPSEC_POLICY_CREATE))
+        self.assertEqual(2, len(samples))
+        self.assertEqual("ipsecpolicy", samples[0].name)
+
+    def test_ike_policy_create(self):
+        v = notifications.IKEPolicy(mock.Mock())
+        samples = list(v.process_notification(
+            NOTIFICATION_IKE_POLICY_CREATE))
+        self.assertEqual(2, len(samples))
+        self.assertEqual("ikepolicy", samples[0].name)
+
+    def test_pool_update(self):
+        v = notifications.Pool(mock.Mock())
+        samples = list(v.process_notification(NOTIFICATION_POOL_UPDATE))
+        self.assertEqual(2, len(samples))
+        self.assertEqual("pool", samples[0].name)
+
+    def test_vip_update(self):
+        v = notifications.Vip(mock.Mock())
+        samples = list(v.process_notification(NOTIFICATION_VIP_UPDATE))
+        self.assertEqual(2, len(samples))
+        self.assertEqual("vip", samples[0].name)
+
+    def test_member_update(self):
+        v = notifications.Member(mock.Mock())
+        samples = list(v.process_notification(NOTIFICATION_MEMBERS_UPDATE))
+        self.assertEqual(2, len(samples))
+        self.assertEqual("member", samples[0].name)
+
+    def test_health_monitor_update(self):
+        v = notifications.HealthMonitor(mock.Mock())
+        samples = list(v.process_notification(
+            NOTIFICATION_HEALTH_MONITORS_UPDATE))
+        self.assertEqual(2, len(samples))
+        self.assertEqual("health_monitor", samples[0].name)
+
+    def test_firewall_update(self):
+        v = notifications.Firewall(mock.Mock())
+        samples = list(v.process_notification(NOTIFICATION_FIREWALL_UPDATE))
+        self.assertEqual(2, len(samples))
+        self.assertEqual("firewall", samples[0].name)
+
+    def test_vpnservice_update(self):
+        v = notifications.VPNService(mock.Mock())
+        samples = list(v.process_notification(NOTIFICATION_VPNSERVICE_UPDATE))
+        self.assertEqual(2, len(samples))
+        self.assertEqual("vpnservice", samples[0].name)
+
+    def test_ipsec_connection_update(self):
+        v = notifications.IPSecSiteConnection(mock.Mock())
+        samples = list(v.process_notification(
+            NOTIFICATION_IPSEC_SITE_CONN_UPDATE))
+        self.assertEqual(2, len(samples))
+        self.assertEqual("ipsec_site_connection", samples[0].name)
+
+    def test_firewall_policy_update(self):
+        v = notifications.FirewallPolicy(mock.Mock())
+        samples = list(v.process_notification(
+            NOTIFICATION_FIREWALL_POLICY_UPDATE))
+        self.assertEqual(2, len(samples))
+        self.assertEqual("firewall_policy", samples[0].name)
+
+    def test_firewall_rule_update(self):
+        v = notifications.FirewallRule(mock.Mock())
+        samples = list(v.process_notification(
+            NOTIFICATION_FIREWALL_RULE_UPDATE))
+        self.assertEqual(2, len(samples))
+        self.assertEqual("firewall_rule", samples[0].name)
+
+    def test_ipsec_policy_update(self):
+        v = notifications.IPSecPolicy(mock.Mock())
+        samples = list(v.process_notification(
+            NOTIFICATION_IPSEC_POLICY_UPDATE))
+        self.assertEqual(2, len(samples))
+        self.assertEqual("ipsecpolicy", samples[0].name)
+
+    def test_ike_policy_update(self):
+        v = notifications.IKEPolicy(mock.Mock())
+        samples = list(v.process_notification(
+            NOTIFICATION_IKE_POLICY_UPDATE))
+        self.assertEqual(2, len(samples))
+        self.assertEqual("ikepolicy", samples[0].name)
+
 
 class TestEventTypes(test.BaseTestCase):
 
@@ -515,3 +1449,37 @@ class TestEventTypes(test.BaseTestCase):
 
     def test_bandwidth(self):
         self.assertTrue(notifications.Bandwidth(mock.Mock()).event_types)
+
+    def test_pool(self):
+        self.assertTrue(notifications.Pool(mock.Mock()).event_types)
+
+    def test_vip(self):
+        self.assertTrue(notifications.Vip(mock.Mock()).event_types)
+
+    def test_member(self):
+        self.assertTrue(notifications.Member(mock.Mock()).event_types)
+
+    def test_health_monitor(self):
+        self.assertTrue(notifications.HealthMonitor(mock.Mock()).event_types)
+
+    def test_firewall(self):
+        self.assertTrue(notifications.Firewall(mock.Mock()).event_types)
+
+    def test_vpnservice(self):
+        self.assertTrue(notifications.VPNService(mock.Mock()).event_types)
+
+    def test_ipsec_connection(self):
+        self.assertTrue(notifications.IPSecSiteConnection(
+            mock.Mock()).event_types)
+
+    def test_firewall_policy(self):
+        self.assertTrue(notifications.FirewallPolicy(mock.Mock()).event_types)
+
+    def test_firewall_rule(self):
+        self.assertTrue(notifications.FirewallRule(mock.Mock()).event_types)
+
+    def test_ipsec_policy(self):
+        self.assertTrue(notifications.IPSecPolicy(mock.Mock()).event_types)
+
+    def test_ike_policy(self):
+        self.assertTrue(notifications.IKEPolicy(mock.Mock()).event_types)
