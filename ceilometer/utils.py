@@ -206,6 +206,10 @@ def uniq(dupes, attrs):
     return deduped
 
 
+def hash_of_set(s):
+    return str(hash(frozenset(s)))
+
+
 class HashRing(object):
 
     def __init__(self, nodes, replicas=100):

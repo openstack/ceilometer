@@ -32,6 +32,7 @@ from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import service as os_service
 from ceilometer import pipeline as publish_pipeline
+from ceilometer import utils
 
 LOG = log.getLogger(__name__)
 
@@ -53,7 +54,14 @@ class Resources(object):
         source_discovery = (self.agent_manager.discover(self._discovery,
                                                         discovery_cache)
                             if self._discovery else [])
-        return self._resources + source_discovery
+        static_resources = []
+        if self._resources:
+            static_resources_group = self.agent_manager.construct_group_id(
+                utils.hash_of_set(self._resources))
+            p_coord = self.agent_manager.partition_coordinator
+            static_resources = p_coord.extract_my_subset(
+                static_resources_group, self._resources)
+        return static_resources + source_discovery
 
     @staticmethod
     def key(source, pollster):
@@ -145,8 +153,15 @@ class AgentManager(os_service.Service):
         )
 
     def join_partitioning_groups(self):
-        groups = set([self._construct_group_id(d.obj.group_id)
+        groups = set([self.construct_group_id(d.obj.group_id)
                       for d in self.discovery_manager])
+        # let each set of statically-defined resources have its own group
+        static_resource_groups = set([
+            self.construct_group_id(utils.hash_of_set(p.resources))
+            for p in self.pipeline_manager.pipelines
+            if p.resources
+        ])
+        groups.update(static_resource_groups)
         for group in groups:
             self.partition_coordinator.join_group(group)
 
@@ -168,7 +183,7 @@ class AgentManager(os_service.Service):
 
         return polling_tasks
 
-    def _construct_group_id(self, discovery_group_id):
+    def construct_group_id(self, discovery_group_id):
         return ('%s-%s' % (self.group_prefix,
                            discovery_group_id)
                 if discovery_group_id else None)
@@ -217,7 +232,7 @@ class AgentManager(os_service.Service):
                 try:
                     discovered = discoverer.discover(self, param)
                     partitioned = self.partition_coordinator.extract_my_subset(
-                        self._construct_group_id(discoverer.group_id),
+                        self.construct_group_id(discoverer.group_id),
                         discovered)
                     resources.extend(partitioned)
                     if discovery_cache is not None:

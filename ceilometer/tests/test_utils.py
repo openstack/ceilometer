@@ -148,6 +148,14 @@ class TestUtils(base.BaseTestCase):
                          ('nested2[1].c', 'B')],
                          sorted(pairs, key=lambda x: x[0]))
 
+    def test_hash_of_set(self):
+        x = ['a', 'b']
+        y = ['a', 'b', 'a']
+        z = ['a', 'c']
+        self.assertEqual(utils.hash_of_set(x), utils.hash_of_set(y))
+        self.assertNotEqual(utils.hash_of_set(x), utils.hash_of_set(z))
+        self.assertNotEqual(utils.hash_of_set(y), utils.hash_of_set(z))
+
     def test_hash_ring(self):
         num_nodes = 10
         num_keys = 1000

@@ -38,6 +38,7 @@ from ceilometer.publisher import test as test_publisher
 from ceilometer import sample
 from ceilometer.tests import base
 from ceilometer import transformer
+from ceilometer import utils
 
 
 class TestSample(sample.Sample):
@@ -297,8 +298,11 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.mgr.discovery_manager = self.create_discovery_manager()
         self.mgr.join_partitioning_groups()
         p_coord = self.mgr.partition_coordinator
-        expected = [mock.call(self.mgr._construct_group_id(g))
-                    for g in ['another_group', 'global']]
+        static_group_ids = [utils.hash_of_set(p['resources'])
+                            for p in self.pipeline_cfg
+                            if p['resources']]
+        expected = [mock.call(self.mgr.construct_group_id(g))
+                    for g in ['another_group', 'global'] + static_group_ids]
         self.assertEqual(len(expected), len(p_coord.join_group.call_args_list))
         for c in expected:
             self.assertIn(c, p_coord.join_group.call_args_list)
@@ -686,13 +690,52 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
                                              'testdiscoveryanother',
                                              'testdiscoverynonexistent',
                                              'testdiscoveryexception']
+        self.pipeline_cfg[0]['resources'] = []
         self.setup_pipeline()
         polling_tasks = self.mgr.setup_polling_tasks()
         self.mgr.interval_task(polling_tasks.get(60))
-        expected = [mock.call(self.mgr._construct_group_id(d.obj.group_id),
+        expected = [mock.call(self.mgr.construct_group_id(d.obj.group_id),
                               d.obj.resources)
                     for d in self.mgr.discovery_manager
                     if hasattr(d.obj, 'resources')]
+        self.assertEqual(len(expected),
+                         len(p_coord.extract_my_subset.call_args_list))
+        for c in expected:
+            self.assertIn(c, p_coord.extract_my_subset.call_args_list)
+
+    def test_static_resources_partitioning(self):
+        p_coord = self.mgr.partition_coordinator
+        self.mgr.default_discovery = []
+        static_resources = ['static_1', 'static_2']
+        static_resources2 = ['static_3', 'static_4']
+        self.pipeline_cfg[0]['resources'] = static_resources
+        self.pipeline_cfg.append({
+                                 'name': "test_pipeline2",
+                                 'interval': 60,
+                                 'counters': ['test', 'test2'],
+                                 'resources': static_resources2,
+                                 'transformers': [],
+                                 'publishers': ["test"],
+                                 })
+        # have one pipeline without static resources defined
+        self.pipeline_cfg.append({
+                                 'name': "test_pipeline3",
+                                 'interval': 60,
+                                 'counters': ['test', 'test2'],
+                                 'resources': [],
+                                 'transformers': [],
+                                 'publishers': ["test"],
+                                 })
+        self.setup_pipeline()
+        polling_tasks = self.mgr.setup_polling_tasks()
+        self.mgr.interval_task(polling_tasks.get(60))
+        # Only two groups need to be created, one for each pipeline,
+        # even though counter test is used twice
+        expected = [mock.call(self.mgr.construct_group_id(
+                              utils.hash_of_set(resources)),
+                              resources)
+                    for resources in [static_resources,
+                                      static_resources2]]
         self.assertEqual(len(expected),
                          len(p_coord.extract_my_subset.call_args_list))
         for c in expected:
