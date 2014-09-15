@@ -18,6 +18,7 @@ import copy
 import re
 import six
 
+import ceilometer
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 
@@ -111,8 +112,9 @@ class MTable(object):
                     # in case of multiple filters
                     rows = m(fargs, rows)
                 else:
-                    raise NotImplementedError("%s filter is not implemented, "
-                                              "you may want to add it!")
+                    raise ceilometer.NotImplementedError(
+                        "%s filter is not implemented, "
+                        "you may want to add it!")
         for k in sorted(rows)[:limit]:
             yield k, rows[k]
 
@@ -195,9 +197,10 @@ class MTable(object):
                     if g == row:
                         r[row] = data
                 else:
-                    raise NotImplementedError("In-memory "
-                                              "RowFilter doesn't support "
-                                              "the %s operation yet" % op)
+                    raise ceilometer.NotImplementedError(
+                        "In-memory "
+                        "RowFilter doesn't support "
+                        "the %s operation yet" % op)
             except AttributeError:
                 pass
         return r
@@ -226,9 +229,10 @@ class MTable(object):
                         (op == '<' and key < column)):
                     r_data[key] = data[key]
                 else:
-                    raise NotImplementedError("In-memory QualifierFilter "
-                                              "doesn't support the %s "
-                                              "operation yet" % op)
+                    raise ceilometer.NotImplementedError(
+                        "In-memory QualifierFilter "
+                        "doesn't support the %s "
+                        "operation yet" % op)
             if r_data:
                 r[row] = r_data
         return r

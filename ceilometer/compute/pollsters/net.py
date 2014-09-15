@@ -21,6 +21,7 @@ import copy
 
 from oslo.utils import timeutils
 
+import ceilometer
 from ceilometer.compute import plugin
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
@@ -104,7 +105,7 @@ class _Base(plugin.ComputePollster):
             except virt_inspector.InstanceNotFoundException as err:
                 # Instance was deleted while getting samples. Ignore it.
                 LOG.debug(_('Exception while getting samples %s'), err)
-            except NotImplementedError:
+            except ceilometer.NotImplementedError:
                 # Selected inspector does not implement this pollster.
                 LOG.debug(_('%(inspector)s does not provide data for '
                             ' %(pollster)s'),

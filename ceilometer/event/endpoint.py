@@ -21,6 +21,7 @@ from oslo.config import cfg
 import oslo.messaging
 from stevedore import extension
 
+import ceilometer
 from ceilometer import dispatcher
 from ceilometer.event import converter as event_converter
 from ceilometer import messaging
@@ -66,7 +67,7 @@ class EventsNotificationEndpoint(object):
                 try:
                     problem_events.extend(
                         dispatcher_ext.obj.record_events(event))
-                except NotImplementedError:
+                except ceilometer.NotImplementedError:
                     LOG.warn(_('Event is not implemented with the storage'
                                ' backend'))
             if models.Event.UNKNOWN_PROBLEM in [x[0] for x in problem_events]:

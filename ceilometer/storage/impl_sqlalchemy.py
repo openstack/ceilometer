@@ -34,6 +34,7 @@ from sqlalchemy import distinct
 from sqlalchemy import func
 from sqlalchemy.orm import aliased
 
+import ceilometer
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import jsonutils
 from ceilometer.openstack.common import log
@@ -114,9 +115,10 @@ def apply_metaquery_filter(session, query, metaquery):
         try:
             _model = sql_utils.META_TYPE_MAP[type(value)]
         except KeyError:
-            raise NotImplementedError('Query on %(key)s is of %(value)s '
-                                      'type and is not supported' %
-                                      {"key": k, "value": type(value)})
+            raise ceilometer.NotImplementedError(
+                'Query on %(key)s is of %(value)s '
+                'type and is not supported' %
+                {"key": k, "value": type(value)})
         else:
             meta_alias = aliased(_model)
             on_clause = and_(models.Resource.internal_id == meta_alias.id,
@@ -390,7 +392,7 @@ class Connection(base.Connection):
         :param pagination: Optional pagination query.
         """
         if pagination:
-            raise NotImplementedError('Pagination not implemented')
+            raise ceilometer.NotImplementedError('Pagination not implemented')
 
         s_filter = storage.SampleFilter(user=user,
                                         project=project,
@@ -457,7 +459,7 @@ class Connection(base.Connection):
         """
 
         if pagination:
-            raise NotImplementedError('Pagination not implemented')
+            raise ceilometer.NotImplementedError('Pagination not implemented')
 
         s_filter = storage.SampleFilter(user=user,
                                         project=project,
@@ -590,8 +592,9 @@ class Connection(base.Connection):
                 compute = PARAMETERIZED_AGGREGATES['compute'][a.func]
                 functions.append(compute(a.param))
             else:
-                raise NotImplementedError('Selectable aggregate function %s'
-                                          ' is not supported' % a.func)
+                raise ceilometer.NotImplementedError(
+                    'Selectable aggregate function %s'
+                    ' is not supported' % a.func)
 
         return functions
 
@@ -666,8 +669,8 @@ class Connection(base.Connection):
         if groupby:
             for group in groupby:
                 if group not in ['user_id', 'project_id', 'resource_id']:
-                    raise NotImplementedError('Unable to group by '
-                                              'these fields')
+                    raise ceilometer.NotImplementedError('Unable to group by '
+                                                         'these fields')
 
         if not period:
             for res in self._make_stats_query(sample_filter,

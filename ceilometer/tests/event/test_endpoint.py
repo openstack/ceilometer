@@ -22,6 +22,7 @@ from oslo.config import fixture as fixture_config
 import oslo.messaging
 from stevedore import extension
 
+import ceilometer
 from ceilometer.event import endpoint as event_endpoint
 from ceilometer.storage import models
 from ceilometer.tests import base as tests_base
@@ -108,7 +109,8 @@ class TestEventEndpoint(tests_base.BaseTestCase):
 
     @mock.patch('ceilometer.event.endpoint.LOG')
     def test_event_not_implemented(self, log):
-        self.mock_dispatcher.record_events.side_effect = NotImplementedError
+        re = self.mock_dispatcher.record_events
+        re.side_effect = ceilometer.NotImplementedError
         message = {'event_type': "foo", 'message_id': "abc"}
         ret = self.endpoint.process_notification(message)
         log.warn.assert_called_once_with(

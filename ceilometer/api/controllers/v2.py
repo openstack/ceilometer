@@ -47,6 +47,7 @@ import wsme
 from wsme import types as wtypes
 import wsmeext.pecan as wsme_pecan
 
+import ceilometer
 from ceilometer.alarm import service as alarm_service
 from ceilometer.alarm.storage import models as alarm_models
 from ceilometer.api import acl
@@ -1990,7 +1991,7 @@ class AlarmController(rest.RestController):
 
         try:
             self.conn.record_alarm_change(payload)
-        except NotImplementedError:
+        except ceilometer.NotImplementedError:
             pass
 
         # Revert to the pre-json'ed details ...
@@ -2146,7 +2147,7 @@ class AlarmsController(rest.RestController):
 
         try:
             conn.record_alarm_change(payload)
-        except NotImplementedError:
+        except ceilometer.NotImplementedError:
             pass
 
         # Revert to the pre-json'ed details ...

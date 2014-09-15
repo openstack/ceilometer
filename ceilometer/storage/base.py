@@ -25,6 +25,8 @@ from oslo.utils import timeutils
 import six
 from six import moves
 
+import ceilometer
+
 
 def iter_period(start, end, period):
     """Split a time from start to end in periods of a number of seconds.
@@ -188,7 +190,8 @@ class Connection(object):
 
         All timestamps must be naive utc datetime object.
         """
-        raise NotImplementedError('Projects not implemented')
+        raise ceilometer.NotImplementedError(
+            'Recording metering data is not implemented')
 
     @staticmethod
     def clear_expired_metering_data(ttl):
@@ -198,7 +201,8 @@ class Connection(object):
 
         :param ttl: Number of seconds to keep records for.
         """
-        raise NotImplementedError('Clearing samples not implemented')
+        raise ceilometer.NotImplementedError(
+            'Clearing samples not implemented')
 
     @staticmethod
     def get_resources(user=None, project=None, source=None,
@@ -219,7 +223,7 @@ class Connection(object):
         :param resource: Optional resource filter.
         :param pagination: Optional pagination query.
         """
-        raise NotImplementedError('Resources not implemented')
+        raise ceilometer.NotImplementedError('Resources not implemented')
 
     @staticmethod
     def get_meters(user=None, project=None, resource=None, source=None,
@@ -234,7 +238,7 @@ class Connection(object):
         :param metaquery: Optional dict with metadata to match on.
         :param pagination: Optional pagination query.
         """
-        raise NotImplementedError('Meters not implemented')
+        raise ceilometer.NotImplementedError('Meters not implemented')
 
     @staticmethod
     def get_samples(sample_filter, limit=None):
@@ -243,7 +247,7 @@ class Connection(object):
         :param sample_filter: Filter.
         :param limit: Maximum number of results to return.
         """
-        raise NotImplementedError('Samples not implemented')
+        raise ceilometer.NotImplementedError('Samples not implemented')
 
     @staticmethod
     def get_meter_statistics(sample_filter, period=None, groupby=None,
@@ -252,7 +256,7 @@ class Connection(object):
 
         The filter must have a meter value set.
         """
-        raise NotImplementedError('Statistics not implemented')
+        raise ceilometer.NotImplementedError('Statistics not implemented')
 
     @staticmethod
     def clear():
@@ -264,17 +268,17 @@ class Connection(object):
 
         :param events: a list of model.Event objects.
         """
-        raise NotImplementedError('Events not implemented.')
+        raise ceilometer.NotImplementedError('Events not implemented.')
 
     @staticmethod
     def get_events(event_filter):
         """Return an iterable of model.Event objects."""
-        raise NotImplementedError('Events not implemented.')
+        raise ceilometer.NotImplementedError('Events not implemented.')
 
     @staticmethod
     def get_event_types():
         """Return all event types as an iterable of strings."""
-        raise NotImplementedError('Events not implemented.')
+        raise ceilometer.NotImplementedError('Events not implemented.')
 
     @staticmethod
     def get_trait_types(event_type):
@@ -284,7 +288,7 @@ class Connection(object):
         returned.
         :param event_type: the type of the Event
         """
-        raise NotImplementedError('Events not implemented.')
+        raise ceilometer.NotImplementedError('Events not implemented.')
 
     @staticmethod
     def get_traits(event_type, trait_type=None):
@@ -295,7 +299,7 @@ class Connection(object):
         :param trait_type: the name of the Trait to filter by
         """
 
-        raise NotImplementedError('Events not implemented.')
+        raise ceilometer.NotImplementedError('Events not implemented.')
 
     @staticmethod
     def query_samples(filter_expr=None, orderby=None, limit=None):
@@ -306,8 +310,8 @@ class Connection(object):
         :param limit: Maximum number of results to return.
         """
 
-        raise NotImplementedError('Complex query for samples '
-                                  'is not implemented.')
+        raise ceilometer.NotImplementedError('Complex query for samples '
+                                             'is not implemented.')
 
     @classmethod
     def get_capabilities(cls):
