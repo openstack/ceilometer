@@ -391,6 +391,8 @@ The chain definition looks like the following::
           - 'meter filter'
         resources:
           - 'list of resource URLs'
+        discovery:
+          - 'list of discoverers'
         sinks
           - 'sink name'
     sinks:
@@ -439,10 +441,32 @@ whose *meters* parameter matches the plugin's meter name.  That is,
 the matching source sections are combined by union, not intersection,
 of the prescribed time series.
 
-The optional *resources* section of a pipeline source allows a static
-list of resource URLs to be to be configured. An amalgamated list of all
+The optional *resources* section of a pipeline source allows a list of
+static resource URLs to be configured. An amalgamated list of all
 statically configured resources for a set of pipeline sources with a
 common interval is passed to individual pollsters matching those pipelines.
+
+The optional *discovery* section of a pipeline source contains the list of
+discoverers. These discoverers can be used to dynamically discover the
+resources to be polled by the pollsters defined in this pipeline. The name
+of the discoverers should be the same as the related names of plugins in
+setup.cfg.
+
+If *resources* or *discovery* section is not set, the default value would
+be an empty list. If both *resources* and *discovery* are set, the final
+resources passed to the pollsters will be the combination of the dynamic
+resources returned by the discoverers and the static resources defined
+in the *resources* section. If there are some duplications between the
+resources returned by the discoverers and those defined in the *resources*
+section, the duplication will be removed before passing those resources
+to the pollsters.
+
+There are three ways a pollster can get a list of resources to poll, as the
+following in descending order of precedence:
+
+    1. From the per-pipeline configured discovery and/or static resources.
+    2. From the per-pollster default discovery.
+    3. From the per-agent default discovery.
 
 The *transformers* section of a pipeline sink provides the possibility to add a
 list of transformer definitions. The names of the transformers should be the same
