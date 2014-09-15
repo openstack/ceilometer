@@ -43,6 +43,7 @@ from __future__ import absolute_import
 import logging
 
 from oslo.utils import timeutils
+import six
 
 from ceilometer.openstack.common import context
 from ceilometer import pipeline
@@ -145,8 +146,14 @@ class CeilometerMiddleware(object):
     def publish_sample(self, env, bytes_received, bytes_sent):
         path = env['PATH_INFO']
         method = env['REQUEST_METHOD']
-        headers = dict((header.strip('HTTP_'), env[header]) for header
-                       in env if header.startswith('HTTP_'))
+        headers = {}
+        for header in env:
+            if header.startswith('HTTP_') and env[header]:
+                key = header.strip('HTTP_')
+                if isinstance(env[header], six.text_type):
+                    headers[key] = env[header].encode('utf-8')
+                else:
+                    headers[key] = str(env[header])
 
         try:
             container = obj = None
