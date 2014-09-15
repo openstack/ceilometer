@@ -110,7 +110,8 @@ class TestVPNServicesPollster(_BaseTestVPNPollster):
                          set([s.name for s in samples]))
 
     def test_vpn_discovery(self):
-        discovered_vpns = discovery.VPNServicesDiscovery().discover()
+        discovered_vpns = discovery.VPNServicesDiscovery().discover(
+            self.manager)
         self.assertEqual(3, len(discovered_vpns))
 
         for vpn in self.fake_get_vpn_service():
@@ -170,6 +171,7 @@ class TestIPSecConnectionsPollster(_BaseTestVPNPollster):
                          set([s.name for s in samples]))
 
     def test_conns_discovery(self):
-        discovered_conns = discovery.IPSecConnectionsDiscovery().discover()
+        discovered_conns = discovery.IPSecConnectionsDiscovery().discover(
+            self.manager)
         self.assertEqual(1, len(discovered_conns))
         self.assertEqual(self.fake_get_ipsec_connections(), discovered_conns)
