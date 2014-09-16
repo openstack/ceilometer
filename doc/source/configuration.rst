@@ -41,7 +41,6 @@ metering_topic                   metering                              the topic
 sample_source                    openstack                             The source name of emitted samples
 control_exchange                 ceilometer                            AMQP exchange to connect to if using RabbitMQ or Qpid
 database_connection              mongodb://localhost:27017/ceilometer  Database connection string
-metering_api_port                8777                                  The port for the ceilometer API server
 reseller_prefix                  AUTH\_                                Prefix used by swift for reseller token
 nova_http_log_debug              False                                 Log request/response parameters between nova and ceilometer
 glance_page_size                 0                                     Number of items to request in each paginated Glance API
@@ -51,6 +50,22 @@ glance_page_size                 0                                     Number of
                                                                        appropriate value in line with each environment when calling
                                                                        glanceclient, than to define higher default value.
 ===============================  ====================================  ==============================================================
+
+API Configuration
+=================
+
+The following options may be used under an [api] section.
+
+===============================  ====================================  ===============================================================
+Parameter                        Default                               Note
+===============================  ====================================  ===============================================================
+host                             0.0.0.0                               The listen IP for the API service
+port                             8777                                  The listen port for the API service
+enable_reverse_dns_lookup        False                                 Set to False if your environment does not need or have DNS
+                                                                       server, otherwise it will delay the response from the api.
+pecan_debug                      The value of DEFAULT.debug            Toggle Pecan Debug Middleware. Set to false when using multiple
+                                                                       processes with mod_wsgi.
+===============================  ====================================  ===============================================================
 
 Service polling authentication
 ==============================
