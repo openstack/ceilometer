@@ -25,6 +25,7 @@ import operator
 import mock
 from oslo.utils import timeutils
 
+import ceilometer
 from ceilometer.alarm.storage import models as alarm_models
 from ceilometer.publisher import utils
 from ceilometer import sample
@@ -1536,7 +1537,7 @@ class StatisticsGroupByTest(DBTestBase,
         # error before list() is called. By using lambda, we can cover both
         # MongoDB and SQLAlchemy in a single test.
         self.assertRaises(
-            NotImplementedError,
+            ceilometer.NotImplementedError,
             lambda: list(self.conn.get_meter_statistics(f, groupby=['wtf']))
         )
 

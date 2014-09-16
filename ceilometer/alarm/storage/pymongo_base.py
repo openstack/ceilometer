@@ -21,6 +21,7 @@
 
 import pymongo
 
+import ceilometer
 from ceilometer.alarm.storage import base
 from ceilometer.alarm.storage import models
 from ceilometer.openstack.common import log
@@ -92,7 +93,7 @@ class Connection(base.Connection):
         :param pagination: Optional pagination query.
         """
         if pagination:
-            raise NotImplementedError('Pagination not implemented')
+            raise ceilometer.NotImplementedError('Pagination not implemented')
 
         q = {}
         if user is not None:

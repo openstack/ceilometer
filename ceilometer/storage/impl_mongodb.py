@@ -34,6 +34,7 @@ from oslo.utils import timeutils
 import pymongo
 import six
 
+import ceilometer
 from ceilometer.openstack.common import log
 from ceilometer import storage
 from ceilometer.storage import base
@@ -791,7 +792,7 @@ class Connection(pymongo_base.Connection):
         :param pagination: Optional pagination query.
         """
         if pagination:
-            raise NotImplementedError('Pagination not implemented')
+            raise ceilometer.NotImplementedError('Pagination not implemented')
 
         metaquery = metaquery or {}
 
@@ -837,8 +838,9 @@ class Connection(pymongo_base.Connection):
                 params = dict(aggregate_param=a.param)
                 fragments += (fragment_map[a.func] % params)
             else:
-                raise NotImplementedError('Selectable aggregate function %s'
-                                          ' is not supported' % a.func)
+                raise ceilometer.NotImplementedError(
+                    'Selectable aggregate function %s'
+                    ' is not supported' % a.func)
 
         return fragments
 
@@ -852,7 +854,8 @@ class Connection(pymongo_base.Connection):
         if (groupby and
                 set(groupby) - set(['user_id', 'project_id',
                                     'resource_id', 'source'])):
-            raise NotImplementedError("Unable to group by these fields")
+            raise ceilometer.NotImplementedError(
+                "Unable to group by these fields")
 
         q = pymongo_utils.make_query_from_filter(sample_filter)
 

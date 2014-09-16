@@ -22,6 +22,7 @@ import collections
 from oslo.config import cfg
 from stevedore import driver
 
+import ceilometer
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 
@@ -148,7 +149,7 @@ class Inspector(object):
 
     def inspect_instances(self):
         """List the instances on the current host."""
-        raise NotImplementedError()
+        raise ceilometer.NotImplementedError
 
     def inspect_cpus(self, instance_name):
         """Inspect the CPU statistics for an instance.
@@ -156,7 +157,7 @@ class Inspector(object):
         :param instance_name: the name of the target instance
         :return: the number of CPUs and cumulative CPU time
         """
-        raise NotImplementedError()
+        raise ceilometer.NotImplementedError
 
     def inspect_cpu_util(self, instance, duration=None):
         """Inspect the CPU Utilization (%) for an instance.
@@ -166,7 +167,7 @@ class Inspector(object):
                inspected
         :return: the percentage of CPU utilization
         """
-        raise NotImplementedError()
+        raise ceilometer.NotImplementedError
 
     def inspect_vnics(self, instance_name):
         """Inspect the vNIC statistics for an instance.
@@ -175,7 +176,7 @@ class Inspector(object):
         :return: for each vNIC, the number of bytes & packets
                  received and transmitted
         """
-        raise NotImplementedError()
+        raise ceilometer.NotImplementedError
 
     def inspect_vnic_rates(self, instance, duration=None):
         """Inspect the vNIC rate statistics for an instance.
@@ -186,7 +187,7 @@ class Inspector(object):
         :return: for each vNIC, the rate of bytes & packets
                  received and transmitted
         """
-        raise NotImplementedError()
+        raise ceilometer.NotImplementedError
 
     def inspect_disks(self, instance_name):
         """Inspect the disk statistics for an instance.
@@ -195,7 +196,7 @@ class Inspector(object):
         :return: for each disk, the number of bytes & operations
                  read and written, and the error count
         """
-        raise NotImplementedError()
+        raise ceilometer.NotImplementedError
 
     def inspect_memory_usage(self, instance, duration=None):
         """Inspect the memory usage statistics for an instance.
@@ -205,7 +206,7 @@ class Inspector(object):
                inspected
         :return: the amount of memory used
         """
-        raise NotImplementedError()
+        raise ceilometer.NotImplementedError
 
     def inspect_disk_rates(self, instance, duration=None):
         """Inspect the disk statistics as rates for an instance.
@@ -216,7 +217,7 @@ class Inspector(object):
         :return: for each disk, the number of bytes & operations
                  read and written per second, with the error count
         """
-        raise NotImplementedError()
+        raise ceilometer.NotImplementedError
 
 
 def get_hypervisor_inspector():

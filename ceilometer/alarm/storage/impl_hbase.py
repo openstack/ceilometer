@@ -19,6 +19,7 @@ import happybase
 from oslo.utils import netutils
 from six.moves.urllib import parse as urlparse
 
+import ceilometer
 from ceilometer.alarm.storage import base
 from ceilometer.alarm.storage import models
 from ceilometer.openstack.common.gettextutils import _
@@ -178,9 +179,10 @@ class Connection(base.Connection):
                    project=None, enabled=None, alarm_id=None, pagination=None):
 
         if pagination:
-            raise NotImplementedError('Pagination not implemented')
+            raise ceilometer.NotImplementedError('Pagination not implemented')
         if meter:
-            raise NotImplementedError('Filter by meter not implemented')
+            raise ceilometer.NotImplementedError(
+                'Filter by meter not implemented')
 
         q = hbase_utils.make_query(alarm_id=alarm_id, name=name,
                                    enabled=enabled, user_id=user,

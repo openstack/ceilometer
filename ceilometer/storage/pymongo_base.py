@@ -19,6 +19,7 @@
 """
 import pymongo
 
+import ceilometer
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.storage import base
@@ -67,7 +68,7 @@ class Connection(base.Connection):
         """
 
         if pagination:
-            raise NotImplementedError('Pagination not implemented')
+            raise ceilometer.NotImplementedError('Pagination not implemented')
 
         metaquery = metaquery or {}
 

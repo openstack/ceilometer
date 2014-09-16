@@ -27,7 +27,9 @@ from oslotest import base
 from oslotest import mockpatch
 import six
 from testtools import testcase
+import webtest
 
+import ceilometer
 from ceilometer import messaging
 
 
@@ -95,11 +97,9 @@ def _skip_decorator(func):
     def skip_if_not_implemented(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except AssertionError:
-            raise
-        except NotImplementedError as e:
+        except ceilometer.NotImplementedError as e:
             raise testcase.TestSkipped(six.text_type(e))
-        except Exception as e:
+        except webtest.app.AppError as e:
             if 'not implemented' in six.text_type(e):
                 raise testcase.TestSkipped(six.text_type(e))
             raise

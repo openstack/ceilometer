@@ -12,7 +12,7 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-
+import ceilometer
 from ceilometer.compute import plugin
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
@@ -45,7 +45,7 @@ class MemoryUsagePollster(plugin.ComputePollster):
             except virt_inspector.InstanceNotFoundException as err:
                 # Instance was deleted while getting samples. Ignore it.
                 LOG.debug(_('Exception while getting samples %s'), err)
-            except NotImplementedError:
+            except ceilometer.NotImplementedError:
                 # Selected inspector does not implement this pollster.
                 LOG.debug(_('Obtaining Memory Usage is not implemented for %s'
                             ), manager.inspector.__class__.__name__)

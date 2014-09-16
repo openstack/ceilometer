@@ -17,6 +17,7 @@
 # under the License.
 """Base classes for storage engines
 """
+import ceilometer
 
 
 class Connection(object):
@@ -46,7 +47,7 @@ class Connection(object):
     def get_alarms(name=None, user=None, state=None, meter=None,
                    project=None, enabled=None, alarm_id=None, pagination=None):
         """Yields a lists of alarms that match filters."""
-        raise NotImplementedError('Alarms not implemented')
+        raise ceilometer.NotImplementedError('Alarms not implemented')
 
     @staticmethod
     def create_alarm(alarm):
@@ -54,17 +55,17 @@ class Connection(object):
 
         :param alarm: The alarm to create.
         """
-        raise NotImplementedError('Alarms not implemented')
+        raise ceilometer.NotImplementedError('Alarms not implemented')
 
     @staticmethod
     def update_alarm(alarm):
         """Update alarm."""
-        raise NotImplementedError('Alarms not implemented')
+        raise ceilometer.NotImplementedError('Alarms not implemented')
 
     @staticmethod
     def delete_alarm(alarm_id):
         """Delete an alarm."""
-        raise NotImplementedError('Alarms not implemented')
+        raise ceilometer.NotImplementedError('Alarms not implemented')
 
     @staticmethod
     def get_alarm_changes(alarm_id, on_behalf_of,
@@ -94,12 +95,12 @@ class Connection(object):
         :param end_timestamp: Optional modified timestamp end range
         :param end_timestamp_op: Optional timestamp end range operation
         """
-        raise NotImplementedError('Alarm history not implemented')
+        raise ceilometer.NotImplementedError('Alarm history not implemented')
 
     @staticmethod
     def record_alarm_change(alarm_change):
         """Record alarm change event."""
-        raise NotImplementedError('Alarm history not implemented')
+        raise ceilometer.NotImplementedError('Alarm history not implemented')
 
     @staticmethod
     def clear():
@@ -114,8 +115,8 @@ class Connection(object):
         :param limit: Maximum number of results to return.
         """
 
-        raise NotImplementedError('Complex query for alarms '
-                                  'is not implemented.')
+        raise ceilometer.NotImplementedError('Complex query for alarms '
+                                             'is not implemented.')
 
     @staticmethod
     def query_alarm_history(filter_expr=None, orderby=None, limit=None):
@@ -126,8 +127,8 @@ class Connection(object):
         :param limit: Maximum number of results to return.
         """
 
-        raise NotImplementedError('Complex query for alarms '
-                                  'history is not implemented.')
+        raise ceilometer.NotImplementedError('Complex query for alarms '
+                                             'history is not implemented.')
 
     @classmethod
     def get_capabilities(cls):
