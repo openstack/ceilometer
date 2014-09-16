@@ -321,3 +321,15 @@ class TestQueryToKwArgs(tests_base.BaseTestCase):
                                           storage.SampleFilter.__init__)
             for o in ['user', 'project', 'resource']:
                 self.assertEqual('fake_%s_id' % o, kwargs.get(o))
+
+    def test_timestamp_validation(self):
+        q = [api.Query(field='timestamp',
+                       op='le',
+                       value='123')]
+
+        exc = self.assertRaises(
+            wsme.exc.InvalidInput,
+            api._query_to_kwargs, q, storage.SampleFilter.__init__)
+        expected_exc = wsme.exc.InvalidInput('timestamp', '123',
+                                             'invalid timestamp format')
+        self.assertEqual(str(expected_exc), str(exc))
