@@ -24,7 +24,6 @@ import os
 
 from oslo.config import cfg
 from oslo.db import exception as dbexc
-from oslo.db.sqlalchemy import migration
 from oslo.db.sqlalchemy import session as db_session
 from oslo.utils import timeutils
 import six
@@ -227,6 +226,8 @@ class Connection(base.Connection):
         )
 
     def upgrade(self):
+        # NOTE(gordc): to minimise memory, only import migration when needed
+        from oslo.db.sqlalchemy import migration
         path = os.path.join(os.path.abspath(os.path.dirname(__file__)),
                             'sqlalchemy', 'migrate_repo')
         migration.db_sync(self._engine_facade.get_engine(), path)
