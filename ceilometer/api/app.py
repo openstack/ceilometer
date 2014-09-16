@@ -40,8 +40,17 @@ auth_opts = [
                ),
 ]
 
+api_opts = [
+    cfg.BoolOpt('pecan_debug',
+                default='$debug',
+                help='Toggle Pecan Debug Middleware. '
+                'Defaults to global debug value.'
+                ),
+]
+
 CONF = cfg.CONF
 CONF.register_opts(auth_opts)
+CONF.register_opts(api_opts, group='api')
 
 
 def get_pecan_config():
@@ -70,7 +79,7 @@ def setup_app(pecan_config=None, extra_hooks=None):
         pecan_config.app.root,
         static_root=pecan_config.app.static_root,
         template_path=pecan_config.app.template_path,
-        debug=CONF.debug,
+        debug=CONF.api.pecan_debug,
         force_canonical=getattr(pecan_config.app, 'force_canonical', True),
         hooks=app_hooks,
         wrap_app=middleware.ParsableErrorMiddleware,
@@ -83,7 +92,7 @@ def setup_app(pecan_config=None, extra_hooks=None):
 class VersionSelectorApplication(object):
     def __init__(self):
         pc = get_pecan_config()
-        pc.app.debug = CONF.debug
+        pc.app.debug = CONF.api.pecan_debug
 
         def not_found(environ, start_response):
             start_response('404 Not Found', [])

@@ -60,10 +60,6 @@ Limitation
 
 As Ceilometer is using Pecan and Pecan's DebugMiddleware doesn't support
 multiple processes, there is no way to set debug mode in the multiprocessing
-case. So user will run into HTTP 500 error if the mod_wsgi's multiprocessing
-is enabled and the Ceilometer debug mode is enabled at the same time. There
-is no good way to make both of them work, since Pecan is sharing the debug
-mode with Ceilometer, see[1]. If you really need to enable both, a possible
-workaround is hacking that line and hardcode the debug configration to False.
-
-[1] https://github.com/openstack/ceilometer/blob/master/ceilometer/api/app.py
+case. To allow multiple processes the DebugMiddleware may be turned off by
+setting ``pecan_debug`` to ``False`` in the ``api`` section of
+``ceilometer.conf``.
