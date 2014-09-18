@@ -2490,7 +2490,7 @@ class QuerySamplesController(rest.RestController):
 
 
 class QueryAlarmHistoryController(rest.RestController):
-    """Provides complex query possibilites for alarm history."""
+    """Provides complex query possibilities for alarm history."""
     @wsme_pecan.wsexpose([AlarmChange], body=ComplexQuery)
     def post(self, body):
         """Define query for retrieving AlarmChange data.
