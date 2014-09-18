@@ -35,9 +35,13 @@ HEAD_ACCOUNTS = [('tenant-000', {'x-account-object-count': 12,
                  ('tenant-001', {'x-account-object-count': 34,
                                  'x-account-bytes-used': 9898989898,
                                  'x-account-container-count': 17,
-                                 })]
+                                 }),
+                 ('tenant-002-ignored', {'x-account-object-count': 34,
+                                         'x-account-bytes-used': 9898989898,
+                                         'x-account-container-count': 17,
+                                         })]
 
-GET_ACCOUNTS = [('tenant-002', ({'x-account-object-count': 10,
+GET_ACCOUNTS = [('tenant-000', ({'x-account-object-count': 10,
                                  'x-account-bytes-used': 123123,
                                  'x-account-container-count': 2,
                                  },
@@ -48,12 +52,17 @@ GET_ACCOUNTS = [('tenant-002', ({'x-account-object-count': 10,
                                   'bytes': 0,
                                   'name': 'new_container'
                                   }])),
-                ('tenant-003', ({'x-account-object-count': 0,
+                ('tenant-001', ({'x-account-object-count': 0,
                                  'x-account-bytes-used': 0,
                                  'x-account-container-count': 0,
-                                 }, [])), ]
+                                 }, [])),
+                ('tenant-002-ignored', ({'x-account-object-count': 0,
+                                         'x-account-bytes-used': 0,
+                                         'x-account-container-count': 0,
+                                         }, []))]
 
-ENDPOINT = 'end://point'
+Tenant = collections.namedtuple('Tenant', 'id')
+ASSIGNED_TENANTS = [Tenant('tenant-000'), Tenant('tenant-001')]
 
 
 class TestManager(manager.AgentManager):
@@ -85,9 +94,11 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
     def fake_ks_service_catalog_url_for(*args, **kwargs):
         raise exceptions.EndpointNotFound("Fake keystone exception")
 
-    def fake_iter_accounts(self, ksclient, cache, endpoint):
+    def fake_iter_accounts(self, ksclient, cache, tenants):
+        tenant_ids = [t.id for t in tenants]
         for i in self.ACCOUNTS:
-            yield i
+            if i[0] in tenant_ids:
+                yield i
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
@@ -100,42 +111,35 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
         else:
             self.ACCOUNTS = GET_ACCOUNTS
 
+    def tearDown(self):
+        super(TestSwiftPollster, self).tearDown()
+        swift._Base._ENDPOINT = None
+
     def test_iter_accounts_no_cache(self):
         cache = {}
         with mockpatch.PatchObject(self.factory, '_get_account_info',
                                    return_value=[]):
             data = list(self.pollster._iter_accounts(mock.Mock(), cache,
-                                                     ENDPOINT))
+                                                     ASSIGNED_TENANTS))
 
-        self.assertTrue('%s-%s' % (ENDPOINT, self.pollster.CACHE_KEY_TENANT)
-                        in cache)
-        self.assertTrue('%s-%s' % (ENDPOINT, self.pollster.CACHE_KEY_METHOD)
-                        in cache)
+        self.assertTrue(self.pollster.CACHE_KEY_METHOD in cache)
         self.assertEqual([], data)
 
-    def test_iter_accounts_tenants_cached(self):
-        # Verify that if there are tenants pre-cached then the account
-        # info loop iterates over those instead of asking for the list
-        # again.
-        ksclient = mock.Mock()
-        ksclient.tenants.list.side_effect = AssertionError(
+    def test_iter_accounts_cached(self):
+        # Verify that if a method has already been called, _iter_accounts
+        # uses the cached version and doesn't call swiftclient.
+        mock_method = mock.Mock()
+        mock_method.side_effect = AssertionError(
             'should not be called',
         )
 
         api_method = '%s_account' % self.pollster.METHOD
-        with mockpatch.PatchObject(swift_client, api_method, new=ksclient):
-            key = '%s-%s' % (ENDPOINT, self.pollster.CACHE_KEY_TENANT)
+        with mockpatch.PatchObject(swift_client, api_method, new=mock_method):
             with mockpatch.PatchObject(self.factory, '_neaten_url'):
-                Tenant = collections.namedtuple('Tenant', 'id')
-                cache = {
-                    key: [
-                        Tenant(self.ACCOUNTS[0][0])
-                    ],
-                }
+                cache = {self.pollster.CACHE_KEY_METHOD: [self.ACCOUNTS[0]]}
                 data = list(self.pollster._iter_accounts(mock.Mock(), cache,
-                                                         ENDPOINT))
-        self.assertTrue(key in cache)
-        self.assertEqual(self.ACCOUNTS[0][0], data[0][0])
+                                                         ASSIGNED_TENANTS))
+        self.assertEqual([self.ACCOUNTS[0]], data)
 
     def test_neaten_url(self):
         test_endpoints = ['http://127.0.0.1:8080',
@@ -158,24 +162,53 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
         with mockpatch.PatchObject(self.factory, '_iter_accounts',
                                    side_effect=self.fake_iter_accounts):
             samples = list(self.pollster.get_samples(self.manager, {},
-                                                     [ENDPOINT]))
+                                                     ASSIGNED_TENANTS))
 
-        self.assertEqual(2, len(samples))
+        self.assertEqual(2, len(samples), self.pollster.__class__)
 
     def test_get_meter_names(self):
         with mockpatch.PatchObject(self.factory, '_iter_accounts',
                                    side_effect=self.fake_iter_accounts):
             samples = list(self.pollster.get_samples(self.manager, {},
-                                                     [ENDPOINT]))
+                                                     ASSIGNED_TENANTS))
 
         self.assertEqual(set([samples[0].name]),
                          set([s.name for s in samples]))
+
+    def test_only_poll_assigned(self):
+        mock_method = mock.MagicMock()
+        endpoint = 'end://point/'
+        api_method = '%s_account' % self.pollster.METHOD
+        with mockpatch.PatchObject(swift_client, api_method, new=mock_method):
+            with mockpatch.PatchObject(
+                    self.manager.keystone.service_catalog, 'url_for',
+                    return_value=endpoint):
+                list(self.pollster.get_samples(self.manager, {},
+                                               ASSIGNED_TENANTS))
+        expected = [mock.call(self.pollster._neaten_url(endpoint, t.id),
+                              self.manager.keystone.auth_token)
+                    for t in ASSIGNED_TENANTS]
+        self.assertEqual(expected, mock_method.call_args_list)
+
+    def test_get_endpoint_only_once(self):
+        mock_url_for = mock.MagicMock()
+        api_method = '%s_account' % self.pollster.METHOD
+        with mockpatch.PatchObject(swift_client, api_method,
+                                   new=mock.MagicMock()):
+            with mockpatch.PatchObject(
+                    self.manager.keystone.service_catalog, 'url_for',
+                    new=mock_url_for):
+                list(self.pollster.get_samples(self.manager, {},
+                                               ASSIGNED_TENANTS))
+                list(self.pollster.get_samples(self.manager, {},
+                                               ASSIGNED_TENANTS))
+        self.assertEqual(1, mock_url_for.call_count)
 
     def test_endpoint_notfound(self):
         with mockpatch.PatchObject(
                 self.manager.keystone.service_catalog, 'url_for',
                 side_effect=self.fake_ks_service_catalog_url_for):
             samples = list(self.pollster.get_samples(self.manager, {},
-                                                     [ENDPOINT]))
+                                                     ASSIGNED_TENANTS))
 
         self.assertEqual(0, len(samples))

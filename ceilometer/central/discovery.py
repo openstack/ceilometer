@@ -27,6 +27,13 @@ cfg.CONF.import_group('service_credentials', 'ceilometer.service')
 
 
 class EndpointDiscovery(plugin.DiscoveryBase):
+    """Discovery that supplies service endpoints.
+
+    This discovery should be used when the relevant APIs are not well suited
+    to dividing the pollster's work into smaller pieces than a whole service
+    at once. Example of this is the floating_ip pollster which calls
+    nova.floating_ips.list() and therefore gets all floating IPs at once.
+    """
 
     def discover(self, manager, param=None):
         if not param:
@@ -40,3 +47,16 @@ class EndpointDiscovery(plugin.DiscoveryBase):
             return []
         else:
             return endpoints
+
+
+class TenantDiscovery(plugin.DiscoveryBase):
+    """Discovery that supplies keystone tenants.
+
+    This discovery should be used when the pollster's work can't be divided
+    into smaller pieces than per-tenant. Example of this is the Swift
+    pollster, which polls account details and does so per-tenant.
+    """
+
+    def discover(self, manager, param=None):
+        tenants = manager.keystone.tenants.list()
+        return tenants or []
