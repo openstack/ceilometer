@@ -34,7 +34,15 @@ Configuring Devstack
 .. index::
    double: installing; devstack
 
-1. Create a ``localrc`` file as input to devstack.
+1. Create a ``local.conf`` file as input to devstack.
+
+   .. note::
+
+      ``local.conf`` replaces the former configuration file called ``localrc``.
+      If you used localrc before, remove it to switch to using the new file.
+      For further information see the `localrc description page
+      <http://devstack.org/localrc.html>`_ or `devstack configuration
+      <http://devstack.org/configuration.html>`_.
 
 2. Ceilometer makes extensive use of the messaging bus, but has not
    yet been tested with ZeroMQ. We recommend using Rabbit or qpid for
@@ -50,19 +58,21 @@ Configuring Devstack
       notification_driver=cinder.openstack.common.notifier.rpc_notifier
 
 5. The ceilometer services are not enabled by default, so they must be
-   enabled in ``localrc`` before running ``stack.sh``.
+   enabled in ``local.conf`` before running ``stack.sh``.
 
-This example ``localrc`` file shows all of the settings required for
-ceilometer::
+   This example ``local.conf`` file shows all of the settings required for
+   ceilometer::
 
-   # Enable the ceilometer metering services
-   enable_service ceilometer-acompute ceilometer-acentral ceilometer-anotification ceilometer-collector
+      [[local|localrc]]
 
-   # Enable the ceilometer alarming services
-   enable_service ceilometer-alarm-evaluator,ceilometer-alarm-notifier
+      # Enable the ceilometer metering services
+      enable_service ceilometer-acompute ceilometer-acentral ceilometer-anotification ceilometer-collector
 
-   # Enable the ceilometer api services
-   enable_service ceilometer-api
+      # Enable the ceilometer alarming services
+      enable_service ceilometer-alarm-evaluator,ceilometer-alarm-notifier
+
+      # Enable the ceilometer api services
+      enable_service ceilometer-api
 
 6. If you use Data Processing (Sahara) service at your DevStack, it will
    generate notifications by default.
