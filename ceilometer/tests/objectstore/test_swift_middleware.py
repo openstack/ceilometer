@@ -246,6 +246,27 @@ class TestSwiftMiddleware(tests_base.BaseTestCase):
                          data.resource_metadata['http_header_x_var2'])
         self.assertFalse('http_header_x_var3' in data.resource_metadata)
 
+    def test_metadata_headers_unicode(self):
+        app = swift_middleware.CeilometerMiddleware(FakeApp(), {
+            'metadata_headers': 'unicode'
+        })
+        uni = u'\xef\xbd\xa1\xef\xbd\xa5'
+        req = FakeRequest('/1.0/account/container',
+                          environ={'REQUEST_METHOD': 'GET'},
+                          headers={'UNICODE': uni})
+        list(app(req.environ, self.start_response))
+        samples = self.pipeline_manager.pipelines[0].samples
+        self.assertEqual(2, len(samples))
+        data = samples[0]
+        http_headers = [k for k in data.resource_metadata.keys()
+                        if k.startswith('http_header_')]
+        self.assertEqual(1, len(http_headers))
+        self.assertEqual('1.0', data.resource_metadata['version'])
+        self.assertEqual('container', data.resource_metadata['container'])
+        self.assertIsNone(data.resource_metadata['object'])
+        self.assertEqual(uni.encode('utf-8'),
+                         data.resource_metadata['http_header_unicode'])
+
     def test_metadata_headers_on_not_existing_header(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(), {
             'metadata_headers': 'x-var3'
