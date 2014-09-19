@@ -349,9 +349,10 @@ agent daemon is configured to run one or more *pollster* plugins using
 the ``ceilometer.poll.central`` namespace.
 
 The agents periodically asks each pollster for instances of
-``Counter`` objects. The agent framework converts the Counters to
-metering messages, which it then signs and transmits on the metering
-message bus.
+``Sample`` objects. The agent framework then publishes the Samples using
+the publishers defined in the pipeline configuration. For example,
+the ``rpc`` publisher converts the Sample to metering messages, which it
+then signs and transmits on the metering message bus.
 
 The pollster plugins do not communicate with the message bus directly,
 unless it is necessary to do so in order to collect the information
