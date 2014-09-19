@@ -103,8 +103,10 @@ NM_GET_DEVICE_ID_TEMPLATE['Last_digit_firmware_build_number'] = 1
 NM_GET_DEVICE_ID_TEMPLATE['Image_flags'] = 1
 
 
-def _hex(list=[]):
+def _hex(list=None):
     """Format the return value in list into hex."""
+
+    list = list or []
     if list:
         list.reverse()
         return int(''.join(list), 16)

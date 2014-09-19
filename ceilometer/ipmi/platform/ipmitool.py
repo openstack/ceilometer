@@ -112,11 +112,14 @@ def _parse_output(output, template):
     return ret
 
 
-def execute_ipmi_cmd(template={}):
+def execute_ipmi_cmd(template=None):
     """Decorator for the execution of IPMI command.
 
     It parses the output of IPMI command into dictionary.
     """
+
+    template = template or []
+
     def _execute_ipmi_cmd(f):
         def _execute(self, **kwargs):
             args = ['ipmitool']
