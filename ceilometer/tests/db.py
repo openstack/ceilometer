@@ -186,5 +186,7 @@ class MixinTestsWithBackendScenarios(object):
         ('hbase', {'db_url': os.environ.get('CEILOMETER_TEST_HBASE_URL',
                                             'hbase://__test__')}),
         ('db2', {'db_url': (os.environ.get('CEILOMETER_TEST_DB2_URL') or
-                            os.environ.get('CEILOMETER_TEST_MONGODB_URL'))})
+                            os.environ.get('CEILOMETER_TEST_MONGODB_URL',
+                                           '').replace('mongodb://',
+                                                       'db2://'))})
     ]
