@@ -17,6 +17,7 @@
 import datetime
 
 from keystoneclient import exceptions
+from oslo.config import cfg
 import requests
 import six
 
@@ -25,7 +26,16 @@ from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer import sample
 
+
 LOG = log.getLogger(__name__)
+
+service_types_opts = [
+    cfg.StrOpt('kwapi',
+               default='energy',
+               help='Kwapi service type.'),
+]
+
+cfg.CONF.register_opts(service_types_opts, group='service_types')
 
 
 class KwapiClient(object):
@@ -56,7 +66,7 @@ class _Base(plugin.CentralPollster):
 
     @property
     def default_discovery(self):
-        return 'endpoint:energy'
+        return 'endpoint:%s' % cfg.CONF.service_types.kwapi
 
     @staticmethod
     def get_kwapi_client(ksclient, endpoint):

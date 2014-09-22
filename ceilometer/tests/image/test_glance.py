@@ -181,6 +181,10 @@ class TestImagePollster(base.BaseTestCase):
             glance._Base, 'get_glance_client',
             side_effect=self.fake_get_glance_client))
 
+    def test_default_discovery(self):
+        pollster = glance.ImagePollster()
+        self.assertEqual('endpoint:image', pollster.default_discovery)
+
     def test_iter_images(self):
         # Tests whether the iter_images method returns a unique image
         # list when there is nothing in the cache

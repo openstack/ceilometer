@@ -21,6 +21,14 @@ from oslo.config import cfg
 
 from ceilometer.openstack.common import log
 
+
+service_types_opts = [
+    cfg.StrOpt('neutron',
+               default='network',
+               help='Neutron service type.'),
+]
+
+cfg.CONF.register_opts(service_types_opts, group='service_types')
 cfg.CONF.import_group('service_credentials', 'ceilometer.service')
 
 LOG = log.getLogger(__name__)
@@ -51,7 +59,8 @@ class Client(object):
             'password': conf.os_password,
             'auth_url': conf.os_auth_url,
             'region_name': conf.os_region_name,
-            'endpoint_type': conf.os_endpoint_type
+            'endpoint_type': conf.os_endpoint_type,
+            'service_type': cfg.CONF.service_types.neutron
         }
 
         if conf.os_tenant_id:
