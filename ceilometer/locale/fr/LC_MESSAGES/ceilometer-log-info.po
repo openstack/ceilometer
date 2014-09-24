@@ -3,14 +3,15 @@
 # This file is distributed under the same license as the ceilometer project.
 #
 # Translators:
+# Bruno Cornec <bruno.cornec@hp.com>, 2014
 # Frédéric <frosmont@free.fr>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-09-09 06:08+0000\n"
-"PO-Revision-Date: 2014-09-02 12:34+0000\n"
-"Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
+"POT-Creation-Date: 2014-09-24 06:05+0000\n"
+"PO-Revision-Date: 2014-09-17 18:00+0000\n"
+"Last-Translator: Bruno Cornec <bruno.cornec@hp.com>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/ceilometer/"
 "language/fr/)\n"
 "Language: fr\n"
@@ -27,7 +28,7 @@ msgstr ""
 #: ceilometer/coordination.py:99
 #, python-format
 msgid "Joined partitioning group %s"
-msgstr ""
+msgstr "Le groupe de partitionnement %s a été rejoint"
 
 #: ceilometer/openstack/common/eventlet_backdoor.py:140
 #, python-format
@@ -56,7 +57,7 @@ msgstr "Processus parent arrêté de manière inattendue, sortie"
 #: ceilometer/openstack/common/service.py:271
 #, python-format
 msgid "Child caught %s, exiting"
-msgstr ""
+msgstr "L'enfant a reçu %s, sortie"
 
 #: ceilometer/openstack/common/service.py:310
 msgid "Forking too fast, sleeping"
