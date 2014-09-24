@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-09-02 06:09+0000\n"
+"POT-Creation-Date: 2014-09-24 06:05+0000\n"
 "PO-Revision-Date: 2014-07-17 07:01+0000\n"
 "Last-Translator: Frédéric <frosmont@free.fr>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/ceilometer/"
@@ -19,6 +19,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: ceilometer/central/discovery.py:46
+#, python-format
+msgid "No endpoints found for service %s"
+msgstr ""
 
 #: ceilometer/openstack/common/loopingcall.py:87
 #, python-format
