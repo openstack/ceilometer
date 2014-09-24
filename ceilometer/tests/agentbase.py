@@ -81,7 +81,7 @@ class TestPollster(plugin.PollsterBase):
         resources = resources or []
         self.samples.append((manager, resources))
         self.resources.extend(resources)
-        c = copy.copy(self.test_data)
+        c = copy.deepcopy(self.test_data)
         c.resource_metadata['resources'] = resources
         return [c]
 
@@ -310,7 +310,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         per_task_resources = polling_tasks[60].resources
         self.assertEqual(1, len(per_task_resources))
         self.assertEqual(set(self.pipeline_cfg[0]['resources']),
-                         set(per_task_resources['test'].resources))
+                         set(per_task_resources['test_pipeline-test'].get({})))
         self.mgr.interval_task(polling_tasks.values()[0])
         pub = self.mgr.pipeline_manager.pipelines[0].publishers[0]
         del pub.samples[0].resource_metadata['resources']
@@ -357,14 +357,16 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.setup_pipeline()
         polling_tasks = self.mgr.setup_polling_tasks()
         self.assertEqual(1, len(polling_tasks))
-        pollsters = polling_tasks.get(60).pollsters
+        pollsters = polling_tasks.get(60).pollster_matches
         self.assertEqual(2, len(pollsters))
         per_task_resources = polling_tasks[60].resources
         self.assertEqual(2, len(per_task_resources))
+        key = 'test_pipeline-test'
         self.assertEqual(set(self.pipeline_cfg[0]['resources']),
-                         set(per_task_resources['test'].resources))
+                         set(per_task_resources[key].get({})))
+        key = 'test_pipeline-testanother'
         self.assertEqual(set(self.pipeline_cfg[1]['resources']),
-                         set(per_task_resources['testanother'].resources))
+                         set(per_task_resources[key].get({})))
 
     def test_interval_exception_isolation(self):
         self.pipeline_cfg = [
@@ -568,35 +570,57 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
                                              ['static_1', 'static_2'])
 
     def test_multiple_pipelines_different_static_resources(self):
-        # assert that the amalgation of all static resources for a set
-        # of pipelines with a common interval is passed to individual
-        # pollsters matching those pipelines
+        # assert that the individual lists of static and discovered resources
+        # for each pipeline with a common interval are passed to individual
+        # pollsters matching each pipeline
         self.pipeline_cfg[0]['resources'] = ['test://']
+        self.pipeline_cfg[0]['discovery'] = ['testdiscovery']
         self.pipeline_cfg.append({
             'name': "another_pipeline",
             'interval': 60,
             'counters': ['test'],
             'resources': ['another://'],
+            'discovery': ['testdiscoveryanother'],
             'transformers': [],
             'publishers': ["new"],
         })
         self.mgr.discovery_manager = self.create_discovery_manager()
-        self.Discovery.resources = []
+        self.Discovery.resources = ['discovered_1', 'discovered_2']
+        self.DiscoveryAnother.resources = ['discovered_3', 'discovered_4']
         self.setup_pipeline()
         polling_tasks = self.mgr.setup_polling_tasks()
         self.assertEqual(1, len(polling_tasks))
         self.assertTrue(60 in polling_tasks.keys())
         self.mgr.interval_task(polling_tasks.get(60))
-        self._verify_discovery_params([])
-        self.assertEqual(1, len(self.Pollster.samples))
-        amalgamated_resources = set(['test://', 'another://'])
-        self.assertEqual(amalgamated_resources,
-                         set(self.Pollster.samples[0][1]))
+        self.assertEqual([None], self.Discovery.params)
+        self.assertEqual([None], self.DiscoveryAnother.params)
+        self.assertEqual(2, len(self.Pollster.samples))
+        samples = self.Pollster.samples
+        test_resources = ['test://', 'discovered_1', 'discovered_2']
+        another_resources = ['another://', 'discovered_3', 'discovered_4']
+        if samples[0][1] == test_resources:
+            self.assertEqual(another_resources, samples[1][1])
+        elif samples[0][1] == another_resources:
+            self.assertEqual(test_resources, samples[1][1])
+        else:
+            self.fail('unexpected sample resources %s' % samples)
+        all_resources = set(test_resources)
+        all_resources.update(another_resources)
+        expected_pipelines = {'test://': 'test_pipeline',
+                              'another://': 'another_pipeline'}
+        sunk_resources = []
         for pipe_line in self.mgr.pipeline_manager.pipelines:
             self.assertEqual(1, len(pipe_line.publishers[0].samples))
             published = pipe_line.publishers[0].samples[0]
-            self.assertEqual(amalgamated_resources,
-                             set(published.resource_metadata['resources']))
+            published_resources = published.resource_metadata['resources']
+            self.assertEqual(3, len(published_resources))
+            self.assertTrue(published_resources[0] in expected_pipelines)
+            self.assertEqual(expected_pipelines[published_resources[0]],
+                             pipe_line.name)
+            for published_resource in published_resources:
+                self.assertTrue(published_resource in all_resources)
+            sunk_resources.extend(published_resources)
+        self.assertEqual(all_resources, set(sunk_resources))
 
     def test_multiple_sources_different_discoverers(self):
         self.Discovery.resources = ['discovered_1', 'discovered_2']

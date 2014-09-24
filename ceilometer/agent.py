@@ -31,7 +31,7 @@ from ceilometer.openstack.common import context
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import service as os_service
-from ceilometer import pipeline
+from ceilometer import pipeline as publish_pipeline
 
 LOG = log.getLogger(__name__)
 
@@ -43,17 +43,21 @@ class Resources(object):
     def __init__(self, agent_manager):
         self.agent_manager = agent_manager
         self._resources = []
-        self._discovery = set([])
+        self._discovery = []
 
-    def extend(self, pipeline):
-        self._resources.extend(pipeline.resources)
-        self._discovery.update(set(pipeline.discovery))
+    def setup(self, pipeline):
+        self._resources = pipeline.resources
+        self._discovery = pipeline.discovery
 
-    @property
-    def resources(self):
-        source_discovery = (self.agent_manager.discover(self._discovery)
+    def get(self, discovery_cache=None):
+        source_discovery = (self.agent_manager.discover(self._discovery,
+                                                        discovery_cache)
                             if self._discovery else [])
         return self._resources + source_discovery
+
+    @staticmethod
+    def key(source, pollster):
+        return '%s-%s' % (source.name, pollster.name)
 
 
 class PollingTask(object):
@@ -64,37 +68,44 @@ class PollingTask(object):
 
     def __init__(self, agent_manager):
         self.manager = agent_manager
-        self.pollsters = set()
-        # we extend the amalgamation of all static resources for this
-        # set of pollsters with a common interval, so as to also
-        # include any dynamically discovered resources specific to
-        # the matching pipelines (if either is present, the per-agent
-        # default discovery is overridden)
+
+        # elements of the Cartesian product of sources X pollsters
+        # with a common interval
+        self.pollster_matches = set()
+
+        # per-sink publisher contexts associated with each source
+        self.publishers = {}
+
+        # we relate the static resources and per-source discovery to
+        # each combination of pollster and matching source
         resource_factory = lambda: Resources(agent_manager)
         self.resources = collections.defaultdict(resource_factory)
-        self.publish_context = pipeline.PublishContext(
-            agent_manager.context)
 
-    def add(self, pollster, pipelines):
-        self.publish_context.add_pipelines(pipelines)
-        for pipe_line in pipelines:
-            self.resources[pollster.name].extend(pipe_line)
-        self.pollsters.update([pollster])
+    def add(self, pollster, pipeline):
+        if pipeline.source.name not in self.publishers:
+            publish_context = publish_pipeline.PublishContext(
+                self.manager.context)
+            self.publishers[pipeline.source.name] = publish_context
+        self.publishers[pipeline.source.name].add_pipelines([pipeline])
+        self.pollster_matches.update([(pipeline.source, pollster)])
+        key = Resources.key(pipeline.source, pollster)
+        self.resources[key].setup(pipeline)
 
     def poll_and_publish(self):
         """Polling sample and publish into pipeline."""
         agent_resources = self.manager.discover()
-        with self.publish_context as publisher:
-            cache = {}
-            discovery_cache = {}
-            for pollster in self.pollsters:
-                key = pollster.name
-                LOG.info(_("Polling pollster %s"), key)
-                pollster_resources = None
-                if pollster.obj.default_discovery:
-                    pollster_resources = self.manager.discover(
-                        [pollster.obj.default_discovery], discovery_cache)
-                source_resources = list(self.resources[key].resources)
+        cache = {}
+        discovery_cache = {}
+        for source, pollster in self.pollster_matches:
+            LOG.info(_("Polling pollster %(poll)s in the context of %(src)s"),
+                     dict(poll=pollster.name, src=source))
+            pollster_resources = None
+            if pollster.obj.default_discovery:
+                pollster_resources = self.manager.discover(
+                    [pollster.obj.default_discovery], discovery_cache)
+            key = Resources.key(source, pollster)
+            source_resources = list(self.resources[key].get(discovery_cache))
+            with self.publishers[source.name] as publisher:
                 try:
                     samples = list(pollster.obj.get_samples(
                         manager=self.manager,
@@ -145,15 +156,15 @@ class AgentManager(os_service.Service):
 
     def setup_polling_tasks(self):
         polling_tasks = {}
-        for pipe_line, pollster in itertools.product(
+        for pipeline, pollster in itertools.product(
                 self.pipeline_manager.pipelines,
                 self.pollster_manager.extensions):
-            if pipe_line.support_meter(pollster.name):
-                polling_task = polling_tasks.get(pipe_line.get_interval())
+            if pipeline.support_meter(pollster.name):
+                polling_task = polling_tasks.get(pipeline.get_interval())
                 if not polling_task:
                     polling_task = self.create_polling_task()
-                    polling_tasks[pipe_line.get_interval()] = polling_task
-                polling_task.add(pollster, [pipe_line])
+                    polling_tasks[pipeline.get_interval()] = polling_task
+                polling_task.add(pollster, pipeline)
 
         return polling_tasks
 
@@ -163,7 +174,7 @@ class AgentManager(os_service.Service):
                 if discovery_group_id else None)
 
     def start(self):
-        self.pipeline_manager = pipeline.setup_pipeline()
+        self.pipeline_manager = publish_pipeline.setup_pipeline()
 
         self.partition_coordinator.start()
         self.join_partitioning_groups()
