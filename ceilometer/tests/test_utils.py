@@ -72,7 +72,7 @@ class TestUtils(base.BaseTestCase):
         big = 1 << 64
         expected = [('a', 'A'),
                     ('b', 'B'),
-                    ('nested:list', ['{%d: 99, %d: 42}' % (small, big)])]
+                    ('nested:list', [{small: 99, big: 42}])]
         data = {'a': 'A',
                 'b': 'B',
                 'nested': {'list': [{small: 99, big: 42}]}}
@@ -82,14 +82,8 @@ class TestUtils(base.BaseTestCase):
             # the keys 1 and 1<<64 cause a hash collision on 64bit platforms
             if k == 'nested:list':
                 self.assertIn(v,
-                              [[('{%d: 99, %d: 42}'
-                                 % (small, big)).encode('ascii')],
-                               [('{%d: 99, %dL: 42}'
-                                 % (small, big)).encode('ascii')],
-                               [('{%d: 42, %d: 99}'
-                                 % (big, small)).encode('ascii')],
-                               [('{%dL: 42, %d: 99}'
-                                 % (big, small)).encode('ascii')]])
+                              [[{small: 99, big: 42}],
+                               [{big: 42, small: 99}]])
             else:
                 self.assertIn((k, v), expected)
 
