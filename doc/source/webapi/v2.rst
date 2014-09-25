@@ -245,16 +245,16 @@ the CPU utilization for a given instance (identified by *resource_id*)::
 
 JSON based example::
 
-     curl -H 'X-Auth-Token: <inserttokenhere>' -H 'Content-Type: application/json' \
-       -d '{"q":[{"field": "timestamp","op": "ge","value":"2013-04-01T13:34:17"}]}' \
-       http://localhost:8777/v2/meters
+     curl -X GET -H "X-Auth-Token: <inserttokenhere>" -H "Content-Type: application/json"
+     -d '{"q": [{"field": "timestamp", "op": "ge", "value": "2014-04-01T13:34:17"}]}'
+       http://localhost:8777/v2/meters/instance
 
 JSON based example with multiple filters::
 
-     curl -H 'X-Auth-Token: <inserttokenhere>' -H 'Content-Type: application/json' \
-       -d '{"q":[{"field": "timestamp","op": "ge","value":"2013-04-01T13:34:17"},'\
-       "'{"field": "project_id","op": "eq","value":"8d6057bc-5b90-4296-afe0-84acaa2ef909"}]}' \
-       http://localhost:8777/v2/meters/instance
+     curl -X GET -H "X-Auth-Token: <inserttokenhere>" -H "Content-Type: application/json"
+      -d '{"q": [{"field": "timestamp", "op": "ge", "value": "2014-04-01T13:34:17"},
+        {"field": "resource_id", "op": "eq", "value": "4da2b992-0dc3-4a7c-a19a-d54bf918de41"}]}'
+        http://localhost:8777/v2/meters/instance
 
 .. _functional-examples:
 
