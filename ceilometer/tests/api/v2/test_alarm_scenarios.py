@@ -628,9 +628,14 @@ class TestAlarms(v2.FunctionalTest,
             'not valid for this resource',
             resp.json['error_message']['faultstring'])
 
-    def _do_post_alarm_invalid_action(self, ok_actions=[], alarm_actions=[],
-                                      insufficient_data_actions=[],
+    def _do_post_alarm_invalid_action(self, ok_actions=None,
+                                      alarm_actions=None,
+                                      insufficient_data_actions=None,
                                       error_message=None):
+
+        ok_actions = ok_actions or []
+        alarm_actions = alarm_actions or []
+        insufficient_data_actions = insufficient_data_actions or []
         json = {
             'enabled': False,
             'name': 'added_alarm',

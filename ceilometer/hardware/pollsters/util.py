@@ -41,8 +41,9 @@ def make_resource_metadata(res_metadata=None, host_url=None):
 
 def make_sample_from_host(host_url, name, sample_type, unit, volume,
                           project_id=None, user_id=None, resource_id=None,
-                          res_metadata=None, extra={}):
+                          res_metadata=None, extra=None):
 
+    extra = extra or {}
     resource_metadata = make_resource_metadata(res_metadata, host_url)
     resource_metadata.update(extra)
 
