@@ -112,7 +112,6 @@ class AlarmService(object):
         pass
 
 
-@six.add_metaclass(abc.ABCMeta)
 class AlarmEvaluationService(AlarmService, os_service.Service):
 
     PARTITIONING_GROUP_NAME = "alarm_evaluator"
