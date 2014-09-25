@@ -33,6 +33,9 @@ from ceilometer import storage
 
 LOG = log.getLogger(__name__)
 
+CONF = cfg.CONF
+CONF.import_opt('debug', 'ceilometer.openstack.common.log')
+
 auth_opts = [
     cfg.StrOpt('api_paste_config',
                default="api_paste.ini",
@@ -42,13 +45,12 @@ auth_opts = [
 
 api_opts = [
     cfg.BoolOpt('pecan_debug',
-                default='$debug',
+                default=CONF.debug,
                 help='Toggle Pecan Debug Middleware. '
                 'Defaults to global debug value.'
                 ),
 ]
 
-CONF = cfg.CONF
 CONF.register_opts(auth_opts)
 CONF.register_opts(api_opts, group='api')
 
