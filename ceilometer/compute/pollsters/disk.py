@@ -73,10 +73,10 @@ class _Base(plugin.ComputePollster):
             per_device_write_bytes = {}
             per_device_write_requests = {}
             for disk, info in inspector.inspect_disks(instance_name):
-                LOG.info(self.DISKIO_USAGE_MESSAGE,
-                         instance, disk.device, info.read_requests,
-                         info.read_bytes, info.write_requests,
-                         info.write_bytes, info.errors)
+                LOG.debug(self.DISKIO_USAGE_MESSAGE,
+                          instance, disk.device, info.read_requests,
+                          info.read_bytes, info.write_requests,
+                          info.write_bytes, info.errors)
                 r_bytes += info.read_bytes
                 r_requests += info.read_requests
                 w_bytes += info.write_bytes
