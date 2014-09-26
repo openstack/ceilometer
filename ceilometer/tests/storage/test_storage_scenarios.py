@@ -3227,3 +3227,24 @@ class MongoTimeToLiveTest(DBTestBase, tests_db.MixinTestsWithBackendScenarios):
                          ['resource_ttl']['expireAfterSeconds'])
         self.assertEqual(15, self.conn.db.meter.index_information()
                          ['meter_ttl']['expireAfterSeconds'])
+
+
+class TestRecordUnicodeSamples(DBTestBase,
+                               tests_db.MixinTestsWithBackendScenarios):
+    def prepare_data(self):
+        self.msgs = []
+        self.msgs.append(self.create_and_store_sample(
+            name=u'meter.accent\xe9\u0437',
+            metadata={u"metadata_key\xe9\u0437": "test",
+                      u"metadata_key": u"test\xe9\u0437"},
+        ))
+
+    def test_unicode_sample(self):
+        f = storage.SampleFilter()
+        results = list(self.conn.get_samples(f))
+        self.assertEqual(1, len(results))
+        expected = self.msgs[0]
+        actual = results[0].as_dict()
+        self.assertEqual(expected['counter_name'], actual['counter_name'])
+        self.assertEqual(expected['resource_metadata'],
+                         actual['resource_metadata'])
