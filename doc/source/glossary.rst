@@ -61,6 +61,11 @@
      infrastructure measuring usage and sending the results to the
      :term:`collector`.
 
+   notification agent
+     The different OpenStack services emit several notifications about the
+     various types of events. The notification agent consumes them from
+     respective queues and filters them by the event_type.
+
    data store
      Storage system for recording data collected by ceilometer.
 

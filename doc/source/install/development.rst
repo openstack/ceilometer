@@ -18,13 +18,12 @@
  Installing and Running the Development Version
 ================================================
 
-Ceilometer has four daemons. The :term:`compute agent` runs on the
-Nova compute node(s) while the :term:`central agent` and
-:term:`collector` run on the cloud's management node(s). In a
-development environment created by devstack_, these two are typically
-the same server. They do not have to be, though, so some of the
-instructions below are duplicated. Skip the steps you have already
-done.
+Ceilometer has several daemons. The basic are: :term:`compute agent` runs on
+the Nova compute node(s) while the :term:`central agent`, :term:`collector`
+and :term:`notification agent` run on the cloud's management node(s).
+In a development environment created by devstack_, these services are
+typically running on the same server. They do not have to be, though, so some
+of the instructions below are duplicated. Skip the steps you have already done.
 
 .. _devstack: http://www.devstack.org/
 
@@ -73,6 +72,9 @@ Configuring Devstack
 
       # Enable the ceilometer api services
       enable_service ceilometer-api
+
+The first group of daemons are necessary for core ceilometer functionality:
+polling, event listening, and data collection.
 
 6. If you use Data Processing (Sahara) service at your DevStack, it will
    generate notifications by default.
