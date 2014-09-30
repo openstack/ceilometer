@@ -19,12 +19,12 @@
 # running devstack to configure the software.
 
 <VirtualHost *>
-    WSGIDaemonProcess ceilometer user=vagrant group=vagrant threads=5
+    WSGIDaemonProcess ceilometer-api user=vagrant group=vagrant processes=2 threads=10
     WSGIScriptAlias / /opt/stack/ceilometer/ceilometer/api/app.wsgi
 
     SetEnv APACHE_RUN_USER vagrant
     SetEnv APACHE_RUN_GROUP vagrant
-    WSGIProcessGroup ceilometer
+    WSGIProcessGroup ceilometer-api
 
     ErrorLog /var/log/apache2/ceilometer_error.log
     LogLevel warn
