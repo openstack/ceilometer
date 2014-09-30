@@ -27,12 +27,12 @@ import hashlib
 import multiprocessing
 import struct
 
+from oslo.concurrency import processutils
 from oslo.config import cfg
 from oslo.utils import timeutils
 from oslo.utils import units
 import six
 
-from ceilometer.openstack.common import processutils
 
 OPTS = [
     cfg.StrOpt('rootwrap_config',
