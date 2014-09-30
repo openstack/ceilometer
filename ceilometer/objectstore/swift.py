@@ -48,6 +48,7 @@ service_types_opts = [
 
 cfg.CONF.register_opts(OPTS)
 cfg.CONF.register_opts(service_types_opts, group='service_types')
+cfg.CONF.import_group('service_credentials', 'ceilometer.service')
 
 
 class _Base(plugin.CentralPollster):
