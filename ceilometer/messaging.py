@@ -104,12 +104,13 @@ def get_rpc_server(transport, topic, endpoint):
                                          serializer=serializer)
 
 
-def get_rpc_client(transport, **kwargs):
+def get_rpc_client(transport, retry=None, **kwargs):
     """Return a configured oslo.messaging RPCClient."""
     target = oslo.messaging.Target(**kwargs)
     serializer = RequestContextSerializer(JsonPayloadSerializer())
     return oslo.messaging.RPCClient(transport, target,
-                                    serializer=serializer)
+                                    serializer=serializer,
+                                    retry=retry)
 
 
 def get_notification_listener(transport, targets, endpoints,
