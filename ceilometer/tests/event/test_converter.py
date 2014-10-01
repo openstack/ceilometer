@@ -23,7 +23,7 @@ from oslo.config import cfg as oslo_cfg
 import six
 
 from ceilometer.event import converter
-from ceilometer.storage import models
+from ceilometer.event.storage import models
 from ceilometer.tests import base
 
 

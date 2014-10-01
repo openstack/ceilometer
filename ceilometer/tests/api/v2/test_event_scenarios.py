@@ -19,7 +19,7 @@ import datetime
 from oslo.utils import timeutils
 import webtest.app
 
-from ceilometer.storage import models
+from ceilometer.event.storage import models
 from ceilometer.tests.api import v2
 from ceilometer.tests import db as tests_db
 

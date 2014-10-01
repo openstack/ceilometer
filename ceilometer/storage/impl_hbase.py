@@ -23,6 +23,7 @@ from oslo.utils import timeutils
 from six.moves.urllib import parse as urlparse
 
 import ceilometer
+from ceilometer.event.storage import models as ev_models
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.storage import base
@@ -529,7 +530,7 @@ class Connection(base.Connection):
                     events_table.put(row, record)
                 except Exception as ex:
                     LOG.debug(_("Failed to record event: %s") % ex)
-                    problem_events.append((models.Event.UNKNOWN_PROBLEM,
+                    problem_events.append((ev_models.Event.UNKNOWN_PROBLEM,
                                            event_model))
         return problem_events
 
@@ -553,12 +554,12 @@ class Connection(base.Connection):
                 if (not key.startswith('event_type')
                         and not key.startswith('timestamp')):
                     trait_name, trait_dtype = key.rsplit('+', 1)
-                    traits.append(models.Trait(name=trait_name,
-                                               dtype=int(trait_dtype),
-                                               value=value))
+                    traits.append(ev_models.Trait(name=trait_name,
+                                                  dtype=int(trait_dtype),
+                                                  value=value))
             ts, mess = event_id.split('_', 1)
 
-            yield models.Event(
+            yield ev_models.Event(
                 message_id=mess,
                 event_type=events_dict['event_type'],
                 generated=events_dict['timestamp'],
@@ -608,7 +609,7 @@ class Connection(base.Connection):
                         # proposed that certain trait name could have only one
                         # trait type.
                         trait_names.add(trait_name)
-                        data_type = models.Trait.type_names[int(trait_type)]
+                        data_type = ev_models.Trait.type_names[int(trait_type)]
                         yield {'name': trait_name, 'data_type': data_type}
 
     def get_traits(self, event_type, trait_type=None):
@@ -629,5 +630,5 @@ class Connection(base.Connection):
                 if (not key.startswith('event_type') and
                         not key.startswith('timestamp')):
                     trait_name, trait_type = key.rsplit('+', 1)
-                    yield models.Trait(name=trait_name,
-                                       dtype=int(trait_type), value=value)
+                    yield ev_models.Trait(name=trait_name,
+                                          dtype=int(trait_type), value=value)

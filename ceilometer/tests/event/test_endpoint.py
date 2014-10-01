@@ -24,7 +24,7 @@ from stevedore import extension
 
 import ceilometer
 from ceilometer.event import endpoint as event_endpoint
-from ceilometer.storage import models
+from ceilometer.event.storage import models
 from ceilometer.tests import base as tests_base
 
 TEST_NOTICE_CTXT = {

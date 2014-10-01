@@ -20,6 +20,7 @@
 import pymongo
 
 import ceilometer
+from ceilometer.event.storage import models as ev_models
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.storage import base
@@ -138,11 +139,11 @@ class Connection(base.Connection):
                      'traits': traits})
             except pymongo.errors.DuplicateKeyError as ex:
                 LOG.exception(_("Failed to record duplicated event: %s") % ex)
-                problem_events.append((models.Event.DUPLICATE,
+                problem_events.append((ev_models.Event.DUPLICATE,
                                        event_model))
             except Exception as ex:
                 LOG.exception(_("Failed to record event: %s") % ex)
-                problem_events.append((models.Event.UNKNOWN_PROBLEM,
+                problem_events.append((ev_models.Event.UNKNOWN_PROBLEM,
                                        event_model))
         return problem_events
 
@@ -156,13 +157,14 @@ class Connection(base.Connection):
         for event in self.db.event.find(q):
             traits = []
             for trait in event['traits']:
-                traits.append(models.Trait(name=trait['trait_name'],
-                                           dtype=int(trait['trait_type']),
-                                           value=trait['trait_value']))
-            yield models.Event(message_id=event['_id'],
-                               event_type=event['event_type'],
-                               generated=event['timestamp'],
-                               traits=traits)
+                traits.append(
+                    ev_models.Trait(name=trait['trait_name'],
+                                    dtype=int(trait['trait_type']),
+                                    value=trait['trait_value']))
+            yield ev_models.Event(message_id=event['_id'],
+                                  event_type=event['event_type'],
+                                  generated=event['timestamp'],
+                                  traits=traits)
 
     def get_event_types(self):
         """Return all event types as an iter of strings."""
@@ -217,9 +219,9 @@ class Connection(base.Connection):
                                          })
         for event in events:
             for trait in event['traits']:
-                yield models.Trait(name=trait['trait_name'],
-                                   dtype=trait['trait_type'],
-                                   value=trait['trait_value'])
+                yield ev_models.Trait(name=trait['trait_name'],
+                                      dtype=trait['trait_type'],
+                                      value=trait['trait_value'])
 
     def query_samples(self, filter_expr=None, orderby=None, limit=None):
         if limit == 0:

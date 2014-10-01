@@ -27,11 +27,11 @@ from oslo.utils import timeutils
 
 import ceilometer
 from ceilometer.alarm.storage import models as alarm_models
+from ceilometer.event.storage import models as event_models
 from ceilometer.publisher import utils
 from ceilometer import sample
 from ceilometer import storage
 from ceilometer.storage import base
-from ceilometer.storage import models
 from ceilometer.tests import db as tests_db
 
 
@@ -2721,12 +2721,12 @@ class EventTest(EventTestBase):
     @tests_db.run_with('sqlite', 'mongodb', 'db2')
     def test_duplicate_message_id(self):
         now = datetime.datetime.utcnow()
-        m = [models.Event("1", "Foo", now, None),
-             models.Event("1", "Zoo", now, [])]
+        m = [event_models.Event("1", "Foo", now, None),
+             event_models.Event("1", "Zoo", now, [])]
         problem_events = self.conn.record_events(m)
         self.assertEqual(1, len(problem_events))
         bad = problem_events[0]
-        self.assertEqual(models.Event.DUPLICATE, bad[0])
+        self.assertEqual(event_models.Event.DUPLICATE, bad[0])
 
 
 class GetEventTest(EventTestBase):
@@ -2736,18 +2736,19 @@ class GetEventTest(EventTestBase):
         self.start = datetime.datetime(2013, 12, 31, 5, 0)
         now = self.start
         for event_type in ['Foo', 'Bar', 'Zoo', 'Foo', 'Bar', 'Zoo']:
-            trait_models = [models.Trait(name, dtype, value)
+            trait_models = [event_models.Trait(name, dtype, value)
                             for name, dtype, value in [
-                                ('trait_A', models.Trait.TEXT_TYPE,
+                                ('trait_A', event_models.Trait.TEXT_TYPE,
                                     "my_%s_text" % event_type),
-                                ('trait_B', models.Trait.INT_TYPE,
+                                ('trait_B', event_models.Trait.INT_TYPE,
                                     base + 1),
-                                ('trait_C', models.Trait.FLOAT_TYPE,
+                                ('trait_C', event_models.Trait.FLOAT_TYPE,
                                     float(base) + 0.123456),
-                                ('trait_D', models.Trait.DATETIME_TYPE, now)]]
+                                ('trait_D', event_models.Trait.DATETIME_TYPE,
+                                    now)]]
             self.event_models.append(
-                models.Event("id_%s_%d" % (event_type, base),
-                             event_type, now, trait_models))
+                event_models.Event("id_%s_%d" % (event_type, base),
+                                   event_type, now, trait_models))
             base += 100
             now = now + datetime.timedelta(hours=1)
         self.end = now
@@ -2764,7 +2765,7 @@ class GetEventTest(EventTestBase):
                              self.event_models[i].generated)
             model_traits = self.event_models[i].traits
             for j, trait in enumerate(event.traits):
-                if trait.dtype == models.Trait.DATETIME_TYPE:
+                if trait.dtype == event_models.Trait.DATETIME_TYPE:
                     self.assertIsInstance(trait.value, datetime.datetime)
                     self.assertEqual(trait.value, model_traits[j].value)
 
@@ -3035,13 +3036,13 @@ class GetEventTest(EventTestBase):
             trait_dict[trait.name] = trait.dtype
 
         self.assertTrue("trait_A" in trait_dict)
-        self.assertEqual(models.Trait.TEXT_TYPE, trait_dict["trait_A"])
+        self.assertEqual(event_models.Trait.TEXT_TYPE, trait_dict["trait_A"])
         self.assertTrue("trait_B" in trait_dict)
-        self.assertEqual(models.Trait.INT_TYPE, trait_dict["trait_B"])
+        self.assertEqual(event_models.Trait.INT_TYPE, trait_dict["trait_B"])
         self.assertTrue("trait_C" in trait_dict)
-        self.assertEqual(models.Trait.FLOAT_TYPE, trait_dict["trait_C"])
+        self.assertEqual(event_models.Trait.FLOAT_TYPE, trait_dict["trait_C"])
         self.assertTrue("trait_D" in trait_dict)
-        self.assertEqual(models.Trait.DATETIME_TYPE,
+        self.assertEqual(event_models.Trait.DATETIME_TYPE,
                          trait_dict["trait_D"])
 
     def test_get_all_traits(self):
@@ -3050,10 +3051,11 @@ class GetEventTest(EventTestBase):
         self.assertEqual(8, len(traits))
         trait = traits[0]
         self.assertEqual("trait_A", trait.name)
-        self.assertEqual(models.Trait.TEXT_TYPE, trait.dtype)
+        self.assertEqual(event_models.Trait.TEXT_TYPE, trait.dtype)
 
     def test_simple_get_event_no_traits(self):
-        new_events = [models.Event("id_notraits", "NoTraits", self.start, [])]
+        new_events = [event_models.Event("id_notraits", "NoTraits",
+                      self.start, [])]
         bad_events = self.conn.record_events(new_events)
         event_filter = storage.EventFilter(self.start, self.end, "NoTraits")
         events = [event for event in self.conn.get_events(event_filter)]
@@ -3069,10 +3071,10 @@ class GetEventTest(EventTestBase):
         self.assertEqual(6, len(events))
 
     def test_get_by_message_id(self):
-        new_events = [models.Event("id_testid",
-                                   "MessageIDTest",
-                                   self.start,
-                                   [])]
+        new_events = [event_models.Event("id_testid",
+                                         "MessageIDTest",
+                                         self.start,
+                                         [])]
 
         bad_events = self.conn.record_events(new_events)
         event_filter = storage.EventFilter(message_id="id_testid")

@@ -29,8 +29,8 @@ import mock
 from oslo.utils import timeutils
 
 from ceilometer.alarm.storage import impl_sqlalchemy as impl_sqla_alarm
+from ceilometer.event.storage import models
 from ceilometer.storage import impl_sqlalchemy
-from ceilometer.storage import models
 from ceilometer.storage.sqlalchemy import models as sql_models
 from ceilometer.tests import base as test_base
 from ceilometer.tests import db as tests_db

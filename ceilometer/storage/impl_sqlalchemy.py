@@ -34,6 +34,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import aliased
 
 import ceilometer
+from ceilometer.event.storage import models as ev_models
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import jsonutils
 from ceilometer.openstack.common import log
@@ -806,11 +807,11 @@ class Connection(base.Connection):
                     event = self._record_event(session, event_model)
             except dbexc.DBDuplicateEntry as e:
                 LOG.exception(_("Failed to record duplicated event: %s") % e)
-                problem_events.append((api_models.Event.DUPLICATE,
+                problem_events.append((ev_models.Event.DUPLICATE,
                                        event_model))
             except Exception as e:
                 LOG.exception(_('Failed to record event: %s') % e)
-                problem_events.append((api_models.Event.UNKNOWN_PROBLEM,
+                problem_events.append((ev_models.Event.UNKNOWN_PROBLEM,
                                        event_model))
             events.append(event)
         return problem_events
@@ -886,10 +887,10 @@ class Connection(base.Connection):
                 if event_filter_conditions:
                     query = query.filter(and_(*event_filter_conditions))
                 for (id_, generated, message_id, desc_) in query.all():
-                    event_models_dict[id_] = api_models.Event(message_id,
-                                                              desc_,
-                                                              generated,
-                                                              [])
+                    event_models_dict[id_] = ev_models.Event(message_id,
+                                                             desc_,
+                                                             generated,
+                                                             [])
 
             # Build event models for the events
             event_query = event_query.subquery()
@@ -903,14 +904,14 @@ class Connection(base.Connection):
             for trait in query.all():
                 event = event_models_dict.get(trait.event_id)
                 if not event:
-                    event = api_models.Event(
+                    event = ev_models.Event(
                         trait.event.message_id,
                         trait.event.event_type.desc,
                         trait.event.generated, [])
                     event_models_dict[trait.event_id] = event
-                trait_model = api_models.Trait(trait.trait_type.desc,
-                                               trait.trait_type.data_type,
-                                               trait.get_value())
+                trait_model = ev_models.Trait(trait.trait_type.desc,
+                                              trait.trait_type.data_type,
+                                              trait.get_value())
                 event.append_trait(trait_model)
 
         event_models = event_models_dict.values()
@@ -983,6 +984,6 @@ class Connection(base.Connection):
 
             for trait in query.all():
                 type = trait.trait_type
-                yield api_models.Trait(name=type.desc,
-                                       dtype=type.data_type,
-                                       value=trait.get_value())
+                yield ev_models.Trait(name=type.desc,
+                                      dtype=type.data_type,
+                                      value=trait.get_value())
