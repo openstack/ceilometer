@@ -31,6 +31,7 @@ def dbsync():
     service.prepare_service()
     storage.get_connection_from_config(cfg.CONF, 'metering').upgrade()
     storage.get_connection_from_config(cfg.CONF, 'alarm').upgrade()
+    storage.get_connection_from_config(cfg.CONF, 'event').upgrade()
 
 
 def expirer():

@@ -2386,7 +2386,7 @@ class TraitsController(rest.RestController):
         """
         LOG.debug(_("Getting traits for %s") % event_type)
         return [Trait._convert_storage_trait(t)
-                for t in pecan.request.storage_conn
+                for t in pecan.request.event_storage_conn
                 .get_traits(event_type, trait_name)]
 
     @requires_admin
@@ -2399,7 +2399,7 @@ class TraitsController(rest.RestController):
         get_trait_name = event_models.Trait.get_name_by_type
         return [TraitDescription(name=t['name'],
                                  type=get_trait_name(t['data_type']))
-                for t in pecan.request.storage_conn
+                for t in pecan.request.event_storage_conn
                 .get_trait_types(event_type)]
 
 
@@ -2416,7 +2416,7 @@ class EventTypesController(rest.RestController):
     @wsme_pecan.wsexpose([unicode])
     def get_all(self):
         """Get all event types."""
-        return list(pecan.request.storage_conn.get_event_types())
+        return list(pecan.request.event_storage_conn.get_event_types())
 
 
 class EventsController(rest.RestController):
@@ -2436,7 +2436,7 @@ class EventsController(rest.RestController):
                       generated=event.generated,
                       traits=event.traits)
                 for event in
-                pecan.request.storage_conn.get_events(event_filter)]
+                pecan.request.event_storage_conn.get_events(event_filter)]
 
     @requires_admin
     @wsme_pecan.wsexpose(Event, wtypes.text)
@@ -2447,7 +2447,7 @@ class EventsController(rest.RestController):
         """
         event_filter = storage.EventFilter(message_id=message_id)
         events = [event for event
-                  in pecan.request.storage_conn.get_events(event_filter)]
+                  in pecan.request.event_storage_conn.get_events(event_filter)]
         if not events:
             raise EntityNotFound(_("Event"), message_id)
 
@@ -2549,7 +2549,9 @@ class Capabilities(_Base):
     storage = {wtypes.text: bool}
     "A flattened dictionary of storage capabilities"
     alarm_storage = {wtypes.text: bool}
-    "A flattened dictionary of storage capabilities"
+    "A flattened dictionary of alarm storage capabilities"
+    event_storage = {wtypes.text: bool}
+    "A flattened dictionary of event storage capabilities"
 
     @classmethod
     def sample(cls):
@@ -2591,6 +2593,7 @@ class Capabilities(_Base):
             }),
             storage=_flatten_capabilities({'production_ready': True}),
             alarm_storage=_flatten_capabilities({'production_ready': True}),
+            event_storage=_flatten_capabilities({'production_ready': True}),
         )
 
 
@@ -2607,14 +2610,19 @@ class CapabilitiesController(rest.RestController):
         # the lack of strict feature parity across storage drivers
         conn = pecan.request.storage_conn
         alarm_conn = pecan.request.alarm_storage_conn
+        event_conn = pecan.request.event_storage_conn
         driver_capabilities = conn.get_capabilities().copy()
         driver_capabilities['alarms'] = alarm_conn.get_capabilities()['alarms']
+        driver_capabilities['events'] = event_conn.get_capabilities()['events']
         driver_perf = conn.get_storage_capabilities()
         alarm_driver_perf = alarm_conn.get_storage_capabilities()
+        event_driver_perf = event_conn.get_storage_capabilities()
         return Capabilities(api=_flatten_capabilities(driver_capabilities),
                             storage=_flatten_capabilities(driver_perf),
                             alarm_storage=_flatten_capabilities(
-                                alarm_driver_perf))
+                                alarm_driver_perf),
+                            event_storage=_flatten_capabilities(
+                                event_driver_perf))
 
 
 class V2Controller(object):

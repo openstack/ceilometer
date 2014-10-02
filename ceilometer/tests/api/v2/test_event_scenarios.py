@@ -61,7 +61,7 @@ class EventTestBase(v2.FunctionalTest,
                              traits=trait_models))
             base += 100
             self.trait_time += datetime.timedelta(days=1)
-        self.conn.record_events(event_models)
+        self.event_conn.record_events(event_models)
 
 
 class TestEventTypeAPI(EventTestBase):

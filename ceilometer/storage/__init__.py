@@ -53,6 +53,10 @@ STORAGE_OPTS = [
                default=None,
                help='The connection string used to connect to the alarm '
                'database. (if unset, connection is used)'),
+    cfg.StrOpt('event_connection',
+               default=None,
+               help='The connection string used to connect to the event '
+               'database. (if unset, connection is used)'),
 ]
 
 cfg.CONF.register_opts(STORAGE_OPTS, group='database')

@@ -2723,7 +2723,7 @@ class EventTest(EventTestBase):
         now = datetime.datetime.utcnow()
         m = [event_models.Event("1", "Foo", now, None),
              event_models.Event("1", "Zoo", now, [])]
-        problem_events = self.conn.record_events(m)
+        problem_events = self.event_conn.record_events(m)
         self.assertEqual(1, len(problem_events))
         bad = problem_events[0]
         self.assertEqual(event_models.Event.DUPLICATE, bad[0])
@@ -2753,11 +2753,11 @@ class GetEventTest(EventTestBase):
             now = now + datetime.timedelta(hours=1)
         self.end = now
 
-        self.conn.record_events(self.event_models)
+        self.event_conn.record_events(self.event_models)
 
     def test_generated_is_datetime(self):
         event_filter = storage.EventFilter(self.start, self.end)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(6, len(events))
         for i, event in enumerate(events):
             self.assertIsInstance(event.generated, datetime.datetime)
@@ -2771,7 +2771,7 @@ class GetEventTest(EventTestBase):
 
     def test_simple_get(self):
         event_filter = storage.EventFilter(self.start, self.end)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(6, len(events))
         start_time = None
         for i, type in enumerate(['Foo', 'Bar', 'Zoo']):
@@ -2800,7 +2800,7 @@ class GetEventTest(EventTestBase):
         }
 
         event_filter = storage.EventFilter(self.start, self.end, "Bar")
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(2, len(events))
         self.assertEqual(events[0].event_type, "Bar")
         self.assertEqual(events[1].event_type, "Bar")
@@ -2822,7 +2822,7 @@ class GetEventTest(EventTestBase):
         trait_filters = [{'key': 'trait_B', 'integer': 101}]
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(1, len(events))
         self.assertEqual(events[0].event_type, "Bar")
         self.assertEqual(4, len(events[0].traits))
@@ -2832,38 +2832,38 @@ class GetEventTest(EventTestBase):
                           'op': 'eq'}]
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(2, len(events))
         self.assertEqual("Foo", events[0].event_type)
         self.assertEqual(4, len(events[0].traits))
         trait_filters[0].update({'key': 'trait_A', 'op': 'lt'})
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(2, len(events))
         self.assertEqual("Bar", events[0].event_type)
         trait_filters[0].update({'key': 'trait_A', 'op': 'le'})
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(4, len(events))
         self.assertEqual("Bar", events[1].event_type)
         trait_filters[0].update({'key': 'trait_A', 'op': 'ne'})
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(4, len(events))
         self.assertEqual("Zoo", events[3].event_type)
         trait_filters[0].update({'key': 'trait_A', 'op': 'gt'})
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(2, len(events))
         self.assertEqual("Zoo", events[0].event_type)
         trait_filters[0].update({'key': 'trait_A', 'op': 'ge'})
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(4, len(events))
         self.assertEqual("Foo", events[2].event_type)
 
@@ -2871,38 +2871,38 @@ class GetEventTest(EventTestBase):
         trait_filters = [{'key': 'trait_B', 'integer': 101, 'op': 'eq'}]
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(1, len(events))
         self.assertEqual("Bar", events[0].event_type)
         self.assertEqual(4, len(events[0].traits))
         trait_filters[0].update({'key': 'trait_B', 'op': 'lt'})
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(1, len(events))
         self.assertEqual("Foo", events[0].event_type)
         trait_filters[0].update({'key': 'trait_B', 'op': 'le'})
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(2, len(events))
         self.assertEqual("Bar", events[1].event_type)
         trait_filters[0].update({'key': 'trait_B', 'op': 'ne'})
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(5, len(events))
         self.assertEqual("Zoo", events[4].event_type)
         trait_filters[0].update({'key': 'trait_B', 'op': 'gt'})
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(4, len(events))
         self.assertEqual("Zoo", events[0].event_type)
         trait_filters[0].update({'key': 'trait_B', 'op': 'ge'})
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(5, len(events))
         self.assertEqual("Foo", events[2].event_type)
 
@@ -2910,38 +2910,38 @@ class GetEventTest(EventTestBase):
         trait_filters = [{'key': 'trait_C', 'float': 300.123456, 'op': 'eq'}]
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(1, len(events))
         self.assertEqual("Foo", events[0].event_type)
         self.assertEqual(4, len(events[0].traits))
         trait_filters[0].update({'key': 'trait_C', 'op': 'lt'})
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(3, len(events))
         self.assertEqual("Zoo", events[2].event_type)
         trait_filters[0].update({'key': 'trait_C', 'op': 'le'})
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(4, len(events))
         self.assertEqual("Bar", events[1].event_type)
         trait_filters[0].update({'key': 'trait_C', 'op': 'ne'})
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(5, len(events))
         self.assertEqual("Zoo", events[2].event_type)
         trait_filters[0].update({'key': 'trait_C', 'op': 'gt'})
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(2, len(events))
         self.assertEqual("Bar", events[0].event_type)
         trait_filters[0].update({'key': 'trait_C', 'op': 'ge'})
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(3, len(events))
         self.assertEqual("Zoo", events[2].event_type)
 
@@ -2951,38 +2951,38 @@ class GetEventTest(EventTestBase):
                           'op': 'eq'}]
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(1, len(events))
         self.assertEqual("Zoo", events[0].event_type)
         self.assertEqual(4, len(events[0].traits))
         trait_filters[0].update({'key': 'trait_D', 'op': 'lt'})
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(2, len(events))
         trait_filters[0].update({'key': 'trait_D', 'op': 'le'})
         self.assertEqual("Bar", events[1].event_type)
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(3, len(events))
         self.assertEqual("Bar", events[1].event_type)
         trait_filters[0].update({'key': 'trait_D', 'op': 'ne'})
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(5, len(events))
         self.assertEqual("Foo", events[2].event_type)
         trait_filters[0].update({'key': 'trait_D', 'op': 'gt'})
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(3, len(events))
         self.assertEqual("Zoo", events[2].event_type)
         trait_filters[0].update({'key': 'trait_D', 'op': 'ge'})
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(4, len(events))
         self.assertEqual("Bar", events[2].event_type)
 
@@ -2991,7 +2991,7 @@ class GetEventTest(EventTestBase):
                          {'key': 'trait_A', 'string': 'my_Foo_text'}]
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(1, len(events))
         self.assertEqual("Foo", events[0].event_type)
         self.assertEqual(4, len(events[0].traits))
@@ -3001,12 +3001,12 @@ class GetEventTest(EventTestBase):
                          {'key': 'trait_A', 'string': 'my_Zoo_text'}]
         event_filter = storage.EventFilter(self.start, self.end,
                                            traits_filter=trait_filters)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(0, len(events))
 
     def test_get_event_types(self):
         event_types = [e for e in
-                       self.conn.get_event_types()]
+                       self.event_conn.get_event_types()]
 
         self.assertEqual(3, len(event_types))
         self.assertTrue("Bar" in event_types)
@@ -3015,7 +3015,7 @@ class GetEventTest(EventTestBase):
 
     def test_get_trait_types(self):
         trait_types = [tt for tt in
-                       self.conn.get_trait_types("Foo")]
+                       self.event_conn.get_trait_types("Foo")]
         self.assertEqual(4, len(trait_types))
         trait_type_names = map(lambda x: x['name'], trait_types)
         self.assertIn("trait_A", trait_type_names)
@@ -3025,11 +3025,11 @@ class GetEventTest(EventTestBase):
 
     def test_get_trait_types_unknown_event(self):
         trait_types = [tt for tt in
-                       self.conn.get_trait_types("Moo")]
+                       self.event_conn.get_trait_types("Moo")]
         self.assertEqual(0, len(trait_types))
 
     def test_get_traits(self):
-        traits = self.conn.get_traits("Bar")
+        traits = self.event_conn.get_traits("Bar")
         # format results in a way that makes them easier to work with
         trait_dict = {}
         for trait in traits:
@@ -3046,7 +3046,7 @@ class GetEventTest(EventTestBase):
                          trait_dict["trait_D"])
 
     def test_get_all_traits(self):
-        traits = self.conn.get_traits("Foo")
+        traits = self.event_conn.get_traits("Foo")
         traits = sorted([t for t in traits], key=operator.attrgetter('dtype'))
         self.assertEqual(8, len(traits))
         trait = traits[0]
@@ -3056,9 +3056,9 @@ class GetEventTest(EventTestBase):
     def test_simple_get_event_no_traits(self):
         new_events = [event_models.Event("id_notraits", "NoTraits",
                       self.start, [])]
-        bad_events = self.conn.record_events(new_events)
+        bad_events = self.event_conn.record_events(new_events)
         event_filter = storage.EventFilter(self.start, self.end, "NoTraits")
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(0, len(bad_events))
         self.assertEqual(1, len(events))
         self.assertEqual(events[0].message_id, "id_notraits")
@@ -3067,7 +3067,7 @@ class GetEventTest(EventTestBase):
 
     def test_simple_get_no_filters(self):
         event_filter = storage.EventFilter(None, None, None)
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(6, len(events))
 
     def test_get_by_message_id(self):
@@ -3076,9 +3076,9 @@ class GetEventTest(EventTestBase):
                                          self.start,
                                          [])]
 
-        bad_events = self.conn.record_events(new_events)
+        bad_events = self.event_conn.record_events(new_events)
         event_filter = storage.EventFilter(message_id="id_testid")
-        events = [event for event in self.conn.get_events(event_filter)]
+        events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(0, len(bad_events))
         self.assertEqual(1, len(events))
         event = events[0]

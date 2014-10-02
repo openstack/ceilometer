@@ -52,6 +52,8 @@ class MongoDbManager(fixtures.Fixture):
                     self.url, 'ceilometer.metering.storage')
                 self.alarm_connection = storage.get_connection(
                     self.url, 'ceilometer.alarm.storage')
+                self.event_connection = storage.get_connection(
+                    self.url, 'ceilometer.event.storage')
             except storage.StorageBadVersion as e:
                 raise testcase.TestSkipped(six.text_type(e))
 
@@ -74,6 +76,8 @@ class MySQLDbManager(fixtures.Fixture):
             self.url, 'ceilometer.metering.storage')
         self.alarm_connection = storage.get_connection(
             self.url, 'ceilometer.alarm.storage')
+        self.event_connection = storage.get_connection(
+            self.url, 'ceilometer.event.storage')
 
     @property
     def url(self):
@@ -90,6 +94,8 @@ class HBaseManager(fixtures.Fixture):
             self.url, 'ceilometer.metering.storage')
         self.alarm_connection = storage.get_connection(
             self.url, 'ceilometer.alarm.storage')
+        self.event_connection = storage.get_connection(
+            self.url, 'ceilometer.event.storage')
         # Unique prefix for each test to keep data is distinguished because
         # all test data is stored in one table
         data_prefix = str(uuid.uuid4().hex)
@@ -129,6 +135,8 @@ class SQLiteManager(fixtures.Fixture):
             self.url, 'ceilometer.metering.storage')
         self.alarm_connection = storage.get_connection(
             self.url, 'ceilometer.alarm.storage')
+        self.event_connection = storage.get_connection(
+            self.url, 'ceilometer.event.storage')
 
 
 class TestBase(testscenarios.testcase.WithScenarios, test_base.BaseTestCase):
@@ -166,6 +174,9 @@ class TestBase(testscenarios.testcase.WithScenarios, test_base.BaseTestCase):
         self.alarm_conn = self.db_manager.alarm_connection
         self.alarm_conn.upgrade()
 
+        self.event_conn = self.db_manager.event_connection
+        self.event_conn.upgrade()
+
         self.useFixture(mockpatch.Patch('ceilometer.storage.get_connection',
                                         side_effect=self._get_connection))
 
@@ -179,6 +190,8 @@ class TestBase(testscenarios.testcase.WithScenarios, test_base.BaseTestCase):
         )
 
     def tearDown(self):
+        self.event_conn.clear()
+        self.event_conn = None
         self.alarm_conn.clear()
         self.alarm_conn = None
         self.conn.clear()
@@ -188,6 +201,8 @@ class TestBase(testscenarios.testcase.WithScenarios, test_base.BaseTestCase):
     def _get_connection(self, url, namespace):
         if namespace == "ceilometer.alarm.storage":
             return self.alarm_conn
+        elif namespace == "ceilometer.event.storage":
+            return self.event_conn
         return self.conn
 
     def _get_driver_manager(self, engine):
