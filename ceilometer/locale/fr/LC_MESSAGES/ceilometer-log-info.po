@@ -5,13 +5,14 @@
 # Translators:
 # Bruno Cornec <bruno.cornec@hp.com>, 2014
 # Frédéric <frosmont@free.fr>, 2014
+# Maxime COQUEREL <max.coquerel@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-09-24 06:05+0000\n"
-"PO-Revision-Date: 2014-09-17 18:00+0000\n"
-"Last-Translator: Bruno Cornec <bruno.cornec@hp.com>\n"
+"POT-Creation-Date: 2014-10-02 06:07+0000\n"
+"PO-Revision-Date: 2014-09-25 09:45+0000\n"
+"Last-Translator: Maxime COQUEREL <max.coquerel@gmail.com>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/ceilometer/"
 "language/fr/)\n"
 "Language: fr\n"
@@ -23,7 +24,7 @@ msgstr ""
 
 #: ceilometer/coordination.py:73
 msgid "Coordination backend started successfully."
-msgstr ""
+msgstr "Coordination avec le backend démarré avec succès."
 
 #: ceilometer/coordination.py:99
 #, python-format
