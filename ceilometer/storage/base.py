@@ -166,7 +166,6 @@ class Connection(object):
                                            'stddev': False,
                                            'cardinality': False}}
                        },
-        'events': {'query': {'simple': False}},
     }
 
     STORAGE_CAPABILITIES = {

@@ -228,7 +228,6 @@ class CapabilitiesTest(test_base.BaseTestCase):
                                                'stddev': True,
                                                'cardinality': True}}
                            },
-            'events': {'query': {'simple': False}},
         }
 
         actual_capabilities = impl_sqlalchemy.Connection.get_capabilities()
