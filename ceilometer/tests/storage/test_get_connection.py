@@ -21,6 +21,7 @@ from oslotest import base
 
 from ceilometer.alarm.storage import impl_log as impl_log_alarm
 from ceilometer.alarm.storage import impl_sqlalchemy as impl_sqlalchemy_alarm
+from ceilometer.event.storage import impl_hbase as impl_hbase_event
 from ceilometer import storage
 from ceilometer.storage import impl_log
 from ceilometer.storage import impl_sqlalchemy
@@ -67,6 +68,21 @@ class ConnectionConfigTest(base.BaseTestCase):
         self.assertIsInstance(conn, impl_log.Connection)
         conn = storage.get_connection_from_config(self.CONF, 'alarm')
         self.assertIsInstance(conn, impl_sqlalchemy_alarm.Connection)
+
+    def test_three_urls(self):
+        self.CONF.set_override("connection", "log://", group="database")
+        self.CONF.set_override("alarm_connection", "sqlite://",
+                               group="database")
+        self.CONF.set_override("event_connection", "hbase://__test__",
+                               group="database")
+        conn = storage.get_connection_from_config(self.CONF)
+        self.assertIsInstance(conn, impl_log.Connection)
+        conn = storage.get_connection_from_config(self.CONF, 'metering')
+        self.assertIsInstance(conn, impl_log.Connection)
+        conn = storage.get_connection_from_config(self.CONF, 'alarm')
+        self.assertIsInstance(conn, impl_sqlalchemy_alarm.Connection)
+        conn = storage.get_connection_from_config(self.CONF, 'event')
+        self.assertIsInstance(conn, impl_hbase_event.Connection)
 
     def test_sqlalchemy_driver(self):
         self.CONF.set_override("connection", "sqlite+pysqlite://",

@@ -66,6 +66,7 @@ def setup_app(pecan_config=None, extra_hooks=None):
     app_hooks = [hooks.ConfigHook(),
                  hooks.DBHook(
                      storage.get_connection_from_config(cfg.CONF, 'metering'),
+                     storage.get_connection_from_config(cfg.CONF, 'event'),
                      storage.get_connection_from_config(cfg.CONF, 'alarm'),),
                  hooks.PipelineHook(),
                  hooks.TranslationHook()]
