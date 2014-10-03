@@ -29,7 +29,7 @@ python-keystoneclient>=0.10.0
 python-neutronclient>=2.3.6,<3
 python-novaclient>=2.18.0
 python-swiftclient>=2.2.0
-pytz>=2010h
+pytz
 PyYAML>=3.1.0
 requests>=1.2.1,!=2.4.0
 six>=1.7.0
