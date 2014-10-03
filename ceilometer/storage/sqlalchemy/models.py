@@ -32,7 +32,7 @@ from sqlalchemy.orm import deferred
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import TypeDecorator
 
-from ceilometer.storage import models as api_models
+from ceilometer.event.storage import models
 from ceilometer import utils
 
 
@@ -380,10 +380,10 @@ class Trait(Base):
     event_id = Column(Integer, ForeignKey('event.id'))
     event = relationship("Event", backref=backref('traits', order_by=id))
 
-    _value_map = {api_models.Trait.TEXT_TYPE: 't_string',
-                  api_models.Trait.FLOAT_TYPE: 't_float',
-                  api_models.Trait.INT_TYPE: 't_int',
-                  api_models.Trait.DATETIME_TYPE: 't_datetime'}
+    _value_map = {models.Trait.TEXT_TYPE: 't_string',
+                  models.Trait.FLOAT_TYPE: 't_float',
+                  models.Trait.INT_TYPE: 't_int',
+                  models.Trait.DATETIME_TYPE: 't_datetime'}
 
     def __init__(self, trait_type, event, t_string=None,
                  t_float=None, t_int=None, t_datetime=None):
@@ -400,13 +400,13 @@ class Trait(Base):
         else:
             dtype = self.trait_type.data_type
 
-        if dtype == api_models.Trait.INT_TYPE:
+        if dtype == models.Trait.INT_TYPE:
             return self.t_int
-        if dtype == api_models.Trait.FLOAT_TYPE:
+        if dtype == models.Trait.FLOAT_TYPE:
             return self.t_float
-        if dtype == api_models.Trait.DATETIME_TYPE:
+        if dtype == models.Trait.DATETIME_TYPE:
             return self.t_datetime
-        if dtype == api_models.Trait.TEXT_TYPE:
+        if dtype == models.Trait.TEXT_TYPE:
             return self.t_string
 
         return None
@@ -414,7 +414,7 @@ class Trait(Base):
     def __repr__(self):
         name = self.trait_type.desc if self.trait_type else None
         data_type = (self.trait_type.data_type if self.trait_type else
-                     api_models.Trait.NONE_TYPE)
+                     models.Trait.NONE_TYPE)
 
         return "<Trait(%s) %d=%s/%s/%s/%s on %s>" % (name,
                                                      data_type,

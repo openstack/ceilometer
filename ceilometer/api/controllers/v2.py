@@ -51,6 +51,7 @@ import ceilometer
 from ceilometer.alarm import service as alarm_service
 from ceilometer.alarm.storage import models as alarm_models
 from ceilometer.api import acl
+from ceilometer.event.storage import models as event_models
 from ceilometer import messaging
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common.gettextutils import _
@@ -2279,9 +2280,9 @@ class Trait(_Base):
         if isinstance(trait, Trait):
             return trait
         value = (six.text_type(trait.value)
-                 if not trait.dtype == storage.models.Trait.DATETIME_TYPE
+                 if not trait.dtype == event_models.Trait.DATETIME_TYPE
                  else trait.value.isoformat())
-        trait_type = storage.models.Trait.get_name_by_type(trait.dtype)
+        trait_type = event_models.Trait.get_name_by_type(trait.dtype)
         return Trait(name=trait.name, type=trait_type, value=value)
 
     @classmethod
@@ -2395,7 +2396,7 @@ class TraitsController(rest.RestController):
 
         :param event_type: Event type to filter traits by
         """
-        get_trait_name = storage.models.Trait.get_name_by_type
+        get_trait_name = event_models.Trait.get_name_by_type
         return [TraitDescription(name=t['name'],
                                  type=get_trait_name(t['data_type']))
                 for t in pecan.request.storage_conn
