@@ -148,9 +148,9 @@ def make_query(metaquery=None, trait_query=None, **kwargs):
         for k, v in kwargs.items():
             if v is not None:
                 res_q = ("SingleColumnValueFilter "
-                         "('f', '%s+%d', %s, 'binary:%s', true, true)" %
-                         (trait_name, EVENT_TRAIT_TYPES[k], OP_SIGN[op],
-                          dump(v)))
+                         "('f', '%s', %s, 'binary:%s', true, true)" %
+                         (prepare_key(trait_name, EVENT_TRAIT_TYPES[k]),
+                          OP_SIGN[op], dump(v)))
         return res_q
 
     # Note: we use extended constructor for SingleColumnValueFilter here.
@@ -165,11 +165,11 @@ def make_query(metaquery=None, trait_query=None, **kwargs):
             elif key == 'trait_type':
                 q.append("ColumnPrefixFilter('%s')" % value)
             elif key == 'event_id':
-                q.append("RowFilter ( = , 'regexstring:\d*_%s')" % value)
+                q.append("RowFilter ( = , 'regexstring:\d*:%s')" % value)
             else:
                 q.append("SingleColumnValueFilter "
                          "('f', '%s', =, 'binary:%s', true, true)" %
-                         (key, dump(value)))
+                         (quote(key), dump(value)))
     res_q = None
     if len(q):
         res_q = " AND ".join(q)
@@ -282,11 +282,13 @@ def make_meter_query_for_resource(start_timestamp, start_timestamp_op,
     end_op = end_timestamp_op or 'lt'
 
     if start_rts:
-        filter_value = start_rts + '+' + source if source else start_rts
+        filter_value = (start_rts + ':' + quote(source) if source
+                        else start_rts)
         mq.append(_QualifierFilter(OP_SIGN_REV[start_op], filter_value))
 
     if end_rts:
-        filter_value = end_rts + '+' + source if source else end_rts
+        filter_value = (end_rts + ':' + quote(source) if source
+                        else end_rts)
         mq.append(_QualifierFilter(OP_SIGN_REV[end_op], filter_value))
 
     if mq:
@@ -308,16 +310,15 @@ def make_general_rowkey_scan(rts_start=None, rts_end=None, some_id=None):
     if some_id is None:
         return None, None
     if not rts_start:
-        rts_start = chr(127)
-    end_row = "%s_%s" % (some_id, rts_start)
-    start_row = "%s_%s" % (some_id, rts_end)
+        # NOTE(idegtiarov): Here we could not use chr > 122 because chr >= 123
+        # will be quoted and character will be turn in a composition that is
+        # started with '%' (chr(37)) that lexicographically is less then chr
+        # of number
+        rts_start = chr(122)
+    end_row = prepare_key(some_id, rts_start)
+    start_row = prepare_key(some_id, rts_end)
 
     return start_row, end_row
-
-
-def format_meter_reference(c_name, c_type, c_unit, rts, source):
-    """Format reference to meter data."""
-    return "%s+%s+%s!%s!%s" % (rts, source, c_name, c_type, c_unit)
 
 
 def prepare_key(*args):
@@ -367,10 +368,14 @@ def deserialize_entry(entry, get_raw_meta=True):
         elif k.startswith('f:r_metadata.'):
             metadata_flattened[k[len('f:r_metadata.'):]] = load(v)
         elif k.startswith("f:m_"):
-            meter = (k[4:], load(v))
+            meter = ([unquote(i) for i in k[4:].split(':')], load(v))
             meters.append(meter)
         else:
-            flatten_result[k[2:]] = load(v)
+            if ':' in k[2:]:
+                key = tuple([unquote(i) for i in k[2:].split(':')])
+            else:
+                key = unquote(k[2:])
+            flatten_result[key] = load(v)
     if get_raw_meta:
         metadata = flatten_result.get('resource_metadata', {})
     else:
@@ -406,11 +411,11 @@ def serialize_entry(data=None, **kwargs):
             # capability with API v2. It will be flattened in another
             # way on API level. But we need flattened too for quick filtering.
             flattened_meta = dump_metadata(v)
-            for k, m in flattened_meta.items():
-                result['f:r_metadata.' + k] = dump(m)
+            for key, m in flattened_meta.items():
+                result['f:r_metadata.' + key] = dump(m)
             result['f:resource_metadata'] = dump(v)
         else:
-            result['f:' + k] = dump(v)
+            result['f:' + quote(k, ':')] = dump(v)
     return result
 
 

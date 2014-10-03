@@ -59,7 +59,7 @@ class Connection(base.Connection):
 
     - alarm_h:
 
-      - row_key: uuid of alarm + "_" + reversed timestamp
+      - row_key: uuid of alarm + ":" + reversed timestamp
       - Column Families:
 
         f: raw incoming alarm_history data. Timestamp becomes now()
@@ -225,5 +225,6 @@ class Connection(base.Connection):
         rts = hbase_utils.timestamp(ts)
         with self.conn_pool.connection() as conn:
             alarm_history_table = conn.table(self.ALARM_HISTORY_TABLE)
-            alarm_history_table.put(alarm_change.get('alarm_id') + "_" +
-                                    str(rts), alarm_change_dict)
+            alarm_history_table.put(
+                hbase_utils.prepare_key(alarm_change.get('alarm_id'), rts),
+                alarm_change_dict)
