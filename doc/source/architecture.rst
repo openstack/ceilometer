@@ -94,8 +94,7 @@ Each of Ceilometer's services are designed to scale horizontally. Additional
 workers and nodes can added depending on the expected load. Ceilometer offers
 five core services:
 
-1. polling agents - compute and central agent daemons designed to poll
-   OpenStack services.
+1. polling agent - daemon designed to poll OpenStack services.
 2. notification agent - daemon designed to listen to message queue.
 3. collector - daemon designed to gather and record event and metering data
    created by notification and polling agents.
@@ -133,14 +132,17 @@ methods to collect data:
    prefer this compared to a polling agent method as resilience (high
    availability) will not be a problem with this method.
 3. :term:`Polling agents` which is the least preferred method, that will poll
-   some API or other tool to collect information at a regular interval. 
+   some API or other tool to collect information at a regular interval.
    This method is least preferred due to the inherent difficulty in making such
    a component resilient.
 
 The first method is supported by the ceilometer-notification agent, which
 monitors the message queues for notifications and for metering data coming
-from the "push" agents. Methods 2 and 3 rely on the ceilometer-compute-agent
-and ceilometer-central-agent respectively.
+from the "push" agents. Methods 2 and 3 rely on the ceilometer-polling agent,
+which behaves differently depending on the resources it's collecting data
+about. Polling agent can be configured either to poll local hypervisor or
+remote APIs (public REST APIs exposed by services and/or host-level SNMP
+daemons).
 
 How to access collected data?
 -----------------------------
@@ -366,16 +368,15 @@ Polling
 
 Metering data comes from two sources: through notifications built into
 the existing OpenStack components and by polling the infrastructure
-(such as via libvirt). Polling for compute resources is handled by an
-agent running on the compute node (where communication with the
-hypervisor is more efficient).  The compute agent daemon is configured
-to run one or more *pollster* plugins using the
-``ceilometer.poll.compute`` namespace.  Polling for resources not tied
-to the compute node is handled by the central agent.  The central
-agent daemon is configured to run one or more *pollster* plugins using
-the ``ceilometer.poll.central`` namespace.
+(such as via libvirt). Polling for compute resources is handled by a
+polling agent running on the compute node (where communication with the
+hypervisor is more efficient). Polling for resources not tied
+to the compute node is handled by the agent running on the cloud
+controller node via services APIs. The polling agent daemon is configured
+to run one or more *pollster* plugins using either the
+``ceilometer.poll.compute`` and/or ``ceilometer.poll.central`` namespaces.
 
-The agents periodically asks each pollster for instances of
+The agents periodically ask each pollster for instances of
 ``Sample`` objects. The agent framework then publishes the Samples using
 the publishers defined in the pipeline configuration. For example,
 the ``notifier`` publisher converts the Sample to metering messages, which it
