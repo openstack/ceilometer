@@ -69,6 +69,10 @@ class SensorPollster(plugin.PollsterBase):
                 'sensor-id': parser.transform_id(sensor_data['Sensor ID'])
             }
 
+            metadata = {
+                'node': CONF.host
+            }
+
             yield sample.Sample(
                 name='hardware.ipmi.%s' % self.METRIC.lower(),
                 type=sample.TYPE_GAUGE,
@@ -78,7 +82,7 @@ class SensorPollster(plugin.PollsterBase):
                 project_id=None,
                 resource_id=resource_id,
                 timestamp=timeutils.utcnow().isoformat(),
-                resource_metadata=None)
+                resource_metadata=metadata)
 
 
 class TemperatureSensorPollster(SensorPollster):
