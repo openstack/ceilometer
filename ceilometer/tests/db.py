@@ -65,13 +65,13 @@ class MongoDbManager(fixtures.Fixture):
         }
 
 
-class MySQLDbManager(fixtures.Fixture):
+class SQLManager(fixtures.Fixture):
 
     def __init__(self, url):
         self._url = url
 
     def setUp(self):
-        super(MySQLDbManager, self).setUp()
+        super(SQLManager, self).setUp()
         self.connection = storage.get_connection(
             self.url, 'ceilometer.metering.storage')
         self.alarm_connection = storage.get_connection(
@@ -143,7 +143,8 @@ class TestBase(testscenarios.testcase.WithScenarios, test_base.BaseTestCase):
 
     DRIVER_MANAGERS = {
         'mongodb': MongoDbManager,
-        'mysql': MySQLDbManager,
+        'mysql': SQLManager,
+        'postgresql': SQLManager,
         'db2': MongoDbManager,
         'sqlite': SQLiteManager,
         'hbase': HBaseManager,
@@ -237,7 +238,7 @@ class MixinTestsWithBackendScenarios(object):
         ('sqlite', {'db_url': 'sqlite://'}),
     ]
 
-    for db in ('MONGODB', 'MYSQL', 'HBASE', 'DB2'):
+    for db in ('MONGODB', 'MYSQL', 'PGSQL', 'HBASE', 'DB2'):
         if os.environ.get('CEILOMETER_TEST_%s_URL' % db):
             scenarios.append(
                 (db.lower(), {'db_url': os.environ.get(
