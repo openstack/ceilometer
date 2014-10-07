@@ -28,6 +28,7 @@ from oslo.config import fixture as fixture_config
 from oslotest import mockpatch
 import six
 from six.moves.urllib import parse as urlparse
+import sqlalchemy
 import testscenarios.testcase
 from testtools import testcase
 
@@ -66,10 +67,6 @@ class MongoDbManager(fixtures.Fixture):
 
 
 class SQLManager(fixtures.Fixture):
-
-    def __init__(self, url):
-        self._url = url
-
     def setUp(self):
         super(SQLManager, self).setUp()
         self.connection = storage.get_connection(
@@ -81,7 +78,31 @@ class SQLManager(fixtures.Fixture):
 
     @property
     def url(self):
-        return self._url
+        return self._url.replace('template1', self._db_name)
+
+
+class PgSQLManager(SQLManager):
+
+    def __init__(self, url):
+        self._url = url
+        self._db_name = 'ceilometer_%s' % uuid.uuid4().hex
+        self._engine = sqlalchemy.create_engine(self._url)
+        self._conn = self._engine.connect()
+        self._conn.connection.set_isolation_level(0)
+        self._conn.execute(
+            'CREATE DATABASE %s WITH TEMPLATE template0;' % self._db_name)
+        self._conn.connection.set_isolation_level(1)
+
+
+class MySQLManager(SQLManager):
+
+    def __init__(self, url):
+        self._url = url
+        self._db_name = 'ceilometer_%s' % uuid.uuid4().hex
+        self._engine = sqlalchemy.create_engine(
+            self._url.replace('template1', ''))
+        self._conn = self._engine.connect()
+        self._conn.execute('CREATE DATABASE %s;' % self._db_name)
 
 
 class HBaseManager(fixtures.Fixture):
@@ -143,8 +164,8 @@ class TestBase(testscenarios.testcase.WithScenarios, test_base.BaseTestCase):
 
     DRIVER_MANAGERS = {
         'mongodb': MongoDbManager,
-        'mysql': SQLManager,
-        'postgresql': SQLManager,
+        'mysql': MySQLManager,
+        'postgresql': PgSQLManager,
         'db2': MongoDbManager,
         'sqlite': SQLiteManager,
         'hbase': HBaseManager,
