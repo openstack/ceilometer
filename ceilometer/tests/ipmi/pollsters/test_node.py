@@ -15,9 +15,14 @@
 # under the License.
 
 import mock
+from oslo.config import cfg
 
 from ceilometer.ipmi.pollsters import node
 from ceilometer.tests.ipmi.pollsters import base
+
+
+CONF = cfg.CONF
+CONF.import_opt('host', 'ceilometer.service')
 
 
 class TestPowerPollster(base.TestPollsterBase):
@@ -38,7 +43,7 @@ class TestPowerPollster(base.TestPollsterBase):
         self._test_get_samples()
 
         # only one sample, and value is 19(0x13 as current_value)
-        self._verify_metering(1, 19)
+        self._verify_metering(1, 19, CONF.host)
 
 
 class TestTemperaturePollster(base.TestPollsterBase):
@@ -59,4 +64,4 @@ class TestTemperaturePollster(base.TestPollsterBase):
         self._test_get_samples()
 
         # only one sample, and value is 35(0x23 as current_value)
-        self._verify_metering(1, 35)
+        self._verify_metering(1, 35, CONF.host)

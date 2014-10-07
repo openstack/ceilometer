@@ -44,6 +44,10 @@ class _Base(plugin.PollsterBase):
     def get_samples(self, manager, cache, resources):
         stats = self.read_data()
 
+        metadata = {
+            'node': CONF.host
+        }
+
         if stats:
             data = node_manager._hex(stats["Current_value"])
 
@@ -56,7 +60,7 @@ class _Base(plugin.PollsterBase):
                 project_id=None,
                 resource_id=CONF.host,
                 timestamp=timeutils.utcnow().isoformat(),
-                resource_metadata=None)
+                resource_metadata=metadata)
 
 
 class TemperaturePollster(_Base):

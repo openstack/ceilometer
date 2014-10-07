@@ -30,7 +30,7 @@ class TestNotifications(base.BaseTestCase):
     def test_ipmi_temperature_notification(self):
         """Test IPMI Temperature sensor data.
 
-        Based on the above test data the expected sample for a single
+        Based on the above ipmi_testdata the expected sample for a single
         temperature reading has::
 
         * a resource_id composed from the node_uuid Sensor ID
@@ -38,6 +38,7 @@ class TestNotifications(base.BaseTestCase):
         * a volume from the first chunk of the Sensor Reading
         * a unit from the last chunk of the Sensor Reading
         * some readings are skipped if the value is 'Disabled'
+        * metatata with the node id
         """
         processor = ipmi.TemperatureSensorNotification(None)
         counters = dict([(counter.resource_id, counter) for counter in
@@ -56,6 +57,8 @@ class TestNotifications(base.BaseTestCase):
         self.assertEqual('hardware.ipmi.temperature', test_counter.name)
         self.assertEqual('hardware.ipmi.metrics.update',
                          test_counter.resource_metadata['event_type'])
+        self.assertEqual('f4982fd2-2f2b-4bb5-9aff-48aac801d1ad',
+                         test_counter.resource_metadata['node'])
 
     def test_ipmi_current_notification(self):
         """Test IPMI Current sensor data.
