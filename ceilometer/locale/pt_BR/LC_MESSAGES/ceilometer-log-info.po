@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-09-09 06:08+0000\n"
-"PO-Revision-Date: 2014-08-27 12:47+0000\n"
+"POT-Creation-Date: 2014-10-07 06:07+0000\n"
+"PO-Revision-Date: 2014-10-03 03:50+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/"
 "ceilometer/language/pt_BR/)\n"
@@ -55,7 +55,7 @@ msgstr "Processo pai saiu inesperadamente, saindo"
 #: ceilometer/openstack/common/service.py:271
 #, python-format
 msgid "Child caught %s, exiting"
-msgstr ""
+msgstr "Filho capturado %s, terminando"
 
 #: ceilometer/openstack/common/service.py:310
 msgid "Forking too fast, sleeping"
@@ -88,7 +88,7 @@ msgstr "%s capturado, parando filhos"
 
 #: ceilometer/openstack/common/service.py:408
 msgid "Wait called after thread killed.  Cleaning up."
-msgstr ""
+msgstr "Espera requisitada depois que thread foi morta.  Limpando."
 
 #: ceilometer/openstack/common/service.py:424
 #, python-format
