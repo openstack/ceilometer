@@ -41,7 +41,7 @@ OPTS = [
                 default=False,
                 help='Requeue the sample on the collector sample queue '
                 'when the collector fails to dispatch it. This is only valid '
-                'if the sample come from the notifier publisher'),
+                'if the sample come from the notifier publisher.'),
 ]
 
 cfg.CONF.register_opts(OPTS, group="collector")

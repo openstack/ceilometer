@@ -25,13 +25,13 @@ LOG = log.getLogger(__name__)
 OPTS = [
     cfg.StrOpt('url_scheme',
                default='snmp://',
-               help='URL scheme to use for hardware nodes'),
+               help='URL scheme to use for hardware nodes.'),
     cfg.StrOpt('readonly_user_name',
                default='ro_snmp_user',
                help='SNMPd user name of all nodes running in the cloud.'),
     cfg.StrOpt('readonly_user_password',
                default='password',
-               help='SNMPd password of all the nodes running in the cloud'),
+               help='SNMPd password of all the nodes running in the cloud.'),
 ]
 cfg.CONF.register_opts(OPTS, group='hardware')
 

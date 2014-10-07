@@ -37,7 +37,7 @@ OPTS = [
     cfg.FloatOpt('heartbeat',
                  default=1.0,
                  help='Number of seconds between heartbeats for distributed '
-                      'coordination (float)')
+                      'coordination.')
 ]
 cfg.CONF.register_opts(OPTS, group='coordination')
 

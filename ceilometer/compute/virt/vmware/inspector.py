@@ -30,26 +30,26 @@ opt_group = cfg.OptGroup(name='vmware',
 OPTS = [
     cfg.StrOpt('host_ip',
                default='',
-               help='IP address of the VMware Vsphere host'),
+               help='IP address of the VMware Vsphere host.'),
     cfg.StrOpt('host_username',
                default='',
-               help='Username of VMware Vsphere'),
+               help='Username of VMware Vsphere.'),
     cfg.StrOpt('host_password',
                default='',
-               help='Password of VMware Vsphere',
+               help='Password of VMware Vsphere.',
                secret=True),
     cfg.IntOpt('api_retry_count',
                default=10,
-               help='Number of times a VMware Vsphere API must be retried'),
+               help='Number of times a VMware Vsphere API may be retried.'),
     cfg.FloatOpt('task_poll_interval',
                  default=0.5,
                  help='Sleep time in seconds for polling an ongoing async '
-                      'task'),
+                      'task.'),
     cfg.StrOpt('wsdl_location',
                help='Optional vim service WSDL location '
                     'e.g http://<server>/vimService.wsdl. '
                     'Optional over-ride to default location for bug '
-                    'work-arounds'),
+                    'work-arounds.'),
 ]
 
 cfg.CONF.register_group(opt_group)

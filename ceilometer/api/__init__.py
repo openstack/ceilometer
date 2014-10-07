@@ -32,8 +32,8 @@ API_SERVICE_OPTS = [
     cfg.BoolOpt('enable_reverse_dns_lookup',
                 default=False,
                 help=('Set it to False if your environment does not need '
-                      'or have dns server, otherwise it will delay the '
-                      'response from api.')
+                      'or have a DNS server, otherwise it will delay the '
+                      'response from the API.')
                 ),
 ]
 
