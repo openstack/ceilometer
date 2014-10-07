@@ -19,11 +19,11 @@
 """Tests alarm operation."""
 
 import datetime
-import json as jsonutils
 import uuid
 
 import mock
 import oslo.messaging.conffixture
+from oslo.serialization import jsonutils
 import six
 from six import moves
 
