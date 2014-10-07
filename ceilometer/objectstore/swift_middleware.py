@@ -44,6 +44,7 @@ import logging
 
 from oslo.utils import timeutils
 import six
+import six.moves.urllib.parse as urlparse
 
 from ceilometer.openstack.common import context
 from ceilometer import pipeline
@@ -144,7 +145,7 @@ class CeilometerMiddleware(object):
             return iter_response(iterable)
 
     def publish_sample(self, env, bytes_received, bytes_sent):
-        path = env['PATH_INFO']
+        path = urlparse.quote(env['PATH_INFO'])
         method = env['REQUEST_METHOD']
         headers = {}
         for header in env:
