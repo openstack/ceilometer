@@ -105,17 +105,17 @@ class Connection(base.Connection):
              f:r_metadata.display_name or f:r_metadata.tag
 
           - sources for all corresponding meters with prefix 's'
-          - all meters for this resource in format:
+          - all meters with prefix 'm' for this resource in format:
 
             .. code-block:: python
 
-              "%s+%s+%s!%s!%s" % (rts, source, counter_name, counter_type,
+              "%s:%s:%s:%s:%s" % (rts, source, counter_name, counter_type,
               counter_unit)
 
     - events:
 
       - row_key: timestamp of event's generation + uuid of event
-        in format: "%s+%s" % (ts, Event.message_id)
+        in format: "%s:%s" % (ts, Event.message_id)
       - Column Families:
 
         f: contains the following qualifiers:
@@ -126,7 +126,7 @@ class Connection(base.Connection):
 
             .. code-block:: python
 
-              "%s+%s" % (trait_name, trait_type)
+              "%s:%s" % (trait_name, trait_type)
     """
 
     CAPABILITIES = utils.update_nested(base.Connection.CAPABILITIES,
@@ -234,9 +234,9 @@ class Connection(base.Connection):
             resource_metadata = data.get('resource_metadata', {})
             # Determine the name of new meter
             rts = hbase_utils.timestamp(data['timestamp'])
-            new_meter = hbase_utils.format_meter_reference(
-                data['counter_name'], data['counter_type'],
-                data['counter_unit'], rts, data['source'])
+            new_meter = hbase_utils.prepare_key(
+                rts, data['source'], data['counter_name'],
+                data['counter_type'], data['counter_unit'])
 
             # TODO(nprivalova): try not to store resource_id
             resource = hbase_utils.serialize_entry(**{
@@ -255,8 +255,8 @@ class Connection(base.Connection):
 
             # Rowkey consists of reversed timestamp, meter and a
             # message signature for purposes of uniqueness
-            row = "%s_%d_%s" % (data['counter_name'], rts,
-                                data['message_signature'])
+            row = hbase_utils.prepare_key(data['counter_name'], rts,
+                                          data['message_signature'])
             record = hbase_utils.serialize_entry(
                 data, **{'source': data['source'], 'rts': rts,
                          'message': data, 'recorded_at': timeutils.utcnow()})
@@ -301,7 +301,7 @@ class Connection(base.Connection):
                 # manually
                 first_ts = min(meters, key=operator.itemgetter(1))[1]
                 last_ts = max(meters, key=operator.itemgetter(1))[1]
-                source = meters[0][0].split('+')[1]
+                source = meters[0][0][1]
                 # If we use QualifierFilter then HBase returnes only
                 # qualifiers filtered by. It will not return the whole entry.
                 # That's why if we need to ask additional qualifiers manually.
@@ -353,10 +353,9 @@ class Connection(base.Connection):
                 flatten_result, s, meters, md = hbase_utils.deserialize_entry(
                     data)
                 for m in meters:
-                    _m_rts, m_source, m_raw = m[0].split("+")
-                    name, type, unit = m_raw.split('!')
+                    _m_rts, m_source, name, m_type, unit = m[0]
                     meter_dict = {'name': name,
-                                  'type': type,
+                                  'type': m_type,
                                   'unit': unit,
                                   'resource_id': flatten_result['resource_id'],
                                   'project_id': flatten_result['project_id'],
@@ -365,8 +364,8 @@ class Connection(base.Connection):
                     if frozen_meter in result:
                         continue
                     result.add(frozen_meter)
-                    meter_dict.update({'source':
-                                       m_source if m_source else None})
+                    meter_dict.update({'source': m_source
+                                       if m_source else None})
 
                     yield models.Meter(**meter_dict)
 
@@ -517,13 +516,14 @@ class Connection(base.Connection):
                 # models.Event or purposes of storage event sorted by
                 # timestamp in the database.
                 ts = event_model.generated
-                row = "%d_%s" % (hbase_utils.timestamp(ts, reverse=False),
-                                 event_model.message_id)
+                row = hbase_utils.prepare_key(
+                    hbase_utils.timestamp(ts, reverse=False),
+                    event_model.message_id)
                 event_type = event_model.event_type
                 traits = {}
                 if event_model.traits:
                     for trait in event_model.traits:
-                        key = "%s+%d" % (trait.name, trait.dtype)
+                        key = hbase_utils.prepare_key(trait.name, trait.dtype)
                         traits[key] = trait.value
                 record = hbase_utils.serialize_entry(traits,
                                                      event_type=event_type,
@@ -553,16 +553,15 @@ class Connection(base.Connection):
             traits = []
             events_dict = hbase_utils.deserialize_entry(data)[0]
             for key, value in events_dict.items():
-                if (not key.startswith('event_type')
-                        and not key.startswith('timestamp')):
-                    trait_name, trait_dtype = key.rsplit('+', 1)
+                if isinstance(key, tuple):
+                    trait_name, trait_dtype = key
                     traits.append(ev_models.Trait(name=trait_name,
                                                   dtype=int(trait_dtype),
                                                   value=value))
-            ts, mess = event_id.split('_', 1)
+            ts, mess = event_id.split(':')
 
             yield ev_models.Event(
-                message_id=mess,
+                message_id=hbase_utils.unquote(mess),
                 event_type=events_dict['event_type'],
                 generated=events_dict['timestamp'],
                 traits=sorted(traits,
@@ -579,7 +578,7 @@ class Connection(base.Connection):
         for event_id, data in gen:
             events_dict = hbase_utils.deserialize_entry(data)[0]
             for key, value in events_dict.items():
-                if key.startswith('event_type'):
+                if not isinstance(key, tuple) and key.startswith('event_type'):
                     if value not in event_types:
                         event_types.add(value)
                         yield value
@@ -600,9 +599,8 @@ class Connection(base.Connection):
         for event_id, data in gen:
             events_dict = hbase_utils.deserialize_entry(data)[0]
             for key, value in events_dict.items():
-                if (not key.startswith('event_type') and
-                        not key.startswith('timestamp')):
-                    trait_name, trait_type = key.rsplit('+', 1)
+                if isinstance(key, tuple):
+                    trait_name, trait_type = key
                     if trait_name not in trait_names:
                         # Here we check that our method return only unique
                         # trait types, for ex. if it is found the same trait
@@ -629,8 +627,7 @@ class Connection(base.Connection):
         for event_id, data in gen:
             events_dict = hbase_utils.deserialize_entry(data)[0]
             for key, value in events_dict.items():
-                if (not key.startswith('event_type') and
-                        not key.startswith('timestamp')):
-                    trait_name, trait_type = key.rsplit('+', 1)
+                if isinstance(key, tuple):
+                    trait_name, trait_type = key
                     yield ev_models.Trait(name=trait_name,
                                           dtype=int(trait_type), value=value)
