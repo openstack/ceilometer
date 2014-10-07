@@ -16,6 +16,7 @@
 
 import functools
 
+from neutronclient.common import exceptions
 from neutronclient.v2_0 import client as clientv20
 from oslo.config import cfg
 
@@ -40,6 +41,10 @@ def logged(func):
     def with_logging(*args, **kwargs):
         try:
             return func(*args, **kwargs)
+        except exceptions.NeutronClientException as e:
+            # handles 404's when services are disabled in neutron
+            LOG.warn(e)
+            return []
         except Exception as e:
             LOG.exception(e)
             raise
