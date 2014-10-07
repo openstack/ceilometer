@@ -15,11 +15,15 @@
 # under the License.
 
 import mock
+from oslo.config import cfg
 
 from ceilometer.ipmi.pollsters import sensor
 from ceilometer.tests.ipmi.notifications import ipmi_test_data
 from ceilometer.tests.ipmi.pollsters import base
 
+
+CONF = cfg.CONF
+CONF.import_opt('host', 'ceilometer.service')
 
 TEMPERATURE_SENSOR_DATA = {
     'Temperature': ipmi_test_data.TEMPERATURE_DATA
@@ -54,7 +58,7 @@ class TestTemperatureSensorPollster(base.TestPollsterBase):
     def test_get_samples(self):
         self._test_get_samples()
 
-        self._verify_metering(10, float(32))
+        self._verify_metering(10, float(32), CONF.host)
 
 
 class TestFanSensorPollster(base.TestPollsterBase):
@@ -73,7 +77,7 @@ class TestFanSensorPollster(base.TestPollsterBase):
     def test_get_samples(self):
         self._test_get_samples()
 
-        self._verify_metering(12, float(7140))
+        self._verify_metering(12, float(7140), CONF.host)
 
 
 class TestCurrentSensorPollster(base.TestPollsterBase):
@@ -92,7 +96,7 @@ class TestCurrentSensorPollster(base.TestPollsterBase):
     def test_get_samples(self):
         self._test_get_samples()
 
-        self._verify_metering(1, float(130))
+        self._verify_metering(1, float(130), CONF.host)
 
 
 class TestVoltageSensorPollster(base.TestPollsterBase):
@@ -111,4 +115,4 @@ class TestVoltageSensorPollster(base.TestPollsterBase):
     def test_get_samples(self):
         self._test_get_samples()
 
-        self._verify_metering(4, float(3.309))
+        self._verify_metering(4, float(3.309), CONF.host)
