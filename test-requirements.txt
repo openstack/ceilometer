@@ -16,6 +16,7 @@ MySQL-python
 oslosphinx>=2.2.0  # Apache-2.0
 oslotest>=1.1.0  # Apache-2.0
 psycopg2
+pylint==0.25.2
 pymongo>=2.5
 python-subunit>=0.0.18
 sphinx>=1.1.2,!=1.2.0,<1.3
