@@ -34,8 +34,7 @@ class ComputePollster(plugin.PollsterBase):
 
     @property
     def default_discovery(self):
-        # get resources from agent-default discovery
-        return None
+        return 'local_instances'
 
     @abc.abstractmethod
     def get_samples(self, manager, cache, resources):
