@@ -29,13 +29,13 @@ from ceilometer import sample
 
 LOG = log.getLogger(__name__)
 
-service_types_opts = [
+SERVICE_OPTS = [
     cfg.StrOpt('kwapi',
                default='energy',
                help='Kwapi service type.'),
 ]
 
-cfg.CONF.register_opts(service_types_opts, group='service_types')
+cfg.CONF.register_opts(SERVICE_OPTS, group='service_types')
 
 
 class KwapiClient(object):

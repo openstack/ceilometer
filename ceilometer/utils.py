@@ -33,12 +33,14 @@ from oslo.utils import timeutils
 from oslo.utils import units
 import six
 
-rootwrap_conf = cfg.StrOpt('rootwrap_config',
-                           default="/etc/ceilometer/rootwrap.conf",
-                           help='Path to the rootwrap configuration file to'
-                                'use for running commands as root')
+OPTS = [
+    cfg.StrOpt('rootwrap_config',
+               default="/etc/ceilometer/rootwrap.conf",
+               help='Path to the rootwrap configuration file to'
+                    'use for running commands as root'),
+]
 CONF = cfg.CONF
-CONF.register_opt(rootwrap_conf)
+CONF.register_opts(OPTS)
 
 
 def _get_root_helper():

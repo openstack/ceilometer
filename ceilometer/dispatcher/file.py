@@ -22,7 +22,7 @@ from oslo.config import cfg
 
 from ceilometer import dispatcher
 
-file_dispatcher_opts = [
+OPTS = [
     cfg.StrOpt('file_path',
                help='Name and the location of the file to record '
                     'meters.'),
@@ -34,7 +34,7 @@ file_dispatcher_opts = [
                help='The max number of the files to keep.'),
 ]
 
-cfg.CONF.register_opts(file_dispatcher_opts, group="dispatcher_file")
+cfg.CONF.register_opts(OPTS, group="dispatcher_file")
 
 
 class FileDispatcher(dispatcher.Base):

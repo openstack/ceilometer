@@ -29,7 +29,7 @@ from ceilometer.openstack.common import log
 
 LOG = log.getLogger(__name__)
 
-REST_NOTIFIER_OPTS = [
+OPTS = [
     cfg.StrOpt('rest_notifier_certificate_file',
                default='',
                help='SSL Client certificate for REST notifier.'
@@ -50,7 +50,7 @@ REST_NOTIFIER_OPTS = [
 
 ]
 
-cfg.CONF.register_opts(REST_NOTIFIER_OPTS, group="alarm")
+cfg.CONF.register_opts(OPTS, group="alarm")
 
 
 class RestAlarmNotifier(notifier.AlarmNotifier):

@@ -22,20 +22,20 @@ from oslo.config import cfg
 from ceilometer.openstack.common import log
 
 
-nova_opts = [
+OPTS = [
     cfg.BoolOpt('nova_http_log_debug',
                 default=False,
                 help='Allow novaclient\'s debug log output.'),
 ]
 
-service_types_opts = [
+SERVICE_OPTS = [
     cfg.StrOpt('nova',
                default='compute',
                help='Nova service type.'),
 ]
 
-cfg.CONF.register_opts(nova_opts)
-cfg.CONF.register_opts(service_types_opts, group='service_types')
+cfg.CONF.register_opts(OPTS)
+cfg.CONF.register_opts(SERVICE_OPTS, group='service_types')
 
 cfg.CONF.import_group('service_credentials', 'ceilometer.service')
 

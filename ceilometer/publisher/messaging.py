@@ -35,7 +35,7 @@ from ceilometer.publisher import utils
 
 LOG = log.getLogger(__name__)
 
-METER_PUBLISH_RPC_OPTS = [
+RPC_OPTS = [
     cfg.StrOpt('metering_topic',
                default='metering',
                help='The topic that ceilometer uses for metering messages.',
@@ -43,7 +43,7 @@ METER_PUBLISH_RPC_OPTS = [
                ),
 ]
 
-METER_PUBLISH_NOTIFIER_OPTS = [
+NOTIFIER_OPTS = [
     cfg.StrOpt('metering_topic',
                default='metering',
                help='The topic that ceilometer uses for metering '
@@ -56,9 +56,9 @@ METER_PUBLISH_NOTIFIER_OPTS = [
                )
 ]
 
-cfg.CONF.register_opts(METER_PUBLISH_RPC_OPTS,
+cfg.CONF.register_opts(RPC_OPTS,
                        group="publisher_rpc")
-cfg.CONF.register_opts(METER_PUBLISH_NOTIFIER_OPTS,
+cfg.CONF.register_opts(NOTIFIER_OPTS,
                        group="publisher_notifier")
 cfg.CONF.import_opt('host', 'ceilometer.service')
 

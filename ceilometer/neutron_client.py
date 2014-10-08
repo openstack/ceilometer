@@ -23,13 +23,13 @@ from oslo.config import cfg
 from ceilometer.openstack.common import log
 
 
-service_types_opts = [
+SERVICE_OPTS = [
     cfg.StrOpt('neutron',
                default='network',
                help='Neutron service type.'),
 ]
 
-cfg.CONF.register_opts(service_types_opts, group='service_types')
+cfg.CONF.register_opts(SERVICE_OPTS, group='service_types')
 cfg.CONF.import_group('service_credentials', 'ceilometer.service')
 
 LOG = log.getLogger(__name__)

@@ -45,14 +45,14 @@ def get_ordereddict():
 
 OrderedDict = get_ordereddict()
 
-node_manager_init_retry = cfg.IntOpt('node_manager_init_retry',
-                                     default=3,
-                                     help='Number of retries upon Intel Node '
-                                          'Manager initialization failure')
-
-
+OPTS = [
+    cfg.IntOpt('node_manager_init_retry',
+               default=3,
+               help='Number of retries upon Intel Node '
+                    'Manager initialization failure')
+]
 CONF = cfg.CONF
-CONF.register_opt(node_manager_init_retry, group='ipmi')
+CONF.register_opts(OPTS, group='ipmi')
 
 IPMICMD = {"sdr_dump": "sdr dump",
            "sdr_info": "sdr info",

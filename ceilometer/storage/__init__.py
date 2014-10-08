@@ -30,17 +30,17 @@ from ceilometer import utils
 
 LOG = log.getLogger(__name__)
 
-OLD_STORAGE_OPTS = [
+OLD_OPTS = [
     cfg.StrOpt('database_connection',
                secret=True,
                help='DEPRECATED - Database connection string.',
                ),
 ]
 
-cfg.CONF.register_opts(OLD_STORAGE_OPTS)
+cfg.CONF.register_opts(OLD_OPTS)
 
 
-STORAGE_OPTS = [
+OPTS = [
     cfg.IntOpt('time_to_live',
                default=-1,
                help="Number of seconds that samples are kept "
@@ -59,7 +59,7 @@ STORAGE_OPTS = [
                'database. (if unset, connection is used)'),
 ]
 
-cfg.CONF.register_opts(STORAGE_OPTS, group='database')
+cfg.CONF.register_opts(OPTS, group='database')
 
 db_options.set_defaults(cfg.CONF)
 cfg.CONF.import_opt('connection', 'oslo.db.options', group='database')
