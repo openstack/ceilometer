@@ -1,4 +1,3 @@
-#
 # Copyright 2014 Red Hat, Inc
 #
 # Author: Nejc Saje <nsaje@redhat.com>
@@ -17,9 +16,9 @@
 
 from oslo.config import cfg
 
+from ceilometer.agent import plugin_base as plugin
 from ceilometer.i18n import _LW
 from ceilometer.openstack.common import log
-from ceilometer import plugin
 
 LOG = log.getLogger(__name__)
 
@@ -47,16 +46,3 @@ class EndpointDiscovery(plugin.DiscoveryBase):
             return []
         else:
             return endpoints
-
-
-class TenantDiscovery(plugin.DiscoveryBase):
-    """Discovery that supplies keystone tenants.
-
-    This discovery should be used when the pollster's work can't be divided
-    into smaller pieces than per-tenant. Example of this is the Swift
-    pollster, which polls account details and does so per-tenant.
-    """
-
-    def discover(self, manager, param=None):
-        tenants = manager.keystone.tenants.list()
-        return tenants or []

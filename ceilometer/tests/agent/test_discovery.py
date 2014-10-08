@@ -21,14 +21,14 @@ import mock
 from oslo.config import fixture as fixture_config
 from oslotest import base
 
-from ceilometer.central import discovery
+from ceilometer.agent.discovery import endpoint
 
 
 class TestEndpointDiscovery(base.BaseTestCase):
 
     def setUp(self):
         super(TestEndpointDiscovery, self).setUp()
-        self.discovery = discovery.EndpointDiscovery()
+        self.discovery = endpoint.EndpointDiscovery()
         self.manager = mock.MagicMock()
         self.CONF = self.useFixture(fixture_config.Config()).conf
 

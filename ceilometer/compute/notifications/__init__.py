@@ -18,7 +18,7 @@
 from oslo.config import cfg
 import oslo.messaging
 
-from ceilometer import plugin
+from ceilometer.agent import plugin_base
 
 
 OPTS = [
@@ -31,7 +31,7 @@ OPTS = [
 cfg.CONF.register_opts(OPTS)
 
 
-class ComputeNotificationBase(plugin.NotificationBase):
+class ComputeNotificationBase(plugin_base.NotificationBase):
     @staticmethod
     def get_targets(conf):
         """Return a sequence of oslo.messaging.Target

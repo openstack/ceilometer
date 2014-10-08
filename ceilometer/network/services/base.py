@@ -15,9 +15,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from ceilometer.agent import plugin_base
 from ceilometer import neutron_client
 from ceilometer.openstack.common import log
-from ceilometer import plugin
 
 LOG = log.getLogger(__name__)
 
@@ -30,7 +30,7 @@ STATUS = {
 }
 
 
-class BaseServicesPollster(plugin.PollsterBase):
+class BaseServicesPollster(plugin_base.PollsterBase):
 
     FIELDS = []
     nc = neutron_client.Client()

@@ -15,14 +15,14 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from ceilometer import agent
+from ceilometer.agent import manager
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.openstack.common import log
 
 LOG = log.getLogger(__name__)
 
 
-class AgentManager(agent.AgentManager):
+class AgentManager(manager.AgentManager):
 
     def __init__(self):
         super(AgentManager, self).__init__('compute')

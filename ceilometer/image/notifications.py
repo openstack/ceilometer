@@ -21,7 +21,7 @@
 from oslo.config import cfg
 import oslo.messaging
 
-from ceilometer import plugin
+from ceilometer.agent import plugin_base
 from ceilometer import sample
 
 OPTS = [
@@ -34,7 +34,7 @@ OPTS = [
 cfg.CONF.register_opts(OPTS)
 
 
-class ImageBase(plugin.NotificationBase):
+class ImageBase(plugin_base.NotificationBase):
     """Base class for image counting."""
 
     @staticmethod

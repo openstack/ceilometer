@@ -22,7 +22,7 @@ from oslotest import base
 from oslotest import mockpatch
 import six
 
-from ceilometer.central import manager
+from ceilometer.agent import manager
 from ceilometer.energy import kwapi
 from ceilometer.openstack.common import context
 

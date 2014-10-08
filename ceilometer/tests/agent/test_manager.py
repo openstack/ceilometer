@@ -22,10 +22,10 @@ from oslotest import base
 from oslotest import mockpatch
 from stevedore import extension
 
-from ceilometer.central import manager
-from ceilometer.central import plugin
+from ceilometer.agent import manager
+from ceilometer.agent import plugin_base
 from ceilometer import pipeline
-from ceilometer.tests import agentbase
+from ceilometer.tests.agent import agentbase
 
 
 class TestManager(base.BaseTestCase):
@@ -37,7 +37,7 @@ class TestManager(base.BaseTestCase):
 
 
 class TestPollsterKeystone(agentbase.TestPollster):
-    @plugin.check_keystone
+    @plugin_base.check_keystone
     def get_samples(self, manager, cache, resources):
         func = super(TestPollsterKeystone, self).get_samples
         return func(manager=manager,
@@ -111,3 +111,8 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         polling_tasks = self.mgr.setup_polling_tasks()
         self.mgr.interval_task(polling_tasks.values()[0])
         self.assertFalse(self.PollsterKeystone.samples)
+
+    def test_interval_exception_isolation(self):
+        super(TestRunTasks, self).test_interval_exception_isolation()
+        self.assertEqual(1, len(self.PollsterException.samples))
+        self.assertEqual(1, len(self.PollsterExceptionAnother.samples))

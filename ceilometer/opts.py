@@ -13,13 +13,13 @@
 # under the License.
 import itertools
 
+import ceilometer.agent.manager
 import ceilometer.alarm.notifier.rest
 import ceilometer.alarm.rpc
 import ceilometer.alarm.service
 import ceilometer.api
 import ceilometer.api.app
 import ceilometer.api.controllers.v2
-import ceilometer.central.manager
 import ceilometer.cmd.alarm
 import ceilometer.collector
 import ceilometer.compute.discovery
@@ -104,7 +104,7 @@ def list_opts():
         ('api',
          itertools.chain(ceilometer.api.OPTS,
                          ceilometer.api.app.API_OPTS,)),
-        ('central', ceilometer.central.manager.OPTS),
+        ('central', ceilometer.agent.manager.OPTS),
         ('collector', ceilometer.collector.OPTS),
         ('compute', ceilometer.compute.discovery.OPTS),
         ('coordination', ceilometer.coordination.OPTS),

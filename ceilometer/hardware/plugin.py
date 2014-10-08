@@ -25,7 +25,7 @@ import itertools
 from oslo.utils import netutils
 import six
 
-from ceilometer.central import plugin
+from ceilometer.agent import plugin_base
 from ceilometer.hardware import inspector as insloader
 from ceilometer.i18n import _
 from ceilometer.openstack.common import log
@@ -34,7 +34,7 @@ LOG = log.getLogger(__name__)
 
 
 @six.add_metaclass(abc.ABCMeta)
-class HardwarePollster(plugin.CentralPollster):
+class HardwarePollster(plugin_base.PollsterBase):
     """Base class for plugins that support the polling API."""
 
     CACHE_KEY = None

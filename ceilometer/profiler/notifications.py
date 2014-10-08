@@ -16,7 +16,7 @@
 from oslo.config import cfg
 import oslo.messaging
 
-from ceilometer import plugin
+from ceilometer.agent import plugin_base
 from ceilometer import sample
 
 
@@ -32,7 +32,7 @@ cfg.CONF.import_opt('keystone_control_exchange',
                     'ceilometer.identity.notifications')
 
 
-class ProfilerNotifications(plugin.NotificationBase):
+class ProfilerNotifications(plugin_base.NotificationBase):
 
     event_types = ["profiler.*"]
 

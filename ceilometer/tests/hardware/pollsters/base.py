@@ -18,7 +18,7 @@
 import fixtures
 import mock
 
-from ceilometer.central import manager
+from ceilometer.agent import manager
 from ceilometer.hardware.inspector import base as inspector_base
 from ceilometer.tests import base as test_base
 

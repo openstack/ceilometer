@@ -19,7 +19,7 @@ import mock
 from oslo.config import fixture as fixture_config
 from oslotest import base
 
-from ceilometer import plugin
+from ceilometer.agent import plugin_base
 
 
 TEST_NOTIFICATION = {
@@ -78,29 +78,29 @@ class NotificationBaseTestCase(base.BaseTestCase):
         self.CONF = self.useFixture(fixture_config.Config()).conf
 
     def test_handle_event_type(self):
-        self.assertFalse(plugin.NotificationBase._handle_event_type(
+        self.assertFalse(plugin_base.NotificationBase._handle_event_type(
             'compute.instance.start', ['compute']))
-        self.assertFalse(plugin.NotificationBase._handle_event_type(
+        self.assertFalse(plugin_base.NotificationBase._handle_event_type(
             'compute.instance.start', ['compute.*.foobar']))
-        self.assertFalse(plugin.NotificationBase._handle_event_type(
+        self.assertFalse(plugin_base.NotificationBase._handle_event_type(
             'compute.instance.start', ['compute.*.*.foobar']))
-        self.assertTrue(plugin.NotificationBase._handle_event_type(
+        self.assertTrue(plugin_base.NotificationBase._handle_event_type(
             'compute.instance.start', ['compute.*']))
-        self.assertTrue(plugin.NotificationBase._handle_event_type(
+        self.assertTrue(plugin_base.NotificationBase._handle_event_type(
             'compute.instance.start', ['*']))
-        self.assertTrue(plugin.NotificationBase._handle_event_type(
+        self.assertTrue(plugin_base.NotificationBase._handle_event_type(
             'compute.instance.start', ['compute.*.start']))
-        self.assertTrue(plugin.NotificationBase._handle_event_type(
+        self.assertTrue(plugin_base.NotificationBase._handle_event_type(
             'compute.instance.start', ['*.start']))
-        self.assertTrue(plugin.NotificationBase._handle_event_type(
+        self.assertTrue(plugin_base.NotificationBase._handle_event_type(
             'compute.instance.start', ['compute.*.*.foobar', 'compute.*']))
 
-    class FakePlugin(plugin.NotificationBase):
+    class FakePlugin(plugin_base.NotificationBase):
         def get_exchange_topics(self, conf):
-            return [plugin.ExchangeTopics(exchange="exchange1",
-                                          topics=["t1", "t2"]),
-                    plugin.ExchangeTopics(exchange="exchange2",
-                                          topics=['t3'])]
+            return [plugin_base.ExchangeTopics(exchange="exchange1",
+                                               topics=["t1", "t2"]),
+                    plugin_base.ExchangeTopics(exchange="exchange2",
+                                               topics=['t3'])]
 
         def process_notification(self, message):
             return message

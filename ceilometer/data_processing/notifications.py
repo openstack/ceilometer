@@ -17,7 +17,7 @@
 from oslo.config import cfg
 import oslo.messaging
 
-from ceilometer import plugin
+from ceilometer.agent import plugin_base
 from ceilometer import sample
 
 
@@ -31,7 +31,7 @@ cfg.CONF.register_opts(OPTS)
 SERVICE = 'sahara'
 
 
-class DataProcessing(plugin.NotificationBase):
+class DataProcessing(plugin_base.NotificationBase):
 
     resource_name = '%s.cluster' % SERVICE
 

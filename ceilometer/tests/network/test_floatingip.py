@@ -22,7 +22,7 @@
 import mock
 from oslotest import base
 
-from ceilometer.central import manager
+from ceilometer.agent import manager
 from ceilometer.network import floatingip
 from ceilometer.openstack.common import context
 

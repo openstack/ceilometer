@@ -21,8 +21,8 @@ notification events.
 from oslo.config import cfg
 from oslo import messaging
 
+from ceilometer.agent import plugin_base
 from ceilometer.openstack.common import log
-from ceilometer import plugin
 from ceilometer import sample
 
 LOG = log.getLogger(__name__)
@@ -67,7 +67,7 @@ class InvalidSensorData(ValueError):
     pass
 
 
-class SensorNotification(plugin.NotificationBase):
+class SensorNotification(plugin_base.NotificationBase):
     """A generic class for extracting samples from sensor data notifications.
 
     A notification message can contain multiple samples from multiple

@@ -14,10 +14,10 @@
 
 from oslo.config import cfg
 
+from ceilometer.agent import plugin_base
 from ceilometer.i18n import _
 from ceilometer import nova_client
 from ceilometer.openstack.common import log
-from ceilometer import plugin
 
 
 LOG = log.getLogger(__name__)
@@ -37,7 +37,7 @@ OPTS = [
 cfg.CONF.register_opts(OPTS, group='hardware')
 
 
-class NodesDiscoveryTripleO(plugin.DiscoveryBase):
+class NodesDiscoveryTripleO(plugin_base.DiscoveryBase):
     def __init__(self):
         super(NodesDiscoveryTripleO, self).__init__()
         self.nova_cli = nova_client.Client()

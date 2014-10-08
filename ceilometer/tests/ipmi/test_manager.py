@@ -17,10 +17,11 @@
 """
 
 from ceilometer.ipmi import manager
-from ceilometer.tests import agentbase
 
 import mock
 from oslotest import base
+
+from ceilometer.tests.agent import agentbase
 
 
 class TestManager(base.BaseTestCase):

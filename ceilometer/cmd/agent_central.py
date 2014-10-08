@@ -14,7 +14,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from ceilometer.central import manager
+from ceilometer.agent import manager
 from ceilometer.openstack.common import service as os_service
 from ceilometer import service
 

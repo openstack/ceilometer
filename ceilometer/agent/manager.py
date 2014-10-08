@@ -18,30 +18,32 @@
 from keystoneclient.v2_0 import client as ksclient
 from oslo.config import cfg
 
-from ceilometer import agent
+from ceilometer.agent import base
 from ceilometer.openstack.common import log
 
 OPTS = [
     cfg.StrOpt('partitioning_group_prefix',
                default=None,
+               deprecated_group='central',
                help='Work-load partitioning group prefix. Use only if you '
-                    'want to run multiple central agents with different '
-                    'config files. For each sub-group of the central agent '
+                    'want to run multiple polling agents with different '
+                    'config files. For each sub-group of the agent '
                     'pool with the same partitioning_group_prefix a disjoint '
                     'subset of pollsters should be loaded.'),
 ]
-cfg.CONF.register_opts(OPTS, group='central')
-cfg.CONF.import_opt('http_timeout', 'ceilometer.service')
+
+cfg.CONF.register_opts(OPTS, group='polling')
 cfg.CONF.import_group('service_credentials', 'ceilometer.service')
+cfg.CONF.import_opt('http_timeout', 'ceilometer.service')
 
 LOG = log.getLogger(__name__)
 
 
-class AgentManager(agent.AgentManager):
+class AgentManager(base.AgentManager):
 
-    def __init__(self):
+    def __init__(self, namespace='agent'):
         super(AgentManager, self).__init__(
-            'central', group_prefix=cfg.CONF.central.partitioning_group_prefix)
+            namespace, group_prefix=cfg.CONF.polling.partitioning_group_prefix)
 
     def interval_task(self, task):
         try:

@@ -20,12 +20,12 @@ import six
 from six.moves.urllib import parse as urlparse
 from stevedore import driver as _driver
 
-from ceilometer.central import plugin
+from ceilometer.agent import plugin_base
 from ceilometer import sample
 
 
 @six.add_metaclass(abc.ABCMeta)
-class _Base(plugin.CentralPollster):
+class _Base(plugin_base.PollsterBase):
 
     NAMESPACE = 'network.statistics.drivers'
     drivers = {}

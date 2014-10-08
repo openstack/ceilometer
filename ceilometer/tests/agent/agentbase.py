@@ -31,8 +31,8 @@ from oslotest import mockpatch
 import six
 from stevedore import extension
 
+from ceilometer.agent import plugin_base
 from ceilometer import pipeline
-from ceilometer import plugin
 from ceilometer import publisher
 from ceilometer.publisher import test as test_publisher
 from ceilometer import sample
@@ -70,7 +70,7 @@ default_test_data = TestSample(
 )
 
 
-class TestPollster(plugin.PollsterBase):
+class TestPollster(plugin_base.PollsterBase):
     test_data = default_test_data
     discovery = None
 
@@ -95,13 +95,13 @@ class TestPollsterException(TestPollster):
         raise Exception()
 
 
-class TestDiscovery(plugin.DiscoveryBase):
+class TestDiscovery(plugin_base.DiscoveryBase):
     def discover(self, manager, param=None):
         self.params.append(param)
         return self.resources
 
 
-class TestDiscoveryException(plugin.DiscoveryBase):
+class TestDiscoveryException(plugin_base.DiscoveryBase):
     def discover(self, manager, param=None):
         self.params.append(param)
         raise Exception()
@@ -310,7 +310,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
     def test_setup_polling_tasks(self):
         polling_tasks = self.mgr.setup_polling_tasks()
         self.assertEqual(1, len(polling_tasks))
-        self.assertIn(60, polling_tasks.keys())
+        self.assertTrue(60 in polling_tasks.keys())
         per_task_resources = polling_tasks[60].resources
         self.assertEqual(1, len(per_task_resources))
         self.assertEqual(set(self.pipeline_cfg[0]['resources']),
@@ -332,8 +332,8 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.setup_pipeline()
         polling_tasks = self.mgr.setup_polling_tasks()
         self.assertEqual(2, len(polling_tasks))
-        self.assertIn(60, polling_tasks.keys())
-        self.assertIn(10, polling_tasks.keys())
+        self.assertTrue(60 in polling_tasks.keys())
+        self.assertTrue(10 in polling_tasks.keys())
 
     def test_setup_polling_tasks_mismatch_counter(self):
         self.pipeline_cfg.append(
@@ -347,7 +347,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
             })
         polling_tasks = self.mgr.setup_polling_tasks()
         self.assertEqual(1, len(polling_tasks))
-        self.assertIn(60, polling_tasks.keys())
+        self.assertTrue(60 in polling_tasks.keys())
 
     def test_setup_polling_task_same_interval(self):
         self.pipeline_cfg.append({
@@ -529,7 +529,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.setup_pipeline()
         polling_tasks = self.mgr.setup_polling_tasks()
         self.assertEqual(1, len(polling_tasks))
-        self.assertIn(60, polling_tasks.keys())
+        self.assertTrue(60 in polling_tasks.keys())
         self.mgr.interval_task(polling_tasks.get(60))
         self.assertEqual([None], self.Discovery.params)
         self.assertEqual([None], self.DiscoveryAnother.params)
@@ -553,11 +553,11 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
             published = pipe_line.publishers[0].samples[0]
             published_resources = published.resource_metadata['resources']
             self.assertEqual(3, len(published_resources))
-            self.assertIn(published_resources[0], expected_pipelines)
+            self.assertTrue(published_resources[0] in expected_pipelines)
             self.assertEqual(expected_pipelines[published_resources[0]],
                              pipe_line.name)
             for published_resource in published_resources:
-                self.assertIn(published_resource, all_resources)
+                self.assertTrue(published_resource in all_resources)
             sunk_resources.extend(published_resources)
         self.assertEqual(all_resources, set(sunk_resources))
 
@@ -585,7 +585,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.setup_pipeline()
         polling_tasks = self.mgr.setup_polling_tasks()
         self.assertEqual(1, len(polling_tasks))
-        self.assertIn(60, polling_tasks.keys())
+        self.assertTrue(60 in polling_tasks.keys())
         self.mgr.interval_task(polling_tasks.get(60))
         self.assertEqual(1, len(self.Pollster.samples))
         self.assertEqual(['discovered_1', 'discovered_2'],
@@ -612,7 +612,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.setup_pipeline()
         polling_tasks = self.mgr.setup_polling_tasks()
         self.assertEqual(1, len(polling_tasks))
-        self.assertIn(60, polling_tasks.keys())
+        self.assertTrue(60 in polling_tasks.keys())
         self.mgr.interval_task(polling_tasks.get(60))
         self.assertEqual(1, len(self.Pollster.samples))
         self.assertEqual(['discovered_1', 'discovered_2'],
@@ -681,7 +681,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         polling_task = self.mgr.setup_polling_tasks().values()[0]
         pollster = list(polling_task.pollster_matches['test_pipeline'])[0]
         LOG = mock.MagicMock()
-        with mock.patch('ceilometer.agent.LOG', LOG):
+        with mock.patch('ceilometer.agent.base.LOG', LOG):
             polling_task.poll_and_publish()
             if not self.mgr.discover():
                 LOG.info.assert_called_with('Skip polling pollster %s, no '
