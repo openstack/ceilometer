@@ -17,7 +17,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import ceilometer
-from ceilometer.compute import plugin
+from ceilometer.compute import pollsters
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.i18n import _
@@ -27,13 +27,13 @@ from ceilometer import sample
 LOG = log.getLogger(__name__)
 
 
-class CPUPollster(plugin.ComputePollster):
+class CPUPollster(pollsters.BaseComputePollster):
 
     def get_samples(self, manager, cache, resources):
         for instance in resources:
             LOG.debug(_('checking instance %s'), instance.id)
             try:
-                cpu_info = manager.inspector.inspect_cpus(instance)
+                cpu_info = self.inspector.inspect_cpus(instance)
                 LOG.debug(_("CPUTIME USAGE: %(instance)s %(time)d"),
                           {'instance': instance.__dict__,
                            'time': cpu_info.time})
@@ -52,20 +52,20 @@ class CPUPollster(plugin.ComputePollster):
             except ceilometer.NotImplementedError:
                 # Selected inspector does not implement this pollster.
                 LOG.debug(_('Obtaining CPU time is not implemented for %s'
-                            ), manager.inspector.__class__.__name__)
+                            ), self.inspector.__class__.__name__)
             except Exception as err:
                 LOG.exception(_('could not get CPU time for %(id)s: %(e)s'),
                               {'id': instance.id, 'e': err})
 
 
-class CPUUtilPollster(plugin.ComputePollster):
+class CPUUtilPollster(pollsters.BaseComputePollster):
 
     def get_samples(self, manager, cache, resources):
         self._inspection_duration = self._record_poll_time()
         for instance in resources:
             LOG.debug(_('Checking CPU util for instance %s'), instance.id)
             try:
-                cpu_info = manager.inspector.inspect_cpu_util(
+                cpu_info = self.inspector.inspect_cpu_util(
                     instance, self._inspection_duration)
                 LOG.debug(_("CPU UTIL: %(instance)s %(util)d"),
                           ({'instance': instance.__dict__,
@@ -83,7 +83,7 @@ class CPUUtilPollster(plugin.ComputePollster):
             except ceilometer.NotImplementedError:
                 # Selected inspector does not implement this pollster.
                 LOG.debug(_('Obtaining CPU Util is not implemented for %s'),
-                          manager.inspector.__class__.__name__)
+                          self.inspector.__class__.__name__)
             except Exception as err:
                 LOG.exception(_('Could not get CPU Util for %(id)s: %(e)s'),
                               {'id': instance.id, 'e': err})

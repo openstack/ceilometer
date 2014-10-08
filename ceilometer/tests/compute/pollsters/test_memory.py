@@ -15,7 +15,7 @@
 
 import mock
 
-from ceilometer.compute import manager
+from ceilometer.agent import manager
 from ceilometer.compute.pollsters import memory
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.tests.compute.pollsters import base

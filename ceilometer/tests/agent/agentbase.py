@@ -180,7 +180,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
             self.pipeline_cfg,
             self.transformer_manager)
 
-    def get_extension_list(self):
+    def create_extension_list(self):
         return [extension.Extension('test',
                                     None,
                                     None,
@@ -197,11 +197,6 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
                                     None,
                                     None,
                                     self.PollsterExceptionAnother(), )]
-
-    def create_pollster_manager(self):
-        return extension.ExtensionManager.make_test_instance(
-            self.get_extension_list(),
-        )
 
     def create_discovery_manager(self):
         return extension.ExtensionManager.make_test_instance(
@@ -232,7 +227,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
     def setUp(self):
         super(BaseAgentManagerTestCase, self).setUp()
         self.mgr = self.create_manager()
-        self.mgr.pollster_manager = self.create_pollster_manager()
+        self.mgr.extensions = self.create_extension_list()
         self.mgr.partition_coordinator = mock.MagicMock()
         fake_subset = lambda _, x: x
         p_coord = self.mgr.partition_coordinator
@@ -404,7 +399,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
 
     def test_agent_manager_start(self):
         mgr = self.create_manager()
-        mgr.pollster_manager = self.mgr.pollster_manager
+        mgr.extensions = self.mgr.extensions
         mgr.create_polling_task = mock.MagicMock()
         mgr.tg = mock.MagicMock()
         mgr.start()

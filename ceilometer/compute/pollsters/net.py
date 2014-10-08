@@ -22,7 +22,7 @@ import copy
 from oslo.utils import timeutils
 
 import ceilometer
-from ceilometer.compute import plugin
+from ceilometer.compute import pollsters
 from ceilometer.compute.pollsters import util
 from ceilometer.compute import util as compute_util
 from ceilometer.compute.virt import inspector as virt_inspector
@@ -33,7 +33,7 @@ from ceilometer import sample
 LOG = log.getLogger(__name__)
 
 
-class _Base(plugin.ComputePollster):
+class _Base(pollsters.BaseComputePollster):
 
     NET_USAGE_MESSAGE = ' '.join(["NETWORK USAGE:", "%s %s:", "read-bytes=%d",
                                   "write-bytes=%d"])
@@ -96,7 +96,7 @@ class _Base(plugin.ComputePollster):
             try:
                 vnics = self._get_vnics_for_instance(
                     cache,
-                    manager.inspector,
+                    self.inspector,
                     instance,
                 )
                 for vnic, info in vnics:
@@ -111,7 +111,7 @@ class _Base(plugin.ComputePollster):
                 # Selected inspector does not implement this pollster.
                 LOG.debug(_('%(inspector)s does not provide data for '
                             ' %(pollster)s'),
-                          {'inspector': manager.inspector.__class__.__name__,
+                          {'inspector': self.inspector.__class__.__name__,
                            'pollster': self.__class__.__name__})
             except Exception as err:
                 LOG.exception(_('Ignoring instance %(name)s: %(error)s'),

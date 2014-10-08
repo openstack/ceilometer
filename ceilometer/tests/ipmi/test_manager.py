@@ -29,7 +29,7 @@ class TestManager(base.BaseTestCase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_load_plugins(self):
         mgr = manager.AgentManager()
-        self.assertIsNotNone(list(mgr.pollster_manager))
+        self.assertIsNotNone(list(mgr.extensions))
 
 
 class TestRunTasks(agentbase.BaseAgentManagerTestCase):
