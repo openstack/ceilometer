@@ -40,11 +40,11 @@ class SystemCpuIdlePollster(_SystemBase):
 
 class SystemIORawSentPollster(_SystemBase):
     IDENTIFIER = 'system_stats.io.outgoing.blocks'
-    TYPE = sample.TYPE_CUMULATIVE,
+    TYPE = sample.TYPE_CUMULATIVE
     UNIT = 'blocks'
 
 
 class SystemIORawReceivedPollster(_SystemBase):
     IDENTIFIER = 'system_stats.io.incoming.blocks'
-    TYPE = sample.TYPE_CUMULATIVE,
+    TYPE = sample.TYPE_CUMULATIVE
     UNIT = 'blocks'
