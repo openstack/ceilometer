@@ -38,8 +38,33 @@ class DatabaseDispatcher(dispatcher.Base):
     """
     def __init__(self, conf):
         super(DatabaseDispatcher, self).__init__(conf)
-        self.meter_conn = storage.get_connection_from_config(conf, 'metering')
-        self.event_conn = storage.get_connection_from_config(conf, 'event')
+
+        self._meter_conn = self._get_db_conn('metering', True)
+        self._event_conn = self._get_db_conn('event', True)
+
+    def _get_db_conn(self, purpose, ignore_exception=False):
+        try:
+            return storage.get_connection_from_config(self.conf, purpose)
+        except Exception as err:
+            params = {"purpose": purpose, "err": err}
+            LOG.exception(_("Failed to connect to db, purpose %(purpose)s "
+                            "re-try later: %(err)s") % params)
+            if not ignore_exception:
+                raise
+
+    @property
+    def meter_conn(self):
+        if not self._meter_conn:
+            self._meter_conn = self._get_db_conn('metering')
+
+        return self._meter_conn
+
+    @property
+    def event_conn(self):
+        if not self._event_conn:
+            self._event_conn = self._get_db_conn('event')
+
+        return self._event_conn
 
     def record_metering_data(self, data):
         # We may have receive only one counter on the wire

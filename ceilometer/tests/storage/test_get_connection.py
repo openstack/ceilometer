@@ -16,8 +16,10 @@
 # under the License.
 """Tests for ceilometer/storage/
 """
+import mock
 from oslo.config import fixture as fixture_config
 from oslotest import base
+import retrying
 
 from ceilometer.alarm.storage import impl_log as impl_log_alarm
 from ceilometer.alarm.storage import impl_sqlalchemy as impl_sqlalchemy_alarm
@@ -30,7 +32,6 @@ import six
 
 
 class EngineTest(base.BaseTestCase):
-
     def test_get_connection(self):
         engine = storage.get_connection('log://localhost',
                                         'ceilometer.metering.storage')
@@ -42,6 +43,23 @@ class EngineTest(base.BaseTestCase):
                                    'ceilometer.metering.storage')
         except RuntimeError as err:
             self.assertIn('no-such-engine', six.text_type(err))
+
+
+class ConnectionRetryTest(base.BaseTestCase):
+    def setUp(self):
+        super(ConnectionRetryTest, self).setUp()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
+
+    def test_retries(self):
+        with mock.patch.object(retrying.time, 'sleep') as retry_sleep:
+            try:
+                self.CONF.set_override("connection", "no-such-engine://",
+                                       group="database")
+                storage.get_connection_from_config(self.CONF)
+            except RuntimeError as err:
+                self.assertIn('no-such-engine', six.text_type(err))
+                self.assertEqual(retry_sleep.call_count, 9)
+                retry_sleep.assert_called_with(10.0)
 
 
 class ConnectionConfigTest(base.BaseTestCase):
