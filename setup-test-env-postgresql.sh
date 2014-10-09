@@ -16,7 +16,7 @@ check_for_cmd pg_config
 PGSQL_DATA=`mktemp -d /tmp/CEILO-PGSQL-XXXXX`
 trap "clean_exit ${PGSQL_DATA}" EXIT
 PGSQL_PATH=`pg_config --bindir`
-${PGSQL_PATH}/initdb ${PGSQL_DATA}
+${PGSQL_PATH}/initdb -E UTF8 ${PGSQL_DATA}
 mkfifo ${PGSQL_DATA}/out
 ${PGSQL_PATH}/postgres -N 100 -F -k ${PGSQL_DATA} -D ${PGSQL_DATA} -p 9823 &> ${PGSQL_DATA}/out &
 # Wait for PostgreSQL to start listening to connections
