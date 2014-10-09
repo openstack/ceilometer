@@ -1,0 +1,33 @@
+# Format is:
+# <preferred e-mail> <other e-mail 1>
+# <preferred e-mail> <other e-mail 2>
+Adam Gandelman <adamg@canonical.com> <adamg@ubuntu.com>
+Alan Pevec <alan.pevec@redhat.com> <apevec@redhat.com>
+Alexei Kornienko <akornienko@mirantis.com> <alexei.kornienko@gmail.com>
+ChangBo Guo(gcb) <eric.guo@easystack.cn> Chang Bo Guo <guochbo@cn.ibm.com>
+Chinmaya Bharadwaj <chinmaya-bharadwaj.a@hp.com> chinmay <chinmaya-bharadwaj.a@hp.com>
+Clark Boylan <cboylan@sapwetik.org> <clark.boylan@gmail.com>
+Doug Hellmann <doug@doughellmann.com> <doug.hellmann@dreamhost.com>
+Fei Long Wang <flwang@catalyst.net.nz> <flwang@cn.ibm.com>
+Fengqian Gao <fengqian.gao@intel.com> Fengqian <fengqian.gao@intel.com>
+Fengqian Gao <fengqian.gao@intel.com> Fengqian.Gao <fengqian.gao@intel.com>
+Gordon Chung <gord@live.ca> gordon chung <gord@live.ca>
+Gordon Chung <gord@live.ca> Gordon Chung <chungg@ca.ibm.com>
+Gordon Chung <gord@live.ca> gordon chung <chungg@ca.ibm.com>
+Ildiko Vancsa <ildiko.vancsa@ericsson.com> Ildiko <ildiko.vancsa@ericsson.com>
+John H. Tran <jhtran@att.com> John Tran <jhtran@att.com>
+Julien Danjou <julien.danjou@enovance.com> <julien@danjou.info>
+LiuSheng <liusheng@huawei.com> liu-sheng <liusheng@huawei.com>
+Mehdi Abaakouk <mehdi.abaakouk@enovance.com> <sileht@sileht.net>
+Nejc Saje <nsaje@redhat.com> <nejc@saje.info>
+Nejc Saje <nsaje@redhat.com> <nejc.saje@xlab.si>
+Nicolas Barcet (nijaba) <nick@enovance.com> <nick.barcet@canonical.com>
+Pádraig Brady <pbrady@redhat.com> <P@draigBrady.com>
+Rich Bowen <rbowen@redhat.com> <rbowen@rcbowen.com>
+Sandy Walsh <sandy.walsh@rackspace.com> <sandy@sandywalsh.com>
+Sascha Peilicke <speilicke@suse.com> <saschpe@gmx.de>
+Sean Dague <sean.dague@samsung.com> <sean@dague.net>
+Shengjie Min <shengjie_min@dell.com> shengjie-min <shengjie_min@dell.com>
+Shuangtai Tian <shuangtai.tian@intel.com> shuangtai <shuangtai.tian@intel.com>
+Swann Croiset <swann.croiset@bull.net> <swann@oopss.org>
+ZhiQiang Fan <zhiqiang.fan@huawei.com> <aji.zqfan@gmail.com>
