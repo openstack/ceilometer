@@ -24,6 +24,7 @@ from oslo.utils import timeutils
 import ceilometer
 from ceilometer.compute import plugin
 from ceilometer.compute.pollsters import util
+from ceilometer.compute import util as compute_util
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
@@ -44,6 +45,9 @@ class _Base(plugin.ComputePollster):
         resource_metadata['instance_id'] = instance.id
         resource_metadata['instance_type'] = (instance.flavor['id'] if
                                               instance.flavor else None)
+
+        compute_util.add_reserved_user_metadata(instance.metadata,
+                                                resource_metadata)
 
         if vnic_data.fref is not None:
             rid = vnic_data.fref
