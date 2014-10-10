@@ -38,7 +38,8 @@ class DatabaseDispatcher(dispatcher.Base):
     """
     def __init__(self, conf):
         super(DatabaseDispatcher, self).__init__(conf)
-        self.storage_conn = storage.get_connection_from_config(conf)
+        self.meter_conn = storage.get_connection_from_config(conf, 'metering')
+        self.event_conn = storage.get_connection_from_config(conf, 'event')
 
     def record_metering_data(self, data):
         # We may have receive only one counter on the wire
@@ -63,7 +64,7 @@ class DatabaseDispatcher(dispatcher.Base):
                     if meter.get('timestamp'):
                         ts = timeutils.parse_isotime(meter['timestamp'])
                         meter['timestamp'] = timeutils.normalize_time(ts)
-                    self.storage_conn.record_metering_data(meter)
+                    self.meter_conn.record_metering_data(meter)
                 except Exception as err:
                     LOG.exception(_('Failed to record metering data: %s'),
                                   err)
@@ -76,4 +77,4 @@ class DatabaseDispatcher(dispatcher.Base):
         if not isinstance(events, list):
             events = [events]
 
-        return self.storage_conn.record_events(events)
+        return self.event_conn.record_events(events)

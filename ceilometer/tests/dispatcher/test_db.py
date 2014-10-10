@@ -15,12 +15,14 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import datetime
+import uuid
 
 import mock
 from oslo.config import fixture as fixture_config
 from oslotest import base
 
 from ceilometer.dispatcher import database
+from ceilometer.event.storage import models as event_models
 from ceilometer.publisher import utils
 
 
@@ -33,6 +35,15 @@ class TestDispatcherDB(base.BaseTestCase):
         self.dispatcher = database.DatabaseDispatcher(self.CONF)
         self.ctx = None
 
+    def test_event_conn(self):
+        event = event_models.Event(uuid.uuid4(), 'test',
+                                   datetime.datetime(2012, 7, 2, 13, 53, 40),
+                                   [])
+        with mock.patch.object(self.dispatcher.event_conn,
+                               'record_events') as record_events:
+            self.dispatcher.record_events(event)
+        self.assertTrue(record_events.called)
+
     def test_valid_message(self):
         msg = {'counter_name': 'test',
                'resource_id': self.id(),
@@ -43,7 +54,7 @@ class TestDispatcherDB(base.BaseTestCase):
             self.CONF.publisher.metering_secret,
         )
 
-        with mock.patch.object(self.dispatcher.storage_conn,
+        with mock.patch.object(self.dispatcher.meter_conn,
                                'record_metering_data') as record_metering_data:
             self.dispatcher.record_metering_data(msg)
 
@@ -62,11 +73,11 @@ class TestDispatcherDB(base.BaseTestCase):
             def record_metering_data(self, data):
                 self.called = True
 
-        self.dispatcher.storage_conn = ErrorConnection()
+        self.dispatcher.meter_conn = ErrorConnection()
 
         self.dispatcher.record_metering_data(msg)
 
-        if self.dispatcher.storage_conn.called:
+        if self.dispatcher.meter_conn.called:
             self.fail('Should not have called the storage connection')
 
     def test_timestamp_conversion(self):
@@ -83,7 +94,7 @@ class TestDispatcherDB(base.BaseTestCase):
         expected = msg.copy()
         expected['timestamp'] = datetime.datetime(2012, 7, 2, 13, 53, 40)
 
-        with mock.patch.object(self.dispatcher.storage_conn,
+        with mock.patch.object(self.dispatcher.meter_conn,
                                'record_metering_data') as record_metering_data:
             self.dispatcher.record_metering_data(msg)
 
@@ -104,7 +115,7 @@ class TestDispatcherDB(base.BaseTestCase):
         expected['timestamp'] = datetime.datetime(2012, 9, 30, 23,
                                                   31, 50, 262000)
 
-        with mock.patch.object(self.dispatcher.storage_conn,
+        with mock.patch.object(self.dispatcher.meter_conn,
                                'record_metering_data') as record_metering_data:
             self.dispatcher.record_metering_data(msg)
 
