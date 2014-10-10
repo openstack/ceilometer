@@ -173,7 +173,6 @@ class Connection(object):
     }
 
     def __init__(self, url):
-        """Constructor."""
         pass
 
     @staticmethod

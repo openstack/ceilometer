@@ -10,21 +10,15 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""HBase storage backend
-"""
-import datetime
-import os
 
-import happybase
-from oslo.utils import netutils
-from six.moves.urllib import parse as urlparse
+import datetime
 
 import ceilometer
 from ceilometer.alarm.storage import base
 from ceilometer.alarm.storage import models
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
-from ceilometer.storage.hbase import inmemory as hbase_inmemory
+from ceilometer.storage.hbase import base as hbase_base
 from ceilometer.storage.hbase import migration as hbase_migration
 from ceilometer.storage.hbase import utils as hbase_utils
 from ceilometer import utils
@@ -45,8 +39,8 @@ AVAILABLE_STORAGE_CAPABILITIES = {
 }
 
 
-class Connection(base.Connection):
-    """Put the data into a HBase database
+class Connection(hbase_base.Connection, base.Connection):
+    """Put the alarm data into a HBase database
 
     Collections:
 
@@ -78,25 +72,7 @@ class Connection(base.Connection):
     ALARM_HISTORY_TABLE = "alarm_h"
 
     def __init__(self, url):
-        """Hbase Connection Initialization."""
-        opts = self._parse_connection_url(url)
-
-        if opts['host'] == '__test__':
-            url = os.environ.get('CEILOMETER_TEST_HBASE_URL')
-            if url:
-                # Reparse URL, but from the env variable now
-                opts = self._parse_connection_url(url)
-                self.conn_pool = self._get_connection_pool(opts)
-            else:
-                # This is a in-memory usage for unit tests
-                if Connection._memory_instance is None:
-                    LOG.debug(_('Creating a new in-memory HBase '
-                              'Connection object'))
-                    Connection._memory_instance = (hbase_inmemory.
-                                                   MConnectionPool())
-                self.conn_pool = Connection._memory_instance
-        else:
-            self.conn_pool = self._get_connection_pool(opts)
+        super(Connection, self).__init__(url)
 
     def upgrade(self):
         tables = [self.ALARM_HISTORY_TABLE, self.ALARM_TABLE]
@@ -118,43 +94,6 @@ class Connection(base.Connection):
                     conn.delete_table(table)
                 except Exception:
                     LOG.debug(_('Cannot delete table but ignoring error'))
-
-    @staticmethod
-    def _get_connection_pool(conf):
-        """Return a connection pool to the database.
-
-        .. note::
-
-          The tests use a subclass to override this and return an
-          in-memory connection pool.
-        """
-        LOG.debug(_('connecting to HBase on %(host)s:%(port)s') % (
-                  {'host': conf['host'], 'port': conf['port']}))
-        return happybase.ConnectionPool(size=100, host=conf['host'],
-                                        port=conf['port'],
-                                        table_prefix=conf['table_prefix'])
-
-    @staticmethod
-    def _parse_connection_url(url):
-        """Parse connection parameters from a database url.
-
-        .. note::
-
-          HBase Thrift does not support authentication and there is no
-          database name, so we are not looking for these in the url.
-        """
-        opts = {}
-        result = netutils.urlsplit(url)
-        opts['table_prefix'] = urlparse.parse_qs(
-            result.query).get('table_prefix', [None])[0]
-        opts['dbtype'] = result.scheme
-        if ':' in result.netloc:
-            opts['host'], port = result.netloc.split(':')
-        else:
-            opts['host'] = result.netloc
-            port = 9090
-        opts['port'] = port and int(port) or 9090
-        return opts
 
     def update_alarm(self, alarm):
         """Create an alarm.
