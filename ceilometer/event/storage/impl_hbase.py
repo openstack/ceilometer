@@ -12,10 +12,19 @@
 # under the License.
 """HBase storage backend
 """
+import operator
+import os
+
+import happybase
+from oslo.utils import netutils
+from six.moves.urllib import parse as urlparse
+
+from ceilometer.event.storage import base
+from ceilometer.event.storage import models
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
+from ceilometer.storage.hbase import inmemory as hbase_inmemory
 from ceilometer.storage.hbase import utils as hbase_utils
-from ceilometer.storage import impl_hbase as base
 from ceilometer import utils
 
 LOG = log.getLogger(__name__)
@@ -39,7 +48,7 @@ class Connection(base.Connection):
     - events:
 
       - row_key: timestamp of event's generation + uuid of event
-        in format: "%s+%s" % (ts, Event.message_id)
+        in format: "%s:%s" % (ts, Event.message_id)
       - Column Families:
 
         f: contains the following qualifiers:
@@ -50,7 +59,7 @@ class Connection(base.Connection):
 
             .. code-block:: python
 
-              "%s+%s" % (trait_name, trait_type)
+              "%s:%s" % (trait_name, trait_type)
     """
 
     CAPABILITIES = utils.update_nested(base.Connection.CAPABILITIES,
@@ -62,6 +71,27 @@ class Connection(base.Connection):
     _memory_instance = None
 
     EVENT_TABLE = "event"
+
+    def __init__(self, url):
+        """Hbase Connection Initialization."""
+        opts = self._parse_connection_url(url)
+
+        if opts['host'] == '__test__':
+            url = os.environ.get('CEILOMETER_TEST_HBASE_URL')
+            if url:
+                # Reparse URL, but from the env variable now
+                opts = self._parse_connection_url(url)
+                self.conn_pool = self._get_connection_pool(opts)
+            else:
+                # This is a in-memory usage for unit tests
+                if Connection._memory_instance is None:
+                    LOG.debug(_('Creating a new in-memory HBase '
+                              'Connection object'))
+                    Connection._memory_instance = (hbase_inmemory.
+                                                   MConnectionPool())
+                self.conn_pool = Connection._memory_instance
+        else:
+            self.conn_pool = self._get_connection_pool(opts)
 
     def upgrade(self):
         tables = [self.EVENT_TABLE]
@@ -81,3 +111,173 @@ class Connection(base.Connection):
                     conn.delete_table(table)
                 except Exception:
                     LOG.debug(_('Cannot delete table but ignoring error'))
+
+    @staticmethod
+    def _get_connection_pool(conf):
+        """Return a connection pool to the database.
+
+        .. note::
+
+          The tests use a subclass to override this and return an
+          in-memory connection pool.
+        """
+        LOG.debug(_('connecting to HBase on %(host)s:%(port)s') % (
+                  {'host': conf['host'], 'port': conf['port']}))
+        return happybase.ConnectionPool(size=100, host=conf['host'],
+                                        port=conf['port'],
+                                        table_prefix=conf['table_prefix'])
+
+    @staticmethod
+    def _parse_connection_url(url):
+        """Parse connection parameters from a database url.
+
+        .. note::
+
+          HBase Thrift does not support authentication and there is no
+          database name, so we are not looking for these in the url.
+        """
+        opts = {}
+        result = netutils.urlsplit(url)
+        opts['table_prefix'] = urlparse.parse_qs(
+            result.query).get('table_prefix', [None])[0]
+        opts['dbtype'] = result.scheme
+        if ':' in result.netloc:
+            opts['host'], port = result.netloc.split(':')
+        else:
+            opts['host'] = result.netloc
+            port = 9090
+        opts['port'] = port and int(port) or 9090
+        return opts
+
+    def record_events(self, event_models):
+        """Write the events to Hbase.
+
+        :param event_models: a list of models.Event objects.
+        :return problem_events: a list of events that could not be saved in a
+          (reason, event) tuple. From the reasons that are enumerated in
+          storage.models.Event only the UNKNOWN_PROBLEM is applicable here.
+        """
+        problem_events = []
+
+        with self.conn_pool.connection() as conn:
+            events_table = conn.table(self.EVENT_TABLE)
+            for event_model in event_models:
+                # Row key consists of timestamp and message_id from
+                # models.Event or purposes of storage event sorted by
+                # timestamp in the database.
+                ts = event_model.generated
+                row = hbase_utils.prepare_key(
+                    hbase_utils.timestamp(ts, reverse=False),
+                    event_model.message_id)
+                event_type = event_model.event_type
+                traits = {}
+                if event_model.traits:
+                    for trait in event_model.traits:
+                        key = hbase_utils.prepare_key(trait.name, trait.dtype)
+                        traits[key] = trait.value
+                record = hbase_utils.serialize_entry(traits,
+                                                     event_type=event_type,
+                                                     timestamp=ts)
+                try:
+                    events_table.put(row, record)
+                except Exception as ex:
+                    LOG.debug(_("Failed to record event: %s") % ex)
+                    problem_events.append((models.Event.UNKNOWN_PROBLEM,
+                                           event_model))
+        return problem_events
+
+    def get_events(self, event_filter):
+        """Return an iter of models.Event objects.
+
+        :param event_filter: storage.EventFilter object, consists of filters
+          for events that are stored in database.
+        """
+        q, start, stop = hbase_utils.make_events_query_from_filter(
+            event_filter)
+        with self.conn_pool.connection() as conn:
+            events_table = conn.table(self.EVENT_TABLE)
+
+            gen = events_table.scan(filter=q, row_start=start, row_stop=stop)
+
+        for event_id, data in gen:
+            traits = []
+            events_dict = hbase_utils.deserialize_entry(data)[0]
+            for key, value in events_dict.items():
+                if isinstance(key, tuple):
+                    trait_name, trait_dtype = key
+                    traits.append(models.Trait(name=trait_name,
+                                               dtype=int(trait_dtype),
+                                               value=value))
+            ts, mess = event_id.split(':')
+
+            yield models.Event(
+                message_id=hbase_utils.unquote(mess),
+                event_type=events_dict['event_type'],
+                generated=events_dict['timestamp'],
+                traits=sorted(traits,
+                              key=operator.attrgetter('dtype'))
+            )
+
+    def get_event_types(self):
+        """Return all event types as an iterable of strings."""
+        with self.conn_pool.connection() as conn:
+            events_table = conn.table(self.EVENT_TABLE)
+            gen = events_table.scan()
+
+        event_types = set()
+        for event_id, data in gen:
+            events_dict = hbase_utils.deserialize_entry(data)[0]
+            for key, value in events_dict.items():
+                if not isinstance(key, tuple) and key.startswith('event_type'):
+                    if value not in event_types:
+                        event_types.add(value)
+                        yield value
+
+    def get_trait_types(self, event_type):
+        """Return a dictionary containing the name and data type of the trait.
+
+        Only trait types for the provided event_type are returned.
+
+        :param event_type: the type of the Event
+        """
+
+        q = hbase_utils.make_query(event_type=event_type)
+        trait_names = set()
+        with self.conn_pool.connection() as conn:
+            events_table = conn.table(self.EVENT_TABLE)
+            gen = events_table.scan(filter=q)
+        for event_id, data in gen:
+            events_dict = hbase_utils.deserialize_entry(data)[0]
+            for key, value in events_dict.items():
+                if isinstance(key, tuple):
+                    trait_name, trait_type = key
+                    if trait_name not in trait_names:
+                        # Here we check that our method return only unique
+                        # trait types, for ex. if it is found the same trait
+                        # types in different events with equal event_type,
+                        # method will return only one trait type. It is
+                        # proposed that certain trait name could have only one
+                        # trait type.
+                        trait_names.add(trait_name)
+                        data_type = models.Trait.type_names[int(trait_type)]
+                        yield {'name': trait_name, 'data_type': data_type}
+
+    def get_traits(self, event_type, trait_type=None):
+        """Return all trait instances associated with an event_type.
+
+        If trait_type is specified, only return instances of that trait type.
+        :param event_type: the type of the Event to filter by
+        :param trait_type: the name of the Trait to filter by
+        """
+        q = hbase_utils.make_query(event_type=event_type,
+                                   trait_type=trait_type)
+        with self.conn_pool.connection() as conn:
+            events_table = conn.table(self.EVENT_TABLE)
+            gen = events_table.scan(filter=q)
+        for event_id, data in gen:
+            events_dict = hbase_utils.deserialize_entry(data)[0]
+            for key, value in events_dict.items():
+                if isinstance(key, tuple):
+                    trait_name, trait_type = key
+                    yield models.Trait(name=trait_name,
+                                       dtype=int(trait_type), value=value)
