@@ -33,7 +33,6 @@ from oslo.utils import timeutils
 from oslo.utils import units
 import six
 
-
 rootwrap_conf = cfg.StrOpt('rootwrap_config',
                            default="/etc/ceilometer/rootwrap.conf",
                            help='Path to the rootwrap configuration file to'
@@ -53,6 +52,28 @@ def execute(*cmd, **kwargs):
     return processutils.execute(*cmd, **kwargs)
 
 
+def decode_unicode(input):
+    """Decode the unicode of the message, and encode it into utf-8."""
+    if isinstance(input, dict):
+        temp = {}
+        # If the input data is a dict, create an equivalent dict with a
+        # predictable insertion order to avoid inconsistencies in the
+        # message signature computation for equivalent payloads modulo
+        # ordering
+        for key, value in sorted(six.iteritems(input)):
+            temp[decode_unicode(key)] = decode_unicode(value)
+        return temp
+    elif isinstance(input, (tuple, list)):
+        # When doing a pair of JSON encode/decode operations to the tuple,
+        # the tuple would become list. So we have to generate the value as
+        # list here.
+        return [decode_unicode(element) for element in input]
+    elif isinstance(input, six.text_type):
+        return input.encode('utf-8')
+    else:
+        return input
+
+
 def recursive_keypairs(d, separator=':'):
     """Generator that produces sequence of keypairs for nested dictionaries."""
     for name, value in sorted(six.iteritems(d)):
@@ -60,20 +81,7 @@ def recursive_keypairs(d, separator=':'):
             for subname, subvalue in recursive_keypairs(value, separator):
                 yield ('%s%s%s' % (name, separator, subname), subvalue)
         elif isinstance(value, (tuple, list)):
-            # When doing a pair of JSON encode/decode operations to the tuple,
-            # the tuple would become list. So we have to generate the value as
-            # list here.
-
-            # in the special case of the list item itself being a dict,
-            # create an equivalent dict with a predictable insertion order
-            # to avoid inconsistencies in the message signature computation
-            # for equivalent payloads modulo ordering
-            first = lambda i: i[0]
-            m = map(lambda x: six.text_type(dict(sorted(x.items(), key=first))
-                                            if isinstance(x, dict)
-                                            else x).encode('utf-8'),
-                    value)
-            yield name, list(m)
+            yield name, decode_unicode(value)
         else:
             yield name, value
 
