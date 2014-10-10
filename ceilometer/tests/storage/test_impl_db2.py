@@ -63,7 +63,6 @@ class CapabilitiesTest(test_base.BaseTestCase):
                                                'stddev': False,
                                                'cardinality': False}}
                            },
-            'events': {'query': {'simple': False}}
         }
 
         actual_capabilities = impl_db2.Connection.get_capabilities()

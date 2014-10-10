@@ -88,7 +88,6 @@ class CapabilitiesTest(test_base.BaseTestCase):
                                                'stddev': False,
                                                'cardinality': False}}
                            },
-            'events': {'query': {'simple': False}},
         }
 
         actual_capabilities = hbase.Connection.get_capabilities()
