@@ -41,11 +41,12 @@ class TestListResources(v2.FunctionalTest,
         # drop TZ specifier
         return six.text_type(timeutils.isotime(timestamp))[:-1]
 
-    def _verify_sample_timestamps(self, res, first, last):
+    def _verify_resource_timestamps(self, res, first, last):
+        # Bounds need not be tight (see ceilometer bug #1288372)
         self.assertTrue('first_sample_timestamp' in res)
-        self.assertEqual(self._isotime(first), res['first_sample_timestamp'])
+        self.assertTrue(self._isotime(first) >= res['first_sample_timestamp'])
         self.assertTrue('last_sample_timestamp' in res)
-        self.assertEqual(self._isotime(last), res['last_sample_timestamp'])
+        self.assertTrue(self._isotime(last) <= res['last_sample_timestamp'])
 
     def test_instance_no_metadata(self):
         timestamp = datetime.datetime(2012, 7, 2, 10, 40)
@@ -69,7 +70,7 @@ class TestListResources(v2.FunctionalTest,
 
         data = self.get_json('/resources')
         self.assertEqual(1, len(data))
-        self._verify_sample_timestamps(data[0], timestamp, timestamp)
+        self._verify_resource_timestamps(data[0], timestamp, timestamp)
 
     def test_instances(self):
         timestamps = {
@@ -120,7 +121,7 @@ class TestListResources(v2.FunctionalTest,
         self.assertEqual(2, len(data))
         for res in data:
             timestamp = timestamps.get(res['resource_id'])
-            self._verify_sample_timestamps(res, timestamp, timestamp)
+            self._verify_resource_timestamps(res, timestamp, timestamp)
 
     def test_instance_multiple_samples(self):
         timestamps = [
@@ -151,7 +152,8 @@ class TestListResources(v2.FunctionalTest,
 
         data = self.get_json('/resources')
         self.assertEqual(1, len(data))
-        self._verify_sample_timestamps(data[0], timestamps[-1], timestamps[1])
+        self._verify_resource_timestamps(data[0],
+                                         timestamps[-1], timestamps[1])
 
     def test_instances_one(self):
         sample1 = sample.Sample(
