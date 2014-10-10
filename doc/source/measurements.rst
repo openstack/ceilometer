@@ -203,6 +203,8 @@ Name                              Type        Unit             Resource    Origi
 identity.authenticate.success     Delta       user             user ID     notification  User successfully authenticates
 identity.authenticate.pending     Delta       user             user ID     notification  User pending authentication
 identity.authenticate.failure     Delta       user             user ID     notification  User failed authentication
+identity.role_assignment.created  Delta       role_assignment  role ID     notification  A role is added to an actor on a target
+identity.role_assignment.deleted  Delta       role_assignment  role ID     notification  A role is removed from an actor on a target
 identity.user.created             Delta       user             user ID     notification  A user is created
 identity.user.deleted             Delta       user             user ID     notification  A user is deleted
 identity.user.updated             Delta       user             user ID     notification  A user is updated
