@@ -19,12 +19,39 @@ import pecan
 
 from ceilometer.api.controllers import v2
 
+MEDIA_TYPE_JSON = 'application/vnd.openstack.telemetry-%s+json'
+MEDIA_TYPE_XML = 'application/vnd.openstack.telemetry-%s+xml'
+
 
 class RootController(object):
 
     v2 = v2.V2Controller()
 
-    @pecan.expose(generic=True, template='index.html')
+    @pecan.expose('json')
     def index(self):
-        # FIXME: Return version information
-        return dict()
+        base_url = pecan.request.host_url
+        available = [{'tag': 'v2', 'date': '2013-02-13T00:00:00Z', }]
+        collected = [version_descriptor(base_url, v['tag'], v['date'])
+                     for v in available]
+        versions = {'versions': {'values': collected}}
+        return versions
+
+
+def version_descriptor(base_url, version, released_on):
+    url = version_url(base_url, version)
+    return {
+        'id': version,
+        'links': [
+            {'href': url, 'rel': 'self', },
+            {'href': 'http://docs.openstack.org/',
+             'rel': 'describedby', 'type': 'text/html', }],
+        'media-types': [
+            {'base': 'application/json', 'type': MEDIA_TYPE_JSON % version, },
+            {'base': 'application/xml', 'type': MEDIA_TYPE_XML % version, }],
+        'status': 'stable',
+        'updated': released_on,
+    }
+
+
+def version_url(base_url, version_number):
+    return '%s/%s' % (base_url, version_number)
