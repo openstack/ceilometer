@@ -36,6 +36,10 @@ nova_control_exchange            nova                                  Exchange 
 glance_control_exchange          glance                                Exchange name for Glance notifications
 cinder_control_exchange          cinder                                Exchange name for Cinder notifications
 neutron_control_exchange         neutron                               Exchange name for Neutron notifications
+sahara_control_exchange          sahara                                Exchange name for Data Processing notifications
+keystone_control_exchange        keystone                              Exchange name for Keystone notifications
+heat_control_exchange            heat                                  Exchange name for Heat notifications
+trove_control_exchange           trove                                 Exchange name for DBaaS notifications
 metering_secret                  change this or be hacked              Secret value for signing metering messages
 metering_topic                   metering                              the topic ceilometer uses for metering messages
 sample_source                    openstack                             The source name of emitted samples
