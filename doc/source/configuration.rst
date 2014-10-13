@@ -254,6 +254,37 @@ requeue_sample_on_dispatcher_error     False                                   R
 =====================================  ======================================  ==============================================================
 
 
+Coordination
+============
+
+Ceilometer agents are using tooz library as a coordination tool, and there are
+several options described in the [coordination] section.
+
+============  =========  ======================================================
+Parameter     Default    Note
+============  =========  ======================================================
+backend_url              The backend URL to use for distributed coordination.
+                         If left empty, per-deployment central agent and
+                         per-host compute agent won\'t do workload
+                         partitioning and will only function correctly if a
+                         single instance of that service is running
+heartbeat     1.0        Number of seconds between heartbeats for distributed
+                         coordination
+============  =========  ======================================================
+
+
+Compute
+=======
+
+Some of the compute agent options need to be defined in [compute] section.
+
+======================  =========  ======================================================
+Parameter               Default    Note
+======================  =========  ======================================================
+workload_partitioning   False      Enable work-load partitioning, allowing multiple
+                                   compute agents to be run simultaneously.
+======================  =========  ======================================================
+
 
 General options
 ===============
