@@ -251,6 +251,9 @@ Parameter                              Default                                 N
 requeue_sample_on_dispatcher_error     False                                   Requeue the sample on the collector sample queue when the
                                                                                collector fails to dispatch it. This option is only valid if
                                                                                the sample comes from the notifier publisher
+udp_address                            0.0.0.0                                 Address to which the UDP socket is bound. Set to an empty
+                                                                               string to disable
+udp_port                               4952                                    Port to which the UDP socket is bound
 =====================================  ======================================  ==============================================================
 
 
