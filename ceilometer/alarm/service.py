@@ -60,6 +60,11 @@ class AlarmService(object):
 
     EXTENSIONS_NAMESPACE = "ceilometer.alarm.evaluator"
 
+    def __init__(self):
+        super(AlarmService, self).__init__()
+        self._load_evaluators()
+        self.api_client = None
+
     def _load_evaluators(self):
         self.evaluators = extension.ExtensionManager(
             namespace=self.EXTENSIONS_NAMESPACE,
@@ -118,8 +123,6 @@ class AlarmEvaluationService(AlarmService, os_service.Service):
 
     def __init__(self):
         super(AlarmEvaluationService, self).__init__()
-        self._load_evaluators()
-        self.api_client = None
         self.partition_coordinator = coordination.PartitionCoordinator()
 
     def start(self):
@@ -155,8 +158,6 @@ class SingletonAlarmService(AlarmService, os_service.Service):
 
     def __init__(self):
         super(SingletonAlarmService, self).__init__()
-        self._load_evaluators()
-        self.api_client = None
 
     def start(self):
         super(SingletonAlarmService, self).start()
@@ -182,8 +183,6 @@ class PartitionedAlarmService(AlarmService, os_service.Service):
         self.rpc_server = messaging.get_rpc_server(
             transport, cfg.CONF.alarm.partition_rpc_topic, self)
 
-        self._load_evaluators()
-        self.api_client = None
         self.partition_coordinator = alarm_coordination.PartitionCoordinator()
 
     def start(self):
