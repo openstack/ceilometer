@@ -215,7 +215,11 @@ Event Conversion
 ==================================  ======================================  ==============================================================
 Parameter                           Default                                 Note
 ==================================  ======================================  ==============================================================
-store_events                        False                                   Boolean variable that switch on/off events storing
+store_events                        False                                   Boolean variable that switches on/off event storage
+ack_on_event_error                  True                                    Acknowledge message when event persistence fails
+messaging_urls                      []                                      Messaging URLs to listen for notifications. Example:
+                                                                            transport://user:pass@host1:port[,hostN:portN]/virtual_host
+                                                                            (DEFAULT/transport_url is used if empty)
 ==================================  ======================================  ==============================================================
 
 The following options in the [event] configuration section affect the extraction of Event data from notifications.
