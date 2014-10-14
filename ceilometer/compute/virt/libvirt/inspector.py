@@ -28,7 +28,7 @@ libvirt = None
 
 LOG = logging.getLogger(__name__)
 
-libvirt_opts = [
+OPTS = [
     cfg.StrOpt('libvirt_type',
                default='kvm',
                help='Libvirt domain type (valid options are: '
@@ -40,7 +40,7 @@ libvirt_opts = [
 ]
 
 CONF = cfg.CONF
-CONF.register_opts(libvirt_opts)
+CONF.register_opts(OPTS)
 
 
 def retry_on_disconnect(function):

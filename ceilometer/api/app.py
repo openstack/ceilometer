@@ -36,14 +36,14 @@ LOG = log.getLogger(__name__)
 CONF = cfg.CONF
 CONF.import_opt('debug', 'ceilometer.openstack.common.log')
 
-auth_opts = [
+OPTS = [
     cfg.StrOpt('api_paste_config',
                default="api_paste.ini",
                help="Configuration file for WSGI definition of API."
                ),
 ]
 
-api_opts = [
+API_OPTS = [
     cfg.BoolOpt('pecan_debug',
                 default=CONF.debug,
                 help='Toggle Pecan Debug Middleware. '
@@ -51,8 +51,8 @@ api_opts = [
                 ),
 ]
 
-CONF.register_opts(auth_opts)
-CONF.register_opts(api_opts, group='api')
+CONF.register_opts(OPTS)
+CONF.register_opts(API_OPTS, group='api')
 
 
 def get_pecan_config():

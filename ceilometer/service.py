@@ -46,7 +46,7 @@ OPTS = [
 ]
 cfg.CONF.register_opts(OPTS)
 
-CLI_OPTIONS = [
+CLI_OPTS = [
     cfg.StrOpt('os-username',
                deprecated_group="DEFAULT",
                default=os.environ.get('OS_USERNAME', 'ceilometer'),
@@ -85,7 +85,7 @@ CLI_OPTIONS = [
                 help='Disables X.509 certificate validation when an '
                      'SSL connection to Identity Service is established.'),
 ]
-cfg.CONF.register_cli_opts(CLI_OPTIONS, group="service_credentials")
+cfg.CONF.register_cli_opts(CLI_OPTS, group="service_credentials")
 
 cfg.CONF.import_opt('default_log_levels',
                     'ceilometer.openstack.common.log')

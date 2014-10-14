@@ -26,7 +26,7 @@ import six
 
 from ceilometer import utils
 
-METER_PUBLISH_OPTS = [
+OPTS = [
     cfg.StrOpt('metering_secret',
                secret=True,
                default='change this or be hacked',
@@ -37,14 +37,7 @@ METER_PUBLISH_OPTS = [
                                                   "publisher_rpc")]
                ),
 ]
-
-
-def register_opts(config):
-    """Register the options for publishing metering messages."""
-    config.register_opts(METER_PUBLISH_OPTS, group="publisher")
-
-
-register_opts(cfg.CONF)
+cfg.CONF.register_opts(OPTS, group="publisher")
 
 
 def compute_signature(message, secret):

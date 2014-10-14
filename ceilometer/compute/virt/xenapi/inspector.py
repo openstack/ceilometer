@@ -30,7 +30,7 @@ from ceilometer.openstack.common.gettextutils import _
 opt_group = cfg.OptGroup(name='xenapi',
                          title='Options for XenAPI')
 
-xenapi_opts = [
+OPTS = [
     cfg.StrOpt('connection_url',
                help='URL for connection to XenServer/Xen Cloud Platform.'),
     cfg.StrOpt('connection_username',
@@ -47,7 +47,7 @@ xenapi_opts = [
 
 CONF = cfg.CONF
 CONF.register_group(opt_group)
-CONF.register_opts(xenapi_opts, group=opt_group)
+CONF.register_opts(OPTS, group=opt_group)
 
 
 class XenapiException(virt_inspector.InspectorException):
