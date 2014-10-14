@@ -61,7 +61,7 @@ class NotificationBase(PluginBase):
         :param conf: Configuration.
         """
 
-        # TODO(sileht): Backwards compatibility, remove in J+1
+        # TODO(sileht): Backwards compatibility, remove in J+2
         if hasattr(self, 'get_exchange_topics'):
             LOG.warn(_('get_exchange_topics API of NotificationPlugin is'
                        'deprecated, implements get_targets instead.'))
