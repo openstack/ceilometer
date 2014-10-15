@@ -119,8 +119,9 @@ def get_server_cls(host):
     if netaddr.valid_ipv6(host):
         # NOTE(dzyu) make sure use IPv6 sockets if host is in IPv6 pattern
         if getattr(server_cls, 'address_family') == socket.AF_INET:
-            class server_cls(server_cls):
+            class ipv6_server_cls(server_cls):
                 address_family = socket.AF_INET6
+            return ipv6_server_cls
     return server_cls
 
 
