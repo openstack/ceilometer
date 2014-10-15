@@ -238,14 +238,26 @@ Alarming
 
 The following options in the [alarm] configuration section affect the configuration of alarm services
 
-======================  ==============  ====================================================================================
-Parameter               Default         Note
-======================  ==============  ====================================================================================
-evaluation_service      singleton       Driver to use for alarm evaluation service:
-                                          * singleton:   All alarms are evaluated by one alarm evaluation service instance
-                                          * partitioned: All alarms are dispatched across all alarm evaluation service
-                                            instances to be evaluate
-======================  ==============  ====================================================================================
+==============================  ============================  =====================================================================================
+Parameter                       Default                       Note
+==============================  ============================  =====================================================================================
+evaluation_service              default                       Driver to use for alarm evaluation service. DEPRECATED:
+                                                              "singleton" and "partitioned" alarm evaluator services will be removed in Kilo
+                                                              in favour of the default alarm evaluation service using tooz for partitioning
+evaluation_interval             60                            Period of evaluation cycle, should be >= than configured pipeline interval for
+                                                              collection of underlying metrics
+notifier_rpc_topic              alarm_notifier                The topic that ceilometer uses for alarm notifier messages
+partition_rpc_topic             alarm_partition_coordination  The topic that ceilometer uses for alarm partition coordination messages
+                                                              DEPRECATED: RPC-based partitioned alarm evaluation service will be removed in Kilo
+                                                              in favour of the default alarm evaluation service using tooz for partitioning
+rest_notifier_certificate_file                                SSL Client certificate for REST notifier
+rest_notifier_certificate_key                                 SSL Client private key for REST notifier
+rest_notifier_ssl_verify        True                          Whether to verify the SSL Server certificate when calling alarm action
+rest_notifier_max_retries       0                             Number of retries for REST notifier
+record_history                  True                          Record alarm change events
+user_alarm_quota                None                          Maximum number of alarms defined for a user
+project_alarm_quota             None                          Maximum number of alarms defined for a project
+==============================  ============================  =====================================================================================
 
 
 Collector
