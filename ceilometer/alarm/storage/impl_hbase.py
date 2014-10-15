@@ -12,6 +12,7 @@
 # under the License.
 
 import datetime
+import operator
 
 import ceilometer
 from ceilometer.alarm.storage import base
@@ -133,9 +134,13 @@ class Connection(hbase_base.Connection, base.Connection):
         with self.conn_pool.connection() as conn:
             alarm_table = conn.table(self.ALARM_TABLE)
             gen = alarm_table.scan(filter=q)
-            for ignored, data in gen:
-                stored_alarm = hbase_utils.deserialize_entry(data)[0]
-                yield models.Alarm(**stored_alarm)
+            alarms = [hbase_utils.deserialize_entry(data)[0]
+                      for ignored, data in gen]
+            for alarm in sorted(
+                    alarms,
+                    key=operator.itemgetter('timestamp'),
+                    reverse=True):
+                yield models.Alarm(**alarm)
 
     def get_alarm_changes(self, alarm_id, on_behalf_of,
                           user=None, project=None, type=None,

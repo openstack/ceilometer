@@ -111,7 +111,10 @@ class Connection(base.Connection):
         if meter is not None:
             q['rule.meter_name'] = meter
 
-        return self._retrieve_alarms(q, [], None)
+        return self._retrieve_alarms(q,
+                                     [("timestamp",
+                                       pymongo.DESCENDING)],
+                                     None)
 
     def get_alarm_changes(self, alarm_id, on_behalf_of,
                           user=None, project=None, type=None,

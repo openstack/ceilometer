@@ -2086,20 +2086,24 @@ class TestAlarms(v2.FunctionalTest,
     def test_alarm_sends_notification(self):
         # Hit the AlarmController (with alarm_id supplied) ...
         data = self.get_json('/alarms')
+        del_alarm_name = "name1"
+        for d in data:
+            if d['name'] == del_alarm_name:
+                del_alarm_id = d['alarm_id']
+
         with mock.patch.object(messaging, 'get_notifier') as get_notifier:
             notifier = get_notifier.return_value
 
-            self.delete('/alarms/%s' % data[0]['alarm_id'],
+            self.delete('/alarms/%s' % del_alarm_id,
                         headers=self.auth_headers, status=204)
             get_notifier.assert_called_once_with(mock.ANY,
                                                  publisher_id='ceilometer.api')
-
         calls = notifier.info.call_args_list
         self.assertEqual(1, len(calls))
         args, _ = calls[0]
         context, event_type, payload = args
         self.assertEqual('alarm.deletion', event_type)
-        self.assertEqual('name1', payload['detail']['name'])
+        self.assertEqual(del_alarm_name, payload['detail']['name'])
         self.assertTrue(set(['alarm_id', 'detail', 'event_id', 'on_behalf_of',
                              'project_id', 'timestamp', 'type',
                              'user_id']).issubset(payload.keys()))

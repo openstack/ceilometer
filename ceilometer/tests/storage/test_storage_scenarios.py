@@ -2311,7 +2311,8 @@ class AlarmTestBase(DBTestBase):
                                      type='threshold',
                                      name='red-alert',
                                      description='my red-alert',
-                                     timestamp=constants.MIN_DATETIME,
+                                     timestamp=datetime.datetime(2015, 7,
+                                                                 2, 10, 25),
                                      user_id='me',
                                      project_id='and-da-boys',
                                      state="insufficient data",
@@ -2339,7 +2340,8 @@ class AlarmTestBase(DBTestBase):
                                      type='threshold',
                                      name='orange-alert',
                                      description='a orange',
-                                     timestamp=constants.MIN_DATETIME,
+                                     timestamp=datetime.datetime(2015, 7,
+                                                                 2, 10, 40),
                                      user_id='me',
                                      project_id='and-da-boys',
                                      state="insufficient data",
@@ -2365,7 +2367,8 @@ class AlarmTestBase(DBTestBase):
                                      type='threshold',
                                      name='yellow-alert',
                                      description='yellow',
-                                     timestamp=constants.MIN_DATETIME,
+                                     timestamp=datetime.datetime(2015, 7,
+                                                                 2, 10, 10),
                                      user_id='me',
                                      project_id='and-da-boys',
                                      state="insufficient data",
@@ -2407,6 +2410,16 @@ class AlarmTest(AlarmTestBase,
         self.add_some_alarms()
         alarms = list(self.alarm_conn.get_alarms())
         self.assertEqual(len(alarms), 3)
+
+    def test_list_ordered_by_timestamp(self):
+        self.add_some_alarms()
+        alarms = list(self.alarm_conn.get_alarms())
+        self.assertEqual(len(alarms), 3)
+        alarm_l = [a.timestamp for a in alarms]
+        alarm_l_ordered = [datetime.datetime(2015, 7, 2, 10, 40),
+                           datetime.datetime(2015, 7, 2, 10, 25),
+                           datetime.datetime(2015, 7, 2, 10, 10)]
+        self.assertEqual(alarm_l_ordered, alarm_l)
 
     def test_list_enabled(self):
         self.add_some_alarms()
@@ -2593,8 +2606,14 @@ class ComplexAlarmHistoryQueryTest(AlarmTestBase,
 
     def prepare_alarm_history(self):
         alarms = list(self.alarm_conn.get_alarms())
+        name_index = {
+            'red-alert': 0,
+            'orange-alert': 1,
+            'yellow-alert': 2
+        }
+
         for alarm in alarms:
-            i = alarms.index(alarm)
+            i = name_index[alarm.name]
             alarm_change = dict(event_id=(
                                 "16fd2706-8baf-433b-82eb-8c7fada847c%s" % i),
                                 alarm_id=alarm.alarm_id,
