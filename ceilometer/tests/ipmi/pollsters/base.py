@@ -57,13 +57,15 @@ class TestPollsterBase(base.BaseTestCase):
 
         self.pollster = self.make_pollster()
 
-    def _verify_metering(self, length, expected_vol, node):
+    def _verify_metering(self, length, expected_vol=None, node=None):
         cache = {}
         resources = {}
 
         samples = list(self.pollster.get_samples(self.mgr, cache, resources))
         self.assertEqual(length, len(samples))
 
-        self.assertTrue(any(s.volume == expected_vol for s in samples))
-        self.assertTrue(any(s.resource_metadata['node'] == node
-                            for s in samples))
+        if expected_vol:
+            self.assertTrue(any(s.volume == expected_vol for s in samples))
+        if node:
+            self.assertTrue(any(s.resource_metadata['node'] == node
+                                for s in samples))

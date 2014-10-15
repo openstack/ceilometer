@@ -54,19 +54,24 @@ class SensorPollster(plugin.PollsterBase):
         sensor_type_data = self._get_sensor_types(stats, self.METRIC)
 
         for sensor_data in sensor_type_data:
+            # Continue if sensor_data is not parseable.
             try:
                 sensor_reading = sensor_data['Sensor Reading']
+                sensor_id = sensor_data['Sensor ID']
             except KeyError:
-                raise InvalidSensorData("missing 'Sensor Reading'")
+                continue
 
             if not parser.validate_reading(sensor_reading):
                 continue
 
-            volume, unit = parser.parse_reading(sensor_reading)
+            try:
+                volume, unit = parser.parse_reading(sensor_reading)
+            except parser.InvalidSensorData:
+                continue
 
             resource_id = '%(host)s-%(sensor-id)s' % {
                 'host': CONF.host,
-                'sensor-id': parser.transform_id(sensor_data['Sensor ID'])
+                'sensor-id': parser.transform_id(sensor_id)
             }
 
             metadata = {

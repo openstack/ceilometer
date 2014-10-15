@@ -41,6 +41,10 @@ VOLTAGE_SENSOR_DATA = {
     'Voltage': ipmi_test_data.VOLTAGE_DATA
 }
 
+MISSING_SENSOR_DATA = ipmi_test_data.MISSING_SENSOR['payload']['payload']
+MALFORMED_SENSOR_DATA = ipmi_test_data.BAD_SENSOR['payload']['payload']
+MISSING_ID_SENSOR_DATA = ipmi_test_data.NO_SENSOR_ID['payload']['payload']
+
 
 class TestTemperatureSensorPollster(base.TestPollsterBase):
 
@@ -59,6 +63,60 @@ class TestTemperatureSensorPollster(base.TestPollsterBase):
         self._test_get_samples()
 
         self._verify_metering(10, float(32), CONF.host)
+
+
+class TestMissingSensorData(base.TestPollsterBase):
+
+    def fake_sensor_data(self, sensor_type):
+        return MISSING_SENSOR_DATA
+
+    def fake_data(self):
+        # No use for Sensor test
+        return None
+
+    def make_pollster(self):
+        return sensor.TemperatureSensorPollster()
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def test_get_samples(self):
+        self._test_get_samples()
+        self._verify_metering(0)
+
+
+class TestMalformedSensorData(base.TestPollsterBase):
+
+    def fake_sensor_data(self, sensor_type):
+        return MALFORMED_SENSOR_DATA
+
+    def fake_data(self):
+        # No use for Sensor test
+        return None
+
+    def make_pollster(self):
+        return sensor.TemperatureSensorPollster()
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def test_get_samples(self):
+        self._test_get_samples()
+        self._verify_metering(0)
+
+
+class TestMissingSensorId(base.TestPollsterBase):
+
+    def fake_sensor_data(self, sensor_type):
+        return MISSING_ID_SENSOR_DATA
+
+    def fake_data(self):
+        # No use for Sensor test
+        return None
+
+    def make_pollster(self):
+        return sensor.TemperatureSensorPollster()
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def test_get_samples(self):
+        self._test_get_samples()
+        self._verify_metering(0)
 
 
 class TestFanSensorPollster(base.TestPollsterBase):
