@@ -13,9 +13,8 @@
 import hashlib
 
 import migrate
+from oslo.serialization import jsonutils
 import sqlalchemy as sa
-
-from ceilometer.openstack.common import jsonutils
 
 
 m_tables = [('metadata_text', sa.Text, True),

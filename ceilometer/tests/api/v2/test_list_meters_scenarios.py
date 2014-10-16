@@ -20,7 +20,8 @@
 
 import base64
 import datetime
-import json as jsonutils
+
+from oslo.serialization import jsonutils
 import webtest.app
 
 from ceilometer.publisher import utils
