@@ -28,15 +28,15 @@ As the project started to come to life, collecting an
 `increasing number of metrics`_ across multiple projects, the OpenStack
 community started to realize that a secondary goal could be added to
 Ceilometer: become a standard way to collect metric, regardless of the
-purpose of the collection.  For example, Ceilometer can now publish information for
-monitoring, debugging and graphing tools in addition or in parallel to the
+purpose of the collection.  For example, Ceilometer can now publish information
+for monitoring, debugging and graphing tools in addition or in parallel to the
 metering backend. We labelled this effort as "multi-publisher".
 
 .. _increasing number of metrics: http://docs.openstack.org/developer/ceilometer/measurements.html
 
 Most recently, as the Heat project started to come to
-life, it soon became clear that the OpenStack project needed a tool to watch for
-variations in key values in order to trigger various reactions.
+life, it soon became clear that the OpenStack project needed a tool to watch
+for variations in key values in order to trigger various reactions.
 As Ceilometer already had the tooling to collect vast quantities of data, it
 seemed logical to add this as an extension of the Ceilometer project, which we
 tagged as "alarming".
@@ -53,23 +53,24 @@ the telco industry, the steps are:
 
 Ceilometer's initial goal was, and still is, strictly limited to step
 one. This is a choice made from the beginning not to go into rating or billing,
-as the variety of possibilities seemed too huge for the project to ever deliver
-a solution that would fit everyone's needs, from private to public clouds. This
-means that if you are looking at this project to solve your billing needs, this
-is the right way to go, but certainly not the end of the road for you. Once
-Ceilometer is in place on your OpenStack deployment, you will still have
-several things to do before you can produce a bill for your customers.
-One of you first task could be: finding the right queries within the Ceilometer
-API to extract the information you need for your very own rating engine.
+as the variety of possibilities seemed too large for the project to ever
+deliver a solution that would fit everyone's needs, from private to public
+clouds. This means that if you are looking at this project to solve your
+billing needs, this is the right way to go, but certainly not the end of the
+road for you. Once Ceilometer is in place on your OpenStack deployment, you
+will still have several things to do before you can produce a bill for your
+customers. One of you first task could be: finding the right queries within the
+Ceilometer API to extract the information you need for your very own rating
+engine.
 
-You can, of course, use the same API to satisfy other needs, such as a data mining
-solution to help you identify unexpected or new usage types, or a capacity
-planning solution. In general, it is recommended to download the data from the API in
-order to work on it in a separate database to avoid overloading the one which
-should be dedicated to storing tickets. It is also often found that the
-Ceilometer metering DB only keeps a couple months worth of data while data is
-regularly offloaded into a long term store connected to the billing system,
-but this is fully left up to the implementor.
+You can, of course, use the same API to satisfy other needs, such as a data
+mining solution to help you identify unexpected or new usage types, or a
+capacity planning solution. In general, it is recommended to download the data
+from the API in order to work on it in a separate database to avoid overloading
+the one which should be dedicated to storing tickets. It is also often found
+that the Ceilometer metering DB only keeps a couple months worth of data while
+data is regularly offloaded into a long term store connected to the billing
+system, but this is fully left up to the implementor.
 
 .. note::
 
@@ -78,24 +79,46 @@ but this is fully left up to the implementor.
    direct queries.
 
 
+Architecture
+------------
+.. The source for the following diagram can be found at: https://docs.google.com/presentation/d/1XiOiaq9zI_DIpxY1tlkysg9VAEw2r8aYob0bjG71pNg/edit?usp=sharing
+
+.. figure:: ./ceilo-arch.png
+   :width: 100%
+   :align: center
+   :alt: Architecture summary
+
+   An overall summary of Ceilometer's logical architecture.
+
+Each of Ceilometer's services are designed to scale horizontally. Additional
+workers and nodes can added depending on the expected load. Ceilometer offers
+five core services:
+
+1. polling agents - compute and central agent daemons designed to poll
+   OpenStack services.
+2. notification agent - daemon designed to listen to message queue.
+3. collector - daemon designed to gather and record event and metering data
+   created by notification and polling agents.
+4. api - service to query and view data recorded by collector service.
+5. alarming - daemons to evaluate and notify based on defined alarming rules.
+
 How is data collected?
 ----------------------
-.. The source for the 7 diagrams below can be found at: https://docs.google.com/presentation/d/1P50qO9BSAdGxRSbgHSbxLo0dKWx4HDIgjhDVa8KBR-Q/edit?usp=sharing
 
-.. figure:: ./1-Collectorandagents.png
-   :figwidth: 100%
+.. figure:: ./1-agents.png
+   :width: 100%
    :align: center
    :alt: Collectors and agents
 
-   This is a representation of how the collectors and agents gather data from multiple sources.
+   This is a representation of how the collectors and agents gather data from
+   multiple sources.
 
 In a perfect world, each and every project that you want to instrument should
 send events on the Oslo bus about anything that could be of interest to
-you. Unfortunately, not all
-projects have implemented this and you will often need to instrument
-other tools which may not use the same bus as OpenStack has defined. To
-circumvent this, the Ceilometer project created 3 independent methods to
-collect data:
+you. Unfortunately, not all projects have implemented this and you will often
+need to instrument other tools which may not use the same bus as OpenStack has
+defined. To circumvent this, the Ceilometer project created 3 independent
+methods to collect data:
 
 1. :term:`Bus listener agent` which takes events generated on the Oslo
    notification bus and transforms them into Ceilometer samples. This
@@ -114,37 +137,36 @@ collect data:
    This method is least preferred due to the inherent difficulty in making such
    a component resilient.
 
-The first method is supported by the ceilometer-collector agent, which monitors
-the message queues for notifications and for metering data coming from the
-"push" and "polling" agents. Methods 2 and 3 rely on a combination of the
-ceilometer-central-agent/ceilometer-compute-agent and the collector.
+The first method is supported by the ceilometer-notification agent, which
+monitors the message queues for notifications and for metering data coming
+from the "push" agents. Methods 2 and 3 rely on the ceilometer-compute-agent
+and ceilometer-central-agent respectively.
 
 How to access collected data?
 -----------------------------
 
 Once collected, the data is usually stored in a database, or in a simple
 file if you do not care about API access and want to do the rest of the
-processing elsewhere. There can be multiple types of
-databases through the use of different database plugins (see the section
-:ref:`which-db`). Moreover, the schema and dictionary of
-this database may evolve over time. For these reasons, we offer a REST API,
-and recommend that you access the collected data that way, rather than
-by accessing the underlying database directly.
+processing elsewhere. There can be multiple types of databases through the use
+of different database plugins (see the section :ref:`which-db`).
+Moreover, the schema and dictionary of this database may evolve over time. For
+these reasons, we offer a REST API, and recommend that you access the collected
+data that way, rather than by accessing the underlying database directly.
 
 If the way in which you wish to access your data is not yet supported by the API,
 please contact us with your feedback, so that we can improve the API
 accordingly.
 
 .. figure:: ./2-accessmodel.png
-   :figwidth: 100%
+   :width: 100%
    :align: center
    :alt: data access model
 
    This is a representation of how to access data stored by Ceilometer
 
-The :ref:`list of currently built in meters <measurements>` is
-available in the developer documentation,
-and it is also relatively easy to add your own (and eventually contribute it).
+The :ref:`list of currently built in meters <measurements>` is available in
+the developer documentation, and it is also relatively easy to add your own
+(and eventually contribute it).
 
 Ceilometer is part of OpenStack, but is not tied to OpenStack's definition of
 "users" and "tenants." The "source" field of each sample refers to the authority
@@ -154,7 +176,8 @@ samples for new meters using those sources. This means that you can collect
 data for applications running on top of OpenStack, such as a PaaS or SaaS
 layer, and use the same tools for metering your entire cloud.
 
-Moreover, end users can also :ref:`send their own application specific data <user-defined-data>` into the
+Moreover, end users can also
+:ref:`send their own application specific data <user-defined-data>` into the
 database through the REST API for a various set of use cases (see the section
 "Alarming" later in this article).
 
@@ -166,7 +189,7 @@ Multi-Publisher
 ---------------
 
 .. figure:: ./3-Pipeline.png
-   :figwidth: 100%
+   :width: 100%
    :align: center
    :alt: Ceilometer pipeline
 
@@ -186,12 +209,14 @@ for rating and billing systems.
 To solve this, the notion of multi-publisher can now be configured for each
 meter within Ceilometer, allowing the same technical meter to be published
 multiple times to multiple destinations, each potentially using a different
-transport and frequency of publication. At the time of writing, two
-transports have been implemented so far: the original and relatively secure
-Oslo RPC queue based, and one using UDP packets.
+transport and frequency of publication. At the time of writing, three
+transports have been implemented so far: notifier, a notification based
+publisher which pushes samples to a message queue; rpc, the original and
+relatively secure RPC based publisher; and udp, which publishes samples using
+UDP packets.
 
 .. figure:: ./4-Transformer.png
-   :figwidth: 100%
+   :width: 100%
    :align: center
    :alt: Transformer example
 
@@ -199,7 +224,7 @@ Oslo RPC queue based, and one using UDP packets.
    cpu percentage sample
 
 .. figure:: ./5-multi-publish.png
-   :figwidth: 100%
+   :width: 100%
    :align: center
    :alt: Multi-publish
 
@@ -208,24 +233,25 @@ Oslo RPC queue based, and one using UDP packets.
 Alarming
 --------
 
-The Alarming component of Ceilometer, first delivered in the Havana
-version, allows you to set alarms based on threshold evaluation for a collection
-of samples. An alarm can be set on a single meter, or on a combination. For
-example, you may want to trigger an alarm when the memory consumption
-reaches 70% on a given instance if the instance has been up for more than
-10 min. To setup an alarm, you will call :ref:`Ceilometer's API server <alarms-api>` specifying
-the alarm conditions and an action to take.
+The alarming component of Ceilometer, first delivered in the Havana
+version, allows you to set alarms based on threshold evaluation for a
+collection of samples. An alarm can be set on a single meter, or on a
+combination. For example, you may want to trigger an alarm when the memory
+consumption reaches 70% on a given instance if the instance has been up for
+more than 10 min. To setup an alarm, you will call
+:ref:`Ceilometer's API server <alarms-api>` specifying the alarm conditions and
+an action to take.
 
-Of course, if you are not administrator of the cloud itself, you can only
-set alarms on meters for your own components. You can also
+Of course, if you are not administrator of the cloud itself, you can only set
+alarms on meters for your own components. You can also
 :ref:`send your own meters <user-defined-data>` from within your instances,
-meaning that you can trigger
-alarms based on application centric data.
+meaning that you can trigger alarms based on application centric data.
 
 There can be multiple form of actions, but two have been implemented so far:
 
-1. :term:`HTTP callback`: you provide a URL to be called whenever the alarm has been set
-   off. The payload of the request contains all the details of why the alarm was triggered.
+1. :term:`HTTP callback`: you provide a URL to be called whenever the alarm has
+   been set off. The payload of the request contains all the details of why the
+   alarm was triggered.
 2. :term:`log`: mostly useful for debugging, stores alarms in a log file.
 
 For more details on this, we recommend that you read the blog post by
@@ -242,7 +268,7 @@ Which database to use
 ---------------------
 
 .. figure:: ./6-storagemodel.png
-   :figwidth: 100%
+   :width: 100%
    :align: center
    :alt: Storage model
 
@@ -257,12 +283,13 @@ details. In short, ensure a dedicated database is used when deploying
 Ceilometer as the volume of data generated can be extensive in a production
 environment and will generally use a lot of I/O.
 
-.. figure:: ./7-overallarchi.png
-   :figwidth: 100%
-   :align: center
-   :alt: Architecture summary
+In the Juno and Kilo release cycle, Ceilometer's database was divided into
+three separate connections: alarm, event, and metering. This allows
+deployers to either continue storing all data within a single database or to
+divide the data into their own databases, tailored for its purpose. For
+example, a deployer could choose to store alarms in an SQL backend while
+storing events and metering data in a NoSQL backend.
 
-   An overall summary of Ceilometer's logical architecture.
 
 Detailed Description
 ====================
@@ -351,12 +378,8 @@ the ``ceilometer.poll.central`` namespace.
 The agents periodically asks each pollster for instances of
 ``Sample`` objects. The agent framework then publishes the Samples using
 the publishers defined in the pipeline configuration. For example,
-the ``rpc`` publisher converts the Sample to metering messages, which it
+the ``notifier`` publisher converts the Sample to metering messages, which it
 then signs and transmits on the metering message bus.
-
-The pollster plugins do not communicate with the message bus directly,
-unless it is necessary to do so in order to collect the information
-for which they are polling.
 
 The frequency of polling is controlled via the pipeline configuration.
 See :ref:`Pipeline-Configuration` for details.
@@ -387,28 +410,19 @@ expressed an interest in seeing. For example, a callback asking for
 events on the ``nova`` exchange using the ``notifications.info`` topic.
 
 The listener plugin returns an iterable with zero or more Sample instances
-based on the data in the incoming message. The collector framework code
+based on the data in the incoming message. The notification framework code
 converts the Sample instances to metering messages and publishes them on the
 metering message bus. Although Ceilometer includes a default storage
 solution to work with the API service, by republishing on the metering
 message bus we can support installations that want to handle their own data
 storage.
 
-The Ceilometer collector daemon then receives this Sample on the bus and
-stores them into a database.
+Collecting Metering Messages
+----------------------------
 
-Handling Metering Messages
---------------------------
-
-The listener for metering messages also runs in the collector
-daemon. It validates the incoming data and (if the signature is valid)
-then writes the messages to the data store.
-
-.. note::
-
-   Because this listener uses ``openstack.common.rpc`` instead of
-   notifications, it is implemented directly in the collector code
-   instead of as a plugin.
+The collector daemon gathers the processed event and metering data captured by
+the notification and polling agents. It validates the incoming data and (if
+the signature is valid) then writes the messages to the data store.
 
 Metering messages are signed using the hmac_ module in Python's
 standard library. A shared secret value can be provided in the
@@ -421,16 +435,7 @@ verification by consumers who access the data via the API.
 
 .. _hmac: http://docs.python.org/library/hmac.html
 
-RPC
----
-
-Ceilometer uses ``openstack.common.rpc`` to cast messages from the
-agent to the collector.
-
 .. seealso::
 
    * http://wiki.openstack.org/EfficientMetering/ArchitectureProposalV1
    * http://wiki.openstack.org/EfficientMetering#Architecture
-   * `Bug 1010037`_ : allow different polling interval for each pollster
-
-.. _Bug 1010037: https://bugs.launchpad.net/ceilometer/+bug/1010037
