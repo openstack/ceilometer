@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-09-09 06:08+0000\n"
+"POT-Creation-Date: 2014-10-16 07:50+0000\n"
 "PO-Revision-Date: 2014-09-02 00:36+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/ceilometer/"
@@ -35,21 +35,6 @@ msgstr ""
 msgid "Error getting group membership info from coordination backend."
 msgstr ""
 
-#: ceilometer/openstack/common/excutils.py:76
-#, python-format
-msgid "Original exception being dropped: %s"
-msgstr "Ursprüngliche Ausnahme wird gelöscht: %s"
-
-#: ceilometer/openstack/common/excutils.py:105
-#, python-format
-msgid "Unexpected exception occurred %d time(s)... retrying."
-msgstr "Unerwartete Ausnahme %d mal(e) aufgetreten... Neuversuch."
-
-#: ceilometer/openstack/common/lockutils.py:117
-#, python-format
-msgid "Could not release the acquired lock `%s`"
-msgstr "Angeforderte Sperre `%s` konnte nicht freigegeben werden"
-
 #: ceilometer/openstack/common/loopingcall.py:95
 msgid "in fixed duration looping call"
 msgstr "in Schleifenaufruf mit festgelegter Dauer"
@@ -58,25 +43,17 @@ msgstr "in Schleifenaufruf mit festgelegter Dauer"
 msgid "in dynamic looping call"
 msgstr "in dynamischen Schleifenaufruf"
 
-#: ceilometer/openstack/common/policy.py:508
+#: ceilometer/openstack/common/policy.py:535
+#: ceilometer/openstack/common/policy.py:815
 #, python-format
 msgid "Failed to understand rule %s"
 msgstr "Regel %s konnte nicht verstanden werden"
 
-#: ceilometer/openstack/common/policy.py:518
+#: ceilometer/openstack/common/policy.py:545
 #, python-format
 msgid "No handler for matches of kind %s"
 msgstr "Kein Handler für Übereinstimmungen des Typs %s"
 
-#: ceilometer/openstack/common/policy.py:788
-#, python-format
-msgid "Failed to understand rule %r"
-msgstr "Regel %r konnte nicht verstanden werden"
-
-#: ceilometer/openstack/common/service.py:188
-msgid "Exception during rpc cleanup."
-msgstr "Ausnahme bei RPC Cleanup."
-
-#: ceilometer/openstack/common/service.py:277
+#: ceilometer/openstack/common/service.py:269
 msgid "Unhandled exception"
 msgstr "Nicht behandelte Ausnahme"

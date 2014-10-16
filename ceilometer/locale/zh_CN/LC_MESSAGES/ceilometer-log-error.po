@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the ceilometer project.
 #
 # Translators:
+# Shuwen SUN <chris-void@outlook.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-09-09 06:08+0000\n"
-"PO-Revision-Date: 2014-09-02 00:36+0000\n"
-"Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
+"POT-Creation-Date: 2014-10-16 07:50+0000\n"
+"PO-Revision-Date: 2014-10-10 17:21+0000\n"
+"Last-Translator: Shuwen SUN <chris-void@outlook.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/"
 "ceilometer/language/zh_CN/)\n"
 "Language: zh_CN\n"
@@ -21,7 +22,7 @@ msgstr ""
 
 #: ceilometer/collector.py:132
 msgid "Dispatcher failed to handle the sample, requeue it."
-msgstr ""
+msgstr "调度器无法处理样例，队列重排"
 
 #: ceilometer/coordination.py:76
 msgid "Error connecting to coordination backend."
@@ -35,21 +36,6 @@ msgstr ""
 msgid "Error getting group membership info from coordination backend."
 msgstr ""
 
-#: ceilometer/openstack/common/excutils.py:76
-#, python-format
-msgid "Original exception being dropped: %s"
-msgstr "正在删除原始异常：%s"
-
-#: ceilometer/openstack/common/excutils.py:105
-#, python-format
-msgid "Unexpected exception occurred %d time(s)... retrying."
-msgstr "意外的异常已发生 %d 次...正在重试。"
-
-#: ceilometer/openstack/common/lockutils.py:117
-#, python-format
-msgid "Could not release the acquired lock `%s`"
-msgstr "未能释放所获取锁定“%s”"
-
 #: ceilometer/openstack/common/loopingcall.py:95
 msgid "in fixed duration looping call"
 msgstr "在固定时段内循环调用"
@@ -58,25 +44,17 @@ msgstr "在固定时段内循环调用"
 msgid "in dynamic looping call"
 msgstr "在动态循环调用中"
 
-#: ceilometer/openstack/common/policy.py:508
+#: ceilometer/openstack/common/policy.py:535
+#: ceilometer/openstack/common/policy.py:815
 #, python-format
 msgid "Failed to understand rule %s"
 msgstr "未能理解规则 %s"
 
-#: ceilometer/openstack/common/policy.py:518
+#: ceilometer/openstack/common/policy.py:545
 #, python-format
 msgid "No handler for matches of kind %s"
 msgstr "对于类型为 %s 的匹配项，不存在任何处理程序"
 
-#: ceilometer/openstack/common/policy.py:788
-#, python-format
-msgid "Failed to understand rule %r"
-msgstr "未能理解规则 %r "
-
-#: ceilometer/openstack/common/service.py:188
-msgid "Exception during rpc cleanup."
-msgstr "在RPC清除期间发生异常。"
-
-#: ceilometer/openstack/common/service.py:277
+#: ceilometer/openstack/common/service.py:269
 msgid "Unhandled exception"
 msgstr "存在未处理的异常"

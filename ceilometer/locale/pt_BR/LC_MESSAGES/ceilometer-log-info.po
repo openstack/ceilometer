@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-10-07 06:07+0000\n"
-"PO-Revision-Date: 2014-10-03 03:50+0000\n"
+"POT-Creation-Date: 2014-10-16 07:50+0000\n"
+"PO-Revision-Date: 2014-10-14 11:31+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/"
 "ceilometer/language/pt_BR/)\n"
@@ -33,64 +33,54 @@ msgstr ""
 msgid "Eventlet backdoor listening on %(port)s for process %(pid)d"
 msgstr "Backdoor de Eventlet escutando na porta %(port)s pelo processo %(pid)d"
 
-#: ceilometer/openstack/common/lockutils.py:82
-#, python-format
-msgid "Created lock path: %s"
-msgstr "Criado caminho de lock: %s"
-
-#: ceilometer/openstack/common/lockutils.py:249
-#, python-format
-msgid "Failed to remove file %(file)s"
-msgstr ""
-
-#: ceilometer/openstack/common/service.py:176
+#: ceilometer/openstack/common/service.py:174
 #, python-format
 msgid "Caught %s, exiting"
 msgstr "%s capturadas, saindo"
 
-#: ceilometer/openstack/common/service.py:240
+#: ceilometer/openstack/common/service.py:232
 msgid "Parent process has died unexpectedly, exiting"
 msgstr "Processo pai saiu inesperadamente, saindo"
 
-#: ceilometer/openstack/common/service.py:271
+#: ceilometer/openstack/common/service.py:263
 #, python-format
 msgid "Child caught %s, exiting"
 msgstr "Filho capturado %s, terminando"
 
-#: ceilometer/openstack/common/service.py:310
+#: ceilometer/openstack/common/service.py:302
 msgid "Forking too fast, sleeping"
 msgstr "Bifurcação muito rápida, suspendendo"
 
-#: ceilometer/openstack/common/service.py:329
+#: ceilometer/openstack/common/service.py:321
 #, python-format
 msgid "Started child %d"
 msgstr "Filho %d iniciado"
 
-#: ceilometer/openstack/common/service.py:339
+#: ceilometer/openstack/common/service.py:331
 #, python-format
 msgid "Starting %d workers"
 msgstr "Iniciando %d trabalhadores"
 
-#: ceilometer/openstack/common/service.py:356
+#: ceilometer/openstack/common/service.py:348
 #, python-format
 msgid "Child %(pid)d killed by signal %(sig)d"
 msgstr "%(pid)d filho eliminado pelo sinal %(sig)d"
 
-#: ceilometer/openstack/common/service.py:360
+#: ceilometer/openstack/common/service.py:352
 #, python-format
 msgid "Child %(pid)s exited with status %(code)d"
 msgstr "Filho %(pid)s encerrando com status %(code)d"
 
-#: ceilometer/openstack/common/service.py:399
+#: ceilometer/openstack/common/service.py:391
 #, python-format
 msgid "Caught %s, stopping children"
 msgstr "%s capturado, parando filhos"
 
-#: ceilometer/openstack/common/service.py:408
+#: ceilometer/openstack/common/service.py:400
 msgid "Wait called after thread killed.  Cleaning up."
 msgstr "Espera requisitada depois que thread foi morta.  Limpando."
 
-#: ceilometer/openstack/common/service.py:424
+#: ceilometer/openstack/common/service.py:416
 #, python-format
 msgid "Waiting on %d children to exit"
 msgstr "Aguardando em %d filhos para sair"
