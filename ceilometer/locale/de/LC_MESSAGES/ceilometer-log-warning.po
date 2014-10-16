@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-09-24 06:05+0000\n"
+"POT-Creation-Date: 2014-10-16 07:50+0000\n"
 "PO-Revision-Date: 2014-06-14 19:30+0000\n"
 "Last-Translator: Andreas Jaeger <jaegerandi@gmail.com>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/ceilometer/"
@@ -30,7 +30,12 @@ msgstr ""
 msgid "task %(func_name)s run outlasted interval by %(delay).2f sec"
 msgstr ""
 
-#: ceilometer/openstack/common/service.py:364
+#: ceilometer/openstack/common/policy.py:248
+#, python-format
+msgid "Can not find policy directories %s"
+msgstr ""
+
+#: ceilometer/openstack/common/service.py:356
 #, python-format
 msgid "pid %d not in child list"
 msgstr "PID %d nicht in Liste untergeordneter Elemente"

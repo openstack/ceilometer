@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 2014.2.dev4.g3263c39\n"
+"Project-Id-Version: ceilometer 2015.1.dev99.ga64ed6d\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-09-09 06:08+0000\n"
+"POT-Creation-Date: 2014-10-16 07:50+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -33,21 +33,6 @@ msgstr ""
 msgid "Error getting group membership info from coordination backend."
 msgstr ""
 
-#: ceilometer/openstack/common/excutils.py:76
-#, python-format
-msgid "Original exception being dropped: %s"
-msgstr ""
-
-#: ceilometer/openstack/common/excutils.py:105
-#, python-format
-msgid "Unexpected exception occurred %d time(s)... retrying."
-msgstr ""
-
-#: ceilometer/openstack/common/lockutils.py:117
-#, python-format
-msgid "Could not release the acquired lock `%s`"
-msgstr ""
-
 #: ceilometer/openstack/common/loopingcall.py:95
 msgid "in fixed duration looping call"
 msgstr ""
@@ -56,26 +41,18 @@ msgstr ""
 msgid "in dynamic looping call"
 msgstr ""
 
-#: ceilometer/openstack/common/policy.py:508
+#: ceilometer/openstack/common/policy.py:535
+#: ceilometer/openstack/common/policy.py:815
 #, python-format
 msgid "Failed to understand rule %s"
 msgstr ""
 
-#: ceilometer/openstack/common/policy.py:518
+#: ceilometer/openstack/common/policy.py:545
 #, python-format
 msgid "No handler for matches of kind %s"
 msgstr ""
 
-#: ceilometer/openstack/common/policy.py:788
-#, python-format
-msgid "Failed to understand rule %r"
-msgstr ""
-
-#: ceilometer/openstack/common/service.py:188
-msgid "Exception during rpc cleanup."
-msgstr ""
-
-#: ceilometer/openstack/common/service.py:277
+#: ceilometer/openstack/common/service.py:269
 msgid "Unhandled exception"
 msgstr ""
 
