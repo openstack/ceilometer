@@ -147,14 +147,14 @@ def make_query_from_filter(session, query, sample_filter, require_meter=True):
     if sample_filter.source:
         query = query.filter(
             models.Resource.source_id == sample_filter.source)
-    if sample_filter.start:
-        ts_start = sample_filter.start
+    if sample_filter.start_timestamp:
+        ts_start = sample_filter.start_timestamp
         if sample_filter.start_timestamp_op == 'gt':
             query = query.filter(models.Sample.timestamp > ts_start)
         else:
             query = query.filter(models.Sample.timestamp >= ts_start)
-    if sample_filter.end:
-        ts_end = sample_filter.end
+    if sample_filter.end_timestamp:
+        ts_end = sample_filter.end_timestamp
         if sample_filter.end_timestamp_op == 'le':
             query = query.filter(models.Sample.timestamp <= ts_end)
         else:
@@ -401,9 +401,9 @@ class Connection(base.Connection):
         s_filter = storage.SampleFilter(user=user,
                                         project=project,
                                         source=source,
-                                        start=start_timestamp,
+                                        start_timestamp=start_timestamp,
                                         start_timestamp_op=start_timestamp_op,
-                                        end=end_timestamp,
+                                        end_timestamp=end_timestamp,
                                         end_timestamp_op=end_timestamp_op,
                                         metaquery=metaquery,
                                         resource=resource)
@@ -687,7 +687,7 @@ class Connection(base.Connection):
                                                       aggregate)
             return
 
-        if not sample_filter.start or not sample_filter.end:
+        if not (sample_filter.start_timestamp and sample_filter.end_timestamp):
             res = self._make_stats_query(sample_filter,
                                          None,
                                          aggregate).first()
@@ -703,8 +703,8 @@ class Connection(base.Connection):
         # stats by period. We would like to use GROUP BY, but there's no
         # portable way to manipulate timestamp in SQL, so we can't.
         for period_start, period_end in base.iter_period(
-                sample_filter.start or res.tsmin,
-                sample_filter.end or res.tsmax,
+                sample_filter.start_timestamp or res.tsmin,
+                sample_filter.end_timestamp or res.tsmax,
                 period):
             q = query.filter(models.Sample.timestamp >= period_start)
             q = q.filter(models.Sample.timestamp < period_end)

@@ -74,8 +74,8 @@ def make_events_query_from_filter(event_filter):
     :param event_filter: storage.EventFilter object.
     """
     q = {}
-    ts_range = make_timestamp_range(event_filter.start_time,
-                                    event_filter.end_time)
+    ts_range = make_timestamp_range(event_filter.start_timestamp,
+                                    event_filter.end_timestamp)
     if ts_range:
         q['timestamp'] = ts_range
     if event_filter.event_type:
@@ -130,8 +130,8 @@ def make_query_from_filter(sample_filter, require_meter=True):
     elif require_meter:
         raise RuntimeError('Missing required meter specifier')
 
-    ts_range = make_timestamp_range(sample_filter.start,
-                                    sample_filter.end,
+    ts_range = make_timestamp_range(sample_filter.start_timestamp,
+                                    sample_filter.end_timestamp,
                                     sample_filter.start_timestamp_op,
                                     sample_filter.end_timestamp_op)
 

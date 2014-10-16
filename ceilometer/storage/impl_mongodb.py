@@ -860,8 +860,8 @@ class Connection(pymongo_base.Connection):
         q = pymongo_utils.make_query_from_filter(sample_filter)
 
         if period:
-            if sample_filter.start:
-                period_start = sample_filter.start
+            if sample_filter.start_timestamp:
+                period_start = sample_filter.start_timestamp
             else:
                 period_start = self.db.meter.find(
                     limit=1, sort=[('timestamp',

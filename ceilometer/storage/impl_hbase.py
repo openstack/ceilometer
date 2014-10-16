@@ -369,15 +369,15 @@ class Connection(hbase_base.Connection, base.Connection):
                                   filter=q, row_start=start,
                                   row_stop=stop, columns=columns)))
 
-        if sample_filter.start:
-            start_time = sample_filter.start
+        if sample_filter.start_timestamp:
+            start_time = sample_filter.start_timestamp
         elif meters:
             start_time = meters[-1][0]['timestamp']
         else:
             start_time = None
 
-        if sample_filter.end:
-            end_time = sample_filter.end
+        if sample_filter.end_timestamp:
+            end_time = sample_filter.end_timestamp
         elif meters:
             end_time = meters[0][0]['timestamp']
         else:

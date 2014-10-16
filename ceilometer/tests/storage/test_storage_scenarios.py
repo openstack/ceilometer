@@ -576,7 +576,7 @@ class RawSampleTest(DBTestBase,
         timestamp = datetime.datetime(2012, 7, 2, 10, 41)
         f = storage.SampleFilter(
             user='user-id',
-            start=timestamp,
+            start_timestamp=timestamp,
         )
 
         results = list(self.conn.get_samples(f))
@@ -596,7 +596,7 @@ class RawSampleTest(DBTestBase,
         timestamp = datetime.datetime(2012, 7, 2, 10, 40)
         f = storage.SampleFilter(
             user='user-id',
-            end=timestamp,
+            end_timestamp=timestamp,
         )
 
         results = list(self.conn.get_samples(f))
@@ -616,8 +616,8 @@ class RawSampleTest(DBTestBase,
         start_ts = datetime.datetime(2012, 7, 2, 10, 42)
         end_ts = datetime.datetime(2012, 7, 2, 10, 43)
         f = storage.SampleFilter(
-            start=start_ts,
-            end=end_ts,
+            start_timestamp=start_ts,
+            end_timestamp=end_ts,
         )
 
         results = list(self.conn.get_samples(f))
@@ -1219,7 +1219,7 @@ class StatisticsTest(DBTestBase,
         f = storage.SampleFilter(
             user='user-5',
             meter='volume.size',
-            start='2012-09-25T10:28:00',
+            start_timestamp='2012-09-25T10:28:00',
         )
         results = list(self.conn.get_meter_statistics(f, period=7200))
         self.assertEqual(2, len(results))
@@ -1278,7 +1278,7 @@ class StatisticsTest(DBTestBase,
             f = storage.SampleFilter(
                 user='user-5',
                 meter='volume.size',
-                start=date
+                start_timestamp=date
             )
             results = list(self.conn.get_meter_statistics(f, period=7200))
             self.assertEqual(2, len(results))
@@ -1293,8 +1293,8 @@ class StatisticsTest(DBTestBase,
         f = storage.SampleFilter(
             user='user-5',
             meter='volume.size',
-            start='2012-09-25T10:28:00',
-            end='2012-09-25T11:28:00',
+            start_timestamp='2012-09-25T10:28:00',
+            end_timestamp='2012-09-25T11:28:00',
         )
         results = list(self.conn.get_meter_statistics(f, period=1800))
         self.assertEqual(1, len(results))
@@ -1320,8 +1320,8 @@ class StatisticsTest(DBTestBase,
         f = storage.SampleFilter(
             meter='volume.size',
             resource='resource-id',
-            start='2012-09-25T11:30:00',
-            end='2012-09-25T11:32:00',
+            start_timestamp='2012-09-25T11:30:00',
+            end_timestamp='2012-09-25T11:32:00',
         )
         results = list(self.conn.get_meter_statistics(f))[0]
         self.assertEqual(0, results.duration)
@@ -2284,7 +2284,7 @@ class StatisticsGroupByTest(DBTestBase,
     def test_group_by_start_timestamp_after(self):
         f = storage.SampleFilter(
             meter='instance',
-            start=datetime.datetime(2013, 8, 1, 17, 28, 1),
+            start_timestamp=datetime.datetime(2013, 8, 1, 17, 28, 1),
         )
         results = list(self.conn.get_meter_statistics(f,
                                                       groupby=['project_id']))
@@ -2294,7 +2294,7 @@ class StatisticsGroupByTest(DBTestBase,
     def test_group_by_end_timestamp_before(self):
         f = storage.SampleFilter(
             meter='instance',
-            end=datetime.datetime(2013, 8, 1, 10, 10, 59),
+            end_timestamp=datetime.datetime(2013, 8, 1, 10, 10, 59),
         )
         results = list(self.conn.get_meter_statistics(f,
                                                       groupby=['project_id']))
@@ -2304,7 +2304,7 @@ class StatisticsGroupByTest(DBTestBase,
     def test_group_by_start_timestamp(self):
         f = storage.SampleFilter(
             meter='instance',
-            start=datetime.datetime(2013, 8, 1, 14, 58),
+            start_timestamp=datetime.datetime(2013, 8, 1, 14, 58),
         )
         results = list(self.conn.get_meter_statistics(f,
                                                       groupby=['project_id']))
@@ -2336,7 +2336,7 @@ class StatisticsGroupByTest(DBTestBase,
     def test_group_by_end_timestamp(self):
         f = storage.SampleFilter(
             meter='instance',
-            end=datetime.datetime(2013, 8, 1, 11, 45),
+            end_timestamp=datetime.datetime(2013, 8, 1, 11, 45),
         )
         results = list(self.conn.get_meter_statistics(f,
                                                       groupby=['project_id']))
@@ -2361,8 +2361,8 @@ class StatisticsGroupByTest(DBTestBase,
     def test_group_by_start_end_timestamp(self):
         f = storage.SampleFilter(
             meter='instance',
-            start=datetime.datetime(2013, 8, 1, 8, 17, 3),
-            end=datetime.datetime(2013, 8, 1, 23, 59, 59),
+            start_timestamp=datetime.datetime(2013, 8, 1, 8, 17, 3),
+            end_timestamp=datetime.datetime(2013, 8, 1, 23, 59, 59),
         )
         results = list(self.conn.get_meter_statistics(f,
                                                       groupby=['project_id']))
@@ -2395,8 +2395,8 @@ class StatisticsGroupByTest(DBTestBase,
         f = storage.SampleFilter(
             meter='instance',
             project='project-1',
-            start=datetime.datetime(2013, 8, 1, 11, 1),
-            end=datetime.datetime(2013, 8, 1, 20, 0),
+            start_timestamp=datetime.datetime(2013, 8, 1, 11, 1),
+            end_timestamp=datetime.datetime(2013, 8, 1, 20, 0),
         )
         results = list(self.conn.get_meter_statistics(f,
                                                       groupby=['resource_id']))
@@ -2427,8 +2427,8 @@ class StatisticsGroupByTest(DBTestBase,
     def test_group_by_start_end_timestamp_with_period(self):
         f = storage.SampleFilter(
             meter='instance',
-            start=datetime.datetime(2013, 8, 1, 14, 0),
-            end=datetime.datetime(2013, 8, 1, 17, 0),
+            start_timestamp=datetime.datetime(2013, 8, 1, 14, 0),
+            end_timestamp=datetime.datetime(2013, 8, 1, 17, 0),
         )
         results = list(self.conn.get_meter_statistics(f,
                                                       period=3600,
@@ -2511,8 +2511,8 @@ class StatisticsGroupByTest(DBTestBase,
         f = storage.SampleFilter(
             meter='instance',
             source='source-1',
-            start=datetime.datetime(2013, 8, 1, 10, 0),
-            end=datetime.datetime(2013, 8, 1, 18, 0),
+            start_timestamp=datetime.datetime(2013, 8, 1, 10, 0),
+            end_timestamp=datetime.datetime(2013, 8, 1, 18, 0),
         )
         results = list(self.conn.get_meter_statistics(f,
                                                       period=7200,

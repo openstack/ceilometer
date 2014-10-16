@@ -65,10 +65,10 @@ def make_events_query_from_filter(event_filter):
     Query is based on the selected parameter.
     :param event_filter: storage.EventFilter object.
     """
-    start = "%s" % (timestamp(event_filter.start_time, reverse=False)
-                    if event_filter.start_time else "")
-    stop = "%s" % (timestamp(event_filter.end_time, reverse=False)
-                   if event_filter.end_time else "")
+    start = "%s" % (timestamp(event_filter.start_timestamp, reverse=False)
+                    if event_filter.start_timestamp else "")
+    stop = "%s" % (timestamp(event_filter.end_timestamp, reverse=False)
+                   if event_filter.end_timestamp else "")
     kwargs = {'event_type': event_filter.event_type,
               'event_id': event_filter.message_id}
     res_q = make_query(**kwargs)
@@ -240,8 +240,10 @@ def make_sample_query_from_filter(sample_filter, require_meter=True):
         raise RuntimeError('Missing required meter specifier')
     start_row, end_row, ts_query = make_timestamp_query(
         make_general_rowkey_scan,
-        start=sample_filter.start, start_op=sample_filter.start_timestamp_op,
-        end=sample_filter.end, end_op=sample_filter.end_timestamp_op,
+        start=sample_filter.start_timestamp,
+        start_op=sample_filter.start_timestamp_op,
+        end=sample_filter.end_timestamp,
+        end_op=sample_filter.end_timestamp_op,
         some_id=meter)
     kwargs = dict(user_id=sample_filter.user,
                   project_id=sample_filter.project,
@@ -257,7 +259,8 @@ def make_sample_query_from_filter(sample_filter, require_meter=True):
     else:
         res_q = ts_query if ts_query else None
 
-    need_timestamp = (sample_filter.start or sample_filter.end) is not None
+    need_timestamp = (sample_filter.start_timestamp or
+                      sample_filter.end_timestamp) is not None
     columns = get_meter_columns(metaquery=sample_filter.metaquery,
                                 need_timestamp=need_timestamp, **kwargs)
     return res_q, start_row, end_row, columns

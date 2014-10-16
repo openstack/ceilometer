@@ -119,9 +119,9 @@ class SampleFilter(object):
 
     :param user: The sample owner.
     :param project: The sample project.
-    :param start: Earliest time point in the request.
+    :param start_timestamp: Earliest time point in the request.
     :param start_timestamp_op: Earliest timestamp operation in the request.
-    :param end: Latest time point in the request.
+    :param end_timestamp: Latest time point in the request.
     :param end_timestamp_op: Latest timestamp operation in the request.
     :param resource: Optional filter for resource id.
     :param meter: Optional filter for meter type using the meter name.
@@ -130,16 +130,16 @@ class SampleFilter(object):
     :param metaquery: Optional filter on the metadata
     """
     def __init__(self, user=None, project=None,
-                 start=None, start_timestamp_op=None,
-                 end=None, end_timestamp_op=None,
+                 start_timestamp=None, start_timestamp_op=None,
+                 end_timestamp=None, end_timestamp_op=None,
                  resource=None, meter=None,
                  source=None, message_id=None,
                  metaquery=None):
         self.user = user
         self.project = project
-        self.start = utils.sanitize_timestamp(start)
+        self.start_timestamp = utils.sanitize_timestamp(start_timestamp)
         self.start_timestamp_op = start_timestamp_op
-        self.end = utils.sanitize_timestamp(end)
+        self.end_timestamp = utils.sanitize_timestamp(end_timestamp)
         self.end_timestamp_op = end_timestamp_op
         self.resource = resource
         self.meter = meter
@@ -150,9 +150,9 @@ class SampleFilter(object):
     def __repr__(self):
         return ("<SampleFilter(user: %s,"
                 " project: %s,"
-                " start: %s,"
+                " start_timestamp: %s,"
                 " start_timestamp_op: %s,"
-                " end: %s,"
+                " end_timestamp: %s,"
                 " end_timestamp_op: %s,"
                 " resource: %s,"
                 " meter: %s,"
@@ -161,9 +161,9 @@ class SampleFilter(object):
                 " message_id: %s)>" %
                 (self.user,
                  self.project,
-                 self.start,
+                 self.start_timestamp,
                  self.start_timestamp_op,
-                 self.end,
+                 self.end_timestamp,
                  self.end_timestamp_op,
                  self.resource,
                  self.meter,
@@ -175,8 +175,8 @@ class SampleFilter(object):
 class EventFilter(object):
     """Properties for building an Event query.
 
-    :param start_time: UTC start datetime (mandatory)
-    :param end_time: UTC end datetime (mandatory)
+    :param start_timestamp: UTC start datetime (mandatory)
+    :param end_timestamp: UTC end datetime (mandatory)
     :param event_type: the name of the event. None for all.
     :param message_id: the message_id of the event. None for all.
     :param traits_filter: the trait filter dicts, all of which are optional.
@@ -192,20 +192,20 @@ class EventFilter(object):
         'op': <eq, lt, le, ne, gt or ge> }
     """
 
-    def __init__(self, start_time=None, end_time=None, event_type=None,
-                 message_id=None, traits_filter=None):
-        self.start_time = utils.sanitize_timestamp(start_time)
-        self.end_time = utils.sanitize_timestamp(end_time)
+    def __init__(self, start_timestamp=None, end_timestamp=None,
+                 event_type=None, message_id=None, traits_filter=None):
+        self.start_timestamp = utils.sanitize_timestamp(start_timestamp)
+        self.end_timestamp = utils.sanitize_timestamp(end_timestamp)
         self.message_id = message_id
         self.event_type = event_type
         self.traits_filter = traits_filter or []
 
     def __repr__(self):
-        return ("<EventFilter(start_time: %s,"
-                " end_time: %s,"
+        return ("<EventFilter(start_timestamp: %s,"
+                " end_timestamp: %s,"
                 " event_type: %s,"
                 " traits: %s)>" %
-                (self.start_time,
-                 self.end_time,
+                (self.start_timestamp,
+                 self.end_timestamp,
                  self.event_type,
                  six.text_type(self.traits_filter)))

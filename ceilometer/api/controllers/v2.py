@@ -411,7 +411,7 @@ def _validate_query(query, db_func, internal_keys=None,
     :param allow_timestamps: defines whether the timestamp-based constraint is
         applicable for this query or not
 
-    :returns: None, if the query is valid
+    :returns: valid query keys the db_func supported
 
     :raises InvalidInput: if an operator is not supported for a given field
     :raises InvalidInput: if timestamp constraints are allowed, but
@@ -428,6 +428,11 @@ def _validate_query(query, db_func, internal_keys=None,
         valid_keys.remove('alarm_type')
         valid_keys.append('type')
 
+    internal_timestamp_keys = ['end_timestamp', 'start_timestamp',
+                               'end_timestamp_op', 'start_timestamp_op']
+    if 'start_timestamp' in valid_keys:
+        internal_keys += internal_timestamp_keys
+        valid_keys += ['timestamp', 'search_offset']
     internal_keys.append('self')
     valid_keys = set(valid_keys) - set(internal_keys)
     translation = {'user_id': 'user',
@@ -470,6 +475,7 @@ def _validate_query(query, db_func, internal_keys=None,
                 msg = ("unrecognized field in query: %s, "
                        "valid keys: %s") % (query, sorted(valid_keys))
                 raise wsme.exc.UnknownArgument(key, msg)
+    return valid_keys
 
 
 def _validate_timestamp_fields(query, field_name, operator_list,
@@ -516,11 +522,9 @@ def _validate_timestamp_fields(query, field_name, operator_list,
 def _query_to_kwargs(query, db_func, internal_keys=None,
                      allow_timestamps=True):
     internal_keys = internal_keys or []
-    _validate_query(query, db_func, internal_keys=internal_keys,
-                    allow_timestamps=allow_timestamps)
+    valid_keys = _validate_query(query, db_func, internal_keys=internal_keys,
+                                 allow_timestamps=allow_timestamps)
     query = _sanitize_query(query, db_func)
-    internal_keys.append('self')
-    valid_keys = set(inspect.getargspec(db_func)[0]) - set(internal_keys)
     translation = {'user_id': 'user',
                    'project_id': 'project',
                    'resource_id': 'resource',
@@ -553,18 +557,7 @@ def _query_to_kwargs(query, db_func, internal_keys=None,
     if metaquery and 'metaquery' in valid_keys:
         kwargs['metaquery'] = metaquery
     if stamp:
-        q_ts = _get_query_timestamps(stamp)
-        if 'start' in valid_keys:
-            kwargs['start'] = q_ts['query_start']
-            kwargs['end'] = q_ts['query_end']
-        elif 'start_timestamp' in valid_keys:
-            kwargs['start_timestamp'] = q_ts['query_start']
-            kwargs['end_timestamp'] = q_ts['query_end']
-        if 'start_timestamp_op' in stamp:
-            kwargs['start_timestamp_op'] = stamp['start_timestamp_op']
-        if 'end_timestamp_op' in stamp:
-            kwargs['end_timestamp_op'] = stamp['end_timestamp_op']
-
+        kwargs.update(_get_query_timestamps(stamp))
     return kwargs
 
 
@@ -599,19 +592,14 @@ def _get_query_timestamps(args=None):
 
     Returns a dictionary containing:
 
-    query_start: First timestamp to use for query
-    start_timestamp: start_timestamp parameter from request
-    query_end: Final timestamp to use for query
-    end_timestamp: end_timestamp parameter from request
-    search_offset: search_offset parameter from request
+    start_timestamp: First timestamp to use for query
+    start_timestamp_op: First timestamp operator to use for query
+    end_timestamp: Final timestamp to use for query
+    end_timestamp_op: Final timestamp operator to use for query
     """
 
     if args is None:
-        return {'query_start': None,
-                'query_end': None,
-                'start_timestamp': None,
-                'end_timestamp': None,
-                'search_offset': 0}
+        return {}
     search_offset = int(args.get('search_offset', 0))
 
     def _parse_timestamp(timestamp):
@@ -625,20 +613,16 @@ def _get_query_timestamps(args=None):
                                         'invalid timestamp format')
         return iso_timestamp
 
-    start_timestamp = args.get('start_timestamp')
-    end_timestamp = args.get('end_timestamp')
-    start_timestamp = _parse_timestamp(start_timestamp)
-    end_timestamp = _parse_timestamp(end_timestamp)
-    query_start = start_timestamp - datetime.timedelta(
+    start_timestamp = _parse_timestamp(args.get('start_timestamp'))
+    end_timestamp = _parse_timestamp(args.get('end_timestamp'))
+    start_timestamp = start_timestamp - datetime.timedelta(
         minutes=search_offset) if start_timestamp else None
-    query_end = end_timestamp + datetime.timedelta(
+    end_timestamp = end_timestamp + datetime.timedelta(
         minutes=search_offset) if end_timestamp else None
-    return {'query_start': query_start,
-            'query_end': query_end,
-            'start_timestamp': start_timestamp,
+    return {'start_timestamp': start_timestamp,
             'end_timestamp': end_timestamp,
-            'search_offset': search_offset,
-            }
+            'start_timestamp_op': args.get('start_timestamp_op'),
+            'end_timestamp_op': args.get('end_timestamp_op')}
 
 
 def _flatten_metadata(metadata):
@@ -2369,8 +2353,8 @@ def _event_query_to_event_filter(q):
     evt_model_filter = {
         'event_type': None,
         'message_id': None,
-        'start_time': None,
-        'end_time': None
+        'start_timestamp': None,
+        'end_timestamp': None
     }
     traits_filter = []
 

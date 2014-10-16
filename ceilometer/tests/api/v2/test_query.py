@@ -23,8 +23,10 @@ from oslotest import base
 from oslotest import mockpatch
 import wsme
 
+from ceilometer.alarm.storage import base as alarm_storage_base
 from ceilometer.api.controllers import v2 as api
 from ceilometer import storage
+from ceilometer.storage import base as storage_base
 from ceilometer.tests import base as tests_base
 
 
@@ -224,8 +226,8 @@ class TestQueryToKwArgs(tests_base.BaseTestCase):
                        value=str(ts_start))]
         kwargs = api._query_to_kwargs(q, storage.SampleFilter.__init__)
         self.assertEqual(4, len(kwargs))
-        self.assertTimestampEqual(kwargs['start'], ts_start)
-        self.assertTimestampEqual(kwargs['end'], ts_end)
+        self.assertTimestampEqual(kwargs['start_timestamp'], ts_start)
+        self.assertTimestampEqual(kwargs['end_timestamp'], ts_end)
         self.assertEqual('gt', kwargs['start_timestamp_op'])
         self.assertEqual('lt', kwargs['end_timestamp_op'])
 
@@ -332,4 +334,76 @@ class TestQueryToKwArgs(tests_base.BaseTestCase):
             api._query_to_kwargs, q, storage.SampleFilter.__init__)
         expected_exc = wsme.exc.InvalidInput('timestamp', '123',
                                              'invalid timestamp format')
+        self.assertEqual(str(expected_exc), str(exc))
+
+    def test_get_alarm_changes_filter_valid_fields(self):
+        q = [api.Query(field='abc',
+                       op='eq',
+                       value='abc')]
+        exc = self.assertRaises(
+            wsme.exc.UnknownArgument,
+            api._query_to_kwargs, q,
+            alarm_storage_base.Connection.get_alarm_changes)
+        valid_keys = ['alarm_id', 'on_behalf_of', 'project', 'search_offset',
+                      'timestamp', 'type', 'user']
+        msg = ("unrecognized field in query: %s, "
+               "valid keys: %s") % (q, valid_keys)
+        expected_exc = wsme.exc.UnknownArgument('abc', msg)
+        self.assertEqual(str(expected_exc), str(exc))
+
+    def test_sample_filter_valid_fields(self):
+        q = [api.Query(field='abc',
+                       op='eq',
+                       value='abc')]
+        exc = self.assertRaises(
+            wsme.exc.UnknownArgument,
+            api._query_to_kwargs, q, storage.SampleFilter.__init__)
+        valid_keys = ['message_id', 'metaquery', 'meter', 'project',
+                      'resource', 'search_offset', 'source', 'timestamp',
+                      'user']
+        msg = ("unrecognized field in query: %s, "
+               "valid keys: %s") % (q, valid_keys)
+        expected_exc = wsme.exc.UnknownArgument('abc', msg)
+        self.assertEqual(str(expected_exc), str(exc))
+
+    def test_get_meters_filter_valid_fields(self):
+        q = [api.Query(field='abc',
+                       op='eq',
+                       value='abc')]
+        exc = self.assertRaises(
+            wsme.exc.UnknownArgument,
+            api._query_to_kwargs, q, storage_base.Connection.get_meters)
+        valid_keys = ['metaquery', 'pagination', 'project', 'resource',
+                      'source', 'user']
+        msg = ("unrecognized field in query: %s, "
+               "valid keys: %s") % (q, valid_keys)
+        expected_exc = wsme.exc.UnknownArgument('abc', msg)
+        self.assertEqual(str(expected_exc), str(exc))
+
+    def test_get_resources_filter_valid_fields(self):
+        q = [api.Query(field='abc',
+                       op='eq',
+                       value='abc')]
+        exc = self.assertRaises(
+            wsme.exc.UnknownArgument,
+            api._query_to_kwargs, q, storage_base.Connection.get_resources)
+        valid_keys = ['metaquery', 'pagination', 'project', 'resource',
+                      'search_offset', 'source', 'timestamp', 'user']
+        msg = ("unrecognized field in query: %s, "
+               "valid keys: %s") % (q, valid_keys)
+        expected_exc = wsme.exc.UnknownArgument('abc', msg)
+        self.assertEqual(str(expected_exc), str(exc))
+
+    def test_get_alarms_filter_valid_fields(self):
+        q = [api.Query(field='abc',
+                       op='eq',
+                       value='abc')]
+        exc = self.assertRaises(
+            wsme.exc.UnknownArgument,
+            api._query_to_kwargs, q, alarm_storage_base.Connection.get_alarms)
+        valid_keys = ['alarm_id', 'enabled', 'meter', 'name', 'pagination',
+                      'project', 'state', 'type', 'user']
+        msg = ("unrecognized field in query: %s, "
+               "valid keys: %s") % (q, valid_keys)
+        expected_exc = wsme.exc.UnknownArgument('abc', msg)
         self.assertEqual(str(expected_exc), str(exc))
