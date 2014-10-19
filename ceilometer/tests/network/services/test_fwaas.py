@@ -111,9 +111,9 @@ class TestFirewallPollster(_BaseTestFWPollster):
 
         for vpn in self.fake_get_fw_service():
             if vpn['status'] == 'error':
-                self.assertTrue(vpn not in discovered_fws)
+                self.assertNotIn(vpn, discovered_fws)
             else:
-                self.assertTrue(vpn in discovered_fws)
+                self.assertIn(vpn, discovered_fws)
 
 
 class TestIPSecConnectionsPollster(_BaseTestFWPollster):

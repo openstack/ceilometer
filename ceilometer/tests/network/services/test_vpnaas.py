@@ -116,9 +116,9 @@ class TestVPNServicesPollster(_BaseTestVPNPollster):
 
         for vpn in self.fake_get_vpn_service():
             if vpn['status'] == 'error':
-                self.assertTrue(vpn not in discovered_vpns)
+                self.assertNotIn(vpn, discovered_vpns)
             else:
-                self.assertTrue(vpn in discovered_vpns)
+                self.assertIn(vpn, discovered_vpns)
 
 
 class TestIPSecConnectionsPollster(_BaseTestVPNPollster):
