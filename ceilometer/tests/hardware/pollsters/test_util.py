@@ -51,7 +51,7 @@ class TestPollsterUtils(test_base.BaseTestCase):
                                        unit='B',
                                        volume=1,
                                        extra=extra)
-        self.assertEqual(None, s.user_id)
+        self.assertIsNone(s.user_id)
         self.assertEqual('project', s.project_id)
         self.assertEqual('resource', s.resource_id)
         self.assertEqual({'resource_url': 'snmp://127.0.0.1:161',
