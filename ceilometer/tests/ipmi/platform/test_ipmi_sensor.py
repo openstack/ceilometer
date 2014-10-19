@@ -97,22 +97,22 @@ class TestNonIPMISensor(base.BaseTestCase):
         sensors = self.ipmi.read_sensor_any('Temperature')
 
         # Non-IPMI platform return empty data
-        self.assertTrue(sensors == {})
+        self.assertEqual({}, sensors)
 
     def test_read_sensor_voltage(self):
         sensors = self.ipmi.read_sensor_any('Voltage')
 
         # Non-IPMI platform return empty data
-        self.assertTrue(sensors == {})
+        self.assertEqual({}, sensors)
 
     def test_read_sensor_current(self):
         sensors = self.ipmi.read_sensor_any('Current')
 
         # Non-IPMI platform return empty data
-        self.assertTrue(sensors == {})
+        self.assertEqual({}, sensors)
 
     def test_read_sensor_fan(self):
         sensors = self.ipmi.read_sensor_any('Fan')
 
         # Non-IPMI platform return empty data
-        self.assertTrue(sensors == {})
+        self.assertEqual({}, sensors)
