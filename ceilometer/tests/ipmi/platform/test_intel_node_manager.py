@@ -75,10 +75,10 @@ class TestNonNodeManager(base.BaseTestCase):
         power = self.nm.read_power_all()
 
         # Non-Node Manager platform return empty data
-        self.assertTrue(power == {})
+        self.assertEqual({}, power)
 
     def test_read_temperature_all(self):
         temperature = self.nm.read_temperature_all()
 
         # Non-Node Manager platform return empty data
-        self.assertTrue(temperature == {})
+        self.assertEqual({}, temperature)
