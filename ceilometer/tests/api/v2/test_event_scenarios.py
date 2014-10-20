@@ -71,7 +71,7 @@ class TestEventTypeAPI(EventTestBase):
     def test_event_types(self):
         data = self.get_json(self.PATH, headers=headers)
         for event_type in ['Foo', 'Bar', 'Zoo']:
-            self.assertTrue(event_type in data)
+            self.assertIn(event_type, data)
 
 
 class TestTraitAPI(EventTestBase):
@@ -141,13 +141,13 @@ class TestEventAPI(EventTestBase):
             expected_generated = timeutils.strtime(
                 at=timeutils.normalize_time(trait_time),
                 fmt=timeutils._ISO8601_TIME_FORMAT)
-            self.assertTrue(event['event_type'] in ['Foo', 'Bar', 'Zoo'])
+            self.assertIn(event['event_type'], ['Foo', 'Bar', 'Zoo'])
             self.assertEqual(4, len(event['traits']))
             self.assertEqual(expected_generated, event['generated'])
             for trait_name in ['trait_A', 'trait_B',
                                'trait_C', 'trait_D']:
-                self.assertTrue(trait_name in map(lambda x: x['name'],
-                                                  event['traits']))
+                self.assertIn(trait_name, map(lambda x: x['name'],
+                              event['traits']))
             trait_time += datetime.timedelta(days=1)
 
     def test_get_event_by_message_id(self):

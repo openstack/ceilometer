@@ -43,9 +43,9 @@ class TestListResources(v2.FunctionalTest,
 
     def _verify_resource_timestamps(self, res, first, last):
         # Bounds need not be tight (see ceilometer bug #1288372)
-        self.assertTrue('first_sample_timestamp' in res)
+        self.assertIn('first_sample_timestamp', res)
         self.assertTrue(self._isotime(first) >= res['first_sample_timestamp'])
-        self.assertTrue('last_sample_timestamp' in res)
+        self.assertIn('last_sample_timestamp', res)
         self.assertTrue(self._isotime(last) <= res['last_sample_timestamp'])
 
     def test_instance_no_metadata(self):

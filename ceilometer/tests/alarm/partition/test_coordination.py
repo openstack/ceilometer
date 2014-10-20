@@ -174,11 +174,11 @@ class TestCoordinate(tests_base.BaseTestCase):
         for call in calls:
             args, _ = call
             target, alarms = args
-            self.assertTrue(target in uneffected)
+            self.assertIn(target, uneffected)
             uneffected.remove(target)
             self.assertEqual(per_worker, len(alarms))
             for aid in alarms:
-                self.assertTrue(aid in remainder)
+                self.assertIn(aid, remainder)
                 remainder.remove(aid)
         self.assertEqual(set(expect_uneffected), set(uneffected))
         return remainder

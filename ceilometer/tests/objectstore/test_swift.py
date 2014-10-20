@@ -122,7 +122,7 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
             data = list(self.pollster._iter_accounts(mock.Mock(), cache,
                                                      ASSIGNED_TENANTS))
 
-        self.assertTrue(self.pollster.CACHE_KEY_METHOD in cache)
+        self.assertIn(self.pollster.CACHE_KEY_METHOD, cache)
         self.assertEqual([], data)
 
     def test_iter_accounts_cached(self):

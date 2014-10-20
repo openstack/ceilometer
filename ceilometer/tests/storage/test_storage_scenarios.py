@@ -3009,9 +3009,9 @@ class GetEventTest(EventTestBase):
                        self.event_conn.get_event_types()]
 
         self.assertEqual(3, len(event_types))
-        self.assertTrue("Bar" in event_types)
-        self.assertTrue("Foo" in event_types)
-        self.assertTrue("Zoo" in event_types)
+        self.assertIn("Bar", event_types)
+        self.assertIn("Foo", event_types)
+        self.assertIn("Zoo", event_types)
 
     def test_get_trait_types(self):
         trait_types = [tt for tt in
@@ -3035,13 +3035,13 @@ class GetEventTest(EventTestBase):
         for trait in traits:
             trait_dict[trait.name] = trait.dtype
 
-        self.assertTrue("trait_A" in trait_dict)
+        self.assertIn("trait_A", trait_dict)
         self.assertEqual(event_models.Trait.TEXT_TYPE, trait_dict["trait_A"])
-        self.assertTrue("trait_B" in trait_dict)
+        self.assertIn("trait_B", trait_dict)
         self.assertEqual(event_models.Trait.INT_TYPE, trait_dict["trait_B"])
-        self.assertTrue("trait_C" in trait_dict)
+        self.assertIn("trait_C", trait_dict)
         self.assertEqual(event_models.Trait.FLOAT_TYPE, trait_dict["trait_C"])
-        self.assertTrue("trait_D" in trait_dict)
+        self.assertIn("trait_D", trait_dict)
         self.assertEqual(event_models.Trait.DATETIME_TYPE,
                          trait_dict["trait_D"])
 
