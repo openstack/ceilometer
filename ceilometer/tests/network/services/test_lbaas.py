@@ -157,9 +157,9 @@ class TestLBPoolPollster(_BaseTestLBPollster):
         self.assertEqual(4, len(discovered_pools))
         for pool in self.fake_get_pools():
             if pool['status'] == 'error':
-                self.assertTrue(pool not in discovered_pools)
+                self.assertNotIn(pool, discovered_pools)
             else:
-                self.assertTrue(pool in discovered_pools)
+                self.assertIn(pool, discovered_pools)
 
 
 class TestLBVipPollster(_BaseTestLBPollster):
@@ -280,9 +280,9 @@ class TestLBVipPollster(_BaseTestLBPollster):
         self.assertEqual(4, len(discovered_vips))
         for pool in self.fake_get_vips():
             if pool['status'] == 'error':
-                self.assertTrue(pool not in discovered_vips)
+                self.assertNotIn(pool, discovered_vips)
             else:
-                self.assertTrue(pool in discovered_vips)
+                self.assertIn(pool, discovered_vips)
 
 
 class TestLBMemberPollster(_BaseTestLBPollster):
@@ -374,9 +374,9 @@ class TestLBMemberPollster(_BaseTestLBPollster):
         self.assertEqual(4, len(discovered_members))
         for pool in self.fake_get_members():
             if pool['status'] == 'error':
-                self.assertTrue(pool not in discovered_members)
+                self.assertNotIn(pool, discovered_members)
             else:
-                self.assertTrue(pool in discovered_members)
+                self.assertIn(pool, discovered_members)
 
 
 class TestLBHealthProbePollster(_BaseTestLBPollster):
