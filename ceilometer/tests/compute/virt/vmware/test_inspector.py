@@ -100,7 +100,7 @@ class TestVsphereInspection(base.BaseTestCase):
         def query_stat_side_effect(vm_moid, counter_id, duration):
             # assert inputs
             self.assertEqual(test_vm_moid, vm_moid)
-            self.assertTrue(counter_id in counter_id_to_stats_map)
+            self.assertIn(counter_id, counter_id_to_stats_map)
             return counter_id_to_stats_map[counter_id]
 
         # configure vsphere operations mock with the test data
@@ -144,7 +144,7 @@ class TestVsphereInspection(base.BaseTestCase):
         def query_stat_side_effect(vm_moid, counter_id, duration):
             # assert inputs
             self.assertEqual(test_vm_moid, vm_moid)
-            self.assertTrue(counter_id in counter_id_to_stats_map)
+            self.assertIn(counter_id, counter_id_to_stats_map)
             return counter_id_to_stats_map[counter_id]
 
         # configure vsphere operations mock with the test data

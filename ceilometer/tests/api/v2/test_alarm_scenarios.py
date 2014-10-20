@@ -1752,8 +1752,8 @@ class TestAlarms(v2.FunctionalTest,
         actual = jsonutils.dumps(jsonutils.loads(actual), sort_keys=True)
         for k, v in six.iteritems(expected):
             fragment = jsonutils.dumps({k: v}, sort_keys=True)[1:-1]
-            self.assertTrue(fragment in actual,
-                            '%s not in %s' % (fragment, actual))
+            self.assertIn(fragment, actual,
+                          '%s not in %s' % (fragment, actual))
 
     def test_record_alarm_history_config(self):
         self.CONF.set_override('record_history', False, group='alarm')

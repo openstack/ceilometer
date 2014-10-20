@@ -35,7 +35,7 @@ class TestIPMISensor(base.BaseTestCase):
         sensors = self.ipmi.read_sensor_any('Temperature')
 
         # only temperature data returned.
-        self.assertTrue('Temperature' in sensors)
+        self.assertIn('Temperature', sensors)
         self.assertEqual(1, len(sensors))
 
         # 4 sensor data in total, ignore 1 without 'Sensor Reading'.
@@ -48,7 +48,7 @@ class TestIPMISensor(base.BaseTestCase):
         sensors = self.ipmi.read_sensor_any('Voltage')
 
         # only voltage data returned.
-        self.assertTrue('Voltage' in sensors)
+        self.assertIn('Voltage', sensors)
         self.assertEqual(1, len(sensors))
 
         # 4 sensor data in total, ignore 1 without 'Sensor Reading'.
@@ -61,7 +61,7 @@ class TestIPMISensor(base.BaseTestCase):
         sensors = self.ipmi.read_sensor_any('Current')
 
         # only Current data returned.
-        self.assertTrue('Current' in sensors)
+        self.assertIn('Current', sensors)
         self.assertEqual(1, len(sensors))
 
         # 2 sensor data in total.
@@ -74,7 +74,7 @@ class TestIPMISensor(base.BaseTestCase):
         sensors = self.ipmi.read_sensor_any('Fan')
 
         # only Fan data returned.
-        self.assertTrue('Fan' in sensors)
+        self.assertIn('Fan', sensors)
         self.assertEqual(1, len(sensors))
 
         # 2 sensor data in total.

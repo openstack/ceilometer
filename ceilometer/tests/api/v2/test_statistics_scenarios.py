@@ -1554,7 +1554,7 @@ class TestSelectableAggregates(v2.FunctionalTest,
                     'aggregate.param': 'injection_attack'}
         resp = self.get_json(self.PATH, status=[400],
                              groupby=['project_id'], **agg_args)
-        self.assertTrue('error_message' in resp)
+        self.assertIn('error_message', resp)
         self.assertEqual(resp['error_message'].get('faultcode'),
                          'Client')
         self.assertEqual(resp['error_message'].get('faultstring'),
