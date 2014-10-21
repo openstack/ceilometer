@@ -120,18 +120,3 @@ class QueryTransformer(object):
 
     def get_query(self):
         return self.query
-
-
-trait_models_dict = {'string': models.Trait.t_string,
-                     'integer': models.Trait.t_int,
-                     'datetime': models.Trait.t_datetime,
-                     'float': models.Trait.t_float}
-
-
-def trait_op_condition(conditions, trait_type, value, op='eq'):
-    trait_model = trait_models_dict[trait_type]
-    op_dict = {'eq': (trait_model == value), 'lt': (trait_model < value),
-               'le': (trait_model <= value), 'gt': (trait_model > value),
-               'ge': (trait_model >= value), 'ne': (trait_model != value)}
-    conditions.append(op_dict[op])
-    return conditions

@@ -30,6 +30,7 @@ class Event(base.Model):
 
     DUPLICATE = 1
     UNKNOWN_PROBLEM = 2
+    INCOMPATIBLE_TRAIT = 3
 
     def __init__(self, message_id, event_type, generated, traits):
         """Create a new event.

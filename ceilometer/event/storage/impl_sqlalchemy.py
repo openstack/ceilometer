@@ -14,13 +14,11 @@
 """SQLAlchemy storage backend."""
 
 from __future__ import absolute_import
-import operator
 import os
 
 from oslo.db import exception as dbexc
 from oslo.db.sqlalchemy import session as db_session
 from oslo_config import cfg
-import six
 import sqlalchemy as sa
 
 from ceilometer.event.storage import base
@@ -28,7 +26,6 @@ from ceilometer.event.storage import models as api_models
 from ceilometer.i18n import _
 from ceilometer.openstack.common import log
 from ceilometer.storage.sqlalchemy import models
-from ceilometer.storage.sqlalchemy import utils as sql_utils
 from ceilometer import utils
 
 LOG = log.getLogger(__name__)
@@ -42,6 +39,36 @@ AVAILABLE_CAPABILITIES = {
 AVAILABLE_STORAGE_CAPABILITIES = {
     'storage': {'production_ready': True},
 }
+
+
+TRAIT_MAPLIST = [(api_models.Trait.NONE_TYPE, models.TraitText),
+                 (api_models.Trait.TEXT_TYPE, models.TraitText),
+                 (api_models.Trait.INT_TYPE, models.TraitInt),
+                 (api_models.Trait.FLOAT_TYPE, models.TraitFloat),
+                 (api_models.Trait.DATETIME_TYPE, models.TraitDatetime)]
+
+
+TRAIT_ID_TO_MODEL = dict((x, y) for x, y in TRAIT_MAPLIST)
+TRAIT_MODEL_TO_ID = dict((y, x) for x, y in TRAIT_MAPLIST)
+
+
+trait_models_dict = {'string': models.TraitText,
+                     'integer': models.TraitInt,
+                     'datetime': models.TraitDatetime,
+                     'float': models.TraitFloat}
+
+
+def _build_trait_query(session, trait_type, key, value, op='eq'):
+    trait_model = trait_models_dict[trait_type]
+    op_dict = {'eq': (trait_model.value == value),
+               'lt': (trait_model.value < value),
+               'le': (trait_model.value <= value),
+               'gt': (trait_model.value > value),
+               'ge': (trait_model.value >= value),
+               'ne': (trait_model.value != value)}
+    conditions = [trait_model.key == key, op_dict[op]]
+    return (session.query(trait_model.event_id.label('ev_id'))
+            .filter(*conditions))
 
 
 class Connection(base.Connection):
@@ -61,21 +88,31 @@ class Connection(base.Connection):
               generated = timestamp of event
               event_type_id = event type -> eventtype.id
               }
-        - Trait
-          - trait value
+        - TraitInt
+          - int trait value
           - { event_id: event -> event.id
-              trait_type_id: trait type -> traittype.id
-              t_string: string value
-              t_float: float value
-              t_int: integer value
-              t_datetime: timestamp value
+              key: trait type
+              value: integer value
               }
-        - TraitType
-          - trait definition
-          - { id: trait id
-              desc: description of trait
-              data_type: data type (integer that maps to datatype)
+        - TraitDatetime
+          - int trait value
+          - { event_id: event -> event.id
+              key: trait type
+              value: datetime value
               }
+        - TraitText
+          - int trait value
+          - { event_id: event -> event.id
+              key: trait type
+              value: text value
+              }
+        - TraitFloat
+          - int trait value
+          - { event_id: event -> event.id
+              key: trait type
+              value: float value
+              }
+
     """
     CAPABILITIES = utils.update_nested(base.Connection.CAPABILITIES,
                                        AVAILABLE_CAPABILITIES)
@@ -108,37 +145,6 @@ class Connection(base.Connection):
         self._engine_facade._session_maker.close_all()
         engine.dispose()
 
-    def _get_or_create_trait_type(self, trait_type, data_type, session=None):
-        """Find if this trait already exists in the database.
-
-        If it does not, create a new entry in the trait type table.
-        """
-        if session is None:
-            session = self._engine_facade.get_session()
-        with session.begin(subtransactions=True):
-            tt = session.query(models.TraitType).filter(
-                models.TraitType.desc == trait_type,
-                models.TraitType.data_type == data_type).first()
-            if not tt:
-                tt = models.TraitType(trait_type, data_type)
-                session.add(tt)
-        return tt
-
-    def _make_trait(self, trait_model, event, session=None):
-        """Make a new Trait from a Trait model.
-
-        Doesn't flush or add to session.
-        """
-        trait_type = self._get_or_create_trait_type(trait_model.name,
-                                                    trait_model.dtype,
-                                                    session)
-        value_map = models.Trait._value_map
-        values = {'t_string': None, 't_float': None,
-                  't_int': None, 't_datetime': None}
-        value = trait_model.value
-        values[value_map[trait_model.dtype]] = value
-        return models.Trait(trait_type, event, **values)
-
     def _get_or_create_event_type(self, event_type, session=None):
         """Check if an event type with the supplied name is already exists.
 
@@ -154,27 +160,6 @@ class Connection(base.Connection):
                 session.add(et)
         return et
 
-    def _record_event(self, session, event_model):
-        """Store a single Event, including related Traits."""
-        with session.begin(subtransactions=True):
-            event_type = self._get_or_create_event_type(event_model.event_type,
-                                                        session=session)
-
-            event = models.Event(event_model.message_id, event_type,
-                                 event_model.generated)
-            session.add(event)
-
-            new_traits = []
-            if event_model.traits:
-                for trait in event_model.traits:
-                    t = self._make_trait(trait, event, session=session)
-                    session.add(t)
-                    new_traits.append(t)
-
-        # Note: we don't flush here, explicitly (unless a new trait or event
-        # does it). Otherwise, just wait until all the Events are staged.
-        return event, new_traits
-
     def record_events(self, event_models):
         """Write the events to SQL database via sqlalchemy.
 
@@ -188,22 +173,43 @@ class Connection(base.Connection):
         TraitTypes are added along the way.
         """
         session = self._engine_facade.get_session()
-        events = []
         problem_events = []
         for event_model in event_models:
             event = None
             try:
                 with session.begin():
-                    event = self._record_event(session, event_model)
+                    event_type = self._get_or_create_event_type(
+                        event_model.event_type, session=session)
+                    event = models.Event(event_model.message_id, event_type,
+                                         event_model.generated)
+                    session.add(event)
+                    session.flush()
+
+                    if event_model.traits:
+                        trait_map = {}
+                        for trait in event_model.traits:
+                            if trait_map.get(trait.dtype) is None:
+                                trait_map[trait.dtype] = []
+                            trait_map[trait.dtype].append(
+                                {'event_id': event.id,
+                                 'key': trait.name,
+                                 'value': trait.value})
+                        for dtype in trait_map.keys():
+                            model = TRAIT_ID_TO_MODEL[dtype]
+                            session.execute(model.__table__.insert(),
+                                            trait_map[dtype])
             except dbexc.DBDuplicateEntry as e:
                 LOG.exception(_("Failed to record duplicated event: %s") % e)
                 problem_events.append((api_models.Event.DUPLICATE,
+                                       event_model))
+            except KeyError as e:
+                LOG.exception(_('Failed to record event: %s') % e)
+                problem_events.append((api_models.Event.INCOMPATIBLE_TRAIT,
                                        event_model))
             except Exception as e:
                 LOG.exception(_('Failed to record event: %s') % e)
                 problem_events.append((api_models.Event.UNKNOWN_PROBLEM,
                                        event_model))
-            events.append(event)
         return problem_events
 
     def get_events(self, event_filter):
@@ -212,10 +218,7 @@ class Connection(base.Connection):
         :param event_filter: EventFilter instance
         """
 
-        start = event_filter.start_timestamp
-        end = event_filter.end_timestamp
         session = self._engine_facade.get_session()
-        LOG.debug(_("Getting events that match filter: %s") % event_filter)
         with session.begin():
             event_query = session.query(models.Event)
 
@@ -233,80 +236,98 @@ class Connection(base.Connection):
             # Build up the where conditions
             event_filter_conditions = []
             if event_filter.message_id:
-                event_filter_conditions.append(models.Event.message_id ==
-                                               event_filter.message_id)
-            if start:
-                event_filter_conditions.append(models.Event.generated >= start)
-            if end:
-                event_filter_conditions.append(models.Event.generated <= end)
-
+                event_filter_conditions.append(
+                    models.Event.message_id == event_filter.message_id)
+            if event_filter.start_timestamp:
+                event_filter_conditions.append(
+                    models.Event.generated >= event_filter.start_timestamp)
+            if event_filter.end_timestamp:
+                event_filter_conditions.append(
+                    models.Event.generated <= event_filter.end_timestamp)
             if event_filter_conditions:
                 event_query = (event_query.
                                filter(sa.and_(*event_filter_conditions)))
 
-            event_models_dict = {}
+            trait_subq = None
+            # Build trait filter
             if event_filter.traits_filter:
+                trait_qlist = []
                 for trait_filter in event_filter.traits_filter:
-
-                    # Build a sub query that joins Trait to TraitType
-                    # where the trait name matches
-                    trait_name = trait_filter.pop('key')
+                    key = trait_filter.pop('key')
                     op = trait_filter.pop('op', 'eq')
-                    conditions = [models.Trait.trait_type_id ==
-                                  models.TraitType.id,
-                                  models.TraitType.desc == trait_name]
+                    trait_qlist.append(_build_trait_query(
+                        session, trait_filter.keys()[0], key,
+                        trait_filter.values()[0], op))
+                trait_subq = trait_qlist.pop()
+                if trait_qlist:
+                    trait_subq = trait_subq.intersect(*trait_qlist)
+                trait_subq = trait_subq.subquery()
 
-                    for key, value in six.iteritems(trait_filter):
-                        sql_utils.trait_op_condition(conditions,
-                                                     key, value, op)
+            query = (session.query(models.Event.id)
+                     .join(models.EventType,
+                           sa.and_(*event_join_conditions)))
+            if trait_subq is not None:
+                query = query.join(trait_subq,
+                                   trait_subq.c.ev_id == models.Event.id)
+            if event_filter_conditions:
+                query = query.filter(sa.and_(*event_filter_conditions))
 
-                    trait_query = (session.query(models.Trait.event_id).
-                                   join(models.TraitType,
-                                        sa.and_(*conditions)).subquery())
+            event_list = {}
+            # get a list of all events that match filters
+            for (id_, generated, message_id,
+                 desc) in query.add_columns(
+                     models.Event.generated, models.Event.message_id,
+                     models.EventType.desc).order_by(
+                         models.Event.generated).all():
+                event_list[id_] = api_models.Event(message_id, desc,
+                                                   generated, [])
+            # Query all traits related to events.
+            # NOTE (gordc): cast is done because pgsql defaults to TEXT when
+            #               handling unknown values such as null.
+            trait_q = (
+                query.join(
+                    models.TraitDatetime,
+                    models.TraitDatetime.event_id == models.Event.id)
+                .add_columns(
+                    models.TraitDatetime.key, models.TraitDatetime.value,
+                    sa.cast(sa.null(), sa.Integer),
+                    sa.cast(sa.null(), sa.Float(53)),
+                    sa.cast(sa.null(), sa.Text))
+            ).union(
+                query.join(
+                    models.TraitInt,
+                    models.TraitInt.event_id == models.Event.id)
+                .add_columns(models.TraitInt.key, sa.null(),
+                             models.TraitInt.value, sa.null(), sa.null()),
+                query.join(
+                    models.TraitFloat,
+                    models.TraitFloat.event_id == models.Event.id)
+                .add_columns(models.TraitFloat.key, sa.null(),
+                             sa.null(), models.TraitFloat.value, sa.null()),
+                query.join(
+                    models.TraitText,
+                    models.TraitText.event_id == models.Event.id)
+                .add_columns(models.TraitText.key, sa.null(),
+                             sa.null(), sa.null(), models.TraitText.value))
 
-                    event_query = (event_query.
-                                   join(trait_query, models.Event.id ==
-                                        trait_query.c.event_id))
-            else:
-                # If there are no trait filters, grab the events from the db
-                query = (session.query(models.Event.id,
-                                       models.Event.generated,
-                                       models.Event.message_id,
-                                       models.EventType.desc).
-                         join(models.EventType,
-                              sa.and_(*event_join_conditions)))
-                if event_filter_conditions:
-                    query = query.filter(sa.and_(*event_filter_conditions))
-                for (id_, generated, message_id, desc_) in query.all():
-                    event_models_dict[id_] = api_models.Event(message_id,
-                                                              desc_,
-                                                              generated,
-                                                              [])
+            for id_, key, t_date, t_int, t_float, t_text in trait_q.all():
+                if t_int:
+                    dtype = api_models.Trait.INT_TYPE
+                    val = t_int
+                elif t_float:
+                    dtype = api_models.Trait.FLOAT_TYPE
+                    val = t_float
+                elif t_date:
+                    dtype = api_models.Trait.DATETIME_TYPE
+                    val = t_date
+                else:
+                    dtype = api_models.Trait.TEXT_TYPE
+                    val = t_text
 
-            # Build event models for the events
-            event_query = event_query.subquery()
-            query = (session.query(models.Trait).
-                     join(models.TraitType, models.Trait.trait_type_id ==
-                          models.TraitType.id).
-                     join(event_query, models.Trait.event_id ==
-                          event_query.c.id))
+                trait_model = api_models.Trait(key, dtype, val)
+                event_list[id_].append_trait(trait_model)
 
-            # Now convert the sqlalchemy objects back into Models ...
-            for trait in query.all():
-                event = event_models_dict.get(trait.event_id)
-                if not event:
-                    event = api_models.Event(
-                        trait.event.message_id,
-                        trait.event.event_type.desc,
-                        trait.event.generated, [])
-                    event_models_dict[trait.event_id] = event
-                trait_model = api_models.Trait(trait.trait_type.desc,
-                                               trait.trait_type.data_type,
-                                               trait.get_value())
-                event.append_trait(trait_model)
-
-        event_models = event_models_dict.values()
-        return sorted(event_models, key=operator.attrgetter('generated'))
+            return event_list.values()
 
     def get_event_types(self):
         """Return all event types as an iterable of strings."""
@@ -327,27 +348,21 @@ class Connection(base.Connection):
         """
         session = self._engine_facade.get_session()
 
-        LOG.debug(_("Get traits for %s") % event_type)
         with session.begin():
-            query = (session.query(models.TraitType.desc,
-                                   models.TraitType.data_type)
-                     .join(models.Trait,
-                           models.Trait.trait_type_id ==
-                           models.TraitType.id)
-                     .join(models.Event,
-                           models.Event.id ==
-                           models.Trait.event_id)
-                     .join(models.EventType,
-                           sa.and_(models.EventType.id ==
-                                   models.Event.id,
-                                   models.EventType.desc ==
-                                   event_type))
-                     .group_by(models.TraitType.desc,
-                               models.TraitType.data_type)
-                     .distinct())
+            for trait_model in [models.TraitText, models.TraitInt,
+                                models.TraitFloat, models.TraitDatetime]:
+                query = (session.query(trait_model.key)
+                         .join(models.Event,
+                               models.Event.id == trait_model.event_id)
+                         .join(models.EventType,
+                               sa.and_(models.EventType.id ==
+                                       models.Event.event_type_id,
+                                       models.EventType.desc == event_type))
+                         .distinct())
 
-            for desc_, dtype in query.all():
-                yield {'name': desc_, 'data_type': dtype}
+                dtype = TRAIT_MODEL_TO_ID.get(trait_model)
+                for row in query.all():
+                    yield {'name': row[0], 'data_type': dtype}
 
     def get_traits(self, event_type, trait_type=None):
         """Return all trait instances associated with an event_type.
@@ -359,22 +374,21 @@ class Connection(base.Connection):
 
         session = self._engine_facade.get_session()
         with session.begin():
-            trait_type_filters = [models.TraitType.id ==
-                                  models.Trait.trait_type_id]
-            if trait_type:
-                trait_type_filters.append(models.TraitType.desc == trait_type)
+            for trait_model in [models.TraitText, models.TraitInt,
+                                models.TraitFloat, models.TraitDatetime]:
+                query = (session.query(trait_model.key, trait_model.value)
+                         .join(models.Event,
+                               models.Event.id == trait_model.event_id)
+                         .join(models.EventType,
+                               sa.and_(models.EventType.id ==
+                                       models.Event.event_type_id,
+                                       models.EventType.desc == event_type))
+                         .order_by(trait_model.key))
+                if trait_type:
+                    query = query.filter(trait_model.key == trait_type)
 
-            query = (session.query(models.Trait)
-                     .join(models.TraitType, sa.and_(*trait_type_filters))
-                     .join(models.Event,
-                           models.Event.id == models.Trait.event_id)
-                     .join(models.EventType,
-                           sa.and_(models.EventType.id ==
-                                   models.Event.event_type_id,
-                                   models.EventType.desc == event_type)))
-
-            for trait in query.all():
-                type = trait.trait_type
-                yield api_models.Trait(name=type.desc,
-                                       dtype=type.data_type,
-                                       value=trait.get_value())
+                dtype = TRAIT_MODEL_TO_ID.get(trait_model)
+                for k, v in query.all():
+                    yield api_models.Trait(name=k,
+                                           dtype=dtype,
+                                           value=v)
