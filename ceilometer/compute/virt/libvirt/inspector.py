@@ -18,8 +18,10 @@
 
 from lxml import etree
 from oslo.config import cfg
+from oslo.utils import units
 import six
 
+from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log as logging
@@ -178,3 +180,35 @@ class LibvirtInspector(virt_inspector.Inspector):
                                              write_bytes=block_stats[3],
                                              errors=block_stats[4])
             yield (disk, stats)
+
+    def inspect_memory_usage(self, instance, duration=None):
+        instance_name = util.instance_name(instance)
+        domain = self._lookup_by_name(instance_name)
+        state = domain.info()[0]
+        if state == libvirt.VIR_DOMAIN_SHUTOFF:
+            LOG.warn(_('Failed to inspect memory usage of %(instance_name)s, '
+                       'domain is in state of SHUTOFF'),
+                     {'instance_name': instance_name})
+            return
+
+        try:
+            memory_stats = domain.memoryStats()
+            if (memory_stats and
+                    memory_stats.get('available') and
+                    memory_stats.get('unused')):
+                memory_used = (memory_stats.get('available') -
+                               memory_stats.get('unused'))
+                # Stat provided from libvirt is in KB, converting it to MB.
+                memory_used = memory_used / units.Ki
+                return virt_inspector.MemoryUsageStats(usage=memory_used)
+            else:
+                LOG.warn(_('Failed to inspect memory usage of '
+                           '%(instance_name)s, can not get info from libvirt'),
+                         {'instance_name': instance_name})
+        # memoryStats might launch an exception if the method
+        # is not supported by the underlying hypervisor being
+        # used by libvirt
+        except libvirt.libvirtError as e:
+            LOG.warn(_('Failed to inspect memory usage of %(instance_name)s, '
+                       'can not get info from libvirt: %(error)s'),
+                     {'instance_name': instance_name, 'error': e})
