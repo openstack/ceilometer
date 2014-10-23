@@ -53,6 +53,10 @@ STORAGE_OPTS = [
                default=None,
                help='The connection string used to connect to the alarm '
                'database. (if unset, connection is used)'),
+    cfg.StrOpt('mongodb_replica_set',
+               default='',
+               help="The connection string used to connect to mongo database, "
+                    "if mongodb replica set was chosen."),
 ]
 
 cfg.CONF.register_opts(STORAGE_OPTS, group='database')
