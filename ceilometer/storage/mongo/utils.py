@@ -19,8 +19,6 @@
 """
 
 
-import time
-
 from oslo.config import cfg
 from oslo.utils import netutils
 import pymongo
@@ -179,26 +177,12 @@ class ConnectionPool(object):
 
     @staticmethod
     def _mongo_connect(url):
-        max_retries = cfg.CONF.database.max_retries
-        retry_interval = cfg.CONF.database.retry_interval
-        attempts = 0
-        while True:
-            try:
-                client = pymongo.MongoClient(url, safe=True)
-            except pymongo.errors.ConnectionFailure as e:
-                if 0 <= max_retries <= attempts:
-                    LOG.error(_('Unable to connect to the database after '
-                                '%(retries)d retries. Giving up.') %
-                              {'retries': max_retries})
-                    raise
-                LOG.warn(_('Unable to connect to the database server: '
-                           '%(errmsg)s. Trying again in %(retry_interval)d '
-                           'seconds.') %
-                         {'errmsg': e, 'retry_interval': retry_interval})
-                attempts += 1
-                time.sleep(retry_interval)
-            else:
-                return client
+        try:
+            return pymongo.MongoClient(url, safe=True)
+        except pymongo.errors.ConnectionFailure as e:
+            LOG.warn(_('Unable to connect to the database server: '
+                       '%(errmsg)s.') % {'errmsg': e})
+            raise
 
 
 class QueryTransformer(object):

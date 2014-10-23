@@ -19,6 +19,7 @@
 
 from oslo.config import cfg
 from oslo.db import options as db_options
+import retrying
 import six
 import six.moves.urllib.parse as urlparse
 from stevedore import driver
@@ -74,6 +75,11 @@ class StorageBadAggregate(Exception):
     code = 400
 
 
+# Convert retry_interval secs to msecs for retry decorator
+@retrying.retry(wait_fixed=cfg.CONF.database.retry_interval * 1000,
+                stop_max_attempt_number=cfg.CONF.database.max_retries
+                if cfg.CONF.database.max_retries >= 0
+                else None)
 def get_connection_from_config(conf, purpose=None):
     if conf.database_connection:
         conf.set_override('connection', conf.database_connection,
@@ -83,6 +89,9 @@ def get_connection_from_config(conf, purpose=None):
     if purpose:
         namespace = 'ceilometer.%s.storage' % purpose
         url = getattr(conf.database, '%s_connection' % purpose) or url
+    # Set max_retries to 0, since oslo.db in certain cases may attempt to retry
+    # making the db connection retried max_retries ^ 2 times in failure case
+    conf.set_override('max_retries', 0, group='database')
     return get_connection(url, namespace)
 
 
