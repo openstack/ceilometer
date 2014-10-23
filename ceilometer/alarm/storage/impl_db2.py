@@ -73,5 +73,5 @@ class Connection(pymongo_base.Connection):
         # not been implemented. However calling this method is important for
         # removal of all the empty dbs created during the test runs since
         # test run is against mongodb on Jenkins
-        self.conn.drop_database(self.db)
+        self.conn.drop_database(self.db.name)
         self.conn.close()

@@ -63,6 +63,6 @@ class Connection(pymongo_base.Connection):
         self.upgrade()
 
     def clear(self):
-        self.conn.drop_database(self.db)
+        self.conn.drop_database(self.db.name)
         # Connection will be reopened automatically if needed
         self.conn.close()
