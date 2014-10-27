@@ -24,7 +24,6 @@ import oslo.messaging
 from ceilometer import plugin
 from ceilometer import sample
 
-
 OPTS = [
     cfg.StrOpt('cinder_control_exchange',
                default='cinder',
@@ -35,7 +34,7 @@ OPTS = [
 cfg.CONF.register_opts(OPTS)
 
 
-class _Base(plugin.NotificationBase):
+class VolumeBase(plugin.NotificationBase):
     """Convert volume/snapshot notification into Counters."""
 
     @staticmethod
@@ -50,7 +49,7 @@ class _Base(plugin.NotificationBase):
                 for topic in conf.notification_topics]
 
 
-class _VolumeBase(_Base):
+class VolumeCRUDBase(VolumeBase):
     """Convert volume notifications into Counters."""
 
     event_types = [
@@ -60,10 +59,24 @@ class _VolumeBase(_Base):
         'volume.resize.*',
         'volume.attach.*',
         'volume.detach.*',
+        'volume.update.*'
     ]
 
 
-class Volume(_VolumeBase):
+class VolumeCRUD(VolumeCRUDBase):
+    def process_notification(self, message):
+        yield sample.Sample.from_notification(
+            name=message['event_type'],
+            type=sample.TYPE_DELTA,
+            unit='volume',
+            volume=1,
+            user_id=message['payload']['user_id'],
+            project_id=message['payload']['tenant_id'],
+            resource_id=message['payload']['volume_id'],
+            message=message)
+
+
+class Volume(VolumeCRUDBase):
     def process_notification(self, message):
         yield sample.Sample.from_notification(
             name='volume',
@@ -76,7 +89,7 @@ class Volume(_VolumeBase):
             message=message)
 
 
-class VolumeSize(_VolumeBase):
+class VolumeSize(VolumeCRUDBase):
     def process_notification(self, message):
         yield sample.Sample.from_notification(
             name='volume.size',
@@ -89,18 +102,31 @@ class VolumeSize(_VolumeBase):
             message=message)
 
 
-class _SnapshotBase(_Base):
+class SnapshotCRUDBase(VolumeBase):
     """Convert snapshot notifications into Counters."""
 
     event_types = [
         'snapshot.exists',
         'snapshot.create.*',
         'snapshot.delete.*',
-        'snapshot.resize.*',
+        'snapshot.update.*'
     ]
 
 
-class Snapshot(_SnapshotBase):
+class SnapshotCRUD(SnapshotCRUDBase):
+    def process_notification(self, message):
+        yield sample.Sample.from_notification(
+            name=message['event_type'],
+            type=sample.TYPE_DELTA,
+            unit='snapshot',
+            volume=1,
+            user_id=message['payload']['user_id'],
+            project_id=message['payload']['tenant_id'],
+            resource_id=message['payload']['snapshot_id'],
+            message=message)
+
+
+class Snapshot(SnapshotCRUDBase):
     def process_notification(self, message):
         yield sample.Sample.from_notification(
             name='snapshot',
@@ -113,7 +139,7 @@ class Snapshot(_SnapshotBase):
             message=message)
 
 
-class SnapshotSize(_SnapshotBase):
+class SnapshotSize(SnapshotCRUDBase):
     def process_notification(self, message):
         yield sample.Sample.from_notification(
             name='snapshot.size',
