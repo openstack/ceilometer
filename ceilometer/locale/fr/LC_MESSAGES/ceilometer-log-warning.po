@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-10-17 06:11+0000\n"
-"PO-Revision-Date: 2014-10-16 07:56+0000\n"
+"POT-Creation-Date: 2014-10-28 06:10+0000\n"
+"PO-Revision-Date: 2014-10-27 09:51+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/ceilometer/"
 "language/fr/)\n"
@@ -36,7 +36,7 @@ msgstr ""
 #: ceilometer/openstack/common/policy.py:248
 #, python-format
 msgid "Can not find policy directories %s"
-msgstr ""
+msgstr "Ne peut trouver les répertoires de la politique %s"
 
 #: ceilometer/openstack/common/service.py:356
 #, python-format
