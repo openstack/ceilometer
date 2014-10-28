@@ -25,6 +25,7 @@ system power and temperature data based on ipmitool.
 """
 
 import binascii
+import collections
 import tempfile
 import time
 
@@ -34,23 +35,14 @@ from ceilometer.openstack.common.gettextutils import _
 from oslo.config import cfg
 
 
-def get_ordereddict():
-    """A fix for py26 not having ordereddict."""
-    try:
-        import collections
-        return collections.OrderedDict
-    except AttributeError:
-        import ordereddict
-        return ordereddict.OrderedDict
-
-OrderedDict = get_ordereddict()
-
 OPTS = [
     cfg.IntOpt('node_manager_init_retry',
                default=3,
                help='Number of retries upon Intel Node '
                     'Manager initialization failure')
 ]
+
+
 CONF = cfg.CONF
 CONF.register_opts(OPTS, group='ipmi')
 
@@ -73,7 +65,7 @@ INTEL_PREFIX = '5701000d01'
 
 ONE_RETURN_TEMPLATE = {"ret": 1}
 
-BMC_INFO_TEMPLATE = OrderedDict()
+BMC_INFO_TEMPLATE = collections.OrderedDict()
 BMC_INFO_TEMPLATE['Device_ID'] = 1
 BMC_INFO_TEMPLATE['Device_Revision'] = 1
 BMC_INFO_TEMPLATE['Firmware_Revision_1'] = 1
@@ -84,7 +76,7 @@ BMC_INFO_TEMPLATE['Manufacturer_ID'] = 3
 BMC_INFO_TEMPLATE['Product_ID'] = 2
 BMC_INFO_TEMPLATE['Auxiliary_Firmware_Revision'] = 4
 
-NM_STATISTICS_TEMPLATE = OrderedDict()
+NM_STATISTICS_TEMPLATE = collections.OrderedDict()
 NM_STATISTICS_TEMPLATE['Manufacturer_ID'] = 3
 NM_STATISTICS_TEMPLATE['Current_value'] = 2
 NM_STATISTICS_TEMPLATE['Minimum_value'] = 2
@@ -94,7 +86,7 @@ NM_STATISTICS_TEMPLATE['Time_stamp'] = 4
 NM_STATISTICS_TEMPLATE['Report_period'] = 4
 NM_STATISTICS_TEMPLATE["DomainID_PolicyState"] = 1
 
-NM_GET_DEVICE_ID_TEMPLATE = OrderedDict()
+NM_GET_DEVICE_ID_TEMPLATE = collections.OrderedDict()
 NM_GET_DEVICE_ID_TEMPLATE['Device_ID'] = 1
 NM_GET_DEVICE_ID_TEMPLATE['Device_revision'] = 1
 NM_GET_DEVICE_ID_TEMPLATE['Firmware_revision_1'] = 1
