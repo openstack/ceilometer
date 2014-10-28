@@ -4,13 +4,14 @@
 #
 # Translators:
 # Frédéric <frosmont@free.fr>, 2014
+# Maxime COQUEREL <max.coquerel@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-10-16 07:50+0000\n"
-"PO-Revision-Date: 2014-09-02 00:36+0000\n"
-"Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
+"POT-Creation-Date: 2014-10-28 06:10+0000\n"
+"PO-Revision-Date: 2014-10-27 20:50+0000\n"
+"Last-Translator: Maxime COQUEREL <max.coquerel@gmail.com>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/ceilometer/"
 "language/fr/)\n"
 "Language: fr\n"
@@ -26,7 +27,7 @@ msgstr ""
 
 #: ceilometer/coordination.py:76
 msgid "Error connecting to coordination backend."
-msgstr ""
+msgstr "Erreur de connexion à la coordination du backend ."
 
 #: ceilometer/coordination.py:89
 msgid "Error sending a heartbeat to coordination backend."

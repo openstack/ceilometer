@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-10-16 07:50+0000\n"
-"PO-Revision-Date: 2014-10-02 22:02+0000\n"
+"POT-Creation-Date: 2014-10-28 06:10+0000\n"
+"PO-Revision-Date: 2014-10-24 13:20+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: English (United Kingdom) "
 "(http://www.transifex.com/projects/p/ceilometer/language/en_GB/)\n"
@@ -151,46 +151,46 @@ msgstr ""
 "alarm %(alarm_id)s has no action configured for state transition from "
 "%(previous)s to state %(state)s, skipping the notification."
 
-#: ceilometer/alarm/service.py:93
+#: ceilometer/alarm/service.py:98
 #, python-format
 msgid "initiating evaluation cycle on %d alarms"
 msgstr "initiating evaluation cycle on %d alarms"
 
-#: ceilometer/alarm/service.py:98
+#: ceilometer/alarm/service.py:103
 msgid "alarm evaluation cycle failed"
 msgstr "alarm evaluation cycle failed"
 
-#: ceilometer/alarm/service.py:103
+#: ceilometer/alarm/service.py:108
 #, python-format
 msgid "skipping alarm %s: type unsupported"
 msgstr "skipping alarm %s: type unsupported"
 
-#: ceilometer/alarm/service.py:107
+#: ceilometer/alarm/service.py:112
 #, python-format
 msgid "evaluating alarm %s"
 msgstr "evaluating alarm %s"
 
-#: ceilometer/alarm/service.py:260
+#: ceilometer/alarm/service.py:259
 #, python-format
 msgid "Unable to parse action %(action)s for alarm %(alarm_id)s"
 msgstr "Unable to parse action %(action)s for alarm %(alarm_id)s"
 
-#: ceilometer/alarm/service.py:269
+#: ceilometer/alarm/service.py:268
 #, python-format
 msgid "Action %(scheme)s for alarm %(alarm_id)s is unknown, cannot notify"
 msgstr "Action %(scheme)s for alarm %(alarm_id)s is unknown, cannot notify"
 
-#: ceilometer/alarm/service.py:275
+#: ceilometer/alarm/service.py:274
 #, python-format
 msgid "Notifying alarm %(id)s with action %(act)s"
 msgstr "Notifying alarm %(id)s with action %(act)s"
 
-#: ceilometer/alarm/service.py:280
+#: ceilometer/alarm/service.py:279
 #, python-format
 msgid "Unable to notify alarm %s"
 msgstr "Unable to notify alarm %s"
 
-#: ceilometer/alarm/service.py:299
+#: ceilometer/alarm/service.py:298
 msgid "Unable to notify for an alarm with no action"
 msgstr "Unable to notify for an alarm with no action"
 
@@ -824,7 +824,7 @@ msgstr "VM %s not found on Hyper-V"
 msgid "Duplicate VM name found: %s"
 msgstr "Duplicate VM name found: %s"
 
-#: ceilometer/compute/virt/libvirt/inspector.py:129
+#: ceilometer/compute/virt/libvirt/inspector.py:131
 #, python-format
 msgid ""
 "Failed to inspect vnics of %(instance_name)s, domain is in state of "
@@ -833,7 +833,7 @@ msgstr ""
 "Failed to inspect vnics of %(instance_name)s, domain is in state of "
 "SHUTOFF"
 
-#: ceilometer/compute/virt/libvirt/inspector.py:164
+#: ceilometer/compute/virt/libvirt/inspector.py:166
 #, python-format
 msgid ""
 "Failed to inspect disks of %(instance_name)s, domain is in state of "
@@ -841,6 +841,27 @@ msgid ""
 msgstr ""
 "Failed to inspect disks of %(instance_name)s, domain is in state of "
 "SHUTOFF"
+
+#: ceilometer/compute/virt/libvirt/inspector.py:189
+#, python-format
+msgid ""
+"Failed to inspect memory usage of %(instance_name)s, domain is in state "
+"of SHUTOFF"
+msgstr ""
+
+#: ceilometer/compute/virt/libvirt/inspector.py:205
+#, python-format
+msgid ""
+"Failed to inspect memory usage of %(instance_name)s, can not get info "
+"from libvirt"
+msgstr ""
+
+#: ceilometer/compute/virt/libvirt/inspector.py:212
+#, python-format
+msgid ""
+"Failed to inspect memory usage of %(instance_name)s, can not get info "
+"from libvirt: %(error)s"
+msgstr ""
 
 #: ceilometer/compute/virt/vmware/inspector.py:90
 #: ceilometer/compute/virt/vmware/inspector.py:107
@@ -894,6 +915,11 @@ msgstr "Failed to load any dispatchers for %s"
 
 #: ceilometer/dispatcher/database.py:50
 #, python-format
+msgid "Failed to connect to db, purpose %(purpose)s re-try later: %(err)s"
+msgstr ""
+
+#: ceilometer/dispatcher/database.py:75
+#, python-format
 msgid ""
 "metering data %(counter_name)s for %(resource_id)s @ %(timestamp)s: "
 "%(counter_volume)s"
@@ -901,12 +927,12 @@ msgstr ""
 "metering data %(counter_name)s for %(resource_id)s @ %(timestamp)s: "
 "%(counter_volume)s"
 
-#: ceilometer/dispatcher/database.py:69
+#: ceilometer/dispatcher/database.py:94
 #, python-format
 msgid "Failed to record metering data: %s"
 msgstr "Failed to record metering data: %s"
 
-#: ceilometer/dispatcher/database.py:72
+#: ceilometer/dispatcher/database.py:97
 #, python-format
 msgid "message signature invalid, discarding message: %r"
 msgstr "message signature invalid, discarding message: %r"
@@ -1258,7 +1284,7 @@ msgstr "Publishing sample %(msg)s over UDP to %(host)s:%(port)d"
 msgid "Unable to send sample over UDP"
 msgstr "Unable to send sample over UDP"
 
-#: ceilometer/storage/__init__.py:95
+#: ceilometer/storage/__init__.py:108
 #, python-format
 msgid "looking for %(name)r driver in %(namespace)r"
 msgstr "looking for %(name)r driver in %(namespace)r"
@@ -1315,26 +1341,29 @@ msgstr "Opening in-memory HBase connection"
 msgid "Cannot create table %(table_name)s   it already exists. Ignoring error"
 msgstr ""
 
-#: ceilometer/storage/mongo/utils.py:175
+#: ceilometer/storage/mongo/utils.py:174
 #, python-format
 msgid "Connecting to %(db)s on %(nodelist)s"
 msgstr "Connecting to %(db)s on %(nodelist)s"
 
-#: ceilometer/storage/mongo/utils.py:190
-#: ceilometer/tests/storage/test_pymongo_base.py:206
+#: ceilometer/storage/mongo/utils.py:193
 #, python-format
-msgid "Unable to connect to the database after %(retries)d retries. Giving up."
-msgstr "Unable to connect to the database after %(retries)d retries. Giving up."
+msgid "Unable to connect to the database server: %(errmsg)s."
+msgstr ""
 
-#: ceilometer/storage/mongo/utils.py:194
-#: ceilometer/tests/storage/test_pymongo_base.py:201
+#: ceilometer/storage/mongo/utils.py:330
 #, python-format
 msgid ""
-"Unable to connect to the database server: %(errmsg)s. Trying again in "
+"Unable to reconnect to the primary mongodb after %(retries)d retries. "
+"Giving up."
+msgstr ""
+
+#: ceilometer/storage/mongo/utils.py:334
+#, python-format
+msgid ""
+"Unable to reconnect to the primary mongodb: %(errmsg)s. Trying again in "
 "%(retry_interval)d seconds."
 msgstr ""
-"Unable to connect to the database server: %(errmsg)s. Trying again in "
-"%(retry_interval)d seconds."
 
 #: ceilometer/transformer/arithmetic.py:57
 #, python-format
