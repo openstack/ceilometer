@@ -55,11 +55,11 @@ def make_test_data(conn, start, end, interval, event_types):
     while timestamp <= end:
         data = []
         for i in range(event_types):
-            traits = [models.Trait('id1_%d' % i, 1, uuid.uuid4()),
+            traits = [models.Trait('id1_%d' % i, 1, str(uuid.uuid4())),
                       models.Trait('id2_%d' % i, 2, random.randint(1,10)),
                       models.Trait('id3_%d' % i, 3, random.random()),
                       models.Trait('id4_%d' % i, 4, timestamp)]
-            data.append(models.Event(uuid.uuid4(),
+            data.append(models.Event(str(uuid.uuid4()),
                                      'event_type%d' % i,
                                      timestamp,
                                      traits))
