@@ -16,6 +16,7 @@
 
 import copy
 import re
+
 import six
 
 import ceilometer

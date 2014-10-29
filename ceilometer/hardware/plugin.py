@@ -21,6 +21,7 @@
 
 import abc
 import itertools
+
 from oslo.utils import netutils
 import six
 

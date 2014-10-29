@@ -17,10 +17,10 @@
 
 
 import abc
-import croniter
 import datetime
 
 from ceilometerclient import client as ceiloclient
+import croniter
 from oslo.config import cfg
 from oslo.utils import timeutils
 import pytz

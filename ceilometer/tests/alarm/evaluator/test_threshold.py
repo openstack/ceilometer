@@ -17,19 +17,19 @@
 """Tests for ceilometer/alarm/evaluator/threshold.py
 """
 import datetime
-import mock
-import pytz
 import uuid
 
+from ceilometerclient import exc
+from ceilometerclient.v2 import statistics
+import mock
+from oslo.config import cfg
 from oslo.utils import timeutils
+import pytz
 from six import moves
 
 from ceilometer.alarm.evaluator import threshold
 from ceilometer.alarm.storage import models
 from ceilometer.tests.alarm.evaluator import base
-from ceilometerclient import exc
-from ceilometerclient.v2 import statistics
-from oslo.config import cfg
 
 
 class TestEvaluate(base.TestEvaluatorBase):

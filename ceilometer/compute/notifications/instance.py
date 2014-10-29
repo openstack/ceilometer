@@ -20,6 +20,7 @@
 """
 
 import abc
+
 import six
 
 from ceilometer.compute import notifications

@@ -17,17 +17,17 @@
 """Tests for ceilometer/alarm/threshold_evaluation.py
 """
 import datetime
-import mock
-import pytz
 import uuid
 
+from ceilometerclient import exc
+from ceilometerclient.v2 import alarms
+import mock
 from oslo.utils import timeutils
+import pytz
 
 from ceilometer.alarm.evaluator import combination
 from ceilometer.alarm.storage import models
 from ceilometer.tests.alarm.evaluator import base
-from ceilometerclient import exc
-from ceilometerclient.v2 import alarms
 
 
 class TestEvaluate(base.TestEvaluatorBase):

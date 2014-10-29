@@ -18,11 +18,11 @@
 # under the License.
 
 """Base classes for API tests."""
-import fixtures
 import os
 import uuid
 import warnings
 
+import fixtures
 import mock
 from oslo.config import fixture as fixture_config
 from oslotest import mockpatch
