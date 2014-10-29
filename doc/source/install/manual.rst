@@ -48,6 +48,12 @@ MongoDB
     [database]
     connection = mongodb://username:password@host:27017/ceilometer
 
+   If MongoDB is configured in replica set mode, add param in ceilometer.conf
+   to use MongoReplicaSetClient::
+
+    [database]
+    mongodb_replica_set = replica_name
+
 SQLalchemy-supported DBs
 ------------------------
 
