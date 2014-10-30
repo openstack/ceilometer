@@ -16,6 +16,7 @@
 # under the License.
 
 import logging
+
 import mock
 from oslo.config import fixture as fixture_config
 import tooz.coordination

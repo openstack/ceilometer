@@ -27,21 +27,21 @@
 import ast
 import base64
 import copy
-import croniter
 import datetime
 import functools
 import inspect
 import json
-import jsonschema
-import pytz
 import uuid
 
+import croniter
+import jsonschema
 from oslo.config import cfg
 from oslo.utils import netutils
 from oslo.utils import strutils
 from oslo.utils import timeutils
 import pecan
 from pecan import rest
+import pytz
 import six
 import wsme
 from wsme import types as wtypes

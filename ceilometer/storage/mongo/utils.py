@@ -19,12 +19,12 @@
 """
 
 import time
+import weakref
 
 from oslo.config import cfg
 from oslo.utils import netutils
 import pymongo
 import six
-import weakref
 
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log

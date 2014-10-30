@@ -29,10 +29,11 @@ import collections
 import tempfile
 import time
 
+from oslo.config import cfg
+
 from ceilometer.ipmi.platform import exception as nmexcept
 from ceilometer.ipmi.platform import ipmitool
 from ceilometer.openstack.common.gettextutils import _
-from oslo.config import cfg
 
 
 OPTS = [

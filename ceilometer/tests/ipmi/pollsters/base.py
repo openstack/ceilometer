@@ -15,13 +15,13 @@
 # under the License.
 
 import abc
+
 import mock
+from oslotest import mockpatch
 import six
 
 from ceilometer.ipmi import manager
 import ceilometer.tests.base as base
-
-from oslotest import mockpatch
 
 
 @six.add_metaclass(abc.ABCMeta)
