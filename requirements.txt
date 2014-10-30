@@ -17,7 +17,6 @@ lockfile>=0.8
 lxml>=2.3
 msgpack-python>=0.4.0
 netaddr>=0.7.12
-ordereddict
 oslo.db>=1.0.0  # Apache-2.0
 oslo.config>=1.4.0  # Apache-2.0
 oslo.rootwrap>=1.3.0
