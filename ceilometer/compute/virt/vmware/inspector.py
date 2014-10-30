@@ -31,6 +31,9 @@ OPTS = [
     cfg.StrOpt('host_ip',
                default='',
                help='IP address of the VMware Vsphere host.'),
+    cfg.IntOpt('host_port',
+               default=443,
+               help='Port of the VMware Vsphere host.'),
     cfg.StrOpt('host_username',
                default='',
                help='Username of VMware Vsphere.'),
@@ -72,7 +75,8 @@ def get_api_session():
         cfg.CONF.vmware.host_password,
         cfg.CONF.vmware.api_retry_count,
         cfg.CONF.vmware.task_poll_interval,
-        wsdl_loc=cfg.CONF.vmware.wsdl_location)
+        wsdl_loc=cfg.CONF.vmware.wsdl_location,
+        port=cfg.CONF.vmware.host_port)
     return api_session
 
 

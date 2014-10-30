@@ -144,6 +144,7 @@ Parameter                   Default                               Note
 host_ip                     ""                                    (Str) IP address of the VMware Vsphere host.
 host_password               ""                                    (Str) Password of VMware Vsphere.
 host_username               ""                                    (Str) Username of VMware Vsphere.
+host_port                   443                                   (Int) Listening Port of VMware Vsphere host. 
 api_retry_count             10                                    (Int) Number of times a VMware Vsphere API must be retried.
 task_poll_interval          0.5                                   (Float) Sleep time in seconds for polling an ongoing async task.
 wsdl_location               None                                  (Str) Optional vim Service WSDL location
