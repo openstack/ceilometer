@@ -31,16 +31,20 @@
         - "disk.read.requests"
         - "disk.write.bytes"
         - "disk.write.requests"
+        - "disk.device.read.bytes"
+        - "disk.device.read.requests"
+        - "disk.device.write.bytes"
+        - "disk.device.write.requests"
     transformers:
         - name: "rate_of_change"
           parameters:
               source:
                   map_from:
-                      name: "disk\\.(read|write)\\.(bytes|requests)"
+                      name: "(disk\\.device|disk)\\.(read|write)\\.(bytes|requests)"
                       unit: "(B|request)"
               target:
                   map_to:
-                      name: "disk.\\1.\\2.rate"
+                      name: "\\1.\\2.\\3.rate"
                       unit: "\\1/s"
                   type: "gauge"
     publishers:
