@@ -28,6 +28,7 @@ import sys
 
 import bson.code
 import bson.objectid
+from oslo.config import cfg
 from oslo.utils import timeutils
 import pymongo
 import six
@@ -159,7 +160,14 @@ class Connection(pymongo_base.Connection):
         # queries, so the database won't take advantage of an index
         # including both.
         if self.db.resource.index_information() == {}:
-            resource_id = str(bson.objectid.ObjectId())
+            # Initializing a longer resource id to workaround DB2 nosql issue.
+            # Longer resource id is required by compute node's resource as
+            # their id is '<hostname>_<nodename>'. DB2 creates a VARCHAR(70)
+            # for resource id when its length < 70. But DB2 can create a
+            # VARCHAR(n) for the resource id which has n(n>70) characters.
+            # Users can adjust 'db2nosql_resource_id_maxlen'(default is 512)
+            # for their ENV.
+            resource_id = 'x' * cfg.CONF.database.db2nosql_resource_id_maxlen
             self.db.resource.insert({'_id': resource_id,
                                      'no_key': resource_id})
             meter_id = str(bson.objectid.ObjectId())

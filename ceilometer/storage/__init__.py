@@ -63,6 +63,11 @@ OPTS = [
                help='The name of the replica set which is used to connect to '
                     'MongoDB database. If it is set, MongoReplicaSetClient '
                     'will be used instead of MongoClient.'),
+    cfg.IntOpt('db2nosql_resource_id_maxlen',
+               default=512,
+               help="The max length of resources id in DB2 nosql, "
+                    "the value should be larger than len(hostname) * 2 "
+                    "as compute node's resource id is <hostname>_<nodename>."),
 ]
 
 cfg.CONF.register_opts(OPTS, group='database')
