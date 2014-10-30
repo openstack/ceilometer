@@ -23,7 +23,7 @@ from oslo_utils import timeutils
 
 from ceilometer.alarm import evaluator
 from ceilometer.alarm.evaluator import utils
-from ceilometer.i18n import _
+from ceilometer.i18n import _, _LW
 from ceilometer.openstack.common import log
 
 LOG = log.getLogger(__name__)
@@ -43,10 +43,6 @@ class ThresholdEvaluator(evaluator.Evaluator):
     # the sliding evaluation window is extended to allow
     # for reporting/ingestion lag
     look_back = 1
-
-    # minimum number of datapoints within sliding window to
-    # avoid unknown state
-    quorum = 1
 
     @classmethod
     def _bound_duration(cls, alarm, constraints):
@@ -108,13 +104,21 @@ class ThresholdEvaluator(evaluator.Evaluator):
         Ensure there is sufficient data for evaluation, transitioning to
         unknown otherwise.
         """
-        sufficient = len(statistics) >= self.quorum
+        sufficient = len(statistics) >= alarm.rule['evaluation_periods']
         if not sufficient and alarm.state != evaluator.UNKNOWN:
+            LOG.warn(_LW('Expecting %(expected)d datapoints but only get '
+                         '%(actual)d') % {
+                'expected': alarm.rule['evaluation_periods'],
+                'actual': len(statistics)})
+            # Reason is not same as log message because we want to keep
+            # consistent since thirdparty software may depend on old format.
             reason = _('%d datapoints are unknown') % alarm.rule[
                 'evaluation_periods']
+            last = None if not statistics else (
+                getattr(statistics[-1], alarm.rule['statistic']))
             reason_data = self._reason_data('unknown',
                                             alarm.rule['evaluation_periods'],
-                                            None)
+                                            last)
             self._refresh(alarm, evaluator.UNKNOWN, reason, reason_data)
         return sufficient
 
