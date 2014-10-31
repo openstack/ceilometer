@@ -113,14 +113,18 @@ class PollingTask(object):
                     [pollster.obj.default_discovery], discovery_cache)
             key = Resources.key(source, pollster)
             source_resources = list(self.resources[key].get(discovery_cache))
+            polling_resources = (source_resources or pollster_resources or
+                                 agent_resources)
+            if not polling_resources:
+                LOG.info(_("Skip polling pollster %s, no resources found"),
+                         pollster.name)
+                continue
             with self.publishers[source.name] as publisher:
                 try:
                     samples = list(pollster.obj.get_samples(
                         manager=self.manager,
                         cache=cache,
-                        resources=(source_resources or
-                                   pollster_resources or
-                                   agent_resources)
+                        resources=polling_resources
                     ))
                     publisher(samples)
                 except Exception as err:

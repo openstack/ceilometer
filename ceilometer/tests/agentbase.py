@@ -740,3 +740,15 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
                          len(p_coord.extract_my_subset.call_args_list))
         for c in expected:
             self.assertIn(c, p_coord.extract_my_subset.call_args_list)
+
+    def test_skip_polling_and_publish_with_no_resources(self):
+        self.pipeline_cfg[0]['resources'] = []
+        self.setup_pipeline()
+        polling_task = self.mgr.setup_polling_tasks().values()[0]
+        pollster = list(polling_task.pollster_matches)[0][1]
+        LOG = mock.MagicMock()
+        with mock.patch('ceilometer.agent.LOG', LOG):
+            polling_task.poll_and_publish()
+            if not self.mgr.discover():
+                LOG.info.assert_called_with('Skip polling pollster %s, no '
+                                            'resources found', pollster.name)
