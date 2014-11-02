@@ -1162,9 +1162,9 @@ class SamplesController(rest.RestController):
 
     @wsme_pecan.wsexpose(Sample, wtypes.text)
     def get_one(self, sample_id):
-        """Return a sample
+        """Return a sample.
 
-        :param sample_id: the id of the sample
+        :param sample_id: the id of the sample.
         """
         f = storage.SampleFilter(message_id=sample_id)
 

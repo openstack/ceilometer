@@ -31,6 +31,9 @@ Meters
 Samples and Statistics
 ======================
 
+.. rest-controller:: ceilometer.api.controllers.v2:SamplesController
+   :webprefix: /v2/samples
+
 .. autotype:: ceilometer.api.controllers.v2.Sample
    :members:
 
