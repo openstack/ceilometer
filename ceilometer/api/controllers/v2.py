@@ -2310,6 +2310,13 @@ class EventQuery(Query):
                                              self._get_value_as_type(),
                                              self.type)
 
+    @classmethod
+    def sample(cls):
+        return cls(field="event_type",
+                   type="string",
+                   op="eq",
+                   value="compute.instance.create.start")
+
 
 class Trait(_Base):
     """A Trait associated with an event."""
@@ -2374,12 +2381,15 @@ class Event(_Base):
     def sample(cls):
         return cls(
             event_type='compute.instance.update',
-            generated='2013-11-11T20:00:00',
+            generated=datetime.datetime(2015, 1, 1, 12, 30, 59, 123456),
             message_id='94834db1-8f1b-404d-b2ec-c35901f1b7f0',
             traits={
-                'request_id': 'req-4e2d67b8-31a4-48af-bb2f-9df72a353a72',
-                'service': 'conductor.tem-devstack-01',
-                'tenant_id': '7f13f2b17917463b9ee21aa92c4b36d6'
+                Trait(name='request_id',
+                      value='req-4e2d67b8-31a4-48af-bb2f-9df72a353a72'),
+                Trait(name='service',
+                      value='conductor.tem-devstack-01'),
+                Trait(name='tenant_id',
+                      value='7f13f2b17917463b9ee21aa92c4b36d6')
             }
         )
 
@@ -2465,8 +2475,13 @@ class EventTypesController(rest.RestController):
 
     traits = TraitsController()
 
-    @pecan.expose()
+    @requires_admin
+    @wsme_pecan.wsexpose(None, wtypes.text)
     def get_one(self, event_type):
+        """Unused API, will always return 404.
+
+        :param event_type: A event type
+        """
         pecan.abort(404)
 
     @requires_admin

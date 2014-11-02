@@ -106,8 +106,30 @@ Alarms
 .. autotype:: ceilometer.api.controllers.v2.AlarmChange
    :members:
 
+Events and Traits
+=================
+
+.. rest-controller:: ceilometer.api.controllers.v2:EventTypesController
+   :webprefix: /v2/event_types
+
+.. rest-controller:: ceilometer.api.controllers.v2:TraitsController
+   :webprefix: /v2/event_types/(event_type)/traits
+
+.. rest-controller:: ceilometer.api.controllers.v2:EventsController
+   :webprefix: /v2/events
+
+.. autotype:: ceilometer.api.controllers.v2.Event
+   :members:
+
+.. autotype:: ceilometer.api.controllers.v2.Trait
+   :members:
+
+.. autotype:: ceilometer.api.controllers.v2.TraitDescription
+   :members:
+
 Filtering Queries
 =================
+
 Ceilometer's REST API currently supports two types of queries. The Simple
 Query functionality provides simple filtering on several fields of the
 *Sample* type. Complex Query provides the possibility to specify queries
@@ -127,6 +149,7 @@ all other fields.
 
 Simple Query
 ++++++++++++
+
 Many of the endpoints above accept a query filter argument, which
 should be a list of Query data structures. Whatever the endpoint you
 want to apply a filter on, you always filter on the fields of the *Sample*
@@ -137,8 +160,22 @@ field of *Sample*).
 .. autotype:: ceilometer.api.controllers.v2.Query
    :members:
 
+Event Query
++++++++++++
+
+Event query is similar to simple query, its type EventQuery is actually
+a subclass of Query, so EventQuery has every attribute Query has.
+But there are some differences. If a field is one of the following:
+event_type, message_id, start_timestamp, end_timestamp, then this field
+will be applied on event, otherwise it will be treated as trait name and
+applied on trait.
+
+.. autotype:: ceilometer.api.controllers.v2.EventQuery
+   :members:
+
 Complex Query
 +++++++++++++
+
 The filter expressions of the Complex Query feature operate on the fields
 of *Sample*, *Alarm* and *AlarmChange*. The following comparison operators are
 supported: *=*, *!=*, *<*, *<=*, *>*, *>=* and *in*; and the following logical
@@ -183,9 +220,9 @@ Links
 API and CLI query examples
 ==========================
 
-
 CLI Queries
 +++++++++++
+
 Ceilometer CLI Commands::
 
      $ ceilometer --debug --os-username <username_here> --os-password <password_here> --os-auth-url http://localhost:5000/v2.0/ --os-tenant-name admin  meter-list
@@ -195,6 +232,7 @@ Ceilometer CLI Commands::
 
 API Queries
 +++++++++++
+
 Ceilometer API calls:
 
 .. note:: To successfully query the Ceilometer you must first get a project-specific token from the Keystone service and add it to any API calls that you execute against that project. See the `OpenStack credentials documentation <http://docs.openstack.org/api/quick-start/content/index.html#getting-credentials-a00665>`_ for additional details.
@@ -244,7 +282,6 @@ the CPU utilization for a given instance (identified by *resource_id*)::
        "&q.field=resource_id&q.op=eq&q.value=64da755c-9120-4236-bee1-54acafe24980"
 
 .. note:: If any of the requested aggregates are not supported by the storage driver, a HTTP 400 error code will be returned along with an appropriate error message.
-
 
 JSON based example::
 
