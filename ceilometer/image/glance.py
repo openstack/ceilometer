@@ -62,7 +62,8 @@ class _Base(plugin.CentralPollster):
         return glanceclient.Client('1', endpoint,
                                    token=ksclient.auth_token,
                                    cacert=service_credentials.os_cacert,
-                                   insecure=service_credentials.insecure)
+                                   insecure=service_credentials.insecure,
+                                   timeout=cfg.CONF.http_timeout)
 
     def _get_images(self, ksclient, endpoint):
         client = self.get_glance_client(ksclient, endpoint)

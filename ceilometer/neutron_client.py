@@ -30,6 +30,7 @@ SERVICE_OPTS = [
 ]
 
 cfg.CONF.register_opts(SERVICE_OPTS, group='service_types')
+cfg.CONF.import_opt('http_timeout', 'ceilometer.service')
 cfg.CONF.import_group('service_credentials', 'ceilometer.service')
 
 LOG = log.getLogger(__name__)
@@ -65,7 +66,8 @@ class Client(object):
             'auth_url': conf.os_auth_url,
             'region_name': conf.os_region_name,
             'endpoint_type': conf.os_endpoint_type,
-            'service_type': cfg.CONF.service_types.neutron
+            'timeout': cfg.CONF.http_timeout,
+            'service_type': cfg.CONF.service_types.neutron,
         }
 
         if conf.os_tenant_id:

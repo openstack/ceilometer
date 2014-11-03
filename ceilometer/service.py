@@ -43,6 +43,10 @@ OPTS = [
                default=1,
                help='Number of workers for notification service. A single '
                'notification agent is enabled by default.'),
+    cfg.IntOpt('http_timeout',
+               default=600,
+               help='Timeout seconds for HTTP requests. Set it to None to '
+                    'disable timeout.'),
 ]
 cfg.CONF.register_opts(OPTS)
 

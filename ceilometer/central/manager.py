@@ -31,6 +31,7 @@ OPTS = [
                     'subset of pollsters should be loaded.'),
 ]
 cfg.CONF.register_opts(OPTS, group='central')
+cfg.CONF.import_opt('http_timeout', 'ceilometer.service')
 cfg.CONF.import_group('service_credentials', 'ceilometer.service')
 
 LOG = log.getLogger(__name__)
@@ -52,7 +53,8 @@ class AgentManager(agent.AgentManager):
                 cacert=cfg.CONF.service_credentials.os_cacert,
                 auth_url=cfg.CONF.service_credentials.os_auth_url,
                 region_name=cfg.CONF.service_credentials.os_region_name,
-                insecure=cfg.CONF.service_credentials.insecure)
+                insecure=cfg.CONF.service_credentials.insecure,
+                timeout=cfg.CONF.http_timeout,)
         except Exception as e:
             self.keystone = e
 

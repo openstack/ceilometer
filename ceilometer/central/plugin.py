@@ -23,6 +23,7 @@ from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer import plugin
 
+cfg.CONF.import_opt('http_timeout', 'ceilometer.service')
 cfg.CONF.import_group('service_credentials', 'ceilometer.service')
 
 LOG = log.getLogger(__name__)
@@ -42,7 +43,8 @@ def _get_keystone():
             cacert=cfg.CONF.service_credentials.os_cacert,
             auth_url=cfg.CONF.service_credentials.os_auth_url,
             region_name=cfg.CONF.service_credentials.os_region_name,
-            insecure=cfg.CONF.service_credentials.insecure)
+            insecure=cfg.CONF.service_credentials.insecure,
+            timeout=cfg.CONF.http_timeout)
     except Exception as e:
         return e
 
