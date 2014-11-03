@@ -261,45 +261,6 @@ class Connection(object):
         """Clear database."""
 
     @staticmethod
-    def record_events(events):
-        """Write the events to the backend storage system.
-
-        :param events: a list of model.Event objects.
-        """
-        raise ceilometer.NotImplementedError('Events not implemented.')
-
-    @staticmethod
-    def get_events(event_filter):
-        """Return an iterable of model.Event objects."""
-        raise ceilometer.NotImplementedError('Events not implemented.')
-
-    @staticmethod
-    def get_event_types():
-        """Return all event types as an iterable of strings."""
-        raise ceilometer.NotImplementedError('Events not implemented.')
-
-    @staticmethod
-    def get_trait_types(event_type):
-        """Return a dictionary containing the name and data type of the trait.
-
-        Only trait types for the provided event_type are
-        returned.
-        :param event_type: the type of the Event
-        """
-        raise ceilometer.NotImplementedError('Events not implemented.')
-
-    @staticmethod
-    def get_traits(event_type, trait_type=None):
-        """Return all trait instances associated with an event_type.
-
-        If trait_type is specified, only return instances of that trait type.
-        :param event_type: the type of the Event to filter by
-        :param trait_type: the name of the Trait to filter by
-        """
-
-        raise ceilometer.NotImplementedError('Events not implemented.')
-
-    @staticmethod
     def query_samples(filter_expr=None, orderby=None, limit=None):
         """Return an iterable of model.Sample objects.
 
