@@ -30,20 +30,6 @@ class CompatibilityTest(test_storage_scenarios.DBTestBase,
 
     def prepare_data(self):
         def old_record_metering_data(self, data):
-            self.db.user.update(
-                {'_id': data['user_id']},
-                {'$addToSet': {'source': data['source'],
-                               },
-                 },
-                upsert=True,
-            )
-            self.db.project.update(
-                {'_id': data['project_id']},
-                {'$addToSet': {'source': data['source'],
-                               },
-                 },
-                upsert=True,
-            )
             received_timestamp = datetime.datetime.utcnow()
             self.db.resource.update(
                 {'_id': data['resource_id']},
