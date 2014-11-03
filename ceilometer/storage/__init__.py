@@ -60,8 +60,9 @@ OPTS = [
                'database. (if unset, connection is used)'),
     cfg.StrOpt('mongodb_replica_set',
                default='',
-               help="The connection string used to connect to mongo database, "
-                    "if mongodb replica set was chosen."),
+               help='The name of the replica set which is used to connect to '
+                    'MongoDB database. If it is set, MongoReplicaSetClient '
+                    'will be used instead of MongoClient.'),
 ]
 
 cfg.CONF.register_opts(OPTS, group='database')
