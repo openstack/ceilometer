@@ -51,6 +51,8 @@ cfg.CONF.import_opt('partition_rpc_topic', 'ceilometer.alarm.rpc',
                     group='alarm')
 cfg.CONF.import_opt('heartbeat', 'ceilometer.coordination',
                     group='coordination')
+cfg.CONF.import_opt('http_timeout', 'ceilometer.service')
+cfg.CONF.import_group('service_credentials', 'ceilometer.service')
 
 LOG = log.getLogger(__name__)
 
@@ -83,6 +85,7 @@ class AlarmService(object):
                 os_cacert=auth_config.os_cacert,
                 os_endpoint_type=auth_config.os_endpoint_type,
                 insecure=auth_config.insecure,
+                timeout=cfg.CONF.http_timeout,
             )
             self.api_client = ceiloclient.get_client(2, **creds)
         return self.api_client
