@@ -107,6 +107,8 @@ class TestRPCAlarmNotifier(tests_base.BaseTestCase):
             actions = getattr(a, models.Alarm.ALARM_ACTIONS_MAP[a.state])
             self.assertEqual(self.alarms[i].alarm_id,
                              self.notifier_server.notified[i]["alarm_id"])
+            self.assertEqual(self.alarms[i].name,
+                             self.notifier_server.notified[i]["alarm_name"])
             self.assertEqual(actions,
                              self.notifier_server.notified[i]["actions"])
             self.assertEqual(previous[i],
