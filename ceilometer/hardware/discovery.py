@@ -70,7 +70,7 @@ class NodesDiscoveryTripleO(plugin.DiscoveryBase):
 
                 resources.append(resource)
             except KeyError:
-                LOG.error(_("Couldn't obtain IP address of"
+                LOG.error(_("Couldn't obtain IP address of "
                             "instance %s") % instance.id)
 
         return resources

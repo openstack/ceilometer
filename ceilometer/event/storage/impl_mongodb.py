@@ -27,7 +27,7 @@ class Connection(pymongo_base.Connection):
 
         # NOTE(jd) Use our own connection pooling on top of the Pymongo one.
         # We need that otherwise we overflow the MongoDB instance with new
-        # connection since we instanciate a Pymongo client each time someone
+        # connection since we instantiate a Pymongo client each time someone
         # requires a new storage connection.
         self.conn = self.CONNECTION_POOL.connect(url)
 
@@ -42,7 +42,7 @@ class Connection(pymongo_base.Connection):
                                  connection_options['password'])
 
         # NOTE(jd) Upgrading is just about creating index, so let's do this
-        # on connection to be sure at least the TTL is correcly updated if
+        # on connection to be sure at least the TTL is correctly updated if
         # needed.
         self.upgrade()
 
