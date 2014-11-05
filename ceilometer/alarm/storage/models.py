@@ -17,6 +17,9 @@
 """Model classes for use in the storage API.
 """
 
+import datetime
+
+from ceilometer.openstack.common.gettextutils import _
 from ceilometer.storage import base
 
 
@@ -60,6 +63,11 @@ class Alarm(base.Model):
                  timestamp, user_id, project_id, state, state_timestamp,
                  ok_actions, alarm_actions, insufficient_data_actions,
                  repeat_actions, rule, time_constraints):
+        if not isinstance(timestamp, datetime.datetime):
+            raise TypeError(_("timestamp should be datetime object"))
+        if not isinstance(state_timestamp, datetime.datetime):
+            raise TypeError(_("state_timestamp should be datetime object"))
+
         base.Model.__init__(
             self,
             alarm_id=alarm_id,

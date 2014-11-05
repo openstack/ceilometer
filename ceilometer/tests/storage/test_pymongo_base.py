@@ -19,6 +19,7 @@ import mock
 
 from ceilometer.publisher import utils
 from ceilometer import sample
+from ceilometer.tests import constants
 from ceilometer.tests import db as tests_db
 from ceilometer.tests.storage import test_storage_scenarios
 
@@ -96,7 +97,7 @@ class CompatibilityTest(test_storage_scenarios.DBTestBase,
                      enabled=True,
                      name='old-alert',
                      description='old-alert',
-                     timestamp=None,
+                     timestamp=constants.MIN_DATETIME,
                      meter_name='cpu',
                      user_id='me',
                      project_id='and-da-boys',
@@ -106,7 +107,7 @@ class CompatibilityTest(test_storage_scenarios.DBTestBase,
                      evaluation_periods=1,
                      period=60,
                      state="insufficient data",
-                     state_timestamp=None,
+                     state_timestamp=constants.MIN_DATETIME,
                      ok_actions=[],
                      alarm_actions=['http://nowhere/alarms'],
                      insufficient_data_actions=[],

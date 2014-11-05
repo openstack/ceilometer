@@ -112,3 +112,47 @@ class TestTraitModel(testbase.BaseTestCase):
             event_models.Trait.TEXT_TYPE, 10)
         self.assertEqual("10", v)
         self.assertIsInstance(v, str)
+
+
+class TestClassModel(testbase.BaseTestCase):
+
+    ALARM = {
+        'alarm_id': '503490ea-ee9e-40d6-9cad-93a71583f4b2',
+        'enabled': True,
+        'type': 'threshold',
+        'name': 'alarm-test',
+        'description': 'alarm-test-description',
+        'timestamp': None,
+        'user_id': '5c76351f5fef4f6490d1048355094ca3',
+        'project_id': 'd83ed14a457141fc8661b4dcb3fd883d',
+        'state': "insufficient data",
+        'state_timestamp': None,
+        'ok_actions': [],
+        'alarm_actions': [],
+        'insufficient_data_actions': [],
+        'repeat_actions': False,
+        'time_constraints': [],
+        'rule': {
+            'comparison_operator': 'lt',
+            'threshold': 34,
+            'statistic': 'max',
+            'evaluation_periods': 1,
+            'period': 60,
+            'meter_name': 'cpu_util',
+            'query': []
+        }
+    }
+
+    def test_timestamp_cannot_be_none(self):
+        self.ALARM['timestamp'] = None
+        self.ALARM['state_timestamp'] = datetime.datetime.utcnow()
+        self.assertRaises(TypeError,
+                          alarm_models.Alarm.__init__,
+                          **self.ALARM)
+
+    def test_state_timestamp_cannot_be_none(self):
+        self.ALARM['timestamp'] = datetime.datetime.utcnow()
+        self.ALARM['state_timestamp'] = None
+        self.assertRaises(TypeError,
+                          alarm_models.Alarm.__init__,
+                          **self.ALARM)
