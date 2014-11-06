@@ -240,6 +240,20 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
                                                                  meters,
                                                                  units)
 
+    def test_rate_of_change_boilerplate_per_disk_device_read_cfg(self):
+        meters = ('disk.device.read.bytes', 'disk.device.read.requests')
+        units = ('B', 'request')
+        self._do_test_rate_of_change_in_boilerplate_pipeline_cfg(2,
+                                                                 meters,
+                                                                 units)
+
+    def test_rate_of_change_boilerplate_per_disk_device_write_cfg(self):
+        meters = ('disk.device.write.bytes', 'disk.device.write.requests')
+        units = ('B', 'request')
+        self._do_test_rate_of_change_in_boilerplate_pipeline_cfg(2,
+                                                                 meters,
+                                                                 units)
+
     def test_rate_of_change_boilerplate_network_outgoing_cfg(self):
         meters = ('network.outgoing.bytes', 'network.outgoing.packets')
         units = ('B', 'packet')
