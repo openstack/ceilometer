@@ -3189,3 +3189,25 @@ class MongoAutoReconnectTest(DBTestBase,
                 {'last_sample_timestamp':
                  datetime.datetime(2014, 10, 15, 17, 39)})[0]['source']
             self.assertEqual('test-proxy-update', data)
+
+
+@tests_db.run_with('mongodb')
+class MongoTimeToLiveTest(DBTestBase, tests_db.MixinTestsWithBackendScenarios):
+
+    def test_ensure_index(self):
+        cfg.CONF.set_override('time_to_live', 5, group='database')
+        self.conn.upgrade()
+        self.assertEqual(5, self.conn.db.resource.index_information()
+                         ['resource_ttl']['expireAfterSeconds'])
+        self.assertEqual(5, self.conn.db.meter.index_information()
+                         ['meter_ttl']['expireAfterSeconds'])
+
+    def test_modification_of_index(self):
+        cfg.CONF.set_override('time_to_live', 5, group='database')
+        self.conn.upgrade()
+        cfg.CONF.set_override('time_to_live', 15, group='database')
+        self.conn.upgrade()
+        self.assertEqual(15, self.conn.db.resource.index_information()
+                         ['resource_ttl']['expireAfterSeconds'])
+        self.assertEqual(15, self.conn.db.meter.index_information()
+                         ['meter_ttl']['expireAfterSeconds'])

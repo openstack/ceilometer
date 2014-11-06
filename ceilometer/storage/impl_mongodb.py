@@ -88,13 +88,6 @@ class Connection(pymongo_base.Connection):
                                        AVAILABLE_CAPABILITIES)
     CONNECTION_POOL = pymongo_utils.ConnectionPool()
 
-    REDUCE_GROUP_CLEAN = bson.code.Code("""
-    function ( curr, result ) {
-        if (result.resources.indexOf(curr.resource_id) < 0)
-            result.resources.push(curr.resource_id);
-    }
-    """)
-
     STANDARD_AGGREGATES = dict(
         emit_initial=dict(
             sum='',
@@ -409,6 +402,31 @@ class Connection(pymongo_base.Connection):
         # needed.
         self.upgrade()
 
+    @staticmethod
+    def update_ttl(ttl_index_name, index_field, coll):
+        """Update or ensure time_to_live indexes.
+
+        :param ttl_index_name: name of the index we want to update or ensure.
+        :param index_field: field with the index that we need to update.
+        :param coll: collection which indexes need to be updated.
+        """
+        ttl = cfg.CONF.database.time_to_live
+        indexes = coll.index_information()
+        if ttl <= 0:
+            if ttl_index_name in indexes:
+                coll.drop_index(ttl_index_name)
+            return
+
+        if ttl_index_name in indexes:
+            return coll.database.command(
+                'collMod', coll.name,
+                index={'keyPattern': {index_field: pymongo.ASCENDING},
+                       'expireAfterSeconds': ttl})
+
+        coll.ensure_index([(index_field, pymongo.ASCENDING)],
+                          expireAfterSeconds=ttl,
+                          name=ttl_index_name)
+
     def upgrade(self):
         # Establish indexes
         #
@@ -445,29 +463,10 @@ class Connection(pymongo_base.Connection):
         self.db.user.drop()
         self.db.project.drop()
 
-        indexes = self.db.meter.index_information()
-
-        ttl = cfg.CONF.database.time_to_live
-
-        if ttl <= 0:
-            if 'meter_ttl' in indexes:
-                self.db.meter.drop_index('meter_ttl')
-            return
-
-        if 'meter_ttl' in indexes:
-            # NOTE(sileht): manually check expireAfterSeconds because
-            # ensure_index doesn't update index options if the index already
-            # exists
-            if ttl == indexes['meter_ttl'].get('expireAfterSeconds', -1):
-                return
-
-            self.db.meter.drop_index('meter_ttl')
-
-        self.db.meter.create_index(
-            [('timestamp', pymongo.ASCENDING)],
-            expireAfterSeconds=ttl,
-            name='meter_ttl'
-        )
+        # update or ensure time_to_live index
+        self.update_ttl('meter_ttl', 'timestamp', self.db.meter)
+        self.update_ttl('resource_ttl', 'last_sample_timestamp',
+                        self.db.resource)
 
     def clear(self):
         self.conn.drop_database(self.db.name)
@@ -538,19 +537,10 @@ class Connection(pymongo_base.Connection):
     def clear_expired_metering_data(self, ttl):
         """Clear expired data from the backend storage system.
 
-        Clearing occurs according to the time-to-live.
-        :param ttl: Number of seconds to keep records for.
+        Clearing occurs with native MongoDB time-to-live feature.
         """
-        results = self.db.meter.group(
-            key={},
-            condition={},
-            reduce=self.REDUCE_GROUP_CLEAN,
-            initial={
-                'resources': [],
-            }
-        )[0]
-
-        self.db.resource.remove({'_id': {'$nin': results['resources']}})
+        LOG.debug(_("Clearing expired metering data is based on native "
+                    "MongoDB time to live feature and going in background."))
 
     @staticmethod
     def _get_marker(db_collection, marker_pairs):

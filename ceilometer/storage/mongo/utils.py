@@ -374,7 +374,7 @@ class MongoProxy(object):
         insert, wrap this method in the MongoConn.
         Else wrap getting attribute with MongoProxy.
         """
-        if item == 'name':
+        if item in ('name', 'database'):
             return getattr(self.conn, item)
         if item in MONGO_METHODS:
             return MongoConn(getattr(self.conn, item))
