@@ -329,7 +329,7 @@ def prepare_key(*args):
     """
     key_quote = []
     for key in args:
-        if isinstance(key, int):
+        if isinstance(key, six.integer_types):
             key = str(key)
         key_quote.append(quote(key))
     return ":".join(key_quote)
