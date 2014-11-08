@@ -2591,9 +2591,12 @@ class Capabilities(_Base):
                                                  'complex': True}}},
                 'events': {'query': {'simple': True}},
             }),
-            storage=_flatten_capabilities({'production_ready': True}),
-            alarm_storage=_flatten_capabilities({'production_ready': True}),
-            event_storage=_flatten_capabilities({'production_ready': True}),
+            storage=_flatten_capabilities(
+                {'storage': {'production_ready': True}}),
+            alarm_storage=_flatten_capabilities(
+                {'storage': {'production_ready': True}}),
+            event_storage=_flatten_capabilities(
+                {'storage': {'production_ready': True}}),
         )
 
 
