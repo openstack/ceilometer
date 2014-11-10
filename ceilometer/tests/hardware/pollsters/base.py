@@ -40,6 +40,11 @@ class FakeInspector(inspector_base.Inspector):
         'network.outgoing.errors': (1, net_metadata, {}),
         'disk.size.total': (1000, disk_metadata, {}),
         'disk.size.used': (90, disk_metadata, {}),
+        'system_stats.cpu.idle': (62, {}, {}),
+        'system_stats.io.outgoing.blocks': (100, {}, {}),
+        'system_stats.io.incoming.blocks': (120, {}, {}),
+        'network.ip.outgoing.datagrams': (200, {}, {}),
+        'network.ip.incoming.datagrams': (300, {}, {}),
     }
 
     def inspect_generic(self, host, identifier, cache, extra_metadata=None):
