@@ -102,7 +102,7 @@ class Role(IdentityCRUD):
 
 class Trust(IdentityCRUD):
 
-    resource_type = 'trust'
+    resource_type = 'OS-TRUST:trust'
     resource_name = '%s.%s' % (SERVICE, resource_type)
 
     @property
