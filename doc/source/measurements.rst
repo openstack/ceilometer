@@ -169,6 +169,7 @@ router.update             Delta       router    rtr ID    notification  Update r
 ip.floating               Gauge       ip        ip ID     both          Existence of floating ip
 ip.floating.create        Delta       ip        ip ID     notification  Creation requests for this floating ip
 ip.floating.update        Delta       ip        ip ID     notification  Update requests for this floating ip
+bandwidth                 Delta       B         label ID  notification  Bytes through this l3 metering label
 ========================  ==========  ========  ========  ============  ======================================================
 
 Image (Glance)
