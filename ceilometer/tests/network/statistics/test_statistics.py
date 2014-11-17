@@ -104,15 +104,15 @@ class TestBaseGetSamples(base.BaseTestCase):
 
     def _assert_sample(self, s, volume, resource_id, resource_metadata,
                        timestamp):
-            self.assertEqual(s.name, 'foo')
-            self.assertEqual(s.type, sample.TYPE_CUMULATIVE)
-            self.assertEqual(s.unit, 'bar')
-            self.assertEqual(s.volume, volume)
+            self.assertEqual('foo', s.name)
+            self.assertEqual(sample.TYPE_CUMULATIVE, s.type)
+            self.assertEqual('bar', s.unit)
+            self.assertEqual(volume, s.volume)
             self.assertIsNone(s.user_id)
             self.assertIsNone(s.project_id)
-            self.assertEqual(s.resource_id, resource_id)
-            self.assertEqual(s.timestamp, timestamp)
-            self.assertEqual(s.resource_metadata, resource_metadata)
+            self.assertEqual(resource_id, s.resource_id)
+            self.assertEqual(timestamp, s.timestamp)
+            self.assertEqual(resource_metadata, s.resource_metadata)
 
     def test_get_samples_one_driver_one_resource(self):
         times = self._make_timestamps(2)
@@ -124,7 +124,7 @@ class TestBaseGetSamples(base.BaseTestCase):
 
         samples = self._get_samples('http://foo')
 
-        self.assertEqual(len(samples), 1)
+        self.assertEqual(1, len(samples))
         self._assert_sample(samples[0], 1, 'a', {'spam': 'egg'}, times[0])
 
     def test_get_samples_one_driver_two_resource(self):
@@ -138,7 +138,7 @@ class TestBaseGetSamples(base.BaseTestCase):
 
         samples = self._get_samples('http://foo', 'http://bar')
 
-        self.assertEqual(len(samples), 2)
+        self.assertEqual(2, len(samples))
         self._assert_sample(samples[0], 1, 'a', {'spam': 'egg'}, times[0])
         self._assert_sample(samples[1], 2, 'b', None, times[1])
 
@@ -155,7 +155,7 @@ class TestBaseGetSamples(base.BaseTestCase):
 
         samples = self._get_samples('http://foo')
 
-        self.assertEqual(len(samples), 1)
+        self.assertEqual(1, len(samples))
         self._assert_sample(samples[0], 1, 'a', {'spam': 'egg'}, times[0])
 
     def test_get_samples_multi_samples(self):
@@ -168,7 +168,7 @@ class TestBaseGetSamples(base.BaseTestCase):
 
         samples = self._get_samples('http://foo')
 
-        self.assertEqual(len(samples), 2)
+        self.assertEqual(2, len(samples))
         self._assert_sample(samples[0], 1, 'a', {'spam': 'egg'}, times[0])
         self._assert_sample(samples[1], 2, 'b', None, times[1])
 
@@ -179,7 +179,7 @@ class TestBaseGetSamples(base.BaseTestCase):
 
         samples = self._get_samples('http://foo')
 
-        self.assertEqual(len(samples), 0)
+        self.assertEqual(0, len(samples))
 
     def test_get_samples_return_no_generator(self):
         class NoneFakeDriver(driver.Driver):

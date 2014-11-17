@@ -92,24 +92,24 @@ class TestNotification(base.BaseTestCase):
 
     def _verify_common_sample(self, s, name, volume):
         self.assertIsNotNone(s)
-        self.assertEqual(s.name, 'stack.%s' % name)
-        self.assertEqual(s.timestamp, NOW)
-        self.assertEqual(s.type, sample.TYPE_DELTA)
-        self.assertEqual(s.project_id, TENANT_ID)
-        self.assertEqual(s.resource_id, STACK_ARN)
+        self.assertEqual('stack.%s' % name, s.name)
+        self.assertEqual(NOW, s.timestamp)
+        self.assertEqual(sample.TYPE_DELTA, s.type)
+        self.assertEqual(TENANT_ID, s.project_id)
+        self.assertEqual(STACK_ARN, s.resource_id)
         metadata = s.resource_metadata
-        self.assertEqual(metadata.get('host'),
-                         u'orchestration.node-n5x66lxdy67d')
+        self.assertEqual(u'orchestration.node-n5x66lxdy67d',
+                         metadata.get('host'))
 
     def _test_operation(self, operation, trust=None):
         notif = stack_notification_for(operation, trust)
         handler = notifications.StackCRUD(mock.Mock())
         data = list(handler.process_notification(notif))
-        self.assertEqual(len(data), 1)
+        self.assertEqual(1, len(data))
         if trust:
-            self.assertEqual(data[0].user_id, TRUSTOR_ID)
+            self.assertEqual(TRUSTOR_ID, data[0].user_id)
         else:
-            self.assertEqual(data[0].user_id, USER_ID)
+            self.assertEqual(USER_ID, data[0].user_id)
         self._verify_common_sample(data[0], operation, 1)
 
     def test_create(self):

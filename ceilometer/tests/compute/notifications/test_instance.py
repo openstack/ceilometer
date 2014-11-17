@@ -622,7 +622,7 @@ class TestNotifications(base.BaseTestCase):
     def _verify_user_metadata(self, metadata):
         self.assertIn('user_metadata', metadata)
         user_meta = metadata['user_metadata']
-        self.assertEqual(user_meta.get('server_group'), 'Group_A')
+        self.assertEqual('Group_A', user_meta.get('server_group'))
         self.assertNotIn('AutoScalingGroupName', user_meta)
         self.assertIn('foo_bar', user_meta)
         self.assertNotIn('foo.bar', user_meta)

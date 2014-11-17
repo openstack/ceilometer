@@ -197,7 +197,7 @@ class TestLibvirtInspection(base.BaseTestCase):
                                                  return_value=(5L, 0L, 0L,
                                                                2L, 999999L))):
             interfaces = list(self.inspector.inspect_vnics(self.instance_name))
-            self.assertEqual(interfaces, [])
+            self.assertEqual([], interfaces)
 
     def test_inspect_disks(self):
         dom_xml = """
@@ -244,7 +244,7 @@ class TestLibvirtInspection(base.BaseTestCase):
                                                  return_value=(5L, 0L, 0L,
                                                                2L, 999999L))):
             disks = list(self.inspector.inspect_disks(self.instance_name))
-            self.assertEqual(disks, [])
+            self.assertEqual([], disks)
 
     def test_inspect_memory_usage(self):
         fake_memory_stats = {'available': 51200L, 'unused': 25600L}
