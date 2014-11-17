@@ -27,7 +27,7 @@ import ceilometer
 from ceilometer.compute import pollsters
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
-from ceilometer.i18n import _
+from ceilometer.i18n import _, _LW
 from ceilometer.openstack.common import log
 from ceilometer import sample
 
@@ -119,6 +119,11 @@ class _Base(pollsters.BaseComputePollster):
             except virt_inspector.InstanceNotFoundException as err:
                 # Instance was deleted while getting samples. Ignore it.
                 LOG.debug(_('Exception while getting samples %s'), err)
+            except virt_inspector.InstanceShutOffException as e:
+                LOG.warn(_LW('Instance %(instance_id)s was shut off while '
+                             'getting samples of %(pollster)s: %(exc)s'),
+                         {'instance_id': instance.id,
+                          'pollster': self.__class__.__name__, 'exc': e})
             except ceilometer.NotImplementedError:
                 # Selected inspector does not implement this pollster.
                 LOG.debug(_('%(inspector)s does not provide data for '

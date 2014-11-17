@@ -31,24 +31,36 @@ class TestMemoryPollster(base.TestPollsterBase):
         next_value = iter((
             virt_inspector.MemoryUsageStats(usage=1.0),
             virt_inspector.MemoryUsageStats(usage=2.0),
+            virt_inspector.NoDataException(),
+            virt_inspector.InstanceShutOffException(),
         ))
 
         def inspect_memory_usage(instance, duration):
-            return next(next_value)
+            value = next(next_value)
+            if isinstance(value, virt_inspector.MemoryUsageStats):
+                return value
+            else:
+                raise value
 
-        (self.inspector.
-         inspect_memory_usage) = mock.Mock(side_effect=inspect_memory_usage)
+        self.inspector.inspect_memory_usage = mock.Mock(
+            side_effect=inspect_memory_usage)
 
         mgr = manager.AgentManager()
         pollster = memory.MemoryUsagePollster()
 
-        def _verify_memory_metering(expected_memory_mb):
-            cache = {}
-            samples = list(pollster.get_samples(mgr, cache, [self.instance]))
-            self.assertEqual(1, len(samples))
-            self.assertEqual(set(['memory.usage']),
-                             set([s.name for s in samples]))
-            self.assertEqual(expected_memory_mb, samples[0].volume)
+        @mock.patch('ceilometer.compute.pollsters.memory.LOG')
+        def _verify_memory_metering(expected_count, expected_memory_mb, mylog):
+            samples = list(pollster.get_samples(mgr, {}, [self.instance]))
+            self.assertEqual(expected_count, len(samples))
+            if expected_count > 0:
+                self.assertEqual(set(['memory.usage']),
+                                 set([s.name for s in samples]))
+                self.assertEqual(expected_memory_mb, samples[0].volume)
+            else:
+                self.assertEqual(1, mylog.warn.call_count)
+            self.assertEqual(0, mylog.exception.call_count)
 
-        _verify_memory_metering(1.0)
-        _verify_memory_metering(2.0)
+        _verify_memory_metering(1, 1.0)
+        _verify_memory_metering(1, 2.0)
+        _verify_memory_metering(0, 0)
+        _verify_memory_metering(0, 0)

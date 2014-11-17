@@ -143,6 +143,14 @@ class InstanceNotFoundException(InspectorException):
     pass
 
 
+class InstanceShutOffException(InspectorException):
+    pass
+
+
+class NoDataException(InspectorException):
+    pass
+
+
 # Main virt inspector abstraction layering over the hypervisor API.
 #
 class Inspector(object):
