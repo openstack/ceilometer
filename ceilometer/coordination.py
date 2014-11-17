@@ -37,7 +37,12 @@ OPTS = [
     cfg.FloatOpt('heartbeat',
                  default=1.0,
                  help='Number of seconds between heartbeats for distributed '
-                      'coordination.')
+                      'coordination.'),
+    cfg.FloatOpt('check_watchers',
+                 default=10.0,
+                 help='Number of seconds between checks to see if group '
+                      'membership has changed')
+
 ]
 cfg.CONF.register_opts(OPTS, group='coordination')
 
@@ -89,6 +94,15 @@ class PartitionCoordinator(object):
                 LOG.exception(_LE('Error sending a heartbeat to coordination '
                                   'backend.'))
 
+    def watch_group(self, namespace, callback):
+        if self._coordinator:
+            self._coordinator.watch_join_group(namespace, callback)
+            self._coordinator.watch_leave_group(namespace, callback)
+
+    def run_watchers(self):
+        if self._coordinator:
+            self._coordinator.run_watchers()
+
     def join_group(self, group_id):
         if not self._coordinator or not self._started or not group_id:
             return
@@ -107,6 +121,11 @@ class PartitionCoordinator(object):
                 except tooz.coordination.GroupAlreadyExist:
                     pass
         self._groups.add(group_id)
+
+    def leave_group(self, group_id):
+        if self._coordinator:
+            self._coordinator.leave_group(group_id)
+            LOG.info(_LI('Left partitioning group %s'), group_id)
 
     def _get_members(self, group_id):
         if not self._coordinator:

@@ -26,6 +26,7 @@ import yaml
 from ceilometer.i18n import _
 from ceilometer.openstack.common import log
 from ceilometer import publisher
+from ceilometer import sample as sample_util
 from ceilometer import transformer as xformer
 
 
@@ -48,6 +49,30 @@ class PipelineException(Exception):
 
     def __str__(self):
         return 'Pipeline %s: %s' % (self.pipeline_cfg, self.msg)
+
+
+class PipelineEndpoint(object):
+
+    def __init__(self, context, pipeline):
+        self.publish_context = PublishContext(context, [pipeline])
+
+    def sample(self, ctxt, publisher_id, event_type, payload, metadata):
+        """RPC endpoint for pipeline messages."""
+        samples = [
+            sample_util.Sample(name=s['counter_name'],
+                               type=s['counter_type'],
+                               unit=s['counter_unit'],
+                               volume=s['counter_volume'],
+                               user_id=s['user_id'],
+                               project_id=s['project_id'],
+                               resource_id=s['resource_id'],
+                               timestamp=s['timestamp'],
+                               resource_metadata=s['resource_metadata'],
+                               source=s.get('source'))
+            for s in payload
+        ]
+        with self.publish_context as p:
+            p(samples)
 
 
 class PublishContext(object):
