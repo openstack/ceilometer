@@ -37,6 +37,10 @@ class TestPollsterBase(base.BaseTestCase):
         self.instance.flavor = {'name': 'm1.small', 'id': 2, 'vcpus': 1,
                                 'ram': 512, 'disk': 20, 'ephemeral': 0}
         self.instance.status = 'active'
+        self.instance.metadata = {
+            'fqdn': 'vm_fqdn',
+            'metering.stack': '2cadc4b4-8789-123c-b4eg-edd2f0a9c128',
+            'project_cos': 'dev'}
 
         patch_virt = mockpatch.Patch(
             'ceilometer.compute.virt.inspector.get_hypervisor_inspector',

@@ -19,6 +19,9 @@ from oslo.config import cfg
 import six
 
 
+# Below config is for collecting metadata which user defined in nova or else,
+# and then storing it to Sample for future use according to user's requirement.
+# Such as using it as OpenTSDB tags for metrics.
 OPTS = [
     cfg.ListOpt('reserved_metadata_namespace',
                 default=['metering.'],
@@ -26,6 +29,11 @@ OPTS = [
     cfg.IntOpt('reserved_metadata_length',
                default=256,
                help='Limit on length of reserved metadata values.'),
+    cfg.ListOpt('reserved_metadata_keys',
+                default=[],
+                help='List of metadata keys reserved for metering use. And '
+                     'these keys are additional to the ones included in the '
+                     'namespace.'),
 ]
 
 cfg.CONF.register_opts(OPTS)
@@ -43,6 +51,17 @@ def add_reserved_user_metadata(src_metadata, dest_metadata):
                 k[len(prefix):].replace('.', '_') not in dest_metadata)
         )
         user_metadata.update(md)
+
+    for metadata_key in cfg.CONF.reserved_metadata_keys:
+        md = dict(
+            (k.replace('.', '_'),
+             v[:limit] if isinstance(v, six.string_types) else v)
+            for k, v in src_metadata.items()
+            if (k == metadata_key and
+                k.replace('.', '_') not in dest_metadata)
+        )
+        user_metadata.update(md)
+
     if user_metadata:
         dest_metadata['user_metadata'] = user_metadata
 
