@@ -60,6 +60,22 @@
     audit_period_ending:
       type: datetime
       fields: payload.audit_period_ending
+- event_type: orchestration.stack.*
+  traits: &orchestration_crud
+    project_id:
+      fields: payload.tenant_id
+    user_id:
+      fields: ['_context_trustor_user_id', '_context_user_id']
+    resource_id:
+      fields: payload.stack_identity
+- event_type: sahara.cluster.*
+  traits: &sahara_crud
+    project_id:
+      fields: payload.project_id
+    user_id:
+      fields: _context_user_id
+    resource_id:
+      fields: payload.cluster_id
 - event_type: ['identity.user.*', 'identity.project.*', 'identity.group.*', 'identity.role.*', 'identity.OS-TRUST:trust']
   traits: &identity_crud
     resource_id:
