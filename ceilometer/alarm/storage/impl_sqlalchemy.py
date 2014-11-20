@@ -172,6 +172,7 @@ class Connection(base.Connection):
         if state is not None:
             query = query.filter(models.Alarm.state == state)
 
+        query = query.order_by(desc(models.Alarm.timestamp))
         alarms = self._retrieve_alarms(query)
 
         # TODO(cmart): improve this by using sqlalchemy.func factory
