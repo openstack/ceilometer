@@ -21,9 +21,6 @@ from ceilometer.agent import plugin_base
 from ceilometer import neutron_client
 
 
-cfg.CONF.import_group('service_types', 'ceilometer.neutron_client')
-
-
 class _BaseServicesDiscovery(plugin_base.DiscoveryBase):
 
     def __init__(self):

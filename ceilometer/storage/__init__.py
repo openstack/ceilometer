@@ -73,7 +73,6 @@ OPTS = [
 cfg.CONF.register_opts(OPTS, group='database')
 
 db_options.set_defaults(cfg.CONF)
-cfg.CONF.import_opt('connection', 'oslo.db.options', group='database')
 
 
 class StorageBadVersion(Exception):

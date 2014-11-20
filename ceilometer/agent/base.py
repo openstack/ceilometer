@@ -37,9 +37,6 @@ from ceilometer import utils
 
 LOG = log.getLogger(__name__)
 
-cfg.CONF.import_opt('heartbeat', 'ceilometer.coordination',
-                    group='coordination')
-
 
 class PollsterListForbidden(Exception):
     def __init__(self):

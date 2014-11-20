@@ -30,8 +30,6 @@ from ceilometer import sample
 
 LOG = log.getLogger(__name__)
 
-cfg.CONF.import_group('service_types', 'ceilometer.nova_client')
-
 
 class FloatingIPPollster(plugin_base.PollsterBase):
 

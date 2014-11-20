@@ -44,9 +44,6 @@ from ceilometer.storage.mongo import utils as pymongo_utils
 from ceilometer.storage import pymongo_base
 from ceilometer import utils
 
-cfg.CONF.import_opt('time_to_live', 'ceilometer.storage',
-                    group="database")
-
 LOG = log.getLogger(__name__)
 
 

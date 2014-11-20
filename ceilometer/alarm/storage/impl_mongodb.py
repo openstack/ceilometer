@@ -20,16 +20,12 @@
 # under the License.
 """MongoDB storage backend"""
 
-from oslo.config import cfg
 import pymongo
 
 from ceilometer.alarm.storage import pymongo_base
 from ceilometer.openstack.common import log
 from ceilometer import storage
 from ceilometer.storage.mongo import utils as pymongo_utils
-
-cfg.CONF.import_opt('time_to_live', 'ceilometer.storage',
-                    group="database")
 
 LOG = log.getLogger(__name__)
 

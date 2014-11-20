@@ -35,7 +35,6 @@ from ceilometer import storage
 LOG = log.getLogger(__name__)
 
 CONF = cfg.CONF
-CONF.import_opt('debug', 'ceilometer.openstack.common.log')
 
 OPTS = [
     cfg.StrOpt('api_paste_config',

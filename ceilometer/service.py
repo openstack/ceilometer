@@ -91,9 +91,6 @@ CLI_OPTS = [
 ]
 cfg.CONF.register_cli_opts(CLI_OPTS, group="service_credentials")
 
-cfg.CONF.import_opt('default_log_levels',
-                    'ceilometer.openstack.common.log')
-
 LOG = log.getLogger(__name__)
 
 
