@@ -34,6 +34,7 @@ from ceilometer.publisher import utils
 from ceilometer import sample
 from ceilometer import storage
 from ceilometer.storage import base
+from ceilometer.tests import constants
 from ceilometer.tests import db as tests_db
 
 
@@ -654,17 +655,16 @@ class RawSampleTest(DBTestBase,
     def test_clear_metering_data_with_alarms(self):
         # NOTE(jd) Override this test in MongoDB because our code doesn't clear
         # the collections, this is handled by MongoDB TTL feature.
-
         alarm = alarm_models.Alarm(alarm_id='r3d',
                                    enabled=True,
                                    type='threshold',
                                    name='red-alert',
                                    description='my red-alert',
-                                   timestamp=None,
+                                   timestamp=constants.MIN_DATETIME,
                                    user_id='user-id',
                                    project_id='project-id',
                                    state="insufficient data",
-                                   state_timestamp=None,
+                                   state_timestamp=constants.MIN_DATETIME,
                                    ok_actions=[],
                                    alarm_actions=['http://nowhere/alarms'],
                                    insufficient_data_actions=[],
@@ -2311,11 +2311,11 @@ class AlarmTestBase(DBTestBase):
                                      type='threshold',
                                      name='red-alert',
                                      description='my red-alert',
-                                     timestamp=None,
+                                     timestamp=constants.MIN_DATETIME,
                                      user_id='me',
                                      project_id='and-da-boys',
                                      state="insufficient data",
-                                     state_timestamp=None,
+                                     state_timestamp=constants.MIN_DATETIME,
                                      ok_actions=[],
                                      alarm_actions=['http://nowhere/alarms'],
                                      insufficient_data_actions=[],
@@ -2339,11 +2339,11 @@ class AlarmTestBase(DBTestBase):
                                      type='threshold',
                                      name='orange-alert',
                                      description='a orange',
-                                     timestamp=None,
+                                     timestamp=constants.MIN_DATETIME,
                                      user_id='me',
                                      project_id='and-da-boys',
                                      state="insufficient data",
-                                     state_timestamp=None,
+                                     state_timestamp=constants.MIN_DATETIME,
                                      ok_actions=[],
                                      alarm_actions=['http://nowhere/alarms'],
                                      insufficient_data_actions=[],
@@ -2365,11 +2365,11 @@ class AlarmTestBase(DBTestBase):
                                      type='threshold',
                                      name='yellow-alert',
                                      description='yellow',
-                                     timestamp=None,
+                                     timestamp=constants.MIN_DATETIME,
                                      user_id='me',
                                      project_id='and-da-boys',
                                      state="insufficient data",
-                                     state_timestamp=None,
+                                     state_timestamp=constants.MIN_DATETIME,
                                      ok_actions=[],
                                      alarm_actions=['http://nowhere/alarms'],
                                      insufficient_data_actions=[],
@@ -2451,11 +2451,11 @@ class AlarmTest(AlarmTestBase,
                                  type='threshold',
                                  name='llu',
                                  description='llu',
-                                 timestamp=None,
+                                 timestamp=constants.MIN_DATETIME,
                                  user_id='bla',
                                  project_id='ffo',
                                  state="insufficient data",
-                                 state_timestamp=None,
+                                 state_timestamp=constants.MIN_DATETIME,
                                  ok_actions=[],
                                  alarm_actions=[],
                                  insufficient_data_actions=[],
@@ -2516,7 +2516,6 @@ class AlarmTestPagination(AlarmTestBase,
         self.assertEqual(len(alarms), 2)
 
     def test_get_alarm_paginate(self):
-
         self.add_some_alarms()
 
         pagination = base.Pagination(limit=4, marker_value='yellow-alert')

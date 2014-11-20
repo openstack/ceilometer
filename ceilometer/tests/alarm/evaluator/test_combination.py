@@ -14,8 +14,10 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Tests for ceilometer/alarm/threshold_evaluation.py
+
+"""Tests for ceilometer/alarm/evaluator/combination.py
 """
+
 import datetime
 import uuid
 
@@ -28,6 +30,7 @@ import pytz
 from ceilometer.alarm.evaluator import combination
 from ceilometer.alarm.storage import models
 from ceilometer.tests.alarm.evaluator import base
+from ceilometer.tests import constants
 
 
 class TestEvaluate(base.TestEvaluatorBase):
@@ -43,8 +46,8 @@ class TestEvaluate(base.TestEvaluatorBase):
                          project_id='snafu',
                          alarm_id=str(uuid.uuid4()),
                          state='insufficient data',
-                         state_timestamp=None,
-                         timestamp=None,
+                         state_timestamp=constants.MIN_DATETIME,
+                         timestamp=constants.MIN_DATETIME,
                          insufficient_data_actions=[],
                          ok_actions=[],
                          alarm_actions=[],
@@ -64,8 +67,8 @@ class TestEvaluate(base.TestEvaluatorBase):
                          project_id='snafu',
                          alarm_id=str(uuid.uuid4()),
                          state='insufficient data',
-                         state_timestamp=None,
-                         timestamp=None,
+                         state_timestamp=constants.MIN_DATETIME,
+                         timestamp=constants.MIN_DATETIME,
                          insufficient_data_actions=[],
                          ok_actions=[],
                          alarm_actions=[],
