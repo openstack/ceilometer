@@ -22,4 +22,4 @@ sphinxcontrib-httpdomain
 sphinxcontrib-pecanwsme>=0.8
 testrepository>=0.0.18
 testscenarios>=0.4
-testtools>=0.9.36,!=1.2.0,!=1.4.0
+testtools>=0.9.36,!=1.2.0
