@@ -102,9 +102,6 @@ class TestHyperVInspection(base.BaseTestCase):
         fake_instance_id = "fake_fake_instance_id"
         fake_host_resource = "fake_host_resource"
 
-        fake_device = {"instance_id": fake_instance_id,
-                       "host_resource": fake_host_resource}
-
         self._inspector._utils.get_disk_metrics.return_value = [{
             'read_mb': fake_read_mb,
             'write_mb': fake_write_mb,
@@ -119,7 +116,7 @@ class TestHyperVInspection(base.BaseTestCase):
 
         inspected_disk, inspected_stats = inspected_disks[0]
 
-        self.assertEqual(fake_device, inspected_disk.device)
+        self.assertEqual(fake_instance_id, inspected_disk.device)
 
         self.assertEqual(fake_read_mb * units.Mi, inspected_stats.read_bytes)
         self.assertEqual(fake_write_mb * units.Mi, inspected_stats.write_bytes)
