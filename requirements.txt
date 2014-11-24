@@ -2,6 +2,9 @@ alembic>=0.4.1
 anyjson>=0.3.3
 argparse
 croniter>=0.3.4 # MIT License
+# List oslo.vmware early to ensure its transitive eventlet dependency
+# on eventlet is satisifed.
+oslo.vmware>=0.2                        # Apache-2.0
 eventlet>=0.13.0
 Flask>=0.10,<1.0
 happybase>=0.5,!=0.7
@@ -14,7 +17,6 @@ lxml>=2.3
 msgpack-python
 netaddr>=0.7.6
 oslo.config>=1.2.0
-oslo.vmware>=0.2                        # Apache-2.0
 pbr>=0.6,<1.0
 pecan>=0.4.5
 pysnmp>=4.2.1,<5.0.0
