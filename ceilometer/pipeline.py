@@ -288,15 +288,18 @@ class Sink(object):
         """
 
         transformed_samples = []
-        for sample in samples:
-            LOG.debug(_(
-                "Pipeline %(pipeline)s: Transform sample "
-                "%(smp)s from %(trans)s transformer") % ({'pipeline': self,
-                                                          'smp': sample,
-                                                          'trans': start}))
-            sample = self._transform_sample(start, ctxt, sample)
-            if sample:
-                transformed_samples.append(sample)
+        if not self.transformers:
+            transformed_samples = samples
+        else:
+            for sample in samples:
+                LOG.debug(_(
+                    "Pipeline %(pipeline)s: Transform sample "
+                    "%(smp)s from %(trans)s transformer") % ({'pipeline': self,
+                                                              'smp': sample,
+                                                              'trans': start}))
+                sample = self._transform_sample(start, ctxt, sample)
+                if sample:
+                    transformed_samples.append(sample)
 
         if transformed_samples:
             for p in self.publishers:
