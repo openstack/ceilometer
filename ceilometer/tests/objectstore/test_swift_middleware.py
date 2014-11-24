@@ -224,19 +224,20 @@ class TestSwiftMiddleware(tests_base.BaseTestCase):
 
     def test_metadata_headers(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(), {
-            'metadata_headers': 'X_VAR1, x-var2, x-var3'
+            'metadata_headers': 'X_VAR1, x-var2, x-var3, token'
         })
         req = FakeRequest('/1.0/account/container',
                           environ={'REQUEST_METHOD': 'GET'},
                           headers={'X_VAR1': 'value1',
-                                   'X_VAR2': 'value2'})
+                                   'X_VAR2': 'value2',
+                                   'TOKEN': 'token'})
         list(app(req.environ, self.start_response))
         samples = self.pipeline_manager.pipelines[0].samples
         self.assertEqual(2, len(samples))
         data = samples[0]
         http_headers = [k for k in data.resource_metadata.keys()
                         if k.startswith('http_header_')]
-        self.assertEqual(2, len(http_headers))
+        self.assertEqual(3, len(http_headers))
         self.assertEqual('1.0', data.resource_metadata['version'])
         self.assertEqual('container', data.resource_metadata['container'])
         self.assertIsNone(data.resource_metadata['object'])
@@ -244,6 +245,8 @@ class TestSwiftMiddleware(tests_base.BaseTestCase):
                          data.resource_metadata['http_header_x_var1'])
         self.assertEqual('value2',
                          data.resource_metadata['http_header_x_var2'])
+        self.assertEqual('token',
+                         data.resource_metadata['http_header_token'])
         self.assertFalse('http_header_x_var3' in data.resource_metadata)
 
     def test_metadata_headers_unicode(self):
