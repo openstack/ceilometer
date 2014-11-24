@@ -102,6 +102,24 @@ class MySQLManager(SQLManager):
         self._conn.execute('CREATE DATABASE %s;' % self._db_name)
 
 
+class ElasticSearchManager(fixtures.Fixture):
+    def __init__(self, url):
+        self.url = url
+
+    def setUp(self):
+        super(ElasticSearchManager, self).setUp()
+        self.connection = storage.get_connection(
+            'sqlite://', 'ceilometer.metering.storage')
+        self.alarm_connection = storage.get_connection(
+            'sqlite://', 'ceilometer.alarm.storage')
+        self.event_connection = storage.get_connection(
+            self.url, 'ceilometer.event.storage')
+        # prefix each test with unique index name
+        self.event_connection.index_name = 'events_%s' % uuid.uuid4().hex
+        # force index on write so data is queryable right away
+        self.event_connection._refresh_on_write = True
+
+
 class HBaseManager(fixtures.Fixture):
     def __init__(self, url):
         self._url = url
@@ -166,6 +184,7 @@ class TestBase(testscenarios.testcase.WithScenarios, test_base.BaseTestCase):
         'db2': MongoDbManager,
         'sqlite': SQLiteManager,
         'hbase': HBaseManager,
+        'es': ElasticSearchManager,
     }
 
     db_url = 'sqlite://'  # NOTE(Alexei_987) Set default db url
@@ -256,7 +275,7 @@ class MixinTestsWithBackendScenarios(object):
         ('sqlite', {'db_url': 'sqlite://'}),
     ]
 
-    for db in ('MONGODB', 'MYSQL', 'PGSQL', 'HBASE', 'DB2'):
+    for db in ('MONGODB', 'MYSQL', 'PGSQL', 'HBASE', 'DB2', 'ES'):
         if os.environ.get('CEILOMETER_TEST_%s_URL' % db):
             scenarios.append(
                 (db.lower(), {'db_url': os.environ.get(
