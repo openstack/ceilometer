@@ -56,7 +56,6 @@ def make_test_data(conn, name, meter_type, unit, volume, random_min,
 
     increment = datetime.timedelta(minutes=interval)
 
-
     print('Adding new events for meter %s.' % (name))
     # Generate events
     n = 0
@@ -69,7 +68,6 @@ def make_test_data(conn, name, meter_type, unit, volume, random_min,
                 total_volume += random.randint(random_min, random_max)
             else:
                 total_volume += random.uniform(random_min, random_max)
-
 
         c = sample.Sample(name=name,
                           type=meter_type,
@@ -191,7 +189,7 @@ def main():
     start = datetime.datetime.utcnow() - datetime.timedelta(days=args.start)
     end = datetime.datetime.utcnow() + datetime.timedelta(days=args.end)
 
-    make_test_data(conn = conn,
+    make_test_data(conn=conn,
                    name=args.counter,
                    meter_type=args.type,
                    unit=args.unit,

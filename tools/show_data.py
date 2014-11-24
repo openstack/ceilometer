@@ -53,9 +53,8 @@ def show_resources(db, args):
                     value = totals[0]['max']
                 else:
                     value = totals[0]['sum']
-                print('    %s (%s): %s' % \
-                     (meter['counter_name'], meter['counter_type'],
-                      value))
+                print('    %s (%s): %s' %
+                      (meter['counter_name'], meter['counter_type'], value))
 
 
 def show_total_resources(db, args):
@@ -115,7 +114,7 @@ def main(argv):
     extra_args = cfg.CONF(
         sys.argv[1:],
         # NOTE(dhellmann): Read the configuration file(s) for the
-        #ceilometer collector by default.
+        # ceilometer collector by default.
         default_config_files=['/etc/ceilometer/ceilometer.conf'],
     )
     db = storage.get_connection_from_config(cfg.CONF)
