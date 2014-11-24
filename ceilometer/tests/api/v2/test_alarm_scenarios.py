@@ -232,6 +232,15 @@ class TestAlarms(v2.FunctionalTest,
         self.assertEqual(1, len(resp))
         self.assertEqual('ok', resp[0]['state'])
 
+    def test_list_alarms_by_type(self):
+        alarms = self.get_json('/alarms',
+                               q=[{'field': 'type',
+                                   'op': 'eq',
+                                   'value': 'threshold'}])
+        self.assertEqual(3, len(alarms))
+        self.assertEqual(set(['threshold']),
+                         set(alarm['type'] for alarm in alarms))
+
     def test_get_not_existing_alarm(self):
         resp = self.get_json('/alarms/alarm-id-3', expect_errors=True)
         self.assertEqual(404, resp.status_code)

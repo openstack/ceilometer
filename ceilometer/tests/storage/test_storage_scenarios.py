@@ -2431,6 +2431,13 @@ class AlarmTest(AlarmTestBase,
         alarms = list(self.alarm_conn.get_alarms(enabled=False))
         self.assertEqual(len(alarms), 1)
 
+    def test_list_by_type(self):
+        self.add_some_alarms()
+        alarms = list(self.alarm_conn.get_alarms(alarm_type='threshold'))
+        self.assertEqual(3, len(alarms))
+        alarms = list(self.alarm_conn.get_alarms(alarm_type='combination'))
+        self.assertEqual(0, len(alarms))
+
     def test_add(self):
         self.add_some_alarms()
         alarms = list(self.alarm_conn.get_alarms())
