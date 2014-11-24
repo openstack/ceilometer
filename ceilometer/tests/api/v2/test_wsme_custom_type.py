@@ -32,4 +32,4 @@ class TestWsmeCustomType(base.BaseTestCase):
         obj = dummybase(ae="one")
         self.assertEqual("one", obj.ae)
 
-        self.assertRaises(ValueError, dummybase, ae="not exists")
+        self.assertRaises(wsme.exc.InvalidInput, dummybase, ae="not exists")

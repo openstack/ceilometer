@@ -165,8 +165,12 @@ class AdvEnum(wtypes.wsproperty):
         return self._default
 
     def _set(self, parent, value):
-        if self.datatype.validate(value):
-            setattr(parent, self._name, value)
+        try:
+            if self.datatype.validate(value):
+                setattr(parent, self._name, value)
+        except ValueError as e:
+            raise wsme.exc.InvalidInput(self._name.replace('_advenum_', '', 1),
+                                        value, e)
 
 
 class CronType(wtypes.UserType):
