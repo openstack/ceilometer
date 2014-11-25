@@ -117,7 +117,7 @@ class NetworkNotificationBase(plugin.NotificationBase):
 class Network(NetworkNotificationBase):
     """Listen for Neutron network notifications.
 
-    Listen in order to mediate with the metering framework.
+    Handle network.{create.end|update.*|exists} notifications from neutron.
     """
     resource_name = 'network'
 
@@ -125,7 +125,7 @@ class Network(NetworkNotificationBase):
 class Subnet(NetworkNotificationBase):
     """Listen for Neutron notifications.
 
-    Listen in order to mediate with the metering framework.
+    Handle subnet.{create.end|update.*|exists} notifications from neutron.
     """
     resource_name = 'subnet'
 
@@ -133,7 +133,7 @@ class Subnet(NetworkNotificationBase):
 class Port(NetworkNotificationBase):
     """Listen for Neutron notifications.
 
-    Listen in order to mediate with the metering framework.
+    Handle port.{create.end|update.*|exists} notifications from neutron.
     """
     resource_name = 'port'
 
@@ -141,7 +141,7 @@ class Port(NetworkNotificationBase):
 class Router(NetworkNotificationBase):
     """Listen for Neutron notifications.
 
-    Listen in order to mediate with the metering framework.
+    Handle router.{create.end|update.*|exists} notifications from neutron.
     """
     resource_name = 'router'
 
@@ -149,7 +149,7 @@ class Router(NetworkNotificationBase):
 class FloatingIP(NetworkNotificationBase):
     """Listen for Neutron notifications.
 
-    Listen in order to mediate with the metering framework.
+    Handle floatingip.{create.end|update.*|exists} notifications from neutron.
     """
     resource_name = 'floatingip'
     counter_name = 'ip.floating'
@@ -173,3 +173,95 @@ class Bandwidth(NetworkNotificationBase):
             project_id=message['payload']['tenant_id'],
             resource_id=message['payload']['label_id'],
             message=message)
+
+
+class Pool(NetworkNotificationBase):
+    """Listen for Neutron notifications.
+
+    Handle pool.{create.end|update.*|exists} notifications from neutron.
+    """
+    resource_name = 'pool'
+
+
+class Vip(NetworkNotificationBase):
+    """Listen for Neutron notifications.
+
+    Handle vip.{create.end|update.*|exists} notifications from neutron.
+    """
+    resource_name = 'vip'
+
+
+class Member(NetworkNotificationBase):
+    """Listen for Neutron notifications.
+
+    Handle member.{create.end|update.*|exists} notifications from neutron.
+    """
+    resource_name = 'member'
+
+
+class HealthMonitor(NetworkNotificationBase):
+    """Listen for Neutron notifications.
+
+    Handle health_monitor.{create.end|update.*|exists} notifications
+    from neutron.
+    """
+    resource_name = 'health_monitor'
+
+
+class Firewall(NetworkNotificationBase):
+    """Listen for Neutron notifications.
+
+    Handle firewall.{create.end|update.*|exists} notifications from neutron.
+    """
+    resource_name = 'firewall'
+
+
+class FirewallPolicy(NetworkNotificationBase):
+    """Listen for Neutron notifications.
+
+    Handle firewall_policy.{create.end|update.*|exists} notifications
+    from neutron.
+    """
+    resource_name = 'firewall_policy'
+
+
+class FirewallRule(NetworkNotificationBase):
+    """Listen for Neutron notifications.
+
+    Handle firewall_rule.{create.end|update.*|exists} notifications
+    from neutron.
+    """
+    resource_name = 'firewall_rule'
+
+
+class VPNService(NetworkNotificationBase):
+    """Listen for Neutron notifications.
+
+    Handle vpnservice.{create.end|update.*|exists} notifications from neutron.
+    """
+    resource_name = 'vpnservice'
+
+
+class IPSecPolicy(NetworkNotificationBase):
+    """Listen for Neutron notifications.
+
+    Handle pool.{create.end|update.*|exists} notifications from neutron.
+    """
+    resource_name = 'ipsecpolicy'
+
+
+class IKEPolicy(NetworkNotificationBase):
+    """Listen for Neutron notifications.
+
+    Handle ikepolicy.{create.end|update.*|exists} notifications from neutron.
+    """
+    resource_name = 'ikepolicy'
+
+
+class IPSecSiteConnection(NetworkNotificationBase):
+    """Listen for Neutron notifications.
+
+    Handle ipsec_site_connection.{create.end|update.*|exists}
+    notifications from neutron.
+    """
+    resource_name = 'ipsec_site_connection'
