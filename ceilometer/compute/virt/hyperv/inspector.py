@@ -69,11 +69,7 @@ class HyperVInspector(virt_inspector.Inspector):
 
     def inspect_disks(self, instance_name):
         for disk_metrics in self._utils.get_disk_metrics(instance_name):
-            device = dict([(i, disk_metrics[i])
-                          for i in ['instance_id', 'host_resource']
-                          if i in disk_metrics])
-
-            disk = virt_inspector.Disk(device=device)
+            disk = virt_inspector.Disk(device=disk_metrics['instance_id'])
             stats = virt_inspector.DiskStats(
                 read_requests=0,
                 # Return bytes
