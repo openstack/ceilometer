@@ -124,9 +124,10 @@ class ErrorKeys(object):
 
 def run_pylint():
     buff = StringIO()
-    reporter = text.ParseableTextReporter(output=buff)
-    args = ["--include-ids=y", "-E", "ceilometer"]
-    lint.Run(args, reporter=reporter, exit=False)
+    args = ["--msg-template={path}:{line}: [{msg_id}({symbol}), {obj}] {msg}",
+            "-E",
+            "ceilometer"]
+    lint.Run(args, exit=False)
     val = buff.getvalue()
     buff.close()
     return val
