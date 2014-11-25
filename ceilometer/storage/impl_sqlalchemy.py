@@ -220,6 +220,11 @@ class Connection(base.Connection):
     )
 
     def __init__(self, url):
+        # Set max_retries to 0, since oslo.db in certain cases may attempt
+        # to retry making the db connection retried max_retries ^ 2 times
+        # in failure case and db reconnection has already been implemented
+        # in storage.__init__.get_connection_from_config function
+        cfg.CONF.set_override('max_retries', 0, group='database')
         self._engine_facade = db_session.EngineFacade(
             url,
             **dict(cfg.CONF.database.items())

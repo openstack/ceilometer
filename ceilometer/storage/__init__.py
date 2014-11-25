@@ -94,9 +94,6 @@ def get_connection_from_config(conf, purpose=None):
     if purpose:
         namespace = 'ceilometer.%s.storage' % purpose
         url = getattr(conf.database, '%s_connection' % purpose) or url
-    # Set max_retries to 0, since oslo.db in certain cases may attempt to retry
-    # making the db connection retried max_retries ^ 2 times in failure case
-    conf.set_override('max_retries', 0, group='database')
     return get_connection(url, namespace)
 
 
