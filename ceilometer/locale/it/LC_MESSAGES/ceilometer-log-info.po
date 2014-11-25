@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-10-16 07:50+0000\n"
-"PO-Revision-Date: 2014-10-14 11:31+0000\n"
+"POT-Creation-Date: 2014-11-25 06:09+0000\n"
+"PO-Revision-Date: 2014-11-21 16:01+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Italian (http://www.transifex.com/projects/p/ceilometer/"
 "language/it/)\n"
@@ -32,7 +32,7 @@ msgstr ""
 #: ceilometer/openstack/common/eventlet_backdoor.py:140
 #, python-format
 msgid "Eventlet backdoor listening on %(port)s for process %(pid)d"
-msgstr ""
+msgstr "Ascolto di eventlet backdoor su %(port)s per il processo %(pid)d"
 
 #: ceilometer/openstack/common/service.py:174
 #, python-format

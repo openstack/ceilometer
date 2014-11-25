@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-10-28 06:10+0000\n"
-"PO-Revision-Date: 2014-10-21 00:51+0000\n"
+"POT-Creation-Date: 2014-11-25 06:09+0000\n"
+"PO-Revision-Date: 2014-11-21 00:50+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/"
 "ceilometer/language/zh_CN/)\n"
@@ -46,7 +46,7 @@ msgstr "父进程已意外终止，正在退出"
 #: ceilometer/openstack/common/service.py:263
 #, python-format
 msgid "Child caught %s, exiting"
-msgstr ""
+msgstr "子代捕获 %s，正在退出"
 
 #: ceilometer/openstack/common/service.py:302
 msgid "Forking too fast, sleeping"
@@ -79,7 +79,7 @@ msgstr "捕获到 %s，正在停止子代"
 
 #: ceilometer/openstack/common/service.py:400
 msgid "Wait called after thread killed.  Cleaning up."
-msgstr ""
+msgstr "等待在线程结束后被调用。正在清理中。"
 
 #: ceilometer/openstack/common/service.py:416
 #, python-format
