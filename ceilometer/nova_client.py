@@ -36,7 +36,7 @@ SERVICE_OPTS = [
 
 cfg.CONF.register_opts(OPTS)
 cfg.CONF.register_opts(SERVICE_OPTS, group='service_types')
-
+cfg.CONF.import_opt('http_timeout', 'ceilometer.service')
 cfg.CONF.import_group('service_credentials', 'ceilometer.service')
 
 LOG = log.getLogger(__name__)
@@ -74,6 +74,7 @@ class Client(object):
             bypass_url=bypass_url,
             cacert=conf.os_cacert,
             insecure=conf.insecure,
+            timeout=cfg.CONF.http_timeout,
             http_log_debug=cfg.CONF.nova_http_log_debug,
             no_cache=True)
 

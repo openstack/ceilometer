@@ -21,6 +21,10 @@ from six.moves.urllib import parse
 from ceilometer.alarm.notifier import rest
 
 
+cfg.CONF.import_opt('http_timeout', 'ceilometer.service')
+cfg.CONF.import_group('service_credentials', 'ceilometer.service')
+
+
 class TrustRestAlarmNotifier(rest.RestAlarmNotifier):
     """Notifier supporting keystone trust authentication.
 
@@ -44,6 +48,7 @@ class TrustRestAlarmNotifier(rest.RestAlarmNotifier):
             auth_url=auth_url,
             region_name=cfg.CONF.service_credentials.os_region_name,
             insecure=cfg.CONF.service_credentials.insecure,
+            timeout=cfg.CONF.http_timeout,
             trust_id=trust_id)
 
         # Remove the fake user

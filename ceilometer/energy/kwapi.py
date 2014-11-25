@@ -52,7 +52,8 @@ class KwapiClient(object):
         headers = {}
         if self.token is not None:
             headers = {'X-Auth-Token': self.token}
-        request = requests.get(probes_url, headers=headers)
+        timeout = cfg.CONF.http_timeout
+        request = requests.get(probes_url, headers=headers, timeout=timeout)
         message = request.json()
         probes = message['probes']
         for key, value in six.iteritems(probes):

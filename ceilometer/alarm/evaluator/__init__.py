@@ -36,6 +36,7 @@ UNKNOWN = 'insufficient data'
 OK = 'ok'
 ALARM = 'alarm'
 
+cfg.CONF.import_opt('http_timeout', 'ceilometer.service')
 cfg.CONF.import_group('service_credentials', 'ceilometer.service')
 
 
@@ -61,6 +62,7 @@ class Evaluator(object):
                 os_cacert=auth_config.os_cacert,
                 os_endpoint_type=auth_config.os_endpoint_type,
                 insecure=auth_config.insecure,
+                timeout=cfg.CONF.http_timeout,
             )
             self.api_client = ceiloclient.get_client(2, **creds)
         return self.api_client

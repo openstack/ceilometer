@@ -361,6 +361,7 @@ class TestEvaluate(base.TestEvaluatorBase):
                                       os_username=conf.os_username,
                                       os_cacert=conf.os_cacert,
                                       os_endpoint_type=conf.os_endpoint_type,
+                                      timeout=cfg.CONF.http_timeout,
                                       insecure=conf.insecure)]
                 actual = client.call_args_list
                 self.assertEqual(expected, actual)
