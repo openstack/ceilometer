@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-10-16 07:50+0000\n"
-"PO-Revision-Date: 2014-10-14 11:41+0000\n"
+"POT-Creation-Date: 2014-11-25 06:09+0000\n"
+"PO-Revision-Date: 2014-11-10 07:27+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Spanish (http://www.transifex.com/projects/p/ceilometer/"
 "language/es/)\n"
@@ -78,7 +78,7 @@ msgstr "Se ha captado %s, deteniendo hijos"
 
 #: ceilometer/openstack/common/service.py:400
 msgid "Wait called after thread killed.  Cleaning up."
-msgstr ""
+msgstr "Espéra llamada después que el hilo ha sido matado. Limpiando."
 
 #: ceilometer/openstack/common/service.py:416
 #, python-format

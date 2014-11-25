@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-10-28 06:10+0000\n"
-"PO-Revision-Date: 2014-10-16 07:56+0000\n"
+"POT-Creation-Date: 2014-11-25 06:09+0000\n"
+"PO-Revision-Date: 2014-11-10 13:52+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/ceilometer/"
 "language/de/)\n"
@@ -28,12 +28,12 @@ msgstr ""
 #: ceilometer/openstack/common/loopingcall.py:87
 #, python-format
 msgid "task %(func_name)s run outlasted interval by %(delay).2f sec"
-msgstr ""
+msgstr "Task %(func_name)s lief %(delay).2f sec als das Interval"
 
 #: ceilometer/openstack/common/policy.py:248
 #, python-format
 msgid "Can not find policy directories %s"
-msgstr ""
+msgstr "Kann Policy Direktory %s nicht finden"
 
 #: ceilometer/openstack/common/service.py:356
 #, python-format

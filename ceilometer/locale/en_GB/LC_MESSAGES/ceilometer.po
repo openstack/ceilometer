@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-10-28 06:10+0000\n"
-"PO-Revision-Date: 2014-10-24 13:20+0000\n"
+"POT-Creation-Date: 2014-11-25 06:09+0000\n"
+"PO-Revision-Date: 2014-11-21 15:10+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: English (United Kingdom) "
 "(http://www.transifex.com/projects/p/ceilometer/language/en_GB/)\n"
@@ -24,17 +24,22 @@ msgstr ""
 msgid "Polling pollster %(poll)s in the context of %(src)s"
 msgstr ""
 
-#: ceilometer/agent.py:127
+#: ceilometer/agent.py:119
+#, python-format
+msgid "Skip polling pollster %s, no resources found"
+msgstr ""
+
+#: ceilometer/agent.py:131
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
 msgstr "Continue after error from %(name)s: %(error)s"
 
-#: ceilometer/agent.py:241
+#: ceilometer/agent.py:245
 #, python-format
 msgid "Unable to discover resources: %s"
 msgstr "Unable to discover resources: %s"
 
-#: ceilometer/agent.py:243
+#: ceilometer/agent.py:247
 #, python-format
 msgid "Unknown discovery extension: %s"
 msgstr "Unknown discovery extension: %s"
@@ -96,35 +101,35 @@ msgstr ""
 "Pipeline %(pipeline)s: Exit after error from transformer %(trans)s for "
 "%(smp)s"
 
-#: ceilometer/pipeline.py:292
+#: ceilometer/pipeline.py:295
 #, python-format
 msgid "Pipeline %(pipeline)s: Transform sample %(smp)s from %(trans)s transformer"
 msgstr "Pipeline %(pipeline)s: Transform sample %(smp)s from %(trans)s transformer"
 
-#: ceilometer/pipeline.py:306
+#: ceilometer/pipeline.py:309
 #, python-format
 msgid "Pipeline %(pipeline)s: Continue after error from publisher %(pub)s"
 msgstr "Pipeline %(pipeline)s: Continue after error from publisher %(pub)s"
 
-#: ceilometer/pipeline.py:325
+#: ceilometer/pipeline.py:328
 #, python-format
 msgid "Pipeline %(pipeline)s: Error flushing transformer %(trans)s"
 msgstr "Pipeline %(pipeline)s: Error flushing transformer %(trans)s"
 
-#: ceilometer/pipeline.py:485
+#: ceilometer/pipeline.py:488
 msgid "detected decoupled pipeline config format"
 msgstr "detected decoupled pipeline config format"
 
-#: ceilometer/pipeline.py:495
+#: ceilometer/pipeline.py:498
 msgid "detected deprecated pipeline config format"
 msgstr "detected deprecated pipeline config format"
 
-#: ceilometer/pipeline.py:515
+#: ceilometer/pipeline.py:518
 #, python-format
 msgid "Pipeline config file: %s"
 msgstr "Pipeline config file: %s"
 
-#: ceilometer/pipeline.py:521
+#: ceilometer/pipeline.py:524
 #, python-format
 msgid "Pipeline config: %s"
 msgstr "Pipeline config: %s"
@@ -428,23 +433,31 @@ msgstr "%(this)s alarms for evaluation: %(alarms)s"
 msgid "assignment retrieval failed"
 msgstr "assignment retrieval failed"
 
-#: ceilometer/alarm/storage/impl_hbase.py:85
+#: ceilometer/alarm/storage/impl_hbase.py:86
 #: ceilometer/event/storage/impl_hbase.py:79
 #: ceilometer/storage/impl_hbase.py:131
 msgid "Dropping HBase schema..."
 msgstr "Dropping HBase schema..."
 
-#: ceilometer/alarm/storage/impl_hbase.py:92
+#: ceilometer/alarm/storage/impl_hbase.py:93
 #: ceilometer/event/storage/impl_hbase.py:85
 #: ceilometer/storage/impl_hbase.py:138
 msgid "Cannot disable table but ignoring error"
 msgstr "Cannot disable table but ignoring error"
 
-#: ceilometer/alarm/storage/impl_hbase.py:96
+#: ceilometer/alarm/storage/impl_hbase.py:97
 #: ceilometer/event/storage/impl_hbase.py:89
 #: ceilometer/storage/impl_hbase.py:142
 msgid "Cannot delete table but ignoring error"
 msgstr "Cannot delete table but ignoring error"
+
+#: ceilometer/alarm/storage/models.py:67
+msgid "timestamp should be datetime object"
+msgstr ""
+
+#: ceilometer/alarm/storage/models.py:69
+msgid "state_timestamp should be datetime object"
+msgstr ""
 
 #: ceilometer/api/app.py:167
 #, python-format
@@ -490,12 +503,12 @@ msgstr "Alarm %(alarm_id)s not found in project %(project)s"
 msgid "Alarm quota exceeded for user %(u)s on project %(p)s"
 msgstr "Alarm quota exceeded for user %(u)s on project %(p)s"
 
-#: ceilometer/api/controllers/v2.py:314
+#: ceilometer/api/controllers/v2.py:318
 #, python-format
 msgid "Unable to convert the value %(value)s to the expected data type %(type)s."
 msgstr "Unable to convert the value %(value)s to the expected data type %(type)s."
 
-#: ceilometer/api/controllers/v2.py:319
+#: ceilometer/api/controllers/v2.py:323
 #, python-format
 msgid ""
 "The data type %(type)s is not supported. The supported data type list is:"
@@ -504,7 +517,7 @@ msgstr ""
 "The data type %(type)s is not supported. The supported data type list is:"
 " %(supported)s"
 
-#: ceilometer/api/controllers/v2.py:324
+#: ceilometer/api/controllers/v2.py:328
 #, python-format
 msgid ""
 "Unexpected exception converting %(value)s to the expected data type "
@@ -513,65 +526,65 @@ msgstr ""
 "Unexpected exception converting %(value)s to the expected data type "
 "%(type)s."
 
-#: ceilometer/api/controllers/v2.py:335
+#: ceilometer/api/controllers/v2.py:339
 #, python-format
 msgid "Not Authorized to access %(aspect)s %(id)s"
 msgstr "Not Authorised to access %(aspect)s %(id)s"
 
-#: ceilometer/api/controllers/v2.py:810
+#: ceilometer/api/controllers/v2.py:819
 msgid "clamping min timestamp to range"
 msgstr "clamping min timestamp to range"
 
-#: ceilometer/api/controllers/v2.py:815
+#: ceilometer/api/controllers/v2.py:824
 msgid "clamping max timestamp to range"
 msgstr "clamping max timestamp to range"
 
-#: ceilometer/api/controllers/v2.py:891 ceilometer/api/controllers/v2.py:1157
+#: ceilometer/api/controllers/v2.py:900 ceilometer/api/controllers/v2.py:1166
 msgid "Limit must be positive"
 msgstr "Limit must be positive"
 
-#: ceilometer/api/controllers/v2.py:974
+#: ceilometer/api/controllers/v2.py:983
 msgid "Period must be positive."
 msgstr "Period must be positive."
 
-#: ceilometer/api/controllers/v2.py:986
+#: ceilometer/api/controllers/v2.py:995
 #, python-format
 msgid "computed value coming from %r"
 msgstr "computed value coming from %r"
 
-#: ceilometer/api/controllers/v2.py:1173
+#: ceilometer/api/controllers/v2.py:1182
 msgid "Sample"
 msgstr "Sample"
 
-#: ceilometer/api/controllers/v2.py:1338
+#: ceilometer/api/controllers/v2.py:1347
 #, python-format
 msgid "Filter expression not valid: %s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1353
+#: ceilometer/api/controllers/v2.py:1362
 #, python-format
 msgid "Order-by expression not valid: %s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1364
+#: ceilometer/api/controllers/v2.py:1373
 msgid "Limit should be positive"
 msgstr "Limit should be positive"
 
-#: ceilometer/api/controllers/v2.py:1457
+#: ceilometer/api/controllers/v2.py:1466
 #, python-format
 msgid "String %s is not a valid isotime"
 msgstr "String %s is not a valid isotime"
 
-#: ceilometer/api/controllers/v2.py:1458
+#: ceilometer/api/controllers/v2.py:1467
 #, python-format
 msgid "Failed to parse the timestamp value %s"
 msgstr "Failed to parse the timestamp value %s"
 
-#: ceilometer/api/controllers/v2.py:1544
+#: ceilometer/api/controllers/v2.py:1553
 msgid "Resource"
 msgstr "Resource"
 
-#: ceilometer/api/controllers/v2.py:1619
+#: ceilometer/api/controllers/v2.py:1628
 #, python-format
 msgid ""
 "Alarm when %(meter_name)s is %(comparison_operator)s a %(statistic)s of "
@@ -580,90 +593,90 @@ msgstr ""
 "Alarm when %(meter_name)s is %(comparison_operator)s a %(statistic)s of "
 "%(threshold)s over %(period)s seconds"
 
-#: ceilometer/api/controllers/v2.py:1659
+#: ceilometer/api/controllers/v2.py:1668
 #, python-format
 msgid "Combined state of alarms %s"
 msgstr "Combined state of alarms %s"
 
-#: ceilometer/api/controllers/v2.py:1668
+#: ceilometer/api/controllers/v2.py:1677
 msgid "Alarm combination rule should contain at least two different alarm ids."
 msgstr "Alarm combination rule should contain at least two different alarm ids."
 
-#: ceilometer/api/controllers/v2.py:1719
+#: ceilometer/api/controllers/v2.py:1728
 #, python-format
 msgid "Timezone %s is not valid"
 msgstr "Timezone %s is not valid"
 
-#: ceilometer/api/controllers/v2.py:1845
+#: ceilometer/api/controllers/v2.py:1854
 msgid "Time constraint names must be unique for a given alarm."
 msgstr "Time constraint names must be unique for a given alarm."
 
-#: ceilometer/api/controllers/v2.py:1855
+#: ceilometer/api/controllers/v2.py:1864
 #, python-format
 msgid "%(rule)s must be set for %(type)s type alarm"
 msgstr "%(rule)s must be set for %(type)s type alarm"
 
-#: ceilometer/api/controllers/v2.py:1859
+#: ceilometer/api/controllers/v2.py:1868
 msgid "threshold_rule and combination_rule cannot be set at the same time"
 msgstr "threshold_rule and combination_rule cannot be set at the same time"
 
-#: ceilometer/api/controllers/v2.py:1876
+#: ceilometer/api/controllers/v2.py:1885
 #, python-format
 msgid "Unable to parse action %s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1879
+#: ceilometer/api/controllers/v2.py:1888
 #, python-format
 msgid "Unsupported action %s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:2042
+#: ceilometer/api/controllers/v2.py:2051
 #, python-format
 msgid "Alarm with name=%s exists"
 msgstr "Alarm with name=%s exists"
 
-#: ceilometer/api/controllers/v2.py:2049
+#: ceilometer/api/controllers/v2.py:2058
 #, python-format
 msgid "Cannot specify alarm %s itself in combination rule"
 msgstr "Cannot specify alarm %s itself in combination rule"
 
-#: ceilometer/api/controllers/v2.py:2057
+#: ceilometer/api/controllers/v2.py:2066
 #, python-format
 msgid "Error while putting alarm: %s"
 msgstr "Error while putting alarm: %s"
 
-#: ceilometer/api/controllers/v2.py:2058 ceilometer/api/controllers/v2.py:2209
+#: ceilometer/api/controllers/v2.py:2067 ceilometer/api/controllers/v2.py:2218
 msgid "Alarm incorrect"
 msgstr "Alarm incorrect"
 
-#: ceilometer/api/controllers/v2.py:2109
+#: ceilometer/api/controllers/v2.py:2118
 msgid "state invalid"
 msgstr "state invalid"
 
-#: ceilometer/api/controllers/v2.py:2202
+#: ceilometer/api/controllers/v2.py:2211
 #, python-format
 msgid "Alarm with name='%s' exists"
 msgstr "Alarm with name='%s' exists"
 
-#: ceilometer/api/controllers/v2.py:2208
+#: ceilometer/api/controllers/v2.py:2217
 #, python-format
 msgid "Error while posting alarm: %s"
 msgstr "Error while posting alarm: %s"
 
-#: ceilometer/api/controllers/v2.py:2365
+#: ceilometer/api/controllers/v2.py:2374
 msgid "operator {} is incorrect"
 msgstr "operator {} is incorrect"
 
-#: ceilometer/api/controllers/v2.py:2387
+#: ceilometer/api/controllers/v2.py:2396
 #, python-format
 msgid "Getting traits for %s"
 msgstr "Getting traits for %s"
 
-#: ceilometer/api/controllers/v2.py:2452
+#: ceilometer/api/controllers/v2.py:2461
 msgid "Event"
 msgstr "Event"
 
-#: ceilometer/api/controllers/v2.py:2455
+#: ceilometer/api/controllers/v2.py:2464
 #, python-format
 msgid "More than one event with id %s returned from storage driver"
 msgstr "More than one event with id %s returned from storage driver"
@@ -863,10 +876,10 @@ msgid ""
 "from libvirt: %(error)s"
 msgstr ""
 
-#: ceilometer/compute/virt/vmware/inspector.py:90
-#: ceilometer/compute/virt/vmware/inspector.py:107
-#: ceilometer/compute/virt/vmware/inspector.py:139
-#: ceilometer/compute/virt/vmware/inspector.py:152
+#: ceilometer/compute/virt/vmware/inspector.py:94
+#: ceilometer/compute/virt/vmware/inspector.py:111
+#: ceilometer/compute/virt/vmware/inspector.py:143
+#: ceilometer/compute/virt/vmware/inspector.py:156
 #, python-format
 msgid "VM %s not found in VMware Vsphere"
 msgstr "VM %s not found in VMware Vsphere"
@@ -1046,24 +1059,24 @@ msgstr "Get traits for %s"
 
 #: ceilometer/hardware/discovery.py:73
 #, python-format
-msgid "Couldn't obtain IP address ofinstance %s"
-msgstr "Couldn't obtain IP address ofinstance %s"
+msgid "Couldn't obtain IP address of instance %s"
+msgstr ""
 
-#: ceilometer/hardware/plugin.py:66
+#: ceilometer/hardware/plugin.py:67
 msgid "Passed resource dict must contain keys resource_id and resource_url."
 msgstr ""
 
-#: ceilometer/hardware/plugin.py:108
+#: ceilometer/hardware/plugin.py:109
 #, python-format
 msgid "inspector call failed for %(ident)s host %(host)s: %(err)s"
 msgstr "inspector call failed for %(ident)s host %(host)s: %(err)s"
 
-#: ceilometer/hardware/plugin.py:139
+#: ceilometer/hardware/plugin.py:140
 #, python-format
 msgid "Can NOT load inspector %(name)s: %(err)s"
 msgstr "Can NOT load inspector %(name)s: %(err)s"
 
-#: ceilometer/ipmi/platform/intel_node_manager.py:238
+#: ceilometer/ipmi/platform/intel_node_manager.py:231
 msgid "Node Manager init failed"
 msgstr ""
 
@@ -1201,47 +1214,6 @@ msgstr "Policy doesn't allow %s to be performed."
 msgid "Rules must be an instance of dict or Rules, got %s instead"
 msgstr "Rules must be an instance of dict or Rules, got %s instead"
 
-#: ceilometer/openstack/common/processutils.py:59
-msgid "Unexpected error while running command."
-msgstr ""
-
-#: ceilometer/openstack/common/processutils.py:62
-#, python-format
-msgid ""
-"%(description)s\n"
-"Command: %(cmd)s\n"
-"Exit code: %(exit_code)s\n"
-"Stdout: %(stdout)r\n"
-"Stderr: %(stderr)r"
-msgstr ""
-
-#: ceilometer/openstack/common/processutils.py:143
-#, python-format
-msgid "Got unknown keyword args: %r"
-msgstr ""
-
-#: ceilometer/openstack/common/processutils.py:148
-msgid "Command requested root, but did not specify a root helper."
-msgstr ""
-
-#: ceilometer/openstack/common/processutils.py:158
-#, python-format
-msgid "Running cmd (subprocess): %s"
-msgstr "Running cmd (subprocess): %s"
-
-#: ceilometer/openstack/common/processutils.py:206
-#, python-format
-msgid "%r failed. Retrying."
-msgstr "%r failed. Retrying."
-
-#: ceilometer/openstack/common/processutils.py:248
-msgid "Environment not supported over SSH"
-msgstr "Environment not supported over SSH"
-
-#: ceilometer/openstack/common/processutils.py:252
-msgid "process_input not supported over SSH"
-msgstr "process_input not supported over SSH"
-
 #: ceilometer/publisher/file.py:63
 msgid "The path for the file publisher is required"
 msgstr "The path for the file publisher is required"
@@ -1284,7 +1256,7 @@ msgstr "Publishing sample %(msg)s over UDP to %(host)s:%(port)d"
 msgid "Unable to send sample over UDP"
 msgstr "Unable to send sample over UDP"
 
-#: ceilometer/storage/__init__.py:108
+#: ceilometer/storage/__init__.py:109
 #, python-format
 msgid "looking for %(name)r driver in %(namespace)r"
 msgstr "looking for %(name)r driver in %(namespace)r"
@@ -1313,6 +1285,12 @@ msgstr "metering data %(counter_name)s for %(resource_id)s: %(counter_volume)s"
 msgid "Dropping data with TTL %d"
 msgstr "Dropping data with TTL %d"
 
+#: ceilometer/storage/impl_mongodb.py:542
+msgid ""
+"Clearing expired metering data is based on native MongoDB time to live "
+"feature and going in background."
+msgstr ""
+
 #: ceilometer/storage/impl_sqlalchemy.py:306
 #, python-format
 msgid "Unknown metadata type. Key (%s) will not be queryable."
@@ -1332,7 +1310,7 @@ msgstr "Creating a new in-memory HBase Connection object"
 msgid "connecting to HBase on %(host)s:%(port)s"
 msgstr "connecting to HBase on %(host)s:%(port)s"
 
-#: ceilometer/storage/hbase/inmemory.py:266
+#: ceilometer/storage/hbase/inmemory.py:267
 msgid "Opening in-memory HBase connection"
 msgstr "Opening in-memory HBase connection"
 
