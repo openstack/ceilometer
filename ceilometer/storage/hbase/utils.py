@@ -364,9 +364,10 @@ def deserialize_entry(entry, get_raw_meta=True):
     metadata_flattened = {}
     for k, v in entry.items():
         if k.startswith('f:s_'):
-            sources.append(k[4:])
+            sources.append(decode_unicode(k[4:]))
         elif k.startswith('f:r_metadata.'):
-            metadata_flattened[k[len('f:r_metadata.'):]] = load(v)
+            qualifier = decode_unicode(k[len('f:r_metadata.'):])
+            metadata_flattened[qualifier] = load(v)
         elif k.startswith("f:m_"):
             meter = ([unquote(i) for i in k[4:].split(':')], load(v))
             meters.append(meter)
@@ -402,17 +403,20 @@ def serialize_entry(data=None, **kwargs):
             # To make insertion safe we need to store all meters and sources in
             # a separate cell. For this purpose s_ and m_ prefixes are
             # introduced.
-                result['f:s_%s' % v] = dump('1')
+            qualifier = encode_unicode('f:s_%s' % v)
+            result[qualifier] = dump('1')
         elif k == 'meter':
             for meter, ts in v.items():
-                result['f:m_%s' % meter] = dump(ts)
+                qualifier = encode_unicode('f:m_%s' % meter)
+                result[qualifier] = dump(ts)
         elif k == 'resource_metadata':
             # keep raw metadata as well as flattened to provide
             # capability with API v2. It will be flattened in another
             # way on API level. But we need flattened too for quick filtering.
             flattened_meta = dump_metadata(v)
             for key, m in flattened_meta.items():
-                result['f:r_metadata.' + key] = dump(m)
+                metadata_qualifier = encode_unicode('f:r_metadata.' + key)
+                result[metadata_qualifier] = dump(m)
             result['f:resource_metadata'] = dump(v)
         else:
             result['f:' + quote(k, ':')] = dump(v)
@@ -432,6 +436,14 @@ def dump(data):
 
 def load(data):
     return json.loads(data, object_hook=object_hook)
+
+
+def encode_unicode(data):
+    return data.encode('utf-8') if isinstance(data, six.text_type) else data
+
+
+def decode_unicode(data):
+    return data.decode('utf-8') if isinstance(data, six.string_types) else data
 
 
 # We don't want to have tzinfo in decoded json.This object_hook is

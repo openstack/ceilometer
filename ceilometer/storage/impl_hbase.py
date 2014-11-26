@@ -171,7 +171,8 @@ class Connection(hbase_base.Connection, base.Connection):
             # automatically 'on the top'. It is needed to keep metadata
             # up-to-date: metadata from newest samples is considered as actual.
             ts = int(time.mktime(data['timestamp'].timetuple()) * 1000)
-            resource_table.put(data['resource_id'], resource, ts)
+            resource_table.put(hbase_utils.encode_unicode(data['resource_id']),
+                               resource, ts)
 
             # Rowkey consists of reversed timestamp, meter and a
             # message signature for purposes of uniqueness
@@ -216,6 +217,7 @@ class Connection(hbase_base.Connection, base.Connection):
             for resource_id, data in resource_table.scan(filter=q):
                 f_res, sources, meters, md = hbase_utils.deserialize_entry(
                     data)
+                resource_id = hbase_utils.encode_unicode(resource_id)
                 # Unfortunately happybase doesn't keep ordered result from
                 # HBase. So that's why it's needed to find min and max
                 # manually
