@@ -138,7 +138,7 @@ class TestEvaluate(base.TestEvaluatorBase):
             expected = [mock.call(alarm.alarm_id, state='insufficient data')
                         for alarm in self.alarms]
             update_calls = self.api_client.alarms.set_state.call_args_list
-            self.assertEqual(update_calls, expected)
+            self.assertEqual(expected, update_calls)
             expected = [mock.call(
                 alarm,
                 'ok',

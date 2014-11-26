@@ -132,19 +132,19 @@ class ResourceTest(DBTestBase,
         expected_last_sample_timestamp = datetime.datetime(2012, 7, 2, 10, 40)
         msgs_sources = [msg['source'] for msg in self.msgs]
         resources = list(self.conn.get_resources())
-        self.assertEqual(len(resources), 9)
+        self.assertEqual(9, len(resources))
         for resource in resources:
             if resource.resource_id != 'resource-id':
                 continue
-            self.assertEqual(resource.first_sample_timestamp,
-                             expected_first_sample_timestamp)
-            self.assertEqual(resource.last_sample_timestamp,
-                             expected_last_sample_timestamp)
-            self.assertEqual(resource.resource_id, 'resource-id')
-            self.assertEqual(resource.project_id, 'project-id')
+            self.assertEqual(expected_first_sample_timestamp,
+                             resource.first_sample_timestamp)
+            self.assertEqual(expected_last_sample_timestamp,
+                             resource.last_sample_timestamp)
+            self.assertEqual('resource-id', resource.resource_id)
+            self.assertEqual('project-id', resource.project_id)
             self.assertIn(resource.source, msgs_sources)
-            self.assertEqual(resource.user_id, 'user-id')
-            self.assertEqual(resource.metadata['display_name'], 'test-server')
+            self.assertEqual('user-id', resource.user_id)
+            self.assertEqual('test-server', resource.metadata['display_name'])
             break
         else:
             self.fail('Never found resource-id')
@@ -156,18 +156,18 @@ class ResourceTest(DBTestBase,
 
         resources = list(self.conn.get_resources(start_timestamp=timestamp))
         resource_ids = [r.resource_id for r in resources]
-        self.assertEqual(set(resource_ids), expected)
+        self.assertEqual(expected, set(resource_ids))
 
         resources = list(self.conn.get_resources(start_timestamp=timestamp,
                                                  start_timestamp_op='ge'))
         resource_ids = [r.resource_id for r in resources]
-        self.assertEqual(set(resource_ids), expected)
+        self.assertEqual(expected, set(resource_ids))
 
         resources = list(self.conn.get_resources(start_timestamp=timestamp,
                                                  start_timestamp_op='gt'))
         resource_ids = [r.resource_id for r in resources]
         expected.remove('resource-id-2')
-        self.assertEqual(set(resource_ids), expected)
+        self.assertEqual(expected, set(resource_ids))
 
     def test_get_resources_end_timestamp(self):
         timestamp = datetime.datetime(2012, 7, 2, 10, 42)
@@ -176,18 +176,18 @@ class ResourceTest(DBTestBase,
 
         resources = list(self.conn.get_resources(end_timestamp=timestamp))
         resource_ids = [r.resource_id for r in resources]
-        self.assertEqual(set(resource_ids), expected)
+        self.assertEqual(expected, set(resource_ids))
 
         resources = list(self.conn.get_resources(end_timestamp=timestamp,
                                                  end_timestamp_op='lt'))
         resource_ids = [r.resource_id for r in resources]
-        self.assertEqual(set(resource_ids), expected)
+        self.assertEqual(expected, set(resource_ids))
 
         resources = list(self.conn.get_resources(end_timestamp=timestamp,
                                                  end_timestamp_op='le'))
         resource_ids = [r.resource_id for r in resources]
         expected.add('resource-id-2')
-        self.assertEqual(set(resource_ids), expected)
+        self.assertEqual(expected, set(resource_ids))
 
     def test_get_resources_both_timestamps(self):
         start_ts = datetime.datetime(2012, 7, 2, 10, 42)
@@ -196,42 +196,42 @@ class ResourceTest(DBTestBase,
         resources = list(self.conn.get_resources(start_timestamp=start_ts,
                                                  end_timestamp=end_ts))
         resource_ids = [r.resource_id for r in resources]
-        self.assertEqual(set(resource_ids), set(['resource-id-2']))
+        self.assertEqual(set(['resource-id-2']), set(resource_ids))
 
         resources = list(self.conn.get_resources(start_timestamp=start_ts,
                                                  end_timestamp=end_ts,
                                                  start_timestamp_op='ge',
                                                  end_timestamp_op='lt'))
         resource_ids = [r.resource_id for r in resources]
-        self.assertEqual(set(resource_ids), set(['resource-id-2']))
+        self.assertEqual(set(['resource-id-2']), set(resource_ids))
 
         resources = list(self.conn.get_resources(start_timestamp=start_ts,
                                                  end_timestamp=end_ts,
                                                  start_timestamp_op='gt',
                                                  end_timestamp_op='lt'))
         resource_ids = [r.resource_id for r in resources]
-        self.assertEqual(len(resource_ids), 0)
+        self.assertEqual(0, len(resource_ids))
 
         resources = list(self.conn.get_resources(start_timestamp=start_ts,
                                                  end_timestamp=end_ts,
                                                  start_timestamp_op='gt',
                                                  end_timestamp_op='le'))
         resource_ids = [r.resource_id for r in resources]
-        self.assertEqual(set(resource_ids), set(['resource-id-3']))
+        self.assertEqual(set(['resource-id-3']), set(resource_ids))
 
         resources = list(self.conn.get_resources(start_timestamp=start_ts,
                                                  end_timestamp=end_ts,
                                                  start_timestamp_op='ge',
                                                  end_timestamp_op='le'))
         resource_ids = [r.resource_id for r in resources]
-        self.assertEqual(set(resource_ids),
-                         set(['resource-id-2', 'resource-id-3']))
+        self.assertEqual(set(['resource-id-2', 'resource-id-3']),
+                         set(resource_ids))
 
     def test_get_resources_by_source(self):
         resources = list(self.conn.get_resources(source='test-1'))
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(1, len(resources))
         ids = set(r.resource_id for r in resources)
-        self.assertEqual(ids, set(['resource-id']))
+        self.assertEqual(set(['resource-id']), ids)
 
     def test_get_resources_by_user(self):
         resources = list(self.conn.get_resources(user='user-id'))
@@ -253,18 +253,18 @@ class ResourceTest(DBTestBase,
 
     def test_get_resources_by_project(self):
         resources = list(self.conn.get_resources(project='project-id'))
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(2, len(resources))
         ids = set(r.resource_id for r in resources)
-        self.assertEqual(ids, set(['resource-id', 'resource-id-alternate']))
+        self.assertEqual(set(['resource-id', 'resource-id-alternate']), ids)
 
     def test_get_resources_by_metaquery(self):
         q = {'metadata.display_name': 'test-server'}
         resources = list(self.conn.get_resources(metaquery=q))
-        self.assertEqual(len(resources), 9)
+        self.assertEqual(9, len(resources))
 
     def test_get_resources_by_empty_metaquery(self):
         resources = list(self.conn.get_resources(metaquery={}))
-        self.assertEqual(len(resources), 9)
+        self.assertEqual(9, len(resources))
 
     def test_get_resources_most_recent_metadata_all(self):
         resources = self.conn.get_resources()
@@ -280,7 +280,7 @@ class ResourceTest(DBTestBase,
             self.conn.get_resources(resource='resource-id-alternate')
         )[0]
         expected_tag = 'self.counter3'
-        self.assertEqual(resource.metadata['tag'], expected_tag)
+        self.assertEqual(expected_tag, resource.metadata['tag'])
 
 
 class ResourceTestPagination(DBTestBase,
@@ -289,11 +289,11 @@ class ResourceTestPagination(DBTestBase,
     def test_get_resource_all_limit(self):
         pagination = base.Pagination(limit=8)
         results = list(self.conn.get_resources(pagination=pagination))
-        self.assertEqual(len(results), 8)
+        self.assertEqual(8, len(results))
 
         pagination = base.Pagination(limit=5)
         results = list(self.conn.get_resources(pagination=pagination))
-        self.assertEqual(len(results), 5)
+        self.assertEqual(5, len(results))
 
     def test_get_resources_all_marker(self):
         pagination = base.Pagination(primary_sort_dir='asc',
@@ -301,7 +301,7 @@ class ResourceTestPagination(DBTestBase,
                                      sort_dirs=['asc'],
                                      marker_value='resource-id-4')
         results = list(self.conn.get_resources(pagination=pagination))
-        self.assertEqual(len(results), 5)
+        self.assertEqual(5, len(results))
 
     def test_get_resources_paginate(self):
         pagination = base.Pagination(limit=3, primary_sort_dir='asc',
@@ -369,12 +369,12 @@ class ResourceTestOrdering(DBTestBase,
             ('resource-id-3', 'sample-12')
         ])
         received = set([(r.resource_id, r.metadata['tag']) for r in resources])
-        self.assertEqual(received, expected)
+        self.assertEqual(expected, received)
 
     def test_get_resources_ordering_single(self):
         resource = list(self.conn.get_resources(resource='resource-id-2'))[0]
-        self.assertEqual(resource.resource_id, 'resource-id-2')
-        self.assertEqual(resource.metadata['tag'], 'sample-8')
+        self.assertEqual('resource-id-2', resource.resource_id)
+        self.assertEqual('sample-8', resource.metadata['tag'])
 
 
 class MeterTest(DBTestBase,
@@ -383,27 +383,27 @@ class MeterTest(DBTestBase,
     def test_get_meters(self):
         msgs_sources = [msg['source'] for msg in self.msgs]
         results = list(self.conn.get_meters())
-        self.assertEqual(len(results), 9)
+        self.assertEqual(9, len(results))
         for meter in results:
             self.assertIn(meter.source, msgs_sources)
 
     def test_get_meters_by_user(self):
         results = list(self.conn.get_meters(user='user-id'))
-        self.assertEqual(len(results), 1)
+        self.assertEqual(1, len(results))
 
     def test_get_meters_by_project(self):
         results = list(self.conn.get_meters(project='project-id'))
-        self.assertEqual(len(results), 2)
+        self.assertEqual(2, len(results))
 
     def test_get_meters_by_metaquery(self):
         q = {'metadata.display_name': 'test-server'}
         results = list(self.conn.get_meters(metaquery=q))
         self.assertIsNotEmpty(results)
-        self.assertEqual(len(results), 9)
+        self.assertEqual(9, len(results))
 
     def test_get_meters_by_empty_metaquery(self):
         results = list(self.conn.get_meters(metaquery={}))
-        self.assertEqual(len(results), 9)
+        self.assertEqual(9, len(results))
 
 
 class MeterTestPagination(DBTestBase,
@@ -412,11 +412,11 @@ class MeterTestPagination(DBTestBase,
     def tet_get_meters_all_limit(self):
         pagination = base.Pagination(limit=8)
         results = list(self.conn.get_meters(pagination=pagination))
-        self.assertEqual(len(results), 8)
+        self.assertEqual(8, len(results))
 
         pagination = base.Pagination(limit=5)
         results = list(self.conn.get_meters(pagination=pagination))
-        self.assertEqual(len(results), 5)
+        self.assertEqual(5, len(results))
 
     def test_get_meters_all_marker(self):
         pagination = base.Pagination(limit=3, primary_sort_dir='desc',
@@ -425,7 +425,7 @@ class MeterTestPagination(DBTestBase,
                                      marker_value='resource-id-5')
 
         results = list(self.conn.get_meters(pagination=pagination))
-        self.assertEqual(len(results), 8)
+        self.assertEqual(8, len(results))
 
     def test_get_meters_paginate(self):
         pagination = base.Pagination(limit=3, primary_sort_dir='desc',
@@ -462,15 +462,14 @@ class RawSampleTest(DBTestBase,
     def test_get_samples_limit_zero(self):
         f = storage.SampleFilter()
         results = list(self.conn.get_samples(f, limit=0))
-        self.assertEqual(len(results), 0)
+        self.assertEqual(0, len(results))
 
     def test_get_samples_limit(self):
         f = storage.SampleFilter()
         results = list(self.conn.get_samples(f, limit=3))
-        self.assertEqual(len(results), 3)
+        self.assertEqual(3, len(results))
         for result in results:
-            self.assertTimestampEqual(result.recorded_at,
-                                      timeutils.utcnow())
+            self.assertTimestampEqual(timeutils.utcnow(), result.recorded_at)
 
     def test_get_samples_in_default_order(self):
         f = storage.SampleFilter()
@@ -483,23 +482,22 @@ class RawSampleTest(DBTestBase,
     def test_get_samples_by_user(self):
         f = storage.SampleFilter(user='user-id')
         results = list(self.conn.get_samples(f))
-        self.assertEqual(len(results), 3)
+        self.assertEqual(3, len(results))
         for meter in results:
             d = meter.as_dict()
-            self.assertTimestampEqual(d['recorded_at'],
-                                      timeutils.utcnow())
+            self.assertTimestampEqual(timeutils.utcnow(), d['recorded_at'])
             del d['recorded_at']
             self.assertIn(d, self.msgs[:3])
 
     def test_get_samples_by_user_limit(self):
         f = storage.SampleFilter(user='user-id')
         results = list(self.conn.get_samples(f, limit=1))
-        self.assertEqual(len(results), 1)
+        self.assertEqual(1, len(results))
 
     def test_get_samples_by_user_limit_bigger(self):
         f = storage.SampleFilter(user='user-id')
         results = list(self.conn.get_samples(f, limit=42))
-        self.assertEqual(len(results), 3)
+        self.assertEqual(3, len(results))
 
     def test_get_samples_by_project(self):
         f = storage.SampleFilter(project='project-id')
@@ -507,8 +505,7 @@ class RawSampleTest(DBTestBase,
         self.assertIsNotNone(results)
         for meter in results:
             d = meter.as_dict()
-            self.assertTimestampEqual(d['recorded_at'],
-                                      timeutils.utcnow())
+            self.assertTimestampEqual(timeutils.utcnow(), d['recorded_at'])
             del d['recorded_at']
             self.assertIn(d, self.msgs[:4])
 
@@ -518,9 +515,9 @@ class RawSampleTest(DBTestBase,
         self.assertIsNotEmpty(results)
         meter = results[1]
         d = meter.as_dict()
-        self.assertEqual(d['recorded_at'], timeutils.utcnow())
+        self.assertEqual(timeutils.utcnow(), d['recorded_at'])
         del d['recorded_at']
-        self.assertEqual(d, self.msgs[0])
+        self.assertEqual(self.msgs[0], d)
 
     def test_get_samples_by_metaquery(self):
         q = {'metadata.display_name': 'test-server'}
@@ -529,8 +526,7 @@ class RawSampleTest(DBTestBase,
         self.assertIsNotNone(results)
         for meter in results:
             d = meter.as_dict()
-            self.assertTimestampEqual(d['recorded_at'],
-                                      timeutils.utcnow())
+            self.assertTimestampEqual(timeutils.utcnow(), d['recorded_at'])
             del d['recorded_at']
             self.assertIn(d, self.msgs)
 
@@ -542,17 +538,17 @@ class RawSampleTest(DBTestBase,
         )
 
         results = list(self.conn.get_samples(f))
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].timestamp, timestamp)
+        self.assertEqual(1, len(results))
+        self.assertEqual(timestamp, results[0].timestamp)
 
         f.start_timestamp_op = 'ge'
         results = list(self.conn.get_samples(f))
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].timestamp, timestamp)
+        self.assertEqual(1, len(results))
+        self.assertEqual(timestamp, results[0].timestamp)
 
         f.start_timestamp_op = 'gt'
         results = list(self.conn.get_samples(f))
-        self.assertEqual(len(results), 0)
+        self.assertEqual(0, len(results))
 
     def test_get_samples_by_end_time(self):
         timestamp = datetime.datetime(2012, 7, 2, 10, 40)
@@ -562,17 +558,17 @@ class RawSampleTest(DBTestBase,
         )
 
         results = list(self.conn.get_samples(f))
-        self.assertEqual(len(results), 1)
+        self.assertEqual(1, len(results))
 
         f.end_timestamp_op = 'lt'
         results = list(self.conn.get_samples(f))
-        self.assertEqual(len(results), 1)
+        self.assertEqual(1, len(results))
 
         f.end_timestamp_op = 'le'
         results = list(self.conn.get_samples(f))
-        self.assertEqual(len(results), 2)
-        self.assertEqual(results[1].timestamp,
-                         datetime.datetime(2012, 7, 2, 10, 39))
+        self.assertEqual(2, len(results))
+        self.assertEqual(datetime.datetime(2012, 7, 2, 10, 39),
+                         results[1].timestamp)
 
     def test_get_samples_by_both_times(self):
         start_ts = datetime.datetime(2012, 7, 2, 10, 42)
@@ -583,32 +579,32 @@ class RawSampleTest(DBTestBase,
         )
 
         results = list(self.conn.get_samples(f))
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].timestamp, start_ts)
+        self.assertEqual(1, len(results))
+        self.assertEqual(start_ts, results[0].timestamp)
 
         f.start_timestamp_op = 'gt'
         f.end_timestamp_op = 'lt'
         results = list(self.conn.get_samples(f))
-        self.assertEqual(len(results), 0)
+        self.assertEqual(0, len(results))
 
         f.start_timestamp_op = 'ge'
         f.end_timestamp_op = 'lt'
         results = list(self.conn.get_samples(f))
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].timestamp, start_ts)
+        self.assertEqual(1, len(results))
+        self.assertEqual(start_ts, results[0].timestamp)
 
         f.start_timestamp_op = 'gt'
         f.end_timestamp_op = 'le'
         results = list(self.conn.get_samples(f))
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].timestamp, end_ts)
+        self.assertEqual(1, len(results))
+        self.assertEqual(end_ts, results[0].timestamp)
 
         f.start_timestamp_op = 'ge'
         f.end_timestamp_op = 'le'
         results = list(self.conn.get_samples(f))
-        self.assertEqual(len(results), 2)
-        self.assertEqual(results[0].timestamp, end_ts)
-        self.assertEqual(results[1].timestamp, start_ts)
+        self.assertEqual(2, len(results))
+        self.assertEqual(end_ts, results[0].timestamp)
+        self.assertEqual(start_ts, results[1].timestamp)
 
     def test_get_samples_by_name(self):
         f = storage.SampleFilter(user='user-id', meter='no-such-meter')
@@ -623,7 +619,7 @@ class RawSampleTest(DBTestBase,
     def test_get_samples_by_source(self):
         f = storage.SampleFilter(source='test-1')
         results = list(self.conn.get_samples(f))
-        self.assertEqual(len(results), 2)
+        self.assertEqual(2, len(results))
 
     @tests_db.run_with('sqlite', 'hbase', 'db2')
     def test_clear_metering_data(self):
@@ -634,9 +630,9 @@ class RawSampleTest(DBTestBase,
         self.conn.clear_expired_metering_data(3 * 60)
         f = storage.SampleFilter(meter='instance')
         results = list(self.conn.get_samples(f))
-        self.assertEqual(len(results), 5)
+        self.assertEqual(5, len(results))
         results = list(self.conn.get_resources())
-        self.assertEqual(len(results), 5)
+        self.assertEqual(5, len(results))
 
     @tests_db.run_with('sqlite', 'hbase', 'db2')
     def test_clear_metering_data_no_data_to_remove(self):
@@ -647,9 +643,9 @@ class RawSampleTest(DBTestBase,
         self.conn.clear_expired_metering_data(3 * 60)
         f = storage.SampleFilter(meter='instance')
         results = list(self.conn.get_samples(f))
-        self.assertEqual(len(results), 11)
+        self.assertEqual(11, len(results))
         results = list(self.conn.get_resources())
-        self.assertEqual(len(results), 9)
+        self.assertEqual(9, len(results))
 
     @tests_db.run_with('sqlite', 'hbase', 'db2')
     def test_clear_metering_data_with_alarms(self):
@@ -687,9 +683,9 @@ class RawSampleTest(DBTestBase,
         self.conn.clear_expired_metering_data(5)
         f = storage.SampleFilter(meter='instance')
         results = list(self.conn.get_samples(f))
-        self.assertEqual(len(results), 2)
+        self.assertEqual(2, len(results))
         results = list(self.conn.get_resources())
-        self.assertEqual(len(results), 2)
+        self.assertEqual(2, len(results))
 
 
 class ComplexSampleQueryTest(DBTestBase,
@@ -741,7 +737,7 @@ class ComplexSampleQueryTest(DBTestBase,
 
     def test_no_filter(self):
         results = list(self.conn.query_samples())
-        self.assertEqual(len(results), len(self.msgs))
+        self.assertEqual(len(self.msgs), len(results))
         for sample_item in results:
             d = sample_item.as_dict()
             del d['recorded_at']
@@ -750,37 +746,36 @@ class ComplexSampleQueryTest(DBTestBase,
     def test_no_filter_with_zero_limit(self):
         limit = 0
         results = list(self.conn.query_samples(limit=limit))
-        self.assertEqual(len(results), limit)
+        self.assertEqual(limit, len(results))
 
     def test_no_filter_with_limit(self):
         limit = 3
         results = list(self.conn.query_samples(limit=limit))
-        self.assertEqual(len(results), limit)
+        self.assertEqual(limit, len(results))
 
     def test_query_simple_filter(self):
         simple_filter = {"=": {"resource_id": "resource-id-8"}}
         results = list(self.conn.query_samples(filter_expr=simple_filter))
-        self.assertEqual(len(results), 1)
+        self.assertEqual(1, len(results))
         for sample_item in results:
-            self.assertEqual(sample_item.resource_id, "resource-id-8")
+            self.assertEqual("resource-id-8", sample_item.resource_id)
 
     def test_query_simple_filter_with_not_equal_relation(self):
         simple_filter = {"!=": {"resource_id": "resource-id-8"}}
         results = list(self.conn.query_samples(filter_expr=simple_filter))
-        self.assertEqual(len(results), len(self.msgs) - 1)
+        self.assertEqual(len(self.msgs) - 1, len(results))
         for sample_item in results:
-            self.assertNotEqual(sample_item.resource_id, "resource-id-8")
+            self.assertNotEqual("resource-id-8", sample_item.resource_id)
 
     def test_query_complex_filter(self):
         self._create_samples()
         results = list(self.conn.query_samples(filter_expr=(
                                                self.complex_filter)))
-        self.assertEqual(len(results), 6)
+        self.assertEqual(6, len(results))
         for sample_item in results:
             self.assertIn(sample_item.resource_id,
                           set(["resource-id-42", "resource-id-44"]))
-            self.assertEqual(sample_item.counter_name,
-                             "cpu_util")
+            self.assertEqual("cpu_util", sample_item.counter_name)
             self.assertTrue(sample_item.counter_volume > 0.4)
             self.assertTrue(sample_item.counter_volume <= 0.8)
 
@@ -789,7 +784,7 @@ class ComplexSampleQueryTest(DBTestBase,
         limit = 3
         results = list(self.conn.query_samples(filter_expr=self.complex_filter,
                                                limit=limit))
-        self.assertEqual(len(results), limit)
+        self.assertEqual(limit, len(results))
 
     def test_query_complex_filter_with_simple_orderby(self):
         self._create_samples()
@@ -821,14 +816,13 @@ class ComplexSampleQueryTest(DBTestBase,
         self._create_samples()
         results = list(
             self.conn.query_samples(filter_expr=self.complex_filter_list))
-        self.assertEqual(len(results), 9)
+        self.assertEqual(9, len(results))
         for sample_item in results:
             self.assertIn(sample_item.resource_id,
                           set(["resource-id-42",
                                "resource-id-43",
                                "resource-id-44"]))
-            self.assertEqual(sample_item.counter_name,
-                             "cpu_util")
+            self.assertEqual("cpu_util", sample_item.counter_name)
             self.assertTrue(sample_item.counter_volume > 0.4)
             self.assertTrue(sample_item.counter_volume <= 0.8)
 
@@ -838,7 +832,7 @@ class ComplexSampleQueryTest(DBTestBase,
         results = list(
             self.conn.query_samples(filter_expr=self.complex_filter_list,
                                     limit=limit))
-        self.assertEqual(len(results), limit)
+        self.assertEqual(limit, len(results))
 
     def test_query_complex_filter_with_list_with_simple_orderby(self):
         self._create_samples()
@@ -887,14 +881,13 @@ class ComplexSampleQueryTest(DBTestBase,
         self._create_samples()
         results = list(
             self.conn.query_samples(filter_expr=self.complex_filter_in))
-        self.assertEqual(len(results), 9)
+        self.assertEqual(9, len(results))
         for sample_item in results:
             self.assertIn(sample_item.resource_id,
                           set(["resource-id-42",
                                "resource-id-43",
                                "resource-id-44"]))
-            self.assertEqual(sample_item.counter_name,
-                             "cpu_util")
+            self.assertEqual("cpu_util", sample_item.counter_name)
             self.assertTrue(sample_item.counter_volume > 0.4)
             self.assertTrue(sample_item.counter_volume <= 0.8)
 
@@ -905,7 +898,7 @@ class ComplexSampleQueryTest(DBTestBase,
 
         results = list(self.conn.query_samples(filter_expr=filter_expr))
 
-        self.assertEqual(len(results), 6)
+        self.assertEqual(6, len(results))
         for sample_item in results:
             self.assertTrue(sample_item.resource_metadata["a_bool_key"])
 
@@ -916,7 +909,7 @@ class ComplexSampleQueryTest(DBTestBase,
 
         results = list(self.conn.query_samples(filter_expr=filter_expr))
 
-        self.assertEqual(len(results), 12)
+        self.assertEqual(12, len(results))
         for sample_item in results:
             self.assertIn(sample_item.resource_metadata["an_int_key"],
                           [42, 43])
@@ -931,7 +924,7 @@ class ComplexSampleQueryTest(DBTestBase,
 
         results = list(self.conn.query_samples(filter_expr=filter_expr))
 
-        self.assertEqual(len(results), 8)
+        self.assertEqual(8, len(results))
         for sample_item in results:
             self.assertTrue((sample_item.resource_metadata["a_string_key"] ==
                             "meta-value0.81" or
@@ -950,13 +943,13 @@ class ComplexSampleQueryTest(DBTestBase,
 
         results = list(self.conn.query_samples(filter_expr=filter_expr))
 
-        self.assertEqual(len(results), 4)
+        self.assertEqual(4, len(results))
         for sample_item in results:
             self.assertTrue((sample_item.resource_metadata["a_string_key"] ==
                             "meta-value0.81" or
                              sample_item.resource_metadata["a_float_key"] <=
                              0.41))
-            self.assertEqual(sample_item.resource_id, "resource-id-42")
+            self.assertEqual("resource-id-42", sample_item.resource_id)
 
     def test_query_non_existing_metadata_with_result(self):
         self._create_samples()
@@ -968,10 +961,10 @@ class ComplexSampleQueryTest(DBTestBase,
 
         results = list(self.conn.query_samples(filter_expr=filter_expr))
 
-        self.assertEqual(len(results), 3)
+        self.assertEqual(3, len(results))
         for sample_item in results:
-            self.assertEqual(sample_item.resource_metadata["a_string_key"],
-                             "meta-value0.81")
+            self.assertEqual("meta-value0.81",
+                             sample_item.resource_metadata["a_string_key"])
 
     def test_query_non_existing_metadata_without_result(self):
         self._create_samples()
@@ -982,7 +975,7 @@ class ComplexSampleQueryTest(DBTestBase,
                    {"<=": {"resource_metadata.key_not_exists": 0.41}}]}
 
         results = list(self.conn.query_samples(filter_expr=filter_expr))
-        self.assertEqual(len(results), 0)
+        self.assertEqual(0, len(results))
 
     def test_query_negated_metadata(self):
         self._create_samples()
@@ -996,9 +989,9 @@ class ComplexSampleQueryTest(DBTestBase,
 
         results = list(self.conn.query_samples(filter_expr=filter_expr))
 
-        self.assertEqual(len(results), 3)
+        self.assertEqual(3, len(results))
         for sample_item in results:
-            self.assertEqual(sample_item.resource_id, "resource-id-42")
+            self.assertEqual("resource-id-42", sample_item.resource_id)
             self.assertTrue(sample_item.resource_metadata["an_int_key"] <= 43)
             self.assertTrue(sample_item.resource_metadata["a_float_key"] >
                             0.41)
@@ -1019,13 +1012,11 @@ class ComplexSampleQueryTest(DBTestBase,
 
         results = list(self.conn.query_samples(filter_expr=filter_expr))
 
-        self.assertEqual(len(results), 4)
+        self.assertEqual(4, len(results))
         for sample_item in results:
-            self.assertEqual(sample_item.resource_id,
-                             "resource-id-43")
+            self.assertEqual("resource-id-43", sample_item.resource_id)
             self.assertIn(sample_item.counter_volume, [0.39, 0.4, 0.8, 0.81])
-            self.assertEqual(sample_item.counter_name,
-                             "cpu_util")
+            self.assertEqual("cpu_util", sample_item.counter_name)
 
     def test_query_with_double_negation(self):
         self._create_samples()
@@ -1042,13 +1033,11 @@ class ComplexSampleQueryTest(DBTestBase,
 
         results = list(self.conn.query_samples(filter_expr=filter_expr))
 
-        self.assertEqual(len(results), 4)
+        self.assertEqual(4, len(results))
         for sample_item in results:
-            self.assertEqual(sample_item.resource_id,
-                             "resource-id-43")
+            self.assertEqual("resource-id-43", sample_item.resource_id)
             self.assertIn(sample_item.counter_volume, [0.39, 0.4, 0.8, 0.81])
-            self.assertEqual(sample_item.counter_name,
-                             "cpu_util")
+            self.assertEqual("cpu_util", sample_item.counter_name)
 
     def test_query_negate_not_equal(self):
         self._create_samples()
@@ -1056,10 +1045,9 @@ class ComplexSampleQueryTest(DBTestBase,
 
         results = list(self.conn.query_samples(filter_expr=filter_expr))
 
-        self.assertEqual(len(results), 6)
+        self.assertEqual(6, len(results))
         for sample_item in results:
-            self.assertEqual(sample_item.resource_id,
-                             "resource-id-43")
+            self.assertEqual("resource-id-43", sample_item.resource_id)
 
     def test_query_negated_in_op(self):
         self._create_samples()
@@ -1069,7 +1057,7 @@ class ComplexSampleQueryTest(DBTestBase,
 
         results = list(self.conn.query_samples(filter_expr=filter_expr))
 
-        self.assertEqual(len(results), 3)
+        self.assertEqual(3, len(results))
         for sample_item in results:
             self.assertIn(sample_item.counter_volume,
                           [0.41, 0.8, 0.81])
@@ -1143,15 +1131,15 @@ class StatisticsTest(DBTestBase,
             meter='memory'
         )
         results = list(self.conn.get_meter_statistics(f))[0]
-        self.assertEqual(results.duration,
-                         (datetime.datetime(2012, 9, 25, 12, 32)
-                          - datetime.datetime(2012, 9, 25, 10, 30)).seconds)
-        self.assertEqual(results.count, 3)
-        self.assertEqual(results.unit, 'MB')
-        self.assertEqual(results.min, 8)
-        self.assertEqual(results.max, 10)
-        self.assertEqual(results.sum, 27)
-        self.assertEqual(results.avg, 9)
+        self.assertEqual((datetime.datetime(2012, 9, 25, 12, 32)
+                          - datetime.datetime(2012, 9, 25, 10, 30)).seconds,
+                         results.duration)
+        self.assertEqual(3, results.count)
+        self.assertEqual('MB', results.unit)
+        self.assertEqual(8, results.min)
+        self.assertEqual(10, results.max)
+        self.assertEqual(27, results.sum)
+        self.assertEqual(9, results.avg)
 
     def test_by_user(self):
         f = storage.SampleFilter(
@@ -1159,15 +1147,15 @@ class StatisticsTest(DBTestBase,
             meter='volume.size',
         )
         results = list(self.conn.get_meter_statistics(f))[0]
-        self.assertEqual(results.duration,
-                         (datetime.datetime(2012, 9, 25, 12, 32)
-                          - datetime.datetime(2012, 9, 25, 10, 30)).seconds)
-        self.assertEqual(results.count, 3)
-        self.assertEqual(results.unit, 'GiB')
-        self.assertEqual(results.min, 8)
-        self.assertEqual(results.max, 10)
-        self.assertEqual(results.sum, 27)
-        self.assertEqual(results.avg, 9)
+        self.assertEqual((datetime.datetime(2012, 9, 25, 12, 32)
+                          - datetime.datetime(2012, 9, 25, 10, 30)).seconds,
+                         results.duration)
+        self.assertEqual(3, results.count)
+        self.assertEqual('GiB', results.unit)
+        self.assertEqual(8, results.min)
+        self.assertEqual(10, results.max)
+        self.assertEqual(27, results.sum)
+        self.assertEqual(9, results.avg)
 
     def test_no_period_in_query(self):
         f = storage.SampleFilter(
@@ -1175,15 +1163,15 @@ class StatisticsTest(DBTestBase,
             meter='volume.size',
         )
         results = list(self.conn.get_meter_statistics(f))[0]
-        self.assertEqual(results.period, 0)
+        self.assertEqual(0, results.period)
 
     def test_period_is_int(self):
         f = storage.SampleFilter(
             meter='volume.size',
         )
         results = list(self.conn.get_meter_statistics(f))[0]
-        self.assertIs(type(results.period), int)
-        self.assertEqual(results.count, 6)
+        self.assertIs(int, type(results.period))
+        self.assertEqual(6, results.count)
 
     def test_by_user_period(self):
         f = storage.SampleFilter(
@@ -1192,31 +1180,31 @@ class StatisticsTest(DBTestBase,
             start='2012-09-25T10:28:00',
         )
         results = list(self.conn.get_meter_statistics(f, period=7200))
-        self.assertEqual(len(results), 2)
-        self.assertEqual(set(r.period_start for r in results),
-                         set([datetime.datetime(2012, 9, 25, 10, 28),
-                              datetime.datetime(2012, 9, 25, 12, 28)]))
-        self.assertEqual(set(r.period_end for r in results),
-                         set([datetime.datetime(2012, 9, 25, 12, 28),
-                              datetime.datetime(2012, 9, 25, 14, 28)]))
+        self.assertEqual(2, len(results))
+        self.assertEqual(set([datetime.datetime(2012, 9, 25, 10, 28),
+                              datetime.datetime(2012, 9, 25, 12, 28)]),
+                         set(r.period_start for r in results))
+        self.assertEqual(set([datetime.datetime(2012, 9, 25, 12, 28),
+                              datetime.datetime(2012, 9, 25, 14, 28)]),
+                         set(r.period_end for r in results))
         r = results[0]
-        self.assertEqual(r.period_start,
-                         datetime.datetime(2012, 9, 25, 10, 28))
-        self.assertEqual(r.count, 2)
-        self.assertEqual(r.unit, 'GiB')
-        self.assertEqual(r.avg, 8.5)
-        self.assertEqual(r.min, 8)
-        self.assertEqual(r.max, 9)
-        self.assertEqual(r.sum, 17)
-        self.assertEqual(r.period, 7200)
+        self.assertEqual(datetime.datetime(2012, 9, 25, 10, 28),
+                         r.period_start)
+        self.assertEqual(2, r.count)
+        self.assertEqual('GiB', r.unit)
+        self.assertEqual(8.5, r.avg)
+        self.assertEqual(8, r.min)
+        self.assertEqual(9, r.max)
+        self.assertEqual(17, r.sum)
+        self.assertEqual(7200, r.period)
         self.assertIsInstance(r.period, int)
         expected_end = r.period_start + datetime.timedelta(seconds=7200)
-        self.assertEqual(r.period_end, expected_end)
-        self.assertEqual(r.duration, 3660)
-        self.assertEqual(r.duration_start,
-                         datetime.datetime(2012, 9, 25, 10, 30))
-        self.assertEqual(r.duration_end,
-                         datetime.datetime(2012, 9, 25, 11, 31))
+        self.assertEqual(expected_end, r.period_end)
+        self.assertEqual(3660, r.duration)
+        self.assertEqual(datetime.datetime(2012, 9, 25, 10, 30),
+                         r.duration_start)
+        self.assertEqual(datetime.datetime(2012, 9, 25, 11, 31),
+                         r.duration_end)
 
     def test_by_user_period_with_timezone(self):
         dates = [
@@ -1251,13 +1239,13 @@ class StatisticsTest(DBTestBase,
                 start=date
             )
             results = list(self.conn.get_meter_statistics(f, period=7200))
-            self.assertEqual(len(results), 2)
-            self.assertEqual(set(r.period_start for r in results),
-                             set([datetime.datetime(2012, 9, 25, 10, 28),
-                                  datetime.datetime(2012, 9, 25, 12, 28)]))
-            self.assertEqual(set(r.period_end for r in results),
-                             set([datetime.datetime(2012, 9, 25, 12, 28),
-                                  datetime.datetime(2012, 9, 25, 14, 28)]))
+            self.assertEqual(2, len(results))
+            self.assertEqual(set([datetime.datetime(2012, 9, 25, 10, 28),
+                                  datetime.datetime(2012, 9, 25, 12, 28)]),
+                             set(r.period_start for r in results))
+            self.assertEqual(set([datetime.datetime(2012, 9, 25, 12, 28),
+                                  datetime.datetime(2012, 9, 25, 14, 28)]),
+                             set(r.period_end for r in results))
 
     def test_by_user_period_start_end(self):
         f = storage.SampleFilter(
@@ -1267,24 +1255,24 @@ class StatisticsTest(DBTestBase,
             end='2012-09-25T11:28:00',
         )
         results = list(self.conn.get_meter_statistics(f, period=1800))
-        self.assertEqual(len(results), 1)
+        self.assertEqual(1, len(results))
         r = results[0]
-        self.assertEqual(r.period_start,
-                         datetime.datetime(2012, 9, 25, 10, 28))
-        self.assertEqual(r.count, 1)
-        self.assertEqual(r.unit, 'GiB')
-        self.assertEqual(r.avg, 8)
-        self.assertEqual(r.min, 8)
-        self.assertEqual(r.max, 8)
-        self.assertEqual(r.sum, 8)
-        self.assertEqual(r.period, 1800)
-        self.assertEqual(r.period_end,
-                         r.period_start + datetime.timedelta(seconds=1800))
-        self.assertEqual(r.duration, 0)
-        self.assertEqual(r.duration_start,
-                         datetime.datetime(2012, 9, 25, 10, 30))
-        self.assertEqual(r.duration_end,
-                         datetime.datetime(2012, 9, 25, 10, 30))
+        self.assertEqual(datetime.datetime(2012, 9, 25, 10, 28),
+                         r.period_start)
+        self.assertEqual(1, r.count)
+        self.assertEqual('GiB', r.unit)
+        self.assertEqual(8, r.avg)
+        self.assertEqual(8, r.min)
+        self.assertEqual(8, r.max)
+        self.assertEqual(8, r.sum)
+        self.assertEqual(1800, r.period)
+        self.assertEqual(r.period_start + datetime.timedelta(seconds=1800),
+                         r.period_end)
+        self.assertEqual(0, r.duration)
+        self.assertEqual(datetime.datetime(2012, 9, 25, 10, 30),
+                         r.duration_start)
+        self.assertEqual(datetime.datetime(2012, 9, 25, 10, 30),
+                         r.duration_end)
 
     def test_by_project(self):
         f = storage.SampleFilter(
@@ -1294,13 +1282,13 @@ class StatisticsTest(DBTestBase,
             end='2012-09-25T11:32:00',
         )
         results = list(self.conn.get_meter_statistics(f))[0]
-        self.assertEqual(results.duration, 0)
-        self.assertEqual(results.count, 1)
-        self.assertEqual(results.unit, 'GiB')
-        self.assertEqual(results.min, 6)
-        self.assertEqual(results.max, 6)
-        self.assertEqual(results.sum, 6)
-        self.assertEqual(results.avg, 6)
+        self.assertEqual(0, results.duration)
+        self.assertEqual(1, results.count)
+        self.assertEqual('GiB', results.unit)
+        self.assertEqual(6, results.min)
+        self.assertEqual(6, results.max)
+        self.assertEqual(6, results.sum)
+        self.assertEqual(6, results.avg)
 
     def test_one_resource(self):
         f = storage.SampleFilter(
@@ -1308,15 +1296,15 @@ class StatisticsTest(DBTestBase,
             meter='volume.size',
         )
         results = list(self.conn.get_meter_statistics(f))[0]
-        self.assertEqual(results.duration,
-                         (datetime.datetime(2012, 9, 25, 12, 32)
-                          - datetime.datetime(2012, 9, 25, 10, 30)).seconds)
-        self.assertEqual(results.count, 3)
-        self.assertEqual(results.unit, 'GiB')
-        self.assertEqual(results.min, 5)
-        self.assertEqual(results.max, 7)
-        self.assertEqual(results.sum, 18)
-        self.assertEqual(results.avg, 6)
+        self.assertEqual((datetime.datetime(2012, 9, 25, 12, 32)
+                          - datetime.datetime(2012, 9, 25, 10, 30)).seconds,
+                         results.duration)
+        self.assertEqual(3, results.count)
+        self.assertEqual('GiB', results.unit)
+        self.assertEqual(5, results.min)
+        self.assertEqual(7, results.max)
+        self.assertEqual(18, results.sum)
+        self.assertEqual(6, results.avg)
 
     def test_with_no_sample(self):
         f = storage.SampleFilter(
@@ -1387,37 +1375,37 @@ class StatisticsGroupByTest(DBTestBase,
             meter='instance',
         )
         results = list(self.conn.get_meter_statistics(f, groupby=['user_id']))
-        self.assertEqual(len(results), 3)
+        self.assertEqual(3, len(results))
         groupby_list = [r.groupby for r in results]
         groupby_keys_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.keys())
         groupby_vals_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.values())
-        self.assertEqual(groupby_keys_set, set(['user_id']))
-        self.assertEqual(groupby_vals_set, set(['user-1', 'user-2', 'user-3']))
+        self.assertEqual(set(['user_id']), groupby_keys_set)
+        self.assertEqual(set(['user-1', 'user-2', 'user-3']), groupby_vals_set)
 
         for r in results:
             if r.groupby == {'user_id': 'user-1'}:
-                self.assertEqual(r.count, 2)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 2)
-                self.assertEqual(r.max, 2)
-                self.assertEqual(r.sum, 4)
-                self.assertEqual(r.avg, 2)
+                self.assertEqual(2, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(2, r.min)
+                self.assertEqual(2, r.max)
+                self.assertEqual(4, r.sum)
+                self.assertEqual(2, r.avg)
             elif r.groupby == {'user_id': 'user-2'}:
-                self.assertEqual(r.count, 4)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 1)
-                self.assertEqual(r.max, 4)
-                self.assertEqual(r.sum, 8)
-                self.assertEqual(r.avg, 2)
+                self.assertEqual(4, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(1, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(8, r.sum)
+                self.assertEqual(2, r.avg)
             elif r.groupby == {'user_id': 'user-3'}:
-                self.assertEqual(r.count, 1)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 4)
-                self.assertEqual(r.max, 4)
-                self.assertEqual(r.sum, 4)
-                self.assertEqual(r.avg, 4)
+                self.assertEqual(1, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(4, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(4, r.sum)
+                self.assertEqual(4, r.avg)
 
     def test_group_by_resource(self):
         f = storage.SampleFilter(
@@ -1425,38 +1413,37 @@ class StatisticsGroupByTest(DBTestBase,
         )
         results = list(self.conn.get_meter_statistics(f,
                                                       groupby=['resource_id']))
-        self.assertEqual(len(results), 3)
+        self.assertEqual(3, len(results))
         groupby_list = [r.groupby for r in results]
         groupby_keys_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.keys())
         groupby_vals_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.values())
-        self.assertEqual(groupby_keys_set, set(['resource_id']))
-        self.assertEqual(groupby_vals_set, set(['resource-1',
-                                                'resource-2',
-                                                'resource-3']))
+        self.assertEqual(set(['resource_id']), groupby_keys_set)
+        self.assertEqual(set(['resource-1', 'resource-2', 'resource-3']),
+                         groupby_vals_set)
         for r in results:
             if r.groupby == {'resource_id': 'resource-1'}:
-                self.assertEqual(r.count, 3)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 2)
-                self.assertEqual(r.max, 2)
-                self.assertEqual(r.sum, 6)
-                self.assertEqual(r.avg, 2)
+                self.assertEqual(3, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(2, r.min)
+                self.assertEqual(2, r.max)
+                self.assertEqual(6, r.sum)
+                self.assertEqual(2, r.avg)
             elif r.groupby == {'resource_id': 'resource-2'}:
-                self.assertEqual(r.count, 3)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 1)
-                self.assertEqual(r.max, 4)
-                self.assertEqual(r.sum, 6)
-                self.assertEqual(r.avg, 2)
+                self.assertEqual(3, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(1, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(6, r.sum)
+                self.assertEqual(2, r.avg)
             elif r.groupby == {'resource_id': 'resource-3'}:
-                self.assertEqual(r.count, 1)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 4)
-                self.assertEqual(r.max, 4)
-                self.assertEqual(r.sum, 4)
-                self.assertEqual(r.avg, 4)
+                self.assertEqual(1, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(4, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(4, r.sum)
+                self.assertEqual(4, r.avg)
 
     def test_group_by_project(self):
         f = storage.SampleFilter(
@@ -1464,69 +1451,68 @@ class StatisticsGroupByTest(DBTestBase,
         )
         results = list(self.conn.get_meter_statistics(f,
                                                       groupby=['project_id']))
-        self.assertEqual(len(results), 2)
+        self.assertEqual(2, len(results))
         groupby_list = [r.groupby for r in results]
         groupby_keys_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.keys())
         groupby_vals_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.values())
-        self.assertEqual(groupby_keys_set, set(['project_id']))
-        self.assertEqual(groupby_vals_set, set(['project-1', 'project-2']))
+        self.assertEqual(set(['project_id']), groupby_keys_set)
+        self.assertEqual(set(['project-1', 'project-2']), groupby_vals_set)
 
         for r in results:
             if r.groupby == {'project_id': 'project-1'}:
-                self.assertEqual(r.count, 5)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 1)
-                self.assertEqual(r.max, 4)
-                self.assertEqual(r.sum, 10)
-                self.assertEqual(r.avg, 2)
+                self.assertEqual(5, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(1, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(10, r.sum)
+                self.assertEqual(2, r.avg)
             elif r.groupby == {'project_id': 'project-2'}:
-                self.assertEqual(r.count, 2)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 2)
-                self.assertEqual(r.max, 4)
-                self.assertEqual(r.sum, 6)
-                self.assertEqual(r.avg, 3)
+                self.assertEqual(2, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(2, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(6, r.sum)
+                self.assertEqual(3, r.avg)
 
     def test_group_by_source(self):
         f = storage.SampleFilter(
             meter='instance',
         )
         results = list(self.conn.get_meter_statistics(f, groupby=['source']))
-        self.assertEqual(len(results), 3)
+        self.assertEqual(3, len(results))
         groupby_list = [r.groupby for r in results]
         groupby_keys_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.keys())
         groupby_vals_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.values())
-        self.assertEqual(groupby_keys_set, set(['source']))
-        self.assertEqual(groupby_vals_set, set(['source-1',
-                                                'source-2',
-                                                'source-3']))
+        self.assertEqual(set(['source']), groupby_keys_set)
+        self.assertEqual(set(['source-1', 'source-2', 'source-3']),
+                         groupby_vals_set)
 
         for r in results:
             if r.groupby == {'source': 'source-1'}:
-                self.assertEqual(r.count, 4)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 1)
-                self.assertEqual(r.max, 4)
-                self.assertEqual(r.sum, 8)
-                self.assertEqual(r.avg, 2)
+                self.assertEqual(4, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(1, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(8, r.sum)
+                self.assertEqual(2, r.avg)
             elif r.groupby == {'source': 'source-2'}:
-                self.assertEqual(r.count, 2)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 2)
-                self.assertEqual(r.max, 2)
-                self.assertEqual(r.sum, 4)
-                self.assertEqual(r.avg, 2)
+                self.assertEqual(2, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(2, r.min)
+                self.assertEqual(2, r.max)
+                self.assertEqual(4, r.sum)
+                self.assertEqual(2, r.avg)
             elif r.groupby == {'source': 'source-3'}:
-                self.assertEqual(r.count, 1)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 4)
-                self.assertEqual(r.max, 4)
-                self.assertEqual(r.sum, 4)
-                self.assertEqual(r.avg, 4)
+                self.assertEqual(1, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(4, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(4, r.sum)
+                self.assertEqual(4, r.avg)
 
     def test_group_by_unknown_field(self):
         f = storage.SampleFilter(
@@ -1555,60 +1541,65 @@ class StatisticsGroupByTest(DBTestBase,
         results = list(self.conn.get_meter_statistics(f,
                                                       groupby=['user_id',
                                                                'resource_id']))
-        self.assertEqual(len(results), 4)
+        self.assertEqual(4, len(results))
         groupby_list = [r.groupby for r in results]
         groupby_keys_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.keys())
         groupby_vals_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.values())
-        self.assertEqual(groupby_keys_set, set(['user_id', 'resource_id']))
-        self.assertEqual(groupby_vals_set, set(['user-1', 'user-2',
-                                                'user-3', 'resource-1',
-                                                'resource-2', 'resource-3']))
+        self.assertEqual(set(['user_id', 'resource_id']), groupby_keys_set)
+        self.assertEqual(set(['user-1', 'user-2', 'user-3', 'resource-1',
+                              'resource-2', 'resource-3']),
+                         groupby_vals_set)
 
         for r in results:
             if r.groupby == {'user_id': 'user-1', 'resource_id': 'resource-1'}:
-                self.assertEqual(r.count, 2)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 2)
-                self.assertEqual(r.max, 2)
-                self.assertEqual(r.sum, 4)
-                self.assertEqual(r.avg, 2)
+                self.assertEqual(2, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(2, r.min)
+                self.assertEqual(2, r.max)
+                self.assertEqual(4, r.sum)
+                self.assertEqual(2, r.avg)
             elif r.groupby == {'user_id': 'user-2',
                                'resource_id': 'resource-1'}:
-                self.assertEqual(r.count, 1)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 2)
-                self.assertEqual(r.max, 2)
-                self.assertEqual(r.sum, 2)
-                self.assertEqual(r.avg, 2)
+                self.assertEqual(1, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(2, r.min)
+                self.assertEqual(2, r.max)
+                self.assertEqual(2, r.sum)
+                self.assertEqual(2, r.avg)
             elif r.groupby == {'user_id': 'user-2',
                                'resource_id': 'resource-2'}:
-                self.assertEqual(r.count, 3)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 1)
-                self.assertEqual(r.max, 4)
-                self.assertEqual(r.sum, 6)
-                self.assertEqual(r.avg, 2)
+                self.assertEqual(3, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(1, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(6, r.sum)
+                self.assertEqual(2, r.avg)
             elif r.groupby == {'user_id': 'user-3',
                                'resource_id': 'resource-3'}:
-                self.assertEqual(r.count, 1)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 4)
-                self.assertEqual(r.max, 4)
-                self.assertEqual(r.sum, 4)
-                self.assertEqual(r.avg, 4)
+                self.assertEqual(1, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(4, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(4, r.sum)
+                self.assertEqual(4, r.avg)
             else:
-                self.assertNotEqual(r.groupby, {'user_id': 'user-1',
-                                                'resource_id': 'resource-2'})
-                self.assertNotEqual(r.groupby, {'user_id': 'user-1',
-                                                'resource_id': 'resource-3'})
-                self.assertNotEqual(r.groupby, {'user_id': 'user-2',
-                                                'resource_id': 'resource-3'})
-                self.assertNotEqual(r.groupby, {'user_id': 'user-3',
-                                                'resource_id': 'resource-1'})
-                self.assertNotEqual(r.groupby, {'user_id': 'user-3',
-                                                'resource_id': 'resource-2'})
+                self.assertNotEqual({'user_id': 'user-1',
+                                     'resource_id': 'resource-2'},
+                                    r.groupby)
+                self.assertNotEqual({'user_id': 'user-1',
+                                     'resource_id': 'resource-3'},
+                                    r.groupby)
+                self.assertNotEqual({'user_id': 'user-2',
+                                     'resource_id': 'resource-3'},
+                                    r.groupby)
+                self.assertNotEqual({'user_id': 'user-3',
+                                     'resource_id': 'resource-1'},
+                                    r.groupby)
+                self.assertNotEqual({'user_id': 'user-3',
+                                     'resource_id': 'resource-2'},
+                                    r.groupby, )
 
     def test_group_by_multiple_metadata(self):
         # TODO(terriyu): test_group_by_multiple_metadata needs to be
@@ -1631,39 +1622,38 @@ class StatisticsGroupByTest(DBTestBase,
         results = list(self.conn.get_meter_statistics(
             f,
             groupby=['resource_id']))
-        self.assertEqual(len(results), 3)
+        self.assertEqual(3, len(results))
         groupby_list = [r.groupby for r in results]
         groupby_keys_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.keys())
         groupby_vals_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.values())
-        self.assertEqual(groupby_keys_set, set(['resource_id']))
-        self.assertEqual(groupby_vals_set, set(['resource-1',
-                                                'resource-2',
-                                                'resource-3']))
+        self.assertEqual(set(['resource_id']), groupby_keys_set)
+        self.assertEqual(set(['resource-1', 'resource-2', 'resource-3']),
+                         groupby_vals_set)
 
         for r in results:
             if r.groupby == {'resource_id': 'resource-1'}:
-                self.assertEqual(r.count, 2)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 2)
-                self.assertEqual(r.max, 2)
-                self.assertEqual(r.sum, 4)
-                self.assertEqual(r.avg, 2)
+                self.assertEqual(2, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(2, r.min)
+                self.assertEqual(2, r.max)
+                self.assertEqual(4, r.sum)
+                self.assertEqual(2, r.avg)
             elif r.groupby == {'resource_id': 'resource-2'}:
-                self.assertEqual(r.count, 2)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 1)
-                self.assertEqual(r.max, 1)
-                self.assertEqual(r.sum, 2)
-                self.assertEqual(r.avg, 1)
+                self.assertEqual(2, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(1, r.min)
+                self.assertEqual(1, r.max)
+                self.assertEqual(2, r.sum)
+                self.assertEqual(1, r.avg)
             elif r.groupby == {'resource_id': 'resource-3'}:
-                self.assertEqual(r.count, 1)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 4)
-                self.assertEqual(r.max, 4)
-                self.assertEqual(r.sum, 4)
-                self.assertEqual(r.avg, 4)
+                self.assertEqual(1, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(4, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(4, r.sum)
+                self.assertEqual(4, r.avg)
 
     def test_group_by_metadata_with_query_filter(self):
         # TODO(terriyu): test_group_by_metadata_with_query_filter needs to be
@@ -1681,44 +1671,46 @@ class StatisticsGroupByTest(DBTestBase,
         results = list(self.conn.get_meter_statistics(
             f,
             groupby=['project_id', 'resource_id']))
-        self.assertEqual(len(results), 3)
+        self.assertEqual(3, len(results))
         groupby_list = [r.groupby for r in results]
         groupby_keys_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.keys())
         groupby_vals_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.values())
-        self.assertEqual(groupby_keys_set, set(['project_id', 'resource_id']))
-        self.assertEqual(groupby_vals_set, set(['project-1', 'project-2',
-                                                'resource-1', 'resource-2']))
+        self.assertEqual(set(['project_id', 'resource_id']), groupby_keys_set)
+        self.assertEqual(set(['project-1', 'project-2',
+                              'resource-1', 'resource-2']),
+                         groupby_vals_set)
 
         for r in results:
             if r.groupby == {'project_id': 'project-1',
                              'resource_id': 'resource-1'}:
-                self.assertEqual(r.count, 1)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 2)
-                self.assertEqual(r.max, 2)
-                self.assertEqual(r.sum, 2)
-                self.assertEqual(r.avg, 2)
+                self.assertEqual(1, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(2, r.min)
+                self.assertEqual(2, r.max)
+                self.assertEqual(2, r.sum)
+                self.assertEqual(2, r.avg)
             elif r.groupby == {'project_id': 'project-1',
                                'resource_id': 'resource-2'}:
-                self.assertEqual(r.count, 2)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 1)
-                self.assertEqual(r.max, 1)
-                self.assertEqual(r.sum, 2)
-                self.assertEqual(r.avg, 1)
+                self.assertEqual(2, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(1, r.min)
+                self.assertEqual(1, r.max)
+                self.assertEqual(2, r.sum)
+                self.assertEqual(1, r.avg)
             elif r.groupby == {'project_id': 'project-2',
                                'resource_id': 'resource-2'}:
-                self.assertEqual(r.count, 1)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 4)
-                self.assertEqual(r.max, 4)
-                self.assertEqual(r.sum, 4)
-                self.assertEqual(r.avg, 4)
+                self.assertEqual(1, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(4, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(4, r.sum)
+                self.assertEqual(4, r.avg)
             else:
-                self.assertNotEqual(r.groupby, {'project_id': 'project-2',
-                                                'resource_id': 'resource-1'})
+                self.assertNotEqual({'project_id': 'project-2',
+                                     'resource_id': 'resource-1'},
+                                    r.groupby)
 
     def test_group_by_metadata_with_query_filter_multiple(self):
         # TODO(terriyu): test_group_by_metadata_with_query_filter_multiple
@@ -1734,92 +1726,92 @@ class StatisticsGroupByTest(DBTestBase,
         results = list(self.conn.get_meter_statistics(f,
                                                       period=7200,
                                                       groupby=['project_id']))
-        self.assertEqual(len(results), 4)
+        self.assertEqual(4, len(results))
         groupby_list = [r.groupby for r in results]
         groupby_keys_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.keys())
         groupby_vals_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.values())
-        self.assertEqual(groupby_keys_set, set(['project_id']))
-        self.assertEqual(groupby_vals_set, set(['project-1', 'project-2']))
+        self.assertEqual(set(['project_id']), groupby_keys_set)
+        self.assertEqual(set(['project-1', 'project-2']), groupby_vals_set)
         period_start_set = set([r.period_start for r in results])
         period_start_valid = set([datetime.datetime(2013, 8, 1, 10, 11),
                                   datetime.datetime(2013, 8, 1, 14, 11),
                                   datetime.datetime(2013, 8, 1, 16, 11)])
-        self.assertEqual(period_start_set, period_start_valid)
+        self.assertEqual(period_start_valid, period_start_set)
 
         for r in results:
             if (r.groupby == {'project_id': 'project-1'} and
                     r.period_start == datetime.datetime(2013, 8, 1, 10, 11)):
-                self.assertEqual(r.count, 3)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 1)
-                self.assertEqual(r.max, 4)
-                self.assertEqual(r.sum, 6)
-                self.assertEqual(r.avg, 2)
-                self.assertEqual(r.duration, 4260)
-                self.assertEqual(r.duration_start,
-                                 datetime.datetime(2013, 8, 1, 10, 11))
-                self.assertEqual(r.duration_end,
-                                 datetime.datetime(2013, 8, 1, 11, 22))
-                self.assertEqual(r.period, 7200)
-                self.assertEqual(r.period_end,
-                                 datetime.datetime(2013, 8, 1, 12, 11))
+                self.assertEqual(3, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(1, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(6, r.sum)
+                self.assertEqual(2, r.avg)
+                self.assertEqual(4260, r.duration)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 10, 11),
+                                 r.duration_start)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 11, 22),
+                                 r.duration_end)
+                self.assertEqual(7200, r.period)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 12, 11),
+                                 r.period_end)
             elif (r.groupby == {'project_id': 'project-1'} and
                     r.period_start == datetime.datetime(2013, 8, 1, 14, 11)):
-                self.assertEqual(r.count, 2)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 2)
-                self.assertEqual(r.max, 2)
-                self.assertEqual(r.sum, 4)
-                self.assertEqual(r.avg, 2)
-                self.assertEqual(r.duration, 4260)
-                self.assertEqual(r.duration_start,
-                                 datetime.datetime(2013, 8, 1, 14, 59))
-                self.assertEqual(r.duration_end,
-                                 datetime.datetime(2013, 8, 1, 16, 10))
-                self.assertEqual(r.period, 7200)
-                self.assertEqual(r.period_end,
-                                 datetime.datetime(2013, 8, 1, 16, 11))
+                self.assertEqual(2, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(2, r.min)
+                self.assertEqual(2, r.max)
+                self.assertEqual(4, r.sum)
+                self.assertEqual(2, r.avg)
+                self.assertEqual(4260, r.duration)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 14, 59),
+                                 r.duration_start)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 16, 10),
+                                 r.duration_end)
+                self.assertEqual(7200, r.period)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 16, 11),
+                                 r.period_end)
             elif (r.groupby == {'project_id': 'project-2'} and
                     r.period_start == datetime.datetime(2013, 8, 1, 14, 11)):
-                self.assertEqual(r.count, 1)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 2)
-                self.assertEqual(r.max, 2)
-                self.assertEqual(r.sum, 2)
-                self.assertEqual(r.avg, 2)
-                self.assertEqual(r.duration, 0)
-                self.assertEqual(r.duration_start,
-                                 datetime.datetime(2013, 8, 1, 15, 37))
-                self.assertEqual(r.duration_end,
-                                 datetime.datetime(2013, 8, 1, 15, 37))
-                self.assertEqual(r.period, 7200)
-                self.assertEqual(r.period_end,
-                                 datetime.datetime(2013, 8, 1, 16, 11))
+                self.assertEqual(1, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(2, r.min)
+                self.assertEqual(2, r.max)
+                self.assertEqual(2, r.sum)
+                self.assertEqual(2, r.avg)
+                self.assertEqual(0, r.duration)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 15, 37),
+                                 r.duration_start)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 15, 37),
+                                 r.duration_end)
+                self.assertEqual(7200, r.period)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 16, 11),
+                                 r.period_end)
             elif (r.groupby == {'project_id': 'project-2'} and
                     r.period_start == datetime.datetime(2013, 8, 1, 16, 11)):
-                self.assertEqual(r.count, 1)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 4)
-                self.assertEqual(r.max, 4)
-                self.assertEqual(r.sum, 4)
-                self.assertEqual(r.avg, 4)
-                self.assertEqual(r.duration, 0)
-                self.assertEqual(r.duration_start,
-                                 datetime.datetime(2013, 8, 1, 17, 28))
-                self.assertEqual(r.duration_end,
-                                 datetime.datetime(2013, 8, 1, 17, 28))
-                self.assertEqual(r.period, 7200)
-                self.assertEqual(r.period_end,
-                                 datetime.datetime(2013, 8, 1, 18, 11))
+                self.assertEqual(1, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(4, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(4, r.sum)
+                self.assertEqual(4, r.avg)
+                self.assertEqual(0, r.duration)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 17, 28),
+                                 r.duration_start)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 17, 28),
+                                 r.duration_end)
+                self.assertEqual(7200, r.period)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 18, 11),
+                                 r.period_end)
             else:
-                self.assertNotEqual([r.groupby, r.period_start],
-                                    [{'project_id': 'project-1'},
-                                     datetime.datetime(2013, 8, 1, 16, 11)])
-                self.assertNotEqual([r.groupby, r.period_start],
-                                    [{'project_id': 'project-2'},
-                                     datetime.datetime(2013, 8, 1, 10, 11)])
+                self.assertNotEqual([{'project_id': 'project-1'},
+                                     datetime.datetime(2013, 8, 1, 16, 11)],
+                                    [r.groupby, r.period_start])
+                self.assertNotEqual([{'project_id': 'project-2'},
+                                     datetime.datetime(2013, 8, 1, 10, 11)],
+                                    [r.groupby, r.period_start])
 
     def test_group_by_metadata_with_period(self):
         # TODO(terriyu): test_group_by_metadata_with_period needs to be
@@ -1836,76 +1828,76 @@ class StatisticsGroupByTest(DBTestBase,
         results = list(self.conn.get_meter_statistics(f,
                                                       period=7200,
                                                       groupby=['project_id']))
-        self.assertEqual(len(results), 3)
+        self.assertEqual(3, len(results))
         groupby_list = [r.groupby for r in results]
         groupby_keys_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.keys())
         groupby_vals_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.values())
-        self.assertEqual(groupby_keys_set, set(['project_id']))
-        self.assertEqual(groupby_vals_set, set(['project-1', 'project-2']))
+        self.assertEqual(set(['project_id']), groupby_keys_set)
+        self.assertEqual(set(['project-1', 'project-2']), groupby_vals_set)
         period_start_set = set([r.period_start for r in results])
         period_start_valid = set([datetime.datetime(2013, 8, 1, 10, 11),
                                   datetime.datetime(2013, 8, 1, 14, 11),
                                   datetime.datetime(2013, 8, 1, 16, 11)])
-        self.assertEqual(period_start_set, period_start_valid)
+        self.assertEqual(period_start_valid, period_start_set)
 
         for r in results:
             if (r.groupby == {'project_id': 'project-1'} and
                     r.period_start == datetime.datetime(2013, 8, 1, 10, 11)):
-                self.assertEqual(r.count, 2)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 1)
-                self.assertEqual(r.max, 1)
-                self.assertEqual(r.sum, 2)
-                self.assertEqual(r.avg, 1)
-                self.assertEqual(r.duration, 1740)
-                self.assertEqual(r.duration_start,
-                                 datetime.datetime(2013, 8, 1, 10, 11))
-                self.assertEqual(r.duration_end,
-                                 datetime.datetime(2013, 8, 1, 10, 40))
-                self.assertEqual(r.period, 7200)
-                self.assertEqual(r.period_end,
-                                 datetime.datetime(2013, 8, 1, 12, 11))
+                self.assertEqual(2, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(1, r.min)
+                self.assertEqual(1, r.max)
+                self.assertEqual(2, r.sum)
+                self.assertEqual(1, r.avg)
+                self.assertEqual(1740, r.duration)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 10, 11),
+                                 r.duration_start)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 10, 40),
+                                 r.duration_end)
+                self.assertEqual(7200, r.period)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 12, 11),
+                                 r.period_end)
             elif (r.groupby == {'project_id': 'project-1'} and
                     r.period_start == datetime.datetime(2013, 8, 1, 14, 11)):
-                self.assertEqual(r.count, 1)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 2)
-                self.assertEqual(r.max, 2)
-                self.assertEqual(r.sum, 2)
-                self.assertEqual(r.avg, 2)
-                self.assertEqual(r.duration, 0)
-                self.assertEqual(r.duration_start,
-                                 datetime.datetime(2013, 8, 1, 14, 59))
-                self.assertEqual(r.duration_end,
-                                 datetime.datetime(2013, 8, 1, 14, 59))
-                self.assertEqual(r.period, 7200)
-                self.assertEqual(r.period_end,
-                                 datetime.datetime(2013, 8, 1, 16, 11))
+                self.assertEqual(1, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(2, r.min)
+                self.assertEqual(2, r.max)
+                self.assertEqual(2, r.sum)
+                self.assertEqual(2, r.avg)
+                self.assertEqual(0, r.duration)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 14, 59),
+                                 r.duration_start)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 14, 59),
+                                 r.duration_end)
+                self.assertEqual(7200, r.period)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 16, 11),
+                                 r.period_end)
             elif (r.groupby == {'project_id': 'project-2'} and
                     r.period_start == datetime.datetime(2013, 8, 1, 16, 11)):
-                self.assertEqual(r.count, 1)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 4)
-                self.assertEqual(r.max, 4)
-                self.assertEqual(r.sum, 4)
-                self.assertEqual(r.avg, 4)
-                self.assertEqual(r.duration, 0)
-                self.assertEqual(r.duration_start,
-                                 datetime.datetime(2013, 8, 1, 17, 28))
-                self.assertEqual(r.duration_end,
-                                 datetime.datetime(2013, 8, 1, 17, 28))
-                self.assertEqual(r.period, 7200)
-                self.assertEqual(r.period_end,
-                                 datetime.datetime(2013, 8, 1, 18, 11))
+                self.assertEqual(1, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(4, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(4, r.sum)
+                self.assertEqual(4, r.avg)
+                self.assertEqual(0, r.duration)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 17, 28),
+                                 r.duration_start)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 17, 28),
+                                 r.duration_end)
+                self.assertEqual(7200, r.period)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 18, 11),
+                                 r.period_end)
             else:
-                self.assertNotEqual([r.groupby, r.period_start],
-                                    [{'project_id': 'project-1'},
-                                     datetime.datetime(2013, 8, 1, 16, 11)])
-                self.assertNotEqual([r.groupby, r.period_start],
-                                    [{'project_id': 'project-2'},
-                                     datetime.datetime(2013, 8, 1, 10, 11)])
+                self.assertNotEqual([{'project_id': 'project-1'},
+                                     datetime.datetime(2013, 8, 1, 16, 11)],
+                                    [r.groupby, r.period_start])
+                self.assertNotEqual([{'project_id': 'project-2'},
+                                     datetime.datetime(2013, 8, 1, 10, 11)],
+                                    [r.groupby, r.period_start])
 
     def test_group_by_metadata_with_query_filter_and_period(self):
         # TODO(terriyu): test_group_by_metadata_with_query_filter_and_period
@@ -1922,7 +1914,7 @@ class StatisticsGroupByTest(DBTestBase,
         results = list(self.conn.get_meter_statistics(f,
                                                       groupby=['project_id']))
 
-        self.assertEqual(results, [])
+        self.assertEqual([], results)
 
     def test_group_by_end_timestamp_before(self):
         f = storage.SampleFilter(
@@ -1932,7 +1924,7 @@ class StatisticsGroupByTest(DBTestBase,
         results = list(self.conn.get_meter_statistics(f,
                                                       groupby=['project_id']))
 
-        self.assertEqual(results, [])
+        self.assertEqual([], results)
 
     def test_group_by_start_timestamp(self):
         f = storage.SampleFilter(
@@ -1941,30 +1933,30 @@ class StatisticsGroupByTest(DBTestBase,
         )
         results = list(self.conn.get_meter_statistics(f,
                                                       groupby=['project_id']))
-        self.assertEqual(len(results), 2)
+        self.assertEqual(2, len(results))
         groupby_list = [r.groupby for r in results]
         groupby_keys_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.keys())
         groupby_vals_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.values())
-        self.assertEqual(groupby_keys_set, set(['project_id']))
-        self.assertEqual(groupby_vals_set, set(['project-1', 'project-2']))
+        self.assertEqual(set(['project_id']), groupby_keys_set)
+        self.assertEqual(set(['project-1', 'project-2']), groupby_vals_set)
 
         for r in results:
             if r.groupby == {'project_id': 'project-1'}:
-                self.assertEqual(r.count, 2)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 2)
-                self.assertEqual(r.max, 2)
-                self.assertEqual(r.sum, 4)
-                self.assertEqual(r.avg, 2)
+                self.assertEqual(2, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(2, r.min)
+                self.assertEqual(2, r.max)
+                self.assertEqual(4, r.sum)
+                self.assertEqual(2, r.avg)
             elif r.groupby == {'project_id': 'project-2'}:
-                self.assertEqual(r.count, 2)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 2)
-                self.assertEqual(r.max, 4)
-                self.assertEqual(r.sum, 6)
-                self.assertEqual(r.avg, 3)
+                self.assertEqual(2, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(2, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(6, r.sum)
+                self.assertEqual(3, r.avg)
 
     def test_group_by_end_timestamp(self):
         f = storage.SampleFilter(
@@ -1973,23 +1965,23 @@ class StatisticsGroupByTest(DBTestBase,
         )
         results = list(self.conn.get_meter_statistics(f,
                                                       groupby=['project_id']))
-        self.assertEqual(len(results), 1)
+        self.assertEqual(1, len(results))
         groupby_list = [r.groupby for r in results]
         groupby_keys_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.keys())
         groupby_vals_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.values())
-        self.assertEqual(groupby_keys_set, set(['project_id']))
-        self.assertEqual(groupby_vals_set, set(['project-1']))
+        self.assertEqual(set(['project_id']), groupby_keys_set)
+        self.assertEqual(set(['project-1']), groupby_vals_set)
 
         for r in results:
             if r.groupby == {'project_id': 'project-1'}:
-                self.assertEqual(r.count, 3)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 1)
-                self.assertEqual(r.max, 4)
-                self.assertEqual(r.sum, 6)
-                self.assertEqual(r.avg, 2)
+                self.assertEqual(3, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(1, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(6, r.sum)
+                self.assertEqual(2, r.avg)
 
     def test_group_by_start_end_timestamp(self):
         f = storage.SampleFilter(
@@ -1999,30 +1991,30 @@ class StatisticsGroupByTest(DBTestBase,
         )
         results = list(self.conn.get_meter_statistics(f,
                                                       groupby=['project_id']))
-        self.assertEqual(len(results), 2)
+        self.assertEqual(2, len(results))
         groupby_list = [r.groupby for r in results]
         groupby_keys_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.keys())
         groupby_vals_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.values())
-        self.assertEqual(groupby_keys_set, set(['project_id']))
-        self.assertEqual(groupby_vals_set, set(['project-1', 'project-2']))
+        self.assertEqual(set(['project_id']), groupby_keys_set)
+        self.assertEqual(set(['project-1', 'project-2']), groupby_vals_set)
 
         for r in results:
             if r.groupby == {'project_id': 'project-1'}:
-                self.assertEqual(r.count, 5)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 1)
-                self.assertEqual(r.max, 4)
-                self.assertEqual(r.sum, 10)
-                self.assertEqual(r.avg, 2)
+                self.assertEqual(5, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(1, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(10, r.sum)
+                self.assertEqual(2, r.avg)
             elif r.groupby == {'project_id': 'project-2'}:
-                self.assertEqual(r.count, 2)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 2)
-                self.assertEqual(r.max, 4)
-                self.assertEqual(r.sum, 6)
-                self.assertEqual(r.avg, 3)
+                self.assertEqual(2, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(2, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(6, r.sum)
+                self.assertEqual(3, r.avg)
 
     def test_group_by_start_end_timestamp_with_query_filter(self):
         f = storage.SampleFilter(
@@ -2038,24 +2030,24 @@ class StatisticsGroupByTest(DBTestBase,
                                for x in sub_dict.keys())
         groupby_vals_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.values())
-        self.assertEqual(groupby_keys_set, set(['resource_id']))
-        self.assertEqual(groupby_vals_set, set(['resource-1', 'resource-3']))
+        self.assertEqual(set(['resource_id']), groupby_keys_set)
+        self.assertEqual(set(['resource-1', 'resource-3']), groupby_vals_set)
 
         for r in results:
             if r.groupby == {'resource_id': 'resource-1'}:
-                self.assertEqual(r.count, 2)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 2)
-                self.assertEqual(r.max, 2)
-                self.assertEqual(r.sum, 4)
-                self.assertEqual(r.avg, 2)
+                self.assertEqual(2, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(2, r.min)
+                self.assertEqual(2, r.max)
+                self.assertEqual(4, r.sum)
+                self.assertEqual(2, r.avg)
             elif r.groupby == {'resource_id': 'resource-3'}:
-                self.assertEqual(r.count, 1)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 4)
-                self.assertEqual(r.max, 4)
-                self.assertEqual(r.sum, 4)
-                self.assertEqual(r.avg, 4)
+                self.assertEqual(1, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(4, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(4, r.sum)
+                self.assertEqual(4, r.avg)
 
     def test_group_by_start_end_timestamp_with_period(self):
         f = storage.SampleFilter(
@@ -2066,79 +2058,79 @@ class StatisticsGroupByTest(DBTestBase,
         results = list(self.conn.get_meter_statistics(f,
                                                       period=3600,
                                                       groupby=['project_id']))
-        self.assertEqual(len(results), 3)
+        self.assertEqual(3, len(results))
         groupby_list = [r.groupby for r in results]
         groupby_keys_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.keys())
         groupby_vals_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.values())
-        self.assertEqual(groupby_keys_set, set(['project_id']))
-        self.assertEqual(groupby_vals_set, set(['project-1', 'project-2']))
+        self.assertEqual(set(['project_id']), groupby_keys_set)
+        self.assertEqual(set(['project-1', 'project-2']), groupby_vals_set)
         period_start_set = set([r.period_start for r in results])
         period_start_valid = set([datetime.datetime(2013, 8, 1, 14, 0),
                                   datetime.datetime(2013, 8, 1, 15, 0),
                                   datetime.datetime(2013, 8, 1, 16, 0)])
-        self.assertEqual(period_start_set, period_start_valid)
+        self.assertEqual(period_start_valid, period_start_set)
 
         for r in results:
             if (r.groupby == {'project_id': 'project-1'} and
                     r.period_start == datetime.datetime(2013, 8, 1, 14, 0)):
-                self.assertEqual(r.count, 1)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 2)
-                self.assertEqual(r.max, 2)
-                self.assertEqual(r.sum, 2)
-                self.assertEqual(r.avg, 2)
-                self.assertEqual(r.duration, 0)
-                self.assertEqual(r.duration_start,
-                                 datetime.datetime(2013, 8, 1, 14, 59))
-                self.assertEqual(r.duration_end,
-                                 datetime.datetime(2013, 8, 1, 14, 59))
-                self.assertEqual(r.period, 3600)
-                self.assertEqual(r.period_end,
-                                 datetime.datetime(2013, 8, 1, 15, 0))
+                self.assertEqual(1, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(2, r.min)
+                self.assertEqual(2, r.max)
+                self.assertEqual(2, r.sum)
+                self.assertEqual(2, r.avg)
+                self.assertEqual(0, r.duration)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 14, 59),
+                                 r.duration_start)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 14, 59),
+                                 r.duration_end)
+                self.assertEqual(3600, r.period)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 15, 0),
+                                 r.period_end)
             elif (r.groupby == {'project_id': 'project-1'} and
                     r.period_start == datetime.datetime(2013, 8, 1, 16, 0)):
-                self.assertEqual(r.count, 1)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 2)
-                self.assertEqual(r.max, 2)
-                self.assertEqual(r.sum, 2)
-                self.assertEqual(r.avg, 2)
-                self.assertEqual(r.duration, 0)
-                self.assertEqual(r.duration_start,
-                                 datetime.datetime(2013, 8, 1, 16, 10))
-                self.assertEqual(r.duration_end,
-                                 datetime.datetime(2013, 8, 1, 16, 10))
-                self.assertEqual(r.period, 3600)
-                self.assertEqual(r.period_end,
-                                 datetime.datetime(2013, 8, 1, 17, 0))
+                self.assertEqual(1, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(2, r.min)
+                self.assertEqual(2, r.max)
+                self.assertEqual(2, r.sum)
+                self.assertEqual(2, r.avg)
+                self.assertEqual(0, r.duration)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 16, 10),
+                                 r.duration_start)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 16, 10),
+                                 r.duration_end)
+                self.assertEqual(3600, r.period)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 17, 0),
+                                 r.period_end)
             elif (r.groupby == {'project_id': 'project-2'} and
                     r.period_start == datetime.datetime(2013, 8, 1, 15, 0)):
-                self.assertEqual(r.count, 1)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 2)
-                self.assertEqual(r.max, 2)
-                self.assertEqual(r.sum, 2)
-                self.assertEqual(r.avg, 2)
-                self.assertEqual(r.duration, 0)
-                self.assertEqual(r.duration_start,
-                                 datetime.datetime(2013, 8, 1, 15, 37))
-                self.assertEqual(r.duration_end,
-                                 datetime.datetime(2013, 8, 1, 15, 37))
-                self.assertEqual(r.period, 3600)
-                self.assertEqual(r.period_end,
-                                 datetime.datetime(2013, 8, 1, 16, 0))
+                self.assertEqual(1, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(2, r.min)
+                self.assertEqual(2, r.max)
+                self.assertEqual(2, r.sum)
+                self.assertEqual(2, r.avg)
+                self.assertEqual(0, r.duration)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 15, 37),
+                                 r.duration_start)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 15, 37),
+                                 r.duration_end)
+                self.assertEqual(3600, r.period)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 16, 0),
+                                 r.period_end)
             else:
-                self.assertNotEqual([r.groupby, r.period_start],
-                                    [{'project_id': 'project-1'},
-                                     datetime.datetime(2013, 8, 1, 15, 0)])
-                self.assertNotEqual([r.groupby, r.period_start],
-                                    [{'project_id': 'project-2'},
-                                     datetime.datetime(2013, 8, 1, 14, 0)])
-                self.assertNotEqual([r.groupby, r.period_start],
-                                    [{'project_id': 'project-2'},
-                                     datetime.datetime(2013, 8, 1, 16, 0)])
+                self.assertNotEqual([{'project_id': 'project-1'},
+                                     datetime.datetime(2013, 8, 1, 15, 0)],
+                                    [r.groupby, r.period_start])
+                self.assertNotEqual([{'project_id': 'project-2'},
+                                     datetime.datetime(2013, 8, 1, 14, 0)],
+                                    [r.groupby, r.period_start])
+                self.assertNotEqual([{'project_id': 'project-2'},
+                                     datetime.datetime(2013, 8, 1, 16, 0)],
+                                    [r.groupby, r.period_start])
 
     def test_group_by_start_end_timestamp_with_query_filter_and_period(self):
         f = storage.SampleFilter(
@@ -2150,79 +2142,79 @@ class StatisticsGroupByTest(DBTestBase,
         results = list(self.conn.get_meter_statistics(f,
                                                       period=7200,
                                                       groupby=['project_id']))
-        self.assertEqual(len(results), 3)
+        self.assertEqual(3, len(results))
         groupby_list = [r.groupby for r in results]
         groupby_keys_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.keys())
         groupby_vals_set = set(x for sub_dict in groupby_list
                                for x in sub_dict.values())
-        self.assertEqual(groupby_keys_set, set(['project_id']))
-        self.assertEqual(groupby_vals_set, set(['project-1', 'project-2']))
+        self.assertEqual(set(['project_id']), groupby_keys_set)
+        self.assertEqual(set(['project-1', 'project-2']), groupby_vals_set)
         period_start_set = set([r.period_start for r in results])
         period_start_valid = set([datetime.datetime(2013, 8, 1, 10, 0),
                                   datetime.datetime(2013, 8, 1, 14, 0),
                                   datetime.datetime(2013, 8, 1, 16, 0)])
-        self.assertEqual(period_start_set, period_start_valid)
+        self.assertEqual(period_start_valid, period_start_set)
 
         for r in results:
             if (r.groupby == {'project_id': 'project-1'} and
                     r.period_start == datetime.datetime(2013, 8, 1, 10, 0)):
-                self.assertEqual(r.count, 2)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 1)
-                self.assertEqual(r.max, 1)
-                self.assertEqual(r.sum, 2)
-                self.assertEqual(r.avg, 1)
-                self.assertEqual(r.duration, 1740)
-                self.assertEqual(r.duration_start,
-                                 datetime.datetime(2013, 8, 1, 10, 11))
-                self.assertEqual(r.duration_end,
-                                 datetime.datetime(2013, 8, 1, 10, 40))
-                self.assertEqual(r.period, 7200)
-                self.assertEqual(r.period_end,
-                                 datetime.datetime(2013, 8, 1, 12, 0))
+                self.assertEqual(2, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(1, r.min)
+                self.assertEqual(1, r.max)
+                self.assertEqual(2, r.sum)
+                self.assertEqual(1, r.avg)
+                self.assertEqual(1740, r.duration)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 10, 11),
+                                 r.duration_start)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 10, 40),
+                                 r.duration_end)
+                self.assertEqual(7200, r.period)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 12, 0),
+                                 r.period_end)
             elif (r.groupby == {'project_id': 'project-1'} and
                     r.period_start == datetime.datetime(2013, 8, 1, 14, 0)):
-                self.assertEqual(r.count, 1)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 2)
-                self.assertEqual(r.max, 2)
-                self.assertEqual(r.sum, 2)
-                self.assertEqual(r.avg, 2)
-                self.assertEqual(r.duration, 0)
-                self.assertEqual(r.duration_start,
-                                 datetime.datetime(2013, 8, 1, 14, 59))
-                self.assertEqual(r.duration_end,
-                                 datetime.datetime(2013, 8, 1, 14, 59))
-                self.assertEqual(r.period, 7200)
-                self.assertEqual(r.period_end,
-                                 datetime.datetime(2013, 8, 1, 16, 0))
+                self.assertEqual(1, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(2, r.min)
+                self.assertEqual(2, r.max)
+                self.assertEqual(2, r.sum)
+                self.assertEqual(2, r.avg)
+                self.assertEqual(0, r.duration)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 14, 59),
+                                 r.duration_start)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 14, 59),
+                                 r.duration_end)
+                self.assertEqual(7200, r.period)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 16, 0),
+                                 r.period_end)
             elif (r.groupby == {'project_id': 'project-2'} and
                     r.period_start == datetime.datetime(2013, 8, 1, 16, 0)):
-                self.assertEqual(r.count, 1)
-                self.assertEqual(r.unit, 's')
-                self.assertEqual(r.min, 4)
-                self.assertEqual(r.max, 4)
-                self.assertEqual(r.sum, 4)
-                self.assertEqual(r.avg, 4)
-                self.assertEqual(r.duration, 0)
-                self.assertEqual(r.duration_start,
-                                 datetime.datetime(2013, 8, 1, 17, 28))
-                self.assertEqual(r.duration_end,
-                                 datetime.datetime(2013, 8, 1, 17, 28))
-                self.assertEqual(r.period, 7200)
-                self.assertEqual(r.period_end,
-                                 datetime.datetime(2013, 8, 1, 18, 0))
+                self.assertEqual(1, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(4, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(4, r.sum)
+                self.assertEqual(4, r.avg)
+                self.assertEqual(0, r.duration)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 17, 28),
+                                 r.duration_start)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 17, 28),
+                                 r.duration_end)
+                self.assertEqual(7200, r.period)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 18, 0),
+                                 r.period_end)
             else:
-                self.assertNotEqual([r.groupby, r.period_start],
-                                    [{'project_id': 'project-1'},
-                                     datetime.datetime(2013, 8, 1, 16, 0)])
-                self.assertNotEqual([r.groupby, r.period_start],
-                                    [{'project_id': 'project-2'},
-                                     datetime.datetime(2013, 8, 1, 10, 0)])
-                self.assertNotEqual([r.groupby, r.period_start],
-                                    [{'project_id': 'project-2'},
-                                     datetime.datetime(2013, 8, 1, 14, 0)])
+                self.assertNotEqual([{'project_id': 'project-1'},
+                                     datetime.datetime(2013, 8, 1, 16, 0)],
+                                    [r.groupby, r.period_start])
+                self.assertNotEqual([{'project_id': 'project-2'},
+                                     datetime.datetime(2013, 8, 1, 10, 0)],
+                                    [r.groupby, r.period_start])
+                self.assertNotEqual([{'project_id': 'project-2'},
+                                     datetime.datetime(2013, 8, 1, 14, 0)],
+                                    [r.groupby, r.period_start])
 
 
 class CounterDataTypeTest(DBTestBase,
@@ -2288,20 +2280,20 @@ class CounterDataTypeTest(DBTestBase,
             meter='dummyBigCounter',
         )
         results = list(self.conn.get_samples(f))
-        self.assertEqual(results[0].counter_volume, 3372036854775807)
+        self.assertEqual(3372036854775807, results[0].counter_volume)
 
         f = storage.SampleFilter(
             meter='dummySmallCounter',
         )
         results = list(self.conn.get_samples(f))
-        self.assertEqual(results[0].counter_volume, -3372036854775807)
+        self.assertEqual(-3372036854775807, results[0].counter_volume)
 
     def test_storage_can_handle_float_values(self):
         f = storage.SampleFilter(
             meter='floatCounter',
         )
         results = list(self.conn.get_samples(f))
-        self.assertEqual(results[0].counter_volume, 1938495037.53697)
+        self.assertEqual(1938495037.53697, results[0].counter_volume)
 
 
 class AlarmTestBase(DBTestBase):
@@ -2409,7 +2401,7 @@ class AlarmTest(AlarmTestBase,
     def test_list(self):
         self.add_some_alarms()
         alarms = list(self.alarm_conn.get_alarms())
-        self.assertEqual(len(alarms), 3)
+        self.assertEqual(3, len(alarms))
 
     def test_list_ordered_by_timestamp(self):
         self.add_some_alarms()
@@ -2424,12 +2416,12 @@ class AlarmTest(AlarmTestBase,
     def test_list_enabled(self):
         self.add_some_alarms()
         alarms = list(self.alarm_conn.get_alarms(enabled=True))
-        self.assertEqual(len(alarms), 2)
+        self.assertEqual(2, len(alarms))
 
     def test_list_disabled(self):
         self.add_some_alarms()
         alarms = list(self.alarm_conn.get_alarms(enabled=False))
-        self.assertEqual(len(alarms), 1)
+        self.assertEqual(1, len(alarms))
 
     def test_list_by_type(self):
         self.add_some_alarms()
@@ -2441,11 +2433,10 @@ class AlarmTest(AlarmTestBase,
     def test_add(self):
         self.add_some_alarms()
         alarms = list(self.alarm_conn.get_alarms())
-        self.assertEqual(len(alarms), 3)
+        self.assertEqual(3, len(alarms))
 
         meter_names = sorted([a.rule['meter_name'] for a in alarms])
-        self.assertEqual(meter_names,
-                         ['test.five', 'test.fourty', 'test.one'])
+        self.assertEqual(['test.five', 'test.fourty', 'test.one'], meter_names)
 
     def test_update(self):
         self.add_some_alarms()
@@ -2459,11 +2450,11 @@ class AlarmTest(AlarmTestBase,
         orange.rule['query'] = query
         orange.rule['meter_name'] = 'new_meter_name'
         updated = self.alarm_conn.update_alarm(orange)
-        self.assertEqual(updated.enabled, False)
-        self.assertEqual(updated.state,
-                         alarm_models.Alarm.ALARM_INSUFFICIENT_DATA)
-        self.assertEqual(updated.rule['query'], query)
-        self.assertEqual(updated.rule['meter_name'], 'new_meter_name')
+        self.assertEqual(False, updated.enabled)
+        self.assertEqual(alarm_models.Alarm.ALARM_INSUFFICIENT_DATA,
+                         updated.state)
+        self.assertEqual(query, updated.rule['query'])
+        self.assertEqual('new_meter_name', updated.rule['meter_name'])
 
     def test_update_llu(self):
         llu = alarm_models.Alarm(alarm_id='llu',
@@ -2495,14 +2486,14 @@ class AlarmTest(AlarmTestBase,
         self.alarm_conn.update_alarm(updated)
 
         all = list(self.alarm_conn.get_alarms())
-        self.assertEqual(len(all), 1)
+        self.assertEqual(1, len(all))
 
     def test_delete(self):
         self.add_some_alarms()
         victim = list(self.alarm_conn.get_alarms(name='orange-alert'))[0]
         self.alarm_conn.delete_alarm(victim.alarm_id)
         survivors = list(self.alarm_conn.get_alarms())
-        self.assertEqual(len(survivors), 2)
+        self.assertEqual(2, len(survivors))
         for s in survivors:
             self.assertNotEqual(victim.name, s.name)
 
@@ -2514,26 +2505,26 @@ class AlarmTestPagination(AlarmTestBase,
         self.add_some_alarms()
         pagination = base.Pagination(limit=2)
         alarms = list(self.alarm_conn.get_alarms(pagination=pagination))
-        self.assertEqual(len(alarms), 2)
+        self.assertEqual(2, len(alarms))
 
         pagination = base.Pagination(limit=1)
         alarms = list(self.alarm_conn.get_alarms(pagination=pagination))
-        self.assertEqual(len(alarms), 1)
+        self.assertEqual(1, len(alarms))
 
     def test_get_alarm_all_marker(self):
         self.add_some_alarms()
 
         pagination = base.Pagination(marker_value='orange-alert')
         alarms = list(self.alarm_conn.get_alarms(pagination=pagination))
-        self.assertEqual(len(alarms), 0)
+        self.assertEqual(0, len(alarms))
 
         pagination = base.Pagination(marker_value='red-alert')
         alarms = list(self.alarm_conn.get_alarms(pagination=pagination))
-        self.assertEqual(len(alarms), 1)
+        self.assertEqual(1, len(alarms))
 
         pagination = base.Pagination(marker_value='yellow-alert')
         alarms = list(self.alarm_conn.get_alarms(pagination=pagination))
-        self.assertEqual(len(alarms), 2)
+        self.assertEqual(2, len(alarms))
 
     def test_get_alarm_paginate(self):
         self.add_some_alarms()
@@ -2585,7 +2576,7 @@ class ComplexAlarmQueryTest(AlarmTestBase,
 
         self.assertEqual(1, len(result))
         for a in result:
-            self.assertEqual(a.alarm_id, "0r4ng3")
+            self.assertEqual("0r4ng3", a.alarm_id)
 
     def test_filter_and_orderby(self):
         self.add_some_alarms()
@@ -2802,7 +2793,7 @@ class GetEventTest(EventTestBase):
         self.assertEqual(6, len(events))
         start_time = None
         for i, type in enumerate(['Foo', 'Bar', 'Zoo']):
-            self.assertEqual(events[i].event_type, type)
+            self.assertEqual(type, events[i].event_type)
             self.assertEqual(4, len(events[i].traits))
             # Ensure sorted results ...
             if start_time is not None:
@@ -2829,8 +2820,8 @@ class GetEventTest(EventTestBase):
         event_filter = storage.EventFilter(self.start, self.end, "Bar")
         events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(2, len(events))
-        self.assertEqual(events[0].event_type, "Bar")
-        self.assertEqual(events[1].event_type, "Bar")
+        self.assertEqual("Bar", events[0].event_type)
+        self.assertEqual("Bar", events[1].event_type)
         self.assertEqual(4, len(events[0].traits))
         self.assertEqual(4, len(events[1].traits))
         for event in events:
@@ -2851,7 +2842,7 @@ class GetEventTest(EventTestBase):
                                            traits_filter=trait_filters)
         events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(1, len(events))
-        self.assertEqual(events[0].event_type, "Bar")
+        self.assertEqual("Bar", events[0].event_type)
         self.assertEqual(4, len(events[0].traits))
 
     def test_get_event_trait_filter_op_string(self):
@@ -3088,8 +3079,8 @@ class GetEventTest(EventTestBase):
         events = [event for event in self.event_conn.get_events(event_filter)]
         self.assertEqual(0, len(bad_events))
         self.assertEqual(1, len(events))
-        self.assertEqual(events[0].message_id, "id_notraits")
-        self.assertEqual(events[0].event_type, "NoTraits")
+        self.assertEqual("id_notraits", events[0].message_id)
+        self.assertEqual("NoTraits", events[0].event_type)
         self.assertEqual(0, len(events[0].traits))
 
     def test_simple_get_no_filters(self):

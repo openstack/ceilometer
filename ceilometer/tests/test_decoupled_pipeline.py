@@ -146,19 +146,19 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
         with pipeline_manager.publisher(None) as p:
             p([self.test_counter])
 
-        self.assertEqual(len(pipeline_manager.pipelines), 2)
-        self.assertEqual(str(pipeline_manager.pipelines[0]),
-                         'test_source:test_sink')
-        self.assertEqual(str(pipeline_manager.pipelines[1]),
-                         'test_source:second_sink')
+        self.assertEqual(2, len(pipeline_manager.pipelines))
+        self.assertEqual('test_source:test_sink',
+                         str(pipeline_manager.pipelines[0]))
+        self.assertEqual('test_source:second_sink',
+                         str(pipeline_manager.pipelines[1]))
         test_publisher = pipeline_manager.pipelines[0].publishers[0]
         new_publisher = pipeline_manager.pipelines[1].publishers[0]
         for publisher, sfx in [(test_publisher, '_update'),
                                (new_publisher, '_new')]:
-            self.assertEqual(len(publisher.samples), 2)
-            self.assertEqual(publisher.calls, 2)
-            self.assertEqual(getattr(publisher.samples[0], "name"), 'a' + sfx)
-            self.assertEqual(getattr(publisher.samples[1], "name"), 'b' + sfx)
+            self.assertEqual(2, len(publisher.samples))
+            self.assertEqual(2, publisher.calls)
+            self.assertEqual('a' + sfx, getattr(publisher.samples[0], "name"))
+            self.assertEqual('b' + sfx, getattr(publisher.samples[1], "name"))
 
     def test_multiple_sources_with_single_sink(self):
         self.pipeline_cfg['sources'].append({
@@ -189,23 +189,23 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
         with pipeline_manager.publisher(None) as p:
             p([self.test_counter])
 
-        self.assertEqual(len(pipeline_manager.pipelines), 2)
-        self.assertEqual(str(pipeline_manager.pipelines[0]),
-                         'test_source:test_sink')
-        self.assertEqual(str(pipeline_manager.pipelines[1]),
-                         'second_source:test_sink')
+        self.assertEqual(2, len(pipeline_manager.pipelines))
+        self.assertEqual('test_source:test_sink',
+                         str(pipeline_manager.pipelines[0]))
+        self.assertEqual('second_source:test_sink',
+                         str(pipeline_manager.pipelines[1]))
         test_publisher = pipeline_manager.pipelines[0].publishers[0]
         another_publisher = pipeline_manager.pipelines[1].publishers[0]
         for publisher in [test_publisher, another_publisher]:
-            self.assertEqual(len(publisher.samples), 2)
-            self.assertEqual(publisher.calls, 2)
-            self.assertEqual(getattr(publisher.samples[0], "name"), 'a_update')
-            self.assertEqual(getattr(publisher.samples[1], "name"), 'b_update')
+            self.assertEqual(2, len(publisher.samples))
+            self.assertEqual(2, publisher.calls)
+            self.assertEqual('a_update', getattr(publisher.samples[0], "name"))
+            self.assertEqual('b_update', getattr(publisher.samples[1], "name"))
 
         transformed_samples = self.TransformerClass.samples
-        self.assertEqual(len(transformed_samples), 2)
-        self.assertEqual([getattr(s, 'name') for s in transformed_samples],
-                         ['a', 'b'])
+        self.assertEqual(2, len(transformed_samples))
+        self.assertEqual(['a', 'b'],
+                         [getattr(s, 'name') for s in transformed_samples])
 
     def _do_test_rate_of_change_in_boilerplate_pipeline_cfg(self, index,
                                                             meters, units):

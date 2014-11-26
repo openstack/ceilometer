@@ -58,7 +58,7 @@ class ConnectionRetryTest(base.BaseTestCase):
                 storage.get_connection_from_config(self.CONF)
             except RuntimeError as err:
                 self.assertIn('no-such-engine', six.text_type(err))
-                self.assertEqual(retry_sleep.call_count, 9)
+                self.assertEqual(9, retry_sleep.call_count)
                 retry_sleep.assert_called_with(10.0)
 
 

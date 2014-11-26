@@ -159,14 +159,14 @@ class TestOpenDayLightDriverSpecial(_Base):
                                     self.fake_odl_url,
                                     self.fake_params,
                                     cache)
-        self.assertEqual(self.get_flow_statistics.call_count, 1)
+        self.assertEqual(1, self.get_flow_statistics.call_count)
 
         cache = {}
         self.driver.get_sample_data('switch',
                                     self.fake_odl_url,
                                     self.fake_params,
                                     cache)
-        self.assertEqual(self.get_flow_statistics.call_count, 2)
+        self.assertEqual(2, self.get_flow_statistics.call_count)
 
     def test_multi_container(self):
         cache = {}
@@ -174,7 +174,7 @@ class TestOpenDayLightDriverSpecial(_Base):
                                     self.fake_odl_url,
                                     self.fake_params_multi_container,
                                     cache)
-        self.assertEqual(self.get_flow_statistics.call_count, 2)
+        self.assertEqual(2, self.get_flow_statistics.call_count)
 
         self.assertIn('network.statistics.opendaylight', cache)
 

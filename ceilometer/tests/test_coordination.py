@@ -162,17 +162,17 @@ class TestPartitioning(base.BaseTestCase):
                   dict(agent_id='agent2', group_id='group')]
         self._usage_simulation(*agents)
 
-        self.assertEqual(sorted(self.shared_storage.keys()), ['group'])
-        self.assertEqual(sorted(self.shared_storage['group'].keys()),
-                         ['agent1', 'agent2'])
+        self.assertEqual(['group'], sorted(self.shared_storage.keys()))
+        self.assertEqual(['agent1', 'agent2'],
+                         sorted(self.shared_storage['group'].keys()))
 
     def test_multiple_groups(self):
         agents = [dict(agent_id='agent1', group_id='group1'),
                   dict(agent_id='agent2', group_id='group2')]
         self._usage_simulation(*agents)
 
-        self.assertEqual(sorted(self.shared_storage.keys()), ['group1',
-                                                              'group2'])
+        self.assertEqual(['group1', 'group2'],
+                         sorted(self.shared_storage.keys()))
 
     def test_partitioning(self):
         all_resources = ['resource_%s' % i for i in range(1000)]

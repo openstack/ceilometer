@@ -94,7 +94,7 @@ class TestNotification(base.BaseTestCase):
 
     def _verify_common_counter(self, c, name, volume):
         self.assertIsNotNone(c)
-        self.assertEqual(c.name, name)
+        self.assertEqual(name, c.name)
         self.assertEqual(fake_uuid('c'), c.resource_id)
         self.assertEqual(NOW, c.timestamp)
         self.assertEqual(volume, c.volume)
