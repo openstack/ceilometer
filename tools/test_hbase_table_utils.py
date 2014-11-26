@@ -17,6 +17,7 @@ from oslo.config import cfg
 
 from ceilometer import storage
 
+
 def main(argv):
     cfg.CONF([], project='ceilometer')
     if os.getenv("CEILOMETER_TEST_HBASE_URL"):

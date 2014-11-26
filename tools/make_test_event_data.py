@@ -56,7 +56,7 @@ def make_test_data(conn, start, end, interval, event_types):
         data = []
         for i in range(event_types):
             traits = [models.Trait('id1_%d' % i, 1, str(uuid.uuid4())),
-                      models.Trait('id2_%d' % i, 2, random.randint(1,10)),
+                      models.Trait('id2_%d' % i, 2, random.randint(1, 10)),
                       models.Trait('id3_%d' % i, 3, random.random()),
                       models.Trait('id4_%d' % i, 4, timestamp)]
             data.append(models.Event(str(uuid.uuid4()),
@@ -121,8 +121,7 @@ def main():
                    start=start,
                    end=end,
                    interval=args.interval,
-                   event_types=args.event_types
-    )
+                   event_types=args.event_types)
 
 
 if __name__ == '__main__':
