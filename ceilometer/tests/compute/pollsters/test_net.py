@@ -22,7 +22,21 @@ import mock
 from ceilometer.compute import manager
 from ceilometer.compute.pollsters import net
 from ceilometer.compute.virt import inspector as virt_inspector
+from ceilometer import sample
 from ceilometer.tests.compute.pollsters import base
+
+
+class FauxInstance(object):
+
+    def __init__(self, **kwargs):
+        for name, value in kwargs.items():
+            setattr(self, name, value)
+
+    def __getitem__(self, key):
+        return getattr(self, key)
+
+    def get(self, key, default):
+        return getattr(self, key, default)
 
 
 class TestNetPollster(base.TestPollsterBase):
@@ -66,6 +80,37 @@ class TestNetPollster(base.TestPollsterBase):
             (self.vnic2, stats2),
         ]
         self.inspector.inspect_vnics = mock.Mock(return_value=vnics)
+
+        self.INSTANCE_PROPERTIES = {'name': 'display name',
+                                    'OS-EXT-SRV-ATTR:instance_name':
+                                    'instance-000001',
+                                    'OS-EXT-AZ:availability_zone': 'foo-zone',
+                                    'reservation_id': 'reservation id',
+                                    'id': 'instance id',
+                                    'user_id': 'user id',
+                                    'tenant_id': 'tenant id',
+                                    'architecture': 'x86_64',
+                                    'kernel_id': 'kernel id',
+                                    'os_type': 'linux',
+                                    'ramdisk_id': 'ramdisk id',
+                                    'status': 'active',
+                                    'ephemeral_gb': 0,
+                                    'root_gb': 20,
+                                    'disk_gb': 20,
+                                    'image': {'id': 1,
+                                              'links': [{"rel": "bookmark",
+                                                         'href': 2}]},
+                                    'hostId': '1234-5678',
+                                    'flavor': {'id': 1,
+                                               'disk': 20,
+                                               'ram': 512,
+                                               'vcpus': 2,
+                                               'ephemeral': 0},
+                                    'metadata': {'metering.autoscale.group':
+                                                 'X' * 512,
+                                                 'metering.ephemeral_gb': 42}}
+
+        self.faux_instance = FauxInstance(**self.INSTANCE_PROPERTIES)
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def _check_get_samples(self, factory, expected):
@@ -131,6 +176,23 @@ class TestNetPollster(base.TestPollsterBase):
               "%s-%s" % (instance_name_id, self.vnic2.name)),
              ],
         )
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def test_metadata(self):
+        factory = net.OutgoingBytesPollster
+        pollster = factory()
+        sm = pollster.make_vnic_sample(self.faux_instance,
+                                       name='network.outgoing.bytes',
+                                       type=sample.TYPE_CUMULATIVE,
+                                       unit='B',
+                                       volume=100,
+                                       vnic_data=self.vnic0)
+
+        user_metadata = sm.resource_metadata['user_metadata']
+        expected = self.INSTANCE_PROPERTIES[
+            'metadata']['metering.autoscale.group'][:256]
+        self.assertEqual(expected, user_metadata['autoscale_group'])
+        self.assertEqual(2, len(user_metadata))
 
 
 class TestNetPollsterCache(base.TestPollsterBase):
