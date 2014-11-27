@@ -150,7 +150,7 @@ class CeilometerMiddleware(object):
         headers = {}
         for header in env:
             if header.startswith('HTTP_') and env[header]:
-                key = header.strip('HTTP_')
+                key = header[5:]
                 if isinstance(env[header], six.text_type):
                     headers[key] = env[header].encode('utf-8')
                 else:
