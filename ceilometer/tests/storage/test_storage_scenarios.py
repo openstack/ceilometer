@@ -1335,31 +1335,31 @@ class StatisticsGroupByTest(DBTestBase,
             {'volume': 2, 'user': 'user-1', 'project': 'project-1',
              'resource': 'resource-1', 'timestamp': (2013, 8, 1, 16, 10),
              'metadata_flavor': 'm1.tiny', 'metadata_event': 'event-1',
-             'source': 'source-2'},
+             'source': 'source-2', 'metadata_instance_type': '84'},
             {'volume': 2, 'user': 'user-1', 'project': 'project-2',
              'resource': 'resource-1', 'timestamp': (2013, 8, 1, 15, 37),
              'metadata_flavor': 'm1.large', 'metadata_event': 'event-1',
-             'source': 'source-2'},
+             'source': 'source-2', 'metadata_instance_type': '83'},
             {'volume': 1, 'user': 'user-2', 'project': 'project-1',
              'resource': 'resource-2', 'timestamp': (2013, 8, 1, 10, 11),
              'metadata_flavor': 'm1.tiny', 'metadata_event': 'event-2',
-             'source': 'source-1'},
+             'source': 'source-1', 'metadata_instance_type': '82'},
             {'volume': 1, 'user': 'user-2', 'project': 'project-1',
              'resource': 'resource-2', 'timestamp': (2013, 8, 1, 10, 40),
              'metadata_flavor': 'm1.large', 'metadata_event': 'event-2',
-             'source': 'source-1'},
+             'source': 'source-1', 'metadata_instance_type': '82'},
             {'volume': 2, 'user': 'user-2', 'project': 'project-1',
              'resource': 'resource-1', 'timestamp': (2013, 8, 1, 14, 59),
              'metadata_flavor': 'm1.large', 'metadata_event': 'event-2',
-             'source': 'source-1'},
+             'source': 'source-1', 'metadata_instance_type': '84'},
             {'volume': 4, 'user': 'user-2', 'project': 'project-2',
              'resource': 'resource-2', 'timestamp': (2013, 8, 1, 17, 28),
              'metadata_flavor': 'm1.large', 'metadata_event': 'event-2',
-             'source': 'source-1'},
+             'source': 'source-1', 'metadata_instance_type': '82'},
             {'volume': 4, 'user': 'user-3', 'project': 'project-1',
              'resource': 'resource-3', 'timestamp': (2013, 8, 1, 11, 22),
              'metadata_flavor': 'm1.tiny', 'metadata_event': 'event-2',
-             'source': 'source-3'},
+             'source': 'source-3', 'metadata_instance_type': '83'},
         )
 
         for test_sample in test_sample_data:
@@ -1373,7 +1373,9 @@ class StatisticsGroupByTest(DBTestBase,
                 resource_id=test_sample['resource'],
                 timestamp=datetime.datetime(*test_sample['timestamp']),
                 resource_metadata={'flavor': test_sample['metadata_flavor'],
-                                   'event': test_sample['metadata_event'], },
+                                   'event': test_sample['metadata_event'],
+                                   'instance_type':
+                                       test_sample['metadata_instance_type']},
                 source=test_sample['source'],
             )
             msg = utils.meter_message_from_counter(
@@ -1544,9 +1546,46 @@ class StatisticsGroupByTest(DBTestBase,
         )
 
     def test_group_by_metadata(self):
-        # TODO(terriyu): test_group_by_metadata needs to be implemented.
-        # This test should check grouping by a single metadata field.
-        pass
+        # This test checks grouping by a single metadata field
+        # (now only resource_metadata.instance_type is available).
+        f = storage.SampleFilter(
+            meter='instance',
+        )
+        results = list(
+            self.conn.get_meter_statistics(
+                f, groupby=['resource_metadata.instance_type']))
+        self.assertEqual(3, len(results))
+        groupby_list = [r.groupby for r in results]
+        groupby_keys_set = set(x for sub_dict in groupby_list
+                               for x in sub_dict.keys())
+        groupby_vals_set = set(x for sub_dict in groupby_list
+                               for x in sub_dict.values())
+        self.assertEqual(set(['resource_metadata.instance_type']),
+                         groupby_keys_set)
+        self.assertEqual(set(['82', '83', '84']), groupby_vals_set)
+
+        for r in results:
+            if r.groupby == {'resource_metadata.instance_type': '82'}:
+                self.assertEqual(3, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(1, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(6, r.sum)
+                self.assertEqual(2, r.avg)
+            elif r.groupby == {'resource_metadata.instance_type': '83'}:
+                self.assertEqual(2, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(2, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(6, r.sum)
+                self.assertEqual(3, r.avg)
+            elif r.groupby == {'resource_metadata.instance_type': '84'}:
+                self.assertEqual(2, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(2, r.min)
+                self.assertEqual(2, r.max)
+                self.assertEqual(4, r.sum)
+                self.assertEqual(2, r.avg)
 
     def test_group_by_multiple_regular(self):
         f = storage.SampleFilter(
@@ -1617,11 +1656,80 @@ class StatisticsGroupByTest(DBTestBase,
         pass
 
     def test_group_by_multiple_regular_metadata(self):
-        # TODO(terriyu): test_group_by_multiple_regular_metadata needs to be
-        # implemented.
-        # This test should check grouping by a combination of regular and
+        # This test checks grouping by a combination of regular and
         # metadata fields.
-        pass
+        f = storage.SampleFilter(
+            meter='instance',
+        )
+        results = list(
+            self.conn.get_meter_statistics(
+                f, groupby=['user_id', 'resource_metadata.instance_type']))
+        self.assertEqual(5, len(results))
+        groupby_list = [r.groupby for r in results]
+        groupby_keys_set = set(x for sub_dict in groupby_list
+                               for x in sub_dict.keys())
+        groupby_vals_set = set(x for sub_dict in groupby_list
+                               for x in sub_dict.values())
+        self.assertEqual(set(['user_id', 'resource_metadata.instance_type']),
+                         groupby_keys_set)
+        self.assertEqual(set(['user-1', 'user-2', 'user-3', '82',
+                              '83', '84']),
+                         groupby_vals_set)
+
+        for r in results:
+            if r.groupby == {'user_id': 'user-1',
+                             'resource_metadata.instance_type': '83'}:
+                self.assertEqual(1, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(2, r.min)
+                self.assertEqual(2, r.max)
+                self.assertEqual(2, r.sum)
+                self.assertEqual(2, r.avg)
+            elif r.groupby == {'user_id': 'user-1',
+                               'resource_metadata.instance_type': '84'}:
+                self.assertEqual(1, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(2, r.min)
+                self.assertEqual(2, r.max)
+                self.assertEqual(2, r.sum)
+                self.assertEqual(2, r.avg)
+            elif r.groupby == {'user_id': 'user-2',
+                               'resource_metadata.instance_type': '82'}:
+                self.assertEqual(3, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(1, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(6, r.sum)
+                self.assertEqual(2, r.avg)
+            elif r.groupby == {'user_id': 'user-2',
+                               'resource_metadata.instance_type': '84'}:
+                self.assertEqual(1, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(2, r.min)
+                self.assertEqual(2, r.max)
+                self.assertEqual(2, r.sum)
+                self.assertEqual(2, r.avg)
+            elif r.groupby == {'user_id': 'user-3',
+                               'resource_metadata.instance_type': '83'}:
+                self.assertEqual(1, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(4, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(4, r.sum)
+                self.assertEqual(4, r.avg)
+            else:
+                self.assertNotEqual({'user_id': 'user-1',
+                                     'resource_metadata.instance_type': '82'},
+                                    r.groupby)
+                self.assertNotEqual({'user_id': 'user-2',
+                                     'resource_metadata.instance_type': '83'},
+                                    r.groupby)
+                self.assertNotEqual({'user_id': 'user-3',
+                                     'resource_metadata.instance_type': '82'},
+                                    r.groupby)
+                self.assertNotEqual({'user_id': 'user-3',
+                                     'resource_metadata.instance_type': '84'},
+                                    r.groupby)
 
     def test_group_by_with_query_filter(self):
         f = storage.SampleFilter(
@@ -1666,11 +1774,48 @@ class StatisticsGroupByTest(DBTestBase,
                 self.assertEqual(r.avg, 4)
 
     def test_group_by_metadata_with_query_filter(self):
-        # TODO(terriyu): test_group_by_metadata_with_query_filter needs to be
-        # implemented.
-        # This test should check grouping by a metadata field in combination
+        # This test checks grouping by a metadata field in combination
         # with a query filter.
-        pass
+        f = storage.SampleFilter(
+            meter='instance',
+            project='project-1',
+        )
+        results = list(self.conn.get_meter_statistics(
+            f,
+            groupby=['resource_metadata.instance_type']))
+        self.assertEqual(3, len(results))
+        groupby_list = [r.groupby for r in results]
+        groupby_keys_set = set(x for sub_dict in groupby_list
+                               for x in sub_dict.keys())
+        groupby_vals_set = set(x for sub_dict in groupby_list
+                               for x in sub_dict.values())
+        self.assertEqual(set(['resource_metadata.instance_type']),
+                         groupby_keys_set)
+        self.assertEqual(set(['82', '83', '84']),
+                         groupby_vals_set)
+
+        for r in results:
+            if r.groupby == {'resource_metadata.instance_type': '82'}:
+                self.assertEqual(2, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(1, r.min)
+                self.assertEqual(1, r.max)
+                self.assertEqual(2, r.sum)
+                self.assertEqual(1, r.avg)
+            elif r.groupby == {'resource_metadata.instance_type': '83'}:
+                self.assertEqual(1, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(4, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(4, r.sum)
+                self.assertEqual(4, r.avg)
+            elif r.groupby == {'resource_metadata.instance_type': '84'}:
+                self.assertEqual(2, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(2, r.min)
+                self.assertEqual(2, r.max)
+                self.assertEqual(4, r.sum)
+                self.assertEqual(2, r.avg)
 
     def test_group_by_with_query_filter_multiple(self):
         f = storage.SampleFilter(
@@ -1822,11 +1967,122 @@ class StatisticsGroupByTest(DBTestBase,
                                      datetime.datetime(2013, 8, 1, 10, 11)])
 
     def test_group_by_metadata_with_period(self):
-        # TODO(terriyu): test_group_by_metadata_with_period needs to be
-        # implemented.
-        # This test should check grouping by metadata fields in combination
+        # This test checks grouping by metadata fields in combination
         # with period grouping.
-        pass
+        f = storage.SampleFilter(
+            meter='instance')
+
+        results = list(self.conn.get_meter_statistics(f, period=7200,
+                       groupby=['resource_metadata.instance_type']))
+        self.assertEqual(5, len(results))
+        groupby_list = [r.groupby for r in results]
+        groupby_keys_set = set(x for sub_dict in groupby_list
+                               for x in sub_dict.keys())
+        groupby_vals_set = set(x for sub_dict in groupby_list
+                               for x in sub_dict.values())
+        self.assertEqual(set(['resource_metadata.instance_type']),
+                         groupby_keys_set)
+        self.assertEqual(set(['82', '83', '84']), groupby_vals_set)
+        period_start_set = set([r.period_start for r in results])
+        period_start_valid = set([datetime.datetime(2013, 8, 1, 10, 11),
+                                  datetime.datetime(2013, 8, 1, 14, 11),
+                                  datetime.datetime(2013, 8, 1, 16, 11)])
+        self.assertEqual(period_start_valid, period_start_set)
+
+        for r in results:
+            if (r.groupby == {'resource_metadata.instance_type': '82'} and
+                    r.period_start == datetime.datetime(2013, 8, 1, 10, 11)):
+                self.assertEqual(2, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(1, r.min)
+                self.assertEqual(1, r.max)
+                self.assertEqual(2, r.sum)
+                self.assertEqual(1, r.avg)
+                self.assertEqual(1740, r.duration)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 10, 11),
+                                 r.duration_start)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 10, 40),
+                                 r.duration_end)
+                self.assertEqual(7200, r.period)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 12, 11),
+                                 r.period_end)
+            elif (r.groupby == {'resource_metadata.instance_type': '82'} and
+                  r.period_start == datetime.datetime(2013, 8, 1, 16, 11)):
+                self.assertEqual(1, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(4, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(4, r.sum)
+                self.assertEqual(4, r.avg)
+                self.assertEqual(0, r.duration)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 17, 28),
+                                 r.duration_start)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 17, 28),
+                                 r.duration_end)
+                self.assertEqual(7200, r.period)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 18, 11),
+                                 r.period_end)
+            elif (r.groupby == {'resource_metadata.instance_type': '83'} and
+                  r.period_start == datetime.datetime(2013, 8, 1, 10, 11)):
+                self.assertEqual(1, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(4, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(4, r.sum)
+                self.assertEqual(4, r.avg)
+                self.assertEqual(0, r.duration)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 11, 22),
+                                 r.duration_start)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 11, 22),
+                                 r.duration_end)
+                self.assertEqual(7200, r.period)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 12, 11),
+                                 r.period_end)
+            elif (r.groupby == {'resource_metadata.instance_type': '83'} and
+                  r.period_start == datetime.datetime(2013, 8, 1, 14, 11)):
+                self.assertEqual(1, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(2, r.min)
+                self.assertEqual(2, r.max)
+                self.assertEqual(2, r.sum)
+                self.assertEqual(2, r.avg)
+                self.assertEqual(0, r.duration)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 15, 37),
+                                 r.duration_start)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 15, 37),
+                                 r.duration_end)
+                self.assertEqual(7200, r.period)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 16, 11),
+                                 r.period_end)
+            elif (r.groupby == {'resource_metadata.instance_type': '84'} and
+                  r.period_start == datetime.datetime(2013, 8, 1, 14, 11)):
+                self.assertEqual(2, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(2, r.min)
+                self.assertEqual(2, r.max)
+                self.assertEqual(4, r.sum)
+                self.assertEqual(2, r.avg)
+                self.assertEqual(4260, r.duration)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 14, 59),
+                                 r.duration_start)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 16, 10),
+                                 r.duration_end)
+                self.assertEqual(7200, r.period)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 16, 11),
+                                 r.period_end)
+            else:
+                self.assertNotEqual([{'resource_metadata.instance_type': '82'},
+                                     datetime.datetime(2013, 8, 1, 14, 11)],
+                                    [r.groupby, r.period_start])
+                self.assertNotEqual([{'resource_metadata.instance_type': '83'},
+                                     datetime.datetime(2013, 8, 1, 16, 11)],
+                                    [r.groupby, r.period_start])
+                self.assertNotEqual([{'resource_metadata.instance_type': '84'},
+                                     datetime.datetime(2013, 8, 1, 10, 11)],
+                                    [r.groupby, r.period_start])
+                self.assertNotEqual([{'resource_metadata.instance_type': '84'},
+                                     datetime.datetime(2013, 8, 1, 16, 11)],
+                                    [r.groupby, r.period_start])
 
     def test_group_by_with_query_filter_and_period(self):
         f = storage.SampleFilter(
@@ -1908,11 +2164,88 @@ class StatisticsGroupByTest(DBTestBase,
                                      datetime.datetime(2013, 8, 1, 10, 11)])
 
     def test_group_by_metadata_with_query_filter_and_period(self):
-        # TODO(terriyu): test_group_by_metadata_with_query_filter_and_period
-        # needs to be implemented.
-        # This test should check grouping with metadata fields in combination
+        # This test checks grouping with metadata fields in combination
         # with a query filter and period grouping.
-        pass
+        f = storage.SampleFilter(
+            meter='instance',
+            project='project-1',
+        )
+        results = list(
+            self.conn.get_meter_statistics(
+                f, period=7200, groupby=['resource_metadata.instance_type']))
+        self.assertEqual(3, len(results))
+        groupby_list = [r.groupby for r in results]
+        groupby_keys_set = set(x for sub_dict in groupby_list
+                               for x in sub_dict.keys())
+        groupby_vals_set = set(x for sub_dict in groupby_list
+                               for x in sub_dict.values())
+        self.assertEqual(set(['resource_metadata.instance_type']),
+                         groupby_keys_set)
+        self.assertEqual(set(['82', '83', '84']), groupby_vals_set)
+        period_start_set = set([r.period_start for r in results])
+        period_start_valid = set([datetime.datetime(2013, 8, 1, 10, 11),
+                                  datetime.datetime(2013, 8, 1, 14, 11)])
+        self.assertEqual(period_start_valid, period_start_set)
+
+        for r in results:
+            if (r.groupby == {'resource_metadata.instance_type': '82'} and
+                    r.period_start == datetime.datetime(2013, 8, 1, 10, 11)):
+                self.assertEqual(2, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(1, r.min)
+                self.assertEqual(1, r.max)
+                self.assertEqual(2, r.sum)
+                self.assertEqual(1, r.avg)
+                self.assertEqual(1740, r.duration)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 10, 11),
+                                 r.duration_start)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 10, 40),
+                                 r.duration_end)
+                self.assertEqual(7200, r.period)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 12, 11),
+                                 r.period_end)
+            elif (r.groupby == {'resource_metadata.instance_type': '83'} and
+                  r.period_start == datetime.datetime(2013, 8, 1, 10, 11)):
+                self.assertEqual(1, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(4, r.min)
+                self.assertEqual(4, r.max)
+                self.assertEqual(4, r.sum)
+                self.assertEqual(4, r.avg)
+                self.assertEqual(0, r.duration)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 11, 22),
+                                 r.duration_start)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 11, 22),
+                                 r.duration_end)
+                self.assertEqual(7200, r.period)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 12, 11),
+                                 r.period_end)
+            elif (r.groupby == {'resource_metadata.instance_type': '84'} and
+                  r.period_start == datetime.datetime(2013, 8, 1, 14, 11)):
+                self.assertEqual(2, r.count)
+                self.assertEqual('s', r.unit)
+                self.assertEqual(2, r.min)
+                self.assertEqual(2, r.max)
+                self.assertEqual(4, r.sum)
+                self.assertEqual(2, r.avg)
+                self.assertEqual(4260, r.duration)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 14, 59),
+                                 r.duration_start)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 16, 10),
+                                 r.duration_end)
+                self.assertEqual(7200, r.period)
+                self.assertEqual(datetime.datetime(2013, 8, 1, 16, 11),
+                                 r.period_end)
+            else:
+                self.assertNotEqual([{'resource_metadata.instance_type': '82'},
+                                     datetime.datetime(2013, 8, 1, 14, 11)],
+                                    [r.groupby, r.period_start])
+                self.assertNotEqual([{'resource_metadata.instance_type': '83'},
+                                     datetime.datetime(2013, 8, 1, 14, 11)],
+                                    [r.groupby, r.period_start])
+                self.assertNotEqual([{'resource_metadata.instance_type': '84'},
+                                     datetime.datetime(2013, 8, 1, 10, 11)],
+                                    [r.groupby, r.period_start])
 
     def test_group_by_start_timestamp_after(self):
         f = storage.SampleFilter(

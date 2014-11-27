@@ -564,9 +564,10 @@ def _validate_groupby_fields(groupby_fields):
 
     If all fields are valid, returns fields with duplicates removed.
     """
-    # NOTE(terriyu): Currently, metadata fields are not supported in our
-    # group by statistics implementation
-    valid_fields = set(['user_id', 'resource_id', 'project_id', 'source'])
+    # NOTE(terriyu): Currently, metadata fields are supported in our
+    # group by statistics implementation only for mongodb
+    valid_fields = set(['user_id', 'resource_id', 'project_id', 'source',
+                        'resource_metadata.instance_type'])
 
     invalid_fields = set(groupby_fields) - valid_fields
     if invalid_fields:

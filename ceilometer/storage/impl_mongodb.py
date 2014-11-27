@@ -241,10 +241,17 @@ class Connection(pymongo_base.Connection):
         var groupby_fields = %(groupby_fields)s;
         var groupby = {};
         var groupby_key = {};
-
         for ( var i=0; i<groupby_fields.length; i++ ) {
+        if (groupby_fields[i].search("resource_metadata") != -1) {
+            var key = "resource_metadata";
+            var j = groupby_fields[i].indexOf('.');
+            var value = groupby_fields[i].slice(j+1, groupby_fields[i].length);
+            groupby[groupby_fields[i]] = this[key][value];
+            groupby_key[groupby_fields[i]] = this[key][value];
+        } else {
             groupby[groupby_fields[i]] = this[groupby_fields[i]]
             groupby_key[groupby_fields[i]] = this[groupby_fields[i]]
+            }
         }
     """
 
@@ -841,9 +848,9 @@ class Connection(pymongo_base.Connection):
         Items are containing meter statistics described by the query
         parameters. The filter must have a meter value set.
         """
-        if (groupby and
-                set(groupby) - set(['user_id', 'project_id',
-                                    'resource_id', 'source'])):
+        if (groupby and set(groupby) -
+            set(['user_id', 'project_id', 'resource_id', 'source',
+                 'resource_metadata.instance_type'])):
             raise ceilometer.NotImplementedError(
                 "Unable to group by these fields")
 
