@@ -151,10 +151,10 @@ class Inspector(object):
         """List the instances on the current host."""
         raise ceilometer.NotImplementedError
 
-    def inspect_cpus(self, instance_name):
+    def inspect_cpus(self, instance):
         """Inspect the CPU statistics for an instance.
 
-        :param instance_name: the name of the target instance
+        :param instance: the target instance
         :return: the number of CPUs and cumulative CPU time
         """
         raise ceilometer.NotImplementedError
@@ -169,10 +169,10 @@ class Inspector(object):
         """
         raise ceilometer.NotImplementedError
 
-    def inspect_vnics(self, instance_name):
+    def inspect_vnics(self, instance):
         """Inspect the vNIC statistics for an instance.
 
-        :param instance_name: the name of the target instance
+        :param instance: the target instance
         :return: for each vNIC, the number of bytes & packets
                  received and transmitted
         """
@@ -189,10 +189,10 @@ class Inspector(object):
         """
         raise ceilometer.NotImplementedError
 
-    def inspect_disks(self, instance_name):
+    def inspect_disks(self, instance):
         """Inspect the disk statistics for an instance.
 
-        :param instance_name: the name of the target instance
+        :param instance: the target instance
         :return: for each disk, the number of bytes & operations
                  read and written, and the error count
         """
