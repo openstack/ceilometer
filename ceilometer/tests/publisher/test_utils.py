@@ -111,6 +111,16 @@ class TestSignature(base.BaseTestCase):
         jsondata = jsonutils.loads(jsonutils.dumps(data))
         self.assertTrue(utils.verify_signature(jsondata, 'not-so-secret'))
 
+    def test_verify_unicode_symbols(self):
+        data = {u'a\xe9\u0437': 'A',
+                'b': u'B\xe9\u0437'
+                }
+        data['message_signature'] = utils.compute_signature(
+            data,
+            'not-so-secret')
+        jsondata = jsonutils.loads(jsonutils.dumps(data))
+        self.assertTrue(utils.verify_signature(jsondata, 'not-so-secret'))
+
     def test_besteffort_compare_digest(self):
         hash1 = "f5ac3fe42b80b80f979825d177191bc5"
         hash2 = "f5ac3fe42b80b80f979825d177191bc5"

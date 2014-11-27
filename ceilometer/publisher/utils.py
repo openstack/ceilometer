@@ -55,7 +55,7 @@ def compute_signature(message, secret):
             # Skip any existing signature value, which would not have
             # been part of the original message.
             continue
-        digest_maker.update(name)
+        digest_maker.update(six.text_type(name).encode('utf-8'))
         digest_maker.update(six.text_type(value).encode('utf-8'))
     return digest_maker.hexdigest()
 
