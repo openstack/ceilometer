@@ -163,6 +163,24 @@ class TestNotification(tests_base.BaseTestCase):
         event_endpoint = self.srv.listeners[0].dispatcher.endpoints[0]
         self.assertEqual(1, len(list(event_endpoint.dispatcher_manager)))
 
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    @mock.patch.object(oslo.messaging.MessageHandlingServer, 'start',
+                       mock.MagicMock())
+    @mock.patch('ceilometer.event.endpoint.EventsNotificationEndpoint')
+    def test_unique_consumers(self, fake_event_endpoint_class):
+
+        def fake_get_notifications_manager_dup_targets(pm):
+            plugin = instance.Instance(pm)
+            return extension.ExtensionManager.make_test_instance(
+                [extension.Extension('test', None, None, plugin),
+                 extension.Extension('test', None, None, plugin)])
+
+        with mock.patch.object(self.srv,
+                               '_get_notifications_manager') as get_nm:
+            get_nm.side_effect = fake_get_notifications_manager_dup_targets
+            self.srv.start()
+            self.assertEqual(1, len(self.srv.listeners[0].dispatcher.targets))
+
 
 class TestRealNotification(tests_base.BaseTestCase):
     def setUp(self):
