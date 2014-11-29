@@ -147,10 +147,6 @@ class InstanceNotFoundException(InspectorException):
 #
 class Inspector(object):
 
-    def inspect_instances(self):
-        """List the instances on the current host."""
-        raise ceilometer.NotImplementedError
-
     def inspect_cpus(self, instance):
         """Inspect the CPU statistics for an instance.
 

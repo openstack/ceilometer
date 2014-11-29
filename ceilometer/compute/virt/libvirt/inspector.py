@@ -105,23 +105,6 @@ class LibvirtInspector(virt_inspector.Inspector):
                                'ex': ex})
             raise virt_inspector.InstanceNotFoundException(msg)
 
-    @retry_on_disconnect
-    def inspect_instance(self, domain_id):
-        domain = self._get_connection().lookupByID(domain_id)
-        return virt_inspector.Instance(name=domain.name(),
-                                       UUID=domain.UUIDString())
-
-    @retry_on_disconnect
-    def inspect_instances(self):
-        if self._get_connection().numOfDomains() > 0:
-            for domain_id in self._get_connection().listDomainsID():
-                if domain_id != 0:
-                    try:
-                        yield self.inspect_instance(domain_id)
-                    except libvirt.libvirtError:
-                        # Instance was deleted while listing... ignore it
-                        pass
-
     def inspect_cpus(self, instance):
         domain = self._lookup_by_uuid(instance)
         dom_info = domain.info()

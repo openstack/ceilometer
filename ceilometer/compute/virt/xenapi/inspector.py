@@ -90,15 +90,6 @@ class XenapiInspector(virt_inspector.Inspector):
     def _call_xenapi(self, method, *args):
         return self.session.xenapi_request(method, args)
 
-    def _list_vms(self):
-        host_ref = self._get_host_ref()
-        vms = self._call_xenapi("VM.get_all_records_where",
-                                'field "is_control_domain"="false" and '
-                                'field "is_a_template"="false" and '
-                                'field "resident_on"="%s"' % host_ref)
-        for vm_ref in vms.keys():
-            yield vm_ref, vms[vm_ref]
-
     def _lookup_by_name(self, instance_name):
         vm_refs = self._call_xenapi("VM.get_by_name_label", instance_name)
         n = len(vm_refs)
@@ -110,14 +101,6 @@ class XenapiInspector(virt_inspector.Inspector):
                 _('Multiple VM %s found in XenServer') % instance_name)
         else:
             return vm_refs[0]
-
-    def inspect_instances(self):
-        for vm_ref, vm_rec in self._list_vms():
-            name = vm_rec['name_label']
-            other_config = vm_rec['other_config']
-            uuid = other_config.get('nova_uuid')
-            if uuid:
-                yield virt_inspector.Instance(name, uuid)
 
     def inspect_cpu_util(self, instance, duration=None):
         instance_name = util.instance_name(instance)
