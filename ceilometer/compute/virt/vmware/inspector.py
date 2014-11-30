@@ -21,7 +21,7 @@ from oslo.vmware import api
 
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.compute.virt.vmware import vsphere_operations
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.i18n import _
 
 
 opt_group = cfg.OptGroup(name='vmware',

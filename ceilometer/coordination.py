@@ -20,7 +20,7 @@ import uuid
 from oslo.config import cfg
 import tooz.coordination
 
-from ceilometer.openstack.common.gettextutils import _LE, _LI
+from ceilometer.i18n import _LE, _LI
 from ceilometer.openstack.common import log
 from ceilometer import utils
 

@@ -27,8 +27,8 @@ from six.moves.urllib import parse as urlparse
 from stevedore import extension
 
 from ceilometer import coordination
+from ceilometer.i18n import _
 from ceilometer.openstack.common import context
-from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import service as os_service
 from ceilometer import pipeline as publish_pipeline

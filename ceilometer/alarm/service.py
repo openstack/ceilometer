@@ -28,8 +28,8 @@ from stevedore import extension
 from ceilometer.alarm.partition import coordination as alarm_coordination
 from ceilometer.alarm import rpc as rpc_alarm
 from ceilometer import coordination as coordination
+from ceilometer.i18n import _
 from ceilometer import messaging
-from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import service as os_service
 

@@ -17,7 +17,7 @@ import operator
 import ceilometer
 from ceilometer.alarm.storage import base
 from ceilometer.alarm.storage import models
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.i18n import _
 from ceilometer.openstack.common import log
 from ceilometer.storage.hbase import base as hbase_base
 from ceilometer.storage.hbase import migration as hbase_migration

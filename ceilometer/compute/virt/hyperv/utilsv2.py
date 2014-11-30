@@ -28,7 +28,7 @@ if sys.platform == 'win32':
 from oslo.config import cfg
 
 from ceilometer.compute.virt import inspector
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.i18n import _
 from ceilometer.openstack.common import log as logging
 
 CONF = cfg.CONF

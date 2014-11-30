@@ -22,7 +22,7 @@ import json
 import mock
 import wsme
 
-from ceilometer.openstack.common import gettextutils
+from ceilometer import i18n
 from ceilometer.tests.api import v2
 
 
@@ -88,7 +88,7 @@ class TestApiMiddleware(v2.FunctionalTest):
 
     def test_json_parsable_error_middleware_translation_400(self):
         # Ensure translated messages get placed properly into json faults
-        with mock.patch.object(gettextutils, 'translate',
+        with mock.patch.object(i18n, 'translate',
                                side_effect=self._fake_translate):
             response = self.post_json('/alarms', params={'name': 'foobar',
                                                          'type': 'threshold'},
@@ -123,7 +123,7 @@ class TestApiMiddleware(v2.FunctionalTest):
 
     def test_xml_parsable_error_middleware_translation_400(self):
         # Ensure translated messages get placed properly into xml faults
-        with mock.patch.object(gettextutils, 'translate',
+        with mock.patch.object(i18n, 'translate',
                                side_effect=self._fake_translate):
             response = self.post_json('/alarms', params={'name': 'foobar',
                                                          'type': 'threshold'},
@@ -140,7 +140,7 @@ class TestApiMiddleware(v2.FunctionalTest):
 
     def test_best_match_language(self):
         # Ensure that we are actually invoking language negotiation
-        with mock.patch.object(gettextutils, 'translate',
+        with mock.patch.object(i18n, 'translate',
                                side_effect=self._fake_translate):
             response = self.post_json('/alarms', params={'name': 'foobar',
                                                          'type': 'threshold'},

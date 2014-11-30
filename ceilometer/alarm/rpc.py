@@ -19,9 +19,9 @@ from oslo.config import cfg
 import six
 
 from ceilometer.alarm.storage import models
+from ceilometer.i18n import _
 from ceilometer import messaging
 from ceilometer.openstack.common import context
-from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 
 OPTS = [

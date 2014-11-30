@@ -22,7 +22,7 @@ import requests
 import six
 
 from ceilometer.central import plugin
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.i18n import _
 from ceilometer.openstack.common import log
 from ceilometer import sample
 

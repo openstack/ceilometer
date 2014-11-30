@@ -24,7 +24,7 @@ import six
 import six.moves.urllib.parse as urlparse
 from stevedore import driver
 
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.i18n import _
 from ceilometer.openstack.common import log
 from ceilometer import utils
 

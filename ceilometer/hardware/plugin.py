@@ -27,7 +27,7 @@ import six
 
 from ceilometer.central import plugin
 from ceilometer.hardware import inspector as insloader
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.i18n import _
 from ceilometer.openstack.common import log
 
 LOG = log.getLogger(__name__)

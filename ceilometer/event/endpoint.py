@@ -25,8 +25,8 @@ import ceilometer
 from ceilometer import dispatcher
 from ceilometer.event import converter as event_converter
 from ceilometer.event.storage import models
+from ceilometer.i18n import _
 from ceilometer import messaging
-from ceilometer.openstack.common.gettextutils import _
 
 LOG = logging.getLogger(__name__)
 

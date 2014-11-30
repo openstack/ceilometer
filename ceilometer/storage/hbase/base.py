@@ -17,7 +17,7 @@ import happybase
 from oslo.utils import netutils
 from six.moves.urllib import parse as urlparse
 
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.i18n import _
 from ceilometer.openstack.common import log
 from ceilometer.storage.hbase import inmemory as hbase_inmemory
 

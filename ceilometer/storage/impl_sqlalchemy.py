@@ -34,7 +34,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import aliased
 
 import ceilometer
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.i18n import _
 from ceilometer.openstack.common import log
 from ceilometer import storage
 from ceilometer.storage import base

@@ -16,8 +16,8 @@
 # under the License.
 from oslo.utils import timeutils
 
+from ceilometer.i18n import _
 from ceilometer.network.services import base
-from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer import sample
 

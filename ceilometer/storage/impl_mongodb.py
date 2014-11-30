@@ -35,6 +35,7 @@ import pymongo
 import six
 
 import ceilometer
+from ceilometer.i18n import _
 from ceilometer.openstack.common import log
 from ceilometer import storage
 from ceilometer.storage import base

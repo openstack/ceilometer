@@ -20,7 +20,7 @@ events.
 from oslo.utils import timeutils
 
 from ceilometer.compute import notifications
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.i18n import _
 from ceilometer.openstack.common import log
 from ceilometer import sample
 

@@ -27,8 +27,8 @@ from lxml import etree
 import webob
 
 from ceilometer.api import hooks
-from ceilometer.openstack.common import gettextutils
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer import i18n
+from ceilometer.i18n import _
 from ceilometer.openstack.common import log
 
 LOG = log.getLogger(__name__)
@@ -46,7 +46,7 @@ class ParsableErrorMiddleware(object):
         """
         if not accept_language:
             return None
-        all_languages = gettextutils.get_available_languages('ceilometer')
+        all_languages = i18n.get_available_languages()
         return accept_language.best_match(all_languages)
 
     def __init__(self, app):
@@ -99,9 +99,8 @@ class ParsableErrorMiddleware(object):
                     # Add the translated error to the xml data
                     if error is not None:
                         for fault_string in fault.findall('faultstring'):
-                            fault_string.text = (
-                                gettextutils.translate(
-                                    error, user_locale))
+                            fault_string.text = i18n.translate(error,
+                                                               user_locale)
                     body = ['<error_message>' + etree.tostring(fault)
                             + '</error_message>']
                 except etree.XMLSyntaxError as err:
@@ -113,9 +112,8 @@ class ParsableErrorMiddleware(object):
                 try:
                     fault = json.loads('\n'.join(app_iter))
                     if error is not None and 'faultstring' in fault:
-                        fault['faultstring'] = (
-                            gettextutils.translate(
-                                error, user_locale))
+                        fault['faultstring'] = i18n.translate(error,
+                                                              user_locale)
                     body = [json.dumps({'error_message': fault})]
                 except ValueError as err:
                     body = [json.dumps({'error_message': '\n'.join(app_iter)})]

@@ -25,7 +25,7 @@ except ImportError:
 
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.i18n import _
 
 opt_group = cfg.OptGroup(name='xenapi',
                          title='Options for XenAPI')

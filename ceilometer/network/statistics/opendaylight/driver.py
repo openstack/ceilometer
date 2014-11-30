@@ -17,9 +17,9 @@ import six
 from six import moves
 from six.moves.urllib import parse as urlparse
 
+from ceilometer.i18n import _
 from ceilometer.network.statistics import driver
 from ceilometer.network.statistics.opendaylight import client
-from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer import utils
 

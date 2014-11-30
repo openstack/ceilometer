@@ -14,8 +14,8 @@
 
 from oslo.config import cfg
 
+from ceilometer.i18n import _
 from ceilometer import nova_client
-from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer import plugin
 

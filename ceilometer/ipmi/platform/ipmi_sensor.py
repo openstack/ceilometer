@@ -16,9 +16,9 @@
 
 """IPMI sensor to collect various sensor data of compute node"""
 
+from ceilometer.i18n import _
 from ceilometer.ipmi.platform import exception as ipmiexcept
 from ceilometer.ipmi.platform import ipmitool
-from ceilometer.openstack.common.gettextutils import _
 
 IPMICMD = {"sdr_dump": "sdr dump",
            "sdr_info": "sdr info",

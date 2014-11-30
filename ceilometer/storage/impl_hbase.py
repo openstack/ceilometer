@@ -18,7 +18,7 @@ import time
 from oslo.utils import timeutils
 
 import ceilometer
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.i18n import _
 from ceilometer.openstack.common import log
 from ceilometer.storage import base
 from ceilometer.storage.hbase import base as hbase_base

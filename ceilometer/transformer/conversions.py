@@ -21,7 +21,7 @@ import re
 from oslo.utils import timeutils
 import six
 
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.i18n import _
 from ceilometer.openstack.common import log
 from ceilometer import sample
 from ceilometer import transformer

@@ -24,9 +24,9 @@ import fnmatch
 import oslo.messaging
 import six
 
+from ceilometer.i18n import _
 from ceilometer import messaging
 from ceilometer.openstack.common import context
-from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 
 LOG = log.getLogger(__name__)

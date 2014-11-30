@@ -52,9 +52,9 @@ from ceilometer.alarm import service as alarm_service
 from ceilometer.alarm.storage import models as alarm_models
 from ceilometer.api import acl
 from ceilometer.event.storage import models as event_models
+from ceilometer.i18n import _
 from ceilometer import messaging
 from ceilometer.openstack.common import context
-from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer import sample
 from ceilometer import storage

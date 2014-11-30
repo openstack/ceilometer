@@ -22,7 +22,7 @@
 from oslo.config import cfg
 import oslo.messaging
 
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.i18n import _
 from ceilometer.openstack.common import log
 from ceilometer import plugin
 from ceilometer import sample

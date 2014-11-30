@@ -26,8 +26,8 @@ import oslo.messaging
 import six
 import six.moves.urllib.parse as urlparse
 
+from ceilometer.i18n import _
 from ceilometer import messaging
-from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer import publisher
 from ceilometer.publisher import utils

@@ -20,7 +20,7 @@ import re
 import six
 
 import ceilometer
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.i18n import _
 from ceilometer.openstack.common import log
 
 LOG = log.getLogger(__name__)

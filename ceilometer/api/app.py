@@ -28,6 +28,7 @@ import pecan
 from ceilometer.api import config as api_config
 from ceilometer.api import hooks
 from ceilometer.api import middleware
+from ceilometer.i18n import _
 from ceilometer.openstack.common import log
 from ceilometer import storage
 

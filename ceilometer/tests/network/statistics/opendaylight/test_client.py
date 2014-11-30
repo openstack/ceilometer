@@ -18,8 +18,8 @@ from requests import auth as req_auth
 import six
 from six.moves.urllib import parse as urlparse
 
+from ceilometer.i18n import _
 from ceilometer.network.statistics.opendaylight import client
-from ceilometer.openstack.common.gettextutils import _
 
 
 class TestClientHTTPBasicAuth(base.BaseTestCase):

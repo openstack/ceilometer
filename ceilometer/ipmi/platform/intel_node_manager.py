@@ -31,9 +31,9 @@ import time
 
 from oslo.config import cfg
 
+from ceilometer.i18n import _
 from ceilometer.ipmi.platform import exception as nmexcept
 from ceilometer.ipmi.platform import ipmitool
-from ceilometer.openstack.common.gettextutils import _
 
 
 OPTS = [

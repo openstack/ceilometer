@@ -24,7 +24,7 @@ import msgpack
 from oslo.config import cfg
 from oslo.utils import netutils
 
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.i18n import _
 from ceilometer.openstack.common import log
 from ceilometer import publisher
 from ceilometer.publisher import utils

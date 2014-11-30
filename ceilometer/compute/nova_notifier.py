@@ -32,7 +32,7 @@ from stevedore import extension
 # use the real ceilometer base package
 import ceilometer  # noqa
 from ceilometer.compute.virt import inspector
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.i18n import _
 
 for name in ['openstack', 'openstack.common', 'openstack.common.log']:
     sys.modules['ceilometer.' + name] = sys.modules['nova.' + name]

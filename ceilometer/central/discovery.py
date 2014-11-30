@@ -17,7 +17,7 @@
 
 from oslo.config import cfg
 
-from ceilometer.openstack.common.gettextutils import _LW
+from ceilometer.i18n import _LW
 from ceilometer.openstack.common import log
 from ceilometer import plugin
 

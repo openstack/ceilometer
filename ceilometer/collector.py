@@ -24,8 +24,7 @@ from oslo.utils import units
 
 from ceilometer import dispatcher
 from ceilometer import messaging
-from ceilometer.openstack.common.gettextutils import _
-from ceilometer.openstack.common.gettextutils import _LE
+from ceilometer.i18n import _, _LE
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import service as os_service
 

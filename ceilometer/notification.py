@@ -19,8 +19,8 @@ from oslo.config import cfg
 from stevedore import extension
 
 from ceilometer.event import endpoint as event_endpoint
+from ceilometer.i18n import _
 from ceilometer import messaging
-from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import service as os_service
 from ceilometer import pipeline

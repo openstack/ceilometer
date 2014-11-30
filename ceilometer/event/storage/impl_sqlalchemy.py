@@ -25,7 +25,7 @@ import sqlalchemy as sa
 
 from ceilometer.event.storage import base
 from ceilometer.event.storage import models as api_models
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.i18n import _
 from ceilometer.openstack.common import log
 from ceilometer.storage.sqlalchemy import models
 from ceilometer.storage.sqlalchemy import utils as sql_utils

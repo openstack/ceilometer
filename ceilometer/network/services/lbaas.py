@@ -21,8 +21,8 @@ import collections
 from oslo.utils import timeutils
 import six
 
+from ceilometer.i18n import _
 from ceilometer.network.services import base
-from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer import sample
 

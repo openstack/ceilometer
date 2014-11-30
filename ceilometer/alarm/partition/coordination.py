@@ -22,7 +22,7 @@ import uuid
 from oslo.utils import timeutils
 
 from ceilometer.alarm import rpc as rpc_alarm
-from ceilometer.openstack.common.gettextutils import _
+from ceilometer.i18n import _
 from ceilometer.openstack.common import log
 
 
