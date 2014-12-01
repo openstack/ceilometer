@@ -208,6 +208,9 @@ class Connection(pymongo_base.Connection):
                      ceilometer.meter.meter_message_from_counter
         """
         # Record the updated resource metadata
+        data = copy.deepcopy(data)
+        data['resource_metadata'] = pymongo_utils.improve_keys(
+            data.pop('resource_metadata'))
         self.db.resource.update(
             {'_id': data['resource_id']},
             {'$set': {'project_id': data['project_id'],
@@ -255,7 +258,7 @@ class Connection(pymongo_base.Connection):
         if pagination:
             raise ceilometer.NotImplementedError('Pagination not implemented')
 
-        metaquery = metaquery or {}
+        metaquery = pymongo_utils.improve_keys(metaquery, metaquery=True) or {}
 
         q = {}
         if user is not None:
@@ -302,7 +305,8 @@ class Connection(pymongo_base.Connection):
                                   last_sample_timestamp=last_ts,
                                   source=latest_meter['source'],
                                   user_id=latest_meter['user_id'],
-                                  metadata=latest_meter['resource_metadata'])
+                                  metadata=pymongo_utils.unquote_keys(
+                latest_meter['resource_metadata']))
 
     def get_meter_statistics(self, sample_filter, period=None, groupby=None,
                              aggregate=None):

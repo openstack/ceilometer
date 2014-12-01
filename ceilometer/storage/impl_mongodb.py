@@ -483,6 +483,9 @@ class Connection(pymongo_base.Connection):
         # unconditionally insert sample timestamps and resource metadata
         # (in the update case, this must be conditional on the sample not
         # being out-of-order)
+        data = copy.deepcopy(data)
+        data['resource_metadata'] = pymongo_utils.improve_keys(
+            data.pop('resource_metadata'))
         resource = self.db.resource.find_and_modify(
             {'_id': data['resource_id']},
             {'$set': {'project_id': data['project_id'],
@@ -729,7 +732,7 @@ class Connection(pymongo_base.Connection):
                     first_sample_timestamp=resource['first_timestamp'],
                     last_sample_timestamp=resource['last_timestamp'],
                     source=resource['source'],
-                    metadata=resource['metadata'])
+                    metadata=pymongo_utils.unquote_keys(resource['metadata']))
         finally:
             self.db[out].drop()
 
@@ -762,7 +765,7 @@ class Connection(pymongo_base.Connection):
                 last_sample_timestamp=r.get('last_sample_timestamp',
                                             self._APOCALYPSE),
                 source=r['source'],
-                metadata=r['metadata'])
+                metadata=pymongo_utils.unquote_keys(r['metadata']))
 
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
@@ -784,7 +787,7 @@ class Connection(pymongo_base.Connection):
         if pagination:
             raise ceilometer.NotImplementedError('Pagination not implemented')
 
-        metaquery = metaquery or {}
+        metaquery = pymongo_utils.improve_keys(metaquery, metaquery=True) or {}
 
         query = {}
         if user is not None:

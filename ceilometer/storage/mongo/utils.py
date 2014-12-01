@@ -25,6 +25,7 @@ from oslo.config import cfg
 from oslo.utils import netutils
 import pymongo
 import six
+from six.moves.urllib import parse
 
 from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
@@ -146,9 +147,80 @@ def make_query_from_filter(sample_filter, require_meter=True):
 
     # so the samples call metadata resource_metadata, so we convert
     # to that.
-    q.update(dict(('resource_%s' % k, v)
-                  for (k, v) in six.iteritems(sample_filter.metaquery)))
+    q.update(dict(
+        ('resource_%s' % k, v) for (k, v) in six.iteritems(
+            improve_keys(sample_filter.metaquery, metaquery=True))))
     return q
+
+
+def quote_key(key, reverse=False):
+    """Prepare key for storage data in MongoDB.
+
+    :param key: key that should be quoted
+    :param reverse: boolean, True --- if we need a reverse order of the keys
+                    parts
+    :return: iter of quoted part of the key
+    """
+    r = -1 if reverse else 1
+
+    for k in key.split('.')[::r]:
+        if k.startswith('$'):
+            k = parse.quote(k)
+        yield k
+
+
+def improve_keys(data, metaquery=False):
+    """Improves keys in dict if they contained '.' or started with '$'.
+
+    :param data: is a dictionary where keys need to be checked and improved
+    :param metaquery: boolean, if True dots are not escaped from the keys
+    :return: improved dictionary if keys contained dots or started with '$':
+            {'a.b': 'v'} -> {'a': {'b': 'v'}}
+            {'$ab': 'v'} -> {'%24ab': 'v'}
+    """
+    if not isinstance(data, dict):
+        return data
+
+    if metaquery:
+        for key in data.iterkeys():
+            if '.$' in key:
+                key_list = []
+                for k in quote_key(key):
+                    key_list.append(k)
+                new_key = '.'.join(key_list)
+                data[new_key] = data.pop(key)
+    else:
+        for key, value in data.items():
+            if isinstance(value, dict):
+                improve_keys(value)
+            if '.' in key:
+                new_dict = {}
+                for k in quote_key(key, reverse=True):
+                    new = {}
+                    new[k] = new_dict if new_dict else data.pop(key)
+                    new_dict = new
+                data.update(new_dict)
+            else:
+                if key.startswith('$'):
+                    new_key = parse.quote(key)
+                    data[new_key] = data.pop(key)
+    return data
+
+
+def unquote_keys(data):
+    """Restores initial view of 'quoted' keys in dictionary data
+
+    :param data: is a dictionary
+    :return: data with restored keys if they were 'quoted'.
+    """
+    if isinstance(data, dict):
+        for key, value in data.items():
+            if isinstance(value, dict):
+                unquote_keys(value)
+            if key.startswith('%24'):
+                k = parse.unquote(key)
+                data[k] = data.pop(key)
+    return data
 
 
 class ConnectionPool(object):

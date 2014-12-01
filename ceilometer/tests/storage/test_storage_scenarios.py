@@ -126,13 +126,26 @@ class DBTestBase(tests_db.TestBase):
 
 class ResourceTest(DBTestBase,
                    tests_db.MixinTestsWithBackendScenarios):
+    def prepare_data(self):
+        super(ResourceTest, self).prepare_data()
+
+        self.msgs.append(self.create_and_store_sample(
+            timestamp=datetime.datetime(2012, 7, 2, 10, 39),
+            user_id='mongodb_test',
+            resource_id='resource-id-mongo_bad_key',
+            project_id='project-id-test',
+            metadata={'display.name': {'name.$1': 'test-server1',
+                                       '$name_2': 'test-server2'},
+                      'tag': 'self.counter'},
+            source='test-4'
+        ))
 
     def test_get_resources(self):
         expected_first_sample_timestamp = datetime.datetime(2012, 7, 2, 10, 39)
         expected_last_sample_timestamp = datetime.datetime(2012, 7, 2, 10, 40)
         msgs_sources = [msg['source'] for msg in self.msgs]
         resources = list(self.conn.get_resources())
-        self.assertEqual(9, len(resources))
+        self.assertEqual(10, len(resources))
         for resource in resources:
             if resource.resource_id != 'resource-id':
                 continue
@@ -172,7 +185,8 @@ class ResourceTest(DBTestBase,
     def test_get_resources_end_timestamp(self):
         timestamp = datetime.datetime(2012, 7, 2, 10, 42)
         expected = set(['resource-id', 'resource-id-alternate',
-                        'resource-id-5', 'resource-id-7'])
+                        'resource-id-5', 'resource-id-7',
+                        'resource-id-mongo_bad_key'])
 
         resources = list(self.conn.get_resources(end_timestamp=timestamp))
         resource_ids = [r.resource_id for r in resources]
@@ -262,9 +276,15 @@ class ResourceTest(DBTestBase,
         resources = list(self.conn.get_resources(metaquery=q))
         self.assertEqual(9, len(resources))
 
+    def test_get_resources_by_metaquery_key_with_dot_in_metadata(self):
+        q = {'metadata.display.name.$name_2': 'test-server2',
+             'metadata.display.name.name.$1': 'test-server1'}
+        resources = list(self.conn.get_resources(metaquery=q))
+        self.assertEqual(1, len(resources))
+
     def test_get_resources_by_empty_metaquery(self):
         resources = list(self.conn.get_resources(metaquery={}))
-        self.assertEqual(9, len(resources))
+        self.assertEqual(10, len(resources))
 
     def test_get_resources_most_recent_metadata_all(self):
         resources = self.conn.get_resources()
@@ -459,6 +479,20 @@ class MeterTestPagination(DBTestBase,
 class RawSampleTest(DBTestBase,
                     tests_db.MixinTestsWithBackendScenarios):
 
+    def prepare_data(self):
+        super(RawSampleTest, self).prepare_data()
+
+        self.msgs.append(self.create_and_store_sample(
+            timestamp=datetime.datetime(2012, 7, 2, 10, 39),
+            user_id='mongodb_test',
+            resource_id='resource-id-mongo_bad_key',
+            project_id='project-id-test',
+            metadata={'display.name': {'name.$1': 'test-server1',
+                                       '$name_2': 'test-server2'},
+                      'tag': 'self.counter'},
+            source='test-4'
+        ))
+
     def test_get_samples_limit_zero(self):
         f = storage.SampleFilter()
         results = list(self.conn.get_samples(f, limit=0))
@@ -529,6 +563,14 @@ class RawSampleTest(DBTestBase,
             self.assertTimestampEqual(timeutils.utcnow(), d['recorded_at'])
             del d['recorded_at']
             self.assertIn(d, self.msgs)
+
+    def test_get_samples_by_metaquery_key_with_dot_in_metadata(self):
+        q = {'metadata.display.name.name.$1': 'test-server1',
+             'metadata.display.name.$name_2': 'test-server2'}
+        f = storage.SampleFilter(metaquery=q)
+        results = list(self.conn.get_samples(f))
+        self.assertIsNotNone(results)
+        self.assertEqual(1, len(results))
 
     def test_get_samples_by_start_time(self):
         timestamp = datetime.datetime(2012, 7, 2, 10, 41)
@@ -643,9 +685,9 @@ class RawSampleTest(DBTestBase,
         self.conn.clear_expired_metering_data(3 * 60)
         f = storage.SampleFilter(meter='instance')
         results = list(self.conn.get_samples(f))
-        self.assertEqual(11, len(results))
+        self.assertEqual(12, len(results))
         results = list(self.conn.get_resources())
-        self.assertEqual(9, len(results))
+        self.assertEqual(10, len(results))
 
     @tests_db.run_with('sqlite', 'hbase', 'db2')
     def test_clear_metering_data_with_alarms(self):

@@ -159,7 +159,9 @@ class TestListMeters(v2.FunctionalTest,
                                        'properties': {
                                            'prop_1': 'prop_value',
                                            'prop_2': {'sub_prop_1':
-                                                      'sub_prop_value'}
+                                                      'sub_prop_value'},
+                                           'prop.3': {'$sub_prop.2':
+                                                      'sub_prop_value2'}
                                        },
                                        'size': 0,
                                        'util': 0.58,
@@ -298,6 +300,22 @@ class TestListMeters(v2.FunctionalTest,
         self.assertEqual('self.sample4', metadata['tag'])
         self.assertEqual('prop_value', metadata['properties.prop_1'])
 
+    def test_list_meters_with_dict_metadata_with_dot_dollar_in_key(self):
+        data = self.get_json('/meters/meter.mine',
+                             q=[{'field':
+                                 'metadata.properties.prop.3.$sub_prop.2',
+                                 'op': 'eq',
+                                 'value': 'sub_prop_value2',
+                                 }])
+        self.assertEqual(1, len(data))
+        self.assertEqual('resource-id4', data[0]['resource_id'])
+        metadata = data[0]['resource_metadata']
+        self.assertIsNotNone(metadata)
+        self.assertEqual('self.sample4', metadata['tag'])
+        self.assertEqual('prop_value', metadata['properties.prop_1'])
+        self.assertEqual('sub_prop_value',
+                         metadata['properties.prop_2:sub_prop_1'])
+
     def test_get_one_sample(self):
         sample_id = self.messages[1]['message_id']
         data = self.get_json('/samples/%s' % sample_id)
@@ -347,13 +365,16 @@ class TestListMeters(v2.FunctionalTest,
             u'type': u'gauge',
             u'unit': u'',
             u'source': u'test_source1',
-            u'metadata': {u'display_name': u'test-server',
-                          u'properties.prop_2:sub_prop_1': u'sub_prop_value',
-                          u'util': u'0.58',
-                          u'tag': u'self.sample4',
-                          u'properties.prop_1': u'prop_value',
-                          u'is_public': u'True',
-                          u'size': u'0'}
+            u'metadata': {
+                u'display_name': u'test-server',
+                u'properties.prop_2:sub_prop_1': u'sub_prop_value',
+                u'util': u'0.58',
+                u'tag': u'self.sample4',
+                u'properties.prop_1': u'prop_value',
+                u'is_public': u'True',
+                u'size': u'0',
+                u'properties.prop:3:$sub_prop:2': u'sub_prop_value2',
+            }
         }], data)
 
     def test_list_meters_metadata_query(self):

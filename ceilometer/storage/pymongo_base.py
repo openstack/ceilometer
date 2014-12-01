@@ -65,7 +65,7 @@ class Connection(base.Connection):
         if pagination:
             raise ceilometer.NotImplementedError('Pagination not implemented')
 
-        metaquery = metaquery or {}
+        metaquery = pymongo_utils.improve_keys(metaquery, metaquery=True) or {}
 
         q = {}
         if user is not None:
@@ -138,4 +138,9 @@ class Connection(base.Connection):
             s['counter_unit'] = s.get('counter_unit', '')
             # Tolerate absence of recorded_at in older datapoints
             s['recorded_at'] = s.get('recorded_at')
+            # Check samples for metadata and "unquote" key if initially it
+            # was started with '$'.
+            if s.get('resource_metadata'):
+                s['resource_metadata'] = pymongo_utils.unquote_keys(
+                    s.get('resource_metadata'))
             yield models.Sample(**s)
