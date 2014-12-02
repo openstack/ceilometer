@@ -633,20 +633,29 @@ Ceilometer to send metering data to other systems in addition to the
 database, multiple dispatchers can be developed and enabled by modifying
 Ceilometer configuration file.
 
-Ceilometer ships two dispatchers currently. One is called database
-dispatcher, and the other is called file dispatcher. As the names imply,
-database dispatcher basically sends metering data to a database driver,
-eventually metering data will be saved in database. File dispatcher sends
-metering data into a file. The location, name, size of the file can be
-configured in ceilometer configuration file. These two dispatchers are
-shipped in the Ceilometer egg and defined in the entry_points as follows::
+Ceilometer ships multiple dispatchers currently. They are database, file and
+http dispatcher. As the names imply, database dispatcher sends metering data
+to a database, file dispatcher logs meters into a file, http dispatcher posts
+the meters onto a http target. Each dispatcher can have its own configuration
+parameters. Please see available configuration parameters at the beginning of
+each dispatcher file.
+
+To check if any of the dispatchers is available in your system, you can
+inspect the Ceilometer egg entry_points.txt file, you should normally see text
+like the following::
 
    [ceilometer.dispatcher]
-   file = ceilometer.dispatcher.file:FileDispatcher
    database = ceilometer.dispatcher.database:DatabaseDispatcher
+   file = ceilometer.dispatcher.file:FileDispatcher
+   http = ceilometer.dispatcher.http:HttpDispatcher
 
-To use both dispatchers on a Ceilometer collector service, add the following
-line in file ceilometer.conf::
+To configure one or multiple dispatchers for Ceilometer, find the Ceilometer
+configuration file ceilometer.conf which is normally located at /etc/ceilometer
+directory and make changes accordingly. Your configuration file can be in a
+different directory.
+
+To use multiple dispatchers on a Ceilometer collector service, add multiple
+dispatcher lines in ceilometer.conf file like the following::
 
    [DEFAULT]
    dispatcher=database
