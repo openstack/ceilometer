@@ -48,7 +48,7 @@ OPTS = [
                "in the database for (<= 0 means forever)."),
     cfg.StrOpt('metering_connection',
                default=None,
-               help='The connection string used to connect to the meteting '
+               help='The connection string used to connect to the metering '
                'database. (if unset, connection is used)'),
     cfg.StrOpt('alarm_connection',
                default=None,
