@@ -31,7 +31,8 @@ OPTS = [
                help='SNMPd user name of all nodes running in the cloud.'),
     cfg.StrOpt('readonly_user_password',
                default='password',
-               help='SNMPd password of all the nodes running in the cloud.'),
+               help='SNMPd password of all the nodes running in the cloud.',
+               secret=True),
 ]
 cfg.CONF.register_opts(OPTS, group='hardware')
 
