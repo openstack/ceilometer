@@ -27,10 +27,10 @@ import hashlib
 import multiprocessing
 import struct
 
-from oslo.concurrency import processutils
 from oslo.config import cfg
 from oslo.utils import timeutils
 from oslo.utils import units
+from oslo_concurrency import processutils
 import six
 
 

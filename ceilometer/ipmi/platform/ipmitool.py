@@ -16,7 +16,7 @@
 # under the License.
 
 """Utils to run ipmitool for data collection"""
-from oslo.concurrency import processutils
+from oslo_concurrency import processutils
 
 from ceilometer.ipmi.platform import exception as ipmiexcept
 from ceilometer.openstack.common.gettextutils import _
