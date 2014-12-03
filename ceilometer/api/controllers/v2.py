@@ -982,25 +982,31 @@ class MeterController(rest.RestController):
         g = _validate_groupby_fields(groupby)
 
         aggregate = utils.uniq(aggregate, ['func', 'param'])
-        computed = pecan.request.storage_conn.get_meter_statistics(f,
-                                                                   period,
-                                                                   g,
-                                                                   aggregate)
-        LOG.debug(_('computed value coming from %r'),
-                  pecan.request.storage_conn)
         # Find the original timestamp in the query to use for clamping
         # the duration returned in the statistics.
         start = end = None
         for i in q:
             if i.field == 'timestamp' and i.op in ('lt', 'le'):
-                end = timeutils.parse_isotime(i.value).replace(tzinfo=None)
+                end = timeutils.parse_isotime(i.value).replace(
+                    tzinfo=None)
             elif i.field == 'timestamp' and i.op in ('gt', 'ge'):
-                start = timeutils.parse_isotime(i.value).replace(tzinfo=None)
+                start = timeutils.parse_isotime(i.value).replace(
+                    tzinfo=None)
 
-        return [Statistics(start_timestamp=start,
-                           end_timestamp=end,
-                           **c.as_dict())
-                for c in computed]
+        try:
+            computed = pecan.request.storage_conn.get_meter_statistics(
+                f, period, g, aggregate)
+            LOG.debug(_('computed value coming from %r'),
+                      pecan.request.storage_conn)
+
+            return [Statistics(start_timestamp=start,
+                               end_timestamp=end,
+                               **c.as_dict())
+                    for c in computed]
+        except OverflowError as e:
+            params = dict(period=period, err=e)
+            raise ClientSideError(_("Invalid period %(period)s: %(err)s")
+                                  % params)
 
 
 class Meter(_Base):

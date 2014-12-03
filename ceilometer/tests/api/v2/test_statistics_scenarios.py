@@ -180,6 +180,15 @@ class TestMaxResourceVolume(v2.FunctionalTest,
                              period=-1)
         self.assertEqual(400, resp.status_code)
 
+    @tests_db.run_with('mysql', 'hbase', 'db2')
+    def test_period_with_large_value(self):
+        resp = self.get_json(self.PATH, expect_errors=True,
+                             q=[{'field': 'user_id',
+                                 'value': 'user-id'}],
+                             period=10000000000000)
+        self.assertEqual(400, resp.status_code)
+        self.assertIn("Invalid period", resp.body)
+
     def test_start_timestamp(self):
         data = self.get_json(self.PATH, q=[{'field': 'resource_id',
                                             'value': 'resource-id',
