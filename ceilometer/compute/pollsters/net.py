@@ -70,8 +70,7 @@ class _Base(plugin.ComputePollster):
     CACHE_KEY_VNIC = 'vnics'
 
     def _get_vnic_info(self, inspector, instance):
-        instance_name = util.instance_name(instance)
-        return inspector.inspect_vnics(instance_name)
+        return inspector.inspect_vnics(instance)
 
     @staticmethod
     def _get_rx_info(info):
@@ -82,13 +81,12 @@ class _Base(plugin.ComputePollster):
         return info.tx_bytes
 
     def _get_vnics_for_instance(self, cache, inspector, instance):
-        instance_name = util.instance_name(instance)
         i_cache = cache.setdefault(self.CACHE_KEY_VNIC, {})
-        if instance_name not in i_cache:
-            i_cache[instance_name] = list(
+        if instance.id not in i_cache:
+            i_cache[instance.id] = list(
                 self._get_vnic_info(inspector, instance)
             )
-        return i_cache[instance_name]
+        return i_cache[instance.id]
 
     def get_samples(self, manager, cache, resources):
         self._inspection_duration = self._record_poll_time()
