@@ -461,7 +461,7 @@ class TestListResources(v2.FunctionalTest,
             timestamp=datetime.datetime(2012, 7, 2, 10, 40),
             resource_metadata={'display_name': 'test-server',
                                'tag': 'self.sample',
-                               'dict_properties': {'key': 'value'},
+                               'dict_properties': {'key.$1': {'$key': 'val'}},
                                'not_ignored_list': ['returned'],
                                },
             source='test',
@@ -474,7 +474,7 @@ class TestListResources(v2.FunctionalTest,
 
         data = self.get_json('/resources')
         metadata = data[0]['metadata']
-        self.assertEqual([(u'dict_properties.key', u'value'),
+        self.assertEqual([(u'dict_properties.key:$1:$key', u'val'),
                           (u'display_name', u'test-server'),
                           (u'not_ignored_list', u"['returned']"),
                           (u'tag', u'self.sample')],
