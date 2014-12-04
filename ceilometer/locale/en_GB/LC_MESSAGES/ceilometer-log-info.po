@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-10-16 07:50+0000\n"
-"PO-Revision-Date: 2014-10-14 11:31+0000\n"
-"Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
+"POT-Creation-Date: 2014-12-04 06:08+0000\n"
+"PO-Revision-Date: 2014-11-26 13:32+0000\n"
+"Last-Translator: Andi Chandler <andi@gowling.com>\n"
 "Language-Team: English (United Kingdom) (http://www.transifex.com/projects/p/"
 "ceilometer/language/en_GB/)\n"
 "Language: en_GB\n"
@@ -22,12 +22,12 @@ msgstr ""
 
 #: ceilometer/coordination.py:73
 msgid "Coordination backend started successfully."
-msgstr ""
+msgstr "Coordination backend started successfully."
 
 #: ceilometer/coordination.py:99
 #, python-format
 msgid "Joined partitioning group %s"
-msgstr ""
+msgstr "Joined partitioning group %s"
 
 #: ceilometer/openstack/common/eventlet_backdoor.py:140
 #, python-format

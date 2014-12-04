@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-10-16 07:50+0000\n"
-"PO-Revision-Date: 2014-09-02 12:34+0000\n"
-"Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
+"POT-Creation-Date: 2014-12-04 06:08+0000\n"
+"PO-Revision-Date: 2014-11-26 13:32+0000\n"
+"Last-Translator: Andi Chandler <andi@gowling.com>\n"
 "Language-Team: English (United Kingdom) (http://www.transifex.com/projects/p/"
 "ceilometer/language/en_GB/)\n"
 "Language: en_GB\n"
@@ -26,15 +26,15 @@ msgstr "Dispatcher failed to handle the sample, requeue it."
 
 #: ceilometer/coordination.py:76
 msgid "Error connecting to coordination backend."
-msgstr ""
+msgstr "Error connecting to coordination backend."
 
 #: ceilometer/coordination.py:89
 msgid "Error sending a heartbeat to coordination backend."
-msgstr ""
+msgstr "Error sending a heartbeat to coordination backend."
 
 #: ceilometer/coordination.py:142
 msgid "Error getting group membership info from coordination backend."
-msgstr ""
+msgstr "Error getting group membership info from coordination backend."
 
 #: ceilometer/openstack/common/loopingcall.py:95
 msgid "in fixed duration looping call"
