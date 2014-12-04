@@ -60,4 +60,51 @@
     audit_period_ending:
       type: datetime
       fields: payload.audit_period_ending
-
+- event_type: ['identity.user.*', 'identity.project.*', 'identity.group.*', 'identity.role.*', 'identity.OS-TRUST:trust']
+  traits: &identity_crud
+    resource_id:
+      fields: payload.resource_info
+- event_type: identity.role_assignment.*
+  traits: &identity_role_assignment
+    role:
+      fields: payload.role
+    group:
+      fields: payload.group
+    domain:
+      fields: payload.domain
+    user:
+      fields: payload.user
+    project:
+      fields: payload.project
+- event_type: identity.authenticate.*
+  traits: &identity_authenticate
+    typeURI:
+      fields: payload.typeURI
+    id:
+      fields: payload.id
+    action:
+      fields: payload.action
+    eventType:
+      fields: payload.eventType
+    eventTime:
+      fields: payload.eventTime
+    outcome:
+      fields: payload.outcome
+    initiator_typeURI:
+      fields: payload.initiator.typeURI
+    initiator_id:
+      fields: payload.initiator.id
+    initiator_name:
+      fields: payload.initiator.name
+    initiator_host_agent:
+      fields: payload.initiator.host.agent
+    initiator_host_addr:
+      fields: payload.initiator.host.address
+    target_typeURI:
+      fields: payload.target.typeURI
+    target_id:
+      fields: payload.target.id
+    observer_typeURI:
+      fields: payload.observer.typeURI
+    observer_id:
+      fields: payload.observer.id
