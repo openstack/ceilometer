@@ -317,7 +317,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
 
     def test_setup_polling_tasks_multiple_interval(self):
         self.pipeline_cfg.append({
-            'name': "test_pipeline",
+            'name': "test_pipeline_1",
             'interval': 10,
             'counters': ['test'],
             'resources': ['test://'] if self.source_resources else [],
@@ -346,7 +346,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
 
     def test_setup_polling_task_same_interval(self):
         self.pipeline_cfg.append({
-            'name': "test_pipeline",
+            'name': "test_pipeline_1",
             'interval': 60,
             'counters': ['testanother'],
             'resources': ['testanother://'] if self.source_resources else [],
@@ -356,14 +356,14 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.setup_pipeline()
         polling_tasks = self.mgr.setup_polling_tasks()
         self.assertEqual(1, len(polling_tasks))
-        pollsters = polling_tasks.get(60).pollster_matches['test_pipeline']
+        pollsters = polling_tasks.get(60).pollster_matches
         self.assertEqual(2, len(pollsters))
         per_task_resources = polling_tasks[60].resources
         self.assertEqual(2, len(per_task_resources))
         key = 'test_pipeline-test'
         self.assertEqual(set(self.pipeline_cfg[0]['resources']),
                          set(per_task_resources[key].get({})))
-        key = 'test_pipeline-testanother'
+        key = 'test_pipeline_1-testanother'
         self.assertEqual(set(self.pipeline_cfg[1]['resources']),
                          set(per_task_resources[key].get({})))
 
@@ -407,7 +407,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
 
     def test_manager_exception_persistency(self):
         self.pipeline_cfg.append({
-            'name': "test_pipeline",
+            'name': "test_pipeline_1",
             'interval': 60,
             'counters': ['testanother'],
             'transformers': [],

@@ -64,6 +64,15 @@ class TestDeprecatedPipeline(pipeline_base.BasePipelineTestCase):
             'publishers': ['except'],
         })
 
+    def _dup_pipeline_name_cfg(self):
+        self.pipeline_cfg.append({
+            'name': 'test_pipeline',
+            'interval': 5,
+            'counters': ['b'],
+            'transformers': [],
+            'publishers': ['except'],
+        })
+
     def _set_pipeline_cfg(self, field, value):
         self.pipeline_cfg[0][field] = value
 

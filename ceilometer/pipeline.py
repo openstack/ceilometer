@@ -512,14 +512,26 @@ class PipelineManager(object):
             for source in sources:
                 source.check_sinks(sinks)
                 for target in source.sinks:
-                    self.pipelines.append(Pipeline(source,
-                                                   sinks[target]))
+                    pipe = Pipeline(source, sinks[target])
+                    if pipe.name in [p.name for p in self.pipelines]:
+                        raise PipelineException(
+                            "Duplicate pipeline name: %s. Ensure pipeline"
+                            " names are unique. (name is the source and sink"
+                            " names combined)" % pipe.name, cfg)
+                    else:
+                        self.pipelines.append(pipe)
         else:
             LOG.warning(_('detected deprecated pipeline config format'))
             for pipedef in cfg:
                 source = Source(pipedef)
                 sink = Sink(pipedef, transformer_manager)
-                self.pipelines.append(Pipeline(source, sink))
+                pipe = Pipeline(source, sink)
+                if pipe.name in [p.name for p in self.pipelines]:
+                    raise PipelineException(
+                        "Duplicate pipeline name: %s. Ensure pipeline"
+                        " names are unique" % pipe.name, cfg)
+                else:
+                    self.pipelines.append(pipe)
 
     def publisher(self, context):
         """Build a new Publisher for these manager pipelines.

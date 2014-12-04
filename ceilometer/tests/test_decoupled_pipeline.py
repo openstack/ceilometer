@@ -74,6 +74,15 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
             'publishers': ['except'],
         })
 
+    def _dup_pipeline_name_cfg(self):
+        self.pipeline_cfg['sources'].append({
+            'name': 'test_source',
+            'interval': 5,
+            'counters': ['b'],
+            'resources': [],
+            'sinks': ['test_sink']
+        })
+
     def _set_pipeline_cfg(self, field, value):
         if field in self.pipeline_cfg['sources'][0]:
             self.pipeline_cfg['sources'][0][field] = value
