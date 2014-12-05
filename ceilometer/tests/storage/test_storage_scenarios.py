@@ -3496,13 +3496,16 @@ class BigIntegerTest(tests_db.TestBase,
         self.conn.record_metering_data(msg)
 
 
+@tests_db.run_with('mongodb')
 class MongoAutoReconnectTest(DBTestBase,
                              tests_db.MixinTestsWithBackendScenarios):
-    cfg.CONF.set_override('retry_interval', 1, group='database')
 
-    @tests_db.run_with('mongodb')
+    def setUp(self):
+        super(MongoAutoReconnectTest, self).setUp()
+        self.CONF.set_override('retry_interval', 0, group='database')
+
     def test_mongo_client(self):
-        if cfg.CONF.database.mongodb_replica_set:
+        if self.CONF.database.mongodb_replica_set:
             self.assertIsInstance(self.conn.conn.conn.conn,
                                   pymongo.MongoReplicaSetClient)
         else:
@@ -3518,7 +3521,6 @@ class MongoAutoReconnectTest(DBTestBase,
                 return method(*args, **kwargs)
         return side_effect
 
-    @tests_db.run_with('mongodb')
     def test_mongo_find(self):
         raise_exc = [False, True]
         method = self.conn.db.resource.find
@@ -3530,7 +3532,6 @@ class MongoAutoReconnectTest(DBTestBase,
             resources = list(self.conn.get_resources())
             self.assertEqual(9, len(resources))
 
-    @tests_db.run_with('mongodb')
     def test_mongo_insert(self):
         raise_exc = [False, True]
         method = self.conn.db.meter.insert
@@ -3546,7 +3547,6 @@ class MongoAutoReconnectTest(DBTestBase,
             meters = list(self.conn.db.meter.find())
             self.assertEqual(12, len(meters))
 
-    @tests_db.run_with('mongodb')
     def test_mongo_find_and_modify(self):
         raise_exc = [False, True]
         method = self.conn.db.resource.find_and_modify
@@ -3563,7 +3563,6 @@ class MongoAutoReconnectTest(DBTestBase,
                  datetime.datetime(2014, 10, 15, 14, 39)})[0]['source']
             self.assertEqual('test-proxy', data)
 
-    @tests_db.run_with('mongodb')
     def test_mongo_update(self):
         raise_exc = [False, True]
         method = self.conn.db.resource.update
