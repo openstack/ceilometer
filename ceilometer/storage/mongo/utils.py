@@ -253,13 +253,12 @@ class ConnectionPool(object):
         try:
             if cfg.CONF.database.mongodb_replica_set:
                 client = MongoProxy(
-                    Prefection(
-                        pymongo.MongoReplicaSetClient(
-                            url,
-                            replicaSet=cfg.CONF.database.mongodb_replica_set)))
+                    pymongo.MongoReplicaSetClient(
+                        url,
+                        replicaSet=cfg.CONF.database.mongodb_replica_set))
             else:
                 client = MongoProxy(
-                    Prefection(pymongo.MongoClient(url, safe=True)))
+                    pymongo.MongoClient(url, safe=True))
             return client
         except pymongo.errors.ConnectionFailure as e:
             LOG.warn(_('Unable to connect to the database server: '
@@ -439,6 +438,12 @@ class MongoProxy(object):
         """
         return MongoProxy(self.conn[item])
 
+    def find(self, *args, **kwargs):
+        # We need this modifying method to return a CursorProxy object so that
+        # we can handle the Cursor next function to catch the AutoReconnect
+        # exception.
+        return CursorProxy(self.conn.find(*args, **kwargs))
+
     def __getattr__(self, item):
         """Wrap MongoDB connection.
 
@@ -456,20 +461,25 @@ class MongoProxy(object):
         return self.conn(*args, **kwargs)
 
 
-class Prefection(pymongo.collection.Collection):
-    def __init__(self, conn):
-        self.conn = conn
+class CursorProxy(pymongo.cursor.Cursor):
+    def __init__(self, cursor):
+        self.cursor = cursor
 
-    def find(self, *args, **kwargs):
-        # We need this modifying method to check a connection for MongoDB
-        # in context of MongoProxy approach. Initially 'find' returns Cursor
-        # object and doesn't connect to db while Cursor is not used.
-        found = self.find(*args, **kwargs)
+    def __getitem__(self, item):
+        return self.cursor[item]
+
+    @safe_mongo_call
+    def next(self):
+        """Wrap Cursor next method.
+
+        This method will be executed before each Cursor next method call.
+        """
         try:
-            found[0]
-        except IndexError:
-                pass
-        return found
+            save_cursor = self.cursor.clone()
+            return self.cursor.next()
+        except pymongo.errors.AutoReconnect:
+            self.cursor = save_cursor
+            raise
 
     def __getattr__(self, item):
-        return getattr(self.conn, item)
+        return getattr(self.cursor, item)

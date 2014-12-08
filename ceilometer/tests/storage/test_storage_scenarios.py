@@ -3505,11 +3505,11 @@ class MongoAutoReconnectTest(DBTestBase,
         self.CONF.set_override('retry_interval', 0, group='database')
 
     def test_mongo_client(self):
-        if self.CONF.database.mongodb_replica_set:
-            self.assertIsInstance(self.conn.conn.conn.conn,
+        if cfg.CONF.database.mongodb_replica_set:
+            self.assertIsInstance(self.conn.conn.conn,
                                   pymongo.MongoReplicaSetClient)
         else:
-            self.assertIsInstance(self.conn.conn.conn.conn,
+            self.assertIsInstance(self.conn.conn.conn,
                                   pymongo.MongoClient)
 
     @staticmethod
@@ -3521,16 +3521,16 @@ class MongoAutoReconnectTest(DBTestBase,
                 return method(*args, **kwargs)
         return side_effect
 
-    def test_mongo_find(self):
+    def test_mongo_cursor_next(self):
+        expected_first_sample_timestamp = datetime.datetime(2012, 7, 2, 10, 39)
         raise_exc = [False, True]
-        method = self.conn.db.resource.find
-
-        with mock.patch('pymongo.collection.Collection.find',
-                        mock.Mock()) as mock_find:
-            mock_find.side_effect = self.create_side_effect(method, raise_exc)
-            mock_find.__name__ = 'find'
-            resources = list(self.conn.get_resources())
-            self.assertEqual(9, len(resources))
+        method = self.conn.db.resource.find().cursor.next
+        with mock.patch('pymongo.cursor.Cursor.next',
+                        mock.Mock()) as mock_next:
+            mock_next.side_effect = self.create_side_effect(method, raise_exc)
+            resource = self.conn.db.resource.find().next()
+            self.assertEqual(expected_first_sample_timestamp,
+                             resource['first_sample_timestamp'])
 
     def test_mongo_insert(self):
         raise_exc = [False, True]
