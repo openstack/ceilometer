@@ -190,14 +190,23 @@ image.serve               Delta       B        image ID  notification  Image is 
 Volume (Cinder)
 ===============
 
-========================  ==========  ========  ========  ============  =======================================================
-Name                      Type        Unit      Resource  Origin        Note
-========================  ==========  ========  ========  ============  =======================================================
-volume                    Gauge       volume    vol ID    notification  Existence of volume
-volume.size               Gauge       GB        vol ID    notification  Size of volume
-snapshot                  Gauge       snapshot  snap ID   notification  Existence of snapshot
-snapshot.size             Gauge       GB        snap ID   notification  Size of snapshot's volume
-========================  ==========  ========  ========  ============  =======================================================
+============================  ==========   ========  ========  ============  =======================================================
+Name                          Type         Unit      Resource  Origin        Note
+============================  ==========   ========  ========  ============  =======================================================
+volume                         Gauge       volume    vol ID    notification  Existence of volume
+volume.size                    Gauge       GB        vol ID    notification  Size of volume
+volume.create.(start|end)      Delta       volume    vol ID    notification  Creation of volume
+volume.delete.(start|end)      Delta       volume    vol ID    notification  Deletion of volume
+volume.update.(start|end)      Delta       volume    vol ID    notification  Update volume(name or description)
+volume.resize.(start|end)      Delta       volume    vol ID    notification  Update volume size
+volume.attach.(start|end)      Delta       volume    vol ID    notification  Attaching volume to instance
+volume.detach.(start|end)      Delta       volume    vol ID    notification  Detaching volume from instance
+snapshot                       Gauge       snapshot  snap ID   notification  Existence of snapshot
+snapshot.size                  Gauge       GB        snap ID   notification  Size of snapshot's volume
+snapshot.create.(start|end)    Delta       snapshot  snap ID   notification  Creation of snapshot
+snapshot.delete.(start|end)    Delta       snapshot  snap ID   notification  Deletion of snapshot
+snapshot.update.(start|end)    Delta       snapshot  snap ID   notification  Update snapshot(name or description)
+============================  ==========   ========  ========  ============  =======================================================
 
 Make sure Cinder is properly configured first: see :ref:`installing_manually`.
 
