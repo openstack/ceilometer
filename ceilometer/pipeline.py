@@ -86,10 +86,9 @@ class PublishContext(object):
         self.pipelines.update(pipelines)
 
     def __enter__(self):
-        def p(samples):
+        def p(data):
             for p in self.pipelines:
-                p.publish_samples(self.context,
-                                  samples)
+                p.publish_data(self.context, data)
         return p
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -98,6 +97,54 @@ class PublishContext(object):
 
 
 class Source(object):
+    """Represents a source of samples or events."""
+
+    def __init__(self, cfg):
+        self.cfg = cfg
+
+        try:
+            self.name = cfg['name']
+        except KeyError as err:
+            raise PipelineException(
+                "Required field %s not specified" % err.args[0], cfg)
+
+    def __str__(self):
+        return self.name
+
+    def check_sinks(self, sinks):
+        if not self.sinks:
+            raise PipelineException(
+                "No sink defined in source %s" % self,
+                self.cfg)
+        for sink in self.sinks:
+            if sink not in sinks:
+                raise PipelineException(
+                    "Dangling sink %s from source %s" % (sink, self),
+                    self.cfg)
+
+    def check_source_filtering(self, data, d_type):
+        """Source data rules checking
+
+        - At least one meaningful datapoint exist
+        - Included type and excluded type can't co-exist on the same pipeline
+        - Included type meter and wildcard can't co-exist at same pipeline
+        """
+        if not data:
+            raise PipelineException('No %s specified' % d_type, self.cfg)
+
+        if ([x for x in data if x[0] not in '!*'] and
+           [x for x in data if x[0] == '!']):
+            raise PipelineException(
+                'Both included and excluded %s specified' % d_type,
+                cfg)
+
+        if '*' in data and [x for x in data if x[0] not in '!*']:
+            raise PipelineException(
+                'Included %s specified with wildcard' % d_type,
+                self.cfg)
+
+
+class SampleSource(Source):
     """Represents a source of samples.
 
     In effect it is a set of pollsters and/or notification handlers emitting
@@ -107,10 +154,8 @@ class Source(object):
     """
 
     def __init__(self, cfg):
-        self.cfg = cfg
-
+        super(SampleSource, self).__init__(cfg)
         try:
-            self.name = cfg['name']
             try:
                 self.interval = int(cfg['interval'])
             except ValueError:
@@ -131,34 +176,7 @@ class Source(object):
         self.discovery = cfg.get('discovery') or []
         if not isinstance(self.discovery, list):
             raise PipelineException("Discovery should be a list", cfg)
-        self._check_meters()
-
-    def __str__(self):
-        return self.name
-
-    def _check_meters(self):
-        """Meter rules checking
-
-        At least one meaningful meter exist
-        Included type and excluded type meter can't co-exist at
-        the same pipeline
-        Included type meter and wildcard can't co-exist at same pipeline
-
-        """
-        meters = self.meters
-        if not meters:
-            raise PipelineException("No meter specified", self.cfg)
-
-        if ([x for x in meters if x[0] not in '!*'] and
-           [x for x in meters if x[0] == '!']):
-            raise PipelineException(
-                "Both included and excluded meters specified",
-                cfg)
-
-        if '*' in meters and [x for x in meters if x[0] not in '!*']:
-            raise PipelineException(
-                "Included meters specified with wildcard",
-                self.cfg)
+        self.check_source_filtering(self.meters, 'meters')
 
     # (yjiang5) To support meters like instance:m1.tiny,
     # which include variable part at the end starting with ':'.
@@ -192,43 +210,30 @@ class Source(object):
 
         return default
 
-    def check_sinks(self, sinks):
-        if not self.sinks:
-            raise PipelineException(
-                "No sink defined in source %s" % self,
-                self.cfg)
-        for sink in self.sinks:
-            if sink not in sinks:
-                raise PipelineException(
-                    "Dangling sink %s from source %s" % (sink, self),
-                    self.cfg)
-
 
 class Sink(object):
-    """Represents a sink for the transformation and publication of samples.
-
-    Samples are emitted from a related source.
+    """Represents a sink for the transformation and publication of data.
 
     Each sink config is concerned *only* with the transformation rules
-    and publication conduits for samples.
+    and publication conduits for data.
 
     In effect, a sink describes a chain of handlers. The chain starts
     with zero or more transformers and ends with one or more publishers.
 
-    The first transformer in the chain is passed samples from the
+    The first transformer in the chain is passed data from the
     corresponding source, takes some action such as deriving rate of
     change, performing unit conversion, or aggregating, before passing
-    the modified sample to next step.
+    the modified data to next step.
 
     The subsequent transformers, if any, handle the data similarly.
 
     At the end of the chain, publishers publish the data. The exact
     publishing method depends on publisher type, for example, pushing
     into data storage via the message bus providing guaranteed delivery,
-    or for loss-tolerant samples UDP may be used.
+    or for loss-tolerant data UDP may be used.
 
     If no transformers are included in the chain, the publishers are
-    passed samples directly from the sink which are published unchanged.
+    passed data directly from the sink which are published unchanged.
     """
 
     def __init__(self, cfg, transformer_manager):
@@ -279,6 +284,9 @@ class Sink(object):
                                                 'param': parameter}))
 
         return transformers
+
+
+class SampleSink(Sink):
 
     def _transform_sample(self, start, ctxt, sample):
         try:
@@ -364,6 +372,17 @@ class Pipeline(object):
         return (self.source.name if self.source.name == self.sink.name
                 else '%s:%s' % (self.source.name, self.sink.name))
 
+    def flush(self, ctxt):
+        self.sink.flush(ctxt)
+
+    @property
+    def publishers(self):
+        return self.sink.publishers
+
+
+class SamplePipeline(Pipeline):
+    """Represents a pipeline for Samples."""
+
     def get_interval(self):
         return self.source.interval
 
@@ -378,19 +397,16 @@ class Pipeline(object):
     def support_meter(self, meter_name):
         return self.source.support_meter(meter_name)
 
-    @property
-    def publishers(self):
-        return self.sink.publishers
-
-    def publish_sample(self, ctxt, sample):
-        self.publish_samples(ctxt, [sample])
-
-    def publish_samples(self, ctxt, samples):
+    def publish_data(self, ctxt, samples):
+        if not isinstance(samples, list):
+            samples = [samples]
         supported = [s for s in samples if self.source.support_meter(s.name)]
         self.sink.publish_samples(ctxt, supported)
 
-    def flush(self, ctxt):
-        self.sink.flush(ctxt)
+
+SAMPLE_TYPE = {'pipeline': SamplePipeline,
+               'source': SampleSource,
+               'sink': SampleSink}
 
 
 class PipelineManager(object):
@@ -402,7 +418,7 @@ class PipelineManager(object):
 
     """
 
-    def __init__(self, cfg, transformer_manager):
+    def __init__(self, cfg, transformer_manager, p_type=SAMPLE_TYPE):
         """Setup the pipelines according to config.
 
         The configuration is supported in one of two forms:
@@ -506,13 +522,13 @@ class PipelineManager(object):
                 raise PipelineException("Both sources & sinks are required",
                                         cfg)
             LOG.info(_('detected decoupled pipeline config format'))
-            sources = [Source(s) for s in cfg.get('sources', [])]
-            sinks = dict((s['name'], Sink(s, transformer_manager))
+            sources = [p_type['source'](s) for s in cfg.get('sources', [])]
+            sinks = dict((s['name'], p_type['sink'](s, transformer_manager))
                          for s in cfg.get('sinks', []))
             for source in sources:
                 source.check_sinks(sinks)
                 for target in source.sinks:
-                    pipe = Pipeline(source, sinks[target])
+                    pipe = p_type['pipeline'](source, sinks[target])
                     if pipe.name in [p.name for p in self.pipelines]:
                         raise PipelineException(
                             "Duplicate pipeline name: %s. Ensure pipeline"
@@ -523,9 +539,9 @@ class PipelineManager(object):
         else:
             LOG.warning(_('detected deprecated pipeline config format'))
             for pipedef in cfg:
-                source = Source(pipedef)
-                sink = Sink(pipedef, transformer_manager)
-                pipe = Pipeline(source, sink)
+                source = p_type['source'](pipedef)
+                sink = p_type['sink'](pipedef, transformer_manager)
+                pipe = p_type['pipeline'](source, sink)
                 if pipe.name in [p.name for p in self.pipelines]:
                     raise PipelineException(
                         "Duplicate pipeline name: %s. Ensure pipeline"
