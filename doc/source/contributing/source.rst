@@ -103,7 +103,7 @@ through gerrit.
 
 .. seealso::
 
-   * http://wiki.openstack.org/GerritWorkflow
+   * http://docs.openstack.org/infra/manual/developers.html#development-workflow
    * `OpenStack Gerrit instance`_.
 
 .. _OpenStack Gerrit instance: https://review.openstack.org/#/q/status:open+project:openstack/ceilometer,n,z
