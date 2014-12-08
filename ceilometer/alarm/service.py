@@ -253,7 +253,7 @@ class AlarmNotifierService(os_service.Service):
         self.rpc_server.stop()
         super(AlarmNotifierService, self).stop()
 
-    def _handle_action(self, action, alarm_id, previous,
+    def _handle_action(self, action, alarm_id, alarm_name, previous,
                        current, reason, reason_data):
         try:
             action = netutils.urlsplit(action)
@@ -276,7 +276,7 @@ class AlarmNotifierService(os_service.Service):
         try:
             LOG.debug(_("Notifying alarm %(id)s with action %(act)s") % (
                       {'id': alarm_id, 'act': action}))
-            notifier.notify(action, alarm_id, previous,
+            notifier.notify(action, alarm_id, alarm_name, previous,
                             current, reason, reason_data)
         except Exception:
             LOG.exception(_("Unable to notify alarm %s"), alarm_id)
@@ -291,6 +291,7 @@ class AlarmNotifierService(os_service.Service):
              - actions, the URL of the action to run; this is mapped to
                extensions automatically
              - alarm_id, the ID of the alarm that has been triggered
+             - alarm_name, the name of the alarm that has been triggered
              - previous, the previous state of the alarm
              - current, the new state the alarm has transitioned to
              - reason, the reason the alarm changed its state
@@ -304,6 +305,7 @@ class AlarmNotifierService(os_service.Service):
         for action in actions:
             self._handle_action(action,
                                 data.get('alarm_id'),
+                                data.get('alarm_name'),
                                 data.get('previous'),
                                 data.get('current'),
                                 data.get('reason'),

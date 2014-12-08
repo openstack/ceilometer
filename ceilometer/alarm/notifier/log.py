@@ -27,10 +27,11 @@ class LogAlarmNotifier(notifier.AlarmNotifier):
     "Log alarm notifier."""
 
     @staticmethod
-    def notify(action, alarm_id, previous, current, reason, reason_data):
+    def notify(action, alarm_id, alarm_name, previous, current, reason,
+               reason_data):
         LOG.info(_(
-            "Notifying alarm %(alarm_id)s from %(previous)s "
+            "Notifying alarm %(alarm_name)s %(alarm_id)s from %(previous)s "
             "to %(current)s with action %(action)s because "
-            "%(reason)s") % ({'alarm_id': alarm_id, 'previous': previous,
-                              'current': current, 'action': action,
-                              'reason': reason}))
+            "%(reason)s.") % ({'alarm_name': alarm_name, 'alarm_id': alarm_id,
+                               'previous': previous, 'current': current,
+                               'action': action, 'reason': reason}))

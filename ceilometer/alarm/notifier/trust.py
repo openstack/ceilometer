@@ -36,7 +36,8 @@ class TrustRestAlarmNotifier(rest.RestAlarmNotifier):
     """
 
     @staticmethod
-    def notify(action, alarm_id, previous, current, reason, reason_data):
+    def notify(action, alarm_id, alarm_name, previous, current,
+               reason, reason_data):
         trust_id = action.username
 
         auth_url = cfg.CONF.service_credentials.os_auth_url.replace(
@@ -61,4 +62,5 @@ class TrustRestAlarmNotifier(rest.RestAlarmNotifier):
 
         headers = {'X-Auth-Token': client.auth_token}
         rest.RestAlarmNotifier.notify(
-            action, alarm_id, previous, current, reason, reason_data, headers)
+            action, alarm_id, alarm_name, previous, current, reason,
+            reason_data, headers)
