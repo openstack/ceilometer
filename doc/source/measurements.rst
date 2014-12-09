@@ -305,6 +305,19 @@ cluster.delete                   Delta       cluster     cluster ID   notificati
 
 To enable Sahara notifications configure Sahara as described in :ref:`installing_manually`.
 
+Key Value Storage (MagnetoDB)
+=============================
+
+===============================  ==========  ==========  ===========  ============  =================================================
+Name                             Type        Unit        Resource     Origin        Note
+===============================  ==========  ==========  ===========  ============  =================================================
+magnetodb.table.create           Gauge       table       table ID     notification  Creation requests for a table successful
+magnetodb.table.delete           Gauge       table       table ID     notification  Deletion requests for a table successful
+magnetodb.table.index.count      Gauge       index       table ID     notification  Number of indices created in a table
+===============================  ==========  ==========  ===========  ============  =================================================
+
+To enable MagnetoDB notifications configure MagnetoDB as described in :ref:`installing_manually`.
+
 Energy (Kwapi)
 ==============
 
