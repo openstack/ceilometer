@@ -20,11 +20,11 @@
 # under the License.
 
 import mock
+from oslo_context import context
 from oslotest import base
 
 from ceilometer.agent import manager
 from ceilometer.network import floatingip
-from ceilometer.openstack.common import context
 
 
 class TestFloatingIPPollster(base.BaseTestCase):

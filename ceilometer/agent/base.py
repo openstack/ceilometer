@@ -23,13 +23,13 @@ import fnmatch
 import itertools
 
 from oslo.config import cfg
+from oslo_context import context
 import six
 from six.moves.urllib import parse as urlparse
 from stevedore import extension
 
 from ceilometer import coordination
 from ceilometer.i18n import _
-from ceilometer.openstack.common import context
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import service as os_service
 from ceilometer import pipeline as publish_pipeline

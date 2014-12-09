@@ -17,13 +17,13 @@
 
 from oslo.config import cfg
 import oslo.messaging
+from oslo_context import context
 from stevedore import extension
 
 from ceilometer import coordination
 from ceilometer.event import endpoint as event_endpoint
 from ceilometer.i18n import _
 from ceilometer import messaging
-from ceilometer.openstack.common import context
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import service as os_service
 from ceilometer import pipeline

@@ -24,10 +24,10 @@ import mock
 from oslo.config import fixture as fixture_config
 import oslo.messaging
 from oslo.utils import netutils
+from oslo_context import context
 import testscenarios.testcase
 
 from ceilometer import messaging
-from ceilometer.openstack.common import context
 from ceilometer.publisher import messaging as msg_publisher
 from ceilometer import sample
 from ceilometer.tests import base as tests_base

@@ -24,11 +24,11 @@ import fnmatch
 from keystoneclient.v2_0 import client as ksclient
 from oslo.config import cfg
 import oslo.messaging
+from oslo_context import context
 import six
 
 from ceilometer.i18n import _
 from ceilometer import messaging
-from ceilometer.openstack.common import context
 from ceilometer.openstack.common import log
 from ceilometer.publisher import utils
 
