@@ -49,13 +49,14 @@ class TestComputeDurationByResource(v2.FunctionalTest,
         self.late2 = datetime.datetime(2012, 8, 29, 19, 0)
 
     def _patch_get_interval(self, start, end):
-        def get_interval(event_filter, period, groupby, aggregate):
-            self.assertIsNotNone(event_filter.start)
-            self.assertIsNotNone(event_filter.end)
-            if event_filter.start > end or event_filter.end < start:
+        def get_interval(sample_filter, period, groupby, aggregate):
+            self.assertIsNotNone(sample_filter.start_timestamp)
+            self.assertIsNotNone(sample_filter.end_timestamp)
+            if (sample_filter.start_timestamp > end or
+                    sample_filter.end_timestamp < start):
                 return []
-            duration_start = max(event_filter.start, start)
-            duration_end = min(event_filter.end, end)
+            duration_start = max(sample_filter.start_timestamp, start)
+            duration_end = min(sample_filter.end_timestamp, end)
             duration = timeutils.delta_seconds(duration_start, duration_end)
             return [
                 models.Statistics(

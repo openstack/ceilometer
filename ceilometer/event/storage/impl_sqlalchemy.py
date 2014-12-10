@@ -209,8 +209,8 @@ class Connection(base.Connection):
         :param event_filter: EventFilter instance
         """
 
-        start = event_filter.start_time
-        end = event_filter.end_time
+        start = event_filter.start_timestamp
+        end = event_filter.end_timestamp
         session = self._engine_facade.get_session()
         LOG.debug(_("Getting events that match filter: %s") % event_filter)
         with session.begin():
