@@ -18,8 +18,6 @@
 # under the License.
 
 import fnmatch
-import itertools
-import operator
 import os
 
 from oslo.config import cfg
@@ -312,10 +310,7 @@ class Sink(object):
                                                       'pub': p}))
 
     def publish_samples(self, ctxt, samples):
-        for meter_name, samples in itertools.groupby(
-                sorted(samples, key=operator.attrgetter('name')),
-                operator.attrgetter('name')):
-            self._publish_samples(0, ctxt, samples)
+        self._publish_samples(0, ctxt, samples)
 
     def flush(self, ctxt):
         """Flush data after all samples have been injected to pipeline."""
