@@ -101,7 +101,6 @@ class PollingTask(object):
 
     def poll_and_publish(self):
         """Polling sample and publish into pipeline."""
-        agent_resources = self.manager.discover()
         cache = {}
         discovery_cache = {}
         for source, pollster in self.pollster_matches:
@@ -113,8 +112,7 @@ class PollingTask(object):
                     [pollster.obj.default_discovery], discovery_cache)
             key = Resources.key(source, pollster)
             source_resources = list(self.resources[key].get(discovery_cache))
-            polling_resources = (source_resources or pollster_resources or
-                                 agent_resources)
+            polling_resources = (source_resources or pollster_resources)
             if not polling_resources:
                 LOG.info(_("Skip polling pollster %s, no resources found"),
                          pollster.name)
@@ -136,10 +134,8 @@ class PollingTask(object):
 
 class AgentManager(os_service.Service):
 
-    def __init__(self, namespace, default_discovery=None, group_prefix=None):
+    def __init__(self, namespace, group_prefix=None):
         super(AgentManager, self).__init__()
-        default_discovery = default_discovery or []
-        self.default_discovery = default_discovery
         self.pollster_manager = self._extensions('poll', namespace)
         self.discovery_manager = self._extensions('discover')
         self.context = context.RequestContext('admin', 'admin', is_admin=True)
@@ -226,7 +222,8 @@ class AgentManager(os_service.Service):
 
     def discover(self, discovery=None, discovery_cache=None):
         resources = []
-        for url in (discovery or self.default_discovery):
+        discovery = discovery or []
+        for url in discovery:
             if discovery_cache is not None and url in discovery_cache:
                 resources.extend(discovery_cache[url])
                 continue

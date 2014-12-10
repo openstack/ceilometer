@@ -425,71 +425,6 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.assertEqual(expected, self.DiscoveryAnother.params)
         self.assertEqual(expected, self.DiscoveryException.params)
 
-    def _do_test_per_agent_discovery(self,
-                                     discovered_resources,
-                                     static_resources):
-        self.mgr.discovery_manager = self.create_discovery_manager()
-        if discovered_resources:
-            self.mgr.default_discovery = [d.name
-                                          for d in self.mgr.discovery_manager]
-        self.Discovery.resources = discovered_resources
-        self.DiscoveryAnother.resources = [d[::-1]
-                                           for d in discovered_resources]
-        self.pipeline_cfg[0]['resources'] = static_resources
-        self.setup_pipeline()
-        polling_tasks = self.mgr.setup_polling_tasks()
-        self.mgr.interval_task(polling_tasks.get(60))
-        self._verify_discovery_params([None] if discovered_resources else [])
-        discovery = self.Discovery.resources + self.DiscoveryAnother.resources
-        # compare resource lists modulo ordering
-        self.assertEqual(set(static_resources or discovery),
-                         set(self.Pollster.resources))
-
-    def test_per_agent_discovery_discovered_only(self):
-        self._do_test_per_agent_discovery(['discovered_1', 'discovered_2'],
-                                          [])
-
-    def test_per_agent_discovery_static_only(self):
-        self._do_test_per_agent_discovery([],
-                                          ['static_1', 'static_2'])
-
-    def test_per_agent_discovery_discovered_overridden_by_static(self):
-        self._do_test_per_agent_discovery(['discovered_1', 'discovered_2'],
-                                          ['static_1', 'static_2'])
-
-    def test_per_agent_discovery_overridden_by_per_pollster_discovery(self):
-        discovered_resources = ['discovered_1', 'discovered_2']
-        self.mgr.discovery_manager = self.create_discovery_manager()
-        self.Pollster.discovery = 'testdiscovery'
-        self.mgr.default_discovery = ['testdiscoveryanother',
-                                      'testdiscoverynonexistent',
-                                      'testdiscoveryexception']
-        self.pipeline_cfg[0]['resources'] = []
-        self.Discovery.resources = discovered_resources
-        self.DiscoveryAnother.resources = [d[::-1]
-                                           for d in discovered_resources]
-        self.setup_pipeline()
-        polling_tasks = self.mgr.setup_polling_tasks()
-        self.mgr.interval_task(polling_tasks.get(60))
-        self.assertEqual(set(self.Discovery.resources),
-                         set(self.Pollster.resources))
-
-    def test_per_agent_discovery_overridden_by_per_pipeline_discovery(self):
-        discovered_resources = ['discovered_1', 'discovered_2']
-        self.mgr.discovery_manager = self.create_discovery_manager()
-        self.Discovery.resources = discovered_resources
-        self.DiscoveryAnother.resources = [d[::-1]
-                                           for d in discovered_resources]
-        self.pipeline_cfg[0]['discovery'] = ['testdiscoveryanother',
-                                             'testdiscoverynonexistent',
-                                             'testdiscoveryexception']
-        self.pipeline_cfg[0]['resources'] = []
-        self.setup_pipeline()
-        polling_tasks = self.mgr.setup_polling_tasks()
-        self.mgr.interval_task(polling_tasks.get(60))
-        self.assertEqual(set(self.DiscoveryAnother.resources),
-                         set(self.Pollster.resources))
-
     def _do_test_per_pollster_discovery(self, discovered_resources,
                                         static_resources):
         self.Pollster.discovery = 'testdiscovery'
@@ -705,7 +640,6 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
 
     def test_static_resources_partitioning(self):
         p_coord = self.mgr.partition_coordinator
-        self.mgr.default_discovery = []
         static_resources = ['static_1', 'static_2']
         static_resources2 = ['static_3', 'static_4']
         self.pipeline_cfg[0]['resources'] = static_resources

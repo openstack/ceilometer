@@ -25,7 +25,7 @@ LOG = log.getLogger(__name__)
 class AgentManager(agent.AgentManager):
 
     def __init__(self):
-        super(AgentManager, self).__init__('compute', ['local_instances'])
+        super(AgentManager, self).__init__('compute')
         self._inspector = virt_inspector.get_hypervisor_inspector()
 
     @property
