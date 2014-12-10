@@ -507,7 +507,8 @@ class Connection(base.Connection):
                 source=row.source_id,
                 user_id=row.user_id)
 
-    def _retrieve_samples(self, query):
+    @staticmethod
+    def _retrieve_samples(query):
         samples = query.all()
 
         for s in samples:

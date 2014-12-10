@@ -127,7 +127,8 @@ class TestManager(manager.AgentManager):
 
 class TestImagePollsterPageSize(base.BaseTestCase):
 
-    def fake_get_glance_client(self, ksclient, endpoint):
+    @staticmethod
+    def fake_get_glance_client(ksclient, endpoint):
         glanceclient = FakeGlanceClient()
         glanceclient.images.list = mock.MagicMock(return_value=IMAGE_LIST)
         return glanceclient
@@ -165,7 +166,8 @@ class TestImagePollsterPageSize(base.BaseTestCase):
 
 class TestImagePollster(base.BaseTestCase):
 
-    def fake_get_glance_client(self, ksclient, endpoint):
+    @staticmethod
+    def fake_get_glance_client(ksclient, endpoint):
         glanceclient = _BaseObject()
         setattr(glanceclient, "images", _BaseObject())
         setattr(glanceclient.images,

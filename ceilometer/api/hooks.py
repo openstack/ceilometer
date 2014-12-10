@@ -30,7 +30,8 @@ class ConfigHook(hooks.PecanHook):
     That allows controllers to get it.
     """
 
-    def before(self, state):
+    @staticmethod
+    def before(state):
         state.request.cfg = cfg.CONF
 
 

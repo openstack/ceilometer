@@ -41,7 +41,8 @@ class SensorPollster(plugin_base.PollsterBase):
     def default_discovery(self):
         return None
 
-    def _get_sensor_types(self, data, sensor_type):
+    @staticmethod
+    def _get_sensor_types(data, sensor_type):
         try:
             return (sensor_type_data for _, sensor_type_data
                     in data[sensor_type].items())

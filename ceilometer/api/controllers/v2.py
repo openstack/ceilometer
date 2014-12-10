@@ -1540,7 +1540,8 @@ class Resource(_Base):
 class ResourcesController(rest.RestController):
     """Works on resources."""
 
-    def _resource_links(self, resource_id, meter_links=1):
+    @staticmethod
+    def _resource_links(resource_id, meter_links=1):
         links = [_make_link('self', pecan.request.host_url, 'resources',
                             resource_id)]
         if meter_links:
@@ -2175,7 +2176,8 @@ class AlarmsController(rest.RestController):
     def _lookup(self, alarm_id, *remainder):
         return AlarmController(alarm_id), remainder
 
-    def _record_creation(self, conn, data, alarm_id, now):
+    @staticmethod
+    def _record_creation(conn, data, alarm_id, now):
         if not cfg.CONF.alarm.record_history:
             return
         type = alarm_models.AlarmChange.CREATION

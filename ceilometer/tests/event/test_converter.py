@@ -28,7 +28,8 @@ from ceilometer.tests import base
 
 
 class ConverterBase(base.BaseTestCase):
-    def _create_test_notification(self, event_type, message_id, **kw):
+    @staticmethod
+    def _create_test_notification(event_type, message_id, **kw):
         return dict(event_type=event_type,
                     message_id=message_id,
                     priority="INFO",

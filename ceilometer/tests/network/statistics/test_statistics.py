@@ -25,7 +25,8 @@ from ceilometer import sample
 
 class TestBase(base.BaseTestCase):
 
-    def test_subclass_ok(self):
+    @staticmethod
+    def test_subclass_ok():
 
         class OkSubclass(statistics._Base):
 
@@ -76,7 +77,8 @@ class TestBaseGetSamples(base.BaseTestCase):
         statistics._Base.drivers = {}
         super(TestBaseGetSamples, self).tearDown()
 
-    def _setup_ext_mgr(self, **drivers):
+    @staticmethod
+    def _setup_ext_mgr(**drivers):
         statistics._Base.drivers = drivers
 
     def _make_fake_driver(self, *return_values):
@@ -93,7 +95,8 @@ class TestBaseGetSamples(base.BaseTestCase):
                 yield retval
         return FakeDriver
 
-    def _make_timestamps(self, count):
+    @staticmethod
+    def _make_timestamps(count):
         now = timeutils.utcnow()
         return [timeutils.isotime(now + datetime.timedelta(seconds=i))
                 for i in range(count)]

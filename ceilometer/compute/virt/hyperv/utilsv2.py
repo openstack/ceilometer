@@ -143,7 +143,8 @@ class UtilsV2(object):
                 'host_resource': host_resource
             }
 
-    def _sum_metric_values(self, metrics):
+    @staticmethod
+    def _sum_metric_values(metrics):
         tot_metric_val = 0
         for metric in metrics:
             tot_metric_val += long(metric.MetricValue)
@@ -160,7 +161,8 @@ class UtilsV2(object):
                 metric_values.append(0)
         return metric_values
 
-    def _get_metric_value_instances(self, elements, result_class):
+    @staticmethod
+    def _get_metric_value_instances(elements, result_class):
         instances = []
         for el in elements:
             associators = el.associators(wmi_result_class=result_class)
@@ -190,7 +192,8 @@ class UtilsV2(object):
             element.associators(
                 wmi_association_class=self._METRICS_ME), metric_def)
 
-    def _filter_metrics(self, all_metrics, metric_def):
+    @staticmethod
+    def _filter_metrics(all_metrics, metric_def):
         return [v for v in all_metrics if
                 v.MetricDefinitionId == metric_def.Id]
 

@@ -95,8 +95,8 @@ class TestSNMPInspector(test_base.BaseTestCase):
                           'test_exact',
                           {})
 
-    def _fake_post_op(self, host, cache, meter_def,
-                      value, metadata, extra, suffix):
+    @staticmethod
+    def _fake_post_op(host, cache, meter_def, value, metadata, extra, suffix):
         metadata.update(post_op_meta=4)
         extra.update(project_id=2)
         return value

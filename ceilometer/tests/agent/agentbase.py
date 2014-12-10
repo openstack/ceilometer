@@ -250,7 +250,8 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.useFixture(mockpatch.PatchObject(
             publisher, 'get_publisher', side_effect=self.get_publisher))
 
-    def get_publisher(self, url, namespace=''):
+    @staticmethod
+    def get_publisher(url, namespace=''):
         fake_drivers = {'test://': test_publisher.TestPublisher,
                         'new://': test_publisher.TestPublisher,
                         'rpc://': test_publisher.TestPublisher}

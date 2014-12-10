@@ -95,7 +95,8 @@ class SensorNotification(plugin_base.NotificationBase):
         except KeyError:
             return []
 
-    def _package_payload(self, message, payload):
+    @staticmethod
+    def _package_payload(message, payload):
         # NOTE(chdent): How much of the payload should we keep?
         payload['node'] = message['payload']['node_uuid']
         info = {'publisher_id': message['publisher_id'],

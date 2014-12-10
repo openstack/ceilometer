@@ -263,7 +263,8 @@ class MConnection(object):
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass
 
-    def open(self):
+    @staticmethod
+    def open():
         LOG.debug(_("Opening in-memory HBase connection"))
 
     def create_table(self, n, families=None):

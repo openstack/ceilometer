@@ -52,6 +52,7 @@ class FakeInspector(inspector_base.Inspector):
 
 
 class TestPollsterBase(test_base.BaseTestCase):
+    @staticmethod
     def faux_get_inspector(url, namespace=None):
         return FakeInspector()
 
