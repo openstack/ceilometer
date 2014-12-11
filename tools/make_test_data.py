@@ -111,12 +111,15 @@ def main():
     parser.add_argument(
         '--start',
         default=31,
-        help='The number of days in the past to start timestamps.',
+        help='Number of days to be stepped back from now or date in the past ('
+             '"YYYY-MM-DDTHH:MM:SS" format) to define timestamps start range.',
     )
     parser.add_argument(
         '--end',
         default=2,
-        help='The number of days into the future to continue timestamps.',
+        help='Number of days to be stepped forward from now or date in the '
+             'future ("YYYY-MM-DDTHH:MM:SS" format) to define timestamps end '
+             'range.',
     )
     parser.add_argument(
         '--type',
@@ -186,8 +189,25 @@ def main():
                 break
 
     # Compute the correct time span
-    start = datetime.datetime.utcnow() - datetime.timedelta(days=args.start)
-    end = datetime.datetime.utcnow() + datetime.timedelta(days=args.end)
+    format = '%Y-%m-%dT%H:%M:%S'
+
+    try:
+        start = datetime.datetime.utcnow() - datetime.timedelta(
+            days=int(args.start))
+    except ValueError:
+        try:
+            start = datetime.datetime.strptime(args.start, format)
+        except ValueError:
+            raise
+
+    try:
+        end = datetime.datetime.utcnow() + datetime.timedelta(
+            days=int(args.end))
+    except ValueError:
+        try:
+            end = datetime.datetime.strptime(args.end, format)
+        except ValueError:
+            raise
 
     make_test_data(conn=conn,
                    name=args.counter,
