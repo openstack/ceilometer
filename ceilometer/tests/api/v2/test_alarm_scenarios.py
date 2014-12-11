@@ -544,12 +544,9 @@ class TestAlarms(v2.FunctionalTest,
         resp = self.post_json('/alarms', params=json, expect_errors=True,
                               status=400, headers=self.auth_headers)
         expected_err_msg = ("Invalid input for field/attribute"
-                            " statistic."
-                            " Value: 'magic'."
-                            " Value should be one of:"
-                            " count, max, sum, avg, min")
-        self.assertEqual(expected_err_msg,
-                         resp.json['error_message']['faultstring'])
+                            " statistic. Value: 'magic'.")
+        self.assertIn(expected_err_msg,
+                      resp.json['error_message']['faultstring'])
         alarms = list(self.alarm_conn.get_alarms())
         self.assertEqual(4, len(alarms))
 
@@ -567,11 +564,9 @@ class TestAlarms(v2.FunctionalTest,
         resp = self.post_json('/alarms', params=json, expect_errors=True,
                               status=400, headers=self.auth_headers)
         expected_err_msg = ("Invalid input for field/attribute state."
-                            " Value: 'bad_state'."
-                            " Value should be one of:"
-                            " alarm, ok, insufficient data")
-        self.assertEqual(expected_err_msg,
-                         resp.json['error_message']['faultstring'])
+                            " Value: 'bad_state'.")
+        self.assertIn(expected_err_msg,
+                      resp.json['error_message']['faultstring'])
         alarms = list(self.alarm_conn.get_alarms())
         self.assertEqual(4, len(alarms))
 
@@ -590,11 +585,9 @@ class TestAlarms(v2.FunctionalTest,
                               status=400, headers=self.auth_headers)
         expected_err_msg = ("Invalid input for field/attribute"
                             " comparison_operator."
-                            " Value: 'bad_co'."
-                            " Value should be one of:"
-                            " gt, lt, ne, ge, le, eq")
-        self.assertEqual(expected_err_msg,
-                         resp.json['error_message']['faultstring'])
+                            " Value: 'bad_co'.")
+        self.assertIn(expected_err_msg,
+                      resp.json['error_message']['faultstring'])
         alarms = list(self.alarm_conn.get_alarms())
         self.assertEqual(4, len(alarms))
 
@@ -613,11 +606,9 @@ class TestAlarms(v2.FunctionalTest,
                               status=400, headers=self.auth_headers)
         expected_err_msg = ("Invalid input for field/attribute"
                             " type."
-                            " Value: 'bad_type'."
-                            " Value should be one of:"
-                            " threshold, combination")
-        self.assertEqual(expected_err_msg,
-                         resp.json['error_message']['faultstring'])
+                            " Value: 'bad_type'.")
+        self.assertIn(expected_err_msg,
+                      resp.json['error_message']['faultstring'])
         alarms = list(self.alarm_conn.get_alarms())
         self.assertEqual(4, len(alarms))
 
@@ -689,10 +680,9 @@ class TestAlarms(v2.FunctionalTest,
                               status=400, headers=self.auth_headers)
         expected_err_msg = ("Invalid input for field/attribute"
                             " operator."
-                            " Value: 'bad_operator'."
-                            " Value should be one of: and, or")
-        self.assertEqual(expected_err_msg,
-                         resp.json['error_message']['faultstring'])
+                            " Value: 'bad_operator'.")
+        self.assertIn(expected_err_msg,
+                      resp.json['error_message']['faultstring'])
         alarms = list(self.alarm_conn.get_alarms())
         self.assertEqual(4, len(alarms))
 
