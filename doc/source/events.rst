@@ -112,8 +112,8 @@ This can be what you want, the notification system is quite chatty by design
 (notifications philosophy is "tell us everything, we'll ignore what we don't
 need"), so you may want to ignore the noisier ones if you don't use them.
 
-.. _definitions_cfg_file: configuration.html#event-conversion
-.. _drop_unmatched_notifications: configuration.html#event-conversion
+.. _definitions_cfg_file: http://docs.openstack.org/trunk/config-reference/content/ch_configuring-openstack-telemetry.html
+.. _drop_unmatched_notifications: http://docs.openstack.org/trunk/config-reference/content/ch_configuring-openstack-telemetry.html
 
 There is a set of default traits (all are TEXT type) that will be added to
 all events if the notification has the relevant data:
