@@ -361,7 +361,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.setup_pipeline()
         polling_tasks = self.mgr.setup_polling_tasks()
         self.assertEqual(1, len(polling_tasks))
-        pollsters = polling_tasks.get(60).pollster_matches
+        pollsters = polling_tasks.get(60).pollster_matches['test_pipeline']
         self.assertEqual(2, len(pollsters))
         per_task_resources = polling_tasks[60].resources
         self.assertEqual(2, len(per_task_resources))
@@ -679,10 +679,29 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.pipeline_cfg[0]['resources'] = []
         self.setup_pipeline()
         polling_task = self.mgr.setup_polling_tasks().values()[0]
-        pollster = list(polling_task.pollster_matches)[0][1]
+        pollster = list(polling_task.pollster_matches['test_pipeline'])[0]
         LOG = mock.MagicMock()
         with mock.patch('ceilometer.agent.LOG', LOG):
             polling_task.poll_and_publish()
             if not self.mgr.discover():
                 LOG.info.assert_called_with('Skip polling pollster %s, no '
                                             'resources found', pollster.name)
+
+    def test_arithmetic_transformer(self):
+        self.pipeline_cfg[0]['counters'] = ['test', 'testanother']
+        self.pipeline_cfg[0]['transformers'] = [
+            {'name': 'arithmetic',
+             'parameters': {
+                 'target': {'name': 'test_sum',
+                            'unit': default_test_data.unit,
+                            'type': default_test_data.type,
+                            'expr': '$(test) * 10 + $(testanother)'
+                            }
+             }}
+        ]
+        self.setup_pipeline()
+        self.mgr.setup_polling_tasks()[60].poll_and_publish()
+        samples = self.mgr.pipeline_manager.pipelines[0].publishers[0].samples
+        self.assertEqual(1, len(samples))
+        self.assertEqual('test_sum', samples[0].name)
+        self.assertEqual(11, samples[0].volume)
