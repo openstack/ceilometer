@@ -609,18 +609,33 @@ class Connection(base.Connection):
         session = self._engine_facade.get_session()
 
         if groupby:
-            group_attributes = [getattr(models.Resource, g) for g in groupby]
+            group_attributes = []
+            for g in groupby:
+                if g != 'resource_metadata.instance_type':
+                    group_attributes.append(getattr(models.Resource, g))
+                else:
+                    group_attributes.append(
+                        getattr(models.MetaText, 'value')
+                        .label('resource_metadata.instance_type'))
+
             select.extend(group_attributes)
 
-        query = (session.query(*select)
-                 .join(models.Meter,
-                       models.Meter.id == models.Sample.meter_id)
-                 .join(
-                     models.Resource,
-                     models.Resource.internal_id == models.Sample.resource_id)
-                 .group_by(models.Meter.unit))
+        query = (
+            session.query(*select)
+            .join(models.Meter,
+                  models.Meter.id == models.Sample.meter_id)
+            .join(models.Resource,
+                  models.Resource.internal_id == models.Sample.resource_id)
+            .group_by(models.Meter.unit))
 
         if groupby:
+            for g in groupby:
+                if g == 'resource_metadata.instance_type':
+                    query = query.join(
+                        models.MetaText,
+                        models.Resource.internal_id == models.MetaText.id)
+                    query = query.filter(
+                        models.MetaText.meta_key == 'instance_type')
             query = query.group_by(*group_attributes)
 
         return make_query_from_filter(session, query, sample_filter)
@@ -667,7 +682,8 @@ class Connection(base.Connection):
         """
         if groupby:
             for group in groupby:
-                if group not in ['user_id', 'project_id', 'resource_id']:
+                if group not in ['user_id', 'project_id', 'resource_id',
+                                 'resource_metadata.instance_type']:
                     raise ceilometer.NotImplementedError('Unable to group by '
                                                          'these fields')
 
