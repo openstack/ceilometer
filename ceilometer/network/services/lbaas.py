@@ -281,7 +281,7 @@ class LBTotalConnectionsPollster(_LBStatsPollster):
         return make_sample_from_pool(
             pool,
             name='network.services.lb.total.connections',
-            type=sample.TYPE_GAUGE,
+            type=sample.TYPE_CUMULATIVE,
             unit='connection',
             volume=data.total_connections,
         )

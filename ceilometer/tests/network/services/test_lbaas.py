@@ -486,7 +486,7 @@ class TestLBStatsPollster(_BaseTestLBPollster):
     def test_lb_total_connections(self):
         self._check_get_samples(lbaas.LBTotalConnectionsPollster,
                                 'network.services.lb.total.connections',
-                                4L, 'gauge')
+                                4L, 'cumulative')
 
     def test_lb_active_connections(self):
         self._check_get_samples(lbaas.LBActiveConnectionsPollster,
