@@ -15,9 +15,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import anyjson
 import mock
 from oslo.config import fixture as fixture_config
+from oslo.serialization import jsonutils
 from oslotest import mockpatch
 import requests
 import six.moves.urllib.parse as urlparse
@@ -27,7 +27,7 @@ from ceilometer.openstack.common import context
 from ceilometer.tests import base as tests_base
 
 
-DATA_JSON = anyjson.loads(
+DATA_JSON = jsonutils.loads(
     '{"current": "ALARM", "alarm_id": "foobar", "alarm_name": "testalarm",'
     ' "reason": "what ?", "reason_data": {"test": "test"},'
     ' "previous": "OK"}'
@@ -120,7 +120,7 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
                                           headers=mock.ANY)
                 args, kwargs = poster.call_args
                 self.assertEqual(self.HTTP_HEADERS, kwargs['headers'])
-                self.assertEqual(DATA_JSON, anyjson.loads(kwargs['data']))
+                self.assertEqual(DATA_JSON, jsonutils.loads(kwargs['data']))
 
     def test_notify_alarm_rest_action_with_ssl_client_cert(self):
         action = 'https://host/action'
@@ -138,7 +138,7 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
                                           cert=certificate, verify=True)
                 args, kwargs = poster.call_args
                 self.assertEqual(self.HTTP_HEADERS, kwargs['headers'])
-                self.assertEqual(DATA_JSON, anyjson.loads(kwargs['data']))
+                self.assertEqual(DATA_JSON, jsonutils.loads(kwargs['data']))
 
     def test_notify_alarm_rest_action_with_ssl_client_cert_and_key(self):
         action = 'https://host/action'
@@ -159,7 +159,7 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
                                           cert=(certificate, key), verify=True)
                 args, kwargs = poster.call_args
                 self.assertEqual(self.HTTP_HEADERS, kwargs['headers'])
-                self.assertEqual(DATA_JSON, anyjson.loads(kwargs['data']))
+                self.assertEqual(DATA_JSON, jsonutils.loads(kwargs['data']))
 
     def test_notify_alarm_rest_action_with_ssl_verify_disable_by_cfg(self):
         action = 'https://host/action'
@@ -176,7 +176,7 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
                                           verify=False)
                 args, kwargs = poster.call_args
                 self.assertEqual(self.HTTP_HEADERS, kwargs['headers'])
-                self.assertEqual(DATA_JSON, anyjson.loads(kwargs['data']))
+                self.assertEqual(DATA_JSON, jsonutils.loads(kwargs['data']))
 
     def test_notify_alarm_rest_action_with_ssl_verify_disable(self):
         action = 'https://host/action?ceilometer-alarm-ssl-verify=0'
@@ -190,7 +190,7 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
                                           verify=False)
                 args, kwargs = poster.call_args
                 self.assertEqual(self.HTTP_HEADERS, kwargs['headers'])
-                self.assertEqual(DATA_JSON, anyjson.loads(kwargs['data']))
+                self.assertEqual(DATA_JSON, jsonutils.loads(kwargs['data']))
 
     def test_notify_alarm_rest_action_with_ssl_verify_enable_by_user(self):
         action = 'https://host/action?ceilometer-alarm-ssl-verify=1'
@@ -207,7 +207,7 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
                                           verify=True)
                 args, kwargs = poster.call_args
                 self.assertEqual(self.HTTP_HEADERS, kwargs['headers'])
-                self.assertEqual(DATA_JSON, anyjson.loads(kwargs['data']))
+                self.assertEqual(DATA_JSON, jsonutils.loads(kwargs['data']))
 
     @staticmethod
     def _fake_urlsplit(*args, **kwargs):
@@ -261,4 +261,4 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
                     url, data=mock.ANY, headers=mock.ANY)
                 args, kwargs = poster.call_args
                 self.assertEqual(headers, kwargs['headers'])
-                self.assertEqual(DATA_JSON, anyjson.loads(kwargs['data']))
+                self.assertEqual(DATA_JSON, jsonutils.loads(kwargs['data']))

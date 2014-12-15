@@ -3,7 +3,6 @@
 # process, which may cause wedges in the gate later.
 
 alembic>=0.6.4
-anyjson>=0.3.3
 argparse
 croniter>=0.3.4 # MIT License
 eventlet>=0.15.2
