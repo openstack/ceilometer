@@ -24,7 +24,7 @@ import collections
 import six
 
 import ceilometer
-from ceilometer.compute import plugin
+from ceilometer.compute import pollsters
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.i18n import _
@@ -48,7 +48,7 @@ DiskRateData = collections.namedtuple('DiskRateData',
 
 
 @six.add_metaclass(abc.ABCMeta)
-class _Base(plugin.ComputePollster):
+class _Base(pollsters.BaseComputePollster):
 
     DISKIO_USAGE_MESSAGE = ' '.join(["DISKIO USAGE:",
                                      "%s %s:",
@@ -110,7 +110,7 @@ class _Base(plugin.ComputePollster):
             instance_name = util.instance_name(instance)
             try:
                 c_data = self._populate_cache(
-                    manager.inspector,
+                    self.inspector,
                     cache,
                     instance,
                 )
@@ -123,7 +123,7 @@ class _Base(plugin.ComputePollster):
                 # Selected inspector does not implement this pollster.
                 LOG.debug(_('%(inspector)s does not provide data for '
                             ' %(pollster)s'),
-                          {'inspector': manager.inspector.__class__.__name__,
+                          {'inspector': self.inspector.__class__.__name__,
                            'pollster': self.__class__.__name__})
             except Exception as err:
                 LOG.exception(_('Ignoring instance %(name)s: %(error)s'),
@@ -263,7 +263,7 @@ class PerDeviceWriteBytesPollster(_Base):
 
 
 @six.add_metaclass(abc.ABCMeta)
-class _DiskRatesPollsterBase(plugin.ComputePollster):
+class _DiskRatesPollsterBase(pollsters.BaseComputePollster):
 
     CACHE_KEY_DISK_RATE = 'diskio-rate'
 
@@ -315,7 +315,7 @@ class _DiskRatesPollsterBase(plugin.ComputePollster):
         for instance in resources:
             try:
                 disk_rates_info = self._populate_cache(
-                    manager.inspector,
+                    self.inspector,
                     cache,
                     instance,
                 )
@@ -328,7 +328,7 @@ class _DiskRatesPollsterBase(plugin.ComputePollster):
                 # Selected inspector does not implement this pollster.
                 LOG.debug(_('%(inspector)s does not provide data for '
                             ' %(pollster)s'),
-                          {'inspector': manager.inspector.__class__.__name__,
+                          {'inspector': self.inspector.__class__.__name__,
                            'pollster': self.__class__.__name__})
             except Exception as err:
                 instance_name = util.instance_name(instance)

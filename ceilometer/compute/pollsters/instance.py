@@ -17,12 +17,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from ceilometer.compute import plugin
+from ceilometer.compute import pollsters
 from ceilometer.compute.pollsters import util
 from ceilometer import sample
 
 
-class InstancePollster(plugin.ComputePollster):
+class InstancePollster(pollsters.BaseComputePollster):
 
     @staticmethod
     def get_samples(manager, cache, resources):
@@ -36,7 +36,7 @@ class InstancePollster(plugin.ComputePollster):
             )
 
 
-class InstanceFlavorPollster(plugin.ComputePollster):
+class InstanceFlavorPollster(pollsters.BaseComputePollster):
 
     @staticmethod
     def get_samples(manager, cache, resources):

@@ -19,7 +19,7 @@
 
 import mock
 
-from ceilometer.compute import manager
+from ceilometer.agent import manager
 from ceilometer.compute.pollsters import instance as pollsters_instance
 from ceilometer.tests.compute.pollsters import base
 

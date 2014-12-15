@@ -17,6 +17,8 @@
 """Tests for ceilometer/central/manager.py
 """
 
+import itertools
+
 import mock
 from oslotest import base
 from oslotest import mockpatch
@@ -33,7 +35,19 @@ class TestManager(base.BaseTestCase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_load_plugins(self):
         mgr = manager.AgentManager()
-        self.assertIsNotNone(list(mgr.pollster_manager))
+        self.assertIsNotNone(list(mgr.extensions))
+
+    def test_load_plugins_pollster_list(self):
+        mgr = manager.AgentManager(pollster_list=['disk.*'])
+        # currently we do have 16 disk-related pollsters
+        self.assertEqual(16, len(list(mgr.extensions)))
+
+    def test_load_plugins_no_intersection(self):
+        # Let's test nothing will be polled if namespace and pollsters
+        # list have no intersection.
+        mgr = manager.AgentManager(namespaces=['compute'],
+                                   pollster_list=['storage.*'])
+        self.assertEqual(0, len(list(mgr.extensions)))
 
 
 class TestPollsterKeystone(agentbase.TestPollster):
@@ -108,6 +122,10 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         self.mgr.pipeline_manager = pipeline.PipelineManager(
             self.pipeline_cfg,
             self.transformer_manager)
+        self.mgr.extensions = itertools.chain(
+            self.mgr.extensions,
+            [extension.Extension('testkeystone', None, None,
+                                 self.PollsterKeystone())])
         polling_tasks = self.mgr.setup_polling_tasks()
         self.mgr.interval_task(polling_tasks.values()[0])
         self.assertFalse(self.PollsterKeystone.samples)

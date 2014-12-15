@@ -104,6 +104,7 @@ def list_opts():
         ('api',
          itertools.chain(ceilometer.api.OPTS,
                          ceilometer.api.app.API_OPTS,)),
+        # deprecated path, new one is 'polling'
         ('central', ceilometer.agent.manager.OPTS),
         ('collector', ceilometer.collector.OPTS),
         ('compute', ceilometer.compute.discovery.OPTS),
@@ -114,6 +115,7 @@ def list_opts():
         ('hardware', ceilometer.hardware.discovery.OPTS),
         ('impi', ceilometer.ipmi.platform.intel_node_manager.OPTS),
         ('notification', ceilometer.notification.OPTS),
+        ('polling', ceilometer.agent.manager.OPTS),
         ('publisher', ceilometer.publisher.utils.OPTS),
         ('publisher_notifier', ceilometer.publisher.messaging.NOTIFIER_OPTS),
         ('publisher_rpc', ceilometer.publisher.messaging.RPC_OPTS),

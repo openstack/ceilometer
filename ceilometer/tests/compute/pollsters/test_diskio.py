@@ -21,7 +21,7 @@
 import mock
 from oslotest import mockpatch
 
-from ceilometer.compute import manager
+from ceilometer.agent import manager
 from ceilometer.compute.pollsters import disk
 from ceilometer.compute.virt import inspector as virt_inspector
 import ceilometer.tests.base as base
@@ -40,6 +40,15 @@ class TestBaseDiskIO(base.BaseTestCase):
             'ceilometer.compute.virt.inspector.get_hypervisor_inspector',
             new=mock.Mock(return_value=self.inspector))
         self.useFixture(patch_virt)
+
+        # as we're having lazy hypervisor inspector singleton object in the
+        # base compute pollster class, that leads to the fact that we
+        # need to mock all this class property to avoid context sharing between
+        # the tests
+        patch_inspector = mockpatch.Patch(
+            'ceilometer.compute.pollsters.BaseComputePollster.inspector',
+            self.inspector)
+        self.useFixture(patch_inspector)
 
     @staticmethod
     def _get_fake_instances():

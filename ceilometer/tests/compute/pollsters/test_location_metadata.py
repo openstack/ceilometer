@@ -23,7 +23,7 @@ import mock
 from oslotest import base
 import six
 
-from ceilometer.compute import manager
+from ceilometer.agent import manager
 from ceilometer.compute.pollsters import util
 
 

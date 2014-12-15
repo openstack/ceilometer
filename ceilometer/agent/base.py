@@ -19,6 +19,7 @@
 # under the License.
 
 import collections
+import fnmatch
 import itertools
 
 from oslo.config import cfg
@@ -38,6 +39,15 @@ LOG = log.getLogger(__name__)
 
 cfg.CONF.import_opt('heartbeat', 'ceilometer.coordination',
                     group='coordination')
+
+
+class PollsterListForbidden(Exception):
+    def __init__(self):
+        msg = ('It is forbidden to use pollster-list option of polling agent '
+               'in case of using coordination between multiple agents. Please '
+               'use either multiple agents being coordinated or polling list '
+               'option for one polling agent.')
+        super(PollsterListForbidden, self).__init__(msg)
 
 
 class Resources(object):
@@ -140,14 +150,42 @@ class PollingTask(object):
 
 class AgentManager(os_service.Service):
 
-    def __init__(self, namespace, group_prefix=None):
+    def __init__(self, namespaces, pollster_list, group_prefix=None):
         super(AgentManager, self).__init__()
-        self.pollster_manager = self._extensions('poll', namespace)
+
+        def _match(pollster):
+            """Find out if pollster name matches to one of the list."""
+            return any(fnmatch.fnmatch(pollster.name, pattern) for
+                       pattern in pollster_list)
+
+        # features of using coordination and pollster-list are exclusive, and
+        # cannot be used at one moment to avoid both samples duplication and
+        # samples being lost
+        if pollster_list and cfg.CONF.coordination.backend_url:
+            raise PollsterListForbidden()
+
+        if type(namespaces) is not list:
+            namespaces = [namespaces]
+
+        # we'll have default ['compute', 'central'] here if no namespaces will
+        # be passed
+        extensions = (self._extensions('poll', namespace).extensions
+                      for namespace in namespaces)
+        if pollster_list:
+            extensions = (itertools.ifilter(_match, exts)
+                          for exts in extensions)
+
+        self.extensions = list(itertools.chain(*list(extensions)))
+
         self.discovery_manager = self._extensions('discover')
         self.context = context.RequestContext('admin', 'admin', is_admin=True)
         self.partition_coordinator = coordination.PartitionCoordinator()
-        self.group_prefix = ('%s-%s' % (namespace, group_prefix)
-                             if group_prefix else namespace)
+
+        # Compose coordination group prefix.
+        # We'll use namespaces as the basement for this partitioning.
+        namespace_prefix = '-'.join(sorted(namespaces))
+        self.group_prefix = ('%s-%s' % (namespace_prefix, group_prefix)
+                             if group_prefix else namespace_prefix)
 
     @staticmethod
     def _extensions(category, agent_ns=None):
@@ -177,15 +215,14 @@ class AgentManager(os_service.Service):
 
     def setup_polling_tasks(self):
         polling_tasks = {}
-        for pipeline, pollster in itertools.product(
-                self.pipeline_manager.pipelines,
-                self.pollster_manager.extensions):
-            if pipeline.support_meter(pollster.name):
-                polling_task = polling_tasks.get(pipeline.get_interval())
-                if not polling_task:
-                    polling_task = self.create_polling_task()
-                    polling_tasks[pipeline.get_interval()] = polling_task
-                polling_task.add(pollster, pipeline)
+        for pipeline in self.pipeline_manager.pipelines:
+            for pollster in self.extensions:
+                if pipeline.support_meter(pollster.name):
+                    polling_task = polling_tasks.get(pipeline.get_interval())
+                    if not polling_task:
+                        polling_task = self.create_polling_task()
+                        polling_tasks[pipeline.get_interval()] = polling_task
+                    polling_task.add(pollster, pipeline)
 
         return polling_tasks
 

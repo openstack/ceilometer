@@ -41,9 +41,12 @@ LOG = log.getLogger(__name__)
 
 class AgentManager(base.AgentManager):
 
-    def __init__(self, namespace='agent'):
+    def __init__(self, namespaces=None, pollster_list=None):
+        namespaces = namespaces or ['compute', 'central']
+        pollster_list = pollster_list or []
         super(AgentManager, self).__init__(
-            namespace, group_prefix=cfg.CONF.polling.partitioning_group_prefix)
+            namespaces, pollster_list,
+            group_prefix=cfg.CONF.polling.partitioning_group_prefix)
 
     def interval_task(self, task):
         try:
