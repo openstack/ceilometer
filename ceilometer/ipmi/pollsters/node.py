@@ -20,8 +20,8 @@ from oslo.config import cfg
 from oslo.utils import timeutils
 import six
 
+from ceilometer.agent import plugin_base
 from ceilometer.ipmi.platform import intel_node_manager as node_manager
-from ceilometer import plugin
 from ceilometer import sample
 
 CONF = cfg.CONF
@@ -29,7 +29,7 @@ CONF.import_opt('host', 'ceilometer.service')
 
 
 @six.add_metaclass(abc.ABCMeta)
-class _Base(plugin.PollsterBase):
+class _Base(plugin_base.PollsterBase):
     def __init__(self):
         self.nodemanager = node_manager.NodeManager()
 

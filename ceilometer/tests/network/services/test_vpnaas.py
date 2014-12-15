@@ -19,8 +19,8 @@ import mock
 from oslotest import base
 from oslotest import mockpatch
 
-from ceilometer.central import manager
-from ceilometer.central import plugin
+from ceilometer.agent import manager
+from ceilometer.agent import plugin_base
 from ceilometer.network.services import discovery
 from ceilometer.network.services import vpnaas
 from ceilometer.openstack.common import context
@@ -34,9 +34,9 @@ class _BaseTestVPNPollster(base.BaseTestCase):
         self.addCleanup(mock.patch.stopall)
         self.context = context.get_admin_context()
         self.manager = manager.AgentManager()
-        plugin._get_keystone = mock.Mock()
-        plugin._get_keystone.service_catalog.get_endpoints = mock.MagicMock(
-            return_value={'network': mock.ANY})
+        plugin_base._get_keystone = mock.Mock()
+        plugin_base._get_keystone.service_catalog.get_endpoints = (
+            mock.MagicMock(return_value={'network': mock.ANY}))
 
 
 class TestVPNServicesPollster(_BaseTestVPNPollster):

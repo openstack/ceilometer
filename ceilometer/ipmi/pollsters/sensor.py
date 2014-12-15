@@ -17,9 +17,9 @@
 from oslo.config import cfg
 from oslo.utils import timeutils
 
+from ceilometer.agent import plugin_base
 from ceilometer.ipmi.notifications import ironic as parser
 from ceilometer.ipmi.platform import ipmi_sensor
-from ceilometer import plugin
 from ceilometer import sample
 
 CONF = cfg.CONF
@@ -30,7 +30,7 @@ class InvalidSensorData(ValueError):
     pass
 
 
-class SensorPollster(plugin.PollsterBase):
+class SensorPollster(plugin_base.PollsterBase):
 
     METRIC = None
 

@@ -25,7 +25,7 @@ from oslotest import mockpatch
 from swiftclient import client as swift_client
 import testscenarios.testcase
 
-from ceilometer.central import manager
+from ceilometer.agent import manager
 from ceilometer.objectstore import swift
 
 HEAD_ACCOUNTS = [('tenant-000', {'x-account-object-count': 12,

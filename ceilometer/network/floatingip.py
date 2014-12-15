@@ -21,7 +21,7 @@
 from oslo.config import cfg
 from oslo.utils import timeutils
 
-from ceilometer.central import plugin
+from ceilometer.agent import plugin_base
 from ceilometer.i18n import _
 from ceilometer import nova_client
 from ceilometer.openstack.common import log
@@ -33,7 +33,7 @@ LOG = log.getLogger(__name__)
 cfg.CONF.import_group('service_types', 'ceilometer.nova_client')
 
 
-class FloatingIPPollster(plugin.CentralPollster):
+class FloatingIPPollster(plugin_base.PollsterBase):
 
     def _get_floating_ips(self, ksclient, endpoint):
         nv = nova_client.Client(

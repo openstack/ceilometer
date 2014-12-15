@@ -14,7 +14,7 @@
 from oslo.config import cfg
 import oslo.messaging
 
-from ceilometer import plugin
+from ceilometer.agent import plugin_base
 from ceilometer import sample
 
 OPTS = [
@@ -29,7 +29,7 @@ cfg.CONF.register_opts(OPTS)
 SERVICE = 'identity'
 
 
-class _Base(plugin.NotificationBase):
+class _Base(plugin_base.NotificationBase):
     """Convert identity notification into Samples."""
 
     resource_type = None

@@ -21,6 +21,8 @@ import abc
 import collections
 import fnmatch
 
+from keystoneclient.v2_0 import client as ksclient
+from oslo.config import cfg
 import oslo.messaging
 import six
 
@@ -29,10 +31,58 @@ from ceilometer import messaging
 from ceilometer.openstack.common import context
 from ceilometer.openstack.common import log
 
+cfg.CONF.import_group('service_credentials', 'ceilometer.service')
+
 LOG = log.getLogger(__name__)
 
 ExchangeTopics = collections.namedtuple('ExchangeTopics',
                                         ['exchange', 'topics'])
+
+
+def _get_keystone():
+    try:
+        return ksclient.Client(
+            username=cfg.CONF.service_credentials.os_username,
+            password=cfg.CONF.service_credentials.os_password,
+            tenant_id=cfg.CONF.service_credentials.os_tenant_id,
+            tenant_name=cfg.CONF.service_credentials.os_tenant_name,
+            cacert=cfg.CONF.service_credentials.os_cacert,
+            auth_url=cfg.CONF.service_credentials.os_auth_url,
+            region_name=cfg.CONF.service_credentials.os_region_name,
+            insecure=cfg.CONF.service_credentials.insecure)
+    except Exception as e:
+        return e
+
+
+def check_keystone(service_type=None):
+    """Decorator function to check if manager has valid keystone client.
+
+       Also checks if the service is registered/enabled in Keystone.
+
+       :param service_type: name of service in Keystone
+    """
+    def wrapped(f):
+        def func(self, *args, **kwargs):
+            manager = kwargs.get('manager')
+            if not manager and len(args) > 0:
+                manager = args[0]
+            keystone = getattr(manager, 'keystone', None)
+            if not keystone:
+                keystone = _get_keystone()
+            if isinstance(keystone, Exception):
+                LOG.error(_('Skip due to keystone error %s'),
+                          str(keystone) if keystone else '')
+                return iter([])
+            elif service_type:
+                endpoints = keystone.service_catalog.get_endpoints(
+                    service_type=service_type)
+                if not endpoints:
+                    LOG.warning(_('Skipping because %s service is not '
+                                  'registered in keystone') % service_type)
+                    return iter([])
+            return f(self, *args, **kwargs)
+        return func
+    return wrapped
 
 
 class PluginBase(object):

@@ -22,7 +22,7 @@ import abc
 from oslo.utils import timeutils
 import six
 
-from ceilometer import plugin
+from ceilometer.agent import plugin_base as plugin
 
 
 @six.add_metaclass(abc.ABCMeta)

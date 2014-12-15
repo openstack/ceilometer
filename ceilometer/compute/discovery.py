@@ -17,8 +17,8 @@
 
 from oslo.config import cfg
 
+from ceilometer.agent import plugin_base
 from ceilometer import nova_client
-from ceilometer import plugin
 
 OPTS = [
     cfg.BoolOpt('workload_partitioning',
@@ -29,7 +29,7 @@ OPTS = [
 cfg.CONF.register_opts(OPTS, group='compute')
 
 
-class InstanceDiscovery(plugin.DiscoveryBase):
+class InstanceDiscovery(plugin_base.DiscoveryBase):
     def __init__(self):
         super(InstanceDiscovery, self).__init__()
         self.nova_cli = nova_client.Client()

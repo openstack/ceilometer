@@ -22,9 +22,9 @@
 from oslo.config import cfg
 import oslo.messaging
 
+from ceilometer.agent import plugin_base
 from ceilometer.i18n import _
 from ceilometer.openstack.common import log
-from ceilometer import plugin
 from ceilometer import sample
 
 OPTS = [
@@ -39,7 +39,7 @@ cfg.CONF.register_opts(OPTS)
 LOG = log.getLogger(__name__)
 
 
-class NetworkNotificationBase(plugin.NotificationBase):
+class NetworkNotificationBase(plugin_base.NotificationBase):
 
     resource_name = None
 

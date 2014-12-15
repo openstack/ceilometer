@@ -21,7 +21,7 @@ from oslo.config import cfg
 import requests
 import six
 
-from ceilometer.central import plugin
+from ceilometer.agent import plugin_base
 from ceilometer.i18n import _
 from ceilometer.openstack.common import log
 from ceilometer import sample
@@ -62,8 +62,8 @@ class KwapiClient(object):
             yield probe_dict
 
 
-class _Base(plugin.CentralPollster):
-    """Base class for the Kwapi pollster, derived from CentralPollster."""
+class _Base(plugin_base.PollsterBase):
+    """Base class for the Kwapi pollster, derived from PollsterBase."""
 
     @property
     def default_discovery(self):

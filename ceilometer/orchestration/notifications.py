@@ -18,7 +18,7 @@
 from oslo.config import cfg
 import oslo.messaging
 
-from ceilometer import plugin
+from ceilometer.agent import plugin_base
 from ceilometer import sample
 
 
@@ -32,7 +32,7 @@ cfg.CONF.register_opts(OPTS)
 SERVICE = 'orchestration'
 
 
-class StackCRUD(plugin.NotificationBase):
+class StackCRUD(plugin_base.NotificationBase):
 
     resource_name = '%s.stack' % SERVICE
 

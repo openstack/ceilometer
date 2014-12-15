@@ -20,7 +20,7 @@ from oslo.config import fixture as fixture_config
 from oslotest import base
 from oslotest import mockpatch
 
-from ceilometer.central import manager
+from ceilometer.agent import manager
 from ceilometer.image import glance
 from ceilometer.openstack.common import context
 

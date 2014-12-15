@@ -18,7 +18,7 @@
 from oslo.config import cfg
 import oslo.messaging
 
-from ceilometer import plugin
+from ceilometer.agent import plugin_base
 from ceilometer import sample
 
 cfg.CONF.import_opt('nova_control_exchange',
@@ -42,7 +42,7 @@ OPTS = [
 cfg.CONF.register_opts(OPTS)
 
 
-class HTTPRequest(plugin.NotificationBase):
+class HTTPRequest(plugin_base.NotificationBase):
     event_types = ['http.request']
 
     @staticmethod
