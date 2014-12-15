@@ -24,34 +24,41 @@ has not yet been covered by an existing plugin.
 Agents
 ======
 
-The compute agent runs on each compute node to poll for resource
+Polling agent might be run either on central cloud management nodes or on the
+compute nodes (where direct hypervisor polling is quite logical).
+
+The agent running on each compute node polls for compute resources
 usage. Each metric collected is tagged with the resource ID (such as
 an instance) and the owner, including tenant and user IDs. The metrics
 are then reported to the collector via the message bus. More detailed
 information follows.
 
-The compute agent is implemented in ``ceilometer/compute/manager.py``. As
-you will see in the manager, the computeagent loads all plugins defined in
-the namespace ``ceilometer.poll.compute``, then periodically calls their
-:func:`get_samples` method.
+The agent running on the cloud central management node polls other types of
+resources from a management server (usually using OpenStack services API to
+collect this data).
 
-The central agent polls other types of resources from a management server.
-The central agent is defined in ``ceilometer/central/manager.py``. It loads
-plugins from the ``ceilometer.poll.central`` namespace and polls them by
-calling their :func:`get_samples` method.
+The polling agent is implemented in ``ceilometer/agent/manager.py``. As
+you will see in the manager, the agent loads all plugins defined in
+the namespace ``ceilometer.poll.agent``, then periodically calls their
+:func:`get_samples` method.
 
 Plugins
 =======
 
-An agent can support multiple plugins to retrieve different
+A polling agent can support multiple plugins to retrieve different
 information and send them to the collector. As stated above, an agent
-will automatically activate all plugins of a given class. For example,
-the compute agent will load all plugins of class
-``ceilometer.poll.compute``.  This will load, among others, the
-:class:`ceilometer.compute.pollsters.CPUPollster`, which is defined in
-the file ``ceilometer/compute/pollsters.py`` as well as the
-:class:`ceilometer.compute.notifications.InstanceNotifications` plugin
-which is defined in the file ``ceilometer/compute/notifications.py``
+will automatically activate all possible plugins if no additional information
+about what to poll was passed. Previously we had separated compute and
+central agents with different namespaces with plugins (pollsters) defined
+within. Currently we keep separated namespaces - ``ceilometer.poll.compute``
+and ``ceilometer.poll.central`` for quick separation of what to poll depending
+on where is polling agent running.  This will load, among others, the
+:class:`ceilometer.compute.pollsters.cpu.CPUPollster`, which is defined in
+the folder ``ceilometer/compute/pollsters``.
+
+Notifications mechanism uses plugins as well, for instance
+:class:`ceilometer.compute.notifications.instance.InstanceNotifications` plugin
+which is defined in the ``ceilometer/compute/notifications`` folder.
 
 We are using these two existing plugins as examples as the first one provides
 an example of how to interact when you need to retrieve information from an
@@ -62,23 +69,44 @@ Pollster
 --------
 
 Compute plugins are defined as subclasses of the
-:class:`ceilometer.compute.plugin.ComputePollster` class as defined in
-the ``ceilometer/compute/plugin.py`` file. Pollsters must implement one
+:class:`ceilometer.compute.BaseComputePollster` class as defined in
+the ``ceilometer/compute/__init__.py`` file. Pollsters must implement one
 method: ``get_samples(self, manager, context)``, which returns a
 sequence of ``Sample`` objects as defined in the
 ``ceilometer/sample.py`` file.
 
-In the ``CPUPollster`` plugin, the ``get_samples`` method is implemented as a loop
-which, for each instances running on the local host, retrieves the cpu_time
-from the hypervisor and sends back two ``Sample`` objects.  The first one, named
-"cpu", is of type "cumulative", meaning that between two polls, its value is
-not reset, or in other word that the cpu value is always provided as a duration
-that continuously increases since the creation of the instance. The second one,
-named "cpu_util", is of type "gauge", meaning that its value is the percentage
-of cpu utilization.
+In the ``CPUPollster`` plugin, the ``get_samples`` method is implemented as a
+loop which, for each instances running on the local host, retrieves the
+cpu_time from the hypervisor and sends back two ``Sample`` objects.  The first
+one, named "cpu", is of type "cumulative", meaning that between two polls, its
+value is not reset while the instance remains active, or in other words that
+the CPU value is always provided as a duration that continuously increases
+since the creation of the instance. The second one, named "cpu_util", is of
+type "gauge", meaning that its value is the percentage of cpu utilization.
 
 Note that the ``LOG`` method is only used as a debugging tool and does not
 participate in the actual metering activity.
+
+There is the way to specify either namespace(s) with pollsters or just
+list of concrete pollsters to use, or even both of these parameters on the
+polling agent start via CLI parameter:
+
+    ceilometer-polling --polling-namespaces central compute
+
+This command will basically make polling agent to load all plugins from the
+central and compute namespaces and poll everything it can. If you need to load
+only some of the pollsters, you can use ``pollster-list`` option:
+
+    ceilometer-polling --pollster-list image image.size storage.*
+
+If both of these options are passed, the polling agent will load only those
+pollsters specified in the pollster list, that can be loaded from the selected
+namespaces.
+
+.. note::
+
+   Agents coordination cannot be used in case of pollster-list option usage.
+   This allows to avoid both samples duplication and their lost.
 
 Notifications
 -------------
