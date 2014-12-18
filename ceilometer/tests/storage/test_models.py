@@ -77,15 +77,15 @@ class ModelTest(testbase.BaseTestCase):
                         "timestamp", "user_id", "project_id", "state",
                         "state_timestamp", "ok_actions", "alarm_actions",
                         "insufficient_data_actions", "repeat_actions", "rule",
-                        "time_constraints"]
+                        "severity", "time_constraints"]
 
         self.assertEqual(set(alarm_fields),
                          set(alarm_models.Alarm.get_field_names()))
 
     def test_get_field_names_of_alarmchange(self):
         alarmchange_fields = ["event_id", "alarm_id", "type", "detail",
-                              "user_id", "project_id", "on_behalf_of",
-                              "timestamp"]
+                              "user_id", "project_id", "severity",
+                              "on_behalf_of", "timestamp"]
 
         self.assertEqual(set(alarmchange_fields),
                          set(alarm_models.AlarmChange.get_field_names()))

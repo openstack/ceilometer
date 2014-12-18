@@ -56,6 +56,7 @@ class TestAlarms(v2.FunctionalTest,
                          alarm_id='a',
                          description='a',
                          state='insufficient data',
+                         severity='critical',
                          state_timestamp=constants.MIN_DATETIME,
                          timestamp=constants.MIN_DATETIME,
                          ok_actions=[],
@@ -76,7 +77,7 @@ class TestAlarms(v2.FunctionalTest,
                                    query=[{'field': 'project_id',
                                            'op': 'eq', 'value':
                                            self.auth_headers['X-Project-Id']}
-                                          ])
+                                          ]),
                          ),
             models.Alarm(name='name2',
                          type='threshold',
@@ -84,6 +85,7 @@ class TestAlarms(v2.FunctionalTest,
                          alarm_id='b',
                          description='b',
                          state='insufficient data',
+                         severity='critical',
                          state_timestamp=constants.MIN_DATETIME,
                          timestamp=constants.MIN_DATETIME,
                          ok_actions=[],
@@ -102,7 +104,7 @@ class TestAlarms(v2.FunctionalTest,
                                    query=[{'field': 'project_id',
                                            'op': 'eq', 'value':
                                            self.auth_headers['X-Project-Id']}
-                                          ])
+                                          ]),
                          ),
             models.Alarm(name='name3',
                          type='threshold',
@@ -110,6 +112,7 @@ class TestAlarms(v2.FunctionalTest,
                          alarm_id='c',
                          description='c',
                          state='insufficient data',
+                         severity='moderate',
                          state_timestamp=constants.MIN_DATETIME,
                          timestamp=constants.MIN_DATETIME,
                          ok_actions=[],
@@ -128,7 +131,7 @@ class TestAlarms(v2.FunctionalTest,
                                    query=[{'field': 'project_id',
                                            'op': 'eq', 'value':
                                            self.auth_headers['X-Project-Id']}
-                                          ])
+                                          ]),
                          ),
             models.Alarm(name='name4',
                          type='combination',
@@ -136,6 +139,7 @@ class TestAlarms(v2.FunctionalTest,
                          alarm_id='d',
                          description='d',
                          state='insufficient data',
+                         severity='low',
                          state_timestamp=constants.MIN_DATETIME,
                          timestamp=constants.MIN_DATETIME,
                          ok_actions=[],
@@ -146,7 +150,7 @@ class TestAlarms(v2.FunctionalTest,
                          project_id=self.auth_headers['X-Project-Id'],
                          time_constraints=[],
                          rule=dict(alarm_ids=['a', 'b'],
-                                   operator='or')
+                                   operator='or'),
                          )]:
             self.alarm_conn.update_alarm(alarm)
 
@@ -222,7 +226,8 @@ class TestAlarms(v2.FunctionalTest,
                              user_id=self.auth_headers['X-User-Id'],
                              project_id=self.auth_headers['X-Project-Id'],
                              time_constraints=[],
-                             rule=dict(alarm_ids=['a', 'b'], operator='or'))
+                             rule=dict(alarm_ids=['a', 'b'], operator='or'),
+                             severity='critical')
         self.alarm_conn.update_alarm(alarm)
         resp = self.get_json('/alarms',
                              q=[{'field': 'state',
@@ -281,7 +286,8 @@ class TestAlarms(v2.FunctionalTest,
                              user_id=self.auth_headers['X-User-Id'],
                              project_id=self.auth_headers['X-Project-Id'],
                              time_constraints=[],
-                             rule=dict(alarm_ids=['a', 'b'], operator='or'))
+                             rule=dict(alarm_ids=['a', 'b'], operator='or'),
+                             severity='critical')
         self.alarm_conn.update_alarm(alarm)
 
         alarms = self.get_json('/alarms',
@@ -565,6 +571,27 @@ class TestAlarms(v2.FunctionalTest,
                               status=400, headers=self.auth_headers)
         expected_err_msg = ("Invalid input for field/attribute state."
                             " Value: 'bad_state'.")
+        self.assertIn(expected_err_msg,
+                      resp.json['error_message']['faultstring'])
+        alarms = list(self.alarm_conn.get_alarms())
+        self.assertEqual(4, len(alarms))
+
+    def test_post_invalid_alarm_input_severity(self):
+        json = {
+            'name': 'alarm1',
+            'state': 'ok',
+            'severity': 'bad_value',
+            'type': 'threshold',
+            'threshold_rule': {
+                'meter_name': 'ameter',
+                'comparison_operator': 'gt',
+                'threshold': 50.0
+            }
+        }
+        resp = self.post_json('/alarms', params=json, expect_errors=True,
+                              status=400, headers=self.auth_headers)
+        expected_err_msg = ("Invalid input for field/attribute severity."
+                            " Value: 'bad_value'.")
         self.assertIn(expected_err_msg,
                       resp.json['error_message']['faultstring'])
         alarms = list(self.alarm_conn.get_alarms())
@@ -928,6 +955,7 @@ class TestAlarms(v2.FunctionalTest,
             'name': 'added_alarm',
             'state': 'ok',
             'type': 'threshold',
+            'severity': 'low',
             'ok_actions': ['http://something/ok'],
             'alarm_actions': ['http://something/alarm'],
             'insufficient_data_actions': ['http://something/no'],
@@ -975,6 +1003,7 @@ class TestAlarms(v2.FunctionalTest,
             'name': 'added_alarm',
             'state': 'ok',
             'type': 'threshold',
+            'severity': 'low',
             'ok_actions': ['http://something/ok'],
             'alarm_actions': ['http://something/alarm'],
             'insufficient_data_actions': ['http://something/no'],
@@ -1543,6 +1572,7 @@ class TestAlarms(v2.FunctionalTest,
             'name': 'name_put',
             'state': 'ok',
             'type': 'threshold',
+            'severity': 'critical',
             'ok_actions': ['http://something/ok'],
             'alarm_actions': ['http://something/alarm'],
             'insufficient_data_actions': ['http://something/no'],
@@ -1585,6 +1615,7 @@ class TestAlarms(v2.FunctionalTest,
             'name': 'name_put',
             'state': 'ok',
             'type': 'threshold',
+            'severity': 'critical',
             'ok_actions': ['http://something/ok'],
             'alarm_actions': ['http://something/alarm'],
             'insufficient_data_actions': ['http://something/no'],
@@ -1634,6 +1665,7 @@ class TestAlarms(v2.FunctionalTest,
             'name': 'name1',
             'state': 'ok',
             'type': 'threshold',
+            'severity': 'critical',
             'ok_actions': ['http://something/ok'],
             'alarm_actions': ['http://something/alarm'],
             'insufficient_data_actions': ['http://something/no'],
@@ -1670,6 +1702,7 @@ class TestAlarms(v2.FunctionalTest,
             'name': 'name1',
             'state': 'ok',
             'type': 'threshold',
+            'severity': 'critical',
             'ok_actions': ['http://something/ok'],
             'alarm_actions': ['http://something/alarm'],
             'insufficient_data_actions': ['http://something/no'],
@@ -1708,6 +1741,7 @@ class TestAlarms(v2.FunctionalTest,
             'name': 'name1',
             'state': 'ok',
             'type': 'threshold',
+            'severity': 'critical',
             'ok_actions': ['spam://something/ok'],
             'alarm_actions': ['http://something/alarm'],
             'insufficient_data_actions': ['http://something/no'],
@@ -2158,10 +2192,11 @@ class TestAlarms(v2.FunctionalTest,
         query = dict(field='alarm_id', op='eq', value='b')
         resp = self._get_alarm_history(alarm, query=query,
                                        expect_errors=True, status=400)
-        self.assertEqual('Unknown argument: "alarm_id": unrecognized'
+        self.assertEqual(u'Unknown argument: "alarm_id": unrecognized'
                          " field in query: [<Query u'alarm_id' eq"
                          " u'b' Unset>], valid keys: ['project', "
-                         "'search_offset', 'timestamp', 'type', 'user']",
+                         "'search_offset', 'severity', 'timestamp',"
+                         " 'type', 'user']",
                          resp.json['error_message']['faultstring'])
 
     def test_get_alarm_history_constrained_by_not_supported_rule(self):
@@ -2169,10 +2204,11 @@ class TestAlarms(v2.FunctionalTest,
         query = dict(field='abcd', op='eq', value='abcd')
         resp = self._get_alarm_history(alarm, query=query,
                                        expect_errors=True, status=400)
-        self.assertEqual('Unknown argument: "abcd": unrecognized'
+        self.assertEqual(u'Unknown argument: "abcd": unrecognized'
                          " field in query: [<Query u'abcd' eq"
                          " u'abcd' Unset>], valid keys: ['project', "
-                         "'search_offset', 'timestamp', 'type', 'user']",
+                         "'search_offset', 'severity', 'timestamp',"
+                         " 'type', 'user']",
                          resp.json['error_message']['faultstring'])
 
     def test_get_nonexistent_alarm_history(self):
@@ -2186,6 +2222,7 @@ class TestAlarms(v2.FunctionalTest,
         json = {
             'name': 'sent_notification',
             'type': 'threshold',
+            'severity': 'low',
             'threshold_rule': {
                 'meter_name': 'ameter',
                 'comparison_operator': 'gt',

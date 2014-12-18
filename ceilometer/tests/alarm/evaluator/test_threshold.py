@@ -65,7 +65,8 @@ class TestEvaluate(base.TestEvaluatorBase):
                                      'value': 'cpu_util'},
                                     {'field': 'resource_id',
                                      'op': 'eq',
-                                     'value': 'my_instance'}])
+                                     'value': 'my_instance'}]),
+                         severity='critical'
                          ),
             models.Alarm(name='group_running_idle',
                          description='group_running_idle',
@@ -94,7 +95,8 @@ class TestEvaluate(base.TestEvaluatorBase):
                                      'value': 'cpu_util'},
                                     {'field': 'metadata.user_metadata.AS',
                                      'op': 'eq',
-                                     'value': 'my_group'}])
+                                     'value': 'my_group'}]),
+                         severity='critical'
                          ),
         ]
 

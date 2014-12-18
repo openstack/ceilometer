@@ -258,6 +258,7 @@ class Alarm(Base):
     enabled = Column(Boolean)
     name = Column(Text)
     type = Column(String(50))
+    severity = Column(String(50))
     description = Column(Text)
     timestamp = Column(PreciseTimestamp, default=lambda: timeutils.utcnow())
 

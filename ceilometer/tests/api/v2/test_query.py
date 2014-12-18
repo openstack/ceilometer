@@ -345,7 +345,7 @@ class TestQueryToKwArgs(tests_base.BaseTestCase):
             api._query_to_kwargs, q,
             alarm_storage_base.Connection.get_alarm_changes)
         valid_keys = ['alarm_id', 'on_behalf_of', 'project', 'search_offset',
-                      'timestamp', 'type', 'user']
+                      'severity', 'timestamp', 'type', 'user']
         msg = ("unrecognized field in query: %s, "
                "valid keys: %s") % (q, valid_keys)
         expected_exc = wsme.exc.UnknownArgument('abc', msg)
@@ -402,7 +402,7 @@ class TestQueryToKwArgs(tests_base.BaseTestCase):
             wsme.exc.UnknownArgument,
             api._query_to_kwargs, q, alarm_storage_base.Connection.get_alarms)
         valid_keys = ['alarm_id', 'enabled', 'meter', 'name', 'pagination',
-                      'project', 'state', 'type', 'user']
+                      'project', 'severity', 'state', 'type', 'user']
         msg = ("unrecognized field in query: %s, "
                "valid keys: %s") % (q, valid_keys)
         expected_exc = wsme.exc.UnknownArgument('abc', msg)

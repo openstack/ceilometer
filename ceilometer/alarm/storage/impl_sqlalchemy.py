@@ -136,14 +136,15 @@ class Connection(base.Connection):
                                           row.insufficient_data_actions),
                                       rule=row.rule,
                                       time_constraints=row.time_constraints,
-                                      repeat_actions=row.repeat_actions)
+                                      repeat_actions=row.repeat_actions,
+                                      severity=row.severity)
 
     def _retrieve_alarms(self, query):
         return (self._row_to_alarm_model(x) for x in query.all())
 
     def get_alarms(self, name=None, user=None, state=None, meter=None,
                    project=None, enabled=None, alarm_id=None, pagination=None,
-                   alarm_type=None):
+                   alarm_type=None, severity=None):
         """Yields a lists of alarms that match filters.
 
         :param name: Optional name for alarm.
@@ -155,6 +156,7 @@ class Connection(base.Connection):
         :param alarm_id: Optional alarm_id to return one alarm.
         :param pagination: Optional pagination query.
         :param alarm_type: Optional alarm type.
+        :param severity: Optional alarm severity
         """
 
         if pagination:
@@ -176,6 +178,8 @@ class Connection(base.Connection):
             query = query.filter(models.Alarm.state == state)
         if alarm_type is not None:
             query = query.filter(models.Alarm.type == alarm_type)
+        if severity is not None:
+            query = query.filter(models.Alarm.severity == severity)
 
         query = query.order_by(desc(models.Alarm.timestamp))
         alarms = self._retrieve_alarms(query)
@@ -250,8 +254,9 @@ class Connection(base.Connection):
 
     def get_alarm_changes(self, alarm_id, on_behalf_of,
                           user=None, project=None, alarm_type=None,
-                          start_timestamp=None, start_timestamp_op=None,
-                          end_timestamp=None, end_timestamp_op=None):
+                          severity=None, start_timestamp=None,
+                          start_timestamp_op=None, end_timestamp=None,
+                          end_timestamp_op=None):
         """Yields list of AlarmChanges describing alarm history
 
         Changes are always sorted in reverse order of occurrence, given
@@ -270,6 +275,7 @@ class Connection(base.Connection):
         :param user: Optional ID of user to return changes for
         :param project: Optional ID of project to return changes for
         :param alarm_type: Optional change type
+        :param severity: Optional alarm severity
         :param start_timestamp: Optional modified timestamp start range
         :param start_timestamp_op: Optional timestamp start range operation
         :param end_timestamp: Optional modified timestamp end range
@@ -288,6 +294,8 @@ class Connection(base.Connection):
             query = query.filter(models.AlarmChange.project_id == project)
         if alarm_type is not None:
             query = query.filter(models.AlarmChange.type == alarm_type)
+        if severity is not None:
+            query = query.filter(models.AlarmChange.severity == severity)
         if start_timestamp:
             if start_timestamp_op == 'gt':
                 query = query.filter(

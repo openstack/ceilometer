@@ -67,6 +67,7 @@ class TestRPCAlarmNotifier(tests_base.BaseTestCase):
                 'project_id': 'snafu',
                 'period': 60,
                 'alarm_id': str(uuid.uuid4()),
+                'severity': 'critical',
                 'matching_metadata':{'resource_id':
                                      'my_instance'}
             }),
@@ -83,6 +84,7 @@ class TestRPCAlarmNotifier(tests_base.BaseTestCase):
                 'project_id': 'snafu',
                 'period': 300,
                 'alarm_id': str(uuid.uuid4()),
+                'severity': 'critical',
                 'matching_metadata':{'metadata.user_metadata.AS':
                                      'my_group'}
             }),
@@ -109,6 +111,8 @@ class TestRPCAlarmNotifier(tests_base.BaseTestCase):
                              self.notifier_server.notified[i]["alarm_id"])
             self.assertEqual(self.alarms[i].name,
                              self.notifier_server.notified[i]["alarm_name"])
+            self.assertEqual(self.alarms[i].severity,
+                             self.notifier_server.notified[i]["severity"])
             self.assertEqual(actions,
                              self.notifier_server.notified[i]["actions"])
             self.assertEqual(previous[i],
