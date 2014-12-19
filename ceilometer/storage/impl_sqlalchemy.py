@@ -417,38 +417,49 @@ class Connection(base.Connection):
                                        require_meter=False)
 
         for res_id in res_q.all():
-            # get latest Sample
-            max_q = (session.query(models.Sample)
-                     .join(models.Resource,
-                           models.Resource.internal_id ==
-                           models.Sample.resource_id)
-                     .filter(models.Resource.resource_id == res_id[0]))
-            max_q = make_query_from_filter(session, max_q, s_filter,
-                                           require_meter=False)
-            max_q = max_q.order_by(models.Sample.timestamp.desc(),
-                                   models.Sample.id.desc()).limit(1)
 
-            # get the min timestamp value.
-            min_q = (session.query(models.Sample.timestamp)
-                     .join(models.Resource,
-                           models.Resource.internal_id ==
-                           models.Sample.resource_id)
-                     .filter(models.Resource.resource_id == res_id[0]))
-            min_q = make_query_from_filter(session, min_q, s_filter,
-                                           require_meter=False)
-            min_q = min_q.order_by(models.Sample.timestamp.asc()).limit(1)
+            # get max and min sample timestamp value
+            min_max_q = (session.query(func.max(models.Sample.timestamp)
+                                       .label('max_timestamp'),
+                                       func.min(models.Sample.timestamp)
+                                       .label('min_timestamp'))
+                                .join(models.Resource,
+                                      models.Resource.internal_id ==
+                                      models.Sample.resource_id)
+                                .filter(models.Resource.resource_id ==
+                                        res_id[0]))
 
-            sample = max_q.first()
-            if sample:
-                yield api_models.Resource(
-                    resource_id=sample.resource.resource_id,
-                    project_id=sample.resource.project_id,
-                    first_sample_timestamp=min_q.first().timestamp,
-                    last_sample_timestamp=sample.timestamp,
-                    source=sample.resource.source_id,
-                    user_id=sample.resource.user_id,
-                    metadata=sample.resource.resource_metadata
-                )
+            min_max_q = make_query_from_filter(session, min_max_q, s_filter,
+                                               require_meter=False)
+
+            min_max = min_max_q.first()
+
+            # get resource details for latest sample
+            res_q = (session.query(models.Resource.resource_id,
+                                   models.Resource.user_id,
+                                   models.Resource.project_id,
+                                   models.Resource.source_id,
+                                   models.Resource.resource_metadata)
+                            .join(models.Sample,
+                                  models.Sample.resource_id ==
+                                  models.Resource.internal_id)
+                            .filter(models.Sample.timestamp ==
+                                    min_max.max_timestamp)
+                            .filter(models.Resource.resource_id ==
+                                    res_id[0])
+                            .order_by(models.Sample.id.desc()).limit(1))
+
+            res = res_q.first()
+
+            yield api_models.Resource(
+                resource_id=res.resource_id,
+                project_id=res.project_id,
+                first_sample_timestamp=min_max.min_timestamp,
+                last_sample_timestamp=min_max.max_timestamp,
+                source=res.source_id,
+                user_id=res.user_id,
+                metadata=res.resource_metadata
+            )
 
     def get_meters(self, user=None, project=None, resource=None, source=None,
                    metaquery=None, pagination=None):
