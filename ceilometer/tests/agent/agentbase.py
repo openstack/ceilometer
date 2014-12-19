@@ -688,3 +688,29 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.assertEqual(1, len(samples))
         self.assertEqual('test_sum', samples[0].name)
         self.assertEqual(11, samples[0].volume)
+
+    @mock.patch('ceilometer.agent.base.LOG')
+    @mock.patch('ceilometer.tests.agent.agentbase.TestPollster.get_samples')
+    def test_skip_polling_and_publish_with_no_resources(
+            self, get_samples, LOG):
+        self.pipeline_cfg[0]['resources'] = []
+        self.setup_pipeline()
+        polling_task = self.mgr.setup_polling_tasks().values()[0]
+        pollster = list(polling_task.pollster_matches['test_pipeline'])[0]
+
+        polling_task.poll_and_publish()
+        LOG.info.assert_called_with(
+            'Skip polling pollster %s, no resources found', pollster.name)
+        self.assertEqual(0, get_samples._mock_call_count)
+
+        setattr(pollster.obj, 'no_resources', False)
+        polling_task.poll_and_publish()
+        LOG.info.assert_called_with(
+            'Skip polling pollster %s, no resources found', pollster.name)
+        self.assertEqual(0, get_samples._mock_call_count)
+
+        setattr(pollster.obj, 'no_resources', True)
+        polling_task.poll_and_publish()
+        LOG.info.not_assert_called_with(
+            'Skip polling pollster %s, no resources found', pollster.name)
+        self.assertEqual(1, get_samples._mock_call_count)

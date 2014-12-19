@@ -128,6 +128,11 @@ class PollingTask(object):
                         self.resources[key].get(discovery_cache))
                     polling_resources = (source_resources or
                                          pollster_resources)
+                    if not polling_resources and not getattr(
+                            pollster.obj, 'no_resources', False):
+                        LOG.info(_("Skip polling pollster %s, no resources"
+                                   " found"), pollster.name)
+                        continue
 
                     try:
                         samples = list(pollster.obj.get_samples(
