@@ -13,6 +13,6 @@ ceilometer/versioninfo
 doc/build
 doc/source/sourcecode
 *.mo
-etc/ceilometer/ceilometer.conf.sample
+etc/ceilometer/ceilometer.conf*
 tools/lintstack.head.py
 tools/pylint_exceptions
