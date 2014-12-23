@@ -114,8 +114,8 @@ Notifications
 -------------
 
 Notifications are defined as subclass of the
-:class:`ceilometer.plugin.NotificationBase` meta class as defined in
-the ``ceilometer/plugin.py`` file.  Notifications must implement:
+:class:`ceilometer.agent.plugin_base.NotificationBase` meta class.
+Notifications must implement:
 
    ``event_types`` which should be a sequence of strings defining the event types to be given to the plugin and
 
