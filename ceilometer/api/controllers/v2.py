@@ -41,6 +41,7 @@ from oslo.config import cfg
 from oslo.utils import netutils
 from oslo.utils import strutils
 from oslo.utils import timeutils
+from oslo_context import context
 import pecan
 from pecan import rest
 import pytz
@@ -56,7 +57,6 @@ from ceilometer.api import rbac
 from ceilometer.event.storage import models as event_models
 from ceilometer.i18n import _
 from ceilometer import messaging
-from ceilometer.openstack.common import context
 from ceilometer.openstack.common import log
 from ceilometer import sample
 from ceilometer import storage

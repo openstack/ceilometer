@@ -15,10 +15,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from oslo_context import context as req_context
 from stevedore import extension
 
 from ceilometer.i18n import _
-from ceilometer.openstack.common import context as req_context
 from ceilometer.openstack.common import log as logging
 from ceilometer import pipeline
 from ceilometer import transformer

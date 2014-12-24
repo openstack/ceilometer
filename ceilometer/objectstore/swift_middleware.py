@@ -43,10 +43,10 @@ from __future__ import absolute_import
 import logging
 
 from oslo.utils import timeutils
+from oslo_context import context
 import six
 import six.moves.urllib.parse as urlparse
 
-from ceilometer.openstack.common import context
 from ceilometer import pipeline
 from ceilometer import sample
 from ceilometer import service

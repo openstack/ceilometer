@@ -18,8 +18,7 @@
 from oslo.config import cfg
 import oslo.messaging
 from oslo.serialization import jsonutils
-
-from ceilometer.openstack.common import context
+from oslo_context import context
 
 DEFAULT_URL = "__default__"
 TRANSPORTS = {}

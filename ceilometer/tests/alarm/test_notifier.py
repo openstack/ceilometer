@@ -18,12 +18,12 @@
 import mock
 from oslo.config import fixture as fixture_config
 from oslo.serialization import jsonutils
+from oslo_context import context
 from oslotest import mockpatch
 import requests
 import six.moves.urllib.parse as urlparse
 
 from ceilometer.alarm import service
-from ceilometer.openstack.common import context
 from ceilometer.tests import base as tests_base
 
 
@@ -49,7 +49,7 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
         self.setup_messaging(self.CONF)
         self.service = service.AlarmNotifierService()
         self.useFixture(mockpatch.Patch(
-            'ceilometer.openstack.common.context.generate_request_id',
+            'oslo_context.context.generate_request_id',
             self._fake_generate_request_id))
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())

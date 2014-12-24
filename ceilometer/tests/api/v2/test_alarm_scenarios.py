@@ -2213,7 +2213,7 @@ class TestAlarms(v2.FunctionalTest,
                              'user_id']).issubset(payload.keys()))
 
         endpoint.info.assert_called_once_with(
-            {'instance_uuid': None,
+            {'resource_uuid': None,
              'domain': None,
              'project_domain': None,
              'auth_token': None,

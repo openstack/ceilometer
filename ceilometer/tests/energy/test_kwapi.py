@@ -18,13 +18,13 @@ import datetime
 
 from keystoneclient import exceptions
 import mock
+from oslo_context import context
 from oslotest import base
 from oslotest import mockpatch
 import six
 
 from ceilometer.agent import manager
 from ceilometer.energy import kwapi
-from ceilometer.openstack.common import context
 
 
 PROBE_DICT = {

@@ -16,6 +16,7 @@
 # under the License.
 
 import mock
+from oslo_context import context
 from oslotest import base
 from oslotest import mockpatch
 
@@ -23,7 +24,6 @@ from ceilometer.agent import manager
 from ceilometer.agent import plugin_base
 from ceilometer.network.services import discovery
 from ceilometer.network.services import fwaas
-from ceilometer.openstack.common import context
 
 
 class _BaseTestFWPollster(base.BaseTestCase):

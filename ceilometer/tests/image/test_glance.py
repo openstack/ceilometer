@@ -17,12 +17,12 @@
 
 import mock
 from oslo.config import fixture as fixture_config
+from oslo_context import context
 from oslotest import base
 from oslotest import mockpatch
 
 from ceilometer.agent import manager
 from ceilometer.image import glance
-from ceilometer.openstack.common import context
 
 IMAGE_LIST = [
     type('Image', (object,),

@@ -22,13 +22,13 @@ import msgpack
 from oslo.config import fixture as fixture_config
 import oslo.messaging
 from oslo.utils import timeutils
+from oslo_context import context
 from oslotest import mockpatch
 from stevedore import extension
 
 from ceilometer import collector
 from ceilometer import dispatcher
 from ceilometer import messaging
-from ceilometer.openstack.common import context
 from ceilometer.publisher import utils
 from ceilometer import sample
 from ceilometer.tests import base as tests_base

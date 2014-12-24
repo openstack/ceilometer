@@ -22,13 +22,13 @@ from oslo.config import fixture as fixture_config
 import oslo.messaging
 import oslo.messaging.conffixture
 from oslo.utils import timeutils
+from oslo_context import context
 from stevedore import extension
 import yaml
 
 from ceilometer.compute.notifications import instance
 from ceilometer import messaging
 from ceilometer import notification
-from ceilometer.openstack.common import context
 from ceilometer.openstack.common import fileutils
 from ceilometer.publisher import test as test_publisher
 from ceilometer.tests import base as tests_base
