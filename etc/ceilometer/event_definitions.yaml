@@ -60,6 +60,42 @@
     audit_period_ending:
       type: datetime
       fields: payload.audit_period_ending
+- event_type: ['volume.exists', 'volume.create.*', 'volume.delete.*', 'volume.resize.*', 'volume.attach.*', 'volume.detach.*', 'volume.update.*', 'snapshot.exists', 'snapshot.create.*', 'snapshot.delete.*', 'snapshot.update.*']
+  traits: &cinder_traits
+    user_id:
+      fields: payload.user_id
+    project_id:
+      fields: payload.tenant_id
+    availability_zone:
+      fields: payload.availability_zone
+    display_name:
+      fields: payload.display_name
+    replication_status:
+      fields: payload.replication_status
+    status:
+      fields: payload.status
+    created_at:
+      fields: payload.created_at
+- event_type: ['volume.exists', 'volume.create.*', 'volume.delete.*', 'volume.resize.*', 'volume.attach.*', 'volume.detach.*', 'volume.update.*']
+  traits:
+    <<: *cinder_traits
+    resource_id:
+      fields: payload.volume_id
+    host:
+      fields: payload.host
+    size:
+      fields: payload.size
+    type:
+      fields: payload.volume_type
+    replication_status:
+      fields: payload.replication_status
+- event_type: ['snapshot.exists', 'snapshot.create.*', 'snapshot.delete.*', 'snapshot.update.*']
+  traits:
+    <<: *cinder_traits
+    resource_id:
+      fields: payload.snapshot_id
+    volume_id:
+      fields: payload.volume_id
 - event_type: orchestration.stack.*
   traits: &orchestration_crud
     project_id:
