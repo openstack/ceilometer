@@ -19,7 +19,8 @@ from ceilometer.network.statistics import driver
 
 class TestDriver(base.BaseTestCase):
 
-    def test_driver_ok(self):
+    @staticmethod
+    def test_driver_ok():
 
         class OkDriver(driver.Driver):
 

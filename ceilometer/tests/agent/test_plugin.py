@@ -96,7 +96,8 @@ class NotificationBaseTestCase(base.BaseTestCase):
             'compute.instance.start', ['compute.*.*.foobar', 'compute.*']))
 
     class FakePlugin(plugin_base.NotificationBase):
-        def get_exchange_topics(self, conf):
+        @staticmethod
+        def get_exchange_topics(conf):
             return [plugin_base.ExchangeTopics(exchange="exchange1",
                                                topics=["t1", "t2"]),
                     plugin_base.ExchangeTopics(exchange="exchange2",

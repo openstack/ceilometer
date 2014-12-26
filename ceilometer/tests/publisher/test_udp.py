@@ -97,7 +97,8 @@ class TestUDPPublisher(base.BaseTestCase):
         ),
     ]
 
-    def _make_fake_socket(self, published):
+    @staticmethod
+    def _make_fake_socket(published):
         def _fake_socket_socket(family, type):
             def record_data(msg, dest):
                 published.append((msg, dest))

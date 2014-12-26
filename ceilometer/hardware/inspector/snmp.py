@@ -408,7 +408,8 @@ class SNMPInspector(base.Inspector):
         metadata.update(ip=ip_addr)
         return value
 
-    def _get_auth_strategy(self, host):
+    @staticmethod
+    def _get_auth_strategy(host):
         if host.password:
             auth_strategy = cmdgen.UsmUserData(host.username,
                                                authKey=host.password)

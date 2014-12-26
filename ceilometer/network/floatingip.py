@@ -35,7 +35,8 @@ cfg.CONF.import_group('service_types', 'ceilometer.nova_client')
 
 class FloatingIPPollster(plugin_base.PollsterBase):
 
-    def _get_floating_ips(self, ksclient, endpoint):
+    @staticmethod
+    def _get_floating_ips(ksclient, endpoint):
         nv = nova_client.Client(
             auth_token=ksclient.auth_token, bypass_url=endpoint)
         return nv.floating_ip_get_all()

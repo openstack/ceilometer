@@ -47,10 +47,12 @@ class TestLibvirtInspection(base.BaseTestCase):
 
     def test_inspect_instances(self):
         class FakeDomain(object):
-            def name(self):
+            @staticmethod
+            def name():
                 return 'fake_name'
 
-            def UUIDString(self):
+            @staticmethod
+            def UUIDString():
                 return 'uuid'
 
         fake_domain = FakeDomain()
@@ -307,6 +309,7 @@ class TestLibvirtInspectionWithError(base.BaseTestCase):
         libvirt_inspector.libvirt = mock.Mock()
         libvirt_inspector.libvirt.libvirtError = self.fakeLibvirtError
 
+    @staticmethod
     def _dummy_get_connection(*args, **kwargs):
         raise Exception('dummy')
 

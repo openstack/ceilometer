@@ -41,12 +41,14 @@ class JSONEncodedDict(TypeDecorator):
 
     impl = String
 
-    def process_bind_param(self, value, dialect):
+    @staticmethod
+    def process_bind_param(value, dialect):
         if value is not None:
             value = json.dumps(value)
         return value
 
-    def process_result_value(self, value, dialect):
+    @staticmethod
+    def process_result_value(value, dialect):
         if value is not None:
             value = json.loads(value)
         return value
@@ -64,14 +66,16 @@ class PreciseTimestamp(TypeDecorator):
                                                    asdecimal=True))
         return self.impl
 
-    def process_bind_param(self, value, dialect):
+    @staticmethod
+    def process_bind_param(value, dialect):
         if value is None:
             return value
         elif dialect.name == 'mysql':
             return utils.dt_to_decimal(value)
         return value
 
-    def process_result_value(self, value, dialect):
+    @staticmethod
+    def process_result_value(value, dialect):
         if value is None:
             return value
         elif dialect.name == 'mysql':
