@@ -26,6 +26,7 @@ from oslo_config import cfg
 import six
 import six.moves.urllib.parse as urlparse
 
+import ceilometer
 from ceilometer.i18n import _
 from ceilometer import messaging
 from ceilometer.openstack.common import log
@@ -161,6 +162,14 @@ class MessagingPublisher(publisher.PublisherBase):
             else:
                 queue.pop(0)
         return []
+
+    def publish_events(self, context, events):
+        """Send an event message for publishing
+
+        :param context: Execution context from the service or RPC call
+        :param events: events from pipeline after transformation
+        """
+        raise ceilometer.NotImplementedError
 
     @abc.abstractmethod
     def _send(self, context, topic, meters):

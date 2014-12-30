@@ -17,10 +17,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import abc
 import fnmatch
 import os
 
 from oslo_config import cfg
+import six
 import yaml
 
 from ceilometer.i18n import _
@@ -34,6 +36,10 @@ OPTS = [
     cfg.StrOpt('pipeline_cfg_file',
                default="pipeline.yaml",
                help="Configuration file for pipeline definition."
+               ),
+    cfg.StrOpt('event_pipeline_cfg_file',
+               default="event_pipeline.yaml",
+               help="Configuration file for event pipeline definition."
                ),
 ]
 
@@ -104,6 +110,7 @@ class Source(object):
 
         try:
             self.name = cfg['name']
+            self.sinks = cfg.get('sinks')
         except KeyError as err:
             raise PipelineException(
                 "Required field %s not specified" % err.args[0], cfg)
@@ -143,6 +150,41 @@ class Source(object):
                 'Included %s specified with wildcard' % d_type,
                 self.cfg)
 
+    @staticmethod
+    def is_supported(dataset, data_name):
+        # Support wildcard like storage.* and !disk.*
+        # Start with negation, we consider that the order is deny, allow
+        if any(fnmatch.fnmatch(data_name, datapoint[1:])
+               for datapoint in dataset if datapoint[0] == '!'):
+            return False
+
+        if any(fnmatch.fnmatch(data_name, datapoint)
+               for datapoint in dataset if datapoint[0] != '!'):
+            return True
+
+        # if we only have negation, we suppose the default is allow
+        return all(datapoint.startswith('!') for datapoint in dataset)
+
+
+class EventSource(Source):
+    """Represents a source of events.
+
+    In effect it is a set of notification handlers capturing events for a set
+    of matching notifications.
+    """
+
+    def __init__(self, cfg):
+        super(EventSource, self).__init__(cfg)
+        try:
+            self.events = cfg['events']
+        except KeyError as err:
+            raise PipelineException(
+                "Required field %s not specified" % err.args[0], cfg)
+        self.check_source_filtering(self.events, 'events')
+
+    def support_event(self, event_name):
+        return self.is_supported(self.events, event_name)
+
 
 class SampleSource(Source):
     """Represents a source of samples.
@@ -162,7 +204,6 @@ class SampleSource(Source):
                 raise PipelineException("Invalid interval value", cfg)
             # Support 'counters' for backward compatibility
             self.meters = cfg.get('meters', cfg.get('counters'))
-            self.sinks = cfg.get('sinks')
         except KeyError as err:
             raise PipelineException(
                 "Required field %s not specified" % err.args[0], cfg)
@@ -191,24 +232,7 @@ class SampleSource(Source):
 
     def support_meter(self, meter_name):
         meter_name = self._variable_meter_name(meter_name)
-
-        # Special case: if we only have negation, we suppose the default is
-        # allow
-        default = all(meter.startswith('!') for meter in self.meters)
-
-        # Support wildcard like storage.* and !disk.*
-        # Start with negation, we consider that the order is deny, allow
-        if any(fnmatch.fnmatch(meter_name, meter[1:])
-               for meter in self.meters
-               if meter[0] == '!'):
-            return False
-
-        if any(fnmatch.fnmatch(meter_name, meter)
-               for meter in self.meters
-               if meter[0] != '!'):
-            return True
-
-        return default
+        return self.is_supported(self.meters, meter_name)
 
 
 class Sink(object):
@@ -285,6 +309,24 @@ class Sink(object):
         return transformers
 
 
+class EventSink(Sink):
+
+    def publish_events(self, ctxt, events):
+        if events:
+            for p in self.publishers:
+                try:
+                    p.publish_events(ctxt, events)
+                except Exception:
+                    LOG.exception(_(
+                        "Pipeline %(pipeline)s: Continue after error "
+                        "from publisher %(pub)s") % ({'pipeline': self,
+                                                      'pub': p}))
+
+    def flush(self, ctxt):
+        """Flush data after all events have been injected to pipeline."""
+        pass
+
+
 class SampleSink(Sink):
 
     def _transform_sample(self, start, ctxt, sample):
@@ -299,6 +341,7 @@ class SampleSink(Sink):
                     return
             return sample
         except Exception as err:
+            # TODO(gordc): only use one log level.
             LOG.warning(_("Pipeline %(pipeline)s: "
                           "Exit after error from transformer "
                           "%(trans)s for %(smp)s") % ({'pipeline': self,
@@ -359,6 +402,7 @@ class SampleSink(Sink):
                 LOG.exception(err)
 
 
+@six.add_metaclass(abc.ABCMeta)
 class Pipeline(object):
     """Represents a coupling between a sink and a corresponding source."""
 
@@ -377,6 +421,29 @@ class Pipeline(object):
     @property
     def publishers(self):
         return self.sink.publishers
+
+    @abc.abstractmethod
+    def publish_data(self, ctxt, data):
+        """Publish data from pipeline."""
+
+
+class EventPipeline(Pipeline):
+    """Represents a pipeline for Events."""
+
+    def __str__(self):
+        # NOTE(gordc): prepend a namespace so we ensure event and sample
+        #              pipelines do not have the same name.
+        return 'event:%s' % super(EventPipeline, self).__str__()
+
+    def support_event(self, event_type):
+        return self.source.support_event(event_type)
+
+    def publish_data(self, ctxt, events):
+        if not isinstance(events, list):
+            events = [events]
+        supported = [e for e in events
+                     if self.source.support_event(e.event_type)]
+        self.sink.publish_events(ctxt, supported)
 
 
 class SamplePipeline(Pipeline):
@@ -406,6 +473,10 @@ class SamplePipeline(Pipeline):
 SAMPLE_TYPE = {'pipeline': SamplePipeline,
                'source': SampleSource,
                'sink': SampleSink}
+
+EVENT_TYPE = {'pipeline': EventPipeline,
+              'source': EventSource,
+              'sink': EventSink}
 
 
 class PipelineManager(object):
@@ -556,9 +627,7 @@ class PipelineManager(object):
         return PublishContext(context, self.pipelines)
 
 
-def setup_pipeline(transformer_manager=None):
-    """Setup pipeline manager according to yaml config file."""
-    cfg_file = cfg.CONF.pipeline_cfg_file
+def _setup_pipeline_manager(cfg_file, transformer_manager, p_type=SAMPLE_TYPE):
     if not os.path.exists(cfg_file):
         cfg_file = cfg.CONF.find_file(cfg_file)
 
@@ -574,4 +643,16 @@ def setup_pipeline(transformer_manager=None):
                            transformer_manager or
                            xformer.TransformerExtensionManager(
                                'ceilometer.transformer',
-                           ))
+                           ), p_type)
+
+
+def setup_event_pipeline(transformer_manager=None):
+    """Setup event pipeline manager according to yaml config file."""
+    cfg_file = cfg.CONF.event_pipeline_cfg_file
+    return _setup_pipeline_manager(cfg_file, transformer_manager, EVENT_TYPE)
+
+
+def setup_pipeline(transformer_manager=None):
+    """Setup pipeline manager according to yaml config file."""
+    cfg_file = cfg.CONF.pipeline_cfg_file
+    return _setup_pipeline_manager(cfg_file, transformer_manager)
