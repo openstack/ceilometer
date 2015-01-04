@@ -99,10 +99,10 @@ class CollectorService(os_service.Service):
             try:
                 sample = msgpack.loads(data, encoding='utf-8')
             except Exception:
-                LOG.warn(_("UDP: Cannot decode data sent by %s"), str(source))
+                LOG.warn(_("UDP: Cannot decode data sent by %s"), source)
             else:
                 try:
-                    LOG.debug(_("UDP: Storing %s"), str(sample))
+                    LOG.debug(_("UDP: Storing %s"), sample)
                     self.dispatcher_manager.map_method('record_metering_data',
                                                        sample)
                 except Exception:

@@ -93,7 +93,7 @@ class ArithmeticTransformer(transformer.TransformerBase):
             )
         except Exception as e:
             LOG.warn(_('Unable to evaluate expression %(expr)s: %(exc)s'),
-                     {'expr': self.expr, 'exc': str(e)})
+                     {'expr': self.expr, 'exc': e})
 
     def handle_sample(self, context, _sample):
         self._update_cache(_sample)

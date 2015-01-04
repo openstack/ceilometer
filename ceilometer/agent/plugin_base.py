@@ -72,7 +72,7 @@ def check_keystone(service_type=None):
                 keystone = _get_keystone()
             if isinstance(keystone, Exception):
                 LOG.error(_('Skip due to keystone error %s'),
-                          str(keystone) if keystone else '')
+                          keystone if keystone else '')
                 return iter([])
             elif service_type:
                 endpoints = keystone.service_catalog.get_endpoints(
