@@ -35,12 +35,6 @@ class HyperVInspector(virt_inspector.Inspector):
         super(HyperVInspector, self).__init__()
         self._utils = utilsv2.UtilsV2()
 
-    def inspect_instances(self):
-        for element_name, name in self._utils.get_all_vms():
-            yield virt_inspector.Instance(
-                name=element_name,
-                UUID=name)
-
     def inspect_cpus(self, instance):
         instance_name = util.instance_name(instance)
         (cpu_clock_used,

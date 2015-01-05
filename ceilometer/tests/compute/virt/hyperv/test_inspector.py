@@ -32,18 +32,6 @@ class TestHyperVInspection(base.BaseTestCase):
 
         super(TestHyperVInspection, self).setUp()
 
-    def test_inspect_instances(self):
-        fake_name = 'fake_name'
-        fake_uuid = 'fake_uuid'
-        fake_instances = [(fake_name, fake_uuid)]
-        self._inspector._utils.get_all_vms.return_value = fake_instances
-
-        inspected_instances = list(self._inspector.inspect_instances())
-
-        self.assertEqual(1, len(inspected_instances))
-        self.assertEqual(fake_name, inspected_instances[0].name)
-        self.assertEqual(fake_uuid, inspected_instances[0].UUID)
-
     def test_inspect_cpus(self):
         fake_instance_name = 'fake_instance_name'
         fake_host_cpu_clock = 1000

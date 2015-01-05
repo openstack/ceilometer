@@ -32,22 +32,6 @@ class TestXenapiInspection(base.BaseTestCase):
 
         super(TestXenapiInspection, self).setUp()
 
-    def test_inspect_instances(self):
-        vms = {
-            'ref': {
-                'name_label': 'fake_name',
-                'other_config': {'nova_uuid': 'fake_uuid', },
-            }
-        }
-
-        session = self.inspector.session
-        with mock.patch.object(session, 'xenapi_request',
-                               return_value=vms):
-            inspected_instances = list(self.inspector.inspect_instances())
-            inspected_instance = inspected_instances[0]
-            self.assertEqual('fake_name', inspected_instance.name)
-            self.assertEqual('fake_uuid', inspected_instance.UUID)
-
     def test_inspect_cpu_util(self):
         fake_instance = {'OS-EXT-SRV-ATTR:instance_name': 'fake_instance_name',
                          'id': 'fake_instance_id'}

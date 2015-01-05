@@ -45,30 +45,6 @@ class TestLibvirtInspection(base.BaseTestCase):
         self.domain = mock.Mock()
         self.addCleanup(mock.patch.stopall)
 
-    def test_inspect_instances(self):
-        class FakeDomain(object):
-            @staticmethod
-            def name():
-                return 'fake_name'
-
-            @staticmethod
-            def UUIDString():
-                return 'uuid'
-
-        fake_domain = FakeDomain()
-        connection = self.inspector.connection
-        with contextlib.nested(mock.patch.object(connection, 'numOfDomains',
-                                                 return_value=1),
-                               mock.patch.object(connection, 'listDomainsID',
-                                                 return_value=[42]),
-                               mock.patch.object(connection, 'lookupByID',
-                                                 return_value=fake_domain)):
-            inspected_instances = list(self.inspector.inspect_instances())
-            self.assertEqual(1, len(inspected_instances))
-            inspected_instance = inspected_instances[0]
-            self.assertEqual('fake_name', inspected_instance.name)
-            self.assertEqual('uuid', inspected_instance.UUID)
-
     def test_inspect_cpus(self):
         with contextlib.nested(mock.patch.object(self.inspector.connection,
                                                  'lookupByUUIDString',
