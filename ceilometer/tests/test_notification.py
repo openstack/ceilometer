@@ -262,3 +262,10 @@ class TestRealNotificationHA(BaseRealNotification):
         fake_coord1.extract_my_subset.side_effect = lambda x, y: y
         fake_coord.return_value = fake_coord1
         self._check_notification_service()
+
+    def test_reset_listeners_on_refresh(self):
+        self.srv.start()
+        self.assertEqual(1, len(self.srv.pipeline_listeners))
+        self.srv._refresh_agent(None)
+        self.assertEqual(1, len(self.srv.pipeline_listeners))
+        self.srv.stop()

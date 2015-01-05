@@ -175,19 +175,19 @@ class NotificationService(os_service.Service):
         self._configure_pipeline_listeners()
 
     def _configure_pipeline_listeners(self):
-        if cfg.CONF.notification.workload_partitioning:
-            partitioned = self.partition_coordinator.extract_my_subset(
-                self.group_id, self.pipeline_manager.pipelines)
-            transport = messaging.get_transport()
-            for pipe in partitioned:
-                LOG.debug(_('Pipeline endpoint: %s'), pipe.name)
-                listener = messaging.get_notification_listener(
-                    transport,
-                    [oslo.messaging.Target(
-                        topic='%s-%s' % (self.NOTIFICATION_IPC, pipe.name))],
-                    [pipeline.PipelineEndpoint(self.ctxt, pipe)])
-                listener.start()
-                self.pipeline_listeners.append(listener)
+        self.pipeline_listeners = []
+        partitioned = self.partition_coordinator.extract_my_subset(
+            self.group_id, self.pipeline_manager.pipelines)
+        transport = messaging.get_transport()
+        for pipe in partitioned:
+            LOG.debug(_('Pipeline endpoint: %s'), pipe.name)
+            listener = messaging.get_notification_listener(
+                transport,
+                [oslo.messaging.Target(
+                    topic='%s-%s' % (self.NOTIFICATION_IPC, pipe.name))],
+                [pipeline.PipelineEndpoint(self.ctxt, pipe)])
+            listener.start()
+            self.pipeline_listeners.append(listener)
 
     def stop(self):
         self.partition_coordinator.leave_group(self.group_id)
