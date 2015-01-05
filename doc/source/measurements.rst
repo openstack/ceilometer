@@ -352,39 +352,72 @@ switch.flow.bytes                  Cumulative  B       switch ID  pollster  Rece
 LoadBalancer as a Service (LBaaS)
 =================================
 
-=======================================  ==========  ==========    ==========  =========  ==============================
-Meter                                    Type        Unit          Resource    Origin     Note
-=======================================  ==========  ==========    ==========  =========  ==============================
-network.services.lb.pool                 Gauge       pool          pool ID     pollster   Existence of a LB Pool
-network.services.lb.vip                  Gauge       vip           vip ID      pollster   Existence of a LB Vip
-network.services.lb.member               Gauge       member        member ID   pollster   Existence of a LB Member
-network.services.lb.health_monitor       Gauge       monitor       monitor ID  pollster   Existence of a LB Health Probe
-network.services.lb.total.connections    Cumulative  connection    pool ID     pollster   Total connections on a LB
-network.services.lb.active.connections   Gauge       connection    pool ID     pollster   Active connections on a LB
-network.services.lb.incoming.bytes       Cumulative  B             pool ID     pollster   Number of incoming Bytes
-network.services.lb.outgoing.bytes       Cumulative  B             pool ID     pollster   Number of outgoing Bytes
-=======================================  ==========  ==========    ==========  =========  ==============================
+======================================      ==========  ==========    ==========  ============  ==============================
+Meter                                       Type        Unit          Resource    Origin        Note
+======================================      ==========  ==========    ==========  ============  ==============================
+network.services.lb.pool                    Gauge       pool          pool ID     pollster      Existence of a LB Pool
+pool                                        Gauge       pool          pool ID     notification  Existence of a LB Pool
+pool.create                                 Delta       pool          pool ID     notification  Creation of a LB Pool
+pool.update                                 Delta       pool          pool ID     notification  Update of a LB Pool
+network.services.lb.vip                     Gauge       vip           vip ID      pollster      Existence of a LB Vip
+vip                                         Gauge       vip           vip ID      notification  Existence of a LB Vip
+vip.create                                  Delta       vip           vip ID      notification  Creation of a LB Vip
+vip.update                                  Delta       vip           vip ID      notification  Update of a LB Vip
+network.services.lb.member                  Gauge       member        member ID   pollster      Existence of a LB Member
+member                                      Gauge       member        member ID   notification  Existence of a LB Member
+member.create                               Delta       member        member ID   notification  Creation of a LB Member
+member.update                               Delta       member        member ID   notification  Update of a LB Member
+network.services.lb.health_monitor          Gauge       monitor       monitor ID  pollster      Existence of a LB Health Probe
+health_monitor                              Gauge       monitor       monitor ID  notification  Existence of a LB Health Probe
+health_monitor.create                       Delta       monitor       monitor ID  notification  Creation of a LB Health Probe
+health_monitor.update                       Delta       monitor       monitor ID  notification  Update of a LB Health Probe
+network.services.lb.total.connections       Cumulative  connection    pool ID     pollster      Total connections on a LB
+network.services.lb.active.connections      Gauge       connection    pool ID     pollster      Active connections on a LB
+network.services.lb.incoming.bytes          Cumulative  B             pool ID     pollster      Number of incoming Bytes
+network.services.lb.outgoing.bytes          Cumulative  B             pool ID     pollster      Number of outgoing Bytes
+======================================      ==========  ==========    ==========  ============  ==============================
 
 VPN as a Service (VPNaaS)
 =========================
 
-================================  =====  ==========    =============  ========  ===============================
-Meter                             Type   Unit          Resource       Origin    Note
-================================  =====  ==========    =============  ========  ===============================
-network.services.vpn              Gauge  vpn           vpn ID         pollster  Existence of a VPN service
-network.services.vpn.connections  Gauge  connection    connection ID  pollster  Existence of a IPSec Connection
-================================  =====  ==========    =============  ========  ===============================
+================================         =====  ===========   ============== ============  ===============================
+Meter                                    Type   Unit          Resource       Origin        Note
+================================         =====  ===========   ============== ============  ===============================
+network.services.vpn                     Gauge  vpn           vpn ID         pollster      Existence of a VPN service
+vpnservice                               Gauge  vpn           vpn ID         notification  Existence of a VPN service
+vpnservice.create                        Delta  vpn           vpn ID         notification  Creation of a VPN service
+vpnservice.update                        Delta  vpn           vpn ID         notification  Update of a VPN service
+network.services.vpn.connections         Gauge  connection    connection ID  pollster      Existence of a IPSec Connection
+ipsec_site_connection                    Gauge  connection    connection ID  notification  Existence of a IPSec Connection
+ipsec_site_connection.create             Delta  connection    connection ID  notification  Creation of a IPSec Connection
+ipsec_site_connection.update             Delta  connection    connection ID  notification  Update of a IPSec Connection
+ipsecpolicy                              Gauge  ipsecpolicy   ipsecpolicy ID notification  Existence of a IPSec Policy
+ipsecpolicy.create                       Delta  ipsecpolicy   ipsecpolicy ID notification  Creation of a IPSec Policy
+ipsecpolicy.update                       Delta  ipsecpolicy   ipsecpolicy ID notification  Update of a IPSec Policy
+ikepolicy                                Gauge  ikepolicy     ikepolicy ID   notification  Existence of a Ike Policy
+ikepolicy.create                         Delta  ikepolicy     ikepolicy ID   notification  Creation of a Ike Policy
+ikepolicy.update                         Delta  ikepolicy     ikepolicy ID   notification  Update of a Ike Policy
+================================         =====  ===========   ============== ============  ===============================
 
 
 Firewall as a Service (FWaaS)
 =============================
 
-================================  =====  ========    ===========  ========  ===============================
-Meter                             Type   Unit        Resource     Origin    Note
-================================  =====  ========    ===========  ========  ===============================
-network.services.firewall         Gauge  firewall    firewall ID  pollster  Existence of a Firewall service
-network.services.firewall.policy  Gauge  policy      policy ID    pollster  Existence of Firewall Policy
-================================  =====  ========    ===========  ========  ===============================
+================================         =====  ========    ===========  ============  ===============================
+Meter                                    Type   Unit        Resource     Origin        Note
+================================         =====  ========    ===========  ============  ===============================
+network.services.firewall                Gauge  firewall    firewall ID  pollster      Existence of a Firewall service
+firewall                                 Gauge  firewall    firewall ID  notification  Existence of a Firewall service
+firewall.create                          Delta  firewall    firewall ID  notification  Creation of a Firewall service
+firewall.update                          Delta  firewall    firewall ID  notification  Update of a Firewall service
+network.services.firewall.policy         Gauge  policy      policy ID    pollster      Existence of a Firewall Policy
+firewall_policy                          Gauge  policy      policy ID    notification  Existence of a Firewall Policy
+firewall_policy.create                   Delta  policy      policy ID    notification  Creation of a Firewall Policy
+firewall_policy.update                   Delta  policy      policy ID    notification  Update of a Firewall Policy
+firewall_rule                            Gauge  rule        rule ID      notification  Existence of a Firewall Rule
+firewall_rule.create                     Delta  rule        rule ID      notification  Creation of a Firewall Rule
+firewall_rule.update                     Delta  rule        rule ID      notification  Update of a Firewall Rule
+================================         =====  ========    ===========  ============  ===============================
 
 
 Ironic Hardware IPMI Sensor Data
