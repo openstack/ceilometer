@@ -605,6 +605,19 @@ details about any other options you might want to modify before starting
 the service.
 
 
+Configuring MagnetoDB to send notifications
+===========================================
+
+Configure the driver in ``magnetodb-async-task-executor.conf``
+
+   ::
+
+        notification_driver=messaging
+
+You also would need to restart the service magnetodb-async-task-executor
+(if it's already running) after changing the above configuration file.
+
+
 Notifications queues
 ========================
 
