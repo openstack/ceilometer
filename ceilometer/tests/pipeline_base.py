@@ -199,7 +199,7 @@ class BasePipelineTestCase(base.BaseTestCase):
 
     def test_no_transformers(self):
         self._unset_pipeline_cfg('transformers')
-        self._exception_create_pipelinemanager()
+        pipeline.PipelineManager(self.pipeline_cfg, self.transformer_manager)
 
     def test_no_name(self):
         self._unset_pipeline_cfg('name')
