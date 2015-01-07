@@ -1,14 +1,14 @@
 # Translations template for ceilometer.
-# Copyright (C) 2014 ORGANIZATION
+# Copyright (C) 2015 ORGANIZATION
 # This file is distributed under the same license as the ceilometer project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2014.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 2015.1.dev230.gcde8916\n"
+"Project-Id-Version: ceilometer 2015.1.dev32\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-12-04 06:08+0000\n"
+"POT-Creation-Date: 2015-01-07 06:11+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,53 +17,33 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
-#: ceilometer/agent.py:108
-#, python-format
-msgid "Polling pollster %(poll)s in the context of %(src)s"
-msgstr ""
-
-#: ceilometer/agent.py:119
-#, python-format
-msgid "Skip polling pollster %s, no resources found"
-msgstr ""
-
-#: ceilometer/agent.py:131
-#, python-format
-msgid "Continue after error from %(name)s: %(error)s"
-msgstr ""
-
-#: ceilometer/agent.py:245
-#, python-format
-msgid "Unable to discover resources: %s"
-msgstr ""
-
-#: ceilometer/agent.py:247
-#, python-format
-msgid "Unknown discovery extension: %s"
-msgstr ""
-
-#: ceilometer/collector.py:103
+#: ceilometer/collector.py:102
 #, python-format
 msgid "UDP: Cannot decode data sent by %s"
 msgstr ""
 
-#: ceilometer/collector.py:106
+#: ceilometer/collector.py:105
 #, python-format
 msgid "UDP: Storing %s"
 msgstr ""
 
-#: ceilometer/collector.py:110
+#: ceilometer/collector.py:109
 msgid "UDP: Unable to store meter"
 msgstr ""
 
-#: ceilometer/notification.py:80 ceilometer/notifier.py:48
+#: ceilometer/notification.py:131 ceilometer/notifier.py:48
 #, python-format
 msgid "Failed to load any notification handlers for %s"
 msgstr ""
 
-#: ceilometer/notification.py:92
+#: ceilometer/notification.py:143
 #, python-format
 msgid "Event types from %(name)s: %(type)s (ack_on_error=%(error)s)"
+msgstr ""
+
+#: ceilometer/notification.py:183
+#, python-format
+msgid "Pipeline endpoint: %s"
 msgstr ""
 
 #: ceilometer/notifier.py:39
@@ -71,72 +51,102 @@ msgstr ""
 msgid "loading notification handlers from %s"
 msgstr ""
 
-#: ceilometer/pipeline.py:233
+#: ceilometer/pipeline.py:256
 #, python-format
 msgid "Unable to load publisher %s"
 msgstr ""
 
-#: ceilometer/pipeline.py:252
+#: ceilometer/pipeline.py:275
 #, python-format
 msgid ""
 "Pipeline %(pipeline)s: Setup transformer instance %(name)s with parameter"
 " %(param)s"
 msgstr ""
 
-#: ceilometer/pipeline.py:265
+#: ceilometer/pipeline.py:288
 #, python-format
 msgid "Pipeline %(pipeline)s: Sample dropped by transformer %(trans)s"
 msgstr ""
 
-#: ceilometer/pipeline.py:272
+#: ceilometer/pipeline.py:295
 #, python-format
 msgid ""
 "Pipeline %(pipeline)s: Exit after error from transformer %(trans)s for "
 "%(smp)s"
 msgstr ""
 
-#: ceilometer/pipeline.py:295
+#: ceilometer/pipeline.py:318
 #, python-format
 msgid "Pipeline %(pipeline)s: Transform sample %(smp)s from %(trans)s transformer"
 msgstr ""
 
-#: ceilometer/pipeline.py:309
+#: ceilometer/pipeline.py:332
 #, python-format
 msgid "Pipeline %(pipeline)s: Continue after error from publisher %(pub)s"
 msgstr ""
 
-#: ceilometer/pipeline.py:328
+#: ceilometer/pipeline.py:348
 #, python-format
 msgid "Pipeline %(pipeline)s: Error flushing transformer %(trans)s"
 msgstr ""
 
-#: ceilometer/pipeline.py:488
+#: ceilometer/pipeline.py:508
 msgid "detected decoupled pipeline config format"
 msgstr ""
 
-#: ceilometer/pipeline.py:498
+#: ceilometer/pipeline.py:524
 msgid "detected deprecated pipeline config format"
 msgstr ""
 
-#: ceilometer/pipeline.py:518
+#: ceilometer/pipeline.py:550
 #, python-format
 msgid "Pipeline config file: %s"
 msgstr ""
 
-#: ceilometer/pipeline.py:524
+#: ceilometer/pipeline.py:556
 #, python-format
 msgid "Pipeline config: %s"
-msgstr ""
-
-#: ceilometer/plugin.py:66
-msgid ""
-"get_exchange_topics API of NotificationPlugin isdeprecated, implements "
-"get_targets instead."
 msgstr ""
 
 #: ceilometer/service.py:108
 #, python-format
 msgid "%(worker_name)s value of %(workers)s is invalid, must be greater than 0"
+msgstr ""
+
+#: ceilometer/agent/base.py:119
+#, python-format
+msgid "Polling pollster %(poll)s in the context of %(src)s"
+msgstr ""
+
+#: ceilometer/agent/base.py:140
+#, python-format
+msgid "Continue after error from %(name)s: %(error)s"
+msgstr ""
+
+#: ceilometer/agent/base.py:280
+#, python-format
+msgid "Unable to discover resources: %s"
+msgstr ""
+
+#: ceilometer/agent/base.py:282
+#, python-format
+msgid "Unknown discovery extension: %s"
+msgstr ""
+
+#: ceilometer/agent/plugin_base.py:74
+#, python-format
+msgid "Skip due to keystone error %s"
+msgstr ""
+
+#: ceilometer/agent/plugin_base.py:81
+#, python-format
+msgid "Skipping because %s service is not registered in keystone"
+msgstr ""
+
+#: ceilometer/agent/plugin_base.py:120
+msgid ""
+"get_exchange_topics API of NotificationPlugin isdeprecated, implements "
+"get_targets instead."
 msgstr ""
 
 #: ceilometer/alarm/rpc.py:56
@@ -185,7 +195,7 @@ msgstr ""
 msgid "Unable to notify alarm %s"
 msgstr ""
 
-#: ceilometer/alarm/service.py:301
+#: ceilometer/alarm/service.py:302
 msgid "Unable to notify for an alarm with no action"
 msgstr ""
 
@@ -276,18 +286,19 @@ msgstr ""
 msgid "comparing value %(value)s against threshold %(limit)s"
 msgstr ""
 
-#: ceilometer/alarm/notifier/log.py:31
+#: ceilometer/alarm/notifier/log.py:32
 #, python-format
 msgid ""
-"Notifying alarm %(alarm_id)s from %(previous)s to %(current)s with action"
-" %(action)s because %(reason)s"
+"Notifying alarm %(alarm_name)s %(alarm_id)s from %(previous)s to "
+"%(current)s with action %(action)s because %(reason)s."
 msgstr ""
 
 #: ceilometer/alarm/notifier/rest.py:66
 #, python-format
 msgid ""
-"Notifying alarm %(alarm_id)s from %(previous)s to %(current)s with action"
-" %(action)s because %(reason)s. request-id: %(request_id)s"
+"Notifying alarm %(alarm_name)s %(alarm_id)s from %(previous)s to "
+"%(current)s with action %(action)s because %(reason)s. request-id: "
+"%(request_id)s "
 msgstr ""
 
 #: ceilometer/alarm/partition/coordination.py:132
@@ -439,242 +450,232 @@ msgstr ""
 msgid "state_timestamp should be datetime object"
 msgstr ""
 
-#: ceilometer/api/app.py:167
+#: ceilometer/api/app.py:168
 #, python-format
 msgid "Starting server in PID %s"
 msgstr ""
 
-#: ceilometer/api/app.py:168
+#: ceilometer/api/app.py:169
 msgid "Configuration:"
 msgstr ""
 
-#: ceilometer/api/app.py:172
+#: ceilometer/api/app.py:173
 #, python-format
 msgid "serving on 0.0.0.0:%(sport)s, view at http://127.0.0.1:%(vport)s"
 msgstr ""
 
-#: ceilometer/api/app.py:176
+#: ceilometer/api/app.py:177
 #, python-format
 msgid "serving on http://%(host)s:%(port)s"
 msgstr ""
 
-#: ceilometer/api/middleware.py:108
+#: ceilometer/api/middleware.py:107
 #, python-format
 msgid "Error parsing HTTP response: %s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:98
+#: ceilometer/api/controllers/v2.py:100
 #, python-format
 msgid "%(entity)s %(id)s Not Found"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:106
+#: ceilometer/api/controllers/v2.py:108
 #, python-format
 msgid "Alarm %s not found"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:108
+#: ceilometer/api/controllers/v2.py:110
 #, python-format
 msgid "Alarm %(alarm_id)s not found in project %(project)s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:121
+#: ceilometer/api/controllers/v2.py:123
 #, python-format
 msgid "Alarm quota exceeded for user %(u)s on project %(p)s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:318
+#: ceilometer/api/controllers/v2.py:320
 #, python-format
 msgid "Unable to convert the value %(value)s to the expected data type %(type)s."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:323
+#: ceilometer/api/controllers/v2.py:325
 #, python-format
 msgid ""
 "The data type %(type)s is not supported. The supported data type list is:"
 " %(supported)s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:328
+#: ceilometer/api/controllers/v2.py:330
 #, python-format
 msgid ""
 "Unexpected exception converting %(value)s to the expected data type "
 "%(type)s."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:339
+#: ceilometer/api/controllers/v2.py:341
 #, python-format
 msgid "Not Authorized to access %(aspect)s %(id)s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:820
+#: ceilometer/api/controllers/v2.py:806
 msgid "clamping min timestamp to range"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:825
+#: ceilometer/api/controllers/v2.py:811
 msgid "clamping max timestamp to range"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:901 ceilometer/api/controllers/v2.py:1173
+#: ceilometer/api/controllers/v2.py:890 ceilometer/api/controllers/v2.py:1174
 msgid "Limit must be positive"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:984
+#: ceilometer/api/controllers/v2.py:979
 msgid "Period must be positive."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1006
+#: ceilometer/api/controllers/v2.py:1001
 #, python-format
 msgid "computed value coming from %r"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1015
+#: ceilometer/api/controllers/v2.py:1010
 #, python-format
 msgid "Invalid period %(period)s: %(err)s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1189
+#: ceilometer/api/controllers/v2.py:1193
 msgid "Sample"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1354
+#: ceilometer/api/controllers/v2.py:1358
 #, python-format
 msgid "Filter expression not valid: %s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1369
+#: ceilometer/api/controllers/v2.py:1373
 #, python-format
 msgid "Order-by expression not valid: %s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1380
+#: ceilometer/api/controllers/v2.py:1384
 msgid "Limit should be positive"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1473
+#: ceilometer/api/controllers/v2.py:1477
 #, python-format
 msgid "String %s is not a valid isotime"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1474
+#: ceilometer/api/controllers/v2.py:1478
 #, python-format
 msgid "Failed to parse the timestamp value %s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1560
+#: ceilometer/api/controllers/v2.py:1568
 msgid "Resource"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1635
+#: ceilometer/api/controllers/v2.py:1646
 #, python-format
 msgid ""
 "Alarm when %(meter_name)s is %(comparison_operator)s a %(statistic)s of "
 "%(threshold)s over %(period)s seconds"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1675
+#: ceilometer/api/controllers/v2.py:1686
 #, python-format
 msgid "Combined state of alarms %s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1684
+#: ceilometer/api/controllers/v2.py:1695
 msgid "Alarm combination rule should contain at least two different alarm ids."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1735
+#: ceilometer/api/controllers/v2.py:1746
 #, python-format
 msgid "Timezone %s is not valid"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1861
+#: ceilometer/api/controllers/v2.py:1872
 msgid "Time constraint names must be unique for a given alarm."
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1871
+#: ceilometer/api/controllers/v2.py:1882
 #, python-format
 msgid "%(rule)s must be set for %(type)s type alarm"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1875
+#: ceilometer/api/controllers/v2.py:1886
 msgid "threshold_rule and combination_rule cannot be set at the same time"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1892
+#: ceilometer/api/controllers/v2.py:1903
 #, python-format
 msgid "Unable to parse action %s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1895
+#: ceilometer/api/controllers/v2.py:1906
 #, python-format
 msgid "Unsupported action %s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:2058
+#: ceilometer/api/controllers/v2.py:2075
 #, python-format
 msgid "Alarm with name=%s exists"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:2065
+#: ceilometer/api/controllers/v2.py:2082
 #, python-format
 msgid "Cannot specify alarm %s itself in combination rule"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:2073
+#: ceilometer/api/controllers/v2.py:2090
 #, python-format
 msgid "Error while putting alarm: %s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:2074 ceilometer/api/controllers/v2.py:2225
+#: ceilometer/api/controllers/v2.py:2091 ceilometer/api/controllers/v2.py:2258
 msgid "Alarm incorrect"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:2125
+#: ceilometer/api/controllers/v2.py:2151
 msgid "state invalid"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:2218
+#: ceilometer/api/controllers/v2.py:2251
 #, python-format
 msgid "Alarm with name='%s' exists"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:2224
+#: ceilometer/api/controllers/v2.py:2257
 #, python-format
 msgid "Error while posting alarm: %s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:2381
+#: ceilometer/api/controllers/v2.py:2422
 msgid "operator {} is incorrect"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:2403
+#: ceilometer/api/controllers/v2.py:2444
 #, python-format
 msgid "Getting traits for %s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:2468
+#: ceilometer/api/controllers/v2.py:2509
 msgid "Event"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:2471
+#: ceilometer/api/controllers/v2.py:2512
 #, python-format
 msgid "More than one event with id %s returned from storage driver"
 msgstr ""
 
-#: ceilometer/central/plugin.py:68
-#, python-format
-msgid "Skip due to keystone error %s"
-msgstr ""
-
-#: ceilometer/central/plugin.py:75
-#, python-format
-msgid "Skipping because %s service is not registered in keystone"
-msgstr ""
-
-#: ceilometer/cmd/storage.py:40
+#: ceilometer/cmd/storage.py:41
 msgid "Clearing expired metering data"
 msgstr ""
 
-#: ceilometer/cmd/storage.py:45
+#: ceilometer/cmd/storage.py:46
 msgid "Nothing to clean, database time to live is disabled"
 msgstr ""
 
@@ -717,61 +718,61 @@ msgstr ""
 msgid "checking instance %s"
 msgstr ""
 
-#: ceilometer/compute/pollsters/cpu.py:38
+#: ceilometer/compute/pollsters/cpu.py:37
 #, python-format
 msgid "CPUTIME USAGE: %(instance)s %(time)d"
 msgstr ""
 
-#: ceilometer/compute/pollsters/cpu.py:52
-#: ceilometer/compute/pollsters/cpu.py:83
-#: ceilometer/compute/pollsters/disk.py:122
-#: ceilometer/compute/pollsters/disk.py:327
+#: ceilometer/compute/pollsters/cpu.py:51
+#: ceilometer/compute/pollsters/cpu.py:82
+#: ceilometer/compute/pollsters/disk.py:121
+#: ceilometer/compute/pollsters/disk.py:326
 #: ceilometer/compute/pollsters/memory.py:47
-#: ceilometer/compute/pollsters/net.py:111
+#: ceilometer/compute/pollsters/net.py:109
 #, python-format
 msgid "Exception while getting samples %s"
 msgstr ""
 
-#: ceilometer/compute/pollsters/cpu.py:55
+#: ceilometer/compute/pollsters/cpu.py:54
 #, python-format
 msgid "Obtaining CPU time is not implemented for %s"
 msgstr ""
 
-#: ceilometer/compute/pollsters/cpu.py:58
+#: ceilometer/compute/pollsters/cpu.py:57
 #, python-format
 msgid "could not get CPU time for %(id)s: %(e)s"
 msgstr ""
 
-#: ceilometer/compute/pollsters/cpu.py:67
+#: ceilometer/compute/pollsters/cpu.py:66
 #, python-format
 msgid "Checking CPU util for instance %s"
 msgstr ""
 
-#: ceilometer/compute/pollsters/cpu.py:71
+#: ceilometer/compute/pollsters/cpu.py:70
 #, python-format
 msgid "CPU UTIL: %(instance)s %(util)d"
 msgstr ""
 
-#: ceilometer/compute/pollsters/cpu.py:86
+#: ceilometer/compute/pollsters/cpu.py:85
 #, python-format
 msgid "Obtaining CPU Util is not implemented for %s"
 msgstr ""
 
-#: ceilometer/compute/pollsters/cpu.py:89
+#: ceilometer/compute/pollsters/cpu.py:88
 #, python-format
 msgid "Could not get CPU Util for %(id)s: %(e)s"
 msgstr ""
 
-#: ceilometer/compute/pollsters/disk.py:125
-#: ceilometer/compute/pollsters/disk.py:330
-#: ceilometer/compute/pollsters/net.py:114
+#: ceilometer/compute/pollsters/disk.py:124
+#: ceilometer/compute/pollsters/disk.py:329
+#: ceilometer/compute/pollsters/net.py:112
 #, python-format
 msgid "%(inspector)s does not provide data for  %(pollster)s"
 msgstr ""
 
-#: ceilometer/compute/pollsters/disk.py:130
-#: ceilometer/compute/pollsters/disk.py:336
-#: ceilometer/compute/pollsters/net.py:119
+#: ceilometer/compute/pollsters/disk.py:129
+#: ceilometer/compute/pollsters/disk.py:335
+#: ceilometer/compute/pollsters/net.py:117
 #, python-format
 msgid "Ignoring instance %(name)s: %(error)s"
 msgstr ""
@@ -796,58 +797,58 @@ msgstr ""
 msgid "Could not get Memory Usage for %(id)s: %(e)s"
 msgstr ""
 
-#: ceilometer/compute/pollsters/net.py:97
+#: ceilometer/compute/pollsters/net.py:95
 #, python-format
 msgid "checking net info for instance %s"
 msgstr ""
 
-#: ceilometer/compute/virt/inspector.py:231
+#: ceilometer/compute/virt/inspector.py:227
 #, python-format
 msgid "Unable to load the hypervisor inspector: %s"
 msgstr ""
 
-#: ceilometer/compute/virt/hyperv/utilsv2.py:182
+#: ceilometer/compute/virt/hyperv/utilsv2.py:184
 #, python-format
 msgid "VM %s not found on Hyper-V"
 msgstr ""
 
-#: ceilometer/compute/virt/hyperv/utilsv2.py:184
+#: ceilometer/compute/virt/hyperv/utilsv2.py:186
 #, python-format
 msgid "Duplicate VM name found: %s"
 msgstr ""
 
-#: ceilometer/compute/virt/libvirt/inspector.py:131
+#: ceilometer/compute/virt/libvirt/inspector.py:118
 #, python-format
 msgid ""
-"Failed to inspect vnics of %(instance_name)s, domain is in state of "
-"SHUTOFF"
+"Failed to inspect vnics of instance Name %(instance_name)s UUID "
+"%(instance_uuid)s, domain is in state of SHUTOFF"
 msgstr ""
 
-#: ceilometer/compute/virt/libvirt/inspector.py:166
+#: ceilometer/compute/virt/libvirt/inspector.py:156
 #, python-format
 msgid ""
-"Failed to inspect disks of %(instance_name)s, domain is in state of "
-"SHUTOFF"
+"Failed to inspect disks of instance Name %(instance_name)s UUID "
+"%(instance_uuid)s, domain is in state of SHUTOFF"
 msgstr ""
 
-#: ceilometer/compute/virt/libvirt/inspector.py:189
+#: ceilometer/compute/virt/libvirt/inspector.py:181
 #, python-format
 msgid ""
-"Failed to inspect memory usage of %(instance_name)s, domain is in state "
-"of SHUTOFF"
+"Failed to inspect memory usage of instance Name %(instance_name)s UUID "
+"%(instance_uuid)s, domain is in state of SHUTOFF"
 msgstr ""
 
-#: ceilometer/compute/virt/libvirt/inspector.py:205
+#: ceilometer/compute/virt/libvirt/inspector.py:199
 #, python-format
 msgid ""
-"Failed to inspect memory usage of %(instance_name)s, can not get info "
-"from libvirt"
+"Failed to inspect memory usage of instance Name %(instance_name)s UUID "
+"%(instance_uuid)s, can not get info from libvirt"
 msgstr ""
 
-#: ceilometer/compute/virt/libvirt/inspector.py:212
+#: ceilometer/compute/virt/libvirt/inspector.py:208
 #, python-format
 msgid ""
-"Failed to inspect memory usage of %(instance_name)s, can not get info "
+"Failed to inspect memory usage of %(instance_uuid)s, can not get info "
 "from libvirt: %(error)s"
 msgstr ""
 
@@ -876,17 +877,17 @@ msgstr ""
 msgid "Could not connect to XenAPI: %s"
 msgstr ""
 
-#: ceilometer/compute/virt/xenapi/inspector.py:107
+#: ceilometer/compute/virt/xenapi/inspector.py:98
 #, python-format
 msgid "VM %s not found in XenServer"
 msgstr ""
 
-#: ceilometer/compute/virt/xenapi/inspector.py:110
+#: ceilometer/compute/virt/xenapi/inspector.py:101
 #, python-format
 msgid "Multiple VM %s found in XenServer"
 msgstr ""
 
-#: ceilometer/compute/virt/xenapi/inspector.py:131
+#: ceilometer/compute/virt/xenapi/inspector.py:114
 #, python-format
 msgid "Could not get VM %s CPU Utilization"
 msgstr ""
@@ -1080,7 +1081,7 @@ msgstr ""
 msgid "running ipmitool failure"
 msgstr ""
 
-#: ceilometer/network/floatingip.py:57
+#: ceilometer/network/floatingip.py:58
 #, python-format
 msgid "FLOATING IP USAGE: %s"
 msgstr ""
@@ -1140,54 +1141,48 @@ msgstr ""
 msgid "Swift endpoint not found"
 msgstr ""
 
-#: ceilometer/openstack/common/gettextutils.py:301
-msgid "Message objects do not support addition."
-msgstr ""
-
-#: ceilometer/openstack/common/gettextutils.py:311
-msgid ""
-"Message objects do not support str() because they may contain non-ascii "
-"characters. Please use unicode() or translate() instead."
-msgstr ""
-
-#: ceilometer/openstack/common/log.py:287
+#: ceilometer/openstack/common/log.py:298
 #, python-format
 msgid "Deprecated: %s"
 msgstr ""
 
-#: ceilometer/openstack/common/log.py:395
+#: ceilometer/openstack/common/log.py:406
 #, python-format
 msgid "Error loading logging config %(log_config)s: %(err_msg)s"
 msgstr ""
 
-#: ceilometer/openstack/common/log.py:456
+#: ceilometer/openstack/common/log.py:467
 #, python-format
 msgid "syslog facility must be one of: %s"
 msgstr ""
 
-#: ceilometer/openstack/common/log.py:707
+#: ceilometer/openstack/common/log.py:715
 #, python-format
 msgid "Fatal call to deprecated config: %(msg)s"
 msgstr ""
 
-#: ceilometer/openstack/common/policy.py:97
+#: ceilometer/openstack/common/policy.py:98
 msgid "The JSON file that defines policies."
 msgstr ""
 
-#: ceilometer/openstack/common/policy.py:100
+#: ceilometer/openstack/common/policy.py:101
 msgid "Default rule. Enforced when a requested rule is not found."
 msgstr ""
 
-#: ceilometer/openstack/common/policy.py:104
-msgid "The directories of policy configuration files is stored"
+#: ceilometer/openstack/common/policy.py:105
+msgid ""
+"Directories where policy configuration files are stored. They can be "
+"relative to any directory in the search path defined by the config_dir "
+"option, or absolute paths. The file defined by policy_file must exist for"
+" these directories to be searched."
 msgstr ""
 
-#: ceilometer/openstack/common/policy.py:119
+#: ceilometer/openstack/common/policy.py:129
 #, python-format
 msgid "Policy doesn't allow %s to be performed."
 msgstr ""
 
-#: ceilometer/openstack/common/policy.py:213
+#: ceilometer/openstack/common/policy.py:226
 #, python-format
 msgid "Rules must be an instance of dict or Rules, got %s instead"
 msgstr ""
@@ -1234,7 +1229,7 @@ msgstr ""
 msgid "Unable to send sample over UDP"
 msgstr ""
 
-#: ceilometer/storage/__init__.py:106
+#: ceilometer/storage/__init__.py:111
 #, python-format
 msgid "looking for %(name)r driver in %(namespace)r"
 msgstr ""
@@ -1263,7 +1258,7 @@ msgstr ""
 msgid "Dropping data with TTL %d"
 msgstr ""
 
-#: ceilometer/storage/impl_mongodb.py:549
+#: ceilometer/storage/impl_mongodb.py:553
 msgid ""
 "Clearing expired metering data is based on native MongoDB time to live "
 "feature and going in background."
@@ -1288,33 +1283,33 @@ msgstr ""
 msgid "connecting to HBase on %(host)s:%(port)s"
 msgstr ""
 
-#: ceilometer/storage/hbase/inmemory.py:267
+#: ceilometer/storage/hbase/inmemory.py:268
 msgid "Opening in-memory HBase connection"
 msgstr ""
 
-#: ceilometer/storage/hbase/utils.py:471
+#: ceilometer/storage/hbase/utils.py:474
 #, python-format
 msgid "Cannot create table %(table_name)s   it already exists. Ignoring error"
 msgstr ""
 
-#: ceilometer/storage/mongo/utils.py:174
+#: ceilometer/storage/mongo/utils.py:246
 #, python-format
 msgid "Connecting to %(db)s on %(nodelist)s"
 msgstr ""
 
-#: ceilometer/storage/mongo/utils.py:193
+#: ceilometer/storage/mongo/utils.py:264
 #, python-format
 msgid "Unable to connect to the database server: %(errmsg)s."
 msgstr ""
 
-#: ceilometer/storage/mongo/utils.py:330
+#: ceilometer/storage/mongo/utils.py:401
 #, python-format
 msgid ""
 "Unable to reconnect to the primary mongodb after %(retries)d retries. "
 "Giving up."
 msgstr ""
 
-#: ceilometer/storage/mongo/utils.py:334
+#: ceilometer/storage/mongo/utils.py:405
 #, python-format
 msgid ""
 "Unable to reconnect to the primary mongodb: %(errmsg)s. Trying again in "
