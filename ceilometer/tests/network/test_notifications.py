@@ -1283,145 +1283,145 @@ class TestNotifications(test.BaseTestCase):
         v = notifications.Pool(mock.Mock())
         samples = list(v.process_notification(NOTIFICATION_POOL_CREATE))
         self.assertEqual(2, len(samples))
-        self.assertEqual("pool", samples[0].name)
+        self.assertEqual("network.services.lb.pool", samples[0].name)
 
     def test_vip_create(self):
         v = notifications.Vip(mock.Mock())
         samples = list(v.process_notification(NOTIFICATION_VIP_CREATE))
         self.assertEqual(2, len(samples))
-        self.assertEqual("vip", samples[0].name)
+        self.assertEqual("network.services.lb.vip", samples[0].name)
 
     def test_member_create(self):
         v = notifications.Member(mock.Mock())
         samples = list(v.process_notification(NOTIFICATION_MEMBERS_CREATE))
         self.assertEqual(2, len(samples))
-        self.assertEqual("member", samples[0].name)
+        self.assertEqual("network.services.lb.member", samples[0].name)
 
     def test_health_monitor_create(self):
         v = notifications.HealthMonitor(mock.Mock())
         samples = list(v.process_notification(
             NOTIFICATION_HEALTH_MONITORS_CREATE))
         self.assertEqual(2, len(samples))
-        self.assertEqual("health_monitor", samples[0].name)
+        self.assertEqual("network.services.lb.health_monitor", samples[0].name)
 
     def test_firewall_create(self):
         v = notifications.Firewall(mock.Mock())
         samples = list(v.process_notification(NOTIFICATION_FIREWALL_CREATE))
         self.assertEqual(2, len(samples))
-        self.assertEqual("firewall", samples[0].name)
+        self.assertEqual("network.services.firewall", samples[0].name)
 
     def test_vpnservice_create(self):
         v = notifications.VPNService(mock.Mock())
         samples = list(v.process_notification(NOTIFICATION_VPNSERVICE_CREATE))
         self.assertEqual(2, len(samples))
-        self.assertEqual("vpnservice", samples[0].name)
+        self.assertEqual("network.services.vpn", samples[0].name)
 
     def test_ipsec_connection_create(self):
         v = notifications.IPSecSiteConnection(mock.Mock())
         samples = list(v.process_notification(
             NOTIFICATION_IPSEC_SITE_CONN_CREATE))
         self.assertEqual(2, len(samples))
-        self.assertEqual("ipsec_site_connection", samples[0].name)
+        self.assertEqual("network.services.vpn.connections", samples[0].name)
 
     def test_firewall_policy_create(self):
         v = notifications.FirewallPolicy(mock.Mock())
         samples = list(v.process_notification(
             NOTIFICATION_FIREWALL_POLICY_CREATE))
         self.assertEqual(2, len(samples))
-        self.assertEqual("firewall_policy", samples[0].name)
+        self.assertEqual("network.services.firewall.policy", samples[0].name)
 
     def test_firewall_rule_create(self):
         v = notifications.FirewallRule(mock.Mock())
         samples = list(v.process_notification(
             NOTIFICATION_FIREWALL_RULE_CREATE))
         self.assertEqual(2, len(samples))
-        self.assertEqual("firewall_rule", samples[0].name)
+        self.assertEqual("network.services.firewall.rule", samples[0].name)
 
     def test_ipsec_policy_create(self):
         v = notifications.IPSecPolicy(mock.Mock())
         samples = list(v.process_notification(
             NOTIFICATION_IPSEC_POLICY_CREATE))
         self.assertEqual(2, len(samples))
-        self.assertEqual("ipsecpolicy", samples[0].name)
+        self.assertEqual("network.services.vpn.ipsecpolicy", samples[0].name)
 
     def test_ike_policy_create(self):
         v = notifications.IKEPolicy(mock.Mock())
         samples = list(v.process_notification(
             NOTIFICATION_IKE_POLICY_CREATE))
         self.assertEqual(2, len(samples))
-        self.assertEqual("ikepolicy", samples[0].name)
+        self.assertEqual("network.services.vpn.ikepolicy", samples[0].name)
 
     def test_pool_update(self):
         v = notifications.Pool(mock.Mock())
         samples = list(v.process_notification(NOTIFICATION_POOL_UPDATE))
         self.assertEqual(2, len(samples))
-        self.assertEqual("pool", samples[0].name)
+        self.assertEqual("network.services.lb.pool", samples[0].name)
 
     def test_vip_update(self):
         v = notifications.Vip(mock.Mock())
         samples = list(v.process_notification(NOTIFICATION_VIP_UPDATE))
         self.assertEqual(2, len(samples))
-        self.assertEqual("vip", samples[0].name)
+        self.assertEqual("network.services.lb.vip", samples[0].name)
 
     def test_member_update(self):
         v = notifications.Member(mock.Mock())
         samples = list(v.process_notification(NOTIFICATION_MEMBERS_UPDATE))
         self.assertEqual(2, len(samples))
-        self.assertEqual("member", samples[0].name)
+        self.assertEqual("network.services.lb.member", samples[0].name)
 
     def test_health_monitor_update(self):
         v = notifications.HealthMonitor(mock.Mock())
         samples = list(v.process_notification(
             NOTIFICATION_HEALTH_MONITORS_UPDATE))
         self.assertEqual(2, len(samples))
-        self.assertEqual("health_monitor", samples[0].name)
+        self.assertEqual("network.services.lb.health_monitor", samples[0].name)
 
     def test_firewall_update(self):
         v = notifications.Firewall(mock.Mock())
         samples = list(v.process_notification(NOTIFICATION_FIREWALL_UPDATE))
         self.assertEqual(2, len(samples))
-        self.assertEqual("firewall", samples[0].name)
+        self.assertEqual("network.services.firewall", samples[0].name)
 
     def test_vpnservice_update(self):
         v = notifications.VPNService(mock.Mock())
         samples = list(v.process_notification(NOTIFICATION_VPNSERVICE_UPDATE))
         self.assertEqual(2, len(samples))
-        self.assertEqual("vpnservice", samples[0].name)
+        self.assertEqual("network.services.vpn", samples[0].name)
 
     def test_ipsec_connection_update(self):
         v = notifications.IPSecSiteConnection(mock.Mock())
         samples = list(v.process_notification(
             NOTIFICATION_IPSEC_SITE_CONN_UPDATE))
         self.assertEqual(2, len(samples))
-        self.assertEqual("ipsec_site_connection", samples[0].name)
+        self.assertEqual("network.services.vpn.connections", samples[0].name)
 
     def test_firewall_policy_update(self):
         v = notifications.FirewallPolicy(mock.Mock())
         samples = list(v.process_notification(
             NOTIFICATION_FIREWALL_POLICY_UPDATE))
         self.assertEqual(2, len(samples))
-        self.assertEqual("firewall_policy", samples[0].name)
+        self.assertEqual("network.services.firewall.policy", samples[0].name)
 
     def test_firewall_rule_update(self):
         v = notifications.FirewallRule(mock.Mock())
         samples = list(v.process_notification(
             NOTIFICATION_FIREWALL_RULE_UPDATE))
         self.assertEqual(2, len(samples))
-        self.assertEqual("firewall_rule", samples[0].name)
+        self.assertEqual("network.services.firewall.rule", samples[0].name)
 
     def test_ipsec_policy_update(self):
         v = notifications.IPSecPolicy(mock.Mock())
         samples = list(v.process_notification(
             NOTIFICATION_IPSEC_POLICY_UPDATE))
         self.assertEqual(2, len(samples))
-        self.assertEqual("ipsecpolicy", samples[0].name)
+        self.assertEqual("network.services.vpn.ipsecpolicy", samples[0].name)
 
     def test_ike_policy_update(self):
         v = notifications.IKEPolicy(mock.Mock())
         samples = list(v.process_notification(
             NOTIFICATION_IKE_POLICY_UPDATE))
         self.assertEqual(2, len(samples))
-        self.assertEqual("ikepolicy", samples[0].name)
+        self.assertEqual("network.services.vpn.ikepolicy", samples[0].name)
 
 
 class TestEventTypes(test.BaseTestCase):
