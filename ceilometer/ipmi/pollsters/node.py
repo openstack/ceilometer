@@ -30,6 +30,9 @@ CONF.import_opt('host', 'ceilometer.service')
 
 @six.add_metaclass(abc.ABCMeta)
 class _Base(plugin_base.PollsterBase):
+
+    no_resources = True
+
     def __init__(self):
         self.nodemanager = node_manager.NodeManager()
 
