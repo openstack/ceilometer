@@ -17,6 +17,11 @@ from oslo_utils import timeutils
 from ceilometer.storage import base
 
 
+def serialize_dt(value):
+    """Serializes parameter if it is datetime."""
+    return value.isoformat() if hasattr(value, 'isoformat') else value
+
+
 class Event(base.Model):
     """A raw event from the source system. Events have Traits.
 
@@ -51,6 +56,12 @@ class Event(base.Model):
                 (self.message_id, self.event_type, self.generated,
                  " ".join(trait_list)))
 
+    def serialize(self):
+        return {'message_id': self.message_id,
+                'event_type': self.event_type,
+                'generated': serialize_dt(self.generated),
+                'traits': [trait.serialize() for trait in self.traits]}
+
 
 class Trait(base.Model):
     """A Trait is a key/value pair of data on an Event.
@@ -79,6 +90,9 @@ class Trait(base.Model):
 
     def __repr__(self):
         return "<Trait: %s %d %s>" % (self.name, self.dtype, self.value)
+
+    def serialize(self):
+        return self.name, self.dtype, serialize_dt(self.value)
 
     def get_type_name(self):
         return self.get_name_by_type(self.dtype)

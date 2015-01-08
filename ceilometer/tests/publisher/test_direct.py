@@ -20,6 +20,7 @@ import uuid
 
 from oslo.utils import netutils
 
+from ceilometer.event.storage import models as event
 from ceilometer.publisher import direct
 from ceilometer import sample
 from ceilometer.tests import db as tests_db
@@ -80,3 +81,22 @@ class TestDirectPublisher(tests_db.TestBase,
 
         self.assertEqual(3, len(meters), 'There should be 3 samples')
         self.assertEqual(['alpha', 'beta', 'gamma'], names)
+
+
+class TestEventDirectPublisher(tests_db.TestBase,
+                               tests_db.MixinTestsWithBackendScenarios):
+
+    test_data = [event.Event(message_id=str(uuid.uuid4()),
+                             event_type='event_%d' % i,
+                             generated=datetime.datetime.utcnow(),
+                             traits=[])
+                 for i in range(0, 5)]
+
+    def test_direct_publisher(self, ):
+        parsed_url = netutils.urlsplit('direct://')
+        publisher = direct.DirectPublisher(parsed_url)
+        publisher.publish_events(None, self.test_data)
+
+        e_types = list(self.event_conn.get_event_types())
+        self.assertEqual(5, len(e_types))
+        self.assertEqual(['event_%d' % i for i in range(0, 5)], e_types)

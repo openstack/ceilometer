@@ -118,3 +118,13 @@ def meter_message_from_counter(sample, secret):
            }
     msg['message_signature'] = compute_signature(msg, secret)
     return msg
+
+
+def message_from_event(event, secret):
+    """Make an event message ready to be published or stored.
+
+    Returns a serialized model of Event containing an event message
+    """
+    msg = event.serialize()
+    msg['message_signature'] = compute_signature(msg, secret)
+    return msg

@@ -13,11 +13,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-
 from oslo.config import cfg
 from oslo.utils import timeutils
 
-import ceilometer
 from ceilometer.dispatcher import database
 from ceilometer import publisher
 from ceilometer.publisher import utils
@@ -33,7 +31,9 @@ class DirectPublisher(publisher.PublisherBase):
 
     def __init__(self, parsed_url):
         super(DirectPublisher, self).__init__(parsed_url)
-        self.meter_conn = database.DatabaseDispatcher(cfg.CONF).meter_conn
+        dispatcher = database.DatabaseDispatcher(cfg.CONF)
+        self.meter_conn = dispatcher.meter_conn
+        self.event_conn = dispatcher.event_conn
 
     def publish_samples(self, context, samples):
         if not isinstance(samples, list):
@@ -54,4 +54,7 @@ class DirectPublisher(publisher.PublisherBase):
             self.meter_conn.record_metering_data(meter)
 
     def publish_events(self, context, events):
-        raise ceilometer.NotImplementedError
+        if not isinstance(events, list):
+            events = [events]
+
+        self.event_conn.record_events(events)
