@@ -31,7 +31,7 @@ import sys
 import uuid
 
 from oslo.config import cfg
-from oslo.utils import timeutils
+from oslo_utils import timeutils
 
 from ceilometer.event.storage import models
 from ceilometer import storage

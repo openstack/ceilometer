@@ -18,7 +18,7 @@ Tests for Hyper-V inspector.
 """
 
 import mock
-from oslo.utils import units
+from oslo_utils import units
 from oslotest import base
 
 from ceilometer.compute.virt.hyperv import inspector as hyperv_inspector

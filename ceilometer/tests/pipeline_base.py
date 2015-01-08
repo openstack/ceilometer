@@ -22,7 +22,7 @@ import datetime
 import traceback
 
 import mock
-from oslo.utils import timeutils
+from oslo_utils import timeutils
 from oslotest import base
 from oslotest import mockpatch
 import six

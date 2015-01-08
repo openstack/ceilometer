@@ -19,7 +19,7 @@
 # under the License.
 
 from oslo.config import cfg
-from oslo.utils import timeutils
+from oslo_utils import timeutils
 
 from ceilometer.agent import plugin_base
 from ceilometer.i18n import _

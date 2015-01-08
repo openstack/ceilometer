@@ -22,7 +22,7 @@
 import abc
 import itertools
 
-from oslo.utils import netutils
+from oslo_utils import netutils
 import six
 
 from ceilometer.agent import plugin_base

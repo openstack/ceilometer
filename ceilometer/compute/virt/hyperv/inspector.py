@@ -17,7 +17,7 @@
 """Implementation of Inspector abstraction for Hyper-V"""
 
 from oslo.config import cfg
-from oslo.utils import units
+from oslo_utils import units
 
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt.hyperv import utilsv2

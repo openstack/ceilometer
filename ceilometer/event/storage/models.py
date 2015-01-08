@@ -12,7 +12,7 @@
 # under the License.
 """Model classes for use in the events storage API.
 """
-from oslo.utils import timeutils
+from oslo_utils import timeutils
 
 from ceilometer.storage import base
 

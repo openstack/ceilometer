@@ -14,7 +14,7 @@
 import os
 
 import happybase
-from oslo.utils import netutils
+from oslo_utils import netutils
 from six.moves.urllib import parse as urlparse
 
 from ceilometer.i18n import _

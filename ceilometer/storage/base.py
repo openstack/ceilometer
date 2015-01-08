@@ -21,7 +21,7 @@ import datetime
 import inspect
 import math
 
-from oslo.utils import timeutils
+from oslo_utils import timeutils
 import six
 from six import moves
 

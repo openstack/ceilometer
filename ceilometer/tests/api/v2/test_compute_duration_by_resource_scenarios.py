@@ -20,7 +20,7 @@
 import datetime
 
 import mock
-from oslo.utils import timeutils
+from oslo_utils import timeutils
 
 from ceilometer.storage import models
 from ceilometer.tests.api import v2

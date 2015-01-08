@@ -214,7 +214,7 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
         raise Exception("Evil urlsplit!")
 
     def test_notify_alarm_invalid_url(self):
-        with mock.patch('oslo.utils.netutils.urlsplit',
+        with mock.patch('oslo_utils.netutils.urlsplit',
                         self._fake_urlsplit):
             LOG = mock.MagicMock()
             with mock.patch('ceilometer.alarm.service.LOG', LOG):

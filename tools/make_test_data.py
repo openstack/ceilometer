@@ -36,7 +36,7 @@ import sys
 import uuid
 
 from oslo.config import cfg
-from oslo.utils import timeutils
+from oslo_utils import timeutils
 
 from ceilometer.publisher import utils
 from ceilometer import sample

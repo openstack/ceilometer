@@ -21,8 +21,8 @@ import mock
 from oslo.config import fixture as fixture_config
 import oslo.messaging
 import oslo.messaging.conffixture
-from oslo.utils import timeutils
 from oslo_context import context
+from oslo_utils import timeutils
 from stevedore import extension
 import yaml
 

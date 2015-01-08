@@ -20,7 +20,7 @@
 
 import copy
 
-from oslo.utils import timeutils
+from oslo_utils import timeutils
 from six.moves.urllib import parse as urlparse
 
 from ceilometer import sample

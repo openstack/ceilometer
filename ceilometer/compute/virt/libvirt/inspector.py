@@ -18,7 +18,7 @@
 
 from lxml import etree
 from oslo.config import cfg
-from oslo.utils import units
+from oslo_utils import units
 import six
 
 from ceilometer.compute.pollsters import util

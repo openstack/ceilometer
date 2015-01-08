@@ -22,7 +22,7 @@ import contextlib
 import datetime
 
 import mock
-from oslo.utils import importutils
+from oslo_utils import importutils
 from oslotest import base
 from oslotest import moxstubout
 

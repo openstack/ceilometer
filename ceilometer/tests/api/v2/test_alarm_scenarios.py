@@ -835,7 +835,7 @@ class TestAlarms(v2.FunctionalTest,
         raise Exception("Evil urlsplit!")
 
     def test_post_invalid_alarm_actions_format(self):
-        with mock.patch('oslo.utils.netutils.urlsplit',
+        with mock.patch('oslo_utils.netutils.urlsplit',
                         self._fake_urlsplit):
             self._do_post_alarm_invalid_action(
                 alarm_actions=['http://[::1'],

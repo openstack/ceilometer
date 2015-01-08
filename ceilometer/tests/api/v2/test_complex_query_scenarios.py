@@ -20,7 +20,7 @@
 
 import datetime
 
-from oslo.utils import timeutils
+from oslo_utils import timeutils
 
 from ceilometer.alarm.storage import models
 from ceilometer.publisher import utils

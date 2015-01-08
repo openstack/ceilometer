@@ -30,7 +30,7 @@ import uuid
 import bson.code
 import bson.objectid
 from oslo.config import cfg
-from oslo.utils import timeutils
+from oslo_utils import timeutils
 import pymongo
 import six
 

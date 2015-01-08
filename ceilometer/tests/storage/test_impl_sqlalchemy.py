@@ -26,7 +26,7 @@ import datetime
 import repr
 
 import mock
-from oslo.utils import timeutils
+from oslo_utils import timeutils
 
 from ceilometer.alarm.storage import impl_sqlalchemy as impl_sqla_alarm
 from ceilometer.event.storage import impl_sqlalchemy as impl_sqla_event

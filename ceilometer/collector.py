@@ -20,7 +20,7 @@ import socket
 import msgpack
 from oslo.config import cfg
 import oslo.messaging
-from oslo.utils import units
+from oslo_utils import units
 
 from ceilometer import dispatcher
 from ceilometer import messaging

@@ -21,8 +21,8 @@ import mock
 import msgpack
 from oslo.config import fixture as fixture_config
 import oslo.messaging
-from oslo.utils import timeutils
 from oslo_context import context
+from oslo_utils import timeutils
 from oslotest import mockpatch
 from stevedore import extension
 

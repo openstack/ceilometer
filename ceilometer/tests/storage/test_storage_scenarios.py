@@ -24,7 +24,7 @@ import operator
 
 import mock
 from oslo.config import cfg
-from oslo.utils import timeutils
+from oslo_utils import timeutils
 import pymongo
 
 import ceilometer

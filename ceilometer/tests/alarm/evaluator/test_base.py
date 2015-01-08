@@ -19,7 +19,7 @@
 import datetime
 
 import mock
-from oslo.utils import timeutils
+from oslo_utils import timeutils
 from oslotest import base
 
 from ceilometer.alarm import evaluator

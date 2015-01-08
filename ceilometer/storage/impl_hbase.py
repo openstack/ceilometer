@@ -15,7 +15,7 @@ import datetime
 import operator
 import time
 
-from oslo.utils import timeutils
+from oslo_utils import timeutils
 
 import ceilometer
 from ceilometer.i18n import _

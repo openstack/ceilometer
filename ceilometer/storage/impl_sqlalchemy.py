@@ -25,7 +25,7 @@ from oslo.config import cfg
 from oslo.db import exception as dbexc
 from oslo.db.sqlalchemy import session as db_session
 from oslo.serialization import jsonutils
-from oslo.utils import timeutils
+from oslo_utils import timeutils
 import six
 import sqlalchemy as sa
 from sqlalchemy import and_

@@ -21,7 +21,7 @@ import copy
 import datetime
 
 import mock
-from oslo.utils import timeutils
+from oslo_utils import timeutils
 from oslotest import mockpatch
 
 from ceilometer.tests.api import v2
