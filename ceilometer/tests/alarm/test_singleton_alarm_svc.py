@@ -71,6 +71,19 @@ class TestSingletonAlarmService(tests_base.BaseTestCase):
             self.singleton._evaluate_assigned_alarms()
             self.threshold_eval.evaluate.assert_called_once_with(alarm)
 
+    def test_evaluation_cycle_with_bad_alarm(self):
+        alarms = [
+            mock.Mock(type='threshold', name='bad'),
+            mock.Mock(type='threshold', name='good'),
+        ]
+        self.threshold_eval.evaluate.side_effect = [Exception('Boom!'), None]
+        self.api_client.alarms.list.return_value = alarms
+        with mock.patch('ceilometerclient.client.get_client',
+                        return_value=self.api_client):
+            self.singleton._evaluate_assigned_alarms()
+            self.assertEqual([mock.call(alarms[0]), mock.call(alarms[1])],
+                             self.threshold_eval.evaluate.call_args_list)
+
     def test_unknown_extension_skipped(self):
         alarms = [
             mock.Mock(type='not_existing_type'),

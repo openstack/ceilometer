@@ -108,7 +108,10 @@ class AlarmService(object):
             return
 
         LOG.debug(_('evaluating alarm %s') % alarm.alarm_id)
-        self.evaluators[alarm.type].obj.evaluate(alarm)
+        try:
+            self.evaluators[alarm.type].obj.evaluate(alarm)
+        except Exception:
+            LOG.exception(_('Failed to evaluate alarm %s'), alarm.alarm_id)
 
     @abc.abstractmethod
     def _assigned_alarms(self):
