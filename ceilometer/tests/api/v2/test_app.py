@@ -164,7 +164,7 @@ class TestApiMiddleware(v2.FunctionalTest):
                          ['faultstring'])
 
         with mock.patch('ceilometer.api.controllers.'
-                        'v2.AlarmNotFound') as CustomErrorClass:
+                        'v2.alarms.AlarmNotFound') as CustomErrorClass:
             CustomErrorClass.return_value = wsme.exc.ClientSideError(
                 "untranslated_error", status_code=404)
             resp = self.get_json('/alarms/alarm-id-5', expect_errors=True)

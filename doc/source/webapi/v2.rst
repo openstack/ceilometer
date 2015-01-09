@@ -7,37 +7,37 @@
 Resources
 =========
 
-.. rest-controller:: ceilometer.api.controllers.v2:ResourcesController
+.. rest-controller:: ceilometer.api.controllers.v2.resources:ResourcesController
    :webprefix: /v2/resources
 
-.. autotype:: ceilometer.api.controllers.v2.Resource
+.. autotype:: ceilometer.api.controllers.v2.resources.Resource
    :members:
 
 Meters
 ======
 
-.. rest-controller:: ceilometer.api.controllers.v2:MetersController
+.. rest-controller:: ceilometer.api.controllers.v2.meters:MetersController
    :webprefix: /v2/meters
 
-.. rest-controller:: ceilometer.api.controllers.v2:MeterController
+.. rest-controller:: ceilometer.api.controllers.v2.meters:MeterController
    :webprefix: /v2/meters
 
-.. autotype:: ceilometer.api.controllers.v2.Meter
+.. autotype:: ceilometer.api.controllers.v2.meters.Meter
    :members:
 
-.. autotype:: ceilometer.api.controllers.v2.OldSample
+.. autotype:: ceilometer.api.controllers.v2.meters.OldSample
    :members:
 
 Samples and Statistics
 ======================
 
-.. rest-controller:: ceilometer.api.controllers.v2:SamplesController
+.. rest-controller:: ceilometer.api.controllers.v2.samples:SamplesController
    :webprefix: /v2/samples
 
-.. autotype:: ceilometer.api.controllers.v2.Sample
+.. autotype:: ceilometer.api.controllers.v2.samples.Sample
    :members:
 
-.. autotype:: ceilometer.api.controllers.v2.Statistics
+.. autotype:: ceilometer.api.controllers.v2.meters.Statistics
    :members:
 
 When a simple statistics request is invoked (using GET /v2/meters/<meter_name>/statistics), it will return the standard set of *Statistics*: *avg*, *sum*,
@@ -61,7 +61,7 @@ are, on the other hand, both allowed by the API and supported by the storage dri
 
 .. note:: Currently only *cardinality* needs aggregate.param to be specified.
 
-.. autotype:: ceilometer.api.controllers.v2.Aggregate
+.. autotype:: ceilometer.api.controllers.v2.meters.Aggregate
    :members:
 
 Capabilities
@@ -74,10 +74,10 @@ returns a flattened dictionary of properties with associated boolean values -
 a 'False' or absent value means that the corresponding feature is not
 available in the backend.
 
-.. rest-controller:: ceilometer.api.controllers.v2:CapabilitiesController
+.. rest-controller:: ceilometer.api.controllers.v2.capabilities:CapabilitiesController
    :webprefix: /v2/capabilities
 
-.. autotype:: ceilometer.api.controllers.v2.Capabilities
+.. autotype:: ceilometer.api.controllers.v2.capabilities.Capabilities
    :members:
 
 .. _alarms-api:
@@ -85,46 +85,46 @@ available in the backend.
 Alarms
 ======
 
-.. rest-controller:: ceilometer.api.controllers.v2:AlarmsController
+.. rest-controller:: ceilometer.api.controllers.v2.alarms:AlarmsController
    :webprefix: /v2/alarms
 
-.. rest-controller:: ceilometer.api.controllers.v2:AlarmController
+.. rest-controller:: ceilometer.api.controllers.v2.alarms:AlarmController
    :webprefix: /v2/alarms
 
-.. autotype:: ceilometer.api.controllers.v2.Alarm
+.. autotype:: ceilometer.api.controllers.v2.alarms.Alarm
    :members:
 
-.. autotype:: ceilometer.api.controllers.v2.AlarmThresholdRule
+.. autotype:: ceilometer.api.controllers.v2.alarms.AlarmThresholdRule
    :members:
 
-.. autotype:: ceilometer.api.controllers.v2.AlarmCombinationRule
+.. autotype:: ceilometer.api.controllers.v2.alarms.AlarmCombinationRule
    :members:
 
-.. autotype:: ceilometer.api.controllers.v2.AlarmTimeConstraint
+.. autotype:: ceilometer.api.controllers.v2.alarms.AlarmTimeConstraint
    :members:
 
-.. autotype:: ceilometer.api.controllers.v2.AlarmChange
+.. autotype:: ceilometer.api.controllers.v2.alarms.AlarmChange
    :members:
 
 Events and Traits
 =================
 
-.. rest-controller:: ceilometer.api.controllers.v2:EventTypesController
+.. rest-controller:: ceilometer.api.controllers.v2.events:EventTypesController
    :webprefix: /v2/event_types
 
-.. rest-controller:: ceilometer.api.controllers.v2:TraitsController
+.. rest-controller:: ceilometer.api.controllers.v2.events:TraitsController
    :webprefix: /v2/event_types/(event_type)/traits
 
-.. rest-controller:: ceilometer.api.controllers.v2:EventsController
+.. rest-controller:: ceilometer.api.controllers.v2.events:EventsController
    :webprefix: /v2/events
 
-.. autotype:: ceilometer.api.controllers.v2.Event
+.. autotype:: ceilometer.api.controllers.v2.events.Event
    :members:
 
-.. autotype:: ceilometer.api.controllers.v2.Trait
+.. autotype:: ceilometer.api.controllers.v2.events.Trait
    :members:
 
-.. autotype:: ceilometer.api.controllers.v2.TraitDescription
+.. autotype:: ceilometer.api.controllers.v2.events.TraitDescription
    :members:
 
 Filtering Queries
@@ -157,7 +157,7 @@ type (for example, if you apply a filter on a query for statistics,
 you won't target *duration_start* field of *Statistics*, but *timestamp*
 field of *Sample*).
 
-.. autotype:: ceilometer.api.controllers.v2.Query
+.. autotype:: ceilometer.api.controllers.v2.base.Query
    :members:
 
 Event Query
@@ -170,7 +170,7 @@ event_type, message_id, start_timestamp, end_timestamp, then this field
 will be applied on event, otherwise it will be treated as trait name and
 applied on trait.
 
-.. autotype:: ceilometer.api.controllers.v2.EventQuery
+.. autotype:: ceilometer.api.controllers.v2.events.EventQuery
    :members:
 
 Complex Query
@@ -199,22 +199,22 @@ The number of the returned items can be bounded using the *limit* option.
 
 The *filter*, *orderby* and *limit* are all optional fields in a query.
 
-.. rest-controller:: ceilometer.api.controllers.v2:QuerySamplesController
+.. rest-controller:: ceilometer.api.controllers.v2.query:QuerySamplesController
    :webprefix: /v2/query/samples
 
-.. rest-controller:: ceilometer.api.controllers.v2:QueryAlarmsController
+.. rest-controller:: ceilometer.api.controllers.v2.query:QueryAlarmsController
    :webprefix: /v2/query/alarms
 
-.. rest-controller:: ceilometer.api.controllers.v2:QueryAlarmHistoryController
+.. rest-controller:: ceilometer.api.controllers.v2.query:QueryAlarmHistoryController
    :webprefix: /v2/query/alarms/history
 
-.. autotype:: ceilometer.api.controllers.v2.ComplexQuery
+.. autotype:: ceilometer.api.controllers.v2.query.ComplexQuery
    :members:
 
 Links
 =====
 
-.. autotype:: ceilometer.api.controllers.v2.Link
+.. autotype:: ceilometer.api.controllers.v2.base.Link
    :members:
 
 API and CLI query examples

@@ -18,7 +18,7 @@ import datetime
 
 from oslotest import base
 
-from ceilometer.api.controllers import v2
+from ceilometer.api.controllers.v2 import meters
 
 
 class TestStatisticsDuration(base.BaseTestCase):
@@ -43,70 +43,63 @@ class TestStatisticsDuration(base.BaseTestCase):
         self.late2 = datetime.datetime(2012, 8, 29, 19, 0)
 
     def test_nulls(self):
-        s = v2.Statistics(duration_start=None,
-                          duration_end=None,
-                          start_timestamp=None,
-                          end_timestamp=None,
-                          )
+        s = meters.Statistics(duration_start=None,
+                              duration_end=None,
+                              start_timestamp=None,
+                              end_timestamp=None)
         self.assertIsNone(s.duration_start)
         self.assertIsNone(s.duration_end)
         self.assertIsNone(s.duration)
 
     def test_overlap_range_start(self):
-        s = v2.Statistics(duration_start=self.early1,
-                          duration_end=self.middle1,
-                          start_timestamp=self.start,
-                          end_timestamp=self.end,
-                          )
+        s = meters.Statistics(duration_start=self.early1,
+                              duration_end=self.middle1,
+                              start_timestamp=self.start,
+                              end_timestamp=self.end)
         self.assertEqual(self.start, s.duration_start)
         self.assertEqual(self.middle1, s.duration_end)
         self.assertEqual(8 * 60 * 60, s.duration)
 
     def test_within_range(self):
-        s = v2.Statistics(duration_start=self.middle1,
-                          duration_end=self.middle2,
-                          start_timestamp=self.start,
-                          end_timestamp=self.end,
-                          )
+        s = meters.Statistics(duration_start=self.middle1,
+                              duration_end=self.middle2,
+                              start_timestamp=self.start,
+                              end_timestamp=self.end)
         self.assertEqual(self.middle1, s.duration_start)
         self.assertEqual(self.middle2, s.duration_end)
         self.assertEqual(10 * 60 * 60, s.duration)
 
     def test_within_range_zero_duration(self):
-        s = v2.Statistics(duration_start=self.middle1,
-                          duration_end=self.middle1,
-                          start_timestamp=self.start,
-                          end_timestamp=self.end,
-                          )
+        s = meters.Statistics(duration_start=self.middle1,
+                              duration_end=self.middle1,
+                              start_timestamp=self.start,
+                              end_timestamp=self.end)
         self.assertEqual(self.middle1, s.duration_start)
         self.assertEqual(self.middle1, s.duration_end)
         self.assertEqual(0, s.duration)
 
     def test_overlap_range_end(self):
-        s = v2.Statistics(duration_start=self.middle2,
-                          duration_end=self.late1,
-                          start_timestamp=self.start,
-                          end_timestamp=self.end,
-                          )
+        s = meters.Statistics(duration_start=self.middle2,
+                              duration_end=self.late1,
+                              start_timestamp=self.start,
+                              end_timestamp=self.end)
         self.assertEqual(self.middle2, s.duration_start)
         self.assertEqual(self.end, s.duration_end)
         self.assertEqual(((6 * 60) - 1) * 60, s.duration)
 
     def test_after_range(self):
-        s = v2.Statistics(duration_start=self.late1,
-                          duration_end=self.late2,
-                          start_timestamp=self.start,
-                          end_timestamp=self.end,
-                          )
+        s = meters.Statistics(duration_start=self.late1,
+                              duration_end=self.late2,
+                              start_timestamp=self.start,
+                              end_timestamp=self.end)
         self.assertIsNone(s.duration_start)
         self.assertIsNone(s.duration_end)
         self.assertIsNone(s.duration)
 
     def test_without_timestamp(self):
-        s = v2.Statistics(duration_start=self.late1,
-                          duration_end=self.late2,
-                          start_timestamp=None,
-                          end_timestamp=None,
-                          )
+        s = meters.Statistics(duration_start=self.late1,
+                              duration_end=self.late2,
+                              start_timestamp=None,
+                              end_timestamp=None)
         self.assertEqual(self.late1, s.duration_start)
         self.assertEqual(self.late2, s.duration_end)
