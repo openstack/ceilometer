@@ -53,7 +53,7 @@ def retry_on_disconnect(function):
             if (e.get_error_code() == libvirt.VIR_ERR_SYSTEM_ERROR and
                 e.get_error_domain() in (libvirt.VIR_FROM_REMOTE,
                                          libvirt.VIR_FROM_RPC)):
-                LOG.debug('Connection to libvirt broken')
+                LOG.debug(_('Connection to libvirt broken'))
                 self.connection = None
                 return function(self, *args, **kwargs)
             else:
@@ -78,7 +78,7 @@ class LibvirtInspector(virt_inspector.Inspector):
             global libvirt
             if libvirt is None:
                 libvirt = __import__('libvirt')
-            LOG.debug('Connecting to libvirt: %s', self.uri)
+            LOG.debug(_('Connecting to libvirt: %s'), self.uri)
             self.connection = libvirt.openReadOnly(self.uri)
 
         return self.connection
@@ -96,13 +96,13 @@ class LibvirtInspector(virt_inspector.Inspector):
                 ex.get_error_domain() in (libvirt.VIR_FROM_REMOTE,
                                           libvirt.VIR_FROM_RPC)):
                 raise
-            msg = ("Error from libvirt while looking up instance Name "
-                   "%(instance_name)s UUID %(instance_uuid)s: "
-                   "[Error Code %(error_code)s] "
-                   "%(ex)s" % {'instance_name': instance_name,
-                               'instance_uuid': instance.id,
-                               'error_code': error_code,
-                               'ex': ex})
+            msg = _("Error from libvirt while looking up instance "
+                    "<name=%(name)s, id=%(id)>: "
+                    "[Error Code %(error_code)s] "
+                    "%(ex)s") % {'name': instance_name,
+                                 'id': instance.id,
+                                 'error_code': error_code,
+                                 'ex': ex}
             raise virt_inspector.InstanceNotFoundException(msg)
 
     def inspect_cpus(self, instance):
@@ -110,17 +110,23 @@ class LibvirtInspector(virt_inspector.Inspector):
         dom_info = domain.info()
         return virt_inspector.CPUStats(number=dom_info[3], time=dom_info[4])
 
-    def inspect_vnics(self, instance):
+    def _get_domain_not_shut_off_or_raise(self, instance):
         instance_name = util.instance_name(instance)
         domain = self._lookup_by_uuid(instance)
+
         state = domain.info()[0]
         if state == libvirt.VIR_DOMAIN_SHUTOFF:
-            LOG.warn(_('Failed to inspect vnics of instance Name '
-                       '%(instance_name)s UUID %(instance_uuid)s, '
-                       'domain is in state of SHUTOFF'),
-                     {'instance_name': instance_name,
-                      'instance_uuid': instance.id})
-            return
+            msg = _('Failed to inspect data of instance '
+                    '<name=%(name)s, id=%(id)s>, '
+                    'domain state is SHUTOFF.') % {
+                'name': instance_name, 'id': instance.id}
+            raise virt_inspector.InstanceShutOffException(msg)
+
+        return domain
+
+    def inspect_vnics(self, instance):
+        domain = self._get_domain_not_shut_off_or_raise(instance)
+
         tree = etree.fromstring(domain.XMLDesc(0))
         for iface in tree.findall('devices/interface'):
             target = iface.find('target')
@@ -149,16 +155,8 @@ class LibvirtInspector(virt_inspector.Inspector):
             yield (interface, stats)
 
     def inspect_disks(self, instance):
-        instance_name = util.instance_name(instance)
-        domain = self._lookup_by_uuid(instance)
-        state = domain.info()[0]
-        if state == libvirt.VIR_DOMAIN_SHUTOFF:
-            LOG.warn(_('Failed to inspect disks of instance Name '
-                       '%(instance_name)s UUID %(instance_uuid)s, '
-                       'domain is in state of SHUTOFF'),
-                     {'instance_name': instance_name,
-                      'instance_uuid': instance.id})
-            return
+        domain = self._get_domain_not_shut_off_or_raise(instance)
+
         tree = etree.fromstring(domain.XMLDesc(0))
         for device in filter(
                 bool,
@@ -175,15 +173,7 @@ class LibvirtInspector(virt_inspector.Inspector):
 
     def inspect_memory_usage(self, instance, duration=None):
         instance_name = util.instance_name(instance)
-        domain = self._lookup_by_uuid(instance)
-        state = domain.info()[0]
-        if state == libvirt.VIR_DOMAIN_SHUTOFF:
-            LOG.warn(_('Failed to inspect memory usage of instance Name '
-                       '%(instance_name)s UUID %(instance_uuid)s, '
-                       'domain is in state of SHUTOFF'),
-                     {'instance_name': instance_name,
-                      'instance_uuid': instance.id})
-            return
+        domain = self._get_domain_not_shut_off_or_raise(instance)
 
         try:
             memory_stats = domain.memoryStats()
@@ -196,15 +186,15 @@ class LibvirtInspector(virt_inspector.Inspector):
                 memory_used = memory_used / units.Ki
                 return virt_inspector.MemoryUsageStats(usage=memory_used)
             else:
-                LOG.warn(_('Failed to inspect memory usage of instance Name '
-                           '%(instance_name)s UUID %(instance_uuid)s, '
-                           'can not get info from libvirt'),
-                         {'instance_name': instance_name,
-                          'instance_uuid': instance.id})
-        # memoryStats might launch an exception if the method
-        # is not supported by the underlying hypervisor being
-        # used by libvirt
+                msg = _('Failed to inspect memory usage of instance '
+                        '<name=%(name)s, id=%(id)s>, '
+                        'can not get info from libvirt.') % {
+                    'name': instance_name, 'id': instance.id}
+                raise virt_inspector.NoDataException(msg)
+        # memoryStats might launch an exception if the method is not supported
+        # by the underlying hypervisor being used by libvirt.
         except libvirt.libvirtError as e:
-            LOG.warn(_('Failed to inspect memory usage of %(instance_uuid)s, '
-                       'can not get info from libvirt: %(error)s'),
-                     {'instance_uuid': instance.id, 'error': e})
+            msg = _('Failed to inspect memory usage of %(instance_uuid)s, '
+                    'can not get info from libvirt: %(error)s') % {
+                'instance_uuid': instance.id, 'error': e}
+            raise virt_inspector.NoDataException(msg)

@@ -180,8 +180,9 @@ class TestLibvirtInspection(base.BaseTestCase):
                                mock.patch.object(self.domain, 'info',
                                                  return_value=(5L, 0L, 0L,
                                                                2L, 999999L))):
-            interfaces = list(self.inspector.inspect_vnics(self.instance))
-            self.assertEqual([], interfaces)
+            inspect = self.inspector.inspect_vnics
+            self.assertRaises(virt_inspector.InstanceShutOffException,
+                              list, inspect(self.instance))
 
     def test_inspect_disks(self):
         dom_xml = """
@@ -228,8 +229,9 @@ class TestLibvirtInspection(base.BaseTestCase):
                                mock.patch.object(self.domain, 'info',
                                                  return_value=(5L, 0L, 0L,
                                                                2L, 999999L))):
-            disks = list(self.inspector.inspect_disks(self.instance))
-            self.assertEqual([], disks)
+            inspect = self.inspector.inspect_disks
+            self.assertRaises(virt_inspector.InstanceShutOffException,
+                              list, inspect(self.instance))
 
     def test_inspect_memory_usage(self):
         fake_memory_stats = {'available': 51200L, 'unused': 25600L}
@@ -252,9 +254,9 @@ class TestLibvirtInspection(base.BaseTestCase):
             with mock.patch.object(self.domain, 'info',
                                    return_value=(5L, 0L, 0L,
                                                  2L, 999999L)):
-                memory = self.inspector.inspect_memory_usage(
-                    self.instance)
-                self.assertIsNone(memory)
+                self.assertRaises(virt_inspector.InstanceShutOffException,
+                                  self.inspector.inspect_memory_usage,
+                                  self.instance)
 
     def test_inspect_memory_usage_with_empty_stats(self):
         connection = self.inspector.connection
@@ -265,9 +267,9 @@ class TestLibvirtInspection(base.BaseTestCase):
                                                  2L, 999999L)):
                 with mock.patch.object(self.domain, 'memoryStats',
                                        return_value={}):
-                    memory = self.inspector.inspect_memory_usage(
-                        self.instance)
-                    self.assertIsNone(memory)
+                    self.assertRaises(virt_inspector.NoDataException,
+                                      self.inspector.inspect_memory_usage,
+                                      self.instance)
 
 
 class TestLibvirtInspectionWithError(base.BaseTestCase):
