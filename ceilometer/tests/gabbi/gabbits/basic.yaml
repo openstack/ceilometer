@@ -1,0 +1,24 @@
+#
+# Some simple tests just to confirm that the system works.
+#
+fixtures:
+    - ConfigFixture
+
+tests:
+
+# Root gives us some information on where to go from here.
+-    name: quick root check
+     url: /
+     response_headers:
+         content-type: application/json; charset=UTF-8
+     response_strings:
+         - '"base": "application/json"'
+     response_json_paths:
+         versions.values.[0].status: stable
+         versions.values.[0].media-types.[0].base: application/json
+
+# NOTE(chdent): Ideally since / has a links ref to /v2, /v2 ought not 404!
+-    name: v2 visit
+     desc: this demonstrates a bug in the info in /
+     url: $RESPONSE['versions.values.[0].links.[0].href']
+     status: 404
