@@ -81,8 +81,6 @@ def setup_app(pecan_config=None, extra_hooks=None):
 
     app = pecan.make_app(
         pecan_config.app.root,
-        static_root=pecan_config.app.static_root,
-        template_path=pecan_config.app.template_path,
         debug=CONF.api.pecan_debug,
         force_canonical=getattr(pecan_config.app, 'force_canonical', True),
         hooks=app_hooks,

@@ -50,15 +50,10 @@ class FunctionalTest(db_test_base.TestBase):
         self.app = self._make_app()
 
     def _make_app(self, enable_acl=False):
-        # Determine where we are so we can set up paths in the config
-        root_dir = self.path_get()
-
         self.config = {
             'app': {
                 'root': 'ceilometer.api.controllers.root.RootController',
                 'modules': ['ceilometer.api'],
-                'static_root': '%s/public' % root_dir,
-                'template_path': '%s/ceilometer/api/templates' % root_dir,
                 'enable_acl': enable_acl,
             },
             'wsme': {
