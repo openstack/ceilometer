@@ -24,7 +24,7 @@ from unittest import case
 import uuid
 
 from gabbi import fixture
-from oslo.config import fixture as fixture_config
+from oslo_config import fixture as fixture_config
 
 from ceilometer.publisher import utils
 from ceilometer import sample

@@ -15,7 +15,7 @@
 # under the License.
 
 import mock
-from oslo.config import fixture as fixture_config
+from oslo_config import fixture as fixture_config
 
 from ceilometer.agent import manager
 from ceilometer.compute.pollsters import instance as pollsters_instance

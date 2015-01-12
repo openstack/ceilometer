@@ -18,7 +18,7 @@
 import datetime
 import uuid
 
-from oslo.utils import netutils
+from oslo_utils import netutils
 
 from ceilometer.event.storage import models as event
 from ceilometer.publisher import direct
