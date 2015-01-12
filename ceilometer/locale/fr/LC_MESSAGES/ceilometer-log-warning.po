@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-01-07 06:11+0000\n"
-"PO-Revision-Date: 2014-12-04 10:48+0000\n"
+"POT-Creation-Date: 2015-01-12 06:08+0000\n"
+"PO-Revision-Date: 2015-01-09 20:28+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/ceilometer/"
 "language/fr/)\n"
@@ -25,6 +25,22 @@ msgstr ""
 #, python-format
 msgid "No endpoints found for service %s"
 msgstr "Pas endpoints trouvé pour le service %s"
+
+#: ceilometer/compute/pollsters/disk.py:123
+#: ceilometer/compute/pollsters/memory.py:49
+#: ceilometer/compute/pollsters/net.py:111
+#, python-format
+msgid ""
+"Instance %(instance_id)s was shut off while getting samples of %(pollster)s: "
+"%(exc)s"
+msgstr ""
+
+#: ceilometer/compute/pollsters/memory.py:54
+#, python-format
+msgid ""
+"Cannot inspect data of %(pollster)s for %(instance_id)s, non-fatal reason: "
+"%(exc)s"
+msgstr ""
 
 #: ceilometer/openstack/common/loopingcall.py:87
 #, python-format
