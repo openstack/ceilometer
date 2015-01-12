@@ -19,8 +19,8 @@
 from __future__ import absolute_import
 import os
 
-from oslo.config import cfg
 from oslo.db.sqlalchemy import session as db_session
+from oslo_config import cfg
 from sqlalchemy import desc
 
 import ceilometer

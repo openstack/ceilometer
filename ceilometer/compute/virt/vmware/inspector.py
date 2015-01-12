@@ -15,8 +15,8 @@
 
 """Implementation of Inspector abstraction for VMware vSphere"""
 
-from oslo.config import cfg
 from oslo.vmware import api
+from oslo_config import cfg
 from oslo_utils import units
 
 from ceilometer.compute.virt import inspector as virt_inspector

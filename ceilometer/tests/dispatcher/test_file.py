@@ -18,7 +18,7 @@ import logging.handlers
 import os
 import tempfile
 
-from oslo.config import fixture as fixture_config
+from oslo_config import fixture as fixture_config
 from oslotest import base
 
 from ceilometer.dispatcher import file

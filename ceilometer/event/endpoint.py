@@ -17,8 +17,8 @@
 
 import logging
 
-from oslo.config import cfg
 import oslo.messaging
+from oslo_config import cfg
 from stevedore import extension
 
 import ceilometer

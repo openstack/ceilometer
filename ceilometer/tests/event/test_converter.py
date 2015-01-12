@@ -19,7 +19,7 @@ import datetime
 
 import jsonpath_rw
 import mock
-from oslo.config import cfg as oslo_cfg
+from oslo_config import cfg as oslo_cfg
 import six
 
 from ceilometer.event import converter

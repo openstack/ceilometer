@@ -22,8 +22,8 @@ import collections
 import fnmatch
 
 from keystoneclient.v2_0 import client as ksclient
-from oslo.config import cfg
 import oslo.messaging
+from oslo_config import cfg
 from oslo_context import context
 import six
 

@@ -18,9 +18,9 @@
 
 import eventlet
 import mock
-from oslo.config import fixture as fixture_config
 import oslo.messaging
 import oslo.messaging.conffixture
+from oslo_config import fixture as fixture_config
 from oslo_context import context
 from oslo_utils import timeutils
 from stevedore import extension

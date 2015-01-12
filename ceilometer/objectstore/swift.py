@@ -20,7 +20,7 @@
 from __future__ import absolute_import
 
 from keystoneclient import exceptions
-from oslo.config import cfg
+from oslo_config import cfg
 from oslo_utils import timeutils
 import six.moves.urllib.parse as urlparse
 from swiftclient import client as swift

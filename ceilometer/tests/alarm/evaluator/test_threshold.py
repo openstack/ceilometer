@@ -22,7 +22,7 @@ import uuid
 from ceilometerclient import exc
 from ceilometerclient.v2 import statistics
 import mock
-from oslo.config import cfg
+from oslo_config import cfg
 from oslo_utils import timeutils
 import pytz
 from six import moves

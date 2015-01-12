@@ -16,7 +16,7 @@
 """Implementation of Inspector abstraction for XenAPI."""
 
 from eventlet import timeout
-from oslo.config import cfg
+from oslo_config import cfg
 from oslo_utils import units
 try:
     import XenAPI as api

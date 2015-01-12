@@ -16,7 +16,7 @@
 
 import json
 
-from oslo.config import cfg
+from oslo_config import cfg
 import requests
 
 from ceilometer import dispatcher

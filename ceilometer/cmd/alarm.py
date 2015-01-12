@@ -14,7 +14,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from oslo.config import cfg
+from oslo_config import cfg
 from stevedore import driver
 
 from ceilometer.alarm import service as alarm_service

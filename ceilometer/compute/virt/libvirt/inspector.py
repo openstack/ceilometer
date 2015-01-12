@@ -17,7 +17,7 @@
 """Implementation of Inspector abstraction for libvirt."""
 
 from lxml import etree
-from oslo.config import cfg
+from oslo_config import cfg
 from oslo_utils import units
 import six
 

@@ -28,7 +28,7 @@ import eventlet
 # first read() or select(), thread need to be patched too, because
 # oslo.messaging use threading.local
 eventlet.monkey_patch(socket=True, select=True, thread=True)
-from oslo.config import cfg
+from oslo_config import cfg
 from oslo_context import context
 from oslo_utils import timeutils
 

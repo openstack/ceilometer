@@ -16,7 +16,7 @@
 import datetime
 
 import mock
-from oslo.config import cfg
+from oslo_config import cfg
 from oslotest import base
 
 from ceilometer.data_processing import notifications

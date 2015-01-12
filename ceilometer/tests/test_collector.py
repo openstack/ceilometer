@@ -19,8 +19,8 @@ import socket
 
 import mock
 import msgpack
-from oslo.config import fixture as fixture_config
 import oslo.messaging
+from oslo_config import fixture as fixture_config
 from oslo_context import context
 from oslo_utils import timeutils
 from oslotest import mockpatch

@@ -16,7 +16,7 @@
 
 import logging
 
-from oslo.config import cfg
+from oslo_config import cfg
 
 from ceilometer.i18n import _
 from ceilometer import service

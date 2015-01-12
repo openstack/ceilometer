@@ -21,8 +21,8 @@ import abc
 import itertools
 import operator
 
-from oslo.config import cfg
 import oslo.messaging
+from oslo_config import cfg
 import six
 import six.moves.urllib.parse as urlparse
 

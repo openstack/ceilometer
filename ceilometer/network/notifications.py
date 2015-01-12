@@ -19,8 +19,8 @@
 
 """
 
-from oslo.config import cfg
 import oslo.messaging
+from oslo_config import cfg
 
 from ceilometer.agent import plugin_base
 from ceilometer.i18n import _

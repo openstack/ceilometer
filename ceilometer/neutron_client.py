@@ -18,7 +18,7 @@ import functools
 
 from neutronclient.common import exceptions
 from neutronclient.v2_0 import client as clientv20
-from oslo.config import cfg
+from oslo_config import cfg
 
 from ceilometer.openstack.common import log
 

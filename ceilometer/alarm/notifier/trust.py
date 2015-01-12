@@ -15,7 +15,7 @@
 """Rest alarm notifier with trusted authentication."""
 
 from keystoneclient.v3 import client as keystone_client
-from oslo.config import cfg
+from oslo_config import cfg
 from six.moves.urllib import parse
 
 from ceilometer.alarm.notifier import rest

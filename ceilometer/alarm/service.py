@@ -20,7 +20,7 @@
 import abc
 
 from ceilometerclient import client as ceiloclient
-from oslo.config import cfg
+from oslo_config import cfg
 from oslo_utils import netutils
 import six
 from stevedore import extension

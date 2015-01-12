@@ -18,8 +18,8 @@
 import socket
 
 import msgpack
-from oslo.config import cfg
 import oslo.messaging
+from oslo_config import cfg
 from oslo_utils import units
 
 from ceilometer import dispatcher

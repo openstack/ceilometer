@@ -21,7 +21,7 @@
 import hashlib
 import hmac
 
-from oslo.config import cfg
+from oslo_config import cfg
 import six
 
 from ceilometer import utils

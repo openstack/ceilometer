@@ -17,7 +17,7 @@
 """Tests for ceilometer.alarm.service.SingletonAlarmService.
 """
 import mock
-from oslo.config import fixture as fixture_config
+from oslo_config import fixture as fixture_config
 from stevedore import extension
 
 from ceilometer.alarm import service

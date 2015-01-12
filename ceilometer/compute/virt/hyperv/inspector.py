@@ -16,7 +16,7 @@
 # under the License.
 """Implementation of Inspector abstraction for Hyper-V"""
 
-from oslo.config import cfg
+from oslo_config import cfg
 from oslo_utils import units
 
 from ceilometer.compute.pollsters import util

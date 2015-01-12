@@ -25,7 +25,7 @@ import sys
 if sys.platform == 'win32':
     import wmi
 
-from oslo.config import cfg
+from oslo_config import cfg
 
 from ceilometer.compute.virt import inspector
 from ceilometer.i18n import _

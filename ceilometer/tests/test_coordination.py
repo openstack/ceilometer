@@ -18,7 +18,7 @@
 import logging
 
 import mock
-from oslo.config import fixture as fixture_config
+from oslo_config import fixture as fixture_config
 import tooz.coordination
 
 from ceilometer import coordination

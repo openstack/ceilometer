@@ -16,7 +16,7 @@
 # under the License.
 
 from keystoneclient.v2_0 import client as ksclient
-from oslo.config import cfg
+from oslo_config import cfg
 
 from ceilometer.agent import base
 from ceilometer.openstack.common import log

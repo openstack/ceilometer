@@ -20,7 +20,7 @@
 import fnmatch
 import os
 
-from oslo.config import cfg
+from oslo_config import cfg
 import yaml
 
 from ceilometer.i18n import _

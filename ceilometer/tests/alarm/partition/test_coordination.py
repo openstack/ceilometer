@@ -21,7 +21,7 @@ import logging
 import uuid
 
 import mock
-from oslo.config import fixture as fixture_config
+from oslo_config import fixture as fixture_config
 from oslo_utils import timeutils
 from six import moves
 

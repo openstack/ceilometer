@@ -21,7 +21,7 @@
 import socket
 
 import msgpack
-from oslo.config import cfg
+from oslo_config import cfg
 from oslo_utils import netutils
 
 from ceilometer.i18n import _

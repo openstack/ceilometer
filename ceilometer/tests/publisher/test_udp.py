@@ -21,7 +21,7 @@ import datetime
 
 import mock
 import msgpack
-from oslo.config import fixture as fixture_config
+from oslo_config import fixture as fixture_config
 from oslo_utils import netutils
 from oslotest import base
 

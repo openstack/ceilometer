@@ -19,7 +19,7 @@
 
 import collections
 
-from oslo.config import cfg
+from oslo_config import cfg
 from stevedore import driver
 
 import ceilometer

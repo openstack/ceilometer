@@ -29,7 +29,7 @@ import collections
 import tempfile
 import time
 
-from oslo.config import cfg
+from oslo_config import cfg
 
 from ceilometer.i18n import _
 from ceilometer.ipmi.platform import exception as nmexcept

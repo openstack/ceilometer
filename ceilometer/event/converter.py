@@ -19,7 +19,7 @@ import fnmatch
 import os
 
 import jsonpath_rw
-from oslo.config import cfg
+from oslo_config import cfg
 from oslo_utils import timeutils
 import six
 import yaml

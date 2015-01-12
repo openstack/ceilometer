@@ -37,7 +37,7 @@ import uuid
 
 import croniter
 import jsonschema
-from oslo.config import cfg
+from oslo_config import cfg
 from oslo_context import context
 from oslo_utils import netutils
 from oslo_utils import strutils

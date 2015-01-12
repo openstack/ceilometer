@@ -21,8 +21,8 @@ import datetime
 
 import eventlet
 import mock
-from oslo.config import fixture as fixture_config
 import oslo.messaging
+from oslo_config import fixture as fixture_config
 from oslo_context import context
 from oslo_utils import netutils
 import testscenarios.testcase

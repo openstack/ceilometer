@@ -30,7 +30,7 @@ from ceilometer.storage.mongo import utils as pymongo_utils
 from ceilometer.tests import base as test_base
 
 import mock
-from oslo.config import cfg
+from oslo_config import cfg
 
 
 class CapabilitiesTest(test_base.BaseTestCase):

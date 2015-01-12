@@ -17,9 +17,9 @@
 """Tests for Ceilometer notify daemon."""
 
 import mock
-from oslo.config import cfg
-from oslo.config import fixture as fixture_config
 import oslo.messaging
+from oslo_config import cfg
+from oslo_config import fixture as fixture_config
 from stevedore import extension
 
 import ceilometer

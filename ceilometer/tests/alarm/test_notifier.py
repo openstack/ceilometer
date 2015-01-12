@@ -16,8 +16,8 @@
 # under the License.
 
 import mock
-from oslo.config import fixture as fixture_config
 from oslo.serialization import jsonutils
+from oslo_config import fixture as fixture_config
 from oslo_context import context
 from oslotest import mockpatch
 import requests

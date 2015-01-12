@@ -21,7 +21,7 @@ import socket
 from wsgiref import simple_server
 
 import netaddr
-from oslo.config import cfg
+from oslo_config import cfg
 from paste import deploy
 import pecan
 

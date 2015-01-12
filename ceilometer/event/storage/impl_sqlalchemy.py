@@ -17,9 +17,9 @@ from __future__ import absolute_import
 import operator
 import os
 
-from oslo.config import cfg
 from oslo.db import exception as dbexc
 from oslo.db.sqlalchemy import session as db_session
+from oslo_config import cfg
 import six
 import sqlalchemy as sa
 

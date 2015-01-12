@@ -17,7 +17,7 @@
 
 import uuid
 
-from oslo.config import cfg
+from oslo_config import cfg
 import tooz.coordination
 
 from ceilometer.i18n import _LE, _LI

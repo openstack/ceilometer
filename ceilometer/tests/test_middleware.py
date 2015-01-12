@@ -15,7 +15,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import mock
-from oslo.config import fixture as fixture_config
+from oslo_config import fixture as fixture_config
 
 from ceilometer import middleware
 from ceilometer.tests import base

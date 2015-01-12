@@ -21,7 +21,7 @@
 import time
 import weakref
 
-from oslo.config import cfg
+from oslo_config import cfg
 from oslo_utils import netutils
 import pymongo
 import six

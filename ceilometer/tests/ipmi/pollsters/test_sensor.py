@@ -15,7 +15,7 @@
 # under the License.
 
 import mock
-from oslo.config import cfg
+from oslo_config import cfg
 
 from ceilometer.ipmi.pollsters import sensor
 from ceilometer.tests.ipmi.notifications import ipmi_test_data

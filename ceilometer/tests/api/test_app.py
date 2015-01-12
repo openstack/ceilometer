@@ -18,8 +18,8 @@
 import socket
 
 import mock
-from oslo.config import cfg
-from oslo.config import fixture as fixture_config
+from oslo_config import cfg
+from oslo_config import fixture as fixture_config
 
 from ceilometer.api import app
 from ceilometer.tests import base

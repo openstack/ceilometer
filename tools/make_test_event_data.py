@@ -30,7 +30,7 @@ import random
 import sys
 import uuid
 
-from oslo.config import cfg
+from oslo_config import cfg
 from oslo_utils import timeutils
 
 from ceilometer.event.storage import models

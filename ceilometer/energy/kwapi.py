@@ -17,7 +17,7 @@
 import datetime
 
 from keystoneclient import exceptions
-from oslo.config import cfg
+from oslo_config import cfg
 import requests
 import six
 

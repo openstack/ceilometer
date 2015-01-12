@@ -24,7 +24,7 @@ import warnings
 
 import fixtures
 import mock
-from oslo.config import fixture as fixture_config
+from oslo_config import fixture as fixture_config
 from oslotest import mockpatch
 import six
 from six.moves.urllib import parse as urlparse

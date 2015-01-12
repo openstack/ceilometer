@@ -17,7 +17,7 @@
 # under the License.
 
 import mock
-from oslo.config import fixture as fixture_config
+from oslo_config import fixture as fixture_config
 from oslotest import mockpatch
 import six
 

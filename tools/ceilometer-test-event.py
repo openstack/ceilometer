@@ -25,7 +25,7 @@ you what events will be generated.
 import json
 import sys
 
-from oslo.config import cfg
+from oslo_config import cfg
 from stevedore import extension
 
 from ceilometer.event import converter

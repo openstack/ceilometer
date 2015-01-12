@@ -21,7 +21,7 @@ from __future__ import absolute_import
 import itertools
 
 import glanceclient
-from oslo.config import cfg
+from oslo_config import cfg
 from oslo_utils import timeutils
 
 from ceilometer.agent import plugin_base

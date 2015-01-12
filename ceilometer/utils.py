@@ -27,8 +27,8 @@ import hashlib
 import multiprocessing
 import struct
 
-from oslo.config import cfg
 from oslo_concurrency import processutils
+from oslo_config import cfg
 from oslo_utils import timeutils
 from oslo_utils import units
 import six

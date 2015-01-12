@@ -22,7 +22,7 @@ import collections
 import fnmatch
 import itertools
 
-from oslo.config import cfg
+from oslo_config import cfg
 from oslo_context import context
 import six
 from six.moves.urllib import parse as urlparse
