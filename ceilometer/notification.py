@@ -54,6 +54,8 @@ OPTS = [
 ]
 
 cfg.CONF.register_opts(OPTS, group="notification")
+cfg.CONF.import_opt('metering_driver', 'ceilometer.publisher.messaging',
+                    group='publisher_notifier')
 
 
 class NotificationService(os_service.Service):
