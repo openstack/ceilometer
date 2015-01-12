@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-01-07 06:11+0000\n"
-"PO-Revision-Date: 2015-01-05 20:11+0000\n"
+"POT-Creation-Date: 2015-01-12 06:08+0000\n"
+"PO-Revision-Date: 2015-01-09 20:42+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: English (United Kingdom) "
 "(http://www.transifex.com/projects/p/ceilometer/language/en_GB/)\n"
@@ -124,17 +124,22 @@ msgstr "%(worker_name)s value of %(workers)s is invalid, must be greater than 0"
 msgid "Polling pollster %(poll)s in the context of %(src)s"
 msgstr ""
 
-#: ceilometer/agent/base.py:140
+#: ceilometer/agent/base.py:133
+#, python-format
+msgid "Skip polling pollster %s, no resources found"
+msgstr ""
+
+#: ceilometer/agent/base.py:145
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
 msgstr "Continue after error from %(name)s: %(error)s"
 
-#: ceilometer/agent/base.py:280
+#: ceilometer/agent/base.py:285
 #, python-format
 msgid "Unable to discover resources: %s"
 msgstr "Unable to discover resources: %s"
 
-#: ceilometer/agent/base.py:282
+#: ceilometer/agent/base.py:287
 #, python-format
 msgid "Unknown discovery extension: %s"
 msgstr "Unknown discovery extension: %s"
@@ -748,7 +753,7 @@ msgstr "CPUTIME USAGE: %(instance)s %(time)d"
 #: ceilometer/compute/pollsters/cpu.py:51
 #: ceilometer/compute/pollsters/cpu.py:82
 #: ceilometer/compute/pollsters/disk.py:121
-#: ceilometer/compute/pollsters/disk.py:326
+#: ceilometer/compute/pollsters/disk.py:331
 #: ceilometer/compute/pollsters/memory.py:47
 #: ceilometer/compute/pollsters/net.py:109
 #, python-format
@@ -785,16 +790,16 @@ msgstr "Obtaining CPU Util is not implemented for %s"
 msgid "Could not get CPU Util for %(id)s: %(e)s"
 msgstr "Could not get CPU Util for %(id)s: %(e)s"
 
-#: ceilometer/compute/pollsters/disk.py:124
-#: ceilometer/compute/pollsters/disk.py:329
-#: ceilometer/compute/pollsters/net.py:112
+#: ceilometer/compute/pollsters/disk.py:129
+#: ceilometer/compute/pollsters/disk.py:334
+#: ceilometer/compute/pollsters/net.py:117
 #, python-format
 msgid "%(inspector)s does not provide data for  %(pollster)s"
 msgstr "%(inspector)s does not provide data for  %(pollster)s"
 
-#: ceilometer/compute/pollsters/disk.py:129
-#: ceilometer/compute/pollsters/disk.py:335
-#: ceilometer/compute/pollsters/net.py:117
+#: ceilometer/compute/pollsters/disk.py:134
+#: ceilometer/compute/pollsters/disk.py:340
+#: ceilometer/compute/pollsters/net.py:122
 #, python-format
 msgid "Ignoring instance %(name)s: %(error)s"
 msgstr "Ignoring instance %(name)s: %(error)s"
@@ -809,12 +814,12 @@ msgstr "Checking memory usage for instance %s"
 msgid "MEMORY USAGE: %(instance)s %(usage)f"
 msgstr "MEMORY USAGE: %(instance)s %(usage)f"
 
-#: ceilometer/compute/pollsters/memory.py:50
+#: ceilometer/compute/pollsters/memory.py:60
 #, python-format
 msgid "Obtaining Memory Usage is not implemented for %s"
 msgstr "Obtaining Memory Usage is not implemented for %s"
 
-#: ceilometer/compute/pollsters/memory.py:53
+#: ceilometer/compute/pollsters/memory.py:63
 #, python-format
 msgid "Could not get Memory Usage for %(id)s: %(e)s"
 msgstr "Could not get Memory Usage for %(id)s: %(e)s"
@@ -824,7 +829,7 @@ msgstr "Could not get Memory Usage for %(id)s: %(e)s"
 msgid "checking net info for instance %s"
 msgstr "checking net info for instance %s"
 
-#: ceilometer/compute/virt/inspector.py:227
+#: ceilometer/compute/virt/inspector.py:235
 #, python-format
 msgid "Unable to load the hypervisor inspector: %s"
 msgstr "Unable to load the hypervisor inspector: %s"
@@ -839,35 +844,37 @@ msgstr "VM %s not found on Hyper-V"
 msgid "Duplicate VM name found: %s"
 msgstr "Duplicate VM name found: %s"
 
-#: ceilometer/compute/virt/libvirt/inspector.py:118
-#, python-format
-msgid ""
-"Failed to inspect vnics of instance Name %(instance_name)s UUID "
-"%(instance_uuid)s, domain is in state of SHUTOFF"
+#: ceilometer/compute/virt/libvirt/inspector.py:56
+msgid "Connection to libvirt broken"
 msgstr ""
 
-#: ceilometer/compute/virt/libvirt/inspector.py:156
+#: ceilometer/compute/virt/libvirt/inspector.py:81
+#, python-format
+msgid "Connecting to libvirt: %s"
+msgstr "Connecting to libvirt: %s"
+
+#: ceilometer/compute/virt/libvirt/inspector.py:99
 #, python-format
 msgid ""
-"Failed to inspect disks of instance Name %(instance_name)s UUID "
-"%(instance_uuid)s, domain is in state of SHUTOFF"
+"Error from libvirt while looking up instance <name=%(name)s, id=%(id)>: "
+"[Error Code %(error_code)s] %(ex)s"
 msgstr ""
 
-#: ceilometer/compute/virt/libvirt/inspector.py:181
+#: ceilometer/compute/virt/libvirt/inspector.py:119
 #, python-format
 msgid ""
-"Failed to inspect memory usage of instance Name %(instance_name)s UUID "
-"%(instance_uuid)s, domain is in state of SHUTOFF"
+"Failed to inspect data of instance <name=%(name)s, id=%(id)s>, domain "
+"state is SHUTOFF."
 msgstr ""
 
-#: ceilometer/compute/virt/libvirt/inspector.py:199
+#: ceilometer/compute/virt/libvirt/inspector.py:189
 #, python-format
 msgid ""
-"Failed to inspect memory usage of instance Name %(instance_name)s UUID "
-"%(instance_uuid)s, can not get info from libvirt"
+"Failed to inspect memory usage of instance <name=%(name)s, id=%(id)s>, "
+"can not get info from libvirt."
 msgstr ""
 
-#: ceilometer/compute/virt/libvirt/inspector.py:208
+#: ceilometer/compute/virt/libvirt/inspector.py:197
 #, python-format
 msgid ""
 "Failed to inspect memory usage of %(instance_uuid)s, can not get info "
