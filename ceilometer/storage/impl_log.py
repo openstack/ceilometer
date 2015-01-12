@@ -49,7 +49,7 @@ class Connection(base.Connection):
         Clearing occurs according to the time-to-live.
         :param ttl: Number of seconds to keep records for.
         """
-        LOG.info(_("Dropping data with TTL %d"), ttl)
+        LOG.info(_("Dropping metering data with TTL %d"), ttl)
 
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,

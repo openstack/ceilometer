@@ -86,33 +86,50 @@ class MongoDBTestMarkerBase(test_storage_scenarios.DBTestBase,
 @tests_db.run_with('mongodb')
 class IndexTest(tests_db.TestBase,
                 tests_db.MixinTestsWithBackendScenarios):
-    def test_meter_ttl_index_absent(self):
-        # create a fake index and check it is deleted
-        self.conn.db.meter.ensure_index('foo', name='meter_ttl')
-        self.CONF.set_override('time_to_live', -1, group='database')
-        self.conn.upgrade()
-        self.assertTrue(self.conn.db.meter.ensure_index('foo',
-                                                        name='meter_ttl'))
-        self.conn.db.meter.drop_index('meter_ttl')
 
-        self.CONF.set_override('time_to_live', 456789, group='database')
-        self.conn.upgrade()
-        self.assertFalse(self.conn.db.meter.ensure_index('foo',
-                                                         name='meter_ttl'))
+    def _test_ttl_index_absent(self, conn, coll_name, ttl_opt):
+        # create a fake index and check it is deleted
+        coll = getattr(conn.db, coll_name)
+        index_name = '%s_ttl' % coll_name
+        coll.ensure_index('foo', name=index_name)
+        self.CONF.set_override(ttl_opt, -1, group='database')
+        conn.upgrade()
+        self.assertTrue(coll.ensure_index('foo', name=index_name))
+        coll.drop_index(index_name)
+
+        self.CONF.set_override(ttl_opt, 456789, group='database')
+        conn.upgrade()
+        self.assertFalse(coll.ensure_index('foo', name=index_name))
+
+    def test_meter_ttl_index_absent(self):
+        self._test_ttl_index_absent(self.conn, 'meter',
+                                    'metering_time_to_live')
+
+    def test_event_ttl_index_absent(self):
+        self._test_ttl_index_absent(self.event_conn, 'event',
+                                    'event_time_to_live')
+
+    def _test_ttl_index_present(self, conn, coll_name, ttl_opt):
+        coll = getattr(conn.db, coll_name)
+        self.CONF.set_override(ttl_opt, 456789, group='database')
+        conn.upgrade()
+        index_name = '%s_ttl' % coll_name
+        self.assertFalse(coll.ensure_index('foo', name=index_name))
+        self.assertEqual(456789,
+                         coll.index_information()
+                         [index_name]['expireAfterSeconds'])
+
+        self.CONF.set_override(ttl_opt, -1, group='database')
+        conn.upgrade()
+        self.assertTrue(coll.ensure_index('foo', name=index_name))
 
     def test_meter_ttl_index_present(self):
-        self.CONF.set_override('time_to_live', 456789, group='database')
-        self.conn.upgrade()
-        self.assertFalse(self.conn.db.meter.ensure_index('foo',
-                                                         name='meter_ttl'))
-        self.assertEqual(456789,
-                         self.conn.db.meter.index_information()
-                         ['meter_ttl']['expireAfterSeconds'])
+        self._test_ttl_index_present(self.conn, 'meter',
+                                     'metering_time_to_live')
 
-        self.CONF.set_override('time_to_live', -1, group='database')
-        self.conn.upgrade()
-        self.assertTrue(self.conn.db.meter.ensure_index('foo',
-                                                        name='meter_ttl'))
+    def test_event_ttl_index_present(self):
+        self._test_ttl_index_present(self.event_conn, 'event',
+                                     'event_time_to_live')
 
 
 @tests_db.run_with('mongodb')
