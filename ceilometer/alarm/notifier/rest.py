@@ -15,9 +15,9 @@
 """Rest alarm notifier."""
 
 import eventlet
-from oslo.serialization import jsonutils
 from oslo_config import cfg
 from oslo_context import context
+from oslo_serialization import jsonutils
 import requests
 import six.moves.urllib.parse as urlparse
 

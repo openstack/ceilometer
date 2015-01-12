@@ -14,9 +14,9 @@
 # under the License.
 
 import mock
-from oslo.serialization import jsonutils
 from oslo_config import fixture as fixture_config
 from oslo_context import context
+from oslo_serialization import jsonutils
 from oslotest import mockpatch
 import requests
 import six.moves.urllib.parse as urlparse

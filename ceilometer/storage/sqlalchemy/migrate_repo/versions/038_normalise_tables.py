@@ -13,7 +13,7 @@
 import hashlib
 
 import migrate
-from oslo.serialization import jsonutils
+from oslo_serialization import jsonutils
 import sqlalchemy as sa
 
 

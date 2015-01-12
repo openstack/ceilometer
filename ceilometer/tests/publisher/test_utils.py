@@ -14,7 +14,7 @@
 # under the License.
 """Tests for ceilometer/publisher/utils.py
 """
-from oslo.serialization import jsonutils
+from oslo_serialization import jsonutils
 from oslotest import base
 
 from ceilometer.publisher import utils

@@ -19,7 +19,7 @@ import uuid
 
 import mock
 import oslo.messaging.conffixture
-from oslo.serialization import jsonutils
+from oslo_serialization import jsonutils
 import six
 from six import moves
 

@@ -14,9 +14,9 @@
 # under the License.
 
 import oslo.messaging
-from oslo.serialization import jsonutils
 from oslo_config import cfg
 from oslo_context import context
+from oslo_serialization import jsonutils
 
 DEFAULT_URL = "__default__"
 TRANSPORTS = {}
