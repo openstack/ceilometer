@@ -17,8 +17,6 @@
 """Tests for ceilometer/central/manager.py
 """
 
-import itertools
-
 import mock
 from oslotest import base
 from oslotest import mockpatch
@@ -91,8 +89,8 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         self.PollsterKeystone.resources = []
         super(TestRunTasks, self).tearDown()
 
-    def get_extension_list(self):
-        exts = super(TestRunTasks, self).get_extension_list()
+    def create_extension_list(self):
+        exts = super(TestRunTasks, self).create_extension_list()
         exts.append(extension.Extension('testkeystone',
                                         None,
                                         None,
@@ -122,10 +120,6 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         self.mgr.pipeline_manager = pipeline.PipelineManager(
             self.pipeline_cfg,
             self.transformer_manager)
-        self.mgr.extensions = itertools.chain(
-            self.mgr.extensions,
-            [extension.Extension('testkeystone', None, None,
-                                 self.PollsterKeystone())])
         polling_tasks = self.mgr.setup_polling_tasks()
         self.mgr.interval_task(polling_tasks.values()[0])
         self.assertFalse(self.PollsterKeystone.samples)
