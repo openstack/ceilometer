@@ -45,12 +45,6 @@ OPTS = [
 ]
 
 cfg.CONF.register_opts(OPTS, group='alarm')
-cfg.CONF.import_opt('notifier_rpc_topic', 'ceilometer.alarm.rpc',
-                    group='alarm')
-cfg.CONF.import_opt('partition_rpc_topic', 'ceilometer.alarm.rpc',
-                    group='alarm')
-cfg.CONF.import_opt('heartbeat', 'ceilometer.coordination',
-                    group='coordination')
 cfg.CONF.import_opt('http_timeout', 'ceilometer.service')
 cfg.CONF.import_group('service_credentials', 'ceilometer.service')
 

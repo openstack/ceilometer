@@ -22,9 +22,6 @@ from ceilometer.i18n import _
 from ceilometer import service
 from ceilometer import storage
 
-cfg.CONF.import_opt('time_to_live', 'ceilometer.storage',
-                    group='database')
-
 LOG = logging.getLogger(__name__)
 
 
