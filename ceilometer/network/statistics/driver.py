@@ -19,7 +19,7 @@ import six
 
 
 @six.add_metaclass(abc.ABCMeta)
-class Driver():
+class Driver(object):
 
     @abc.abstractmethod
     def get_sample_data(self, meter_name, parse_url, params, cache):

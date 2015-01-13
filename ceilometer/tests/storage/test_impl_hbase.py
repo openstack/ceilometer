@@ -1,9 +1,6 @@
 #
 # Copyright 2012, 2013 Dell Inc.
 #
-# Author: Stas Maksimov <Stanislav_M@dell.com>
-# Author: Shengjie Min <Shengjie_Min@dell.com>
-#
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
 # a copy of the License at

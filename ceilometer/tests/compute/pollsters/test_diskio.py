@@ -2,10 +2,6 @@
 # Copyright 2012 eNovance <licensing@enovance.com>
 # Copyright 2012 Red Hat, Inc
 # Copyright 2014 Cisco Systems, Inc
-
-# Author: Julien Danjou <julien@danjou.info>
-# Author: Eoghan Glynn <eglynn@redhat.com>
-# Author: Pradeep Kilambi <pkilambi@cisco.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
