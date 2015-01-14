@@ -170,8 +170,9 @@ def _event_query_to_event_filter(q):
         if i.field in evt_model_filter:
             evt_model_filter[i.field] = i.value
         else:
+            trait_type = i.type or 'string'
             traits_filter.append({"key": i.field,
-                                  i.type: i._get_value_as_type(),
+                                  trait_type: i._get_value_as_type(),
                                   "op": i.op})
     return storage.EventFilter(traits_filter=traits_filter, **evt_model_filter)
 

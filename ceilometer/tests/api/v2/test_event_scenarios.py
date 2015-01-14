@@ -177,6 +177,34 @@ class TestEventAPI(EventTestBase):
                                  'value': 'Foo'}])
         self.assertEqual(1, len(data))
 
+    def test_get_events_filter_trait_no_type(self):
+        data = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_A',
+                                 'value': 'my_Foo_text'}])
+        self.assertEqual(1, len(data))
+        self.assertEqual('Foo', data[0]['event_type'])
+
+    def test_get_events_filter_trait_empty_type(self):
+        return
+        data = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_A',
+                                 'value': 'my_Foo_text',
+                                 'type': ''}])
+        self.assertEqual(1, len(data))
+        self.assertEqual('Foo', data[0]['event_type'])
+
+    def test_get_events_filter_trait_invalid_type(self):
+        resp = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_A',
+                                 'value': 'my_Foo_text',
+                                 'type': 'whats-up'}],
+                             expect_errors=True)
+        self.assertEqual(400, resp.status_code)
+        self.assertEqual("The data type whats-up is not supported. The "
+                         "supported data type list is: [\'integer\', "
+                         "\'float\', \'string\', \'datetime\']",
+                         resp.json['error_message']['faultstring'])
+
     def test_get_events_filter_text_trait(self):
         data = self.get_json(self.PATH, headers=headers,
                              q=[{'field': 'trait_A',
