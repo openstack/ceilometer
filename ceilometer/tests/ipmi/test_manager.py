@@ -27,6 +27,10 @@ from ceilometer.tests.agent import agentbase
 class TestManager(base.BaseTestCase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    @mock.patch('ceilometer.ipmi.pollsters.node._Base.__init__',
+                mock.Mock(return_value=None))
+    @mock.patch('ceilometer.ipmi.pollsters.sensor.SensorPollster.__init__',
+                mock.Mock(return_value=None))
     def test_load_plugins(self):
         mgr = manager.AgentManager()
         self.assertIsNotNone(list(mgr.extensions))
@@ -35,6 +39,10 @@ class TestManager(base.BaseTestCase):
 class TestRunTasks(agentbase.BaseAgentManagerTestCase):
 
     @staticmethod
+    @mock.patch('ceilometer.ipmi.pollsters.node._Base.__init__',
+                mock.Mock(return_value=None))
+    @mock.patch('ceilometer.ipmi.pollsters.sensor.SensorPollster.__init__',
+                mock.Mock(return_value=None))
     def create_manager():
         return manager.AgentManager()
 
