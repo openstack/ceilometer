@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-01-12 06:08+0000\n"
-"PO-Revision-Date: 2015-01-09 20:42+0000\n"
+"POT-Creation-Date: 2015-01-14 06:09+0000\n"
+"PO-Revision-Date: 2015-01-12 16:23+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: English (United Kingdom) "
 "(http://www.transifex.com/projects/p/ceilometer/language/en_GB/)\n"
@@ -33,17 +33,17 @@ msgstr "UDP: Storing %s"
 msgid "UDP: Unable to store meter"
 msgstr "UDP: Unable to store meter"
 
-#: ceilometer/notification.py:131 ceilometer/notifier.py:48
+#: ceilometer/notification.py:133 ceilometer/notifier.py:48
 #, python-format
 msgid "Failed to load any notification handlers for %s"
 msgstr "Failed to load any notification handlers for %s"
 
-#: ceilometer/notification.py:143
+#: ceilometer/notification.py:145
 #, python-format
 msgid "Event types from %(name)s: %(type)s (ack_on_error=%(error)s)"
 msgstr "Event types from %(name)s: %(type)s (ack_on_error=%(error)s)"
 
-#: ceilometer/notification.py:183
+#: ceilometer/notification.py:185
 #, python-format
 msgid "Pipeline endpoint: %s"
 msgstr ""
@@ -114,32 +114,32 @@ msgstr "Pipeline config file: %s"
 msgid "Pipeline config: %s"
 msgstr "Pipeline config: %s"
 
-#: ceilometer/service.py:108
+#: ceilometer/service.py:105
 #, python-format
 msgid "%(worker_name)s value of %(workers)s is invalid, must be greater than 0"
 msgstr "%(worker_name)s value of %(workers)s is invalid, must be greater than 0"
 
-#: ceilometer/agent/base.py:119
+#: ceilometer/agent/base.py:116
 #, python-format
 msgid "Polling pollster %(poll)s in the context of %(src)s"
 msgstr ""
 
-#: ceilometer/agent/base.py:133
+#: ceilometer/agent/base.py:130
 #, python-format
 msgid "Skip polling pollster %s, no resources found"
 msgstr ""
 
-#: ceilometer/agent/base.py:145
+#: ceilometer/agent/base.py:142
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
 msgstr "Continue after error from %(name)s: %(error)s"
 
-#: ceilometer/agent/base.py:285
+#: ceilometer/agent/base.py:282
 #, python-format
 msgid "Unable to discover resources: %s"
 msgstr "Unable to discover resources: %s"
 
-#: ceilometer/agent/base.py:287
+#: ceilometer/agent/base.py:284
 #, python-format
 msgid "Unknown discovery extension: %s"
 msgstr "Unknown discovery extension: %s"
@@ -171,46 +171,51 @@ msgstr ""
 "alarm %(alarm_id)s has no action configured for state transition from "
 "%(previous)s to state %(state)s, skipping the notification."
 
-#: ceilometer/alarm/service.py:101
+#: ceilometer/alarm/service.py:95
 #, python-format
 msgid "initiating evaluation cycle on %d alarms"
 msgstr "initiating evaluation cycle on %d alarms"
 
-#: ceilometer/alarm/service.py:106
+#: ceilometer/alarm/service.py:100
 msgid "alarm evaluation cycle failed"
 msgstr "alarm evaluation cycle failed"
 
-#: ceilometer/alarm/service.py:111
+#: ceilometer/alarm/service.py:105
 #, python-format
 msgid "skipping alarm %s: type unsupported"
 msgstr "skipping alarm %s: type unsupported"
 
-#: ceilometer/alarm/service.py:115
+#: ceilometer/alarm/service.py:109
 #, python-format
 msgid "evaluating alarm %s"
 msgstr "evaluating alarm %s"
 
-#: ceilometer/alarm/service.py:262
+#: ceilometer/alarm/service.py:113
+#, python-format
+msgid "Failed to evaluate alarm %s"
+msgstr ""
+
+#: ceilometer/alarm/service.py:259
 #, python-format
 msgid "Unable to parse action %(action)s for alarm %(alarm_id)s"
 msgstr "Unable to parse action %(action)s for alarm %(alarm_id)s"
 
-#: ceilometer/alarm/service.py:271
+#: ceilometer/alarm/service.py:268
 #, python-format
 msgid "Action %(scheme)s for alarm %(alarm_id)s is unknown, cannot notify"
 msgstr "Action %(scheme)s for alarm %(alarm_id)s is unknown, cannot notify"
 
-#: ceilometer/alarm/service.py:277
+#: ceilometer/alarm/service.py:274
 #, python-format
 msgid "Notifying alarm %(id)s with action %(act)s"
 msgstr "Notifying alarm %(id)s with action %(act)s"
 
-#: ceilometer/alarm/service.py:282
+#: ceilometer/alarm/service.py:279
 #, python-format
 msgid "Unable to notify alarm %s"
 msgstr "Unable to notify alarm %s"
 
-#: ceilometer/alarm/service.py:302
+#: ceilometer/alarm/service.py:299
 msgid "Unable to notify for an alarm with no action"
 msgstr "Unable to notify for an alarm with no action"
 
@@ -471,21 +476,21 @@ msgstr ""
 msgid "state_timestamp should be datetime object"
 msgstr ""
 
-#: ceilometer/api/app.py:168
+#: ceilometer/api/app.py:165
 #, python-format
 msgid "Starting server in PID %s"
 msgstr "Starting server in PID %s"
 
-#: ceilometer/api/app.py:169
+#: ceilometer/api/app.py:166
 msgid "Configuration:"
 msgstr "Configuration:"
 
-#: ceilometer/api/app.py:173
+#: ceilometer/api/app.py:170
 #, python-format
 msgid "serving on 0.0.0.0:%(sport)s, view at http://127.0.0.1:%(vport)s"
 msgstr "serving on 0.0.0.0:%(sport)s, view at http://127.0.0.1:%(vport)s"
 
-#: ceilometer/api/app.py:177
+#: ceilometer/api/app.py:174
 #, python-format
 msgid "serving on http://%(host)s:%(port)s"
 msgstr "serving on http://%(host)s:%(port)s"
@@ -698,11 +703,11 @@ msgstr "Event"
 msgid "More than one event with id %s returned from storage driver"
 msgstr "More than one event with id %s returned from storage driver"
 
-#: ceilometer/cmd/storage.py:41
+#: ceilometer/cmd/storage.py:38
 msgid "Clearing expired metering data"
 msgstr "Clearing expired metering data"
 
-#: ceilometer/cmd/storage.py:46
+#: ceilometer/cmd/storage.py:43
 msgid "Nothing to clean, database time to live is disabled"
 msgstr "Nothing to clean, database time to live is disabled"
 
@@ -1116,7 +1121,7 @@ msgstr ""
 msgid "running ipmitool failure"
 msgstr ""
 
-#: ceilometer/network/floatingip.py:58
+#: ceilometer/network/floatingip.py:56
 #, python-format
 msgid "FLOATING IP USAGE: %s"
 msgstr "FLOATING IP USAGE: %s"
@@ -1264,7 +1269,7 @@ msgstr "Publishing sample %(msg)s over UDP to %(host)s:%(port)d"
 msgid "Unable to send sample over UDP"
 msgstr "Unable to send sample over UDP"
 
-#: ceilometer/storage/__init__.py:111
+#: ceilometer/storage/__init__.py:110
 #, python-format
 msgid "looking for %(name)r driver in %(namespace)r"
 msgstr "looking for %(name)r driver in %(namespace)r"
@@ -1293,7 +1298,7 @@ msgstr "metering data %(counter_name)s for %(resource_id)s: %(counter_volume)s"
 msgid "Dropping data with TTL %d"
 msgstr "Dropping data with TTL %d"
 
-#: ceilometer/storage/impl_mongodb.py:553
+#: ceilometer/storage/impl_mongodb.py:550
 msgid ""
 "Clearing expired metering data is based on native MongoDB time to live "
 "feature and going in background."
