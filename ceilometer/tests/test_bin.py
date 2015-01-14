@@ -120,7 +120,7 @@ class BinAlarmEvaluatorServiceTestCase(base.BaseTestCase):
         self.subp = subprocess.Popen(['ceilometer-alarm-evaluator',
                                       "--config-file=%s" % self.tempfile],
                                      stderr=subprocess.PIPE)
-        err = self.subp.stderr.read(1024)
+        err = self.subp.stderr.read(2048)
         self.assertIn("Alarm evaluator loaded: %s" % driver_class, err)
 
     def tearDown(self):

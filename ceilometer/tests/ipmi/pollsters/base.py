@@ -44,9 +44,8 @@ class TestPollsterBase(base.BaseTestCase):
         nm.read_temperature_all.side_effect = self.fake_data
         nm.read_power_all.side_effect = self.fake_data
         nm.read_sensor_any.side_effect = self.fake_sensor_data
-
-        self.mgr = manager.AgentManager()
-
+        # We should mock the pollster first before initialize the Manager
+        # so that we don't trigger the sudo in pollsters' __init__().
         self.useFixture(mockpatch.Patch(
             'ceilometer.ipmi.platform.intel_node_manager.NodeManager',
             return_value=nm))
@@ -54,6 +53,8 @@ class TestPollsterBase(base.BaseTestCase):
         self.useFixture(mockpatch.Patch(
             'ceilometer.ipmi.platform.ipmi_sensor.IPMISensor',
             return_value=nm))
+
+        self.mgr = manager.AgentManager()
 
         self.pollster = self.make_pollster()
 

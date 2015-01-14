@@ -16,7 +16,6 @@
 
 import datetime
 
-from oslo.utils import timeutils
 import webtest.app
 
 from ceilometer.storage import models
@@ -36,7 +35,7 @@ class EventTestBase(v2.FunctionalTest,
     def _generate_models(self):
         event_models = []
         base = 0
-        self.trait_time = datetime.datetime(2013, 12, 31, 5, 0)
+        self.s_time = self.trait_time = datetime.datetime(2013, 12, 31, 5, 0)
         for event_type in ['Foo', 'Bar', 'Zoo']:
             trait_models = [models.Trait(name, type, value)
                             for name, type, value in [
@@ -130,18 +129,15 @@ class TestTraitAPI(EventTestBase):
 class TestEventAPI(EventTestBase):
 
     PATH = '/events'
-    START_TRAIT_TIME = datetime.datetime(2013, 12, 31, 5, 0)
 
     def test_get_events(self):
         data = self.get_json(self.PATH, headers=headers)
         self.assertEqual(3, len(data))
         # We expect to get native UTC generated time back
-        trait_time = self.START_TRAIT_TIME
+        trait_time = self.s_time
         for event in data:
-            expected_generated = timeutils.strtime(
-                at=timeutils.normalize_time(trait_time),
-                fmt=timeutils._ISO8601_TIME_FORMAT)
-            self.assertTrue(event['event_type'] in ['Foo', 'Bar', 'Zoo'])
+            expected_generated = trait_time.isoformat()
+            self.assertIn(event['event_type'], ['Foo', 'Bar', 'Zoo'])
             self.assertEqual(4, len(event['traits']))
             self.assertEqual(expected_generated, event['generated'])
             for trait_name in ['trait_A', 'trait_B',
