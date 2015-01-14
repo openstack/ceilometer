@@ -242,7 +242,7 @@ class Sink(object):
         try:
             self.name = cfg['name']
             # It's legal to have no transformer specified
-            self.transformer_cfg = cfg['transformers'] or []
+            self.transformer_cfg = cfg.get('transformers') or []
         except KeyError as err:
             raise PipelineException(
                 "Required field %s not specified" % err.args[0], cfg)
@@ -266,9 +266,8 @@ class Sink(object):
         return self.name
 
     def _setup_transformers(self, cfg, transformer_manager):
-        transformer_cfg = cfg['transformers'] or []
         transformers = []
-        for transformer in transformer_cfg:
+        for transformer in self.transformer_cfg:
             parameter = transformer['parameters'] or {}
             try:
                 ext = transformer_manager.get_ext(transformer['name'])
