@@ -39,11 +39,10 @@ class MultiChoicesOpt(cfg.Opt):
             kwargs['choices'] = choices
         return kwargs
 
-# todo(dbelova): add ipmi agent here as well
 CLI_OPTS = [
     MultiChoicesOpt('polling-namespaces',
                     default=['compute', 'central'],
-                    choices=['compute', 'central'],
+                    choices=['compute', 'central', 'ipmi'],
                     dest='polling_namespaces',
                     help='Polling namespace(s) to be used while '
                          'resource polling'),
@@ -73,3 +72,8 @@ def main_compute():
 def main_central():
     service.prepare_service()
     os_service.launch(manager.AgentManager(['central'])).wait()
+
+
+def main_ipmi():
+    service.prepare_service()
+    os_service.launch(manager.AgentManager(['ipmi'])).wait()
