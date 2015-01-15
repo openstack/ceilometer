@@ -308,7 +308,7 @@ class TestNetRatesPollster(base.TestPollsterBase):
              ],
         )
 
-    def test_outgoing_bytes(self):
+    def test_outgoing_bytes_rate(self):
         instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
         self._check_get_samples(
             net.OutgoingBytesRatePollster,
