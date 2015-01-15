@@ -20,7 +20,7 @@ import uuid
 from ceilometerclient.v2 import alarms
 import eventlet
 from oslo.config import fixture as fixture_config
-from oslo.utils import timeutils
+from oslo_utils import timeutils
 import six
 
 from ceilometer.alarm import rpc as rpc_alarm

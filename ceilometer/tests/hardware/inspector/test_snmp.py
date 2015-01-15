@@ -16,7 +16,7 @@
 # under the License.
 """Tests for ceilometer/hardware/inspector/snmp/inspector.py
 """
-from oslo.utils import netutils
+from oslo_utils import netutils
 from oslotest import mockpatch
 
 from ceilometer.hardware.inspector import snmp

@@ -17,7 +17,7 @@
 """Converters for producing compute CPU sample messages from notification
 events.
 """
-from oslo.utils import timeutils
+from oslo_utils import timeutils
 
 from ceilometer.compute import notifications
 from ceilometer.i18n import _

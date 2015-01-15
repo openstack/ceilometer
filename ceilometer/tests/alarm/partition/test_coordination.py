@@ -22,7 +22,7 @@ import uuid
 
 import mock
 from oslo.config import fixture as fixture_config
-from oslo.utils import timeutils
+from oslo_utils import timeutils
 from six import moves
 
 from ceilometer.alarm.partition import coordination

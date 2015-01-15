@@ -22,7 +22,7 @@ import socket
 
 import msgpack
 from oslo.config import cfg
-from oslo.utils import netutils
+from oslo_utils import netutils
 
 from ceilometer.i18n import _
 from ceilometer.openstack.common import log

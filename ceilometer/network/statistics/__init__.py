@@ -15,7 +15,7 @@
 
 import abc
 
-from oslo.utils import netutils
+from oslo_utils import netutils
 import six
 from six.moves.urllib import parse as urlparse
 from stevedore import driver as _driver

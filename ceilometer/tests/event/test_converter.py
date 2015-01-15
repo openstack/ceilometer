@@ -547,7 +547,7 @@ class TestEventDefinition(ConverterBase):
         edef = converter.EventDefinition(cfg, self.fake_plugin_mgr)
         self.assertTrue(edef.is_catchall)
 
-    @mock.patch('oslo.utils.timeutils.utcnow')
+    @mock.patch('oslo_utils.timeutils.utcnow')
     def test_extract_when(self, mock_utcnow):
         now = datetime.datetime.utcnow()
         modified = now + datetime.timedelta(minutes=1)
@@ -624,7 +624,7 @@ class TestNotificationConverter(ConverterBase):
             host='cydonia')
         self.fake_plugin_mgr = {}
 
-    @mock.patch('oslo.utils.timeutils.utcnow')
+    @mock.patch('oslo_utils.timeutils.utcnow')
     def test_converter_missing_keys(self, mock_utcnow):
         # test a malformed notification
         now = datetime.datetime.utcnow()

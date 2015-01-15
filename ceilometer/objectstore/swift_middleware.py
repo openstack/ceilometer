@@ -42,8 +42,8 @@ before "proxy-server" and add the following filter in the file:
 from __future__ import absolute_import
 import logging
 
-from oslo.utils import timeutils
 from oslo_context import context
+from oslo_utils import timeutils
 import six
 import six.moves.urllib.parse as urlparse
 

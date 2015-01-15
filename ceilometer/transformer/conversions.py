@@ -18,7 +18,7 @@
 import collections
 import re
 
-from oslo.utils import timeutils
+from oslo_utils import timeutils
 import six
 
 from ceilometer.i18n import _

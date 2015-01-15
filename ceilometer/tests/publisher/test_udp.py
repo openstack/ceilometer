@@ -22,7 +22,7 @@ import datetime
 import mock
 import msgpack
 from oslo.config import fixture as fixture_config
-from oslo.utils import netutils
+from oslo_utils import netutils
 from oslotest import base
 
 from ceilometer.publisher import udp

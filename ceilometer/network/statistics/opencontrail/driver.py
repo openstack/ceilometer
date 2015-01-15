@@ -13,7 +13,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-from oslo.utils import timeutils
+from oslo_utils import timeutils
 from six.moves.urllib import parse as urlparse
 
 from ceilometer.network.statistics import driver

@@ -24,7 +24,7 @@ import uuid
 from ceilometerclient import exc
 from ceilometerclient.v2 import alarms
 import mock
-from oslo.utils import timeutils
+from oslo_utils import timeutils
 import pytz
 
 from ceilometer.alarm.evaluator import combination

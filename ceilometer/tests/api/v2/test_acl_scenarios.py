@@ -19,7 +19,7 @@
 import datetime
 import json
 
-from oslo.utils import timeutils
+from oslo_utils import timeutils
 import webtest
 
 from ceilometer.api import app

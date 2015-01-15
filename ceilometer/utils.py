@@ -28,9 +28,9 @@ import multiprocessing
 import struct
 
 from oslo.config import cfg
-from oslo.utils import timeutils
-from oslo.utils import units
 from oslo_concurrency import processutils
+from oslo_utils import timeutils
+from oslo_utils import units
 import six
 
 

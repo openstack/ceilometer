@@ -23,8 +23,8 @@ import eventlet
 import mock
 from oslo.config import fixture as fixture_config
 import oslo.messaging
-from oslo.utils import netutils
 from oslo_context import context
+from oslo_utils import netutils
 import testscenarios.testcase
 
 from ceilometer import messaging

@@ -22,7 +22,7 @@ import logging.handlers
 import os
 import tempfile
 
-from oslo.utils import netutils
+from oslo_utils import netutils
 from oslotest import base
 
 from ceilometer.publisher import file

@@ -17,7 +17,7 @@
 
 from eventlet import timeout
 from oslo.config import cfg
-from oslo.utils import units
+from oslo_utils import units
 try:
     import XenAPI as api
 except ImportError:

@@ -19,7 +19,7 @@ SQLAlchemy models for Ceilometer data.
 import hashlib
 import json
 
-from oslo.utils import timeutils
+from oslo_utils import timeutils
 import six
 from sqlalchemy import (Column, Integer, String, ForeignKey, Index,
                         UniqueConstraint, BigInteger)

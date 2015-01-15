@@ -19,7 +19,7 @@
 
 import copy
 
-from oslo.utils import timeutils
+from oslo_utils import timeutils
 
 import ceilometer
 from ceilometer.compute import pollsters

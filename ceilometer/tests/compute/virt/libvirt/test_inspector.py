@@ -22,7 +22,7 @@ import contextlib
 
 import fixtures
 import mock
-from oslo.utils import units
+from oslo_utils import units
 from oslotest import base
 
 from ceilometer.compute.virt import inspector as virt_inspector

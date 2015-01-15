@@ -19,7 +19,7 @@
 import datetime
 import operator
 
-from oslo.utils import timeutils
+from oslo_utils import timeutils
 
 from ceilometer.alarm import evaluator
 from ceilometer.alarm.evaluator import utils
