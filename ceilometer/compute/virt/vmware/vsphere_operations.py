@@ -13,7 +13,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from oslo.vmware import vim_util
+from oslo_vmware import vim_util
 
 
 PERF_MANAGER_TYPE = "PerformanceManager"
