@@ -158,7 +158,7 @@ class BinApiTestCase(base.BaseTestCase):
 
         # create ceilometer.conf file
         self.api_port = random.randint(10000, 11000)
-        self.http = httplib2.Http()
+        self.http = httplib2.Http(proxy_info=None)
         pipeline_cfg_file = self.path_get('etc/ceilometer/pipeline.yaml')
         policy_file = self.path_get('etc/ceilometer/policy.json')
         content = ("[DEFAULT]\n"
