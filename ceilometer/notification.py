@@ -25,6 +25,7 @@ from ceilometer import messaging
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import service as os_service
 from ceilometer import pipeline
+from ceilometer import utils
 
 
 LOG = log.getLogger(__name__)
@@ -52,7 +53,7 @@ OPTS = [
 ]
 
 cfg.CONF.register_opts(OPTS, group="notification")
-cfg.CONF.import_opt('metering_driver', 'ceilometer.publisher.messaging',
+cfg.CONF.import_opt('telemetry_driver', 'ceilometer.publisher.messaging',
                     group='publisher_notifier')
 
 
@@ -80,7 +81,7 @@ class NotificationService(os_service.Service):
     def _get_notifier(self, transport, pipe):
         return oslo.messaging.Notifier(
             transport,
-            driver=cfg.CONF.publisher_notifier.metering_driver,
+            driver=cfg.CONF.publisher_notifier.telemetry_driver,
             publisher_id='ceilometer.notification',
             topic='%s-%s' % (self.NOTIFICATION_IPC, pipe.name))
 
@@ -174,17 +175,8 @@ class NotificationService(os_service.Service):
             listener.start()
             self.listeners.append(listener)
 
-    @staticmethod
-    def _kill_listeners(listeners):
-        # NOTE(gordc): correct usage of oslo.messaging listener is to stop(),
-        # which stops new messages, and wait(), which processes remaining
-        # messages and closes connection
-        for listener in listeners:
-            listener.stop()
-            listener.wait()
-
     def _refresh_agent(self, event):
-        self._kill_listeners(self.pipeline_listeners)
+        utils.kill_listeners(self.pipeline_listeners)
         self._configure_pipeline_listeners()
 
     def _configure_pipeline_listeners(self):
@@ -210,5 +202,5 @@ class NotificationService(os_service.Service):
 
     def stop(self):
         self.partition_coordinator.leave_group(self.group_id)
-        self._kill_listeners(self.listeners + self.pipeline_listeners)
+        utils.kill_listeners(self.listeners + self.pipeline_listeners)
         super(NotificationService, self).stop()

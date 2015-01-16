@@ -24,14 +24,16 @@ import six
 from ceilometer import utils
 
 OPTS = [
-    cfg.StrOpt('metering_secret',
+    cfg.StrOpt('telemetry_secret',
                secret=True,
                default='change this or be hacked',
                help='Secret value for signing metering messages.',
                deprecated_opts=[cfg.DeprecatedOpt("metering_secret",
                                                   "DEFAULT"),
                                 cfg.DeprecatedOpt("metering_secret",
-                                                  "publisher_rpc")]
+                                                  "publisher_rpc"),
+                                cfg.DeprecatedOpt("metering_secret",
+                                                  "publisher")]
                ),
 ]
 cfg.CONF.register_opts(OPTS, group="publisher")

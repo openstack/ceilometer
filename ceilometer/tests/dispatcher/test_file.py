@@ -52,8 +52,7 @@ class TestDispatcherFile(base.BaseTestCase):
                'counter_volume': 1,
                }
         msg['message_signature'] = utils.compute_signature(
-            msg,
-            self.CONF.publisher.metering_secret,
+            msg, self.CONF.publisher.telemetry_secret,
         )
 
         # The record_metering_data method should exist and not produce errors.
@@ -84,8 +83,7 @@ class TestDispatcherFile(base.BaseTestCase):
                'counter_volume': 1,
                }
         msg['message_signature'] = utils.compute_signature(
-            msg,
-            self.CONF.publisher.metering_secret,
+            msg, self.CONF.publisher.telemetry_secret,
         )
 
         # The record_metering_data method should exist and not produce errors.

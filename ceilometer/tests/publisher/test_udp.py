@@ -110,7 +110,7 @@ class TestUDPPublisher(base.BaseTestCase):
     def setUp(self):
         super(TestUDPPublisher, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
-        self.CONF.publisher.metering_secret = 'not-so-secret'
+        self.CONF.publisher.telemetry_secret = 'not-so-secret'
 
     def test_published(self):
         self.data_sent = []

@@ -61,8 +61,7 @@ class TestListResources(v2.FunctionalTest,
             source='test',
         )
         msg = utils.meter_message_from_counter(
-            sample1,
-            self.CONF.publisher.metering_secret,
+            sample1, self.CONF.publisher.telemetry_secret,
         )
         self.conn.record_metering_data(msg)
 
@@ -90,8 +89,7 @@ class TestListResources(v2.FunctionalTest,
             source='test',
         )
         msg = utils.meter_message_from_counter(
-            sample1,
-            self.CONF.publisher.metering_secret,
+            sample1, self.CONF.publisher.telemetry_secret,
         )
         self.conn.record_metering_data(msg)
 
@@ -110,8 +108,7 @@ class TestListResources(v2.FunctionalTest,
             source='test',
         )
         msg2 = utils.meter_message_from_counter(
-            sample2,
-            self.CONF.publisher.metering_secret,
+            sample2, self.CONF.publisher.telemetry_secret,
         )
         self.conn.record_metering_data(msg2)
 
@@ -144,7 +141,7 @@ class TestListResources(v2.FunctionalTest,
             )
             msg = utils.meter_message_from_counter(
                 datapoint,
-                self.CONF.publisher.metering_secret,
+                self.CONF.publisher.telemetry_secret,
             )
             self.conn.record_metering_data(msg)
 
@@ -169,8 +166,7 @@ class TestListResources(v2.FunctionalTest,
             source='test',
         )
         msg = utils.meter_message_from_counter(
-            sample1,
-            self.CONF.publisher.metering_secret,
+            sample1, self.CONF.publisher.telemetry_secret,
         )
         self.conn.record_metering_data(msg)
 
@@ -189,8 +185,7 @@ class TestListResources(v2.FunctionalTest,
             source='test',
         )
         msg2 = utils.meter_message_from_counter(
-            sample2,
-            self.CONF.publisher.metering_secret,
+            sample2, self.CONF.publisher.telemetry_secret,
         )
         self.conn.record_metering_data(msg2)
 
@@ -213,8 +208,7 @@ class TestListResources(v2.FunctionalTest,
             source='test_list_resources',
         )
         msg = utils.meter_message_from_counter(
-            sample1,
-            self.CONF.publisher.metering_secret,
+            sample1, self.CONF.publisher.telemetry_secret,
         )
         self.conn.record_metering_data(msg)
 
@@ -233,8 +227,7 @@ class TestListResources(v2.FunctionalTest,
             source='not-test',
         )
         msg2 = utils.meter_message_from_counter(
-            sample2,
-            self.CONF.publisher.metering_secret,
+            sample2, self.CONF.publisher.telemetry_secret,
         )
         self.conn.record_metering_data(msg2)
 
@@ -262,8 +255,7 @@ class TestListResources(v2.FunctionalTest,
             source='test_list_resources',
         )
         msg = utils.meter_message_from_counter(
-            sample1,
-            self.CONF.publisher.metering_secret,
+            sample1, self.CONF.publisher.telemetry_secret,
         )
         self.conn.record_metering_data(msg)
 
@@ -282,8 +274,7 @@ class TestListResources(v2.FunctionalTest,
             source='test_list_resources',
         )
         msg2 = utils.meter_message_from_counter(
-            sample2,
-            self.CONF.publisher.metering_secret,
+            sample2, self.CONF.publisher.telemetry_secret,
         )
         self.conn.record_metering_data(msg2)
 
@@ -315,8 +306,7 @@ class TestListResources(v2.FunctionalTest,
             source='test_list_resources',
         )
         msg = utils.meter_message_from_counter(
-            sample1,
-            self.CONF.publisher.metering_secret,
+            sample1, self.CONF.publisher.telemetry_secret,
         )
         self.conn.record_metering_data(msg)
 
@@ -335,8 +325,7 @@ class TestListResources(v2.FunctionalTest,
             source='not-test',
         )
         msg2 = utils.meter_message_from_counter(
-            sample2,
-            self.CONF.publisher.metering_secret,
+            sample2, self.CONF.publisher.telemetry_secret,
         )
         self.conn.record_metering_data(msg2)
 
@@ -362,8 +351,7 @@ class TestListResources(v2.FunctionalTest,
             source='test_list_resources',
         )
         msg = utils.meter_message_from_counter(
-            sample1,
-            self.CONF.publisher.metering_secret,
+            sample1, self.CONF.publisher.telemetry_secret,
         )
         self.conn.record_metering_data(msg)
 
@@ -382,8 +370,7 @@ class TestListResources(v2.FunctionalTest,
             source='not-test',
         )
         msg2 = utils.meter_message_from_counter(
-            sample2,
-            self.CONF.publisher.metering_secret,
+            sample2, self.CONF.publisher.telemetry_secret,
         )
         self.conn.record_metering_data(msg2)
 
@@ -409,8 +396,7 @@ class TestListResources(v2.FunctionalTest,
             source='not-test',
         )
         msg2 = utils.meter_message_from_counter(
-            sample1,
-            self.CONF.publisher.metering_secret,
+            sample1, self.CONF.publisher.telemetry_secret,
         )
         self.conn.record_metering_data(msg2)
 
@@ -436,8 +422,7 @@ class TestListResources(v2.FunctionalTest,
             source='not-test',
         )
         msg2 = utils.meter_message_from_counter(
-            sample1,
-            self.CONF.publisher.metering_secret,
+            sample1, self.CONF.publisher.telemetry_secret,
         )
         self.conn.record_metering_data(msg2)
 
@@ -465,8 +450,7 @@ class TestListResources(v2.FunctionalTest,
             source='test',
         )
         msg = utils.meter_message_from_counter(
-            sample1,
-            self.CONF.publisher.metering_secret,
+            sample1, self.CONF.publisher.telemetry_secret,
         )
         self.conn.record_metering_data(msg)
 
@@ -494,8 +478,7 @@ class TestListResources(v2.FunctionalTest,
             source='test_list_resources',
         )
         msg = utils.meter_message_from_counter(
-            sample1,
-            self.CONF.publisher.metering_secret,
+            sample1, self.CONF.publisher.telemetry_secret,
         )
         self.conn.record_metering_data(msg)
 
@@ -526,8 +509,7 @@ class TestListResources(v2.FunctionalTest,
             source='test_list_resources',
         )
         msg = utils.meter_message_from_counter(
-            sample1,
-            self.CONF.publisher.metering_secret,
+            sample1, self.CONF.publisher.telemetry_secret,
         )
         self.conn.record_metering_data(msg)
 

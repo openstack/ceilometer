@@ -52,10 +52,11 @@ NOTIFIER_OPTS = [
                help='The topic that ceilometer uses for event '
                'notifications.',
                ),
-    cfg.StrOpt('metering_driver',
+    cfg.StrOpt('telemetry_driver',
                default='messagingv2',
                help='The driver that ceilometer uses for metering '
                'notifications.',
+               deprecated_name='metering_driver',
                )
 ]
 
@@ -102,8 +103,7 @@ class MessagingPublisher(publisher.PublisherBase):
 
         meters = [
             utils.meter_message_from_counter(
-                sample,
-                cfg.CONF.publisher.metering_secret)
+                sample, cfg.CONF.publisher.telemetry_secret)
             for sample in samples
         ]
         topic = cfg.CONF.publisher_rpc.metering_topic
@@ -171,7 +171,7 @@ class MessagingPublisher(publisher.PublisherBase):
         :param events: events from pipeline after transformation
         """
         ev_list = [utils.message_from_event(
-            event, cfg.CONF.publisher.metering_secret) for event in events]
+            event, cfg.CONF.publisher.telemetry_secret) for event in events]
 
         topic = cfg.CONF.publisher_notifier.event_topic
         self.local_queue.append((context, topic, ev_list))
@@ -204,7 +204,7 @@ class NotifierPublisher(MessagingPublisher):
         super(NotifierPublisher, self).__init__(parsed_url)
         self.notifier = oslo.messaging.Notifier(
             messaging.get_transport(),
-            driver=cfg.CONF.publisher_notifier.metering_driver,
+            driver=cfg.CONF.publisher_notifier.telemetry_driver,
             publisher_id='telemetry.publisher.%s' % cfg.CONF.host,
             topic=topic,
             retry=self.retry

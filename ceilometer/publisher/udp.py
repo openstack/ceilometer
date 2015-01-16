@@ -50,8 +50,7 @@ class UDPPublisher(publisher.PublisherBase):
 
         for sample in samples:
             msg = utils.meter_message_from_counter(
-                sample,
-                cfg.CONF.publisher.metering_secret)
+                sample, cfg.CONF.publisher.telemetry_secret)
             host = self.host
             port = self.port
             LOG.debug(_("Publishing sample %(msg)s over UDP to "

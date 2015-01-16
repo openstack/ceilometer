@@ -47,7 +47,7 @@ class TestCollector(tests_base.BaseTestCase):
         self.CONF = self.useFixture(fixture_config.Config()).conf
         self.CONF.import_opt("connection", "oslo.db.options", group="database")
         self.CONF.set_override("connection", "log://", group='database')
-        self.CONF.set_override('metering_secret', 'not-so-secret',
+        self.CONF.set_override('telemetry_secret', 'not-so-secret',
                                group='publisher')
         self._setup_messaging()
 
@@ -230,25 +230,53 @@ class TestCollector(tests_base.BaseTestCase):
         mylog.info.assert_called_once_with(
             'metering data test for test_run_tasks: 1')
 
-    @mock.patch.object(oslo.messaging.MessageHandlingServer, 'start')
-    @mock.patch.object(collector.CollectorService, 'start_udp')
-    def test_collector_requeue(self, udp_start, rpc_start):
-        self.CONF.set_override('requeue_sample_on_dispatcher_error', True,
-                               group='collector')
+    def _test_collector_requeue(self, listener):
         self.srv.start()
         with mock.patch.object(self.srv.dispatcher_manager, 'map_method',
                                side_effect=Exception('boom')):
-            ret = self.srv.sample({}, 'pub_id', 'event', {}, {})
+            endp = getattr(self.srv, listener).dispatcher.endpoints[0]
+            ret = endp.sample({}, 'pub_id', 'event', {}, {})
             self.assertEqual(oslo.messaging.NotificationResult.REQUEUE,
                              ret)
 
-    @mock.patch.object(oslo.messaging.MessageHandlingServer, 'start')
-    @mock.patch.object(collector.CollectorService, 'start_udp')
-    def test_collector_no_requeue(self, udp_start, rpc_start):
-        self.CONF.set_override('requeue_sample_on_dispatcher_error', False,
+    @mock.patch.object(oslo.messaging.MessageHandlingServer, 'start',
+                       mock.Mock())
+    @mock.patch.object(collector.CollectorService, 'start_udp', mock.Mock())
+    def test_collector_sample_requeue(self):
+        self.CONF.set_override('requeue_sample_on_dispatcher_error', True,
                                group='collector')
+        self._test_collector_requeue('sample_listener')
+
+    @mock.patch.object(oslo.messaging.MessageHandlingServer, 'start',
+                       mock.Mock())
+    @mock.patch.object(collector.CollectorService, 'start_udp', mock.Mock())
+    def test_collector_event_requeue(self):
+        self.CONF.set_override('requeue_event_on_dispatcher_error', True,
+                               group='collector')
+        self.CONF.set_override('store_events', True, group='notification')
+        self._test_collector_requeue('event_listener')
+
+    def _test_collector_no_requeue(self, listener):
         self.srv.start()
         with mock.patch.object(self.srv.dispatcher_manager, 'map_method',
                                side_effect=FakeException('boom')):
-            self.assertRaises(FakeException, self.srv.sample, {}, 'pub_id',
+            endp = getattr(self.srv, listener).dispatcher.endpoints[0]
+            self.assertRaises(FakeException, endp.sample, {}, 'pub_id',
                               'event', {}, {})
+
+    @mock.patch.object(oslo.messaging.MessageHandlingServer, 'start',
+                       mock.Mock())
+    @mock.patch.object(collector.CollectorService, 'start_udp', mock.Mock())
+    def test_collector_sample_no_requeue(self):
+        self.CONF.set_override('requeue_sample_on_dispatcher_error', False,
+                               group='collector')
+        self._test_collector_no_requeue('sample_listener')
+
+    @mock.patch.object(oslo.messaging.MessageHandlingServer, 'start',
+                       mock.Mock())
+    @mock.patch.object(collector.CollectorService, 'start_udp', mock.Mock())
+    def test_collector_event_no_requeue(self):
+        self.CONF.set_override('requeue_event_on_dispatcher_error', False,
+                               group='collector')
+        self.CONF.set_override('store_events', True, group='notification')
+        self._test_collector_no_requeue('event_listener')

@@ -89,8 +89,7 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                           source='test_source')]:
 
             msg = utils.meter_message_from_counter(
-                cnt,
-                self.CONF.publisher.metering_secret)
+                cnt, self.CONF.publisher.telemetry_secret)
             self.conn.record_metering_data(msg)
 
     def test_query_fields_are_optional(self):

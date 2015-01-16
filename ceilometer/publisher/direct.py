@@ -42,8 +42,7 @@ class DirectPublisher(publisher.PublisherBase):
         # Transform the Sample objects into a list of dicts
         meters = [
             utils.meter_message_from_counter(
-                sample,
-                cfg.CONF.publisher.metering_secret)
+                sample, cfg.CONF.publisher.telemetry_secret)
             for sample in samples
         ]
 

@@ -51,7 +51,7 @@ class DBTestBase(tests_db.TestBase):
             resource_metadata=metadata, source=source
         )
         msg = utils.meter_message_from_counter(
-            s, self.CONF.publisher.metering_secret
+            s, self.CONF.publisher.telemetry_secret
         )
         self.conn.record_metering_data(msg)
         return msg
@@ -1409,8 +1409,7 @@ class StatisticsGroupByTest(DBTestBase,
                 source=test_sample['source'],
             )
             msg = utils.meter_message_from_counter(
-                c,
-                self.CONF.publisher.metering_secret,
+                c, self.CONF.publisher.telemetry_secret,
             )
             self.conn.record_metering_data(msg)
 
@@ -2608,8 +2607,7 @@ class CounterDataTypeTest(DBTestBase,
             source='test-1',
         )
         msg = utils.meter_message_from_counter(
-            c,
-            self.CONF.publisher.metering_secret,
+            c, self.CONF.publisher.telemetry_secret,
         )
 
         self.conn.record_metering_data(msg)
@@ -2627,8 +2625,7 @@ class CounterDataTypeTest(DBTestBase,
             source='test-1',
         )
         msg = utils.meter_message_from_counter(
-            c,
-            self.CONF.publisher.metering_secret,
+            c, self.CONF.publisher.telemetry_secret,
         )
         self.conn.record_metering_data(msg)
 
@@ -2645,8 +2642,7 @@ class CounterDataTypeTest(DBTestBase,
             source='test-1',
         )
         msg = utils.meter_message_from_counter(
-            c,
-            self.CONF.publisher.metering_secret,
+            c, self.CONF.publisher.telemetry_secret,
         )
         self.conn.record_metering_data(msg)
 
@@ -3492,7 +3488,7 @@ class BigIntegerTest(tests_db.TestBase,
                           timestamp=datetime.datetime.utcnow(),
                           resource_metadata=metadata)
         msg = utils.meter_message_from_counter(
-            s, self.CONF.publisher.metering_secret)
+            s, self.CONF.publisher.telemetry_secret)
         self.conn.record_metering_data(msg)
 
 
