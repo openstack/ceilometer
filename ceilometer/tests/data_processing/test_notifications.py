@@ -17,10 +17,10 @@ import datetime
 
 import mock
 from oslo_config import cfg
+from oslo_log import log
 from oslotest import base
 
 from ceilometer.data_processing import notifications
-from ceilometer.openstack.common import log
 from ceilometer import sample
 
 NOW = datetime.datetime.isoformat(datetime.datetime.utcnow())
@@ -37,6 +37,7 @@ PUBLISHER_ID = u'data_processing.node-n5x66lxdy67d'
 
 
 CONF = cfg.CONF
+log.register_options(CONF)
 CONF.set_override('use_stderr', True)
 
 LOG = log.getLogger(__name__)

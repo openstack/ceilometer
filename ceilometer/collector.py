@@ -17,6 +17,7 @@ import socket
 
 import msgpack
 from oslo_config import cfg
+from oslo_log import log
 import oslo_messaging
 from oslo_utils import netutils
 from oslo_utils import units
@@ -24,7 +25,6 @@ from oslo_utils import units
 from ceilometer import dispatcher
 from ceilometer import messaging
 from ceilometer.i18n import _, _LE
-from ceilometer.openstack.common import log
 from ceilometer.openstack.common import service as os_service
 from ceilometer import utils
 

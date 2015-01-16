@@ -16,13 +16,13 @@
 
 from lxml import etree
 from oslo_config import cfg
+from oslo_log import log as logging
 from oslo_utils import units
 import six
 
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.i18n import _
-from ceilometer.openstack.common import log as logging
 
 libvirt = None
 

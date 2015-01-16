@@ -16,6 +16,7 @@ import operator
 
 import elasticsearch as es
 from elasticsearch import helpers
+from oslo_log import log
 from oslo_utils import netutils
 from oslo_utils import timeutils
 import six
@@ -23,7 +24,6 @@ import six
 from ceilometer.event.storage import base
 from ceilometer.event.storage import models
 from ceilometer.i18n import _LE, _LI
-from ceilometer.openstack.common import log
 from ceilometer import storage
 from ceilometer import utils
 

@@ -20,6 +20,7 @@
 
 import datetime
 
+from oslo_log import log
 import pecan
 from pecan import rest
 import six
@@ -31,7 +32,6 @@ from ceilometer.api.controllers.v2 import base
 from ceilometer.api.controllers.v2 import utils as v2_utils
 from ceilometer.event.storage import models as event_models
 from ceilometer.i18n import _
-from ceilometer.openstack.common import log
 from ceilometer import storage
 
 LOG = log.getLogger(__name__)

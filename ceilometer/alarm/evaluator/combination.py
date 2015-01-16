@@ -18,9 +18,10 @@
 
 from six import moves
 
+from oslo_log import log
+
 from ceilometer.alarm import evaluator
 from ceilometer.i18n import _
-from ceilometer.openstack.common import log
 
 LOG = log.getLogger(__name__)
 

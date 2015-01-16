@@ -12,6 +12,8 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+
+from oslo_log import log
 from oslo_utils import timeutils
 import six
 from six import moves
@@ -20,7 +22,6 @@ from six.moves.urllib import parse as urlparse
 from ceilometer.i18n import _
 from ceilometer.network.statistics import driver
 from ceilometer.network.statistics.opendaylight import client
-from ceilometer.openstack.common import log
 from ceilometer import utils
 
 

@@ -22,6 +22,7 @@ import base64
 import datetime
 
 from oslo_context import context
+from oslo_log import log
 from oslo_utils import timeutils
 import pecan
 from pecan import rest
@@ -34,7 +35,6 @@ from ceilometer.api.controllers.v2 import base
 from ceilometer.api.controllers.v2 import utils as v2_utils
 from ceilometer.api import rbac
 from ceilometer.i18n import _
-from ceilometer.openstack.common import log
 from ceilometer import sample
 from ceilometer import storage
 from ceilometer import utils

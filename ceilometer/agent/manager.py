@@ -14,10 +14,10 @@
 # under the License.
 
 from oslo_config import cfg
+from oslo_log import log
 
 from ceilometer.agent import base
 from ceilometer import keystone_client
-from ceilometer.openstack.common import log
 
 OPTS = [
     cfg.StrOpt('partitioning_group_prefix',

@@ -21,6 +21,7 @@
 import json
 
 import jsonschema
+from oslo_log import log
 from oslo_utils import timeutils
 import pecan
 from pecan import rest
@@ -33,7 +34,6 @@ from ceilometer.api.controllers.v2 import base
 from ceilometer.api.controllers.v2 import samples
 from ceilometer.api import rbac
 from ceilometer.i18n import _
-from ceilometer.openstack.common import log
 from ceilometer import storage
 from ceilometer import utils
 

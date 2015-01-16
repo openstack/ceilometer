@@ -15,10 +15,10 @@
 # under the License.
 
 from oslo_config import cfg
+from oslo_log import log
 
 from ceilometer.agent import manager
 from ceilometer.i18n import _LW
-from ceilometer.openstack.common import log
 from ceilometer.openstack.common import service as os_service
 from ceilometer import service
 

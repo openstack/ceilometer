@@ -17,6 +17,7 @@ import datetime
 import operator
 
 from oslo_config import cfg
+from oslo_log import log
 from oslo_serialization import jsonutils
 from oslo_utils import timeutils
 import requests
@@ -25,7 +26,6 @@ import six.moves
 from ceilometer.alarm import evaluator
 from ceilometer.i18n import _
 from ceilometer import keystone_client
-from ceilometer.openstack.common import log
 
 LOG = log.getLogger(__name__)
 

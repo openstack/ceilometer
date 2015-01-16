@@ -22,6 +22,7 @@ from oslo_config import cfg
 from oslo_db import api
 from oslo_db import exception as dbexc
 from oslo_db.sqlalchemy import session as db_session
+from oslo_log import log
 from oslo_serialization import jsonutils
 from oslo_utils import timeutils
 import six
@@ -33,7 +34,6 @@ from sqlalchemy.orm import aliased
 
 import ceilometer
 from ceilometer.i18n import _
-from ceilometer.openstack.common import log
 from ceilometer import storage
 from ceilometer.storage import base
 from ceilometer.storage import models as api_models

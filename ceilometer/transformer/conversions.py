@@ -16,11 +16,11 @@
 import collections
 import re
 
+from oslo_log import log
 from oslo_utils import timeutils
 import six
 
 from ceilometer.i18n import _
-from ceilometer.openstack.common import log
 from ceilometer import sample
 from ceilometer import transformer
 

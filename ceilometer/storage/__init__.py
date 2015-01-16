@@ -17,12 +17,12 @@
 
 from oslo_config import cfg
 from oslo_db import options as db_options
+from oslo_log import log
 import retrying
 import six
 import six.moves.urllib.parse as urlparse
 from stevedore import driver
 
-from ceilometer.openstack.common import log
 from ceilometer import utils
 
 

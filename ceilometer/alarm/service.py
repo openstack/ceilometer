@@ -21,6 +21,7 @@ import abc
 
 from ceilometerclient import client as ceiloclient
 from oslo_config import cfg
+from oslo_log import log
 from oslo_utils import netutils
 import six
 from stevedore import extension
@@ -30,7 +31,6 @@ from ceilometer.alarm import rpc as rpc_alarm
 from ceilometer import coordination as coordination
 from ceilometer.i18n import _
 from ceilometer import messaging
-from ceilometer.openstack.common import log
 from ceilometer.openstack.common import service as os_service
 
 

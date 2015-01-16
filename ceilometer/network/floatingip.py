@@ -17,12 +17,12 @@
 # under the License.
 
 from oslo_config import cfg
+from oslo_log import log
 from oslo_utils import timeutils
 
 from ceilometer.agent import plugin_base
 from ceilometer.i18n import _
 from ceilometer import nova_client
-from ceilometer.openstack.common import log
 from ceilometer import sample
 
 

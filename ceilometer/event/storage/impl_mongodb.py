@@ -13,10 +13,10 @@
 """MongoDB storage backend"""
 
 from oslo_config import cfg
+from oslo_log import log
 import pymongo
 
 from ceilometer.event.storage import pymongo_base
-from ceilometer.openstack.common import log
 from ceilometer import storage
 from ceilometer.storage import impl_mongodb
 from ceilometer.storage.mongo import utils as pymongo_utils

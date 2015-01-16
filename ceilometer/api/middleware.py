@@ -22,12 +22,12 @@ Based on pecan.middleware.errordocument
 import json
 
 from lxml import etree
+from oslo_log import log
 import webob
 
 from ceilometer.api import hooks
 from ceilometer import i18n
 from ceilometer.i18n import _
-from ceilometer.openstack.common import log
 
 LOG = log.getLogger(__name__)
 

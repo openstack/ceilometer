@@ -16,11 +16,11 @@
 import logging
 import logging.handlers
 
+from oslo_log import log
 from six.moves.urllib import parse as urlparse
 
 import ceilometer
 from ceilometer.i18n import _
-from ceilometer.openstack.common import log
 from ceilometer import publisher
 
 LOG = log.getLogger(__name__)

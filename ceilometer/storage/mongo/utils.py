@@ -22,13 +22,13 @@ import time
 import weakref
 
 from oslo_config import cfg
+from oslo_log import log
 from oslo_utils import netutils
 import pymongo
 import six
 from six.moves.urllib import parse
 
 from ceilometer.i18n import _
-from ceilometer.openstack.common import log
 
 LOG = log.getLogger(__name__)
 

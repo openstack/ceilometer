@@ -15,11 +15,11 @@ import datetime
 import operator
 import time
 
+from oslo_log import log
 from oslo_utils import timeutils
 
 import ceilometer
 from ceilometer.i18n import _
-from ceilometer.openstack.common import log
 from ceilometer.storage import base
 from ceilometer.storage.hbase import base as hbase_base
 from ceilometer.storage.hbase import migration as hbase_migration

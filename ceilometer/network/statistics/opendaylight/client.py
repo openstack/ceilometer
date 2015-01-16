@@ -16,12 +16,12 @@
 import abc
 
 from oslo_config import cfg
+from oslo_log import log
 import requests
 from requests import auth
 import six
 
 from ceilometer.i18n import _
-from ceilometer.openstack.common import log
 
 
 CONF = cfg.CONF

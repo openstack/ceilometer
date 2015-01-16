@@ -13,9 +13,9 @@
 # under the License.
 
 from oslo_config import cfg
+from oslo_log import log
 
 from ceilometer.agent import plugin_base as plugin
-from ceilometer.openstack.common import log
 
 LOG = log.getLogger(__name__)
 

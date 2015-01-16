@@ -22,13 +22,13 @@
 import abc
 import itertools
 
+from oslo_log import log
 from oslo_utils import netutils
 import six
 
 from ceilometer.agent import plugin_base
 from ceilometer.hardware import inspector as insloader
 from ceilometer.i18n import _
-from ceilometer.openstack.common import log
 
 LOG = log.getLogger(__name__)
 

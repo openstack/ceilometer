@@ -51,7 +51,6 @@ import ceilometer.nova_client
 import ceilometer.objectstore.rgw
 import ceilometer.objectstore.swift
 import ceilometer.openstack.common.eventlet_backdoor
-import ceilometer.openstack.common.log
 import ceilometer.orchestration.notifications
 import ceilometer.pipeline
 import ceilometer.profiler.notifications
@@ -86,10 +85,6 @@ def list_opts():
                          ceilometer.objectstore.swift.OPTS,
                          (ceilometer.openstack.common.eventlet_backdoor
                           .eventlet_backdoor_opts),
-                         ceilometer.openstack.common.log.common_cli_opts,
-                         ceilometer.openstack.common.log.generic_log_opts,
-                         ceilometer.openstack.common.log.logging_cli_opts,
-                         ceilometer.openstack.common.log.log_opts,
                          ceilometer.orchestration.notifications.OPTS,
                          ceilometer.pipeline.OPTS,
                          ceilometer.profiler.notifications.OPTS,

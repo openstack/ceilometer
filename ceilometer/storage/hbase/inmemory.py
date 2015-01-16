@@ -17,11 +17,11 @@
 import copy
 import re
 
+from oslo_log import log
 import six
 
 import ceilometer
 from ceilometer.i18n import _
-from ceilometer.openstack.common import log
 
 LOG = log.getLogger(__name__)
 

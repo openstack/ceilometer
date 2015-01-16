@@ -15,6 +15,7 @@
 import abc
 
 from oslo_config import cfg
+from oslo_log import log
 from oslo_utils import timeutils
 import six
 
@@ -22,7 +23,6 @@ from ceilometer.agent import plugin_base
 from ceilometer.i18n import _
 from ceilometer.ipmi.platform import exception as nmexcept
 from ceilometer.ipmi.platform import intel_node_manager as node_manager
-from ceilometer.openstack.common import log
 from ceilometer import sample
 
 CONF = cfg.CONF
