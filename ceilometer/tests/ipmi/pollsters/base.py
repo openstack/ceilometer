@@ -20,8 +20,8 @@ import mock
 from oslotest import mockpatch
 import six
 
-from ceilometer.ipmi import manager
-import ceilometer.tests.base as base
+from ceilometer.agent import manager
+from ceilometer.tests import base
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -54,7 +54,7 @@ class TestPollsterBase(base.BaseTestCase):
             'ceilometer.ipmi.platform.ipmi_sensor.IPMISensor',
             return_value=nm))
 
-        self.mgr = manager.AgentManager()
+        self.mgr = manager.AgentManager(['ipmi'])
 
         self.pollster = self.make_pollster()
 
