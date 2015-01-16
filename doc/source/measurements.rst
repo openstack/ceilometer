@@ -305,7 +305,7 @@ cluster.delete                   Delta       cluster     cluster ID   notificati
 
 To enable Sahara notifications configure Sahara as described in :ref:`installing_manually`.
 
-Key Value Storage (MagnetoDB)
+Key Value Store (MagnetoDB)
 =============================
 
 ===============================  ==========  ==========  ===========  ============  =================================================
