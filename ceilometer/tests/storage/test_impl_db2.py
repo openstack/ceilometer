@@ -23,8 +23,13 @@
 
 """
 
+import bson
+import mock
+from oslo.utils import timeutils
+
 from ceilometer.alarm.storage import impl_db2 as impl_db2_alarm
 from ceilometer.storage import impl_db2
+from ceilometer.storage.mongo import utils as pymongo_utils
 from ceilometer.tests import base as test_base
 
 
@@ -85,3 +90,24 @@ class CapabilitiesTest(test_base.BaseTestCase):
         }
         actual_capabilities = impl_db2.Connection.get_storage_capabilities()
         self.assertEqual(expected_capabilities, actual_capabilities)
+
+
+class ConnectionTest(test_base.BaseTestCase):
+    @mock.patch.object(pymongo_utils.ConnectionPool, 'connect')
+    @mock.patch.object(timeutils, 'utcnow')
+    @mock.patch.object(bson.objectid, 'ObjectId')
+    def test_upgrade(self, meter_id, timestamp, mongo_connect):
+        conn_mock = mock.MagicMock()
+        conn_mock.server_info.return_value = {}
+        conn_mock.ceilodb2.resource.index_information.return_value = {}
+        mongo_connect.return_value = conn_mock
+        meter_id.return_value = '54b8860d75bfe43b54e84ce7'
+        timestamp.return_value = 'timestamp'
+        impl_db2.Connection('db2://user:pwd@localhost:27017/ceilodb2')
+        conn_mock.ceilodb2.resource.insert.assert_called_with(
+            {'_id': '54b8860d75bfe43b54e84ce7',
+             'no_key': '54b8860d75bfe43b54e84ce7'})
+        conn_mock.ceilodb2.meter.insert.assert_called_with(
+            {'_id': '54b8860d75bfe43b54e84ce7',
+             'no_key': '54b8860d75bfe43b54e84ce7',
+             'timestamp': 'timestamp'})

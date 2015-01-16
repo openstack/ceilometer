@@ -163,8 +163,10 @@ class Connection(pymongo_base.Connection):
             self.db.resource.insert({'_id': resource_id,
                                      'no_key': resource_id})
             meter_id = str(bson.objectid.ObjectId())
+            timestamp = timeutils.utcnow()
             self.db.meter.insert({'_id': meter_id,
-                                  'no_key': meter_id})
+                                  'no_key': meter_id,
+                                  'timestamp': timestamp})
 
             self.db.resource.ensure_index([
                 ('user_id', pymongo.ASCENDING),
