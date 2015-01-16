@@ -29,8 +29,10 @@ from ceilometer.storage import impl_db2
 from ceilometer.storage.mongo import utils as pymongo_utils
 from ceilometer.tests import base as test_base
 
+import bson
 import mock
 from oslo_config import cfg
+from oslo_utils import timeutils
 
 
 class CapabilitiesTest(test_base.BaseTestCase):
@@ -100,11 +102,15 @@ class CapabilitiesTest(test_base.BaseTestCase):
 
 class ConnectionTest(test_base.BaseTestCase):
     @mock.patch.object(pymongo_utils.ConnectionPool, 'connect')
-    def test_upgrade(self, mongo_connect):
+    @mock.patch.object(timeutils, 'utcnow')
+    @mock.patch.object(bson.objectid, 'ObjectId')
+    def test_upgrade(self, meter_id, timestamp, mongo_connect):
         conn_mock = mock.MagicMock()
         conn_mock.server_info.return_value = {}
         conn_mock.ceilodb2.resource.index_information.return_value = {}
         mongo_connect.return_value = conn_mock
+        meter_id.return_value = '54b8860d75bfe43b54e84ce7'
+        timestamp.return_value = 'timestamp'
         cfg.CONF.set_override('db2nosql_resource_id_maxlen',
                               256,
                               group='database')
@@ -113,3 +119,7 @@ class ConnectionTest(test_base.BaseTestCase):
         conn_mock.ceilodb2.resource.insert.assert_called_with(
             {'_id': resource_id,
              'no_key': resource_id})
+        conn_mock.ceilodb2.meter.insert.assert_called_with(
+            {'_id': '54b8860d75bfe43b54e84ce7',
+             'no_key': '54b8860d75bfe43b54e84ce7',
+             'timestamp': 'timestamp'})
