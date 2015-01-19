@@ -14,6 +14,13 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+# This must be set before the initial import of eventlet because if
+# dnspython is present in your environment then eventlet monkeypatches
+# socket.getaddrinfo() with an implementation which doesn't work for IPv6.
+import os
+
+os.environ['EVENTLET_NO_GREENDNS'] = 'yes'
+
 
 class NotImplementedError(NotImplementedError):
     # FIXME(jd) This is used by WSME to return a correct HTTP code. We should
