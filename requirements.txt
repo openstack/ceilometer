@@ -12,7 +12,6 @@ iso8601>=0.1.9
 jsonpath-rw>=1.2.0,<2.0
 jsonschema>=2.0.0,<3.0.0
 keystonemiddleware>=1.0.0
-lockfile>=0.8
 lxml>=2.3
 msgpack-python>=0.4.0
 netaddr>=0.7.12
