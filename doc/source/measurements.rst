@@ -528,11 +528,20 @@ User-defined sample metadata for Nova
 
 Users are allowed to add additional metadata to samples of nova meter.
 These additional metadata are stored in 'resource_metadata.user_metadata.*' of the sample.
-To do so, users should add nova user metadata prefixed with 'metering.':
+
+To do so, users can add nova user metadata prefixed with 'metering.':
 
 ::
 
    $ nova boot --meta metering.custom_metadata=a_value my_vm
+
+Or users can define metadata keys they cared without any prefix in ceilometer.conf.
+For example,if users need to add "fqdn" of metadata to samples,
+they can add or modify as below into ceilometer.conf in [DEFAULT] group:
+
+::
+
+   reserved_metadata_keys=fqdn
 
 Note: The name of the metadata shouldn't exceed 256 characters otherwise it will be cut off.
 Also, if it has '.', this will be replaced by a '_' in ceilometer.
