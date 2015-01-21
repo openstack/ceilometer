@@ -115,7 +115,7 @@ def list_opts():
         ('dispatcher_file', ceilometer.dispatcher.file.OPTS),
         ('event', ceilometer.event.converter.OPTS),
         ('hardware', ceilometer.hardware.discovery.OPTS),
-        ('impi', ceilometer.ipmi.platform.intel_node_manager.OPTS),
+        ('ipmi', ceilometer.ipmi.platform.intel_node_manager.OPTS),
         ('notification', ceilometer.notification.OPTS),
         ('polling', ceilometer.agent.manager.OPTS),
         ('publisher', ceilometer.publisher.utils.OPTS),
