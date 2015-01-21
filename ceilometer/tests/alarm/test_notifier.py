@@ -23,6 +23,7 @@ from oslotest import mockpatch
 import requests
 import six.moves.urllib.parse as urlparse
 
+from ceilometer import alarm as ceilometer_alarm
 from ceilometer.alarm import service
 from ceilometer.tests import base as tests_base
 
@@ -71,7 +72,7 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
             'reason_data': {'fire': 'everywhere'}
         }
         self.service.notify_alarm(context.get_admin_context(), data)
-        notifications = self.service.notifiers['test'].obj.notifications
+        notifications = ceilometer_alarm.NOTIFIERS['test'].obj.notifications
         self.assertEqual(1, len(notifications))
         self.assertEqual((urlparse.urlsplit(data['actions'][0]),
                           data['alarm_id'],

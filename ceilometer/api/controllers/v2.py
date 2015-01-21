@@ -51,7 +51,7 @@ from wsme import types as wtypes
 import wsmeext.pecan as wsme_pecan
 
 import ceilometer
-from ceilometer.alarm import service as alarm_service
+from ceilometer import alarm as ceilometer_alarm
 from ceilometer.alarm.storage import models as alarm_models
 from ceilometer.api import rbac
 from ceilometer.event.storage import models as event_models
@@ -1889,7 +1889,7 @@ class Alarm(_Base):
 
     @staticmethod
     def check_alarm_actions(alarm):
-        actions_schema = alarm_service.AlarmNotifierService.notifiers_schemas
+        actions_schema = ceilometer_alarm.NOTIFIER_SCHEMAS
         for state in state_kind:
             actions_name = state.replace(" ", "_") + '_actions'
             actions = getattr(alarm, actions_name)

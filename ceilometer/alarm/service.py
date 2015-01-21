@@ -25,6 +25,7 @@ from oslo_utils import netutils
 import six
 from stevedore import extension
 
+from ceilometer import alarm as ceilometer_alarm
 from ceilometer.alarm.partition import coordination as alarm_coordination
 from ceilometer.alarm import rpc as rpc_alarm
 from ceilometer import coordination as coordination
@@ -54,8 +55,6 @@ LOG = log.getLogger(__name__)
 @six.add_metaclass(abc.ABCMeta)
 class AlarmService(object):
 
-    EXTENSIONS_NAMESPACE = "ceilometer.alarm.evaluator"
-
     def __init__(self):
         super(AlarmService, self).__init__()
         self._load_evaluators()
@@ -63,7 +62,7 @@ class AlarmService(object):
 
     def _load_evaluators(self):
         self.evaluators = extension.ExtensionManager(
-            namespace=self.EXTENSIONS_NAMESPACE,
+            namespace=ceilometer_alarm.EVALUATOR_EXTENSIONS_NAMESPACE,
             invoke_on_load=True,
             invoke_args=(rpc_alarm.RPCAlarmNotifier(),)
         )
@@ -228,12 +227,6 @@ class PartitionedAlarmService(AlarmService, os_service.Service):
 
 class AlarmNotifierService(os_service.Service):
 
-    EXTENSIONS_NAMESPACE = "ceilometer.alarm.notifier"
-
-    notifiers = extension.ExtensionManager(EXTENSIONS_NAMESPACE,
-                                           invoke_on_load=True)
-    notifiers_schemas = notifiers.map(lambda x: x.name)
-
     def __init__(self):
         super(AlarmNotifierService, self).__init__()
         transport = messaging.get_transport()
@@ -261,7 +254,7 @@ class AlarmNotifierService(os_service.Service):
             return
 
         try:
-            notifier = self.notifiers[action.scheme].obj
+            notifier = ceilometer_alarm.NOTIFIERS[action.scheme].obj
         except KeyError:
             scheme = action.scheme
             LOG.error(
