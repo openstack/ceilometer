@@ -33,7 +33,8 @@ from ceilometer.tests.storage import test_storage_scenarios
 
 
 @tests_db.run_with('mongodb')
-class MongoDBConnection(tests_db.TestBase):
+class MongoDBConnection(tests_db.TestBase,
+                        tests_db.MixinTestsWithBackendScenarios):
     def test_connection_pooling(self):
         test_conn = impl_mongodb.Connection(self.db_manager.url)
         self.assertEqual(self.conn.conn, test_conn.conn)
@@ -55,7 +56,8 @@ class MongoDBConnection(tests_db.TestBase):
 
 
 @tests_db.run_with('mongodb')
-class MongoDBTestMarkerBase(test_storage_scenarios.DBTestBase):
+class MongoDBTestMarkerBase(test_storage_scenarios.DBTestBase,
+                            tests_db.MixinTestsWithBackendScenarios):
     # NOTE(Fengqian): All these three test case are the same for resource
     # and meter collection. As to alarm, we will set up in AlarmTestPagination.
     def test_get_marker(self):
@@ -84,7 +86,8 @@ class MongoDBTestMarkerBase(test_storage_scenarios.DBTestBase):
 
 
 @tests_db.run_with('mongodb')
-class IndexTest(tests_db.TestBase):
+class IndexTest(tests_db.TestBase,
+                tests_db.MixinTestsWithBackendScenarios):
     def test_meter_ttl_index_absent(self):
         # create a fake index and check it is deleted
         self.conn.db.meter.ensure_index('foo', name='meter_ttl')
@@ -92,6 +95,8 @@ class IndexTest(tests_db.TestBase):
         self.conn.upgrade()
         self.assertTrue(self.conn.db.meter.ensure_index('foo',
                                                         name='meter_ttl'))
+        self.conn.db.meter.drop_index('meter_ttl')
+
         self.CONF.set_override('time_to_live', 456789, group='database')
         self.conn.upgrade()
         self.assertFalse(self.conn.db.meter.ensure_index('foo',
@@ -113,7 +118,8 @@ class IndexTest(tests_db.TestBase):
 
 
 @tests_db.run_with('mongodb')
-class AlarmTestPagination(test_storage_scenarios.AlarmTestBase):
+class AlarmTestPagination(test_storage_scenarios.AlarmTestBase,
+                          tests_db.MixinTestsWithBackendScenarios):
     def test_alarm_get_marker(self):
         self.add_some_alarms()
         marker_pairs = {'name': 'red-alert'}
