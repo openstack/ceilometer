@@ -1182,6 +1182,10 @@ class StatisticsTest(DBTestBase,
         self.assertEqual(10, results.max)
         self.assertEqual(27, results.sum)
         self.assertEqual(9, results.avg)
+        self.assertEqual(datetime.datetime(2012, 9, 25, 10, 30),
+                         results.period_start)
+        self.assertEqual(datetime.datetime(2012, 9, 25, 12, 32),
+                         results.period_end)
 
     def test_by_user(self):
         f = storage.SampleFilter(
