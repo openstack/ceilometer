@@ -35,19 +35,6 @@ then
     echo "notification_driver=neutron.openstack.common.notifier.rabbit_notifier" >> $NEUTRON_CONF
 fi
 
-# For nova we set both the rabbit notifier and the special ceilometer
-# notifier that forces one more poll to happen before an instance is
-# removed.
-NOVA_CONF=/etc/nova/nova.conf
-if ! grep -q "notification_driver=ceilometer.compute.nova_notifier" $NOVA_CONF
-then
-    echo "notification_driver=ceilometer.compute.nova_notifier" >> $NOVA_CONF
-fi
-if ! grep -q "notification_driver=nova.openstack.common.notifier.rabbit_notifier" $NOVA_CONF
-then
-    echo "notification_driver=nova.openstack.common.notifier.rabbit_notifier" >> $NOVA_CONF
-fi
-
 # SPECIAL CASE
 # Glance does not use the openstack common notifier library,
 # so we have to set a different option.
