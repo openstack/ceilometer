@@ -24,53 +24,44 @@ class TestOpencontrailClient(base.BaseTestCase):
 
     def setUp(self):
         super(TestOpencontrailClient, self).setUp()
-        self.client = client.Client('http://127.0.0.1:8143',
-                                    'admin', 'admin', None, False)
-
-        self.post_resp = mock.MagicMock()
-        self.post = mock.patch('requests.post',
-                               return_value=self.post_resp).start()
-
-        self.post_resp.raw.version = 1.1
-        self.post_resp.status_code = 302
-        self.post_resp.reason = 'Moved'
-        self.post_resp.headers = {}
-        self.post_resp.cookies = {'connect.sid': 'aaa'}
-        self.post_resp.content = 'dummy'
+        self.client = client.Client('http://127.0.0.1:8081', {'arg1': 'aaa'})
 
         self.get_resp = mock.MagicMock()
         self.get = mock.patch('requests.get',
                               return_value=self.get_resp).start()
         self.get_resp.raw_version = 1.1
         self.get_resp.status_code = 200
-        self.post_resp.content = 'dqs'
 
-    def test_port_statistics(self):
-        uuid = 'bbb'
-        self.client.networks.get_port_statistics(uuid)
-
-        call_args = self.post.call_args_list[0][0]
-        call_kwargs = self.post.call_args_list[0][1]
-
-        expected_url = 'http://127.0.0.1:8143/authenticate'
-        self.assertEqual(expected_url, call_args[0])
-
-        data = call_kwargs.get('data')
-        expected_data = {'domain': None, 'password': 'admin',
-                         'username': 'admin'}
-        self.assertEqual(expected_data, data)
+    def test_vm_statistics(self):
+        self.client.networks.get_vm_statistics('bbb')
 
         call_args = self.get.call_args_list[0][0]
         call_kwargs = self.get.call_args_list[0][1]
 
-        expected_url = ('http://127.0.0.1:8143/api/tenant/'
-                        'networking/virtual-machines/details')
+        expected_url = ('http://127.0.0.1:8081/analytics/'
+                        'uves/virtual-machine/bbb')
         self.assertEqual(expected_url, call_args[0])
 
         data = call_kwargs.get('data')
-        cookies = call_kwargs.get('cookies')
 
-        expected_data = {'fqnUUID': 'bbb', 'type': 'vn'}
-        expected_cookies = {'connect.sid': 'aaa'}
+        expected_data = {'arg1': 'aaa'}
         self.assertEqual(expected_data, data)
-        self.assertEqual(expected_cookies, cookies)
+
+    def test_vm_statistics_params(self):
+        self.client.networks.get_vm_statistics('bbb',
+                                               {'resource': 'fip_stats_list',
+                                                'virtual_network': 'ccc'})
+
+        call_args = self.get.call_args_list[0][0]
+        call_kwargs = self.get.call_args_list[0][1]
+
+        expected_url = ('http://127.0.0.1:8081/analytics/'
+                        'uves/virtual-machine/bbb')
+        self.assertEqual(expected_url, call_args[0])
+
+        data = call_kwargs.get('data')
+
+        expected_data = {'arg1': 'aaa',
+                         'resource': 'fip_stats_list',
+                         'virtual_network': 'ccc'}
+        self.assertEqual(expected_data, data)
