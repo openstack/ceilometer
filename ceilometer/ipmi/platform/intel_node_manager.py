@@ -48,12 +48,18 @@ IPMICMD = {"sdr_dump": "sdr dump",
            "sdr_info": "sdr info",
            "sensor_dump": "sdr -v"}
 IPMIRAWCMD = {"get_device_id": "raw 0x06 0x01",
+              "get_nm_version": "raw 0x2e 0xca 0x57 0x01 0x00",
               "init_sensor_agent": "raw 0x0a 0x2c 0x01",
               "init_complete": "raw 0x0a 0x2c 0x00",
               "init_sensor_agent_status": "raw 0x0a 0x2c 0x00",
               "read_power_all": "raw 0x2e 0xc8 0x57 0x01 0x00 0x01 0x00 0x00",
-              "read_temperature_all":
-              "raw 0x2e 0xc8 0x57 0x01 0x00 0x02 0x00 0x00"}
+              "read_inlet_temperature":
+              "raw 0x2e 0xc8 0x57 0x01 0x00 0x02 0x00 0x00",
+              "read_outlet_temperature":
+              "raw 0x2e 0xc8 0x57 0x01 0x00 0x05 0x00 0x00",
+              "read_airflow": "raw 0x2e 0xc8 0x57 0x01 0x00 0x04 0x00 0x00",
+              "read_cups_utilization": "raw 0x2e 0x65 0x57 0x01 0x00 0x05",
+              "read_cups_index": "raw 0x2e 0x65 0x57 0x01 0x00 0x01"}
 
 MANUFACTURER_ID_INTEL = ['57', '01', '00']
 INTEL_PREFIX = '5701000d01'
@@ -99,6 +105,24 @@ NM_GET_DEVICE_ID_TEMPLATE['Firmware_build_number'] = 1
 NM_GET_DEVICE_ID_TEMPLATE['Last_digit_firmware_build_number'] = 1
 NM_GET_DEVICE_ID_TEMPLATE['Image_flags'] = 1
 
+NM_GET_VERSION_TEMPLATE = collections.OrderedDict()
+NM_GET_VERSION_TEMPLATE['Manufacturer_ID'] = 3
+NM_GET_VERSION_TEMPLATE['NM_Version'] = 1
+NM_GET_VERSION_TEMPLATE['IPMI_Version'] = 1
+NM_GET_VERSION_TEMPLATE['Patch_Version'] = 1
+NM_GET_VERSION_TEMPLATE['Firmware_Revision_Major'] = 1
+NM_GET_VERSION_TEMPLATE['Firmware_Revision_Minor'] = 1
+
+NM_CUPS_UTILIZATION_TEMPLATE = collections.OrderedDict()
+NM_CUPS_UTILIZATION_TEMPLATE['Manufacturer_ID'] = 3
+NM_CUPS_UTILIZATION_TEMPLATE['CPU_Utilization'] = 8
+NM_CUPS_UTILIZATION_TEMPLATE['Mem_Utilization'] = 8
+NM_CUPS_UTILIZATION_TEMPLATE['IO_Utilization'] = 8
+
+NM_CUPS_INDEX_TEMPLATE = collections.OrderedDict()
+NM_CUPS_INDEX_TEMPLATE['Manufacturer_ID'] = 3
+NM_CUPS_INDEX_TEMPLATE['CUPS_Index'] = 2
+
 
 def _hex(list=None):
     """Format the return value in list into hex."""
@@ -130,11 +154,14 @@ class NodeManager(object):
 
     def __init__(self):
         if not (self._instance and self._inited):
-            self.nm_support = False
-            self.channel_slave = ''
+            # As singleton, only the 1st NM pollster would trigger its
+            # initialization. nm_version indicate init result, and is shared
+            # across all pollsters
             self._inited = True
+            self.nm_version = 0
+            self.channel_slave = ''
 
-            self.nm_support = self.check_node_manager()
+            self.nm_version = self.check_node_manager()
 
     @staticmethod
     def _parse_slave_and_channel(file_path):
@@ -193,27 +220,69 @@ class NodeManager(object):
         """
         return self.channel_slave + ' ' + IPMIRAWCMD["get_device_id"]
 
+    @ipmitool.execute_ipmi_cmd(NM_GET_VERSION_TEMPLATE)
+    def _node_manager_get_version(self):
+        """GET_NODE_MANAGER_VERSION command in Intel Node Manager
+
+        Byte 4 of the response:
+        01h - Intel NM 1.0
+        02h - Intel NM 1.5
+        03h - Intel NM 2.0
+        04h - Intel NM 2.5
+        05h - Intel NM 3.0
+        """
+        return self.channel_slave + ' ' + IPMIRAWCMD["get_nm_version"]
+
     @ipmitool.execute_ipmi_cmd(NM_STATISTICS_TEMPLATE)
     def _read_power_all(self):
         """Get the power consumption of the whole platform."""
         return self.channel_slave + ' ' + IPMIRAWCMD['read_power_all']
 
     @ipmitool.execute_ipmi_cmd(NM_STATISTICS_TEMPLATE)
-    def _read_temperature_all(self):
-        """Get the temperature info of the whole platform."""
-        return self.channel_slave + ' ' + IPMIRAWCMD['read_temperature_all']
+    def _read_inlet_temperature(self):
+        """Get the inlet temperature info of the whole platform."""
+        return self.channel_slave + ' ' + IPMIRAWCMD['read_inlet_temperature']
+
+    @ipmitool.execute_ipmi_cmd(NM_STATISTICS_TEMPLATE)
+    def _read_outlet_temperature(self):
+        """Get the outlet temperature info of the whole platform."""
+        return self.channel_slave + ' ' + IPMIRAWCMD['read_outlet_temperature']
+
+    @ipmitool.execute_ipmi_cmd(NM_STATISTICS_TEMPLATE)
+    def _read_airflow(self):
+        """Get the volumetric airflow of the whole platform."""
+        return self.channel_slave + ' ' + IPMIRAWCMD['read_airflow']
+
+    @ipmitool.execute_ipmi_cmd(NM_CUPS_UTILIZATION_TEMPLATE)
+    def _read_cups_utilization(self):
+        """Get the average CUPS utilization of the whole platform."""
+        return self.channel_slave + ' ' + IPMIRAWCMD['read_cups_utilization']
+
+    @ipmitool.execute_ipmi_cmd(NM_CUPS_INDEX_TEMPLATE)
+    def _read_cups_index(self):
+        """Get the CUPS Index of the whole platform."""
+        return self.channel_slave + ' ' + IPMIRAWCMD['read_cups_index']
 
     def read_power_all(self):
-        if self.nm_support:
-            return self._read_power_all()
+        return self._read_power_all() if self.nm_version > 0 else {}
 
-        return {}
+    def read_inlet_temperature(self):
+        return self._read_inlet_temperature() if self.nm_version > 0 else {}
 
-    def read_temperature_all(self):
-        if self.nm_support:
-            return self._read_temperature_all()
+    def read_outlet_temperature(self):
+        return self._read_outlet_temperature() if self.nm_version >= 5 else {}
 
-        return {}
+    def read_airflow(self):
+        # only available after NM 3.0
+        return self._read_airflow() if self.nm_version >= 5 else {}
+
+    def read_cups_utilization(self):
+        # only available after NM 3.0
+        return self._read_cups_utilization() if self.nm_version >= 5 else {}
+
+    def read_cups_index(self):
+        # only available after NM 3.0
+        return self._read_cups_index() if self.nm_version >= 5 else {}
 
     def init_node_manager(self):
         if self._init_sensor_agent_process()['ret'] == ['01']:
@@ -237,26 +306,26 @@ class NodeManager(object):
         # String of channel and slave_address
         self.channel_slave = '-b ' + channel + ' -t ' + slave_address
 
-    def node_manager_support(self):
+    def node_manager_version(self):
         """Intel Node Manager capability checking
 
-        This function is used to detect if compute node support Intel
-        Node Manager or not and parse out the slave address and channel
-        number of node manager.
+        This function is used to detect if compute node support Intel Node
+        Manager(return version number) or not(return -1) and parse out the
+        slave address and channel number of node manager.
         """
         self.manufacturer_id = self.get_device_id()['Manufacturer_ID']
         if MANUFACTURER_ID_INTEL != self.manufacturer_id:
             # If the manufacturer is not Intel, just set False and return.
-            return False
+            return 0
 
         self.discover_slave_channel()
         support = self._node_manager_get_device_id()['Implemented_firmware']
         # According to Intel Node Manager spec, return value of GET_DEVICE_ID,
         # bits 3 to 0 shows if Intel NM implemented or not.
-        if int(support[0], 16) & 0xf != 0:
-            return True
-        else:
-            return False
+        if int(support[0], 16) & 0xf == 0:
+            return 0
+
+        return _hex(self._node_manager_get_version()['NM_Version'])
 
     def check_node_manager(self):
         """Intel Node Manager init and check
@@ -267,7 +336,7 @@ class NodeManager(object):
         """
         try:
             self.init_node_manager()
-            has_nm = self.node_manager_support()
+            nm_version = self.node_manager_version()
         except (nmexcept.NodeManagerException, nmexcept.IPMIException):
-            return False
-        return has_nm
+            return 0
+        return nm_version

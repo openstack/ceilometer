@@ -332,12 +332,20 @@ read_sensor_fan_cmd = 'ipmitoolsdr-vtypeFan'
 
 device_id_cmd = 'ipmitoolraw0x060x01'
 nm_device_id_cmd = 'ipmitool-b0x6-t0x2craw0x060x01'
+nm_version_cmd = 'ipmitool-b0x6-t0x2craw0x2e0xca0x570x010x00'
 get_power_cmd = 'ipmitool-b0x6-t0x2craw0x2e0xc80x570x010x000x010x000x00'
-get_temperature_cmd = 'ipmitool-b0x6-t0x2craw0x2e0xc80x570x010x000x020x000x00'
+get_inlet_temp_cmd = 'ipmitool-b0x6-t0x2craw0x2e0xc80x570x010x000x020x000x00'
+get_outlet_temp_cmd = 'ipmitool-b0x6-t0x2craw0x2e0xc80x570x010x000x050x000x00'
+get_airflow_cmd = 'ipmitool-b0x6-t0x2craw0x2e0xc80x570x010x000x040x000x00'
+get_cups_index_cmd = 'ipmitool-b0x6-t0x2craw0x2e0x650x570x010x000x01'
+get_cups_util_cmd = 'ipmitool-b0x6-t0x2craw0x2e0x650x570x010x000x05'
 
 
 device_id = (' 21 01 01 04 02 bf 57 01 00 49 00 01 07 50 0b', '')
 nm_device_id = (' 50 01 02 15 02 21 57 01 00 02 0b 02 09 10 01', '')
+
+nm_version_v2 = (' 57 01 00 03 02 00 02 15', '')
+nm_version_v3 = (' 57 01 00 05 03 00 03 06', '')
 
 # start from byte 3, get cur- 57 00(87), min- 03 00(3)
 # max- 37 02(567), avg- 5c 00(92)
@@ -346,8 +354,26 @@ power_data = (' 57 01 00 57 00 03 00 37 02 5c 00 cc 37 f4 53 ce\n'
 
 # start from byte 3, get cur- 17 00(23), min- 16 00(22)
 # max- 18 00(24), avg- 17 00(23)
-temperature_data = (' 57 01 00 17 00 16 00 18 00 17 00 f3 6f fe 53 85\n'
-                    ' b7 02 00 50\n', '')
+inlet_temperature_data = (' 57 01 00 17 00 16 00 18 00 17 00 f3 6f fe 53 85\n'
+                          ' b7 02 00 50\n', '')
+
+# start from byte 3, get cur- 19 00(25), min- 18 00(24)
+# max- 1b 00(27), avg- 19 00(25)
+outlet_temperature_data = (' 57 01 00 19 00 18 00 1b 00 19 00 f3 6f fe 53 85\n'
+                           ' b7 02 00 50\n', '')
+
+# start from byte 3, get cur- be 00(190), min- 96 00(150)
+# max- 26 02(550), avg- cb 00(203)
+airflow_data = (' 57 01 00 be 00 96 00 26 02 cb 00 e1 65 c1 54 db\n'
+                ' b7 02 00 50\n', '')
+
+# start from byte 3, cups index 2e 00 (46)
+cups_index_data = (' 57 01 00 2e 00\n', '')
+
+# start from byte 3, get cup_util - 33 00 ...(51), mem_util - 05 00 ...(5)
+# io_util - 00 00 ...(0)
+cups_util_data = (' 57 01 00 33 00 00 00 00 00 00 00 05 00 00 00 00\n'
+                  ' 00 00 00 00 00 00 00 00 00 00 00\n', '')
 
 sdr_info = ('', '')
 

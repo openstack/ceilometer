@@ -31,6 +31,14 @@ def init_sensor_agent(parameter=''):
     return (' 00\n', '')
 
 
+def get_nm_version_v2(parameter=''):
+    return test_data.nm_version_v2
+
+
+def get_nm_version_v3(parameter=''):
+    return test_data.nm_version_v3
+
+
 def sdr_dump(data_file=''):
     if data_file == '':
         raise ValueError("No file specified for ipmitool sdr dump")
@@ -50,7 +58,11 @@ def _execute(funcs, *cmd, **kwargs):
         test_data.device_id_cmd: test_data.device_id,
         test_data.nm_device_id_cmd: test_data.nm_device_id,
         test_data.get_power_cmd: test_data.power_data,
-        test_data.get_temperature_cmd: test_data.temperature_data,
+        test_data.get_inlet_temp_cmd: test_data.inlet_temperature_data,
+        test_data.get_outlet_temp_cmd: test_data.outlet_temperature_data,
+        test_data.get_airflow_cmd: test_data.airflow_data,
+        test_data.get_cups_index_cmd: test_data.cups_index_data,
+        test_data.get_cups_util_cmd: test_data.cups_util_data,
         test_data.sdr_info_cmd: test_data.sdr_info,
         test_data.read_sensor_temperature_cmd: test_data.sensor_temperature,
         test_data.read_sensor_voltage_cmd: test_data.sensor_voltage,
@@ -72,12 +84,24 @@ def _execute(funcs, *cmd, **kwargs):
         return funcs[cmd_str](par_str)
 
 
-def execute_with_nm(*cmd, **kwargs):
-    """test version of execute on Node Manager platform."""
+def execute_with_nm_v3(*cmd, **kwargs):
+    """test version of execute on Node Manager V3.0 platform."""
 
     funcs = {test_data.sensor_status_cmd: get_sensor_status_init,
              test_data.init_sensor_cmd: init_sensor_agent,
-             test_data.sdr_dump_cmd: sdr_dump}
+             test_data.sdr_dump_cmd: sdr_dump,
+             test_data.nm_version_cmd: get_nm_version_v3}
+
+    return _execute(funcs, *cmd, **kwargs)
+
+
+def execute_with_nm_v2(*cmd, **kwargs):
+    """test version of execute on Node Manager V2.0 platform."""
+
+    funcs = {test_data.sensor_status_cmd: get_sensor_status_init,
+             test_data.init_sensor_cmd: init_sensor_agent,
+             test_data.sdr_dump_cmd: sdr_dump,
+             test_data.nm_version_cmd: get_nm_version_v2}
 
     return _execute(funcs, *cmd, **kwargs)
 

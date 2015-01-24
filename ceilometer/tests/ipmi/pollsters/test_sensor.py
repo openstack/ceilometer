@@ -49,10 +49,6 @@ class TestTemperatureSensorPollster(base.TestPollsterBase):
     def fake_sensor_data(self, sensor_type):
         return TEMPERATURE_SENSOR_DATA
 
-    def fake_data(self):
-        # No use for Sensor test
-        return None
-
     def make_pollster(self):
         return sensor.TemperatureSensorPollster()
 
@@ -68,10 +64,6 @@ class TestMissingSensorData(base.TestPollsterBase):
     def fake_sensor_data(self, sensor_type):
         return MISSING_SENSOR_DATA
 
-    def fake_data(self):
-        # No use for Sensor test
-        return None
-
     def make_pollster(self):
         return sensor.TemperatureSensorPollster()
 
@@ -85,10 +77,6 @@ class TestMalformedSensorData(base.TestPollsterBase):
 
     def fake_sensor_data(self, sensor_type):
         return MALFORMED_SENSOR_DATA
-
-    def fake_data(self):
-        # No use for Sensor test
-        return None
 
     def make_pollster(self):
         return sensor.TemperatureSensorPollster()
@@ -104,10 +92,6 @@ class TestMissingSensorId(base.TestPollsterBase):
     def fake_sensor_data(self, sensor_type):
         return MISSING_ID_SENSOR_DATA
 
-    def fake_data(self):
-        # No use for Sensor test
-        return None
-
     def make_pollster(self):
         return sensor.TemperatureSensorPollster()
 
@@ -121,10 +105,6 @@ class TestFanSensorPollster(base.TestPollsterBase):
 
     def fake_sensor_data(self, sensor_type):
         return FAN_SENSOR_DATA
-
-    def fake_data(self):
-        # No use for Sensor test
-        return None
 
     def make_pollster(self):
         return sensor.FanSensorPollster()
@@ -141,10 +121,6 @@ class TestCurrentSensorPollster(base.TestPollsterBase):
     def fake_sensor_data(self, sensor_type):
         return CURRENT_SENSOR_DATA
 
-    def fake_data(self):
-        # No use for Sensor test
-        return None
-
     def make_pollster(self):
         return sensor.CurrentSensorPollster()
 
@@ -159,10 +135,6 @@ class TestVoltageSensorPollster(base.TestPollsterBase):
 
     def fake_sensor_data(self, sensor_type):
         return VOLTAGE_SENSOR_DATA
-
-    def fake_data(self):
-        # No use for Sensor test
-        return None
 
     def make_pollster(self):
         return sensor.VoltageSensorPollster()

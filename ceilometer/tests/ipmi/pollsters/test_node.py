@@ -29,10 +29,6 @@ class TestPowerPollster(base.TestPollsterBase):
         # data after parsing Intel Node Manager output
         return {"Current_value": ['13', '00']}
 
-    def fake_sensor_data(self, sensor_type):
-        # No use for this test
-        return None
-
     def make_pollster(self):
         return node.PowerPollster()
 
@@ -44,18 +40,14 @@ class TestPowerPollster(base.TestPollsterBase):
         self._verify_metering(1, 19, CONF.host)
 
 
-class TestTemperaturePollster(base.TestPollsterBase):
+class TestInletTemperaturePollster(base.TestPollsterBase):
 
     def fake_data(self):
         # data after parsing Intel Node Manager output
         return {"Current_value": ['23', '00']}
 
-    def fake_sensor_data(self, sensor_type):
-        # No use for this test
-        return None
-
     def make_pollster(self):
-        return node.TemperaturePollster()
+        return node.InletTemperaturePollster()
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
@@ -63,3 +55,108 @@ class TestTemperaturePollster(base.TestPollsterBase):
 
         # only one sample, and value is 35(0x23 as current_value)
         self._verify_metering(1, 35, CONF.host)
+
+
+class TestOutletTemperaturePollster(base.TestPollsterBase):
+
+    def fake_data(self):
+        # data after parsing Intel Node Manager output
+        return {"Current_value": ['25', '00']}
+
+    def make_pollster(self):
+        return node.OutletTemperaturePollster()
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def test_get_samples(self):
+        self._test_get_samples()
+
+        # only one sample, and value is 37(0x25 as current_value)
+        self._verify_metering(1, 37, CONF.host)
+
+
+class TestAirflowPollster(base.TestPollsterBase):
+
+    def fake_data(self):
+        # data after parsing Intel Node Manager output
+        return {"Current_value": ['be', '00']}
+
+    def make_pollster(self):
+        return node.AirflowPollster()
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def test_get_samples(self):
+        self._test_get_samples()
+
+        # only one sample, and value is 190(0xbe as current_value)
+        self._verify_metering(1, 190, CONF.host)
+
+
+class TestCUPSIndexPollster(base.TestPollsterBase):
+
+    def fake_data(self):
+        # data after parsing Intel Node Manager output
+        return {"CUPS_Index": ['2e', '00']}
+
+    def make_pollster(self):
+        return node.CUPSIndexPollster()
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def test_get_samples(self):
+        self._test_get_samples()
+
+        # only one sample, and value is 190(0xbe)
+        self._verify_metering(1, 46, CONF.host)
+
+
+class CPUUtilPollster(base.TestPollsterBase):
+
+    def fake_data(self):
+        # data after parsing Intel Node Manager output
+        return {"CPU_Utilization":
+                ['33', '00', '00', '00', '00', '00', '00', '00']}
+
+    def make_pollster(self):
+        return node.CPUUtilPollster()
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def test_get_samples(self):
+        self._test_get_samples()
+
+        # only one sample, and value is 190(0xbe)
+        self._verify_metering(1, 51, CONF.host)
+
+
+class MemUtilPollster(base.TestPollsterBase):
+
+    def fake_data(self):
+        # data after parsing Intel Node Manager output
+        return {"Mem_Utilization":
+                ['05', '00', '00', '00', '00', '00', '00', '00']}
+
+    def make_pollster(self):
+        return node.MemUtilPollster()
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def test_get_samples(self):
+        self._test_get_samples()
+
+        # only one sample, and value is 5(0x05)
+        self._verify_metering(1, 5, CONF.host)
+
+
+class IOUtilPollster(base.TestPollsterBase):
+
+    def fake_data(self):
+        # data after parsing Intel Node Manager output
+        return {"IO_Utilization":
+                ['00', '00', '00', '00', '00', '00', '00', '00']}
+
+    def make_pollster(self):
+        return node.IOUtilPollster()
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def test_get_samples(self):
+        self._test_get_samples()
+
+        # only one sample, and value is 0(0x00)
+        self._verify_metering(1, 0, CONF.host)

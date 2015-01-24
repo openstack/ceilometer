@@ -42,21 +42,25 @@ class _Base(plugin_base.PollsterBase):
         self.polling_failures = 0
 
         # Do not load this extension if no NM support
-        if not self.nodemanager.nm_support:
+        if self.nodemanager.nm_version == 0:
             raise plugin_base.ExtensionLoadError()
 
     @property
     def default_discovery(self):
         return 'local_node'
 
+    def get_value(self, stats):
+        """Get value from statistics."""
+        return node_manager._hex(stats["Current_value"])
+
     @abc.abstractmethod
-    def read_data(self):
+    def read_data(self, cache):
         """Return data sample for IPMI."""
 
     def get_samples(self, manager, cache, resources):
         # Only one resource for Node Manager pollster
         try:
-            stats = self.read_data()
+            stats = self.read_data(cache)
         except nmexcept.IPMIException:
             self.polling_failures += 1
             LOG.warning(_('Polling %(name)s faild for %(cnt)s times!')
@@ -76,7 +80,7 @@ class _Base(plugin_base.PollsterBase):
         }
 
         if stats:
-            data = node_manager._hex(stats["Current_value"])
+            data = self.get_value(stats)
 
             yield sample.Sample(
                 name=self.NAME,
@@ -90,13 +94,22 @@ class _Base(plugin_base.PollsterBase):
                 resource_metadata=metadata)
 
 
-class TemperaturePollster(_Base):
-    NAME = "hardware.ipmi.node.temperature"
+class InletTemperaturePollster(_Base):
+    NAME = "hardware.ipmi.node.inlet_temperature"
     TYPE = sample.TYPE_GAUGE
     UNIT = "C"
 
-    def read_data(self):
-        return self.nodemanager.read_temperature_all()
+    def read_data(self, cache):
+        return self.nodemanager.read_inlet_temperature()
+
+
+class OutletTemperaturePollster(_Base):
+    NAME = "hardware.ipmi.node.outlet_temperature"
+    TYPE = sample.TYPE_GAUGE
+    UNIT = "C"
+
+    def read_data(self, cache):
+        return self.nodemanager.read_outlet_temperature()
 
 
 class PowerPollster(_Base):
@@ -104,5 +117,63 @@ class PowerPollster(_Base):
     TYPE = sample.TYPE_GAUGE
     UNIT = "W"
 
-    def read_data(self):
+    def read_data(self, cache):
         return self.nodemanager.read_power_all()
+
+
+class AirflowPollster(_Base):
+    NAME = "hardware.ipmi.node.airflow"
+    TYPE = sample.TYPE_GAUGE
+    UNIT = "CFM"
+
+    def read_data(self, cache):
+        return self.nodemanager.read_airflow()
+
+
+class CUPSIndexPollster(_Base):
+    NAME = "hardware.ipmi.node.cups"
+    TYPE = sample.TYPE_GAUGE
+    UNIT = "CUPS"
+
+    def read_data(self, cache):
+        return self.nodemanager.read_cups_index()
+
+    def get_value(self, stats):
+        return node_manager._hex(stats["CUPS_Index"])
+
+
+class _CUPSUtilPollsterBase(_Base):
+    CACHE_KEY_CUPS = 'CUPS'
+
+    def read_data(self, cache):
+        i_cache = cache.setdefault(self.CACHE_KEY_CUPS, {})
+        if not i_cache:
+            i_cache.update(self.nodemanager.read_cups_utilization())
+        return i_cache
+
+
+class CPUUtilPollster(_CUPSUtilPollsterBase):
+    NAME = "hardware.ipmi.node.cpu_util"
+    TYPE = sample.TYPE_GAUGE
+    UNIT = "%"
+
+    def get_value(self, stats):
+        return node_manager._hex(stats["CPU_Utilization"])
+
+
+class MemUtilPollster(_CUPSUtilPollsterBase):
+    NAME = "hardware.ipmi.node.mem_util"
+    TYPE = sample.TYPE_GAUGE
+    UNIT = "%"
+
+    def get_value(self, stats):
+        return node_manager._hex(stats["Mem_Utilization"])
+
+
+class IOUtilPollster(_CUPSUtilPollsterBase):
+    NAME = "hardware.ipmi.node.io_util"
+    TYPE = sample.TYPE_GAUGE
+    UNIT = "%"
+
+    def get_value(self, stats):
+        return node_manager._hex(stats["IO_Utilization"])

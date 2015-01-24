@@ -97,7 +97,7 @@ def _parse_output(output, template):
     if "translate" in template:
         ret = _translate_output(output)
     else:
-        output_list = output.strip().split(' ')
+        output_list = output.strip().replace('\n', '').split(' ')
         if sum(template.values()) != len(output_list):
             raise ipmiexcept.IPMIException(_("ipmitool output "
                                              "length mismatch"))

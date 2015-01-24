@@ -12,7 +12,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import abc
 import mock
+import six
 
 from ceilometer.ipmi.platform import intel_node_manager as node_manager
 from ceilometer.tests.ipmi.platform import fake_utils
@@ -21,19 +23,83 @@ from ceilometer import utils
 from oslotest import base
 
 
-class TestNodeManager(base.BaseTestCase):
+@six.add_metaclass(abc.ABCMeta)
+class _Base(base.BaseTestCase):
+
+    @abc.abstractmethod
+    def init_test_engine(self):
+        """Prepare specific ipmitool as engine for different NM version."""
 
     def setUp(self):
-        super(TestNodeManager, self).setUp()
-
-        utils.execute = mock.Mock(side_effect=fake_utils.execute_with_nm)
+        super(_Base, self).setUp()
+        self.init_test_engine()
         self.nm = node_manager.NodeManager()
 
     @classmethod
     def tearDownClass(cls):
         # reset inited to force an initialization of singleton for next test
         node_manager.NodeManager()._inited = False
-        super(TestNodeManager, cls).tearDownClass()
+        super(_Base, cls).tearDownClass()
+
+
+class TestNodeManagerV3(_Base):
+
+    def init_test_engine(self):
+        utils.execute = mock.Mock(side_effect=fake_utils.execute_with_nm_v3)
+
+    def test_read_airflow(self):
+        airflow = self.nm.read_airflow()
+        avg_val = node_manager._hex(airflow["Average_value"])
+        max_val = node_manager._hex(airflow["Maximum_value"])
+        min_val = node_manager._hex(airflow["Minimum_value"])
+        cur_val = node_manager._hex(airflow["Current_value"])
+
+        # get NM 3.0
+        self.assertEqual(5, self.nm.nm_version)
+
+        # see ipmi_test_data.py for raw data
+        self.assertEqual(190, cur_val)
+        self.assertEqual(150, min_val)
+        self.assertEqual(550, max_val)
+        self.assertEqual(203, avg_val)
+
+    def test_read_outlet_temperature(self):
+        temperature = self.nm.read_outlet_temperature()
+        avg_val = node_manager._hex(temperature["Average_value"])
+        max_val = node_manager._hex(temperature["Maximum_value"])
+        min_val = node_manager._hex(temperature["Minimum_value"])
+        cur_val = node_manager._hex(temperature["Current_value"])
+
+        # get NM 3.0
+        self.assertEqual(5, self.nm.nm_version)
+
+        # see ipmi_test_data.py for raw data
+        self.assertEqual(25, cur_val)
+        self.assertEqual(24, min_val)
+        self.assertEqual(27, max_val)
+        self.assertEqual(25, avg_val)
+
+    def test_read_cups_utilization(self):
+        cups_util = self.nm.read_cups_utilization()
+        cpu_util = node_manager._hex(cups_util["CPU_Utilization"])
+        mem_util = node_manager._hex(cups_util["Mem_Utilization"])
+        io_util = node_manager._hex(cups_util["IO_Utilization"])
+
+        # see ipmi_test_data.py for raw data
+        self.assertEqual(51, cpu_util)
+        self.assertEqual(5, mem_util)
+        self.assertEqual(0, io_util)
+
+    def test_read_cups_index(self):
+        cups_index = self.nm.read_cups_index()
+        index = node_manager._hex(cups_index["CUPS_Index"])
+        self.assertEqual(46, index)
+
+
+class TestNodeManager(_Base):
+
+    def init_test_engine(self):
+        utils.execute = mock.Mock(side_effect=fake_utils.execute_with_nm_v2)
 
     def test_read_power_all(self):
         power = self.nm.read_power_all()
@@ -43,15 +109,16 @@ class TestNodeManager(base.BaseTestCase):
         min_val = node_manager._hex(power["Minimum_value"])
         cur_val = node_manager._hex(power["Current_value"])
 
-        self.assertTrue(self.nm.nm_support)
+        # get NM 2.0
+        self.assertEqual(3, self.nm.nm_version)
         # see ipmi_test_data.py for raw data
         self.assertEqual(87, cur_val)
         self.assertEqual(3, min_val)
         self.assertEqual(567, max_val)
         self.assertEqual(92, avg_val)
 
-    def test_read_temperature_all(self):
-        temperature = self.nm.read_temperature_all()
+    def test_read_inlet_temperature(self):
+        temperature = self.nm.read_inlet_temperature()
 
         avg_val = node_manager._hex(temperature["Average_value"])
         max_val = node_manager._hex(temperature["Maximum_value"])
@@ -64,30 +131,38 @@ class TestNodeManager(base.BaseTestCase):
         self.assertEqual(24, max_val)
         self.assertEqual(23, avg_val)
 
+    def test_read_airflow(self):
+        airflow = self.nm.read_airflow()
+        self.assertEqual({}, airflow)
 
-class TestNonNodeManager(base.BaseTestCase):
+    def test_read_outlet_temperature(self):
+        temperature = self.nm.read_outlet_temperature()
+        self.assertEqual({}, temperature)
 
-    def setUp(self):
-        super(TestNonNodeManager, self).setUp()
+    def test_read_cups_utilization(self):
+        cups_util = self.nm.read_cups_utilization()
+        self.assertEqual({}, cups_util)
 
+    def test_read_cups_index(self):
+        cups_index = self.nm.read_cups_index()
+        self.assertEqual({}, cups_index)
+
+
+class TestNonNodeManager(_Base):
+
+    def init_test_engine(self):
         utils.execute = mock.Mock(side_effect=fake_utils.execute_without_nm)
-        self.nm = node_manager.NodeManager()
-
-    @classmethod
-    def tearDownClass(cls):
-        # reset inited to force an initialization of singleton for next test
-        node_manager.NodeManager()._inited = False
-        super(TestNonNodeManager, cls).tearDownClass()
 
     def test_read_power_all(self):
+        # no NM support
+        self.assertEqual(0, self.nm.nm_version)
         power = self.nm.read_power_all()
 
-        self.assertFalse(self.nm.nm_support)
         # Non-Node Manager platform return empty data
         self.assertEqual({}, power)
 
-    def test_read_temperature_all(self):
-        temperature = self.nm.read_temperature_all()
+    def test_read_inlet_temperature(self):
+        temperature = self.nm.read_inlet_temperature()
 
         # Non-Node Manager platform return empty data
         self.assertEqual({}, temperature)
