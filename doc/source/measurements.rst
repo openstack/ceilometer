@@ -70,37 +70,37 @@ Name                             Type*  Unit       Resource  Origin**  Support**
 ===============================  =====  =========  ========  ========  =============  ==================================================================
 instance                         g      instance   inst ID   both      1, 2, 3, 4     Existence of instance
 instance:<type>                  g      instance   inst ID   both      1, 2, 3, 4     Existence of instance <type> (openstack types)
-memory                           g      MB         inst ID   n         1, 2           Volume of RAM allocated in MB
-memory.usage                     g      MB         inst ID   p         1, 3, 4        Volume of RAM used in MB
+memory                           g      MB         inst ID   n         1, 2           Volume of RAM allocated
+memory.usage                     g      MB         inst ID   p         1, 3, 4        Volume of RAM used
 cpu                              c      ns         inst ID   p         1, 2           CPU time used
 cpu_util                         g      %          inst ID   p         1, 2, 3, 4     Average CPU utilisation
 vcpus                            g      vcpu       inst ID   n         1, 2           Number of VCPUs
 disk.read.requests               c      request    inst ID   p         1, 2           Number of read requests
-disk.read.requests.rate          g      request/s  inst ID   p         1, 2, 3        Average rate of read requests per second
+disk.read.requests.rate          g      request/s  inst ID   p         1, 2, 3        Average rate of reads
 disk.write.requests              c      request    inst ID   p         1, 2           Number of write requests
-disk.write.requests.rate         g      request/s  inst ID   p         1, 2, 3        Average rate of write requests per second
-disk.read.bytes                  c      B          inst ID   p         1, 2           Volume of reads in B
-disk.read.bytes.rate             g      B/s        inst ID   p         1, 2, 3, 4     Average rate of reads in B per second
-disk.write.bytes                 c      B          inst ID   p         1, 2           Volume of writes in B
-disk.write.bytes.rate            g      B/s        inst ID   p         1, 2, 3, 4     Average volume of writes in B per second
-disk.device.read.requests        c      request    disk ID   p         1, 2           Number of read requests per device
-disk.device.read.requests.rate   g      request/s  disk ID   p         1, 2, 3        Average rate of read requests per second per device
-disk.device.write.requests       c      request    disk ID   p         1, 2           Number of write requests per device
-disk.device.write.requests.rate  g      request/s  disk ID   p         1, 2, 3        Average rate of write requests per second per device
-disk.device.read.bytes           c      B          disk ID   p         1, 2           Volume of reads in B per device
-disk.device.read.bytes.rate      g      B/s        disk ID   p         1, 2, 3        Average rate of reads in B per second per device
-disk.device.write.bytes          c      B          disk ID   p         1, 2           Volume of writes in B per device
-disk.device.write.bytes.rate     g      B/s        disk ID   p         1, 2, 3        Average volume of writes in B per second per device
-disk.root.size                   g      GB         inst ID   n         1, 2           Size of root disk in GB
-disk.ephemeral.size              g      GB         inst ID   n         1, 2           Size of ephemeral disk in GB
-network.incoming.bytes           c      B          iface ID  p         1, 2           Number of incoming bytes on a VM network interface
-network.incoming.bytes.rate      g      B/s        iface ID  p         1, 2, 3, 4     Average rate per sec of incoming bytes on a VM network interface
-network.outgoing.bytes           c      B          iface ID  p         1, 2           Number of outgoing bytes on a VM network interface
-network.outgoing.bytes.rate      g      B/s        iface ID  p         1, 2, 3, 4     Average rate per sec of outgoing bytes on a VM network interface
-network.incoming.packets         c      packet     iface ID  p         1, 2           Number of incoming packets on a VM network interface
-network.incoming.packets.rate    g      packet/s   iface ID  p         1, 2, 3, 4     Average rate per sec of incoming packets on a VM network interface
-network.outgoing.packets         c      packet     iface ID  p         1, 2           Number of outgoing packets on a VM network interface
-network.outgoing.packets.rate    g      packet/s   iface ID  p         1, 2, 3, 4     Average rate per sec of outgoing packets on a VM network interface
+disk.write.requests.rate         g      request/s  inst ID   p         1, 2, 3        Average rate of writes
+disk.read.bytes                  c      B          inst ID   p         1, 2           Volume of reads
+disk.read.bytes.rate             g      B/s        inst ID   p         1, 2, 3, 4     Average rate of reads
+disk.write.bytes                 c      B          inst ID   p         1, 2           Volume of writes
+disk.write.bytes.rate            g      B/s        inst ID   p         1, 2, 3, 4     Average volume of writes
+disk.device.read.requests        c      request    disk ID   p         1, 2           Number of read requests
+disk.device.read.requests.rate   g      request/s  disk ID   p         1, 2, 3        Average rate of read requests
+disk.device.write.requests       c      request    disk ID   p         1, 2           Number of write requests
+disk.device.write.requests.rate  g      request/s  disk ID   p         1, 2, 3        Average rate of write requests
+disk.device.read.bytes           c      B          disk ID   p         1, 2           Volume of reads
+disk.device.read.bytes.rate      g      B/s        disk ID   p         1, 2, 3        Average rate of reads
+disk.device.write.bytes          c      B          disk ID   p         1, 2           Volume of writes
+disk.device.write.bytes.rate     g      B/s        disk ID   p         1, 2, 3        Average volume of writes
+disk.root.size                   g      GB         inst ID   n         1, 2           Size of root disk
+disk.ephemeral.size              g      GB         inst ID   n         1, 2           Size of ephemeral disk
+network.incoming.bytes           c      B          iface ID  p         1, 2           Number of incoming bytes
+network.incoming.bytes.rate      g      B/s        iface ID  p         1, 2, 3, 4     Average rate of incoming bytes
+network.outgoing.bytes           c      B          iface ID  p         1, 2           Number of outgoing bytes
+network.outgoing.bytes.rate      g      B/s        iface ID  p         1, 2, 3, 4     Average rate of outgoing bytes
+network.incoming.packets         c      packet     iface ID  p         1, 2           Number of incoming packets
+network.incoming.packets.rate    g      packet/s   iface ID  p         1, 2, 3, 4     Average rate of incoming packets
+network.outgoing.packets         c      packet     iface ID  p         1, 2           Number of outgoing packets
+network.outgoing.packets.rate    g      packet/s   iface ID  p         1, 2, 3, 4     Average rate of outgoing packets
 ===============================  =====  =========  ========  ========  =============  ==================================================================
 
 ::
