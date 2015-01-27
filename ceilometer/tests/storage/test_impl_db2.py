@@ -23,16 +23,16 @@
 
 """
 
+import bson
+import mock
+from oslo_config import cfg
+from oslo_utils import timeutils
+
 from ceilometer.alarm.storage import impl_db2 as impl_db2_alarm
 from ceilometer.event.storage import impl_db2 as impl_db2_event
 from ceilometer.storage import impl_db2
 from ceilometer.storage.mongo import utils as pymongo_utils
 from ceilometer.tests import base as test_base
-
-import bson
-import mock
-from oslo_config import cfg
-from oslo_utils import timeutils
 
 
 class CapabilitiesTest(test_base.BaseTestCase):
