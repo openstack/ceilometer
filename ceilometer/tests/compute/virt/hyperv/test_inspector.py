@@ -114,3 +114,23 @@ class TestHyperVInspection(base.BaseTestCase):
 
         self.assertEqual(fake_read_mb * units.Mi, inspected_stats.read_bytes)
         self.assertEqual(fake_write_mb * units.Mi, inspected_stats.write_bytes)
+
+    def test_inspect_disk_latency(self):
+        fake_instance_name = mock.sentinel.INSTANCE_NAME
+        fake_disk_latency = mock.sentinel.DISK_LATENCY
+        fake_instance_id = mock.sentinel.INSTANCE_ID
+
+        self._inspector._utils.get_disk_latency_metrics.return_value = [{
+            'disk_latency': fake_disk_latency,
+            'instance_id': fake_instance_id}]
+
+        inspected_disks = list(self._inspector.inspect_disk_latency(
+            fake_instance_name))
+
+        self.assertEqual(1, len(inspected_disks))
+        self.assertEqual(2, len(inspected_disks[0]))
+
+        inspected_disk, inspected_stats = inspected_disks[0]
+
+        self.assertEqual(fake_instance_id, inspected_disk.device)
+        self.assertEqual(fake_disk_latency, inspected_stats.disk_latency)

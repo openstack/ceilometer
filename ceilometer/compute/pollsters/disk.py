@@ -42,6 +42,10 @@ DiskRateData = collections.namedtuple('DiskRateData',
                                        'write_requests_rate',
                                        'per_disk_rate'])
 
+DiskLatencyData = collections.namedtuple('DiskLatencyData',
+                                         ['disk_latency',
+                                          'per_disk_latency'])
+
 
 @six.add_metaclass(abc.ABCMeta)
 class _Base(pollsters.BaseComputePollster):
@@ -461,5 +465,88 @@ class PerDeviceWriteRequestsRatePollster(_DiskRatesPollsterBase):
                 unit='requests/s',
                 volume=value,
                 resource_id="%s-%s" % (instance.id, disk),
+            ))
+        return samples
+
+
+@six.add_metaclass(abc.ABCMeta)
+class _DiskLatencyPollsterBase(pollsters.BaseComputePollster):
+
+    CACHE_KEY_DISK_LATENCY = 'disk-latency'
+
+    def _populate_cache(self, inspector, cache, instance):
+        i_cache = cache.setdefault(self.CACHE_KEY_DISK_LATENCY, {})
+        if instance.id not in i_cache:
+            latency = 0
+            per_device_latency = {}
+            disk_rates = inspector.inspect_disk_latency(instance)
+            for disk, stats in disk_rates:
+                latency += stats.disk_latency
+                per_device_latency[disk.device] = (
+                    stats.disk_latency)
+            per_disk_latency = {
+                'disk_latency': per_device_latency
+            }
+            i_cache[instance.id] = DiskLatencyData(
+                latency,
+                per_disk_latency
+            )
+        return i_cache[instance.id]
+
+    @abc.abstractmethod
+    def _get_samples(self, instance, disk_rates_info):
+        """Return one or more Sample."""
+
+    def get_samples(self, manager, cache, resources):
+        for instance in resources:
+            try:
+                disk_latency_info = self._populate_cache(
+                    self.inspector,
+                    cache,
+                    instance,
+                )
+                for disk_latency in self._get_samples(instance,
+                                                      disk_latency_info):
+                    yield disk_latency
+            except virt_inspector.InstanceNotFoundException as err:
+                # Instance was deleted while getting samples. Ignore it.
+                LOG.debug(_('Exception while getting samples %s'), err)
+            except ceilometer.NotImplementedError:
+                # Selected inspector does not implement this pollster.
+                LOG.debug(_('%(inspector)s does not provide data for '
+                            ' %(pollster)s'),
+                          {'inspector': self.inspector.__class__.__name__,
+                           'pollster': self.__class__.__name__})
+            except Exception as err:
+                instance_name = util.instance_name(instance)
+                LOG.exception(_('Ignoring instance %(name)s: %(error)s'),
+                              {'name': instance_name, 'error': err})
+
+
+class DiskLatencyPollster(_DiskLatencyPollsterBase):
+
+    def _get_samples(self, instance, disk_latency_info):
+        return [util.make_sample_from_instance(
+            instance,
+            name='disk.latency',
+            type=sample.TYPE_GAUGE,
+            unit='ms',
+            volume=disk_latency_info.disk_latency / 1000
+        )]
+
+
+class PerDeviceDiskLatencyPollster(_DiskLatencyPollsterBase):
+
+    def _get_samples(self, instance, disk_latency_info):
+        samples = []
+        for disk, value in six.iteritems(disk_latency_info.per_disk_latency[
+                'disk_latency']):
+            samples.append(util.make_sample_from_instance(
+                instance,
+                name='disk.device.latency',
+                type=sample.TYPE_GAUGE,
+                unit='ms',
+                volume=value / 1000,
+                resource_id="%s-%s" % (instance.id, disk)
             ))
         return samples

@@ -128,6 +128,13 @@ DiskRateStats = collections.namedtuple('DiskRateStats',
                                         'write_bytes_rate',
                                         'write_requests_rate'])
 
+# Named tuple representing disk latency statistics.
+#
+# disk_latency: average disk latency
+#
+DiskLatencyStats = collections.namedtuple('DiskLatencyStats',
+                                          ['disk_latency'])
+
 
 # Exception types
 #
@@ -217,6 +224,14 @@ class Inspector(object):
                inspected
         :return: for each disk, the number of bytes & operations
                  read and written per second, with the error count
+        """
+        raise ceilometer.NotImplementedError
+
+    def inspect_disk_latency(self, instance):
+        """Inspect the disk statistics as rates for an instance.
+
+        :param instance: the target instance
+        :return: for each disk, the average disk latency
         """
         raise ceilometer.NotImplementedError
 
