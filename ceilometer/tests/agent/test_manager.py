@@ -35,8 +35,8 @@ class TestManager(base.BaseTestCase):
 
     def test_load_plugins_pollster_list(self):
         mgr = manager.AgentManager(pollster_list=['disk.*'])
-        # currently we do have 18 disk-related pollsters
-        self.assertEqual(18, len(list(mgr.extensions)))
+        # currently we do have 20 disk-related pollsters
+        self.assertEqual(20, len(list(mgr.extensions)))
 
     def test_load_plugins_no_intersection(self):
         # Let's test nothing will be polled if namespace and pollsters

@@ -90,3 +90,12 @@ class HyperVInspector(virt_inspector.Inspector):
                 disk_latency=disk_metrics['disk_latency'])
 
             yield (disk, stats)
+
+    def inspect_disk_iops(self, instance):
+        instance_name = util.instance_name(instance)
+        for disk_metrics in self._utils.get_disk_iops_count(instance_name):
+            disk = virt_inspector.Disk(device=disk_metrics['instance_id'])
+            stats = virt_inspector.DiskIOPSStats(
+                iops_count=disk_metrics['iops_count'])
+
+            yield (disk, stats)

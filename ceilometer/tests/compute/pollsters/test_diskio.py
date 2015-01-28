@@ -318,3 +318,51 @@ class TestDiskLatencyPollsters(TestBaseDiskIO):
 
         self._check_per_device_samples(disk.PerDeviceDiskLatencyPollster,
                                        'disk.device.latency', 2, 'disk2')
+
+
+class TestDiskIOPSPollsters(TestBaseDiskIO):
+
+    DISKS = [
+        (virt_inspector.Disk(device='disk1'),
+         virt_inspector.DiskIOPSStats(10)),
+
+        (virt_inspector.Disk(device='disk2'),
+         virt_inspector.DiskIOPSStats(20)),
+    ]
+    TYPE = 'gauge'
+
+    def setUp(self):
+        super(TestDiskIOPSPollsters, self).setUp()
+        self.inspector.inspect_disk_iops = mock.Mock(return_value=self.DISKS)
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def _check_get_samples(self, factory, sample_name,
+                           expected_count=2):
+        pollster = factory()
+
+        mgr = manager.AgentManager()
+        cache = {}
+        samples = list(pollster.get_samples(mgr, cache, self.instance))
+        self.assertIsNotNone(samples)
+        self.assertIsNotEmpty(samples)
+        self.assertIn(pollster.CACHE_KEY_DISK_IOPS, cache)
+        for instance in self.instance:
+            self.assertIn(instance.id, cache[pollster.CACHE_KEY_DISK_IOPS])
+
+        self.assertEqual(set([sample_name]), set([s.name for s in samples]))
+
+        match = [s for s in samples if s.name == sample_name]
+        self.assertEqual(expected_count, len(match),
+                         'missing counter %s' % sample_name)
+        return match
+
+    def test_disk_iops(self):
+        self._check_aggregate_samples(disk.DiskIOPSPollster,
+                                      'disk.iops', 30L)
+
+    def test_per_device_iops(self):
+        self._check_per_device_samples(disk.PerDeviceDiskIOPSPollster,
+                                       'disk.device.iops', 10L, 'disk1')
+
+        self._check_per_device_samples(disk.PerDeviceDiskIOPSPollster,
+                                       'disk.device.iops', 20L, 'disk2')
