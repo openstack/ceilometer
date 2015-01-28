@@ -2,8 +2,6 @@
 #
 # Copyright 2012 Red Hat, Inc
 #
-# Author: Eoghan Glynn <eglynn@redhat.com>
-#
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
 # a copy of the License at
@@ -34,7 +32,7 @@ class TestLibvirtInspection(base.BaseTestCase):
     def setUp(self):
         super(TestLibvirtInspection, self).setUp()
 
-        class VMInstance:
+        class VMInstance(object):
             id = 'ff58e738-12f4-4c58-acde-77617b68da56'
             name = 'instance-00000001'
         self.instance = VMInstance

@@ -14,7 +14,7 @@ from migrate import ForeignKeyConstraint
 import sqlalchemy as sa
 
 
-class ForeignKeyHandle():
+class ForeignKeyHandle(object):
     def __init__(self, meta):
         sample = sa.Table('sample', meta, autoload=True)
         meter = sa.Table('meter', meta, autoload=True)
