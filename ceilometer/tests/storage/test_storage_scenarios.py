@@ -781,6 +781,34 @@ class ComplexSampleQueryTest(DBTestBase,
             del d['recorded_at']
             self.assertIn(d, self.msgs)
 
+    @tests_db.run_with('mongodb')
+    def test_query_complex_filter_with_regexp(self):
+        self._create_samples()
+        complex_regex_filter = {"and": [
+            {"=~": {"resource_id": "resource-id.*"}},
+            {"=": {"counter_volume": 0.4}}]}
+        results = list(
+            self.conn.query_samples(filter_expr=complex_regex_filter))
+        self.assertEqual(3, len(results))
+        for sample_item in results:
+            self.assertIn(sample_item.resource_id,
+                          set(["resource-id-42",
+                               "resource-id-43",
+                               "resource-id-44"]))
+
+    @tests_db.run_with('mongodb')
+    def test_query_complex_filter_with_regexp_metadata(self):
+        self._create_samples()
+        complex_regex_filter = {"and": [
+            {"=~": {"resource_metadata.a_string_key": "meta-value.*"}},
+            {"=": {"counter_volume": 0.4}}]}
+        results = list(
+            self.conn.query_samples(filter_expr=complex_regex_filter))
+        self.assertEqual(3, len(results))
+        for sample_item in results:
+            self.assertEqual("meta-value0.4",
+                             sample_item.resource_metadata['a_string_key'])
+
     def test_no_filter_with_zero_limit(self):
         limit = 0
         results = list(self.conn.query_samples(limit=limit))
@@ -2939,6 +2967,20 @@ class ComplexAlarmQueryTest(AlarmTestBase,
             self.assertIn(a.name, set(["yellow-alert", "red-alert"]))
             self.assertTrue(a.enabled)
 
+    @tests_db.run_with('mongodb')
+    def test_filter_with_regexp(self):
+        self.add_some_alarms()
+        filter_expr = {"and":
+                       [{"or": [{"=": {"name": "yellow-alert"}},
+                                {"=": {"name": "red-alert"}}]},
+                        {"=~": {"description": "yel.*"}}]}
+
+        result = list(self.alarm_conn.query_alarms(filter_expr=filter_expr))
+
+        self.assertEqual(1, len(result))
+        for a in result:
+            self.assertEqual("yellow", a.description)
+
     def test_filter_for_alarm_id(self):
         self.add_some_alarms()
         filter_expr = {"=": {"alarm_id": "0r4ng3"}}
@@ -3051,6 +3093,15 @@ class ComplexAlarmHistoryQueryTest(AlarmTestBase,
     def test_alarm_history_with_filter(self):
         history = list(
             self.alarm_conn.query_alarm_history(filter_expr=self.filter_expr))
+        self.assertEqual(2, len(history))
+
+    @tests_db.run_with('mongodb')
+    def test_alarm_history_with_regexp(self):
+        filter_expr = {"and":
+                       [{"=~": {"type": "(rule)|(state)"}},
+                        {"=": {"alarm_id": "0r4ng3"}}]}
+        history = list(
+            self.alarm_conn.query_alarm_history(filter_expr=filter_expr))
         self.assertEqual(2, len(history))
 
     def test_alarm_history_with_filter_and_orderby(self):

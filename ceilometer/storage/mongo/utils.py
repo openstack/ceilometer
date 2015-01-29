@@ -275,7 +275,8 @@ class QueryTransformer(object):
                  ">=": "$gte",
                  "=>": "$gte",
                  "!=": "$ne",
-                 "in": "$in"}
+                 "in": "$in",
+                 "=~": "$regex"}
 
     complex_operators = {"or": "$or",
                          "and": "$and"}

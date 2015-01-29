@@ -81,7 +81,7 @@ def _list_to_regexp(items, regexp_prefix=""):
 class ValidatedComplexQuery(object):
     complex_operators = ["and", "or"]
     order_directions = ["asc", "desc"]
-    simple_ops = ["=", "!=", "<", ">", "<=", "=<", ">=", "=>"]
+    simple_ops = ["=", "!=", "<", ">", "<=", "=<", ">=", "=>", "=~"]
     regexp_prefix = "(?i)"
 
     complex_ops = _list_to_regexp(complex_operators, regexp_prefix)
