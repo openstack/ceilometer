@@ -10,7 +10,6 @@ discover
 fixtures>=0.3.14
 httplib2>=0.7.5
 mock>=1.0
-mox>=0.5.3
 MySQL-python
 # Docs Requirements
 oslosphinx>=2.2.0  # Apache-2.0
