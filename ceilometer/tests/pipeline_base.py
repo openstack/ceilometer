@@ -78,7 +78,10 @@ class BasePipelineTestCase(base.BaseTestCase):
         return fake_drivers[url](url)
 
     class PublisherClassException(publisher.PublisherBase):
-        def publish_samples(self, ctxt, counters):
+        def publish_samples(self, ctxt, samples):
+            raise Exception()
+
+        def publish_events(self, ctxt, events):
             raise Exception()
 
     class TransformerClass(transformer.TransformerBase):

@@ -23,6 +23,7 @@ class TestPublisher(publisher.PublisherBase):
 
     def __init__(self, parsed_url):
         self.samples = []
+        self.events = []
         self.calls = 0
 
     def publish_samples(self, context, samples):
@@ -32,4 +33,13 @@ class TestPublisher(publisher.PublisherBase):
         :param samples: Samples from pipeline after transformation
         """
         self.samples.extend(samples)
+        self.calls += 1
+
+    def publish_events(self, context, events):
+        """Send an event message for publishing
+
+        :param context: Execution context from the service or RPC call
+        :param events: events from pipeline after transformation
+        """
+        self.events.extend(events)
         self.calls += 1

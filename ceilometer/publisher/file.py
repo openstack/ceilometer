@@ -18,6 +18,7 @@ import logging.handlers
 
 from six.moves.urllib import parse as urlparse
 
+import ceilometer
 from ceilometer.i18n import _
 from ceilometer.openstack.common import log
 from ceilometer import publisher
@@ -95,3 +96,11 @@ class FilePublisher(publisher.PublisherBase):
         if self.publisher_logger:
             for sample in samples:
                 self.publisher_logger.info(sample.as_dict())
+
+    def publish_events(self, context, events):
+        """Send an event message for publishing
+
+        :param context: Execution context from the service or RPC call
+        :param events: events from pipeline after transformation
+        """
+        raise ceilometer.NotImplementedError

@@ -21,6 +21,7 @@ import msgpack
 from oslo_config import cfg
 from oslo_utils import netutils
 
+import ceilometer
 from ceilometer.i18n import _
 from ceilometer.openstack.common import log
 from ceilometer import publisher
@@ -62,3 +63,11 @@ class UDPPublisher(publisher.PublisherBase):
             except Exception as e:
                 LOG.warn(_("Unable to send sample over UDP"))
                 LOG.exception(e)
+
+    def publish_events(self, context, events):
+        """Send an event message for publishing
+
+        :param context: Execution context from the service or RPC call
+        :param events: events from pipeline after transformation
+        """
+        raise ceilometer.NotImplementedError

@@ -17,6 +17,7 @@
 from oslo.config import cfg
 from oslo.utils import timeutils
 
+import ceilometer
 from ceilometer.dispatcher import database
 from ceilometer import publisher
 from ceilometer.publisher import utils
@@ -51,3 +52,6 @@ class DirectPublisher(publisher.PublisherBase):
                 ts = timeutils.parse_isotime(meter['timestamp'])
                 meter['timestamp'] = timeutils.normalize_time(ts)
             self.meter_conn.record_metering_data(meter)
+
+    def publish_events(self, context, events):
+        raise ceilometer.NotImplementedError

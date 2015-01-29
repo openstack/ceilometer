@@ -34,7 +34,7 @@ def get_publisher(url, namespace='ceilometer.publisher'):
 
 @six.add_metaclass(abc.ABCMeta)
 class PublisherBase(object):
-    """Base class for plugins that publish the sampler."""
+    """Base class for plugins that publish data."""
 
     def __init__(self, parsed_url):
         pass
@@ -42,3 +42,7 @@ class PublisherBase(object):
     @abc.abstractmethod
     def publish_samples(self, context, samples):
         """Publish samples into final conduit."""
+
+    @abc.abstractmethod
+    def publish_events(self, context, events):
+        """Publish events into final conduit."""
