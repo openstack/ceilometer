@@ -39,7 +39,7 @@ class SensorPollster(plugin_base.PollsterBase):
 
     @property
     def default_discovery(self):
-        return None
+        return 'local_node'
 
     @staticmethod
     def _get_sensor_types(data, sensor_type):
