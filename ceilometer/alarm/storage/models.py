@@ -32,6 +32,10 @@ class Alarm(base.Model):
         ALARM_ALARM: 'alarm_actions',
     }
 
+    ALARM_LEVEL_LOW = 'low'
+    ALARM_LEVEL_MODERATE = 'moderate'
+    ALARM_LEVEL_CRITICAL = 'critical'
+
     """
     An alarm to monitor.
 
@@ -56,16 +60,16 @@ class Alarm(base.Model):
                                       entering the insufficient data state
     :param repeat_actions: Is the actions should be triggered on each
                            alarm evaluation.
+    :param severity: Alarm level (low/moderate/critical)
     """
     def __init__(self, alarm_id, type, enabled, name, description,
                  timestamp, user_id, project_id, state, state_timestamp,
                  ok_actions, alarm_actions, insufficient_data_actions,
-                 repeat_actions, rule, time_constraints):
+                 repeat_actions, rule, time_constraints, severity=None):
         if not isinstance(timestamp, datetime.datetime):
             raise TypeError(_("timestamp should be datetime object"))
         if not isinstance(state_timestamp, datetime.datetime):
             raise TypeError(_("state_timestamp should be datetime object"))
-
         base.Model.__init__(
             self,
             alarm_id=alarm_id,
@@ -83,7 +87,8 @@ class Alarm(base.Model):
             insufficient_data_actions=insufficient_data_actions,
             repeat_actions=repeat_actions,
             rule=rule,
-            time_constraints=time_constraints)
+            time_constraints=time_constraints,
+            severity=severity)
 
 
 class AlarmChange(base.Model):
@@ -92,6 +97,7 @@ class AlarmChange(base.Model):
     :param event_id: UUID of the change event
     :param alarm_id: UUID of the alarm
     :param type: The type of change
+    :param severity: The severity of alarm
     :param detail: JSON fragment describing change
     :param user_id: the user ID of the initiating identity
     :param project_id: the project ID of the initiating identity
@@ -113,6 +119,7 @@ class AlarmChange(base.Model):
                  user_id,
                  project_id,
                  on_behalf_of,
+                 severity=None,
                  timestamp=None
                  ):
         base.Model.__init__(
@@ -120,6 +127,7 @@ class AlarmChange(base.Model):
             event_id=event_id,
             alarm_id=alarm_id,
             type=type,
+            severity=severity,
             detail=detail,
             user_id=user_id,
             project_id=project_id,

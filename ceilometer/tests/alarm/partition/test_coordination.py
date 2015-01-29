@@ -121,6 +121,7 @@ class TestCoordinate(tests_base.BaseTestCase):
                             alarm_actions=[],
                             insufficient_data_actions=[],
                             alarm_id=uuid,
+                            severity='critical',
                             time_constraints=[],
                             rule=dict(
                                 statistic='avg',

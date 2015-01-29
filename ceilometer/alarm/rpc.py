@@ -65,6 +65,7 @@ class RPCAlarmNotifier(object):
                              'actions': actions,
                              'alarm_id': alarm.alarm_id,
                              'alarm_name': alarm.name,
+                             'severity': alarm.severity,
                              'previous': previous,
                              'current': alarm.state,
                              'reason': six.text_type(reason),

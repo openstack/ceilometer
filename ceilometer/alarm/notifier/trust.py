@@ -36,7 +36,7 @@ class TrustRestAlarmNotifier(rest.RestAlarmNotifier):
     """
 
     @staticmethod
-    def notify(action, alarm_id, alarm_name, previous, current,
+    def notify(action, alarm_id, alarm_name, severity, previous, current,
                reason, reason_data):
         trust_id = action.username
 
@@ -62,5 +62,5 @@ class TrustRestAlarmNotifier(rest.RestAlarmNotifier):
 
         headers = {'X-Auth-Token': client.auth_token}
         rest.RestAlarmNotifier.notify(
-            action, alarm_id, alarm_name, previous, current, reason,
+            action, alarm_id, alarm_name, severity, previous, current, reason,
             reason_data, headers)

@@ -351,7 +351,8 @@ class TestQueryAlarmsController(tests_api.FunctionalTest,
                                                            'project_id',
                                                            'op': 'eq',
                                                            'value':
-                                                           project_id}]))
+                                                           project_id}]),
+                                         severity='critical')
                     self.alarm_conn.update_alarm(alarm)
 
     def test_query_all(self):

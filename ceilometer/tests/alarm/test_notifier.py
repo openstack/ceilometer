@@ -28,11 +28,12 @@ from ceilometer.tests import base as tests_base
 
 DATA_JSON = jsonutils.loads(
     '{"current": "ALARM", "alarm_id": "foobar", "alarm_name": "testalarm",'
-    ' "reason": "what ?", "reason_data": {"test": "test"},'
-    ' "previous": "OK"}'
+    ' "severity": "critical", "reason": "what ?",'
+    ' "reason_data": {"test": "test"}, "previous": "OK"}'
 )
 NOTIFICATION = dict(alarm_id='foobar',
                     alarm_name='testalarm',
+                    severity='critical',
                     condition=dict(threshold=42),
                     reason='what ?',
                     reason_data={'test': 'test'},
@@ -64,6 +65,7 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
             'actions': ['test://'],
             'alarm_id': 'foobar',
             'alarm_name': 'testalarm',
+            'severity': 'critical',
             'previous': 'OK',
             'current': 'ALARM',
             'reason': 'Everything is on fire',
@@ -75,6 +77,7 @@ class TestAlarmNotifier(tests_base.BaseTestCase):
         self.assertEqual((urlparse.urlsplit(data['actions'][0]),
                           data['alarm_id'],
                           data['alarm_name'],
+                          data['severity'],
                           data['previous'],
                           data['current'],
                           data['reason'],

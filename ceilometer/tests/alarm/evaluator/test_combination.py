@@ -58,7 +58,8 @@ class TestEvaluate(base.TestEvaluatorBase):
                                  '9cfc3e51-2ff1-4b1d-ac01-c1bd4c6d0d1e',
                                  '1d441595-d069-4e05-95ab-8693ba6a8302'],
                              operator='or',
-                         )),
+                         ),
+                         severity='critical'),
             models.Alarm(name='and-alarm',
                          description='the and alarm',
                          type='combination',
@@ -79,7 +80,8 @@ class TestEvaluate(base.TestEvaluatorBase):
                                  'b82734f4-9d06-48f3-8a86-fa59a0c99dc8',
                                  '15a700e5-2fe8-4b3d-8c55-9e92831f6a2b'],
                              operator='and',
-                         ))
+                         ),
+                         severity='critical')
         ]
 
     @staticmethod

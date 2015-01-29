@@ -120,7 +120,7 @@ class Connection(hbase_base.Connection, base.Connection):
 
     def get_alarms(self, name=None, user=None, state=None, meter=None,
                    project=None, enabled=None, alarm_id=None, pagination=None,
-                   alarm_type=None):
+                   alarm_type=None, severity=None):
 
         if pagination:
             raise ceilometer.NotImplementedError('Pagination not implemented')
@@ -131,7 +131,7 @@ class Connection(hbase_base.Connection, base.Connection):
         q = hbase_utils.make_query(alarm_id=alarm_id, name=name,
                                    enabled=enabled, user_id=user,
                                    project_id=project, state=state,
-                                   type=alarm_type)
+                                   type=alarm_type, severity=severity)
 
         with self.conn_pool.connection() as conn:
             alarm_table = conn.table(self.ALARM_TABLE)
@@ -146,11 +146,13 @@ class Connection(hbase_base.Connection, base.Connection):
 
     def get_alarm_changes(self, alarm_id, on_behalf_of,
                           user=None, project=None, alarm_type=None,
-                          start_timestamp=None, start_timestamp_op=None,
-                          end_timestamp=None, end_timestamp_op=None):
+                          severity=None, start_timestamp=None,
+                          start_timestamp_op=None, end_timestamp=None,
+                          end_timestamp_op=None):
         q = hbase_utils.make_query(alarm_id=alarm_id,
                                    on_behalf_of=on_behalf_of, type=alarm_type,
-                                   user_id=user, project_id=project)
+                                   user_id=user, project_id=project,
+                                   severity=severity)
         start_row, end_row = hbase_utils.make_timestamp_query(
             hbase_utils.make_general_rowkey_scan,
             start=start_timestamp, start_op=start_timestamp_op,

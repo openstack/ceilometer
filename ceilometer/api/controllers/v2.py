@@ -86,6 +86,8 @@ state_kind = ["ok", "alarm", "insufficient data"]
 state_kind_enum = wtypes.Enum(str, *state_kind)
 operation_kind = ('lt', 'le', 'eq', 'ne', 'ge', 'gt')
 operation_kind_enum = wtypes.Enum(str, *operation_kind)
+severity_kind = ["low", "moderate", "critical"]
+severity_kind_enum = wtypes.Enum(str, *severity_kind)
 
 
 class ClientSideError(wsme.exc.ClientSideError):
@@ -1832,6 +1834,10 @@ class Alarm(_Base):
     state_timestamp = datetime.datetime
     "The date of the last alarm state changed"
 
+    severity = AdvEnum('severity', str, *severity_kind,
+                       default='low')
+    "The severity of the alarm"
+
     def __init__(self, rule=None, time_constraints=None, **kwargs):
         super(Alarm, self).__init__(**kwargs)
 
@@ -1920,6 +1926,7 @@ class Alarm(_Base):
                    enabled=True,
                    timestamp=datetime.datetime.utcnow(),
                    state="ok",
+                   severity="moderate",
                    state_timestamp=datetime.datetime.utcnow(),
                    ok_actions=["http://site:8000/ok"],
                    alarm_actions=["http://site:8000/alarm"],
@@ -2051,6 +2058,7 @@ class AlarmController(rest.RestController):
         now = timeutils.utcnow()
 
         data.alarm_id = self._id
+
         user, project = rbac.get_limited_to(pecan.request.headers)
         if user:
             data.user_id = user
@@ -2065,7 +2073,7 @@ class AlarmController(rest.RestController):
             data.state_timestamp = now
         else:
             data.state_timestamp = alarm_in.state_timestamp
-
+        alarm_in.severity = data.severity
         # make sure alarms are unique by name per project.
         if alarm_in.name != data.name:
             alarms = list(self.conn.get_alarms(name=data.name,

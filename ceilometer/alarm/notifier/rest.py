@@ -55,8 +55,8 @@ class RestAlarmNotifier(notifier.AlarmNotifier):
     """Rest alarm notifier."""
 
     @staticmethod
-    def notify(action, alarm_id, alarm_name, previous, current, reason,
-               reason_data, headers=None):
+    def notify(action, alarm_id, alarm_name, severity, previous,
+               current, reason, reason_data, headers=None):
         headers = headers or {}
         if not headers.get('x-openstack-request-id'):
             headers['x-openstack-request-id'] = context.generate_request_id()
@@ -66,12 +66,13 @@ class RestAlarmNotifier(notifier.AlarmNotifier):
             "%(previous)s to %(current)s with action %(action)s because "
             "%(reason)s. request-id: %(request_id)s ") %
             ({'alarm_name': alarm_name, 'alarm_id': alarm_id,
-              'previous': previous, 'current': current,
-              'action': action, 'reason': reason,
+              'severity': severity, 'previous': previous,
+              'current': current, 'action': action, 'reason': reason,
               'request_id': headers['x-openstack-request-id']}))
         body = {'alarm_name': alarm_name, 'alarm_id': alarm_id,
-                'previous': previous, 'current': current,
-                'reason': reason, 'reason_data': reason_data}
+                'severity': severity, 'previous': previous,
+                'current': current, 'reason': reason,
+                'reason_data': reason_data}
         headers['content-type'] = 'application/json'
         kwargs = {'data': jsonutils.dumps(body),
                   'headers': headers}

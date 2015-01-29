@@ -32,7 +32,7 @@ class Connection(base.Connection):
 
     def get_alarms(self, name=None, user=None, state=None, meter=None,
                    project=None, enabled=None, alarm_id=None, pagination=None,
-                   alarm_type=None):
+                   alarm_type=None, severity=None):
         """Yields a lists of alarms that match filters."""
         return []
 
