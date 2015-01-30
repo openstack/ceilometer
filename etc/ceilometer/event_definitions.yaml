@@ -96,6 +96,38 @@
       fields: payload.snapshot_id
     volume_id:
       fields: payload.volume_id
+- event_type: ['image.update', 'image.upload', 'image.delete']
+  traits: &glance_crud
+    project_id:
+      fields: payload.owner
+    resource_id:
+      fields: payload.id
+    name:
+      fields: payload.name
+    status:
+      fields: payload.status
+    created_at:
+      fields: payload.created_at
+    user_id:
+      fields: payload.owner
+    deleted_at:
+      fields: payload.deleted_at
+    size:
+      fields: payload.size
+- event_type: image.send
+  traits: &glance_send
+    receiver_project:
+      fields: payload.receiver_tenant_id
+    receiver_user:
+      fields: payload.receiver_user_id
+    user_id:
+      fields: payload.owner_id
+    image_id:
+      fields: payload.image_id
+    destination_ip:
+      fields: payload.destination_ip
+    bytes_sent:
+      fields: payload.bytes_sent
 - event_type: orchestration.stack.*
   traits: &orchestration_crud
     project_id:
