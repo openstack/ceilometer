@@ -192,3 +192,39 @@
       fields: payload.observer.typeURI
     observer_id:
       fields: payload.observer.id
+- event_type: objectstore.http.request
+  traits: &objectstore_request
+    typeURI:
+      fields: payload.typeURI
+    id:
+      fields: payload.id
+    action:
+      fields: payload.action
+    eventType:
+      fields: payload.eventType
+    eventTime:
+      fields: payload.eventTime
+    outcome:
+      fields: payload.outcome
+    initiator_typeURI:
+      fields: payload.initiator.typeURI
+    initiator_id:
+      fields: payload.initiator.id
+    initiator_project_id:
+      fields: payload.initiator.project_id
+    target_typeURI:
+      fields: payload.target.typeURI
+    target_id:
+      fields: payload.target.id
+    target_action:
+      fields: payload.target.action
+    target_metadata_path:
+      fields: payload.target.metadata.path
+    target_metadata_version:
+      fields: payload.target.metadata.version
+    target_metadata_container:
+      fields: payload.target.metadata.container
+    target_metadata_object:
+      fields: payload.target.metadata.object
+    observer_id:
+      fields: payload.observer.id
