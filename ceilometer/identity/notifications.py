@@ -50,13 +50,14 @@ class _Base(plugin_base.NotificationBase,
 
 class IdentityCRUD(_Base):
     def process_notification(self, message):
+        user_id = message['payload'].get("initiator", {}).get("id")
         yield sample.Sample.from_notification(
             name=message['event_type'],
             type=sample.TYPE_DELTA,
             unit=self.resource_type,
             volume=1,
             resource_id=message['payload']['resource_info'],
-            user_id=None,
+            user_id=user_id,
             project_id=None,
             message=message)
 

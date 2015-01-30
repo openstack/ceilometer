@@ -81,6 +81,16 @@ def cadf_format_notification():
     }
 
 
+def cadf_crud_notification_for(resource_type, operation, resource_id):
+    base = cadf_format_notification()
+    event_type = '%s.%s.%s' % (notifications.SERVICE, resource_type,
+                               operation)
+    base['event_type'] = event_type
+    base['payload']['action'] = '%s.%s' % (operation, resource_type)
+    base['payload']['resource_info'] = resource_id
+    return base
+
+
 def authn_notification_for(outcome):
     base = cadf_format_notification()
     base['event_type'] = 'identity.authenticate'
@@ -130,65 +140,109 @@ class TestCRUDNotification(base.BaseTestCase):
         self.assertEqual(NOW, s.timestamp)
         self.assertEqual(sample.TYPE_DELTA, s.type)
         self.assertIsNone(s.project_id)
-        self.assertIsNone(s.user_id)
         metadata = s.resource_metadata
         self.assertEqual(PUBLISHER_ID, metadata.get('host'))
+
+    def _verify_common_operations(self, data, resource_type, operation,
+                                  resource_id):
+        self.assertEqual(1, len(data))
+        self.assertEqual(resource_id, data[0].resource_id)
+        name = '%s.%s.%s' % (notifications.SERVICE, resource_type, operation)
+        self.assertEqual(name, data[0].name)
 
     def _test_operation(self, resource_type, operation, resource_id,
                         notification_class):
         notif = notification_for(resource_type, operation, resource_id)
         handler = notification_class(mock.Mock())
         data = list(handler.process_notification(notif))
-        self.assertEqual(1, len(data))
-        self.assertEqual(resource_id, data[0].resource_id)
-        name = '%s.%s.%s' % (notifications.SERVICE, resource_type, operation)
-        self.assertEqual(name, data[0].name)
+        self.assertIsNone(data[0].user_id)
+        self._verify_common_operations(data, resource_type, operation,
+                                       resource_id)
+        self._verify_common_sample(data[0])
+
+    def _test_audit_operation(self, resource_type, operation, resource_id,
+                              notification_class):
+        notif = cadf_crud_notification_for(resource_type, operation,
+                                           resource_id)
+        handler = notification_class(mock.Mock())
+        data = list(handler.process_notification(notif))
+        self.assertEqual(USER_ID, data[0].user_id)
+        self._verify_common_operations(data, resource_type, operation,
+                                       resource_id)
         self._verify_common_sample(data[0])
 
     def test_create_user(self):
         self._test_operation('user', 'created', USER_ID, notifications.User)
+        self._test_audit_operation('user', 'created', USER_ID,
+                                   notifications.User)
 
     def test_delete_user(self):
         self._test_operation('user', 'deleted', USER_ID, notifications.User)
+        self._test_audit_operation('user', 'deleted', USER_ID,
+                                   notifications.User)
 
     def test_update_user(self):
         self._test_operation('user', 'updated', USER_ID, notifications.User)
+        self._test_audit_operation('user', 'updated', USER_ID,
+                                   notifications.User)
 
     def test_create_group(self):
         self._test_operation('group', 'created', GROUP_ID, notifications.Group)
+        self._test_audit_operation('group', 'created', GROUP_ID,
+                                   notifications.Group)
 
     def test_update_group(self):
         self._test_operation('group', 'updated', GROUP_ID, notifications.Group)
+        self._test_audit_operation('group', 'updated', GROUP_ID,
+                                   notifications.Group)
 
     def test_delete_group(self):
         self._test_operation('group', 'deleted', GROUP_ID, notifications.Group)
+        self._test_audit_operation('group', 'deleted', GROUP_ID,
+                                   notifications.Group)
 
     def test_create_project(self):
         self._test_operation('project', 'created', PROJECT_ID,
                              notifications.Project)
+        self._test_audit_operation('project', 'created', PROJECT_ID,
+                                   notifications.Project)
 
     def test_update_project(self):
         self._test_operation('project', 'updated', PROJECT_ID,
                              notifications.Project)
+        self._test_audit_operation('project', 'updated', PROJECT_ID,
+                                   notifications.Project)
 
     def test_delete_project(self):
         self._test_operation('project', 'deleted', PROJECT_ID,
                              notifications.Project)
+        self._test_audit_operation('project', 'deleted', PROJECT_ID,
+                                   notifications.Project)
 
     def test_create_role(self):
         self._test_operation('role', 'deleted', ROLE_ID, notifications.Role)
+        self._test_audit_operation('role', 'deleted', ROLE_ID,
+                                   notifications.Role)
 
     def test_update_role(self):
         self._test_operation('role', 'updated', ROLE_ID, notifications.Role)
+        self._test_audit_operation('role', 'updated', ROLE_ID,
+                                   notifications.Role)
 
     def test_delete_role(self):
         self._test_operation('role', 'deleted', ROLE_ID, notifications.Role)
+        self._test_audit_operation('role', 'deleted', ROLE_ID,
+                                   notifications.Role)
 
     def test_create_trust(self):
         self._test_operation('trust', 'created', TRUST_ID, notifications.Trust)
+        self._test_audit_operation('trust', 'created', TRUST_ID,
+                                   notifications.Trust)
 
     def test_delete_trust(self):
         self._test_operation('trust', 'deleted', TRUST_ID, notifications.Trust)
+        self._test_audit_operation('trust', 'deleted', TRUST_ID,
+                                   notifications.Trust)
 
 
 class TestAuthenticationNotification(base.BaseTestCase):

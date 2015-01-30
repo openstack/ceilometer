@@ -148,6 +148,8 @@
   traits: &identity_crud
     resource_id:
       fields: payload.resource_info
+    initiator_id:
+      fields: payload.initiator.id
 - event_type: identity.role_assignment.*
   traits: &identity_role_assignment
     role:
