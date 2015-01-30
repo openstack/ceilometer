@@ -703,15 +703,3 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         LOG.info.assert_called_with(
             'Skip polling pollster %s, no resources found', pollster.name)
         self.assertEqual(0, get_samples._mock_call_count)
-
-        setattr(pollster.obj, 'no_resources', False)
-        polling_task.poll_and_publish()
-        LOG.info.assert_called_with(
-            'Skip polling pollster %s, no resources found', pollster.name)
-        self.assertEqual(0, get_samples._mock_call_count)
-
-        setattr(pollster.obj, 'no_resources', True)
-        polling_task.poll_and_publish()
-        LOG.info.not_assert_called_with(
-            'Skip polling pollster %s, no resources found', pollster.name)
-        self.assertEqual(1, get_samples._mock_call_count)

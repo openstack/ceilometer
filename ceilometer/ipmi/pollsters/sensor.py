@@ -29,9 +29,6 @@ class InvalidSensorData(ValueError):
 
 
 class SensorPollster(plugin_base.PollsterBase):
-
-    no_resources = True
-
     METRIC = None
 
     def __init__(self):
