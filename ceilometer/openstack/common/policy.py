@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#
 # Copyright (c) 2012 OpenStack Foundation.
 # All Rights Reserved.
 #
@@ -22,22 +24,43 @@ string written in the new policy language.
 In the list-of-lists representation, each check inside the innermost
 list is combined as with an "and" conjunction--for that check to pass,
 all the specified checks must pass.  These innermost lists are then
-combined as with an "or" conjunction.  This is the original way of
-expressing policies, but there now exists a new way: the policy
-language.
-
-In the policy language, each check is specified the same way as in the
-list-of-lists representation: a simple "a:b" pair that is matched to
-the correct code to perform that check.  However, conjunction
-operators are available, allowing for more expressiveness in crafting
-policies.
-
-As an example, take the following rule, expressed in the list-of-lists
-representation::
+combined as with an "or" conjunction. As an example, take the following
+rule, expressed in the list-of-lists representation::
 
     [["role:admin"], ["project_id:%(project_id)s", "role:projectadmin"]]
 
-In the policy language, this becomes::
+This is the original way of expressing policies, but there now exists a
+new way: the policy language.
+
+In the policy language, each check is specified the same way as in the
+list-of-lists representation: a simple "a:b" pair that is matched to
+the correct class to perform that check::
+
+ +===========================================================================+
+ |            TYPE                |                SYNTAX                    |
+ +===========================================================================+
+ |User's Role                     |              role:admin                  |
+ +---------------------------------------------------------------------------+
+ |Rules already defined on policy |          rule:admin_required             |
+ +---------------------------------------------------------------------------+
+ |Against URL's¹                  |         http://my-url.org/check          |
+ +---------------------------------------------------------------------------+
+ |User attributes²                |    project_id:%(target.project.id)s      |
+ +---------------------------------------------------------------------------+
+ |Strings                         |        <variable>:'xpto2035abc'          |
+ |                                |         'myproject':<variable>           |
+ +---------------------------------------------------------------------------+
+ |                                |         project_id:xpto2035abc           |
+ |Literals                        |         domain_id:20                     |
+ |                                |         True:%(user.enabled)s            |
+ +===========================================================================+
+
+¹URL checking must return 'True' to be valid
+²User attributes (obtained through the token): user_id, domain_id or project_id
+
+Conjunction operators are available, allowing for more expressiveness
+in crafting policies. So, in the policy language, the previous check in
+list-of-lists becomes::
 
     role:admin or (project_id:%(project_id)s and role:projectadmin)
 
@@ -46,26 +69,16 @@ policy rule::
 
     project_id:%(project_id)s and not role:dunce
 
-It is possible to perform policy checks on the following user
-attributes (obtained through the token): user_id, domain_id or
-project_id::
-
-    domain_id:<some_value>
-
 Attributes sent along with API calls can be used by the policy engine
 (on the right side of the expression), by using the following syntax::
 
-    <some_value>:user.id
+    <some_value>:%(user.id)s
 
 Contextual attributes of objects identified by their IDs are loaded
 from the database. They are also available to the policy engine and
 can be checked through the `target` keyword::
 
-    <some_value>:target.role.name
-
-All these attributes (related to users, API calls, and context) can be
-checked against each other or against constants, be it literals (True,
-<a_number>) or strings.
+    <some_value>:%(target.role.name)s
 
 Finally, two special policy checks should be mentioned; the policy
 check "@" will always accept an access, and the policy check "!" will
@@ -78,6 +91,7 @@ as it allows particular rules to be explicitly disabled.
 import abc
 import ast
 import copy
+import logging
 import os
 import re
 
@@ -89,7 +103,6 @@ import six.moves.urllib.request as urlrequest
 
 from ceilometer.openstack.common import fileutils
 from ceilometer.openstack.common._i18n import _, _LE, _LI
-from ceilometer.openstack.common import log as logging
 
 
 policy_opts = [
