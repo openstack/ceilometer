@@ -45,6 +45,7 @@ from oslo_utils import timeutils
 import six
 import six.moves.urllib.parse as urlparse
 
+from ceilometer.openstack.common import versionutils
 from ceilometer import pipeline
 from ceilometer import sample
 from ceilometer import service
@@ -80,6 +81,8 @@ class InputProxy(object):
         return line
 
 
+@versionutils.deprecated(as_of=versionutils.deprecated.KILO,
+                         in_favor_of='ceilometermiddleware.swift:Swift')
 class CeilometerMiddleware(object):
     """Ceilometer middleware used for counting requests."""
 
