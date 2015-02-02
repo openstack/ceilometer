@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-01-12 06:08+0000\n"
-"PO-Revision-Date: 2015-01-09 20:28+0000\n"
+"POT-Creation-Date: 2015-02-02 06:08+0000\n"
+"PO-Revision-Date: 2015-01-26 22:20+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: English (United Kingdom) (http://www.transifex.com/projects/p/"
 "ceilometer/language/en_GB/)\n"
@@ -20,14 +20,19 @@ msgstr ""
 "Generated-By: Babel 1.3\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ceilometer/agent/discovery/endpoint.py:45
+#: ceilometer/agent/discovery/endpoint.py:43
 #, python-format
 msgid "No endpoints found for service %s"
 msgstr "No endpoints found for service %s"
 
-#: ceilometer/compute/pollsters/disk.py:123
+#: ceilometer/alarm/evaluator/threshold.py:106
+#, python-format
+msgid "Expecting %(expected)d datapoints but only get %(actual)d"
+msgstr ""
+
+#: ceilometer/compute/pollsters/disk.py:119
 #: ceilometer/compute/pollsters/memory.py:49
-#: ceilometer/compute/pollsters/net.py:111
+#: ceilometer/compute/pollsters/net.py:108
 #, python-format
 msgid ""
 "Instance %(instance_id)s was shut off while getting samples of %(pollster)s: "
