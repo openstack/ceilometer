@@ -41,6 +41,7 @@ class UtilsV2(object):
     _VIRTUAL_SYSTEM_TYPE_REALIZED = 'Microsoft:Hyper-V:System:Realized'
 
     _PROC_SETTING = 'Msvm_ProcessorSettingData'
+    _MEMORY_SETTING = "Msvm_MemorySettingData"
     _SYNTH_ETH_PORT = 'Msvm_SyntheticEthernetPortSettingData'
     _ETH_PORT_ALLOC = 'Msvm_EthernetPortAllocationSettingData'
     _PORT_ACL_SET_DATA = 'Msvm_EthernetSwitchPortAclSettingData'
@@ -50,6 +51,7 @@ class UtilsV2(object):
     _BASE_METRICS_VALUE = 'Msvm_BaseMetricValue'
 
     _CPU_METRIC_NAME = 'Aggregated Average CPU Utilization'
+    _MEMORY_METRIC_NAME = 'Aggregated Average Memory Utilization'
     _NET_IN_METRIC_NAME = 'Filtered Incoming Network Traffic'
     _NET_OUT_METRIC_NAME = 'Filtered Outgoing Network Traffic'
     # Disk metrics are supported from Hyper-V 2012 R2
@@ -93,6 +95,15 @@ class UtilsV2(object):
         return (cpu_used,
                 int(cpu_sd.VirtualQuantity),
                 long(vm.OnTimeInMilliseconds))
+
+    def get_memory_metrics(self, vm_name):
+        vm = self._lookup_vm(vm_name)
+        memory_def = self._get_metric_def(self._MEMORY_METRIC_NAME)
+        metric_memory = self._get_metrics(vm, memory_def)
+        memory_usage = 0
+        if metric_memory:
+            memory_usage = long(metric_memory[0].MetricValue)
+        return memory_usage
 
     def get_vnic_metrics(self, vm_name):
         vm = self._lookup_vm(vm_name)

@@ -54,6 +54,14 @@ class TestHyperVInspection(base.BaseTestCase):
         self.assertEqual(fake_cpu_count, cpu_stats.number)
         self.assertEqual(fake_cpu_time, cpu_stats.time)
 
+    @mock.patch('ceilometer.compute.virt.hyperv.utilsv2.UtilsV2.'
+                'get_memory_metrics')
+    def test_inspect_memory_usage(self, mock_get_memory_metrics):
+        fake_usage = self._inspector._utils.get_memory_metrics.return_value
+        usage = self._inspector.inspect_memory_usage(
+            mock.sentinel.FAKE_INSTANCE, mock.sentinel.FAKE_DURATION)
+        self.assertEqual(fake_usage, usage.usage)
+
     def test_inspect_vnics(self):
         fake_instance_name = 'fake_instance_name'
         fake_rx_mb = 1000
