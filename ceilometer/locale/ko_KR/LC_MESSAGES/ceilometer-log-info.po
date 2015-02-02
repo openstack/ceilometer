@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-01-07 06:11+0000\n"
-"PO-Revision-Date: 2014-12-23 12:43+0000\n"
+"POT-Creation-Date: 2015-02-02 06:08+0000\n"
+"PO-Revision-Date: 2015-01-24 01:51+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/projects/p/"
 "ceilometer/language/ko_KR/)\n"
@@ -19,16 +19,16 @@ msgstr ""
 "Generated-By: Babel 1.3\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: ceilometer/coordination.py:78
+#: ceilometer/coordination.py:76
 msgid "Coordination backend started successfully."
 msgstr ""
 
-#: ceilometer/coordination.py:113
+#: ceilometer/coordination.py:111
 #, python-format
 msgid "Joined partitioning group %s"
 msgstr ""
 
-#: ceilometer/coordination.py:128
+#: ceilometer/coordination.py:126
 #, python-format
 msgid "Left partitioning group %s"
 msgstr ""
@@ -41,7 +41,7 @@ msgstr "Eventlet 백도어는 프로세스 %(pid)d 일 동안 %(port)s에서 수
 #: ceilometer/openstack/common/policy.py:262
 #, python-format
 msgid "Can not find policy directory: %s"
-msgstr ""
+msgstr "%s: 정책 디렉토리를 찾을 수 없습니다."
 
 #: ceilometer/openstack/common/service.py:174
 #, python-format
