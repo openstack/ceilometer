@@ -139,27 +139,13 @@ class TestNotification(tests_base.BaseTestCase):
         self.assertNotEqual(self.fake_event_endpoint,
                             self.srv.listeners[0].dispatcher.endpoints[0])
 
+    @mock.patch('ceilometer.pipeline.setup_event_pipeline', mock.MagicMock())
     def test_process_notification_with_events(self):
         self.CONF.set_override("store_events", True, group="notification")
         self._do_process_notification_manager_start()
         self.assertEqual(2, len(self.srv.listeners[0].dispatcher.endpoints))
         self.assertEqual(self.fake_event_endpoint,
                          self.srv.listeners[0].dispatcher.endpoints[0])
-
-    @mock.patch('ceilometer.event.converter.get_config_file',
-                mock.MagicMock(return_value=None))
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
-    @mock.patch.object(oslo.messaging.MessageHandlingServer, 'start',
-                       mock.MagicMock())
-    def test_event_dispatcher_loaded(self):
-        self.CONF.set_override("store_events", True, group="notification")
-        with mock.patch.object(self.srv,
-                               '_get_notifications_manager') as get_nm:
-            get_nm.side_effect = self.fake_get_notifications_manager
-            self.srv.start()
-        self.assertEqual(2, len(self.srv.listeners[0].dispatcher.endpoints))
-        event_endpoint = self.srv.listeners[0].dispatcher.endpoints[0]
-        self.assertEqual(1, len(list(event_endpoint.dispatcher_manager)))
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     @mock.patch.object(oslo.messaging.MessageHandlingServer, 'start',
@@ -193,13 +179,32 @@ class BaseRealNotification(tests_base.BaseTestCase):
             'transformers': [],
             'publishers': ['test://'],
         }])
-
         self.expected_samples = 2
-
         pipeline_cfg_file = fileutils.write_to_tempfile(content=pipeline,
                                                         prefix="pipeline",
                                                         suffix="yaml")
         self.CONF.set_override("pipeline_cfg_file", pipeline_cfg_file)
+
+        self.CONF.set_override("store_events", True, group="notification")
+        ev_pipeline = yaml.dump({
+            'sources': [{
+                'name': 'test_event',
+                'events': '*',
+                'sinks': ['test_sink']
+            }],
+            'sinks': [{
+                'name': 'test_sink',
+                'publishers': ['test://']
+            }]
+        })
+        self.expected_events = 1
+        ev_pipeline_cfg_file = fileutils.write_to_tempfile(
+            content=ev_pipeline, prefix="event_pipeline", suffix="yaml")
+        self.CONF.set_override("event_pipeline_cfg_file", ev_pipeline_cfg_file)
+        self.CONF.set_override(
+            "definitions_cfg_file",
+            self.path_get('etc/ceilometer/event_definitions.yaml'),
+            group='event')
         self.publisher = test_publisher.TestPublisher("")
 
     def _check_notification_service(self):
@@ -211,7 +216,8 @@ class BaseRealNotification(tests_base.BaseTestCase):
                       TEST_NOTICE_PAYLOAD)
         start = timeutils.utcnow()
         while timeutils.delta_seconds(start, timeutils.utcnow()) < 600:
-            if len(self.publisher.samples) >= self.expected_samples:
+            if (len(self.publisher.samples) >= self.expected_samples and
+                    len(self.publisher.events) >= self.expected_events):
                 break
             eventlet.sleep(0)
 
@@ -219,6 +225,7 @@ class BaseRealNotification(tests_base.BaseTestCase):
 
         resources = list(set(s.resource_id for s in self.publisher.samples))
         self.assertEqual(self.expected_samples, len(self.publisher.samples))
+        self.assertEqual(self.expected_events, len(self.publisher.events))
         self.assertEqual(["9f9d01b9-4a58-4271-9e27-398b21ab20d1"], resources)
 
 
@@ -263,7 +270,7 @@ class TestRealNotificationHA(BaseRealNotification):
 
     def test_reset_listeners_on_refresh(self):
         self.srv.start()
-        self.assertEqual(1, len(self.srv.pipeline_listeners))
+        self.assertEqual(2, len(self.srv.pipeline_listeners))
         self.srv._refresh_agent(None)
-        self.assertEqual(1, len(self.srv.pipeline_listeners))
+        self.assertEqual(2, len(self.srv.pipeline_listeners))
         self.srv.stop()

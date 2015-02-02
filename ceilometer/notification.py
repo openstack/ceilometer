@@ -77,22 +77,33 @@ class NotificationService(os_service.Service):
             invoke_args=(transporter, )
         )
 
+    def _get_notifier(self, transport, pipe):
+        return oslo.messaging.Notifier(
+            transport,
+            driver=cfg.CONF.publisher_notifier.metering_driver,
+            publisher_id='ceilometer.notification',
+            topic='%s-%s' % (self.NOTIFICATION_IPC, pipe.name))
+
     def start(self):
         super(NotificationService, self).start()
         self.pipeline_manager = pipeline.setup_pipeline()
+        if cfg.CONF.notification.store_events:
+            self.event_pipeline_manager = pipeline.setup_event_pipeline()
 
         transport = messaging.get_transport()
         self.partition_coordinator = coordination.PartitionCoordinator()
         self.partition_coordinator.start()
 
+        event_transporter = None
         if cfg.CONF.notification.workload_partitioning:
             transporter = []
             for pipe in self.pipeline_manager.pipelines:
-                transporter.append(oslo.messaging.Notifier(
-                    transport,
-                    driver=cfg.CONF.publisher_notifier.metering_driver,
-                    publisher_id='ceilometer.notification',
-                    topic='%s-%s' % (self.NOTIFICATION_IPC, pipe.name)))
+                transporter.append(self._get_notifier(transport, pipe))
+            if cfg.CONF.notification.store_events:
+                event_transporter = []
+                for pipe in self.event_pipeline_manager.pipelines:
+                    event_transporter.append(self._get_notifier(transport,
+                                                                pipe))
 
             self.ctxt = context.get_admin_context()
             self.group_id = self.NOTIFICATION_NAMESPACE
@@ -105,10 +116,12 @@ class NotificationService(os_service.Service):
             # beeen registered by oslo.messaging
             messaging.get_notifier(transport, '')
             transporter = self.pipeline_manager
+            if cfg.CONF.notification.store_events:
+                event_transporter = self.event_pipeline_manager
             self.group_id = None
 
         self.listeners = self.pipeline_listeners = []
-        self._configure_main_queue_listeners(transporter)
+        self._configure_main_queue_listeners(transporter, event_transporter)
 
         if cfg.CONF.notification.workload_partitioning:
             self.partition_coordinator.join_group(self.group_id)
@@ -124,10 +137,9 @@ class NotificationService(os_service.Service):
         # Add a dummy thread to have wait() working
         self.tg.add_timer(604800, lambda: None)
 
-    def _configure_main_queue_listeners(self, transporter):
-        self.notification_manager = self._get_notifications_manager(
-            transporter)
-        if not list(self.notification_manager):
+    def _configure_main_queue_listeners(self, transporter, event_transporter):
+        notification_manager = self._get_notifications_manager(transporter)
+        if not list(notification_manager):
             LOG.warning(_('Failed to load any notification handlers for %s'),
                         self.NOTIFICATION_NAMESPACE)
 
@@ -135,10 +147,11 @@ class NotificationService(os_service.Service):
 
         endpoints = []
         if cfg.CONF.notification.store_events:
-            endpoints = [event_endpoint.EventsNotificationEndpoint()]
+            endpoints.append(
+                event_endpoint.EventsNotificationEndpoint(event_transporter))
 
         targets = []
-        for ext in self.notification_manager:
+        for ext in notification_manager:
             handler = ext.obj
             LOG.debug(_('Event types from %(name)s: %(type)s'
                         ' (ack_on_error=%(error)s)') %
@@ -176,16 +189,22 @@ class NotificationService(os_service.Service):
 
     def _configure_pipeline_listeners(self):
         self.pipeline_listeners = []
+        ev_pipes = []
+        if cfg.CONF.notification.store_events:
+            ev_pipes = self.event_pipeline_manager.pipelines
         partitioned = self.partition_coordinator.extract_my_subset(
-            self.group_id, self.pipeline_manager.pipelines)
+            self.group_id, self.pipeline_manager.pipelines + ev_pipes)
         transport = messaging.get_transport()
         for pipe in partitioned:
             LOG.debug(_('Pipeline endpoint: %s'), pipe.name)
+            pipe_endpoint = (pipeline.EventPipelineEndpoint
+                             if isinstance(pipe, pipeline.EventPipeline) else
+                             pipeline.SamplePipelineEndpoint)
             listener = messaging.get_notification_listener(
                 transport,
                 [oslo.messaging.Target(
                     topic='%s-%s' % (self.NOTIFICATION_IPC, pipe.name))],
-                [pipeline.PipelineEndpoint(self.ctxt, pipe)])
+                [pipe_endpoint(self.ctxt, pipe)])
             listener.start()
             self.pipeline_listeners.append(listener)
 

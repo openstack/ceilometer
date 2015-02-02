@@ -22,9 +22,11 @@ import fnmatch
 import os
 
 from oslo_config import cfg
+from oslo_utils import timeutils
 import six
 import yaml
 
+from ceilometer.event.storage import models
 from ceilometer.i18n import _
 from ceilometer.openstack.common import log
 from ceilometer import publisher
@@ -57,13 +59,19 @@ class PipelineException(Exception):
         return 'Pipeline %s: %s' % (self.pipeline_cfg, self.msg)
 
 
+@six.add_metaclass(abc.ABCMeta)
 class PipelineEndpoint(object):
 
     def __init__(self, context, pipeline):
         self.publish_context = PublishContext(context, [pipeline])
 
+    @abc.abstractmethod
     def sample(self, ctxt, publisher_id, event_type, payload, metadata):
-        """RPC endpoint for pipeline messages."""
+        pass
+
+
+class SamplePipelineEndpoint(PipelineEndpoint):
+    def sample(self, ctxt, publisher_id, event_type, payload, metadata):
         samples = [
             sample_util.Sample(name=s['counter_name'],
                                type=s['counter_type'],
@@ -79,6 +87,23 @@ class PipelineEndpoint(object):
         ]
         with self.publish_context as p:
             p(samples)
+
+
+class EventPipelineEndpoint(PipelineEndpoint):
+    def sample(self, ctxt, publisher_id, event_type, payload, metadata):
+        events = [
+            models.Event(
+                message_id=ev['message_id'],
+                event_type=ev['event_type'],
+                generated=timeutils.normalize_time(
+                    timeutils.parse_isotime(ev['generated'])),
+                traits=[models.Trait(name, dtype,
+                                     models.Trait.convert_value(dtype, value))
+                        for name, dtype, value in ev['traits']])
+            for ev in payload
+        ]
+        with self.publish_context as p:
+            p(events)
 
 
 class PublishContext(object):
@@ -280,7 +305,8 @@ class Sink(object):
                 # Support old format without URL
                 p = p + "://"
             try:
-                self.publishers.append(publisher.get_publisher(p))
+                self.publishers.append(publisher.get_publisher(p,
+                                                               self.NAMESPACE))
             except Exception:
                 LOG.exception(_("Unable to load publisher %s"), p)
 
@@ -311,6 +337,8 @@ class Sink(object):
 
 class EventSink(Sink):
 
+    NAMESPACE = 'ceilometer.event.publisher'
+
     def publish_events(self, ctxt, events):
         if events:
             for p in self.publishers:
@@ -328,6 +356,8 @@ class EventSink(Sink):
 
 
 class SampleSink(Sink):
+
+    NAMESPACE = 'ceilometer.publisher'
 
     def _transform_sample(self, start, ctxt, sample):
         try:

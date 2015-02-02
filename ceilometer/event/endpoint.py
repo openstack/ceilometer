@@ -17,26 +17,29 @@ import logging
 
 import oslo.messaging
 from oslo_config import cfg
+from oslo_context import context
 from stevedore import extension
 
-import ceilometer
-from ceilometer import dispatcher
 from ceilometer.event import converter as event_converter
-from ceilometer.event.storage import models
 from ceilometer.i18n import _
 from ceilometer import messaging
+from ceilometer.publisher import utils
 
 LOG = logging.getLogger(__name__)
 
 
 class EventsNotificationEndpoint(object):
-    def __init__(self):
+    def __init__(self, transporter):
         super(EventsNotificationEndpoint, self).__init__()
-        self.dispatcher_manager = dispatcher.load_dispatcher_manager()
         LOG.debug(_('Loading event definitions'))
+        self.ctxt = context.get_admin_context()
         self.event_converter = event_converter.setup_events(
             extension.ExtensionManager(
                 namespace='ceilometer.event.trait_plugin'))
+        self.transporter = transporter
+        # NOTE(gordc): if no publisher, this isn't a PipelineManager and
+        # data should be requeued.
+        self.requeue = not hasattr(transporter, 'publisher')
 
     def info(self, ctxt, publisher_id, event_type, payload, metadata):
         """Convert message to Ceilometer Event.
@@ -56,19 +59,21 @@ class EventsNotificationEndpoint(object):
         self.process_notification(notification)
 
     def process_notification(self, notification):
-        event = self.event_converter.to_event(notification)
-
-        if event is not None:
-            LOG.debug(_('Saving event "%s"'), event.event_type)
-            problem_events = []
-            for dispatcher_ext in self.dispatcher_manager:
-                try:
-                    problem_events.extend(
-                        dispatcher_ext.obj.record_events(event))
-                except ceilometer.NotImplementedError:
-                    LOG.warn(_('Event is not implemented with the storage'
-                               ' backend'))
-            if models.Event.UNKNOWN_PROBLEM in [x[0] for x in problem_events]:
-                if not cfg.CONF.notification.ack_on_event_error:
-                    return oslo.messaging.NotificationResult.REQUEUE
+        try:
+            event = self.event_converter.to_event(notification)
+            if event is not None:
+                if self.requeue:
+                    for notifier in self.transporter:
+                        notifier.sample(
+                            self.ctxt.to_dict(),
+                            event_type='pipeline.event',
+                            payload=[utils.message_from_event(
+                                event, cfg.CONF.publisher.metering_secret)])
+                else:
+                    with self.transporter.publisher(self.ctxt) as p:
+                        p(event)
+        except Exception:
+            if not cfg.CONF.notification.ack_on_event_error:
+                return oslo.messaging.NotificationResult.REQUEUE
+            raise
         return oslo.messaging.NotificationResult.HANDLED
