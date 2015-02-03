@@ -269,3 +269,52 @@ class TestDiskRatePollsters(TestBaseDiskIO):
         self._check_per_device_samples(disk.PerDeviceWriteRequestsRatePollster,
                                        'disk.device.write.requests.rate', 800L,
                                        'disk2')
+
+
+class TestDiskLatencyPollsters(TestBaseDiskIO):
+
+    DISKS = [
+        (virt_inspector.Disk(device='disk1'),
+         virt_inspector.DiskLatencyStats(1000)),
+
+        (virt_inspector.Disk(device='disk2'),
+         virt_inspector.DiskLatencyStats(2000))
+    ]
+    TYPE = 'gauge'
+
+    def setUp(self):
+        super(TestDiskLatencyPollsters, self).setUp()
+        self.inspector.inspect_disk_latency = mock.Mock(
+            return_value=self.DISKS)
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def _check_get_samples(self, factory, sample_name,
+                           expected_count=2):
+        pollster = factory()
+
+        mgr = manager.AgentManager()
+        cache = {}
+        samples = list(pollster.get_samples(mgr, cache, self.instance))
+        self.assertIsNotNone(samples)
+        self.assertIsNotEmpty(samples)
+        self.assertIn(pollster.CACHE_KEY_DISK_LATENCY, cache)
+        for instance in self.instance:
+            self.assertIn(instance.id, cache[pollster.CACHE_KEY_DISK_LATENCY])
+
+        self.assertEqual(set([sample_name]), set([s.name for s in samples]))
+
+        match = [s for s in samples if s.name == sample_name]
+        self.assertEqual(expected_count, len(match),
+                         'missing counter %s' % sample_name)
+        return match
+
+    def test_disk_latency(self):
+        self._check_aggregate_samples(disk.DiskLatencyPollster,
+                                      'disk.latency', 3)
+
+    def test_per_device_latency(self):
+        self._check_per_device_samples(disk.PerDeviceDiskLatencyPollster,
+                                       'disk.device.latency', 1, 'disk1')
+
+        self._check_per_device_samples(disk.PerDeviceDiskLatencyPollster,
+                                       'disk.device.latency', 2, 'disk2')

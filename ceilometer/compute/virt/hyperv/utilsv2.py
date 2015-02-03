@@ -57,6 +57,7 @@ class UtilsV2(object):
     # Disk metrics are supported from Hyper-V 2012 R2
     _DISK_RD_METRIC_NAME = 'Disk Data Read'
     _DISK_WR_METRIC_NAME = 'Disk Data Written'
+    _DISK_LATENCY_METRIC_NAME = 'Average Disk Latency'
 
     def __init__(self, host='.'):
         if sys.platform == 'win32':
@@ -149,6 +150,21 @@ class UtilsV2(object):
                 'write_mb': metric_values[1],
                 'instance_id': disk.InstanceID,
                 'host_resource': host_resource
+            }
+
+    def get_disk_latency_metrics(self, vm_name):
+        vm = self._lookup_vm(vm_name)
+        metric_latency_def = self._get_metric_def(
+            self._DISK_LATENCY_METRIC_NAME)
+
+        disks = self._get_vm_resources(vm, self._STORAGE_ALLOC)
+        for disk in disks:
+            metric_values = self._get_metric_values(
+                disk, [metric_latency_def])
+
+            yield {
+                'disk_latency': metric_values[0],
+                'instance_id': disk.InstanceID,
             }
 
     @staticmethod
