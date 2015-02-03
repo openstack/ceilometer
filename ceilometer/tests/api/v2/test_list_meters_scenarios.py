@@ -177,8 +177,7 @@ class TestListMeters(v2.FunctionalTest,
                     resource_metadata={},
                     source='test_source1')]:
             msg = utils.meter_message_from_counter(
-                cnt,
-                self.CONF.publisher.metering_secret)
+                cnt, self.CONF.publisher.telemetry_secret)
             self.messages.append(msg)
             self.conn.record_metering_data(msg)
 

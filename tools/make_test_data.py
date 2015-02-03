@@ -81,8 +81,7 @@ def make_test_data(name, meter_type, unit, volume, random_min,
                           source=source,
                           )
         data = utils.meter_message_from_counter(
-            c,
-            cfg.CONF.publisher.metering_secret)
+            c, cfg.CONF.publisher.telemetry_secret)
 
         yield data
         n += 1

@@ -217,9 +217,9 @@ Installing the notification agent
          not yet been tested with ZeroMQ. We recommend using Rabbit or
          qpid for now.
 
-   2. Set the ``metering_secret`` value.
+   2. Set the ``telemetry_secret`` value.
 
-      Set the ``metering_secret`` value to a large, random, value. Use
+      Set the ``telemetry_secret`` value to a large, random, value. Use
       the same value in all ceilometer configuration files, on all
       nodes, so that messages passing between the nodes can be
       validated.
@@ -289,9 +289,9 @@ Installing the collector
          not yet been tested with ZeroMQ. We recommend using Rabbit or
          qpid for now.
 
-   2. Set the ``metering_secret`` value.
+   2. Set the ``telemetry_secret`` value.
 
-      Set the ``metering_secret`` value to a large, random, value. Use
+      Set the ``telemetry_secret`` value to a large, random, value. Use
       the same value in all ceilometer configuration files, on all
       nodes, so that messages passing between the nodes can be
       validated.
@@ -372,9 +372,9 @@ Installing the Compute Agent
          not yet been tested with ZeroMQ. We recommend using Rabbit or
          qpid for now.
 
-   2. Set the ``metering_secret`` value.
+   2. Set the ``telemetry_secret`` value.
 
-      Set the ``metering_secret`` value to a large, random, value. Use
+      Set the ``telemetry_secret`` value to a large, random, value. Use
       the same value in all ceilometer configuration files, on all
       nodes, so that messages passing between the nodes can be
       validated.
@@ -446,9 +446,9 @@ Installing the Central Agent
          not yet been tested with ZeroMQ. We recommend using Rabbit or
          qpid for now.
 
-   2. Set the ``metering_secret`` value.
+   2. Set the ``telemetry_secret`` value.
 
-      Set the ``metering_secret`` value to a large, random, value. Use
+      Set the ``telemetry_secret`` value to a large, random, value. Use
       the same value in all ceilometer configuration files, on all
       nodes, so that messages passing between the nodes can be
       validated.

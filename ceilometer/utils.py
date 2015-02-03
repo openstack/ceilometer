@@ -249,3 +249,12 @@ class HashRing(object):
             return None
         pos = self._get_position_on_ring(key)
         return self._ring[self._sorted_keys[pos]]
+
+
+def kill_listeners(listeners):
+    # NOTE(gordc): correct usage of oslo.messaging listener is to stop(),
+    # which stops new messages, and wait(), which processes remaining
+    # messages and closes connection
+    for listener in listeners:
+        listener.stop()
+        listener.wait()

@@ -54,8 +54,7 @@ class TestListEvents(v2.FunctionalTest,
             source='test_source',
         )
         msg = utils.meter_message_from_counter(
-            self.sample1,
-            self.CONF.publisher.metering_secret,
+            self.sample1, self.CONF.publisher.telemetry_secret,
         )
         self.conn.record_metering_data(msg)
 
@@ -74,8 +73,7 @@ class TestListEvents(v2.FunctionalTest,
             source='source2',
         )
         msg2 = utils.meter_message_from_counter(
-            self.sample2,
-            self.CONF.publisher.metering_secret,
+            self.sample2, self.CONF.publisher.telemetry_secret,
         )
         self.conn.record_metering_data(msg2)
 

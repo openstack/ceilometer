@@ -85,8 +85,7 @@ class HttpDispatcher(dispatcher.Base):
                     'timestamp': meter.get('timestamp', 'NO TIMESTAMP'),
                     'counter_volume': meter['counter_volume']}))
             if publisher_utils.verify_signature(
-                    meter,
-                    self.conf.publisher.metering_secret):
+                    meter, self.conf.publisher.telemetry_secret):
                 try:
                     if self.cadf_only:
                         # Only cadf messages are being wanted.

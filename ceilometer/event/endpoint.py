@@ -68,7 +68,7 @@ class EventsNotificationEndpoint(object):
                             self.ctxt.to_dict(),
                             event_type='pipeline.event',
                             payload=[utils.message_from_event(
-                                event, cfg.CONF.publisher.metering_secret)])
+                                event, cfg.CONF.publisher.telemetry_secret)])
                 else:
                     with self.transporter.publisher(self.ctxt) as p:
                         p(event)

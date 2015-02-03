@@ -18,13 +18,16 @@ import socket
 import msgpack
 import oslo.messaging
 from oslo_config import cfg
+from oslo_utils import timeutils
 from oslo_utils import units
 
 from ceilometer import dispatcher
+from ceilometer.event.storage import models
 from ceilometer import messaging
 from ceilometer.i18n import _, _LE
 from ceilometer.openstack.common import log
 from ceilometer.openstack.common import service as os_service
+from ceilometer import utils
 
 OPTS = [
     cfg.StrOpt('udp_address',
@@ -39,13 +42,21 @@ OPTS = [
                 help='Requeue the sample on the collector sample queue '
                 'when the collector fails to dispatch it. This is only valid '
                 'if the sample come from the notifier publisher.'),
+    cfg.BoolOpt('requeue_event_on_dispatcher_error',
+                default=False,
+                help='Requeue the event on the collector event queue '
+                'when the collector fails to dispatch it.'),
 ]
 
 cfg.CONF.register_opts(OPTS, group="collector")
 cfg.CONF.import_opt('metering_topic', 'ceilometer.publisher.messaging',
-                    group="publisher_rpc")
+                    group='publisher_rpc')
 cfg.CONF.import_opt('metering_topic', 'ceilometer.publisher.messaging',
-                    group="publisher_notifier")
+                    group='publisher_notifier')
+cfg.CONF.import_opt('event_topic', 'ceilometer.publisher.messaging',
+                    group='publisher_notifier')
+cfg.CONF.import_opt('store_events', 'ceilometer.notification',
+                    group='notification')
 
 
 LOG = log.getLogger(__name__)
@@ -58,26 +69,38 @@ class CollectorService(os_service.Service):
         # ensure dispatcher is configured before starting other services
         self.dispatcher_manager = dispatcher.load_dispatcher_manager()
         self.rpc_server = None
-        self.notification_server = None
+        self.sample_listener = None
+        self.event_listener = None
         super(CollectorService, self).start()
 
         if cfg.CONF.collector.udp_address:
             self.tg.add_thread(self.start_udp)
 
-        allow_requeue = cfg.CONF.collector.requeue_sample_on_dispatcher_error
         transport = messaging.get_transport(optional=True)
         if transport:
             self.rpc_server = messaging.get_rpc_server(
                 transport, cfg.CONF.publisher_rpc.metering_topic, self)
 
-            target = oslo.messaging.Target(
+            sample_target = oslo.messaging.Target(
                 topic=cfg.CONF.publisher_notifier.metering_topic)
-            self.notification_server = messaging.get_notification_listener(
-                transport, [target], [self],
-                allow_requeue=allow_requeue)
+            self.sample_listener = messaging.get_notification_listener(
+                transport, [sample_target],
+                [SampleEndpoint(self.dispatcher_manager)],
+                allow_requeue=(cfg.CONF.collector.
+                               requeue_sample_on_dispatcher_error))
+
+            if cfg.CONF.notification.store_events:
+                event_target = oslo.messaging.Target(
+                    topic=cfg.CONF.publisher_notifier.event_topic)
+                self.event_listener = messaging.get_notification_listener(
+                    transport, [event_target],
+                    [EventEndpoint(self.dispatcher_manager)],
+                    allow_requeue=(cfg.CONF.collector.
+                                   requeue_event_on_dispatcher_error))
+                self.event_listener.start()
 
             self.rpc_server.start()
-            self.notification_server.start()
+            self.sample_listener.start()
 
             if not cfg.CONF.collector.udp_address:
                 # Add a dummy thread to have wait() working
@@ -110,26 +133,11 @@ class CollectorService(os_service.Service):
         self.udp_run = False
         if self.rpc_server:
             self.rpc_server.stop()
-        if self.notification_server:
-            self.notification_server.stop()
+        if self.sample_listener:
+            utils.kill_listeners([self.sample_listener])
+        if self.event_listener:
+            utils.kill_listeners([self.event_listener])
         super(CollectorService, self).stop()
-
-    def sample(self, ctxt, publisher_id, event_type, payload, metadata):
-        """RPC endpoint for notification messages
-
-        When another service sends a notification over the message
-        bus, this method receives it.
-
-        """
-        try:
-            self.dispatcher_manager.map_method('record_metering_data',
-                                               data=payload)
-        except Exception:
-            if cfg.CONF.collector.requeue_sample_on_dispatcher_error:
-                LOG.exception(_LE("Dispatcher failed to handle the sample, "
-                                  "requeue it."))
-                return oslo.messaging.NotificationResult.REQUEUE
-            raise
 
     def record_metering_data(self, context, data):
         """RPC endpoint for messages we send to ourselves.
@@ -138,3 +146,65 @@ class CollectorService(os_service.Service):
         RPC publisher, this method receives them for processing.
         """
         self.dispatcher_manager.map_method('record_metering_data', data=data)
+
+
+class CollectorEndpoint(object):
+    def __init__(self, dispatcher_manager, requeue_on_error):
+        self.dispatcher_manager = dispatcher_manager
+        self.requeue_on_error = requeue_on_error
+
+    def sample(self, ctxt, publisher_id, event_type, payload, metadata):
+        """RPC endpoint for notification messages
+
+        When another service sends a notification over the message
+        bus, this method receives it.
+        """
+        try:
+            self.dispatcher_manager.map_method(self.method, payload)
+        except Exception:
+            if self.requeue_on_error:
+                LOG.exception(_LE("Dispatcher failed to handle the %s, "
+                                  "requeue it."), self.ep_type)
+                return oslo.messaging.NotificationResult.REQUEUE
+            raise
+
+
+class SampleEndpoint(CollectorEndpoint):
+    method = 'record_metering_data'
+    ep_type = 'sample'
+
+    def __init__(self, dispatcher_manager):
+        super(SampleEndpoint, self).__init__(
+            dispatcher_manager,
+            cfg.CONF.collector.requeue_sample_on_dispatcher_error)
+
+
+class EventEndpoint(CollectorEndpoint):
+    method = 'record_events'
+    ep_type = 'event'
+
+    def __init__(self, dispatcher_manager):
+        super(EventEndpoint, self).__init__(
+            dispatcher_manager,
+            cfg.CONF.collector.requeue_event_on_dispatcher_error)
+
+    def sample(self, ctxt, publisher_id, event_type, payload, metadata):
+        events = []
+        for ev in payload:
+            try:
+                events.append(
+                    models.Event(
+                        message_id=ev['message_id'],
+                        event_type=ev['event_type'],
+                        generated=timeutils.normalize_time(
+                            timeutils.parse_isotime(ev['generated'])),
+                        traits=[models.Trait(
+                                name, dtype,
+                                models.Trait.convert_value(dtype, value))
+                                for name, dtype, value in ev['traits']])
+                )
+            except Exception:
+                LOG.exception(_LE("Error processing event and it will be "
+                                  "dropped: %s"), ev)
+        return super(EventEndpoint, self).sample(
+            ctxt, publisher_id, event_type, events, metadata)

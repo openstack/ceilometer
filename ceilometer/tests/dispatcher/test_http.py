@@ -32,8 +32,7 @@ class TestDispatcherHttp(base.BaseTestCase):
                     'counter_volume': 1,
                     }
         self.msg['message_signature'] = utils.compute_signature(
-            self.msg,
-            self.CONF.publisher.metering_secret,
+            self.msg, self.CONF.publisher.telemetry_secret,
         )
 
     def test_http_dispatcher_config_options(self):
@@ -78,8 +77,7 @@ class TestDispatcherHttp(base.BaseTestCase):
         self.msg['resource_metadata'] = {'request': {'NONE_CADF_EVENT': {
             'q1': 'v1', 'q2': 'v2'}, }, }
         self.msg['message_signature'] = utils.compute_signature(
-            self.msg,
-            self.CONF.publisher.metering_secret,
+            self.msg, self.CONF.publisher.telemetry_secret,
         )
 
         with mock.patch.object(requests, 'post') as post:
@@ -97,8 +95,7 @@ class TestDispatcherHttp(base.BaseTestCase):
         self.msg['resource_metadata'] = {'request': {'CADF_EVENT': {
             'q1': 'v1', 'q2': 'v2'}, }, }
         self.msg['message_signature'] = utils.compute_signature(
-            self.msg,
-            self.CONF.publisher.metering_secret,
+            self.msg, self.CONF.publisher.telemetry_secret,
         )
 
         with mock.patch.object(requests, 'post') as post:
@@ -114,8 +111,7 @@ class TestDispatcherHttp(base.BaseTestCase):
         self.msg['resource_metadata'] = {'any': {'thing1': 'v1',
                                                  'thing2': 'v2', }, }
         self.msg['message_signature'] = utils.compute_signature(
-            self.msg,
-            self.CONF.publisher.metering_secret,
+            self.msg, self.CONF.publisher.telemetry_secret,
         )
 
         with mock.patch.object(requests, 'post') as post:
