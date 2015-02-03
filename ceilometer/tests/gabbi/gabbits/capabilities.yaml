@@ -1,0 +1,16 @@
+#
+# Explore the capabilities API
+#
+fixtures:
+    - ConfigFixture
+
+tests:
+
+- name: get capabilities
+  desc: retrieve capabilities for the mongo store
+  url: /v2/capabilities
+  response_json_paths:
+      $.alarm_storage.['storage:production_ready']: true
+      $.event_storage.['storage:production_ready']: true
+      $.storage.['storage:production_ready']: true
+      $.api.['meters:pagination']: false
