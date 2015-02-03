@@ -1,4 +1,4 @@
-# Copyright 2014 Red Hat, Inc
+# Copyright 2014-2015 Red Hat, Inc
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -32,15 +32,14 @@ class EndpointDiscovery(plugin.DiscoveryBase):
     nova.floating_ips.list() and therefore gets all floating IPs at once.
     """
 
-    def discover(self, manager, param=None):
-        if not param:
-            return []
+    @staticmethod
+    def discover(manager, param=None):
         endpoints = manager.keystone.service_catalog.get_urls(
             service_type=param,
             endpoint_type=cfg.CONF.service_credentials.os_endpoint_type,
             region_name=cfg.CONF.service_credentials.os_region_name)
         if not endpoints:
-            LOG.warning(_LW('No endpoints found for service %s'), param)
+            LOG.warning(_LW('No endpoints found for service %s'),
+                        "<all services>" if param is None else param)
             return []
-        else:
-            return endpoints
+        return endpoints
