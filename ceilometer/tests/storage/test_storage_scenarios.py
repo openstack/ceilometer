@@ -781,7 +781,6 @@ class ComplexSampleQueryTest(DBTestBase,
             del d['recorded_at']
             self.assertIn(d, self.msgs)
 
-    @tests_db.run_with('mongodb')
     def test_query_complex_filter_with_regexp(self):
         self._create_samples()
         complex_regex_filter = {"and": [
@@ -796,7 +795,6 @@ class ComplexSampleQueryTest(DBTestBase,
                                "resource-id-43",
                                "resource-id-44"]))
 
-    @tests_db.run_with('mongodb')
     def test_query_complex_filter_with_regexp_metadata(self):
         self._create_samples()
         complex_regex_filter = {"and": [
@@ -2967,7 +2965,6 @@ class ComplexAlarmQueryTest(AlarmTestBase,
             self.assertIn(a.name, set(["yellow-alert", "red-alert"]))
             self.assertTrue(a.enabled)
 
-    @tests_db.run_with('mongodb')
     def test_filter_with_regexp(self):
         self.add_some_alarms()
         filter_expr = {"and":
@@ -3095,7 +3092,6 @@ class ComplexAlarmHistoryQueryTest(AlarmTestBase,
             self.alarm_conn.query_alarm_history(filter_expr=self.filter_expr))
         self.assertEqual(2, len(history))
 
-    @tests_db.run_with('mongodb')
     def test_alarm_history_with_regexp(self):
         filter_expr = {"and":
                        [{"=~": {"type": "(rule)|(state)"}},

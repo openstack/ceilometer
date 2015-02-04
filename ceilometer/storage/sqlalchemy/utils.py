@@ -43,7 +43,8 @@ class QueryTransformer(object):
                  ">=": operator.ge,
                  "=>": operator.ge,
                  "!=": operator.ne,
-                 "in": lambda field_name, values: field_name.in_(values)}
+                 "in": lambda field_name, values: field_name.in_(values),
+                 "=~": lambda field, value: field.op("regexp")(value)}
 
     complex_operators = {"or": or_,
                          "and": and_,
@@ -79,7 +80,6 @@ class QueryTransformer(object):
         if op == self.operators["in"]:
             raise ceilometer.NotImplementedError('Metadata query with in '
                                                  'operator is not implemented')
-
         field_name = field_name[len('resource_metadata.'):]
         meta_table = META_TYPE_MAP[type(value)]
         meta_alias = aliased(meta_table)
