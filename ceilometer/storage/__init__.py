@@ -40,10 +40,16 @@ cfg.CONF.register_opts(OLD_OPTS)
 
 
 OPTS = [
-    cfg.IntOpt('time_to_live',
+    cfg.IntOpt('metering_time_to_live',
                default=-1,
                help="Number of seconds that samples are kept "
-               "in the database for (<= 0 means forever)."),
+               "in the database for (<= 0 means forever).",
+               deprecated_opts=[cfg.DeprecatedOpt('time_to_live',
+                                                  'database')]),
+    cfg.IntOpt('event_time_to_live',
+               default=-1,
+               help=("Number of seconds that events are kept "
+                     "in the database for (<= 0 means forever).")),
     cfg.StrOpt('metering_connection',
                default=None,
                help='The connection string used to connect to the metering '

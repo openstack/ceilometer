@@ -410,14 +410,14 @@ class Connection(pymongo_base.Connection):
         self.upgrade()
 
     @staticmethod
-    def update_ttl(ttl_index_name, index_field, coll):
+    def update_ttl(ttl, ttl_index_name, index_field, coll):
         """Update or ensure time_to_live indexes.
 
+        :param ttl: time to live in seconds.
         :param ttl_index_name: name of the index we want to update or ensure.
         :param index_field: field with the index that we need to update.
         :param coll: collection which indexes need to be updated.
         """
-        ttl = cfg.CONF.database.time_to_live
         indexes = coll.index_information()
         if ttl <= 0:
             if ttl_index_name in indexes:
@@ -471,8 +471,9 @@ class Connection(pymongo_base.Connection):
         self.db.project.drop()
 
         # update or ensure time_to_live index
-        self.update_ttl('meter_ttl', 'timestamp', self.db.meter)
-        self.update_ttl('resource_ttl', 'last_sample_timestamp',
+        ttl = cfg.CONF.database.metering_time_to_live
+        self.update_ttl(ttl, 'meter_ttl', 'timestamp', self.db.meter)
+        self.update_ttl(ttl, 'resource_ttl', 'last_sample_timestamp',
                         self.db.resource)
 
     def clear(self):

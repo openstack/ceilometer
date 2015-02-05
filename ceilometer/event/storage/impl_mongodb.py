@@ -11,11 +11,17 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 """MongoDB storage backend"""
+
+from oslo_config import cfg
 import pymongo
 
 from ceilometer.event.storage import pymongo_base
+from ceilometer.openstack.common import log
 from ceilometer import storage
+from ceilometer.storage import impl_mongodb
 from ceilometer.storage.mongo import utils as pymongo_utils
+
+LOG = log.getLogger(__name__)
 
 
 class Connection(pymongo_base.Connection):
@@ -46,7 +52,24 @@ class Connection(pymongo_base.Connection):
         # needed.
         self.upgrade()
 
+    def upgrade(self):
+        # Establish indexes
+        ttl = cfg.CONF.database.event_time_to_live
+        impl_mongodb.Connection.update_ttl(ttl, 'event_ttl', 'timestamp',
+                                           self.db.event)
+
     def clear(self):
         self.conn.drop_database(self.db.name)
         # Connection will be reopened automatically if needed
         self.conn.close()
+
+    @staticmethod
+    def clear_expired_event_data(ttl):
+        """Clear expired data from the backend storage system.
+
+        Clearing occurs according to the time-to-live.
+
+        :param ttl: Number of seconds to keep records for.
+        """
+        LOG.debug("Clearing expired event data is based on native "
+                  "MongoDB time to live feature and going in background.")

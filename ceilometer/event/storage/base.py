@@ -87,3 +87,13 @@ class Connection(object):
         This is needed to evaluate the performance of each driver.
         """
         return cls.STORAGE_CAPABILITIES
+
+    @staticmethod
+    def clear_expired_event_data(ttl):
+        """Clear expired data from the backend storage system.
+
+        Clearing occurs according to the time-to-live.
+
+        :param ttl: Number of seconds to keep records for.
+        """
+        raise ceilometer.NotImplementedError('Clearing events not implemented')

@@ -9,9 +9,24 @@
 # distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
-# under the License.i
+# under the License.
+
 from ceilometer.event.storage import base
+from ceilometer.i18n import _LI
+from ceilometer.openstack.common import log
+
+LOG = log.getLogger(__name__)
 
 
 class Connection(base.Connection):
     """Log event data."""
+
+    @staticmethod
+    def clear_expired_event_data(ttl):
+        """Clear expired data from the backend storage system.
+
+        Clearing occurs according to the time-to-live.
+
+        :param ttl: Number of seconds to keep records for.
+        """
+        LOG.info(_LI("Dropping event data with TTL %d"), ttl)
