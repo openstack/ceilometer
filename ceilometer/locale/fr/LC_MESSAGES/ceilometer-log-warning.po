@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-02 06:08+0000\n"
-"PO-Revision-Date: 2015-01-26 22:20+0000\n"
+"POT-Creation-Date: 2015-02-05 06:19+0000\n"
+"PO-Revision-Date: 2015-02-02 11:04+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/ceilometer/"
 "language/fr/)\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Generated-By: Babel 1.3\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: ceilometer/agent/discovery/endpoint.py:43
+#: ceilometer/agent/discovery/endpoint.py:42
 #, python-format
 msgid "No endpoints found for service %s"
 msgstr "Pas endpoints trouvé pour le service %s"
@@ -31,7 +31,7 @@ msgstr "Pas endpoints trouvé pour le service %s"
 msgid "Expecting %(expected)d datapoints but only get %(actual)d"
 msgstr ""
 
-#: ceilometer/compute/pollsters/disk.py:119
+#: ceilometer/compute/pollsters/disk.py:123
 #: ceilometer/compute/pollsters/memory.py:49
 #: ceilometer/compute/pollsters/net.py:108
 #, python-format
@@ -49,12 +49,10 @@ msgstr ""
 
 #: ceilometer/openstack/common/loopingcall.py:87
 #, python-format
-msgid "task %(func_name)s run outlasted interval by %(delay).2f sec"
+msgid "task %(func_name)r run outlasted interval by %(delay).2f sec"
 msgstr ""
-"L'exécution de la tâche %(func_name)s a dépassé intervalle de %(delay).2f "
-"secondes "
 
-#: ceilometer/openstack/common/service.py:356
+#: ceilometer/openstack/common/service.py:355
 #, python-format
 msgid "pid %d not in child list"
 msgstr "PID %d absent de la liste d'enfants"

@@ -1,5 +1,5 @@
 # Translations template for ceilometer.
-# Copyright (C) 2014 ORGANIZATION
+# Copyright (C) 2015 ORGANIZATION
 # This file is distributed under the same license as the ceilometer project.
 #
 # Translators:
@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-10-28 06:10+0000\n"
-"PO-Revision-Date: 2014-10-27 20:50+0000\n"
-"Last-Translator: Maxime COQUEREL <max.coquerel@gmail.com>\n"
+"POT-Creation-Date: 2015-02-05 06:19+0000\n"
+"PO-Revision-Date: 2015-02-03 11:11+0000\n"
+"Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/ceilometer/"
 "language/fr/)\n"
 "Language: fr\n"
@@ -21,19 +21,25 @@ msgstr ""
 "Generated-By: Babel 1.3\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: ceilometer/collector.py:132
-msgid "Dispatcher failed to handle the sample, requeue it."
+#: ceilometer/collector.py:166
+#, python-format
+msgid "Dispatcher failed to handle the %s, requeue it."
 msgstr ""
 
-#: ceilometer/coordination.py:76
+#: ceilometer/collector.py:207
+#, python-format
+msgid "Error processing event and it will be dropped: %s"
+msgstr ""
+
+#: ceilometer/coordination.py:79
 msgid "Error connecting to coordination backend."
 msgstr "Erreur de connexion à la coordination du backend ."
 
-#: ceilometer/coordination.py:89
+#: ceilometer/coordination.py:92
 msgid "Error sending a heartbeat to coordination backend."
 msgstr ""
 
-#: ceilometer/coordination.py:142
+#: ceilometer/coordination.py:159
 msgid "Error getting group membership info from coordination backend."
 msgstr ""
 
@@ -45,17 +51,17 @@ msgstr "dans l'appel en boucle de durée fixe"
 msgid "in dynamic looping call"
 msgstr "dans l'appel en boucle dynamique"
 
-#: ceilometer/openstack/common/policy.py:535
-#: ceilometer/openstack/common/policy.py:815
+#: ceilometer/openstack/common/policy.py:563
+#: ceilometer/openstack/common/policy.py:843
 #, python-format
 msgid "Failed to understand rule %s"
 msgstr "Règle %s incompréhensible"
 
-#: ceilometer/openstack/common/policy.py:545
+#: ceilometer/openstack/common/policy.py:573
 #, python-format
 msgid "No handler for matches of kind %s"
 msgstr "Aucun gestionnaire pour les correspondances de type %s"
 
-#: ceilometer/openstack/common/service.py:269
+#: ceilometer/openstack/common/service.py:268
 msgid "Unhandled exception"
 msgstr "Exception non gérée"

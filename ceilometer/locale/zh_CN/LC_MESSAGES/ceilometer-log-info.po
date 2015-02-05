@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-01-14 06:09+0000\n"
-"PO-Revision-Date: 2015-01-12 08:50+0000\n"
+"POT-Creation-Date: 2015-02-05 06:19+0000\n"
+"PO-Revision-Date: 2015-02-04 08:18+0000\n"
 "Last-Translator: aji.zqfan <aji.zqfan@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/"
 "ceilometer/language/zh_CN/)\n"
@@ -21,78 +21,78 @@ msgstr ""
 "Generated-By: Babel 1.3\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: ceilometer/coordination.py:78
+#: ceilometer/coordination.py:76
 msgid "Coordination backend started successfully."
 msgstr "协调器后台启动成功"
 
-#: ceilometer/coordination.py:113
+#: ceilometer/coordination.py:111
 #, python-format
 msgid "Joined partitioning group %s"
 msgstr "已加入分组%s"
 
-#: ceilometer/coordination.py:128
+#: ceilometer/coordination.py:126
 #, python-format
 msgid "Left partitioning group %s"
 msgstr "已离开分组%s"
 
-#: ceilometer/openstack/common/eventlet_backdoor.py:147
+#: ceilometer/openstack/common/eventlet_backdoor.py:146
 #, python-format
 msgid "Eventlet backdoor listening on %(port)s for process %(pid)d"
 msgstr "Eventlet为进程 %(pid)d 在后台监听 %(port)s "
 
-#: ceilometer/openstack/common/policy.py:262
+#: ceilometer/openstack/common/policy.py:275
 #, python-format
 msgid "Can not find policy directory: %s"
 msgstr "无法找到策略目录:%s"
 
-#: ceilometer/openstack/common/service.py:174
+#: ceilometer/openstack/common/service.py:173
 #, python-format
 msgid "Caught %s, exiting"
 msgstr "捕获到 %s，正在退出"
 
-#: ceilometer/openstack/common/service.py:232
+#: ceilometer/openstack/common/service.py:231
 msgid "Parent process has died unexpectedly, exiting"
 msgstr "父进程已意外终止，正在退出"
 
-#: ceilometer/openstack/common/service.py:263
+#: ceilometer/openstack/common/service.py:262
 #, python-format
 msgid "Child caught %s, exiting"
 msgstr "子线程捕获 %s，正在退出"
 
-#: ceilometer/openstack/common/service.py:302
+#: ceilometer/openstack/common/service.py:301
 msgid "Forking too fast, sleeping"
 msgstr "派生速度太快，正在休眠"
 
-#: ceilometer/openstack/common/service.py:321
+#: ceilometer/openstack/common/service.py:320
 #, python-format
 msgid "Started child %d"
 msgstr "已启动子进程%d"
 
-#: ceilometer/openstack/common/service.py:331
+#: ceilometer/openstack/common/service.py:330
 #, python-format
 msgid "Starting %d workers"
 msgstr "正在启动 %d 个子进程"
 
-#: ceilometer/openstack/common/service.py:348
+#: ceilometer/openstack/common/service.py:347
 #, python-format
 msgid "Child %(pid)d killed by signal %(sig)d"
 msgstr "信号 %(sig)d 已终止子线程 %(pid)d"
 
-#: ceilometer/openstack/common/service.py:352
+#: ceilometer/openstack/common/service.py:351
 #, python-format
 msgid "Child %(pid)s exited with status %(code)d"
 msgstr "子线程 %(pid)s 已退出，状态为 %(code)d"
 
-#: ceilometer/openstack/common/service.py:391
+#: ceilometer/openstack/common/service.py:390
 #, python-format
 msgid "Caught %s, stopping children"
 msgstr "捕获到 %s，正在停止子线程"
 
-#: ceilometer/openstack/common/service.py:400
-msgid "Wait called after thread killed.  Cleaning up."
-msgstr "等待在线程结束后被调用。正在清理中。"
+#: ceilometer/openstack/common/service.py:399
+msgid "Wait called after thread killed. Cleaning up."
+msgstr "线程结束，正在清理"
 
-#: ceilometer/openstack/common/service.py:416
+#: ceilometer/openstack/common/service.py:415
 #, python-format
 msgid "Waiting on %d children to exit"
 msgstr "正在等待 %d 个子线程退出"
