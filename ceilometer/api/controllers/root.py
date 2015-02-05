@@ -15,7 +15,7 @@
 
 import pecan
 
-from ceilometer.api.controllers import v2
+from ceilometer.api.controllers.v2 import root as v2
 
 MEDIA_TYPE_JSON = 'application/vnd.openstack.telemetry-%s+json'
 MEDIA_TYPE_XML = 'application/vnd.openstack.telemetry-%s+xml'

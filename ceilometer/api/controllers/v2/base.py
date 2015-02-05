@@ -83,7 +83,7 @@ class AdvEnum(wtypes.wsproperty):
                                         value, e)
 
 
-class Base(wtypes.Base):
+class Base(wtypes.DynamicBase):
 
     @classmethod
     def from_db_model(cls, m):
@@ -228,3 +228,18 @@ class Query(Base):
                    {'value': self.value, 'type': type})
             raise ClientSideError(msg)
         return converted_value
+
+
+class AlarmRule(Base):
+    """Base class Alarm Rule extension and wsme.types."""
+    @staticmethod
+    def validate_alarm(alarm):
+        pass
+
+    @staticmethod
+    def create_hook(alarm):
+        pass
+
+    @staticmethod
+    def update_hook(alarm):
+        pass

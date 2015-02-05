@@ -31,6 +31,7 @@ import pecan
 from pecan import rest
 import pytz
 import six
+from stevedore import extension
 import wsme
 from wsme import types as wtypes
 import wsmeext.pecan as wsme_pecan
@@ -133,7 +134,12 @@ class CronType(wtypes.UserType):
         return value
 
 
-class AlarmThresholdRule(base.Base):
+class AlarmThresholdRule(base.AlarmRule):
+    """Alarm Threshold Rule
+
+    Describe when to trigger the alarm based on computed statistics
+    """
+
     meter_name = wsme.wsattr(wtypes.text, mandatory=True)
     "The name of the meter"
 
@@ -186,6 +192,16 @@ class AlarmThresholdRule(base.Base):
                                 allow_timestamps=False)
         return threshold_rule
 
+    @staticmethod
+    def validate_alarm(alarm):
+        # ensure an implicit constraint on project_id is added to
+        # the query if not already present
+        alarm.threshold_rule.query = v2_utils.sanitize_query(
+            alarm.threshold_rule.query,
+            storage.SampleFilter.__init__,
+            on_behalf_of=alarm.project_id
+        )
+
     @property
     def default_description(self):
         return (_('Alarm when %(meter_name)s is %(comparison_operator)s a '
@@ -218,7 +234,13 @@ class AlarmThresholdRule(base.Base):
                            'type': 'string'}])
 
 
-class AlarmCombinationRule(base.Base):
+class AlarmCombinationRule(base.AlarmRule):
+    """Alarm Combinarion Rule
+
+    Describe when to trigger the alarm based on combining the state of
+    other alarms.
+    """
+
     operator = base.AdvEnum('operator', str, 'or', 'and', default='and')
     "How to combine the sub-alarms"
 
@@ -241,6 +263,25 @@ class AlarmCombinationRule(base.Base):
                                          'contain at least two different '
                                          'alarm ids.'))
         return rule
+
+    @staticmethod
+    def validate_alarm(alarm):
+        project = v2_utils.get_auth_project(
+            alarm.project_id if alarm.project_id != wtypes.Unset else None)
+        for id in alarm.combination_rule.alarm_ids:
+            alarms = list(pecan.request.alarm_storage_conn.get_alarms(
+                alarm_id=id, project=project))
+            if not alarms:
+                raise AlarmNotFound(id, project)
+
+    @staticmethod
+    def update_hook(alarm):
+        # should check if there is any circle in the dependency, but for
+        # efficiency reason, here only check alarm cannot depend on itself
+        if alarm.alarm_id in alarm.combination_rule.alarm_ids:
+            raise base.ClientSideError(
+                _('Cannot specify alarm %s itself in combination rule') %
+                alarm.alarm_id)
 
     @classmethod
     def sample(cls):
@@ -302,6 +343,10 @@ class AlarmTimeConstraint(base.Base):
                    timezone='Europe/Ljubljana')
 
 
+ALARMS_RULES = extension.ExtensionManager("ceilometer.alarm.rule")
+LOG.debug("alarm rules plugin loaded: %s" % ",".join(ALARMS_RULES.names()))
+
+
 class Alarm(base.Base):
     """Representation of an alarm.
 
@@ -347,16 +392,9 @@ class Alarm(base.Base):
     repeat_actions = wsme.wsattr(bool, default=False)
     "The actions should be re-triggered on each evaluation cycle"
 
-    type = base.AdvEnum('type', str, 'threshold', 'combination',
+    type = base.AdvEnum('type', str, *ALARMS_RULES.names(),
                         mandatory=True)
     "Explicit type specifier to select which rule to follow below."
-
-    threshold_rule = AlarmThresholdRule
-    "Describe when to trigger the alarm based on computed statistics"
-
-    combination_rule = AlarmCombinationRule
-    """Describe when to trigger the alarm based on combining the state of
-    other alarms"""
 
     time_constraints = wtypes.wsattr([AlarmTimeConstraint], default=[])
     """Describe time constraints for the alarm"""
@@ -387,10 +425,9 @@ class Alarm(base.Base):
         super(Alarm, self).__init__(**kwargs)
 
         if rule:
-            if self.type == 'threshold':
-                self.threshold_rule = AlarmThresholdRule(**rule)
-            elif self.type == 'combination':
-                self.combination_rule = AlarmCombinationRule(**rule)
+            setattr(self, '%s_rule' % self.type,
+                    ALARMS_RULES[self.type].plugin(**rule))
+
         if time_constraints:
             self.time_constraints = [AlarmTimeConstraint(**tc)
                                      for tc in time_constraints]
@@ -400,22 +437,8 @@ class Alarm(base.Base):
 
         Alarm.check_rule(alarm)
         Alarm.check_alarm_actions(alarm)
-        if alarm.threshold_rule:
-            # ensure an implicit constraint on project_id is added to
-            # the query if not already present
-            alarm.threshold_rule.query = v2_utils.sanitize_query(
-                alarm.threshold_rule.query,
-                storage.SampleFilter.__init__,
-                on_behalf_of=alarm.project_id
-            )
-        elif alarm.combination_rule:
-            project = v2_utils.get_auth_project(
-                alarm.project_id if alarm.project_id != wtypes.Unset else None)
-            for id in alarm.combination_rule.alarm_ids:
-                alarms = list(pecan.request.alarm_storage_conn.get_alarms(
-                    alarm_id=id, project=project))
-                if not alarms:
-                    raise AlarmNotFound(id, project)
+
+        ALARMS_RULES[alarm.type].plugin.validate_alarm(alarm)
 
         tc_names = [tc.name for tc in alarm.time_constraints]
         if len(tc_names) > len(set(tc_names)):
@@ -432,10 +455,17 @@ class Alarm(base.Base):
             error = _("%(rule)s must be set for %(type)s"
                       " type alarm") % {"rule": rule, "type": alarm.type}
             raise base.ClientSideError(error)
-        if alarm.threshold_rule and alarm.combination_rule:
-            error = _("threshold_rule and combination_rule "
-                      "cannot be set at the same time")
-            raise base.ClientSideError(error)
+
+        rule_set = None
+        for ext in ALARMS_RULES:
+            name = "%s_rule" % ext.name
+            if getattr(alarm, name):
+                if rule_set is None:
+                    rule_set = name
+                else:
+                    error = _("%(rule1)s and %(rule2)s cannot be set at the "
+                              "same time") % {'rule1': rule_set, 'rule2': name}
+                    raise base.ClientSideError(error)
 
     @staticmethod
     def check_alarm_actions(alarm):
@@ -462,8 +492,6 @@ class Alarm(base.Base):
                    name="SwiftObjectAlarm",
                    description="An alarm",
                    type='combination',
-                   threshold_rule=None,
-                   combination_rule=AlarmCombinationRule.sample(),
                    time_constraints=[AlarmTimeConstraint.sample().as_dict()],
                    user_id="c96c887c216949acbdfbd8b494863567",
                    project_id="c96c887c216949acbdfbd8b494863567",
@@ -486,6 +514,9 @@ class Alarm(base.Base):
         d['rule'] = getattr(self, "%s_rule" % self.type).as_dict()
         d['time_constraints'] = [tc.as_dict() for tc in self.time_constraints]
         return d
+
+Alarm.add_attributes(**{"%s_rule" % ext.name: ext.plugin
+                        for ext in ALARMS_RULES})
 
 
 class AlarmChange(base.Base):
@@ -639,13 +670,7 @@ class AlarmController(rest.RestController):
                     _("Alarm with name=%s exists") % data.name,
                     status_code=409)
 
-        # should check if there is any circle in the dependency, but for
-        # efficiency reason, here only check alarm cannot depend on itself
-        if data.type == 'combination':
-            if self._id in data.combination_rule.alarm_ids:
-                raise base.ClientSideError(
-                    _('Cannot specify alarm %s itself in '
-                      'combination rule') % self._id)
+        ALARMS_RULES[data.type].plugin.update_hook(data)
 
         old_alarm = Alarm.from_db_model(alarm_in).as_dict(alarm_models.Alarm)
         updated_alarm = data.as_dict(alarm_models.Alarm)
@@ -804,6 +829,8 @@ class AlarmsController(rest.RestController):
 
         data.timestamp = now
         data.state_timestamp = now
+
+        ALARMS_RULES[data.type].plugin.create_hook(data)
 
         change = data.as_dict(alarm_models.Alarm)
 
