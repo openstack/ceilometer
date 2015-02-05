@@ -66,7 +66,8 @@ import ceilometer.volume.notifications
 def list_opts():
     return [
         ('DEFAULT',
-         itertools.chain(ceilometer.api.app.OPTS,
+         itertools.chain(ceilometer.agent.base.OPTS,
+                         ceilometer.api.app.OPTS,
                          ceilometer.cmd.polling.CLI_OPTS,
                          ceilometer.compute.notifications.OPTS,
                          ceilometer.compute.util.OPTS,

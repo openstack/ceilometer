@@ -382,6 +382,12 @@ the publishers defined in the pipeline configuration. For example,
 the ``notifier`` publisher converts the Sample to metering messages, which it
 then signs and transmits on the metering message bus.
 
+Please notice that there's an optional config called
+``shuffle_time_before_polling_task`` in ceilometer.conf. Enable this by
+setting an integer greater than zero to shuffle agents to start polling task,
+so that fluff up the time of sending requests to nova or other components to
+avoid large number of requests in short time.
+
 The frequency of polling is controlled via the pipeline configuration.
 See :ref:`Pipeline-Configuration` for details.
 

@@ -21,6 +21,7 @@
 import collections
 import fnmatch
 import itertools
+import random
 
 from oslo_config import cfg
 from oslo_context import context
@@ -36,6 +37,16 @@ from ceilometer import pipeline as publish_pipeline
 from ceilometer import utils
 
 LOG = log.getLogger(__name__)
+
+OPTS = [
+    cfg.IntOpt('shuffle_time_before_polling_task',
+               default=0,
+               help='To reduce large requests at same time to Nova or other '
+                    'components from different compute agents, shuffle '
+                    'start time of polling task.'),
+]
+
+cfg.CONF.register_opts(OPTS)
 
 
 class PollsterListForbidden(Exception):
@@ -237,10 +248,16 @@ class AgentManager(os_service.Service):
         # allow time for coordination if necessary
         delay_start = self.partition_coordinator.is_active()
 
+        # set shuffle time before polling task if necessary
+        delay_polling_time = random.randint(
+            0, cfg.CONF.shuffle_time_before_polling_task)
+
         for interval, task in six.iteritems(self.setup_polling_tasks()):
+            delay_time = (interval + delay_polling_time if delay_start
+                          else delay_polling_time)
             self.tg.add_timer(interval,
                               self.interval_task,
-                              initial_delay=interval if delay_start else None,
+                              initial_delay=delay_time,
                               task=task)
         self.tg.add_timer(cfg.CONF.coordination.heartbeat,
                           self.partition_coordinator.heartbeat)
