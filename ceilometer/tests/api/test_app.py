@@ -49,3 +49,21 @@ class TestApp(base.BaseTestCase):
         with mock.patch.object(self.CONF, 'find_file') as ff:
             ff.return_value = None
             self.assertRaises(cfg.ConfigFilesNotFoundError, app.load_app)
+
+    @mock.patch('ceilometer.storage.get_connection_from_config',
+                mock.MagicMock())
+    @mock.patch('ceilometer.api.hooks.PipelineHook', mock.MagicMock())
+    @mock.patch('pecan.make_app')
+    def test_pecan_debug(self, mocked):
+        def _check_pecan_debug(g_debug, p_debug, expected):
+            self.CONF.set_override('debug', g_debug)
+            if p_debug is not None:
+                self.CONF.set_override('pecan_debug', p_debug, group='api')
+            app.setup_app()
+            args, kwargs = mocked.call_args
+            self.assertEqual(expected, kwargs.get('debug'))
+
+        _check_pecan_debug(g_debug=False, p_debug=None, expected=False)
+        _check_pecan_debug(g_debug=True, p_debug=None, expected=True)
+        _check_pecan_debug(g_debug=True, p_debug=False, expected=False)
+        _check_pecan_debug(g_debug=False, p_debug=True, expected=True)

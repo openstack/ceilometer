@@ -43,9 +43,8 @@ OPTS = [
 
 API_OPTS = [
     cfg.BoolOpt('pecan_debug',
-                default=CONF.debug,
                 help='Toggle Pecan Debug Middleware. '
-                'Defaults to global debug value.'
+                'If it is not set, global debug value will be used.'
                 ),
 ]
 
@@ -76,6 +75,8 @@ def setup_app(pecan_config=None, extra_hooks=None):
 
     pecan.configuration.set_config(dict(pecan_config), overwrite=True)
 
+    cfg.set_defaults(API_OPTS, pecan_debug=CONF.debug)
+
     app = pecan.make_app(
         pecan_config.app.root,
         debug=CONF.api.pecan_debug,
@@ -91,7 +92,6 @@ def setup_app(pecan_config=None, extra_hooks=None):
 class VersionSelectorApplication(object):
     def __init__(self):
         pc = get_pecan_config()
-        pc.app.debug = CONF.api.pecan_debug
 
         def not_found(environ, start_response):
             start_response('404 Not Found', [])
