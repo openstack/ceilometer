@@ -84,6 +84,7 @@ disk.read.bytes.rate             g      B/s        inst ID   p         1, 2, 3, 
 disk.write.bytes                 c      B          inst ID   p         1, 2           Volume of writes
 disk.write.bytes.rate            g      B/s        inst ID   p         1, 2, 3, 4     Average volume of writes
 disk.latency                     g      ms         inst ID   p         2              Average disk latency
+disk.iops                        g      count/s    inst ID   p         2              Average disk iops
 disk.device.read.requests        c      request    disk ID   p         1, 2           Number of read requests
 disk.device.read.requests.rate   g      request/s  disk ID   p         1, 2, 3        Average rate of read requests
 disk.device.write.requests       c      request    disk ID   p         1, 2           Number of write requests
@@ -93,6 +94,7 @@ disk.device.read.bytes.rate      g      B/s        disk ID   p         1, 2, 3  
 disk.device.write.bytes          c      B          disk ID   p         1, 2           Volume of writes
 disk.device.write.bytes.rate     g      B/s        disk ID   p         1, 2, 3        Average volume of writes
 disk.device.latency              g      ms         disk ID   p         2              Average disk latency per device
+disk.device.iops                 g      count/s    disk ID   p         2              Average disk iops per device
 disk.root.size                   g      GB         inst ID   n         1, 2           Size of root disk
 disk.ephemeral.size              g      GB         inst ID   n         1, 2           Size of ephemeral disk
 network.incoming.bytes           c      B          iface ID  p         1, 2           Number of incoming bytes
