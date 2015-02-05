@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-02 06:08+0000\n"
-"PO-Revision-Date: 2015-01-29 21:58+0000\n"
+"POT-Creation-Date: 2015-02-05 06:19+0000\n"
+"PO-Revision-Date: 2015-02-02 22:58+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: English (United Kingdom) "
 "(http://www.transifex.com/projects/p/ceilometer/language/en_GB/)\n"
@@ -19,31 +19,31 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
-#: ceilometer/collector.py:100
+#: ceilometer/collector.py:123
 #, python-format
 msgid "UDP: Cannot decode data sent by %s"
 msgstr "UDP: Cannot decode data sent by %s"
 
-#: ceilometer/collector.py:103
+#: ceilometer/collector.py:126
 #, python-format
 msgid "UDP: Storing %s"
 msgstr "UDP: Storing %s"
 
-#: ceilometer/collector.py:107
+#: ceilometer/collector.py:130
 msgid "UDP: Unable to store meter"
 msgstr "UDP: Unable to store meter"
 
-#: ceilometer/notification.py:131 ceilometer/notifier.py:46
+#: ceilometer/notification.py:144 ceilometer/notifier.py:46
 #, python-format
 msgid "Failed to load any notification handlers for %s"
 msgstr "Failed to load any notification handlers for %s"
 
-#: ceilometer/notification.py:143
+#: ceilometer/notification.py:157
 #, python-format
 msgid "Event types from %(name)s: %(type)s (ack_on_error=%(error)s)"
 msgstr "Event types from %(name)s: %(type)s (ack_on_error=%(error)s)"
 
-#: ceilometer/notification.py:183
+#: ceilometer/notification.py:191
 #, python-format
 msgid "Pipeline endpoint: %s"
 msgstr ""
@@ -53,12 +53,12 @@ msgstr ""
 msgid "loading notification handlers from %s"
 msgstr "loading notification handlers from %s"
 
-#: ceilometer/pipeline.py:285
+#: ceilometer/pipeline.py:311
 #, python-format
 msgid "Unable to load publisher %s"
 msgstr "Unable to load publisher %s"
 
-#: ceilometer/pipeline.py:303
+#: ceilometer/pipeline.py:329
 #, python-format
 msgid ""
 "Pipeline %(pipeline)s: Setup transformer instance %(name)s with parameter"
@@ -67,17 +67,17 @@ msgstr ""
 "Pipeline %(pipeline)s: Setup transformer instance %(name)s with parameter"
 " %(param)s"
 
-#: ceilometer/pipeline.py:320 ceilometer/pipeline.py:382
+#: ceilometer/pipeline.py:348 ceilometer/pipeline.py:412
 #, python-format
 msgid "Pipeline %(pipeline)s: Continue after error from publisher %(pub)s"
 msgstr "Pipeline %(pipeline)s: Continue after error from publisher %(pub)s"
 
-#: ceilometer/pipeline.py:337
+#: ceilometer/pipeline.py:367
 #, python-format
 msgid "Pipeline %(pipeline)s: Sample dropped by transformer %(trans)s"
 msgstr "Pipeline %(pipeline)s: Sample dropped by transformer %(trans)s"
 
-#: ceilometer/pipeline.py:345
+#: ceilometer/pipeline.py:375
 #, python-format
 msgid ""
 "Pipeline %(pipeline)s: Exit after error from transformer %(trans)s for "
@@ -86,30 +86,30 @@ msgstr ""
 "Pipeline %(pipeline)s: Exit after error from transformer %(trans)s for "
 "%(smp)s"
 
-#: ceilometer/pipeline.py:368
+#: ceilometer/pipeline.py:398
 #, python-format
 msgid "Pipeline %(pipeline)s: Transform sample %(smp)s from %(trans)s transformer"
 msgstr "Pipeline %(pipeline)s: Transform sample %(smp)s from %(trans)s transformer"
 
-#: ceilometer/pipeline.py:398
+#: ceilometer/pipeline.py:428
 #, python-format
 msgid "Pipeline %(pipeline)s: Error flushing transformer %(trans)s"
 msgstr "Pipeline %(pipeline)s: Error flushing transformer %(trans)s"
 
-#: ceilometer/pipeline.py:594
+#: ceilometer/pipeline.py:624
 msgid "detected decoupled pipeline config format"
 msgstr "detected decoupled pipeline config format"
 
-#: ceilometer/pipeline.py:610
+#: ceilometer/pipeline.py:640
 msgid "detected deprecated pipeline config format"
 msgstr "detected deprecated pipeline config format"
 
-#: ceilometer/pipeline.py:634
+#: ceilometer/pipeline.py:664
 #, python-format
 msgid "Pipeline config file: %s"
 msgstr "Pipeline config file: %s"
 
-#: ceilometer/pipeline.py:640
+#: ceilometer/pipeline.py:670
 #, python-format
 msgid "Pipeline config: %s"
 msgstr "Pipeline config: %s"
@@ -119,27 +119,27 @@ msgstr "Pipeline config: %s"
 msgid "%(worker_name)s value of %(workers)s is invalid, must be greater than 0"
 msgstr "%(worker_name)s value of %(workers)s is invalid, must be greater than 0"
 
-#: ceilometer/agent/base.py:116
+#: ceilometer/agent/base.py:127
 #, python-format
 msgid "Polling pollster %(poll)s in the context of %(src)s"
 msgstr ""
 
-#: ceilometer/agent/base.py:130
+#: ceilometer/agent/base.py:141
 #, python-format
 msgid "Skip polling pollster %s, no resources found"
 msgstr ""
 
-#: ceilometer/agent/base.py:142
+#: ceilometer/agent/base.py:153
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
 msgstr "Continue after error from %(name)s: %(error)s"
 
-#: ceilometer/agent/base.py:282
+#: ceilometer/agent/base.py:299
 #, python-format
 msgid "Unable to discover resources: %s"
 msgstr "Unable to discover resources: %s"
 
-#: ceilometer/agent/base.py:284
+#: ceilometer/agent/base.py:301
 #, python-format
 msgid "Unknown discovery extension: %s"
 msgstr "Unknown discovery extension: %s"
@@ -728,8 +728,9 @@ msgstr "CPUTIME USAGE: %(instance)s %(time)d"
 
 #: ceilometer/compute/pollsters/cpu.py:48
 #: ceilometer/compute/pollsters/cpu.py:79
-#: ceilometer/compute/pollsters/disk.py:117
-#: ceilometer/compute/pollsters/disk.py:327
+#: ceilometer/compute/pollsters/disk.py:121
+#: ceilometer/compute/pollsters/disk.py:331
+#: ceilometer/compute/pollsters/disk.py:513
 #: ceilometer/compute/pollsters/memory.py:47
 #: ceilometer/compute/pollsters/net.py:106
 #, python-format
@@ -766,15 +767,17 @@ msgstr "Obtaining CPU Util is not implemented for %s"
 msgid "Could not get CPU Util for %(id)s: %(e)s"
 msgstr "Could not get CPU Util for %(id)s: %(e)s"
 
-#: ceilometer/compute/pollsters/disk.py:125
-#: ceilometer/compute/pollsters/disk.py:330
+#: ceilometer/compute/pollsters/disk.py:129
+#: ceilometer/compute/pollsters/disk.py:334
+#: ceilometer/compute/pollsters/disk.py:516
 #: ceilometer/compute/pollsters/net.py:114
 #, python-format
 msgid "%(inspector)s does not provide data for  %(pollster)s"
 msgstr "%(inspector)s does not provide data for  %(pollster)s"
 
-#: ceilometer/compute/pollsters/disk.py:130
-#: ceilometer/compute/pollsters/disk.py:336
+#: ceilometer/compute/pollsters/disk.py:134
+#: ceilometer/compute/pollsters/disk.py:340
+#: ceilometer/compute/pollsters/disk.py:522
 #: ceilometer/compute/pollsters/net.py:119
 #, python-format
 msgid "Ignoring instance %(name)s: %(error)s"
@@ -805,17 +808,17 @@ msgstr "Could not get Memory Usage for %(id)s: %(e)s"
 msgid "checking net info for instance %s"
 msgstr "checking net info for instance %s"
 
-#: ceilometer/compute/virt/inspector.py:232
+#: ceilometer/compute/virt/inspector.py:247
 #, python-format
 msgid "Unable to load the hypervisor inspector: %s"
 msgstr "Unable to load the hypervisor inspector: %s"
 
-#: ceilometer/compute/virt/hyperv/utilsv2.py:181
+#: ceilometer/compute/virt/hyperv/utilsv2.py:208
 #, python-format
 msgid "VM %s not found on Hyper-V"
 msgstr "VM %s not found on Hyper-V"
 
-#: ceilometer/compute/virt/hyperv/utilsv2.py:183
+#: ceilometer/compute/virt/hyperv/utilsv2.py:210
 #, python-format
 msgid "Duplicate VM name found: %s"
 msgstr "Duplicate VM name found: %s"
@@ -921,12 +924,12 @@ msgstr ""
 "metering data %(counter_name)s for %(resource_id)s @ %(timestamp)s: "
 "%(counter_volume)s"
 
-#: ceilometer/dispatcher/database.py:92 ceilometer/dispatcher/http.py:109
+#: ceilometer/dispatcher/database.py:91 ceilometer/dispatcher/http.py:108
 #, python-format
 msgid "Failed to record metering data: %s"
 msgstr "Failed to record metering data: %s"
 
-#: ceilometer/dispatcher/database.py:95 ceilometer/dispatcher/http.py:112
+#: ceilometer/dispatcher/database.py:94 ceilometer/dispatcher/http.py:111
 #, python-format
 msgid "message signature invalid, discarding message: %r"
 msgstr "message signature invalid, discarding message: %r"
@@ -937,7 +940,7 @@ msgid ""
 " the ceilometer.conf file"
 msgstr ""
 
-#: ceilometer/dispatcher/http.py:106
+#: ceilometer/dispatcher/http.py:105
 #, python-format
 msgid "Message posting finished with status code %d."
 msgstr ""
@@ -1013,18 +1016,9 @@ msgstr "No Event Definitions configuration file found! Using default config."
 msgid "Event Definitions: %s"
 msgstr "Event Definitions: %s"
 
-#: ceilometer/event/endpoint.py:36
+#: ceilometer/event/endpoint.py:34
 msgid "Loading event definitions"
 msgstr "Loading event definitions"
-
-#: ceilometer/event/endpoint.py:62
-#, python-format
-msgid "Saving event \"%s\""
-msgstr "Saving event \"%s\""
-
-#: ceilometer/event/endpoint.py:69
-msgid "Event is not implemented with the storage backend"
-msgstr "Event is not implemented with the storage backend"
 
 #: ceilometer/event/storage/impl_hbase.py:123
 #: ceilometer/event/storage/impl_sqlalchemy.py:200
@@ -1152,6 +1146,7 @@ msgid "Swift endpoint not found"
 msgstr "Swift endpoint not found"
 
 #: ceilometer/openstack/common/log.py:298
+#: ceilometer/openstack/common/versionutils.py:232
 #, python-format
 msgid "Deprecated: %s"
 msgstr "Deprecated: %s"
@@ -1167,19 +1162,20 @@ msgid "syslog facility must be one of: %s"
 msgstr "syslog facility must be one of: %s"
 
 #: ceilometer/openstack/common/log.py:715
+#: ceilometer/openstack/common/versionutils.py:250
 #, python-format
 msgid "Fatal call to deprecated config: %(msg)s"
 msgstr "Fatal call to deprecated config: %(msg)s"
 
-#: ceilometer/openstack/common/policy.py:98
+#: ceilometer/openstack/common/policy.py:111
 msgid "The JSON file that defines policies."
 msgstr "The JSON file that defines policies."
 
-#: ceilometer/openstack/common/policy.py:101
+#: ceilometer/openstack/common/policy.py:114
 msgid "Default rule. Enforced when a requested rule is not found."
 msgstr "Default rule. Enforced when a requested rule is not found."
 
-#: ceilometer/openstack/common/policy.py:105
+#: ceilometer/openstack/common/policy.py:118
 msgid ""
 "Directories where policy configuration files are stored. They can be "
 "relative to any directory in the search path defined by the config_dir "
@@ -1187,15 +1183,39 @@ msgid ""
 " these directories to be searched."
 msgstr ""
 
-#: ceilometer/openstack/common/policy.py:129
+#: ceilometer/openstack/common/policy.py:142
 #, python-format
 msgid "Policy doesn't allow %s to be performed."
 msgstr "Policy doesn't allow %s to be performed."
 
-#: ceilometer/openstack/common/policy.py:226
+#: ceilometer/openstack/common/policy.py:239
 #, python-format
 msgid "Rules must be an instance of dict or Rules, got %s instead"
 msgstr "Rules must be an instance of dict or Rules, got %s instead"
+
+#: ceilometer/openstack/common/versionutils.py:99
+#, python-format
+msgid ""
+"%(what)s is deprecated as of %(as_of)s in favor of %(in_favor_of)s and "
+"may be removed in %(remove_in)s."
+msgstr ""
+
+#: ceilometer/openstack/common/versionutils.py:103
+#, python-format
+msgid ""
+"%(what)s is deprecated as of %(as_of)s and may be removed in "
+"%(remove_in)s. It will not be superseded."
+msgstr ""
+
+#: ceilometer/openstack/common/versionutils.py:107
+#, python-format
+msgid "%(what)s is deprecated as of %(as_of)s in favor of %(in_favor_of)s."
+msgstr ""
+
+#: ceilometer/openstack/common/versionutils.py:110
+#, python-format
+msgid "%(what)s is deprecated as of %(as_of)s. It will not be superseded."
+msgstr ""
 
 #: ceilometer/publisher/file.py:62
 msgid "The path for the file publisher is required"
@@ -1205,37 +1225,37 @@ msgstr "The path for the file publisher is required"
 msgid "max_bytes and backup_count should be numbers."
 msgstr "max_bytes and backup_count should be numbers."
 
-#: ceilometer/publisher/messaging.py:83
+#: ceilometer/publisher/messaging.py:88
 #, python-format
 msgid "Publishing policy set to %s"
 msgstr "Publishing policy set to %s"
 
-#: ceilometer/publisher/messaging.py:85
+#: ceilometer/publisher/messaging.py:90
 #, python-format
 msgid "Publishing policy is unknown (%s) force to default"
 msgstr "Publishing policy is unknown (%s) force to default"
 
-#: ceilometer/publisher/messaging.py:140
+#: ceilometer/publisher/messaging.py:143
 #, python-format
 msgid "Publisher max local_queue length is exceeded, dropping %d oldest samples"
 msgstr "Publisher max local_queue length is exceeded, dropping %d oldest samples"
 
-#: ceilometer/publisher/messaging.py:151
+#: ceilometer/publisher/messaging.py:154
 #, python-format
-msgid "Failed to publish %d samples, queue them"
-msgstr "Failed to publish %d samples, queue them"
+msgid "Failed to publish %d datapoints, queue them"
+msgstr ""
 
-#: ceilometer/publisher/messaging.py:155
+#: ceilometer/publisher/messaging.py:158
 #, python-format
-msgid "Failed to publish %d samples, dropping them"
-msgstr "Failed to publish %d samples, dropping them"
+msgid "Failed to publish %d datapoints, dropping them"
+msgstr ""
 
-#: ceilometer/publisher/udp.py:57
+#: ceilometer/publisher/udp.py:56
 #, python-format
 msgid "Publishing sample %(msg)s over UDP to %(host)s:%(port)d"
 msgstr "Publishing sample %(msg)s over UDP to %(host)s:%(port)d"
 
-#: ceilometer/publisher/udp.py:64
+#: ceilometer/publisher/udp.py:63
 msgid "Unable to send sample over UDP"
 msgstr "Unable to send sample over UDP"
 

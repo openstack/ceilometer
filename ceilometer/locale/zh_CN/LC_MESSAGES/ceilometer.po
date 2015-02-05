@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-02 06:08+0000\n"
-"PO-Revision-Date: 2015-01-29 21:58+0000\n"
+"POT-Creation-Date: 2015-02-05 06:19+0000\n"
+"PO-Revision-Date: 2015-02-02 22:58+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Chinese (China) "
 "(http://www.transifex.com/projects/p/ceilometer/language/zh_CN/)\n"
@@ -23,31 +23,31 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
-#: ceilometer/collector.py:100
+#: ceilometer/collector.py:123
 #, python-format
 msgid "UDP: Cannot decode data sent by %s"
 msgstr "UDP: 无法解码由 %s 发送的数据"
 
-#: ceilometer/collector.py:103
+#: ceilometer/collector.py:126
 #, python-format
 msgid "UDP: Storing %s"
 msgstr "UDP: 正在存储%s"
 
-#: ceilometer/collector.py:107
+#: ceilometer/collector.py:130
 msgid "UDP: Unable to store meter"
 msgstr "UDP: 无法存储计量器"
 
-#: ceilometer/notification.py:131 ceilometer/notifier.py:46
+#: ceilometer/notification.py:144 ceilometer/notifier.py:46
 #, python-format
 msgid "Failed to load any notification handlers for %s"
 msgstr "无法为%s加载任何通知处理器"
 
-#: ceilometer/notification.py:143
+#: ceilometer/notification.py:157
 #, python-format
 msgid "Event types from %(name)s: %(type)s (ack_on_error=%(error)s)"
 msgstr ""
 
-#: ceilometer/notification.py:183
+#: ceilometer/notification.py:191
 #, python-format
 msgid "Pipeline endpoint: %s"
 msgstr " 流水线入口：%s"
@@ -57,59 +57,59 @@ msgstr " 流水线入口：%s"
 msgid "loading notification handlers from %s"
 msgstr "从%s加载通知处理器"
 
-#: ceilometer/pipeline.py:285
+#: ceilometer/pipeline.py:311
 #, python-format
 msgid "Unable to load publisher %s"
 msgstr "无法加载发布器%s"
 
-#: ceilometer/pipeline.py:303
+#: ceilometer/pipeline.py:329
 #, python-format
 msgid ""
 "Pipeline %(pipeline)s: Setup transformer instance %(name)s with parameter"
 " %(param)s"
 msgstr "流水线%(pipeline)s：使用参数%(param)s初始化变形器实例%(name)s"
 
-#: ceilometer/pipeline.py:320 ceilometer/pipeline.py:382
+#: ceilometer/pipeline.py:348 ceilometer/pipeline.py:412
 #, python-format
 msgid "Pipeline %(pipeline)s: Continue after error from publisher %(pub)s"
 msgstr "流水线%(pipeline)s：发布器%(pub)s报错，继续执行"
 
-#: ceilometer/pipeline.py:337
+#: ceilometer/pipeline.py:367
 #, python-format
 msgid "Pipeline %(pipeline)s: Sample dropped by transformer %(trans)s"
 msgstr "流水线%(pipeline)s：数据点被变形器%(trans)s丢弃"
 
-#: ceilometer/pipeline.py:345
+#: ceilometer/pipeline.py:375
 #, python-format
 msgid ""
 "Pipeline %(pipeline)s: Exit after error from transformer %(trans)s for "
 "%(smp)s"
 msgstr "流水线%(pipeline)s：数据%(smp)s的变形器%(trans)s遇到错误，退出"
 
-#: ceilometer/pipeline.py:368
+#: ceilometer/pipeline.py:398
 #, python-format
 msgid "Pipeline %(pipeline)s: Transform sample %(smp)s from %(trans)s transformer"
 msgstr "流水线%(pipeline)s：使用变形器%(trans)s作用于数据%(smp)s "
 
-#: ceilometer/pipeline.py:398
+#: ceilometer/pipeline.py:428
 #, python-format
 msgid "Pipeline %(pipeline)s: Error flushing transformer %(trans)s"
 msgstr "流水线%(pipeline)s：变形器%(trans)s清空数据时出错"
 
-#: ceilometer/pipeline.py:594
+#: ceilometer/pipeline.py:624
 msgid "detected decoupled pipeline config format"
 msgstr "检测到分离的流水线配置格式"
 
-#: ceilometer/pipeline.py:610
+#: ceilometer/pipeline.py:640
 msgid "detected deprecated pipeline config format"
 msgstr "检测到废弃的流水线配置格式"
 
-#: ceilometer/pipeline.py:634
+#: ceilometer/pipeline.py:664
 #, python-format
 msgid "Pipeline config file: %s"
 msgstr "流水线配置文件：%s"
 
-#: ceilometer/pipeline.py:640
+#: ceilometer/pipeline.py:670
 #, python-format
 msgid "Pipeline config: %s"
 msgstr "流水线配置：%s"
@@ -119,27 +119,27 @@ msgstr "流水线配置：%s"
 msgid "%(worker_name)s value of %(workers)s is invalid, must be greater than 0"
 msgstr "工作线程%(worker_name)s的数量%(workers)s非法，必须大于0"
 
-#: ceilometer/agent/base.py:116
+#: ceilometer/agent/base.py:127
 #, python-format
 msgid "Polling pollster %(poll)s in the context of %(src)s"
 msgstr "在上下文环境%(src)s执行采集器%(poll)s"
 
-#: ceilometer/agent/base.py:130
+#: ceilometer/agent/base.py:141
 #, python-format
 msgid "Skip polling pollster %s, no resources found"
 msgstr "没有任何资源被发现，跳过采集器%s"
 
-#: ceilometer/agent/base.py:142
+#: ceilometer/agent/base.py:153
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
 msgstr "遇到错误%(name)s：%(error)s，继续执行"
 
-#: ceilometer/agent/base.py:282
+#: ceilometer/agent/base.py:299
 #, python-format
 msgid "Unable to discover resources: %s"
 msgstr "无法发现资源：%s"
 
-#: ceilometer/agent/base.py:284
+#: ceilometer/agent/base.py:301
 #, python-format
 msgid "Unknown discovery extension: %s"
 msgstr "未知的发现器插件：%s"
@@ -714,8 +714,9 @@ msgstr "虚拟机%(instance)s的CPU时间为%(time)d"
 
 #: ceilometer/compute/pollsters/cpu.py:48
 #: ceilometer/compute/pollsters/cpu.py:79
-#: ceilometer/compute/pollsters/disk.py:117
-#: ceilometer/compute/pollsters/disk.py:327
+#: ceilometer/compute/pollsters/disk.py:121
+#: ceilometer/compute/pollsters/disk.py:331
+#: ceilometer/compute/pollsters/disk.py:513
 #: ceilometer/compute/pollsters/memory.py:47
 #: ceilometer/compute/pollsters/net.py:106
 #, python-format
@@ -752,15 +753,17 @@ msgstr "为%s获取CPU使用率尚未实现"
 msgid "Could not get CPU Util for %(id)s: %(e)s"
 msgstr "无法为虚拟机%(id)s获取CPU使用率：%(e)s"
 
-#: ceilometer/compute/pollsters/disk.py:125
-#: ceilometer/compute/pollsters/disk.py:330
+#: ceilometer/compute/pollsters/disk.py:129
+#: ceilometer/compute/pollsters/disk.py:334
+#: ceilometer/compute/pollsters/disk.py:516
 #: ceilometer/compute/pollsters/net.py:114
 #, python-format
 msgid "%(inspector)s does not provide data for  %(pollster)s"
 msgstr "探测器%(inspector)s没有为%(pollster)s提供数据"
 
-#: ceilometer/compute/pollsters/disk.py:130
-#: ceilometer/compute/pollsters/disk.py:336
+#: ceilometer/compute/pollsters/disk.py:134
+#: ceilometer/compute/pollsters/disk.py:340
+#: ceilometer/compute/pollsters/disk.py:522
 #: ceilometer/compute/pollsters/net.py:119
 #, python-format
 msgid "Ignoring instance %(name)s: %(error)s"
@@ -791,17 +794,17 @@ msgstr "无法为%(id)s获取内存使用信息：%(e)s"
 msgid "checking net info for instance %s"
 msgstr "为虚拟机%s检查网络信息"
 
-#: ceilometer/compute/virt/inspector.py:232
+#: ceilometer/compute/virt/inspector.py:247
 #, python-format
 msgid "Unable to load the hypervisor inspector: %s"
 msgstr "无法加载管理程序的探测器：%s"
 
-#: ceilometer/compute/virt/hyperv/utilsv2.py:181
+#: ceilometer/compute/virt/hyperv/utilsv2.py:208
 #, python-format
 msgid "VM %s not found on Hyper-V"
 msgstr "在Hyper-V上找不到 VM %s"
 
-#: ceilometer/compute/virt/hyperv/utilsv2.py:183
+#: ceilometer/compute/virt/hyperv/utilsv2.py:210
 #, python-format
 msgid "Duplicate VM name found: %s"
 msgstr "找到重复 VM 名称：%s"
@@ -905,12 +908,12 @@ msgid ""
 "%(counter_volume)s"
 msgstr "再时间点%(timestamp)s为资源%(resource_id)s获得指标%(counter_name)s的监控数据：%(counter_volume)s"
 
-#: ceilometer/dispatcher/database.py:92 ceilometer/dispatcher/http.py:109
+#: ceilometer/dispatcher/database.py:91 ceilometer/dispatcher/http.py:108
 #, python-format
 msgid "Failed to record metering data: %s"
 msgstr "无法保存监控数据：%s"
 
-#: ceilometer/dispatcher/database.py:95 ceilometer/dispatcher/http.py:112
+#: ceilometer/dispatcher/database.py:94 ceilometer/dispatcher/http.py:111
 #, python-format
 msgid "message signature invalid, discarding message: %r"
 msgstr "消息签名不合法，丢弃消息：%r"
@@ -921,7 +924,7 @@ msgid ""
 " the ceilometer.conf file"
 msgstr "分发器目标未设置，没有指标将被发送。在ceilometer.conf文件中设置目标。"
 
-#: ceilometer/dispatcher/http.py:106
+#: ceilometer/dispatcher/http.py:105
 #, python-format
 msgid "Message posting finished with status code %d."
 msgstr "消息发送结束，状态码为%d"
@@ -993,18 +996,9 @@ msgstr "没有找到事件定义配置文件！使用默认的配置。"
 msgid "Event Definitions: %s"
 msgstr "事件定义：%s"
 
-#: ceilometer/event/endpoint.py:36
+#: ceilometer/event/endpoint.py:34
 msgid "Loading event definitions"
 msgstr "正在加载事件定义"
-
-#: ceilometer/event/endpoint.py:62
-#, python-format
-msgid "Saving event \"%s\""
-msgstr "正在保存事件\"%s\""
-
-#: ceilometer/event/endpoint.py:69
-msgid "Event is not implemented with the storage backend"
-msgstr "事件特性尚未在该数据库中实现"
 
 #: ceilometer/event/storage/impl_hbase.py:123
 #: ceilometer/event/storage/impl_sqlalchemy.py:200
@@ -1132,6 +1126,7 @@ msgid "Swift endpoint not found"
 msgstr "Swift端点无法找到"
 
 #: ceilometer/openstack/common/log.py:298
+#: ceilometer/openstack/common/versionutils.py:232
 #, python-format
 msgid "Deprecated: %s"
 msgstr "建议不要使用：%s"
@@ -1147,19 +1142,20 @@ msgid "syslog facility must be one of: %s"
 msgstr "系统日志工具必须是下列其中一项：%s"
 
 #: ceilometer/openstack/common/log.py:715
+#: ceilometer/openstack/common/versionutils.py:250
 #, python-format
 msgid "Fatal call to deprecated config: %(msg)s"
 msgstr "对建议不要使用的配置进行了后果极严重的调用：%(msg)s"
 
-#: ceilometer/openstack/common/policy.py:98
+#: ceilometer/openstack/common/policy.py:111
 msgid "The JSON file that defines policies."
 msgstr "定义策略的JSON文件。"
 
-#: ceilometer/openstack/common/policy.py:101
+#: ceilometer/openstack/common/policy.py:114
 msgid "Default rule. Enforced when a requested rule is not found."
 msgstr "默认规则。当一个请求的规则没有找到时强制使用的规则。"
 
-#: ceilometer/openstack/common/policy.py:105
+#: ceilometer/openstack/common/policy.py:118
 msgid ""
 "Directories where policy configuration files are stored. They can be "
 "relative to any directory in the search path defined by the config_dir "
@@ -1167,15 +1163,39 @@ msgid ""
 " these directories to be searched."
 msgstr ""
 
-#: ceilometer/openstack/common/policy.py:129
+#: ceilometer/openstack/common/policy.py:142
 #, python-format
 msgid "Policy doesn't allow %s to be performed."
 msgstr "策略不允许 %s 被执行。"
 
-#: ceilometer/openstack/common/policy.py:226
+#: ceilometer/openstack/common/policy.py:239
 #, python-format
 msgid "Rules must be an instance of dict or Rules, got %s instead"
 msgstr "规则必须是字典或者规则的实例化对像，获取 %s 取代"
+
+#: ceilometer/openstack/common/versionutils.py:99
+#, python-format
+msgid ""
+"%(what)s is deprecated as of %(as_of)s in favor of %(in_favor_of)s and "
+"may be removed in %(remove_in)s."
+msgstr ""
+
+#: ceilometer/openstack/common/versionutils.py:103
+#, python-format
+msgid ""
+"%(what)s is deprecated as of %(as_of)s and may be removed in "
+"%(remove_in)s. It will not be superseded."
+msgstr ""
+
+#: ceilometer/openstack/common/versionutils.py:107
+#, python-format
+msgid "%(what)s is deprecated as of %(as_of)s in favor of %(in_favor_of)s."
+msgstr ""
+
+#: ceilometer/openstack/common/versionutils.py:110
+#, python-format
+msgid "%(what)s is deprecated as of %(as_of)s. It will not be superseded."
+msgstr ""
 
 #: ceilometer/publisher/file.py:62
 msgid "The path for the file publisher is required"
@@ -1185,37 +1205,37 @@ msgstr "文件发布器必须设置文件路径"
 msgid "max_bytes and backup_count should be numbers."
 msgstr "max_bytes和backup_count必须是整数。"
 
-#: ceilometer/publisher/messaging.py:83
+#: ceilometer/publisher/messaging.py:88
 #, python-format
 msgid "Publishing policy set to %s"
 msgstr "设置发布策略为%s"
 
-#: ceilometer/publisher/messaging.py:85
+#: ceilometer/publisher/messaging.py:90
 #, python-format
 msgid "Publishing policy is unknown (%s) force to default"
 msgstr "未知的发布策略(%s)，强制使用默认策略"
 
-#: ceilometer/publisher/messaging.py:140
+#: ceilometer/publisher/messaging.py:143
 #, python-format
 msgid "Publisher max local_queue length is exceeded, dropping %d oldest samples"
 msgstr "发布的数据量超过本地队列最大长度，正在丢弃最老的%d个数据"
 
-#: ceilometer/publisher/messaging.py:151
+#: ceilometer/publisher/messaging.py:154
 #, python-format
-msgid "Failed to publish %d samples, queue them"
-msgstr "发送%d个数据失败了，将其重新入队"
+msgid "Failed to publish %d datapoints, queue them"
+msgstr ""
 
-#: ceilometer/publisher/messaging.py:155
+#: ceilometer/publisher/messaging.py:158
 #, python-format
-msgid "Failed to publish %d samples, dropping them"
-msgstr "发布%d个数据失败了，将其丢弃"
+msgid "Failed to publish %d datapoints, dropping them"
+msgstr ""
 
-#: ceilometer/publisher/udp.py:57
+#: ceilometer/publisher/udp.py:56
 #, python-format
 msgid "Publishing sample %(msg)s over UDP to %(host)s:%(port)d"
 msgstr "通过UDP发布采样 %(msg)s 至 %(host)s:%(port)d"
 
-#: ceilometer/publisher/udp.py:64
+#: ceilometer/publisher/udp.py:63
 msgid "Unable to send sample over UDP"
 msgstr "无法通过UDP发送采样"
 
