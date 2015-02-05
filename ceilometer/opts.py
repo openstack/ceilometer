@@ -19,7 +19,7 @@ import ceilometer.alarm.rpc
 import ceilometer.alarm.service
 import ceilometer.api
 import ceilometer.api.app
-import ceilometer.api.controllers.v2
+import ceilometer.api.controllers.v2.alarms
 import ceilometer.cmd.alarm
 import ceilometer.cmd.polling
 import ceilometer.collector
@@ -102,7 +102,7 @@ def list_opts():
          itertools.chain(ceilometer.alarm.notifier.rest.OPTS,
                          ceilometer.alarm.service.OPTS,
                          ceilometer.alarm.rpc.OPTS,
-                         ceilometer.api.controllers.v2.ALARM_API_OPTS,
+                         ceilometer.api.controllers.v2.alarms.ALARM_API_OPTS,
                          ceilometer.cmd.alarm.OPTS)),
         ('api',
          itertools.chain(ceilometer.api.OPTS,

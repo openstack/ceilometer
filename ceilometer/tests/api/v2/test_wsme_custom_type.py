@@ -15,14 +15,14 @@
 from oslotest import base
 import wsme
 
-from ceilometer.api.controllers import v2
+from ceilometer.api.controllers.v2 import base as v2_base
 
 
 class TestWsmeCustomType(base.BaseTestCase):
 
     def test_advenum_default(self):
         class dummybase(wsme.types.Base):
-            ae = v2.AdvEnum("name", str, "one", "other", default="other")
+            ae = v2_base.AdvEnum("name", str, "one", "other", default="other")
 
         obj = dummybase()
         self.assertEqual("other", obj.ae)

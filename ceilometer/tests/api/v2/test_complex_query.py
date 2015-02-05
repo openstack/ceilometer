@@ -25,11 +25,11 @@ from oslotest import base
 import wsme
 
 from ceilometer.alarm.storage import models as alarm_models
-from ceilometer.api.controllers import v2 as api
+from ceilometer.api.controllers.v2 import query
 from ceilometer.storage import models
 
 
-class FakeComplexQuery(api.ValidatedComplexQuery):
+class FakeComplexQuery(query.ValidatedComplexQuery):
     def __init__(self, db_model, additional_name_mapping=None, metadata=False):
         super(FakeComplexQuery, self).__init__(query=None,
                                                db_model=db_model,
