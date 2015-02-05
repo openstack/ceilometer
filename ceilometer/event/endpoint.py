@@ -58,6 +58,23 @@ class EventsNotificationEndpoint(object):
             'info', ctxt, publisher_id, event_type, payload, metadata)
         self.process_notification(notification)
 
+    def error(self, ctxt, publisher_id, event_type, payload, metadata):
+        """Convert error message to Ceilometer Event.
+
+        :param ctxt: oslo.messaging context
+        :param publisher_id: publisher of the notification
+        :param event_type: type of notification
+        :param payload: notification payload
+        :param metadata: metadata about the notification
+        """
+
+        # NOTE: the rpc layer currently rips out the notification
+        # delivery_info, which is critical to determining the
+        # source of the notification. This will have to get added back later.
+        notification = messaging.convert_to_old_notification_format(
+            'error', ctxt, publisher_id, event_type, payload, metadata)
+        self.process_notification(notification)
+
     def process_notification(self, notification):
         try:
             event = self.event_converter.to_event(notification)
