@@ -70,6 +70,12 @@ class NotificationService(os_service.Service):
     NOTIFICATION_NAMESPACE = 'ceilometer.notification'
     NOTIFICATION_IPC = 'ceilometer-pipe'
 
+    def __init__(self, *args, **kwargs):
+        super(NotificationService, self).__init__(*args, **kwargs)
+        self.partition_coordinator = None
+        self.listeners = self.pipeline_listeners = []
+        self.group_id = None
+
     @classmethod
     def _get_notifications_manager(cls, transporter):
         return extension.ExtensionManager(
@@ -201,6 +207,7 @@ class NotificationService(os_service.Service):
             self.pipeline_listeners.append(listener)
 
     def stop(self):
-        self.partition_coordinator.leave_group(self.group_id)
+        if self.partition_coordinator:
+            self.partition_coordinator.stop()
         utils.kill_listeners(self.listeners + self.pipeline_listeners)
         super(NotificationService, self).stop()

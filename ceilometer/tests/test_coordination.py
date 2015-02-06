@@ -32,6 +32,9 @@ class MockToozCoordinator(object):
     def start(self):
         pass
 
+    def stop(self):
+        pass
+
     def heartbeat(self):
         pass
 
@@ -53,6 +56,9 @@ class MockToozCoordinator(object):
         self._groups[group_id][self._member_id] = {
             "capabilities": capabilities,
         }
+        return MockAsyncResult(None)
+
+    def leave_group(self, group_id):
         return MockAsyncResult(None)
 
     def get_members(self, group_id):
@@ -221,3 +227,23 @@ class TestPartitioning(base.BaseTestCase):
             coord.heartbeat()
         for e in expected_errors:
             self.assertNotIn(e, self.str_handler.messages['error'])
+
+    def test_group_id_none(self):
+        coord = self._get_new_started_coordinator({}, 'a')
+        self.assertTrue(coord._started)
+
+        with mock.patch.object(coord._coordinator, 'join_group') as mocked:
+            coord.join_group(None)
+            self.assertEqual(0, mocked.call_count)
+        with mock.patch.object(coord._coordinator, 'leave_group') as mocked:
+            coord.leave_group(None)
+            self.assertEqual(0, mocked.call_count)
+
+    def test_stop(self):
+        coord = self._get_new_started_coordinator({}, 'a')
+        self.assertTrue(coord._started)
+        coord.join_group("123")
+        coord.stop()
+        self.assertIsEmpty(coord._groups)
+        self.assertFalse(coord._started)
+        self.assertIsNone(coord._coordinator)
