@@ -267,3 +267,13 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
         self._do_test_rate_of_change_in_boilerplate_pipeline_cfg(3,
                                                                  meters,
                                                                  units)
+
+    def test_duplicated_sinks_names(self):
+        self.pipeline_cfg['sinks'].append({
+            'name': 'test_sink',
+            'publishers': ['except'],
+        })
+        self.assertRaises(pipeline.PipelineException,
+                          pipeline.PipelineManager,
+                          self.pipeline_cfg,
+                          self.transformer_manager)
