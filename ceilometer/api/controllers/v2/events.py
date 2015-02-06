@@ -135,6 +135,9 @@ class Event(base.Base):
     generated = datetime.datetime
     "The time the event occurred"
 
+    raw = base.JsonType()
+    "The raw copy of notification"
+
     @classmethod
     def sample(cls):
         return cls(
@@ -148,7 +151,8 @@ class Event(base.Base):
                       value='conductor.tem-devstack-01'),
                 Trait(name='tenant_id',
                       value='7f13f2b17917463b9ee21aa92c4b36d6')
-            }
+            },
+            raw={'status': {'nested': 'started'}}
         )
 
 
@@ -243,7 +247,8 @@ class EventsController(rest.RestController):
         return [Event(message_id=event.message_id,
                       event_type=event.event_type,
                       generated=event.generated,
-                      traits=event.traits)
+                      traits=event.traits,
+                      raw=event.raw)
                 for event in
                 pecan.request.event_storage_conn.get_events(event_filter)]
 
@@ -269,4 +274,5 @@ class EventsController(rest.RestController):
         return Event(message_id=event.message_id,
                      event_type=event.event_type,
                      generated=event.generated,
-                     traits=event.traits)
+                     traits=event.traits,
+                     raw=event.raw)

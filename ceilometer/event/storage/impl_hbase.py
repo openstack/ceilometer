@@ -116,7 +116,8 @@ class Connection(hbase_base.Connection, base.Connection):
                         traits[key] = trait.value
                 record = hbase_utils.serialize_entry(traits,
                                                      event_type=event_type,
-                                                     timestamp=ts)
+                                                     timestamp=ts,
+                                                     raw=event_model.raw)
                 try:
                     events_table.put(row, record)
                 except Exception as ex:
@@ -154,7 +155,8 @@ class Connection(hbase_base.Connection, base.Connection):
                 event_type=events_dict['event_type'],
                 generated=events_dict['timestamp'],
                 traits=sorted(traits,
-                              key=operator.attrgetter('dtype'))
+                              key=operator.attrgetter('dtype')),
+                raw=events_dict['raw']
             )
 
     def get_event_types(self):

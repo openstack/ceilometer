@@ -89,7 +89,7 @@ class TestEventDirectPublisher(tests_db.TestBase,
     test_data = [event.Event(message_id=str(uuid.uuid4()),
                              event_type='event_%d' % i,
                              generated=datetime.datetime.utcnow(),
-                             traits=[])
+                             traits=[], raw={})
                  for i in range(0, 5)]
 
     def test_direct_publisher(self, ):

@@ -3166,7 +3166,8 @@ class EventTestBase(tests_db.TestBase,
                                     now)]]
             self.event_models.append(
                 event_models.Event("id_%s_%d" % (event_type, base),
-                                   event_type, now, trait_models))
+                                   event_type, now, trait_models,
+                                   {'status': {'nested': 'started'}}))
             base += 100
             now = now + datetime.timedelta(hours=1)
         self.end = now
@@ -3197,8 +3198,8 @@ class EventTTLTest(EventTestBase):
 class EventTest(EventTestBase):
     def test_duplicate_message_id(self):
         now = datetime.datetime.utcnow()
-        m = [event_models.Event("1", "Foo", now, None),
-             event_models.Event("1", "Zoo", now, [])]
+        m = [event_models.Event("1", "Foo", now, None, {}),
+             event_models.Event("1", "Zoo", now, [], {})]
         problem_events = self.event_conn.record_events(m)
         self.assertEqual(1, len(problem_events))
         bad = problem_events[0]
@@ -3508,7 +3509,7 @@ class GetEventTest(EventTestBase):
 
     def test_simple_get_event_no_traits(self):
         new_events = [event_models.Event("id_notraits", "NoTraits",
-                      self.start, [])]
+                      self.start, [], {})]
         bad_events = self.event_conn.record_events(new_events)
         event_filter = storage.EventFilter(self.start, self.end, "NoTraits")
         events = [event for event in self.event_conn.get_events(event_filter)]
@@ -3527,7 +3528,7 @@ class GetEventTest(EventTestBase):
         new_events = [event_models.Event("id_testid",
                                          "MessageIDTest",
                                          self.start,
-                                         [])]
+                                         [], {})]
 
         bad_events = self.event_conn.record_events(new_events)
         event_filter = storage.EventFilter(message_id="id_testid")
@@ -3536,6 +3537,12 @@ class GetEventTest(EventTestBase):
         self.assertEqual(1, len(events))
         event = events[0]
         self.assertEqual("id_testid", event.message_id)
+
+    def test_simple_get_raw(self):
+        event_filter = storage.EventFilter()
+        events = [event for event in self.event_conn.get_events(event_filter)]
+        self.assertTrue(events)
+        self.assertEqual({'status': {'nested': 'started'}}, events[0].raw)
 
 
 class BigIntegerTest(tests_db.TestBase,

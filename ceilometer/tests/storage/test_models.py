@@ -58,7 +58,7 @@ class ModelTest(testbase.BaseTestCase):
                          d)
 
     def test_event_repr_no_traits(self):
-        x = event_models.Event("1", "name", "now", None)
+        x = event_models.Event("1", "name", "now", None, {})
         self.assertEqual("<Event: 1, name, now, >", repr(x))
 
     def test_get_field_names_of_sample(self):

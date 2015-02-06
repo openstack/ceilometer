@@ -73,7 +73,7 @@ class MyException(Exception):
 class EventTest(tests_db.TestBase):
     def _verify_data(self, trait, trait_table):
         now = datetime.datetime.utcnow()
-        ev = models.Event('1', 'name', now, [trait])
+        ev = models.Event('1', 'name', now, [trait], {})
         self.event_conn.record_events([ev])
         session = self.event_conn._engine_facade.get_session()
         t_tables = [sql_models.TraitText, sql_models.TraitFloat,
@@ -103,8 +103,8 @@ class EventTest(tests_db.TestBase):
 
     def test_bad_event(self):
         now = datetime.datetime.utcnow()
-        m = [models.Event("1", "Foo", now, []),
-             models.Event("2", "Zoo", now, [])]
+        m = [models.Event("1", "Foo", now, [], {}),
+             models.Event("2", "Zoo", now, [], {})]
 
         with mock.patch.object(self.event_conn,
                                "_get_or_create_event_type") as mock_save:
@@ -115,7 +115,7 @@ class EventTest(tests_db.TestBase):
             self.assertEqual(bad, models.Event.UNKNOWN_PROBLEM)
 
     def test_event_repr(self):
-        ev = sql_models.Event('msg_id', None, False)
+        ev = sql_models.Event('msg_id', None, False, {})
         ev.id = 100
         self.assertTrue(repr.repr(ev))
 

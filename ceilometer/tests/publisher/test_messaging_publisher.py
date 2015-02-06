@@ -37,7 +37,7 @@ class BasePublisherTestCase(tests_base.BaseTestCase):
         event.Event(message_id=uuid.uuid4(),
                     event_type='event_%d' % i,
                     generated=datetime.datetime.utcnow(),
-                    traits=[])
+                    traits=[], raw={})
         for i in range(0, 5)
     ]
 

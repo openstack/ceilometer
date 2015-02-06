@@ -17,7 +17,7 @@ import datetime
 
 import jsonpath_rw
 import mock
-from oslo_config import cfg as oslo_cfg
+from oslo_config import fixture as fixture_config
 import six
 
 from ceilometer.event import converter
@@ -594,7 +594,7 @@ class TestNotificationConverter(ConverterBase):
 
     def setUp(self):
         super(TestNotificationConverter, self).setUp()
-
+        self.CONF = self.useFixture(fixture_config.Config()).conf
         self.valid_event_def1 = [{
             'event_type': 'compute.instance.create.*',
             'traits': {
@@ -704,6 +704,60 @@ class TestNotificationConverter(ConverterBase):
         e = c.to_event(self.test_notification2)
         self.assertIsNotValidEvent(e, self.test_notification2)
 
+    @staticmethod
+    def _convert_message(convert, level):
+        message = {'priority': level, 'event_type': "foo",
+                   'message_id': "abc", 'publisher_id': "1"}
+        return convert.to_event(message)
+
+    def test_store_raw_all(self):
+        self.CONF.event.store_raw = ['info', 'error']
+        c = converter.NotificationEventsConverter(
+            [], self.fake_plugin_mgr)
+        self.assertTrue(self._convert_message(c, 'info').raw)
+        self.assertTrue(self._convert_message(c, 'error').raw)
+
+    def test_store_raw_info_only(self):
+        self.CONF.event.store_raw = ['info']
+        c = converter.NotificationEventsConverter(
+            [], self.fake_plugin_mgr)
+        self.assertTrue(self._convert_message(c, 'info').raw)
+        self.assertFalse(self._convert_message(c, 'error').raw)
+
+    def test_store_raw_error_only(self):
+        self.CONF.event.store_raw = ['error']
+        c = converter.NotificationEventsConverter(
+            [], self.fake_plugin_mgr)
+        self.assertFalse(self._convert_message(c, 'info').raw)
+        self.assertTrue(self._convert_message(c, 'error').raw)
+
+    def test_store_raw_skip_all(self):
+        c = converter.NotificationEventsConverter(
+            [], self.fake_plugin_mgr)
+        self.assertFalse(self._convert_message(c, 'info').raw)
+        self.assertFalse(self._convert_message(c, 'error').raw)
+
+    def test_store_raw_info_only_no_case(self):
+        self.CONF.event.store_raw = ['INFO']
+        c = converter.NotificationEventsConverter(
+            [], self.fake_plugin_mgr)
+        self.assertTrue(self._convert_message(c, 'info').raw)
+        self.assertFalse(self._convert_message(c, 'error').raw)
+
+    def test_store_raw_bad_skip_all(self):
+        self.CONF.event.store_raw = ['unknown']
+        c = converter.NotificationEventsConverter(
+            [], self.fake_plugin_mgr)
+        self.assertFalse(self._convert_message(c, 'info').raw)
+        self.assertFalse(self._convert_message(c, 'error').raw)
+
+    def test_store_raw_bad_and_good(self):
+        self.CONF.event.store_raw = ['info', 'unknown']
+        c = converter.NotificationEventsConverter(
+            [], self.fake_plugin_mgr)
+        self.assertTrue(self._convert_message(c, 'info').raw)
+        self.assertFalse(self._convert_message(c, 'error').raw)
+
     def test_setup_events_default_config(self):
 
         def mock_exists(path):
@@ -715,8 +769,8 @@ class TestNotificationConverter(ConverterBase):
         with mock.patch('ceilometer.event.converter.get_config_file',
                         mock_get_config_file):
 
-            oslo_cfg.CONF.set_override('drop_unmatched_notifications',
-                                       False, group='event')
+            self.CONF.set_override('drop_unmatched_notifications',
+                                   False, group='event')
 
             with mock.patch('os.path.exists', mock_exists):
                 c = converter.setup_events(self.fake_plugin_mgr)
@@ -724,8 +778,8 @@ class TestNotificationConverter(ConverterBase):
             self.assertEqual(1, len(c.definitions))
             self.assertTrue(c.definitions[0].is_catchall)
 
-            oslo_cfg.CONF.set_override('drop_unmatched_notifications',
-                                       True, group='event')
+            self.CONF.set_override('drop_unmatched_notifications',
+                                   True, group='event')
 
             with mock.patch('os.path.exists', mock_exists):
                 c = converter.setup_events(self.fake_plugin_mgr)

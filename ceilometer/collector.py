@@ -201,7 +201,8 @@ class EventEndpoint(CollectorEndpoint):
                         traits=[models.Trait(
                                 name, dtype,
                                 models.Trait.convert_value(dtype, value))
-                                for name, dtype, value in ev['traits']])
+                                for name, dtype, value in ev['traits']],
+                        raw=ev.get('raw', {}))
                 )
             except Exception:
                 LOG.exception(_LE("Error processing event and it will be "

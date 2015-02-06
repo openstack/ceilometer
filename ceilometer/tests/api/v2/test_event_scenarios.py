@@ -58,7 +58,8 @@ class EventTestBase(v2.FunctionalTest,
                 models.Event(message_id=str(base),
                              event_type=event_type,
                              generated=self.trait_time,
-                             traits=trait_models))
+                             traits=trait_models,
+                             raw={'status': {'nested': 'started'}}))
             base += 100
             self.trait_time += datetime.timedelta(days=1)
         self.event_conn.record_events(event_models)
@@ -140,6 +141,7 @@ class TestEventAPI(EventTestBase):
             expected_generated = trait_time.isoformat()
             self.assertIn(event['event_type'], ['Foo', 'Bar', 'Zoo'])
             self.assertEqual(4, len(event['traits']))
+            self.assertEqual({'status': {'nested': 'started'}}, event['raw']),
             self.assertEqual(expected_generated, event['generated'])
             for trait_name in ['trait_A', 'trait_B',
                                'trait_C', 'trait_D']:

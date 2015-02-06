@@ -317,14 +317,16 @@ class Event(Base):
     id = Column(Integer, primary_key=True)
     message_id = Column(String(50), unique=True)
     generated = Column(PreciseTimestamp())
+    raw = deferred(Column(JSONEncodedDict()))
 
     event_type_id = Column(Integer, ForeignKey('event_type.id'))
     event_type = relationship("EventType", backref='events')
 
-    def __init__(self, message_id, event_type, generated):
+    def __init__(self, message_id, event_type, generated, raw):
         self.message_id = message_id
         self.event_type = event_type
         self.generated = generated
+        self.raw = raw
 
     def __repr__(self):
         return "<Event %d('Event: %s %s, Generated: %s')>" % (self.id,

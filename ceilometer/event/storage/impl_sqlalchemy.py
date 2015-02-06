@@ -183,7 +183,8 @@ class Connection(base.Connection):
                     event_type = self._get_or_create_event_type(
                         event_model.event_type, session=session)
                     event = models.Event(event_model.message_id, event_type,
-                                         event_model.generated)
+                                         event_model.generated,
+                                         event_model.raw)
                     session.add(event)
                     session.flush()
 
@@ -277,12 +278,12 @@ class Connection(base.Connection):
             event_list = {}
             # get a list of all events that match filters
             for (id_, generated, message_id,
-                 desc) in query.add_columns(
+                 desc, raw) in query.add_columns(
                      models.Event.generated, models.Event.message_id,
-                     models.EventType.desc).order_by(
+                     models.EventType.desc, models.Event.raw).order_by(
                          models.Event.generated).all():
                 event_list[id_] = api_models.Event(message_id, desc,
-                                                   generated, [])
+                                                   generated, [], raw)
             # Query all traits related to events.
             # NOTE (gordc): cast is done because pgsql defaults to TEXT when
             #               handling unknown values such as null.
