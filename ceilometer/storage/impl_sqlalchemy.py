@@ -362,23 +362,25 @@ class Connection(base.Connection):
             end = timeutils.utcnow() - datetime.timedelta(seconds=ttl)
             sample_q = (session.query(models.Sample)
                         .filter(models.Sample.timestamp < end))
-
-            sample_subq = sample_q.subquery()
-            for table in [models.MetaText, models.MetaBigInt,
-                          models.MetaFloat, models.MetaBool]:
-                (session.query(table)
-                 .join(sample_subq, sample_subq.c.id == table.id)
-                 .delete())
-
             rows = sample_q.delete()
+            LOG.info(_("%d samples removed from database"), rows)
+
             # remove Meter definitions with no matching samples
             (session.query(models.Meter)
              .filter(~models.Meter.samples.any())
-             .delete(synchronize_session='fetch'))
-            (session.query(models.Resource)
-             .filter(~models.Resource.samples.any())
-             .delete(synchronize_session='fetch'))
-            LOG.info(_("%d samples removed from database"), rows)
+             .delete(synchronize_session=False))
+
+            # remove resources with no matching samples
+            resource_q = (session.query(models.Resource.internal_id)
+                          .filter(~models.Resource.samples.any()))
+            resource_subq = resource_q.subquery()
+            # remove metadata of cleaned resources
+            for table in [models.MetaText, models.MetaBigInt,
+                          models.MetaFloat, models.MetaBool]:
+                (session.query(table)
+                 .filter(table.id.in_(resource_subq))
+                 .delete(synchronize_session=False))
+            resource_q.delete(synchronize_session=False)
 
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
