@@ -3149,24 +3149,6 @@ class EventTestBase(tests_db.TestBase,
         self.prepare_data()
 
     def prepare_data(self):
-        # Add some data ...
-        pass
-
-
-@tests_db.run_with('sqlite', 'mysql', 'pgsql', 'mongodb', 'db2')
-class EventTest(EventTestBase):
-    def test_duplicate_message_id(self):
-        now = datetime.datetime.utcnow()
-        m = [event_models.Event("1", "Foo", now, None),
-             event_models.Event("1", "Zoo", now, [])]
-        problem_events = self.event_conn.record_events(m)
-        self.assertEqual(1, len(problem_events))
-        bad = problem_events[0]
-        self.assertEqual(event_models.Event.DUPLICATE, bad[0])
-
-
-class GetEventTest(EventTestBase):
-    def prepare_data(self):
         self.event_models = []
         base = 0
         self.start = datetime.datetime(2013, 12, 31, 5, 0)
@@ -3190,6 +3172,40 @@ class GetEventTest(EventTestBase):
         self.end = now
 
         self.event_conn.record_events(self.event_models)
+
+
+@tests_db.run_with('sqlite', 'mysql', 'pgsql')
+class EventTTLTest(EventTestBase):
+
+    @mock.patch.object(timeutils, 'utcnow')
+    def test_clear_expired_event_data(self, mock_utcnow):
+        mock_utcnow.return_value = datetime.datetime(2013, 12, 31, 10, 0)
+        self.event_conn.clear_expired_event_data(3600)
+
+        events = list(self.event_conn.get_events(storage.EventFilter()))
+        self.assertEqual(2, len(events))
+        event_types = list(self.event_conn.get_event_types())
+        self.assertEqual(['Bar', 'Zoo'], event_types)
+        for event_type in event_types:
+            trait_types = list(self.event_conn.get_trait_types(event_type))
+            self.assertEqual(4, len(trait_types))
+            traits = list(self.event_conn.get_traits(event_type))
+            self.assertEqual(4, len(traits))
+
+
+@tests_db.run_with('sqlite', 'mysql', 'pgsql', 'mongodb', 'db2')
+class EventTest(EventTestBase):
+    def test_duplicate_message_id(self):
+        now = datetime.datetime.utcnow()
+        m = [event_models.Event("1", "Foo", now, None),
+             event_models.Event("1", "Zoo", now, [])]
+        problem_events = self.event_conn.record_events(m)
+        self.assertEqual(1, len(problem_events))
+        bad = problem_events[0]
+        self.assertEqual(event_models.Event.DUPLICATE, bad[0])
+
+
+class GetEventTest(EventTestBase):
 
     def test_generated_is_datetime(self):
         event_filter = storage.EventFilter(self.start, self.end)
