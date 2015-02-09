@@ -88,7 +88,7 @@ class StorageBadAggregate(Exception):
     code = 400
 
 
-def get_connection_from_config(conf, purpose=None):
+def get_connection_from_config(conf, purpose='metering'):
     retries = conf.database.max_retries
 
     # Convert retry_interval secs to msecs for retry decorator
@@ -98,11 +98,9 @@ def get_connection_from_config(conf, purpose=None):
         if conf.database_connection:
             conf.set_override('connection', conf.database_connection,
                               group='database')
-        namespace = 'ceilometer.metering.storage'
-        url = conf.database.connection
-        if purpose:
-            namespace = 'ceilometer.%s.storage' % purpose
-            url = getattr(conf.database, '%s_connection' % purpose) or url
+        namespace = 'ceilometer.%s.storage' % purpose
+        url = (getattr(conf.database, '%s_connection' % purpose) or
+               conf.database.connection)
         return get_connection(url, namespace)
 
     return _inner()
