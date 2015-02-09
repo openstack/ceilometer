@@ -176,7 +176,7 @@ class TestMaxResourceVolume(v2.FunctionalTest,
                              period=-1)
         self.assertEqual(400, resp.status_code)
 
-    @tests_db.run_with('mysql', 'hbase', 'db2')
+    @tests_db.run_with('sqlite', 'mysql', 'pgsql', 'hbase', 'db2')
     def test_period_with_large_value(self):
         resp = self.get_json(self.PATH, expect_errors=True,
                              q=[{'field': 'user_id',
