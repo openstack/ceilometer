@@ -623,8 +623,13 @@ class PipelineManager(object):
                                         cfg)
             LOG.info(_('detected decoupled pipeline config format'))
             sources = [p_type['source'](s) for s in cfg.get('sources', [])]
-            sinks = dict((s['name'], p_type['sink'](s, transformer_manager))
-                         for s in cfg.get('sinks', []))
+            sinks = {}
+            for s in cfg.get('sinks', []):
+                if s['name'] in sinks:
+                    raise PipelineException("Duplicated sink names: %s" %
+                                            s['name'], self)
+                else:
+                    sinks[s['name']] = p_type['sink'](s, transformer_manager)
             for source in sources:
                 source.check_sinks(sinks)
                 for target in source.sinks:
