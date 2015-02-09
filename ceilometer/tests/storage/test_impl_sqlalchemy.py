@@ -34,7 +34,7 @@ from ceilometer.tests import db as tests_db
 from ceilometer.tests.storage import test_storage_scenarios as scenarios
 
 
-@tests_db.run_with('sqlite')
+@tests_db.run_with('sqlite', 'mysql', 'pgsql')
 class CeilometerBaseTest(tests_db.TestBase):
 
     def test_ceilometer_base(self):
@@ -43,7 +43,7 @@ class CeilometerBaseTest(tests_db.TestBase):
         self.assertEqual('value', base['key'])
 
 
-@tests_db.run_with('sqlite')
+@tests_db.run_with('sqlite', 'mysql', 'pgsql')
 class TraitTypeTest(tests_db.TestBase):
     # TraitType is a construct specific to sqlalchemy.
     # Not applicable to other drivers.
@@ -76,7 +76,7 @@ class TraitTypeTest(tests_db.TestBase):
         self.assertTrue(repr.repr(tt2))
 
 
-@tests_db.run_with('sqlite')
+@tests_db.run_with('sqlite', 'mysql', 'pgsql')
 class EventTypeTest(tests_db.TestBase):
     # EventType is a construct specific to sqlalchemy
     # Not applicable to other drivers.
@@ -102,7 +102,7 @@ class MyException(Exception):
     pass
 
 
-@tests_db.run_with('sqlite')
+@tests_db.run_with('sqlite', 'mysql', 'pgsql')
 class EventTest(tests_db.TestBase):
     def test_string_traits(self):
         model = models.Trait("Foo", models.Trait.TEXT_TYPE, "my_text")
@@ -169,7 +169,7 @@ class EventTest(tests_db.TestBase):
         self.assertTrue(repr.repr(ev))
 
 
-@tests_db.run_with('sqlite')
+@tests_db.run_with('sqlite', 'mysql', 'pgsql')
 class RelationshipTest(scenarios.DBTestBase):
     # Note: Do not derive from SQLAlchemyEngineTestBase, since we
     # don't want to automatically inherit all the Meter setup.
