@@ -36,7 +36,7 @@ class _Base(plugin_base.PollsterBase):
 
     @property
     def default_discovery(self):
-        return None
+        return 'local_node'
 
     @abc.abstractmethod
     def read_data(self):

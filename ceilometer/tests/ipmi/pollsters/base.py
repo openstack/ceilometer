@@ -58,7 +58,7 @@ class TestPollsterBase(base.BaseTestCase):
 
     def _verify_metering(self, length, expected_vol=None, node=None):
         cache = {}
-        resources = {}
+        resources = ['local_host']
 
         samples = list(self.pollster.get_samples(self.mgr, cache, resources))
         self.assertEqual(length, len(samples))
