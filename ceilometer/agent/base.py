@@ -65,6 +65,7 @@ class Resources(object):
         self._resources = []
         self._discovery = []
         self.blacklist = []
+        self.last_dup = []
 
     def setup(self, pipeline):
         self._resources = pipeline.resources
@@ -139,10 +140,32 @@ class PollingTask(object):
                     candidate_res = (source_resources or
                                      pollster_resources)
 
-                    # Exclude the failed resource from polling
+                    # Remove duplicated resources and black resources. Using
+                    # set() requires well defined __hash__ for each resource.
+                    # Since __eq__ is defined, 'not in' is safe here.
+                    seen = []
+                    duplicated = []
+                    polling_resources = []
                     black_res = self.resources[key].blacklist
-                    polling_resources = [
-                        x for x in candidate_res if x not in black_res]
+                    for x in candidate_res:
+                        if x not in seen:
+                            seen.append(x)
+                            if x not in black_res:
+                                polling_resources.append(x)
+                        else:
+                            duplicated.append(x)
+
+                    # Warn duplicated resources for the 1st time
+                    if self.resources[key].last_dup != duplicated:
+                        self.resources[key].last_dup = duplicated
+                        LOG.warning(_(
+                            'Found following duplicated resoures for '
+                            '%(name)s in context of %(source)s:%(list)s. '
+                            'Check pipeline configuration.')
+                            % ({'name': pollster.name,
+                                'source': source_name,
+                                'list': duplicated
+                                }))
 
                     # If no resources, skip for this pollster
                     if not polling_resources:
