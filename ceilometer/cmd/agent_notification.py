@@ -21,8 +21,5 @@ from ceilometer import service
 
 def main():
     service.prepare_service()
-    launcher = os_service.ProcessLauncher()
-    launcher.launch_service(
-        notification.NotificationService(),
-        workers=service.get_workers('notification'))
-    launcher.wait()
+    os_service.launch(notification.NotificationService(),
+                      workers=service.get_workers('notification')).wait()
