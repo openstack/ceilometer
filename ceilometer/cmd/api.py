@@ -20,5 +20,4 @@ from ceilometer import service
 
 def main():
     service.prepare_service()
-    srv = app.build_server()
-    srv.serve_forever()
+    app.build_server()

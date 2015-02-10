@@ -63,3 +63,6 @@ multiple processes, there is no way to set debug mode in the multiprocessing
 case. To allow multiple processes the DebugMiddleware may be turned off by
 setting ``pecan_debug`` to ``False`` in the ``api`` section of
 ``ceilometer.conf``.
+
+For other WSGI setup you can refer to the `pecan deployement`_ documentation.
+.. _`pecan deployement`: http://pecan.readthedocs.org/en/latest/deployment.html#deployment

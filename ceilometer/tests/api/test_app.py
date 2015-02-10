@@ -15,8 +15,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import socket
-
 import mock
 from oslo_config import cfg
 from oslo_config import fixture as fixture_config
@@ -31,19 +29,6 @@ class TestApp(base.BaseTestCase):
         super(TestApp, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
 
-    def test_WSGI_address_family(self):
-        self.CONF.set_override('host', '::', group='api')
-        server_cls = app.get_server_cls(cfg.CONF.api.host)
-        self.assertEqual(server_cls.address_family, socket.AF_INET6)
-
-        self.CONF.set_override('host', '127.0.0.1', group='api')
-        server_cls = app.get_server_cls(cfg.CONF.api.host)
-        self.assertEqual(server_cls.address_family, socket.AF_INET)
-
-        self.CONF.set_override('host', 'ddddd', group='api')
-        server_cls = app.get_server_cls(cfg.CONF.api.host)
-        self.assertEqual(server_cls.address_family, socket.AF_INET)
-
     def test_api_paste_file_not_exist(self):
         self.CONF.set_override('api_paste_config', 'non-existent-file')
         with mock.patch.object(self.CONF, 'find_file') as ff:
@@ -55,10 +40,11 @@ class TestApp(base.BaseTestCase):
     @mock.patch('ceilometer.api.hooks.PipelineHook', mock.MagicMock())
     @mock.patch('pecan.make_app')
     def test_pecan_debug(self, mocked):
-        def _check_pecan_debug(g_debug, p_debug, expected):
+        def _check_pecan_debug(g_debug, p_debug, expected, workers=1):
             self.CONF.set_override('debug', g_debug)
             if p_debug is not None:
                 self.CONF.set_override('pecan_debug', p_debug, group='api')
+            self.CONF.set_override('api_workers', workers)
             app.setup_app()
             args, kwargs = mocked.call_args
             self.assertEqual(expected, kwargs.get('debug'))
@@ -67,3 +53,7 @@ class TestApp(base.BaseTestCase):
         _check_pecan_debug(g_debug=True, p_debug=None, expected=True)
         _check_pecan_debug(g_debug=True, p_debug=False, expected=False)
         _check_pecan_debug(g_debug=False, p_debug=True, expected=True)
+        _check_pecan_debug(g_debug=True, p_debug=None, expected=False,
+                           workers=5)
+        _check_pecan_debug(g_debug=False, p_debug=True, expected=False,
+                           workers=5)
