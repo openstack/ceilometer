@@ -62,8 +62,23 @@ class TestBaseDiskIO(base.BaseTestCase):
         return instances
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
-    def _check_get_samples(self, factory, name):
-        pass
+    def _check_get_samples(self, factory, name, expected_count=2):
+        pollster = factory()
+
+        mgr = manager.AgentManager()
+        cache = {}
+        samples = list(pollster.get_samples(mgr, cache, self.instance))
+        self.assertIsNotEmpty(samples)
+        cache_key = getattr(pollster, self.CACHE_KEY)
+        self.assertIn(cache_key, cache)
+        for instance in self.instance:
+            self.assertIn(instance.id, cache[cache_key])
+        self.assertEqual(set([name]), set([s.name for s in samples]))
+
+        match = [s for s in samples if s.name == name]
+        self.assertEqual(len(match), expected_count,
+                         'missing counter %s' % name)
+        return match
 
     def _check_aggregate_samples(self, factory, name,
                                  expected_volume,
@@ -106,28 +121,11 @@ class TestDiskPollsters(TestBaseDiskIO):
                                   write_bytes=5L, write_requests=7L,
                                   errors=-1L)),
     ]
+    CACHE_KEY = "CACHE_KEY_DISK"
 
     def setUp(self):
         super(TestDiskPollsters, self).setUp()
         self.inspector.inspect_disks = mock.Mock(return_value=self.DISKS)
-
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
-    def _check_get_samples(self, factory, name, expected_count=2):
-        pollster = factory()
-
-        mgr = manager.AgentManager()
-        cache = {}
-        samples = list(pollster.get_samples(mgr, cache, self.instance))
-        self.assertIsNotEmpty(samples)
-        self.assertIn(pollster.CACHE_KEY_DISK, cache)
-        for instance in self.instance:
-            self.assertIn(instance.id, cache[pollster.CACHE_KEY_DISK])
-        self.assertEqual(set([name]), set([s.name for s in samples]))
-
-        match = [s for s in samples if s.name == name]
-        self.assertEqual(len(match), expected_count,
-                         'missing counter %s' % name)
-        return match
 
     def test_disk_read_requests(self):
         self._check_aggregate_samples(disk.ReadRequestsPollster,
@@ -192,31 +190,11 @@ class TestDiskRatePollsters(TestBaseDiskIO):
          virt_inspector.DiskRateStats(2048, 400, 6144, 800))
     ]
     TYPE = 'gauge'
+    CACHE_KEY = "CACHE_KEY_DISK_RATE"
 
     def setUp(self):
         super(TestDiskRatePollsters, self).setUp()
         self.inspector.inspect_disk_rates = mock.Mock(return_value=self.DISKS)
-
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
-    def _check_get_samples(self, factory, sample_name,
-                           expected_count=2):
-        pollster = factory()
-
-        mgr = manager.AgentManager()
-        cache = {}
-        samples = list(pollster.get_samples(mgr, cache, self.instance))
-        self.assertIsNotEmpty(samples)
-        self.assertIsNotNone(samples)
-        self.assertIn(pollster.CACHE_KEY_DISK_RATE, cache)
-        for instance in self.instance:
-            self.assertIn(instance.id, cache[pollster.CACHE_KEY_DISK_RATE])
-
-        self.assertEqual(set([sample_name]), set([s.name for s in samples]))
-
-        match = [s for s in samples if s.name == sample_name]
-        self.assertEqual(expected_count, len(match),
-                         'missing counter %s' % sample_name)
-        return match
 
     def test_disk_read_bytes_rate(self):
         self._check_aggregate_samples(disk.ReadBytesRatePollster,
@@ -281,32 +259,12 @@ class TestDiskLatencyPollsters(TestBaseDiskIO):
          virt_inspector.DiskLatencyStats(2000))
     ]
     TYPE = 'gauge'
+    CACHE_KEY = "CACHE_KEY_DISK_LATENCY"
 
     def setUp(self):
         super(TestDiskLatencyPollsters, self).setUp()
         self.inspector.inspect_disk_latency = mock.Mock(
             return_value=self.DISKS)
-
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
-    def _check_get_samples(self, factory, sample_name,
-                           expected_count=2):
-        pollster = factory()
-
-        mgr = manager.AgentManager()
-        cache = {}
-        samples = list(pollster.get_samples(mgr, cache, self.instance))
-        self.assertIsNotNone(samples)
-        self.assertIsNotEmpty(samples)
-        self.assertIn(pollster.CACHE_KEY_DISK_LATENCY, cache)
-        for instance in self.instance:
-            self.assertIn(instance.id, cache[pollster.CACHE_KEY_DISK_LATENCY])
-
-        self.assertEqual(set([sample_name]), set([s.name for s in samples]))
-
-        match = [s for s in samples if s.name == sample_name]
-        self.assertEqual(expected_count, len(match),
-                         'missing counter %s' % sample_name)
-        return match
 
     def test_disk_latency(self):
         self._check_aggregate_samples(disk.DiskLatencyPollster,
@@ -330,31 +288,11 @@ class TestDiskIOPSPollsters(TestBaseDiskIO):
          virt_inspector.DiskIOPSStats(20)),
     ]
     TYPE = 'gauge'
+    CACHE_KEY = "CACHE_KEY_DISK_IOPS"
 
     def setUp(self):
         super(TestDiskIOPSPollsters, self).setUp()
         self.inspector.inspect_disk_iops = mock.Mock(return_value=self.DISKS)
-
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
-    def _check_get_samples(self, factory, sample_name,
-                           expected_count=2):
-        pollster = factory()
-
-        mgr = manager.AgentManager()
-        cache = {}
-        samples = list(pollster.get_samples(mgr, cache, self.instance))
-        self.assertIsNotNone(samples)
-        self.assertIsNotEmpty(samples)
-        self.assertIn(pollster.CACHE_KEY_DISK_IOPS, cache)
-        for instance in self.instance:
-            self.assertIn(instance.id, cache[pollster.CACHE_KEY_DISK_IOPS])
-
-        self.assertEqual(set([sample_name]), set([s.name for s in samples]))
-
-        match = [s for s in samples if s.name == sample_name]
-        self.assertEqual(expected_count, len(match),
-                         'missing counter %s' % sample_name)
-        return match
 
     def test_disk_iops(self):
         self._check_aggregate_samples(disk.DiskIOPSPollster,
