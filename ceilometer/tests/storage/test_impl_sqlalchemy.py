@@ -180,14 +180,19 @@ class RelationshipTest(scenarios.DBTestBase):
         self.conn.clear_expired_metering_data(3 * 60)
 
         session = self.conn._engine_facade.get_session()
+        self.assertEqual(5, session.query(sql_models.Sample).count())
+
+        resource_ids = (session.query(sql_models.Resource.internal_id)
+                        .group_by(sql_models.Resource.internal_id))
         meta_tables = [sql_models.MetaText, sql_models.MetaFloat,
                        sql_models.MetaBigInt, sql_models.MetaBool]
+        s = set()
         for table in meta_tables:
             self.assertEqual(0, (session.query(table)
-                                 .filter(~table.id.in_(
-                                     session.query(sql_models.Sample.id)
-                                     .group_by(sql_models.Sample.id))).count()
+                                 .filter(~table.id.in_(resource_ids)).count()
                                  ))
+            s.update(session.query(table.id).all())
+        self.assertEqual(set(resource_ids.all()), s)
 
 
 class CapabilitiesTest(test_base.BaseTestCase):
