@@ -304,3 +304,58 @@ class TestDiskIOPSPollsters(TestBaseDiskIO):
 
         self._check_per_device_samples(disk.PerDeviceDiskIOPSPollster,
                                        'disk.device.iops', 20L, 'disk2')
+
+
+class TestDiskInfoPollsters(TestBaseDiskIO):
+
+    DISKS = [
+        (virt_inspector.Disk(device='vda1'),
+         virt_inspector.DiskInfo(capacity=3L, allocation=2L, physical=1L)),
+        (virt_inspector.Disk(device='vda2'),
+         virt_inspector.DiskInfo(capacity=4L, allocation=3L, physical=2L)),
+    ]
+    TYPE = 'gauge'
+    CACHE_KEY = "CACHE_KEY_DISK_INFO"
+
+    def setUp(self):
+        super(TestDiskInfoPollsters, self).setUp()
+        self.inspector.inspect_disk_info = mock.Mock(return_value=self.DISKS)
+
+    def test_disk_capacity(self):
+        self._check_aggregate_samples(disk.CapacityPollster,
+                                      'disk.capacity', 7L,
+                                      expected_device=['vda1', 'vda2'])
+
+    def test_disk_allocation(self):
+        self._check_aggregate_samples(disk.AllocationPollster,
+                                      'disk.allocation', 5L,
+                                      expected_device=['vda1', 'vda2'])
+
+    def test_disk_physical(self):
+        self._check_aggregate_samples(disk.PhysicalPollster,
+                                      'disk.usage', 3L,
+                                      expected_device=['vda1', 'vda2'])
+
+    def test_per_disk_capacity(self):
+        self._check_per_device_samples(disk.PerDeviceCapacityPollster,
+                                       'disk.device.capacity', 3L,
+                                       'vda1')
+        self._check_per_device_samples(disk.PerDeviceCapacityPollster,
+                                       'disk.device.capacity', 4L,
+                                       'vda2')
+
+    def test_per_disk_allocation(self):
+        self._check_per_device_samples(disk.PerDeviceAllocationPollster,
+                                       'disk.device.allocation', 2L,
+                                       'vda1')
+        self._check_per_device_samples(disk.PerDeviceAllocationPollster,
+                                       'disk.device.allocation', 3L,
+                                       'vda2')
+
+    def test_per_disk_physical(self):
+        self._check_per_device_samples(disk.PerDevicePhysicalPollster,
+                                       'disk.device.usage', 1L,
+                                       'vda1')
+        self._check_per_device_samples(disk.PerDevicePhysicalPollster,
+                                       'disk.device.usage', 2L,
+                                       'vda2')

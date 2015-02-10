@@ -196,3 +196,19 @@ class LibvirtInspector(virt_inspector.Inspector):
                     'can not get info from libvirt: %(error)s') % {
                 'instance_uuid': instance.id, 'error': e}
             raise virt_inspector.NoDataException(msg)
+
+    def inspect_disk_info(self, instance):
+        domain = self._get_domain_not_shut_off_or_raise(instance)
+
+        tree = etree.fromstring(domain.XMLDesc(0))
+        for device in filter(
+                bool,
+                [target.get("dev")
+                 for target in tree.findall('devices/disk/target')]):
+            disk = virt_inspector.Disk(device=device)
+            block_info = domain.blockInfo(device)
+            info = virt_inspector.DiskInfo(capacity=block_info[0],
+                                           allocation=block_info[1],
+                                           physical=block_info[2])
+
+            yield (disk, info)

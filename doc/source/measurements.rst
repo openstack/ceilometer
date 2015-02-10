@@ -97,6 +97,12 @@ disk.device.latency              g      ms         disk ID   p         2        
 disk.device.iops                 g      count/s    disk ID   p         2              Average disk iops per device
 disk.root.size                   g      GB         inst ID   n         1, 2           Size of root disk
 disk.ephemeral.size              g      GB         inst ID   n         1, 2           Size of ephemeral disk
+disk.capacity                    g      B          inst ID   p         1              Capacity of disk
+disk.allocation                  g      B          inst ID   p         1              Allocation of disk
+disk.usage                       g      B          inst ID   p         1              Usage of virtual disk
+disk.device.capacity             g      B          disk ID   p         1              Capacity per device of disk
+disk.device.allocation           g      B          disk ID   p         1              Allocation per device of disk
+disk.device.usage                g      B          disk ID   p         1              Usage per device of virtual disk
 network.incoming.bytes           c      B          iface ID  p         1, 2           Number of incoming bytes
 network.incoming.bytes.rate      g      B/s        iface ID  p         1, 2, 3, 4     Average rate of incoming bytes
 network.outgoing.bytes           c      B          iface ID  p         1, 2           Number of outgoing bytes
