@@ -201,7 +201,7 @@ class TestBase(testscenarios.testcase.WithScenarios, test_base.BaseTestCase):
                 'Test is not applicable for %s' % engine)
 
         self.CONF = self.useFixture(fixture_config.Config()).conf
-        self.CONF([], project='ceilometer')
+        self.CONF([], project='ceilometer', validate_default_values=True)
 
         self.db_manager = self._get_driver_manager(engine)(self.db_url)
         self.useFixture(self.db_manager)
