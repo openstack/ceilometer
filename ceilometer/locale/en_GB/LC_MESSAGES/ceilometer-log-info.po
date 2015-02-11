@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-05 06:19+0000\n"
-"PO-Revision-Date: 2015-02-02 11:04+0000\n"
+"POT-Creation-Date: 2015-02-11 06:10+0000\n"
+"PO-Revision-Date: 2015-02-05 16:05+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: English (United Kingdom) (http://www.transifex.com/projects/p/"
 "ceilometer/language/en_GB/)\n"
@@ -32,6 +32,11 @@ msgstr "Joined partitioning group %s"
 #: ceilometer/coordination.py:126
 #, python-format
 msgid "Left partitioning group %s"
+msgstr ""
+
+#: ceilometer/event/storage/impl_log.py:32
+#, python-format
+msgid "Dropping event data with TTL %d"
 msgstr ""
 
 #: ceilometer/openstack/common/eventlet_backdoor.py:146
