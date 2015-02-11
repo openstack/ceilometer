@@ -16,12 +16,19 @@ from oslo_config import cfg
 from oslo_utils import timeutils
 
 from ceilometer.agent import plugin_base
+from ceilometer.i18n import _
 from ceilometer.ipmi.notifications import ironic as parser
+from ceilometer.ipmi.platform import exception as ipmiexcept
 from ceilometer.ipmi.platform import ipmi_sensor
+from ceilometer.openstack.common import log
 from ceilometer import sample
 
 CONF = cfg.CONF
 CONF.import_opt('host', 'ceilometer.service')
+CONF.import_opt('polling_retry', 'ceilometer.ipmi.pollsters',
+                group='ipmi')
+
+LOG = log.getLogger(__name__)
 
 
 class InvalidSensorData(ValueError):
@@ -31,8 +38,14 @@ class InvalidSensorData(ValueError):
 class SensorPollster(plugin_base.PollsterBase):
     METRIC = None
 
-    def __init__(self):
+    def setup_environment(self):
+        super(SensorPollster, self).setup_environment()
         self.ipmi = ipmi_sensor.IPMISensor()
+        self.polling_failures = 0
+
+        # Do not load this extension if no IPMI support
+        if not self.ipmi.ipmi_support:
+            raise plugin_base.ExtensionLoadError()
 
     @property
     def default_discovery(self):
@@ -47,7 +60,23 @@ class SensorPollster(plugin_base.PollsterBase):
             return []
 
     def get_samples(self, manager, cache, resources):
-        stats = self.ipmi.read_sensor_any(self.METRIC)
+        # Only one resource for IPMI pollster
+        try:
+            stats = self.ipmi.read_sensor_any(self.METRIC)
+        except ipmiexcept.IPMIException:
+            self.polling_failures += 1
+            LOG.warning(_(
+                'Polling %(mtr)s sensor failed for %(cnt)s times!')
+                % ({'mtr': self.METRIC,
+                    'cnt': self.polling_failures}))
+            if (CONF.ipmi.polling_retry >= 0 and
+                    self.polling_failures > CONF.ipmi.polling_retry):
+                LOG.warning(_('Pollster for %s is disabled!') % self.METRIC)
+                raise plugin_base.PollsterPermanentError(resources[0])
+            else:
+                return
+
+        self.polling_failures = 0
 
         sensor_type_data = self._get_sensor_types(stats, self.METRIC)
 

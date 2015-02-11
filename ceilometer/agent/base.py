@@ -29,6 +29,7 @@ import six
 from six.moves.urllib import parse as urlparse
 from stevedore import extension
 
+from ceilometer.agent import plugin_base
 from ceilometer import coordination
 from ceilometer.i18n import _
 from ceilometer.openstack.common import log
@@ -63,6 +64,7 @@ class Resources(object):
         self.agent_manager = agent_manager
         self._resources = []
         self._discovery = []
+        self.blacklist = []
 
     def setup(self, pipeline):
         self._resources = pipeline.resources
@@ -127,15 +129,22 @@ class PollingTask(object):
                     LOG.info(_("Polling pollster %(poll)s in the context of "
                                "%(src)s"),
                              dict(poll=pollster.name, src=source_name))
-                    pollster_resources = None
+                    pollster_resources = []
                     if pollster.obj.default_discovery:
                         pollster_resources = self.manager.discover(
                             [pollster.obj.default_discovery], discovery_cache)
                     key = Resources.key(source_name, pollster)
                     source_resources = list(
                         self.resources[key].get(discovery_cache))
-                    polling_resources = (source_resources or
-                                         pollster_resources)
+                    candidate_res = (source_resources or
+                                     pollster_resources)
+
+                    # Exclude the failed resource from polling
+                    black_res = self.resources[key].blacklist
+                    polling_resources = [
+                        x for x in candidate_res if x not in black_res]
+
+                    # If no resources, skip for this pollster
                     if not polling_resources:
                         LOG.info(_("Skip polling pollster %s, no resources"
                                    " found"), pollster.name)
@@ -148,6 +157,12 @@ class PollingTask(object):
                             resources=polling_resources
                         ))
                         publisher(samples)
+                    except plugin_base.PollsterPermanentError as err:
+                        LOG.error(_(
+                            'Prevent pollster %(name)s for '
+                            'polling source %(source)s anymore!')
+                            % ({'name': pollster.name, 'source': source_name}))
+                        self.resources[key].blacklist.append(err.fail_res)
                     except Exception as err:
                         LOG.warning(_(
                             'Continue after error from %(name)s: %(error)s')
@@ -198,9 +213,18 @@ class AgentManager(os_service.Service):
     def _extensions(category, agent_ns=None):
         namespace = ('ceilometer.%s.%s' % (category, agent_ns) if agent_ns
                      else 'ceilometer.%s' % category)
+
+        def _catch_extension_load_error(mgr, ep, exc):
+            # Extension raising ExtensionLoadError can be ignored
+            if isinstance(exc, plugin_base.ExtensionLoadError):
+                LOG.error(_("Skip loading extension for %s") % ep.name)
+                return
+            raise exc
+
         return extension.ExtensionManager(
             namespace=namespace,
             invoke_on_load=True,
+            on_load_failure_callback=_catch_extension_load_error,
         )
 
     def join_partitioning_groups(self):

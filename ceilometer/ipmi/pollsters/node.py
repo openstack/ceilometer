@@ -19,17 +19,31 @@ from oslo_utils import timeutils
 import six
 
 from ceilometer.agent import plugin_base
+from ceilometer.i18n import _
+from ceilometer.ipmi.platform import exception as nmexcept
 from ceilometer.ipmi.platform import intel_node_manager as node_manager
+from ceilometer.openstack.common import log
 from ceilometer import sample
 
 CONF = cfg.CONF
 CONF.import_opt('host', 'ceilometer.service')
+CONF.import_opt('polling_retry', 'ceilometer.ipmi.pollsters',
+                group='ipmi')
+
+LOG = log.getLogger(__name__)
 
 
 @six.add_metaclass(abc.ABCMeta)
 class _Base(plugin_base.PollsterBase):
-    def __init__(self):
+
+    def setup_environment(self):
+        super(_Base, self).setup_environment()
         self.nodemanager = node_manager.NodeManager()
+        self.polling_failures = 0
+
+        # Do not load this extension if no NM support
+        if not self.nodemanager.nm_support:
+            raise plugin_base.ExtensionLoadError()
 
     @property
     def default_discovery(self):
@@ -40,7 +54,22 @@ class _Base(plugin_base.PollsterBase):
         """Return data sample for IPMI."""
 
     def get_samples(self, manager, cache, resources):
-        stats = self.read_data()
+        # Only one resource for Node Manager pollster
+        try:
+            stats = self.read_data()
+        except nmexcept.IPMIException:
+            self.polling_failures += 1
+            LOG.warning(_('Polling %(name)s faild for %(cnt)s times!')
+                        % ({'name': self.NAME,
+                            'cnt': self.polling_failures}))
+            if (CONF.ipmi.polling_retry >= 0 and
+                    self.polling_failures > CONF.ipmi.polling_retry):
+                LOG.warning(_('Pollster for %s is disabled!') % self.NAME)
+                raise plugin_base.PollsterPermanentError(resources[0])
+            else:
+                return
+
+        self.polling_failures = 0
 
         metadata = {
             'node': CONF.host
