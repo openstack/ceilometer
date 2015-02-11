@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-05 06:19+0000\n"
-"PO-Revision-Date: 2015-02-02 22:58+0000\n"
-"Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
+"POT-Creation-Date: 2015-02-11 06:10+0000\n"
+"PO-Revision-Date: 2015-02-09 06:41+0000\n"
+"Last-Translator: aji.zqfan <aji.zqfan@gmail.com>\n"
 "Language-Team: Chinese (China) "
 "(http://www.transifex.com/projects/p/ceilometer/language/zh_CN/)\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -100,16 +100,16 @@ msgstr "流水线%(pipeline)s：变形器%(trans)s清空数据时出错"
 msgid "detected decoupled pipeline config format"
 msgstr "检测到分离的流水线配置格式"
 
-#: ceilometer/pipeline.py:640
+#: ceilometer/pipeline.py:645
 msgid "detected deprecated pipeline config format"
 msgstr "检测到废弃的流水线配置格式"
 
-#: ceilometer/pipeline.py:664
+#: ceilometer/pipeline.py:669
 #, python-format
 msgid "Pipeline config file: %s"
 msgstr "流水线配置文件：%s"
 
-#: ceilometer/pipeline.py:670
+#: ceilometer/pipeline.py:675
 #, python-format
 msgid "Pipeline config: %s"
 msgstr "流水线配置：%s"
@@ -124,22 +124,22 @@ msgstr "工作线程%(worker_name)s的数量%(workers)s非法，必须大于0"
 msgid "Polling pollster %(poll)s in the context of %(src)s"
 msgstr "在上下文环境%(src)s执行采集器%(poll)s"
 
-#: ceilometer/agent/base.py:141
+#: ceilometer/agent/base.py:140
 #, python-format
 msgid "Skip polling pollster %s, no resources found"
 msgstr "没有任何资源被发现，跳过采集器%s"
 
-#: ceilometer/agent/base.py:153
+#: ceilometer/agent/base.py:152
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
 msgstr "遇到错误%(name)s：%(error)s，继续执行"
 
-#: ceilometer/agent/base.py:299
+#: ceilometer/agent/base.py:298
 #, python-format
 msgid "Unable to discover resources: %s"
 msgstr "无法发现资源：%s"
 
-#: ceilometer/agent/base.py:301
+#: ceilometer/agent/base.py:300
 #, python-format
 msgid "Unknown discovery extension: %s"
 msgstr "未知的发现器插件：%s"
@@ -446,27 +446,27 @@ msgstr "获取失败"
 #: ceilometer/event/storage/impl_hbase.py:79
 #: ceilometer/storage/impl_hbase.py:131
 msgid "Dropping HBase schema..."
-msgstr ""
+msgstr "正在丢弃HBase的schema"
 
 #: ceilometer/alarm/storage/impl_hbase.py:93
 #: ceilometer/event/storage/impl_hbase.py:85
 #: ceilometer/storage/impl_hbase.py:138
 msgid "Cannot disable table but ignoring error"
-msgstr ""
+msgstr "无法禁用表，但是忽略该错误"
 
 #: ceilometer/alarm/storage/impl_hbase.py:97
 #: ceilometer/event/storage/impl_hbase.py:89
 #: ceilometer/storage/impl_hbase.py:142
 msgid "Cannot delete table but ignoring error"
-msgstr ""
+msgstr "无法删除表，但是忽略该错误"
 
 #: ceilometer/alarm/storage/models.py:70
 msgid "timestamp should be datetime object"
-msgstr ""
+msgstr "timestamp必须是datatime对象"
 
 #: ceilometer/alarm/storage/models.py:72
 msgid "state_timestamp should be datetime object"
-msgstr ""
+msgstr "state_timestamp必须是datetime对象"
 
 #: ceilometer/api/app.py:163
 #, python-format
@@ -492,215 +492,226 @@ msgstr "在 http://%(host)s:%(port)s上服务"
 msgid "Error parsing HTTP response: %s"
 msgstr "解析HTTP响应失败: %s"
 
-#: ceilometer/api/controllers/v2.py:102
-#, python-format
-msgid "%(entity)s %(id)s Not Found"
-msgstr "无法找到%(entity)s %(id)s "
-
-#: ceilometer/api/controllers/v2.py:110
+#: ceilometer/api/controllers/v2/alarms.py:80
 #, python-format
 msgid "Alarm %s not found"
-msgstr ""
+msgstr "告警%s没有找到"
 
-#: ceilometer/api/controllers/v2.py:112
+#: ceilometer/api/controllers/v2/alarms.py:82
 #, python-format
 msgid "Alarm %(alarm_id)s not found in project %(project)s"
-msgstr ""
+msgstr "告警%(alarm_id)s在项目%(project)s中未找到"
 
-#: ceilometer/api/controllers/v2.py:125
+#: ceilometer/api/controllers/v2/alarms.py:95
 #, python-format
 msgid "Alarm quota exceeded for user %(u)s on project %(p)s"
-msgstr ""
+msgstr "用户%(u)s在项目%(p)s中的告警配额已溢出"
 
-#: ceilometer/api/controllers/v2.py:322
-#, python-format
-msgid "Unable to convert the value %(value)s to the expected data type %(type)s."
-msgstr ""
-
-#: ceilometer/api/controllers/v2.py:327
-#, python-format
-msgid ""
-"The data type %(type)s is not supported. The supported data type list is:"
-" %(supported)s"
-msgstr ""
-
-#: ceilometer/api/controllers/v2.py:332
-#, python-format
-msgid ""
-"Unexpected exception converting %(value)s to the expected data type "
-"%(type)s."
-msgstr ""
-
-#: ceilometer/api/controllers/v2.py:343
-#, python-format
-msgid "Not Authorized to access %(aspect)s %(id)s"
-msgstr ""
-
-#: ceilometer/api/controllers/v2.py:808
-msgid "clamping min timestamp to range"
-msgstr ""
-
-#: ceilometer/api/controllers/v2.py:813
-msgid "clamping max timestamp to range"
-msgstr ""
-
-#: ceilometer/api/controllers/v2.py:892 ceilometer/api/controllers/v2.py:1176
-msgid "Limit must be positive"
-msgstr "limit必须是正数"
-
-#: ceilometer/api/controllers/v2.py:981
-msgid "Period must be positive."
-msgstr "period 参数必须是正数"
-
-#: ceilometer/api/controllers/v2.py:1003
-#, python-format
-msgid "computed value coming from %r"
-msgstr ""
-
-#: ceilometer/api/controllers/v2.py:1012
-#, python-format
-msgid "Invalid period %(period)s: %(err)s"
-msgstr "非法的间隔%(period)s: %(err)s"
-
-#: ceilometer/api/controllers/v2.py:1195
-msgid "Sample"
-msgstr "范例"
-
-#: ceilometer/api/controllers/v2.py:1360
-#, python-format
-msgid "Filter expression not valid: %s"
-msgstr "过滤表达式不合法：%s"
-
-#: ceilometer/api/controllers/v2.py:1375
-#, python-format
-msgid "Order-by expression not valid: %s"
-msgstr "orderby表达式不合法：%s"
-
-#: ceilometer/api/controllers/v2.py:1386
-msgid "Limit should be positive"
-msgstr "limit必须是正整数"
-
-#: ceilometer/api/controllers/v2.py:1479
-#, python-format
-msgid "String %s is not a valid isotime"
-msgstr "字符串%s不是个合法的标准时间格式"
-
-#: ceilometer/api/controllers/v2.py:1480
-#, python-format
-msgid "Failed to parse the timestamp value %s"
-msgstr "解析时间戳%s失败"
-
-#: ceilometer/api/controllers/v2.py:1570
-msgid "Resource"
-msgstr "资源"
-
-#: ceilometer/api/controllers/v2.py:1648
+#: ceilometer/api/controllers/v2/alarms.py:207
 #, python-format
 msgid ""
 "Alarm when %(meter_name)s is %(comparison_operator)s a %(statistic)s of "
 "%(threshold)s over %(period)s seconds"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:1688
+#: ceilometer/api/controllers/v2/alarms.py:253
 #, python-format
 msgid "Combined state of alarms %s"
 msgstr "将告警%s的状态进行组合"
 
-#: ceilometer/api/controllers/v2.py:1697
+#: ceilometer/api/controllers/v2/alarms.py:262
 msgid "Alarm combination rule should contain at least two different alarm ids."
 msgstr "告警组合规则必须包含至少两个不同的告警id"
 
-#: ceilometer/api/controllers/v2.py:1748
-#, python-format
-msgid "Timezone %s is not valid"
-msgstr "时区%s不合法"
-
-#: ceilometer/api/controllers/v2.py:1878
-msgid "Time constraint names must be unique for a given alarm."
-msgstr "一个指定的告警的时间约束名称必须唯一"
-
-#: ceilometer/api/controllers/v2.py:1888
-#, python-format
-msgid "%(rule)s must be set for %(type)s type alarm"
-msgstr "类型为%(type)s的告警必须设置%(rule)s"
-
-#: ceilometer/api/controllers/v2.py:1892
-msgid "threshold_rule and combination_rule cannot be set at the same time"
-msgstr "threshold_rule和combination_rule 不能同时设置"
-
-#: ceilometer/api/controllers/v2.py:1909
-#, python-format
-msgid "Unable to parse action %s"
-msgstr "无法解析动作%s"
-
-#: ceilometer/api/controllers/v2.py:1912
-#, python-format
-msgid "Unsupported action %s"
-msgstr "动作%s不支持"
-
-#: ceilometer/api/controllers/v2.py:2083
-#, python-format
-msgid "Alarm with name=%s exists"
-msgstr "名称为%s的告警已存在"
-
-#: ceilometer/api/controllers/v2.py:2090
+#: ceilometer/api/controllers/v2/alarms.py:283
 #, python-format
 msgid "Cannot specify alarm %s itself in combination rule"
 msgstr "无法在组合规则中指定告警%s自身"
 
-#: ceilometer/api/controllers/v2.py:2098
+#: ceilometer/api/controllers/v2/alarms.py:333
+#, python-format
+msgid "Timezone %s is not valid"
+msgstr "时区%s不合法"
+
+#: ceilometer/api/controllers/v2/alarms.py:445
+msgid "Time constraint names must be unique for a given alarm."
+msgstr "一个指定的告警的时间约束名称必须唯一"
+
+#: ceilometer/api/controllers/v2/alarms.py:455
+#, python-format
+msgid "%(rule)s must be set for %(type)s type alarm"
+msgstr "类型为%(type)s的告警必须设置%(rule)s"
+
+#: ceilometer/api/controllers/v2/alarms.py:466
+#, python-format
+msgid "%(rule1)s and %(rule2)s cannot be set at the same time"
+msgstr ""
+
+#: ceilometer/api/controllers/v2/alarms.py:483
+#, python-format
+msgid "Unable to parse action %s"
+msgstr "无法解析动作%s"
+
+#: ceilometer/api/controllers/v2/alarms.py:486
+#, python-format
+msgid "Unsupported action %s"
+msgstr "动作%s不支持"
+
+#: ceilometer/api/controllers/v2/alarms.py:670
+#, python-format
+msgid "Alarm with name=%s exists"
+msgstr "名称为%s的告警已存在"
+
+#: ceilometer/api/controllers/v2/alarms.py:680
 #, python-format
 msgid "Error while putting alarm: %s"
 msgstr "修改告警%s时遇到错误"
 
-#: ceilometer/api/controllers/v2.py:2099 ceilometer/api/controllers/v2.py:2266
+#: ceilometer/api/controllers/v2/alarms.py:681
+#: ceilometer/api/controllers/v2/alarms.py:849
 msgid "Alarm incorrect"
 msgstr "警报不正确"
 
-#: ceilometer/api/controllers/v2.py:2159
+#: ceilometer/api/controllers/v2/alarms.py:741
 msgid "state invalid"
 msgstr "状态无效"
 
-#: ceilometer/api/controllers/v2.py:2259
+#: ceilometer/api/controllers/v2/alarms.py:842
 #, python-format
 msgid "Alarm with name='%s' exists"
 msgstr "名称为'%s'的告警已经存在"
 
-#: ceilometer/api/controllers/v2.py:2265
+#: ceilometer/api/controllers/v2/alarms.py:848
 #, python-format
 msgid "Error while posting alarm: %s"
 msgstr "创建告警%s时遇到错误"
 
-#: ceilometer/api/controllers/v2.py:2440
-msgid "operator {} is incorrect"
+#: ceilometer/api/controllers/v2/base.py:48
+#, python-format
+msgid "%(entity)s %(id)s Not Found"
+msgstr "无法找到%(entity)s %(id)s "
+
+#: ceilometer/api/controllers/v2/base.py:57
+#, python-format
+msgid "Not Authorized to access %(aspect)s %(id)s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2.py:2462
+#: ceilometer/api/controllers/v2/base.py:216
+#, python-format
+msgid "Unable to convert the value %(value)s to the expected data type %(type)s."
+msgstr ""
+
+#: ceilometer/api/controllers/v2/base.py:221
+#, python-format
+msgid ""
+"The data type %(type)s is not supported. The supported data type list is:"
+" %(supported)s"
+msgstr ""
+
+#: ceilometer/api/controllers/v2/base.py:226
+#, python-format
+msgid ""
+"Unexpected exception converting %(value)s to the expected data type "
+"%(type)s."
+msgstr ""
+
+#: ceilometer/api/controllers/v2/events.py:168
+msgid "operator {} is incorrect"
+msgstr "操作符{}不合法"
+
+#: ceilometer/api/controllers/v2/events.py:190
 #, python-format
 msgid "Getting traits for %s"
 msgstr "正在为%s获取特征"
 
-#: ceilometer/api/controllers/v2.py:2532
+#: ceilometer/api/controllers/v2/events.py:260
 msgid "Event"
 msgstr "事件"
 
-#: ceilometer/api/controllers/v2.py:2535
+#: ceilometer/api/controllers/v2/events.py:263
 #, python-format
 msgid "More than one event with id %s returned from storage driver"
 msgstr "从数据库返回了多个id为%s的事件"
 
-#: ceilometer/cmd/storage.py:38
+#: ceilometer/api/controllers/v2/meters.py:181
+msgid "clamping min timestamp to range"
+msgstr ""
+
+#: ceilometer/api/controllers/v2/meters.py:186
+msgid "clamping max timestamp to range"
+msgstr ""
+
+#: ceilometer/api/controllers/v2/meters.py:286
+#: ceilometer/api/controllers/v2/samples.py:126
+msgid "Limit must be positive"
+msgstr "limit必须是正数"
+
+#: ceilometer/api/controllers/v2/meters.py:376
+msgid "Period must be positive."
+msgstr "period 参数必须是正数"
+
+#: ceilometer/api/controllers/v2/meters.py:398
+#, python-format
+msgid "computed value coming from %r"
+msgstr ""
+
+#: ceilometer/api/controllers/v2/meters.py:408
+#, python-format
+msgid "Invalid period %(period)s: %(err)s"
+msgstr "非法的间隔%(period)s: %(err)s"
+
+#: ceilometer/api/controllers/v2/query.py:204
+#, python-format
+msgid "Filter expression not valid: %s"
+msgstr "过滤表达式不合法：%s"
+
+#: ceilometer/api/controllers/v2/query.py:219
+#, python-format
+msgid "Order-by expression not valid: %s"
+msgstr "orderby表达式不合法：%s"
+
+#: ceilometer/api/controllers/v2/query.py:229
+msgid "Limit should be positive"
+msgstr "limit必须是正整数"
+
+#: ceilometer/api/controllers/v2/query.py:323
+#, python-format
+msgid "String %s is not a valid isotime"
+msgstr "字符串%s不是个合法的标准时间格式"
+
+#: ceilometer/api/controllers/v2/query.py:324
+#, python-format
+msgid "Failed to parse the timestamp value %s"
+msgstr "解析时间戳%s失败"
+
+#: ceilometer/api/controllers/v2/resources.py:127
+msgid "Resource"
+msgstr "资源"
+
+#: ceilometer/api/controllers/v2/samples.py:145
+msgid "Sample"
+msgstr "数据"
+
+#: ceilometer/cmd/storage.py:39
 msgid "Clearing expired metering data"
 msgstr "正在清除过期的监控数据"
 
-#: ceilometer/cmd/storage.py:43
-msgid "Nothing to clean, database time to live is disabled"
-msgstr "没有数据要清除，数据库TTL被关闭"
+#: ceilometer/cmd/storage.py:44
+msgid "Nothing to clean, database metering time to live is disabled"
+msgstr "监控数据库过期时间未激活，没有数据要清除"
+
+#: ceilometer/cmd/storage.py:48
+msgid "Clearing expired event data"
+msgstr "正在清除过期的事件数据"
+
+#: ceilometer/cmd/storage.py:53
+msgid "Nothing to clean, database event time to live is disabled"
+msgstr "事件数据库过期时间未激活，没有数据要清除"
 
 #: ceilometer/compute/notifications/cpu.py:50
 #, python-format
 msgid "An error occurred while building %(m)s sample: %(e)s"
-msgstr ""
+msgstr "构造指标%(m)s的数据时遇到错误：%(e)s"
 
 #: ceilometer/compute/pollsters/cpu.py:31
 #, python-format
@@ -714,9 +725,10 @@ msgstr "虚拟机%(instance)s的CPU时间为%(time)d"
 
 #: ceilometer/compute/pollsters/cpu.py:48
 #: ceilometer/compute/pollsters/cpu.py:79
-#: ceilometer/compute/pollsters/disk.py:121
-#: ceilometer/compute/pollsters/disk.py:331
-#: ceilometer/compute/pollsters/disk.py:513
+#: ceilometer/compute/pollsters/disk.py:125
+#: ceilometer/compute/pollsters/disk.py:335
+#: ceilometer/compute/pollsters/disk.py:517
+#: ceilometer/compute/pollsters/disk.py:598
 #: ceilometer/compute/pollsters/memory.py:47
 #: ceilometer/compute/pollsters/net.py:106
 #, python-format
@@ -753,21 +765,27 @@ msgstr "为%s获取CPU使用率尚未实现"
 msgid "Could not get CPU Util for %(id)s: %(e)s"
 msgstr "无法为虚拟机%(id)s获取CPU使用率：%(e)s"
 
-#: ceilometer/compute/pollsters/disk.py:129
-#: ceilometer/compute/pollsters/disk.py:334
-#: ceilometer/compute/pollsters/disk.py:516
+#: ceilometer/compute/pollsters/disk.py:133
+#: ceilometer/compute/pollsters/disk.py:338
+#: ceilometer/compute/pollsters/disk.py:520
 #: ceilometer/compute/pollsters/net.py:114
 #, python-format
 msgid "%(inspector)s does not provide data for  %(pollster)s"
 msgstr "探测器%(inspector)s没有为%(pollster)s提供数据"
 
-#: ceilometer/compute/pollsters/disk.py:134
-#: ceilometer/compute/pollsters/disk.py:340
-#: ceilometer/compute/pollsters/disk.py:522
+#: ceilometer/compute/pollsters/disk.py:138
+#: ceilometer/compute/pollsters/disk.py:344
+#: ceilometer/compute/pollsters/disk.py:526
+#: ceilometer/compute/pollsters/disk.py:607
 #: ceilometer/compute/pollsters/net.py:119
 #, python-format
 msgid "Ignoring instance %(name)s: %(error)s"
 msgstr "忽略虚拟机%(name)s：%(error)s"
+
+#: ceilometer/compute/pollsters/disk.py:601
+#, python-format
+msgid "%(inspector)s does not provide data for %(pollster)s"
+msgstr "%(inspector)s无法为采集器%(pollster)s提供数据"
 
 #: ceilometer/compute/pollsters/memory.py:31
 #, python-format
@@ -794,17 +812,17 @@ msgstr "无法为%(id)s获取内存使用信息：%(e)s"
 msgid "checking net info for instance %s"
 msgstr "为虚拟机%s检查网络信息"
 
-#: ceilometer/compute/virt/inspector.py:247
+#: ceilometer/compute/virt/inspector.py:262
 #, python-format
 msgid "Unable to load the hypervisor inspector: %s"
 msgstr "无法加载管理程序的探测器：%s"
 
-#: ceilometer/compute/virt/hyperv/utilsv2.py:208
+#: ceilometer/compute/virt/hyperv/utilsv2.py:223
 #, python-format
 msgid "VM %s not found on Hyper-V"
 msgstr "在Hyper-V上找不到 VM %s"
 
-#: ceilometer/compute/virt/hyperv/utilsv2.py:210
+#: ceilometer/compute/virt/hyperv/utilsv2.py:225
 #, python-format
 msgid "Duplicate VM name found: %s"
 msgstr "找到重复 VM 名称：%s"
@@ -1223,12 +1241,12 @@ msgstr "发布的数据量超过本地队列最大长度，正在丢弃最老的
 #: ceilometer/publisher/messaging.py:154
 #, python-format
 msgid "Failed to publish %d datapoints, queue them"
-msgstr ""
+msgstr "发布%d个数据点时失败，将其入队"
 
 #: ceilometer/publisher/messaging.py:158
 #, python-format
 msgid "Failed to publish %d datapoints, dropping them"
-msgstr ""
+msgstr "发布%d个数据点时失败，正在将其丢弃"
 
 #: ceilometer/publisher/udp.py:56
 #, python-format
@@ -1239,7 +1257,7 @@ msgstr "通过UDP发布采样 %(msg)s 至 %(host)s:%(port)d"
 msgid "Unable to send sample over UDP"
 msgstr "无法通过UDP发送采样"
 
-#: ceilometer/storage/__init__.py:108
+#: ceilometer/storage/__init__.py:114
 #, python-format
 msgid "looking for %(name)r driver in %(namespace)r"
 msgstr "正在名字空间%(namespace)r查找驱动%(name)r "
@@ -1265,10 +1283,10 @@ msgstr "为资源%(resource_id)s获得指标%(counter_name)s的监控数据：%(
 
 #: ceilometer/storage/impl_log.py:52
 #, python-format
-msgid "Dropping data with TTL %d"
-msgstr "根据TTL%d丢弃数据"
+msgid "Dropping metering data with TTL %d"
+msgstr "正在根据TTL %d丢弃监控数据"
 
-#: ceilometer/storage/impl_mongodb.py:552
+#: ceilometer/storage/impl_mongodb.py:553
 msgid ""
 "Clearing expired metering data is based on native MongoDB time to live "
 "feature and going in background."
@@ -1279,7 +1297,7 @@ msgstr "MongoDB正在后台使用原生的TTL机制清除过期监控数据。"
 msgid "Unknown metadata type. Key (%s) will not be queryable."
 msgstr "未知的元数据类型。键(%s)将无法进行查询。"
 
-#: ceilometer/storage/impl_sqlalchemy.py:376
+#: ceilometer/storage/impl_sqlalchemy.py:361
 #, python-format
 msgid "%d samples removed from database"
 msgstr "从数据库中移除%d个监控数据。"
@@ -1312,14 +1330,14 @@ msgstr "连接到%(nodelist)s节点的数据库%(db)s。"
 msgid "Unable to connect to the database server: %(errmsg)s."
 msgstr "无法连接到数据库服务器：%(errmsg)s。"
 
-#: ceilometer/storage/mongo/utils.py:401
+#: ceilometer/storage/mongo/utils.py:402
 #, python-format
 msgid ""
 "Unable to reconnect to the primary mongodb after %(retries)d retries. "
 "Giving up."
 msgstr "在%(retries)d次尝试后仍无法重连到MongoDB主节点。放弃重连。"
 
-#: ceilometer/storage/mongo/utils.py:405
+#: ceilometer/storage/mongo/utils.py:406
 #, python-format
 msgid ""
 "Unable to reconnect to the primary mongodb: %(errmsg)s. Trying again in "

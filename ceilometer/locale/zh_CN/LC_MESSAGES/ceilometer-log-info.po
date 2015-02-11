@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-05 06:19+0000\n"
-"PO-Revision-Date: 2015-02-04 08:18+0000\n"
+"POT-Creation-Date: 2015-02-11 06:10+0000\n"
+"PO-Revision-Date: 2015-02-09 06:33+0000\n"
 "Last-Translator: aji.zqfan <aji.zqfan@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/"
 "ceilometer/language/zh_CN/)\n"
@@ -34,6 +34,11 @@ msgstr "已加入分组%s"
 #, python-format
 msgid "Left partitioning group %s"
 msgstr "已离开分组%s"
+
+#: ceilometer/event/storage/impl_log.py:32
+#, python-format
+msgid "Dropping event data with TTL %d"
+msgstr "正在根据TTL: %d丢弃事件数据"
 
 #: ceilometer/openstack/common/eventlet_backdoor.py:146
 #, python-format

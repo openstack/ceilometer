@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 2015.1.dev2\n"
+"Project-Id-Version: ceilometer 2015.1.dev39\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-05 06:19+0000\n"
+"POT-Creation-Date: 2015-02-11 06:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,6 +29,11 @@ msgstr ""
 #: ceilometer/coordination.py:126
 #, python-format
 msgid "Left partitioning group %s"
+msgstr ""
+
+#: ceilometer/event/storage/impl_log.py:32
+#, python-format
+msgid "Dropping event data with TTL %d"
 msgstr ""
 
 #: ceilometer/openstack/common/eventlet_backdoor.py:146
