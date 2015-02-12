@@ -245,6 +245,42 @@ class TestLibvirtInspection(base.BaseTestCase):
                         self.instance)
                     self.assertEqual(25600L / units.Ki, memory.usage)
 
+    def test_inspect_disk_info(self):
+        dom_xml = """
+             <domain type='kvm'>
+                 <devices>
+                     <disk type='file' device='disk'>
+                         <driver name='qemu' type='qcow2' cache='none'/>
+                         <source file='/path/instance-00000001/disk'/>
+                         <target dev='vda' bus='virtio'/>
+                         <alias name='virtio-disk0'/>
+                         <address type='pci' domain='0x0000' bus='0x00'
+                                  slot='0x04' function='0x0'/>
+                     </disk>
+                 </devices>
+             </domain>
+        """
+
+        with contextlib.nested(mock.patch.object(self.inspector.connection,
+                                                 'lookupByUUIDString',
+                                                 return_value=self.domain),
+                               mock.patch.object(self.domain, 'XMLDesc',
+                                                 return_value=dom_xml),
+                               mock.patch.object(self.domain, 'blockInfo',
+                                                 return_value=(1L, 2L, 3L,
+                                                               -1)),
+                               mock.patch.object(self.domain, 'info',
+                                                 return_value=(0L, 0L, 0L,
+                                                               2L, 999999L))):
+            disks = list(self.inspector.inspect_disk_info(self.instance))
+
+            self.assertEqual(1, len(disks))
+            disk0, info0 = disks[0]
+            self.assertEqual('vda', disk0.device)
+            self.assertEqual(1L, info0.capacity)
+            self.assertEqual(2L, info0.allocation)
+            self.assertEqual(3L, info0.physical)
+
     def test_inspect_memory_usage_with_domain_shutoff(self):
         connection = self.inspector.connection
         with mock.patch.object(connection, 'lookupByUUIDString',

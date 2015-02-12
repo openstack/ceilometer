@@ -143,6 +143,18 @@ DiskIOPSStats = collections.namedtuple('DiskIOPSStats',
                                        ['iops_count'])
 
 
+# Named tuple representing disk Information.
+#
+# capacity: capacity of the disk
+# allocation: allocation of the disk
+# physical: usage of the disk
+
+DiskInfo = collections.namedtuple('DiskInfo',
+                                  ['capacity',
+                                   'allocation',
+                                   'physical'])
+
+
 # Exception types
 #
 class InspectorException(Exception):
@@ -247,6 +259,14 @@ class Inspector(object):
 
         :param instance: the target instance
         :return: for each disk, the number of iops per second
+        """
+        raise ceilometer.NotImplementedError
+
+    def inspect_disk_info(self, instance):
+        """Inspect the disk information for an instance.
+
+        :param instance: the target instance
+        :return: for each disk , capacity , alloaction and usage
         """
         raise ceilometer.NotImplementedError
 
