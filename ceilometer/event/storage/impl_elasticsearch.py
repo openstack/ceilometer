@@ -16,8 +16,8 @@ import operator
 
 import elasticsearch as es
 from elasticsearch import helpers
-from oslo.utils import netutils
-from oslo.utils import timeutils
+from oslo_utils import netutils
+from oslo_utils import timeutils
 import six
 
 from ceilometer.event.storage import base
