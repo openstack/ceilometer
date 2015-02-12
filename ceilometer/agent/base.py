@@ -285,6 +285,11 @@ class AgentManager(os_service.Service):
         self.tg.add_timer(cfg.CONF.coordination.heartbeat,
                           self.partition_coordinator.heartbeat)
 
+    def stop(self):
+        if self.partition_coordinator:
+            self.partition_coordinator.stop()
+        super(AgentManager, self).stop()
+
     @staticmethod
     def interval_task(task):
         task.poll_and_publish()

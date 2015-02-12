@@ -28,6 +28,7 @@ from ceilometer.compute.notifications import instance
 from ceilometer import messaging
 from ceilometer import notification
 from ceilometer.openstack.common import fileutils
+import ceilometer.openstack.common.service
 from ceilometer.publisher import test as test_publisher
 from ceilometer.tests import base as tests_base
 
@@ -249,6 +250,14 @@ class TestRealNotification(BaseRealNotification):
         fake_coord1.extract_my_subset.side_effect = lambda x, y: y
         fake_coord.return_value = fake_coord1
         self._check_notification_service()
+
+    @mock.patch.object(ceilometer.openstack.common.service.Service, 'stop')
+    def test_notification_service_start_abnormal(self, mocked):
+        try:
+            self.srv.stop()
+        except Exception:
+            pass
+        self.assertEqual(1, mocked.call_count)
 
 
 class TestRealNotificationHA(BaseRealNotification):

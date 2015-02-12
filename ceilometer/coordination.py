@@ -78,6 +78,21 @@ class PartitionCoordinator(object):
                 self._started = False
                 LOG.exception(_LE('Error connecting to coordination backend.'))
 
+    def stop(self):
+        if not self._coordinator:
+            return
+
+        for group in list(self._groups):
+            self.leave_group(group)
+
+        try:
+            self._coordinator.stop()
+        except tooz.coordination.ToozError:
+            LOG.exception(_LE('Error connecting to coordination backend.'))
+        finally:
+            self._coordinator = None
+            self._started = False
+
     def is_active(self):
         return self._coordinator is not None
 
@@ -121,8 +136,11 @@ class PartitionCoordinator(object):
         self._groups.add(group_id)
 
     def leave_group(self, group_id):
+        if group_id not in self._groups:
+            return
         if self._coordinator:
             self._coordinator.leave_group(group_id)
+            self._groups.remove(group_id)
             LOG.info(_LI('Left partitioning group %s'), group_id)
 
     def _get_members(self, group_id):
