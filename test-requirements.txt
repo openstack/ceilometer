@@ -29,3 +29,4 @@ testrepository>=0.0.18
 testscenarios>=0.4
 testtools>=0.9.36,!=1.2.0
 gabbi>=0.6.0
+requests-aws>=0.1.4
