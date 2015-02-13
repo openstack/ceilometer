@@ -27,12 +27,6 @@ OPTS = [
                default='0.0.0.0',
                help='The listen IP for the ceilometer API server.',
                ),
-    cfg.BoolOpt('enable_reverse_dns_lookup',
-                default=False,
-                help=('Set it to False if your environment does not need '
-                      'or have a DNS server, otherwise it will delay the '
-                      'response from the API.')
-                ),
 ]
 
 CONF = cfg.CONF

@@ -15,19 +15,20 @@
 
 import logging
 import os
-import socket
-from wsgiref import simple_server
 
-import netaddr
+
 from oslo_config import cfg
 from paste import deploy
 import pecan
+from werkzeug import serving
 
 from ceilometer.api import config as api_config
 from ceilometer.api import hooks
 from ceilometer.api import middleware
 from ceilometer.i18n import _
+from ceilometer.i18n import _LW
 from ceilometer.openstack.common import log
+from ceilometer import service
 from ceilometer import storage
 
 LOG = log.getLogger(__name__)
@@ -39,6 +40,8 @@ OPTS = [
                default="api_paste.ini",
                help="Configuration file for WSGI definition of API."
                ),
+    cfg.IntOpt('api_workers', default=1,
+               help='Number of workers for Ceilometer API server.'),
 ]
 
 API_OPTS = [
@@ -77,9 +80,16 @@ def setup_app(pecan_config=None, extra_hooks=None):
 
     cfg.set_defaults(API_OPTS, pecan_debug=CONF.debug)
 
+    # NOTE(sileht): pecan debug won't work in multi-process environment
+    pecan_debug = CONF.api.pecan_debug
+    if service.get_workers('api') != 1 and pecan_debug:
+        pecan_debug = False
+        LOG.warning(_LW('pecan_debug cannot be enabled, if workers is > 1, '
+                        'the value is overrided with False'))
+
     app = pecan.make_app(
         pecan_config.app.root,
-        debug=CONF.api.pecan_debug,
+        debug=pecan_debug,
         force_canonical=getattr(pecan_config.app, 'force_canonical', True),
         hooks=app_hooks,
         wrap_app=middleware.ParsableErrorMiddleware,
@@ -106,36 +116,6 @@ class VersionSelectorApplication(object):
         return self.v2(environ, start_response)
 
 
-def get_server_cls(host):
-    """Return an appropriate WSGI server class base on provided host
-
-    :param host: The listen host for the ceilometer API server.
-    """
-    server_cls = simple_server.WSGIServer
-    if netaddr.valid_ipv6(host):
-        # NOTE(dzyu) make sure use IPv6 sockets if host is in IPv6 pattern
-        if getattr(server_cls, 'address_family') == socket.AF_INET:
-            class ipv6_server_cls(server_cls):
-                address_family = socket.AF_INET6
-            return ipv6_server_cls
-    return server_cls
-
-
-def get_handler_cls():
-    cls = simple_server.WSGIRequestHandler
-
-    # old-style class doesn't support super
-    class CeilometerHandler(cls, object):
-        def address_string(self):
-            if cfg.CONF.api.enable_reverse_dns_lookup:
-                return super(CeilometerHandler, self).address_string()
-            else:
-                # disable reverse dns lookup, directly return ip address
-                return self.client_address[0]
-
-    return CeilometerHandler
-
-
 def load_app():
     # Build the WSGI app
     cfg_file = None
@@ -155,10 +135,6 @@ def build_server():
     app = load_app()
     # Create the WSGI server and start it
     host, port = cfg.CONF.api.host, cfg.CONF.api.port
-    server_cls = get_server_cls(host)
-
-    srv = simple_server.make_server(host, port, app,
-                                    server_cls, get_handler_cls())
 
     LOG.info(_('Starting server in PID %s') % os.getpid())
     LOG.info(_("Configuration:"))
@@ -172,7 +148,9 @@ def build_server():
         LOG.info(_("serving on http://%(host)s:%(port)s") % (
                  {'host': host, 'port': port}))
 
-    return srv
+    workers = service.get_workers('api')
+    serving.run_simple(cfg.CONF.api.host, cfg.CONF.api.port,
+                       app, processes=workers)
 
 
 def app_factory(global_config, **local_conf):
