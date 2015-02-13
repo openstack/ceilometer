@@ -100,6 +100,12 @@ Alarms
 .. autotype:: ceilometer.api.controllers.v2.alarm_rules.combination.AlarmCombinationRule
    :members:
 
+.. autotype:: ceilometer.api.controllers.v2.alarm_rules.gnocchi.AlarmGnocchiMetricOfResourcesThresholdRule
+   :members:
+
+.. autotype:: ceilometer.api.controllers.v2.alarm_rules.gnocchi.AlarmGnocchiMetricsThresholdRule
+   :members:
+
 .. autotype:: ceilometer.api.controllers.v2.alarms.AlarmTimeConstraint
    :members:
 

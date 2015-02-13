@@ -199,8 +199,10 @@ class Alarm(base.Base):
 
     def get_description(self):
         rule = getattr(self, '%s_rule' % self.type, None)
-        if not self._description and rule:
-            return six.text_type(rule.default_description)
+        if not self._description:
+            if hasattr(rule, 'default_description'):
+                return six.text_type(rule.default_description)
+            return "%s alarm rule" % self.type
         return self._description
 
     def set_description(self, value):

@@ -105,6 +105,7 @@ def list_opts():
          itertools.chain(ceilometer.alarm.notifier.rest.OPTS,
                          ceilometer.alarm.service.OPTS,
                          ceilometer.alarm.rpc.OPTS,
+                         ceilometer.alarm.evaluator.gnocchi.OPTS,
                          ceilometer.api.controllers.v2.alarms.ALARM_API_OPTS,
                          ceilometer.cmd.alarm.OPTS)),
         ('api',
