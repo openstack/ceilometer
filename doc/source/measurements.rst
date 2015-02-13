@@ -73,7 +73,7 @@ instance:<type>                  g      instance   inst ID   both      1, 2, 3, 
 memory                           g      MB         inst ID   n         1, 2           Volume of RAM allocated
 memory.usage                     g      MB         inst ID   p         1, 2, 3, 4     Volume of RAM used
 cpu                              c      ns         inst ID   p         1, 2           CPU time used
-cpu_util                         g      %          inst ID   p         1, 2, 3, 4     Average CPU utilisation
+cpu_util                         g      %          inst ID   p         1, 2, 3, 4     Average CPU utilization
 vcpus                            g      vcpu       inst ID   n         1, 2           Number of VCPUs
 disk.read.requests               c      request    inst ID   p         1, 2           Number of read requests
 disk.read.requests.rate          g      request/s  inst ID   p         1, 2, 3        Average rate of reads

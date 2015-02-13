@@ -347,7 +347,7 @@ Get the list of samples about instances with *m1.tiny* flavor running for June
 
 Now you may want to have statistics on the meters you are targeting.
 Consider the following example where you are getting the list of samples
-about CPU utilisation of a given instance (identified by its *resource_id*)
+about CPU utilization of a given instance (identified by its *resource_id*)
 running for June 2013::
 
     GET /v2/meters/cpu_util
