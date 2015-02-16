@@ -4,6 +4,9 @@
 
  http://creativecommons.org/licenses/by/3.0/legalcode
 
+
+.. _paas_event_format:
+
 =================
 PaaS Event Format
 =================
@@ -211,7 +214,6 @@ guideline for PaaS service developers:
     as in the specifications.
     **Audit period timestamps** are not currently enforced against the audit period.
 
-=============
 Sample Events
 =============
 
@@ -337,4 +339,3 @@ event.
                 "state_description": "happy DNS"
                 }
     }
-

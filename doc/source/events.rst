@@ -59,13 +59,16 @@ traits
     The event's Traits contain most of the details of the event. Traits are
     typed, and can be strings, ints, floats, or datetimes.
 
+raw
+    (Optional) Mainly for auditing purpose, the full notification message
+    can be stored (unindexed) for future evaluation.
 
 Events from Notifications
 =========================
 
 Events are primarily created via the notifications system in OpenStack.
 OpenStack systems, such as Nova, Glance, Neutron, etc. will emit
-notifications in a JSON format to message queue when some notable action is
+notifications in a JSON format to the message queue when some notable action is
 taken by that system. Ceilometer will consume such notifications from the
 message queue, and process them.
 
@@ -103,7 +106,7 @@ projects (mostly Nova) using empty string for null dates.)
 
 If the definitions file is not present, a warning will be logged, but an empty
 set of definitions will be assumed. By default, any notifications that
-do not have an event definition in the definitions file for them will be
+do not have a corresponding event definition in the definitions file will be
 converted to events with a set of minimal, default traits.  This can be
 changed by setting the flag drop_unmatched_notifications_ in the
 ceilometer.conf file. If this is set to True, then any notifications
@@ -267,3 +270,18 @@ added. If the plugin returns anything other than *None*, the trait's value
 will be set from whatever the plugin returned (coerced to the appropriate type
 for the trait).
 
+Building Notifications
+======================
+
+In general, the payload format OpenStack services emit could be described as
+the Wild West. The payloads are often arbitrary data dumps at the time of
+the event which is often susceptible to change. To make consumption easier,
+the Ceilometer team offers two proposals: CADF_, an open, cloud standard
+which helps model cloud events and the PaaS Event Format.
+
+.. toctree::
+   :maxdepth: 1
+
+   format
+
+.. _CADF: http://docs.openstack.org/developer/pycadf/
