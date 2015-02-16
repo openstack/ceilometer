@@ -504,6 +504,7 @@ class Alarm(base.Base):
                    alarm_actions=["http://site:8000/alarm"],
                    insufficient_data_actions=["http://site:8000/nodata"],
                    repeat_actions=False,
+                   combination_rule=AlarmCombinationRule.sample(),
                    )
 
     def as_dict(self, db_model):
