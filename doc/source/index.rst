@@ -40,8 +40,8 @@ What is the purpose of the project and vision for it?
 This documentation offers information on how Ceilometer works and how to
 contribute to the project.
 
-Table of contents
-=================
+Overview
+========
 
 .. toctree::
    :maxdepth: 2
@@ -50,13 +50,30 @@ Table of contents
    architecture
    measurements
    events
+   webapi/index
+
+Developer Documentation
+=======================
+
+.. toctree::
+   :maxdepth: 2
+
    install/index
    configuration
-   webapi/index
-   contributing/index
+   plugins
+   testing
+   contributing
+
+Appendix
+========
+
+.. toctree::
+   :maxdepth: 1
+
    releasenotes/index
    glossary
    sourcecode/autoindex
+
 
 .. update index
 

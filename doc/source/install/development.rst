@@ -14,9 +14,9 @@
       License for the specific language governing permissions and limitations
       under the License.
 
-================================================
- Installing and Running the Development Version
-================================================
+================================
+ Installing Development Sandbox
+================================
 
 Ceilometer has several daemons. The basic are: :term:`polling agent` running
 either on the Nova compute node(s) or :term:`polling agent` running on the
@@ -34,15 +34,15 @@ of the instructions below are duplicated. Skip the steps you have already done.
    behaviour using namespaces option passed to polling agent, which will be
    maintained for a transitional period.
 
-.. _devstack: http://www.devstack.org/
-
 Configuring Devstack
 ====================
 
 .. index::
    double: installing; devstack
 
-1. Create a ``local.conf`` file as input to devstack.
+1. Download devstack_.
+
+2. Create a ``local.conf`` file as input to devstack.
 
    .. note::
 
@@ -52,20 +52,11 @@ Configuring Devstack
       <http://devstack.org/localrc.html>`_ or `devstack configuration
       <http://devstack.org/configuration.html>`_.
 
-2. Ceilometer makes extensive use of the messaging bus, but has not
+3. Ceilometer makes extensive use of the messaging bus, but has not
    yet been tested with ZeroMQ. We recommend using Rabbit or qpid for
-   now.
+   now. By default, RabbitMQ will be used by devstack.
 
-3. Nova does not generate the periodic notifications for all known
-   instances by default. To enable these auditing events, set
-   ``instance_usage_audit`` to true in the nova configuration file.
-
-4. Cinder does not generate notifications by default. To enable
-   these auditing events, set the following in the cinder configuration file::
-
-      notification_driver=cinder.openstack.common.notifier.rpc_notifier
-
-5. The ceilometer services are not enabled by default, so they must be
+4. The ceilometer services are not enabled by default, so they must be
    enabled in ``local.conf`` before running ``stack.sh``.
 
    This example ``local.conf`` file shows all of the settings required for
@@ -82,8 +73,18 @@ Configuring Devstack
       # Enable the ceilometer api services
       enable_service ceilometer-api
 
-The first group of daemons are necessary for core ceilometer functionality:
-polling, event listening, and data collection.
+   The first group of daemons are necessary for core ceilometer functionality:
+   polling, event listening, and data collection.
 
-6. If you use Data Processing (Sahara) service at your DevStack, it will
-   generate notifications by default.
+5. Nova does not generate the periodic notifications for all known
+   instances by default. To enable these auditing events, set
+   ``instance_usage_audit`` to true in the nova configuration file and restart
+   the service.
+
+6. Cinder does not generate notifications by default. To enable
+   these auditing events, set the following in the cinder configuration file
+   and restart the service::
+
+      notification_driver=messagingv2
+
+.. _devstack: http://www.devstack.org/

@@ -19,19 +19,6 @@
  Installing Ceilometer
 =======================
 
-.. note::
-
-  The ceilometer team has limited capacity to provide support for
-  older versions of the project. Because the project graduated from
-  incubation around the time of the grizzly release, that is the
-  first version for which we will provide regular ongoing support
-  following `the standard deprecation cycle for OpenStack
-  <https://wiki.openstack.org/wiki/StableBranch>`__. The grizzly
-  version of ceilometer cannot be installed on the same server
-  with earlier versions of OpenStack because of conflicting package
-  requirements, but is API compatible with the folsom release if
-  installed separately.
-
 .. toctree::
    :maxdepth: 2
 
@@ -39,4 +26,3 @@
    development
    manual
    mod_wsgi
-
