@@ -67,11 +67,18 @@ class TestManager(base.BaseTestCase):
                 mock.Mock(side_effect=plugin_base.ExtensionLoadError))
     @mock.patch('ceilometer.ipmi.pollsters.sensor.SensorPollster.__init__',
                 mock.Mock(return_value=None))
-    def test_load_failed_plugins(self):
+    @mock.patch('ceilometer.agent.base.LOG')
+    def test_load_failed_plugins(self, LOG):
         mgr = manager.AgentManager(namespaces=['ipmi'],
                                    pollster_list=['hardware.ipmi.node.*'])
         # 0 pollsters
         self.assertEqual(0, len(mgr.extensions))
+
+        err_msg = 'Skip loading extension for hardware.ipmi.node.%s'
+        pollster_names = ['power', 'temperature']
+        calls = [mock.call(err_msg % n) for n in pollster_names]
+        LOG.error.assert_has_calls(calls=calls,
+                                   any_order=True)
 
     # Exceptions other than ExtensionLoadError are propagated
     @mock.patch('ceilometer.ipmi.pollsters.node._Base.__init__',
@@ -106,7 +113,7 @@ class TestPollsterPollingException(agentbase.TestPollster):
         # Raise polling exception after 2 times
         self.polling_failures += 1
         if self.polling_failures > 2:
-            raise plugin_base.PollsterPermanentError()
+            raise plugin_base.PollsterPermanentError(resources[0])
 
         return sample
 
@@ -203,10 +210,12 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         self.assertEqual(1, len(self.PollsterException.samples))
         self.assertEqual(1, len(self.PollsterExceptionAnother.samples))
 
-    def test_polling_exception(self):
+    @mock.patch('ceilometer.agent.base.LOG')
+    def test_polling_exception(self, LOG):
+        source_name = 'test_pollingexception'
         self.pipeline_cfg = [
             {
-                'name': "test_pollingexception",
+                'name': source_name,
                 'interval': 10,
                 'counters': ['testpollingexception'],
                 'resources': ['test://'] if self.source_resources else [],
@@ -217,10 +226,15 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         self.mgr.pipeline_manager = pipeline.PipelineManager(
             self.pipeline_cfg,
             self.transformer_manager)
-        polling_tasks = self.mgr.setup_polling_tasks()
+        polling_task = self.mgr.setup_polling_tasks().values()[0]
+        pollster = list(polling_task.pollster_matches[source_name])[0]
 
         # 2 samples after 4 pollings, as pollster got disabled unpon exception
         for x in range(0, 4):
-            self.mgr.interval_task(polling_tasks.values()[0])
+            self.mgr.interval_task(polling_task)
         pub = self.mgr.pipeline_manager.pipelines[0].publishers[0]
         self.assertEqual(2, len(pub.samples))
+        LOG.error.assert_called_once_with((
+            'Prevent pollster %(name)s for '
+            'polling source %(source)s anymore!')
+            % ({'name': pollster.name, 'source': source_name}))
