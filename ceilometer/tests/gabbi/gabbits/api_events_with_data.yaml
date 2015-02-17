@@ -1,0 +1,188 @@
+# These test run against the Events API with data preloaded into the datastore.
+fixtures:
+- ConfigFixture
+- EventDataFixture
+
+tests:
+
+# this attempts to get all the events and checks to make sure they are valid
+- name: get all events
+  url: /v2/events
+  response_headers:
+      content-type: application/json; charset=UTF-8
+      content-location: $SCHEME://$NETLOC/v2/events
+  response_json_paths:
+      $.[0].event_type: cookies_chocolate.chip
+      $.[0].traits.[0].value: chocolate.chip
+      $.[0].traits.[1].value: '0'
+      $.[1].event_type: cookies_peanut.butter
+      $.[1].traits.[0].name: type
+      $.[1].traits.[1].name: ate
+      $.[2].event_type: cookies_sugar
+      $.[2].traits.[0].type: string
+      $.[2].traits.[1].type: integer
+
+# this attempts to get all the events with invalid parameters and expects a 400
+- name: get events with bad params
+  url: /v2/events?bad_Stuff_here
+  status: 400
+
+# this attempts to query the events with the correct parameterized query syntax
+# and expects a matching event
+- name: get events that match query
+  url: /v2/events?q.field=event_type&q.op=eq&q.type=string&q.value=cookies_chocolate.chip
+  response_headers:
+      content-type: application/json; charset=UTF-8
+      content-location: $SCHEME://$NETLOC/v2/events?q.field=event_type&q.op=eq&q.type=string&q.value=cookies_chocolate.chip
+  response_json_paths:
+      $.[0].event_type: cookies_chocolate.chip
+      $.[0].traits.[0].value: chocolate.chip
+
+# this attempts to query the events with the correct data query syntax and
+# expects a matching event
+- name: get events that match query via data
+  url: /v2/events
+  request_headers:
+      content-type: application/json; charset=UTF-8
+  data:
+      q:
+        - field: event_type
+          op: eq
+          type: string
+          value: cookies_chocolate.chip
+  response_headers:
+      content-type: application/json; charset=UTF-8
+      content-location: $SCHEME://$NETLOC/v2/events
+  response_json_paths:
+      $.[0].event_type: cookies_chocolate.chip
+      $.[0].traits.[0].value: chocolate.chip
+
+# this attempts to query the events with the correct parameterized query syntax
+# but a bad field name and expects an empty list
+- name: get events that match bad query
+  url: /v2/events?q.field=bad_field&q.op=eq&q.type=string&q.value=cookies_chocolate.chip
+  response_headers:
+      content-type: application/json; charset=UTF-8
+      content-location: $SCHEME://$NETLOC/v2/events?q.field=bad_field&q.op=eq&q.type=string&q.value=cookies_chocolate.chip
+  response_strings:
+      - "[]"
+
+# this attempts to query the events with the correct data query syntax and
+# a bad field name and expects an empty list
+- name: get events that match bad query via data
+  url: /v2/events
+  request_headers:
+      content-type: application/json; charset=UTF-8
+  data:
+      q:
+        - field: bad_field
+          op: eq
+          type: string
+          value: cookies_chocolate.chip
+  response_headers:
+      content-type: application/json; charset=UTF-8
+      content-location: $SCHEME://$NETLOC/v2/events
+  response_strings:
+      - "[]"
+
+# this attempts to query the events with the wrong data query syntax missing the
+# q object but supplying the field list and  a bad field name and expects a 400
+- name: get events that match bad query via data list
+  desc: https://bugs.launchpad.net/ceilometer/+bug/1423634
+  url: /v2/events
+  request_headers:
+      content-type: application/json; charset=UTF-8
+  data:
+      - field: bad_field
+        op: eq
+        type: string
+        value: cookies_chocolate.chip
+  xfail: True
+  status: 400
+
+# Get a single event by message_id should return an event
+- name: get a single event
+  url: /v2/events/fea1b15a-1d47-4175-85a5-a4bb2c729240
+  response_headers:
+      content-type: application/json; charset=UTF-8
+      content-location: $SCHEME://$NETLOC/v2/events/fea1b15a-1d47-4175-85a5-a4bb2c729240
+  response_json_paths:
+      $.event_type: cookies_chocolate.chip
+      $.traits.[0].value: chocolate.chip
+      $.traits.[1].value: '0'
+
+# Get a single event by message_id no data is present so should return a 404
+- name: get a single event that does not exist
+  url: /v2/events/bad-id
+  status: 404
+
+# Get all the event types should return a list of event types
+- name: get all event types
+  url: /v2/event_types
+  response_headers:
+      content-type: application/json; charset=UTF-8
+      content-location: $SCHEME://$NETLOC/v2/event_types
+  response_strings:
+      - cookies_chocolate.chip
+      - cookies_peanut.butter
+      - cookies_sugar
+
+# Get a single event type by valid name, this API is unused and should return a 404
+- name: get event types for good event_type unused api
+  url: /v2/event_types/cookies_chocolate.chip
+  status: 404
+
+# Get a single event type by invalid name, this API is unused and should return a 404
+- name: get event types for bad event_type unused api
+  url: /v2/event_types/bad_event_type
+  status: 404
+
+# Get all traits for a valid event type should return an list of traits
+- name: get all traits for event type
+  url: /v2/event_types/cookies_chocolate.chip/traits
+  response_headers:
+      content-type: application/json; charset=UTF-8
+      content-location: $SCHEME://$NETLOC/v2/event_types/cookies_chocolate.chip/traits
+  response_json_paths:
+      $.[0].type: string
+      $.[1].name: ate
+
+# Get all traits for an invalid event type should return an empty list
+- name: get all traits names for event type bad event type
+  url: /v2/event_types/bad_event_type/traits
+  response_headers:
+      content-type: application/json; charset=UTF-8
+      content-location: $SCHEME://$NETLOC/v2/event_types/bad_event_type/traits
+  response_strings:
+      - "[]"
+
+# Get all traits of type ate for a valid event type should return an list of
+# traits
+- name: get all traits of type ate for event type
+  url: /v2/event_types/cookies_chocolate.chip/traits/ate
+  response_headers:
+      content-type: application/json; charset=UTF-8
+      content-location: $SCHEME://$NETLOC/v2/event_types/cookies_chocolate.chip/traits/ate
+  response_json_paths:
+      $.[0].name: ate
+      $.[0].value: '0'
+
+# Get all traits of type ate for a invalid event type should return an empty
+# list
+- name: get all traits of type for event type bad event type
+  url: /v2/event_types/bad_event_type/traits/ate
+  response_headers:
+      content-type: application/json; charset=UTF-8
+      content-location: $SCHEME://$NETLOC/v2/event_types/bad_event_type/traits/ate
+  response_strings:
+      - "[]"
+
+# Get all traits of type bad_trait_name for a valid event type should return an
+# empty list
+- name: get all traits of type instances for event type bad trait name
+  url: /v2/event_types/cookies_chocolate.chip/traits/bad_trait_name
+  response_headers:
+      content-type: application/json; charset=UTF-8
+      content-location: $SCHEME://$NETLOC/v2/event_types/cookies_chocolate.chip/traits/bad_trait_name
+  response_strings:
+      - "[]"

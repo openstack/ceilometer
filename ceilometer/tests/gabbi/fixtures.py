@@ -26,6 +26,7 @@ import uuid
 from gabbi import fixture
 from oslo_config import fixture as fixture_config
 
+from ceilometer.event.storage import models
 from ceilometer.publisher import utils
 from ceilometer import sample
 from ceilometer import service
@@ -48,6 +49,8 @@ class ConfigFixture(fixture.GabbiFixture):
         conf = fixture_config.Config().conf
         self.conf = conf
         conf.import_opt('policy_file', 'ceilometer.openstack.common.policy')
+        conf.import_opt('store_events', 'ceilometer.notification',
+                        group='notification')
         conf.set_override('policy_file',
                           os.path.abspath('etc/ceilometer/policy.json'))
 
@@ -72,6 +75,8 @@ class ConfigFixture(fixture.GabbiFixture):
         conf.set_override('alarm_connection', '', group='database')
 
         conf.set_override('pecan_debug', True, group='api')
+
+        conf.set_override('store_events', True, group='notification')
 
     def stop_fixture(self):
         """Reset the config and remove data."""
@@ -102,8 +107,7 @@ class SampleDataFixture(fixture.GabbiFixture):
                               resource_id=project_id,
                               timestamp=timestamp,
                               resource_metadata=resource_metadata,
-                              source=self.source,
-                              )
+                              source=self.source)
             data = utils.meter_message_from_counter(
                 c, conf.publisher.telemetry_secret)
             self.conn.record_metering_data(data)
@@ -115,3 +119,29 @@ class SampleDataFixture(fixture.GabbiFixture):
         print('resource',
               self.conn.db.resource.remove({'source': self.source}))
         print('meter', self.conn.db.meter.remove({'source': self.source}))
+
+
+class EventDataFixture(fixture.GabbiFixture):
+    """Instantiate some sample event data for use in testing."""
+
+    def start_fixture(self):
+        """Create some events."""
+        conf = fixture_config.Config().conf
+        self.conn = storage.get_connection_from_config(conf, 'event')
+        events = []
+        name_list = ['chocolate.chip', 'peanut.butter', 'sugar']
+        for ix, name in enumerate(name_list):
+            timestamp = datetime.datetime.utcnow()
+            message_id = 'fea1b15a-1d47-4175-85a5-a4bb2c72924{}'.format(ix)
+            traits = [models.Trait('type', 1, name),
+                      models.Trait('ate', 2, ix)]
+            event = models.Event(message_id,
+                                 'cookies_{}'.format(name),
+                                 timestamp,
+                                 traits)
+            events.append(event)
+        self.conn.record_events(events)
+
+    def stop_fixture(self):
+        """Destroy the events."""
+        self.conn.db.event.remove({'event_type': '/^cookies_/'})
