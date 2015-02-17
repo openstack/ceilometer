@@ -523,6 +523,12 @@ Using notification plugin profiler/notifications.py.
 Creating New Meters
 ===================
 
+.. note::
+
+  Meters in Ceilometer should represent a standard of measurement. If tracking
+  the general state of a resource, the datapoint should be modelled as an Event
+  rather than a Meter.
+
 Naming convention
 -----------------
 

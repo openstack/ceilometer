@@ -187,6 +187,16 @@ class NotificationBase(PluginBase):
                 p(list(self.process_notification(notification)))
 
 
+class NonMetricNotificationBase(object):
+    """Use to mark non-measurement meters
+
+    There are a number of historical non-measurement meters that should really
+    be captured as events. This common base allows us to disable these invalid
+    meters.
+    """
+    pass
+
+
 class ExtensionLoadError(Exception):
     """Error of loading pollster plugin.
 

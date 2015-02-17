@@ -30,7 +30,8 @@ cfg.CONF.register_opts(OPTS)
 SERVICE = 'orchestration'
 
 
-class StackCRUD(plugin_base.NotificationBase):
+class StackCRUD(plugin_base.NotificationBase,
+                plugin_base.NonMetricNotificationBase):
 
     resource_name = '%s.stack' % SERVICE
 

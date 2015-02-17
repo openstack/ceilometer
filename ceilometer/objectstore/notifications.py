@@ -44,7 +44,7 @@ class _Base(plugin_base.NotificationBase):
                 for topic in conf.notification_topics]
 
 
-class SwiftWsgiMiddleware(_Base):
+class SwiftWsgiMiddleware(_Base, plugin_base.NonMetricNotificationBase):
 
     @property
     def event_types(self):

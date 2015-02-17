@@ -29,7 +29,8 @@ cfg.CONF.register_opts(OPTS)
 SERVICE = 'identity'
 
 
-class _Base(plugin_base.NotificationBase):
+class _Base(plugin_base.NotificationBase,
+            plugin_base.NonMetricNotificationBase):
     """Convert identity notification into Samples."""
 
     resource_type = None

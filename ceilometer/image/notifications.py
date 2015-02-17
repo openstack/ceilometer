@@ -55,7 +55,7 @@ class ImageCRUDBase(ImageBase):
     ]
 
 
-class ImageCRUD(ImageCRUDBase):
+class ImageCRUD(ImageCRUDBase, plugin_base.NonMetricNotificationBase):
     def process_notification(self, message):
         yield sample.Sample.from_notification(
             name=message['event_type'],
@@ -68,7 +68,7 @@ class ImageCRUD(ImageCRUDBase):
             message=message)
 
 
-class Image(ImageCRUDBase):
+class Image(ImageCRUDBase, plugin_base.NonMetricNotificationBase):
     def process_notification(self, message):
         yield sample.Sample.from_notification(
             name='image',

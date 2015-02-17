@@ -20,6 +20,7 @@ import abc
 
 import six
 
+from ceilometer.agent import plugin_base
 from ceilometer.compute import notifications
 from ceilometer.compute import util
 from ceilometer import sample
@@ -47,7 +48,8 @@ class UserMetadataAwareInstanceNotificationBase(
         """Derive sample from notification payload."""
 
 
-class InstanceScheduled(UserMetadataAwareInstanceNotificationBase):
+class InstanceScheduled(UserMetadataAwareInstanceNotificationBase,
+                        plugin_base.NonMetricNotificationBase):
     event_types = ['scheduler.run_instance.scheduled']
 
     def get_instance_properties(self, message):
@@ -73,7 +75,8 @@ class ComputeInstanceNotificationBase(
     event_types = ['compute.instance.*']
 
 
-class Instance(ComputeInstanceNotificationBase):
+class Instance(ComputeInstanceNotificationBase,
+               plugin_base.NonMetricNotificationBase):
     def get_sample(self, message):
         yield sample.Sample.from_notification(
             name='instance',
@@ -138,7 +141,8 @@ class EphemeralDiskSize(ComputeInstanceNotificationBase):
             message=message)
 
 
-class InstanceFlavor(ComputeInstanceNotificationBase):
+class InstanceFlavor(ComputeInstanceNotificationBase,
+                     plugin_base.NonMetricNotificationBase):
     def get_sample(self, message):
         instance_type = message.get('payload', {}).get('instance_type')
         if instance_type:

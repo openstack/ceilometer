@@ -112,7 +112,7 @@ class NetworkNotificationBase(plugin_base.NotificationBase):
                     message=resource_message)
 
 
-class Network(NetworkNotificationBase):
+class Network(NetworkNotificationBase, plugin_base.NonMetricNotificationBase):
     """Listen for Neutron network notifications.
 
     Handle network.{create.end|update.*|exists} notifications from neutron.
@@ -120,7 +120,7 @@ class Network(NetworkNotificationBase):
     resource_name = 'network'
 
 
-class Subnet(NetworkNotificationBase):
+class Subnet(NetworkNotificationBase, plugin_base.NonMetricNotificationBase):
     """Listen for Neutron notifications.
 
     Handle subnet.{create.end|update.*|exists} notifications from neutron.
@@ -128,7 +128,7 @@ class Subnet(NetworkNotificationBase):
     resource_name = 'subnet'
 
 
-class Port(NetworkNotificationBase):
+class Port(NetworkNotificationBase, plugin_base.NonMetricNotificationBase):
     """Listen for Neutron notifications.
 
     Handle port.{create.end|update.*|exists} notifications from neutron.
@@ -136,7 +136,7 @@ class Port(NetworkNotificationBase):
     resource_name = 'port'
 
 
-class Router(NetworkNotificationBase):
+class Router(NetworkNotificationBase, plugin_base.NonMetricNotificationBase):
     """Listen for Neutron notifications.
 
     Handle router.{create.end|update.*|exists} notifications from neutron.
@@ -144,7 +144,8 @@ class Router(NetworkNotificationBase):
     resource_name = 'router'
 
 
-class FloatingIP(NetworkNotificationBase):
+class FloatingIP(NetworkNotificationBase,
+                 plugin_base.NonMetricNotificationBase):
     """Listen for Neutron notifications.
 
     Handle floatingip.{create.end|update.*|exists} notifications from neutron.
@@ -173,7 +174,7 @@ class Bandwidth(NetworkNotificationBase):
             message=message)
 
 
-class Pool(NetworkNotificationBase):
+class Pool(NetworkNotificationBase, plugin_base.NonMetricNotificationBase):
     """Listen for Neutron notifications.
 
     Handle pool.{create.end|update.*|exists} notifications from neutron.
@@ -182,7 +183,7 @@ class Pool(NetworkNotificationBase):
     counter_name = 'network.services.lb.pool'
 
 
-class Vip(NetworkNotificationBase):
+class Vip(NetworkNotificationBase, plugin_base.NonMetricNotificationBase):
     """Listen for Neutron notifications.
 
     Handle vip.{create.end|update.*|exists} notifications from neutron.
@@ -191,7 +192,7 @@ class Vip(NetworkNotificationBase):
     counter_name = 'network.services.lb.vip'
 
 
-class Member(NetworkNotificationBase):
+class Member(NetworkNotificationBase, plugin_base.NonMetricNotificationBase):
     """Listen for Neutron notifications.
 
     Handle member.{create.end|update.*|exists} notifications from neutron.
@@ -200,7 +201,8 @@ class Member(NetworkNotificationBase):
     counter_name = 'network.services.lb.member'
 
 
-class HealthMonitor(NetworkNotificationBase):
+class HealthMonitor(NetworkNotificationBase,
+                    plugin_base.NonMetricNotificationBase):
     """Listen for Neutron notifications.
 
     Handle health_monitor.{create.end|update.*|exists} notifications
@@ -210,7 +212,7 @@ class HealthMonitor(NetworkNotificationBase):
     counter_name = 'network.services.lb.health_monitor'
 
 
-class Firewall(NetworkNotificationBase):
+class Firewall(NetworkNotificationBase, plugin_base.NonMetricNotificationBase):
     """Listen for Neutron notifications.
 
     Handle firewall.{create.end|update.*|exists} notifications from neutron.
@@ -219,7 +221,8 @@ class Firewall(NetworkNotificationBase):
     counter_name = 'network.services.firewall'
 
 
-class FirewallPolicy(NetworkNotificationBase):
+class FirewallPolicy(NetworkNotificationBase,
+                     plugin_base.NonMetricNotificationBase):
     """Listen for Neutron notifications.
 
     Handle firewall_policy.{create.end|update.*|exists} notifications
@@ -229,7 +232,8 @@ class FirewallPolicy(NetworkNotificationBase):
     counter_name = 'network.services.firewall.policy'
 
 
-class FirewallRule(NetworkNotificationBase):
+class FirewallRule(NetworkNotificationBase,
+                   plugin_base.NonMetricNotificationBase):
     """Listen for Neutron notifications.
 
     Handle firewall_rule.{create.end|update.*|exists} notifications
@@ -239,7 +243,8 @@ class FirewallRule(NetworkNotificationBase):
     counter_name = 'network.services.firewall.rule'
 
 
-class VPNService(NetworkNotificationBase):
+class VPNService(NetworkNotificationBase,
+                 plugin_base.NonMetricNotificationBase):
     """Listen for Neutron notifications.
 
     Handle vpnservice.{create.end|update.*|exists} notifications from neutron.
@@ -248,7 +253,8 @@ class VPNService(NetworkNotificationBase):
     counter_name = 'network.services.vpn'
 
 
-class IPSecPolicy(NetworkNotificationBase):
+class IPSecPolicy(NetworkNotificationBase,
+                  plugin_base.NonMetricNotificationBase):
     """Listen for Neutron notifications.
 
     Handle pool.{create.end|update.*|exists} notifications from neutron.
@@ -257,7 +263,8 @@ class IPSecPolicy(NetworkNotificationBase):
     counter_name = 'network.services.vpn.ipsecpolicy'
 
 
-class IKEPolicy(NetworkNotificationBase):
+class IKEPolicy(NetworkNotificationBase,
+                plugin_base.NonMetricNotificationBase):
     """Listen for Neutron notifications.
 
     Handle ikepolicy.{create.end|update.*|exists} notifications from neutron.
@@ -266,7 +273,8 @@ class IKEPolicy(NetworkNotificationBase):
     counter_name = 'network.services.vpn.ikepolicy'
 
 
-class IPSecSiteConnection(NetworkNotificationBase):
+class IPSecSiteConnection(NetworkNotificationBase,
+                          plugin_base.NonMetricNotificationBase):
     """Listen for Neutron notifications.
 
     Handle ipsec_site_connection.{create.end|update.*|exists}

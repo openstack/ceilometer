@@ -61,7 +61,7 @@ class VolumeCRUDBase(VolumeBase):
     ]
 
 
-class VolumeCRUD(VolumeCRUDBase):
+class VolumeCRUD(VolumeCRUDBase, plugin_base.NonMetricNotificationBase):
     def process_notification(self, message):
         yield sample.Sample.from_notification(
             name=message['event_type'],
@@ -74,7 +74,7 @@ class VolumeCRUD(VolumeCRUDBase):
             message=message)
 
 
-class Volume(VolumeCRUDBase):
+class Volume(VolumeCRUDBase, plugin_base.NonMetricNotificationBase):
     def process_notification(self, message):
         yield sample.Sample.from_notification(
             name='volume',
@@ -111,7 +111,7 @@ class SnapshotCRUDBase(VolumeBase):
     ]
 
 
-class SnapshotCRUD(SnapshotCRUDBase):
+class SnapshotCRUD(SnapshotCRUDBase, plugin_base.NonMetricNotificationBase):
     def process_notification(self, message):
         yield sample.Sample.from_notification(
             name=message['event_type'],
@@ -124,7 +124,7 @@ class SnapshotCRUD(SnapshotCRUDBase):
             message=message)
 
 
-class Snapshot(SnapshotCRUDBase):
+class Snapshot(SnapshotCRUDBase, plugin_base.NonMetricNotificationBase):
     def process_notification(self, message):
         yield sample.Sample.from_notification(
             name='snapshot',

@@ -30,7 +30,8 @@ cfg.CONF.register_opts(OPTS)
 SERVICE = 'sahara'
 
 
-class DataProcessing(plugin_base.NotificationBase):
+class DataProcessing(plugin_base.NotificationBase,
+                     plugin_base.NonMetricNotificationBase):
 
     resource_name = '%s.cluster' % SERVICE
 

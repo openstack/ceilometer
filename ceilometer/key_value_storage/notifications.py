@@ -41,7 +41,7 @@ class _Base(plugin_base.NotificationBase):
                 for topic in conf.notification_topics]
 
 
-class Table(_Base):
+class Table(_Base, plugin_base.NonMetricNotificationBase):
 
     event_types = [
         'magnetodb.table.create.end',
