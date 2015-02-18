@@ -241,6 +241,22 @@ class TestRealNotification(BaseRealNotification):
         fake_publisher_cls.return_value = self.publisher
         self._check_notification_service()
 
+    @mock.patch('ceilometer.publisher.test.TestPublisher')
+    def test_notification_service_error_topic(self, fake_publisher_cls):
+        fake_publisher_cls.return_value = self.publisher
+        self.srv.start()
+        notifier = messaging.get_notifier(self.transport,
+                                          'compute.vagrant-precise')
+        notifier.error(context.RequestContext(), 'compute.instance.error',
+                       TEST_NOTICE_PAYLOAD)
+        start = timeutils.utcnow()
+        while timeutils.delta_seconds(start, timeutils.utcnow()) < 600:
+            if len(self.publisher.events) >= self.expected_events:
+                break
+            eventlet.sleep(0)
+        self.srv.stop()
+        self.assertEqual(self.expected_events, len(self.publisher.events))
+
     @mock.patch('ceilometer.coordination.PartitionCoordinator')
     @mock.patch('ceilometer.publisher.test.TestPublisher')
     def test_ha_configured_agent_coord_disabled(self, fake_publisher_cls,
