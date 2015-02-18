@@ -13,6 +13,7 @@
 """Model classes for use in the events storage API.
 """
 from oslo_utils import timeutils
+import six
 
 from ceilometer.storage import base
 
@@ -51,7 +52,7 @@ class Event(base.Model):
     def __repr__(self):
         trait_list = []
         if self.traits:
-            trait_list = [str(trait) for trait in self.traits]
+            trait_list = [six.text_type(trait) for trait in self.traits]
         return ("<Event: %s, %s, %s, %s>" %
                 (self.message_id, self.event_type, self.generated,
                  " ".join(trait_list)))
@@ -117,4 +118,4 @@ class Trait(base.Model):
             return float(value)
         if trait_type is cls.DATETIME_TYPE:
             return timeutils.normalize_time(timeutils.parse_isotime(value))
-        return str(value)
+        return six.text_type(value)

@@ -110,7 +110,7 @@ class SplitterTraitPlugin(TraitPluginBase):
     def trait_value(self, match_list):
         if not match_list:
             return None
-        value = str(match_list[0][1])
+        value = six.text_type(match_list[0][1])
         if self.max_split is not None:
             values = value.split(self.separator, self.max_split)
         else:

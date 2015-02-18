@@ -16,6 +16,7 @@
 import datetime
 
 from oslotest import base as testbase
+import six
 
 from ceilometer.alarm.storage import models as alarm_models
 from ceilometer.event.storage import models as event_models
@@ -109,7 +110,7 @@ class TestTraitModel(testbase.BaseTestCase):
         v = event_models.Trait.convert_value(
             event_models.Trait.TEXT_TYPE, 10)
         self.assertEqual("10", v)
-        self.assertIsInstance(v, str)
+        self.assertIsInstance(v, six.text_type)
 
 
 class TestClassModel(testbase.BaseTestCase):
