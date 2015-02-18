@@ -19,6 +19,9 @@
  Measurements
 ==============
 
+Types
+=====
+
 Three type of meters are defined in ceilometer:
 
 .. index::
@@ -58,10 +61,14 @@ Volume        byte      B
 Time          seconds   s
 ============  ========  ==============  =======================
 
+
+Meters
+======
+
 Here are the meter types by components that are currently implemented:
 
 Compute (Nova)
-==============
+--------------
 
 All meters are related to the guest machine, not the host.
 
@@ -177,7 +184,7 @@ compute.node.cpu.percent         Gauge       %          host ID   notification  
 ===============================  ==========  =========  ========  ============  ========================
 
 Network (Neutron)
-=================
+-----------------
 
 ========================  ==========  ========  ========  ============  ======================================================
 Name                      Type        Unit      Resource  Origin        Note
@@ -201,7 +208,7 @@ bandwidth                 Delta       B         label ID  notification  Bytes th
 ========================  ==========  ========  ========  ============  ======================================================
 
 Image (Glance)
-==============
+--------------
 
 ========================  ==========  =======  ========  ============  =======================================================
 Name                      Type        Unit     Resource  Origin        Note
@@ -216,7 +223,7 @@ image.serve               Delta       B        image ID  notification  Image is 
 ========================  ==========  =======  ========  ============  =======================================================
 
 Volume (Cinder)
-===============
+---------------
 
 ============================  ==========   ========  ========  ============  =======================================================
 Name                          Type         Unit      Resource  Origin        Note
@@ -239,7 +246,7 @@ snapshot.update.(start|end)    Delta       snapshot  snap ID   notification  Upd
 Make sure Cinder is properly configured first: see :ref:`installing_manually`.
 
 Identity (Keystone)
-===================
+-------------------
 
 ================================  ==========  ===============  ==========  ============  ===========================================
 Name                              Type        Unit             Resource    Origin        Note
@@ -265,9 +272,8 @@ identity.trust.created            Delta       trust            trust ID    notif
 identity.trust.deleted            Delta       trust            trust ID    notification  A trust is deleted
 ================================  ==========  ===============  ==========  ============  ===========================================
 
-
 Object Storage (Swift)
-======================
+----------------------
 
 ===============================  ==========  ==========  ===========  ============  ==========================================
 Name                             Type        Unit        Resource     Origin        Note
@@ -288,7 +294,7 @@ updated right after an upload/download, since Swift takes some time to update
 the container properties.
 
 Orchestration (Heat)
-====================
+--------------------
 
 ===============================  ==========  ==========  ===========  ============  ==========================================
 Name                             Type        Unit        Resource     Origin        Note
@@ -303,7 +309,7 @@ stack.suspend                    Delta       stack       stack ID     notificati
 To enable Heat notifications configure Heat as described in :ref:`installing_manually`.
 
 Data Processing (Sahara)
-========================
+------------------------
 
 ===============================  ==========  ==========  ===========  ============  =================================================
 Name                             Type        Unit        Resource     Origin        Note
@@ -316,7 +322,7 @@ cluster.delete                   Delta       cluster     cluster ID   notificati
 To enable Sahara notifications configure Sahara as described in :ref:`installing_manually`.
 
 Key Value Store (MagnetoDB)
-=============================
+---------------------------
 
 ===============================  ==========  ==========  ===========  ============  =================================================
 Name                             Type        Unit        Resource     Origin        Note
@@ -329,7 +335,7 @@ magnetodb.table.index.count      Gauge       index       table ID     notificati
 To enable MagnetoDB notifications configure MagnetoDB as described in :ref:`installing_manually`.
 
 Energy (Kwapi)
-==============
+--------------
 
 ==========================  ==========  ==========  ========  ========= ==============================================
 Name                        Type        Unit        Resource  Origin    Note
@@ -339,7 +345,7 @@ power                       Gauge       W           probe ID  pollster  Power co
 ==========================  ==========  ==========  ========  ========= ==============================================
 
 Network (From SDN Controller)
-=============================
+-----------------------------
 
 These meters based on OpenFlow Switch metrics.
 In order to enable these meters, each driver needs to be configured.
@@ -373,7 +379,7 @@ switch.flow.bytes                  Cumulative  B       switch ID  pollster  Rece
 =================================  ==========  ======  =========  ========  ==============================
 
 LoadBalancer as a Service (LBaaS)
-=================================
+---------------------------------
 
 =========================================   ==========  ==========    ==========  ============  ==============================
 Meter                                       Type        Unit          Resource    Origin        Note
@@ -397,7 +403,7 @@ network.services.lb.outgoing.bytes          Cumulative  B             pool ID   
 =========================================   ==========  ==========    ==========  ============  ==============================
 
 VPN as a Service (VPNaaS)
-=========================
+-------------------------
 
 =======================================  =====  ===========   ============== ============  ===============================
 Meter                                    Type   Unit          Resource       Origin        Note
@@ -416,9 +422,8 @@ network.services.vpn.ikepolicy.create    Delta  ikepolicy     ikepolicy ID   not
 network.services.vpn.ikepolicy.update    Delta  ikepolicy     ikepolicy ID   notification  Update of a Ike Policy
 =======================================  =====  ===========   ============== ============  ===============================
 
-
 Firewall as a Service (FWaaS)
-=============================
+-----------------------------
 
 =======================================  =====  ========    ===========  ============  ===============================
 Meter                                    Type   Unit        Resource     Origin        Note
@@ -434,9 +439,8 @@ network.services.firewall.rule.create    Delta  rule        rule ID      notific
 network.services.firewall.rule.update    Delta  rule        rule ID      notification  Update of a Firewall Rule
 =======================================  =====  ========    ===========  ============  ===============================
 
-
 Ironic Hardware IPMI Sensor Data
-================================
+--------------------------------
 
 IPMI sensor data is not available by default in Ironic. To enable these meters
 see the `Ironic Installation Guide`_.
@@ -468,9 +472,8 @@ hardware.ipmi.node.power         Gauge       W       host ID         pollster   
 hardware.ipmi.node.temperature   Gauge       C       host ID         pollster      System Current Temperature
 ===============================  ==========  ======  ==============  ============  ==========================
 
-
 Generic Host
-================================
+------------
 
 These meters are generic host metrics getting from snmp. To enable these, snmpd
 agent should be running on the host from which the metrics are gathered.
@@ -504,24 +507,25 @@ hardware.system_stats.cpu.idle            g      %          host ID   pollster  
   [g]: gauge
   [c]: cumulative
 
+OSprofiler data
+---------------
 
-Dynamically retrieving the Meters via ceilometer client
-=======================================================
+All messages with event type "profiler.*" will be collected as profiling data.
+Using notification plugin profiler/notifications.py.
 
-To retrieve the available meters that can be queried given the actual
-resource instances available, use the ``meter-list`` command:
+.. note::
 
-::
+  Be sparing with heavy usage of OSprofiler, especially in case of complex
+  operations like booting and deleting instance that may create over 100kb of
+  sample data per each request.
 
-    $ ceilometer meter-list
-    +------------+-------+--------------------------------------+---------+----------------------------------+
-    | Name       | Type  | Resource ID                          | User ID | Project ID                       |
-    +------------+-------+--------------------------------------+---------+----------------------------------+
-    | image      | gauge | 09e84d97-8712-4dd2-bcce-45970b2430f7 |         | 57cf6d93688e4d39bf2fe3d3c03eb326 |
 
+Creating New Meters
+===================
 
 Naming convention
-=================
+-----------------
+
 If you plan on adding meters, please follow the convention below:
 
 1. Always use '.' as separator and go from least to most discriminant word.
@@ -534,7 +538,7 @@ If you plan on adding meters, please follow the convention below:
 
 
 User-defined sample metadata for Nova
-=========================================
+-------------------------------------
 
 Users are allowed to add additional metadata to samples of nova meter.
 These additional metadata are stored in 'resource_metadata.user_metadata.*' of the sample.
@@ -557,7 +561,8 @@ Note: The name of the metadata shouldn't exceed 256 characters otherwise it will
 Also, if it has '.', this will be replaced by a '_' in ceilometer.
 
 User-defined sample metadata for Swift
-==========================================
+--------------------------------------
+
 It's possible to add additional metadata to sample of Swift meter as well.
 You might specify headers whose values will be stored in resource_metadata as
 'resource_metadata.http_header_$name', where $name is a name of the header with
@@ -569,17 +574,3 @@ refer to :ref:`installing_manually` for details.
 For example, this could be used to distinguish external and internal users. You'd
 have to implement a custom Swift middleware that sets a proper header and just add
 it to metadata_headers.
-
-
-OSprofiler data
-===============
-
-All messages with event type "profiler.*" will be collected as profiling data.
-Using notification plugin profiler/notifications.py.
-
-.. note::
-
-  Be sparing with heavy usage of OSprofiler, especially in case of complex
-  operations like booting and deleting instance that may create over 100kb of
-  sample data per each request.
-
