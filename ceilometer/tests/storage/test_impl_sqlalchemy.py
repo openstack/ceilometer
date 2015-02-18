@@ -44,39 +44,6 @@ class CeilometerBaseTest(tests_db.TestBase):
 
 
 @tests_db.run_with('sqlite', 'mysql', 'pgsql')
-class TraitTypeTest(tests_db.TestBase):
-    # TraitType is a construct specific to sqlalchemy.
-    # Not applicable to other drivers.
-
-    def test_trait_type_exists(self):
-        tt1 = self.event_conn._get_or_create_trait_type("foo", 0)
-        self.assertTrue(tt1.id >= 0)
-        tt2 = self.event_conn._get_or_create_trait_type("foo", 0)
-        self.assertEqual(tt2.id, tt1.id)
-        self.assertEqual(tt2.desc, tt1.desc)
-        self.assertEqual(tt2.data_type, tt1.data_type)
-
-    def test_new_trait_type(self):
-        tt1 = self.event_conn._get_or_create_trait_type("foo", 0)
-        self.assertTrue(tt1.id >= 0)
-        tt2 = self.event_conn._get_or_create_trait_type("blah", 0)
-        self.assertNotEqual(tt1.id, tt2.id)
-        self.assertNotEqual(tt1.desc, tt2.desc)
-        # Test the method __repr__ returns a string
-        self.assertTrue(repr.repr(tt2))
-
-    def test_trait_different_data_type(self):
-        tt1 = self.event_conn._get_or_create_trait_type("foo", 0)
-        self.assertTrue(tt1.id >= 0)
-        tt2 = self.event_conn._get_or_create_trait_type("foo", 1)
-        self.assertNotEqual(tt1.id, tt2.id)
-        self.assertEqual(tt2.desc, tt1.desc)
-        self.assertNotEqual(tt1.data_type, tt2.data_type)
-        # Test the method __repr__ returns a string
-        self.assertTrue(repr.repr(tt2))
-
-
-@tests_db.run_with('sqlite', 'mysql', 'pgsql')
 class EventTypeTest(tests_db.TestBase):
     # EventType is a construct specific to sqlalchemy
     # Not applicable to other drivers.
@@ -104,64 +71,48 @@ class MyException(Exception):
 
 @tests_db.run_with('sqlite', 'mysql', 'pgsql')
 class EventTest(tests_db.TestBase):
+    def _verify_data(self, trait, trait_table):
+        now = datetime.datetime.utcnow()
+        ev = models.Event('1', 'name', now, [trait])
+        self.event_conn.record_events([ev])
+        session = self.event_conn._engine_facade.get_session()
+        t_tables = [sql_models.TraitText, sql_models.TraitFloat,
+                    sql_models.TraitInt, sql_models.TraitDatetime]
+        for table in t_tables:
+            if table == trait_table:
+                self.assertEqual(1, session.query(table).count())
+            else:
+                self.assertEqual(0, session.query(table).count())
+
     def test_string_traits(self):
         model = models.Trait("Foo", models.Trait.TEXT_TYPE, "my_text")
-        trait = self.event_conn._make_trait(model, None)
-        self.assertEqual(models.Trait.TEXT_TYPE, trait.trait_type.data_type)
-        self.assertIsNone(trait.t_float)
-        self.assertIsNone(trait.t_int)
-        self.assertIsNone(trait.t_datetime)
-        self.assertEqual("my_text", trait.t_string)
-        self.assertIsNotNone(trait.trait_type.desc)
+        self._verify_data(model, sql_models.TraitText)
 
     def test_int_traits(self):
         model = models.Trait("Foo", models.Trait.INT_TYPE, 100)
-        trait = self.event_conn._make_trait(model, None)
-        self.assertEqual(models.Trait.INT_TYPE, trait.trait_type.data_type)
-        self.assertIsNone(trait.t_float)
-        self.assertIsNone(trait.t_string)
-        self.assertIsNone(trait.t_datetime)
-        self.assertEqual(100, trait.t_int)
-        self.assertIsNotNone(trait.trait_type.desc)
+        self._verify_data(model, sql_models.TraitInt)
 
     def test_float_traits(self):
         model = models.Trait("Foo", models.Trait.FLOAT_TYPE, 123.456)
-        trait = self.event_conn._make_trait(model, None)
-        self.assertEqual(models.Trait.FLOAT_TYPE, trait.trait_type.data_type)
-        self.assertIsNone(trait.t_int)
-        self.assertIsNone(trait.t_string)
-        self.assertIsNone(trait.t_datetime)
-        self.assertEqual(123.456, trait.t_float)
-        self.assertIsNotNone(trait.trait_type.desc)
+        self._verify_data(model, sql_models.TraitFloat)
 
     def test_datetime_traits(self):
         now = datetime.datetime.utcnow()
         model = models.Trait("Foo", models.Trait.DATETIME_TYPE, now)
-        trait = self.event_conn._make_trait(model, None)
-        self.assertEqual(models.Trait.DATETIME_TYPE,
-                         trait.trait_type.data_type)
-        self.assertIsNone(trait.t_int)
-        self.assertIsNone(trait.t_string)
-        self.assertIsNone(trait.t_float)
-        self.assertEqual(now, trait.t_datetime)
-        self.assertIsNotNone(trait.trait_type.desc)
+        self._verify_data(model, sql_models.TraitDatetime)
 
     def test_bad_event(self):
         now = datetime.datetime.utcnow()
         m = [models.Event("1", "Foo", now, []),
              models.Event("2", "Zoo", now, [])]
 
-        with mock.patch.object(self.event_conn, "_record_event") as mock_save:
+        with mock.patch.object(self.event_conn,
+                               "_get_or_create_event_type") as mock_save:
             mock_save.side_effect = MyException("Boom")
             problem_events = self.event_conn.record_events(m)
         self.assertEqual(2, len(problem_events))
         for bad, event in problem_events:
             self.assertEqual(bad, models.Event.UNKNOWN_PROBLEM)
-
-    def test_get_none_value_traits(self):
-        model = sql_models.Trait(None, None, 5)
-        self.assertIsNone(model.get_value())
-        self.assertTrue(repr.repr(model))
 
     def test_event_repr(self):
         ev = sql_models.Event('msg_id', None, False)

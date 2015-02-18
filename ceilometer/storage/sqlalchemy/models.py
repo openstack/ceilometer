@@ -24,12 +24,10 @@ from sqlalchemy import event, select
 from sqlalchemy import Float, Boolean, Text, DateTime
 from sqlalchemy.dialects.mysql import DECIMAL
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import deferred
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import TypeDecorator
 
-from ceilometer.event.storage import models
 from ceilometer import utils
 
 
@@ -335,93 +333,49 @@ class Event(Base):
                                                               self.generated)
 
 
-class TraitType(Base):
-    """Types of event traits.
+class TraitText(Base):
+    """Event text traits."""
 
-    A trait type includes a description and a data type. Uniqueness is
-    enforced compositely on the data_type and desc fields. This is to
-    accommodate cases, such as 'generated', which, depending on the
-    corresponding event, could be a date, a boolean, or a float.
-    """
-    __tablename__ = 'trait_type'
+    __tablename__ = 'trait_text'
     __table_args__ = (
-        UniqueConstraint('desc', 'data_type', name='tt_unique'),
-        Index('ix_trait_type', 'desc')
+        Index('ix_trait_text_event_id_key', 'event_id', 'key'),
     )
-
-    id = Column(Integer, primary_key=True)
-    desc = Column(String(255))
-    data_type = Column(Integer)
-
-    def __init__(self, desc, data_type):
-        self.desc = desc
-        self.data_type = data_type
-
-    def __repr__(self):
-        return "<TraitType: %s:%d>" % (self.desc, self.data_type)
+    event_id = Column(Integer, ForeignKey('event.id'), primary_key=True)
+    key = Column(Integer, primary_key=True)
+    value = Column(Text)
 
 
-class Trait(Base):
-    __tablename__ = 'trait'
+class TraitInt(Base):
+    """Event integer traits."""
+
+    __tablename__ = 'trait_int'
     __table_args__ = (
-        Index('ix_trait_t_int', 't_int'),
-        Index('ix_trait_t_string', 't_string'),
-        Index('ix_trait_t_datetime', 't_datetime'),
-        Index('ix_trait_t_float', 't_float'),
+        Index('ix_trait_int_event_id_key', 'event_id', 'key'),
     )
-    id = Column(Integer, primary_key=True)
+    event_id = Column(Integer, ForeignKey('event.id'), primary_key=True)
+    key = Column(Integer, primary_key=True)
+    value = Column(Integer)
 
-    trait_type_id = Column(Integer, ForeignKey('trait_type.id'))
-    trait_type = relationship("TraitType", backref='traits')
 
-    t_string = Column(String(255), nullable=True, default=None)
-    t_float = Column(Float(53), nullable=True, default=None)
-    t_int = Column(Integer, nullable=True, default=None)
-    t_datetime = Column(PreciseTimestamp(), nullable=True, default=None)
+class TraitFloat(Base):
+    """Event float traits."""
 
-    event_id = Column(Integer, ForeignKey('event.id'))
-    event = relationship("Event", backref=backref('traits', order_by=id))
+    __tablename__ = 'trait_float'
+    __table_args__ = (
+        Index('ix_trait_float_event_id_key', 'event_id', 'key'),
+    )
+    event_id = Column(Integer, ForeignKey('event.id'), primary_key=True)
+    key = Column(Integer, primary_key=True)
+    value = Column(Float(53))
 
-    _value_map = {models.Trait.TEXT_TYPE: 't_string',
-                  models.Trait.FLOAT_TYPE: 't_float',
-                  models.Trait.INT_TYPE: 't_int',
-                  models.Trait.DATETIME_TYPE: 't_datetime'}
 
-    def __init__(self, trait_type, event, t_string=None,
-                 t_float=None, t_int=None, t_datetime=None):
-        self.trait_type = trait_type
-        self.t_string = t_string
-        self.t_float = t_float
-        self.t_int = t_int
-        self.t_datetime = t_datetime
-        self.event = event
+class TraitDatetime(Base):
+    """Event datetime traits."""
 
-    def get_value(self):
-        if self.trait_type is None:
-            dtype = None
-        else:
-            dtype = self.trait_type.data_type
-
-        if dtype == models.Trait.INT_TYPE:
-            return self.t_int
-        if dtype == models.Trait.FLOAT_TYPE:
-            return self.t_float
-        if dtype == models.Trait.DATETIME_TYPE:
-            return self.t_datetime
-        if dtype == models.Trait.TEXT_TYPE:
-            return self.t_string
-
-        return None
-
-    def __repr__(self):
-        name = self.trait_type.desc if self.trait_type else None
-        data_type = (self.trait_type.data_type if self.trait_type else
-                     models.Trait.NONE_TYPE)
-
-        return "<Trait(%s) %d=%s/%s/%s/%s on %s>" % (name,
-                                                     data_type,
-                                                     self.t_string,
-                                                     self.t_float,
-                                                     self.t_int,
-                                                     self.t_datetime,
-                                                     self.event)
+    __tablename__ = 'trait_datetime'
+    __table_args__ = (
+        Index('ix_trait_datetime_event_id_key', 'event_id', 'key'),
+    )
+    event_id = Column(Integer, ForeignKey('event.id'), primary_key=True)
+    key = Column(Integer, primary_key=True)
+    value = Column(PreciseTimestamp())
