@@ -155,7 +155,7 @@ should be a list of Query data structures. Whatever the endpoint you
 want to apply a filter on, you always filter on the fields of the *Sample*
 type (for example, if you apply a filter on a query for statistics,
 you won't target *duration_start* field of *Statistics*, but *timestamp*
-field of *Sample*).
+field of *Sample*). See :ref:`api-queries` for how to query the API.
 
 .. autotype:: ceilometer.api.controllers.v2.base.Query
    :members:
@@ -168,7 +168,7 @@ a subclass of Query, so EventQuery has every attribute Query has.
 But there are some differences. If a field is one of the following:
 event_type, message_id, start_timestamp, end_timestamp, then this field
 will be applied on event, otherwise it will be treated as trait name and
-applied on trait.
+applied on trait. See :ref:`api-queries` for how to query the API.
 
 .. autotype:: ceilometer.api.controllers.v2.events.EventQuery
    :members:
@@ -180,7 +180,7 @@ The filter expressions of the Complex Query feature operate on the fields
 of *Sample*, *Alarm* and *AlarmChange*. The following comparison operators are
 supported: *=*, *!=*, *<*, *<=*, *>*, *>=* and *in*; and the following logical
 operators can be used: *and* *or* and *not*. The field names are validated
-against the database models.
+against the database models. See :ref:`api-queries` for how to query the API.
 
 .. note:: The *not* operator has different meaning in Mongo DB and in SQL DB engine.
    If the *not* operator is applied on a non existent metadata field then
@@ -229,6 +229,8 @@ Ceilometer CLI Commands::
 
 .. note:: The *username*, *password*, and *tenant-name* options are required to be present in these commands or specified via environment variables. Note that the in-line commands will override the environment variables.
 
+
+.. _api-queries:
 
 API Queries
 +++++++++++
