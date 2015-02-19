@@ -65,7 +65,7 @@ class SNMPInspector(base.Inspector):
     _cpu_15_min_load_oid = "1.3.6.1.4.1.2021.10.1.3.3"
     # Memory OIDs
     _memory_total_oid = "1.3.6.1.4.1.2021.4.5.0"
-    _memory_used_oid = "1.3.6.1.4.1.2021.4.6.0"
+    _memory_avail_real_oid = "1.3.6.1.4.1.2021.4.6.0"
     _memory_total_swap_oid = "1.3.6.1.4.1.2021.4.3.0"
     _memory_avail_swap_oid = "1.3.6.1.4.1.2021.4.4.0"
     # Disk OIDs
@@ -191,9 +191,9 @@ class SNMPInspector(base.Inspector):
         },
         'memory.used': {
             'matching_type': EXACT,
-            'metric_oid': (_memory_used_oid, int),
+            'metric_oid': (_memory_avail_real_oid, int),
             'metadata': {},
-            'post_op': None,
+            'post_op': "_post_op_memory_avail_to_used",
         },
         'memory.swap.total': {
             'matching_type': EXACT,
@@ -391,6 +391,13 @@ class SNMPInspector(base.Inspector):
                                  value, metadata, extra_metadata,
                                  suffix)
             yield (value, metadata, extra_metadata)
+
+    def _post_op_memory_avail_to_used(self, host, cache, meter_def,
+                                      value, metadata, extra, suffix):
+        if self._memory_total_oid not in cache[self._CACHE_KEY_OID]:
+            self._query_oids(host, [self._memory_total_oid], cache, False)
+        value = int(cache[self._CACHE_KEY_OID][self._memory_total_oid]) - value
+        return value
 
     def _post_op_net(self, host, cache, meter_def,
                      value, metadata, extra, suffix):
