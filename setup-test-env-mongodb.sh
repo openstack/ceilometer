@@ -12,7 +12,7 @@ export PATH=${PATH:+$PATH:}/sbin:/usr/sbin
 check_for_cmd mongod
 
 # Start MongoDB process for tests
-MONGO_DATA=`mktemp -d CEILO-MONGODB-XXXXX`
+MONGO_DATA=`mktemp -d /tmp/CEILO-MONGODB-XXXXX`
 MONGO_PORT=29000
 trap "clean_exit ${MONGO_DATA}" EXIT
 mkfifo ${MONGO_DATA}/out
