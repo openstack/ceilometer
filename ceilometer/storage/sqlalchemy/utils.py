@@ -46,6 +46,10 @@ class QueryTransformer(object):
                  "in": lambda field_name, values: field_name.in_(values),
                  "=~": lambda field, value: field.op("regexp")(value)}
 
+    # operators which are differs for different dialects
+    dialect_operators = {'postgresql': {'=~': (lambda field, value:
+                                               field.op("~")(value))}}
+
     complex_operators = {"or": or_,
                          "and": and_,
                          "not": not_}
@@ -53,9 +57,14 @@ class QueryTransformer(object):
     ordering_functions = {"asc": asc,
                           "desc": desc}
 
-    def __init__(self, table, query):
+    def __init__(self, table, query, dialect='mysql'):
         self.table = table
         self.query = query
+        self.dialect_name = dialect
+
+    def _get_operator(self, op):
+        return (self.dialect_operators.get(self.dialect_name, {}).get(op)
+                or self.operators[op])
 
     def _handle_complex_op(self, complex_op, nodes):
         op = self.complex_operators[complex_op]
@@ -68,7 +77,7 @@ class QueryTransformer(object):
         return op(*element_list)
 
     def _handle_simple_op(self, simple_op, nodes):
-        op = self.operators[simple_op]
+        op = self._get_operator(simple_op)
         field_name = nodes.keys()[0]
         value = nodes.values()[0]
         if field_name.startswith('resource_metadata.'):

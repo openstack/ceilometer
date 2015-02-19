@@ -577,8 +577,10 @@ class Connection(base.Connection):
             return []
 
         session = self._engine_facade.get_session()
+        engine = self._engine_facade.get_engine()
         query = session.query(models.FullSample)
-        transformer = sql_utils.QueryTransformer(models.FullSample, query)
+        transformer = sql_utils.QueryTransformer(models.FullSample, query,
+                                                 dialect=engine.dialect.name)
         if filter_expr is not None:
             transformer.apply_filter(filter_expr)
 
