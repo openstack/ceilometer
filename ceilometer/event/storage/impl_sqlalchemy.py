@@ -292,7 +292,7 @@ class Connection(base.Connection):
                     models.TraitDatetime.key, models.TraitDatetime.value,
                     sa.cast(sa.null(), sa.Integer),
                     sa.cast(sa.null(), sa.Float(53)),
-                    sa.cast(sa.null(), sa.Text))
+                    sa.cast(sa.null(), sa.String(255)))
             ).union(
                 query.join(
                     models.TraitInt,
