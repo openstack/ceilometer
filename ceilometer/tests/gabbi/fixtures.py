@@ -74,7 +74,8 @@ class ConfigFixture(fixture.GabbiFixture):
         conf.set_override('pecan_debug', True, group='api')
 
     def stop_fixture(self):
-        """Clean up the config."""
+        """Reset the config and remove data."""
+        storage.get_connection_from_config(self.conf).clear()
         self.conf.reset()
 
 
