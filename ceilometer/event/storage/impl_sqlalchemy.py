@@ -313,7 +313,8 @@ class Connection(base.Connection):
                 .add_columns(models.TraitText.key, sa.null(),
                              sa.null(), sa.null(), models.TraitText.value))
 
-            for id_, key, t_date, t_int, t_float, t_text in trait_q.all():
+            for id_, key, t_date, t_int, t_float, t_text in (
+                    trait_q.order_by('2')).all():
                 if t_int:
                     dtype = api_models.Trait.INT_TYPE
                     val = t_int

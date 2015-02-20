@@ -3229,8 +3229,7 @@ class GetEventTest(EventTestBase):
             self.assertEqual(event.generated,
                              self.event_models[i].generated)
             model_traits = self.event_models[i].traits
-            for j, trait in enumerate(sorted(event.traits,
-                                             key=operator.attrgetter("name"))):
+            for j, trait in enumerate(event.traits):
                 if trait.dtype == event_models.Trait.DATETIME_TYPE:
                     self.assertIsInstance(trait.value, datetime.datetime)
                     self.assertEqual(trait.value, model_traits[j].value)
