@@ -32,7 +32,7 @@ Components
    Currently covered components are: Nova, Nova-network, Glance, Cinder and
    Quantum. Notably, there is no support yet for Swift and it was decided not
    to support nova-volume in favor of Cinder. A detailed list of meters covered
-   per component can be found at in :doc:`../measurements`.
+   per component can be found at in :ref:`measurements`.
 
 Nova with libvirt only
    Most of the Nova meters will only work with libvirt fronted hypervisors at the
