@@ -21,7 +21,7 @@ function clean_exit_pgsql(){
 check_for_cmd pg_config
 
 # Start PostgreSQL process for tests
-PGSQL_DATA=`mktemp -d CEILO-PGSQL-XXXXX`
+PGSQL_DATA=`mktemp -d /tmp/CEILO-PGSQL-XXXXX`
 PGSQL_PATH=`pg_config --bindir`
 PGSQL_PORT=9823
 ${PGSQL_PATH}/initdb -E UTF8 ${PGSQL_DATA}
