@@ -18,7 +18,7 @@ from oslo_config import cfg
 import requests
 
 from ceilometer import dispatcher
-from ceilometer.i18n import _
+from ceilometer.i18n import _, _LE
 from ceilometer.openstack.common import log
 from ceilometer.publisher import utils as publisher_utils
 
@@ -30,6 +30,10 @@ http_dispatcher_opts = [
                help='The target where the http request will be sent to. '
                     'If this is not set, no data will be posted. For '
                     'example: target = http://hostname:1234/path'),
+    cfg.StrOpt('event_target',
+               help='The target for event data where the http request '
+                    'will be sent to. If this is not set, it will default '
+                    'to same as Sample target.'),
     cfg.BoolOpt('cadf_only',
                 default=False,
                 help='The flag which indicates if only cadf message should '
@@ -54,6 +58,7 @@ class HttpDispatcher(dispatcher.Base):
     Dispatcher specific options can be added as follows:
         [dispatcher_http]
         target = www.example.com
+        event_target = www.example.com
         cadf_only = true
         timeout = 2
     """
@@ -62,6 +67,8 @@ class HttpDispatcher(dispatcher.Base):
         self.headers = {'Content-type': 'application/json'}
         self.timeout = self.conf.dispatcher_http.timeout
         self.target = self.conf.dispatcher_http.target
+        self.event_target = (self.conf.dispatcher_http.event_target or
+                             self.target)
         self.cadf_only = self.conf.dispatcher_http.cadf_only
 
     def record_metering_data(self, data):
@@ -113,4 +120,18 @@ class HttpDispatcher(dispatcher.Base):
                     meter)
 
     def record_events(self, events):
-        pass
+        if not isinstance(events, list):
+            events = [events]
+
+        for event in events:
+            res = None
+            try:
+                res = requests.post(self.event_target, data=event.serialize(),
+                                    headers=self.headers, timeout=self.timeout)
+                res.raise_for_status()
+            except Exception:
+                error_code = res.status_code if res else 'unknown'
+                LOG.exception(_LE('Status Code: %{code}s. Failed to dispatch '
+                                  'event: %{event}s'),
+                              {'code': error_code,
+                               'event': event.serialize()})

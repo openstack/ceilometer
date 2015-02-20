@@ -13,12 +13,16 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import datetime
+import uuid
+
 import mock
 from oslo_config import fixture as fixture_config
 from oslotest import base
 import requests
 
 from ceilometer.dispatcher import http
+from ceilometer.event.storage import models as event_models
 from ceilometer.publisher import utils
 
 
@@ -118,3 +122,49 @@ class TestDispatcherHttp(base.BaseTestCase):
             dispatcher.record_metering_data(self.msg)
 
         self.assertEqual(1, post.call_count)
+
+
+class TestEventDispatcherHttp(base.BaseTestCase):
+
+    def setUp(self):
+        super(TestEventDispatcherHttp, self).setUp()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
+
+    def test_http_dispatcher(self):
+        self.CONF.dispatcher_http.event_target = 'fake'
+        dispatcher = http.HttpDispatcher(self.CONF)
+
+        event = event_models.Event(uuid.uuid4(), 'test',
+                                   datetime.datetime(2012, 7, 2, 13, 53, 40),
+                                   [], {})
+
+        with mock.patch.object(requests, 'post') as post:
+            dispatcher.record_events(event)
+
+        self.assertEqual(1, post.call_count)
+
+    def test_http_dispatcher_bad(self):
+        self.CONF.dispatcher_http.event_target = ''
+        dispatcher = http.HttpDispatcher(self.CONF)
+
+        event = event_models.Event(uuid.uuid4(), 'test',
+                                   datetime.datetime(2012, 7, 2, 13, 53, 40),
+                                   [], {})
+
+        with mock.patch('ceilometer.dispatcher.http.LOG',
+                        mock.MagicMock()) as LOG:
+            dispatcher.record_events(event)
+            self.assertTrue(LOG.exception.called)
+
+    def test_http_dispatcher_share_target(self):
+        self.CONF.dispatcher_http.target = 'fake'
+        dispatcher = http.HttpDispatcher(self.CONF)
+
+        event = event_models.Event(uuid.uuid4(), 'test',
+                                   datetime.datetime(2012, 7, 2, 13, 53, 40),
+                                   [], {})
+
+        with mock.patch.object(requests, 'post') as post:
+            dispatcher.record_events(event)
+
+        self.assertEqual('fake', post.call_args[0][0])
