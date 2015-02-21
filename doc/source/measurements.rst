@@ -293,6 +293,35 @@ Swift as described in :ref:`installing_manually`. Note that they may not be
 updated right after an upload/download, since Swift takes some time to update
 the container properties.
 
+
+Object Storage (ceph - radosgw)
+===============================
+
+===============================  ==========  ==========  ===========  ============  ==========================================
+Name                             Type        Unit        Resource     Origin        Note
+===============================  ==========  ==========  ===========  ============  ==========================================
+radosgw.objects                  Gauge       object      store ID     pollster      Number of objects
+radosgw.objects.size             Gauge       B           store ID     pollster      Total size of stored objects
+radosgw.objects.containers       Gauge       container   store ID     pollster      Number of containers
+radosgw.api.request              Gauge       request     store ID     pollster      Number of API requests against ceph radosgw
+radosgw.containers.objects       Gauge       object      str ID/cont  pollster      Number of objects in container
+radosgw.containers.objects.size  Gauge       B           str ID/cont  pollster      Total size of stored objects in container
+===============================  ==========  ==========  ===========  ============  ==========================================
+
+In order to use ceph object storage meters, one must configure ceph as
+described in ceph radosgw object storage installation manual along with
+radosgw usage logging enabled. Create a radosgw 'admin' user, add the
+users, buckets, metadata and usage caps to this user.
+
+Add a 'rgw_admin_credentials' service group to the ceilometer.conf file
+with 'rgw_access_key' and 'rgw_secret_key' for radosgw 'admin' user
+keys.
+
+Note: The usage info may not be updated right after an upload/download,
+because ceph radosgw takes some time to update the usage properties
+(i.e default configuration takes 30 min. to generate the usage logs).
+
+
 Orchestration (Heat)
 --------------------
 
