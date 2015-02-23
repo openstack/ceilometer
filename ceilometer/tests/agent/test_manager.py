@@ -80,6 +80,17 @@ class TestManager(base.BaseTestCase):
         LOG.error.assert_has_calls(calls=calls,
                                    any_order=True)
 
+    # Skip loading pollster upon ImportError
+    @mock.patch('ceilometer.ipmi.pollsters.node._Base.__init__',
+                mock.Mock(side_effect=ImportError))
+    @mock.patch('ceilometer.ipmi.pollsters.sensor.SensorPollster.__init__',
+                mock.Mock(return_value=None))
+    def test_import_error_in_plugin(self):
+        mgr = manager.AgentManager(namespaces=['ipmi'],
+                                   pollster_list=['hardware.ipmi.node.*'])
+        # 0 pollsters
+        self.assertEqual(0, len(mgr.extensions))
+
     # Exceptions other than ExtensionLoadError are propagated
     @mock.patch('ceilometer.ipmi.pollsters.node._Base.__init__',
                 mock.Mock(side_effect=PollingException))
