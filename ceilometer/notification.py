@@ -73,7 +73,7 @@ class NotificationService(os_service.Service):
     def __init__(self, *args, **kwargs):
         super(NotificationService, self).__init__(*args, **kwargs)
         self.partition_coordinator = None
-        self.listeners = self.pipeline_listeners = []
+        self.listeners, self.pipeline_listeners = [], []
         self.group_id = None
 
     @classmethod
@@ -127,7 +127,7 @@ class NotificationService(os_service.Service):
                 event_transporter = self.event_pipeline_manager
             self.group_id = None
 
-        self.listeners = self.pipeline_listeners = []
+        self.listeners, self.pipeline_listeners = [], []
         self._configure_main_queue_listeners(transporter, event_transporter)
 
         if cfg.CONF.notification.workload_partitioning:

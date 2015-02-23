@@ -35,7 +35,8 @@ class EventTestBase(v2.FunctionalTest,
     def _generate_models(self):
         event_models = []
         base = 0
-        self.s_time = self.trait_time = datetime.datetime(2013, 12, 31, 5, 0)
+        self.s_time = datetime.datetime(2013, 12, 31, 5, 0)
+        self.trait_time = datetime.datetime(2013, 12, 31, 5, 0)
         for event_type in ['Foo', 'Bar', 'Zoo']:
             trait_models = [models.Trait(name, type, value)
                             for name, type, value in [
