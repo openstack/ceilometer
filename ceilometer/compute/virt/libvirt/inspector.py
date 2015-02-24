@@ -31,8 +31,8 @@ LOG = logging.getLogger(__name__)
 OPTS = [
     cfg.StrOpt('libvirt_type',
                default='kvm',
-               help='Libvirt domain type (valid options are: '
-                    'kvm, lxc, qemu, uml, xen).'),
+               choices=['kvm', 'lxc', 'qemu', 'uml', 'xen'],
+               help='Libvirt domain type.'),
     cfg.StrOpt('libvirt_uri',
                default='',
                help='Override the default libvirt URI '
