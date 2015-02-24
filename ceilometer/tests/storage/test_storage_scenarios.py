@@ -2624,7 +2624,7 @@ class CounterDataTypeTest(DBTestBase,
             'dummyBigCounter',
             sample.TYPE_CUMULATIVE,
             unit='',
-            volume=3372036854775807,
+            volume=337203685477580,
             user_id='user-id',
             project_id='project-id',
             resource_id='resource-id',
@@ -2642,7 +2642,7 @@ class CounterDataTypeTest(DBTestBase,
             'dummySmallCounter',
             sample.TYPE_CUMULATIVE,
             unit='',
-            volume=-3372036854775807,
+            volume=-337203685477580,
             user_id='user-id',
             project_id='project-id',
             resource_id='resource-id',
@@ -2677,13 +2677,13 @@ class CounterDataTypeTest(DBTestBase,
             meter='dummyBigCounter',
         )
         results = list(self.conn.get_samples(f))
-        self.assertEqual(3372036854775807, results[0].counter_volume)
-
+        self.assertEqual(337203685477580, results[0].counter_volume)
         f = storage.SampleFilter(
             meter='dummySmallCounter',
         )
         results = list(self.conn.get_samples(f))
-        self.assertEqual(-3372036854775807, results[0].counter_volume)
+        observed_num = long(results[0].counter_volume)
+        self.assertEqual(-337203685477580, observed_num)
 
     def test_storage_can_handle_float_values(self):
         f = storage.SampleFilter(
@@ -3200,7 +3200,8 @@ class GetEventTest(EventTestBase):
             self.assertEqual(event.generated,
                              self.event_models[i].generated)
             model_traits = self.event_models[i].traits
-            for j, trait in enumerate(event.traits):
+            for j, trait in enumerate(sorted(event.traits,
+                                             key=operator.attrgetter("name"))):
                 if trait.dtype == event_models.Trait.DATETIME_TYPE:
                     self.assertIsInstance(trait.value, datetime.datetime)
                     self.assertEqual(trait.value, model_traits[j].value)
