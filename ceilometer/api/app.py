@@ -46,9 +46,8 @@ OPTS = [
 
 API_OPTS = [
     cfg.BoolOpt('pecan_debug',
-                help='Toggle Pecan Debug Middleware. '
-                'If it is not set, global debug value will be used.'
-                ),
+                default=False,
+                help='Toggle Pecan Debug Middleware.'),
 ]
 
 CONF.register_opts(OPTS)
@@ -77,8 +76,6 @@ def setup_app(pecan_config=None, extra_hooks=None):
         pecan_config = get_pecan_config()
 
     pecan.configuration.set_config(dict(pecan_config), overwrite=True)
-
-    cfg.set_defaults(API_OPTS, pecan_debug=CONF.debug)
 
     # NOTE(sileht): pecan debug won't work in multi-process environment
     pecan_debug = CONF.api.pecan_debug
