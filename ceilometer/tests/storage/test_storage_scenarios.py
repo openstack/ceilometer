@@ -685,6 +685,18 @@ class RawSampleTest(DBTestBase,
         results = list(self.conn.get_resources())
         self.assertEqual(10, len(results))
 
+    @tests_db.run_with('sqlite', 'mysql', 'pgsql')
+    def test_clear_metering_data_expire_samples_only(self):
+
+        cfg.CONF.set_override('sql_expire_samples_only', True)
+        self.mock_utcnow.return_value = datetime.datetime(2012, 7, 2, 10, 45)
+        self.conn.clear_expired_metering_data(4 * 60)
+        f = storage.SampleFilter(meter='instance')
+        results = list(self.conn.get_samples(f))
+        self.assertEqual(7, len(results))
+        results = list(self.conn.get_resources())
+        self.assertEqual(6, len(results))
+
     @tests_db.run_with('sqlite', 'mysql', 'pgsql', 'hbase', 'db2')
     def test_clear_metering_data_with_alarms(self):
         # NOTE(jd) Override this test in MongoDB because our code doesn't clear

@@ -358,22 +358,25 @@ class Connection(base.Connection):
             rows = sample_q.delete()
             LOG.info(_("%d samples removed from database"), rows)
 
-            # remove Meter definitions with no matching samples
-            (session.query(models.Meter)
-             .filter(~models.Meter.samples.any())
-             .delete(synchronize_session=False))
-
-            # remove resources with no matching samples
-            resource_q = (session.query(models.Resource.internal_id)
-                          .filter(~models.Resource.samples.any()))
-            resource_subq = resource_q.subquery()
-            # remove metadata of cleaned resources
-            for table in [models.MetaText, models.MetaBigInt,
-                          models.MetaFloat, models.MetaBool]:
-                (session.query(table)
-                 .filter(table.id.in_(resource_subq))
+            if not cfg.CONF.sql_expire_samples_only:
+                # remove Meter definitions with no matching samples
+                (session.query(models.Meter)
+                 .filter(~models.Meter.samples.any())
                  .delete(synchronize_session=False))
-            resource_q.delete(synchronize_session=False)
+
+                # remove resources with no matching samples
+                resource_q = (session.query(models.Resource.internal_id)
+                              .filter(~models.Resource.samples.any()))
+                resource_subq = resource_q.subquery()
+                # remove metadata of cleaned resources
+                for table in [models.MetaText, models.MetaBigInt,
+                              models.MetaFloat, models.MetaBool]:
+                    (session.query(table)
+                     .filter(table.id.in_(resource_subq))
+                     .delete(synchronize_session=False))
+                resource_q.delete(synchronize_session=False)
+                LOG.info(_("Expired residual resource and"
+                           " meter definition data"))
 
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,

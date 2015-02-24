@@ -76,6 +76,17 @@ OPTS = [
 
 cfg.CONF.register_opts(OPTS, group='database')
 
+CLI_OPTS = [
+    cfg.BoolOpt('sql-expire-samples-only',
+                default=False,
+                help="Indicates if expirer expires only samples. If set true,"
+                     " expired samples will be deleted, but residual"
+                     " resource and meter definition data will remain.",
+                ),
+]
+
+cfg.CONF.register_cli_opts(CLI_OPTS)
+
 db_options.set_defaults(cfg.CONF)
 
 
