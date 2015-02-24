@@ -46,6 +46,25 @@ class _Base(plugin_base.NotificationBase):
 
 class SwiftWsgiMiddleware(_Base):
 
+    @property
+    def event_types(self):
+        return ['objectstore.http.request']
+
+    def process_notification(self, message):
+        yield sample.Sample.from_notification(
+            name='storage.api.request',
+            type=sample.TYPE_DELTA,
+            unit='request',
+            volume=1,
+            resource_id=message['payload']['target']['id'],
+            user_id=message['payload']['initiator']['id'],
+            project_id=message['payload']['initiator']['project_id'],
+            message=message)
+
+
+class SwiftWsgiMiddlewareMeters(_Base):
+
+    @property
     def event_types(self):
         return ['objectstore.http.request']
 
@@ -61,12 +80,3 @@ class SwiftWsgiMiddleware(_Base):
                     user_id=message['payload']['initiator']['id'],
                     project_id=message['payload']['initiator']['project_id'],
                     message=message)
-        yield sample.Sample.from_notification(
-            name='storage.api.request',
-            type=sample.TYPE_DELTA,
-            unit='request',
-            volume=1,
-            resource_id=message['payload']['target']['id'],
-            user_id=message['payload']['initiator']['id'],
-            project_id=message['payload']['initiator']['project_id'],
-            message=message)

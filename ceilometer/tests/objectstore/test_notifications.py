@@ -92,15 +92,24 @@ class TestMiddlewareNotifications(test.BaseTestCase):
     def test_middleware_event(self):
         v = notifications.SwiftWsgiMiddleware(mock.Mock())
         samples = list(v.process_notification(MIDDLEWARE_EVENT))
-        self.assertEqual(3, len(samples))
+        self.assertEqual(1, len(samples))
+        target = MIDDLEWARE_EVENT['payload']['target']
+        initiator = MIDDLEWARE_EVENT['payload']['initiator']
+        self.assertEqual(target['id'], samples[0].resource_id)
+        self.assertEqual(initiator['id'], samples[0].user_id)
+        self.assertEqual(initiator['project_id'], samples[0].project_id)
+
+    def test_middleware_event_meters(self):
+        v = notifications.SwiftWsgiMiddlewareMeters(mock.Mock())
+        samples = list(v.process_notification(MIDDLEWARE_EVENT))
+        self.assertEqual(2, len(samples))
+        target = MIDDLEWARE_EVENT['payload']['target']
+        initiator = MIDDLEWARE_EVENT['payload']['initiator']
         for i in range(2):
             measure = MIDDLEWARE_EVENT['payload']['measurements'][i]
             self.assertEqual(measure['metric']['name'], samples[i].name)
             self.assertEqual(measure['metric']['unit'], samples[i].unit)
             self.assertEqual(measure['result'], samples[i].volume)
-        target = MIDDLEWARE_EVENT['payload']['target']
-        initiator = MIDDLEWARE_EVENT['payload']['initiator']
-        for i in range(3):
             self.assertEqual(target['id'], samples[i].resource_id)
             self.assertEqual(initiator['id'], samples[i].user_id)
             self.assertEqual(initiator['project_id'], samples[i].project_id)
