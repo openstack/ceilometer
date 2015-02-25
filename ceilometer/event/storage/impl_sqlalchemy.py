@@ -14,16 +14,18 @@
 """SQLAlchemy storage backend."""
 
 from __future__ import absolute_import
+import datetime
 import os
 
 from oslo.db import exception as dbexc
 from oslo.db.sqlalchemy import session as db_session
 from oslo_config import cfg
+from oslo_utils import timeutils
 import sqlalchemy as sa
 
 from ceilometer.event.storage import base
 from ceilometer.event.storage import models as api_models
-from ceilometer.i18n import _
+from ceilometer.i18n import _, _LI
 from ceilometer.openstack.common import log
 from ceilometer.storage.sqlalchemy import models
 from ceilometer import utils
@@ -392,3 +394,32 @@ class Connection(base.Connection):
                     yield api_models.Trait(name=k,
                                            dtype=dtype,
                                            value=v)
+
+    def clear_expired_event_data(self, ttl):
+        """Clear expired data from the backend storage system.
+
+        Clearing occurs according to the time-to-live.
+
+        :param ttl: Number of seconds to keep records for.
+        """
+        session = self._engine_facade.get_session()
+        with session.begin():
+            end = timeutils.utcnow() - datetime.timedelta(seconds=ttl)
+            event_q = (session.query(models.Event.id)
+                       .filter(models.Event.generated < end))
+
+            event_subq = event_q.subquery()
+            for trait_model in [models.TraitText, models.TraitInt,
+                                models.TraitFloat, models.TraitDatetime]:
+                (session.query(trait_model)
+                 .filter(trait_model.event_id.in_(event_subq))
+                 .delete(synchronize_session="fetch"))
+            event_rows = event_q.delete()
+
+            # remove EventType and TraitType with no corresponding
+            # matching events and traits
+            (session.query(models.EventType)
+             .filter(~models.EventType.events.any())
+             .delete(synchronize_session="fetch"))
+            LOG.info(_LI("%(event)d events are removed from database"),
+                     event_rows)
