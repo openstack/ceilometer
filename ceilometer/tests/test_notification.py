@@ -225,7 +225,7 @@ class BaseRealNotification(tests_base.BaseTestCase):
                     len(self.publisher.events) >= self.expected_events):
                 break
             eventlet.sleep(0)
-
+        self.assertNotEqual(self.srv.listeners, self.srv.pipeline_listeners)
         self.srv.stop()
 
         resources = list(set(s.resource_id for s in self.publisher.samples))
