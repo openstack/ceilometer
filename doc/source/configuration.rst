@@ -25,7 +25,7 @@ in the OpenStack Manuals Configuration Reference.
 HBase
 ===================
 
-This storage implementation uses Thrift HBase interface. The default Thrift's
+This storage implementation uses Thrift HBase interface. The default Thrift
 connection settings should be changed to support using ConnectionPool in HBase.
 To ensure proper configuration, please add the following lines to the
 `hbase-site.xml` configuration file::
@@ -36,7 +36,7 @@ To ensure proper configuration, please add the following lines to the
     </property>
 
 For pure development purposes, you can use HBase from Apache_ or some other
-vendors like Cloudera or Hortonworks. To verify your installation, you can use
+vendor like Cloudera or Hortonworks. To verify your installation, you can use
 the `list` command in `HBase shell`, to list the tables in your
 HBase server, as follows::
 
@@ -87,8 +87,7 @@ Pipelines
 =========
 
 Pipelines describe a coupling between sources of samples and the
-corresponding sinks for transformation and publication of these
-data.
+corresponding sinks for transformation and publication of the samples.
 
 A source is a producer of samples, in effect a set of pollsters and/or
 notification handlers emitting samples for a set of matching meters.

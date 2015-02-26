@@ -263,11 +263,11 @@ a screwball date into ISO format, or the like. They are initialized with the
 parameters from the trait definition, if any, which can customize their
 behavior for a given trait. They are called with a list of all matching fields
 from the notification, so they can derive a value from multiple fields. The
-plugin will be called even if there is no fields found matching the field
+plugin will be called even if there are no fields found matching the field
 path(s), this lets a plugin set a default value, if needed. A plugin can also
 reject a value by returning *None*, which will cause the trait not to be
 added. If the plugin returns anything other than *None*, the trait's value
-will be set from whatever the plugin returned (coerced to the appropriate type
+will be set to whatever the plugin returned (coerced to the appropriate type
 for the trait).
 
 Building Notifications

@@ -45,7 +45,7 @@ Units
    should be expressed in bits ('b') or bytes ('B').
 2. For a given meter, the units should NEVER, EVER be changed.
 3. When the measurement does not represent a volume, the unit
-   description should always described WHAT is measured (ie: apples,
+   description should always describe WHAT is measured (ie: apples,
    disk, routers, floating IPs, etc.).
 4. When creating a new meter, if another meter exists measuring
    something similar, the same units and precision should be used.
