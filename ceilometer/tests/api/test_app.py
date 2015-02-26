@@ -50,7 +50,7 @@ class TestApp(base.BaseTestCase):
             self.assertEqual(expected, kwargs.get('debug'))
 
         _check_pecan_debug(g_debug=False, p_debug=None, expected=False)
-        _check_pecan_debug(g_debug=True, p_debug=None, expected=True)
+        _check_pecan_debug(g_debug=True, p_debug=None, expected=False)
         _check_pecan_debug(g_debug=True, p_debug=False, expected=False)
         _check_pecan_debug(g_debug=False, p_debug=True, expected=True)
         _check_pecan_debug(g_debug=True, p_debug=None, expected=False,
