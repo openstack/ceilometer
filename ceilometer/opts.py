@@ -84,7 +84,6 @@ def list_opts():
                          ceilometer.middleware.OPTS,
                          ceilometer.network.notifications.OPTS,
                          ceilometer.nova_client.OPTS,
-                         ceilometer.objectstore.rgw.OPTS,
                          ceilometer.objectstore.swift.OPTS,
                          (ceilometer.openstack.common.eventlet_backdoor
                           .eventlet_backdoor_opts),
@@ -127,6 +126,7 @@ def list_opts():
         ('publisher', ceilometer.publisher.utils.OPTS),
         ('publisher_notifier', ceilometer.publisher.messaging.NOTIFIER_OPTS),
         ('publisher_rpc', ceilometer.publisher.messaging.RPC_OPTS),
+        ('rgw_admin_credentials', ceilometer.objectstore.rgw.CREDENTIAL_OPTS),
         ('service_credentials', ceilometer.service.CLI_OPTS),
         ('service_types',
          itertools.chain(ceilometer.energy.kwapi.SERVICE_OPTS,
