@@ -14,7 +14,7 @@
 import functools
 
 import novaclient
-from novaclient.v1_1 import client as nova_client
+from novaclient import client as nova_client
 from oslo_config import cfg
 
 from ceilometer.openstack.common import log
@@ -61,6 +61,7 @@ class Client(object):
         conf = cfg.CONF.service_credentials
         tenant = conf.os_tenant_id or conf.os_tenant_name
         self.nova_client = nova_client.Client(
+            version=2,
             username=conf.os_username,
             api_key=conf.os_password,
             project_id=tenant,
