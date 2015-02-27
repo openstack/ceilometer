@@ -188,8 +188,8 @@ against the database models. See :ref:`api-queries` for how to query the API.
    {"not": {"metadata.nonexistent_field" : "some value"}} filter is used in a query
    the Mongo DB will return every Sample object as *not* operator evaluated true
    for every Sample where the given field does not exists. See more in the Mongod DB doc.
-   In the other hand SQL based DB engine will return empty result as the join operation
-   on the metadata table will return zero row as the on clause of the join which
+   On the other hand SQL based DB engine will return empty result as the join operation
+   on the metadata table will return zero rows as the on clause of the join which
    tries to match on the metadata field name is never fulfilled.
 
 Complex Query supports defining the list of orderby expressions in the form
