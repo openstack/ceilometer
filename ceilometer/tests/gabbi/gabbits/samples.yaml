@@ -1,0 +1,159 @@
+#
+# Explore and test the samples controller, using samples supplied by
+# the SampleDataFixture.
+#
+
+fixtures:
+    - ConfigFixture
+    - SampleDataFixture
+
+tests:
+
+# Confirm all the samples are there and expected requests behave.
+# TODO(chdent): There's a danger here that the ordering of multiple
+# samples will not be consistent.
+
+    - name: lists samples
+      url: /v2/samples
+      response_headers:
+          content-type: /application/json/
+      response_json_paths:
+          $[0].meter: livestock
+          $[0].metadata.breed: cow
+          $[1].metadata.breed: pig
+          $[2].metadata.breed: sheep
+
+    - name: get just one
+      url: /v2/samples/$RESPONSE['$[0].id']
+      response_json_paths:
+          $.meter: livestock
+          $.metadata.breed: cow
+
+    - name: list samples with limit
+      url: /v2/samples?limit=1
+      response_json_paths:
+          $[0].meter: livestock
+          $[0].metadata.breed: cow
+          $[-1].metadata.breed: cow
+
+    - name: list zero samples with zero limit
+      url: /v2/samples?limit=0
+      response_strings:
+          - '[]'
+
+    - name: list samples with query
+      url: /v2/samples?q.field=resource_metadata.breed&q.value=cow&q.op=eq
+      response_json_paths:
+          $[0].meter: livestock
+          $[0].metadata.breed: cow
+          $[-1].metadata.breed: cow
+
+    - name: query by user
+      url: /v2/samples?q.field=user&q.value=$RESPONSE['$[0].user_id']&q.op=eq
+      response_json_paths:
+          $[0].user_id: $RESPONSE['$[0].user_id']
+
+    - name: query by user_id
+      url: /v2/samples?q.field=user_id&q.value=$RESPONSE['$[0].user_id']&q.op=eq
+      response_json_paths:
+          $[0].user_id: $RESPONSE['$[0].user_id']
+
+    - name: query by project
+      url: /v2/samples?q.field=project&q.value=$RESPONSE['$[0].project_id']&q.op=eq
+      response_json_paths:
+          $[0].project_id: $RESPONSE['$[0].project_id']
+
+    - name: query by project_id
+      url: /v2/samples?q.field=project_id&q.value=$RESPONSE['$[0].project_id']&q.op=eq
+      response_json_paths:
+          $[0].project_id: $RESPONSE['$[0].project_id']
+
+# Explore failure modes for listing samples
+
+    - name: list samples with bad field
+      url: /v2/samples?q.field=harpoon&q.value=cow&q.op=eq
+      status: 400
+      response_strings:
+          - metaquery
+          - unrecognized field in query
+
+    - name: list samples with metaquery field
+      url: /v2/samples?q.field=metaquery&q.value=cow&q.op=eq
+      desc: https://bugs.launchpad.net/ceilometer/+bug/1426466
+      xfail: true
+      status: 400
+
+    - name: bad limit value
+      url: /v2/samples?limit=happiness
+      status: 400
+      response_strings:
+          - Invalid input for field/attribute limit
+
+    - name: negative limit value 400
+      url: /v2/samples?limit=-99
+      status: 400
+
+    - name: negative limit value error message
+      url: /v2/samples?limit=-99
+      desc: https://bugs.launchpad.net/ceilometer/+bug/1426483
+      xfail: true
+      status: 400
+      response_headers:
+          content-type: /application/json/
+      response_json_paths:
+          $.error_message.faultstring: Limit must be positive
+
+    - name: bad accept
+      desc: try an unexpected content type
+      url: /v2/samples
+      request_headers:
+          accept: text/plain
+      status: 406
+
+    - name: complex good accept
+      desc: client sends complex accept do we adapt
+      url: /v2/samples
+      request_headers:
+          accept: text/plain, application/json; q=0.8
+
+    - name: complex bad accept
+      desc: client sends complex accept do we adapt
+      url: /v2/samples
+      request_headers:
+          accept: text/plain, application/binary; q=0.8
+      status: 406
+
+    - name: bad method
+      desc: https://bugs.launchpad.net/ceilometer/+bug/1426476
+      xfail: true
+      url: /v2/samples
+      method: POST
+      status: 405
+
+# Work with just one sample.
+
+    - name: list one of the samples
+      url: /v2/samples?limit=1
+
+    - name: retrieve one sample
+      url: /v2/samples/$RESPONSE['$[0].id']
+      response_headers:
+          content-type: /application/json/
+      response_json_paths:
+          $.meter: livestock
+
+    - name: retrieve sample with useless query
+      url: /v2/samples/$RESPONSE['$.id']?limit=5
+      status: 400
+      response_strings:
+          - "Unknown argument:"
+
+    - name: attempt missing sample
+      url: /v2/samples/davesnothere
+      desc: https://bugs.launchpad.net/ceilometer/+bug/1426483
+      xfail: true
+      status: 404
+      response_headers:
+          content-type: /application/json/
+      response_json_paths:
+          $.error_message.faultstring: Sample davesnothere Not Found
