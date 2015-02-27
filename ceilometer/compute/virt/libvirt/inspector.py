@@ -95,7 +95,7 @@ class LibvirtInspector(virt_inspector.Inspector):
                                           libvirt.VIR_FROM_RPC)):
                 raise
             msg = _("Error from libvirt while looking up instance "
-                    "<name=%(name)s, id=%(id)>: "
+                    "<name=%(name)s, id=%(id)s>: "
                     "[Error Code %(error_code)s] "
                     "%(ex)s") % {'name': instance_name,
                                  'id': instance.id,
