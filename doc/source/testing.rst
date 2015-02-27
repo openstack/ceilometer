@@ -13,33 +13,7 @@
       License for the specific language governing permissions and limitations
       under the License.
 
-=========================
- Working with the Source
-=========================
-
-Setting up a Development Sandbox
-================================
-
-1. Set up a server or virtual machine to run OpenStack using
-   devstack_.
-
-.. _devstack: http://www.devstack.org/
-
-2. Clone the ceilometer project to the machine::
-
-    $ cd /opt/stack
-    $ git clone https://git.openstack.org/openstack/ceilometer
-    $ cd ./ceilometer
-
-3. Once this is done, you need to setup the review process::
-
-    $ git remote add gerrit ssh://<username>@review.openstack.org:29418/openstack/ceilometer.git
-
-4. If you are preparing a patch, create a topic branch and switch to
-   it before making any changes::
-
-    $ git checkout -b TOPIC-BRANCH
-
+=================
 Running the Tests
 =================
 
@@ -106,17 +80,3 @@ run through tox_.
    * tox_
 
 .. _tox: http://tox.testrun.org/latest/
-
-Code Reviews
-============
-
-Ceilometer uses the OpenStack review process for all code and
-developer documentation contributions. Code reviews are managed
-through gerrit.
-
-.. seealso::
-
-   * http://docs.openstack.org/infra/manual/developers.html#development-workflow
-   * `OpenStack Gerrit instance`_.
-
-.. _OpenStack Gerrit instance: https://review.openstack.org/#/q/status:open+project:openstack/ceilometer,n,z

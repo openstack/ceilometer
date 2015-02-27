@@ -13,6 +13,8 @@
       License for the specific language governing permissions and limitations
       under the License.
 
+.. _plugins-and-containers:
+
 =======================
  Writing Agent Plugins
 =======================
@@ -130,6 +132,31 @@ In the ``InstanceNotifications`` plugin, it listens to three events:
 using the ``get_event_type`` method and subsequently the method
 ``process_notification`` will be invoked each time such events are happening which
 generates the appropriate sample objects to be sent to the collector.
+
+Adding new plugins
+------------------
+
+Although we have described a list of the metrics Ceilometer should
+collect, we cannot predict all of the ways deployers will want to
+measure the resources their customers use. This means that Ceilometer
+needs to be easy to extend and configure so it can be tuned for each
+installation. A plugin system based on `setuptools entry points`_
+makes it easy to add new monitors in the agents.  In particular,
+Ceilometer now uses Stevedore_, and you should put your entry point
+definitions in the ``entry_points.txt`` file of your Ceilometer egg.
+
+.. _setuptools entry points: http://pythonhosted.org/setuptools/setuptools.html#dynamic-discovery-of-services-and-plugins
+
+.. _Stevedore: http://stevedore.readthedocs.org
+
+Installing a plugin automatically activates it the next time the
+ceilometer daemon starts. Rather than running and reporting errors or
+simply consuming cycles for no-ops, plugins may disable themselves at
+runtime based on configuration settings defined by other components (for example, the
+plugin for polling libvirt does not run if it sees that the system is
+configured using some other virtualization tool). Additionally, if no
+valid resources can be discovered the plugin will be disabled.
+
 
 Tests
 =====

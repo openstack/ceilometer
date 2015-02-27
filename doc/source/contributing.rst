@@ -1,5 +1,4 @@
 ..
-      Copyright 2012 New Dream Network, LLC (DreamHost)
 
       Licensed under the Apache License, Version 2.0 (the "License"); you may
       not use this file except in compliance with the License. You may obtain
@@ -13,18 +12,23 @@
       License for the specific language governing permissions and limitations
       under the License.
 
-.. _resources:
+.. _contributing:
 
-=========================
- Project Hosting Details
-=========================
+============================
+ Contributing to Ceilometer
+============================
+
+Ceilometer follows the same workflow as other OpenStack projects. To start
+contributing to Ceilometer, please follow the workflow found here_.
+
+.. _here: https://wiki.openstack.org/wiki/Gerrit_Workflow
+
+
+Project Hosting Details
+=======================
 
 :Bug tracker: http://launchpad.net/ceilometer
 :Mailing list: http://lists.openstack.org/cgi-bin/mailman/listinfo/openstack-dev (prefix subjects with ``[Ceilometer]`` for faster responses)
 :Wiki: http://wiki.openstack.org/wiki/Ceilometer
 :Code Hosting: https://git.openstack.org/cgit/openstack/ceilometer/
 :Code Review: https://review.openstack.org/#/q/status:open+project:openstack/ceilometer,n,z
-
-.. seealso::
-
-   * :ref:`user`

@@ -92,7 +92,7 @@ data.
 
 A source is a producer of samples, in effect a set of pollsters and/or
 notification handlers emitting samples for a set of matching meters.
-See :doc:`contributing/plugins` and :ref:`plugins-and-containers` for
+See :doc:`plugins` and :ref:`plugins-and-containers` for
 details on how to write and plug in your plugins.
 
 Each source configuration encapsulates meter name matching, polling
