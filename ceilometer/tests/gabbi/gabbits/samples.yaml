@@ -74,7 +74,8 @@ tests:
       url: /v2/samples?q.field=harpoon&q.value=cow&q.op=eq
       status: 400
       response_strings:
-          - metaquery
+          - timestamp
+          - project
           - unrecognized field in query
 
     - name: list samples with metaquery field

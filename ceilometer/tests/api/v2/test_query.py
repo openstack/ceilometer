@@ -367,9 +367,8 @@ class TestQueryToKwArgs(tests_base.BaseTestCase):
         exc = self.assertRaises(
             wsme.exc.UnknownArgument,
             utils.query_to_kwargs, q, storage.SampleFilter.__init__)
-        valid_keys = ['message_id', 'metaquery', 'meter', 'project',
-                      'resource', 'search_offset', 'source', 'timestamp',
-                      'user']
+        valid_keys = ['message_id', 'meter', 'project', 'resource',
+                      'search_offset', 'source', 'timestamp', 'user']
         msg = ("unrecognized field in query: %s, "
                "valid keys: %s") % (q, valid_keys)
         expected_exc = wsme.exc.UnknownArgument('abc', msg)
@@ -382,8 +381,7 @@ class TestQueryToKwArgs(tests_base.BaseTestCase):
         exc = self.assertRaises(
             wsme.exc.UnknownArgument,
             utils.query_to_kwargs, q, storage_base.Connection.get_meters)
-        valid_keys = ['metaquery', 'pagination', 'project', 'resource',
-                      'source', 'user']
+        valid_keys = ['pagination', 'project', 'resource', 'source', 'user']
         msg = ("unrecognized field in query: %s, "
                "valid keys: %s") % (q, valid_keys)
         expected_exc = wsme.exc.UnknownArgument('abc', msg)
@@ -396,7 +394,7 @@ class TestQueryToKwArgs(tests_base.BaseTestCase):
         exc = self.assertRaises(
             wsme.exc.UnknownArgument,
             utils.query_to_kwargs, q, storage_base.Connection.get_resources)
-        valid_keys = ['metaquery', 'pagination', 'project', 'resource',
+        valid_keys = ['pagination', 'project', 'resource',
                       'search_offset', 'source', 'timestamp', 'user']
         msg = ("unrecognized field in query: %s, "
                "valid keys: %s") % (q, valid_keys)

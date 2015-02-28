@@ -104,8 +104,6 @@ def validate_query(query, db_func, internal_keys=None,
     :param allow_timestamps: defines whether the timestamp-based constraint is
         applicable for this query or not
 
-    :returns: valid query keys the db_func supported
-
     :raises InvalidInput: if an operator is not supported for a given field
     :raises InvalidInput: if timestamp constraints are allowed, but
         search_offset was included without timestamp constraint
@@ -127,6 +125,7 @@ def validate_query(query, db_func, internal_keys=None,
         internal_keys += internal_timestamp_keys
         valid_keys += ['timestamp', 'search_offset']
     internal_keys.append('self')
+    internal_keys.append('metaquery')
     valid_keys = set(valid_keys) - set(internal_keys)
     translation = {'user_id': 'user',
                    'project_id': 'project',
@@ -168,7 +167,6 @@ def validate_query(query, db_func, internal_keys=None,
                 msg = ("unrecognized field in query: %s, "
                        "valid keys: %s") % (query, sorted(valid_keys))
                 raise wsme.exc.UnknownArgument(key, msg)
-    return valid_keys
 
 
 def _validate_timestamp_fields(query, field_name, operator_list,
@@ -214,9 +212,8 @@ def _validate_timestamp_fields(query, field_name, operator_list,
 
 def query_to_kwargs(query, db_func, internal_keys=None,
                     allow_timestamps=True):
-    internal_keys = internal_keys or []
-    valid_keys = validate_query(query, db_func, internal_keys=internal_keys,
-                                allow_timestamps=allow_timestamps)
+    validate_query(query, db_func, internal_keys=internal_keys,
+                   allow_timestamps=allow_timestamps)
     query = sanitize_query(query, db_func)
     translation = {'user_id': 'user',
                    'project_id': 'project',
@@ -247,7 +244,7 @@ def query_to_kwargs(query, db_func, internal_keys=None,
                     key = translation.get(i.field, i.field)
                     kwargs[key] = i.value
 
-    if metaquery and 'metaquery' in valid_keys:
+    if metaquery and 'metaquery' in inspect.getargspec(db_func)[0]:
         kwargs['metaquery'] = metaquery
     if stamp:
         kwargs.update(_get_query_timestamps(stamp))
