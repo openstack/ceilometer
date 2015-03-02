@@ -39,13 +39,13 @@ import wsmeext.pecan as wsme_pecan
 import ceilometer
 from ceilometer import alarm as ceilometer_alarm
 from ceilometer.alarm.storage import models as alarm_models
+from ceilometer.api.controllers.v2.alarm_rules import combination
 from ceilometer.api.controllers.v2 import base
 from ceilometer.api.controllers.v2 import utils as v2_utils
 from ceilometer.api import rbac
 from ceilometer.i18n import _
 from ceilometer import messaging
 from ceilometer.openstack.common import log
-from ceilometer import storage
 from ceilometer import utils
 
 LOG = log.getLogger(__name__)
@@ -72,17 +72,6 @@ state_kind = ["ok", "alarm", "insufficient data"]
 state_kind_enum = wtypes.Enum(str, *state_kind)
 severity_kind = ["low", "moderate", "critical"]
 severity_kind_enum = wtypes.Enum(str, *severity_kind)
-
-
-class AlarmNotFound(base.ClientSideError):
-    def __init__(self, alarm, auth_project):
-        if not auth_project:
-            msg = _('Alarm %s not found') % alarm
-        else:
-            msg = _('Alarm %(alarm_id)s not found in project %'
-                    '(project)s') % {
-                        'alarm_id': alarm, 'project': auth_project}
-        super(AlarmNotFound, self).__init__(msg, status_code=404)
 
 
 class OverQuota(base.ClientSideError):
@@ -132,162 +121,6 @@ class CronType(wtypes.UserType):
         # raises ValueError if invalid
         croniter.croniter(value)
         return value
-
-
-class AlarmThresholdRule(base.AlarmRule):
-    """Alarm Threshold Rule
-
-    Describe when to trigger the alarm based on computed statistics
-    """
-
-    meter_name = wsme.wsattr(wtypes.text, mandatory=True)
-    "The name of the meter"
-
-    # FIXME(sileht): default doesn't work
-    # workaround: default is set in validate method
-    query = wsme.wsattr([base.Query], default=[])
-    """The query to find the data for computing statistics.
-    Ownership settings are automatically included based on the Alarm owner.
-    """
-
-    period = wsme.wsattr(wtypes.IntegerType(minimum=1), default=60)
-    "The time range in seconds over which query"
-
-    comparison_operator = base.AdvEnum('comparison_operator', str,
-                                       'lt', 'le', 'eq', 'ne', 'ge', 'gt',
-                                       default='eq')
-    "The comparison against the alarm threshold"
-
-    threshold = wsme.wsattr(float, mandatory=True)
-    "The threshold of the alarm"
-
-    statistic = base.AdvEnum('statistic', str, 'max', 'min', 'avg', 'sum',
-                             'count', default='avg')
-    "The statistic to compare to the threshold"
-
-    evaluation_periods = wsme.wsattr(wtypes.IntegerType(minimum=1), default=1)
-    "The number of historical periods to evaluate the threshold"
-
-    exclude_outliers = wsme.wsattr(bool, default=False)
-    "Whether datapoints with anomalously low sample counts are excluded"
-
-    def __init__(self, query=None, **kwargs):
-        if query:
-            query = [base.Query(**q) for q in query]
-        super(AlarmThresholdRule, self).__init__(query=query, **kwargs)
-
-    @staticmethod
-    def validate(threshold_rule):
-        # note(sileht): wsme default doesn't work in some case
-        # workaround for https://bugs.launchpad.net/wsme/+bug/1227039
-        if not threshold_rule.query:
-            threshold_rule.query = []
-
-        # Timestamp is not allowed for AlarmThresholdRule query, as the alarm
-        # evaluator will construct timestamp bounds for the sequence of
-        # statistics queries as the sliding evaluation window advances
-        # over time.
-        v2_utils.validate_query(threshold_rule.query,
-                                storage.SampleFilter.__init__,
-                                allow_timestamps=False)
-        return threshold_rule
-
-    @staticmethod
-    def validate_alarm(alarm):
-        # ensure an implicit constraint on project_id is added to
-        # the query if not already present
-        alarm.threshold_rule.query = v2_utils.sanitize_query(
-            alarm.threshold_rule.query,
-            storage.SampleFilter.__init__,
-            on_behalf_of=alarm.project_id
-        )
-
-    @property
-    def default_description(self):
-        return (_('Alarm when %(meter_name)s is %(comparison_operator)s a '
-                  '%(statistic)s of %(threshold)s over %(period)s seconds') %
-                dict(comparison_operator=self.comparison_operator,
-                     statistic=self.statistic,
-                     threshold=self.threshold,
-                     meter_name=self.meter_name,
-                     period=self.period))
-
-    def as_dict(self):
-        rule = self.as_dict_from_keys(['period', 'comparison_operator',
-                                       'threshold', 'statistic',
-                                       'evaluation_periods', 'meter_name',
-                                       'exclude_outliers'])
-        rule['query'] = [q.as_dict() for q in self.query]
-        return rule
-
-    @classmethod
-    def sample(cls):
-        return cls(meter_name='cpu_util',
-                   period=60,
-                   evaluation_periods=1,
-                   threshold=300.0,
-                   statistic='avg',
-                   comparison_operator='gt',
-                   query=[{'field': 'resource_id',
-                           'value': '2a4d689b-f0b8-49c1-9eef-87cae58d80db',
-                           'op': 'eq',
-                           'type': 'string'}])
-
-
-class AlarmCombinationRule(base.AlarmRule):
-    """Alarm Combinarion Rule
-
-    Describe when to trigger the alarm based on combining the state of
-    other alarms.
-    """
-
-    operator = base.AdvEnum('operator', str, 'or', 'and', default='and')
-    "How to combine the sub-alarms"
-
-    alarm_ids = wsme.wsattr([wtypes.text], mandatory=True)
-    "List of alarm identifiers to combine"
-
-    @property
-    def default_description(self):
-        joiner = ' %s ' % self.operator
-        return _('Combined state of alarms %s') % joiner.join(self.alarm_ids)
-
-    def as_dict(self):
-        return self.as_dict_from_keys(['operator', 'alarm_ids'])
-
-    @staticmethod
-    def validate(rule):
-        rule.alarm_ids = sorted(set(rule.alarm_ids), key=rule.alarm_ids.index)
-        if len(rule.alarm_ids) <= 1:
-            raise base.ClientSideError(_('Alarm combination rule should '
-                                         'contain at least two different '
-                                         'alarm ids.'))
-        return rule
-
-    @staticmethod
-    def validate_alarm(alarm):
-        project = v2_utils.get_auth_project(
-            alarm.project_id if alarm.project_id != wtypes.Unset else None)
-        for id in alarm.combination_rule.alarm_ids:
-            alarms = list(pecan.request.alarm_storage_conn.get_alarms(
-                alarm_id=id, project=project))
-            if not alarms:
-                raise AlarmNotFound(id, project)
-
-    @staticmethod
-    def update_hook(alarm):
-        # should check if there is any circle in the dependency, but for
-        # efficiency reason, here only check alarm cannot depend on itself
-        if alarm.alarm_id in alarm.combination_rule.alarm_ids:
-            raise base.ClientSideError(
-                _('Cannot specify alarm %s itself in combination rule') %
-                alarm.alarm_id)
-
-    @classmethod
-    def sample(cls):
-        return cls(operator='or',
-                   alarm_ids=['739e99cb-c2ec-4718-b900-332502355f38',
-                              '153462d0-a9b8-4b5b-8175-9e4b05e9b856'])
 
 
 class AlarmTimeConstraint(base.Base):
@@ -505,7 +338,7 @@ class Alarm(base.Base):
                    alarm_actions=["http://site:8000/alarm"],
                    insufficient_data_actions=["http://site:8000/nodata"],
                    repeat_actions=False,
-                   combination_rule=AlarmCombinationRule.sample(),
+                   combination_rule=combination.AlarmCombinationRule.sample(),
                    )
 
     def as_dict(self, db_model):
@@ -594,7 +427,7 @@ class AlarmController(rest.RestController):
         alarms = list(self.conn.get_alarms(alarm_id=self._id,
                                            project=auth_project))
         if not alarms:
-            raise AlarmNotFound(alarm=self._id, auth_project=auth_project)
+            raise base.AlarmNotFound(alarm=self._id, auth_project=auth_project)
         return alarms[0]
 
     def _record_change(self, data, now, on_behalf_of=None, type=None):

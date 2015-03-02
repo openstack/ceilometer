@@ -230,6 +230,17 @@ class Query(Base):
         return converted_value
 
 
+class AlarmNotFound(ClientSideError):
+    def __init__(self, alarm, auth_project):
+        if not auth_project:
+            msg = _('Alarm %s not found') % alarm
+        else:
+            msg = _('Alarm %(alarm_id)s not found in project %'
+                    '(project)s') % {
+                        'alarm_id': alarm, 'project': auth_project}
+        super(AlarmNotFound, self).__init__(msg, status_code=404)
+
+
 class AlarmRule(Base):
     """Base class Alarm Rule extension and wsme.types."""
     @staticmethod
