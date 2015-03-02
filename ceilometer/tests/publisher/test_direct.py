@@ -99,4 +99,5 @@ class TestEventDirectPublisher(tests_db.TestBase,
 
         e_types = list(self.event_conn.get_event_types())
         self.assertEqual(5, len(e_types))
-        self.assertEqual(['event_%d' % i for i in range(0, 5)], e_types)
+        self.assertEqual(['event_%d' % i for i in range(0, 5)],
+                         sorted(e_types))
