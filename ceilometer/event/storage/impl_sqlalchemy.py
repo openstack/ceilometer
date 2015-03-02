@@ -421,5 +421,4 @@ class Connection(base.Connection):
             (session.query(models.EventType)
              .filter(~models.EventType.events.any())
              .delete(synchronize_session="fetch"))
-            LOG.info(_LI("%(event)d events are removed from database"),
-                     event_rows)
+            LOG.info(_LI("%d events are removed from database"), event_rows)
