@@ -458,6 +458,19 @@ class TestAlarms(v2.FunctionalTest,
         alarms = list(self.alarm_conn.get_alarms())
         self.assertEqual(4, len(alarms))
 
+    def test_post_alarm_null_time_constraint(self):
+        json = {
+            'name': 'added_alarm_invalid_constraint_duration',
+            'type': 'threshold',
+            'time_constraints': None,
+            'threshold_rule': {
+                'meter_name': 'ameter',
+                'threshold': 300.0
+            }
+        }
+        self.post_json('/alarms', params=json, status=201,
+                       headers=self.auth_headers)
+
     def test_post_invalid_alarm_time_constraint_duration(self):
         json = {
             'name': 'added_alarm_invalid_constraint_duration',

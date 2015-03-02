@@ -440,11 +440,12 @@ class Alarm(base.Base):
 
         ALARMS_RULES[alarm.type].plugin.validate_alarm(alarm)
 
-        tc_names = [tc.name for tc in alarm.time_constraints]
-        if len(tc_names) > len(set(tc_names)):
-            error = _("Time constraint names must be "
-                      "unique for a given alarm.")
-            raise base.ClientSideError(error)
+        if alarm.time_constraints:
+            tc_names = [tc.name for tc in alarm.time_constraints]
+            if len(tc_names) > len(set(tc_names)):
+                error = _("Time constraint names must be "
+                          "unique for a given alarm.")
+                raise base.ClientSideError(error)
 
         return alarm
 
@@ -513,7 +514,9 @@ class Alarm(base.Base):
             if k.endswith('_rule'):
                 del d[k]
         d['rule'] = getattr(self, "%s_rule" % self.type).as_dict()
-        d['time_constraints'] = [tc.as_dict() for tc in self.time_constraints]
+        if self.time_constraints:
+            d['time_constraints'] = [tc.as_dict()
+                                     for tc in self.time_constraints]
         return d
 
 Alarm.add_attributes(**{"%s_rule" % ext.name: ext.plugin
