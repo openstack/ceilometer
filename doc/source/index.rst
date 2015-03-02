@@ -61,6 +61,7 @@ Developer Documentation
    install/index
    configuration
    plugins
+   new_meters
    testing
    contributing
 
