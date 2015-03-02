@@ -98,14 +98,7 @@ class Connection(base.Connection):
 
     def get_event_types(self):
         """Return all event types as an iter of strings."""
-        event_types = set()
-        events = self.db.event.find()
-
-        for event in events:
-            event_type = event['event_type']
-            if event_type not in event_types:
-                event_types.add(event_type)
-                yield event_type
+        return self.db.event.distinct('event_type')
 
     def get_trait_types(self, event_type):
         """Return a dictionary containing the name and data type of the trait.
