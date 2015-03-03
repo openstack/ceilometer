@@ -3,73 +3,102 @@ fixtures:
     - ConfigFixture
 
 tests:
-- name: post sample for meter
-  desc: post a single sample
-  url: /v2/meters/apples
-  method: POST
-  request_headers:
-      content-type: application/json
-  data: |
-    [
-        {
-            "counter_name": "apples",
-            "project_id": "35b17138-b364-4e6a-a131-8f3099c5be68",
-            "user_id": "efd87807-12d2-4b38-9c70-5f5c2ac427ff",
-            "counter_unit": "instance",
-            "counter_volume": 1,
-            "resource_id": "bd9431c1-8d69-4ad3-803a-8d4a6b89fd36",
-            "resource_metadata": {
-                "name2": "value2",
-                "name1": "value1"
-            },
-            "counter_type": "gauge"
-        }
-    ]
 
-  response_json_paths:
-      $.[0].counter_name: apples
-  status: 200
-  response_headers:
-      content-type: application/json; charset=UTF-8
+# POST one sample and verify its existence.
 
-# TODO(chdent): No location header in the response!!!!
-# - name: get sample
-#   desc: get the sample we just posted
-#   url: $LOCATION
+    - name: post sample for meter
+      desc: post a single sample
+      url: /v2/meters/apples
+      method: POST
+      request_headers:
+          content-type: application/json
+      data: |
+        [
+            {
+                "counter_name": "apples",
+                "project_id": "35b17138-b364-4e6a-a131-8f3099c5be68",
+                "user_id": "efd87807-12d2-4b38-9c70-5f5c2ac427ff",
+                "counter_unit": "instance",
+                "counter_volume": 1,
+                "resource_id": "bd9431c1-8d69-4ad3-803a-8d4a6b89fd36",
+                "resource_metadata": {
+                    "name2": "value2",
+                    "name1": "value1"
+                },
+                "counter_type": "gauge"
+            }
+        ]
 
-- name: get samples for meter
-  desc: get all the samples at that meter
-  url: /v2/meters/apples
-  response_json_paths:
-      $.[0].counter_name: apples
-      $.[0].counter_volume: 1
-      $.[0].resource_metadata.name2: value2
+      response_json_paths:
+          $.[0].counter_name: apples
+      status: 200
+      response_headers:
+          content-type: application/json; charset=UTF-8
 
-- name: get resources
-  desc: get the resources that exist because of the sample
-  url: /v2/resources
-  response_json_paths:
-      $.[0].metadata.name2: value2
+# When POSTing a sample perhaps we should get back a location header
+# with the URI of the posted sample
+
+    - name: post a sample expect location
+      desc: https://bugs.launchpad.net/ceilometer/+bug/1426426
+      xfail: true
+      url: /v2/meters/apples
+      method: POST
+      request_headers:
+          content-type: application/json
+      data:
+          - counter_name: apples
+            project_id: 35b17138-b364-4e6a-a131-8f3099c5be68
+            user_id: efd87807-12d2-4b38-9c70-5f5c2ac427ff
+            counter_unit: instance
+            counter_volume: 1
+            resource_id: bd9431c1-8d69-4ad3-803a-8d4a6b89fd36
+            resource_metadata:
+              name2: value2
+              name1: value1
+            counter_type: gauge
+      response_headers:
+          location: /$SCHEME://$NETLOC/
+
+# GET all the samples created for the apples meter
+
+    - name: get samples for meter
+      desc: get all the samples at that meter
+      url: /v2/meters/apples
+      response_json_paths:
+          $.[0].counter_name: apples
+          $.[0].counter_volume: 1
+          $.[0].resource_metadata.name2: value2
+
+# POSTing a sample to a meter will implicitly create a resource
+
+    - name: get resources
+      desc: get the resources that exist because of the sample
+      url: /v2/resources
+      response_json_paths:
+          $.[0].metadata.name2: value2
 
 # NOTE(chdent): We assume that the first item in links is self.
 # Need to determine how to express the more correct JSONPath here
 # (if possible).
-- name: get resource
-  desc: get just one of those resources via self
-  url: $RESPONSE['$[0].links[0].href']
-  response_json_paths:
-      $.metadata.name2: value2
 
-- name: get samples
-  desc: get all the created samples
-  url: /v2/samples
-  response_json_paths:
-      $.[0].metadata.name2: value2
-      $.[0].meter: apples
+    - name: get resource
+      desc: get just one of those resources via self
+      url: $RESPONSE['$[0].links[0].href']
+      response_json_paths:
+          $.metadata.name2: value2
 
-- name: get one sample
-  desc: get the one sample that exists
-  url: /v2/samples/$RESPONSE['$[0].id']
-  response_json_paths:
-      $.metadata.name2: value2
-      $.meter: apples
+# GET the created samples
+
+    - name: get samples
+      desc: get all the created samples
+      url: /v2/samples
+      response_json_paths:
+          $.[0].metadata.name2: value2
+          $.[0].meter: apples
+
+    - name: get one sample
+      desc: get the one sample that exists
+      url: /v2/samples/$RESPONSE['$[0].id']
+      response_json_paths:
+          $.metadata.name2: value2
+          $.meter: apples
