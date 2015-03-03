@@ -15,9 +15,9 @@ import sqlalchemy as sa
 
 from ceilometer.storage.sqlalchemy import models
 
-tables = [('trait_text', sa.Text, True, 't_string', 1),
+tables = [('trait_text', sa.String(255), True, 't_string', 1),
           ('trait_int', sa.Integer, False, 't_int', 2),
-          ('trait_float', sa.Float, False, 't_float', 3),
+          ('trait_float', sa.Float(53), False, 't_float', 3),
           ('trait_datetime', models.PreciseTimestamp(),
            False, 't_datetime', 4)]
 
