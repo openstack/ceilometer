@@ -101,12 +101,15 @@ class CapabilitiesTest(test_base.BaseTestCase):
 
 
 class ConnectionTest(test_base.BaseTestCase):
+    @mock.patch.object(impl_db2.Connection, '_generate_random_str')
     @mock.patch.object(pymongo_utils.ConnectionPool, 'connect')
     @mock.patch.object(timeutils, 'utcnow')
     @mock.patch.object(bson.objectid, 'ObjectId')
-    def test_upgrade(self, meter_id, timestamp, mongo_connect):
+    def test_upgrade(self, meter_id, timestamp, mongo_connect,
+                     _generate_random_str):
         conn_mock = mock.MagicMock()
         conn_mock.server_info.return_value = {}
+        _generate_random_str.return_value = 'wew' * 247 + 'x' * 3
         conn_mock.ceilodb2.resource.index_information.return_value = {}
         mongo_connect.return_value = conn_mock
         meter_id.return_value = '54b8860d75bfe43b54e84ce7'
@@ -115,7 +118,7 @@ class ConnectionTest(test_base.BaseTestCase):
                               256,
                               group='database')
         impl_db2.Connection('db2://user:pwd@localhost:27017/ceilodb2')
-        resource_id = 'x' * 256
+        resource_id = 'wew' * 247 + 'x' * 3
         conn_mock.ceilodb2.resource.insert.assert_called_with(
             {'_id': resource_id,
              'no_key': resource_id})
@@ -123,3 +126,37 @@ class ConnectionTest(test_base.BaseTestCase):
             {'_id': '54b8860d75bfe43b54e84ce7',
              'no_key': '54b8860d75bfe43b54e84ce7',
              'timestamp': 'timestamp'})
+
+    @mock.patch.object(pymongo_utils.ConnectionPool, 'connect')
+    @mock.patch.object(bson.objectid, 'ObjectId')
+    def test_generate_random_str_with_less_config_len(self, objectid,
+                                                      mongo_connect):
+        fake_str = '54b8860d75bfe43b54e84ce7'
+        conn_mock = mock.MagicMock()
+        conn_mock.server_info.return_value = {}
+        mongo_connect.return_value = conn_mock
+        objectid.return_value = fake_str
+        cfg.CONF.set_override('db2nosql_resource_id_maxlen',
+                              20,
+                              group='database')
+        conn = impl_db2.Connection('db2://user:pwd@localhost:27017/ceilodb2')
+        rand_str = conn._generate_random_str(20)
+        self.assertEqual(fake_str, rand_str)
+
+    @mock.patch.object(pymongo_utils.ConnectionPool, 'connect')
+    @mock.patch.object(bson.objectid, 'ObjectId')
+    def test_generate_random_str_with_default_config_len(self, objectid,
+                                                         mongo_connect):
+        fake_str = '54b8860d75bfe43b54e84ce7'
+        conn_mock = mock.MagicMock()
+        conn_mock.server_info.return_value = {}
+        mongo_connect.return_value = conn_mock
+        objectid.return_value = fake_str
+        cfg.CONF.set_override('db2nosql_resource_id_maxlen',
+                              512,
+                              group='database')
+        conn = impl_db2.Connection('db2://user:pwd@localhost:27017/ceilodb2')
+        rand_str = conn._generate_random_str(512)
+        str_len = len(str(fake_str))
+        expect_str = fake_str * int(512 / str_len) + 'x' * (512 % str_len)
+        self.assertEqual(expect_str, rand_str)

@@ -147,6 +147,14 @@ class Connection(pymongo_base.Connection):
 
         return sort_instructions
 
+    def _generate_random_str(self, str_len):
+        init_str = str(bson.objectid.ObjectId())
+        objectid_len = len(init_str)
+        if str_len >= objectid_len:
+            init_str = (init_str * int(str_len/objectid_len) +
+                        'x' * int(str_len % objectid_len))
+        return init_str
+
     def upgrade(self, version=None):
         # Establish indexes
         #
@@ -163,7 +171,8 @@ class Connection(pymongo_base.Connection):
             # VARCHAR(n) for the resource id which has n(n>70) characters.
             # Users can adjust 'db2nosql_resource_id_maxlen'(default is 512)
             # for their ENV.
-            resource_id = 'x' * cfg.CONF.database.db2nosql_resource_id_maxlen
+            resource_id = self._generate_random_str(
+                cfg.CONF.database.db2nosql_resource_id_maxlen)
             self.db.resource.insert({'_id': resource_id,
                                      'no_key': resource_id})
             meter_id = str(bson.objectid.ObjectId())
