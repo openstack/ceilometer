@@ -17,8 +17,12 @@
 from oslo_config import cfg
 
 from ceilometer.agent import manager
+from ceilometer.i18n import _LW
+from ceilometer.openstack.common import log
 from ceilometer.openstack.common import service as os_service
 from ceilometer import service
+
+LOG = log.getLogger(__name__)
 
 CONF = cfg.CONF
 
@@ -26,7 +30,7 @@ CONF = cfg.CONF
 class MultiChoicesOpt(cfg.Opt):
     def __init__(self, name, choices=None, **kwargs):
         super(MultiChoicesOpt, self).__init__(name,
-                                              type=cfg.types.List(),
+                                              type=DeduplicatedCfgList(),
                                               **kwargs)
         self.choices = choices
 
@@ -38,6 +42,17 @@ class MultiChoicesOpt(cfg.Opt):
         if choices:
             kwargs['choices'] = choices
         return kwargs
+
+
+class DeduplicatedCfgList(cfg.types.List):
+    def __call__(self, *args, **kwargs):
+        result = super(DeduplicatedCfgList, self).__call__(*args, **kwargs)
+        if len(result) != len(set(result)):
+            LOG.warning(_LW("Duplicated values: %s found in CLI options, "
+                            "auto de-duplidated"), result)
+            result = list(set(result))
+        return result
+
 
 CLI_OPTS = [
     MultiChoicesOpt('polling-namespaces',
