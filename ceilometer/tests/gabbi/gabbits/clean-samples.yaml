@@ -31,7 +31,7 @@ tests:
 
       response_json_paths:
           $.[0].counter_name: apples
-      status: 200
+      status: 201
       response_headers:
           content-type: application/json; charset=UTF-8
 

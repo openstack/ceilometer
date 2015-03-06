@@ -291,7 +291,7 @@ class MeterController(rest.RestController):
                 for e in pecan.request.storage_conn.get_samples(f, limit=limit)
                 ]
 
-    @wsme_pecan.wsexpose([OldSample], body=[OldSample])
+    @wsme_pecan.wsexpose([OldSample], body=[OldSample], status_code=201)
     def post(self, samples):
         """Post a list of new Samples to Telemetry.
 
