@@ -148,7 +148,7 @@ class Query(Base):
     def set_op(self, value):
         self._op = value
 
-    field = wtypes.text
+    field = wsme.wsattr(wtypes.text, mandatory=True)
     "The name of the field to test"
 
     # op = wsme.wsattr(operation_kind, default='eq')
@@ -156,7 +156,7 @@ class Query(Base):
     op = wsme.wsproperty(operation_kind_enum, get_op, set_op)
     "The comparison operator. Defaults to 'eq'."
 
-    value = wtypes.text
+    value = wsme.wsattr(wtypes.text, mandatory=True)
     "The value to compare against the stored data"
 
     type = wtypes.text

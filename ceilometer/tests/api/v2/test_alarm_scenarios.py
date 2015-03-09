@@ -827,6 +827,46 @@ class TestAlarms(v2.FunctionalTest,
         alarms = list(self.alarm_conn.get_alarms())
         self.assertEqual(6, len(alarms))
 
+    def test_post_invalid_alarm_query_non_field(self):
+        json = {
+            'name': 'added_alarm',
+            'type': 'threshold',
+            'threshold_rule': {
+                'meter_name': 'ameter',
+                'query': [{'q.field': 'metadata.valid',
+                           'value': 'value'}],
+                'threshold': 2.0,
+            }
+        }
+        resp = self.post_json('/alarms', params=json, expect_errors=True,
+                              status=400, headers=self.auth_headers)
+        expected_error_message = ("Invalid input for field/attribute field. "
+                                  "Value: 'None'. Mandatory field missing.")
+        fault_string = resp.json['error_message']['faultstring']
+        self.assertEqual(expected_error_message, fault_string)
+        alarms = list(self.alarm_conn.get_alarms())
+        self.assertEqual(6, len(alarms))
+
+    def test_post_invalid_alarm_query_non_value(self):
+        json = {
+            'name': 'added_alarm',
+            'type': 'threshold',
+            'threshold_rule': {
+                'meter_name': 'ameter',
+                'query': [{'field': 'metadata.valid',
+                           'q.value': 'value'}],
+                'threshold': 2.0,
+            }
+        }
+        resp = self.post_json('/alarms', params=json, expect_errors=True,
+                              status=400, headers=self.auth_headers)
+        expected_error_message = ("Invalid input for field/attribute value. "
+                                  "Value: 'None'. Mandatory field missing.")
+        fault_string = resp.json['error_message']['faultstring']
+        self.assertEqual(expected_error_message, fault_string)
+        alarms = list(self.alarm_conn.get_alarms())
+        self.assertEqual(6, len(alarms))
+
     def test_post_invalid_alarm_have_multiple_rules(self):
         json = {
             'name': 'added_alarm',
