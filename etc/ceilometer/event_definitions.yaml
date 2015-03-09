@@ -144,7 +144,8 @@
       fields: _context_user_id
     resource_id:
       fields: payload.cluster_id
-- event_type: ['identity.user.*', 'identity.project.*', 'identity.group.*', 'identity.role.*', 'identity.OS-TRUST:trust']
+- event_type: ['identity.user.*', 'identity.project.*', 'identity.group.*', 'identity.role.*', 'identity.OS-TRUST:trust',
+               'identity.region.*', 'identity.service.*', 'identity.endpoint.*', 'identity.policy.*']
   traits: &identity_crud
     resource_id:
       fields: payload.resource_info
