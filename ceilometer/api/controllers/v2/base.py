@@ -21,6 +21,7 @@
 import ast
 import functools
 import inspect
+import json
 
 from oslo_utils import strutils
 from oslo_utils import timeutils
@@ -254,3 +255,16 @@ class AlarmRule(Base):
     @staticmethod
     def update_hook(alarm):
         pass
+
+
+class JsonType(wtypes.UserType):
+    """A simple JSON type."""
+
+    basetype = wtypes.text
+    name = 'json'
+
+    @staticmethod
+    def validate(value):
+        # check that value can be serialised
+        json.dumps(value)
+        return value

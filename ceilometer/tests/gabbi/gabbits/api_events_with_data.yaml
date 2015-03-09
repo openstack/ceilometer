@@ -15,12 +15,15 @@ tests:
       $.[0].event_type: cookies_chocolate.chip
       $.[0].traits.[0].value: chocolate.chip
       $.[0].traits.[1].value: '0'
+      $.[0].raw.nested.inside: value
       $.[1].event_type: cookies_peanut.butter
       $.[1].traits.[0].name: type
       $.[1].traits.[1].name: ate
+      $.[1].raw.nested.inside: value
       $.[2].event_type: cookies_sugar
       $.[2].traits.[0].type: string
       $.[2].traits.[1].type: integer
+      $.[2].raw.nested.inside: value
 
 # this attempts to get all the events with invalid parameters and expects a 400
 - name: get events with bad params

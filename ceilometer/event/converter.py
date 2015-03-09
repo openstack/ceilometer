@@ -35,7 +35,11 @@ OPTS = [
                 default=False,
                 help='Drop notifications if no event definition matches. '
                 '(Otherwise, we convert them with just the default traits)'),
-
+    cfg.MultiStrOpt('store_raw',
+                    default=[],
+                    help='Store the raw notification for select priority '
+                    'levels (info and/or error). By default, raw details are '
+                    'not captured.')
 ]
 
 cfg.CONF.register_opts(OPTS, group='event')
@@ -157,6 +161,7 @@ class EventDefinition(object):
         self._excluded_types = []
         self.traits = dict()
         self.cfg = definition_cfg
+        self.raw_levels = [level.lower() for level in cfg.CONF.event.store_raw]
 
         try:
             event_type = definition_cfg['event_type']
@@ -232,7 +237,9 @@ class EventDefinition(object):
                   for t in self.traits)
         # Only accept non-None value traits ...
         traits = [trait for trait in traits if trait is not None]
-        event = models.Event(message_id, event_type, when, traits)
+        raw = (notification_body
+               if notification_body.get('priority') in self.raw_levels else {})
+        event = models.Event(message_id, event_type, when, traits, raw)
         return event
 
 

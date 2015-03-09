@@ -99,7 +99,8 @@ class EventPipelineEndpoint(PipelineEndpoint):
                     timeutils.parse_isotime(ev['generated'])),
                 traits=[models.Trait(name, dtype,
                                      models.Trait.convert_value(dtype, value))
-                        for name, dtype, value in ev['traits']])
+                        for name, dtype, value in ev['traits']],
+                raw=ev.get('raw', {}))
             for ev in payload
         ]
         with self.publish_context as p:

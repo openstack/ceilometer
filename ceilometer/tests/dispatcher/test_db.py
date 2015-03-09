@@ -36,7 +36,7 @@ class TestDispatcherDB(base.BaseTestCase):
     def test_event_conn(self):
         event = event_models.Event(uuid.uuid4(), 'test',
                                    datetime.datetime(2012, 7, 2, 13, 53, 40),
-                                   [])
+                                   [], {})
         with mock.patch.object(self.dispatcher.event_conn,
                                'record_events') as record_events:
             self.dispatcher.record_events(event)

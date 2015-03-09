@@ -138,7 +138,7 @@ class EventDataFixture(fixture.GabbiFixture):
             event = models.Event(message_id,
                                  'cookies_{}'.format(name),
                                  timestamp,
-                                 traits)
+                                 traits, {'nested': {'inside': 'value'}})
             events.append(event)
         self.conn.record_events(events)
 

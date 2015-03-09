@@ -53,7 +53,8 @@ class EventPipelineTestCase(base.BaseTestCase):
                 models.Trait('t_int', 2, 'int_trait'),
                 models.Trait('t_float', 3, 'float_trait'),
                 models.Trait('t_datetime', 4, 'datetime_trait')
-            ]
+            ],
+            raw={'status': 'started'}
         )
 
         self.test_event2 = models.Event(
@@ -65,7 +66,8 @@ class EventPipelineTestCase(base.BaseTestCase):
                 models.Trait('t_int', 2, 'int_trait'),
                 models.Trait('t_float', 3, 'float_trait'),
                 models.Trait('t_datetime', 4, 'datetime_trait')
-            ]
+            ],
+            raw={'status': 'stopped'}
         )
 
         self.useFixture(mockpatch.PatchObject(
