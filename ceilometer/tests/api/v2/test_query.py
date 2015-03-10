@@ -70,6 +70,14 @@ class TestQuery(base.BaseTestCase):
         expected = 'linux'
         self.assertEqual(expected, query._get_value_as_type())
 
+    def test_get_value_as_type_with_datetime(self):
+        query = v2_base.Query(field='metadata.date',
+                              op='eq',
+                              value='2014-01-01T05:00:00',
+                              type='datetime')
+        self.assertIsInstance(query._get_value_as_type(), datetime.datetime)
+        self.assertIsNone(query._get_value_as_type().tzinfo)
+
     def test_get_value_as_type_with_integer_without_type(self):
         query = v2_base.Query(field='metadata.size',
                               op='eq',
