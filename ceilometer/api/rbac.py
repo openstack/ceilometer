@@ -16,11 +16,13 @@
 
 """Access Control Lists (ACL's) control access the API server."""
 
+from oslo_config import cfg
+from oslo_policy import policy
 import pecan
 
-from ceilometer.openstack.common import policy
-
 _ENFORCER = None
+
+CONF = cfg.CONF
 
 
 def enforce(policy_name, request):
@@ -33,7 +35,7 @@ def enforce(policy_name, request):
     """
     global _ENFORCER
     if not _ENFORCER:
-        _ENFORCER = policy.Enforcer()
+        _ENFORCER = policy.Enforcer(CONF)
         _ENFORCER.load_rules()
 
     rule_method = "telemetry:" + policy_name
@@ -67,7 +69,7 @@ def get_limited_to(headers):
     """
     global _ENFORCER
     if not _ENFORCER:
-        _ENFORCER = policy.Enforcer()
+        _ENFORCER = policy.Enforcer(CONF)
         _ENFORCER.load_rules()
 
     policy_dict = dict()
