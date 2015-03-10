@@ -20,6 +20,7 @@ import uuid
 import mock
 import oslo.messaging.conffixture
 from oslo_serialization import jsonutils
+import requests
 import six
 from six import moves
 
@@ -147,12 +148,68 @@ class TestAlarms(v2.FunctionalTest,
                          time_constraints=[],
                          rule=dict(alarm_ids=['a', 'b'],
                                    operator='or'),
-                         )]:
+                         ),
+            models.Alarm(name='name5',
+                         type='gnocchi_resources_threshold',
+                         enabled=True,
+                         alarm_id='e',
+                         description='e',
+                         state='insufficient data',
+                         severity='critical',
+                         state_timestamp=constants.MIN_DATETIME,
+                         timestamp=constants.MIN_DATETIME,
+                         ok_actions=[],
+                         insufficient_data_actions=[],
+                         alarm_actions=[],
+                         repeat_actions=True,
+                         user_id=self.auth_headers['X-User-Id'],
+                         project_id=self.auth_headers['X-Project-Id'],
+                         time_constraints=[],
+                         rule=dict(comparison_operator='gt',
+                                   threshold=2.0,
+                                   aggregation_method='mean',
+                                   granularity=60,
+                                   evaluation_periods=1,
+                                   metric='meter.test',
+                                   resource_type='instance',
+                                   resource_constraint=(
+                                       '6841c175-d7c4-4bc2-bc7a-1c7832271b8f'),
+                                   )
+                         ),
+            models.Alarm(name='name6',
+                         type='gnocchi_metrics_threshold',
+                         enabled=True,
+                         alarm_id='f',
+                         description='f',
+                         state='insufficient data',
+                         severity='critical',
+                         state_timestamp=constants.MIN_DATETIME,
+                         timestamp=constants.MIN_DATETIME,
+                         ok_actions=[],
+                         insufficient_data_actions=[],
+                         alarm_actions=[],
+                         repeat_actions=True,
+                         user_id=self.auth_headers['X-User-Id'],
+                         project_id=self.auth_headers['X-Project-Id'],
+                         time_constraints=[],
+                         rule=dict(comparison_operator='gt',
+                                   threshold=2.0,
+                                   aggregation_method='mean',
+                                   evaluation_periods=1,
+                                   granularity=60,
+                                   metrics=[
+                                       '41869681-5776-46d6-91ed-cccc43b6e4e3',
+                                       'a1fb80f4-c242-4f57-87c6-68f47521059e']
+                                   ),
+                         ),
+                ]:
+
             self.alarm_conn.update_alarm(alarm)
 
     @staticmethod
     def _add_default_threshold_rule(alarm):
-        if 'exclude_outliers' not in alarm['threshold_rule']:
+        if (alarm['type'] == 'threshold' and
+                'exclude_outliers' not in alarm['threshold_rule']):
             alarm['threshold_rule']['exclude_outliers'] = False
 
     def _verify_alarm(self, json, alarm, expected_name=None):
@@ -168,8 +225,9 @@ class TestAlarms(v2.FunctionalTest,
 
     def test_list_alarms(self):
         data = self.get_json('/alarms')
-        self.assertEqual(4, len(data))
-        self.assertEqual(set(['name1', 'name2', 'name3', 'name4']),
+        self.assertEqual(6, len(data))
+        self.assertEqual(set(['name1', 'name2', 'name3', 'name4', 'name5',
+                              'name6']),
                          set(r['name'] for r in data))
         self.assertEqual(set(['meter.test', 'meter.mine']),
                          set(r['threshold_rule']['meter_name']
@@ -177,6 +235,10 @@ class TestAlarms(v2.FunctionalTest,
         self.assertEqual(set(['or']),
                          set(r['combination_rule']['operator']
                              for r in data if 'combination_rule' in r))
+        self.assertEqual(set(['meter.test']),
+                         set(r['gnocchi_resources_threshold_rule']['metric']
+                             for r in data
+                             if 'gnocchi_resources_threshold_rule' in r))
 
     def test_alarms_query_with_timestamp(self):
         date_time = datetime.datetime(2012, 7, 2, 10, 41)
@@ -341,7 +403,7 @@ class TestAlarms(v2.FunctionalTest,
                                    q=[{'field': field,
                                        'op': 'eq',
                                        'value': project}])
-            self.assertEqual(4, len(alarms))
+            self.assertEqual(6, len(alarms))
 
         _test('project')
         _test('project_id')
@@ -406,7 +468,7 @@ class TestAlarms(v2.FunctionalTest,
                              % field.split('/', 1)[-1],
                              resp.json['error_message']['faultstring'])
         alarms = list(self.alarm_conn.get_alarms())
-        self.assertEqual(4, len(alarms))
+        self.assertEqual(6, len(alarms))
 
     def test_post_invalid_alarm_time_constraint_start(self):
         json = {
@@ -427,7 +489,7 @@ class TestAlarms(v2.FunctionalTest,
         self.post_json('/alarms', params=json, expect_errors=True, status=400,
                        headers=self.auth_headers)
         alarms = list(self.alarm_conn.get_alarms())
-        self.assertEqual(4, len(alarms))
+        self.assertEqual(6, len(alarms))
 
     def test_post_duplicate_time_constraint_name(self):
         json = {
@@ -456,7 +518,7 @@ class TestAlarms(v2.FunctionalTest,
             "Time constraint names must be unique for a given alarm.",
             resp.json['error_message']['faultstring'])
         alarms = list(self.alarm_conn.get_alarms())
-        self.assertEqual(4, len(alarms))
+        self.assertEqual(6, len(alarms))
 
     def test_post_alarm_null_time_constraint(self):
         json = {
@@ -490,7 +552,7 @@ class TestAlarms(v2.FunctionalTest,
         self.post_json('/alarms', params=json, expect_errors=True, status=400,
                        headers=self.auth_headers)
         alarms = list(self.alarm_conn.get_alarms())
-        self.assertEqual(4, len(alarms))
+        self.assertEqual(6, len(alarms))
 
     def test_post_invalid_alarm_time_constraint_timezone(self):
         json = {
@@ -512,7 +574,7 @@ class TestAlarms(v2.FunctionalTest,
         self.post_json('/alarms', params=json, expect_errors=True, status=400,
                        headers=self.auth_headers)
         alarms = list(self.alarm_conn.get_alarms())
-        self.assertEqual(4, len(alarms))
+        self.assertEqual(6, len(alarms))
 
     def test_post_invalid_alarm_period(self):
         json = {
@@ -530,7 +592,7 @@ class TestAlarms(v2.FunctionalTest,
         self.post_json('/alarms', params=json, expect_errors=True, status=400,
                        headers=self.auth_headers)
         alarms = list(self.alarm_conn.get_alarms())
-        self.assertEqual(4, len(alarms))
+        self.assertEqual(6, len(alarms))
 
     def test_post_null_threshold_rule(self):
         json = {
@@ -563,7 +625,7 @@ class TestAlarms(v2.FunctionalTest,
         self.assertIn(expected_err_msg,
                       resp.json['error_message']['faultstring'])
         alarms = list(self.alarm_conn.get_alarms())
-        self.assertEqual(4, len(alarms))
+        self.assertEqual(6, len(alarms))
 
     def test_post_invalid_alarm_input_state(self):
         json = {
@@ -583,7 +645,7 @@ class TestAlarms(v2.FunctionalTest,
         self.assertIn(expected_err_msg,
                       resp.json['error_message']['faultstring'])
         alarms = list(self.alarm_conn.get_alarms())
-        self.assertEqual(4, len(alarms))
+        self.assertEqual(6, len(alarms))
 
     def test_post_invalid_alarm_input_severity(self):
         json = {
@@ -604,7 +666,7 @@ class TestAlarms(v2.FunctionalTest,
         self.assertIn(expected_err_msg,
                       resp.json['error_message']['faultstring'])
         alarms = list(self.alarm_conn.get_alarms())
-        self.assertEqual(4, len(alarms))
+        self.assertEqual(6, len(alarms))
 
     def test_post_invalid_alarm_input_comparison_operator(self):
         json = {
@@ -625,7 +687,7 @@ class TestAlarms(v2.FunctionalTest,
         self.assertIn(expected_err_msg,
                       resp.json['error_message']['faultstring'])
         alarms = list(self.alarm_conn.get_alarms())
-        self.assertEqual(4, len(alarms))
+        self.assertEqual(6, len(alarms))
 
     def test_post_invalid_alarm_input_type(self):
         json = {
@@ -646,7 +708,7 @@ class TestAlarms(v2.FunctionalTest,
         self.assertIn(expected_err_msg,
                       resp.json['error_message']['faultstring'])
         alarms = list(self.alarm_conn.get_alarms())
-        self.assertEqual(4, len(alarms))
+        self.assertEqual(6, len(alarms))
 
     def test_post_invalid_alarm_input_enabled_str(self):
         json = {
@@ -670,7 +732,7 @@ class TestAlarms(v2.FunctionalTest,
         self.assertEqual(expected_err_msg,
                          resp.json['error_message']['faultstring'])
         alarms = list(self.alarm_conn.get_alarms())
-        self.assertEqual(4, len(alarms))
+        self.assertEqual(6, len(alarms))
 
     def test_post_invalid_alarm_input_enabled_int(self):
         json = {
@@ -694,7 +756,7 @@ class TestAlarms(v2.FunctionalTest,
         self.assertEqual(expected_err_msg,
                          resp.json['error_message']['faultstring'])
         alarms = list(self.alarm_conn.get_alarms())
-        self.assertEqual(4, len(alarms))
+        self.assertEqual(6, len(alarms))
 
     def test_post_invalid_combination_alarm_input_operator(self):
         json = {
@@ -720,7 +782,7 @@ class TestAlarms(v2.FunctionalTest,
         self.assertIn(expected_err_msg,
                       resp.json['error_message']['faultstring'])
         alarms = list(self.alarm_conn.get_alarms())
-        self.assertEqual(4, len(alarms))
+        self.assertEqual(6, len(alarms))
 
     def test_post_invalid_alarm_query(self):
         json = {
@@ -739,7 +801,7 @@ class TestAlarms(v2.FunctionalTest,
         self.post_json('/alarms', params=json, expect_errors=True, status=400,
                        headers=self.auth_headers)
         alarms = list(self.alarm_conn.get_alarms())
-        self.assertEqual(4, len(alarms))
+        self.assertEqual(6, len(alarms))
 
     def test_post_invalid_alarm_query_field_type(self):
         json = {
@@ -763,7 +825,7 @@ class TestAlarms(v2.FunctionalTest,
         fault_string = resp_string['error_message']['faultstring']
         self.assertTrue(fault_string.startswith(expected_error_message))
         alarms = list(self.alarm_conn.get_alarms())
-        self.assertEqual(4, len(alarms))
+        self.assertEqual(6, len(alarms))
 
     def test_post_invalid_alarm_have_multiple_rules(self):
         json = {
@@ -784,7 +846,7 @@ class TestAlarms(v2.FunctionalTest,
         resp = self.post_json('/alarms', params=json, expect_errors=True,
                               status=400, headers=self.auth_headers)
         alarms = list(self.alarm_conn.get_alarms())
-        self.assertEqual(4, len(alarms))
+        self.assertEqual(6, len(alarms))
         self.assertEqual('threshold_rule and combination_rule cannot '
                          'be set at the same time',
                          resp.json['error_message']['faultstring'])
@@ -808,7 +870,7 @@ class TestAlarms(v2.FunctionalTest,
         resp = self.post_json('/alarms', params=json, expect_errors=True,
                               status=400, headers=self.auth_headers)
         alarms = list(self.alarm_conn.get_alarms())
-        self.assertEqual(4, len(alarms))
+        self.assertEqual(6, len(alarms))
         self.assertEqual(
             'Unknown argument: "timestamp": '
             'not valid for this resource',
@@ -847,7 +909,7 @@ class TestAlarms(v2.FunctionalTest,
         resp = self.post_json('/alarms', params=json, status=400,
                               headers=self.auth_headers)
         alarms = list(self.alarm_conn.get_alarms())
-        self.assertEqual(4, len(alarms))
+        self.assertEqual(6, len(alarms))
         self.assertEqual(error_message,
                          resp.json['error_message']['faultstring'])
 
@@ -915,7 +977,7 @@ class TestAlarms(v2.FunctionalTest,
         self.post_json('/alarms', params=json, status=201,
                        headers=self.auth_headers)
         alarms = list(self.alarm_conn.get_alarms())
-        self.assertEqual(5, len(alarms))
+        self.assertEqual(7, len(alarms))
         for alarm in alarms:
             if alarm.name == 'added_alarm_defaults':
                 for key in to_check:
@@ -1868,18 +1930,18 @@ class TestAlarms(v2.FunctionalTest,
 
     def test_delete_alarm(self):
         data = self.get_json('/alarms')
-        self.assertEqual(4, len(data))
+        self.assertEqual(6, len(data))
 
         resp = self.delete('/alarms/%s' % data[0]['alarm_id'],
                            headers=self.auth_headers,
                            status=204)
         self.assertEqual('', resp.body)
         alarms = list(self.alarm_conn.get_alarms())
-        self.assertEqual(3, len(alarms))
+        self.assertEqual(5, len(alarms))
 
     def test_get_state_alarm(self):
         data = self.get_json('/alarms')
-        self.assertEqual(4, len(data))
+        self.assertEqual(6, len(data))
 
         resp = self.get_json('/alarms/%s/state' % data[0]['alarm_id'],
                              headers=self.auth_headers)
@@ -1887,7 +1949,7 @@ class TestAlarms(v2.FunctionalTest,
 
     def test_set_state_alarm(self):
         data = self.get_json('/alarms')
-        self.assertEqual(4, len(data))
+        self.assertEqual(6, len(data))
 
         resp = self.put_json('/alarms/%s/state' % data[0]['alarm_id'],
                              headers=self.auth_headers,
@@ -1899,7 +1961,7 @@ class TestAlarms(v2.FunctionalTest,
 
     def test_set_invalid_state_alarm(self):
         data = self.get_json('/alarms')
-        self.assertEqual(4, len(data))
+        self.assertEqual(6, len(data))
 
         self.put_json('/alarms/%s/state' % data[0]['alarm_id'],
                       headers=self.auth_headers,
@@ -2298,6 +2360,140 @@ class TestAlarms(v2.FunctionalTest,
         self.assertTrue(set(['alarm_id', 'detail', 'event_id', 'on_behalf_of',
                              'project_id', 'timestamp', 'type',
                              'user_id']).issubset(payload.keys()))
+
+    @mock.patch('ceilometer.keystone_client.get_client')
+    def test_post_gnocchi_resources_alarm(self, __):
+        json = {
+            'enabled': False,
+            'name': 'name_post',
+            'state': 'ok',
+            'type': 'gnocchi_resources_threshold',
+            'severity': 'critical',
+            'ok_actions': ['http://something/ok'],
+            'alarm_actions': ['http://something/alarm'],
+            'insufficient_data_actions': ['http://something/no'],
+            'repeat_actions': True,
+            'gnocchi_resources_threshold_rule': {
+                'metric': 'ameter',
+                'comparison_operator': 'le',
+                'aggregation_method': 'count',
+                'threshold': 50,
+                'evaluation_periods': 3,
+                'granularity': 180,
+                'resource_type': 'instance',
+                'resource_constraint': '209ef69c-c10c-4efb-90ff-46f4b2d90d2e',
+            }
+        }
+
+        with mock.patch('requests.get',
+                        side_effect=requests.ConnectionError()):
+            resp = self.post_json('/alarms', params=json,
+                                  headers=self.auth_headers,
+                                  expect_errors=True)
+            self.assertEqual(503, resp.status_code, resp.body)
+
+        with mock.patch('requests.get',
+                        return_value=mock.Mock(status_code=500,
+                                               body="my_custom_error",
+                                               text="my_custom_error")):
+            resp = self.post_json('/alarms', params=json,
+                                  headers=self.auth_headers,
+                                  expect_errors=True)
+            self.assertEqual(503, resp.status_code, resp.body)
+            self.assertIn('my_custom_error',
+                          resp.json['error_message']['faultstring'])
+
+        cap_result = mock.Mock(status_code=201,
+                               text=jsonutils.dumps(
+                                   {'aggregation_methods': ['count']}))
+        resource_result = mock.Mock(status_code=200, text="blob")
+        with mock.patch('requests.get', side_effect=[cap_result,
+                                                     resource_result]
+                        ) as gnocchi_get:
+            self.post_json('/alarms', params=json, headers=self.auth_headers)
+
+            expected = [mock.call('http://localhost:8041/v1/capabilities',
+                                  headers=mock.ANY),
+                        mock.call('http://localhost:8041/v1/resource/instance/'
+                                  '209ef69c-c10c-4efb-90ff-46f4b2d90d2e',
+                                  headers=mock.ANY)]
+            self.assertEqual(expected, gnocchi_get.mock_calls)
+
+        alarms = list(self.alarm_conn.get_alarms(enabled=False))
+        self.assertEqual(1, len(alarms))
+        self._verify_alarm(json, alarms[0])
+
+    @mock.patch('ceilometer.keystone_client.get_client')
+    def test_post_gnocchi_metrics_alarm(self, __):
+        json = {
+            'enabled': False,
+            'name': 'name_post',
+            'state': 'ok',
+            'type': 'gnocchi_metrics_threshold',
+            'severity': 'critical',
+            'ok_actions': ['http://something/ok'],
+            'alarm_actions': ['http://something/alarm'],
+            'insufficient_data_actions': ['http://something/no'],
+            'repeat_actions': True,
+            'gnocchi_metrics_threshold_rule': {
+                'metrics': ['b3d9d8ab-05e8-439f-89ad-5e978dd2a5eb',
+                            '009d4faf-c275-46f0-8f2d-670b15bac2b0'],
+                'comparison_operator': 'le',
+                'aggregation_method': 'count',
+                'threshold': 50,
+                'evaluation_periods': 3,
+                'granularity': 180,
+            }
+        }
+
+        cap_result = mock.Mock(status_code=200,
+                               text=jsonutils.dumps(
+                                   {'aggregation_methods': ['count']}))
+        with mock.patch('requests.get', return_value=cap_result):
+            self.post_json('/alarms', params=json, headers=self.auth_headers)
+
+        alarms = list(self.alarm_conn.get_alarms(enabled=False))
+        self.assertEqual(1, len(alarms))
+        self._verify_alarm(json, alarms[0])
+
+    @mock.patch('ceilometer.keystone_client.get_client')
+    def test_post_gnocchi_resources_alarm_project_constraint(self, __):
+        json = {
+            'enabled': False,
+            'name': 'name_post',
+            'state': 'ok',
+            'type': 'gnocchi_resources_threshold',
+            'severity': 'critical',
+            'ok_actions': ['http://something/ok'],
+            'alarm_actions': ['http://something/alarm'],
+            'insufficient_data_actions': ['http://something/no'],
+            'repeat_actions': True,
+            'gnocchi_resources_threshold_rule': {
+                'metric': 'ameter',
+                'comparison_operator': 'le',
+                'aggregation_method': 'count',
+                'threshold': 50,
+                'evaluation_periods': 3,
+                'granularity': 180,
+                'resource_type': 'instance',
+                'resource_constraint': u'server_group=as',
+            }
+        }
+
+        cap_result = mock.Mock(status_code=201,
+                               text=jsonutils.dumps(
+                                   {'aggregation_methods': ['count']}))
+        resource_result = mock.Mock(status_code=200, text="blob")
+        with mock.patch('requests.get',
+                        side_effect=[cap_result, resource_result]):
+            self.post_json('/alarms', params=json, headers=self.auth_headers)
+
+        alarms = list(self.alarm_conn.get_alarms(enabled=False))
+        self.assertEqual(1, len(alarms))
+
+        json['gnocchi_resources_threshold_rule']['resource_constraint'] += (
+            u'\u2227project_id=%s' % self.auth_headers['X-Project-Id'])
+        self._verify_alarm(json, alarms[0])
 
 
 class TestAlarmsQuotas(v2.FunctionalTest,

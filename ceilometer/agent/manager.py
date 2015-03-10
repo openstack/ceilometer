@@ -13,10 +13,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from keystoneclient.v2_0 import client as ksclient
 from oslo_config import cfg
 
 from ceilometer.agent import base
+from ceilometer import keystone_client
 from ceilometer.openstack.common import log
 
 OPTS = [
@@ -31,8 +31,6 @@ OPTS = [
 ]
 
 cfg.CONF.register_opts(OPTS, group='polling')
-cfg.CONF.import_group('service_credentials', 'ceilometer.service')
-cfg.CONF.import_opt('http_timeout', 'ceilometer.service')
 
 LOG = log.getLogger(__name__)
 
@@ -48,17 +46,7 @@ class AgentManager(base.AgentManager):
 
     def interval_task(self, task):
         try:
-            self.keystone = ksclient.Client(
-                username=cfg.CONF.service_credentials.os_username,
-                password=cfg.CONF.service_credentials.os_password,
-                tenant_id=cfg.CONF.service_credentials.os_tenant_id,
-                tenant_name=cfg.CONF.service_credentials.os_tenant_name,
-                cacert=cfg.CONF.service_credentials.os_cacert,
-                auth_url=cfg.CONF.service_credentials.os_auth_url,
-                region_name=cfg.CONF.service_credentials.os_region_name,
-                insecure=cfg.CONF.service_credentials.insecure,
-                timeout=cfg.CONF.http_timeout,)
+            self.keystone = keystone_client.get_client()
         except Exception as e:
             self.keystone = e
-
         super(AgentManager, self).interval_task(task)
