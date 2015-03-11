@@ -248,7 +248,7 @@ class TestPostSamples(v2.FunctionalTest,
         data = self.post_json('/meters/my_counter_name/', s1,
                               headers={"X-Roles": "admin"})
 
-        self.assertEqual(200, data.status_int)
+        self.assertEqual(201, data.status_int)
         for x, s in enumerate(s1):
             # source is modified to include the project_id.
             s['source'] = '%s:%s' % (s['project_id'],
@@ -296,7 +296,7 @@ class TestPostSamples(v2.FunctionalTest,
                                      'name2': 'value2'}}]
         data = self.post_json('/meters/my_counter_name/', s1,
                               expect_errors=True)
-        self.assertEqual(200, data.status_int)
+        self.assertEqual(201, data.status_int)
         for x, s in enumerate(s1):
             # source is modified to include the project_id.
             s['source'] = '%s:%s' % (
@@ -332,7 +332,7 @@ class TestPostSamples(v2.FunctionalTest,
                                   'X-User-Id': user_id,
                               })
 
-        self.assertEqual(200, data.status_int)
+        self.assertEqual(201, data.status_int)
         for x, s in enumerate(s1):
             # source is modified to include the project_id.
             s['source'] = '%s:%s' % (project_id,
