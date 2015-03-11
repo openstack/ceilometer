@@ -25,6 +25,7 @@ import uuid
 
 from gabbi import fixture
 from oslo_config import fixture as fixture_config
+from oslo_policy import opts
 
 from ceilometer.event.storage import models
 from ceilometer.publisher import utils
@@ -48,11 +49,12 @@ class ConfigFixture(fixture.GabbiFixture):
         service.prepare_service([])
         conf = fixture_config.Config().conf
         self.conf = conf
-        conf.import_opt('policy_file', 'ceilometer.openstack.common.policy')
+        opts.set_defaults(self.conf)
         conf.import_opt('store_events', 'ceilometer.notification',
                         group='notification')
         conf.set_override('policy_file',
-                          os.path.abspath('etc/ceilometer/policy.json'))
+                          os.path.abspath('etc/ceilometer/policy.json'),
+                          group='oslo_policy')
 
         # A special pipeline is required to use the direct publisher.
         conf.set_override('pipeline_cfg_file',

@@ -17,6 +17,7 @@
 
 from oslo_config import cfg
 from oslo_config import fixture as fixture_config
+from oslo_policy import opts
 import pecan
 import pecan.testing
 
@@ -24,7 +25,6 @@ from ceilometer.tests import db as db_test_base
 
 OPT_GROUP_NAME = 'keystone_authtoken'
 cfg.CONF.import_group(OPT_GROUP_NAME, "keystonemiddleware.auth_token")
-cfg.CONF.import_opt("policy_file", "ceilometer.openstack.common.policy")
 
 
 class FunctionalTest(db_test_base.TestBase):
@@ -40,11 +40,13 @@ class FunctionalTest(db_test_base.TestBase):
         super(FunctionalTest, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
         self.setup_messaging(self.CONF)
+        opts.set_defaults(self.CONF)
 
         self.CONF.set_override("auth_version", "v2.0",
                                group=OPT_GROUP_NAME)
         self.CONF.set_override("policy_file",
-                               self.path_get('etc/ceilometer/policy.json'))
+                               self.path_get('etc/ceilometer/policy.json'),
+                               group='oslo_policy')
         self.app = self._make_app()
 
     def _make_app(self, enable_acl=False):
