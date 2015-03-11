@@ -1,0 +1,206 @@
+#
+# Copyright 2015 Cisco Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+"""Tests for ceilometer/publisher/kafka_broker.py
+"""
+import datetime
+import uuid
+
+import mock
+from oslo_utils import netutils
+
+from ceilometer.event.storage import models as event
+from ceilometer.publisher import kafka_broker as kafka_publisher
+from ceilometer import sample
+from ceilometer.tests import base as tests_base
+
+
+class TestKafkaPublisher(tests_base.BaseTestCase):
+    test_event_data = [
+        event.Event(message_id=uuid.uuid4(),
+                    event_type='event_%d' % i,
+                    generated=datetime.datetime.utcnow(),
+                    traits=[], raw={})
+        for i in range(0, 5)
+    ]
+
+    test_data = [
+        sample.Sample(
+            name='test',
+            type=sample.TYPE_CUMULATIVE,
+            unit='',
+            volume=1,
+            user_id='test',
+            project_id='test',
+            resource_id='test_run_tasks',
+            timestamp=datetime.datetime.utcnow().isoformat(),
+            resource_metadata={'name': 'TestPublish'},
+        ),
+        sample.Sample(
+            name='test',
+            type=sample.TYPE_CUMULATIVE,
+            unit='',
+            volume=1,
+            user_id='test',
+            project_id='test',
+            resource_id='test_run_tasks',
+            timestamp=datetime.datetime.utcnow().isoformat(),
+            resource_metadata={'name': 'TestPublish'},
+        ),
+        sample.Sample(
+            name='test2',
+            type=sample.TYPE_CUMULATIVE,
+            unit='',
+            volume=1,
+            user_id='test',
+            project_id='test',
+            resource_id='test_run_tasks',
+            timestamp=datetime.datetime.utcnow().isoformat(),
+            resource_metadata={'name': 'TestPublish'},
+        ),
+        sample.Sample(
+            name='test2',
+            type=sample.TYPE_CUMULATIVE,
+            unit='',
+            volume=1,
+            user_id='test',
+            project_id='test',
+            resource_id='test_run_tasks',
+            timestamp=datetime.datetime.utcnow().isoformat(),
+            resource_metadata={'name': 'TestPublish'},
+        ),
+        sample.Sample(
+            name='test3',
+            type=sample.TYPE_CUMULATIVE,
+            unit='',
+            volume=1,
+            user_id='test',
+            project_id='test',
+            resource_id='test_run_tasks',
+            timestamp=datetime.datetime.utcnow().isoformat(),
+            resource_metadata={'name': 'TestPublish'},
+        ),
+    ]
+
+    def setUp(self):
+        super(TestKafkaPublisher, self).setUp()
+
+    def _make_fake_kafka_broker(self, published):
+        def _fake_kafka_broker():
+            def record_data(msg, dest):
+                published.append((msg, dest))
+
+            kafka_broker = mock.Mock()
+            kafka_broker.send_to = record_data
+        return _fake_kafka_broker
+
+    def test_publish(self):
+        publisher = kafka_publisher.KafkaBrokerPublisher(
+            netutils.urlsplit('kafka://127.0.0.1:9092?topic=ceilometer'))
+        publisher._get_client = mock.Mock(name="_get_client")
+        publisher._get_client.return_value = mock.Mock()
+
+        with mock.patch.object(publisher, '_send') as fake_send:
+            fake_send.side_effect = mock.Mock()
+            publisher.publish_samples(mock.MagicMock(), self.test_data)
+            self.assertEqual(1, len(fake_send.mock_calls))
+            self.assertEqual(0, len(publisher.local_queue))
+
+    def test_publish_without_options(self):
+        publisher = kafka_publisher.KafkaBrokerPublisher(
+            netutils.urlsplit('kafka://127.0.0.1:9092'))
+        publisher._get_client = mock.Mock(name="_get_client")
+        publisher._get_client.return_value = mock.Mock()
+
+        with mock.patch.object(publisher, '_send') as fake_send:
+            fake_send.side_effect = mock.Mock()
+            publisher.publish_samples(mock.MagicMock(), self.test_data)
+            self.assertEqual(1, len(fake_send.mock_calls))
+            self.assertEqual(0, len(publisher.local_queue))
+
+    def test_publish_to_unreacheable_host_under_retry_policy(self):
+        publisher = kafka_publisher.KafkaBrokerPublisher(
+            netutils.urlsplit(
+                'kafka://127.0.0.1:9092?topic=ceilometer&policy=retry'))
+
+        with mock.patch.object(publisher, '_get_client') as fake_client:
+            fake_client.return_value = None
+            self.assertRaises(TypeError, publisher.publish_samples,
+                              (mock.MagicMock(), self.test_data))
+
+    def test_publish_to_unreacheable_host_under_drop_policy(self):
+        publisher = kafka_publisher.KafkaBrokerPublisher(
+            netutils.urlsplit(
+                'kafka://127.0.0.1:9092?topic=ceilometer&policy=drop'))
+
+        with mock.patch.object(publisher, '_get_client') as fake_client:
+            fake_client.return_value = None
+            publisher.publish_samples(mock.MagicMock(), self.test_data)
+            self.assertEqual(0, len(publisher.local_queue))
+
+    def test_publish_to_unreacheable_host_under_queue_policy(self):
+        publisher = kafka_publisher.KafkaBrokerPublisher(
+            netutils.urlsplit(
+                'kafka://127.0.0.1:9092?topic=ceilometer&policy=queue'))
+
+        with mock.patch.object(publisher, '_get_client') as fake_client:
+            fake_client.return_value = None
+            publisher.publish_samples(mock.MagicMock(), self.test_data)
+            self.assertEqual(1, len(publisher.local_queue))
+
+    def test_publish_to_unreachable_host_with_default_queue_size(self):
+        publisher = kafka_publisher.KafkaBrokerPublisher(
+            netutils.urlsplit(
+                'kafka://127.0.0.1:9092?topic=ceilometer&policy=queue'))
+
+        with mock.patch.object(publisher, '_get_client') as fake_client:
+            fake_client.return_value = None
+            for i in range(0, 2000):
+                for s in self.test_data:
+                    s.name = 'test-%d' % i
+                publisher.publish_samples(mock.MagicMock(),
+                                          self.test_data)
+
+            self.assertEqual(1024, len(publisher.local_queue))
+            self.assertEqual(
+                'test-976',
+                publisher.local_queue[0][0]['counter_name']
+            )
+            self.assertEqual(
+                'test-1999',
+                publisher.local_queue[1023][0]['counter_name']
+            )
+
+    def test_publish_to_host_from_down_to_up_with_local_queue(self):
+        publisher = kafka_publisher.KafkaBrokerPublisher(
+            netutils.urlsplit(
+                'kafka://127.0.0.1:9092?topic=ceilometer&policy=queue'))
+
+        with mock.patch.object(publisher, "_get_client") as fake_client:
+            fake_client.return_value = None
+            for i in range(0, 16):
+                for s in self.test_data:
+                    s.name = 'test-%d' % i
+                publisher.publish_samples(mock.MagicMock(), self.test_data)
+
+            self.assertEqual(16, len(publisher.local_queue))
+
+            fake_client.return_value = mock.Mock()
+
+            with mock.patch.object(publisher, '_send') as fake_send:
+                fake_send.return_value = mock.Mock()
+                for s in self.test_data:
+                    s.name = 'test-%d' % 16
+                publisher.publish_samples(mock.MagicMock(), self.test_data)
+                self.assertEqual(0, len(publisher.local_queue))
