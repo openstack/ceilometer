@@ -19,6 +19,7 @@
 # under the License.
 
 import ast
+import datetime
 import functools
 import inspect
 import json
@@ -129,7 +130,7 @@ class Query(Base):
     """Query filter."""
 
     # The data types supported by the query.
-    _supported_types = ['integer', 'float', 'string', 'boolean']
+    _supported_types = ['integer', 'float', 'string', 'boolean', 'datetime']
 
     # Functions to convert the data field to the correct type.
     _type_converters = {'integer': int,
@@ -213,6 +214,8 @@ class Query(Base):
                     # _type_converters to define their own types.
                     raise TypeError()
                 converted_value = self._type_converters[type](self.value)
+                if isinstance(converted_value, datetime.datetime):
+                    converted_value = timeutils.normalize_time(converted_value)
         except ValueError:
             msg = (_('Unable to convert the value %(value)s'
                      ' to the expected data type %(type)s.') %
