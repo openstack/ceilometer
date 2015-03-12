@@ -5,13 +5,13 @@
 # Translators:
 # Bruno Cornec <bruno.cornec@hp.com>, 2014
 # Frédéric <frosmont@free.fr>, 2014
-# Maxime COQUEREL <max.coquerel@gmail.com>, 2014
+# Maxime COQUEREL <max.coquerel@gmail.com>, 2014-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-11 06:10+0000\n"
-"PO-Revision-Date: 2015-02-05 16:05+0000\n"
+"POT-Creation-Date: 2015-03-12 06:06+0000\n"
+"PO-Revision-Date: 2015-03-11 21:03+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/ceilometer/"
 "language/fr/)\n"
@@ -26,30 +26,30 @@ msgstr ""
 msgid "Coordination backend started successfully."
 msgstr "Coordination avec le backend démarré avec succès."
 
-#: ceilometer/coordination.py:111
+#: ceilometer/coordination.py:126
 #, python-format
 msgid "Joined partitioning group %s"
 msgstr "Le groupe de partitionnement %s a été rejoint"
 
-#: ceilometer/coordination.py:126
+#: ceilometer/coordination.py:144
 #, python-format
 msgid "Left partitioning group %s"
-msgstr ""
+msgstr "Groupe de partitionnement Gauche %s"
 
 #: ceilometer/event/storage/impl_log.py:32
 #, python-format
 msgid "Dropping event data with TTL %d"
-msgstr ""
+msgstr "Suppression de la donnée de l’événement avec le TTL %d"
+
+#: ceilometer/event/storage/impl_sqlalchemy.py:430
+#, python-format
+msgid "%d events are removed from database"
+msgstr "Les événements %d sont supprimés de la base de donnée"
 
 #: ceilometer/openstack/common/eventlet_backdoor.py:146
 #, python-format
 msgid "Eventlet backdoor listening on %(port)s for process %(pid)d"
 msgstr "Eventlet backdoor en écoute sur le port %(port)s for process %(pid)d"
-
-#: ceilometer/openstack/common/policy.py:275
-#, python-format
-msgid "Can not find policy directory: %s"
-msgstr ""
 
 #: ceilometer/openstack/common/service.py:173
 #, python-format
@@ -96,9 +96,14 @@ msgstr "%s interceptée, arrêt de l'enfant"
 
 #: ceilometer/openstack/common/service.py:399
 msgid "Wait called after thread killed. Cleaning up."
-msgstr ""
+msgstr "Pause demandée après suppression de thread. Nettoyage."
 
 #: ceilometer/openstack/common/service.py:415
 #, python-format
 msgid "Waiting on %d children to exit"
 msgstr "En attente %d enfants pour sortie"
+
+#: ceilometer/publisher/kafka_broker.py:86
+#, python-format
+msgid "Publishing policy set to %s"
+msgstr "La politique de publication est réglé sur %s"

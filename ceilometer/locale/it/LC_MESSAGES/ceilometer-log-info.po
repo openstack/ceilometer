@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-11 06:10+0000\n"
-"PO-Revision-Date: 2015-02-05 16:05+0000\n"
+"POT-Creation-Date: 2015-03-12 06:06+0000\n"
+"PO-Revision-Date: 2015-03-11 20:49+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Italian (http://www.transifex.com/projects/p/ceilometer/"
 "language/it/)\n"
@@ -24,12 +24,12 @@ msgstr ""
 msgid "Coordination backend started successfully."
 msgstr ""
 
-#: ceilometer/coordination.py:111
+#: ceilometer/coordination.py:126
 #, python-format
 msgid "Joined partitioning group %s"
 msgstr ""
 
-#: ceilometer/coordination.py:126
+#: ceilometer/coordination.py:144
 #, python-format
 msgid "Left partitioning group %s"
 msgstr ""
@@ -39,15 +39,15 @@ msgstr ""
 msgid "Dropping event data with TTL %d"
 msgstr ""
 
+#: ceilometer/event/storage/impl_sqlalchemy.py:430
+#, python-format
+msgid "%d events are removed from database"
+msgstr ""
+
 #: ceilometer/openstack/common/eventlet_backdoor.py:146
 #, python-format
 msgid "Eventlet backdoor listening on %(port)s for process %(pid)d"
 msgstr "Ascolto di eventlet backdoor su %(port)s per il processo %(pid)d"
-
-#: ceilometer/openstack/common/policy.py:275
-#, python-format
-msgid "Can not find policy directory: %s"
-msgstr ""
 
 #: ceilometer/openstack/common/service.py:173
 #, python-format
@@ -100,3 +100,8 @@ msgstr ""
 #, python-format
 msgid "Waiting on %d children to exit"
 msgstr "In attesa %d degli elementi secondari per uscire"
+
+#: ceilometer/publisher/kafka_broker.py:86
+#, python-format
+msgid "Publishing policy set to %s"
+msgstr ""

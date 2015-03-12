@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-05 06:19+0000\n"
-"PO-Revision-Date: 2015-02-03 11:11+0000\n"
+"POT-Creation-Date: 2015-03-12 06:06+0000\n"
+"PO-Revision-Date: 2015-03-11 20:49+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/projects/p/"
 "ceilometer/language/ko_KR/)\n"
@@ -24,20 +24,20 @@ msgstr ""
 msgid "Dispatcher failed to handle the %s, requeue it."
 msgstr ""
 
-#: ceilometer/collector.py:207
+#: ceilometer/collector.py:208
 #, python-format
 msgid "Error processing event and it will be dropped: %s"
 msgstr ""
 
-#: ceilometer/coordination.py:79
+#: ceilometer/coordination.py:79 ceilometer/coordination.py:91
 msgid "Error connecting to coordination backend."
 msgstr ""
 
-#: ceilometer/coordination.py:92
+#: ceilometer/coordination.py:107
 msgid "Error sending a heartbeat to coordination backend."
 msgstr ""
 
-#: ceilometer/coordination.py:159
+#: ceilometer/coordination.py:177
 msgid "Error getting group membership info from coordination backend."
 msgstr ""
 
@@ -49,17 +49,21 @@ msgstr "고정 기간 루프 호출에서"
 msgid "in dynamic looping call"
 msgstr "동적 루프 호출에서"
 
-#: ceilometer/openstack/common/policy.py:563
-#: ceilometer/openstack/common/policy.py:843
-#, python-format
-msgid "Failed to understand rule %s"
-msgstr "%s 규칙을 이해하는데 실패했습니다"
-
-#: ceilometer/openstack/common/policy.py:573
-#, python-format
-msgid "No handler for matches of kind %s"
-msgstr "%s 유형의 일치에 대한 핸들러가 없음"
-
 #: ceilometer/openstack/common/service.py:268
 msgid "Unhandled exception"
 msgstr "처리되지 않은 예외"
+
+#: ceilometer/publisher/kafka_broker.py:95
+#: ceilometer/publisher/kafka_broker.py:177
+#, python-format
+msgid "Failed to connect to Kafka service: %s"
+msgstr ""
+
+#: ceilometer/publisher/kafka_broker.py:158
+msgid "Failed to retry to send sample data with max_retry times"
+msgstr ""
+
+#: ceilometer/publisher/kafka_broker.py:198
+#, python-format
+msgid "Failed to send sample data: %s"
+msgstr ""
