@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-05 06:19+0000\n"
-"PO-Revision-Date: 2015-02-04 08:09+0000\n"
-"Last-Translator: aji.zqfan <aji.zqfan@gmail.com>\n"
+"POT-Creation-Date: 2015-03-12 06:06+0000\n"
+"PO-Revision-Date: 2015-03-11 20:49+0000\n"
+"Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/"
 "ceilometer/language/zh_CN/)\n"
 "Language: zh_CN\n"
@@ -26,20 +26,20 @@ msgstr ""
 msgid "Dispatcher failed to handle the %s, requeue it."
 msgstr "分发器处理%s失败，重新入队"
 
-#: ceilometer/collector.py:207
+#: ceilometer/collector.py:208
 #, python-format
 msgid "Error processing event and it will be dropped: %s"
 msgstr "处理事件%s时报错，将其丢弃"
 
-#: ceilometer/coordination.py:79
+#: ceilometer/coordination.py:79 ceilometer/coordination.py:91
 msgid "Error connecting to coordination backend."
 msgstr "无法连接到协调器后端"
 
-#: ceilometer/coordination.py:92
+#: ceilometer/coordination.py:107
 msgid "Error sending a heartbeat to coordination backend."
 msgstr "无法发送心跳信息到协调器后端"
 
-#: ceilometer/coordination.py:159
+#: ceilometer/coordination.py:177
 msgid "Error getting group membership info from coordination backend."
 msgstr "从协调器后端获取组成员信息时出错"
 
@@ -51,17 +51,21 @@ msgstr "在固定时段内循环调用"
 msgid "in dynamic looping call"
 msgstr "在动态循环调用中"
 
-#: ceilometer/openstack/common/policy.py:563
-#: ceilometer/openstack/common/policy.py:843
-#, python-format
-msgid "Failed to understand rule %s"
-msgstr "未能理解规则 %s"
-
-#: ceilometer/openstack/common/policy.py:573
-#, python-format
-msgid "No handler for matches of kind %s"
-msgstr "对于类型为 %s 的匹配项，不存在任何处理程序"
-
 #: ceilometer/openstack/common/service.py:268
 msgid "Unhandled exception"
 msgstr "存在未处理的异常"
+
+#: ceilometer/publisher/kafka_broker.py:95
+#: ceilometer/publisher/kafka_broker.py:177
+#, python-format
+msgid "Failed to connect to Kafka service: %s"
+msgstr ""
+
+#: ceilometer/publisher/kafka_broker.py:158
+msgid "Failed to retry to send sample data with max_retry times"
+msgstr ""
+
+#: ceilometer/publisher/kafka_broker.py:198
+#, python-format
+msgid "Failed to send sample data: %s"
+msgstr ""

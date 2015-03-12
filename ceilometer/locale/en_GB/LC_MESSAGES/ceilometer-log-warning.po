@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-05 06:19+0000\n"
-"PO-Revision-Date: 2015-02-02 11:04+0000\n"
+"POT-Creation-Date: 2015-03-12 06:06+0000\n"
+"PO-Revision-Date: 2015-03-11 21:03+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: English (United Kingdom) (http://www.transifex.com/projects/p/"
 "ceilometer/language/en_GB/)\n"
@@ -19,6 +19,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ceilometer/notification.py:154
+msgid ""
+"Non-metric meters may be collected. It is highly advisable to disable these "
+"meters using ceilometer.conf or the pipeline.yaml"
+msgstr ""
 
 #: ceilometer/agent/discovery/endpoint.py:42
 #, python-format
@@ -30,7 +36,14 @@ msgstr "No endpoints found for service %s"
 msgid "Expecting %(expected)d datapoints but only get %(actual)d"
 msgstr ""
 
-#: ceilometer/compute/pollsters/disk.py:123
+#: ceilometer/api/app.py:84
+msgid ""
+"pecan_debug cannot be enabled, if workers is > 1, the value is overrided "
+"with False"
+msgstr ""
+
+#: ceilometer/compute/pollsters/disk.py:133
+#: ceilometer/compute/pollsters/disk.py:701
 #: ceilometer/compute/pollsters/memory.py:49
 #: ceilometer/compute/pollsters/net.py:108
 #, python-format
@@ -55,3 +68,19 @@ msgstr ""
 #, python-format
 msgid "pid %d not in child list"
 msgstr "pid %d not in child list"
+
+#: ceilometer/publisher/kafka_broker.py:88
+#, python-format
+msgid "Publishing policy is unknown (%s) force to default"
+msgstr "Publishing policy is unknown (%s) force to default"
+
+#: ceilometer/publisher/kafka_broker.py:149
+#, python-format
+msgid "Failed to publish %d datum"
+msgstr ""
+
+#: ceilometer/publisher/kafka_broker.py:170
+#, python-format
+msgid ""
+"Kafka Publisher max local queue length is exceeded, dropping %d oldest data"
+msgstr ""

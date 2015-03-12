@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-11 06:10+0000\n"
-"PO-Revision-Date: 2015-02-09 06:33+0000\n"
-"Last-Translator: aji.zqfan <aji.zqfan@gmail.com>\n"
+"POT-Creation-Date: 2015-03-12 06:06+0000\n"
+"PO-Revision-Date: 2015-03-11 21:03+0000\n"
+"Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/"
 "ceilometer/language/zh_CN/)\n"
 "Language: zh_CN\n"
@@ -25,12 +25,12 @@ msgstr ""
 msgid "Coordination backend started successfully."
 msgstr "协调器后台启动成功"
 
-#: ceilometer/coordination.py:111
+#: ceilometer/coordination.py:126
 #, python-format
 msgid "Joined partitioning group %s"
 msgstr "已加入分组%s"
 
-#: ceilometer/coordination.py:126
+#: ceilometer/coordination.py:144
 #, python-format
 msgid "Left partitioning group %s"
 msgstr "已离开分组%s"
@@ -40,15 +40,15 @@ msgstr "已离开分组%s"
 msgid "Dropping event data with TTL %d"
 msgstr "正在根据TTL: %d丢弃事件数据"
 
+#: ceilometer/event/storage/impl_sqlalchemy.py:430
+#, python-format
+msgid "%d events are removed from database"
+msgstr ""
+
 #: ceilometer/openstack/common/eventlet_backdoor.py:146
 #, python-format
 msgid "Eventlet backdoor listening on %(port)s for process %(pid)d"
 msgstr "Eventlet为进程 %(pid)d 在后台监听 %(port)s "
-
-#: ceilometer/openstack/common/policy.py:275
-#, python-format
-msgid "Can not find policy directory: %s"
-msgstr "无法找到策略目录:%s"
 
 #: ceilometer/openstack/common/service.py:173
 #, python-format
@@ -101,3 +101,8 @@ msgstr "线程结束，正在清理"
 #, python-format
 msgid "Waiting on %d children to exit"
 msgstr "正在等待 %d 个子线程退出"
+
+#: ceilometer/publisher/kafka_broker.py:86
+#, python-format
+msgid "Publishing policy set to %s"
+msgstr "设置发布策略为%s"
