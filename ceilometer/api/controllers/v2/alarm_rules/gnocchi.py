@@ -16,7 +16,6 @@
 from oslo_config import cfg
 from oslo_serialization import jsonutils
 import requests
-import uuid
 import wsme
 from wsme import types as wtypes
 
@@ -80,12 +79,12 @@ class AlarmGnocchiThresholdRule(base.AlarmRule):
         return jsonutils.loads(r.text).get('aggregation_methods', [])
 
 
-class AlarmGnocchiMetricOfResourcesThresholdRule(AlarmGnocchiThresholdRule):
+class MetricOfResourceRule(AlarmGnocchiThresholdRule):
     metric = wsme.wsattr(wtypes.text, mandatory=True)
     "The name of the metric"
 
-    resource_constraint = wsme.wsattr(wtypes.text, mandatory=True)
-    "The id of a resource or a expression to select multiple resources"
+    resource_id = wsme.wsattr(wtypes.text, mandatory=True)
+    "The id of a resource"
 
     resource_type = wsme.wsattr(wtypes.text, mandatory=True)
     "The resource type"
@@ -95,46 +94,95 @@ class AlarmGnocchiMetricOfResourcesThresholdRule(AlarmGnocchiThresholdRule):
                                        'threshold', 'aggregation_method',
                                        'evaluation_periods',
                                        'metric',
-                                       'resource_constraint',
+                                       'resource_id',
                                        'resource_type'])
         return rule
 
     @classmethod
     def validate_alarm(cls, alarm):
-        super(AlarmGnocchiMetricOfResourcesThresholdRule,
+        super(MetricOfResourceRule,
               cls).validate_alarm(alarm)
 
         rule = alarm.gnocchi_resources_threshold_rule
+        ks_client = keystone_client.get_client()
+        gnocchi_url = cfg.CONF.alarms.gnocchi_url
+        headers = {'Content-Type': "application/json",
+                   'X-Auth-Token': ks_client.auth_token}
         try:
-            uuid.UUID(rule.resource_constraint)
-        except Exception:
-            auth_project = v2_utils.get_auth_project(alarm.project_id)
-            if auth_project:
-                # NOTE(sileht): when we have more complex query allowed
-                # this should be enhanced to ensure the constraint are still
-                # scoped to auth_project
-                rule.resource_constraint += (
-                    u'\u2227project_id=%s' % auth_project)
-        else:
-            ks_client = keystone_client.get_client()
-            gnocchi_url = cfg.CONF.alarms.gnocchi_url
-            headers = {'Content-Type': "application/json",
-                       'X-Auth-Token': ks_client.auth_token}
-            try:
-                r = requests.get("%s/v1/resource/%s/%s" % (
-                    gnocchi_url, rule.resource_type,
-                    rule.resource_constraint),
-                    headers=headers)
-            except requests.ConnectionError as e:
-                raise GnocchiUnavailable(e)
-            if r.status_code == 404:
-                raise base.EntityNotFound('gnocchi resource',
-                                          rule.resource_constraint)
-            elif r.status_code // 200 != 1:
-                raise base.ClientSideError(r.body, status_code=r.status_code)
+            r = requests.get("%s/v1/resource/%s/%s" % (
+                gnocchi_url, rule.resource_type,
+                rule.resource_id),
+                headers=headers)
+        except requests.ConnectionError as e:
+            raise GnocchiUnavailable(e)
+        if r.status_code == 404:
+            raise base.EntityNotFound('gnocchi resource',
+                                      rule.resource_id)
+        elif r.status_code // 200 != 1:
+            raise base.ClientSideError(r.content, status_code=r.status_code)
 
 
-class AlarmGnocchiMetricsThresholdRule(AlarmGnocchiThresholdRule):
+class AggregationMetricByResourcesLookupRule(AlarmGnocchiThresholdRule):
+    metric = wsme.wsattr(wtypes.text, mandatory=True)
+    "The name of the metric"
+
+    query = wsme.wsattr(wtypes.text, mandatory=True)
+    "The query to filter the metric"
+
+    resource_type = wsme.wsattr(wtypes.text, mandatory=True)
+    "The resource type"
+
+    def as_dict(self):
+        rule = self.as_dict_from_keys(['granularity', 'comparison_operator',
+                                       'threshold', 'aggregation_method',
+                                       'evaluation_periods',
+                                       'metric',
+                                       'query',
+                                       'resource_type'])
+        return rule
+
+    @classmethod
+    def validate_alarm(cls, alarm):
+        super(AggregationMetricByResourcesLookupRule,
+              cls).validate_alarm(alarm)
+
+        rule = alarm.gnocchi_aggregation_by_resources_threshold_rule
+
+        # check the query string is a valid json
+        try:
+            query = jsonutils.loads(rule.query)
+        except ValueError:
+            raise wsme.exc.InvalidInput('rule/query', rule.query)
+
+        # Scope the alarm to the project id if needed
+        auth_project = v2_utils.get_auth_project(alarm.project_id)
+        if auth_project:
+            rule.query = jsonutils.dumps({
+                "and": [{"=": {"created_by_project_id": auth_project}},
+                        query]})
+
+        # Delegate the query validation to gnocchi
+        ks_client = keystone_client.get_client()
+        request = {
+            'url': "%s/v1/aggregation/resource/%s/metric/%s/measures" % (
+                cfg.CONF.alarms.gnocchi_url,
+                rule.resource_type,
+                rule.metric),
+            'headers': {'Content-Type': "application/json",
+                        'X-Auth-Token': ks_client.auth_token},
+            'params': {'aggregation': rule.aggregation_method},
+            'data': rule.query,
+        }
+
+        try:
+            r = requests.post(**request)
+        except requests.ConnectionError as e:
+            raise GnocchiUnavailable(e)
+        if r.status_code // 200 != 1:
+            raise base.ClientSideError(r.content, status_code=r.status_code)
+
+
+class AggregationMetricsByIdLookupRule(AlarmGnocchiThresholdRule):
     metrics = wsme.wsattr([wtypes.text], mandatory=True)
     "A list of metric Ids"
 
