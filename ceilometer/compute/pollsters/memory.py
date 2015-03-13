@@ -16,7 +16,7 @@ import ceilometer
 from ceilometer.compute import pollsters
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
-from ceilometer.i18n import _, _LW
+from ceilometer.i18n import _, _LW, _LE
 from ceilometer.openstack.common import log
 from ceilometer import sample
 
@@ -63,3 +63,46 @@ class MemoryUsagePollster(pollsters.BaseComputePollster):
                 LOG.exception(_('Could not get Memory Usage for '
                                 '%(id)s: %(e)s'), {'id': instance.id,
                                                    'e': err})
+
+
+class MemoryResidentPollster(pollsters.BaseComputePollster):
+
+    def get_samples(self, manager, cache, resources):
+        self._inspection_duration = self._record_poll_time()
+        for instance in resources:
+            LOG.debug(_('Checking resident memory for instance %s'),
+                      instance.id)
+            try:
+                memory_info = self.inspector.inspect_memory_resident(
+                    instance, self._inspection_duration)
+                LOG.debug(_("RESIDENT MEMORY: %(instance)s %(resident)f"),
+                          ({'instance': instance.__dict__,
+                            'resident': memory_info.resident}))
+                yield util.make_sample_from_instance(
+                    instance,
+                    name='memory.resident',
+                    type=sample.TYPE_GAUGE,
+                    unit='MB',
+                    volume=memory_info.resident,
+                )
+            except virt_inspector.InstanceNotFoundException as err:
+                # Instance was deleted while getting samples. Ignore it.
+                LOG.debug(_('Exception while getting samples %s'), err)
+            except virt_inspector.InstanceShutOffException as e:
+                LOG.warn(_LW('Instance %(instance_id)s was shut off while '
+                             'getting samples of %(pollster)s: %(exc)s'),
+                         {'instance_id': instance.id,
+                          'pollster': self.__class__.__name__, 'exc': e})
+            except virt_inspector.NoDataException as e:
+                LOG.warn(_LW('Cannot inspect data of %(pollster)s for '
+                             '%(instance_id)s, non-fatal reason: %(exc)s'),
+                         {'pollster': self.__class__.__name__,
+                          'instance_id': instance.id, 'exc': e})
+            except ceilometer.NotImplementedError:
+                # Selected inspector does not implement this pollster.
+                LOG.debug(_('Obtaining Resident Memory is not implemented'
+                            ' for %s'), self.inspector.__class__.__name__)
+            except Exception as err:
+                LOG.exception(_LE('Could not get Resident Memory Usage for '
+                                  '%(id)s: %(e)s'), {'id': instance.id,
+                                                     'e': err})
