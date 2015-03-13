@@ -211,3 +211,33 @@ class BinApiTestCase(base.BaseTestCase):
         response, content = self.get_response('v2/meters')
         self.assertEqual(200, response.status)
         self.assertEqual([], json.loads(content))
+
+
+class BinCeilometerPollingServiceTestCase(base.BaseTestCase):
+    def setUp(self):
+        super(BinCeilometerPollingServiceTestCase, self).setUp()
+        content = ("[DEFAULT]\n"
+                   "rpc_backend=fake\n"
+                   "[database]\n"
+                   "connection=log://localhost\n")
+        self.tempfile = fileutils.write_to_tempfile(content=content,
+                                                    prefix='ceilometer',
+                                                    suffix='.conf')
+        self.subp = None
+
+    def tearDown(self):
+        super(BinCeilometerPollingServiceTestCase, self).tearDown()
+        if self.subp:
+            self.subp.kill()
+        os.remove(self.tempfile)
+
+    def test_starting_with_duplication_namespaces(self):
+        self.subp = subprocess.Popen(['ceilometer-polling',
+                                      "--config-file=%s" % self.tempfile,
+                                      "--polling-namespaces",
+                                      "compute",
+                                      "compute"],
+                                     stderr=subprocess.PIPE)
+        out = self.subp.stderr.read(1024)
+        self.assertIn('Duplicated values: [\'compute\', \'compute\'] '
+                      'found in CLI options, auto de-duplidated', out)
