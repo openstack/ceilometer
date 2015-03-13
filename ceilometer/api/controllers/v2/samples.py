@@ -45,7 +45,7 @@ class Sample(base.Base):
     "The meter name this sample is for."
 
     type = wtypes.Enum(str, *sample.TYPES)
-    "The meter type (see :ref:`measurements`)"
+    "The meter type (see :ref:`meter_types`)"
 
     unit = wtypes.text
     "The unit of measure."

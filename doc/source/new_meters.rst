@@ -24,6 +24,7 @@ from other external components. If you would like to add new meters to the
 currently existing ones, you need to follow the guidelines given in this
 section.
 
+.. _meter_types:
 
 Types
 =====
