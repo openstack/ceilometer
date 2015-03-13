@@ -231,3 +231,134 @@
       fields: payload.target.metadata.object
     observer_id:
       fields: payload.observer.id
+- event_type: magnetodb.table.*
+  traits: &kv_store
+    resource_id:
+      fields: payload.table_uuid
+    user_id:
+      fields: _context_user_id
+    project_id:
+      fields: _context_tenant
+- event_type: ['network.*', 'subnet.*', 'port.*', 'router.*', 'floatingip.*', 'pool.*', 'vip.*', 'member.*', 'health_monitor.*', 'firewall.*', 'firewall_policy.*', 'firewall_rule.*', 'vpnservice.*', 'ipsecpolicy.*', 'ikepolicy.*', 'ipsec_site_connection.*']
+  traits: &network_traits
+    user_id:
+      fields: _context_user_id
+    project_id:
+      fields: _context_tenant_id
+- event_type: network.*
+  traits:
+    <<: *network_traits
+    resource_id:
+      fields: ['payload.network.id', 'payload.id']
+- event_type: subnet.*
+  traits:
+    <<: *network_traits
+    resource_id:
+      fields: ['payload.subnet.id', 'payload.id']
+- event_type: port.*
+  traits:
+    <<: *network_traits
+    resource_id:
+      fields: ['payload.port.id', 'payload.id']
+- event_type: router.*
+  traits:
+    <<: *network_traits
+    resource_id:
+      fields: ['payload.router.id', 'payload.id']
+- event_type: floatingip.*
+  traits:
+    <<: *network_traits
+    resource_id:
+      fields: ['payload.floatingip.id', 'payload.id']
+- event_type: pool.*
+  traits:
+    <<: *network_traits
+    resource_id:
+      fields: ['payload.pool.id', 'payload.id']
+- event_type: vip.*
+  traits:
+    <<: *network_traits
+    resource_id:
+      fields: ['payload.vip.id', 'payload.id']
+- event_type: member.*
+  traits:
+    <<: *network_traits
+    resource_id:
+      fields: ['payload.member.id', 'payload.id']
+- event_type: health_monitor.*
+  traits:
+    <<: *network_traits
+    resource_id:
+      fields: ['payload.health_monitor.id', 'payload.id']
+- event_type: firewall.*
+  traits:
+    <<: *network_traits
+    resource_id:
+      fields: ['payload.firewall.id', 'payload.id']
+- event_type: firewall_policy.*
+  traits:
+    <<: *network_traits
+    resource_id:
+      fields: ['payload.firewall_policy.id', 'payload.id']
+- event_type: firewall_rule.*
+  traits:
+    <<: *network_traits
+    resource_id:
+      fields: ['payload.firewall_rule.id', 'payload.id']
+- event_type: vpnservice.*
+  traits:
+    <<: *network_traits
+    resource_id:
+      fields: ['payload.vpnservice.id', 'payload.id']
+- event_type: ipsecpolicy.*
+  traits:
+    <<: *network_traits
+    resource_id:
+      fields: ['payload.ipsecpolicy.id', 'payload.id']
+- event_type: ikepolicy.*
+  traits:
+    <<: *network_traits
+    resource_id:
+      fields: ['payload.ikepolicy.id', 'payload.id']
+- event_type: ipsec_site_connection.*
+  traits:
+    <<: *network_traits
+    resource_id:
+      fields: ['payload.ipsec_site_connection.id', 'payload.id']
+- event_type: '*http.*'
+  traits: &http_audit
+    typeURI:
+      fields: payload.typeURI
+    eventType:
+      fields: payload.eventType
+    action:
+      fields: payload.action
+    outcome:
+      fields: payload.outcome
+    id:
+      fields: payload.id
+    eventTime:
+      fields: payload.eventTime
+    requestPath:
+      fields: payload.requestPath
+    observer_id:
+      fields: payload.observer.id
+    target_id:
+      fields: payload.target.id
+    target_typeURI:
+      fields: payload.target.typeURI
+    target_name:
+      fields: payload.target.name
+    initiator_typeURI:
+      fields: payload.initiator.typeURI
+    initiator_id:
+      fields: payload.initiator.id
+    initiator_name:
+      fields: payload.initiator.name
+    initiator_host_address:
+      fields: payload.initiator.host.address
+- event_type: '*http.response'
+  traits:
+    <<: *http_audit
+    reason_code:
+      fields: payload.reason.reasonCode
