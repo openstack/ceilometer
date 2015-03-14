@@ -22,6 +22,7 @@ import mock
 from oslo_utils import timeutils
 from oslotest import mockpatch
 
+from ceilometer import pipeline
 from ceilometer.tests.api import v2
 from ceilometer.tests import db as tests_db
 
@@ -40,6 +41,25 @@ class TestPostSamples(v2.FunctionalTest,
         self.useFixture(mockpatch.Patch('oslo.messaging.Notifier',
                                         return_value=notifier))
         super(TestPostSamples, self).setUp()
+
+    @mock.patch.object(pipeline.SampleSource, "support_meter")
+    def test_post_not_supported_sample(self, mocked):
+        mocked.return_value = False
+        s = [{'counter_name': 'apples',
+              'counter_type': 'gauge',
+              'counter_unit': 'instance',
+              'counter_volume': 1,
+              'resource_id': 'bd9431c1-8d69-4ad3-803a-8d4a6b89fd36',
+              'project_id': '35b17138-b364-4e6a-a131-8f3099c5be68',
+              'user_id': 'efd87807-12d2-4b38-9c70-5f5c2ac427ff',
+              'resource_metadata': {'name1': 'value1',
+                                    'name2': 'value2'}}]
+        resp = self.post_json('/meters/apples/', s, expect_errors=True)
+        self.assertEqual(409, resp.status_code)
+        expected_msg = ("The metric apples is not supported by metering "
+                        "pipeline configuration.")
+        self.assertEqual(expected_msg,
+                         resp.json['error_message']['faultstring'])
 
     def test_one(self):
         s1 = [{'counter_name': 'apples',
