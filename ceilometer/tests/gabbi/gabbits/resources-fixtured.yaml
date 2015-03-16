@@ -1,0 +1,57 @@
+#
+# Explore and cover resources API with gabbi tests when there are a
+# small number of pre-existing resources
+#
+
+fixtures:
+    - ConfigFixture
+    - SampleDataFixture
+
+tests:
+
+    - name: list all resources
+      url: /v2/resources
+      response_json_paths:
+          $[0].user_id: farmerjon
+          $[0].links[1].rel: livestock
+
+    - name: get one resource
+      desc: get a resource via the links in the first resource listed above
+      url: $RESPONSE['$[0].links[0].href']
+      response_json_paths:
+          $.resource_id: $RESPONSE['$[0].resource_id']
+
+    - name: list resources limit user_id
+      url: /v2/resources?q.field=user_id&q.value=farmerjon
+      response_json_paths:
+          $[0].user_id: farmerjon
+          $[0].links[1].rel: livestock
+
+    - name: list resources limit metadata
+      url: /v2/resources?q.field=metadata.breed&q.value=sheep
+      response_json_paths:
+          $[0].user_id: farmerjon
+          $[0].links[1].rel: livestock
+
+    - name: list resources limit metadata no match
+      url: /v2/resources?q.field=metadata.breed&q.value=llamma
+      response_strings:
+          - "[]"
+
+    - name: fail to get one resource
+      url: /v2/resources/nosirnothere
+      status: 404
+
+    - name: list resource meter links present
+      url: /v2/resources?meter_links=1
+      response_json_paths:
+          $[0].links[0].rel: self
+          $[0].links[1].rel: livestock
+          $[0].links[-1].rel: livestock
+
+    - name: list resource meter links not present
+      url: /v2/resources?meter_links=0
+      desc: there is only one links entry when meter_links is 0
+      response_json_paths:
+          $[0].links[0].rel: self
+          $[0].links[-1].rel: self
