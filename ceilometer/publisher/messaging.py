@@ -200,8 +200,10 @@ class RPCPublisher(MessagingPublisher):
 
 
 class NotifierPublisher(MessagingPublisher):
-    def __init__(self, parsed_url, topic):
+    def __init__(self, parsed_url, default_topic):
         super(NotifierPublisher, self).__init__(parsed_url)
+        options = urlparse.parse_qs(parsed_url.query)
+        topic = options.get('topic', [default_topic])[-1]
         self.notifier = oslo.messaging.Notifier(
             messaging.get_transport(),
             driver=cfg.CONF.publisher_notifier.telemetry_driver,
