@@ -212,3 +212,8 @@ class LibvirtInspector(virt_inspector.Inspector):
                                            physical=block_info[2])
 
             yield (disk, info)
+
+    def inspect_memory_resident(self, instance, duration=None):
+        domain = self._get_domain_not_shut_off_or_raise(instance)
+        memory = domain.memoryStats()['rss'] / units.Ki
+        return virt_inspector.MemoryResidentStats(resident=memory)

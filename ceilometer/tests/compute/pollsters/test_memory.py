@@ -64,3 +64,51 @@ class TestMemoryPollster(base.TestPollsterBase):
         _verify_memory_metering(1, 2.0)
         _verify_memory_metering(0, 0)
         _verify_memory_metering(0, 0)
+
+
+class TestResidentMemoryPollster(base.TestPollsterBase):
+
+    def setUp(self):
+        super(TestResidentMemoryPollster, self).setUp()
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def test_get_samples(self):
+        next_value = iter((
+            virt_inspector.MemoryResidentStats(resident=1.0),
+            virt_inspector.MemoryResidentStats(resident=2.0),
+            virt_inspector.NoDataException(),
+            virt_inspector.InstanceShutOffException(),
+        ))
+
+        def inspect_memory_resident(instance, duration):
+            value = next(next_value)
+            if isinstance(value, virt_inspector.MemoryResidentStats):
+                return value
+            else:
+                raise value
+
+        self.inspector.inspect_memory_resident = mock.Mock(
+            side_effect=inspect_memory_resident)
+
+        mgr = manager.AgentManager()
+        pollster = memory.MemoryResidentPollster()
+
+        @mock.patch('ceilometer.compute.pollsters.memory.LOG')
+        def _verify_resident_memory_metering(expected_count,
+                                             expected_resident_memory_mb,
+                                             mylog):
+            samples = list(pollster.get_samples(mgr, {}, [self.instance]))
+            self.assertEqual(expected_count, len(samples))
+            if expected_count > 0:
+                self.assertEqual(set(['memory.resident']),
+                                 set([s.name for s in samples]))
+                self.assertEqual(expected_resident_memory_mb,
+                                 samples[0].volume)
+            else:
+                self.assertEqual(1, mylog.warn.call_count)
+            self.assertEqual(0, mylog.exception.call_count)
+
+        _verify_resident_memory_metering(1, 1.0)
+        _verify_resident_memory_metering(1, 2.0)
+        _verify_resident_memory_metering(0, 0)
+        _verify_resident_memory_metering(0, 0)

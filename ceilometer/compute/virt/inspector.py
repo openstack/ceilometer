@@ -63,6 +63,14 @@ CPUUtilStats = collections.namedtuple('CPUUtilStats', ['util'])
 MemoryUsageStats = collections.namedtuple('MemoryUsageStats', ['usage'])
 
 
+# Named tuple representing Resident Memory usage statistics.
+#
+# resident: Amount of resident memory
+#
+MemoryResidentStats = collections.namedtuple('MemoryResidentStats',
+                                             ['resident'])
+
+
 # Named tuple representing vNICs.
 #
 # name: the name of the vNIC
