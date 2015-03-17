@@ -22,7 +22,6 @@
 from oslo.config import cfg
 import oslo.messaging
 
-from ceilometer.openstack.common.gettextutils import _
 from ceilometer.openstack.common import log
 from ceilometer import plugin
 from ceilometer import sample
@@ -74,7 +73,6 @@ class NetworkNotificationBase(plugin.NotificationBase):
                 for topic in conf.notification_topics]
 
     def process_notification(self, message):
-        LOG.info(_('network notification %r') % message)
         counter_name = getattr(self, 'counter_name', self.resource_name)
         unit_value = getattr(self, 'unit', self.resource_name)
 
