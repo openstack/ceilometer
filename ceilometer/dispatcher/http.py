@@ -27,16 +27,16 @@ LOG = log.getLogger(__name__)
 http_dispatcher_opts = [
     cfg.StrOpt('target',
                default='',
-               help='The target where the http request will be sent to. '
+               help='The target where the http request will be sent. '
                     'If this is not set, no data will be posted. For '
                     'example: target = http://hostname:1234/path'),
     cfg.BoolOpt('cadf_only',
                 default=False,
-                help='The flag which indicates if only cadf message should '
+                help='The flag that indicates if only cadf message should '
                      'be posted. If false, all meters will be posted.'),
     cfg.IntOpt('timeout',
                default=5,
-               help='The max time in second to wait for a request to '
+               help='The max time in seconds to wait for a request to '
                     'timeout.'),
 ]
 
@@ -47,11 +47,12 @@ class HttpDispatcher(dispatcher.Base):
     """Dispatcher class for posting metering data into a http target.
 
     To enable this dispatcher, the following option needs to be present in
-    ceilometer.conf file
+    ceilometer.conf file::
 
         dispatchers = http
 
-    Dispatcher specific options can be added as follows:
+    Dispatcher specific options can be added as follows::
+
         [dispatcher_http]
         target = www.example.com
         cadf_only = true
