@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-12 06:06+0000\n"
-"PO-Revision-Date: 2015-03-11 21:03+0000\n"
+"POT-Creation-Date: 2015-03-18 06:10+0000\n"
+"PO-Revision-Date: 2015-03-17 20:34+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: English (United Kingdom) "
 "(http://www.transifex.com/projects/p/ceilometer/language/en_GB/)\n"
@@ -780,6 +780,7 @@ msgstr "CPUTIME USAGE: %(instance)s %(time)d"
 #: ceilometer/compute/pollsters/disk.py:604
 #: ceilometer/compute/pollsters/disk.py:699
 #: ceilometer/compute/pollsters/memory.py:47
+#: ceilometer/compute/pollsters/memory.py:90
 #: ceilometer/compute/pollsters/net.py:106
 #, python-format
 msgid "Exception while getting samples %s"
@@ -863,12 +864,27 @@ msgstr "Obtaining Memory Usage is not implemented for %s"
 msgid "Could not get Memory Usage for %(id)s: %(e)s"
 msgstr "Could not get Memory Usage for %(id)s: %(e)s"
 
+#: ceilometer/compute/pollsters/memory.py:73
+#, python-format
+msgid "Checking resident memory for instance %s"
+msgstr ""
+
+#: ceilometer/compute/pollsters/memory.py:78
+#, python-format
+msgid "RESIDENT MEMORY: %(instance)s %(resident)f"
+msgstr ""
+
+#: ceilometer/compute/pollsters/memory.py:103
+#, python-format
+msgid "Obtaining Resident Memory is not implemented for %s"
+msgstr ""
+
 #: ceilometer/compute/pollsters/net.py:92
 #, python-format
 msgid "checking net info for instance %s"
 msgstr "checking net info for instance %s"
 
-#: ceilometer/compute/virt/inspector.py:282
+#: ceilometer/compute/virt/inspector.py:290
 #, python-format
 msgid "Unable to load the hypervisor inspector: %s"
 msgstr "Unable to load the hypervisor inspector: %s"

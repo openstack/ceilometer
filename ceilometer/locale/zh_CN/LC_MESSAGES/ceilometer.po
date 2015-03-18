@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-12 06:06+0000\n"
-"PO-Revision-Date: 2015-03-11 21:03+0000\n"
-"Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
+"POT-Creation-Date: 2015-03-18 06:10+0000\n"
+"PO-Revision-Date: 2015-03-18 03:44+0000\n"
+"Last-Translator: aji.zqfan <aji.zqfan@gmail.com>\n"
 "Language-Team: Chinese (China) "
 "(http://www.transifex.com/projects/p/ceilometer/language/zh_CN/)\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -149,12 +149,12 @@ msgstr "遇到错误%(name)s：%(error)s，继续执行"
 #: ceilometer/agent/base.py:244
 #, python-format
 msgid "Skip loading extension for %s"
-msgstr ""
+msgstr "跳过为%s加载扩展"
 
 #: ceilometer/agent/base.py:248
 #, python-format
 msgid "Failed to import extension for %(name)s: %(error)s"
-msgstr ""
+msgstr "无法为%(name)s引入扩展：%(error)s"
 
 #: ceilometer/agent/base.py:357
 #, python-format
@@ -286,7 +286,7 @@ msgstr "警报统计信息获取失败"
 #: ceilometer/alarm/evaluator/gnocchi.py:106
 #, python-format
 msgid "alarm stats retrieval failed: %s"
-msgstr ""
+msgstr "告警状态检索失败：%s"
 
 #: ceilometer/alarm/evaluator/gnocchi.py:121
 #: ceilometer/alarm/evaluator/threshold.py:56
@@ -466,7 +466,7 @@ msgstr ""
 #: ceilometer/alarm/partition/coordination.py:298
 #, python-format
 msgid "%s has no assigned alarms to evaluate"
-msgstr ""
+msgstr "%s没有被指派告警以供评估"
 
 #: ceilometer/alarm/partition/coordination.py:302
 #, python-format
@@ -766,6 +766,7 @@ msgstr "虚拟机%(instance)s的CPU时间为%(time)d"
 #: ceilometer/compute/pollsters/disk.py:604
 #: ceilometer/compute/pollsters/disk.py:699
 #: ceilometer/compute/pollsters/memory.py:47
+#: ceilometer/compute/pollsters/memory.py:90
 #: ceilometer/compute/pollsters/net.py:106
 #, python-format
 msgid "Exception while getting samples %s"
@@ -827,7 +828,7 @@ msgstr "%(inspector)s无法为采集器%(pollster)s提供数据"
 #: ceilometer/compute/pollsters/disk.py:713
 #, python-format
 msgid "Ignoring instance %(name)s (%(instance_id)s) : %(error)s"
-msgstr ""
+msgstr "忽略虚拟机%(name)s (%(instance_id)s) : %(error)s"
 
 #: ceilometer/compute/pollsters/memory.py:31
 #, python-format
@@ -849,12 +850,27 @@ msgstr "获取内存使用信息尚未在%s中实现"
 msgid "Could not get Memory Usage for %(id)s: %(e)s"
 msgstr "无法为%(id)s获取内存使用信息：%(e)s"
 
+#: ceilometer/compute/pollsters/memory.py:73
+#, python-format
+msgid "Checking resident memory for instance %s"
+msgstr "正在检查虚拟机%s的常驻内存RSS"
+
+#: ceilometer/compute/pollsters/memory.py:78
+#, python-format
+msgid "RESIDENT MEMORY: %(instance)s %(resident)f"
+msgstr ""
+
+#: ceilometer/compute/pollsters/memory.py:103
+#, python-format
+msgid "Obtaining Resident Memory is not implemented for %s"
+msgstr ""
+
 #: ceilometer/compute/pollsters/net.py:92
 #, python-format
 msgid "checking net info for instance %s"
 msgstr "为虚拟机%s检查网络信息"
 
-#: ceilometer/compute/virt/inspector.py:282
+#: ceilometer/compute/virt/inspector.py:290
 #, python-format
 msgid "Unable to load the hypervisor inspector: %s"
 msgstr "无法加载管理程序的探测器：%s"
@@ -1120,17 +1136,17 @@ msgstr "运行ipmitool时失败了"
 #: ceilometer/ipmi/pollsters/node.py:66
 #, python-format
 msgid "Polling %(name)s faild for %(cnt)s times!"
-msgstr ""
+msgstr "拉取%(name)s失败了%(cnt)s次！"
 
 #: ceilometer/ipmi/pollsters/node.py:71 ceilometer/ipmi/pollsters/sensor.py:74
 #, python-format
 msgid "Pollster for %s is disabled!"
-msgstr ""
+msgstr "%s的采集器被禁用"
 
 #: ceilometer/ipmi/pollsters/sensor.py:68
 #, python-format
 msgid "Polling %(mtr)s sensor failed for %(cnt)s times!"
-msgstr ""
+msgstr "拉取%(mtr)s传感器失败了%(cnt)s次！"
 
 #: ceilometer/network/floatingip.py:54
 #, python-format
@@ -1189,12 +1205,12 @@ msgstr "请求无法连接到OpenDaylight的北向REST接口"
 
 #: ceilometer/objectstore/rgw.py:80
 msgid "Radosgw endpoint not found"
-msgstr ""
+msgstr "Radosgw服务入口未找到"
 
 #: ceilometer/objectstore/rgw_client.py:48
 #, python-format
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
-msgstr ""
+msgstr "RGW AdminOps接口返回%(status)s %(reason)s"
 
 #: ceilometer/objectstore/swift.py:76
 msgid "Swift endpoint not found"
