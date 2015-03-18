@@ -30,6 +30,7 @@ from sqlalchemy import and_
 from sqlalchemy import distinct
 from sqlalchemy import func
 from sqlalchemy.orm import aliased
+from sqlalchemy.sql.expression import cast
 
 import ceilometer
 from ceilometer.i18n import _
@@ -352,7 +353,8 @@ class Connection(base.Connection):
         Clearing occurs according to the time-to-live.
         :param ttl: Number of seconds to keep records for.
         """
-
+        # Prevent database deadlocks from occurring by
+        # using separate transaction for each delete
         session = self._engine_facade.get_session()
         with session.begin():
             end = timeutils.utcnow() - datetime.timedelta(seconds=ttl)
@@ -361,25 +363,42 @@ class Connection(base.Connection):
             rows = sample_q.delete()
             LOG.info(_("%d samples removed from database"), rows)
 
-            if not cfg.CONF.sql_expire_samples_only:
+        if not cfg.CONF.sql_expire_samples_only:
+            with session.begin():
                 # remove Meter definitions with no matching samples
                 (session.query(models.Meter)
                  .filter(~models.Meter.samples.any())
                  .delete(synchronize_session=False))
 
-                # remove resources with no matching samples
+            with session.begin():
                 resource_q = (session.query(models.Resource.internal_id)
                               .filter(~models.Resource.samples.any()))
-                resource_subq = resource_q.subquery()
-                # remove metadata of cleaned resources
-                for table in [models.MetaText, models.MetaBigInt,
-                              models.MetaFloat, models.MetaBool]:
+                # mark resource with no matching samples for delete
+                resource_q.update({models.Resource.metadata_hash: "delete_"
+                                  + cast(models.Resource.internal_id,
+                                         sa.String)},
+                                  synchronize_session=False)
+
+            # remove metadata of resources marked for delete
+            for table in [models.MetaText, models.MetaBigInt,
+                          models.MetaFloat, models.MetaBool]:
+                with session.begin():
+                    resource_q = (session.query(models.Resource.internal_id)
+                                  .filter(models.Resource.metadata_hash
+                                          .like('delete_%')))
+                    resource_subq = resource_q.subquery()
                     (session.query(table)
                      .filter(table.id.in_(resource_subq))
                      .delete(synchronize_session=False))
+
+            # remove resource marked for delete
+            with session.begin():
+                resource_q = (session.query(models.Resource.internal_id)
+                              .filter(models.Resource.metadata_hash
+                                      .like('delete_%')))
                 resource_q.delete(synchronize_session=False)
-                LOG.info(_("Expired residual resource and"
-                           " meter definition data"))
+            LOG.info(_("Expired residual resource and"
+                       " meter definition data"))
 
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
