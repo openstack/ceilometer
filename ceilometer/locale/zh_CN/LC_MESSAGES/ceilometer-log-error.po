@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-12 06:06+0000\n"
-"PO-Revision-Date: 2015-03-11 20:49+0000\n"
-"Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
+"POT-Creation-Date: 2015-03-18 06:10+0000\n"
+"PO-Revision-Date: 2015-03-18 03:34+0000\n"
+"Last-Translator: aji.zqfan <aji.zqfan@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/"
 "ceilometer/language/zh_CN/)\n"
 "Language: zh_CN\n"
@@ -43,6 +43,11 @@ msgstr "无法发送心跳信息到协调器后端"
 msgid "Error getting group membership info from coordination backend."
 msgstr "从协调器后端获取组成员信息时出错"
 
+#: ceilometer/compute/pollsters/memory.py:106
+#, python-format
+msgid "Could not get Resident Memory Usage for %(id)s: %(e)s"
+msgstr "无法为%(id)s获取常驻内存使用量RSS： %(e)s"
+
 #: ceilometer/openstack/common/loopingcall.py:95
 msgid "in fixed duration looping call"
 msgstr "在固定时段内循环调用"
@@ -59,13 +64,13 @@ msgstr "存在未处理的异常"
 #: ceilometer/publisher/kafka_broker.py:177
 #, python-format
 msgid "Failed to connect to Kafka service: %s"
-msgstr ""
+msgstr "无法连接到Kafka服务：%s"
 
 #: ceilometer/publisher/kafka_broker.py:158
 msgid "Failed to retry to send sample data with max_retry times"
-msgstr ""
+msgstr "尝试发送数据达到最大重试次数后仍失败"
 
 #: ceilometer/publisher/kafka_broker.py:198
 #, python-format
 msgid "Failed to send sample data: %s"
-msgstr ""
+msgstr "发送指标数据失败：%s"

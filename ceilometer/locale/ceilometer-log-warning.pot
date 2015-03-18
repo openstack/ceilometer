@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 2015.1.dev168\n"
+"Project-Id-Version: ceilometer 2015.1.dev188\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-12 06:06+0000\n"
+"POT-Creation-Date: 2015-03-18 06:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -39,9 +39,15 @@ msgid ""
 "with False"
 msgstr ""
 
+#: ceilometer/cmd/polling.py:51
+#, python-format
+msgid "Duplicated values: %s found in CLI options, auto de-duplidated"
+msgstr ""
+
 #: ceilometer/compute/pollsters/disk.py:133
 #: ceilometer/compute/pollsters/disk.py:701
 #: ceilometer/compute/pollsters/memory.py:49
+#: ceilometer/compute/pollsters/memory.py:92
 #: ceilometer/compute/pollsters/net.py:108
 #, python-format
 msgid ""
@@ -50,6 +56,7 @@ msgid ""
 msgstr ""
 
 #: ceilometer/compute/pollsters/memory.py:54
+#: ceilometer/compute/pollsters/memory.py:97
 #, python-format
 msgid ""
 "Cannot inspect data of %(pollster)s for %(instance_id)s, non-fatal "

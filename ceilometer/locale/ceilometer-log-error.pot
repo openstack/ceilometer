@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 2015.1.dev168\n"
+"Project-Id-Version: ceilometer 2015.1.dev188\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-12 06:06+0000\n"
+"POT-Creation-Date: 2015-03-18 06:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -37,6 +37,11 @@ msgstr ""
 
 #: ceilometer/coordination.py:177
 msgid "Error getting group membership info from coordination backend."
+msgstr ""
+
+#: ceilometer/compute/pollsters/memory.py:106
+#, python-format
+msgid "Could not get Resident Memory Usage for %(id)s: %(e)s"
 msgstr ""
 
 #: ceilometer/openstack/common/loopingcall.py:95

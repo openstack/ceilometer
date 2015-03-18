@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-12 06:06+0000\n"
-"PO-Revision-Date: 2015-03-11 20:49+0000\n"
+"POT-Creation-Date: 2015-03-18 06:10+0000\n"
+"PO-Revision-Date: 2015-03-17 20:34+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/ceilometer/"
 "language/fr/)\n"
@@ -41,6 +41,11 @@ msgstr ""
 
 #: ceilometer/coordination.py:177
 msgid "Error getting group membership info from coordination backend."
+msgstr ""
+
+#: ceilometer/compute/pollsters/memory.py:106
+#, python-format
+msgid "Could not get Resident Memory Usage for %(id)s: %(e)s"
 msgstr ""
 
 #: ceilometer/openstack/common/loopingcall.py:95

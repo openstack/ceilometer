@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-12 06:06+0000\n"
-"PO-Revision-Date: 2015-03-11 21:03+0000\n"
-"Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
+"POT-Creation-Date: 2015-03-18 06:10+0000\n"
+"PO-Revision-Date: 2015-03-18 03:24+0000\n"
+"Last-Translator: aji.zqfan <aji.zqfan@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/"
 "ceilometer/language/zh_CN/)\n"
 "Language: zh_CN\n"
@@ -40,10 +40,10 @@ msgstr "已离开分组%s"
 msgid "Dropping event data with TTL %d"
 msgstr "正在根据TTL: %d丢弃事件数据"
 
-#: ceilometer/event/storage/impl_sqlalchemy.py:430
+#: ceilometer/event/storage/impl_sqlalchemy.py:431
 #, python-format
 msgid "%d events are removed from database"
-msgstr ""
+msgstr "%d个事件从数据库中被移除"
 
 #: ceilometer/openstack/common/eventlet_backdoor.py:146
 #, python-format

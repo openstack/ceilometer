@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-12 06:06+0000\n"
-"PO-Revision-Date: 2015-03-11 21:03+0000\n"
-"Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
+"POT-Creation-Date: 2015-03-18 06:10+0000\n"
+"PO-Revision-Date: 2015-03-18 03:38+0000\n"
+"Last-Translator: aji.zqfan <aji.zqfan@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/"
 "ceilometer/language/zh_CN/)\n"
 "Language: zh_CN\n"
@@ -25,6 +25,8 @@ msgid ""
 "Non-metric meters may be collected. It is highly advisable to disable these "
 "meters using ceilometer.conf or the pipeline.yaml"
 msgstr ""
+"非计量指标也许会被收集。强烈建议在ceilometer.conf或者pipeline.yaml中禁用这些"
+"指标"
 
 #: ceilometer/agent/discovery/endpoint.py:42
 #, python-format
@@ -42,9 +44,15 @@ msgid ""
 "with False"
 msgstr "pecan_debug无法被启用，如果api_workers>1，该值会被重置为False"
 
+#: ceilometer/cmd/polling.py:51
+#, python-format
+msgid "Duplicated values: %s found in CLI options, auto de-duplidated"
+msgstr "重复值：发现控制台参数%s，自动去除重复项"
+
 #: ceilometer/compute/pollsters/disk.py:133
 #: ceilometer/compute/pollsters/disk.py:701
 #: ceilometer/compute/pollsters/memory.py:49
+#: ceilometer/compute/pollsters/memory.py:92
 #: ceilometer/compute/pollsters/net.py:108
 #, python-format
 msgid ""
@@ -53,6 +61,7 @@ msgid ""
 msgstr "采集器%(pollster)s在采集数据点时，虚拟机%(instance_id)s被关闭：%(exc)s"
 
 #: ceilometer/compute/pollsters/memory.py:54
+#: ceilometer/compute/pollsters/memory.py:97
 #, python-format
 msgid ""
 "Cannot inspect data of %(pollster)s for %(instance_id)s, non-fatal reason: "
@@ -78,10 +87,10 @@ msgstr "未知的发布策略(%s)，强制使用默认策略"
 #: ceilometer/publisher/kafka_broker.py:149
 #, python-format
 msgid "Failed to publish %d datum"
-msgstr ""
+msgstr "%d个数据发送失败"
 
 #: ceilometer/publisher/kafka_broker.py:170
 #, python-format
 msgid ""
 "Kafka Publisher max local queue length is exceeded, dropping %d oldest data"
-msgstr ""
+msgstr "Kafka发布器本地队列超过本地最大长度，正在丢弃%d个最老的数据"
