@@ -2757,7 +2757,7 @@ class AlarmTestBase(DBTestBase):
                                                statistic='avg',
                                                evaluation_periods=1,
                                                period=60,
-                                               meter_name='test.fourty',
+                                               meter_name='test.forty',
                                                query=[{'field': 'key2',
                                                        'op': 'eq',
                                                        'value': 'value2',
@@ -2845,7 +2845,7 @@ class AlarmTest(AlarmTestBase,
         self.assertEqual(3, len(alarms))
 
         meter_names = sorted([a.rule['meter_name'] for a in alarms])
-        self.assertEqual(['test.five', 'test.fourty', 'test.one'], meter_names)
+        self.assertEqual(['test.five', 'test.forty', 'test.one'], meter_names)
 
     def test_update(self):
         self.add_some_alarms()

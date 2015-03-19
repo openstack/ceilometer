@@ -35,7 +35,7 @@ work with a copy of ceilometer installed via devstack.
 
 .. literalinclude:: ../../../etc/apache2/ceilometer
 
-1. Copy or symlink the file to ``/etc/apache2/sites-avilable``.
+1. Copy or symlink the file to ``/etc/apache2/sites-available``.
 
 2. Modify the ``VirtualHost`` directive, setting a hostname or IP for
    the service. The default settings assume that the ceilometer API is
