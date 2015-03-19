@@ -1709,6 +1709,88 @@ class TestAlarms(v2.FunctionalTest,
         self._test_post_alarm_combination_rule_less_than_two_alarms(['a',
                                                                      'a'])
 
+    def test_post_alarm_with_duplicate_actions(self):
+        body = {
+            'name': 'dup-alarm-actions',
+            'type': 'combination',
+            'combination_rule': {
+                'alarm_ids': ['a', 'b'],
+            },
+            'alarm_actions': ['http://no.where', 'http://no.where']
+        }
+        resp = self.post_json('/alarms', params=body,
+                              headers=self.auth_headers)
+        self.assertEqual(201, resp.status_code)
+        alarms = list(self.alarm_conn.get_alarms(name='dup-alarm-actions'))
+        self.assertEqual(1, len(alarms))
+        self.assertEqual(['http://no.where'], alarms[0].alarm_actions)
+
+    def test_post_alarm_with_too_many_actions(self):
+        self.CONF.set_override('alarm_max_actions', 1, group='alarm')
+        body = {
+            'name': 'alarm-with-many-actions',
+            'type': 'combination',
+            'combination_rule': {
+                'alarm_ids': ['a', 'b'],
+            },
+            'alarm_actions': ['http://no.where', 'http://no.where2']
+        }
+        resp = self.post_json('/alarms', params=body, expect_errors=True,
+                              headers=self.auth_headers)
+        self.assertEqual(400, resp.status_code)
+        self.assertEqual("alarm_actions count exceeds maximum value 1",
+                         resp.json['error_message']['faultstring'])
+
+    def test_post_alarm_normal_user_set_log_actions(self):
+        body = {
+            'name': 'log_alarm_actions',
+            'type': 'combination',
+            'combination_rule': {
+                'alarm_ids': ['a', 'b'],
+            },
+            'alarm_actions': ['log://']
+        }
+        resp = self.post_json('/alarms', params=body, expect_errors=True,
+                              headers=self.auth_headers)
+        self.assertEqual(401, resp.status_code)
+        expected_msg = ("You are not authorized to create action: log://")
+        self.assertEqual(expected_msg,
+                         resp.json['error_message']['faultstring'])
+
+    def test_post_alarm_normal_user_set_test_actions(self):
+        body = {
+            'name': 'test_alarm_actions',
+            'type': 'combination',
+            'combination_rule': {
+                'alarm_ids': ['a', 'b'],
+            },
+            'alarm_actions': ['test://']
+        }
+        resp = self.post_json('/alarms', params=body, expect_errors=True,
+                              headers=self.auth_headers)
+        self.assertEqual(401, resp.status_code)
+        expected_msg = ("You are not authorized to create action: test://")
+        self.assertEqual(expected_msg,
+                         resp.json['error_message']['faultstring'])
+
+    def test_post_alarm_admin_user_set_log_test_actions(self):
+        body = {
+            'name': 'admin_alarm_actions',
+            'type': 'combination',
+            'combination_rule': {
+                'alarm_ids': ['a', 'b'],
+            },
+            'alarm_actions': ['test://', 'log://']
+        }
+        headers = self.auth_headers
+        headers['X-Roles'] = 'admin'
+        self.post_json('/alarms', params=body, status=201,
+                       headers=headers)
+        alarms = list(self.alarm_conn.get_alarms(name='admin_alarm_actions'))
+        self.assertEqual(1, len(alarms))
+        self.assertEqual(['test://', 'log://'],
+                         alarms[0].alarm_actions)
+
     def test_put_alarm(self):
         json = {
             'enabled': False,
