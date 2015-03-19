@@ -90,6 +90,8 @@ class DatabaseDispatcher(dispatcher.Base):
                 except Exception as err:
                     LOG.exception(_('Failed to record metering data: %s'),
                                   err)
+                    # raise the exception to propagate it up in the chain.
+                    raise
             else:
                 LOG.warning(_(
                     'message signature invalid, discarding message: %r'),

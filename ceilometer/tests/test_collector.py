@@ -100,7 +100,7 @@ class TestCollector(tests_base.BaseTestCase):
         plugin = mock.MagicMock()
         fake_dispatcher = extension.ExtensionManager.make_test_instance([
             extension.Extension('test', None, None, plugin,),
-        ])
+        ], propagate_map_exceptions=True)
         self.useFixture(mockpatch.Patch(
             'ceilometer.dispatcher.load_dispatcher_manager',
             return_value=fake_dispatcher))
@@ -231,13 +231,17 @@ class TestCollector(tests_base.BaseTestCase):
             'metering data test for test_run_tasks: 1')
 
     def _test_collector_requeue(self, listener):
+
+        mock_dispatcher = self._setup_fake_dispatcher()
+        self.srv.dispatcher_manager = dispatcher.load_dispatcher_manager()
+        mock_dispatcher.record_metering_data.side_effect = Exception('boom')
+        mock_dispatcher.record_events.side_effect = Exception('boom')
+
         self.srv.start()
-        with mock.patch.object(self.srv.dispatcher_manager, 'map_method',
-                               side_effect=Exception('boom')):
-            endp = getattr(self.srv, listener).dispatcher.endpoints[0]
-            ret = endp.sample({}, 'pub_id', 'event', {}, {})
-            self.assertEqual(oslo.messaging.NotificationResult.REQUEUE,
-                             ret)
+        endp = getattr(self.srv, listener).dispatcher.endpoints[0]
+        ret = endp.sample({}, 'pub_id', 'event', {}, {})
+        self.assertEqual(oslo.messaging.NotificationResult.REQUEUE,
+                         ret)
 
     @mock.patch.object(oslo.messaging.MessageHandlingServer, 'start',
                        mock.Mock())
@@ -257,12 +261,17 @@ class TestCollector(tests_base.BaseTestCase):
         self._test_collector_requeue('event_listener')
 
     def _test_collector_no_requeue(self, listener):
+        mock_dispatcher = self._setup_fake_dispatcher()
+        self.srv.dispatcher_manager = dispatcher.load_dispatcher_manager()
+        mock_dispatcher.record_metering_data.side_effect = (FakeException
+                                                            ('boom'))
+        mock_dispatcher.record_events.side_effect = (FakeException
+                                                     ('boom'))
+
         self.srv.start()
-        with mock.patch.object(self.srv.dispatcher_manager, 'map_method',
-                               side_effect=FakeException('boom')):
-            endp = getattr(self.srv, listener).dispatcher.endpoints[0]
-            self.assertRaises(FakeException, endp.sample, {}, 'pub_id',
-                              'event', {}, {})
+        endp = getattr(self.srv, listener).dispatcher.endpoints[0]
+        self.assertRaises(FakeException, endp.sample, {}, 'pub_id',
+                          'event', {}, {})
 
     @mock.patch.object(oslo.messaging.MessageHandlingServer, 'start',
                        mock.Mock())

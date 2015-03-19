@@ -40,11 +40,14 @@ DISPATCHER_NAMESPACE = 'ceilometer.dispatcher'
 def load_dispatcher_manager():
     LOG.debug(_('loading dispatchers from %s'),
               DISPATCHER_NAMESPACE)
+    # set propagate_map_exceptions to True to enable stevedore
+    # to propagate exceptions.
     dispatcher_manager = named.NamedExtensionManager(
         namespace=DISPATCHER_NAMESPACE,
         names=cfg.CONF.dispatcher,
         invoke_on_load=True,
-        invoke_args=[cfg.CONF])
+        invoke_args=[cfg.CONF],
+        propagate_map_exceptions=True)
     if not list(dispatcher_manager):
         LOG.warning(_('Failed to load any dispatchers for %s'),
                     DISPATCHER_NAMESPACE)
