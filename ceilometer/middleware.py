@@ -40,7 +40,8 @@ OPTS = [
 cfg.CONF.register_opts(OPTS)
 
 
-class HTTPRequest(plugin_base.NotificationBase):
+class HTTPRequest(plugin_base.NotificationBase,
+                  plugin_base.NonMetricNotificationBase):
     event_types = ['http.request']
 
     @staticmethod
