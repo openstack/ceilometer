@@ -19,6 +19,8 @@ import datetime
 import operator
 
 import mock
+from oslo.db import api
+from oslo.db import exception as dbexc
 from oslo_config import cfg
 from oslo_utils import timeutils
 import pymongo
@@ -35,6 +37,15 @@ from ceilometer.tests import db as tests_db
 
 
 class DBTestBase(tests_db.TestBase):
+    @staticmethod
+    def create_side_effect(method, exception_type, test_exception):
+        def side_effect(*args, **kwargs):
+            if test_exception.pop():
+                raise exception_type
+            else:
+                return method(*args, **kwargs)
+        return side_effect
+
     def create_and_store_sample(self, timestamp=datetime.datetime.utcnow(),
                                 metadata=None,
                                 name='instance',
@@ -696,6 +707,65 @@ class RawSampleTest(DBTestBase,
         self.assertEqual(7, len(results))
         results = list(self.conn.get_resources())
         self.assertEqual(6, len(results))
+
+    @tests_db.run_with('sqlite', 'mysql', 'pgsql')
+    def test_record_metering_data_retry_success_on_deadlock(self):
+        raise_deadlock = [False, True]
+        self.CONF.set_override('max_retries', 2, group='database')
+
+        s = sample.Sample('instance', sample.TYPE_CUMULATIVE, unit='',
+                          volume=1, user_id='user_id',
+                          project_id='project_id',
+                          resource_id='resource_id',
+                          timestamp=datetime.datetime.utcnow(),
+                          resource_metadata={'display_name': 'test-server',
+                                             'tag': 'self.counter'},
+                          source=None)
+
+        msg = utils.meter_message_from_counter(
+            s, self.CONF.publisher.telemetry_secret
+        )
+
+        mock_resource_create = mock.patch.object(self.conn, "_create_resource")
+
+        mock_resource_create.side_effect = self.create_side_effect(
+            self.conn._create_resource, dbexc.DBDeadlock, raise_deadlock)
+        with mock.patch.object(api.time, 'sleep') as retry_sleep:
+            self.conn.record_metering_data(msg)
+            self.assertEqual(1, retry_sleep.call_count)
+
+        f = storage.SampleFilter(meter='instance')
+        results = list(self.conn.get_samples(f))
+        self.assertEqual(13, len(results))
+
+    @tests_db.run_with('sqlite', 'mysql', 'pgsql')
+    def test_record_metering_data_retry_failure_on_deadlock(self):
+        raise_deadlock = [True, True, True]
+        self.CONF.set_override('max_retries', 3, group='database')
+
+        s = sample.Sample('instance', sample.TYPE_CUMULATIVE, unit='',
+                          volume=1, user_id='user_id',
+                          project_id='project_id',
+                          resource_id='resource_id',
+                          timestamp=datetime.datetime.utcnow(),
+                          resource_metadata={'display_name': 'test-server',
+                                             'tag': 'self.counter'},
+                          source=None)
+
+        msg = utils.meter_message_from_counter(
+            s, self.CONF.publisher.telemetry_secret
+        )
+
+        mock_resource_create = mock.patch.object(self.conn, "_create_resource")
+
+        mock_resource_create.side_effect = self.create_side_effect(
+            self.conn._create_resource, dbexc.DBDeadlock, raise_deadlock)
+        with mock.patch.object(api.time, 'sleep') as retry_sleep:
+            try:
+                self.conn.record_metering_data(msg)
+            except dbexc.DBError as err:
+                self.assertIn('DBDeadlock', str(type(err)))
+                self.assertEqual(3, retry_sleep.call_count)
 
     @tests_db.run_with('sqlite', 'mysql', 'pgsql', 'hbase', 'db2')
     def test_clear_metering_data_with_alarms(self):
@@ -3590,22 +3660,14 @@ class MongoAutoReconnectTest(DBTestBase,
             self.assertIsInstance(self.conn.conn.conn,
                                   pymongo.MongoClient)
 
-    @staticmethod
-    def create_side_effect(method, test_exception):
-        def side_effect(*args, **kwargs):
-            if test_exception.pop():
-                raise pymongo.errors.AutoReconnect
-            else:
-                return method(*args, **kwargs)
-        return side_effect
-
     def test_mongo_cursor_next(self):
         expected_first_sample_timestamp = datetime.datetime(2012, 7, 2, 10, 39)
         raise_exc = [False, True]
         method = self.conn.db.resource.find().cursor.next
         with mock.patch('pymongo.cursor.Cursor.next',
                         mock.Mock()) as mock_next:
-            mock_next.side_effect = self.create_side_effect(method, raise_exc)
+            mock_next.side_effect = self.create_side_effect(
+                method, pymongo.errors.AutoReconnect, raise_exc)
             resource = self.conn.db.resource.find().next()
             self.assertEqual(expected_first_sample_timestamp,
                              resource['first_sample_timestamp'])
@@ -3616,8 +3678,8 @@ class MongoAutoReconnectTest(DBTestBase,
 
         with mock.patch('pymongo.collection.Collection.insert',
                         mock.Mock(return_value=method)) as mock_insert:
-            mock_insert.side_effect = self.create_side_effect(method,
-                                                              raise_exc)
+            mock_insert.side_effect = self.create_side_effect(
+                method, pymongo.errors.AutoReconnect, raise_exc)
             mock_insert.__name__ = 'insert'
             self.create_and_store_sample(
                 timestamp=datetime.datetime(2014, 10, 15, 14, 39),
@@ -3631,7 +3693,8 @@ class MongoAutoReconnectTest(DBTestBase,
 
         with mock.patch('pymongo.collection.Collection.find_and_modify',
                         mock.Mock()) as mock_fam:
-            mock_fam.side_effect = self.create_side_effect(method, raise_exc)
+            mock_fam.side_effect = self.create_side_effect(
+                method, pymongo.errors.AutoReconnect, raise_exc)
             mock_fam.__name__ = 'find_and_modify'
             self.create_and_store_sample(
                 timestamp=datetime.datetime(2014, 10, 15, 14, 39),
@@ -3647,8 +3710,8 @@ class MongoAutoReconnectTest(DBTestBase,
 
         with mock.patch('pymongo.collection.Collection.update',
                         mock.Mock()) as mock_update:
-            mock_update.side_effect = self.create_side_effect(method,
-                                                              raise_exc)
+            mock_update.side_effect = self.create_side_effect(
+                method, pymongo.errors.AutoReconnect, raise_exc)
             mock_update.__name__ = 'update'
             self.create_and_store_sample(
                 timestamp=datetime.datetime(2014, 10, 15, 17, 39),
