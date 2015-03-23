@@ -53,6 +53,9 @@ class Connection(pymongo_base.Connection):
         self.upgrade()
 
     def upgrade(self):
+        # create collection if not present
+        if 'event' not in self.db.conn.collection_names():
+            self.db.conn.create_collection('event')
         # Establish indexes
         ttl = cfg.CONF.database.event_time_to_live
         impl_mongodb.Connection.update_ttl(ttl, 'event_ttl', 'timestamp',

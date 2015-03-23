@@ -442,6 +442,13 @@ class Connection(pymongo_base.Connection):
         # project_id values are usually mutually exclusive in the
         # queries, so the database won't take advantage of an index
         # including both.
+
+        # create collection if not present
+        if 'resource' not in self.db.conn.collection_names():
+            self.db.conn.create_collection('resource')
+        if 'meter' not in self.db.conn.collection_names():
+            self.db.conn.create_collection('meter')
+
         name_qualifier = dict(user_id='', project_id='project_')
         background = dict(user_id=False, project_id=True)
         for primary in ['user_id', 'project_id']:

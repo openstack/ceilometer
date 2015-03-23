@@ -58,6 +58,13 @@ class Connection(pymongo_base.Connection):
         # needed.
         self.upgrade()
 
+    def upgrade(self):
+        # create collection if not present
+        if 'alarm' not in self.db.conn.collection_names():
+            self.db.conn.create_collection('alarm')
+        if 'alarm_history' not in self.db.conn.collection_names():
+            self.db.conn.create_collection('alarm_history')
+
     def clear(self):
         self.conn.drop_database(self.db.name)
         # Connection will be reopened automatically if needed
