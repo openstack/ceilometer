@@ -80,7 +80,6 @@ IMAGE_LIST = [
           u'deleted_at': None,
           u'min_ram': 0,
           u'size': 1024}),
-    # Make one duplicate private image to test the iter_images method.
     type('Image', (object,),
          {u'status': u'queued',
           u'name': "some name",
@@ -92,7 +91,7 @@ IMAGE_LIST = [
           u'properties': {},
           u'min_disk': 0,
           u'protected': False,
-          u'id': u'1d21a8d0-25f4-4e0a-b4ec-85f40237676b',
+          u'id': u'e753b196-49b4-48e8-8ca5-09ebd9805f40',
           u'location': None,
           u'checksum': None,
           u'owner': u'4c8364fc20184ed7971b76602aa96184',
@@ -141,7 +140,7 @@ class TestImagePollsterPageSize(base.BaseTestCase):
             side_effect=self.fake_get_glance_client))
         self.CONF = self.useFixture(fixture_config.Config()).conf
 
-    def _do_test_iter_images(self, page_size=0):
+    def _do_test_iter_images(self, page_size=0, length=0):
         self.CONF.set_override("glance_page_size", page_size)
         images = list(glance.ImagePollster().
                       _iter_images(self.manager.keystone, {}, ENDPOINT))
@@ -149,17 +148,17 @@ class TestImagePollsterPageSize(base.BaseTestCase):
         if page_size > 0:
             kwargs['page_size'] = page_size
         FakeGlanceClient.images.list.assert_called_with(
-            filters={'is_public': False}, **kwargs)
-        self.assertEqual(len(set(image.id for image in images)), len(images))
+            filters={'is_public': None}, **kwargs)
+        self.assertEqual(length, len(images))
 
     def test_page_size(self):
-        self._do_test_iter_images(100)
+        self._do_test_iter_images(100, 4)
 
     def test_page_size_default(self):
-        self._do_test_iter_images()
+        self._do_test_iter_images(length=4)
 
     def test_page_size_negative_number(self):
-        self._do_test_iter_images(-1)
+        self._do_test_iter_images(-1, 4)
 
 
 class TestImagePollster(base.BaseTestCase):
@@ -204,7 +203,7 @@ class TestImagePollster(base.BaseTestCase):
     def test_image(self):
         samples = list(glance.ImagePollster().get_samples(self.manager, {},
                                                           [ENDPOINT]))
-        self.assertEqual(3, len(samples))
+        self.assertEqual(4, len(samples))
         for sample in samples:
             self.assertEqual(1, sample.volume)
 
@@ -212,7 +211,7 @@ class TestImagePollster(base.BaseTestCase):
         samples = list(glance.ImageSizePollster().get_samples(self.manager,
                                                               {},
                                                               [ENDPOINT]))
-        self.assertEqual(3, len(samples))
+        self.assertEqual(4, len(samples))
         for image in IMAGE_LIST:
             self.assertTrue(
                 any(map(lambda sample: sample.volume == image.size,
