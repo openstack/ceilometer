@@ -308,6 +308,14 @@ class MeterController(rest.RestController):
 
         published_samples = []
         for s in samples:
+            for p in pecan.request.pipeline_manager.pipelines:
+                if p.support_meter(s.counter_name):
+                    break
+            else:
+                message = _("The metric %s is not supported by metering "
+                            "pipeline configuration.") % s.counter_name
+                raise base.ClientSideError(message, status_code=409)
+
             if self.meter_name != s.counter_name:
                 raise wsme.exc.InvalidInput('counter_name', s.counter_name,
                                             'should be %s' % self.meter_name)
