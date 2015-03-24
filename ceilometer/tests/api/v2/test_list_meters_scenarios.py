@@ -374,6 +374,23 @@ class TestListMeters(v2.FunctionalTest,
             }
         }], data)
 
+    def test_list_with_field_metaquery(self):
+        def _helper(url):
+            resp = self.get_json(url,
+                                 q=[{'field':
+                                     'metaquery',
+                                     'op': 'eq',
+                                     'value': 'cow',
+                                     }],
+                                 expect_errors=True)
+            self.assertEqual(400, resp.status_code)
+            expected = ('Unknown argument: "metaquery": '
+                        'unrecognized field in query')
+            self.assertIn(expected, resp.json['error_message']['faultstring'])
+
+        _helper('/samples')
+        _helper('/meters/meter.test')
+
     def test_list_meters_metadata_query(self):
         data = self.get_json('/meters/meter.test',
                              q=[{'field': 'metadata.tag',
