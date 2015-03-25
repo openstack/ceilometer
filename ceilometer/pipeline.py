@@ -110,6 +110,57 @@ class EventPipelineEndpoint(PipelineEndpoint):
             p(events)
 
 
+class _PipelineTransportManager(object):
+    def __init__(self):
+        self.transporters = []
+
+    def add_transporter(self, transporter):
+        self.transporters.append(transporter)
+
+    def publisher(self, context):
+        serializer = self.serializer
+        transporters = self.transporters
+        filter_attr = self.filter_attr
+        event_type = self.event_type
+
+        class PipelinePublishContext(object):
+            def __enter__(self):
+                def p(data):
+                    serialized_data = serializer(data)
+                    for d_filter, notifier in transporters:
+                        if any(d_filter(d[filter_attr])
+                               for d in serialized_data):
+                            notifier.sample(context.to_dict(),
+                                            event_type=event_type,
+                                            payload=serialized_data)
+                return p
+
+            def __exit__(self, exc_type, exc_value, traceback):
+                pass
+
+        return PipelinePublishContext()
+
+
+class SamplePipelineTransportManager(_PipelineTransportManager):
+    filter_attr = 'counter_name'
+    event_type = 'ceilometer.pipeline'
+
+    @staticmethod
+    def serializer(data):
+        return [publisher_utils.meter_message_from_counter(
+            sample, cfg.CONF.publisher.telemetry_secret) for sample in data]
+
+
+class EventPipelineTransportManager(_PipelineTransportManager):
+    filter_attr = 'event_type'
+    event_type = 'pipeline.event'
+
+    @staticmethod
+    def serializer(data):
+        return [publisher_utils.message_from_event(
+            data, cfg.CONF.publisher.telemetry_secret)]
+
+
 class PublishContext(object):
 
     def __init__(self, context, pipelines=None):

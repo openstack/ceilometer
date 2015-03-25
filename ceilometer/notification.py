@@ -86,11 +86,11 @@ class NotificationService(os_service.Service):
         self.group_id = None
 
     @classmethod
-    def _get_notifications_manager(cls, transporter):
+    def _get_notifications_manager(cls, pm):
         return extension.ExtensionManager(
             namespace=cls.NOTIFICATION_NAMESPACE,
             invoke_on_load=True,
-            invoke_args=(transporter, )
+            invoke_args=(pm, )
         )
 
     def _get_notifier(self, transport, pipe):
@@ -110,16 +110,19 @@ class NotificationService(os_service.Service):
         self.partition_coordinator = coordination.PartitionCoordinator()
         self.partition_coordinator.start()
 
-        event_transporter = None
+        event_pipe_manager = None
         if cfg.CONF.notification.workload_partitioning:
-            transporter = []
+            pipe_manager = pipeline.SamplePipelineTransportManager()
             for pipe in self.pipeline_manager.pipelines:
-                transporter.append(self._get_notifier(transport, pipe))
+                pipe_manager.add_transporter(
+                    (pipe.source.support_meter,
+                     self._get_notifier(transport, pipe)))
             if cfg.CONF.notification.store_events:
-                event_transporter = []
+                event_pipe_manager = pipeline.EventPipelineTransportManager()
                 for pipe in self.event_pipeline_manager.pipelines:
-                    event_transporter.append(self._get_notifier(transport,
-                                                                pipe))
+                    event_pipe_manager.add_transporter(
+                        (pipe.source.support_event,
+                         self._get_notifier(transport, pipe)))
 
             self.ctxt = context.get_admin_context()
             self.group_id = self.NOTIFICATION_NAMESPACE
@@ -131,13 +134,13 @@ class NotificationService(os_service.Service):
             # we must create a transport to ensure the option have
             # beeen registered by oslo.messaging
             messaging.get_notifier(transport, '')
-            transporter = self.pipeline_manager
+            pipe_manager = self.pipeline_manager
             if cfg.CONF.notification.store_events:
-                event_transporter = self.event_pipeline_manager
+                event_pipe_manager = self.event_pipeline_manager
             self.group_id = None
 
         self.listeners, self.pipeline_listeners = [], []
-        self._configure_main_queue_listeners(transporter, event_transporter)
+        self._configure_main_queue_listeners(pipe_manager, event_pipe_manager)
 
         if cfg.CONF.notification.workload_partitioning:
             self.partition_coordinator.join_group(self.group_id)
@@ -157,8 +160,9 @@ class NotificationService(os_service.Service):
         # Add a dummy thread to have wait() working
         self.tg.add_timer(604800, lambda: None)
 
-    def _configure_main_queue_listeners(self, transporter, event_transporter):
-        notification_manager = self._get_notifications_manager(transporter)
+    def _configure_main_queue_listeners(self, pipe_manager,
+                                        event_pipe_manager):
+        notification_manager = self._get_notifications_manager(pipe_manager)
         if not list(notification_manager):
             LOG.warning(_('Failed to load any notification handlers for %s'),
                         self.NOTIFICATION_NAMESPACE)
@@ -168,7 +172,7 @@ class NotificationService(os_service.Service):
         endpoints = []
         if cfg.CONF.notification.store_events:
             endpoints.append(
-                event_endpoint.EventsNotificationEndpoint(event_transporter))
+                event_endpoint.EventsNotificationEndpoint(event_pipe_manager))
 
         targets = []
         for ext in notification_manager:
