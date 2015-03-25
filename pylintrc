@@ -23,7 +23,7 @@ argument-rgx=[a-z_][a-z0-9_]{1,30}$
 # Type attributes names can be 2 to 31 characters long, with lowercase and underscores
 attr-rgx=[a-z_][a-z0-9_]{1,30}$
 
-# Method names shold be at least 3 characters long and be lowercased with underscores
+# Method names should be at least 3 characters long and be lowercased with underscores
 method-rgx=([a-z_][a-z0-9_]{1,30}|setUp|tearDown)$
 
 # Module names matching sahara-* are ok (files in bin/)
