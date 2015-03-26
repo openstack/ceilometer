@@ -80,12 +80,13 @@ class EventsNotificationEndpoint(object):
             event = self.event_converter.to_event(notification)
             if event is not None:
                 if self.requeue:
+                    serialized_event = utils.message_from_event(
+                        event, cfg.CONF.publisher.telemetry_secret)
                     for notifier in self.transporter:
                         notifier.sample(
                             self.ctxt.to_dict(),
                             event_type='pipeline.event',
-                            payload=[utils.message_from_event(
-                                event, cfg.CONF.publisher.telemetry_secret)])
+                            payload=[serialized_event])
                 else:
                     with self.transporter.publisher(self.ctxt) as p:
                         p(event)

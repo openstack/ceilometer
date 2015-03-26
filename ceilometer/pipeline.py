@@ -30,6 +30,7 @@ from ceilometer.event.storage import models
 from ceilometer.i18n import _
 from ceilometer.openstack.common import log
 from ceilometer import publisher
+from ceilometer.publisher import utils as publisher_utils
 from ceilometer import sample as sample_util
 from ceilometer import transformer as xformer
 
@@ -83,7 +84,8 @@ class SamplePipelineEndpoint(PipelineEndpoint):
                                timestamp=s['timestamp'],
                                resource_metadata=s['resource_metadata'],
                                source=s.get('source'))
-            for s in payload
+            for s in payload if publisher_utils.verify_signature(
+                s, cfg.CONF.publisher.telemetry_secret)
         ]
         with self.publish_context as p:
             p(samples)
@@ -101,7 +103,8 @@ class EventPipelineEndpoint(PipelineEndpoint):
                                      models.Trait.convert_value(dtype, value))
                         for name, dtype, value in ev['traits']],
                 raw=ev.get('raw', {}))
-            for ev in payload
+            for ev in payload if publisher_utils.verify_signature(
+                ev, cfg.CONF.publisher.telemetry_secret)
         ]
         with self.publish_context as p:
             p(events)
