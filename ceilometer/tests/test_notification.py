@@ -307,6 +307,19 @@ class TestRealNotificationHA(BaseRealNotification):
         fake_coord.return_value = fake_coord1
         self._check_notification_service()
 
+    @mock.patch('hmac.new')
+    @mock.patch('ceilometer.coordination.PartitionCoordinator')
+    @mock.patch('ceilometer.publisher.test.TestPublisher')
+    def test_notification_service_no_secret(self, fake_publisher_cls,
+                                            fake_coord, fake_hmac):
+        self.CONF.set_override('telemetry_secret', None, group='publisher')
+        fake_publisher_cls.return_value = self.publisher
+        fake_coord1 = mock.MagicMock()
+        fake_coord1.extract_my_subset.side_effect = lambda x, y: y
+        fake_coord.return_value = fake_coord1
+        self._check_notification_service()
+        self.assertFalse(fake_hmac.called)
+
     def test_reset_listeners_on_refresh(self):
         self.srv.start()
         self.assertEqual(2, len(self.srv.pipeline_listeners))
