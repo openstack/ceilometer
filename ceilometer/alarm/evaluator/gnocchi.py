@@ -77,28 +77,35 @@ class GnocchiThresholdEvaluator(evaluator.Evaluator):
 
     def _statistics(self, alarm, start, end):
         """Retrieve statistics over the current window."""
-        if alarm.type == 'gnocchi_metrics_threshold':
-            url = ("%s/v1/metric_aggregation/?"
-                   "aggregation=%s&start=%s&end=%s&%s") % (
-                       self.gnocchi_url,
-                       alarm.rule['aggregation_method'],
-                       start, end,
-                       "&".join("metric=%s" % m
-                                for m in alarm.rule['metrics']))
+        method = 'get'
+        req = {
+            'url': self.gnocchi_url + "/v1",
+            'headers': self._get_headers(),
+            'params': {
+                'aggregation': alarm.rule['aggregation_method'],
+                'start': start,
+                'end': end,
+            }
+        }
+
+        if alarm.type == 'gnocchi_aggregation_by_resources_threshold':
+            method = 'post'
+            req['url'] += "/aggregation/resource/%s/metric/%s" % (
+                alarm.rule['resource_type'], alarm.rule['metric'])
+            req['data'] = alarm.rule['query']
+
+        elif alarm.type == 'gnocchi_aggregation_by_metrics_threshold':
+            req['url'] += "/aggregation/metric"
+            req['params']['metric[]'] = alarm.rule['metrics']
 
         elif alarm.type == 'gnocchi_resources_threshold':
-            url = ("%s/v1/resource/%s/%s/metric/%s/measures?"
-                   "aggregation=%s&start=%s&end=%s") % (
-                       self.gnocchi_url,
-                       alarm.rule['resource_type'],
-                       alarm.rule['resource_constraint'],
-                       alarm.rule['metric'],
-                       alarm.rule['aggregation_method'],
-                       start, end)
+            req['url'] += "/resource/%s/%s/metric/%s/measures" % (
+                alarm.rule['resource_type'],
+                alarm.rule['resource_id'], alarm.rule['metric'])
 
-        LOG.debug(_('stats query %s') % url)
+        LOG.debug(_('stats query %s') % req['url'])
         try:
-            r = requests.get(url, headers=self._get_headers())
+            r = getattr(requests, method)(**req)
         except Exception:
             LOG.exception(_('alarm stats retrieval failed'))
             return []
