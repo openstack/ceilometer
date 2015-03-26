@@ -69,14 +69,13 @@ class SwiftWsgiMiddlewareMeters(_Base):
         return ['objectstore.http.request']
 
     def process_notification(self, message):
-        if message['payload']['measurements']:
-            for meter in message['payload']['measurements']:
-                yield sample.Sample.from_notification(
-                    name=meter['metric']['name'],
-                    type=sample.TYPE_DELTA,
-                    unit=meter['metric']['unit'],
-                    volume=meter['result'],
-                    resource_id=message['payload']['target']['id'],
-                    user_id=message['payload']['initiator']['id'],
-                    project_id=message['payload']['initiator']['project_id'],
-                    message=message)
+        for meter in message['payload'].get('measurements', []):
+            yield sample.Sample.from_notification(
+                name=meter['metric']['name'],
+                type=sample.TYPE_DELTA,
+                unit=meter['metric']['unit'],
+                volume=meter['result'],
+                resource_id=message['payload']['target']['id'],
+                user_id=message['payload']['initiator']['id'],
+                project_id=message['payload']['initiator']['project_id'],
+                message=message)

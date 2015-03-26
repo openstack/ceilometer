@@ -11,6 +11,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 """Tests for swift notification events."""
+import copy
 import mock
 
 from ceilometer.objectstore import notifications
@@ -113,3 +114,9 @@ class TestMiddlewareNotifications(test.BaseTestCase):
             self.assertEqual(target['id'], samples[i].resource_id)
             self.assertEqual(initiator['id'], samples[i].user_id)
             self.assertEqual(initiator['project_id'], samples[i].project_id)
+
+    def test_middleware_without_measurements(self):
+        v = notifications.SwiftWsgiMiddlewareMeters(mock.Mock())
+        event = copy.copy(MIDDLEWARE_EVENT)
+        event['payload'].pop('measurements')
+        self.assertEqual([], list(v.process_notification(event)))
