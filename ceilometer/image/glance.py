@@ -16,7 +16,6 @@
 """
 
 from __future__ import absolute_import
-import itertools
 
 import glanceclient
 from oslo_config import cfg
@@ -69,30 +68,7 @@ class _Base(plugin_base.PollsterBase):
         kwargs = {}
         if page_size > 0:
             kwargs['page_size'] = page_size
-        rawImageList = list(itertools.chain(
-            client.images.list(filters={"is_public": True}, **kwargs),
-            # TODO(eglynn): extend glance API with all_tenants logic to
-            #              avoid second call to retrieve private images
-            client.images.list(filters={"is_public": False}, **kwargs)))
-
-        # When retrieving images from glance, glance will check
-        # whether the user is of 'admin_role' which is
-        # configured in glance-api.conf. If the user is of
-        # admin_role, and is querying public images(which means
-        # that the 'is_public' param is set to be True),
-        # glance will ignore 'is_public' parameter and returns
-        # all the public images together with private images.
-        # As a result, if the user/tenant has an admin role
-        # for ceilometer to collect image list,
-        # the _Base.iter_images method will return an image list
-        # which contains duplicate images. Add the following
-        # code to avoid recording down duplicate image events.
-        imageIdSet = set(image.id for image in rawImageList)
-
-        for image in rawImageList:
-            if image.id in imageIdSet:
-                imageIdSet -= set([image.id])
-                yield image
+        return client.images.list(filters={"is_public": None}, **kwargs)
 
     def _iter_images(self, ksclient, cache, endpoint):
         """Iterate over all images."""
