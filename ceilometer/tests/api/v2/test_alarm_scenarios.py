@@ -914,9 +914,14 @@ class TestAlarms(v2.FunctionalTest,
                               status=400, headers=self.auth_headers)
         alarms = list(self.alarm_conn.get_alarms())
         self.assertEqual(7, len(alarms))
-        self.assertEqual('threshold_rule and combination_rule cannot '
-                         'be set at the same time',
-                         resp.json['error_message']['faultstring'])
+
+        # threshold_rule and combination_rule order is not
+        # predictable so it is not possible to do an exact match
+        # here
+        error_faultstring = resp.json['error_message']['faultstring']
+        for expected_string in ['threshold_rule', 'combination_rule',
+                                'cannot be set at the same time']:
+            self.assertIn(expected_string, error_faultstring)
 
     def test_post_invalid_alarm_timestamp_in_threshold_rule(self):
         date_time = datetime.datetime(2012, 7, 2, 10, 41)
