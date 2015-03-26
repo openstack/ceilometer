@@ -1,0 +1,361 @@
+#
+# Tests to explore and cover the /v2/meters section of the
+# Ceilometer API.
+#
+
+fixtures:
+    - ConfigFixture
+
+tests:
+
+# Generic HTTP health explorations of all meters.
+
+    - name: empty meters list
+      url: /v2/meters
+      response_headers:
+          content-type: /application/json/
+      response_strings:
+          - "[]"
+
+    - name: meters list bad accept
+      url: /v2/meters
+      request_headers:
+          accept: text/plain
+      status: 406
+
+    - name: meters list bad method
+      desc: https://bugs.launchpad.net/ceilometer/+bug/1426476
+      xfail: true
+      url: /v2/meters
+      method: POST
+      status: 405
+
+    - name: try to delete meters
+      desc: https://bugs.launchpad.net/ceilometer/+bug/1426476
+      xfail: true
+      url: /v2/meters
+      method: DELETE
+      status: 405 # actual response is 404, at least we can't delete
+
+# Generic HTTP health explorations of single meter.
+
+    - name: get non exist meter
+      url: /v2/meters/noexist
+      response_strings:
+          - "[]"
+
+    - name: meter bad accept
+      url: /v2/meters/noexist
+      request_headers:
+          accept: text/plain
+      status: 406
+
+    - name: meter delete noexist
+      url: /v2/meters/noexist
+      method: DELETE
+      status: 404
+
+    - name: post meter no data
+      url: /v2/meters/apples
+      method: POST
+      request_headers:
+          content-type: application/json
+      data: ""
+      status: 400
+
+    - name: post meter error is JSON
+      desc: https://bugs.launchpad.net/ceilometer/+bug/1426483
+      xfail: true
+      url: /v2/meters/apples
+      method: POST
+      request_headers:
+          content-type: application/json
+      data: ""
+      status: 400
+      response_headers:
+          content-type: /application/json/
+      response_json_paths:
+          error_message:
+              faulstring: 'Missing argument: "samples"'
+
+    - name: post meter bad content-type
+      desc: https://bugs.launchpad.net/wsme/+bug/1419110
+      xfail: true
+      url: /v2/meters/apples
+      method: POST
+      request_headers:
+          content-type: text/plain
+      data: hello
+      status: 400
+
+    - name: post bad samples to meter
+      desc: https://bugs.launchpad.net/ceilometer/+bug/1428185
+      xfail: true
+      url: /v2/meters/apples
+      method: POST
+      request_headers:
+          content-type: application/json
+      data:
+          samples:
+              - red
+              - blue
+              - yellow
+      status: 400
+
+# POST variations on a malformed sample
+
+    - name: post limited counter to meter
+      url: /v2/meters/apples
+      method: POST
+      request_headers:
+          content-type: application/json
+      data:
+          - counter_unit: instance
+            counter_volume: 1
+            resource_id: bd9431c1-8d69-4ad3-803a-8d4a6b89fd36
+      status: 400
+      response_strings:
+          - "Invalid input for field/attribute counter_name"
+
+    - name: post mismatched counter name to meter
+      url: /v2/meters/apples
+      method: POST
+      request_headers:
+          content-type: application/json
+      data:
+          - counter_name: cars
+            counter_type: gauge
+            counter_unit: instance
+            counter_volume: 1
+            resource_id: bd9431c1-8d69-4ad3-803a-8d4a6b89fd36
+      status: 400
+      response_strings:
+          - "Invalid input for field/attribute counter_name"
+          - "should be apples"
+
+    - name: post counter no resource to meter
+      url: /v2/meters/apples
+      method: POST
+      request_headers:
+          content-type: application/json
+      data:
+          - counter_name: apples
+            counter_type: gauge
+            counter_unit: instance
+            counter_volume: 1
+      status: 400
+      response_strings:
+          - "Invalid input for field/attribute resource_id"
+          - "Mandatory field missing."
+
+    - name: post counter bad type to meter
+      url: /v2/meters/apples
+      method: POST
+      request_headers:
+          content-type: application/json
+      data:
+          - counter_name: apples
+            counter_type: elevation
+            counter_unit: instance
+            counter_volume: 1
+            resource_id: bd9431c1-8d69-4ad3-803a-8d4a6b89fd36
+      status: 400
+      response_strings:
+          - "Invalid input for field/attribute counter_type."
+          - "The counter type must be: gauge, delta, cumulative"
+
+# Manipulate samples
+
+    - name: post counter to meter
+      url: /v2/meters/apples
+      method: POST
+      request_headers:
+          content-type: application/json
+      data:
+          - counter_name: apples
+            counter_type: gauge
+            counter_unit: instance
+            counter_volume: 1
+            resource_id: bd9431c1-8d69-4ad3-803a-8d4a6b89fd36
+      status: 201
+
+    - name: list apple samples
+      url: /v2/meters/apples
+      response_json_paths:
+          $[0].counter_volume: 1.0
+          $[0].counter_name: apples
+          $[0].resource_id: bd9431c1-8d69-4ad3-803a-8d4a6b89fd36
+
+    - name: list meters
+      url: /v2/meters
+      response_json_paths:
+          $[0].name: apples
+          $[0].resource_id: bd9431c1-8d69-4ad3-803a-8d4a6b89fd36
+          $[0].type: gauge
+          $[-1].name: apples
+
+    - name: negative limit on meter list
+      url: /v2/meters/apples?limit=-5
+      status: 400
+      response_strings:
+          - Limit must be positive
+
+    - name: nan limit on meter list
+      url: /v2/meters/apples?limit=NaN
+      status: 400
+      response_strings:
+          - unable to convert to int
+
+    - name: post counter to meter different resource
+      url: /v2/meters/apples
+      method: POST
+      status: 201
+      request_headers:
+          content-type: application/json
+      data:
+          - counter_name: apples
+            counter_type: gauge
+            counter_unit: instance
+            counter_volume: 2
+            resource_id: aa9431c1-8d69-4ad3-803a-8d4a6b89fdaa
+
+    - name: query for resource
+      url: /v2/meters/apples?q.field=resource_id&q.value=aa9431c1-8d69-4ad3-803a-8d4a6b89fdaa&q.op=eq
+      response_json_paths:
+          $[0].resource_id: aa9431c1-8d69-4ad3-803a-8d4a6b89fdaa
+          $[-1].resource_id: aa9431c1-8d69-4ad3-803a-8d4a6b89fdaa
+
+# Explore posting samples with less than perfect data.
+
+    - name: post counter with bad timestamp
+      desc: https://bugs.launchpad.net/wsme/+bug/1428624
+      xfail: true
+      url: /v2/meters/apples
+      method: POST
+      request_headers:
+          content-type: application/json
+      data:
+          - counter_name: apples
+            counter_type: gauge
+            counter_unit: instance
+            counter_volume: 3
+            resource_id: aa9431c1-8d69-4ad3-803a-8d4a6b89fdaa
+            timestamp: "2013-01-bad 23:23:20"
+
+    - name: post counter with good timestamp
+      url: /v2/meters/apples
+      method: POST
+      status: 201
+      request_headers:
+          content-type: application/json
+      data:
+          - counter_name: apples
+            counter_type: gauge
+            counter_unit: instance
+            counter_volume: 3
+            resource_id: aa9431c1-8d69-4ad3-803a-8d4a6b89fdaa
+            timestamp: "2013-01-01 23:23:20"
+
+    - name: post counter with wrong metadata
+      desc: https://bugs.launchpad.net/ceilometer/+bug/1428628
+      xfail: true
+      url: /v2/meters/apples
+      method: POST
+      request_headers:
+          content-type: application/json
+      data:
+          - counter_name: apples
+            counter_type: gauge
+            counter_unit: instance
+            counter_volume: 3
+            resource_id: aa9431c1-8d69-4ad3-803a-8d4a6b89fdaa
+            timestamp: "2013-01-01 23:23:20"
+            resource_metadata: "a string"
+
+    - name: post counter with empty metadata
+      url: /v2/meters/apples
+      method: POST
+      status: 201
+      request_headers:
+          content-type: application/json
+      data:
+          - counter_name: apples
+            counter_type: gauge
+            counter_unit: instance
+            counter_volume: 3
+            resource_id: aa9431c1-8d69-4ad3-803a-8d4a6b89fdaa
+            timestamp: "2013-01-01 23:23:20"
+            resource_metadata: {}
+
+# Statistics
+
+    - name: get sample statistics
+      url: /v2/meters/apples/statistics
+      response_json_paths:
+          $[0].groupby: null
+          $[0].unit: instance
+          $[0].sum: 9.0
+          $[0].min: 1.0
+          $[0].max: 3.0
+          $[0].count: 4
+
+    - name: get incorrectly grouped sample statistics
+      url: /v2/meters/apples/statistics?groupby=house_id
+      status: 400
+      response_strings:
+          - Invalid groupby fields
+
+    - name: get grouped sample statistics
+      url: /v2/meters/apples/statistics?groupby=resource_id
+      response_json_paths:
+          $[0].max: 3.0
+          $[1].max: 1.0
+
+    - name: get sample statistics bad period
+      url: /v2/meters/apples/statistics?period=seven
+      status: 400
+      response_strings:
+          - unable to convert to int
+
+    - name: get sample statistics negative period
+      url: /v2/meters/apples/statistics?period=-7
+      status: 400
+      response_strings:
+          - Period must be positive.
+
+    - name: get sample statistics 600 period
+      url: /v2/meters/apples/statistics?period=600
+      response_json_paths:
+          $[0].period: 600
+
+    - name: get sample statistics time limit not time
+      url: /v2/meters/apples/statistics?q.field=timestamp&q.op=gt&q.value=Remember%20Remember
+      status: 400
+      response_strings:
+          - invalid timestamp format
+
+    - name: get sample statistics time limit gt
+      url: /v2/meters/apples/statistics?q.field=timestamp&q.op=gt&q.value=2014-01-01
+      response_json_paths:
+          $[0].count: 2
+
+    - name: get sample statistics time limit lt
+      url: /v2/meters/apples/statistics?q.field=timestamp&q.op=lt&q.value=2014-01-01
+      response_json_paths:
+          $[0].count: 2
+
+    - name: get sample statistics time limit bounded
+      url: /v2/meters/apples/statistics?q.field=timestamp&q.op=gt&q.value=2013-06-01&q.field=timestamp&q.op=lt&q.value=2014-01-01
+      response_strings:
+          - "[]"
+
+    - name: get sample statistics select aggregate bad format
+      desc: https://bugs.launchpad.net/wsme/+bug/1428658
+      xfail: true
+      url: /v2/meters/apples/statistics?aggregate=max
+      status: 400
+
+    - name: get sample statistics select aggregate
+      url: /v2/meters/apples/statistics?aggregate.func=max
+      response_json_paths:
+          $[0].aggregate.max: 3.0
