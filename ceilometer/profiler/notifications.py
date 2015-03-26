@@ -35,7 +35,8 @@ cfg.CONF.import_opt('keystone_control_exchange',
                     'ceilometer.identity.notifications')
 
 
-class ProfilerNotifications(plugin_base.NotificationBase):
+class ProfilerNotifications(plugin_base.NotificationBase,
+                            plugin_base.NonMetricNotificationBase):
 
     event_types = ["profiler.*"]
 
