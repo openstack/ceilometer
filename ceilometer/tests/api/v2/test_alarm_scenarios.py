@@ -23,6 +23,7 @@ from oslo_serialization import jsonutils
 import requests
 import six
 from six import moves
+import six.moves.urllib.parse as urlparse
 
 from ceilometer.alarm.storage import models
 from ceilometer import messaging
@@ -2452,10 +2453,17 @@ class TestAlarms(v2.FunctionalTest,
                         ) as gnocchi_get:
             self.post_json('/alarms', params=json, headers=self.auth_headers)
 
-            expected = [mock.call('http://localhost:8041/v1/capabilities',
+            gnocchi_url = self.CONF.alarms.gnocchi_url
+            capabilities_url = urlparse.urljoin(gnocchi_url,
+                                                '/v1/capabilities')
+            resource_url = urlparse.urljoin(
+                gnocchi_url,
+                '/v1/resource/instance/209ef69c-c10c-4efb-90ff-46f4b2d90d2e'
+            )
+
+            expected = [mock.call(capabilities_url,
                                   headers=mock.ANY),
-                        mock.call('http://localhost:8041/v1/resource/instance/'
-                                  '209ef69c-c10c-4efb-90ff-46f4b2d90d2e',
+                        mock.call(resource_url,
                                   headers=mock.ANY)]
             self.assertEqual(expected, gnocchi_get.mock_calls)
 
