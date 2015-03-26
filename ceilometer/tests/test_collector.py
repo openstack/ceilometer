@@ -141,13 +141,26 @@ class TestCollector(tests_base.BaseTestCase):
 
         udp_socket = self._make_fake_socket(self.counter)
 
-        with mock.patch('socket.socket', return_value=udp_socket):
+        with mock.patch('socket.socket') as mock_socket:
+            mock_socket.return_value = udp_socket
             self.srv.start()
+            mock_socket.assert_called_with(socket.AF_INET, socket.SOCK_DGRAM)
 
         self._verify_udp_socket(udp_socket)
 
         mock_dispatcher.record_metering_data.assert_called_once_with(
             self.counter)
+
+    def test_udp_socket_ipv6(self):
+        self._setup_messaging(False)
+        self.CONF.set_override('udp_address', '::1', group='collector')
+        self._setup_fake_dispatcher()
+        sock = self._make_fake_socket('data')
+
+        with mock.patch.object(socket, 'socket') as mock_socket:
+            mock_socket.return_value = sock
+            self.srv.start()
+            mock_socket.assert_called_with(socket.AF_INET6, socket.SOCK_DGRAM)
 
     def test_udp_receive_storage_error(self):
         self._setup_messaging(False)

@@ -16,6 +16,7 @@
 import socket
 
 import msgpack
+import netaddr
 import oslo.messaging
 from oslo_config import cfg
 from oslo_utils import timeutils
@@ -107,7 +108,10 @@ class CollectorService(os_service.Service):
                 self.tg.add_timer(604800, lambda: None)
 
     def start_udp(self):
-        udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        address_family = socket.AF_INET
+        if netaddr.valid_ipv6(cfg.CONF.collector.udp_address):
+            address_family = socket.AF_INET6
+        udp = socket.socket(address_family, socket.SOCK_DGRAM)
         udp.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         udp.bind((cfg.CONF.collector.udp_address,
                   cfg.CONF.collector.udp_port))
