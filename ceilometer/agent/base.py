@@ -130,15 +130,12 @@ class PollingTask(object):
                     LOG.info(_("Polling pollster %(poll)s in the context of "
                                "%(src)s"),
                              dict(poll=pollster.name, src=source_name))
-                    pollster_resources = []
-                    if pollster.obj.default_discovery:
-                        pollster_resources = self.manager.discover(
-                            [pollster.obj.default_discovery], discovery_cache)
                     key = Resources.key(source_name, pollster)
-                    source_resources = list(
+                    candidate_res = list(
                         self.resources[key].get(discovery_cache))
-                    candidate_res = (source_resources or
-                                     pollster_resources)
+                    if not candidate_res and pollster.obj.default_discovery:
+                        candidate_res = self.manager.discover(
+                            [pollster.obj.default_discovery], discovery_cache)
 
                     # Remove duplicated resources and black resources. Using
                     # set() requires well defined __hash__ for each resource.
