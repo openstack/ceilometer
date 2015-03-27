@@ -25,6 +25,10 @@ _ENFORCER = None
 CONF = cfg.CONF
 
 
+def _has_rule(name):
+    return name in _ENFORCER.rules.keys()
+
+
 def enforce(policy_name, request):
     """Return the user and project the request should be limited to.
 
@@ -46,14 +50,11 @@ def enforce(policy_name, request):
     policy_dict['target.user_id'] = (headers.get('X-User-Id'))
     policy_dict['target.project_id'] = (headers.get('X-Project-Id'))
 
-    for rule_name in _ENFORCER.rules.keys():
-        if rule_method == rule_name:
-            if not _ENFORCER.enforce(
-                    rule_name,
-                    {},
-                    policy_dict):
-                pecan.core.abort(status_code=403,
-                                 detail='RBAC Authorization Failed')
+    # maintain backward compat with Juno and previous by allowing the action if
+    # there is no rule defined for it
+    if ((_has_rule('default') or _has_rule(rule_method)) and
+            not _ENFORCER.enforce(rule_method, {}, policy_dict)):
+        pecan.core.abort(status_code=403, detail='RBAC Authorization Failed')
 
 
 # TODO(fabiog): these methods are still used because the scoping part is really
@@ -77,10 +78,15 @@ def get_limited_to(headers):
     policy_dict['target.user_id'] = (headers.get('X-User-Id'))
     policy_dict['target.project_id'] = (headers.get('X-Project-Id'))
 
-    if not _ENFORCER.enforce('segregation',
+    # maintain backward compat with Juno and previous by using context_is_admin
+    # rule if the segregation rule (added in Kilo) is not defined
+    rule_name = 'segregation' if _has_rule(
+        'segregation') else 'context_is_admin'
+    if not _ENFORCER.enforce(rule_name,
                              {},
                              policy_dict):
         return headers.get('X-User-Id'), headers.get('X-Project-Id')
+
     return None, None
 
 
