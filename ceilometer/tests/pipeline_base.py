@@ -751,43 +751,6 @@ class BasePipelineTestCase(base.BaseTestCase):
         self.assertEqual('a_update',
                          getattr(publisher.samples[0], 'name'))
 
-    def test_variable_counter(self):
-        self.pipeline_cfg = [{
-            'name': "test_pipeline",
-            'interval': 5,
-            'counters': ['a:*'],
-            'transformers': [
-                {'name': "update",
-                 'parameters': {}}
-            ],
-            'publishers': ["test://"],
-        }, ]
-        pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
-                                                    self.transformer_manager)
-
-        self.test_counter = sample.Sample(
-            name='a:b',
-            type=self.test_counter.type,
-            volume=self.test_counter.volume,
-            unit=self.test_counter.unit,
-            user_id=self.test_counter.user_id,
-            project_id=self.test_counter.project_id,
-            resource_id=self.test_counter.resource_id,
-            timestamp=self.test_counter.timestamp,
-            resource_metadata=self.test_counter.resource_metadata,
-        )
-
-        with pipeline_manager.publisher(None) as p:
-            p([self.test_counter])
-
-        publisher = pipeline_manager.pipelines[0].publishers[0]
-        self.assertEqual(1, len(publisher.samples))
-        self.assertEqual(1, len(self.TransformerClass.samples))
-        self.assertEqual('a:b_update',
-                         getattr(publisher.samples[0], "name"))
-        self.assertEqual('a:b',
-                         getattr(self.TransformerClass.samples[0], "name"))
-
     def test_global_unit_conversion(self):
         scale = 'volume / ((10**6) * 60)'
         transformer_cfg = [
