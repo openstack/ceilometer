@@ -38,7 +38,11 @@ class UDPPublisher(publisher.PublisherBase):
         self.host, self.port = netutils.parse_host_port(
             parsed_url.netloc,
             default_port=cfg.CONF.collector.udp_port)
-        self.socket = socket.socket(socket.AF_INET,
+        if netutils.is_valid_ipv6(self.host):
+            addr_family = socket.AF_INET6
+        else:
+            addr_family = socket.AF_INET
+        self.socket = socket.socket(addr_family,
                                     socket.SOCK_DGRAM)
 
     def publish_samples(self, context, samples):
