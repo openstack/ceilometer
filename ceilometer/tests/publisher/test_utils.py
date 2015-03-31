@@ -129,3 +129,7 @@ class TestSignature(base.BaseTestCase):
         self.assertFalse(utils.besteffort_compare_digest(hash1, hash3))
         self.assertTrue(utils.besteffort_compare_digest(hash4, hash5))
         self.assertFalse(utils.besteffort_compare_digest(hash4, hash6))
+
+    def test_verify_no_secret(self):
+        data = {'a': 'A', 'b': 'B'}
+        self.assertTrue(utils.verify_signature(data, ''))

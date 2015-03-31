@@ -26,8 +26,9 @@ from ceilometer import utils
 OPTS = [
     cfg.StrOpt('telemetry_secret',
                secret=True,
-               default='change this or be hacked',
-               help='Secret value for signing metering messages.',
+               default='change this for valid signing',
+               help='Secret value for signing messages. Set value empty if '
+                    'signing is not required to avoid computational overhead.',
                deprecated_opts=[cfg.DeprecatedOpt("metering_secret",
                                                   "DEFAULT"),
                                 cfg.DeprecatedOpt("metering_secret",
@@ -41,6 +42,9 @@ cfg.CONF.register_opts(OPTS, group="publisher")
 
 def compute_signature(message, secret):
     """Return the signature for a message dictionary."""
+    if not secret:
+        return ''
+
     digest_maker = hmac.new(secret, '', hashlib.sha256)
     for name, value in utils.recursive_keypairs(message):
         if name == 'message_signature':
@@ -88,6 +92,9 @@ def verify_signature(message, secret):
     Message is verified against the value computed from the rest of the
     contents.
     """
+    if not secret:
+        return True
+
     old_sig = message.get('message_signature', '')
     new_sig = compute_signature(message, secret)
 
