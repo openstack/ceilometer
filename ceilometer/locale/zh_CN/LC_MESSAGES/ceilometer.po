@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-18 06:10+0000\n"
-"PO-Revision-Date: 2015-03-18 03:44+0000\n"
-"Last-Translator: aji.zqfan <aji.zqfan@gmail.com>\n"
+"POT-Creation-Date: 2015-03-31 06:06+0000\n"
+"PO-Revision-Date: 2015-03-24 14:24+0000\n"
+"Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Chinese (China) "
 "(http://www.transifex.com/projects/p/ceilometer/language/zh_CN/)\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -23,17 +23,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
-#: ceilometer/collector.py:123
+#: ceilometer/collector.py:127
 #, python-format
 msgid "UDP: Cannot decode data sent by %s"
 msgstr "UDP: 无法解码由 %s 发送的数据"
 
-#: ceilometer/collector.py:126
+#: ceilometer/collector.py:130
 #, python-format
 msgid "UDP: Storing %s"
 msgstr "UDP: 正在存储%s"
 
-#: ceilometer/collector.py:130
+#: ceilometer/collector.py:134
 msgid "UDP: Unable to store meter"
 msgstr "UDP: 无法存储计量器"
 
@@ -57,59 +57,59 @@ msgstr " 流水线入口：%s"
 msgid "loading notification handlers from %s"
 msgstr "从%s加载通知处理器"
 
-#: ceilometer/pipeline.py:312
+#: ceilometer/pipeline.py:315
 #, python-format
 msgid "Unable to load publisher %s"
 msgstr "无法加载发布器%s"
 
-#: ceilometer/pipeline.py:330
+#: ceilometer/pipeline.py:333
 #, python-format
 msgid ""
 "Pipeline %(pipeline)s: Setup transformer instance %(name)s with parameter"
 " %(param)s"
 msgstr "流水线%(pipeline)s：使用参数%(param)s初始化变形器实例%(name)s"
 
-#: ceilometer/pipeline.py:349 ceilometer/pipeline.py:413
+#: ceilometer/pipeline.py:352 ceilometer/pipeline.py:416
 #, python-format
 msgid "Pipeline %(pipeline)s: Continue after error from publisher %(pub)s"
 msgstr "流水线%(pipeline)s：发布器%(pub)s报错，继续执行"
 
-#: ceilometer/pipeline.py:368
+#: ceilometer/pipeline.py:371
 #, python-format
 msgid "Pipeline %(pipeline)s: Sample dropped by transformer %(trans)s"
 msgstr "流水线%(pipeline)s：数据点被变形器%(trans)s丢弃"
 
-#: ceilometer/pipeline.py:376
+#: ceilometer/pipeline.py:379
 #, python-format
 msgid ""
 "Pipeline %(pipeline)s: Exit after error from transformer %(trans)s for "
 "%(smp)s"
 msgstr "流水线%(pipeline)s：数据%(smp)s的变形器%(trans)s遇到错误，退出"
 
-#: ceilometer/pipeline.py:399
+#: ceilometer/pipeline.py:402
 #, python-format
 msgid "Pipeline %(pipeline)s: Transform sample %(smp)s from %(trans)s transformer"
 msgstr "流水线%(pipeline)s：使用变形器%(trans)s作用于数据%(smp)s "
 
-#: ceilometer/pipeline.py:429
+#: ceilometer/pipeline.py:432
 #, python-format
 msgid "Pipeline %(pipeline)s: Error flushing transformer %(trans)s"
 msgstr "流水线%(pipeline)s：变形器%(trans)s清空数据时出错"
 
-#: ceilometer/pipeline.py:625
+#: ceilometer/pipeline.py:628
 msgid "detected decoupled pipeline config format"
 msgstr "检测到分离的流水线配置格式"
 
-#: ceilometer/pipeline.py:646
+#: ceilometer/pipeline.py:649
 msgid "detected deprecated pipeline config format"
 msgstr "检测到废弃的流水线配置格式"
 
-#: ceilometer/pipeline.py:670
+#: ceilometer/pipeline.py:673
 #, python-format
 msgid "Pipeline config file: %s"
 msgstr "流水线配置文件：%s"
 
-#: ceilometer/pipeline.py:676
+#: ceilometer/pipeline.py:679
 #, python-format
 msgid "Pipeline config: %s"
 msgstr "流水线配置：%s"
@@ -124,44 +124,44 @@ msgstr "工作线程%(worker_name)s的数量%(workers)s非法，必须大于0"
 msgid "Polling pollster %(poll)s in the context of %(src)s"
 msgstr "在上下文环境%(src)s执行采集器%(poll)s"
 
-#: ceilometer/agent/base.py:161
+#: ceilometer/agent/base.py:158
 #, python-format
 msgid ""
 "Found following duplicated resoures for %(name)s in context of "
 "%(source)s:%(list)s. Check pipeline configuration."
 msgstr ""
 
-#: ceilometer/agent/base.py:172
+#: ceilometer/agent/base.py:169
 #, python-format
 msgid "Skip polling pollster %s, no resources found"
 msgstr "没有任何资源被发现，跳过采集器%s"
 
-#: ceilometer/agent/base.py:184
+#: ceilometer/agent/base.py:181
 #, python-format
 msgid "Prevent pollster %(name)s for polling source %(source)s anymore!"
 msgstr ""
 
-#: ceilometer/agent/base.py:190
+#: ceilometer/agent/base.py:187
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
 msgstr "遇到错误%(name)s：%(error)s，继续执行"
 
-#: ceilometer/agent/base.py:244
+#: ceilometer/agent/base.py:241
 #, python-format
 msgid "Skip loading extension for %s"
 msgstr "跳过为%s加载扩展"
 
-#: ceilometer/agent/base.py:248
+#: ceilometer/agent/base.py:245
 #, python-format
 msgid "Failed to import extension for %(name)s: %(error)s"
 msgstr "无法为%(name)s引入扩展：%(error)s"
 
-#: ceilometer/agent/base.py:357
+#: ceilometer/agent/base.py:354
 #, python-format
 msgid "Unable to discover resources: %s"
 msgstr "无法发现资源：%s"
 
-#: ceilometer/agent/base.py:359
+#: ceilometer/agent/base.py:356
 #, python-format
 msgid "Unknown discovery extension: %s"
 msgstr "未知的发现器插件：%s"
@@ -266,41 +266,41 @@ msgid "Remaining as %(state)s due to alarms %(alarm_ids)s in state %(state)s"
 msgstr "停留在状态%(state)s因为告警%(alarm_ids)s处于状态%(state)s"
 
 #: ceilometer/alarm/evaluator/combination.py:99
-#: ceilometer/alarm/evaluator/gnocchi.py:207
+#: ceilometer/alarm/evaluator/gnocchi.py:214
 #: ceilometer/alarm/evaluator/threshold.py:178
 #, python-format
 msgid "Attempted to evaluate alarm %s, but it is not within its time constraint."
 msgstr "尝试评估告警%s，但是该告警当前不在激活的时间范围内"
 
-#: ceilometer/alarm/evaluator/gnocchi.py:99
+#: ceilometer/alarm/evaluator/gnocchi.py:106
 #: ceilometer/alarm/evaluator/threshold.py:89
 #, python-format
 msgid "stats query %s"
 msgstr "统计信息查询 %s"
 
-#: ceilometer/alarm/evaluator/gnocchi.py:103
+#: ceilometer/alarm/evaluator/gnocchi.py:110
 #: ceilometer/alarm/evaluator/threshold.py:95
 msgid "alarm stats retrieval failed"
 msgstr "警报统计信息获取失败"
 
-#: ceilometer/alarm/evaluator/gnocchi.py:106
+#: ceilometer/alarm/evaluator/gnocchi.py:113
 #, python-format
 msgid "alarm stats retrieval failed: %s"
 msgstr "告警状态检索失败：%s"
 
-#: ceilometer/alarm/evaluator/gnocchi.py:121
+#: ceilometer/alarm/evaluator/gnocchi.py:128
 #: ceilometer/alarm/evaluator/threshold.py:56
 #, python-format
 msgid "query stats from %(start)s to %(now)s"
 msgstr "查询 %(start)s 到 %(now)s 之间的统计信息"
 
-#: ceilometer/alarm/evaluator/gnocchi.py:133
+#: ceilometer/alarm/evaluator/gnocchi.py:140
 #: ceilometer/alarm/evaluator/threshold.py:112
 #, python-format
 msgid "%d datapoints are unknown"
 msgstr "%d 数据点为未知"
 
-#: ceilometer/alarm/evaluator/gnocchi.py:156
+#: ceilometer/alarm/evaluator/gnocchi.py:163
 #: ceilometer/alarm/evaluator/threshold.py:137
 #, python-format
 msgid ""
@@ -308,7 +308,7 @@ msgid ""
 "threshold, most recent: %(most_recent)s"
 msgstr "有%(count)d个数据满足%(disposition)s阈值，因而状态迁移到%(state)s，最近的一次数据：%(most_recent)s"
 
-#: ceilometer/alarm/evaluator/gnocchi.py:160
+#: ceilometer/alarm/evaluator/gnocchi.py:167
 #: ceilometer/alarm/evaluator/threshold.py:141
 #, python-format
 msgid ""
@@ -316,7 +316,7 @@ msgid ""
 "threshold, most recent: %(most_recent)s"
 msgstr "有%(count)d个数据满足%(disposition)s阈值，因而状态保持为%(state)s，最近的一次数据：%(most_recent)s"
 
-#: ceilometer/alarm/evaluator/gnocchi.py:219
+#: ceilometer/alarm/evaluator/gnocchi.py:226
 #: ceilometer/alarm/evaluator/threshold.py:197
 #, python-format
 msgid "comparing value %(value)s against threshold %(limit)s"
@@ -660,16 +660,21 @@ msgstr ""
 msgid "Limit must be positive"
 msgstr "limit必须是正数"
 
-#: ceilometer/api/controllers/v2/meters.py:376
+#: ceilometer/api/controllers/v2/meters.py:315
+#, python-format
+msgid "The metric %s is not supported by metering pipeline configuration."
+msgstr ""
+
+#: ceilometer/api/controllers/v2/meters.py:384
 msgid "Period must be positive."
 msgstr "period 参数必须是正数"
 
-#: ceilometer/api/controllers/v2/meters.py:398
+#: ceilometer/api/controllers/v2/meters.py:406
 #, python-format
 msgid "computed value coming from %r"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/meters.py:408
+#: ceilometer/api/controllers/v2/meters.py:416
 #, python-format
 msgid "Invalid period %(period)s: %(err)s"
 msgstr "非法的间隔%(period)s: %(err)s"
@@ -967,7 +972,7 @@ msgstr "无法获取虚拟机%s的CPU使用率"
 msgid "loading dispatchers from %s"
 msgstr "正在从%s加载分发器"
 
-#: ceilometer/dispatcher/__init__.py:49
+#: ceilometer/dispatcher/__init__.py:52
 #, python-format
 msgid "Failed to load any dispatchers for %s"
 msgstr "无法为%s加载任何分发器"
@@ -977,30 +982,30 @@ msgstr "无法为%s加载任何分发器"
 msgid "Failed to connect to db, purpose %(purpose)s re-try later: %(err)s"
 msgstr "无法连接到数据库，目的%(purpose)s稍后重试：%(err)s"
 
-#: ceilometer/dispatcher/database.py:73 ceilometer/dispatcher/http.py:80
+#: ceilometer/dispatcher/database.py:73 ceilometer/dispatcher/http.py:88
 #, python-format
 msgid ""
 "metering data %(counter_name)s for %(resource_id)s @ %(timestamp)s: "
 "%(counter_volume)s"
 msgstr "再时间点%(timestamp)s为资源%(resource_id)s获得指标%(counter_name)s的监控数据：%(counter_volume)s"
 
-#: ceilometer/dispatcher/database.py:91 ceilometer/dispatcher/http.py:108
+#: ceilometer/dispatcher/database.py:91 ceilometer/dispatcher/http.py:116
 #, python-format
 msgid "Failed to record metering data: %s"
 msgstr "无法保存监控数据：%s"
 
-#: ceilometer/dispatcher/database.py:94 ceilometer/dispatcher/http.py:111
+#: ceilometer/dispatcher/database.py:96 ceilometer/dispatcher/http.py:119
 #, python-format
 msgid "message signature invalid, discarding message: %r"
 msgstr "消息签名不合法，丢弃消息：%r"
 
-#: ceilometer/dispatcher/http.py:70
+#: ceilometer/dispatcher/http.py:78
 msgid ""
 "Dispatcher target was not set, no meter will be posted. Set the target in"
 " the ceilometer.conf file"
 msgstr "分发器目标未设置，没有指标将被发送。在ceilometer.conf文件中设置目标。"
 
-#: ceilometer/dispatcher/http.py:105
+#: ceilometer/dispatcher/http.py:113
 #, python-format
 msgid "Message posting finished with status code %d."
 msgstr "消息发送结束，状态码为%d"
@@ -1153,11 +1158,6 @@ msgstr "拉取%(mtr)s传感器失败了%(cnt)s次！"
 msgid "FLOATING IP USAGE: %s"
 msgstr "浮动IP使用情况：%s"
 
-#: ceilometer/network/notifications.py:75
-#, python-format
-msgid "network notification %r"
-msgstr "收到网络通知%r"
-
 #: ceilometer/network/services/fwaas.py:47
 #, python-format
 msgid "Unknown status %(stat)s received on fw %(id)s,skipping sample"
@@ -1295,12 +1295,12 @@ msgstr "发布%d个数据点时失败，将其入队"
 msgid "Failed to publish %d datapoints, dropping them"
 msgstr "发布%d个数据点时失败，正在将其丢弃"
 
-#: ceilometer/publisher/udp.py:56
+#: ceilometer/publisher/udp.py:60
 #, python-format
 msgid "Publishing sample %(msg)s over UDP to %(host)s:%(port)d"
 msgstr "通过UDP发布采样 %(msg)s 至 %(host)s:%(port)d"
 
-#: ceilometer/publisher/udp.py:63
+#: ceilometer/publisher/udp.py:67
 msgid "Unable to send sample over UDP"
 msgstr "无法通过UDP发送采样"
 
@@ -1333,23 +1333,23 @@ msgstr "为资源%(resource_id)s获得指标%(counter_name)s的监控数据：%(
 msgid "Dropping metering data with TTL %d"
 msgstr "正在根据TTL %d丢弃监控数据"
 
-#: ceilometer/storage/impl_mongodb.py:553
+#: ceilometer/storage/impl_mongodb.py:560
 msgid ""
 "Clearing expired metering data is based on native MongoDB time to live "
 "feature and going in background."
 msgstr "MongoDB正在后台使用原生的TTL机制清除过期监控数据。"
 
-#: ceilometer/storage/impl_sqlalchemy.py:306
+#: ceilometer/storage/impl_sqlalchemy.py:307
 #, python-format
 msgid "Unknown metadata type. Key (%s) will not be queryable."
 msgstr "未知的元数据类型。键(%s)将无法进行查询。"
 
-#: ceilometer/storage/impl_sqlalchemy.py:359
+#: ceilometer/storage/impl_sqlalchemy.py:363
 #, python-format
 msgid "%d samples removed from database"
 msgstr "从数据库中移除%d个监控数据。"
 
-#: ceilometer/storage/impl_sqlalchemy.py:378
+#: ceilometer/storage/impl_sqlalchemy.py:382
 msgid "Expired residual resource and meter definition data"
 msgstr ""
 
