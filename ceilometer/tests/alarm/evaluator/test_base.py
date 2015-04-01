@@ -72,6 +72,20 @@ class TestEvaluatorBaseClass(base.BaseTestCase):
         self.assertFalse(cls.within_time_constraint(alarm))
 
     @mock.patch.object(timeutils, 'utcnow')
+    def test_base_time_constraints_by_month(self, mock_utcnow):
+        alarm = mock.MagicMock()
+        alarm.time_constraints = [
+            {'name': 'test',
+             'description': 'test',
+             'start': '0 11 31 1,3,5,7,8,10,12 *',  # every 31st at 11:00
+             'duration': 10800,  # 3 hours
+             'timezone': ''},
+        ]
+        cls = evaluator.Evaluator
+        mock_utcnow.return_value = datetime.datetime(2015, 3, 31, 11, 30, 0)
+        self.assertTrue(cls.within_time_constraint(alarm))
+
+    @mock.patch.object(timeutils, 'utcnow')
     def test_base_time_constraints_complex(self, mock_utcnow):
         alarm = mock.MagicMock()
         alarm.time_constraints = [

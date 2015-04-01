@@ -102,6 +102,9 @@ class Evaluator(object):
             start_cron = croniter.croniter(tc['start'], now_tz)
             if cls._is_exact_match(start_cron, now_tz):
                 return True
+            # start_cron.cur has changed in _is_exact_match(),
+            # croniter cannot recover properly in some corner case.
+            start_cron = croniter.croniter(tc['start'], now_tz)
             latest_start = start_cron.get_prev(datetime.datetime)
             duration = datetime.timedelta(seconds=tc['duration'])
             if latest_start <= now_tz <= latest_start + duration:
