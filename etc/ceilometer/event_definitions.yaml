@@ -151,6 +151,10 @@
       fields: payload.resource_info
     initiator_id:
       fields: payload.initiator.id
+    project_id:
+      fields: payload.initiator.project_id
+    domain_id:
+      fields: payload.initiator.domain_id
 - event_type: identity.role_assignment.*
   traits: &identity_role_assignment
     role:
