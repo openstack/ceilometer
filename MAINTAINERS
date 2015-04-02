@@ -8,6 +8,19 @@ This group can +2 and approve patches in Ceilometer. However, they may
 choose to seek feedback from the appropriate specialist maintainer before
 approving a patch if it is in any way controversial or risky.
 
+= IRC handles of maintainers =
+asalkeld
+dhellmann
+DinaBelova
+eglynn
+gordc
+ildikov
+jd__
+llu
+_nadya_
+sileht
+zqfan
+
 
 = List of Maintainers =
 
