@@ -95,7 +95,11 @@ class _Base(plugin_base.PollsterBase):
 
 
 class InletTemperaturePollster(_Base):
-    NAME = "hardware.ipmi.node.inlet_temperature"
+    # Note(ildikov): The new meter name should be
+    # "hardware.ipmi.node.inlet_temperature". As currently there
+    # is no meter deprecation support in the code, we should use the
+    # old name in order to avoid confusion.
+    NAME = "hardware.ipmi.node.temperature"
     TYPE = sample.TYPE_GAUGE
     UNIT = "C"
 
