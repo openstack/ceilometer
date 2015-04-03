@@ -42,6 +42,14 @@ class TestInstancePollster(base.TestPollsterBase):
         self.assertEqual('active', samples[0].resource_metadata['status'])
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def test_get_samples_instance_flavor(self):
+        mgr = manager.AgentManager()
+        pollster = pollsters_instance.InstanceFlavorPollster()
+        samples = list(pollster.get_samples(mgr, {}, [self.instance]))
+        self.assertEqual(1, len(samples))
+        self.assertEqual('instance:m1.small', samples[0].name)
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_reserved_metadata_with_keys(self):
         self.CONF = self.useFixture(fixture_config.Config()).conf
         self.CONF.set_override('reserved_metadata_keys', ['fqdn'])

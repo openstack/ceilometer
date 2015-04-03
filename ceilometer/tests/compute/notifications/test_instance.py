@@ -631,6 +631,13 @@ class TestNotifications(base.BaseTestCase):
         c = counters[0]
         self.assertEqual(1, c.volume)
 
+    def test_instance_create_flavor(self):
+        ic = instance.InstanceFlavor(None)
+        counters = list(ic.process_notification(INSTANCE_CREATE_END))
+        self.assertEqual(1, len(counters))
+        c = counters[0]
+        self.assertEqual(1, c.volume)
+
     def test_instance_create_memory(self):
         ic = instance.Memory(None)
         counters = list(ic.process_notification(INSTANCE_CREATE_END))
@@ -670,7 +677,17 @@ class TestNotifications(base.BaseTestCase):
         counters = list(ic.process_notification(INSTANCE_EXISTS_METADATA_LIST))
         self.assertEqual(1, len(counters))
 
+    def test_instance_exists_flavor(self):
+        ic = instance.Instance(None)
+        counters = list(ic.process_notification(INSTANCE_EXISTS))
+        self.assertEqual(1, len(counters))
+
     def test_instance_delete_instance(self):
+        ic = instance.Instance(None)
+        counters = list(ic.process_notification(INSTANCE_DELETE_START))
+        self.assertEqual(1, len(counters))
+
+    def test_instance_delete_flavor(self):
         ic = instance.Instance(None)
         counters = list(ic.process_notification(INSTANCE_DELETE_START))
         self.assertEqual(1, len(counters))
@@ -681,6 +698,15 @@ class TestNotifications(base.BaseTestCase):
         self.assertEqual(1, len(counters))
         c = counters[0]
         self.assertEqual(1, c.volume)
+        self._verify_user_metadata(c.resource_metadata)
+
+    def test_instance_finish_resize_flavor(self):
+        ic = instance.InstanceFlavor(None)
+        counters = list(ic.process_notification(INSTANCE_FINISH_RESIZE_END))
+        self.assertEqual(1, len(counters))
+        c = counters[0]
+        self.assertEqual(1, c.volume)
+        self.assertEqual('instance:m1.small', c.name)
         self._verify_user_metadata(c.resource_metadata)
 
     def test_instance_finish_resize_memory(self):
@@ -707,6 +733,15 @@ class TestNotifications(base.BaseTestCase):
         self.assertEqual(1, len(counters))
         c = counters[0]
         self.assertEqual(1, c.volume)
+        self._verify_user_metadata(c.resource_metadata)
+
+    def test_instance_resize_finish_flavor(self):
+        ic = instance.InstanceFlavor(None)
+        counters = list(ic.process_notification(INSTANCE_RESIZE_REVERT_END))
+        self.assertEqual(1, len(counters))
+        c = counters[0]
+        self.assertEqual(1, c.volume)
+        self.assertEqual('instance:m1.tiny', c.name)
         self._verify_user_metadata(c.resource_metadata)
 
     def test_instance_resize_finish_memory(self):
