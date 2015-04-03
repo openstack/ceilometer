@@ -66,7 +66,6 @@ class CapabilitiesTest(test_base.BaseTestCase):
                                     'metadata': True,
                                     'complex': False}},
             'samples': {'pagination': False,
-                        'groupby': False,
                         'query': {'simple': True,
                                   'metadata': True,
                                   'complex': False}},

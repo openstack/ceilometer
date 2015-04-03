@@ -73,7 +73,6 @@ AVAILABLE_CAPABILITIES = {
     'resources': {'query': {'simple': True,
                             'metadata': True}},
     'samples': {'pagination': True,
-                'groupby': True,
                 'query': {'simple': True,
                           'metadata': True,
                           'complex': True}},

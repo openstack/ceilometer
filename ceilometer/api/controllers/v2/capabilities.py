@@ -59,7 +59,6 @@ class Capabilities(base.Base):
                                         'metadata': True,
                                         'complex': False}},
                 'samples': {'pagination': True,
-                            'groupby': True,
                             'query': {'simple': True,
                                       'metadata': True,
                                       'complex': True}},
