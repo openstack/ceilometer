@@ -17,12 +17,11 @@
 
 import abc
 import collections
-import fnmatch
 
 from keystoneclient.v2_0 import client as ksclient
-import oslo.messaging
 from oslo_config import cfg
 from oslo_context import context
+import oslo_messaging
 import six
 
 from ceilometer.i18n import _
@@ -93,6 +92,10 @@ class NotificationBase(PluginBase):
     """Base class for plugins that support the notification API."""
     def __init__(self, transporter):
         super(NotificationBase, self).__init__()
+        # NOTE(gordc): this is filter rule used by oslo.messaging to dispatch
+        # messages to an endpoint.
+        self.filter_rule = oslo_messaging.NotificationFilter(
+            event_type='|'.join(self.event_types))
         self.transporter = transporter
         # NOTE(gordc): if no publisher, this isn't a PipelineManager and
         # data should be requeued.
@@ -120,7 +123,7 @@ class NotificationBase(PluginBase):
 
             targets = []
             for exchange, topics in self.get_exchange_topics(conf):
-                targets.extend(oslo.messaging.Target(topic=topic,
+                targets.extend(oslo_messaging.Target(topic=topic,
                                                      exchange=exchange)
                                for topic in topics)
             return targets
@@ -131,15 +134,6 @@ class NotificationBase(PluginBase):
 
         :param message: Message to process.
         """
-
-    @staticmethod
-    def _handle_event_type(event_type, event_type_to_handle):
-        """Check whether event_type should be handled.
-
-        It is according to event_type_to_handle.
-        """
-        return any(map(lambda e: fnmatch.fnmatch(event_type, e),
-                       event_type_to_handle))
 
     def info(self, ctxt, publisher_id, event_type, payload, metadata):
         """RPC endpoint for notification messages
@@ -165,13 +159,6 @@ class NotificationBase(PluginBase):
         :param context: Execution context from the service or RPC call
         :param notification: The notification to process.
         """
-
-        # TODO(sileht): this will be moved into oslo.messaging
-        # see oslo.messaging bp notification-dispatcher-filter
-        if not self._handle_event_type(notification['event_type'],
-                                       self.event_types):
-            return
-
         if self.requeue:
             meters = [
                 utils.meter_message_from_counter(
