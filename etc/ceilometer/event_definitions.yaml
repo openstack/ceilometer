@@ -167,7 +167,7 @@
       fields: payload.user
     project:
       fields: payload.project
-- event_type: identity.authenticate.*
+- event_type: identity.authenticate
   traits: &identity_authenticate
     typeURI:
       fields: payload.typeURI
