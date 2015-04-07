@@ -145,7 +145,6 @@ class Connection(object):
                                 'metadata': False,
                                 'complex': False}},
         'samples': {'pagination': False,
-                    'groupby': False,
                     'query': {'simple': False,
                               'metadata': False,
                               'complex': False}},
