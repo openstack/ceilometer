@@ -1,36 +1,36 @@
-alembic>=0.4.1
-anyjson>=0.3.3
+alembic>=0.4.1,<=0.7.5.post2
+anyjson>=0.3.3,<=0.3.3
 argparse
-croniter>=0.3.4 # MIT License
+croniter>=0.3.4,<=0.3.5 # MIT License
 # List oslo.vmware early to ensure its transitive eventlet dependency
 # on eventlet is satisifed.
 oslo.vmware<0.6.0                       # Apache-2.0
 eventlet>=0.13.0,<0.16.0
 Flask>=0.10,<1.0
-happybase>=0.5,!=0.7
-iso8601>=0.1.9
+happybase>=0.5,!=0.7,<=0.9
+iso8601>=0.1.9,<=0.1.10
 jsonpath-rw>=1.2.0,<2.0
 jsonschema>=2.0.0,<3.0.0
-kombu>=2.4.8
-lockfile>=0.8
-lxml>=2.3
-msgpack-python
-netaddr>=0.7.6
+kombu>=2.5.0,<=3.0.7
+lockfile>=0.8,<=0.10.2
+lxml>=2.3,<=3.4.2
+msgpack-python<=0.4.6
+netaddr>=0.7.6,<=0.7.14
 oslo.config>=1.2.0,<1.5
 pbr>=0.6,<1.0
-pecan>=0.4.5
+pecan>=0.4.5,<=0.8.3
 pysnmp>=4.2.1,<5.0.0
 python-ceilometerclient>=1.0.6,<=1.0.12
 python-glanceclient>=0.9.0,!=0.14.0,<=0.14.2
 python-keystoneclient>=0.7.0,<=0.11.2
 python-novaclient>=2.17.0,<2.21
 python-swiftclient>=1.6,<=2.3.1
-pytz>=2010h
-PyYAML>=3.1.0
-requests>=1.1
-six>=1.6.0
+pytz>=2010h,<=2015.2
+PyYAML>=3.1.0,<=3.11
+requests>=1.1,<=2.6.0
+six>=1.6.0,<=1.9.0
 SQLAlchemy>=0.7.8,!=0.9.5,<=0.9.99
 sqlalchemy-migrate>=0.8.2,!=0.8.4,<=0.9.1
 stevedore>=0.14,<1.2
-WebOb>=1.2.3
-WSME>=0.6
+WebOb>=1.2.3,<=1.4
+WSME>=0.6,<=0.6.4
