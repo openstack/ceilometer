@@ -91,15 +91,15 @@ class IndexTest(tests_db.TestBase,
         # create a fake index and check it is deleted
         coll = getattr(conn.db, coll_name)
         index_name = '%s_ttl' % coll_name
-        coll.ensure_index('foo', name=index_name)
         self.CONF.set_override(ttl_opt, -1, group='database')
         conn.upgrade()
-        self.assertTrue(coll.ensure_index('foo', name=index_name))
-        coll.drop_index(index_name)
+        self.assertNotIn(index_name, coll.index_information())
 
         self.CONF.set_override(ttl_opt, 456789, group='database')
         conn.upgrade()
-        self.assertFalse(coll.ensure_index('foo', name=index_name))
+        self.assertEqual(456789,
+                         coll.index_information()
+                         [index_name]['expireAfterSeconds'])
 
     def test_meter_ttl_index_absent(self):
         self._test_ttl_index_absent(self.conn, 'meter',
@@ -114,14 +114,13 @@ class IndexTest(tests_db.TestBase,
         self.CONF.set_override(ttl_opt, 456789, group='database')
         conn.upgrade()
         index_name = '%s_ttl' % coll_name
-        self.assertFalse(coll.ensure_index('foo', name=index_name))
         self.assertEqual(456789,
                          coll.index_information()
                          [index_name]['expireAfterSeconds'])
 
         self.CONF.set_override(ttl_opt, -1, group='database')
         conn.upgrade()
-        self.assertTrue(coll.ensure_index('foo', name=index_name))
+        self.assertNotIn(index_name, coll.index_information())
 
     def test_meter_ttl_index_present(self):
         self._test_ttl_index_present(self.conn, 'meter',
