@@ -12,14 +12,14 @@ single source to transform events into billable items which we
 label as "metering".
 
 As the project started to come to life, collecting an
-`increasing number of metrics`_ across multiple projects, the OpenStack
+`increasing number of meters`_ across multiple projects, the OpenStack
 community started to realize that a secondary goal could be added to
-Ceilometer: become a standard way to collect metric, regardless of the
+Ceilometer: become a standard way to collect meter, regardless of the
 purpose of the collection.  For example, Ceilometer can now publish information
 for monitoring, debugging and graphing tools in addition or in parallel to the
 metering backend. We labelled this effort as "multi-publisher".
 
-.. _increasing number of metrics: http://docs.openstack.org/developer/ceilometer/measurements.html
+.. _increasing number of meters: http://docs.openstack.org/developer/ceilometer/measurements.html
 
 Most recently, as the Heat project started to come to
 life, it soon became clear that the OpenStack project needed a tool to watch

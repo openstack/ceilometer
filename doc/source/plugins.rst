@@ -30,8 +30,8 @@ Polling agent might be run either on central cloud management nodes or on the
 compute nodes (where direct hypervisor polling is quite logical).
 
 The agent running on each compute node polls for compute resources
-usage. Each metric collected is tagged with the resource ID (such as
-an instance) and the owner, including tenant and user IDs. The metrics
+usage. Each meter collected is tagged with the resource ID (such as
+an instance) and the owner, including tenant and user IDs. The meters
 are then reported to the collector via the message bus. More detailed
 information follows.
 
@@ -136,7 +136,7 @@ generates the appropriate sample objects to be sent to the collector.
 Adding new plugins
 ------------------
 
-Although we have described a list of the metrics Ceilometer should
+Although we have described a list of the meters Ceilometer should
 collect, we cannot predict all of the ways deployers will want to
 measure the resources their customers use. This means that Ceilometer
 needs to be easy to extend and configure so it can be tuned for each

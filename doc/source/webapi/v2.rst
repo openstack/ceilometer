@@ -313,7 +313,7 @@ Functional examples
 +++++++++++++++++++
 
 The examples below are meant to help you understand how to query the
-Ceilometer API to build custom metrics report. The query parameters should
+Ceilometer API to build custom meters report. The query parameters should
 be encoded using one of the above methods, e.g. as the URL parameters or
 as JSON encoded data passed to the GET request.
 
