@@ -78,11 +78,11 @@ tests:
           - project
           - unrecognized field in query
 
-    - name: list samples with metaquery field
+    - name: list samples with bad metaquery field
       url: /v2/samples?q.field=metaquery&q.value=cow&q.op=eq
-      desc: https://bugs.launchpad.net/ceilometer/+bug/1426466
-      xfail: true
       status: 400
+      response_strings:
+          - unrecognized field in query
 
     - name: bad limit value
       url: /v2/samples?limit=happiness
