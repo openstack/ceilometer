@@ -27,9 +27,10 @@ class TestOpencontrailClient(base.BaseTestCase):
         self.get_resp = mock.MagicMock()
         self.get = mock.patch('requests.get',
                               return_value=self.get_resp).start()
-        self.get_resp.raw_version = 1.1
+        self.get_resp.raw.version = 1.1
         self.get_resp.status_code = 200
         self.get_resp.reason = 'OK'
+        self.get_resp.content = ''
 
     def test_vm_statistics(self):
         self.client.networks.get_vm_statistics('bbb')
