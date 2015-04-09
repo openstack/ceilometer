@@ -153,7 +153,7 @@ class KafkaBrokerPublisher(publisher.PublisherBase):
                 elif self.policy == 'drop':
                     return []
                 current_retry += 1
-                if self.current_retry >= self.max_retry:
+                if current_retry >= self.max_retry:
                     self.local_queue = []
                     LOG.exception(_LE("Failed to retry to send sample data "
                                       "with max_retry times"))
