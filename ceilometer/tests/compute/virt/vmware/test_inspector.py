@@ -17,7 +17,7 @@ Tests for VMware Vsphere inspector.
 """
 
 import mock
-from oslo.vmware import api
+from oslo_vmware import api
 from oslotest import base
 
 from ceilometer.compute.virt import inspector as virt_inspector
