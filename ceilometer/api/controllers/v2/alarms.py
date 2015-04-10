@@ -64,6 +64,10 @@ ALARM_API_OPTS = [
                default=None,
                help='Maximum number of alarms defined for a project.'
                ),
+    cfg.IntOpt('alarm_max_actions',
+               default=-1,
+               help='Maximum count of actions for each state of an alarm, '
+                    'non-positive number means no limit.'),
 ]
 
 cfg.CONF.register_opts(ALARM_API_OPTS, group='alarm')
@@ -306,11 +310,27 @@ class Alarm(base.Base):
     @staticmethod
     def check_alarm_actions(alarm):
         actions_schema = ceilometer_alarm.NOTIFIER_SCHEMAS
+        max_actions = cfg.CONF.alarm.alarm_max_actions
         for state in state_kind:
             actions_name = state.replace(" ", "_") + '_actions'
             actions = getattr(alarm, actions_name)
             if not actions:
                 continue
+
+            action_set = set(actions)
+            if len(actions) != len(action_set):
+                LOG.info(_('duplicate actions are found: %s, '
+                           'remove duplicate ones') % actions)
+                actions = list(action_set)
+                setattr(alarm, actions_name, actions)
+
+            if 0 < max_actions < len(actions):
+                error = _('%(name)s count exceeds maximum value '
+                          '%(maximum)d') % {"name": actions_name,
+                                            "maximum": max_actions}
+                raise base.ClientSideError(error)
+
+            limited = rbac.get_limited_to_project(pecan.request.headers)
 
             for action in actions:
                 try:
@@ -321,6 +341,10 @@ class Alarm(base.Base):
                 if url.scheme not in actions_schema:
                     error = _("Unsupported action %s") % action
                     raise base.ClientSideError(error)
+                if limited and url.scheme in ('log', 'test'):
+                    error = _('You are not authorized to create '
+                              'action: %s') % action
+                    raise base.ClientSideError(error, status_code=401)
 
     @classmethod
     def sample(cls):
