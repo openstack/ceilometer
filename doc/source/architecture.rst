@@ -25,7 +25,7 @@ High-Level Architecture
    An overall summary of Ceilometer's logical architecture.
 
 Each of Ceilometer's services are designed to scale horizontally. Additional
-workers and nodes can added depending on the expected load. Ceilometer offers
+workers and nodes can be added depending on the expected load. Ceilometer offers
 five core services, the data agents designed to work independently from
 collection and alarming, but also designed to work together as a
 complete solution:
@@ -85,7 +85,7 @@ Notification Agents: Listening for data
 The heart of the system is the notification daemon (agent-notification)
 which monitors the message bus for data being provided by other
 OpenStack components such as Nova, Glance, Cinder, Neutron, Swift, Keystone,
-and Heat
+and Heat.
 
 The notification daemon loads one or more *listener* plugins, using the
 namespace ``ceilometer.notification``. Each plugin can listen to any topics,
@@ -152,7 +152,7 @@ Pipeline Manager
    :align: center
    :alt: Ceilometer pipeline
 
-   The assembly of components making the Ceilometer pipeline
+   The assembly of components making the Ceilometer pipeline.
 
 Ceilometer offers the ability to take data gathered by the agents, manipulate
 it, and publish it in various combinations via multiple pipelines.
@@ -166,7 +166,7 @@ Transforming the data
    :alt: Transformer example
 
    Example of aggregation of multiple cpu time usage samples in a single
-   cpu percentage sample
+   cpu percentage sample.
 
 The data gathered from the polling and notifications agents contains a wealth
 of data and if combined with historical or temporal context, can be used to
