@@ -18,6 +18,7 @@
 """Common functions for MongoDB and DB2 backends
 """
 
+import datetime
 import time
 import weakref
 
@@ -40,6 +41,15 @@ cfg.CONF.import_opt('retry_interval', 'oslo_db.options', group="database")
 EVENT_TRAIT_TYPES = {'none': 0, 'string': 1, 'integer': 2, 'float': 3,
                      'datetime': 4}
 OP_SIGN = {'lt': '$lt', 'le': '$lte', 'ne': '$ne', 'gt': '$gt', 'ge': '$gte'}
+
+MINIMUM_COMPATIBLE_MONGODB_VERSION = [2, 4]
+COMPLETE_AGGREGATE_COMPATIBLE_VERSION = [2, 6]
+
+TRIVIAL_LAMBDA = lambda result, param=None: result
+CARDINALITY_VALIDATION = (lambda name, param: param in ['resource_id',
+                                                        'user_id',
+                                                        'project_id',
+                                                        'source'])
 
 
 def make_timestamp_range(start, end,
@@ -484,3 +494,136 @@ class CursorProxy(pymongo.cursor.Cursor):
 
     def __getattr__(self, item):
         return getattr(self.cursor, item)
+
+
+class AggregationFields(object):
+    def __init__(self, version,
+                 group,
+                 project,
+                 finalize=None,
+                 parametrized=False,
+                 validate=None):
+        self._finalize = finalize or TRIVIAL_LAMBDA
+        self.group = lambda *args: group(*args) if parametrized else group
+        self.project = (lambda *args: project(*args)
+                        if parametrized else project)
+        self.version = version
+        self.validate = validate or (lambda name, param: True)
+
+    def finalize(self, name, data, param=None):
+        field = ("%s" % name) + ("/%s" % param if param else "")
+        return {field: (self._finalize(data.get(field))
+                        if self._finalize else data.get(field))}
+
+
+class Aggregation(object):
+    def __init__(self, name, aggregation_fields):
+        self.name = name
+        aggregation_fields = (aggregation_fields
+                              if isinstance(aggregation_fields, list)
+                              else [aggregation_fields])
+        self.aggregation_fields = sorted(aggregation_fields,
+                                         key=lambda af: getattr(af, "version"),
+                                         reverse=True)
+
+    def _get_compatible_aggregation_field(self, version_array):
+        if version_array:
+            version_array = version_array[0:2]
+        else:
+            version_array = MINIMUM_COMPATIBLE_MONGODB_VERSION
+        for aggregation_field in self.aggregation_fields:
+            if version_array >= aggregation_field.version:
+                return aggregation_field
+
+    def group(self, param=None, version_array=None):
+        af = self._get_compatible_aggregation_field(version_array)
+        return af.group(param)
+
+    def project(self, param=None, version_array=None):
+        af = self._get_compatible_aggregation_field(version_array)
+        return af.project(param)
+
+    def finalize(self, data, param=None, version_array=None):
+        af = self._get_compatible_aggregation_field(version_array)
+        return af.finalize(self.name, data, param)
+
+    def validate(self, param=None, version_array=None):
+        af = self._get_compatible_aggregation_field(version_array)
+        return af.validate(self.name, param)
+
+SUM_AGGREGATION = Aggregation(
+    "sum", AggregationFields(MINIMUM_COMPATIBLE_MONGODB_VERSION,
+                             {"sum": {"$sum": "$counter_volume"}},
+                             {"sum": "$sum"}))
+AVG_AGGREGATION = Aggregation(
+    "avg", AggregationFields(MINIMUM_COMPATIBLE_MONGODB_VERSION,
+                             {"avg": {"$avg": "$counter_volume"}},
+                             {"avg": "$avg"}))
+MIN_AGGREGATION = Aggregation(
+    "min", AggregationFields(MINIMUM_COMPATIBLE_MONGODB_VERSION,
+                             {"min": {"$min": "$counter_volume"}},
+                             {"min": "$min"}))
+MAX_AGGREGATION = Aggregation(
+    "max", AggregationFields(MINIMUM_COMPATIBLE_MONGODB_VERSION,
+                             {"max": {"$max": "$counter_volume"}},
+                             {"max": "$max"}))
+COUNT_AGGREGATION = Aggregation(
+    "count", AggregationFields(MINIMUM_COMPATIBLE_MONGODB_VERSION,
+                               {"count": {"$sum": 1}},
+                               {"count": "$count"}))
+STDDEV_AGGREGATION = Aggregation(
+    "stddev",
+    AggregationFields(MINIMUM_COMPATIBLE_MONGODB_VERSION,
+                      {"std_square": {
+                          "$sum": {
+                              "$multiply": ["$counter_volume",
+                                            "$counter_volume"]
+                          }},
+                       "std_count": {"$sum": 1},
+                       "std_sum": {"$sum": "$counter_volume"}},
+                      {"stddev": {
+                          "count": "$std_count",
+                          "sum": "$std_sum",
+                          "square_sum": "$std_square"}},
+                      lambda stddev: ((stddev['square_sum']
+                                       * stddev['count']
+                                       - stddev["sum"] ** 2) ** 0.5
+                                      / stddev['count'])))
+
+CARDINALITY_AGGREGATION = Aggregation(
+    "cardinality",
+    # $cond operator available only in MongoDB 2.6+
+    [AggregationFields(COMPLETE_AGGREGATE_COMPATIBLE_VERSION,
+                       lambda field: ({"cardinality/%s" % field:
+                                      {"$addToSet": "$%s" % field}}),
+                       lambda field: {
+                           "cardinality/%s" % field: {
+                               "$cond": [
+                                   {"$eq": ["$cardinality/%s" % field, None]},
+                                   0,
+                                   {"$size": "$cardinality/%s" % field}]
+                           }},
+                       validate=CARDINALITY_VALIDATION,
+                       parametrized=True),
+     AggregationFields(MINIMUM_COMPATIBLE_MONGODB_VERSION,
+                       lambda field: ({"cardinality/%s" % field:
+                                       {"$addToSet": "$%s" % field}}),
+                       lambda field: ({"cardinality/%s" % field:
+                                       "$cardinality/%s" % field}),
+                       finalize=len,
+                       validate=CARDINALITY_VALIDATION,
+                       parametrized=True)]
+)
+
+
+def to_unix_timestamp(timestamp):
+    if isinstance(timestamp, datetime.datetime):
+        return int(time.mktime(timestamp.timetuple()))
+    return timestamp
+
+
+def from_unix_timestamp(timestamp):
+    if (isinstance(timestamp, six.integer_types) or
+            isinstance(timestamp, float)):
+        return datetime.datetime.fromtimestamp(timestamp)
+    return timestamp
