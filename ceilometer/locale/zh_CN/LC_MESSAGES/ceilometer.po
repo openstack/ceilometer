@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-31 06:06+0000\n"
-"PO-Revision-Date: 2015-03-24 14:24+0000\n"
+"POT-Creation-Date: 2015-04-11 06:05+0000\n"
+"PO-Revision-Date: 2015-04-10 10:59+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Chinese (China) "
 "(http://www.transifex.com/projects/p/ceilometer/language/zh_CN/)\n"
@@ -166,17 +166,17 @@ msgstr "无法发现资源：%s"
 msgid "Unknown discovery extension: %s"
 msgstr "未知的发现器插件：%s"
 
-#: ceilometer/agent/plugin_base.py:72
+#: ceilometer/agent/plugin_base.py:71
 #, python-format
 msgid "Skip due to keystone error %s"
 msgstr "跳过执行，因为keystone出错了：%s，"
 
-#: ceilometer/agent/plugin_base.py:79
+#: ceilometer/agent/plugin_base.py:78
 #, python-format
 msgid "Skipping because %s service is not registered in keystone"
 msgstr "跳过执行，因为%s服务没有在keystone中注册"
 
-#: ceilometer/agent/plugin_base.py:118
+#: ceilometer/agent/plugin_base.py:121
 msgid ""
 "get_exchange_topics API of NotificationPlugin isdeprecated, implements "
 "get_targets instead."
@@ -527,65 +527,80 @@ msgstr "在 http://%(host)s:%(port)s上服务"
 msgid "Error parsing HTTP response: %s"
 msgstr "解析HTTP响应失败: %s"
 
-#: ceilometer/api/controllers/v2/alarms.py:84
+#: ceilometer/api/controllers/v2/alarms.py:88
 #, python-format
 msgid "Alarm quota exceeded for user %(u)s on project %(p)s"
 msgstr "用户%(u)s在项目%(p)s中的告警配额已溢出"
 
-#: ceilometer/api/controllers/v2/alarms.py:166
+#: ceilometer/api/controllers/v2/alarms.py:170
 #, python-format
 msgid "Timezone %s is not valid"
 msgstr "时区%s不合法"
 
-#: ceilometer/api/controllers/v2/alarms.py:281
+#: ceilometer/api/controllers/v2/alarms.py:285
 msgid "Time constraint names must be unique for a given alarm."
 msgstr "一个指定的告警的时间约束名称必须唯一"
 
-#: ceilometer/api/controllers/v2/alarms.py:291
+#: ceilometer/api/controllers/v2/alarms.py:295
 #, python-format
 msgid "%(rule)s must be set for %(type)s type alarm"
 msgstr "类型为%(type)s的告警必须设置%(rule)s"
 
-#: ceilometer/api/controllers/v2/alarms.py:302
+#: ceilometer/api/controllers/v2/alarms.py:306
 #, python-format
 msgid "%(rule1)s and %(rule2)s cannot be set at the same time"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/alarms.py:319
+#: ceilometer/api/controllers/v2/alarms.py:322
+#, python-format
+msgid "duplicate actions are found: %s, remove duplicate ones"
+msgstr ""
+
+#: ceilometer/api/controllers/v2/alarms.py:328
+#, python-format
+msgid "%(name)s count exceeds maximum value %(maximum)d"
+msgstr ""
+
+#: ceilometer/api/controllers/v2/alarms.py:339
 #, python-format
 msgid "Unable to parse action %s"
 msgstr "无法解析动作%s"
 
-#: ceilometer/api/controllers/v2/alarms.py:322
+#: ceilometer/api/controllers/v2/alarms.py:342
 #, python-format
 msgid "Unsupported action %s"
 msgstr "动作%s不支持"
 
-#: ceilometer/api/controllers/v2/alarms.py:509
+#: ceilometer/api/controllers/v2/alarms.py:345
+#, python-format
+msgid "You are not authorized to create action: %s"
+msgstr ""
+
+#: ceilometer/api/controllers/v2/alarms.py:533
 #, python-format
 msgid "Alarm with name=%s exists"
 msgstr "名称为%s的告警已存在"
 
-#: ceilometer/api/controllers/v2/alarms.py:519
+#: ceilometer/api/controllers/v2/alarms.py:543
 #, python-format
 msgid "Error while putting alarm: %s"
 msgstr "修改告警%s时遇到错误"
 
-#: ceilometer/api/controllers/v2/alarms.py:520
-#: ceilometer/api/controllers/v2/alarms.py:688
+#: ceilometer/api/controllers/v2/alarms.py:544
+#: ceilometer/api/controllers/v2/alarms.py:712
 msgid "Alarm incorrect"
 msgstr "警报不正确"
 
-#: ceilometer/api/controllers/v2/alarms.py:580
+#: ceilometer/api/controllers/v2/alarms.py:604
 msgid "state invalid"
 msgstr "状态无效"
 
-#: ceilometer/api/controllers/v2/alarms.py:681
+#: ceilometer/api/controllers/v2/alarms.py:705
 #, python-format
 msgid "Alarm with name='%s' exists"
 msgstr "名称为'%s'的告警已经存在"
 
-#: ceilometer/api/controllers/v2/alarms.py:687
+#: ceilometer/api/controllers/v2/alarms.py:711
 #, python-format
 msgid "Error while posting alarm: %s"
 msgstr "创建告警%s时遇到错误"
@@ -1339,17 +1354,17 @@ msgid ""
 "feature and going in background."
 msgstr "MongoDB正在后台使用原生的TTL机制清除过期监控数据。"
 
-#: ceilometer/storage/impl_sqlalchemy.py:307
+#: ceilometer/storage/impl_sqlalchemy.py:306
 #, python-format
 msgid "Unknown metadata type. Key (%s) will not be queryable."
 msgstr "未知的元数据类型。键(%s)将无法进行查询。"
 
-#: ceilometer/storage/impl_sqlalchemy.py:363
+#: ceilometer/storage/impl_sqlalchemy.py:362
 #, python-format
 msgid "%d samples removed from database"
 msgstr "从数据库中移除%d个监控数据。"
 
-#: ceilometer/storage/impl_sqlalchemy.py:382
+#: ceilometer/storage/impl_sqlalchemy.py:381
 msgid "Expired residual resource and meter definition data"
 msgstr ""
 
@@ -1376,19 +1391,19 @@ msgstr "表%(table_name)s已经存在，无法创建。忽略此错误继续执�
 msgid "Connecting to %(db)s on %(nodelist)s"
 msgstr "连接到%(nodelist)s节点的数据库%(db)s。"
 
-#: ceilometer/storage/mongo/utils.py:264
+#: ceilometer/storage/mongo/utils.py:263
 #, python-format
 msgid "Unable to connect to the database server: %(errmsg)s."
 msgstr "无法连接到数据库服务器：%(errmsg)s。"
 
-#: ceilometer/storage/mongo/utils.py:402
+#: ceilometer/storage/mongo/utils.py:401
 #, python-format
 msgid ""
 "Unable to reconnect to the primary mongodb after %(retries)d retries. "
 "Giving up."
 msgstr "在%(retries)d次尝试后仍无法重连到MongoDB主节点。放弃重连。"
 
-#: ceilometer/storage/mongo/utils.py:406
+#: ceilometer/storage/mongo/utils.py:405
 #, python-format
 msgid ""
 "Unable to reconnect to the primary mongodb: %(errmsg)s. Trying again in "

@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-31 06:06+0000\n"
-"PO-Revision-Date: 2015-03-24 14:24+0000\n"
+"POT-Creation-Date: 2015-04-11 06:05+0000\n"
+"PO-Revision-Date: 2015-04-10 10:59+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: English (United Kingdom) "
 "(http://www.transifex.com/projects/p/ceilometer/language/en_GB/)\n"
@@ -166,17 +166,17 @@ msgstr "Unable to discover resources: %s"
 msgid "Unknown discovery extension: %s"
 msgstr "Unknown discovery extension: %s"
 
-#: ceilometer/agent/plugin_base.py:72
+#: ceilometer/agent/plugin_base.py:71
 #, python-format
 msgid "Skip due to keystone error %s"
 msgstr "Skip due to keystone error %s"
 
-#: ceilometer/agent/plugin_base.py:79
+#: ceilometer/agent/plugin_base.py:78
 #, python-format
 msgid "Skipping because %s service is not registered in keystone"
 msgstr ""
 
-#: ceilometer/agent/plugin_base.py:118
+#: ceilometer/agent/plugin_base.py:121
 msgid ""
 "get_exchange_topics API of NotificationPlugin isdeprecated, implements "
 "get_targets instead."
@@ -535,65 +535,80 @@ msgstr "serving on http://%(host)s:%(port)s"
 msgid "Error parsing HTTP response: %s"
 msgstr "Error parsing HTTP response: %s"
 
-#: ceilometer/api/controllers/v2/alarms.py:84
+#: ceilometer/api/controllers/v2/alarms.py:88
 #, python-format
 msgid "Alarm quota exceeded for user %(u)s on project %(p)s"
 msgstr "Alarm quota exceeded for user %(u)s on project %(p)s"
 
-#: ceilometer/api/controllers/v2/alarms.py:166
+#: ceilometer/api/controllers/v2/alarms.py:170
 #, python-format
 msgid "Timezone %s is not valid"
 msgstr "Timezone %s is not valid"
 
-#: ceilometer/api/controllers/v2/alarms.py:281
+#: ceilometer/api/controllers/v2/alarms.py:285
 msgid "Time constraint names must be unique for a given alarm."
 msgstr "Time constraint names must be unique for a given alarm."
 
-#: ceilometer/api/controllers/v2/alarms.py:291
+#: ceilometer/api/controllers/v2/alarms.py:295
 #, python-format
 msgid "%(rule)s must be set for %(type)s type alarm"
 msgstr "%(rule)s must be set for %(type)s type alarm"
 
-#: ceilometer/api/controllers/v2/alarms.py:302
+#: ceilometer/api/controllers/v2/alarms.py:306
 #, python-format
 msgid "%(rule1)s and %(rule2)s cannot be set at the same time"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/alarms.py:319
+#: ceilometer/api/controllers/v2/alarms.py:322
+#, python-format
+msgid "duplicate actions are found: %s, remove duplicate ones"
+msgstr ""
+
+#: ceilometer/api/controllers/v2/alarms.py:328
+#, python-format
+msgid "%(name)s count exceeds maximum value %(maximum)d"
+msgstr ""
+
+#: ceilometer/api/controllers/v2/alarms.py:339
 #, python-format
 msgid "Unable to parse action %s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/alarms.py:322
+#: ceilometer/api/controllers/v2/alarms.py:342
 #, python-format
 msgid "Unsupported action %s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/alarms.py:509
+#: ceilometer/api/controllers/v2/alarms.py:345
+#, python-format
+msgid "You are not authorized to create action: %s"
+msgstr ""
+
+#: ceilometer/api/controllers/v2/alarms.py:533
 #, python-format
 msgid "Alarm with name=%s exists"
 msgstr "Alarm with name=%s exists"
 
-#: ceilometer/api/controllers/v2/alarms.py:519
+#: ceilometer/api/controllers/v2/alarms.py:543
 #, python-format
 msgid "Error while putting alarm: %s"
 msgstr "Error while putting alarm: %s"
 
-#: ceilometer/api/controllers/v2/alarms.py:520
-#: ceilometer/api/controllers/v2/alarms.py:688
+#: ceilometer/api/controllers/v2/alarms.py:544
+#: ceilometer/api/controllers/v2/alarms.py:712
 msgid "Alarm incorrect"
 msgstr "Alarm incorrect"
 
-#: ceilometer/api/controllers/v2/alarms.py:580
+#: ceilometer/api/controllers/v2/alarms.py:604
 msgid "state invalid"
 msgstr "state invalid"
 
-#: ceilometer/api/controllers/v2/alarms.py:681
+#: ceilometer/api/controllers/v2/alarms.py:705
 #, python-format
 msgid "Alarm with name='%s' exists"
 msgstr "Alarm with name='%s' exists"
 
-#: ceilometer/api/controllers/v2/alarms.py:687
+#: ceilometer/api/controllers/v2/alarms.py:711
 #, python-format
 msgid "Error while posting alarm: %s"
 msgstr "Error while posting alarm: %s"
@@ -1363,17 +1378,17 @@ msgid ""
 "feature and going in background."
 msgstr ""
 
-#: ceilometer/storage/impl_sqlalchemy.py:307
+#: ceilometer/storage/impl_sqlalchemy.py:306
 #, python-format
 msgid "Unknown metadata type. Key (%s) will not be queryable."
 msgstr "Unknown metadata type. Key (%s) will not be queryable."
 
-#: ceilometer/storage/impl_sqlalchemy.py:363
+#: ceilometer/storage/impl_sqlalchemy.py:362
 #, python-format
 msgid "%d samples removed from database"
 msgstr "%d samples removed from database"
 
-#: ceilometer/storage/impl_sqlalchemy.py:382
+#: ceilometer/storage/impl_sqlalchemy.py:381
 msgid "Expired residual resource and meter definition data"
 msgstr ""
 
@@ -1400,19 +1415,19 @@ msgstr ""
 msgid "Connecting to %(db)s on %(nodelist)s"
 msgstr "Connecting to %(db)s on %(nodelist)s"
 
-#: ceilometer/storage/mongo/utils.py:264
+#: ceilometer/storage/mongo/utils.py:263
 #, python-format
 msgid "Unable to connect to the database server: %(errmsg)s."
 msgstr ""
 
-#: ceilometer/storage/mongo/utils.py:402
+#: ceilometer/storage/mongo/utils.py:401
 #, python-format
 msgid ""
 "Unable to reconnect to the primary mongodb after %(retries)d retries. "
 "Giving up."
 msgstr ""
 
-#: ceilometer/storage/mongo/utils.py:406
+#: ceilometer/storage/mongo/utils.py:405
 #, python-format
 msgid ""
 "Unable to reconnect to the primary mongodb: %(errmsg)s. Trying again in "
