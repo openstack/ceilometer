@@ -3325,10 +3325,22 @@ class EventTest(EventTestBase):
         now = datetime.datetime.utcnow()
         m = [event_models.Event("1", "Foo", now, None, {}),
              event_models.Event("1", "Zoo", now, [], {})]
-        problem_events = self.event_conn.record_events(m)
-        self.assertEqual(1, len(problem_events))
-        bad = problem_events[0]
-        self.assertEqual(event_models.Event.DUPLICATE, bad[0])
+        with mock.patch('%s.LOG' %
+                        self.event_conn.record_events.__module__) as log:
+            self.event_conn.record_events(m)
+            self.assertEqual(1, log.info.call_count)
+
+    def test_bad_event(self):
+        now = datetime.datetime.utcnow()
+        broken_event = event_models.Event("1", "Foo", now, None, {})
+        del(broken_event.__dict__['raw'])
+        m = [broken_event, broken_event]
+        with mock.patch('%s.LOG' %
+                        self.event_conn.record_events.__module__) as log:
+            self.assertRaises(AttributeError, self.event_conn.record_events, m)
+            # ensure that record_events does not break on first error but
+            # delays exception and tries to record each event.
+            self.assertEqual(2, log.exception.call_count)
 
 
 class GetEventTest(EventTestBase):
@@ -3634,10 +3646,9 @@ class GetEventTest(EventTestBase):
     def test_simple_get_event_no_traits(self):
         new_events = [event_models.Event("id_notraits", "NoTraits",
                       self.start, [], {})]
-        bad_events = self.event_conn.record_events(new_events)
+        self.event_conn.record_events(new_events)
         event_filter = storage.EventFilter(self.start, self.end, "NoTraits")
         events = [event for event in self.event_conn.get_events(event_filter)]
-        self.assertEqual(0, len(bad_events))
         self.assertEqual(1, len(events))
         self.assertEqual("id_notraits", events[0].message_id)
         self.assertEqual("NoTraits", events[0].event_type)
@@ -3654,10 +3665,9 @@ class GetEventTest(EventTestBase):
                                          self.start,
                                          [], {})]
 
-        bad_events = self.event_conn.record_events(new_events)
+        self.event_conn.record_events(new_events)
         event_filter = storage.EventFilter(message_id="id_testid")
         events = [event for event in self.event_conn.get_events(event_filter)]
-        self.assertEqual(0, len(bad_events))
         self.assertEqual(1, len(events))
         event = events[0]
         self.assertEqual("id_testid", event.message_id)

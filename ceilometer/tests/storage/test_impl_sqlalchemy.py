@@ -65,10 +65,6 @@ class EventTypeTest(tests_db.TestBase):
         self.assertTrue(repr.repr(et2))
 
 
-class MyException(Exception):
-    pass
-
-
 @tests_db.run_with('sqlite', 'mysql', 'pgsql')
 class EventTest(tests_db.TestBase):
     def _verify_data(self, trait, trait_table):
@@ -100,19 +96,6 @@ class EventTest(tests_db.TestBase):
         now = datetime.datetime.utcnow()
         model = models.Trait("Foo", models.Trait.DATETIME_TYPE, now)
         self._verify_data(model, sql_models.TraitDatetime)
-
-    def test_bad_event(self):
-        now = datetime.datetime.utcnow()
-        m = [models.Event("1", "Foo", now, [], {}),
-             models.Event("2", "Zoo", now, [], {})]
-
-        with mock.patch.object(self.event_conn,
-                               "_get_or_create_event_type") as mock_save:
-            mock_save.side_effect = MyException("Boom")
-            problem_events = self.event_conn.record_events(m)
-        self.assertEqual(2, len(problem_events))
-        for bad, event in problem_events:
-            self.assertEqual(bad, models.Event.UNKNOWN_PROBLEM)
 
     def test_event_repr(self):
         ev = sql_models.Event('msg_id', None, False, {})
