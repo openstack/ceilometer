@@ -128,12 +128,11 @@ class HttpDispatcher(dispatcher.Base):
         for event in events:
             res = None
             try:
-                res = requests.post(self.event_target, data=event.serialize(),
+                res = requests.post(self.event_target, data=event,
                                     headers=self.headers, timeout=self.timeout)
                 res.raise_for_status()
             except Exception:
                 error_code = res.status_code if res else 'unknown'
                 LOG.exception(_LE('Status Code: %{code}s. Failed to dispatch '
                                   'event: %{event}s'),
-                              {'code': error_code,
-                               'event': event.serialize()})
+                              {'code': error_code, 'event': event})

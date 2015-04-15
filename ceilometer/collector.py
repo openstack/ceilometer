@@ -19,11 +19,9 @@ import msgpack
 from oslo_config import cfg
 import oslo_messaging
 from oslo_utils import netutils
-from oslo_utils import timeutils
 from oslo_utils import units
 
 from ceilometer import dispatcher
-from ceilometer.event.storage import models
 from ceilometer import messaging
 from ceilometer.i18n import _, _LE
 from ceilometer.openstack.common import log
@@ -191,25 +189,3 @@ class EventEndpoint(CollectorEndpoint):
         super(EventEndpoint, self).__init__(
             dispatcher_manager,
             cfg.CONF.collector.requeue_event_on_dispatcher_error)
-
-    def sample(self, ctxt, publisher_id, event_type, payload, metadata):
-        events = []
-        for ev in payload:
-            try:
-                events.append(
-                    models.Event(
-                        message_id=ev['message_id'],
-                        event_type=ev['event_type'],
-                        generated=timeutils.normalize_time(
-                            timeutils.parse_isotime(ev['generated'])),
-                        traits=[models.Trait(
-                                name, dtype,
-                                models.Trait.convert_value(dtype, value))
-                                for name, dtype, value in ev['traits']],
-                        raw=ev.get('raw', {}))
-                )
-            except Exception:
-                LOG.exception(_LE("Error processing event and it will be "
-                                  "dropped: %s"), ev)
-        return super(EventEndpoint, self).sample(
-            ctxt, publisher_id, event_type, events, metadata)
