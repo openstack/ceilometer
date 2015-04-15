@@ -164,7 +164,7 @@ class AggregationMetricByResourcesLookupRule(AlarmGnocchiThresholdRule):
         # Delegate the query validation to gnocchi
         ks_client = keystone_client.get_client()
         request = {
-            'url': "%s/v1/aggregation/resource/%s/metric/%s/measures" % (
+            'url': "%s/v1/aggregation/resource/%s/metric/%s" % (
                 cfg.CONF.alarms.gnocchi_url,
                 rule.resource_type,
                 rule.metric),

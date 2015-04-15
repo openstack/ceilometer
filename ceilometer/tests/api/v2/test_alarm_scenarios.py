@@ -2662,7 +2662,7 @@ class TestAlarms(v2.FunctionalTest,
 
                 self.assertEqual([mock.call(
                     url=('http://localhost:8041/v1/aggregation/'
-                         'resource/instance/metric/ameter/measures'),
+                         'resource/instance/metric/ameter'),
                     headers={'Content-Type': 'application/json',
                              'X-Auth-Token': mock.ANY},
                     params={'aggregation': 'count'},
