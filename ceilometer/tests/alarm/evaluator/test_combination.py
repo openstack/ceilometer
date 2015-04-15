@@ -223,6 +223,30 @@ class TestEvaluate(base.TestEvaluatorBase):
                         in zip(self.alarms, reasons, reason_datas)]
             self.assertEqual(expected, self.notifier.notify.call_args_list)
 
+    def test_to_alarm_with_one_insufficient_data(self):
+        self._set_all_alarms('ok')
+        with mock.patch('ceilometerclient.client.get_client',
+                        return_value=self.api_client):
+            self.api_client.alarms.get.side_effect = [
+                self._get_alarm('insufficient data'),
+                self._get_alarm('alarm'),
+                self._get_alarm('alarm'),
+                self._get_alarm('alarm'),
+            ]
+            self._evaluate_all_alarms()
+            expected = [mock.call(alarm.alarm_id, state='alarm')
+                        for alarm in self.alarms]
+            update_calls = self.api_client.alarms.set_state.call_args_list
+            self.assertEqual(expected, update_calls)
+            reasons, reason_datas = self._combination_transition_reason(
+                'alarm',
+                [self.alarms[0].rule['alarm_ids'][1]],
+                self.alarms[1].rule['alarm_ids'])
+            expected = [mock.call(alarm, 'ok', reason, reason_data)
+                        for alarm, reason, reason_data
+                        in zip(self.alarms, reasons, reason_datas)]
+            self.assertEqual(expected, self.notifier.notify.call_args_list)
+
     def test_to_alarm_with_one_ok(self):
         self._set_all_alarms('ok')
         with mock.patch('ceilometerclient.client.get_client',

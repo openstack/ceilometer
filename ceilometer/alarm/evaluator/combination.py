@@ -48,6 +48,11 @@ class CombinationEvaluator(evaluator.Evaluator):
         alarms_missing_states = [alarm_id for alarm_id, state in states
                                  if not state or state == evaluator.UNKNOWN]
         sufficient = len(alarms_missing_states) == 0
+        if not sufficient and alarm.rule['operator'] == 'or':
+            # if operator is 'or' and there is one alarm, then the combinated
+            # alarm's state should be 'alarm'
+            sufficient = bool([alarm_id for alarm_id, state in states
+                               if state == evaluator.ALARM])
         if not sufficient and alarm.state != evaluator.UNKNOWN:
             reason = (_('Alarms %(alarm_ids)s'
                         ' are in unknown state') %
