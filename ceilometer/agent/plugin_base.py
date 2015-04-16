@@ -27,7 +27,6 @@ import six
 from ceilometer.i18n import _
 from ceilometer import messaging
 from ceilometer.openstack.common import log
-from ceilometer.publisher import utils
 
 cfg.CONF.import_group('service_credentials', 'ceilometer.service')
 
@@ -90,16 +89,13 @@ class PluginBase(object):
 @six.add_metaclass(abc.ABCMeta)
 class NotificationBase(PluginBase):
     """Base class for plugins that support the notification API."""
-    def __init__(self, transporter):
+    def __init__(self, manager):
         super(NotificationBase, self).__init__()
         # NOTE(gordc): this is filter rule used by oslo.messaging to dispatch
         # messages to an endpoint.
         self.filter_rule = oslo_messaging.NotificationFilter(
             event_type='|'.join(self.event_types))
-        self.transporter = transporter
-        # NOTE(gordc): if no publisher, this isn't a PipelineManager and
-        # data should be requeued.
-        self.requeue = False if hasattr(transporter, 'publisher') else True
+        self.manager = manager
 
     @abc.abstractproperty
     def event_types(self):
@@ -159,19 +155,8 @@ class NotificationBase(PluginBase):
         :param context: Execution context from the service or RPC call
         :param notification: The notification to process.
         """
-        if self.requeue:
-            meters = [
-                utils.meter_message_from_counter(
-                    sample, cfg.CONF.publisher.telemetry_secret)
-                for sample in self.process_notification(notification)
-            ]
-            for notifier in self.transporter:
-                notifier.sample(context.to_dict(),
-                                event_type='ceilometer.pipeline',
-                                payload=meters)
-        else:
-            with self.transporter.publisher(context) as p:
-                p(list(self.process_notification(notification)))
+        with self.manager.publisher(context) as p:
+            p(list(self.process_notification(notification)))
 
 
 class NonMetricNotificationBase(object):

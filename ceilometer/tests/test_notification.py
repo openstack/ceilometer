@@ -194,7 +194,7 @@ class BaseRealNotification(tests_base.BaseTestCase):
         ev_pipeline = yaml.dump({
             'sources': [{
                 'name': 'test_event',
-                'events': '*',
+                'events': ['compute.instance.*'],
                 'sinks': ['test_sink']
             }],
             'sinks': [{
@@ -325,4 +325,35 @@ class TestRealNotificationHA(BaseRealNotification):
         self.assertEqual(2, len(self.srv.pipeline_listeners))
         self.srv._refresh_agent(None)
         self.assertEqual(2, len(self.srv.pipeline_listeners))
+        self.srv.stop()
+
+    @mock.patch('oslo.messaging.Notifier.sample')
+    def test_broadcast_to_relevant_pipes_only(self, mock_notifier):
+        self.srv.start()
+        for endpoint in self.srv.listeners[0].dispatcher.endpoints:
+            if (hasattr(endpoint, 'filter_rule') and
+                not endpoint.filter_rule.match(None, None, 'nonmatching.end',
+                                               None, None)):
+                continue
+            endpoint.info(TEST_NOTICE_CTXT, 'compute.vagrant-precise',
+                          'nonmatching.end',
+                          TEST_NOTICE_PAYLOAD, TEST_NOTICE_METADATA)
+        self.assertFalse(mock_notifier.called)
+        for endpoint in self.srv.listeners[0].dispatcher.endpoints:
+            if (hasattr(endpoint, 'filter_rule') and
+                not endpoint.filter_rule.match(None, None,
+                                               'compute.instance.create.end',
+                                               None, None)):
+                continue
+            endpoint.info(TEST_NOTICE_CTXT, 'compute.vagrant-precise',
+                          'compute.instance.create.end',
+                          TEST_NOTICE_PAYLOAD, TEST_NOTICE_METADATA)
+        self.assertTrue(mock_notifier.called)
+        self.assertEqual(3, mock_notifier.call_count)
+        self.assertEqual('pipeline.event',
+                         mock_notifier.call_args_list[0][1]['event_type'])
+        self.assertEqual('ceilometer.pipeline',
+                         mock_notifier.call_args_list[1][1]['event_type'])
+        self.assertEqual('ceilometer.pipeline',
+                         mock_notifier.call_args_list[2][1]['event_type'])
         self.srv.stop()
