@@ -55,7 +55,7 @@ class Connection(hbase_base.Connection, base.Connection):
 
     - meter (describes sample actually):
 
-      - row-key: consists of reversed timestamp, meter and a message signature
+      - row-key: consists of reversed timestamp, meter and a message uuid
         for purposes of uniqueness
       - Column Families:
 
@@ -175,9 +175,9 @@ class Connection(hbase_base.Connection, base.Connection):
                                resource, ts)
 
             # Rowkey consists of reversed timestamp, meter and a
-            # message signature for purposes of uniqueness
+            # message uuid for purposes of uniqueness
             row = hbase_utils.prepare_key(data['counter_name'], rts,
-                                          data['message_signature'])
+                                          data['message_id'])
             record = hbase_utils.serialize_entry(
                 data, **{'source': data['source'], 'rts': rts,
                          'message': data, 'recorded_at': timeutils.utcnow()})
