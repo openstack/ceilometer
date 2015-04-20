@@ -106,49 +106,6 @@ class BinSendSampleTestCase(base.BaseTestCase):
         self.assertEqual(0, subp.wait())
 
 
-class BinAlarmEvaluatorServiceTestCase(base.BaseTestCase):
-    def _do_test(self, driver, driver_class):
-        pipeline_cfg_file = self.path_get('etc/ceilometer/pipeline.yaml')
-        content = ("[DEFAULT]\n"
-                   "rpc_backend=fake\n"
-                   "pipeline_cfg_file={0}\n"
-                   "debug=true\n"
-                   "[database]\n"
-                   "time_to_live=1\n"
-                   "connection=log://localhost\n".format(pipeline_cfg_file))
-
-        if driver:
-            content += "[alarm]\nevaluation_service=%s\n" % driver
-
-        self.tempfile = fileutils.write_to_tempfile(content=content,
-                                                    prefix='ceilometer',
-                                                    suffix='.conf')
-        self.subp = subprocess.Popen(['ceilometer-alarm-evaluator',
-                                      "--config-file=%s" % self.tempfile],
-                                     stderr=subprocess.PIPE)
-        err = self.subp.stderr.read(1024)
-        self.assertIn("Alarm evaluator loaded: %s" % driver_class, err)
-
-    def tearDown(self):
-        super(BinAlarmEvaluatorServiceTestCase, self).tearDown()
-        self.subp.kill()
-        self.subp.wait()
-        os.remove(self.tempfile)
-
-    def test_default_config(self):
-        self._do_test(None, "AlarmEvaluationService")
-
-    def test_singleton_driver(self):
-        self._do_test('singleton', "SingletonAlarmService")
-
-    def test_backward_compat(self):
-        self._do_test("ceilometer.alarm.service.PartitionedAlarmService",
-                      "PartitionedAlarmService")
-
-    def test_partitioned_driver(self):
-        self._do_test("partitioned", "PartitionedAlarmService")
-
-
 class BinApiTestCase(base.BaseTestCase):
 
     def setUp(self):

@@ -26,7 +26,6 @@ import six
 from stevedore import extension
 
 from ceilometer import alarm as ceilometer_alarm
-from ceilometer.alarm.partition import coordination as alarm_coordination
 from ceilometer.alarm import rpc as rpc_alarm
 from ceilometer import coordination as coordination
 from ceilometer.i18n import _
@@ -151,78 +150,6 @@ class AlarmEvaluationService(AlarmService, os_service.Service):
                                                   'value': True}])
         return self.partition_coordinator.extract_my_subset(
             self.PARTITIONING_GROUP_NAME, all_alarms)
-
-
-class SingletonAlarmService(AlarmService, os_service.Service):
-
-    def __init__(self):
-        super(SingletonAlarmService, self).__init__()
-
-    def start(self):
-        super(SingletonAlarmService, self).start()
-        if self.evaluators:
-            interval = cfg.CONF.alarm.evaluation_interval
-            self.tg.add_timer(
-                interval,
-                self._evaluate_assigned_alarms,
-                0)
-        # Add a dummy thread to have wait() working
-        self.tg.add_timer(604800, lambda: None)
-
-    def _assigned_alarms(self):
-        return self._client.alarms.list(q=[{'field': 'enabled',
-                                            'value': True}])
-
-
-class PartitionedAlarmService(AlarmService, os_service.Service):
-
-    def __init__(self):
-        super(PartitionedAlarmService, self).__init__()
-        transport = messaging.get_transport()
-        self.rpc_server = messaging.get_rpc_server(
-            transport, cfg.CONF.alarm.partition_rpc_topic, self)
-
-        self.partition_coordinator = alarm_coordination.PartitionCoordinator()
-
-    def start(self):
-        super(PartitionedAlarmService, self).start()
-        if self.evaluators:
-            eval_interval = cfg.CONF.alarm.evaluation_interval
-            self.tg.add_timer(
-                eval_interval / 4,
-                self.partition_coordinator.report_presence,
-                0)
-            self.tg.add_timer(
-                eval_interval / 2,
-                self.partition_coordinator.check_mastership,
-                eval_interval,
-                *[eval_interval, self._client])
-            self.tg.add_timer(
-                eval_interval,
-                self._evaluate_assigned_alarms,
-                eval_interval)
-        self.rpc_server.start()
-        # Add a dummy thread to have wait() working
-        self.tg.add_timer(604800, lambda: None)
-
-    def stop(self):
-        self.rpc_server.stop()
-        super(PartitionedAlarmService, self).stop()
-
-    def _assigned_alarms(self):
-        return self.partition_coordinator.assigned_alarms(self._client)
-
-    def presence(self, context, data):
-        self.partition_coordinator.presence(data.get('uuid'),
-                                            data.get('priority'))
-
-    def assign(self, context, data):
-        self.partition_coordinator.assign(data.get('uuid'),
-                                          data.get('alarms'))
-
-    def allocate(self, context, data):
-        self.partition_coordinator.allocate(data.get('uuid'),
-                                            data.get('alarms'))
 
 
 class AlarmNotifierService(os_service.Service):

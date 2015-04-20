@@ -18,9 +18,7 @@
 import uuid
 
 from ceilometerclient.v2 import alarms
-import eventlet
 from oslo_config import fixture as fixture_config
-from oslo_utils import timeutils
 import six
 
 from ceilometer.alarm import rpc as rpc_alarm
@@ -170,78 +168,3 @@ class FakeCoordinator(object):
     def _record(self, method, data):
         self.notified.append((method, data))
         self.rpc.stop()
-
-
-class TestRPCAlarmPartitionCoordination(tests_base.BaseTestCase):
-    def setUp(self):
-        super(TestRPCAlarmPartitionCoordination, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
-        self.setup_messaging(self.CONF)
-
-        self.coordinator_server = FakeCoordinator(self.transport)
-        self.coordinator_server.rpc.start()
-        eventlet.sleep()  # must be sure that fanout queue is created
-
-        self.coordination = rpc_alarm.RPCAlarmPartitionCoordination()
-        self.alarms = [
-            alarms.Alarm(None, info={
-                'name': 'instance_running_hot',
-                'meter_name': 'cpu_util',
-                'comparison_operator': 'gt',
-                'threshold': 80.0,
-                'evaluation_periods': 5,
-                'statistic': 'avg',
-                'state': 'ok',
-                'ok_actions': ['http://host:8080/path'],
-                'user_id': 'foobar',
-                'project_id': 'snafu',
-                'period': 60,
-                'alarm_id': str(uuid.uuid4()),
-                'matching_metadata':{'resource_id':
-                                     'my_instance'}
-            }),
-            alarms.Alarm(None, info={
-                'name': 'group_running_idle',
-                'meter_name': 'cpu_util',
-                'comparison_operator': 'le',
-                'threshold': 10.0,
-                'statistic': 'max',
-                'evaluation_periods': 4,
-                'state': 'insufficient data',
-                'insufficient_data_actions': ['http://other_host/path'],
-                'user_id': 'foobar',
-                'project_id': 'snafu',
-                'period': 300,
-                'alarm_id': str(uuid.uuid4()),
-                'matching_metadata':{'metadata.user_metadata.AS':
-                                     'my_group'}
-            }),
-        ]
-
-    def test_coordination_presence(self):
-        id = str(uuid.uuid4())
-        priority = float(timeutils.utcnow().strftime('%s.%f'))
-        self.coordination.presence(id, priority)
-        self.coordinator_server.rpc.wait()
-        method, args = self.coordinator_server.notified[0]
-        self.assertEqual(id, args['uuid'])
-        self.assertEqual(priority, args['priority'])
-        self.assertEqual('presence', method)
-
-    def test_coordination_assign(self):
-        id = str(uuid.uuid4())
-        self.coordination.assign(id, self.alarms)
-        self.coordinator_server.rpc.wait()
-        method, args = self.coordinator_server.notified[0]
-        self.assertEqual(id, args['uuid'])
-        self.assertEqual(2, len(args['alarms']))
-        self.assertEqual('assign', method)
-
-    def test_coordination_allocate(self):
-        id = str(uuid.uuid4())
-        self.coordination.allocate(id, self.alarms)
-        self.coordinator_server.rpc.wait()
-        method, args = self.coordinator_server.notified[0]
-        self.assertEqual(id, args['uuid'])
-        self.assertEqual(2, len(args['alarms']))
-        self.assertEqual('allocate', method)

@@ -29,13 +29,6 @@ OPTS = [
                default='alarm_notifier',
                help='The topic that ceilometer uses for alarm notifier '
                     'messages.'),
-    cfg.StrOpt('partition_rpc_topic',
-               default='alarm_partition_coordination',
-               help='The topic that ceilometer uses for alarm partition '
-                    'coordination messages. DEPRECATED: RPC-based partitioned'
-                    'alarm evaluation service will be removed in Kilo in '
-                    'favour of the default alarm evaluation service using '
-                    'tooz for partitioning.'),
 ]
 
 cfg.CONF.register_opts(OPTS, group='alarm')
@@ -70,29 +63,3 @@ class RPCAlarmNotifier(object):
                              'current': alarm.state,
                              'reason': six.text_type(reason),
                              'reason_data': reason_data})
-
-
-class RPCAlarmPartitionCoordination(object):
-    def __init__(self):
-        transport = messaging.get_transport()
-        self.client = messaging.get_rpc_client(
-            transport, topic=cfg.CONF.alarm.partition_rpc_topic,
-            version="1.0")
-
-    def presence(self, uuid, priority):
-        cctxt = self.client.prepare(fanout=True)
-        return cctxt.cast(context.get_admin_context(),
-                          'presence', data={'uuid': uuid,
-                                            'priority': priority})
-
-    def assign(self, uuid, alarms):
-        cctxt = self.client.prepare(fanout=True)
-        return cctxt.cast(context.get_admin_context(),
-                          'assign', data={'uuid': uuid,
-                                          'alarms': alarms})
-
-    def allocate(self, uuid, alarms):
-        cctxt = self.client.prepare(fanout=True)
-        return cctxt.cast(context.get_admin_context(),
-                          'allocate', data={'uuid': uuid,
-                                            'alarms': alarms})
