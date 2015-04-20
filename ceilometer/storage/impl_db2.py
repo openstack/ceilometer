@@ -156,6 +156,12 @@ class Connection(pymongo_base.Connection):
         return init_str
 
     def upgrade(self, version=None):
+        # create collection if not present
+        if 'resource' not in self.db.conn.collection_names():
+            self.db.conn.create_collection('resource')
+        if 'meter' not in self.db.conn.collection_names():
+            self.db.conn.create_collection('meter')
+
         # Establish indexes
         #
         # We need variations for user_id vs. project_id because of the

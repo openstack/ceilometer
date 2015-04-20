@@ -64,11 +64,7 @@ class Connection(pymongo_base.Connection):
         self.upgrade()
 
     def upgrade(self):
-        # create collection if not present
-        if 'alarm' not in self.db.conn.collection_names():
-            self.db.conn.create_collection('alarm')
-        if 'alarm_history' not in self.db.conn.collection_names():
-            self.db.conn.create_collection('alarm_history')
+        super(Connection, self).upgrade()
         # Establish indexes
         ttl = cfg.CONF.database.alarm_history_time_to_live
         impl_mongodb.Connection.update_ttl(

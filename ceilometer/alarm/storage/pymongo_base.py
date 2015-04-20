@@ -54,6 +54,13 @@ class Connection(base.Connection):
         AVAILABLE_STORAGE_CAPABILITIES,
     )
 
+    def upgrade(self):
+        # create collection if not present
+        if 'alarm' not in self.db.conn.collection_names():
+            self.db.conn.create_collection('alarm')
+        if 'alarm_history' not in self.db.conn.collection_names():
+            self.db.conn.create_collection('alarm_history')
+
     def update_alarm(self, alarm):
         """Update alarm."""
         data = alarm.as_dict()
