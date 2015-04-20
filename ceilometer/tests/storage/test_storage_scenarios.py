@@ -553,9 +553,8 @@ class RawSampleTest(DBTestBase,
     def test_get_samples_by_resource(self):
         f = storage.SampleFilter(user='user-id', resource='resource-id')
         results = list(self.conn.get_samples(f))
-        self.assertIsNotEmpty(results)
-        meter = results[1]
-        d = meter.as_dict()
+        self.assertEqual(2, len(results))
+        d = results[1].as_dict()
         self.assertEqual(timeutils.utcnow(), d['recorded_at'])
         del d['recorded_at']
         self.assertEqual(self.msgs[0], d)
