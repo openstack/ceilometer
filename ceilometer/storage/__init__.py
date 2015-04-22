@@ -22,7 +22,6 @@ import six
 import six.moves.urllib.parse as urlparse
 from stevedore import driver
 
-from ceilometer.i18n import _
 from ceilometer.openstack.common import log
 from ceilometer import utils
 
@@ -123,8 +122,9 @@ def get_connection(url, namespace):
     # SqlAlchemy connections specify may specify a 'dialect' or
     # 'dialect+driver'. Handle the case where driver is specified.
     engine_name = connection_scheme.split('+')[0]
-    LOG.debug(_('looking for %(name)r driver in %(namespace)r') % (
-              {'name': engine_name, 'namespace': namespace}))
+    # NOTE: translation not applied bug #1446983
+    LOG.debug('looking for %(name)r driver in %(namespace)r',
+              {'name': engine_name, 'namespace': namespace})
     mgr = driver.DriverManager(namespace, engine_name)
     return mgr.driver(url)
 
