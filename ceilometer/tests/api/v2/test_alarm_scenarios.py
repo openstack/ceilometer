@@ -2620,6 +2620,8 @@ class TestAlarms(v2.FunctionalTest,
 
     @mock.patch('ceilometer.keystone_client.get_client')
     def test_post_gnocchi_aggregation_alarm_project_constraint(self, __):
+        self.CONF.set_override('gnocchi_url', 'http://localhost:8041',
+                               group='alarms')
         json = {
             'enabled': False,
             'name': 'project_constraint',
