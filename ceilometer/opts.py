@@ -20,8 +20,7 @@ import ceilometer.alarm.service
 import ceilometer.api
 import ceilometer.api.app
 import ceilometer.api.controllers.v2.alarms
-import ceilometer.cmd.alarm
-import ceilometer.cmd.polling
+import ceilometer.cmd.eventlet.polling
 import ceilometer.collector
 import ceilometer.compute.discovery
 import ceilometer.compute.notifications
@@ -68,7 +67,7 @@ def list_opts():
         ('DEFAULT',
          itertools.chain(ceilometer.agent.base.OPTS,
                          ceilometer.api.app.OPTS,
-                         ceilometer.cmd.polling.CLI_OPTS,
+                         ceilometer.cmd.eventlet.polling.CLI_OPTS,
                          ceilometer.compute.notifications.OPTS,
                          ceilometer.compute.util.OPTS,
                          ceilometer.compute.virt.inspector.OPTS,
