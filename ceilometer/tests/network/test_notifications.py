@@ -1194,6 +1194,30 @@ NOTIFICATION_IPSEC_SITE_CONN_UPDATE = {
     "publisher_id": "network.ubuntu",
     "message_id": "4c0e6ecb-2e40-4975-aee2-d88045c747bf"}
 
+NOTIFICATION_EMPTY_PAYLOAD = {
+    "_context_roles": ["heat_stack_owner", "admin"],
+    "_context_request_id": "req-e56a8a5e-5d42-43e8-9677-2d36e6e17d5e",
+    "event_type": "health_monitor.create.end",
+    "timestamp": "2014-09-15 17:22:11.323644",
+    "_context_tenant_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_user": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "_unique_id": "f112a185e1d1424eba3a13df9e0f0277",
+    "_context_tenant_name": "demo",
+    "_context_user_id": "1c1f7c80efc24a16b835ae1c0802d0a1",
+    "payload": {
+        "health_monitor": {}},
+    "_context_project_name": "demo",
+    "_context_read_deleted": "no",
+    "_context_auth_token": "e6daf56d7d1787e1fbefff0ecf29703f",
+    "_context_tenant": "a820f2d6293b4a7587d1c582767f43fb",
+    "priority": "INFO",
+    "_context_is_admin": True,
+    "_context_project_id": "a820f2d6293b4a7587d1c582767f43fb",
+    "_context_timestamp": "2014-09-15 17:22:11.187163",
+    "_context_user_name": "admin",
+    "publisher_id": "network.ubuntu",
+    "message_id": "65067e3f-830d-4fbb-87e2-f0e51fda83d2"}
+
 
 class TestNotifications(test.BaseTestCase):
     def test_network_create(self):
@@ -1420,6 +1444,12 @@ class TestNotifications(test.BaseTestCase):
             NOTIFICATION_IKE_POLICY_UPDATE))
         self.assertEqual(2, len(samples))
         self.assertEqual("network.services.vpn.ikepolicy", samples[0].name)
+
+    def test_empty_event_payload(self):
+        v = notifications.HealthMonitor(mock.Mock())
+        samples = list(v.process_notification(
+            NOTIFICATION_EMPTY_PAYLOAD))
+        self.assertEqual(0, len(samples))
 
 
 class TestEventTypes(test.BaseTestCase):

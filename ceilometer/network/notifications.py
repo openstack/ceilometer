@@ -82,7 +82,7 @@ class NetworkNotificationBase(plugin_base.NotificationBase):
                 resource['id'] = message['payload']['id']
             resources = [resource]
         else:
-            resources = message['payload'].get(self.resource_name + 's')
+            resources = message['payload'].get(self.resource_name + 's', [])
 
         resource_message = message.copy()
         for resource in resources:
