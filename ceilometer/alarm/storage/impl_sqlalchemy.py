@@ -13,15 +13,18 @@
 """SQLAlchemy storage backend."""
 
 from __future__ import absolute_import
+import datetime
 import os
 
 from oslo.db.sqlalchemy import session as db_session
 from oslo_config import cfg
+from oslo_utils import timeutils
 from sqlalchemy import desc
 
 import ceilometer
 from ceilometer.alarm.storage import base
 from ceilometer.alarm.storage import models as alarm_api_models
+from ceilometer.i18n import _LI
 from ceilometer.openstack.common import log
 from ceilometer.storage.sqlalchemy import models
 from ceilometer.storage.sqlalchemy import utils as sql_utils
@@ -323,3 +326,21 @@ class Connection(base.Connection):
                 event_id=alarm_change['event_id'])
             alarm_change_row.update(alarm_change)
             session.add(alarm_change_row)
+
+    def clear_expired_alarm_history_data(self, alarm_history_ttl):
+        """Clear expired alarm history data from the backend storage system.
+
+        Clearing occurs according to the time-to-live.
+
+        :param alarm_history_ttl: Number of seconds to keep alarm history
+                                  records for.
+        """
+        session = self._engine_facade.get_session()
+        with session.begin():
+            valid_start = (timeutils.utcnow() -
+                           datetime.timedelta(seconds=alarm_history_ttl))
+            deleted_rows = (session.query(models.AlarmChange)
+                            .filter(models.AlarmChange.timestamp < valid_start)
+                            .delete())
+            LOG.info(_LI("%d alarm histories are removed from database"),
+                     deleted_rows)

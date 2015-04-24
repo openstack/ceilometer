@@ -54,15 +54,19 @@ class BinTestCase(base.BaseTestCase):
                                 stderr=subprocess.PIPE)
         __, err = subp.communicate()
         self.assertEqual(0, subp.poll())
-        self.assertIn("Nothing to clean", err)
+        self.assertIn("Nothing to clean, database metering "
+                      "time to live is disabled", err)
+        self.assertIn("Nothing to clean, database event "
+                      "time to live is disabled", err)
+        self.assertIn("Nothing to clean, database alarm history "
+                      "time to live is disabled", err)
 
-    def _test_run_expirer_ttl_enabled(self, metering_ttl_name):
+    def _test_run_expirer_ttl_enabled(self, ttl_name, data_name):
         content = ("[DEFAULT]\n"
                    "rpc_backend=fake\n"
                    "[database]\n"
                    "%s=1\n"
-                   "event_time_to_live=1\n"
-                   "connection=log://localhost\n" % metering_ttl_name)
+                   "connection=log://localhost\n" % ttl_name)
         self.tempfile = fileutils.write_to_tempfile(content=content,
                                                     prefix='ceilometer',
                                                     suffix='.conf')
@@ -72,14 +76,15 @@ class BinTestCase(base.BaseTestCase):
                                 stderr=subprocess.PIPE)
         __, err = subp.communicate()
         self.assertEqual(0, subp.poll())
-        self.assertIn("Dropping metering data with TTL 1", err)
-        self.assertIn("Dropping event data with TTL 1", err)
+        self.assertIn("Dropping %s data with TTL 1" % data_name, err)
 
     def test_run_expirer_ttl_enabled(self):
-        self._test_run_expirer_ttl_enabled('metering_time_to_live')
-
-    def test_run_expirer_ttl_enabled_with_deprecated_opt_name(self):
-        self._test_run_expirer_ttl_enabled('time_to_live')
+        self._test_run_expirer_ttl_enabled('metering_time_to_live',
+                                           'metering')
+        self._test_run_expirer_ttl_enabled('time_to_live', 'metering')
+        self._test_run_expirer_ttl_enabled('event_time_to_live', 'event')
+        self._test_run_expirer_ttl_enabled('alarm_history_time_to_live',
+                                           'alarm history')
 
 
 class BinSendSampleTestCase(base.BaseTestCase):

@@ -16,6 +16,7 @@
 """
 
 from ceilometer.alarm.storage import base
+from ceilometer.i18n import _LI
 from ceilometer.openstack.common import log
 
 LOG = log.getLogger(__name__)
@@ -46,3 +47,14 @@ class Connection(base.Connection):
 
     def delete_alarm(self, alarm_id):
         """Delete an alarm."""
+
+    def clear_expired_alarm_history_data(self, alarm_history_ttl):
+        """Clear expired alarm history data from the backend storage system.
+
+        Clearing occurs according to the time-to-live.
+
+        :param alarm_history_ttl: Number of seconds to keep alarm history
+                                  records for.
+        """
+        LOG.info(_LI('Dropping alarm history data with TTL %d'),
+                 alarm_history_ttl)

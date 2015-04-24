@@ -3018,6 +3018,50 @@ class AlarmTestPagination(AlarmTestBase,
                          [i.name for i in page1])
 
 
+@tests_db.run_with('sqlite', 'mysql', 'pgsql', 'hbase', 'db2')
+class AlarmHistoryTest(AlarmTestBase,
+                       tests_db.MixinTestsWithBackendScenarios):
+
+    def setUp(self):
+        super(AlarmTestBase, self).setUp()
+        self.add_some_alarms()
+        self.prepare_alarm_history()
+
+    def prepare_alarm_history(self):
+        alarms = list(self.alarm_conn.get_alarms())
+        for alarm in alarms:
+            i = alarms.index(alarm)
+            alarm_change = {
+                "event_id": "3e11800c-a3ca-4991-b34b-d97efb6047d%s" % i,
+                "alarm_id": alarm.alarm_id,
+                "type": alarm_models.AlarmChange.CREATION,
+                "detail": "detail %s" % alarm.name,
+                "user_id": alarm.user_id,
+                "project_id": alarm.project_id,
+                "on_behalf_of": alarm.project_id,
+                "timestamp": datetime.datetime(2014, 4, 7, 7, 30 + i)
+            }
+            self.alarm_conn.record_alarm_change(alarm_change=alarm_change)
+
+    def _clear_alarm_history(self, utcnow, ttl, count):
+        self.mock_utcnow.return_value = utcnow
+        self.alarm_conn.clear_expired_alarm_history_data(ttl)
+        history = list(self.alarm_conn.query_alarm_history())
+        self.assertEqual(count, len(history))
+
+    def test_clear_alarm_history_no_data_to_remove(self):
+        utcnow = datetime.datetime(2013, 4, 7, 7, 30)
+        self._clear_alarm_history(utcnow, 1, 3)
+
+    def test_clear_some_alarm_history(self):
+        utcnow = datetime.datetime(2014, 4, 7, 7, 35)
+        self._clear_alarm_history(utcnow, 3 * 60, 1)
+
+    def test_clear_all_alarm_history(self):
+        utcnow = datetime.datetime(2014, 4, 7, 7, 45)
+        self._clear_alarm_history(utcnow, 3 * 60, 0)
+
+
 class ComplexAlarmQueryTest(AlarmTestBase,
                             tests_db.MixinTestsWithBackendScenarios):
 
