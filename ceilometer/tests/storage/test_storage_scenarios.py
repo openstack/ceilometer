@@ -19,9 +19,9 @@ import datetime
 import operator
 
 import mock
-from oslo.db import api
-from oslo.db import exception as dbexc
 from oslo_config import cfg
+from oslo_db import api
+from oslo_db import exception as dbexc
 from oslo_utils import timeutils
 import pymongo
 

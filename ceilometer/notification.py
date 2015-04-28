@@ -13,9 +13,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import oslo.messaging
 from oslo_config import cfg
 from oslo_context import context
+import oslo_messaging
 from stevedore import extension
 
 from ceilometer.agent import plugin_base as base
@@ -94,7 +94,7 @@ class NotificationService(os_service.Service):
         )
 
     def _get_notifier(self, transport, pipe):
-        return oslo.messaging.Notifier(
+        return oslo_messaging.Notifier(
             transport,
             driver=cfg.CONF.publisher_notifier.telemetry_driver,
             publisher_id='ceilometer.notification',
@@ -128,11 +128,11 @@ class NotificationService(os_service.Service):
             self.group_id = self.NOTIFICATION_NAMESPACE
         else:
             # FIXME(sileht): endpoint use notification_topics option
-            # and it should not because this is oslo.messaging option
+            # and it should not because this is oslo_messaging option
             # not a ceilometer, until we have a something to get
             # the notification_topics in an other way
             # we must create a transport to ensure the option have
-            # beeen registered by oslo.messaging
+            # beeen registered by oslo_messaging
             messaging.get_notifier(transport, '')
             pipe_manager = self.pipeline_manager
             if cfg.CONF.notification.store_events:
@@ -185,7 +185,7 @@ class NotificationService(os_service.Service):
                       {'name': ext.name,
                        'type': ', '.join(handler.event_types),
                        'error': ack_on_error})
-            # NOTE(gordc): this could be a set check but oslo.messaging issue
+            # NOTE(gordc): this could be a set check but oslo_messaging issue
             # https://bugs.launchpad.net/oslo.messaging/+bug/1398511
             # This ensures we don't create multiple duplicate consumers.
             for new_tar in handler.get_targets(cfg.CONF):
@@ -220,7 +220,7 @@ class NotificationService(os_service.Service):
                              pipeline.SamplePipelineEndpoint)
             listener = messaging.get_notification_listener(
                 transport,
-                [oslo.messaging.Target(
+                [oslo_messaging.Target(
                     topic='%s-%s' % (self.NOTIFICATION_IPC, pipe.name))],
                 [pipe_endpoint(self.ctxt, pipe)])
             listener.start()

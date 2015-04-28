@@ -16,8 +16,8 @@
    events.
 """
 
-import oslo.messaging
 from oslo_config import cfg
+import oslo_messaging
 
 from ceilometer.agent import plugin_base
 from ceilometer import sample
@@ -37,12 +37,12 @@ class ImageBase(plugin_base.NotificationBase):
 
     @staticmethod
     def get_targets(conf):
-        """Return a sequence of oslo.messaging.Target
+        """Return a sequence of oslo_messaging.Target
 
         This sequence is defining the exchange and topics to be connected for
         this plugin.
         """
-        return [oslo.messaging.Target(topic=topic,
+        return [oslo_messaging.Target(topic=topic,
                                       exchange=conf.glance_control_exchange)
                 for topic in conf.notification_topics]
 

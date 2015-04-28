@@ -19,8 +19,8 @@ import abc
 import itertools
 import operator
 
-import oslo.messaging
 from oslo_config import cfg
+import oslo_messaging
 import six
 import six.moves.urllib.parse as urlparse
 
@@ -148,7 +148,7 @@ class MessagingPublisher(publisher.PublisherBase):
             context, topic, data = queue[0]
             try:
                 self._send(context, topic, data)
-            except oslo.messaging.MessageDeliveryFailure:
+            except oslo_messaging.MessageDeliveryFailure:
                 data = sum([len(m) for __, __, m in queue])
                 if policy == 'queue':
                     LOG.warn(_("Failed to publish %d datapoints, queue them"),
@@ -204,7 +204,7 @@ class NotifierPublisher(MessagingPublisher):
         super(NotifierPublisher, self).__init__(parsed_url)
         options = urlparse.parse_qs(parsed_url.query)
         topic = options.get('topic', [default_topic])[-1]
-        self.notifier = oslo.messaging.Notifier(
+        self.notifier = oslo_messaging.Notifier(
             messaging.get_transport(),
             driver=cfg.CONF.publisher_notifier.telemetry_driver,
             publisher_id='telemetry.publisher.%s' % cfg.CONF.host,

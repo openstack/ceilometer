@@ -16,8 +16,8 @@
 events.
 """
 
-import oslo.messaging
 from oslo_config import cfg
+import oslo_messaging
 
 from ceilometer.agent import plugin_base
 from ceilometer import sample
@@ -42,7 +42,7 @@ class VolumeBase(plugin_base.NotificationBase):
         Sequence defining the exchange and topics to be connected for this
         plugin.
         """
-        return [oslo.messaging.Target(topic=topic,
+        return [oslo_messaging.Target(topic=topic,
                                       exchange=conf.cinder_control_exchange)
                 for topic in conf.notification_topics]
 

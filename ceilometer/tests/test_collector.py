@@ -17,9 +17,9 @@ import socket
 
 import mock
 import msgpack
-import oslo.messaging
 from oslo_config import fixture as fixture_config
 from oslo_context import context
+import oslo_messaging
 from oslo_utils import timeutils
 from oslotest import mockpatch
 from stevedore import extension
@@ -45,7 +45,7 @@ class TestCollector(tests_base.BaseTestCase):
     def setUp(self):
         super(TestCollector, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
-        self.CONF.import_opt("connection", "oslo.db.options", group="database")
+        self.CONF.import_opt("connection", "oslo_db.options", group="database")
         self.CONF.set_override("connection", "log://", group='database')
         self.CONF.set_override('telemetry_secret', 'not-so-secret',
                                group='publisher')
@@ -196,7 +196,7 @@ class TestCollector(tests_base.BaseTestCase):
 
         self._verify_udp_socket(udp_socket)
 
-    @mock.patch.object(oslo.messaging.MessageHandlingServer, 'start')
+    @mock.patch.object(oslo_messaging.MessageHandlingServer, 'start')
     @mock.patch.object(collector.CollectorService, 'start_udp')
     def test_only_udp(self, udp_start, rpc_start):
         """Check that only UDP is started if messaging transport is unset."""
@@ -207,7 +207,7 @@ class TestCollector(tests_base.BaseTestCase):
             self.assertEqual(0, rpc_start.call_count)
             self.assertEqual(1, udp_start.call_count)
 
-    @mock.patch.object(oslo.messaging.MessageHandlingServer, 'start')
+    @mock.patch.object(oslo_messaging.MessageHandlingServer, 'start')
     @mock.patch.object(collector.CollectorService, 'start_udp')
     def test_only_rpc(self, udp_start, rpc_start):
         """Check that only RPC is started if udp_address is empty."""
@@ -253,10 +253,10 @@ class TestCollector(tests_base.BaseTestCase):
         self.srv.start()
         endp = getattr(self.srv, listener).dispatcher.endpoints[0]
         ret = endp.sample({}, 'pub_id', 'event', {}, {})
-        self.assertEqual(oslo.messaging.NotificationResult.REQUEUE,
+        self.assertEqual(oslo_messaging.NotificationResult.REQUEUE,
                          ret)
 
-    @mock.patch.object(oslo.messaging.MessageHandlingServer, 'start',
+    @mock.patch.object(oslo_messaging.MessageHandlingServer, 'start',
                        mock.Mock())
     @mock.patch.object(collector.CollectorService, 'start_udp', mock.Mock())
     def test_collector_sample_requeue(self):
@@ -264,7 +264,7 @@ class TestCollector(tests_base.BaseTestCase):
                                group='collector')
         self._test_collector_requeue('sample_listener')
 
-    @mock.patch.object(oslo.messaging.MessageHandlingServer, 'start',
+    @mock.patch.object(oslo_messaging.MessageHandlingServer, 'start',
                        mock.Mock())
     @mock.patch.object(collector.CollectorService, 'start_udp', mock.Mock())
     def test_collector_event_requeue(self):
@@ -286,7 +286,7 @@ class TestCollector(tests_base.BaseTestCase):
         self.assertRaises(FakeException, endp.sample, {}, 'pub_id',
                           'event', {}, {})
 
-    @mock.patch.object(oslo.messaging.MessageHandlingServer, 'start',
+    @mock.patch.object(oslo_messaging.MessageHandlingServer, 'start',
                        mock.Mock())
     @mock.patch.object(collector.CollectorService, 'start_udp', mock.Mock())
     def test_collector_sample_no_requeue(self):
@@ -294,7 +294,7 @@ class TestCollector(tests_base.BaseTestCase):
                                group='collector')
         self._test_collector_no_requeue('sample_listener')
 
-    @mock.patch.object(oslo.messaging.MessageHandlingServer, 'start',
+    @mock.patch.object(oslo_messaging.MessageHandlingServer, 'start',
                        mock.Mock())
     @mock.patch.object(collector.CollectorService, 'start_udp', mock.Mock())
     def test_collector_event_no_requeue(self):

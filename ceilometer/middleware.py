@@ -13,8 +13,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import oslo.messaging
 from oslo_config import cfg
+import oslo_messaging
 
 from ceilometer.agent import plugin_base
 from ceilometer import sample
@@ -46,12 +46,12 @@ class HTTPRequest(plugin_base.NotificationBase,
 
     @staticmethod
     def get_targets(conf):
-        """Return a sequence of oslo.messaging.Target
+        """Return a sequence of oslo_messaging.Target
 
         This sequence is defining the exchange and topics to be connected for
         this plugin.
         """
-        return [oslo.messaging.Target(topic=topic, exchange=exchange)
+        return [oslo_messaging.Target(topic=topic, exchange=exchange)
                 for topic in conf.notification_topics
                 for exchange in conf.http_control_exchanges]
 

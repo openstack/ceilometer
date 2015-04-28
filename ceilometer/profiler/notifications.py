@@ -13,8 +13,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import oslo.messaging
 from oslo_config import cfg
+import oslo_messaging
 
 from ceilometer.agent import plugin_base
 from ceilometer import sample
@@ -41,7 +41,7 @@ class ProfilerNotifications(plugin_base.NotificationBase,
     event_types = ["profiler.*"]
 
     def get_targets(self, conf):
-        """Return a sequence of oslo.messaging.Target
+        """Return a sequence of oslo_messaging.Target
 
         It is defining the exchange and topics to be connected for this plugin.
         :param conf: Configuration.
@@ -60,7 +60,7 @@ class ProfilerNotifications(plugin_base.NotificationBase,
         ]
 
         for exchange in exchanges:
-            targets.extend(oslo.messaging.Target(topic=topic,
+            targets.extend(oslo_messaging.Target(topic=topic,
                                                  exchange=exchange)
                            for topic in conf.notification_topics)
         return targets

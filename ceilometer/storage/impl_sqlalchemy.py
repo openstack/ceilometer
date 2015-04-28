@@ -18,10 +18,10 @@ import datetime
 import hashlib
 import os
 
-from oslo.db import api
-from oslo.db import exception as dbexc
-from oslo.db.sqlalchemy import session as db_session
 from oslo_config import cfg
+from oslo_db import api
+from oslo_db import exception as dbexc
+from oslo_db.sqlalchemy import session as db_session
 from oslo_serialization import jsonutils
 from oslo_utils import timeutils
 import six
@@ -227,7 +227,7 @@ class Connection(base.Connection):
 
     def upgrade(self):
         # NOTE(gordc): to minimise memory, only import migration when needed
-        from oslo.db.sqlalchemy import migration
+        from oslo_db.sqlalchemy import migration
         path = os.path.join(os.path.abspath(os.path.dirname(__file__)),
                             'sqlalchemy', 'migrate_repo')
         migration.db_sync(self._engine_facade.get_engine(), path)

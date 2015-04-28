@@ -15,9 +15,9 @@
 """Tests for Ceilometer notify daemon."""
 
 import mock
-import oslo.messaging
 from oslo_config import cfg
 from oslo_config import fixture as fixture_config
+import oslo_messaging
 
 from ceilometer.event import endpoint as event_endpoint
 from ceilometer.tests import base as tests_base
@@ -105,4 +105,4 @@ class TestEventEndpoint(tests_base.BaseTestCase):
         self.mock_pm.publisher.side_effect = Exception
         message = {'event_type': "foo", 'message_id': "abc"}
         ret = self.endpoint.process_notification(message)
-        self.assertEqual(oslo.messaging.NotificationResult.REQUEUE, ret)
+        self.assertEqual(oslo_messaging.NotificationResult.REQUEUE, ret)

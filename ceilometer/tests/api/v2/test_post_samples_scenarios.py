@@ -38,7 +38,7 @@ class TestPostSamples(v2.FunctionalTest,
         self.published = []
         notifier = mock.Mock()
         notifier.sample.side_effect = self.fake_notifier_sample
-        self.useFixture(mockpatch.Patch('oslo.messaging.Notifier',
+        self.useFixture(mockpatch.Patch('oslo_messaging.Notifier',
                                         return_value=notifier))
         super(TestPostSamples, self).setUp()
 
