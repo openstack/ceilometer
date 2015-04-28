@@ -758,30 +758,20 @@ class TestNotificationConverter(ConverterBase):
         self.assertTrue(self._convert_message(c, 'info').raw)
         self.assertFalse(self._convert_message(c, 'error').raw)
 
+    @mock.patch('ceilometer.event.converter.get_config_file',
+                mock.Mock(return_value=None))
     def test_setup_events_default_config(self):
+        self.CONF.set_override('drop_unmatched_notifications',
+                               False, group='event')
 
-        def mock_exists(path):
-            return False
+        c = converter.setup_events(self.fake_plugin_mgr)
+        self.assertIsInstance(c, converter.NotificationEventsConverter)
+        self.assertEqual(1, len(c.definitions))
+        self.assertTrue(c.definitions[0].is_catchall)
 
-        def mock_get_config_file():
-            return None
+        self.CONF.set_override('drop_unmatched_notifications',
+                               True, group='event')
 
-        with mock.patch('ceilometer.event.converter.get_config_file',
-                        mock_get_config_file):
-
-            self.CONF.set_override('drop_unmatched_notifications',
-                                   False, group='event')
-
-            with mock.patch('os.path.exists', mock_exists):
-                c = converter.setup_events(self.fake_plugin_mgr)
-            self.assertIsInstance(c, converter.NotificationEventsConverter)
-            self.assertEqual(1, len(c.definitions))
-            self.assertTrue(c.definitions[0].is_catchall)
-
-            self.CONF.set_override('drop_unmatched_notifications',
-                                   True, group='event')
-
-            with mock.patch('os.path.exists', mock_exists):
-                c = converter.setup_events(self.fake_plugin_mgr)
-            self.assertIsInstance(c, converter.NotificationEventsConverter)
-            self.assertEqual(0, len(c.definitions))
+        c = converter.setup_events(self.fake_plugin_mgr)
+        self.assertIsInstance(c, converter.NotificationEventsConverter)
+        self.assertEqual(0, len(c.definitions))
