@@ -344,7 +344,7 @@ class TraitText(Base):
     )
     event_id = Column(Integer, ForeignKey('event.id'), primary_key=True)
     key = Column(String(255), primary_key=True)
-    value = Column(Text)
+    value = Column(String(255))
 
 
 class TraitInt(Base):
