@@ -93,25 +93,25 @@ class Connection(base.Connection):
         - TraitInt
           - int trait value
           - { event_id: event -> event.id
-              key: trait type
+              key: trait name
               value: integer value
               }
         - TraitDatetime
-          - int trait value
+          - datetime trait value
           - { event_id: event -> event.id
-              key: trait type
+              key: trait name
               value: datetime value
               }
         - TraitText
-          - int trait value
+          - text trait value
           - { event_id: event -> event.id
-              key: trait type
+              key: trait name
               value: text value
               }
         - TraitFloat
-          - int trait value
+          - float trait value
           - { event_id: event -> event.id
-              key: trait type
+              key: trait name
               value: float value
               }
 
