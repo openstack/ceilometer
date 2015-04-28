@@ -16,10 +16,10 @@
 
 import eventlet
 import mock
-import oslo.messaging
-import oslo.messaging.conffixture
 from oslo_config import fixture as fixture_config
 from oslo_context import context
+import oslo_messaging
+import oslo_messaging.conffixture
 from oslo_utils import timeutils
 from stevedore import extension
 import yaml
@@ -108,7 +108,7 @@ class TestNotification(tests_base.BaseTestCase):
         )
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
-    @mock.patch.object(oslo.messaging.MessageHandlingServer, 'start',
+    @mock.patch.object(oslo_messaging.MessageHandlingServer, 'start',
                        mock.MagicMock())
     @mock.patch('ceilometer.event.endpoint.EventsNotificationEndpoint')
     def _do_process_notification_manager_start(self,
@@ -151,7 +151,7 @@ class TestNotification(tests_base.BaseTestCase):
                          self.srv.listeners[0].dispatcher.endpoints[0])
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
-    @mock.patch.object(oslo.messaging.MessageHandlingServer, 'start',
+    @mock.patch.object(oslo_messaging.MessageHandlingServer, 'start',
                        mock.MagicMock())
     @mock.patch('ceilometer.event.endpoint.EventsNotificationEndpoint')
     def test_unique_consumers(self, fake_event_endpoint_class):
@@ -327,7 +327,7 @@ class TestRealNotificationHA(BaseRealNotification):
         self.assertEqual(2, len(self.srv.pipeline_listeners))
         self.srv.stop()
 
-    @mock.patch('oslo.messaging.Notifier.sample')
+    @mock.patch('oslo_messaging.Notifier.sample')
     def test_broadcast_to_relevant_pipes_only(self, mock_notifier):
         self.srv.start()
         for endpoint in self.srv.listeners[0].dispatcher.endpoints:

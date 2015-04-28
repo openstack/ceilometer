@@ -19,7 +19,7 @@ import functools
 import os.path
 
 import eventlet
-import oslo.messaging.conffixture
+import oslo_messaging.conffixture
 from oslo_utils import timeutils
 from oslotest import base
 from oslotest import mockpatch
@@ -33,7 +33,7 @@ from ceilometer import messaging
 
 class BaseTestCase(base.BaseTestCase):
     def setup_messaging(self, conf, exchange=None):
-        self.useFixture(oslo.messaging.conffixture.ConfFixture(conf))
+        self.useFixture(oslo_messaging.conffixture.ConfFixture(conf))
         conf.set_override("notification_driver", "messaging")
         if not exchange:
             exchange = 'ceilometer'

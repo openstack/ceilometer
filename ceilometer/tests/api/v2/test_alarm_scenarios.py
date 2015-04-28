@@ -18,7 +18,7 @@ import datetime
 import uuid
 
 import mock
-import oslo.messaging.conffixture
+import oslo_messaging.conffixture
 from oslo_serialization import jsonutils
 import requests
 import six
@@ -2458,7 +2458,7 @@ class TestAlarms(v2.FunctionalTest,
 
         }
         endpoint = mock.MagicMock()
-        target = oslo.messaging.Target(topic="notifications")
+        target = oslo_messaging.Target(topic="notifications")
         listener = messaging.get_notification_listener(
             self.transport, [target], [endpoint])
         listener.start()

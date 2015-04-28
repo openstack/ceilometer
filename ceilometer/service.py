@@ -18,8 +18,8 @@ import os
 import socket
 import sys
 
-from oslo import i18n
 from oslo_config import cfg
+import oslo_i18n
 
 from ceilometer.i18n import _
 from ceilometer import messaging
@@ -108,7 +108,7 @@ def get_workers(name):
 
 
 def prepare_service(argv=None):
-    i18n.enable_lazy()
+    oslo_i18n.enable_lazy()
     log_levels = (cfg.CONF.default_log_levels +
                   ['stevedore=INFO', 'keystoneclient=INFO'])
     cfg.set_defaults(log.log_opts,

@@ -32,8 +32,10 @@ from ceilometer.openstack.common import log
 
 LOG = log.getLogger(__name__)
 
-cfg.CONF.import_opt('max_retries', 'oslo.db.options', group="database")
-cfg.CONF.import_opt('retry_interval', 'oslo.db.options', group="database")
+# FIXME(dhellmann): Configuration options are not part of the Oslo
+# library APIs, and should not be used like this.
+cfg.CONF.import_opt('max_retries', 'oslo_db.options', group="database")
+cfg.CONF.import_opt('retry_interval', 'oslo_db.options', group="database")
 
 EVENT_TRAIT_TYPES = {'none': 0, 'string': 1, 'integer': 2, 'float': 3,
                      'datetime': 4}

@@ -12,8 +12,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import oslo.messaging
 from oslo_config import fixture as fixture_config
+import oslo_messaging
 from oslotest import base
 
 from ceilometer import messaging
@@ -23,10 +23,10 @@ class MessagingTests(base.BaseTestCase):
     def setUp(self):
         super(MessagingTests, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
-        self.useFixture(oslo.messaging.conffixture.ConfFixture(self.CONF))
+        self.useFixture(oslo_messaging.conffixture.ConfFixture(self.CONF))
 
     def test_get_transport_invalid_url(self):
-        self.assertRaises(oslo.messaging.InvalidTransportURL,
+        self.assertRaises(oslo_messaging.InvalidTransportURL,
                           messaging.get_transport, "notvalid!")
 
     def test_get_transport_url_caching(self):

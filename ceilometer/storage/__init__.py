@@ -15,8 +15,8 @@
 """Storage backend management
 """
 
-from oslo.db import options as db_options
 from oslo_config import cfg
+from oslo_db import options as db_options
 import retrying
 import six
 import six.moves.urllib.parse as urlparse

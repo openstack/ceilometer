@@ -16,8 +16,8 @@ from __future__ import absolute_import
 import datetime
 import os
 
-from oslo.db.sqlalchemy import session as db_session
 from oslo_config import cfg
+from oslo_db.sqlalchemy import session as db_session
 from oslo_utils import timeutils
 from sqlalchemy import desc
 
@@ -90,7 +90,7 @@ class Connection(base.Connection):
 
     def upgrade(self):
         # NOTE(gordc): to minimise memory, only import migration when needed
-        from oslo.db.sqlalchemy import migration
+        from oslo_db.sqlalchemy import migration
         path = os.path.join(os.path.abspath(os.path.dirname(__file__)),
                             '..', '..', 'storage', 'sqlalchemy',
                             'migrate_repo')

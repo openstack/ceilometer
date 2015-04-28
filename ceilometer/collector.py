@@ -16,8 +16,8 @@
 import socket
 
 import msgpack
-import oslo.messaging
 from oslo_config import cfg
+import oslo_messaging
 from oslo_utils import netutils
 from oslo_utils import timeutils
 from oslo_utils import units
@@ -82,7 +82,7 @@ class CollectorService(os_service.Service):
             self.rpc_server = messaging.get_rpc_server(
                 transport, cfg.CONF.publisher_rpc.metering_topic, self)
 
-            sample_target = oslo.messaging.Target(
+            sample_target = oslo_messaging.Target(
                 topic=cfg.CONF.publisher_notifier.metering_topic)
             self.sample_listener = messaging.get_notification_listener(
                 transport, [sample_target],
@@ -91,7 +91,7 @@ class CollectorService(os_service.Service):
                                requeue_sample_on_dispatcher_error))
 
             if cfg.CONF.notification.store_events:
-                event_target = oslo.messaging.Target(
+                event_target = oslo_messaging.Target(
                     topic=cfg.CONF.publisher_notifier.event_topic)
                 self.event_listener = messaging.get_notification_listener(
                     transport, [event_target],
@@ -169,7 +169,7 @@ class CollectorEndpoint(object):
             if self.requeue_on_error:
                 LOG.exception(_LE("Dispatcher failed to handle the %s, "
                                   "requeue it."), self.ep_type)
-                return oslo.messaging.NotificationResult.REQUEUE
+                return oslo_messaging.NotificationResult.REQUEUE
             raise
 
 

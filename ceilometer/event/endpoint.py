@@ -15,9 +15,9 @@
 
 import logging
 
-import oslo.messaging
 from oslo_config import cfg
 from oslo_context import context
+import oslo_messaging
 from stevedore import extension
 
 from ceilometer.event import converter as event_converter
@@ -40,7 +40,7 @@ class EventsNotificationEndpoint(object):
     def info(self, ctxt, publisher_id, event_type, payload, metadata):
         """Convert message to Ceilometer Event.
 
-        :param ctxt: oslo.messaging context
+        :param ctxt: oslo_messaging context
         :param publisher_id: publisher of the notification
         :param event_type: type of notification
         :param payload: notification payload
@@ -57,7 +57,7 @@ class EventsNotificationEndpoint(object):
     def error(self, ctxt, publisher_id, event_type, payload, metadata):
         """Convert error message to Ceilometer Event.
 
-        :param ctxt: oslo.messaging context
+        :param ctxt: oslo_messaging context
         :param publisher_id: publisher of the notification
         :param event_type: type of notification
         :param payload: notification payload
@@ -79,6 +79,6 @@ class EventsNotificationEndpoint(object):
                     p(event)
         except Exception:
             if not cfg.CONF.notification.ack_on_event_error:
-                return oslo.messaging.NotificationResult.REQUEUE
+                return oslo_messaging.NotificationResult.REQUEUE
             raise
-        return oslo.messaging.NotificationResult.HANDLED
+        return oslo_messaging.NotificationResult.HANDLED

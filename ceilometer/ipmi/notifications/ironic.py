@@ -16,8 +16,8 @@
 notification events.
 """
 
-from oslo import messaging
 from oslo_config import cfg
+import oslo_messaging as messaging
 
 from ceilometer.agent import plugin_base
 from ceilometer.openstack.common import log
