@@ -20,6 +20,8 @@ from oslo_config import fixture as fixture_config
 from oslotest import base
 
 from ceilometer.agent.discovery import endpoint
+from ceilometer.agent.discovery import localnode
+from ceilometer.hardware import discovery as hardware
 
 
 class TestEndpointDiscovery(base.BaseTestCase):
@@ -51,3 +53,56 @@ class TestEndpointDiscovery(base.BaseTestCase):
         self.assertEqual(expected,
                          self.manager.keystone.service_catalog.get_urls
                          .call_args_list)
+
+    def test_keystone_called_no_endpoints(self):
+        self.manager.keystone.service_catalog.get_urls.return_value = []
+        self.assertEqual([], self.discovery.discover(self.manager))
+
+
+class TestLocalnodeDiscovery(base.BaseTestCase):
+    def setUp(self):
+        super(TestLocalnodeDiscovery, self).setUp()
+        self.discovery = localnode.LocalNodeDiscovery()
+        self.manager = mock.MagicMock()
+
+    def test_lockalnode_discovery(self):
+        self.assertEqual(['local_host'], self.discovery.discover(self.manager))
+
+
+class TestHardwareDiscovery(base.BaseTestCase):
+    class MockInstance(object):
+        addresses = {'ctlplane': [
+            {'addr': '0.0.0.0',
+             'OS-EXT-IPS-MAC:mac_addr': '01-23-45-67-89-ab'}
+        ]}
+        id = 'resource_id'
+        image = {'id': 'image_id'}
+        flavor = {'id': 'flavor_id'}
+
+    expected = {
+        'resource_id': 'resource_id',
+        'resource_url': 'snmp://ro_snmp_user:password@0.0.0.0',
+        'mac_addr': '01-23-45-67-89-ab',
+        'image_id': 'image_id',
+        'flavor_id': 'flavor_id',
+    }
+
+    def setUp(self):
+        super(TestHardwareDiscovery, self).setUp()
+        self.discovery = hardware.NodesDiscoveryTripleO()
+        self.discovery.nova_cli = mock.MagicMock()
+        self.manager = mock.MagicMock()
+
+    def test_hardware_discovery(self):
+        self.discovery.nova_cli.instance_get_all.return_value = [
+            self.MockInstance()]
+        resources = self.discovery.discover(self.manager)
+        self.assertEqual(1, len(resources))
+        self.assertEqual(self.expected, resources[0])
+
+    def test_hardware_discovery_without_flavor(self):
+        instance = self.MockInstance()
+        instance.flavor = {}
+        self.discovery.nova_cli.instance_get_all.return_value = [instance]
+        resources = self.discovery.discover(self.manager)
+        self.assertEqual(0, len(resources))
