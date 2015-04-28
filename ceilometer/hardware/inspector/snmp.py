@@ -68,6 +68,8 @@ class SNMPInspector(base.Inspector):
     _memory_avail_real_oid = "1.3.6.1.4.1.2021.4.6.0"
     _memory_total_swap_oid = "1.3.6.1.4.1.2021.4.3.0"
     _memory_avail_swap_oid = "1.3.6.1.4.1.2021.4.4.0"
+    _memory_buffer_oid = "1.3.6.1.4.1.2021.4.14.0"
+    _memory_cached_oid = "1.3.6.1.4.1.2021.4.15.0"
     # Disk OIDs
     _disk_index_oid = "1.3.6.1.4.1.2021.9.1.1"
     _disk_path_oid = "1.3.6.1.4.1.2021.9.1.2"
@@ -204,6 +206,18 @@ class SNMPInspector(base.Inspector):
         'memory.swap.avail': {
             'matching_type': EXACT,
             'metric_oid': (_memory_avail_swap_oid, int),
+            'metadata': {},
+            'post_op': None,
+        },
+        'memory.buffer': {
+            'matching_type': EXACT,
+            'metric_oid': (_memory_buffer_oid, int),
+            'metadata': {},
+            'post_op': None,
+        },
+        'memory.cached': {
+            'matching_type': EXACT,
+            'metric_oid': (_memory_cached_oid, int),
             'metadata': {},
             'post_op': None,
         },
