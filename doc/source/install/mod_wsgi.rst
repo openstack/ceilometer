@@ -13,9 +13,9 @@
       License for the specific language governing permissions and limitations
       under the License.
 
-====================================
- Installing the API Behind mod_wsgi
-====================================
+===================================
+ Installing the API behind mod_wsgi
+===================================
 
 Ceilometer comes with a few example files for configuring the API
 service to run behind Apache with ``mod_wsgi``.
@@ -64,5 +64,5 @@ case. To allow multiple processes the DebugMiddleware may be turned off by
 setting ``pecan_debug`` to ``False`` in the ``api`` section of
 ``ceilometer.conf``.
 
-For other WSGI setup you can refer to the `pecan deployement`_ documentation.
-.. _`pecan deployement`: http://pecan.readthedocs.org/en/latest/deployment.html#deployment
+For other WSGI setup you can refer to the `pecan deployment`_ documentation.
+.. _`pecan deployment`: http://pecan.readthedocs.org/en/latest/deployment.html#deployment
