@@ -14,9 +14,9 @@
       License for the specific language governing permissions and limitations
       under the License.
 
-================================
- Installing Development Sandbox
-================================
+===============================
+ Installing development sandbox
+===============================
 
 Ceilometer has several daemons. The basic are: :term:`polling agent` running
 either on the Nova compute node(s) or :term:`polling agent` running on the
@@ -28,13 +28,13 @@ of the instructions below are duplicated. Skip the steps you have already done.
 
 .. note::
 
-   In fact, previously Ceilometer had separated compute and central agents, and
+   In fact, previously ceilometer had separated compute and central agents, and
    their support is implemented in devstack_ right now, not one agent variant.
-   For now we do have deprecated cmd sripts emulating old compute/central
-   behaviour using namespaces option passed to polling agent, which will be
+   For now we do have deprecated cmd scripts emulating old compute/central
+   behavior using namespaces option passed to polling agent, which will be
    maintained for a transitional period.
 
-Configuring Devstack
+Configuring devstack
 ====================
 
 .. index::
