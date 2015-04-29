@@ -3668,6 +3668,22 @@ class GetEventTest(EventTestBase):
         self.assertTrue(events)
         self.assertEqual({'status': {'nested': 'started'}}, events[0].raw)
 
+    def test_trait_type_enforced_on_none(self):
+        new_events = [event_models.Event(
+            "id_testid", "MessageIDTest", self.start,
+            [event_models.Trait('text', event_models.Trait.TEXT_TYPE, ''),
+             event_models.Trait('int', event_models.Trait.INT_TYPE, 0),
+             event_models.Trait('float', event_models.Trait.FLOAT_TYPE, 0.0)],
+            {})]
+        self.event_conn.record_events(new_events)
+        event_filter = storage.EventFilter(message_id="id_testid")
+        events = [event for event in self.event_conn.get_events(event_filter)]
+        options = [(event_models.Trait.TEXT_TYPE, ''),
+                   (event_models.Trait.INT_TYPE, 0.0),
+                   (event_models.Trait.FLOAT_TYPE, 0.0)]
+        for trait in events[0].traits:
+            options.remove((trait.dtype, trait.value))
+
 
 class BigIntegerTest(tests_db.TestBase,
                      tests_db.MixinTestsWithBackendScenarios):

@@ -320,13 +320,13 @@ class Connection(base.Connection):
 
             for id_, key, t_date, t_int, t_float, t_text in (
                     trait_q.order_by('2')).all():
-                if t_int:
+                if t_int is not None:
                     dtype = api_models.Trait.INT_TYPE
                     val = t_int
-                elif t_float:
+                elif t_float is not None:
                     dtype = api_models.Trait.FLOAT_TYPE
                     val = t_float
-                elif t_date:
+                elif t_date is not None:
                     dtype = api_models.Trait.DATETIME_TYPE
                     val = t_date
                 else:
