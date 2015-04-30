@@ -13,19 +13,27 @@
 # under the License.
 
 # This is an example Apache2 configuration file for using the
-# ceilometer API through mod_wsgi.  This version assumes you are
-# running devstack to configure the software.
+# ceilometer API through mod_wsgi.
 
-<VirtualHost *>
-    WSGIDaemonProcess ceilometer-api user=vagrant group=vagrant processes=2 threads=10
-    WSGIScriptAlias / /opt/stack/ceilometer/ceilometer/api/app.wsgi
+# Note: If you are using a Debian-based system then the paths
+# "/var/log/httpd" and "/var/run/httpd" will use "apache2" instead
+# of "httpd".
+#
+# The number of processes and threads is an example only and should
+# be adjusted according to local requirements.
 
-    SetEnv APACHE_RUN_USER vagrant
-    SetEnv APACHE_RUN_GROUP vagrant
+Listen 8777
+
+<VirtualHost *:8777>
+    WSGIDaemonProcess ceilometer-api processes=2 threads=10 user=SOMEUSER display-name=%{GROUP}
     WSGIProcessGroup ceilometer-api
-
-    ErrorLog /var/log/apache2/ceilometer_error.log
-    LogLevel warn
-    CustomLog /var/log/apache2/ceilometer_access.log combined
-
+    WSGIScriptAlias / /var/www/ceilometer/app
+    WSGIApplicationGroup %{GLOBAL}
+    <IfVersion >= 2.4>
+        ErrorLogFormat "%{cu}t %M"
+    </IfVersion>
+    ErrorLog /var/log/httpd/ceilometer_error.log
+    CustomLog /var/log/httpd/ceilometer_access.log combined
 </VirtualHost>
+
+WSGISocketPrefix /var/run/httpd
