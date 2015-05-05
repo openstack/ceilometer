@@ -41,6 +41,15 @@ OPTS = [
                default='',
                help='Password of VMware Vsphere.',
                secret=True),
+    cfg.StrOpt('ca_file',
+               help='CA bundle file to use in verifying the vCenter server '
+                    'certificate.'),
+    cfg.BoolOpt('insecure',
+                default=False,
+                help='If true, the vCenter server certificate is not '
+                     'verified. If false, then the default CA truststore is '
+                     'used for verification. This option is ignored if '
+                     '"ca_file" is set.'),
     cfg.IntOpt('api_retry_count',
                default=10,
                help='Number of times a VMware Vsphere API may be retried.'),
@@ -76,7 +85,9 @@ def get_api_session():
         cfg.CONF.vmware.api_retry_count,
         cfg.CONF.vmware.task_poll_interval,
         wsdl_loc=cfg.CONF.vmware.wsdl_location,
-        port=cfg.CONF.vmware.host_port)
+        port=cfg.CONF.vmware.host_port,
+        cacert=cfg.CONF.vmware.ca_file,
+        insecure=cfg.CONF.vmware.insecure)
     return api_session
 
 
