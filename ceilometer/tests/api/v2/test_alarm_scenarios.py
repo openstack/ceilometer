@@ -2096,6 +2096,20 @@ class TestAlarms(v2.FunctionalTest,
         history = self._get_alarm_history(alarm)
         self.assertEqual(1, len(history))
 
+    def test_record_alarm_history_severity(self):
+        alarm = self._get_alarm('a')
+        history = self._get_alarm_history(alarm)
+        self.assertEqual([], history)
+        self.assertEqual('critical', alarm['severity'])
+
+        self._update_alarm(alarm, dict(severity='low'))
+        new_alarm = self._get_alarm('a')
+        history = self._get_alarm_history(alarm)
+        self.assertEqual(1, len(history))
+        self.assertEqual(jsonutils.dumps({'severity': 'low'}),
+                         history[0]['detail'])
+        self.assertEqual('low', new_alarm['severity'])
+
     def test_get_recorded_alarm_history_on_create(self):
         new_alarm = {
             'name': 'new_alarm',
