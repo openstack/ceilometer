@@ -210,7 +210,11 @@ class BasePipelineTestCase(base.BaseTestCase):
 
     def test_no_interval(self):
         self._unset_pipeline_cfg('interval')
-        self._exception_create_pipelinemanager()
+        pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager)
+
+        pipe = pipeline_manager.pipelines[0]
+        self.assertEqual(600, pipe.get_interval())
 
     def test_no_publishers(self):
         self._unset_pipeline_cfg('publishers')

@@ -278,15 +278,16 @@ class SampleSource(Source):
     def __init__(self, cfg):
         super(SampleSource, self).__init__(cfg)
         try:
-            try:
-                self.interval = int(cfg['interval'])
-            except ValueError:
-                raise PipelineException("Invalid interval value", cfg)
             # Support 'counters' for backward compatibility
             self.meters = cfg.get('meters', cfg.get('counters'))
         except KeyError as err:
             raise PipelineException(
                 "Required field %s not specified" % err.args[0], cfg)
+
+        try:
+            self.interval = int(cfg.get('interval', 600))
+        except ValueError:
+            raise PipelineException("Invalid interval value", cfg)
         if self.interval <= 0:
             raise PipelineException("Interval value should > 0", cfg)
 
