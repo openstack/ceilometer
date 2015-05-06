@@ -522,8 +522,6 @@ class AlarmController(rest.RestController):
         else:
             data.state_timestamp = alarm_in.state_timestamp
 
-        alarm_in.severity = data.severity
-
         # make sure alarms are unique by name per project.
         if alarm_in.name != data.name:
             alarms = list(self.conn.get_alarms(name=data.name,
