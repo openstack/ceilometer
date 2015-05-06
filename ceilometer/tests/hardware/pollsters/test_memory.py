@@ -30,3 +30,13 @@ class TestMemoryPollsters(base.TestPollsterBase):
         self._check_get_samples(memory.MemoryUsedPollster,
                                 'hardware.memory.used',
                                 90, sample.TYPE_GAUGE)
+
+    def test_memory_size_buffer(self):
+        self._check_get_samples(memory.MemoryBufferPollster,
+                                'hardware.memory.buffer',
+                                500, sample.TYPE_GAUGE)
+
+    def test_memory_size_cached(self):
+        self._check_get_samples(memory.MemoryCachedPollster,
+                                'hardware.memory.cached',
+                                200, sample.TYPE_GAUGE)

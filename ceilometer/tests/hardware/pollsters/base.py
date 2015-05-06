@@ -35,6 +35,8 @@ class FakeInspector(inspector_base.Inspector):
         'cpu.load.15min': (0.55, {}, {}),
         'memory.total': (1000, {}, {}),
         'memory.used': (90, {}, {}),
+        'memory.buffer': (500, {}, {}),
+        'memory.cached': (200, {}, {}),
         'network.incoming.bytes': (90, net_metadata, {}),
         'network.outgoing.bytes': (80, net_metadata, {}),
         'network.outgoing.errors': (1, net_metadata, {}),
