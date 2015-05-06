@@ -32,7 +32,8 @@ class DatabaseDispatcher(dispatcher.Base):
     To enable this dispatcher, the following section needs to be present in
     ceilometer.conf file
 
-    dispatchers = database
+    [DEFAULT]
+    dispatcher = database
     """
     def __init__(self, conf):
         super(DatabaseDispatcher, self).__init__(conf)

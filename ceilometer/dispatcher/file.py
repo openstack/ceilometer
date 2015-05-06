@@ -48,8 +48,8 @@ class FileDispatcher(dispatcher.Base):
     To enable this dispatcher, the following section needs to be present in
     ceilometer.conf file
 
-    [collector]
-    dispatchers = file
+    [DEFAULT]
+    dispatcher = file
     """
 
     def __init__(self, conf):

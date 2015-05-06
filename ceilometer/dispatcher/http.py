@@ -53,7 +53,8 @@ class HttpDispatcher(dispatcher.Base):
     To enable this dispatcher, the following option needs to be present in
     ceilometer.conf file::
 
-        dispatchers = http
+        [DEFAULT]
+        dispatcher = http
 
     Dispatcher specific options can be added as follows::
 
