@@ -343,7 +343,7 @@ class TraitText(Base):
         Index('ix_trait_text_event_id_key', 'event_id', 'key'),
     )
     event_id = Column(Integer, ForeignKey('event.id'), primary_key=True)
-    key = Column(Integer, primary_key=True)
+    key = Column(String(255), primary_key=True)
     value = Column(Text)
 
 
@@ -355,7 +355,7 @@ class TraitInt(Base):
         Index('ix_trait_int_event_id_key', 'event_id', 'key'),
     )
     event_id = Column(Integer, ForeignKey('event.id'), primary_key=True)
-    key = Column(Integer, primary_key=True)
+    key = Column(String(255), primary_key=True)
     value = Column(Integer)
 
 
@@ -367,7 +367,7 @@ class TraitFloat(Base):
         Index('ix_trait_float_event_id_key', 'event_id', 'key'),
     )
     event_id = Column(Integer, ForeignKey('event.id'), primary_key=True)
-    key = Column(Integer, primary_key=True)
+    key = Column(String(255), primary_key=True)
     value = Column(Float(53))
 
 
@@ -379,5 +379,5 @@ class TraitDatetime(Base):
         Index('ix_trait_datetime_event_id_key', 'event_id', 'key'),
     )
     event_id = Column(Integer, ForeignKey('event.id'), primary_key=True)
-    key = Column(Integer, primary_key=True)
+    key = Column(String(255), primary_key=True)
     value = Column(PreciseTimestamp())
