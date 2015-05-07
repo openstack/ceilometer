@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 2015.1.dev168\n"
+"Project-Id-Version: ceilometer 2015.2.0.dev51\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-12 06:06+0000\n"
+"POT-Creation-Date: 2015-05-07 06:07+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,12 +31,34 @@ msgstr ""
 msgid "Left partitioning group %s"
 msgstr ""
 
+#: ceilometer/alarm/storage/impl_log.py:59
+#, python-format
+msgid "Dropping alarm history data with TTL %d"
+msgstr ""
+
+#: ceilometer/alarm/storage/impl_sqlalchemy.py:345
+#, python-format
+msgid "%d alarm histories are removed from database"
+msgstr ""
+
+#: ceilometer/cmd/storage.py:45
+msgid "Nothing to clean, database metering time to live is disabled"
+msgstr ""
+
+#: ceilometer/cmd/storage.py:54
+msgid "Nothing to clean, database event time to live is disabled"
+msgstr ""
+
+#: ceilometer/cmd/storage.py:63
+msgid "Nothing to clean, database alarm history time to live is disabled"
+msgstr ""
+
 #: ceilometer/event/storage/impl_log.py:32
 #, python-format
 msgid "Dropping event data with TTL %d"
 msgstr ""
 
-#: ceilometer/event/storage/impl_sqlalchemy.py:430
+#: ceilometer/event/storage/impl_sqlalchemy.py:431
 #, python-format
 msgid "%d events are removed from database"
 msgstr ""
