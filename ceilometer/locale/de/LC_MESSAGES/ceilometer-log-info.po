@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-12 06:06+0000\n"
-"PO-Revision-Date: 2015-03-11 20:49+0000\n"
+"POT-Creation-Date: 2015-05-07 06:07+0000\n"
+"PO-Revision-Date: 2015-04-24 16:40+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/ceilometer/"
 "language/de/)\n"
@@ -19,89 +19,45 @@ msgstr ""
 "Generated-By: Babel 1.3\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ceilometer/coordination.py:76
-msgid "Coordination backend started successfully."
-msgstr ""
-
-#: ceilometer/coordination.py:126
-#, python-format
-msgid "Joined partitioning group %s"
-msgstr ""
-
-#: ceilometer/coordination.py:144
-#, python-format
-msgid "Left partitioning group %s"
-msgstr ""
-
-#: ceilometer/event/storage/impl_log.py:32
-#, python-format
-msgid "Dropping event data with TTL %d"
-msgstr ""
-
-#: ceilometer/event/storage/impl_sqlalchemy.py:430
-#, python-format
-msgid "%d events are removed from database"
-msgstr ""
-
-#: ceilometer/openstack/common/eventlet_backdoor.py:146
 #, python-format
 msgid "Eventlet backdoor listening on %(port)s for process %(pid)d"
 msgstr "Eventlet backdoor hört auf %(port)s für Prozess %(pid)d"
 
-#: ceilometer/openstack/common/service.py:173
 #, python-format
 msgid "Caught %s, exiting"
 msgstr "%s abgefangen. Vorgang wird beendet"
 
-#: ceilometer/openstack/common/service.py:231
 msgid "Parent process has died unexpectedly, exiting"
 msgstr ""
 "Übergeordneter Prozess wurde unerwartet abgebrochen. Vorgang wird beendet"
 
-#: ceilometer/openstack/common/service.py:262
 #, python-format
 msgid "Child caught %s, exiting"
 msgstr "Untergeordnetes Element %s abgefangen; Vorgang wird beendet"
 
-#: ceilometer/openstack/common/service.py:301
 msgid "Forking too fast, sleeping"
 msgstr "Verzweigung zu schnell; im Ruhemodus"
 
-#: ceilometer/openstack/common/service.py:320
 #, python-format
 msgid "Started child %d"
 msgstr "Untergeordnetes Element %d gestartet"
 
-#: ceilometer/openstack/common/service.py:330
 #, python-format
 msgid "Starting %d workers"
 msgstr "Starten von %d Workers"
 
-#: ceilometer/openstack/common/service.py:347
 #, python-format
 msgid "Child %(pid)d killed by signal %(sig)d"
 msgstr "Untergeordnetes Element %(pid)d durch Signal %(sig)d abgebrochen"
 
-#: ceilometer/openstack/common/service.py:351
 #, python-format
 msgid "Child %(pid)s exited with status %(code)d"
 msgstr "Untergeordnete %(pid)s mit Status %(code)d beendet"
 
-#: ceilometer/openstack/common/service.py:390
 #, python-format
 msgid "Caught %s, stopping children"
 msgstr "%s abgefangen, untergeordnete Elemente werden gestoppt"
 
-#: ceilometer/openstack/common/service.py:399
-msgid "Wait called after thread killed. Cleaning up."
-msgstr ""
-
-#: ceilometer/openstack/common/service.py:415
 #, python-format
 msgid "Waiting on %d children to exit"
 msgstr "Warten auf Beenden von %d untergeordneten Elementen"
-
-#: ceilometer/publisher/kafka_broker.py:86
-#, python-format
-msgid "Publishing policy set to %s"
-msgstr ""

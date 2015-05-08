@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-31 06:06+0000\n"
+"POT-Creation-Date: 2015-05-07 06:07+0000\n"
 "PO-Revision-Date: 2015-03-18 21:15+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/"
@@ -19,60 +19,11 @@ msgstr ""
 "Generated-By: Babel 1.3\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: ceilometer/collector.py:170
-#, python-format
-msgid "Dispatcher failed to handle the %s, requeue it."
-msgstr ""
-
-#: ceilometer/collector.py:212
-#, python-format
-msgid "Error processing event and it will be dropped: %s"
-msgstr ""
-
-#: ceilometer/coordination.py:79 ceilometer/coordination.py:91
-msgid "Error connecting to coordination backend."
-msgstr ""
-
-#: ceilometer/coordination.py:107
-msgid "Error sending a heartbeat to coordination backend."
-msgstr ""
-
-#: ceilometer/coordination.py:177
-msgid "Error getting group membership info from coordination backend."
-msgstr ""
-
-#: ceilometer/compute/pollsters/memory.py:106
-#, python-format
-msgid "Could not get Resident Memory Usage for %(id)s: %(e)s"
-msgstr ""
-
-#: ceilometer/dispatcher/http.py:135
-msgid "Status Code: %{code}s. Failed to dispatch event: %{event}s"
-msgstr ""
-
-#: ceilometer/openstack/common/loopingcall.py:95
 msgid "in fixed duration looping call"
 msgstr "em uma chamada de laço de duração fixa"
 
-#: ceilometer/openstack/common/loopingcall.py:138
 msgid "in dynamic looping call"
 msgstr "em chamada de laço dinâmico"
 
-#: ceilometer/openstack/common/service.py:268
 msgid "Unhandled exception"
 msgstr "Exceção não tratada"
-
-#: ceilometer/publisher/kafka_broker.py:95
-#: ceilometer/publisher/kafka_broker.py:177
-#, python-format
-msgid "Failed to connect to Kafka service: %s"
-msgstr ""
-
-#: ceilometer/publisher/kafka_broker.py:158
-msgid "Failed to retry to send sample data with max_retry times"
-msgstr ""
-
-#: ceilometer/publisher/kafka_broker.py:198
-#, python-format
-msgid "Failed to send sample data: %s"
-msgstr ""
