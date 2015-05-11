@@ -187,6 +187,8 @@ class Connection(base.Connection):
                         if t_map['name'] == key:
                             dtype = t_map['data_type']
                             break
+                    else:
+                        dtype = models.Trait.TEXT_TYPE
                     trait_list.append(models.Trait(
                         name=key, dtype=dtype,
                         value=models.Trait.convert_value(dtype, value)))
