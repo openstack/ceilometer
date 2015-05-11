@@ -35,25 +35,23 @@ work with a copy of ceilometer installed via devstack.
 
 .. literalinclude:: ../../../etc/apache2/ceilometer
 
-1. Copy or symlink the file to ``/etc/apache2/sites-available``.
+1. On deb-based systems copy or symlink the file to
+   ``/etc/apache2/sites-available``. For rpm-based systems the file will go in
+   ``/etc/httpd/conf.d``.
 
-2. Modify the ``VirtualHost`` directive, setting a hostname or IP for
-   the service. The default settings assume that the ceilometer API is
-   the only service running on the local Apache instance, which
-   conflicts with Horizon's default configuration.
+2. Modify the ``WSGIDaemonProcess`` directive to set the ``user`` and
+   ``group`` values to a appropriate user on your server. In many
+   installations ``ceilometer`` will be correct.
 
-3. Modify the ``WSGIDaemonProcess`` directive to set the
-   ``user`` and ``group`` values to a user available on your server.
-
-4. Modify the ``APACHE_RUN_USER`` and ``APACHE_RUN_GROUP`` values to
-   the name of a user and group available on your server.
-
-5. Enable the ceilometer site.
-
-   ::
+3. Enable the ceilometer site. On deb-based systems::
 
       $ a2ensite ceilometer
       $ service apache2 reload
+
+   On rpm-based systems::
+
+      $ service httpd reload
+
 
 Limitation
 ==========

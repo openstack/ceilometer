@@ -524,9 +524,18 @@ Installing the API Server
 
 .. _documentation: http://pythonpaste.org/deploy/
 
-6. Start the API server.
+6. Choose and start the API server.
 
-   ::
+   Ceilometer includes the ``ceilometer-api`` command. This can be
+   used to run the API server. For smaller or proof-of-concept
+   installations this is a reasonable choice. For larger installations it
+   is strongly recommended to install the API server in a WSGI host
+   such as mod_wsgi (see :doc:`mod_wsgi`). Doing so will provide better
+   performance and more options for making adjustments specific to the
+   installation environment.
+
+   If you are using the ``ceilometer-api`` command it can be started
+   as::
 
     $ ceilometer-api
 
