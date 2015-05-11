@@ -25,7 +25,7 @@ import sqlalchemy as sa
 
 from ceilometer.event.storage import base
 from ceilometer.event.storage import models as api_models
-from ceilometer.i18n import _, _LI
+from ceilometer.i18n import _LE, _LI
 from ceilometer.openstack.common import log
 from ceilometer.storage.sqlalchemy import models
 from ceilometer import utils
@@ -166,16 +166,9 @@ class Connection(base.Connection):
         """Write the events to SQL database via sqlalchemy.
 
         :param event_models: a list of model.Event objects.
-
-        Returns a list of events that could not be saved in a
-        (reason, event) tuple. Reasons are enumerated in
-        storage.model.Event
-
-        Flush when they're all added, unless new EventTypes or
-        TraitTypes are added along the way.
         """
         session = self._engine_facade.get_session()
-        problem_events = []
+        error = None
         for event_model in event_models:
             event = None
             try:
@@ -202,18 +195,14 @@ class Connection(base.Connection):
                             session.execute(model.__table__.insert(),
                                             trait_map[dtype])
             except dbexc.DBDuplicateEntry as e:
-                LOG.exception(_("Failed to record duplicated event: %s") % e)
-                problem_events.append((api_models.Event.DUPLICATE,
-                                       event_model))
+                LOG.info(_LI("Duplicate event detected, skipping it: %s") % e)
             except KeyError as e:
-                LOG.exception(_('Failed to record event: %s') % e)
-                problem_events.append((api_models.Event.INCOMPATIBLE_TRAIT,
-                                       event_model))
+                LOG.exception(_LE('Failed to record event: %s') % e)
             except Exception as e:
-                LOG.exception(_('Failed to record event: %s') % e)
-                problem_events.append((api_models.Event.UNKNOWN_PROBLEM,
-                                       event_model))
-        return problem_events
+                LOG.exception(_LE('Failed to record event: %s') % e)
+                error = e
+        if error:
+            raise error
 
     def get_events(self, event_filter):
         """Return an iterable of model.Event objects.

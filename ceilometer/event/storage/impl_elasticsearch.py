@@ -22,7 +22,12 @@ import six
 
 from ceilometer.event.storage import base
 from ceilometer.event.storage import models
+from ceilometer.i18n import _LE, _LI
+from ceilometer.openstack.common import log
+from ceilometer import storage
 from ceilometer import utils
+
+LOG = log.getLogger(__name__)
 
 
 AVAILABLE_CAPABILITIES = {
@@ -93,23 +98,24 @@ class Connection(base.Connection):
                                    'traits': traits,
                                    'raw': ev.raw}}
 
-        problem_events = []
+        error = None
         for ok, result in helpers.streaming_bulk(
                 self.conn, _build_bulk_index(events)):
             if not ok:
                 __, result = result.popitem()
                 if result['status'] == 409:
-                    problem_events.append((models.Event.DUPLICATE,
-                                           result['_id']))
+                    LOG.info(_LI('Duplicate event detected, skipping it: %s')
+                             % result)
                 else:
-                    problem_events.append((models.Event.UNKNOWN_PROBLEM,
-                                           result['_id']))
+                    LOG.exception(_LE('Failed to record event: %s') % result)
+                    error = storage.StorageUnknownWriteError(result)
 
         if self._refresh_on_write:
             self.conn.indices.refresh(index='%s_*' % self.index_name)
             while self.conn.cluster.pending_tasks(local=True)['tasks']:
                 pass
-        return problem_events
+        if error:
+            raise error
 
     def _make_dsl_from_filter(self, indices, ev_filter):
         q_args = {}

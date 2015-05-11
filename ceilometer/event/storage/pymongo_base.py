@@ -16,7 +16,7 @@ import pymongo
 
 from ceilometer.event.storage import base
 from ceilometer.event.storage import models
-from ceilometer.i18n import _
+from ceilometer.i18n import _LE, _LI
 from ceilometer.openstack.common import log
 from ceilometer.storage.mongo import utils as pymongo_utils
 from ceilometer import utils
@@ -47,14 +47,9 @@ class Connection(base.Connection):
     def record_events(self, event_models):
         """Write the events to database.
 
-        Return a list of events of type models.Event.DUPLICATE in case of
-        trying to write an already existing event to the database, or
-        models.Event.UNKONW_PROBLEM in case of any failures with recording the
-        event in the database.
-
         :param event_models: a list of models.Event objects.
         """
-        problem_events = []
+        error = None
         for event_model in event_models:
             traits = []
             if event_model.traits:
@@ -69,14 +64,12 @@ class Connection(base.Connection):
                      'timestamp': event_model.generated,
                      'traits': traits, 'raw': event_model.raw})
             except pymongo.errors.DuplicateKeyError as ex:
-                LOG.exception(_("Failed to record duplicated event: %s") % ex)
-                problem_events.append((models.Event.DUPLICATE,
-                                       event_model))
+                LOG.info(_LI("Duplicate event detected, skipping it: %s") % ex)
             except Exception as ex:
-                LOG.exception(_("Failed to record event: %s") % ex)
-                problem_events.append((models.Event.UNKNOWN_PROBLEM,
-                                       event_model))
-        return problem_events
+                LOG.exception(_LE("Failed to record event: %s") % ex)
+                error = ex
+        if error:
+            raise error
 
     def get_events(self, event_filter):
         """Return an iter of models.Event objects.

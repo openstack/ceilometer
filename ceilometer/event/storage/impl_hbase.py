@@ -15,7 +15,7 @@ import operator
 
 from ceilometer.event.storage import base
 from ceilometer.event.storage import models
-from ceilometer.i18n import _
+from ceilometer.i18n import _, _LE
 from ceilometer.openstack.common import log
 from ceilometer.storage.hbase import base as hbase_base
 from ceilometer.storage.hbase import utils as hbase_utils
@@ -92,12 +92,8 @@ class Connection(hbase_base.Connection, base.Connection):
         """Write the events to Hbase.
 
         :param event_models: a list of models.Event objects.
-        :return problem_events: a list of events that could not be saved in a
-          (reason, event) tuple. From the reasons that are enumerated in
-          storage.models.Event only the UNKNOWN_PROBLEM is applicable here.
         """
-        problem_events = []
-
+        error = None
         with self.conn_pool.connection() as conn:
             events_table = conn.table(self.EVENT_TABLE)
             for event_model in event_models:
@@ -121,10 +117,10 @@ class Connection(hbase_base.Connection, base.Connection):
                 try:
                     events_table.put(row, record)
                 except Exception as ex:
-                    LOG.debug(_("Failed to record event: %s") % ex)
-                    problem_events.append((models.Event.UNKNOWN_PROBLEM,
-                                           event_model))
-        return problem_events
+                    LOG.exception(_LE("Failed to record event: %s") % ex)
+                    error = ex
+        if error:
+            raise error
 
     def get_events(self, event_filter):
         """Return an iter of models.Event objects.

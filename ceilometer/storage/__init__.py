@@ -93,6 +93,10 @@ cfg.CONF.register_cli_opts(CLI_OPTS)
 db_options.set_defaults(cfg.CONF)
 
 
+class StorageUnknownWriteError(Exception):
+    """Error raised when an unknown error occurs while recording."""
+
+
 class StorageBadVersion(Exception):
     """Error raised when the storage backend version is not good enough."""
 
