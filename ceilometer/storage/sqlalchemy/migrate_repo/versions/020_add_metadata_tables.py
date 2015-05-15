@@ -60,7 +60,7 @@ def upgrade(migrate_engine):
                     ins = meta_tables['metadata_text'].insert()
                 elif isinstance(v, bool):
                     ins = meta_tables['metadata_bool'].insert()
-                elif isinstance(v, (int, long)):
+                elif isinstance(v, six.integer_types):
                     ins = meta_tables['metadata_int'].insert()
                 elif isinstance(v, float):
                     ins = meta_tables['metadata_float'].insert()

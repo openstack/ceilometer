@@ -665,7 +665,7 @@ class Connection(base.Connection):
     @staticmethod
     def _stats_result_aggregates(result, aggregate):
         stats_args = {}
-        if isinstance(result.count, (int, long)):
+        if isinstance(result.count, six.integer_types):
             stats_args['count'] = result.count
         for attr in ['min', 'max', 'sum', 'avg']:
             if hasattr(result, attr):

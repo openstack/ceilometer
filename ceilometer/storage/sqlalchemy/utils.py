@@ -14,6 +14,7 @@
 import operator
 import types
 
+import six
 from sqlalchemy import and_
 from sqlalchemy import asc
 from sqlalchemy import desc
@@ -30,8 +31,9 @@ META_TYPE_MAP = {bool: models.MetaBool,
                  unicode: models.MetaText,
                  types.NoneType: models.MetaText,
                  int: models.MetaBigInt,
-                 long: models.MetaBigInt,
                  float: models.MetaFloat}
+if six.PY2:
+    META_TYPE_MAP[long] = models.MetaBigInt
 
 
 class QueryTransformer(object):

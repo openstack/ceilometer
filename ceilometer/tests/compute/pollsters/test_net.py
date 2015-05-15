@@ -48,8 +48,8 @@ class TestNetPollster(base.TestPollsterBase):
                             projmask='255.255.255.0',
                             projnet='proj1',
                             dhcp_server='10.0.0.1'))
-        stats0 = virt_inspector.InterfaceStats(rx_bytes=1L, rx_packets=2L,
-                                               tx_bytes=3L, tx_packets=4L)
+        stats0 = virt_inspector.InterfaceStats(rx_bytes=1, rx_packets=2,
+                                               tx_bytes=3, tx_packets=4)
         self.vnic1 = virt_inspector.Interface(
             name='vnet1',
             fref='fa163e71ec6f',
@@ -58,8 +58,8 @@ class TestNetPollster(base.TestPollsterBase):
                             projmask='255.255.255.0',
                             projnet='proj2',
                             dhcp_server='10.0.0.2'))
-        stats1 = virt_inspector.InterfaceStats(rx_bytes=5L, rx_packets=6L,
-                                               tx_bytes=7L, tx_packets=8L)
+        stats1 = virt_inspector.InterfaceStats(rx_bytes=5, rx_packets=6,
+                                               tx_bytes=7, tx_packets=8)
         self.vnic2 = virt_inspector.Interface(
             name='vnet2',
             fref=None,
@@ -68,8 +68,8 @@ class TestNetPollster(base.TestPollsterBase):
                             projmask='255.255.255.0',
                             projnet='proj3',
                             dhcp_server='10.0.0.3'))
-        stats2 = virt_inspector.InterfaceStats(rx_bytes=9L, rx_packets=10L,
-                                               tx_bytes=11L, tx_packets=12L)
+        stats2 = virt_inspector.InterfaceStats(rx_bytes=9, rx_packets=10,
+                                               tx_bytes=11, tx_packets=12)
 
         vnics = [
             (self.vnic0, stats0),
@@ -134,9 +134,9 @@ class TestNetPollster(base.TestPollsterBase):
         instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
         self._check_get_samples(
             net.IncomingBytesPollster,
-            [('10.0.0.2', 1L, self.vnic0.fref),
-             ('192.168.0.3', 5L, self.vnic1.fref),
-             ('192.168.0.4', 9L,
+            [('10.0.0.2', 1, self.vnic0.fref),
+             ('192.168.0.3', 5, self.vnic1.fref),
+             ('192.168.0.4', 9,
               "%s-%s" % (instance_name_id, self.vnic2.name)),
              ],
         )
@@ -145,9 +145,9 @@ class TestNetPollster(base.TestPollsterBase):
         instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
         self._check_get_samples(
             net.OutgoingBytesPollster,
-            [('10.0.0.2', 3L, self.vnic0.fref),
-             ('192.168.0.3', 7L, self.vnic1.fref),
-             ('192.168.0.4', 11L,
+            [('10.0.0.2', 3, self.vnic0.fref),
+             ('192.168.0.3', 7, self.vnic1.fref),
+             ('192.168.0.4', 11,
               "%s-%s" % (instance_name_id, self.vnic2.name)),
              ],
         )
@@ -156,9 +156,9 @@ class TestNetPollster(base.TestPollsterBase):
         instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
         self._check_get_samples(
             net.IncomingPacketsPollster,
-            [('10.0.0.2', 2L, self.vnic0.fref),
-             ('192.168.0.3', 6L, self.vnic1.fref),
-             ('192.168.0.4', 10L,
+            [('10.0.0.2', 2, self.vnic0.fref),
+             ('192.168.0.3', 6, self.vnic1.fref),
+             ('192.168.0.4', 10,
               "%s-%s" % (instance_name_id, self.vnic2.name)),
              ],
         )
@@ -167,9 +167,9 @@ class TestNetPollster(base.TestPollsterBase):
         instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
         self._check_get_samples(
             net.OutgoingPacketsPollster,
-            [('10.0.0.2', 4L, self.vnic0.fref),
-             ('192.168.0.3', 8L, self.vnic1.fref),
-             ('192.168.0.4', 12L,
+            [('10.0.0.2', 4, self.vnic0.fref),
+             ('192.168.0.3', 8, self.vnic1.fref),
+             ('192.168.0.4', 12,
               "%s-%s" % (instance_name_id, self.vnic2.name)),
              ],
         )
@@ -204,8 +204,8 @@ class TestNetPollsterCache(base.TestPollsterBase):
                             projmask='255.255.255.0',
                             projnet='proj1',
                             dhcp_server='10.0.0.1'))
-        stats0 = virt_inspector.InterfaceStats(rx_bytes=1L, rx_packets=2L,
-                                               tx_bytes=3L, tx_packets=4L)
+        stats0 = virt_inspector.InterfaceStats(rx_bytes=1, rx_packets=2,
+                                               tx_bytes=3, tx_packets=4)
         vnics = [(vnic0, stats0)]
 
         mgr = manager.AgentManager()
@@ -243,8 +243,8 @@ class TestNetRatesPollster(base.TestPollsterBase):
                             projmask='255.255.255.0',
                             projnet='proj1',
                             dhcp_server='10.0.0.1'))
-        stats0 = virt_inspector.InterfaceRateStats(rx_bytes_rate=1L,
-                                                   tx_bytes_rate=2L)
+        stats0 = virt_inspector.InterfaceRateStats(rx_bytes_rate=1,
+                                                   tx_bytes_rate=2)
         self.vnic1 = virt_inspector.Interface(
             name='vnet1',
             fref='fa163e71ec6f',
@@ -253,8 +253,8 @@ class TestNetRatesPollster(base.TestPollsterBase):
                             projmask='255.255.255.0',
                             projnet='proj2',
                             dhcp_server='10.0.0.2'))
-        stats1 = virt_inspector.InterfaceRateStats(rx_bytes_rate=3L,
-                                                   tx_bytes_rate=4L)
+        stats1 = virt_inspector.InterfaceRateStats(rx_bytes_rate=3,
+                                                   tx_bytes_rate=4)
         self.vnic2 = virt_inspector.Interface(
             name='vnet2',
             fref=None,
@@ -263,8 +263,8 @@ class TestNetRatesPollster(base.TestPollsterBase):
                             projmask='255.255.255.0',
                             projnet='proj3',
                             dhcp_server='10.0.0.3'))
-        stats2 = virt_inspector.InterfaceRateStats(rx_bytes_rate=5L,
-                                                   tx_bytes_rate=6L)
+        stats2 = virt_inspector.InterfaceRateStats(rx_bytes_rate=5,
+                                                   tx_bytes_rate=6)
 
         vnics = [
             (self.vnic0, stats0),
@@ -298,9 +298,9 @@ class TestNetRatesPollster(base.TestPollsterBase):
         instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
         self._check_get_samples(
             net.IncomingBytesRatePollster,
-            [('10.0.0.2', 1L, self.vnic0.fref),
-             ('192.168.0.3', 3L, self.vnic1.fref),
-             ('192.168.0.4', 5L,
+            [('10.0.0.2', 1, self.vnic0.fref),
+             ('192.168.0.3', 3, self.vnic1.fref),
+             ('192.168.0.4', 5,
               "%s-%s" % (instance_name_id, self.vnic2.name)),
              ],
         )
@@ -309,9 +309,9 @@ class TestNetRatesPollster(base.TestPollsterBase):
         instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
         self._check_get_samples(
             net.OutgoingBytesRatePollster,
-            [('10.0.0.2', 2L, self.vnic0.fref),
-             ('192.168.0.3', 4L, self.vnic1.fref),
-             ('192.168.0.4', 6L,
+            [('10.0.0.2', 2, self.vnic0.fref),
+             ('192.168.0.3', 4, self.vnic1.fref),
+             ('192.168.0.4', 6,
               "%s-%s" % (instance_name_id, self.vnic2.name)),
              ],
         )

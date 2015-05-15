@@ -175,10 +175,10 @@ class TestNeutronClient(base.BaseTestCase):
     @staticmethod
     def fake_pool_stats(fake_pool):
         return {'stats':
-                [{'active_connections': 1L,
-                  'total_connections': 2L,
-                  'bytes_in': 3L,
-                  'bytes_out': 4L
+                [{'active_connections': 1,
+                  'total_connections': 2,
+                  'bytes_in': 3,
+                  'bytes_out': 4
                   }]}
 
     def test_pool_stats(self):
@@ -187,7 +187,7 @@ class TestNeutronClient(base.BaseTestCase):
             stats = self.nc.pool_stats('fake_pool')['stats']
 
         self.assertEqual(1, len(stats))
-        self.assertEqual(1L, stats[0]['active_connections'])
-        self.assertEqual(2L, stats[0]['total_connections'])
-        self.assertEqual(3L, stats[0]['bytes_in'])
-        self.assertEqual(4L, stats[0]['bytes_out'])
+        self.assertEqual(1, stats[0]['active_connections'])
+        self.assertEqual(2, stats[0]['total_connections'])
+        self.assertEqual(3, stats[0]['bytes_in'])
+        self.assertEqual(4, stats[0]['bytes_out'])

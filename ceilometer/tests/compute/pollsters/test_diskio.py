@@ -113,13 +113,13 @@ class TestDiskPollsters(TestBaseDiskIO):
 
     DISKS = [
         (virt_inspector.Disk(device='vda1'),
-         virt_inspector.DiskStats(read_bytes=1L, read_requests=2L,
-                                  write_bytes=3L, write_requests=4L,
-                                  errors=-1L)),
+         virt_inspector.DiskStats(read_bytes=1, read_requests=2,
+                                  write_bytes=3, write_requests=4,
+                                  errors=-1)),
         (virt_inspector.Disk(device='vda2'),
-         virt_inspector.DiskStats(read_bytes=2L, read_requests=3L,
-                                  write_bytes=5L, write_requests=7L,
-                                  errors=-1L)),
+         virt_inspector.DiskStats(read_bytes=2, read_requests=3,
+                                  write_bytes=5, write_requests=7,
+                                  errors=-1)),
     ]
     CACHE_KEY = "CACHE_KEY_DISK"
 
@@ -129,54 +129,54 @@ class TestDiskPollsters(TestBaseDiskIO):
 
     def test_disk_read_requests(self):
         self._check_aggregate_samples(disk.ReadRequestsPollster,
-                                      'disk.read.requests', 5L,
+                                      'disk.read.requests', 5,
                                       expected_device=['vda1', 'vda2'])
 
     def test_disk_read_bytes(self):
         self._check_aggregate_samples(disk.ReadBytesPollster,
-                                      'disk.read.bytes', 3L,
+                                      'disk.read.bytes', 3,
                                       expected_device=['vda1', 'vda2'])
 
     def test_disk_write_requests(self):
         self._check_aggregate_samples(disk.WriteRequestsPollster,
-                                      'disk.write.requests', 11L,
+                                      'disk.write.requests', 11,
                                       expected_device=['vda1', 'vda2'])
 
     def test_disk_write_bytes(self):
         self._check_aggregate_samples(disk.WriteBytesPollster,
-                                      'disk.write.bytes', 8L,
+                                      'disk.write.bytes', 8,
                                       expected_device=['vda1', 'vda2'])
 
     def test_per_disk_read_requests(self):
         self._check_per_device_samples(disk.PerDeviceReadRequestsPollster,
-                                       'disk.device.read.requests', 2L,
+                                       'disk.device.read.requests', 2,
                                        'vda1')
         self._check_per_device_samples(disk.PerDeviceReadRequestsPollster,
-                                       'disk.device.read.requests', 3L,
+                                       'disk.device.read.requests', 3,
                                        'vda2')
 
     def test_per_disk_write_requests(self):
         self._check_per_device_samples(disk.PerDeviceWriteRequestsPollster,
-                                       'disk.device.write.requests', 4L,
+                                       'disk.device.write.requests', 4,
                                        'vda1')
         self._check_per_device_samples(disk.PerDeviceWriteRequestsPollster,
-                                       'disk.device.write.requests', 7L,
+                                       'disk.device.write.requests', 7,
                                        'vda2')
 
     def test_per_disk_read_bytes(self):
         self._check_per_device_samples(disk.PerDeviceReadBytesPollster,
-                                       'disk.device.read.bytes', 1L,
+                                       'disk.device.read.bytes', 1,
                                        'vda1')
         self._check_per_device_samples(disk.PerDeviceReadBytesPollster,
-                                       'disk.device.read.bytes', 2L,
+                                       'disk.device.read.bytes', 2,
                                        'vda2')
 
     def test_per_disk_write_bytes(self):
         self._check_per_device_samples(disk.PerDeviceWriteBytesPollster,
-                                       'disk.device.write.bytes', 3L,
+                                       'disk.device.write.bytes', 3,
                                        'vda1')
         self._check_per_device_samples(disk.PerDeviceWriteBytesPollster,
-                                       'disk.device.write.bytes', 5L,
+                                       'disk.device.write.bytes', 5,
                                        'vda2')
 
 
@@ -198,54 +198,54 @@ class TestDiskRatePollsters(TestBaseDiskIO):
 
     def test_disk_read_bytes_rate(self):
         self._check_aggregate_samples(disk.ReadBytesRatePollster,
-                                      'disk.read.bytes.rate', 3072L,
+                                      'disk.read.bytes.rate', 3072,
                                       expected_device=['disk1', 'disk2'])
 
     def test_disk_read_requests_rate(self):
         self._check_aggregate_samples(disk.ReadRequestsRatePollster,
-                                      'disk.read.requests.rate', 700L,
+                                      'disk.read.requests.rate', 700,
                                       expected_device=['disk1', 'disk2'])
 
     def test_disk_write_bytes_rate(self):
         self._check_aggregate_samples(disk.WriteBytesRatePollster,
-                                      'disk.write.bytes.rate', 11264L,
+                                      'disk.write.bytes.rate', 11264,
                                       expected_device=['disk1', 'disk2'])
 
     def test_disk_write_requests_rate(self):
         self._check_aggregate_samples(disk.WriteRequestsRatePollster,
-                                      'disk.write.requests.rate', 1500L,
+                                      'disk.write.requests.rate', 1500,
                                       expected_device=['disk1', 'disk2'])
 
     def test_per_disk_read_bytes_rate(self):
         self._check_per_device_samples(disk.PerDeviceReadBytesRatePollster,
                                        'disk.device.read.bytes.rate',
-                                       1024L, 'disk1')
+                                       1024, 'disk1')
         self._check_per_device_samples(disk.PerDeviceReadBytesRatePollster,
                                        'disk.device.read.bytes.rate',
-                                       2048L, 'disk2')
+                                       2048, 'disk2')
 
     def test_per_disk_read_requests_rate(self):
         self._check_per_device_samples(disk.PerDeviceReadRequestsRatePollster,
                                        'disk.device.read.requests.rate',
-                                       300L, 'disk1')
+                                       300, 'disk1')
         self._check_per_device_samples(disk.PerDeviceReadRequestsRatePollster,
                                        'disk.device.read.requests.rate',
-                                       400L, 'disk2')
+                                       400, 'disk2')
 
     def test_per_disk_write_bytes_rate(self):
         self._check_per_device_samples(disk.PerDeviceWriteBytesRatePollster,
                                        'disk.device.write.bytes.rate',
-                                       5120L, 'disk1')
+                                       5120, 'disk1')
         self._check_per_device_samples(disk.PerDeviceWriteBytesRatePollster,
-                                       'disk.device.write.bytes.rate', 6144L,
+                                       'disk.device.write.bytes.rate', 6144,
                                        'disk2')
 
     def test_per_disk_write_requests_rate(self):
         self._check_per_device_samples(disk.PerDeviceWriteRequestsRatePollster,
-                                       'disk.device.write.requests.rate', 700L,
+                                       'disk.device.write.requests.rate', 700,
                                        'disk1')
         self._check_per_device_samples(disk.PerDeviceWriteRequestsRatePollster,
-                                       'disk.device.write.requests.rate', 800L,
+                                       'disk.device.write.requests.rate', 800,
                                        'disk2')
 
 
@@ -296,23 +296,23 @@ class TestDiskIOPSPollsters(TestBaseDiskIO):
 
     def test_disk_iops(self):
         self._check_aggregate_samples(disk.DiskIOPSPollster,
-                                      'disk.iops', 30L)
+                                      'disk.iops', 30)
 
     def test_per_device_iops(self):
         self._check_per_device_samples(disk.PerDeviceDiskIOPSPollster,
-                                       'disk.device.iops', 10L, 'disk1')
+                                       'disk.device.iops', 10, 'disk1')
 
         self._check_per_device_samples(disk.PerDeviceDiskIOPSPollster,
-                                       'disk.device.iops', 20L, 'disk2')
+                                       'disk.device.iops', 20, 'disk2')
 
 
 class TestDiskInfoPollsters(TestBaseDiskIO):
 
     DISKS = [
         (virt_inspector.Disk(device='vda1'),
-         virt_inspector.DiskInfo(capacity=3L, allocation=2L, physical=1L)),
+         virt_inspector.DiskInfo(capacity=3, allocation=2, physical=1)),
         (virt_inspector.Disk(device='vda2'),
-         virt_inspector.DiskInfo(capacity=4L, allocation=3L, physical=2L)),
+         virt_inspector.DiskInfo(capacity=4, allocation=3, physical=2)),
     ]
     TYPE = 'gauge'
     CACHE_KEY = "CACHE_KEY_DISK_INFO"
@@ -323,39 +323,39 @@ class TestDiskInfoPollsters(TestBaseDiskIO):
 
     def test_disk_capacity(self):
         self._check_aggregate_samples(disk.CapacityPollster,
-                                      'disk.capacity', 7L,
+                                      'disk.capacity', 7,
                                       expected_device=['vda1', 'vda2'])
 
     def test_disk_allocation(self):
         self._check_aggregate_samples(disk.AllocationPollster,
-                                      'disk.allocation', 5L,
+                                      'disk.allocation', 5,
                                       expected_device=['vda1', 'vda2'])
 
     def test_disk_physical(self):
         self._check_aggregate_samples(disk.PhysicalPollster,
-                                      'disk.usage', 3L,
+                                      'disk.usage', 3,
                                       expected_device=['vda1', 'vda2'])
 
     def test_per_disk_capacity(self):
         self._check_per_device_samples(disk.PerDeviceCapacityPollster,
-                                       'disk.device.capacity', 3L,
+                                       'disk.device.capacity', 3,
                                        'vda1')
         self._check_per_device_samples(disk.PerDeviceCapacityPollster,
-                                       'disk.device.capacity', 4L,
+                                       'disk.device.capacity', 4,
                                        'vda2')
 
     def test_per_disk_allocation(self):
         self._check_per_device_samples(disk.PerDeviceAllocationPollster,
-                                       'disk.device.allocation', 2L,
+                                       'disk.device.allocation', 2,
                                        'vda1')
         self._check_per_device_samples(disk.PerDeviceAllocationPollster,
-                                       'disk.device.allocation', 3L,
+                                       'disk.device.allocation', 3,
                                        'vda2')
 
     def test_per_disk_physical(self):
         self._check_per_device_samples(disk.PerDevicePhysicalPollster,
-                                       'disk.device.usage', 1L,
+                                       'disk.device.usage', 1,
                                        'vda1')
         self._check_per_device_samples(disk.PerDevicePhysicalPollster,
-                                       'disk.device.usage', 2L,
+                                       'disk.device.usage', 2,
                                        'vda2')

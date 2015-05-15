@@ -456,10 +456,10 @@ class TestLBStatsPollster(_BaseTestLBPollster):
 
     @staticmethod
     def fake_pool_stats():
-        return {'stats': {'active_connections': 2L,
-                          'bytes_in': 1L,
-                          'bytes_out': 3L,
-                          'total_connections': 4L
+        return {'stats': {'active_connections': 2,
+                          'bytes_in': 1,
+                          'bytes_out': 3,
+                          'total_connections': 4
                           }
                 }
 
@@ -484,19 +484,19 @@ class TestLBStatsPollster(_BaseTestLBPollster):
     def test_lb_total_connections(self):
         self._check_get_samples(lbaas.LBTotalConnectionsPollster,
                                 'network.services.lb.total.connections',
-                                4L, 'cumulative')
+                                4, 'cumulative')
 
     def test_lb_active_connections(self):
         self._check_get_samples(lbaas.LBActiveConnectionsPollster,
                                 'network.services.lb.active.connections',
-                                2L, 'gauge')
+                                2, 'gauge')
 
     def test_lb_incoming_bytes(self):
         self._check_get_samples(lbaas.LBBytesInPollster,
                                 'network.services.lb.incoming.bytes',
-                                1L, 'cumulative')
+                                1, 'cumulative')
 
     def test_lb_outgoing_bytes(self):
         self._check_get_samples(lbaas.LBBytesOutPollster,
                                 'network.services.lb.outgoing.bytes',
-                                3L, 'cumulative')
+                                3, 'cumulative')

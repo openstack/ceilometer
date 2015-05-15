@@ -269,7 +269,7 @@ class TestUtilsV2(base.BaseTestCase):
                                                        [mock_metric_def])
 
         self.assertEqual(1, len(metric_values))
-        self.assertEqual(long(fake_metric_value), metric_values[0])
+        self.assertEqual(int(fake_metric_value), metric_values[0])
 
     def test_get_vm_setting_data(self):
         mock_vm_s = mock.MagicMock()

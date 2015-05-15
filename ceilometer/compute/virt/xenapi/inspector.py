@@ -125,7 +125,7 @@ class XenapiInspector(virt_inspector.Inspector):
         metrics_rec = self._call_xenapi("VM_metrics.get_record",
                                         metrics_ref)
         # Stat provided from XenServer is in B, converting it to MB.
-        memory = long(metrics_rec['memory_actual']) / units.Mi
+        memory = int(metrics_rec['memory_actual']) / units.Mi
         return virt_inspector.MemoryUsageStats(usage=memory)
 
     def inspect_vnic_rates(self, instance, duration=None):
