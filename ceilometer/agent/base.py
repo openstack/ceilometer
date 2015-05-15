@@ -26,6 +26,7 @@ import random
 from oslo_config import cfg
 from oslo_context import context
 import six
+from six import moves
 from six.moves.urllib import parse as urlparse
 from stevedore import extension
 
@@ -214,7 +215,7 @@ class AgentManager(os_service.Service):
         extensions = (self._extensions('poll', namespace).extensions
                       for namespace in namespaces)
         if pollster_list:
-            extensions = (itertools.ifilter(_match, exts)
+            extensions = (moves.filter(_match, exts)
                           for exts in extensions)
 
         self.extensions = list(itertools.chain(*list(extensions)))

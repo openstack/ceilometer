@@ -57,7 +57,7 @@ class FakeRequest(object):
         if 'wsgi.input' not in environ:
             environ['wsgi.input'] = six.moves.cStringIO('')
 
-        for header, value in headers.iteritems():
+        for header, value in six.iteritems(headers):
             environ['HTTP_%s' % header.upper()] = value
         self.environ = environ
 

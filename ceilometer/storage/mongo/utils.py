@@ -184,7 +184,7 @@ def improve_keys(data, metaquery=False):
         return data
 
     if metaquery:
-        for key in data.iterkeys():
+        for key in six.iterkeys(data):
             if '.$' in key:
                 key_list = []
                 for k in quote_key(key):

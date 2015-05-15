@@ -19,7 +19,7 @@
 """
 
 import datetime
-import repr
+from six.moves import reprlib
 
 import mock
 from oslo_utils import timeutils
@@ -62,7 +62,7 @@ class EventTypeTest(tests_db.TestBase):
         self.assertNotEqual(et1.id, et2.id)
         self.assertNotEqual(et1.desc, et2.desc)
         # Test the method __repr__ returns a string
-        self.assertTrue(repr.repr(et2))
+        self.assertTrue(reprlib.repr(et2))
 
 
 @tests_db.run_with('sqlite', 'mysql', 'pgsql')
@@ -100,7 +100,7 @@ class EventTest(tests_db.TestBase):
     def test_event_repr(self):
         ev = sql_models.Event('msg_id', None, False, {})
         ev.id = 100
-        self.assertTrue(repr.repr(ev))
+        self.assertTrue(reprlib.repr(ev))
 
 
 @tests_db.run_with('sqlite', 'mysql', 'pgsql')

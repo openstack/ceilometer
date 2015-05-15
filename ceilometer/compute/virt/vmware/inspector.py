@@ -18,6 +18,7 @@
 from oslo_config import cfg
 from oslo_utils import units
 from oslo_vmware import api
+import six
 
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.compute.virt.vmware import vsphere_operations
@@ -129,7 +130,7 @@ class VsphereInspector(virt_inspector.Inspector):
             vnic_id_to_stats_map = self._ops.query_vm_device_stats(
                 vm_moid, net_counter_id, duration)
             vnic_stats[net_counter] = vnic_id_to_stats_map
-            vnic_ids.update(vnic_id_to_stats_map.iterkeys())
+            vnic_ids.update(six.iterkeys(vnic_id_to_stats_map))
 
         # Stats provided from vSphere are in KB/s, converting it to B/s.
         for vnic_id in vnic_ids:
@@ -180,7 +181,7 @@ class VsphereInspector(virt_inspector.Inspector):
             disk_id_to_stat_map = self._ops.query_vm_device_stats(
                 vm_moid, disk_counter_id, duration)
             disk_stats[disk_counter] = disk_id_to_stat_map
-            disk_ids.update(disk_id_to_stat_map.iterkeys())
+            disk_ids.update(six.iterkeys(disk_id_to_stat_map))
 
         for disk_id in disk_ids:
 

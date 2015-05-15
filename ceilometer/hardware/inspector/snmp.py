@@ -21,6 +21,8 @@
 
 from pysnmp.entity.rfc3413.oneliner import cmdgen
 
+import six
+
 from ceilometer.hardware.inspector import base
 
 
@@ -347,7 +349,7 @@ class SNMPInspector(base.Inspector):
     @classmethod
     def construct_metadata(cls, oid_cache, meta_defs, suffix=''):
         metadata = {}
-        for key, oid_def in meta_defs.iteritems():
+        for key, oid_def in six.iteritems(meta_defs):
             metadata[key] = cls.get_oid_value(oid_cache, oid_def, suffix)
         return metadata
 
@@ -423,7 +425,7 @@ class SNMPInspector(base.Inspector):
             # populate the oid into cache
             self._query_oids(host, [self._interface_ip_oid], cache, True)
         ip_addr = ''
-        for k, v in oid_cache.iteritems():
+        for k, v in six.iteritems(oid_cache):
             if k.startswith(self._interface_ip_oid) and v == int(suffix[1:]):
                 ip_addr = k.replace(self._interface_ip_oid + ".", "")
         metadata.update(ip=ip_addr)

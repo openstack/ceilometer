@@ -201,4 +201,4 @@ class ThresholdEvaluator(evaluator.Evaluator):
 
             self._transition(alarm,
                              statistics,
-                             map(_compare, statistics))
+                             [_compare(statistic) for statistic in statistics])

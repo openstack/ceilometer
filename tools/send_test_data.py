@@ -27,6 +27,7 @@ import uuid
 
 import make_test_data
 from oslo_context import context
+from six import moves
 
 from ceilometer import messaging
 from ceilometer import service
@@ -53,7 +54,7 @@ def generate_data(rpc_client, make_data_args, samples_count,
 
     make_data_args.resource_id = None
     resources_list = [str(uuid.uuid4())
-                      for _ in xrange(resources_count)]
+                      for _ in moves.xrange(resources_count)]
     resource_samples = {resource: 0 for resource in resources_list}
     batch = []
     count = 0
