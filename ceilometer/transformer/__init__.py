@@ -89,3 +89,4 @@ class Namespace(object):
 
     def __nonzero__(self):
         return len(self.__dict__) > 0
+    __bool__ = __nonzero__
