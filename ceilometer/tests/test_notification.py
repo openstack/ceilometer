@@ -21,6 +21,7 @@ from oslo_context import context
 import oslo_messaging
 import oslo_messaging.conffixture
 from oslo_utils import timeutils
+import six
 from stevedore import extension
 import yaml
 
@@ -182,6 +183,8 @@ class BaseRealNotification(tests_base.BaseTestCase):
             'transformers': [],
             'publishers': ['test://'],
         }])
+        if six.PY3:
+            pipeline = pipeline.encode('utf-8')
         self.expected_samples = 2
         pipeline_cfg_file = fileutils.write_to_tempfile(content=pipeline,
                                                         prefix="pipeline",
@@ -202,6 +205,8 @@ class BaseRealNotification(tests_base.BaseTestCase):
                 'publishers': ['test://']
             }]
         })
+        if six.PY3:
+            ev_pipeline = ev_pipeline.encode('utf-8')
         self.expected_events = 1
         ev_pipeline_cfg_file = fileutils.write_to_tempfile(
             content=ev_pipeline, prefix="event_pipeline", suffix="yaml")
