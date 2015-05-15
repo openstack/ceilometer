@@ -376,7 +376,7 @@ class Connection(pymongo_base.Connection):
 
         for key, grouped_meters in itertools.groupby(meters, key=_group_key):
             stat = models.Statistics(unit=None,
-                                     min=sys.maxint, max=-sys.maxint,
+                                     min=sys.maxsize, max=-sys.maxsize,
                                      avg=0, sum=0, count=0,
                                      period=0, period_start=0, period_end=0,
                                      duration=0, duration_start=0,
