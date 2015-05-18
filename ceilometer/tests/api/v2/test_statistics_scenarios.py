@@ -1460,7 +1460,7 @@ class TestSelectableAggregates(v2.FunctionalTest,
         # add a large number of datapoints that won't impact on cardinality
         # if the computation logic is tolerant of different DB behavior on
         # larger numbers of samples per-period
-        for i in xrange(200):
+        for i in range(200):
             s = sample.Sample(
                 'instance',
                 sample.TYPE_GAUGE,

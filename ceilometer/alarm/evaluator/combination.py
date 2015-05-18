@@ -16,7 +16,7 @@
 # under the License.
 
 
-import itertools
+from six import moves
 
 from ceilometer.alarm import evaluator
 from ceilometer.i18n import _
@@ -106,8 +106,7 @@ class CombinationEvaluator(evaluator.Evaluator):
             return
 
         states = zip(alarm.rule['alarm_ids'],
-                     itertools.imap(self._get_alarm_state,
-                                    alarm.rule['alarm_ids']))
+                     moves.map(self._get_alarm_state, alarm.rule['alarm_ids']))
 
         if self._sufficient_states(alarm, states):
             self._transition(alarm, states)

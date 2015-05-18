@@ -403,12 +403,12 @@ class TestEvaluate(base.TestEvaluatorBase):
             avgs = [self._get_stat('avg',
                                    threshold + (v if v < 10 else -v),
                                    count=20 if v < 10 else 1)
-                    for v in xrange(1, 11)]
+                    for v in moves.xrange(1, 11)]
             threshold = self.alarms[1].rule['threshold']
             maxs = [self._get_stat('max',
                                    threshold - (v if v < 7 else -v),
                                    count=20 if v < 7 else 1)
-                    for v in xrange(8)]
+                    for v in moves.xrange(8)]
             self.api_client.statistics.list.side_effect = [avgs, maxs]
             self._evaluate_all_alarms()
             self._assert_all_alarms('alarm' if exclude_outliers else 'ok')
@@ -445,12 +445,12 @@ class TestEvaluate(base.TestEvaluatorBase):
             avgs = [self._get_stat('avg',
                                    threshold - (v if v < 9 else -v),
                                    count=20 if v < 9 else 1)
-                    for v in xrange(10)]
+                    for v in moves.xrange(10)]
             threshold = self.alarms[1].rule['threshold']
             maxs = [self._get_stat('max',
                                    threshold + (v if v < 8 else -v),
                                    count=20 if v < 8 else 1)
-                    for v in xrange(1, 9)]
+                    for v in moves.xrange(1, 9)]
             self.api_client.statistics.list.side_effect = [avgs, maxs]
             self._evaluate_all_alarms()
             self._assert_all_alarms('ok' if exclude_outliers else 'alarm')
