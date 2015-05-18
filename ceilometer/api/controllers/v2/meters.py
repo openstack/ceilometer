@@ -363,7 +363,7 @@ class MeterController(rest.RestController):
         return samples
 
     @wsme_pecan.wsexpose([Statistics],
-                         [base.Query], [unicode], int, [Aggregate])
+                         [base.Query], [six.text_type], int, [Aggregate])
     def statistics(self, q=None, groupby=None, period=None, aggregate=None):
         """Computes the statistics of the samples in the time range given.
 

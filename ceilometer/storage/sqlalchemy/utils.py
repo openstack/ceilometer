@@ -14,6 +14,7 @@
 import operator
 import types
 
+import six
 from sqlalchemy import and_
 from sqlalchemy import asc
 from sqlalchemy import desc
@@ -27,7 +28,7 @@ from ceilometer.storage.sqlalchemy import models
 
 META_TYPE_MAP = {bool: models.MetaBool,
                  str: models.MetaText,
-                 unicode: models.MetaText,
+                 six.text_type: models.MetaText,
                  types.NoneType: models.MetaText,
                  int: models.MetaBigInt,
                  long: models.MetaBigInt,

@@ -226,7 +226,7 @@ class EventTypesController(rest.RestController):
         pecan.abort(404)
 
     @v2_utils.requires_admin
-    @wsme_pecan.wsexpose([unicode])
+    @wsme_pecan.wsexpose([six.text_type])
     def get_all(self):
         """Get all event types."""
         return list(pecan.request.event_storage_conn.get_event_types())

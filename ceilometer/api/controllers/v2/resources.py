@@ -22,6 +22,7 @@ import datetime
 
 import pecan
 from pecan import rest
+import six
 from wsme import types as wtypes
 import wsmeext.pecan as wsme_pecan
 
@@ -111,7 +112,7 @@ class ResourcesController(rest.RestController):
                                              query=query))
         return links
 
-    @wsme_pecan.wsexpose(Resource, unicode)
+    @wsme_pecan.wsexpose(Resource, six.text_type)
     def get_one(self, resource_id):
         """Retrieve details about one resource.
 
