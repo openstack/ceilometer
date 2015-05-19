@@ -31,8 +31,9 @@ META_TYPE_MAP = {bool: models.MetaBool,
                  six.text_type: models.MetaText,
                  types.NoneType: models.MetaText,
                  int: models.MetaBigInt,
-                 long: models.MetaBigInt,
                  float: models.MetaFloat}
+if six.PY2:
+    META_TYPE_MAP[long] = models.MetaBigInt
 
 
 class QueryTransformer(object):

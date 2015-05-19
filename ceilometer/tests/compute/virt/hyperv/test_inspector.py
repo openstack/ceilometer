@@ -40,7 +40,7 @@ class TestHyperVInspection(base.BaseTestCase):
 
         fake_cpu_percent_used = (fake_cpu_clock_used /
                                  float(fake_host_cpu_clock * fake_cpu_count))
-        fake_cpu_time = (long(fake_uptime * fake_cpu_percent_used) *
+        fake_cpu_time = (int(fake_uptime * fake_cpu_percent_used) *
                          1000)
 
         self._inspector._utils.get_host_cpu_info.return_value = (

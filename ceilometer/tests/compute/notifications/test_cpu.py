@@ -36,16 +36,16 @@ METRICS_UPDATE = {
              'name': 'cpu.frequency', 'value': 1600,
              'source': 'libvirt.LibvirtDriver'},
             {'timestamp': u'2013-07-29T06:51:34.472416',
-             'name': 'cpu.user.time', 'value': 17421440000000L,
+             'name': 'cpu.user.time', 'value': 17421440000000,
              'source': 'libvirt.LibvirtDriver'},
             {'timestamp': u'2013-07-29T06:51:34.472416',
-             'name': 'cpu.kernel.time', 'value': 7852600000000L,
+             'name': 'cpu.kernel.time', 'value': 7852600000000,
              'source': 'libvirt.LibvirtDriver'},
             {'timestamp': u'2013-07-29T06:51:34.472416',
-             'name': 'cpu.idle.time', 'value': 1307374400000000L,
+             'name': 'cpu.idle.time', 'value': 1307374400000000,
              'source': 'libvirt.LibvirtDriver'},
             {'timestamp': u'2013-07-29T06:51:34.472416',
-             'name': 'cpu.iowait.time', 'value': 11697470000000L,
+             'name': 'cpu.iowait.time', 'value': 11697470000000,
              'source': 'libvirt.LibvirtDriver'},
             {'timestamp': u'2013-07-29T06:51:34.472416',
              'name': 'cpu.user.percent', 'value': 0.012959045637294348,
@@ -114,22 +114,22 @@ class TestMetricsNotifications(base.BaseTestCase):
     def test_compute_cpu_user_time(self):
         c = self._process_notification(cpu.CpuUserTime(None))
         self.assertEqual('compute.node.cpu.user.time', c.name)
-        self.assertEqual(17421440000000L, c.volume)
+        self.assertEqual(17421440000000, c.volume)
 
     def test_compute_cpu_kernel_time(self):
         c = self._process_notification(cpu.CpuKernelTime(None))
         self.assertEqual('compute.node.cpu.kernel.time', c.name)
-        self.assertEqual(7852600000000L, c.volume)
+        self.assertEqual(7852600000000, c.volume)
 
     def test_compute_cpu_idle_time(self):
         c = self._process_notification(cpu.CpuIdleTime(None))
         self.assertEqual('compute.node.cpu.idle.time', c.name)
-        self.assertEqual(1307374400000000L, c.volume)
+        self.assertEqual(1307374400000000, c.volume)
 
     def test_compute_cpu_iowait_time(self):
         c = self._process_notification(cpu.CpuIowaitTime(None))
         self.assertEqual('compute.node.cpu.iowait.time', c.name)
-        self.assertEqual(11697470000000L, c.volume)
+        self.assertEqual(11697470000000, c.volume)
 
     def test_compute_cpu_kernel_percent(self):
         c = self._process_notification(cpu.CpuKernelPercent(None))

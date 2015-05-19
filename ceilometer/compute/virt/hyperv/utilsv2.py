@@ -92,11 +92,11 @@ class UtilsV2(object):
 
         cpu_used = 0
         if cpu_metric_aggr:
-            cpu_used = long(cpu_metric_aggr[0].MetricValue)
+            cpu_used = int(cpu_metric_aggr[0].MetricValue)
 
         return (cpu_used,
                 int(cpu_sd.VirtualQuantity),
-                long(vm.OnTimeInMilliseconds))
+                int(vm.OnTimeInMilliseconds))
 
     def get_memory_metrics(self, vm_name):
         vm = self._lookup_vm(vm_name)
@@ -104,7 +104,7 @@ class UtilsV2(object):
         metric_memory = self._get_metrics(vm, memory_def)
         memory_usage = 0
         if metric_memory:
-            memory_usage = long(metric_memory[0].MetricValue)
+            memory_usage = int(metric_memory[0].MetricValue)
         return memory_usage
 
     def get_vnic_metrics(self, vm_name):
@@ -186,7 +186,7 @@ class UtilsV2(object):
     def _sum_metric_values(metrics):
         tot_metric_val = 0
         for metric in metrics:
-            tot_metric_val += long(metric.MetricValue)
+            tot_metric_val += int(metric.MetricValue)
         return tot_metric_val
 
     def _sum_metric_values_by_defs(self, element_metrics, metric_defs):

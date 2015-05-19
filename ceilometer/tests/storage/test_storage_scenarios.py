@@ -2763,7 +2763,7 @@ class CounterDataTypeTest(DBTestBase,
             meter='dummySmallCounter',
         )
         results = list(self.conn.get_samples(f))
-        observed_num = long(results[0].counter_volume)
+        observed_num = int(results[0].counter_volume)
         self.assertEqual(-337203685477580, observed_num)
 
     def test_storage_can_handle_float_values(self):
