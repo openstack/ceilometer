@@ -91,7 +91,7 @@ def upgrade(migrate_engine):
     )
 
     tables = [meter, project, resource, user, source, sourceassoc]
-    for i in sorted(tables):
+    for i in sorted(tables, key=lambda table: table.fullname):
         i.create()
 
 
