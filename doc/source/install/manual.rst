@@ -69,7 +69,7 @@ SQLalchemy-supported DBs
    ceilometer.conf as follows::
 
     [database]
-    connection = mysql://username:password@host/ceilometer?charset=utf8
+    connection = mysql+pymysql://username:password@host/ceilometer?charset=utf8
 
 HBase
 -----
