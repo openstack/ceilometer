@@ -16,9 +16,15 @@
 import threading
 
 from oslo_config import cfg
+
 from pecan import hooks
 
+from ceilometer.i18n import _LE
+from ceilometer.openstack.common import log
 from ceilometer import pipeline
+from ceilometer import storage
+
+LOG = log.getLogger(__name__)
 
 
 class ConfigHook(hooks.PecanHook):
@@ -34,15 +40,31 @@ class ConfigHook(hooks.PecanHook):
 
 class DBHook(hooks.PecanHook):
 
-    def __init__(self, conn, event_conn, alarm_conn):
-        self.storage_connection = conn
-        self.event_storage_connection = event_conn
-        self.alarm_storage_connection = alarm_conn
+    def __init__(self):
+        self.storage_connection = DBHook.get_connection('metering')
+        self.event_storage_connection = DBHook.get_connection('event')
+        self.alarm_storage_connection = DBHook.get_connection('alarm')
+
+        if (not self.storage_connection and
+                not self.event_storage_connection and
+                not self.alarm_storage_connection):
+            raise Exception("Api failed to start. Failed to connect to "
+                            "databases, purpose:  %s" %
+                            ', '.join(['metering', 'event', 'alarm']))
 
     def before(self, state):
         state.request.storage_conn = self.storage_connection
         state.request.event_storage_conn = self.event_storage_connection
         state.request.alarm_storage_conn = self.alarm_storage_connection
+
+    @staticmethod
+    def get_connection(purpose):
+        try:
+            return storage.get_connection_from_config(cfg.CONF, purpose)
+        except Exception as err:
+            params = {"purpose": purpose, "err": err}
+            LOG.exception(_LE("Failed to connect to db, purpose %(purpose)s "
+                              "retry later: %(err)s") % params)
 
 
 class PipelineHook(hooks.PecanHook):
