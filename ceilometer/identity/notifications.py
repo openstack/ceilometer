@@ -99,7 +99,7 @@ class Role(IdentityCRUD):
 
     @property
     def event_types(self):
-        return ['%s.*' % self.resource_name]
+        return ['%s\..*' % self.resource_name]
 
 
 class Trust(IdentityCRUD):
