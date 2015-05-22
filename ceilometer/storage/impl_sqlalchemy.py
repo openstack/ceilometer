@@ -270,8 +270,10 @@ class Connection(base.Connection):
         # TODO(gordc): implement lru_cache to improve performance
         try:
             res = models.Resource.__table__
-            m_hash = hashlib.md5(jsonutils.dumps(rmeta,
-                                                 sort_keys=True)).hexdigest()
+            m_hash = jsonutils.dumps(rmeta, sort_keys=True)
+            if six.PY3:
+                m_hash = m_hash.encode('utf-8')
+            m_hash = hashlib.md5(m_hash).hexdigest()
             trans = conn.begin_nested()
             if conn.dialect.name == 'sqlite':
                 trans = conn.begin()
