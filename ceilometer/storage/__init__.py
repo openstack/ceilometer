@@ -50,10 +50,12 @@ OPTS = [
                help=("Number of seconds that events are kept "
                      "in the database for (<= 0 means forever).")),
     cfg.StrOpt('metering_connection',
+               secret=True,
                default=None,
                help='The connection string used to connect to the metering '
                'database. (if unset, connection is used)'),
     cfg.StrOpt('alarm_connection',
+               secret=True,
                default=None,
                help='The connection string used to connect to the alarm '
                'database. (if unset, connection is used)'),
@@ -62,6 +64,7 @@ OPTS = [
                help=("Number of seconds that alarm histories are kept "
                      "in the database for (<= 0 means forever).")),
     cfg.StrOpt('event_connection',
+               secret=True,
                default=None,
                help='The connection string used to connect to the event '
                'database. (if unset, connection is used)'),
