@@ -21,7 +21,6 @@ from oslo_db.sqlalchemy import session as db_session
 from oslo_utils import timeutils
 from sqlalchemy import desc
 
-import ceilometer
 from ceilometer.alarm.storage import base
 from ceilometer.alarm.storage import models as alarm_api_models
 from ceilometer.i18n import _LI
@@ -147,7 +146,7 @@ class Connection(base.Connection):
         return (self._row_to_alarm_model(x) for x in query.all())
 
     def get_alarms(self, name=None, user=None, state=None, meter=None,
-                   project=None, enabled=None, alarm_id=None, pagination=None,
+                   project=None, enabled=None, alarm_id=None,
                    alarm_type=None, severity=None):
         """Yields a lists of alarms that match filters.
 
@@ -158,13 +157,9 @@ class Connection(base.Connection):
         :param project: Optional ID for project that owns the resource.
         :param enabled: Optional boolean to list disable alarm.
         :param alarm_id: Optional alarm_id to return one alarm.
-        :param pagination: Optional pagination query.
         :param alarm_type: Optional alarm type.
         :param severity: Optional alarm severity
         """
-
-        if pagination:
-            raise ceilometer.NotImplementedError('Pagination not implemented')
 
         session = self._engine_facade.get_session()
         query = session.query(models.Alarm)

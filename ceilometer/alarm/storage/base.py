@@ -41,7 +41,7 @@ class Connection(object):
 
     @staticmethod
     def get_alarms(name=None, user=None, state=None, meter=None,
-                   project=None, enabled=None, alarm_id=None, pagination=None,
+                   project=None, enabled=None, alarm_id=None,
                    alarm_type=None, severity=None):
         """Yields a lists of alarms that match filters.
 
@@ -52,7 +52,6 @@ class Connection(object):
         :param project: Optional ID for project that owns the resource.
         :param enabled: Optional boolean to list disable alarm.
         :param alarm_id: Optional alarm_id to return one alarm.
-        :param pagination: Optional pagination query.
         :param alarm_type: Optional alarm type.
         :parmr severity: Optional alarm severity
         """

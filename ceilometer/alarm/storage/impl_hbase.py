@@ -119,11 +119,9 @@ class Connection(hbase_base.Connection, base.Connection):
             alarm_table.delete(alarm_id)
 
     def get_alarms(self, name=None, user=None, state=None, meter=None,
-                   project=None, enabled=None, alarm_id=None, pagination=None,
+                   project=None, enabled=None, alarm_id=None,
                    alarm_type=None, severity=None):
 
-        if pagination:
-            raise ceilometer.NotImplementedError('Pagination not implemented')
         if meter:
             raise ceilometer.NotImplementedError(
                 'Filter by meter not implemented')

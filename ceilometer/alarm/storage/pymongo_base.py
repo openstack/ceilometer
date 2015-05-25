@@ -21,7 +21,6 @@
 
 import pymongo
 
-import ceilometer
 from ceilometer.alarm.storage import base
 from ceilometer.alarm.storage import models
 from ceilometer.openstack.common import log
@@ -80,7 +79,7 @@ class Connection(base.Connection):
         self.db.alarm_history.insert(alarm_change.copy())
 
     def get_alarms(self, name=None, user=None, state=None, meter=None,
-                   project=None, enabled=None, alarm_id=None, pagination=None,
+                   project=None, enabled=None, alarm_id=None,
                    alarm_type=None, severity=None):
         """Yields a lists of alarms that match filters.
 
@@ -91,13 +90,9 @@ class Connection(base.Connection):
         :param project: Optional ID for project that owns the resource.
         :param enabled: Optional boolean to list disable alarm.
         :param alarm_id: Optional alarm_id to return one alarm.
-        :param pagination: Optional pagination query.
         :param alarm_type: Optional alarm type.
         :param severity: Optional alarm severity.
         """
-        if pagination:
-            raise ceilometer.NotImplementedError('Pagination not implemented')
-
         q = {}
         if user is not None:
             q['user_id'] = user

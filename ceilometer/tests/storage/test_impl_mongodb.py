@@ -23,11 +23,9 @@
 
 from ceilometer.alarm.storage import impl_mongodb as impl_mongodb_alarm
 from ceilometer.event.storage import impl_mongodb as impl_mongodb_event
-from ceilometer.storage import base
 from ceilometer.storage import impl_mongodb
 from ceilometer.tests import base as test_base
 from ceilometer.tests import db as tests_db
-from ceilometer.tests.storage import test_storage_scenarios
 
 
 @tests_db.run_with('mongodb')
@@ -51,36 +49,6 @@ class MongoDBConnection(tests_db.TestBase,
                                                          flag=flag)
         expect = {'k3': {'$lt': 'v3'}, 'k2': {'eq': 'v2'}, 'k1': {'eq': 'v1'}}
         self.assertEqual(expect, ret)
-
-
-@tests_db.run_with('mongodb')
-class MongoDBTestMarkerBase(test_storage_scenarios.DBTestBase,
-                            tests_db.MixinTestsWithBackendScenarios):
-    # NOTE(Fengqian): All these three test case are the same for resource
-    # and meter collection. As to alarm, we will set up in AlarmTestPagination.
-    def test_get_marker(self):
-        marker_pairs = {'user_id': 'user-id-4'}
-        ret = impl_mongodb.Connection._get_marker(self.conn.db.resource,
-                                                  marker_pairs)
-        self.assertEqual('project-id-4', ret['project_id'])
-
-    def test_get_marker_None(self):
-        marker_pairs = {'user_id': 'user-id-foo'}
-        try:
-            ret = impl_mongodb.Connection._get_marker(self.conn.db.resource,
-                                                      marker_pairs)
-            self.assertEqual('project-id-foo', ret['project_id'])
-        except base.NoResultFound:
-            self.assertTrue(True)
-
-    def test_get_marker_multiple(self):
-        try:
-            marker_pairs = {'project_id': 'project-id'}
-            ret = impl_mongodb.Connection._get_marker(self.conn.db.resource,
-                                                      marker_pairs)
-            self.assertEqual('project-id-foo', ret['project_id'])
-        except base.MultipleResultsFound:
-            self.assertTrue(True)
 
 
 @tests_db.run_with('mongodb')
@@ -139,57 +107,22 @@ class IndexTest(tests_db.TestBase,
                                      'alarm_history_time_to_live')
 
 
-@tests_db.run_with('mongodb')
-class AlarmTestPagination(test_storage_scenarios.AlarmTestBase,
-                          tests_db.MixinTestsWithBackendScenarios):
-    def test_alarm_get_marker(self):
-        self.add_some_alarms()
-        marker_pairs = {'name': 'red-alert'}
-        ret = impl_mongodb.Connection._get_marker(self.alarm_conn.db.alarm,
-                                                  marker_pairs=marker_pairs)
-        self.assertEqual('test.one', ret['rule']['meter_name'])
-
-    def test_alarm_get_marker_None(self):
-        self.add_some_alarms()
-        try:
-            marker_pairs = {'name': 'user-id-foo'}
-            ret = impl_mongodb.Connection._get_marker(self.alarm_conn.db.alarm,
-                                                      marker_pairs)
-            self.assertEqual('meter_name-foo', ret['rule']['meter_name'])
-        except base.NoResultFound:
-            self.assertTrue(True)
-
-    def test_alarm_get_marker_multiple(self):
-        self.add_some_alarms()
-        try:
-            marker_pairs = {'user_id': 'me'}
-            ret = impl_mongodb.Connection._get_marker(self.alarm_conn.db.alarm,
-                                                      marker_pairs)
-            self.assertEqual('counter-name-foo', ret['rule']['meter_name'])
-        except base.MultipleResultsFound:
-            self.assertTrue(True)
-
-
 class CapabilitiesTest(test_base.BaseTestCase):
     # Check the returned capabilities list, which is specific to each DB
     # driver
 
     def test_capabilities(self):
         expected_capabilities = {
-            'meters': {'pagination': False,
-                       'query': {'simple': True,
+            'meters': {'query': {'simple': True,
                                  'metadata': True,
                                  'complex': False}},
-            'resources': {'pagination': False,
-                          'query': {'simple': True,
+            'resources': {'query': {'simple': True,
                                     'metadata': True,
                                     'complex': False}},
-            'samples': {'pagination': False,
-                        'query': {'simple': True,
+            'samples': {'query': {'simple': True,
                                   'metadata': True,
                                   'complex': True}},
-            'statistics': {'pagination': False,
-                           'groupby': True,
+            'statistics': {'groupby': True,
                            'query': {'simple': True,
                                      'metadata': True,
                                      'complex': False},

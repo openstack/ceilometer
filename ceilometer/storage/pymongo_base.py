@@ -19,7 +19,6 @@
 """
 import pymongo
 
-import ceilometer
 from ceilometer.storage import base
 from ceilometer.storage import models
 from ceilometer.storage.mongo import utils as pymongo_utils
@@ -51,7 +50,7 @@ class Connection(base.Connection):
     )
 
     def get_meters(self, user=None, project=None, resource=None, source=None,
-                   metaquery=None, pagination=None):
+                   metaquery=None):
         """Return an iterable of models.Meter instances
 
         :param user: Optional ID for user that owns the resource.
@@ -59,11 +58,7 @@ class Connection(base.Connection):
         :param resource: Optional resource filter.
         :param source: Optional source filter.
         :param metaquery: Optional dict with metadata to match on.
-        :param pagination: Optional pagination query.
         """
-
-        if pagination:
-            raise ceilometer.NotImplementedError('Pagination not implemented')
 
         metaquery = pymongo_utils.improve_keys(metaquery, metaquery=True) or {}
 

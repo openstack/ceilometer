@@ -72,8 +72,7 @@ AVAILABLE_CAPABILITIES = {
                          'metadata': True}},
     'resources': {'query': {'simple': True,
                             'metadata': True}},
-    'samples': {'pagination': True,
-                'query': {'simple': True,
+    'samples': {'query': {'simple': True,
                           'metadata': True,
                           'complex': True}},
     'statistics': {'groupby': True,
@@ -386,7 +385,7 @@ class Connection(base.Connection):
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
                       end_timestamp=None, end_timestamp_op=None,
-                      metaquery=None, resource=None, pagination=None):
+                      metaquery=None, resource=None):
         """Return an iterable of api_models.Resource instances
 
         :param user: Optional ID for user that owns the resource.
@@ -398,11 +397,7 @@ class Connection(base.Connection):
         :param end_timestamp_op: Optional end time operator, like lt, le.
         :param metaquery: Optional dict with metadata to match on.
         :param resource: Optional resource filter.
-        :param pagination: Optional pagination query.
         """
-        if pagination:
-            raise ceilometer.NotImplementedError('Pagination not implemented')
-
         s_filter = storage.SampleFilter(user=user,
                                         project=project,
                                         source=source,
@@ -467,7 +462,7 @@ class Connection(base.Connection):
             )
 
     def get_meters(self, user=None, project=None, resource=None, source=None,
-                   metaquery=None, pagination=None):
+                   metaquery=None):
         """Return an iterable of api_models.Meter instances
 
         :param user: Optional ID for user that owns the resource.
@@ -475,12 +470,7 @@ class Connection(base.Connection):
         :param resource: Optional ID of the resource.
         :param source: Optional source filter.
         :param metaquery: Optional dict with metadata to match on.
-        :param pagination: Optional pagination query.
         """
-
-        if pagination:
-            raise ceilometer.NotImplementedError('Pagination not implemented')
-
         s_filter = storage.SampleFilter(user=user,
                                         project=project,
                                         source=source,
