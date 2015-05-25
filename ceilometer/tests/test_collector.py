@@ -12,7 +12,6 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-import contextlib
 import socket
 
 import mock
@@ -189,10 +188,9 @@ class TestCollector(tests_base.BaseTestCase):
     def test_udp_receive_bad_decoding(self):
         self._setup_messaging(False)
         udp_socket = self._make_fake_socket(self.counter)
-        with contextlib.nested(
-                mock.patch('socket.socket', return_value=udp_socket),
-                mock.patch('msgpack.loads', self._raise_error)):
-            self.srv.start()
+        with mock.patch('socket.socket', return_value=udp_socket):
+            with mock.patch('msgpack.loads', self._raise_error):
+                self.srv.start()
 
         self._verify_udp_socket(udp_socket)
 

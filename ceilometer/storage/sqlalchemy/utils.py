@@ -12,7 +12,6 @@
 #
 
 import operator
-import types
 
 import six
 from sqlalchemy import and_
@@ -29,7 +28,7 @@ from ceilometer.storage.sqlalchemy import models
 META_TYPE_MAP = {bool: models.MetaBool,
                  str: models.MetaText,
                  six.text_type: models.MetaText,
-                 types.NoneType: models.MetaText,
+                 type(None): models.MetaText,
                  int: models.MetaBigInt,
                  float: models.MetaFloat}
 if six.PY2:
