@@ -14,6 +14,8 @@
 # under the License.
 """Tests for ceilometer/storage/
 """
+import unittest
+
 import mock
 from oslo_config import fixture as fixture_config
 from oslotest import base
@@ -21,7 +23,10 @@ import retrying
 
 from ceilometer.alarm.storage import impl_log as impl_log_alarm
 from ceilometer.alarm.storage import impl_sqlalchemy as impl_sqlalchemy_alarm
-from ceilometer.event.storage import impl_hbase as impl_hbase_event
+try:
+    from ceilometer.event.storage import impl_hbase as impl_hbase_event
+except ImportError:
+    impl_hbase_event = None
 from ceilometer import storage
 from ceilometer.storage import impl_log
 from ceilometer.storage import impl_sqlalchemy
@@ -85,6 +90,7 @@ class ConnectionConfigTest(base.BaseTestCase):
         conn = storage.get_connection_from_config(self.CONF, 'alarm')
         self.assertIsInstance(conn, impl_sqlalchemy_alarm.Connection)
 
+    @unittest.skipIf(impl_hbase_event is None, 'need hbase implementation')
     def test_three_urls(self):
         self.CONF.set_override("connection", "log://", group="database")
         self.CONF.set_override("alarm_connection", "sqlite://",

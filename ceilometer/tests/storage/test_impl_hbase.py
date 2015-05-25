@@ -22,6 +22,13 @@
 """
 import mock
 
+
+try:
+    import happybase   # noqa
+except ImportError:
+    import testtools.testcase
+    raise testtools.testcase.TestSkipped("happybase is needed")
+
 from ceilometer.alarm.storage import impl_hbase as hbase_alarm
 from ceilometer.event.storage import impl_hbase as hbase_event
 from ceilometer.storage import impl_hbase as hbase
