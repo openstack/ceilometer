@@ -15,8 +15,6 @@
 
 """Fixtures used during Gabbi-based test runs."""
 
-from __future__ import print_function
-
 import datetime
 import os
 import random

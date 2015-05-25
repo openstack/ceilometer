@@ -21,8 +21,6 @@ Generate testing data for e.g. for default time span
 source .tox/py27/bin/activate
 ./tools/make_test_event_data.py --event_types 3
 """
-from __future__ import print_function
-
 import argparse
 import datetime
 import logging

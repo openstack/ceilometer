@@ -24,8 +24,6 @@ source .tox/py27/bin/activate
 ./tools/make_test_data.py --user 1 --project 1 --resource 1 --counter cpu_util
 --volume 20
 """
-from __future__ import print_function
-
 import argparse
 import datetime
 import logging
