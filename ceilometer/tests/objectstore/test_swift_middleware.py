@@ -239,13 +239,13 @@ class TestSwiftMiddleware(tests_base.BaseTestCase):
         self.assertEqual('1.0', data.resource_metadata['version'])
         self.assertEqual('container', data.resource_metadata['container'])
         self.assertIsNone(data.resource_metadata['object'])
-        self.assertEqual('value1',
+        self.assertEqual(b'value1',
                          data.resource_metadata['http_header_x_var1'])
-        self.assertEqual('value2',
+        self.assertEqual(b'value2',
                          data.resource_metadata['http_header_x_var2'])
-        self.assertEqual('token',
+        self.assertEqual(b'token',
                          data.resource_metadata['http_header_token'])
-        self.assertFalse('http_header_x_var3' in data.resource_metadata)
+        self.assertFalse(b'http_header_x_var3' in data.resource_metadata)
 
     def test_metadata_headers_unicode(self):
         app = swift_middleware.CeilometerMiddleware(FakeApp(), {
