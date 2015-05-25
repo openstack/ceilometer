@@ -55,6 +55,11 @@ class Connection(pymongo_base.Connection):
 
         self.upgrade()
 
+    def upgrade(self):
+        # create collection if not present
+        if 'event' not in self.db.conn.collection_names():
+            self.db.conn.create_collection('event')
+
     def clear(self):
         # drop_database command does nothing on db2 database since this has
         # not been implemented. However calling this method is important for
