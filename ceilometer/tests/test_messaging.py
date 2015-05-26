@@ -13,7 +13,7 @@
 # under the License.
 
 from oslo_config import fixture as fixture_config
-import oslo_messaging
+import oslo_messaging.conffixture
 from oslotest import base
 
 from ceilometer import messaging

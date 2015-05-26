@@ -105,6 +105,8 @@ def verify_signature(message, secret):
             old_sig = old_sig.encode('ascii')
         except UnicodeDecodeError:
             return False
+    if six.PY3:
+        new_sig = new_sig.encode('ascii')
 
     return compare_digest(new_sig, old_sig)
 
