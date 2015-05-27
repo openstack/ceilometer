@@ -189,7 +189,8 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
         self.assertEqual(expected, mock_method.call_args_list)
 
     def test_get_endpoint_only_once(self):
-        mock_url_for = mock.MagicMock()
+        endpoint = 'end://point/'
+        mock_url_for = mock.MagicMock(return_value=endpoint)
         api_method = '%s_account' % self.pollster.METHOD
         with mockpatch.PatchObject(swift_client, api_method,
                                    new=mock.MagicMock()):

@@ -124,8 +124,8 @@ class TestQuery(base.BaseTestCase):
         # bug 1221736
         query = v2_base.Query(field='should_be_a_string',
                               op='eq',
-                              value='123-1')
-        expected = '123-1'
+                              value='WWW-Layer-4a80714f')
+        expected = 'WWW-Layer-4a80714f'
         self.assertEqual(expected, query._get_value_as_type())
 
     def test_get_value_as_type_boolean_expression_without_type(self):
