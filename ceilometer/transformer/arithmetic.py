@@ -43,7 +43,7 @@ class ArithmeticTransformer(transformer.TransformerBase):
         self.target = target
         self.expr = target.get('expr', '')
         self.expr_escaped, self.escaped_names = self.parse_expr(self.expr)
-        self.required_meters = self.escaped_names.values()
+        self.required_meters = list(self.escaped_names.values())
         self.misconfigured = len(self.required_meters) == 0
         if not self.misconfigured:
             self.reference_meter = self.required_meters[0]

@@ -247,15 +247,15 @@ class Connection(base.Connection):
                 trait_filter = filters.pop()
                 key = trait_filter.pop('key')
                 op = trait_filter.pop('op', 'eq')
-                trait_subq, t_model = _build_trait_query(
-                    session, trait_filter.keys()[0], key,
-                    trait_filter.values()[0], op)
+                trait_type, value = list(trait_filter.items())[0]
+                trait_subq, t_model = _build_trait_query(session, trait_type,
+                                                         key, value, op)
                 for trait_filter in filters:
                     key = trait_filter.pop('key')
                     op = trait_filter.pop('op', 'eq')
-                    q, model = _build_trait_query(
-                        session, trait_filter.keys()[0], key,
-                        trait_filter.values()[0], op)
+                    trait_type, value = list(trait_filter.items())[0]
+                    q, model = _build_trait_query(session, trait_type,
+                                                  key, value, op)
                     trait_subq = trait_subq.filter(
                         q.filter(model.event_id == t_model.event_id).exists())
                 trait_subq = trait_subq.subquery()

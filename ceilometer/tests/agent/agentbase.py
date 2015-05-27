@@ -311,7 +311,8 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.assertEqual(1, len(per_task_resources))
         self.assertEqual(set(self.pipeline_cfg[0]['resources']),
                          set(per_task_resources['test_pipeline-test'].get({})))
-        self.mgr.interval_task(polling_tasks.values()[0])
+        task = list(polling_tasks.values())[0]
+        self.mgr.interval_task(task)
         pub = self.mgr.pipeline_manager.pipelines[0].publishers[0]
         del pub.samples[0].resource_metadata['resources']
         self.assertEqual(self.Pollster.test_data, pub.samples[0])
@@ -716,7 +717,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
             self, get_samples, LOG):
         self.pipeline_cfg[0]['resources'] = []
         self.setup_pipeline()
-        polling_task = self.mgr.setup_polling_tasks().values()[0]
+        polling_task = list(self.mgr.setup_polling_tasks().values())[0]
         pollster = list(polling_task.pollster_matches['test_pipeline'])[0]
 
         polling_task.poll_and_publish()
