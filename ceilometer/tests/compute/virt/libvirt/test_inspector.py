@@ -16,7 +16,10 @@
 """Tests for libvirt inspector.
 """
 
-import contextlib
+try:
+    import contextlib2 as contextlib   # for Python < 3.3
+except ImportError:
+    import contextlib
 
 import fixtures
 import mock
@@ -29,6 +32,9 @@ from ceilometer.compute.virt.libvirt import inspector as libvirt_inspector
 
 class TestLibvirtInspection(base.BaseTestCase):
 
+    class fakeLibvirtError(Exception):
+        pass
+
     def setUp(self):
         super(TestLibvirtInspection, self).setUp()
 
@@ -40,19 +46,21 @@ class TestLibvirtInspection(base.BaseTestCase):
         self.inspector.connection = mock.Mock()
         libvirt_inspector.libvirt = mock.Mock()
         libvirt_inspector.libvirt.VIR_DOMAIN_SHUTOFF = 5
+        libvirt_inspector.libvirt.libvirtError = self.fakeLibvirtError
         self.domain = mock.Mock()
         self.addCleanup(mock.patch.stopall)
 
     def test_inspect_cpus(self):
-        with contextlib.nested(mock.patch.object(self.inspector.connection,
-                                                 'lookupByUUIDString',
-                                                 return_value=self.domain),
-                               mock.patch.object(self.domain, 'info',
-                                                 return_value=(0, 0, 0,
-                                                               2, 999999))):
-                cpu_info = self.inspector.inspect_cpus(self.instance)
-                self.assertEqual(2, cpu_info.number)
-                self.assertEqual(999999, cpu_info.time)
+        with contextlib.ExitStack() as stack:
+            stack.enter_context(mock.patch.object(self.inspector.connection,
+                                                  'lookupByUUIDString',
+                                                  return_value=self.domain))
+            stack.enter_context(mock.patch.object(self.domain, 'info',
+                                                  return_value=(0, 0, 0,
+                                                                2, 999999)))
+            cpu_info = self.inspector.inspect_cpus(self.instance)
+            self.assertEqual(2, cpu_info.number)
+            self.assertEqual(999999, cpu_info.time)
 
     def test_inspect_vnics(self):
         dom_xml = """
@@ -120,17 +128,18 @@ class TestLibvirtInspection(base.BaseTestCase):
         interfaceStats = interface_stats.__getitem__
 
         connection = self.inspector.connection
-        with contextlib.nested(mock.patch.object(connection,
-                                                 'lookupByUUIDString',
-                                                 return_value=self.domain),
-                               mock.patch.object(self.domain, 'XMLDesc',
-                                                 return_value=dom_xml),
-                               mock.patch.object(self.domain,
-                                                 'interfaceStats',
-                                                 side_effect=interfaceStats),
-                               mock.patch.object(self.domain, 'info',
-                                                 return_value=(0, 0, 0,
-                                                               2, 999999))):
+        with contextlib.ExitStack() as stack:
+            stack.enter_context(mock.patch.object(connection,
+                                                  'lookupByUUIDString',
+                                                  return_value=self.domain))
+            stack.enter_context(mock.patch.object(self.domain, 'XMLDesc',
+                                                  return_value=dom_xml))
+            stack.enter_context(mock.patch.object(self.domain,
+                                                  'interfaceStats',
+                                                  side_effect=interfaceStats))
+            stack.enter_context(mock.patch.object(self.domain, 'info',
+                                                  return_value=(0, 0, 0,
+                                                                2, 999999)))
             interfaces = list(self.inspector.inspect_vnics(self.instance))
 
             self.assertEqual(3, len(interfaces))
@@ -172,12 +181,13 @@ class TestLibvirtInspection(base.BaseTestCase):
 
     def test_inspect_vnics_with_domain_shutoff(self):
         connection = self.inspector.connection
-        with contextlib.nested(mock.patch.object(connection,
-                                                 'lookupByUUIDString',
-                                                 return_value=self.domain),
-                               mock.patch.object(self.domain, 'info',
-                                                 return_value=(5, 0, 0,
-                                                               2, 999999))):
+        with contextlib.ExitStack() as stack:
+            stack.enter_context(mock.patch.object(connection,
+                                                  'lookupByUUIDString',
+                                                  return_value=self.domain))
+            stack.enter_context(mock.patch.object(self.domain, 'info',
+                                                  return_value=(5, 0, 0,
+                                                                2, 999999)))
             inspect = self.inspector.inspect_vnics
             self.assertRaises(virt_inspector.InstanceShutOffException,
                               list, inspect(self.instance))
@@ -198,35 +208,37 @@ class TestLibvirtInspection(base.BaseTestCase):
              </domain>
         """
 
-        with contextlib.nested(mock.patch.object(self.inspector.connection,
-                                                 'lookupByUUIDString',
-                                                 return_value=self.domain),
-                               mock.patch.object(self.domain, 'XMLDesc',
-                                                 return_value=dom_xml),
-                               mock.patch.object(self.domain, 'blockStats',
-                                                 return_value=(1, 2, 3,
-                                                               4, -1)),
-                               mock.patch.object(self.domain, 'info',
-                                                 return_value=(0, 0, 0,
-                                                               2, 999999))):
-                disks = list(self.inspector.inspect_disks(self.instance))
+        with contextlib.ExitStack() as stack:
+            stack.enter_context(mock.patch.object(self.inspector.connection,
+                                                  'lookupByUUIDString',
+                                                  return_value=self.domain))
+            stack.enter_context(mock.patch.object(self.domain, 'XMLDesc',
+                                                  return_value=dom_xml))
+            stack.enter_context(mock.patch.object(self.domain, 'blockStats',
+                                                  return_value=(1, 2, 3,
+                                                                4, -1)))
+            stack.enter_context(mock.patch.object(self.domain, 'info',
+                                                  return_value=(0, 0, 0,
+                                                                2, 999999)))
+            disks = list(self.inspector.inspect_disks(self.instance))
 
-                self.assertEqual(1, len(disks))
-                disk0, info0 = disks[0]
-                self.assertEqual('vda', disk0.device)
-                self.assertEqual(1, info0.read_requests)
-                self.assertEqual(2, info0.read_bytes)
-                self.assertEqual(3, info0.write_requests)
-                self.assertEqual(4, info0.write_bytes)
+            self.assertEqual(1, len(disks))
+            disk0, info0 = disks[0]
+            self.assertEqual('vda', disk0.device)
+            self.assertEqual(1, info0.read_requests)
+            self.assertEqual(2, info0.read_bytes)
+            self.assertEqual(3, info0.write_requests)
+            self.assertEqual(4, info0.write_bytes)
 
     def test_inspect_disks_with_domain_shutoff(self):
         connection = self.inspector.connection
-        with contextlib.nested(mock.patch.object(connection,
-                                                 'lookupByUUIDString',
-                                                 return_value=self.domain),
-                               mock.patch.object(self.domain, 'info',
-                                                 return_value=(5, 0, 0,
-                                                               2, 999999))):
+        with contextlib.ExitStack() as stack:
+            stack.enter_context(mock.patch.object(connection,
+                                                  'lookupByUUIDString',
+                                                  return_value=self.domain))
+            stack.enter_context(mock.patch.object(self.domain, 'info',
+                                                  return_value=(5, 0, 0,
+                                                                2, 999999)))
             inspect = self.inspector.inspect_disks
             self.assertRaises(virt_inspector.InstanceShutOffException,
                               list, inspect(self.instance))
@@ -261,17 +273,18 @@ class TestLibvirtInspection(base.BaseTestCase):
              </domain>
         """
 
-        with contextlib.nested(mock.patch.object(self.inspector.connection,
-                                                 'lookupByUUIDString',
-                                                 return_value=self.domain),
-                               mock.patch.object(self.domain, 'XMLDesc',
-                                                 return_value=dom_xml),
-                               mock.patch.object(self.domain, 'blockInfo',
-                                                 return_value=(1, 2, 3,
-                                                               -1)),
-                               mock.patch.object(self.domain, 'info',
-                                                 return_value=(0, 0, 0,
-                                                               2, 999999))):
+        with contextlib.ExitStack() as stack:
+            stack.enter_context(mock.patch.object(self.inspector.connection,
+                                                  'lookupByUUIDString',
+                                                  return_value=self.domain))
+            stack.enter_context(mock.patch.object(self.domain, 'XMLDesc',
+                                                  return_value=dom_xml))
+            stack.enter_context(mock.patch.object(self.domain, 'blockInfo',
+                                                  return_value=(1, 2, 3,
+                                                                -1)))
+            stack.enter_context(mock.patch.object(self.domain, 'info',
+                                                  return_value=(0, 0, 0,
+                                                                2, 999999)))
             disks = list(self.inspector.inspect_disk_info(self.instance))
 
             self.assertEqual(1, len(disks))
