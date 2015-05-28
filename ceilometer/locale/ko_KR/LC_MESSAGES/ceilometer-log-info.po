@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-05-07 06:07+0000\n"
-"PO-Revision-Date: 2015-04-24 16:40+0000\n"
+"POT-Creation-Date: 2015-05-28 06:06+0000\n"
+"PO-Revision-Date: 2015-05-11 05:13+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/projects/p/"
 "ceilometer/language/ko_KR/)\n"
@@ -20,30 +20,12 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #, python-format
-msgid "Eventlet backdoor listening on %(port)s for process %(pid)d"
-msgstr "Eventlet 백도어는 프로세스 %(pid)d 일 동안 %(port)s에서 수신"
-
-#, python-format
 msgid "Caught %s, exiting"
 msgstr "%s 발견, 종료 중"
 
-msgid "Parent process has died unexpectedly, exiting"
-msgstr "상위 프로세스가 예기치 않게 정지했습니다. 종료 중"
-
 #, python-format
-msgid "Child caught %s, exiting"
-msgstr "자식으로 된 %s가 존재함."
-
-msgid "Forking too fast, sleeping"
-msgstr "포크가 너무 빠름. 정지 중"
-
-#, python-format
-msgid "Started child %d"
-msgstr "%d 하위를 시작했음"
-
-#, python-format
-msgid "Starting %d workers"
-msgstr "%d 작업자 시작 중"
+msgid "Caught %s, stopping children"
+msgstr "%s 발견, 하위 중지 중"
 
 #, python-format
 msgid "Child %(pid)d killed by signal %(sig)d"
@@ -54,8 +36,26 @@ msgid "Child %(pid)s exited with status %(code)d"
 msgstr "%(pid)s 하위가 %(code)d 상태와 함께 종료했음"
 
 #, python-format
-msgid "Caught %s, stopping children"
-msgstr "%s 발견, 하위 중지 중"
+msgid "Child caught %s, exiting"
+msgstr "자식으로 된 %s가 존재함."
+
+#, python-format
+msgid "Eventlet backdoor listening on %(port)s for process %(pid)d"
+msgstr "Eventlet 백도어는 프로세스 %(pid)d 일 동안 %(port)s에서 수신"
+
+msgid "Forking too fast, sleeping"
+msgstr "포크가 너무 빠름. 정지 중"
+
+msgid "Parent process has died unexpectedly, exiting"
+msgstr "상위 프로세스가 예기치 않게 정지했습니다. 종료 중"
+
+#, python-format
+msgid "Started child %d"
+msgstr "%d 하위를 시작했음"
+
+#, python-format
+msgid "Starting %d workers"
+msgstr "%d 작업자 시작 중"
 
 #, python-format
 msgid "Waiting on %d children to exit"

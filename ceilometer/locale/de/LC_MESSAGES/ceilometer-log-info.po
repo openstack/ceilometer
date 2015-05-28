@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-05-07 06:07+0000\n"
-"PO-Revision-Date: 2015-04-24 16:40+0000\n"
+"POT-Creation-Date: 2015-05-28 06:06+0000\n"
+"PO-Revision-Date: 2015-05-11 05:13+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/ceilometer/"
 "language/de/)\n"
@@ -20,31 +20,12 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #, python-format
-msgid "Eventlet backdoor listening on %(port)s for process %(pid)d"
-msgstr "Eventlet backdoor hört auf %(port)s für Prozess %(pid)d"
-
-#, python-format
 msgid "Caught %s, exiting"
 msgstr "%s abgefangen. Vorgang wird beendet"
 
-msgid "Parent process has died unexpectedly, exiting"
-msgstr ""
-"Übergeordneter Prozess wurde unerwartet abgebrochen. Vorgang wird beendet"
-
 #, python-format
-msgid "Child caught %s, exiting"
-msgstr "Untergeordnetes Element %s abgefangen; Vorgang wird beendet"
-
-msgid "Forking too fast, sleeping"
-msgstr "Verzweigung zu schnell; im Ruhemodus"
-
-#, python-format
-msgid "Started child %d"
-msgstr "Untergeordnetes Element %d gestartet"
-
-#, python-format
-msgid "Starting %d workers"
-msgstr "Starten von %d Workers"
+msgid "Caught %s, stopping children"
+msgstr "%s abgefangen, untergeordnete Elemente werden gestoppt"
 
 #, python-format
 msgid "Child %(pid)d killed by signal %(sig)d"
@@ -55,8 +36,27 @@ msgid "Child %(pid)s exited with status %(code)d"
 msgstr "Untergeordnete %(pid)s mit Status %(code)d beendet"
 
 #, python-format
-msgid "Caught %s, stopping children"
-msgstr "%s abgefangen, untergeordnete Elemente werden gestoppt"
+msgid "Child caught %s, exiting"
+msgstr "Untergeordnetes Element %s abgefangen; Vorgang wird beendet"
+
+#, python-format
+msgid "Eventlet backdoor listening on %(port)s for process %(pid)d"
+msgstr "Eventlet backdoor hört auf %(port)s für Prozess %(pid)d"
+
+msgid "Forking too fast, sleeping"
+msgstr "Verzweigung zu schnell; im Ruhemodus"
+
+msgid "Parent process has died unexpectedly, exiting"
+msgstr ""
+"Übergeordneter Prozess wurde unerwartet abgebrochen. Vorgang wird beendet"
+
+#, python-format
+msgid "Started child %d"
+msgstr "Untergeordnetes Element %d gestartet"
+
+#, python-format
+msgid "Starting %d workers"
+msgstr "Starten von %d Workers"
 
 #, python-format
 msgid "Waiting on %d children to exit"

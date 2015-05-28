@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 2015.2.0.dev51\n"
+"Project-Id-Version: ceilometer 2015.2.0.dev106\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-05-07 06:07+0000\n"
+"POT-Creation-Date: 2015-05-28 06:06+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -53,12 +53,19 @@ msgstr ""
 msgid "Nothing to clean, database alarm history time to live is disabled"
 msgstr ""
 
+#: ceilometer/event/storage/impl_elasticsearch.py:107
+#: ceilometer/event/storage/impl_sqlalchemy.py:198
+#: ceilometer/event/storage/pymongo_base.py:67
+#, python-format
+msgid "Duplicate event detected, skipping it: %s"
+msgstr ""
+
 #: ceilometer/event/storage/impl_log.py:32
 #, python-format
 msgid "Dropping event data with TTL %d"
 msgstr ""
 
-#: ceilometer/event/storage/impl_sqlalchemy.py:431
+#: ceilometer/event/storage/impl_sqlalchemy.py:420
 #, python-format
 msgid "%d events are removed from database"
 msgstr ""

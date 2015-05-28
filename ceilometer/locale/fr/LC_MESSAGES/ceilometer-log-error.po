@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-05-07 06:07+0000\n"
-"PO-Revision-Date: 2015-03-18 21:15+0000\n"
+"POT-Creation-Date: 2015-05-28 06:06+0000\n"
+"PO-Revision-Date: 2015-05-11 05:31+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/ceilometer/"
 "language/fr/)\n"
@@ -24,11 +24,19 @@ msgstr ""
 msgid "Error connecting to coordination backend."
 msgstr "Erreur de connexion à la coordination du backend ."
 
-msgid "in fixed duration looping call"
-msgstr "dans l'appel en boucle de durée fixe"
+#, python-format
+msgid "Failed to record event: %s"
+msgstr "Impossible d'enregistrer l'événement: %s"
+
+#, python-format
+msgid "Failed to record metering data: %s"
+msgstr "Impossible d'enregistrer les données de mesure: %s"
+
+msgid "Unhandled exception"
+msgstr "Exception non gérée"
 
 msgid "in dynamic looping call"
 msgstr "dans l'appel en boucle dynamique"
 
-msgid "Unhandled exception"
-msgstr "Exception non gérée"
+msgid "in fixed duration looping call"
+msgstr "dans l'appel en boucle de durée fixe"

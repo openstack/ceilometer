@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-12 06:06+0000\n"
-"PO-Revision-Date: 2015-03-11 21:03+0000\n"
+"POT-Creation-Date: 2015-05-28 06:06+0000\n"
+"PO-Revision-Date: 2015-05-11 05:13+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/ceilometer/"
 "language/fr/)\n"
@@ -22,88 +22,70 @@ msgstr ""
 "Generated-By: Babel 1.3\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: ceilometer/coordination.py:76
-msgid "Coordination backend started successfully."
-msgstr "Coordination avec le backend démarré avec succès."
-
-#: ceilometer/coordination.py:126
-#, python-format
-msgid "Joined partitioning group %s"
-msgstr "Le groupe de partitionnement %s a été rejoint"
-
-#: ceilometer/coordination.py:144
-#, python-format
-msgid "Left partitioning group %s"
-msgstr "Groupe de partitionnement Gauche %s"
-
-#: ceilometer/event/storage/impl_log.py:32
-#, python-format
-msgid "Dropping event data with TTL %d"
-msgstr "Suppression de la donnée de l’événement avec le TTL %d"
-
-#: ceilometer/event/storage/impl_sqlalchemy.py:430
 #, python-format
 msgid "%d events are removed from database"
 msgstr "Les événements %d sont supprimés de la base de donnée"
 
-#: ceilometer/openstack/common/eventlet_backdoor.py:146
-#, python-format
-msgid "Eventlet backdoor listening on %(port)s for process %(pid)d"
-msgstr "Eventlet backdoor en écoute sur le port %(port)s for process %(pid)d"
-
-#: ceilometer/openstack/common/service.py:173
 #, python-format
 msgid "Caught %s, exiting"
 msgstr "%s interceptée, sortie"
 
-#: ceilometer/openstack/common/service.py:231
-msgid "Parent process has died unexpectedly, exiting"
-msgstr "Processus parent arrêté de manière inattendue, sortie"
-
-#: ceilometer/openstack/common/service.py:262
-#, python-format
-msgid "Child caught %s, exiting"
-msgstr "L'enfant a reçu %s, sortie"
-
-#: ceilometer/openstack/common/service.py:301
-msgid "Forking too fast, sleeping"
-msgstr "Bifurcation trop rapide, pause"
-
-#: ceilometer/openstack/common/service.py:320
-#, python-format
-msgid "Started child %d"
-msgstr "Enfant démarré %d"
-
-#: ceilometer/openstack/common/service.py:330
-#, python-format
-msgid "Starting %d workers"
-msgstr "Démarrage des travailleurs %d"
-
-#: ceilometer/openstack/common/service.py:347
-#, python-format
-msgid "Child %(pid)d killed by signal %(sig)d"
-msgstr "Enfant %(pid)d arrêté par le signal %(sig)d"
-
-#: ceilometer/openstack/common/service.py:351
-#, python-format
-msgid "Child %(pid)s exited with status %(code)d"
-msgstr "Processus fils %(pid)s terminé avec le status %(code)d"
-
-#: ceilometer/openstack/common/service.py:390
 #, python-format
 msgid "Caught %s, stopping children"
 msgstr "%s interceptée, arrêt de l'enfant"
 
-#: ceilometer/openstack/common/service.py:399
-msgid "Wait called after thread killed. Cleaning up."
-msgstr "Pause demandée après suppression de thread. Nettoyage."
-
-#: ceilometer/openstack/common/service.py:415
 #, python-format
-msgid "Waiting on %d children to exit"
-msgstr "En attente %d enfants pour sortie"
+msgid "Child %(pid)d killed by signal %(sig)d"
+msgstr "Enfant %(pid)d arrêté par le signal %(sig)d"
 
-#: ceilometer/publisher/kafka_broker.py:86
+#, python-format
+msgid "Child %(pid)s exited with status %(code)d"
+msgstr "Processus fils %(pid)s terminé avec le status %(code)d"
+
+#, python-format
+msgid "Child caught %s, exiting"
+msgstr "L'enfant a reçu %s, sortie"
+
+msgid "Coordination backend started successfully."
+msgstr "Coordination avec le backend démarré avec succès."
+
+#, python-format
+msgid "Dropping event data with TTL %d"
+msgstr "Suppression de la donnée de l’événement avec le TTL %d"
+
+#, python-format
+msgid "Eventlet backdoor listening on %(port)s for process %(pid)d"
+msgstr "Eventlet backdoor en écoute sur le port %(port)s for process %(pid)d"
+
+msgid "Forking too fast, sleeping"
+msgstr "Bifurcation trop rapide, pause"
+
+#, python-format
+msgid "Joined partitioning group %s"
+msgstr "Le groupe de partitionnement %s a été rejoint"
+
+#, python-format
+msgid "Left partitioning group %s"
+msgstr "Groupe de partitionnement Gauche %s"
+
+msgid "Parent process has died unexpectedly, exiting"
+msgstr "Processus parent arrêté de manière inattendue, sortie"
+
 #, python-format
 msgid "Publishing policy set to %s"
 msgstr "La politique de publication est réglé sur %s"
+
+#, python-format
+msgid "Started child %d"
+msgstr "Enfant démarré %d"
+
+#, python-format
+msgid "Starting %d workers"
+msgstr "Démarrage des travailleurs %d"
+
+msgid "Wait called after thread killed. Cleaning up."
+msgstr "Pause demandée après suppression de thread. Nettoyage."
+
+#, python-format
+msgid "Waiting on %d children to exit"
+msgstr "En attente %d enfants pour sortie"

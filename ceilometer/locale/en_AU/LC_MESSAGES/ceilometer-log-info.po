@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-05-07 06:07+0000\n"
-"PO-Revision-Date: 2015-04-24 16:40+0000\n"
+"POT-Creation-Date: 2015-05-28 06:06+0000\n"
+"PO-Revision-Date: 2015-05-11 05:13+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: English (Australia) (http://www.transifex.com/projects/p/"
 "ceilometer/language/en_AU/)\n"
@@ -20,26 +20,12 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #, python-format
-msgid "Eventlet backdoor listening on %(port)s for process %(pid)d"
-msgstr "Eventlet backdoor listening on %(port)s for process %(pid)d"
-
-#, python-format
 msgid "Caught %s, exiting"
 msgstr "Caught %s, exiting"
 
-msgid "Parent process has died unexpectedly, exiting"
-msgstr "Parent process has died unexpectedly, exiting"
-
-msgid "Forking too fast, sleeping"
-msgstr "Forking too fast, sleeping"
-
 #, python-format
-msgid "Started child %d"
-msgstr "Started child %d"
-
-#, python-format
-msgid "Starting %d workers"
-msgstr "Starting %d workers"
+msgid "Caught %s, stopping children"
+msgstr "Caught %s, stopping children"
 
 #, python-format
 msgid "Child %(pid)d killed by signal %(sig)d"
@@ -50,8 +36,22 @@ msgid "Child %(pid)s exited with status %(code)d"
 msgstr "Child %(pid)s exited with status %(code)d"
 
 #, python-format
-msgid "Caught %s, stopping children"
-msgstr "Caught %s, stopping children"
+msgid "Eventlet backdoor listening on %(port)s for process %(pid)d"
+msgstr "Eventlet backdoor listening on %(port)s for process %(pid)d"
+
+msgid "Forking too fast, sleeping"
+msgstr "Forking too fast, sleeping"
+
+msgid "Parent process has died unexpectedly, exiting"
+msgstr "Parent process has died unexpectedly, exiting"
+
+#, python-format
+msgid "Started child %d"
+msgstr "Started child %d"
+
+#, python-format
+msgid "Starting %d workers"
+msgstr "Starting %d workers"
 
 #, python-format
 msgid "Waiting on %d children to exit"

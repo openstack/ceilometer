@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-05-07 06:07+0000\n"
-"PO-Revision-Date: 2015-04-24 16:40+0000\n"
+"POT-Creation-Date: 2015-05-28 06:06+0000\n"
+"PO-Revision-Date: 2015-05-11 05:13+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Telugu (India) (http://www.transifex.com/projects/p/"
 "ceilometer/language/te_IN/)\n"
@@ -23,23 +23,9 @@ msgstr ""
 msgid "Caught %s, exiting"
 msgstr "%s క్యాచ్ నిష్క్రమించే"
 
-msgid "Parent process has died unexpectedly, exiting"
-msgstr "parrent  ప్రక్రియ నిష్క్రమించే, అనుకోకుండా మరణించాడు,"
-
 #, python-format
-msgid "Child caught %s, exiting"
-msgstr "చైల్డ్ నిష్క్రమించే,%s క్యాచ్"
-
-msgid "Forking too fast, sleeping"
-msgstr "Forking చాలా వేగంగా, పడుకుంది "
-
-#, python-format
-msgid "Started child %d"
-msgstr "మొదలైంది పిల్లల%d"
-
-#, python-format
-msgid "Starting %d workers"
-msgstr "%d కార్మికులు ప్రారంభిస్తోంది"
+msgid "Caught %s, stopping children"
+msgstr " పిల్లలు ఆపటం %s దోరికిను "
 
 #, python-format
 msgid "Child %(pid)d killed by signal %(sig)d"
@@ -50,8 +36,22 @@ msgid "Child %(pid)s exited with status %(code)d"
 msgstr "చైల్డ్ %(pid)s స్థితి తో నిష్క్రమించారు %(code)d  "
 
 #, python-format
-msgid "Caught %s, stopping children"
-msgstr " పిల్లలు ఆపటం %s దోరికిను "
+msgid "Child caught %s, exiting"
+msgstr "చైల్డ్ నిష్క్రమించే,%s క్యాచ్"
+
+msgid "Forking too fast, sleeping"
+msgstr "Forking చాలా వేగంగా, పడుకుంది "
+
+msgid "Parent process has died unexpectedly, exiting"
+msgstr "parrent  ప్రక్రియ నిష్క్రమించే, అనుకోకుండా మరణించాడు,"
+
+#, python-format
+msgid "Started child %d"
+msgstr "మొదలైంది పిల్లల%d"
+
+#, python-format
+msgid "Starting %d workers"
+msgstr "%d కార్మికులు ప్రారంభిస్తోంది"
 
 #, python-format
 msgid "Waiting on %d children to exit"

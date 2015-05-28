@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-05-07 06:07+0000\n"
-"PO-Revision-Date: 2015-04-24 16:40+0000\n"
+"POT-Creation-Date: 2015-05-28 06:06+0000\n"
+"PO-Revision-Date: 2015-05-11 05:13+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Spanish (http://www.transifex.com/projects/p/ceilometer/"
 "language/es/)\n"
@@ -20,30 +20,12 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #, python-format
-msgid "Eventlet backdoor listening on %(port)s for process %(pid)d"
-msgstr "Eventlet oculto escuchando en %(port)s para el proceso %(pid)d"
-
-#, python-format
 msgid "Caught %s, exiting"
 msgstr "Se ha captado %s, saliendo"
 
-msgid "Parent process has died unexpectedly, exiting"
-msgstr "El proceso padre se ha detenido inesperadamente, saliendo"
-
 #, python-format
-msgid "Child caught %s, exiting"
-msgstr "Hijo captado %s, saliendo"
-
-msgid "Forking too fast, sleeping"
-msgstr "Bifurcación demasiado rápida, en reposo"
-
-#, python-format
-msgid "Started child %d"
-msgstr "Se ha iniciado el hijo %d"
-
-#, python-format
-msgid "Starting %d workers"
-msgstr "Iniciando %d trabajadores"
+msgid "Caught %s, stopping children"
+msgstr "Se ha captado %s, deteniendo hijos"
 
 #, python-format
 msgid "Child %(pid)d killed by signal %(sig)d"
@@ -54,8 +36,26 @@ msgid "Child %(pid)s exited with status %(code)d"
 msgstr "El hijo %(pid)s ha salido con el estado %(code)d"
 
 #, python-format
-msgid "Caught %s, stopping children"
-msgstr "Se ha captado %s, deteniendo hijos"
+msgid "Child caught %s, exiting"
+msgstr "Hijo captado %s, saliendo"
+
+#, python-format
+msgid "Eventlet backdoor listening on %(port)s for process %(pid)d"
+msgstr "Eventlet oculto escuchando en %(port)s para el proceso %(pid)d"
+
+msgid "Forking too fast, sleeping"
+msgstr "Bifurcación demasiado rápida, en reposo"
+
+msgid "Parent process has died unexpectedly, exiting"
+msgstr "El proceso padre se ha detenido inesperadamente, saliendo"
+
+#, python-format
+msgid "Started child %d"
+msgstr "Se ha iniciado el hijo %d"
+
+#, python-format
+msgid "Starting %d workers"
+msgstr "Iniciando %d trabajadores"
 
 #, python-format
 msgid "Waiting on %d children to exit"

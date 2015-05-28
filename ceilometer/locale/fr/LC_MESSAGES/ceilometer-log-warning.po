@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-05-07 06:07+0000\n"
-"PO-Revision-Date: 2015-03-13 12:57+0000\n"
+"POT-Creation-Date: 2015-05-28 06:06+0000\n"
+"PO-Revision-Date: 2015-05-11 05:31+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/ceilometer/"
 "language/fr/)\n"
@@ -26,9 +26,13 @@ msgid "No endpoints found for service %s"
 msgstr "Pas endpoints trouvé pour le service %s"
 
 #, python-format
-msgid "pid %d not in child list"
-msgstr "PID %d absent de la liste d'enfants"
-
-#, python-format
 msgid "Publishing policy is unknown (%s) force to default"
 msgstr "La politique de publication est inconnue (%s) forcé le défaut"
+
+#, python-format
+msgid "message signature invalid, discarding message: %r"
+msgstr "signature du message invalide, message ignoré: %r"
+
+#, python-format
+msgid "pid %d not in child list"
+msgstr "PID %d absent de la liste d'enfants"
