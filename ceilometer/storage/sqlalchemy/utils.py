@@ -79,8 +79,7 @@ class QueryTransformer(object):
 
     def _handle_simple_op(self, simple_op, nodes):
         op = self._get_operator(simple_op)
-        field_name = nodes.keys()[0]
-        value = nodes.values()[0]
+        field_name, value = list(nodes.items())[0]
         if field_name.startswith('resource_metadata.'):
             return self._handle_metadata(op, field_name, value)
         else:
@@ -103,8 +102,7 @@ class QueryTransformer(object):
         return op(meta_alias.value, value)
 
     def _transform(self, sub_tree):
-        operator = sub_tree.keys()[0]
-        nodes = sub_tree.values()[0]
+        operator, nodes = list(sub_tree.items())[0]
         if operator in self.complex_operators:
             return self._handle_complex_op(operator, nodes)
         else:
@@ -122,9 +120,10 @@ class QueryTransformer(object):
     def _apply_order_by(self, orderby):
         if orderby is not None:
             for field in orderby:
-                ordering_function = self.ordering_functions[field.values()[0]]
+                attr, order = list(field.items())[0]
+                ordering_function = self.ordering_functions[order]
                 self.query = self.query.order_by(ordering_function(
-                    getattr(self.table, field.keys()[0])))
+                    getattr(self.table, attr)))
         else:
             self.query = self.query.order_by(desc(self.table.timestamp))
 
