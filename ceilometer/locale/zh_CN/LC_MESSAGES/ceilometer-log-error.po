@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-05-07 06:07+0000\n"
-"PO-Revision-Date: 2015-04-23 06:41+0000\n"
-"Last-Translator: aji.zqfan <aji.zqfan@gmail.com>\n"
+"POT-Creation-Date: 2015-05-28 06:06+0000\n"
+"PO-Revision-Date: 2015-05-11 05:31+0000\n"
+"Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/"
 "ceilometer/language/zh_CN/)\n"
 "Language: zh_CN\n"
@@ -22,41 +22,41 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #, python-format
+msgid "Could not get Resident Memory Usage for %(id)s: %(e)s"
+msgstr "无法为%(id)s获取常驻内存使用量RSS： %(e)s"
+
+#, python-format
 msgid "Dispatcher failed to handle the %s, requeue it."
 msgstr "分发器处理%s失败，重新入队"
 
-#, python-format
-msgid "Error processing event and it will be dropped: %s"
-msgstr "处理事件%s时报错，将其丢弃"
-
 msgid "Error connecting to coordination backend."
 msgstr "无法连接到协调器后端"
-
-msgid "Error sending a heartbeat to coordination backend."
-msgstr "无法发送心跳信息到协调器后端"
 
 msgid "Error getting group membership info from coordination backend."
 msgstr "从协调器后端获取组成员信息时出错"
 
 #, python-format
-msgid "Could not get Resident Memory Usage for %(id)s: %(e)s"
-msgstr "无法为%(id)s获取常驻内存使用量RSS： %(e)s"
+msgid "Error processing event and it will be dropped: %s"
+msgstr "处理事件%s时报错，将其丢弃"
 
-msgid "Status Code: %{code}s. Failed to dispatch event: %{event}s"
-msgstr "状态码：%{code}s。分发事件：%{event}s失败"
-
-msgid "in fixed duration looping call"
-msgstr "在固定时段内循环调用"
-
-msgid "in dynamic looping call"
-msgstr "在动态循环调用中"
-
-msgid "Unhandled exception"
-msgstr "存在未处理的异常"
+msgid "Error sending a heartbeat to coordination backend."
+msgstr "无法发送心跳信息到协调器后端"
 
 #, python-format
 msgid "Failed to connect to Kafka service: %s"
 msgstr "无法连接到Kafka服务：%s"
+
+#, python-format
+msgid "Failed to connect to db, purpose %(purpose)s re-try later: %(err)s"
+msgstr "无法连接到数据库，目的%(purpose)s稍后重试：%(err)s"
+
+#, python-format
+msgid "Failed to record event: %s"
+msgstr "无法记录事件：%s"
+
+#, python-format
+msgid "Failed to record metering data: %s"
+msgstr "无法保存监控数据：%s"
 
 msgid "Failed to retry to send sample data with max_retry times"
 msgstr "尝试发送数据达到最大重试次数后仍失败"
@@ -64,3 +64,15 @@ msgstr "尝试发送数据达到最大重试次数后仍失败"
 #, python-format
 msgid "Failed to send sample data: %s"
 msgstr "发送指标数据失败：%s"
+
+msgid "Status Code: %{code}s. Failed to dispatch event: %{event}s"
+msgstr "状态码：%{code}s。分发事件：%{event}s失败"
+
+msgid "Unhandled exception"
+msgstr "存在未处理的异常"
+
+msgid "in dynamic looping call"
+msgstr "在动态循环调用中"
+
+msgid "in fixed duration looping call"
+msgstr "在固定时段内循环调用"

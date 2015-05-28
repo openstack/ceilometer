@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-05-07 06:07+0000\n"
-"PO-Revision-Date: 2015-04-24 16:40+0000\n"
+"POT-Creation-Date: 2015-05-28 06:06+0000\n"
+"PO-Revision-Date: 2015-05-11 05:13+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Vietnamese (Viet Nam) (http://www.transifex.com/projects/p/"
 "ceilometer/language/vi_VN/)\n"
@@ -21,30 +21,12 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #, python-format
-msgid "Eventlet backdoor listening on %(port)s for process %(pid)d"
-msgstr "Eventlet backdoor lắng nghe trên %(port)s đối với tiến trình %(pid)d"
-
-#, python-format
 msgid "Caught %s, exiting"
 msgstr "Bắt %s, thoát"
 
-msgid "Parent process has died unexpectedly, exiting"
-msgstr "Tiến trình cha bị chết đột ngột, thoát"
-
 #, python-format
-msgid "Child caught %s, exiting"
-msgstr "Tiến trình con bắt %s, thoát"
-
-msgid "Forking too fast, sleeping"
-msgstr "Tạo tiến trình con quá nhanh, nghỉ"
-
-#, python-format
-msgid "Started child %d"
-msgstr "Tiến trình con đã được khởi động %d "
-
-#, python-format
-msgid "Starting %d workers"
-msgstr "Khởi động %d động cơ"
+msgid "Caught %s, stopping children"
+msgstr "Bắt %s, đang dừng tiến trình con"
 
 #, python-format
 msgid "Child %(pid)d killed by signal %(sig)d"
@@ -55,8 +37,26 @@ msgid "Child %(pid)s exited with status %(code)d"
 msgstr "Tiến trình con %(pid)s đã thiaast với trạng thái %(code)d"
 
 #, python-format
-msgid "Caught %s, stopping children"
-msgstr "Bắt %s, đang dừng tiến trình con"
+msgid "Child caught %s, exiting"
+msgstr "Tiến trình con bắt %s, thoát"
+
+#, python-format
+msgid "Eventlet backdoor listening on %(port)s for process %(pid)d"
+msgstr "Eventlet backdoor lắng nghe trên %(port)s đối với tiến trình %(pid)d"
+
+msgid "Forking too fast, sleeping"
+msgstr "Tạo tiến trình con quá nhanh, nghỉ"
+
+msgid "Parent process has died unexpectedly, exiting"
+msgstr "Tiến trình cha bị chết đột ngột, thoát"
+
+#, python-format
+msgid "Started child %d"
+msgstr "Tiến trình con đã được khởi động %d "
+
+#, python-format
+msgid "Starting %d workers"
+msgstr "Khởi động %d động cơ"
 
 #, python-format
 msgid "Waiting on %d children to exit"

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-05-07 06:07+0000\n"
-"PO-Revision-Date: 2015-04-24 16:40+0000\n"
+"POT-Creation-Date: 2015-05-28 06:06+0000\n"
+"PO-Revision-Date: 2015-05-22 13:44+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/"
 "ceilometer/language/pt_BR/)\n"
@@ -20,30 +20,12 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #, python-format
-msgid "Eventlet backdoor listening on %(port)s for process %(pid)d"
-msgstr "Backdoor de Eventlet escutando na porta %(port)s pelo processo %(pid)d"
-
-#, python-format
 msgid "Caught %s, exiting"
 msgstr "%s capturadas, saindo"
 
-msgid "Parent process has died unexpectedly, exiting"
-msgstr "Processo pai saiu inesperadamente, saindo"
-
 #, python-format
-msgid "Child caught %s, exiting"
-msgstr "Filho capturado %s, terminando"
-
-msgid "Forking too fast, sleeping"
-msgstr "Bifurcação muito rápida, suspendendo"
-
-#, python-format
-msgid "Started child %d"
-msgstr "Filho %d iniciado"
-
-#, python-format
-msgid "Starting %d workers"
-msgstr "Iniciando %d trabalhadores"
+msgid "Caught %s, stopping children"
+msgstr "%s capturado, parando filhos"
 
 #, python-format
 msgid "Child %(pid)d killed by signal %(sig)d"
@@ -54,8 +36,29 @@ msgid "Child %(pid)s exited with status %(code)d"
 msgstr "Filho %(pid)s encerrando com status %(code)d"
 
 #, python-format
-msgid "Caught %s, stopping children"
-msgstr "%s capturado, parando filhos"
+msgid "Child caught %s, exiting"
+msgstr "Filho capturado %s, terminando"
+
+#, python-format
+msgid "Eventlet backdoor listening on %(port)s for process %(pid)d"
+msgstr "Backdoor de Eventlet escutando na porta %(port)s pelo processo %(pid)d"
+
+msgid "Forking too fast, sleeping"
+msgstr "Bifurcação muito rápida, suspendendo"
+
+msgid "Parent process has died unexpectedly, exiting"
+msgstr "Processo pai saiu inesperadamente, saindo"
+
+#, python-format
+msgid "Started child %d"
+msgstr "Filho %d iniciado"
+
+#, python-format
+msgid "Starting %d workers"
+msgstr "Iniciando %d trabalhadores"
+
+msgid "Wait called after thread killed. Cleaning up."
+msgstr "Espera requisitada depois que thread foi morta.  Limpando."
 
 #, python-format
 msgid "Waiting on %d children to exit"
