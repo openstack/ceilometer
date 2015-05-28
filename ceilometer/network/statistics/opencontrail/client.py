@@ -15,12 +15,12 @@
 import copy
 
 from oslo_config import cfg
+from oslo_log import log
 import requests
 import six
 from six.moves.urllib import parse as urlparse
 
 from ceilometer.i18n import _
-from ceilometer.openstack.common import log
 
 
 CONF = cfg.CONF

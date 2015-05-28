@@ -20,13 +20,13 @@ import os
 from oslo_config import cfg
 from oslo_db import exception as dbexc
 from oslo_db.sqlalchemy import session as db_session
+from oslo_log import log
 from oslo_utils import timeutils
 import sqlalchemy as sa
 
 from ceilometer.event.storage import base
 from ceilometer.event.storage import models as api_models
 from ceilometer.i18n import _LE, _LI
-from ceilometer.openstack.common import log
 from ceilometer.storage.sqlalchemy import models
 from ceilometer import utils
 

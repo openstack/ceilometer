@@ -13,6 +13,7 @@
 # under the License.
 
 from oslo_config import cfg
+from oslo_log import log
 from oslo_utils import timeutils
 
 from ceilometer.agent import plugin_base
@@ -20,7 +21,6 @@ from ceilometer.i18n import _
 from ceilometer.ipmi.notifications import ironic as parser
 from ceilometer.ipmi.platform import exception as ipmiexcept
 from ceilometer.ipmi.platform import ipmi_sensor
-from ceilometer.openstack.common import log
 from ceilometer import sample
 
 CONF = cfg.CONF

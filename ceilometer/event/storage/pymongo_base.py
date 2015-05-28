@@ -12,12 +12,12 @@
 # under the License.
 """Common functions for MongoDB and DB2 backends
 """
+from oslo_log import log
 import pymongo
 
 from ceilometer.event.storage import base
 from ceilometer.event.storage import models
 from ceilometer.i18n import _LE, _LI
-from ceilometer.openstack.common import log
 from ceilometer.storage.mongo import utils as pymongo_utils
 from ceilometer import utils
 

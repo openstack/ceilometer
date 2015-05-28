@@ -18,13 +18,12 @@
 """Common functions for MongoDB and DB2 backends
 """
 
-
+from oslo_log import log
 import pymongo
 
 import ceilometer
 from ceilometer.alarm.storage import base
 from ceilometer.alarm.storage import models
-from ceilometer.openstack.common import log
 from ceilometer.storage.mongo import utils as pymongo_utils
 from ceilometer import utils
 

@@ -18,6 +18,7 @@ import os
 
 from oslo_config import cfg
 from oslo_db.sqlalchemy import session as db_session
+from oslo_log import log
 from oslo_utils import timeutils
 from sqlalchemy import desc
 
@@ -25,7 +26,6 @@ import ceilometer
 from ceilometer.alarm.storage import base
 from ceilometer.alarm.storage import models as alarm_api_models
 from ceilometer.i18n import _LI
-from ceilometer.openstack.common import log
 from ceilometer.storage.sqlalchemy import models
 from ceilometer.storage.sqlalchemy import utils as sql_utils
 from ceilometer import utils

@@ -17,11 +17,11 @@
 import collections
 
 from oslo_config import cfg
+from oslo_log import log
 from stevedore import driver
 
 import ceilometer
 from ceilometer.i18n import _
-from ceilometer.openstack.common import log
 
 
 OPTS = [

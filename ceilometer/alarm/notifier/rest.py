@@ -17,13 +17,13 @@
 import eventlet
 from oslo_config import cfg
 from oslo_context import context
+from oslo_log import log
 from oslo_serialization import jsonutils
 import requests
 import six.moves.urllib.parse as urlparse
 
 from ceilometer.alarm import notifier
 from ceilometer.i18n import _
-from ceilometer.openstack.common import log
 
 LOG = log.getLogger(__name__)
 

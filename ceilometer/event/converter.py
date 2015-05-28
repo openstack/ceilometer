@@ -18,13 +18,13 @@ import os
 
 import jsonpath_rw
 from oslo_config import cfg
+from oslo_log import log
 from oslo_utils import timeutils
 import six
 import yaml
 
 from ceilometer.event.storage import models
 from ceilometer.i18n import _
-from ceilometer.openstack.common import log
 
 OPTS = [
     cfg.StrOpt('definitions_cfg_file',

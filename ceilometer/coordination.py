@@ -16,10 +16,10 @@
 import uuid
 
 from oslo_config import cfg
+from oslo_log import log
 import tooz.coordination
 
 from ceilometer.i18n import _LE, _LI
-from ceilometer.openstack.common import log
 from ceilometer import utils
 
 LOG = log.getLogger(__name__)

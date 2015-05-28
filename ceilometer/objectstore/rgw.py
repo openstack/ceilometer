@@ -17,13 +17,13 @@
 
 from keystoneclient import exceptions
 from oslo_config import cfg
+from oslo_log import log
 from oslo_utils import timeutils
 import six.moves.urllib.parse as urlparse
 
 from ceilometer.agent import plugin_base
 from ceilometer.i18n import _
 from ceilometer.objectstore.rgw_client import RGWAdminClient as rgwclient
-from ceilometer.openstack.common import log
 from ceilometer import sample
 
 LOG = log.getLogger(__name__)

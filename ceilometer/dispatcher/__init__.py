@@ -16,11 +16,11 @@
 import abc
 
 from oslo_config import cfg
+from oslo_log import log
 import six
 from stevedore import named
 
 from ceilometer.i18n import _
-from ceilometer.openstack.common import log
 
 
 LOG = log.getLogger(__name__)

@@ -17,12 +17,12 @@
 
 from oslo_config import cfg
 from oslo_context import context
+from oslo_log import log
 import six
 
 from ceilometer.alarm.storage import models
 from ceilometer.i18n import _
 from ceilometer import messaging
-from ceilometer.openstack.common import log
 
 OPTS = [
     cfg.StrOpt('notifier_rpc_topic',

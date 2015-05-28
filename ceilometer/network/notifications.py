@@ -18,10 +18,10 @@
 """
 
 from oslo_config import cfg
+from oslo_log import log
 import oslo_messaging
 
 from ceilometer.agent import plugin_base
-from ceilometer.openstack.common import log
 from ceilometer import sample
 
 OPTS = [

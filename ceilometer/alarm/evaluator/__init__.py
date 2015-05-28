@@ -22,12 +22,12 @@ import datetime
 from ceilometerclient import client as ceiloclient
 import croniter
 from oslo_config import cfg
+from oslo_log import log
 from oslo_utils import timeutils
 import pytz
 import six
 
 from ceilometer.i18n import _
-from ceilometer.openstack.common import log
 
 
 LOG = log.getLogger(__name__)

@@ -12,11 +12,12 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+
+from oslo_log import log
 from oslo_utils import timeutils
 
 from ceilometer.i18n import _
 from ceilometer.network.services import base
-from ceilometer.openstack.common import log
 from ceilometer import sample
 
 LOG = log.getLogger(__name__)

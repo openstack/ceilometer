@@ -21,12 +21,12 @@ import collections
 from keystoneclient.v2_0 import client as ksclient
 from oslo_config import cfg
 from oslo_context import context
+from oslo_log import log
 import oslo_messaging
 import six
 
 from ceilometer.i18n import _
 from ceilometer import messaging
-from ceilometer.openstack.common import log
 
 cfg.CONF.import_group('service_credentials', 'ceilometer.service')
 

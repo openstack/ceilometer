@@ -14,11 +14,11 @@
 import os
 
 import happybase
+from oslo_log import log
 from oslo_utils import netutils
 from six.moves.urllib import parse as urlparse
 
 from ceilometer.i18n import _
-from ceilometer.openstack.common import log
 from ceilometer.storage.hbase import inmemory as hbase_inmemory
 
 LOG = log.getLogger(__name__)

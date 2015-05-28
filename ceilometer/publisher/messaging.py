@@ -20,13 +20,13 @@ import itertools
 import operator
 
 from oslo_config import cfg
+from oslo_log import log
 import oslo_messaging
 import six
 import six.moves.urllib.parse as urlparse
 
 from ceilometer.i18n import _
 from ceilometer import messaging
-from ceilometer.openstack.common import log
 from ceilometer import publisher
 from ceilometer.publisher import utils
 

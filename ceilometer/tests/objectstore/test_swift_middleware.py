@@ -313,7 +313,7 @@ class TestSwiftMiddleware(tests_base.BaseTestCase):
         self.assertEqual(["test"], resp)
         mocked_publish_sample.assert_called_once_with(mock.ANY, 0, 4)
 
-    def test_reseller_prefix(self):
+    def test_no_reseller_prefix(self):
         # No reseller prefix set: ensure middleware uses AUTH_
         app = swift_middleware.CeilometerMiddleware(FakeApp(), {})
         req = FakeRequest('/1.0/AUTH_account/container/obj',
@@ -322,6 +322,7 @@ class TestSwiftMiddleware(tests_base.BaseTestCase):
         samples = self.pipeline_manager.pipelines[0].samples[0]
         self.assertEqual("account", samples.resource_id)
 
+    def test_custom_reseller_prefix(self):
         # Custom reseller prefix set
         app = swift_middleware.CeilometerMiddleware(
             FakeApp(), {'reseller_prefix': 'CUSTOM_'})

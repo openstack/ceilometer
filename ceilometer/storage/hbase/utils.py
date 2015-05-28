@@ -18,10 +18,10 @@ import json
 
 import bson.json_util
 from happybase.hbase import ttypes
+from oslo_log import log
 import six
 
 from ceilometer.i18n import _
-from ceilometer.openstack.common import log
 from ceilometer import utils
 
 LOG = log.getLogger(__name__)

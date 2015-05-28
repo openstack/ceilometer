@@ -16,6 +16,7 @@
 
 import copy
 
+from oslo_log import log
 from oslo_utils import timeutils
 
 import ceilometer
@@ -24,7 +25,6 @@ from ceilometer.compute.pollsters import util
 from ceilometer.compute import util as compute_util
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.i18n import _, _LW
-from ceilometer.openstack.common import log
 from ceilometer import sample
 
 LOG = log.getLogger(__name__)

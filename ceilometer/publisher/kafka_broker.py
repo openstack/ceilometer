@@ -17,13 +17,13 @@ import json
 
 import kafka
 from oslo_config import cfg
+from oslo_log import log
 from oslo_utils import netutils
 from six.moves.urllib import parse as urlparse
 
 from ceilometer.i18n import _LE
 from ceilometer.i18n import _LI
 from ceilometer.i18n import _LW
-from ceilometer.openstack.common import log
 from ceilometer import publisher
 from ceilometer.publisher import utils
 

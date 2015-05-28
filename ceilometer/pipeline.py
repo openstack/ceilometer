@@ -22,13 +22,13 @@ import fnmatch
 import os
 
 from oslo_config import cfg
+from oslo_log import log
 from oslo_utils import timeutils
 import six
 import yaml
 
 from ceilometer.event.storage import models
 from ceilometer.i18n import _
-from ceilometer.openstack.common import log
 from ceilometer import publisher
 from ceilometer.publisher import utils as publisher_utils
 from ceilometer import sample as sample_util

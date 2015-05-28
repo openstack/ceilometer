@@ -20,10 +20,10 @@ import sys
 
 from oslo_config import cfg
 import oslo_i18n
+from oslo_log import log
 
 from ceilometer.i18n import _
 from ceilometer import messaging
-from ceilometer.openstack.common import log
 from ceilometer import utils
 
 
@@ -109,12 +109,12 @@ def get_workers(name):
 
 def prepare_service(argv=None):
     oslo_i18n.enable_lazy()
+    log.register_options(cfg.CONF)
     log_levels = (cfg.CONF.default_log_levels +
                   ['stevedore=INFO', 'keystoneclient=INFO'])
-    cfg.set_defaults(log.log_opts,
-                     default_log_levels=log_levels)
+    log.set_defaults(default_log_levels=log_levels)
     if argv is None:
         argv = sys.argv
     cfg.CONF(argv[1:], project='ceilometer', validate_default_values=True)
-    log.setup('ceilometer')
+    log.setup(cfg.CONF, 'ceilometer')
     messaging.setup()

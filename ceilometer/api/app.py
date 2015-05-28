@@ -16,8 +16,8 @@
 import logging
 import os
 
-
 from oslo_config import cfg
+from oslo_log import log
 from paste import deploy
 import pecan
 from werkzeug import serving
@@ -27,7 +27,6 @@ from ceilometer.api import hooks
 from ceilometer.api import middleware
 from ceilometer.i18n import _
 from ceilometer.i18n import _LW
-from ceilometer.openstack.common import log
 from ceilometer import service
 from ceilometer import storage
 

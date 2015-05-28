@@ -13,10 +13,11 @@
 
 import operator
 
+from oslo_log import log
+
 from ceilometer.event.storage import base
 from ceilometer.event.storage import models
 from ceilometer.i18n import _, _LE
-from ceilometer.openstack.common import log
 from ceilometer.storage.hbase import base as hbase_base
 from ceilometer.storage.hbase import utils as hbase_utils
 from ceilometer import utils
