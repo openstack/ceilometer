@@ -5,6 +5,7 @@
 # Hacking already pins down pep8, pyflakes and flake8
 hacking>=0.10.0,<0.11
 Babel>=1.3
+contextlib2>=0.4.0 # PSF License
 coverage>=3.6
 discover
 elasticsearch>=1.3.0
