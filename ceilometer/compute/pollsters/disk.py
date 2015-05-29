@@ -706,7 +706,7 @@ class _DiskInfoPollsterBase(pollsters.BaseComputePollster):
                 # Selected inspector does not implement this pollster.
                 LOG.debug(_('%(inspector)s does not provide data for '
                             ' %(pollster)s'), (
-                          {'inspector': manager.inspector.__class__.__name__,
+                          {'inspector': self.inspector.__class__.__name__,
                            'pollster': self.__class__.__name__}))
             except Exception as err:
                 instance_name = util.instance_name(instance)
