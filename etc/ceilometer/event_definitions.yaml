@@ -366,3 +366,33 @@
     <<: *http_audit
     reason_code:
       fields: payload.reason.reasonCode
+- event_type: ['dns.domain.create', 'dns.domain.update', 'dns.domain.delete']
+  traits: &dns_domain_traits
+    status:
+      fields: payload.status
+    retry:
+      fields: payload.retry
+    description:
+      fields: payload.description
+    expire:
+      fields: payload.expire
+    email:
+      fields: payload.email
+    ttl:
+      fields: payload.ttl
+    action:
+      fields: payload.action
+    name:
+      fields: payload.name
+    resource_id:
+      fields: payload.id
+    created_at:
+      fields: payload.created_at
+    updated_at:
+      fields: payload.updated_at
+    version:
+      fields: payload.version
+    parent_domain_id:
+      fields: parent_domain_id
+    serial:
+      fields: payload.serial
