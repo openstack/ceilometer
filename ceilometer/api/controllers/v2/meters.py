@@ -403,9 +403,6 @@ class MeterController(rest.RestController):
         try:
             computed = pecan.request.storage_conn.get_meter_statistics(
                 f, period, g, aggregate)
-            LOG.debug(_('computed value coming from %r'),
-                      pecan.request.storage_conn)
-
             return [Statistics(start_timestamp=start,
                                end_timestamp=end,
                                **c.as_dict())
