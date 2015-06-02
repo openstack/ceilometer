@@ -11,13 +11,7 @@ tests:
   response_strings:
       - "[]"
 
-# TODO(chdent) because of the way _lookup is used in the
-# AlarmsController pecan is unable to correctly create a 405
-# when it receives a PUT to /v2/alarms. This is partially
-# fixable in Ceilometer by raising an exception in _lookup if
-# alarm_id is not present, but no Allow header will be created.
 - name: try to PUT an alarm
-  xfail: true
   desc: what does PUT do
   url: /v2/alarms
   method: PUT
