@@ -752,13 +752,9 @@ class TestAlarms(v2.FunctionalTest,
         }
         resp = self.post_json('/alarms', params=json, expect_errors=True,
                               status=400, headers=self.auth_headers)
-        expected_err_msg = ("Invalid input for field/attribute"
-                            " enabled."
-                            " Value: 'bad_enabled'."
-                            " Wrong type. Expected '<type 'bool'>',"
-                            " got '<type 'str'>'")
-        self.assertEqual(expected_err_msg,
-                         resp.json['error_message']['faultstring'])
+        expected_err_msg = "Value not an unambiguous boolean: bad_enabled"
+        self.assertIn(expected_err_msg,
+                      resp.json['error_message']['faultstring'])
         alarms = list(self.alarm_conn.get_alarms())
         self.assertEqual(7, len(alarms))
 
@@ -774,17 +770,11 @@ class TestAlarms(v2.FunctionalTest,
                 'threshold': 50.0
             }
         }
-        resp = self.post_json('/alarms', params=json, expect_errors=True,
-                              status=400, headers=self.auth_headers)
-        expected_err_msg = ("Invalid input for field/attribute"
-                            " enabled."
-                            " Value: '0'."
-                            " Wrong type. Expected '<type 'bool'>',"
-                            " got '<type 'int'>'")
-        self.assertEqual(expected_err_msg,
-                         resp.json['error_message']['faultstring'])
+        resp = self.post_json('/alarms', params=json,
+                              headers=self.auth_headers)
+        self.assertFalse(resp.json['enabled'])
         alarms = list(self.alarm_conn.get_alarms())
-        self.assertEqual(7, len(alarms))
+        self.assertEqual(8, len(alarms))
 
     def test_post_invalid_combination_alarm_input_operator(self):
         json = {
