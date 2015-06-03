@@ -23,7 +23,6 @@ import six.moves.urllib.parse as urlparse
 
 from ceilometer.agent import plugin_base
 from ceilometer.i18n import _
-from ceilometer.objectstore.rgw_client import RGWAdminClient as rgwclient
 from ceilometer import sample
 
 LOG = log.getLogger(__name__)
@@ -91,7 +90,12 @@ class _Base(plugin_base.PollsterBase):
         if not endpoint:
             raise StopIteration()
 
-        rgw_client = rgwclient(endpoint, self.access_key, self.secret)
+        try:
+            from ceilometer.objectstore.rgw_client import RGWAdminClient
+            rgw_client = RGWAdminClient(endpoint, self.access_key, self.secret)
+        except ImportError as e:
+            raise plugin_base.PollsterPermanentError(e)
+
         for t in tenants:
             api_method = 'get_%s' % self.METHOD
             yield t.id, getattr(rgw_client, api_method)(t.id)
