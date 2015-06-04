@@ -20,6 +20,7 @@ from oslotest import base
 from oslotest import mockpatch
 from stevedore import extension
 
+from ceilometer.agent import base as agent_base
 from ceilometer.agent import manager
 from ceilometer.agent import plugin_base
 from ceilometer import pipeline
@@ -69,7 +70,9 @@ class TestManager(base.BaseTestCase):
                 mock.Mock(return_value=None))
     @mock.patch('ceilometer.agent.base.LOG')
     def test_load_failed_plugins(self, LOG):
-        mgr = manager.AgentManager(namespaces=['ipmi'],
+        # Here we additionally check that namespaces will be converted to the
+        # list if param was not set as a list.
+        mgr = manager.AgentManager(namespaces='ipmi',
                                    pollster_list=['hardware.ipmi.node.*'])
         # 0 pollsters
         self.assertEqual(0, len(mgr.extensions))
@@ -103,6 +106,13 @@ class TestManager(base.BaseTestCase):
                           manager.AgentManager,
                           ['ipmi'],
                           ['hardware.ipmi.node.*'])
+
+    def test_load_plugins_pollster_list_forbidden(self):
+        manager.cfg.CONF.set_override('backend_url', 'http://',
+                                      group='coordination')
+        self.assertRaises(agent_base.PollsterListForbidden,
+                          manager.AgentManager,
+                          pollster_list=['disk.*'])
 
 
 class TestPollsterKeystone(agentbase.TestPollster):
