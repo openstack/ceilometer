@@ -125,11 +125,11 @@ tests:
       status: 406
 
     - name: bad method
-      desc: https://bugs.launchpad.net/ceilometer/+bug/1426476
-      xfail: true
       url: /v2/samples
       method: POST
       status: 405
+      response_headers:
+          allow: GET
 
 # Work with just one sample.
 

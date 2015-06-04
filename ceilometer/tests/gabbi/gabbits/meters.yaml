@@ -24,18 +24,18 @@ tests:
       status: 406
 
     - name: meters list bad method
-      desc: https://bugs.launchpad.net/ceilometer/+bug/1426476
-      xfail: true
       url: /v2/meters
       method: POST
       status: 405
+      response_headers:
+          allow: GET
 
     - name: try to delete meters
-      desc: https://bugs.launchpad.net/ceilometer/+bug/1426476
-      xfail: true
       url: /v2/meters
       method: DELETE
-      status: 405 # actual response is 404, at least we can't delete
+      status: 405
+      response_headers:
+          allow: GET
 
 # Generic HTTP health explorations of single meter.
 
