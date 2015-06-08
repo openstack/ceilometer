@@ -21,12 +21,6 @@ from oslo_serialization import jsonutils
 DEFAULT_URL = "__default__"
 TRANSPORTS = {}
 
-_ALIASES = {
-    'ceilometer.openstack.common.rpc.impl_kombu': 'rabbit',
-    'ceilometer.openstack.common.rpc.impl_qpid': 'qpid',
-    'ceilometer.openstack.common.rpc.impl_zmq': 'zmq',
-}
-
 
 class RequestContextSerializer(oslo_messaging.Serializer):
     def __init__(self, base):
@@ -68,8 +62,7 @@ def get_transport(url=None, optional=False, cache=True):
     transport = TRANSPORTS.get(cache_key)
     if not transport or not cache:
         try:
-            transport = oslo_messaging.get_transport(cfg.CONF, url,
-                                                     aliases=_ALIASES)
+            transport = oslo_messaging.get_transport(cfg.CONF, url)
         except oslo_messaging.InvalidTransportURL as e:
             if not optional or e.url:
                 # NOTE(sileht): oslo_messaging is configured but unloadable
