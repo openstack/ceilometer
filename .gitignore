@@ -6,13 +6,12 @@
 .tox
 AUTHORS
 build/*
-ceilometer/versioninfo
 ChangeLog
 cover/*
 dist/*
 doc/build/*
 doc/source/sourcecode
-etc/ceilometer/ceilometer.conf*
+etc/ceilometer/ceilometer.conf
 subunit.log
 tools/lintstack.head.py
 tools/pylint_exceptions
