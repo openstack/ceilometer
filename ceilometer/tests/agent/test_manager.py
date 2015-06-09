@@ -113,6 +113,7 @@ class TestManager(base.BaseTestCase):
         self.assertRaises(agent_base.PollsterListForbidden,
                           manager.AgentManager,
                           pollster_list=['disk.*'])
+        manager.cfg.CONF.reset()
 
 
 class TestPollsterKeystone(agentbase.TestPollster):
