@@ -186,10 +186,11 @@ class BinApiTestCase(base.BaseTestCase):
                    "auth_strategy=noauth\n"
                    "debug=true\n"
                    "pipeline_cfg_file={0}\n"
-                   "policy_file={1}\n"
                    "api_paste_config={2}\n"
                    "[api]\n"
                    "port={3}\n"
+                   "[oslo_policy]\n"
+                   "policy_file={1}\n"
                    "[database]\n"
                    "connection=log://localhost\n".
                    format(self.pipeline_cfg_file,
