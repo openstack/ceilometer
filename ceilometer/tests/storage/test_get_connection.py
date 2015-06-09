@@ -90,7 +90,7 @@ class ConnectionConfigTest(base.BaseTestCase):
         conn = storage.get_connection_from_config(self.CONF, 'alarm')
         self.assertIsInstance(conn, impl_sqlalchemy_alarm.Connection)
 
-    @unittest.skipIf(impl_hbase_event is None, 'need hbase implementation')
+    @unittest.skipUnless(impl_hbase_event, 'need hbase implementation')
     def test_three_urls(self):
         self.CONF.set_override("connection", "log://", group="database")
         self.CONF.set_override("alarm_connection", "sqlite://",
@@ -106,6 +106,7 @@ class ConnectionConfigTest(base.BaseTestCase):
         conn = storage.get_connection_from_config(self.CONF, 'event')
         self.assertIsInstance(conn, impl_hbase_event.Connection)
 
+    @unittest.skipUnless(impl_hbase_event, 'need hbase implementation')
     def test_three_urls_no_default(self):
         self.CONF.set_override("connection", None, group="database")
         self.CONF.set_override("metering_connection", "log://",

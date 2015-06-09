@@ -67,8 +67,8 @@ class TestDispatcherFile(base.BaseTestCase):
         tf.close()
 
         self.CONF.dispatcher_file.file_path = filename
-        self.CONF.dispatcher_file.max_bytes = None
-        self.CONF.dispatcher_file.backup_count = None
+        self.CONF.dispatcher_file.max_bytes = 0
+        self.CONF.dispatcher_file.backup_count = 0
         dispatcher = file.FileDispatcher(self.CONF)
 
         # The number of the handlers should be 1
