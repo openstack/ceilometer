@@ -44,6 +44,18 @@ class ConfigFixture(fixture.GabbiFixture):
     def start_fixture(self):
         """Set up config."""
 
+        self.conf = None
+
+        # Determine the database connection.
+        db_url = None
+        for engine in ENGINES:
+            try:
+                db_url = os.environ['CEILOMETER_TEST_%s_URL' % engine]
+            except KeyError:
+                pass
+        if db_url is None:
+            raise case.SkipTest('No database connection configured')
+
         service.prepare_service([])
         conf = fixture_config.Config().conf
         self.conf = conf
@@ -58,16 +70,6 @@ class ConfigFixture(fixture.GabbiFixture):
         conf.set_override('pipeline_cfg_file',
                           'etc/ceilometer/gabbi_pipeline.yaml')
 
-        # Determine the database connection.
-        db_url = None
-        for engine in ENGINES:
-            try:
-                db_url = os.environ['CEILOMETER_TEST_%s_URL' % engine]
-            except KeyError:
-                pass
-        if db_url is None:
-            raise case.SkipTest('No database connection configured')
-
         database_name = '%s-%s' % (db_url, str(uuid.uuid4()))
         conf.set_override('connection', database_name, group='database')
         conf.set_override('metering_connection', '', group='database')
@@ -80,8 +82,9 @@ class ConfigFixture(fixture.GabbiFixture):
 
     def stop_fixture(self):
         """Reset the config and remove data."""
-        storage.get_connection_from_config(self.conf).clear()
-        self.conf.reset()
+        if self.conf:
+            storage.get_connection_from_config(self.conf).clear()
+            self.conf.reset()
 
 
 class SampleDataFixture(fixture.GabbiFixture):
