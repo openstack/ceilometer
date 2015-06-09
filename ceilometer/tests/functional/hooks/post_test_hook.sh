@@ -37,7 +37,8 @@ sudo chown -R jenkins:stack $CEILOMETER_DIR
 echo "Running ceilometer functional test suite"
 set +e
 
-sudo -E -H -u jenkins tox -efunctional
+# NOTE(ityaptin) Expected a script param which contains a backend name
+CEILOMETER_TEST_BACKEND="$1" sudo -E -H -u jenkins tox -efunctional
 EXIT_CODE=$?
 set -e
 
