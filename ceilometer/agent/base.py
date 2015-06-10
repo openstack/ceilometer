@@ -194,18 +194,18 @@ class PollingTask(object):
 class AgentManager(os_service.Service):
 
     def __init__(self, namespaces, pollster_list, group_prefix=None):
+        # features of using coordination and pollster-list are exclusive, and
+        # cannot be used at one moment to avoid both samples duplication and
+        # samples being lost
+        if pollster_list and cfg.CONF.coordination.backend_url:
+            raise PollsterListForbidden()
+
         super(AgentManager, self).__init__()
 
         def _match(pollster):
             """Find out if pollster name matches to one of the list."""
             return any(fnmatch.fnmatch(pollster.name, pattern) for
                        pattern in pollster_list)
-
-        # features of using coordination and pollster-list are exclusive, and
-        # cannot be used at one moment to avoid both samples duplication and
-        # samples being lost
-        if pollster_list and cfg.CONF.coordination.backend_url:
-            raise PollsterListForbidden()
 
         if type(namespaces) is not list:
             namespaces = [namespaces]
