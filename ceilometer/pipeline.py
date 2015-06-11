@@ -19,6 +19,7 @@
 
 import abc
 import fnmatch
+import hashlib
 import os
 
 from oslo_config import cfg
@@ -44,6 +45,15 @@ OPTS = [
     cfg.StrOpt('event_pipeline_cfg_file',
                default="event_pipeline.yaml",
                help="Configuration file for event pipeline definition."
+               ),
+    cfg.BoolOpt('refresh_pipeline_cfg',
+                default=False,
+                help="Refresh Pipeline configuration on-the-fly."
+                ),
+    cfg.IntOpt('pipeline_polling_interval',
+               default=20,
+               help="Polling interval for pipeline file configuration"
+                    " in seconds."
                ),
 ]
 
@@ -723,3 +733,32 @@ def setup_pipeline(transformer_manager=None):
     """Setup pipeline manager according to yaml config file."""
     cfg_file = cfg.CONF.pipeline_cfg_file
     return _setup_pipeline_manager(cfg_file, transformer_manager)
+
+
+def _get_pipeline_cfg_file(p_type=SAMPLE_TYPE):
+    if p_type == EVENT_TYPE:
+        cfg_file = cfg.CONF.event_pipeline_cfg_file
+    else:
+        cfg_file = cfg.CONF.pipeline_cfg_file
+
+    if not os.path.exists(cfg_file):
+        cfg_file = cfg.CONF.find_file(cfg_file)
+
+    return cfg_file
+
+
+def get_pipeline_mtime(p_type=SAMPLE_TYPE):
+    cfg_file = _get_pipeline_cfg_file(p_type)
+    return os.path.getmtime(cfg_file)
+
+
+def get_pipeline_hash(p_type=SAMPLE_TYPE):
+
+    cfg_file = _get_pipeline_cfg_file(p_type)
+    with open(cfg_file) as fap:
+        data = fap.read()
+    if six.PY3:
+        data = data.encode('utf-8')
+
+    file_hash = hashlib.md5(data).hexdigest()
+    return file_hash
