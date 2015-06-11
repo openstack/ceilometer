@@ -262,7 +262,7 @@ class Connection(pymongo_base.Connection):
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
                       end_timestamp=None, end_timestamp_op=None,
-                      metaquery=None, resource=None, pagination=None):
+                      metaquery=None, resource=None):
         """Return an iterable of models.Resource instances
 
         :param user: Optional ID for user that owns the resource.
@@ -274,11 +274,7 @@ class Connection(pymongo_base.Connection):
         :param end_timestamp_op: Optional end time operator, like lt, le.
         :param metaquery: Optional dict with metadata to match on.
         :param resource: Optional resource filter.
-        :param pagination: Optional pagination query.
         """
-        if pagination:
-            raise ceilometer.NotImplementedError('Pagination not implemented')
-
         metaquery = pymongo_utils.improve_keys(metaquery, metaquery=True) or {}
 
         q = {}

@@ -13,4 +13,3 @@ tests:
       $.alarm_storage.['storage:production_ready']: true
       $.event_storage.['storage:production_ready']: true
       $.storage.['storage:production_ready']: true
-      $.api.['meters:pagination']: false

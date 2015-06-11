@@ -563,8 +563,6 @@ class AlarmController(rest.RestController):
                             timeutils.utcnow(),
                             type=alarm_models.AlarmChange.DELETION)
 
-    # TODO(eglynn): add pagination marker to signature once overall
-    #               API support for pagination is finalized
     @wsme_pecan.wsexpose([AlarmChange], [base.Query])
     def history(self, q=None):
         """Assembles the alarm history requested.

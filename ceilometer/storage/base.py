@@ -80,29 +80,6 @@ class NoResultFound(Exception):
     pass
 
 
-class Pagination(object):
-    """Class for pagination query."""
-
-    def __init__(self, limit=None, primary_sort_dir='desc', sort_keys=None,
-                 sort_dirs=None, marker_value=None):
-        """This puts all parameters used for paginate query together.
-
-        :param limit: Maximum number of items to return;
-        :param primary_sort_dir: Sort direction of primary key.
-        :param marker_value: Value of primary key to identify the last item of
-                             the previous page.
-        :param sort_keys: Array of attributes passed in by users to sort the
-                            results besides the primary key.
-        :param sort_dirs: Per-column array of sort_dirs, corresponding to
-                            sort_keys.
-        """
-        self.limit = limit
-        self.primary_sort_dir = primary_sort_dir
-        self.marker_value = marker_value
-        self.sort_keys = sort_keys or []
-        self.sort_dirs = sort_dirs or []
-
-
 class Model(object):
     """Base class for storage API models."""
 
@@ -136,20 +113,16 @@ class Connection(object):
 
     # A dictionary representing the capabilities of this driver.
     CAPABILITIES = {
-        'meters': {'pagination': False,
-                   'query': {'simple': False,
+        'meters': {'query': {'simple': False,
                              'metadata': False,
                              'complex': False}},
-        'resources': {'pagination': False,
-                      'query': {'simple': False,
+        'resources': {'query': {'simple': False,
                                 'metadata': False,
                                 'complex': False}},
-        'samples': {'pagination': False,
-                    'query': {'simple': False,
+        'samples': {'query': {'simple': False,
                               'metadata': False,
                               'complex': False}},
-        'statistics': {'pagination': False,
-                       'groupby': False,
+        'statistics': {'groupby': False,
                        'query': {'simple': False,
                                  'metadata': False,
                                  'complex': False},
@@ -203,7 +176,7 @@ class Connection(object):
     def get_resources(user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
                       end_timestamp=None, end_timestamp_op=None,
-                      metaquery=None, resource=None, pagination=None):
+                      metaquery=None, resource=None):
         """Return an iterable of models.Resource instances.
 
         Iterable items containing resource information.
@@ -216,13 +189,12 @@ class Connection(object):
         :param end_timestamp_op: Optional timestamp end range operation.
         :param metaquery: Optional dict with metadata to match on.
         :param resource: Optional resource filter.
-        :param pagination: Optional pagination query.
         """
         raise ceilometer.NotImplementedError('Resources not implemented')
 
     @staticmethod
     def get_meters(user=None, project=None, resource=None, source=None,
-                   metaquery=None, pagination=None):
+                   metaquery=None):
         """Return an iterable of model.Meter instances.
 
         Iterable items containing meter information.
@@ -231,7 +203,6 @@ class Connection(object):
         :param resource: Optional resource filter.
         :param source: Optional source filter.
         :param metaquery: Optional dict with metadata to match on.
-        :param pagination: Optional pagination query.
         """
         raise ceilometer.NotImplementedError('Meters not implemented')
 
