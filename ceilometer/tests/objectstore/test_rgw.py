@@ -51,6 +51,7 @@ class TestManager(manager.AgentManager):
     def __init__(self):
         super(TestManager, self).__init__()
         self.keystone = mock.MagicMock()
+        self.keystone.service_catalog.url_for.return_value = '/endpoint'
 
 
 class TestRgwPollster(testscenarios.testcase.WithScenarios,
@@ -157,6 +158,7 @@ class TestRgwPollster(testscenarios.testcase.WithScenarios,
 
     def test_get_endpoint_only_once(self):
         mock_url_for = mock.MagicMock()
+        mock_url_for.return_value = '/endpoint'
         api_method = 'get_%s' % self.pollster.METHOD
         with mockpatch.PatchObject(rgw_client, api_method,
                                    new=mock.MagicMock()):
