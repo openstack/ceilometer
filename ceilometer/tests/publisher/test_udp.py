@@ -141,7 +141,7 @@ class TestUDPPublisher(base.BaseTestCase):
         sent_counters = []
 
         for data, dest in self.data_sent:
-            counter = msgpack.loads(data)
+            counter = msgpack.loads(data, encoding="utf-8")
             sent_counters.append(counter)
 
             # Check destination
@@ -149,9 +149,14 @@ class TestUDPPublisher(base.BaseTestCase):
                               self.CONF.collector.udp_port), dest)
 
         # Check that counters are equal
-        self.assertEqual(sorted(
-            [utils.meter_message_from_counter(d, "not-so-secret")
-             for d in self.test_data]), sorted(sent_counters))
+        def sort_func(counter):
+            return counter['counter_name']
+
+        counters = [utils.meter_message_from_counter(d, "not-so-secret")
+                    for d in self.test_data]
+        counters.sort(key=sort_func)
+        sent_counters.sort(key=sort_func)
+        self.assertEqual(counters, sent_counters)
 
     @staticmethod
     def _raise_ioerror(*args):
