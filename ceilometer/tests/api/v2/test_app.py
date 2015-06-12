@@ -18,6 +18,7 @@
 import json
 
 import mock
+import six
 import wsme
 
 from ceilometer import i18n
@@ -159,8 +160,11 @@ class TestApiMiddleware(v2.FunctionalTest):
     def test_translated_then_untranslated_error(self):
         resp = self.get_json('/alarms/alarm-id-3', expect_errors=True)
         self.assertEqual(404, resp.status_code)
+        body = resp.body
+        if six.PY3:
+            body = body.decode('utf-8')
         self.assertEqual("Alarm alarm-id-3 not found",
-                         json.loads(resp.body)['error_message']
+                         json.loads(body)['error_message']
                          ['faultstring'])
 
         with mock.patch('ceilometer.api.controllers.'
@@ -170,6 +174,9 @@ class TestApiMiddleware(v2.FunctionalTest):
             resp = self.get_json('/alarms/alarm-id-5', expect_errors=True)
 
         self.assertEqual(404, resp.status_code)
+        body = resp.body
+        if six.PY3:
+            body = body.decode('utf-8')
         self.assertEqual("untranslated_error",
-                         json.loads(resp.body)['error_message']
+                         json.loads(body)['error_message']
                          ['faultstring'])

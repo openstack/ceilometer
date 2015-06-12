@@ -23,6 +23,7 @@ import json
 
 from lxml import etree
 from oslo_log import log
+import six
 import webob
 
 from ceilometer.api import hooks
@@ -79,7 +80,7 @@ class ParsableErrorMiddleware(object):
                 return start_response(status, headers, exc_info)
 
         app_iter = self.app(environ, replacement_start_response)
-        if (state['status_code'] / 100) not in (2, 3):
+        if (state['status_code'] // 100) not in (2, 3):
             req = webob.Request(environ)
             # Find the first TranslationHook in the array of hooks and use the
             # translatable_error object from it
@@ -91,32 +92,44 @@ class ParsableErrorMiddleware(object):
             user_locale = self.best_match_language(req.accept_language)
             if (req.accept.best_match(['application/json', 'application/xml'])
                == 'application/xml'):
+                content_type = 'application/xml'
                 try:
                     # simple check xml is valid
-                    fault = etree.fromstring('\n'.join(app_iter))
+                    fault = etree.fromstring(b'\n'.join(app_iter))
                     # Add the translated error to the xml data
                     if error is not None:
                         for fault_string in fault.findall('faultstring'):
                             fault_string.text = i18n.translate(error,
                                                                user_locale)
-                    body = ['<error_message>' + etree.tostring(fault)
-                            + '</error_message>']
+                    error_message = etree.tostring(fault)
+                    body = b''.join((b'<error_message>',
+                                     error_message,
+                                     b'</error_message>'))
                 except etree.XMLSyntaxError as err:
-                    LOG.error(_('Error parsing HTTP response: %s') % err)
-                    body = ['<error_message>%s' % state['status_code']
-                            + '</error_message>']
-                state['headers'].append(('Content-Type', 'application/xml'))
+                    LOG.error(_('Error parsing HTTP response: %s'), err)
+                    error_message = state['status_code']
+                    body = '<error_message>%s</error_message>' % error_message
+                    if six.PY3:
+                        body = body.encode('utf-8')
             else:
+                content_type = 'application/json'
+                app_data = b'\n'.join(app_iter)
+                if six.PY3:
+                    app_data = app_data.decode('utf-8')
                 try:
-                    fault = json.loads('\n'.join(app_iter))
+                    fault = json.loads(app_data)
                     if error is not None and 'faultstring' in fault:
                         fault['faultstring'] = i18n.translate(error,
                                                               user_locale)
-                    body = [json.dumps({'error_message': fault})]
                 except ValueError as err:
-                    body = [json.dumps({'error_message': '\n'.join(app_iter)})]
-                state['headers'].append(('Content-Type', 'application/json'))
-            state['headers'].append(('Content-Length', str(len(body[0]))))
+                    fault = app_data
+                body = json.dumps({'error_message': fault})
+                if six.PY3:
+                    body = body.encode('utf-8')
+
+            state['headers'].append(('Content-Length', str(len(body))))
+            state['headers'].append(('Content-Type', content_type))
+            body = [body]
         else:
             body = app_iter
         return body
