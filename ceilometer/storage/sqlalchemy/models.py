@@ -177,10 +177,10 @@ class Resource(Base):
     )
 
     internal_id = Column(Integer, primary_key=True)
-    user_id = Column(String(255))
-    project_id = Column(String(255))
-    source_id = Column(String(255))
-    resource_id = Column(String(255), nullable=False)
+    user_id = Column(String(128))
+    project_id = Column(String(128))
+    source_id = Column(String(128))
+    resource_id = Column(String(128), nullable=False)
     resource_metadata = deferred(Column(JSONEncodedDict()))
     metadata_hash = deferred(Column(String(32)))
     samples = relationship("Sample", backref="resource")
@@ -217,8 +217,8 @@ class Sample(Base):
     timestamp = Column(PreciseTimestamp(), default=lambda: timeutils.utcnow())
     recorded_at = Column(PreciseTimestamp(),
                          default=lambda: timeutils.utcnow())
-    message_signature = Column(String(1000))
-    message_id = Column(String(1000))
+    message_signature = Column(String(64))
+    message_id = Column(String(128))
 
 
 class FullSample(Base):
@@ -253,7 +253,7 @@ class Alarm(Base):
         Index('ix_alarm_user_id', 'user_id'),
         Index('ix_alarm_project_id', 'project_id'),
     )
-    alarm_id = Column(String(255), primary_key=True)
+    alarm_id = Column(String(128), primary_key=True)
     enabled = Column(Boolean)
     name = Column(Text)
     type = Column(String(50))
@@ -261,8 +261,8 @@ class Alarm(Base):
     description = Column(Text)
     timestamp = Column(PreciseTimestamp, default=lambda: timeutils.utcnow())
 
-    user_id = Column(String(255))
-    project_id = Column(String(255))
+    user_id = Column(String(128))
+    project_id = Column(String(128))
 
     state = Column(String(255))
     state_timestamp = Column(PreciseTimestamp,
@@ -283,11 +283,11 @@ class AlarmChange(Base):
     __table_args__ = (
         Index('ix_alarm_history_alarm_id', 'alarm_id'),
     )
-    event_id = Column(String(255), primary_key=True)
-    alarm_id = Column(String(255))
-    on_behalf_of = Column(String(255))
-    project_id = Column(String(255))
-    user_id = Column(String(255))
+    event_id = Column(String(128), primary_key=True)
+    alarm_id = Column(String(128))
+    on_behalf_of = Column(String(128))
+    project_id = Column(String(128))
+    user_id = Column(String(128))
     type = Column(String(20))
     detail = Column(Text)
     timestamp = Column(PreciseTimestamp, default=lambda: timeutils.utcnow())
