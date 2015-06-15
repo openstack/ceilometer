@@ -216,7 +216,7 @@ class ValidatedComplexQuery(object):
                 self._validate_orderby(self.orderby)
             except (ValueError, jsonschema.exceptions.ValidationError) as e:
                 raise base.ClientSideError(
-                    _("Order-by expression not valid: %s") % e.message)
+                    _("Order-by expression not valid: %s") % e)
             self._convert_orderby_to_lower_case(self.orderby)
             self._normalize_field_names_in_orderby(self.orderby)
 
