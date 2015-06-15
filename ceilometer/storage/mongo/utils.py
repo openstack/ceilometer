@@ -289,8 +289,8 @@ class QueryTransformer(object):
         orderby_filter = []
 
         for field in orderby:
-            field_name = field.keys()[0]
-            ordering = self.ordering_functions[field.values()[0]]
+            field_name = list(field.keys())[0]
+            ordering = self.ordering_functions[list(field.values())[0]]
             orderby_filter.append((field_name, ordering))
         return orderby_filter
 
@@ -312,12 +312,12 @@ class QueryTransformer(object):
             del tree["not"]
 
         def transform(subtree):
-            op = subtree.keys()[0]
+            op = list(subtree.keys())[0]
             if op in ["and", "or"]:
                 [transform(child) for child in subtree[op]]
             elif op == "not":
                 negated_tree = subtree[op]
-                negated_op = negated_tree.keys()[0]
+                negated_op = list(negated_tree.keys())[0]
                 if negated_op == "and":
                     _apply_de_morgan(subtree, negated_tree, negated_op)
                     transform(subtree)
@@ -326,7 +326,8 @@ class QueryTransformer(object):
                     transform(subtree)
                 elif negated_op == "not":
                     # two consecutive not annihilates themselves
-                    new_op = negated_tree.values()[0].keys()[0]
+                    value = list(negated_tree.values())[0]
+                    new_op = list(value.keys())[0]
                     subtree[new_op] = negated_tree[negated_op][new_op]
                     del subtree["not"]
                     transform(subtree)
@@ -352,8 +353,8 @@ class QueryTransformer(object):
     def _handle_not_op(self, negated_tree):
         # assumes that not is moved to the leaf already
         # so we are next to a leaf
-        negated_op = negated_tree.keys()[0]
-        negated_field = negated_tree[negated_op].keys()[0]
+        negated_op = list(negated_tree.keys())[0]
+        negated_field = list(negated_tree[negated_op].keys())[0]
         value = negated_tree[negated_op][negated_field]
         if negated_op == "=":
             return {negated_field: {"$ne": value}}
@@ -364,8 +365,8 @@ class QueryTransformer(object):
                                     {self.operators[negated_op]: value}}}
 
     def _handle_simple_op(self, simple_op, nodes):
-        field_name = nodes.keys()[0]
-        field_value = nodes.values()[0]
+        field_name = list(nodes.keys())[0]
+        field_value = list(nodes.values())[0]
 
         # no operator for equal in Mongo
         if simple_op == "=":
@@ -377,8 +378,8 @@ class QueryTransformer(object):
         return op
 
     def _process_json_tree(self, condition_tree):
-        operator_node = condition_tree.keys()[0]
-        nodes = condition_tree.values()[0]
+        operator_node = list(condition_tree.keys())[0]
+        nodes = list(condition_tree.values())[0]
 
         if operator_node in self.complex_operators:
             return self._handle_complex_op(operator_node, nodes)

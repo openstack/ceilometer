@@ -231,7 +231,7 @@ class AggregatorTransformer(ScalingTransformer):
                                            self.retention_time))
         full = self.aggregated_samples >= self.size
         if full or expired:
-            x = self.samples.values()
+            x = list(self.samples.values())
             # gauge aggregates need to be averages
             for s in x:
                 if s.type == sample.TYPE_GAUGE:

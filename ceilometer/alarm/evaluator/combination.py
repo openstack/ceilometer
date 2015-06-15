@@ -16,9 +16,8 @@
 # under the License.
 
 
-from six import moves
-
 from oslo_log import log
+from six import moves
 
 from ceilometer.alarm import evaluator
 from ceilometer.i18n import _
@@ -108,6 +107,8 @@ class CombinationEvaluator(evaluator.Evaluator):
 
         states = zip(alarm.rule['alarm_ids'],
                      moves.map(self._get_alarm_state, alarm.rule['alarm_ids']))
+        # states is consumed more than once, we need a list
+        states = list(states)
 
         if self._sufficient_states(alarm, states):
             self._transition(alarm, states)

@@ -102,14 +102,14 @@ class TestComplexQuery(base.BaseTestCase):
         filter_expr = {"AND": [{"=": {"project_id": 42}},
                                {"=": {"project_id": 44}}]}
         self.query._convert_operator_to_lower_case(filter_expr)
-        self.assertEqual("and", filter_expr.keys()[0])
+        self.assertEqual("and", list(filter_expr.keys())[0])
 
         filter_expr = {"Or": [{"=": {"project_id": 43}},
                               {"anD": [{"=": {"project_id": 44}},
                                        {"=": {"project_id": 42}}]}]}
         self.query._convert_operator_to_lower_case(filter_expr)
-        self.assertEqual("or", filter_expr.keys()[0])
-        self.assertEqual("and", filter_expr["or"][1].keys()[0])
+        self.assertEqual("or", list(filter_expr.keys())[0])
+        self.assertEqual("and", list(filter_expr["or"][1].keys())[0])
 
     def test_invalid_filter_misstyped_field_name_samples(self):
         filter = {"=": {"project_id11": 42}}

@@ -223,7 +223,7 @@ class TestEventAPI(EventTestBase):
         self.assertEqual(1, len(data))
         self.assertEqual('Bar', data[0]['event_type'])
 
-        traits = filter(lambda x: x['name'] == 'trait_B', data[0]['traits'])
+        traits = [x for x in data[0]['traits'] if x['name'] == 'trait_B']
         self.assertEqual(1, len(traits))
         self.assertEqual('integer', traits[0]['type'])
         self.assertEqual('101', traits[0]['value'])
@@ -236,7 +236,7 @@ class TestEventAPI(EventTestBase):
         self.assertEqual(1, len(data))
         self.assertEqual('Zoo', data[0]['event_type'])
 
-        traits = filter(lambda x: x['name'] == 'trait_C', data[0]['traits'])
+        traits = [x for x in data[0]['traits'] if x['name'] == 'trait_C']
         self.assertEqual(1, len(traits))
         self.assertEqual('float', traits[0]['type'])
         self.assertEqual('200.123456', traits[0]['value'])
@@ -247,7 +247,7 @@ class TestEventAPI(EventTestBase):
                                  'value': '2014-01-01T05:00:00',
                                  'type': 'datetime'}])
         self.assertEqual(1, len(data))
-        traits = filter(lambda x: x['name'] == 'trait_D', data[0]['traits'])
+        traits = [x for x in data[0]['traits'] if x['name'] == 'trait_D']
         self.assertEqual(1, len(traits))
         self.assertEqual('datetime', traits[0]['type'])
         self.assertEqual('2014-01-01T05:00:00', traits[0]['value'])
