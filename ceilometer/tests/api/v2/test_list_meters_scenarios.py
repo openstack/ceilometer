@@ -222,12 +222,13 @@ class TestListMeters(v2.FunctionalTest,
                              expect_errors=True)
         resp_string = jsonutils.loads(resp.body)
         fault_string = resp_string['error_message']['faultstring']
-        expected_error_message = ('Unknown argument: "non_valid_field_name"'
-                                  ': unrecognized field in query: '
-                                  '[<Query u\'non_valid_field_name\' '
-                                  'gt u\'3\' ')
+        msg = ('Unknown argument: "non_valid_field_name"'
+               ': unrecognized field in query: '
+               '[<Query {key!r} '
+               'gt {value!r} ')
+        msg = msg.format(key=u'non_valid_field_name', value=u'3')
         self.assertEqual(400, resp.status_code)
-        self.assertTrue(fault_string.startswith(expected_error_message))
+        self.assertTrue(fault_string.startswith(msg))
 
     def test_query_samples_with_invalid_field_name_and_eq_operator(self):
         resp = self.get_json('/samples',
@@ -237,12 +238,12 @@ class TestListMeters(v2.FunctionalTest,
                              expect_errors=True)
         resp_string = jsonutils.loads(resp.body)
         fault_string = resp_string['error_message']['faultstring']
-        expected_error_message = ('Unknown argument: "non_valid_field_name"'
-                                  ': unrecognized field in query: '
-                                  '[<Query u\'non_valid_field_name\' '
-                                  'eq u\'3\' ')
+        msg = ('Unknown argument: "non_valid_field_name"'
+               ': unrecognized field in query: '
+               '[<Query {key!r} eq {value!r} ')
+        msg = msg.format(key=u'non_valid_field_name', value=u'3')
         self.assertEqual(400, resp.status_code)
-        self.assertTrue(fault_string.startswith(expected_error_message))
+        self.assertTrue(fault_string.startswith(msg))
 
     def test_query_samples_with_invalid_operator_and_valid_field_name(self):
         resp = self.get_json('/samples',

@@ -2422,11 +2422,13 @@ class TestAlarms(v2.FunctionalTest,
         query = dict(field='alarm_id', op='eq', value='b')
         resp = self._get_alarm_history(alarm, query=query,
                                        expect_errors=True, status=400)
-        self.assertEqual(u'Unknown argument: "alarm_id": unrecognized'
-                         " field in query: [<Query u'alarm_id' eq"
-                         " u'b' Unset>], valid keys: ['project', "
-                         "'search_offset', 'severity', 'timestamp',"
-                         " 'type', 'user']",
+        msg = ('Unknown argument: "alarm_id": unrecognized'
+               " field in query: [<Query {key!r} eq"
+               " {value!r} Unset>], valid keys: ['project', "
+               "'search_offset', 'severity', 'timestamp',"
+               " 'type', 'user']")
+        msg = msg.format(key=u'alarm_id', value=u'b')
+        self.assertEqual(msg,
                          resp.json['error_message']['faultstring'])
 
     def test_get_alarm_history_constrained_by_not_supported_rule(self):
@@ -2434,11 +2436,13 @@ class TestAlarms(v2.FunctionalTest,
         query = dict(field='abcd', op='eq', value='abcd')
         resp = self._get_alarm_history(alarm, query=query,
                                        expect_errors=True, status=400)
-        self.assertEqual(u'Unknown argument: "abcd": unrecognized'
-                         " field in query: [<Query u'abcd' eq"
-                         " u'abcd' Unset>], valid keys: ['project', "
-                         "'search_offset', 'severity', 'timestamp',"
-                         " 'type', 'user']",
+        msg = ('Unknown argument: "abcd": unrecognized'
+               " field in query: [<Query {key!r} eq"
+               " {value!r} Unset>], valid keys: ['project', "
+               "'search_offset', 'severity', 'timestamp',"
+               " 'type', 'user']")
+        msg = msg.format(key=u'abcd', value=u'abcd')
+        self.assertEqual(msg,
                          resp.json['error_message']['faultstring'])
 
     def test_get_nonexistent_alarm_history(self):
