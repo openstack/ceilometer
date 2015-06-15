@@ -286,8 +286,11 @@ class TestListResources(v2.FunctionalTest,
 
         resp3 = self.get_json('/resources/resource-id-3', expect_errors=True)
         self.assertEqual(404, resp3.status_code)
+        json_data = resp3.body
+        if six.PY3:
+            json_data = json_data.decode('utf-8')
         self.assertEqual("Resource resource-id-3 Not Found",
-                         json.loads(resp3.body)['error_message']
+                         json.loads(json_data)['error_message']
                          ['faultstring'])
 
     def test_with_user(self):
