@@ -62,9 +62,9 @@ class RestAlarmNotifier(notifier.AlarmNotifier):
             headers['x-openstack-request-id'] = context.generate_request_id()
 
         LOG.info(_(
-            "Notifying alarm %(alarm_name)s %(alarm_id)s from "
-            "%(previous)s to %(current)s with action %(action)s because "
-            "%(reason)s. request-id: %(request_id)s ") %
+            "Notifying alarm %(alarm_name)s %(alarm_id)s with severity"
+            " %(severity)s from %(previous)s to %(current)s with action "
+            "%(action)s because %(reason)s. request-id: %(request_id)s ") %
             ({'alarm_name': alarm_name, 'alarm_id': alarm_id,
               'severity': severity, 'previous': previous,
               'current': current, 'action': action, 'reason': reason,
