@@ -54,10 +54,12 @@ cfg.CONF.register_opts(OPTS)
 # Resource ID: the resource ID
 # Timestamp: when the sample has been read
 # Resource metadata: various metadata
+# id: an uuid of a sample, can be taken from API  when post sample via API
 class Sample(object):
 
     def __init__(self, name, type, unit, volume, user_id, project_id,
-                 resource_id, timestamp, resource_metadata, source=None):
+                 resource_id, timestamp, resource_metadata, source=None,
+                 id=None):
         self.name = name
         self.type = type
         self.unit = unit
@@ -68,7 +70,7 @@ class Sample(object):
         self.timestamp = timestamp
         self.resource_metadata = resource_metadata
         self.source = source or cfg.CONF.sample_source
-        self.id = str(uuid.uuid1())
+        self.id = id or str(uuid.uuid1())
 
     def as_dict(self):
         return copy.copy(self.__dict__)
