@@ -141,22 +141,6 @@ class EphemeralDiskSize(ComputeInstanceNotificationBase):
             message=message)
 
 
-class InstanceFlavor(ComputeInstanceNotificationBase,
-                     plugin_base.NonMetricNotificationBase):
-    def get_sample(self, message):
-        instance_type = message.get('payload', {}).get('instance_type')
-        if instance_type:
-            yield sample.Sample.from_notification(
-                name='instance:%s' % instance_type,
-                type=sample.TYPE_GAUGE,
-                unit='instance',
-                volume=1,
-                user_id=message['payload']['user_id'],
-                project_id=message['payload']['tenant_id'],
-                resource_id=message['payload']['instance_id'],
-                message=message)
-
-
 class InstanceDelete(ComputeInstanceNotificationBase):
     """Handle the messages sent by the nova notifier plugin.
 
