@@ -195,22 +195,6 @@ NOTIFICATION_SNAPSHOT_DELETE_END = {
     "payload": SNAPSHOT_META,
     "timestamp": NOW}
 
-NOTIFICATION_SNAPSHOT_UPDATE_START = {
-    "message_id": "1d2944f9-f8e9-4b2b-8df1-465f759a63e8",
-    "publisher_id": "snapshots.example.com",
-    "event_type": "snapshot.update.start",
-    "priority": "info",
-    "payload": SNAPSHOT_META,
-    "timestamp": NOW}
-
-NOTIFICATION_SNAPSHOT_UPDATE_END = {
-    "message_id": "1d2944f9-f8e9-4b2b-8df1-465f759a63e8",
-    "publisher_id": "snapshots.example.com",
-    "event_type": "snapshot.update.end",
-    "priority": "info",
-    "payload": SNAPSHOT_META,
-    "timestamp": NOW}
-
 
 class TestNotifications(base.BaseTestCase):
 
@@ -349,21 +333,13 @@ class TestSnapshotNotifications(TestNotifications):
             NOTIFICATION_SNAPSHOT_DELETE_START, 'snapshot.delete.start')
         self._check_crud(
             NOTIFICATION_SNAPSHOT_DELETE_END, 'snapshot.delete.end')
-        self._check_crud(
-            NOTIFICATION_SNAPSHOT_UPDATE_START, 'snapshot.update.start')
-        self._check_crud(
-            NOTIFICATION_SNAPSHOT_UPDATE_END, 'snapshot.update.end')
         self._check(NOTIFICATION_SNAPSHOT_EXISTS)
         self._check(NOTIFICATION_SNAPSHOT_CREATE_START)
         self._check(NOTIFICATION_SNAPSHOT_CREATE_END)
         self._check(NOTIFICATION_SNAPSHOT_DELETE_START)
         self._check(NOTIFICATION_SNAPSHOT_DELETE_END)
-        self._check(NOTIFICATION_SNAPSHOT_UPDATE_START)
-        self._check(NOTIFICATION_SNAPSHOT_UPDATE_END)
         self._check_size(NOTIFICATION_SNAPSHOT_EXISTS)
         self._check_size(NOTIFICATION_SNAPSHOT_CREATE_START)
         self._check_size(NOTIFICATION_SNAPSHOT_CREATE_END)
         self._check_size(NOTIFICATION_SNAPSHOT_DELETE_START)
         self._check_size(NOTIFICATION_SNAPSHOT_DELETE_END)
-        self._check_size(NOTIFICATION_SNAPSHOT_UPDATE_START)
-        self._check_size(NOTIFICATION_SNAPSHOT_UPDATE_END)

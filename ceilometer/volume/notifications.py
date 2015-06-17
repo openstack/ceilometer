@@ -107,7 +107,6 @@ class SnapshotCRUDBase(VolumeBase):
         'snapshot.exists',
         'snapshot.create.*',
         'snapshot.delete.*',
-        'snapshot.update.*'
     ]
 
 
