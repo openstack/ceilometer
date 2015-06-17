@@ -87,7 +87,7 @@ class FirewallPolicyPollster(base.BaseServicesPollster):
             yield sample.Sample(
                 name='network.services.firewall.policy',
                 type=sample.TYPE_GAUGE,
-                unit='policy',
+                unit='firewall_policy',
                 volume=1,
                 user_id=None,
                 project_id=fw['tenant_id'],
