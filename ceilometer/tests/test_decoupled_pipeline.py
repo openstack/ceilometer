@@ -277,3 +277,16 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
                           pipeline.PipelineManager,
                           self.pipeline_cfg,
                           self.transformer_manager)
+
+    def test_duplicated_source_names(self):
+        self.pipeline_cfg['sources'].append({
+            'name': 'test_source',
+            'interval': 5,
+            'counters': ['a'],
+            'resources': [],
+            'sinks': ['test_sink']
+        })
+        self.assertRaises(pipeline.PipelineException,
+                          pipeline.PipelineManager,
+                          self.pipeline_cfg,
+                          self.transformer_manager)

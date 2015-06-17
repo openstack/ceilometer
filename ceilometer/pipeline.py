@@ -678,25 +678,43 @@ class PipelineManager(object):
                 raise PipelineException("Both sources & sinks are required",
                                         cfg)
             LOG.info(_('detected decoupled pipeline config format'))
-            sources = [p_type['source'](s) for s in cfg.get('sources', [])]
+
+            unique_names = set()
+            sources = []
+            for s in cfg.get('sources', []):
+                name = s.get('name')
+                if name in unique_names:
+                    raise PipelineException("Duplicated source names: %s" %
+                                            name, self)
+                else:
+                    unique_names.add(name)
+                    sources.append(p_type['source'](s))
+            unique_names.clear()
+
             sinks = {}
             for s in cfg.get('sinks', []):
-                if s['name'] in sinks:
+                name = s.get('name')
+                if name in unique_names:
                     raise PipelineException("Duplicated sink names: %s" %
-                                            s['name'], self)
+                                            name, self)
                 else:
+                    unique_names.add(name)
                     sinks[s['name']] = p_type['sink'](s, transformer_manager)
+            unique_names.clear()
+
             for source in sources:
                 source.check_sinks(sinks)
                 for target in source.sinks:
                     pipe = p_type['pipeline'](source, sinks[target])
-                    if pipe.name in [p.name for p in self.pipelines]:
+                    if pipe.name in unique_names:
                         raise PipelineException(
                             "Duplicate pipeline name: %s. Ensure pipeline"
                             " names are unique. (name is the source and sink"
                             " names combined)" % pipe.name, cfg)
                     else:
+                        unique_names.add(pipe.name)
                         self.pipelines.append(pipe)
+            unique_names.clear()
         else:
             LOG.warning(_('detected deprecated pipeline config format'))
             for pipedef in cfg:
