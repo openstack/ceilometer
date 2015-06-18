@@ -15,6 +15,7 @@
 """Test ACL."""
 
 import datetime
+import hashlib
 import json
 
 from oslo_utils import timeutils
@@ -32,9 +33,13 @@ VALID_TOKEN2 = '4562138218392832'
 
 
 class FakeMemcache(object):
-    @staticmethod
-    def get(key):
-        if key == "tokens/%s" % VALID_TOKEN:
+
+    TOKEN_HASH = hashlib.sha256(VALID_TOKEN).hexdigest()
+    TOKEN2_HASH = hashlib.sha256(VALID_TOKEN2).hexdigest()
+
+    def get(self, key):
+        if (key == "tokens/%s" % VALID_TOKEN or
+                key == "tokens/%s" % self.TOKEN_HASH):
             dt = timeutils.utcnow() + datetime.timedelta(minutes=5)
             return json.dumps(({'access': {
                 'token': {'id': VALID_TOKEN,
@@ -48,7 +53,8 @@ class FakeMemcache(object):
                         {'name': 'admin'},
                     ]},
             }}, timeutils.isotime(dt)))
-        if key == "tokens/%s" % VALID_TOKEN2:
+        if (key == "tokens/%s" % VALID_TOKEN2 or
+                key == "tokens/%s" % self.TOKEN2_HASH):
             dt = timeutils.utcnow() + datetime.timedelta(minutes=5)
             return json.dumps(({'access': {
                 'token': {'id': VALID_TOKEN2,
