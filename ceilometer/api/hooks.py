@@ -21,7 +21,7 @@ from oslo_log import log
 from pecan import hooks
 
 from ceilometer.i18n import _LE
-from ceilometer import pipeline
+from ceilometer import messaging
 from ceilometer import storage
 
 LOG = log.getLogger(__name__)
@@ -67,19 +67,20 @@ class DBHook(hooks.PecanHook):
                               "retry later: %(err)s") % params)
 
 
-class PipelineHook(hooks.PecanHook):
-    """Create and attach a pipeline to the request.
+class NotifierHook(hooks.PecanHook):
+    """Create and attach a notifier to the request.
 
-    That allows new samples to be posted via the /v2/meters/ API.
+    Usually, samples will be push to notification bus by notifier when they
+    are posted via /v2/meters/ API.
     """
 
     def __init__(self):
-        # this is done here as the cfg options are not available
-        # when the file is imported.
-        self.pipeline_manager = pipeline.setup_pipeline()
+        transport = messaging.get_transport()
+        self.notifier = messaging.get_notifier(transport,
+                                               publisher_id="ceilometer.api")
 
     def before(self, state):
-        state.request.pipeline_manager = self.pipeline_manager
+        state.request.notifier = self.notifier
 
 
 class TranslationHook(hooks.PecanHook):
