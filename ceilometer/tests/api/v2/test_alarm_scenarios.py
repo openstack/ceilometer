@@ -2080,7 +2080,7 @@ class TestAlarms(v2.FunctionalTest,
         resp = self.delete('/alarms/%s' % data[0]['alarm_id'],
                            headers=self.auth_headers,
                            status=204)
-        self.assertEqual('', resp.body)
+        self.assertEqual(b'', resp.body)
         alarms = list(self.alarm_conn.get_alarms())
         self.assertEqual(6, len(alarms))
 

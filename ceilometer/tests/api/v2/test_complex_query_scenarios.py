@@ -126,7 +126,7 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                               headers=non_admin_header)
 
         self.assertEqual(401, data.status_int)
-        self.assertIn("Not Authorized to access project project-id2",
+        self.assertIn(b"Not Authorized to access project project-id2",
                       data.body)
 
     def test_non_admin_tenant_can_explicitly_filter_for_own_project(self):
@@ -216,7 +216,8 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                               expect_errors=True)
 
         self.assertEqual(400, data.status_int)
-        self.assertIn("is not valid under any of the given schemas", data.body)
+        self.assertIn(b"is not valid under any of the given schemas",
+                      data.body)
 
     def test_query_with_wrong_json(self):
         data = self.post_json(self.url,
@@ -225,7 +226,7 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                               expect_errors=True)
 
         self.assertEqual(400, data.status_int)
-        self.assertIn("Filter expression not valid", data.body)
+        self.assertIn(b"Filter expression not valid", data.body)
 
     def test_query_with_field_name_user(self):
         data = self.post_json(self.url,
@@ -275,7 +276,7 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                               expect_errors=True)
 
         self.assertEqual(400, data.status_int)
-        self.assertIn("does not match '(?i)^asc$|^desc$'", data.body)
+        self.assertIn(b"does not match '(?i)^asc$|^desc$'", data.body)
 
     def test_query_with_wrong_json_in_orderby(self):
         data = self.post_json(self.url,
@@ -283,7 +284,7 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                               expect_errors=True)
 
         self.assertEqual(400, data.status_int)
-        self.assertIn("Order-by expression not valid: Extra data", data.body)
+        self.assertIn(b"Order-by expression not valid: Extra data", data.body)
 
     def test_filter_with_metadata(self):
         data = self.post_json(self.url,
@@ -309,7 +310,7 @@ class TestQueryMetersController(tests_api.FunctionalTest,
                               expect_errors=True)
 
         self.assertEqual(400, data.status_int)
-        self.assertIn("Limit should be positive", data.body)
+        self.assertIn(b"Limit should be positive", data.body)
 
 
 class TestQueryAlarmsController(tests_api.FunctionalTest,
@@ -405,7 +406,7 @@ class TestQueryAlarmsController(tests_api.FunctionalTest,
                               headers=non_admin_header)
 
         self.assertEqual(401, data.status_int)
-        self.assertIn("Not Authorized to access project project-id2",
+        self.assertIn(b"Not Authorized to access project project-id2",
                       data.body)
 
     def test_non_admin_tenant_can_explicitly_filter_for_own_project(self):
@@ -476,7 +477,7 @@ class TestQueryAlarmsController(tests_api.FunctionalTest,
                               expect_errors=True)
 
         self.assertEqual(400, data.status_int)
-        self.assertIn("Limit should be positive", data.body)
+        self.assertIn(b"Limit should be positive", data.body)
 
 
 class TestQueryAlarmsHistoryController(
@@ -538,7 +539,7 @@ class TestQueryAlarmsHistoryController(
                               headers=non_admin_header)
 
         self.assertEqual(401, data.status_int)
-        self.assertIn("Not Authorized to access project project-id2",
+        self.assertIn(b"Not Authorized to access project project-id2",
                       data.body)
 
     def test_non_admin_tenant_can_explicitly_filter_for_own_project(self):
@@ -596,4 +597,4 @@ class TestQueryAlarmsHistoryController(
                               expect_errors=True)
 
         self.assertEqual(400, data.status_int)
-        self.assertIn("Limit should be positive", data.body)
+        self.assertIn(b"Limit should be positive", data.body)

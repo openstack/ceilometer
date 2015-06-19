@@ -20,6 +20,7 @@ import base64
 import datetime
 
 from oslo_serialization import jsonutils
+import six
 import webtest.app
 
 from ceilometer.publisher import utils
@@ -704,4 +705,6 @@ class TestListMeters(v2.FunctionalTest,
         for i in data:
             meter_id = '%s+%s' % (i['resource_id'], i['name'])
             expected = base64.encodestring(meter_id.encode('utf-8'))
+            if six.PY3:
+                expected = expected.decode('ascii')
             self.assertEqual(expected, i['meter_id'])

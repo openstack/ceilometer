@@ -183,7 +183,7 @@ class TestMaxResourceVolume(v2.FunctionalTest,
                                  'value': 'user-id'}],
                              period=10000000000000)
         self.assertEqual(400, resp.status_code)
-        self.assertIn("Invalid period", resp.body)
+        self.assertIn(b"Invalid period", resp.body)
 
     def test_start_timestamp(self):
         data = self.get_json(self.PATH, q=[{'field': 'resource_id',
