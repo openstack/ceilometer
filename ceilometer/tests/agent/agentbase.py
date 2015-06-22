@@ -37,7 +37,6 @@ from ceilometer import publisher
 from ceilometer.publisher import test as test_publisher
 from ceilometer import sample
 from ceilometer.tests import base
-from ceilometer import transformer
 from ceilometer import utils
 
 
@@ -173,7 +172,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         params = []
 
     def setup_pipeline(self):
-        self.transformer_manager = transformer.TransformerExtensionManager(
+        self.transformer_manager = extension.ExtensionManager(
             'ceilometer.transformer',
         )
         self.mgr.pipeline_manager = pipeline.PipelineManager(

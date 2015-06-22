@@ -17,22 +17,6 @@ import abc
 import collections
 
 import six
-from stevedore import extension
-
-
-class TransformerExtensionManager(extension.ExtensionManager):
-
-    def __init__(self, namespace):
-        super(TransformerExtensionManager, self).__init__(
-            namespace=namespace,
-            invoke_on_load=False,
-            invoke_args=(),
-            invoke_kwds={}
-        )
-        self.by_name = dict((e.name, e) for e in self.extensions)
-
-    def get_ext(self, name):
-        return self.by_name[name]
 
 
 @six.add_metaclass(abc.ABCMeta)
