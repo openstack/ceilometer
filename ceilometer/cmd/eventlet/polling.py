@@ -16,10 +16,10 @@
 
 from oslo_config import cfg
 from oslo_log import log
+from oslo_service import service as os_service
 
 from ceilometer.agent import manager
 from ceilometer.i18n import _LW
-from ceilometer.openstack.common import service as os_service
 from ceilometer import service
 
 LOG = log.getLogger(__name__)
@@ -73,22 +73,22 @@ CONF.register_cli_opts(CLI_OPTS)
 
 def main():
     service.prepare_service()
-    os_service.launch(manager.AgentManager(CONF.polling_namespaces,
-                                           CONF.pollster_list)).wait()
+    os_service.launch(CONF, manager.AgentManager(CONF.polling_namespaces,
+                                                 CONF.pollster_list)).wait()
 
 
 # todo(dbelova): remove it someday. Needed for backward compatibility
 def main_compute():
     service.prepare_service()
-    os_service.launch(manager.AgentManager(['compute'])).wait()
+    os_service.launch(CONF, manager.AgentManager(['compute'])).wait()
 
 
 # todo(dbelova): remove it someday. Needed for backward compatibility
 def main_central():
     service.prepare_service()
-    os_service.launch(manager.AgentManager(['central'])).wait()
+    os_service.launch(CONF, manager.AgentManager(['central'])).wait()
 
 
 def main_ipmi():
     service.prepare_service()
-    os_service.launch(manager.AgentManager(['ipmi'])).wait()
+    os_service.launch(CONF, manager.AgentManager(['ipmi'])).wait()

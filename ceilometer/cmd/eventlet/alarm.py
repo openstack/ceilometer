@@ -14,16 +14,20 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from oslo_config import cfg
+from oslo_service import service as os_service
+
 from ceilometer.alarm import service as alarm_service
-from ceilometer.openstack.common import service as os_service
 from ceilometer import service
+
+CONF = cfg.CONF
 
 
 def notifier():
     service.prepare_service()
-    os_service.launch(alarm_service.AlarmNotifierService()).wait()
+    os_service.launch(CONF, alarm_service.AlarmNotifierService()).wait()
 
 
 def evaluator():
     service.prepare_service()
-    os_service.launch(alarm_service.AlarmEvaluationService()).wait()
+    os_service.launch(CONF, alarm_service.AlarmEvaluationService()).wait()

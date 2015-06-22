@@ -26,6 +26,7 @@ import random
 from oslo_config import cfg
 from oslo_context import context
 from oslo_log import log
+from oslo_service import service as os_service
 import six
 from six import moves
 from six.moves.urllib import parse as urlparse
@@ -34,7 +35,6 @@ from stevedore import extension
 from ceilometer.agent import plugin_base
 from ceilometer import coordination
 from ceilometer.i18n import _
-from ceilometer.openstack.common import service as os_service
 from ceilometer import pipeline as publish_pipeline
 from ceilometer import utils
 
