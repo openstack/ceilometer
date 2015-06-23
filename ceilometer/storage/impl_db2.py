@@ -179,13 +179,13 @@ class Connection(pymongo_base.Connection):
             # for their ENV.
             resource_id = self._generate_random_str(
                 cfg.CONF.database.db2nosql_resource_id_maxlen)
-            self.db.resource.insert({'_id': resource_id,
-                                     'no_key': resource_id})
+            self.db.resource.insert_one({'_id': resource_id,
+                                         'no_key': resource_id})
             meter_id = str(bson.objectid.ObjectId())
             timestamp = timeutils.utcnow()
-            self.db.meter.insert({'_id': meter_id,
-                                  'no_key': meter_id,
-                                  'timestamp': timestamp})
+            self.db.meter.insert_one({'_id': meter_id,
+                                      'no_key': meter_id,
+                                      'timestamp': timestamp})
 
             self.db.resource.create_index([
                 ('user_id', pymongo.ASCENDING),
@@ -232,7 +232,7 @@ class Connection(pymongo_base.Connection):
         data = copy.deepcopy(data)
         data['resource_metadata'] = pymongo_utils.improve_keys(
             data.pop('resource_metadata'))
-        self.db.resource.update(
+        self.db.resource.update_one(
             {'_id': data['resource_id']},
             {'$set': {'project_id': data['project_id'],
                       'user_id': data['user_id'] or 'null',
@@ -257,7 +257,7 @@ class Connection(pymongo_base.Connection):
         # automatically.
         if record.get('_id') is None:
             record['_id'] = str(bson.objectid.ObjectId())
-        self.db.meter.insert(record)
+        self.db.meter.insert_one(record)
 
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,

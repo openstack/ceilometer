@@ -58,7 +58,7 @@ class Connection(base.Connection):
                                    'trait_type': trait.dtype,
                                    'trait_value': trait.value})
             try:
-                self.db.event.insert(
+                self.db.event.insert_one(
                     {'_id': event_model.message_id,
                      'event_type': event_model.event_type,
                      'timestamp': event_model.generated,
