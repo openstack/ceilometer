@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-05-28 06:06+0000\n"
-"PO-Revision-Date: 2015-05-13 19:17+0000\n"
+"POT-Creation-Date: 2015-06-23 06:14+0000\n"
+"PO-Revision-Date: 2015-06-19 19:24+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: English (United Kingdom) (http://www.transifex.com/projects/p/"
 "ceilometer/language/en_GB/)\n"
@@ -30,30 +30,6 @@ msgstr "%(inspector)s does not provide data for  %(pollster)s"
 #, python-format
 msgid "%(rule)s must be set for %(type)s type alarm"
 msgstr "%(rule)s must be set for %(type)s type alarm"
-
-#, python-format
-msgid ""
-"%(what)s is deprecated as of %(as_of)s and may be removed in %(remove_in)s. "
-"It will not be superseded."
-msgstr ""
-"%(what)s is deprecated as of %(as_of)s and may be removed in %(remove_in)s. "
-"It will not be superseded."
-
-#, python-format
-msgid ""
-"%(what)s is deprecated as of %(as_of)s in favor of %(in_favor_of)s and may "
-"be removed in %(remove_in)s."
-msgstr ""
-"%(what)s is deprecated as of %(as_of)s in favor of %(in_favor_of)s and may "
-"be removed in %(remove_in)s."
-
-#, python-format
-msgid "%(what)s is deprecated as of %(as_of)s in favor of %(in_favor_of)s."
-msgstr "%(what)s is deprecated as of %(as_of)s in favour of %(in_favor_of)s."
-
-#, python-format
-msgid "%(what)s is deprecated as of %(as_of)s. It will not be superseded."
-msgstr "%(what)s is deprecated as of %(as_of)s. It will not be superseded."
 
 #, python-format
 msgid "%(worker_name)s value of %(workers)s is invalid, must be greater than 0"
@@ -196,10 +172,6 @@ msgstr "Could not get VM %s CPU Utilisation"
 msgid "Creating a new in-memory HBase Connection object"
 msgstr "Creating a new in-memory HBase Connection object"
 
-#, python-format
-msgid "Deprecated: %s"
-msgstr "Deprecated: %s"
-
 msgid "Dropping HBase schema..."
 msgstr "Dropping HBase schema..."
 
@@ -210,10 +182,6 @@ msgstr "Dropping Notification %(type)s (uuid:%(msgid)s)"
 #, python-format
 msgid "Duplicate VM name found: %s"
 msgstr "Duplicate VM name found: %s"
-
-#, python-format
-msgid "Error loading logging config %(log_config)s: %(err_msg)s"
-msgstr "Error loading logging config %(log_config)s: %(err_msg)s"
 
 #, python-format
 msgid "Error parsing HTTP response: %s"
@@ -268,10 +236,6 @@ msgstr "Failed to parse the timestamp value %s"
 #, python-format
 msgid "Failed to record metering data: %s"
 msgstr "Failed to record metering data: %s"
-
-#, python-format
-msgid "Fatal call to deprecated config: %(msg)s"
-msgstr "Fatal call to deprecated config: %(msg)s"
 
 #, python-format
 msgid "Getting traits for %s"
@@ -361,9 +325,6 @@ msgstr "Opencontrail API returned %(status)s %(reason)s"
 
 msgid "Opening in-memory HBase connection"
 msgstr "Opening in-memory HBase connection"
-
-msgid "Pagination not implemented"
-msgstr "Pagination not implemented"
 
 #, python-format
 msgid ""
@@ -670,10 +631,6 @@ msgid "comparing value %(value)s against threshold %(limit)s"
 msgstr "comparing value %(value)s against threshold %(limit)s"
 
 #, python-format
-msgid "computed value coming from %r"
-msgstr "computed value coming from %r"
-
-#, python-format
 msgid "connecting to HBase on %(host)s:%(port)s"
 msgstr "connecting to HBase on %(host)s:%(port)s"
 
@@ -788,7 +745,3 @@ msgstr "state invalid"
 #, python-format
 msgid "stats query %s"
 msgstr "stats query %s"
-
-#, python-format
-msgid "syslog facility must be one of: %s"
-msgstr "syslog facility must be one of: %s"
