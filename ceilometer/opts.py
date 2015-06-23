@@ -13,6 +13,8 @@
 # under the License.
 import itertools
 
+import oslo_service.eventlet_backdoor
+
 import ceilometer.agent.manager
 import ceilometer.alarm.notifier.rest
 import ceilometer.alarm.rpc
@@ -49,7 +51,6 @@ import ceilometer.notification
 import ceilometer.nova_client
 import ceilometer.objectstore.rgw
 import ceilometer.objectstore.swift
-import ceilometer.openstack.common.eventlet_backdoor
 import ceilometer.orchestration.notifications
 import ceilometer.pipeline
 import ceilometer.profiler.notifications
@@ -65,7 +66,8 @@ import ceilometer.volume.notifications
 def list_opts():
     return [
         ('DEFAULT',
-         itertools.chain(ceilometer.agent.base.OPTS,
+         itertools.chain(oslo_service.eventlet_backdoor.eventlet_backdoor_opts,
+                         ceilometer.agent.base.OPTS,
                          ceilometer.api.app.OPTS,
                          ceilometer.cmd.eventlet.polling.CLI_OPTS,
                          ceilometer.compute.notifications.OPTS,
@@ -82,8 +84,6 @@ def list_opts():
                          ceilometer.network.notifications.OPTS,
                          ceilometer.nova_client.OPTS,
                          ceilometer.objectstore.swift.OPTS,
-                         (ceilometer.openstack.common.eventlet_backdoor
-                          .eventlet_backdoor_opts),
                          ceilometer.orchestration.notifications.OPTS,
                          ceilometer.pipeline.OPTS,
                          ceilometer.profiler.notifications.OPTS,

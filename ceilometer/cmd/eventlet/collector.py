@@ -14,12 +14,16 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from oslo_config import cfg
+from oslo_service import service as os_service
+
 from ceilometer import collector
-from ceilometer.openstack.common import service as os_service
 from ceilometer import service
+
+CONF = cfg.CONF
 
 
 def main():
     service.prepare_service()
-    os_service.launch(collector.CollectorService(),
+    os_service.launch(CONF, collector.CollectorService(),
                       workers=service.get_workers('collector')).wait()

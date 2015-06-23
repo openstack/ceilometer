@@ -20,6 +20,7 @@ from oslo_config import fixture as fixture_config
 from oslo_context import context
 import oslo_messaging
 import oslo_messaging.conffixture
+import oslo_service.service
 from oslo_utils import timeutils
 import six
 from stevedore import extension
@@ -29,7 +30,6 @@ from ceilometer.compute.notifications import instance
 from ceilometer import messaging
 from ceilometer import notification
 from ceilometer.openstack.common import fileutils
-import ceilometer.openstack.common.service
 from ceilometer.publisher import test as test_publisher
 from ceilometer.tests import base as tests_base
 
@@ -286,7 +286,7 @@ class TestRealNotification(BaseRealNotification):
         fake_coord.return_value = fake_coord1
         self._check_notification_service()
 
-    @mock.patch.object(ceilometer.openstack.common.service.Service, 'stop')
+    @mock.patch.object(oslo_service.service.Service, 'stop')
     def test_notification_service_start_abnormal(self, mocked):
         try:
             self.srv.stop()
