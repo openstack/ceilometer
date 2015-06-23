@@ -99,7 +99,6 @@ class Connection(base.Connection):
         engine = self._engine_facade.get_engine()
         for table in reversed(models.Base.metadata.sorted_tables):
             engine.execute(table.delete())
-        self._engine_facade._session_maker.close_all()
         engine.dispose()
 
     def _retrieve_data(self, filter_expr, orderby, limit, table):
