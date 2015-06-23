@@ -34,8 +34,8 @@ VALID_TOKEN2 = '4562138218392832'
 
 class FakeMemcache(object):
 
-    TOKEN_HASH = hashlib.sha256(VALID_TOKEN).hexdigest()
-    TOKEN2_HASH = hashlib.sha256(VALID_TOKEN2).hexdigest()
+    TOKEN_HASH = hashlib.sha256(VALID_TOKEN.encode('utf-8')).hexdigest()
+    TOKEN2_HASH = hashlib.sha256(VALID_TOKEN2.encode('utf-8')).hexdigest()
 
     def get(self, key):
         if (key == "tokens/%s" % VALID_TOKEN or
