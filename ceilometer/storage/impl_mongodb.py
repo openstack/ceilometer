@@ -411,10 +411,10 @@ class Connection(pymongo_base.Connection):
 
     @staticmethod
     def update_ttl(ttl, ttl_index_name, index_field, coll):
-        """Update or ensure time_to_live indexes.
+        """Update or create time_to_live indexes.
 
         :param ttl: time to live in seconds.
-        :param ttl_index_name: name of the index we want to update or ensure.
+        :param ttl_index_name: name of the index we want to update or create.
         :param index_field: field with the index that we need to update.
         :param coll: collection which indexes need to be updated.
         """
@@ -474,7 +474,7 @@ class Connection(pymongo_base.Connection):
         self.db.meter.create_index([('timestamp', pymongo.DESCENDING)],
                                    name='timestamp_idx')
 
-        # update or ensure time_to_live index
+        # update or create time_to_live index
         ttl = cfg.CONF.database.metering_time_to_live
         self.update_ttl(ttl, 'meter_ttl', 'timestamp', self.db.meter)
         self.update_ttl(ttl, 'resource_ttl', 'last_sample_timestamp',
