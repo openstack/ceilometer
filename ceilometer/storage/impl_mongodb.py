@@ -473,9 +473,6 @@ class Connection(pymongo_base.Connection):
                                       sparse=True)
         self.db.meter.create_index([('timestamp', pymongo.DESCENDING)],
                                    name='timestamp_idx')
-        # remove API v1 related table
-        self.db.user.drop()
-        self.db.project.drop()
 
         # update or ensure time_to_live index
         ttl = cfg.CONF.database.metering_time_to_live

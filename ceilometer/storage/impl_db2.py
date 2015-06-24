@@ -207,10 +207,6 @@ class Connection(pymongo_base.Connection):
             self.db.resource.remove({'_id': resource_id})
             self.db.meter.remove({'_id': meter_id})
 
-        # remove API v1 related table
-        self.db.user.drop()
-        self.db.project.drop()
-
     def clear(self):
         # db2 does not support drop_database, remove all collections
         for col in ['resource', 'meter']:
