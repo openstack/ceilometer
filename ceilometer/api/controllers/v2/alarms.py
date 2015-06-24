@@ -435,6 +435,8 @@ class AlarmController(rest.RestController):
     def _record_change(self, data, now, on_behalf_of=None, type=None):
         if not cfg.CONF.alarm.record_history:
             return
+        if not data:
+            return
         type = type or alarm_models.AlarmChange.RULE_CHANGE
         scrubbed_data = utils.stringify_timestamps(data)
         detail = json.dumps(scrubbed_data)
