@@ -186,7 +186,7 @@ class LBHealthMonitorPollster(base.BaseServicesPollster):
             yield sample.Sample(
                 name='network.services.lb.health_monitor',
                 type=sample.TYPE_GAUGE,
-                unit='monitor',
+                unit='health_monitor',
                 volume=1,
                 user_id=None,
                 project_id=probe['tenant_id'],
