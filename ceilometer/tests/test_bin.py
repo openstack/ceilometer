@@ -226,7 +226,7 @@ class BinApiTestCase(base.BaseTestCase):
                           self.paste,
                           self.api_port))
 
-        self.subp = self.run_api(content)
+        self.subp = self.run_api(content, err_pipe=True)
 
         response, content = self.get_response('v2/alarms')
         self.assertEqual(200, response.status)
