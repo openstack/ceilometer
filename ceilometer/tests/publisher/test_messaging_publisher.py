@@ -218,6 +218,8 @@ class TestPublisher(testscenarios.testcase.WithScenarios,
                       if self.pub_func == 'publish_events' else
                       self.CONF.publisher_rpc.metering_topic)
 
+
+class TestPublisherPolicy(TestPublisher):
     def test_published_concurrency(self):
         """Test concurrent access to the local queue of the rpc publisher."""
 
@@ -293,6 +295,10 @@ class TestPublisher(testscenarios.testcase.WithScenarios,
             self.assertEqual(0, len(publisher.local_queue))
             fake_send.assert_called_once_with(
                 mock.ANY, self.topic, mock.ANY)
+
+
+@mock.patch('ceilometer.publisher.messaging.LOG', mock.Mock())
+class TestPublisherPolicyReactions(TestPublisher):
 
     def test_published_with_policy_drop_and_rpc_down(self):
         publisher = self.publisher_cls(
