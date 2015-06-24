@@ -430,7 +430,7 @@ class Connection(pymongo_base.Connection):
                 index={'keyPattern': {index_field: pymongo.ASCENDING},
                        'expireAfterSeconds': ttl})
 
-        coll.ensure_index([(index_field, pymongo.ASCENDING)],
+        coll.create_index([(index_field, pymongo.ASCENDING)],
                           expireAfterSeconds=ttl,
                           name=ttl_index_name)
 
@@ -453,13 +453,13 @@ class Connection(pymongo_base.Connection):
         background = dict(user_id=False, project_id=True)
         for primary in ['user_id', 'project_id']:
             name = 'resource_%sidx' % name_qualifier[primary]
-            self.db.resource.ensure_index([
+            self.db.resource.create_index([
                 (primary, pymongo.ASCENDING),
                 ('source', pymongo.ASCENDING),
             ], name=name, background=background[primary])
 
             name = 'meter_%sidx' % name_qualifier[primary]
-            self.db.meter.ensure_index([
+            self.db.meter.create_index([
                 ('resource_id', pymongo.ASCENDING),
                 (primary, pymongo.ASCENDING),
                 ('counter_name', pymongo.ASCENDING),
@@ -467,11 +467,11 @@ class Connection(pymongo_base.Connection):
                 ('source', pymongo.ASCENDING),
             ], name=name, background=background[primary])
 
-        self.db.resource.ensure_index([('last_sample_timestamp',
+        self.db.resource.create_index([('last_sample_timestamp',
                                         pymongo.DESCENDING)],
                                       name='last_sample_timestamp_idx',
                                       sparse=True)
-        self.db.meter.ensure_index([('timestamp', pymongo.DESCENDING)],
+        self.db.meter.create_index([('timestamp', pymongo.DESCENDING)],
                                    name='timestamp_idx')
         # remove API v1 related table
         self.db.user.drop()
