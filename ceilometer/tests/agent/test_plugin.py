@@ -28,22 +28,31 @@ class NotificationBaseTestCase(base.BaseTestCase):
     class FakePlugin(plugin_base.NotificationBase):
         event_types = ['compute.*']
 
-        @staticmethod
-        def get_exchange_topics(conf):
-            return [plugin_base.ExchangeTopics(exchange="exchange1",
-                                               topics=["t1", "t2"]),
-                    plugin_base.ExchangeTopics(exchange="exchange2",
-                                               topics=['t3'])]
-
         def process_notification(self, message):
-            return message
+            pass
 
-    def test_get_targets_compat(self):
-        targets = self.FakePlugin(mock.Mock()).get_targets(self.CONF)
-        self.assertEqual(3, len(targets))
-        self.assertEqual('t1', targets[0].topic)
-        self.assertEqual('exchange1', targets[0].exchange)
-        self.assertEqual('t2', targets[1].topic)
-        self.assertEqual('exchange1', targets[1].exchange)
-        self.assertEqual('t3', targets[2].topic)
-        self.assertEqual('exchange2', targets[2].exchange)
+        def get_targets(self, conf):
+            pass
+
+    def test_plugin_info(self):
+        plugin = self.FakePlugin(mock.Mock())
+        plugin.to_samples_and_publish = mock.Mock()
+        ctxt = {'user_id': 'fake_user_id', 'project_id': 'fake_project_id'}
+        publisher_id = 'fake.publisher_id'
+        event_type = 'fake.event'
+        payload = {'foo': 'bar'}
+        metadata = {'message_id': '3577a84f-29ec-4904-9566-12c52289c2e8',
+                    'timestamp': '2015-06-1909:19:35.786893'}
+        plugin.info(ctxt, publisher_id, event_type, payload, metadata)
+        notification = {
+            'priority': 'info',
+            'event_type': 'fake.event',
+            'timestamp': '2015-06-1909:19:35.786893',
+            '_context_user_id': 'fake_user_id',
+            '_context_project_id': 'fake_project_id',
+            'publisher_id': 'fake.publisher_id',
+            'payload': {'foo': 'bar'},
+            'message_id': '3577a84f-29ec-4904-9566-12c52289c2e8'
+        }
+        plugin.to_samples_and_publish.assert_called_with(mock.ANY,
+                                                         notification)

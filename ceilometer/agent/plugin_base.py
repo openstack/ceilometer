@@ -104,6 +104,7 @@ class NotificationBase(PluginBase):
         Strings are defining the event types to be given to this plugin.
         """
 
+    @abc.abstractmethod
     def get_targets(self, conf):
         """Return a sequence of oslo.messaging.Target.
 
@@ -111,18 +112,6 @@ class NotificationBase(PluginBase):
         plugin.
         :param conf: Configuration.
         """
-
-        # TODO(sileht): Backwards compatibility, remove in J+2
-        if hasattr(self, 'get_exchange_topics'):
-            LOG.warn(_('get_exchange_topics API of NotificationPlugin is'
-                       'deprecated, implements get_targets instead.'))
-
-            targets = []
-            for exchange, topics in self.get_exchange_topics(conf):
-                targets.extend(oslo_messaging.Target(topic=topic,
-                                                     exchange=exchange)
-                               for topic in topics)
-            return targets
 
     @abc.abstractmethod
     def process_notification(self, message):
