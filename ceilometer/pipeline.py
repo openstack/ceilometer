@@ -25,14 +25,15 @@ from oslo_config import cfg
 from oslo_log import log
 from oslo_utils import timeutils
 import six
+from stevedore import extension
 import yaml
+
 
 from ceilometer.event.storage import models
 from ceilometer.i18n import _
 from ceilometer import publisher
 from ceilometer.publisher import utils as publisher_utils
 from ceilometer import sample as sample_util
-from ceilometer import transformer as xformer
 
 
 OPTS = [
@@ -376,7 +377,7 @@ class Sink(object):
         for transformer in self.transformer_cfg:
             parameter = transformer['parameters'] or {}
             try:
-                ext = transformer_manager.get_ext(transformer['name'])
+                ext = transformer_manager[transformer['name']]
             except KeyError:
                 raise PipelineException(
                     "No transformer named %s loaded" % transformer['name'],
@@ -732,7 +733,7 @@ def _setup_pipeline_manager(cfg_file, transformer_manager, p_type=SAMPLE_TYPE):
 
     return PipelineManager(pipeline_cfg,
                            transformer_manager or
-                           xformer.TransformerExtensionManager(
+                           extension.ExtensionManager(
                                'ceilometer.transformer',
                            ), p_type)
 

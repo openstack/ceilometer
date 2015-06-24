@@ -139,17 +139,11 @@ class BasePipelineTestCase(base.BaseTestCase):
         )
 
         self.useFixture(mockpatch.PatchObject(
-            transformer.TransformerExtensionManager, "__init__",
-            side_effect=self.fake_tem_init))
-
-        self.useFixture(mockpatch.PatchObject(
-            transformer.TransformerExtensionManager, "get_ext",
-            side_effect=self.fake_tem_get_ext))
-
-        self.useFixture(mockpatch.PatchObject(
             publisher, 'get_publisher', side_effect=self.get_publisher))
 
-        self.transformer_manager = transformer.TransformerExtensionManager()
+        self.transformer_manager = mock.MagicMock()
+        self.transformer_manager.__getitem__.side_effect = \
+            self.fake_tem_get_ext
 
         self._setup_pipeline_cfg()
 

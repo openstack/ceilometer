@@ -15,10 +15,10 @@
 """Tests for ceilometer/notifier.py
 """
 from oslotest import base
+from stevedore import extension
 
 from ceilometer import notifier
 from ceilometer import pipeline
-from ceilometer import transformer
 
 
 MESSAGE = {
@@ -64,7 +64,7 @@ MESSAGE = {
 class TestNotifier(base.BaseTestCase):
 
     def test_process_notification(self):
-        transformer_manager = transformer.TransformerExtensionManager(
+        transformer_manager = extension.ExtensionManager(
             'ceilometer.transformer',
         )
         notifier._pipeline_manager = pipeline.PipelineManager(

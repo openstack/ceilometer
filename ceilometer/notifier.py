@@ -19,7 +19,6 @@ from stevedore import extension
 
 from ceilometer.i18n import _
 from ceilometer import pipeline
-from ceilometer import transformer
 
 
 LOG = logging.getLogger(__name__)
@@ -51,7 +50,7 @@ def _load_pipeline_manager():
     global _pipeline_manager
 
     _pipeline_manager = pipeline.setup_pipeline(
-        transformer.TransformerExtensionManager(
+        extension.ExtensionManager(
             'ceilometer.transformer',
         ),
     )
