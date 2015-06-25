@@ -1,0 +1,13 @@
+# This test runs against the Events API and confirms the
+# content-location header includes a prefix.
+fixtures:
+- ConfigFixture
+- EventDataFixture
+
+tests:
+
+- name: get all events
+  url: /v2/events
+  response_headers:
+      content-type: application/json; charset=UTF-8
+      content-location: /$SCHEME://.*/telemetry/v2/events/
