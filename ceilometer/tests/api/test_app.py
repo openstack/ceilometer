@@ -39,6 +39,7 @@ class TestApp(base.BaseTestCase):
 
     @mock.patch('ceilometer.storage.get_connection_from_config',
                 mock.MagicMock())
+    @mock.patch('ceilometer.api.hooks.PipelineHook', mock.MagicMock())
     @mock.patch('pecan.make_app')
     def test_pecan_debug(self, mocked):
         def _check_pecan_debug(g_debug, p_debug, expected, workers=1):
