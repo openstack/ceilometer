@@ -10,28 +10,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from sqlalchemy import MetaData
-from sqlalchemy import String
-from sqlalchemy import Table
-
 
 def upgrade(migrate_engine):
-    meta = MetaData(bind=migrate_engine)
-    resource = Table('resource', meta, autoload=True)
-    resource.c.user_id.alter(type=String(128))
-    resource.c.project_id.alter(type=String(128))
-    resource.c.resource_id.alter(type=String(128))
-    resource.c.source_id.alter(type=String(128))
-    sample = Table('sample', meta, autoload=True)
-    sample.c.message_signature.alter(type=String(64))
-    sample.c.message_id.alter(type=String(128))
-    alarm = Table('alarm', meta, autoload=True)
-    alarm.c.alarm_id.alter(type=String(128))
-    alarm.c.user_id.alter(type=String(128))
-    alarm.c.project_id.alter(type=String(128))
-    alarm_history = Table('alarm_history', meta, autoload=True)
-    alarm_history.c.alarm_id.alter(type=String(128))
-    alarm_history.c.user_id.alter(type=String(128))
-    alarm_history.c.project_id.alter(type=String(128))
-    alarm_history.c.event_id.alter(type=String(128))
-    alarm_history.c.on_behalf_of.alter(type=String(128))
+    # NOTE(gordc): this is a noop script to handle bug1468916
+    # previous lowering of id length will fail if db contains data longer.
+    # this skips migration for those failing. the next script will resize
+    # if this original migration passed.
+    pass
