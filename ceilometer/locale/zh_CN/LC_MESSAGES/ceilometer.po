@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-05-28 06:06+0000\n"
-"PO-Revision-Date: 2015-05-13 19:17+0000\n"
+"POT-Creation-Date: 2015-06-23 06:14+0000\n"
+"PO-Revision-Date: 2015-06-19 19:24+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/"
 "ceilometer/language/zh_CN/)\n"
@@ -200,10 +200,6 @@ msgstr "无法为实例%s获取IP地址"
 msgid "Creating a new in-memory HBase Connection object"
 msgstr "正在创建一个新的内存HBase连接对象。"
 
-#, python-format
-msgid "Deprecated: %s"
-msgstr "建议不要使用：%s"
-
 msgid ""
 "Dispatcher target was not set, no meter will be posted. Set the target in "
 "the ceilometer.conf file"
@@ -223,10 +219,6 @@ msgstr "正在根据TTL %d丢弃监控数据"
 #, python-format
 msgid "Duplicate VM name found: %s"
 msgstr "找到重复 VM 名称：%s"
-
-#, python-format
-msgid "Error loading logging config %(log_config)s: %(err_msg)s"
-msgstr "日志配置加载错误 %(log_config)s: %(err_msg)s"
 
 #, python-format
 msgid "Error parsing HTTP response: %s"
@@ -318,10 +310,6 @@ msgid "Failed to record metering data: %s"
 msgstr "无法保存监控数据：%s"
 
 #, python-format
-msgid "Fatal call to deprecated config: %(msg)s"
-msgstr "对建议不要使用的配置进行了后果极严重的调用：%(msg)s"
-
-#, python-format
 msgid "Filter expression not valid: %s"
 msgstr "过滤表达式不合法：%s"
 
@@ -402,14 +390,6 @@ msgstr "权限不足以访问%(aspect)s %(id)s"
 
 #, python-format
 msgid ""
-"Notifying alarm %(alarm_name)s %(alarm_id)s from %(previous)s to %(current)s "
-"with action %(action)s because %(reason)s. request-id: %(request_id)s "
-msgstr ""
-"正在通知告警%(alarm_name)s %(alarm_id)s从状态%(previous)s变为%(current)s，动"
-"作为%(action)s，原因为%(reason)s。请求编号：%(request_id)s"
-
-#, python-format
-msgid ""
 "Notifying alarm %(alarm_name)s %(alarm_id)s of %(severity)s priority from "
 "%(previous)s to %(current)s with action %(action)s because %(reason)s."
 msgstr ""
@@ -446,9 +426,6 @@ msgstr "正在打开内存HBase连接。"
 #, python-format
 msgid "Order-by expression not valid: %s"
 msgstr "orderby表达式不合法：%s"
-
-msgid "Pagination not implemented"
-msgstr "未实现分页操作"
 
 msgid "Passed resource dict must contain keys resource_id and resource_url."
 msgstr "传入的资源字典必须包含键resource_id和resource_url"
@@ -934,10 +911,6 @@ msgstr "state_timestamp必须是datetime对象"
 #, python-format
 msgid "stats query %s"
 msgstr "统计信息查询 %s"
-
-#, python-format
-msgid "syslog facility must be one of: %s"
-msgstr "系统日志工具必须是下列其中一项：%s"
 
 msgid "timestamp should be datetime object"
 msgstr "timestamp必须是datatime对象"

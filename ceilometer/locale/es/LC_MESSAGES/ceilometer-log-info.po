@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-05-28 06:06+0000\n"
-"PO-Revision-Date: 2015-05-11 05:13+0000\n"
+"POT-Creation-Date: 2015-06-23 06:14+0000\n"
+"PO-Revision-Date: 2015-06-22 20:46+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Spanish (http://www.transifex.com/projects/p/ceilometer/"
 "language/es/)\n"
@@ -56,6 +56,9 @@ msgstr "Se ha iniciado el hijo %d"
 #, python-format
 msgid "Starting %d workers"
 msgstr "Iniciando %d trabajadores"
+
+msgid "Wait called after thread killed. Cleaning up."
+msgstr "Esperar llamado después de cortar la línea. Limpiando."
 
 #, python-format
 msgid "Waiting on %d children to exit"
