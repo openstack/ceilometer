@@ -114,10 +114,10 @@ class ConnectionTest(test_base.BaseTestCase):
                               group='database')
         impl_db2.Connection('db2://user:pwd@localhost:27017/ceilodb2')
         resource_id = 'wew' * 247 + 'x' * 3
-        conn_mock.ceilodb2.resource.insert.assert_called_with(
+        conn_mock.ceilodb2.resource.insert_one.assert_called_with(
             {'_id': resource_id,
              'no_key': resource_id})
-        conn_mock.ceilodb2.meter.insert.assert_called_with(
+        conn_mock.ceilodb2.meter.insert_one.assert_called_with(
             {'_id': '54b8860d75bfe43b54e84ce7',
              'no_key': '54b8860d75bfe43b54e84ce7',
              'timestamp': 'timestamp'})

@@ -498,7 +498,7 @@ class Connection(pymongo_base.Connection):
         data = copy.deepcopy(data)
         data['resource_metadata'] = pymongo_utils.improve_keys(
             data.pop('resource_metadata'))
-        resource = self.db.resource.find_and_modify(
+        resource = self.db.resource.find_one_and_update(
             {'_id': data['resource_id']},
             {'$set': {'project_id': data['project_id'],
                       'user_id': data['user_id'],
@@ -515,7 +515,7 @@ class Connection(pymongo_base.Connection):
                            },
              },
             upsert=True,
-            new=True,
+            return_document=pymongo.ReturnDocument.AFTER,
         )
 
         # only update last sample timestamp if actually later (the usual
@@ -523,7 +523,7 @@ class Connection(pymongo_base.Connection):
         last_sample_timestamp = resource.get('last_sample_timestamp')
         if (last_sample_timestamp is None or
                 last_sample_timestamp <= data['timestamp']):
-            self.db.resource.update(
+            self.db.resource.update_one(
                 {'_id': data['resource_id']},
                 {'$set': {'metadata': data['resource_metadata'],
                           'last_sample_timestamp': data['timestamp']}}
@@ -537,7 +537,7 @@ class Connection(pymongo_base.Connection):
         first_sample_timestamp = resource.get('first_sample_timestamp')
         if (first_sample_timestamp is not None and
                 first_sample_timestamp > data['timestamp']):
-            self.db.resource.update(
+            self.db.resource.update_one(
                 {'_id': data['resource_id']},
                 {'$set': {'first_sample_timestamp': data['timestamp']}}
             )
@@ -547,7 +547,7 @@ class Connection(pymongo_base.Connection):
         # a new key '_id').
         record = copy.copy(data)
         record['recorded_at'] = timeutils.utcnow()
-        self.db.meter.insert(record)
+        self.db.meter.insert_one(record)
 
     def clear_expired_metering_data(self, ttl):
         """Clear expired data from the backend storage system.
