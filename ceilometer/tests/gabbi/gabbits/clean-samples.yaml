@@ -8,7 +8,7 @@ tests:
 
     - name: post sample for meter
       desc: post a single sample
-      url: /v2/meters/apples?direct=True
+      url: /v2/meters/apples
       method: POST
       request_headers:
           content-type: application/json
@@ -41,7 +41,7 @@ tests:
     - name: post a sample expect location
       desc: https://bugs.launchpad.net/ceilometer/+bug/1426426
       xfail: true
-      url: /v2/meters/apples?direct=True
+      url: /v2/meters/apples
       method: POST
       request_headers:
           content-type: application/json
