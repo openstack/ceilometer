@@ -64,6 +64,7 @@ Developer Documentation
    new_meters
    testing
    contributing
+   gmr
 
 Appendix
 ========
