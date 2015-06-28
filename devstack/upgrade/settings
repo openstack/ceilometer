@@ -1,0 +1,7 @@
+register_project_for_upgrade ceilometer
+
+devstack_localrc base enable_plugin ceilometer git://git.openstack.org/openstack/ceilometer
+devstack_localrc base enable_service ceilometer-acompute ceilometer-acentral ceilometer-aipmi ceilometer-anotification ceilometer-collector ceilometer-api ceilometer-alarm-notifier ceilometer-alarm-evaluator tempest
+
+devstack_localrc target enable_plugin ceilometer git://git.openstack.org/openstack/ceilometer
+devstack_localrc target enable_service ceilometer-acompute ceilometer-acentral ceilometer-aipmi ceilometer-anotification ceilometer-collector ceilometer-api ceilometer-alarm-notifier ceilometer-alarm-evaluator tempest
