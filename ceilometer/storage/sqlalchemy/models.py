@@ -177,10 +177,10 @@ class Resource(Base):
     )
 
     internal_id = Column(Integer, primary_key=True)
-    user_id = Column(String(128))
-    project_id = Column(String(128))
-    source_id = Column(String(128))
-    resource_id = Column(String(128), nullable=False)
+    user_id = Column(String(255))
+    project_id = Column(String(255))
+    source_id = Column(String(255))
+    resource_id = Column(String(255), nullable=False)
     resource_metadata = deferred(Column(JSONEncodedDict()))
     metadata_hash = deferred(Column(String(32)))
     samples = relationship("Sample", backref="resource")
@@ -261,8 +261,8 @@ class Alarm(Base):
     description = Column(Text)
     timestamp = Column(PreciseTimestamp, default=lambda: timeutils.utcnow())
 
-    user_id = Column(String(128))
-    project_id = Column(String(128))
+    user_id = Column(String(255))
+    project_id = Column(String(255))
 
     state = Column(String(255))
     state_timestamp = Column(PreciseTimestamp,
@@ -285,9 +285,9 @@ class AlarmChange(Base):
     )
     event_id = Column(String(128), primary_key=True)
     alarm_id = Column(String(128))
-    on_behalf_of = Column(String(128))
-    project_id = Column(String(128))
-    user_id = Column(String(128))
+    on_behalf_of = Column(String(255))
+    project_id = Column(String(255))
+    user_id = Column(String(255))
     type = Column(String(20))
     detail = Column(Text)
     timestamp = Column(PreciseTimestamp, default=lambda: timeutils.utcnow())
