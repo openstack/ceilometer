@@ -15,6 +15,7 @@
 """Test event, event_type and trait retrieval."""
 
 import datetime
+import uuid
 
 import webtest.app
 
@@ -450,3 +451,57 @@ class TestEventAPI(EventTestBase):
                               'value': '1',
                               'type': 'integer',
                               'op': 'el'}])
+
+
+class EventRestrictionTestBase(v2.FunctionalTest,
+                               tests_db.MixinTestsWithBackendScenarios):
+
+    def setUp(self):
+        super(EventRestrictionTestBase, self).setUp()
+        self.CONF.set_override('default_api_return_limit', 10, group='api')
+        self._generate_models()
+
+    def _generate_models(self):
+        event_models = []
+        base = 0
+        self.s_time = datetime.datetime(2013, 12, 31, 5, 0)
+        self.trait_time = datetime.datetime(2013, 12, 31, 5, 0)
+        for i in range(20):
+            trait_models = [models.Trait(name, type, value)
+                            for name, type, value in [
+                                ('trait_A', models.Trait.TEXT_TYPE,
+                                    "my_text"),
+                                ('trait_B', models.Trait.INT_TYPE,
+                                    base + 1),
+                                ('trait_C', models.Trait.FLOAT_TYPE,
+                                    float(base) + 0.123456),
+                                ('trait_D', models.Trait.DATETIME_TYPE,
+                                    self.trait_time)]]
+
+            event_models.append(
+                models.Event(message_id=str(uuid.uuid4()),
+                             event_type='foo.bar',
+                             generated=self.trait_time,
+                             traits=trait_models,
+                             raw={'status': {'nested': 'started'}}))
+            self.trait_time += datetime.timedelta(seconds=1)
+        self.event_conn.record_events(event_models)
+
+
+class TestEventRestriction(EventRestrictionTestBase):
+
+    def test_get_limit(self):
+        data = self.get_json('/events?limit=1', headers=headers)
+        self.assertEqual(1, len(data))
+
+    def test_get_limit_negative(self):
+        self.assertRaises(webtest.app.AppError,
+                          self.get_json, '/events?limit=-2', headers=headers)
+
+    def test_get_limit_bigger(self):
+        data = self.get_json('/events?limit=100', headers=headers)
+        self.assertEqual(20, len(data))
+
+    def test_get_default_limit(self):
+        data = self.get_json('/events', headers=headers)
+        self.assertEqual(10, len(data))

@@ -123,18 +123,21 @@ class Connection(hbase_base.Connection, base.Connection):
         if error:
             raise error
 
-    def get_events(self, event_filter):
+    def get_events(self, event_filter, limit=None):
         """Return an iter of models.Event objects.
 
         :param event_filter: storage.EventFilter object, consists of filters
           for events that are stored in database.
         """
+        if limit == 0:
+            return
         q, start, stop = hbase_utils.make_events_query_from_filter(
             event_filter)
         with self.conn_pool.connection() as conn:
             events_table = conn.table(self.EVENT_TABLE)
 
-            gen = events_table.scan(filter=q, row_start=start, row_stop=stop)
+            gen = events_table.scan(filter=q, row_start=start, row_stop=stop,
+                                    limit=limit)
 
         for event_id, data in gen:
             traits = []

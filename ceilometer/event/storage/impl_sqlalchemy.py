@@ -203,12 +203,13 @@ class Connection(base.Connection):
         if error:
             raise error
 
-    def get_events(self, event_filter):
+    def get_events(self, event_filter, limit=None):
         """Return an iterable of model.Event objects.
 
         :param event_filter: EventFilter instance
         """
-
+        if limit == 0:
+            return
         session = self._engine_facade.get_session()
         with session.begin():
             # Build up the join conditions
@@ -260,46 +261,49 @@ class Connection(base.Connection):
             if event_filter_conditions:
                 query = query.filter(sa.and_(*event_filter_conditions))
 
+            query = query.order_by(models.Event.generated).limit(limit)
             event_list = {}
             # get a list of all events that match filters
             for (id_, generated, message_id,
                  desc, raw) in query.add_columns(
                      models.Event.generated, models.Event.message_id,
-                     models.EventType.desc, models.Event.raw).order_by(
-                         models.Event.generated).all():
+                     models.EventType.desc, models.Event.raw).all():
                 event_list[id_] = api_models.Event(message_id, desc,
                                                    generated, [], raw)
             # Query all traits related to events.
             # NOTE (gordc): cast is done because pgsql defaults to TEXT when
             #               handling unknown values such as null.
             trait_q = (
-                query.join(
-                    models.TraitDatetime,
-                    models.TraitDatetime.event_id == models.Event.id)
-                .add_columns(
+                session.query(
+                    models.TraitDatetime.event_id,
                     models.TraitDatetime.key, models.TraitDatetime.value,
                     sa.cast(sa.null(), sa.Integer),
                     sa.cast(sa.null(), sa.Float(53)),
                     sa.cast(sa.null(), sa.String(255)))
+                .filter(sa.exists().where(
+                    models.TraitDatetime.event_id == query.subquery().c.id))
             ).union(
-                query.join(
-                    models.TraitInt,
-                    models.TraitInt.event_id == models.Event.id)
-                .add_columns(models.TraitInt.key, sa.null(),
-                             models.TraitInt.value, sa.null(), sa.null()),
-                query.join(
-                    models.TraitFloat,
-                    models.TraitFloat.event_id == models.Event.id)
-                .add_columns(models.TraitFloat.key, sa.null(),
-                             sa.null(), models.TraitFloat.value, sa.null()),
-                query.join(
-                    models.TraitText,
-                    models.TraitText.event_id == models.Event.id)
-                .add_columns(models.TraitText.key, sa.null(),
-                             sa.null(), sa.null(), models.TraitText.value))
+                session.query(
+                    models.TraitInt.event_id,
+                    models.TraitInt.key, sa.null(),
+                    models.TraitInt.value, sa.null(), sa.null())
+                .filter(sa.exists().where(
+                    models.TraitInt.event_id == query.subquery().c.id)),
+                session.query(
+                    models.TraitFloat.event_id,
+                    models.TraitFloat.key, sa.null(), sa.null(),
+                    models.TraitFloat.value, sa.null())
+                .filter(sa.exists().where(
+                    models.TraitFloat.event_id == query.subquery().c.id)),
+                session.query(
+                    models.TraitText.event_id,
+                    models.TraitText.key, sa.null(), sa.null(), sa.null(),
+                    models.TraitText.value)
+                .filter(sa.exists().where(
+                    models.TraitText.event_id == query.subquery().c.id)))
 
             for id_, key, t_date, t_int, t_float, t_text in (
-                    trait_q.order_by('2')).all():
+                    trait_q.order_by(models.TraitDatetime.key)).all():
                 if t_int is not None:
                     dtype = api_models.Trait.INT_TYPE
                     val = t_int

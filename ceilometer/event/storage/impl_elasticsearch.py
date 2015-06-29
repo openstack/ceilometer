@@ -172,11 +172,15 @@ class Connection(base.Connection):
                                     {'filter': {'bool': {'must': filters}}}}}
         return q_args
 
-    def get_events(self, event_filter):
+    def get_events(self, event_filter, limit=None):
+        if limit == 0:
+            return
         iclient = es.client.IndicesClient(self.conn)
         indices = iclient.get_mapping('%s_*' % self.index_name).keys()
         if indices:
             filter_args = self._make_dsl_from_filter(indices, event_filter)
+            if limit is not None:
+                filter_args['size'] = limit
             results = self.conn.search(fields=['_id', 'timestamp',
                                                '_type', '_source'],
                                        sort='timestamp:asc',
