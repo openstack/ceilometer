@@ -169,7 +169,9 @@ def _event_query_to_event_filter(q):
         if not i.op:
             i.op = 'eq'
         elif i.op not in base.operation_kind:
-            error = _("operator {} is incorrect").format(i.op)
+            error = (_('operator %(operator)s is not supported. the supported'
+                       ' operators are: %(supported)s') %
+                     {'operator': i.op, 'supported': base.operation_kind})
             raise base.ClientSideError(error)
         if i.field in evt_model_filter:
             evt_model_filter[i.field] = i.value

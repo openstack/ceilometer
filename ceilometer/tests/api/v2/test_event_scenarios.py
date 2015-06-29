@@ -207,6 +207,18 @@ class TestEventAPI(EventTestBase):
                          "\'float\', \'string\', \'datetime\']",
                          resp.json['error_message']['faultstring'])
 
+    def test_get_events_filter_operator_invalid_type(self):
+        resp = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_A',
+                                 'value': 'my_Foo_text',
+                                 'op': 'whats-up'}],
+                             expect_errors=True)
+        self.assertEqual(400, resp.status_code)
+        self.assertEqual("operator whats-up is not supported. the "
+                         "supported operators are: (\'lt\', \'le\', "
+                         "\'eq\', \'ne\', \'ge\', \'gt\')",
+                         resp.json['error_message']['faultstring'])
+
     def test_get_events_filter_text_trait(self):
         data = self.get_json(self.PATH, headers=headers,
                              q=[{'field': 'trait_A',
