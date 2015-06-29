@@ -122,8 +122,7 @@ class SamplesController(rest.RestController):
 
         q = q or []
 
-        if limit and limit < 0:
-            raise base.ClientSideError(_("Limit must be positive"))
+        limit = utils.enforce_limit(limit)
         kwargs = utils.query_to_kwargs(q, storage.SampleFilter.__init__)
         f = storage.SampleFilter(**kwargs)
         return map(Sample.from_db_model,

@@ -20,7 +20,6 @@ import datetime
 import mock
 from oslo_utils import timeutils
 import six
-import webtest.app
 
 from ceilometer.publisher import utils
 from ceilometer import sample
@@ -85,19 +84,6 @@ class TestListEvents(v2.FunctionalTest,
 
     def test_all_trailing_slash(self):
         data = self.get_json('/meters/instance/')
-        self.assertEqual(2, len(data))
-
-    def test_all_limit(self):
-        data = self.get_json('/meters/instance?limit=1')
-        self.assertEqual(1, len(data))
-
-    def test_all_limit_negative(self):
-        self.assertRaises(webtest.app.AppError,
-                          self.get_json,
-                          '/meters/instance?limit=-2')
-
-    def test_all_limit_bigger(self):
-        data = self.get_json('/meters/instance?limit=42')
         self.assertEqual(2, len(data))
 
     def test_empty_project(self):
