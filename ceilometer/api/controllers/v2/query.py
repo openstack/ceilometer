@@ -28,8 +28,6 @@ from pecan import rest
 from wsme import types as wtypes
 import wsmeext.pecan as wsme_pecan
 
-from ceilometer.alarm.storage import models as alarm_models
-from ceilometer.api.controllers.v2 import alarms
 from ceilometer.api.controllers.v2 import base
 from ceilometer.api.controllers.v2 import samples
 from ceilometer.api.controllers.v2 import utils as v2_utils
@@ -356,45 +354,6 @@ class QuerySamplesController(rest.RestController):
                                             query.limit)]
 
 
-class QueryAlarmHistoryController(rest.RestController):
-    """Provides complex query possibilities for alarm history."""
-    @wsme_pecan.wsexpose([alarms.AlarmChange], body=ComplexQuery)
-    def post(self, body):
-        """Define query for retrieving AlarmChange data.
+class QueryController(rest.RestController):
 
-        :param body: Query rules for the alarm history to be returned.
-        """
-
-        rbac.enforce('query_alarm_history', pecan.request)
-
-        query = ValidatedComplexQuery(body,
-                                      alarm_models.AlarmChange)
-        query.validate(visibility_field="on_behalf_of")
-        conn = pecan.request.alarm_storage_conn
-        return [alarms.AlarmChange.from_db_model(s)
-                for s in conn.query_alarm_history(query.filter_expr,
-                                                  query.orderby,
-                                                  query.limit)]
-
-
-class QueryAlarmsController(rest.RestController):
-    """Provides complex query possibilities for alarms."""
-    history = QueryAlarmHistoryController()
-
-    @wsme_pecan.wsexpose([alarms.Alarm], body=ComplexQuery)
-    def post(self, body):
-        """Define query for retrieving Alarm data.
-
-        :param body: Query rules for the alarms to be returned.
-        """
-
-        rbac.enforce('query_alarm', pecan.request)
-
-        query = ValidatedComplexQuery(body,
-                                      alarm_models.Alarm)
-        query.validate(visibility_field="project_id")
-        conn = pecan.request.alarm_storage_conn
-        return [alarms.Alarm.from_db_model(s)
-                for s in conn.query_alarms(query.filter_expr,
-                                           query.orderby,
-                                           query.limit)]
+    samples = QuerySamplesController()

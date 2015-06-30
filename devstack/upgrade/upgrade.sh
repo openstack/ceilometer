@@ -78,8 +78,6 @@ ensure_services_started "ceilometer-polling --polling-namespaces compute" \
                         "ceilometer-polling --polling-namespaces central" \
                         "ceilometer-polling --polling-namespaces ipmi" \
                         ceilometer-agent-notification \
-                        ceilometer-alarm-evaluator \
-                        ceilometer-alarm-notifier \
                         ceilometer-api \
                         ceilometer-collector
 

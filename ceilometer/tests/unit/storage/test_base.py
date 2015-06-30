@@ -46,9 +46,6 @@ class BaseTest(testbase.BaseTestCase):
                          times[21])
 
     def test_handle_sort_key(self):
-        sort_keys_alarm = base._handle_sort_key('alarm')
-        self.assertEqual(['name', 'user_id', 'project_id'], sort_keys_alarm)
-
         sort_keys_meter = base._handle_sort_key('meter', 'foo')
         self.assertEqual(['foo', 'user_id', 'project_id'], sort_keys_meter)
 

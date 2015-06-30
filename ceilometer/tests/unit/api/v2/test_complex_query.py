@@ -24,7 +24,6 @@ import mock
 from oslotest import base
 import wsme
 
-from ceilometer.alarm.storage import models as alarm_models
 from ceilometer.api.controllers.v2 import query
 from ceilometer.storage import models
 
@@ -54,9 +53,6 @@ class TestComplexQuery(base.BaseTestCase):
         self.query = FakeComplexQuery(models.Sample,
                                       sample_name_mapping,
                                       True)
-        self.query_alarm = FakeComplexQuery(alarm_models.Alarm)
-        self.query_alarmchange = FakeComplexQuery(
-            alarm_models.AlarmChange)
 
     def test_replace_isotime_utc(self):
         filter_expr = {"=": {"timestamp": "2013-12-05T19:38:29Z"}}
@@ -117,38 +113,12 @@ class TestComplexQuery(base.BaseTestCase):
                           self.query._validate_filter,
                           filter)
 
-    def test_invalid_filter_misstyped_field_name_alarms(self):
-        filter = {"=": {"enabbled": True}}
-        self.assertRaises(jsonschema.ValidationError,
-                          self.query_alarm._validate_filter,
-                          filter)
-
-    def test_invalid_filter_misstyped_field_name_alarmchange(self):
-        filter = {"=": {"tpe": "rule change"}}
-        self.assertRaises(jsonschema.ValidationError,
-                          self.query_alarmchange._validate_filter,
-                          filter)
-
     def test_invalid_complex_filter_wrong_field_names(self):
         filter = {"and":
                   [{"=": {"non_existing_field": 42}},
                    {"=": {"project_id": 42}}]}
         self.assertRaises(jsonschema.ValidationError,
                           self.query._validate_filter,
-                          filter)
-
-        filter = {"and":
-                  [{"=": {"project_id": 42}},
-                   {"=": {"non_existing_field": 42}}]}
-        self.assertRaises(jsonschema.ValidationError,
-                          self.query_alarm._validate_filter,
-                          filter)
-
-        filter = {"and":
-                  [{"=": {"project_id11": 42}},
-                   {"=": {"project_id": 42}}]}
-        self.assertRaises(jsonschema.ValidationError,
-                          self.query_alarmchange._validate_filter,
                           filter)
 
         filter = {"or":
@@ -158,15 +128,6 @@ class TestComplexQuery(base.BaseTestCase):
                      {"=": {"project_id": 42}}]}]}
         self.assertRaises(jsonschema.ValidationError,
                           self.query._validate_filter,
-                          filter)
-
-        filter = {"or":
-                  [{"=": {"project_id": 43}},
-                   {"and":
-                    [{"=": {"project_id": 44}},
-                     {"=": {"non_existing_field": 42}}]}]}
-        self.assertRaises(jsonschema.ValidationError,
-                          self.query_alarm._validate_filter,
                           filter)
 
     def test_convert_orderby(self):

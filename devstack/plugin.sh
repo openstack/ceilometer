@@ -8,9 +8,7 @@
 #
 # By default all ceilometer services are started (see
 # devstack/settings). To disable a specific service use the
-# disable_service function. For example to turn off alarming:
-#
-# disable_service ceilometer-alarm-notifier ceilometer-alarm-evaluator
+# disable_service function.
 #
 # NOTE: Currently, there are two ways to get the IPMI based meters in
 # OpenStack. One way is to configure Ironic conductor to report those meters
@@ -213,17 +211,14 @@ function cleanup_ceilometer {
 # Set configuration for storage backend.
 function _ceilometer_configure_storage_backend {
     if [ "$CEILOMETER_BACKEND" = 'mysql' ] || [ "$CEILOMETER_BACKEND" = 'postgresql' ] ; then
-        iniset $CEILOMETER_CONF database alarm_connection $(database_connection_url ceilometer)
         iniset $CEILOMETER_CONF database event_connection $(database_connection_url ceilometer)
         iniset $CEILOMETER_CONF database metering_connection $(database_connection_url ceilometer)
     elif [ "$CEILOMETER_BACKEND" = 'es' ] ; then
-        # es is only supported for events. we will use sql for alarming/metering.
-        iniset $CEILOMETER_CONF database alarm_connection $(database_connection_url ceilometer)
+        # es is only supported for events. we will use sql for metering.
         iniset $CEILOMETER_CONF database event_connection es://localhost:9200
         iniset $CEILOMETER_CONF database metering_connection $(database_connection_url ceilometer)
         ${TOP_DIR}/pkg/elasticsearch.sh start
     elif [ "$CEILOMETER_BACKEND" = 'mongodb' ] ; then
-        iniset $CEILOMETER_CONF database alarm_connection mongodb://localhost:27017/ceilometer
         iniset $CEILOMETER_CONF database event_connection mongodb://localhost:27017/ceilometer
         iniset $CEILOMETER_CONF database metering_connection mongodb://localhost:27017/ceilometer
     else
@@ -272,7 +267,6 @@ function configure_ceilometer {
 
     # The compute and central agents need these credentials in order to
     # call out to other services' public APIs.
-    # The alarm evaluator needs these options to call ceilometer APIs
     iniset $CEILOMETER_CONF service_credentials os_username ceilometer
     iniset $CEILOMETER_CONF service_credentials os_password $SERVICE_PASSWORD
     iniset $CEILOMETER_CONF service_credentials os_tenant_name $SERVICE_TENANT_NAME
@@ -397,9 +391,6 @@ function start_ceilometer {
             die $LINENO "ceilometer-api did not start"
         fi
     fi
-
-    run_process ceilometer-alarm-notifier "$CEILOMETER_BIN_DIR/ceilometer-alarm-notifier --config-file $CEILOMETER_CONF"
-    run_process ceilometer-alarm-evaluator "$CEILOMETER_BIN_DIR/ceilometer-alarm-evaluator --config-file $CEILOMETER_CONF"
 }
 
 # stop_ceilometer() - Stop running processes
@@ -414,7 +405,7 @@ function stop_ceilometer {
     fi
 
     # Kill the ceilometer screen windows
-    for serv in ceilometer-acompute ceilometer-acentral ceilometer-aipmi ceilometer-anotification ceilometer-collector ceilometer-alarm-notifier ceilometer-alarm-evaluator; do
+    for serv in ceilometer-acompute ceilometer-acentral ceilometer-aipmi ceilometer-anotification ceilometer-collector; do
         stop_process $serv
     done
 }

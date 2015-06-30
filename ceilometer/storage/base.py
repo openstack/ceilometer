@@ -49,12 +49,11 @@ def iter_period(start, end, period):
 def _handle_sort_key(model_name, sort_key=None):
     """Generate sort keys according to the passed in sort key from user.
 
-    :param model_name: Database model name be query.(alarm, meter, etc.)
+    :param model_name: Database model name be query.(meter, etc.)
     :param sort_key: sort key passed from user.
     return: sort keys list
     """
-    sort_keys_extra = {'alarm': ['name', 'user_id', 'project_id'],
-                       'meter': ['user_id', 'project_id'],
+    sort_keys_extra = {'meter': ['user_id', 'project_id'],
                        'resource': ['user_id', 'project_id', 'timestamp'],
                        }
 

@@ -25,10 +25,9 @@ High-Level Architecture
    An overall summary of Ceilometer's logical architecture.
 
 Each of Ceilometer's services are designed to scale horizontally. Additional
-workers and nodes can be added depending on the expected load. Ceilometer offers
-five core services, the data agents designed to work independently from
-collection and alarming, but also designed to work together as a
-complete solution:
+workers and nodes can be added depending on the expected load. Ceilometer
+offers five core services, the data agents designed to work independently from
+collection, but also designed to work together as a complete solution:
 
 1. polling agent - daemon designed to poll OpenStack services and build Meters.
 2. notification agent - daemon designed to listen to notifications on message queue,
@@ -36,7 +35,6 @@ complete solution:
 3. collector - daemon designed to gather and record event and metering data
    created by notification and polling agents.
 4. api - service to query and view data recorded by collector service.
-5. alarming - daemons to evaluate and notify based on defined alarming rules.
 
 As Ceilometer has grown to capture more data, it became apparent that data
 storage would need to be optimised. To address this, Gnocchi_ (resource metering
@@ -301,49 +299,6 @@ layer, and use the same tools for metering your entire cloud.
 
 Moreover, end users can also
 :ref:`send their own application specific data <user-defined-data>` into the
-database through the REST API for a various set of use cases (see the section
-"Alarming" later in this article).
+database through the REST API for a various set of use cases.
 
 .. _send their own application centric data: ./webapi/v2.html#user-defined-data
-
-
-Evaluating the data
-===================
-
-Alarming Service
-----------------
-
-.. note::
-
-   This functionality has been moved to Aodh_ project. Existing functionality
-   is deprecated and will be removed post-Liberty.
-
-The alarming component of Ceilometer, first delivered in the Havana
-version, allows you to set alarms based on threshold evaluation for a
-collection of samples. An alarm can be set on a single meter, or on a
-combination. For example, you may want to trigger an alarm when the memory
-consumption reaches 70% on a given instance if the instance has been up for
-more than 10 min. To setup an alarm, you will call
-:ref:`Ceilometer's API server <alarms-api>` specifying the alarm conditions and
-an action to take.
-
-Of course, if you are not administrator of the cloud itself, you can only set
-alarms on meters for your own components. You can also
-:ref:`send your own meters <user-defined-data>` from within your instances,
-meaning that you can trigger alarms based on application centric data.
-
-There can be multiple form of actions, but two have been implemented so far:
-
-1. :term:`HTTP callback`: you provide a URL to be called whenever the alarm has
-   been set off. The payload of the request contains all the details of why the
-   alarm was triggered.
-2. :term:`log`: mostly useful for debugging, stores alarms in a log file.
-
-For more details on this, we recommend that you read the blog post by
-Mehdi Abaakouk `Autoscaling with Heat and Ceilometer`_. Particular attention
-should be given to the section "Some notes about deploying alarming" as the
-database setup (using a separate database from the one used for metering)
-will be critical in all cases of production deployment.
-
-.. _Aodh: https://github.com/openstack/Aodh
-.. _Autoscaling with Heat and Ceilometer: http://techs.enovance.com/5991/autoscaling-with-heat-and-ceilometer

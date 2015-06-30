@@ -52,15 +52,6 @@ def enforce_limit(limit):
 
 
 def get_auth_project(on_behalf_of=None):
-    # when an alarm is created by an admin on behalf of another tenant
-    # we must ensure for:
-    # - threshold alarm, that an implicit query constraint on project_id is
-    #   added so that admin-level visibility on statistics is not leaked
-    # - combination alarm, that alarm ids verification is scoped to
-    #   alarms owned by the alarm project.
-    # hence for null auth_project (indicating admin-ness) we check if
-    # the creating tenant differs from the tenant on whose behalf the
-    # alarm is being created
     auth_project = rbac.get_limited_to_project(pecan.request.headers)
     created_by = pecan.request.headers.get('X-Project-Id')
     is_admin = auth_project is None
@@ -133,9 +124,6 @@ def validate_query(query, db_func, internal_keys=None,
     _verify_query_segregation(query)
 
     valid_keys = inspect.getargspec(db_func)[0]
-    if 'alarm_type' in valid_keys:
-        valid_keys.remove('alarm_type')
-        valid_keys.append('type')
 
     internal_timestamp_keys = ['end_timestamp', 'start_timestamp',
                                'end_timestamp_op', 'start_timestamp_op']
@@ -235,8 +223,7 @@ def query_to_kwargs(query, db_func, internal_keys=None,
     query = sanitize_query(query, db_func)
     translation = {'user_id': 'user',
                    'project_id': 'project',
-                   'resource_id': 'resource',
-                   'type': 'alarm_type'}
+                   'resource_id': 'resource'}
     stamp = {}
     metaquery = {}
     kwargs = {}
@@ -336,7 +323,7 @@ def flatten_metadata(metadata):
 # TODO(fabiog): this decorator should disappear and have a more unified
 # way of controlling access and scope. Before messing with this, though
 # I feel this file should be re-factored in smaller chunks one for each
-# controller (e.g. meters, alarms and so on ...). Right now its size is
+# controller (e.g. meters and so on ...). Right now its size is
 # overwhelming.
 def requires_admin(func):
 

@@ -23,7 +23,6 @@ from oslotest import base
 from oslotest import mockpatch
 import wsme
 
-from ceilometer.alarm.storage import base as alarm_storage_base
 from ceilometer.api.controllers.v2 import base as v2_base
 from ceilometer.api.controllers.v2 import events
 from ceilometer.api.controllers.v2 import meters
@@ -359,21 +358,6 @@ class TestQueryToKwArgs(tests_base.BaseTestCase):
                                              'invalid timestamp format')
         self.assertEqual(str(expected_exc), str(exc))
 
-    def test_get_alarm_changes_filter_valid_fields(self):
-        q = [v2_base.Query(field='abc',
-                           op='eq',
-                           value='abc')]
-        exc = self.assertRaises(
-            wsme.exc.UnknownArgument,
-            utils.query_to_kwargs, q,
-            alarm_storage_base.Connection.get_alarm_changes)
-        valid_keys = ['alarm_id', 'on_behalf_of', 'project', 'search_offset',
-                      'severity', 'timestamp', 'type', 'user']
-        msg = ("unrecognized field in query: %s, "
-               "valid keys: %s") % (q, valid_keys)
-        expected_exc = wsme.exc.UnknownArgument('abc', msg)
-        self.assertEqual(str(expected_exc), str(exc))
-
     def test_sample_filter_valid_fields(self):
         q = [v2_base.Query(field='abc',
                            op='eq',
@@ -412,21 +396,6 @@ class TestQueryToKwArgs(tests_base.BaseTestCase):
             q, storage_base.Connection.get_resources, ['limit'])
         valid_keys = ['project', 'resource',
                       'search_offset', 'source', 'timestamp', 'user']
-        msg = ("unrecognized field in query: %s, "
-               "valid keys: %s") % (q, valid_keys)
-        expected_exc = wsme.exc.UnknownArgument('abc', msg)
-        self.assertEqual(str(expected_exc), str(exc))
-
-    def test_get_alarms_filter_valid_fields(self):
-        q = [v2_base.Query(field='abc',
-                           op='eq',
-                           value='abc')]
-        exc = self.assertRaises(
-            wsme.exc.UnknownArgument,
-            utils.query_to_kwargs, q,
-            alarm_storage_base.Connection.get_alarms)
-        valid_keys = ['alarm_id', 'enabled', 'meter', 'name',
-                      'project', 'severity', 'state', 'type', 'user']
         msg = ("unrecognized field in query: %s, "
                "valid keys: %s") % (q, valid_keys)
         expected_exc = wsme.exc.UnknownArgument('abc', msg)

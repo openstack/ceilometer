@@ -80,45 +80,6 @@ available in the backend.
 .. autotype:: ceilometer.api.controllers.v2.capabilities.Capabilities
    :members:
 
-.. _alarms-api:
-
-Alarms
-======
-
-The Alarms API is deprecated in favor of the new
-`Telemetry Alarming service API <http://docs.openstack.org/developer/aodh/webapi/v2.html#alarms>`_.
-This API endpoint will be removed post-Liberty.
-
-.. rest-controller:: ceilometer.api.controllers.v2.alarms:AlarmsController
-   :webprefix: /v2/alarms
-
-.. rest-controller:: ceilometer.api.controllers.v2.alarms:AlarmController
-   :webprefix: /v2/alarms
-
-.. autotype:: ceilometer.api.controllers.v2.alarms.Alarm
-   :members:
-
-.. autotype:: ceilometer.api.controllers.v2.alarm_rules.threshold.AlarmThresholdRule
-   :members:
-
-.. autotype:: ceilometer.api.controllers.v2.alarm_rules.combination.AlarmCombinationRule
-   :members:
-
-.. autotype:: ceilometer.api.controllers.v2.alarm_rules.gnocchi.MetricOfResourceRule
-   :members:
-
-.. autotype:: ceilometer.api.controllers.v2.alarm_rules.gnocchi.AggregationMetricByResourcesLookupRule
-   :members:
-
-.. autotype:: ceilometer.api.controllers.v2.alarm_rules.gnocchi.AggregationMetricsByIdLookupRule
-   :members:
-
-.. autotype:: ceilometer.api.controllers.v2.alarms.AlarmTimeConstraint
-   :members:
-
-.. autotype:: ceilometer.api.controllers.v2.alarms.AlarmChange
-   :members:
-
 Events and Traits
 =================
 
@@ -190,7 +151,7 @@ Complex Query
 +++++++++++++
 
 The filter expressions of the Complex Query feature operate on the fields
-of *Sample*, *Alarm* and *AlarmChange*. The following comparison operators are
+of *Sample*. The following comparison operators are
 supported: *=*, *!=*, *<*, *<=*, *>*, *>=* and *in*; and the following logical
 operators can be used: *and* *or* and *not*. The field names are validated
 against the database models. See :ref:`api-queries` for how to query the API.
@@ -214,12 +175,6 @@ The *filter*, *orderby* and *limit* are all optional fields in a query.
 
 .. rest-controller:: ceilometer.api.controllers.v2.query:QuerySamplesController
    :webprefix: /v2/query/samples
-
-.. rest-controller:: ceilometer.api.controllers.v2.query:QueryAlarmsController
-   :webprefix: /v2/query/alarms
-
-.. rest-controller:: ceilometer.api.controllers.v2.query:QueryAlarmHistoryController
-   :webprefix: /v2/query/alarms/history
 
 .. autotype:: ceilometer.api.controllers.v2.query.ComplexQuery
    :members:

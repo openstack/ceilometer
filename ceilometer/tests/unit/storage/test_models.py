@@ -18,7 +18,6 @@ import datetime
 from oslotest import base as testbase
 import six
 
-from ceilometer.alarm.storage import models as alarm_models
 from ceilometer.event.storage import models as event_models
 from ceilometer.storage import base
 from ceilometer.storage import models
@@ -71,24 +70,6 @@ class ModelTest(testbase.BaseTestCase):
         self.assertEqual(set(sample_fields),
                          set(models.Sample.get_field_names()))
 
-    def test_get_field_names_of_alarm(self):
-        alarm_fields = ["alarm_id", "type", "enabled", "name", "description",
-                        "timestamp", "user_id", "project_id", "state",
-                        "state_timestamp", "ok_actions", "alarm_actions",
-                        "insufficient_data_actions", "repeat_actions", "rule",
-                        "severity", "time_constraints"]
-
-        self.assertEqual(set(alarm_fields),
-                         set(alarm_models.Alarm.get_field_names()))
-
-    def test_get_field_names_of_alarmchange(self):
-        alarmchange_fields = ["event_id", "alarm_id", "type", "detail",
-                              "user_id", "project_id", "severity",
-                              "on_behalf_of", "timestamp"]
-
-        self.assertEqual(set(alarmchange_fields),
-                         set(alarm_models.AlarmChange.get_field_names()))
-
 
 class TestTraitModel(testbase.BaseTestCase):
 
@@ -111,47 +92,3 @@ class TestTraitModel(testbase.BaseTestCase):
             event_models.Trait.TEXT_TYPE, 10)
         self.assertEqual("10", v)
         self.assertIsInstance(v, six.text_type)
-
-
-class TestClassModel(testbase.BaseTestCase):
-
-    ALARM = {
-        'alarm_id': '503490ea-ee9e-40d6-9cad-93a71583f4b2',
-        'enabled': True,
-        'type': 'threshold',
-        'name': 'alarm-test',
-        'description': 'alarm-test-description',
-        'timestamp': None,
-        'user_id': '5c76351f5fef4f6490d1048355094ca3',
-        'project_id': 'd83ed14a457141fc8661b4dcb3fd883d',
-        'state': "insufficient data",
-        'state_timestamp': None,
-        'ok_actions': [],
-        'alarm_actions': [],
-        'insufficient_data_actions': [],
-        'repeat_actions': False,
-        'time_constraints': [],
-        'rule': {
-            'comparison_operator': 'lt',
-            'threshold': 34,
-            'statistic': 'max',
-            'evaluation_periods': 1,
-            'period': 60,
-            'meter_name': 'cpu_util',
-            'query': []
-        }
-    }
-
-    def test_timestamp_cannot_be_none(self):
-        self.ALARM['timestamp'] = None
-        self.ALARM['state_timestamp'] = datetime.datetime.utcnow()
-        self.assertRaises(TypeError,
-                          alarm_models.Alarm.__init__,
-                          **self.ALARM)
-
-    def test_state_timestamp_cannot_be_none(self):
-        self.ALARM['timestamp'] = datetime.datetime.utcnow()
-        self.ALARM['state_timestamp'] = None
-        self.assertRaises(TypeError,
-                          alarm_models.Alarm.__init__,
-                          **self.ALARM)

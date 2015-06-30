@@ -24,7 +24,6 @@ from oslo_log import log
 from oslo_utils import strutils
 import pecan
 
-from ceilometer.api.controllers.v2 import alarms
 from ceilometer.api.controllers.v2 import capabilities
 from ceilometer.api.controllers.v2 import events
 from ceilometer.api.controllers.v2 import meters
@@ -177,8 +176,6 @@ class V2Controller(object):
             ), remainder
         elif kind == 'alarms' and self.aodh_url:
             aodh_redirect(self.aodh_url)
-        elif kind == 'alarms':
-            return alarms.AlarmsController(), remainder
         else:
             pecan.abort(404)
 

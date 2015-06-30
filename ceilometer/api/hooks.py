@@ -45,19 +45,16 @@ class DBHook(hooks.PecanHook):
     def __init__(self):
         self.storage_connection = DBHook.get_connection('metering')
         self.event_storage_connection = DBHook.get_connection('event')
-        self.alarm_storage_connection = DBHook.get_connection('alarm')
 
-        if (not self.storage_connection and
-                not self.event_storage_connection and
-                not self.alarm_storage_connection):
+        if (not self.storage_connection
+           and not self.event_storage_connection):
             raise Exception("Api failed to start. Failed to connect to "
                             "databases, purpose:  %s" %
-                            ', '.join(['metering', 'event', 'alarm']))
+                            ', '.join(['metering', 'event']))
 
     def before(self, state):
         state.request.storage_conn = self.storage_connection
         state.request.event_storage_conn = self.event_storage_connection
-        state.request.alarm_storage_conn = self.alarm_storage_connection
 
     @staticmethod
     def get_connection(purpose):

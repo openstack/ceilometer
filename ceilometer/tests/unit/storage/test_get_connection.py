@@ -21,8 +21,6 @@ from oslo_config import fixture as fixture_config
 from oslotest import base
 import retrying
 
-from ceilometer.alarm.storage import impl_log as impl_log_alarm
-from ceilometer.alarm.storage import impl_sqlalchemy as impl_sqlalchemy_alarm
 try:
     from ceilometer.event.storage import impl_hbase as impl_hbase_event
 except ImportError:
@@ -78,33 +76,23 @@ class ConnectionConfigTest(base.BaseTestCase):
         self.assertIsInstance(conn, impl_log.Connection)
         conn = storage.get_connection_from_config(self.CONF, 'metering')
         self.assertIsInstance(conn, impl_log.Connection)
-        conn = storage.get_connection_from_config(self.CONF, 'alarm')
-        self.assertIsInstance(conn, impl_log_alarm.Connection)
 
     def test_two_urls(self):
         self.CONF.set_override("connection", "log://", group="database")
-        self.CONF.set_override("alarm_connection", "sqlite://",
-                               group="database")
         conn = storage.get_connection_from_config(self.CONF)
         self.assertIsInstance(conn, impl_log.Connection)
         conn = storage.get_connection_from_config(self.CONF, 'metering')
         self.assertIsInstance(conn, impl_log.Connection)
-        conn = storage.get_connection_from_config(self.CONF, 'alarm')
-        self.assertIsInstance(conn, impl_sqlalchemy_alarm.Connection)
 
     @unittest.skipUnless(impl_hbase_event, 'need hbase implementation')
     def test_three_urls(self):
         self.CONF.set_override("connection", "log://", group="database")
-        self.CONF.set_override("alarm_connection", "sqlite://",
-                               group="database")
         self.CONF.set_override("event_connection", "hbase://__test__",
                                group="database")
         conn = storage.get_connection_from_config(self.CONF)
         self.assertIsInstance(conn, impl_log.Connection)
         conn = storage.get_connection_from_config(self.CONF, 'metering')
         self.assertIsInstance(conn, impl_log.Connection)
-        conn = storage.get_connection_from_config(self.CONF, 'alarm')
-        self.assertIsInstance(conn, impl_sqlalchemy_alarm.Connection)
         conn = storage.get_connection_from_config(self.CONF, 'event')
         self.assertIsInstance(conn, impl_hbase_event.Connection)
 
@@ -113,14 +101,10 @@ class ConnectionConfigTest(base.BaseTestCase):
         self.CONF.set_override("connection", None, group="database")
         self.CONF.set_override("metering_connection", "log://",
                                group="database")
-        self.CONF.set_override("alarm_connection", "sqlite://",
-                               group="database")
         self.CONF.set_override("event_connection", "hbase://__test__",
                                group="database")
         conn = storage.get_connection_from_config(self.CONF)
         self.assertIsInstance(conn, impl_log.Connection)
-        conn = storage.get_connection_from_config(self.CONF, 'alarm')
-        self.assertIsInstance(conn, impl_sqlalchemy_alarm.Connection)
         conn = storage.get_connection_from_config(self.CONF, 'event')
         self.assertIsInstance(conn, impl_hbase_event.Connection)
 
@@ -131,5 +115,3 @@ class ConnectionConfigTest(base.BaseTestCase):
         self.assertIsInstance(conn, impl_sqlalchemy.Connection)
         conn = storage.get_connection_from_config(self.CONF, 'metering')
         self.assertIsInstance(conn, impl_sqlalchemy.Connection)
-        conn = storage.get_connection_from_config(self.CONF, 'alarm')
-        self.assertIsInstance(conn, impl_sqlalchemy_alarm.Connection)

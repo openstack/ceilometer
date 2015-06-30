@@ -7,8 +7,6 @@ enable_service ceilometer-anotification
 enable_service ceilometer-collector
 # API service
 enable_service ceilometer-api
-# Alarming
-enable_service ceilometer-alarm-notifier ceilometer-alarm-evaluator
 
 # Default directories
 CEILOMETER_DIR=$DEST/ceilometer

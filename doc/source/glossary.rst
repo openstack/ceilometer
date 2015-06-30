@@ -24,9 +24,6 @@
      Software service running on the OpenStack infrastructure
      measuring usage and sending the results to the :term:`collector`.
 
-   alarm
-     An action triggered whenever a meter reaches a certain threshold.
-
    API server
      HTTP REST API service for ceilometer.
 
@@ -63,15 +60,6 @@
 
    data store
      Storage system for recording data collected by ceilometer.
-
-   http callback
-     HTTP callback is used for calling a predefined URL, whenever an
-     alarm has been set off. The payload of the request contains
-     all the details of why the alarm was triggered.
-
-   log
-     Logging is one of the alarm actions that is useful mostly for debugging,
-     it stores the alarms in a log file.
 
    meter
      The measurements tracked for a resource. For example, an instance has

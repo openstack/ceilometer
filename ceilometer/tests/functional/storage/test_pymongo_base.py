@@ -19,7 +19,6 @@ import mock
 
 from ceilometer.publisher import utils
 from ceilometer import sample
-from ceilometer.tests import constants
 from ceilometer.tests import db as tests_db
 from ceilometer.tests.functional.storage import test_storage_scenarios
 
@@ -76,79 +75,6 @@ class CompatibilityTest(test_storage_scenarios.DBTestBase,
                 c,
                 secret='not-so-secret')
             self.conn.record_metering_data(self.conn, msg)
-
-        # Create the old format alarm with a dict instead of a
-        # array for matching_metadata
-        alarm = dict(alarm_id='0ld-4l3rt',
-                     enabled=True,
-                     name='old-alert',
-                     description='old-alert',
-                     timestamp=constants.MIN_DATETIME,
-                     meter_name='cpu',
-                     user_id='me',
-                     project_id='and-da-boys',
-                     comparison_operator='lt',
-                     threshold=36,
-                     statistic='count',
-                     evaluation_periods=1,
-                     period=60,
-                     state="insufficient data",
-                     state_timestamp=constants.MIN_DATETIME,
-                     ok_actions=[],
-                     alarm_actions=['http://nowhere/alarms'],
-                     insufficient_data_actions=[],
-                     repeat_actions=False,
-                     matching_metadata={'key': 'value'})
-
-        self.alarm_conn.db.alarm.update(
-            {'alarm_id': alarm['alarm_id']},
-            {'$set': alarm},
-            upsert=True)
-
-        alarm['alarm_id'] = 'other-kind-of-0ld-4l3rt'
-        alarm['name'] = 'other-old-alaert'
-        alarm['matching_metadata'] = [{'key': 'key1', 'value': 'value1'},
-                                      {'key': 'key2', 'value': 'value2'}]
-        self.alarm_conn.db.alarm.update(
-            {'alarm_id': alarm['alarm_id']},
-            {'$set': alarm},
-            upsert=True)
-
-    def test_alarm_get_old_format_matching_metadata_dict(self):
-        old = list(self.alarm_conn.get_alarms(name='old-alert'))[0]
-        self.assertEqual('threshold', old.type)
-        self.assertEqual([{'field': 'key',
-                           'op': 'eq',
-                           'value': 'value',
-                           'type': 'string'}],
-                         old.rule['query'])
-        self.assertEqual(60, old.rule['period'])
-        self.assertEqual('cpu', old.rule['meter_name'])
-        self.assertEqual(1, old.rule['evaluation_periods'])
-        self.assertEqual('count', old.rule['statistic'])
-        self.assertEqual('lt', old.rule['comparison_operator'])
-        self.assertEqual(36, old.rule['threshold'])
-
-    def test_alarm_get_old_format_matching_metadata_array(self):
-        old = list(self.alarm_conn.get_alarms(name='other-old-alaert'))[0]
-        self.assertEqual('threshold', old.type)
-        self.assertEqual(sorted([{'field': 'key1',
-                                  'op': 'eq',
-                                  'value': 'value1',
-                                  'type': 'string'},
-                                 {'field': 'key2',
-                                  'op': 'eq',
-                                  'value': 'value2',
-                                  'type': 'string'}],
-                                key=lambda obj: sorted(obj.items())),
-                         sorted(old.rule['query'],
-                                key=lambda obj: sorted(obj.items())))
-        self.assertEqual('cpu', old.rule['meter_name'])
-        self.assertEqual(60, old.rule['period'])
-        self.assertEqual(1, old.rule['evaluation_periods'])
-        self.assertEqual('count', old.rule['statistic'])
-        self.assertEqual('lt', old.rule['comparison_operator'])
-        self.assertEqual(36, old.rule['threshold'])
 
     def test_counter_unit(self):
         meters = list(self.conn.get_meters())

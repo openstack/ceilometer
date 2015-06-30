@@ -21,13 +21,6 @@ metering backend. We labelled this effort as "multi-publisher".
 
 .. _increasing number of meters: http://docs.openstack.org/developer/ceilometer/measurements.html
 
-Most recently, as the Heat project started to come to
-life, it soon became clear that the OpenStack project needed a tool to watch
-for variations in key values in order to trigger various reactions.
-As Ceilometer already had the tooling to collect vast quantities of data, it
-seemed logical to add this as an extension of the Ceilometer project, which we
-tagged as "alarming".
-
 Metering
 ========
 

@@ -91,8 +91,7 @@ HBase
    ..
 
    In case of HBase, the needed database tables (`project`, `user`, `resource`,
-   `meter`, `alarm`, `alarm_h`) should be created manually with `f` column
-   family for each one.
+   `meter`) should be created manually with `f` column family for each one.
 
    To use HBase as the storage backend, change the 'database' section in
    ceilometer.conf as follows::

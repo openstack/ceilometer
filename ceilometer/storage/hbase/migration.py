@@ -90,23 +90,7 @@ def migrate_event_table(conn, table):
         event_table.delete(row)
 
 
-def migrate_alarm_history_table(conn, table):
-    """Migrate table 'alarm_h' in HBase.
-
-    Change row format from ""%s_%s" % alarm_id, rts,
-    to new separator format "%s:%s" % alarm_id, rts
-    """
-    alarm_h_table = conn.table(table)
-    alarm_h_filter = "RowFilter(=, 'regexstring:\\w*_\\d{19}')"
-    gen = alarm_h_table.scan(filter=alarm_h_filter)
-    for row, data in gen:
-        row_parts = row.rsplit('_', 1)
-        alarm_h_table.put(hbase_utils.prepare_key(*row_parts), data)
-        alarm_h_table.delete(row)
-
-
 TABLE_MIGRATION_FUNCS = {'resource': migrate_resource_table,
-                         'alarm_h': migrate_alarm_history_table,
                          'meter': migrate_meter_table,
                          'event': migrate_event_table}
 

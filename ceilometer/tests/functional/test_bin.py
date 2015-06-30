@@ -61,8 +61,6 @@ class BinTestCase(base.BaseTestCase):
                       b"time to live is disabled", err)
         self.assertIn(b"Nothing to clean, database event "
                       b"time to live is disabled", err)
-        self.assertIn(b"Nothing to clean, database alarm history "
-                      b"time to live is disabled", err)
 
     def _test_run_expirer_ttl_enabled(self, ttl_name, data_name):
         content = ("[DEFAULT]\n"
@@ -91,8 +89,6 @@ class BinTestCase(base.BaseTestCase):
                                            'metering')
         self._test_run_expirer_ttl_enabled('time_to_live', 'metering')
         self._test_run_expirer_ttl_enabled('event_time_to_live', 'event')
-        self._test_run_expirer_ttl_enabled('alarm_history_time_to_live',
-                                           'alarm history')
 
 
 class BinSendSampleTestCase(base.BaseTestCase):
@@ -206,37 +202,6 @@ class BinApiTestCase(base.BaseTestCase):
             content = content.decode('utf-8')
         self.assertEqual([], json.loads(content))
 
-    def test_v2_with_bad_storage_conn(self):
-
-        content = ("[DEFAULT]\n"
-                   "rpc_backend=fake\n"
-                   "auth_strategy=noauth\n"
-                   "debug=true\n"
-                   "pipeline_cfg_file={0}\n"
-                   "policy_file={1}\n"
-                   "api_paste_config={2}\n"
-                   "[api]\n"
-                   "port={3}\n"
-                   "[database]\n"
-                   "max_retries=1\n"
-                   "alarm_connection=log://localhost\n"
-                   "connection=dummy://localhost\n".
-                   format(self.pipeline_cfg_file,
-                          self.policy_file,
-                          self.paste,
-                          self.api_port))
-
-        self.subp = self.run_api(content, err_pipe=True)
-
-        response, content = self.get_response('v2/alarms')
-        self.assertEqual(200, response.status)
-        if six.PY3:
-            content = content.decode('utf-8')
-        self.assertEqual([], json.loads(content))
-
-        response, content = self.get_response('v2/meters')
-        self.assertEqual(500, response.status)
-
     def test_v2_with_all_bad_conns(self):
 
         content = ("[DEFAULT]\n"
@@ -250,7 +215,6 @@ class BinApiTestCase(base.BaseTestCase):
                    "port={3}\n"
                    "[database]\n"
                    "max_retries=1\n"
-                   "alarm_connection=dummy://localhost\n"
                    "connection=dummy://localhost\n"
                    "event_connection=dummy://localhost\n".
                    format(self.pipeline_cfg_file,
@@ -263,7 +227,7 @@ class BinApiTestCase(base.BaseTestCase):
         __, err = self.subp.communicate()
 
         self.assertIn(b"Api failed to start. Failed to connect to"
-                      b" databases, purpose:  metering, event, alarm", err)
+                      b" databases, purpose:  metering, event", err)
 
 
 class BinCeilometerPollingServiceTestCase(base.BaseTestCase):

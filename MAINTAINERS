@@ -37,13 +37,6 @@ Each  has an entry with the following keys:
  F: Wildcard patterns, relative to ceilometer/
 
 
-== alarms ==
-
-M: Eoghan Glynn (eglynn)
-M: Mehdi Abaakouk (sileht)
-S: Maintained
-F: alarm/
-
 == api ==
 
 M: Doug Hellmann (dhellmann) <doug.hellmann@dreamhost.com>

@@ -29,7 +29,6 @@ LOG = logging.getLogger(__name__)
 def dbsync():
     service.prepare_service()
     storage.get_connection_from_config(cfg.CONF, 'metering').upgrade()
-    storage.get_connection_from_config(cfg.CONF, 'alarm').upgrade()
     storage.get_connection_from_config(cfg.CONF, 'event').upgrade()
 
 
@@ -52,13 +51,4 @@ def expirer():
             cfg.CONF.database.event_time_to_live)
     else:
         LOG.info(_LI("Nothing to clean, database event time to live "
-                     "is disabled"))
-
-    if cfg.CONF.database.alarm_history_time_to_live > 0:
-        LOG.debug("Clearing expired alarm history data")
-        storage_conn = storage.get_connection_from_config(cfg.CONF, 'alarm')
-        storage_conn.clear_expired_alarm_history_data(
-            cfg.CONF.database.alarm_history_time_to_live)
-    else:
-        LOG.info(_LI("Nothing to clean, database alarm history time to live "
                      "is disabled"))

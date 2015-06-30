@@ -51,8 +51,6 @@ class MongoDbManager(fixtures.Fixture):
             try:
                 self.connection = storage.get_connection(
                     self.url, 'ceilometer.metering.storage')
-                self.alarm_connection = storage.get_connection(
-                    self.url, 'ceilometer.alarm.storage')
                 self.event_connection = storage.get_connection(
                     self.url, 'ceilometer.event.storage')
             except storage.StorageBadVersion as e:
@@ -71,8 +69,6 @@ class SQLManager(fixtures.Fixture):
         super(SQLManager, self).setUp()
         self.connection = storage.get_connection(
             self.url, 'ceilometer.metering.storage')
-        self.alarm_connection = storage.get_connection(
-            self.url, 'ceilometer.alarm.storage')
         self.event_connection = storage.get_connection(
             self.url, 'ceilometer.event.storage')
 
@@ -117,8 +113,6 @@ class ElasticSearchManager(fixtures.Fixture):
         super(ElasticSearchManager, self).setUp()
         self.connection = storage.get_connection(
             'sqlite://', 'ceilometer.metering.storage')
-        self.alarm_connection = storage.get_connection(
-            'sqlite://', 'ceilometer.alarm.storage')
         self.event_connection = storage.get_connection(
             self.url, 'ceilometer.event.storage')
         # prefix each test with unique index name
@@ -135,8 +129,6 @@ class HBaseManager(fixtures.Fixture):
         super(HBaseManager, self).setUp()
         self.connection = storage.get_connection(
             self.url, 'ceilometer.metering.storage')
-        self.alarm_connection = storage.get_connection(
-            self.url, 'ceilometer.alarm.storage')
         self.event_connection = storage.get_connection(
             self.url, 'ceilometer.event.storage')
         # Unique prefix for each test to keep data is distinguished because
@@ -177,8 +169,6 @@ class SQLiteManager(fixtures.Fixture):
         super(SQLiteManager, self).setUp()
         self.connection = storage.get_connection(
             self.url, 'ceilometer.metering.storage')
-        self.alarm_connection = storage.get_connection(
-            self.url, 'ceilometer.alarm.storage')
         self.event_connection = storage.get_connection(
             self.url, 'ceilometer.event.storage')
 
@@ -224,9 +214,6 @@ class TestBase(testscenarios.testcase.WithScenarios, test_base.BaseTestCase):
         self.conn = self.db_manager.connection
         self.conn.upgrade()
 
-        self.alarm_conn = self.db_manager.alarm_connection
-        self.alarm_conn.upgrade()
-
         self.event_conn = self.db_manager.event_connection
         self.event_conn.upgrade()
 
@@ -245,16 +232,12 @@ class TestBase(testscenarios.testcase.WithScenarios, test_base.BaseTestCase):
     def tearDown(self):
         self.event_conn.clear()
         self.event_conn = None
-        self.alarm_conn.clear()
-        self.alarm_conn = None
         self.conn.clear()
         self.conn = None
         super(TestBase, self).tearDown()
 
     def _get_connection(self, url, namespace):
-        if namespace == "ceilometer.alarm.storage":
-            return self.alarm_conn
-        elif namespace == "ceilometer.event.storage":
+        if namespace == "ceilometer.event.storage":
             return self.event_conn
         return self.conn
 

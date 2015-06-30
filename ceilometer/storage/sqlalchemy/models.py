@@ -241,53 +241,6 @@ class FullSample(object):
     internal_id = Resource.internal_id
 
 
-class Alarm(Base):
-    """Define Alarm data."""
-    __tablename__ = 'alarm'
-    __table_args__ = (
-        Index('ix_alarm_user_id', 'user_id'),
-        Index('ix_alarm_project_id', 'project_id'),
-    )
-    alarm_id = Column(String(128), primary_key=True)
-    enabled = Column(Boolean)
-    name = Column(Text)
-    type = Column(String(50))
-    severity = Column(String(50))
-    description = Column(Text)
-    timestamp = Column(PreciseTimestamp, default=lambda: timeutils.utcnow())
-
-    user_id = Column(String(255))
-    project_id = Column(String(255))
-
-    state = Column(String(255))
-    state_timestamp = Column(PreciseTimestamp,
-                             default=lambda: timeutils.utcnow())
-
-    ok_actions = Column(JSONEncodedDict)
-    alarm_actions = Column(JSONEncodedDict)
-    insufficient_data_actions = Column(JSONEncodedDict)
-    repeat_actions = Column(Boolean)
-
-    rule = Column(JSONEncodedDict)
-    time_constraints = Column(JSONEncodedDict)
-
-
-class AlarmChange(Base):
-    """Define AlarmChange data."""
-    __tablename__ = 'alarm_history'
-    __table_args__ = (
-        Index('ix_alarm_history_alarm_id', 'alarm_id'),
-    )
-    event_id = Column(String(128), primary_key=True)
-    alarm_id = Column(String(128))
-    on_behalf_of = Column(String(255))
-    project_id = Column(String(255))
-    user_id = Column(String(255))
-    type = Column(String(20))
-    detail = Column(Text)
-    timestamp = Column(PreciseTimestamp, default=lambda: timeutils.utcnow())
-
-
 class EventType(Base):
     """Types of event records."""
     __tablename__ = 'event_type'

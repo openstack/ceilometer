@@ -22,6 +22,6 @@ stop_ceilometer
 
 # ensure everything is stopped
 
-SERVICES_DOWN="ceilometer-acompute ceilometer-acentral ceilometer-aipmi ceilometer-anotification ceilometer-collector ceilometer-api ceilometer-alarm-notifier ceilometer-alarm-evaluator"
+SERVICES_DOWN="ceilometer-acompute ceilometer-acentral ceilometer-aipmi ceilometer-anotification ceilometer-collector ceilometer-api"
 
 ensure_services_stopped $SERVICES_DOWN
