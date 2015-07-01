@@ -182,7 +182,7 @@ class TestCollector(tests_base.BaseTestCase):
             self.counter)
 
     @staticmethod
-    def _raise_error():
+    def _raise_error(*args, **kwargs):
         raise Exception
 
     def test_udp_receive_bad_decoding(self):
