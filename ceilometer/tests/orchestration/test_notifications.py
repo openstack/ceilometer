@@ -14,11 +14,12 @@ import datetime
 
 import mock
 from oslo_config import cfg
+from oslo_config import fixture as fixture_config
 from oslo_log import log
-from oslotest import base
 
-from ceilometer.orchestration import notifications
+from ceilometer.meter import notifications
 from ceilometer import sample
+from ceilometer.tests import base as test
 
 NOW = datetime.datetime.isoformat(datetime.datetime.utcnow())
 
@@ -51,8 +52,7 @@ def stack_notification_for(operation, use_trust=None):
         trustor_id = None
 
     return {
-        u'event_type': '%s.stack.%s.end' % (notifications.SERVICE,
-                                            operation),
+        u'event_type': 'orchestration.stack.%s.end' % operation,
         u'_context_roles': [
             u'Member',
         ],
@@ -87,7 +87,15 @@ def stack_notification_for(operation, use_trust=None):
     }
 
 
-class TestNotification(base.BaseTestCase):
+class TestNotification(test.BaseTestCase):
+
+    def setUp(self):
+        super(TestNotification, self).setUp()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
+        self.CONF.set_override(
+            'meter_definitions_cfg_file',
+            self.path_get('etc/ceilometer/meters.yaml'), group='meter')
+        self.handler = notifications.ProcessMeterNotifications(mock.Mock())
 
     def _verify_common_sample(self, s, name, volume):
         self.assertIsNotNone(s)
@@ -102,8 +110,8 @@ class TestNotification(base.BaseTestCase):
 
     def _test_operation(self, operation, trust=None):
         notif = stack_notification_for(operation, trust)
-        handler = notifications.StackCRUD(mock.Mock())
-        data = list(handler.process_notification(notif))
+
+        data = list(self.handler.process_notification(notif))
         self.assertEqual(1, len(data))
         if trust:
             self.assertEqual(TRUSTOR_ID, data[0].user_id)
