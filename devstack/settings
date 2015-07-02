@@ -1,0 +1,48 @@
+# turn on all the ceilometer services by default
+# Pollsters
+enable_service ceilometer-acompute ceilometer-acentral ceilometer-aipmi
+# Notification Agent
+enable_service ceilometer-anotification
+# Data Collector
+enable_service ceilometer-collector
+# API service
+enable_service ceilometer-api
+# Alarming
+enable_service ceilometer-alarm-notifier ceilometer-alarm-evaluator
+
+# Default directories
+CEILOMETER_DIR=$DEST/ceilometer
+CEILOMETER_CONF_DIR=/etc/ceilometer
+CEILOMETER_CONF=$CEILOMETER_CONF_DIR/ceilometer.conf
+CEILOMETER_API_LOG_DIR=/var/log/ceilometer-api
+CEILOMETER_AUTH_CACHE_DIR=${CEILOMETER_AUTH_CACHE_DIR:-/var/cache/ceilometer}
+CEILOMETER_WSGI_DIR=${CEILOMETER_WSGI_DIR:-/var/www/ceilometer}
+
+# Set up database backend
+CEILOMETER_BACKEND=${CEILOMETER_BACKEND:-mysql}
+
+# Ceilometer connection info.
+CEILOMETER_SERVICE_PROTOCOL=http
+CEILOMETER_SERVICE_HOST=$SERVICE_HOST
+CEILOMETER_SERVICE_PORT=${CEILOMETER_SERVICE_PORT:-8777}
+CEILOMETER_USE_MOD_WSGI=${CEILOMETER_USE_MOD_WSGI:-${ENABLE_HTTPD_MOD_WSGI_SERVICES}}
+
+# To enable OSprofiler change value of this variable to "notifications,profiler"
+CEILOMETER_NOTIFICATION_TOPICS=${CEILOMETER_NOTIFICATION_TOPICS:-notifications}
+CEILOMETER_EVENTS=${CEILOMETER_EVENTS:-True}
+
+CEILOMETER_COORDINATION_URL=${CEILOMETER_COORDINATION_URL:-}
+CEILOMETER_PIPELINE_INTERVAL=${CEILOMETER_PIPELINE_INTERVAL:-}
+
+# Tell Tempest this project is present
+TEMPEST_SERVICES+=,ceilometer
+
+# Set up default directories for client and middleware
+GITDIR["python-ceilometerclient"]=$DEST/python-ceilometerclient
+GITDIR["ceilometermiddleware"]=$DEST/ceilometermiddleware
+
+# Get rid of this before done.
+# Tell emacs to use shell-script-mode
+## Local variables:
+## mode: shell-script
+## End:
