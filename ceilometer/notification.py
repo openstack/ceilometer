@@ -94,7 +94,12 @@ class NotificationService(os_service.Service):
                       {'name': ext.name,
                        'type': ', '.join(handler.event_types),
                        'error': ack_on_error})
-            targets.extend(handler.get_targets(cfg.CONF))
+            # NOTE(gordc): this could be a set check but oslo.messaging issue
+            # https://bugs.launchpad.net/oslo.messaging/+bug/1398511
+            # This ensures we don't create multiple duplicate consumers.
+            for new_tar in handler.get_targets(cfg.CONF):
+                if new_tar not in targets:
+                    targets.append(new_tar)
             endpoints.append(handler)
 
         urls = cfg.CONF.notification.messaging_urls or [None]
