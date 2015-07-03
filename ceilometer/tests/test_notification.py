@@ -176,13 +176,19 @@ class BaseRealNotification(tests_base.BaseTestCase):
         self.CONF = self.useFixture(fixture_config.Config()).conf
         self.setup_messaging(self.CONF, 'nova')
 
-        pipeline = yaml.dump([{
-            'name': 'test_pipeline',
-            'interval': 5,
-            'counters': ['instance', 'memory'],
-            'transformers': [],
-            'publishers': ['test://'],
-        }])
+        pipeline = yaml.dump({
+            'sources': [{
+                'name': 'test_pipeline',
+                'interval': 5,
+                'meters': ['instance', 'memory'],
+                'sinks': ['test_sink']
+            }],
+            'sinks': [{
+                'name': 'test_sink',
+                'transformers': [],
+                'publishers': ['test://']
+            }]
+        })
         if six.PY3:
             pipeline = pipeline.encode('utf-8')
         self.expected_samples = 2

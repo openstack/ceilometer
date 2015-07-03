@@ -750,16 +750,12 @@ class BasePipelineTestCase(base.BaseTestCase):
                          getattr(publisher.samples[0], 'name'))
 
     def test_variable_counter(self):
-        self.pipeline_cfg = [{
-            'name': "test_pipeline",
-            'interval': 5,
-            'counters': ['a:*'],
-            'transformers': [
-                {'name': "update",
-                 'parameters': {}}
-            ],
-            'publishers': ["test://"],
-        }, ]
+        transformer_cfg = [{
+            'name': "update",
+            'parameters': {}
+        }]
+        self._set_pipeline_cfg('transformers', transformer_cfg)
+        self._set_pipeline_cfg('counters', ['a:*'])
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
                                                     self.transformer_manager)
 
