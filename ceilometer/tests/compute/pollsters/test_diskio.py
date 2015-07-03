@@ -116,7 +116,7 @@ class TestDiskPollsters(TestBaseDiskIO):
         self.assertIsNotEmpty(samples)
         self.assertIn(pollster.CACHE_KEY_DISK, cache)
         for instance in self.instance:
-            self.assertIn(instance.name, cache[pollster.CACHE_KEY_DISK])
+            self.assertIn(instance.id, cache[pollster.CACHE_KEY_DISK])
         self.assertEqual(set([name]), set([s.name for s in samples]))
 
         match = [s for s in samples if s.name == name]
