@@ -578,74 +578,44 @@ class PipelineManager(object):
     def __init__(self, cfg, transformer_manager, p_type=SAMPLE_TYPE):
         """Setup the pipelines according to config.
 
-        The configuration is supported in one of two forms:
+        The configuration is supported as follows:
 
-        1. Deprecated: the source and sink configuration are conflated
-           as a list of consolidated pipelines.
+        Decoupled: the source and sink configuration are separately
+        specified before being linked together. This allows source-
+        specific configuration, such as resource discovery, to be
+        kept focused only on the fine-grained source while avoiding
+        the necessity for wide duplication of sink-related config.
 
-           The pipelines are defined as a list of dictionaries each
-           specifying the target samples, the transformers involved,
-           and the target publishers, for example:
+        The configuration is provided in the form of separate lists
+        of dictionaries defining sources and sinks, for example:
 
-           [{"name": pipeline_1,
-             "interval": interval_time,
-             "meters" : ["meter_1", "meter_2"],
-             "resources": ["resource_uri1", "resource_uri2"],
-             "transformers": [
-                              {"name": "Transformer_1",
-                               "parameters": {"p1": "value"}},
+        {"sources": [{"name": source_1,
+                      "interval": interval_time,
+                      "meters" : ["meter_1", "meter_2"],
+                      "resources": ["resource_uri1", "resource_uri2"],
+                      "sinks" : ["sink_1", "sink_2"]
+                     },
+                     {"name": source_2,
+                      "interval": interval_time,
+                      "meters" : ["meter_3"],
+                      "sinks" : ["sink_2"]
+                     },
+                    ],
+         "sinks": [{"name": sink_1,
+                    "transformers": [
+                           {"name": "Transformer_1",
+                         "parameters": {"p1": "value"}},
 
-                              {"name": "Transformer_2",
-                               "parameters": {"p1": "value"}},
-                              ],
-             "publishers": ["publisher_1", "publisher_2"]
-            },
-            {"name": pipeline_2,
-             "interval": interval_time,
-             "meters" : ["meter_3"],
-             "publishers": ["publisher_3"]
-            },
-           ]
-
-        2. Decoupled: the source and sink configuration are separately
-           specified before being linked together. This allows source-
-           specific configuration, such as resource discovery, to be
-           kept focused only on the fine-grained source while avoiding
-           the necessity for wide duplication of sink-related config.
-
-           The configuration is provided in the form of separate lists
-           of dictionaries defining sources and sinks, for example:
-
-           {"sources": [{"name": source_1,
-                         "interval": interval_time,
-                         "meters" : ["meter_1", "meter_2"],
-                         "resources": ["resource_uri1", "resource_uri2"],
-                         "sinks" : ["sink_1", "sink_2"]
-                        },
-                        {"name": source_2,
-                         "interval": interval_time,
-                         "meters" : ["meter_3"],
-                         "sinks" : ["sink_2"]
-                        },
-                       ],
-            "sinks": [{"name": sink_1,
-                       "transformers": [
-                              {"name": "Transformer_1",
-                               "parameters": {"p1": "value"}},
-
-                              {"name": "Transformer_2",
-                               "parameters": {"p1": "value"}},
-                             ],
-                        "publishers": ["publisher_1", "publisher_2"]
-                       },
-                       {"name": sink_2,
-                        "publishers": ["publisher_3"]
-                       },
-                      ]
-           }
-
-        The semantics of the common individual configuration elements
-        are identical in the deprecated and decoupled version.
+                           {"name": "Transformer_2",
+                            "parameters": {"p1": "value"}},
+                          ],
+                     "publishers": ["publisher_1", "publisher_2"]
+                    },
+                    {"name": sink_2,
+                     "publishers": ["publisher_3"]
+                    },
+                   ]
+        }
 
         The interval determines the cadence of sample injection into
         the pipeline where samples are produced under the direct control
@@ -674,60 +644,47 @@ class PipelineManager(object):
 
         """
         self.pipelines = []
-        if 'sources' in cfg or 'sinks' in cfg:
-            if not ('sources' in cfg and 'sinks' in cfg):
-                raise PipelineException("Both sources & sinks are required",
-                                        cfg)
-            LOG.info(_('detected decoupled pipeline config format'))
+        if not ('sources' in cfg and 'sinks' in cfg):
+            raise PipelineException("Both sources & sinks are required",
+                                    cfg)
+        LOG.info(_('detected decoupled pipeline config format'))
 
-            unique_names = set()
-            sources = []
-            for s in cfg.get('sources', []):
-                name = s.get('name')
-                if name in unique_names:
-                    raise PipelineException("Duplicated source names: %s" %
-                                            name, self)
-                else:
-                    unique_names.add(name)
-                    sources.append(p_type['source'](s))
-            unique_names.clear()
+        unique_names = set()
+        sources = []
+        for s in cfg.get('sources', []):
+            name = s.get('name')
+            if name in unique_names:
+                raise PipelineException("Duplicated source names: %s" %
+                                        name, self)
+            else:
+                unique_names.add(name)
+                sources.append(p_type['source'](s))
+        unique_names.clear()
 
-            sinks = {}
-            for s in cfg.get('sinks', []):
-                name = s.get('name')
-                if name in unique_names:
-                    raise PipelineException("Duplicated sink names: %s" %
-                                            name, self)
-                else:
-                    unique_names.add(name)
-                    sinks[s['name']] = p_type['sink'](s, transformer_manager)
-            unique_names.clear()
+        sinks = {}
+        for s in cfg.get('sinks', []):
+            name = s.get('name')
+            if name in unique_names:
+                raise PipelineException("Duplicated sink names: %s" %
+                                        name, self)
+            else:
+                unique_names.add(name)
+                sinks[s['name']] = p_type['sink'](s, transformer_manager)
+        unique_names.clear()
 
-            for source in sources:
-                source.check_sinks(sinks)
-                for target in source.sinks:
-                    pipe = p_type['pipeline'](source, sinks[target])
-                    if pipe.name in unique_names:
-                        raise PipelineException(
-                            "Duplicate pipeline name: %s. Ensure pipeline"
-                            " names are unique. (name is the source and sink"
-                            " names combined)" % pipe.name, cfg)
-                    else:
-                        unique_names.add(pipe.name)
-                        self.pipelines.append(pipe)
-            unique_names.clear()
-        else:
-            LOG.warning(_('detected deprecated pipeline config format'))
-            for pipedef in cfg:
-                source = p_type['source'](pipedef)
-                sink = p_type['sink'](pipedef, transformer_manager)
-                pipe = p_type['pipeline'](source, sink)
-                if pipe.name in [p.name for p in self.pipelines]:
+        for source in sources:
+            source.check_sinks(sinks)
+            for target in source.sinks:
+                pipe = p_type['pipeline'](source, sinks[target])
+                if pipe.name in unique_names:
                     raise PipelineException(
                         "Duplicate pipeline name: %s. Ensure pipeline"
-                        " names are unique" % pipe.name, cfg)
+                        " names are unique. (name is the source and sink"
+                        " names combined)" % pipe.name, cfg)
                 else:
+                    unique_names.add(pipe.name)
                     self.pipelines.append(pipe)
+        unique_names.clear()
 
     def publisher(self, context):
         """Build a new Publisher for these manager pipelines.

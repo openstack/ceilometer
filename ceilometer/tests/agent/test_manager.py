@@ -213,16 +213,18 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         self.useFixture(mockpatch.Patch(
             'keystoneclient.v2_0.client.Client',
             side_effect=Exception))
-        self.pipeline_cfg = [
-            {
+        self.pipeline_cfg = {
+            'sources': [{
                 'name': "test_keystone",
                 'interval': 10,
-                'counters': ['testkeystone'],
+                'meters': ['testkeystone'],
                 'resources': ['test://'] if self.source_resources else [],
+                'sinks': ['test_sink']}],
+            'sinks': [{
+                'name': 'test_sink',
                 'transformers': [],
-                'publishers': ["test"],
-            },
-        ]
+                'publishers': ["test"]}]
+        }
         self.mgr.pipeline_manager = pipeline.PipelineManager(
             self.pipeline_cfg,
             self.transformer_manager)
@@ -239,16 +241,18 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
     @mock.patch('ceilometer.agent.base.LOG')
     def test_polling_exception(self, LOG):
         source_name = 'test_pollingexception'
-        self.pipeline_cfg = [
-            {
+        self.pipeline_cfg = {
+            'sources': [{
                 'name': source_name,
                 'interval': 10,
-                'counters': ['testpollingexception'],
+                'meters': ['testpollingexception'],
                 'resources': ['test://'] if self.source_resources else [],
+                'sinks': ['test_sink']}],
+            'sinks': [{
+                'name': 'test_sink',
                 'transformers': [],
-                'publishers': ["test"],
-            },
-        ]
+                'publishers': ["test"]}]
+        }
         self.mgr.pipeline_manager = pipeline.PipelineManager(
             self.pipeline_cfg,
             self.transformer_manager)
