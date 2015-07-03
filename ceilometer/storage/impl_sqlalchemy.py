@@ -384,7 +384,7 @@ class Connection(base.Connection):
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
                       end_timestamp=None, end_timestamp_op=None,
-                      metaquery=None, resource=None):
+                      metaquery=None, resource=None, limit=None):
         """Return an iterable of api_models.Resource instances
 
         :param user: Optional ID for user that owns the resource.
@@ -396,7 +396,10 @@ class Connection(base.Connection):
         :param end_timestamp_op: Optional end time operator, like lt, le.
         :param metaquery: Optional dict with metadata to match on.
         :param resource: Optional resource filter.
+        :param limit: Maximum number of results to return.
         """
+        if limit == 0:
+            return
         s_filter = storage.SampleFilter(user=user,
                                         project=project,
                                         source=source,
@@ -414,7 +417,7 @@ class Connection(base.Connection):
             models.Sample.resource_id == models.Resource.internal_id)
         res_q = make_query_from_filter(session, res_q, s_filter,
                                        require_meter=False)
-
+        res_q = res_q.limit(limit) if limit else res_q
         for res_id in res_q.all():
 
             # get max and min sample timestamp value

@@ -258,7 +258,7 @@ class Connection(pymongo_base.Connection):
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
                       end_timestamp=None, end_timestamp_op=None,
-                      metaquery=None, resource=None):
+                      metaquery=None, resource=None, limit=None):
         """Return an iterable of models.Resource instances
 
         :param user: Optional ID for user that owns the resource.
@@ -270,7 +270,10 @@ class Connection(pymongo_base.Connection):
         :param end_timestamp_op: Optional end time operator, like lt, le.
         :param metaquery: Optional dict with metadata to match on.
         :param resource: Optional resource filter.
+        :param limit: Maximum number of results to return.
         """
+        if limit == 0:
+            return
         metaquery = pymongo_utils.improve_keys(metaquery, metaquery=True) or {}
 
         q = {}
@@ -302,7 +305,11 @@ class Connection(pymongo_base.Connection):
         sort_instructions = self._build_sort_instructions(sort_keys=sort_keys,
                                                           sort_dir='desc')
         resource = lambda x: x['resource_id']
-        meters = self.db.meter.find(q, sort=sort_instructions)
+        if limit is not None:
+            meters = self.db.meter.find(q, sort=sort_instructions,
+                                        limit=limit)
+        else:
+            meters = self.db.meter.find(q, sort=sort_instructions)
         for resource_id, r_meters in itertools.groupby(meters, key=resource):
             # Because we have to know first/last timestamp, and we need a full
             # list of references to the resource's meters, we need a tuple
