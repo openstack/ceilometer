@@ -46,6 +46,10 @@ API_OPTS = [
     cfg.BoolOpt('pecan_debug',
                 default=False,
                 help='Toggle Pecan Debug Middleware.'),
+    cfg.IntOpt('default_api_return_limit',
+               default=1000,
+               help='Default maximum number of items returned by API request.'
+               ),
 ]
 
 CONF.register_opts(OPTS)

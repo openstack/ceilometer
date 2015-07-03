@@ -285,8 +285,7 @@ class MeterController(rest.RestController):
         rbac.enforce('get_samples', pecan.request)
 
         q = q or []
-        if limit and limit < 0:
-            raise base.ClientSideError(_("Limit must be positive"))
+        limit = v2_utils.enforce_limit(limit)
         kwargs = v2_utils.query_to_kwargs(q, storage.SampleFilter.__init__)
         kwargs['meter'] = self.meter_name
         f = storage.SampleFilter(**kwargs)
