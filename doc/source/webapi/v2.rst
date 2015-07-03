@@ -667,6 +667,17 @@ Fields *source*, *timestamp*, *project_id* and *user_id* are automatically
 added if not present in the samples. Field *message_id* is not taken into
 account if present and an internal value will be set.
 
+By default, samples posted via API will be placed on the notification bus and
+processed by the notification agent.
+
+To avoid re-queuing the data, samples posted via API can be stored directly to
+the storage backend verbatim by specifying a boolean flag 'direct' in the
+request URL, like this::
+
+    POST /v2/meters/ram_util?direct=True
+
+Samples posted this way will bypass pipeline processing.
+
 Here is an example showing how to add a sample for a *ram_util* meter (already
 existing or not)::
 
