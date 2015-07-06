@@ -9,8 +9,8 @@ build/*
 ChangeLog
 cover/*
 dist/*
-doc/build/*
-doc/source/sourcecode
+doc/build
+doc/source/api/
 etc/ceilometer/ceilometer.conf
 subunit.log
 tools/lintstack.head.py
