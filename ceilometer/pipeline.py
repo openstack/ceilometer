@@ -311,6 +311,9 @@ class SampleSource(Source):
             raise PipelineException("Discovery should be a list", cfg)
         self.check_source_filtering(self.meters, 'meters')
 
+    def get_interval(self):
+        return self.interval
+
     # (yjiang5) To support meters like instance:m1.tiny,
     # which include variable part at the end starting with ':'.
     # Hope we will not add such meters in future.
@@ -704,6 +707,35 @@ class PipelineManager(object):
         return PublishContext(context, self.pipelines)
 
 
+class PollingManager(object):
+    """Polling Manager
+
+    Polling manager sets up polling according to config file.
+    """
+
+    def __init__(self, cfg):
+        """Setup the polling according to config.
+
+        The configuration is the sources half of the Pipeline Config.
+        """
+        self.sources = []
+        if not ('sources' in cfg and 'sinks' in cfg):
+            raise PipelineException("Both sources & sinks are required",
+                                    cfg)
+        LOG.info(_('detected decoupled pipeline config format'))
+
+        unique_names = set()
+        for s in cfg.get('sources', []):
+            name = s.get('name')
+            if name in unique_names:
+                raise PipelineException("Duplicated source names: %s" %
+                                        name, self)
+            else:
+                unique_names.add(name)
+                self.sources.append(SampleSource(s))
+        unique_names.clear()
+
+
 def _setup_pipeline_manager(cfg_file, transformer_manager, p_type=SAMPLE_TYPE):
     if not os.path.exists(cfg_file):
         cfg_file = cfg.CONF.find_file(cfg_file)
@@ -721,6 +753,21 @@ def _setup_pipeline_manager(cfg_file, transformer_manager, p_type=SAMPLE_TYPE):
                            extension.ExtensionManager(
                                'ceilometer.transformer',
                            ), p_type)
+
+
+def _setup_polling_manager(cfg_file):
+    if not os.path.exists(cfg_file):
+        cfg_file = cfg.CONF.find_file(cfg_file)
+
+    LOG.debug(_("Polling config file: %s"), cfg_file)
+
+    with open(cfg_file) as fap:
+        data = fap.read()
+
+    pipeline_cfg = yaml.safe_load(data)
+    LOG.info(_("Pipeline config: %s"), pipeline_cfg)
+
+    return PollingManager(pipeline_cfg)
 
 
 def setup_event_pipeline(transformer_manager=None):
@@ -762,3 +809,9 @@ def get_pipeline_hash(p_type=SAMPLE_TYPE):
 
     file_hash = hashlib.md5(data).hexdigest()
     return file_hash
+
+
+def setup_polling():
+    """Setup polling manager according to yaml config file."""
+    cfg_file = cfg.CONF.pipeline_cfg_file
+    return _setup_polling_manager(cfg_file)

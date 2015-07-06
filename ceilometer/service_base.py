@@ -54,7 +54,12 @@ class BaseService(os_service.Service):
                 LOG.info(_LI("Detected change in pipeline configuration."))
 
                 try:
-                    self.pipeline_manager = pipeline.setup_pipeline()
+                    # Pipeline in the notification agent.
+                    if hasattr(self, 'pipeline_manager'):
+                        self.pipeline_manager = pipeline.setup_pipeline()
+                    # Polling in the polling agent.
+                    elif hasattr(self, 'polling_manager'):
+                        self.polling_manager = pipeline.setup_polling()
                     LOG.debug(_("Pipeline has been refreshed. "
                                 "old hash: %(old)s, new hash: %(new)s") %
                               ({'old': self.pipeline_hash,
