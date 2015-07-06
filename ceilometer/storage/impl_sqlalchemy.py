@@ -464,7 +464,7 @@ class Connection(base.Connection):
             )
 
     def get_meters(self, user=None, project=None, resource=None, source=None,
-                   metaquery=None):
+                   metaquery=None, limit=None):
         """Return an iterable of api_models.Meter instances
 
         :param user: Optional ID for user that owns the resource.
@@ -472,7 +472,10 @@ class Connection(base.Connection):
         :param resource: Optional ID of the resource.
         :param source: Optional source filter.
         :param metaquery: Optional dict with metadata to match on.
+        :param limit: Maximum number of results to return.
         """
+        if limit == 0:
+            return
         s_filter = storage.SampleFilter(user=user,
                                         project=project,
                                         source=source,
@@ -505,6 +508,7 @@ class Connection(base.Connection):
         query_sample = make_query_from_filter(session, query_sample, s_filter,
                                               require_meter=False)
 
+        query_sample = query_sample.limit(limit) if limit else query_sample
         for row in query_sample.all():
             yield api_models.Meter(
                 name=row.name,

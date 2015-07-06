@@ -66,44 +66,62 @@ class TestListMetersRestriction(v2.FunctionalTest,
 
     def setUp(self):
         super(TestListMetersRestriction, self).setUp()
-        self.CONF.set_override('default_api_return_limit', 10, group='api')
-        for i in range(20):
-            s = sample.Sample(
-                'volume.size',
-                'gauge',
-                'GiB',
-                5 + i,
-                'user-id',
-                'project1',
-                'resource-id',
-                timestamp=(datetime.datetime(2012, 9, 25, 10, 30) +
-                           datetime.timedelta(seconds=i)),
-                resource_metadata={'display_name': 'test-volume',
-                                   'tag': 'self.sample',
-                                   },
-                source='source1',
-            )
-            msg = utils.meter_message_from_counter(
-                s, self.CONF.publisher.telemetry_secret,
-            )
-            self.conn.record_metering_data(msg)
+        self.CONF.set_override('default_api_return_limit', 3, group='api')
+        for x in range(5):
+            for i in range(5):
+                s = sample.Sample(
+                    'volume.size%s' % x,
+                    'gauge',
+                    'GiB',
+                    5 + i,
+                    'user-id',
+                    'project1',
+                    'resource-id',
+                    timestamp=(datetime.datetime(2012, 9, 25, 10, 30) +
+                               datetime.timedelta(seconds=i)),
+                    resource_metadata={'display_name': 'test-volume',
+                                       'tag': 'self.sample',
+                                       },
+                    source='source1',
+                )
+                msg = utils.meter_message_from_counter(
+                    s, self.CONF.publisher.telemetry_secret,
+                )
+                self.conn.record_metering_data(msg)
 
     def test_meter_limit(self):
-        data = self.get_json('/meters/volume.size?limit=1')
+        data = self.get_json('/meters?limit=1')
         self.assertEqual(1, len(data))
 
     def test_meter_limit_negative(self):
         self.assertRaises(webtest.app.AppError,
                           self.get_json,
-                          '/meters/volume.size?limit=-2')
+                          '/meters?limit=-2')
 
     def test_meter_limit_bigger(self):
-        data = self.get_json('/meters/volume.size?limit=42')
-        self.assertEqual(20, len(data))
+        data = self.get_json('/meters?limit=42')
+        self.assertEqual(5, len(data))
 
     def test_meter_default_limit(self):
-        data = self.get_json('/meters/volume.size')
-        self.assertEqual(10, len(data))
+        data = self.get_json('/meters')
+        self.assertEqual(3, len(data))
+
+    def test_old_sample_limit(self):
+        data = self.get_json('/meters/volume.size0?limit=1')
+        self.assertEqual(1, len(data))
+
+    def test_old_sample_limit_negative(self):
+        self.assertRaises(webtest.app.AppError,
+                          self.get_json,
+                          '/meters/volume.size0?limit=-2')
+
+    def test_old_sample_limit_bigger(self):
+        data = self.get_json('/meters/volume.size0?limit=42')
+        self.assertEqual(5, len(data))
+
+    def test_old_sample_default_limit(self):
+        data = self.get_json('/meters/volume.size0')
+        self.assertEqual(3, len(data))
 
     def test_sample_limit(self):
         data = self.get_json('/samples?limit=1')
@@ -116,11 +134,11 @@ class TestListMetersRestriction(v2.FunctionalTest,
 
     def test_sample_limit_bigger(self):
         data = self.get_json('/samples?limit=42')
-        self.assertEqual(20, len(data))
+        self.assertEqual(25, len(data))
 
     def test_sample_default_limit(self):
         data = self.get_json('/samples')
-        self.assertEqual(10, len(data))
+        self.assertEqual(3, len(data))
 
 
 class TestListMeters(v2.FunctionalTest,
