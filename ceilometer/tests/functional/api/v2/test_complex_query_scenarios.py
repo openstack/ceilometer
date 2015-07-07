@@ -304,13 +304,18 @@ class TestQueryMetersController(tests_api.FunctionalTest,
         for sample_item in data.json:
             self.assertTrue(float(sample_item["metadata"]["util"]) < 0.5)
 
-    def test_limit_should_be_positive(self):
+    def test_limit_must_be_positive(self):
         data = self.post_json(self.url,
                               params={"limit": 0},
                               expect_errors=True)
 
         self.assertEqual(400, data.status_int)
-        self.assertIn(b"Limit should be positive", data.body)
+        self.assertIn(b"Limit must be positive", data.body)
+
+    def test_default_limit(self):
+        self.CONF.set_override('default_api_return_limit', 1, group='api')
+        data = self.post_json(self.url, params={})
+        self.assertEqual(1, len(data.json))
 
 
 class TestQueryAlarmsController(tests_api.FunctionalTest,
@@ -471,13 +476,18 @@ class TestQueryAlarmsController(tests_api.FunctionalTest,
         for alarm in data.json:
             self.assertEqual("alarm", alarm["state"])
 
-    def test_limit_should_be_positive(self):
+    def test_limit_must_be_positive(self):
         data = self.post_json(self.alarm_url,
                               params={"limit": 0},
                               expect_errors=True)
 
         self.assertEqual(400, data.status_int)
-        self.assertIn(b"Limit should be positive", data.body)
+        self.assertIn(b"Limit must be positive", data.body)
+
+    def test_default_limit(self):
+        self.CONF.set_override('default_api_return_limit', 1, group='api')
+        data = self.post_json(self.alarm_url, params={})
+        self.assertEqual(1, len(data.json))
 
 
 class TestQueryAlarmsHistoryController(
@@ -591,10 +601,15 @@ class TestQueryAlarmsHistoryController(
         for history in data.json:
             self.assertEqual("creation", history['type'])
 
-    def test_limit_should_be_positive(self):
+    def test_limit_must_be_positive(self):
         data = self.post_json(self.url,
                               params={"limit": 0},
                               expect_errors=True)
 
         self.assertEqual(400, data.status_int)
-        self.assertIn(b"Limit should be positive", data.body)
+        self.assertIn(b"Limit must be positive", data.body)
+
+    def test_default_limit(self):
+        self.CONF.set_override('default_api_return_limit', 1, group='api')
+        data = self.post_json(self.url, params={})
+        self.assertEqual(1, len(data.json))

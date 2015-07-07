@@ -47,7 +47,8 @@ API_OPTS = [
                 default=False,
                 help='Toggle Pecan Debug Middleware.'),
     cfg.IntOpt('default_api_return_limit',
-               default=1000,
+               min=1,
+               default=100,
                help='Default maximum number of items returned by API request.'
                ),
 ]
