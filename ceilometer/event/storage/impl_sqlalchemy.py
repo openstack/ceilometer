@@ -211,8 +211,6 @@ class Connection(base.Connection):
 
         session = self._engine_facade.get_session()
         with session.begin():
-            event_query = session.query(models.Event)
-
             # Build up the join conditions
             event_join_conditions = [models.EventType.id ==
                                      models.Event.event_type_id]
@@ -220,9 +218,6 @@ class Connection(base.Connection):
             if event_filter.event_type:
                 event_join_conditions.append(models.EventType.desc ==
                                              event_filter.event_type)
-
-            event_query = event_query.join(models.EventType,
-                                           sa.and_(*event_join_conditions))
 
             # Build up the where conditions
             event_filter_conditions = []
@@ -235,9 +230,6 @@ class Connection(base.Connection):
             if event_filter.end_timestamp:
                 event_filter_conditions.append(
                     models.Event.generated <= event_filter.end_timestamp)
-            if event_filter_conditions:
-                event_query = (event_query.
-                               filter(sa.and_(*event_filter_conditions)))
 
             trait_subq = None
             # Build trait filter
