@@ -29,9 +29,7 @@ from six.moves import cStringIO as StringIO  # noqa
 # These variables will be useful if we will need to skip some pylint checks
 ignore_codes = []
 ignore_messages = []
-# We ignore all errors in openstack.common because it should be checked
-# elsewhere.
-ignore_modules = ["ceilometer/openstack/common/"]
+ignore_modules = []
 
 KNOWN_PYLINT_EXCEPTIONS_FILE = "tools/pylint_exceptions"
 

@@ -85,6 +85,3 @@ class HackingTestCase(testcase.TestCase):
         for code in codes:
             self._assert_has_errors(code, checks.check_oslo_namespace_imports,
                                     expected_errors=[(1, 0, "C300")])
-            self._assert_has_errors(
-                code, checks.check_oslo_namespace_imports,
-                filename="ceilometer/openstack/common/xyz.py")

@@ -22,9 +22,9 @@ import subprocess
 import time
 
 import httplib2
+from oslo_utils import fileutils
 import six
 
-from ceilometer.openstack.common import fileutils
 from ceilometer.tests import base
 
 

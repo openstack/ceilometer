@@ -23,6 +23,7 @@ from oslo_context import context
 import oslo_messaging
 import oslo_messaging.conffixture
 import oslo_service.service
+from oslo_utils import fileutils
 from oslo_utils import timeutils
 import six
 from stevedore import extension
@@ -31,7 +32,6 @@ import yaml
 from ceilometer.compute.notifications import instance
 from ceilometer import messaging
 from ceilometer import notification
-from ceilometer.openstack.common import fileutils
 from ceilometer.publisher import test as test_publisher
 from ceilometer.tests import base as tests_base
 

@@ -36,10 +36,6 @@ oslo_namespace_imports = re.compile(
 
 
 def check_oslo_namespace_imports(logical_line, physical_line, filename):
-    # ignore openstack.common since they are not maintained by us
-    if 'ceilometer/openstack/common/' in filename:
-        return
-
     if re.match(oslo_namespace_imports, logical_line):
         msg = ("C300: '%s' must be used instead of '%s'." % (
                logical_line.replace('oslo.', 'oslo_'),

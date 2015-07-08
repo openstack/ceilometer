@@ -17,9 +17,9 @@ import six
 import yaml
 
 from oslo_config import fixture as fixture_config
+from oslo_utils import fileutils
 
 from ceilometer.meter import notifications
-from ceilometer.openstack.common import fileutils
 from ceilometer.tests import base as test
 
 NOTIFICATION = {
