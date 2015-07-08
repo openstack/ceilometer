@@ -1782,6 +1782,54 @@ class TestAlarms(v2.FunctionalTest,
         self.assertEqual(['test://', 'log://'],
                          alarms[0].alarm_actions)
 
+    def test_post_alarm_trust(self):
+        json = {
+            'name': 'added_alarm_defaults',
+            'type': 'threshold',
+            'ok_actions': ['trust+http://my.server:1234/foo'],
+            'threshold_rule': {
+                'meter_name': 'ameter',
+                'threshold': 300.0
+            }
+        }
+        auth = mock.Mock()
+        trust_client = mock.Mock()
+        with mock.patch('ceilometer.keystone_client.get_v3_client') as client:
+            client.return_value = mock.Mock(
+                auth_ref=mock.Mock(user_id='my_user'))
+            with mock.patch('keystoneclient.v3.client.Client') as sub_client:
+                sub_client.return_value = trust_client
+                trust_client.trusts.create.return_value = mock.Mock(id='5678')
+                self.post_json('/alarms', params=json, status=201,
+                               headers=self.auth_headers,
+                               extra_environ={'keystone.token_auth': auth})
+                trust_client.trusts.create.assert_called_once_with(
+                    trustor_user=self.auth_headers['X-User-Id'],
+                    trustee_user='my_user',
+                    project=self.auth_headers['X-Project-Id'],
+                    impersonation=True,
+                    role_names=[])
+        alarms = list(self.alarm_conn.get_alarms())
+        for alarm in alarms:
+            if alarm.name == 'added_alarm_defaults':
+                self.assertEqual(
+                    ['trust+http://5678:delete@my.server:1234/foo'],
+                    alarm.ok_actions)
+                break
+        else:
+            self.fail("Alarm not found")
+
+        with mock.patch('ceilometer.keystone_client.get_v3_client') as client:
+            client.return_value = mock.Mock(
+                auth_ref=mock.Mock(user_id='my_user'))
+            with mock.patch('keystoneclient.v3.client.Client') as sub_client:
+                sub_client.return_value = trust_client
+                self.delete('/alarms/%s' % alarm.alarm_id,
+                            headers=self.auth_headers,
+                            status=204,
+                            extra_environ={'keystone.token_auth': auth})
+                trust_client.trusts.delete.assert_called_once_with('5678')
+
     def test_put_alarm(self):
         json = {
             'enabled': False,
@@ -2072,6 +2120,39 @@ class TestAlarms(v2.FunctionalTest,
         alarms = list(self.alarm_conn.get_alarms(alarm_id=alarm_id))
         self.assertEqual(1, len(alarms))
         self.assertEqual(['c', 'a', 'b'], alarms[0].rule.get('alarm_ids'))
+
+    def test_put_alarm_trust(self):
+        data = self._get_alarm('a')
+        data.update({'ok_actions': ['trust+http://something/ok']})
+        trust_client = mock.Mock()
+        with mock.patch('ceilometer.keystone_client.get_v3_client') as client:
+            client.return_value = mock.Mock(
+                auth_ref=mock.Mock(user_id='my_user'))
+            with mock.patch('keystoneclient.v3.client.Client') as sub_client:
+                sub_client.return_value = trust_client
+                trust_client.trusts.create.return_value = mock.Mock(id='5678')
+                self.put_json('/alarms/%s' % data['alarm_id'],
+                              params=data,
+                              headers=self.auth_headers)
+        data = self._get_alarm('a')
+        self.assertEqual(
+            ['trust+http://5678:delete@something/ok'], data['ok_actions'])
+
+        data.update({'ok_actions': ['http://no-trust-something/ok']})
+
+        with mock.patch('ceilometer.keystone_client.get_v3_client') as client:
+            client.return_value = mock.Mock(
+                auth_ref=mock.Mock(user_id='my_user'))
+            with mock.patch('keystoneclient.v3.client.Client') as sub_client:
+                sub_client.return_value = trust_client
+                self.put_json('/alarms/%s' % data['alarm_id'],
+                              params=data,
+                              headers=self.auth_headers)
+                trust_client.trusts.delete.assert_called_once_with('5678')
+
+        data = self._get_alarm('a')
+        self.assertEqual(
+            ['http://no-trust-something/ok'], data['ok_actions'])
 
     def test_delete_alarm(self):
         data = self.get_json('/alarms')

@@ -14,11 +14,11 @@
 # under the License.
 """Rest alarm notifier with trusted authentication."""
 
-from keystoneclient.v3 import client as keystone_client
 from oslo_config import cfg
 from six.moves.urllib import parse
 
 from ceilometer.alarm.notifier import rest
+from ceilometer import keystone_client
 
 
 cfg.CONF.import_opt('http_timeout', 'ceilometer.service')
@@ -40,17 +40,7 @@ class TrustRestAlarmNotifier(rest.RestAlarmNotifier):
                reason, reason_data):
         trust_id = action.username
 
-        auth_url = cfg.CONF.service_credentials.os_auth_url.replace(
-            "v2.0", "v3")
-        client = keystone_client.Client(
-            username=cfg.CONF.service_credentials.os_username,
-            password=cfg.CONF.service_credentials.os_password,
-            cacert=cfg.CONF.service_credentials.os_cacert,
-            auth_url=auth_url,
-            region_name=cfg.CONF.service_credentials.os_region_name,
-            insecure=cfg.CONF.service_credentials.insecure,
-            timeout=cfg.CONF.http_timeout,
-            trust_id=trust_id)
+        client = keystone_client.get_v3_client(trust_id)
 
         # Remove the fake user
         netloc = action.netloc.split("@")[1]
