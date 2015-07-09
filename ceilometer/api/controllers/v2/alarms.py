@@ -396,18 +396,20 @@ class Alarm(base.Base):
         auth_plugin = pecan.request.environ.get('keystone.token_auth')
         for actions in (self.ok_actions, self.alarm_actions,
                         self.insufficient_data_actions):
-            for index, action in enumerate(actions[:]):
-                url = netutils.urlsplit(action)
-                if self._is_trust_url(url):
-                    if '@' not in url.netloc:
-                        # We have a trust action without a trust ID, create it
-                        trust_id = keystone_client.create_trust_id(
-                            trustor_user_id, trustor_project_id, roles,
-                            auth_plugin)
-                        netloc = '%s:delete@%s' % (trust_id, url.netloc)
-                        url = list(url)
-                        url[1] = netloc
-                        actions[index] = urlparse.urlunsplit(url)
+            if actions is not None:
+                for index, action in enumerate(actions[:]):
+                    url = netutils.urlsplit(action)
+                    if self._is_trust_url(url):
+                        if '@' not in url.netloc:
+                            # We have a trust action without a trust ID,
+                            # create it
+                            trust_id = keystone_client.create_trust_id(
+                                trustor_user_id, trustor_project_id, roles,
+                                auth_plugin)
+                            netloc = '%s:delete@%s' % (trust_id, url.netloc)
+                            url = list(url)
+                            url[1] = netloc
+                            actions[index] = urlparse.urlunsplit(url)
         if old_alarm:
             for key in ('ok_actions', 'alarm_actions',
                         'insufficient_data_actions'):

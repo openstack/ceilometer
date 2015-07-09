@@ -1782,6 +1782,30 @@ class TestAlarms(v2.FunctionalTest,
         self.assertEqual(['test://', 'log://'],
                          alarms[0].alarm_actions)
 
+    def test_post_alarm_without_actions(self):
+        body = {
+            'name': 'alarm_actions_none',
+            'type': 'combination',
+            'combination_rule': {
+                'alarm_ids': ['a', 'b'],
+            },
+            'alarm_actions': None
+        }
+        headers = self.auth_headers
+        headers['X-Roles'] = 'admin'
+        self.post_json('/alarms', params=body, status=201,
+                       headers=headers)
+        alarms = list(self.alarm_conn.get_alarms(name='alarm_actions_none'))
+        self.assertEqual(1, len(alarms))
+
+        # FIXME(sileht): This should really returns [] not None
+        # but the mongodb and sql just store the json dict as is...
+        # migration script for sql will be a mess because we have
+        # to parse all JSON :(
+        # I guess we assume that wsme convert the None input to []
+        # because of the array type, but it won't...
+        self.assertIsNone(alarms[0].alarm_actions)
+
     def test_post_alarm_trust(self):
         json = {
             'name': 'added_alarm_defaults',
