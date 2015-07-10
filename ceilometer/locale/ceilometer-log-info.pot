@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 2015.2.0.dev106\n"
+"Project-Id-Version: ceilometer 5.0.0.0b2.dev56\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-05-28 06:06+0000\n"
+"POT-Creation-Date: 2015-07-10 06:11+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,100 +31,48 @@ msgstr ""
 msgid "Left partitioning group %s"
 msgstr ""
 
-#: ceilometer/alarm/storage/impl_log.py:59
+#: ceilometer/alarm/storage/impl_log.py:60
 #, python-format
 msgid "Dropping alarm history data with TTL %d"
 msgstr ""
 
-#: ceilometer/alarm/storage/impl_sqlalchemy.py:345
+#: ceilometer/alarm/storage/impl_sqlalchemy.py:339
 #, python-format
 msgid "%d alarm histories are removed from database"
 msgstr ""
 
-#: ceilometer/cmd/storage.py:45
+#: ceilometer/api/controllers/v2/utils.py:47
+#, python-format
+msgid "No limit value provided, result set will belimited to %(limit)d."
+msgstr ""
+
+#: ceilometer/cmd/eventlet/storage.py:45
 msgid "Nothing to clean, database metering time to live is disabled"
 msgstr ""
 
-#: ceilometer/cmd/storage.py:54
+#: ceilometer/cmd/eventlet/storage.py:54
 msgid "Nothing to clean, database event time to live is disabled"
 msgstr ""
 
-#: ceilometer/cmd/storage.py:63
+#: ceilometer/cmd/eventlet/storage.py:63
 msgid "Nothing to clean, database alarm history time to live is disabled"
 msgstr ""
 
 #: ceilometer/event/storage/impl_elasticsearch.py:107
-#: ceilometer/event/storage/impl_sqlalchemy.py:198
+#: ceilometer/event/storage/impl_sqlalchemy.py:197
 #: ceilometer/event/storage/pymongo_base.py:67
 #, python-format
 msgid "Duplicate event detected, skipping it: %s"
 msgstr ""
 
-#: ceilometer/event/storage/impl_log.py:32
+#: ceilometer/event/storage/impl_log.py:33
 #, python-format
 msgid "Dropping event data with TTL %d"
 msgstr ""
 
-#: ceilometer/event/storage/impl_sqlalchemy.py:420
+#: ceilometer/event/storage/impl_sqlalchemy.py:411
 #, python-format
 msgid "%d events are removed from database"
-msgstr ""
-
-#: ceilometer/openstack/common/eventlet_backdoor.py:146
-#, python-format
-msgid "Eventlet backdoor listening on %(port)s for process %(pid)d"
-msgstr ""
-
-#: ceilometer/openstack/common/service.py:173
-#, python-format
-msgid "Caught %s, exiting"
-msgstr ""
-
-#: ceilometer/openstack/common/service.py:231
-msgid "Parent process has died unexpectedly, exiting"
-msgstr ""
-
-#: ceilometer/openstack/common/service.py:262
-#, python-format
-msgid "Child caught %s, exiting"
-msgstr ""
-
-#: ceilometer/openstack/common/service.py:301
-msgid "Forking too fast, sleeping"
-msgstr ""
-
-#: ceilometer/openstack/common/service.py:320
-#, python-format
-msgid "Started child %d"
-msgstr ""
-
-#: ceilometer/openstack/common/service.py:330
-#, python-format
-msgid "Starting %d workers"
-msgstr ""
-
-#: ceilometer/openstack/common/service.py:347
-#, python-format
-msgid "Child %(pid)d killed by signal %(sig)d"
-msgstr ""
-
-#: ceilometer/openstack/common/service.py:351
-#, python-format
-msgid "Child %(pid)s exited with status %(code)d"
-msgstr ""
-
-#: ceilometer/openstack/common/service.py:390
-#, python-format
-msgid "Caught %s, stopping children"
-msgstr ""
-
-#: ceilometer/openstack/common/service.py:399
-msgid "Wait called after thread killed. Cleaning up."
-msgstr ""
-
-#: ceilometer/openstack/common/service.py:415
-#, python-format
-msgid "Waiting on %d children to exit"
 msgstr ""
 
 #: ceilometer/publisher/kafka_broker.py:86

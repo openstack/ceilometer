@@ -8,10 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-06-23 06:14+0000\n"
-"PO-Revision-Date: 2015-06-19 19:24+0000\n"
+"POT-Creation-Date: 2015-07-10 06:11+0000\n"
+"PO-Revision-Date: 2015-07-03 08:45+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
-"Language-Team: English (United Kingdom) (http://www.transifex.com/projects/p/"
+"Language-Team: English (United Kingdom) (http://www.transifex.com/p/"
 "ceilometer/language/en_GB/)\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
@@ -645,9 +645,6 @@ msgstr "could not get CPU time for %(id)s: %(e)s"
 msgid "detected decoupled pipeline config format"
 msgstr "detected decoupled pipeline config format"
 
-msgid "detected deprecated pipeline config format"
-msgstr "detected deprecated pipeline config format"
-
 #, python-format
 msgid "dropping sample with no predecessor: %s"
 msgstr "dropping sample with no predecessor: %s"
@@ -659,13 +656,6 @@ msgstr "evaluating alarm %s"
 #, python-format
 msgid "excluded weak datapoints with sample counts %s"
 msgstr "excluded weak datapoints with sample counts %s"
-
-msgid ""
-"get_exchange_topics API of NotificationPlugin isdeprecated, implements "
-"get_targets instead."
-msgstr ""
-"get_exchange_topics API of NotificationPlugin isdeprecated, implements "
-"get_targets instead."
 
 #, python-format
 msgid "handling sample %s"
@@ -682,10 +672,6 @@ msgstr "inspector call failed for %(ident)s host %(host)s: %(err)s"
 #, python-format
 msgid "loading dispatchers from %s"
 msgstr "loading dispatchers from %s"
-
-#, python-format
-msgid "loading notification handlers from %s"
-msgstr "loading notification handlers from %s"
 
 msgid "max_bytes and backup_count should be numbers."
 msgstr "max_bytes and backup_count should be numbers."

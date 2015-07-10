@@ -8,10 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-05-28 06:06+0000\n"
-"PO-Revision-Date: 2015-05-11 05:13+0000\n"
+"POT-Creation-Date: 2015-07-10 06:11+0000\n"
+"PO-Revision-Date: 2015-07-03 11:10+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
-"Language-Team: English (United Kingdom) (http://www.transifex.com/projects/p/"
+"Language-Team: English (United Kingdom) (http://www.transifex.com/p/"
 "ceilometer/language/en_GB/)\n"
 "Language: en_GB\n"
 "MIME-Version: 1.0\n"
@@ -20,55 +20,13 @@ msgstr ""
 "Generated-By: Babel 1.3\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#, python-format
-msgid "Caught %s, exiting"
-msgstr "Caught %s, exiting"
-
-#, python-format
-msgid "Caught %s, stopping children"
-msgstr "Caught %s, stopping children"
-
-#, python-format
-msgid "Child %(pid)d killed by signal %(sig)d"
-msgstr "Child %(pid)d killed by signal %(sig)d"
-
-#, python-format
-msgid "Child %(pid)s exited with status %(code)d"
-msgstr "Child %(pid)s exited with status %(code)d"
-
-#, python-format
-msgid "Child caught %s, exiting"
-msgstr "Child caught %s, exiting"
-
 msgid "Coordination backend started successfully."
 msgstr "Coordination backend started successfully."
-
-#, python-format
-msgid "Eventlet backdoor listening on %(port)s for process %(pid)d"
-msgstr "Eventlet backdoor listening on %(port)s for process %(pid)d"
-
-msgid "Forking too fast, sleeping"
-msgstr "Forking too fast, sleeping"
 
 #, python-format
 msgid "Joined partitioning group %s"
 msgstr "Joined partitioning group %s"
 
-msgid "Parent process has died unexpectedly, exiting"
-msgstr "Parent process has died unexpectedly, exiting"
-
 #, python-format
 msgid "Publishing policy set to %s"
 msgstr "Publishing policy set to %s"
-
-#, python-format
-msgid "Started child %d"
-msgstr "Started child %d"
-
-#, python-format
-msgid "Starting %d workers"
-msgstr "Starting %d workers"
-
-#, python-format
-msgid "Waiting on %d children to exit"
-msgstr "Waiting on %d children to exit"
