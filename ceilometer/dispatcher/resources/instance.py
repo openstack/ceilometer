@@ -29,10 +29,10 @@ class Instance(base.ResourceBase):
             "display_name": metadata['display_name'],
         }
         if "instance_flavor_id" in metadata:
-            params["flavor_id"] = int(metadata['instance_flavor_id'])
+            params["flavor_id"] = metadata['instance_flavor_id']
         else:
             # NOTE(sileht): instance.exists have the flavor here
-            params["flavor_id"] = int(metadata["flavor"]["id"])
+            params["flavor_id"] = metadata["flavor"]["id"]
 
         server_group = metadata.get('user_metadata', {}).get('server_group')
         if server_group:
