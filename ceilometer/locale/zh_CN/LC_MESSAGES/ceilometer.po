@@ -12,11 +12,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-06-23 06:14+0000\n"
-"PO-Revision-Date: 2015-06-19 19:24+0000\n"
+"POT-Creation-Date: 2015-07-10 06:11+0000\n"
+"PO-Revision-Date: 2015-07-03 08:45+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
-"Language-Team: Chinese (China) (http://www.transifex.com/projects/p/"
-"ceilometer/language/zh_CN/)\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/p/ceilometer/"
+"language/zh_CN/)\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -802,9 +802,6 @@ msgstr "无法为虚拟机%(id)s获取CPU时间：%(e)s"
 msgid "detected decoupled pipeline config format"
 msgstr "检测到分离的流水线配置格式"
 
-msgid "detected deprecated pipeline config format"
-msgstr "检测到废弃的流水线配置格式"
-
 #, python-format
 msgid "dropping sample with no predecessor: %s"
 msgstr "因为之前没有数据（用来计算差值）因而丢弃数据：%s"
@@ -835,10 +832,6 @@ msgstr "ipmi输出长度不匹配"
 #, python-format
 msgid "loading dispatchers from %s"
 msgstr "正在从%s加载分发器"
-
-#, python-format
-msgid "loading notification handlers from %s"
-msgstr "从%s加载通知处理器"
 
 msgid "max_bytes and backup_count should be numbers."
 msgstr "max_bytes和backup_count必须是整数。"
