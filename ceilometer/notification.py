@@ -42,13 +42,11 @@ OPTS = [
                 default=False,
                 help='Save event details.'),
     cfg.BoolOpt('disable_non_metric_meters',
-                default=False,
+                default=True,
                 help='WARNING: Ceilometer historically offered the ability to '
                      'store events as meters. This usage is NOT advised as it '
                      'can flood the metering database and cause performance '
-                     'degradation. This option disables the collection of '
-                     'non-metric meters and will be the default behavior in '
-                     'Liberty.'),
+                     'degradation.'),
     cfg.BoolOpt('workload_partitioning',
                 default=False,
                 help='Enable workload partitioning, allowing multiple '
