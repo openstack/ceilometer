@@ -100,14 +100,14 @@ class ResourcesController(rest.RestController):
                          rel=rel_name)
 
     def _resource_links(self, resource_id, meter_links=1):
-        links = [self._make_link('self', pecan.request.host_url,
+        links = [self._make_link('self', pecan.request.application_url,
                                  'resources', resource_id)]
         if meter_links:
             for meter in pecan.request.storage_conn.get_meters(
                     resource=resource_id):
                 query = {'field': 'resource_id', 'value': resource_id}
                 links.append(self._make_link(meter.name,
-                                             pecan.request.host_url,
+                                             pecan.request.application_url,
                                              'meters', meter.name,
                                              query=query))
         return links
