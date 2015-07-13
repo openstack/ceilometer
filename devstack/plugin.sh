@@ -58,8 +58,8 @@ function ceilometer_service_url {
 }
 
 
-# _install_mongdb - Install mongodb and pyton lib.
-function _install_mongodb {
+# _ceilometer_install_mongdb - Install mongodb and python lib.
+function _ceilometer_install_mongodb {
     # Server package is the same on all
     local packages=mongodb-server
 
@@ -69,10 +69,19 @@ function _install_mongodb {
     fi
 
     install_package ${packages}
+
+    if is_fedora; then
+        restart_service mongod
+    else
+        restart_service mongodb
+    fi
+
+    # give time for service to restart
+    sleep 5
 }
 
-# _install_redis() - Install the redis server and python lib.
-function _install_redis {
+# _ceilometer_install_redis() - Install the redis server and python lib.
+function _ceilometer_install_redis {
     if is_ubuntu; then
         install_package redis-server
         restart_service redis-server
@@ -86,7 +95,7 @@ function _install_redis {
 }
 
 # Configure mod_wsgi
-function _config_ceilometer_apache_wsgi {
+function _ceilometer_config_apache_wsgi {
     sudo mkdir -p $CEILOMETER_WSGI_DIR
 
     local ceilometer_apache_conf=$(apache_site_config_for ceilometer)
@@ -111,19 +120,19 @@ function _config_ceilometer_apache_wsgi {
 }
 
 # Install required services for coordination
-function _prepare_coordination {
+function _ceilometer_prepare_coordination {
     if echo $CEILOMETER_COORDINATION_URL | grep -q '^memcached:'; then
         install_package memcached
     elif echo $CEILOMETER_COORDINATION_URL | grep -q '^redis:'; then
-        _install_redis
+        _ceilometer_install_redis
     fi
 }
 
 # Install required services for storage backends
-function _prepare_storage_backend {
+function _ceilometer_prepare_storage_backend {
     if [ "$CEILOMETER_BACKEND" = 'mongodb' ] ; then
         pip_install_gr pymongo
-        _install_mongodb
+        _ceilometer_install_mongodb
     fi
 
     if [ "$CEILOMETER_BACKEND" = 'es' ] ; then
@@ -134,7 +143,7 @@ function _prepare_storage_backend {
 
 
 # Install the python modules for inspecting nova virt instances
-function _prepare_virt_drivers {
+function _ceilometer_prepare_virt_drivers {
     # Only install virt drivers if we're running nova compute
     if is_service_enabled n-cpu ; then
         if [[ "$VIRT_DRIVER" = 'libvirt' ]]; then
@@ -149,7 +158,7 @@ function _prepare_virt_drivers {
 
 
 # Create ceilometer related accounts in Keystone
-function _create_ceilometer_accounts {
+function _ceilometer_create_accounts {
     if is_service_enabled ceilometer-api; then
 
         create_service_user "ceilometer" "admin"
@@ -176,7 +185,7 @@ function preinstall_ceilometer {
 }
 
 # Remove WSGI files, disable and remove Apache vhost file
-function _cleanup_ceilometer_apache_wsgi {
+function _ceilometer_cleanup_apache_wsgi {
     sudo rm -f $CEILOMETER_WSGI_DIR/*
     sudo rm -f $(apache_site_config_for ceilometer)
 }
@@ -190,12 +199,12 @@ function cleanup_ceilometer {
         curl -XDELETE "localhost:9200/events_*"
     fi
     if [ "$CEILOMETER_USE_MOD_WSGI" == "True" ]; then
-        _cleanup_ceilometer_apache_wsgi
+        _ceilometer_cleanup_apache_wsgi
     fi
 }
 
 # Set configuration for storage backend.
-function _configure_storage_backend {
+function _ceilometer_configure_storage_backend {
     if [ "$CEILOMETER_BACKEND" = 'mysql' ] || [ "$CEILOMETER_BACKEND" = 'postgresql' ] ; then
         iniset $CEILOMETER_CONF database alarm_connection $(database_connection_url ceilometer)
         iniset $CEILOMETER_CONF database event_connection $(database_connection_url ceilometer)
@@ -260,8 +269,8 @@ function configure_ceilometer {
 
     iniset $CEILOMETER_CONF notification store_events $CEILOMETER_EVENTS
 
-    # Configured storage
-    _configure_storage_backend
+    # Configure storage
+    _ceilometer_configure_storage_backend
 
     if [[ "$VIRT_DRIVER" = 'vsphere' ]]; then
         iniset $CEILOMETER_CONF DEFAULT hypervisor_inspector vsphere
@@ -274,7 +283,7 @@ function configure_ceilometer {
     # call cleanup_ceilometer which will wipe the WSGI config.
     if [ "$CEILOMETER_USE_MOD_WSGI" == "True" ]; then
         iniset $CEILOMETER_CONF api pecan_debug "False"
-        _config_ceilometer_apache_wsgi
+        _ceilometer_config_apache_wsgi
     fi
 
     if is_service_enabled ceilometer-aipmi; then
@@ -286,7 +295,7 @@ function configure_ceilometer {
 # init_ceilometer() - Initialize etc.
 function init_ceilometer {
     # Get ceilometer keystone settings in place
-    _create_ceilometer_accounts
+    _ceilometer_create_accounts
     # Create cache dir
     sudo install -d -o $STACK_USER $CEILOMETER_AUTH_CACHE_DIR
     rm -f $CEILOMETER_AUTH_CACHE_DIR/*
@@ -305,9 +314,9 @@ function init_ceilometer {
 # installed. The context is not active during preinstall (when it would
 # otherwise makes sense to do the backend services).
 function install_ceilometer {
-    _prepare_coordination
-    _prepare_storage_backend
-    _prepare_virt_drivers
+    _ceilometer_prepare_coordination
+    _ceilometer_prepare_storage_backend
+    _ceilometer_prepare_virt_drivers
     install_ceilometerclient
     setup_develop $CEILOMETER_DIR
 }
