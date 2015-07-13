@@ -24,14 +24,20 @@
 import abc
 import copy
 import datetime
+import shutil
 
+import eventlet
 import mock
 from oslo_config import fixture as fixture_config
+from oslo_service import service as os_service
+from oslo_utils import timeutils
 from oslotest import mockpatch
 import six
 from stevedore import extension
+import yaml
 
 from ceilometer.agent import plugin_base
+from ceilometer.openstack.common import fileutils
 from ceilometer import pipeline
 from ceilometer import publisher
 from ceilometer.publisher import test as test_publisher
@@ -292,6 +298,102 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.mgr.setup_polling_tasks.assert_called_once_with()
         timer_call = mock.call(1.0, self.mgr.partition_coordinator.heartbeat)
         self.assertEqual([timer_call], self.mgr.tg.add_timer.call_args_list)
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline')
+    def test_start_with_pipeline_poller(self, setup_pipeline):
+        self.mgr.join_partitioning_groups = mock.MagicMock()
+        self.mgr.setup_polling_tasks = mock.MagicMock()
+
+        self.CONF.set_override('heartbeat', 1.0, group='coordination')
+        self.CONF.set_override('refresh_pipeline_cfg', True)
+        self.CONF.set_override('pipeline_polling_interval', 5)
+        self.mgr.start()
+        setup_pipeline.assert_called_once_with()
+        self.mgr.partition_coordinator.start.assert_called_once_with()
+        self.mgr.join_partitioning_groups.assert_called_once_with()
+        self.mgr.setup_polling_tasks.assert_called_once_with()
+        timer_call = mock.call(1.0, self.mgr.partition_coordinator.heartbeat)
+        pipeline_poller_call = mock.call(5, self.mgr.refresh_pipeline)
+        self.assertEqual([timer_call, pipeline_poller_call],
+                         self.mgr.tg.add_timer.call_args_list)
+
+    def test_start_with_reloadable_pipeline(self):
+
+        def setup_pipeline_file(pipeline):
+            if six.PY3:
+                pipeline = pipeline.encode('utf-8')
+
+            pipeline_cfg_file = fileutils.write_to_tempfile(content=pipeline,
+                                                            prefix="pipeline",
+                                                            suffix="yaml")
+            return pipeline_cfg_file
+
+        self.CONF.set_override('heartbeat', 1.0, group='coordination')
+        self.CONF.set_override('refresh_pipeline_cfg', True)
+        self.CONF.set_override('pipeline_polling_interval', 2)
+
+        pipeline = yaml.dump({
+            'sources': [{
+                'name': 'test_pipeline',
+                'interval': 1,
+                'meters': ['test'],
+                'resources': ['test://'] if self.source_resources else [],
+                'sinks': ['test_sink']}],
+            'sinks': [{
+                'name': 'test_sink',
+                'transformers': [],
+                'publishers': ["test"]}]
+        })
+
+        pipeline_cfg_file = setup_pipeline_file(pipeline)
+
+        self.CONF.set_override("pipeline_cfg_file", pipeline_cfg_file)
+        self.mgr.tg = os_service.threadgroup.ThreadGroup(1000)
+        self.mgr.start()
+        pub = self.mgr.pipeline_manager.pipelines[0].publishers[0]
+        self.expected_samples = 1
+        start = timeutils.utcnow()
+        while timeutils.delta_seconds(start, timeutils.utcnow()) < 600:
+            if len(pub.samples) >= self.expected_samples:
+                break
+            eventlet.sleep(0)
+
+        del pub.samples[0].resource_metadata['resources']
+        self.assertEqual(self.Pollster.test_data, pub.samples[0])
+
+        # Flush publisher samples to test reloading
+        pub.samples = []
+        # Modify the collection targets
+        pipeline = yaml.dump({
+            'sources': [{
+                'name': 'test_pipeline',
+                'interval': 1,
+                'meters': ['testanother'],
+                'resources': ['test://'] if self.source_resources else [],
+                'sinks': ['test_sink']}],
+            'sinks': [{
+                'name': 'test_sink',
+                'transformers': [],
+                'publishers': ["test"]}]
+        })
+
+        updated_pipeline_cfg_file = setup_pipeline_file(pipeline)
+        # Move/re-name the updated pipeline file to the original pipeline
+        # file path as recorded in oslo config
+        shutil.move(updated_pipeline_cfg_file, pipeline_cfg_file)
+        # Random sleep to let the pipeline poller complete the reloading
+        eventlet.sleep(3)
+
+        pub = self.mgr.pipeline_manager.pipelines[0].publishers[0]
+        self.expected_samples = 1
+        start = timeutils.utcnow()
+        while timeutils.delta_seconds(start, timeutils.utcnow()) < 600:
+            if len(pub.samples) >= self.expected_samples:
+                break
+            eventlet.sleep(0)
+
+        del pub.samples[0].resource_metadata['resources']
+        self.assertEqual(self.PollsterAnother.test_data, pub.samples[0])
 
     def test_join_partitioning_groups(self):
         self.mgr.discovery_manager = self.create_discovery_manager()
