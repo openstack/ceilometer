@@ -39,10 +39,9 @@ class BaseTestCase(base.BaseTestCase):
             exchange = 'ceilometer'
         conf.set_override("control_exchange", exchange)
 
-        # NOTE(sileht): oslo.messaging fake driver uses time.sleep
-        # for task switch, so we need to monkey_patch it
-        # and also ensure the correct exchange have been set
-        eventlet.monkey_patch(time=True)
+        # oslo.messaging fake driver needs time and thread
+        # to be patched, otherwise there are chances of deadlocks
+        eventlet.monkey_patch(time=True, thread=True)
 
         # NOTE(sileht): Ensure a new oslo.messaging driver is loaded
         # between each tests
