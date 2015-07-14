@@ -90,6 +90,7 @@ class DispatcherTest(base.BaseTestCase):
         self.useFixture(mockpatch.Patch(
             'ceilometer.keystone_client.get_client',
             return_value=ks_client))
+        self.conf.conf.dispatcher_gnocchi.filter_service_activity = True
 
     def test_extensions_load(self):
         self.conf.config(filter_service_activity=False,
