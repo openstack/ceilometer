@@ -63,7 +63,6 @@ class PartitionCoordinator(object):
         self._coordinator = None
         self._groups = set()
         self._my_id = my_id or str(uuid.uuid4())
-        self._started = False
 
     def start(self):
         backend_url = cfg.CONF.coordination.backend_url
@@ -72,10 +71,8 @@ class PartitionCoordinator(object):
                 self._coordinator = tooz.coordination.get_coordinator(
                     backend_url, self._my_id)
                 self._coordinator.start()
-                self._started = True
                 LOG.info(_LI('Coordination backend started successfully.'))
             except tooz.coordination.ToozError:
-                self._started = False
                 LOG.exception(_LE('Error connecting to coordination backend.'))
 
     def stop(self):
@@ -91,14 +88,13 @@ class PartitionCoordinator(object):
             LOG.exception(_LE('Error connecting to coordination backend.'))
         finally:
             self._coordinator = None
-            self._started = False
 
     def is_active(self):
         return self._coordinator is not None
 
     def heartbeat(self):
         if self._coordinator:
-            if not self._started:
+            if not self._coordinator.is_started:
                 # re-connect
                 self.start()
             try:
@@ -117,7 +113,8 @@ class PartitionCoordinator(object):
             self._coordinator.run_watchers()
 
     def join_group(self, group_id):
-        if not self._coordinator or not self._started or not group_id:
+        if (not self._coordinator or not self._coordinator.is_started
+                or not group_id):
             return
         while True:
             try:
