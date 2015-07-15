@@ -18,11 +18,16 @@ check_for_cmd () {
 }
 
 wait_for_line () {
+    exit_code=1
     while read line
     do
-        echo "$line" | grep -q "$1" && break
+        echo "$line" | grep -q "$1" && exit_code=0 && break
     done < "$2"
     # Read the fifo for ever otherwise process would block
     cat "$2" >/dev/null &
+    if [ $exit_code -eq 1 ]; then
+        echo "Entries of \"$1\" have not been found. Now tests will be stopped."
+        exit $exit_code
+    fi
 }
 
