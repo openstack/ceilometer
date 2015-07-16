@@ -38,6 +38,10 @@
 #   CEILOMETER_COORDINATION_URL:   URL for group membership service provided by tooz.
 #   CEILOMETER_EVENTS:             Set to True to enable event collection
 
+# Save trace setting
+XTRACE=$(set +o | grep xtrace)
+set -o xtrace
+
 # Support potential entry-points console scripts in VENV or not
 if [[ ${USE_VENV} = True ]]; then
     PROJECT_VENV["ceilometer"]=${CEILOMETER_DIR}.venv
@@ -412,3 +416,6 @@ if is_service_enabled ceilometer; then
         cleanup_ceilometer
     fi
 fi
+
+# Restore xtrace
+$XTRACE
