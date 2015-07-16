@@ -139,15 +139,23 @@ class DispatcherTest(base.BaseTestCase):
                               gnocchi.GnocchiDispatcher, self.conf.conf)
 
     @mock.patch('ceilometer.dispatcher.gnocchi.GnocchiDispatcher'
-                '._process_samples')
-    def _do_test_activity_filter(self, expected_samples, fake_process_samples):
+                '._process_resource')
+    def _do_test_activity_filter(self, expected_samples,
+                                 fake_process_resource):
+
+        def assert_samples(resource_id, metric_grouped_samples):
+            samples = []
+            for metric_name, s in metric_grouped_samples:
+                samples.extend(list(s))
+            self.assertEqual(expected_samples, samples)
+
+        fake_process_resource.side_effect = assert_samples
+
         d = gnocchi.GnocchiDispatcher(self.conf.conf)
         d.record_metering_data(self.samples)
 
-        fake_process_samples.assert_called_with(
-            mock.ANY, self.resource_id, 'disk.root.size',
-            expected_samples, True,
-        )
+        fake_process_resource.assert_called_with(self.resource_id,
+                                                 mock.ANY)
 
     def test_archive_policy_map_config(self):
         archive_policy_map = yaml.dump({
@@ -263,7 +271,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
         ('normal_workflow', dict(measure=204, post_resource=None, metric=None,
                                  measure_retry=None, patch_resource=204)),
         ('new_resource', dict(measure=404, post_resource=204, metric=None,
-                              measure_retry=204, patch_resource=None)),
+                              measure_retry=204, patch_resource=204)),
         ('new_resource_fail', dict(measure=404, post_resource=500, metric=None,
                                    measure_retry=None, patch_resource=None)),
         ('resource_update_fail', dict(measure=204, post_resource=None,
