@@ -32,7 +32,7 @@ OPTS = [
 cfg.CONF.register_opts(OPTS)
 # TODO(boris-42): remove after adding keystone audit plugins.
 cfg.CONF.import_opt('keystone_control_exchange',
-                    'ceilometer.identity.notifications')
+                    'ceilometer.notification')
 
 
 class ProfilerNotifications(plugin_base.NotificationBase,

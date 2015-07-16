@@ -150,3 +150,24 @@ class TestMeterProcessing(test.BaseTestCase):
             self.__setup_meter_def_file(cfg))
         c = list(self.handler.process_notification(NOTIFICATION))
         self.assertEqual(1, len(c))
+
+    def test_multi_match_event_meter(self):
+        cfg = yaml.dump(
+            {'metric': [dict(name="test1",
+                        event_type="test.create",
+                        type="delta",
+                             unit="B",
+                             volume="payload.volume",
+                             resource_id="payload.resource_id",
+                             project_id="payload.project_id"),
+                        dict(name="test2",
+                             event_type="test.create",
+                             type="delta",
+                             unit="B",
+                             volume="payload.volume",
+                             resource_id="payload.resource_id",
+                             project_id="payload.project_id")]})
+        self.handler.definitions = notifications.load_definitions(
+            self.__setup_meter_def_file(cfg))
+        c = list(self.handler.process_notification(NOTIFICATION))
+        self.assertEqual(2, len(c))

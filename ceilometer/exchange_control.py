@@ -23,4 +23,13 @@ EXCHANGE_OPTS = [
     cfg.StrOpt('magnetodb_control_exchange',
                default='magnetodb',
                help="Exchange name for Magnetodb notifications."),
+    cfg.StrOpt('keystone_control_exchange',
+               default='keystone',
+               help="Exchange name for Keystone notifications."),
+    cfg.StrOpt('cinder_control_exchange',
+               default='cinder',
+               help="Exchange name for Cinder notifications."),
+    cfg.StrOpt('sahara_control_exchange',
+               default='sahara',
+               help="Exchange name for Data Processing notifications."),
 ]

@@ -39,6 +39,33 @@ metric:
     resource_id: payload.table_uuid
     user_id: _context_user
 
+  - name: 'volume.size'
+    event_type:
+      - 'volume.exists'
+      - 'volume.create.*'
+      - 'volume.delete.*'
+      - 'volume.resize.*'
+      - 'volume.attach.*'
+      - 'volume.detach.*'
+      - 'volume.update.*'
+    type: 'gauge'
+    unit: 'GB'
+    volume: payload.size
+    user_id: payload.user_id
+    project_id: payload.tenant_id
+    resource_id: payload.volume_id
+
+  - name: 'snapshot.size'
+    event_type:
+      - 'snapshot.exists'
+      - 'snapshot.create.*'
+      - 'snapshot.delete.*'
+    type: 'gauge'
+    unit: 'GB'
+    volume: payload.volume_size
+    user_id: payload.user_id
+    project_id: payload.tenant_id
+    resource_id: payload.snapshot_id
 
 # NOTE: non-metric meters are generally events/existence meters
 # These are expected to be DEPRECATED in future releases
@@ -46,9 +73,9 @@ metric:
   # Image
   - name: "image"
     event_type:
-        - "image.upload"
-        - "image.delete"
-        - "image.update"
+      - "image.upload"
+      - "image.delete"
+      - "image.update"
     type: "gauge"
     unit: 'image'
     volume: 1
@@ -124,3 +151,415 @@ metric:
     resource_id: payload.table_uuid
     user_id: _context_user
     project_id: _context_tenant
+
+  # Volume
+  - name: 'volume'
+    type: 'gauge'
+    unit: 'volume'
+    volume: 1
+    event_type:
+      - 'volume.exists'
+      - 'volume.create.*'
+      - 'volume.delete.*'
+      - 'volume.resize.*'
+      - 'volume.attach.*'
+      - 'volume.detach.*'
+      - 'volume.update.*'
+    resource_id: payload.volume_id
+    user_id: payload.user_id
+    project_id: payload.tenant_id
+
+  - name: 'volume.exists'
+    type: 'delta'
+    unit: 'volume'
+    volume: 1
+    event_type:
+      - 'volume.exists'
+    resource_id: payload.volume_id
+    user_id: payload.user_id
+    project_id: payload.tenant_id
+
+  - name: 'volume.create.start'
+    type: 'delta'
+    unit: 'volume'
+    volume: 1
+    event_type:
+      - 'volume.create.start'
+    resource_id: payload.volume_id
+    user_id: payload.user_id
+    project_id: payload.tenant_id
+
+  - name: 'volume.create.end'
+    type: 'delta'
+    unit: 'volume'
+    volume: 1
+    event_type:
+      - 'volume.create.end'
+    resource_id: payload.volume_id
+    user_id: payload.user_id
+    project_id: payload.tenant_id
+
+  - name: 'volume.delete.start'
+    type: 'delta'
+    unit: 'volume'
+    volume: 1
+    event_type:
+      - 'volume.delete.start'
+    resource_id: payload.volume_id
+    user_id: payload.user_id
+    project_id: payload.tenant_id
+
+  - name: 'volume.delete.end'
+    type: 'delta'
+    unit: 'volume'
+    volume: 1
+    event_type:
+      - 'volume.delete.end'
+    resource_id: payload.volume_id
+    user_id: payload.user_id
+    project_id: payload.tenant_id
+
+  - name: 'volume.update.end'
+    type: 'delta'
+    unit: 'volume'
+    volume: 1
+    event_type:
+      - 'volume.update.end'
+    resource_id: payload.volume_id
+    user_id: payload.user_id
+    project_id: payload.tenant_id
+
+  - name: 'volume.update.start'
+    type: 'delta'
+    unit: 'volume'
+    volume: 1
+    event_type:
+      - 'volume.update.start'
+    resource_id: payload.volume_id
+    user_id: payload.user_id
+    project_id: payload.tenant_id
+
+  - name: 'volume.resize.end'
+    type: 'delta'
+    unit: 'volume'
+    volume: 1
+    event_type:
+      - 'volume.resize.end'
+    resource_id: payload.volume_id
+    user_id: payload.user_id
+    project_id: payload.tenant_id
+
+  - name: 'volume.resize.start'
+    type: 'delta'
+    unit: 'volume'
+    volume: 1
+    event_type:
+      - 'volume.resize.start'
+    resource_id: payload.volume_id
+    user_id: payload.user_id
+    project_id: payload.tenant_id
+
+
+  - name: 'volume.attach.end'
+    type: 'delta'
+    unit: 'volume'
+    volume: 1
+    event_type:
+      - 'volume.attach.end'
+    resource_id: payload.volume_id
+    user_id: payload.user_id
+    project_id: payload.tenant_id
+
+  - name: 'volume.attach.start'
+    type: 'delta'
+    unit: 'volume'
+    volume: 1
+    event_type:
+      - 'volume.attach.start'
+    resource_id: payload.volume_id
+    user_id: payload.user_id
+    project_id: payload.tenant_id
+
+  - name: 'volume.detach.end'
+    type: 'delta'
+    unit: 'volume'
+    volume: 1
+    event_type:
+      - 'volume.detach.end'
+    resource_id: payload.volume_id
+    user_id: payload.user_id
+    project_id: payload.tenant_id
+
+  - name: 'volume.detach.start'
+    type: 'delta'
+    unit: 'volume'
+    volume: 1
+    event_type:
+      - 'volume.detach.start'
+    resource_id: payload.volume_id
+    user_id: payload.user_id
+    project_id: payload.tenant_id
+
+  # Volume Snapshot
+  - name: 'snapshot'
+    type: 'gauge'
+    unit: 'snapshot'
+    volume: 1
+    event_type:
+      - 'snapshot.exists'
+      - 'snapshot.create.*'
+      - 'snapshot.delete.*'
+
+    resource_id: payload.snapshot_id
+    user_id: payload.user_id
+    project_id: payload.tenant_id
+
+  - name: 'snapshot.exists'
+    type: 'delta'
+    unit: 'snapshot'
+    volume: 1
+    event_type:
+      - 'snapshot.exists'
+    resource_id: payload.snapshot_id
+    user_id: payload.user_id
+    project_id: payload.tenant_id
+
+  - name: 'snapshot.create.start'
+    type: 'delta'
+    unit: 'snapshot'
+    volume: 1
+    event_type:
+      - 'snapshot.create.start'
+    resource_id: payload.snapshot_id
+    user_id: payload.user_id
+    project_id: payload.tenant_id
+
+  - name: 'snapshot.create.end'
+    type: 'delta'
+    unit: 'snapshot'
+    volume: 1
+    event_type:
+      - 'snapshot.create.end'
+    resource_id: payload.snapshot_id
+    user_id: payload.user_id
+    project_id: payload.tenant_id
+
+  - name: 'snapshot.delete.start'
+    type: 'delta'
+    unit: 'snapshot'
+    volume: 1
+    event_type:
+      - 'snapshot.delete.start'
+    resource_id: payload.snapshot_id
+    user_id: payload.user_id
+    project_id: payload.tenant_id
+
+  - name: 'snapshot.delete.end'
+    type: 'delta'
+    unit: 'snapshot'
+    volume: 1
+    event_type:
+      - 'snapshot.delete.end'
+    resource_id: payload.snapshot_id
+    user_id: payload.user_id
+    project_id: payload.tenant_id
+
+  # Sahara
+  - name: 'cluster.create'
+    type: 'delta'
+    unit: 'cluster'
+    volume: 1
+    event_type:
+      - 'sahara.cluster.create'
+    resource_id: payload.cluster_id
+    project_id: payload.project_id
+
+  - name: 'cluster.update'
+    type: 'delta'
+    unit: 'cluster'
+    volume: 1
+    event_type:
+      - 'sahara.cluster.update'
+    resource_id: payload.cluster_id
+    project_id: payload.project_id
+
+  - name: 'cluster.delete'
+    type: 'delta'
+    unit: 'cluster'
+    volume: 1
+    event_type:
+      - 'sahara.cluster.delete'
+    resource_id: payload.cluster_id
+    project_id: payload.project_id
+
+  # Identity
+  - name: 'identity.user.created'
+    type: 'delta'
+    unit: 'user'
+    volume: 1
+    event_type:
+      - 'identity.user.created'
+    resource_id: payload.resource_info
+    user_id: payload.initiator.id
+
+  - name: 'identity.user.updated'
+    type: 'delta'
+    unit: 'user'
+    volume: 1
+    event_type:
+      - 'identity.user.updated'
+    resource_id: payload.resource_info
+    user_id: payload.initiator.id
+
+  - name: 'identity.user.deleted'
+    type: 'delta'
+    unit: 'user'
+    volume: 1
+    event_type:
+      - 'identity.user.deleted'
+    resource_id: payload.resource_info
+    user_id: payload.initiator.id
+
+  - name: 'identity.group.created'
+    type: 'delta'
+    unit: 'group'
+    volume: 1
+    event_type:
+      - 'identity.group.created'
+    resource_id: payload.resource_info
+    user_id: payload.initiator.id
+
+  - name: 'identity.group.updated'
+    type: 'delta'
+    unit: 'group'
+    volume: 1
+    event_type:
+      - 'identity.group.updated'
+    resource_id: payload.resource_info
+    user_id: payload.initiator.id
+
+  - name: 'identity.group.deleted'
+    type: 'delta'
+    unit: 'group'
+    volume: 1
+    event_type:
+      - 'identity.group.deleted'
+    resource_id: payload.resource_info
+    user_id: payload.initiator.id
+
+  - name: 'identity.project.created'
+    type: 'delta'
+    unit: 'project'
+    volume: 1
+    event_type:
+      - 'identity.project.created'
+    resource_id: payload.resource_info
+    user_id: payload.initiator.id
+
+  - name: 'identity.project.updated'
+    type: 'delta'
+    unit: 'project'
+    volume: 1
+    event_type:
+      - 'identity.project.updated'
+    resource_id: payload.resource_info
+    user_id: payload.initiator.id
+
+  - name: 'identity.project.deleted'
+    type: 'delta'
+    unit: 'project'
+    volume: 1
+    event_type:
+      - 'identity.project.deleted'
+    resource_id: payload.resource_info
+    user_id: payload.initiator.id
+
+  - name: 'identity.role.created'
+    type: 'delta'
+    unit: 'role'
+    volume: 1
+    event_type:
+      - 'identity.role.created'
+    resource_id: payload.resource_info
+    user_id: payload.initiator.id
+
+  - name: 'identity.role.updated'
+    type: 'delta'
+    unit: 'role'
+    volume: 1
+    event_type:
+      - 'identity.role.updated'
+    resource_id: payload.resource_info
+    user_id: payload.initiator.id
+
+  - name: 'identity.role.deleted'
+    type: 'delta'
+    unit: 'role'
+    volume: 1
+    event_type:
+      - 'identity.role.deleted'
+    resource_id: payload.resource_info
+    user_id: payload.initiator.id
+
+  - name: 'identity.role_assignment.created'
+    type: 'delta'
+    unit: 'role_assignment'
+    volume: 1
+    event_type:
+      - 'identity.role_assignment.created'
+    resource_id: payload.role
+    user_id: payload.initiator.id
+
+  - name: 'identity.role_assignment.deleted'
+    type: 'delta'
+    unit: 'role_assignment'
+    volume: 1
+    event_type:
+      - 'identity.role_assignment.deleted'
+    resource_id: payload.role
+    user_id: payload.initiator.id
+
+  - name: 'identity.authenticate.success'
+    type: 'delta'
+    unit: 'user'
+    volume: 1
+    event_type:
+      - 'identity.authenticate'
+    resource_id: payload.initiator.id
+    user_id: payload.initiator.id
+
+  - name: 'identity.authenticate.pending'
+    type: 'delta'
+    unit: 'user'
+    volume: 1
+    event_type:
+      - 'identity.authenticate'
+    resource_id: payload.initiator.id
+    user_id: payload.initiator.id
+
+  - name: 'identity.authenticate.failure'
+    type: 'delta'
+    unit: 'user'
+    volume: 1
+    event_type:
+      - 'identity.authenticate'
+    resource_id: payload.initiator.id
+    user_id: payload.initiator.id
+
+  - name: 'identity.trust.created'
+    type: 'delta'
+    unit: 'trust'
+    volume: 1
+    event_type:
+      - 'identity.trust.created'
+    resource_id: payload.resource_info
+    user_id: payload.initiator.id
+
+  - name: 'identity.trust.deleted'
+    type: 'delta'
+    unit: 'trust'
+    volume: 1
+    event_type:
+      - 'identity.trust.deleted'
+    resource_id: payload.resource_info
+    user_id: payload.initiator.id
