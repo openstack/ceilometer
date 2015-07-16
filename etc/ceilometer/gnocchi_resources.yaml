@@ -1,0 +1,121 @@
+---
+
+resources:
+  - resource_type: identity
+    archive_policy: low
+    metrics:
+      - 'identity.authenticate.success'
+      - 'identity.authenticate.pending'
+      - 'identity.authenticate.failure'
+      - 'identity.user.created'
+      - 'identity.user.deleted'
+      - 'identity.user.updated'
+      - 'identity.group.created'
+      - 'identity.group.deleted'
+      - 'identity.group.updated'
+
+  - resource_type: identity
+    archive_policy: low
+    metrics:
+      - 'identity.role.created'
+      - 'identity.role.deleted'
+      - 'identity.role.updated'
+      - 'identity.project.created'
+      - 'identity.project.deleted'
+      - 'identity.project.updated'
+      - 'identity.trust.created'
+      - 'identity.trust.deleted'
+      - 'identity.role_assignment.created'
+      - 'identity.role_assignment.deleted'
+
+  - resource_type: ceph_account
+    metrics:
+      - 'stack.create'
+      - 'stack.update'
+      - 'stack.delete'
+      - 'stack.resume'
+      - 'stack.suspend'
+
+  - resource_type: instance
+    metrics:
+      - 'instance'
+      - 'disk.root.size'
+      - 'disk.ephemeral.size'
+      - 'memory'
+      - 'memory.usage'
+      - 'vcpus'
+      - 'cpu'
+      - 'cpu_util'
+    attributes:
+      - host: resource_metadata.host
+      - image_ref: resource_metadata.image_ref_url
+      - display_name: resource_metadata.display_name
+      - flavor_id: resource_metadata.instance_flavor_id
+      - flavor_id: resource_metadata.flavor.id
+      - server_group: resource_metadata.user_metadata.server_group
+
+  - resource_type: image
+    metrics:
+      - 'image'
+      - 'image.size'
+    attributes:
+      - name: resource_metadata.name
+      - container_format: resource_metadata.container_format
+      - disk_format: resource_metadata.disk_format
+
+  - resource_type: ipmi
+    metrics:
+      - 'hardware.ipmi.node.power'
+      - 'hardware.ipmi.node.temperature'
+      - 'hardware.ipmi.node.fan'
+      - 'hardware.ipmi.node.current'
+      - 'hardware.ipmi.node.voltage'
+
+  - resource_type: network
+    metrics:
+      - 'bandwidth'
+      - 'network'
+      - 'network.create'
+      - 'network.update'
+      - 'subnet'
+      - 'subnet.create'
+      - 'subnet.update'
+      - 'port'
+      - 'port.create'
+      - 'port.update'
+      - 'router'
+      - 'router.create'
+      - 'router.update'
+      - 'ip.floating'
+      - 'ip.floating.create'
+      - 'ip.floating.update'
+
+  - resource_type: orchestration
+    metrics:
+      - 'stack.create'
+      - 'stack.update'
+      - 'stack.delete'
+      - 'stack.resume'
+      - 'stack.suspend'
+
+  - resource_type: swift_account
+    metrics:
+      - 'storage.objects.incoming.bytes'
+      - 'storage.objects.outgoing.bytes'
+      - 'storage.api.request'
+      - 'storage.objects.size'
+      - 'storage.objects'
+      - 'storage.objects.containers'
+
+  - resource_type: volume
+    metrics:
+      - 'volume'
+      - 'volume.size'
+      - 'volume.create'
+      - 'volume.delete'
+      - 'volume.update'
+      - 'volume.resize'
+      - 'volume.attach'
+      - 'volume.detach'
+    attributes:
+      - display_name: resource_metadata.display_name
