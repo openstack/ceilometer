@@ -223,6 +223,10 @@ class DispatcherWorkflowTest(base.BaseTestCase,
     def setUp(self):
         super(DispatcherWorkflowTest, self).setUp()
         self.conf = self.useFixture(config_fixture.Config())
+        # Set this explicitly to avoid conflicts with any existing
+        # configuration.
+        self.conf.config(url='http://localhost:8041',
+                         group='dispatcher_gnocchi')
         ks_client = mock.Mock(auth_token='fake_token')
         ks_client.tenants.find.return_value = mock.Mock(
             name='gnocchi', id='a2d42c23-d518-46b6-96ab-3fba2e146859')
