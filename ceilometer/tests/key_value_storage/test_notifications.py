@@ -13,10 +13,12 @@
 import datetime
 
 import mock
-from oslotest import base
 
-from ceilometer.key_value_storage import notifications
+from oslo_config import fixture as fixture_config
+
+from ceilometer.meter import notifications
 from ceilometer import sample
+from ceilometer.tests import base as test
 
 
 def fake_uuid(x):
@@ -70,7 +72,15 @@ NOTIFICATION_TABLE_DELETE = {
     }
 
 
-class TestNotification(base.BaseTestCase):
+class TestNotification(test.BaseTestCase):
+
+    def setUp(self):
+        super(TestNotification, self).setUp()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
+        self.CONF.set_override(
+            'meter_definitions_cfg_file',
+            self.path_get('etc/ceilometer/meters.yaml'), group='meter')
+        self.handler = notifications.ProcessMeterNotifications(mock.Mock())
 
     def _verify_common_counter(self, c, name, volume):
         self.assertIsNotNone(c)
@@ -82,19 +92,18 @@ class TestNotification(base.BaseTestCase):
         self.assertEqual(u'magnetodb.winterfell.com', metadata.get('host'))
 
     def test_create_table(self):
-        handler = notifications.Table(mock.Mock())
-        counters = list(handler.process_notification(
+        counters = list(self.handler.process_notification(
                         NOTIFICATION_TABLE_CREATE))
-        self.assertEqual(1, len(counters))
-        table = counters[0]
+        self.assertEqual(2, len(counters))
+        table = [item for item in counters
+                 if item.name == "magnetodb.table.create"][0]
         self._verify_common_counter(table, 'magnetodb.table.create', 1)
         self.assertEqual(fake_uuid('u'), table.user_id)
         self.assertEqual(fake_uuid('t'), table.project_id)
         self.assertEqual(sample.TYPE_GAUGE, table.type)
 
     def test_delete_table(self):
-        handler = notifications.Table(mock.Mock())
-        counters = list(handler.process_notification(
+        counters = list(self.handler.process_notification(
                         NOTIFICATION_TABLE_DELETE))
         self.assertEqual(1, len(counters))
         table = counters[0]
@@ -104,11 +113,11 @@ class TestNotification(base.BaseTestCase):
         self.assertEqual(sample.TYPE_GAUGE, table.type)
 
     def test_index_count(self):
-        handler = notifications.Index(mock.Mock())
-        counters = list(handler.process_notification(
+        counters = list(self.handler.process_notification(
                         NOTIFICATION_TABLE_CREATE))
-        self.assertEqual(1, len(counters))
-        table = counters[0]
+        self.assertEqual(2, len(counters))
+        table = [item for item in counters
+                 if item.name == "magnetodb.table.index.count"][0]
         self._verify_common_counter(table, 'magnetodb.table.index.count', 2)
         self.assertEqual(fake_uuid('u'), table.user_id)
         self.assertEqual(fake_uuid('t'), table.project_id)
