@@ -193,6 +193,35 @@ class DispatcherWorkflowTest(base.BaseTestCase,
                 'instance', 'disk.root.size', 'disk.ephemeral.size',
                 'memory', 'vcpus', 'memory.usage', 'cpu', 'cpu_util'],
             resource_type='instance')),
+        ('hardware.ipmi.node.power', dict(
+            sample={
+                'counter_name': 'hardware.ipmi.node.power',
+                'counter_type': 'gauge',
+                'counter_volume': '2',
+                'user_id': 'test_user',
+                'project_id': 'test_project',
+                'source': 'openstack',
+                'timestamp': '2012-05-08 20:23:48.028195',
+                'resource_metadata': {
+                    'useless': 'not_used',
+                }
+            },
+            measures_attributes=[{
+                'timestamp': '2012-05-08 20:23:48.028195',
+                'value': '2'
+            }],
+            postable_attributes={
+                'user_id': 'test_user',
+                'project_id': 'test_project',
+            },
+            patchable_attributes={
+            },
+            metric_names=[
+                'hardware.ipmi.node.power', 'hardware.ipmi.node.temperature',
+                'hardware.ipmi.node.fan', 'hardware.ipmi.node.current',
+                'hardware.ipmi.node.voltage',
+            ],
+            resource_type='ipmi')),
     ]
 
     worflow_scenarios = [
@@ -304,7 +333,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
             )
             post_responses.append(MockResponse(self.measure_retry))
 
-        if self.patch_resource:
+        if self.patch_resource and self.patchable_attributes:
             expected_calls.append(mock.call.session().patch(
                 "%(url)s/%(resource_type)s/%(resource_id)s" % url_params,
                 headers=headers,
@@ -327,7 +356,8 @@ class DispatcherWorkflowTest(base.BaseTestCase,
                  self.sample['resource_id'],
                  500))
 
-        elif self.post_resource == 500 or self.patch_resource == 500:
+        elif self.post_resource == 500 or (self.patch_resource == 500 and
+                                           self.patchable_attributes):
             logger.error.assert_called_with(
                 "Resource %s %s failed with status: "
                 "%d: Internal Server Error" %
@@ -341,7 +371,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
                 (self.sample['counter_name'],
                  self.sample['resource_id'],
                  500))
-        elif self.patch_resource == 204:
+        elif self.patch_resource == 204 and self.patchable_attributes:
             logger.debug.assert_called_with(
                 'Resource %s updated', self.sample['resource_id'])
         else:

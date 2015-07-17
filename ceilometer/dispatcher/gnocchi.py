@@ -279,8 +279,9 @@ class GnocchiDispatcher(dispatcher.Base):
         if resource_need_to_be_updated:
             resource_attributes = self._get_resource_attributes(
                 ext, resource_id, metric_name, samples, for_update=True)
-            self._update_resource(resource_type, resource_id,
-                                  resource_attributes)
+            if resource_attributes:
+                self._update_resource(resource_type, resource_id,
+                                      resource_attributes)
 
     def _get_resource_attributes(self, ext, resource_id, metric_name, samples,
                                  for_update=False):
