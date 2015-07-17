@@ -23,6 +23,7 @@ from ceilometer.agent import plugin_base as base
 from ceilometer import coordination
 from ceilometer.event import endpoint as event_endpoint
 from ceilometer.i18n import _, _LI, _LW
+from ceilometer import exchange_control
 from ceilometer import messaging
 from ceilometer import pipeline
 from ceilometer import service_base
@@ -60,6 +61,7 @@ OPTS = [
                          "(DEFAULT/transport_url is used if empty)"),
 ]
 
+cfg.CONF.register_opts(exchange_control.EXCHANGE_OPTS)
 cfg.CONF.register_opts(OPTS, group="notification")
 cfg.CONF.import_opt('telemetry_driver', 'ceilometer.publisher.messaging',
                     group='publisher_notifier')

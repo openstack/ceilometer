@@ -38,7 +38,6 @@ import ceilometer.event.converter
 import ceilometer.hardware.discovery
 import ceilometer.identity.notifications
 import ceilometer.image.glance
-import ceilometer.image.notifications
 import ceilometer.ipmi.notifications.ironic
 import ceilometer.ipmi.platform.intel_node_manager
 import ceilometer.ipmi.pollsters
@@ -49,7 +48,6 @@ import ceilometer.notification
 import ceilometer.nova_client
 import ceilometer.objectstore.rgw
 import ceilometer.objectstore.swift
-import ceilometer.orchestration.notifications
 import ceilometer.pipeline
 import ceilometer.profiler.notifications
 import ceilometer.publisher.messaging
@@ -75,13 +73,11 @@ def list_opts():
                          ceilometer.dispatcher.OPTS,
                          ceilometer.identity.notifications.OPTS,
                          ceilometer.image.glance.OPTS,
-                         ceilometer.image.notifications.OPTS,
                          ceilometer.ipmi.notifications.ironic.OPTS,
                          ceilometer.middleware.OPTS,
                          ceilometer.network.notifications.OPTS,
                          ceilometer.nova_client.OPTS,
                          ceilometer.objectstore.swift.OPTS,
-                         ceilometer.orchestration.notifications.OPTS,
                          ceilometer.pipeline.OPTS,
                          ceilometer.profiler.notifications.OPTS,
                          ceilometer.sample.OPTS,

@@ -22,7 +22,7 @@ from ceilometer import sample
 cfg.CONF.import_opt('nova_control_exchange',
                     'ceilometer.compute.notifications')
 cfg.CONF.import_opt('glance_control_exchange',
-                    'ceilometer.image.notifications')
+                    'ceilometer.notification')
 cfg.CONF.import_opt('neutron_control_exchange',
                     'ceilometer.network.notifications')
 cfg.CONF.import_opt('cinder_control_exchange',
