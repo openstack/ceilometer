@@ -31,16 +31,16 @@ opt_group = cfg.OptGroup(name='vmware',
 OPTS = [
     cfg.StrOpt('host_ip',
                default='',
-               help='IP address of the VMware Vsphere host.'),
+               help='IP address of the VMware vSphere host.'),
     cfg.IntOpt('host_port',
                default=443,
-               help='Port of the VMware Vsphere host.'),
+               help='Port of the VMware vSphere host.'),
     cfg.StrOpt('host_username',
                default='',
-               help='Username of VMware Vsphere.'),
+               help='Username of VMware vSphere.'),
     cfg.StrOpt('host_password',
                default='',
-               help='Password of VMware Vsphere.',
+               help='Password of VMware vSphere.',
                secret=True),
     cfg.StrOpt('ca_file',
                help='CA bundle file to use in verifying the vCenter server '
@@ -53,7 +53,7 @@ OPTS = [
                      '"ca_file" is set.'),
     cfg.IntOpt('api_retry_count',
                default=10,
-               help='Number of times a VMware Vsphere API may be retried.'),
+               help='Number of times a VMware vSphere API may be retried.'),
     cfg.FloatOpt('task_poll_interval',
                  default=0.5,
                  help='Sleep time in seconds for polling an ongoing async '
@@ -103,7 +103,7 @@ class VsphereInspector(virt_inspector.Inspector):
         vm_moid = self._ops.get_vm_moid(instance.id)
         if vm_moid is None:
             raise virt_inspector.InstanceNotFoundException(
-                _('VM %s not found in VMware Vsphere') % instance.id)
+                _('VM %s not found in VMware vSphere') % instance.id)
         cpu_util_counter_id = self._ops.get_perf_counter_id(
             VC_AVERAGE_CPU_CONSUMED_CNTR)
         cpu_util = self._ops.query_vm_aggregate_stats(
@@ -120,7 +120,7 @@ class VsphereInspector(virt_inspector.Inspector):
         vm_moid = self._ops.get_vm_moid(instance.id)
         if not vm_moid:
             raise virt_inspector.InstanceNotFoundException(
-                _('VM %s not found in VMware Vsphere') % instance.id)
+                _('VM %s not found in VMware vSphere') % instance.id)
 
         vnic_stats = {}
         vnic_ids = set()
@@ -152,7 +152,7 @@ class VsphereInspector(virt_inspector.Inspector):
         vm_moid = self._ops.get_vm_moid(instance.id)
         if vm_moid is None:
             raise virt_inspector.InstanceNotFoundException(
-                _('VM %s not found in VMware Vsphere') % instance.id)
+                _('VM %s not found in VMware vSphere') % instance.id)
         mem_counter_id = self._ops.get_perf_counter_id(
             VC_AVERAGE_MEMORY_CONSUMED_CNTR)
         memory = self._ops.query_vm_aggregate_stats(
@@ -165,7 +165,7 @@ class VsphereInspector(virt_inspector.Inspector):
         vm_moid = self._ops.get_vm_moid(instance.id)
         if not vm_moid:
             raise virt_inspector.InstanceNotFoundException(
-                _('VM %s not found in VMware Vsphere') % instance.id)
+                _('VM %s not found in VMware vSphere') % instance.id)
 
         disk_stats = {}
         disk_ids = set()

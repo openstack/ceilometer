@@ -13,7 +13,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 """
-Tests for VMware Vsphere inspector.
+Tests for VMware vSphere inspector.
 """
 
 import mock
