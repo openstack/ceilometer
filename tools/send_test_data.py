@@ -21,21 +21,37 @@ source .tox/py27/bin/activate
 """
 import argparse
 import datetime
+import functools
 import json
 import random
 import uuid
 
 import make_test_data
 from oslo_context import context
+import oslo_messaging
 from six import moves
 
 from ceilometer import messaging
 from ceilometer import service
 
 
-def send_batch(rpc_client, topic, batch):
+def send_batch_rpc(rpc_client, topic, batch):
     rpc_client.prepare(topic=topic).cast(context.RequestContext(),
                                          'record_metering_data', data=batch)
+
+
+def send_batch_notifier(notifier, topic, batch):
+    notifier.sample({}, event_type=topic, payload=batch)
+
+
+def get_notifier(config_file):
+    service.prepare_service(argv=['/', '--config-file', config_file])
+    return oslo_messaging.Notifier(
+        messaging.get_transport(),
+        driver='messagingv2',
+        publisher_id='telemetry.publisher.test',
+        topic='metering',
+    )
 
 
 def get_rpc_client(config_file):
@@ -45,7 +61,7 @@ def get_rpc_client(config_file):
     return rpc_client
 
 
-def generate_data(rpc_client, make_data_args, samples_count,
+def generate_data(send_batch, make_data_args, samples_count,
                   batch_size, resources_count, topic):
     make_data_args.interval = 1
     make_data_args.start = (datetime.datetime.utcnow() -
@@ -65,17 +81,24 @@ def generate_data(rpc_client, make_data_args, samples_count,
         sample['resource_id'] = resource
         batch.append(sample)
         if len(batch) == batch_size:
-            send_batch(rpc_client, topic, batch)
+            send_batch(topic, batch)
             batch = []
         if count == samples_count:
-            send_batch(rpc_client, topic, batch)
+            send_batch(topic, batch)
             return resource_samples
-    send_batch(rpc_client, topic, batch)
+    send_batch(topic, batch)
     return resource_samples
 
 
 def get_parser():
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--notify',
+        dest='notify',
+        type=bool,
+        default=True
+    )
+
     parser.add_argument(
         '--batch-size',
         dest='batch_size',
@@ -113,12 +136,18 @@ def get_parser():
 def main():
     args = get_parser().parse_known_args()[0]
     make_data_args = make_test_data.get_parser().parse_known_args()[0]
-    rpc_client = get_rpc_client(args.config_file)
+    if args.notify:
+        notifier = get_notifier(args.config_file)
+        send_batch = functools.partial(send_batch_notifier, notifier)
+    else:
+        rpc_client = get_rpc_client(args.config_file)
+        send_batch = functools.partial(send_batch_rpc, rpc_client)
     result_dir = args.result_dir
+    del args.notify
     del args.config_file
     del args.result_dir
 
-    resource_writes = generate_data(rpc_client, make_data_args,
+    resource_writes = generate_data(send_batch, make_data_args,
                                     **args.__dict__)
     result_file = "%s/sample-by-resource-%s" % (result_dir,
                                                 random.getrandbits(32))
