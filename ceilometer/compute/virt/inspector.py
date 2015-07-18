@@ -27,6 +27,7 @@ from ceilometer.i18n import _
 OPTS = [
     cfg.StrOpt('hypervisor_inspector',
                default='libvirt',
+               choices=('hyperv', 'libvirt', 'vmware', 'xenapi'),
                help='Inspector to use for inspecting the hypervisor layer.'),
 ]
 
