@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-07-10 06:11+0000\n"
-"PO-Revision-Date: 2015-07-03 08:45+0000\n"
+"POT-Creation-Date: 2015-07-20 06:09+0000\n"
+"PO-Revision-Date: 2015-07-18 14:10+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: English (United Kingdom) (http://www.transifex.com/p/"
 "ceilometer/language/en_GB/)\n"
@@ -570,10 +570,6 @@ msgid "Unknown status %(stat)s received on vpn %(id)s,skipping sample"
 msgstr "Unknown status %(stat)s received on vpn %(id)s,skipping sample"
 
 #, python-format
-msgid "VM %s not found in VMware Vsphere"
-msgstr "VM %s not found in VMware Vsphere"
-
-#, python-format
 msgid "VM %s not found in XenServer"
 msgstr "VM %s not found in XenServer"
 
@@ -691,9 +687,6 @@ msgstr ""
 #, python-format
 msgid "metering data %(counter_name)s for %(resource_id)s: %(counter_volume)s"
 msgstr "metering data %(counter_name)s for %(resource_id)s: %(counter_volume)s"
-
-msgid "operator {} is incorrect"
-msgstr "operator {} is incorrect"
 
 #, python-format
 msgid "pruned statistics to %d"

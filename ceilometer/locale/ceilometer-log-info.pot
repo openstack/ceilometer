@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 5.0.0.0b2.dev56\n"
+"Project-Id-Version: ceilometer 5.0.0.0b2.dev94\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-07-10 06:11+0000\n"
+"POT-Creation-Date: 2015-07-20 06:09+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,6 +29,22 @@ msgstr ""
 #: ceilometer/coordination.py:144
 #, python-format
 msgid "Left partitioning group %s"
+msgstr ""
+
+#: ceilometer/notification.py:254
+msgid "Reloading notification agent and listeners."
+msgstr ""
+
+#: ceilometer/service_base.py:48
+msgid "Pipeline configuration file has been updated."
+msgstr ""
+
+#: ceilometer/service_base.py:54
+msgid "Detected change in pipeline configuration."
+msgstr ""
+
+#: ceilometer/agent/base.py:378
+msgid "Reconfiguring polling tasks."
 msgstr ""
 
 #: ceilometer/alarm/storage/impl_log.py:60
