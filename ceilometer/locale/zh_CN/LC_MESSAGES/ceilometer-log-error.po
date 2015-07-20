@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-07-10 06:12+0000\n"
-"PO-Revision-Date: 2015-06-23 16:41+0000\n"
+"POT-Creation-Date: 2015-07-20 06:09+0000\n"
+"PO-Revision-Date: 2015-07-16 19:11+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/p/ceilometer/"
 "language/zh_CN/)\n"
@@ -64,6 +64,10 @@ msgstr "尝试发送数据达到最大重试次数后仍失败"
 #, python-format
 msgid "Failed to send sample data: %s"
 msgstr "发送指标数据失败：%s"
+
+#, python-format
+msgid "Required field %s not specified"
+msgstr "必填项%s没有填写"
 
 msgid "Status Code: %{code}s. Failed to dispatch event: %{event}s"
 msgstr "状态码：%{code}s。分发事件：%{event}s失败"

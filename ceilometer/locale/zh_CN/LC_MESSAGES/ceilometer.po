@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-07-10 06:11+0000\n"
-"PO-Revision-Date: 2015-07-03 08:45+0000\n"
+"POT-Creation-Date: 2015-07-20 06:09+0000\n"
+"PO-Revision-Date: 2015-07-18 14:10+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/p/ceilometer/"
 "language/zh_CN/)\n"
@@ -722,10 +722,6 @@ msgid "Unsupported action %s"
 msgstr "动作%s不支持"
 
 #, python-format
-msgid "VM %s not found in VMware Vsphere"
-msgstr "无法在VMware Vsphere中找到虚拟机%s"
-
-#, python-format
 msgid "VM %s not found in XenServer"
 msgstr "无法在XenServer中找到虚拟机%s"
 
@@ -852,9 +848,6 @@ msgstr ""
 msgid "metering data %(counter_name)s for %(resource_id)s: %(counter_volume)s"
 msgstr ""
 "为资源%(resource_id)s获得指标%(counter_name)s的监控数据：%(counter_volume)s"
-
-msgid "operator {} is incorrect"
-msgstr "操作符{}不合法"
 
 msgid "parse IPMI sensor data failed,No data retrieved from given input"
 msgstr "解析IPMI传感器数据失败，从给定的输入中无法检索到数据"
