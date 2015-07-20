@@ -172,18 +172,16 @@ class PollingTask(object):
                         cache=cache,
                         resources=polling_resources
                     )
-                    sample_messages = []
                     for sample in samples:
                         sample_dict = (
                             publisher_utils.meter_message_from_counter(
                                 sample, cfg.CONF.publisher.telemetry_secret
                             ))
-                        sample_messages.append(sample_dict)
-                    self.manager.notifier.info(
-                        self.manager.context.to_dict(),
-                        'telemetry.api',
-                        sample_messages
-                    )
+                        self.manager.notifier.info(
+                            self.manager.context.to_dict(),
+                            'telemetry.api',
+                            [sample_dict]
+                        )
                 except plugin_base.PollsterPermanentError as err:
                     LOG.error(_(
                         'Prevent pollster %(name)s for '
