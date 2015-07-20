@@ -1,7 +1,7 @@
 [run]
 branch = True
 source = ceilometer
-omit = ceilometer/tests/*, ceilometer/openstack/common/*
+omit = ceilometer/tests/*
 
 [report]
 ignore-errors = True

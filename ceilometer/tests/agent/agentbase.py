@@ -30,6 +30,7 @@ import eventlet
 import mock
 from oslo_config import fixture as fixture_config
 from oslo_service import service as os_service
+from oslo_utils import fileutils
 from oslo_utils import timeutils
 from oslotest import mockpatch
 import six
@@ -37,7 +38,6 @@ from stevedore import extension
 import yaml
 
 from ceilometer.agent import plugin_base
-from ceilometer.openstack.common import fileutils
 from ceilometer import pipeline
 from ceilometer import publisher
 from ceilometer.publisher import test as test_publisher
