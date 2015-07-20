@@ -363,16 +363,6 @@ class TestRealNotification(BaseRealNotification):
         self._check_notification_service()
         self.assertEqual('memory', self.publisher.samples[0].name)
 
-    @mock.patch('ceilometer.coordination.PartitionCoordinator')
-    @mock.patch('ceilometer.publisher.test.TestPublisher')
-    def test_ha_configured_agent_coord_disabled(self, fake_publisher_cls,
-                                                fake_coord):
-        fake_publisher_cls.return_value = self.publisher
-        fake_coord1 = mock.MagicMock()
-        fake_coord1.extract_my_subset.side_effect = lambda x, y: y
-        fake_coord.return_value = fake_coord1
-        self._check_notification_service()
-
     @mock.patch.object(oslo_service.service.Service, 'stop')
     def test_notification_service_start_abnormal(self, mocked):
         try:
@@ -390,32 +380,24 @@ class TestRealNotificationHA(BaseRealNotification):
                                group='notification')
         self.srv = notification.NotificationService()
 
-    @mock.patch('ceilometer.coordination.PartitionCoordinator')
     @mock.patch('ceilometer.publisher.test.TestPublisher')
-    def test_notification_service(self, fake_publisher_cls, fake_coord):
+    def test_notification_service(self, fake_publisher_cls):
         fake_publisher_cls.return_value = self.publisher
-        fake_coord1 = mock.MagicMock()
-        fake_coord1.extract_my_subset.side_effect = lambda x, y: y
-        fake_coord.return_value = fake_coord1
         self._check_notification_service()
 
     @mock.patch('hmac.new')
-    @mock.patch('ceilometer.coordination.PartitionCoordinator')
     @mock.patch('ceilometer.publisher.test.TestPublisher')
     def test_notification_service_no_secret(self, fake_publisher_cls,
-                                            fake_coord, fake_hmac):
+                                            fake_hmac):
         self.CONF.set_override('telemetry_secret', None, group='publisher')
         fake_publisher_cls.return_value = self.publisher
-        fake_coord1 = mock.MagicMock()
-        fake_coord1.extract_my_subset.side_effect = lambda x, y: y
-        fake_coord.return_value = fake_coord1
         self._check_notification_service()
         self.assertFalse(fake_hmac.called)
 
     def test_reset_listeners_on_refresh(self):
         self.srv.start()
         self.assertEqual(2, len(self.srv.pipeline_listeners))
-        self.srv._refresh_agent(None)
+        self.srv._refresh_listeners()
         self.assertEqual(2, len(self.srv.pipeline_listeners))
         self.srv.stop()
 
@@ -449,3 +431,41 @@ class TestRealNotificationHA(BaseRealNotification):
         self.assertEqual('ceilometer.pipeline',
                          mock_notifier.call_args_list[2][1]['event_type'])
         self.srv.stop()
+
+    @mock.patch('ceilometer.publisher.test.TestPublisher')
+    def test_multiple_agents(self, fake_publisher_cls):
+        fake_publisher_cls.return_value = self.publisher
+
+        self.srv2 = notification.NotificationService()
+        with mock.patch('ceilometer.coordination.PartitionCoordinator'
+                        '._get_members', return_value=['harry', 'lloyd']):
+            with mock.patch('uuid.uuid4', return_value='harry'):
+                self.srv.start()
+            with mock.patch('uuid.uuid4', return_value='lloyd'):
+                self.srv2.start()
+
+        notifier = messaging.get_notifier(self.transport,
+                                          "compute.vagrant-precise")
+        payload1 = TEST_NOTICE_PAYLOAD.copy()
+        payload1['instance_id'] = '0'
+        notifier.info(context.RequestContext(), 'compute.instance.create.end',
+                      payload1)
+        payload2 = TEST_NOTICE_PAYLOAD.copy()
+        payload2['instance_id'] = '1'
+        notifier.info(context.RequestContext(), 'compute.instance.create.end',
+                      payload2)
+        self.expected_samples = 4
+        self.expected_events = 2
+        start = timeutils.utcnow()
+        while timeutils.delta_seconds(start, timeutils.utcnow()) < 60:
+            if (len(self.publisher.samples) >= self.expected_samples and
+                    len(self.publisher.events) >= self.expected_events):
+                break
+            eventlet.sleep(0)
+        self.srv.stop()
+        self.srv2.stop()
+
+        resources = set(s.resource_id for s in self.publisher.samples)
+        self.assertEqual(self.expected_samples, len(self.publisher.samples))
+        self.assertEqual(self.expected_events, len(self.publisher.events))
+        self.assertEqual(set(['1', '0']), resources)
