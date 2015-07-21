@@ -43,6 +43,10 @@ class TransformerBase(object):
         :param sample: A sample.
         """
 
+    @abc.abstractproperty
+    def grouping_keys(self):
+        """Keys used to group transformer."""
+
     def flush(self, context):
         """Flush samples cached previously.
 

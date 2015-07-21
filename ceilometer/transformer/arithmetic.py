@@ -35,6 +35,8 @@ class ArithmeticTransformer(transformer.TransformerBase):
     over one or more meters and/or their metadata.
     """
 
+    grouping_keys = ['resource_id']
+
     meter_name_re = re.compile(r'\$\(([\w\.\-]+)\)')
 
     def __init__(self, target=None, **kwargs):

@@ -109,8 +109,9 @@ class NotificationService(service_base.BaseService):
         if cfg.CONF.notification.workload_partitioning:
             pipe_manager = pipeline.SamplePipelineTransportManager()
             for pipe in pipeline_manager.pipelines:
+                key = pipeline.get_pipeline_grouping_key(pipe)
                 pipe_manager.add_transporter(
-                    (pipe.source.support_meter,
+                    (pipe.source.support_meter, key or ['resource_id'],
                      self._get_notifiers(transport, pipe)))
         else:
             pipe_manager = pipeline_manager
@@ -126,7 +127,7 @@ class NotificationService(service_base.BaseService):
                 event_pipe_manager = pipeline.EventPipelineTransportManager()
                 for pipe in self.event_pipeline_manager.pipelines:
                     event_pipe_manager.add_transporter(
-                        (pipe.source.support_event,
+                        (pipe.source.support_event, ['event_type'],
                          self._get_notifiers(transport, pipe)))
             else:
                 event_pipe_manager = self.event_pipeline_manager
