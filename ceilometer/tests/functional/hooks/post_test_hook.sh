@@ -31,14 +31,18 @@ export CEILOMETER_DIR="$BASE/new/ceilometer"
 # Go to the ceilometer dir
 cd $CEILOMETER_DIR
 
-sudo chown -R jenkins:stack $CEILOMETER_DIR
+if [[ -z "$STACK_USER" ]]; then
+    export STACK_USER=stack
+fi
+
+sudo chown -R $STACK_USER:stack $CEILOMETER_DIR
 
 # Run tests
 echo "Running ceilometer functional test suite"
 set +e
 
 # NOTE(ityaptin) Expected a script param which contains a backend name
-CEILOMETER_TEST_BACKEND="$1" sudo -E -H -u jenkins tox -efunctional
+CEILOMETER_TEST_BACKEND="$1" sudo -E -H -u ${STACK_USER:-${USER}} tox -efunctional
 EXIT_CODE=$?
 set -e
 
