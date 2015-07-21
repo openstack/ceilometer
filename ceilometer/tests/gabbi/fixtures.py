@@ -78,6 +78,7 @@ class ConfigFixture(fixture.GabbiFixture):
 
         conf.set_override('pecan_debug', True, group='api')
         conf.set_override('gnocchi_is_enabled', False, group='api')
+        conf.set_override('aodh_is_enabled', False, group='api')
 
         conf.set_override('store_events', True, group='notification')
 

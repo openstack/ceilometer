@@ -50,6 +50,7 @@ class FunctionalTest(db_test_base.TestBase):
                                group='oslo_policy')
 
         self.CONF.set_override('gnocchi_is_enabled', False, group='api')
+        self.CONF.set_override('aodh_is_enabled', False, group='api')
 
         self.app = self._make_app()
 

@@ -21,9 +21,14 @@ from ceilometer.tests.api import v2
 class TestAPIUpgradePath(v2.FunctionalTest):
     def _setup_osloconfig_options(self):
         self.CONF.set_override('gnocchi_is_enabled', True, group='api')
+        self.CONF.set_override('aodh_is_enabled', True, group='api')
+        self.CONF.set_override('aodh_url', 'http://alarm-endpoint:8008/',
+                               group='api')
 
     def _setup_keystone_mock(self):
         self.CONF.set_override('gnocchi_is_enabled', None, group='api')
+        self.CONF.set_override('aodh_is_enabled', None, group='api')
+        self.CONF.set_override('aodh_url', None, group='api')
         self.ks = mock.Mock()
         self.ks.service_catalog.url_for.side_effect = self._url_for
         self.useFixture(mockpatch.Patch(
@@ -33,6 +38,8 @@ class TestAPIUpgradePath(v2.FunctionalTest):
     def _url_for(service_type=None):
         if service_type == 'metric':
             return 'http://gnocchi/'
+        elif service_type == 'alarming':
+            return 'http://alarm-endpoint:8008/'
         raise exceptions.EndpointNotFound()
 
     def _do_test_gnocchi_enabled_without_database_backend(self):
@@ -54,12 +61,54 @@ class TestAPIUpgradePath(v2.FunctionalTest):
                                   }, status=410)
         self.assertIn('Gnocchi API', response.body)
 
+    def _do_test_alarm_redirect(self):
+        response = self.app.get(self.PATH_PREFIX + '/alarms',
+                                expect_errors=True)
+
+        self.assertEqual(307, response.status_code)
+        self.assertEqual("http://alarm-endpoint:8008/v2/alarms",
+                         response.headers['Location'])
+
+        response = self.app.get(self.PATH_PREFIX + '/alarms/uuid',
+                                expect_errors=True)
+
+        self.assertEqual(307, response.status_code)
+        self.assertEqual("http://alarm-endpoint:8008/v2/alarms/uuid",
+                         response.headers['Location'])
+
+        response = self.app.delete(self.PATH_PREFIX + '/alarms/uuid',
+                                   expect_errors=True)
+
+        self.assertEqual(307, response.status_code)
+        self.assertEqual("http://alarm-endpoint:8008/v2/alarms/uuid",
+                         response.headers['Location'])
+
+        response = self.post_json('/query/alarms',
+                                  params={
+                                      "filter": '{"=": {"type": "creation"}}',
+                                      "orderby": '[{"timestamp": "DESC"}]',
+                                      "limit": 3
+                                  }, status=307)
+        self.assertEqual("http://alarm-endpoint:8008/v2/query/alarms",
+                         response.headers['Location'])
+
     def test_gnocchi_enabled_without_database_backend_keystone(self):
         self._setup_keystone_mock()
         self._do_test_gnocchi_enabled_without_database_backend()
-        self.ks.service_catalog.url_for.assert_called_once_with(
-            service_type="metric")
+        self.assertEqual([mock.call(service_type="alarming"),
+                          mock.call(service_type="metric")],
+                         sorted(self.ks.service_catalog.url_for.mock_calls))
 
     def test_gnocchi_enabled_without_database_backend_configoptions(self):
         self._setup_osloconfig_options()
         self._do_test_gnocchi_enabled_without_database_backend()
+
+    def test_alarm_redirect_keystone(self):
+        self._setup_keystone_mock()
+        self._do_test_alarm_redirect()
+        self.assertEqual([mock.call(service_type="alarming")],
+                         self.ks.service_catalog.url_for.mock_calls)
+
+    def test_alarm_redirect_configoptions(self):
+        self._setup_osloconfig_options()
+        self._do_test_alarm_redirect()
