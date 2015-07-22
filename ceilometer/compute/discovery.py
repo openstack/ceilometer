@@ -14,6 +14,7 @@
 # under the License.
 
 from oslo_config import cfg
+from oslo_utils import timeutils
 
 from ceilometer.agent import plugin_base
 from ceilometer import nova_client
@@ -31,12 +32,21 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
     def __init__(self):
         super(InstanceDiscovery, self).__init__()
         self.nova_cli = nova_client.Client()
+        self.last_run = None
+        self.instances = {}
 
     def discover(self, manager, param=None):
         """Discover resources to monitor."""
-        instances = self.nova_cli.instance_get_all_by_host(cfg.CONF.host)
-        return [i for i in instances
-                if getattr(i, 'OS-EXT-STS:vm_state', None) != 'error']
+        instances = self.nova_cli.instance_get_all_by_host(
+            cfg.CONF.host, self.last_run)
+        for instance in instances:
+            if getattr(instance, 'OS-EXT-STS:vm_state', None) in ['deleted',
+                                                                  'error']:
+                self.instances.pop(instance.id, None)
+            else:
+                self.instances[instance.id] = instance
+        self.last_run = timeutils.utcnow(True).isoformat()
+        return self.instances.values()
 
     @property
     def group_id(self):
