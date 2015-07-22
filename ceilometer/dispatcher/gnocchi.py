@@ -212,6 +212,7 @@ class GnocchiDispatcher(dispatcher.Base):
         # contains a lot of different kind of samples
         # So perhaps the next step will be to pool the received data from
         # message bus.
+        data.sort(key=lambda s: (s['resource_id'], s['counter_name']))
 
         resource_grouped_samples = itertools.groupby(
             data, key=operator.itemgetter('resource_id'))
