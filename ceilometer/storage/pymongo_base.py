@@ -50,7 +50,7 @@ class Connection(base.Connection):
     )
 
     def get_meters(self, user=None, project=None, resource=None, source=None,
-                   metaquery=None):
+                   metaquery=None, limit=None):
         """Return an iterable of models.Meter instances
 
         :param user: Optional ID for user that owns the resource.
@@ -58,7 +58,10 @@ class Connection(base.Connection):
         :param resource: Optional resource filter.
         :param source: Optional source filter.
         :param metaquery: Optional dict with metadata to match on.
+        :param limit: Maximum number of results to return.
         """
+        if limit == 0:
+            return
 
         metaquery = pymongo_utils.improve_keys(metaquery, metaquery=True) or {}
 
@@ -73,8 +76,13 @@ class Connection(base.Connection):
             q['source'] = source
         q.update(metaquery)
 
+        count = 0
         for r in self.db.resource.find(q):
             for r_meter in r['meter']:
+                if limit and count >= limit:
+                    return
+                else:
+                    count += 1
                 yield models.Meter(
                     name=r_meter['counter_name'],
                     type=r_meter['counter_type'],

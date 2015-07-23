@@ -242,7 +242,7 @@ class Connection(hbase_base.Connection, base.Connection):
                     metadata=md)
 
     def get_meters(self, user=None, project=None, resource=None, source=None,
-                   metaquery=None):
+                   metaquery=None, limit=None):
         """Return an iterable of models.Meter instances
 
         :param user: Optional ID for user that owns the resource.
@@ -250,7 +250,10 @@ class Connection(hbase_base.Connection, base.Connection):
         :param resource: Optional resource filter.
         :param source: Optional source filter.
         :param metaquery: Optional dict with metadata to match on.
+        :param limit: Maximum number of results to return.
         """
+        if limit == 0:
+            return
 
         metaquery = metaquery or {}
 
@@ -271,6 +274,8 @@ class Connection(hbase_base.Connection, base.Connection):
                 flatten_result, s, meters, md = hbase_utils.deserialize_entry(
                     data)
                 for m in meters:
+                    if limit and len(result) >= limit:
+                        return
                     _m_rts, m_source, name, m_type, unit = m[0]
                     meter_dict = {'name': name,
                                   'type': m_type,

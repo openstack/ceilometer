@@ -476,8 +476,8 @@ class MetersController(rest.RestController):
     def _lookup(self, meter_name, *remainder):
         return MeterController(meter_name), remainder
 
-    @wsme_pecan.wsexpose([Meter], [base.Query])
-    def get_all(self, q=None):
+    @wsme_pecan.wsexpose([Meter], [base.Query], int)
+    def get_all(self, q=None, limit=None):
         """Return all known meters, based on the data recorded so far.
 
         :param q: Filter rules for the meters to be returned.
@@ -488,7 +488,9 @@ class MetersController(rest.RestController):
         q = q or []
 
         # Timestamp field is not supported for Meter queries
+        limit = v2_utils.enforce_limit(limit)
         kwargs = v2_utils.query_to_kwargs(
             q, pecan.request.storage_conn.get_meters, allow_timestamps=False)
         return [Meter.from_db_model(m)
-                for m in pecan.request.storage_conn.get_meters(**kwargs)]
+                for m in pecan.request.storage_conn.get_meters(limit=limit,
+                                                               **kwargs)]
