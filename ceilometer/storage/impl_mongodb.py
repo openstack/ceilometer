@@ -614,7 +614,7 @@ class Connection(pymongo_base.Connection):
     def _get_time_constrained_resources(self, query,
                                         start_timestamp, start_timestamp_op,
                                         end_timestamp, end_timestamp_op,
-                                        metaquery, resource):
+                                        metaquery, resource, limit):
         """Return an iterable of models.Resource instances
 
         Items are constrained by sample timestamp.
@@ -661,7 +661,12 @@ class Connection(pymongo_base.Connection):
                                  query=query)
 
         try:
-            for r in self.db[out].find(sort=sort_instructions):
+            if limit is not None:
+                results = self.db[out].find(sort=sort_instructions,
+                                            limit=limit)
+            else:
+                results = self.db[out].find(sort=sort_instructions)
+            for r in results:
                 resource = r['value']
                 yield models.Resource(
                     resource_id=r['_id'],
@@ -674,7 +679,7 @@ class Connection(pymongo_base.Connection):
         finally:
             self.db[out].drop()
 
-    def _get_floating_resources(self, query, metaquery, resource):
+    def _get_floating_resources(self, query, metaquery, resource, limit):
         """Return an iterable of models.Resource instances
 
         Items are unconstrained by timestamp.
@@ -693,7 +698,13 @@ class Connection(pymongo_base.Connection):
                      for i in keys]
         sort_instructions = self._build_sort_instructions(sort_keys)[0]
 
-        for r in self.db.resource.find(query, sort=sort_instructions):
+        if limit is not None:
+            results = self.db.resource.find(query, sort=sort_instructions,
+                                            limit=limit)
+        else:
+            results = self.db.resource.find(query, sort=sort_instructions)
+
+        for r in results:
             yield models.Resource(
                 resource_id=r['_id'],
                 user_id=r['user_id'],
@@ -708,7 +719,7 @@ class Connection(pymongo_base.Connection):
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
                       end_timestamp=None, end_timestamp_op=None,
-                      metaquery=None, resource=None):
+                      metaquery=None, resource=None, limit=None):
         """Return an iterable of models.Resource instances
 
         :param user: Optional ID for user that owns the resource.
@@ -720,7 +731,10 @@ class Connection(pymongo_base.Connection):
         :param end_timestamp_op: Optional end time operator, like lt, le.
         :param metaquery: Optional dict with metadata to match on.
         :param resource: Optional resource filter.
+        :param limit: Maximum number of results to return.
         """
+        if limit == 0:
+            return
         metaquery = pymongo_utils.improve_keys(metaquery, metaquery=True) or {}
 
         query = {}
@@ -737,9 +751,11 @@ class Connection(pymongo_base.Connection):
                                                         start_timestamp_op,
                                                         end_timestamp,
                                                         end_timestamp_op,
-                                                        metaquery, resource)
+                                                        metaquery, resource,
+                                                        limit)
         else:
-            return self._get_floating_resources(query, metaquery, resource)
+            return self._get_floating_resources(query, metaquery, resource,
+                                                limit)
 
     def _aggregate_param(self, fragment_key, aggregate):
         fragment_map = self.STANDARD_AGGREGATES[fragment_key]

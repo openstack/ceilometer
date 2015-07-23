@@ -20,6 +20,7 @@ import json
 
 from oslo_utils import timeutils
 import six
+import webtest.app
 
 from ceilometer.publisher import utils
 from ceilometer import sample
@@ -522,3 +523,47 @@ class TestListResources(v2.FunctionalTest,
         self.assertEqual(links[0]['rel'], 'self')
         self.assertTrue((self.PATH_PREFIX + '/resources/resource-id')
                         in links[0]['href'])
+
+
+class TestListResourcesRestriction(v2.FunctionalTest,
+                                   tests_db.MixinTestsWithBackendScenarios):
+
+    def setUp(self):
+        super(TestListResourcesRestriction, self).setUp()
+        self.CONF.set_override('default_api_return_limit', 10, group='api')
+        for i in range(20):
+            s = sample.Sample(
+                'volume.size',
+                'gauge',
+                'GiB',
+                5 + i,
+                'user-id',
+                'project1',
+                'resource-id%s' % i,
+                timestamp=(datetime.datetime(2012, 9, 25, 10, 30) +
+                           datetime.timedelta(seconds=i)),
+                resource_metadata={'display_name': 'test-volume',
+                                   'tag': 'self.sample',
+                                   },
+                source='source1',
+            )
+            msg = utils.meter_message_from_counter(
+                s, self.CONF.publisher.telemetry_secret,
+            )
+            self.conn.record_metering_data(msg)
+
+    def test_resource_limit(self):
+        data = self.get_json('/resources?limit=1')
+        self.assertEqual(1, len(data))
+
+    def test_resource_limit_negative(self):
+        self.assertRaises(webtest.app.AppError, self.get_json,
+                          '/resources?limit=-2')
+
+    def test_resource_limit_bigger(self):
+        data = self.get_json('/resources?limit=42')
+        self.assertEqual(20, len(data))
+
+    def test_resource_default_limit(self):
+        data = self.get_json('/resources')
+        self.assertEqual(10, len(data))

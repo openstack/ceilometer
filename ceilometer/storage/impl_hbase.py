@@ -186,7 +186,7 @@ class Connection(hbase_base.Connection, base.Connection):
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
                       end_timestamp=None, end_timestamp_op=None,
-                      metaquery=None, resource=None):
+                      metaquery=None, resource=None, limit=None):
         """Return an iterable of models.Resource instances
 
         :param user: Optional ID for user that owns the resource.
@@ -198,7 +198,10 @@ class Connection(hbase_base.Connection, base.Connection):
         :param end_timestamp_op: Optional end time operator, like lt, le.
         :param metaquery: Optional dict with metadata to match on.
         :param resource: Optional resource filter.
+        :param limit: Maximum number of results to return.
         """
+        if limit == 0:
+            return
         q = hbase_utils.make_query(metaquery=metaquery, user_id=user,
                                    project_id=project,
                                    resource_id=resource, source=source)
@@ -210,7 +213,8 @@ class Connection(hbase_base.Connection, base.Connection):
         with self.conn_pool.connection() as conn:
             resource_table = conn.table(self.RESOURCE_TABLE)
             LOG.debug(_("Query Resource table: %s") % q)
-            for resource_id, data in resource_table.scan(filter=q):
+            for resource_id, data in resource_table.scan(filter=q,
+                                                         limit=limit):
                 f_res, sources, meters, md = hbase_utils.deserialize_entry(
                     data)
                 resource_id = hbase_utils.encode_unicode(resource_id)
