@@ -396,6 +396,15 @@
       fields: parent_domain_id
     serial:
       fields: payload.serial
+- event_type: dns.domain.exists
+  traits:
+    <<: *dns_domain_traits
+    audit_period_beginning:
+      type: datetime
+      fields: payload.audit_period_beginning
+    audit_period_ending:
+      type: datetime
+      fields: payload.audit_period_ending
 - event_type: trove.*
   traits: &trove_base_traits
     state:
