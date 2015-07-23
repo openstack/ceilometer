@@ -238,13 +238,15 @@ class EventsController(rest.RestController):
     """Works on Events."""
 
     @v2_utils.requires_admin
-    @wsme_pecan.wsexpose([Event], [EventQuery])
-    def get_all(self, q=None):
+    @wsme_pecan.wsexpose([Event], [EventQuery], int)
+    def get_all(self, q=None, limit=None):
         """Return all events matching the query filters.
 
         :param q: Filter arguments for which Events to return
+        :param limit: Maximum number of samples to be returned.
         """
         q = q or []
+        limit = v2_utils.enforce_limit(limit)
         event_filter = _event_query_to_event_filter(q)
         return [Event(message_id=event.message_id,
                       event_type=event.event_type,
@@ -252,7 +254,8 @@ class EventsController(rest.RestController):
                       traits=event.traits,
                       raw=event.raw)
                 for event in
-                pecan.request.event_storage_conn.get_events(event_filter)]
+                pecan.request.event_storage_conn.get_events(event_filter,
+                                                            limit)]
 
     @v2_utils.requires_admin
     @wsme_pecan.wsexpose(Event, wtypes.text)

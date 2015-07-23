@@ -45,7 +45,7 @@ class Connection(object):
         raise ceilometer.NotImplementedError('Events not implemented.')
 
     @staticmethod
-    def get_events(event_filter):
+    def get_events(event_filter, limit=None):
         """Return an iterable of model.Event objects."""
         raise ceilometer.NotImplementedError('Events not implemented.')
 

@@ -71,14 +71,21 @@ class Connection(base.Connection):
         if error:
             raise error
 
-    def get_events(self, event_filter):
+    def get_events(self, event_filter, limit=None):
         """Return an iter of models.Event objects.
 
         :param event_filter: storage.EventFilter object, consists of filters
                              for events that are stored in database.
+        :param limit: Maximum number of results to return.
         """
+        if limit == 0:
+            return
         q = pymongo_utils.make_events_query_from_filter(event_filter)
-        for event in self.db.event.find(q):
+        if limit is not None:
+            results = self.db.event.find(q, limit=limit)
+        else:
+            results = self.db.event.find(q)
+        for event in results:
             traits = []
             for trait in event['traits']:
                 traits.append(models.Trait(name=trait['trait_name'],
