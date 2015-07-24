@@ -401,9 +401,3 @@ class QueryAlarmsController(rest.RestController):
                 for s in conn.query_alarms(query.filter_expr,
                                            query.orderby,
                                            query.limit)]
-
-
-class QueryController(rest.RestController):
-
-    samples = QuerySamplesController()
-    alarms = QueryAlarmsController()

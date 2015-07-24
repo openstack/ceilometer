@@ -23,7 +23,8 @@ MEDIA_TYPE_XML = 'application/vnd.openstack.telemetry-%s+xml'
 
 class RootController(object):
 
-    v2 = v2.V2Controller()
+    def __init__(self):
+        self.v2 = v2.V2Controller()
 
     @pecan.expose('json')
     def index(self):
