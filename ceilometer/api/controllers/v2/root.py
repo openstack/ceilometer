@@ -39,6 +39,15 @@ API_OPTS = [
                 default=None,
                 help=('Set True to disable resource/meter/sample URLs. '
                       'Default autodetection by querying keystone.')),
+    cfg.BoolOpt('aodh_is_enabled',
+                default=None,
+                help=('Set True to redirect alarms URLs to aodh. '
+                      'Default autodetection by querying keystone.')),
+    cfg.StrOpt('aodh_url',
+               default=None,
+               help=('The endpoint of Aodh to redirect alarms URLs '
+                     'to Aodh API. Default autodetection by querying '
+                     'keystone.')),
 ]
 
 cfg.CONF.register_opts(API_OPTS, group='api')
@@ -53,13 +62,26 @@ def gnocchi_abort():
                       "the metric endpoint to retreive data."))
 
 
+def aodh_redirect(url):
+    # NOTE(sileht): we use 307 and not 301 or 302 to allow
+    # client to redirect POST/PUT/DELETE/...
+    # FIXME(sileht): it would be better to use 308, but webob
+    # doesn't handle it :(
+    # https://github.com/Pylons/webob/pull/207
+    pecan.redirect(location=url + pecan.request.path_qs,
+                   code=307)
+
+
 class QueryController(object):
-    def __init__(self, gnocchi_is_enabled=False):
+    def __init__(self, gnocchi_is_enabled=False, aodh_url=None):
         self.gnocchi_is_enabled = gnocchi_is_enabled
+        self.aodh_url = aodh_url
 
     @pecan.expose()
     def _lookup(self, kind, *remainder):
-        if kind == 'alarms':
+        if kind == 'alarms' and self.aodh_url:
+            aodh_redirect(self.aodh_url)
+        elif kind == 'alarms':
             return query.QueryAlarmsController(), remainder
         elif kind == 'samples' and self.gnocchi_is_enabled:
             gnocchi_abort()
@@ -78,6 +100,8 @@ class V2Controller(object):
 
     def __init__(self):
         self._gnocchi_is_enabled = None
+        self._aodh_is_enabled = None
+        self._aodh_url = None
 
     @property
     def gnocchi_is_enabled(self):
@@ -97,13 +121,36 @@ class V2Controller(object):
                 except exceptions.ClientException:
                     LOG.warn(_LW("Can't connect to keystone, assuming gnocchi "
                                  "is disabled and retry later"))
-                    return False
                 else:
                     self._gnocchi_is_enabled = True
                     LOG.warn(_LW("ceilometer-api started with gnocchi "
                                  "enabled. The resources/meters/samples "
                                  "URLs are disabled."))
         return self._gnocchi_is_enabled
+
+    @property
+    def aodh_url(self):
+        if self._aodh_url is None:
+            if cfg.CONF.api.aodh_is_enabled is False:
+                self._aodh_url = ""
+            elif cfg.CONF.api.aodh_url is not None:
+                self._aodh_url = self._normalize_aodh_url(
+                    cfg.CONF.api.aodh_url)
+            else:
+                try:
+                    ks = keystone_client.get_client()
+                    self._aodh_url = self._normalize_aodh_url(
+                        ks.service_catalog.url_for(service_type='alarming'))
+                except exceptions.EndpointNotFound:
+                    self._aodh_url = ""
+                except exceptions.ClientException:
+                    LOG.warn(_LW("Can't connect to keystone, "
+                                 "assuming aodh is disabled and retry later."))
+                else:
+                    LOG.warn(_LW("ceilometer-api started with aodh enabled. "
+                                 "Alarms URLs will be redirected to aodh "
+                                 "endpoint."))
+        return self._aodh_url
 
     @pecan.expose()
     def _lookup(self, kind, *remainder):
@@ -119,8 +166,17 @@ class V2Controller(object):
         elif kind == 'query':
             return QueryController(
                 gnocchi_is_enabled=self.gnocchi_is_enabled,
+                aodh_url=self.aodh_url,
             ), remainder
+        elif kind == 'alarms' and self.aodh_url:
+            aodh_redirect(self.aodh_url)
         elif kind == 'alarms':
             return alarms.AlarmsController(), remainder
         else:
             pecan.abort(404)
+
+    @staticmethod
+    def _normalize_aodh_url(url):
+        if url.endswith("/"):
+            return url[:-1]
+        return url
