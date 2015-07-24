@@ -16,13 +16,15 @@
 # under the License.
 
 import json
+import os
 import uuid
 
 import mock
 from oslo_config import fixture as config_fixture
-from oslotest import base
+from oslo_utils import fileutils
 from oslotest import mockpatch
 import requests
+import six
 import six.moves.urllib.parse as urlparse
 import tempfile
 import testscenarios
@@ -30,6 +32,7 @@ import yaml
 
 from ceilometer.dispatcher import gnocchi
 from ceilometer import service as ceilometer_service
+from ceilometer.tests import base
 
 load_tests = testscenarios.load_tests_apply_scenarios
 
@@ -51,6 +54,11 @@ class DispatcherTest(base.BaseTestCase):
         super(DispatcherTest, self).setUp()
         self.conf = self.useFixture(config_fixture.Config())
         ceilometer_service.prepare_service([])
+        self.conf.config(
+            resources_definition_file=self.path_get(
+                'etc/ceilometer/gnocchi_resources.yaml'),
+            group="dispatcher_gnocchi"
+        )
         self.resource_id = str(uuid.uuid4())
         self.samples = [{
             'counter_name': 'disk.root.size',
@@ -92,12 +100,43 @@ class DispatcherTest(base.BaseTestCase):
             return_value=ks_client))
         self.conf.conf.dispatcher_gnocchi.filter_service_activity = True
 
-    def test_extensions_load(self):
+    def test_config_load(self):
         self.conf.config(filter_service_activity=False,
                          group='dispatcher_gnocchi')
         d = gnocchi.GnocchiDispatcher(self.conf.conf)
-        self.assertIn('instance', d.mgmr.names())
-        self.assertIn('volume', d.mgmr.names())
+        names = [rd.cfg['resource_type'] for rd in d.resources_definition]
+        self.assertIn('instance', names)
+        self.assertIn('volume', names)
+
+    def test_broken_config_load(self):
+        contents = [("---\n"
+                     "resources:\n"
+                     "  - resource_type: foobar\n"),
+                    ("---\n"
+                     "resources:\n"
+                     "  - resource_type: 0\n"),
+                    ("---\n"
+                     "resources:\n"
+                     "  - sample_types: ['foo', 'bar']\n"),
+                    ("---\n"
+                     "resources:\n"
+                     "  - sample_types: foobar\n"
+                     "  - resource_type: foobar\n"),
+                    ]
+
+        for content in contents:
+            if six.PY3:
+                content = content.encode('utf-8')
+
+            temp = fileutils.write_to_tempfile(content=content,
+                                               prefix='gnocchi_resources',
+                                               suffix='.yaml')
+            self.addCleanup(os.remove, temp)
+            self.conf.config(filter_service_activity=False,
+                             resources_definition_file=temp,
+                             group='dispatcher_gnocchi')
+            self.assertRaises(gnocchi.ResourcesDefinitionException,
+                              gnocchi.GnocchiDispatcher, self.conf.conf)
 
     @mock.patch('ceilometer.dispatcher.gnocchi.GnocchiDispatcher'
                 '._process_samples')
@@ -110,10 +149,6 @@ class DispatcherTest(base.BaseTestCase):
             expected_samples, True,
         )
 
-    def test_archive_policy_default(self):
-        d = gnocchi.GnocchiDispatcher(self.conf.conf)
-        self.assertEqual(d.gnocchi_archive_policy_default, "low")
-
     def test_archive_policy_map_config(self):
         archive_policy_map = yaml.dump({
             'foo.*': 'low'
@@ -125,9 +160,8 @@ class DispatcherTest(base.BaseTestCase):
         self.conf.conf.dispatcher_gnocchi.archive_policy_file = (
             archive_policy_cfg_file.name)
         d = gnocchi.GnocchiDispatcher(self.conf.conf)
-        self.assertEqual(
-            d.get_archive_policy(
-                'foo.disk.rate')['archive_policy_name'], "low")
+        legacy = d._load_archive_policy(self.conf.conf)
+        self.assertEqual(legacy.get('foo.disk.rate'), "low")
         archive_policy_cfg_file.close()
 
     def test_activity_filter_match_project_id(self):
@@ -265,6 +299,12 @@ class DispatcherWorkflowTest(base.BaseTestCase,
             return_value=ks_client))
 
         ceilometer_service.prepare_service([])
+        self.conf.config(
+            resources_definition_file=self.path_get(
+                'etc/ceilometer/gnocchi_resources.yaml'),
+            group="dispatcher_gnocchi"
+        )
+
         self.dispatcher = gnocchi.GnocchiDispatcher(self.conf.conf)
         self.sample['resource_id'] = str(uuid.uuid4())
 
