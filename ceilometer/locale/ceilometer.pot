@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 5.0.0.0b2.dev94\n"
+"Project-Id-Version: ceilometer 5.0.0.0b2.dev116\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-07-20 06:09+0000\n"
+"POT-Creation-Date: 2015-07-24 06:28+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -46,57 +46,62 @@ msgstr ""
 msgid "Pipeline endpoint: %s"
 msgstr ""
 
-#: ceilometer/pipeline.py:378
+#: ceilometer/pipeline.py:381
 #, python-format
 msgid "Unable to load publisher %s"
 msgstr ""
 
-#: ceilometer/pipeline.py:396
+#: ceilometer/pipeline.py:399
 #, python-format
 msgid ""
 "Pipeline %(pipeline)s: Setup transformer instance %(name)s with parameter"
 " %(param)s"
 msgstr ""
 
-#: ceilometer/pipeline.py:415 ceilometer/pipeline.py:479
+#: ceilometer/pipeline.py:418 ceilometer/pipeline.py:482
 #, python-format
 msgid "Pipeline %(pipeline)s: Continue after error from publisher %(pub)s"
 msgstr ""
 
-#: ceilometer/pipeline.py:434
+#: ceilometer/pipeline.py:437
 #, python-format
 msgid "Pipeline %(pipeline)s: Sample dropped by transformer %(trans)s"
 msgstr ""
 
-#: ceilometer/pipeline.py:442
+#: ceilometer/pipeline.py:445
 #, python-format
 msgid ""
 "Pipeline %(pipeline)s: Exit after error from transformer %(trans)s for "
 "%(smp)s"
 msgstr ""
 
-#: ceilometer/pipeline.py:465
+#: ceilometer/pipeline.py:468
 #, python-format
 msgid "Pipeline %(pipeline)s: Transform sample %(smp)s from %(trans)s transformer"
 msgstr ""
 
-#: ceilometer/pipeline.py:495
+#: ceilometer/pipeline.py:498
 #, python-format
 msgid "Pipeline %(pipeline)s: Error flushing transformer %(trans)s"
 msgstr ""
 
-#: ceilometer/pipeline.py:660
+#: ceilometer/pipeline.py:663 ceilometer/pipeline.py:725
 msgid "detected decoupled pipeline config format"
 msgstr ""
 
-#: ceilometer/pipeline.py:711
+#: ceilometer/pipeline.py:743
 #, python-format
 msgid "Pipeline config file: %s"
 msgstr ""
 
-#: ceilometer/pipeline.py:717
+#: ceilometer/pipeline.py:749 ceilometer/pipeline.py:768
 #, python-format
 msgid "Pipeline config: %s"
+msgstr ""
+
+#: ceilometer/pipeline.py:762
+#, python-format
+msgid "Polling config file: %s"
 msgstr ""
 
 #: ceilometer/service.py:103
@@ -104,64 +109,64 @@ msgstr ""
 msgid "%(worker_name)s value of %(workers)s is invalid, must be greater than 0"
 msgstr ""
 
-#: ceilometer/service_base.py:58
+#: ceilometer/service_base.py:63
 #, python-format
 msgid "Pipeline has been refreshed. old hash: %(old)s, new hash: %(new)s"
 msgstr ""
 
-#: ceilometer/service_base.py:63
+#: ceilometer/service_base.py:68
 #, python-format
 msgid "Active pipeline config's hash is %s"
 msgstr ""
 
-#: ceilometer/agent/base.py:131
+#: ceilometer/agent/base.py:126
 #, python-format
 msgid "Polling pollster %(poll)s in the context of %(src)s"
 msgstr ""
 
-#: ceilometer/agent/base.py:159
+#: ceilometer/agent/base.py:154
 #, python-format
 msgid ""
 "Found following duplicated resoures for %(name)s in context of "
 "%(source)s:%(list)s. Check pipeline configuration."
 msgstr ""
 
-#: ceilometer/agent/base.py:170
+#: ceilometer/agent/base.py:165
 #, python-format
 msgid "Skip polling pollster %s, no resources found"
 msgstr ""
 
-#: ceilometer/agent/base.py:182
+#: ceilometer/agent/base.py:188
 #, python-format
 msgid "Prevent pollster %(name)s for polling source %(source)s anymore!"
 msgstr ""
 
-#: ceilometer/agent/base.py:188
+#: ceilometer/agent/base.py:194
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
 msgstr ""
 
-#: ceilometer/agent/base.py:242
+#: ceilometer/agent/base.py:253
 #, python-format
 msgid "Skip loading extension for %s"
 msgstr ""
 
-#: ceilometer/agent/base.py:246
+#: ceilometer/agent/base.py:257
 #, python-format
 msgid "Failed to import extension for %(name)s: %(error)s"
 msgstr ""
 
-#: ceilometer/agent/base.py:363
+#: ceilometer/agent/base.py:381
 #, python-format
 msgid "Unable to discover resources: %s"
 msgstr ""
 
-#: ceilometer/agent/base.py:365
+#: ceilometer/agent/base.py:383
 #, python-format
 msgid "Unknown discovery extension: %s"
 msgstr ""
 
-#: ceilometer/agent/base.py:374
+#: ceilometer/agent/base.py:392
 msgid "Error stopping pollster."
 msgstr ""
 
@@ -524,11 +529,11 @@ msgstr ""
 msgid "Getting traits for %s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/events.py:268
+#: ceilometer/api/controllers/v2/events.py:271
 msgid "Event"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/events.py:271
+#: ceilometer/api/controllers/v2/events.py:274
 #, python-format
 msgid "More than one event with id %s returned from storage driver"
 msgstr ""
@@ -863,35 +868,35 @@ msgstr ""
 msgid "No archive policy file found! Using default config."
 msgstr ""
 
-#: ceilometer/dispatcher/gnocchi.py:310
+#: ceilometer/dispatcher/gnocchi.py:311
 #, python-format
 msgid ""
 "The metric %(metric_name)s of resource %(resource_id)s doesn't exists: "
 "%(status_code)d"
 msgstr ""
 
-#: ceilometer/dispatcher/gnocchi.py:319
+#: ceilometer/dispatcher/gnocchi.py:320
 #, python-format
 msgid ""
 "Fail to post measure on metric %(metric_name)s of resource "
 "%(resource_id)s with status: %(status_code)d: %(msg)s"
 msgstr ""
 
-#: ceilometer/dispatcher/gnocchi.py:342
+#: ceilometer/dispatcher/gnocchi.py:343
 #, python-format
 msgid ""
 "Resource %(resource_id)s creation failed with status: %(status_code)d: "
 "%(msg)s"
 msgstr ""
 
-#: ceilometer/dispatcher/gnocchi.py:360
+#: ceilometer/dispatcher/gnocchi.py:361
 #, python-format
 msgid ""
 "Resource %(resource_id)s update failed with status: %(status_code)d: "
 "%(msg)s"
 msgstr ""
 
-#: ceilometer/dispatcher/gnocchi.py:382
+#: ceilometer/dispatcher/gnocchi.py:383
 #, python-format
 msgid ""
 "Fail to create metric %(metric_name)s of resource %(resource_id)s with "
@@ -1153,12 +1158,12 @@ msgstr ""
 msgid "Unable to send sample over UDP"
 msgstr ""
 
-#: ceilometer/storage/impl_hbase.py:212 ceilometer/storage/impl_hbase.py:259
+#: ceilometer/storage/impl_hbase.py:215 ceilometer/storage/impl_hbase.py:266
 #, python-format
 msgid "Query Resource table: %s"
 msgstr ""
 
-#: ceilometer/storage/impl_hbase.py:299
+#: ceilometer/storage/impl_hbase.py:308
 #, python-format
 msgid "Query Meter Table: %s"
 msgstr ""
