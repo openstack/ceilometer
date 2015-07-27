@@ -111,7 +111,7 @@ class ImagePollster(_Base):
                     user_id=None,
                     project_id=image.owner,
                     resource_id=image.id,
-                    timestamp=timeutils.isotime(),
+                    timestamp=timeutils.utcnow().isoformat(),
                     resource_metadata=self.extract_image_metadata(image),
                 )
 
@@ -128,6 +128,6 @@ class ImageSizePollster(_Base):
                     user_id=None,
                     project_id=image.owner,
                     resource_id=image.id,
-                    timestamp=timeutils.isotime(),
+                    timestamp=timeutils.utcnow().isoformat(),
                     resource_metadata=self.extract_image_metadata(image),
                 )

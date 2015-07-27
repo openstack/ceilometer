@@ -41,9 +41,10 @@ class FakeMemcache(object):
         if (key == "tokens/%s" % VALID_TOKEN or
                 key == "tokens/%s" % self.TOKEN_HASH):
             dt = timeutils.utcnow() + datetime.timedelta(minutes=5)
+            dt_isoformat = dt.isoformat()
             return json.dumps(({'access': {
                 'token': {'id': VALID_TOKEN,
-                          'expires': timeutils.isotime(dt)},
+                          'expires': dt_isoformat},
                 'user': {
                     'id': 'user_id1',
                     'name': 'user_name1',
@@ -52,13 +53,14 @@ class FakeMemcache(object):
                     'roles': [
                         {'name': 'admin'},
                     ]},
-            }}, timeutils.isotime(dt)))
+            }}, dt_isoformat))
         if (key == "tokens/%s" % VALID_TOKEN2 or
                 key == "tokens/%s" % self.TOKEN2_HASH):
             dt = timeutils.utcnow() + datetime.timedelta(minutes=5)
+            dt_isoformat = dt.isoformat()
             return json.dumps(({'access': {
                 'token': {'id': VALID_TOKEN2,
-                          'expires': timeutils.isotime(dt)},
+                          'expires': dt_isoformat},
                 'user': {
                     'id': 'user_id2',
                     'name': 'user-good',
@@ -67,7 +69,7 @@ class FakeMemcache(object):
                     'roles': [
                         {'name': 'Member'},
                     ]},
-            }}, timeutils.isotime(dt)))
+            }}, dt_isoformat))
 
     @staticmethod
     def set(key, value, **kwargs):

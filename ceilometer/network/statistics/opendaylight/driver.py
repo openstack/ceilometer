@@ -162,7 +162,7 @@ class OpenDayLightDriver(driver.Driver):
                 container_data['inactive_hosts'] = (
                     cs.host_tracker.get_inactive_hosts(container_name))
 
-                container_data['timestamp'] = timeutils.isotime()
+                container_data['timestamp'] = timeutils.utcnow().isoformat()
 
                 data[container_name] = container_data
             except Exception:

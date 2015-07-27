@@ -56,7 +56,7 @@ def make_sample_from_host(host_url, name, sample_type, unit, volume,
         user_id=user_id or extra.get('user_id'),
         project_id=project_id or extra.get('project_id'),
         resource_id=res_id,
-        timestamp=timeutils.isotime(),
+        timestamp=timeutils.utcnow().isoformat(),
         resource_metadata=resource_metadata,
         source='hardware',
     )
