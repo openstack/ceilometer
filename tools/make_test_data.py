@@ -42,7 +42,11 @@ from ceilometer import storage
 def make_test_data(name, meter_type, unit, volume, random_min,
                    random_max, user_id, project_id, resource_id, start,
                    end, interval, resource_metadata=None, source='artificial'):
-    resource_metadata = resource_metadata or {}
+    resource_metadata = resource_metadata or {'display_name': 'toto',
+                                              'host': 'tata',
+                                              'image_ref_url': 'test',
+                                              'instance_flavor_id': 'toto',
+                                              }
     # Compute start and end timestamps for the new data.
     if isinstance(start, datetime.datetime):
         timestamp = start
