@@ -184,6 +184,16 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
     def create_manager():
         return manager.AgentManager()
 
+    @staticmethod
+    def setup_pipeline_file(pipeline):
+        if six.PY3:
+            pipeline = pipeline.encode('utf-8')
+
+        pipeline_cfg_file = fileutils.write_to_tempfile(content=pipeline,
+                                                        prefix="pipeline",
+                                                        suffix="yaml")
+        return pipeline_cfg_file
+
     def fake_notifier_sample(self, ctxt, event_type, payload):
         for m in payload:
             del m['message_signature']
@@ -191,10 +201,10 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
 
     def setUp(self):
         self.notified_samples = []
-        notifier = mock.Mock()
-        notifier.info.side_effect = self.fake_notifier_sample
+        self.notifier = mock.Mock()
+        self.notifier.info.side_effect = self.fake_notifier_sample
         self.useFixture(mockpatch.Patch('oslo_messaging.Notifier',
-                                        return_value=notifier))
+                                        return_value=self.notifier))
         self.source_resources = True
         super(TestRunTasks, self).setUp()
         self.useFixture(mockpatch.Patch(
@@ -278,16 +288,48 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
             'polling source %(source)s anymore!')
             % ({'name': pollster.name, 'source': source_name}))
 
+    def test_batching_polled_samples_false(self):
+        self.CONF.set_override('batch_polled_samples', False)
+        self._batching_samples(4, 4)
+
+    def test_batching_polled_samples_true(self):
+        self.CONF.set_override('batch_polled_samples', True)
+        self._batching_samples(4, 1)
+
+    def test_batching_polled_samples_default(self):
+        self._batching_samples(4, 1)
+
+    def _batching_samples(self, expected_samples, call_count):
+        pipeline = yaml.dump({
+            'sources': [{
+                'name': 'test_pipeline',
+                'interval': 1,
+                'meters': ['testbatch'],
+                'resources': ['alpha', 'beta', 'gamma', 'delta'],
+                'sinks': ['test_sink']}],
+            'sinks': [{
+                'name': 'test_sink',
+                'transformers': [],
+                'publishers': ["test"]}]
+        })
+
+        pipeline_cfg_file = self.setup_pipeline_file(pipeline)
+
+        self.CONF.set_override("pipeline_cfg_file", pipeline_cfg_file)
+
+        self.mgr.tg = os_service.threadgroup.ThreadGroup(1000)
+        self.mgr.start()
+        start = timeutils.utcnow()
+        while timeutils.delta_seconds(start, timeutils.utcnow()) < 600:
+            if len(self.notified_samples) >= expected_samples:
+                break
+            eventlet.sleep(0)
+
+        samples = self.notified_samples
+        self.assertEqual(expected_samples, len(samples))
+        self.assertEqual(call_count, self.notifier.info.call_count)
+
     def test_start_with_reloadable_pipeline(self):
-
-        def setup_pipeline_file(pipeline):
-            if six.PY3:
-                pipeline = pipeline.encode('utf-8')
-
-            pipeline_cfg_file = fileutils.write_to_tempfile(content=pipeline,
-                                                            prefix="pipeline",
-                                                            suffix="yaml")
-            return pipeline_cfg_file
 
         self.CONF.set_override('heartbeat', 1.0, group='coordination')
         self.CONF.set_override('refresh_pipeline_cfg', True)
@@ -306,7 +348,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                 'publishers': ["test"]}]
         })
 
-        pipeline_cfg_file = setup_pipeline_file(pipeline)
+        pipeline_cfg_file = self.setup_pipeline_file(pipeline)
 
         self.CONF.set_override("pipeline_cfg_file", pipeline_cfg_file)
         self.mgr.tg = os_service.threadgroup.ThreadGroup(1000)
@@ -338,7 +380,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                 'publishers': ["test"]}]
         })
 
-        updated_pipeline_cfg_file = setup_pipeline_file(pipeline)
+        updated_pipeline_cfg_file = self.setup_pipeline_file(pipeline)
 
         # Move/re-name the updated pipeline file to the original pipeline
         # file path as recorded in oslo config
