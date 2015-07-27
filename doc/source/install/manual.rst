@@ -654,12 +654,14 @@ Ceilometer to send metering data to other systems in addition to the
 database, multiple dispatchers can be developed and enabled by modifying
 Ceilometer configuration file.
 
-Ceilometer ships multiple dispatchers currently. They are database, file and
-http dispatcher. As the names imply, database dispatcher sends metering data
+Ceilometer ships multiple dispatchers currently. They are `database`, `file`, `http`
+and `gnocchi` dispatcher. As the names imply, database dispatcher sends metering data
 to a database, file dispatcher logs meters into a file, http dispatcher posts
-the meters onto a http target. Each dispatcher can have its own configuration
-parameters. Please see available configuration parameters at the beginning of
-each dispatcher file.
+the meters onto a http target, gnocchi dispatcher posts the meters onto Gnocchi_
+backend. Each dispatcher can have its own configuration parameters. Please see
+available configuration parameters at the beginning of each dispatcher file.
+
+.. _Gnocchi: http://gnocchi.readthedocs.org/en/latest/basic.html
 
 To check if any of the dispatchers is available in your system, you can
 inspect the Ceilometer egg entry_points.txt file, you should normally see text
@@ -669,6 +671,7 @@ like the following::
    database = ceilometer.dispatcher.database:DatabaseDispatcher
    file = ceilometer.dispatcher.file:FileDispatcher
    http = ceilometer.dispatcher.http:HttpDispatcher
+   gnocchi = ceilometer.dispatcher.gnocchi:GnocchiDispatcher
 
 To configure one or multiple dispatchers for Ceilometer, find the Ceilometer
 configuration file ceilometer.conf which is normally located at /etc/ceilometer
@@ -695,3 +698,21 @@ one can configure the line like the following::
 
 With above configuration, no dispatcher is used by the Ceilometer collector
 service, all metering data received by Ceilometer collector will be dropped.
+
+For Gnocchi dispatcher, the following configuration settings should be added::
+
+    [DEFAULT]
+    dispatcher = gnocchi
+
+    [dispatcher_gnocchi]
+    filter_project = gnocchi_swift
+    filter_service_activity = True
+    archive_policy = low
+    url = http://localhost:8041
+
+The `url` in the above configuration is a Gnocchi endpoint url and depends on your
+deployment.
+
+.. note::
+   If gnocchi dispatcher is enabled, Ceilometer api calls will return a 410 with
+   an empty result. The Gnocchi Api should be used instead to access the data.
