@@ -223,7 +223,7 @@ class _LBStatsPollster(base.BaseServicesPollster):
             user_id=None,
             project_id=pool['tenant_id'],
             resource_id=pool['id'],
-            timestamp=timeutils.isotime(),
+            timestamp=timeutils.utcnow().isoformat(),
             resource_metadata=resource_metadata,
         )
 
@@ -325,6 +325,6 @@ def make_sample_from_pool(pool, name, type, unit, volume,
         user_id=None,
         project_id=pool['tenant_id'],
         resource_id=pool['id'],
-        timestamp=timeutils.isotime(),
+        timestamp=timeutils.utcnow().isoformat(),
         resource_metadata=resource_metadata,
     )

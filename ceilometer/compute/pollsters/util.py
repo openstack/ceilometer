@@ -84,7 +84,7 @@ def make_sample_from_instance(instance, name, type, unit, volume,
         user_id=instance.user_id,
         project_id=instance.tenant_id,
         resource_id=resource_id or instance.id,
-        timestamp=timeutils.isotime(),
+        timestamp=timeutils.utcnow().isoformat(),
         resource_metadata=resource_metadata,
     )
 

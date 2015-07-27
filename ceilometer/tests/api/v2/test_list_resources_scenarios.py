@@ -18,7 +18,6 @@
 import datetime
 import json
 
-from oslo_utils import timeutils
 import six
 import webtest.app
 
@@ -35,17 +34,12 @@ class TestListResources(v2.FunctionalTest,
         data = self.get_json('/resources')
         self.assertEqual([], data)
 
-    @staticmethod
-    def _isotime(timestamp):
-        # drop TZ specifier
-        return six.text_type(timeutils.isotime(timestamp))[:-1]
-
     def _verify_resource_timestamps(self, res, first, last):
         # Bounds need not be tight (see ceilometer bug #1288372)
         self.assertIn('first_sample_timestamp', res)
-        self.assertTrue(self._isotime(first) >= res['first_sample_timestamp'])
+        self.assertTrue(first.isoformat() >= res['first_sample_timestamp'])
         self.assertIn('last_sample_timestamp', res)
-        self.assertTrue(self._isotime(last) <= res['last_sample_timestamp'])
+        self.assertTrue(last.isoformat() <= res['last_sample_timestamp'])
 
     def test_instance_no_metadata(self):
         timestamp = datetime.datetime(2012, 7, 2, 10, 40)

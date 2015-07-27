@@ -60,7 +60,7 @@ class _Base(pollsters.BaseComputePollster):
             user_id=instance.user_id,
             project_id=instance.tenant_id,
             resource_id=rid,
-            timestamp=timeutils.isotime(),
+            timestamp=timeutils.utcnow().isoformat(),
             resource_metadata=resource_metadata
         )
 

@@ -21,7 +21,7 @@ from oslotest import base
 from ceilometer.database import notifications
 from ceilometer import sample
 
-NOW = timeutils.isotime()
+NOW = timeutils.utcnow().isoformat()
 
 TENANT_ID = u'76538754af6548f5b53cf9af2d35d582'
 USER_ID = u'b70ece400e4e45c187168c40fa42ff7a'

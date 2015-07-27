@@ -98,7 +98,7 @@ class TestBaseGetSamples(base.BaseTestCase):
     @staticmethod
     def _make_timestamps(count):
         now = timeutils.utcnow()
-        return [timeutils.isotime(now + datetime.timedelta(seconds=i))
+        return [(now + datetime.timedelta(seconds=i)).isoformat()
                 for i in range(count)]
 
     def _get_samples(self, *resources):

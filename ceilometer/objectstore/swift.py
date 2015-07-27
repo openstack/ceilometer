@@ -114,7 +114,7 @@ class ObjectsPollster(_Base):
                 user_id=None,
                 project_id=tenant,
                 resource_id=tenant,
-                timestamp=timeutils.isotime(),
+                timestamp=timeutils.utcnow().isoformat(),
                 resource_metadata=None,
             )
 
@@ -133,7 +133,7 @@ class ObjectsSizePollster(_Base):
                 user_id=None,
                 project_id=tenant,
                 resource_id=tenant,
-                timestamp=timeutils.isotime(),
+                timestamp=timeutils.utcnow().isoformat(),
                 resource_metadata=None,
             )
 
@@ -152,7 +152,7 @@ class ObjectsContainersPollster(_Base):
                 user_id=None,
                 project_id=tenant,
                 resource_id=tenant,
-                timestamp=timeutils.isotime(),
+                timestamp=timeutils.utcnow().isoformat(),
                 resource_metadata=None,
             )
 
@@ -176,7 +176,7 @@ class ContainersObjectsPollster(_Base):
                     user_id=None,
                     project_id=tenant,
                     resource_id=tenant + '/' + container['name'],
-                    timestamp=timeutils.isotime(),
+                    timestamp=timeutils.utcnow().isoformat(),
                     resource_metadata=None,
                 )
 
@@ -200,6 +200,6 @@ class ContainersSizePollster(_Base):
                     user_id=None,
                     project_id=tenant,
                     resource_id=tenant + '/' + container['name'],
-                    timestamp=timeutils.isotime(),
+                    timestamp=timeutils.utcnow().isoformat(),
                     resource_metadata=None,
                 )
