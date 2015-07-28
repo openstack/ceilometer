@@ -17,7 +17,6 @@
 # under the License.
 import fnmatch
 import itertools
-import json
 import operator
 import os
 import threading
@@ -25,11 +24,11 @@ import threading
 import jsonpath_rw
 from oslo_config import cfg
 from oslo_log import log
-import requests
 import six
 import yaml
 
 from ceilometer import dispatcher
+from ceilometer.dispatcher import gnocchi_client
 from ceilometer.i18n import _, _LE
 from ceilometer import keystone_client
 
@@ -65,35 +64,11 @@ dispatcher_opts = [
 cfg.CONF.register_opts(dispatcher_opts, group="dispatcher_gnocchi")
 
 
-class UnexpectedWorkflowError(Exception):
-    pass
-
-
-class NoSuchMetric(Exception):
-    pass
-
-
-class MetricAlreadyExists(Exception):
-    pass
-
-
-class NoSuchResource(Exception):
-    pass
-
-
-class ResourceAlreadyExists(Exception):
-    pass
-
-
 def log_and_ignore_unexpected_workflow_error(func):
     def log_and_ignore(self, *args, **kwargs):
         try:
             func(self, *args, **kwargs)
-        except requests.ConnectionError as e:
-            with self._gnocchi_api_lock:
-                self._gnocchi_api = None
-            LOG.warn("Connection error, reconnecting...")
-        except UnexpectedWorkflowError as e:
+        except gnocchi_client.UnexpectedError as e:
             LOG.error(six.text_type(e))
     return log_and_ignore
 
@@ -197,20 +172,13 @@ class GnocchiDispatcher(dispatcher.Base):
         self.filter_service_activity = (
             conf.dispatcher_gnocchi.filter_service_activity)
         self._ks_client = keystone_client.get_client()
-        self.gnocchi_url = conf.dispatcher_gnocchi.url
         self.gnocchi_archive_policy_data = self._load_archive_policy(conf)
         self.resources_definition = self._load_resources_definitions(conf)
 
         self._gnocchi_project_id = None
         self._gnocchi_project_id_lock = threading.Lock()
-        self._gnocchi_api = None
-        self._gnocchi_api_lock = threading.Lock()
 
-    def _get_headers(self, content_type="application/json"):
-        return {
-            'Content-Type': content_type,
-            'X-Auth-Token': self._ks_client.auth_token,
-        }
+        self._gnocchi = gnocchi_client.Client(conf.dispatcher_gnocchi.url)
 
     # TODO(sileht): Share yaml loading with
     # event converter and declarative notification
@@ -268,23 +236,6 @@ class GnocchiDispatcher(dispatcher.Base):
                           self.gnocchi_project_id)
             return self._gnocchi_project_id
 
-    @property
-    def gnocchi_api(self):
-        """return a working requests session object"""
-        if self._gnocchi_api is not None:
-            return self._gnocchi_api
-
-        with self._gnocchi_api_lock:
-            if self._gnocchi_api is None:
-                self._gnocchi_api = requests.session()
-                # NOTE(sileht): wait when the pool is empty
-                # instead of raising errors.
-                adapter = requests.adapters.HTTPAdapter(pool_block=True)
-                self._gnocchi_api.mount("http://", adapter)
-                self._gnocchi_api.mount("https://", adapter)
-
-            return self._gnocchi_api
-
     def _is_swift_account_sample(self, sample):
         return bool([rd for rd in self.resources_definition
                      if rd.cfg['resource_type'] == 'swift_account'
@@ -328,11 +279,6 @@ class GnocchiDispatcher(dispatcher.Base):
 
     @log_and_ignore_unexpected_workflow_error
     def _process_resource(self, resource_id, metric_grouped_samples):
-        # TODO(sileht): Any HTTP 50X/401 error is just logged and this method
-        # stop, perhaps we can be smarter and retry later in case of 50X and
-        # directly in case of 401. A gnocchiclient would help a lot for the
-        # latest.
-
         resource_extra = {}
         for metric_name, samples in metric_grouped_samples:
             samples = list(samples)
@@ -359,9 +305,9 @@ class GnocchiDispatcher(dispatcher.Base):
             resource.update(resource_extra)
 
             try:
-                self._post_measure(resource_type, resource_id, metric_name,
-                                   measures)
-            except NoSuchMetric:
+                self._gnocchi.post_measure(resource_type, resource_id,
+                                           metric_name, measures)
+            except gnocchi_client.NoSuchMetric:
                 # TODO(sileht): Make gnocchi smarter to be able to detect 404
                 # for 'resource doesn't exist' and for 'metric doesn't exist'
                 # https://bugs.launchpad.net/gnocchi/+bug/1476186
@@ -369,121 +315,31 @@ class GnocchiDispatcher(dispatcher.Base):
                                                  metric_name)
 
                 try:
-                    self._post_measure(resource_type, resource_id,
-                                       metric_name, measures)
-                except NoSuchMetric:
+                    self._gnocchi.post_measure(resource_type, resource_id,
+                                               metric_name, measures)
+                except gnocchi_client.NoSuchMetric:
                     LOG.error(_LE("Fail to post measures for "
                                   "%(resource_id)s/%(metric_name)s") %
                               dict(resource_id=resource_id,
                                    metric_name=metric_name))
 
         if resource_extra:
-            self._update_resource(resource_type, resource_id, resource_extra)
+            self._gnocchi.update_resource(resource_type, resource_id,
+                                          resource_extra)
 
     def _ensure_resource_and_metric(self, resource_type, resource,
                                     metric_name):
         try:
-            self._create_resource(resource_type, resource)
-        except ResourceAlreadyExists:
+            self._gnocchi.create_resource(resource_type, resource)
+        except gnocchi_client.ResourceAlreadyExists:
             try:
                 archive_policy = resource['metrics'][metric_name]
-                self._create_metric(resource_type, resource['id'],
-                                    metric_name, archive_policy)
-            except MetricAlreadyExists:
+                self._gnocchi.create_metric(resource_type, resource['id'],
+                                            metric_name, archive_policy)
+            except gnocchi_client.MetricAlreadyExists:
                 # NOTE(sileht): Just ignore the metric have been
                 # created in the meantime.
                 pass
-
-    def _post_measure(self, resource_type, resource_id, metric_name,
-                      measure_attributes):
-        r = self.gnocchi_api.post("%s/v1/resource/%s/%s/metric/%s/measures"
-                                  % (self.gnocchi_url, resource_type,
-                                     resource_id, metric_name),
-                                  headers=self._get_headers(),
-                                  data=json.dumps(measure_attributes))
-        if r.status_code == 404:
-            LOG.debug(_("The metric %(metric_name)s of "
-                        "resource %(resource_id)s doesn't exists: "
-                        "%(status_code)d"),
-                      {'metric_name': metric_name,
-                       'resource_id': resource_id,
-                       'status_code': r.status_code})
-            raise NoSuchMetric
-        elif r.status_code // 100 != 2:
-            raise UnexpectedWorkflowError(
-                _("Fail to post measure on metric %(metric_name)s of "
-                  "resource %(resource_id)s with status: "
-                  "%(status_code)d: %(msg)s") %
-                {'metric_name': metric_name,
-                 'resource_id': resource_id,
-                 'status_code': r.status_code,
-                 'msg': r.text})
-        else:
-            LOG.debug("Measure posted on metric %s of resource %s",
-                      metric_name, resource_id)
-
-    def _create_resource(self, resource_type, resource):
-        r = self.gnocchi_api.post("%s/v1/resource/%s"
-                                  % (self.gnocchi_url, resource_type),
-                                  headers=self._get_headers(),
-                                  data=json.dumps(resource))
-        if r.status_code == 409:
-            LOG.debug("Resource %s already exists", resource['id'])
-            raise ResourceAlreadyExists
-
-        elif r.status_code // 100 != 2:
-            raise UnexpectedWorkflowError(
-                _("Resource %(resource_id)s creation failed with "
-                  "status: %(status_code)d: %(msg)s") %
-                {'resource_id': resource['id'],
-                 'status_code': r.status_code,
-                 'msg': r.text})
-        else:
-            LOG.debug("Resource %s created", resource['id'])
-
-    def _update_resource(self, resource_type, resource_id,
-                         resource_extra):
-        r = self.gnocchi_api.patch(
-            "%s/v1/resource/%s/%s"
-            % (self.gnocchi_url, resource_type, resource_id),
-            headers=self._get_headers(),
-            data=json.dumps(resource_extra))
-
-        if r.status_code // 100 != 2:
-            raise UnexpectedWorkflowError(
-                _("Resource %(resource_id)s update failed with "
-                  "status: %(status_code)d: %(msg)s") %
-                {'resource_id': resource_id,
-                 'status_code': r.status_code,
-                 'msg': r.text})
-        else:
-            LOG.debug("Resource %s updated", resource_id)
-
-    def _create_metric(self, resource_type, resource_id, metric_name,
-                       archive_policy):
-        params = {metric_name: archive_policy}
-        r = self.gnocchi_api.post("%s/v1/resource/%s/%s/metric"
-                                  % (self.gnocchi_url, resource_type,
-                                     resource_id),
-                                  headers=self._get_headers(),
-                                  data=json.dumps(params))
-        if r.status_code == 409:
-            LOG.debug("Metric %s of resource %s already exists",
-                      metric_name, resource_id)
-            raise MetricAlreadyExists
-
-        elif r.status_code // 100 != 2:
-            raise UnexpectedWorkflowError(
-                _("Fail to create metric %(metric_name)s of "
-                  "resource %(resource_id)s with status: "
-                  "%(status_code)d: %(msg)s") %
-                {'metric_name': metric_name,
-                 'resource_id': resource_id,
-                 'status_code': r.status_code,
-                 'msg': r.text})
-        else:
-            LOG.debug("Metric %s of resource %s created",
-                      metric_name, resource_id)
 
     @staticmethod
     def record_events(events):

@@ -306,6 +306,8 @@ class DispatcherWorkflowTest(base.BaseTestCase,
                             measure_retry=500, patch_resource=None)),
         ('measure_fail', dict(measure=500, post_resource=None, metric=None,
                               measure_retry=None, patch_resource=None)),
+        ('measure_auth', dict(measure=401, post_resource=None, metric=None,
+                              measure_retry=None, patch_resource=204)),
     ]
 
     @classmethod
@@ -326,6 +328,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
         self.useFixture(mockpatch.Patch(
             'ceilometer.keystone_client.get_client',
             return_value=ks_client))
+        self.ks_client = ks_client
 
         ceilometer_service.prepare_service([])
         self.conf.config(
@@ -334,12 +337,14 @@ class DispatcherWorkflowTest(base.BaseTestCase,
             group="dispatcher_gnocchi"
         )
 
-        self.dispatcher = gnocchi.GnocchiDispatcher(self.conf.conf)
         self.sample['resource_id'] = str(uuid.uuid4())
 
     @mock.patch('ceilometer.dispatcher.gnocchi.LOG')
-    @mock.patch('ceilometer.dispatcher.gnocchi.requests')
-    def test_workflow(self, fake_requests, logger):
+    @mock.patch('ceilometer.dispatcher.gnocchi_client.LOG')
+    @mock.patch('ceilometer.dispatcher.gnocchi_client.requests')
+    def test_workflow(self, fake_requests, client_logger, logger):
+        self.dispatcher = gnocchi.GnocchiDispatcher(self.conf.conf)
+
         base_url = self.dispatcher.conf.dispatcher_gnocchi.url
         url_params = {
             'url': urlparse.urljoin(base_url, '/v1/resource'),
@@ -350,14 +355,13 @@ class DispatcherWorkflowTest(base.BaseTestCase,
         headers = {'Content-Type': 'application/json',
                    'X-Auth-Token': 'fake_token'}
 
-        expected_calls = []
         patch_responses = []
         post_responses = []
 
         # This is needed to mock Exception in py3
         fake_requests.ConnectionError = requests.ConnectionError
 
-        expected_calls.extend([
+        expected_calls = [
             mock.call.session(),
             mock.call.adapters.HTTPAdapter(pool_block=True),
             mock.call.session().mount('http://', mock.ANY),
@@ -367,8 +371,25 @@ class DispatcherWorkflowTest(base.BaseTestCase,
                 "metric/%(metric_name)s/measures" % url_params,
                 headers=headers,
                 data=json_matcher(self.measures_attributes))
-        ])
+
+        ]
         post_responses.append(MockResponse(self.measure))
+
+        if self.measure == 401:
+            type(self.ks_client).auth_token = mock.PropertyMock(
+                side_effect=['fake_token', 'new_token', 'new_token',
+                             'new_token', 'new_token'])
+            headers = {'Content-Type': 'application/json',
+                       'X-Auth-Token': 'new_token'}
+
+            expected_calls.append(
+                mock.call.session().post(
+                    "%(url)s/%(resource_type)s/%(resource_id)s/"
+                    "metric/%(metric_name)s/measures" % url_params,
+                    headers=headers,
+                    data=json_matcher(self.measures_attributes)))
+
+            post_responses.append(MockResponse(200))
 
         if self.post_resource:
             attributes = self.postable_attributes.copy()
@@ -442,10 +463,10 @@ class DispatcherWorkflowTest(base.BaseTestCase,
                  self.sample['resource_id'],
                  500))
         elif self.patch_resource == 204 and self.patchable_attributes:
-            logger.debug.assert_called_with(
+            client_logger.debug.assert_called_with(
                 'Resource %s updated', self.sample['resource_id'])
-        else:
-            logger.debug.assert_called_with(
+        elif self.measure == 200:
+            client_logger.debug.assert_called_with(
                 "Measure posted on metric %s of resource %s",
                 self.sample['counter_name'],
                 self.sample['resource_id'])
