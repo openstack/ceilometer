@@ -92,7 +92,7 @@ class TestEventDirectPublisher(tests_db.TestBase,
                              traits=[], raw={})
                  for i in range(0, 5)]
 
-    def test_direct_publisher(self, ):
+    def test_direct_publisher(self):
         parsed_url = netutils.urlsplit('direct://')
         publisher = direct.DirectPublisher(parsed_url)
         publisher.publish_events(None, self.test_data)
