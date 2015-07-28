@@ -60,6 +60,7 @@ class ConfigFixture(fixture.GabbiFixture):
         conf = fixture_config.Config().conf
         self.conf = conf
         opts.set_defaults(self.conf)
+        conf.import_group('api', 'ceilometer.api.controllers.v2.root')
         conf.import_opt('store_events', 'ceilometer.notification',
                         group='notification')
         conf.set_override('policy_file',
