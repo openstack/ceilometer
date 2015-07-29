@@ -150,9 +150,15 @@ class Client(object):
             search_opts=search_opts))
 
     @logged
-    def instance_get_all(self):
-        """Returns list of all instances."""
+    def instance_get_all(self, since=None):
+        """Returns list of all instances.
+
+        If since is supplied, it will return the instances changes since that
+        datetime. since should be in ISO Format '%Y-%m-%dT%H:%M:%SZ'
+        """
         search_opts = {'all_tenants': True}
+        if since:
+            search_opts['changes-since'] = since
         return self.nova_client.servers.list(
             detailed=True,
             search_opts=search_opts)
