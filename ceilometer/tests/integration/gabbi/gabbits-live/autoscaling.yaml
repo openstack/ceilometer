@@ -1,0 +1,169 @@
+defaults:
+    request_headers:
+        x-auth-token: $ENVIRON['ADMIN_TOKEN']
+
+tests:
+    - name: list alarms none
+      desc: Lists alarms, none yet exist
+      url: $ENVIRON['AODH_SERVICE_URL']/v2/alarms
+      method: GET
+      response_strings:
+          - "[]"
+
+    - name: list servers none
+      desc: List servers, none yet exists
+      url: $ENVIRON['NOVA_SERVICE_URL']/servers
+      method: GET
+      response_strings:
+          - "[]"
+
+    - name: create stack
+      desc: Create an autoscaling stack
+      url: $ENVIRON['HEAT_SERVICE_URL']/stacks
+      method: POST
+      request_headers:
+          content-type: application/json
+      data:
+          stack_name: integration_test
+          template:
+              heat_template_version: "2013-05-23"
+              description: Integration Test AutoScaling with heat+ceilometer+gnocchi+aodh
+              resources:
+                asg:
+                  type: OS::Heat::AutoScalingGroup
+                  properties:
+                    min_size: 1
+                    max_size: 3
+                    resource:
+                      type: OS::Nova::Server
+                      properties:
+                        networks:
+                          - network: "private"
+                        flavor: m1.tiny
+                        image: $ENVIRON['GLANCE_IMAGE_NAME']
+                        metadata:
+                          "metering.server_group": {get_param: "OS::stack_id"}
+                        user_data_format: RAW
+                        user_data: |
+                          #!/bin/sh
+                          echo "Loading CPU"
+                          set -v
+                          cat /dev/urandom > /dev/null
+                web_server_scaleup_policy:
+                  type: OS::Heat::ScalingPolicy
+                  properties:
+                    adjustment_type: change_in_capacity
+                    auto_scaling_group_id: {get_resource: asg}
+                    cooldown: 2
+                    scaling_adjustment: 1
+                cpu_alarm_high:
+                  type: OS::Ceilometer::GnocchiAggregationByResourcesAlarm
+                  properties:
+                    description: Scale-up if the mean CPU > 10% on 1 minute
+                    metric: cpu_util
+                    aggregation_method: mean
+                    granularity: 60.0
+                    evaluation_periods: 1
+                    threshold: 10
+                    comparison_operator: gt
+                    alarm_actions:
+                      - {get_attr: [web_server_scaleup_policy, alarm_url]}
+                    resource_type: instance
+                    query:
+                      str_replace:
+                        template: '{"=": {"server_group": "stack_id"}}'
+                        params:
+                           stack_id: {get_param: "OS::stack_id"}
+                # TODO(sileht): create some other kind of kind alarm just to ensure
+                # heat and aodh API are in sync
+      status: 201
+
+    - name: waiting for stack creation
+      desc: Wait for the second event on the stack resource, it can be a success or failure
+      url: $ENVIRON['HEAT_SERVICE_URL']/stacks/integration_test/events?resource_name=integration_test
+      redirects: true
+      method: GET
+      status: 200
+      poll:
+          count: 300
+          delay: 1
+      response_json_paths:
+          $.events[1].resource_name: integration_test
+
+    - name: control stack status
+      desc: Checks the stack have been created successfully
+      url: $ENVIRON['HEAT_SERVICE_URL']/stacks/integration_test
+      redirects: true
+      method: GET
+      status: 200
+      response_json_paths:
+          $.stack.stack_status: "CREATE_COMPLETE"
+
+    - name: list servers
+      desc: Wait the autoscaling stack grow to three servers
+      url: $ENVIRON['NOVA_SERVICE_URL']/servers/detail
+      method: GET
+      poll:
+          count: 1200
+          delay: 1
+      response_json_paths:
+          $.servers[0].metadata.'metering.server_group': $RESPONSE['$.stack.id']
+          $.servers[1].metadata.'metering.server_group': $RESPONSE['$.stack.id']
+          $.servers[2].metadata.'metering.server_group': $RESPONSE['$.stack.id']
+          $.servers[0].status: ACTIVE
+          $.servers[1].status: ACTIVE
+          $.servers[2].status: ACTIVE
+
+    - name: check gnocchi resources
+      desc: Check the gnocchi resources for this three servers exists
+      url: $ENVIRON['GNOCCHI_SERVICE_URL']/v1/resource/instance
+      method: GET
+      response_strings:
+          - '"id": "$RESPONSE["$.servers[0].id"]"'
+          - '"id": "$RESPONSE["$.servers[1].id"]"'
+          - '"id": "$RESPONSE["$.servers[2].id"]"'
+
+    - name: check alarm
+      desc: Check the aodh alarm and its state
+      url: $ENVIRON['AODH_SERVICE_URL']/v2/alarms
+      method: GET
+      response_strings:
+          - "integration_test-cpu_alarm_high-"
+      response_json_paths:
+          $[0].state: alarm
+
+    - name: get stack location
+      desc: Get the stack location
+      url: $ENVIRON['HEAT_SERVICE_URL']/stacks/integration_test
+      method: GET
+      status: 302
+
+    - name: delete stack
+      desc: Delete the stack
+      url: $LOCATION
+      method: DELETE
+      status: 204
+
+    - name: get deleted stack
+      desc: Check the stack have been deleted
+      url: $ENVIRON['HEAT_SERVICE_URL']/stacks/integration_test
+      redirects: true
+      method: GET
+      poll:
+          count: 240
+          delay: 1
+      status: 404
+
+    - name: list alarms deleted
+      desc: List alarms, no more exist
+      url: $ENVIRON['AODH_SERVICE_URL']/v2/alarms
+      method: GET
+      response_strings:
+          - "[]"
+
+    - name: list servers deleted
+      desc: List servers, no more exists
+      url: $ENVIRON['NOVA_SERVICE_URL']/servers
+      method: GET
+      response_strings:
+          - "[]"
