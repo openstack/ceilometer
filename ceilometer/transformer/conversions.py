@@ -121,9 +121,16 @@ class RateOfChangeTransformer(ScalingTransformer):
             prev_volume = prev[0]
             prev_timestamp = prev[1]
             time_delta = timeutils.delta_seconds(prev_timestamp, timestamp)
-            # we only allow negative deltas for noncumulative samples, whereas
-            # for cumulative we assume that a reset has occurred in the interim
-            # so that the current volume gives a lower bound on growth
+            # disallow violations of the arrow of time
+            if time_delta < 0:
+                LOG.warn(_('dropping out of time order sample: %s'), (s,))
+                # Reset the cache to the newer sample.
+                self.cache[key] = prev
+                return None
+            # we only allow negative volume deltas for noncumulative
+            # samples, whereas for cumulative we assume that a reset has
+            # occurred in the interim so that the current volume gives a
+            # lower bound on growth
             volume_delta = (s.volume - prev_volume
                             if (prev_volume <= s.volume or
                                 s.type != sample.TYPE_CUMULATIVE)
