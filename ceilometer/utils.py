@@ -43,6 +43,8 @@ OPTS = [
 CONF = cfg.CONF
 CONF.register_opts(OPTS)
 
+EPOCH_TIME = datetime.datetime(1970, 1, 1)
+
 
 def _get_root_helper():
     return 'sudo ceilometer-rootwrap %s' % CONF.rootwrap_config
