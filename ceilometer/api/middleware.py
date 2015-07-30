@@ -67,7 +67,7 @@ class ParsableErrorMiddleware(object):
                     'status %s' % status
                 ))
             else:
-                if (state['status_code'] / 100) not in (2, 3):
+                if (state['status_code'] // 100) not in (2, 3):
                     # Remove some headers so we can replace them later
                     # when we have the full error message and can
                     # compute the length.
