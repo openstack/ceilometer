@@ -207,27 +207,29 @@ class Connection(pymongo_base.Connection):
         name_qualifier = dict(user_id='', project_id='project_')
         background = dict(user_id=False, project_id=True)
         for primary in ['user_id', 'project_id']:
-            name = 'resource_%sidx' % name_qualifier[primary]
-            self.db.resource.create_index([
-                (primary, pymongo.ASCENDING),
-                ('source', pymongo.ASCENDING),
-            ], name=name, background=background[primary])
-
             name = 'meter_%sidx' % name_qualifier[primary]
             self.db.meter.create_index([
                 ('resource_id', pymongo.ASCENDING),
                 (primary, pymongo.ASCENDING),
                 ('counter_name', pymongo.ASCENDING),
                 ('timestamp', pymongo.ASCENDING),
-                ('source', pymongo.ASCENDING),
             ], name=name, background=background[primary])
 
-        self.db.resource.create_index([('last_sample_timestamp',
-                                        pymongo.DESCENDING)],
-                                      name='last_sample_timestamp_idx',
-                                      sparse=True)
         self.db.meter.create_index([('timestamp', pymongo.DESCENDING)],
                                    name='timestamp_idx')
+
+        # NOTE(ityaptin) This index covers get_resource requests sorting
+        # and MongoDB uses part of this compound index for different
+        # queries based on any of user_id, project_id, last_sample_timestamp
+        # fields
+        self.db.resource.create_index([('user_id', pymongo.DESCENDING),
+                                       ('project_id', pymongo.DESCENDING),
+                                       ('last_sample_timestamp',
+                                        pymongo.DESCENDING)],
+                                      name='resource_user_project_timestamp',)
+        self.db.resource.create_index([('last_sample_timestamp',
+                                        pymongo.DESCENDING)],
+                                      name='last_sample_timestamp_idx')
 
         # update or create time_to_live index
         ttl = cfg.CONF.database.metering_time_to_live
