@@ -47,7 +47,7 @@ class TestAPIUpgradePath(v2.FunctionalTest):
         for endpoint in ['meters', 'samples', 'resources']:
             response = self.app.get(self.PATH_PREFIX + '/' + endpoint,
                                     status=410)
-            self.assertIn('Gnocchi API', response.body)
+            self.assertIn(b'Gnocchi API', response.body)
 
         for endpoint in ['events', 'event_types']:
             self.app.get(self.PATH_PREFIX + '/' + endpoint,
@@ -59,7 +59,7 @@ class TestAPIUpgradePath(v2.FunctionalTest):
                                       "orderby": '[{"timestamp": "DESC"}]',
                                       "limit": 3
                                   }, status=410)
-        self.assertIn('Gnocchi API', response.body)
+        self.assertIn(b'Gnocchi API', response.body)
 
     def _do_test_alarm_redirect(self):
         response = self.app.get(self.PATH_PREFIX + '/alarms',
@@ -95,9 +95,10 @@ class TestAPIUpgradePath(v2.FunctionalTest):
     def test_gnocchi_enabled_without_database_backend_keystone(self):
         self._setup_keystone_mock()
         self._do_test_gnocchi_enabled_without_database_backend()
-        self.assertEqual([mock.call(service_type="alarming"),
-                          mock.call(service_type="metric")],
-                         sorted(self.ks.service_catalog.url_for.mock_calls))
+        self.ks.service_catalog.url_for.assert_has_calls([
+            mock.call(service_type="alarming"),
+            mock.call(service_type="metric")],
+            any_order=True)
 
     def test_gnocchi_enabled_without_database_backend_configoptions(self):
         self._setup_osloconfig_options()
