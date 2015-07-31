@@ -227,7 +227,7 @@ class Client(object):
         resp = requests.get(url, **self._req_params)
         if CONF.debug:
             self._log_res(resp)
-        if resp.status_code / 100 != 2:
+        if resp.status_code // 100 != 2:
             raise OpenDaylightRESTAPIFailed(
                 _('OpenDaylitght API returned %(status)s %(reason)s') %
                 {'status': resp.status_code, 'reason': resp.reason})

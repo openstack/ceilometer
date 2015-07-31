@@ -109,7 +109,7 @@ class GnocchiThresholdEvaluator(evaluator.Evaluator):
         except Exception:
             LOG.exception(_('alarm stats retrieval failed'))
             return []
-        if int(r.status_code / 100) != 2:
+        if r.status_code // 100 != 2:
             LOG.exception(_('alarm stats retrieval failed: %s') % r.text)
             return []
         else:
