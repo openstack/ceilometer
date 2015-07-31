@@ -139,8 +139,10 @@ class CompatibilityTest(test_storage_scenarios.DBTestBase,
                                  {'field': 'key2',
                                   'op': 'eq',
                                   'value': 'value2',
-                                  'type': 'string'}]),
-                         sorted(old.rule['query']),)
+                                  'type': 'string'}],
+                                key=lambda obj: sorted(obj.items())),
+                         sorted(old.rule['query'],
+                                key=lambda obj: sorted(obj.items())))
         self.assertEqual('cpu', old.rule['meter_name'])
         self.assertEqual(60, old.rule['period'])
         self.assertEqual(1, old.rule['evaluation_periods'])
