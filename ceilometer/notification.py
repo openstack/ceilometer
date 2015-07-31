@@ -53,6 +53,7 @@ OPTS = [
                      'notification agents to be run simultaneously.'),
     cfg.MultiStrOpt('messaging_urls',
                     default=[],
+                    secret=True,
                     help="Messaging URLs to listen for notifications. "
                          "Example: transport://user:pass@host1:port"
                          "[,hostN:portN]/virtual_host "
