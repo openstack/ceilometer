@@ -171,7 +171,7 @@ class PartitionCoordinator(object):
             hr = utils.HashRing(members)
             filtered = [v for v in iterable
                         if hr.get_node(str(v)) == self._my_id]
-            LOG.debug('My subset: %s', filtered)
+            LOG.debug('My subset: %s', [str(f) for f in filtered])
             return filtered
         except tooz.coordination.ToozError:
             LOG.exception(_LE('Error getting group membership info from '
