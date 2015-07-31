@@ -91,12 +91,15 @@ class NotificationService(service_base.BaseService):
             invoke_args=(pm, )
         )
 
-    def _get_notifier(self, transport, pipe):
-        return oslo_messaging.Notifier(
-            transport,
-            driver=cfg.CONF.publisher_notifier.telemetry_driver,
-            publisher_id='ceilometer.notification',
-            topic='%s-%s' % (self.NOTIFICATION_IPC, pipe.name))
+    def _get_notifiers(self, transport, pipe):
+        notifiers = []
+        for agent in self.partition_coordinator._get_members(self.group_id):
+            notifiers.append(oslo_messaging.Notifier(
+                transport,
+                driver=cfg.CONF.publisher_notifier.telemetry_driver,
+                publisher_id='ceilometer.notification',
+                topic='%s-%s-%s' % (self.NOTIFICATION_IPC, pipe.name, agent)))
+        return notifiers
 
     def _get_pipe_manager(self, transport, pipeline_manager):
 
@@ -105,7 +108,7 @@ class NotificationService(service_base.BaseService):
             for pipe in pipeline_manager.pipelines:
                 pipe_manager.add_transporter(
                     (pipe.source.support_meter,
-                     self._get_notifier(transport, pipe)))
+                     self._get_notifiers(transport, pipe)))
         else:
             pipe_manager = pipeline_manager
 
@@ -121,7 +124,7 @@ class NotificationService(service_base.BaseService):
                 for pipe in self.event_pipeline_manager.pipelines:
                     event_pipe_manager.add_transporter(
                         (pipe.source.support_event,
-                         self._get_notifier(transport, pipe)))
+                         self._get_notifiers(transport, pipe)))
             else:
                 event_pipe_manager = self.event_pipeline_manager
 
@@ -133,17 +136,12 @@ class NotificationService(service_base.BaseService):
         self.pipeline_manager = pipeline.setup_pipeline()
         self.transport = messaging.get_transport()
 
-        self.pipe_manager = self._get_pipe_manager(self.transport,
-                                                   self.pipeline_manager)
-        self.event_pipe_manager = self._get_event_pipeline_manager(
-            self.transport)
-
-        self.partition_coordinator = coordination.PartitionCoordinator()
-        self.partition_coordinator.start()
-
         if cfg.CONF.notification.workload_partitioning:
             self.ctxt = context.get_admin_context()
             self.group_id = self.NOTIFICATION_NAMESPACE
+            self.partition_coordinator = coordination.PartitionCoordinator()
+            self.partition_coordinator.start()
+            self.partition_coordinator.join_group(self.group_id)
         else:
             # FIXME(sileht): endpoint use notification_topics option
             # and it should not because this is oslo_messaging option
@@ -154,12 +152,16 @@ class NotificationService(service_base.BaseService):
             messaging.get_notifier(self.transport, '')
             self.group_id = None
 
+        self.pipe_manager = self._get_pipe_manager(self.transport,
+                                                   self.pipeline_manager)
+        self.event_pipe_manager = self._get_event_pipeline_manager(
+            self.transport)
+
         self.listeners, self.pipeline_listeners = [], []
         self._configure_main_queue_listeners(self.pipe_manager,
                                              self.event_pipe_manager)
 
         if cfg.CONF.notification.workload_partitioning:
-            self.partition_coordinator.join_group(self.group_id)
             self._configure_pipeline_listeners()
             self.partition_coordinator.watch_group(self.group_id,
                                                    self._refresh_agent)
@@ -220,6 +222,9 @@ class NotificationService(service_base.BaseService):
             self.listeners.append(listener)
 
     def _refresh_agent(self, event):
+        self.reload_pipeline()
+
+    def _refresh_listeners(self):
         utils.kill_listeners(self.pipeline_listeners)
         self._configure_pipeline_listeners()
 
@@ -228,10 +233,9 @@ class NotificationService(service_base.BaseService):
         ev_pipes = []
         if cfg.CONF.notification.store_events:
             ev_pipes = self.event_pipeline_manager.pipelines
-        partitioned = self.partition_coordinator.extract_my_subset(
-            self.group_id, self.pipeline_manager.pipelines + ev_pipes)
+        pipelines = self.pipeline_manager.pipelines + ev_pipes
         transport = messaging.get_transport()
-        for pipe in partitioned:
+        for pipe in pipelines:
             LOG.debug(_('Pipeline endpoint: %s'), pipe.name)
             pipe_endpoint = (pipeline.EventPipelineEndpoint
                              if isinstance(pipe, pipeline.EventPipeline) else
@@ -239,7 +243,9 @@ class NotificationService(service_base.BaseService):
             listener = messaging.get_notification_listener(
                 transport,
                 [oslo_messaging.Target(
-                    topic='%s-%s' % (self.NOTIFICATION_IPC, pipe.name))],
+                    topic='%s-%s-%s' % (self.NOTIFICATION_IPC,
+                                        pipe.name,
+                                        self.partition_coordinator._my_id))],
                 [pipe_endpoint(self.ctxt, pipe)])
             listener.start()
             self.pipeline_listeners.append(listener)
@@ -256,6 +262,9 @@ class NotificationService(service_base.BaseService):
         self.pipe_manager = self._get_pipe_manager(
             self.transport, self.pipeline_manager)
 
+        self.event_pipe_manager = self._get_event_pipeline_manager(
+            self.transport)
+
         # re-start the main queue listeners.
         utils.kill_listeners(self.listeners)
         self._configure_main_queue_listeners(
@@ -264,4 +273,4 @@ class NotificationService(service_base.BaseService):
         # re-start the pipeline listeners if workload partitioning
         # is enabled.
         if cfg.CONF.notification.workload_partitioning:
-            self._refresh_agent(None)
+            self._refresh_listeners()

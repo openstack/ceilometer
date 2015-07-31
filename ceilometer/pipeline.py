@@ -130,6 +130,7 @@ class _PipelineTransportManager(object):
 
     def publisher(self, context):
         serializer = self.serializer
+        hash_to_bucketise = self.hash_to_bucketise
         transporters = self.transporters
         filter_attr = self.filter_attr
         event_type = self.event_type
@@ -137,13 +138,20 @@ class _PipelineTransportManager(object):
         class PipelinePublishContext(object):
             def __enter__(self):
                 def p(data):
-                    serialized_data = serializer(data)
-                    for d_filter, notifier in transporters:
-                        if any(d_filter(d[filter_attr])
-                               for d in serialized_data):
-                            notifier.sample(context.to_dict(),
-                                            event_type=event_type,
-                                            payload=serialized_data)
+                    # TODO(gordc): cleanup so payload is always single
+                    #              datapoint. we can't correctly bucketise
+                    #              datapoints if batched.
+                    data = [data] if not isinstance(data, list) else data
+                    for datapoint in data:
+                        serialized_data = serializer(datapoint)
+                        for d_filter, notifiers in transporters:
+                            if d_filter(serialized_data[filter_attr]):
+                                key = (hash_to_bucketise(serialized_data) %
+                                       len(notifiers))
+                                notifier = notifiers[key]
+                                notifier.sample(context.to_dict(),
+                                                event_type=event_type,
+                                                payload=[serialized_data])
                 return p
 
             def __exit__(self, exc_type, exc_value, traceback):
@@ -157,9 +165,13 @@ class SamplePipelineTransportManager(_PipelineTransportManager):
     event_type = 'ceilometer.pipeline'
 
     @staticmethod
+    def hash_to_bucketise(datapoint):
+        return hash(datapoint['resource_id'])
+
+    @staticmethod
     def serializer(data):
-        return [publisher_utils.meter_message_from_counter(
-            sample, cfg.CONF.publisher.telemetry_secret) for sample in data]
+        return publisher_utils.meter_message_from_counter(
+            data, cfg.CONF.publisher.telemetry_secret)
 
 
 class EventPipelineTransportManager(_PipelineTransportManager):
@@ -167,9 +179,13 @@ class EventPipelineTransportManager(_PipelineTransportManager):
     event_type = 'pipeline.event'
 
     @staticmethod
+    def hash_to_bucketise(datapoint):
+        return hash(datapoint['event_type'])
+
+    @staticmethod
     def serializer(data):
-        return [publisher_utils.message_from_event(
-            data, cfg.CONF.publisher.telemetry_secret)]
+        return publisher_utils.message_from_event(
+            data, cfg.CONF.publisher.telemetry_secret)
 
 
 class PublishContext(object):
