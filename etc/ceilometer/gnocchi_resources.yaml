@@ -13,10 +13,6 @@ resources:
       - 'identity.group.created'
       - 'identity.group.deleted'
       - 'identity.group.updated'
-
-  - resource_type: identity
-    archive_policy: low
-    metrics:
       - 'identity.role.created'
       - 'identity.role.deleted'
       - 'identity.role.updated'
@@ -30,11 +26,12 @@ resources:
 
   - resource_type: ceph_account
     metrics:
-      - 'stack.create'
-      - 'stack.update'
-      - 'stack.delete'
-      - 'stack.resume'
-      - 'stack.suspend'
+      - 'radosgw.objects'
+      - 'radosgw.objects.size'
+      - 'radosgw.objects.containers'
+      - 'radosgw.api.request'
+      - 'radosgw.containers.objects'
+      - 'radosgw.containers.objects.size'
 
   - resource_type: instance
     metrics:
@@ -43,9 +40,45 @@ resources:
       - 'disk.ephemeral.size'
       - 'memory'
       - 'memory.usage'
+      - 'memory.resident'
       - 'vcpus'
       - 'cpu'
       - 'cpu_util'
+      - 'vcpus'
+      - 'disk.read.requests'
+      - 'disk.read.requests.rate'
+      - 'disk.write.requests'
+      - 'disk.write.requests.rate'
+      - 'disk.read.bytes'
+      - 'disk.read.bytes.rate'
+      - 'disk.write.bytes'
+      - 'disk.write.bytes.rate'
+      - 'disk.device.read.requests'
+      - 'disk.device.read.requests.rate'
+      - 'disk.device.write.requests'
+      - 'disk.device.write.requests.rate'
+      - 'disk.device.read.bytes'
+      - 'disk.device.read.bytes.rate'
+      - 'disk.device.write.bytes'
+      - 'disk.device.write.bytes.rate'
+      - 'disk.latency'
+      - 'disk.iops'
+      - 'disk.device.latency'
+      - 'disk.device.iops'
+      - 'disk.capacity'
+      - 'disk.allocation'
+      - 'disk.usage'
+      - 'disk.device.capacity'
+      - 'disk.device.allocation'
+      - 'disk.device.usage'
+      - 'network.outgoing.packets.rate'
+      - 'network.incoming.packets.rate'
+      - 'network.outgoing.packets'
+      - 'network.incoming.packets'
+      - 'network.outgoing.bytes.rate'
+      - 'network.incoming.bytes.rate'
+      - 'network.outgoing.bytes'
+      - 'network.incoming.bytes'
     attributes:
       - host: resource_metadata.host
       - image_ref: resource_metadata.image_ref_url
@@ -58,6 +91,8 @@ resources:
     metrics:
       - 'image'
       - 'image.size'
+      - 'image.download'
+      - 'image.serve'
     attributes:
       - name: resource_metadata.name
       - container_format: resource_metadata.container_format
@@ -67,9 +102,16 @@ resources:
     metrics:
       - 'hardware.ipmi.node.power'
       - 'hardware.ipmi.node.temperature'
+      - 'hardware.ipmi.node.inlet_temperature'
+      - 'hardware.ipmi.node.outlet_temperature'
       - 'hardware.ipmi.node.fan'
       - 'hardware.ipmi.node.current'
       - 'hardware.ipmi.node.voltage'
+      - 'hardware.ipmi.node.airflow'
+      - 'hardware.ipmi.node.cups'
+      - 'hardware.ipmi.node.cpu_util'
+      - 'hardware.ipmi.node.mem_util'
+      - 'hardware.ipmi.node.io_util'
 
   - resource_type: network
     metrics:
@@ -106,6 +148,8 @@ resources:
       - 'storage.objects.size'
       - 'storage.objects'
       - 'storage.objects.containers'
+      - 'storage.containers.objects'
+      - 'storage.containers.objects.size'
 
   - resource_type: volume
     metrics:
