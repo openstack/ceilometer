@@ -127,8 +127,6 @@ class NotificationService(service_base.BaseService):
     def _get_event_pipeline_manager(self, transport):
 
         if cfg.CONF.notification.store_events:
-            self.event_pipeline_manager = pipeline.setup_event_pipeline()
-
             if cfg.CONF.notification.workload_partitioning:
                 event_pipe_manager = pipeline.EventPipelineTransportManager()
                 for pipe in self.event_pipeline_manager.pipelines:
@@ -144,6 +142,10 @@ class NotificationService(service_base.BaseService):
         super(NotificationService, self).start()
 
         self.pipeline_manager = pipeline.setup_pipeline()
+
+        if cfg.CONF.notification.store_events:
+            self.event_pipeline_manager = pipeline.setup_event_pipeline()
+
         self.transport = messaging.get_transport()
 
         if cfg.CONF.notification.workload_partitioning:
@@ -272,11 +274,13 @@ class NotificationService(service_base.BaseService):
     def reload_pipeline(self):
         LOG.info(_LI("Reloading notification agent and listeners."))
 
-        self.pipe_manager = self._get_pipe_manager(
-            self.transport, self.pipeline_manager)
+        if self.pipeline_validated:
+            self.pipe_manager = self._get_pipe_manager(
+                self.transport, self.pipeline_manager)
 
-        self.event_pipe_manager = self._get_event_pipeline_manager(
-            self.transport)
+        if self.event_pipeline_validated:
+            self.event_pipe_manager = self._get_event_pipeline_manager(
+                self.transport)
 
         # re-start the main queue listeners.
         utils.kill_listeners(self.listeners)

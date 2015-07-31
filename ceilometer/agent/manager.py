@@ -436,14 +436,15 @@ class AgentManager(service_base.BaseService):
         self.pollster_timers = []
 
     def reload_pipeline(self):
-        LOG.info(_LI("Reconfiguring polling tasks."))
+        if self.pipeline_validated:
+            LOG.info(_LI("Reconfiguring polling tasks."))
 
-        # stop existing pollsters and leave partitioning groups
-        self.stop_pollsters()
-        for group in self.groups:
-            self.partition_coordinator.leave_group(group)
+            # stop existing pollsters and leave partitioning groups
+            self.stop_pollsters()
+            for group in self.groups:
+                self.partition_coordinator.leave_group(group)
 
-        # re-create partitioning groups according to pipeline
-        # and configure polling tasks with latest pipeline conf
-        self.join_partitioning_groups()
-        self.pollster_timers = self.configure_polling_tasks()
+            # re-create partitioning groups according to pipeline
+            # and configure polling tasks with latest pipeline conf
+            self.join_partitioning_groups()
+            self.pollster_timers = self.configure_polling_tasks()
