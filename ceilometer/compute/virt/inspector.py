@@ -244,6 +244,16 @@ class Inspector(object):
         """
         raise ceilometer.NotImplementedError
 
+    def inspect_memory_resident(self, instance, duration=None):
+        """Inspect the resident memory statistics for an instance.
+
+        :param instance: the target instance
+        :param duration: the last 'n' seconds, over which the value should be
+               inspected
+        :return: the amount of resident memory
+        """
+        raise ceilometer.NotImplementedError
+
     def inspect_disk_rates(self, instance, duration=None):
         """Inspect the disk statistics as rates for an instance.
 
