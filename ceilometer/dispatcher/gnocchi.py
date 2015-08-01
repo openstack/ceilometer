@@ -409,7 +409,7 @@ class GnocchiDispatcher(dispatcher.Base):
                        'resource_id': resource_id,
                        'status_code': r.status_code})
             raise NoSuchMetric
-        elif int(r.status_code / 100) != 2:
+        elif r.status_code // 100 != 2:
             raise UnexpectedWorkflowError(
                 _("Fail to post measure on metric %(metric_name)s of "
                   "resource %(resource_id)s with status: "
@@ -431,7 +431,7 @@ class GnocchiDispatcher(dispatcher.Base):
             LOG.debug("Resource %s already exists", resource['id'])
             raise ResourceAlreadyExists
 
-        elif int(r.status_code / 100) != 2:
+        elif r.status_code // 100 != 2:
             raise UnexpectedWorkflowError(
                 _("Resource %(resource_id)s creation failed with "
                   "status: %(status_code)d: %(msg)s") %
@@ -449,7 +449,7 @@ class GnocchiDispatcher(dispatcher.Base):
             headers=self._get_headers(),
             data=json.dumps(resource_extra))
 
-        if int(r.status_code / 100) != 2:
+        if r.status_code // 100 != 2:
             raise UnexpectedWorkflowError(
                 _("Resource %(resource_id)s update failed with "
                   "status: %(status_code)d: %(msg)s") %
@@ -472,7 +472,7 @@ class GnocchiDispatcher(dispatcher.Base):
                       metric_name, resource_id)
             raise MetricAlreadyExists
 
-        elif int(r.status_code / 100) != 2:
+        elif r.status_code // 100 != 2:
             raise UnexpectedWorkflowError(
                 _("Fail to create metric %(metric_name)s of "
                   "resource %(resource_id)s with status: "
