@@ -201,7 +201,7 @@ class ValidatedComplexQuery(object):
                 self._validate_filter(self.filter_expr)
             except (ValueError, jsonschema.exceptions.ValidationError) as e:
                 raise base.ClientSideError(
-                    _("Filter expression not valid: %s") % e.message)
+                    _("Filter expression not valid: %s") % e)
             self._replace_isotime_with_datetime(self.filter_expr)
             self._convert_operator_to_lower_case(self.filter_expr)
             self._normalize_field_names_for_db_model(self.filter_expr)

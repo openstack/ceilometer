@@ -73,8 +73,10 @@ def decode_unicode(input):
         # the tuple would become list. So we have to generate the value as
         # list here.
         return [decode_unicode(element) for element in input]
-    elif isinstance(input, six.text_type):
+    elif six.PY2 and isinstance(input, six.text_type):
         return input.encode('utf-8')
+    elif six.PY3 and isinstance(input, six.binary_type):
+        return input.decode('utf-8')
     else:
         return input
 

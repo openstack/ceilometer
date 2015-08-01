@@ -40,6 +40,7 @@ LOG = log.getLogger(__name__)
 class MeterDefinitionException(Exception):
     def __init__(self, message, definition_cfg):
         super(MeterDefinitionException, self).__init__(message)
+        self.message = message
         self.definition_cfg = definition_cfg
 
     def __str__(self):
