@@ -143,12 +143,11 @@ class NotificationService(service_base.BaseService):
             self.partition_coordinator.start()
             self.partition_coordinator.join_group(self.group_id)
         else:
-            # FIXME(sileht): endpoint use notification_topics option
-            # and it should not because this is oslo_messaging option
-            # not a ceilometer, until we have a something to get
-            # the notification_topics in an other way
-            # we must create a transport to ensure the option have
-            # beeen registered by oslo_messaging
+            # FIXME(sileht): endpoint uses the notification_topics option
+            # and it should not because this is an oslo_messaging option
+            # not a ceilometer. Until we have something to get the
+            # notification_topics in another way, we must create a transport
+            # to ensure the option has been registered by oslo_messaging.
             messaging.get_notifier(self.transport, '')
             self.group_id = None
 
