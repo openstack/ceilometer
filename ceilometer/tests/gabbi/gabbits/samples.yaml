@@ -96,8 +96,6 @@ tests:
 
     - name: negative limit value error message
       url: /v2/samples?limit=-99
-      desc: https://bugs.launchpad.net/ceilometer/+bug/1426483
-      xfail: true
       status: 400
       response_headers:
           content-type: /application/json/
@@ -151,8 +149,6 @@ tests:
 
     - name: attempt missing sample
       url: /v2/samples/davesnothere
-      desc: https://bugs.launchpad.net/ceilometer/+bug/1426483
-      xfail: true
       status: 404
       response_headers:
           content-type: /application/json/
