@@ -86,6 +86,26 @@ class TestPollster(plugin_base.PollsterBase):
         return [c]
 
 
+class BatchTestPollster(TestPollster):
+    test_data = default_test_data
+    discovery = None
+
+    @property
+    def default_discovery(self):
+        return self.discovery
+
+    def get_samples(self, manager, cache, resources):
+        resources = resources or []
+        self.samples.append((manager, resources))
+        self.resources.extend(resources)
+        for resource in resources:
+            c = copy.deepcopy(self.test_data)
+            c.timestamp = datetime.datetime.utcnow().isoformat()
+            c.resource_id = resource
+            c.resource_metadata['resource'] = resource
+            yield c
+
+
 class TestPollsterException(TestPollster):
     def get_samples(self, manager, cache, resources):
         resources = resources or []
@@ -110,6 +130,11 @@ class TestDiscoveryException(plugin_base.DiscoveryBase):
 class BaseAgentManagerTestCase(base.BaseTestCase):
 
     class Pollster(TestPollster):
+        samples = []
+        resources = []
+        test_data = default_test_data
+
+    class BatchPollster(BatchTestPollster):
         samples = []
         resources = []
         test_data = default_test_data
@@ -179,6 +204,10 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
                                     None,
                                     None,
                                     self.Pollster(), ),
+                extension.Extension('testbatch',
+                                    None,
+                                    None,
+                                    self.BatchPollster(), ),
                 extension.Extension('testanother',
                                     None,
                                     None,

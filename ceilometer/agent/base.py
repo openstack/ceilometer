@@ -43,6 +43,11 @@ from ceilometer import utils
 LOG = log.getLogger(__name__)
 
 OPTS = [
+    cfg.BoolOpt('batch_polled_samples',
+                default=True,
+                help='To reduce polling agent load, samples are sent to the '
+                     'notification agent in a batch. To gain higher '
+                     'throughput at the cost of load set this to False.'),
     cfg.IntOpt('shuffle_time_before_polling_task',
                default=0,
                help='To reduce large requests at same time to Nova or other '
@@ -112,6 +117,12 @@ class PollingTask(object):
         resource_factory = lambda: Resources(agent_manager)
         self.resources = collections.defaultdict(resource_factory)
 
+        if cfg.CONF.batch_polled_samples:
+            self._handle_sample = self._assemble_samples
+        else:
+            self._handle_sample = self._send_notification
+        self._telemetry_secret = cfg.CONF.publisher.telemetry_secret
+
     def add(self, pollster, source):
         self.pollster_matches[source.name].add(pollster)
         key = Resources.key(source.name, pollster)
@@ -172,16 +183,20 @@ class PollingTask(object):
                         cache=cache,
                         resources=polling_resources
                     )
+                    sample_batch = []
+
                     for sample in samples:
                         sample_dict = (
                             publisher_utils.meter_message_from_counter(
-                                sample, cfg.CONF.publisher.telemetry_secret
+                                sample, self._telemetry_secret
                             ))
-                        self.manager.notifier.info(
-                            self.manager.context.to_dict(),
-                            'telemetry.api',
-                            [sample_dict]
-                        )
+                        self._handle_sample([sample_dict], sample_batch)
+
+                    # sample_batch will contain samples if
+                    # cfg.CONF.batch_polled_samples is True
+                    if sample_batch:
+                        self._send_notification(sample_batch)
+
                 except plugin_base.PollsterPermanentError as err:
                     LOG.error(_(
                         'Prevent pollster %(name)s for '
@@ -193,6 +208,17 @@ class PollingTask(object):
                         'Continue after error from %(name)s: %(error)s')
                         % ({'name': pollster.name, 'error': err}),
                         exc_info=True)
+
+    @staticmethod
+    def _assemble_samples(samples, batch):
+        batch.extend(samples)
+
+    def _send_notification(self, samples, batch=None):
+        self.manager.notifier.info(
+            self.manager.context.to_dict(),
+            'telemetry.api',
+            samples
+        )
 
 
 class AgentManager(service_base.BaseService):
