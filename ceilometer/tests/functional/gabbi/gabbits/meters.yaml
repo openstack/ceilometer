@@ -76,18 +76,14 @@ tests:
           $.error_message.faultstring: "Samples should be included in request body"
 
     - name: post meter bad content-type
-      desc: https://bugs.launchpad.net/wsme/+bug/1419110
-      xfail: true
       url: /v2/meters/apples?direct=True
       method: POST
       request_headers:
           content-type: text/plain
       data: hello
-      status: 400
+      status: 415
 
     - name: post bad samples to meter
-      desc: https://bugs.launchpad.net/ceilometer/+bug/1428185
-      xfail: true
       url: /v2/meters/apples?direct=True
       method: POST
       request_headers:
@@ -225,8 +221,6 @@ tests:
 # Explore posting samples with less than perfect data.
 
     - name: post counter with bad timestamp
-      desc: https://bugs.launchpad.net/wsme/+bug/1428624
-      xfail: true
       url: /v2/meters/apples?direct=True
       method: POST
       request_headers:
@@ -238,6 +232,9 @@ tests:
             counter_volume: 3
             resource_id: aa9431c1-8d69-4ad3-803a-8d4a6b89fdaa
             timestamp: "2013-01-bad 23:23:20"
+      status: 400
+      response_strings:
+          - 'Invalid input for field/attribute samples'
 
     - name: post counter with good timestamp
       url: /v2/meters/apples?direct=True
@@ -254,8 +251,6 @@ tests:
             timestamp: "2013-01-01 23:23:20"
 
     - name: post counter with wrong metadata
-      desc: https://bugs.launchpad.net/ceilometer/+bug/1428628
-      xfail: true
       url: /v2/meters/apples?direct=True
       method: POST
       request_headers:
@@ -268,6 +263,9 @@ tests:
             resource_id: aa9431c1-8d69-4ad3-803a-8d4a6b89fdaa
             timestamp: "2013-01-01 23:23:20"
             resource_metadata: "a string"
+      status: 400
+      response_strings:
+          - "Invalid input for field/attribute samples"
 
     - name: post counter with empty metadata
       url: /v2/meters/apples?direct=True
@@ -347,8 +345,6 @@ tests:
           - "[]"
 
     - name: get sample statistics select aggregate bad format
-      desc: https://bugs.launchpad.net/wsme/+bug/1428658
-      xfail: true
       url: /v2/meters/apples/statistics?aggregate=max
       status: 400
 

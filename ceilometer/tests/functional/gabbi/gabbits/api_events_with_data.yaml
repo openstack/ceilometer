@@ -91,7 +91,6 @@ tests:
 # this attempts to query the events with the wrong data query syntax missing the
 # q object but supplying the field list and  a bad field name and expects a 400
 - name: get events that match bad query via data list
-  desc: https://bugs.launchpad.net/ceilometer/+bug/1423634
   url: /v2/events
   request_headers:
       content-type: application/json; charset=UTF-8
@@ -100,7 +99,6 @@ tests:
         op: eq
         type: string
         value: cookies_chocolate.chip
-  xfail: True
   status: 400
 
 # Get a single event by message_id should return an event

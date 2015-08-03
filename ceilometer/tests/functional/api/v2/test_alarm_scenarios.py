@@ -859,8 +859,8 @@ class TestAlarms(v2.FunctionalTest,
         }
         resp = self.post_json('/alarms', params=json, expect_errors=True,
                               status=400, headers=self.auth_headers)
-        expected_error_message = ("Invalid input for field/attribute field. "
-                                  "Value: 'None'. Mandatory field missing.")
+        expected_error_message = ("Unknown attribute for argument "
+                                  "data.threshold_rule.query: q.field")
         fault_string = resp.json['error_message']['faultstring']
         self.assertEqual(expected_error_message, fault_string)
         alarms = list(self.alarm_conn.get_alarms())
@@ -879,8 +879,8 @@ class TestAlarms(v2.FunctionalTest,
         }
         resp = self.post_json('/alarms', params=json, expect_errors=True,
                               status=400, headers=self.auth_headers)
-        expected_error_message = ("Invalid input for field/attribute value. "
-                                  "Value: 'None'. Mandatory field missing.")
+        expected_error_message = ("Unknown attribute for argument "
+                                  "data.threshold_rule.query: q.value")
         fault_string = resp.json['error_message']['faultstring']
         self.assertEqual(expected_error_message, fault_string)
         alarms = list(self.alarm_conn.get_alarms())
@@ -1946,8 +1946,6 @@ class TestAlarms(v2.FunctionalTest,
         self._verify_alarm(json, alarm)
 
     def test_put_alarm_wrong_field(self):
-        # Note: wsme will ignore unknown fields so will just not appear in
-        # the Alarm.
         json = {
             'this_can_not_be_correct': 'ha',
             'enabled': False,
@@ -1980,9 +1978,10 @@ class TestAlarms(v2.FunctionalTest,
         alarm_id = data[0]['alarm_id']
 
         resp = self.put_json('/alarms/%s' % alarm_id,
+                             expect_errors=True,
                              params=json,
                              headers=self.auth_headers)
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(400, resp.status_code)
 
     def test_put_alarm_with_existing_name(self):
         """Test that update a threshold alarm with an existing name."""

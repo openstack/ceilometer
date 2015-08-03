@@ -79,7 +79,6 @@ tests:
 # this attempts to query the events with the wrong data query syntax missing the
 # q object but supplying the field list and a bad field name and expects a 400
 - name: get events that match bad query via request data malformed list
-  desc: https://bugs.launchpad.net/ceilometer/+bug/1423634
   url: /v2/events
   request_headers:
       content-type: application/json; charset=UTF-8
@@ -88,21 +87,18 @@ tests:
         op: eq
         type: string
         value: cookies_chocolate.chip
-  xfail: True
   status: 400
 
 # this attempts to query the events with the wrong data query syntax missing the
 # q object but supplying the field list along with a bad content-type. Should
 # return a 400
 - name: get events that match bad query via request data wrong type
-  desc: https://bugs.launchpad.net/ceilometer/+bug/1423634 and https://bugs.launchpad.net/ceilometer/+bug/1424642
   url: /v2/events
   request_headers:
       content-type: text/plain
   data:
       "field: bad_field op: eq type: string value: cookies_chocolate.chip xfail: True"
-  xfail: True
-  status: 400
+  status: 415
 
 # Get a single event by message_id no data is present so should return a 404
 - name: get a single event
