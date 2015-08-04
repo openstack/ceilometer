@@ -26,10 +26,13 @@ from oslo_config import cfg
 from oslo_log import log
 from oslo_utils import netutils
 import pymongo
+import pymongo.errors
 import six
 from six.moves.urllib import parse
 
 from ceilometer.i18n import _
+
+ERROR_INDEX_WITH_DIFFERENT_SPEC_ALREADY_EXISTS = 86
 
 LOG = log.getLogger(__name__)
 
@@ -454,6 +457,19 @@ class MongoProxy(object):
         # we can handle the Cursor next function to catch the AutoReconnect
         # exception.
         return CursorProxy(self.conn.find(*args, **kwargs))
+
+    def create_index(self, keys, name=None, *args, **kwargs):
+        try:
+            self.conn.create_index(keys, name=name, *args, **kwargs)
+        except pymongo.errors.OperationFailure as e:
+            if e.code is ERROR_INDEX_WITH_DIFFERENT_SPEC_ALREADY_EXISTS:
+                LOG.info(_("Index %s will be recreate.") % name)
+                self._recreate_index(keys, name, *args, **kwargs)
+
+    @safe_mongo_call
+    def _recreate_index(self, keys, name, *args, **kwargs):
+        self.conn.drop_index(name)
+        self.conn.create_index(keys, name=name, *args, **kwargs)
 
     def __getattr__(self, item):
         """Wrap MongoDB connection.
