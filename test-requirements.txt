@@ -16,7 +16,7 @@ mock>=1.2
 PyMySQL>=0.6.2 # MIT License
 # Docs Requirements
 oslosphinx>=2.5.0 # Apache-2.0
-oslotest>=1.7.0 # Apache-2.0
+oslotest>=1.10.0 # Apache-2.0
 oslo.vmware>=1.16.0 # Apache-2.0
 psycopg2
 pylint==1.4.4 # GNU GPL v2
