@@ -64,8 +64,6 @@ tests:
       status: 400
 
     - name: post meter error is JSON
-      desc: https://bugs.launchpad.net/ceilometer/+bug/1426483
-      xfail: true
       url: /v2/meters/apples?direct=True
       method: POST
       request_headers:
@@ -75,8 +73,7 @@ tests:
       response_headers:
           content-type: /application/json/
       response_json_paths:
-          error_message:
-              faulstring: 'Missing argument: "samples"'
+          $.error_message.faultstring: "Samples should be included in request body"
 
     - name: post meter bad content-type
       desc: https://bugs.launchpad.net/wsme/+bug/1419110
