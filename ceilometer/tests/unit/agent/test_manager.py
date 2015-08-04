@@ -232,7 +232,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
 
     def test_get_sample_resources(self):
         polling_tasks = self.mgr.setup_polling_tasks()
-        self.mgr.interval_task(polling_tasks['test_pipeline']['task'])
+        self.mgr.interval_task(list(polling_tasks.values())[0])
         self.assertTrue(self.Pollster.resources)
 
     def test_when_keystone_fail(self):
@@ -254,8 +254,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         }
         self.mgr.polling_manager = pipeline.PollingManager(self.pipeline_cfg)
         polling_tasks = self.mgr.setup_polling_tasks()
-        task = polling_tasks['test_keystone']['task']
-        self.mgr.interval_task(task)
+        self.mgr.interval_task(list(polling_tasks.values())[0])
         self.assertFalse(self.PollsterKeystone.samples)
         self.assertFalse(self.notified_samples)
 
@@ -275,7 +274,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                 'publishers': ["test"]}]
         }
         self.mgr.polling_manager = pipeline.PollingManager(self.pipeline_cfg)
-        polling_task = self.mgr.setup_polling_tasks()[source_name]['task']
+        polling_task = list(self.mgr.setup_polling_tasks().values())[0]
         pollster = list(polling_task.pollster_matches[source_name])[0]
 
         # 2 samples after 4 pollings, as pollster got disabled upon exception
