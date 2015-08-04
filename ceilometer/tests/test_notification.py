@@ -385,15 +385,6 @@ class TestRealNotificationHA(BaseRealNotification):
         fake_publisher_cls.return_value = self.publisher
         self._check_notification_service()
 
-    @mock.patch('hmac.new')
-    @mock.patch('ceilometer.publisher.test.TestPublisher')
-    def test_notification_service_no_secret(self, fake_publisher_cls,
-                                            fake_hmac):
-        self.CONF.set_override('telemetry_secret', None, group='publisher')
-        fake_publisher_cls.return_value = self.publisher
-        self._check_notification_service()
-        self.assertFalse(fake_hmac.called)
-
     def test_reset_listeners_on_refresh(self):
         self.srv.start()
         self.assertEqual(2, len(self.srv.pipeline_listeners))
