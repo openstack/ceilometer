@@ -142,7 +142,9 @@ def load_definitions(config_def):
     if not config_def:
         return []
     return [MeterDefinition(event_def)
-            for event_def in reversed(config_def['metric'])]
+            for event_def in reversed(config_def['metric'])
+            if (event_def['volume'] != 1 or
+                not cfg.CONF.notification.disable_non_metric_meters)]
 
 
 class ProcessMeterNotifications(plugin_base.NotificationBase):
