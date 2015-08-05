@@ -35,7 +35,7 @@ class _Base(plugin.HardwarePollster):
         return util.make_sample_from_host(host,
                                           name=self.IDENTIFIER,
                                           sample_type=sample.TYPE_GAUGE,
-                                          unit='B',
+                                          unit='KB',
                                           volume=value,
                                           res_metadata=metadata,
                                           extra=extra,
