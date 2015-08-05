@@ -78,6 +78,49 @@ metric:
     project_id: payload.initiator.project_id
     multi: ['name', 'unit', 'volume']
 
+  - name: 'memory'
+    event_type: 'compute.instance.*'
+    type: 'gauge'
+    unit: 'MB'
+    volume: payload.memory_mb
+    user_id: payload.user_id
+    project_id: payload.tenant_id
+    resource_id: payload.instance_id
+
+  - name: 'vcpus'
+    event_type: 'compute.instance.*'
+    type: 'gauge'
+    unit: 'vcpu'
+    volume: payload.vcpus
+    user_id: payload.user_id
+    project_id: payload.tenant_id
+    resource_id: payload.instance_id
+
+  - name: 'disk.root.size'
+    event_type: 'compute.instance.*'
+    type: 'gauge'
+    unit: 'GB'
+    volume: payload.root_gb
+    user_id: payload.user_id
+    project_id: payload.tenant_id
+    resource_id: payload.instance_id
+
+  - name: 'disk.ephemeral.size'
+    event_type: 'compute.instance.*'
+    type: 'gauge'
+    unit: 'GB'
+    volume: payload.ephemeral_gb
+    user_id: payload.user_id
+    project_id: payload.tenant_id
+    resource_id: payload.instance_id
+
+  - name: 'bandwidth'
+    event_type: 'l3.meter'
+    type: 'delta'
+    unit: 'B'
+    volume: payload.bytes
+    project_id: payload.tenant_id
+    resource_id: payload.label_id
 
 # NOTE: non-metric meters are generally events/existence meters
 # These are expected to be DEPRECATED in future releases
@@ -575,3 +618,13 @@ metric:
       - 'identity.trust.deleted'
     resource_id: payload.resource_info
     user_id: payload.initiator.id
+
+  - name: 'storage.api.request'
+    type: 'delta'
+    unit: 'request'
+    volume: 1
+    event_type:
+      - 'objectstore.http.request'
+    resource_id: payload.target.id
+    user_id: payload.initiator.id
+    project_id: payload.initiator.project_id

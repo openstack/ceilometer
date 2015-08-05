@@ -381,30 +381,6 @@ NOTIFICATION_FLOATINGIP_UPDATE_START = {
 }
 
 
-NOTIFICATION_L3_METER = {
-    u'_context_roles': [u'admin'],
-    u'_context_read_deleted': u'no',
-    u'event_type': u'l3.meter',
-    u'timestamp': u'2013-08-22 13:14:06.880304',
-    u'_context_tenant_id': None,
-    u'payload': {u'first_update': 1377176476,
-                 u'bytes': 0,
-                 u'label_id': u'383244a7-e99b-433a-b4a1-d37cf5b17d15',
-                 u'last_update': 1377177246,
-                 u'host': u'precise64',
-                 u'tenant_id': u'admin',
-                 u'time': 30,
-                 u'pkts': 0},
-    u'priority': u'INFO',
-    u'_context_is_admin': True,
-    u'_context_timestamp': u'2013-08-22 13:01:06.614635',
-    u'_context_user_id': None,
-    u'publisher_id': u'metering.precise64',
-    u'message_id': u'd7aee6e8-c7eb-4d47-9338-f60920d708e4',
-    u'_unique_id': u'd5a3bdacdcc24644b84e67a4c10e886a',
-    u'_context_project_id': None}
-
-
 NOTIFICATION_POOL_CREATE = {
     "_context_roles": ["heat_stack_owner", "admin"],
     "_context_request_id": "req-10715057-7590-4529-8020-b994295ee6f4",
@@ -1295,12 +1271,6 @@ class TestNotifications(test.BaseTestCase):
         self.assertEqual(len(samples), 2)
         self.assertEqual("ip.floating", samples[0].name)
 
-    def test_metering_report(self):
-        v = notifications.Bandwidth(mock.Mock())
-        samples = list(v.process_notification(NOTIFICATION_L3_METER))
-        self.assertEqual(1, len(samples))
-        self.assertEqual("bandwidth", samples[0].name)
-
     def test_pool_create(self):
         v = notifications.Pool(mock.Mock())
         samples = list(v.process_notification(NOTIFICATION_POOL_CREATE))
@@ -1474,9 +1444,6 @@ class TestEventTypes(test.BaseTestCase):
 
     def test_floatingip(self):
         self.assertTrue(notifications.FloatingIP(mock.Mock()).event_types)
-
-    def test_bandwidth(self):
-        self.assertTrue(notifications.Bandwidth(mock.Mock()).event_types)
 
     def test_pool(self):
         self.assertTrue(notifications.Pool(mock.Mock()).event_types)
