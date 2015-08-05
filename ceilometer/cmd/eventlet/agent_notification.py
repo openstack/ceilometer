@@ -26,4 +26,4 @@ CONF = cfg.CONF
 def main():
     service.prepare_service()
     os_service.launch(CONF, notification.NotificationService(),
-                      workers=service.get_workers('notification')).wait()
+                      workers=CONF.notification.workers).wait()

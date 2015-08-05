@@ -24,7 +24,6 @@ import copy
 import datetime
 import decimal
 import hashlib
-import multiprocessing
 import struct
 
 from oslo_concurrency import processutils
@@ -200,13 +199,6 @@ def update_nested(original_dict, updates):
         else:
             dict_to_update[key] = updates[key]
     return dict_to_update
-
-
-def cpu_count():
-    try:
-        return multiprocessing.cpu_count() or 1
-    except NotImplementedError:
-        return 1
 
 
 def uniq(dupes, attrs):
