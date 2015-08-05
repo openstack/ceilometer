@@ -18,7 +18,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from keystoneclient.openstack.common.apiclient import exceptions
+from keystoneclient import exceptions
 from oslo_config import cfg
 from oslo_log import log
 import pecan

@@ -11,7 +11,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from keystoneclient.openstack.common.apiclient import exceptions
+from keystoneclient import exceptions
 import mock
 from oslotest import mockpatch
 
