@@ -1,0 +1,66 @@
+{
+    "template": {
+        "heat_template_version": "2013-05-23",
+        "description": "Integration Test AutoScaling with heat+ceilometer+gnocchi+aodh",
+        "resources": {
+            "asg": {
+                "type": "OS::Heat::AutoScalingGroup",
+                "properties": {
+                    "min_size": 1,
+                    "max_size": 2,
+                    "resource": {
+                        "type": "OS::Nova::Server",
+                        "properties": {
+                            "networks": [{ "network": "private" }],
+                            "flavor": "m1.tiny",
+                            "image": "$ENVIRON['GLANCE_IMAGE_NAME']",
+                            "metadata": {
+                                "metering.server_group": { "get_param": "OS::stack_id" }
+                            },
+                            "user_data_format": "RAW",
+                            "user_data": {"Fn::Join": ["", [
+                                "#!/bin/sh\n",
+                                "echo 'Loading CPU'\n",
+                                "set -v\n",
+                                "cat /dev/urandom > /dev/null\n"
+                            ]]}
+                        }
+                    }
+                }
+            },
+            "web_server_scaledown_policy": {
+                "type": "OS::Heat::ScalingPolicy",
+                "properties": {
+                    "adjustment_type": "change_in_capacity",
+                    "auto_scaling_group_id": { "get_resource": "asg" },
+                    "cooldown": 2,
+                    "scaling_adjustment": -1
+                }
+            },
+            "cpu_alarm_high": {
+                "type": "OS::Ceilometer::GnocchiAggregationByResourcesAlarm",
+                "properties": {
+                    "description": "Scale-down if the mean CPU > 10% on 1 minute",
+                    "metric": "cpu_util",
+                    "aggregation_method": "mean",
+                    "granularity": 60,
+                    "evaluation_periods": 1,
+                    "threshold": 10,
+                    "comparison_operator": "gt",
+                    "alarm_actions": [
+                        { "get_attr": [ "web_server_scaledown_policy", "alarm_url" ] }
+                    ],
+                    "resource_type": "instance",
+                    "query": {
+                        "str_replace": {
+                            "template": "{\"and\": [{\"=\": {\"server_group\": \"stack_id\"}}, {\"=\": {\"ended_at\": null}}]}",
+                            "params": {
+                                "stack_id": { "get_param": "OS::stack_id" }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
