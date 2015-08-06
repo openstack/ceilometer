@@ -29,9 +29,9 @@ function generate_testr_results {
 # If we're running in the gate find our keystone endpoint to give to
 # gabbi tests and do a chown. Otherwise the existing environment
 # should provide URL and TOKEN.
-if [ -f $BASE/new/devstack ]; then
+if [ -d $BASE/new/devstack ]; then
     export CEILOMETER_DIR="$BASE/new/ceilometer"
-    JENKINS_USER=jenkins
+    STACK_USER=stack
     sudo chown -R jenkins:stack $CEILOMETER_DIR
     source $BASE/new/devstack/openrc admin admin
     # Go to the ceilometer dir
@@ -50,7 +50,7 @@ export ADMIN_TOKEN=$(openstack token issue -c id -f value)
 echo "Running telemetry integration test suite"
 set +e
 
-sudo -E -H -u ${JENKINS_USER:-${USER}} tox -eintegration
+sudo -E -H -u ${STACK_USER:-${USER}} tox -eintegration
 EXIT_CODE=$?
 set -e
 
