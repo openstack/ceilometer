@@ -155,7 +155,7 @@ function _ceilometer_prepare_virt_drivers {
         fi
 
         if [[ "$VIRT_DRIVER" = 'vsphere' ]]; then
-            pip_instal_gr oslo.vmware
+            pip_install_gr oslo.vmware
         fi
     fi
 }
@@ -168,9 +168,8 @@ function _ceilometer_create_accounts {
         create_service_user "ceilometer" "admin"
 
         if [[ "$KEYSTONE_CATALOG_BACKEND" = 'sql' ]]; then
-            local ceilometer_service=$(get_or_create_service "ceilometer" \
-                "metering" "OpenStack Telemetry Service")
-            get_or_create_endpoint $ceilometer_service \
+            get_or_create_service "ceilometer" "metering" "OpenStack Telemetry Service"
+            get_or_create_endpoint "metering" \
                 "$REGION_NAME" \
                 "$(ceilometer_service_url)/" \
                 "$(ceilometer_service_url)/" \
