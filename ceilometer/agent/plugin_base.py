@@ -178,8 +178,8 @@ class PollsterPermanentError(Exception):
     error.
     """
 
-    def __init__(self, resource):
-        self.fail_res = resource
+    def __init__(self, resources):
+        self.fail_res_list = resources
 
 
 @six.add_metaclass(abc.ABCMeta)

@@ -93,8 +93,8 @@ class _Base(plugin_base.PollsterBase):
         try:
             from ceilometer.objectstore.rgw_client import RGWAdminClient
             rgw_client = RGWAdminClient(endpoint, self.access_key, self.secret)
-        except ImportError as e:
-            raise plugin_base.PollsterPermanentError(e)
+        except ImportError:
+            raise plugin_base.PollsterPermanentError(tenants)
 
         for t in tenants:
             api_method = 'get_%s' % self.METHOD

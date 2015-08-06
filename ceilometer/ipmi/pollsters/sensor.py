@@ -72,7 +72,7 @@ class SensorPollster(plugin_base.PollsterBase):
             if (CONF.ipmi.polling_retry >= 0 and
                     self.polling_failures > CONF.ipmi.polling_retry):
                 LOG.warning(_('Pollster for %s is disabled!') % self.METRIC)
-                raise plugin_base.PollsterPermanentError(resources[0])
+                raise plugin_base.PollsterPermanentError(resources)
             else:
                 return
 

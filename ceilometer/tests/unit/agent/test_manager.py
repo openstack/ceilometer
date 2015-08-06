@@ -145,7 +145,7 @@ class TestPollsterPollingException(agentbase.TestPollster):
         # Raise polling exception after 2 times
         self.polling_failures += 1
         if self.polling_failures > 2:
-            raise plugin_base.PollsterPermanentError(resources[0])
+            raise plugin_base.PollsterPermanentError(resources)
 
         return sample
 

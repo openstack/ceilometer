@@ -202,7 +202,7 @@ class PollingTask(object):
                         'Prevent pollster %(name)s for '
                         'polling source %(source)s anymore!')
                         % ({'name': pollster.name, 'source': source_name}))
-                    self.resources[key].blacklist.append(err.fail_res)
+                    self.resources[key].blacklist.extend(err.fail_res_list)
                 except Exception as err:
                     LOG.warning(_(
                         'Continue after error from %(name)s: %(error)s')
