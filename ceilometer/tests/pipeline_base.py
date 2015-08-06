@@ -1010,7 +1010,7 @@ class BasePipelineTestCase(base.BaseTestCase):
                                                 offset=0)
 
     def test_rate_of_change_no_predecessor(self):
-        s = "100.0 / (10**9 * resource_metadata.get('cpu_number', 1))"
+        s = "100.0 / (10**9 * (resource_metadata.cpu_number or 1))"
         transformer_cfg = [
             {
                 'name': 'rate_of_change',
@@ -1049,6 +1049,80 @@ class BasePipelineTestCase(base.BaseTestCase):
         self.assertEqual(0, len(publisher.samples))
         pipe.flush(None)
         self.assertEqual(0, len(publisher.samples))
+
+    @mock.patch('ceilometer.transformer.conversions.LOG')
+    def test_rate_of_change_out_of_order(self, the_log):
+        s = "100.0 / (10**9 * (resource_metadata.cpu_number or 1))"
+        transformer_cfg = [
+            {
+                'name': 'rate_of_change',
+                'parameters': {
+                    'source': {},
+                    'target': {'name': 'cpu_util',
+                               'unit': '%',
+                               'type': sample.TYPE_GAUGE,
+                               'scale': s}
+                }
+            },
+        ]
+        self._set_pipeline_cfg('transformers', transformer_cfg)
+        self._set_pipeline_cfg('counters', ['cpu'])
+        pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager)
+        pipe = pipeline_manager.pipelines[0]
+
+        now = timeutils.utcnow()
+        earlier = now - datetime.timedelta(seconds=10)
+        later = now + datetime.timedelta(seconds=10)
+
+        counters = [
+            sample.Sample(
+                name='cpu',
+                type=sample.TYPE_CUMULATIVE,
+                volume=125000000000,
+                unit='ns',
+                user_id='test_user',
+                project_id='test_proj',
+                resource_id='test_resource',
+                timestamp=now.isoformat(),
+                resource_metadata={'cpu_number': 4}
+            ),
+            sample.Sample(
+                name='cpu',
+                type=sample.TYPE_CUMULATIVE,
+                volume=120000000000,
+                unit='ns',
+                user_id='test_user',
+                project_id='test_proj',
+                resource_id='test_resource',
+                timestamp=earlier.isoformat(),
+                resource_metadata={'cpu_number': 4}
+            ),
+            sample.Sample(
+                name='cpu',
+                type=sample.TYPE_CUMULATIVE,
+                volume=130000000000,
+                unit='ns',
+                user_id='test_user',
+                project_id='test_proj',
+                resource_id='test_resource',
+                timestamp=later.isoformat(),
+                resource_metadata={'cpu_number': 4}
+            ),
+        ]
+
+        pipe.publish_data(None, counters)
+        publisher = pipe.publishers[0]
+        self.assertEqual(1, len(publisher.samples))
+        pipe.flush(None)
+        self.assertEqual(1, len(publisher.samples))
+
+        cpu_util_sample = publisher.samples[0]
+        self.assertEqual(12.5, cpu_util_sample.volume)
+        the_log.warn.assert_called_with(
+            'dropping out of time order sample: %s',
+            (counters[1],)
+        )
 
     def test_resources(self):
         resources = ['test1://', 'test2://']
