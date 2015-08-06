@@ -13,24 +13,19 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import json
-
 import kafka
-from oslo_config import cfg
 from oslo_log import log
+from oslo_serialization import jsonutils
 from oslo_utils import netutils
 from six.moves.urllib import parse as urlparse
 
 from ceilometer.i18n import _LE
-from ceilometer.i18n import _LI
-from ceilometer.i18n import _LW
-from ceilometer import publisher
-from ceilometer.publisher import utils
+from ceilometer.publisher import messaging
 
 LOG = log.getLogger(__name__)
 
 
-class KafkaBrokerPublisher(publisher.PublisherBase):
+class KafkaBrokerPublisher(messaging.MessagingPublisher):
     """Publish metering data to kafka broker.
 
     The ip address and port number of kafka broker should be configured in
@@ -68,132 +63,34 @@ class KafkaBrokerPublisher(publisher.PublisherBase):
     """
 
     def __init__(self, parsed_url):
-        self.kafka_client = None
+        super(KafkaBrokerPublisher, self).__init__(parsed_url)
+        options = urlparse.parse_qs(parsed_url.query)
 
-        self.host, self.port = netutils.parse_host_port(
+        self._producer = None
+        self._host, self._port = netutils.parse_host_port(
             parsed_url.netloc, default_port=9092)
+        self._topic = options.get('topic', ['ceilometer'])[-1]
+        self.max_retry = int(options.get('max_retry', [100])[-1])
 
-        self.local_queue = []
-
-        params = urlparse.parse_qs(parsed_url.query)
-        self.topic = params.get('topic', ['ceilometer'])[-1]
-        self.policy = params.get('policy', ['default'])[-1]
-        self.max_queue_length = int(params.get(
-            'max_queue_length', [1024])[-1])
-        self.max_retry = int(params.get('max_retry', [100])[-1])
-
-        if self.policy in ['default', 'drop', 'queue']:
-            LOG.info(_LI('Publishing policy set to %s') % self.policy)
-        else:
-            LOG.warn(_LW('Publishing policy is unknown (%s) force to default')
-                     % self.policy)
-            self.policy = 'default'
+    def _ensure_connection(self):
+        if self._producer:
+            return
 
         try:
-            self._get_client()
+            client = kafka.KafkaClient("%s:%s" % (self._host, self._port))
+            self._producer = kafka.SimpleProducer(client)
         except Exception as e:
             LOG.exception(_LE("Failed to connect to Kafka service: %s"), e)
+            raise messaging.DeliveryFailure('Kafka Client is not available, '
+                                            'please restart Kafka client')
 
-    def publish_samples(self, context, samples):
-        """Send a metering message for kafka broker.
-
-        :param context: Execution context from the service or RPC call
-        :param samples: Samples from pipeline after transformation
-        """
-        samples_list = [
-            utils.meter_message_from_counter(
-                sample, cfg.CONF.publisher.telemetry_secret)
-            for sample in samples
-        ]
-
-        self.local_queue.append(samples_list)
-
+    def _send(self, context, event_type, data):
+        self._ensure_connection()
+        # TODO(sileht): don't split the payload into multiple network
+        # message ... but how to do that without breaking consuming
+        # application...
         try:
-            self._check_kafka_connection()
+            for d in data:
+                self._producer.send_messages(self._topic, jsonutils.dumps(d))
         except Exception as e:
-            raise e
-
-        self.flush()
-
-    def flush(self):
-        queue = self.local_queue
-        self.local_queue = self._process_queue(queue)
-        if self.policy == 'queue':
-            self._check_queue_length()
-
-    def publish_events(self, context, events):
-        """Send an event message for kafka broker.
-
-        :param context: Execution context from the service or RPC call
-        :param events: events from pipeline after transformation
-        """
-        events_list = [utils.message_from_event(
-            event, cfg.CONF.publisher.telemetry_secret) for event in events]
-
-        self.local_queue.append(events_list)
-
-        try:
-            self._check_kafka_connection()
-        except Exception as e:
-            raise e
-
-        self.flush()
-
-    def _process_queue(self, queue):
-        current_retry = 0
-        while queue:
-            data = queue[0]
-            try:
-                self._send(data)
-            except Exception:
-                LOG.warn(_LW("Failed to publish %d datum"),
-                         sum([len(d) for d in queue]))
-                if self.policy == 'queue':
-                    return queue
-                elif self.policy == 'drop':
-                    return []
-                current_retry += 1
-                if current_retry >= self.max_retry:
-                    self.local_queue = []
-                    LOG.exception(_LE("Failed to retry to send sample data "
-                                      "with max_retry times"))
-                    raise
-            else:
-                queue.pop(0)
-        return []
-
-    def _check_queue_length(self):
-        queue_length = len(self.local_queue)
-        if queue_length > self.max_queue_length > 0:
-            diff = queue_length - self.max_queue_length
-            self.local_queue = self.local_queue[diff:]
-            LOG.warn(_LW("Kafka Publisher max local queue length is exceeded, "
-                     "dropping %d oldest data") % diff)
-
-    def _check_kafka_connection(self):
-        try:
-            self._get_client()
-        except Exception as e:
-            LOG.exception(_LE("Failed to connect to Kafka service: %s"), e)
-
-            if self.policy == 'queue':
-                self._check_queue_length()
-            else:
-                self.local_queue = []
-            raise Exception('Kafka Client is not available, '
-                            'please restart Kafka client')
-
-    def _get_client(self):
-        if not self.kafka_client:
-            self.kafka_client = kafka.KafkaClient(
-                "%s:%s" % (self.host, self.port))
-            self.kafka_producer = kafka.SimpleProducer(self.kafka_client)
-
-    def _send(self, data):
-        for d in data:
-            try:
-                self.kafka_producer.send_messages(
-                    self.topic, json.dumps(d))
-            except Exception as e:
-                LOG.exception(_LE("Failed to send sample data: %s"), e)
-                raise
+            messaging.raise_delivery_failure(e)

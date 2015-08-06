@@ -22,12 +22,14 @@ from oslo_utils import netutils
 
 from ceilometer.event.storage import models as event
 from ceilometer.publisher import kafka_broker as kafka
+from ceilometer.publisher import messaging as msg_publisher
 from ceilometer import sample
 from ceilometer.tests import base as tests_base
 
 
 @mock.patch('ceilometer.publisher.kafka_broker.LOG', mock.Mock())
-@mock.patch.object(kafka.KafkaBrokerPublisher, '_get_client', mock.Mock())
+@mock.patch('ceilometer.publisher.kafka_broker.kafka.KafkaClient',
+            mock.Mock())
 class TestKafkaPublisher(tests_base.BaseTestCase):
     test_event_data = [
         event.Event(message_id=uuid.uuid4(),
@@ -95,25 +97,22 @@ class TestKafkaPublisher(tests_base.BaseTestCase):
         ),
     ]
 
-    def setUp(self):
-        super(TestKafkaPublisher, self).setUp()
-
     def test_publish(self):
         publisher = kafka.KafkaBrokerPublisher(netutils.urlsplit(
             'kafka://127.0.0.1:9092?topic=ceilometer'))
 
-        with mock.patch.object(publisher, '_send') as fake_send:
+        with mock.patch.object(publisher, '_producer') as fake_producer:
             publisher.publish_samples(mock.MagicMock(), self.test_data)
-            self.assertEqual(1, len(fake_send.mock_calls))
+            self.assertEqual(5, len(fake_producer.send_messages.mock_calls))
             self.assertEqual(0, len(publisher.local_queue))
 
     def test_publish_without_options(self):
         publisher = kafka.KafkaBrokerPublisher(
             netutils.urlsplit('kafka://127.0.0.1:9092'))
 
-        with mock.patch.object(publisher, '_send') as fake_send:
+        with mock.patch.object(publisher, '_producer') as fake_producer:
             publisher.publish_samples(mock.MagicMock(), self.test_data)
-            self.assertEqual(1, len(fake_send.mock_calls))
+            self.assertEqual(5, len(fake_producer.send_messages.mock_calls))
             self.assertEqual(0, len(publisher.local_queue))
 
     def test_publish_to_host_without_policy(self):
@@ -129,39 +128,40 @@ class TestKafkaPublisher(tests_base.BaseTestCase):
         publisher = kafka.KafkaBrokerPublisher(netutils.urlsplit(
             'kafka://127.0.0.1:9092?topic=ceilometer&policy=default'))
 
-        with mock.patch.object(publisher, '_send') as fake_send:
-            fake_send.side_effect = TypeError
-            self.assertRaises(TypeError, publisher.publish_samples,
+        with mock.patch.object(publisher, '_producer') as fake_producer:
+            fake_producer.send_messages.side_effect = TypeError
+            self.assertRaises(msg_publisher.DeliveryFailure,
+                              publisher.publish_samples,
                               mock.MagicMock(), self.test_data)
-            self.assertEqual(100, len(fake_send.mock_calls))
+            self.assertEqual(100, len(fake_producer.send_messages.mock_calls))
             self.assertEqual(0, len(publisher.local_queue))
 
     def test_publish_to_host_with_drop_policy(self):
         publisher = kafka.KafkaBrokerPublisher(netutils.urlsplit(
             'kafka://127.0.0.1:9092?topic=ceilometer&policy=drop'))
 
-        with mock.patch.object(publisher, '_send') as fake_send:
-            fake_send.side_effect = Exception("test")
+        with mock.patch.object(publisher, '_producer') as fake_producer:
+            fake_producer.send_messages.side_effect = Exception("test")
             publisher.publish_samples(mock.MagicMock(), self.test_data)
-            self.assertEqual(1, len(fake_send.mock_calls))
+            self.assertEqual(1, len(fake_producer.send_messages.mock_calls))
             self.assertEqual(0, len(publisher.local_queue))
 
     def test_publish_to_host_with_queue_policy(self):
         publisher = kafka.KafkaBrokerPublisher(netutils.urlsplit(
             'kafka://127.0.0.1:9092?topic=ceilometer&policy=queue'))
 
-        with mock.patch.object(publisher, '_send') as fake_send:
-            fake_send.side_effect = Exception("test")
+        with mock.patch.object(publisher, '_producer') as fake_producer:
+            fake_producer.send_messages.side_effect = Exception("test")
             publisher.publish_samples(mock.MagicMock(), self.test_data)
-            self.assertEqual(1, len(fake_send.mock_calls))
+            self.assertEqual(1, len(fake_producer.send_messages.mock_calls))
             self.assertEqual(1, len(publisher.local_queue))
 
     def test_publish_to_down_host_with_default_queue_size(self):
         publisher = kafka.KafkaBrokerPublisher(netutils.urlsplit(
             'kafka://127.0.0.1:9092?topic=ceilometer&policy=queue'))
 
-        with mock.patch.object(publisher, '_send') as fake_send:
-            fake_send.side_effect = Exception('No Connection')
+        with mock.patch.object(publisher, '_producer') as fake_producer:
+            fake_producer.send_messages.side_effect = Exception("test")
 
             for i in range(0, 2000):
                 for s in self.test_data:
@@ -170,16 +170,16 @@ class TestKafkaPublisher(tests_base.BaseTestCase):
 
             self.assertEqual(1024, len(publisher.local_queue))
             self.assertEqual('test-976',
-                             publisher.local_queue[0][0]['counter_name'])
+                             publisher.local_queue[0][2][0]['counter_name'])
             self.assertEqual('test-1999',
-                             publisher.local_queue[1023][0]['counter_name'])
+                             publisher.local_queue[1023][2][0]['counter_name'])
 
     def test_publish_to_host_from_down_to_up_with_queue(self):
         publisher = kafka.KafkaBrokerPublisher(netutils.urlsplit(
             'kafka://127.0.0.1:9092?topic=ceilometer&policy=queue'))
 
-        with mock.patch.object(publisher, '_send') as fake_send:
-            fake_send.side_effect = Exception('No Connection')
+        with mock.patch.object(publisher, '_producer') as fake_producer:
+            fake_producer.send_messages.side_effect = Exception("test")
             for i in range(0, 16):
                 for s in self.test_data:
                     s.name = 'test-%d' % i
@@ -187,7 +187,7 @@ class TestKafkaPublisher(tests_base.BaseTestCase):
 
             self.assertEqual(16, len(publisher.local_queue))
 
-            fake_send.side_effect = None
+            fake_producer.send_messages.side_effect = None
             for s in self.test_data:
                 s.name = 'test-%d' % 16
             publisher.publish_samples(mock.MagicMock(), self.test_data)
@@ -197,13 +197,14 @@ class TestKafkaPublisher(tests_base.BaseTestCase):
         publisher = kafka.KafkaBrokerPublisher(
             netutils.urlsplit('kafka://127.0.0.1:9092?topic=ceilometer'))
 
-        with mock.patch.object(publisher, '_send') as fake_send:
+        with mock.patch.object(publisher, '_producer') as fake_producer:
             publisher.publish_events(mock.MagicMock(), self.test_event_data)
-            self.assertEqual(1, len(fake_send.mock_calls))
+            self.assertEqual(5, len(fake_producer.send_messages.mock_calls))
 
-        with mock.patch.object(publisher, '_send') as fake_send:
-            fake_send.side_effect = TypeError
-            self.assertRaises(TypeError, publisher.publish_events,
+        with mock.patch.object(publisher, '_producer') as fake_producer:
+            fake_producer.send_messages.side_effect = Exception("test")
+            self.assertRaises(msg_publisher.DeliveryFailure,
+                              publisher.publish_events,
                               mock.MagicMock(), self.test_event_data)
-            self.assertEqual(100, len(fake_send.mock_calls))
+            self.assertEqual(100, len(fake_producer.send_messages.mock_calls))
             self.assertEqual(0, len(publisher.local_queue))
