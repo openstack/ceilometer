@@ -310,6 +310,8 @@ class Connection(hbase_base.Connection, base.Connection):
                                    limit=limit, columns=columns)
             for ignored, meter in gen:
                 d_meter = hbase_utils.deserialize_entry(meter)[0]
+                d_meter['message']['counter_volume'] = (
+                    float(d_meter['message']['counter_volume']))
                 d_meter['message']['recorded_at'] = d_meter['recorded_at']
                 yield models.Sample(**d_meter['message'])
 
