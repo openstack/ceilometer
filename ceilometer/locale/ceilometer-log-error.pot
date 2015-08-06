@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 5.0.0.0b2.dev138\n"
+"Project-Id-Version: ceilometer 5.0.0.0b3.dev38\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-07-29 06:35+0000\n"
+"POT-Creation-Date: 2015-08-06 06:33+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -64,19 +64,24 @@ msgstr ""
 msgid "Error processing event and it will be dropped: %s"
 msgstr ""
 
-#: ceilometer/dispatcher/gnocchi.py:174 ceilometer/meter/notifications.py:79
+#: ceilometer/dispatcher/gnocchi.py:149 ceilometer/meter/notifications.py:80
 #, python-format
 msgid "Parse error in JSONPath specification '%(jsonpath)s': %(err)s"
 msgstr ""
 
-#: ceilometer/dispatcher/gnocchi.py:186 ceilometer/meter/notifications.py:61
+#: ceilometer/dispatcher/gnocchi.py:161 ceilometer/meter/notifications.py:62
 #, python-format
 msgid "Required field %s not specified"
 msgstr ""
 
-#: ceilometer/dispatcher/gnocchi.py:189
+#: ceilometer/dispatcher/gnocchi.py:164
 #, python-format
 msgid "Required field %(field)s should be a %(type)s"
+msgstr ""
+
+#: ceilometer/dispatcher/gnocchi.py:321
+#, python-format
+msgid "Fail to post measures for %(resource_id)s/%(metric_name)s"
 msgstr ""
 
 #: ceilometer/dispatcher/http.py:136
@@ -92,33 +97,33 @@ msgstr ""
 msgid "Failed to record event: %s"
 msgstr ""
 
-#: ceilometer/meter/notifications.py:90
+#: ceilometer/meter/notifications.py:91
 #, python-format
 msgid "Invalid type %s specified"
 msgstr ""
 
-#: ceilometer/meter/notifications.py:104
+#: ceilometer/meter/notifications.py:105
 #, python-format
 msgid "Meter Definitions configuration file: %s"
 msgstr ""
 
-#: ceilometer/meter/notifications.py:114
+#: ceilometer/meter/notifications.py:115
 #, python-format
 msgid ""
 "Invalid YAML syntax in Meter Definitions file %(file)s at line: %(line)s,"
 " column: %(column)s."
 msgstr ""
 
-#: ceilometer/meter/notifications.py:120
+#: ceilometer/meter/notifications.py:121
 #, python-format
 msgid "YAML error reading Meter Definitions file %(file)s"
 msgstr ""
 
-#: ceilometer/meter/notifications.py:127
+#: ceilometer/meter/notifications.py:128
 msgid "No Meter Definitions configuration file found! Using default config."
 msgstr ""
 
-#: ceilometer/meter/notifications.py:131
+#: ceilometer/meter/notifications.py:132
 #, python-format
 msgid "Meter Definitions: %s"
 msgstr ""
