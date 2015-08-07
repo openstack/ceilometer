@@ -26,7 +26,6 @@ from oslo_log import log
 import six
 import webob
 
-from ceilometer.api import hooks
 from ceilometer import i18n
 from ceilometer.i18n import _
 
@@ -82,13 +81,7 @@ class ParsableErrorMiddleware(object):
         app_iter = self.app(environ, replacement_start_response)
         if (state['status_code'] // 100) not in (2, 3):
             req = webob.Request(environ)
-            # Find the first TranslationHook in the array of hooks and use the
-            # translatable_error object from it
-            error = None
-            for hook in self.app.hooks:
-                if isinstance(hook, hooks.TranslationHook):
-                    error = hook.local_error.translatable_error
-                    break
+            error = environ.get('translatable_error')
             user_locale = self.best_match_language(req.accept_language)
             if (req.accept.best_match(['application/json', 'application/xml'])
                == 'application/xml'):
