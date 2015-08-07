@@ -12,6 +12,7 @@
 # under the License.
 """Tests for ceilometer.meter.notifications
 """
+import copy
 import mock
 import six
 import yaml
@@ -40,6 +41,76 @@ NOTIFICATION = {
     u'_context_user': u'e1d870e51c7340cb9d555b15cbfcaec2',
     'message_id': u'939823de-c242-45a2-a399-083f4d6a8c3e',
     'publisher_id': "foo123"
+}
+
+MIDDLEWARE_EVENT = {
+    u'_context_request_id': u'req-a8bfa89b-d28b-4b95-9e4b-7d7875275650',
+    u'_context_quota_class': None,
+    u'event_type': u'objectstore.http.request',
+    u'_context_service_catalog': [],
+    u'_context_auth_token': None,
+    u'_context_user_id': None,
+    u'priority': u'INFO',
+    u'_context_is_admin': True,
+    u'_context_user': None,
+    u'publisher_id': u'ceilometermiddleware',
+    u'message_id': u'6eccedba-120e-4db8-9735-2ad5f061e5ee',
+    u'_context_remote_address': None,
+    u'_context_roles': [],
+    u'timestamp': u'2013-07-29 06:51:34.474815',
+    u'_context_timestamp': u'2013-07-29T06:51:34.348091',
+    u'_unique_id': u'0ee26117077648e18d88ac76e28a72e2',
+    u'_context_project_name': None,
+    u'_context_read_deleted': u'no',
+    u'_context_tenant': None,
+    u'_context_instance_lock_checked': False,
+    u'_context_project_id': None,
+    u'_context_user_name': None,
+    u'payload': {
+        'typeURI': 'http: //schemas.dmtf.org/cloud/audit/1.0/event',
+        'eventTime': '2015-01-30T16: 38: 43.233621',
+        'target': {
+            'action': 'get',
+            'typeURI': 'service/storage/object',
+            'id': 'account',
+            'metadata': {
+                'path': '/1.0/CUSTOM_account/container/obj',
+                'version': '1.0',
+                'container': 'container',
+                'object': 'obj'
+            }
+        },
+        'observer': {
+            'id': 'target'
+        },
+        'eventType': 'activity',
+        'measurements': [
+            {
+                'metric': {
+                    'metricId': 'openstack: uuid',
+                    'name': 'storage.objects.outgoing.bytes',
+                    'unit': 'B'
+                },
+                'result': 28
+            },
+            {
+                'metric': {
+                    'metricId': 'openstack: uuid2',
+                    'name': 'storage.objects.incoming.bytes',
+                    'unit': 'B'
+                },
+                'result': 1
+            }
+        ],
+        'initiator': {
+            'typeURI': 'service/security/account/user',
+            'project_id': None,
+            'id': 'openstack: 288f6260-bf37-4737-a178-5038c84ba244'
+        },
+        'action': 'read',
+        'outcome': 'success',
+        'id': 'openstack: 69972bb6-14dd-46e4-bdaf-3148014363dc'
+    }
 }
 
 
@@ -171,3 +242,104 @@ class TestMeterProcessing(test.BaseTestCase):
             self.__setup_meter_def_file(cfg))
         c = list(self.handler.process_notification(NOTIFICATION))
         self.assertEqual(2, len(c))
+
+    def test_multi_meter_payload(self):
+        cfg = yaml.dump(
+            {'metric': [dict(name="payload.measurements.[*].metric.[*].name",
+                        event_type="objectstore.http.request",
+                        type="delta",
+                        unit="payload.measurements.[*].metric.[*].unit",
+                        volume="payload.measurements.[*].result",
+                        resource_id="payload.target_id",
+                        project_id="payload.initiator.project_id",
+                        multi="name")]})
+        self.handler.definitions = notifications.load_definitions(
+            self.__setup_meter_def_file(cfg))
+        c = list(self.handler.process_notification(MIDDLEWARE_EVENT))
+        self.assertEqual(2, len(c))
+        s1 = c[0].as_dict()
+        self.assertEqual('storage.objects.outgoing.bytes', s1['name'])
+        self.assertEqual(28, s1['volume'])
+        self.assertEqual('B', s1['unit'])
+        s2 = c[1].as_dict()
+        self.assertEqual('storage.objects.incoming.bytes', s2['name'])
+        self.assertEqual(1, s2['volume'])
+        self.assertEqual('B', s2['unit'])
+
+    def test_multi_meter_payload_single(self):
+        event = copy.deepcopy(MIDDLEWARE_EVENT)
+        del event['payload']['measurements'][1]
+        cfg = yaml.dump(
+            {'metric': [dict(name="payload.measurements.[*].metric.[*].name",
+                        event_type="objectstore.http.request",
+                        type="delta",
+                        unit="payload.measurements.[*].metric.[*].unit",
+                        volume="payload.measurements.[*].result",
+                        resource_id="payload.target_id",
+                        project_id="payload.initiator.project_id",
+                        multi="name")]})
+        self.handler.definitions = notifications.load_definitions(
+            self.__setup_meter_def_file(cfg))
+        c = list(self.handler.process_notification(event))
+        self.assertEqual(1, len(c))
+        s1 = c[0].as_dict()
+        self.assertEqual('storage.objects.outgoing.bytes', s1['name'])
+        self.assertEqual(28, s1['volume'])
+        self.assertEqual('B', s1['unit'])
+
+    def test_multi_meter_payload_none(self):
+        event = copy.deepcopy(MIDDLEWARE_EVENT)
+        del event['payload']['measurements']
+        cfg = yaml.dump(
+            {'metric': [dict(name="payload.measurements.[*].metric.[*].name",
+                        event_type="objectstore.http.request",
+                        type="delta",
+                        unit="payload.measurements.[*].metric.[*].unit",
+                        volume="payload.measurements.[*].result",
+                        resource_id="payload.target_id",
+                        project_id="payload.initiator.project_id",
+                        multi="name")]})
+        self.handler.definitions = notifications.load_definitions(
+            self.__setup_meter_def_file(cfg))
+        c = list(self.handler.process_notification(event))
+        self.assertEqual(0, len(c))
+
+    @mock.patch('ceilometer.meter.notifications.LOG')
+    def test_multi_meter_payload_invalid_missing(self, LOG):
+        event = copy.deepcopy(MIDDLEWARE_EVENT)
+        del event['payload']['measurements'][0]['result']
+        del event['payload']['measurements'][1]['result']
+        cfg = yaml.dump(
+            {'metric': [dict(name="payload.measurements.[*].metric.[*].name",
+                        event_type="objectstore.http.request",
+                        type="delta",
+                        unit="payload.measurements.[*].metric.[*].unit",
+                        volume="payload.measurements.[*].result",
+                        resource_id="payload.target_id",
+                        project_id="payload.initiator.project_id",
+                        multi=["name", "unit", "volume"])]})
+        self.handler.definitions = notifications.load_definitions(
+            self.__setup_meter_def_file(cfg))
+        c = list(self.handler.process_notification(event))
+        self.assertEqual(0, len(c))
+        LOG.warning.assert_called_with('Could not find %s values', 'volume')
+
+    @mock.patch('ceilometer.meter.notifications.LOG')
+    def test_multi_meter_payload_invalid_short(self, LOG):
+        event = copy.deepcopy(MIDDLEWARE_EVENT)
+        del event['payload']['measurements'][0]['result']
+        cfg = yaml.dump(
+            {'metric': [dict(name="payload.measurements.[*].metric.[*].name",
+                        event_type="objectstore.http.request",
+                        type="delta",
+                        unit="payload.measurements.[*].metric.[*].unit",
+                        volume="payload.measurements.[*].result",
+                        resource_id="payload.target_id",
+                        project_id="payload.initiator.project_id",
+                        multi=["name", "unit", "volume"])]})
+        self.handler.definitions = notifications.load_definitions(
+            self.__setup_meter_def_file(cfg))
+        c = list(self.handler.process_notification(event))
+        self.assertEqual(0, len(c))
+        LOG.warning.assert_called_with('Not all fetched meters contain "%s" '
+                                       'field', 'volume')

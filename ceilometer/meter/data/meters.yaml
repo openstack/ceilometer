@@ -67,6 +67,18 @@ metric:
     project_id: payload.tenant_id
     resource_id: payload.snapshot_id
 
+  # Swift
+  - name: payload.measurements.[*].metric.[*].name
+    event_type: 'objectstore.http.request'
+    type: 'delta'
+    unit: payload.measurements.[*].metric.[*].unit
+    volume: payload.measurements.[*].result
+    resource_id: payload.target.id
+    user_id: payload.initiator.id
+    project_id: payload.initiator.project_id
+    multi: ['name', 'unit', 'volume']
+
+
 # NOTE: non-metric meters are generally events/existence meters
 # These are expected to be DEPRECATED in future releases
 #

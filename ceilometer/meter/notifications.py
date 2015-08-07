@@ -12,6 +12,7 @@
 # under the License.
 
 import fnmatch
+import itertools
 import os
 import pkg_resources
 import six
@@ -68,7 +69,7 @@ class MeterDefinition(object):
             if fnmatch.fnmatch(meter_name, t):
                 return True
 
-    def parse_fields(self, field, message):
+    def parse_fields(self, field, message, all_values=False):
         fval = self.cfg.get(field)
         if not fval:
             return
@@ -84,7 +85,9 @@ class MeterDefinition(object):
         values = [match.value for match in parts.find(message)
                   if match.value is not None]
         if values:
-            return values[0]
+            if not all_values:
+                return values[0]
+            return values
 
     def _validate_type(self):
         if self.cfg['type'] not in sample.TYPES:
@@ -145,6 +148,10 @@ def load_definitions(config_def):
             for event_def in reversed(config_def['metric'])]
 
 
+class InvalidPayload(Exception):
+    pass
+
+
 class ProcessMeterNotifications(plugin_base.NotificationBase):
 
     event_types = []
@@ -182,21 +189,57 @@ class ProcessMeterNotifications(plugin_base.NotificationBase):
                            for topic in conf.notification_topics)
         return targets
 
+    @staticmethod
+    def _normalise_as_list(value, d, body, length):
+        values = d.parse_fields(value, body, True)
+        if not values:
+            if value in d.cfg.get('multi'):
+                LOG.warning('Could not find %s values', value)
+                raise InvalidPayload
+            values = [d.cfg[value]]
+        elif value in d.cfg.get('multi') and length != len(values):
+            LOG.warning('Not all fetched meters contain "%s" field', value)
+            raise InvalidPayload
+        return values
+
     def process_notification(self, notification_body):
         for d in self.definitions:
             if d.match_type(notification_body['event_type']):
                 userid = self.get_user_id(d, notification_body)
                 projectid = self.get_project_id(d, notification_body)
                 resourceid = d.parse_fields('resource_id', notification_body)
-                yield sample.Sample.from_notification(
-                    name=d.cfg['name'],
-                    type=d.cfg['type'],
-                    unit=d.cfg['unit'],
-                    volume=d.parse_fields('volume', notification_body),
-                    resource_id=resourceid,
-                    user_id=userid,
-                    project_id=projectid,
-                    message=notification_body)
+                if d.cfg.get('multi'):
+                    meters = d.parse_fields('name', notification_body, True)
+                    if not meters:  # skip if no meters in payload
+                        break
+                    try:
+                        volumes = self._normalise_as_list(
+                            'volume', d, notification_body, len(meters))
+                        units = self._normalise_as_list(
+                            'unit', d, notification_body, len(meters))
+                        types = self._normalise_as_list(
+                            'type', d, notification_body, len(meters))
+                    except InvalidPayload:
+                        break
+                    for m, v, u, t in zip(meters, volumes,
+                                          itertools.cycle(units),
+                                          itertools.cycle(types)):
+                        yield sample.Sample.from_notification(
+                            name=m, type=t, unit=u, volume=v,
+                            resource_id=resourceid,
+                            user_id=userid,
+                            project_id=projectid,
+                            message=notification_body)
+                else:
+                    yield sample.Sample.from_notification(
+                        name=d.cfg['name'],
+                        type=d.cfg['type'],
+                        unit=d.cfg['unit'],
+                        volume=d.parse_fields('volume', notification_body),
+                        resource_id=resourceid,
+                        user_id=userid,
+                        project_id=projectid,
+                        message=notification_body)
 
     @staticmethod
     def get_user_id(d, notification_body):

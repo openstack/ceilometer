@@ -60,22 +60,3 @@ class SwiftWsgiMiddleware(_Base, plugin_base.NonMetricNotificationBase):
             user_id=message['payload']['initiator']['id'],
             project_id=message['payload']['initiator']['project_id'],
             message=message)
-
-
-class SwiftWsgiMiddlewareMeters(_Base):
-
-    @property
-    def event_types(self):
-        return ['objectstore.http.request']
-
-    def process_notification(self, message):
-        for meter in message['payload'].get('measurements', []):
-            yield sample.Sample.from_notification(
-                name=meter['metric']['name'],
-                type=sample.TYPE_DELTA,
-                unit=meter['metric']['unit'],
-                volume=meter['result'],
-                resource_id=message['payload']['target']['id'],
-                user_id=message['payload']['initiator']['id'],
-                project_id=message['payload']['initiator']['project_id'],
-                message=message)
