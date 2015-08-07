@@ -30,13 +30,11 @@ import ceilometer.compute.virt.libvirt.inspector
 import ceilometer.compute.virt.vmware.inspector
 import ceilometer.compute.virt.xenapi.inspector
 import ceilometer.coordination
-import ceilometer.data_processing.notifications
 import ceilometer.dispatcher
 import ceilometer.dispatcher.file
 import ceilometer.energy.kwapi
 import ceilometer.event.converter
 import ceilometer.hardware.discovery
-import ceilometer.identity.notifications
 import ceilometer.image.glance
 import ceilometer.ipmi.notifications.ironic
 import ceilometer.ipmi.platform.intel_node_manager
@@ -56,7 +54,6 @@ import ceilometer.sample
 import ceilometer.service
 import ceilometer.storage
 import ceilometer.utils
-import ceilometer.volume.notifications
 
 
 def list_opts():
@@ -69,9 +66,7 @@ def list_opts():
                          ceilometer.compute.util.OPTS,
                          ceilometer.compute.virt.inspector.OPTS,
                          ceilometer.compute.virt.libvirt.inspector.OPTS,
-                         ceilometer.data_processing.notifications.OPTS,
                          ceilometer.dispatcher.OPTS,
-                         ceilometer.identity.notifications.OPTS,
                          ceilometer.image.glance.OPTS,
                          ceilometer.ipmi.notifications.ironic.OPTS,
                          ceilometer.middleware.OPTS,
@@ -83,8 +78,7 @@ def list_opts():
                          ceilometer.sample.OPTS,
                          ceilometer.service.OPTS,
                          ceilometer.storage.OLD_OPTS,
-                         ceilometer.utils.OPTS,
-                         ceilometer.volume.notifications.OPTS,)),
+                         ceilometer.utils.OPTS,)),
         ('alarm',
          itertools.chain(ceilometer.alarm.notifier.rest.OPTS,
                          ceilometer.alarm.service.OPTS,

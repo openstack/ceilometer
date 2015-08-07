@@ -26,7 +26,7 @@ cfg.CONF.import_opt('glance_control_exchange',
 cfg.CONF.import_opt('neutron_control_exchange',
                     'ceilometer.network.notifications')
 cfg.CONF.import_opt('cinder_control_exchange',
-                    'ceilometer.volume.notifications')
+                    'ceilometer.notification')
 
 OPTS = [
     cfg.MultiStrOpt('http_control_exchanges',
