@@ -152,6 +152,66 @@ FULL_MULTI_MSG = {
     'message_id': u'939823de-c242-45a2-a399-083f4d6a8c3e'
 }
 
+METRICS_UPDATE = {
+    u'_context_request_id': u'req-a8bfa89b-d28b-4b95-9e4b-7d7875275650',
+    u'_context_quota_class': None,
+    u'event_type': u'compute.metrics.update',
+    u'_context_service_catalog': [],
+    u'_context_auth_token': None,
+    u'_context_user_id': None,
+    u'payload': {
+        u'metrics': [
+            {'timestamp': u'2013-07-29T06:51:34.472416',
+             'name': 'cpu.frequency', 'value': 1600,
+             'source': 'libvirt.LibvirtDriver'},
+            {'timestamp': u'2013-07-29T06:51:34.472416',
+             'name': 'cpu.user.time', 'value': 17421440000000,
+             'source': 'libvirt.LibvirtDriver'},
+            {'timestamp': u'2013-07-29T06:51:34.472416',
+             'name': 'cpu.kernel.time', 'value': 7852600000000,
+             'source': 'libvirt.LibvirtDriver'},
+            {'timestamp': u'2013-07-29T06:51:34.472416',
+             'name': 'cpu.idle.time', 'value': 1307374400000000,
+             'source': 'libvirt.LibvirtDriver'},
+            {'timestamp': u'2013-07-29T06:51:34.472416',
+             'name': 'cpu.iowait.time', 'value': 11697470000000,
+             'source': 'libvirt.LibvirtDriver'},
+            {'timestamp': u'2013-07-29T06:51:34.472416',
+             'name': 'cpu.user.percent', 'value': 0.012959045637294348,
+             'source': 'libvirt.LibvirtDriver'},
+            {'timestamp': u'2013-07-29T06:51:34.472416',
+             'name': 'cpu.kernel.percent', 'value': 0.005841204961898534,
+             'source': 'libvirt.LibvirtDriver'},
+            {'timestamp': u'2013-07-29T06:51:34.472416',
+             'name': 'cpu.idle.percent', 'value': 0.9724985141658965,
+             'source': 'libvirt.LibvirtDriver'},
+            {'timestamp': u'2013-07-29T06:51:34.472416',
+             'name': 'cpu.iowait.percent', 'value': 0.008701235234910634,
+             'source': 'libvirt.LibvirtDriver'},
+            {'timestamp': u'2013-07-29T06:51:34.472416',
+             'name': 'cpu.percent', 'value': 0.027501485834103515,
+             'source': 'libvirt.LibvirtDriver'}],
+        u'nodename': u'tianst.sh.intel.com',
+        u'host': u'tianst',
+        u'host_id': u'10.0.1.1'},
+    u'priority': u'INFO',
+    u'_context_is_admin': True,
+    u'_context_user': None,
+    u'publisher_id': u'compute.tianst.sh.intel.com',
+    u'message_id': u'6eccedba-120e-4db8-9735-2ad5f061e5ee',
+    u'_context_remote_address': None,
+    u'_context_roles': [],
+    u'timestamp': u'2013-07-29 06:51:34.474815',
+    u'_context_timestamp': u'2013-07-29T06:51:34.348091',
+    u'_unique_id': u'0ee26117077648e18d88ac76e28a72e2',
+    u'_context_project_name': None,
+    u'_context_read_deleted': u'no',
+    u'_context_tenant': None,
+    u'_context_instance_lock_checked': False,
+    u'_context_project_id': None,
+    u'_context_user_name': None
+}
+
 
 class TestMeterDefinition(test.BaseTestCase):
 
@@ -315,7 +375,7 @@ class TestMeterProcessing(test.BaseTestCase):
                         volume="payload.measurements.[*].result",
                         resource_id="payload.target_id",
                         project_id="payload.initiator.project_id",
-                        multi="name")]})
+                        multi=["name", "volume", "unit"])]})
         self.handler.definitions = notifications.load_definitions(
             self.__setup_meter_def_file(cfg))
         c = list(self.handler.process_notification(MIDDLEWARE_EVENT))
@@ -340,7 +400,7 @@ class TestMeterProcessing(test.BaseTestCase):
                         volume="payload.measurements.[*].result",
                         resource_id="payload.target_id",
                         project_id="payload.initiator.project_id",
-                        multi="name")]})
+                        multi=["name", "unit"])]})
         self.handler.definitions = notifications.load_definitions(
             self.__setup_meter_def_file(cfg))
         c = list(self.handler.process_notification(event))
@@ -433,3 +493,62 @@ class TestMeterProcessing(test.BaseTestCase):
         self.assertEqual(0, len(c))
         LOG.warning.assert_called_with('Not all fetched meters contain "%s" '
                                        'field', 'volume')
+
+    def test_arithmetic_expr_meter(self):
+        cfg = yaml.dump(
+            {'metric': [dict(name='compute.node.cpu.percent',
+                        event_type="compute.metrics.update",
+                        type='gauge',
+                        unit="percent",
+                        volume="payload.metrics[?(@.name='cpu.percent')].value"
+                               " * 100",
+                        resource_id="$.payload.host + '_'"
+                                    " + $.payload.nodename")]})
+        self.handler.definitions = notifications.load_definitions(
+            self.__setup_meter_def_file(cfg))
+        c = list(self.handler.process_notification(METRICS_UPDATE))
+        self.assertEqual(1, len(c))
+        s1 = c[0].as_dict()
+        self.assertEqual('compute.node.cpu.percent', s1['name'])
+        self.assertEqual(2.7501485834103514, s1['volume'])
+        self.assertEqual("tianst_tianst.sh.intel.com",
+                         s1['resource_id'])
+
+    def test_string_expr_meter(self):
+        cfg = yaml.dump(
+            {'metric': [dict(name='compute.node.cpu.frequency',
+                        event_type="compute.metrics.update",
+                        type='gauge',
+                        unit="ns",
+                        volume="payload.metrics[?(@.name='cpu.frequency')]"
+                               ".value",
+                        resource_id="$.payload.host + '_'"
+                                    " + $.payload.nodename")]})
+        self.handler.definitions = notifications.load_definitions(
+            self.__setup_meter_def_file(cfg))
+        c = list(self.handler.process_notification(METRICS_UPDATE))
+        self.assertEqual(1, len(c))
+        s1 = c[0].as_dict()
+        self.assertEqual('compute.node.cpu.frequency', s1['name'])
+        self.assertEqual(1600, s1['volume'])
+        self.assertEqual("tianst_tianst.sh.intel.com",
+                         s1['resource_id'])
+
+    def test_prefix_expr_meter(self):
+        cfg = yaml.dump(
+            {'metric': [dict(name='compute.node.cpu.frequency',
+                        event_type="compute.metrics.update",
+                        type='gauge',
+                        unit="ns",
+                        volume="payload.metrics[?(@.name='cpu.frequency')]"
+                               ".value",
+                        resource_id="'prefix-' + $.payload.nodename")]})
+        self.handler.definitions = notifications.load_definitions(
+            self.__setup_meter_def_file(cfg))
+        c = list(self.handler.process_notification(METRICS_UPDATE))
+        self.assertEqual(1, len(c))
+        s1 = c[0].as_dict()
+        self.assertEqual('compute.node.cpu.frequency', s1['name'])
+        self.assertEqual(1600, s1['volume'])
+        self.assertEqual("prefix-tianst.sh.intel.com",
+                         s1['resource_id'])

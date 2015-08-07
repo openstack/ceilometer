@@ -71,21 +71,25 @@ class MeterDefinition(object):
                 _LE("Invalid type %s specified") % self.cfg['type'], self.cfg)
 
         self._field_getter = {}
-        for name, fval in self.cfg.items():
-            if name in ["event_type", "multi"] or not fval:
+        for name, field in self.cfg.items():
+            if name in ["event_type", "multi"] or not field:
                 continue
-            elif isinstance(fval, six.integer_types):
-                self._field_getter[name] = fval
+            elif isinstance(field, six.integer_types):
+                self._field_getter[name] = field
             else:
-                try:
-                    parts = self.JSONPATH_RW_PARSER.parse(fval)
-                except Exception as e:
-                    raise MeterDefinitionException(_LE(
-                        "Parse error in JSONPath specification "
-                        "'%(jsonpath)s': %(err)s")
-                        % dict(jsonpath=fval, err=e), self.cfg)
+                parts = self.parse_jsonpath(field)
                 self._field_getter[name] = functools.partial(
                     self._parse_jsonpath_field, parts)
+
+    def parse_jsonpath(self, field):
+        try:
+            parts = self.JSONPATH_RW_PARSER.parse(field)
+        except Exception as e:
+            raise MeterDefinitionException(_LE(
+                "Parse error in JSONPath specification "
+                "'%(jsonpath)s': %(err)s")
+                % dict(jsonpath=field, err=e), self.cfg)
+        return parts
 
     def match_type(self, meter_name):
         for t in self._event_type:
