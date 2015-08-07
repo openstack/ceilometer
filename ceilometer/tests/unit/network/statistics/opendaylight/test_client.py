@@ -13,6 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import mock
+from oslo_config import fixture as config_fixture
 from oslotest import base
 from requests import auth as req_auth
 import six
@@ -20,6 +21,7 @@ from six.moves.urllib import parse as urlparse
 
 from ceilometer.i18n import _
 from ceilometer.network.statistics.opendaylight import client
+from ceilometer import service as ceilometer_service
 
 
 class TestClientHTTPBasicAuth(base.BaseTestCase):
@@ -29,6 +31,8 @@ class TestClientHTTPBasicAuth(base.BaseTestCase):
 
     def setUp(self):
         super(TestClientHTTPBasicAuth, self).setUp()
+        self.conf = self.useFixture(config_fixture.Config())
+        ceilometer_service.prepare_service([])
         self.parsed_url = urlparse.urlparse(
             'http://127.0.0.1:8080/controller/nb/v2?container_name=default&'
             'container_name=egg&auth=%s&user=admin&password=admin_pass&'
