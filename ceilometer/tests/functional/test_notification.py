@@ -33,6 +33,7 @@ from ceilometer.compute.notifications import instance
 from ceilometer import messaging
 from ceilometer import notification
 from ceilometer.publisher import test as test_publisher
+from ceilometer import service
 from ceilometer.tests import base as tests_base
 
 TEST_NOTICE_CTXT = {
@@ -198,6 +199,7 @@ class BaseRealNotification(tests_base.BaseTestCase):
     def setUp(self):
         super(BaseRealNotification, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
+        service.prepare_service([])
         self.setup_messaging(self.CONF, 'nova')
 
         pipeline_cfg_file = self.setup_pipeline(['instance', 'memory'])

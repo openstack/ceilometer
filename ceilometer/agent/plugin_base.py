@@ -93,7 +93,7 @@ class NotificationBase(PluginBase):
         super(NotificationBase, self).__init__()
         # NOTE(gordc): this is filter rule used by oslo.messaging to dispatch
         # messages to an endpoint.
-        if self.event_types is not None:
+        if self.event_types:
             self.filter_rule = oslo_messaging.NotificationFilter(
                 event_type='|'.join(self.event_types))
         self.manager = manager

@@ -20,6 +20,7 @@ from oslo_config import fixture as fixture_config
 from oslo_utils import fileutils
 
 from ceilometer.meter import notifications
+from ceilometer import service as ceilometer_service
 from ceilometer.tests import base as test
 
 NOTIFICATION = {
@@ -82,10 +83,12 @@ class TestMeterProcessing(test.BaseTestCase):
     def setUp(self):
         super(TestMeterProcessing, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
-        self.CONF.set_override(
-            'meter_definitions_cfg_file',
-            self.path_get('etc/ceilometer/meters.yaml'), group='meter')
+        ceilometer_service.prepare_service([])
         self.handler = notifications.ProcessMeterNotifications(mock.Mock())
+
+    def test_fallback_meter_path(self):
+        fall_bak_path = notifications.get_config_file()
+        self.assertIn("meter/data/meters.yaml", fall_bak_path)
 
     def __setup_meter_def_file(self, cfg):
         if six.PY3:

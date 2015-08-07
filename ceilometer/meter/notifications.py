@@ -13,6 +13,7 @@
 
 import fnmatch
 import os
+import pkg_resources
 import six
 import yaml
 
@@ -95,6 +96,9 @@ def get_config_file():
     config_file = cfg.CONF.meter.meter_definitions_cfg_file
     if not os.path.exists(config_file):
         config_file = cfg.CONF.find_file(config_file)
+    if not config_file:
+        config_file = pkg_resources.resource_filename(
+            __name__, "data/meters.yaml")
     return config_file
 
 
@@ -127,7 +131,7 @@ def setup_meters_config():
     else:
         LOG.debug(_LE("No Meter Definitions configuration file found!"
                   " Using default config."))
-        meters_config = []
+        meters_config = {}
 
     LOG.info(_LE("Meter Definitions: %s"), meters_config)
 
@@ -135,13 +139,15 @@ def setup_meters_config():
 
 
 def load_definitions(config_def):
+    if not config_def:
+        return []
     return [MeterDefinition(event_def)
             for event_def in reversed(config_def['metric'])]
 
 
 class ProcessMeterNotifications(plugin_base.NotificationBase):
 
-    event_types = None
+    event_types = []
 
     def __init__(self, manager):
         super(ProcessMeterNotifications, self).__init__(manager)

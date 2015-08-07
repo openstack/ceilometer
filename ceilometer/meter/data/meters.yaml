@@ -1,0 +1,126 @@
+---
+
+metric:
+  # Image
+  - name: "image.size"
+    event_type:
+      - "image.upload"
+      - "image.delete"
+      - "image.update"
+    type: "gauge"
+    unit: B
+    volume: payload.size
+    resource_id: payload.id
+    project_id: payload.owner
+
+  - name: "image.download"
+    event_type: "image.send"
+    type: "delta"
+    unit: "B"
+    volume: payload.bytes_sent
+    resource_id: payload.image_id
+    user_id: payload.receiver_user_id
+    project_id: payload.receiver_tenant_id
+
+  - name: "image.serve"
+    event_type: "image.send"
+    type: "delta"
+    unit: "B"
+    volume: payload.bytes_sent
+    resource_id: payload.image_id
+    project_id: payload.owner_id
+
+  # MagnetoDB
+  - name: 'magnetodb.table.index.count'
+    type: 'gauge'
+    unit: 'index'
+    event_type: 'magnetodb.table.create.end'
+    volume: payload.index_count
+    resource_id: payload.table_uuid
+    user_id: _context_user
+
+
+# NOTE: non-metric meters are generally events/existence meters
+# These are expected to be DEPRECATED in future releases
+#
+  # Image
+  - name: "image"
+    event_type:
+        - "image.upload"
+        - "image.delete"
+        - "image.update"
+    type: "gauge"
+    unit: 'image'
+    volume: 1
+    resource_id: payload.id
+    project_id: payload.owner
+
+  # Orchestration
+  - name: 'stack.create'
+    event_type:
+      - 'orchestration.stack.create.end'
+    type: 'delta'
+    unit: 'stack'
+    volume: 1
+    user_id: _context_trustor_user_id
+    project_id: payload.tenant_id
+    resource_id: payload.stack_identity
+
+  - name: 'stack.update'
+    event_type:
+      - 'orchestration.stack.update.end'
+    type: 'delta'
+    unit: 'stack'
+    volume: 1
+    user_id: _context_trustor_user_id
+    project_id: payload.tenant_id
+    resource_id: payload.stack_identity
+
+  - name: 'stack.delete'
+    event_type:
+      - 'orchestration.stack.delete.end'
+    type: 'delta'
+    unit: 'stack'
+    volume: 1
+    user_id: _context_trustor_user_id
+    project_id: payload.tenant_id
+    resource_id: payload.stack_identity
+
+  - name: 'stack.resume'
+    event_type:
+      - 'orchestration.stack.resume.end'
+    type: 'delta'
+    unit: 'stack'
+    volume: 1
+    user_id: _context_trustor_user_id
+    project_id: payload.tenant_id
+    resource_id: payload.stack_identity
+
+  - name: 'stack.suspend'
+    event_type:
+      - 'orchestration.stack.suspend.end'
+    type: 'delta'
+    unit: 'stack'
+    volume: 1
+    user_id: _context_trustor_user_id
+    project_id: payload.tenant_id
+    resource_id: payload.stack_identity
+
+  # MagnetoDB
+  - name: 'magnetodb.table.create'
+    type: 'gauge'
+    unit: 'table'
+    volume: 1
+    event_type: 'magnetodb.table.create.end'
+    resource_id: payload.table_uuid
+    user_id: _context_user
+    project_id: _context_tenant
+
+  - name: 'magnetodb.table.delete'
+    type: 'gauge'
+    unit: 'table'
+    volume: 1
+    event_type: 'magnetodb.table.delete.end'
+    resource_id: payload.table_uuid
+    user_id: _context_user
+    project_id: _context_tenant
