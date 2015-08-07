@@ -406,6 +406,13 @@ class RawSampleTest(DBTestBase,
             source='test-4'
         ))
 
+    def test_get_sample_counter_volume(self):
+        # NOTE(idegtiarov) Because wsme expected a float type of data this test
+        # checks type of counter_volume received from database.
+        f = storage.SampleFilter()
+        result = next(self.conn.get_samples(f, limit=1))
+        self.assertIsInstance(result.counter_volume, float)
+
     def test_get_samples_limit_zero(self):
         f = storage.SampleFilter()
         results = list(self.conn.get_samples(f, limit=0))

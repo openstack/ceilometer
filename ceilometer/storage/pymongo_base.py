@@ -139,6 +139,8 @@ class Connection(base.Connection):
             del s['_id']
             # Backward compatibility for samples without units
             s['counter_unit'] = s.get('counter_unit', '')
+            # Compatibility with MongoDB 3.+
+            s['counter_volume'] = float(s.get('counter_volume'))
             # Tolerate absence of recorded_at in older datapoints
             s['recorded_at'] = s.get('recorded_at')
             # Check samples for metadata and "unquote" key if initially it

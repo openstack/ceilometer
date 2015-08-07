@@ -48,7 +48,7 @@ OP_SIGN = {'lt': '$lt', 'le': '$lte', 'ne': '$ne', 'gt': '$gt', 'ge': '$gte'}
 MINIMUM_COMPATIBLE_MONGODB_VERSION = [2, 4]
 COMPLETE_AGGREGATE_COMPATIBLE_VERSION = [2, 6]
 
-TRIVIAL_LAMBDA = lambda result, param=None: result
+FINALIZE_AGGREGATION_LAMBDA = lambda result, param=None: float(result)
 CARDINALITY_VALIDATION = (lambda name, param: param in ['resource_id',
                                                         'user_id',
                                                         'project_id',
@@ -519,7 +519,7 @@ class AggregationFields(object):
                  finalize=None,
                  parametrized=False,
                  validate=None):
-        self._finalize = finalize or TRIVIAL_LAMBDA
+        self._finalize = finalize or FINALIZE_AGGREGATION_LAMBDA
         self.group = lambda *args: group(*args) if parametrized else group
         self.project = (lambda *args: project(*args)
                         if parametrized else project)
