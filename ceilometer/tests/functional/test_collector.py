@@ -209,6 +209,7 @@ class TestCollector(tests_base.BaseTestCase):
     @mock.patch.object(collector.CollectorService, 'start_udp')
     def test_only_rpc(self, udp_start, rpc_start):
         """Check that only RPC is started if udp_address is empty."""
+        self.CONF.set_override('enable_rpc', True, group='collector')
         self.CONF.set_override('udp_address', '', group='collector')
         self.srv.start()
         # two calls because two servers (notification and rpc)
@@ -228,6 +229,7 @@ class TestCollector(tests_base.BaseTestCase):
 
     @mock.patch('ceilometer.storage.impl_log.LOG')
     def test_collector_no_mock(self, mylog):
+        self.CONF.set_override('enable_rpc', True, group='collector')
         self.CONF.set_override('udp_address', '', group='collector')
         self.srv.start()
         mylog.info.side_effect = lambda *args: self.srv.stop()

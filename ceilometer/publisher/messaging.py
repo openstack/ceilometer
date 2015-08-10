@@ -38,6 +38,7 @@ LOG = log.getLogger(__name__)
 RPC_OPTS = [
     cfg.StrOpt('metering_topic',
                default='metering',
+               deprecated_for_removal=True,
                help='The topic that ceilometer uses for metering messages.',
                deprecated_group="DEFAULT",
                ),
