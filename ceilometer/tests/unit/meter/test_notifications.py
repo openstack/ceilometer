@@ -173,6 +173,25 @@ class TestMeterProcessing(test.BaseTestCase):
         cfg = notifications.setup_meters_config()
         return cfg
 
+    def test_jsonpath_values_parsed(self):
+        cfg = yaml.dump(
+            {'metric': [dict(name="test1",
+                        event_type="test.create",
+                        type="delta",
+                             unit="B",
+                             volume="payload.volume",
+                             resource_id="payload.resource_id",
+                             project_id="payload.project_id")]})
+        self.handler.definitions = notifications.load_definitions(
+            self.__setup_meter_def_file(cfg))
+        c = list(self.handler.process_notification(NOTIFICATION))
+        self.assertEqual(1, len(c))
+        s1 = c[0].as_dict()
+        self.assertEqual('test1', s1['name'])
+        self.assertEqual(1.0, s1['volume'])
+        self.assertEqual('bea70e51c7340cb9d555b15cbfcaec23', s1['resource_id'])
+        self.assertEqual('30be1fc9a03c4e94ab05c403a8a377f2', s1['project_id'])
+
     def test_multiple_meter(self):
         cfg = yaml.dump(
             {'metric': [dict(name="test1",
@@ -193,6 +212,10 @@ class TestMeterProcessing(test.BaseTestCase):
             self.__setup_meter_def_file(cfg))
         c = list(self.handler.process_notification(NOTIFICATION))
         self.assertEqual(2, len(c))
+        s1 = c[0].as_dict()
+        self.assertEqual('test2', s1['name'])
+        s2 = c[1].as_dict()
+        self.assertEqual('test1', s2['name'])
 
     def test_unmatched_meter(self):
         cfg = yaml.dump(
