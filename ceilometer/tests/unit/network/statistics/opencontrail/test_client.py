@@ -13,15 +13,19 @@
 # under the License.
 
 import mock
+from oslo_config import fixture as config_fixture
 from oslotest import base
 
 from ceilometer.network.statistics.opencontrail import client
+from ceilometer import service as ceilometer_service
 
 
 class TestOpencontrailClient(base.BaseTestCase):
 
     def setUp(self):
         super(TestOpencontrailClient, self).setUp()
+        self.conf = self.useFixture(config_fixture.Config())
+        ceilometer_service.prepare_service([])
         self.client = client.Client('http://127.0.0.1:8081', {'arg1': 'aaa'})
 
         self.get_resp = mock.MagicMock()
