@@ -44,9 +44,3 @@ def upgrade(migrate_engine):
         mysql_engine='InnoDB',
         mysql_charset='utf8')
     alarm.create()
-
-
-def downgrade(migrate_engine):
-    meta = MetaData(bind=migrate_engine)
-    alarm = Table('alarm', meta, autoload=True)
-    alarm.drop()

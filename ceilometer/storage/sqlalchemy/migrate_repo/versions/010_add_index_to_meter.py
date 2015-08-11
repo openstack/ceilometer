@@ -21,11 +21,3 @@ def upgrade(migrate_engine):
     index = sa.Index('idx_meter_rid_cname', meter.c.resource_id,
                      meter.c.counter_name)
     index.create(bind=migrate_engine)
-
-
-def downgrade(migrate_engine):
-    meta = sa.MetaData(bind=migrate_engine)
-    meter = sa.Table('meter', meta, autoload=True)
-    index = sa.Index('idx_meter_rid_cname', meter.c.resource_id,
-                     meter.c.counter_name)
-    index.drop(bind=migrate_engine)

@@ -56,22 +56,3 @@ def upgrade(migrate_engine):
                 params['name'] = "_".join(('fk', table_name, column))
             fkey = ForeignKeyConstraint(**params)
             fkey.create()
-
-
-def downgrade(migrate_engine):
-    if migrate_engine.name == 'sqlite':
-        return
-    meta = MetaData(bind=migrate_engine)
-    load_tables = dict((table_name, Table(table_name, meta, autoload=True))
-                       for table_name in TABLES)
-    for table_name, indexes in INDEXES.items():
-        table = load_tables[table_name]
-        for column, ref_table_name, ref_column_name in indexes:
-            ref_table = load_tables[ref_table_name]
-            params = {'columns': [table.c[column]],
-                      'refcolumns': [ref_table.c[ref_column_name]]}
-            if migrate_engine.name == 'mysql':
-                params['name'] = "_".join(('fk', table_name, column))
-            with migrate_engine.begin():
-                fkey = ForeignKeyConstraint(**params)
-                fkey.drop()

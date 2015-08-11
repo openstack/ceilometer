@@ -16,7 +16,7 @@
 import json
 
 from sqlalchemy import MetaData, Table, Column, Index
-from sqlalchemy import String, Float, Integer, Text
+from sqlalchemy import String, Text
 
 
 def upgrade(migrate_engine):
@@ -58,49 +58,3 @@ def upgrade(migrate_engine):
     table.c.evaluation_periods.drop()
     table.c.period.drop()
     table.c.matching_metadata.drop()
-
-
-def downgrade(migrate_engine):
-    meta = MetaData()
-    meta.bind = migrate_engine
-    table = Table('alarm', meta, autoload=True)
-
-    columns = [
-        Column('meter_name', String(255)),
-        Column('comparison_operator', String(2)),
-        Column('threshold', Float),
-        Column('statistic', String(255)),
-        Column('evaluation_periods', Integer),
-        Column('period', Integer),
-        Column('matching_metadata', Text())
-    ]
-    for c in columns:
-        c.create(table)
-
-    for row in table.select().execute().fetchall():
-        if row.type != 'threshold':
-            # note: type insupported in previous version
-            table.delete().where(table.c.id == row.id).execute()
-        else:
-            rule = json.loads(row.rule)
-            values = {'comparison_operator': rule['comparison_operator'],
-                      'threshold': float(rule['threshold']),
-                      'statistic': rule['statistic'],
-                      'evaluation_periods': int(rule['evaluation_periods']),
-                      'period': int(rule['period']),
-                      'meter_name': int(rule['mater_name']),
-                      'matching_metadata': {}}
-
-            # note: op are ignored because previous format don't support it
-            for q in rule['query']:
-                values['matching_metadata'][q['field']] = q['value']
-            values['matching_metadata'] = json.dumps(
-                values['matching_metadata'])
-            table.update().where(table.c.id == row.id
-                                 ).values(**values).execute()
-
-    index = Index('ix_alarm_counter_name', table.c.meter_name)
-    index.create(bind=migrate_engine)
-
-    table.c.type.drop()
-    table.c.rule.drop()

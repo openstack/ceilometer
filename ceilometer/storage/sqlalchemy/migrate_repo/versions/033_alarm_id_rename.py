@@ -19,9 +19,3 @@ def upgrade(migrate_engine):
     meta = MetaData(bind=migrate_engine)
     users = Table('alarm', meta, autoload=True)
     users.c.id.alter(name='alarm_id')
-
-
-def downgrade(migrate_engine):
-    meta = MetaData(bind=migrate_engine)
-    users = Table('alarm', meta, autoload=True)
-    users.c.alarm_id.alter(name='id')

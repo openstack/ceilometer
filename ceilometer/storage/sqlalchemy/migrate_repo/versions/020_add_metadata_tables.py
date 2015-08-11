@@ -66,10 +66,3 @@ def upgrade(migrate_engine):
                     ins = meta_tables['metadata_float'].insert()
                 if ins is not None:
                     ins.values(id=meter_id, meta_key=key, value=v).execute()
-
-
-def downgrade(migrate_engine):
-    meta = MetaData(bind=migrate_engine)
-    for t in tables:
-        table = Table(t[0], meta, autoload=True)
-        table.drop()

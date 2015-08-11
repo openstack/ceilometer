@@ -21,10 +21,3 @@ def upgrade(migrate_engine):
     meter = Table('meter', meta, autoload=True)
     duration = Column('counter_duration', Integer)
     meter.drop_column(duration)
-
-
-def downgrade(migrate_engine):
-    meta = MetaData(bind=migrate_engine)
-    meter = Table('meter', meta, autoload=True)
-    duration = Column('counter_duration', Integer)
-    meter.create_column(duration)

@@ -73,7 +73,7 @@ def index_cleanup(meta, table_name, uniq_name, columns,
             sa.Index(uniq_name, *cols).drop()
 
 
-def change_uniq(meta, downgrade=False):
+def change_uniq(meta):
     uniq_name = 'uniq_sourceassoc0meter_id0user_id'
     columns = ('meter_id', 'user_id')
 
@@ -94,12 +94,9 @@ def change_uniq(meta, downgrade=False):
                   'refcolumns': [user.c.id],
                   'name': 'fk_sourceassoc_user_id'}
         migrate.ForeignKeyConstraint(**params).drop()
-    if downgrade:
-        migrate.UniqueConstraint(*columns, table=sourceassoc,
-                                 name=uniq_name).drop()
-    else:
-        migrate.UniqueConstraint(*columns, table=sourceassoc,
-                                 name=uniq_name).create()
+
+    migrate.UniqueConstraint(*columns, table=sourceassoc,
+                             name=uniq_name).create()
     if meta.bind.engine.name == 'mysql':
         params = {'columns': [sourceassoc.c.meter_id],
                   'refcolumns': [meter.c.id],
@@ -139,22 +136,3 @@ def upgrade(migrate_engine):
         change_uniq(meta)
 
     delete_alembic(meta)
-
-
-def downgrade(migrate_engine):
-    meta = sa.MetaData(bind=migrate_engine)
-
-    change_uniq(meta, downgrade=True)
-
-    for (engine_names, table_name, uniq_name,
-         columns, create, uniq, limited) in INDEXES:
-        if migrate_engine.name in engine_names:
-            index_cleanup(meta, table_name, uniq_name,
-                          columns, not create, uniq, limited)
-
-    meter = sa.Table('meter', meta, autoload=True)
-    meter.c.resource_metadata.alter(type=sa.String(5000))
-
-    alarm = sa.Table('alarm', meta, autoload=True)
-    repeat_act = sa.Column('repeat_actions', sa.Boolean)
-    alarm.drop_column(repeat_act)

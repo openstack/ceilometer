@@ -31,7 +31,3 @@ def upgrade(migrate_engine):
              drop(checkfirst=True))
         except sa.exc.NoSuchTableError:
             pass
-
-
-def downgrade(migrate_engine):
-    pass

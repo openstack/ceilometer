@@ -35,14 +35,3 @@ def upgrade(migrate_engine):
         for index_name, column in indexes:
             index = Index(index_name, table.c[column])
             index.drop()
-
-
-def downgrade(migrate_engine):
-    meta = MetaData(bind=migrate_engine)
-    load_tables = dict((table_name, Table(table_name, meta, autoload=True))
-                       for table_name in INDEXES.keys())
-    for table_name, indexes in INDEXES.items():
-        table = load_tables[table_name]
-        for index_name, column in indexes:
-            index = Index(index_name, table.c[column])
-            index.create()

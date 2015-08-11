@@ -93,11 +93,3 @@ def upgrade(migrate_engine):
     tables = [meter, project, resource, user, source, sourceassoc]
     for i in sorted(tables, key=lambda table: table.fullname):
         i.create()
-
-
-def downgrade(migrate_engine):
-    meta = MetaData(bind=migrate_engine)
-    for name in ['source', 'sourceassoc', 'project',
-                 'user', 'resource', 'meter']:
-        t = Table(name, meta, autoload=True)
-        t.drop()

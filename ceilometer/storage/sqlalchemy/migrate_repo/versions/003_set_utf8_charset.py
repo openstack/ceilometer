@@ -27,19 +27,3 @@ def upgrade(migrate_engine):
         migrate_engine.execute(
             "ALTER DATABASE %s DEFAULT CHARACTER SET utf8" %
             migrate_engine.url.database)
-
-
-def downgrade(migrate_engine):
-    # Operations to reverse the above upgrade go here.
-    if migrate_engine.name == "mysql":
-        tables = ['meter', 'user', 'resource', 'project', 'source',
-                  'sourceassoc']
-        migrate_engine.execute("SET foreign_key_checks = 0")
-
-        for table in tables:
-            migrate_engine.execute(
-                "ALTER TABLE %s CONVERT TO CHARACTER SET latin1" % table)
-        migrate_engine.execute("SET foreign_key_checks = 1")
-        migrate_engine.execute(
-            "ALTER DATABASE %s DEFAULT CHARACTER SET latin1" %
-            migrate_engine.url.database)

@@ -16,7 +16,6 @@
 # under the License.
 
 from sqlalchemy import BigInteger
-from sqlalchemy import Integer
 from sqlalchemy import MetaData
 from sqlalchemy import Table
 
@@ -25,9 +24,3 @@ def upgrade(migrate_engine):
     meta = MetaData(bind=migrate_engine)
     resource = Table('metadata_int', meta, autoload=True)
     resource.c.value.alter(type=BigInteger)
-
-
-def downgrade(migrate_engine):
-    meta = MetaData(bind=migrate_engine)
-    resource = Table('metadata_int', meta, autoload=True)
-    resource.c.value.alter(type=Integer)

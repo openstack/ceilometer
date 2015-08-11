@@ -21,10 +21,3 @@ def upgrade(migrate_engine):
     alarm = Table('alarm', meta, autoload=True)
     time_constraints = Column('time_constraints', Text())
     alarm.create_column(time_constraints)
-
-
-def downgrade(migrate_engine):
-    meta = MetaData(bind=migrate_engine)
-    alarm = Table('alarm', meta, autoload=True)
-    time_constraints = Column('time_constraints', Text())
-    alarm.drop_column(time_constraints)

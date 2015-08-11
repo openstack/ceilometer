@@ -19,10 +19,3 @@ def upgrade(migrate_engine):
     event = sa.Table('event', meta, autoload=True)
     raw = sa.Column('raw', sa.Text)
     event.create_column(raw)
-
-
-def downgrade(migrate_engine):
-    meta = sa.MetaData(bind=migrate_engine)
-    event = sa.Table('event', meta, autoload=True)
-    raw = sa.Column('raw', sa.Text)
-    event.drop_column(raw)
