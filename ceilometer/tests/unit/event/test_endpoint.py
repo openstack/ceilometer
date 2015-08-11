@@ -18,9 +18,17 @@ import mock
 from oslo_config import cfg
 from oslo_config import fixture as fixture_config
 import oslo_messaging
+from oslo_utils import fileutils
+from oslotest import mockpatch
+import six
+import yaml
 
 from ceilometer.event import endpoint as event_endpoint
+from ceilometer import pipeline
+from ceilometer import publisher
+from ceilometer.publisher import test
 from ceilometer.tests import base as tests_base
+
 
 TEST_NOTICE_CTXT = {
     u'auth_token': u'3d8b13de1b7d499587dfc69b77dc09c2',
@@ -80,6 +88,43 @@ cfg.CONF.import_opt('store_events', 'ceilometer.notification',
 
 class TestEventEndpoint(tests_base.BaseTestCase):
 
+    def get_publisher(self, url, namespace=''):
+        fake_drivers = {'test://': test.TestPublisher,
+                        'except://': test.TestPublisher}
+        return fake_drivers[url](url)
+
+    def _setup_pipeline(self, publishers):
+        ev_pipeline = yaml.dump({
+            'sources': [{
+                'name': 'test_event',
+                'events': ['test.test'],
+                'sinks': ['test_sink']
+            }],
+            'sinks': [{
+                'name': 'test_sink',
+                'publishers': publishers
+            }]
+        })
+
+        if six.PY3:
+            ev_pipeline = ev_pipeline.encode('utf-8')
+        ev_pipeline_cfg_file = fileutils.write_to_tempfile(
+            content=ev_pipeline, prefix="event_pipeline", suffix="yaml")
+        self.CONF.set_override('event_pipeline_cfg_file',
+                               ev_pipeline_cfg_file)
+
+        ev_pipeline_mgr = pipeline.setup_event_pipeline()
+        return ev_pipeline_mgr
+
+    def _setup_endpoint(self, publishers):
+        ev_pipeline_mgr = self._setup_pipeline(publishers)
+        self.endpoint = event_endpoint.EventsNotificationEndpoint(
+            ev_pipeline_mgr)
+
+        self.endpoint.event_converter = mock.MagicMock()
+        self.endpoint.event_converter.to_event.return_value = mock.MagicMock(
+            event_type='test.test')
+
     def setUp(self):
         super(TestEventEndpoint, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
@@ -88,21 +133,46 @@ class TestEventEndpoint(tests_base.BaseTestCase):
         self.CONF.set_override("store_events", True, group="notification")
         self.setup_messaging(self.CONF)
 
-        self.mock_pm = mock.MagicMock()
-        self.endpoint = event_endpoint.EventsNotificationEndpoint(self.mock_pm)
-        self.endpoint.event_converter = mock.MagicMock()
-        self.endpoint.event_converter.to_event.return_value = mock.MagicMock(
-            event_type='test.test')
+        self.useFixture(mockpatch.PatchObject(publisher, 'get_publisher',
+                                              side_effect=self.get_publisher))
+        self.fake_publisher = mock.Mock()
+        self.useFixture(mockpatch.Patch(
+            'ceilometer.publisher.test.TestPublisher',
+            return_value=self.fake_publisher))
 
     def test_message_to_event(self):
+        self._setup_endpoint(['test://'])
         self.endpoint.info(TEST_NOTICE_CTXT, 'compute.vagrant-precise',
                            'compute.instance.create.end',
                            TEST_NOTICE_PAYLOAD, TEST_NOTICE_METADATA)
 
     def test_message_to_event_bad_event(self):
+        self._setup_endpoint(['test://'])
+        self.fake_publisher.publish_events.side_effect = Exception
         self.CONF.set_override("ack_on_event_error", False,
                                group="notification")
-        self.mock_pm.publisher.side_effect = Exception
+
         message = {'event_type': "foo", 'message_id': "abc"}
-        ret = self.endpoint.process_notification(message)
-        self.assertEqual(oslo_messaging.NotificationResult.REQUEUE, ret)
+        with mock.patch("ceilometer.pipeline.LOG") as mock_logger:
+            ret = self.endpoint.process_notification(message)
+            self.assertEqual(oslo_messaging.NotificationResult.REQUEUE, ret)
+            exception_mock = mock_logger.exception
+            self.assertIn('Exit after error from publisher',
+                          exception_mock.call_args_list[0][0][0])
+
+    def test_message_to_event_bad_event_multi_publish(self):
+
+        self._setup_endpoint(['test://', 'except://'])
+
+        self.fake_publisher.publish_events.side_effect = Exception
+        self.CONF.set_override("ack_on_event_error", False,
+                               group="notification")
+
+        message = {'event_type': "foo", 'message_id': "abc"}
+
+        with mock.patch("ceilometer.pipeline.LOG") as mock_logger:
+            ret = self.endpoint.process_notification(message)
+            self.assertEqual(oslo_messaging.NotificationResult.HANDLED, ret)
+            exception_mock = mock_logger.exception
+            self.assertIn('Continue after error from publisher',
+                          exception_mock.call_args_list[0][0][0])

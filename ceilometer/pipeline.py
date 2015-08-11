@@ -384,6 +384,7 @@ class Sink(object):
             except Exception:
                 LOG.exception(_("Unable to load publisher %s"), p)
 
+        self.multi_publish = True if len(self.publishers) > 1 else False
         self.transformers = self._setup_transformers(cfg, transformer_manager)
 
     def __str__(self):
@@ -419,10 +420,13 @@ class EventSink(Sink):
                 try:
                     p.publish_events(ctxt, events)
                 except Exception:
-                    LOG.exception(_(
-                        "Pipeline %(pipeline)s: Continue after error "
-                        "from publisher %(pub)s") % ({'pipeline': self,
-                                                      'pub': p}))
+                    LOG.exception(_("Pipeline %(pipeline)s: %(status)s"
+                                    " after error from publisher %(pub)s") %
+                                   ({'pipeline': self, 'status': 'Continue' if
+                                     self.multi_publish else 'Exit', 'pub': p}
+                                    ))
+                    if not self.multi_publish:
+                        raise
 
     def flush(self, ctxt):
         """Flush data after all events have been injected to pipeline."""
