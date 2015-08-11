@@ -31,19 +31,3 @@ class InstancePollster(pollsters.BaseComputePollster):
                 unit='instance',
                 volume=1,
             )
-
-
-class InstanceFlavorPollster(pollsters.BaseComputePollster):
-
-    @staticmethod
-    def get_samples(manager, cache, resources):
-        for instance in resources:
-            yield util.make_sample_from_instance(
-                instance,
-                # Use the "meter name + variable" syntax
-                name='instance:%s' %
-                instance.flavor['name'],
-                type=sample.TYPE_GAUGE,
-                unit='instance',
-                volume=1,
-            )
