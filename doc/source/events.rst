@@ -126,6 +126,8 @@ all events if the notification has the relevant data:
 * service:  (All notifications should have this) notification's publisher
 * tenant_id
 * request_id
+* project_id
+* user_id
 
 These do not have to be specified in the event definition, they are
 automatically added, but their definitions can be overridden for a given

@@ -154,6 +154,12 @@ class EventDefinition(object):
     DEFAULT_TRAITS = dict(
         service=dict(type='text', fields='publisher_id'),
         request_id=dict(type='text', fields='_context_request_id'),
+        project_id=dict(type='text', fields=['payload.tenant_id',
+                                             '_context_tenant']),
+        user_id=dict(type='text', fields=['payload.user_id',
+                                          '_context_user_id']),
+        # TODO(dikonoor):tenant_id is old terminology and should
+        # be deprecated
         tenant_id=dict(type='text', fields=['payload.tenant_id',
                                             '_context_tenant']),
     )
