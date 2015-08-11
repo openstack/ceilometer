@@ -30,6 +30,7 @@ import wsmeext.pecan as wsme_pecan
 
 from ceilometer.api.controllers.v2 import base
 from ceilometer.api.controllers.v2 import utils as v2_utils
+from ceilometer.api import rbac
 from ceilometer.event.storage import models as event_models
 from ceilometer.i18n import _
 from ceilometer import storage
@@ -238,7 +239,6 @@ class EventsController(rest.RestController):
     """Works on Events."""
 
     @v2_utils.requires_context
-    @v2_utils.requires_admin
     @wsme_pecan.wsexpose([Event], [EventQuery], int)
     def get_all(self, q=None, limit=None):
         """Return all events matching the query filters.
@@ -246,6 +246,7 @@ class EventsController(rest.RestController):
         :param q: Filter arguments for which Events to return
         :param limit: Maximum number of samples to be returned.
         """
+        rbac.enforce("events:index", pecan.request)
         q = q or []
         limit = v2_utils.enforce_limit(limit)
         event_filter = _event_query_to_event_filter(q)
@@ -259,13 +260,13 @@ class EventsController(rest.RestController):
                                                             limit)]
 
     @v2_utils.requires_context
-    @v2_utils.requires_admin
     @wsme_pecan.wsexpose(Event, wtypes.text)
     def get_one(self, message_id):
         """Return a single event with the given message id.
 
         :param message_id: Message ID of the Event to be returned
         """
+        rbac.enforce("events:show", pecan.request)
         event_filter = storage.EventFilter(message_id=message_id)
         events = [event for event
                   in pecan.request.event_storage_conn.get_events(event_filter)]

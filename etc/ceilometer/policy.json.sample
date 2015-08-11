@@ -27,5 +27,8 @@
 
     "telemetry:alarm_history": "rule:context_is_admin",
     "telemetry:change_alarm_state": "rule:context_is_admin",
-    "telemetry:query_alarm_history": "rule:context_is_admin"
+    "telemetry:query_alarm_history": "rule:context_is_admin",
+
+    "telemetry:events:index": "rule:context_is_admin",
+    "telemetry:events:show": "rule:context_is_admin"
 }
