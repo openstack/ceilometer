@@ -411,22 +411,28 @@ class Alarm(base.Base):
                             url[1] = netloc
                             actions[index] = urlparse.urlunsplit(url)
         if old_alarm:
-            for key in ('ok_actions', 'alarm_actions',
-                        'insufficient_data_actions'):
-                for action in getattr(old_alarm, key):
-                    url = netutils.urlsplit(action)
-                    if (self._is_trust_url(url) and url.password and
-                            action not in getattr(self, key)):
-                        keystone_client.delete_trust_id(
-                            url.username, auth_plugin)
+            new_actions = list(itertools.chain(
+                self.ok_actions or [],
+                self.alarm_actions or [],
+                self.insufficient_data_actions or []))
+            for action in itertools.chain(
+                    old_alarm.ok_actions or [],
+                    old_alarm.alarm_actions or [],
+                    old_alarm.insufficient_data_actions or []):
+                if action not in new_actions:
+                    self.delete_trust(action)
 
     def delete_actions(self):
+        for action in itertools.chain(self.ok_actions or [],
+                                      self.alarm_actions or [],
+                                      self.insufficient_data_actions or []):
+            self.delete_trust(action)
+
+    def delete_trust(self, action):
         auth_plugin = pecan.request.environ.get('keystone.token_auth')
-        for action in itertools.chain(self.ok_actions, self.alarm_actions,
-                                      self.insufficient_data_actions):
-            url = netutils.urlsplit(action)
-            if self._is_trust_url(url) and url.password:
-                keystone_client.delete_trust_id(url.username, auth_plugin)
+        url = netutils.urlsplit(action)
+        if self._is_trust_url(url) and url.password:
+            keystone_client.delete_trust_id(url.username, auth_plugin)
 
 
 Alarm.add_attributes(**{"%s_rule" % ext.name: ext.plugin

@@ -36,6 +36,7 @@ tests:
   request_headers:
       content-type: application/json
   data:
+      ok_actions: null
       name: added_alarm_defaults
       type: threshold
       threshold_rule:
