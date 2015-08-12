@@ -3,7 +3,6 @@
 # process, which may cause wedges in the gate later.
 
 retrying!=1.3.0,>=1.2.3 # Apache-2.0
-alembic>=0.7.2
 croniter>=0.3.4 # MIT License
 eventlet>=0.17.4
 jsonpath-rw<2.0,>=1.2.0
