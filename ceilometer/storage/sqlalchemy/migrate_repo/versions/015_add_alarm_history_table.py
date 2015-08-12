@@ -61,10 +61,3 @@ def upgrade(migrate_engine):
                                       refcolumns=[user.c.id])]
         for fkey in fkeys:
             fkey.create(engine=migrate_engine)
-
-
-def downgrade(migrate_engine):
-    meta = MetaData()
-    meta.bind = migrate_engine
-    alarm_history = Table('alarm_history', meta, autoload=True)
-    alarm_history.drop()

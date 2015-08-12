@@ -22,10 +22,3 @@ def upgrade(migrate_engine):
     alarm = Table('alarm', meta, autoload=True)
     severity = Column('severity', String(50))
     alarm.create_column(severity)
-
-
-def downgrade(migrate_engine):
-    meta = MetaData(bind=migrate_engine)
-    alarm = Table('alarm', meta, autoload=True)
-    severity = Column('severity', String(50))
-    alarm.drop_column(severity)

@@ -15,7 +15,6 @@
 # under the License.
 
 from sqlalchemy import Float
-from sqlalchemy import Integer
 from sqlalchemy import MetaData
 from sqlalchemy import Table
 
@@ -24,9 +23,3 @@ def upgrade(migrate_engine):
     meta = MetaData(bind=migrate_engine)
     meter = Table('meter', meta, autoload=True)
     meter.c.counter_volume.alter(type=Float(53))
-
-
-def downgrade(migrate_engine):
-    meta = MetaData(bind=migrate_engine)
-    meter = Table('meter', meta, autoload=True)
-    meter.c.counter_volume.alter(type=Integer)

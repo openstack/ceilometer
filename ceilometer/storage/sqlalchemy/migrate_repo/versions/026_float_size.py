@@ -22,11 +22,3 @@ def upgrade(migrate_engine):
     metadata_float.c.value.alter(type=Float(53))
     trait = Table('trait', meta, autoload=True)
     trait.c.t_float.alter(type=Float(53))
-
-
-def downgrade(migrate_engine):
-    meta = MetaData(bind=migrate_engine)
-    metadata_float = Table('metadata_float', meta, autoload=True)
-    metadata_float.c.value.alter(type=Float())
-    trait = Table('trait', meta, autoload=True)
-    trait.c.t_string.alter(type=Float())

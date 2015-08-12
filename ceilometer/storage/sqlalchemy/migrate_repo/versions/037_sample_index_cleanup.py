@@ -42,13 +42,3 @@ def upgrade(migrate_engine):
             if index.name in ['fk_sample_meter_id', 'fk_sample_resource_id']:
                 index.drop()
         sa.Index('ix_sample_meter_id', sample.c.meter_id).create()
-
-
-def downgrade(migrate_engine):
-    if migrate_engine.name == 'sqlite':
-        return
-    meta = sa.MetaData(bind=migrate_engine)
-    sample = sa.Table('sample', meta, autoload=True)
-
-    with ForeignKeyHandle(meta):
-        sa.Index('ix_sample_meter_id', sample.c.meter_id).drop()

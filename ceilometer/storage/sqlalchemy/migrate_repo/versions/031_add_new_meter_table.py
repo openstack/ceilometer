@@ -17,7 +17,7 @@ import migrate
 import sqlalchemy as sa
 
 
-def handle_rid_index(meta, downgrade=False):
+def handle_rid_index(meta):
     if meta.bind.engine.name == 'sqlite':
         return
 
@@ -33,7 +33,7 @@ def handle_rid_index(meta, downgrade=False):
 
     index = sa.Index('idx_sample_rid_cname', sample.c.resource_id,
                      sample.c.counter_name)
-    index.create() if downgrade else index.drop()
+    index.drop()
 
     if meta.bind.engine.name == 'mysql':
         migrate.ForeignKeyConstraint(**params).create()
@@ -85,31 +85,3 @@ def upgrade(migrate_engine):
     sample.c.counter_type.drop()
     sample.c.counter_unit.drop()
     sample.c.counter_volume.alter(name='volume')
-
-
-def downgrade(migrate_engine):
-    meta = sa.MetaData(bind=migrate_engine)
-    sample = sa.Table('sample', meta, autoload=True)
-    sample.c.volume.alter(name='counter_volume')
-    sa.Column('counter_name', sa.String(255)).create(sample)
-    sa.Column('counter_type', sa.String(255)).create(sample)
-    sa.Column('counter_unit', sa.String(255)).create(sample)
-    meter = sa.Table('meter', meta, autoload=True)
-    for row in sa.select([meter]).execute():
-        (sample.update().
-         where(sample.c.meter_id == row['id']).
-         values({sample.c.counter_name: row['name'],
-                 sample.c.counter_type: row['type'],
-                 sample.c.counter_unit: row['unit']}).execute())
-
-    params = {'columns': [sample.c.meter_id],
-              'refcolumns': [meter.c.id]}
-    if migrate_engine.name == 'mysql':
-        params['name'] = 'fk_sample_meter_id'
-    if migrate_engine.name != 'sqlite':
-        migrate.ForeignKeyConstraint(**params).drop()
-
-    handle_rid_index(meta, True)
-
-    sample.c.meter_id.drop()
-    meter.drop()

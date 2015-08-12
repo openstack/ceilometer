@@ -15,7 +15,7 @@ import migrate
 import sqlalchemy as sa
 
 
-def _handle_meter_indices(meta, downgrade=False):
+def _handle_meter_indices(meta):
     if meta.bind.engine.name == 'sqlite':
         return
 
@@ -51,17 +51,17 @@ def _handle_meter_indices(meta, downgrade=False):
     for fk in fk_params:
         params = fk[0]
         if meta.bind.engine.name == 'mysql':
-            params['name'] = fk[2] if downgrade else fk[1]
+            params['name'] = fk[1]
         migrate.ForeignKeyConstraint(**params).drop()
 
     for meter_ix, sample_ix in indices:
-        meter_ix.create() if downgrade else meter_ix.drop()
-        sample_ix.drop() if downgrade else sample_ix.create()
+        meter_ix.drop()
+        sample_ix.create()
 
     for fk in fk_params:
         params = fk[0]
         if meta.bind.engine.name == 'mysql':
-            params['name'] = fk[1] if downgrade else fk[2]
+            params['name'] = fk[2]
         migrate.ForeignKeyConstraint(**params).create()
 
 
@@ -108,17 +108,3 @@ def upgrade(migrate_engine):
     # re-bind metadata to pick up alter name change
     meta = sa.MetaData(bind=migrate_engine)
     _alter_sourceassoc(meta, 'sample', 'idx_ss', True)
-
-
-def downgrade(migrate_engine):
-    meta = sa.MetaData(bind=migrate_engine)
-
-    sample = sa.Table('sample', meta, autoload=True)
-    sample.rename('meter')
-    _handle_meter_indices(meta, True)
-
-    _alter_sourceassoc(meta, 'sample', 'idx_ss')
-    sourceassoc = sa.Table('sourceassoc', meta, autoload=True)
-    sourceassoc.c.sample_id.alter(name='meter_id')
-    meta = sa.MetaData(bind=migrate_engine)
-    _alter_sourceassoc(meta, 'meter', 'idx_sm', True)

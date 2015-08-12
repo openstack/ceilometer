@@ -22,9 +22,3 @@ def upgrade(migrate_engine):
     c = sqlalchemy.Column('recorded_at', models.PreciseTimestamp(),
                           default=timeutils.utcnow)
     meter.create_column(c)
-
-
-def downgrade(migrate_engine):
-    meta = sqlalchemy.MetaData(bind=migrate_engine)
-    meter = sqlalchemy.Table('meter', meta, autoload=True)
-    meter.drop_column('recorded_at')

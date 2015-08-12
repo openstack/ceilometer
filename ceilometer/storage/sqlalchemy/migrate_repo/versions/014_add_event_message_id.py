@@ -42,14 +42,3 @@ def upgrade(migrate_engine):
          execute())
 
     # Leave the Trait, makes the rollback easier and won't really hurt anyone.
-
-
-def downgrade(migrate_engine):
-    meta = sqlalchemy.MetaData(bind=migrate_engine)
-    event = sqlalchemy.Table('event', meta, autoload=True)
-    message_id = sqlalchemy.Column('message_id', sqlalchemy.String(50))
-    cons = UniqueConstraint('message_id', table=event)
-    cons.drop()
-    index = sqlalchemy.Index('idx_event_message_id', event.c.message_id)
-    index.drop(bind=migrate_engine)
-    event.drop_column(message_id)

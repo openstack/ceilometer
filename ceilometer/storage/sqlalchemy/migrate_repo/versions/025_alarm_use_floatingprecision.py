@@ -56,13 +56,3 @@ def upgrade(migrate_engine):
             _convert_data_type(table, col_name, sa.DateTime(),
                                models.PreciseTimestamp(),
                                pk_attr=pk_attr)
-
-
-def downgrade(migrate_engine):
-    if migrate_engine.name == 'mysql':
-        meta = sa.MetaData(bind=migrate_engine)
-        for table_name, col_name, pk_attr in to_convert:
-            table = sa.Table(table_name, meta, autoload=True)
-            _convert_data_type(table, col_name, models.PreciseTimestamp(),
-                               sa.DateTime(),
-                               pk_attr=pk_attr)

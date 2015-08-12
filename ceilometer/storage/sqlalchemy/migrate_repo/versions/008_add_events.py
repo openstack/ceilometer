@@ -58,10 +58,3 @@ def upgrade(migrate_engine):
         mysql_charset='utf8',
     )
     trait.create()
-
-
-def downgrade(migrate_engine):
-    meta = MetaData(bind=migrate_engine)
-    for name in ['trait', 'event', 'unique_name']:
-        t = Table(name, meta, autoload=True)
-        t.drop()

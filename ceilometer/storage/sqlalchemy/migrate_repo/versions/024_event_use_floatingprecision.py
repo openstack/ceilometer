@@ -54,14 +54,3 @@ def upgrade(migrate_engine):
         _convert_data_type(trait, 't_datetime', sa.Float(),
                            models.PreciseTimestamp(),
                            pk_attr='id', index=True)
-
-
-def downgrade(migrate_engine):
-    if migrate_engine.name == 'mysql':
-        meta = sa.MetaData(bind=migrate_engine)
-        event = sa.Table('event', meta, autoload=True)
-        _convert_data_type(event, 'generated', models.PreciseTimestamp(),
-                           sa.Float(), pk_attr='id', index=True)
-        trait = sa.Table('trait', meta, autoload=True)
-        _convert_data_type(trait, 't_datetime', models.PreciseTimestamp(),
-                           sa.Float(), pk_attr='id', index=True)

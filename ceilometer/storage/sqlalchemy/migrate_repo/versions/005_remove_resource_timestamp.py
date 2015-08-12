@@ -12,7 +12,6 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-from oslo_utils import timeutils
 from sqlalchemy import MetaData, Table, Column, DateTime
 
 
@@ -23,13 +22,3 @@ def upgrade(migrate_engine):
     resource.drop_column(timestamp)
     received_timestamp = Column('received_timestamp', DateTime)
     resource.drop_column(received_timestamp)
-
-
-def downgrade(migrate_engine):
-    meta = MetaData(bind=migrate_engine)
-    resource = Table('resource', meta, autoload=True)
-    timestamp = Column('timestamp', DateTime)
-    resource.create_column(timestamp)
-    received_timestamp = Column('received_timestamp', DateTime,
-                                default=timeutils.utcnow)
-    resource.create_column(received_timestamp)

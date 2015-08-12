@@ -22,11 +22,3 @@ def upgrade(migrate_engine):
     name.c.key.alter(type=VARCHAR(length=255))
     trait = Table('trait', meta, autoload=True)
     trait.c.t_string.alter(type=VARCHAR(length=255))
-
-
-def downgrade(migrate_engine):
-    meta = MetaData(bind=migrate_engine)
-    name = Table('unique_name', meta, autoload=True)
-    name.c.key.alter(type=VARCHAR(length=32))
-    trait = Table('trait', meta, autoload=True)
-    trait.c.t_string.alter(type=VARCHAR(length=32))

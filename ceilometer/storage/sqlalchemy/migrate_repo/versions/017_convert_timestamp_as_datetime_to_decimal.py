@@ -52,11 +52,3 @@ def upgrade(migrate_engine):
         _convert_data_type(meter, _col, sa.DateTime(),
                            models.PreciseTimestamp(),
                            pk_attr='id', index=True)
-
-
-def downgrade(migrate_engine):
-    if migrate_engine.name == 'mysql':
-        meta = sa.MetaData(bind=migrate_engine)
-        meter = sa.Table('meter', meta, autoload=True)
-        _convert_data_type(meter, _col, models.PreciseTimestamp(),
-                           sa.DateTime(), pk_attr='id', index=True)
