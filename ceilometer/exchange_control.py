@@ -32,4 +32,7 @@ EXCHANGE_OPTS = [
     cfg.StrOpt('sahara_control_exchange',
                default='sahara',
                help="Exchange name for Data Processing notifications."),
+    cfg.StrOpt('swift_control_exchange',
+               default='swift',
+               help="Exchange name for Swift notifications."),
 ]

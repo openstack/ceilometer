@@ -89,58 +89,6 @@ class Instance(ComputeInstanceNotificationBase,
             message=message)
 
 
-class Memory(ComputeInstanceNotificationBase):
-    def get_sample(self, message):
-        yield sample.Sample.from_notification(
-            name='memory',
-            type=sample.TYPE_GAUGE,
-            unit='MB',
-            volume=message['payload']['memory_mb'],
-            user_id=message['payload']['user_id'],
-            project_id=message['payload']['tenant_id'],
-            resource_id=message['payload']['instance_id'],
-            message=message)
-
-
-class VCpus(ComputeInstanceNotificationBase):
-    def get_sample(self, message):
-        yield sample.Sample.from_notification(
-            name='vcpus',
-            type=sample.TYPE_GAUGE,
-            unit='vcpu',
-            volume=message['payload']['vcpus'],
-            user_id=message['payload']['user_id'],
-            project_id=message['payload']['tenant_id'],
-            resource_id=message['payload']['instance_id'],
-            message=message)
-
-
-class RootDiskSize(ComputeInstanceNotificationBase):
-    def get_sample(self, message):
-        yield sample.Sample.from_notification(
-            name='disk.root.size',
-            type=sample.TYPE_GAUGE,
-            unit='GB',
-            volume=message['payload']['root_gb'],
-            user_id=message['payload']['user_id'],
-            project_id=message['payload']['tenant_id'],
-            resource_id=message['payload']['instance_id'],
-            message=message)
-
-
-class EphemeralDiskSize(ComputeInstanceNotificationBase):
-    def get_sample(self, message):
-        yield sample.Sample.from_notification(
-            name='disk.ephemeral.size',
-            type=sample.TYPE_GAUGE,
-            unit='GB',
-            volume=message['payload']['ephemeral_gb'],
-            user_id=message['payload']['user_id'],
-            project_id=message['payload']['tenant_id'],
-            resource_id=message['payload']['instance_id'],
-            message=message)
-
-
 class InstanceDelete(ComputeInstanceNotificationBase):
     """Handle the messages sent by the nova notifier plugin.
 
