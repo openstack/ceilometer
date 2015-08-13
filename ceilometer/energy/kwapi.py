@@ -21,7 +21,6 @@ import requests
 import six
 
 from ceilometer.agent import plugin_base
-from ceilometer.i18n import _
 from ceilometer import sample
 
 
@@ -85,7 +84,7 @@ class _Base(plugin_base.PollsterBase):
         try:
             client = self.get_kwapi_client(ksclient, endpoint)
         except exceptions.EndpointNotFound:
-            LOG.debug(_("Kwapi endpoint not found"))
+            LOG.debug("Kwapi endpoint not found")
             return []
         return list(client.iter_probes())
 

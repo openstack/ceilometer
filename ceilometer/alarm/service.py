@@ -100,11 +100,10 @@ class AlarmService(object):
     def _evaluate_alarm(self, alarm):
         """Evaluate the alarms assigned to this evaluator."""
         if alarm.type not in self.supported_evaluators:
-            LOG.debug(_('skipping alarm %s: type unsupported') %
-                      alarm.alarm_id)
+            LOG.debug('skipping alarm %s: type unsupported', alarm.alarm_id)
             return
 
-        LOG.debug(_('evaluating alarm %s') % alarm.alarm_id)
+        LOG.debug('evaluating alarm %s', alarm.alarm_id)
         try:
             self.evaluators[alarm.type].obj.evaluate(alarm)
         except Exception:
@@ -191,8 +190,8 @@ class AlarmNotifierService(os_service.Service):
             return
 
         try:
-            LOG.debug(_("Notifying alarm %(id)s with action %(act)s") % (
-                      {'id': alarm_id, 'act': action}))
+            LOG.debug("Notifying alarm %(id)s with action %(act)s",
+                      {'id': alarm_id, 'act': action})
             notifier.notify(action, alarm_id, alarm_name, severity,
                             previous, current, reason, reason_data)
         except Exception:

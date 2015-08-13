@@ -134,7 +134,7 @@ class CollectorService(os_service.Service):
                 LOG.warn(_("UDP: Cannot decode data sent by %s"), source)
             else:
                 try:
-                    LOG.debug(_("UDP: Storing %s"), sample)
+                    LOG.debug("UDP: Storing %s", sample)
                     self.dispatcher_manager.map_method('record_metering_data',
                                                        sample)
                 except Exception:

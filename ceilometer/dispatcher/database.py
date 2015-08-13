@@ -18,7 +18,7 @@ from oslo_utils import timeutils
 
 from ceilometer import dispatcher
 from ceilometer.event.storage import models
-from ceilometer.i18n import _, _LE, _LW
+from ceilometer.i18n import _LE, _LW
 from ceilometer.publisher import utils as publisher_utils
 from ceilometer import storage
 
@@ -73,13 +73,13 @@ class DatabaseDispatcher(dispatcher.Base):
             data = [data]
 
         for meter in data:
-            LOG.debug(_(
+            LOG.debug(
                 'metering data %(counter_name)s '
-                'for %(resource_id)s @ %(timestamp)s: %(counter_volume)s')
-                % ({'counter_name': meter['counter_name'],
-                    'resource_id': meter['resource_id'],
-                    'timestamp': meter.get('timestamp', 'NO TIMESTAMP'),
-                    'counter_volume': meter['counter_volume']}))
+                'for %(resource_id)s @ %(timestamp)s: %(counter_volume)s',
+                {'counter_name': meter['counter_name'],
+                 'resource_id': meter['resource_id'],
+                 'timestamp': meter.get('timestamp', 'NO TIMESTAMP'),
+                 'counter_volume': meter['counter_volume']})
             if publisher_utils.verify_signature(
                     meter, self.conf.publisher.telemetry_secret):
                 try:

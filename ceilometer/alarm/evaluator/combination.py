@@ -101,8 +101,8 @@ class CombinationEvaluator(evaluator.Evaluator):
 
     def evaluate(self, alarm):
         if not self.within_time_constraint(alarm):
-            LOG.debug(_('Attempted to evaluate alarm %s, but it is not '
-                        'within its time constraint.') % alarm.alarm_id)
+            LOG.debug('Attempted to evaluate alarm %s, but it is not '
+                      'within its time constraint.', alarm.alarm_id)
             return
 
         states = zip(alarm.rule['alarm_ids'],

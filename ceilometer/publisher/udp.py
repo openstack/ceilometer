@@ -57,9 +57,9 @@ class UDPPublisher(publisher.PublisherBase):
                 sample, cfg.CONF.publisher.telemetry_secret)
             host = self.host
             port = self.port
-            LOG.debug(_("Publishing sample %(msg)s over UDP to "
-                        "%(host)s:%(port)d") % {'msg': msg, 'host': host,
-                                                'port': port})
+            LOG.debug("Publishing sample %(msg)s over UDP to "
+                      "%(host)s:%(port)d", {'msg': msg, 'host': host,
+                                            'port': port})
             try:
                 self.socket.sendto(msgpack.dumps(msg),
                                    (self.host, self.port))

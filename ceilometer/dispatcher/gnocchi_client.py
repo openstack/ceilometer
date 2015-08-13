@@ -109,9 +109,9 @@ class Client(object):
                                data=json.dumps(measure_attributes))
 
         if r.status_code == 404:
-            LOG.debug(_("The metric %(metric_name)s of "
-                        "resource %(resource_id)s doesn't exists: "
-                        "%(status_code)d"),
+            LOG.debug("The metric %(metric_name)s of "
+                      "resource %(resource_id)s doesn't exists: "
+                      "%(status_code)d",
                       {'metric_name': metric_name,
                        'resource_id': resource_id,
                        'status_code': r.status_code})

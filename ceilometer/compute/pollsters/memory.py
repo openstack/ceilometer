@@ -30,13 +30,13 @@ class MemoryUsagePollster(pollsters.BaseComputePollster):
     def get_samples(self, manager, cache, resources):
         self._inspection_duration = self._record_poll_time()
         for instance in resources:
-            LOG.debug(_('Checking memory usage for instance %s'), instance.id)
+            LOG.debug('Checking memory usage for instance %s', instance.id)
             try:
                 memory_info = self.inspector.inspect_memory_usage(
                     instance, self._inspection_duration)
-                LOG.debug(_("MEMORY USAGE: %(instance)s %(usage)f"),
-                          ({'instance': instance.__dict__,
-                            'usage': memory_info.usage}))
+                LOG.debug("MEMORY USAGE: %(instance)s %(usage)f",
+                          {'instance': instance.__dict__,
+                           'usage': memory_info.usage})
                 yield util.make_sample_from_instance(
                     instance,
                     name='memory.usage',
@@ -46,7 +46,7 @@ class MemoryUsagePollster(pollsters.BaseComputePollster):
                 )
             except virt_inspector.InstanceNotFoundException as err:
                 # Instance was deleted while getting samples. Ignore it.
-                LOG.debug(_('Exception while getting samples %s'), err)
+                LOG.debug('Exception while getting samples %s', err)
             except virt_inspector.InstanceShutOffException as e:
                 LOG.warn(_LW('Instance %(instance_id)s was shut off while '
                              'getting samples of %(pollster)s: %(exc)s'),
@@ -59,8 +59,8 @@ class MemoryUsagePollster(pollsters.BaseComputePollster):
                           'instance_id': instance.id, 'exc': e})
             except ceilometer.NotImplementedError:
                 # Selected inspector does not implement this pollster.
-                LOG.debug(_('Obtaining Memory Usage is not implemented for %s'
-                            ), self.inspector.__class__.__name__)
+                LOG.debug('Obtaining Memory Usage is not implemented for %s',
+                          self.inspector.__class__.__name__)
             except Exception as err:
                 LOG.exception(_('Could not get Memory Usage for '
                                 '%(id)s: %(e)s'), {'id': instance.id,
@@ -72,14 +72,14 @@ class MemoryResidentPollster(pollsters.BaseComputePollster):
     def get_samples(self, manager, cache, resources):
         self._inspection_duration = self._record_poll_time()
         for instance in resources:
-            LOG.debug(_('Checking resident memory for instance %s'),
+            LOG.debug('Checking resident memory for instance %s',
                       instance.id)
             try:
                 memory_info = self.inspector.inspect_memory_resident(
                     instance, self._inspection_duration)
-                LOG.debug(_("RESIDENT MEMORY: %(instance)s %(resident)f"),
-                          ({'instance': instance.__dict__,
-                            'resident': memory_info.resident}))
+                LOG.debug("RESIDENT MEMORY: %(instance)s %(resident)f",
+                          {'instance': instance.__dict__,
+                           'resident': memory_info.resident})
                 yield util.make_sample_from_instance(
                     instance,
                     name='memory.resident',
@@ -89,7 +89,7 @@ class MemoryResidentPollster(pollsters.BaseComputePollster):
                 )
             except virt_inspector.InstanceNotFoundException as err:
                 # Instance was deleted while getting samples. Ignore it.
-                LOG.debug(_('Exception while getting samples %s'), err)
+                LOG.debug('Exception while getting samples %s', err)
             except virt_inspector.InstanceShutOffException as e:
                 LOG.warn(_LW('Instance %(instance_id)s was shut off while '
                              'getting samples of %(pollster)s: %(exc)s'),
@@ -102,8 +102,8 @@ class MemoryResidentPollster(pollsters.BaseComputePollster):
                           'instance_id': instance.id, 'exc': e})
             except ceilometer.NotImplementedError:
                 # Selected inspector does not implement this pollster.
-                LOG.debug(_('Obtaining Resident Memory is not implemented'
-                            ' for %s'), self.inspector.__class__.__name__)
+                LOG.debug('Obtaining Resident Memory is not implemented'
+                          ' for %s', self.inspector.__class__.__name__)
             except Exception as err:
                 LOG.exception(_LE('Could not get Resident Memory Usage for '
                                   '%(id)s: %(e)s'), {'id': instance.id,

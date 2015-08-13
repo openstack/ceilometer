@@ -30,10 +30,10 @@ class CPUPollster(pollsters.BaseComputePollster):
 
     def get_samples(self, manager, cache, resources):
         for instance in resources:
-            LOG.debug(_('checking instance %s'), instance.id)
+            LOG.debug('checking instance %s', instance.id)
             try:
                 cpu_info = self.inspector.inspect_cpus(instance)
-                LOG.debug(_("CPUTIME USAGE: %(instance)s %(time)d"),
+                LOG.debug("CPUTIME USAGE: %(instance)s %(time)d",
                           {'instance': instance.__dict__,
                            'time': cpu_info.time})
                 cpu_num = {'cpu_number': cpu_info.number}
@@ -47,11 +47,11 @@ class CPUPollster(pollsters.BaseComputePollster):
                 )
             except virt_inspector.InstanceNotFoundException as err:
                 # Instance was deleted while getting samples. Ignore it.
-                LOG.debug(_('Exception while getting samples %s'), err)
+                LOG.debug('Exception while getting samples %s', err)
             except ceilometer.NotImplementedError:
                 # Selected inspector does not implement this pollster.
-                LOG.debug(_('Obtaining CPU time is not implemented for %s'
-                            ), self.inspector.__class__.__name__)
+                LOG.debug('Obtaining CPU time is not implemented for %s',
+                          self.inspector.__class__.__name__)
             except Exception as err:
                 LOG.exception(_('could not get CPU time for %(id)s: %(e)s'),
                               {'id': instance.id, 'e': err})
@@ -62,13 +62,13 @@ class CPUUtilPollster(pollsters.BaseComputePollster):
     def get_samples(self, manager, cache, resources):
         self._inspection_duration = self._record_poll_time()
         for instance in resources:
-            LOG.debug(_('Checking CPU util for instance %s'), instance.id)
+            LOG.debug('Checking CPU util for instance %s', instance.id)
             try:
                 cpu_info = self.inspector.inspect_cpu_util(
                     instance, self._inspection_duration)
-                LOG.debug(_("CPU UTIL: %(instance)s %(util)d"),
-                          ({'instance': instance.__dict__,
-                            'util': cpu_info.util}))
+                LOG.debug("CPU UTIL: %(instance)s %(util)d",
+                          {'instance': instance.__dict__,
+                           'util': cpu_info.util})
                 yield util.make_sample_from_instance(
                     instance,
                     name='cpu_util',
@@ -78,10 +78,10 @@ class CPUUtilPollster(pollsters.BaseComputePollster):
                 )
             except virt_inspector.InstanceNotFoundException as err:
                 # Instance was deleted while getting samples. Ignore it.
-                LOG.debug(_('Exception while getting samples %s'), err)
+                LOG.debug('Exception while getting samples %s', err)
             except ceilometer.NotImplementedError:
                 # Selected inspector does not implement this pollster.
-                LOG.debug(_('Obtaining CPU Util is not implemented for %s'),
+                LOG.debug('Obtaining CPU Util is not implemented for %s',
                           self.inspector.__class__.__name__)
             except Exception as err:
                 LOG.exception(_('Could not get CPU Util for %(id)s: %(e)s'),

@@ -86,13 +86,13 @@ class HttpDispatcher(dispatcher.Base):
             data = [data]
 
         for meter in data:
-            LOG.debug(_(
+            LOG.debug(
                 'metering data %(counter_name)s '
-                'for %(resource_id)s @ %(timestamp)s: %(counter_volume)s')
-                % ({'counter_name': meter['counter_name'],
-                    'resource_id': meter['resource_id'],
-                    'timestamp': meter.get('timestamp', 'NO TIMESTAMP'),
-                    'counter_volume': meter['counter_volume']}))
+                'for %(resource_id)s @ %(timestamp)s: %(counter_volume)s',
+                {'counter_name': meter['counter_name'],
+                 'resource_id': meter['resource_id'],
+                 'timestamp': meter.get('timestamp', 'NO TIMESTAMP'),
+                 'counter_volume': meter['counter_volume']})
             if publisher_utils.verify_signature(
                     meter, self.conf.publisher.telemetry_secret):
                 try:
@@ -111,8 +111,8 @@ class HttpDispatcher(dispatcher.Base):
                                         data=json.dumps(data),
                                         headers=self.headers,
                                         timeout=self.timeout)
-                    LOG.debug(_('Message posting finished with status code '
-                                '%d.') % res.status_code)
+                    LOG.debug('Message posting finished with status code '
+                              '%d.', res.status_code)
                 except Exception as err:
                     LOG.exception(_('Failed to record metering data: %s'),
                                   err)

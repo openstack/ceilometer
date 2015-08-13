@@ -43,10 +43,9 @@ class ScalingTransformer(transformer.TransformerBase):
         self.source = source
         self.target = target
         self.scale = target.get('scale')
-        LOG.debug(_('scaling conversion transformer with source:'
-                    ' %(source)s target: %(target)s:')
-                  % {'source': source,
-                     'target': target})
+        LOG.debug('scaling conversion transformer with source:'
+                  ' %(source)s target: %(target)s:', {'source': source,
+                                                      'target': target})
         super(ScalingTransformer, self).__init__(**kwargs)
 
     def _scale(self, s):
@@ -89,10 +88,10 @@ class ScalingTransformer(transformer.TransformerBase):
 
     def handle_sample(self, context, s):
         """Handle a sample, converting if necessary."""
-        LOG.debug(_('handling sample %s'), (s,))
+        LOG.debug('handling sample %s', s)
         if self.source.get('unit', s.unit) == s.unit:
             s = self._convert(s)
-            LOG.debug(_('converted to: %s'), (s,))
+            LOG.debug('converted to: %s', s)
         return s
 
 
@@ -111,7 +110,7 @@ class RateOfChangeTransformer(ScalingTransformer):
 
     def handle_sample(self, context, s):
         """Handle a sample, converting if necessary."""
-        LOG.debug(_('handling sample %s'), (s,))
+        LOG.debug('handling sample %s', s)
         key = s.name + s.resource_id
         prev = self.cache.get(key)
         timestamp = timeutils.parse_isotime(s.timestamp)
@@ -139,7 +138,7 @@ class RateOfChangeTransformer(ScalingTransformer):
                               if time_delta else 0.0)
 
             s = self._convert(s, rate_of_change)
-            LOG.debug(_('converted to: %s'), (s,))
+            LOG.debug('converted to: %s', s)
         else:
             LOG.warn(_('dropping sample with no predecessor: %s'),
                      (s,))

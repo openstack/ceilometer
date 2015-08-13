@@ -20,7 +20,7 @@ from oslo_log import log
 from oslo_service import service as os_service
 import six
 
-from ceilometer.i18n import _, _LE, _LI
+from ceilometer.i18n import _LE, _LI
 from ceilometer import pipeline
 
 LOG = log.getLogger(__name__)
@@ -60,12 +60,12 @@ class BaseService(os_service.Service):
                     # Polling in the polling agent.
                     elif hasattr(self, 'polling_manager'):
                         self.polling_manager = pipeline.setup_polling()
-                    LOG.debug(_("Pipeline has been refreshed. "
-                                "old hash: %(old)s, new hash: %(new)s") %
-                              ({'old': self.pipeline_hash,
-                                'new': _hash}))
+                    LOG.debug("Pipeline has been refreshed. "
+                              "old hash: %(old)s, new hash: %(new)s",
+                              {'old': self.pipeline_hash,
+                               'new': _hash})
                 except Exception as err:
-                    LOG.debug(_("Active pipeline config's hash is %s") %
+                    LOG.debug("Active pipeline config's hash is %s",
                               self.pipeline_hash)
                     LOG.exception(_LE('Unable to load changed pipeline: %s')
                                   % err)

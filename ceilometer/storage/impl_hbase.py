@@ -19,7 +19,6 @@ from oslo_log import log
 from oslo_utils import timeutils
 
 import ceilometer
-from ceilometer.i18n import _
 from ceilometer.storage import base
 from ceilometer.storage.hbase import base as hbase_base
 from ceilometer.storage.hbase import migration as hbase_migration
@@ -128,18 +127,18 @@ class Connection(hbase_base.Connection, base.Connection):
             hbase_migration.migrate_tables(conn, tables)
 
     def clear(self):
-        LOG.debug(_('Dropping HBase schema...'))
+        LOG.debug('Dropping HBase schema...')
         with self.conn_pool.connection() as conn:
             for table in [self.RESOURCE_TABLE,
                           self.METER_TABLE]:
                 try:
                     conn.disable_table(table)
                 except Exception:
-                    LOG.debug(_('Cannot disable table but ignoring error'))
+                    LOG.debug('Cannot disable table but ignoring error')
                 try:
                     conn.delete_table(table)
                 except Exception:
-                    LOG.debug(_('Cannot delete table but ignoring error'))
+                    LOG.debug('Cannot delete table but ignoring error')
 
     def record_metering_data(self, data):
         """Write the data to the backend storage system.
@@ -212,7 +211,7 @@ class Connection(hbase_base.Connection, base.Connection):
                                                       source, q)
         with self.conn_pool.connection() as conn:
             resource_table = conn.table(self.RESOURCE_TABLE)
-            LOG.debug(_("Query Resource table: %s") % q)
+            LOG.debug("Query Resource table: %s", q)
             for resource_id, data in resource_table.scan(filter=q,
                                                          limit=limit):
                 f_res, sources, meters, md = hbase_utils.deserialize_entry(
@@ -263,7 +262,7 @@ class Connection(hbase_base.Connection, base.Connection):
                                        project_id=project,
                                        resource_id=resource,
                                        source=source)
-            LOG.debug(_("Query Resource table: %s") % q)
+            LOG.debug("Query Resource table: %s", q)
 
             gen = resource_table.scan(filter=q)
             # We need result set to be sure that user doesn't receive several
@@ -305,7 +304,7 @@ class Connection(hbase_base.Connection, base.Connection):
             q, start, stop, columns = (hbase_utils.
                                        make_sample_query_from_filter
                                        (sample_filter, require_meter=False))
-            LOG.debug(_("Query Meter Table: %s") % q)
+            LOG.debug("Query Meter Table: %s", q)
             gen = meter_table.scan(filter=q, row_start=start, row_stop=stop,
                                    limit=limit, columns=columns)
             for ignored, meter in gen:

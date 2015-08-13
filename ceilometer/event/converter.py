@@ -369,7 +369,7 @@ def setup_events(trait_plugin_mgr):
     """Setup the event definitions from yaml config file."""
     config_file = get_config_file()
     if config_file is not None:
-        LOG.debug(_("Event Definitions configuration file: %s"), config_file)
+        LOG.debug("Event Definitions configuration file: %s", config_file)
 
         with open(config_file) as cf:
             config = cf.read()
@@ -392,8 +392,8 @@ def setup_events(trait_plugin_mgr):
             raise
 
     else:
-        LOG.debug(_("No Event Definitions configuration file found!"
-                  " Using default config."))
+        LOG.debug("No Event Definitions configuration file found!"
+                  " Using default config.")
         events_config = []
 
     LOG.info(_("Event Definitions: %s"), events_config)

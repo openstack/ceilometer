@@ -194,7 +194,7 @@ class TraitsController(rest.RestController):
         :param event_type: Event type to filter traits by
         :param trait_name: Trait to return values for
         """
-        LOG.debug(_("Getting traits for %s") % event_type)
+        LOG.debug("Getting traits for %s", event_type)
         return [Trait._convert_storage_trait(t)
                 for t in pecan.request.event_storage_conn
                 .get_traits(event_type, trait_name)]

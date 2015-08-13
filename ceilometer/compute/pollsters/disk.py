@@ -128,7 +128,7 @@ class _Base(pollsters.BaseComputePollster):
                     yield s
             except virt_inspector.InstanceNotFoundException as err:
                 # Instance was deleted while getting samples. Ignore it.
-                LOG.debug(_('Exception while getting samples %s'), err)
+                LOG.debug('Exception while getting samples %s', err)
             except virt_inspector.InstanceShutOffException as e:
                 LOG.warn(_LW('Instance %(instance_id)s was shut off while '
                              'getting samples of %(pollster)s: %(exc)s'),
@@ -136,8 +136,8 @@ class _Base(pollsters.BaseComputePollster):
                           'pollster': self.__class__.__name__, 'exc': e})
             except ceilometer.NotImplementedError:
                 # Selected inspector does not implement this pollster.
-                LOG.debug(_('%(inspector)s does not provide data for '
-                            ' %(pollster)s'),
+                LOG.debug('%(inspector)s does not provide data for '
+                          ' %(pollster)s',
                           {'inspector': self.inspector.__class__.__name__,
                            'pollster': self.__class__.__name__})
             except Exception as err:
@@ -338,11 +338,11 @@ class _DiskRatesPollsterBase(pollsters.BaseComputePollster):
                     yield disk_rate
             except virt_inspector.InstanceNotFoundException as err:
                 # Instance was deleted while getting samples. Ignore it.
-                LOG.debug(_('Exception while getting samples %s'), err)
+                LOG.debug('Exception while getting samples %s', err)
             except ceilometer.NotImplementedError:
                 # Selected inspector does not implement this pollster.
-                LOG.debug(_('%(inspector)s does not provide data for '
-                            ' %(pollster)s'),
+                LOG.debug('%(inspector)s does not provide data for '
+                          ' %(pollster)s',
                           {'inspector': self.inspector.__class__.__name__,
                            'pollster': self.__class__.__name__})
             except Exception as err:
@@ -520,11 +520,11 @@ class _DiskLatencyPollsterBase(pollsters.BaseComputePollster):
                     yield disk_latency
             except virt_inspector.InstanceNotFoundException as err:
                 # Instance was deleted while getting samples. Ignore it.
-                LOG.debug(_('Exception while getting samples %s'), err)
+                LOG.debug('Exception while getting samples %s', err)
             except ceilometer.NotImplementedError:
                 # Selected inspector does not implement this pollster.
-                LOG.debug(_('%(inspector)s does not provide data for '
-                            ' %(pollster)s'),
+                LOG.debug('%(inspector)s does not provide data for '
+                          ' %(pollster)s',
                           {'inspector': self.inspector.__class__.__name__,
                            'pollster': self.__class__.__name__})
             except Exception as err:
@@ -601,11 +601,11 @@ class _DiskIOPSPollsterBase(pollsters.BaseComputePollster):
                     yield disk_iops
             except virt_inspector.InstanceNotFoundException as err:
                 # Instance was deleted while getting samples. Ignore it.
-                LOG.debug(_('Exception while getting samples %s'), err)
+                LOG.debug('Exception while getting samples %s', err)
             except ceilometer.NotImplementedError:
                 # Selected inspector does not implement this pollster.
-                LOG.debug(_('%(inspector)s does not provide data for '
-                            '%(pollster)s'),
+                LOG.debug('%(inspector)s does not provide data for '
+                          '%(pollster)s',
                           {'inspector': self.inspector.__class__.__name__,
                            'pollster': self.__class__.__name__})
             except Exception as err:
@@ -696,7 +696,7 @@ class _DiskInfoPollsterBase(pollsters.BaseComputePollster):
                     yield disk_info
             except virt_inspector.InstanceNotFoundException as err:
                 # Instance was deleted while getting samples. Ignore it.
-                LOG.debug(_('Exception while getting samples %s'), err)
+                LOG.debug('Exception while getting samples %s', err)
             except virt_inspector.InstanceShutOffException as e:
                 LOG.warn(_LW('Instance %(instance_id)s was shut off while '
                              'getting samples of %(pollster)s: %(exc)s'),
@@ -704,10 +704,10 @@ class _DiskInfoPollsterBase(pollsters.BaseComputePollster):
                           'pollster': self.__class__.__name__, 'exc': e})
             except ceilometer.NotImplementedError:
                 # Selected inspector does not implement this pollster.
-                LOG.debug(_('%(inspector)s does not provide data for '
-                            ' %(pollster)s'), (
+                LOG.debug('%(inspector)s does not provide data for '
+                          ' %(pollster)s',
                           {'inspector': self.inspector.__class__.__name__,
-                           'pollster': self.__class__.__name__}))
+                           'pollster': self.__class__.__name__})
             except Exception as err:
                 instance_name = util.instance_name(instance)
                 LOG.exception(_('Ignoring instance %(name)s '

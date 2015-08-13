@@ -181,12 +181,12 @@ class Statistics(base.Base):
                 self.duration_start and
                 self.duration_start < start_timestamp):
             self.duration_start = start_timestamp
-            LOG.debug(_('clamping min timestamp to range'))
+            LOG.debug('clamping min timestamp to range')
         if (end_timestamp and
                 self.duration_end and
                 self.duration_end > end_timestamp):
             self.duration_end = end_timestamp
-            LOG.debug(_('clamping max timestamp to range'))
+            LOG.debug('clamping max timestamp to range')
 
         # If we got valid timestamps back, compute a duration in seconds.
         #
