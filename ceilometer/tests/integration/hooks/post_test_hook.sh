@@ -32,7 +32,7 @@ function generate_testr_results {
 if [ -d $BASE/new/devstack ]; then
     export CEILOMETER_DIR="$BASE/new/ceilometer"
     STACK_USER=stack
-    sudo chown -R jenkins:stack $CEILOMETER_DIR
+    sudo chown -R $STACK_USER:stack $CEILOMETER_DIR
     source $BASE/new/devstack/openrc admin admin
     # Go to the ceilometer dir
     cd $CEILOMETER_DIR
