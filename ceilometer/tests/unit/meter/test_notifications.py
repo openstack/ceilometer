@@ -113,6 +113,44 @@ MIDDLEWARE_EVENT = {
     }
 }
 
+FULL_MULTI_MSG = {
+    u'_context_domain': None,
+    u'_context_request_id': u'req-da91b4bf-d2b5-43ae-8b66-c7752e72726d',
+    'event_type': u'full.sample',
+    'timestamp': u'2015-06-1909: 19: 35.786893',
+    u'_context_auth_token': None,
+    u'_context_read_only': False,
+    'payload': [{
+                u'counter_name': u'instance1',
+                u'user_id': u'user1',
+                u'resource_id': u'res1',
+                u'counter_unit': u'ns',
+                u'counter_volume': 28.0,
+                u'project_id': u'proj1',
+                u'counter_type': u'gauge'
+                },
+                {
+                u'counter_name': u'instance2',
+                u'user_id': u'user2',
+                u'resource_id': u'res2',
+                u'counter_unit': u'%',
+                u'counter_volume': 1.0,
+                u'project_id': u'proj2',
+                u'counter_type': u'delta'
+                }],
+    u'_context_resource_uuid': None,
+    u'_context_user_identity': u'fake_user_identity---',
+    u'_context_show_deleted': False,
+    u'_context_tenant': u'30be1fc9a03c4e94ab05c403a8a377f2',
+    'priority': 'info',
+    u'_context_is_admin': True,
+    u'_context_project_domain': None,
+    u'_context_user': u'e1d870e51c7340cb9d555b15cbfcaec2',
+    u'_context_user_domain': None,
+    'publisher_id': u'ceilometer.api',
+    'message_id': u'939823de-c242-45a2-a399-083f4d6a8c3e'
+}
+
 
 class TestMeterDefinition(test.BaseTestCase):
 
@@ -326,6 +364,33 @@ class TestMeterProcessing(test.BaseTestCase):
             self.__setup_meter_def_file(cfg))
         c = list(self.handler.process_notification(event))
         self.assertEqual(0, len(c))
+
+    def test_multi_meter_payload_all_multi(self):
+        cfg = yaml.dump(
+            {'metric': [dict(name="payload.[*].counter_name",
+                        event_type="full.sample",
+                        type="payload.[*].counter_type",
+                        unit="payload.[*].counter_unit",
+                        volume="payload.[*].counter_volume",
+                        resource_id="payload.[*].resource_id",
+                        project_id="payload.[*].project_id",
+                        user_id="payload.[*].user_id",
+                        multi=['name', 'type', 'unit', 'volume', 'resource_id',
+                               'project_id', 'user_id'])]})
+        self.handler.definitions = notifications.load_definitions(
+            self.__setup_meter_def_file(cfg))
+        c = list(self.handler.process_notification(FULL_MULTI_MSG))
+        self.assertEqual(2, len(c))
+        msg = FULL_MULTI_MSG['payload']
+        for idx, val in enumerate(c):
+            s1 = val.as_dict()
+            self.assertEqual(msg[idx]['counter_name'], s1['name'])
+            self.assertEqual(msg[idx]['counter_volume'], s1['volume'])
+            self.assertEqual(msg[idx]['counter_unit'], s1['unit'])
+            self.assertEqual(msg[idx]['counter_type'], s1['type'])
+            self.assertEqual(msg[idx]['resource_id'], s1['resource_id'])
+            self.assertEqual(msg[idx]['project_id'], s1['project_id'])
+            self.assertEqual(msg[idx]['user_id'], s1['user_id'])
 
     @mock.patch('ceilometer.meter.notifications.LOG')
     def test_multi_meter_payload_invalid_missing(self, LOG):

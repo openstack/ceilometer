@@ -90,7 +90,8 @@ class MeterDefinition(object):
             return values
 
     def _validate_type(self):
-        if self.cfg['type'] not in sample.TYPES:
+        if ('type' not in self.cfg.get('multi', []) and
+                self.cfg['type'] not in sample.TYPES):
             raise MeterDefinitionException(
                 _LE("Invalid type %s specified") % self.cfg['type'], self.cfg)
 
@@ -213,22 +214,29 @@ class ProcessMeterNotifications(plugin_base.NotificationBase):
                     if not meters:  # skip if no meters in payload
                         break
                     try:
+                        resources = self._normalise_as_list(
+                            'resource_id', d, notification_body, len(meters))
                         volumes = self._normalise_as_list(
                             'volume', d, notification_body, len(meters))
                         units = self._normalise_as_list(
                             'unit', d, notification_body, len(meters))
                         types = self._normalise_as_list(
                             'type', d, notification_body, len(meters))
+                        users = (self._normalise_as_list(
+                            'user_id', d, notification_body, len(meters))
+                            if 'user_id' in d.cfg['multi'] else [userid])
+                        projs = (self._normalise_as_list(
+                            'project_id', d, notification_body, len(meters))
+                            if 'project_id' in d.cfg['multi'] else [projectid])
                     except InvalidPayload:
                         break
-                    for m, v, u, t in zip(meters, volumes,
-                                          itertools.cycle(units),
-                                          itertools.cycle(types)):
+                    for m, v, unit, t, r, p, user in zip(
+                            meters, volumes, itertools.cycle(units),
+                            itertools.cycle(types), itertools.cycle(resources),
+                            itertools.cycle(projs), itertools.cycle(users)):
                         yield sample.Sample.from_notification(
-                            name=m, type=t, unit=u, volume=v,
-                            resource_id=resourceid,
-                            user_id=userid,
-                            project_id=projectid,
+                            name=m, type=t, unit=unit, volume=v,
+                            resource_id=r, user_id=user, project_id=p,
                             message=notification_body)
                 else:
                     yield sample.Sample.from_notification(
