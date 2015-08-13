@@ -353,3 +353,17 @@ def requires_admin(func):
         return func(*args, **kwargs)
 
     return wrapped
+
+
+def requires_context(func):
+
+    @functools.wraps(func)
+    def wrapped(*args, **kwargs):
+        req_usr = pecan.request.headers.get('X-User-Id')
+        proj_usr = pecan.request.headers.get('X-Project-Id')
+        if ((not req_usr) or (not proj_usr)):
+            pecan.core.abort(status_code=403,
+                             detail='RBAC Authorization Failed')
+        return func(*args, **kwargs)
+
+    return wrapped

@@ -9,21 +9,65 @@ tests:
 # this attempts to get all the events and expects an empty list back
 - name: get all events
   url: /v2/events
+  request_headers:
+      X-Roles: admin
+      X-User-Id: user1
+      X-Project-Id: project1
   response_headers:
       content-type: application/json; charset=UTF-8
       content-location: $SCHEME://$NETLOC/v2/events
   response_strings:
       - "[]"
 
+# this attempts to get all the events with no role/user/project
+# info in header and expects a 403
+- name: get events with bad headers
+  url: /v2/events
+  status: 403
+
+# this attempts to get all the events with no user/project
+# info in header and expects a 403
+- name: get events with admin only header
+  url: /v2/events
+  request_headers:
+      X-Roles: admin
+  status: 403
+
+# this attempts to get all the events with no project
+# info in header and expects a 403
+- name: get events with no project header
+  url: /v2/events
+  request_headers:
+      X-Roles: admin
+      X-User-Id: user1
+  status: 403
+
+# this attempts to get all the events with no user
+# info in header and expects a 403
+- name: get events with no user header
+  url: /v2/events
+  request_headers:
+      X-Roles: admin
+      X-Project-Id: project1
+  status: 403
+
 # this attempts to get all the events with invalid parameters and expects a 400
 - name: get events with bad params
   url: /v2/events?bad_Stuff_here
+  request_headers:
+      X-Roles: admin
+      X-User-Id: user1
+      X-Project-Id: project1
   status: 400
 
 # this attempts to query the events with the correct parameterized query syntax
 # and expects an empty list
 - name: get events that match query
   url: /v2/events?q.field=event_type&q.op=eq&q.type=string&q.value=cookies_chocolate.chip
+  request_headers:
+      X-Roles: admin
+      X-User-Id: user1
+      X-Project-Id: project1
   response_headers:
       content-type: application/json; charset=UTF-8
       content-location: $SCHEME://$NETLOC/v2/events?q.field=event_type&q.op=eq&q.type=string&q.value=cookies_chocolate.chip
@@ -36,6 +80,9 @@ tests:
   url: /v2/events
   request_headers:
       content-type: application/json; charset=UTF-8
+      X-Roles: admin
+      X-User-Id: user1
+      X-Project-Id: project1
   data:
       q:
         - field: event_type
@@ -52,6 +99,10 @@ tests:
 # but a bad field name and expects an empty list
 - name: get events that match bad query
   url: /v2/events?q.field=bad_field&q.op=eq&q.type=string&q.value=cookies_chocolate.chip
+  request_headers:
+      X-Roles: admin
+      X-User-Id: user1
+      X-Project-Id: project1
   response_headers:
       content-type: application/json; charset=UTF-8
       content-location: $SCHEME://$NETLOC/v2/events?q.field=bad_field&q.op=eq&q.type=string&q.value=cookies_chocolate.chip
@@ -64,6 +115,9 @@ tests:
   url: /v2/events
   request_headers:
       content-type: application/json; charset=UTF-8
+      X-Roles: admin
+      X-User-Id: user1
+      X-Project-Id: project1
   data:
       q:
         - field: bad_field
@@ -82,6 +136,9 @@ tests:
   url: /v2/events
   request_headers:
       content-type: application/json; charset=UTF-8
+      X-Roles: admin
+      X-User-Id: user1
+      X-Project-Id: project1
   data:
       - field: bad_field
         op: eq
@@ -96,6 +153,9 @@ tests:
   url: /v2/events
   request_headers:
       content-type: text/plain
+      X-Roles: admin
+      X-User-Id: user1
+      X-Project-Id: project1
   data:
       "field: bad_field op: eq type: string value: cookies_chocolate.chip xfail: True"
   status: 415
@@ -103,11 +163,19 @@ tests:
 # Get a single event by message_id no data is present so should return a 404
 - name: get a single event
   url: /v2/events/fea1b15a-1d47-4175-85a5-a4bb2c729240
+  request_headers:
+      X-Roles: admin
+      X-User-Id: user1
+      X-Project-Id: project1
   status: 404
 
 # Get all the event types should return an empty list
 - name: get all event types
   url: /v2/event_types
+  request_headers:
+      X-Roles: admin
+      X-User-Id: user1
+      X-Project-Id: project1
   response_headers:
       content-type: application/json; charset=UTF-8
       content-location: $SCHEME://$NETLOC/v2/event_types
@@ -117,11 +185,19 @@ tests:
 # Get a single event type by name, this API is unused and should return a 404
 - name: get event types for good event_type unused api
   url: /v2/event_types/cookies_chocolate.chip
+  request_headers:
+      X-Roles: admin
+      X-User-Id: user1
+      X-Project-Id: project1
   status: 404
 
 # Get all traits for an event type should return an empty list
 - name: get all traits for event type
   url: /v2/event_types/cookies_chocolate.chip/traits
+  request_headers:
+      X-Roles: admin
+      X-User-Id: user1
+      X-Project-Id: project1
   response_headers:
       content-type: application/json; charset=UTF-8
       content-location: $SCHEME://$NETLOC/v2/event_types/cookies_chocolate.chip/traits
@@ -131,6 +207,10 @@ tests:
 # Get all traits named ate for an event type should return an empty list
 - name: get all traits named ate for event type
   url: /v2/event_types/cookies_chocolate.chip/traits/ate
+  request_headers:
+      X-Roles: admin
+      X-User-Id: user1
+      X-Project-Id: project1
   response_headers:
       content-type: application/json; charset=UTF-8
       content-location: $SCHEME://$NETLOC/v2/event_types/cookies_chocolate.chip/traits/ate
