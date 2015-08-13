@@ -38,8 +38,7 @@ DISPATCHER_NAMESPACE = 'ceilometer.dispatcher'
 
 
 def load_dispatcher_manager():
-    LOG.debug(_('loading dispatchers from %s'),
-              DISPATCHER_NAMESPACE)
+    LOG.debug('loading dispatchers from %s', DISPATCHER_NAMESPACE)
     # set propagate_map_exceptions to True to enable stevedore
     # to propagate exceptions.
     dispatcher_manager = named.NamedExtensionManager(

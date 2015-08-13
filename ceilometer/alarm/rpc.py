@@ -21,7 +21,6 @@ from oslo_log import log
 import six
 
 from ceilometer.alarm.storage import models
-from ceilometer.i18n import _
 from ceilometer import messaging
 
 OPTS = [
@@ -46,9 +45,9 @@ class RPCAlarmNotifier(object):
     def notify(self, alarm, previous, reason, reason_data):
         actions = getattr(alarm, models.Alarm.ALARM_ACTIONS_MAP[alarm.state])
         if not actions:
-            LOG.debug(_('alarm %(alarm_id)s has no action configured '
-                        'for state transition from %(previous)s to '
-                        'state %(state)s, skipping the notification.') %
+            LOG.debug('alarm %(alarm_id)s has no action configured '
+                      'for state transition from %(previous)s to '
+                      'state %(state)s, skipping the notification.',
                       {'alarm_id': alarm.alarm_id,
                        'previous': previous,
                        'state': alarm.state})

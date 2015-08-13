@@ -203,8 +203,8 @@ class NotificationService(service_base.BaseService):
             if (cfg.CONF.notification.disable_non_metric_meters and
                     isinstance(handler, base.NonMetricNotificationBase)):
                 continue
-            LOG.debug(_('Event types from %(name)s: %(type)s'
-                        ' (ack_on_error=%(error)s)') %
+            LOG.debug('Event types from %(name)s: %(type)s'
+                      ' (ack_on_error=%(error)s)',
                       {'name': ext.name,
                        'type': ', '.join(handler.event_types),
                        'error': ack_on_error})
@@ -239,7 +239,7 @@ class NotificationService(service_base.BaseService):
         pipelines = self.pipeline_manager.pipelines + ev_pipes
         transport = messaging.get_transport()
         for pipe in pipelines:
-            LOG.debug(_('Pipeline endpoint: %s'), pipe.name)
+            LOG.debug('Pipeline endpoint: %s', pipe.name)
             pipe_endpoint = (pipeline.EventPipelineEndpoint
                              if isinstance(pipe, pipeline.EventPipeline) else
                              pipeline.SamplePipelineEndpoint)

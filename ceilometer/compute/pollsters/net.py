@@ -89,7 +89,7 @@ class _Base(pollsters.BaseComputePollster):
         self._inspection_duration = self._record_poll_time()
         for instance in resources:
             instance_name = util.instance_name(instance)
-            LOG.debug(_('checking net info for instance %s'), instance.id)
+            LOG.debug('checking net info for instance %s', instance.id)
             try:
                 vnics = self._get_vnics_for_instance(
                     cache,
@@ -103,7 +103,7 @@ class _Base(pollsters.BaseComputePollster):
                     yield self._get_sample(instance, vnic, info)
             except virt_inspector.InstanceNotFoundException as err:
                 # Instance was deleted while getting samples. Ignore it.
-                LOG.debug(_('Exception while getting samples %s'), err)
+                LOG.debug('Exception while getting samples %s', err)
             except virt_inspector.InstanceShutOffException as e:
                 LOG.warn(_LW('Instance %(instance_id)s was shut off while '
                              'getting samples of %(pollster)s: %(exc)s'),
@@ -111,8 +111,8 @@ class _Base(pollsters.BaseComputePollster):
                           'pollster': self.__class__.__name__, 'exc': e})
             except ceilometer.NotImplementedError:
                 # Selected inspector does not implement this pollster.
-                LOG.debug(_('%(inspector)s does not provide data for '
-                            ' %(pollster)s'),
+                LOG.debug('%(inspector)s does not provide data for '
+                          ' %(pollster)s',
                           {'inspector': self.inspector.__class__.__name__,
                            'pollster': self.__class__.__name__})
             except Exception as err:

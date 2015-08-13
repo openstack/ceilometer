@@ -53,8 +53,8 @@ class ThresholdEvaluator(evaluator.Evaluator):
         window = (alarm.rule['period'] *
                   (alarm.rule['evaluation_periods'] + look_back))
         start = now - datetime.timedelta(seconds=window)
-        LOG.debug(_('query stats from %(start)s to '
-                    '%(now)s') % {'start': start, 'now': now})
+        LOG.debug('query stats from %(start)s to '
+                  '%(now)s', {'start': start, 'now': now})
         after = dict(field='timestamp', op='ge', value=start.isoformat())
         before = dict(field='timestamp', op='le', value=now.isoformat())
         constraints.extend([before, after])
@@ -63,7 +63,7 @@ class ThresholdEvaluator(evaluator.Evaluator):
     @staticmethod
     def _sanitize(alarm, statistics):
         """Sanitize statistics."""
-        LOG.debug(_('sanitize stats %s') % statistics)
+        LOG.debug('sanitize stats %s', statistics)
         if alarm.rule.get('exclude_outliers'):
             key = operator.attrgetter('count')
             mean = utils.mean(statistics, key)
@@ -72,7 +72,7 @@ class ThresholdEvaluator(evaluator.Evaluator):
             upper = mean + 2 * stddev
             inliers, outliers = utils.anomalies(statistics, key, lower, upper)
             if outliers:
-                LOG.debug(_('excluded weak datapoints with sample counts %s'),
+                LOG.debug('excluded weak datapoints with sample counts %s',
                           [s.count for s in outliers])
                 statistics = inliers
             else:
@@ -81,12 +81,12 @@ class ThresholdEvaluator(evaluator.Evaluator):
         # in practice statistics are always sorted by period start, not
         # strictly required by the API though
         statistics = statistics[-alarm.rule['evaluation_periods']:]
-        LOG.debug(_('pruned statistics to %d') % len(statistics))
+        LOG.debug('pruned statistics to %d', len(statistics))
         return statistics
 
     def _statistics(self, alarm, query):
         """Retrieve statistics over the current window."""
-        LOG.debug(_('stats query %s') % query)
+        LOG.debug('stats query %s', query)
         try:
             return self._client.statistics.list(
                 meter_name=alarm.rule['meter_name'], q=query,
@@ -175,8 +175,8 @@ class ThresholdEvaluator(evaluator.Evaluator):
 
     def evaluate(self, alarm):
         if not self.within_time_constraint(alarm):
-            LOG.debug(_('Attempted to evaluate alarm %s, but it is not '
-                        'within its time constraint.') % alarm.alarm_id)
+            LOG.debug('Attempted to evaluate alarm %s, but it is not '
+                      'within its time constraint.', alarm.alarm_id)
             return
 
         query = self._bound_duration(
@@ -194,9 +194,8 @@ class ThresholdEvaluator(evaluator.Evaluator):
                 op = COMPARATORS[alarm.rule['comparison_operator']]
                 value = getattr(stat, alarm.rule['statistic'])
                 limit = alarm.rule['threshold']
-                LOG.debug(_('comparing value %(value)s against threshold'
-                            ' %(limit)s') %
-                          {'value': value, 'limit': limit})
+                LOG.debug('comparing value %(value)s against threshold'
+                          ' %(limit)s', {'value': value, 'limit': limit})
                 return op(value, limit)
 
             self._transition(alarm,

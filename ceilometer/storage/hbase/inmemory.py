@@ -21,7 +21,6 @@ from oslo_log import log
 import six
 
 import ceilometer
-from ceilometer.i18n import _
 
 LOG = log.getLogger(__name__)
 
@@ -265,7 +264,7 @@ class MConnection(object):
 
     @staticmethod
     def open():
-        LOG.debug(_("Opening in-memory HBase connection"))
+        LOG.debug("Opening in-memory HBase connection")
 
     def create_table(self, n, families=None):
         families = families or {}

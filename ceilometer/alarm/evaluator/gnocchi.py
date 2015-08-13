@@ -103,7 +103,7 @@ class GnocchiThresholdEvaluator(evaluator.Evaluator):
                 alarm.rule['resource_type'],
                 alarm.rule['resource_id'], alarm.rule['metric'])
 
-        LOG.debug(_('stats query %s') % req['url'])
+        LOG.debug('stats query %s', req['url'])
         try:
             r = getattr(requests, method)(**req)
         except Exception:
@@ -125,8 +125,8 @@ class GnocchiThresholdEvaluator(evaluator.Evaluator):
         window = (alarm.rule['granularity'] *
                   (alarm.rule['evaluation_periods'] + cls.look_back))
         start = now - datetime.timedelta(seconds=window)
-        LOG.debug(_('query stats from %(start)s to '
-                    '%(now)s') % {'start': start, 'now': now})
+        LOG.debug('query stats from %(start)s to '
+                  '%(now)s', {'start': start, 'now': now})
         return start.isoformat(), now.isoformat()
 
     def _sufficient(self, alarm, statistics):
@@ -211,8 +211,8 @@ class GnocchiThresholdEvaluator(evaluator.Evaluator):
 
     def evaluate(self, alarm):
         if not self.within_time_constraint(alarm):
-            LOG.debug(_('Attempted to evaluate alarm %s, but it is not '
-                        'within its time constraint.') % alarm.alarm_id)
+            LOG.debug('Attempted to evaluate alarm %s, but it is not '
+                      'within its time constraint.', alarm.alarm_id)
             return
 
         start, end = self._bound_duration(alarm)
@@ -223,9 +223,8 @@ class GnocchiThresholdEvaluator(evaluator.Evaluator):
             def _compare(value):
                 op = COMPARATORS[alarm.rule['comparison_operator']]
                 limit = alarm.rule['threshold']
-                LOG.debug(_('comparing value %(value)s against threshold'
-                            ' %(limit)s') %
-                          {'value': value, 'limit': limit})
+                LOG.debug('comparing value %(value)s against threshold'
+                          ' %(limit)s', {'value': value, 'limit': limit})
                 return op(value, limit)
 
             self._transition(alarm,

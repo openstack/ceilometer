@@ -22,7 +22,6 @@ from oslo_utils import timeutils
 import six.moves.urllib.parse as urlparse
 
 from ceilometer.agent import plugin_base
-from ceilometer.i18n import _
 from ceilometer import sample
 
 LOG = log.getLogger(__name__)
@@ -76,7 +75,7 @@ class _Base(plugin_base.PollsterBase):
                     endpoint_type=conf.os_endpoint_type)
                 _Base._ENDPOINT = urlparse.urljoin(rgw_url, '/admin')
             except exceptions.EndpointNotFound:
-                LOG.debug(_("Radosgw endpoint not found"))
+                LOG.debug("Radosgw endpoint not found")
         return _Base._ENDPOINT
 
     def _iter_accounts(self, ksclient, cache, tenants):

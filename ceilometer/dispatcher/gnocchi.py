@@ -77,8 +77,7 @@ class LegacyArchivePolicyDefinition(object):
     def __init__(self, definition_cfg):
         self.cfg = definition_cfg
         if self.cfg is None:
-            LOG.debug(_("No archive policy file found!"
-                      " Using default config."))
+            LOG.debug("No archive policy file found! Using default config.")
 
     def get(self, metric_name):
         if self.cfg is not None:
@@ -232,8 +231,7 @@ class GnocchiDispatcher(dispatcher.Base):
                     LOG.exception('fail to retreive user of Gnocchi service')
                     raise
                 self._gnocchi_project_id = project.id
-                LOG.debug("gnocchi project found: %s" %
-                          self.gnocchi_project_id)
+                LOG.debug("gnocchi project found: %s", self.gnocchi_project_id)
             return self._gnocchi_project_id
 
     def _is_swift_account_sample(self, sample):

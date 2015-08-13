@@ -438,10 +438,10 @@ class SampleSink(Sink):
             for transformer in self.transformers[start:]:
                 sample = transformer.handle_sample(ctxt, sample)
                 if not sample:
-                    LOG.debug(_(
+                    LOG.debug(
                         "Pipeline %(pipeline)s: Sample dropped by "
-                        "transformer %(trans)s") % ({'pipeline': self,
-                                                     'trans': transformer}))
+                        "transformer %(trans)s", {'pipeline': self,
+                                                  'trans': transformer})
                     return
             return sample
         except Exception as err:
@@ -469,11 +469,11 @@ class SampleSink(Sink):
             transformed_samples = samples
         else:
             for sample in samples:
-                LOG.debug(_(
+                LOG.debug(
                     "Pipeline %(pipeline)s: Transform sample "
-                    "%(smp)s from %(trans)s transformer") % ({'pipeline': self,
-                                                              'smp': sample,
-                                                              'trans': start}))
+                    "%(smp)s from %(trans)s transformer", {'pipeline': self,
+                                                           'smp': sample,
+                                                           'trans': start})
                 sample = self._transform_sample(start, ctxt, sample)
                 if sample:
                     transformed_samples.append(sample)
@@ -744,7 +744,7 @@ def _setup_pipeline_manager(cfg_file, transformer_manager, p_type=SAMPLE_TYPE):
     if not os.path.exists(cfg_file):
         cfg_file = cfg.CONF.find_file(cfg_file)
 
-    LOG.debug(_("Pipeline config file: %s"), cfg_file)
+    LOG.debug("Pipeline config file: %s", cfg_file)
 
     with open(cfg_file) as fap:
         data = fap.read()
@@ -763,7 +763,7 @@ def _setup_polling_manager(cfg_file):
     if not os.path.exists(cfg_file):
         cfg_file = cfg.CONF.find_file(cfg_file)
 
-    LOG.debug(_("Polling config file: %s"), cfg_file)
+    LOG.debug("Polling config file: %s", cfg_file)
 
     with open(cfg_file) as fap:
         data = fap.read()

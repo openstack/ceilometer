@@ -17,7 +17,7 @@ from oslo_log import log
 
 from ceilometer.event.storage import base
 from ceilometer.event.storage import models
-from ceilometer.i18n import _, _LE
+from ceilometer.i18n import _LE
 from ceilometer.storage.hbase import base as hbase_base
 from ceilometer.storage.hbase import utils as hbase_utils
 from ceilometer import utils
@@ -77,17 +77,17 @@ class Connection(hbase_base.Connection, base.Connection):
             hbase_utils.create_tables(conn, tables, column_families)
 
     def clear(self):
-        LOG.debug(_('Dropping HBase schema...'))
+        LOG.debug('Dropping HBase schema...')
         with self.conn_pool.connection() as conn:
             for table in [self.EVENT_TABLE]:
                 try:
                     conn.disable_table(table)
                 except Exception:
-                    LOG.debug(_('Cannot disable table but ignoring error'))
+                    LOG.debug('Cannot disable table but ignoring error')
                 try:
                     conn.delete_table(table)
                 except Exception:
-                    LOG.debug(_('Cannot delete table but ignoring error'))
+                    LOG.debug('Cannot delete table but ignoring error')
 
     def record_events(self, event_models):
         """Write the events to Hbase.

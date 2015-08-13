@@ -33,7 +33,6 @@ import pymongo
 import six
 
 import ceilometer
-from ceilometer.i18n import _
 from ceilometer import storage
 from ceilometer.storage import base
 from ceilometer.storage import models
@@ -312,8 +311,8 @@ class Connection(pymongo_base.Connection):
 
         Clearing occurs with native MongoDB time-to-live feature.
         """
-        LOG.debug(_("Clearing expired metering data is based on native "
-                    "MongoDB time to live feature and going in background."))
+        LOG.debug("Clearing expired metering data is based on native "
+                  "MongoDB time to live feature and going in background.")
 
     @staticmethod
     def _get_marker(db_collection, marker_pairs):

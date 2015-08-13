@@ -51,7 +51,7 @@ def retry_on_disconnect(function):
             if (e.get_error_code() == libvirt.VIR_ERR_SYSTEM_ERROR and
                 e.get_error_domain() in (libvirt.VIR_FROM_REMOTE,
                                          libvirt.VIR_FROM_RPC)):
-                LOG.debug(_('Connection to libvirt broken'))
+                LOG.debug('Connection to libvirt broken')
                 self.connection = None
                 return function(self, *args, **kwargs)
             else:
@@ -76,7 +76,7 @@ class LibvirtInspector(virt_inspector.Inspector):
             global libvirt
             if libvirt is None:
                 libvirt = __import__('libvirt')
-            LOG.debug(_('Connecting to libvirt: %s'), self.uri)
+            LOG.debug('Connecting to libvirt: %s', self.uri)
             self.connection = libvirt.openReadOnly(self.uri)
 
         return self.connection
