@@ -31,7 +31,7 @@ import yaml
 
 
 from ceilometer.event.storage import models
-from ceilometer.i18n import _
+from ceilometer.i18n import _, _LW
 from ceilometer import publisher
 from ceilometer.publisher import utils as publisher_utils
 from ceilometer import sample as sample_util
@@ -567,10 +567,40 @@ class SamplePipeline(Pipeline):
     def support_meter(self, meter_name):
         return self.source.support_meter(meter_name)
 
+    def _validate_volume(self, s):
+        volume = s.volume
+        if volume is None:
+            LOG.warning(_LW(
+                'metering data %(counter_name)s for %(resource_id)s '
+                '@ %(timestamp)s has no volume (volume: None), the sample will'
+                ' be dropped')
+                % {'counter_name': s.name,
+                   'resource_id': s.resource_id,
+                   'timestamp': s.timestamp if s.timestamp else 'NO TIMESTAMP'}
+            )
+            return False
+        if not isinstance(volume, (int, float)):
+            try:
+                volume = float(volume)
+            except ValueError:
+                LOG.warning(_LW(
+                    'metering data %(counter_name)s for %(resource_id)s '
+                    '@ %(timestamp)s has volume which is not a number '
+                    '(volume: %(counter_volume)s), the sample will be dropped')
+                    % {'counter_name': s.name,
+                       'resource_id': s.resource_id,
+                       'timestamp': (
+                           s.timestamp if s.timestamp else 'NO TIMESTAMP'),
+                       'counter_volume': volume}
+                )
+                return False
+        return True
+
     def publish_data(self, ctxt, samples):
         if not isinstance(samples, list):
             samples = [samples]
-        supported = [s for s in samples if self.source.support_meter(s.name)]
+        supported = [s for s in samples if self.source.support_meter(s.name)
+                     and self._validate_volume(s)]
         self.sink.publish_samples(ctxt, supported)
 
 
