@@ -66,7 +66,8 @@ def get_api_session():
     exception = api.Failure(_("Unable to log in to XenAPI "
                               "(is the Dom0 disk full?)"))
     try:
-        session = api.Session(url)
+        session = (api.xapi_local() if url == 'unix://local'
+                   else api.Session(url))
         with timeout.Timeout(CONF.xenapi.login_timeout, exception):
             session.login_with_password(username, password)
     except api.Failure as e:
