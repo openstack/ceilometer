@@ -19,6 +19,7 @@ from oslo_config import cfg
 OPTS = [
     cfg.IntOpt('port',
                default=8777,
+               min=1, max=65535,
                deprecated_name='metering_api_port',
                deprecated_group='DEFAULT',
                help='The port for the ceilometer API server.',

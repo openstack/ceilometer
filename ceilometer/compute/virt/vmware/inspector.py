@@ -34,6 +34,7 @@ OPTS = [
                help='IP address of the VMware vSphere host.'),
     cfg.IntOpt('host_port',
                default=443,
+               min=1, max=65535,
                help='Port of the VMware vSphere host.'),
     cfg.StrOpt('host_username',
                default='',
