@@ -35,4 +35,7 @@ EXCHANGE_OPTS = [
     cfg.StrOpt('swift_control_exchange',
                default='swift',
                help="Exchange name for Swift notifications."),
+    cfg.StrOpt('magnum_control_exchange',
+               default='magnum',
+               help="Exchange name for Magnum notifications."),
 ]

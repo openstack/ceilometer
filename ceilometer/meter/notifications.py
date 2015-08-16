@@ -181,6 +181,7 @@ class ProcessMeterNotifications(plugin_base.NotificationBase):
             conf.swift_control_exchange,
             conf.magnetodb_control_exchange,
             conf.ceilometer_control_exchange,
+            conf.magnum_control_exchange,
             ]
 
         for exchange in exchanges:
