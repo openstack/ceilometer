@@ -282,7 +282,7 @@ class Connection(base.Connection):
                     sa.cast(sa.null(), sa.String(255)))
                 .filter(sa.exists().where(
                     models.TraitDatetime.event_id == query.subquery().c.id))
-            ).union(
+            ).union_all(
                 session.query(
                     models.TraitInt.event_id,
                     models.TraitInt.key, sa.null(),
