@@ -76,7 +76,7 @@ metric:
     user_id: $.payload.user_id
     project_id: $.payload.project_id
     resource_id: $.payload.resource_id
-    multi: ['name', 'unit', 'volume']
+    lookup: ['name', 'unit', 'volume']
 
   # Swift
   - name: $.payload.measurements.[*].metric.[*].name
@@ -87,7 +87,7 @@ metric:
     resource_id: $.payload.target.id
     user_id: $.payload.initiator.id
     project_id: $.payload.initiator.project_id
-    multi: ['name', 'unit', 'volume']
+    lookup: ['name', 'unit', 'volume']
 
   - name: 'memory'
     event_type: 'compute.instance.*'
@@ -710,3 +710,12 @@ metric:
     resource_id: $.payload.target.id
     user_id: $.payload.initiator.id
     project_id: $.payload.initiator.project_id
+
+  - name: '$.payload.name'
+    event_type: 'profiler.*'
+    type: 'gauge'
+    unit: 'trace'
+    volume: 1
+    user_id: $.payload.user_id
+    project_id: $.payload.project_id
+    resource_id: '"profiler-" + $.payload.base_id'

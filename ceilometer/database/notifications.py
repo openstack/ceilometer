@@ -22,7 +22,7 @@ from ceilometer import sample
 
 SERVICE = 'trove'
 cfg.CONF.import_opt('trove_control_exchange',
-                    'ceilometer.profiler.notifications')
+                    'ceilometer.notification')
 
 
 class TroveMetricsNotificationBase(plugin_base.NotificationBase):
