@@ -45,10 +45,10 @@ class TelemetryBase(plugin_base.NotificationBase):
 class TelemetryApiPost(TelemetryBase):
     """Handle sample from notification bus, which is posted via API."""
 
-    event_types = ['telemetry.api']
+    event_types = ['telemetry.api', 'telemetry.polling']
 
     def process_notification(self, message):
-        samples = message['payload']
+        samples = message['payload']['samples']
         for sample_dict in samples:
             yield sample.Sample(
                 name=sample_dict['counter_name'],

@@ -29,9 +29,10 @@ from ceilometer.tests.functional.api import v2
 class TestPostSamples(v2.FunctionalTest,
                       tests_db.MixinTestsWithBackendScenarios):
     def fake_notifier_sample(self, ctxt, event_type, payload):
-        for m in payload:
+        samples = payload['samples']
+        for m in samples:
             del m['message_signature']
-        self.published.append(payload)
+        self.published.append(samples)
 
     def setUp(self):
         self.published = []

@@ -367,7 +367,8 @@ class MeterController(rest.RestController):
                                           tenant=def_project_id,
                                           is_admin=True)
             notifier = pecan.request.notifier
-            notifier.info(ctxt.to_dict(), 'telemetry.api', published_samples)
+            notifier.info(ctxt.to_dict(), 'telemetry.api',
+                          {'samples': published_samples})
 
         return samples
 

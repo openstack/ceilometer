@@ -21,34 +21,31 @@ NOTIFICATION = {
     'timestamp': u'2015-06-1909: 19: 35.786893',
     u'_context_auth_token': None,
     u'_context_read_only': False,
-    'payload': [{
-                u'counter_name': u'instance100',
-                u'user_id': u'e1d870e51c7340cb9d555b15cbfcaec2',
-                u'resource_id': u'instance',
-                u'timestamp': u'2015-06-19T09: 19: 35.785330',
-                u'message_signature': u'fake_signature1',
-                u'resource_metadata': {u'foo': u'bar'},
-                u'source': u'30be1fc9a03c4e94ab05c403a8a377f2: openstack',
-                u'counter_unit': u'instance',
-                u'counter_volume': 1.0,
-                u'project_id': u'30be1fc9a03c4e94ab05c403a8a377f2',
-                u'message_id': u'4d865c6e-1664-11e5-9d41-0819a6cff905',
-                u'counter_type': u'gauge'
-                },
-                {
-                u'counter_name': u'instance100',
-                u'user_id': u'e1d870e51c7340cb9d555b15cbfcaec2',
-                u'resource_id': u'instance',
-                u'timestamp': u'2015-06-19T09: 19: 35.785330',
-                u'message_signature': u'fake_signature12',
-                u'resource_metadata': {u'foo': u'bar'},
-                u'source': u'30be1fc9a03c4e94ab05c403a8a377f2: openstack',
-                u'counter_unit': u'instance',
-                u'counter_volume': 1.0,
-                u'project_id': u'30be1fc9a03c4e94ab05c403a8a377f2',
-                u'message_id': u'4d866da8-1664-11e5-9d41-0819a6cff905',
-                u'counter_type': u'gauge'
-                }],
+    'payload': {'samples':
+                [{'counter_name': u'instance100',
+                  u'user_id': u'e1d870e51c7340cb9d555b15cbfcaec2',
+                  u'resource_id': u'instance',
+                  u'timestamp': u'2015-06-19T09: 19: 35.785330',
+                  u'message_signature': u'fake_signature1',
+                  u'resource_metadata': {u'foo': u'bar'},
+                  u'source': u'30be1fc9a03c4e94ab05c403a8a377f2: openstack',
+                  u'counter_unit': u'instance',
+                  u'counter_volume': 1.0,
+                  u'project_id': u'30be1fc9a03c4e94ab05c403a8a377f2',
+                  u'message_id': u'4d865c6e-1664-11e5-9d41-0819a6cff905',
+                  u'counter_type': u'gauge'},
+                 {u'counter_name': u'instance100',
+                  u'user_id': u'e1d870e51c7340cb9d555b15cbfcaec2',
+                  u'resource_id': u'instance',
+                  u'timestamp': u'2015-06-19T09: 19: 35.785330',
+                  u'message_signature': u'fake_signature12',
+                  u'resource_metadata': {u'foo': u'bar'},
+                  u'source': u'30be1fc9a03c4e94ab05c403a8a377f2: openstack',
+                  u'counter_unit': u'instance',
+                  u'counter_volume': 1.0,
+                  u'project_id': u'30be1fc9a03c4e94ab05c403a8a377f2',
+                  u'message_id': u'4d866da8-1664-11e5-9d41-0819a6cff905',
+                  u'counter_type': u'gauge'}]},
     u'_context_resource_uuid': None,
     u'_context_user_identity': u'fake_user_identity---',
     u'_context_show_deleted': False,
@@ -69,7 +66,7 @@ class TelemetryApiPostTestCase(base.BaseTestCase):
         sample_creation = notifications.TelemetryApiPost(None)
         samples = list(sample_creation.process_notification(NOTIFICATION))
         self.assertEqual(2, len(samples))
-        payload = NOTIFICATION["payload"]
+        payload = NOTIFICATION["payload"]['samples']
         for index, sample in enumerate(samples):
             self.assertEqual(payload[index]["user_id"], sample.user_id)
             self.assertEqual(payload[index]["counter_name"], sample.name)
