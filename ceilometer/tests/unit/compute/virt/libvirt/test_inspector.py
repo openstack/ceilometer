@@ -341,3 +341,25 @@ class TestLibvirtInspectionWithError(base.BaseTestCase):
     def test_inspect_unknown_error(self):
         self.assertRaises(virt_inspector.InspectorException,
                           self.inspector.inspect_cpus, 'foo')
+
+
+class TestLibvirtInitWithError(base.BaseTestCase):
+
+    def setUp(self):
+        super(TestLibvirtInitWithError, self).setUp()
+        self.inspector = libvirt_inspector.LibvirtInspector()
+        libvirt_inspector.libvirt = mock.Mock()
+
+    @mock.patch('ceilometer.compute.virt.libvirt.inspector.'
+                'LibvirtInspector._get_connection',
+                mock.Mock(return_value=None))
+    def test_init_error(self):
+        self.assertRaises(virt_inspector.NoSanityException,
+                          self.inspector.check_sanity)
+
+    @mock.patch('ceilometer.compute.virt.libvirt.inspector.'
+                'LibvirtInspector._get_connection',
+                mock.Mock(side_effect=virt_inspector.NoDataException))
+    def test_init_exception(self):
+        self.assertRaises(virt_inspector.NoDataException,
+                          self.inspector.check_sanity)
