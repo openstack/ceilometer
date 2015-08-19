@@ -26,4 +26,4 @@ CONF = cfg.CONF
 def main():
     service.prepare_service()
     os_service.launch(CONF, collector.CollectorService(),
-                      workers=service.get_workers('collector')).wait()
+                      workers=CONF.collector.workers).wait()

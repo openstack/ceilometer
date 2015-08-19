@@ -45,7 +45,7 @@ class TestApp(base.BaseTestCase):
             self.CONF.set_override('debug', g_debug)
             if p_debug is not None:
                 self.CONF.set_override('pecan_debug', p_debug, group='api')
-            self.CONF.set_override('api_workers', workers)
+            self.CONF.set_override('workers', workers, group='api')
             app.setup_app()
             args, kwargs = mocked.call_args
             self.assertEqual(expected, kwargs.get('debug'))
