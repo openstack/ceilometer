@@ -313,15 +313,11 @@ class AgentManager(service_base.BaseService):
             polling_task = None
             for pollster in self.extensions:
                 if source.support_meter(pollster.name):
+                    polling_task = polling_tasks.get(source.get_interval())
                     if not polling_task:
                         polling_task = self.create_polling_task()
+                        polling_tasks[source.get_interval()] = polling_task
                     polling_task.add(pollster, source)
-            if polling_task:
-                polling_tasks[source.name] = {
-                    'task': polling_task,
-                    'interval': source.get_interval()
-                }
-
         return polling_tasks
 
     def construct_group_id(self, discovery_group_id):
@@ -339,15 +335,13 @@ class AgentManager(service_base.BaseService):
 
         pollster_timers = []
         data = self.setup_polling_tasks()
-        for name, polling_task in data.items():
-            interval = polling_task['interval']
-            task = polling_task['task']
+        for interval, polling_task in data.items():
             delay_time = (interval + delay_polling_time if delay_start
                           else delay_polling_time)
             pollster_timers.append(self.tg.add_timer(interval,
                                    self.interval_task,
                                    initial_delay=delay_time,
-                                   task=task))
+                                   task=polling_task))
         self.tg.add_timer(cfg.CONF.coordination.heartbeat,
                           self.partition_coordinator.heartbeat)
 
