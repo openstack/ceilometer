@@ -73,7 +73,7 @@ guideline for PaaS service developers:
                 "event": "events describe some kind of state change in the service",
                 "quantity": "quantity describes a usage metric value"
             },
-            "Compliance": "required",
+            "Compliance": "optional",
             "Notes": ""
         },
         {
