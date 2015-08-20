@@ -81,6 +81,10 @@ class LibvirtInspector(virt_inspector.Inspector):
 
         return self.connection
 
+    def check_sanity(self):
+        if not self._get_connection():
+            raise virt_inspector.NoSanityException()
+
     @retry_on_disconnect
     def _lookup_by_uuid(self, instance):
         instance_name = util.instance_name(instance)

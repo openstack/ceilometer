@@ -39,6 +39,9 @@ class PollingException(Exception):
     pass
 
 
+@mock.patch('ceilometer.compute.pollsters.'
+            'BaseComputePollster.setup_environment',
+            mock.Mock(return_value=None))
 class TestManager(base.BaseTestCase):
 
     @mock.patch('ceilometer.pipeline.setup_polling', mock.MagicMock())
@@ -181,6 +184,9 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
             resource_metadata=agentbase.default_test_data.resource_metadata)
 
     @staticmethod
+    @mock.patch('ceilometer.compute.pollsters.'
+                'BaseComputePollster.setup_environment',
+                mock.Mock(return_value=None))
     def create_manager():
         return manager.AgentManager()
 

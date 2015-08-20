@@ -24,6 +24,11 @@ from ceilometer.compute.virt import inspector as virt_inspector
 @six.add_metaclass(abc.ABCMeta)
 class BaseComputePollster(plugin_base.PollsterBase):
 
+    def setup_environment(self):
+        super(BaseComputePollster, self).setup_environment()
+        # propagate exception from check_sanity
+        self.inspector.check_sanity()
+
     @property
     def inspector(self):
         try:
