@@ -50,6 +50,7 @@ html: check-dependencies
 .PHONY: check-dependencies
 check-dependencies:
 	@python -c 'import sphinxcontrib.autohttp.flask' >/dev/null 2>&1 || (echo "ERROR: Missing Sphinx dependencies. Run: pip install sphinxcontrib-httpdomain" && exit 1)
+	@ld -ltidy >/dev/null 2>&1 || (echo "Error: Missing libtidy dependencies. Pls. install libtidy with system package manager" && exit 1)
 
 wadl:
 	$(SPHINXBUILD) -b docbook $(ALLSPHINXOPTS) $(BUILDDIR)/wadl
