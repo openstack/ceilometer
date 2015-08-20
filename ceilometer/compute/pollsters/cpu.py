@@ -34,7 +34,7 @@ class CPUPollster(pollsters.BaseComputePollster):
             try:
                 cpu_info = self.inspector.inspect_cpus(instance)
                 LOG.debug("CPUTIME USAGE: %(instance)s %(time)d",
-                          {'instance': instance.__dict__,
+                          {'instance': instance,
                            'time': cpu_info.time})
                 cpu_num = {'cpu_number': cpu_info.number}
                 yield util.make_sample_from_instance(
@@ -67,7 +67,7 @@ class CPUUtilPollster(pollsters.BaseComputePollster):
                 cpu_info = self.inspector.inspect_cpu_util(
                     instance, self._inspection_duration)
                 LOG.debug("CPU UTIL: %(instance)s %(util)d",
-                          {'instance': instance.__dict__,
+                          {'instance': instance,
                            'util': cpu_info.util})
                 yield util.make_sample_from_instance(
                     instance,

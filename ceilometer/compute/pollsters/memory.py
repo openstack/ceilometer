@@ -35,7 +35,7 @@ class MemoryUsagePollster(pollsters.BaseComputePollster):
                 memory_info = self.inspector.inspect_memory_usage(
                     instance, self._inspection_duration)
                 LOG.debug("MEMORY USAGE: %(instance)s %(usage)f",
-                          {'instance': instance.__dict__,
+                          {'instance': instance,
                            'usage': memory_info.usage})
                 yield util.make_sample_from_instance(
                     instance,
@@ -78,7 +78,7 @@ class MemoryResidentPollster(pollsters.BaseComputePollster):
                 memory_info = self.inspector.inspect_memory_resident(
                     instance, self._inspection_duration)
                 LOG.debug("RESIDENT MEMORY: %(instance)s %(resident)f",
-                          {'instance': instance.__dict__,
+                          {'instance': instance,
                            'resident': memory_info.resident})
                 yield util.make_sample_from_instance(
                     instance,
