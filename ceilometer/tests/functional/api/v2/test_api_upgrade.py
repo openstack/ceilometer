@@ -29,7 +29,7 @@ class TestAPIUpgradePath(v2.FunctionalTest):
         self.CONF.set_override('gnocchi_is_enabled', None, group='api')
         self.CONF.set_override('aodh_is_enabled', None, group='api')
         self.CONF.set_override('aodh_url', None, group='api')
-        self.CONF.set_override('dispatcher', ['database'])
+        self.CONF.set_override('meter_dispatchers', ['database'])
         self.ks = mock.Mock()
         self.ks.service_catalog.url_for.side_effect = self._url_for
         self.useFixture(mockpatch.Patch(
@@ -44,7 +44,7 @@ class TestAPIUpgradePath(v2.FunctionalTest):
         raise exceptions.EndpointNotFound()
 
     def _do_test_gnocchi_enabled_without_database_backend(self):
-        self.CONF.set_override('dispatcher', 'gnocchi')
+        self.CONF.set_override('meter_dispatchers', 'gnocchi')
         for endpoint in ['meters', 'samples', 'resources']:
             response = self.app.get(self.PATH_PREFIX + '/' + endpoint,
                                     status=410)

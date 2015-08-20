@@ -51,7 +51,7 @@ API_OPTS = [
 ]
 
 cfg.CONF.register_opts(API_OPTS, group='api')
-cfg.CONF.import_opt('dispatcher', 'ceilometer.dispatcher')
+cfg.CONF.import_opt('meter_dispatchers', 'ceilometer.dispatcher')
 
 LOG = log.getLogger(__name__)
 
@@ -109,8 +109,8 @@ class V2Controller(object):
             if cfg.CONF.api.gnocchi_is_enabled is not None:
                 self._gnocchi_is_enabled = cfg.CONF.api.gnocchi_is_enabled
 
-            elif ("gnocchi" not in cfg.CONF.dispatcher
-                  or "database" in cfg.CONF.dispatcher):
+            elif ("gnocchi" not in cfg.CONF.meter_dispatchers
+                  or "database" in cfg.CONF.meter_dispatchers):
                 self._gnocchi_is_enabled = False
             else:
                 try:

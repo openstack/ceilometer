@@ -171,7 +171,23 @@ class ResourcesDefinition(object):
         return metrics
 
 
-class GnocchiDispatcher(dispatcher.Base):
+class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
+    """Dispatcher class for recording metering data into database.
+
+    The dispatcher class records each meter into the gnocchi service
+    configured in ceilometer configuration file. An example configuration may
+    look like the following:
+
+    [dispatcher_gnocchi]
+    url = http://localhost:8041
+    archive_policy = low
+
+    To enable this dispatcher, the following section needs to be present in
+    ceilometer.conf file
+
+    [DEFAULT]
+    meter_dispatchers = gnocchi
+    """
     def __init__(self, conf):
         super(GnocchiDispatcher, self).__init__(conf)
         self.conf = conf
@@ -347,7 +363,3 @@ class GnocchiDispatcher(dispatcher.Base):
                 # NOTE(sileht): Just ignore the metric have been
                 # created in the meantime.
                 pass
-
-    @staticmethod
-    def record_events(events):
-        pass

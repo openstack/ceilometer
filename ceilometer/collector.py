@@ -72,7 +72,8 @@ class CollectorService(os_service.Service):
     def start(self):
         """Bind the UDP socket and handle incoming data."""
         # ensure dispatcher is configured before starting other services
-        self.dispatcher_manager = dispatcher.load_dispatcher_manager()
+        dispatcher_managers = dispatcher.load_dispatcher_manager()
+        (self.meter_manager, self.event_manager) = dispatcher_managers
         self.rpc_server = None
         self.sample_listener = None
         self.event_listener = None
@@ -89,27 +90,28 @@ class CollectorService(os_service.Service):
                 self.rpc_server = messaging.get_rpc_server(
                     transport, cfg.CONF.publisher_rpc.metering_topic, self)
 
-            sample_target = oslo_messaging.Target(
-                topic=cfg.CONF.publisher_notifier.metering_topic)
-            self.sample_listener = messaging.get_notification_listener(
-                transport, [sample_target],
-                [SampleEndpoint(self.dispatcher_manager)],
-                allow_requeue=(cfg.CONF.collector.
-                               requeue_sample_on_dispatcher_error))
+            if list(self.meter_manager):
+                sample_target = oslo_messaging.Target(
+                    topic=cfg.CONF.publisher_notifier.metering_topic)
+                self.sample_listener = messaging.get_notification_listener(
+                    transport, [sample_target],
+                    [SampleEndpoint(self.meter_manager)],
+                    allow_requeue=(cfg.CONF.collector.
+                                   requeue_sample_on_dispatcher_error))
+                self.sample_listener.start()
 
-            if cfg.CONF.notification.store_events:
+            if cfg.CONF.notification.store_events and list(self.event_manager):
                 event_target = oslo_messaging.Target(
                     topic=cfg.CONF.publisher_notifier.event_topic)
                 self.event_listener = messaging.get_notification_listener(
                     transport, [event_target],
-                    [EventEndpoint(self.dispatcher_manager)],
+                    [EventEndpoint(self.event_manager)],
                     allow_requeue=(cfg.CONF.collector.
                                    requeue_event_on_dispatcher_error))
                 self.event_listener.start()
 
             if cfg.CONF.collector.enable_rpc:
                 self.rpc_server.start()
-            self.sample_listener.start()
 
             if not cfg.CONF.collector.udp_address:
                 # Add a dummy thread to have wait() working
@@ -136,8 +138,8 @@ class CollectorService(os_service.Service):
             else:
                 try:
                     LOG.debug("UDP: Storing %s", sample)
-                    self.dispatcher_manager.map_method('record_metering_data',
-                                                       sample)
+                    self.meter_manager.map_method('record_metering_data',
+                                                  sample)
                 except Exception:
                     LOG.exception(_("UDP: Unable to store meter"))
 
@@ -157,7 +159,7 @@ class CollectorService(os_service.Service):
         When the notification messages are re-published through the
         RPC publisher, this method receives them for processing.
         """
-        self.dispatcher_manager.map_method('record_metering_data', data=data)
+        self.meter_manager.map_method('record_metering_data', data=data)
 
 
 class CollectorEndpoint(object):
