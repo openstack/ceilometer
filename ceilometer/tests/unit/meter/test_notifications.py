@@ -349,13 +349,13 @@ class TestMeterProcessing(test.BaseTestCase):
         event = copy.deepcopy(MIDDLEWARE_EVENT)
         del event['payload']['measurements'][1]
         cfg = yaml.dump(
-            {'metric': [dict(name="payload.measurements.[*].metric.[*].name",
+            {'metric': [dict(name="$.payload.measurements.[*].metric.[*].name",
                         event_type="objectstore.http.request",
                         type="delta",
-                        unit="payload.measurements.[*].metric.[*].unit",
-                        volume="payload.measurements.[*].result",
-                        resource_id="payload.target_id",
-                        project_id="payload.initiator.project_id",
+                        unit="$.payload.measurements.[*].metric.[*].unit",
+                        volume="$.payload.measurements.[*].result",
+                        resource_id="$.payload.target_id",
+                        project_id="$.payload.initiator.project_id",
                         multi="name")]})
         self.handler.definitions = notifications.load_definitions(
             self.__setup_meter_def_file(cfg))
@@ -368,15 +368,15 @@ class TestMeterProcessing(test.BaseTestCase):
         event = copy.deepcopy(MIDDLEWARE_EVENT)
         del event['payload']['measurements'][1]
         cfg = yaml.dump(
-            {'metric': [dict(name="payload.measurements.[*].metric.[*].name",
+            {'metric': [dict(name="$.payload.measurements.[*].metric.[*].name",
                         event_type="objectstore.http.request",
                         type="delta",
-                        unit="payload.measurements.[*].metric.[*].unit",
-                        volume="payload.measurements.[*].result",
-                        resource_id="payload.target_id",
-                        project_id="payload.initiator.project_id",
+                        unit="$.payload.measurements.[*].metric.[*].unit",
+                        volume="$.payload.measurements.[*].result",
+                        resource_id="$.payload.target_id",
+                        project_id="$.payload.initiator.project_id",
                         multi="name",
-                        timestamp='payload.eventTime')]})
+                        timestamp='$.payload.eventTime')]})
         self.handler.definitions = notifications.load_definitions(
             self.__setup_meter_def_file(cfg))
         c = list(self.handler.process_notification(event))
@@ -384,6 +384,45 @@ class TestMeterProcessing(test.BaseTestCase):
         s1 = c[0].as_dict()
         self.assertEqual(MIDDLEWARE_EVENT['payload']['eventTime'],
                          s1['timestamp'])
+
+    def test_default_metadata(self):
+        cfg = yaml.dump(
+            {'metric': [dict(name="test1",
+                        event_type="test.*",
+                        type="delta",
+                        unit="B",
+                        volume="$.payload.volume",
+                        resource_id="$.payload.resource_id",
+                        project_id="$.payload.project_id")]})
+        self.handler.definitions = notifications.load_definitions(
+            self.__setup_meter_def_file(cfg))
+        c = list(self.handler.process_notification(NOTIFICATION))
+        self.assertEqual(1, len(c))
+        s1 = c[0].as_dict()
+        meta = NOTIFICATION['payload'].copy()
+        meta['host'] = NOTIFICATION['publisher_id']
+        meta['event_type'] = NOTIFICATION['event_type']
+        self.assertEqual(meta, s1['resource_metadata'])
+
+    def test_custom_metadata(self):
+        cfg = yaml.dump(
+            {'metric': [dict(name="test1",
+                        event_type="test.*",
+                        type="delta",
+                        unit="B",
+                        volume="$.payload.volume",
+                        resource_id="$.payload.resource_id",
+                        project_id="$.payload.project_id",
+                        metadata={'proj': '$.payload.project_id',
+                                  'dict': '$.payload.resource_metadata'})]})
+        self.handler.definitions = notifications.load_definitions(
+            self.__setup_meter_def_file(cfg))
+        c = list(self.handler.process_notification(NOTIFICATION))
+        self.assertEqual(1, len(c))
+        s1 = c[0].as_dict()
+        meta = {'proj': s1['project_id'],
+                'dict': NOTIFICATION['payload']['resource_metadata']}
+        self.assertEqual(meta, s1['resource_metadata'])
 
     def test_multi_match_event_meter(self):
         cfg = yaml.dump(
