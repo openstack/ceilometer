@@ -285,6 +285,46 @@ class TestMeterProcessing(test.BaseTestCase):
         c = list(self.handler.process_notification(NOTIFICATION))
         self.assertEqual(1, len(c))
 
+    def test_default_timestamp(self):
+        event = copy.deepcopy(MIDDLEWARE_EVENT)
+        del event['payload']['measurements'][1]
+        cfg = yaml.dump(
+            {'metric': [dict(name="payload.measurements.[*].metric.[*].name",
+                        event_type="objectstore.http.request",
+                        type="delta",
+                        unit="payload.measurements.[*].metric.[*].unit",
+                        volume="payload.measurements.[*].result",
+                        resource_id="payload.target_id",
+                        project_id="payload.initiator.project_id",
+                        multi="name")]})
+        self.handler.definitions = notifications.load_definitions(
+            self.__setup_meter_def_file(cfg))
+        c = list(self.handler.process_notification(event))
+        self.assertEqual(1, len(c))
+        s1 = c[0].as_dict()
+        self.assertEqual(MIDDLEWARE_EVENT['timestamp'], s1['timestamp'])
+
+    def test_custom_timestamp(self):
+        event = copy.deepcopy(MIDDLEWARE_EVENT)
+        del event['payload']['measurements'][1]
+        cfg = yaml.dump(
+            {'metric': [dict(name="payload.measurements.[*].metric.[*].name",
+                        event_type="objectstore.http.request",
+                        type="delta",
+                        unit="payload.measurements.[*].metric.[*].unit",
+                        volume="payload.measurements.[*].result",
+                        resource_id="payload.target_id",
+                        project_id="payload.initiator.project_id",
+                        multi="name",
+                        timestamp='payload.eventTime')]})
+        self.handler.definitions = notifications.load_definitions(
+            self.__setup_meter_def_file(cfg))
+        c = list(self.handler.process_notification(event))
+        self.assertEqual(1, len(c))
+        s1 = c[0].as_dict()
+        self.assertEqual(MIDDLEWARE_EVENT['payload']['eventTime'],
+                         s1['timestamp'])
+
     def test_multi_match_event_meter(self):
         cfg = yaml.dump(
             {'metric': [dict(name="test1",
