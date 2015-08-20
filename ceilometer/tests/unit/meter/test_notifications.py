@@ -19,6 +19,7 @@ import yaml
 
 from oslo_config import fixture as fixture_config
 from oslo_utils import fileutils
+from oslotest import mockpatch
 
 from ceilometer.meter import notifications
 from ceilometer import service as ceilometer_service
@@ -158,6 +159,8 @@ class TestMeterProcessing(test.BaseTestCase):
         self.handler = notifications.ProcessMeterNotifications(mock.Mock())
 
     def test_fallback_meter_path(self):
+        self.useFixture(mockpatch.PatchObject(self.CONF,
+                        'find_file', return_value=None))
         fall_bak_path = notifications.get_config_file()
         self.assertIn("meter/data/meters.yaml", fall_bak_path)
 
