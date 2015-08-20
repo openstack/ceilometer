@@ -132,11 +132,9 @@ class PollingTask(object):
         """Polling sample and notify."""
         cache = {}
         discovery_cache = {}
+        poll_history = {}
         for source_name in self.pollster_matches:
             for pollster in self.pollster_matches[source_name]:
-                LOG.info(_("Polling pollster %(poll)s in the context of "
-                           "%(src)s"),
-                         dict(poll=pollster.name, src=source_name))
                 key = Resources.key(source_name, pollster)
                 candidate_res = list(
                     self.resources[key].get(discovery_cache))
@@ -147,36 +145,27 @@ class PollingTask(object):
                 # Remove duplicated resources and black resources. Using
                 # set() requires well defined __hash__ for each resource.
                 # Since __eq__ is defined, 'not in' is safe here.
-                seen = []
-                duplicated = []
                 polling_resources = []
                 black_res = self.resources[key].blacklist
+                history = poll_history.get(pollster.name, [])
                 for x in candidate_res:
-                    if x not in seen:
-                        seen.append(x)
+                    if x not in history:
+                        history.append(x)
                         if x not in black_res:
                             polling_resources.append(x)
-                    else:
-                        duplicated.append(x)
-
-                # Warn duplicated resources for the 1st time
-                if self.resources[key].last_dup != duplicated:
-                    self.resources[key].last_dup = duplicated
-                    LOG.warning(_(
-                        'Found following duplicated resoures for '
-                        '%(name)s in context of %(source)s:%(list)s. '
-                        'Check pipeline configuration.')
-                        % ({'name': pollster.name,
-                            'source': source_name,
-                            'list': duplicated
-                            }))
+                poll_history[pollster.name] = history
 
                 # If no resources, skip for this pollster
                 if not polling_resources:
-                    LOG.info(_("Skip polling pollster %s, no resources"
-                               " found"), pollster.name)
+                    p_context = 'new ' if history else ''
+                    LOG.info(_("Skip pollster %(name)s, no %(p_context)s"
+                               "resources found this cycle"),
+                             {'name': pollster.name, 'p_context': p_context})
                     continue
 
+                LOG.info(_("Polling pollster %(poll)s in the context of "
+                           "%(src)s"),
+                         dict(poll=pollster.name, src=source_name))
                 try:
                     samples = pollster.obj.get_samples(
                         manager=self.manager,
