@@ -173,15 +173,14 @@ class TestMeterDefinition(test.BaseTestCase):
 
     def test_config_missing_fields(self):
         cfg = dict(name="test", type="delta")
-        handler = notifications.MeterDefinition(cfg)
         try:
-            handler.match_type("test.create")
+            notifications.MeterDefinition(cfg)
         except notifications.MeterDefinitionException as e:
             self.assertEqual("Required field event_type not specified",
                              e.message)
 
     def test_bad_type_cfg_definition(self):
-        cfg = dict(name="test", type="foo")
+        cfg = dict(name="test", type="foo", event_type="bar.create")
         try:
             notifications.MeterDefinition(cfg)
         except notifications.MeterDefinitionException as e:
