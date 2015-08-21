@@ -36,3 +36,33 @@ class TestSample(base.BaseTestCase):
                     'resource_id: 1ca738a1-c49c-4401-8346-5c60ebdb03f4, '
                     'timestamp: 2014-10-29 14:12:15.485877>')
         self.assertEqual(expected, str(self.SAMPLE))
+
+    def test_sample_from_notifications_list(self):
+        msg = {
+            'event_type': u'sample.create',
+            'timestamp': u'2015-06-1909: 19: 35.786893',
+            'payload': [{u'counter_name': u'instance100'}],
+            'priority': 'info',
+            'publisher_id': u'ceilometer.api',
+            'message_id': u'939823de-c242-45a2-a399-083f4d6a8c3e'
+        }
+        s = sample.Sample.from_notification(
+            'sample', 'type', 1.0, '%', 'user', 'project', 'res', msg)
+        expected = {'event_type': msg['event_type'],
+                    'host': msg['publisher_id']}
+        self.assertEqual(expected, s.resource_metadata)
+
+    def test_sample_from_notifications_dict(self):
+        msg = {
+            'event_type': u'sample.create',
+            'timestamp': u'2015-06-1909: 19: 35.786893',
+            'payload': {u'counter_name': u'instance100'},
+            'priority': 'info',
+            'publisher_id': u'ceilometer.api',
+            'message_id': u'939823de-c242-45a2-a399-083f4d6a8c3e'
+        }
+        s = sample.Sample.from_notification(
+            'sample', 'type', 1.0, '%', 'user', 'project', 'res', msg)
+        msg['payload']['event_type'] = msg['event_type']
+        msg['payload']['host'] = msg['publisher_id']
+        self.assertEqual(msg['payload'], s.resource_metadata)

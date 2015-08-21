@@ -83,7 +83,8 @@ class Sample(object):
     def from_notification(cls, name, type, volume, unit,
                           user_id, project_id, resource_id,
                           message, source=None):
-        metadata = copy.copy(message['payload'])
+        metadata = (copy.copy(message['payload'])
+                    if isinstance(message['payload'], dict) else {})
         metadata['event_type'] = message['event_type']
         metadata['host'] = message['publisher_id']
         return cls(name=name,
