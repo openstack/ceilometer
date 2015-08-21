@@ -67,6 +67,17 @@ metric:
     project_id: payload.tenant_id
     resource_id: payload.snapshot_id
 
+  # Magnum
+  - name: payload.metrics.[*].name
+    event_type: 'magnum.bay.metrics.*'
+    type: 'gauge'
+    unit: payload.metrics.[*].unit
+    volume: payload.metrics.[*].value
+    user_id: payload.user_id
+    project_id: payload.project_id
+    resource_id: payload.resource_id
+    multi: ['name', 'unit', 'volume']
+
   # Swift
   - name: payload.measurements.[*].metric.[*].name
     event_type: 'objectstore.http.request'
