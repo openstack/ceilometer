@@ -21,8 +21,10 @@ import sys
 from oslo_config import cfg
 import oslo_i18n
 from oslo_log import log
+from oslo_reports import guru_meditation_report as gmr
 
 from ceilometer import messaging
+from ceilometer import version
 
 
 OPTS = [
@@ -118,6 +120,12 @@ def prepare_service(argv=None):
     log.set_defaults(default_log_levels=log_levels)
     if argv is None:
         argv = sys.argv
-    cfg.CONF(argv[1:], project='ceilometer', validate_default_values=True)
+    cfg.CONF(argv[1:], project='ceilometer', validate_default_values=True,
+             version=version.version_info.version_string())
     log.setup(cfg.CONF, 'ceilometer')
+    # NOTE(liusheng): guru cannot run with service under apache daemon, so when
+    # ceilometer-api running with mod_wsgi, the argv is [], we don't start
+    # guru.
+    if argv:
+        gmr.TextGuruMeditation.setup_autorun(version)
     messaging.setup()
