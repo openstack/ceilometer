@@ -96,6 +96,9 @@ tests:
       redirects: true
       method: GET
       status: 200
+      poll:
+          count: 5
+          delay: 1
       response_json_paths:
           $.stack.stack_status: "CREATE_COMPLETE"
 
@@ -104,7 +107,7 @@ tests:
       url: $ENVIRON['NOVA_SERVICE_URL']/servers/detail
       method: GET
       poll:
-          count: 1200
+          count: 600
           delay: 1
       response_json_paths:
           $.servers[0].metadata.'metering.server_group': $RESPONSE['$.stack.id']
@@ -118,6 +121,9 @@ tests:
       desc: Check the gnocchi resources for this three servers exists
       url: $ENVIRON['GNOCCHI_SERVICE_URL']/v1/resource/instance
       method: GET
+      poll:
+          count: 30
+          delay: 1
       response_strings:
           - '"id": "$RESPONSE["$.servers[0].id"]"'
           - '"id": "$RESPONSE["$.servers[1].id"]"'
