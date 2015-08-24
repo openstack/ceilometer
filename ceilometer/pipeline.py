@@ -125,12 +125,19 @@ class _PipelineTransportManager(object):
     def __init__(self):
         self.transporters = []
 
+    @staticmethod
+    def hash_grouping(datapoint, grouping_keys):
+        value = ''
+        for key in grouping_keys or []:
+            value += datapoint.get(key) if datapoint.get(key) else ''
+        return hash(value)
+
     def add_transporter(self, transporter):
         self.transporters.append(transporter)
 
     def publisher(self, context):
         serializer = self.serializer
-        hash_to_bucketise = self.hash_to_bucketise
+        hash_grouping = self.hash_grouping
         transporters = self.transporters
         filter_attr = self.filter_attr
         event_type = self.event_type
@@ -144,10 +151,11 @@ class _PipelineTransportManager(object):
                     data = [data] if not isinstance(data, list) else data
                     for datapoint in data:
                         serialized_data = serializer(datapoint)
-                        for d_filter, notifiers in transporters:
+                        for d_filter, grouping_keys, notifiers in transporters:
                             if d_filter(serialized_data[filter_attr]):
-                                key = (hash_to_bucketise(serialized_data) %
-                                       len(notifiers))
+                                key = (hash_grouping(serialized_data,
+                                                     grouping_keys)
+                                       % len(notifiers))
                                 notifier = notifiers[key]
                                 notifier.sample(context.to_dict(),
                                                 event_type=event_type,
@@ -165,10 +173,6 @@ class SamplePipelineTransportManager(_PipelineTransportManager):
     event_type = 'ceilometer.pipeline'
 
     @staticmethod
-    def hash_to_bucketise(datapoint):
-        return hash(datapoint['resource_id'])
-
-    @staticmethod
     def serializer(data):
         return publisher_utils.meter_message_from_counter(
             data, cfg.CONF.publisher.telemetry_secret)
@@ -177,10 +181,6 @@ class SamplePipelineTransportManager(_PipelineTransportManager):
 class EventPipelineTransportManager(_PipelineTransportManager):
     filter_attr = 'event_type'
     event_type = 'pipeline.event'
-
-    @staticmethod
-    def hash_to_bucketise(datapoint):
-        return hash(datapoint['event_type'])
 
     @staticmethod
     def serializer(data):
@@ -853,3 +853,10 @@ def setup_polling():
     """Setup polling manager according to yaml config file."""
     cfg_file = cfg.CONF.pipeline_cfg_file
     return _setup_polling_manager(cfg_file)
+
+
+def get_pipeline_grouping_key(pipe):
+    keys = []
+    for transformer in pipe.sink.transformers:
+        keys += transformer.grouping_keys
+    return list(set(keys))

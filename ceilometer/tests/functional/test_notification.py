@@ -425,10 +425,50 @@ class TestRealNotificationHA(BaseRealNotification):
                          mock_notifier.call_args_list[2][1]['event_type'])
         self.srv.stop()
 
-    @mock.patch('ceilometer.publisher.test.TestPublisher')
-    def test_multiple_agents(self, fake_publisher_cls):
-        fake_publisher_cls.return_value = self.publisher
 
+class TestRealNotificationMultipleAgents(tests_base.BaseTestCase):
+    def setup_pipeline(self, transformers):
+        pipeline = yaml.dump({
+            'sources': [{
+                'name': 'test_pipeline',
+                'interval': 5,
+                'meters': ['instance', 'memory'],
+                'sinks': ['test_sink']
+            }],
+            'sinks': [{
+                'name': 'test_sink',
+                'transformers': transformers,
+                'publishers': ['test://']
+            }]
+        })
+        if six.PY3:
+            pipeline = pipeline.encode('utf-8')
+
+        pipeline_cfg_file = fileutils.write_to_tempfile(content=pipeline,
+                                                        prefix="pipeline",
+                                                        suffix="yaml")
+        return pipeline_cfg_file
+
+    def setUp(self):
+        super(TestRealNotificationMultipleAgents, self).setUp()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
+        service.prepare_service([])
+        self.setup_messaging(self.CONF, 'nova')
+
+        pipeline_cfg_file = self.setup_pipeline(['instance', 'memory'])
+        self.CONF.set_override("pipeline_cfg_file", pipeline_cfg_file)
+        self.CONF.set_override("store_events", False, group="notification")
+        self.CONF.set_override("disable_non_metric_meters", False,
+                               group="notification")
+        self.CONF.set_override('workload_partitioning', True,
+                               group='notification')
+        self.publisher = test_publisher.TestPublisher("")
+        self.publisher2 = test_publisher.TestPublisher("")
+
+    def _check_notifications(self, fake_publisher_cls):
+        fake_publisher_cls.side_effect = [self.publisher, self.publisher2]
+
+        self.srv = notification.NotificationService()
         self.srv2 = notification.NotificationService()
         with mock.patch('ceilometer.coordination.PartitionCoordinator'
                         '._get_members', return_value=['harry', 'lloyd']):
@@ -448,17 +488,63 @@ class TestRealNotificationHA(BaseRealNotification):
         notifier.info(context.RequestContext(), 'compute.instance.create.end',
                       payload2)
         self.expected_samples = 4
-        self.expected_events = 2
         start = timeutils.utcnow()
-        while timeutils.delta_seconds(start, timeutils.utcnow()) < 60:
-            if (len(self.publisher.samples) >= self.expected_samples and
-                    len(self.publisher.events) >= self.expected_events):
-                break
-            eventlet.sleep(0)
-        self.srv.stop()
-        self.srv2.stop()
+        with mock.patch('six.moves.builtins.hash', lambda x: int(x)):
+            while timeutils.delta_seconds(start, timeutils.utcnow()) < 60:
+                if (len(self.publisher.samples + self.publisher2.samples) >=
+                        self.expected_samples):
+                    break
+                eventlet.sleep(0)
+            self.srv.stop()
+            self.srv2.stop()
 
-        resources = set(s.resource_id for s in self.publisher.samples)
-        self.assertEqual(self.expected_samples, len(self.publisher.samples))
-        self.assertEqual(self.expected_events, len(self.publisher.events))
-        self.assertEqual(set(['1', '0']), resources)
+        self.assertEqual(2, len(self.publisher.samples))
+        self.assertEqual(2, len(self.publisher2.samples))
+        self.assertEqual(1, len(set(
+            s.resource_id for s in self.publisher.samples)))
+        self.assertEqual(1, len(set(
+            s.resource_id for s in self.publisher2.samples)))
+
+    @mock.patch('ceilometer.publisher.test.TestPublisher')
+    def test_multiple_agents_no_transform(self, fake_publisher_cls):
+        pipeline_cfg_file = self.setup_pipeline([])
+        self.CONF.set_override("pipeline_cfg_file", pipeline_cfg_file)
+        self._check_notifications(fake_publisher_cls)
+
+    @mock.patch('ceilometer.publisher.test.TestPublisher')
+    def test_multiple_agents_transform(self, fake_publisher_cls):
+        pipeline_cfg_file = self.setup_pipeline(
+            [{
+                'name': 'unit_conversion',
+                'parameters': {
+                    'source': {},
+                    'target': {'name': 'cpu_mins',
+                               'unit': 'min',
+                               'scale': 'volume'},
+                }
+            }])
+        self.CONF.set_override("pipeline_cfg_file", pipeline_cfg_file)
+        self._check_notifications(fake_publisher_cls)
+
+    @mock.patch('ceilometer.publisher.test.TestPublisher')
+    def test_multiple_agents_multiple_transform(self, fake_publisher_cls):
+        pipeline_cfg_file = self.setup_pipeline(
+            [{
+                'name': 'unit_conversion',
+                'parameters': {
+                    'source': {},
+                    'target': {'name': 'cpu_mins',
+                               'unit': 'min',
+                               'scale': 'volume'},
+                }
+            }, {
+                'name': 'unit_conversion',
+                'parameters': {
+                    'source': {},
+                    'target': {'name': 'cpu_mins',
+                               'unit': 'min',
+                               'scale': 'volume'},
+                }
+            }])
+        self.CONF.set_override("pipeline_cfg_file", pipeline_cfg_file)
+        self._check_notifications(fake_publisher_cls)

@@ -22,6 +22,8 @@ class TransformerAccumulator(transformer.TransformerBase):
     And then flushes them out into the wild.
     """
 
+    grouping_keys = ['resource_id']
+
     def __init__(self, size=1, **kwargs):
         if size >= 1:
             self.samples = []
