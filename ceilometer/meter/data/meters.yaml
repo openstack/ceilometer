@@ -9,35 +9,35 @@ metric:
       - "image.update"
     type: "gauge"
     unit: B
-    volume: payload.size
-    resource_id: payload.id
-    project_id: payload.owner
+    volume: $.payload.size
+    resource_id: $.payload.id
+    project_id: $.payload.owner
 
   - name: "image.download"
     event_type: "image.send"
     type: "delta"
     unit: "B"
-    volume: payload.bytes_sent
-    resource_id: payload.image_id
-    user_id: payload.receiver_user_id
-    project_id: payload.receiver_tenant_id
+    volume: $.payload.bytes_sent
+    resource_id: $.payload.image_id
+    user_id: $.payload.receiver_user_id
+    project_id: $.payload.receiver_tenant_id
 
   - name: "image.serve"
     event_type: "image.send"
     type: "delta"
     unit: "B"
-    volume: payload.bytes_sent
-    resource_id: payload.image_id
-    project_id: payload.owner_id
+    volume: $.payload.bytes_sent
+    resource_id: $.payload.image_id
+    project_id: $.payload.owner_id
 
   # MagnetoDB
   - name: 'magnetodb.table.index.count'
     type: 'gauge'
     unit: 'index'
     event_type: 'magnetodb.table.create.end'
-    volume: payload.index_count
-    resource_id: payload.table_uuid
-    user_id: _context_user
+    volume: $.payload.index_count
+    resource_id: $.payload.table_uuid
+    user_id: $._context_user
 
   - name: 'volume.size'
     event_type:
@@ -50,10 +50,10 @@ metric:
       - 'volume.update.*'
     type: 'gauge'
     unit: 'GB'
-    volume: payload.size
-    user_id: payload.user_id
-    project_id: payload.tenant_id
-    resource_id: payload.volume_id
+    volume: $.payload.size
+    user_id: $.payload.user_id
+    project_id: $.payload.tenant_id
+    resource_id: $.payload.volume_id
 
   - name: 'snapshot.size'
     event_type:
@@ -62,145 +62,145 @@ metric:
       - 'snapshot.delete.*'
     type: 'gauge'
     unit: 'GB'
-    volume: payload.volume_size
-    user_id: payload.user_id
-    project_id: payload.tenant_id
-    resource_id: payload.snapshot_id
+    volume: $.payload.volume_size
+    user_id: $.payload.user_id
+    project_id: $.payload.tenant_id
+    resource_id: $.payload.snapshot_id
 
   # Magnum
-  - name: payload.metrics.[*].name
+  - name: $.payload.metrics.[*].name
     event_type: 'magnum.bay.metrics.*'
     type: 'gauge'
-    unit: payload.metrics.[*].unit
-    volume: payload.metrics.[*].value
-    user_id: payload.user_id
-    project_id: payload.project_id
-    resource_id: payload.resource_id
+    unit: $.payload.metrics.[*].unit
+    volume: $.payload.metrics.[*].value
+    user_id: $.payload.user_id
+    project_id: $.payload.project_id
+    resource_id: $.payload.resource_id
     multi: ['name', 'unit', 'volume']
 
   # Swift
-  - name: payload.measurements.[*].metric.[*].name
+  - name: $.payload.measurements.[*].metric.[*].name
     event_type: 'objectstore.http.request'
     type: 'delta'
-    unit: payload.measurements.[*].metric.[*].unit
-    volume: payload.measurements.[*].result
-    resource_id: payload.target.id
-    user_id: payload.initiator.id
-    project_id: payload.initiator.project_id
+    unit: $.payload.measurements.[*].metric.[*].unit
+    volume: $.payload.measurements.[*].result
+    resource_id: $.payload.target.id
+    user_id: $.payload.initiator.id
+    project_id: $.payload.initiator.project_id
     multi: ['name', 'unit', 'volume']
 
   - name: 'memory'
     event_type: 'compute.instance.*'
     type: 'gauge'
     unit: 'MB'
-    volume: payload.memory_mb
-    user_id: payload.user_id
-    project_id: payload.tenant_id
-    resource_id: payload.instance_id
+    volume: $.payload.memory_mb
+    user_id: $.payload.user_id
+    project_id: $.payload.tenant_id
+    resource_id: $.payload.instance_id
 
   - name: 'vcpus'
     event_type: 'compute.instance.*'
     type: 'gauge'
     unit: 'vcpu'
-    volume: payload.vcpus
-    user_id: payload.user_id
-    project_id: payload.tenant_id
-    resource_id: payload.instance_id
+    volume: $.payload.vcpus
+    user_id: $.payload.user_id
+    project_id: $.payload.tenant_id
+    resource_id: $.payload.instance_id
 
   - name: 'disk.root.size'
     event_type: 'compute.instance.*'
     type: 'gauge'
     unit: 'GB'
-    volume: payload.root_gb
-    user_id: payload.user_id
-    project_id: payload.tenant_id
-    resource_id: payload.instance_id
+    volume: $.payload.root_gb
+    user_id: $.payload.user_id
+    project_id: $.payload.tenant_id
+    resource_id: $.payload.instance_id
 
   - name: 'disk.ephemeral.size'
     event_type: 'compute.instance.*'
     type: 'gauge'
     unit: 'GB'
-    volume: payload.ephemeral_gb
-    user_id: payload.user_id
-    project_id: payload.tenant_id
-    resource_id: payload.instance_id
+    volume: $.payload.ephemeral_gb
+    user_id: $.payload.user_id
+    project_id: $.payload.tenant_id
+    resource_id: $.payload.instance_id
 
   - name: 'bandwidth'
     event_type: 'l3.meter'
     type: 'delta'
     unit: 'B'
-    volume: payload.bytes
-    project_id: payload.tenant_id
-    resource_id: payload.label_id
+    volume: $.payload.bytes
+    project_id: $.payload.tenant_id
+    resource_id: $.payload.label_id
 
   - name: 'compute.node.cpu.frequency'
     event_type: 'compute.metrics.update'
     type: 'gauge'
     unit: 'MHz'
-    volume: payload.metrics[?(@.name='cpu.frequency')].value
+    volume: $.payload.metrics[?(@.name='cpu.frequency')].value
     resource_id: $.payload.host + "_" + $.payload.nodename
 
   - name: 'compute.node.cpu.user.time'
     event_type: 'compute.metrics.update'
     type: 'cumulative'
     unit: 'ns'
-    volume: payload.metrics[?(@.name='cpu.user.time')].value
+    volume: $.payload.metrics[?(@.name='cpu.user.time')].value
     resource_id: $.payload.host + "_" + $.payload.nodename
 
   - name: 'compute.node.cpu.kernel.time'
     event_type: 'compute.metrics.update'
     type: 'cumulative'
     unit: 'ns'
-    volume: payload.metrics[?(@.name='cpu.kernel.time')].value
+    volume: $.payload.metrics[?(@.name='cpu.kernel.time')].value
     resource_id: $.payload.host + "_" + $.payload.nodename
 
   - name: 'compute.node.cpu.idle.time'
     event_type: 'compute.metrics.update'
     type: 'cumulative'
     unit: 'ns'
-    volume: payload.metrics[?(@.name='cpu.idle.time')].value
+    volume: $.payload.metrics[?(@.name='cpu.idle.time')].value
     resource_id: $.payload.host + "_" + $.payload.nodename
 
   - name: 'compute.node.cpu.iowait.time'
     event_type: 'compute.metrics.update'
     type: 'cumulative'
     unit: 'ns'
-    volume: payload.metrics[?(@.name='cpu.iowait.time')].value
+    volume: $.payload.metrics[?(@.name='cpu.iowait.time')].value
     resource_id: $.payload.host + "_" + $.payload.nodename
 
   - name: 'compute.node.cpu.kernel.percent'
     event_type: 'compute.metrics.update'
     type: 'gauge'
     unit: 'percent'
-    volume: payload.metrics[?(@.name='cpu.kernel.percent')].value * 100
+    volume: $.payload.metrics[?(@.name='cpu.kernel.percent')].value * 100
     resource_id: $.payload.host + "_" + $.payload.nodename
 
   - name: 'compute.node.cpu.idle.percent'
     event_type: 'compute.metrics.update'
     type: 'gauge'
     unit: 'percent'
-    volume: payload.metrics[?(@.name='cpu.idle.percent')].value * 100
+    volume: $.payload.metrics[?(@.name='cpu.idle.percent')].value * 100
     resource_id: $.payload.host + "_" + $.payload.nodename
 
   - name: 'compute.node.cpu.user.percent'
     event_type: 'compute.metrics.update'
     type: 'gauge'
     unit: 'percent'
-    volume: payload.metrics[?(@.name='cpu.user.percent')].value * 100
+    volume: $.payload.metrics[?(@.name='cpu.user.percent')].value * 100
     resource_id: $.payload.host + "_" + $.payload.nodename
 
   - name: 'compute.node.cpu.iowait.percent'
     event_type: 'compute.metrics.update'
     type: 'gauge'
     unit: 'percent'
-    volume: payload.metrics[?(@.name='cpu.iowait.percent')].value * 100
+    volume: $.payload.metrics[?(@.name='cpu.iowait.percent')].value * 100
     resource_id: $.payload.host + "_" + $.payload.nodename
 
   - name: 'compute.node.cpu.percent'
     event_type: 'compute.metrics.update'
     type: 'gauge'
     unit: 'percent'
-    volume: payload.metrics[?(@.name='cpu.percent')].value * 100
+    volume: $.payload.metrics[?(@.name='cpu.percent')].value * 100
     resource_id: $.payload.host + "_" + $.payload.nodename
 
 
@@ -216,8 +216,8 @@ metric:
     type: "gauge"
     unit: 'image'
     volume: 1
-    resource_id: payload.id
-    project_id: payload.owner
+    resource_id: $.payload.id
+    project_id: $.payload.owner
 
   # Orchestration
   - name: 'stack.create'
@@ -227,8 +227,8 @@ metric:
     unit: 'stack'
     volume: 1
     user_id: _context_trustor_user_id
-    project_id: payload.tenant_id
-    resource_id: payload.stack_identity
+    project_id: $.payload.tenant_id
+    resource_id: $.payload.stack_identity
 
   - name: 'stack.update'
     event_type:
@@ -237,8 +237,8 @@ metric:
     unit: 'stack'
     volume: 1
     user_id: _context_trustor_user_id
-    project_id: payload.tenant_id
-    resource_id: payload.stack_identity
+    project_id: $.payload.tenant_id
+    resource_id: $.payload.stack_identity
 
   - name: 'stack.delete'
     event_type:
@@ -247,8 +247,8 @@ metric:
     unit: 'stack'
     volume: 1
     user_id: _context_trustor_user_id
-    project_id: payload.tenant_id
-    resource_id: payload.stack_identity
+    project_id: $.payload.tenant_id
+    resource_id: $.payload.stack_identity
 
   - name: 'stack.resume'
     event_type:
@@ -257,8 +257,8 @@ metric:
     unit: 'stack'
     volume: 1
     user_id: _context_trustor_user_id
-    project_id: payload.tenant_id
-    resource_id: payload.stack_identity
+    project_id: $.payload.tenant_id
+    resource_id: $.payload.stack_identity
 
   - name: 'stack.suspend'
     event_type:
@@ -267,8 +267,8 @@ metric:
     unit: 'stack'
     volume: 1
     user_id: _context_trustor_user_id
-    project_id: payload.tenant_id
-    resource_id: payload.stack_identity
+    project_id: $.payload.tenant_id
+    resource_id: $.payload.stack_identity
 
   # MagnetoDB
   - name: 'magnetodb.table.create'
@@ -276,7 +276,7 @@ metric:
     unit: 'table'
     volume: 1
     event_type: 'magnetodb.table.create.end'
-    resource_id: payload.table_uuid
+    resource_id: $.payload.table_uuid
     user_id: _context_user
     project_id: _context_tenant
 
@@ -285,7 +285,7 @@ metric:
     unit: 'table'
     volume: 1
     event_type: 'magnetodb.table.delete.end'
-    resource_id: payload.table_uuid
+    resource_id: $.payload.table_uuid
     user_id: _context_user
     project_id: _context_tenant
 
@@ -302,9 +302,9 @@ metric:
       - 'volume.attach.*'
       - 'volume.detach.*'
       - 'volume.update.*'
-    resource_id: payload.volume_id
-    user_id: payload.user_id
-    project_id: payload.tenant_id
+    resource_id: $.payload.volume_id
+    user_id: $.payload.user_id
+    project_id: $.payload.tenant_id
 
   - name: 'volume.exists'
     type: 'delta'
@@ -312,9 +312,9 @@ metric:
     volume: 1
     event_type:
       - 'volume.exists'
-    resource_id: payload.volume_id
-    user_id: payload.user_id
-    project_id: payload.tenant_id
+    resource_id: $.payload.volume_id
+    user_id: $.payload.user_id
+    project_id: $.payload.tenant_id
 
   - name: 'volume.create.start'
     type: 'delta'
@@ -322,9 +322,9 @@ metric:
     volume: 1
     event_type:
       - 'volume.create.start'
-    resource_id: payload.volume_id
-    user_id: payload.user_id
-    project_id: payload.tenant_id
+    resource_id: $.payload.volume_id
+    user_id: $.payload.user_id
+    project_id: $.payload.tenant_id
 
   - name: 'volume.create.end'
     type: 'delta'
@@ -332,9 +332,9 @@ metric:
     volume: 1
     event_type:
       - 'volume.create.end'
-    resource_id: payload.volume_id
-    user_id: payload.user_id
-    project_id: payload.tenant_id
+    resource_id: $.payload.volume_id
+    user_id: $.payload.user_id
+    project_id: $.payload.tenant_id
 
   - name: 'volume.delete.start'
     type: 'delta'
@@ -342,9 +342,9 @@ metric:
     volume: 1
     event_type:
       - 'volume.delete.start'
-    resource_id: payload.volume_id
-    user_id: payload.user_id
-    project_id: payload.tenant_id
+    resource_id: $.payload.volume_id
+    user_id: $.payload.user_id
+    project_id: $.payload.tenant_id
 
   - name: 'volume.delete.end'
     type: 'delta'
@@ -352,9 +352,9 @@ metric:
     volume: 1
     event_type:
       - 'volume.delete.end'
-    resource_id: payload.volume_id
-    user_id: payload.user_id
-    project_id: payload.tenant_id
+    resource_id: $.payload.volume_id
+    user_id: $.payload.user_id
+    project_id: $.payload.tenant_id
 
   - name: 'volume.update.end'
     type: 'delta'
@@ -362,9 +362,9 @@ metric:
     volume: 1
     event_type:
       - 'volume.update.end'
-    resource_id: payload.volume_id
-    user_id: payload.user_id
-    project_id: payload.tenant_id
+    resource_id: $.payload.volume_id
+    user_id: $.payload.user_id
+    project_id: $.payload.tenant_id
 
   - name: 'volume.update.start'
     type: 'delta'
@@ -372,9 +372,9 @@ metric:
     volume: 1
     event_type:
       - 'volume.update.start'
-    resource_id: payload.volume_id
-    user_id: payload.user_id
-    project_id: payload.tenant_id
+    resource_id: $.payload.volume_id
+    user_id: $.payload.user_id
+    project_id: $.payload.tenant_id
 
   - name: 'volume.resize.end'
     type: 'delta'
@@ -382,9 +382,9 @@ metric:
     volume: 1
     event_type:
       - 'volume.resize.end'
-    resource_id: payload.volume_id
-    user_id: payload.user_id
-    project_id: payload.tenant_id
+    resource_id: $.payload.volume_id
+    user_id: $.payload.user_id
+    project_id: $.payload.tenant_id
 
   - name: 'volume.resize.start'
     type: 'delta'
@@ -392,9 +392,9 @@ metric:
     volume: 1
     event_type:
       - 'volume.resize.start'
-    resource_id: payload.volume_id
-    user_id: payload.user_id
-    project_id: payload.tenant_id
+    resource_id: $.payload.volume_id
+    user_id: $.payload.user_id
+    project_id: $.payload.tenant_id
 
 
   - name: 'volume.attach.end'
@@ -403,9 +403,9 @@ metric:
     volume: 1
     event_type:
       - 'volume.attach.end'
-    resource_id: payload.volume_id
-    user_id: payload.user_id
-    project_id: payload.tenant_id
+    resource_id: $.payload.volume_id
+    user_id: $.payload.user_id
+    project_id: $.payload.tenant_id
 
   - name: 'volume.attach.start'
     type: 'delta'
@@ -413,9 +413,9 @@ metric:
     volume: 1
     event_type:
       - 'volume.attach.start'
-    resource_id: payload.volume_id
-    user_id: payload.user_id
-    project_id: payload.tenant_id
+    resource_id: $.payload.volume_id
+    user_id: $.payload.user_id
+    project_id: $.payload.tenant_id
 
   - name: 'volume.detach.end'
     type: 'delta'
@@ -423,9 +423,9 @@ metric:
     volume: 1
     event_type:
       - 'volume.detach.end'
-    resource_id: payload.volume_id
-    user_id: payload.user_id
-    project_id: payload.tenant_id
+    resource_id: $.payload.volume_id
+    user_id: $.payload.user_id
+    project_id: $.payload.tenant_id
 
   - name: 'volume.detach.start'
     type: 'delta'
@@ -433,9 +433,9 @@ metric:
     volume: 1
     event_type:
       - 'volume.detach.start'
-    resource_id: payload.volume_id
-    user_id: payload.user_id
-    project_id: payload.tenant_id
+    resource_id: $.payload.volume_id
+    user_id: $.payload.user_id
+    project_id: $.payload.tenant_id
 
   # Volume Snapshot
   - name: 'snapshot'
@@ -447,9 +447,9 @@ metric:
       - 'snapshot.create.*'
       - 'snapshot.delete.*'
 
-    resource_id: payload.snapshot_id
-    user_id: payload.user_id
-    project_id: payload.tenant_id
+    resource_id: $.payload.snapshot_id
+    user_id: $.payload.user_id
+    project_id: $.payload.tenant_id
 
   - name: 'snapshot.exists'
     type: 'delta'
@@ -457,9 +457,9 @@ metric:
     volume: 1
     event_type:
       - 'snapshot.exists'
-    resource_id: payload.snapshot_id
-    user_id: payload.user_id
-    project_id: payload.tenant_id
+    resource_id: $.payload.snapshot_id
+    user_id: $.payload.user_id
+    project_id: $.payload.tenant_id
 
   - name: 'snapshot.create.start'
     type: 'delta'
@@ -467,9 +467,9 @@ metric:
     volume: 1
     event_type:
       - 'snapshot.create.start'
-    resource_id: payload.snapshot_id
-    user_id: payload.user_id
-    project_id: payload.tenant_id
+    resource_id: $.payload.snapshot_id
+    user_id: $.payload.user_id
+    project_id: $.payload.tenant_id
 
   - name: 'snapshot.create.end'
     type: 'delta'
@@ -477,9 +477,9 @@ metric:
     volume: 1
     event_type:
       - 'snapshot.create.end'
-    resource_id: payload.snapshot_id
-    user_id: payload.user_id
-    project_id: payload.tenant_id
+    resource_id: $.payload.snapshot_id
+    user_id: $.payload.user_id
+    project_id: $.payload.tenant_id
 
   - name: 'snapshot.delete.start'
     type: 'delta'
@@ -487,9 +487,9 @@ metric:
     volume: 1
     event_type:
       - 'snapshot.delete.start'
-    resource_id: payload.snapshot_id
-    user_id: payload.user_id
-    project_id: payload.tenant_id
+    resource_id: $.payload.snapshot_id
+    user_id: $.payload.user_id
+    project_id: $.payload.tenant_id
 
   - name: 'snapshot.delete.end'
     type: 'delta'
@@ -497,9 +497,9 @@ metric:
     volume: 1
     event_type:
       - 'snapshot.delete.end'
-    resource_id: payload.snapshot_id
-    user_id: payload.user_id
-    project_id: payload.tenant_id
+    resource_id: $.payload.snapshot_id
+    user_id: $.payload.user_id
+    project_id: $.payload.tenant_id
 
   # Sahara
   - name: 'cluster.create'
@@ -508,8 +508,8 @@ metric:
     volume: 1
     event_type:
       - 'sahara.cluster.create'
-    resource_id: payload.cluster_id
-    project_id: payload.project_id
+    resource_id: $.payload.cluster_id
+    project_id: $.payload.project_id
 
   - name: 'cluster.update'
     type: 'delta'
@@ -517,8 +517,8 @@ metric:
     volume: 1
     event_type:
       - 'sahara.cluster.update'
-    resource_id: payload.cluster_id
-    project_id: payload.project_id
+    resource_id: $.payload.cluster_id
+    project_id: $.payload.project_id
 
   - name: 'cluster.delete'
     type: 'delta'
@@ -526,8 +526,8 @@ metric:
     volume: 1
     event_type:
       - 'sahara.cluster.delete'
-    resource_id: payload.cluster_id
-    project_id: payload.project_id
+    resource_id: $.payload.cluster_id
+    project_id: $.payload.project_id
 
   # Identity
   - name: 'identity.user.created'
@@ -536,8 +536,8 @@ metric:
     volume: 1
     event_type:
       - 'identity.user.created'
-    resource_id: payload.resource_info
-    user_id: payload.initiator.id
+    resource_id: $.payload.resource_info
+    user_id: $.payload.initiator.id
 
   - name: 'identity.user.updated'
     type: 'delta'
@@ -545,8 +545,8 @@ metric:
     volume: 1
     event_type:
       - 'identity.user.updated'
-    resource_id: payload.resource_info
-    user_id: payload.initiator.id
+    resource_id: $.payload.resource_info
+    user_id: $.payload.initiator.id
 
   - name: 'identity.user.deleted'
     type: 'delta'
@@ -554,8 +554,8 @@ metric:
     volume: 1
     event_type:
       - 'identity.user.deleted'
-    resource_id: payload.resource_info
-    user_id: payload.initiator.id
+    resource_id: $.payload.resource_info
+    user_id: $.payload.initiator.id
 
   - name: 'identity.group.created'
     type: 'delta'
@@ -563,8 +563,8 @@ metric:
     volume: 1
     event_type:
       - 'identity.group.created'
-    resource_id: payload.resource_info
-    user_id: payload.initiator.id
+    resource_id: $.payload.resource_info
+    user_id: $.payload.initiator.id
 
   - name: 'identity.group.updated'
     type: 'delta'
@@ -572,8 +572,8 @@ metric:
     volume: 1
     event_type:
       - 'identity.group.updated'
-    resource_id: payload.resource_info
-    user_id: payload.initiator.id
+    resource_id: $.payload.resource_info
+    user_id: $.payload.initiator.id
 
   - name: 'identity.group.deleted'
     type: 'delta'
@@ -581,8 +581,8 @@ metric:
     volume: 1
     event_type:
       - 'identity.group.deleted'
-    resource_id: payload.resource_info
-    user_id: payload.initiator.id
+    resource_id: $.payload.resource_info
+    user_id: $.payload.initiator.id
 
   - name: 'identity.project.created'
     type: 'delta'
@@ -590,8 +590,8 @@ metric:
     volume: 1
     event_type:
       - 'identity.project.created'
-    resource_id: payload.resource_info
-    user_id: payload.initiator.id
+    resource_id: $.payload.resource_info
+    user_id: $.payload.initiator.id
 
   - name: 'identity.project.updated'
     type: 'delta'
@@ -599,8 +599,8 @@ metric:
     volume: 1
     event_type:
       - 'identity.project.updated'
-    resource_id: payload.resource_info
-    user_id: payload.initiator.id
+    resource_id: $.payload.resource_info
+    user_id: $.payload.initiator.id
 
   - name: 'identity.project.deleted'
     type: 'delta'
@@ -608,8 +608,8 @@ metric:
     volume: 1
     event_type:
       - 'identity.project.deleted'
-    resource_id: payload.resource_info
-    user_id: payload.initiator.id
+    resource_id: $.payload.resource_info
+    user_id: $.payload.initiator.id
 
   - name: 'identity.role.created'
     type: 'delta'
@@ -617,8 +617,8 @@ metric:
     volume: 1
     event_type:
       - 'identity.role.created'
-    resource_id: payload.resource_info
-    user_id: payload.initiator.id
+    resource_id: $.payload.resource_info
+    user_id: $.payload.initiator.id
 
   - name: 'identity.role.updated'
     type: 'delta'
@@ -626,8 +626,8 @@ metric:
     volume: 1
     event_type:
       - 'identity.role.updated'
-    resource_id: payload.resource_info
-    user_id: payload.initiator.id
+    resource_id: $.payload.resource_info
+    user_id: $.payload.initiator.id
 
   - name: 'identity.role.deleted'
     type: 'delta'
@@ -635,8 +635,8 @@ metric:
     volume: 1
     event_type:
       - 'identity.role.deleted'
-    resource_id: payload.resource_info
-    user_id: payload.initiator.id
+    resource_id: $.payload.resource_info
+    user_id: $.payload.initiator.id
 
   - name: 'identity.role_assignment.created'
     type: 'delta'
@@ -644,8 +644,8 @@ metric:
     volume: 1
     event_type:
       - 'identity.role_assignment.created'
-    resource_id: payload.role
-    user_id: payload.initiator.id
+    resource_id: $.payload.role
+    user_id: $.payload.initiator.id
 
   - name: 'identity.role_assignment.deleted'
     type: 'delta'
@@ -653,8 +653,8 @@ metric:
     volume: 1
     event_type:
       - 'identity.role_assignment.deleted'
-    resource_id: payload.role
-    user_id: payload.initiator.id
+    resource_id: $.payload.role
+    user_id: $.payload.initiator.id
 
   - name: 'identity.authenticate.success'
     type: 'delta'
@@ -662,8 +662,8 @@ metric:
     volume: 1
     event_type:
       - 'identity.authenticate'
-    resource_id: payload.initiator.id
-    user_id: payload.initiator.id
+    resource_id: $.payload.initiator.id
+    user_id: $.payload.initiator.id
 
   - name: 'identity.authenticate.pending'
     type: 'delta'
@@ -671,8 +671,8 @@ metric:
     volume: 1
     event_type:
       - 'identity.authenticate'
-    resource_id: payload.initiator.id
-    user_id: payload.initiator.id
+    resource_id: $.payload.initiator.id
+    user_id: $.payload.initiator.id
 
   - name: 'identity.authenticate.failure'
     type: 'delta'
@@ -680,8 +680,8 @@ metric:
     volume: 1
     event_type:
       - 'identity.authenticate'
-    resource_id: payload.initiator.id
-    user_id: payload.initiator.id
+    resource_id: $.payload.initiator.id
+    user_id: $.payload.initiator.id
 
   - name: 'identity.trust.created'
     type: 'delta'
@@ -689,8 +689,8 @@ metric:
     volume: 1
     event_type:
       - 'identity.trust.created'
-    resource_id: payload.resource_info
-    user_id: payload.initiator.id
+    resource_id: $.payload.resource_info
+    user_id: $.payload.initiator.id
 
   - name: 'identity.trust.deleted'
     type: 'delta'
@@ -698,8 +698,8 @@ metric:
     volume: 1
     event_type:
       - 'identity.trust.deleted'
-    resource_id: payload.resource_info
-    user_id: payload.initiator.id
+    resource_id: $.payload.resource_info
+    user_id: $.payload.initiator.id
 
   - name: 'storage.api.request'
     type: 'delta'
@@ -707,6 +707,6 @@ metric:
     volume: 1
     event_type:
       - 'objectstore.http.request'
-    resource_id: payload.target.id
-    user_id: payload.initiator.id
-    project_id: payload.initiator.project_id
+    resource_id: $.payload.target.id
+    user_id: $.payload.initiator.id
+    project_id: $.payload.initiator.project_id

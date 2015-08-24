@@ -220,9 +220,9 @@ class TestMeterDefinition(test.BaseTestCase):
                    event_type="test.create",
                    type="delta",
                    unit="B",
-                   volume="payload.volume",
-                   resource_id="payload.resource_id",
-                   project_id="payload.project_id")
+                   volume="$.payload.volume",
+                   resource_id="$.payload.resource_id",
+                   project_id="$.payload.project_id")
         handler = notifications.MeterDefinition(cfg)
         self.assertTrue(handler.match_type("test.create"))
         self.assertEqual(1, handler.parse_fields("volume", NOTIFICATION))
@@ -279,9 +279,9 @@ class TestMeterProcessing(test.BaseTestCase):
                         event_type="test.create",
                         type="delta",
                              unit="B",
-                             volume="payload.volume",
-                             resource_id="payload.resource_id",
-                             project_id="payload.project_id")]})
+                             volume="$.payload.volume",
+                             resource_id="$.payload.resource_id",
+                             project_id="$.payload.project_id")]})
         self.handler.definitions = notifications.load_definitions(
             self.__setup_meter_def_file(cfg))
         c = list(self.handler.process_notification(NOTIFICATION))
@@ -298,16 +298,16 @@ class TestMeterProcessing(test.BaseTestCase):
                         event_type="test.create",
                         type="delta",
                              unit="B",
-                             volume="payload.volume",
-                             resource_id="payload.resource_id",
-                             project_id="payload.project_id"),
+                             volume="$.payload.volume",
+                             resource_id="$.payload.resource_id",
+                             project_id="$.payload.project_id"),
                         dict(name="test2",
                              event_type="test.create",
                              type="delta",
                              unit="B",
-                             volume="payload.volume",
-                             resource_id="payload.resource_id",
-                             project_id="payload.project_id")]})
+                             volume="$.payload.volume",
+                             resource_id="$.payload.resource_id",
+                             project_id="$.payload.project_id")]})
         self.handler.definitions = notifications.load_definitions(
             self.__setup_meter_def_file(cfg))
         c = list(self.handler.process_notification(NOTIFICATION))
@@ -323,9 +323,9 @@ class TestMeterProcessing(test.BaseTestCase):
                         event_type="test.update",
                         type="delta",
                         unit="B",
-                        volume="payload.volume",
-                        resource_id="payload.resource_id",
-                        project_id="payload.project_id")]})
+                        volume="$.payload.volume",
+                        resource_id="$.payload.resource_id",
+                        project_id="$.payload.project_id")]})
         self.handler.definitions = notifications.load_definitions(
             self.__setup_meter_def_file(cfg))
         c = list(self.handler.process_notification(NOTIFICATION))
@@ -337,9 +337,9 @@ class TestMeterProcessing(test.BaseTestCase):
                         event_type="test.*",
                         type="delta",
                         unit="B",
-                        volume="payload.volume",
-                        resource_id="payload.resource_id",
-                        project_id="payload.project_id")]})
+                        volume="$.payload.volume",
+                        resource_id="$.payload.resource_id",
+                        project_id="$.payload.project_id")]})
         self.handler.definitions = notifications.load_definitions(
             self.__setup_meter_def_file(cfg))
         c = list(self.handler.process_notification(NOTIFICATION))
@@ -351,16 +351,16 @@ class TestMeterProcessing(test.BaseTestCase):
                         event_type="test.create",
                         type="delta",
                              unit="B",
-                             volume="payload.volume",
-                             resource_id="payload.resource_id",
-                             project_id="payload.project_id"),
+                             volume="$.payload.volume",
+                             resource_id="$.payload.resource_id",
+                             project_id="$.payload.project_id"),
                         dict(name="test2",
                              event_type="test.create",
                              type="delta",
                              unit="B",
-                             volume="payload.volume",
-                             resource_id="payload.resource_id",
-                             project_id="payload.project_id")]})
+                             volume="$.payload.volume",
+                             resource_id="$.payload.resource_id",
+                             project_id="$.payload.project_id")]})
         self.handler.definitions = notifications.load_definitions(
             self.__setup_meter_def_file(cfg))
         c = list(self.handler.process_notification(NOTIFICATION))
@@ -368,13 +368,13 @@ class TestMeterProcessing(test.BaseTestCase):
 
     def test_multi_meter_payload(self):
         cfg = yaml.dump(
-            {'metric': [dict(name="payload.measurements.[*].metric.[*].name",
+            {'metric': [dict(name="$.payload.measurements.[*].metric.[*].name",
                         event_type="objectstore.http.request",
                         type="delta",
-                        unit="payload.measurements.[*].metric.[*].unit",
-                        volume="payload.measurements.[*].result",
-                        resource_id="payload.target_id",
-                        project_id="payload.initiator.project_id",
+                        unit="$.payload.measurements.[*].metric.[*].unit",
+                        volume="$.payload.measurements.[*].result",
+                        resource_id="$.payload.target_id",
+                        project_id="$.payload.initiator.project_id",
                         multi=["name", "volume", "unit"])]})
         self.handler.definitions = notifications.load_definitions(
             self.__setup_meter_def_file(cfg))
@@ -393,13 +393,13 @@ class TestMeterProcessing(test.BaseTestCase):
         event = copy.deepcopy(MIDDLEWARE_EVENT)
         del event['payload']['measurements'][1]
         cfg = yaml.dump(
-            {'metric': [dict(name="payload.measurements.[*].metric.[*].name",
+            {'metric': [dict(name="$.payload.measurements.[*].metric.[*].name",
                         event_type="objectstore.http.request",
                         type="delta",
-                        unit="payload.measurements.[*].metric.[*].unit",
-                        volume="payload.measurements.[*].result",
-                        resource_id="payload.target_id",
-                        project_id="payload.initiator.project_id",
+                        unit="$.payload.measurements.[*].metric.[*].unit",
+                        volume="$.payload.measurements.[*].result",
+                        resource_id="$.payload.target_id",
+                        project_id="$.payload.initiator.project_id",
                         multi=["name", "unit"])]})
         self.handler.definitions = notifications.load_definitions(
             self.__setup_meter_def_file(cfg))
@@ -414,13 +414,13 @@ class TestMeterProcessing(test.BaseTestCase):
         event = copy.deepcopy(MIDDLEWARE_EVENT)
         del event['payload']['measurements']
         cfg = yaml.dump(
-            {'metric': [dict(name="payload.measurements.[*].metric.[*].name",
+            {'metric': [dict(name="$.payload.measurements.[*].metric.[*].name",
                         event_type="objectstore.http.request",
                         type="delta",
-                        unit="payload.measurements.[*].metric.[*].unit",
-                        volume="payload.measurements.[*].result",
-                        resource_id="payload.target_id",
-                        project_id="payload.initiator.project_id",
+                        unit="$.payload.measurements.[*].metric.[*].unit",
+                        volume="$.payload.measurements.[*].result",
+                        resource_id="$.payload.target_id",
+                        project_id="$.payload.initiator.project_id",
                         multi="name")]})
         self.handler.definitions = notifications.load_definitions(
             self.__setup_meter_def_file(cfg))
@@ -429,14 +429,14 @@ class TestMeterProcessing(test.BaseTestCase):
 
     def test_multi_meter_payload_all_multi(self):
         cfg = yaml.dump(
-            {'metric': [dict(name="payload.[*].counter_name",
+            {'metric': [dict(name="$.payload.[*].counter_name",
                         event_type="full.sample",
-                        type="payload.[*].counter_type",
-                        unit="payload.[*].counter_unit",
-                        volume="payload.[*].counter_volume",
-                        resource_id="payload.[*].resource_id",
-                        project_id="payload.[*].project_id",
-                        user_id="payload.[*].user_id",
+                        type="$.payload.[*].counter_type",
+                        unit="$.payload.[*].counter_unit",
+                        volume="$.payload.[*].counter_volume",
+                        resource_id="$.payload.[*].resource_id",
+                        project_id="$.payload.[*].project_id",
+                        user_id="$.payload.[*].user_id",
                         multi=['name', 'type', 'unit', 'volume', 'resource_id',
                                'project_id', 'user_id'])]})
         self.handler.definitions = notifications.load_definitions(
@@ -460,13 +460,13 @@ class TestMeterProcessing(test.BaseTestCase):
         del event['payload']['measurements'][0]['result']
         del event['payload']['measurements'][1]['result']
         cfg = yaml.dump(
-            {'metric': [dict(name="payload.measurements.[*].metric.[*].name",
+            {'metric': [dict(name="$.payload.measurements.[*].metric.[*].name",
                         event_type="objectstore.http.request",
                         type="delta",
-                        unit="payload.measurements.[*].metric.[*].unit",
-                        volume="payload.measurements.[*].result",
-                        resource_id="payload.target_id",
-                        project_id="payload.initiator.project_id",
+                        unit="$.payload.measurements.[*].metric.[*].unit",
+                        volume="$.payload.measurements.[*].result",
+                        resource_id="$.payload.target_id",
+                        project_id="$.payload.initiator.project_id",
                         multi=["name", "unit", "volume"])]})
         self.handler.definitions = notifications.load_definitions(
             self.__setup_meter_def_file(cfg))
@@ -479,13 +479,13 @@ class TestMeterProcessing(test.BaseTestCase):
         event = copy.deepcopy(MIDDLEWARE_EVENT)
         del event['payload']['measurements'][0]['result']
         cfg = yaml.dump(
-            {'metric': [dict(name="payload.measurements.[*].metric.[*].name",
+            {'metric': [dict(name="$.payload.measurements.[*].metric.[*].name",
                         event_type="objectstore.http.request",
                         type="delta",
-                        unit="payload.measurements.[*].metric.[*].unit",
-                        volume="payload.measurements.[*].result",
-                        resource_id="payload.target_id",
-                        project_id="payload.initiator.project_id",
+                        unit="$.payload.measurements.[*].metric.[*].unit",
+                        volume="$.payload.measurements.[*].result",
+                        resource_id="$.payload.target_id",
+                        project_id="$.payload.initiator.project_id",
                         multi=["name", "unit", "volume"])]})
         self.handler.definitions = notifications.load_definitions(
             self.__setup_meter_def_file(cfg))
@@ -500,7 +500,8 @@ class TestMeterProcessing(test.BaseTestCase):
                         event_type="compute.metrics.update",
                         type='gauge',
                         unit="percent",
-                        volume="payload.metrics[?(@.name='cpu.percent')].value"
+                        volume="$.payload.metrics["
+                               "?(@.name='cpu.percent')].value"
                                " * 100",
                         resource_id="$.payload.host + '_'"
                                     " + $.payload.nodename")]})
@@ -520,7 +521,7 @@ class TestMeterProcessing(test.BaseTestCase):
                         event_type="compute.metrics.update",
                         type='gauge',
                         unit="ns",
-                        volume="payload.metrics[?(@.name='cpu.frequency')]"
+                        volume="$.payload.metrics[?(@.name='cpu.frequency')]"
                                ".value",
                         resource_id="$.payload.host + '_'"
                                     " + $.payload.nodename")]})
@@ -540,7 +541,7 @@ class TestMeterProcessing(test.BaseTestCase):
                         event_type="compute.metrics.update",
                         type='gauge',
                         unit="ns",
-                        volume="payload.metrics[?(@.name='cpu.frequency')]"
+                        volume="$.payload.metrics[?(@.name='cpu.frequency')]"
                                ".value",
                         resource_id="'prefix-' + $.payload.nodename")]})
         self.handler.definitions = notifications.load_definitions(
