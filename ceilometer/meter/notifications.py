@@ -19,7 +19,7 @@ import pkg_resources
 import six
 import yaml
 
-from jsonpath_rw import parser
+from jsonpath_rw_ext import parser
 from oslo_config import cfg
 from oslo_log import log
 import oslo_messaging
@@ -53,7 +53,7 @@ class MeterDefinitionException(Exception):
 
 class MeterDefinition(object):
 
-    JSONPATH_RW_PARSER = parser.JsonPathParser()
+    JSONPATH_RW_PARSER = parser.ExtentedJsonPathParser()
 
     def __init__(self, definition_cfg):
         self.cfg = definition_cfg
