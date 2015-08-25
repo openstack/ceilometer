@@ -12,13 +12,14 @@
 # under the License.
 
 import fnmatch
+import functools
 import itertools
 import os
 import pkg_resources
 import six
 import yaml
 
-import jsonpath_rw
+from jsonpath_rw import parser
 from oslo_config import cfg
 from oslo_log import log
 import oslo_messaging
@@ -52,48 +53,62 @@ class MeterDefinitionException(Exception):
 
 class MeterDefinition(object):
 
+    JSONPATH_RW_PARSER = parser.JsonPathParser()
+
     def __init__(self, definition_cfg):
         self.cfg = definition_cfg
-        self._validate_type()
+
+        self._event_type = self.cfg.get('event_type')
+        if not self._event_type:
+            raise MeterDefinitionException(
+                _LE("Required field event_type not specified"), self.cfg)
+        if isinstance(self._event_type, six.string_types):
+            self._event_type = [self._event_type]
+
+        if ('type' not in self.cfg.get('multi', []) and
+                self.cfg['type'] not in sample.TYPES):
+            raise MeterDefinitionException(
+                _LE("Invalid type %s specified") % self.cfg['type'], self.cfg)
+
+        self._field_getter = {}
+        for name, fval in self.cfg.items():
+            if name in ["event_type", "multi"] or not fval:
+                continue
+            elif isinstance(fval, six.integer_types):
+                self._field_getter[name] = fval
+            else:
+                try:
+                    parts = self.JSONPATH_RW_PARSER.parse(fval)
+                except Exception as e:
+                    raise MeterDefinitionException(_LE(
+                        "Parse error in JSONPath specification "
+                        "'%(jsonpath)s': %(err)s")
+                        % dict(jsonpath=fval, err=e), self.cfg)
+                self._field_getter[name] = functools.partial(
+                    self._parse_jsonpath_field, parts)
 
     def match_type(self, meter_name):
-        try:
-            event_type = self.cfg['event_type']
-        except KeyError as err:
-            raise MeterDefinitionException(
-                _LE("Required field %s not specified") % err.args[0], self.cfg)
-
-        if isinstance(event_type, six.string_types):
-            event_type = [event_type]
-        for t in event_type:
+        for t in self._event_type:
             if fnmatch.fnmatch(meter_name, t):
                 return True
 
     def parse_fields(self, field, message, all_values=False):
-        fval = self.cfg.get(field)
-        if not fval:
+        getter = self._field_getter.get(field)
+        if not getter:
             return
-        if isinstance(fval, six.integer_types):
-            return fval
-        try:
-            parts = jsonpath_rw.parse(fval)
-        except Exception as e:
-            raise MeterDefinitionException(
-                _LE("Parse error in JSONPath specification "
-                    "'%(jsonpath)s': %(err)s")
-                % dict(jsonpath=parts, err=e), self.cfg)
+        elif callable(getter):
+            return getter(message, all_values)
+        else:
+            return getter
+
+    @staticmethod
+    def _parse_jsonpath_field(parts, message, all_values):
         values = [match.value for match in parts.find(message)
                   if match.value is not None]
         if values:
             if not all_values:
                 return values[0]
             return values
-
-    def _validate_type(self):
-        if ('type' not in self.cfg.get('multi', []) and
-                self.cfg['type'] not in sample.TYPES):
-            raise MeterDefinitionException(
-                _LE("Invalid type %s specified") % self.cfg['type'], self.cfg)
 
 
 def get_config_file():
