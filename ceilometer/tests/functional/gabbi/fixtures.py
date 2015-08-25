@@ -56,7 +56,7 @@ class ConfigFixture(fixture.GabbiFixture):
         if db_url is None:
             raise case.SkipTest('No database connection configured')
 
-        service.prepare_service([])
+        service.prepare_service(argv=[], config_files=[])
         conf = fixture_config.Config().conf
         self.conf = conf
         opts.set_defaults(self.conf)
