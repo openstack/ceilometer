@@ -32,7 +32,7 @@ class TestClientHTTPBasicAuth(base.BaseTestCase):
     def setUp(self):
         super(TestClientHTTPBasicAuth, self).setUp()
         self.conf = self.useFixture(config_fixture.Config())
-        ceilometer_service.prepare_service([])
+        ceilometer_service.prepare_service(argv=[], config_files=[])
         self.parsed_url = urlparse.urlparse(
             'http://127.0.0.1:8080/controller/nb/v2?container_name=default&'
             'container_name=egg&auth=%s&user=admin&password=admin_pass&'

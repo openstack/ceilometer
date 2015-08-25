@@ -199,7 +199,8 @@ class BaseRealNotification(tests_base.BaseTestCase):
     def setUp(self):
         super(BaseRealNotification, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
-        service.prepare_service([])
+        # Dummy config file to avoid looking for system config
+        service.prepare_service(argv=[], config_files=[])
         self.setup_messaging(self.CONF, 'nova')
 
         pipeline_cfg_file = self.setup_pipeline(['instance', 'memory'])
@@ -452,7 +453,7 @@ class TestRealNotificationMultipleAgents(tests_base.BaseTestCase):
     def setUp(self):
         super(TestRealNotificationMultipleAgents, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
-        service.prepare_service([])
+        service.prepare_service(argv=[], config_files=[])
         self.setup_messaging(self.CONF, 'nova')
 
         pipeline_cfg_file = self.setup_pipeline(['instance', 'memory'])

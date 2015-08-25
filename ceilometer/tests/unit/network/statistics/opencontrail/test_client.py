@@ -25,7 +25,7 @@ class TestOpencontrailClient(base.BaseTestCase):
     def setUp(self):
         super(TestOpencontrailClient, self).setUp()
         self.conf = self.useFixture(config_fixture.Config())
-        ceilometer_service.prepare_service([])
+        ceilometer_service.prepare_service(argv=[], config_files=[])
         self.client = client.Client('http://127.0.0.1:8081', {'arg1': 'aaa'})
 
         self.get_resp = mock.MagicMock()

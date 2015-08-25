@@ -53,7 +53,7 @@ class DispatcherTest(base.BaseTestCase):
     def setUp(self):
         super(DispatcherTest, self).setUp()
         self.conf = self.useFixture(config_fixture.Config())
-        ceilometer_service.prepare_service([])
+        ceilometer_service.prepare_service(argv=[], config_files=[])
         self.conf.config(
             resources_definition_file=self.path_get(
                 'etc/ceilometer/gnocchi_resources.yaml'),
@@ -330,7 +330,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
             return_value=ks_client))
         self.ks_client = ks_client
 
-        ceilometer_service.prepare_service([])
+        ceilometer_service.prepare_service(argv=[], config_files=[])
         self.conf.config(
             resources_definition_file=self.path_get(
                 'etc/ceilometer/gnocchi_resources.yaml'),

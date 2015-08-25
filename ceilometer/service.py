@@ -112,7 +112,7 @@ cfg.CONF.register_opt(COLL_OPT, 'collector')
 LOG = log.getLogger(__name__)
 
 
-def prepare_service(argv=None):
+def prepare_service(argv=None, config_files=None):
     oslo_i18n.enable_lazy()
     log.register_options(cfg.CONF)
     log_levels = (cfg.CONF.default_log_levels +
@@ -121,7 +121,8 @@ def prepare_service(argv=None):
     if argv is None:
         argv = sys.argv
     cfg.CONF(argv[1:], project='ceilometer', validate_default_values=True,
-             version=version.version_info.version_string())
+             version=version.version_info.version_string(),
+             default_config_files=config_files)
     log.setup(cfg.CONF, 'ceilometer')
     # NOTE(liusheng): guru cannot run with service under apache daemon, so when
     # ceilometer-api running with mod_wsgi, the argv is [], we don't start
