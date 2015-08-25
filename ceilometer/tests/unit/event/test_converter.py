@@ -15,7 +15,7 @@
 
 import datetime
 
-import jsonpath_rw
+import jsonpath_rw_ext
 import mock
 from oslo_config import fixture as fixture_config
 import six
@@ -296,14 +296,14 @@ class TestTraitDefinition(ConverterBase):
     def test_string_fields_config(self):
         cfg = dict(fields='payload.test')
         t = converter.TraitDefinition('test_trait', cfg, self.fake_plugin_mgr)
-        self.assertPathsEqual(t.fields, jsonpath_rw.parse('payload.test'))
+        self.assertPathsEqual(t.fields, jsonpath_rw_ext.parse('payload.test'))
 
     def test_list_fields_config(self):
         cfg = dict(fields=['payload.test', 'payload.other'])
         t = converter.TraitDefinition('test_trait', cfg, self.fake_plugin_mgr)
         self.assertPathsEqual(
             t.fields,
-            jsonpath_rw.parse('(payload.test)|(payload.other)'))
+            jsonpath_rw_ext.parse('(payload.test)|(payload.other)'))
 
     def test_invalid_path_config(self):
         # test invalid jsonpath...
