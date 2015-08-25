@@ -337,7 +337,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
             group="dispatcher_gnocchi"
         )
 
-        self.sample['resource_id'] = str(uuid.uuid4())
+        self.sample['resource_id'] = str(uuid.uuid4()) + "/foobar"
 
     @mock.patch('ceilometer.dispatcher.gnocchi.LOG')
     @mock.patch('ceilometer.dispatcher.gnocchi_client.LOG')
@@ -348,7 +348,9 @@ class DispatcherWorkflowTest(base.BaseTestCase,
         base_url = self.dispatcher.conf.dispatcher_gnocchi.url
         url_params = {
             'url': urlparse.urljoin(base_url, '/v1/resource'),
-            'resource_id': self.sample['resource_id'],
+            # NOTE(sileht): we don't use urlparse.quote here
+            # to ensure / is converted in %2F
+            'resource_id': self.sample['resource_id'].replace("/", "%2F"),
             'resource_type': self.resource_type,
             'metric_name': self.sample['counter_name']
         }
