@@ -63,4 +63,4 @@ setting ``pecan_debug`` to ``False`` in the ``api`` section of
 ``ceilometer.conf``.
 
 For other WSGI setup you can refer to the `pecan deployment`_ documentation.
-.. _`pecan deployment`: http://pecan.readthedocs.org/en/latest/deployment.html#deployment
+.. _`pecan deployment`: http://pecan.readthedocs.org/en/latest/deployment.html
