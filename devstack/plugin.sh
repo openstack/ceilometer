@@ -233,7 +233,6 @@ function _ceilometer_configure_storage_backend {
 
 # Configure Ceilometer
 function configure_ceilometer {
-    sudo install -d -o $STACK_USER -m 755 $CEILOMETER_CONF_DIR $CEILOMETER_API_LOG_DIR
 
     iniset_rpc_backend ceilometer $CEILOMETER_CONF
 
@@ -325,6 +324,7 @@ function install_ceilometer {
     _ceilometer_prepare_virt_drivers
     install_ceilometerclient
     setup_develop $CEILOMETER_DIR
+    sudo install -d -o $STACK_USER -m 755 $CEILOMETER_CONF_DIR $CEILOMETER_API_LOG_DIR
 }
 
 # install_ceilometerclient() - Collect source and prepare
