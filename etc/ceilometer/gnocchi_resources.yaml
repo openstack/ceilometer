@@ -80,12 +80,11 @@ resources:
       - 'network.outgoing.bytes'
       - 'network.incoming.bytes'
     attributes:
-      - host: resource_metadata.host
-      - image_ref: resource_metadata.image_ref_url
-      - display_name: resource_metadata.display_name
-      - flavor_id: resource_metadata.instance_flavor_id
-      - flavor_id: resource_metadata.flavor.id
-      - server_group: resource_metadata.user_metadata.server_group
+      host: resource_metadata.host
+      image_ref: resource_metadata.image_ref_url
+      display_name: resource_metadata.display_name
+      flavor_id: resource_metadata.(instance_flavor_id|(flavor.id))
+      server_group: resource_metadata.user_metadata.server_group
 
   - resource_type: image
     metrics:
@@ -94,9 +93,9 @@ resources:
       - 'image.download'
       - 'image.serve'
     attributes:
-      - name: resource_metadata.name
-      - container_format: resource_metadata.container_format
-      - disk_format: resource_metadata.disk_format
+      name: resource_metadata.name
+      container_format: resource_metadata.container_format
+      disk_format: resource_metadata.disk_format
 
   - resource_type: ipmi
     metrics:
@@ -162,4 +161,4 @@ resources:
       - 'volume.attach'
       - 'volume.detach'
     attributes:
-      - display_name: resource_metadata.display_name
+      display_name: resource_metadata.display_name

@@ -16,12 +16,13 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import fnmatch
+import functools
 import itertools
 import operator
 import os
 import threading
 
-import jsonpath_rw
+from jsonpath_rw_ext import parser
 from oslo_config import cfg
 from oslo_log import log
 import six
@@ -102,12 +103,44 @@ class ResourcesDefinition(object):
     MANDATORY_FIELDS = {'resource_type': six.string_types,
                         'metrics': list}
 
+    JSONPATH_RW_PARSER = parser.ExtentedJsonPathParser()
+
     def __init__(self, definition_cfg, default_archive_policy,
                  legacy_archive_policy_defintion):
         self._default_archive_policy = default_archive_policy
         self._legacy_archive_policy_defintion = legacy_archive_policy_defintion
         self.cfg = definition_cfg
-        self._validate()
+
+        for field, field_type in self.MANDATORY_FIELDS.items():
+            if field not in self.cfg:
+                raise ResourcesDefinitionException(
+                    _LE("Required field %s not specified") % field, self.cfg)
+            if not isinstance(self.cfg[field], field_type):
+                raise ResourcesDefinitionException(
+                    _LE("Required field %(field)s should be a %(type)s") %
+                    {'field': field, 'type': field_type}, self.cfg)
+
+        self._field_getter = {}
+        for name, fval in self.cfg.get('attributes', {}).items():
+            if isinstance(fval, six.integer_types):
+                self._field_getter[name] = fval
+            else:
+                try:
+                    parts = self.JSONPATH_RW_PARSER.parse(fval)
+                except Exception as e:
+                    raise ResourcesDefinitionException(
+                        _LE("Parse error in JSONPath specification "
+                            "'%(jsonpath)s': %(err)s")
+                        % dict(jsonpath=fval, err=e), self.cfg)
+                self._field_getter[name] = functools.partial(
+                    self._parse_jsonpath_field, parts)
+
+    @staticmethod
+    def _parse_jsonpath_field(parts, sample):
+        values = [match.value for match in parts.find(sample)
+                  if match.value is not None]
+        if values:
+            return values[0]
 
     def match(self, metric_name):
         for t in self.cfg['metrics']:
@@ -117,11 +150,13 @@ class ResourcesDefinition(object):
 
     def attributes(self, sample):
         attrs = {}
-        for attribute_info in self.cfg.get('attributes', []):
-            for attr, field in attribute_info.items():
-                value = self._parse_field(field, sample)
-                if value is not None:
-                    attrs[attr] = value
+        for attr, getter in self._field_getter.items():
+            if callable(getter):
+                value = getter(sample)
+            else:
+                value = getter
+            if value is not None:
+                attrs[attr] = value
         return attrs
 
     def metrics(self):
@@ -133,35 +168,6 @@ class ResourcesDefinition(object):
             metrics[t] = dict(archive_policy_name=archive_policy or
                               self._default_archive_policy)
         return metrics
-
-    def _parse_field(self, field, sample):
-        # TODO(sileht): share this with
-        # https://review.openstack.org/#/c/197633/
-        if not field:
-            return
-        if isinstance(field, six.integer_types):
-            return field
-        try:
-            parts = jsonpath_rw.parse(field)
-        except Exception as e:
-            raise ResourcesDefinitionException(
-                _LE("Parse error in JSONPath specification "
-                    "'%(jsonpath)s': %(err)s")
-                % dict(jsonpath=field, err=e), self.cfg)
-        values = [match.value for match in parts.find(sample)
-                  if match.value is not None]
-        if values:
-            return values[0]
-
-    def _validate(self):
-        for field, field_type in self.MANDATORY_FIELDS.items():
-            if field not in self.cfg:
-                raise ResourcesDefinitionException(
-                    _LE("Required field %s not specified") % field, self.cfg)
-            if not isinstance(self.cfg[field], field_type):
-                raise ResourcesDefinitionException(
-                    _LE("Required field %(field)s should be a %(type)s") %
-                    {'field': field, 'type': field_type}, self.cfg)
 
 
 class GnocchiDispatcher(dispatcher.Base):
