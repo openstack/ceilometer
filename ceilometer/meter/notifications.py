@@ -227,6 +227,7 @@ class ProcessMeterNotifications(plugin_base.NotificationBase):
                 userid = self.get_user_id(d, notification_body)
                 projectid = self.get_project_id(d, notification_body)
                 resourceid = d.parse_fields('resource_id', notification_body)
+                ts = d.parse_fields('timestamp', notification_body)
                 if d.cfg.get('multi'):
                     meters = d.parse_fields('name', notification_body, True)
                     if not meters:  # skip if no meters in payload
@@ -246,16 +247,20 @@ class ProcessMeterNotifications(plugin_base.NotificationBase):
                         projs = (self._normalise_as_list(
                             'project_id', d, notification_body, len(meters))
                             if 'project_id' in d.cfg['multi'] else [projectid])
+                        times = (self._normalise_as_list(
+                            'timestamp', d, notification_body, len(meters))
+                            if 'timestamp' in d.cfg['multi'] else [ts])
                     except InvalidPayload:
                         break
-                    for m, v, unit, t, r, p, user in zip(
+                    for m, v, unit, t, r, p, user, ts in zip(
                             meters, volumes, itertools.cycle(units),
                             itertools.cycle(types), itertools.cycle(resources),
-                            itertools.cycle(projs), itertools.cycle(users)):
+                            itertools.cycle(projs), itertools.cycle(users),
+                            itertools.cycle(times)):
                         yield sample.Sample.from_notification(
                             name=m, type=t, unit=unit, volume=v,
                             resource_id=r, user_id=user, project_id=p,
-                            message=notification_body)
+                            message=notification_body, timestamp=ts)
                 else:
                     yield sample.Sample.from_notification(
                         name=d.cfg['name'],
@@ -265,7 +270,8 @@ class ProcessMeterNotifications(plugin_base.NotificationBase):
                         resource_id=resourceid,
                         user_id=userid,
                         project_id=projectid,
-                        message=notification_body)
+                        message=notification_body,
+                        timestamp=ts)
 
     @staticmethod
     def get_user_id(d, notification_body):
