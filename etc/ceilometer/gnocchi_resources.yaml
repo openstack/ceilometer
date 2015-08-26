@@ -64,6 +64,16 @@ resources:
       display_name: resource_metadata.display_name
       flavor_id: resource_metadata.(instance_flavor_id|(flavor.id))
       server_group: resource_metadata.user_metadata.server_group
+    event_delete: compute.instance.delete.start
+    event_attributes:
+      id: instance_id
+    event_associated_resources:
+      instance_network_interface:
+        query: '{"=": {"instance_id": "%s"}}'
+        fields: [id]
+      instance_disk:
+        query: '{"=": {"instance_id": "%s"}}'
+        fields: [id]
 
   - resource_type: instance_network_interface
     metrics:
@@ -108,6 +118,9 @@ resources:
       name: resource_metadata.name
       container_format: resource_metadata.container_format
       disk_format: resource_metadata.disk_format
+    event_delete: image.delete
+    event_attributes:
+      id: resource_id
 
   - resource_type: ipmi
     metrics:

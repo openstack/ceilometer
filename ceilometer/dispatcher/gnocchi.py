@@ -28,6 +28,7 @@ from keystoneauth1 import session as ka_session
 from oslo_config import cfg
 from oslo_log import log
 from oslo_utils import fnmatch
+from oslo_utils import timeutils
 import requests
 import retrying
 import six
@@ -73,6 +74,9 @@ def cache_key_mangler(key):
     return uuid.uuid5(CACHE_NAMESPACE, key).hex
 
 
+EVENT_CREATE, EVENT_UPDATE, EVENT_DELETE = ("create", "update", "delete")
+
+
 class ResourcesDefinition(object):
 
     MANDATORY_FIELDS = {'resource_type': six.string_types,
@@ -105,18 +109,51 @@ class ResourcesDefinition(object):
             else:
                 self.metrics[t] = dict(archive_policy_name=archive_policy)
 
-    def match(self, metric_name):
+    @staticmethod
+    def _ensure_list(value):
+        if isinstance(value, list):
+            return value
+        return [value]
+
+    def metric_match(self, metric_name):
         for t in self.cfg['metrics']:
             if fnmatch.fnmatch(metric_name, t):
                 return True
         return False
 
-    def attributes(self, sample):
+    @property
+    def support_events(self):
+        for e in ["event_create", "event_delete", "event_update"]:
+            if e in self.cfg:
+                return True
+        return False
+
+    def event_match(self, event_type):
+        for e in self._ensure_list(self.cfg.get('event_create', [])):
+            if fnmatch.match(event_type, e):
+                return EVENT_CREATE
+        for e in self._ensure_list(self.cfg.get('event_delete', [])):
+            if fnmatch.match(event_type, e):
+                return EVENT_DELETE
+        for e in self._ensure_list(self.cfg.get('event_update', [])):
+            if fnmatch.match(event_type, e):
+                return EVENT_UPDATE
+
+    def sample_attributes(self, sample):
         attrs = {}
         for name, definition in self._attributes.items():
             value = definition.parse(sample)
             if value is not None:
                 attrs[name] = value
+        return attrs
+
+    def event_attributes(self, event):
+        attrs = {}
+        traits = dict([(trait[0], trait[2]) for trait in event['traits']])
+        for attr, field in self.cfg.get('event_attributes', {}).items():
+            value = traits.get(field)
+            if value is not None:
+                attrs[attr] = value
         return attrs
 
 
@@ -262,7 +299,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
     def _is_swift_account_sample(self, sample):
         return bool([rd for rd in self.resources_definition
                      if rd.cfg['resource_type'] == 'swift_account'
-                     and rd.match(sample['counter_name'])])
+                     and rd.metric_match(sample['counter_name'])])
 
     def _is_gnocchi_activity(self, sample):
         return (self.filter_service_activity and self.gnocchi_project_id and (
@@ -273,10 +310,16 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
              self._is_swift_account_sample(sample))
         ))
 
-    def _get_resource_definition(self, metric_name):
+    def _get_resource_definition_from_metric(self, metric_name):
         for rd in self.resources_definition:
-            if rd.match(metric_name):
+            if rd.metric_match(metric_name):
                 return rd
+
+    def _get_resource_definition_from_event(self, event_type):
+        for rd in self.resources_definition:
+            operation = rd.event_match(event_type)
+            if operation:
+                return rd, operation
 
     def record_metering_data(self, data):
         # We may have receive only one counter on the wire
@@ -314,7 +357,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
                 stats['metrics'] += 1
 
                 samples = list(samples)
-                rd = self._get_resource_definition(metric_name)
+                rd = self._get_resource_definition_from_metric(metric_name)
                 if rd is None:
                     LOG.warning(_LW("metric %s is not handled by Gnocchi") %
                                 metric_name)
@@ -332,7 +375,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
 
                 for sample in samples:
                     res_info.setdefault("resource_extra", {}).update(
-                        rd.attributes(sample))
+                        rd.sample_attributes(sample))
                     m = measures.setdefault(gnocchi_id, {}).setdefault(
                         metric_name, [])
                     m.append({'timestamp': sample['timestamp'],
@@ -467,3 +510,35 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
             return attribute_hash
         else:
             return None
+
+    def record_events(self, events):
+        for event in events:
+            rd = self._get_resource_definition_from_event(event['event_type'])
+            if not rd:
+                LOG.debug("No gnocchi definition for event type: %s",
+                          event['event_type'])
+                continue
+
+            rd, operation = rd
+            resource_type = rd.cfg['resource_type']
+            resource = rd.event_attributes(event)
+
+            if operation == EVENT_DELETE:
+                ended_at = timeutils.utcnow().isoformat()
+                resources_to_end = [resource]
+                extra_resources = cfg['event_associated_resources'].items()
+                for resource_type, filters in extra_resources:
+                    resources_to_end.extend(self._gnocchi.search_resource(
+                        resource_type, filters['query'] % resource['id']))
+                for resource in resources_to_end:
+                    try:
+                        self._gnocchi.update_resource(resource_type,
+                                                      resource['id'],
+                                                      {'ended_at': ended_at})
+                    except gnocchi_exc.NoSuchResource:
+                        LOG.debug(_("Delete event received on unexiting "
+                                    "resource (%s), ignore it.") %
+                                  resource['id'])
+                    except Exception:
+                        LOG.error(_LE("Fail to update the resource %s") %
+                                  resource, exc_info=True)
