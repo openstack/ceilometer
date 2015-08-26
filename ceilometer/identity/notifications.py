@@ -102,7 +102,7 @@ class Role(IdentityCRUD):
         return ['%s\..*' % self.resource_name]
 
 
-class Trust(IdentityCRUD):
+class Trust(_Base):
 
     resource_type = 'OS-TRUST:trust'
     resource_name = '%s.%s' % (SERVICE, resource_type)
@@ -113,6 +113,19 @@ class Trust(IdentityCRUD):
             '%s.created' % self.resource_name,
             '%s.deleted' % self.resource_name,
         ]
+
+    def process_notification(self, message):
+        name = message['event_type'].replace(self.resource_type, 'trust')
+        user_id = message['payload'].get("initiator", {}).get("id")
+        yield sample.Sample.from_notification(
+            name=name,
+            type=sample.TYPE_DELTA,
+            unit='trust',
+            volume=1,
+            resource_id=message['payload']['resource_info'],
+            user_id=user_id,
+            project_id=None,
+            message=message)
 
 
 class Authenticate(_Base):

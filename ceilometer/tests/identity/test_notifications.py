@@ -144,31 +144,33 @@ class TestCRUDNotification(base.BaseTestCase):
         self.assertEqual(PUBLISHER_ID, metadata.get('host'))
 
     def _verify_common_operations(self, data, resource_type, operation,
-                                  resource_id):
+                                  resource_id, expected_name=None):
         self.assertEqual(1, len(data))
         self.assertEqual(resource_id, data[0].resource_id)
-        name = '%s.%s.%s' % (notifications.SERVICE, resource_type, operation)
+        name = expected_name if expected_name else (
+            '%s.%s.%s' % (notifications.SERVICE, resource_type, operation))
         self.assertEqual(name, data[0].name)
 
     def _test_operation(self, resource_type, operation, resource_id,
-                        notification_class):
+                        notification_class, expected_name=None):
         notif = notification_for(resource_type, operation, resource_id)
         handler = notification_class(mock.Mock())
         data = list(handler.process_notification(notif))
         self.assertIsNone(data[0].user_id)
         self._verify_common_operations(data, resource_type, operation,
-                                       resource_id)
+                                       resource_id, expected_name)
         self._verify_common_sample(data[0])
 
     def _test_audit_operation(self, resource_type, operation, resource_id,
-                              notification_class):
+                              notification_class,
+                              expected_name=None):
         notif = cadf_crud_notification_for(resource_type, operation,
                                            resource_id)
         handler = notification_class(mock.Mock())
         data = list(handler.process_notification(notif))
         self.assertEqual(USER_ID, data[0].user_id)
         self._verify_common_operations(data, resource_type, operation,
-                                       resource_id)
+                                       resource_id, expected_name)
         self._verify_common_sample(data[0])
 
     def test_create_user(self):
@@ -235,14 +237,20 @@ class TestCRUDNotification(base.BaseTestCase):
                                    notifications.Role)
 
     def test_create_trust(self):
-        self._test_operation('trust', 'created', TRUST_ID, notifications.Trust)
-        self._test_audit_operation('trust', 'created', TRUST_ID,
-                                   notifications.Trust)
+        self._test_operation('OS-TRUST:trust', 'created', TRUST_ID,
+                             notifications.Trust,
+                             expected_name='identity.trust.created')
+        self._test_audit_operation('OS-TRUST:trust', 'created', TRUST_ID,
+                                   notifications.Trust,
+                                   expected_name='identity.trust.created')
 
     def test_delete_trust(self):
-        self._test_operation('trust', 'deleted', TRUST_ID, notifications.Trust)
-        self._test_audit_operation('trust', 'deleted', TRUST_ID,
-                                   notifications.Trust)
+        self._test_operation('OS-TRUST:trust', 'deleted', TRUST_ID,
+                             notifications.Trust,
+                             expected_name='identity.trust.deleted')
+        self._test_audit_operation('OS-TRUST:trust', 'deleted', TRUST_ID,
+                                   notifications.Trust,
+                                   expected_name='identity.trust.deleted')
 
 
 class TestAuthenticationNotification(base.BaseTestCase):
