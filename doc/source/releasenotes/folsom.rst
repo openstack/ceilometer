@@ -23,7 +23,7 @@ This is the first release (Version 0.1) of Ceilometer. Please take all appropria
 caution in using it, as it is a technology preview at this time.
 
 Version of OpenStack
-   It is curently tested to work with OpenStack 2012.2 Folsom. Due to its use of
+   It is currently tested to work with OpenStack 2012.2 Folsom. Due to its use of
    openstack-common, and the modification that were made in term of notification
    to many other components (glance, cinder, quantum), it will not easily work
    with any prior version of OpenStack.
