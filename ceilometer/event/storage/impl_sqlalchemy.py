@@ -333,8 +333,13 @@ class Connection(base.Connection):
                     dtype = api_models.Trait.TEXT_TYPE
                     val = t_text
 
-                trait_model = api_models.Trait(key, dtype, val)
-                event_list[id_].append_trait(trait_model)
+                try:
+                    trait_model = api_models.Trait(key, dtype, val)
+                    event_list[id_].append_trait(trait_model)
+                except KeyError:
+                    LOG.warning('Trait key: %(key)s, val: %(val)s, for event: '
+                                '%(event)s not valid.' %
+                                {'key': key, 'val': val, 'event': id_})
 
             return event_list.values()
 
