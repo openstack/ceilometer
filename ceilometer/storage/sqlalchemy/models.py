@@ -174,6 +174,7 @@ class Resource(Base):
         #                  'source_id', 'metadata_hash',
         #                  name='res_def_unique'),
         Index('ix_resource_resource_id', 'resource_id'),
+        Index('ix_resource_metadata_hash', 'metadata_hash'),
     )
 
     internal_id = Column(Integer, primary_key=True)
