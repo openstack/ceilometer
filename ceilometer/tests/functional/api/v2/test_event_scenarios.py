@@ -457,6 +457,90 @@ class TestEventAPI(EventTestBase):
                               'op': 'el'}])
 
 
+class AclRestrictedEventTestBase(v2.FunctionalTest,
+                                 tests_db.MixinTestsWithBackendScenarios):
+
+    def setUp(self):
+        super(AclRestrictedEventTestBase, self).setUp()
+        self.admin_user_id = uuid.uuid4().hex
+        self.admin_proj_id = uuid.uuid4().hex
+        self.user_id = uuid.uuid4().hex
+        self.proj_id = uuid.uuid4().hex
+        self._generate_models()
+
+    def _generate_models(self):
+        event_models = []
+        self.s_time = datetime.datetime(2013, 12, 31, 5, 0)
+        event_models.append(
+            models.Event(message_id='1',
+                         event_type='empty_ev',
+                         generated=self.s_time,
+                         traits=[models.Trait('random',
+                                              models.Trait.TEXT_TYPE,
+                                              'blah')],
+                         raw={}))
+        event_models.append(
+            models.Event(message_id='2',
+                         event_type='admin_ev',
+                         generated=self.s_time,
+                         traits=[models.Trait('project_id',
+                                              models.Trait.TEXT_TYPE,
+                                              self.admin_proj_id),
+                                 models.Trait('user_id',
+                                              models.Trait.TEXT_TYPE,
+                                              self.admin_user_id)],
+                         raw={}))
+        event_models.append(
+            models.Event(message_id='3',
+                         event_type='user_ev',
+                         generated=self.s_time,
+                         traits=[models.Trait('project_id',
+                                              models.Trait.TEXT_TYPE,
+                                              self.proj_id),
+                                 models.Trait('user_id',
+                                              models.Trait.TEXT_TYPE,
+                                              self.user_id)],
+                         raw={}))
+        self.event_conn.record_events(event_models)
+
+    def test_non_admin_access(self):
+        a_headers = {"X-Roles": "member",
+                     "X-User-Id": self.user_id,
+                     "X-Project-Id": self.proj_id}
+        data = self.get_json('/events', headers=a_headers)
+        self.assertEqual(1, len(data))
+        self.assertEqual('user_ev', data[0]['event_type'])
+
+    def test_non_admin_access_single(self):
+        a_headers = {"X-Roles": "member",
+                     "X-User-Id": self.user_id,
+                     "X-Project-Id": self.proj_id}
+        data = self.get_json('/events/3', headers=a_headers)
+        self.assertEqual('user_ev', data['event_type'])
+
+    def test_non_admin_access_incorrect_user(self):
+        a_headers = {"X-Roles": "member",
+                     "X-User-Id": 'blah',
+                     "X-Project-Id": self.proj_id}
+        data = self.get_json('/events', headers=a_headers)
+        self.assertEqual(0, len(data))
+
+    def test_non_admin_access_incorrect_proj(self):
+        a_headers = {"X-Roles": "member",
+                     "X-User-Id": self.user_id,
+                     "X-Project-Id": 'blah'}
+        data = self.get_json('/events', headers=a_headers)
+        self.assertEqual(0, len(data))
+
+    def test_non_admin_access_single_invalid(self):
+        a_headers = {"X-Roles": "member",
+                     "X-User-Id": self.user_id,
+                     "X-Project-Id": self.proj_id}
+        data = self.get_json('/events/1', headers=a_headers,
+                             expect_errors=True)
+        self.assertEqual(404, data.status_int)
+
+
 class EventRestrictionTestBase(v2.FunctionalTest,
                                tests_db.MixinTestsWithBackendScenarios):
 
