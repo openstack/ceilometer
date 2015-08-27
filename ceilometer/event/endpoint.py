@@ -50,7 +50,7 @@ class EventsNotificationEndpoint(object):
         # source of the notification. This will have to get added back later.
         notification = messaging.convert_to_old_notification_format(
             'info', ctxt, publisher_id, event_type, payload, metadata)
-        self.process_notification(notification)
+        return self.process_notification(notification)
 
     def error(self, ctxt, publisher_id, event_type, payload, metadata):
         """Convert error message to Ceilometer Event.
@@ -67,7 +67,7 @@ class EventsNotificationEndpoint(object):
         # source of the notification. This will have to get added back later.
         notification = messaging.convert_to_old_notification_format(
             'error', ctxt, publisher_id, event_type, payload, metadata)
-        self.process_notification(notification)
+        return self.process_notification(notification)
 
     def process_notification(self, notification):
         try:
