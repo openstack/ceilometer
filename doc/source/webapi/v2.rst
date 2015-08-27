@@ -191,12 +191,12 @@ supported: *=*, *!=*, *<*, *<=*, *>*, *>=* and *in*; and the following logical
 operators can be used: *and* *or* and *not*. The field names are validated
 against the database models. See :ref:`api-queries` for how to query the API.
 
-.. note:: The *not* operator has different meaning in Mongo DB and in SQL DB engine.
+.. note:: The *not* operator has different meaning in MongoDB and in SQL DB engine.
    If the *not* operator is applied on a non existent metadata field then
    the result depends on the DB engine. For example if
    {"not": {"metadata.nonexistent_field" : "some value"}} filter is used in a query
-   the Mongo DB will return every Sample object as *not* operator evaluated true
-   for every Sample where the given field does not exists. See more in the Mongod DB doc.
+   the MongoDB will return every Sample object as *not* operator evaluated true
+   for every Sample where the given field does not exists. See more in the MongoDB doc.
    On the other hand SQL based DB engine will return empty result as the join operation
    on the metadata table will return zero rows as the on clause of the join which
    tries to match on the metadata field name is never fulfilled.
