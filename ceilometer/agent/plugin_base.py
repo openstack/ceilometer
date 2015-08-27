@@ -24,6 +24,7 @@ from oslo_context import context
 from oslo_log import log
 import oslo_messaging
 import six
+from stevedore import extension
 
 from ceilometer.i18n import _
 from ceilometer import messaging
@@ -231,6 +232,33 @@ class PollsterBase(PluginBase):
                           see ``default_discovery`` for more information.
 
         """
+
+    @classmethod
+    def build_pollsters(cls):
+        """Return a list of tuple (name, pollster).
+
+        The name is the meter name which the pollster would return, the
+        pollster is a pollster object instance. The pollster which implements
+        this method should be registered in the namespace of
+        ceilometer.builder.xxx instead of ceilometer.poll.xxx.
+        """
+        return []
+
+    @classmethod
+    def get_pollsters_extensions(cls):
+        """Return a list of stevedore extensions.
+
+        The returned stevedore extensions wrap the pollster object instances
+        returned by build_pollsters.
+        """
+        extensions = []
+        try:
+            for name, pollster in cls.build_pollsters():
+                ext = extension.Extension(name, None, cls, pollster)
+                extensions.append(ext)
+        except Exception as err:
+            raise ExtensionLoadError(err)
+        return extensions
 
 
 @six.add_metaclass(abc.ABCMeta)

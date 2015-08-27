@@ -1,0 +1,181 @@
+---
+
+metric:
+# cpu
+    - name: hardware.cpu.load.1min
+      unit: process
+      type: gauge
+      snmp_inspector:
+          matching_type: "type_exact"
+          oid:  "1.3.6.1.4.1.2021.10.1.3.1"
+          type: "lambda x: float(str(x))"
+
+    - name: hardware.cpu.load.5min
+      unit: process
+      type: gauge
+      snmp_inspector:
+          matching_type: "type_exact"
+          oid:  "1.3.6.1.4.1.2021.10.1.3.2"
+          type: "lambda x: float(str(x))"
+
+    - name: hardware.cpu.load.15min
+      unit: process
+      type: gauge
+      snmp_inspector:
+          matching_type: "type_exact"
+          oid:  "1.3.6.1.4.1.2021.10.1.3.3"
+          type: "lambda x: float(str(x))"
+# disk
+    - name: hardware.disk.size.total
+      unit: KB
+      type: gauge
+      snmp_inspector:
+          matching_type: "type_prefix"
+          oid:  "1.3.6.1.4.1.2021.9.1.6"
+          type: "int"
+          metadata: &disk_metadata
+              path:
+                  oid: "1.3.6.1.4.1.2021.9.1.2"
+                  type: "str"
+              device:
+                  oid: "1.3.6.1.4.1.2021.9.1.3"
+                  type: "str"
+          post_op: "_post_op_disk"
+
+    - name: hardware.disk.size.used
+      unit: KB
+      type: gauge
+      snmp_inspector:
+          matching_type: "type_prefix"
+          oid:  "1.3.6.1.4.1.2021.9.1.8"
+          type: "int"
+          metadata: *disk_metadata
+          post_op: "_post_op_disk"
+# memory
+    - name: hardware.memory.total
+      unit: KB
+      type: gauge
+      snmp_inspector:
+          matching_type: "type_exact"
+          oid:  "1.3.6.1.4.1.2021.4.5.0"
+          type: "int"
+
+    - name: hardware.memory.used
+      unit: KB
+      type: gauge
+      snmp_inspector:
+          matching_type: "type_exact"
+          oid:  "1.3.6.1.4.1.2021.4.6.0"
+          type: "int"
+          post_op: "_post_op_memory_avail_to_used"
+
+    - name: hardware.memory.swap.total
+      unit: KB
+      type: gauge
+      snmp_inspector:
+          matching_type: "type_exact"
+          oid:  "1.3.6.1.4.1.2021.4.3.0"
+          type: "int"
+
+    - name: hardware.memory.swap.avail
+      unit: KB
+      type: gauge
+      snmp_inspector:
+          matching_type: "type_exact"
+          oid:  "1.3.6.1.4.1.2021.4.4.0"
+          type: "int"
+
+    - name: hardware.memory.buffer
+      unit: KB
+      type: gauge
+      snmp_inspector:
+          matching_type: "type_exact"
+          oid:  "1.3.6.1.4.1.2021.4.14.0"
+          type: "int"
+
+    - name: hardware.memory.cached
+      unit: KB
+      type: gauge
+      snmp_inspector:
+          matching_type: "type_exact"
+          oid:  "1.3.6.1.4.1.2021.4.15.0"
+          type: "int"
+# network interface
+    - name: hardware.network.incoming.bytes
+      unit: B
+      type: cumulative
+      snmp_inspector:
+          matching_type: "type_prefix"
+          oid:  "1.3.6.1.2.1.2.2.1.10"
+          type: "int"
+          metadata: &net_metadata
+              name:
+                  oid: "1.3.6.1.2.1.2.2.1.2"
+                  type: "str"
+              speed:
+                  oid: "1.3.6.1.2.1.2.2.1.5"
+                  type: "lambda x: int(x) / 8"
+              mac:
+                  oid: "1.3.6.1.2.1.2.2.1.6"
+                  type: "lambda x: x.prettyPrint().replace('0x', '')"
+          post_op: "_post_op_net"
+
+    - name: hardware.network.outgoing.bytes
+      unit: B
+      type: cumulative
+      snmp_inspector:
+          matching_type: "type_prefix"
+          oid:  "1.3.6.1.2.1.2.2.1.16"
+          type: "int"
+          metadata: *net_metadata
+          post_op: "_post_op_net"
+
+    - name: hardware.network.outgoing.errors
+      unit: packet
+      type: cumulative
+      snmp_inspector:
+          matching_type: "type_prefix"
+          oid:  "1.3.6.1.2.1.2.2.1.20"
+          type: "int"
+          metadata: *net_metadata
+          post_op: "_post_op_net"
+#network aggregate
+    - name: hardware.network.ip.outgoing.datagrams
+      unit: datagrams
+      type: cumulative
+      snmp_inspector:
+          matching_type: "type_exact"
+          oid:  "1.3.6.1.2.1.4.10.0"
+          type: "int"
+
+    - name: hardware.network.ip.incoming.datagrams
+      unit: datagrams
+      type: cumulative
+      snmp_inspector:
+          matching_type: "type_exact"
+          oid:  "1.3.6.1.2.1.4.3.0"
+          type: "int"
+#system stats
+    - name: hardware.system_stats.cpu.idle
+      unit: "%"
+      type: gauge
+      snmp_inspector:
+          matching_type: "type_exact"
+          oid:  "1.3.6.1.4.1.2021.11.11.0"
+          type: "int"
+
+    - name: hardware.system_stats.io.outgoing.blocks
+      unit: blocks
+      type: cumulative
+      snmp_inspector:
+          matching_type: "type_exact"
+          oid:  "1.3.6.1.4.1.2021.11.57.0"
+          type: "int"
+
+    - name: hardware.system_stats.io.incoming.blocks
+      unit: blocks
+      type: cumulative
+      snmp_inspector:
+          matching_type: "type_exact"
+          oid:  "1.3.6.1.4.1.2021.11.58.0"
+          type: "int"

@@ -19,6 +19,7 @@
 # under the License.
 """Inspector for collecting data over SNMP"""
 
+import copy
 from pysnmp.entity.rfc3413.oneliner import cmdgen
 
 import six
@@ -111,7 +112,7 @@ class SNMPInspector(base.Inspector):
 
     _CACHE_KEY_OID = "snmp_cached_oid"
 
-    '''
+    """
 
      The following mapping define how to construct
      (value, metadata, extra) returned by inspect_generic
@@ -166,7 +167,7 @@ class SNMPInspector(base.Inspector):
      it could be used to add information into extra dict to be returned
      to construct the pollster how to build final sample, e.g.
          extra.update('project_id': xy, 'user_id': zw)
-    '''
+    """
 
     MAPPING = {
         'cpu.load.1min': {
@@ -370,9 +371,14 @@ class SNMPInspector(base.Inspector):
                 new_oids.append(metadata[0])
         return new_oids
 
-    def inspect_generic(self, host, identifier, cache, extra_metadata=None):
+    def inspect_generic(self, host, identifier, cache,
+                        extra_metadata=None,
+                        param=None):
         # the snmp definition for the corresponding meter
-        meter_def = self.MAPPING[identifier]
+        if param:
+            meter_def = param
+        else:
+            meter_def = self.MAPPING[identifier]
         # collect oids that needs to be queried
         oids_to_query = self._find_missing_oids(meter_def, cache)
         # query oids and populate into caches
@@ -389,7 +395,8 @@ class SNMPInspector(base.Inspector):
             meter_def['metric_oid'][0],
             meter_def['matching_type'],
             False)
-        extra_metadata = extra_metadata or {}
+        input_extra_metadata = extra_metadata
+
         for oid in oids_for_sample_values:
             suffix = oid[len(meter_def['metric_oid'][0]):]
             value = self.get_oid_value(oid_cache,
@@ -399,6 +406,7 @@ class SNMPInspector(base.Inspector):
             metadata = self.construct_metadata(oid_cache,
                                                meter_def['metadata'],
                                                suffix)
+            extra_metadata = copy.deepcopy(input_extra_metadata) or {}
             # call post_op for special cases
             if meter_def['post_op']:
                 func = getattr(self, meter_def['post_op'], None)
@@ -431,6 +439,14 @@ class SNMPInspector(base.Inspector):
         metadata.update(ip=ip_addr)
         return value
 
+    def _post_op_disk(self, host, cache, meter_def,
+                      value, metadata, extra, suffix):
+        if metadata.get('device'):
+            res_id = extra.get('resource_id') or host.hostname
+            res_id = res_id + ".%s" % metadata.get('device')
+            extra.update(resource_id=res_id)
+        return value
+
     @staticmethod
     def _get_auth_strategy(host):
         if host.password:
@@ -438,5 +454,14 @@ class SNMPInspector(base.Inspector):
                                                authKey=host.password)
         else:
             auth_strategy = cmdgen.CommunityData(host.username or 'public')
-
         return auth_strategy
+
+    def prepare_params(self, param):
+        processed = {}
+        processed['matching_type'] = param['matching_type']
+        processed['metric_oid'] = (param['oid'], eval(param['type']))
+        processed['post_op'] = param.get('post_op', None)
+        processed['metadata'] = {}
+        for k, v in six.iteritems(param.get('metadata', {})):
+            processed['metadata'][k] = (v['oid'], eval(v['type']))
+        return processed
