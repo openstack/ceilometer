@@ -51,7 +51,7 @@ tests:
           $.stack.stack_status: "CREATE_COMPLETE"
 
     - name: list servers
-      desc: Wait the autoscaling stack grow to three servers
+      desc: Wait the autoscaling stack grow to two servers
       url: $ENVIRON['NOVA_SERVICE_URL']/servers/detail
       method: GET
       poll:
@@ -65,7 +65,7 @@ tests:
           $.servers.`len`: 2
 
     - name: check gnocchi resources
-      desc: Check the gnocchi resources for this three servers exists
+      desc: Check the gnocchi resources for this two servers exists
       url: $ENVIRON['GNOCCHI_SERVICE_URL']/v1/resource/instance
       method: GET
       poll:
@@ -127,7 +127,7 @@ tests:
           $.stack.stack_status: "UPDATE_COMPLETE"
 
     - name: list servers
-      desc: Wait the autoscaling stack grow to three servers
+      desc: Wait the autoscaling stack shrink to one server
       url: $ENVIRON['NOVA_SERVICE_URL']/servers/detail
       method: GET
       poll:
