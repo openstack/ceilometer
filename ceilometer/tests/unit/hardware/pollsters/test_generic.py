@@ -72,13 +72,13 @@ class FakeInspector(inspector_base.Inspector):
                         ip='10.0.0.2',
                         speed=1000)
     DATA = {
-        'hardware.test1': (0.99, {}, {}),
-        'hardware.test2.abc': (90, net_metadata, {}),
+        'test': (0.99, {}, {}),
+        'test2': (90, net_metadata, {}),
     }
 
-    def inspect_generic(self, host, identifier, cache,
+    def inspect_generic(self, host, cache,
                         extra_metadata=None, param=None):
-        yield self.DATA[identifier]
+        yield self.DATA[host.hostname]
 
 
 class TestGenericPollsters(test_base.BaseTestCase):

@@ -165,10 +165,9 @@ class GenericHardwareDeclarativePollster(plugin_base.PollsterBase):
 
                 if identifier not in i_cache:
                     i_cache[identifier] = list(ins.inspect_generic(
-                        parsed_url,
-                        identifier,
-                        i_cache,
-                        extra_metadata,
+                        host=parsed_url,
+                        cache=i_cache,
+                        extra_metadata=extra_metadata,
                         param=inspector_param))
                 # Generate samples
                 if i_cache[identifier]:
