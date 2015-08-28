@@ -24,6 +24,7 @@ import os
 
 from oslo_config import cfg
 from oslo_log import log
+import oslo_messaging
 from oslo_utils import timeutils
 import six
 from stevedore import extension
@@ -117,8 +118,14 @@ class EventPipelineEndpoint(PipelineEndpoint):
             for ev in payload if publisher_utils.verify_signature(
                 ev, cfg.CONF.publisher.telemetry_secret)
         ]
-        with self.publish_context as p:
-            p(events)
+        try:
+            with self.publish_context as p:
+                p(events)
+        except Exception:
+            if not cfg.CONF.notification.ack_on_event_error:
+                return oslo_messaging.NotificationResult.REQUEUE
+            raise
+        return oslo_messaging.NotificationResult.HANDLED
 
 
 class _PipelineTransportManager(object):
