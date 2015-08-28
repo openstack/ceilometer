@@ -36,6 +36,8 @@ OPTS = [
 ]
 
 cfg.CONF.register_opts(OPTS, group='meter')
+cfg.CONF.import_opt('disable_non_metric_meters', 'ceilometer.notification',
+                    group='notification')
 
 LOG = log.getLogger(__name__)
 
