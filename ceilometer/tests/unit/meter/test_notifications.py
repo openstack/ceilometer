@@ -225,7 +225,7 @@ class TestMeterDefinition(test.BaseTestCase):
                    project_id="$.payload.project_id")
         handler = notifications.MeterDefinition(cfg)
         self.assertTrue(handler.match_type("test.create"))
-        self.assertEqual(1, handler.parse_fields("volume", NOTIFICATION))
+        self.assertEqual(1.0, handler.parse_fields("volume", NOTIFICATION))
         self.assertEqual("bea70e51c7340cb9d555b15cbfcaec23",
                          handler.parse_fields("resource_id", NOTIFICATION))
         self.assertEqual("30be1fc9a03c4e94ab05c403a8a377f2",
@@ -415,7 +415,7 @@ class TestMeterProcessing(test.BaseTestCase):
                         volume="$.payload.measurements.[*].result",
                         resource_id="$.payload.target_id",
                         project_id="$.payload.initiator.project_id",
-                        multi=["name", "volume", "unit"])]})
+                        lookup=["name", "volume", "unit"])]})
         self.handler.definitions = notifications.load_definitions(
             self.__setup_meter_def_file(cfg))
         c = list(self.handler.process_notification(MIDDLEWARE_EVENT))
@@ -440,7 +440,7 @@ class TestMeterProcessing(test.BaseTestCase):
                         volume="$.payload.measurements.[*].result",
                         resource_id="$.payload.target_id",
                         project_id="$.payload.initiator.project_id",
-                        multi=["name", "unit"])]})
+                        lookup=["name", "unit"])]})
         self.handler.definitions = notifications.load_definitions(
             self.__setup_meter_def_file(cfg))
         c = list(self.handler.process_notification(event))
@@ -461,7 +461,7 @@ class TestMeterProcessing(test.BaseTestCase):
                         volume="$.payload.measurements.[*].result",
                         resource_id="$.payload.target_id",
                         project_id="$.payload.initiator.project_id",
-                        multi="name")]})
+                        lookup="name")]})
         self.handler.definitions = notifications.load_definitions(
             self.__setup_meter_def_file(cfg))
         c = list(self.handler.process_notification(event))
@@ -477,8 +477,8 @@ class TestMeterProcessing(test.BaseTestCase):
                         resource_id="$.payload.[*].resource_id",
                         project_id="$.payload.[*].project_id",
                         user_id="$.payload.[*].user_id",
-                        multi=['name', 'type', 'unit', 'volume', 'resource_id',
-                               'project_id', 'user_id'])]})
+                        lookup=['name', 'type', 'unit', 'volume',
+                                'resource_id', 'project_id', 'user_id'])]})
         self.handler.definitions = notifications.load_definitions(
             self.__setup_meter_def_file(cfg))
         c = list(self.handler.process_notification(FULL_MULTI_MSG))
@@ -507,7 +507,7 @@ class TestMeterProcessing(test.BaseTestCase):
                         volume="$.payload.measurements.[*].result",
                         resource_id="$.payload.target_id",
                         project_id="$.payload.initiator.project_id",
-                        multi=["name", "unit", "volume"])]})
+                        lookup=["name", "unit", "volume"])]})
         self.handler.definitions = notifications.load_definitions(
             self.__setup_meter_def_file(cfg))
         c = list(self.handler.process_notification(event))
@@ -526,7 +526,7 @@ class TestMeterProcessing(test.BaseTestCase):
                         volume="$.payload.measurements.[*].result",
                         resource_id="$.payload.target_id",
                         project_id="$.payload.initiator.project_id",
-                        multi=["name", "unit", "volume"])]})
+                        lookup=["name", "unit", "volume"])]})
         self.handler.definitions = notifications.load_definitions(
             self.__setup_meter_def_file(cfg))
         c = list(self.handler.process_notification(event))

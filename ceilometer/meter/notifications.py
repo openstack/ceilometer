@@ -67,14 +67,14 @@ class MeterDefinition(object):
         if isinstance(self._event_type, six.string_types):
             self._event_type = [self._event_type]
 
-        if ('type' not in self.cfg.get('multi', []) and
+        if ('type' not in self.cfg.get('lookup', []) and
                 self.cfg['type'] not in sample.TYPES):
             raise MeterDefinitionException(
                 _LE("Invalid type %s specified") % self.cfg['type'], self.cfg)
 
         self._field_getter = {}
         for name, field in self.cfg.items():
-            if name in ["event_type", "multi"] or not field:
+            if name in ["event_type", "lookup"] or not field:
                 continue
             elif isinstance(field, six.integer_types):
                 self._field_getter[name] = field
@@ -218,14 +218,14 @@ class ProcessMeterNotifications(plugin_base.NotificationBase):
     def _normalise_as_list(value, d, body, length):
         values = d.parse_fields(value, body, True)
         if not values:
-            if value in d.cfg.get('multi'):
+            if value in d.cfg.get('lookup'):
                 LOG.warning('Could not find %s values', value)
                 raise InvalidPayload
             values = [d.cfg[value]]
-        elif value in d.cfg.get('multi') and length != len(values):
+        elif value in d.cfg.get('lookup') and length != len(values):
             LOG.warning('Not all fetched meters contain "%s" field', value)
             raise InvalidPayload
-        return values
+        return values if isinstance(values, list) else [values]
 
     def process_notification(self, notification_body):
         for d in self.definitions:
@@ -234,7 +234,7 @@ class ProcessMeterNotifications(plugin_base.NotificationBase):
                 projectid = self.get_project_id(d, notification_body)
                 resourceid = d.parse_fields('resource_id', notification_body)
                 ts = d.parse_fields('timestamp', notification_body)
-                if d.cfg.get('multi'):
+                if d.cfg.get('lookup'):
                     meters = d.parse_fields('name', notification_body, True)
                     if not meters:  # skip if no meters in payload
                         break
@@ -249,13 +249,14 @@ class ProcessMeterNotifications(plugin_base.NotificationBase):
                             'type', d, notification_body, len(meters))
                         users = (self._normalise_as_list(
                             'user_id', d, notification_body, len(meters))
-                            if 'user_id' in d.cfg['multi'] else [userid])
+                            if 'user_id' in d.cfg['lookup'] else [userid])
                         projs = (self._normalise_as_list(
                             'project_id', d, notification_body, len(meters))
-                            if 'project_id' in d.cfg['multi'] else [projectid])
+                            if 'project_id' in d.cfg['lookup']
+                            else [projectid])
                         times = (self._normalise_as_list(
                             'timestamp', d, notification_body, len(meters))
-                            if 'timestamp' in d.cfg['multi'] else [ts])
+                            if 'timestamp' in d.cfg['lookup'] else [ts])
                     except InvalidPayload:
                         break
                     for m, v, unit, t, r, p, user, ts in zip(

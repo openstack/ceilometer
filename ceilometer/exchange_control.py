@@ -38,4 +38,10 @@ EXCHANGE_OPTS = [
     cfg.StrOpt('magnum_control_exchange',
                default='magnum',
                help="Exchange name for Magnum notifications."),
+    cfg.StrOpt('trove_control_exchange',
+               default='trove',
+               help="Exchange name for DBaaS notifications."),
+    cfg.StrOpt('zaqar_control_exchange',
+               default='zaqar',
+               help="Exchange name for Messaging service notifications."),
 ]
