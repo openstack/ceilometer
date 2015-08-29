@@ -19,6 +19,7 @@ import json
 from oslo_log import log
 import requests
 import retrying
+from six.moves.urllib import parse as urlparse
 
 from ceilometer.i18n import _
 from ceilometer import keystone_client
@@ -104,7 +105,8 @@ class Client(object):
                      measure_attributes):
         r = self._session.post("%s/v1/resource/%s/%s/metric/%s/measures"
                                % (self._gnocchi_url, resource_type,
-                                  resource_id, metric_name),
+                                  urlparse.quote(resource_id, safe=""),
+                                  metric_name),
                                headers=self._get_headers(),
                                data=json.dumps(measure_attributes))
 
@@ -155,7 +157,8 @@ class Client(object):
                         resource_extra):
         r = self._session.patch(
             "%s/v1/resource/%s/%s"
-            % (self._gnocchi_url, resource_type, resource_id),
+            % (self._gnocchi_url, resource_type,
+               urlparse.quote(resource_id, safe="")),
             headers=self._get_headers(),
             data=json.dumps(resource_extra))
 
@@ -175,7 +178,7 @@ class Client(object):
         params = {metric_name: archive_policy}
         r = self._session.post("%s/v1/resource/%s/%s/metric"
                                % (self._gnocchi_url, resource_type,
-                                  resource_id),
+                                  urlparse.quote(resource_id, safe="")),
                                headers=self._get_headers(),
                                data=json.dumps(params))
         if r.status_code == 409:
