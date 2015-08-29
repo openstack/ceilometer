@@ -23,59 +23,7 @@ tests:
       method: POST
       request_headers:
           content-type: application/json
-      data:
-          stack_name: integration_test
-          template:
-              heat_template_version: "2013-05-23"
-              description: Integration Test AutoScaling with heat+ceilometer+gnocchi+aodh
-              resources:
-                asg:
-                  type: OS::Heat::AutoScalingGroup
-                  properties:
-                    min_size: 1
-                    max_size: 3
-                    resource:
-                      type: OS::Nova::Server
-                      properties:
-                        networks:
-                          - network: "private"
-                        flavor: m1.tiny
-                        image: $ENVIRON['GLANCE_IMAGE_NAME']
-                        metadata:
-                          "metering.server_group": {get_param: "OS::stack_id"}
-                        user_data_format: RAW
-                        user_data: |
-                          #!/bin/sh
-                          echo "Loading CPU"
-                          set -v
-                          cat /dev/urandom > /dev/null
-                web_server_scaleup_policy:
-                  type: OS::Heat::ScalingPolicy
-                  properties:
-                    adjustment_type: change_in_capacity
-                    auto_scaling_group_id: {get_resource: asg}
-                    cooldown: 2
-                    scaling_adjustment: 1
-                cpu_alarm_high:
-                  type: OS::Ceilometer::GnocchiAggregationByResourcesAlarm
-                  properties:
-                    description: Scale-up if the mean CPU > 10% on 1 minute
-                    metric: cpu_util
-                    aggregation_method: mean
-                    granularity: 60.0
-                    evaluation_periods: 1
-                    threshold: 10
-                    comparison_operator: gt
-                    alarm_actions:
-                      - {get_attr: [web_server_scaleup_policy, alarm_url]}
-                    resource_type: instance
-                    query:
-                      str_replace:
-                        template: '{"=": {"server_group": "stack_id"}}'
-                        params:
-                           stack_id: {get_param: "OS::stack_id"}
-                # TODO(sileht): create some other kind of kind alarm just to ensure
-                # heat and aodh API are in sync
+      data: <@create_stack.json
       status: 201
 
     - name: waiting for stack creation
@@ -112,10 +60,9 @@ tests:
       response_json_paths:
           $.servers[0].metadata.'metering.server_group': $RESPONSE['$.stack.id']
           $.servers[1].metadata.'metering.server_group': $RESPONSE['$.stack.id']
-          $.servers[2].metadata.'metering.server_group': $RESPONSE['$.stack.id']
           $.servers[0].status: ACTIVE
           $.servers[1].status: ACTIVE
-          $.servers[2].status: ACTIVE
+          $.servers.`len`: 2
 
     - name: check gnocchi resources
       desc: Check the gnocchi resources for this three servers exists
@@ -127,16 +74,69 @@ tests:
       response_strings:
           - '"id": "$RESPONSE["$.servers[0].id"]"'
           - '"id": "$RESPONSE["$.servers[1].id"]"'
-          - '"id": "$RESPONSE["$.servers[2].id"]"'
 
     - name: check alarm
       desc: Check the aodh alarm and its state
       url: $ENVIRON['AODH_SERVICE_URL']/v2/alarms
       method: GET
+      poll:
+          count: 30
+          delay: 1
       response_strings:
           - "integration_test-cpu_alarm_high-"
       response_json_paths:
           $[0].state: alarm
+
+    - name: get stack location for update
+      desc: Get the stack location
+      url: $ENVIRON['HEAT_SERVICE_URL']/stacks/integration_test
+      method: GET
+      status: 302
+
+    - name: update stack
+      desc: Update an autoscaling stack
+      url: $LOCATION
+      method: PUT
+      request_headers:
+          content-type: application/json
+      data: <@update_stack.json
+      status: 202
+
+    - name: waiting for stack update
+      desc: Wait for the third event on the stack resource, it can be a success or failure
+      url: $ENVIRON['HEAT_SERVICE_URL']/stacks/integration_test/events?resource_name=integration_test
+      redirects: true
+      method: GET
+      status: 200
+      poll:
+          count: 300
+          delay: 1
+      response_json_paths:
+          $.events[3].resource_name: integration_test
+
+    - name: control stack status
+      desc: Checks the stack have been created successfully
+      url: $ENVIRON['HEAT_SERVICE_URL']/stacks/integration_test
+      redirects: true
+      method: GET
+      status: 200
+      poll:
+          count: 5
+          delay: 1
+      response_json_paths:
+          $.stack.stack_status: "UPDATE_COMPLETE"
+
+    - name: list servers
+      desc: Wait the autoscaling stack grow to three servers
+      url: $ENVIRON['NOVA_SERVICE_URL']/servers/detail
+      method: GET
+      poll:
+          count: 600
+          delay: 1
+      response_json_paths:
+          $.servers[0].metadata.'metering.server_group': $RESPONSE['$.stack.id']
+          $.servers[0].status: ACTIVE
+          $.servers.`len`: 1
 
     - name: get stack location
       desc: Get the stack location
