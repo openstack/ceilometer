@@ -146,6 +146,16 @@ class TestEventEndpoint(tests_base.BaseTestCase):
                            'compute.instance.create.end',
                            TEST_NOTICE_PAYLOAD, TEST_NOTICE_METADATA)
 
+    def test_bad_event_non_ack_and_requeue(self):
+        self._setup_endpoint(['test://'])
+        self.fake_publisher.publish_events.side_effect = Exception
+        self.CONF.set_override("ack_on_event_error", False,
+                               group="notification")
+        ret = self.endpoint.info(TEST_NOTICE_CTXT, 'compute.vagrant-precise',
+                                 'compute.instance.create.end',
+                                 TEST_NOTICE_PAYLOAD, TEST_NOTICE_METADATA)
+        self.assertEqual(oslo_messaging.NotificationResult.REQUEUE, ret)
+
     def test_message_to_event_bad_event(self):
         self._setup_endpoint(['test://'])
         self.fake_publisher.publish_events.side_effect = Exception
