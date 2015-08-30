@@ -688,7 +688,7 @@ metric:
     unit: 'trust'
     volume: 1
     event_type:
-      - 'identity.trust.created'
+      - 'identity.OS-TRUST:trust.created'
     resource_id: $.payload.resource_info
     user_id: $.payload.initiator.id
 
@@ -697,7 +697,7 @@ metric:
     unit: 'trust'
     volume: 1
     event_type:
-      - 'identity.trust.deleted'
+      - 'identity.OS-TRUST:trust.deleted'
     resource_id: $.payload.resource_info
     user_id: $.payload.initiator.id
 
