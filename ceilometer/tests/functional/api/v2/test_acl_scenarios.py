@@ -212,9 +212,48 @@ class TestAPIACL(v2.FunctionalTest,
                                  }])
         self.assertEqual(401, data.status_int)
 
+
+class TestAPIEventACL(TestAPIACL):
+
+    PATH = '/events'
+
     def test_non_admin_get_events(self):
+        data = self.get_json(self.PATH, expect_errors=True,
+                             headers={"X-Roles": "Member",
+                                      "X-Auth-Token": VALID_TOKEN2,
+                                      "X-Project-Id": "project-good",
+                                      "X-User-Id": "user-good"})
+        self.assertEqual(401, data.status_int)
+
+    def test_non_admin_get_event_types(self):
         data = self.get_json('/event_types', expect_errors=True,
                              headers={"X-Roles": "Member",
                                       "X-Auth-Token": VALID_TOKEN2,
                                       "X-Project-Id": "project-good"})
         self.assertEqual(401, data.status_int)
+
+
+class TestApiEventRBAC(v2.FunctionalTest,
+                       tests_db.MixinTestsWithBackendScenarios):
+
+    PATH = '/events'
+
+    def test_get_events_without_project(self):
+        headers_no_proj = {"X-Roles": "admin", "X-User-Id": "user-good"}
+        resp = self.get_json(self.PATH, expect_errors=True,
+                             headers=headers_no_proj, status=403)
+        self.assertEqual(403, resp.status_int)
+
+    def test_get_events_without_user(self):
+        headers_no_user = {"X-Roles": "admin", "X-Project-Id": "project-good"}
+        resp = self.get_json(self.PATH, expect_errors=True,
+                             headers=headers_no_user, status=403)
+        self.assertEqual(403, resp.status_int)
+
+    def test_get_events_without_scope(self):
+        headers_no_user_proj = {"X-Roles": "admin"}
+        resp = self.get_json(self.PATH,
+                             expect_errors=True,
+                             headers=headers_no_user_proj,
+                             status=403)
+        self.assertEqual(403, resp.status_int)

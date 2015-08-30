@@ -237,6 +237,7 @@ class EventTypesController(rest.RestController):
 class EventsController(rest.RestController):
     """Works on Events."""
 
+    @v2_utils.requires_context
     @v2_utils.requires_admin
     @wsme_pecan.wsexpose([Event], [EventQuery], int)
     def get_all(self, q=None, limit=None):
@@ -257,6 +258,7 @@ class EventsController(rest.RestController):
                 pecan.request.event_storage_conn.get_events(event_filter,
                                                             limit)]
 
+    @v2_utils.requires_context
     @v2_utils.requires_admin
     @wsme_pecan.wsexpose(Event, wtypes.text)
     def get_one(self, message_id):

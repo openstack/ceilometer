@@ -49,8 +49,12 @@ class TestAPIUpgradePath(v2.FunctionalTest):
                                     status=410)
             self.assertIn(b'Gnocchi API', response.body)
 
+        headers_events = {"X-Roles": "admin",
+                          "X-User-Id": "user1",
+                          "X-Project-Id": "project1"}
         for endpoint in ['events', 'event_types']:
             self.app.get(self.PATH_PREFIX + '/' + endpoint,
+                         headers=headers_events,
                          status=200)
 
         response = self.post_json('/query/samples',

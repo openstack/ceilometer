@@ -8,6 +8,10 @@ tests:
 
 - name: get all events
   url: /v2/events
+  request_headers:
+      X-Roles: admin
+      X-User-Id: user1
+      X-Project-Id: project1
   response_headers:
       content-type: application/json; charset=UTF-8
       content-location: /$SCHEME://.*/telemetry/v2/events/
