@@ -265,6 +265,15 @@ class Connection(base.Connection):
             if trait_subq is not None:
                 query = query.join(trait_subq,
                                    trait_subq.c.ev_id == models.Event.id)
+            if event_filter.admin_proj:
+                admin_q = session.query(models.TraitText).filter(
+                    models.TraitText.key == 'project_id')
+                query = query.filter(sa.or_(~sa.exists().where(
+                    models.Event.id == admin_q.subquery().c.event_id),
+                    sa.and_(
+                        models.TraitText.key == 'project_id',
+                        models.TraitText.value == event_filter.admin_proj,
+                        models.Event.id == models.TraitText.event_id)))
             if event_filter_conditions:
                 query = query.filter(sa.and_(*event_filter_conditions))
 
@@ -274,7 +283,7 @@ class Connection(base.Connection):
             for (id_, generated, message_id,
                  desc, raw) in query.add_columns(
                      models.Event.generated, models.Event.message_id,
-                     models.EventType.desc, models.Event.raw).all():
+                     models.EventType.desc, models.Event.raw).distinct().all():
                 event_list[id_] = api_models.Event(message_id, desc,
                                                    generated, [], raw)
             # Query all traits related to events.
