@@ -48,5 +48,4 @@ MongoDB            Yes                           Yes                 Yes
 MySQL              Yes                           Yes                 Yes
 PostgreSQL         Yes                           Yes                 Yes
 HBase              Yes                           Yes, except groupby Yes
-DB2                Yes                           Yes                 Yes
 ================== ============================= =================== ======

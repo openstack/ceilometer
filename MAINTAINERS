@@ -64,11 +64,6 @@ F: publisher/, transformer/, pipeline.py
 
 == storage ==
 
--- DB2 --
-M: Tong Li (litong) <litong01@us.ibm.com>
-S: Maintained
-F: storage/impl_db2.py
-
 -- HBase --
 M:
 S: Orphan
