@@ -350,4 +350,4 @@ class GnocchiDispatcher(dispatcher.Base):
 
     @staticmethod
     def record_events(events):
-        raise NotImplementedError
+        pass
