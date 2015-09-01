@@ -201,7 +201,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         return pipeline_cfg_file
 
     def fake_notifier_sample(self, ctxt, event_type, payload):
-        for m in payload:
+        for m in payload['samples']:
             del m['message_signature']
             self.notified_samples.append(m)
 

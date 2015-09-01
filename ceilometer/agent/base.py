@@ -117,10 +117,7 @@ class PollingTask(object):
         resource_factory = lambda: Resources(agent_manager)
         self.resources = collections.defaultdict(resource_factory)
 
-        if cfg.CONF.batch_polled_samples:
-            self._handle_sample = self._assemble_samples
-        else:
-            self._handle_sample = self._send_notification
+        self._batch = cfg.CONF.batch_polled_samples
         self._telemetry_secret = cfg.CONF.publisher.telemetry_secret
 
     def add(self, pollster, source):
@@ -179,10 +176,11 @@ class PollingTask(object):
                             publisher_utils.meter_message_from_counter(
                                 sample, self._telemetry_secret
                             ))
-                        self._handle_sample([sample_dict], sample_batch)
+                        if self._batch:
+                            sample_batch.append(sample_dict)
+                        else:
+                            self._send_notification([sample_dict])
 
-                    # sample_batch will contain samples if
-                    # cfg.CONF.batch_polled_samples is True
                     if sample_batch:
                         self._send_notification(sample_batch)
 
@@ -198,15 +196,11 @@ class PollingTask(object):
                         % ({'name': pollster.name, 'error': err}),
                         exc_info=True)
 
-    @staticmethod
-    def _assemble_samples(samples, batch):
-        batch.extend(samples)
-
-    def _send_notification(self, samples, batch=None):
+    def _send_notification(self, samples):
         self.manager.notifier.info(
             self.manager.context.to_dict(),
-            'telemetry.api',
-            samples
+            'telemetry.polling',
+            {'samples': samples}
         )
 
 
