@@ -122,8 +122,8 @@ Installing the notification agent
 
 2. If you want to be able to retrieve volume samples, you need to instruct
    Cinder to send notifications to the bus by changing ``notification_driver``
-   to ``cinder.openstack.common.notifier.rpc_notifier`` and
-   ``control_exchange`` to ``cinder``, before restarting the service.
+   to ``messagingv2`` and ``control_exchange`` to ``cinder``, before restarting
+   the service.
 
 3. If you want to be able to retrieve instance samples, you need to instruct
    Nova to send notifications to the bus by setting these values::
@@ -132,7 +132,7 @@ Installing the notification agent
       instance_usage_audit=True
       instance_usage_audit_period=hour
       notify_on_state_change=vm_and_task_state
-      notification_driver=nova.openstack.common.notifier.rpc_notifier
+      notification_driver=messagingv2
 
 4. In order to retrieve object store statistics, ceilometer needs
    access to swift with ``ResellerAdmin`` role. You should give this
@@ -197,11 +197,11 @@ Installing the notification agent
 
 8. Edit ``/etc/ceilometer/ceilometer.conf``
 
-   1. Configure RPC
+   1. Configure messaging
 
-      Set the RPC-related options correctly so ceilometer's daemons
-      can communicate with each other and receive notifications from
-      the other projects.
+      Set the messaging related options correctly so ceilometer's daemons can
+      communicate with each other and receive notifications from the other
+      projects.
 
       In particular, look for the ``*_control_exchange`` options and
       make sure the names are correct. If you did not change the
@@ -269,11 +269,11 @@ Installing the collector
 
 4. Edit ``/etc/ceilometer/ceilometer.conf``
 
-   1. Configure RPC
+   1. Configure messaging
 
-      Set the RPC-related options correctly so ceilometer's daemons
-      can communicate with each other and receive notifications from
-      the other projects.
+      Set the messaging related options correctly so ceilometer's daemons can
+      communicate with each other and receive notifications from the other
+      projects.
 
       In particular, look for the ``*_control_exchange`` options and
       make sure the names are correct. If you did not change the
@@ -343,9 +343,9 @@ Installing the Polling Agent
       $ cp etc/ceilometer/ceilometer.conf.sample /etc/ceilometer/ceilometer.conf
 
 4. Edit ``/etc/ceilometer/ceilometer.conf``
-   Set the RPC-related options correctly so ceilometer's daemons
-   can communicate with each other and receive notifications from
-   the other projects.
+   Set the messaging related options correctly so ceilometer's daemons can
+   communicate with each other and receive notifications from the other
+   projects.
 
    In particular, look for the ``*_control_exchange`` options and
    make sure the names are correct. If you did not change the
@@ -408,11 +408,11 @@ Installing the API Server
 
 4. Edit ``/etc/ceilometer/ceilometer.conf``
 
-   1. Configure RPC
+   1. Configure messaging
 
-      Set the RPC-related options correctly so ceilometer's daemons
-      can communicate with each other and receive notifications from
-      the other projects.
+      Set the messaging related options correctly so ceilometer's daemons can
+      communicate with each other and receive notifications from the other
+      projects.
 
       In particular, look for the ``*_control_exchange`` options and
       make sure the names are correct. If you did not change the
@@ -499,13 +499,7 @@ Configure the driver in ``heat.conf``
 
    ::
 
-        notification_driver=heat.openstack.common.notifier.rpc_notifier
-
-Or if migration to oslo.messaging is done for Icehouse:
-
-   ::
-
-        notification_driver=oslo.messaging.notifier.Notifier
+        notification_driver=messagingv2
 
 
 Configuring Sahara to send notifications
@@ -516,12 +510,12 @@ Configure the driver in ``sahara.conf``
    ::
 
         enable_notifications=true
-        notification_driver=messaging
+        notification_driver=messagingv2
 
-Also you need to configure RPC-related options correctly as written above
+Also you need to configure messaging related options correctly as written above
 for other parts of installation guide. Refer to :doc:`/configuration` for
-details about any other options you might want to modify before starting
-the service.
+details about any other options you might want to modify before starting the
+service.
 
 
 Configuring MagnetoDB to send notifications
@@ -531,7 +525,7 @@ Configure the driver in ``magnetodb-async-task-executor.conf``
 
    ::
 
-        notification_driver=messaging
+        notification_driver=messagingv2
 
 You also would need to restart the service magnetodb-async-task-executor
 (if it's already running) after changing the above configuration file.
@@ -543,13 +537,12 @@ Notifications queues
 .. index::
    double: installing; notifications queues
 
-By default, Ceilometer consumes notifications on the RPC bus sent to
+By default, Ceilometer consumes notifications on the messaging bus sent to
 **notification_topics** by using a queue/pool name that is identical to the
-topic name. You shouldn't have different applications consuming messages
-from this queue.
-If you want to also consume the topic notifications with a system other than
-Ceilometer, you should configure a separate queue that listens for the same
-messages.
+topic name. You shouldn't have different applications consuming messages from
+this queue. If you want to also consume the topic notifications with a system
+other than Ceilometer, you should configure a separate queue that listens for
+the same messages.
 
 Using multiple dispatchers
 ================================
