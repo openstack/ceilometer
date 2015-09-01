@@ -227,11 +227,17 @@ class AgentManager(service_base.BaseService):
         # be passed
         extensions = (self._extensions('poll', namespace).extensions
                       for namespace in namespaces)
+        # get the extensions from pollster builder
+        extensions_fb = (self._extensions_from_builder('poll', namespace)
+                         for namespace in namespaces)
         if pollster_list:
             extensions = (moves.filter(_match, exts)
                           for exts in extensions)
+            extensions_fb = (moves.filter(_match, exts)
+                             for exts in extensions_fb)
 
-        self.extensions = list(itertools.chain(*list(extensions)))
+        self.extensions = list(itertools.chain(*list(extensions))) + list(
+            itertools.chain(*list(extensions_fb)))
 
         self.discovery_manager = self._extensions('discover')
         self.context = context.RequestContext('admin', 'admin', is_admin=True)
@@ -249,10 +255,7 @@ class AgentManager(service_base.BaseService):
             publisher_id="ceilometer.api")
 
     @staticmethod
-    def _extensions(category, agent_ns=None):
-        namespace = ('ceilometer.%s.%s' % (category, agent_ns) if agent_ns
-                     else 'ceilometer.%s' % category)
-
+    def _get_ext_mgr(namespace):
         def _catch_extension_load_error(mgr, ep, exc):
             # Extension raising ExtensionLoadError can be ignored,
             # and ignore anything we can't import as a safety measure.
@@ -260,10 +263,9 @@ class AgentManager(service_base.BaseService):
                 LOG.error(_("Skip loading extension for %s") % ep.name)
                 return
             if isinstance(exc, ImportError):
-                LOG.error(
-                    _("Failed to import extension for %(name)s: %(error)s"),
-                    {'name': ep.name, 'error': exc},
-                )
+                LOG.error(_("Failed to import extension for %(name)s: "
+                            "%(error)s"),
+                          {'name': ep.name, 'error': exc})
                 return
             raise exc
 
@@ -272,6 +274,26 @@ class AgentManager(service_base.BaseService):
             invoke_on_load=True,
             on_load_failure_callback=_catch_extension_load_error,
         )
+
+    def _extensions(self, category, agent_ns=None):
+        namespace = ('ceilometer.%s.%s' % (category, agent_ns) if agent_ns
+                     else 'ceilometer.%s' % category)
+        return self._get_ext_mgr(namespace)
+
+    def _extensions_from_builder(self, category, agent_ns=None):
+        ns = ('ceilometer.builder.%s.%s' % (category, agent_ns) if agent_ns
+              else 'ceilometer.builder.%s' % category)
+        mgr = self._get_ext_mgr(ns)
+
+        def _build(ext):
+            return ext.plugin.get_pollsters_extensions()
+
+        # NOTE: this seems a stevedore bug. if no extensions are found,
+        # map will raise runtimeError which is not documented.
+        if mgr.names():
+            return list(itertools.chain(*mgr.map(_build)))
+        else:
+            return []
 
     def join_partitioning_groups(self):
         self.groups = set([self.construct_group_id(d.obj.group_id)
