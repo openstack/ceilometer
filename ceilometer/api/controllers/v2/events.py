@@ -157,6 +157,18 @@ class Event(base.Base):
         )
 
 
+def _add_user_proj_filter():
+    traits_filter = []
+    # Returns user_id, proj_id for non-admins
+    user_id, proj_id = rbac.get_limited_to(pecan.request.headers)
+    # If non-admin, filter events by user and project
+    if (user_id and proj_id):
+        traits_filter.append({"key": "project_id", "string": proj_id,
+                              "op": "eq"})
+        traits_filter.append({"key": "user_id", "string": user_id, "op": "eq"})
+    return traits_filter
+
+
 def _event_query_to_event_filter(q):
     evt_model_filter = {
         'event_type': None,
@@ -164,7 +176,7 @@ def _event_query_to_event_filter(q):
         'start_timestamp': None,
         'end_timestamp': None
     }
-    traits_filter = []
+    traits_filter = _add_user_proj_filter()
 
     for i in q:
         if not i.op:
@@ -267,7 +279,9 @@ class EventsController(rest.RestController):
         :param message_id: Message ID of the Event to be returned
         """
         rbac.enforce("events:show", pecan.request)
-        event_filter = storage.EventFilter(message_id=message_id)
+        t_filter = _add_user_proj_filter()
+        event_filter = storage.EventFilter(traits_filter=t_filter,
+                                           message_id=message_id)
         events = [event for event
                   in pecan.request.event_storage_conn.get_events(event_filter)]
         if not events:
