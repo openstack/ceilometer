@@ -32,6 +32,7 @@ from ceilometer.alarm.storage import models as alarm_models
 from ceilometer.api.controllers.v2 import alarms
 from ceilometer.api.controllers.v2 import base
 from ceilometer.api.controllers.v2 import samples
+from ceilometer.api.controllers.v2 import utils as v2_utils
 from ceilometer.api import rbac
 from ceilometer.i18n import _
 from ceilometer import storage
@@ -220,14 +221,10 @@ class ValidatedComplexQuery(object):
             self._convert_orderby_to_lower_case(self.orderby)
             self._normalize_field_names_in_orderby(self.orderby)
 
-        if self.original_query.limit is wtypes.Unset:
-            self.limit = None
-        else:
-            self.limit = self.original_query.limit
+        self.limit = (None if self.original_query.limit is wtypes.Unset
+                      else self.original_query.limit)
 
-        if self.limit is not None and self.limit <= 0:
-            msg = _('Limit should be positive')
-            raise base.ClientSideError(msg)
+        self.limit = v2_utils.enforce_limit(self.limit)
 
     @staticmethod
     def _convert_orderby_to_lower_case(orderby):

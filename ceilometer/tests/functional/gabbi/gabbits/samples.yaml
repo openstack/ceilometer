@@ -38,8 +38,7 @@ tests:
 
     - name: list zero samples with zero limit
       url: /v2/samples?limit=0
-      response_strings:
-          - '[]'
+      status: 400
 
     - name: list samples with query
       url: /v2/samples?q.field=resource_metadata.breed&q.value=cow&q.op=eq
