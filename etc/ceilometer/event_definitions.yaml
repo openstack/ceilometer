@@ -331,6 +331,10 @@
       fields: ['payload.ipsec_site_connection.id', 'payload.id']
 - event_type: '*http.*'
   traits: &http_audit
+    project_id:
+      fields: payload.initiator.project_id
+    user_id:
+      fields: payload.initiator.id
     typeURI:
       fields: payload.typeURI
     eventType:
