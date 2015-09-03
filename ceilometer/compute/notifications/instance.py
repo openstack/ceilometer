@@ -87,24 +87,3 @@ class Instance(ComputeInstanceNotificationBase,
             project_id=message['payload']['tenant_id'],
             resource_id=message['payload']['instance_id'],
             message=message)
-
-
-class InstanceDelete(ComputeInstanceNotificationBase):
-    """Handle the messages sent by the nova notifier plugin.
-
-    Messages are sent when an instance is being deleted.
-    """
-
-    event_types = ['compute.instance.delete.samples']
-
-    def get_sample(self, message):
-        for s in message['payload'].get('samples', []):
-            yield sample.Sample.from_notification(
-                name=s['name'],
-                type=s['type'],
-                unit=s['unit'],
-                volume=s['volume'],
-                user_id=message['payload']['user_id'],
-                project_id=message['payload']['tenant_id'],
-                resource_id=message['payload']['instance_id'],
-                message=message)
