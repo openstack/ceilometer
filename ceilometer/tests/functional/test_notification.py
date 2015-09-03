@@ -390,9 +390,9 @@ class TestRealNotificationHA(BaseRealNotification):
 
     def test_reset_listeners_on_refresh(self):
         self.srv.start()
-        self.assertEqual(2, len(self.srv.pipeline_listeners))
+        self.assertEqual(20, len(self.srv.pipeline_listeners))
         self.srv._refresh_listeners()
-        self.assertEqual(2, len(self.srv.pipeline_listeners))
+        self.assertEqual(20, len(self.srv.pipeline_listeners))
         self.srv.stop()
 
     @mock.patch('oslo_messaging.Notifier.sample')
@@ -462,6 +462,8 @@ class TestRealNotificationMultipleAgents(tests_base.BaseTestCase):
         self.CONF.set_override("disable_non_metric_meters", False,
                                group="notification")
         self.CONF.set_override('workload_partitioning', True,
+                               group='notification')
+        self.CONF.set_override('pipeline_processing_queues', 2,
                                group='notification')
         self.publisher = test_publisher.TestPublisher("")
         self.publisher2 = test_publisher.TestPublisher("")
