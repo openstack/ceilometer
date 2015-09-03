@@ -143,3 +143,38 @@ class TestSNMPInspector(test_base.BaseTestCase):
         self.assertEqual(8, ret)
         self.assertIn('ip', metadata)
         self.assertIn("2", metadata['ip'])
+
+    def test_post_op_disk(self):
+        cache = {}
+        metadata = dict(device='/dev/sda1',
+                        path='/')
+        extra = {}
+        ret = self.inspector._post_op_disk(self.host, cache, None,
+                                           value=8,
+                                           metadata=metadata,
+                                           extra=extra,
+                                           suffix=None)
+        self.assertEqual(8, ret)
+        self.assertIn('resource_id', extra)
+        self.assertEqual("localhost./dev/sda1", extra['resource_id'])
+
+    def test_prepare_params(self):
+        param = {'post_op': '_post_op_disk',
+                 'oid': '1.3.6.1.4.1.2021.9.1.6',
+                 'type': 'int',
+                 'matching_type': 'type_prefix',
+                 'metadata': {
+                     'device': {'oid': '1.3.6.1.4.1.2021.9.1.3',
+                                'type': 'str'},
+                     'path': {'oid': '1.3.6.1.4.1.2021.9.1.2',
+                              'type': "lambda x: str(x)"}}}
+        processed = self.inspector.prepare_params(param)
+        self.assertEqual('_post_op_disk', processed['post_op'])
+        self.assertEqual('1.3.6.1.4.1.2021.9.1.6', processed['metric_oid'][0])
+        self.assertEqual(int, processed['metric_oid'][1])
+        self.assertEqual(snmp.PREFIX, processed['matching_type'])
+        self.assertEqual(2, len(processed['metadata'].keys()))
+        self.assertEqual('1.3.6.1.4.1.2021.9.1.2',
+                         processed['metadata']['path'][0])
+        self.assertEqual("4",
+                         processed['metadata']['path'][1](4))
