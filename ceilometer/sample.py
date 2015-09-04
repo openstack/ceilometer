@@ -82,11 +82,12 @@ class Sample(object):
     @classmethod
     def from_notification(cls, name, type, volume, unit,
                           user_id, project_id, resource_id,
-                          message, timestamp=None, source=None):
-        metadata = (copy.copy(message['payload'])
-                    if isinstance(message['payload'], dict) else {})
-        metadata['event_type'] = message['event_type']
-        metadata['host'] = message['publisher_id']
+                          message, timestamp=None, metadata=None, source=None):
+        if not metadata:
+            metadata = (copy.copy(message['payload'])
+                        if isinstance(message['payload'], dict) else {})
+            metadata['event_type'] = message['event_type']
+            metadata['host'] = message['publisher_id']
         ts = timestamp if timestamp else message['timestamp']
         return cls(name=name,
                    type=type,
