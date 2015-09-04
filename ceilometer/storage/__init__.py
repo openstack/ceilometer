@@ -136,6 +136,12 @@ def get_connection(url, namespace):
     # SqlAlchemy connections specify may specify a 'dialect' or
     # 'dialect+driver'. Handle the case where driver is specified.
     engine_name = connection_scheme.split('+')[0]
+    if engine_name == 'db2':
+        import warnings
+        warnings.simplefilter("always")
+        import debtcollector
+        debtcollector.deprecate("The DB2nosql driver is no longer supported",
+                                version="Liberty", removal_version="N*-cycle")
     # NOTE: translation not applied bug #1446983
     LOG.debug('looking for %(name)r driver in %(namespace)r',
               {'name': engine_name, 'namespace': namespace})
