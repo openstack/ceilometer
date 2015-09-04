@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-08-06 06:33+0000\n"
-"PO-Revision-Date: 2015-07-31 22:06+0000\n"
+"POT-Creation-Date: 2015-09-04 06:16+0000\n"
+"PO-Revision-Date: 2015-09-03 19:17+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/openstack/"
 "ceilometer/language/zh_CN/)\n"
@@ -61,9 +61,8 @@ msgstr "无法保存监控数据：%s"
 msgid "Failed to retry to send sample data with max_retry times"
 msgstr "尝试发送数据达到最大重试次数后仍失败"
 
-#, python-format
-msgid "Failed to send sample data: %s"
-msgstr "发送指标数据失败：%s"
+msgid "Passed resource dict must contain keys resource_id and resource_url."
+msgstr "传入的资源字典必须包含键resource_id和resource_url"
 
 #, python-format
 msgid "Required field %s not specified"

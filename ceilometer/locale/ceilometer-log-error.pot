@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 5.0.0.0b3.dev38\n"
+"Project-Id-Version: ceilometer 5.0.0.0b4.dev16\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-08-06 06:33+0000\n"
+"POT-Creation-Date: 2015-09-04 06:16+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,20 +17,20 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.0\n"
 
-#: ceilometer/collector.py:168
+#: ceilometer/collector.py:178
 #, python-format
 msgid "Dispatcher failed to handle the %s, requeue it."
 msgstr ""
 
-#: ceilometer/coordination.py:79 ceilometer/coordination.py:91
+#: ceilometer/coordination.py:76 ceilometer/coordination.py:88
 msgid "Error connecting to coordination backend."
 msgstr ""
 
-#: ceilometer/coordination.py:107
+#: ceilometer/coordination.py:103
 msgid "Error sending a heartbeat to coordination backend."
 msgstr ""
 
-#: ceilometer/coordination.py:177
+#: ceilometer/coordination.py:174
 msgid "Error getting group membership info from coordination backend."
 msgstr ""
 
@@ -39,7 +39,7 @@ msgstr ""
 msgid "Unable to load changed pipeline: %s"
 msgstr ""
 
-#: ceilometer/api/hooks.py:70
+#: ceilometer/api/hooks.py:68
 #, python-format
 msgid "Failed to connect to db, purpose %(purpose)s retry later: %(err)s"
 msgstr ""
@@ -64,22 +64,22 @@ msgstr ""
 msgid "Error processing event and it will be dropped: %s"
 msgstr ""
 
-#: ceilometer/dispatcher/gnocchi.py:149 ceilometer/meter/notifications.py:80
-#, python-format
-msgid "Parse error in JSONPath specification '%(jsonpath)s': %(err)s"
-msgstr ""
-
-#: ceilometer/dispatcher/gnocchi.py:161 ceilometer/meter/notifications.py:62
+#: ceilometer/dispatcher/gnocchi.py:117
 #, python-format
 msgid "Required field %s not specified"
 msgstr ""
 
-#: ceilometer/dispatcher/gnocchi.py:164
+#: ceilometer/dispatcher/gnocchi.py:120
 #, python-format
 msgid "Required field %(field)s should be a %(type)s"
 msgstr ""
 
-#: ceilometer/dispatcher/gnocchi.py:321
+#: ceilometer/dispatcher/gnocchi.py:132 ceilometer/meter/notifications.py:97
+#, python-format
+msgid "Parse error in JSONPath specification '%(jsonpath)s': %(err)s"
+msgstr ""
+
+#: ceilometer/dispatcher/gnocchi.py:327
 #, python-format
 msgid "Fail to post measures for %(resource_id)s/%(metric_name)s"
 msgstr ""
@@ -90,56 +90,85 @@ msgstr ""
 
 #: ceilometer/event/storage/impl_elasticsearch.py:110
 #: ceilometer/event/storage/impl_hbase.py:121
-#: ceilometer/event/storage/impl_sqlalchemy.py:199
-#: ceilometer/event/storage/impl_sqlalchemy.py:201
+#: ceilometer/event/storage/impl_sqlalchemy.py:203
+#: ceilometer/event/storage/impl_sqlalchemy.py:205
 #: ceilometer/event/storage/pymongo_base.py:69
 #, python-format
 msgid "Failed to record event: %s"
 msgstr ""
 
-#: ceilometer/meter/notifications.py:91
+#: ceilometer/hardware/pollsters/generic.py:70
 #, python-format
-msgid "Invalid type %s specified"
+msgid "Missing field %s"
 msgstr ""
 
-#: ceilometer/meter/notifications.py:105
+#: ceilometer/hardware/pollsters/generic.py:73
 #, python-format
-msgid "Meter Definitions configuration file: %s"
+msgid "Unrecognized type value %s"
 msgstr ""
 
-#: ceilometer/meter/notifications.py:115
+#: ceilometer/hardware/pollsters/generic.py:108
+msgid "Passed resource dict must contain keys resource_id and resource_url."
+msgstr ""
+
+#: ceilometer/hardware/pollsters/generic.py:127
+#, python-format
+msgid "Cannot load inspector %(name)s: %(err)s"
+msgstr ""
+
+#: ceilometer/hardware/pollsters/generic.py:150
+#, python-format
+msgid "Skip invalid resource %s"
+msgstr ""
+
+#: ceilometer/hardware/pollsters/generic.py:179
+#, python-format
+msgid "inspector call failed for %(ident)s host %(host)s: %(err)s"
+msgstr ""
+
+#: ceilometer/hardware/pollsters/generic.py:242
+#: ceilometer/meter/notifications.py:156
 #, python-format
 msgid ""
 "Invalid YAML syntax in Meter Definitions file %(file)s at line: %(line)s,"
 " column: %(column)s."
 msgstr ""
 
-#: ceilometer/meter/notifications.py:121
+#: ceilometer/hardware/pollsters/generic.py:248
+#: ceilometer/meter/notifications.py:162
 #, python-format
 msgid "YAML error reading Meter Definitions file %(file)s"
 msgstr ""
 
-#: ceilometer/meter/notifications.py:128
+#: ceilometer/meter/notifications.py:66
+msgid "Required field event_type not specified"
+msgstr ""
+
+#: ceilometer/meter/notifications.py:73
+#, python-format
+msgid "Invalid type %s specified"
+msgstr ""
+
+#: ceilometer/meter/notifications.py:146
+#, python-format
+msgid "Meter Definitions configuration file: %s"
+msgstr ""
+
+#: ceilometer/meter/notifications.py:169
 msgid "No Meter Definitions configuration file found! Using default config."
 msgstr ""
 
-#: ceilometer/meter/notifications.py:132
+#: ceilometer/meter/notifications.py:173
 #, python-format
 msgid "Meter Definitions: %s"
 msgstr ""
 
-#: ceilometer/publisher/kafka_broker.py:95
-#: ceilometer/publisher/kafka_broker.py:177
+#: ceilometer/publisher/kafka_broker.py:83
 #, python-format
 msgid "Failed to connect to Kafka service: %s"
 msgstr ""
 
-#: ceilometer/publisher/kafka_broker.py:158
+#: ceilometer/publisher/messaging.py:180
 msgid "Failed to retry to send sample data with max_retry times"
-msgstr ""
-
-#: ceilometer/publisher/kafka_broker.py:198
-#, python-format
-msgid "Failed to send sample data: %s"
 msgstr ""
 

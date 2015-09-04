@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-08-06 06:33+0000\n"
-"PO-Revision-Date: 2015-08-04 13:56+0000\n"
+"POT-Creation-Date: 2015-09-04 06:16+0000\n"
+"PO-Revision-Date: 2015-09-02 18:21+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: English (United Kingdom) (http://www.transifex.com/openstack/"
 "ceilometer/language/en_GB/)\n"
@@ -24,17 +24,8 @@ msgid "%(entity)s %(id)s Not Found"
 msgstr "%(entity)s %(id)s Not Found"
 
 #, python-format
-msgid "%(inspector)s does not provide data for  %(pollster)s"
-msgstr "%(inspector)s does not provide data for  %(pollster)s"
-
-#, python-format
 msgid "%(rule)s must be set for %(type)s type alarm"
 msgstr "%(rule)s must be set for %(type)s type alarm"
-
-#, python-format
-msgid "%(worker_name)s value of %(workers)s is invalid, must be greater than 0"
-msgstr ""
-"%(worker_name)s value of %(workers)s is invalid, must be greater than 0"
 
 #, python-format
 msgid "%d datapoints are unknown"
@@ -88,51 +79,16 @@ msgid "Alarms %(alarm_ids)s are in unknown state"
 msgstr "Alarms %(alarm_ids)s are in unknown state"
 
 #, python-format
-msgid "An error occurred while building %(m)s sample: %(e)s"
-msgstr "An error occurred while building %(m)s sample: %(e)s"
-
-#, python-format
 msgid "Arithmetic transformer must use at least one meter in expression '%s'"
 msgstr "Arithmetic transformer must use at least one meter in expression '%s'"
-
-#, python-format
-msgid ""
-"Attempted to evaluate alarm %s, but it is not within its time constraint."
-msgstr ""
-"Attempted to evaluate alarm %s, but it is not within its time constraint."
-
-#, python-format
-msgid "CPU UTIL: %(instance)s %(util)d"
-msgstr "CPU UTIL: %(instance)s %(util)d"
-
-#, python-format
-msgid "CPUTIME USAGE: %(instance)s %(time)d"
-msgstr "CPUTIME USAGE: %(instance)s %(time)d"
 
 #, python-format
 msgid "Can NOT load inspector %(name)s: %(err)s"
 msgstr "Can NOT load inspector %(name)s: %(err)s"
 
-msgid "Cannot delete table but ignoring error"
-msgstr "Cannot delete table but ignoring error"
-
-msgid "Cannot disable table but ignoring error"
-msgstr "Cannot disable table but ignoring error"
-
 #, python-format
 msgid "Cannot specify alarm %s itself in combination rule"
 msgstr "Cannot specify alarm %s itself in combination rule"
-
-#, python-format
-msgid "Checking CPU util for instance %s"
-msgstr "Checking CPU util for instance %s"
-
-#, python-format
-msgid "Checking memory usage for instance %s"
-msgstr "Checking memory usage for instance %s"
-
-msgid "Clearing expired metering data"
-msgstr "Clearing expired metering data"
 
 #, python-format
 msgid "Combined state of alarms %s"
@@ -144,10 +100,6 @@ msgstr "Configuration:"
 #, python-format
 msgid "Connecting to %(db)s on %(nodelist)s"
 msgstr "Connecting to %(db)s on %(nodelist)s"
-
-#, python-format
-msgid "Connecting to libvirt: %s"
-msgstr "Connecting to libvirt: %s"
 
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
@@ -168,12 +120,6 @@ msgstr "Could not get Memory Usage for %(id)s: %(e)s"
 #, python-format
 msgid "Could not get VM %s CPU Utilization"
 msgstr "Could not get VM %s CPU Utilisation"
-
-msgid "Creating a new in-memory HBase Connection object"
-msgstr "Creating a new in-memory HBase Connection object"
-
-msgid "Dropping HBase schema..."
-msgstr "Dropping HBase schema..."
 
 #, python-format
 msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
@@ -199,20 +145,8 @@ msgid "Event"
 msgstr "Event"
 
 #, python-format
-msgid "Event Definitions configuration file: %s"
-msgstr "Event Definitions configuration file: %s"
-
-#, python-format
 msgid "Event Definitions: %s"
 msgstr "Event Definitions: %s"
-
-#, python-format
-msgid "Event types from %(name)s: %(type)s (ack_on_error=%(error)s)"
-msgstr "Event types from %(name)s: %(type)s (ack_on_error=%(error)s)"
-
-#, python-format
-msgid "Exception while getting samples %s"
-msgstr "Exception while getting samples %s"
 
 msgid "Expression evaluated to a NaN value!"
 msgstr "Expression evaluated to a NaN value!"
@@ -238,10 +172,6 @@ msgid "Failed to record metering data: %s"
 msgstr "Failed to record metering data: %s"
 
 #, python-format
-msgid "Getting traits for %s"
-msgstr "Getting traits for %s"
-
-#, python-format
 msgid "Ignoring instance %(name)s: %(error)s"
 msgstr "Ignoring instance %(name)s: %(error)s"
 
@@ -261,21 +191,8 @@ msgstr ""
 msgid "Invalid trait type '%(type)s' for trait %(trait)s"
 msgstr "Invalid trait type '%(type)s' for trait %(trait)s"
 
-msgid "Kwapi endpoint not found"
-msgstr "Kwapi endpoint not found"
-
 msgid "Limit must be positive"
 msgstr "Limit must be positive"
-
-msgid "Limit should be positive"
-msgstr "Limit should be positive"
-
-msgid "Loading event definitions"
-msgstr "Loading event definitions"
-
-#, python-format
-msgid "MEMORY USAGE: %(instance)s %(usage)f"
-msgstr "MEMORY USAGE: %(instance)s %(usage)f"
 
 #, python-format
 msgid "More than one event with id %s returned from storage driver"
@@ -288,9 +205,6 @@ msgstr "Multiple VM %s found in XenServer"
 msgid "Must specify connection_url, and connection_password to use"
 msgstr "Must specify connection_url, and connection_password to use"
 
-msgid "No Event Definitions configuration file found! Using default config."
-msgstr "No Event Definitions configuration file found! Using default config."
-
 #, python-format
 msgid "No plugin named %(plugin)s available for trait %(trait)s"
 msgstr "No plugin named %(plugin)s available for trait %(trait)s"
@@ -300,31 +214,12 @@ msgid "Not Authorized to access %(aspect)s %(id)s"
 msgstr "Not Authorised to access %(aspect)s %(id)s"
 
 #, python-format
-msgid "Notifying alarm %(id)s with action %(act)s"
-msgstr "Notifying alarm %(id)s with action %(act)s"
-
-#, python-format
-msgid "Obtaining CPU Util is not implemented for %s"
-msgstr "Obtaining CPU Util is not implemented for %s"
-
-#, python-format
-msgid "Obtaining CPU time is not implemented for %s"
-msgstr "Obtaining CPU time is not implemented for %s"
-
-#, python-format
-msgid "Obtaining Memory Usage is not implemented for %s"
-msgstr "Obtaining Memory Usage is not implemented for %s"
-
-#, python-format
 msgid "OpenDaylitght API returned %(status)s %(reason)s"
 msgstr "OpenDaylitght API returned %(status)s %(reason)s"
 
 #, python-format
 msgid "Opencontrail API returned %(status)s %(reason)s"
 msgstr "Opencontrail API returned %(status)s %(reason)s"
-
-msgid "Opening in-memory HBase connection"
-msgstr "Opening in-memory HBase connection"
 
 #, python-format
 msgid ""
@@ -352,26 +247,12 @@ msgstr ""
 "%(smp)s"
 
 #, python-format
-msgid "Pipeline %(pipeline)s: Sample dropped by transformer %(trans)s"
-msgstr "Pipeline %(pipeline)s: Sample dropped by transformer %(trans)s"
-
-#, python-format
 msgid ""
 "Pipeline %(pipeline)s: Setup transformer instance %(name)s with parameter "
 "%(param)s"
 msgstr ""
 "Pipeline %(pipeline)s: Setup transformer instance %(name)s with parameter "
 "%(param)s"
-
-#, python-format
-msgid ""
-"Pipeline %(pipeline)s: Transform sample %(smp)s from %(trans)s transformer"
-msgstr ""
-"Pipeline %(pipeline)s: Transform sample %(smp)s from %(trans)s transformer"
-
-#, python-format
-msgid "Pipeline config file: %s"
-msgstr "Pipeline config file: %s"
 
 #, python-format
 msgid "Pipeline config: %s"
@@ -394,18 +275,6 @@ msgstr "Publishing policy is unknown (%s) force to default"
 #, python-format
 msgid "Publishing policy set to %s"
 msgstr "Publishing policy set to %s"
-
-#, python-format
-msgid "Publishing sample %(msg)s over UDP to %(host)s:%(port)d"
-msgstr "Publishing sample %(msg)s over UDP to %(host)s:%(port)d"
-
-#, python-format
-msgid "Query Meter Table: %s"
-msgstr "Query Meter Table: %s"
-
-#, python-format
-msgid "Query Resource table: %s"
-msgstr "Query Resource table: %s"
 
 #, python-format
 msgid ""
@@ -448,9 +317,6 @@ msgstr "Starting server in PID %s"
 msgid "String %s is not a valid isotime"
 msgstr "String %s is not a valid isotime"
 
-msgid "Swift endpoint not found"
-msgstr "Swift endpoint not found"
-
 #, python-format
 msgid ""
 "The data type %(type)s is not supported. The supported data type list is: "
@@ -484,10 +350,6 @@ msgstr "Transition to %(state)s due to alarms %(alarm_ids)s in state %(state)s"
 #, python-format
 msgid "UDP: Cannot decode data sent by %s"
 msgstr "UDP: Cannot decode data sent by %s"
-
-#, python-format
-msgid "UDP: Storing %s"
-msgstr "UDP: Storing %s"
 
 msgid "UDP: Unable to store meter"
 msgstr "UDP: Unable to store meter"
@@ -585,14 +447,6 @@ msgid "YAML error reading Event Definitions file %(file)s"
 msgstr "YAML error reading Event Definitions file %(file)s"
 
 #, python-format
-msgid ""
-"alarm %(alarm_id)s has no action configured for state transition from "
-"%(previous)s to state %(state)s, skipping the notification."
-msgstr ""
-"alarm %(alarm_id)s has no action configured for state transition from "
-"%(previous)s to state %(state)s, skipping the notification."
-
-#, python-format
 msgid "alarm %(id)s transitioning to %(state)s because %(reason)s"
 msgstr "alarm %(id)s transitioning to %(state)s because %(reason)s"
 
@@ -609,32 +463,6 @@ msgid "alarm stats retrieval failed"
 msgstr "alarm stats retrieval failed"
 
 #, python-format
-msgid "checking instance %s"
-msgstr "checking instance %s"
-
-#, python-format
-msgid "checking net info for instance %s"
-msgstr "checking net info for instance %s"
-
-msgid "clamping max timestamp to range"
-msgstr "clamping max timestamp to range"
-
-msgid "clamping min timestamp to range"
-msgstr "clamping min timestamp to range"
-
-#, python-format
-msgid "comparing value %(value)s against threshold %(limit)s"
-msgstr "comparing value %(value)s against threshold %(limit)s"
-
-#, python-format
-msgid "connecting to HBase on %(host)s:%(port)s"
-msgstr "connecting to HBase on %(host)s:%(port)s"
-
-#, python-format
-msgid "converted to: %s"
-msgstr "converted to: %s"
-
-#, python-format
 msgid "could not get CPU time for %(id)s: %(e)s"
 msgstr "could not get CPU time for %(id)s: %(e)s"
 
@@ -646,28 +474,12 @@ msgid "dropping sample with no predecessor: %s"
 msgstr "dropping sample with no predecessor: %s"
 
 #, python-format
-msgid "evaluating alarm %s"
-msgstr "evaluating alarm %s"
-
-#, python-format
-msgid "excluded weak datapoints with sample counts %s"
-msgstr "excluded weak datapoints with sample counts %s"
-
-#, python-format
-msgid "handling sample %s"
-msgstr "handling sample %s"
-
-#, python-format
 msgid "initiating evaluation cycle on %d alarms"
 msgstr "initiating evaluation cycle on %d alarms"
 
 #, python-format
 msgid "inspector call failed for %(ident)s host %(host)s: %(err)s"
 msgstr "inspector call failed for %(ident)s host %(host)s: %(err)s"
-
-#, python-format
-msgid "loading dispatchers from %s"
-msgstr "loading dispatchers from %s"
 
 msgid "max_bytes and backup_count should be numbers."
 msgstr "max_bytes and backup_count should be numbers."
@@ -677,34 +489,8 @@ msgid "message signature invalid, discarding message: %r"
 msgstr "message signature invalid, discarding message: %r"
 
 #, python-format
-msgid ""
-"metering data %(counter_name)s for %(resource_id)s @ %(timestamp)s: "
-"%(counter_volume)s"
-msgstr ""
-"metering data %(counter_name)s for %(resource_id)s @ %(timestamp)s: "
-"%(counter_volume)s"
-
-#, python-format
 msgid "metering data %(counter_name)s for %(resource_id)s: %(counter_volume)s"
 msgstr "metering data %(counter_name)s for %(resource_id)s: %(counter_volume)s"
-
-#, python-format
-msgid "pruned statistics to %d"
-msgstr "pruned statistics to %d"
-
-#, python-format
-msgid "query stats from %(start)s to %(now)s"
-msgstr "query stats from %(start)s to %(now)s"
-
-#, python-format
-msgid "sanitize stats %s"
-msgstr "sanitise stats %s"
-
-#, python-format
-msgid ""
-"scaling conversion transformer with source: %(source)s target: %(target)s:"
-msgstr ""
-"scaling conversion transformer with source: %(source)s target: %(target)s:"
 
 #, python-format
 msgid "serving on 0.0.0.0:%(sport)s, view at http://127.0.0.1:%(vport)s"
@@ -714,13 +500,5 @@ msgstr "serving on 0.0.0.0:%(sport)s, view at http://127.0.0.1:%(vport)s"
 msgid "serving on http://%(host)s:%(port)s"
 msgstr "serving on http://%(host)s:%(port)s"
 
-#, python-format
-msgid "skipping alarm %s: type unsupported"
-msgstr "skipping alarm %s: type unsupported"
-
 msgid "state invalid"
 msgstr "state invalid"
-
-#, python-format
-msgid "stats query %s"
-msgstr "stats query %s"

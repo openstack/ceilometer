@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-08-06 06:33+0000\n"
-"PO-Revision-Date: 2015-08-04 13:56+0000\n"
+"POT-Creation-Date: 2015-09-04 06:16+0000\n"
+"PO-Revision-Date: 2015-09-02 18:21+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/openstack/"
 "ceilometer/language/zh_CN/)\n"
@@ -28,14 +28,6 @@ msgid "%(entity)s %(id)s Not Found"
 msgstr "无法找到%(entity)s %(id)s "
 
 #, python-format
-msgid "%(inspector)s does not provide data for  %(pollster)s"
-msgstr "探测器%(inspector)s没有为%(pollster)s提供数据"
-
-#, python-format
-msgid "%(inspector)s does not provide data for %(pollster)s"
-msgstr "%(inspector)s无法为采集器%(pollster)s提供数据"
-
-#, python-format
 msgid "%(name)s count exceeds maximum value %(maximum)d"
 msgstr "%(name)s数量超过最大值%(maximum)d"
 
@@ -46,10 +38,6 @@ msgstr "类型为%(type)s的告警必须设置%(rule)s"
 #, python-format
 msgid "%(rule1)s and %(rule2)s cannot be set at the same time"
 msgstr "%(rule1)s和%(rule2)s无法同时被设置"
-
-#, python-format
-msgid "%(worker_name)s value of %(workers)s is invalid, must be greater than 0"
-msgstr "工作线程%(worker_name)s的数量%(workers)s非法，必须大于0"
 
 #, python-format
 msgid "%d datapoints are unknown"
@@ -94,25 +82,8 @@ msgid "Alarms %(alarm_ids)s are in unknown state"
 msgstr "告警%(alarm_ids)s处于未知的状态"
 
 #, python-format
-msgid "An error occurred while building %(m)s sample: %(e)s"
-msgstr "构造指标%(m)s的数据时遇到错误：%(e)s"
-
-#, python-format
 msgid "Arithmetic transformer must use at least one meter in expression '%s'"
 msgstr "算术变形器在表达式'%s'中必须至少使用一个指标"
-
-#, python-format
-msgid ""
-"Attempted to evaluate alarm %s, but it is not within its time constraint."
-msgstr "尝试评估告警%s，但是该告警当前不在激活的时间范围内"
-
-#, python-format
-msgid "CPU UTIL: %(instance)s %(util)d"
-msgstr "虚拟机%(instance)s的CPU使用率为%(util)d"
-
-#, python-format
-msgid "CPUTIME USAGE: %(instance)s %(time)d"
-msgstr "虚拟机%(instance)s的CPU时间为%(time)d"
 
 #, python-format
 msgid "Can NOT load inspector %(name)s: %(err)s"
@@ -122,38 +93,9 @@ msgstr "无法加载探测器%(name)s: %(err)s"
 msgid "Cannot create table %(table_name)s   it already exists. Ignoring error"
 msgstr "表%(table_name)s已经存在，无法创建。忽略此错误继续执行。"
 
-msgid "Cannot delete table but ignoring error"
-msgstr "无法删除表，但是忽略该错误"
-
-msgid "Cannot disable table but ignoring error"
-msgstr "无法禁用表，但是忽略该错误"
-
 #, python-format
 msgid "Cannot specify alarm %s itself in combination rule"
 msgstr "无法在组合规则中指定告警%s自身"
-
-#, python-format
-msgid "Checking CPU util for instance %s"
-msgstr "为虚拟机%s查询CPU使用率"
-
-#, python-format
-msgid "Checking memory usage for instance %s"
-msgstr "为虚拟机%s检查内存使用信息"
-
-#, python-format
-msgid "Checking resident memory for instance %s"
-msgstr "正在检查虚拟机%s的常驻内存RSS"
-
-msgid "Clearing expired event data"
-msgstr "正在清除过期的事件数据"
-
-msgid "Clearing expired metering data"
-msgstr "正在清除过期的监控数据"
-
-msgid ""
-"Clearing expired metering data is based on native MongoDB time to live "
-"feature and going in background."
-msgstr "MongoDB正在后台使用原生的TTL机制清除过期监控数据。"
 
 #, python-format
 msgid "Combined state of alarms %s"
@@ -165,13 +107,6 @@ msgstr "配置"
 #, python-format
 msgid "Connecting to %(db)s on %(nodelist)s"
 msgstr "连接到%(nodelist)s节点的数据库%(db)s。"
-
-#, python-format
-msgid "Connecting to libvirt: %s"
-msgstr "正在连接 libvirt：%s"
-
-msgid "Connection to libvirt broken"
-msgstr "无法连接到libvirt"
 
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
@@ -197,16 +132,10 @@ msgstr "无法获取虚拟机%s的CPU使用率"
 msgid "Couldn't obtain IP address of instance %s"
 msgstr "无法为实例%s获取IP地址"
 
-msgid "Creating a new in-memory HBase Connection object"
-msgstr "正在创建一个新的内存HBase连接对象。"
-
 msgid ""
 "Dispatcher target was not set, no meter will be posted. Set the target in "
 "the ceilometer.conf file"
 msgstr "分发器目标未设置，没有指标将被发送。在ceilometer.conf文件中设置目标。"
-
-msgid "Dropping HBase schema..."
-msgstr "正在丢弃HBase的schema"
 
 #, python-format
 msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
@@ -236,16 +165,8 @@ msgid "Event"
 msgstr "事件"
 
 #, python-format
-msgid "Event Definitions configuration file: %s"
-msgstr "事件定义配置文件：%s"
-
-#, python-format
 msgid "Event Definitions: %s"
 msgstr "事件定义：%s"
-
-#, python-format
-msgid "Exception while getting samples %s"
-msgstr "在获取监控数据时遇到异常：%s"
 
 msgid "Expression evaluated to a NaN value!"
 msgstr "表达式计算结果为NaN！"
@@ -314,10 +235,6 @@ msgid "Filter expression not valid: %s"
 msgstr "过滤表达式不合法：%s"
 
 #, python-format
-msgid "Getting traits for %s"
-msgstr "正在为%s获取特征"
-
-#, python-format
 msgid "Ignoring instance %(name)s (%(instance_id)s) : %(error)s"
 msgstr "忽略虚拟机%(name)s (%(instance_id)s) : %(error)s"
 
@@ -343,25 +260,8 @@ msgstr "非法的间隔%(period)s: %(err)s"
 msgid "Invalid trait type '%(type)s' for trait %(trait)s"
 msgstr "特征%(trait)s包含了不合法的特征类型'%(type)s' "
 
-msgid "Kwapi endpoint not found"
-msgstr "Kwapi端点无法找到"
-
 msgid "Limit must be positive"
 msgstr "limit必须是正数"
-
-msgid "Limit should be positive"
-msgstr "limit必须是正整数"
-
-msgid "Loading event definitions"
-msgstr "正在加载事件定义"
-
-#, python-format
-msgid "MEMORY USAGE: %(instance)s %(usage)f"
-msgstr "虚拟机%(instance)s的内存使用为%(usage)f"
-
-#, python-format
-msgid "Message posting finished with status code %d."
-msgstr "消息发送结束，状态码为%d"
 
 #, python-format
 msgid "More than one event with id %s returned from storage driver"
@@ -373,9 +273,6 @@ msgstr "多个虚拟机%s在XenServer中被找到"
 
 msgid "Must specify connection_url, and connection_password to use"
 msgstr "使用时必须指定connection_url和connection_password"
-
-msgid "No Event Definitions configuration file found! Using default config."
-msgstr "没有找到事件定义配置文件！使用默认的配置。"
 
 #, python-format
 msgid "No plugin named %(plugin)s available for trait %(trait)s"
@@ -397,31 +294,12 @@ msgstr ""
 "从%(previous)s变为%(current)s，动作为%(action)s，原因是%(reason)s。"
 
 #, python-format
-msgid "Notifying alarm %(id)s with action %(act)s"
-msgstr "使用动作%(act)s通知告警%(id)s"
-
-#, python-format
-msgid "Obtaining CPU Util is not implemented for %s"
-msgstr "为%s获取CPU使用率尚未实现"
-
-#, python-format
-msgid "Obtaining CPU time is not implemented for %s"
-msgstr "为%s获取CPU时间尚未实现"
-
-#, python-format
-msgid "Obtaining Memory Usage is not implemented for %s"
-msgstr "获取内存使用信息尚未在%s中实现"
-
-#, python-format
 msgid "OpenDaylitght API returned %(status)s %(reason)s"
 msgstr "OpenDaylight接口返回状态%(status)s，原因%(reason)s"
 
 #, python-format
 msgid "Opencontrail API returned %(status)s %(reason)s"
 msgstr "Opencontrail接口返回状态%(status)s，原因%(reason)s"
-
-msgid "Opening in-memory HBase connection"
-msgstr "正在打开内存HBase连接。"
 
 #, python-format
 msgid "Order-by expression not valid: %s"
@@ -448,31 +326,14 @@ msgid ""
 msgstr "流水线%(pipeline)s：数据%(smp)s的变形器%(trans)s遇到错误，退出"
 
 #, python-format
-msgid "Pipeline %(pipeline)s: Sample dropped by transformer %(trans)s"
-msgstr "流水线%(pipeline)s：数据点被变形器%(trans)s丢弃"
-
-#, python-format
 msgid ""
 "Pipeline %(pipeline)s: Setup transformer instance %(name)s with parameter "
 "%(param)s"
 msgstr "流水线%(pipeline)s：使用参数%(param)s初始化变形器实例%(name)s"
 
 #, python-format
-msgid ""
-"Pipeline %(pipeline)s: Transform sample %(smp)s from %(trans)s transformer"
-msgstr "流水线%(pipeline)s：使用变形器%(trans)s作用于数据%(smp)s "
-
-#, python-format
-msgid "Pipeline config file: %s"
-msgstr "流水线配置文件：%s"
-
-#, python-format
 msgid "Pipeline config: %s"
 msgstr "流水线配置：%s"
-
-#, python-format
-msgid "Pipeline endpoint: %s"
-msgstr " 流水线入口：%s"
 
 #, python-format
 msgid "Plugin specified, but no plugin name supplied for trait %s"
@@ -508,23 +369,8 @@ msgid "Publishing policy set to %s"
 msgstr "设置发布策略为%s"
 
 #, python-format
-msgid "Publishing sample %(msg)s over UDP to %(host)s:%(port)d"
-msgstr "通过UDP发布采样 %(msg)s 至 %(host)s:%(port)d"
-
-#, python-format
-msgid "Query Meter Table: %s"
-msgstr "查询指标表：%s"
-
-#, python-format
-msgid "Query Resource table: %s"
-msgstr "查询资源表：%s"
-
-#, python-format
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
 msgstr "RGW AdminOps接口返回%(status)s %(reason)s"
-
-msgid "Radosgw endpoint not found"
-msgstr "Radosgw服务入口未找到"
 
 #, python-format
 msgid ""
@@ -564,10 +410,6 @@ msgid "Skip loading extension for %s"
 msgstr "跳过为%s加载扩展"
 
 #, python-format
-msgid "Skip polling pollster %s, no resources found"
-msgstr "没有任何资源被发现，跳过采集器%s"
-
-#, python-format
 msgid "Skipping because %s service is not registered in keystone"
 msgstr "跳过执行，因为%s服务没有在keystone中注册"
 
@@ -578,9 +420,6 @@ msgstr "正在启动服务进程PID %s"
 #, python-format
 msgid "String %s is not a valid isotime"
 msgstr "字符串%s不是个合法的标准时间格式"
-
-msgid "Swift endpoint not found"
-msgstr "Swift端点无法找到"
 
 #, python-format
 msgid ""
@@ -613,10 +452,6 @@ msgstr "迁移到状态%(state)s，因为告警%(alarm_ids)s处于状态%(state)
 #, python-format
 msgid "UDP: Cannot decode data sent by %s"
 msgstr "UDP: 无法解码由 %s 发送的数据"
-
-#, python-format
-msgid "UDP: Storing %s"
-msgstr "UDP: 正在存储%s"
 
 msgid "UDP: Unable to store meter"
 msgstr "UDP: 无法存储计量器"
@@ -744,14 +579,6 @@ msgid "You are not authorized to create action: %s"
 msgstr "你没有权限创建动作：%s"
 
 #, python-format
-msgid ""
-"alarm %(alarm_id)s has no action configured for state transition from "
-"%(previous)s to state %(state)s, skipping the notification."
-msgstr ""
-"告警%(alarm_id)s没有为状态从%(previous)s变迁到%(state)s配置动作，忽略收到的通"
-"知。"
-
-#, python-format
 msgid "alarm %(id)s transitioning to %(state)s because %(reason)s"
 msgstr "因为 %(reason)s, 警报 %(id)s 转换至 %(state)s "
 
@@ -772,26 +599,6 @@ msgid "alarm stats retrieval failed: %s"
 msgstr "告警状态检索失败：%s"
 
 #, python-format
-msgid "checking instance %s"
-msgstr "正在检查虚拟机%s"
-
-#, python-format
-msgid "checking net info for instance %s"
-msgstr "为虚拟机%s检查网络信息"
-
-#, python-format
-msgid "comparing value %(value)s against threshold %(limit)s"
-msgstr "将值 %(value)s 与阈值 %(limit)s 相比较"
-
-#, python-format
-msgid "connecting to HBase on %(host)s:%(port)s"
-msgstr "正在连接%(host)s:%(port)s的HBase"
-
-#, python-format
-msgid "converted to: %s"
-msgstr "转换为: %s"
-
-#, python-format
 msgid "could not get CPU time for %(id)s: %(e)s"
 msgstr "无法为虚拟机%(id)s获取CPU时间：%(e)s"
 
@@ -807,27 +614,11 @@ msgid "duplicate actions are found: %s, remove duplicate ones"
 msgstr "检测到重复的动作：%s，已去除重复的内容"
 
 #, python-format
-msgid "evaluating alarm %s"
-msgstr "评估警报 %s"
-
-#, python-format
-msgid "excluded weak datapoints with sample counts %s"
-msgstr "排除%s个弱相关的数据"
-
-#, python-format
-msgid "handling sample %s"
-msgstr "正在处理数据%s"
-
-#, python-format
 msgid "initiating evaluation cycle on %d alarms"
 msgstr "在 %d 个警报上初始化评估周期"
 
 msgid "ipmitool output length mismatch"
 msgstr "ipmi输出长度不匹配"
-
-#, python-format
-msgid "loading dispatchers from %s"
-msgstr "正在从%s加载分发器"
 
 msgid "max_bytes and backup_count should be numbers."
 msgstr "max_bytes和backup_count必须是整数。"
@@ -835,14 +626,6 @@ msgstr "max_bytes和backup_count必须是整数。"
 #, python-format
 msgid "message signature invalid, discarding message: %r"
 msgstr "消息签名不合法，丢弃消息：%r"
-
-#, python-format
-msgid ""
-"metering data %(counter_name)s for %(resource_id)s @ %(timestamp)s: "
-"%(counter_volume)s"
-msgstr ""
-"在时间点%(timestamp)s为资源%(resource_id)s获得指标%(counter_name)s的监控数"
-"据：%(counter_volume)s"
 
 #, python-format
 msgid "metering data %(counter_name)s for %(resource_id)s: %(counter_volume)s"
@@ -855,25 +638,8 @@ msgstr "解析IPMI传感器数据失败，从给定的输入中无法检索到�
 msgid "parse IPMI sensor data failed,unknown sensor type"
 msgstr "解析IPMI传感器数据失败，未知的传感器类型"
 
-#, python-format
-msgid "pruned statistics to %d"
-msgstr "裁剪统计信息到%d个"
-
-#, python-format
-msgid "query stats from %(start)s to %(now)s"
-msgstr "查询 %(start)s 到 %(now)s 之间的统计信息"
-
 msgid "running ipmitool failure"
 msgstr "运行ipmitool时失败了"
-
-#, python-format
-msgid "sanitize stats %s"
-msgstr "审查统计信息 %s"
-
-#, python-format
-msgid ""
-"scaling conversion transformer with source: %(source)s target: %(target)s:"
-msgstr "扩缩变形器作用于来源：%(source)s，目标：%(target)s"
 
 #, python-format
 msgid "serving on 0.0.0.0:%(sport)s, view at http://127.0.0.1:%(vport)s"
@@ -884,19 +650,11 @@ msgstr ""
 msgid "serving on http://%(host)s:%(port)s"
 msgstr "在 http://%(host)s:%(port)s上服务"
 
-#, python-format
-msgid "skipping alarm %s: type unsupported"
-msgstr "跳过警报 %s：不支持的类型"
-
 msgid "state invalid"
 msgstr "状态无效"
 
 msgid "state_timestamp should be datetime object"
 msgstr "state_timestamp必须是datetime对象"
-
-#, python-format
-msgid "stats query %s"
-msgstr "统计信息查询 %s"
 
 msgid "timestamp should be datetime object"
 msgstr "timestamp必须是datatime对象"

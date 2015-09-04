@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-08-06 06:33+0000\n"
-"PO-Revision-Date: 2015-07-24 13:32+0000\n"
+"POT-Creation-Date: 2015-09-04 06:16+0000\n"
+"PO-Revision-Date: 2015-09-03 19:17+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/openstack/"
 "ceilometer/language/zh_CN/)\n"
@@ -36,19 +36,10 @@ msgid "Expecting %(expected)d datapoints but only get %(actual)d"
 msgstr "预期有 %(expected)d个数据但是只得到%(actual)d个"
 
 #, python-format
-msgid "Failed to publish %d datum"
-msgstr "%d个数据发送失败"
-
-#, python-format
 msgid ""
 "Instance %(instance_id)s was shut off while getting samples of %(pollster)s: "
 "%(exc)s"
 msgstr "采集器%(pollster)s在采集数据点时，虚拟机%(instance_id)s被关闭：%(exc)s"
-
-#, python-format
-msgid ""
-"Kafka Publisher max local queue length is exceeded, dropping %d oldest data"
-msgstr "Kafka发布器本地队列超过本地最大长度，正在丢弃%d个最老的数据"
 
 #, python-format
 msgid "No endpoints found for service %s"
@@ -60,10 +51,6 @@ msgid ""
 msgstr ""
 "非计量指标也许会被收集。强烈建议在ceilometer.conf或者pipeline.yaml中禁用这些"
 "指标"
-
-#, python-format
-msgid "Publishing policy is unknown (%s) force to default"
-msgstr "未知的发布策略(%s)，强制使用默认策略"
 
 #, python-format
 msgid "message signature invalid, discarding message: %r"
