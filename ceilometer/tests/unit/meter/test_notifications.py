@@ -385,6 +385,25 @@ class TestMeterProcessing(test.BaseTestCase):
         self.assertEqual(MIDDLEWARE_EVENT['payload']['eventTime'],
                          s1['timestamp'])
 
+    def test_custom_timestamp_expr_meter(self):
+        cfg = yaml.dump(
+            {'metric': [dict(name='compute.node.cpu.frequency',
+                        event_type="compute.metrics.update",
+                        type='gauge',
+                        unit="ns",
+                        volume="$.payload.metrics[?(@.name='cpu.frequency')]"
+                               ".value",
+                        resource_id="'prefix-' + $.payload.nodename",
+                        timestamp="$.payload.metrics"
+                                  "[?(@.name='cpu.frequency')].timestamp")]})
+        self.handler.definitions = notifications.load_definitions(
+            self.__setup_meter_def_file(cfg))
+        c = list(self.handler.process_notification(METRICS_UPDATE))
+        self.assertEqual(1, len(c))
+        s1 = c[0].as_dict()
+        self.assertEqual('compute.node.cpu.frequency', s1['name'])
+        self.assertEqual("2013-07-29T06:51:34.472416", s1['timestamp'])
+
     def test_default_metadata(self):
         cfg = yaml.dump(
             {'metric': [dict(name="test1",

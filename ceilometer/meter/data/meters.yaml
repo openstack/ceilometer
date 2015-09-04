@@ -139,6 +139,11 @@ metric:
     unit: 'MHz'
     volume: $.payload.metrics[?(@.name='cpu.frequency')].value
     resource_id: $.payload.host + "_" + $.payload.nodename
+    timestamp: $.payload.metrics[?(@.name='cpu.frequency')].timestamp
+    metadata:
+      event_type: $.event_type
+      host: $.publisher_id
+      source: $.payload.metrics[?(@.name='cpu.frequency')].source
 
   - name: 'compute.node.cpu.user.time'
     event_type: 'compute.metrics.update'
@@ -146,6 +151,11 @@ metric:
     unit: 'ns'
     volume: $.payload.metrics[?(@.name='cpu.user.time')].value
     resource_id: $.payload.host + "_" + $.payload.nodename
+    timestamp: $.payload.metrics[?(@.name='cpu.user.time')].timestamp
+    metadata:
+      event_type: $.event_type
+      host: $.publisher_id
+      source: $.payload.metrics[?(@.name='cpu.user.time')].source
 
   - name: 'compute.node.cpu.kernel.time'
     event_type: 'compute.metrics.update'
@@ -153,6 +163,11 @@ metric:
     unit: 'ns'
     volume: $.payload.metrics[?(@.name='cpu.kernel.time')].value
     resource_id: $.payload.host + "_" + $.payload.nodename
+    timestamp: $.payload.metrics[?(@.name='cpu.kernel.time')].timestamp
+    metadata:
+      event_type: $.event_type
+      host: $.publisher_id
+      source: $.payload.metrics[?(@.name='cpu.kernel.time')].source
 
   - name: 'compute.node.cpu.idle.time'
     event_type: 'compute.metrics.update'
@@ -160,6 +175,11 @@ metric:
     unit: 'ns'
     volume: $.payload.metrics[?(@.name='cpu.idle.time')].value
     resource_id: $.payload.host + "_" + $.payload.nodename
+    timestamp: $.payload.metrics[?(@.name='cpu.idle.time')].timestamp
+    metadata:
+      event_type: $.event_type
+      host: $.publisher_id
+      source: $.payload.metrics[?(@.name='cpu.idle.time')].source
 
   - name: 'compute.node.cpu.iowait.time'
     event_type: 'compute.metrics.update'
@@ -167,6 +187,11 @@ metric:
     unit: 'ns'
     volume: $.payload.metrics[?(@.name='cpu.iowait.time')].value
     resource_id: $.payload.host + "_" + $.payload.nodename
+    timestamp: $.payload.metrics[?(@.name='cpu.iowait.time')].timestamp
+    metadata:
+      event_type: $.event_type
+      host: $.publisher_id
+      source: $.payload.metrics[?(@.name='cpu.iowait.time')].source
 
   - name: 'compute.node.cpu.kernel.percent'
     event_type: 'compute.metrics.update'
@@ -174,6 +199,11 @@ metric:
     unit: 'percent'
     volume: $.payload.metrics[?(@.name='cpu.kernel.percent')].value * 100
     resource_id: $.payload.host + "_" + $.payload.nodename
+    timestamp: $.payload.metrics[?(@.name='cpu.kernel.percent')].timestamp
+    metadata:
+      event_type: $.event_type
+      host: $.publisher_id
+      source: $.payload.metrics[?(@.name='cpu.kernel.percent')].source
 
   - name: 'compute.node.cpu.idle.percent'
     event_type: 'compute.metrics.update'
@@ -181,6 +211,11 @@ metric:
     unit: 'percent'
     volume: $.payload.metrics[?(@.name='cpu.idle.percent')].value * 100
     resource_id: $.payload.host + "_" + $.payload.nodename
+    timestamp: $.payload.metrics[?(@.name='cpu.idle.percent')].timestamp
+    metadata:
+      event_type: $.event_type
+      host: $.publisher_id
+      source: $.payload.metrics[?(@.name='cpu.idle.percent')].source
 
   - name: 'compute.node.cpu.user.percent'
     event_type: 'compute.metrics.update'
@@ -188,6 +223,11 @@ metric:
     unit: 'percent'
     volume: $.payload.metrics[?(@.name='cpu.user.percent')].value * 100
     resource_id: $.payload.host + "_" + $.payload.nodename
+    timestamp: $.payload.metrics[?(@.name='cpu.user.percent')].timestamp
+    metadata:
+      event_type: $.event_type
+      host: $.publisher_id
+      source: $.payload.metrics[?(@.name='cpu.user.percent')].source
 
   - name: 'compute.node.cpu.iowait.percent'
     event_type: 'compute.metrics.update'
@@ -195,6 +235,11 @@ metric:
     unit: 'percent'
     volume: $.payload.metrics[?(@.name='cpu.iowait.percent')].value * 100
     resource_id: $.payload.host + "_" + $.payload.nodename
+    timestamp: $.payload.metrics[?(@.name='cpu.iowait.percent')].timestamp
+    metadata:
+      event_type: $.event_type
+      host: $.publisher_id
+      source: $.payload.metrics[?(@.name='cpu.iowait.percent')].source
 
   - name: 'compute.node.cpu.percent'
     event_type: 'compute.metrics.update'
@@ -202,6 +247,11 @@ metric:
     unit: 'percent'
     volume: $.payload.metrics[?(@.name='cpu.percent')].value * 100
     resource_id: $.payload.host + "_" + $.payload.nodename
+    timestamp: $.payload.metrics[?(@.name='cpu.percent')].timestamp
+    metadata:
+      event_type: $.event_type
+      host: $.publisher_id
+      source: $.payload.metrics[?(@.name='cpu.percent')].source
 
 
 # NOTE: non-metric meters are generally events/existence meters
