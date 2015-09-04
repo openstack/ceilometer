@@ -39,6 +39,12 @@ class PollingException(Exception):
     pass
 
 
+class TestPollsterBuilder(agentbase.TestPollster):
+    @classmethod
+    def build_pollsters(cls):
+        return [('builder1', cls()), ('builder2', cls())]
+
+
 @mock.patch('ceilometer.compute.pollsters.'
             'BaseComputePollster.setup_environment',
             mock.Mock(return_value=None))
@@ -125,6 +131,36 @@ class TestManager(base.BaseTestCase):
                           manager.AgentManager,
                           pollster_list=['disk.*'])
         manager.cfg.CONF.reset()
+
+    def test_builder(self):
+        @staticmethod
+        def fake_get_ext_mgr(namespace):
+            if 'builder' in namespace:
+                return extension.ExtensionManager.make_test_instance(
+                    [
+                        extension.Extension('builder',
+                                            None,
+                                            TestPollsterBuilder,
+                                            None),
+                    ]
+                )
+            else:
+                return extension.ExtensionManager.make_test_instance(
+                    [
+                        extension.Extension('test',
+                                            None,
+                                            None,
+                                            agentbase.TestPollster()),
+                    ]
+                )
+
+        with mock.patch.object(manager.AgentManager, '_get_ext_mgr',
+                               new=fake_get_ext_mgr):
+            mgr = manager.AgentManager(namespaces=['central'])
+            self.assertEqual(3, len(mgr.extensions))
+            for ext in mgr.extensions:
+                self.assertIn(ext.name, ['builder1', 'builder2', 'test'])
+                self.assertIsInstance(ext.obj, agentbase.TestPollster)
 
 
 class TestPollsterKeystone(agentbase.TestPollster):
