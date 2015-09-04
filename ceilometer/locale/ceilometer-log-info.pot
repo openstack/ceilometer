@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 5.0.0.0b2.dev138\n"
+"Project-Id-Version: ceilometer 5.0.0.0b4.dev16\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-07-29 06:34+0000\n"
+"POT-Creation-Date: 2015-09-04 06:16+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,21 +17,21 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.0\n"
 
-#: ceilometer/coordination.py:76
+#: ceilometer/coordination.py:74
 msgid "Coordination backend started successfully."
 msgstr ""
 
-#: ceilometer/coordination.py:126
+#: ceilometer/coordination.py:123
 #, python-format
 msgid "Joined partitioning group %s"
 msgstr ""
 
-#: ceilometer/coordination.py:144
+#: ceilometer/coordination.py:141
 #, python-format
 msgid "Left partitioning group %s"
 msgstr ""
 
-#: ceilometer/notification.py:254
+#: ceilometer/notification.py:273
 msgid "Reloading notification agent and listeners."
 msgstr ""
 
@@ -43,7 +43,7 @@ msgstr ""
 msgid "Detected change in pipeline configuration."
 msgstr ""
 
-#: ceilometer/agent/base.py:394
+#: ceilometer/agent/base.py:419
 msgid "Reconfiguring polling tasks."
 msgstr ""
 
@@ -75,7 +75,7 @@ msgid "Nothing to clean, database alarm history time to live is disabled"
 msgstr ""
 
 #: ceilometer/event/storage/impl_elasticsearch.py:107
-#: ceilometer/event/storage/impl_sqlalchemy.py:197
+#: ceilometer/event/storage/impl_sqlalchemy.py:201
 #: ceilometer/event/storage/pymongo_base.py:67
 #, python-format
 msgid "Duplicate event detected, skipping it: %s"
@@ -86,13 +86,13 @@ msgstr ""
 msgid "Dropping event data with TTL %d"
 msgstr ""
 
-#: ceilometer/event/storage/impl_sqlalchemy.py:415
+#: ceilometer/event/storage/impl_sqlalchemy.py:427
 #, python-format
 msgid "%d events are removed from database"
 msgstr ""
 
-#: ceilometer/publisher/kafka_broker.py:86
+#: ceilometer/hardware/pollsters/generic.py:254
 #, python-format
-msgid "Publishing policy set to %s"
+msgid "Meter Definitions: %s"
 msgstr ""
 

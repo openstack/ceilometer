@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 5.0.0.0b2.dev138\n"
+"Project-Id-Version: ceilometer 5.0.0.0b4.dev16\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-07-29 06:35+0000\n"
+"POT-Creation-Date: 2015-09-04 06:16+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,10 +17,25 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.0\n"
 
-#: ceilometer/notification.py:173
+#: ceilometer/notification.py:184
 msgid ""
 "Non-metric meters may be collected. It is highly advisable to disable "
 "these meters using ceilometer.conf or the pipeline.yaml"
+msgstr ""
+
+#: ceilometer/pipeline.py:584
+#, python-format
+msgid ""
+"metering data %(counter_name)s for %(resource_id)s @ %(timestamp)s has no"
+" volume (volume: None), the sample will be dropped"
+msgstr ""
+
+#: ceilometer/pipeline.py:597
+#, python-format
+msgid ""
+"metering data %(counter_name)s for %(resource_id)s @ %(timestamp)s has "
+"volume which is not a number (volume: %(counter_volume)s), the sample "
+"will be dropped"
 msgstr ""
 
 #: ceilometer/agent/discovery/endpoint.py:42
@@ -33,7 +48,7 @@ msgstr ""
 msgid "Expecting %(expected)d datapoints but only get %(actual)d"
 msgstr ""
 
-#: ceilometer/api/app.py:83
+#: ceilometer/api/app.py:81
 msgid ""
 "pecan_debug cannot be enabled, if workers is > 1, the value is overrided "
 "with False"
@@ -88,20 +103,8 @@ msgstr ""
 msgid "message signature invalid, discarding message: %r"
 msgstr ""
 
-#: ceilometer/publisher/kafka_broker.py:88
+#: ceilometer/hardware/pollsters/generic.py:66
 #, python-format
-msgid "Publishing policy is unknown (%s) force to default"
-msgstr ""
-
-#: ceilometer/publisher/kafka_broker.py:149
-#, python-format
-msgid "Failed to publish %d datum"
-msgstr ""
-
-#: ceilometer/publisher/kafka_broker.py:170
-#, python-format
-msgid ""
-"Kafka Publisher max local queue length is exceeded, dropping %d oldest "
-"data"
+msgid "Ignore unrecognized field %s"
 msgstr ""
 

@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-08-06 06:33+0000\n"
-"PO-Revision-Date: 2015-07-31 22:06+0000\n"
+"POT-Creation-Date: 2015-09-04 06:16+0000\n"
+"PO-Revision-Date: 2015-09-03 19:17+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: English (United Kingdom) (http://www.transifex.com/openstack/"
 "ceilometer/language/en_GB/)\n"
@@ -40,3 +40,7 @@ msgstr "Failed to record metering data: %s"
 #, python-format
 msgid "Required field %s not specified"
 msgstr "Required field %s not specified"
+
+#, python-format
+msgid "inspector call failed for %(ident)s host %(host)s: %(err)s"
+msgstr "inspector call failed for %(ident)s host %(host)s: %(err)s"
