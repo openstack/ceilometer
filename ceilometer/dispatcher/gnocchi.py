@@ -291,6 +291,8 @@ class GnocchiDispatcher(dispatcher.Base):
                 LOG.warn("metric %s is not handled by gnocchi" %
                          metric_name)
                 continue
+            if rd.cfg.get("ignore"):
+                continue
 
             resource_type = rd.cfg['resource_type']
             resource = {
