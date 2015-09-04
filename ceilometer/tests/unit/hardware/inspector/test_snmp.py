@@ -72,7 +72,6 @@ class TestSNMPInspector(test_base.BaseTestCase):
         super(TestSNMPInspector, self).setUp()
         self.inspector = snmp.SNMPInspector()
         self.host = netutils.urlsplit("snmp://localhost")
-        self.inspector.MAPPING = self.mapping
         self.useFixture(mockpatch.PatchObject(
             self.inspector._cmdGen, 'getCmd', new=faux_getCmd_new))
         self.useFixture(mockpatch.PatchObject(
@@ -91,9 +90,10 @@ class TestSNMPInspector(test_base.BaseTestCase):
         self.assertRaises(snmp.SNMPException,
                           get_list,
                           self.inspector.inspect_generic,
-                          self.host,
-                          'test_exact',
-                          {})
+                          host=self.host,
+                          cache={},
+                          extra_metadata={},
+                          param=self.mapping['test_exact'])
 
     @staticmethod
     def _fake_post_op(host, cache, meter_def, value, metadata, extra, suffix):
@@ -105,8 +105,9 @@ class TestSNMPInspector(test_base.BaseTestCase):
         self.inspector._fake_post_op = self._fake_post_op
         cache = {}
         ret = list(self.inspector.inspect_generic(self.host,
-                                                  'test_exact',
-                                                  cache))
+                                                  cache,
+                                                  {},
+                                                  self.mapping['test_exact']))
         keys = cache[ins._CACHE_KEY_OID].keys()
         self.assertIn('1.3.6.1.4.1.2021.10.1.3.1', keys)
         self.assertIn('1.3.6.1.4.1.2021.10.1.3.8', keys)
@@ -119,8 +120,9 @@ class TestSNMPInspector(test_base.BaseTestCase):
     def test_inspect_generic_prefix(self):
         cache = {}
         ret = list(self.inspector.inspect_generic(self.host,
-                                                  'test_prefix',
-                                                  cache))
+                                                  cache,
+                                                  {},
+                                                  self.mapping['test_prefix']))
         keys = cache[ins._CACHE_KEY_OID].keys()
         self.assertIn('1.3.6.1.4.1.2021.9.1.8' + '.1', keys)
         self.assertIn('1.3.6.1.4.1.2021.9.1.8' + '.2', keys)
@@ -134,15 +136,20 @@ class TestSNMPInspector(test_base.BaseTestCase):
         self.useFixture(mockpatch.PatchObject(
             self.inspector._cmdGen, 'bulkCmd', new=faux_bulkCmd_new))
         cache = {}
-        metadata = {}
+        metadata = dict(name='lo',
+                        speed=0,
+                        mac='ba21e43302fe')
+        extra = {}
         ret = self.inspector._post_op_net(self.host, cache, None,
                                           value=8,
                                           metadata=metadata,
-                                          extra={},
+                                          extra=extra,
                                           suffix=".2")
         self.assertEqual(8, ret)
         self.assertIn('ip', metadata)
         self.assertIn("2", metadata['ip'])
+        self.assertIn('resource_id', extra)
+        self.assertEqual("localhost.lo", extra['resource_id'])
 
     def test_post_op_disk(self):
         cache = {}
