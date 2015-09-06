@@ -171,7 +171,7 @@ class ExtensionLoadError(Exception):
 
 
 class PollsterPermanentError(Exception):
-    """Permenant error when polling.
+    """Permanent error when polling.
 
     When unrecoverable error happened in polling, pollster can raise this
     exception with failed resource to prevent itself from polling any more.

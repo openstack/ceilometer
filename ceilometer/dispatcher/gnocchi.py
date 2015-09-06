@@ -234,7 +234,7 @@ class GnocchiDispatcher(dispatcher.Base):
                     project = self._ks_client.tenants.find(
                         name=self.conf.dispatcher_gnocchi.filter_project)
                 except Exception:
-                    LOG.exception('fail to retreive user of Gnocchi service')
+                    LOG.exception('fail to retrieve user of Gnocchi service')
                     raise
                 self._gnocchi_project_id = project.id
                 LOG.debug("gnocchi project found: %s", self.gnocchi_project_id)

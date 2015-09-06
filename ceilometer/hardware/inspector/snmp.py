@@ -67,8 +67,8 @@ class SNMPInspector(base.Inspector):
 
     _CACHE_KEY_OID = "snmp_cached_oid"
 
-    # NOTE: The folloing mapping has been moved to the yaml file identified by
-    # the config options hardware.meter_definitions_file. However, we still
+    # NOTE: The following mapping has been moved to the yaml file identified
+    # by the config options hardware.meter_definitions_file. However, we still
     # keep the description here for code reading purpose.
 
     """
