@@ -45,7 +45,7 @@ def enforce_limit(limit):
         if limit is None:
             limit = cfg.CONF.api.default_api_return_limit
             LOG.info(_LI('No limit value provided, result set will be'
-                         'limited to %(limit)d.'), {'limit': limit})
+                         ' limited to %(limit)d.'), {'limit': limit})
         if not limit or limit <= 0:
             raise base.ClientSideError(_("Limit must be positive"))
         return limit
