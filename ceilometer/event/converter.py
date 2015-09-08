@@ -278,7 +278,7 @@ class NotificationEventsConverter(object):
                 Examples:
 
                 * ['compute.instance.exists'] will only match
-                  compute.intance.exists notifications
+                  compute.instance.exists notifications
                 * "compute.instance.exists"   Same as above.
                 * ["image.create", "image.delete"]  will match
                   image.create and image.delete, but not anything else.

@@ -106,9 +106,10 @@ class ResourcesDefinition(object):
     JSONPATH_RW_PARSER = parser.ExtentedJsonPathParser()
 
     def __init__(self, definition_cfg, default_archive_policy,
-                 legacy_archive_policy_defintion):
+                 legacy_archive_policy_definition):
         self._default_archive_policy = default_archive_policy
-        self._legacy_archive_policy_defintion = legacy_archive_policy_defintion
+        self._legacy_archive_policy_definition =\
+            legacy_archive_policy_definition
         self.cfg = definition_cfg
 
         for field, field_type in self.MANDATORY_FIELDS.items():
@@ -164,7 +165,7 @@ class ResourcesDefinition(object):
         for t in self.cfg['metrics']:
             archive_policy = self.cfg.get(
                 'archive_policy',
-                self._legacy_archive_policy_defintion.get(t))
+                self._legacy_archive_policy_definition.get(t))
             metrics[t] = dict(archive_policy_name=archive_policy or
                               self._default_archive_policy)
         return metrics
