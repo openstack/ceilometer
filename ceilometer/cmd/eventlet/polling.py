@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 #
-# Copyright 2014 OpenStack Foundation
+# Copyright 2014-2015 OpenStack Foundation
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -75,20 +75,3 @@ def main():
     service.prepare_service()
     os_service.launch(CONF, manager.AgentManager(CONF.polling_namespaces,
                                                  CONF.pollster_list)).wait()
-
-
-# todo(dbelova): remove it someday. Needed for backward compatibility
-def main_compute():
-    service.prepare_service()
-    os_service.launch(CONF, manager.AgentManager(['compute'])).wait()
-
-
-# todo(dbelova): remove it someday. Needed for backward compatibility
-def main_central():
-    service.prepare_service()
-    os_service.launch(CONF, manager.AgentManager(['central'])).wait()
-
-
-def main_ipmi():
-    service.prepare_service()
-    os_service.launch(CONF, manager.AgentManager(['ipmi'])).wait()

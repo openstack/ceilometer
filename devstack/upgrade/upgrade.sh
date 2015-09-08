@@ -74,7 +74,14 @@ $CEILOMETER_BIN_DIR/ceilometer-dbsync || die $LINENO "DB sync error"
 start_ceilometer
 
 # Note these are process names, not service names
-ensure_services_started ceilometer-agent-ipmi ceilometer-agent-compute ceilometer-agent-central ceilometer-agent-notification ceilometer-alarm-evaluator ceilometer-alarm-notifier ceilometer-api ceilometer-collector
+ensure_services_started "ceilometer-polling --polling-namespaces compute" \
+                        "ceilometer-polling --polling-namespaces central" \
+                        "ceilometer-polling --polling-namespaces ipmi" \
+                        ceilometer-agent-notification \
+                        ceilometer-alarm-evaluator \
+                        ceilometer-alarm-notifier \
+                        ceilometer-api \
+                        ceilometer-collector
 
 # Save mongodb state (replace with snapshot)
 if grep -q 'connection *= *mongo' /etc/ceilometer/ceilometer.conf; then
