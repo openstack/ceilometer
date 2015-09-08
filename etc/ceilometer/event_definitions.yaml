@@ -96,6 +96,12 @@
       fields: payload.snapshot_id
     volume_id:
       fields: payload.volume_id
+- event_type: ['image_volume_cache.*']
+  traits:
+    image_id:
+      fields: payload.image_id
+    host:
+      fields: payload.host
 - event_type: ['image.update', 'image.upload', 'image.delete']
   traits: &glance_crud
     project_id:
